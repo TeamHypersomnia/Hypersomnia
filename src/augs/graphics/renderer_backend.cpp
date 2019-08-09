@@ -303,6 +303,8 @@ namespace augs {
 #else
 			(void)c;
 			(void)n;
+			(void)output;
+			(void)dedicated;
 #endif
 		}
 

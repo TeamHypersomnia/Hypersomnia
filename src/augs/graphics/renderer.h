@@ -11,9 +11,9 @@
 
 #include "augs/graphics/dedicated_buffers.h"
 
-using render_command_buffer = std::vector<augs::graphics::renderer_command>;
-
 namespace augs {
+	using render_command_buffer = std::vector<augs::graphics::renderer_command>;
+
 	namespace graphics {
 		class texture;
 

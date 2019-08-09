@@ -535,6 +535,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/graphics/renderer_backend.cpp"
 	"src/augs/graphics/shader.cpp"
 	"src/augs/graphics/vertex.cpp"
+	"src/augs/audio/audio_backend.cpp"
 	"src/augs/gui/dragger.cpp"
 	"src/augs/gui/rect_world.cpp"
 	"src/augs/gui/text/caret.cpp"

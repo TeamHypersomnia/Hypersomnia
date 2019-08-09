@@ -21,14 +21,12 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "view/audiovisual_state/flashbang_math.h"
 
-#if BUILD_OPENAL
-#include <AL/al.h>
-#include <AL/alc.h>
-#include <AL/alext.h>
-#include <AL/efx.h>
-#endif
-
 struct shouldnt_play {};
+
+void augs::update_multiple_properties::update(augs::sound_source_proxy_data& data) {
+	data.last_pitch = pitch;
+	data.last_gain = gain;
+}
 
 std::optional<transformr> sound_system::update_properties_input::find_transform(const absolute_or_local& positioning) const {
 	return ::find_transform(positioning, get_listener().get_cosmos(), interp);
@@ -43,27 +41,41 @@ void sound_system::clear() {
 	fading_sources.clear();
 	firearm_engine_caches.clear();
 	continuous_sound_caches.clear();
+	id_pool.reset();
 }
 
-void sound_system::start_fading(generic_sound_cache& cache, const float fade_per_sec) {
-	if (container_full(fading_sources)) {
-		return;
+void sound_system::generic_sound_cache::stop_and_free(const update_properties_input& in) {
+	{
+		const auto proxy = get_proxy(in);
+		proxy.stop();
 	}
 
-	auto& source = cache.source;
+	in.owner.id_pool.free(source.id);
+}
 
-	if (source.is_playing()) {
-		fading_sources.push_back({ cache.original.input.id, std::move(source), fade_per_sec });
+bool sound_system::start_fading(generic_sound_cache& cache, const float fade_per_sec) {
+	if (!container_full(fading_sources)) {
+		if (cache.probably_still_playing()) {
+			fading_sources.push_back({ cache.original.input.id, std::move(cache.source), fade_per_sec });
+			return true;
+		}
 	}
+
+	return false;
 }
 
 void sound_system::clear_sources_playing(const assets::sound_id id) {
-	erase_if(fading_sources, [id](const fading_source& source) {
-		return id == source.id;
+	auto and_free_proxy_id = [&](const augs::sound_source_proxy_id& id) {
+		id_pool.free(id);
+		return true;
+	};
+
+	erase_if(fading_sources, [&](const fading_source& f) {
+		return id == f.id && and_free_proxy_id(f.source.id);
 	});
 	
-	auto linear_erase = [id](const generic_sound_cache& it) {
-		return id == it.original.input.id;
+	auto linear_erase = [id, and_free_proxy_id](const generic_sound_cache& it) {
+		return id == it.original.input.id && and_free_proxy_id(it.source.id);
 	};
 
 	auto map_erase = [linear_erase](const auto& it) {
@@ -73,18 +85,17 @@ void sound_system::clear_sources_playing(const assets::sound_id id) {
 	erase_if(short_sounds, linear_erase);
 	erase_if(firearm_engine_caches, map_erase);
 	erase_if(continuous_sound_caches, map_erase);
-
-	flash_noise_source.stop();
-	flash_noise_source.unbind_buffer();
 }
 
 void sound_system::update_listener(
+	const augs::audio_renderer& renderer,
 	const const_entity_handle listener,
 	const interpolation_system& sys,
 	const sound_system_settings& settings,
 	const vec2 world_screen_center
 ) {
-	const auto si = listener.get_cosmos().get_si();
+	augs::update_listener_properties cmd;
+
 	const auto character_transform = listener.get_viewing_transform(sys);
 
 	{
@@ -96,10 +107,10 @@ void sound_system::update_listener(
 			character_pos
 		;
 
-		augs::set_listener_position(si, listener_pos);
+		cmd.position = listener_pos;
 	}
 
-	augs::set_listener_velocity(si, listener.get_effective_velocity());
+	cmd.velocity = listener.get_effective_velocity();
 
 	vec2 orientation = vec2(0, -1.f);
 
@@ -108,7 +119,10 @@ void sound_system::update_listener(
 		orientation.rotate(character_transform.rotation);
 	}
 
-	augs::set_listener_orientation({ 0.f, -1.f, 0.f, orientation.x, 0.f, orientation.y });
+	cmd.si = listener.get_cosmos().get_si();
+	cmd.orientation = orientation;
+	
+	renderer.push_command(cmd);
 }
 
 void sound_system::generic_sound_cache::init(update_properties_input in) {
@@ -123,13 +137,16 @@ void sound_system::generic_sound_cache::init(update_properties_input in) {
 	update_properties(in);
 	previous_transform = in.find_transform(positioning);
 
-	source.play();
+	const auto proxy = get_proxy(in);
+	proxy.play();
 }
 
 sound_system::generic_sound_cache::generic_sound_cache(
+	const augs::sound_source_proxy_id proxy_id,
 	const packaged_sound_effect& original,
 	const update_properties_input in
 ) : 
+	source(proxy_id),
 	original(original),
 	positioning(original.start.positioning)
 {
@@ -137,9 +154,11 @@ sound_system::generic_sound_cache::generic_sound_cache(
 }
 
 sound_system::generic_sound_cache::generic_sound_cache(
+	const augs::sound_source_proxy_id proxy_id,
 	const packaged_multi_sound_effect& multi,
 	const update_properties_input in
 ) :
+	source(proxy_id),
 	positioning(multi.start.positioning),
 	followup_inputs(multi.inputs)
 {
@@ -153,13 +172,18 @@ sound_system::generic_sound_cache::generic_sound_cache(
 	init(in);
 }
 
-void sound_system::generic_sound_cache::bind(const augs::sound_buffer& buf) {
-	source.bind_buffer(buf, original.start.variation_number);
+augs::sound_source_proxy sound_system::generic_sound_cache::get_proxy(const update_properties_input& in) {
+	return { in.renderer, source };
+}
+
+void sound_system::generic_sound_cache::bind(const update_properties_input& in, const augs::sound_buffer& buf) {
+	const auto proxy = get_proxy(in);
+	proxy.bind_buffer(buf, original.start.variation_number);
 }
 
 bool sound_system::generic_sound_cache::rebind_buffer(const update_properties_input in) {
 	if (auto buf = mapped_or_nullptr(in.manager, original.input.id)) {
-		bind(*buf);
+		bind(in, *buf);
 		return true;
 	}
 
@@ -187,6 +211,11 @@ void sound_system::generic_sound_cache::eat_followup() {
 void sound_system::generic_sound_cache::update_properties(const update_properties_input in) {
 	const auto listening_character = in.get_listener();
 
+	const auto& input = original.input;
+	const auto& m = input.modifier;
+
+	elapsed_secs += in.dt.in_seconds() * m.pitch * in.speed_multiplier;
+
 	if (listening_character.dead()) {
 		return;
 	}
@@ -201,12 +230,9 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	;
 
 	const auto& cosm = listening_character.get_cosmos();
-	const auto si = cosm.get_si();
 	const auto maybe_transform = in.find_transform(positioning);
 
-	if (!maybe_transform) {
-		source.set_gain(0.f);
-	}
+	augs::update_multiple_properties cmd;
 
 	const auto current_transform = *maybe_transform;
 
@@ -214,7 +240,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	const auto& defaults = common.default_sound_properties;
 
 	if (is_direct_listener) {
-		source.set_air_absorption_factor(0.f);
+		cmd.air_absorption_factor = 0.f;
 	}
 	else {
 #if 0
@@ -223,11 +249,8 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		const auto dist_from_listener = (listener_pos - current_transform.pos).length();
 		const auto absorption = 1.f + 0 * std::min(10.f, 3 * static_cast<float>(pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2)));
 #endif
-		source.set_air_absorption_factor(std::clamp(defaults.air_absorption, 0.f, 10.f));
+		cmd.air_absorption_factor = std::clamp(defaults.air_absorption, 0.f, 10.f);
 	}
-
-	const auto& input = original.input;
-	const auto& m = input.modifier;
 
 	if (previous_transform && !is_direct_listener && !(in.dt == augs::delta::zero)) {
 		const bool interp_enabled = in.interp.is_enabled();
@@ -247,7 +270,8 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 		if (!m.disable_velocity) {
 			if (interp_enabled || when_set_velocity != cosm.get_timestamp()) {
-				source.set_velocity(si, effective_velocity);
+				cmd.set_velocity = true;
+				cmd.velocity = effective_velocity;
 			}
 		}
 
@@ -283,7 +307,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const auto mult_via_settings = [&]() {
 		if (original.input.modifier.always_direct_listener) {
-			if (const auto buf = source.get_bound_buffer_meta(); buf.is_set()) {
+			if (const auto buf = source.buffer_meta; buf.is_set()) {
 				if (buf.computed_length_in_seconds > in.settings.treat_as_music_sounds_longer_than_secs) {
 					return in.volume.music;
 				}
@@ -295,22 +319,11 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const auto flash_mult = in.owner.get_effective_flash_mult();
 
-#if BUILD_OPENAL
-	if (flash_mult > 0.f) {
-		if (const auto filter_id = in.owner.get_lowpass_filter()) {
-			alFilterf(*filter_id, AL_LOWPASS_GAINHF, 1.f - flash_mult);
-			alSourcei(source.get_id(), AL_DIRECT_FILTER, *filter_id);
-		}
-	}
-	else {
-		alSourcei(source.get_id(), AL_DIRECT_FILTER, AL_FILTER_NULL);
-	}
-#endif
-
 	float custom_dist_gain_mult = 1.f;
 
+
 	if (is_linear) {
-		source.set_max_distance(si, max_dist);
+
 	}
 	else if (is_nonlinear && !is_direct_listener && listening_character) {
 		/* Let's just do our custom gain calculation */
@@ -322,32 +335,30 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		}
 
 		custom_dist_gain_mult *= custom_dist_gain_mult;
-
-		//source.set_max_distance(si, max_dist);
-		//source.set_rolloff_factor(std::max(0.f, defaults.basic_nonlinear_rolloff * (ref_dist / max_dist)));
 	}
 
-	source.set_pitch(m.pitch * in.speed_multiplier);
-	source.set_gain(std::clamp((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * std::clamp(mult_via_settings, 0.f, 1.f) * custom_dist_gain_mult, 0.f, 1.f));
-	source.set_reference_distance(si, ref_dist);
-	source.set_looping(m.repetitions == -1);
-	source.set_distance_model(dist_model);
-	source.set_doppler_factor(std::max(0.f, m.doppler_factor));
-
-	source.set_spatialize(!is_direct_listener);
-	source.set_direct_channels(is_direct_listener);
-
-	if (is_direct_listener) {
-		source.set_relative_and_zero_vel_pos();
+	if (flash_mult > 0.f) {
+		cmd.lowpass_gainhf = 1.f - flash_mult;
 	}
-	else {
-		source.set_relative(false);
-		source.set_position(si, current_transform.pos);
-	}
+
+	cmd.proxy_id = source.id;
+	cmd.si = cosm.get_si();
+	cmd.position = current_transform.pos;
+	cmd.gain = std::clamp((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * std::clamp(mult_via_settings, 0.f, 1.f) * custom_dist_gain_mult, 0.f, 1.f);
+	cmd.pitch = m.pitch * in.speed_multiplier;
+	cmd.doppler_factor = std::max(0.f, m.doppler_factor);
+	cmd.reference_distance = ref_dist;
+	cmd.max_distance = max_dist;
+	cmd.looping = m.repetitions == -1;
+	cmd.model = dist_model;
+	cmd.is_direct_listener = is_direct_listener;
+	cmd.update(source);
+
+	in.renderer.push_command(cmd);
 }
 
 void sound_system::generic_sound_cache::maybe_play_next(update_properties_input in) {
-	if (source.is_playing()) {
+	if (probably_still_playing()) {
 		return;
 	}
 
@@ -355,17 +366,28 @@ void sound_system::generic_sound_cache::maybe_play_next(update_properties_input 
 		return;
 	}
 
+	const auto proxy = get_proxy(in);
 	eat_followup();
-	source.stop();
+
+	proxy.stop();
+	elapsed_secs = 0.f;
 
 	if (rebind_buffer(in)) {
 		update_properties(in);
-		source.play();
+		proxy.play();
 	}
 }
 
-bool sound_system::generic_sound_cache::still_playing() const {
-	return source.is_playing() || followup_inputs.size() > 0;
+bool sound_system::generic_sound_cache::probably_still_playing() const {
+	const auto& input = original.input;
+	const auto& m = input.modifier;
+	const auto reps = m.repetitions;
+
+	if (reps < 0) {
+		return true;
+	}
+
+	return elapsed_secs <= source.buffer_meta.computed_length_in_seconds * reps;
 }
 
 void sound_system::update_effects_from_messages(const const_logic_step step, const update_properties_input in) {
@@ -373,7 +395,7 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 		const auto& events = step.get_queue<messages::stop_sound_effect>();
 
 		for (auto& e : events) {
-			erase_if(short_sounds, [&](generic_sound_cache& c){	
+			erase_if(short_sounds, [&](generic_sound_cache& c) {	
 				if (const auto m = e.match_chased_subject) {
 					if (*m != c.positioning.target) { 
 						return false;
@@ -387,7 +409,12 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				}
 
 				if (c.original.input.modifier.fade_on_exit) {
-					start_fading(c);
+					if (!start_fading(c)) {
+						c.stop_and_free(in);
+					}
+				}
+				else {
+					id_pool.free(c.source.id);
 				}
 
 				return true;
@@ -434,19 +461,26 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				}
 			}
 
-			try {
-				if (!container_full(short_sounds)) {
-					short_sounds.emplace_back(e.payload, in);
-				}
-			}
-			catch (const effect_not_found&) {
+				if (!id_pool.full()) {
+					const auto new_id = id_pool.allocate();
 
+				auto release_id = [&]() {
+					id_pool.free(new_id);
+				};
+
+				try {
+					short_sounds.emplace_back(new_id, e.payload, in);
+				}
+			catch (const effect_not_found&) {
+					release_id();
 			}
 			catch (const shouldnt_play&) {
-
+					release_id();
 			}
 			catch (const augs::too_many_sound_sources_error& err) {
 				LOG("Warning: maxmimum number of sound sources reached at sound_system.cpp.");
+					release_id();
+				}
 			}
 		}
 	};
@@ -456,16 +490,6 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 }
 
 void sound_system::advance_flash(const const_entity_handle listener, const augs::delta dt) {
-#if BUILD_OPENAL
-	if (lowpass_filter_id == std::nullopt) {
-		ALuint id;
-		alGenFilters(1, &id);
-		alFilteri(id, AL_FILTER_TYPE, AL_FILTER_LOWPASS);
-
-		lowpass_filter_id = id;
-	}
-#endif
-
 	if (listener.dead()) {
 		return;
 	}
@@ -502,15 +526,13 @@ void sound_system::advance_flash(const const_entity_handle listener, const augs:
 }
 
 void sound_system::update_sound_properties(const update_properties_input in) {
-#if 0
-	auto queried_size = cone.visible_world_area;
-	queried_size.set(10000.f, 10000.f);
-#endif
+	const auto& renderer = in.renderer;
 	const auto listening_character = in.get_listener();
 
 	const auto screen_center = in.camera.get_world_screen_center();
 
 	update_listener(
+		in.renderer,
 		listening_character, 
 		in.interp, 
 		in.settings,
@@ -527,18 +549,10 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		const auto effect = cosm.get_common_assets().flash_noise_sound;
 
 		if (auto buf = mapped_or_nullptr(in.manager, effect.id)) {
-			auto& source = flash_noise_source;
-
-			if (!source.is_playing()) {
-				source.bind_buffer(*buf, 0);
-				source.set_spatialize(false);
-				source.set_direct_channels(true);
-				source.set_relative_and_zero_vel_pos();
-				source.set_looping(true);
-				source.play();
-			}
-
-			source.set_gain(last_mult * in.volume.sound_effects);
+			augs::update_flash_noise cmd;
+			cmd.buffer = buf;
+			cmd.gain = last_mult * in.volume.sound_effects;
+			renderer.push_command(cmd);
 		}
 	}
 
@@ -551,20 +565,28 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 					existing->cache.original = *sound;
 
 					if (!existing->cache.rebind_buffer(in)) {
-						fade_and_erase(firearm_engine_caches, id);
+						fade_and_erase(in, firearm_engine_caches, id);
 					}
 				}
 				else {
-					try {
-						firearm_engine_caches.try_emplace(id, continuous_sound_cache { { *sound, in }, { gun_entity.get_name() } });
-					}
-					catch (...) {
+						if (!id_pool.full()) {
+							const auto new_id = id_pool.allocate();
 
+						auto release_id = [&]() {
+							id_pool.free(new_id);
+						};
+
+						try {
+							firearm_engine_caches.try_emplace(id, continuous_sound_cache { { new_id, *sound, in }, { gun_entity.get_name() } });
+						}
+					catch (...) {
+							release_id();
+						}
 					}
 				}
 			}
 			else {
-				fade_and_erase(firearm_engine_caches, id);
+				fade_and_erase(in, firearm_engine_caches, id);
 			}
 		}
 	);
@@ -573,6 +595,11 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		[&](const auto sound_entity) {
 			const auto id = sound_entity.get_id().to_unversioned();
 			const auto& continuous_sound = sound_entity.template get<invariants::continuous_sound>();
+
+			if (!continuous_sound.effect.id.is_set()) {
+				fade_and_erase(in, continuous_sound_caches, id);
+				return;
+			}
 
 			packaged_sound_effect sound;
 
@@ -584,12 +611,12 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			if (const auto item = sound_entity.template find<components::item>()) {
 				if (const auto slot = sound_entity.get_current_slot(); slot.alive()) {
 					if (!slot.is_hand_slot()) {
-						fade_and_erase(continuous_sound_caches, id);
+						fade_and_erase(in, continuous_sound_caches, id);
 						return;
 					}
 
 					if (sound_entity.find_colliders_connection() == nullptr) {
-						fade_and_erase(continuous_sound_caches, id);
+						fade_and_erase(in, continuous_sound_caches, id);
 						return;
 					}
 				}
@@ -599,15 +626,23 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				existing->cache.original = sound;
 
 				if (!existing->cache.rebind_buffer(in)) {
-					fade_and_erase(continuous_sound_caches, id);
+					fade_and_erase(in, continuous_sound_caches, id);
 				}
 			}
 			else {
-				try {
-					continuous_sound_caches.try_emplace(id, continuous_sound_cache { { sound, in }, { sound_entity.get_name() } } );
-				}
-				catch (...) {
+					if (!id_pool.full()) {
+						const auto new_id = id_pool.allocate();
 
+					auto release_id = [&]() {
+						id_pool.free(new_id);
+					};
+
+					try {
+						continuous_sound_caches.try_emplace(id, continuous_sound_cache { { new_id, sound, in }, { sound_entity.get_name() } } );
+					}
+				catch (...) {
+						release_id();
+					}
 				}
 			}
 		}
@@ -617,7 +652,14 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		cache.update_properties(in);
 		cache.maybe_play_next(in);
 
-		return !cache.still_playing();
+		const bool still_playing_or_has_followup = cache.probably_still_playing() || cache.followup_inputs.size() > 0;
+		return !still_playing_or_has_followup;
+	};
+
+	auto fade_or_stop = [&](auto& c) {
+		if (!start_fading(c)) {
+			c.stop_and_free(in);
+		}
 	};
 
 	erase_if(firearm_engine_caches, [&](auto& it) {
@@ -627,16 +669,22 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		auto& cache = it.second.cache;
 
 		if (handle.dead()) {
-			start_fading(cache);
+			fade_or_stop(cache);
 			return true;
 		}
 
 		if (recorded.name != handle.get_name()) {
-			start_fading(cache);
+			fade_or_stop(cache);
 			return true;
 		}
 
-		return update_facade(cache);
+		const bool result = update_facade(cache);
+
+		if (result) {
+			id_pool.free(cache.source.id);
+		}
+
+		return result;
 	});
 
 	auto can_have_continuous_sound = [&](const auto handle) {
@@ -651,11 +699,11 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		return false;
 	};
 
-	auto reseek = [&](const auto& subject, const auto& cache) {
+	auto reseek_if_diverged = [&](const auto& subject, const auto& cache) {
 		const auto& source = cache.source;
 		const auto& m = cache.original.input.modifier;
 
-		if (const auto buf = source.get_bound_buffer_meta(); buf.is_set()) {
+		if (const auto buf = source.buffer_meta; buf.is_set()) {
 			const auto secs = buf.computed_length_in_seconds;
 
 			if (secs > in.settings.sync_sounds_longer_than_secs) {
@@ -682,13 +730,13 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				}();
 
 				const auto max_divergence = in.settings.max_divergence_before_sync_secs;
-				const auto actual_secs = source.get_time_in_seconds();
 
-				//LOG_NVPS(subject, expected_secs, actual_secs);
-
-				if (std::abs(expected_secs - actual_secs) > max_divergence) {
-					source.seek_to(expected_secs);
-				}
+				augs::reseek_to_sync_if_needed cmd;
+				cmd.proxy_id = source.id;
+				cmd.expected_secs = expected_secs;
+				cmd.max_divergence = max_divergence;
+				
+				renderer.push_command(cmd);
 			}
 		}
 	};
@@ -700,24 +748,28 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		auto& cache = it.second.cache;
 
 		if (handle.dead()) {
-			start_fading(cache);
+			fade_or_stop(cache);
 			return true;
 		}
 
 		if (!can_have_continuous_sound(handle)) {
-			start_fading(cache);
+			fade_or_stop(cache);
 			return true;
 		}
 
 		if (recorded.name != handle.get_name()) {
-			start_fading(cache);
+			fade_or_stop(cache);
 			return true;
 		}
 
 		const auto result = update_facade(cache);
 
 		if (!result) {
-			reseek(cosm[it.first], cache);
+			reseek_if_diverged(cosm[it.first], cache);
+		}
+
+		if (result) {
+			id_pool.free(cache.source.id);
 		}
 
 		return result;
@@ -728,35 +780,44 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 
 		const auto logical_subject = cosm[in.positioning.target];
 
-		auto request_erase = [&]() {
-			start_fading(cache);
+		auto erase_by_fade = [&]() {
+			fade_or_stop(cache);
 			return true;
 		};
 
 		if (!logical_subject) {
 			if (in.clear_when_target_entity_deleted) {
-				return request_erase();
+				return erase_by_fade();
 			}
 		}
 		else {
 			if (in.clear_when_target_alive) {
 				if (::sentient_and_alive(logical_subject)) {
-					return request_erase();
+					return erase_by_fade();
 				}
 			}
 
 			if (in.clear_when_target_conscious) {
 				if (::sentient_and_conscious(logical_subject)) {
-					return request_erase();
+					return erase_by_fade();
 				}
 			}
 		}
 
-		return update_facade(cache);
+		const bool result = update_facade(cache);
+
+		if (result) {
+			id_pool.free(cache.source.id);
+		}
+
+		return result;
 	});
 }
 
-void sound_system::fade_sources(const augs::delta dt) {
+void sound_system::fade_sources(
+	const augs::audio_renderer& renderer,
+	const augs::delta dt
+) {
 	erase_if (collision_sound_cooldowns, [&](auto& it) {
 		auto& c = it.second;
 
@@ -769,21 +830,23 @@ void sound_system::fade_sources(const augs::delta dt) {
 		return false;
 	});
 
-	erase_if(fading_sources, [dt](fading_source& f) {
-		auto& source = f.source;
+	erase_if(fading_sources, [this, dt, &renderer](fading_source& f) {
+		const auto proxy = augs::sound_source_proxy { renderer, f.source };
 
-		const auto new_gain = source.get_gain() - dt.in_seconds() * f.fade_per_sec;
-		const auto new_pitch = source.get_pitch() - dt.in_seconds() * f.fade_per_sec;
+		const auto new_gain = proxy.get_gain() - dt.in_seconds() * f.fade_per_sec;
+		const auto new_pitch = proxy.get_pitch() - dt.in_seconds() * f.fade_per_sec;
 
 		if (new_pitch > 0.1f) {
-			source.set_pitch(new_pitch);
+			proxy.set_pitch(new_pitch);
 		}
 
 		if (new_gain > 0.f) {
-			source.set_gain(new_gain);
+			proxy.set_gain(new_gain);
 			return false;
 		}
 
+		proxy.stop();
+		id_pool.free(f.source.id);
 		return true;
 	});
 }

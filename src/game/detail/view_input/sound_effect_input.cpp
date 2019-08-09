@@ -10,6 +10,10 @@ void sound_effect_input::start(
 	const sound_effect_start_input start,
 	const predictability_info info
 ) const {
+	if (!id.is_set()) {
+		return;
+	}
+
 	auto msg = messages::start_sound_effect(info);
 	auto& p = msg.payload;
 

@@ -117,6 +117,4 @@ using sound_effect_input_vector = augs::constant_size_vector<sound_effect_input,
 struct packaged_multi_sound_effect {
 	sound_effect_input_vector inputs;
 	sound_effect_start_input start;
-
-	void post(const_logic_step step, predictability_info info) const;
 };

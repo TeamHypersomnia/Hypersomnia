@@ -120,7 +120,7 @@ namespace augs {
 #endif
 	}
 
-	void sound_source::set_distance_model(const distance_model model) {
+	void sound_source::set_distance_model(const distance_model model) const {
 #if BUILD_OPENAL
 		ALint resolved;
 
@@ -307,10 +307,14 @@ namespace augs {
 		LOG_NVPS(buf.get_id());
 #endif
 
+		const auto new_meta = buf.get_meta();
+
 		if (previous_seconds) {
 			play();
-			seek_to(*previous_seconds);
+			//seek_to(std::min(new_meta.computed_length_in_seconds, static_cast<double>(*previous_seconds)));
 		}
+
+		buffer_meta = new_meta;
 	}
 
 	void sound_source::bind_buffer(

@@ -27,6 +27,7 @@
 #include "augs/graphics/dedicated_buffers.h"
 #include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
 #include "view/audiovisual_state/systems/wandering_pixels_system.hpp"
+#include "augs/audio/audio_command_buffers.h"
 
 void audiovisual_state::clear() {
 	systems.for_each([](auto& sys) {
@@ -67,6 +68,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	}
 
 	const auto& anims = input.plain_animations;
+	const auto audio_renderer = input.audio_renderer;
 
 	auto& rng = get_rng();
 
@@ -239,7 +241,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto& sound_freq = input.sound_settings.processing_frequency;
 	const bool sound_every_step = sound_freq == sound_processing_frequency::EVERY_SIMULATION_STEP;
 
-	auto update_sound_properties = [sound_every_step, scaled_state_dt, viewed_character, dt, input, &sounds, &interp, input_camera]() {
+	auto update_sound_properties = [audio_renderer, sound_every_step, scaled_state_dt, viewed_character, dt, input, &sounds, &interp, input_camera]() {
 		if (viewed_character.dead()) {
 			return;
 		}
@@ -249,6 +251,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		
 		sounds.update_sound_properties(
 			{
+				*audio_renderer,
 				sounds,
 				input.audio_volume,
 				input.sound_settings,
@@ -263,15 +266,19 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		);
 	};
 
-	auto fade_sound_sources = [sound_every_step, &sounds, frame_dt, state_dt]() {
-		sounds.fade_sources(sound_every_step ? *state_dt : frame_dt);
+	auto fade_sound_sources = [audio_renderer, sound_every_step, &sounds, frame_dt, state_dt]() {
+		sounds.fade_sources(*audio_renderer, sound_every_step ? *state_dt : frame_dt);
 	};
 
-	auto audio_job = [this, update_sound_properties, fade_sound_sources]() {
+	auto& command_buffers = input.command_buffers;
+
+	auto audio_job = [this, &command_buffers, update_sound_properties, fade_sound_sources]() {
 		auto scope = measure_scope(performance.sound_logic);
 
 		update_sound_properties();
 		fade_sound_sources();
+
+		command_buffers.submit_write_buffer();
 	};
 
 	synchronous_facade();
@@ -280,6 +287,10 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	launch_wandering_pixels_jobs();
 
 	const bool should_update_audio = [&]() {
+		if (audio_renderer == nullptr) {
+			return false;
+		}
+
 		if (sound_freq == sound_processing_frequency::EVERY_SINGLE_FRAME) {
 			return true;
 		}
@@ -398,7 +409,9 @@ void audiovisual_state::standard_post_solve(
 			particles.update_effects_from_messages(rng, step, input.particle_effects, interp, input.performance.special_effects);
 		}
 
-		{
+		const auto audio_renderer = input.audio_renderer;
+
+		if (audio_renderer) {
 			auto& sounds = get<sound_system>();
 
 			auto ear = input.camera;
@@ -412,6 +425,7 @@ void audiovisual_state::standard_post_solve(
 			sounds.update_effects_from_messages(
 				step, 
 				{
+					*audio_renderer,
 					sounds,
 					input.audio_volume,
 					input.sound_settings,

@@ -1,9 +1,12 @@
+#include <unordered_set>
 #include "augs/graphics/renderer.h"
 #include "augs/templates/thread_templates.h"
 #include "view/viewables/streaming/viewables_streaming.h"
 #include "view/audiovisual_state/systems/sound_system.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
 
+#include "augs/audio/audio_command_buffers.h"
+#include "augs/audio/audio_backend.h"
 #include "view/viewables/regeneration/atlas_progress_structs.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
@@ -272,6 +275,29 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	if (valid_and_is_ready(future_loaded_buffers)) {
 		auto& now_loaded_defs = now_all_defs.sounds;
 		auto& new_loaded_defs = future_sound_definitions;
+
+		{
+			thread_local std::unordered_set<ALuint> all_unloaded_buffers;
+
+			in.audio_buffers.finish();
+
+			all_unloaded_buffers.clear();
+
+			auto buffer_unloaded = [&](const ALuint buffer_id) {
+				return found_in(all_unloaded_buffers, buffer_id);
+			};
+
+			for (const auto& r : sound_requests) {
+				if (const auto loaded_sound = mapped_or_nullptr(loaded_sounds, r.first)) {
+					for (const auto& v : loaded_sound->variations) {
+						all_unloaded_buffers.emplace(v.get_id());
+					}
+				}
+			}
+
+			// TODO_PERFORMANCE
+			in.audio_buffers.stop_sources_if(buffer_unloaded);
+		}
 
 		auto unload = [&](const assets::sound_id key) {
 			in.sounds.clear_sources_playing(key);

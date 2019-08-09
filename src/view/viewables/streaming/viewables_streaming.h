@@ -20,6 +20,10 @@
 
 class sound_system;
 
+namespace augs {
+	class audio_command_buffers;
+}
+
 struct viewables_load_input {
 	const augs::frame_num_type current_frame;
 	const all_viewables_defs& new_defs;
@@ -34,6 +38,7 @@ struct viewables_load_input {
 };
 
 struct viewables_finalize_input {
+	augs::audio_command_buffers& audio_buffers;
 	const augs::frame_num_type current_frame;
 	const bool measure_atlas_upload;
 	augs::renderer& renderer;

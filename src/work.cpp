@@ -30,6 +30,7 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 #include "augs/audio/audio_context.h"
+#include "augs/audio/audio_command_buffers.h"
 #include "augs/drawing/drawing.hpp"
 
 #include "game/organization/all_component_includes.h"
@@ -342,6 +343,8 @@ and then hitting Save settings.
 	LOG("Logging all audio devices.");
 	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
 
+	static augs::audio_command_buffers audio_buffers;
+
 	LOG("Initializing the window.");
 	static augs::window window(config.window);
 
@@ -551,6 +554,10 @@ and then hitting Save settings.
 
 	static auto setup_launcher = [&](auto&& setup_init_callback) {
 		game_gui_mode_flag = false;
+
+		audio_buffers.finish();
+		audio_buffers.stop_all_sources();
+
 		get_audiovisuals().get<sound_system>().clear();
 
 		network_stats = {};
@@ -1121,6 +1128,7 @@ and then hitting Save settings.
 	static auto thread_pool = augs::thread_pool(config.performance.get_num_pool_workers());
 
 	static auto audiovisual_step = [&](
+		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
 		const double speed_multiplier,
 		const config_lua_table& viewing_config
@@ -1167,6 +1175,8 @@ and then hitting Save settings.
 		static augs::timer state_changed_timer;
 
 		get_audiovisuals().advance(audiovisual_advance_input {
+			audio_buffers,
+			audio_renderer,
 			frame_delta,
 			speed_multiplier,
 			inv_tickrate,
@@ -1197,6 +1207,7 @@ and then hitting Save settings.
 
 	static auto setup_post_solve = [&](
 		const const_logic_step step, 
+		const augs::audio_renderer* audio_renderer,
 		const config_lua_table& viewing_config,
 		const audiovisual_post_solve_settings settings
 	) {
@@ -1206,6 +1217,7 @@ and then hitting Save settings.
 			const auto& defs = get_viewable_defs();
 
 			get_audiovisuals().standard_post_solve(step, { 
+				audio_renderer,
 				defs.particle_effects, 
 				streaming.loaded_sounds,
 				viewing_config.audio_volume,
@@ -1227,6 +1239,7 @@ and then hitting Save settings.
 	};
 
 	static auto advance_setup = [&](
+		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
 		auto& setup,
 		const input_pass_result& result
@@ -1239,7 +1252,7 @@ and then hitting Save settings.
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
 		auto setup_audiovisual_post_solve = [&](const const_logic_step step, const audiovisual_post_solve_settings settings = {}) {
-			setup_post_solve(step, viewing_config, settings);
+			setup_post_solve(step, audio_renderer, viewing_config, settings);
 		};
 
 		{
@@ -1304,16 +1317,17 @@ and then hitting Save settings.
 		}
 
 		get_audiovisuals().randomizing.last_frame_delta = frame_delta;
-		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);
+		audiovisual_step(audio_renderer, frame_delta, setup.get_audiovisual_speed(), viewing_config);
 	};
 
 	static auto advance_current_setup = [&](
+		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
 		const input_pass_result& result
 	) { 
 		visit_current_setup(
 			[&](auto& setup) {
-				advance_setup(frame_delta, setup, result);
+				advance_setup(audio_renderer, frame_delta, setup, result);
 			}
 		);
 	};
@@ -1819,6 +1833,7 @@ and then hitting Save settings.
 
 			auto finalize_loading_viewables = [&](const auto& new_viewing_config) {
 				streaming.finalize_load({
+					audio_buffers,
 					get_current_frame_num(),
 					new_viewing_config.debug.measure_atlas_uploading,
 					general_renderer,
@@ -1826,7 +1841,7 @@ and then hitting Save settings.
 				});
 			};
 
-			auto do_advance_setup = [&](auto& with_result) {
+			auto do_advance_setup = [&](const augs::audio_renderer* const audio_renderer, auto& with_result) {
 				/* 
 					Advance the current setup's logic,
 					and let the audiovisual_state sample the game world 
@@ -1836,7 +1851,7 @@ and then hitting Save settings.
 				*/
 
 				auto scope = measure_scope(game_thread_performance.advance_setup);
-				advance_current_setup(frame_delta, with_result);
+				advance_current_setup(audio_renderer, frame_delta, with_result);
 			};
 
 			auto create_viewing_game_gui_context = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
@@ -2167,7 +2182,14 @@ and then hitting Save settings.
 
 			reload_needed_viewables();
 			finalize_loading_viewables(new_viewing_config);
-			do_advance_setup(input_result);
+
+			auto audio_renderer = std::optional<augs::audio_renderer>();
+
+			if (const auto audio_buffer = audio_buffers.map_write_buffer()) {
+				audio_renderer.emplace(augs::audio_renderer { *audio_buffer });
+			}
+
+			do_advance_setup(audio_renderer ? std::addressof(audio_renderer.value()) : nullptr, input_result);
 
 			auto create_menu_context = make_create_menu_context(new_viewing_config);
 			auto create_game_gui_context = make_create_game_gui_context(new_viewing_config);
@@ -2360,6 +2382,7 @@ and then hitting Save settings.
 
 	static auto game_thread = std::thread(game_thread_worker);
 
+	auto audio_thread_joiner = augs::scope_guard([]() { audio_buffers.quit(); });
 	auto game_thread_joiner = augs::scope_guard([]() { game_thread.join(); });
 
 	request_quit = []() {

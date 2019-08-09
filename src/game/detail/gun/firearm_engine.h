@@ -48,6 +48,10 @@ auto calc_firearm_engine_sound(const T& gun_handle)
 	auto& gun = gun_handle.template get<components::gun>();
 	auto& gun_def = gun_handle.template get<invariants::gun>();
 
+	if (!gun_def.firing_engine_sound.id.is_set()) {
+		return std::nullopt;
+	}
+
 	const bool effect_enabled = gun.current_heat > 0.20f;
 
 	if (effect_enabled) {

@@ -6,9 +6,95 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Let's do the delegation thing later, I think openal is thread safe and just creating and loading new sound buffers should not at all alter existing ptrs
+
+- Since it will happen rarily and it'll be good for performance to just pass naked pointers,
+	- let's simply synchronize with the audio thread whenever we make a sound buffer transaction
+	- but let the audio thread do the actual loading
+		- and we'll compare the frame numbers to determine if it's complete, instead of having futures?
+
+- what if we delegate a loading job to the audio thread as a generic std::function command?
+	- doesn't it happen asynchronously anyway now?
+	- we just have to either finish processing ascertain that
+	- we need to ascertain that we only ever post existing pointers
+
+- test if lowpass_gainhf >= 0.f really cuts it
+
+- WHILE SOUND BUFFERS ARE LOADING, remember to finish and halt the execution of sound system  to avoid data races, e.g. due to meta writing
+	- A command for bufferdata?
+	- Actually if we anyway commandize creation of bufferdata, why not commandize erasure of buffers and thus also commandize clear_sources_playing?
+		- this way we don't even need completion mutex/notification
+
+- so many uses of getters...
+	- perhaps let's really use these metas.
+		- POINTLESS!! We'd have to pass all transforms every time.
+
+- We can really easily approximate if the sound source should already be over with playing,
+	- but we can always return a vector of sound sources that ended, from the audio backend itself, every sound frame
+
+- Let's have a unified means of source identification. Having a template for this will bloat our code.
+	- same list of free ints can be used for short/continuous cache construction
+	- Let's keep renderer backend simple.
+	- to clear_sources_playing, we can pass a deleted buffer id instead of assets::sound_id
+	- and additionally to sound system, but it will only clear caches, not stop/destroy sources
+
+- both short sounds and continuous can be faded
+	- we need to include means of identification
+	- however we don't exactly need to request deletion of short sounds because we'll pool them
+
+- Hey, audio thread can actually be just a thread pool with a single worker.
+	- Bonus: we get a free interface for waiting for tasks to finish.
+	- we also get a free interface for task submission
+	- con: we should watch out to never add another thread to the work
+	- con: we have to be able to actuall add tasks
+	- it would be good if we avoided re-allocating the entire sound command buffer every time
+	- a fixed-size circular buffer would be in order I guess
+	- we can entirely avoid the sound frame generation step upon overflow
+	- okay so maybe let's have a separate thread so that we know exactly what's happening
+
+- well, still, how do we remove the short sound caches even if we just map an incremented id?
+	- do we really have to estimate? what about randomly changed speed in editor?
+	- Actually we don't have to erase short sounds because we'll just cycle them.
+	- Logic-side, we'll delete continuous sounds the moment that handles are dead or the logical conditions change.
+	- Sound backend-side, we'll delete the sounds once they stop playing.
+		- Logic-side, we can make issue special commands upon deletion so eventually these sounds stop indeed playing.
+		- We actually make them start fading.
+		- Or we can make a command to deallocate a source.
+
+- other caches can be mapped to entities. the unordered map logic will happen on a background thread so it shouldn't be a concern
+
+- clear sources playing
+	- however it cannot conflict with the audio thread.
+	- we could put a mutex on audio thread whenever it is processing
+	- "finish()"
+		- well, would work just like gl
+		- audio would just notify a cv when there are no more tasks
+	- called synchronously from the game thread
+	- called rarely so doesn't have to be fast
+
+- What if we could extract some game metadata to that separate thread?
+	- pretty hard. still probably need some means of identification
+- Number pool.
+	- For now, if we run out of sound sources (unlikely because we have a ton), we can just prevent a new sound from allocating.
+	- How do we determine in sound system if the sound source has stopped playing?
+		- Actually we probably don't have to since it's only about erasing sound sources to save memory and we'll anyway pool
+		- We won't ever do erase_if anyway
+		- However, we need some means of freeing up the identificators
+		- We can approximately calculate the time of ending in sound system
+
+- Can't we use augs::pool for this?
+
+- A pool with an internal sound system counter seems like the best option for identification
+	- We'll measure if mere existence of sound sources makes any difference
+
+- a specialized command for handling flash_noise_source
+
 - Use pointers for sound source identification?
 	- We could also "request" new sound source to be put into a unique ptr
 
+- unique pointer of int, not audio source
+	- actually same problem as with audio source as pointer
+	- by the time audio backend decides to communicate the id for us the sound system might have deleted the sound and the memory address becomes invalid
 
 - We might want to somehow decrease heap contention between threads
 	- Best would be per-thread heaps

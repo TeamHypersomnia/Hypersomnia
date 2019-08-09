@@ -6,6 +6,7 @@
 
 #include "augs/audio/sound_source.h"
 #include "augs/math/camera_cone.h"
+#include "augs/audio/sound_source_proxy.h"
 
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/entity_handle_declaration.h"
@@ -18,6 +19,10 @@
 #include "augs/misc/timing/stepped_timing.h"
 
 #include "view/audiovisual_state/systems/sound_system_settings.h"
+#include "view/audiovisual_state/systems/sound_system_types.h"
+#include "augs/audio/sound_sizes.h"
+
+#include "augs/misc/simple_id_pool.h"
 
 struct character_camera;
 class interpolation_system;
@@ -25,6 +30,7 @@ class cosmos;
 
 namespace augs {
 	struct audio_volume_settings;
+	class audio_renderer;
 }
 
 struct collision_cooldown_key {
@@ -47,7 +53,8 @@ namespace std {
 
 class sound_system {
 	struct update_properties_input {
-		const sound_system& owner;
+		const augs::audio_renderer& renderer;
+		sound_system& owner;
 		const augs::audio_volume_settings& volume;
 		const sound_system_settings& settings;
 		const loaded_sounds_map& manager;
@@ -65,7 +72,9 @@ class sound_system {
 	struct effect_not_found {};
 
 	struct generic_sound_cache {
-		augs::sound_source source;
+		float elapsed_secs = 0.f;
+
+		augs::sound_source_proxy_data source;
 		packaged_sound_effect original;
 		absolute_or_local positioning;
 
@@ -78,11 +87,13 @@ class sound_system {
 		generic_sound_cache() = default;
 
 		generic_sound_cache(
+			augs::sound_source_proxy_id,
 			const packaged_sound_effect& original,
 			update_properties_input
 		); 
 
 		generic_sound_cache(
+			augs::sound_source_proxy_id,
 			const packaged_multi_sound_effect& original,
 			update_properties_input
 		); 
@@ -91,9 +102,11 @@ class sound_system {
 		bool rebind_buffer(update_properties_input in);
 		void update_properties(update_properties_input in);
 
-		void bind(const augs::sound_buffer&);
+		augs::sound_source_proxy get_proxy(const update_properties_input& in);
+		void stop_and_free(const update_properties_input& in);
+		void bind(const update_properties_input&, const augs::sound_buffer&);
 
-		bool still_playing() const;
+		bool probably_still_playing() const;
 		void maybe_play_next(update_properties_input in);
 
 	private:
@@ -103,7 +116,7 @@ class sound_system {
 
 	struct fading_source {
 		assets::sound_id id;
-		augs::sound_source source;
+		augs::sound_source_proxy_data source;
 		float fade_per_sec = 3.f;
 	};
 
@@ -112,7 +125,7 @@ class sound_system {
 		int consecutive_occurences = 0;
 	};
 
-	augs::constant_size_vector<generic_sound_cache, MAX_SHORT_SOUNDS> short_sounds;
+	augs::constant_size_vector<generic_sound_cache, SOUNDS_SOURCES_IN_POOL> short_sounds;
 
 	struct recorded_meta {
 		std::string name;
@@ -123,6 +136,8 @@ class sound_system {
 		recorded_meta recorded;
 	};
 
+	augs::simple_id_pool<augs::constant_size_vector<augs::sound_source_proxy_id, SOUNDS_SOURCES_IN_POOL>> id_pool;
+
 	audiovisual_cache_map<continuous_sound_cache> firearm_engine_caches;
 	audiovisual_cache_map<continuous_sound_cache> continuous_sound_caches;
 
@@ -130,21 +145,25 @@ class sound_system {
 	std::unordered_map<collision_cooldown_key, collision_sound_cooldown> collision_sound_cooldowns;
 
 	template <class T>
-	void fade_and_erase(T& caches, const unversioned_entity_id id, const float fade_per_sec = 3.f) {
+	void fade_and_erase(const update_properties_input& in, T& caches, const unversioned_entity_id id, const float fade_per_sec = 3.f) {
 		if (auto* const cache = mapped_or_nullptr(caches, id)) {
-			start_fading(cache->cache, fade_per_sec);
+			if (!start_fading(cache->cache, fade_per_sec)) {
+				cache->cache.stop_and_free(in);
+			}
+
 			caches.erase(id);
 		}
 	}
 
 	void update_listener(
+		const augs::audio_renderer& renderer,
 		const const_entity_handle subject,
 		const interpolation_system& sys,
 		const sound_system_settings& settings,
 		const vec2 world_screen_center
 	);
 
-	void start_fading(generic_sound_cache&, float fade_per_sec = 3.f);
+	bool start_fading(generic_sound_cache&, float fade_per_sec = 3.f);
 
 	float after_flash_passed_ms = 0.f;
 	float last_registered_flash_mult = 0.f;
@@ -158,7 +177,10 @@ public:
 	void update_effects_from_messages(const_logic_step, update_properties_input);
 	void update_sound_properties(update_properties_input);
 
-	void fade_sources(const augs::delta dt);
+	void fade_sources(
+		const augs::audio_renderer& renderer,
+		const augs::delta dt
+	);
 
 	void clear();
 	void clear_sources_playing(const assets::sound_id);

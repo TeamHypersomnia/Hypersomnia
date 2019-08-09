@@ -30,12 +30,14 @@ class visible_entities;
 
 namespace augs {
 	class thread_pool;
+	class audio_command_buffers;
 	struct dedicated_buffers;
 }
 
 struct character_camera;
 
 struct audiovisual_post_solve_input {
+	const augs::audio_renderer* audio_renderer;
 	const particle_effects_map& particle_effects;
 	const loaded_sounds_map& sounds;
 	const augs::audio_volume_settings audio_volume;
@@ -46,6 +48,8 @@ struct audiovisual_post_solve_input {
 };
 
 struct audiovisual_advance_input {
+	augs::audio_command_buffers& command_buffers;
+	const augs::audio_renderer* audio_renderer;
 	const augs::delta frame_delta;
 	const double speed_multiplier;
 	const double inv_tickrate;
