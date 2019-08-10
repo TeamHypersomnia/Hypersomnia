@@ -343,7 +343,8 @@ and then hitting Save settings.
 	LOG("Logging all audio devices.");
 	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
 
-	static augs::audio_command_buffers audio_buffers;
+	static auto thread_pool = augs::thread_pool(config.performance.get_num_pool_workers());
+	static augs::audio_command_buffers audio_buffers(thread_pool);
 
 	LOG("Initializing the window.");
 	static augs::window window(config.window);
@@ -1125,7 +1126,6 @@ and then hitting Save settings.
 	};
 
 	static bool pending_new_state_sample = true;
-	static auto thread_pool = augs::thread_pool(config.performance.get_num_pool_workers());
 
 	static auto audiovisual_step = [&](
 		const augs::audio_renderer* audio_renderer,
