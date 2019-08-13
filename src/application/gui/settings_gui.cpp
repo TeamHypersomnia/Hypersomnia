@@ -1131,6 +1131,17 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
+				text_color("Light", yellow);
+
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.performance;
+					revertable_enum_radio(SCOPE_CFG_NVP(wall_light_drawing_precision));
+				}
+
+				ImGui::Separator();
+
 				text_color("Decorations", yellow);
 
 				ImGui::Separator();

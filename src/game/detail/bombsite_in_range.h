@@ -15,7 +15,7 @@ bool bombsite_in_range_of_entity(const E& queried_entity) {
 	entities.reacquire_all_and_sort({
 		cosm,
 		camera_cone::from_aabb(queried_entity),
-		visible_entities_query::accuracy_type::PROXIMATE,
+		accuracy_type::PROXIMATE,
 		render_layer_filter::whitelist(render_layer::AREA_MARKERS),
 		{ { tree_of_npo_type::RENDERABLES } }
 	});

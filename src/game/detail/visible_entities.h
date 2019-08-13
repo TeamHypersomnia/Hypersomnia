@@ -11,12 +11,9 @@
 #include "game/detail/tree_of_npo_filter.h"
 #include "augs/enums/callback_result.h"
 
-struct visible_entities_query {
-	enum class accuracy_type {
-		PROXIMATE,
-		EXACT
-	};
+#include "augs/enums/accuracy_type.h"
 
+struct visible_entities_query {
 	const cosmos& cosm;
 	const camera_cone cone;
 	const accuracy_type accuracy;
@@ -150,7 +147,7 @@ entity_id get_hovered_world_entity(
 	entities.reacquire_all_and_sort({
 		cosm,
 		camera_cone(camera_eye(world_cursor_position, 1.f), vec2i::square(1)),
-		visible_entities_query::accuracy_type::EXACT,
+		accuracy_type::EXACT,
 		filter,
 		tree_of_npo_filter::all_drawables()
 	});

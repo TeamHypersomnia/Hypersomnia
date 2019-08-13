@@ -3664,3 +3664,17 @@ which can be done from Settings->Reset all settings to factory default.
 		- Actually not, some might want to have a cached colliders connection
 	- Keep same index as real objects
 
+- Fixes to audio
+	- seek_to crash
+		- would it be too due to bad meta?
+	- crash on exit
+		- terminating with uncaught exception of type std::__3::system_error: thread::join failed: Invalid argument
+		- fixed: we had twice the quit
+	- sounds disappearing randomly
+		- we were reading wrong variations
+	- heap-after-free usage in generic sound cache init
+		- might have been due to those variations too
+	- too many sources?
+
+- Some lights are skipped
+

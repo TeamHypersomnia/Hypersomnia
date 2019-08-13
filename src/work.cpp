@@ -1087,7 +1087,7 @@ and then hitting Save settings.
 		all_visible.reacquire_all_and_sort({ 
 			viewed_character.get_cosmos(), 
 			queried_cone, 
-			visible_entities_query::accuracy_type::PROXIMATE,
+			accuracy_type::PROXIMATE,
 			get_render_layer_filter(),
 			tree_of_npo_filter::all()
 		});
@@ -2250,6 +2250,7 @@ and then hitting Save settings.
 					},
 
 					viewed_cosmos,
+					all_visible,
 
 					get_audiovisuals().get<light_system>().per_entity_cache,
 					interp,

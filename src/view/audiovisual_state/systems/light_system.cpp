@@ -234,7 +234,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 		const auto& variation_vals = cache.all_variation_values;
 
 		const auto wall_light_aabb = [&]() {
-			const auto wall_reach = light.calc_wall_reach_trimmed();
+			const bool exact = in.perf_settings.wall_light_drawing_precision == accuracy_type::EXACT;
+			const auto wall_reach = exact ? light.calc_wall_reach_trimmed() : light.calc_reach_trimmed();
+
 			return xywh::center_and_size(world_light_pos, wall_reach);
 		}();
 

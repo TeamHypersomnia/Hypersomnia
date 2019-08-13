@@ -265,7 +265,7 @@ void editor_entity_selector::do_mousemotion(
 		const auto query = visible_entities_query {
 			cosm,
 			camera_cone(camera_eye(world_range.get_center(), 1.f), world_range.get_size()),
-			visible_entities_query::accuracy_type::PROXIMATE,
+			accuracy_type::PROXIMATE,
 			filter,
 			tree_of_npo_filter::all()
 		};
@@ -311,7 +311,7 @@ void editor_entity_selector::do_mousemotion(
 		vis.reacquire_all_and_sort({
 			cosm,
 			camera_cone(camera_eye(world_cursor_pos, 1.f), vec2i::square(1)),
-			visible_entities_query::accuracy_type::EXACT,
+			accuracy_type::EXACT,
 			filter,
 			tree_of_npo_filter::all()
 		});

@@ -19,7 +19,7 @@ void startle_nearby_organisms(
 	neighbors.acquire_non_physical({
 		cosm,
 		{ camera_eye(startle_origin), vec2::square(startle_radius * 2) },
-		visible_entities_query::accuracy_type::PROXIMATE,
+		accuracy_type::PROXIMATE,
 		organism_types,
 		{ tree_of_npo_type::ORGANISMS }
 	});

@@ -9,7 +9,7 @@ inline auto get_current_callout(const cosmos& cosm, const vec2 pos) {
 	entities.acquire_non_physical({
 		cosm,
 		camera_cone(camera_eye(pos, 1.f), vec2i::square(1)),
-		visible_entities_query::accuracy_type::EXACT,
+		accuracy_type::EXACT,
 		render_layer_filter::all(),
 		tree_types
 	});

@@ -20,7 +20,7 @@
 #include "game/detail/calc_render_layer.h"
 #include "augs/templates/enum_introspect.h"
 
-static constexpr auto EXACT = visible_entities_query::accuracy_type::EXACT;
+static constexpr auto EXACT = accuracy_type::EXACT;
 
 visible_entities::visible_entities(const visible_entities_query input) {
 	reacquire_all_and_sort(input);

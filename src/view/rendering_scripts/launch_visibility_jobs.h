@@ -30,6 +30,12 @@ inline void enqueue_visibility_jobs(
 		for (std::size_t i = 0; i < lights_n; ++i) {
 			const auto& request = light_requests[i];
 			auto& response = light_responses[i];
+
+			if (!request.valid()) {
+				response.clear();
+				continue;
+			}
+
 			auto& triangles = light_triangles_vectors[i].triangles;
 
 			auto light_job = [&cosm, request, &response, &triangles]() {

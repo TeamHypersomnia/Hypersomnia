@@ -6,17 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fixes to audio
-	- seek_to crash
-		- would it be too due to bad meta?
-	- crash on exit
-		- terminating with uncaught exception of type std::__3::system_error: thread::join failed: Invalid argument
-		- fixed: we had twice the quit
-	- sounds disappearing randomly
-		- we were reading wrong variations
-	- heap-after-free usage in generic sound cache init
-		- might have been due to those variations too
-	- too many sources?
+- Mouse sometimes freezes movement when lpm or rpm is pressed 
+	- happens only when we change windows
 
 - Let's do the delegation thing later, I think openal is thread safe and just creating and loading new sound buffers should not at all alter existing ptrs
 
