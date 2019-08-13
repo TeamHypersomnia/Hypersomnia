@@ -801,7 +801,7 @@ namespace augs {
 		SetCursorPos(pos.x, pos.y);
 	}
 
-	void window::set_cursor_clipping_impl(const bool flag) {
+	bool window::set_cursor_clipping_impl(const bool flag) {
 		if (flag) {
 			thread_local RECT r;
 			
@@ -812,10 +812,10 @@ namespace augs {
 			r.right = lt.r;
 			r.top = lt.t;
 
-			ClipCursor(&r);
+			return ClipCursor(&r);
 		}
 		else {
-			ClipCursor(NULL);
+			return ClipCursor(NULL);
 		}
 	}
 

@@ -10,40 +10,41 @@ void for_each_vis_request(
 	const interpolation_system& interp,
 	const ltrb queried_camera_aabb
 ) {
-	visible.for_each<render_layer::LIGHTS>(
-		cosm,
-		[&](const auto& handle) {
-			handle.template dispatch_on_having_all<invariants::light>(
-				[&](const auto& light_entity) {
-					const auto light_transform = light_entity.get_viewing_transform(interp);
-					const auto& light = light_entity.template get<components::light>();
+	/* 
+		TODO_PERFORMANCE: If we're going to use visible here, we must fix problems with lights' aabb detection,
+		and probably somehow ascertain that transforms are reinferred properly, e.g. there were some problems in testbed.
+	*/
 
-					const auto reach = light.calc_reach_trimmed();
-					const auto light_aabb = xywh::center_and_size(light_transform.pos, reach);
+	(void)visible;
+	cosm.template for_each_having<components::light>(
+		[&](const auto light_entity) {
+			const auto light_transform = light_entity.get_viewing_transform(interp);
+			const auto& light = light_entity.template get<components::light>();
 
-					if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
-						const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
+			const auto reach = light.calc_reach_trimmed();
+			const auto light_aabb = xywh::center_and_size(light_transform.pos, reach);
 
-						messages::visibility_information_request request;
+			if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
+				const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
 
-						request.eye_transform = light_transform;
-						request.eye_transform.pos += light_displacement;
+				messages::visibility_information_request request;
 
-						if (queried_camera_aabb.hover(light_aabb)) {
-							request.queried_rect = reach;
-						}
-						else {
-							request.queried_rect = {};
-						}
+				request.eye_transform = light_transform;
+				request.eye_transform.pos += light_displacement;
 
-						request.filter = predefined_queries::line_of_sight();
-						request.subject = light_entity;
-						request.color = light.color;
-
-						callback(request);
-					}
+				if (queried_camera_aabb.hover(light_aabb)) {
+					request.queried_rect = reach;
 				}
-			);
+				else {
+					request.queried_rect = {};
+				}
+
+				request.filter = predefined_queries::line_of_sight();
+				request.subject = light_entity;
+				request.color = light.color;
+
+				callback(request);
+			}
 		}
 	);
 }

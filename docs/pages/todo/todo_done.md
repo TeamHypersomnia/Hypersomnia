@@ -3678,3 +3678,6 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Some lights are skipped
 
+- Mouse sometimes freezes movement when lpm or rpm is pressed 
+	- happens only when we change windows
+

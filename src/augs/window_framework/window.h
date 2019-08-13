@@ -117,7 +117,7 @@ namespace augs {
 		window_settings current_settings;
 
 		void set_cursor_visible_impl(bool flag); 
-		void set_cursor_clipping_impl(bool flag); 
+		bool set_cursor_clipping_impl(bool flag); 
 
 		void destroy();
 

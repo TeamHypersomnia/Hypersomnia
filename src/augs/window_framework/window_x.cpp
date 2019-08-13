@@ -851,9 +851,9 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		XSync(display, False);
 	}
 
-	void window::set_cursor_clipping_impl(const bool flag) {
+	bool window::set_cursor_clipping_impl(const bool flag) {
 		if (flag) {
-			XGrabPointer(
+			if (GrabSuccess != XGrabPointer(
 				display,
 				window_id,
 				True,
@@ -863,7 +863,9 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 				window_id,
 				None,
 				CurrentTime
-			);
+			)) {
+				return false;
+			}
 
 			XSync(display, False);
 		}
@@ -872,6 +874,8 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 
 			XSync(display, False);
 		}
+
+		return true;
 	}
 
 	void window::set_cursor_visible_impl(const bool flag) {

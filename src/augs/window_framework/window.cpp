@@ -218,9 +218,9 @@ namespace augs {
 			return;
 		}
 
-		set_cursor_clipping_impl(flag);
-
-		cursor_clipping = flag;
+		if (set_cursor_clipping_impl(flag)) {
+			cursor_clipping = flag;
+		}
 	}
 
 	void window::set_cursor_visible(const bool flag) {

@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Mouse sometimes freezes movement when lpm or rpm is pressed 
-	- happens only when we change windows
-
 - Let's do the delegation thing later, I think openal is thread safe and just creating and loading new sound buffers should not at all alter existing ptrs
 
 - Since it will happen rarily and it'll be good for performance to just pass naked pointers,
