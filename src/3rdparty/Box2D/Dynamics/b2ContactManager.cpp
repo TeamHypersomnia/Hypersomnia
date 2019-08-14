@@ -38,7 +38,7 @@ void b2ContactManager::Destroy(b2Contact* c)
 	b2Body* bodyA = fixtureA->GetBody();
 	b2Body* bodyB = fixtureB->GetBody();
 
-	if (m_contactListener && c->IsTouching())
+	if (c->IsTouching())
 	{
 		m_contactListener->EndContact(c);
 	}

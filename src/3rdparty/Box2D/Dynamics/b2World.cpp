@@ -91,6 +91,10 @@ void b2World::SetContactFilter(b2ContactFilter* filter)
 void b2World::SetContactListener(b2ContactListener* listener)
 {
 	m_contactManager.m_contactListener = listener;
+
+	if (listener == nullptr) {
+		m_contactManager.m_contactListener = &defaultListener;
+	}
 }
 
 void b2World::SetDebugDraw(b2Draw* debugDraw)

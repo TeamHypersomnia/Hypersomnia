@@ -20,7 +20,7 @@ cosmos::cosmos(const cosmic_pool_size_type reserved_entities)
 {}
 
 cosmos::cosmos(const cosmos& b) : common(b.common), solvable(b.solvable), profiler(b.profiler) {
-	cosmic::after_copy(*this, b);
+	cosmic::after_solvable_copy(*this, b);
 }
 
 cosmos& cosmos::operator=(const cosmos& b) {
@@ -28,7 +28,7 @@ cosmos& cosmos::operator=(const cosmos& b) {
 	solvable = b.solvable;
 	profiler = b.profiler;
 
-	cosmic::after_copy(*this, b);
+	cosmic::after_solvable_copy(*this, b);
 	return *this;
 }
 
@@ -131,4 +131,6 @@ void cosmos::set_fixed_delta(const augs::delta& dt) {
 
 void cosmos::assign_solvable(const cosmos& b) {
 	solvable = b.solvable;
+
+	cosmic::after_solvable_copy(*this, b);
 }

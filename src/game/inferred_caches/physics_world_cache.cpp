@@ -213,19 +213,24 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache&) 
 	return *this;
 }
 
-void physics_world_cache::clone_from(const physics_world_cache& from_world, cosmos& target_cosm, const cosmos& source_cosm) {
-	accumulated_messages = from_world.accumulated_messages;
+void physics_world_cache::clone_from(const physics_world_cache& source_cache, cosmos& target_cosm, const cosmos& source_cosm) {
+	ensure(std::addressof(target_cosm) != std::addressof(source_cosm));
+	ensure(this != std::addressof(source_cache));
+
+	accumulated_messages = source_cache.accumulated_messages;
 
 	b2World& migrated_b2World = *b2world.get();
 	migrated_b2World.~b2World();
 	new (&migrated_b2World) b2World(b2Vec2(0.f, 0.f));
 
-	const b2World& source_b2World = *from_world.b2world.get();
+	const b2World& source_b2World = *source_cache.b2world.get();
 
 #if DEBUG_PHYSICS_SYSTEM_COPY
 	ensure_eq(0, source_b2World.m_stackAllocator.m_entryCount);
 	ensure_eq(0, source_b2World.m_stackAllocator.m_index);
 #endif
+
+	ensure_eq(source_b2World.m_contactManager.m_contactListener, &source_b2World.defaultListener);
 
 	// do the initial trivial copy of all fields,
 	// we will migrate all pointers shortly
@@ -562,6 +567,9 @@ void physics_world_cache::clone_from(const physics_world_cache& from_world, cosm
 						if (b_body) {
 							migrated_cache.body = reinterpret_cast<b2Body*>(pointer_migrations.at(reinterpret_cast<const void*>(b_body)));
 						}
+						else {
+							migrated_cache.body = nullptr;
+						}
 					}
 				}
 			);
@@ -570,10 +578,10 @@ void physics_world_cache::clone_from(const physics_world_cache& from_world, cosm
 
 #if TODO_JOINTS
 	joint_caches.clear();
-	joint_caches.reserve(from_world.joint_caches.size());
+	joint_caches.reserve(source_cache.joint_caches.size());
 
 	for (auto& it : joint_caches) {
-		const auto b_joint = from_world.joint_caches[it.first].joint.get();
+		const auto b_joint = source_cache.joint_caches[it.first].joint.get();
 
 		if (b_joint) {
 			joint_caches[i].joint = reinterpret_cast<b2Joint*>(pointer_migrations.at(reinterpret_cast<const void*>(b_joint)));

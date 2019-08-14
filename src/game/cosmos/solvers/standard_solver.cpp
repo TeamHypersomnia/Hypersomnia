@@ -236,8 +236,6 @@ void standard_solve(const logic_step step) {
 
 	trace_system().spawn_finishing_traces_for_deleted_entities(step);
 
-	listener.~contact_listener();
-
 	const auto queued_at_end_num = step.get_queue<messages::queue_deletion>().size();
 	(void)queued_at_end_num;
 

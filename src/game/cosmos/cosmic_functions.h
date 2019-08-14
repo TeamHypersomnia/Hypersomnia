@@ -105,6 +105,6 @@ public:
 	template <template <class> class Predicate = always_true, class C, class F>
 	static void for_each_entity(C& self, F callback);
 
-	static void after_copy(cosmos&, const cosmos&);
+	static void after_solvable_copy(cosmos&, const cosmos&);
 	static void set_flavour_id_cache_enabled(bool flag, cosmos&);
 };
