@@ -3772,3 +3772,7 @@ which can be done from Settings->Reset all settings to factory default.
 	- actually same problem as with audio source as pointer
 	- by the time audio backend decides to communicate the id for us the sound system might have deleted the sound and the memory address becomes invalid
 
+- Referential is assigned from but it its interpolation is never advanced
+	- thus the glitch
+	- so we need to preserve interpolation somehow
+

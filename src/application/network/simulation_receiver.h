@@ -263,7 +263,7 @@ public:
 				predicted_cosmos
 			);
 
-			predicted_arena.assign_all_solvables(referential_arena);
+			predicted_arena.transfer_all_solvables(referential_arena);
 
 			for (auto& predicted_step_entropy : predicted_entropies) {
 				predict_intents_of_remote_entities(

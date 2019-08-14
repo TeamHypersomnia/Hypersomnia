@@ -107,4 +107,6 @@ public:
 
 	static void after_solvable_copy(cosmos&, const cosmos&);
 	static void set_flavour_id_cache_enabled(bool flag, cosmos&);
+
+	static void assign_interpolation(cosmos&, const cosmos&);
 };

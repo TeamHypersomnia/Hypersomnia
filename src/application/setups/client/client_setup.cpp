@@ -301,7 +301,7 @@ message_handler_result client_setup::handle_server_message(
 		auto predicted = get_arena_handle(client_arena_type::PREDICTED);
 		const auto referential = get_arena_handle(client_arena_type::REFERENTIAL);
 
-		predicted.assign_all_solvables(referential);
+		predicted.transfer_all_solvables(referential);
 		receiver.clear_incoming();
 	}
 #if CONTEXTS_SEPARATE
