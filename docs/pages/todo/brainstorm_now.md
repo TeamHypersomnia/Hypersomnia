@@ -6,6 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- FIX INTERPOLATION
+	- Before assigning to predicted, make a temporary backup consisting of all interpolation arrays + ONLY indirection ids
+	- Resimulate prediction
+	- Only then, restore interpolation values from the backup to what can be restored
+		- Technically if entities were allocated in different order, all bets are off, so we could as well just rewrite the arrays without remapping
+			- We might try this first
+		- Destruction of entities is sorta predictable
+	- So probably no "assign_interpolation" function at all, we'll do it on our own
+
+- Interpolation is still fucked up with ping, it never was like it before
+- Profile interpolation rewrite
+
 - We might want to somehow decrease heap contention between threads
 	- Best would be per-thread heaps
 		- Even better just no allocations

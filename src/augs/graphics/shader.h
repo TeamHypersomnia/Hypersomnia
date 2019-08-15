@@ -146,8 +146,8 @@ namespace augs {
 				shader_error(
 					"Failed to compile %x. Error message:\n%x\nSource code: %x",
 					describe_shader_type(type),
-					shader_source,
-					error_message
+					error_message,
+					shader_source
 				) 
 			{}
 		};

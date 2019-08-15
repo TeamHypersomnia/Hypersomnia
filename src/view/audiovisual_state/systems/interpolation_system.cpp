@@ -45,7 +45,6 @@ void interpolation_system::integrate_interpolated_transforms(
 			const auto& info = get_corresponding<components::interpolation>(e);
 			//const auto& def = e.template get<invariants::interpolation>();
 
-			auto& integrated = info.interpolated_transform;
 			auto& cache = info;
 
 			const auto considered_positional_speed = settings.speed / (sqrt(cache.positional_slowdown_multiplier));
@@ -70,6 +69,7 @@ void interpolation_system::integrate_interpolated_transforms(
 			const auto positional_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_positional_speed * seconds));
 			const auto rotational_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_rotational_speed * seconds));
 
+			auto& integrated = info.interpolated_transform;
 			integrated = integrated.interp_separate(info.desired_transform, positional_averaging_constant, rotational_averaging_constant);
 		}
 	);

@@ -104,6 +104,7 @@ namespace augs {
 			const type shader_type,
 			const std::string& source_code
 		) {
+#if BUILD_OPENGL
 			built = true;
 
 			if (shader_type == type::VERTEX) {
@@ -118,7 +119,20 @@ namespace augs {
 			GL_CHECK(glShaderSource(id, 1, &source_ptr, nullptr));
 			GL_CHECK(glCompileShader(id));
 
-			log_shader(shader_type, id, source_code);
+			GLint compilation_status;
+			GL_CHECK(glGetShaderiv(id, GL_COMPILE_STATUS, std::addressof(compilation_status)));
+
+			if (compilation_status == GL_FALSE) {
+				LOG("GL_COMPILE_STATUS returned GL_FALSE. Printing error log.");
+				log_shader(shader_type, id, source_code);
+			}
+			else {
+
+			}
+#else
+			(void)shader_type;
+			(void)source_code;
+#endif
 		}
 
 		void shader::destroy() {
