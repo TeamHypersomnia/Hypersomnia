@@ -49,7 +49,7 @@ all_necessary_shaders::all_necessary_shaders(
 	const augs::path_type& canon_directory,
 	const augs::path_type& local_directory,
 	const game_drawing_settings /* settings */
-) {
+) try {
 	augs::introspect(
 		[&](const auto& label, auto& shader) {
 			const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", canon_directory, label);
@@ -130,6 +130,12 @@ all_necessary_shaders::all_necessary_shaders(
 		flash_afterimage->set_as_current(renderer);
 		flash_afterimage->set_uniform(renderer, U::afterimage_texture, 0);
 	}
+} 
+catch (const augs::graphics::shader_compilation_error& err) {
+	throw necessary_resource_loading_error("Failed to compile a necessary shader. Details: %x", err.what());
+}
+catch (const augs::graphics::shader_program_build_error& err) {
+	throw necessary_resource_loading_error("Failed to link a necessary shader. Details: %x", err.what());
 }
 
 all_necessary_sounds::all_necessary_sounds(

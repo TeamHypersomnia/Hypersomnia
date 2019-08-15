@@ -119,7 +119,7 @@ namespace augs {
 			GL_CHECK(glShaderSource(id, 1, &source_ptr, nullptr));
 			GL_CHECK(glCompileShader(id));
 
-			GLint compilation_status;
+			GLint compilation_status = GL_FALSE;
 			GL_CHECK(glGetShaderiv(id, GL_COMPILE_STATUS, std::addressof(compilation_status)));
 
 			if (compilation_status == GL_FALSE) {
@@ -197,13 +197,24 @@ namespace augs {
 			fragment(std::move(new_fragment))
 #endif
 		{
+#if BUILD_OPENGL
 			GL_CHECK(id = glCreateProgram());
 
 			GL_CHECK(glAttachShader(id, new_vertex.id));
 			GL_CHECK(glAttachShader(id, new_fragment.id));
 
 			GL_CHECK(glLinkProgram(id));
-			log_shader_program(id);
+
+			GLint link_status = GL_FALSE;
+			GL_CHECK(glGetProgramiv(id, GL_LINK_STATUS, std::addressof(link_status)));
+
+			if (link_status == GL_FALSE) {
+				LOG("GL_LINK_STATUS returned GL_FALSE. Printing error log.");
+				log_shader_program(id);
+			}
+			else {
+
+			}
 
 #if !STORE_SHADERS_IN_PROGRAM
 			new_vertex.destroy();
@@ -215,6 +226,9 @@ namespace augs {
 			for_each_enum_except_bounds([&](const common_uniform_name u) {
 				uniform_map[u] = get_uniform_location(enum_to_string(u));
 			});
+#else
+
+#endif
 		}
 
 		void shader_program::destroy() {
