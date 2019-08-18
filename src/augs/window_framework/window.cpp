@@ -176,6 +176,7 @@ namespace augs {
 		if (!settings.fullscreen) {
 			if (force
 				|| changed(settings.position)
+				|| changed(settings.size)
 				|| changed(settings.border)
 			) {
 				xywhi screen_rect;

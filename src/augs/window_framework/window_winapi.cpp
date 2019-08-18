@@ -5,12 +5,18 @@
 #include "augs/string/string_templates.h"
 #include "augs/templates/corresponding_field.h"
 #include "augs/templates/algorithm_templates.h"
+#include "augs/templates/container_templates.h"
 
-#include "augs/window_framework/window.h"
-#include "augs/window_framework/platform_utils.h"
 
 #include <Windows.h>
 #include <shlobj.h>
+#undef min
+#undef max
+
+#define DECLARE_FRIEND_WNDPROC 1
+#include "augs/window_framework/window.h"
+#include "augs/window_framework/platform_utils.h"
+
 #include "augs/graphics/OpenGL_includes.h"
 
 #include "3rdparty/glad/glad_wgl.h"
@@ -29,6 +35,8 @@ auto get_hinstance() {
 	return GetModuleHandle(NULL);
 }
 #endif
+
+augs::window* window_ptr = nullptr;
 
 static std::string PickContainer(const std::wstring& custom_title) {
 	std::string result;
@@ -67,14 +75,26 @@ static std::string PickContainer(const std::wstring& custom_title) {
     return result;
 }
 
+LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+	auto& self = *window_ptr;
+	self.handle_wndproc(hwnd, umsg, wParam, lParam);
+
+	if (umsg == WM_ACTIVATE) {
+		return 0;
+	}
+
+	if (umsg == SC_MINIMIZE) {
+		return 0;
+	}
+
+	return DefWindowProc(hwnd, umsg, wParam, lParam);
+}
+
 namespace augs {
 	struct window::platform_data {
 		HWND hwnd = nullptr;
 		HDC hdc = nullptr;
 		HGLRC hglrc = nullptr;
-
-		vec2i min_window_size;
-		vec2i max_window_size;
 
 		int style = 0xdeadbeef;
 		int exstyle = 0xdeadbeef;
@@ -89,42 +109,36 @@ namespace augs {
 		return std::wstring(s.begin(), s.end());
 	}
 
-	LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
-		if (umsg == WM_GETMINMAXINFO || umsg == WM_INPUT) {
-			return DefWindowProc(hwnd, umsg, wParam, lParam);
-		}
+	void window::handle_wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
+		const auto new_change = handle_event(
+			hwnd,
+			umsg, 
+			wParam, 
+			lParam
+		);
 
-		if (umsg == WM_CREATE) {
-			AddClipboardFormatListener(hwnd);
+		if (new_change.has_value()) {
+			common_event_handler(*new_change, wndproc_queue);
+			wndproc_queue.push_back(*new_change);
 		}
-
-		if (umsg == WM_DESTROY) {
-			RemoveClipboardFormatListener(hwnd);
-		}
-		else if (umsg == WM_SYSCOMMAND || umsg == WM_ACTIVATE || umsg == WM_INPUT) {
-			(PostMessage(hwnd, umsg, wParam, lParam));
-			return 0;
-		}
-		else if (umsg == WM_SIZE) {
-			LRESULT res = DefWindowProc(hwnd, umsg, wParam, lParam);
-			return res;
-		}
-
-		return DefWindowProc(hwnd, umsg, wParam, lParam);
 	}
 
-	template <class U, class W, class L>
-	std::optional<event::change> window::handle_event(const U m, const W wParam, const L lParam) {
+	template <class H, class U, class W, class L>
+	std::optional<event::change> window::handle_event(const H hwnd, const U m, const W wParam, const L lParam) {
 		using namespace event::keys;
 
 		event::change change;
 		change.msg = translate_enum(m);
 
-		auto default_proc = [&]() {
-			DefWindowProc(platform->hwnd, m, wParam, lParam);
-		};
-
 		switch (m) {
+		case WM_CREATE: 
+			AddClipboardFormatListener(hwnd);
+			return std::nullopt;
+
+			case WM_DESTROY:
+			RemoveClipboardFormatListener(hwnd);
+			return std::nullopt;
+
 		case WM_CHAR:
 			change.data.character.code_point = wchar_t(wParam);
 			if (change.data.character.code_point > 255) {
@@ -193,7 +207,7 @@ namespace augs {
 		// Doubleclicks
 		
 		case WM_LBUTTONDBLCLK:
-			SetCapture(platform->hwnd);
+			SetCapture(hwnd);
 			
 			platform->triple_click_timer.extract<std::chrono::microseconds>();
 			platform->double_click_occured = true;
@@ -209,7 +223,7 @@ namespace augs {
 		case WM_LBUTTONDOWN:
 			change.data.key.key = key::LMOUSE;
 
-			SetCapture(platform->hwnd);
+			SetCapture(hwnd);
 
 			if (platform->double_click_occured && platform->triple_click_timer.extract<std::chrono::milliseconds>() < platform->triple_click_delay) {
 				change.msg = event::message::ltripleclick;
@@ -263,7 +277,7 @@ namespace augs {
 			return change;
 		case WM_LBUTTONUP:
 			change.data.key.key = key::LMOUSE;
-			if (GetCapture() == platform->hwnd) ReleaseCapture(); return change;
+			if (GetCapture() == hwnd) ReleaseCapture(); return change;
 		case WM_RBUTTONUP:
 			change.data.key.key = key::RMOUSE;
 			return change;
@@ -325,30 +339,17 @@ namespace augs {
 
 			return change;
 
-		case WM_GETMINMAXINFO:
-			{
-				auto* const mi = reinterpret_cast<MINMAXINFO*>(lParam);
-				mi->ptMinTrackSize.x = platform->min_window_size.x;
-				mi->ptMinTrackSize.y = platform->min_window_size.y;
-				mi->ptMaxTrackSize.x = platform->max_window_size.x;
-				mi->ptMaxTrackSize.y = platform->max_window_size.y;
-			}
-			return change;
-
 		case WM_SYSCOMMAND:
-			default_proc();
 			change.msg = translate_enum(static_cast<UINT>(wParam));
 			return change;
 
 		case WM_SIZE:
-			default_proc();
 			return change;
 
 		case WM_MOVE:
-			default_proc();
 			return change;
 
-		default: default_proc(); return std::nullopt;
+		default: return std::nullopt;
 		}
 	}
 
@@ -359,6 +360,8 @@ namespace augs {
 	window::window(
 		const window_settings& settings
 	) : platform(std::make_unique<window::platform_data>()) {
+		ensure_eq(nullptr, window_ptr);
+		window_ptr = this;
 		// TODO: throw an exception instead of ensuring
 		static bool register_once = [](){
 			LOG("WINAPI: Registering the window class.");
@@ -617,19 +620,12 @@ namespace augs {
 			MSG wmsg;
 
 			while (PeekMessageW(&wmsg, platform->hwnd, 0, 0, PM_REMOVE)) {
-				const auto new_change = handle_event(
-					wmsg.message, 
-					wmsg.wParam, 
-					wmsg.lParam
-				);
-
 				TranslateMessage(&wmsg);
-
-				if (new_change.has_value()) {
-					common_event_handler(*new_change, output);
-					output.push_back(*new_change);
-				}
+				DispatchMessage(&wmsg);
 			}
+
+			concatenate(output, wndproc_queue);
+			wndproc_queue.clear();
 		}
 	}
 
@@ -642,7 +638,7 @@ namespace augs {
 		;
 
 		(void)result;
-		ensure(result);
+		current_rect = r;
 	}
 
 	xywhi window::get_window_rect_impl() const {

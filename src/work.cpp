@@ -2202,10 +2202,6 @@ and then hitting Save settings.
 				except for usage of graphical resources and profilers.
 			*/
 
-			if (/* minimized */ screen_size.is_zero()) {
-				return;
-			}
-
 			/*
 				Canonical rendering order of the Hypersomnia Universe:
 				
@@ -2401,8 +2397,8 @@ and then hitting Save settings.
 			It will eat from the window input vector that is later passed to the game and other GUIs.	
 		*/
 
-		configurables.sync_back_into(config);
 		configurables.apply_main_thread(read_buffer.new_settings);
+		configurables.sync_back_into(config);
 
 		if (config.session.show_developer_console) {
 			const auto viewed_character = get_viewed_character();

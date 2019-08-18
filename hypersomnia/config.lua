@@ -85,7 +85,7 @@ return {
     default_filtering = "NEAREST_NEIGHBOR" -- alternatively: "LINEAR"
   },
   audio = {
-    enable_hrtf = false,
+    enable_hrtf = true,
     max_number_of_sound_sources = 4200,
     output_device_name = "",
 	sound_meters_per_second = 150
@@ -511,7 +511,7 @@ return {
     app_icon_path = "content/necessary/gfx/app.ico",
     border = true,
     bpp = 24,
-    fullscreen = true,
+    fullscreen = false,
     name = "Hypersomnia",
     position = {
       x = 189,

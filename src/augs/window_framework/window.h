@@ -50,10 +50,19 @@ namespace augs {
 		struct platform_data;
 		std::unique_ptr<platform_data> platform;
 
+		local_entropy wndproc_queue;
+
 		void show();
 
-		template <class U, class W, class L>
+#if DECLARE_FRIEND_WNDPROC
+	public:
+		void handle_wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
+	private:
+#endif
+
+		template <class H, class U, class W, class L>
 		std::optional<event::change> handle_event(
+			const H,
 			const U, 
 			const W, 
 			const L
