@@ -25,6 +25,8 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/cosmos/entity_type_traits.h"
 
+void snap_interpolated_to_logical(cosmos&);
+
 client_setup::client_setup(
 	sol::state& lua,
 	const client_start_input& in,
@@ -319,6 +321,10 @@ message_handler_result client_setup::handle_server_message(
 		}
 
 		receiver.clear_incoming();
+
+		if (!was_resyncing) {
+			snap_interpolated_to_logical(predicted_cosmos);
+		}
 	}
 #if CONTEXTS_SEPARATE
 	else if constexpr (std::is_same_v<T, prestep_client_context>) {

@@ -2088,14 +2088,18 @@ const editor_view_ids& editor_setup::view_ids() const {
 	return folder().commanded->view_ids;
 }
 
+void snap_interpolated_to_logical(cosmos&);
+
 void editor_setup::begin_recording() {
 	mover.escape();
 	player().begin_recording(folder());
+	snap_interpolated_to_logical(work().world);
 }
 
 void editor_setup::begin_replaying() {
 	mover.escape();
 	player().begin_replaying(folder());
+	snap_interpolated_to_logical(work().world);
 }
 
 editor_arena_handle<false> editor_setup::get_arena_handle() {

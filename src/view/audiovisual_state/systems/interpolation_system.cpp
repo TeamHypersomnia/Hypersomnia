@@ -9,6 +9,17 @@ void interpolation_system::set_interpolation_enabled(const bool flag) {
 	enabled = flag;
 }
 
+void snap_interpolated_to_logical(cosmos& cosm) {
+	cosm.for_each_having<invariants::interpolation>( 
+		[&](const auto& e) {
+			if (const auto current = e.find_logic_transform()) {
+				const auto& info = get_corresponding<components::interpolation>(e);
+				info.desired_transform = info.interpolated_transform = *current;
+			}
+		}
+	);
+}
+
 void interpolation_system::update_desired_transforms(const cosmos& cosm) {
 	cosm.for_each_having<invariants::interpolation>( 
 		[&](const auto& e) {

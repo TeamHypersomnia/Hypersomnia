@@ -26,6 +26,8 @@ static_assert(has_introspect_base_v<const entity_solvable<const controlled_chara
 static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_assets>);
 static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
 
+void snap_interpolated_to_logical(cosmos&);
+
 void intercosm::clear() {
 	cosmic::clear(world);
 	viewables.clear();
@@ -81,6 +83,8 @@ void intercosm::make_test_scene(
 		if (bomb_mode != nullptr) {
 			populator.setup(*bomb_mode);
 		}
+
+		snap_interpolated_to_logical(world);
 	};
 
 	if (settings.create_minimal) {
@@ -96,13 +100,6 @@ void intercosm::save_as_lua(const intercosm_path_op op) const {
 	augs::save_as_lua_table(op.lua, *this, op.path);
 }
 
-void post_load_state_correction(
-	cosmos_common_significant& common,
-	const all_viewables_defs& viewables
-) {
-	viewables.update_relevant(common.logical_assets);
-}
-
 void intercosm::post_load_state_correction() {
 	world.change_common_significant([&](cosmos_common_significant& common) {
 		/*
@@ -112,12 +109,13 @@ void intercosm::post_load_state_correction() {
 			Resides outside of the logical assets' introspection so that it is never written to hdd.
 		*/
 
-		::post_load_state_correction(common, viewables);
+		viewables.update_relevant(common.logical_assets);
 
 		return changer_callback_result::DONT_REFRESH;
 	});
 
 	world.reinfer_everything();
+	snap_interpolated_to_logical(world);
 }
 
 void intercosm::load_from_lua(const intercosm_path_op op) {

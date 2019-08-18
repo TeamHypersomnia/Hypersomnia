@@ -9,8 +9,6 @@
 #include "game/cosmos/entity_handle_declaration.h"
 
 #include "game/components/transform_component.h"
-
-#include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 #include "game/cosmos/get_corresponding.h"
 
 struct interpolation_settings;
@@ -20,18 +18,6 @@ class interpolation_system {
 	void set_interpolation_enabled(const bool);
 
 public:
-	struct cache {
-		transformr recorded_place_of_birth;
-		transformr interpolated_transform;
-		decltype(entity_id().raw.version) recorded_version = entity_id().raw.version;
-		float rotational_slowdown_multiplier = 1.f;
-		float positional_slowdown_multiplier = 1.f;
-
-		bool is_constructed() const {
-			return recorded_version != entity_id().raw.version;
-		}
-	};
-
 	entity_id id_to_integerize;
 
 	void integrate_interpolated_transforms(
