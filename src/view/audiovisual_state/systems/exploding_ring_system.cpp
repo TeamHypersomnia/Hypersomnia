@@ -231,7 +231,7 @@ void exploding_ring_system::draw_highlights_of_rings(
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
 		auto ratio = passed / (r.in.maximum_duration_seconds * 1.2);
 
-		const auto radius = std::max(r.in.outer_radius_end_value, r.in.outer_radius_start_value) / cone.eye.zoom;
+		const auto radius = std::max(r.in.outer_radius_end_value, r.in.outer_radius_start_value);
 		auto highlight_col = r.in.color;
 
 		const auto highlight_amount = 1.f - ratio;
