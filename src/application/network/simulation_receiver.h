@@ -67,8 +67,6 @@ private:
 		const cosmos& predicted_arena
 	);
 
-	interpolation_transfer_caches transfer_caches;
-
 public:
 
 	struct incoming_entropy_entry {
@@ -79,6 +77,7 @@ public:
 	std::vector<prestep_client_context> incoming_contexts;
 	std::vector<incoming_entropy_entry> incoming_entropies;
 	std::vector<simulated_entropy_type> predicted_entropies;
+	interpolation_transfer_caches transfer_caches;
 
 	bool schedule_reprediction = false;
 
@@ -140,7 +139,7 @@ public:
 		auto& repredict = result.should_repredict;
 
 		if (schedule_reprediction) {
-			if (!entropies.empty()) {
+			if (!predicted_entropies.empty()) {
 				repredict = true;
 				schedule_reprediction = false;
 			}

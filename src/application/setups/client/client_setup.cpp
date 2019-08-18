@@ -269,6 +269,8 @@ message_handler_result client_setup::handle_server_message(
 			return abort_v;
 		}
 
+		const bool was_resyncing = now_resyncing;
+
 		now_resyncing = false;
 
 		uint32_t read_client_id;
@@ -303,7 +305,19 @@ message_handler_result client_setup::handle_server_message(
 		auto predicted = get_arena_handle(client_arena_type::PREDICTED);
 		const auto referential = get_arena_handle(client_arena_type::REFERENTIAL);
 
+		auto& predicted_cosmos = predicted.advanced_cosm;
+
+		if (was_resyncing) {
+			::save_interpolations(receiver.transfer_caches, std::as_const(predicted_cosmos));
+		}
+
 		predicted.transfer_all_solvables(referential);
+
+		if (was_resyncing) {
+			::restore_interpolations(receiver.transfer_caches, predicted_cosmos);
+			receiver.schedule_reprediction = true;
+		}
+
 		receiver.clear_incoming();
 	}
 #if CONTEXTS_SEPARATE
