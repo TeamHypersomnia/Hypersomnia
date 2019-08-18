@@ -375,6 +375,10 @@ namespace augs {
 			return id;
 		}
 
+		const auto& get_indirectors() const {
+			return indirectors;
+		}
+
 		void clear() {
 			const auto c = capacity();
 

@@ -3776,3 +3776,21 @@ which can be done from Settings->Reset all settings to factory default.
 	- thus the glitch
 	- so we need to preserve interpolation somehow
 
+- FIX INTERPOLATION
+	- Before assigning to predicted, make a temporary backup consisting of all interpolation arrays + ONLY indirection ids
+	- Resimulate prediction
+	- Only then, restore interpolation values from the backup to what can be restored
+		- Technically if entities were allocated in different order, all bets are off, so we could as well just rewrite the arrays without remapping
+			- We might try this first
+		- Destruction of entities is sorta predictable
+	- So probably no "assign_interpolation" function at all, we'll do it on our own
+
+- Interpolation is still fucked up with ping, it never was like it before
+- Audio parallelization
+	- We might just use a concurrentqueue to push audio jobs, preferably with a set maximum
+- for sound and rendering, use readerwriterqueue repository?
+
+- Fix the sudden increase in upload rate when someone timeouts 
+	- After some time, we could send initial state instead of inputs
+	- Aggressively disconnect?
+

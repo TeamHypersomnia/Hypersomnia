@@ -16,23 +16,6 @@
 #include "game/inferred_caches/flavour_id_cache.hpp"
 #include "game/inferred_caches/physics_world_cache.hpp"
 
-void cosmic::assign_interpolation(cosmos& target, const cosmos& source) {
-	/* Optimize somehow, maybe iterate without the indirectors? */
-
-	source.for_each_having<invariants::interpolation>(
-		[&](const auto& typed_source) {
-			const auto id = typed_source.get_id();
-
-			if (const auto typed_target = target[id]) {
-				const auto& source_interp = get_corresponding<components::interpolation>(typed_source);
-				auto& target_interp = get_corresponding<components::interpolation>(typed_target);
-
-				target_interp = source_interp;
-			}
-		}
-	);
-}
-
 void cosmic::set_flavour_id_cache_enabled(const bool flag, cosmos& cosm) {
 	cosm.get_solvable_inferred({}).flavour_ids.enabled = flag;
 }

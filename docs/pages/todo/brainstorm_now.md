@@ -6,16 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- FIX INTERPOLATION
-	- Before assigning to predicted, make a temporary backup consisting of all interpolation arrays + ONLY indirection ids
-	- Resimulate prediction
-	- Only then, restore interpolation values from the backup to what can be restored
-		- Technically if entities were allocated in different order, all bets are off, so we could as well just rewrite the arrays without remapping
-			- We might try this first
-		- Destruction of entities is sorta predictable
-	- So probably no "assign_interpolation" function at all, we'll do it on our own
-
-- Interpolation is still fucked up with ping, it never was like it before
 - Profile interpolation rewrite
 
 - We might want to somehow decrease heap contention between threads
@@ -24,8 +14,6 @@ summary: That which we are brainstorming at the moment.
 		- Though even something as trivial as draw debug details will do a lot of allocations
 	- Use hoard allocator?
 
-- Audio parallelization
-	- We might just use a concurrentqueue to push audio jobs, preferably with a set maximum
 
 - Determine how could we possibly have over 1000 fps on linux in the past
 	- Really just movement paths?
@@ -46,12 +34,6 @@ summary: That which we are brainstorming at the moment.
 	- Snapshots could prove a little hard but we could just resimulate from the beginning if we want to seek backwards
 
 - Default camera mode in settings, maybe controls?
-
-- for sound and rendering, use readerwriterqueue repository?
-
-- Fix the sudden increase in upload rate when someone timeouts 
-	- After some time, we could send initial state instead of inputs
-	- Aggressively disconnect?
 
 - Looks like we have drastically less FPS with character on screen compared to no character
 	- Would it be only sound logic?
@@ -210,7 +192,7 @@ summary: That which we are brainstorming at the moment.
 - if the referential post solve determines that the predicted post solve has missed something predictable (e.g. a bullet impact)
 	- we should somehow try to replay it
 
-- Fix prediction of collisions
+- Fix prediction of collision sounds
 	- Never predict collisions of remote players
 		- This might be important for not exposing tactical information
 	- Predict collisions with items only if they weren't just recently dropped by a remote player

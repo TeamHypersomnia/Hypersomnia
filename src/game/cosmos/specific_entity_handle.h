@@ -9,6 +9,7 @@
 #include "game/cosmos/specific_entity_handle_declaration.h"
 #include "game/cosmos/entity_solvable.h"
 #include "game/cosmos/cosmos_solvable_access.h"
+#include "game/cosmos/entity_type_traits.h"
 
 #include "game/detail/entity_handle_mixins/all_handle_mixins.h"
 #include "game/common_state/entity_flavours.h"
@@ -300,10 +301,7 @@ public:
 
 	template <class T>
 	static constexpr bool has() {
-		return 
-			subject_type::template has<T>() 
-			|| entity_flavour<entity_type>::template has<T>()
-		;
+		return has_all_of_v<entity_type, T>;
 	}
 
 	template<class T>

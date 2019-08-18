@@ -37,6 +37,8 @@ struct entity_solvable : entity_solvable_meta {
 
 	template <class C>
 	static constexpr bool has() {
+		static_assert(!is_invariant_v<C>, "Don't check for invariants here!");
+
 		return is_one_of_list_v<C, components_type>;
 	}
 

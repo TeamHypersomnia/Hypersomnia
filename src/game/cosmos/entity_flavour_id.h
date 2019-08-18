@@ -16,9 +16,22 @@ struct constrained_entity_flavour_id;
 
 using entity_flavour_id = constrained_entity_flavour_id<>;
 
+template <class...>
+struct all_or_some;
+
+template <class A, class... Rest>
+struct all_or_some<A, Rest...> {
+	using type = entity_types_having_all_of<A, Rest...>;
+};
+
+template <>
+struct all_or_some<> {
+	using type = all_entity_types;
+};
+
 template <class... C>
 struct constrained_entity_flavour_id {
-	using matching_types = entity_types_having_all_of<C...>;
+	using matching_types = typename all_or_some<C...>::type;
 
 	// GEN INTROSPECTOR struct constrained_entity_flavour_id class... C
 	raw_entity_flavour_id raw;
@@ -78,10 +91,15 @@ struct typed_entity_flavour_id {
 	}
 
 	template <
-		class... C,
-		class V = std::enable_if_t<has_all_of_v<E, C...>>
+		class C,
+		class... CR,
+		class V = std::enable_if_t<has_all_of_v<E, C, CR...>>
 	>
-	operator constrained_entity_flavour_id<C...>() const {
+	operator constrained_entity_flavour_id<C, CR...>() const {
+		return { raw, entity_type_id::of<E>() };
+	}
+
+	operator entity_flavour_id() const {
 		return { raw, entity_type_id::of<E>() };
 	}
 };

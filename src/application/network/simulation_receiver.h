@@ -11,6 +11,8 @@
 #include "application/network/server_step_entropy.h"
 #include "application/network/simulation_receiver_settings.h"
 
+#include "application/network/interpolation_transfer.h"
+
 /* Prediction is too costly in debug builds. */
 #define USE_CLIENT_PREDICTION NDEBUG
 #define TEST_DESYNC_DETECTION 0
@@ -64,6 +66,8 @@ private:
 		const entity_id locally_controlled_entity, 
 		const cosmos& predicted_arena
 	);
+
+	interpolation_transfer_caches transfer_caches;
 
 public:
 
@@ -263,6 +267,8 @@ public:
 				predicted_cosmos
 			);
 
+			::save_interpolations(transfer_caches, std::as_const(predicted_cosmos));
+
 			predicted_arena.transfer_all_solvables(referential_arena);
 
 			for (auto& predicted_step_entropy : predicted_entropies) {
@@ -274,6 +280,8 @@ public:
 
 				advance_predicted(predicted_step_entropy);
 			}
+
+			::restore_interpolations(transfer_caches, predicted_cosmos);
 
 			drag_mispredictions_into_past(
 				settings, 

@@ -22,6 +22,8 @@
 #include "augs/readwrite/byte_file.h"
 #include "application/network/payload_easily_movable.h"
 #include "augs/misc/readable_bytesize.h"
+#include "game/cosmos/for_each_entity.h"
+#include "game/cosmos/entity_type_traits.h"
 
 client_setup::client_setup(
 	sol::state& lua,
@@ -1017,6 +1019,61 @@ std::optional<session_id_type> client_setup::find_session_id(const mode_player_i
 
 std::optional<session_id_type> client_setup::find_local_session_id() const {
 	return find_session_id(get_local_player_id());
+}
+
+template <class I, class O, class K>
+auto find_in_indirectors(const I& indirectors, O& objects, const K key) -> maybe_const_ptr_t<std::is_const_v<O>, typename O::value_type> {
+	if (key.indirection_index >= indirectors.size()) {
+		return nullptr;
+	}
+
+	const auto& indirector = indirectors[key.indirection_index];
+	using size_type = decltype(indirector.real_index);
+
+	const bool versions_match = indirector.version == key.version && indirector.real_index != static_cast<size_type>(-1);
+
+	if (!versions_match) {
+		return nullptr;
+	}
+
+	return &objects[indirector.real_index];
+}
+
+void save_interpolations(
+	interpolation_transfer_caches& caches,
+	const cosmos& source
+) {
+	source.get_solvable().significant.entity_pools.for_each_container(
+		[&](const auto& p) {
+			using P = remove_cref<decltype(p)>;
+			using V = typename P::mapped_type;
+			using E = entity_type_of<V>;
+
+			if constexpr(has_all_of_v<E, invariants::interpolation>) {
+				auto& c = caches.get_for<E>();
+				c.interpolations = p.template get_corresponding_array<components::interpolation>();
+				c.indirectors = p.get_indirectors();
+			}
+		}
+	);
+}
+
+void restore_interpolations(
+	const interpolation_transfer_caches& caches,
+	cosmos& target
+) {
+	target.for_each_having<invariants::interpolation>(
+		[&](const auto& typed_adjusted) {
+			using E = entity_type_of<decltype(typed_adjusted)>;
+
+			const auto id = typed_adjusted.get_id();
+			const auto& c = caches.get_for<E>();
+
+			if (const auto entry = ::find_in_indirectors(c.indirectors, c.interpolations, id.raw)) {
+				get_corresponding<components::interpolation>(typed_adjusted) = *entry;
+			}
+		}
+	);
 }
 
 void client_setup::handle_new_session(const add_player_input& in) {

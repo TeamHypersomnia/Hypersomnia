@@ -68,13 +68,6 @@ public:
 
 	template <class T>
 	void transfer_all_solvables(T& from) {
-		{
-			const auto& from_interp = advanced_cosm;
-			auto& to_interp = from.advanced_cosm;
-
-			cosmic::assign_interpolation(to_interp, from_interp);
-		}
-
 		advanced_cosm.assign_solvable(from.advanced_cosm);
 		current_mode = from.current_mode;
 	}

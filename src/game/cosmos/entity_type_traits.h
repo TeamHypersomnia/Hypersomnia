@@ -47,17 +47,15 @@ using entity_types_passing = filter_types_in_list_t<Predicate, all_entity_types>
 
 template <class... Types>
 struct has_all_of {
+	static_assert(sizeof...(Types) >= 1);
+
 	template <class E>
 	struct type : value_conjunction<
 		is_one_of_list_v<Types, invariants_and_components_of<E>>...
 	>
-	{};	
-};
-
-template <>
-struct has_all_of<> {
-	template <class E>
-	struct type : std::true_type {};
+	{
+		static_assert(is_one_of_list_v<E, all_entity_types>);
+	};	
 };
 
 template <class E, class... Args>
