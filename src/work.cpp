@@ -2350,6 +2350,7 @@ and then hitting Save settings.
 			auto scope = measure_scope(game_thread_performance.main_help);
 
 			thread_pool.help_until_no_tasks();
+			thread_pool.wait_for_all_tasks_to_complete();
 		};
 
 		while (!should_quit) {
@@ -2373,7 +2374,6 @@ and then hitting Save settings.
 			{
 				auto scope = measure_scope(game_thread_performance.total);
 				prepare_next_game_frame();
-				thread_pool.wait_for_all_tasks_to_complete();
 			}
 
 			auto scope = measure_scope(game_thread_performance.main_wait);
