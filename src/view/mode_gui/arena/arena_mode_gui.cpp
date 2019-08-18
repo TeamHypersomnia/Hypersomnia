@@ -28,6 +28,9 @@ const auto default_popul = augs::populate_with_delays_impl(
 	0.65f
 );
 
+arena_gui_state::arena_gui_state() : populator(std::make_unique<augs::populate_with_delays_impl>(default_popul)) {}
+arena_gui_state::~arena_gui_state() = default;
+
 bool arena_gui_state::control(
 	const general_gui_intent_input in
 ) {
@@ -789,16 +792,14 @@ void arena_gui_state::draw_mode_gui(
 			if (non_spectator && !original_welcome.empty()) {
 				auto& last = warmup.last_seconds_value;
 
-				thread_local auto populator = default_popul;
-
 				if (!last || warmup_left > *last || warmup.requested.empty()) {
 					last = std::nullopt;
 
 					warmup.requested = augs::gui::text::from_bbcode(original_welcome, style(in.gui_fonts.gui, white));
 					warmup.current.clear();
 
-					populator = default_popul;
-					populator.on_enter(warmup.requested);
+					populator = std::make_unique<augs::populate_with_delays_impl>(default_popul);
+					populator->on_enter(warmup.requested);
 				}
 
 				const auto dt_secs = last.has_value() ? *last - warmup_left : 0.f;
@@ -806,7 +807,7 @@ void arena_gui_state::draw_mode_gui(
 				const auto dt = augs::delta::from_milliseconds(dt_ms);
 
 				{
-					populator.on_update(warmup.current, warmup.requested, dt);
+					populator->on_update(warmup.current, warmup.requested, dt);
 
 					const auto one_fourth_t = in.screen_size.y / 6;
 					const auto t = one_fourth_t + line_height * 3;
@@ -817,7 +818,7 @@ void arena_gui_state::draw_mode_gui(
 
 					auto alpha_mult = 1.f;
 
-					if (!populator.is_complete()) {
+					if (!populator->is_complete()) {
 						target += colored("|", white);
 					}
 					else if (warmup.completed_at_secs > 0.f) {

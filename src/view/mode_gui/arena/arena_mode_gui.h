@@ -23,6 +23,10 @@ struct warmup_welcome_cache {
 	float completed_at_secs = -1.f;
 };
 
+namespace augs {
+	struct populate_with_delays_impl;
+}
+
 struct arena_gui_state {
 	arena_scoreboard_gui scoreboard;
 	arena_choose_team_gui choose_team;
@@ -31,7 +35,11 @@ struct arena_gui_state {
 	bool resyncing_notifier = false;
 
 	mutable std::optional<float> last_seconds_value;
+	mutable std::unique_ptr<augs::populate_with_delays_impl> populator;
 	mutable warmup_welcome_cache warmup;
+
+	arena_gui_state();
+	~arena_gui_state();
 
 	bool control(general_gui_intent_input);
 	bool escape();
