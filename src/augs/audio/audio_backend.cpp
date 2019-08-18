@@ -20,6 +20,10 @@ namespace augs {
 		alFilteri(lowpass_filter_id, AL_FILTER_TYPE, AL_FILTER_LOWPASS);
 	}
 
+	audio_backend::~audio_backend() {
+		alDeleteFilters(1, &lowpass_filter_id);
+	}
+
 	void audio_backend::perform(
 		const audio_command* const c, 
 		const std::size_t n

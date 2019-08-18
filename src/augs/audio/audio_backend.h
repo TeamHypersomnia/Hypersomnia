@@ -18,6 +18,7 @@ namespace augs {
 		unsigned get_max_texture_size() const;
 
 		audio_backend();
+		~audio_backend();
 
 		audio_backend(audio_backend&&) = delete;
 		audio_backend& operator=(audio_backend&&) = delete;
