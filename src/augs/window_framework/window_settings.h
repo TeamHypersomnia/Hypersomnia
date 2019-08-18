@@ -28,5 +28,13 @@ namespace augs {
 		xywhi make_window_rect() const {
 			return { position, size };
 		}
+
+		bool is_raw_mouse_input() const {
+			if (fullscreen) {
+				return true;
+			}
+
+			return raw_mouse_input;
+		}
 	};
 }

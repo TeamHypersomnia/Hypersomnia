@@ -250,12 +250,8 @@ void settings_gui_state::perform(
 					}
 
 					revertable_checkbox(CONFIG_NVP(window.border));
-				}
 
-				{
 					text("GUI cursor input source");
-
-					auto indent = scoped_indent();
 
 					int e = config.window.raw_mouse_input ? 1 : 0;
 					ImGui::RadioButton("Raw (traps cursor inside the window)", &e, 1);

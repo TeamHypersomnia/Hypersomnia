@@ -677,7 +677,7 @@ namespace augs {
 						const auto x = axes[0].integral;
 						const auto y = axes[1].integral;
 
-						if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
+						if (is_active() && (current_settings.is_raw_mouse_input() || mouse_pos_paused)) {
 							auto ch = do_raw_motion({
 								static_cast<short>(x),
 								static_cast<short>(y) 

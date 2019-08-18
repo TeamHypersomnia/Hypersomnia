@@ -911,7 +911,7 @@ and then hitting Save settings.
 		write_buffer.should_clip_cursor = (
 			in_direct_gameplay
 			|| (
-				cfg.window.raw_mouse_input
+				cfg.window.is_raw_mouse_input()
 #if TODO
 				&& !cfg.session.use_system_cursor_for_gui
 #endif
@@ -1993,7 +1993,7 @@ and then hitting Save settings.
 			};
 
 			auto draw_non_menu_cursor = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config, const assets::necessary_image_id menu_chosen_cursor) {
-				const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
+				const bool should_draw_our_cursor = viewing_config.window.is_raw_mouse_input() && !window.is_mouse_pos_paused();
 				const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
 				auto get_drawer = [&]() {

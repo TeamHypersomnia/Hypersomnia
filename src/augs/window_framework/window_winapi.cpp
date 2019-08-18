@@ -87,6 +87,10 @@ LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 		return 0;
 	}
 
+	if (umsg == WM_SYSKEYDOWN || umsg == WM_SYSKEYUP) {
+		return 0;
+	}
+
 	return DefWindowProc(hwnd, umsg, wParam, lParam);
 }
 
@@ -297,7 +301,7 @@ namespace augs {
 			return change;
 
 		case WM_INPUT:
-			if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
+			if (is_active() && (current_settings.is_raw_mouse_input() || mouse_pos_paused)) {
 				thread_local BYTE lpb[sizeof(RAWINPUT)];
 				thread_local UINT dwSize = sizeof(RAWINPUT);
 
@@ -332,7 +336,7 @@ namespace augs {
 				default: return std::nullopt;
 				}
 
-				if (change.msg == event::message::deactivate && current_settings.raw_mouse_input) {
+				if (change.msg == event::message::deactivate && current_settings.is_raw_mouse_input()) {
 					set_cursor_pos(last_mouse_pos);
 				}
 			}
