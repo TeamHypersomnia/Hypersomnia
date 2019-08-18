@@ -1547,10 +1547,19 @@ and then hitting Save settings.
 							return true;
 						}
 						
-						if (e.was_pressed(key::F11)) {
-							bool& f = config.window.fullscreen;
-							f = !f;
-							return true;
+						{
+							const bool toggle_fullscreen = 
+								e.was_pressed(key::F11)
+#if PLATFORM_WINDOWS
+								|| (e.was_pressed(key::ENTER) && common_input_state[augs::event::keys::key::LALT])
+#endif
+							;
+
+							if (toggle_fullscreen) {
+								bool& f = config.window.fullscreen;
+								f = !f;
+								return true;
+							}
 						}
 
 						if (settings_gui.should_hijack_key()) {
