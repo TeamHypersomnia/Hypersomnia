@@ -510,7 +510,7 @@ return {
   window = {
     app_icon_path = "content/necessary/gfx/app.ico",
     border = true,
-    bpp = 24,
+    bpp = 32,
     fullscreen = false,
     name = "Hypersomnia",
     position = {

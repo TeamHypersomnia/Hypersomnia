@@ -109,7 +109,14 @@ namespace augs {
 
 	void window::set_fullscreen_geometry(const bool flag) {
 		if (flag) {
- 			set_window_rect(get_display());
+			const auto detected_display = get_display();
+
+			LOG_NVPS(detected_display);
+ 			set_window_rect(detected_display);
+
+ 			if (!set_display(detected_display.get_size(), current_settings.bpp)) {
+ 				LOG("set_display failed!");
+ 			}
 		}
 		else {
  			set_window_rect(get_current_settings().make_window_rect());
