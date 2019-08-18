@@ -164,7 +164,10 @@ void arena_gui_state::draw_mode_gui(
 ) const {
 	const auto& cfg = in.config.arena_mode_gui;
 	const auto line_height = in.gui_fonts.gui.metrics.get_height();
-	auto general_drawer = in.get_drawer();
+
+	auto get_drawer = [&in]() {
+		return in.get_drawer();
+	};
 
 	if constexpr(M::round_based) {
 		using namespace augs::gui::text;
@@ -423,6 +426,8 @@ void arena_gui_state::draw_mode_gui(
 			const auto popup_lt = vec2(in.screen_size.x / 2 - predicted_size.x / 2, in.screen_size.y * off_mult);
 			const auto window_bg_rect = ltrb(popup_lt, predicted_size);
 
+			auto general_drawer = get_drawer();
+
 			// TODO give it its own settings struct
 			{
 				const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
@@ -485,6 +490,7 @@ void arena_gui_state::draw_mode_gui(
 			// TODO: fix this for varying icon sizes
 
 			if (const auto p = typed_mode.find(local_player_id)) {
+				auto general_drawer = get_drawer();
 				const auto& stats = p->stats;
 
 				auto drawn_current_money = stats.money;
@@ -656,6 +662,8 @@ void arena_gui_state::draw_mode_gui(
 					cfg.inside_knockout_box_pad * 2 + std::max(tool_size.y, std::max(lhs_bbox.y, rhs_bbox.y))
 				);
 
+				auto general_drawer = get_drawer();
+
 				general_drawer.aabb_with_border(
 					total_bbox,
 					cols.background,
@@ -713,6 +721,7 @@ void arena_gui_state::draw_mode_gui(
 
 		auto draw_text_indicator_at = [&](const auto& val, const auto t) {
 			const auto s = in.screen_size;
+			auto general_drawer = get_drawer();
 
 			print_stroked(
 				general_drawer,
@@ -836,6 +845,8 @@ void arena_gui_state::draw_mode_gui(
 						warmup.completed_at_secs = warmup_left;
 					}
 
+					auto general_drawer = get_drawer();
+
 					print_stroked(
 						general_drawer,
 						target_pos,
@@ -923,6 +934,7 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_context_tip = [&]() {
+			auto general_drawer = get_drawer();
 			const auto viewed_player_data = typed_mode.find(local_player_id);
 
 			if (viewed_player_data == nullptr) {
