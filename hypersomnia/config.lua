@@ -552,6 +552,7 @@ return {
   },
 
   server = {
+    log_performance_once_every_secs = 1,
 	current_arena = "de_cyberaqua",
 	override_default_ruleset = "",
 

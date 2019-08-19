@@ -29,6 +29,7 @@
 #include "augs/build_settings/setting_dump.h"
 #include "application/setups/server/chat_structs.h"
 #include "application/gui/client/client_gui_state.h"
+#include "application/setups/server/server_profiler.h"
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 #include "game/modes/dump_for_debugging.h"
@@ -101,6 +102,11 @@ class server_setup :
 
 	client_gui_state integrated_client_gui;
 	std::string failure_reason;
+
+public:
+	net_time_t last_logged_at = 0;
+	server_profiler profiler;
+private:
 	/* No server state follows later in code. */
 
 	static net_time_t get_current_time();
@@ -207,10 +213,19 @@ public:
 		const auto current_time = get_current_time();
 
 		while (server_time <= current_time) {
+			auto scope = measure_scope(profiler.step);
+
 			step_collected.clear();
 
-			handle_client_messages();
-			advance_clients_state();
+			{
+				auto scope = measure_scope(profiler.advance_adapter);
+				handle_client_messages();
+			}
+
+			{
+				auto scope = measure_scope(profiler.advance_clients_state);
+				advance_clients_state();
+			}
 
 			{
 				/* 
@@ -235,12 +250,21 @@ public:
 				local_collected.clear();
 			}
 
-			send_server_step_entropies(step_collected);
-			send_packets_if_its_time();
+			{
+				auto scope = measure_scope(profiler.send_entropies);
+				send_server_step_entropies(step_collected);
+			}
+
+			{
+				auto scope = measure_scope(profiler.send_packets);
+				send_packets_if_its_time();
+			}
 
 			reinfer_if_necessary_for(step_collected);
 
 			{
+				auto scope = measure_scope(profiler.solve_simulation);
+
 				const auto unpacked = unpack(step_collected);
 				const auto arena = get_arena_handle();
 
@@ -306,6 +330,8 @@ public:
 			update_stats(in.server_stats);
 			step_collected.clear();
 		}
+
+		log_performance();
 	}
 
 	template <class T>
@@ -395,4 +421,5 @@ public:
 	bool is_dedicated() const;
 
 	void handle_new_session(const add_player_input& in);
+	void log_performance();
 };

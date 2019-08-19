@@ -1057,11 +1057,10 @@ bool server_setup::should_have_admin_character() const {
 }
 
 void server_setup::sleep_until_next_tick() {
-	return;
-	const auto sleep_dt = get_current_time() - server_time;
+	const auto sleep_dt = server_time - get_current_time();
 
 	if (sleep_dt > 0.0) {
-		yojimbo_sleep(sleep_dt * 0.9);
+		yojimbo_sleep(sleep_dt * 0.1);
 	}
 }
 
@@ -1327,6 +1326,31 @@ bool server_setup::is_dedicated() const {
 
 void server_setup::handle_new_session(const add_player_input&) {
 	rebuild_player_meta_viewables = true;
+}
+
+void server_setup::log_performance() {
+	if (is_dedicated()) {
+		const auto s = vars.log_performance_once_every_secs;
+
+		if (s > 0) {
+			if (server_time - last_logged_at >= vars.log_performance_once_every_secs) {
+				profiler.prepare_summary_info();
+
+				const auto summary = typesafe_sprintf(
+					"S: %3f, SS: %3f, AA: %3f, ACS: %3f, SE: %3f, SP: %3f",
+					1000 * profiler.step.get_summary_info().value,
+					1000 * profiler.solve_simulation.get_summary_info().value,
+					1000 * profiler.advance_adapter.get_summary_info().value,
+					1000 * profiler.advance_clients_state.get_summary_info().value,
+					1000 * profiler.send_entropies.get_summary_info().value,
+					1000 * profiler.send_packets.get_summary_info().value
+				);
+
+				last_logged_at = server_time;
+				LOG(summary);
+			}
+		}
+	}
 }
 
 #include "augs/readwrite/to_bytes.h"
