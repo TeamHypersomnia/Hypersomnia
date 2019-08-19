@@ -106,8 +106,6 @@ enum class test_scene_sound_id {
 	POWER_OUT,
 
 	BOMB_EXPLOSION,
-	CASCADE_EXPLOSION,
-	FIREWORK,
 
 	MT_START,
 

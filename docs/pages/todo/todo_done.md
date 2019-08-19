@@ -3794,3 +3794,6 @@ which can be done from Settings->Reset all settings to factory default.
 	- After some time, we could send initial state instead of inputs
 	- Aggressively disconnect?
 
+- Optimize bomb explosion - remove unnecessary sounds
+	- It doesn't even sound that good
+

@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Sleep multiplier for server
+
 - Profile interpolation rewrite
 
 - We might want to somehow decrease heap contention between threads
