@@ -1060,7 +1060,11 @@ void server_setup::sleep_until_next_tick() {
 	const auto sleep_dt = server_time - get_current_time();
 
 	if (sleep_dt > 0.0) {
-		yojimbo_sleep(sleep_dt * 0.1);
+		const auto mult = vars.sleep_mult;
+
+		if (mult > 0.f) {
+			yojimbo_sleep(static_cast<float>(sleep_dt) * mult);
+		}
 	}
 }
 

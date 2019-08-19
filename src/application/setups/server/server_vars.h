@@ -29,6 +29,7 @@ struct server_vars {
 	unsigned max_unauthorized_rcon_commands = 100;
 	unsigned max_bots = 0;
 	float log_performance_once_every_secs = 1;
+	float sleep_mult = 0.1f;
 	// END GEN INTROSPECTOR
 };
 
