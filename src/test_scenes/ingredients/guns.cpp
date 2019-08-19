@@ -389,6 +389,9 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::LEWSII_ROUND);
 			meta = get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND);
+
+			auto& missile = meta.get<invariants::missile>();
+
 			missile.trace_sound.id = {};
 
 			missile.remnant_flavours.clear();
@@ -1396,6 +1399,15 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_remnant_bodies::LEWSII_SHELL);
+			meta = get_test_flavour(flavours, test_remnant_bodies::STEEL_SHELL);
+
+			auto& remnant = meta.get<invariants::remnant>();
+			remnant.lifetime_secs = 0.35f;
+			remnant.start_shrinking_when_remaining_ms = 100.f;
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::ORANGE_SHELL);
 
 			{
@@ -1608,6 +1620,7 @@ namespace test_flavours {
 			meta = get_test_flavour(flavours, test_shootable_charges::STEEL_CHARGE);
 			meta.get<invariants::text_details>().name = "Lews II charge";
 			meta.get<invariants::cartridge>().round_flavour = to_entity_flavour_id(test_plain_missiles::LEWSII_ROUND);
+			meta.get<invariants::cartridge>().shell_flavour = to_entity_flavour_id(test_remnant_bodies::LEWSII_SHELL);
 		}
 
 		{
