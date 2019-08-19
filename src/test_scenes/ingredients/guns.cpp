@@ -178,7 +178,8 @@ namespace test_flavours {
 		{
 			auto make_round_remnant_flavour = [&](
 				const auto flavour_id,
-				const auto image_id
+				const auto image_id,
+				const float lifetime_mult = 1.f
 			) {
 				auto& meta = get_test_flavour(flavours, flavour_id);
 
@@ -191,8 +192,8 @@ namespace test_flavours {
 
 				{
 					invariants::remnant remnant_def;
-					remnant_def.lifetime_secs = 1.f;
-					remnant_def.start_shrinking_when_remaining_ms = 350.f;
+					remnant_def.lifetime_secs = 1.f * lifetime_mult;
+					remnant_def.start_shrinking_when_remaining_ms = 350.f * lifetime_mult;
 					remnant_def.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
 					remnant_def.trace_particles.modifier.colorize = orange;
 					meta.set(remnant_def);
@@ -215,6 +216,24 @@ namespace test_flavours {
 			make_round_remnant_flavour(
 				test_remnant_bodies::STEEL_ROUND_REMNANT_3,
 				test_scene_image_id::STEEL_ROUND_REMNANT_3
+			);
+
+			make_round_remnant_flavour(
+				test_remnant_bodies::LEWSII_ROUND_REMNANT_1,
+				test_scene_image_id::STEEL_ROUND_REMNANT_1,
+				0.2f
+			);
+
+			make_round_remnant_flavour(
+				test_remnant_bodies::LEWSII_ROUND_REMNANT_2,
+				test_scene_image_id::STEEL_ROUND_REMNANT_2,
+				0.2f
+			);
+
+			make_round_remnant_flavour(
+				test_remnant_bodies::LEWSII_ROUND_REMNANT_3,
+				test_scene_image_id::STEEL_ROUND_REMNANT_3,
+				0.2f
 			);
 		}
 
@@ -359,12 +378,23 @@ namespace test_flavours {
 			auto& trace_modifier = missile.trace_sound.modifier;
 
 			trace_modifier.doppler_factor = 1.f;
-			trace_modifier.max_distance = 700.f;
+			trace_modifier.max_distance = 1320.f;
 			trace_modifier.reference_distance = 50.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::LEWSII_ROUND);
+			meta = get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND);
+			missile.trace_sound.id = {};
+
+			missile.remnant_flavours.clear();
+			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::LEWSII_ROUND_REMNANT_1));
+			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::LEWSII_ROUND_REMNANT_2));
+			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::LEWSII_ROUND_REMNANT_3));
 		}
 
 		{
@@ -513,7 +543,7 @@ namespace test_flavours {
 			auto& trace_modifier = missile.trace_sound.modifier;
 
 			trace_modifier.doppler_factor = 1.f;
-			trace_modifier.max_distance = 700.f;
+			trace_modifier.max_distance = 1400.f;
 			trace_modifier.reference_distance = 50.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.fade_on_exit = false;
@@ -1574,6 +1604,13 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_shootable_charges::LEWSII_CHARGE);
+			meta = get_test_flavour(flavours, test_shootable_charges::STEEL_CHARGE);
+			meta.get<invariants::text_details>().name = "Lews II charge";
+			meta.get<invariants::cartridge>().round_flavour = to_entity_flavour_id(test_plain_missiles::LEWSII_ROUND);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::SKULL_ROCKET);
 
 			{
@@ -2283,7 +2320,7 @@ namespace test_flavours {
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("1.5");
-			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::LEWSII_CHARGE);
 			charge_deposit_def.mounting_duration_ms = 300.f;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;

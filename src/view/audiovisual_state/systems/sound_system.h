@@ -167,6 +167,9 @@ class sound_system {
 	float after_flash_passed_ms = 0.f;
 	float last_registered_flash_mult = 0.f;
 
+	float silent_trace_cooldown = 0.f;
+	int current_num_silent_traces = 0;
+
 public:
 	void reserve_caches_for_entities(const std::size_t) const {}
 

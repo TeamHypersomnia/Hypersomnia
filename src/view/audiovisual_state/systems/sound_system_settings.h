@@ -24,6 +24,8 @@ struct sound_system_settings {
 
 	listener_position_reference listener_reference = listener_position_reference::CHARACTER_POSITION;
 	bool set_listener_orientation_to_character_orientation = false;
+	int max_simultaneous_bullet_trace_sounds = 6;
+	float gain_threshold_for_bullet_trace_sounds = 0.012f;
 
 	sound_processing_frequency processing_frequency = sound_processing_frequency::EVERY_SIMULATION_STEP;
 	// END GEN INTROSPECTOR

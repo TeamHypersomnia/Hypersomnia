@@ -374,21 +374,34 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		in.renderer.push_command(cmd);
 	}
 
-	if (gain_dependent_lifetime) {
-		if (elapsed_secs == 0.f) {
-			if (custom_dist_gain_mult > 0.005f) {
-				elapsed_secs = dt_this_frame;
+	if (!(in.dt == augs::delta::zero)) {
+		if (gain_dependent_lifetime) {
+			if (elapsed_secs == 0.f) {
+				if (custom_dist_gain_mult > in.settings.gain_threshold_for_bullet_trace_sounds) {
+					auto& current = in.owner.current_num_silent_traces;
 
-				const auto proxy = get_proxy(in);
-				proxy.play();
+					if (current < in.settings.max_simultaneous_bullet_trace_sounds) {
+						elapsed_secs = dt_this_frame;
+
+						in.renderer.push_command(cmd);
+
+						const auto proxy = get_proxy(in);
+						proxy.play();
+
+						++current;
+					}
+					else {
+						original.input.modifier.repetitions = 0;
+					}
+				}
 			}
 		}
-	}
 
-	if (gain_dependent_lifetime) {
-		if (elapsed_secs != 0.f) {
-			if (custom_dist_gain_mult < 0.005f) {
-				original.input.modifier.repetitions = 0;
+		if (gain_dependent_lifetime) {
+			if (elapsed_secs != 0.f) {
+				if (custom_dist_gain_mult < in.settings.gain_threshold_for_bullet_trace_sounds) {
+					original.input.modifier.repetitions = 0;
+				}
 			}
 		}
 	}
@@ -572,6 +585,18 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		screen_center
 	);
 
+	silent_trace_cooldown += in.dt.in_milliseconds();
+
+	if (silent_trace_cooldown > 150.f) {
+		silent_trace_cooldown = 0.f;
+
+		--current_num_silent_traces;
+
+		if (current_num_silent_traces < 0) {
+			current_num_silent_traces = 0;
+		}
+	}
+
 	const auto& cosm = listening_character.get_cosmos();
 
 	{
@@ -612,7 +637,10 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 						try {
 							firearm_engine_caches.try_emplace(id, continuous_sound_cache { { new_id, *sound, in }, { gun_entity.get_name() } } );
 						}
-						catch (...) {
+						catch (const effect_not_found&) {
+							release_id();
+						}
+						catch (const shouldnt_play&) {
 							release_id();
 						}
 					}
@@ -673,7 +701,10 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 					try {
 						continuous_sound_caches.try_emplace(id, continuous_sound_cache { { new_id, sound, in }, { sound_entity.get_name() } } );
 					}
-					catch (...) {
+					catch (const effect_not_found&) {
+						release_id();
+					}
+					catch (const shouldnt_play&) {
 						release_id();
 					}
 				}

@@ -1096,6 +1096,7 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.sound;
 
 					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
+					revertable_slider(SCOPE_CFG_NVP(max_simultaneous_bullet_trace_sounds), 0, 20);
 				}
 
 
