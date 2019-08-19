@@ -122,7 +122,7 @@ namespace augs {
 				else if constexpr(same<C, source_no_arg_command>) {
 					using A = source_no_arg_command_type;
 
-					const auto& source = source_pool[t.proxy_id];
+					auto& source = source_pool[t.proxy_id];
 
 					switch (t.type) {
 						case A::PLAY:

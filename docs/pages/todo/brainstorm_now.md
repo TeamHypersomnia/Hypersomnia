@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Sleep multiplier for server
+- Remember to re-import the new content to cyberaqua after we're done
 
 - Profile interpolation rewrite
 
@@ -15,7 +15,6 @@ summary: That which we are brainstorming at the moment.
 		- Even better just no allocations
 		- Though even something as trivial as draw debug details will do a lot of allocations
 	- Use hoard allocator?
-
 
 - Determine how could we possibly have over 1000 fps on linux in the past
 	- Really just movement paths?

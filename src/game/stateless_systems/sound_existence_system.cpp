@@ -149,6 +149,11 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 							auto start = sound_effect_start_input::at_entity(cosm[r]);
 							start.clear_when_target_entity_deleted = true;
 
+							if (!missile->trace_sound_audible_to_shooter) {
+								start.silent_trace_like = true;
+								start.direct_listener = owning_capability;
+							}
+
 							effect.start(step, start, predictability);
 						}
 					}

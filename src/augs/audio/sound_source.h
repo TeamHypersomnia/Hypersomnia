@@ -26,6 +26,7 @@ namespace augs {
 
 	class sound_source {
 		bool initialized = false;
+		bool stopped = true;
 		ALuint id = 0;
 		ALuint attached_buffer = -1;
 		sound_buffer_meta buffer_meta;
@@ -44,9 +45,9 @@ namespace augs {
 		void set_relative(bool) const;
 		void set_relative_and_zero_vel_pos() const;
 
-		void play() const;
+		void play();
 		void seek_to(float seconds) const;
-		void stop() const;
+		void stop();
 		void set_looping(bool) const;
 		void set_doppler_factor(float) const;
 		void set_rolloff_factor(float) const;

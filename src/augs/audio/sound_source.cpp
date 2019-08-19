@@ -93,8 +93,9 @@ namespace augs {
 		return get_id();
 	}
 
-	void sound_source::play() const {
+	void sound_source::play() {
 		AL_CHECK(alSourcePlay(id));
+		stopped = false;
 	}
 	
 	void sound_source::seek_to(const float seconds) const {
@@ -108,8 +109,9 @@ namespace augs {
 		return seconds;
 	}
 
-	void sound_source::stop() const {
+	void sound_source::stop() {
 		AL_CHECK(alSourceStop(id));
+		stopped = true;
 	}
 	
 	void sound_source::set_looping(const bool loop) const {
@@ -273,6 +275,10 @@ namespace augs {
 
 	bool sound_source::is_playing() const {
 #if BUILD_OPENAL
+		if (stopped) {
+			return false;
+		}
+
 		ALenum state = 0xdeadbeef;
 		AL_CHECK(alGetSourcei(id, AL_SOURCE_STATE, &state));
 		return state == AL_PLAYING;
@@ -282,8 +288,6 @@ namespace augs {
 	}
 
 	void sound_source::bind_buffer(const single_sound_buffer& buf) {
-		std::optional<float> previous_seconds;
-
 		{
 			const auto buf_addr = buf.get_id();
 
@@ -291,11 +295,16 @@ namespace augs {
 				return;
 			}
 
+			attached_buffer = buf_addr;
+		}
+
+		const bool reseek = is_playing();
+		std::optional<float> previous_seconds;
+
+		if (reseek) {
 			if (buffer_meta.is_set()) {
 				previous_seconds = get_time_in_seconds();
 			}
-
-			attached_buffer = buf_addr;
 		}
 
 		if (previous_seconds) {

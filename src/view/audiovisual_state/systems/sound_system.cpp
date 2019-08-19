@@ -137,6 +137,12 @@ void sound_system::generic_sound_cache::init(update_properties_input in) {
 	update_properties(in);
 	previous_transform = in.find_transform(positioning);
 
+	const bool gain_dependent_lifetime = original.start.silent_trace_like;
+
+	if (gain_dependent_lifetime) {
+		return;
+	}
+
 	const auto proxy = get_proxy(in);
 	proxy.play();
 }
@@ -197,6 +203,12 @@ bool sound_system::generic_sound_cache::should_play(const update_properties_inpu
 		return false;
 	}
 
+	if (original.start.silent_trace_like) {
+		if (original.start.direct_listener == listening_character) {
+			return false;
+		}
+	}
+
 	const auto faction = listening_character.get_official_faction();
 	const auto target_faction = original.start.listener_faction;
 
@@ -214,7 +226,12 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	const auto& input = original.input;
 	const auto& m = input.modifier;
 
-	elapsed_secs += in.dt.in_seconds() * m.pitch * in.speed_multiplier;
+	const auto dt_this_frame = in.dt.in_seconds() * m.pitch * in.speed_multiplier;
+	const bool gain_dependent_lifetime = original.start.silent_trace_like;
+
+	if (!gain_dependent_lifetime) {
+		elapsed_secs += dt_this_frame;
+	}
 
 	if (listening_character.dead()) {
 		return;
@@ -321,7 +338,6 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	float custom_dist_gain_mult = 1.f;
 
-
 	if (is_linear) {
 
 	}
@@ -354,7 +370,28 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	cmd.is_direct_listener = is_direct_listener;
 	cmd.update(source);
 
-	in.renderer.push_command(cmd);
+	if (!gain_dependent_lifetime || elapsed_secs != 0.f) {
+		in.renderer.push_command(cmd);
+	}
+
+	if (gain_dependent_lifetime) {
+		if (elapsed_secs == 0.f) {
+			if (custom_dist_gain_mult > 0.005f) {
+				elapsed_secs = dt_this_frame;
+
+				const auto proxy = get_proxy(in);
+				proxy.play();
+			}
+		}
+	}
+
+	if (gain_dependent_lifetime) {
+		if (elapsed_secs != 0.f) {
+			if (custom_dist_gain_mult < 0.005f) {
+				original.input.modifier.repetitions = 0;
+			}
+		}
+	}
 }
 
 void sound_system::generic_sound_cache::maybe_play_next(update_properties_input in) {

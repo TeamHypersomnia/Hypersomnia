@@ -51,6 +51,7 @@ struct sound_effect_start_input {
 	bool clear_when_target_entity_deleted = false;
 	bool clear_when_target_alive = false;
 	bool clear_when_target_conscious = false;
+	bool silent_trace_like = false;
 
 	static sound_effect_start_input fire_and_forget(const transformr where) {
 		sound_effect_start_input in;
