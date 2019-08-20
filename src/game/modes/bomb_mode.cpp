@@ -23,6 +23,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/inventory/perform_wielding.hpp"
 #include "game/detail/inventory/wielding_setup.hpp"
+#include "game/detail/snap_interpolation_to_logical.h"
 
 #define LOG_BOMB_MODE 0
 
@@ -397,6 +398,7 @@ void bomb_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 		else {
 			const auto spawn_transform = spawn.get_logic_transform();
 			typed_handle.set_logic_transform(spawn_transform);
+			snap_interpolated_to(typed_handle, spawn_transform);
 
 			if (const auto crosshair = typed_handle.find_crosshair()) {
 				crosshair->base_offset = spawn_transform.get_direction() * 200;

@@ -21,6 +21,10 @@ struct sound_system_settings {
 	float sync_sounds_longer_than_secs = 5.f;
 	float max_divergence_before_sync_secs = 1.f;
 	float treat_as_music_sounds_longer_than_secs = 4.f;
+	float max_speed_for_doppler_calculation = 4000.f;
+
+	float missile_impact_sound_cooldown_duration = 60.f;
+	int missile_impact_occurences_before_cooldown = 1; 
 
 	listener_position_reference listener_reference = listener_position_reference::CHARACTER_POSITION;
 	bool set_listener_orientation_to_character_orientation = false;

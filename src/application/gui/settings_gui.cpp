@@ -460,6 +460,8 @@ void settings_gui_state::perform(
 				ImGui::Separator();
 
 				revertable_slider("Speed of sound (m/s)", config.audio.sound_meters_per_second, 50.f, 400.f);
+				revertable_slider("Max object speed for doppler calculation", config.sound.max_speed_for_doppler_calculation, 0.f, 10000.f);
+
 
 				break;
 			}
@@ -1117,8 +1119,10 @@ void settings_gui_state::perform(
 					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
 					revertable_slider(SCOPE_CFG_NVP(max_simultaneous_bullet_trace_sounds), 0, 20);
 					revertable_slider(SCOPE_CFG_NVP(max_short_sounds), 0, static_cast<int>(SOUNDS_SOURCES_IN_POOL));
-				}
 
+					revertable_slider(SCOPE_CFG_NVP(missile_impact_sound_cooldown_duration), 1.f, 100.f);
+					revertable_slider(SCOPE_CFG_NVP(missile_impact_occurences_before_cooldown), 0, 10);
+				}
 
 				ImGui::Separator();
 

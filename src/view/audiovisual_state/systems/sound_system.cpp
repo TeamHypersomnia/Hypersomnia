@@ -295,6 +295,13 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 			if (interp_enabled || when_set_velocity != cosm.get_timestamp()) {
 				cmd.set_velocity = true;
 				cmd.velocity = effective_velocity;
+
+				const auto sq_max = in.settings.max_speed_for_doppler_calculation * in.settings.max_speed_for_doppler_calculation;
+				const auto sq_len = cmd.velocity.length_sq();
+
+				if (sq_len > sq_max) {
+					cmd.velocity.set_length(in.settings.max_speed_for_doppler_calculation);
+				}
 			}
 		}
 
@@ -501,8 +508,8 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 						}
 					}
 
-					if (start.for_continuous_cooldown()) {
-						const auto max_occurences = -start.collision_sound_occurences_before_cooldown;
+					if (start.is_missile_impact()) {
+						const auto max_occurences = in.settings.missile_impact_occurences_before_cooldown;
 
 						const auto it = damage_sound_cooldowns.try_emplace(key);
 						auto& cooldown = (*it.first).second;
@@ -512,7 +519,7 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 						}
 
 						++cooldown.consecutive_occurences;
-						cooldown.max_ms = start.collision_sound_cooldown_duration;
+						cooldown.max_ms = in.settings.missile_impact_sound_cooldown_duration;
 					}
 					else {
 						const auto it = collision_sound_cooldowns.try_emplace(key);

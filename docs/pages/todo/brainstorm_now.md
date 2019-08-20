@@ -6,8 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Automatic updater?
+	- Would also solve the problem with cache?
+
+- Hold user avatar/nickname/other identity in appdata folder
+	- so that we don't have to specify each time a new version comes out
+
 - We could set a limit to the number of allowed simultaneous muzzle sounds from the same gun
-	- similarly on health decrease sounds
+	- similarly for health decrease sounds
 
 - Remember to re-import the new content to cyberaqua after we're done
 

@@ -98,6 +98,9 @@ return {
   sound = {
     processing_frequency = "EVERY_SIMULATION_STEP",
 	sync_sounds_longer_than_secs = 5,
+    max_speed_for_doppler_calculation = 5000,
+	missile_impact_sound_cooldown_duration = 60,
+	missile_impact_occurences_before_cooldown = 1,
     max_short_sounds = 80,
     max_simultaneous_bullet_trace_sounds = 5,
 	gain_threshold_for_bullet_trace_sounds = 0.012,

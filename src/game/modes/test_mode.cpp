@@ -6,6 +6,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/generate_equipment.h"
+#include "game/detail/snap_interpolation_to_logical.h"
 
 using input_type = test_mode::input;
 
@@ -61,6 +62,7 @@ void test_mode::teleport_to_next_spawn(const input_type in, const entity_id id) 
 		if (const auto spawn = ::find_faction_spawn(in.cosm, faction, current_spawn_index)) {
 			const auto spawn_transform = spawn.get_logic_transform();
 			typed_handle.set_logic_transform(spawn_transform);
+			snap_interpolated_to(typed_handle, spawn_transform);
 
 			if (const auto crosshair = typed_handle.find_crosshair()) {
 				crosshair->base_offset = spawn_transform.get_direction() * 200;

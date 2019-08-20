@@ -53,7 +53,7 @@ struct sound_effect_start_input {
 	bool clear_when_target_conscious = false;
 	bool silent_trace_like = false;
 
-	bool for_continuous_cooldown() const {
+	bool is_missile_impact() const {
 		return collision_sound_occurences_before_cooldown < 0;
 	}
 
@@ -92,6 +92,14 @@ struct sound_effect_start_input {
 	auto& mark_source_collision(const entity_id sub, const entity_id col) {
 		source_collision.subject = sub;
 		source_collision.collider = col;
+
+		return *this;
+	}
+
+	auto& mark_as_missile_impact(const entity_id sub, const entity_id col) {
+		source_collision.subject = sub;
+		source_collision.collider = col;
+		collision_sound_occurences_before_cooldown = -1;
 
 		return *this;
 	}

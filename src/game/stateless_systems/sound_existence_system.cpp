@@ -71,15 +71,12 @@ void play_collision_sound(
 					auto start = sound_effect_start_input::fire_and_forget(location);
 
 					if (for_damage_cooldown) {
-						start.collision_sound_cooldown_duration = 75.f;
-						start.collision_sound_occurences_before_cooldown = -1;
-
 						const auto missile = sub_missile ? sub : col;
 						const auto wall = sub_missile ? col : sub;
 
 						const auto capability = missile.template get<components::sender>().capability_of_sender;
 
-						start.mark_source_collision(capability, wall);
+						start.mark_as_missile_impact(capability, wall);
 					}
 					else {
 						start.mark_source_collision(sub, col);
@@ -291,9 +288,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		const auto sender = d.origin.sender.capability_of_sender;
 
 		auto mark_coll = [&](auto& eff) -> auto& {
-			eff.collision_sound_cooldown_duration = 75.f;
-			eff.collision_sound_occurences_before_cooldown = -1;
-			eff.mark_source_collision(sender, d.subject);
+			eff.mark_as_missile_impact(sender, d.subject);
 			return eff;
 		};
 
