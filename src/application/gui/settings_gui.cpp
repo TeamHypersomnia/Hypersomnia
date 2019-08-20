@@ -1,11 +1,15 @@
 #include <cstring>
 #include <thread>
 
+#include "augs/log_path_getters.h"
+#include "augs/window_framework/shell.h"
+#include "augs/filesystem/file.h"
 #include "augs/templates/introspect.h"
 #include "augs/graphics/renderer.h"
 #include "augs/templates/enum_introspect.h"
 #include "augs/string/format_enum.h"
 #include "augs/misc/enum/enum_array.h"
+#include "augs/filesystem/directory.h"
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
@@ -1214,9 +1218,26 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::ADVANCED: {
+				const auto cwd = augs::get_current_working_directory();
+				text("Working directory: %x", cwd, std::filesystem::absolute(cwd));
+				text("Cache folder location: %x (%x)", GENERATED_FILES_DIR, std::filesystem::absolute(GENERATED_FILES_DIR));
+
+				if (ImGui::Button("Dump debug log")) {
+					get_dumped_log_path();
+					
+					const auto logs = program_log::get_current().get_complete();
+					auto failure_log_path = augs::path_type(get_dumped_log_path());
+
+					augs::save_as_text(failure_log_path, logs);
+
+					augs::open_text_editor(failure_log_path.string());
+					augs::open_text_editor(failure_log_path.replace_filename("").string());
+				}
+
 #if !PLATFORM_WINDOWS
 				text(u8"Test: いい товарищ żółćńźś");
 #endif
+				ImGui::Separator();
 
 				revertable_checkbox("Show developer console", config.session.show_developer_console);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);

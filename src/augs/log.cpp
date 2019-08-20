@@ -81,6 +81,10 @@ std::string get_exit_failure_path() {
 	return get_path_in_log_files("exit_failure_debug_log.txt");
 }
 
+std::string get_dumped_log_path() {
+	return get_path_in_log_files("dumped_debug_log.txt");
+}
+
 program_log program_log::global_instance = 10000;
 
 program_log::program_log(const unsigned max_all_entries) 

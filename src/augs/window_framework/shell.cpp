@@ -42,7 +42,7 @@ namespace augs {
 #if PLATFORM_WINDOWS
 namespace augs {
 	void open_text_editor(const std::string& on_file) {
-		augs::shell("\"" + augs::path_type(on_file).string() + "\"");
+		augs::shell("\"" + std::filesystem::absolute(augs::path_type(on_file)).string() + "\"");
 	}
 }
 #elif PLATFORM_UNIX
