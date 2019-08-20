@@ -71,7 +71,7 @@ void play_collision_sound(
 					auto start = sound_effect_start_input::fire_and_forget(location);
 
 					if (for_damage_cooldown) {
-						start.collision_sound_cooldown_duration = 60.f;
+						start.collision_sound_cooldown_duration = 75.f;
 						start.collision_sound_occurences_before_cooldown = -1;
 
 						const auto missile = sub_missile ? sub : col;
@@ -291,7 +291,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		const auto sender = d.origin.sender.capability_of_sender;
 
 		auto mark_coll = [&](auto& eff) -> auto& {
-			eff.collision_sound_cooldown_duration = 60.f;
+			eff.collision_sound_cooldown_duration = 75.f;
 			eff.collision_sound_occurences_before_cooldown = -1;
 			eff.mark_source_collision(sender, d.subject);
 			return eff;

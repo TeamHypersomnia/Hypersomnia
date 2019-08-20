@@ -129,7 +129,7 @@ namespace test_flavours {
 		
 		fixtures_def.filter = filters[predefined_filter_type::FLYING_BULLET];
 		fixtures_def.density = 1;
-		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
+		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::STANDARD_MISSILE);
 		fixtures_def.max_ricochet_angle = 0.f;
 
 		meta.set(fixtures_def);
