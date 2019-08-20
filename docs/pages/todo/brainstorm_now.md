@@ -6,6 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Dedicated server communication
+	- Advanced RCON functionality
+		- Rcon can download the log
+		- Rcon should have a reserved slot to enter in case of emergency
+		- RCON password
+		- Switch teams
+		- Restart
+		- A way to view dedicated server stats?
+	- Remember to keep the old master rcon password so that basic level rcons cannot change it
+
+
 - Automatic updater?
 	- Would also solve the problem with cache?
 
@@ -17,19 +28,11 @@ summary: That which we are brainstorming at the moment.
 
 - Remember to re-import the new content to cyberaqua after we're done
 
-- Profile interpolation rewrite
-
 - We might want to somehow decrease heap contention between threads
 	- Best would be per-thread heaps
 		- Even better just no allocations
 		- Though even something as trivial as draw debug details will do a lot of allocations
 	- Use hoard allocator?
-
-- Determine how could we possibly have over 1000 fps on linux in the past
-	- Really just movement paths?
-	- More debug details?
-	- Why does having a character on screen decrease the fps so much?
-		- Test it by going to spectator
 
 - Benefits of demos
 	- Deterministic repros
@@ -43,66 +46,21 @@ summary: That which we are brainstorming at the moment.
 	- Also makes it easier to debug
 	- Snapshots could prove a little hard but we could just resimulate from the beginning if we want to seek backwards
 
-- Default camera mode in settings, maybe controls?
-
-- Looks like we have drastically less FPS with character on screen compared to no character
-	- Would it be only sound logic?
-
-- Do we send the client back their own entropy?
-	- If no and we just add num accepted commands, a desync may occur if the server can modify for some reason the entropy after receiving it from the client
-	- if yes, that's a slight optimization opportunity, although it may complicate stuff a little
-
 - Port fy_minilab
 
-- Things to update for windows
-	- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
-		- We had differing versions, the one on our computer is newer so it builds everything
-	- augs::date_time constructor for file write type, used to display last write times of lua meta files, although that's low priority
+- Upgrade appveyor
+	- Things to update for windows
+		- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
+			- We had differing versions, the one on our computer is newer so it builds everything
+		- augs::date_time constructor for file write type, used to display last write times of lua meta files, although that's low priority
 
 - blurred text if zoomed out
 
-- Upgrade appveyor
-
-- Advanced RCON functionality
-	- Rcon can download the log
-	- Rcon should have a reserved slot to enter in case of emergency
-	- RCON password
-	- Switch teams
-	- Restart
-	- A way to view dedicated server stats?
-
-- Remember to keep the old master rcon password so that basic level rcons cannot change it
 - fix area indicator zoom in editor
-
-- 1 byte in entropy = 60 bytes/sec for recordings
-- 10 bytes (2 floats + 2 flags) = 600 bytes/sec for recordings = 2mb / hr
-
 
 - In-game tip system
 	- Notifications like "can't holster" will be drawn a little above the context tip
 		- So that both can appear at once
-
-- Test polish characters on Windows again
-
-- Perhaps replace shift+c with some other shortcut?
-
-- Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
-
-- Test avatars on windows, especially the png filename filter
-
-- Fix that clipboard on all platforms at last
-
-- In host a server menu option, simply spawn a separate dedicated server process and use locally created client_setup to connect
-	- Something to check if the servers is already on
-
-- panel -> ct computers
-		
-- Tinfoil hat
-	- Grants a 50% protection from magic
-	- Can't use spells
-	- 1900$
-
-- Perhaps interpolate velocity values if we detect that they are ugly at 60hz, apart from the case with skull rocket?
 
 - Keep timestamps in log structures and, when writing the logs to a file, preffix the log entries with time
 	- Will later be good to separate logs via date, for the dedicated server
@@ -110,44 +68,17 @@ summary: That which we are brainstorming at the moment.
 - Dump logs once every 1000 or so
 - Write editor write date to version.txt file
 	
-- Still, if we are able to always connect and catch up with inputs, it should never disconnect if we resync mid-game
-	- Using debug mode to simulate a slow computer does not reproduce the issue
-
-- Theory: weak clients don't catch up with the steps they have to re-simulate after desyncing
-	- Why would they then be able to do so on connection init?
-
-- Treat holster as last setup flag?
-
 - Radar
 	- Also show bomb
 
-- friendlies off-screen indicators
-	- meters instead of pixels, because of varying levels of zoom
-
-- Stress test connection under desyncs
-- Fix spectator to show the past
-
-- Crash when turning on drawing of cast raycasts
-
 - make layer with insects hoverable in editor
 
-- some strange recurring problem with H (temporarily hiding layers) not working
-
-- actually make two rulesets for server and playtesting
-	- perhaps do so from test scene content and replace on update official content
-
 - bomb falls outside the map
+
 - Editor errata
 	- fix confusing undo behaviour when duplicating entities
 	- particle delete command does not show message
 	- if duplicate names in project, the button just does not work in asset file choice dialog
-
-- flipping of the other hand in akimbo?
-
-- minimally buff pro90 over zamieć: perhaps increase the round's impact a little?
-
-- The rocket launcher still glitches during reloading, sometimes
-	- watch the footage from chrzan
 
 - Indeed, there is a problem when importing project-specific gfx on windows, but not on linux
 

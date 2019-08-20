@@ -5,6 +5,8 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Default camera mode in settings, maybe controls?
+
 - consider putting nades and knives to the primary hand for better aiming consistency when quickthrowing
 	- problematic because the gun will stop shooting and it will be displaced
 

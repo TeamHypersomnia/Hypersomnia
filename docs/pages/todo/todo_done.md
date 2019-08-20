@@ -3799,3 +3799,38 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Sleep multiplier for server
 
+- Test polish characters on Windows again
+
+- Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
+
+- Test avatars on windows, especially the png filename filter
+
+- Fix that clipboard on all platforms at last
+
+- In host a server menu option, simply spawn a separate dedicated server process and use locally created client_setup to connect
+	- Something to check if the servers is already on
+
+- Still, if we are able to always connect and catch up with inputs, it should never disconnect if we resync mid-game
+	- Using debug mode to simulate a slow computer does not reproduce the issue
+
+- Theory: weak clients don't catch up with the steps they have to re-simulate after desyncing
+	- Why would they then be able to do so on connection init?
+
+- Treat holster as last setup flag?
+
+- friendlies off-screen indicators
+	- meters instead of pixels, because of varying levels of zoom
+
+- Stress test connection under desyncs
+- Fix spectator to show the past
+
+- actually make two rulesets for server and playtesting
+	- perhaps do so from test scene content and replace on update official content
+
+- flipping of the other hand in akimbo?
+
+- minimally buff pro90 over zamieć: perhaps increase the round's impact a little?
+
+- The rocket launcher still glitches during reloading, sometimes
+	- watch the footage from chrzan
+

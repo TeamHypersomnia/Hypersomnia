@@ -5,6 +5,16 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Profile interpolation rewrite
+
+- Looks like we have drastically less FPS with character on screen compared to no character
+	- Would it be only sound logic?
+- Determine how could we possibly have over 1000 fps on linux in the past
+	- Really just movement paths?
+	- More debug details?
+	- Why does having a character on screen decrease the fps so much?
+		- Test it by going to spectator
+
 - Perhaps conditionally remove the logs for deletions in relwithdebinfo?
 - Perhaps conditionally remove the checking if the inventory slots are valid?
 

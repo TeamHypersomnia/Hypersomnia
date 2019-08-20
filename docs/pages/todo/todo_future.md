@@ -5,6 +5,11 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Tinfoil hat
+	- Grants a 50% protection from magic
+	- Can't use spells
+	- 1900$
+
 - Switching to fixed point
 	- Fix cases like rng.randval(-1.f, 1.f) where the template will resolve to floats
 

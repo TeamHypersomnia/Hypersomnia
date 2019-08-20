@@ -24,27 +24,41 @@
 void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
+	const auto dt_secs = delta.in_seconds();
+	const auto damp_mult = 20.f;
 
 	cosm.for_each_having<components::trace>(
 		[&](const auto t) {
 			auto& trace = t.template get<components::trace>();
 			const auto& trace_def = t.template get<invariants::trace>();
 
-			vec2 surplus_multiplier;
-			
-			if (!trace.is_it_a_finishing_trace) {
-				surplus_multiplier = trace.chosen_multiplier * trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms;
+			if (trace.is_it_a_finishing_trace) {
+				auto shrink = [&](vec2& v) {
+					if (v.x == 0.f) {
+						v.reset();
+					}
+					else {
+						const auto mult = v.y / v.x;
+
+						augs::shrink(v.x, dt_secs * damp_mult);
+						augs::shrink(v.y, dt_secs * damp_mult * mult);
+					}
+				};
+
+				shrink(trace.last_size_mult);
+
+				trace.last_center_offset_mult = (trace.last_size_mult - trace_def.additional_multiplier) / 2.f;
 			}
 			else {
-				surplus_multiplier = (trace.chosen_multiplier + vec2(1, 1)) * (1.f - (trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms)) - vec2(1, 1);
+				const auto surplus_multiplier = vec2(trace.chosen_multiplier * trace.lengthening_time_passed_ms / trace.chosen_lengthening_duration_ms);
+
+				const auto size_multiplier = trace_def.additional_multiplier + surplus_multiplier;
+
+				trace.last_size_mult = size_multiplier; 
+				trace.last_center_offset_mult = surplus_multiplier / 2.f;
+
+				trace.lengthening_time_passed_ms += static_cast<float>(delta.in_milliseconds());
 			}
-
-			const auto size_multiplier = trace_def.additional_multiplier + surplus_multiplier;
-
-			trace.last_size_mult = size_multiplier; 
-			trace.last_center_offset_mult = surplus_multiplier / 2.f;
-
-			trace.lengthening_time_passed_ms += static_cast<float>(delta.in_milliseconds());
 		}
 	);
 }
@@ -58,8 +72,10 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 
 			if (trace.lengthening_time_passed_ms > trace.chosen_lengthening_duration_ms) {
 				trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms;
+			}
 
-				if (trace.is_it_a_finishing_trace) {
+			if (trace.is_it_a_finishing_trace) {
+				if (trace.last_size_mult.length_sq() < 0.00001f) {
 					step.queue_deletion_of(t, "Trace expiration");
 				}
 			}
@@ -74,22 +90,26 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 	for (const auto& it : events) {
 		const auto deleted_entity = cosm[it.subject];
 
-		if (const auto* const trace = deleted_entity.find<components::trace>();
-	   		trace && !trace->is_it_a_finishing_trace
-		) {
-			const auto& trace_def = deleted_entity.get<invariants::trace>();
+		deleted_entity.dispatch_on_having_all<invariants::trace>([&](const auto& typed_deleted) {
+			const auto& trace = typed_deleted.template get<components::trace>();
 
-			auto transform_of_finishing = deleted_entity.get_logic_transform();
+			if (trace.is_it_a_finishing_trace) {
+				return;
+			}
 
-			if (const auto missile = deleted_entity.find<components::missile>()) {
+			const auto& trace_def = typed_deleted.template get<invariants::trace>();
+
+			auto transform_of_finishing = typed_deleted.get_logic_transform();
+
+			if (const auto missile = typed_deleted.template find<components::missile>()) {
 				transform_of_finishing = missile->saved_point_of_impact_before_death;
 
-				const auto w = deleted_entity.get_logical_size().x;
+				const auto w = typed_deleted.get_logical_size().x;
 				transform_of_finishing.pos -= transform_of_finishing.get_direction() * (w / 2);
 
 				/* transform_of_finishing */
 
-				/* 	- vec2(deleted_entity.get<invariants::sprite>().get_size() / 2) */
+				/* 	- vec2(typed_deleted.get<invariants::sprite>().get_size() / 2) */
 				/* 	.rotate(transform_of_finishing.rotation, vec2i(0, 0)) */
 				/* ; */
 			}
@@ -108,20 +128,21 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 
 					{
 						auto& copied_trace = typed_handle.template get<components::trace>();
-						copied_trace = *trace;
-						copied_trace.lengthening_time_passed_ms = 0.f;
-						copied_trace.chosen_lengthening_duration_ms /= 4;
+						copied_trace = trace;
 						copied_trace.is_it_a_finishing_trace = true;
 					}
 				}
 			)) {
-				messages::interpolation_correction_request request;
-				request.subject = finishing_trace;
-				request.set_previous_transform_from = deleted_entity;
+				finishing_trace.template dispatch_on_having_all<invariants::interpolation>(
+					[&](const auto& typed_finishing) {
+						auto& src_interp = get_corresponding<components::interpolation>(typed_deleted);
+						auto& trg_interp = get_corresponding<components::interpolation>(typed_finishing);
 
-				step.post_message(request);
+						trg_interp = src_interp;
+					}
+				);
 			}
-		}
+		});
 	}
 }
 

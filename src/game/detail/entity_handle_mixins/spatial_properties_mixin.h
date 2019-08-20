@@ -94,10 +94,7 @@ public:
 					const auto& cosm = handle.get_cosmos();
 
 					if (const auto connection = handle.find_colliders_connection()) {
-						if (connection->owner == handle.get_id()) {
-							return sys.get_interpolated(handle);
-						}
-						else {
+						if (connection->owner != handle.get_id()) {
 							transformr bt;
 
 							cosm[connection->owner].template dispatch_on_having_all<components::rigid_body>([&](const auto& typed_body) {
@@ -113,6 +110,8 @@ public:
 							return bt + displacement;
 						}
 					}
+
+					return sys.get_interpolated(handle);
 				}
 			}
 

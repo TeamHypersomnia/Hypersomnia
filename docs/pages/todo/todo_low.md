@@ -4,6 +4,10 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Perhaps replace shift+c with some other shortcut?
+
+- Perhaps interpolate velocity values if we detect that they are ugly at 60hz, apart from the case with skull rocket?
+
 - introduce particle multiplier for ring explosions
 	- set a reasonable value for things like rocket launcher
 
