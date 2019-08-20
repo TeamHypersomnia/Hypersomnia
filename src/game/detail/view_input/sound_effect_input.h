@@ -53,6 +53,10 @@ struct sound_effect_start_input {
 	bool clear_when_target_conscious = false;
 	bool silent_trace_like = false;
 
+	bool for_continuous_cooldown() const {
+		return collision_sound_occurences_before_cooldown < 0;
+	}
+
 	static sound_effect_start_input fire_and_forget(const transformr where) {
 		sound_effect_start_input in;
 		in.positioning.offset = where;

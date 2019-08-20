@@ -98,6 +98,7 @@ return {
   sound = {
     processing_frequency = "EVERY_SIMULATION_STEP",
 	sync_sounds_longer_than_secs = 5,
+    max_short_sounds = 80,
     max_simultaneous_bullet_trace_sounds = 5,
 	gain_threshold_for_bullet_trace_sounds = 0.012,
 	max_divergence_before_sync_secs = 1,

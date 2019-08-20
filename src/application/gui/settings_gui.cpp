@@ -21,6 +21,7 @@
 #include "application/config_lua_table.h"
 #include "application/gui/settings_gui.h"
 #include "augs/network/network_types.h"
+#include "augs/audio/sound_sizes.h"
 
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 	window.sync_back_into(into.window);
@@ -1097,6 +1098,7 @@ void settings_gui_state::perform(
 
 					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
 					revertable_slider(SCOPE_CFG_NVP(max_simultaneous_bullet_trace_sounds), 0, 20);
+					revertable_slider(SCOPE_CFG_NVP(max_short_sounds), 0, static_cast<int>(SOUNDS_SOURCES_IN_POOL));
 				}
 
 

@@ -26,6 +26,7 @@ struct sound_system_settings {
 	bool set_listener_orientation_to_character_orientation = false;
 	int max_simultaneous_bullet_trace_sounds = 6;
 	float gain_threshold_for_bullet_trace_sounds = 0.012f;
+	int max_short_sounds = 64;
 
 	sound_processing_frequency processing_frequency = sound_processing_frequency::EVERY_SIMULATION_STEP;
 	// END GEN INTROSPECTOR

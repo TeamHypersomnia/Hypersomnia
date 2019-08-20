@@ -36,11 +36,17 @@ const_entity_handle sound_system::update_properties_input::get_listener() const 
 	return ear.viewed_character;
 }
 
+bool sound_system::update_properties_input::under_short_sound_limit() const {
+	return static_cast<int>(owner.short_sounds.size()) < settings.max_short_sounds;
+}
+
 void sound_system::clear() {
 	short_sounds.clear();
 	fading_sources.clear();
 	firearm_engine_caches.clear();
 	continuous_sound_caches.clear();
+	collision_sound_cooldowns.clear();
+	damage_sound_cooldowns.clear();
 	id_pool.reset();
 }
 
@@ -495,23 +501,45 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 						}
 					}
 
-					const auto it = collision_sound_cooldowns.try_emplace(key);
+					if (start.for_continuous_cooldown()) {
+						const auto max_occurences = -start.collision_sound_occurences_before_cooldown;
 
-					auto& cooldown = (*it.first).second;
+						const auto it = damage_sound_cooldowns.try_emplace(key);
+						auto& cooldown = (*it.first).second;
 
-					++cooldown.consecutive_occurences;
-					++cooldown.remaining_ms = start.collision_sound_cooldown_duration;
+						if (cooldown.consecutive_occurences >= max_occurences) {
+							continue;
+						}
 
-					// LOG_NVPS(cooldown.consecutive_occurences);
+						++cooldown.consecutive_occurences;
+						cooldown.max_ms = start.collision_sound_cooldown_duration;
+					}
+					else {
+						const auto it = collision_sound_cooldowns.try_emplace(key);
 
-					if (cooldown.consecutive_occurences > start.collision_sound_occurences_before_cooldown) {
-						// LOG("Skipping");
-						continue;
+						auto& cooldown = (*it.first).second;
+
+						++cooldown.consecutive_occurences;
+						cooldown.remaining_ms = start.collision_sound_cooldown_duration;
+
+						// LOG_NVPS(cooldown.consecutive_occurences);
+
+						if (cooldown.consecutive_occurences > start.collision_sound_occurences_before_cooldown) {
+							// LOG("Skipping");
+							continue;
+						}
 					}
 				}
 			}
 
-			if (!id_pool.full() && short_sounds.size() < short_sounds.max_size()) {
+			if (in.settings.max_short_sounds > 0 && !id_pool.full() && short_sounds.size() < short_sounds.max_size()) {
+				if (!in.under_short_sound_limit()) {
+					if (short_sounds.size() > 0) {
+						short_sounds[0].stop_and_free(in);
+						short_sounds.erase(short_sounds.begin());
+					}
+				}
+
 				const auto new_id = id_pool.allocate();
 
 				auto release_id = [&]() {
@@ -889,6 +917,23 @@ void sound_system::fade_sources(
 
 		if (c.remaining_ms <= 0.f) {
 			return true;
+		}
+
+		return false;
+	});
+
+	erase_if (damage_sound_cooldowns, [&](auto& it) {
+		auto& c = it.second;
+
+		c.current_ms += dt.in_milliseconds();
+
+		if (c.current_ms > c.max_ms) {
+			c.current_ms = 0.f;
+			--c.consecutive_occurences;
+
+			if (0 == c.consecutive_occurences) {
+				return true;
+			}
 		}
 
 		return false;

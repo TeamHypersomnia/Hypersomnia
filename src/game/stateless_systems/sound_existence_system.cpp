@@ -41,6 +41,11 @@ void play_collision_sound(
 	const auto subject_coll = sub.get<invariants::fixtures>();
 	const auto collider_coll = col.get<invariants::fixtures>();
 
+	const bool sub_missile = sub.find<invariants::missile>();
+	const bool col_missile = col.find<invariants::missile>();
+
+	const bool for_damage_cooldown = sub_missile || col_missile;
+
 	const auto* const subject_coll_material = logicals.find(calc_physical_material(sub));
 	const auto* const collider_coll_material = logicals.find(calc_physical_material(col));
 
@@ -63,9 +68,24 @@ void play_collision_sound(
 					effect.modifier.pitch *= std::max(pitch_bound.first, pitch_bound.second - pitch_mult);
 					effect.modifier.gain *= std::min(1.f, gain_mult);
 
-					auto start = sound_effect_start_input::fire_and_forget(location).mark_source_collision(sub, col);
-					start.collision_sound_cooldown_duration = sound_def->cooldown_duration;
-					start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
+					auto start = sound_effect_start_input::fire_and_forget(location);
+
+					if (for_damage_cooldown) {
+						start.collision_sound_cooldown_duration = 60.f;
+						start.collision_sound_occurences_before_cooldown = -1;
+
+						const auto missile = sub_missile ? sub : col;
+						const auto wall = sub_missile ? col : sub;
+
+						const auto capability = missile.template get<components::sender>().capability_of_sender;
+
+						start.mark_source_collision(capability, wall);
+					}
+					else {
+						start.mark_source_collision(sub, col);
+						start.collision_sound_cooldown_duration = sound_def->cooldown_duration;
+						start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
+					}
 
 					// TODO: PARAMETRIZE!
 					effect.modifier.max_distance = 2700.f;
@@ -268,11 +288,20 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			continue;
 		}
 
+		const auto sender = d.origin.sender.capability_of_sender;
+
+		auto mark_coll = [&](auto& eff) -> auto& {
+			eff.collision_sound_cooldown_duration = 60.f;
+			eff.collision_sound_occurences_before_cooldown = -1;
+			eff.mark_source_collision(sender, d.subject);
+			return eff;
+		};
+
 		if (subject.has<components::item>()) {
 			if (const auto capability = subject.get_owning_transfer_capability()) {
 				d.damage.pass_through_held_item_sound.start(
 					step,
-					sound_effect_start_input::fire_and_forget( { d.point_of_impact, 0.f } ).set_listener(capability),
+					mark_coll(sound_effect_start_input::fire_and_forget( { d.point_of_impact, 0.f } ).set_listener(capability)),
 					always_predictable_v
 				);
 
@@ -284,7 +313,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			auto do_effect = [&](const auto& effect_def) {
 				effect_def.sound.start(
 					step,
-					sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject),
+					mark_coll(sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)),
 					always_predictable_v
 				);
 			};
@@ -325,7 +354,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 				effect.start(
 					step,
-					sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject),
+					mark_coll(sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)),
 					always_predictable_v
 				);
 			}

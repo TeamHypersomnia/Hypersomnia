@@ -66,6 +66,8 @@ class sound_system {
 
 		const_entity_handle get_listener() const;
 		std::optional<transformr> find_transform(const absolute_or_local&) const;
+
+		bool under_short_sound_limit() const;
 	};
 
 	struct effect_not_found {};
@@ -124,6 +126,13 @@ class sound_system {
 		int consecutive_occurences = 0;
 	};
 
+	struct damage_sound_cooldown {
+		float current_ms = 0.f;
+		float max_ms = 0.f;
+
+		int consecutive_occurences = 0;
+	};
+
 	augs::constant_size_vector<generic_sound_cache, SOUNDS_SOURCES_IN_POOL> short_sounds;
 
 	struct recorded_meta {
@@ -142,6 +151,7 @@ class sound_system {
 
 	augs::constant_size_vector<fading_source, MAX_FADING_SOURCES> fading_sources;
 	std::unordered_map<collision_cooldown_key, collision_sound_cooldown> collision_sound_cooldowns;
+	std::unordered_map<collision_cooldown_key, damage_sound_cooldown> damage_sound_cooldowns;
 
 	template <class T>
 	void fade_and_erase(const update_properties_input& in, T& caches, const unversioned_entity_id id, const float fade_per_sec = 3.f) {
