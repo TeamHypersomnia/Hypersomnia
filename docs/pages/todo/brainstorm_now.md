@@ -7,6 +7,7 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - We could set a limit to the number of allowed simultaneous muzzle sounds from the same gun
+	- similarly on health decrease sounds
 
 - Remember to re-import the new content to cyberaqua after we're done
 

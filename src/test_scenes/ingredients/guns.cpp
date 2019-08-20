@@ -389,6 +389,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::LEWSII_ROUND);
 			meta = get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND);
+			meta.get<invariants::text_details>().name = "Lews II round";
 
 			auto& missile = meta.get<invariants::missile>();
 
@@ -1401,6 +1402,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::LEWSII_SHELL);
 			meta = get_test_flavour(flavours, test_remnant_bodies::STEEL_SHELL);
+			meta.get<invariants::text_details>().name = "Lews II shell";
 
 			auto& remnant = meta.get<invariants::remnant>();
 			remnant.lifetime_secs = 0.35f;

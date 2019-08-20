@@ -1,4 +1,4 @@
-Revision no.: 6881 (clean)
-Build date: Wed Aug 7 18:56:48 2019
+Revision no.: 6910 (dirty)
+Build date: Mon Aug 19 01:32:13 2019
 Commit message:
-Put physics caches into synced(...)
+Alt+Enter for fullscreen

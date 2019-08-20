@@ -915,13 +915,30 @@ void settings_gui_state::perform(
 			case settings_pane::SERVER: {
 				auto& scope_cfg = config.server;
 
-				revertable_slider(SCOPE_CFG_NVP(kick_if_no_messages_for_secs), 0u, 300u);
-				revertable_slider(SCOPE_CFG_NVP(kick_if_away_from_keyboard_for_secs), 0u, 6000u);
-				revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 0u, 300u);
+				ImGui::Separator();
 
+				text_color("General", yellow);
+
+				ImGui::Separator();
+
+				input_text<100>(SCOPE_CFG_NVP(current_arena)); revert(scope_cfg.current_arena);
 				input_text<100>(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
 
+				if (auto node = scoped_tree_node("Time limits")) {
+					revertable_slider(SCOPE_CFG_NVP(kick_if_no_messages_for_secs), 0u, 300u);
+					revertable_slider(SCOPE_CFG_NVP(kick_if_away_from_keyboard_for_secs), 0u, 6000u);
+					revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 0u, 300u);
+				}
+
 				do_lag_simulator(config.server.network_simulator);
+
+				ImGui::Separator();
+
+				text_color("Dedicated server", yellow);
+
+				ImGui::Separator();
+
+				revertable_slider(SCOPE_CFG_NVP(sleep_mult), 0.0f, 0.9f);
 
 				if (auto node = scoped_tree_node("RCON")) {
 					auto& scope_cfg = config.private_server;
@@ -931,11 +948,12 @@ void settings_gui_state::perform(
 
 					input_text<max_rcon_password_length_v>(SCOPE_CFG_NVP(master_rcon_password)); revert(scope_cfg.master_rcon_password);
 					text_disabled("A master rcon can additionally change the rcon password in case of an emergency.");
+
+					{
+						auto& scope_cfg = config.server;
+						revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_loopback_for_rcon));
+					}
 				}
-
-				revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_loopback_for_rcon));
-
-				input_text<100>(SCOPE_CFG_NVP(current_arena)); revert(scope_cfg.current_arena);
 
 				break;
 			}
