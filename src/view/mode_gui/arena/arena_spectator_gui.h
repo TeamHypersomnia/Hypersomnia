@@ -18,6 +18,7 @@ struct arena_spectator_gui {
 	bool show = false;
 	bool its_match_summary = false;
 	bool accept_inputs = false;
+	mutable bool has_been_drawn = false;
 
 	std::optional<augs::timer> when_local_player_knocked_out;
 

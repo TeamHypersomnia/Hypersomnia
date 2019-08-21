@@ -115,7 +115,7 @@ void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 }
 
 bool client_setup::is_spectating_referential() const {
-	return vars.spectate_referential_state && arena_gui.spectator.show;
+	return vars.spectate_referential_state && arena_gui.spectator.has_been_drawn;
 }
 
 client_arena_type client_setup::get_viewed_arena_type() const {

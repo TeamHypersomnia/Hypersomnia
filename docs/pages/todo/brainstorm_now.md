@@ -21,7 +21,6 @@ summary: That which we are brainstorming at the moment.
 		- A way to view dedicated server stats?
 	- Remember to keep the old master rcon password so that basic level rcons cannot change it
 
-
 - Automatic updater?
 	- Would also solve the problem with cache?
 

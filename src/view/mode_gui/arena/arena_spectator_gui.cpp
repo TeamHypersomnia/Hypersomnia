@@ -53,6 +53,8 @@ void arena_spectator_gui::draw_gui(
 ) const {
 	using namespace augs::gui::text;
 
+	has_been_drawn = false;
+
 	(void)typed_mode;
 	(void)mode_input;
 	(void)draw_in;
@@ -134,6 +136,8 @@ void arena_spectator_gui::draw_gui(
 			
 		draw_text_indicator_at(instructions, one_sixth_t + 2 * cell_h, rgba(0, 0, 0, 150));
 	}
+
+	has_been_drawn = true;
 }
 
 void arena_spectator_gui::hide() {
