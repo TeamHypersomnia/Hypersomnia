@@ -631,13 +631,15 @@ return {
     spectate_referential_state = true,
 
 	client_chat = {
+      background_color = "15 15 15 200",
+      border_color = "109 109 127 100",
       chat_window_width = 600,
 	  chat_window_offset = {
 		  x = 10,
 		  y = 300
 	  },
-      show_recent_chat_messages_num = 20,
-      keep_recent_chat_messages_for_seconds = 18,
+      show_recent_chat_messages_num = 30,
+      keep_recent_chat_messages_for_seconds = 22,
 	}
   },
 

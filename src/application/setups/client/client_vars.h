@@ -2,6 +2,7 @@
 #include <string>
 #include "augs/network/network_simulator_settings.h"
 #include "augs/filesystem/path_declaration.h"
+#include "augs/graphics/rgba.h"
 
 struct client_jitter_vars {
 	// GEN INTROSPECTOR struct client_jitter_vars
@@ -21,6 +22,9 @@ struct client_chat_settings {
 	// GEN INTROSPECTOR struct client_chat_settings
 	unsigned chat_window_width = 300;
 	vec2i chat_window_offset = vec2i(10, 300);
+
+	rgba background_color = white;
+	rgba border_color = white;
 
 	unsigned show_recent_chat_messages_num = 5;
 	float keep_recent_chat_messages_for_seconds = 8.f;

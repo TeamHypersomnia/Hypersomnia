@@ -49,10 +49,8 @@ namespace augs {
 			}
 		}
 
-		template <std::size_t buffer_size = 1000, class... Args>
-		bool input_text(const std::string& label, std::string& value, Args&&... args) {
-			std::array<char, buffer_size> buf;
-
+		template <std::size_t buffer_size, class... Args>
+		bool input_text(std::array<char, buffer_size>& buf, const std::string& label, std::string& value, Args&&... args) {
 			std::copy(value.data(), value.data() + value.size() + 1, buf.data());
 
 			if (ImGui::InputText(label.c_str(), buf.data(), buffer_size, std::forward<Args>(args)...)) {
@@ -61,6 +59,12 @@ namespace augs {
 			}
 
 			return false;
+		}
+
+		template <std::size_t buffer_size = 1000, class... Args>
+		bool input_text(const std::string& label, std::string& value, Args&&... args) {
+			std::array<char, buffer_size> buf;
+			return input_text(buf, label, value, std::forward<Args>(args)...);
 		}
 
 		template <std::size_t buffer_size = 1000, class... Args>

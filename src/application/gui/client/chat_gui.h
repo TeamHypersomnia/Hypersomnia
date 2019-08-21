@@ -3,6 +3,7 @@
 #include "application/setups/server/chat_structs.h"
 #include "augs/network/network_types.h"
 #include "augs/math/vec2.h"
+#include "augs/texture_atlas/atlas_entry.h"
 
 namespace messages {
 	struct game_notification;
@@ -10,7 +11,8 @@ namespace messages {
 
 namespace augs {
 	struct baked_font;
-	struct drawer;
+	struct drawer_with_default;
+	class renderer;
 }
 
 struct client_chat_settings;
@@ -66,7 +68,7 @@ struct chat_gui_state {
 	void open_input_bar(chat_target_type);
 
 	void draw_recent_messages(
-		augs::drawer,
+		augs::drawer_with_default,
 		const client_chat_settings&, 
 		const faction_view_settings&,
 		const augs::baked_font& gui_font,

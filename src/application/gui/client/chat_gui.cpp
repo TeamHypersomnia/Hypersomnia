@@ -3,6 +3,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "application/setups/client/client_vars.h"
 #include "view/faction_view_settings.h"
+#include "augs/graphics/renderer.h"
 #include "augs/gui/text/printer.h"
 #include "augs/drawing/drawing.h"
 #include "augs/string/format_enum.h"
@@ -243,19 +244,20 @@ bool chat_gui_state::perform_input_bar(const client_chat_settings& vars) {
 	std::string label;
 
 	switch (target) {
-		case chat_target_type::GENERAL: label = "(Say to all)"; break;
-		case chat_target_type::TEAM_ONLY: label = "(Say to team)"; break;
+		case chat_target_type::GENERAL: label = " (Say to all)"; break;
+		case chat_target_type::TEAM_ONLY: label = " (Say to team)"; break;
 		default: break;
 	}
 
-	text_disabled(label);
+	const auto local_pos = ImGui::GetCursorPos();
 
-	ImGui::SameLine();
+	std::array<char, max_chat_message_length_v> buf;
+	buf[0] = '\0';
 
 	{
 		auto scope = augs::imgui::scoped_item_width(size.x);
 
-		if (input_text<max_chat_message_length_v>("##ChatInput", current_message, ImGuiInputTextFlags_EnterReturnsTrue)) {
+		if (input_text(buf, "##ChatInput", current_message, ImGuiInputTextFlags_EnterReturnsTrue)) {
 			show = false;
 
 			if (current_message.size() > 0) {
@@ -264,11 +266,17 @@ bool chat_gui_state::perform_input_bar(const client_chat_settings& vars) {
 		}
 	}
 
+	ImGui::SetCursorPos(local_pos);
+
+	if (buf[0] == '\0') {
+		text_color(label, rgba(220, 255, 255, 220));
+	}
+
 	return false;
 }
 
 void chat_gui_state::draw_recent_messages(
-	const augs::drawer drawer,
+	const augs::drawer_with_default drawer,
 	const client_chat_settings& vars,
    	const faction_view_settings& faction_view,
 	const augs::baked_font& gui_font,
@@ -286,8 +294,10 @@ void chat_gui_state::draw_recent_messages(
 	const auto starting_i = [&]() {
 		auto i = history.size() - entries_to_show;
 
-		while (i < history.size() && now - history[i].timestamp >= vars.keep_recent_chat_messages_for_seconds) {
-			++i;
+		if (!show) {
+			while (i < history.size() && now - history[i].timestamp >= vars.keep_recent_chat_messages_for_seconds) {
+				++i;
+			}
 		}
 
 		return static_cast<int>(i);
@@ -302,14 +312,17 @@ void chat_gui_state::draw_recent_messages(
 		return formatted_string(text, text_style);
 	};
 
+
+	const auto window_padding = ImGui::GetStyle().WindowPadding;
 	const auto wrapping = vars.chat_window_width;
+	const auto drawn_window_width = vars.chat_window_width + 2 * window_padding.x;
 
 	auto calc_size = [&](const auto& text) { 
 		return get_text_bbox(colored(text, white), wrapping);
 	};
 
 	const auto size = vec2 {
-		static_cast<float>(vars.chat_window_width),
+		static_cast<float>(wrapping),
 		ImGui::GetTextLineHeight() * 3.f
 	};
 
@@ -317,7 +330,15 @@ void chat_gui_state::draw_recent_messages(
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 	const auto window_pos = vec2(window_offset.x, screen_size.y - size.y - window_offset.y);
 
-	auto pen = window_pos;
+	auto pen = window_pos + vec2(window_padding.x, -window_padding.y);
+
+	auto& buf = drawer.output_buffer;
+	const auto current_i = buf.size();
+
+	if (show) {
+		// 8 not 10 to avoid drawing the bottom border
+		buf.resize(buf.size() + 8);
+	}
 
 	for (int i = history.size() - 1; i >= starting_i; --i) {
 		const auto& entry = history[i];
@@ -340,5 +361,15 @@ void chat_gui_state::draw_recent_messages(
 			black,
 			wrapping
 		);
+	}
+
+	if (show) {
+		augs::vertex_triangle_buffer aabb_buf;
+		auto aabb_drawer = augs::drawer_with_default { aabb_buf, drawer.default_texture };
+		aabb_drawer.aabb_with_border(ltrb::from_points(pen - vec2(window_padding.x, window_padding.y), window_pos + vec2(drawn_window_width, 1)), vars.background_color, vars.border_color, border_input { -1, 0 } );
+
+		for (std::size_t i = 0; i < 8 && i < aabb_buf.size(); ++i) {
+			buf[current_i + i] = aabb_buf[i];
+		}
 	}
 }
