@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Check if we don't have some dump file on windows
+
 - Do we want to somehow let the user be able to rollback to older versions?
 	- How do we even do it? Build retention on appveyor?
 

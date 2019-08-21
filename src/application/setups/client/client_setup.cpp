@@ -1122,7 +1122,7 @@ void client_setup::handle_new_session(const add_player_input& in) {
 	ensure(new_session_id != std::nullopt);
 
 	auto& meta = player_metas[new_player.value];
-	meta.clear();
+	meta.clear_session_channeled_data();
 	meta.session_id = *new_session_id;
 
 	auto untimely_handler = [&](auto& untimely) {

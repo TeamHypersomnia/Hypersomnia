@@ -15,13 +15,13 @@ struct arena_player_network_stats {
 struct arena_player_meta {
 	arena_player_avatar_payload avatar;
 	arena_player_network_stats stats;
-	public_client_settings public_settings;
 	session_id_type session_id;
 
-	void clear() {
+	public_client_settings public_settings;
+
+	void clear_session_channeled_data() {
 		avatar.png_bytes.clear();
 		stats = {};
-		public_settings = {};
 		session_id = {};
 	}
 };

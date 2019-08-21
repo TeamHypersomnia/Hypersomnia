@@ -5,6 +5,9 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Fix a fatal desync-causing bug: handle_new_session overwrote the crosshair_sensitivity with default values AFTER receiving the public settings update from the server.
+We'll now separately handle session-channeled and solvable-channeled information.
+
 -
 [xcb] Unknown sequence number while processing reply
 [xcb] Most likely this is a multi-threaded client and XInitThreads has not been called

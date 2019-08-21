@@ -2,7 +2,7 @@
 
 struct per_character_input_settings {
 	// GEN INTROSPECTOR struct per_character_input_settings
-	vec2 crosshair_sensitivity = vec2(3.f, 3.f);
+	vec2 crosshair_sensitivity = vec2(1000.f, 1000.f);
 	bool keep_movement_forces_relative_to_crosshair = false;
 	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
