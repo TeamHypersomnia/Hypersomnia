@@ -13,7 +13,22 @@
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/filesystem/file.h"
 
+#include "augs/misc/imgui/imgui_enum_radio.h"
+
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
+
+address_and_port client_start_input::get_address_and_port() const {
+	if (chosen_address_type == connect_address_type::OFFICIAL) {
+		return { preferred_official_address, default_port_when_no_specified };
+	}
+
+	return { custom_address, default_port_when_no_specified };
+}
+
+void client_start_input::set_custom(const std::string& target) { 
+	custom_address = target;
+	chosen_address_type = connect_address_type::CUSTOM;
+}
 
 bool start_client_gui_state::perform(
 	const augs::frame_num_type current_frame,
@@ -21,7 +36,8 @@ bool start_client_gui_state::perform(
 	augs::graphics::texture& avatar_preview_tex,
 	augs::window& window,
 	client_start_input& into_start,
-	client_vars& into_vars
+	client_vars& into_vars,
+	const std::vector<std::string>& official_servers
 ) {
 	if (!show) {
 		return false;
@@ -43,10 +59,40 @@ bool start_client_gui_state::perform(
 		auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
+		enum_radio(into_start.chosen_address_type, true);
+
+		ImGui::Separator();
+
 		// auto& scope_cfg = into;
 
-		base::acquire_keyboard_once();
-		input_text<100>("Address (ipv4:port or [ipv6]:port)", into_start.ip_port);
+		if (into_start.chosen_address_type == connect_address_type::CUSTOM) {
+			base::acquire_keyboard_once();
+
+			input_text<100>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", into_start.custom_address);
+		}
+		else {
+			auto& preferred = into_start.preferred_official_address;
+
+			if (preferred.empty()) {
+				if (official_servers.size() > 0) {
+					preferred = official_servers[0];
+				}
+			}
+
+			if (preferred.empty()) {
+				text("Could not determine the best official server.", red);
+			}
+			else {
+				auto p = preferred;
+				input_text<100>("##Official", p, ImGuiInputTextFlags_ReadOnly);
+				ImGui::SameLine();
+
+				text_color("Best official server", yellow);
+			}
+
+			base::acquire_keyboard_once();
+		}
+
 		input_text<max_nickname_length_v>("Chosen nickname (3-30 characters)", into_vars.nickname);
 
 		struct loading_result {

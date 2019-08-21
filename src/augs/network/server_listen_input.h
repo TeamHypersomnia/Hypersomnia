@@ -1,12 +1,13 @@
 #pragma once
 #include <string>
 #include "augs/templates/maybe.h"
+#include "augs/network/port_type.h"
 
 namespace augs {
 	struct server_listen_input {
 		// GEN INTROSPECTOR struct augs::server_listen_input
 		std::string ip = "127.0.0.1";
-		unsigned short port = 8412;
+		port_type port = 0;
 		int max_connections = 64;
 		// END GEN INTROSPECTOR
 	};

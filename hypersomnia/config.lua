@@ -3,6 +3,18 @@ return {
   log_to_live_file = false,
   perform_float_consistency_test = true,
 
+  official_servers = {
+	"arena.hypersomnia.xyz" 
+  },
+
+  default_client_start = {
+  	default_port_when_no_specified = 8412,
+	chosen_address_type = "OFFICIAL",
+
+	preferred_official_address = "",
+	custom_address = "127.0.0.1"
+  },
+
   app_controls = {
     F1 = "SWITCH_DEVELOPER_CONSOLE"
   },
@@ -594,10 +606,6 @@ return {
 
   dedicated_server = {
 
-  },
-
-  default_client_start = {
-	ip_port = "127.0.0.1:8412",
   },
 
   client = {

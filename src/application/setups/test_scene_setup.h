@@ -35,6 +35,8 @@ class test_scene_setup : public default_setup_settings {
 	mode_player_id local_player_id;
 
 public:
+	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
+
 	test_scene_setup(
 		sol::state& lua,
 		const test_scene_settings,

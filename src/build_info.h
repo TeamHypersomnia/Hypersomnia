@@ -76,8 +76,8 @@ usage: Hypersomnia [options|editor_file_path]
 Options:
     -h, --help                  Show this help and quit.
     --unit-tests-only           Perform unit tests only and quit.
-    --connect [ip:port]         Connect to an arena server in accordance with default_client_start inside the config file.
-                                The ip:port argument is optional - if specified, it will override the ip_port field from the config file.
+    --connect [ADDRESS]         Connect to an arena server in accordance with default_client_start inside the config file.
+                                The ADDRESS argument is optional - if specified, it will override the connect_address field from the config file.
     --server                    Host an arena server in accordance with default_server_start inside the config file.
                                 Contrary to the --dedicated-server option, this lets you play on your own server within the same game instance.
     --dedicated-server          The same as --server, but applies some settings suitable for a dedicated server instance.

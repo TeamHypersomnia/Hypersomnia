@@ -80,7 +80,7 @@ class client_setup :
 
 	simulation_receiver receiver;
 
-	client_start_input last_start;
+	address_and_port last_start;
 	client_state_type state = client_state_type::INVALID;
 
 	client_vars vars;

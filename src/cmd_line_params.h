@@ -10,7 +10,7 @@ struct cmd_line_params {
 	bool start_server = false;
 	bool start_dedicated_server = false;
 	bool should_connect = false;
-	std::string connect_to_address;
+	std::string connect_address;
 
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
@@ -34,7 +34,7 @@ struct cmd_line_params {
 				should_connect = true;
 				
 				if (argc > 2) {
-					connect_to_address = argv[2];
+					connect_address = argv[2];
 				}
 			}
 			else {

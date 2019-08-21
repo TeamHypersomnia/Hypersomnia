@@ -33,6 +33,7 @@ public:
 		augs::graphics::texture& avatar_preview_tex,
 		augs::window& window,
 		client_start_input&,
-		client_vars& 
+		client_vars&,
+		const std::vector<std::string>& official_servers
 	);
 };

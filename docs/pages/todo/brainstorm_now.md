@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Do we want to somehow let the user be able to rollback to older versions?
+	- How do we even do it? Build retention on appveyor?
+
+- Check if there's no room for error in those connection tokens
+
 - Dedicated server communication
 	- Advanced RCON functionality
 		- Rcon can download the log

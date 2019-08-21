@@ -54,12 +54,12 @@ struct main_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::C)) {
-			button_callback(main_menu_button_type::CONNECT_TO_UNIVERSE);
+			button_callback(main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE);
 			return true;
 		}
 
-		if (change.was_pressed(augs::event::keys::key::O)) {
-			button_callback(main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE);
+		if (change.was_pressed(augs::event::keys::key::U)) {
+			button_callback(main_menu_button_type::CONNECT_TO_UNIVERSE);
 			return true;
 		}
 

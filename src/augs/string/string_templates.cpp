@@ -88,6 +88,15 @@ std::string& cut_trailing(std::string& s, const char* const characters) {
 	return s;
 }
 
+std::string get_trailing(const std::string& s, const char* const characters) {
+	if (const auto it = s.find_last_not_of(characters); it != std::string::npos) {
+		const auto len = s.size() - 1 - it;
+		return std::string(s.end() - len, s.end());
+	}
+
+	return "";
+}
+
 std::string& cut_trailing_number(std::string& s) {
 	return cut_trailing(s, "0123456789");
 }

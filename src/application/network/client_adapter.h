@@ -3,6 +3,19 @@
 #include "application/network/network_adapters.h"
 #include "augs/network/network_simulator_settings.h"
 
+enum class resolve_result_type {
+	OK,
+	INVALID_ADDRESS,
+	COULDNT_RESOLVE_HOST
+};
+
+struct resolve_address_result {
+	yojimbo::Address addr;
+	std::string host;
+
+	resolve_result_type result = resolve_result_type::OK;
+};
+
 class client_adapter {
 	augs::network_raii raii;
 
@@ -21,7 +34,7 @@ class client_adapter {
 
 public:
 	client_adapter();
-	void connect(const client_start_input&);
+	resolve_address_result connect(const address_and_port&);
 
 	template <class H>
 	void advance(

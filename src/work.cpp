@@ -663,7 +663,8 @@ and then hitting Save settings.
 			streaming.avatar_preview_tex, 
 			window, 
 			config.default_client_start, 
-			config.client
+			config.client,
+			config.official_servers
 		);
 
 		if (perform_result || client_start_requested) {
@@ -696,7 +697,7 @@ and then hitting Save settings.
 			}
 			else {
 				augs::spawn_detached_process(params.exe_path.string(), "--dedicated-server");
-				config.default_client_start.ip_port = typesafe_sprintf("%x:%x", config.default_server_start.ip, config.default_server_start.port);
+				config.default_client_start.set_custom(typesafe_sprintf("%x:%x", config.default_server_start.ip, config.default_server_start.port));
 
 				launch_setup(launch_type::CLIENT);
 			}
@@ -990,12 +991,26 @@ and then hitting Save settings.
 		using T = decltype(t);
 
 		switch (t) {
+			case T::CONNECT_TO_OFFICIAL_UNIVERSE:
+				start_client_gui.open();
+
+				if (common_input_state[augs::event::keys::key::LSHIFT]) {
+					client_start_requested = true;
+				}
+				else {
+					config.default_client_start.chosen_address_type = connect_address_type::OFFICIAL;
+				}
+
+				break;
+
 			case T::CONNECT_TO_UNIVERSE:
 				start_client_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
 					client_start_requested = true;
 				}
+
+				config.default_client_start.chosen_address_type = connect_address_type::CUSTOM;
 
 				break;
 				
@@ -1340,11 +1355,11 @@ and then hitting Save settings.
 	}
 	else if (params.should_connect) {
 		{
-			const auto& target = params.connect_to_address;
+			const auto& target = params.connect_address;
 
 			if (!target.empty()) {
 				change_with_save([&](config_lua_table& cfg) {
-					cfg.default_client_start.ip_port = params.connect_to_address;
+					cfg.default_client_start.set_custom(target);
 				});
 			}
 		}
@@ -1824,14 +1839,11 @@ and then hitting Save settings.
 
 						constexpr auto s = T::loading_strategy;
 
-						if constexpr(s == S::LOAD_ALL) {
+						if constexpr(s == S::LOAD_ALL || s == S::LOAD_ALL_ONLY_ONCE) {
 							load_all(setup.get_viewable_defs());
 						}
 						else if constexpr(s == S::LOAD_ONLY_NEAR_CAMERA) {
 							static_assert(always_false_v<T>, "Unimplemented");
-						}
-						else if constexpr(T::loading_strategy == S::LOAD_ALL_ONLY_ONCE) {
-							/* Do nothing */
 						}
 						else {
 							static_assert(always_false_v<T>, "Unknown viewables loading strategy.");

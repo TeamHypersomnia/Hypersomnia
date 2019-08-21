@@ -33,13 +33,13 @@ client_setup::client_setup(
 	const client_vars& initial_vars
 ) : 
 	lua(lua),
-	last_start(in),
+	last_start(in.get_address_and_port()),
 	vars(initial_vars),
 	adapter(std::make_unique<client_adapter>()),
 	client_time(get_current_time()),
 	when_initiated_connection(get_current_time())
 {
-	LOG("Initializing connection with %x", in.ip_port);
+	LOG("Initializing connection with %x", last_start.connect_address);
 
 	if (!nickname_len_in_range(vars.nickname.length())) {
 		const auto reason = typesafe_sprintf(
@@ -51,7 +51,26 @@ client_setup::client_setup(
 		set_disconnect_reason(reason);
 	}
 	else {
-		adapter->connect(in);
+		const auto resolution = adapter->connect(last_start);
+
+		if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
+			const auto reason = typesafe_sprintf(
+				"Couldn't resolve host: %x", 
+				resolution.host
+			);
+
+			set_disconnect_reason(reason);
+		}
+		else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
+			const auto reason = typesafe_sprintf(
+				"The address: \"%x\" is invalid!", last_start.connect_address
+			);
+
+			set_disconnect_reason(reason);
+		}
+		else {
+			ensure_eq(resolution.result, resolve_result_type::OK);
+		}
 	}
 }
 
@@ -820,7 +839,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
 		if (adapter->is_connecting()) {
-			text("Connecting to %x\nTime: %2f seconds", last_start.ip_port, get_current_time() - when_initiated_connection);
+			text("Connecting to %x\nTime: %2f seconds", last_start.connect_address, get_current_time() - when_initiated_connection);
 
 			text("\n");
 			ImGui::Separator();
@@ -844,7 +863,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				}
 			}
 			else {
-				text("Failed to establish connection with %x.", last_start.ip_port);
+				text("Failed to establish connection with %x.", last_start.connect_address);
 
 				print_reason_if_any();
 
@@ -881,7 +900,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				text("The client has desynchronized.\nDownloading the complete state snapshot.");
 			}
 			else {
-				text_color(typesafe_sprintf("Connected to %x.", last_start.ip_port), green);
+				text_color(typesafe_sprintf("Connected to %x.", last_start.connect_address), green);
 
 				if (state == C::INVALID) {
 					text("Initializing connection...");

@@ -69,6 +69,8 @@ class main_menu_setup : public default_setup_settings {
 	augs::action_list credits_actions;
 
 public:
+	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
+
 	main_menu_gui gui;
 
 	main_menu_setup(sol::state&, const main_menu_settings);

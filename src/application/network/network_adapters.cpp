@@ -173,11 +173,132 @@ client_adapter::client_adapter() :
 	)
 {}
 
-void client_adapter::connect(const client_start_input& in) {
+std::optional<unsigned long> get_trailing_number(const std::string& s);
+std::string& cut_trailing_number(std::string& s);
+
+static resolve_address_result resolve_address(const address_and_port& in) {
+	const auto& input = in.connect_address;
+	const auto default_port = in.default_port_when_no_specified;
+
+	if (input.empty()) {
+		resolve_address_result out;
+		out.result = resolve_result_type::INVALID_ADDRESS;
+		return out;
+	}
+
+	{
+		resolve_address_result out;
+
+		auto addr = yojimbo::Address(input.c_str());
+
+		if (addr.IsValid()) {
+			if (addr.GetPort() == 0) {
+				addr.SetPort(default_port);
+			}
+
+			out.addr = addr;
+			return out;
+		}
+		else {
+			LOG("INV: %x", input);
+		}
+	}
+
+	const auto no_port = [&]() {
+		auto result = input;
+
+		cut_trailing_number(result);
+		
+		if (result.size() > 0 && result.back() == ':') {
+			result.pop_back();
+		}
+
+		if (result.size() > 0 && result.back() == ']') {
+			result.pop_back();
+		}
+
+		if (result.size() > 0 && result.front() == '[') {
+			result.erase(result.begin());
+		}
+
+		return result;
+	}();
+
+	const bool requested_ipv6 = input[0] == '[';
+	const bool requested_ipv4 = !requested_ipv6;
+
+	struct addrinfo hints, *res, *p;
+	int status;
+	char ipstr[INET6_ADDRSTRLEN];
+
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if ((status = getaddrinfo(no_port.c_str(), NULL, &hints, &res)) != 0) {
+		resolve_address_result out;
+
+		out.result = resolve_result_type::COULDNT_RESOLVE_HOST;
+		out.host = no_port;
+		return out;
+	}
+
+	std::string resolved_ip;
+
+	for (p = res;p != NULL; p = p->ai_next) {
+		void *addr = nullptr;
+
+		if (p->ai_family == AF_INET) {
+			struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+
+			if (requested_ipv4) {
+				addr = &(ipv4->sin_addr);
+			}
+		} 
+		else { 
+			struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+
+			if (requested_ipv6) {
+				addr = &(ipv6->sin6_addr);
+			}
+		}
+
+		if (addr) {
+			inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
+			resolved_ip = ipstr;
+
+			break;
+		}
+	}
+
+	freeaddrinfo(res);
+
+	const auto specified_port = [&]() -> port_type {
+		if (const auto trailing = get_trailing_number(input)) {
+			return static_cast<port_type>(*trailing);
+		}
+
+		return default_port;
+	}();
+
+	resolve_address_result out;
+	out.host = no_port;
+	out.addr = yojimbo::Address(resolved_ip.c_str(), specified_port);
+
+	return out;
+}
+
+resolve_address_result client_adapter::connect(const address_and_port& in) {
 	uint64_t clientId;
 	yojimbo::random_bytes((uint8_t*)&clientId, 8);
 
-	const auto target_addr = yojimbo::Address(in.ip_port.c_str());
+	const auto resolved_addr = resolve_address(in);
+
+	if (resolved_addr.result != resolve_result_type::OK) {
+		return resolved_addr;
+	}
+
+	const auto& target_addr = resolved_addr.addr;
 
 	auto local_addr = yojimbo::Address("127.0.0.1", 8412);
 
@@ -198,6 +319,8 @@ void client_adapter::connect(const client_start_input& in) {
 		addrs,
 		2
 	);
+
+	return resolved_addr;
 }
 
 void client_adapter::disconnect() {
@@ -339,3 +462,4 @@ yojimbo::Address server_adapter::get_client_address(const client_id_type& id) co
 yojimbo::Address client_adapter::get_server_address() const {
 	return client.GetAddress();
 }
+

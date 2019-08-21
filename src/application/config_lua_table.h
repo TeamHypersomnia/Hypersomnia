@@ -89,6 +89,8 @@ struct config_lua_table {
 	bool log_to_live_file = false;
 	bool perform_float_consistency_test = true;
 
+	std::vector<std::string> official_servers;
+
 	unit_tests_settings unit_tests;
 	augs::window_settings window;
 	augs::renderer_settings renderer;
@@ -133,23 +135,10 @@ struct config_lua_table {
 	performance_settings performance;
 
 #if TODO
-	std::string connect_address;
-	unsigned short connect_port = 0;
-	unsigned short server_port = 0;
-	unsigned short alternative_port = 0;
-
-	unsigned jitter_buffer_ms = 0;
-	unsigned client_commands_jitter_buffer_ms = 0;
-
-	bool debug_randomize_entropies_in_client_setup = 0;
-	unsigned debug_randomize_entropies_in_client_setup_once_every_steps = 0;
-
 	augs::path_type db_path;
 	augs::path_type survey_num_file_path;
 	augs::path_type post_data_file_path;
 	std::string last_session_update_link;
-
-	augs::path_type director_input_scene_entropy_path;
 
 	bool server_launch_http_daemon = 0;
 	unsigned short server_http_daemon_port = 0;
