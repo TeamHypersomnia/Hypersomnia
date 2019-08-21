@@ -138,7 +138,7 @@ int work(const int argc, const char* const * const argv) try {
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
-	static const auto canon_config_path = augs::path_type("config.lua");
+	static const auto canon_config_path = augs::path_type("default_config.lua");
 	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
 
 	LOG("Creating lua state.");

@@ -2854,7 +2854,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PLASMA_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4700.f, 4700.f};
+			gun_def.muzzle_velocity = {4850.f, 4850.f};
 			gun_def.shot_cooldown_ms = 95.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};

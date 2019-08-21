@@ -23,6 +23,10 @@ return 0;
 
 namespace augs {
 	namespace network {
+		void enable_detailed_logs(const bool flag) {
+			yojimbo_log_level(flag ? YOJIMBO_LOG_LEVEL_DEBUG : YOJIMBO_LOG_LEVEL_INFO);
+		}
+
 		bool init() {
 			LOG("Initializing the network library.");
 			const bool result = InitializeYojimbo();

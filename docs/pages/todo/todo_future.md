@@ -5,6 +5,9 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- We could log each respective step of the fp consistency test (could be enabled via config) to diagnose where we diverge
+	- Looks like Windows with STREFLOP yields even a different result than both windows without streflop and linux with streflop
+
 - Tinfoil hat
 	- Grants a 50% protection from magic
 	- Can't use spells

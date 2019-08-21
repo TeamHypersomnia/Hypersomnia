@@ -33,6 +33,7 @@ namespace augs {
 	namespace network {
 		bool init();
 		bool deinit();
+		void enable_detailed_logs(bool);
 	}
 }
 

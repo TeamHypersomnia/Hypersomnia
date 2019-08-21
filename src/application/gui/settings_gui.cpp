@@ -288,7 +288,7 @@ void settings_gui_state::perform(
 				ImGui::Separator();
 
 				if (ImGui::Button("Reset all settings to factory defaults")) {
-					config = config_lua_table(lua, augs::path_type("config.lua"));
+					config = config_lua_table(lua, augs::path_type("default_config.lua"));
 				}
 
 				break;

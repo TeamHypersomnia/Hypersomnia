@@ -51,6 +51,8 @@ client_setup::client_setup(
 		set_disconnect_reason(reason);
 	}
 	else {
+		augs::network::enable_detailed_logs(true);
+
 		const auto resolution = adapter->connect(last_start);
 
 		if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
@@ -77,6 +79,8 @@ client_setup::client_setup(
 client_setup::~client_setup() {
 	LOG("Client setup dtor");
 	disconnect();
+
+	augs::network::enable_detailed_logs(false);
 }
 
 net_time_t client_setup::get_current_time() {
@@ -815,6 +819,8 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	}
 
 	if (is_gameplay_on) {
+		augs::network::enable_detailed_logs(false);
+
 		arena_base::perform_custom_imgui(in);
 	}
 	else {
@@ -896,6 +902,8 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (adapter->is_connected()) {
+			augs::network::enable_detailed_logs(false);
+
 			if (now_resyncing) {
 				text("The client has desynchronized.\nDownloading the complete state snapshot.");
 			}

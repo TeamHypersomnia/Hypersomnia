@@ -6,6 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Write autoupdater so we don't have to save those avatar images in temporary
+	- We'll keep them in cache, just autoupdater will preserve some config values
+	- We might keep the entire config local lua intact, just per-push specify what config values to overwrite
+
+- buff datum gun
+- nerf amplifier arm
+
+- DO NOT disclose a single rcon password to multiple moderators/admins
+	- That is because a single malicious RCON holder could avoid responsibility for their misdeeds
+	- Instead, just assign permissions to accounts, or just the private IDs
+
 - Check if we don't have some dump file on windows
 
 - Do we want to somehow let the user be able to rollback to older versions?
