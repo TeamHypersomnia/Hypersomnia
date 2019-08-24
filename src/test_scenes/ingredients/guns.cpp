@@ -1256,6 +1256,7 @@ namespace test_flavours {
 
 				amp.get<invariants::text_details>().name = "Amplifier arm missile";
 				amp.get<invariants::missile>().damage.base = 32;
+				amp.get<invariants::missile>().max_lifetime_ms = 850.f;
 			}
 
 			invariants::explosive explosive; 
@@ -3420,7 +3421,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {2000.f, 2000.f};
+			gun_def.muzzle_velocity = {1250.f, 1250.f};
 			gun_def.shot_cooldown_ms = 500.f;
 
 			gun_def.damage_multiplier = 1.f;

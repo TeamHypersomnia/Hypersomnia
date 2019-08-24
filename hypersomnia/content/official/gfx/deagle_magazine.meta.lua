@@ -2,7 +2,7 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 90,
+      amplification = 60,
       light_colors = {
         "170 255 0 255",
         "136 255 0 255",
@@ -14,7 +14,7 @@ return {
         x = 80,
         y = 80
       },
-      standard_deviation = 6.5
+      standard_deviation = 6
     },
     generate_desaturation = false
   },
