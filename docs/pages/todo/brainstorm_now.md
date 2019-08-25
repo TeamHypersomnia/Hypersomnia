@@ -19,8 +19,6 @@ summary: That which we are brainstorming at the moment.
 
 - Absolute paths are remembered under Windows
 
-- For chambering, we might use reloading animation but without flip 
-
 - LPM acts as Q when hands are empty
 	- Punches when no weapons
 - RPM could always punch
@@ -112,6 +110,7 @@ summary: That which we are brainstorming at the moment.
 - bomb falls outside the map
 
 - Editor errata
+	- let windows be open without changes after importing
 	- fix confusing undo behaviour when duplicating entities
 	- particle delete command does not show message
 	- if duplicate names in project, the button just does not work in asset file choice dialog

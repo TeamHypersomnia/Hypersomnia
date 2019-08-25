@@ -3653,7 +3653,7 @@ namespace test_flavours {
 			only_allow_mag(meta, test_container_items::HPSR_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().flip_when_reloading = true;
-			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 1;
+			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 2;
 		}
 
 		{
@@ -3847,7 +3847,7 @@ namespace test_flavours {
 			only_allow_mag(meta, test_container_items::BULLDUP2000_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().flip_when_reloading = true;
-			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 1;
+			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 2;
 		}
 
 		{

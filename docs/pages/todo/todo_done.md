@@ -3834,3 +3834,5 @@ which can be done from Settings->Reset all settings to factory default.
 - The rocket launcher still glitches during reloading, sometimes
 	- watch the footage from chrzan
 
+- For chambering, we might use reloading animation but without flip 
+
