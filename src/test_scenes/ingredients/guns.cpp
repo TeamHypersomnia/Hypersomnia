@@ -2418,7 +2418,7 @@ namespace test_flavours {
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("0.4");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
-				item.standard_price = 70;
+				item.standard_price = 100;
 				meta.set(item);
 			}
 		}
@@ -3614,9 +3614,9 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 2000.f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {5700.f, 5700.f};
+			gun_def.muzzle_velocity = {5850.f, 5850.f};
 			gun_def.shot_cooldown_ms = 600.f;
-			gun_def.after_transfer_shot_cooldown_mult = 0.4f;
+			gun_def.after_transfer_shot_cooldown_mult = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HPSR_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
 
@@ -3654,6 +3654,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().flip_when_reloading = true;
 			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 2;
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 		}
 
 		{
@@ -3811,7 +3812,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 1800.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = { 5200.f, 5200.f };
+			gun_def.muzzle_velocity = { 5350.f, 5350.f };
 			gun_def.shot_cooldown_ms = 250.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;

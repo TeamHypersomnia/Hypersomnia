@@ -334,14 +334,6 @@ perform_transfer_result perform_transfer_impl::operator()(
 		target_root.infer_item_physics_recursive();
 	}
 
-	if (target_root) 
-	if (auto target_item = target_root.find<components::item>()) {
-		const auto now = cosm.get_timestamp();
-		auto& data = target_item.get_raw_component(access);
-		data.when_last_transferred = now;
-		LOG_NVPS(target_root);
-	}
-
 	const bool is_drop_request = result.relation == capability_relation::DROP;
 
 	const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
