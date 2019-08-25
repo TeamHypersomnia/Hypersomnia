@@ -6,16 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix interpolation bug with particle streams
-
-- flag for setting when transferred to 'now' when finished reloading?
-	- so that there's a delay between finished load and chambering sounds
-
 - Deleting flavour crash
 	- can it really let delete a flavour even if it is used?
-
-- Fix that bug again!!!!!
-	- It depends on the player order
 
 - Absolute paths are remembered under Windows
 
@@ -26,9 +18,6 @@ summary: That which we are brainstorming at the moment.
 - Write autoupdater so we don't have to save those avatar images in temporary
 	- We'll keep them in cache, just autoupdater will preserve some config values
 	- We might keep the entire config local lua intact, just per-push specify what config values to overwrite
-
-- buff datum gun
-- nerf amplifier arm
 
 - DO NOT disclose a single rcon password to multiple moderators/admins
 	- That is because a single malicious RCON holder could avoid responsibility for their misdeeds

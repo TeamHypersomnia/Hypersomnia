@@ -20,6 +20,7 @@
 #include "view/character_camera.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "view/audiovisual_state/flashbang_math.h"
+#include "game/detail/find_absolute_or_local_transform.h"
 
 struct shouldnt_play {};
 

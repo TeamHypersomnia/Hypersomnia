@@ -201,9 +201,11 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 				effect.modifier.scale_amounts *= std::min(4.f, mult);
 				effect.modifier.scale_lifetimes *= std::min(1.3f, mult);
 
+				const auto start = particle_effect_start_input::orbit_absolute(subject, impact_transform);
+
 				effect.start(
 					step,
-					particle_effect_start_input::orbit_absolute(subject, impact_transform),
+					start,
 					always_predictable_v
 				);
 			}

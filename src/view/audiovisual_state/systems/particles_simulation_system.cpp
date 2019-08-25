@@ -25,6 +25,7 @@
 #include "view/viewables/particle_types.hpp"
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/templates/thread_pool.h"
+#include "game/detail/find_absolute_or_local_transform.h"
 
 using emi_inst = particles_simulation_system::emission_instance;
 

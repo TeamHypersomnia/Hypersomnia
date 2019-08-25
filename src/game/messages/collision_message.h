@@ -6,8 +6,8 @@
 namespace messages {
 	struct collision_message : public message {
 		entity_id collider;
-		vec2 collider_impact_velocity;
 		vec2 subject_impact_velocity;
+		vec2 collider_impact_velocity;
 		vec2 point;
 		vec2 normal;
 

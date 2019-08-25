@@ -4,6 +4,14 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Calculation might be off for orbital streams due to quick movements
+	- Offsets are calculated against entities that have already moved
+	- Possible solution
+		- Save b2Transforms of bodies into the collision_message. These will be the transforms before impact solve.
+			- logic will later process (si transformation etc) them if they are at all needed
+		- Calculate against these transforms
+
+
 - Perhaps replace shift+c with some other shortcut?
 
 - Perhaps interpolate velocity values if we detect that they are ugly at 60hz, apart from the case with skull rocket?

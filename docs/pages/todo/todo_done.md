@@ -3836,3 +3836,9 @@ which can be done from Settings->Reset all settings to factory default.
 
 - For chambering, we might use reloading animation but without flip 
 
+
+- Fix that bug again!!!!!
+	- It depends on the player order
+- buff datum gun
+- nerf amplifier arm
+

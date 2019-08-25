@@ -126,7 +126,9 @@ namespace test_scenes {
 
 		cosmic::reinfer_all_entities(world);
 
-		give_weapon(transformr(), test_shootable_weapons::BILMER2000);
+		give_weapon(transformr(), test_shootable_weapons::ZAMIEC);
+		give_weapon(transformr(), test_shootable_weapons::HPSR);
+
 		//give_weapon(transformr(), test_shootable_weapons::BILMER2000);
 
 		create(test_point_markers::BOMB_MODE_SPAWN, transformr()).set_associated_faction(faction_type::METROPOLIS);
