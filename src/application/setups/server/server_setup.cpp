@@ -518,21 +518,38 @@ void server_setup::advance_clients_state() {
 				}
 			);
 
-			auto download_existing_avatar = [this, recipient_client_id = client_id](const auto client_id_of_avatar, auto& cc) {
-				const auto session_id_of_avatar = find_session_id(client_id_of_avatar);
+			{
+				auto download_existing_avatar = [this, recipient_client_id = client_id](const auto client_id_of_avatar, auto& cc) {
+					const auto session_id_of_avatar = find_session_id(client_id_of_avatar);
 
-				if (session_id_of_avatar) {
+					if (session_id_of_avatar) {
+						server->send_payload(
+							recipient_client_id,
+							game_channel_type::COMMUNICATIONS,
+
+							*session_id_of_avatar,
+							cc.meta.avatar
+						);
+					}
+				};
+
+				for_each_id_and_client(download_existing_avatar, connected_and_integrated_v);
+			}
+
+			{
+				auto download_existing_public_settings  = [this, recipient_client_id = client_id](const auto client_id_of_settings, auto& cc) {
+					const auto downloaded_settings = make_public_settings_update_from(cc, client_id_of_settings);
+
 					server->send_payload(
 						recipient_client_id,
-						game_channel_type::COMMUNICATIONS,
+						game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
-						*session_id_of_avatar,
-						cc.meta.avatar
+						downloaded_settings
 					);
-				}
-			};
+				};
 
-			for_each_id_and_client(download_existing_avatar, connected_and_integrated_v);
+				for_each_id_and_client(download_existing_public_settings, connected_and_integrated_v);
+			}
 
 			LOG("Sending initial payload for %x at step: %x", client_id, scene.world.get_total_steps_passed());
 		};
@@ -819,6 +836,18 @@ void server_setup::handle_client_messages() {
 	server->advance(server_time, message_handler);
 }
 
+::public_settings_update server_setup::make_public_settings_update_from(
+	const server_client_state& c,
+	const client_id_type& id
+) const {
+	::public_settings_update update;
+
+	update.subject_id = to_mode_player_id(id);
+	update.new_settings = c.settings.public_settings;
+	
+	return update;
+}
+
 void server_setup::send_server_step_entropies(const compact_server_step_entropy& total_input) {
 	{
 		auto process_client = [&](const auto client_id, auto& c) {
@@ -829,17 +858,14 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 
 				c.rebroadcast_public_settings = false;
 
-				::public_settings_update update;
+				const auto broadcasted_update = make_public_settings_update_from(c, client_id);
 
-				update.subject_id = to_mode_player_id(client_id);
-				update.new_settings = c.settings.public_settings;
-
-				auto update_for_client = [this, &update](const auto recipient_client_id, auto&) {
+				auto update_for_client = [this, &broadcasted_update](const auto recipient_client_id, auto&) {
 					server->send_payload(
 						recipient_client_id, 
 						game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
-						update
+						broadcasted_update
 					);
 				};
 

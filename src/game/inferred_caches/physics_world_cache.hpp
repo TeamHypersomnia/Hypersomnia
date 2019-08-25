@@ -447,6 +447,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		return;
 	}
 
+	LOG_NVPS(handle);
 	ensure(false && "Fixtures requested with no shape defined! Maybe the entity has no image specified?");
 }
 

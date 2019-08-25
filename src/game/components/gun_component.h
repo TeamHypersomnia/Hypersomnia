@@ -115,13 +115,15 @@ namespace invariants {
 
 		bool allow_chambering_with_akimbo = false;
 		bool allow_charge_in_chamber_magazine_when_chamber_loaded = true;
-		pad_bytes<2> pad;
+		bool delay_shell_spawn_until_chambering = false;
+		pad_bytes<1> pad;
 
 		constrained_entity_flavour_id<invariants::missile, components::sender> magic_missile_flavour;
 		recoil_player_instance_def recoil;
 
 		assets::plain_animation_id shoot_animation;
 		adversarial_meta adversarial = { static_cast<money_type>(500) };
+		real32 shell_spawn_delay_mult = 0.f;
 		// END GEN INTROSPECTOR
 
 		auto get_steam_schedule_heat() const {

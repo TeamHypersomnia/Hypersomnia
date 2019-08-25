@@ -734,7 +734,11 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 					if (considered_stance != std::nullopt) {
 						if (item.holding_stance != *considered_stance) {
-							return;
+							const bool but_its_sniper_and_we_want_rifles = item.holding_stance == item_holding_stance::SNIPER_LIKE && considered_stance == item_holding_stance::RIFLE_LIKE;
+
+							if (!but_its_sniper_and_we_want_rifles) {
+								return;
+							}
 						}
 					}
 

@@ -2,9 +2,11 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 400,
+      amplification = 90,
       light_colors = {
-        "255 255 255 255"
+        "254 127 0 255",
+        "255 255 255 255",
+        "122 122 122 255"
       },
       radius = {
         x = 80,
@@ -18,7 +20,7 @@ return {
     gun = {
       bullet_spawn = {
         x = 0,
-        y = 0
+        y = -3
       },
       chamber = {
         pos = {
@@ -36,8 +38,8 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = 0,
-          y = 0
+          x = -17,
+          y = 3
         },
         rotation = 0
       },
@@ -73,7 +75,7 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = 0,
+          x = -28,
           y = 0
         },
         rotation = 0
@@ -100,8 +102,101 @@ return {
       }
     },
     non_standard_shape = {
-      convex_partition = {},
-      original_poly = {}
+      convex_partition = {
+        14,
+        0,
+        1,
+        13,
+        14,
+        3,
+        4,
+        5,
+        2,
+        3,
+        2,
+        5,
+        6,
+        9,
+        2,
+        11,
+        12,
+        13,
+        1,
+        2,
+        10,
+        11,
+        7,
+        8,
+        9,
+        6,
+        7,
+        10,
+        2,
+        9,
+        10
+      },
+      original_poly = {
+        {
+          x = -58,
+          y = -8
+        },
+        {
+          x = -34,
+          y = -5
+        },
+        {
+          x = -32,
+          y = -8
+        },
+        {
+          x = 57,
+          y = -6
+        },
+        {
+          x = 57,
+          y = 2
+        },
+        {
+          x = 34,
+          y = 0
+        },
+        {
+          x = 33,
+          y = 3
+        },
+        {
+          x = 0,
+          y = 6
+        },
+        {
+          x = -10,
+          y = 5
+        },
+        {
+          x = -11,
+          y = 0
+        },
+        {
+          x = -20,
+          y = 0
+        },
+        {
+          x = -22,
+          y = 3
+        },
+        {
+          x = -28,
+          y = 4
+        },
+        {
+          x = -35,
+          y = 1
+        },
+        {
+          x = -58,
+          y = 2
+        }
+      }
     },
     torso = {
       back = {

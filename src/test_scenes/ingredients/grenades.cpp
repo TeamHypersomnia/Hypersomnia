@@ -355,7 +355,7 @@ namespace test_flavours {
 
 		auto bomb_cascade_explosion = bomb_explosion;
 		//bomb_cascade_explosion *= 0.7f;
-		bomb_cascade_explosion.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
+		bomb_cascade_explosion.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
 		bomb_cascade_explosion.inner_ring_color = white;
 		bomb_cascade_explosion.outer_ring_color = cyan;
 		bomb_cascade_explosion.ring_duration_seconds = 0.3f;

@@ -327,9 +327,25 @@ void load_test_scene_animations(
 			return anim;
 		};
 
-		auto standard_shoot = [&](const T test_id, const I first_frame_id) -> auto& {
-			auto& anim = make_torso(test_id, first_frame_id, 20.0f);
+		auto standard_shoot = [&](const T test_id, const I first_frame_id, const real32 base_ms = 20.f) -> auto& {
+			auto& anim = make_torso(test_id, first_frame_id, base_ms);
 			make_shoot_durations(anim.frames);
+			return anim;
+		};
+
+		auto standard_sniper_chamber = [&](const T test_id, const I first_frame_id) -> auto& {
+			auto& anim = make_torso(test_id, first_frame_id, 35.f);
+			auto& f = anim.frames;
+
+			const auto last = f[f.size() - 1];
+			const auto bef_last = f[f.size() - 2];
+
+			f.push_back(last);
+			f.push_back(bef_last);
+			f.back().duration_milliseconds *= 1.3f;
+
+			ping_pong_range(f);
+
 			return anim;
 		};
 
@@ -512,6 +528,11 @@ void load_test_scene_animations(
 
 				anim.name_suffix = "(shot)";
 			}
+
+			standard_sniper_chamber(
+				T::METROPOLIS_TORSO_SNIPER_CHAMBER,
+				I::METROPOLIS_TORSO_RIFLE_GTM_1
+			);
 		}
 
 		{
@@ -650,6 +671,11 @@ void load_test_scene_animations(
 
 				anim.name_suffix = "(shot)";
 			}
+
+			standard_sniper_chamber(
+				T::RESISTANCE_TORSO_SNIPER_CHAMBER,
+				I::RESISTANCE_TORSO_RIFLE_GTM_1
+			);
 		}
 	}
 

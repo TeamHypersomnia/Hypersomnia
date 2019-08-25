@@ -40,6 +40,7 @@
 
 struct config_lua_table;
 struct draw_setup_gui_input;
+struct public_settings_update;
 
 namespace net_messages {
 	struct client_welcome;
@@ -422,4 +423,9 @@ public:
 
 	void handle_new_session(const add_player_input& in);
 	void log_performance();
+
+	::public_settings_update make_public_settings_update_from(
+		const server_client_state&,
+		const client_id_type& id
+	) const;
 };

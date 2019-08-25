@@ -5,6 +5,7 @@ enum class item_holding_stance {
 	BARE_LIKE,
 	PISTOL_LIKE,
 	RIFLE_LIKE,
+	SNIPER_LIKE,
 	HEAVY_LIKE,
 	KNIFE_LIKE,
 	SWORD_LIKE,

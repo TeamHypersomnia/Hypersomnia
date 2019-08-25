@@ -80,6 +80,12 @@ namespace test_flavours {
 				}
 
 				{
+					auto& sniper_like = torso_def.stances[item_holding_stance::SNIPER_LIKE];
+					sniper_like = torso_def.stances[item_holding_stance::RIFLE_LIKE];
+					sniper_like.chambering = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_SNIPER_CHAMBER);
+				}
+
+				{
 					auto& pistol_like = torso_def.stances[item_holding_stance::PISTOL_LIKE];
 
 					pistol_like.carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_PISTOL_WALK);
@@ -368,6 +374,12 @@ namespace test_flavours {
 					rifle_like.pocket_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_PTM);
 					rifle_like.grip_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_GTM);
 					rifle_like.chambering = shot;
+				}
+
+				{
+					auto& sniper_like = torso_def.stances[item_holding_stance::SNIPER_LIKE];
+					sniper_like = torso_def.stances[item_holding_stance::RIFLE_LIKE];
+					sniper_like.chambering = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_SNIPER_CHAMBER);
 				}
 
 				{

@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Deleting flavour crash
+	- can it really let delete a flavour even if it is used?
+
+- Fix that bug again!!!!!
+	- It depends on the player order
+
+- Absolute paths are remembered under Windows
+
 - For chambering, we might use reloading animation but without flip 
 
 - LPM acts as Q when hands are empty

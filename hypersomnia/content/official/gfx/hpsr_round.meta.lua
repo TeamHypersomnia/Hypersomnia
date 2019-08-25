@@ -101,7 +101,32 @@ return {
     },
     non_standard_shape = {
       convex_partition = {},
-      original_poly = {}
+      original_poly = {
+        {
+          x = -17,
+          y = -3
+        },
+        {
+          x = 17,
+          y = -5
+        },
+        {
+          x = 24,
+          y = -3
+        },
+        {
+          x = 24,
+          y = 3
+        },
+        {
+          x = 18,
+          y = 5
+        },
+        {
+          x = -22,
+          y = 3
+        }
+      }
     },
     torso = {
       back = {
