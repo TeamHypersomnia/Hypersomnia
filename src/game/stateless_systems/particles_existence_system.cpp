@@ -111,18 +111,6 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 				}
 			}
 		}
-
-		const auto shell = cosm[g.spawned_shell];
-
-		if (shell.alive()) {
-			const auto& effect = g.cartridge_definition.shell_trace_particles;
-
-			effect.start(
-				step,
-				particle_effect_start_input::orbit_local(shell, { vec2::zero, 180 } ),
-				predictability
-			);
-		}
 	}
 
 	for (const auto& d : damages) {

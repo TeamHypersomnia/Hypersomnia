@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix interpolation bug with particle streams
+
+- flag for setting when transferred to 'now' when finished reloading?
+	- so that there's a delay between finished load and chambering sounds
+
 - Deleting flavour crash
 	- can it really let delete a flavour even if it is used?
 

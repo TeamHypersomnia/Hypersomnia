@@ -41,6 +41,10 @@ namespace components {
 		// GEN INTROSPECTOR struct components::gun
 		real32 current_heat = 0.f;
 		real32 chambering_progress_ms = 0.f;
+
+		bool shell_drop_scheduled = false;
+		pad_bytes<3> pad;
+
 		real32 max_heat_after_steam_schedule = 0.f;
 
 		gun_special_state special_state = gun_special_state::NONE;

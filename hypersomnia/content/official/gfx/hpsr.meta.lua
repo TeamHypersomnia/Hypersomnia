@@ -19,7 +19,7 @@ return {
   offsets = {
     gun = {
       bullet_spawn = {
-        x = -30,
+        x = -33,
         y = -8
       },
       chamber = {
@@ -45,10 +45,10 @@ return {
       },
       shell_spawn = {
         pos = {
-          x = -15,
-          y = -8
+          x = -10,
+          y = -1
         },
-        rotation = -90
+        rotation = 58.054603576660156
       }
     },
     item = {

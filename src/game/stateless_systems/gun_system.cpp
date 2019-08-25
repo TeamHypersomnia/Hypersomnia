@@ -43,6 +43,7 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/calc_ammo_info.hpp"
+#include "game/modes/detail/item_purchase_logic.hpp"
 
 template <class T>
 bool gun_try_to_fire_and_reset(
@@ -178,6 +179,56 @@ static void cooldown_gun_heat(
 			gun.steam_burst_scheduled = false;
 		}
 	}
+}
+
+template <class A, class B, class C, class D>
+static void spawn_shell(
+	const logic_step step,
+	const transformr gun_transform,
+	const transformr muzzle_transform,
+	const invariants::gun gun_def,
+	const A& gun_entity,
+	const B& shell_flavour,
+	const C& owning_capability,
+	const D& cartridge_def
+) {
+	auto& cosm = step.get_cosmos();
+
+	cosmic::create_entity(cosm, shell_flavour, [&](const auto shell_entity, auto&&...) {
+		auto rng = cosm.get_nontemporal_rng_for(shell_entity);
+
+		const auto shell_spawn_offset = ::calc_shell_offset(gun_entity);
+		const auto spread_component = rng.randval_h(gun_def.shell_spread_degrees) + shell_spawn_offset.rotation;
+
+		auto shell_transform = gun_transform;
+		shell_transform.pos += vec2(shell_spawn_offset.pos).rotate(gun_transform.rotation);
+		shell_transform.rotation += spread_component;
+
+		shell_entity.set_logic_transform(shell_transform);
+
+		const auto& rigid_body = shell_entity.template get<components::rigid_body>();
+		rigid_body.set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+		rigid_body.set_angular_velocity(rng.randval(gun_def.shell_angular_velocity));
+
+		auto& ignored = rigid_body.get_special().during_cooldown_ignore_collision_with;
+
+		if (owning_capability.alive()) {
+			ignored = owning_capability;
+		}
+		else {
+			ignored = gun_entity;
+		}
+
+		const auto& effect = cartridge_def.shell_trace_particles;
+
+		const auto predictability = predictable_only_by(owning_capability);
+
+		effect.start(
+			step,
+			particle_effect_start_input::orbit_local(shell_entity, { vec2::zero, 180 } ),
+			predictability
+		);
+	}, [&](const auto) {});
 }
 
 void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
@@ -571,6 +622,25 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 								const auto chambering_duration_ms = ::calc_current_chambering_duration(gun_entity);
 
+								if (gun.shell_drop_scheduled) {
+									if (progress >= chambering_duration_ms * gun_def.shell_spawn_delay_mult) {
+										if (const auto charge_flavour = ::calc_default_charge_flavour(gun_entity); charge_flavour.is_set()) {
+											cosm.on_flavour(
+												charge_flavour,
+												[&](const auto& typed_charge_flavour) {
+													if (const auto cartridge_def = typed_charge_flavour.template find<invariants::cartridge>()) {
+														if (const auto shell_flavour = cartridge_def->shell_flavour; shell_flavour.is_set()) {
+															::spawn_shell(step, gun_transform, muzzle_transform, gun_def, gun_entity, shell_flavour, owning_capability, *cartridge_def);
+														}
+													}
+												}
+											);
+										}
+
+										gun.shell_drop_scheduled = false;
+									}
+								}
+
 								if (progress >= chambering_duration_ms) {
 									::load_next_cartridge(gun_entity, next_cartridge, step);
 									progress = 0.f;
@@ -640,7 +710,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								const auto cartridge_in_chamber = cosm[chamber_slot.get_items_inside()[0]];
 
 								auto response = make_gunshot_message();
-								response.cartridge_definition = cartridge_in_chamber.template get<invariants::cartridge>();
 
 								thread_local std::vector<entity_id> bullet_stacks;
 								bullet_stacks.clear();
@@ -743,34 +812,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 										}
 									}
 
-									if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().shell_flavour; shell_flavour.is_set()) {
-										cosmic::create_entity(cosm, shell_flavour, [&](const auto shell_entity, auto&&...){
-											auto rng = cosm.get_nontemporal_rng_for(shell_entity);
+									if (gun_def.delay_shell_spawn_until_chambering) {
+										gun.shell_drop_scheduled = true;
+									}
+									else {
+										const auto& cartridge_def = single_bullet_or_pellet_stack.get<invariants::cartridge>();
 
-											const auto shell_spawn_offset = ::calc_shell_offset(gun_entity);
-											const auto spread_component = rng.randval_h(gun_def.shell_spread_degrees) + shell_spawn_offset.rotation;
-
-											auto shell_transform = gun_transform;
-											shell_transform.pos += vec2(shell_spawn_offset.pos).rotate(gun_transform.rotation);
-											shell_transform.rotation += spread_component;
-
-											shell_entity.set_logic_transform(shell_transform);
-
-											const auto& rigid_body = shell_entity.template get<components::rigid_body>();
-											rigid_body.set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
-											rigid_body.set_angular_velocity(rng.randval(gun_def.shell_angular_velocity));
-
-											auto& ignored = rigid_body.get_special().during_cooldown_ignore_collision_with;
-
-											if (owning_capability.alive()) {
-												ignored = owning_capability;
-											}
-											else {
-												ignored = gun_entity;
-											}
-
-											response.spawned_shell = shell_entity;
-										}, [&](const auto) {});
+										if (const auto shell_flavour = cartridge_def.shell_flavour; shell_flavour.is_set()) {
+											::spawn_shell(step, gun_transform, muzzle_transform, gun_def, gun_entity, shell_flavour, owning_capability, cartridge_def);
+										}
 									}
 
 									destructions.emplace_back(single_bullet_or_pellet_stack);

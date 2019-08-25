@@ -839,9 +839,9 @@ namespace test_flavours {
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = pink;
+			missile.trace_particles.modifier.colorize = cyan;
 			missile.trace_particles.modifier.scale_amounts = 1.2f;
-			missile.trace_particles.modifier.scale_lifetimes = 1.5f;
+			missile.trace_particles.modifier.scale_lifetimes = 2.0f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HPSR_ROUND_MUZZLE_LEAVE_EXPLOSION);
 			missile.trace_particles_fly_backwards = true;
@@ -859,8 +859,8 @@ namespace test_flavours {
 			auto& trace_modifier = missile.trace_sound.modifier;
 
 			trace_modifier.doppler_factor = 0.6f;
-			trace_modifier.max_distance = 2500.f;
-			trace_modifier.reference_distance = 200.f;
+			trace_modifier.max_distance = 4500.f;
+			trace_modifier.reference_distance = 600.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.fade_on_exit = false;
 
@@ -1938,7 +1938,8 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = steel_color;
+				cartridge.shell_trace_particles.modifier.colorize = pink;
+				cartridge.shell_trace_particles.modifier *= 2.5f;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::HPSR_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::HPSR_ROUND);
@@ -3360,7 +3361,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.062f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.recoil_multiplier = 0.94f;
-			gun_def.adversarial.knockout_award = static_cast<money_type>(600);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(700);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
@@ -3609,19 +3610,22 @@ namespace test_flavours {
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::HPSR_MUZZLE);
-			gun_def.muzzle_shot_sound.modifier.max_distance = 6000.f;
+			gun_def.muzzle_shot_sound.modifier.max_distance = 8000.f;
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 2000.f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {5600.f, 5600.f};
-			gun_def.shot_cooldown_ms = 750.f;
+			gun_def.muzzle_velocity = {5700.f, 5700.f};
+			gun_def.shot_cooldown_ms = 600.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.4f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HPSR_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
 
+			gun_def.delay_shell_spawn_until_chambering = true;
+			gun_def.shell_spawn_delay_mult = 0.15f;
+
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
-			gun_def.shell_velocity = {500.f, 2500.f};
+			gun_def.shell_velocity = {2500.f, 3500.f};
 			gun_def.damage_multiplier = 12.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
@@ -3640,11 +3644,11 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 2.0f);
+			set_density_mult(meta, 3.0f);
 			make_default_gun_container(meta, item_holding_stance::SNIPER_LIKE, 1850.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 4750;
-			set_chambering_duration_ms(meta, 700.f);
+			set_chambering_duration_ms(meta, 650.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("8");
 			only_allow_mag(meta, test_container_items::HPSR_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
@@ -3665,6 +3669,9 @@ namespace test_flavours {
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::AO44_MUZZLE);
+
+			gun_def.delay_shell_spawn_until_chambering = true;
+			gun_def.shell_spawn_delay_mult = 0.15f;
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
@@ -3804,7 +3811,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 1800.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = { 5000.f, 5000.f };
+			gun_def.muzzle_velocity = { 5200.f, 5200.f };
 			gun_def.shot_cooldown_ms = 250.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
@@ -3830,11 +3837,11 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.5f);
+			set_density_mult(meta, 2.0f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 5200;
+			meta.get<invariants::item>().standard_price = 5000;
 			set_chambering_duration_ms(meta, 700.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("9");
 			only_allow_mag(meta, test_container_items::BULLDUP2000_MAGAZINE);
