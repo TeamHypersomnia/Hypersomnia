@@ -268,7 +268,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 			movement.was_walk_effective = is_walking;
 
-			const bool should_decelerate_due_to_walk = is_walking && movement.animation_amount >= num_frames * frame_ms - 60.f;
+			const auto time_to_gain_speed_ms = 100.f;
+			const bool should_decelerate_due_to_walk = is_walking && movement.animation_amount >= time_to_gain_speed_ms;
 			const bool propelling = !should_decelerate_due_to_walk && non_zero_requested;
 
 			if (propelling) {
