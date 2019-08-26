@@ -1185,7 +1185,7 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 		}
 
 		if (const auto s = stats_of(ko.assist.id)) {
-			s->deaths += assists_dt;
+			s->assists += assists_dt;
 		}
 	}
 }
