@@ -1,14 +1,14 @@
 #version 130
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 precision mediump int;
 precision mediump float;
 
 
 uniform mat4 projection_matrix;
-layout(location = 0) in vec2 position;
-layout(location = 1) in vec2 texcoord;
-layout(location = 2) in vec4 color;
-layout(location = 3) in vec4 special;
+in vec2 position;
+in vec2 texcoord;
+in vec4 color;
+in vec4 special;
 
 smooth out vec4 theColor;
 out vec2 startingAngleVec;

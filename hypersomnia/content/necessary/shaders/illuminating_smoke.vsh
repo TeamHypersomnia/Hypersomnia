@@ -1,9 +1,9 @@
 #version 130
-#extension GL_ARB_explicit_attrib_location : enable
+//#extension GL_ARB_explicit_attrib_location : enable
 precision mediump int;
 precision mediump float;
 
-layout(location = 0) in vec2 position;
+in vec2 position;
 
 out vec2 theTexcoord;
 

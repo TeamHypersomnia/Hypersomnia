@@ -203,6 +203,11 @@ namespace augs {
 			GL_CHECK(glAttachShader(id, new_vertex.id));
 			GL_CHECK(glAttachShader(id, new_fragment.id));
 
+			GL_CHECK(glBindAttribLocation(id, 0, "position"));
+			GL_CHECK(glBindAttribLocation(id, 1, "texcoord"));
+			GL_CHECK(glBindAttribLocation(id, 2, "color"));
+			GL_CHECK(glBindAttribLocation(id, 3, "special"));
+
 			GL_CHECK(glLinkProgram(id));
 
 			GLint link_status = GL_FALSE;
