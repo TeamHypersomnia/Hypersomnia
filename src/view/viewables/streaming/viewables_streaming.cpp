@@ -10,6 +10,15 @@
 #include "view/viewables/regeneration/atlas_progress_structs.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/filesystem/file.h"
+
+void viewables_streaming::request_rescan() {
+	if (!general_atlas.empty()) {
+		rescan_for_modified_images = true;
+	}
+
+	rescan_for_modified_sounds = true;
+}
 
 void viewables_streaming::finalize_pending_tasks() {
 	if (future_loaded_buffers.valid()) {
@@ -28,6 +37,25 @@ void viewables_streaming::finalize_pending_tasks() {
 viewables_streaming::~viewables_streaming() {
 	finalize_pending_tasks();
 }
+
+template <class D, class F>
+static auto make_current_registry_of_write_times(const D& dir, const F& from_defs) {
+	auto get_write_time = [](const auto& dir, const auto& def) {
+		const auto path = image_definition_view(dir, def).get_source_image_path();
+
+		return augs::last_write_time(path);
+	};
+
+	std::vector<augs::file_time_type> output;
+
+	output.reserve(from_defs.size());
+
+	for (const auto& v : from_defs) {
+		output.emplace_back(get_write_time(dir, v));
+	}
+
+	return output;
+};
 
 bool viewables_streaming::finished_loading_player_metas(const augs::frame_num_type current_frame) const {
 	return !future_avatar_atlas.valid() && augs::has_completed(current_frame, avatar_atlas_submitted_when);
@@ -120,6 +148,28 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			new_atlas_required = true;
 		}
 
+		if (!new_atlas_required) {
+			if (rescan_for_modified_images) {
+				augs::timer t;
+
+				const auto current_times = make_current_registry_of_write_times(
+					unofficial_content_dir,
+					now_loaded_viewables_defs.image_definitions
+				);
+
+				if (current_times != image_write_times) {
+					LOG("Detected modified image file(s). Reloading atlas.");
+
+					new_atlas_required = true;
+					image_write_times = current_times;
+				}
+
+				LOG("Rescanning for modified images took %x ms", t.get<std::chrono::milliseconds>());
+			}
+		}
+
+		rescan_for_modified_images = false;
+
 		if (new_atlas_required) {
 			auto scope = measure_scope(performance.launching_atlas_reload);
 
@@ -152,6 +202,18 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			future_general_atlas = std::async(
 				std::launch::async,
 				[general_atlas_in, this]() { 
+					if (!rescan_for_modified_images) {
+						/* 
+							The request was not due to source image modification, 
+							so we have yet to re-scan the modified times. 
+						*/
+
+						image_write_times = make_current_registry_of_write_times(
+							general_atlas_in.subjects.unofficial_project_dir,
+							general_atlas_in.subjects.image_definitions
+						);
+					}
+
 					return create_general_atlas(general_atlas_in, general_atlas_performance);
 				}
 			);
@@ -230,6 +292,8 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			future_sound_definitions = new_all_defs.sounds;
 		}
+
+		rescan_for_modified_sounds = false;
 	}
 }
 

@@ -18,6 +18,8 @@
 #include "view/viewables/regeneration/atlas_progress_structs.h"
 #include "augs/graphics/frame_num_type.h"
 
+#include "augs/filesystem/file_time_type.h"
+
 class sound_system;
 
 namespace augs {
@@ -65,10 +67,16 @@ class viewables_streaming {
 	std::vector<std::pair<assets::sound_id, augs::sound_buffer_loading_input>> sound_requests;
 	std::future<std::vector<std::optional<augs::sound_buffer>>> future_loaded_buffers;
 
+	std::vector<augs::file_time_type> image_write_times;
+	std::vector<augs::file_time_type> sound_write_times;
+
 	std::optional<atlas_progress_structs> general_atlas_progress;
 
 	std::optional<augs::frame_num_type> general_atlas_submitted_when;
 	std::optional<augs::frame_num_type> avatar_atlas_submitted_when;
+
+	bool rescan_for_modified_images = false;
+	bool rescan_for_modified_sounds = false;
 
 public:
 	augs::graphics::texture avatar_atlas = augs::image::white_pixel();
@@ -100,4 +108,6 @@ public:
 	bool finished_loading_player_metas(augs::frame_num_type) const;
 	bool finished_generating_atlas() const;
 	void display_loading_progress() const;
+
+	void request_rescan();
 };

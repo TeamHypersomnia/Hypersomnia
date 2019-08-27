@@ -1592,6 +1592,12 @@ and then hitting Save settings.
 
 						simulated_input_state.apply(e);
 
+						if (e.msg == message::activate) {
+							if (config.content_regeneration.rescan_assets_on_window_focus) {
+								streaming.request_rescan();
+							}
+						}
+
 						if (e.msg == message::deactivate) {
 							releases.set_all();
 						}

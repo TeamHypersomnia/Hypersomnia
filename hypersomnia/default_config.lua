@@ -149,6 +149,7 @@ return {
   },
   content_regeneration = {
     regenerate_every_time = false,
+	rescan_assets_on_window_focus = true,
 	atlas_blitting_threads = 3,
 	neon_regeneration_threads = 3
   },
