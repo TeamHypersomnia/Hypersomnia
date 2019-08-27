@@ -15,11 +15,24 @@
 
 #include "game/cosmos/for_each_entity.h"
 
-cosmos::cosmos(const cosmic_pool_size_type reserved_entities) 
-	: solvable(reserved_entities) 
-{}
+#include <atomic>
 
-cosmos::cosmos(const cosmos& b) : common(b.common), solvable(b.solvable), profiler(b.profiler) {
+std::atomic<int> cosmos_counter = 0;
+
+void cosmos::request_resample() {
+	cosmos_id = cosmos_counter++;
+}
+
+cosmos::cosmos() : cosmos_id(cosmos_counter++) 
+{
+}
+
+cosmos::cosmos(const cosmic_pool_size_type reserved_entities) 
+	: solvable(reserved_entities), cosmos_id(cosmos_counter++)
+{
+}
+
+cosmos::cosmos(const cosmos& b) : common(b.common), solvable(b.solvable), cosmos_id(cosmos_counter++), profiler(b.profiler) {
 	cosmic::after_solvable_copy(*this, b);
 }
 

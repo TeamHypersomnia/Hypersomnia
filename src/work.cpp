@@ -1141,6 +1141,7 @@ and then hitting Save settings.
 	};
 
 	static bool pending_new_state_sample = true;
+	static auto last_sampled_cosmos = cosmos_id_type(-1);
 
 	static auto audiovisual_step = [&](
 		const augs::audio_renderer* audio_renderer,
@@ -1188,6 +1189,44 @@ and then hitting Save settings.
 		});
 
 		static augs::timer state_changed_timer;
+
+		visit_current_setup([&](const auto& setup) {
+			using S = remove_cref<decltype(setup)>;
+
+			const auto now_sampled_cosmos = cosm.get_cosmos_id();
+
+			auto resample = [&]() {
+				if (last_sampled_cosmos != now_sampled_cosmos) {
+					get_audiovisuals().get<particles_simulation_system>().clear();
+
+					last_sampled_cosmos = now_sampled_cosmos;
+
+#if !IS_PRODUCTION_BUILD
+					LOG("Now sampled cosmos has changed.");
+#endif
+				}
+			};
+
+			if constexpr(std::is_same_v<S, client_setup>) {
+				const auto& referential = setup.get_arena_handle(client_arena_type::REFERENTIAL).get_cosmos().get_cosmos_id();
+				const auto& predicted = setup.get_arena_handle(client_arena_type::PREDICTED).get_cosmos().get_cosmos_id();
+
+				const bool valid_switch = 
+					(last_sampled_cosmos == referential && now_sampled_cosmos == predicted)
+					|| (last_sampled_cosmos == predicted && now_sampled_cosmos == referential)
+				;
+
+				if (valid_switch) {
+					last_sampled_cosmos = now_sampled_cosmos;
+				}
+				else {
+					resample();
+				}
+			}
+			else {
+				resample();
+			}
+		});
 
 		get_audiovisuals().advance(audiovisual_advance_input {
 			audio_buffers,

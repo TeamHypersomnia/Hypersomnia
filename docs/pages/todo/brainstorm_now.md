@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix randomly losing the controlled character
+
 - Do something about reimporting those rulesets
 	- turn it off by default and remap
 

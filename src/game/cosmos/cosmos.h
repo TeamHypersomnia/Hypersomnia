@@ -13,6 +13,8 @@
 
 #include "game/enums/processing_subjects.h"
 
+using cosmos_id_type = int;
+
 class cosmos {
 	template <class C, class F>
 	static void for_each_in_impl(C& self, const processing_subjects f, F callback) {
@@ -24,13 +26,15 @@ class cosmos {
 	cosmos_common common;
 	private_cosmos_solvable solvable;
 
+	cosmos_id_type cosmos_id = 0;
+
 public: 
 	/* A detail only for performance benchmarks */
 	mutable cosmic_profiler profiler;
 
 	static const cosmos zero;
 
-	cosmos() = default;
+	cosmos();
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 
 	cosmos(const cosmos&);
@@ -304,4 +308,10 @@ public:
 
 	template <class T>
 	T calculate_solvable_signi_hash() const;
+
+	cosmos_id_type get_cosmos_id() const {
+		return cosmos_id;
+	}
+
+	void request_resample();
 };
