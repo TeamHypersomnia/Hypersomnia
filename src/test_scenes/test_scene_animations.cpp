@@ -346,6 +346,8 @@ void load_test_scene_animations(
 
 			ping_pong_range(f);
 
+			anim.name_suffix = "chambering";
+
 			return anim;
 		};
 

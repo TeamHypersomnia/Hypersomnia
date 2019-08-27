@@ -50,8 +50,8 @@ struct update_official_content_settings {
 	bool overwrite_physical_materials = true;
 	bool overwrite_common_assets = true;
 	bool overwrite_non_decoration_flavours = true;
-	bool overwrite_economy_vars = true;
-	bool overwrite_whole_ruleset = true;
+	bool overwrite_economy_vars = false;
+	bool overwrite_whole_ruleset = false;
 	bool overwrite_meters = true;
 	bool overwrite_spells = true;
 	bool overwrite_perks = true;

@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Do something about reimporting those rulesets
+	- turn it off by default and remap
+
+- Maybe warn about animations with same names or automatically add suffixes
+	- THink about if it's even necessary apart from specifying the official content because then it doesnt make sense
+
 - Deleting flavour crash
 	- can it really let delete a flavour even if it is used?
 
