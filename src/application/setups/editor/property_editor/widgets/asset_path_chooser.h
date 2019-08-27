@@ -44,7 +44,7 @@ public:
 						if (assets::is_supported_extension<I>(p.extension().string())) {
 							maybe_official_path<I> entry;
 
-							entry.path = cut_preffix(p.string(), root.string() + "/");
+							entry.path = std::filesystem::relative(p, root);
 							entry.is_official = official;
 
 							if (allow_path_predicate(entry)) {
