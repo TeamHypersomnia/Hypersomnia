@@ -161,8 +161,27 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					return requested_by_input_aa;
 				}
 
+				const auto disp = ::calc_crosshair_displacement(it);
+
+				auto total_vec = vec2::zero;
+
+				{
+					auto side_disp = disp;
+
+					if (side_disp.y > 0) {
+						side_disp = -side_disp;
+					}
+
+					const auto angle = side_disp.degrees();
+					const auto side_component = vec2(requested_by_input_aa.x, 0.f);
+					total_vec += vec2(side_component).rotate(angle + 90);
+				}
+
+				const auto forward_component = vec2(0.f, requested_by_input_aa.y);
 				const auto angle = ::calc_crosshair_displacement(it).degrees();
-				return vec2(requested_by_input_aa).rotate(angle + 90);
+
+				total_vec += vec2(forward_component).rotate(angle + 90);
+				return total_vec;
 			}();
 
 			if (is_sentient) {
