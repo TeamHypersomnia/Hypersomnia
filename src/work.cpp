@@ -354,18 +354,24 @@ and then hitting Save settings.
 
 	static game_frame_buffer_swapper buffer_swapper;
 
-	static game_frame_buffer read_buffer;
-	static game_frame_buffer write_buffer;
-
-	write_buffer.screen_size = window.get_screen_size();
-	read_buffer.new_settings = config.window;
-
-	static auto logic_get_screen_size = []() {
-		return write_buffer.screen_size;
+	static auto get_read_buffer = []() -> game_frame_buffer& {
+		return buffer_swapper.get_read_buffer();
 	};
 
-	// temporary
-	static auto& general_renderer = write_buffer.renderers.all[renderer_type::GENERAL];
+	static auto get_write_buffer = []() -> game_frame_buffer& {
+		return buffer_swapper.get_write_buffer();
+	};
+
+	get_write_buffer().screen_size = window.get_screen_size();
+	get_read_buffer().new_settings = config.window;
+
+	static auto logic_get_screen_size = []() {
+		return get_write_buffer().screen_size;
+	};
+
+	static auto get_general_renderer = []() -> augs::renderer& {
+		return get_write_buffer().renderers.all[renderer_type::GENERAL];
+	};
 
 	LOG_NVPS(renderer_backend.get_max_texture_size());
 
@@ -377,7 +383,7 @@ and then hitting Save settings.
 
 	LOG("Initializing the necessary shaders.");
 	static all_necessary_shaders necessary_shaders(
-		general_renderer,
+		get_general_renderer(),
 		"content/necessary/shaders",
 		"content/necessary/shaders",
 		config.drawing
@@ -402,7 +408,7 @@ and then hitting Save settings.
 		window,
 		necessary_fbos,
 		audio,
-		general_renderer
+		get_general_renderer()
 	};
 
 	static atlas_profiler atlas_performance;
@@ -546,7 +552,7 @@ and then hitting Save settings.
 			config.gui_fonts,
 			config.content_regeneration,
 			get_unofficial_content_dir(),
-			general_renderer,
+			get_general_renderer(),
 			renderer_backend.get_max_texture_size(),
 
 			new_player_metas
@@ -659,7 +665,7 @@ and then hitting Save settings.
 	static auto perform_start_client = [](const auto frame_num) {
 		const bool perform_result = start_client_gui.perform(
 			frame_num,
-			general_renderer, 
+			get_general_renderer(), 
 			streaming.avatar_preview_tex, 
 			window, 
 			config.default_client_start, 
@@ -909,7 +915,7 @@ and then hitting Save settings.
 	};
 
 	static auto decide_on_cursor_clipping = [](const bool in_direct_gameplay, const auto& cfg) {
-		write_buffer.should_clip_cursor = (
+		get_write_buffer().should_clip_cursor = (
 			in_direct_gameplay
 			|| (
 				cfg.window.is_raw_mouse_input()
@@ -1072,7 +1078,7 @@ and then hitting Save settings.
 	};
 
 	static auto setup_pre_solve = [&](auto...) {
-		general_renderer.save_debug_logic_step_lines_for_interpolation(DEBUG_LOGIC_STEP_LINES);
+		get_general_renderer().save_debug_logic_step_lines_for_interpolation(DEBUG_LOGIC_STEP_LINES);
 		DEBUG_LOGIC_STEP_LINES.clear();
 	};
 
@@ -1249,8 +1255,8 @@ and then hitting Save settings.
 			viewing_config.performance,
 
 			streaming.images_in_atlas,
-			write_buffer.particle_buffers,
-			general_renderer.dedicated,
+			get_write_buffer().particle_buffers,
+			get_general_renderer().dedicated,
 			pending_new_state_sample ? state_changed_timer.extract_delta() : std::optional<augs::delta>(),
 
 			thread_pool
@@ -1508,6 +1514,8 @@ and then hitting Save settings.
 			const auto frame_delta = frame_timer.extract_delta();
 			const auto current_frame_num = current_frame.load();
 			auto game_gui_mode = game_gui_mode_flag;
+
+			auto& write_buffer = get_write_buffer();
 
 			auto& game_gui_renderer = write_buffer.renderers.all[renderer_type::GAME_GUI];
 			auto& post_game_gui_renderer = write_buffer.renderers.all[renderer_type::POST_GAME_GUI];
@@ -1902,7 +1910,7 @@ and then hitting Save settings.
 					audio_buffers,
 					get_current_frame_num(),
 					new_viewing_config.debug.measure_atlas_uploading,
-					general_renderer,
+					get_general_renderer(),
 					get_audiovisuals().get<sound_system>()
 				});
 			};
@@ -2295,7 +2303,7 @@ and then hitting Save settings.
 						- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
 			*/
 
-			setup_the_first_fbo(general_renderer);
+			setup_the_first_fbo(get_general_renderer());
 
 			const auto viewed_character = get_viewed_character();
 			const auto& viewed_cosmos = viewed_character.get_cosmos();
@@ -2335,7 +2343,7 @@ and then hitting Save settings.
 					thread_pool,
 
 					viewed_cosmos,
-					general_renderer.dedicated,
+					get_general_renderer().dedicated,
 					cached_visibility,
 
 					fog_of_war_effective,
@@ -2345,15 +2353,15 @@ and then hitting Save settings.
 				);
 			};
 
-			const auto illuminated_input = make_illuminated_rendering_input(general_renderer, new_viewing_config);
+			const auto illuminated_input = make_illuminated_rendering_input(get_general_renderer(), new_viewing_config);
 
 			auto illuminated_rendering_job = [&]() {
 				/* #1 */
 				perform_illuminated_rendering(illuminated_input);
 				/* #2 */
-				draw_debug_lines(general_renderer, new_viewing_config);
+				draw_debug_lines(get_general_renderer(), new_viewing_config);
 
-				setup_standard_projection(general_renderer);
+				setup_standard_projection(get_general_renderer());
 			};
 
 			auto game_gui_job = [&]() {
@@ -2417,11 +2425,11 @@ and then hitting Save settings.
 
 		while (!should_quit) {
 			auto extract_num_total_drawn_triangles = []() {
-				return write_buffer.renderers.extract_num_total_triangles_drawn();
+				return get_write_buffer().renderers.extract_num_total_triangles_drawn();
 			};
 
 			auto finalize_frame_and_swap = [&]() {
-				for (auto& r : write_buffer.renderers.all) {
+				for (auto& r : get_write_buffer().renderers.all) {
 					r.call_and_clear_triangles();
 				}
 
@@ -2429,8 +2437,12 @@ and then hitting Save settings.
 
 				buffer_swapper.wait_swap();
 
-				write_buffer.renderers.next_frame();
-				write_buffer.particle_buffers.clear();
+				{
+					auto& write_buffer = get_write_buffer();
+
+					write_buffer.renderers.next_frame();
+					write_buffer.particle_buffers.clear();
+				}
 			};
 
 			{
@@ -2449,7 +2461,7 @@ and then hitting Save settings.
 	auto game_thread_joiner = augs::scope_guard([]() { game_thread.join(); });
 
 	request_quit = []() {
-		write_buffer.should_quit = true;
+		get_write_buffer().should_quit = true;
 		should_quit = true;
 	};
 
@@ -2463,7 +2475,7 @@ and then hitting Save settings.
 			It will eat from the window input vector that is later passed to the game and other GUIs.	
 		*/
 
-		configurables.apply_main_thread(read_buffer.new_settings);
+		configurables.apply_main_thread(get_read_buffer().new_settings);
 		configurables.sync_back_into(config);
 
 		if (config.session.show_developer_console) {
@@ -2487,13 +2499,15 @@ and then hitting Save settings.
 		}
 	};
 
-	do {
+	for (;;) {
 		auto scope = measure_scope(render_thread_performance.fps);
 		
 		{
 			auto scope = measure_scope(render_thread_performance.renderer_commands);
 
 			renderer_backend_result.clear();
+
+			auto& read_buffer = get_read_buffer();
 
 			for (auto& r : read_buffer.renderers.all) {
 				renderer_backend.perform(
@@ -2519,6 +2533,8 @@ and then hitting Save settings.
 
 		{
 			{
+				auto& read_buffer = get_read_buffer();
+
 				auto scope = measure_scope(render_thread_performance.local_entropy);
 
 				auto& next_entropy = read_buffer.new_window_entropy;
@@ -2537,9 +2553,11 @@ and then hitting Save settings.
 
 			{
 				auto scope = measure_scope(render_thread_performance.render_wait);
-				buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);
+				buffer_swapper.swap_buffers(game_main_thread_synced_op);
 			}
 		}
+
+		auto& read_buffer = get_read_buffer();
 
 		if (window.is_active() && read_buffer.should_clip_cursor) {
 			window.set_cursor_clipping(true);
@@ -2551,7 +2569,11 @@ and then hitting Save settings.
 		}
 
 		window.set_mouse_pos_paused(read_buffer.should_pause_cursor);
-	} while(!read_buffer.should_quit);
+
+		if (read_buffer.should_quit) {
+			break;
+		}
+	}
 
 	return EXIT_SUCCESS;
 }

@@ -6,6 +6,20 @@ permalink: todo_editor
 summary: That which is to be done with the editor.
 ---
 
+- Opening will have an inline radio button where we can choose either community or official
+
+- Asynchronously compress maps to 7z for easier transmission
+	- If the maps don't match and we need to download, rename the unmatching map to _old or _unmatching or _local
+
+- Instead of opening up the file browser, make a visual-studio-like dialog where you simply choose the project name
+and by default it will show the community arenas location, only then you can press "Browse" to change location
+
+- Debug crashes after deleting arbitrary mode elements
+- add invisible physical bodies to test scenes
+
+- make it clear that a test mode is running, not a bomb mode
+- clicking the same spot cycles through all selectable entities in this spot
+
 - let windows be open without changes after importing
 - fix confusing undo behaviour when duplicating entities
 - particle delete command does not show message

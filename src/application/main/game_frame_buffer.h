@@ -64,13 +64,20 @@ class game_frame_buffer_swapper {
 	std::condition_variable swapper_cv;
 	std::condition_variable waiter_cv;
 
+	std::array<game_frame_buffer, 2> buffers;
+
 public:
+
+	game_frame_buffer& get_read_buffer() {
+		return buffers[0];
+	}
+
+	game_frame_buffer& get_write_buffer() {
+		return buffers[1];
+	}
+
 	template <class T>
-	void swap_buffers(
-		game_frame_buffer& read_buffer, 
-		game_frame_buffer& write_buffer,
-		T&& synchronized_op
-	) {
+	void swap_buffers(T&& synchronized_op) {
 		{
 			std::unique_lock<std::mutex> lk(swapper_m);
 			swapper_cv.wait(lk, [this]{ return already_waiting.load(); });
@@ -79,7 +86,7 @@ public:
 
 		{
 			/* The other thread MUST be waiting while in this block */
-			std::swap(read_buffer, write_buffer);
+			std::swap(buffers[0], buffers[1]);
 			already_waiting.store(false);
 
 			synchronized_op();

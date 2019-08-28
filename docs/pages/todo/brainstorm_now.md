@@ -6,14 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Instead of opening up the file browser, make a visual-studio-like dialog where you simply choose the project name
-and by default it will show the community arenas location, only then you can press "Browse" to change location
-
-- Opening will have an inline radio button where we can choose either community or official
-
-- Asynchronously compress maps to 7z for easier transmission
-	- If the maps don't match and we need to download, rename the unmatching map to _old or _unmatching or _local
-
 - Try to reimplement that swap buffers without UB and so that it doesn't crash on windows
 
 - Maybe let's try using clang's stdlib on Windows?
