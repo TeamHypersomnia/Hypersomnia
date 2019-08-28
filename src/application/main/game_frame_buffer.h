@@ -54,6 +54,8 @@ struct game_frame_buffer {
 	particle_triangle_buffers particle_buffers;
 };
 
+#define SWAP_BUFFERS_BY_POINTERS 1
+
 class game_frame_buffer_swapper {
 	std::atomic<bool> already_waiting = false;
 	std::atomic<bool> swap_complete = false;
@@ -64,17 +66,42 @@ class game_frame_buffer_swapper {
 	std::condition_variable swapper_cv;
 	std::condition_variable waiter_cv;
 
+#if SWAP_BUFFERS_BY_POINTERS
 	std::array<game_frame_buffer, 2> buffers;
+
+	game_frame_buffer* read_buffer = nullptr;
+	game_frame_buffer* write_buffer = nullptr;
+#else
+	game_frame_buffer read_buffer;
+	game_frame_buffer write_buffer;
+#endif
 
 public:
 
+	game_frame_buffer_swapper() {
+#if SWAP_BUFFERS_BY_POINTERS
+		read_buffer = &buffers[0];
+		write_buffer = &buffers[1];
+#endif
+	}
+
+#if SWAP_BUFFERS_BY_POINTERS
 	game_frame_buffer& get_read_buffer() {
-		return buffers[0];
+		return *read_buffer;
 	}
 
 	game_frame_buffer& get_write_buffer() {
-		return buffers[1];
+		return *write_buffer;
 	}
+#else
+	game_frame_buffer& get_read_buffer() {
+		return read_buffer;
+	}
+
+	game_frame_buffer& get_write_buffer() {
+		return write_buffer;
+	}
+#endif
 
 	template <class T>
 	void swap_buffers(T&& synchronized_op) {
@@ -86,7 +113,7 @@ public:
 
 		{
 			/* The other thread MUST be waiting while in this block */
-			std::swap(buffers[0], buffers[1]);
+			std::swap(read_buffer, write_buffer);
 			already_waiting.store(false);
 
 			synchronized_op();
