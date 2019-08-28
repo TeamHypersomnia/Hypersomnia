@@ -3842,3 +3842,5 @@ which can be done from Settings->Reset all settings to factory default.
 - buff datum gun
 - nerf amplifier arm
 
+- Absolute paths are remembered under Windows
+

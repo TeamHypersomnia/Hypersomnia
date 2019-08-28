@@ -43,7 +43,12 @@ static auto make_current_registry_of_write_times(const D& dir, const F& from_def
 	auto get_write_time = [](const auto& dir, const auto& def) {
 		const auto path = image_definition_view(dir, def).get_source_image_path();
 
-		return augs::last_write_time(path);
+		try {
+			return augs::last_write_time(path);
+		}
+		catch (const augs::filesystem_error&) {
+			return augs::file_time_type();
+		}
 	};
 
 	std::vector<augs::file_time_type> output;

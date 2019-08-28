@@ -3416,7 +3416,7 @@ namespace test_flavours {
 			gun_def.steam_burst_schedule_mult = 1.f;
 			gun_def.heat_cooldown_speed_mult = 4.f;
 
-			gun_def.minimum_heat_to_shoot = 3.8f;
+			gun_def.minimum_heat_to_shoot = 3.3f;
 			gun_def.maximum_heat = 4.0f;
 			gun_def.gunshot_adds_heat = 0.2f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.4f;

@@ -6,18 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix randomly losing the controlled character
+- Instead of opening up the file browser, make a visual-studio-like dialog where you simply choose the project name
+and by default it will show the community arenas location, only then you can press "Browse" to change location
 
-- Do something about reimporting those rulesets
-	- turn it off by default and remap
+- Opening will have an inline radio button where we can choose either community or official
 
-- Maybe warn about animations with same names or automatically add suffixes
-	- THink about if it's even necessary apart from specifying the official content because then it doesnt make sense
+- Asynchronously compress maps to 7z for easier transmission
+	- If the maps don't match and we need to download, rename the unmatching map to _old or _unmatching or _local
 
-- Deleting flavour crash
-	- can it really let delete a flavour even if it is used?
+- Try to reimplement that swap buffers without UB and so that it doesn't crash on windows
 
-- Absolute paths are remembered under Windows
+- Maybe let's try using clang's stdlib on Windows?
+
+- Map transmission
+	- Maybe asynchronously compress the entire map to .7z
+
+- Maybe a separate folder for official arenas?
+
+- Disallow exporting to lua when playtesting
 
 - LPM acts as Q when hands are empty
 	- Punches when no weapons
@@ -35,6 +41,7 @@ summary: That which we are brainstorming at the moment.
 
 - Do we want to somehow let the user be able to rollback to older versions?
 	- How do we even do it? Build retention on appveyor?
+	- Not now, certainly not until editor is publicly usable
 
 - Check if there's no room for error in those connection tokens
 
@@ -78,6 +85,7 @@ summary: That which we are brainstorming at the moment.
 	- Snapshots could prove a little hard but we could just resimulate from the beginning if we want to seek backwards
 
 - Port fy_minilab
+	- though change "invariants" to "invariants_state" and same with components
 
 - Upgrade appveyor
 	- Things to update for windows
@@ -106,11 +114,6 @@ summary: That which we are brainstorming at the moment.
 
 - bomb falls outside the map
 
-- Editor errata
-	- let windows be open without changes after importing
-	- fix confusing undo behaviour when duplicating entities
-	- particle delete command does not show message
-	- if duplicate names in project, the button just does not work in asset file choice dialog
 
 - Indeed, there is a problem when importing project-specific gfx on windows, but not on linux
 
