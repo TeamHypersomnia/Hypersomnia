@@ -1186,6 +1186,8 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.performance;
 
+					revertable_enum_radio(SCOPE_CFG_NVP(swap_window_buffers_when));
+
 					const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
 
 					{

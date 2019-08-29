@@ -3844,3 +3844,5 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Absolute paths are remembered under Windows
 
+- Try to reimplement that swap buffers without UB and so that it doesn't crash on windows
+

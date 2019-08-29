@@ -646,6 +646,7 @@ return {
 
   performance = {
 	max_particles_in_single_job = 2500,
+	swap_buffers_when = "AFTER_HELPING_LOGIC_THREAD",
 
     special_effects = {
 	  explosions = {

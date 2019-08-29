@@ -364,6 +364,7 @@ and then hitting Save settings.
 
 	get_write_buffer().screen_size = window.get_screen_size();
 	get_read_buffer().new_settings = config.window;
+	get_read_buffer().swap_when = config.performance.swap_window_buffers_when;
 
 	static auto logic_get_screen_size = []() {
 		return get_write_buffer().screen_size;
@@ -1677,6 +1678,7 @@ and then hitting Save settings.
 
 				configurables.apply(viewing_config);
 				write_buffer.new_settings = viewing_config.window;
+				write_buffer.swap_when = viewing_config.performance.swap_window_buffers_when;
 				decide_on_cursor_clipping(in_direct_gameplay, viewing_config);
 
 				releases.set_due_to_imgui(ImGui::GetIO());
@@ -2502,32 +2504,44 @@ and then hitting Save settings.
 	for (;;) {
 		auto scope = measure_scope(render_thread_performance.fps);
 		
-		{
-			auto scope = measure_scope(render_thread_performance.renderer_commands);
-
-			renderer_backend_result.clear();
-
-			auto& read_buffer = get_read_buffer();
-
-			for (auto& r : read_buffer.renderers.all) {
-				renderer_backend.perform(
-					renderer_backend_result,
-					r.commands.data(),
-					r.commands.size(),
-					r.dedicated
-				);
-			}
-
-			current_frame.fetch_add(1, std::memory_order_relaxed);
-		}
-
-		{
+		auto swap_window_buffers = [&]() {
 			auto scope = measure_scope(render_thread_performance.swap_window_buffers);
 			window.swap_buffers();
 
 			if (!until_first_swap_measured) {
 				LOG("Time until first swap: %x ms", until_first_swap.extract<std::chrono::milliseconds>());
 				until_first_swap_measured = true;
+			}
+		};
+
+		{
+			auto& read_buffer = get_read_buffer();
+
+			const auto swap_when = read_buffer.swap_when;
+
+			if (swap_when == swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD) {
+				swap_window_buffers();
+			}
+
+			{
+				auto scope = measure_scope(render_thread_performance.renderer_commands);
+
+				renderer_backend_result.clear();
+
+				for (auto& r : read_buffer.renderers.all) {
+					renderer_backend.perform(
+						renderer_backend_result,
+						r.commands.data(),
+						r.commands.size(),
+						r.dedicated
+					);
+				}
+
+				current_frame.fetch_add(1, std::memory_order_relaxed);
+			}
+
+			if (swap_when == swap_buffers_moment::AFTER_GL_COMMANDS) {
+				swap_window_buffers();
 			}
 		}
 

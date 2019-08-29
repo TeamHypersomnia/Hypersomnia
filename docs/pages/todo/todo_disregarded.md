@@ -5,6 +5,8 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Maybe let's try using clang's stdlib on Windows?
+
 - Default camera mode in settings, maybe controls?
 
 - consider putting nades and knives to the primary hand for better aiming consistency when quickthrowing

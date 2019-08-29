@@ -44,6 +44,7 @@ struct all_game_renderers {
 struct game_frame_buffer {
 	augs::local_entropy new_window_entropy;
 	augs::window_settings new_settings;
+	swap_buffers_moment swap_when = swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD;
 
 	bool should_clip_cursor = false;
 	bool should_pause_cursor = false;

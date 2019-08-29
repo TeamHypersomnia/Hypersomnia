@@ -6,9 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Try to reimplement that swap buffers without UB and so that it doesn't crash on windows
-
-- Maybe let's try using clang's stdlib on Windows?
+- Maybe allow map changing through rcon so that we could switch to this other map?
 
 - Map transmission
 	- Maybe asynchronously compress the entire map to .7z
