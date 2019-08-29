@@ -2097,11 +2097,7 @@ and then hitting Save settings.
 				}
 				else {
 					if (should_draw_our_cursor) {
-						on_specific_setup([&](editor_setup& setup) {
-							if (setup.is_editing_mode()) {
-								get_drawer().cursor(streaming.necessary_images_in_atlas, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
-							}
-						});
+						get_drawer().cursor(streaming.necessary_images_in_atlas, assets::necessary_image_id::GUI_CURSOR, cursor_drawing_pos, white);
 					}
 				}
 			};

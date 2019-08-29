@@ -3,7 +3,7 @@
 #include <string>
 
 namespace augs {
-	template <unsigned const_count>
+	template <std::size_t const_count>
 	class constant_size_string {
 		using array_type = std::array<char, const_count>;
 
@@ -35,12 +35,12 @@ namespace augs {
 			return arr.data();
 		}
 
-		template <unsigned B>
+		template <std::size_t B>
 		bool operator==(const constant_size_string<B>& b) const {
 			return len == b.len && !std::memcmp(data(), b.data(), len);
 		}
 
-		template <unsigned B>
+		template <std::size_t B>
 		bool operator!=(const constant_size_string<B>& b) const {
 			return !operator==(b);
 		}
@@ -58,6 +58,10 @@ namespace augs {
 		}
 
 		auto size() const {
+			return len;
+		}
+
+		auto length() const {
 			return len;
 		}
 

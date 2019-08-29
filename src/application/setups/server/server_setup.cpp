@@ -381,7 +381,9 @@ void server_setup::advance_clients_state() {
 
 			if (!removed_someone_already) {
 				if (c.when_kicked != std::nullopt) {
-					if (server_time - *c.when_kicked > vars.max_kick_ban_linger_secs) {
+					const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
+
+					if (server_time - *c.when_kicked > linger_secs) {
 						disconnect_and_unset(client_id);
 					}
 				}
@@ -935,7 +937,9 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 	for_each_id_and_client(process_client, only_connected_v);
 
 	{
-		if (server_time - when_last_sent_net_statistics > vars.send_net_statistics_update_once_every_secs) {
+		const auto& interval = vars.send_net_statistics_update_once_every_secs;
+
+		if (interval > 0 && server_time - when_last_sent_net_statistics > std::max(interval, 0.5f)) {
 			net_statistics_update update;
 
 			auto gather_stats = [&](const auto client_id, const auto& c) {
@@ -1086,7 +1090,7 @@ void server_setup::sleep_until_next_tick() {
 	const auto sleep_dt = server_time - get_current_time();
 
 	if (sleep_dt > 0.0) {
-		const auto mult = vars.sleep_mult;
+		const auto mult = std::clamp(vars.sleep_mult, 0.f, 0.9f);
 
 		if (mult > 0.f) {
 			yojimbo_sleep(static_cast<float>(sleep_dt) * mult);
@@ -1363,7 +1367,9 @@ void server_setup::log_performance() {
 		const auto s = vars.log_performance_once_every_secs;
 
 		if (s > 0) {
-			if (server_time - last_logged_at >= vars.log_performance_once_every_secs) {
+			const auto once_every = std::max(s, 0.5f);
+
+			if (server_time - last_logged_at >= once_every) {
 				profiler.prepare_summary_info();
 
 				const auto summary = typesafe_sprintf(
