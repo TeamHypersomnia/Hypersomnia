@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix triad missing explosions
-
 - We still have crashes on Windows, even after fixing swap buffers
 	- Perhaps it's a compiler bug since with our home-brewn build everything seemed to be fine
 	- Although I think it was the same with that mega.nz build

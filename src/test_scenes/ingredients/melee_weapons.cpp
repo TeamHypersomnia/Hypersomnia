@@ -60,6 +60,7 @@ namespace test_flavours {
 
 			{
 				invariants::melee melee;
+				melee.adversarial.knockout_award = static_cast<money_type>(1350);
 
 				{
 					auto& t = melee.throw_def;

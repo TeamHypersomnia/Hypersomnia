@@ -3851,3 +3851,5 @@ which can be done from Settings->Reset all settings to factory default.
 	- A little increase in price
 
 - less delay for uwota
+- fix triad missing explosions
+

@@ -364,6 +364,10 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 
 			remap_ids_in(comm.assets, settings.overwrite_common_assets);
 
+			remap_ids_in(comm.spells, settings.overwrite_spells);
+			remap_ids_in(comm.perks, settings.overwrite_perks);
+			remap_ids_in(comm.meters, settings.overwrite_meters);
+
 			return changer_callback_result::DONT_REFRESH;
 		}
 	);

@@ -194,7 +194,7 @@ void load_test_scene_sentience_properties(
 			in.type = adverse_element_type::FORCE;
 
 			{
-				in.effective_radius = 350.f;
+				in.effective_radius = 400.f;
 				in.damage.base = 88.f;
 				in.damage.impact_impulse = 150.f;
 				in.sound.modifier.max_distance = 6000.f;
@@ -211,9 +211,10 @@ void load_test_scene_sentience_properties(
 			}
 			
 			{
-				in.effective_radius = 500.f;
+				in.effective_radius = 550.f;
 				in.damage.base = 88.f;
-				in.damage.impact_impulse = 200.f;
+				in.damage.impact_impulse = 600.f;
+				in.damage.impulse_multiplier_against_sentience *= 2.5f;
 				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
@@ -228,9 +229,10 @@ void load_test_scene_sentience_properties(
 			}
 			
 			{
-				in.effective_radius = 700.f;
+				in.effective_radius = 750.f;
 				in.damage.base = 90.f;
-				in.damage.impact_impulse = 250.f;
+				in.damage.impact_impulse = 1250.f;
+				in.damage.impulse_multiplier_against_sentience *= 600.f;
 				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
