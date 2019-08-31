@@ -3125,7 +3125,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 22.f;
-			gun_def.adversarial.knockout_award = static_cast<money_type>(450);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
@@ -3531,6 +3531,7 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::MEDIUM_PISTOL_CHAMBERING);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(850);
 
 			meta.set(gun_def);
 
@@ -3540,7 +3541,6 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 350;
-			gun_def.adversarial.knockout_award = static_cast<money_type>(850);
 			set_chambering_duration_ms(meta, 390.f);
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			only_allow_mag(meta, test_container_items::KEK9_MAGAZINE);
