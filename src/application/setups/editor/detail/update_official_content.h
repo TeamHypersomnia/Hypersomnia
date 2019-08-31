@@ -88,12 +88,12 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 	const auto old_cust_logicals = std::make_unique<all_logical_assets>(cust_logicals);
 	const auto old_cust_flavours = std::make_unique<all_entity_flavours>(cust_cosm.get_common_significant().flavours);
 
-	auto find_and_remap_by_name = [&](const auto& reference_pool, const auto& target_pool, auto& field) {
+	auto find_and_remap_by_name = [&](const auto& reference_pool, const auto& refere_image_defs, const auto& target_pool, auto& field) {
 		using F = decltype(field);
 
 		if constexpr(!is_const_ref_v<F>) {
 			if (const auto found = mapped_or_nullptr(reference_pool, field)) {
-				const auto source_name = get_displayed_name(*found, offi_image_defs);
+				const auto source_name = get_displayed_name(*found, refere_image_defs);
 
 				if (const auto found_in_new = ::find_asset_id_by_name(source_name, target_pool, cust_image_defs)) {
 					field = *found_in_new;
@@ -137,6 +137,7 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 
 		const auto& reference_viewables = remapping_official ? offi_viewables : *old_cust_viewables;
 		const auto& reference_logicals = remapping_official ? offi_logicals : *old_cust_logicals;
+		const auto& refere_image_defs = reference_viewables.image_definitions;
 
 		if constexpr(is_pathed_asset<T>) {
 			const auto& refere_pool = get_viewable_pool<T>(reference_viewables);
@@ -148,7 +149,7 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 			const auto& refere_pool = get_asset_pool<T>(reference_viewables, reference_logicals);
 			const auto& target_pool = get_asset_pool<T>(cust_viewables, cust_logicals);
 
-			find_and_remap_by_name(refere_pool, target_pool, field);
+			find_and_remap_by_name(refere_pool, refere_image_defs, target_pool, field);
 		}
 		else if constexpr(is_typed_flavour_id_v<T>) {
 			using E = entity_type_of<T>;
@@ -156,7 +157,7 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 			const auto& refere_flavours = remapping_official ? offi_cosm.get_flavours<E>() : old_cust_flavours->get_for<E>();
 			const auto& target_flavours = cust_cosm.get_flavours<E>();
 
-			find_and_remap_by_name(refere_flavours, target_flavours, field);
+			find_and_remap_by_name(refere_flavours, refere_image_defs, target_flavours, field);
 		}
 		else if constexpr(is_constrained_flavour_id_v<T>) {
 			if (field.is_set()) {
@@ -167,7 +168,7 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 						const auto& refere_flavours = remapping_official ? offi_cosm.get_flavours<E>() : old_cust_flavours->get_for<E>();
 						const auto& target_flavours = cust_cosm.get_flavours<E>();
 
-						find_and_remap_by_name(refere_flavours, target_flavours, typed_id.raw);
+						find_and_remap_by_name(refere_flavours, refere_image_defs, target_flavours, typed_id.raw);
 						field = typed_id;
 					}
 				);
@@ -224,6 +225,7 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 			}
 		}
 	};
+
 	add_pathed_assets(cust_viewables.image_definitions, offi_viewables.image_definitions, "Image");
 	add_pathed_assets(cust_viewables.sounds, offi_viewables.sounds, "Sound");
 	add_unpathed_assets(cust_viewables.particle_effects, offi_viewables.particle_effects, "Particle effect");
