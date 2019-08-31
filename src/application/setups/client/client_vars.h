@@ -3,6 +3,9 @@
 #include "augs/network/network_simulator_settings.h"
 #include "augs/filesystem/path_declaration.h"
 #include "augs/graphics/rgba.h"
+#include "augs/misc/constant_size_string.h"
+
+using client_nickname_type = augs::constant_size_string<max_nickname_length_v>;
 
 struct client_jitter_vars {
 	// GEN INTROSPECTOR struct client_jitter_vars
@@ -34,7 +37,7 @@ struct client_chat_settings {
 
 struct client_vars {
 	// GEN INTROSPECTOR struct client_vars
-	std::string nickname = "Player";
+	client_nickname_type nickname = "Player";
 	client_net_vars net;
 
 	augs::maybe_network_simulator network_simulator;

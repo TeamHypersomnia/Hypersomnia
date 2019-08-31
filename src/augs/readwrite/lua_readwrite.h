@@ -10,6 +10,7 @@
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/is_maybe.h"
 #include "augs/templates/traits/is_pair.h"
+#include "augs/misc/is_constant_size_string.h"
 #include "augs/readwrite/lua_readwrite_errors.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"
@@ -45,6 +46,9 @@ namespace augs {
 		}
 		else if constexpr(has_custom_to_lua_value_v<T>) {
 			from_lua_value(object, into);
+		}
+		else if constexpr(is_constant_size_string_v<T>) {
+			into = object.as<std::string>();
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			into = object.as<T>();
@@ -324,6 +328,9 @@ namespace augs {
 		}
 		else if constexpr(has_custom_to_lua_value_v<T>) {
 			return to_lua_value(field);
+		}
+		else if constexpr(is_constant_size_string_v<T>) {
+			return field.operator std::string();
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
 			return field;

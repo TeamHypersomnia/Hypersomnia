@@ -10,10 +10,15 @@ constexpr std::size_t max_incoming_connections_v = 64;
 /* One for the machine admin */
 constexpr std::size_t max_mode_players_v = max_incoming_connections_v + 1;
 
-constexpr std::size_t max_nickname_length_v = 30;
 constexpr std::size_t max_rcon_password_length_v = 30;
 constexpr std::size_t max_chat_message_length_v = 180;
+
 constexpr std::size_t min_nickname_length_v = 3;
+constexpr std::size_t max_nickname_length_v = 30;
+
+constexpr std::size_t max_arena_name_length_v = 30;
+constexpr std::size_t max_ruleset_name_length_v = 30;
+constexpr std::size_t max_arenas_in_pool_v = 50;
 
 inline bool nickname_len_in_range(const std::size_t len) {
 	return len >= min_nickname_length_v && len <= max_chat_message_length_v;

@@ -1,11 +1,27 @@
 #pragma once
 #include <string>
 #include "augs/network/network_simulator_settings.h"
+#include "augs/misc/constant_size_string.h"
+#include "augs/network/network_types.h"
+
+using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
+using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;
+
+struct arena_switching_settings {
+	// GEN INTROSPECTOR struct arena_switching_settings
+	int switch_once_every_n_matches = 2;
+	int vote_rounds_before = 0;
+	// END GEN INTROSPECTOR
+};
 
 struct server_vars {
+	static constexpr bool force_read_field_by_field = true;
+
 	// GEN INTROSPECTOR struct server_vars
-	std::string current_arena = "";
-	std::string override_default_ruleset = "";
+	arena_switching_settings arena_switching;
+
+	arena_identifier current_arena = "";
+	augs::constant_size_string<max_ruleset_name_length_v> override_default_ruleset = "";
 
 	unsigned kick_if_no_messages_for_secs = 60;
 	unsigned kick_if_away_from_keyboard_for_secs = 240;

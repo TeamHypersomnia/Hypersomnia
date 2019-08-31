@@ -1,6 +1,7 @@
 #pragma once
 #include <type_traits>
 #include <sol2/sol.hpp>
+#include "augs/misc/is_constant_size_string.h"
 
 #define LUA_TRAITS_INCLUDED 1
 
@@ -29,6 +30,7 @@ namespace augs {
 	template <class T>
 	constexpr bool representable_as_lua_value_v =
 		std::is_same_v<T, std::string>
+		|| is_constant_size_string_v<T>
 		|| std::is_arithmetic_v<T>
 		|| std::is_enum_v<T>
 		|| has_custom_to_lua_value_v<T>

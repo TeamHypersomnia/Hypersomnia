@@ -93,7 +93,9 @@ bool start_client_gui_state::perform(
 			base::acquire_keyboard_once();
 		}
 
-		input_text<max_nickname_length_v>("Chosen nickname (3-30 characters)", into_vars.nickname);
+		const auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
+
+		input_text<max_nickname_length_v>(label, into_vars.nickname);
 
 		struct loading_result {
 			std::optional<std::string> new_path;

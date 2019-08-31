@@ -861,7 +861,9 @@ void settings_gui_state::perform(
 			case settings_pane::CLIENT: {
 				auto& scope_cfg = config.client;
 
-				input_text<max_nickname_length_v>("Chosen nickname (3-30 characters)", scope_cfg.nickname);
+				const auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
+
+				input_text<max_nickname_length_v>(label, scope_cfg.nickname);
 
 				{
 					auto& scope_cfg = config.arena_mode_gui;
@@ -927,8 +929,8 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
-				input_text<100>(SCOPE_CFG_NVP(current_arena)); revert(scope_cfg.current_arena);
-				input_text<100>(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
+				input_text(SCOPE_CFG_NVP(current_arena)); revert(scope_cfg.current_arena);
+				input_text(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
 
 				if (auto node = scoped_tree_node("Time limits")) {
 					revertable_slider(SCOPE_CFG_NVP(kick_if_no_messages_for_secs), 0u, 300u);

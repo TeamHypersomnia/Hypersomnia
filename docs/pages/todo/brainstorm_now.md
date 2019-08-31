@@ -6,6 +6,41 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- less delay for uwota
+- fix triad missing explosions
+
+- We still have crashes on Windows, even after fixing swap buffers
+	- Perhaps it's a compiler bug since with our home-brewn build everything seemed to be fine
+	- Although I think it was the same with that mega.nz build
+
+- Inventory GUI still acts up
+
+
+- Balance grenades
+	- +0.1ms delay
+	- A little increase in price
+
+- ask glenn about those tokens
+
+- do_server_vars
+	- both in settings gui cpp and in rcon
+	- just simply apply & save buttons along with revert
+	- these changes are too important
+	- we can easily make snapshots of vars applied
+
+- Ruleset chooser might be a combo too
+	- it might only read the names or ids from the ruleset file
+	- rcon can set values on the go (later)
+	- or load a lua (later)
+
+- Re-transmission of server_vars as a universal rcon feature
+	- Handles map changing
+		- How do we load arena?
+		- Do we deterministically re-insert all clients?
+			- Probably 
+
+- Update imgui later for cool features like builtin tabs
+
 - Maybe allow map changing through rcon so that we could switch to this other map?
 
 - Map transmission

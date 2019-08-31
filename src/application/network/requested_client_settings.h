@@ -10,13 +10,12 @@ struct public_client_settings {
 	// END GEN INTROSPECTOR
 };
 
-struct requested_client_settings {
-	static constexpr std::size_t nick_buf_len = max_nickname_length_v + 1;
-	static constexpr std::size_t rcon_buf_len = max_rcon_password_length_v + 1;
+using rcon_password_type = augs::constant_size_string<max_rcon_password_length_v>;
 
+struct requested_client_settings {
 	// GEN INTROSPECTOR struct requested_client_settings
-	augs::constant_size_string<nick_buf_len> chosen_nickname;
-	augs::constant_size_string<rcon_buf_len> rcon_password;
+	client_nickname_type chosen_nickname;
+	rcon_password_type rcon_password;
 
 	public_client_settings public_settings;
 	client_net_vars net;

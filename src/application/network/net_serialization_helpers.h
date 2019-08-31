@@ -42,7 +42,7 @@ namespace net_messages {
 			length = str.size();
 		}
 
-		serialize_int( stream, length, 0, buffer_size - 1 );
+		serialize_int( stream, length, 0, buffer_size );
 		serialize_bytes( stream, (uint8_t*)s, length );
 
 		if ( Stream::IsReading ) {

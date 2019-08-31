@@ -102,6 +102,19 @@ struct ImVec4;
 
 		/* Hand-written introspectors that do not fit into the standard schema begin here */
 
+		template <class F, class Elem, class Enum, class... Instances>
+		static void introspect_body(
+			const augs::enum_array<Elem, Enum>* const,
+			F f,
+			Instances&... _t_
+		) {
+			for (int e = 0; e < static_cast<int>(Enum::COUNT); ++e) {
+				const auto e_resolved = static_cast<Enum>(e);
+
+				f(enum_to_string(e_resolved), _t_[e]...);
+			}
+		}
+
 		template <class F, class First, class Second, class... Instances>
 		static void introspect_body(
 			const std::pair<First, Second>* const,
