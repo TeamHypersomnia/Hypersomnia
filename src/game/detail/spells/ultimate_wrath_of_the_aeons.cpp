@@ -22,9 +22,9 @@ void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input
 	const auto dt = clk.dt;
 	const auto when_casted = in.when_casted;
 
-	const auto first_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(0.8f / dt.in_seconds()) };
-	const auto second_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.15f / dt.in_seconds()) };
-	const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.5f / dt.in_seconds()) };
+	const auto first_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(0.6f / dt.in_seconds()) };
+	const auto second_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(0.95f / dt.in_seconds()) };
+	const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.3f / dt.in_seconds()) };
 
 	auto cause = damage_cause(caster);
 	cause.spell = in.this_id;

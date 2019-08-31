@@ -47,9 +47,9 @@ struct bomb_mode_economy_rules {
 	money_type lost_but_bomb_planted_team_bonus = 800;
 	money_type defused_team_bonus = 1200;
 
-	money_type bomb_plant_award = 400;
-	money_type bomb_explosion_award = 800;
-	money_type bomb_defuse_award = 800;
+	money_type bomb_plant_award = 600;
+	money_type bomb_explosion_award = 1000;
+	money_type bomb_defuse_award = 1300;
 
 	bool give_extra_mags_on_first_purchase = true;
 	// END GEN INTROSPECTOR
