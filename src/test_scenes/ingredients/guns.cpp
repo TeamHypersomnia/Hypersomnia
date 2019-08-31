@@ -2900,7 +2900,7 @@ namespace test_flavours {
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, cyan);
+				test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white);
 			}
 
 			{
@@ -2916,7 +2916,7 @@ namespace test_flavours {
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_ROUND, cyan);
+				test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_ROUND, white);
 			}
 
 			{

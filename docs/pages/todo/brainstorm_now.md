@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- less delay for uwota
 - fix triad missing explosions
 
 - We still have crashes on Windows, even after fixing swap buffers
@@ -14,11 +13,6 @@ summary: That which we are brainstorming at the moment.
 	- Although I think it was the same with that mega.nz build
 
 - Inventory GUI still acts up
-
-
-- Balance grenades
-	- +0.1ms delay
-	- A little increase in price
 
 - ask glenn about those tokens
 

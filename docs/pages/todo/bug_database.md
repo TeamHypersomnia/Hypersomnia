@@ -5,6 +5,9 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- The inventory bug with atlas being shown in place of a backpack was due to there being an old Brown backpack sprite on fy_minilab
+
+
 - Fix a fatal desync-causing bug: handle_new_session overwrote the crosshair_sensitivity with default values AFTER receiving the public settings update from the server.
 We'll now separately handle session-channeled and solvable-channeled information.
 

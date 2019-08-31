@@ -3846,3 +3846,8 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Try to reimplement that swap buffers without UB and so that it doesn't crash on windows
 
+- Balance grenades
+	- +0.1ms delay
+	- A little increase in price
+
+- less delay for uwota
