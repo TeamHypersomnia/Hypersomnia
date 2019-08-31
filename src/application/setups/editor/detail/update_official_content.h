@@ -43,7 +43,13 @@ void on_each_object_in_object(T& object, F&& callback) {
 }
 
 template <class T>
-using make_flavour_ids_vector = std::vector<typed_entity_flavour_id<T>>;
+struct flavour_remap_entry {
+	typed_entity_flavour_id<T> id;
+	bool is_content_mapped_to_official = false;
+};
+
+template <class T>
+using make_flavour_ids_vector = std::vector<flavour_remap_entry<T>>;
 
 struct update_official_content_settings {
 	bool overwrite_recoils = true;
@@ -62,30 +68,34 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 
 	auto test = std::make_unique<intercosm>();
 
-	test_mode_ruleset tt;
-	bomb_mode_ruleset bt;
+	test_mode_ruleset offi_tt;
+	bomb_mode_ruleset offi_bt;
 
-	test->make_test_scene(cmd_in.lua, test_scene_settings(), tt, &bt);
+	test->make_test_scene(cmd_in.lua, test_scene_settings(), offi_tt, &offi_bt);
 
 	std::vector<std::string> added_names;
 
-	const auto& from_cosm = test->world;
-	auto& to_cosm = folder.commanded->work.world;
-	auto& to_viewables = folder.commanded->work.viewables;
-	const auto& to_logicals = to_cosm.get_logical_assets();
-	const auto& from_viewables = test->viewables;
-	const auto& from_image_defs = from_viewables.image_definitions;
-	const auto& to_image_defs = to_viewables.image_definitions;
-	const auto& from_logicals = from_cosm.get_logical_assets();
+	const auto& offi_cosm = test->world;
+	auto& cust_cosm = folder.commanded->work.world;
+	auto& cust_viewables = folder.commanded->work.viewables;
+	const auto& cust_logicals = cust_cosm.get_logical_assets();
+	const auto& offi_viewables = test->viewables;
+	const auto& offi_image_defs = offi_viewables.image_definitions;
+	const auto& cust_image_defs = cust_viewables.image_definitions;
+	const auto& offi_logicals = offi_cosm.get_logical_assets();
 
-	auto find_and_remap_by_name = [&](const auto& from_pool, const auto& to_pool, auto& field) {
+	const auto old_cust_viewables = std::make_unique<all_viewables_defs>(cust_viewables);
+	const auto old_cust_logicals = std::make_unique<all_logical_assets>(cust_logicals);
+	const auto old_cust_flavours = std::make_unique<all_entity_flavours>(cust_cosm.get_common_significant().flavours);
+
+	auto find_and_remap_by_name = [&](const auto& reference_pool, const auto& target_pool, auto& field) {
 		using F = decltype(field);
 
 		if constexpr(!is_const_ref_v<F>) {
-			if (const auto found = mapped_or_nullptr(from_pool, field)) {
-				const auto source_name = get_displayed_name(*found, from_image_defs);
+			if (const auto found = mapped_or_nullptr(reference_pool, field)) {
+				const auto source_name = get_displayed_name(*found, offi_image_defs);
 
-				if (const auto found_in_new = ::find_asset_id_by_name(source_name, to_pool, to_image_defs)) {
+				if (const auto found_in_new = ::find_asset_id_by_name(source_name, target_pool, cust_image_defs)) {
 					field = *found_in_new;
 				}
 				else {
@@ -105,11 +115,11 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 		}
 	};
 
-	auto find_and_remap_by_path = [&](const auto& from_pool, const auto& to_pool, auto& field) {
-		if (const auto found = mapped_or_nullptr(from_pool, field)) {
+	auto find_and_remap_by_path = [&](const auto& reference_pool, const auto& target_pool, auto& field) {
+		if (const auto found = mapped_or_nullptr(reference_pool, field)) {
 			const auto source_path = found->get_source_path();
 
-			if (const auto found_in_new = ::find_asset_id_by_path(source_path, to_pool)) {
+			if (const auto found_in_new = ::find_asset_id_by_path(source_path, target_pool)) {
 				field = *found_in_new;
 			}
 			else {
@@ -121,29 +131,32 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 		}
 	};
 
-	auto remap_ids = [&](auto& field) {
+	auto remap_ids = [&](auto& field, const bool remapping_official) {
 		using F = decltype(field);
 		using T = remove_cref<F>;
 
-		if constexpr(is_pathed_asset<T>) {
-			const auto& from_pool = get_viewable_pool<T>(from_viewables);
-			const auto& to_pool = get_viewable_pool<T>(to_viewables);
+		const auto& reference_viewables = remapping_official ? offi_viewables : *old_cust_viewables;
+		const auto& reference_logicals = remapping_official ? offi_logicals : *old_cust_logicals;
 
-			find_and_remap_by_path(from_pool, to_pool, field);
+		if constexpr(is_pathed_asset<T>) {
+			const auto& refere_pool = get_viewable_pool<T>(reference_viewables);
+			const auto& target_pool = get_viewable_pool<T>(cust_viewables);
+
+			find_and_remap_by_path(refere_pool, target_pool, field);
 		}
 		else if constexpr(is_unpathed_asset<T>) {
-			const auto& from_pool = get_asset_pool<T>(from_viewables, from_logicals);
-			const auto& to_pool = get_asset_pool<T>(to_viewables, to_logicals);
+			const auto& refere_pool = get_asset_pool<T>(reference_viewables, reference_logicals);
+			const auto& target_pool = get_asset_pool<T>(cust_viewables, cust_logicals);
 
-			find_and_remap_by_name(from_pool, to_pool, field);
+			find_and_remap_by_name(refere_pool, target_pool, field);
 		}
 		else if constexpr(is_typed_flavour_id_v<T>) {
 			using E = entity_type_of<T>;
 
-			const auto& from_pool = from_cosm.get_flavours<E>();
-			const auto& to_pool = to_cosm.get_flavours<E>();
+			const auto& refere_flavours = remapping_official ? offi_cosm.get_flavours<E>() : old_cust_flavours->get_for<E>();
+			const auto& target_flavours = cust_cosm.get_flavours<E>();
 
-			find_and_remap_by_name(from_pool, to_pool, field);
+			find_and_remap_by_name(refere_flavours, target_flavours, field);
 		}
 		else if constexpr(is_constrained_flavour_id_v<T>) {
 			if (field.is_set()) {
@@ -151,10 +164,10 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 					[&](auto typed_id) {
 						using E = entity_type_of<decltype(typed_id)>;
 
-						const auto& from_pool = from_cosm.get_flavours<E>();
-						const auto& to_pool = to_cosm.get_flavours<E>();
+						const auto& refere_flavours = remapping_official ? offi_cosm.get_flavours<E>() : old_cust_flavours->get_for<E>();
+						const auto& target_flavours = cust_cosm.get_flavours<E>();
 
-						find_and_remap_by_name(from_pool, to_pool, typed_id.raw);
+						find_and_remap_by_name(refere_flavours, target_flavours, typed_id.raw);
 						field = typed_id;
 					}
 				);
@@ -162,41 +175,48 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 		}
 	};
 
-	auto remap_ids_in = [&](auto& new_object) {
-		::on_each_object_in_object(new_object, remap_ids);
+	auto remap_ids_in = [&](auto& new_object, const bool is_official) {
+		::on_each_object_in_object(new_object, [&](auto& field) { remap_ids(field, is_official); });
 	};
 
-	auto add_pathed_assets = [&](auto& to, const auto& from, const std::string& type_name) {
-		for (const auto& o : from) {
+	auto add_pathed_assets = [&](auto& custom, const auto& official, const std::string& type_name) {
+		for (const auto& o : official) {
 			const auto source_path = o.get_source_path();
-			const auto existing_asset = find_asset_id_by_path(source_path, to);
+			const auto existing_custom_asset = find_asset_id_by_path(source_path, custom);
 
-			if (existing_asset == std::nullopt) {
+			if (existing_custom_asset != std::nullopt) {
+				auto adjusted_asset = o;
+				remap_ids_in(adjusted_asset, true);
+				custom[*existing_custom_asset] = adjusted_asset;
+			}
+			else {
 				{
 					auto new_asset = o;
-					remap_ids_in(new_asset);
-					to.allocate(new_asset);
+					remap_ids_in(new_asset, true);
+					custom.allocate(new_asset);
 				}
 
 				const auto added_name = ::get_displayed_name(o) + " (" + type_name + ")";
 				added_names.push_back(added_name);
 			}
-			else {
-				to[*existing_asset] = o;
-			}
 		}
 	};
 
-	auto add_unpathed_assets = [&](auto& to, const auto& from, const std::string& type_name) {
-		for (const auto& o : from) {
-			const auto source_name = ::get_displayed_name(o, from_image_defs);
-			const auto existing_asset = find_asset_id_by_name(source_name, to, to_image_defs);
+	auto add_unpathed_assets = [&](auto& custom, const auto& official, const std::string& type_name) {
+		for (const auto& o : official) {
+			const auto source_name = ::get_displayed_name(o, offi_image_defs);
+			const auto existing_custom_asset = find_asset_id_by_name(source_name, custom, cust_image_defs);
 
-			if (existing_asset == std::nullopt) {
+			if (existing_custom_asset != std::nullopt) {
+				auto adjusted_asset = o;
+				remap_ids_in(adjusted_asset, true);
+				custom[*existing_custom_asset] = adjusted_asset;
+			}
+			else {
 				{
 					auto new_asset = o;
-					remap_ids_in(new_asset);
-					to.allocate(new_asset);
+					remap_ids_in(new_asset, true);
+					custom.allocate(new_asset);
 				}
 
 				const auto added_name = source_name + " (" + type_name + ")";
@@ -204,59 +224,64 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 			}
 		}
 	};
-	add_pathed_assets(to_viewables.image_definitions, from_viewables.image_definitions, "Image");
-	add_pathed_assets(to_viewables.sounds, from_viewables.sounds, "Sound");
-	add_unpathed_assets(to_viewables.particle_effects, from_viewables.particle_effects, "Particle effect");
+	add_pathed_assets(cust_viewables.image_definitions, offi_viewables.image_definitions, "Image");
+	add_pathed_assets(cust_viewables.sounds, offi_viewables.sounds, "Sound");
+	add_unpathed_assets(cust_viewables.particle_effects, offi_viewables.particle_effects, "Particle effect");
 
 	using flavours_ids_type = per_entity_type_container<make_flavour_ids_vector>;
 
 	folder.commanded->work.world.change_common_significant(
 		[&](auto& comm) {
-			auto& mut_to_logicals = comm.logical_assets;
+			auto& mut_cust_logicals = comm.logical_assets;
 
 			if (settings.overwrite_physical_materials) {
-				mut_to_logicals.physical_materials = from_logicals.physical_materials;
+				mut_cust_logicals.physical_materials = offi_logicals.physical_materials;
 			}
 
 			if (settings.overwrite_recoils) {
-				mut_to_logicals.recoils = from_logicals.recoils;
+				mut_cust_logicals.recoils = offi_logicals.recoils;
 			}
 
 			if (settings.overwrite_common_assets) {
-				comm.assets = from_cosm.get_common_assets();
+				comm.assets = offi_cosm.get_common_assets();
 			}
 
 			if (settings.overwrite_spells) {
-				comm.spells = from_cosm.get_common_significant().spells;
+				comm.spells = offi_cosm.get_common_significant().spells;
 			}
 
 			if (settings.overwrite_perks) {
-				comm.perks = from_cosm.get_common_significant().perks;
+				comm.perks = offi_cosm.get_common_significant().perks;
 			}
 
 			if (settings.overwrite_meters) {
-				comm.meters = from_cosm.get_common_significant().meters;
+				comm.meters = offi_cosm.get_common_significant().meters;
 			}
 
-			add_unpathed_assets(mut_to_logicals.plain_animations, from_logicals.plain_animations, "Animation");
+			add_unpathed_assets(mut_cust_logicals.plain_animations, offi_logicals.plain_animations, "Animation");
 
 			flavours_ids_type flavours_to_remap;
 
-			auto do_update = [&](const auto& from_flavours) {
-				using V = typename remove_cref<decltype(from_flavours)>::mapped_type;
+
+			auto import_official_flavours = [&](const auto& offi_flavours) {
+				using V = typename remove_cref<decltype(offi_flavours)>::mapped_type;
 				using E = entity_type_of<V>;
 
 				const auto type_name = get_type_name<V>();
 
-				for (const auto& f : from_flavours) {
+				for (const auto& f : offi_flavours) {
 					const auto source_name = f.get_name();
-					auto& to_flavours = comm.flavours.template get_for<E>();
-					const auto existing_flavour = find_asset_id_by_name(source_name, std::as_const(to_flavours), to_image_defs);
+					auto& cust_flavours = comm.flavours.template get_for<E>();
 
-					if (existing_flavour == std::nullopt) {
+					LOG("Processing flavour: %x", source_name);
+
+					const auto existing_custom_flavour = find_asset_id_by_name(source_name, std::as_const(cust_flavours), cust_image_defs);
+
+					if (existing_custom_flavour == std::nullopt) {
+						LOG("It's new");
 						{
-							const auto result = to_flavours.allocate(f);
-							flavours_to_remap.get_for<E>().push_back(typed_entity_flavour_id<E>(result.key));
+							const auto result = cust_flavours.allocate(f);
+							flavours_to_remap.get_for<E>().push_back({ typed_entity_flavour_id<E>(result.key), true });
 						}
 
 						{
@@ -265,6 +290,10 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 						}
 					}
 					else {
+						LOG("Exists already");
+
+						bool will_remapped_be_official = false;
+
 						if (settings.overwrite_non_decoration_flavours) {
 							if constexpr(is_one_of_v<
 								E,
@@ -280,59 +309,91 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 								explosion_body,
 								tool_item
 							>) {
-								to_flavours[*existing_flavour] = f;
-								flavours_to_remap.get_for<E>().push_back(typed_entity_flavour_id<E>(*existing_flavour));
+								LOG("Non-decoration, overwriting");
+								cust_flavours[*existing_custom_flavour] = f;
+								will_remapped_be_official = true;
 							}
 						}
+
+						flavours_to_remap.get_for<E>().push_back({ typed_entity_flavour_id<E>(*existing_custom_flavour), will_remapped_be_official });
 					}
 				}
 			};
 
-			const auto& from_flavours = from_cosm.get_common_significant().flavours;
-			from_flavours.for_each_container(do_update);
+			const auto& offi_flavours = offi_cosm.get_common_significant().flavours;
+			offi_flavours.for_each_container(import_official_flavours);
 
-			flavours_to_remap.for_each([&](const auto& typed_id) {
-				comm.on_flavour(typed_id, [&](auto& new_flavour) {
-					remap_ids_in(new_flavour);
+			auto remap_custom_flavours = [&](auto& cust_flavours) {
+				using V = typename remove_cref<decltype(cust_flavours)>::mapped_type;
+				using E = entity_type_of<V>;
+
+				const auto& typed_offi_flavours = offi_flavours.template get_for<E>();
+
+				for (auto& f : cust_flavours) {
+					const auto source_name = f.get_name();
+
+					{
+						const auto existing_official_flavour = find_asset_id_by_name(source_name, typed_offi_flavours, offi_image_defs);
+
+						if (existing_official_flavour) {
+							continue;
+						}
+					}
+
+					remap_ids_in(f, false);
+				}
+			};
+
+			comm.flavours.for_each_container(remap_custom_flavours);
+
+			flavours_to_remap.for_each([&](const auto& remapped_entry) {
+				comm.on_flavour(remapped_entry.id, [&](auto& new_flavour) {
+					remap_ids_in(new_flavour, remapped_entry.is_content_mapped_to_official);
 				});
 			});
 
-			if (settings.overwrite_physical_materials) {
-				for (auto& p : mut_to_logicals.physical_materials) {
-					remap_ids_in(p);
-				}
+			for (auto& p : mut_cust_logicals.physical_materials) {
+				remap_ids_in(p, settings.overwrite_physical_materials);
 			}
 
-			if (settings.overwrite_recoils) {
-				for (auto& p : mut_to_logicals.recoils) {
-					remap_ids_in(p);
-				}
+			for (auto& p : mut_cust_logicals.recoils) {
+				remap_ids_in(p, settings.overwrite_recoils);
 			}
 
-			if (settings.overwrite_common_assets) {
-				remap_ids_in(comm.assets);
-			}
+			remap_ids_in(comm.assets, settings.overwrite_common_assets);
 
 			return changer_callback_result::DONT_REFRESH;
 		}
 	);
 
-	if (settings.overwrite_economy_vars) {
-		(*folder.commanded->rulesets.all.get_for<bomb_mode>().begin()).second.economy = bt.economy;
+	{
+		auto& cust_economy = (*folder.commanded->rulesets.all.get_for<bomb_mode>().begin()).second.economy;
+
+		if (settings.overwrite_economy_vars) {
+			cust_economy = offi_bt.economy;
+		}
+
+		remap_ids_in(cust_economy, settings.overwrite_economy_vars);
 	}
 
-	if (settings.overwrite_whole_ruleset) {
-		auto& overwritten = (*folder.commanded->rulesets.all.get_for<bomb_mode>().begin()).second;
-		const auto previous = overwritten;
 
-		overwritten = bt;
+	{
+		auto& cust_rulesets = (*folder.commanded->rulesets.all.get_for<bomb_mode>().begin()).second;
 
-		overwritten.bot_quota = previous.bot_quota;
-		overwritten.max_players_per_team = previous.max_players_per_team;
-		overwritten.freeze_secs = previous.freeze_secs;
-		overwritten.warmup_secs = previous.warmup_secs;
-		overwritten.max_rounds = previous.max_rounds;
-		overwritten.round_end_secs = previous.round_end_secs;
+		if (settings.overwrite_whole_ruleset) {
+			const auto previous = cust_rulesets;
+
+			cust_rulesets = offi_bt;
+
+			cust_rulesets.bot_quota = previous.bot_quota;
+			cust_rulesets.max_players_per_team = previous.max_players_per_team;
+			cust_rulesets.freeze_secs = previous.freeze_secs;
+			cust_rulesets.warmup_secs = previous.warmup_secs;
+			cust_rulesets.max_rounds = previous.max_rounds;
+			cust_rulesets.round_end_secs = previous.round_end_secs;
+		}
+
+		remap_ids_in(cust_rulesets, settings.overwrite_whole_ruleset);
 	}
 
 	folder.commanded->work.post_load_state_correction();
