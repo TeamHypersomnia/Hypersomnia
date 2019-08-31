@@ -1163,6 +1163,13 @@ void settings_gui_state::perform(
 				ImGui::Separator();
 
 				{
+					auto& scope_cfg = config.drawing;
+					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_sentiences));
+					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_other_bodies));
+				}
+
+
+				{
 					auto& scope_cfg = config.performance;
 					revertable_enum_radio(SCOPE_CFG_NVP(wall_light_drawing_precision));
 				}

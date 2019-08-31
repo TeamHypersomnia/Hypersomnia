@@ -179,6 +179,8 @@ return {
 	enabled_draw_callout_indicators = 0.8,
 	draw_nicknames = false,
 	draw_health_numbers = true,
+	occlude_neons_under_sentiences = true,
+	occlude_neons_under_other_bodies = true,
     draw_offscreen_indicators = true,
     print_current_character_callout = true,
     nickname_characters_for_offscreen_indicators = 4,

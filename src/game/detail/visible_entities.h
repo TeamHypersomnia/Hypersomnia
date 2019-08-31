@@ -56,10 +56,10 @@ public:
 	void clear_dead_entities(const cosmos&);
 	void clear();
 
-	template <class F>
-	auto for_all_ids(F&& callback) const {
-		for (const auto& layer : per_layer) {
-			for (const auto id : layer) {
+	template <class F, class O>
+	auto for_all_ids_ordered(F&& callback, const O& order) const {
+		for (const auto& layer : order) {
+			for (const auto id : per_layer[layer]) {
 				callback(id);
 			}
 		}
@@ -67,17 +67,6 @@ public:
 
 	auto count_all() const {
 		return ::accumulate_sizes(per_layer);
-	}
-
-	template <class C>
-	auto make_all() const {
-		C result;
-
-		for_all_ids([&result](const auto id) {
-			emplace_element(result, id);
-		});
-
-		return result;
 	}
 
 	template <class C, class F>
@@ -116,41 +105,11 @@ public:
 
 
 	template <class F>
-	entity_id get_first_fulfilling(F condition) const {
-		for (const auto& layer : per_layer) {
-			for (const auto candidate : layer) {
-				if (condition(candidate)) {
-					return candidate;
-				}
-			}
-		}
-
-		return {};
-	}
+	entity_id get_first_fulfilling(F condition) const;
 };
 
 inline auto& thread_local_visible_entities() {
 	thread_local visible_entities entities;
 	entities.clear();
 	return entities;
-}
-
-template <class F>
-entity_id get_hovered_world_entity(
-	const cosmos& cosm,
-	const vec2 world_cursor_position,
-	F&& is_hoverable,
-	const augs::maybe<render_layer_filter>& filter
-) {
-	auto& entities = thread_local_visible_entities();
-
-	entities.reacquire_all_and_sort({
-		cosm,
-		camera_cone(camera_eye(world_cursor_position, 1.f), vec2i::square(1)),
-		accuracy_type::EXACT,
-		filter,
-		tree_of_npo_filter::all_drawables()
-	});
-
-	return entities.get_first_fulfilling(std::forward<F>(is_hoverable));
 }

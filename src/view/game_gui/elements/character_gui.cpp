@@ -43,6 +43,7 @@
 #include "game/detail/weapon_like.h"
 
 #include "view/game_gui_input_settings.h"
+#include "game/detail/get_hovered_world_entity.h"
 
 #define LOG_HOTBAR 0
 

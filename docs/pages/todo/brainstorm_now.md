@@ -6,6 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Write autoupdater so we don't have to save those avatar images in temporary
+	- We'll keep them in cache, just autoupdater will preserve some config values
+	- We might keep the entire config local lua intact, just per-push specify what config values to overwrite
+	- Maybe just preserve the local config and untitled editor works
+		- though with this everything could be preserved
+		- generated file checking should be pretty safe
+		- we have an option to get factory defaults
+		- one could easily delete the user_config.lua
+		- kay what if we only store the modified settings in the user_config.lua?
+		- like a delta
+		- we'll then always have defaults updated
+		- fix these imgui layouts though, "choose team" shouldn't be resized as well as maybe shop
+			- we'll just give a sensible multiplier
+			- close to fullscreen for shop
+
+- galilea can't be hidden. We must decrease it's space occupied drastically
+	- possibly even mags
+
 - We still have crashes on Windows, even after fixing swap buffers
 	- Perhaps it's a compiler bug since with our home-brewn build everything seemed to be fine
 	- Although I think it was the same with that mega.nz build
@@ -46,9 +64,6 @@ summary: That which we are brainstorming at the moment.
 	- Punches when no weapons
 - RPM could always punch
 
-- Write autoupdater so we don't have to save those avatar images in temporary
-	- We'll keep them in cache, just autoupdater will preserve some config values
-	- We might keep the entire config local lua intact, just per-push specify what config values to overwrite
 
 - DO NOT disclose a single rcon password to multiple moderators/admins
 	- That is because a single malicious RCON holder could avoid responsibility for their misdeeds

@@ -11,6 +11,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "application/setups/editor/gui/editor_entity_selector.hpp"
 #include "game/cosmos/for_each_entity.h"
+#include "game/detail/get_hovered_world_entity.h"
 
 void editor_entity_selector::reset_held_params() {
 	flavour_of_held = {};
@@ -257,6 +258,8 @@ void editor_entity_selector::do_mousemotion(
 		);
 	};
 
+	const auto layer_order = get_default_layer_order();
+
 	if (rectangular_drag_origin.has_value()) {
 		in_rectangular_selection.clear();
 
@@ -272,9 +275,9 @@ void editor_entity_selector::do_mousemotion(
 
 		vis.reacquire_all_and_sort(query);
 
-		vis.for_all_ids([&](const auto id) {
+		vis.for_all_ids_ordered([&](const auto id) {
 			emplace_element(in_rectangular_selection, id);
-		});
+		}, layer_order);
 
 		remove_non_hovering_icons_from(in_rectangular_selection, world_range);
 
@@ -319,9 +322,9 @@ void editor_entity_selector::do_mousemotion(
 		thread_local std::vector<entity_id> ids;
 		ids.clear();
 
-		vis.for_all_ids([&](const auto id) {
+		vis.for_all_ids_ordered([&](const auto id) {
 			ids.emplace_back(id);
-		});
+		}, layer_order);
 
 		remove_non_hovering_icons_from(ids, world_cursor_pos);
 

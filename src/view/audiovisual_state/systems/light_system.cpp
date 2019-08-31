@@ -122,7 +122,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	standard_shader.set_as_current(renderer);
 
 	renderer.call_triangles(D::FLOOR_NEONS);
-	renderer.set_overwriting_blending();
+	renderer.set_standard_blending();
+	in.neon_occlusion_callback();
 	renderer.call_triangles(D::FLOOR_NEON_OVERLAYS);
 	renderer.set_additive_blending();
 
@@ -270,6 +271,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			);
 
 			renderer.call_triangles(D::WALL_LIGHTED_BODIES);
+			renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);
 			renderer.call_triangles(D::OVER_SENTIENCES);
 
 			set_uniform(

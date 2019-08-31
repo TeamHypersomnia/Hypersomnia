@@ -275,15 +275,18 @@ void enqueue_illuminated_rendering_jobs(
 		};
 
 		{
-			auto job = [h1 = make_helper(D::WALL_LIGHTED_BODIES), h2 = make_helper(D::OVER_SENTIENCES)]() {
+			auto job = [h1 = make_helper(D::WALL_LIGHTED_BODIES), h2 = make_helper(D::OVER_SENTIENCES), h3 = make_helper(D::NEON_OCCLUDING_DYNAMIC_BODY)]() {
 				h1.draw<
 					render_layer::DYNAMIC_BODY,
-					render_layer::OVER_DYNAMIC_BODY,
-					render_layer::OVER_SENTIENCES
+					render_layer::OVER_DYNAMIC_BODY
 				>();
 
 				h2.draw<
 					render_layer::OVER_SENTIENCES
+				>();
+
+				h3.draw<
+					render_layer::NEON_OCCLUDING_DYNAMIC_BODY
 				>();
 			};
 
@@ -299,7 +302,6 @@ void enqueue_illuminated_rendering_jobs(
 					render_layer::CAR_INTERIOR,
 					render_layer::CAR_WHEEL,
 					render_layer::NEON_CAPTIONS,
-					render_layer::ON_ON_FLOOR,
 					render_layer::PLANTED_BOMBS,
 					render_layer::AQUARIUM_FLOWERS,
 					render_layer::BOTTOM_FISH,
@@ -320,7 +322,8 @@ void enqueue_illuminated_rendering_jobs(
 					render_layer::GLASS_BODY,
 					render_layer::SMALL_DYNAMIC_BODY,
 					render_layer::OVER_SMALL_DYNAMIC_BODY,
-					render_layer::OVER_SENTIENCES
+					render_layer::OVER_SENTIENCES,
+					render_layer::NEON_OCCLUDING_DYNAMIC_BODY
 				>();
 			};
 
@@ -331,7 +334,8 @@ void enqueue_illuminated_rendering_jobs(
 			auto job = [h1 = make_helper(D::FLOOR_NEONS), h2 = make_helper(D::FLOOR_NEON_OVERLAYS)]() {
 				h1.draw_neons<
 					render_layer::FLOOR_AND_ROAD,
-					render_layer::ON_FLOOR
+					render_layer::ON_FLOOR,
+					render_layer::ON_ON_FLOOR
 				>();
 
 				h2.draw<

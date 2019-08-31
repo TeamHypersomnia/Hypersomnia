@@ -24,6 +24,7 @@
 #include "view/rendering_scripts/draw_offscreen_indicator.h"
 #include "augs/drawing/drawing.hpp"
 #include "game/detail/calc_ammo_info.hpp"
+#include "game/detail/get_hovered_world_entity.h"
 
 using namespace augs::gui::text;
 

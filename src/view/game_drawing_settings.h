@@ -34,6 +34,9 @@ struct game_drawing_settings {
 	bool draw_nicknames = true;
 	bool draw_health_numbers = true;
 
+	bool occlude_neons_under_sentiences = true;
+	bool occlude_neons_under_other_bodies = false;
+
 	offscreen_reference_type offscreen_reference_mode = offscreen_reference_type::CHARACTER_POSITION;
 
 	augs::maybe<float> draw_teammate_indicators = augs::maybe<float>(1.f, true);

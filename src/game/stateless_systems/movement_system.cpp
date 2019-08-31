@@ -27,6 +27,7 @@
 #include "game/detail/movement/movement_getters.h"
 #include "game/detail/sentience/tool_getters.h"
 #include "game/detail/crosshair_math.hpp"
+#include "game/detail/get_hovered_world_entity.h"
 
 using namespace augs;
 

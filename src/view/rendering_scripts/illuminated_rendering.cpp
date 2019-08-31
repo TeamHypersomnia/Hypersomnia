@@ -50,6 +50,7 @@
 #include "augs/graphics/shader.hpp"
 #include "application/main/cached_visibility_data.h"
 #include "augs/templates/thread_pool.h"
+#include "game/detail/get_hovered_world_entity.h"
 
 #include "view/rendering_scripts/enqueue_illuminated_rendering_jobs.hpp"
 
@@ -228,6 +229,40 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.start_testing_stencil();
 	};
 
+	auto draw_sentiences = [&](auto& shader) {
+		if (fog_of_war_effective) {
+			renderer.stencil_positive_test();
+
+			shader.set_as_current(renderer);
+
+			renderer.call_triangles(D::ENEMY_SENTIENCES);
+			renderer.set_stencil(false);
+
+			renderer.call_triangles(D::FRIENDLY_SENTIENCES);
+		}
+		else {
+			renderer.call_triangles(D::FRIENDLY_SENTIENCES);
+		}
+	};
+
+	auto neon_occlusion_callback = [&]() {
+		auto& shader = shaders.neon_occluder;
+
+		set_shader_with_matrix(shader);
+
+		const auto& ambient_color = cosm.get_common_significant().ambient_light_color;
+		set_uniform(shader, U::global_color, ambient_color);
+
+		if (settings.occlude_neons_under_sentiences) {
+			//renderer.clear_current_fbo();
+			draw_sentiences(*shader);
+		}
+
+		if (settings.occlude_neons_under_other_bodies) {
+			renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);
+		}
+	};
+
 	const auto light_input = light_system_input {
 		renderer,
 		profiler,
@@ -237,6 +272,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		*shaders.light, 
 		*shaders.textured_light, 
 		*shaders.standard, 
+		neon_occlusion_callback,
 		[&]() {
 			draw_particles_neons();
 
@@ -396,6 +432,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	shaders.illuminated->set_as_current(renderer);
 
 	renderer.call_triangles(D::WALL_LIGHTED_BODIES);
+	renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);
 	renderer.call_triangles(D::SMALL_AND_GLASS_BODIES);
 
 	if (fog_of_war_effective) {
@@ -421,20 +458,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		);
 
 		renderer.call_and_clear_triangles();
-		shaders.pure_color_highlight->set_projection(renderer, matrix);
-
-		renderer.stencil_positive_test();
-
-		shaders.illuminated->set_as_current(renderer);
-
-		renderer.call_triangles(D::ENEMY_SENTIENCES);
-		renderer.set_stencil(false);
-
-		renderer.call_triangles(D::FRIENDLY_SENTIENCES);
 	}
-	else {
-		renderer.call_triangles(D::FRIENDLY_SENTIENCES);
-	}
+
+	draw_sentiences(*shaders.illuminated);
 
 	renderer.call_triangles(D::INSECTS);
 	renderer.call_triangles(D::OVER_SENTIENCES);

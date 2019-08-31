@@ -17,6 +17,7 @@ namespace augs {
 		smoke_texture,
 		light_texture,
 		afterimage_texture,
+		global_color,
 
 		COUNT
 		// END GEN INTROSPECTOR

@@ -71,6 +71,7 @@ struct all_necessary_shaders {
 	optional_shader light;
 	optional_shader textured_light;
 	optional_shader flash_afterimage;
+	optional_shader neon_occluder;
 	// END GEN INTROSPECTOR
 
 	all_necessary_shaders(

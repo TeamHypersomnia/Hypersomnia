@@ -130,6 +130,11 @@ all_necessary_shaders::all_necessary_shaders(
 		flash_afterimage->set_as_current(renderer);
 		flash_afterimage->set_uniform(renderer, U::afterimage_texture, 0);
 	}
+
+	if (neon_occluder) {
+		neon_occluder->set_as_current(renderer);
+		neon_occluder->set_uniform(renderer, U::basic_texture, 0);
+	}
 } 
 catch (const augs::graphics::shader_compilation_error& err) {
 	throw necessary_resource_loading_error("Failed to compile a necessary shader. Details: %x", err.what());
