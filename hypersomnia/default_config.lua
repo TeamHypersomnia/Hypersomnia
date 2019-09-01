@@ -572,7 +572,7 @@ return {
 	max_connections = 64
   },
 
-  server = {
+  server_solvable = {
 	arena_switching = {
       switch_once_every_n_matches = 2,
       vote_rounds_before = 0
@@ -580,7 +580,9 @@ return {
 
 	current_arena = "de_cyberaqua",
 	override_default_ruleset = "",
+  },
 
+  server = {
     sleep_mult = 0.1,
     log_performance_once_every_secs = 1,
 
@@ -588,7 +590,7 @@ return {
 	kick_if_away_from_keyboard_for_secs = 180,
 	time_limit_to_enter_game_since_connection = 15,
 
-	send_updates_once_every_tick = 1,
+	send_packets_once_every_tick = 1,
 	reset_resync_timer_once_every_secs = 4,
 	max_client_resyncs = 30,
 

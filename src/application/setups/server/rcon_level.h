@@ -1,6 +1,6 @@
 #pragma once
 
-enum class rcon_level {
+enum class rcon_level_type {
 	NONE,
 	BASIC,
 	MASTER

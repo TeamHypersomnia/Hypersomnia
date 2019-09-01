@@ -1,7 +1,7 @@
 #pragma once
 
 enum class client_state_type {
-	INVALID,
+	INITIATING_CONNECTION,
 
 	PENDING_WELCOME,
 	WELCOME_ARRIVED,

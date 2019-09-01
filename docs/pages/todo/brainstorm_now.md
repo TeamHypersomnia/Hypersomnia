@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- 
+
 - Write autoupdater so we don't have to save those avatar images in temporary
 	- We'll keep them in cache, just autoupdater will preserve some config values
 	- We might keep the entire config local lua intact, just per-push specify what config values to overwrite

@@ -25,6 +25,12 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/cosmos/entity_type_traits.h"
 
+#include "application/gui/config_nvp.h"
+#include "application/gui/do_server_vars.h"
+
+#include "application/setups/client/rcon_pane.h"
+#include "application/gui/pretty_tabs.h"
+
 void snap_interpolated_to_logical(cosmos&);
 
 client_setup::client_setup(
@@ -185,7 +191,7 @@ message_handler_result client_setup::handle_server_message(
 		}
 	}
 
-	if constexpr (std::is_same_v<T, server_vars>) {
+	if constexpr (std::is_same_v<T, server_solvable_vars>) {
 		const bool are_initial_vars = state == client_state_type::PENDING_WELCOME;
 		const auto& new_vars = payload;
 
@@ -198,7 +204,10 @@ message_handler_result client_setup::handle_server_message(
 		}
 
 		const auto& new_arena = new_vars.current_arena;
-		if (are_initial_vars || new_arena != sv_vars.current_arena) {
+
+		LOG_NVPS(new_arena);
+
+		if (are_initial_vars || new_arena != sv_solvable_vars.current_arena) {
 			LOG("Client loads arena: %x", new_arena);
 
 			try {
@@ -228,7 +237,20 @@ message_handler_result client_setup::handle_server_message(
 			predicted_cosmos = scene.world;
 		}
 
+		sv_solvable_vars = new_vars;
+		last_applied_sv_solvable_vars = new_vars;
+		edited_sv_solvable_vars = new_vars;
+
+		applying_sv_solvable_vars = false;
+	}
+	else if constexpr (std::is_same_v<T, server_vars>) {
+		const auto& new_vars = payload;
+
 		sv_vars = new_vars;
+		last_applied_sv_vars = new_vars;
+		edited_sv_vars = new_vars;
+
+		applying_sv_vars = false;
 	}
 	else if constexpr (std::is_same_v<T, server_broadcasted_chat>) {
 		const auto author_id = payload.author;
@@ -268,22 +290,39 @@ message_handler_result client_setup::handle_server_message(
 		}
 
 		if (payload.recipient_shall_kindly_leave) {
-			std::string kicked_or_banned;
+			if (payload.target == chat_target_type::SERVER_SHUTTING_DOWN) {
+				const auto msg = std::string(payload.message);
 
-			if (payload.target == chat_target_type::KICK) {
-				kicked_or_banned = "kicked";
-			}
-			else if (payload.target == chat_target_type::BAN) {
-				kicked_or_banned = "banned";
-			}
+				std::string reason_str;
 
-			set_disconnect_reason(typesafe_sprintf(
-				"You were %x from the server.\nReason: %x", 
-				kicked_or_banned,
-				std::string(payload.message)
-			), true);
+				if (msg.size() > 0) {
+					reason_str = "\n\n" + reason_str;
+				}
+
+				set_disconnect_reason(typesafe_sprintf(
+					"The server is shutting down.%x", 
+					reason_str
+				), true);
+			}
+			else {
+				std::string kicked_or_banned;
+
+				if (payload.target == chat_target_type::KICK) {
+					kicked_or_banned = "kicked";
+				}
+				else if (payload.target == chat_target_type::BAN) {
+					kicked_or_banned = "banned";
+				}
+
+				set_disconnect_reason(typesafe_sprintf(
+					"You were %x from the server.\nReason: %x", 
+					kicked_or_banned,
+					std::string(payload.message)
+				), true);
+			}
 
 			LOG_NVPS(last_disconnect_reason);
+
 			return abort_v;
 		}	
 	}
@@ -657,7 +696,7 @@ void client_setup::send_pending_commands() {
 
 	using C = client_state_type;
 
-	const bool init_send = state == C::INVALID;
+	const bool init_send = state == C::INITIATING_CONNECTION;
 
 	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
 	const bool resend_requested_settings = can_already_resend_settings && !augs::introspective_equal(current_requested_settings, requested_settings);
@@ -764,40 +803,109 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 	auto& rcon_gui = client_gui.rcon;
 
-	if (rcon_gui.show) {
+	if (!adapter->is_connected()) {
+		rcon_gui.show = false;
+	}
+
+	if (!arena_gui.scoreboard.show && rcon_gui.show) {
 		const auto window_name = "Remote Control (RCON)";
-		auto window = scoped_window(window_name, nullptr);
 
-		if (adapter->is_connected()) {
-			if (rcon == rcon_level::MASTER) {
-				text_color("Master Access granted.", green);
-			}
-			else if (rcon == rcon_level::BASIC) {
-				text_color("Access granted.", green);
-			}
-			else if (rcon == rcon_level::NONE) {
-				text_color("Access denied.", red);
-			}
+		ImGui::SetNextWindowPosCenter();
 
-			ImGui::Separator();
+		ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.7f).operator ImVec2(), ImGuiCond_Once);
 
-			if (ImGui::Button("Shutdown server")) {
-				LOG("Requesting the server to shut down");
+		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
+		centered_text(window_name);
 
-				rcon_command_variant payload;
-				payload = rcon_commands::special::SHUTDOWN;
-
-				adapter->send_payload(
-					game_channel_type::CLIENT_COMMANDS,
-					payload
-				);
-			}
-
+		if (rcon == rcon_level_type::NONE) {
+			text_color("Access denied.", red);
 			ImGui::Separator();
 		}
 		else {
-			text_color("Disconnected.", red);
+			do_pretty_tabs(rcon_gui.active_pane);
+
+			auto do_server_vars_panel = [&](
+				auto& edited,
+				auto& last_saved,
+				auto& applying_flag
+			) { 
+				{
+					auto child = scoped_child("settings view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
+					auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
+
+					do_server_vars(
+						edited,
+						last_saved
+					);
+				}
+
+				{
+					auto scope = scoped_child("save revert");
+
+					ImGui::Separator();
+
+					if (applying_flag) {
+						text_color("Applying changes...", yellow);
+					}
+					else if (!augs::introspective_equal(last_saved, edited)) {
+						if (ImGui::Button("Apply & Save")) {
+							rcon_command_variant payload;
+							payload = edited;
+
+							LOG("Sending new configuration (%x)", edited_sv_solvable_vars.current_arena);
+
+							adapter->send_payload(
+								game_channel_type::COMMUNICATIONS,
+								payload
+							);
+
+							applying_flag = true;
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Revert all")) {
+							edited = last_saved;
+						}
+					}
+				}
+			};
+
+			switch (rcon_gui.active_pane) {
+				case rcon_pane::ARENAS:
+					do_server_vars_panel(edited_sv_solvable_vars, last_applied_sv_solvable_vars, applying_sv_solvable_vars);
+					break;
+
+				case rcon_pane::VARS:
+					do_server_vars_panel(edited_sv_vars, last_applied_sv_vars, applying_sv_vars);
+					break;
+
+				case rcon_pane::RULESETS:
+					break;
+
+				case rcon_pane::USERS:
+					break;
+
+				case rcon_pane::ADVANCED:
+					if (ImGui::Button("Shutdown server")) {
+						LOG("Requesting the server to shut down");
+
+						rcon_command_variant payload;
+						payload = rcon_commands::special::SHUTDOWN;
+
+						adapter->send_payload(
+							game_channel_type::COMMUNICATIONS,
+							payload
+						);
+					}
+
+					break;
+
+				default: break;
+			}
 		}
+
+		ImGui::Separator();
 	}
 
 	{
@@ -844,7 +952,9 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		const auto window_name = "Connection status";
 		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
-		if (adapter->is_connecting()) {
+		const bool failed_after_connected = adapter->is_connecting() && state > C::INITIATING_CONNECTION;
+
+		if (state == C::INITIATING_CONNECTION && adapter->is_connecting()) {
 			text("Connecting to %x\nTime: %2f seconds", last_start.connect_address, get_current_time() - when_initiated_connection);
 
 			text("\n");
@@ -855,41 +965,35 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
-		else if (adapter->has_connection_failed()) {
+		else if (failed_after_connected || adapter->has_connection_failed()) {
 			if (state == C::IN_GAME) {
-				text("Server is shutting down.");
-
-				print_reason_if_any();
-
-				text("\n");
-				ImGui::Separator();
-
-				if (ImGui::Button("Go back")) {
-					return custom_imgui_result::GO_TO_MAIN_MENU;
-				}
+				text("Lost connection to the server.");
+			}
+			else if (state == C::INITIATING_CONNECTION) {
+				text("Failed to establish connection with %x", last_start.connect_address);
 			}
 			else {
-				text("Failed to establish connection with %x.", last_start.connect_address);
+				text("Failed to join %x", last_start.connect_address);
+			}
 
-				print_reason_if_any();
+			print_reason_if_any();
 
-				text("\n");
-				ImGui::Separator();
+			text("\n");
+			ImGui::Separator();
 
-				if (ImGui::Button("Retry")) {
-					return custom_imgui_result::RETRY;
-				}
+			if (ImGui::Button("Retry")) {
+				return custom_imgui_result::RETRY;
+			}
 
-				ImGui::SameLine();
+			ImGui::SameLine();
 
-				if (ImGui::Button("Go back")) {
-					return custom_imgui_result::GO_TO_MAIN_MENU;
-				}
+			if (ImGui::Button("Go back")) {
+				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
 		else if (adapter->is_disconnected()) {
 			if (!print_only_disconnect_reason) {
-				text("Connection has ended.");
+				text("Disconnected from the server.");
 			}
 
 			print_reason_if_any();
@@ -904,34 +1008,29 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		else if (adapter->is_connected()) {
 			augs::network::enable_detailed_logs(false);
 
-			if (now_resyncing) {
-				text("The client has desynchronized.\nDownloading the complete state snapshot.");
+			text_color(typesafe_sprintf("Connected to %x.", last_start.connect_address), green);
+
+			if (state == C::INITIATING_CONNECTION) {
+				text("Initializing connection...");
+			}
+			else if (state == C::PENDING_WELCOME) {
+				text("Sending the client configuration.");
+			}
+			else if (state == C::RECEIVING_INITIAL_STATE) {
+				text("Receiving the initial state:");
+			}
+			else if (state == C::RECEIVING_INITIAL_STATE_CORRECTION) {
+				text("Receiving the initial state correction:");
 			}
 			else {
-				text_color(typesafe_sprintf("Connected to %x.", last_start.connect_address), green);
+				text("Unknown error.");
+			}
 
-				if (state == C::INVALID) {
-					text("Initializing connection...");
-				}
-				else if (state == C::PENDING_WELCOME) {
-					text("Sending the client configuration.");
-				}
-				else if (state == C::RECEIVING_INITIAL_STATE) {
-					text("Receiving the initial state:");
-				}
-				else if (state == C::RECEIVING_INITIAL_STATE_CORRECTION) {
-					text("Receiving the initial state correction:");
-				}
-				else {
-					text("Unknown error.");
-				}
+			text("\n");
+			ImGui::Separator();
 
-				text("\n");
-				ImGui::Separator();
-
-				if (ImGui::Button("Abort")) {
-					disconnect();
-				}
+			if (ImGui::Button("Abort")) {
+				disconnect();
 			}
 		}
 	}
@@ -989,7 +1088,7 @@ void client_setup::update_stats(network_info& stats) const {
 }
 
 augs::path_type client_setup::get_unofficial_content_dir() const {
-	const auto& name = sv_vars.current_arena;
+	const auto& name = sv_solvable_vars.current_arena;
 
 	if (name.empty()) {
 		return {};

@@ -15,7 +15,7 @@ enum class settings_pane {
 	CLIENT,
 	SERVER,
 	EDITOR,
-	GUI_STYLES,
+	GUI,
 	PERFORMANCE,
 	ADVANCED,
 

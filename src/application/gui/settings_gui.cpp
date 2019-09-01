@@ -26,6 +26,9 @@
 #include "application/gui/settings_gui.h"
 #include "augs/network/network_types.h"
 #include "augs/audio/sound_sizes.h"
+#include "application/gui/config_nvp.h"
+#include "application/gui/do_server_vars.h"
+#include "application/gui/pretty_tabs.h"
 
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 	window.sync_back_into(into.window);
@@ -77,9 +80,6 @@ int performance_settings::get_num_pool_workers() const {
 
 	return get_default_num_pool_workers();
 }
-
-#define CONFIG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), config.x
-#define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
 void settings_gui_state::perform(
 	sol::state& lua,
@@ -142,34 +142,7 @@ void settings_gui_state::perform(
 
 		int field_id = 0;
 
-		{
-			auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
-
-			{
-				static auto labels = []() {
-					static augs::enum_array<std::string, settings_pane> label_strs;
-					augs::enum_array<const char*, settings_pane> c_strs;
-
-					augs::for_each_enum_except_bounds([&c_strs](const settings_pane s) {
-						label_strs[s] = format_enum(s);
-						c_strs[s] = label_strs[s].c_str();
-					});
-
-					c_strs[settings_pane::GUI_STYLES] = "GUI";
-
-					return c_strs;
-				}();
-
-				auto index = static_cast<int>(active_pane);
-				ImGui::TabLabels(labels.data(), static_cast<int>(labels.size()), index, nullptr);
-				active_pane = static_cast<settings_pane>(index);
-			}
-		}
-		
-		{
-			auto scope = scoped_style_color(ImGuiCol_Separator, ImGui::GetStyle().Colors[ImGuiCol_Button]);
-			ImGui::Separator();
-		}
+		do_pretty_tabs(active_pane);
 
 		auto revert = make_revert_button_lambda(config, last_saved_config);
 
@@ -233,8 +206,8 @@ void settings_gui_state::perform(
 				revertable_slider(SCOPE_CFG_NVP(duplicates_percent), 0.f, 99.f);
 			}
 
-			text_disabled("The network simulation is always disabled in production builds.");
 			//#else
+			// text_disabled("The network simulation is always disabled in production builds.");
 			(void)sim;
 			//#endif
 		};
@@ -914,39 +887,30 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
 					revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
 
-					revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 20u);
-					revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 20.f);
+					revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 30u);
+					revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 30.f);
 				}
 
 				break;
 			}
 			case settings_pane::SERVER: {
-				auto& scope_cfg = config.server;
+				ImGui::Separator();
+
+				text_color("Arenas", yellow);
 
 				ImGui::Separator();
 
-				text_color("General", yellow);
+				do_server_vars(
+					config.server_solvable,
+					last_saved_config.server_solvable
+				);
 
 				ImGui::Separator();
 
-				input_text(SCOPE_CFG_NVP(current_arena)); revert(scope_cfg.current_arena);
-				input_text(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
-
-				if (auto node = scoped_tree_node("Time limits")) {
-					revertable_slider(SCOPE_CFG_NVP(kick_if_no_messages_for_secs), 0u, 300u);
-					revertable_slider(SCOPE_CFG_NVP(kick_if_away_from_keyboard_for_secs), 0u, 6000u);
-					revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 0u, 300u);
-				}
-
-				do_lag_simulator(config.server.network_simulator);
-
-				ImGui::Separator();
-
-				text_color("Dedicated server", yellow);
-
-				ImGui::Separator();
-
-				revertable_slider(SCOPE_CFG_NVP(sleep_mult), 0.0f, 0.9f);
+				do_server_vars(
+					config.server,
+					last_saved_config.server
+				);
 
 				if (auto node = scoped_tree_node("RCON")) {
 					auto& scope_cfg = config.private_server;
@@ -1094,7 +1058,7 @@ void settings_gui_state::perform(
 
 				break;
 			}
-			case settings_pane::GUI_STYLES: {
+			case settings_pane::GUI: {
 				if (auto node = scoped_tree_node("GUI font")) {
 					auto scope = scoped_indent();
 

@@ -15,6 +15,8 @@ enum class chat_target_type : unsigned char {
 	KICK,
 	BAN,
 
+	SERVER_SHUTTING_DOWN,
+
 	COUNT
 };
 

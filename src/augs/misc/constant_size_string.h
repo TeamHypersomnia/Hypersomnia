@@ -85,6 +85,10 @@ namespace augs {
 			return arr.begin() + size();
 		}
 
+		static constexpr std::size_t max_size() {
+			return const_count;
+		}
+
 		void resize_no_init(const std::size_t n) {
 			len = n;
 			arr[len] = 0;

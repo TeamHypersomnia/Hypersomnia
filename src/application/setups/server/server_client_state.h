@@ -14,7 +14,7 @@ using client_pending_entropies = std::vector<total_client_entropy>;
 struct server_client_state {
 	using type = client_state_type;
 
-	type state = type::INVALID;
+	type state = type::INITIATING_CONNECTION;
 	net_time_t last_valid_message_time = -1.0;
 	net_time_t last_keyboard_activity_time = -1.0;
 	requested_client_settings settings;
@@ -38,17 +38,17 @@ struct server_client_state {
 
 	bool should_kick_due_to_afk(const server_vars& v, const net_time_t server_time) const {
 		const auto diff = server_time - last_keyboard_activity_time;
-		return diff > v.kick_if_away_from_keyboard_for_secs;
+		return diff > std::max(20u, v.kick_if_away_from_keyboard_for_secs);
 	}
 
 	bool should_kick_due_to_inactivity(const server_vars& v, const net_time_t server_time) const {
 		const auto diff = server_time - last_valid_message_time;
 
 		if (state == type::IN_GAME) {
-			return diff > v.kick_if_no_messages_for_secs;
+			return diff > std::max(2u, v.kick_if_no_messages_for_secs);
 		}
 
-		return diff > v.time_limit_to_enter_game_since_connection;
+		return diff > std::max(5u, v.time_limit_to_enter_game_since_connection);
 	}
 
 	void set_in_game(const net_time_t at_time) {
@@ -58,7 +58,7 @@ struct server_client_state {
 	}
 
 	bool is_set() const {
-		return state != type::INVALID;
+		return state != type::INITIATING_CONNECTION;
 	}
 
 	void init(const net_time_t server_time) {

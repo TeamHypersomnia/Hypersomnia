@@ -4,7 +4,7 @@
 inline void choose_arena(
 	sol::state& lua,
 	online_arena_handle<false> handle,
-	const server_vars& vars,
+	const server_solvable_vars& vars,
 	cosmos_solvable_significant& initial_signi
 ) {
 	const auto& name = vars.current_arena;

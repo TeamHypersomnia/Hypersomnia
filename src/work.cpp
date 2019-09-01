@@ -292,6 +292,7 @@ and then hitting Save settings.
 			lua,
 			config.default_server_start,
 			config.server,
+			config.server_solvable,
 			config.client,
 			config.private_server,
 			config.dedicated_server
@@ -630,6 +631,7 @@ and then hitting Save settings.
 						lua,
 						config.default_server_start,
 						config.server,
+						config.server_solvable,
 						config.client,
 						config.private_server,
 						std::nullopt

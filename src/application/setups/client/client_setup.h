@@ -64,6 +64,16 @@ class client_setup :
 	/* Other replicated state */
 	online_mode_and_rules current_mode;
 	server_vars sv_vars;
+	server_solvable_vars sv_solvable_vars;
+
+	server_vars last_applied_sv_vars;
+	server_vars edited_sv_vars;
+
+	server_solvable_vars last_applied_sv_solvable_vars;
+	server_solvable_vars edited_sv_solvable_vars;
+
+	bool applying_sv_vars = false;
+	bool applying_sv_solvable_vars = false;
 
 	mode_player_id client_player_id;
 
@@ -81,12 +91,12 @@ class client_setup :
 	simulation_receiver receiver;
 
 	address_and_port last_start;
-	client_state_type state = client_state_type::INVALID;
+	client_state_type state = client_state_type::INITIATING_CONNECTION;
 
 	client_vars vars;
 	requested_client_settings requested_settings;
 	requested_client_settings current_requested_settings;
-	rcon_level rcon = rcon_level::NONE;
+	rcon_level_type rcon = rcon_level_type::NONE;
 
 	entropy_accumulator total_collected;
 	augs::serialization_buffers buffers;

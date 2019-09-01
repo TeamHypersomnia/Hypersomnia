@@ -100,23 +100,25 @@ mode_player_entropy arena_gui_state::perform_imgui(
 
 			const auto player_id = mode_in.local_player_id;
 
-			if (const auto p = typed_mode.find(player_id)) {
-				const auto choice = choose_team.perform_imgui({
-					mode_input.rules.view.square_logos,
-					factions,
-					mode_in.images_in_atlas,
-					p->faction
-				});
+			if (!scoreboard.show) {
+				if (const auto p = typed_mode.find(player_id)) {
+					const auto choice = choose_team.perform_imgui({
+						mode_input.rules.view.square_logos,
+						factions,
+						mode_in.images_in_atlas,
+						p->faction
+					});
 
-				if (logically_set(choice)) {
-					result_entropy = *choice;
+					if (logically_set(choice)) {
+						result_entropy = *choice;
+					}
+
+					spectator.advance(
+						player_id,
+						typed_mode,
+						mode_input
+					);
 				}
-
-				spectator.advance(
-					player_id,
-					typed_mode,
-					mode_input
-				);
 			}
 		}
 
@@ -969,7 +971,7 @@ void arena_gui_state::draw_mode_gui(
 			draw_death_summary();
 			draw_scoreboard();
 
-			if (!choose_team.show) {
+			if (!scoreboard.show && !choose_team.show) {
 				draw_spectator();
 			}
 

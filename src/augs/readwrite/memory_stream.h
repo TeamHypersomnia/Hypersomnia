@@ -4,15 +4,11 @@
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/templates/maybe_const.h"
-#include "augs/templates/exception_templates.h"
 #include "augs/templates/resize_no_init.h"
+#include "augs/readwrite/stream_read_error.h"
 
 namespace augs {
 	class byte_counter_stream;
-
-	struct stream_read_error : error_with_typesafe_sprintf {
-		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
-	};
 
 	class stream_position {
 	protected:

@@ -164,7 +164,19 @@ void arena_gui_mixin<D>::draw_custom_gui(const draw_setup_gui_input& in) const {
 
 template <class D>
 bool arena_gui_mixin<D>::requires_cursor() const {
-	return arena_gui.requires_cursor();
+	if (arena_gui.requires_cursor()) {
+		return true;
+	}
+
+	if constexpr (std::is_same_v<client_setup, D>) {
+		const auto& self = static_cast<const D&>(*this);
+
+		if (self.client_gui.rcon.show) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 template <class D>

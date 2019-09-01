@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/readwrite/byte_readwrite_traits.h"
 #include "application/setups/server/public_settings_update.h"
+#include "augs/readwrite/to_bytes.h"
 
 namespace net_messages {
 	template <class Stream, class V>
@@ -107,6 +108,44 @@ namespace net_messages {
 	template <class Stream>
 	bool serialize(Stream& s, rcon_commands::special& c) {
 		return serialize_enum(s, c);
+	}
+
+	template <class Stream, class T>
+	bool unsafe_serialize(Stream& s, T& c) {
+		std::vector<std::byte> bytes;
+
+		if (Stream::IsWriting) {
+			bytes = augs::to_bytes(c);
+		}
+
+		auto length = static_cast<int>(bytes.size());
+
+		serialize_int(s, length, 0, sizeof(server_vars));
+
+		if (Stream::IsReading) {
+			bytes.resize(length);
+		}
+
+		serialize_bytes(s, (uint8_t*)bytes.data(), length);
+
+		try {
+			augs::from_bytes(bytes, c);
+		}
+		catch (...) {
+			return false;
+		}
+
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, server_vars& c) {
+		return unsafe_serialize(s, c);
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, server_solvable_vars& c) {
+		return unsafe_serialize(s, c);
 	}
 
 	template <class Stream>

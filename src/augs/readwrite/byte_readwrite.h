@@ -20,6 +20,7 @@
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/readwrite/byte_readwrite_overload_traits.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
+#include "augs/readwrite/stream_read_error.h"
 #include "augs/templates/resize_no_init.h"
 
 namespace augs {
@@ -300,6 +301,12 @@ namespace augs {
 			return;
 		}
 
+		if (s > storage.max_size()) {
+			throw stream_read_error(
+				"Requested storage size is bigger than its max_size!"
+			);
+		}
+
 		if constexpr(can_access_data_v<Container>) {
 			resize_no_init(storage, s);
 			detail::read_bytes_n(ar, storage.data(), s);
@@ -372,6 +379,13 @@ namespace augs {
 	) {
 		container_size_type c;
 		read_bytes(ar, c);
+
+		if (c > storage.max_size()) {
+			throw stream_read_error(
+				"Requested storage capacity is bigger than its max_size!"
+			);
+		}
+
 		storage.reserve(c);
 	}
 

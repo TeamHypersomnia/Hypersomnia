@@ -70,6 +70,7 @@ class server_setup :
 
 	client_vars integrated_client_vars;
 	server_vars vars;
+	server_solvable_vars solvable_vars;
 	private_server_vars private_vars;
 
 	/* The rest is server-specific */
@@ -157,6 +158,7 @@ public:
 		sol::state& lua,
 		const server_start_input&,
 		const server_vars&,
+		const server_solvable_vars&,
 		const client_vars& integrated_client_vars,
 		const private_server_vars&,
 		std::optional<augs::dedicated_server_input>
@@ -190,6 +192,7 @@ public:
 
 	void apply(const config_lua_table&);
 	void apply(const server_vars&, bool force);
+	void apply(const server_solvable_vars&, bool force);
 	void apply(const private_server_vars&, bool force);
 
 	void choose_arena(const std::string& name);
@@ -377,7 +380,7 @@ public:
 
 	server_step_entropy unpack(const compact_server_step_entropy&) const;
 
-	rcon_level get_rcon_level(const client_id_type&) const;
+	rcon_level_type get_rcon_level(const client_id_type&) const;
 
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return local_collected;

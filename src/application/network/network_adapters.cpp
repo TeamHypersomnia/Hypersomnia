@@ -8,6 +8,7 @@
 #include "application/network/net_message_serialization.h"
 
 #include "3rdparty/yojimbo/netcode.io/netcode.c"
+#include "augs/readwrite/byte_readwrite.h"
 
 #undef SendMessage
 #undef SetPort

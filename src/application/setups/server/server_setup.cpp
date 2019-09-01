@@ -30,6 +30,7 @@ const auto only_connected_v = server_setup::for_each_flags { server_setup::for_e
 
 void server_setup::shutdown() {
 	if (server->is_running()) {
+		server->send_packets();
 		LOG("Shutting down the server.");
 		server->stop();
 	}
@@ -44,6 +45,7 @@ server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in,
 	const server_vars& initial_vars,
+	const server_solvable_vars& initial_solvable_vars,
 	const client_vars& integrated_client_vars,
 	const private_server_vars& private_initial_vars,
 	const std::optional<augs::dedicated_server_input> dedicated
@@ -58,6 +60,7 @@ server_setup::server_setup(
 	const bool force = true;
 	apply(initial_vars, force);
 	apply(private_initial_vars, force);
+	apply(initial_solvable_vars, force);
 
 	if (private_initial_vars.master_rcon_password.empty()) {
 		LOG("WARNING! The master rcon password is empty! This means that only the localhost can access the master rcon.");
@@ -241,37 +244,83 @@ void server_setup::apply(const private_server_vars& private_new_vars, const bool
 }
 
 void server_setup::apply(const server_vars& new_vars, const bool force) {
+	const bool any_difference = 
+		force || 
+		!augs::introspective_equal(new_vars, vars)
+	;
+
 	const auto old_vars = vars;
 	vars = new_vars;
 
-	if (force || old_vars.current_arena != new_vars.current_arena) {
-		try {
-			choose_arena(new_vars.current_arena);
-		}
-		catch (const augs::file_open_error& err) {
-			/* 
-				TODO!!! 
-				In case of loading errors, we should update the config to the previously working map (or empty string). 
-				We should also remove this line: "vars = cfg.server;" since it will update the arena name despite not having it loaded.
-			*/
+	if (any_difference) {
+		auto broadcast_new_vars_to_rcons = [&](const auto recipient_id, auto&) {
+			const auto rcon_level = get_rcon_level(recipient_id);
 
-			/* This should never really happen as we'll always check before allowing admin to set a map name. */
+			if (rcon_level != rcon_level_type::NONE) {
+				server->send_payload(
+					recipient_id,
+					game_channel_type::COMMUNICATIONS,
 
-			LOG("Arena named \"%x\" was not found on the server!\nLoading the default arena instead.", new_vars.current_arena);
+					new_vars
+				);
+			}
+		};
 
-			const auto test_scene_arena = "";
-			choose_arena(test_scene_arena);
+		for_each_id_and_client(broadcast_new_vars_to_rcons, only_connected_v);
+
+		if (force || old_vars.network_simulator != new_vars.network_simulator) {
+			server->set(new_vars.network_simulator);
 		}
 	}
+}
 
-	if (force || old_vars.network_simulator != new_vars.network_simulator) {
-		server->set(new_vars.network_simulator);
+void server_setup::apply(const server_solvable_vars& new_vars, const bool force) {
+	const bool any_difference = 
+		force || 
+		!augs::introspective_equal(new_vars, solvable_vars)
+	;
+
+	const auto old_vars = solvable_vars;
+	solvable_vars = new_vars;
+
+	if (any_difference) {
+		auto broadcast_new_vars = [&](const auto recipient_id, auto&) {
+			server->send_payload(
+				recipient_id,
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+
+				solvable_vars
+			);
+		};
+
+		for_each_id_and_client(broadcast_new_vars, only_connected_v);
+
+		if (force || old_vars.current_arena != new_vars.current_arena) {
+			try {
+				choose_arena(new_vars.current_arena);
+			}
+			catch (const augs::file_open_error& err) {
+				/* 
+					TODO!!! 
+					In case of loading errors, we should update the config to the previously working map (or empty string). 
+					We should also remove this line: "vars = cfg.server;" since it will update the arena name despite not having it loaded.
+				*/
+
+				/* This should never really happen as we'll always check before allowing admin to set a map name. */
+
+				LOG("Arena named \"%x\" was not found on the server!\nLoading the default arena instead.", new_vars.current_arena);
+
+				const auto test_scene_arena = "";
+				choose_arena(test_scene_arena);
+			}
+		}
 	}
 }
 
 void server_setup::apply(const config_lua_table& cfg) {
 	const bool force = false;
 	apply(cfg.server, force);
+	apply(cfg.server_solvable, force);
 
 	integrated_client_vars = cfg.client;
 
@@ -292,12 +341,12 @@ void server_setup::apply(const config_lua_table& cfg) {
 void server_setup::choose_arena(const std::string& name) {
 	LOG("Choosing arena: %x", name);
 
-	vars.current_arena = name;
+	solvable_vars.current_arena = name;
 
 	::choose_arena(
 		lua,
 		get_arena_handle(),
-		vars,
+		solvable_vars,
 		initial_signi
 	);
 
@@ -498,10 +547,19 @@ void server_setup::advance_clients_state() {
 				client_id, 
 				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
 
-				vars
+				solvable_vars
 			);
 
 			const auto rcon_level = get_rcon_level(client_id);
+
+			if (rcon_level != rcon_level_type::NONE) {
+				server->send_payload(
+					client_id, 
+					game_channel_type::COMMUNICATIONS, 
+
+					vars
+				);
+			}
 
 			server->send_payload(
 				client_id, 
@@ -580,7 +638,7 @@ void server_setup::advance_clients_state() {
 			}
 		}
 
-		if (c.state > client_state_type::INVALID) {
+		if (c.state > client_state_type::INITIATING_CONNECTION) {
 			if (c.should_kick_due_to_inactivity(vars, server_time)) {
 				kick(client_id, "No messages arrived for too long!");
 			}
@@ -608,6 +666,7 @@ message_handler_result server_setup::handle_client_message(
 	F&& read_payload
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
+	constexpr auto continue_v = message_handler_result::CONTINUE;
 	constexpr bool is_easy_v = payload_easily_movable_v<T>;
 
 	std::conditional_t<is_easy_v, T, std::monostate> payload;
@@ -646,7 +705,7 @@ message_handler_result server_setup::handle_client_message(
 
 		LOG("Detected rcon level: %x", static_cast<int>(level));
 
-		if (level != rcon_level::NONE) {
+		if (level != rcon_level_type::NONE) {
 			const auto result = std::visit(
 				[&](const auto& typed_payload) {
 					using P = remove_cref<decltype(typed_payload)>;
@@ -654,19 +713,38 @@ message_handler_result server_setup::handle_client_message(
 
 					if constexpr(std::is_same_v<P, special>) {
 						switch (typed_payload) {
-							case special::SHUTDOWN:
-							LOG("Shutting down due to rcon's request.");
-							schedule_shutdown = true;
+							case special::SHUTDOWN: {
+								LOG("Shutting down due to rcon's request.");
+								schedule_shutdown = true;
 
-							return abort_v;
-							break;
+								server_broadcasted_chat message;
+								message.target = chat_target_type::SERVER_SHUTTING_DOWN;
+								message.recipient_shall_kindly_leave = true;
+
+								broadcast(message);
+
+								return continue_v;
+							}
 
 							default:
-
-							LOG("Unsupported rcon command.");
-							return message_handler_result::CONTINUE;
-							break;
+								LOG("Unsupported rcon command.");
+								return continue_v;
 						}
+					}
+					else if constexpr(std::is_same_v<P, server_vars>) {
+						LOG("New server vars from the client.");
+
+						apply(typed_payload, true);
+
+						return continue_v;
+					}
+					else if constexpr(std::is_same_v<P, server_solvable_vars>) {
+						LOG("New server solvable vars from the client (%x).", typed_payload.current_arena);
+
+
+						apply(typed_payload, true);
+
+						return continue_v;
 					}
 					else if constexpr(std::is_same_v<P, std::monostate>) {
 						return abort_v;
@@ -998,7 +1076,7 @@ void server_setup::send_packets_if_its_time() {
 	if (ticks_remaining == 0) {
 		server->send_packets();
 
-		ticks_remaining = vars.send_updates_once_every_tick;
+		ticks_remaining = vars.send_packets_once_every_tick;
 		--ticks_remaining;
 	}
 }
@@ -1123,7 +1201,7 @@ server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) c
 }
 
 augs::path_type server_setup::get_unofficial_content_dir() const {
-	const auto& name = vars.current_arena;
+	const auto& name = solvable_vars.current_arena;
 
 	if (name.empty()) {
 		return {};
@@ -1154,29 +1232,29 @@ bool safe_equal(const decltype(requested_client_settings::rcon_password)& candid
 	return matches == static_cast<int>(actual_password.size());
 }
 
-rcon_level server_setup::get_rcon_level(const client_id_type& id) const { 
+rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const { 
 	const auto& c = clients[id];
 
 	if (vars.auto_authorize_loopback_for_rcon) {
 		if (server->get_client_address(id).IsLoopback()) {
 			LOG("Auto-authorizing the loopback client for master rcon.");
-			return rcon_level::MASTER;
+			return rcon_level_type::MASTER;
 		}
 	}
 
 	if (::safe_equal(c.settings.rcon_password, private_vars.master_rcon_password)) {
 		LOG("Authorized the remote client for master rcon.");
-		return rcon_level::MASTER;
+		return rcon_level_type::MASTER;
 	}
 
 	if (::safe_equal(c.settings.rcon_password, private_vars.rcon_password)) {
 		LOG("Authorized the remote client for basic rcon.");
-		return rcon_level::BASIC;
+		return rcon_level_type::BASIC;
 	}
 
 	LOG("RCON disabled for this client.");
 
-	return rcon_level::NONE;
+	return rcon_level_type::NONE;
 }
 
 void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {

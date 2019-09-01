@@ -14,15 +14,21 @@ struct arena_switching_settings {
 	// END GEN INTROSPECTOR
 };
 
-struct server_vars {
+struct server_solvable_vars {
 	static constexpr bool force_read_field_by_field = true;
 
-	// GEN INTROSPECTOR struct server_vars
+	// GEN INTROSPECTOR struct server_solvable_vars
 	arena_switching_settings arena_switching;
 
 	arena_identifier current_arena = "";
 	augs::constant_size_string<max_ruleset_name_length_v> override_default_ruleset = "";
+	// END GEN INTROSPECTOR
+};
 
+struct server_vars {
+	static constexpr bool force_read_field_by_field = true;
+
+	// GEN INTROSPECTOR struct server_vars
 	unsigned kick_if_no_messages_for_secs = 60;
 	unsigned kick_if_away_from_keyboard_for_secs = 240;
 	unsigned time_limit_to_enter_game_since_connection = 10;
@@ -30,7 +36,7 @@ struct server_vars {
 	unsigned reset_resync_timer_once_every_secs = 10;
 	unsigned max_client_resyncs = 3;
 
-	unsigned send_updates_once_every_tick = 1;
+	unsigned send_packets_once_every_tick = 1;
 
 	unsigned max_buffered_client_commands = 1000;
 

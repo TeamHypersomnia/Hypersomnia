@@ -14,7 +14,7 @@ struct initial_arena_state_payload {
 	maybe_const_ref_t<C, cosmos_solvable_significant> signi;
 	maybe_const_ref_t<C, online_mode_and_rules> mode;
 	maybe_const_ref_t<C, uint32_t> client_id;
-	maybe_const_ref_t<C, rcon_level> rcon;
+	maybe_const_ref_t<C, rcon_level_type> rcon;
 };
 
 using ref_net_stream = augs::basic_ref_memory_stream<message_bytes_type>;
@@ -454,6 +454,21 @@ namespace net_messages {
 
 	inline bool new_server_vars::write_payload(
 		const server_vars& input
+	) {
+		return unsafe_write_message(*this, input);
+	}
+
+	inline bool new_server_solvable_vars::read_payload(
+		server_solvable_vars& output
+	) {
+		// TODO SECURITY: don't blindly trust the server!!!
+		// TODO BANDWIDTH: optimize vars i/o
+
+		return unsafe_read_message(*this, output);
+	}
+
+	inline bool new_server_solvable_vars::write_payload(
+		const server_solvable_vars& input
 	) {
 		return unsafe_write_message(*this, input);
 	}
