@@ -816,6 +816,10 @@ and then hitting Save settings.
 			return *custom;
 		}
 		
+		if (get_viewed_character().dead()) {
+			return camera_eye();
+		}
+
 		return gameplay_camera.get_current_eye();
 	};
 

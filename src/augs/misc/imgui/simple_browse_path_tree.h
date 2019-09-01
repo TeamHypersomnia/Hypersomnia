@@ -24,7 +24,8 @@ void simple_browse_path_tree(
 	const bool acquire_keyboard,
 
 	const C& disallowed_paths = {},
-	const std::string& disallowed_paths_displayed_name = "Busy paths"
+	const std::string& disallowed_paths_displayed_name = "Busy paths",
+	const std::array<std::string, 2> custom_column_names = {}
 ) {
 	using namespace augs::imgui;
 
@@ -39,7 +40,17 @@ void simple_browse_path_tree(
 
 	if (settings.linear_view) {
 		ImGui::Columns(2);
-		settings.do_name_location_columns();
+
+		if (custom_column_names[0].size() > 0) {
+			text_disabled(custom_column_names[0]);
+			ImGui::NextColumn();
+			text_disabled(custom_column_names[1]);
+			ImGui::NextColumn();
+		}
+		else {
+			settings.do_name_location_columns();
+		}
+
 		ImGui::Separator();
 
 		bool official_separator = false;

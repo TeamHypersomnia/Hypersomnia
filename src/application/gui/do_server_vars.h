@@ -2,6 +2,9 @@
 #include "application/setups/server/server_vars.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
+#include "application/gui/arena_chooser.h"
+#include "application/arena/arena_paths.h"
+
 inline void do_server_vars(
 	server_solvable_vars& vars,
 	server_solvable_vars& last_saved_vars
@@ -14,7 +17,19 @@ inline void do_server_vars(
 
 	auto revert = make_revert_button_lambda(vars, last_saved_vars);
 
-	input_text(SCOPE_CFG_NVP(current_arena)); revert(scope_cfg.current_arena);
+	thread_local arena_chooser chooser;
+
+	chooser.perform(
+		SCOPE_CFG_NVP(current_arena),
+		augs::path_type(OFFICIAL_ARENAS_DIR),
+		augs::path_type(COMMUNITY_ARENAS_DIR),
+		[&](const auto& new_choice) {
+			vars.current_arena = new_choice.path.string();
+		}
+	);
+
+	revert(scope_cfg.current_arena);
+
 	input_text(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
 }
 
