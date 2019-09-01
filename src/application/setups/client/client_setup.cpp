@@ -217,6 +217,9 @@ message_handler_result client_setup::handle_server_message(
 					new_vars,
 					initial_signi
 				);
+
+				arena_gui.reset();
+				client_gui.rcon = {};
 			}
 			catch (const augs::file_open_error& err) {
 				set_disconnect_reason(typesafe_sprintf(

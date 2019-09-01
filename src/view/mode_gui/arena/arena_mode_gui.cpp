@@ -31,6 +31,11 @@ const auto default_popul = augs::populate_with_delays_impl(
 arena_gui_state::arena_gui_state() : populator(std::make_unique<augs::populate_with_delays_impl>(default_popul)) {}
 arena_gui_state::~arena_gui_state() = default;
 
+void arena_gui_state::reset() {
+	std::destroy_at(this);
+	new (this) arena_gui_state();
+}
+
 bool arena_gui_state::control(
 	const general_gui_intent_input in
 ) {

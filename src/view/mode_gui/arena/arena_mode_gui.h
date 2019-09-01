@@ -65,4 +65,6 @@ struct arena_gui_state {
 	) const;
 
 	bool requires_cursor() const;
+
+	void reset();
 };

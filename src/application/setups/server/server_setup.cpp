@@ -298,6 +298,8 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 		if (force || old_vars.current_arena != new_vars.current_arena) {
 			try {
 				choose_arena(new_vars.current_arena);
+
+				arena_gui.reset();
 			}
 			catch (const augs::file_open_error& err) {
 				/* 
