@@ -47,7 +47,7 @@ namespace test_scenes {
 		};
 
 		rs.name = "Minimal bomb ruleset";
-		rs.bot_quota = rs.bot_names.size();
+		rs.bot_quota = 0;
 	}
 
 	void minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {

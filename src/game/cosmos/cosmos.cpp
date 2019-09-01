@@ -20,7 +20,15 @@
 std::atomic<int> cosmos_counter = 0;
 
 void cosmos::request_resample() {
-	cosmos_id = cosmos_counter++;
+	resample = true;
+}
+
+bool cosmos::resample_requested() const {
+	return resample;
+}
+
+void cosmos::mark_as_resampled() const {
+	resample = false;
 }
 
 cosmos::cosmos() : cosmos_id(cosmos_counter++) 

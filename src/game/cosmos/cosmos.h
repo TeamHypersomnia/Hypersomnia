@@ -27,6 +27,7 @@ class cosmos {
 	private_cosmos_solvable solvable;
 
 	cosmos_id_type cosmos_id = 0;
+	mutable bool resample = true;
 
 public: 
 	/* A detail only for performance benchmarks */
@@ -314,4 +315,6 @@ public:
 	}
 
 	void request_resample();
+	bool resample_requested() const;
+	void mark_as_resampled() const;
 };

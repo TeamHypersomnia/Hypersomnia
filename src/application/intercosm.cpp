@@ -116,6 +116,7 @@ void intercosm::post_load_state_correction() {
 
 	world.reinfer_everything();
 	snap_interpolated_to_logical(world);
+	world.request_resample();
 }
 
 void intercosm::load_from_lua(const intercosm_path_op op) {

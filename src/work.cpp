@@ -1209,10 +1209,19 @@ and then hitting Save settings.
 			const auto now_sampled_cosmos = cosm.get_cosmos_id();
 
 			auto resample = [&]() {
-				if (last_sampled_cosmos != now_sampled_cosmos) {
+				const bool requested_resample = cosm.resample_requested();
+
+				if (requested_resample || last_sampled_cosmos != now_sampled_cosmos) {
 					get_audiovisuals().get<particles_simulation_system>().clear();
 
+					audio_buffers.finish();
+					audio_buffers.stop_all_sources();
+
+					get_audiovisuals().get<sound_system>().clear();
+
 					last_sampled_cosmos = now_sampled_cosmos;
+
+					cosm.mark_as_resampled();
 
 #if !IS_PRODUCTION_BUILD
 					LOG("Now sampled cosmos has changed.");
@@ -1221,12 +1230,15 @@ and then hitting Save settings.
 			};
 
 			if constexpr(std::is_same_v<S, client_setup>) {
-				const auto& referential = setup.get_arena_handle(client_arena_type::REFERENTIAL).get_cosmos().get_cosmos_id();
-				const auto& predicted = setup.get_arena_handle(client_arena_type::PREDICTED).get_cosmos().get_cosmos_id();
+				const auto& referential = setup.get_arena_handle(client_arena_type::REFERENTIAL).get_cosmos();
+				const auto& predicted = setup.get_arena_handle(client_arena_type::PREDICTED).get_cosmos();
+
+				const auto referential_id = referential.get_cosmos_id();
+				const auto predicted_id = predicted.get_cosmos_id();
 
 				const bool valid_switch = 
-					(last_sampled_cosmos == referential && now_sampled_cosmos == predicted)
-					|| (last_sampled_cosmos == predicted && now_sampled_cosmos == referential)
+					(last_sampled_cosmos == referential_id && now_sampled_cosmos == predicted_id)
+					|| (last_sampled_cosmos == predicted_id && now_sampled_cosmos == referential_id)
 				;
 
 				if (valid_switch) {
@@ -1234,6 +1246,9 @@ and then hitting Save settings.
 				}
 				else {
 					resample();
+
+					referential.mark_as_resampled();
+					predicted.mark_as_resampled();
 				}
 			}
 			else {
