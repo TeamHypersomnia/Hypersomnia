@@ -148,18 +148,32 @@ int work(const int argc, const char* const * const argv) try {
 
 	LOG("Loading the config.");
 
-	static const config_lua_table canon_config {
-		lua,
-		canon_config_path
-	};
+	static const auto canon_config = []() {
+		auto result = config_lua_table {
+			lua,
+			canon_config_path
+		};
 
-	static config_lua_table config { 
-		lua, 
-		augs::switch_path(
-			canon_config_path,
-			local_config_path
-		)
-	};
+#if PLATFORM_UNIX
+		/* Some developer-friendly options */
+		result.default_client_start.chosen_address_type = connect_address_type::CUSTOM;
+		result.window.fullscreen = false;
+#endif
+
+		return result;
+	}();
+
+	static auto config = []() {
+		if (augs::exists(local_config_path)) {
+			return config_lua_table { 
+				lua,
+				local_config_path
+			};
+		}
+		else {
+			return canon_config;
+		}
+	}();
 
 	static const auto float_tests_succeeded = 
 		config.perform_float_consistency_test 
@@ -224,7 +238,7 @@ Consider sending developers the log file located at:
 %x
 
 If you experience repeated crashes, 
-you might try to reset all your settings,
+you might try resetting all your settings,
 which can be done by pressing "Reset to factory default" in Settings->General,
 and then hitting Save settings.
 

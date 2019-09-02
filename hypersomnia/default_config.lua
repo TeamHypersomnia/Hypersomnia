@@ -326,7 +326,7 @@ return {
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "NEVER",
 		settings = {},
-		source_font_path = "content/necessary/fonts/unifont.ttf"
+		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
 	  }
   },
   gui_style = {
