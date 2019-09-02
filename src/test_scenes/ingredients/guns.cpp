@@ -3378,6 +3378,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 700.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::GALILEA_MAGAZINE);
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 		}
 
 		{

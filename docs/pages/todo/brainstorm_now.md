@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- custom chosen ruleset could be a part of mode solvable
+	- or actually client/server solvable (arena_handle)
+
 - pretty print - check if convertible to string
 
 - Write autoupdater so we don't have to save those avatar images in temporary
