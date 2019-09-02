@@ -4,7 +4,7 @@ It will always show you only the information that is relevant to what you are cu
 If you close this window, you can always re-open it by going to View->Tutorial, or simply by pressing Alt+X. 
 Whenever you focus another window, specific help for that window will be shown here.
 
-To restart the tutorial, you may safely delete the cache/usr/editor folder.
+To restart the tutorial, you may safely delete the user/editor folder.
 This will also delete all previously open untitled projects.
  
 The text you are reading is stored in files inside the content/manual/editor folder.

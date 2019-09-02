@@ -15,6 +15,8 @@ struct client_start_input {
 
 	std::string custom_address = "127.0.0.1";
 	std::string preferred_official_address = "";
+
+	bool record_demo = true;
 	// END GEN INTROSPECTOR
 
 	address_and_port get_address_and_port() const;

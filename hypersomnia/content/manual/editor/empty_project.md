@@ -1,5 +1,5 @@
 You are currently inside an empty, untitled project.
-All untitled projects reside within the ``cache/usr/editor/untitled`` folder.
+All untitled projects reside within the ``user/editor/untitled`` folder.
 
 This empty project is useless as it is,  
 so you should begin by filling it with a test scene built-in during compilation.

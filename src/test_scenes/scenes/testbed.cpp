@@ -108,8 +108,8 @@ namespace test_scenes {
 #define GIVE_AMMO 1
 
 #if GIVE_AMMO
-			resistance.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
-			metropolis.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
+			resistance.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::FURY_THROWER);
+			metropolis.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::POSEIDON);
 
 			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SN69);
 			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::KEK9);

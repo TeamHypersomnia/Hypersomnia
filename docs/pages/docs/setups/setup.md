@@ -8,7 +8,7 @@ summary: |
     e.g. a server, a client, an editor or a local test scene.  
 
     Usually, each *setup* has a single dedicated button in the game's main menu.  
-    Users may choose which setup to launch on startup via a relevant [``config.local.lua``](config_lua) setting.
+    Users may choose which setup to launch on startup via a relevant [``config.lua``](config_lua) setting.
 
     They are allocated and used directly by [``main.cpp``](main_cpp).  
 ---

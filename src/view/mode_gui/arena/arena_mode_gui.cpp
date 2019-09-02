@@ -789,7 +789,12 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		/* Synonym */
-		auto draw_warmup_indicator = draw_info_indicator;
+		auto draw_warmup_indicator = [&](const auto& val, const formatted_string& val2 = {}) {
+			const auto one_sixth_t = in.screen_size.y / 6;
+
+			draw_text_indicator_at(val, one_sixth_t);
+			draw_text_indicator_at(val2, one_sixth_t + in.gui_fonts.gui.metrics.get_height());
+		};
 
 		const auto warmup_left = typed_mode.get_warmup_seconds_left(mode_input);
 		const bool now_is_warmup = warmup_left > 0.f;
@@ -798,7 +803,7 @@ void arena_gui_state::draw_mode_gui(
 			const auto c = std::ceil(warmup_left);
 
 			play_tick_if_soon(c, 5.f, true);
-			draw_warmup_indicator(colored("WARMUP\n" + format_mins_secs(c), white));
+			draw_warmup_indicator(colored("WARMUP", white), colored(format_mins_secs(c), white));
 		};
 
 		auto draw_warmup_welcome = [&]() {
@@ -902,7 +907,7 @@ void arena_gui_state::draw_mode_gui(
 				const auto c = std::ceil(match_begins_in_seconds - 1.f);
 
 				if (c > 0.f) {
-					draw_warmup_indicator(colored("Match begins in\n" + format_mins_secs(match_begins_in_seconds), yellow));
+					draw_warmup_indicator(colored("Match begins in", yellow), colored(format_mins_secs(match_begins_in_seconds), yellow));
 				}
 				else {
 					draw_warmup_indicator(colored("The match has begun", yellow));

@@ -211,7 +211,7 @@ bool start_client_gui_state::perform(
 
 		const auto first_size = vec2(max_avatar_side_v, max_avatar_side_v);
 		const auto half_size = first_size / 2;
-		const auto icon_size = vec2(22, 22);
+		const auto icon_size = vec2::square(22);
 
 		if (p.size() > 0) {
 			augs::atlas_entry entry;
@@ -294,6 +294,8 @@ bool start_client_gui_state::perform(
 		}
 
 		into_vars.avatar_image_path = p;
+
+		checkbox("Record demo", into_start.record_demo);
 
 		text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 	}

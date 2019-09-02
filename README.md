@@ -316,7 +316,7 @@ To implement your own script for choosing a directory:
 
 - Use a ``$TERMINAL`` variable for file managers that need a terminal to run on.  
   Ensure your terminal supports ``-e`` flag that passes the commands to launch on startup. 
-- Output a ``$PWD/cache/gen/last_file_path.txt`` file containg the result - which is the chosen path, e.g. ``/home/pbc/projects/my_map``.
+- Output a ``$PWD/cache/last_file_path.txt`` file containg the result - which is the chosen path, e.g. ``/home/pbc/projects/my_map``.
 
 # Contributing
 

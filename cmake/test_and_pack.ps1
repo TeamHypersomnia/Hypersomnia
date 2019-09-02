@@ -5,9 +5,9 @@ param(
 
 $target_exe = "../nin/" + $configuration + "/Hypersomnia.exe"
 
-$good_log = "cache/log/exit_success_debug_log.txt"
-$fail_log = "cache/log/exit_failure_debug_log.txt"
-$ensr_log = "cache/log/ensure_failed_debug_log.txt"
+$good_log = "logs/exit_success_debug_log.txt"
+$fail_log = "logs/exit_failure_debug_log.txt"
+$ensr_log = "logs/ensure_failed_debug_log.txt"
 
 if ($console_mode -eq 1) { 
 	& $target_exe --unit-tests-only
@@ -38,6 +38,6 @@ else {
 Write-Host "Archiving the binary." -ForegroundColor yellow
 
 cp $target_exe Hypersomnia.exe
-rm -r cache
+rm -r cache logs user demos
 cd ../
 7z a Hypersomnia-x64.zip hypersomnia

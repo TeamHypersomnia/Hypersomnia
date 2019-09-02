@@ -60,6 +60,11 @@ std::string augs::date_time::get_stamp() const {
 	;
 }
 
+std::string augs::date_time::get_readable_for_file() const {
+	std::tm local_time = *std::localtime(&t);
+	return typesafe_sprintf("%x", std::put_time(&local_time, "%y.%m.%d at %H-%M-%S"));
+}
+
 std::string augs::date_time::get_readable() const {
 	std::tm local_time = *std::localtime(&t);
 	return typesafe_sprintf("%x", std::put_time(&local_time, "%H:%M:%S on %m.%d.%y"));

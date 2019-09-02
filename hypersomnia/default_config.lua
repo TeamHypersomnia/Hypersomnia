@@ -12,7 +12,9 @@ return {
 	chosen_address_type = "OFFICIAL",
 
 	preferred_official_address = "",
-	custom_address = "127.0.0.1"
+	custom_address = "127.0.0.1",
+
+	record_demo = true
   },
 
   app_controls = {

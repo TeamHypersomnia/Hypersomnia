@@ -173,13 +173,12 @@ void arena_scoreboard_gui::draw_gui(
 		int r;
 	};
 
-	const auto scoreboard_avatar_icon_side = 22;
-	(void)scoreboard_avatar_icon_side;
+	const auto scoreboard_avatar_icon_side = static_cast<int>(font_h);
 
 	std::vector<column> columns = {
 		{ calc_size("9999").x, "Ping", true },
 		{ 22, " " },
-		{ 16, " " },
+		{ scoreboard_avatar_icon_side, " " },
 		{ sz.x, "Player" },
 		{ calc_size("999999$").x, "Money", true },
 
@@ -375,10 +374,10 @@ void arena_scoreboard_gui::draw_gui(
 
 			//const auto score_text_size = calc_size(fmt_large(score_text));
 
-			const auto score_text_pos = vec2i(cell_pad.x, 0);
+			const auto score_text_pos = vec2i(cell_pad.x, faction_bg_orig.get_center().y);
 			//+ score_text_max_w - score_text_size.x
 
-			text_stroked_large(score_text, colors.standard, score_text_pos);
+			text_stroked_large(score_text, colors.standard, score_text_pos, { augs::ralign::CY });
 
 			//const auto score_text_r = score_text_pos.x + score_text_size.x;
 

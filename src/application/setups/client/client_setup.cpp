@@ -787,7 +787,7 @@ void client_setup::send_packets_if_its_time() {
 }
 
 void client_setup::log_malicious_server() {
-	set_disconnect_reason("The client is out of date, or the server might be malicious.\nIf your game is up to date, please report this fact to the developers\n - send them the files in cache/usr/log.", true);
+	set_disconnect_reason("The client is out of date, or the server might be malicious.\nIf your game is up to date, please report this fact to the developers\n - send them the files in the \"logs\" folder.", true);
 
 #if !IS_PRODUCTION_BUILD
 	ensure(false && "Server has sent some invalid data.");

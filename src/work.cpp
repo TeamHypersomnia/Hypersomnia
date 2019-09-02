@@ -85,6 +85,7 @@
 #include "view/rendering_scripts/launch_visibility_jobs.h"
 #include "view/rendering_scripts/for_each_vis_request.h"
 #include "game/cosmos/for_each_entity.h"
+#include "application/setups/client/demo_paths.h"
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
@@ -135,11 +136,12 @@ int work(const int argc, const char* const * const argv) try {
 
 	augs::create_directories(GENERATED_FILES_DIR);
 	augs::create_directories(LOCAL_FILES_DIR);
+	augs::create_directories(DEMOS_DIR);
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
 	static const auto canon_config_path = augs::path_type("default_config.lua");
-	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
+	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.lua");
 
 	LOG("Creating lua state.");
 	static auto lua = augs::create_lua_state();

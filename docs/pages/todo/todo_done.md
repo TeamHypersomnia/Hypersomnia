@@ -679,7 +679,7 @@ we consider whole type overrides too complex architeciturally:
 	- have some reserved thread_local memory stream
 
 - crashfix with no images in atlas?
-	Regenerating texture atlas: cache/gen/atlases/game_world_atlas.bin
+	Regenerating texture atlas: cache/atlases/game_world_atlas.bin
 	Loading font content/necessary/fonts/unifont.ttf
 	ensure_less(static_cast<size_type>(i), count) failed with expansion:
 	9 < 0
@@ -2335,7 +2335,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Host/connect window
 	- non-commanding window with property widgets and a start button
 		- since these settings will be critical, we'll hand-write the controls
-	- always save to config local lua on connect/host press
+	- always save to config lua on connect/host press
 
 - Don't use settings_gui.cpp for client/server defaults: simply edit these in connect/host dialogs and save on confirmation
 - replace queues with a single optional for item purchase, let us not allow more than a single purchase per step

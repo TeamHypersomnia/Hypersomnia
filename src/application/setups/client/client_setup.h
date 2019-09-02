@@ -42,6 +42,7 @@
 #include "application/gui/client/client_gui_state.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "augs/texture_atlas/loaded_png_vector.h"
+#include "application/setups/client/demo_file.h"
 
 struct config_lua_table;
 
@@ -229,42 +230,42 @@ public:
 		const client_advance_input& in,
 		const Callbacks& callbacks
 	) {
-		const auto referential_solve_settings = [&]() {
-			solve_settings out;
-			out.effect_prediction = in.lag_compensation.effect_prediction;
-			return out;
-		}();
-
-		const auto repredicted_solve_settings = [&]() {
-			solve_settings out;
-			out.effect_prediction = in.lag_compensation.effect_prediction;
-
-			if (in.lag_compensation.confirm_controlled_character_death) {
-				out.disable_knockouts = get_viewed_character();
-			}
-
-			out.simulate_decorative_organisms = in.lag_compensation.simulate_decorative_organisms_during_reconciliation;
-
-			return out;
-		}();
-
-		const auto predicted_solve_settings = [&]() {
-			auto out = repredicted_solve_settings;
-			out.simulate_decorative_organisms = true;
-			return out;
-		}();
-
-		auto schedule_reprediction_if_inconsistent = [&](const auto result) {
-			if (result.state_inconsistent) {
-				receiver.schedule_reprediction = true;
-			}
-		};
-
-		auto& performance = in.network_performance;
-
 		const auto current_time = get_current_time();
 
 		if (client_time <= current_time) {
+			const auto referential_solve_settings = [&]() {
+				solve_settings out;
+				out.effect_prediction = in.lag_compensation.effect_prediction;
+				return out;
+			}();
+
+			const auto repredicted_solve_settings = [&]() {
+				solve_settings out;
+				out.effect_prediction = in.lag_compensation.effect_prediction;
+
+				if (in.lag_compensation.confirm_controlled_character_death) {
+					out.disable_knockouts = get_viewed_character();
+				}
+
+				out.simulate_decorative_organisms = in.lag_compensation.simulate_decorative_organisms_during_reconciliation;
+
+				return out;
+			}();
+
+			const auto predicted_solve_settings = [&]() {
+				auto out = repredicted_solve_settings;
+				out.simulate_decorative_organisms = true;
+				return out;
+			}();
+
+			auto schedule_reprediction_if_inconsistent = [&](const auto result) {
+				if (result.state_inconsistent) {
+					receiver.schedule_reprediction = true;
+				}
+			};
+
+			auto& performance = in.network_performance;
+
 			{
 				auto scope = measure_scope(performance.receiving_messages);
 				handle_server_messages();

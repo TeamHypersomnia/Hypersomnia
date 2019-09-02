@@ -69,11 +69,14 @@ void main_menu_setup::launch_creators_screen() {
 }
 
 void main_menu_setup::query_latest_news(const std::string& url) {
+	// TODO: FIX THIS!!!
 	if (latest_news.valid()) {
 		latest_news.wait();
 	}
 
 	latest_news = std::async(std::launch::async, [&url]() noexcept {
+		return std::string("");
+
 		auto html = augs::http_get_request(url);
 		const auto delimiter = std::string("newsbegin");
 
