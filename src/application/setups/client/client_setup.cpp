@@ -874,9 +874,34 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				}
 			};
 
+			auto do_command_button = [&](const std::string& label, const auto cmd) {
+				if (ImGui::Button(label.c_str())) {
+					rcon_command_variant payload;
+					payload = cmd;
+
+					adapter->send_payload(
+						game_channel_type::COMMUNICATIONS,
+						payload
+					);
+
+					return true;
+				}
+
+				return false;
+			};
+
 			switch (rcon_gui.active_pane) {
 				case rcon_pane::ARENAS:
 					do_server_vars_panel(edited_sv_solvable_vars, last_applied_sv_solvable_vars, applying_sv_solvable_vars);
+					break;
+
+				case rcon_pane::MATCH:
+					using MC = match_command;
+
+					augs::for_each_enum_except_bounds([&](const MC cmd) {
+						do_command_button(format_enum(cmd), cmd);
+					});
+
 					break;
 
 				case rcon_pane::VARS:
@@ -890,17 +915,13 @@ custom_imgui_result client_setup::perform_custom_imgui(
 					break;
 
 				case rcon_pane::ADVANCED:
-					if (ImGui::Button("Shutdown server")) {
+					using RS = rcon_commands::special;
+
+					if (do_command_button("Shutdown server", RS::SHUTDOWN)) {
 						LOG("Requesting the server to shut down");
-
-						rcon_command_variant payload;
-						payload = rcon_commands::special::SHUTDOWN;
-
-						adapter->send_payload(
-							game_channel_type::COMMUNICATIONS,
-							payload
-						);
 					}
+
+					do_command_button("Download logs", RS::DOWNLOAD_LOGS);
 
 					break;
 

@@ -356,6 +356,8 @@ private:
 	bool give_bomb_to_random_player(input, logic_step);
 	void spawn_bomb_near_players(input);
 
+	void end_warmup_and_go_live(input, logic_step);
+
 	void execute_player_commands(input, mode_entropy&, logic_step);
 	void add_or_remove_players(input, const mode_entropy&, logic_step);
 	void handle_special_commands(input, const mode_entropy&, logic_step);
@@ -406,6 +408,7 @@ private:
 	entity_id bomb_detonation_theme;
 	augs::speed_vars round_speeds;
 	session_id_type next_session_id = session_id_type::first();
+	unsigned scramble_counter = 0;
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
@@ -413,6 +416,10 @@ private:
 
 	void on_faction_changed_for(const_input, faction_type previous_faction, const mode_player_id&);
 	void assign_free_color_to_best_uncolored(const_input in, faction_type previous_faction, rgba free_color);
+
+	void swap_assigned_factions(const participating_factions&);
+	void scramble_assigned_factions(const participating_factions&);
+
 public:
 
 	faction_type get_player_faction(const mode_player_id&) const;

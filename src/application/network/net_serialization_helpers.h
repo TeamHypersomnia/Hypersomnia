@@ -2,6 +2,7 @@
 #include "augs/readwrite/byte_readwrite_traits.h"
 #include "application/setups/server/public_settings_update.h"
 #include "augs/readwrite/to_bytes.h"
+#include "game/modes/mode_commands/match_command.h"
 
 namespace net_messages {
 	template <class Stream, class V>
@@ -167,11 +168,6 @@ namespace net_messages {
 	}
 
 	template <class Stream>
-	bool serialize(Stream&, mode_restart_command&) {
-		return true;
-	}
-
-	template <class Stream>
 	bool serialize(Stream& s, mode_commands::team_choice& c) {
 		return serialize_enum(s, c);
 	}
@@ -188,6 +184,11 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream& s, mode_commands::special_purchase& c) {
+		return serialize_enum(s, c);
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, match_command& c) {
 		return serialize_enum(s, c);
 	}
 

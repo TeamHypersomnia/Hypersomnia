@@ -3853,3 +3853,22 @@ which can be done from Settings->Reset all settings to factory default.
 - less delay for uwota
 - fix triad missing explosions
 
+- galilea can't be hidden. We must decrease it's space occupied drastically
+	- possibly even mags
+
+- do_server_vars
+	- both in settings gui cpp and in rcon
+	- just simply apply & save buttons along with revert
+	- these changes are too important
+	- we can easily make snapshots of vars applied
+
+- Re-transmission of server_vars as a universal rcon feature
+	- Handles map changing
+		- How do we load arena?
+		- Do we deterministically re-insert all clients?
+			- Probably 
+
+- Maybe allow map changing through rcon so that we could switch to this other map?
+
+- Check if there's no room for error in those connection tokens
+

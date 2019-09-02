@@ -27,6 +27,9 @@ S& pretty_print(S& os, const T& val) {
 			os << val;
 		}
 	}
+	else if constexpr(std::is_convertible_v<T, std::string>) {
+		os << val.operator std::string();
+	}
 	else if constexpr(is_optional_v<T>) {
 		if (val != std::nullopt) {
 			pretty_print(os, *val);

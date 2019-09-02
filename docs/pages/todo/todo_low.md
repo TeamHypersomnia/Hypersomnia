@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- pretty print - check if convertible to string
+
 - Calculation might be off for orbital streams due to quick movements
 	- Offsets are calculated against entities that have already moved
 	- Possible solution

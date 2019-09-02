@@ -713,7 +713,12 @@ message_handler_result server_setup::handle_client_message(
 					using P = remove_cref<decltype(typed_payload)>;
 					using namespace rcon_commands;
 
-					if constexpr(std::is_same_v<P, special>) {
+					if constexpr(std::is_same_v<P, match_command>) {
+						local_collected.mode_general.special_command = typed_payload;
+
+						return continue_v;
+					}
+					else if constexpr(std::is_same_v<P, special>) {
 						switch (typed_payload) {
 							case special::SHUTDOWN: {
 								LOG("Shutting down due to rcon's request.");
@@ -1656,7 +1661,7 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 		sent.payload.general.added_player.name = "proplayerrrrrrrrrr";
 		sent.payload.general.added_player.faction = faction_type::DEFAULT;
 		sent.payload.general.removed_player = third;
-		sent.payload.general.special_command.emplace<mode_restart_command>();
+		sent.payload.general.special_command = match_command::RESTART_MATCH;
 
 		REQUIRE(ss.write_payload(sent));
 

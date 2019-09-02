@@ -1425,6 +1425,32 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	}
 }
 
+void bomb_mode::swap_assigned_factions(const bomb_mode::participating_factions& p) {
+	for (auto& it : players) {
+		auto& player_data = it.second;
+		p.make_swapped(player_data.faction);
+	}
+}
+
+void bomb_mode::scramble_assigned_factions(const bomb_mode::participating_factions& p) {
+	auto rng = randomization(scramble_counter++);
+
+	std::vector<bomb_mode_player*> ptrs;
+	ptrs.reserve(players.size());
+
+	for (auto& it : players) {
+		ptrs.push_back(std::addressof(it.second));
+	}
+
+	shuffle_range(ptrs, rng);
+
+	const auto off = rng.randval(0, 1); 
+
+	for (std::size_t i = 0; i < ptrs.size(); ++i) {
+		ptrs[i]->faction = (i + off) % 2 ? p.defusing : p.bombing;
+	}
+}
+
 void bomb_mode::handle_special_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	const auto& g = entropy.general;
 
@@ -1435,8 +1461,29 @@ void bomb_mode::handle_special_commands(const input_type in, const mode_entropy&
 			if constexpr(std::is_same_v<C, std::monostate>) {
 
 			}
-			else if constexpr(std::is_same_v<C, mode_restart_command>) {
-				restart(in, step);
+			else if constexpr(std::is_same_v<C, match_command>) {
+				switch (cmd) {
+					case C::RESTART_MATCH:
+						restart(in, step);
+						break;
+
+					case C::RESTART_MATCH_NO_WARMUP:
+						restart(in, step);
+						end_warmup_and_go_live(in, step);
+						break;
+
+					case C::SWAP_TEAMS:
+						swap_assigned_factions(calc_participating_factions(in));
+						restart(in, step);
+						break;
+
+					case C::SCRAMBLE_TEAMS:
+						scramble_assigned_factions(calc_participating_factions(in));
+						restart(in, step);
+						break;
+
+					default: break;
+				}
 			}
 			else {
 				static_assert(always_false_v<C>, "Unhandled command type!");
@@ -1865,6 +1912,16 @@ void bomb_mode::handle_game_commencing(const input_type in, const logic_step ste
 	}
 }
 
+void bomb_mode::end_warmup_and_go_live(const input_type in, const logic_step step) {
+	if (state != arena_mode_state::WARMUP) {
+		return;
+	}
+
+	state = arena_mode_state::LIVE;
+	reset_players_stats(in);
+	setup_round(in, step);
+}
+
 void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	if (state == arena_mode_state::INIT) {
 		restart(in, step);
@@ -1892,9 +1949,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 			}
 
 			if (get_match_begins_in_seconds(in) <= 0.f) {
-				state = arena_mode_state::LIVE;
-				reset_players_stats(in);
-				setup_round(in, step);
+				end_warmup_and_go_live(in, step);
 			}
 		}
 	}
@@ -1926,12 +1981,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 				restart(in, step);
 			}
 			else {
-				/* Switch teams */
-
-				for (auto& it : players) {
-					auto& player_data = it.second;
-					p.make_swapped(player_data.faction);
-				}
+				swap_assigned_factions(p);
 
 				std::swap(factions[p.bombing].score, factions[p.defusing].score);
 

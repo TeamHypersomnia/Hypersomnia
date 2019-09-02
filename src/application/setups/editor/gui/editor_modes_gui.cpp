@@ -76,7 +76,7 @@ mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, 
 					else {
 						if (ImGui::Button("Restart")) {
 							mode_entropy_general cmd;
-							cmd.special_command = mode_restart_command();
+							cmd.special_command = match_command::RESTART_MATCH;
 
 							output += cmd;
 						}

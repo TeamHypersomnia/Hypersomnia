@@ -1,6 +1,7 @@
 #pragma once
 #include "game/common_state/entity_name_str.h"
 #include "game/modes/mode_player_id.h"
+#include "game/modes/mode_commands/match_command.h"
 
 struct add_player_input {
 	// GEN INTROSPECTOR struct add_player_input
@@ -22,27 +23,7 @@ struct add_player_input {
 	}
 };
 
-struct mode_restart_command {
-	// GEN INTROSPECTOR struct mode_restart_command
-	pad_bytes<1> pad;
-	// END GEN INTROSPECTOR
-
-	/* 
-		Prevents trivial-copyability, 
-		and thus copying of the command variant by std::memcpy.
-	*/
-
-	auto& operator=(const mode_restart_command& b) {
-		pad = b.pad;
-		return *this;
-	}
-
-	bool operator==(const mode_restart_command&) const {
-		return true;
-	}
-};
-
 using all_general_mode_commands_variant = std::variant<
 	std::monostate,
-	mode_restart_command
+	match_command
 >;	

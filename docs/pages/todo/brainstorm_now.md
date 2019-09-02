@@ -9,8 +9,6 @@ summary: That which we are brainstorming at the moment.
 - custom chosen ruleset could be a part of mode solvable
 	- or actually client/server solvable (arena_handle)
 
-- pretty print - check if convertible to string
-
 - Write autoupdater so we don't have to save those avatar images in temporary
 	- We'll keep them in cache, just autoupdater will preserve some config values
 	- We might keep the entire config local lua intact, just per-push specify what config values to overwrite
@@ -26,37 +24,18 @@ summary: That which we are brainstorming at the moment.
 			- we'll just give a sensible multiplier
 			- close to fullscreen for shop
 
-- galilea can't be hidden. We must decrease it's space occupied drastically
-	- possibly even mags
-
 - We still have crashes on Windows, even after fixing swap buffers
 	- Perhaps it's a compiler bug since with our home-brewn build everything seemed to be fine
 	- Although I think it was the same with that mega.nz build
 
 - Inventory GUI still acts up
 
-- ask glenn about those tokens
-
-- do_server_vars
-	- both in settings gui cpp and in rcon
-	- just simply apply & save buttons along with revert
-	- these changes are too important
-	- we can easily make snapshots of vars applied
-
 - Ruleset chooser might be a combo too
 	- it might only read the names or ids from the ruleset file
 	- rcon can set values on the go (later)
 	- or load a lua (later)
 
-- Re-transmission of server_vars as a universal rcon feature
-	- Handles map changing
-		- How do we load arena?
-		- Do we deterministically re-insert all clients?
-			- Probably 
-
 - Update imgui later for cool features like builtin tabs
-
-- Maybe allow map changing through rcon so that we could switch to this other map?
 
 - Map transmission
 	- Maybe asynchronously compress the entire map to .7z
@@ -69,7 +48,6 @@ summary: That which we are brainstorming at the moment.
 	- Punches when no weapons
 - RPM could always punch
 
-
 - DO NOT disclose a single rcon password to multiple moderators/admins
 	- That is because a single malicious RCON holder could avoid responsibility for their misdeeds
 	- Instead, just assign permissions to accounts, or just the private IDs
@@ -79,8 +57,6 @@ summary: That which we are brainstorming at the moment.
 - Do we want to somehow let the user be able to rollback to older versions?
 	- How do we even do it? Build retention on appveyor?
 	- Not now, certainly not until editor is publicly usable
-
-- Check if there's no room for error in those connection tokens
 
 - Dedicated server communication
 	- Advanced RCON functionality
