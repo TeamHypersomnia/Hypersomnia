@@ -74,7 +74,7 @@ server_setup::server_setup(
 		integrated_client.init(server_time);
 
 		if (!integrated_client_vars.avatar_image_path.empty()) {
-			auto& png = integrated_client.meta.avatar.png_bytes;
+			auto& png = integrated_client.meta.avatar.image_bytes;
 
 			try {
 				png = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
@@ -873,7 +873,7 @@ message_handler_result server_setup::handle_client_message(
 
 			if (read_payload(dummy_id, payload)) {
 				try {
-					const auto size = augs::image::get_size(payload.png_bytes);
+					const auto size = augs::image::get_size(payload.image_bytes);
 
 					if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
 						const auto disconnect_reason = typesafe_sprintf("sending an avatar of size %xx%x", size.x, size.y);
@@ -1387,7 +1387,7 @@ std::optional<arena_player_metas> server_setup::get_new_player_metas() {
 		auto& metas = last_player_metas;
 		
 		auto make_meta = [&](const auto client_id, const auto& cc) {
-			metas[client_id].avatar.png_bytes = cc.meta.avatar.png_bytes;
+			metas[client_id].avatar.image_bytes = cc.meta.avatar.image_bytes;
 		};
 
 		for_each_id_and_client(make_meta, connected_and_integrated_v);

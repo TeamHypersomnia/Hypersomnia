@@ -525,9 +525,9 @@ bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
 	if constexpr(std::is_same_v<U, arena_player_avatar_payload>) {
 		auto& new_avatar = u;
 
-		if (new_avatar.png_bytes.size() > 0) {
+		if (new_avatar.image_bytes.size() > 0) {
 			try {
-				const auto size = augs::image::get_size(new_avatar.png_bytes);
+				const auto size = augs::image::get_size(new_avatar.image_bytes);
 
 				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
 					LOG("The server has tried to send an avatar of size %xx%x!", size.x, size.y);
@@ -734,13 +734,13 @@ void client_setup::send_pending_commands() {
 				arena_player_avatar_payload payload;
 
 				try {
-					payload.png_bytes = augs::file_to_bytes(avatar_path);
+					payload.image_bytes = augs::file_to_bytes(avatar_path);
 				}
 				catch (...) {
-					payload.png_bytes.clear();
+					payload.image_bytes.clear();
 				}
 
-				if (payload.png_bytes.size() > 0 && payload.png_bytes.size() <= max_avatar_bytes_v) {
+				if (payload.image_bytes.size() > 0 && payload.image_bytes.size() <= max_avatar_bytes_v) {
 					const auto dummy_client_id = session_id_type::dead();
 
 					adapter->send_payload(
@@ -752,8 +752,8 @@ void client_setup::send_pending_commands() {
 				}
 				else {
 					const auto reason = typesafe_sprintf(
-						"The avatar file (%x) exceeds the maximum size of %x.\nSupply a less entropic PNG file.", 
-						readable_bytesize(payload.png_bytes.size()), 
+						"The avatar file (%x) exceeds the maximum size of %x.\nSupply a less entropic image file.", 
+						readable_bytesize(payload.image_bytes.size()), 
 						readable_bytesize(max_avatar_bytes_v)
 					);
 

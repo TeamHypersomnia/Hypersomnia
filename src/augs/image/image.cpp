@@ -242,7 +242,9 @@ namespace augs {
 				int y;
 				int comp;
 
-				if (!stbi_info(file_path.c_str(), &x, &y, &comp)) {
+				const auto str_path = file_path.string();
+
+				if (!stbi_info(str_path.c_str(), &x, &y, &comp)) {
 					throw image_loading_error("Failed to read size of %x:\nstbi_info returned 0!", file_path);
 				}
 
@@ -309,7 +311,8 @@ namespace augs {
 			int height;
 			int comp;
 
-			const auto result = stbi_load(path.c_str(), &width, &height, &comp, 4);
+			const auto str_path = path.string();
+			const auto result = stbi_load(str_path.c_str(), &width, &height, &comp, 4);
 
 			if (result == nullptr) {
 				throw image_loading_error(
@@ -330,7 +333,7 @@ namespace augs {
 
 		try {
 			augs::file_to_bytes(path, loaded_bytes);
-			from_png_bytes(loaded_bytes, path);
+			from_image_bytes(loaded_bytes, path);
 		}
 		catch (const augs::file_open_error& err) {
 			throw image_loading_error(
@@ -361,7 +364,7 @@ namespace augs {
 		const auto extension = reported_path.extension();
 
 		if (extension == ".png") {
-			from_png_bytes(from, reported_path);
+			from_image_bytes(from, reported_path);
 		}
 		else if (extension == ".bin") {
 			auto in = augs::cref_memory_stream(from);
@@ -386,7 +389,7 @@ namespace augs {
 		}
 	}
 
-	void image::from_png_bytes(
+	void image::from_image_bytes(
 		const std::vector<std::byte>& from, 
 		const path_type& reported_path
 	) {
@@ -564,7 +567,7 @@ namespace augs {
 		}
 	}
 
-	std::vector<std::byte> image::to_png_bytes() const {
+	std::vector<std::byte> image::to_image_bytes() const {
 		std::vector<std::byte> saved_bytes;
 
 		if (const auto lodepng_result = encode_rgba(saved_bytes, v, size.x, size.y)) {

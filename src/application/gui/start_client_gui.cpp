@@ -118,18 +118,17 @@ bool start_client_gui_state::perform(
 
 					if (sz != loaded_image.get_size()) {
 						was_shrinked = true;
-
 						loaded_image.scale(sz);
-
-						const auto resized_file_path = LOCAL_FILES_DIR "/avatar_resized.png";
-						loaded_image.save_as_png(resized_file_path);
-
-						new_path = resized_file_path;
 					}
 					else {
 						will_be_upscaled = true;
 					}
 				}
+
+				const auto cached_file_path = LOCAL_FILES_DIR "/cached_avatar.png";
+				loaded_image.save_as_png(cached_file_path);
+
+				new_path = cached_file_path;
 			}
 		};
 

@@ -88,7 +88,7 @@ namespace augs {
 			const path_type& reported_path
 		);
 
-		void from_png_bytes(
+		void from_image_bytes(
 			const std::vector<std::byte>& from, 
 			const path_type& reported_path
 		);
@@ -129,7 +129,7 @@ namespace augs {
 			size = {};
 		}
 
-		std::vector<std::byte> to_png_bytes() const;
+		std::vector<std::byte> to_image_bytes() const;
 		void save_as_png(const path_type& path) const;
 		void save_as_binary_file(const path_type& path) const;
 

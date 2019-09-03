@@ -497,8 +497,8 @@ namespace net_messages {
 			return false;
 		}
 
-		payload.png_bytes.resize(size);
-		std::memcpy(payload.png_bytes.data(), data, size);
+		payload.image_bytes.resize(size);
+		std::memcpy(payload.image_bytes.data(), data, size);
 
 		return true;
 	}
@@ -511,7 +511,7 @@ namespace net_messages {
 	) {
 		using id_type = session_id_type::id_value_type;
 
-		const auto& png = payload.png_bytes;
+		const auto& png = payload.image_bytes;
 		auto block = block_allocator(sizeof(id_type) + png.size());
 
 		std::memcpy(block, &session_id.value, sizeof(session_id));

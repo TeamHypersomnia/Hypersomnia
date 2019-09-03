@@ -5,7 +5,7 @@
 #include "game/modes/session_id.h"
 
 struct arena_player_avatar_payload {
-	std::vector<std::byte> png_bytes;
+	std::vector<std::byte> image_bytes;
 };
 
 struct arena_player_network_stats {
@@ -20,7 +20,7 @@ struct arena_player_meta {
 	public_client_settings public_settings;
 
 	void clear_session_channeled_data() {
-		avatar.png_bytes.clear();
+		avatar.image_bytes.clear();
 		stats = {};
 		session_id = {};
 	}

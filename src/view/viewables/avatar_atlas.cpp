@@ -15,8 +15,8 @@ avatar_atlas_output create_avatar_atlas(avatar_atlas_input in) {
 		auto& meta = in.subjects[i];
 		auto& avatar = meta.avatar;
 
-		if (avatar.png_bytes.size() > 0) {
-			atlas_subjects.loaded_images.push_back(std::move(avatar.png_bytes));
+		if (avatar.image_bytes.size() > 0) {
+			atlas_subjects.loaded_images.push_back(std::move(avatar.image_bytes));
 			indices_of_existing.push_back(i);
 		}
 	}
