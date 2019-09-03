@@ -9,8 +9,6 @@ summary: That which we are brainstorming at the moment.
 - We should check if the spectator gui is ready for sudden complete changes to the sampled cosmos
 	- if some entities aren't actually dead for example
 
-- You have released the cursor. To control the crosshair, press Tilde again.
-
 - client_setup replay
 	- for now we can have entire client setups as snapshots
 	- adapter can have a pointer
@@ -27,13 +25,8 @@ summary: That which we are brainstorming at the moment.
 			- we could make it derive arena mixin with a singular arena gui and not at all care about the arena guis found in client setup snapshots
 		- since we want to be able to spectate all players, note that only our client will possess the actual prediction information
 
-
-
 - completely different approach to client setup replay: only record the relevant messages in some mini format?
 	- well it's less out of the box
-
-- jpg/jpeg file support for avatars
-	- stb_image
 
 - custom chosen ruleset could be a part of mode solvable
 	- or actually client/server solvable (arena_handle)

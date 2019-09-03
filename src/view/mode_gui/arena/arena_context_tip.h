@@ -44,7 +44,23 @@ inline void draw_context_tip(
 			return colored(" (UNASSIGNED) ", settings.bound_key_color);
 		}
 
-		return colored(" \"" + key_to_string_shortened(found_k) + "\" ", settings.bound_key_color);
+		const auto key_str = [&]() {
+			const auto shortened = key_to_string_shortened(found_k);
+
+			if (shortened.length() == 1) {
+				return "\"" + shortened + "\"";
+			}
+
+			const auto alt_char = key_to_alternative_char_representation(found_k);
+
+			if (alt_char.empty()) {
+				return shortened;
+			}
+
+			return alt_char + " (" + shortened + ")" ;
+		}();
+
+		return colored(" " + key_str + " ", settings.bound_key_color);
 	};
 
 	const auto final_pos = vec2i(screen_size.x / 2, settings.tip_offset_mult * screen_size.y);

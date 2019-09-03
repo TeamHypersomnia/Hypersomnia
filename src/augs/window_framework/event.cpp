@@ -255,6 +255,28 @@ namespace augs {
 				}
 			}
 
+			std::string key_to_alternative_char_representation(const key k) {
+				switch (k) {
+				case key::MULTIPLY: return "*"; break;
+				case key::ADD: return "+"; break;
+				case key::SUBTRACT: return "-"; break;
+				case key::DIVIDE: return "/"; break;
+				case key::TILDE: return "~"; break;
+				case key::EQUAL: return "="; break;
+				case key::SEMICOLON: return ";"; break;
+				case key::PLUS: return "+"; break;
+				case key::COMMA: return ","; break;
+				case key::MINUS: return "-"; break;
+				case key::PERIOD: return "."; break;
+				case key::SLASH: return "/"; break;
+				case key::OPEN_SQUARE_BRACKET: return "["; break;
+				case key::BACKSLASH: return "\\"; break;
+				case key::CLOSE_SQUARE_BRACKET: return "]"; break;
+				case key::APOSTROPHE: return "'"; break;
+				default: return ""; break;
+				}
+			}
+
 			std::string key_to_string(const key k) {
 				switch (k) {
 				case key::INVALID: return "INVALID"; break;

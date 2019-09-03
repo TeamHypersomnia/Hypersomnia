@@ -3872,3 +3872,8 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Check if there's no room for error in those connection tokens
 
+- You have released the cursor. To control the crosshair, press Tilde again.
+
+- jpg/jpeg file support for avatars
+	- stb_image
+
