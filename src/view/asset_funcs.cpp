@@ -31,7 +31,7 @@ namespace assets {
 	template <class T>
 	bool is_supported_extension(const std::string& ext) {
 		if constexpr(std::is_same_v<T, assets::image_id>) {
-			return ext == ".png";
+			return ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".tga" || ext == ".bmp";
 		}
 		else if constexpr(std::is_same_v<T, assets::sound_id>) {
 			return ext == ".wav" || ext == ".ogg";

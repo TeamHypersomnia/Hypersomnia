@@ -16,7 +16,7 @@ avatar_atlas_output create_avatar_atlas(avatar_atlas_input in) {
 		auto& avatar = meta.avatar;
 
 		if (avatar.png_bytes.size() > 0) {
-			atlas_subjects.loaded_pngs.push_back(std::move(avatar.png_bytes));
+			atlas_subjects.loaded_images.push_back(std::move(avatar.png_bytes));
 			indices_of_existing.push_back(i);
 		}
 	}
@@ -43,10 +43,10 @@ avatar_atlas_output create_avatar_atlas(avatar_atlas_input in) {
 	avatar_atlas_output out;
 	out.atlas_size = baked.atlas_image_size;
 
-	ensure_eq(indices_of_existing.size(), baked.loaded_pngs.size());
+	ensure_eq(indices_of_existing.size(), baked.loaded_images.size());
 
 	for (int i = 0; i < static_cast<int>(indices_of_existing.size()); ++i) {
-		const auto& baked_image = baked.loaded_pngs[i];
+		const auto& baked_image = baked.loaded_images[i];
 		const auto& idx_in_entries = indices_of_existing[i];
 
 		out.atlas_entries[idx_in_entries] = baked_image;

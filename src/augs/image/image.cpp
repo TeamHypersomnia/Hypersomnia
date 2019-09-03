@@ -15,6 +15,9 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/image/blit.h"
 #include "augs/readwrite/byte_file.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "3rdparty/stb/stb_image.h"
+#include "augs/readwrite/memory_stream.h"
 
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "3rdparty/stb/stb_image_resize.h"
@@ -145,75 +148,17 @@ static void Line(
 	}
 }
 
+auto& thread_local_file_buffer() {
+	thread_local std::vector<std::byte> loaded_bytes;
+	loaded_bytes.clear();
+	return loaded_bytes;
+}
+
 namespace augs {
 	static void throw_if_zero_size(const path_type& path, const vec2u size) {
 		if (!size.x || !size.y) {
 			throw image_loading_error("Failed to load image %x:\nWidth or height is zero!", path);
 		}
-	}
-
-	vec2u image::get_png_size(const std::vector<std::byte>& bytes) {
-#if BUILD_IMAGE
-		const auto minimum_bytes = 16 + 4 + 4 + 1;
-
-		if (bytes.size() < minimum_bytes) {
-			throw image_loading_error("Failed to read size of byte vector. The number of bytes is %x, has to be at least %x.", bytes.size(), minimum_bytes);
-		}
-
-		uint32_t width;
-		uint32_t height;
-
-		std::memcpy(&width, &bytes[16], sizeof(uint32_t));
-		std::memcpy(&height, &bytes[20], sizeof(uint32_t));
-
-		width = ntohl(width);
-		height = ntohl(height);
-
-		return { width, height };
-#else
-		return vec2u::zero;
-#endif
-	}
-
-	vec2u image::get_size(const path_type& file_path) {
-#if BUILD_IMAGE
-		try {
-			const auto extension = file_path.extension();
-			auto in = with_exceptions<std::ifstream>();
-			in.open(file_path, std::ios::in | std::ios::binary);
-
-			if (extension == ".png") {
-				unsigned int width, height;
-
-				in.seekg(16);
-				in.read((char*)&width, 4);
-				in.read((char*)&height, 4);
-
-				width = ntohl(width);
-				height = ntohl(height);
-
-				return { width, height };
-			}
-			else if (extension == ".bin") {
-				vec2u s;
-				augs::read_bytes(in, s);
-				return s;
-			}
-			else {
-				throw image_loading_error(
-					"Failed to read size of %x:\nUnknown image extension: %x!", file_path, extension
-				);
-			}
-		}
-		catch (const image_loading_error& err) {
-			throw;
-		}
-		catch (const std::exception& err) {
-			throw image_loading_error("Failed to read size of %x:\n%x", file_path, err.what());
-		}
-#else
-		return vec2u::zero;
-#endif
 	}
 
 	image image::white_pixel() {
@@ -251,36 +196,147 @@ namespace augs {
 		}
 	}
 
-	image::image(const path_type& path) {
-		from_file(path);
+	void image::load_stbi_buffer(unsigned char* buf, const int w, const int h) {
+		size.x = w;
+		size.y = h;
+
+		v.resize(size.area() * 4);
+		std::memcpy(v.data(), buf, v.size());
+
+		stbi_image_free(reinterpret_cast<void*>(buf));
 	}
-	
+
+	vec2u image::get_size(const path_type& file_path) {
+#if BUILD_IMAGE
+		try {
+			const auto extension = file_path.extension();
+
+			auto do_open_file = [&]() {
+				auto in = with_exceptions<std::ifstream>();
+				in.open(file_path, std::ios::in | std::ios::binary);
+				return in;
+			};
+
+			if (extension == ".png") {
+				unsigned int width, height;
+
+				auto in = do_open_file();
+				in.seekg(16);
+				in.read((char*)&width, 4);
+				in.read((char*)&height, 4);
+
+				width = ntohl(width);
+				height = ntohl(height);
+
+				return { width, height };
+			}
+			else if (extension == ".bin") {
+				vec2u s;
+
+				auto in = do_open_file();
+				augs::read_bytes(in, s);
+				return s;
+			}
+			else {
+				int x;
+				int y;
+				int comp;
+
+				if (!stbi_info(file_path.c_str(), &x, &y, &comp)) {
+					throw image_loading_error("Failed to read size of %x:\nstbi_info returned 0!", file_path);
+				}
+
+				return vec2u(x, y);
+			}
+		}
+		catch (const image_loading_error& err) {
+			throw;
+		}
+		catch (const std::exception& err) {
+			throw image_loading_error("Failed to read size of %x:\n%x", file_path, err.what());
+		}
+#else
+		return vec2u::zero;
+#endif
+	}
+
+	vec2u image::get_size(const std::vector<std::byte>& bytes) {
+		int x;
+		int y;
+		int comp;
+
+		if (!stbi_info_from_memory(reinterpret_cast<const unsigned char*>(bytes.data()), static_cast<int>(bytes.size()), &x, &y, &comp)) {
+			return vec2u(0, 0);
+		}
+
+		return vec2u(x, y);
+	}
+
+	vec2u image::get_png_size(const std::vector<std::byte>& bytes) {
+#if BUILD_IMAGE
+		const auto minimum_bytes = 16 + 4 + 4 + 1;
+
+		if (bytes.size() < minimum_bytes) {
+			throw image_loading_error("Failed to read size of byte vector. The number of bytes is %x, has to be at least %x.", bytes.size(), minimum_bytes);
+		}
+
+		uint32_t width;
+		uint32_t height;
+
+		std::memcpy(&width, &bytes[16], sizeof(uint32_t));
+		std::memcpy(&height, &bytes[20], sizeof(uint32_t));
+
+		width = ntohl(width);
+		height = ntohl(height);
+
+		return { width, height };
+#else
+		return vec2u::zero;
+#endif
+	}
+
 	void image::from_file(const path_type& path) {
 		const auto extension = path.extension();
 
-		if (extension == "") {
-			const auto resolved_path = augs::switch_path(
-				augs::path_type(path) += ".png",
-				augs::path_type(path) += ".bin"
-			);
-
-			from_file(resolved_path);
+		if (extension == ".png") {
+			from_png(path);
+		}
+		else if (extension == ".bin") {
+			from_binary_file(path);
 		}
 		else {
-			if (extension == ".png") {
-				from_png(path);
-			}
-			else if (extension == ".bin") {
-				from_binary_file(path);
-			}
-			else {
+			int width;
+			int height;
+			int comp;
+
+			const auto result = stbi_load(path.c_str(), &width, &height, &comp, 4);
+
+			if (result == nullptr) {
 				throw image_loading_error(
-					"Failed to load image %x:\nUnknown image extension: %x!", path, extension
+					"Failed to load image %x (earlier loaded into memory):\nstbi returned NULL", path
 				);
 			}
+
+			load_stbi_buffer(result, width, height);
 		}
 
 		throw_if_zero_size(path, size);
+	}
+
+	void image::from_png(const path_type& path) {
+		v.clear();
+
+		auto& loaded_bytes = thread_local_file_buffer();
+
+		try {
+			augs::file_to_bytes(path, loaded_bytes);
+			from_png_bytes(loaded_bytes, path);
+		}
+		catch (const augs::file_open_error& err) {
+			throw image_loading_error(
+				"Failed to open the avatar file:\n%x\nEnsure that the file exists and the path is correct.\n\nDetails:\n%x", path, err.what()
+			);
+		}
 	}
 
 	void image::from_binary_file(const path_type& path) try {
@@ -298,8 +354,39 @@ namespace augs {
 		);
 	}
 
+	void image::from_bytes(
+		const std::vector<std::byte>& from, 
+		const path_type& reported_path
+	) {
+		const auto extension = reported_path.extension();
 
-	void image::from_png(
+		if (extension == ".png") {
+			from_png_bytes(from, reported_path);
+		}
+		else if (extension == ".bin") {
+			auto in = augs::cref_memory_stream(from);
+
+			augs::read_bytes(in, size);
+			augs::read_bytes(in, v);
+		}
+		else {
+			int width;
+			int height;
+			int comp;
+
+			const auto result = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(from.data()), static_cast<int>(from.size()), &width, &height, &comp, 4);
+
+			if (result == nullptr) {
+				throw image_loading_error(
+					"Failed to load image %x (earlier loaded into memory):\nstbi returned NULL", reported_path
+				);
+			}
+
+			load_stbi_buffer(result, width, height);
+		}
+	}
+
+	void image::from_png_bytes(
 		const std::vector<std::byte>& from, 
 		const path_type& reported_path
 	) {
@@ -318,36 +405,6 @@ namespace augs {
 		size.y = height;
 
 		throw_if_zero_size(reported_path, size);
-	}
-
-	void image::from_png(const path_type& path) {
-		v.clear();
-
-		unsigned width;
-		unsigned height;
-
-		thread_local std::vector<std::byte> loaded_bytes;
-		loaded_bytes.clear();
-
-		try {
-			augs::file_to_bytes(path, loaded_bytes);
-		}
-		catch (const augs::file_open_error& err) {
-			throw image_loading_error(
-				"Failed to open the avatar file:\n%x\nEnsure that the file exists and the path is correct.\n\nDetails:\n%x", path, err.what()
-			);
-		}
-
-		if (const auto lodepng_result = decode_rgba(v, width, height, loaded_bytes)) {
-			throw image_loading_error(
-				"Failed to load image %x:\nlodepng returned %x", path, lodepng_result
-			);
-		}
-
-		size.x = width;
-		size.y = height;
-
-		throw_if_zero_size(path, size);
 	}
 
 	void image::execute(const paint_command_variant& in) {

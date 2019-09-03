@@ -527,7 +527,7 @@ bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
 
 		if (new_avatar.png_bytes.size() > 0) {
 			try {
-				const auto size = augs::image::get_png_size(new_avatar.png_bytes);
+				const auto size = augs::image::get_size(new_avatar.png_bytes);
 
 				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
 					LOG("The server has tried to send an avatar of size %xx%x!", size.x, size.y);

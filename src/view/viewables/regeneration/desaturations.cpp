@@ -46,7 +46,9 @@ void regenerate_desaturation(
 	if (should_regenerate) {
 		LOG("Regenerating desaturation for %x", source_path);
 
-		augs::image(source_path).desaturate().save(output_path);
+		augs::image input_image;
+		input_image.from_file(source_path);
+		input_image.desaturate().save(output_path);
 
 		augs::create_directories_for(desaturation_stamp_path);
 		augs::bytes_to_file(new_stamp_bytes, desaturation_stamp_path);

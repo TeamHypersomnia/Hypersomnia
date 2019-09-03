@@ -79,7 +79,7 @@ server_setup::server_setup(
 			try {
 				png = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
 
-				const auto size = augs::image::get_png_size(png);
+				const auto size = augs::image::get_size(png);
 
 				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
 					png.clear();
@@ -873,7 +873,7 @@ message_handler_result server_setup::handle_client_message(
 
 			if (read_payload(dummy_id, payload)) {
 				try {
-					const auto size = augs::image::get_png_size(payload.png_bytes);
+					const auto size = augs::image::get_size(payload.png_bytes);
 
 					if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
 						const auto disconnect_reason = typesafe_sprintf("sending an avatar of size %xx%x", size.x, size.y);

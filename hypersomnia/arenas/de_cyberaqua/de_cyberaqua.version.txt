@@ -1,4 +1,4 @@
-Revision no.: 6910 (dirty)
-Build date: Mon Aug 19 01:32:13 2019
+Revision no.: 6968 (dirty)
+Build date: Mon Sep 2 16:15:24 2019
 Commit message:
-Alt+Enter for fullscreen
+Basic match management command(...)

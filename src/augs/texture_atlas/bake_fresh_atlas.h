@@ -14,16 +14,16 @@ using source_font_identifier = augs::font_loading_input;
 struct atlas_input_subjects {
 	std::vector<source_image_identifier> images;
 	std::vector<source_font_identifier> fonts;
-	loaded_png_vector loaded_pngs;
+	loaded_png_vector loaded_images;
 
 	void clear() {
 		images.clear();
 		fonts.clear();
-		loaded_pngs.clear();
+		loaded_images.clear();
 	}
 
 	std::size_t count_images() const {
-		return images.size() + loaded_pngs.size();
+		return images.size() + loaded_images.size();
 	}
 };
 
@@ -32,7 +32,7 @@ struct baked_atlas {
 
 	std::unordered_map<source_image_identifier, augs::atlas_entry> images;
 	std::unordered_map<source_font_identifier, augs::stored_baked_font> fonts;
-	std::vector<augs::atlas_entry> loaded_pngs;
+	std::vector<augs::atlas_entry> loaded_images;
 
 	void clear() {
 		atlas_image_size = {};

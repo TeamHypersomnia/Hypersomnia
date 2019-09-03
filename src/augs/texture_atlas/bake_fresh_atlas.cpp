@@ -67,17 +67,17 @@ void bake_fresh_atlas(
 			}
 		}
 
-		baked.loaded_pngs.resize(subjects.loaded_pngs.size());
+		baked.loaded_images.resize(subjects.loaded_images.size());
 
-		for (const auto& input_png_bytes : subjects.loaded_pngs) {
-			const auto input_img_id = index_in(subjects.loaded_pngs, input_png_bytes);
+		for (const auto& input_image_bytes : subjects.loaded_images) {
+			const auto input_img_id = index_in(subjects.loaded_images, input_image_bytes);
 
-			auto& out_entry = baked.loaded_pngs[input_img_id];
+			auto& out_entry = baked.loaded_images[input_img_id];
 
 			try {
 				const auto u_size = [&]() { 
 					auto sc = measure_scope(scope); 
-					return augs::image::get_png_size(input_png_bytes); 
+					return augs::image::get_size(input_image_bytes); 
 				}();
 
 				out_entry.cached_original_size_pixels = u_size;
@@ -245,8 +245,8 @@ void bake_fresh_atlas(
 				worker_inputs[current_rect].original_index = current_rect;
 			}
 
-			for (const auto& r : subjects.loaded_pngs) {
-				const auto current_rect = subjects.images.size() + static_cast<unsigned>(index_in(subjects.loaded_pngs, r));
+			for (const auto& r : subjects.loaded_images) {
+				const auto current_rect = subjects.images.size() + static_cast<unsigned>(index_in(subjects.loaded_images, r));
 				const auto area = static_cast<unsigned>(rects_for_packer[current_rect].area());
 
 				worker_inputs[current_rect].image_area = area;
@@ -259,20 +259,20 @@ void bake_fresh_atlas(
 		auto scope = measure_scope(out.profiler.blitting_images);
 
 		auto worker = [&output_image, &subjects, &baked, output_image_size](const worker_input& input) {
-			const bool is_loaded_png = input.original_index >= subjects.images.size();
-			const auto loaded_png_index = input.original_index - subjects.images.size();
+			const bool is_loaded_image = input.original_index >= subjects.images.size();
+			const auto loaded_image_index = input.original_index - subjects.images.size();
 
 			const auto current_rect = input.original_index;
 
 			const auto& input_img_id = 
-				is_loaded_png ? 
+				is_loaded_image ? 
 				augs::path_type() : 
 				subjects.images[current_rect]
 			;
 
 			const auto packed_rect = rects_for_packer[current_rect];
 
-			auto& output_entry = is_loaded_png ? baked.loaded_pngs[loaded_png_index] : baked.images[input_img_id];
+			auto& output_entry = is_loaded_image ? baked.loaded_images[loaded_image_index] : baked.images[input_img_id];
 			const auto& error_reported_img_id = input_img_id;
 
 			auto set_glitch_uv = [&output_entry, output_image_size](){
@@ -304,11 +304,11 @@ void bake_fresh_atlas(
 			output_entry.was_flipped = packed_rect.flipped;
 			output_entry.was_successfully_packed = true;
 
-			thread_local augs::image loaded_png;
+			thread_local augs::image loaded_image;
 
 			const auto& source_bytes = 
-				is_loaded_png ?
-				subjects.loaded_pngs[loaded_png_index] :
+				is_loaded_image ?
+				subjects.loaded_images[loaded_image_index] :
 				all_loaded_bytes[current_rect]
 			;
 
@@ -318,7 +318,7 @@ void bake_fresh_atlas(
 			}
 
 			try {
-				loaded_png.from_png(source_bytes, error_reported_img_id);
+				loaded_image.from_bytes(source_bytes, error_reported_img_id);
 			}
 			catch (...) {
 				set_glitch_uv();
@@ -326,11 +326,11 @@ void bake_fresh_atlas(
 			}
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
-			loaded_png.fill(rgba(white).set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+			loaded_image.fill(rgba(white).set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
 #endif
 			augs::blit(
 				output_image,
-				loaded_png,
+				loaded_image,
 				{
 					static_cast<unsigned>(packed_rect.x + 1),
 					static_cast<unsigned>(packed_rect.y + 1)
@@ -340,7 +340,7 @@ void bake_fresh_atlas(
 
 			augs::blit_border(
 				output_image,
-				loaded_png,
+				loaded_image,
 				{
 					static_cast<unsigned>(packed_rect.x + 1),
 					static_cast<unsigned>(packed_rect.y + 1)
@@ -393,6 +393,6 @@ void bake_fresh_atlas(
 	}
 
 #if TEST_SAVE_ATLAS
-	augs::image(output_image.get_data(), output_image.get_size()).save_as_png("/tmp/atl.png");
+	augs::image(output_image.get_data(), output_image.get_size()).save_as_image("/tmp/atl.image");
 #endif
 }

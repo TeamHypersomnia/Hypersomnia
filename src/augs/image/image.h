@@ -65,6 +65,8 @@ namespace augs {
 	class image {
 		std::vector<rgba> v;
 		vec2u size;
+
+		void load_stbi_buffer(unsigned char*, int w, int h);
 	public:
 
 		enum class scaling_method {
@@ -72,8 +74,24 @@ namespace augs {
 		};
 
 		static image white_pixel();
+
 		static vec2u get_size(const path_type& file_path);
+		static vec2u get_size(const std::vector<std::byte>& bytes);
 		static vec2u get_png_size(const std::vector<std::byte>& bytes);
+
+		void from_file(const path_type& path);
+		void from_png(const path_type& path);
+		void from_binary_file(const path_type& path);
+
+		void from_bytes(
+			const std::vector<std::byte>& from, 
+			const path_type& reported_path
+		);
+
+		void from_png_bytes(
+			const std::vector<std::byte>& from, 
+			const path_type& reported_path
+		);
 
 		image(const vec2u image_size = {});
 		
@@ -84,8 +102,6 @@ namespace augs {
 			const unsigned pitch = 0
 		);
 		
-		image(const path_type& file_path);
-
 		void fill(const rgba fill_color);
 
 		void execute(const paint_command_variant&);
@@ -112,16 +128,6 @@ namespace augs {
 			v.clear();
 			size = {};
 		}
-
-		void from_file(const path_type& path);
-		void from_png(const path_type& path);
-
-		void from_png(
-			const std::vector<std::byte>& from, 
-			const path_type& reported_path
-		);
-
-		void from_binary_file(const path_type& path);
 
 		std::vector<std::byte> to_png_bytes() const;
 		void save_as_png(const path_type& path) const;

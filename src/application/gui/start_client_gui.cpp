@@ -106,7 +106,7 @@ bool start_client_gui_state::perform(
 			bool will_be_upscaled = false;
 
 			void load_image(const augs::path_type& from) {
-				loaded_image.from_png(from);
+				loaded_image.from_file(from);
 
 				const auto max_s = static_cast<unsigned>(max_avatar_side_v);
 
@@ -175,8 +175,8 @@ bool start_client_gui_state::perform(
 				std::launch::async,
 				[&window]() {
 					const std::vector<augs::window::file_dialog_filter> filters = { {
-						"PNG file",
-						"*.png"
+						"Image file",
+						"*.png;*.jpg;*.jpeg;*.bmp;*.tga"
 					} };
 
 					loading_result out;

@@ -13,6 +13,23 @@
 #include "augs/readwrite/lua_readwrite_errors.h"
 #include "view/load_meta_lua.h"
 
+inline auto find_with_existent_extension(const augs::path_type& path_wo_extension) {
+	const std::array<const char*, 5> exts = {
+		".png", ".jpg", ".jpeg", ".tga", ".bmp"
+	};
+
+	for (const auto e : exts) {
+		auto candidate = path_wo_extension;
+		candidate += e;
+
+		if (augs::exists(candidate)) {
+			return candidate;
+		}
+	}
+
+	return augs::path_type();
+}
+
 struct test_image_does_not_exist {
 
 };
@@ -27,11 +44,19 @@ void load_test_scene_images(
 
 	auto register_image = [&](const augs::path_type& at_stem) -> decltype(auto) {
 		image_definition definition;
-		definition.set_source_path({ add_image_ext(at_stem.string()), true });
+		definition.set_source_path({ at_stem.string(), true });
 
-		if (!augs::exists(definition.get_source_path().resolve({}))) {
+		const auto resolved_no_ext = definition.get_source_path().resolve({});
+		const auto with_existent_ext = find_with_existent_extension(resolved_no_ext);
+
+		if (with_existent_ext.empty()) {
 			throw test_image_does_not_exist{};
 		}
+
+		auto final_path = at_stem ;
+		final_path += with_existent_ext.extension();
+
+		definition.set_source_path({ final_path.string(), true });
 
 		try {
 			load_meta_lua_if_exists(

@@ -16,8 +16,3 @@ template <class T>
 auto enum_to_image_path(const T& enum_id) {
 	return maybe_official_path<assets::image_id>{ enum_to_image_stem(enum_id) + ".png", true };
 }
-
-template <class T>
-auto add_image_ext(const T& img) {
-	return img + ".png";
-}
