@@ -74,19 +74,19 @@ server_setup::server_setup(
 		integrated_client.init(server_time);
 
 		if (!integrated_client_vars.avatar_image_path.empty()) {
-			auto& png = integrated_client.meta.avatar.image_bytes;
+			auto& image_bytes = integrated_client.meta.avatar.image_bytes;
 
 			try {
-				png = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
+				image_bytes = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
 
-				const auto size = augs::image::get_size(png);
+				const auto size = augs::image::get_size(image_bytes);
 
 				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
-					png.clear();
+					image_bytes.clear();
 				}
 			}
 			catch (...) {
-				png.clear();
+				image_bytes.clear();
 			}
 		}
 

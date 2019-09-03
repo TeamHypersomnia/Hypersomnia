@@ -6,7 +6,7 @@
 #include "augs/image/font.h"
 #include "augs/texture_atlas/atlas_profiler.h"
 
-#include "augs/texture_atlas/loaded_png_vector.h"
+#include "augs/texture_atlas/loaded_images_vector.h"
 
 using source_image_identifier = augs::path_type;
 using source_font_identifier = augs::font_loading_input;
@@ -14,7 +14,7 @@ using source_font_identifier = augs::font_loading_input;
 struct atlas_input_subjects {
 	std::vector<source_image_identifier> images;
 	std::vector<source_font_identifier> fonts;
-	loaded_png_vector loaded_images;
+	loaded_images_vector loaded_images;
 
 	void clear() {
 		images.clear();

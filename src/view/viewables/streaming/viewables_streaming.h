@@ -14,7 +14,7 @@
 #include "view/viewables/atlas_distributions.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/viewables/avatars_in_atlas_map.h"
-#include "augs/texture_atlas/loaded_png_vector.h"
+#include "augs/texture_atlas/loaded_images_vector.h"
 #include "view/viewables/regeneration/atlas_progress_structs.h"
 #include "augs/graphics/frame_num_type.h"
 

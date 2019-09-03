@@ -8,7 +8,7 @@
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "view/viewables/avatars_in_atlas_map.h"
-#include "augs/texture_atlas/loaded_png_vector.h"
+#include "augs/texture_atlas/loaded_images_vector.h"
 
 /* 
 	The standard atlas distribution is the simplest one where
