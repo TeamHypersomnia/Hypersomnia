@@ -1122,10 +1122,6 @@ augs::path_type client_setup::get_unofficial_content_dir() const {
 	return paths.folder_path;
 }
 
-bool client_setup::is_loopback() const {
-	return is_connected() && adapter->get_server_address().IsLoopback();
-}
-
 bool client_setup::handle_input_before_game(
 	const handle_input_before_game_input in
 ) {

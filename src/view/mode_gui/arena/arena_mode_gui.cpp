@@ -966,7 +966,8 @@ void arena_gui_state::draw_mode_gui(
 				viewed_player_handle,
 				viewed_player_data->faction,
 				choose_team.show,
-				buy_menu.show
+				buy_menu.show,
+				in.is_cursor_released
 			);
 		};
 

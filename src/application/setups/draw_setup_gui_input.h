@@ -33,6 +33,7 @@ struct draw_setup_gui_input {
 	const all_loaded_gui_fonts& gui_fonts;
 	const all_necessary_sounds& sounds;
 	const arena_player_metas* const player_metas;
+	const bool is_cursor_released;
 
 	auto get_drawer() const {
 		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank_texture };

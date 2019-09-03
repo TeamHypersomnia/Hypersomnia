@@ -15,7 +15,8 @@ inline void draw_context_tip(
 	const E& viewed_character,
 	const faction_type current_faction,
 	const bool team_choice_opened,
-	const bool buy_menu_opened
+	const bool buy_menu_opened,
+	const bool is_cursor_released
 ) {
 	using namespace augs::gui::text;
 	using namespace augs::event;
@@ -110,6 +111,14 @@ inline void draw_context_tip(
 		}
 
 		if (!sentient_and_conscious(viewed_character)) {
+			return total_text;
+		}
+
+		if (is_cursor_released) {
+			text("You have released the cursor and can now interact with GUI.");
+			break_line();
+			text("To control the crosshair, press"); hotkey(general_gui_intent_type::TOGGLE_MOUSE_CURSOR); text("again.");
+
 			return total_text;
 		}
 

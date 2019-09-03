@@ -2042,7 +2042,8 @@ and then hitting Save settings.
 						screen_size,
 						streaming.get_loaded_gui_fonts(),
 						necessary_sounds,
-						player_metas
+						player_metas,
+						game_gui_mode
 					});
 
 					chosen_renderer.call_and_clear_lines();

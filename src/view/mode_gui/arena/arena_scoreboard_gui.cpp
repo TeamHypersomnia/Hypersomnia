@@ -211,10 +211,10 @@ void arena_scoreboard_gui::draw_gui(
 		}
 	}
 
-	auto print_col_text = [&](const column& c, const auto& text, const auto& col) {
+	auto print_col_text = [&](const column& c, const auto& text, const auto& col, bool force_right_align = false) {
 		const auto& pp = cell_pad;
 
-		if (c.align_right) {
+		if (force_right_align || c.align_right) {
 			text_stroked(text, col, vec2i(c.r - pp.x - calc_size(text).x, pp.y));
 		}
 		else {
@@ -646,6 +646,7 @@ void arena_scoreboard_gui::draw_gui(
 
 			next_col();
 			col_text(player_data.chosen_name);
+			print_col_text(*current_column, "(Kierownik imprezy)", white, true);
 			next_col();
 
 			const auto& stats = player_data.stats;
