@@ -646,7 +646,7 @@ void arena_scoreboard_gui::draw_gui(
 
 			next_col();
 			col_text(player_data.chosen_name);
-			print_col_text(*current_column, "(Kierownik imprezy)", white, true);
+			//print_col_text(*current_column, "(Kierownik imprezy)", white, true);
 			next_col();
 
 			const auto& stats = player_data.stats;

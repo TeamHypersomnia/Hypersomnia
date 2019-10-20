@@ -15,13 +15,13 @@ install:
   - mkdir C:\projects\deps
   - cd C:\projects\deps
 
-  - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip"
+  - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip"
   - appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
   - 7z x ninja.zip -oC:\projects\deps\ninja > nul
   - set PATH=C:\projects\deps\ninja;%PATH%
   - ninja --version
 
-  - appveyor DownloadFile http://releases.llvm.org/7.0.1/LLVM-7.0.1-win64.exe -FileName llvm-installer.exe
+  - appveyor DownloadFile http://releases.llvm.org/9.0.0/LLVM-9.0.0-win64.exe -FileName llvm-installer.exe
   - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
 
 notifications:

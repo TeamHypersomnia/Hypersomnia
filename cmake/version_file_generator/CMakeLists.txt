@@ -73,7 +73,19 @@ add_executable(version_file_generator
 if (MSVC)
 
 elseif (CLANG)
-	target_link_libraries(version_file_generator c++fs c++experimental)
+	target_link_libraries(version_file_generator c++experimental)
+
+	EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE clang_full_version_string )
+	string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${clang_full_version_string})
+
+	message("Clang version: ${CLANG_VERSION_STRING}")
+
+	if (CLANG_VERSION_STRING VERSION_LESS 9.0)
+		message("Appending c++fs.")
+		target_link_libraries(version_file_generator c++fs)
+	else()
+		message("Omitting c++fs.")
+	endif()
 elseif(GCC)
 	target_link_libraries(version_file_generator stdc++fs)
 endif()
