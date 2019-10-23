@@ -226,7 +226,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_uniform(shaders.fog_of_war, U::eye_frag_pos, eye_frag_pos);
 
 		renderer.call_triangles(D::FOG_OF_WAR);
-		renderer.start_testing_stencil();
+
+		renderer.finish_writing_stencil();
+		renderer.set_stencil(false);
 	};
 
 	auto draw_sentiences = [&](auto& shader) {
@@ -235,6 +237,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			shader.set_as_current(renderer);
 
+			renderer.set_stencil(true);
 			renderer.call_triangles(D::ENEMY_SENTIENCES);
 			renderer.set_stencil(false);
 
@@ -346,7 +349,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	if (fog_of_war_effective) {
 		renderer.call_and_clear_triangles();
 		write_fow_to_stencil();
-		renderer.set_stencil(false);
 	}
 
 	light.render_all_lights(light_input);
@@ -458,6 +460,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		);
 
 		renderer.call_and_clear_triangles();
+		renderer.set_stencil(false);
 	}
 
 	draw_sentiences(*shaders.illuminated);

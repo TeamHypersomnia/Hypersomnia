@@ -49,7 +49,7 @@ namespace augs {
 			void clear_stencil();
 
 			void start_writing_stencil();
-			void start_testing_stencil();
+			void finish_writing_stencil();
 
 			void stencil_positive_test();
 			void stencil_reverse_test();

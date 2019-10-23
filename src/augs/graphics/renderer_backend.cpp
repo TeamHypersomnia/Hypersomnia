@@ -242,7 +242,7 @@ namespace augs {
 							case N::SET_ADDITIVE_BLENDING: set_additive_blending(); break;
 							case N::CLEAR_STENCIL: clear_stencil(); break;
 							case N::START_WRITING_STENCIL: start_writing_stencil(); break;
-							case N::START_TESTING_STENCIL: start_testing_stencil(); break;
+							case N::FINISH_WRITING_STENCIL: finish_writing_stencil(); break;
 							case N::STENCIL_POSITIVE_TEST: stencil_positive_test(); break;
 							case N::STENCIL_REVERSE_TEST: stencil_reverse_test(); break;
 
@@ -430,7 +430,7 @@ namespace augs {
 			GL_CHECK(glStencilFunc(GL_EQUAL, 1, 0xFF));
 		}
 
-		void renderer_backend::start_testing_stencil() {
+		void renderer_backend::finish_writing_stencil() {
 			stencil_reverse_test();
 			GL_CHECK(glStencilMask(0x00));
 			GL_CHECK(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));

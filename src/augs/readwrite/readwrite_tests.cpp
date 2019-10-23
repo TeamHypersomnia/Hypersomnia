@@ -1,3 +1,4 @@
+#if !IS_PRODUCTION_BUILD
 #if BUILD_UNIT_TESTS
 #include "augs/log.h"
 #include <Catch/single_include/catch2/catch.hpp>
@@ -404,4 +405,5 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 		readwrite_test_cycle(v);
 	}
 }
+#endif
 #endif

@@ -288,8 +288,8 @@ namespace augs {
 		push_no_arg(no_arg_command::STENCIL_POSITIVE_TEST);
 	}
 
-	void renderer::start_testing_stencil() {
-		push_no_arg(no_arg_command::START_TESTING_STENCIL);
+	void renderer::finish_writing_stencil() {
+		push_no_arg(no_arg_command::FINISH_WRITING_STENCIL);
 	}
 
 }

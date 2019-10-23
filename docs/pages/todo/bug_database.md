@@ -5,6 +5,9 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Strange performance problem when paused in editor?
+	- We had Unity and OBS turned on...
+
 - The inventory bug with atlas being shown in place of a backpack was due to there being an old Brown backpack sprite on fy_minilab
 
 

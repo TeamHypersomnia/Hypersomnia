@@ -113,7 +113,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	ensure_eq(static_cast<std::size_t>(0), renderer.get_triangle_count());
 
 	in.light_fbo.set_as_current(renderer);
-	
+	in.write_fow_to_stencil();
+
 	renderer.set_clear_color(cosm.get_common_significant().ambient_light_color);
 	renderer.clear_current_fbo();
 	renderer.set_clear_color({ 0, 0, 0, 0 });
@@ -292,12 +293,11 @@ void light_system::render_all_lights(const light_system_input in) const {
 	{
 		if (const auto fog_of_war_character = cosm[in.fog_of_war_character ? *in.fog_of_war_character : entity_id()]) {
 			renderer.call_and_clear_triangles();
-			in.write_fow_to_stencil();
 			renderer.stencil_positive_test();
 			standard_shader.set_as_current(renderer);
 
+			renderer.set_stencil(true);
 			renderer.call_triangles(D::NEONS_ENEMY_SENTIENCES);
-
 			renderer.set_stencil(false);
 
 			renderer.call_triangles(D::NEONS_FRIENDLY_SENTIENCES);
