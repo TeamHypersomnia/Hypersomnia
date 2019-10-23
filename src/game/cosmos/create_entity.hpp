@@ -133,40 +133,6 @@ void cosmic::make_suitable_for_cloning(entity_solvable<E>& solvable) {
 	}
 }
 
-template <class handle_type, class P>
-auto cosmic::specific_clone_entity(
-	const handle_type source_entity,
-	P&& pre_construction
-) {
-	auto& cosm = source_entity.get_cosmos();
-
-	return cosmic::specific_create_entity(cosm, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
-		const auto& source_components = source_entity.get({}).component_state;
-		auto& new_solvable = new_entity.get({});
-		auto& new_components = new_solvable.component_state;
-
-		/* Initial copy-assignment */
-		new_components = source_components; 
-
-		cosmic::make_suitable_for_cloning(new_solvable);
-
-		pre_construction(new_entity);
-
-		if (const auto slot = source_entity.get_current_slot()) {
-			if (const auto source_transform = source_entity.find_logic_transform()) {
-				new_entity.set_logic_transform(*source_transform);
-			}
-		}
-
-		return new_entity;
-	});
-}
-
-template <class handle_type>
-auto cosmic::specific_clone_entity(const handle_type source_entity) {
-	return specific_clone_entity(source_entity, [](auto&&...) {});
-}
-
 template <class E>
 auto cosmos_solvable::allocate_new_entity(const entity_creation_input in) {
 	auto& pool = significant.get_pool<E>();

@@ -46,6 +46,28 @@ using all_entity_types = type_list<
 	tool_item
 >;
 
+#define FOR_ALL_ENTITY_TYPES(MACRO) \
+	MACRO(plain_sprited_body) \
+	MACRO(controlled_character) \
+	MACRO(plain_missile) \
+	MACRO(shootable_weapon) \
+	MACRO(shootable_charge) \
+	MACRO(melee_weapon) \
+	MACRO(sprite_decoration) \
+	MACRO(complex_decoration) \
+	MACRO(wandering_pixels_decoration) \
+	MACRO(static_light) \
+	MACRO(hand_explosive) \
+	MACRO(finishing_trace) \
+	MACRO(container_item) \
+	MACRO(remnant_body) \
+	MACRO(sound_decoration) \
+	MACRO(particles_decoration) \
+	MACRO(point_marker) \
+	MACRO(box_marker) \
+	MACRO(explosion_body) \
+	MACRO(tool_item)
+
 using entity_type_id = type_in_list_id<all_entity_types>;
 
 constexpr std::size_t ENTITY_TYPES_COUNT = num_types_in_list_v<all_entity_types>;

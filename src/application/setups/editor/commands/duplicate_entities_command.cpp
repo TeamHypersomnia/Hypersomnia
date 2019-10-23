@@ -36,6 +36,7 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 
 	auto& f = in.folder;
 	auto& selections = f.commanded->view_ids.selected_entities;
+	(void)selections;
 	auto& groups = f.commanded->view_ids.selection_groups;
 
 	auto& cosm = in.get_cosmos();
@@ -67,14 +68,14 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 	auto duplicate = [&](auto&& new_transform_setter) {
 		duplicated_entities.for_each([&](auto& e) {
 			try {
-				const auto duplicated = cosmic::specific_clone_entity(cosm[e.source_id]);
+				const auto duplicated = cosmic::specific_clone_entity(*cosm[e.source_id]);
 
 				const bool group_found = groups.on_group_entry_of(e.source_id, [&](auto, const auto& group, auto) {
 					/* 
 						If the source entity was in a group,
 						move the duplicated one to a corresponding group for duplicates.
 					*/
-
+				
 					const auto new_group_name = group.name + new_group_suffix;
 					const auto new_idx = groups.get_group_by(new_group_name);
 
@@ -142,68 +143,65 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 		};
 
 		if (const auto source_aabb = find_aabb_of(cosm, for_each_source_subject)) {
+			const auto mir_dir = mirror_direction;
+
+			auto calc_mirror_offset = [source_aabb, mir_dir](const transformr& source, const std::optional<ltrb>& aabb) {
+				if (mir_dir == vec2i(1, 0)) {
+					if (aabb) {
+						return vec2(2 * source_aabb->r - aabb->l - aabb->r, 0.f);
+					}
+					else {
+						const auto dist_to_axis = source_aabb->r - source.pos.x;
+						return vec2(dist_to_axis * 2, 0.f);
+					}
+				}
+
+				else if (mir_dir == vec2i(-1, 0)) {
+					if (aabb) {
+						return vec2(2 * source_aabb->l - aabb->l - aabb->r, 0.f);
+					}
+					else {
+						const auto dist_to_axis = source.pos.x - source_aabb->l;
+						return vec2(-(dist_to_axis * 2), 0.f);
+					}
+				}
+
+				else if (mir_dir == vec2i(0, 1)) {
+					if (aabb) {
+						return vec2(0.f, 2 * source_aabb->b - aabb->t - aabb->b);
+					}
+					else {
+						const auto dist_to_axis = source_aabb->b - source.pos.y;
+						return vec2(0.f, dist_to_axis * 2);
+					}
+				}
+
+				else {
+					// (mir_dir == vec2i(0, -1)) 
+					if (aabb) {
+						return vec2(0.f, 2 * source_aabb->t - aabb->t - aabb->b);
+					}
+					else {
+						const auto dist_to_axis = source.pos.y - source_aabb->t;
+						return vec2(0.f, -(dist_to_axis * 2));
+					}
+				}
+			};
+
 			if (mirror_direction == vec2i(1, 0)) {
-				duplicate_with_flip(
-					[source_aabb](const transformr& source, const std::optional<ltrb>& aabb) {
-						if (aabb) {
-							return vec2(2 * source_aabb->r - aabb->l - aabb->r, 0.f);
-						}
-						else {
-							const auto dist_to_axis = source_aabb->r - source.pos.x;
-							return vec2(dist_to_axis * 2, 0.f);
-						}
-					},
-					true,
-					false
-				);
+				duplicate_with_flip(calc_mirror_offset, true, false);
 			}
 
 			if (mirror_direction == vec2i(-1, 0)) {
-				duplicate_with_flip(
-					[source_aabb](const transformr& source, const std::optional<ltrb>& aabb) {
-						if (aabb) {
-							return vec2(2 * source_aabb->l - aabb->l - aabb->r, 0.f);
-						}
-						else {
-							const auto dist_to_axis = source.pos.x - source_aabb->l;
-							return vec2(-(dist_to_axis * 2), 0.f);
-						}
-					},
-					true,
-					false
-				);
+				duplicate_with_flip(calc_mirror_offset, true, false);
 			}
 
 			if (mirror_direction == vec2i(0, 1)) {
-				duplicate_with_flip(
-					[source_aabb](const transformr& source, const std::optional<ltrb>& aabb) {
-						if (aabb) {
-							return vec2(0.f, 2 * source_aabb->b - aabb->t - aabb->b);
-						}
-						else {
-							const auto dist_to_axis = source_aabb->b - source.pos.y;
-							return vec2(0.f, dist_to_axis * 2);
-						}
-					},
-					false,
-					true
-				);
+				duplicate_with_flip(calc_mirror_offset, false, true);
 			}
 
 			if (mirror_direction == vec2i(0, -1)) {
-				duplicate_with_flip(
-					[source_aabb](const transformr& source, const std::optional<ltrb>& aabb) {
-						if (aabb) {
-							return vec2(0.f, 2 * source_aabb->t - aabb->t - aabb->b);
-						}
-						else {
-							const auto dist_to_axis = source.pos.y - source_aabb->t;
-							return vec2(0.f, -(dist_to_axis * 2));
-						}
-					},
-					false,
-					true
-				);
+				duplicate_with_flip(calc_mirror_offset, false, true);
 			}
 		}
 	}

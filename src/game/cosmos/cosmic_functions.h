@@ -81,14 +81,8 @@ public:
 	template <class E>
 	static void make_suitable_for_cloning(entity_solvable<E>& solvable);
 
-	template <class handle_type, class P>
-	static auto specific_clone_entity(
-		const handle_type source_entity,
-		P&& pre_construction
-	);
-
-	template <class handle_type>
-	static auto specific_clone_entity(const handle_type source_entity);
+	template <class entity_type>
+	static ref_typed_entity_handle<entity_type> specific_clone_entity(ref_typed_entity_handle<entity_type> source_entity);
 
 	static void undo_last_create_entity(const entity_handle);
 	static std::optional<cosmic_pool_undo_free_input> delete_entity(const entity_handle);

@@ -166,6 +166,9 @@ private:
 	
 	const id_type stored_id;
 
+	template <class DH>
+	friend struct ref_stored_id_provider;
+
 protected:
 	auto& get_subject() const {
 		return subject;
@@ -362,6 +365,12 @@ public:
 
 	bool operator!=(const typed_id_type id) const {
 		return operator typed_id_type() != id;
+	}
+
+
+	template <bool C = is_const, class = std::enable_if_t<!C>>
+	specific_entity_handle<true, entity_type, identifier_provider> to_const() const {
+		return { owner, static_cast<const used_identifier_provider&>(*this) };
 	}
 
 	/* Return a handle with a reference instead of a pointer */

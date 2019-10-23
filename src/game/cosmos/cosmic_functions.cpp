@@ -317,3 +317,31 @@ void reverse_perform_deletions(const deletion_queue& deletions, cosmos& cosm) {
 	}
 }
 
+template <class entity_type>
+ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(const ref_typed_entity_handle<entity_type> in_entity) {
+	const auto source_entity = in_entity.to_const();
+	auto& cosm = in_entity.get_cosmos();
+
+	return cosmic::specific_create_entity(cosm, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
+		const auto& source_components = source_entity.get({}).component_state;
+		auto& new_solvable = new_entity.get({});
+		auto& new_components = new_solvable.component_state;
+
+		/* Initial copy-assignment */
+		new_components = source_components; 
+
+		cosmic::make_suitable_for_cloning(new_solvable);
+
+		if (const auto slot = source_entity.get_current_slot()) {
+			if (const auto source_transform = source_entity.find_logic_transform()) {
+				new_entity.set_logic_transform(*source_transform);
+			}
+		}
+
+		return new_entity;
+	});
+}
+
+#define INSTANTIATE_SPECIFIC_CLONE(entity_type) template ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(const ref_typed_entity_handle<entity_type> in_entity);
+
+FOR_ALL_ENTITY_TYPES(INSTANTIATE_SPECIFIC_CLONE)
