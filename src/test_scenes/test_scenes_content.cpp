@@ -1,3 +1,4 @@
+#include "augs/log_direct.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/cosmos/cosmos_common_significant.h"
 #include "view/viewables/all_viewables_defs.h"
@@ -20,7 +21,7 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 		load_test_scene_sounds(output_sources.sounds);
 	}
 	catch (const test_scene_asset_loading_error& err) {
-		LOG(err.what());
+		LOG_DIRECT(err.what());
 	}
 
 	loaded_image_caches_map out;
@@ -56,7 +57,7 @@ void populate_test_scene_viewables(
 		);
 	}
 	catch (const test_scene_asset_loading_error& err) {
-		LOG(err.what());
+		LOG_DIRECT(err.what());
 	}
 }
 

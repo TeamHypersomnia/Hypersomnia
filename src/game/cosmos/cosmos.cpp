@@ -1,3 +1,4 @@
+#include "augs/ensure_rel.h"
 #include "3rdparty/crc32/crc32.h"
 
 #include "augs/readwrite/memory_stream.h"
@@ -144,7 +145,9 @@ void cosmos::reinfer_everything() {
 
 void cosmos::set_fixed_delta(const augs::delta& dt) {
 	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi){ 
-		ensure_eq(0, current_signi.clk.now.step);
+		using S = decltype(current_signi.clk.now.step);
+
+		ensure_eq(static_cast<S>(0), current_signi.clk.now.step);
 		current_signi.clk.dt = dt;
 		return changer_callback_result::DONT_REFRESH; 
 	});

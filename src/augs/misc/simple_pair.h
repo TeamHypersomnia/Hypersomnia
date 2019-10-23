@@ -1,5 +1,4 @@
 #pragma once
-#include <ostream>
 #include "augs/templates/hash_templates.h"
 #include "augs/templates/can_stream.h"
 
@@ -46,11 +45,12 @@ namespace augs {
 }
 
 template <
+	class S,
 	class A, 
 	class B, 
-	class = std::enable_if_t<can_stream_left_v<std::ostream, A> && can_stream_left_v<std::ostream, B>>
+	class = std::enable_if_t<can_stream_left_v<S, A> && can_stream_left_v<S, B>>
 >
-std::ostream& operator<<(std::ostream& out, const augs::simple_pair<A, B>& x) {
+decltype(auto) operator<<(S& out, const augs::simple_pair<A, B>& x) {
 	return out << '(' << x.first << " - " << x.second << ')';
 }
 

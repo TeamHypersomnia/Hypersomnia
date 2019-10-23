@@ -110,7 +110,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	const auto& cosm = in.cosm;
 
-	ensure_eq(0, renderer.get_triangle_count());
+	ensure_eq(static_cast<std::size_t>(0), renderer.get_triangle_count());
 
 	in.light_fbo.set_as_current(renderer);
 	

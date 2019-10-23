@@ -1,5 +1,7 @@
 #pragma once
 #include "application/setups/editor/editor_command_input.h"
+#include "augs/ensure_rel.h"
+#include "augs/ensure_rel_util.h"
 #include "augs/readwrite/memory_stream.h"
 #include "augs/misc/pool/pool_structs.h"
 
@@ -28,7 +30,7 @@ public:
 		auto validate = [previous_id](const auto new_id) {
 			if (previous_id.is_set()) {
 				(void)new_id;
-				ensure_eq(new_id, previous_id);
+				ensure_eq_id(new_id, previous_id);
 			}
 		};
 

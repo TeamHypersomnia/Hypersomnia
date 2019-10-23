@@ -1,3 +1,5 @@
+#include "augs/log.h"
+
 #if BUILD_OPENAL
 #include <AL/al.h>
 #include <AL/alc.h>

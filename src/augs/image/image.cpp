@@ -8,6 +8,7 @@
 #endif
 
 #include "augs/ensure.h"
+#include "augs/log.h"
 
 #include "augs/image/image.h"
 #include "augs/filesystem/directory.h"

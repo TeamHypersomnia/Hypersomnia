@@ -1,6 +1,7 @@
 #include "augs/audio/audio_backend.h"
 #include "augs/audio/sound_source.h"
 #include "augs/audio/audio_command.h"
+#include "augs/templates/always_false.h"
 
 #if BUILD_OPENAL
 #include <AL/al.h>

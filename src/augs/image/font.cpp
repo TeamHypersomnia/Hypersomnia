@@ -1,5 +1,6 @@
 #include <map>
 #include "augs/image/font.h"
+#include "augs/log.h"
 
 #if BUILD_FREETYPE
 #include <ft2build.h> 

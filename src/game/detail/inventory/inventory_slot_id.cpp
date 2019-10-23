@@ -1,4 +1,5 @@
 #include "augs/ensure.h"
+#include "augs/ensure_rel.h"
 #include "inventory_slot_id.h"
 
 template <class T>

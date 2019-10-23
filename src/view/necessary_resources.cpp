@@ -4,6 +4,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/audio/sound_data.h"
 #include "augs/gui/button_corners.h"
+#include "augs/log.h"
 
 #include "view/game_drawing_settings.h"
 

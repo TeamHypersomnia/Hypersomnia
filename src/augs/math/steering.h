@@ -2,7 +2,6 @@
 #include <optional>
 #include "augs/math/vec2.h"
 #include "augs/math/arithmetical.h"
-#include "augs/log.h"
 #include "augs/templates/wrap_templates.h"
 
 namespace augs {

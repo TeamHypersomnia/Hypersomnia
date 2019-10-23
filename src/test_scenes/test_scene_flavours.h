@@ -448,7 +448,12 @@ auto& get_test_flavour(all_entity_flavours& flavours, const T enum_id) {
 			const auto new_allocation = into.allocate();
 			(void)t;
 			(void)new_allocation;
-			ensure_eq(to_raw_flavour_id(t), new_allocation.key);
+			const auto rt = to_raw_flavour_id(t);
+
+			ensure_eq(rt.indirection_index, new_allocation.key.indirection_index);
+			ensure_eq(rt.version, new_allocation.key.version);
+
+			(void)rt;
 		});
 	}
 

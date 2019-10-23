@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "view/viewables/image_cache.h"
 #include "view/viewables/image_meta.h"
 #include "view/viewables/image_definition.h"

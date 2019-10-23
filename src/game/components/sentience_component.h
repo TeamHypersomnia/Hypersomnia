@@ -9,7 +9,7 @@
 
 #include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
-#include "augs/templates/identity_templates.h"
+#include "augs/templates/always_false.h"
 #include "augs/misc/constant_size_vector.h"
 
 #include "game/assets/ids/asset_ids.h"

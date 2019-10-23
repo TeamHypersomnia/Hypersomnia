@@ -4,6 +4,7 @@
 #include <new>
 #include <utility>
 #include "augs/ensure.h"
+#include "augs/ensure_rel.h"
 
 #include "augs/misc/simple_pair.h"
 #include "augs/templates/folded_finders.h"
@@ -92,18 +93,18 @@ namespace augs {
 		}
 
 		void push_back(const value_type& obj) {
-			ensure_less(count, capacity());
+			ensure_less(count, static_cast<size_type>(capacity()));
 			construct_at(count++, obj);
 		}
 
 		void push_back(value_type&& obj) {
-			ensure_less(count, capacity());
+			ensure_less(count, static_cast<size_type>(capacity()));
 			construct_at(count++, std::move(obj));
 		}
 
 		template <class... Args>
 		value_type& emplace_back(Args&&... args) {
-			ensure_less(count, capacity());
+			ensure_less(count, static_cast<size_type>(capacity()));
 			construct_at(count, std::forward<Args>(args)...);
 			return nth(count++);
 		}
@@ -176,7 +177,7 @@ namespace augs {
 			const auto new_elements_count = 1;
 
 			ensure_geq(where, begin());
-			ensure_leq(count + new_elements_count, capacity());
+			ensure_leq(count + new_elements_count, static_cast<size_type>(capacity()));
 
 			std::move(where, end(), where + 1);
 			construct_at(static_cast<size_type>(where - begin()), std::forward<Args>(args)...);
@@ -188,7 +189,7 @@ namespace augs {
 			const auto new_elements_count = 1;
 
 			ensure_geq(where, begin());
-			ensure_leq(count + new_elements_count, capacity());
+			ensure_leq(count + new_elements_count, static_cast<size_type>(capacity()));
 
 			std::move(where, end(), where + 1);
 			construct_at(static_cast<size_type>(where - begin()), obj);
@@ -201,7 +202,7 @@ namespace augs {
 			const auto new_elements_count = static_cast<size_type>(last - first);
 			
 			ensure_geq(where, begin());
-			ensure_leq(count + new_elements_count, capacity());
+			ensure_leq(count + new_elements_count, static_cast<size_type>(capacity()));
 
 			std::move(where, end(), where + (last - first));
 			
@@ -301,7 +302,7 @@ namespace augs {
 		}
 
 		void pop_back() {
-			ensure_greater(count, 0);
+			ensure_greater(count, static_cast<size_type>(0));
 			_pop_back();	
 		}
 

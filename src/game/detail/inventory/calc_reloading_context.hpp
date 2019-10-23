@@ -2,6 +2,10 @@
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #define LOG_RELOADING 0
 
+#if LOG_RELOADING
+#include "augs/log.h"
+#endif
+
 template <class... Args>
 void RLD_LOG(Args&&... args) {
 #if LOG_RELOADING

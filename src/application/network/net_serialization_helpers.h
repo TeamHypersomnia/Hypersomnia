@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/log.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
 #include "application/setups/server/public_settings_update.h"
 #include "augs/readwrite/to_bytes.h"

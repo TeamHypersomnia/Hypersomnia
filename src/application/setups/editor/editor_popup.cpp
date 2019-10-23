@@ -1,6 +1,45 @@
+#include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
-
 #include "application/setups/editor/editor_popup.h"
+
+editor_popup editor_popup::sum_all(const std::vector<editor_popup>& popups) {
+	editor_popup result;
+
+	// for example: 11 Error(s), 23 Warning(s)
+
+	std::map<std::string, std::size_t> counts;
+
+	for (const auto& p : popups) {
+		counts[p.title]++;
+
+		if (p.message.size() > 0) {
+			result.message += p.message + "\n\n";
+		}
+
+		if (p.details.size() > 0) {
+			result.details += p.details + "\n";
+		}
+	}
+
+	for (const auto& e : counts) {
+		result.title += typesafe_sprintf("%x %x(s), ", e.second, e.first);
+	}
+
+	if (result.title.size() >= 2) {
+		result.title.pop_back();
+		result.title.pop_back();
+	}
+
+	if (result.message.size() >= 1) {
+		result.message.pop_back();
+	}
+
+	if (result.details.size() >= 1) {
+		result.details.pop_back();
+	}
+
+	return result;
+}
 
 int editor_popup::perform(const std::vector<button>& buttons) {
 	using namespace augs::imgui;

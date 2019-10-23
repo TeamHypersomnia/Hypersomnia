@@ -1,7 +1,10 @@
 #pragma once
 #include <optional>
 
+#if !IS_PRODUCTION_BUILD
 #include "augs/ensure.h"
+#include "augs/ensure_rel.h"
+#endif
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/container_traits.h"
@@ -66,12 +69,14 @@ namespace augs {
 			return indirector.version == key.version && indirector.real_index != static_cast<size_type>(-1);
 		}
 
+#if !IS_PRODUCTION_BUILD
 		static auto ensure_versions_match(const pool_indirector_type& indirector, const key_type& key) {
 			(void)indirector;
 			(void)key;
 			ensure_eq(indirector.version, key.version);
 			ensure(indirector.real_index != static_cast<size_type>(-1));
 		}
+#endif
 
 	public:
 		pool() : pool(0u) {}
@@ -172,11 +177,15 @@ namespace augs {
 	private:
 		template <class S>
 		static auto& get_impl(S& self, const key_type key) {
+#if !IS_PRODUCTION_BUILD
 			ensure(self.correct_range(key));
+#endif
 
 			const auto& indirector = self.get_indirector(key);
 
+#if !IS_PRODUCTION_BUILD
 			ensure_versions_match(indirector, key);
+#endif
 
 			return self.objects[indirector.real_index];
 		}

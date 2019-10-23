@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstring>
 
+#include "augs/log_direct.h"
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/build_settings/setting_enable_debug_log.h"
 #include "augs/build_settings/compiler_defines.h"
@@ -15,7 +16,7 @@ class program_log {
 	unsigned max_all_entries;
 
 	void push_entry(const log_entry&);
-	friend void write_log_entry(const std::string& f);
+	friend void LOG_DIRECT(const std::string& f);
 
 public:
 	static auto& get_current() {
@@ -29,11 +30,9 @@ public:
 	std::string get_complete() const;
 };
 
-void write_log_entry(const std::string& f);
-
 template <class... A>
 FORCE_NOINLINE void LOG(const std::string& f, A&&... a) {
-	write_log_entry(typesafe_sprintf(f, std::forward<A>(a)...));
+	LOG_DIRECT(typesafe_sprintf(f, std::forward<A>(a)...));
 }
 
 #define LOG_NVPS(...) { \

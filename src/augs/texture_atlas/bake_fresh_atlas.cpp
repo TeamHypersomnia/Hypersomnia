@@ -5,6 +5,7 @@
 #include "3rdparty/rectpack2D/src/finders_interface.h"
 
 #include "augs/ensure.h"
+#include "augs/log.h"
 #include "augs/misc/measurements.h"
 
 #include "augs/readwrite/memory_stream.h"

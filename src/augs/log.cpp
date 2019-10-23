@@ -112,7 +112,7 @@ std::string program_log::get_complete() const {
 	return logs;
 }
 
-void write_log_entry(const std::string& f) {
+void LOG_DIRECT(const std::string& f) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 

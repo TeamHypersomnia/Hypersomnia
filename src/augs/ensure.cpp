@@ -1,7 +1,9 @@
 #include <csignal>
 #include <functional>
 
+#include "augs/log.h"
 #include "augs/ensure.h"
+#include "augs/ensure_rel.h"
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/shell.h"
@@ -11,7 +13,7 @@
 extern std::function<void()> ensure_handler;
 //void (*ensure_handler)() = nullptr;
 
-FORCE_NOINLINE void save_log_and_terminate() {
+void save_log_and_terminate() {
 	if (ensure_handler) {
 		ensure_handler();
 	}
@@ -45,3 +47,55 @@ FORCE_NOINLINE void save_log_and_terminate() {
 
 	std::abort();	
 }
+
+template <class T>
+void log_ensure_rel(const int type, const char* left_name, const char* right_name, const T& left, const T& right, const char* const file, const int line) {
+	const char* preff = "";
+
+	switch(type) {
+		case 0:
+			preff = "ensure_eq";
+			break;
+		case 1:
+			preff = "ensure_less";
+			break;
+		case 2:
+			preff = "ensure_leq";
+			break;
+		case 3:
+			preff = "ensure_greater";
+			break;
+		case 4:
+			preff = "ensure_geq";
+			break;
+
+		default: break;
+	}
+
+    LOG("%x(%x, %x) failed with expansion:\n%x < %x\nfile: %x\nline: %x", preff, left_name, right_name, left, right, file, line);
+	save_log_and_terminate();
+}
+
+void log_ensure(const char* expr, const char* file, const int line)
+{
+	LOG("ensure(%x) failed\nfile: %x\nline: %x", expr, file, line);
+	save_log_and_terminate();
+}
+
+template void log_ensure_rel(const int, const char*, const char*, const int&, const int&, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const short&, const short&, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const unsigned short&, const unsigned short&, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const std::size_t&, const std::size_t&, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const unsigned&, const unsigned&, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const void*, const void*, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const float&, const float&, const char*, int);
+
+#include "application/network/resolve_result_type.h"
+#include "game/detail/inventory/wielding_result_type.h"
+#include "game/enums/slot_function.h"
+#include "view/client_arena_type.h"
+
+template void log_ensure_rel(const int, const char*, const char*, const resolve_result_type&, const resolve_result_type&, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const wielding_result_type&, const wielding_result_type&, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const slot_function&, const slot_function&, const char*, int);
+template void log_ensure_rel(const int, const char*, const char*, const client_arena_type&, const client_arena_type&, const char*, int);

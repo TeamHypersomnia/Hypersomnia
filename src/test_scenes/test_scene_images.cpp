@@ -1,3 +1,4 @@
+#include "augs/ensure_rel_util.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/pool/pool_allocate.h"
@@ -12,6 +13,8 @@
 #include "test_scenes/test_enum_to_path.h"
 #include "augs/readwrite/lua_readwrite_errors.h"
 #include "view/load_meta_lua.h"
+
+#include "augs/log_direct.h"
 
 inline auto find_with_existent_extension(const augs::path_type& path_wo_extension) {
 	const std::array<const char*, 5> exts = {
@@ -90,10 +93,10 @@ void load_test_scene_images(
 			(void)new_allocation;
 			(void)id;
 
-			ensure_eq(id, new_allocation.key);
+			ensure_eq_id(id, new_allocation.key);
 		}
 		catch (const test_image_does_not_exist&) {
-			LOG("WARNING! Could not find an official game image: %x", stem);
+			LOG_DIRECT("WARNING! Could not find an official game image: " + stem);
 		}
 	});
 

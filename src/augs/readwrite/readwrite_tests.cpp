@@ -1,4 +1,5 @@
 #if BUILD_UNIT_TESTS
+#include "augs/log.h"
 #include <Catch/single_include/catch2/catch.hpp>
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/pool/pool.h"

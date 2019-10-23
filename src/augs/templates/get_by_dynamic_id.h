@@ -1,9 +1,13 @@
 #pragma once
 #include <tuple>
 #include <variant>
+#include <optional>
 #include "augs/misc/trivially_copyable_tuple.h"
 
-#include "augs/ensure.h"
+#if !IS_PRODUCTION_BUILD
+#include "augs/ensure_rel.h"
+#endif
+
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/type_list.h"
 #include "augs/templates/nth_type_in.h"
@@ -33,7 +37,9 @@ decltype(auto) get_by_dynamic_index(
 			}
 		}
 		else {
+#if !IS_PRODUCTION_BUILD
 			ensure_eq(dynamic_type_index, current_candidate);
+#endif
 			(void)dynamic_type_index;
 			return generic_call(std::get<current_candidate>(std::forward<T>(index_gettable_object)));
 		}
@@ -85,7 +91,9 @@ decltype(auto) conditional_get_by_dynamic_index(
 			}
 		}
 		else {
+#if !IS_PRODUCTION_BUILD
 			ensure_eq(dynamic_type_index, list_space_current);
+#endif
 			(void)dynamic_type_index;
 			return generic_call(std::get<list_space_current>(std::forward<T>(index_gettable_object)));
 		}

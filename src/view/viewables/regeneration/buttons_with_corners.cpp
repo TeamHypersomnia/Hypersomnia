@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "augs/gui/button_corners.h"
 
 #include "augs/readwrite/memory_stream.h"

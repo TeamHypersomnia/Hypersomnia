@@ -2,6 +2,7 @@
 #include <string>
 
 #include "augs/ensure.h"
+#include "augs/string/typesafe_sprintf.h"
 #include "augs/math/vec2.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/misc/timing/timer.h"
@@ -32,8 +33,7 @@ namespace augs {
 		std::vector<T> tracked;
 
 		measurements(const std::size_t tracked_count = 50u) {
-			/* A value of 0 would cause division by 0. */
-			ensure_greater(tracked_count, 0);
+			ensure(tracked_count != 0);
 			tracked.resize(tracked_count);
 		}
 

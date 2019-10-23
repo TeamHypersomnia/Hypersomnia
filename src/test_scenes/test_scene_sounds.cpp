@@ -1,3 +1,4 @@
+#include "augs/ensure_rel_util.h"
 #include "augs/misc/enum/enum_map.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/templates/enum_introspect.h"
@@ -59,7 +60,7 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 			const auto new_allocation = all_definitions.allocate(std::move(definition));
 			(void)new_allocation;
 			(void)id;
-			ensure_eq(new_allocation.key, id);
+			ensure_eq_id(new_allocation.key, id);
 		}
 		else {
 			auto get_in_official = [](const auto& p) {

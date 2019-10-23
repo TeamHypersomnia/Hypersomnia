@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/messages/health_event.h"
 #include "game/modes/bomb_mode.hpp"
@@ -864,7 +865,6 @@ void bomb_mode::setup_round(
 ) {
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 	{
-		LOG("LOOL PISZEMY");
 		thread_local auto lua = augs::create_lua_state();
 
 		const auto pid = augs::getpid();
@@ -1030,7 +1030,7 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 					);
 					
 					if (container_index == static_cast<std::size_t>(-1)) {
-						ensure_eq(handle.get_id(), container_id);
+						//ensure_eq(handle.get_id(), container_id);
 					}
 
 					if (typed_item.template has<invariants::container>()) {

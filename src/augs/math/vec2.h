@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/math/repro_math.h"
 
+#include <string>
 #include <algorithm>
-#include <sstream>
 #include <cmath>
 
 #include "augs/math/rects.h"
@@ -10,9 +10,6 @@
 #include "augs/math/arithmetical.h"
 
 #include "augs/templates/hash_templates.h"
-
-#include "augs/string/typesafe_sprintf.h"
-#include "augs/string/typesafe_sscanf.h"
 
 template <class T, class = void>
 struct has_x_and_y : std::false_type {};
@@ -691,15 +688,7 @@ namespace std {
 	};
 }
 
-template<class T>
-std::ostream& operator<<(std::ostream& out, const basic_vec2<T>& x) {
-	return out << typesafe_sprintf("(%x;%x)", x.x, x.y);
-}
-
-template<class T>
-std::istream& operator>>(std::istream& out, basic_vec2<T>& x) {
-	std::string chunk;
-	out >> chunk;
-	typesafe_sscanf(chunk, "(%x;%x)", x.x, x.y);
-	return out;
+template <class S, class T>
+decltype(auto) operator<<(S& out, const basic_vec2<T>& x) {
+	return out << "(" << x.x << ";" << x.y << ")"; 
 }

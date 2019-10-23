@@ -4,6 +4,10 @@
 
 #define LOG_PLAYER 1
 
+#if LOG_PLAYER
+#include "augs/log.h"
+#endif
+
 template <class... Args>
 void PLR_LOG(Args&&... args) {
 #if LOG_PLAYER
@@ -186,7 +190,7 @@ namespace augs {
 		if (is_recording() || (is_replaying() && get_current_step() == 0)) {
 			const bool is_snapshot_time = [&]() {
 				if (snapshots.empty()) {
-					ensure_eq(0, current_step);
+					ensure_eq(static_cast<step_type>(0), current_step);
 					return true;
 				}
 

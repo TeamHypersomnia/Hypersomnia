@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "augs/ensure.h"
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/templates/maybe_const.h"
@@ -25,7 +24,6 @@ namespace augs {
 		}
 
 		std::size_t get_unread_bytes() const {
-			ensure(read_pos <= write_pos);
 			return write_pos - read_pos;
 		}
 
@@ -234,36 +232,4 @@ namespace augs {
 		basic_ref_memory_stream(basic_ref_memory_stream&&) = delete;
 		basic_ref_memory_stream& operator=(basic_ref_memory_stream&&) = delete;
 	};
-}
-
-namespace augs {
-	template<class A>
-	void write_stream_with_properties(A& ar, const augs::memory_stream& storage) {
-		storage.write_with_properties(ar);
-	}
-
-	template <class A>
-	void read_stream_with_properties(A& ar, augs::memory_stream& storage) {
-		storage.read_with_properties(ar);
-	}
-
-	template <class A>
-	void write_stream_with_size(A& ar, const augs::memory_stream& storage) {
-		ensure_eq(storage.get_read_pos(), 0);
-		augs::write_bytes(ar, storage.size());
-		
-		detail::write_raw_bytes(ar, storage.data(), storage.size());
-	}
-
-	template <class A>
-	void read_stream_with_size(A& ar, augs::memory_stream& storage) {
-		std::size_t s;
-
-		augs::read_bytes(ar, s);
-		
-		storage.reserve(s);
-		storage.set_write_pos(s);
-		
-		detail::read_raw_bytes(ar, storage.data(), storage.size());
-	}
 }

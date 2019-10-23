@@ -1,21 +1,16 @@
 #pragma once
-#include "augs/log.h"
-#include "augs/string/typesafe_sprintf.h"
+#include "game/common_state/entity_name_str.h"
+
+void log_warn_other(const entity_name_str&, entity_id_base, const char* c1, const char* c2 = "");
 
 template <class E>
-void warning_other(const E handle, const std::string& content) {
-	const auto subject_info = 
-		handle.get_name() 
-		+ typesafe_sprintf("'s (id: %x)", handle.get_id())
-	;
-
-	LOG("WARNING! %x %x.", subject_info, content); 
+void warning_other(const E& handle, const char* content) {
+	const auto id = handle.get_id().raw;
+	log_warn_other(handle.get_name(), id, content);
 }
 
 template <class E>
-void warning_unset_field(E&& handle, std::string field_name) {
-	warning_other(
-		std::forward<E>(handle),
-	   	typesafe_sprintf("%x was not set", field_name)
-	); 
+void warning_unset_field(E&& handle, const char* field_name) {
+	const auto id = handle.get_id().raw;
+	log_warn_other(handle.get_name(), id, field_name, " was not set");
 }

@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "augs/filesystem/file.h"
 
 #include "augs/window_framework/shell.h"

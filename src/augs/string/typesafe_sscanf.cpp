@@ -4,6 +4,7 @@
 
 #include "augs/math/vec2.h"
 #include "augs/string/typesafe_sscanf.h"
+#include "augs/string/typesafe_sprintf.h"
 
 TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 	{
@@ -40,21 +41,6 @@ TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 		REQUIRE(2 == s2);
 		REQUIRE(3 == s3);
 		REQUIRE(4 == s4);
-	}
-
-	{
-
-
-		vec2i test(123, -412);
-		const auto format = "Vector is equal to: %x";
-		const auto sprintfed = typesafe_sprintf(format, test);
-		REQUIRE("Vector is equal to: (123;-412)" == sprintfed);
-
-		vec2i read_test;
-
-		typesafe_sscanf(sprintfed, format, read_test);
-
-		REQUIRE(test == read_test);
 	}
 }
 

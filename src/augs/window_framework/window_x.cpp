@@ -13,6 +13,7 @@
 #include <xcb/xcb_keysyms.h>
 #include <xcb/xcbext.h>
 
+#include "augs/log.h"
 #include "3rdparty/glad/glad_glx.h"
 #include "3rdparty/glad/glad_glx.c"
 

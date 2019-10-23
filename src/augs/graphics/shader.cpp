@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "augs/graphics/shader.h"
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"

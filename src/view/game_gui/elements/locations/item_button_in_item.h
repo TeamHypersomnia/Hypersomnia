@@ -1,7 +1,6 @@
 #pragma once
 #include "game/cosmos/entity_id.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
-#include "augs/ensure.h"
 
 struct item_button;
 
@@ -27,9 +26,6 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		const auto handle = context.get_cosmos()[item_id];
-		(void)handle;
-		ensure_eq(context.get_subject_entity(), handle.get_owning_transfer_capability());
 		return &context.get_game_gui_system().get_item_button(item_id);
 	}
 };

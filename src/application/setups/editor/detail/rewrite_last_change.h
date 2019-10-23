@@ -50,8 +50,5 @@ auto make_rewrite_last_change(
 				::post_editor_command(cmd_in, cloned_cmd);
 			}
 		}
-		else {
-			LOG("WARNING! There was some problem with tracking activity of editor controls.");
-		}
 	};
 }

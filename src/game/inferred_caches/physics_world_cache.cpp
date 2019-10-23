@@ -230,7 +230,7 @@ void physics_world_cache::clone_from(const physics_world_cache& source_cache, co
 	ensure_eq(0, source_b2World.m_stackAllocator.m_index);
 #endif
 
-	ensure_eq(source_b2World.m_contactManager.m_contactListener, &source_b2World.defaultListener);
+	ensure_eq(static_cast<const b2ContactListener*>(source_b2World.m_contactManager.m_contactListener), &source_b2World.defaultListener);
 
 	// do the initial trivial copy of all fields,
 	// we will migrate all pointers shortly

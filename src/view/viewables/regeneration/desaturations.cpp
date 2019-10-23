@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include <sstream>
 
 #include "augs/filesystem/directory.h"

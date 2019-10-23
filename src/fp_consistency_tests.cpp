@@ -2,6 +2,7 @@
 
 #include "augs/log.h"
 #include "augs/ensure.h"
+#include "augs/ensure_rel.h"
 
 #if !defined(STREFLOP_SSE)
 #error "STREFLOP_SSE was not defined."

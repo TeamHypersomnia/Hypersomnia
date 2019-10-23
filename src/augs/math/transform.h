@@ -3,6 +3,7 @@
 
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
+#include "augs/templates/identity_templates.h"
 
 struct b2Transform;
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/log.h"
 #include "test_scenes/test_scene_settings.h"
 #include "game/cosmos/change_common_significant.hpp"
 #include "augs/templates/introspection_utils/on_dynamic_content.h"

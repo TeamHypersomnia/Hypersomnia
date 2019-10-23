@@ -1,3 +1,4 @@
+#include "augs/ensure_rel_util.h"
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_animations.h"
 #include "augs/misc/pool/pool_allocate.h"
@@ -32,7 +33,7 @@ void load_test_scene_animations(
 		(void)new_allocation;
 		(void)id;
 
-		ensure_eq(new_allocation.key, id);
+		ensure_eq_id(new_allocation.key, id);
 	});
 
 	auto alloc = [&](auto test_id, auto& anim) -> auto& {

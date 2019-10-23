@@ -6,11 +6,12 @@
 #include "augs/readwrite/to_bytes.h"
 
 #include "augs/ensure.h"
+#include "augs/ensure_rel.h"
 
 namespace augs {
 	template <class offset_type>
 	auto run_length_encoding(const std::vector<char>& bit_data) {
-		ensure_leq(bit_data.size(), std::numeric_limits<offset_type>::max() + 1);
+		ensure_leq(bit_data.size(), static_cast<std::size_t>(std::numeric_limits<offset_type>::max() + 1));
 
 		std::vector<offset_type> output;
 
@@ -37,7 +38,7 @@ namespace augs {
 				else {
 					const offset_type next_offset = i - current_vec_pos;
 					
-					ensure_greater(output.size(), 0);
+					ensure_greater(output.size(), static_cast<std::size_t>(0));
 
 					output.push_back(next_offset);
 					current_vec_pos += next_offset;
@@ -161,7 +162,7 @@ namespace augs {
 				ptr += changed_offsets[i + 1];
 			}
 
-			ensure_leq(ptr, original_location + length);
+			ensure_leq(static_cast<const delta_unit*>(ptr), original_location + length);
 			(void)length;
 			(void)original_location;
 		}

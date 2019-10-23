@@ -1,3 +1,4 @@
+#include "augs/log_direct.h"
 #include "augs/graphics/renderer_backend.h"
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/fbo.h"
@@ -48,16 +49,15 @@ namespace augs {
 
 		renderer_backend::renderer_backend() : platform(std::make_unique<renderer_backend::platform_data>()) {
 #if BUILD_OPENGL
-			LOG("Calling gladLoadGL: %x.", intptr_t(gladLoadGL));
+			LOG_DIRECT("Calling gladLoadGL.");
+
 			if (!gladLoadGL()) {
-				LOG("Calling gladLoadGL failed.");
+				LOG_DIRECT("Calling gladLoadGL failed.");
 				throw renderer_error("Failed to initialize GLAD!"); 		
 			}
 #endif
 
-			LOG("glBlendFuncSeparate ADDR: %x", intptr_t(glBlendFuncSeparate));
-
-			LOG("Calling gladLoadGL succeeded.");
+			LOG_DIRECT("Calling gladLoadGL succeeded.");
 
 			set_blending(true);
 

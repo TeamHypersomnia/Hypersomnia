@@ -1,4 +1,5 @@
 #include "imgui_utils.h"
+#include "augs/log.h"
 
 #include <imgui/imgui_internal.h>
 

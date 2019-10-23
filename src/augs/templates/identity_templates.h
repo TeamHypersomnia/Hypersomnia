@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/always_false.h"
 
 struct empty_callback {
 	template <class... Types>
@@ -11,14 +12,6 @@ struct true_returner {
 		return true;
 	}
 };
-
-template <class T>
-struct always_false {
-	static constexpr bool value = false;
-};
-
-template<class T>
-constexpr bool always_false_v = always_false<T>::value;
 
 template <class T>
 struct always_true {

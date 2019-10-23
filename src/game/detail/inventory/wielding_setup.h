@@ -1,6 +1,5 @@
 #pragma once
 #include <array>
-#include "augs/string/pretty_print.h"
 #include "game/cosmos/entity_id.h"
 
 #include "game/detail/inventory/hand_count.h"
@@ -60,10 +59,6 @@ struct basic_wielding_setup  {
 	template <class E>
 	bool same_as_in(const E& character_entity) const {
 		return *this == from_current(character_entity);
-	}
-
-	friend std::ostream& operator<<(std::ostream& o, const this_type& s) {
-		return pretty_print(o, s.hand_selections);
 	}
 
 	template <class C, class F>

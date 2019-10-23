@@ -1,4 +1,6 @@
+#if !PRODUCTION_BUILD
 #if BUILD_UNIT_TESTS
+#include "augs/log_direct.h"
 #include <Catch/single_include/catch2/catch.hpp>
 #include <cstring>
 #include <array>
@@ -30,7 +32,7 @@ TEST_CASE("StateTest0 PaddingSanityCheck1") {
 		}
 	};
 
-	typedef ok checked_type;
+	using checked_type = ok;
 	constexpr size_t type_size = sizeof(checked_type);
 
 	std::array<char, type_size> buf1{};
@@ -129,7 +131,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 				augs::save_as_text(get_path_in_log_files("object1.txt"), describe_fields(*reinterpret_cast<checked_type*>(&buf1)));
 				augs::save_as_text(get_path_in_log_files("object2.txt"), describe_fields(*reinterpret_cast<checked_type*>(&buf2)));
 
-				LOG(log_contents);
+				LOG_DIRECT(log_contents);
 				FAIL(log_contents);
 			}
 
@@ -152,7 +154,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 					augs::save_as_text(get_path_in_log_files("object1.txt"), describe_fields(a));
 					augs::save_as_text(get_path_in_log_files("object2.txt"), describe_fields(b));
 
-					LOG(log_contents);
+					LOG_DIRECT(log_contents);
 					FAIL(log_contents);
 				}
 			}
@@ -161,8 +163,8 @@ TEST_CASE("StateTest2 PaddingTest") {
 			const auto breaks = determine_breaks_in_fields_continuity_by_introspection(checked_type(args...));
 
 			if (breaks.size() > 0) {
-				LOG(breaks);
-				LOG(describe_fields(checked_type(args...)));
+				LOG_DIRECT(breaks);
+				LOG_DIRECT(describe_fields(checked_type(args...)));
 
 				FAIL(typesafe_sprintf(
 					"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\n", 
@@ -215,4 +217,5 @@ TEST_CASE("StateTest2 PaddingTest") {
 	);
 #endif
 }
+#endif
 #endif

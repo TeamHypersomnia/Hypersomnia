@@ -1,6 +1,7 @@
 #include <cstring>
 #include <thread>
 
+#include "augs/log.h"
 #include "augs/log_path_getters.h"
 #include "augs/window_framework/shell.h"
 #include "augs/filesystem/file.h"

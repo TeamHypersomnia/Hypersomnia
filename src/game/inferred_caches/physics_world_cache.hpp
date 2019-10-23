@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/log.h"
+#include "augs/ensure_rel.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "augs/misc/convex_partitioned_shape.hpp"
 #include "game/enums/filters.h"

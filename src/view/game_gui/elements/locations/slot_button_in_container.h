@@ -1,7 +1,6 @@
 #pragma once
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
-#include "augs/ensure.h"
 
 struct slot_button;
 
@@ -23,9 +22,6 @@ public:
 
 	template <class C>
 	decltype(auto) dereference(const C context) const {
-		const auto handle = context.get_cosmos()[slot_id];
-		(void)handle;
-		ensure_eq(context.get_subject_entity(), handle.get_container().get_owning_transfer_capability());
 		return &context.get_game_gui_system().get_slot_button(slot_id);
 	}
 };

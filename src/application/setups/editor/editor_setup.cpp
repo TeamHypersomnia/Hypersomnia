@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/log_path_getters.h"
 #include "augs/misc/marks.hpp"
@@ -31,6 +32,7 @@
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
+#include "augs/filesystem/find_path.h"
 
 std::optional<ltrb> editor_setup::find_screen_space_rect_selection(
 	const vec2i screen_size,
@@ -1005,6 +1007,11 @@ void editor_setup::go_to_entity() {
 
 void editor_setup::reveal_in_explorer(const augs::window& window) {
 	window.reveal_in_explorer(folder().get_paths().version_info_file);
+}
+
+template <class T, class F>
+auto get_first_free_untitled_path(const T& path_template, F&& allow_candidate) {
+	return augs::first_empty_path(get_path_in_untitled(path_template), std::forward<F>(allow_candidate));
 }
 
 void editor_setup::new_tab() {

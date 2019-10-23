@@ -39,11 +39,6 @@ auto get_path_in_untitled(const T& p) {
 	return augs::path_type(get_untitled_dir()) / p;
 }
 
-template <class T, class F>
-auto get_first_free_untitled_path(const T& path_template, F&& allow_candidate) {
-	return augs::first_empty_path(get_path_in_untitled(path_template), std::forward<F>(allow_candidate));
-}
-
 inline auto get_unsaved_path(augs::path_type path) {
 	return path.replace_extension(path.extension() += ".unsaved");
 }

@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include <unordered_set>
 #include "augs/graphics/renderer.h"
 #include "augs/templates/thread_templates.h"

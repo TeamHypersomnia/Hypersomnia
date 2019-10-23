@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <optional>
 
 #include "augs/math/vec2.h"
 #include "augs/misc/enum/enum_boolset.h"

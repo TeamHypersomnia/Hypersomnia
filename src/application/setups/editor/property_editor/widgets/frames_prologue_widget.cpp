@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "augs/misc/timing/timer.h"
 #include "augs/filesystem/file.h"
 #include "augs/misc/imgui/imgui_game_image.h"

@@ -621,7 +621,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/commands/asset_commands.cpp"
 	"src/augs/misc/imgui/path_tree_structs.cpp"
 	"src/application/setups/editor/gui/asset_path_browser_settings.cpp"
-	"src/augs/filesystem/path.cpp"
 	"src/view/viewables/image_meta.cpp"
 	"src/application/setups/editor/commands/flavour_commands.cpp"
 	"src/augs/texture_atlas/atlas_profiler.cpp"

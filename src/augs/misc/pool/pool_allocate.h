@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/pool/pool.h"
+#include "augs/ensure_rel.h"
 
 namespace augs {
 	template <class T, template <class> class M, class size_type, class SA, class... K>
@@ -15,7 +16,7 @@ namespace augs {
 				const auto new_size = static_cast<std::size_t>(old_size) * expansion_mult + expansion_add;
 				const auto trimmed_new_size = std::min(static_cast<std::size_t>(max_size()), new_size);
 
-				ensure_greater(trimmed_new_size, old_size);
+				ensure_greater(trimmed_new_size, static_cast<std::size_t>(old_size));
 				reserve(static_cast<size_type>(trimmed_new_size));
 			}
 			else {

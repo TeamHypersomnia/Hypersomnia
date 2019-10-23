@@ -1,6 +1,6 @@
 #pragma once
-#include "augs/log.h"
 #include "augs/build_settings/compiler_defines.h"
+#include "augs/templates/remove_cref.h"
 #include "augs/math/vec2.h"
 
 namespace augs {

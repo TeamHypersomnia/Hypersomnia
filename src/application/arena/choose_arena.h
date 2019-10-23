@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/log_direct.h"
 #include "application/arena/arena_paths.h"
 
 inline void choose_arena(
@@ -10,7 +11,7 @@ inline void choose_arena(
 	const auto& name = vars.current_arena;
 
 	if (name.empty()) {
-		LOG("Arena name empty, so making a default one.");
+		LOG_DIRECT("Arena name empty, so making a default one.");
 
 		handle.make_default(
 			lua, 
@@ -19,7 +20,7 @@ inline void choose_arena(
 	}
 	else {
 		const auto paths = arena_paths(name);
-		LOG("Solv file: %x", paths.int_paths.solv_file);
+		LOG_DIRECT("Solv file: " + paths.int_paths.solv_file.string());
 
 		handle.load_from(
 			paths,

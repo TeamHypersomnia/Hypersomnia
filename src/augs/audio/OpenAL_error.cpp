@@ -1,6 +1,7 @@
 #include <AL/al.h>
 
 #include "augs/audio/OpenAL_error.h"
+#include "augs/log.h"
 #include "augs/ensure.h"
 
 static const char * get_OpenAL_error_string(int errID) {

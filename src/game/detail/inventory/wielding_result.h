@@ -2,14 +2,10 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/cosmos/step_declaration.h"
+#include "game/detail/inventory/wielding_result_type.h"
 
 struct wielding_result {
-	enum class type {
-		NO_SPACE_FOR_HOLSTER,
-		NOT_ENOUGH_HANDS,
-		THE_SAME_SETUP,
-		SUCCESSFUL
-	};
+	using type = wielding_result_type;
 
 	type result = type::THE_SAME_SETUP;
 	augs::constant_size_vector<item_slot_transfer_request, 4> transfers;

@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/log.h"
 #include "application/network/network_adapters.hpp"
 #include "application/network/server_adapter.h"
 

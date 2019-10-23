@@ -7,7 +7,6 @@
 #include "declare_math.h"
 #include "augs/math/si_scaling.h"
 #include "augs/math/repro_math.h"
-#include "augs/string/typesafe_sprintf.h"
 
 enum rectangle_sticking {
 	LEFT,
@@ -601,14 +600,14 @@ struct basic_xywh {
 	}
 };
 
-template<class T>
-std::ostream& operator<<(std::ostream& out, const basic_xywh<T>& x) {
-	out << typesafe_sprintf("(xywh: %x;%x;%x;%x)", x.x, x.y, x.w, x.h);
+template <class S, class T>
+decltype(auto) operator<<(S& out, const basic_xywh<T>& x) {
+	out << "(xywh: " << x.x << ";" << x.y << ";" << x.w << ";" << x.h << ")";
 	return out;
 }
 
-template<class T>
-std::ostream& operator<<(std::ostream& out, const basic_ltrb<T>& x) {
-	out << typesafe_sprintf("(ltrb: %x;%x;%x;%x)", x.l, x.t, x.r, x.b);
+template <class S, class T>
+decltype(auto) operator<<(S& out, const basic_ltrb<T>& x) {
+	out << "(ltrb: " << x.l << ";" << x.t << ";" << x.r << ";" << x.b << ")";
 	return out;
 }

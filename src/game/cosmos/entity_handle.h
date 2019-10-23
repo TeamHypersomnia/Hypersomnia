@@ -1,5 +1,4 @@
 #pragma once
-#include <ostream>
 #include "augs/build_settings/compiler_defines.h"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "augs/build_settings/compiler_defines.h"
@@ -329,8 +328,8 @@ public:
 	}
 };
 
-template <bool is_const>
-std::ostream& operator<<(std::ostream& out, const basic_entity_handle<is_const> &x) {
+template <class S, bool is_const>
+decltype(auto) operator<<(S& out, const basic_entity_handle<is_const> &x) {
 	if (x.dead()) {
 		return out << "(dead handle)";
 	}

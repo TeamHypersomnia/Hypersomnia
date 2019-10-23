@@ -1,5 +1,6 @@
 #pragma once
 #include "3rdparty/imgui/imgui.h"
+#include "augs/string/typesafe_sprintf.h"
 
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/identity_templates.h"

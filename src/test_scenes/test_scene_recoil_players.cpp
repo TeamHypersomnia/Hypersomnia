@@ -1,3 +1,4 @@
+#include "augs/ensure_rel_util.h"
 #include "augs/string/format_enum.h"
 #include "test_scenes/test_scene_recoil_players.h"
 #include "test_scenes/test_scenes_content.h"
@@ -46,6 +47,6 @@ void load_test_scene_recoil_players(recoil_players_pool& all_definitions) {
 		(void)id;
 		(void)new_allocation;
 
-		ensure_eq(new_allocation.key, id);
+		ensure_eq_id(new_allocation.key, id);
 	}
 }

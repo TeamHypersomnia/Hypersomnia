@@ -1,6 +1,8 @@
 #pragma once
 #include <unordered_set>
 
+#include "augs/log.h"
+
 #include "augs/network/jitter_buffer.h"
 #include "augs/templates/logically_empty.h"
 #include "game/cosmos/cosmic_functions.h"

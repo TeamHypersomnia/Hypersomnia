@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 
+#include "augs/ensure.h"
 #include "augs/enums/callback_result.h"
 #include "augs/build_settings/compiler_defines.h"
 
@@ -31,8 +32,7 @@ protected:
 		if (self.alive()) {
 			switch (n) {
 				default:
-				LOG("Random access abstraction for this child_entity_name is not implemented!");
-				ensure(false);
+				ensure(false && "Random access abstraction for this child_entity_name is not implemented!");
 				break;
 			}
 		}

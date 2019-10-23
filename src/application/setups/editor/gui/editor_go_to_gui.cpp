@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "application/setups/editor/gui/editor_go_to_gui.h"
 
 #include "augs/misc/imgui/imgui_utils.h"

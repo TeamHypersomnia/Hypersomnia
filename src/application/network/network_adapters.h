@@ -10,7 +10,6 @@
 #include "game/modes/mode_entropy.h"
 #include "augs/network/network_types.h"
 #include "augs/enums/callback_result.h"
-#include "augs/ensure.h"
 
 #include "application/network/requested_client_settings.h"
 

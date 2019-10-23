@@ -2,8 +2,6 @@
 #include <vector>
 #include <array>
 
-#include "augs/ensure.h"
-
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/logic_step.h"
@@ -54,7 +52,6 @@ public:
 
 		template<class T>
 		T& get_goal() {
-			ensure(goals_set.at(index_in_list_v<T, decltype(resolved_goals)>));
 			return std::get<T>(resolved_goals);
 		}
 	};

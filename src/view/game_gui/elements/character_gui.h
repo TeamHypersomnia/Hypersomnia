@@ -2,8 +2,6 @@
 #include <unordered_map>
 #include <array>
 
-#include "augs/ensure.h"
-
 #include "augs/gui/rect.h"
 #include "augs/gui/rect_world.h"
 #include "augs/gui/dereferenced_location.h"
