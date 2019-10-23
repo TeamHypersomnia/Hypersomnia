@@ -3,4 +3,4 @@ import sys
 
 x = TransferApi(sys.argv[2])
 
-print( x.upload_file(sys.argv[1], "test upload") )
+print( x.upload_file("test upload", sys.argv[1]) )
