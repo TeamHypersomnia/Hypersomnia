@@ -1,4 +1,4 @@
-from py3wetransfer import Py3WeTransfer
+from wetransfer import TransferApi
 import sys
 
 x = Py3WeTransfer(sys.argv[2])
