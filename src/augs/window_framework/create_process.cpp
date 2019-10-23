@@ -1,4 +1,5 @@
 #include "augs/window_framework/create_process.h"
+#include <vector>
 
 #if PLATFORM_UNIX
 #include <unistd.h>
