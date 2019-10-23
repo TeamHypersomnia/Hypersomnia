@@ -1,10 +1,14 @@
 #include "game/cosmos/entity_handle.h"
+#include "application/setups/editor/editor_command_input.h"
+
+#if TODO
 
 #include "application/intercosm.h"
 #include "game/cosmos/create_entity.hpp"
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/editor_folder.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
+#endif
 
 #include "application/setups/editor/commands/paste_entities_command.h"
 
@@ -13,6 +17,8 @@ std::string paste_entities_command::describe() const {
 }
 
 void paste_entities_command::push_entry(const const_entity_handle handle) {
+	(void)handle;
+#if TODO
 	handle.dispatch([&](const auto typed_handle) {
 		using E = entity_type_of<decltype(typed_handle)>;
 		using vector_type = make_data_vector<E>;
@@ -22,6 +28,7 @@ void paste_entities_command::push_entry(const const_entity_handle handle) {
 
 		pasted_entities.get<vector_type>().push_back({ solvable, handle.get_id() });
 	});
+#endif
 }
 
 bool paste_entities_command::empty() const {
@@ -29,6 +36,8 @@ bool paste_entities_command::empty() const {
 }
 
 void paste_entities_command::redo(const editor_command_input in) {
+	(void)in;
+#if TODO
 	in.purge_selections();
 	in.interrupt_tweakers();
 
@@ -52,9 +61,12 @@ void paste_entities_command::redo(const editor_command_input in) {
 	}
 
 	cosmic::reinfer_all_entities(cosm);
+#endif
 }
 
 void paste_entities_command::undo(const editor_command_input in) const {
+	(void)in;
+#if TODO
 	in.purge_selections();
 	in.interrupt_tweakers();
 
@@ -75,4 +87,5 @@ void paste_entities_command::undo(const editor_command_input in) const {
 		We could fix this by always incrementing the id versions on creating via redoing,
 		but the same problem will nevertheless persist in networked environments.
 	*/
+#endif
 }

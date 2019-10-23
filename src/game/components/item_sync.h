@@ -18,6 +18,10 @@ class component_synchronizer<E, components::item> : public synchronizer_base<E, 
 protected:
 	using base = synchronizer_base<E, components::item>;
 	using base::operator->;
+
+	template <class H>
+	friend void arena_mode_set_transferred_item_meta(H, int charges, const item_owner_meta&);
+
 public:
 	using base::get_raw_component;
 	using base::base;

@@ -57,11 +57,6 @@ public:
 		P&& pre_construction
 	);
 
-	static entity_handle create_entity(
-		cosmos& cosm,
-		entity_flavour_id
-	);
-
 	template <class C, class... Types, class Pre, class Post>
 	static entity_handle create_entity(
 		C& cosm,

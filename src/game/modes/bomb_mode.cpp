@@ -6,7 +6,6 @@
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/messages/start_sound_effect.h"
@@ -25,6 +24,8 @@
 #include "game/detail/inventory/perform_wielding.hpp"
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/snap_interpolation_to_logical.h"
+
+#include "game/cosmos/just_create_entity_functional.h"
 
 #define LOG_BOMB_MODE 0
 
@@ -186,6 +187,13 @@ faction_type bomb_mode::get_player_faction(const mode_player_id& id) const {
 	return faction_type::SPECTATOR;
 }
 
+template <class H>
+void arena_mode_set_transferred_item_meta(const H handle, int charges, const item_owner_meta& meta) {
+	auto& item = *handle.template get<components::item>().component;
+	item.charges = charges;
+	item.owner_meta = meta;
+}
+
 void bomb_mode::init_spawned(
 	const input_type in, 
 	const entity_id id, 
@@ -248,16 +256,11 @@ void bomb_mode::init_spawned(
 					}
 				}
 
-				const auto new_item = cosmic::create_entity(
+				const auto new_item = just_create_entity(
 					cosm,
 					i.flavour,
-					[&](const auto&, auto& raw_entity) {
-						auto& item = raw_entity.template get<components::item>();
-						item.charges = i.charges;
-						item.owner_meta = i.owner_meta;
-					},
-					[&](const auto&) {
-
+					[&](const entity_handle& handle) {
+						arena_mode_set_transferred_item_meta(handle, i.charges, i.owner_meta);
 					}
 				);
 
@@ -723,7 +726,7 @@ void bomb_mode::spawn_bomb_near_players(const input_type in) {
 
 
 entity_handle bomb_mode::spawn_bomb(const input_type in) {
-	const auto new_bomb = cosmic::create_entity(in.cosm, in.rules.bomb_flavour);
+	const auto new_bomb = just_create_entity(in.cosm, in.rules.bomb_flavour);
 	bomb_entity = new_bomb;
 	return new_bomb;
 }
@@ -799,11 +802,11 @@ entity_id bomb_mode::create_character_for_player(
 			}
 
 			if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
-				auto new_player = cosmic::create_entity(
+				auto new_player = just_create_entity(
 					cosm, 
 					entity_flavour_id(flavour), 
-					[](auto&&...) {},
-					[&](const auto new_character) {
+					[](entity_handle) {},
+					[&](const entity_handle new_character) {
 						teleport_to_next_spawn(in, new_character);
 						init_spawned(in, new_character, step, transferred);
 					}
@@ -973,16 +976,7 @@ void bomb_mode::setup_round(
 	if (state == arena_mode_state::WARMUP) {
 		const auto theme = in.rules.view.warmup_theme;
 
-		cosmic::create_entity(
-			cosm, 
-			theme,
-			[&](const auto&, auto&) {
-
-			},
-			[&](auto&) {
-
-			}
-		);
+		just_create_entity(cosm, theme);
 	}
 }
 
@@ -2080,16 +2074,7 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 					if (theme.is_set()) {
 						LOG("Bomb detonation theme started.");
 
-						bomb_detonation_theme = cosmic::create_entity(
-							cosm, 
-							theme,
-							[&](const auto&, auto&) {
-
-							},
-							[&](auto&) {
-
-							}
-						);
+						bomb_detonation_theme = just_create_entity(cosm, theme);
 					}
 				}
 			}

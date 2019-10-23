@@ -13,6 +13,8 @@
 
 #include "application/setups/editor/commands/editor_command_structs.h"
 
+struct editor_command_input;
+
 namespace augs {
 	struct introspection_access;
 }

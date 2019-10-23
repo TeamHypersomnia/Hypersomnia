@@ -9,7 +9,7 @@
 #include "game/detail/spells/spell_logic_input.h"
 #include "game/detail/spells/spell_utils.h"
 #include "game/enums/filters.h"
-#include "game/cosmos/create_entity.hpp"
+#include "game/cosmos/just_create_entity_functional.h"
 
 bool electric_triad_instance::are_additional_conditions_for_casting_fulfilled(const const_entity_handle caster) const {
 	constexpr float standard_triad_radius = 800.f;
@@ -59,10 +59,10 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		LOG_NVPS(next_hostile.get_id());
 #endif
 
-		cosmic::create_entity(
+		just_create_entity(
 			cosm, 
 			spell_data.missile_flavour,
-			[&](const auto new_energy_ball, auto&&...) {
+			[&](const entity_handle new_energy_ball) {
 				const auto target_vector = next_hostile.get_logic_transform().pos - caster_transform.pos;
 				const auto target_degrees = target_vector.degrees();
 
@@ -106,8 +106,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 
 				const auto energy_ball_velocity = new_energy_ball_transform.get_direction() * spell_data.missile_velocity;
 				new_energy_ball.template get<components::rigid_body>().set_velocity(energy_ball_velocity);
-			},
-			[&](const auto) {}
+			}
 		);
 	}
 }

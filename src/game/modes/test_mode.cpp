@@ -1,10 +1,10 @@
+#include "game/cosmos/just_create_entity_functional.h"
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/modes/test_mode.h"
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/detail/snap_interpolation_to_logical.h"
 
@@ -79,18 +79,17 @@ mode_player_id test_mode::add_player(input_type in, const faction_type faction) 
 	if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
 		const auto new_id = first_free_key(players, mode_player_id::first());
 
-		if (cosmic::create_entity(
+		if (just_create_entity(
 			cosm, 
 			entity_flavour_id(flavour), 
-			[&](const auto new_character, auto&&...) {
+			[&](const entity_handle new_character) {
 				teleport_to_next_spawn(in, new_character);
 				pending_inits.push_back(new_character);
 
 				cosmic::set_specific_name(new_character, "Player");
 
 				players.try_emplace(new_id, new_character);
-			},
-			[](auto&&...) {}
+			}
 		)) {
 			return new_id;
 		}

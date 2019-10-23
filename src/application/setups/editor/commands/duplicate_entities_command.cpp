@@ -1,6 +1,6 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/cosmos/create_entity.hpp"
+#include "game/cosmos/cosmic_functions.h"
 
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_command_input.h"

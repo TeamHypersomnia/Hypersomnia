@@ -4,7 +4,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/stateless_systems/driver_system.h"
 #include "game/detail/inventory/drop_from_all_slots.h"
-#include "game/cosmos/create_entity.hpp"
+#include "game/cosmos/just_create_entity_functional.h"
 
 void perform_knockout(
 	const entity_id& subject_id, 
@@ -59,10 +59,10 @@ void perform_knockout(
 
 		if (sentience.is_dead()) {
 			auto spawn_detached_body_part = [&](const auto& flavour) {
-				cosmic::create_entity(
+				just_create_entity(
 					cosm,
 					flavour,
-					[&](const auto& typed_entity, auto&&...) {
+					[&](const entity_handle& typed_entity) {
 						typed_entity.set_logic_transform(typed_subject.get_logic_transform());
 
 						const auto& rigid_body = typed_entity.template get<components::rigid_body>();
@@ -89,8 +89,7 @@ void perform_knockout(
 							particle_effect_start_input::orbit_local(typed_subject, { vec2::zero, 180 } ),
 							predictability
 						);
-					},
-					[&](auto&&...) {}
+					}
 				);
 			};
 

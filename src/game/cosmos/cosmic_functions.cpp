@@ -15,6 +15,7 @@
 #include "game/inferred_caches/processing_lists_cache.hpp"
 #include "game/inferred_caches/flavour_id_cache.hpp"
 #include "game/inferred_caches/physics_world_cache.hpp"
+#include "game/cosmos/just_create_entity_functional.h"
 
 void cosmic::set_flavour_id_cache_enabled(const bool flag, cosmos& cosm) {
 	cosm.get_solvable_inferred({}).flavour_ids.enabled = flag;
@@ -26,9 +27,31 @@ void cosmic::after_solvable_copy(cosmos& to, const cosmos& from) {
 
 entity_handle just_create_entity(
 	cosmos& cosm,
+	const entity_flavour_id id,
+	pre_construction_callback pre,
+	post_construction_callback post
+) {
+	return cosmic::create_entity(cosm, id, [&pre](const auto& handle, auto& agg) { pre(handle); (void)agg; }, post);
+}
+
+entity_handle just_create_entity(
+	cosmos& cosm,
 	const entity_flavour_id id
 ) {
-	return cosmic::create_entity(cosm, id);
+	pre_construction_callback pre = [](entity_handle){};
+	post_construction_callback post = [](entity_handle){};
+
+	return just_create_entity(cosm, id, pre, post);
+}
+
+entity_handle just_create_entity(
+	cosmos& cosm,
+	const entity_flavour_id id,
+	pre_construction_callback pre
+) {
+	pre_construction_callback post = [](entity_handle){};
+
+	return just_create_entity(cosm, id, pre, post);
 }
 
 void cosmic::set_specific_name(const entity_handle& handle, const entity_name_str& name) {
@@ -76,22 +99,6 @@ void cosmic::clear(cosmos& cosm) {
 
 		return changer_callback_result::DONT_REFRESH;
 	});
-}
-
-entity_handle cosmic::create_entity(
-	cosmos& cosm,
-	const entity_flavour_id id
-) {
-	return create_entity(
-		cosm,
-		id,
-		[&](auto&&...) {
-
-		},
-		[&](auto&&...) {
-
-		}
-	);
 }
 
 void cosmic::infer_caches_for(const entity_handle& in) {
