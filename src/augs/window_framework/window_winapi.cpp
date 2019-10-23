@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "augs/log.h"
+#include "augs/ensure.h"
 
 #include "augs/string/string_templates.h"
 #include "augs/templates/corresponding_field.h"
@@ -364,7 +365,7 @@ namespace augs {
 	window::window(
 		const window_settings& settings
 	) : platform(std::make_unique<window::platform_data>()) {
-		ensure_eq(nullptr, window_ptr);
+		ensure(window_ptr == nullptr);
 		window_ptr = this;
 		// TODO: throw an exception instead of ensuring
 		static bool register_once = [](){
