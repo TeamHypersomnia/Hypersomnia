@@ -6,7 +6,7 @@ template <class T>
 void log_ensure_rel(int type, const char* left_name, const char* right_name, const T& left, const T& right, const char* file, int line);
 
 template <class T>
-void log_ensure_rel(const int type, const char* const left_name, const char* const right_name, T* const left, T* const right, const char* const file, const int line) {
+void log_ensure_rel(int type, const char* left_name, const char* right_name, T* left, T* right, const char* file, int line) {
 	log_ensure_rel(type, left_name, right_name, static_cast<const void*>(left), static_cast<const void*>(right), file, line);
 }
 

@@ -80,7 +80,7 @@ git clone --depth 1 --recurse-submodules https://github.com/TeamHypersomnia/Hype
 The ``--depth 1`` parameters forces a shallow clone which will drastically reduce the download size.
 The ``--recurse-submodules`` is necessary to clone the submodules as well.
 
-Once repository finishes downloading, create a ```build/``` folder next to ```CMakeLists.txt``` file.  
+Wait for the download to complete.
 Next steps depend on the platform you are on.
 
 On all platforms, you can choose among three building configurations:
@@ -100,10 +100,25 @@ Prerequisites:
 - [LLVM](https://releases.llvm.org/) 7 toolchain (or newer).
   - For example, use this installer: https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe
 
-Use your favorite shell to go into the newly created ```build/``` folder and run these commands:
+Open up the terminal. Setup the environment:
 
 ```
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\VC\Auxiliary\Build\vcvarsall.bat" x64
+```
+
+or:
+```
 call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+```
+
+(for older Visual Studio versions)
+
+Next, run these commands:
+
+```
+cd Hypersomnia
+mkdir build
+cd build
 set CONFIGURATION=Release
 cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 ..
 ninja

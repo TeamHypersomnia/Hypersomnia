@@ -151,7 +151,14 @@ set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 ## Build optimization switches.
 ## These may speed up build times.
 
+option(LINK_TIME_OPTIMIZATION "Perform link-time optimization. Can drastically increase the build time." OFF)
+
+## Debug information.
+
 option(GENERATE_DEBUG_INFORMATION "Generate source-level debug information. If 0, -g flag will be removed to speed up the build." ${DEFAULT_OPT})
+
+## Thread sanitizer.
+
 option(ENABLE_THREADSANITIZER "Enable ThreadSanitizer." OFF)
 
 if (ENABLE_THREADSANITIZER)
@@ -160,7 +167,7 @@ if (ENABLE_THREADSANITIZER)
 	message("Forcing GENERATE_DEBUG_INFORMATION to ON.")
 endif()
 
-# Other self-explanatory static allocation switches. Possible values are one or zero.
+## Static allocation switches. Possible values are one or zero.
 
 # If this variable is nonzero, the cosmos will use a statically allocated number
 # of entities, drastically improving access performance. Might be very useful for a sever application.
@@ -1042,9 +1049,11 @@ if(CLANG)
 	endif()
 endif()
 
-if(CLANG)
-	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "-flto -fwhole-program-vtables")
-	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "-flto -fwhole-program-vtables")
+if (LINK_TIME_OPTIMIZATION)
+	if(CLANG)
+		set(HYPERSOMNIA_CXX_RELEASE_FLAGS "-flto -fwhole-program-vtables")
+		set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "-flto -fwhole-program-vtables")
+	endif()
 endif()
 
 if(ADD_MCMODEL_LARGE_FLAG)
@@ -1066,11 +1075,9 @@ set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 if (MSVC_SPECIFIC)
-	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG")
-
-	# Incremental LTCG is enough for RelWithDebInfo.
-	# It will drastically reduce rebuild times.
-	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "/LTCG:incremental")
+	if (LINK_TIME_OPTIMIZATION)
+		set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG")
+	endif()
 endif()
 
 if (MSVC)
@@ -1082,7 +1089,7 @@ if (MSVC)
 	endif()
 
 	set(HYPERSOMNIA_LINKER_DEBUG_FLAGS "${HYPERSOMNIA_LINKER_DEBUG_FLAGS} /OPT:NOREF")
-	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "${HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS} /OPT:NOREF")
+	set(HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS "${HYPERSOMNIA_LINKER_RELWITHDEBINFO_FLAGS} /OPT:ICF /OPT:REF")
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "${HYPERSOMNIA_LINKER_RELEASE_FLAGS} /OPT:ICF /OPT:REF")
 endif()
 
