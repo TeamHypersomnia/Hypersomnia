@@ -1,3 +1,6 @@
+git:
+  depth: false
+
 os: linux
 language: python
 sudo: required

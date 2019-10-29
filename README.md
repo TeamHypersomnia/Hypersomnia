@@ -74,10 +74,9 @@ Once dependencies are installed, go to the directory where you wish to have your
 open git bash and paste:
 
 ```
-git clone --depth 1 --recurse-submodules https://github.com/TeamHypersomnia/Hypersomnia
+git clone --recurse-submodules https://github.com/TeamHypersomnia/Hypersomnia
 ```
 
-The ``--depth 1`` parameters forces a shallow clone which will drastically reduce the download size.
 The ``--recurse-submodules`` is necessary to clone the submodules as well.
 
 Wait for the download to complete.
