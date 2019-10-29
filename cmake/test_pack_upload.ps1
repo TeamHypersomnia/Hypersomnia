@@ -1,4 +1,5 @@
 param(
+	[String]$artifact_upload_key="Unknown",
 	[String]$configuration="Unknown",
 	[Int32]$console_mode=0
 )
@@ -37,7 +38,17 @@ else {
 
 Write-Host "Archiving the binary." -ForegroundColor yellow
 
-cp $target_exe Hypersomnia.exe
-rm -r cache logs user demos
+$platform = "Windows"
+$uploadUrl = "https://hypersomnia.xyz/upload_artifact.php"
+$apiKey = $artifact_upload_key
+$filePath = "Hypersomnia-for-$platform.zip"
+$commitHash = $(git rev-parse HEAD)
+$commitNumber = $(git rev-list --count master)
+$version = "1.0.$commitNumber"
+
+mv $target_exe Hypersomnia.exe
+rm -rf cache logs user demos
 cd ../
-7z a Hypersomnia-x64.zip hypersomnia
+7z a $filePath hypersomnia
+
+curl -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" $uploadUrl

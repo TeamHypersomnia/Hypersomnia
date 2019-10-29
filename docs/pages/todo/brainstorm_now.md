@@ -6,6 +6,54 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- Build file server
+	- corner cases
+		- What if linux build and windows build finish at the same time?
+			- either linux or windows build will stamp the build and it should be the one that takes longest
+				- so, windows
+		- What if two travis builds finish at the same time?
+			- they will have stamping disabled so nothing bad will happen
+		- Two appveyor builds can't finish at the same time because we've checked rolling builds
+		- What if windows build completes before linux?
+			- The app will detect a new version but won't be able to download the binary because it is not yet there
+			- We have to handle this case anyway
+	- security
+		- secure api key comparison
+		- are the denied file candidates left dangling in memory?
+	- Appveyor could hold a release_notes.txt artifact
+	- But we need retention so appveyor is a no-go 
+	- Folders
+		- builds/
+			- 1.0.1323
+				- windows
+					- Hypersomnia.7z
+					- commit_hash.txt
+				- linux
+				- Hypersomnia-x64-windows.7z
+				- Hypersomnia-x64-linux.7z
+				- Hypersomnia-linux-x64.7z
+
+				- hypersomnia-1.0.9430-linux.7z
+				- hypersomnia-1.0.9430-win64.zip
+					
+				- Hypersomnia-for-Linux.tar.gz
+				- Hypersomnia-for-Windows.zip
+
+				- commit_hash.txt
+					- for client-side version check
+				- whats_new.txt
+					- Optionally
+
+			- 1.0.4383
+			- latest
+
+- Website
+
+- Server/client continuous integration
+	- Automatic client upgrade
+	- Automatic server upgrade
+
 - We should check if the spectator gui is ready for sudden complete changes to the sampled cosmos
 	- if some entities aren't actually dead for example
 

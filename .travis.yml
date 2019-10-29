@@ -93,7 +93,7 @@ script:
   - popd
   - ls -l hypersomnia
   - cmake/print_bt_if_core_found.sh hypersomnia/core
-  - cmake/upload_if_exe_found.sh $wetransferkey
+  - cmake/upload_if_exe_found.sh $artifact_upload_key
 
 notfications:
   email: false

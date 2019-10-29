@@ -1,3 +1,7 @@
+environment:
+  ARTIFACT_UPLOAD_KEY:
+    secure: BunFdgloJyh1ho/GH4LAOdEIADDDYuz2qN+WzJWUHXz/3G3C8YuXXMeFV06MedP4VN87yPJ7LC525SqfknmoaOIG9WSeZNQvgODCXWytaKqm/2VvENSv+I44arrmhzhCHwc91eFITSy0AEO/aPyyKx2jwmHMGmzpYlU8Lvs0yGDRFx5NUmCk+Tm0ljoquSWp
+
 version: 1.0.{build}
 branches:
   only:
@@ -50,5 +54,5 @@ build_script:
 
 test_script:
   - cd ../../hypersomnia
-  - ps: '& ../cmake/test_and_pack.ps1 -configuration $env:CONFIGURATION -console_mode 0'
+  - ps: '& ../cmake/test_pack_upload.ps1 -artifact_upload_key $env:ARTIFACT_UPLOAD_KEY -configuration $env:CONFIGURATION -console_mode 0'
 
