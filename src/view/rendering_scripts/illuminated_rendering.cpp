@@ -195,6 +195,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	auto write_fow_to_stencil = [&]() {
+		if (viewed_character.dead()) {
+			return;
+		}
+
 		renderer.set_stencil(true);
 
 		renderer.start_writing_stencil();
