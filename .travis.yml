@@ -52,7 +52,6 @@ before_install:
 install:
   - python --version
   - pip install urllib3
-  - pip install py3wetransfer
   - pushd /usr/local/lib
   - ls
   - popd
