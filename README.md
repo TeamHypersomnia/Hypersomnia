@@ -3,8 +3,11 @@
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 
-Latest **Windows** binaries: https://ci.appveyor.com/project/geneotech/hypersomnia/build/artifacts  
-The latest **Linux** binary has to [be built manually](#linux-instructions).
+**Download for:**
+
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.tar.gz"> <img src="https://hypersomnia.xyz/windows2.svg" height=70 hspace=1> </a>
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Linux.tar.gz"> <img src="https://hypersomnia.xyz/linux4.svg" height=70 hspace=1 vspace=20> </a>
+<br>
 
 - [Hypersomnia](#hypersomnia)
 - [Gallery](#gallery)
