@@ -2,6 +2,7 @@
 #include <sol2/sol.hpp>
 
 #include "augs/ensure.h"
+#include "augs/log.h"
 #include "augs/pad_bytes.h"
 
 #include "augs/string/get_type_name.h"
@@ -48,33 +49,41 @@ namespace augs {
 			from_lua_value(object, into);
 		}
 		else if constexpr(is_constant_size_string_v<T>) {
-			into = object.as<std::string>();
+			if (object.is<std::string>()) {
+				into = object.as<std::string>();
+			}
 		}
 		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
-			into = object.as<T>();
+			if (object.is<T>()) {
+				into = object.as<T>();
+			}
 		}
 		else if constexpr(std::is_enum_v<T>) {
 			if constexpr(has_enum_to_string_v<T>) {
-				const auto stringized_enum = object.as<std::string>();
+				if (object.is<std::string>()) {
+					const auto stringized_enum = object.as<std::string>();
 
-				if (
-					const auto* enumized = mapped_or_nullptr(
-						get_string_to_enum_map<T>(), 
-						stringized_enum
-					)
-				) {
-					into = *enumized;
-				}
-				else {
-					throw lua_deserialization_error(
-						"Failed to read \"%x\" into %x enum. Check if such option exists, or if spelling is correct.",
-						stringized_enum,
-						get_type_name<T>()
-					);
+					if (
+						const auto* enumized = mapped_or_nullptr(
+							get_string_to_enum_map<T>(), 
+							stringized_enum
+						)
+					) {
+						into = *enumized;
+					}
+					else {
+						LOG(
+							"Failed to read \"%x\" into %x enum. Check if such option exists, or if spelling is correct.",
+							stringized_enum,
+							get_type_name<T>()
+						);
+					}
 				}
 			}
 			else {
-				into = static_cast<T>(object.as<int>());
+				if (object.is<int>()) {
+					into = static_cast<T>(object.as<int>());
+				}
 			}
 		}
 		else {
