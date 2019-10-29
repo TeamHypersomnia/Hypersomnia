@@ -25,6 +25,7 @@ summary: That which we are brainstorming at the moment.
 	- But we need retention so appveyor is a no-go 
 	- Folders
 		- builds/
+			- latest
 			- 1.0.1323
 				- windows
 					- Hypersomnia.7z

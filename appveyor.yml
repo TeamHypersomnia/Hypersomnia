@@ -36,10 +36,6 @@ notifications:
     on_build_failure: false
     on_build_status_changed: true
 
-artifacts:
-  - path: Hypersomnia-x64.zip
-    name: Hypersomnia (64-bit)
-
 before_build:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\VC\Auxiliary\Build\vcvarsall.bat" x64
   - cd C:\projects\hypersomnia
