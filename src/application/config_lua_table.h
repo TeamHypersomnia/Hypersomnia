@@ -155,4 +155,5 @@ struct config_lua_table {
 	input_recording_type get_input_recording_mode() const;
 
 	void save(sol::state&, const augs::path_type& target_path) const;
+	void load_additive(sol::state&, const augs::path_type& config_lua_path);
 };

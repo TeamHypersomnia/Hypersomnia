@@ -165,10 +165,10 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto config = []() {
 		if (augs::exists(local_config_path)) {
-			return config_lua_table { 
-				lua,
-				local_config_path
-			};
+			auto result = canon_config;
+			result.load_additive(lua, local_config_path);
+
+			return result;
 		}
 		else {
 			return canon_config;

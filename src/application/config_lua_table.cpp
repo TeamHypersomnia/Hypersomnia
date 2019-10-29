@@ -8,6 +8,10 @@
 #include "application/config_lua_table.h"
 
 config_lua_table::config_lua_table(sol::state& lua, const augs::path_type& config_lua_path) {
+	load_additive(lua, config_lua_path);
+}
+
+void config_lua_table::load_additive(sol::state& lua, const augs::path_type& config_lua_path) {
 	try {
 		augs::load_from_lua_table(lua, *this, config_lua_path);
 	}
