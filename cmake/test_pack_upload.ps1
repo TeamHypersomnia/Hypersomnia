@@ -47,8 +47,10 @@ $commitNumber = $(git rev-list --count master)
 $version = "1.0.$commitNumber"
 
 mv $target_exe Hypersomnia.exe
-rm -rf cache logs user demos
+ls -al
+Remove-item -Recurse -Force cache, logs, user, demos 
 cd ../
 7z a $filePath hypersomnia
 
+Remove-item alias:curl
 curl -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" $uploadUrl
