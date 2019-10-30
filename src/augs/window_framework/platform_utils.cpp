@@ -57,12 +57,24 @@ namespace augs {
 
 #elif PLATFORM_UNIX
 
+#if TODO
+#include <X11/Xlib.h>
+#endif
+
 namespace augs {
 	bool set_display(const vec2i /* v */, const int /* bpp */) {
 		return true;
 	}
 
 	xywhi get_display() {
+#if TODO
+		if (Display* d = XOpenDisplay(NULL)) {
+			if (Screen*  s = DefaultScreenOfDisplay(d)) {
+				return { 0, 0, s->width, s->height };
+			}
+		}
+#endif
+
 		return {};
 	}
 
