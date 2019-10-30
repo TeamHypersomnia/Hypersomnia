@@ -230,6 +230,10 @@ namespace augs {
 
 						GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, p.imgui_elements_id));
 						buffer_data(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+
+						lists_to_delete.emplace_back(cmd_list);
+						cmd_i = 0;
+						idx_buffer_offset = nullptr;
 					}
 					else if constexpr(same<C, no_arg_command>) {
 						using N = no_arg_command;
@@ -257,15 +261,6 @@ namespace augs {
 								GL_CHECK(glDrawElements(GL_TRIANGLES, (GLsizei)cc.ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset));
 
 								idx_buffer_offset += cc.ElemCount;
-
-								if (static_cast<int>(cmd_i) == cmd_list->CmdBuffer.size()) {
-									lists_to_delete.emplace_back(cmd_list);
-
-									cmd_list = nullptr;
-									cmd_i = 0;
-									idx_buffer_offset = nullptr;
-								}
-
 								break;
 							}
 						}
