@@ -166,7 +166,7 @@ int work(const int argc, const char* const * const argv) try {
 	static auto config = []() {
 		if (augs::exists(local_config_path)) {
 			auto result = canon_config;
-			result.load_additive(lua, local_config_path);
+			result.load_patch(lua, local_config_path);
 
 			return result;
 		}
@@ -212,7 +212,7 @@ int work(const int argc, const char* const * const argv) try {
 		setter(config);
 		setter(last_saved_config);
 
-		last_saved_config.save(lua, local_config_path);
+		last_saved_config.save_patch(lua, canon_config, local_config_path);
 	};
 
 	static auto last_exit_incorrect_popup = std::optional<editor_popup>();

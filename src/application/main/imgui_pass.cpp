@@ -92,7 +92,7 @@ void perform_imgui_pass(
 					config.perform_float_consistency_test = false;
 					last_saved_config.perform_float_consistency_test = false;
 
-					last_saved_config.save(lua, path_for_saving_config);
+					last_saved_config.save_patch(lua, canon_config, path_for_saving_config);
 				}
 			}
 		}

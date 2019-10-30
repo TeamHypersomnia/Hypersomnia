@@ -8,10 +8,22 @@
 #include "application/config_lua_table.h"
 
 config_lua_table::config_lua_table(sol::state& lua, const augs::path_type& config_lua_path) {
-	load_additive(lua, config_lua_path);
+	load(lua, config_lua_path);
 }
 
-void config_lua_table::load_additive(sol::state& lua, const augs::path_type& config_lua_path) {
+void config_lua_table::load_patch(sol::state& lua, const augs::path_type& config_lua_path) {
+	try {
+		augs::load_from_lua_patch(lua, *this, config_lua_path);
+	}
+	catch (const augs::lua_deserialization_error& err) {
+		throw config_read_error(config_lua_path, err.what());
+	}
+	catch (const augs::file_open_error& err) {
+		throw config_read_error(config_lua_path, err.what());
+	}
+}
+
+void config_lua_table::load(sol::state& lua, const augs::path_type& config_lua_path) {
 	try {
 		augs::load_from_lua_table(lua, *this, config_lua_path);
 	}
@@ -23,8 +35,8 @@ void config_lua_table::load_additive(sol::state& lua, const augs::path_type& con
 	}
 }
 
-void config_lua_table::save(sol::state& lua, const augs::path_type& target_path) const {
-	augs::save_as_lua_table(lua, *this, target_path);
+void config_lua_table::save_patch(sol::state& lua, const config_lua_table& source, const augs::path_type& target_path) const {
+	augs::save_as_lua_patch(lua, source, *this, target_path);
 }
 
 launch_type config_lua_table::get_launch_mode() const {

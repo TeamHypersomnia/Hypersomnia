@@ -1293,7 +1293,7 @@ void settings_gui_state::perform(
 			if (ImGui::Button("Save settings")) {
 				augs::timer save_timer;
 				last_saved_config = config;
-				config.save(lua, config_path_for_saving);
+				config.save_patch(lua, canon_config, config_path_for_saving);
 				LOG("Saved new config in: %x ms", save_timer.get<std::chrono::milliseconds>());
 			}
 
