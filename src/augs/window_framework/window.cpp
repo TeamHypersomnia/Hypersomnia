@@ -194,12 +194,6 @@ namespace augs {
 	
 				set_window_rect(screen_rect);
 			}
-	
-			if (force || changed(settings.position)) {
-				auto r = get_window_rect_impl();
-				r.set_position(settings.position);
-				set_window_rect(r);
-			}
 		}
 
 		current_settings = settings;
