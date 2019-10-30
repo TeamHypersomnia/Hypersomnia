@@ -89,7 +89,7 @@ struct config_lua_table {
 	bool log_to_live_file = false;
 	bool perform_float_consistency_test = true;
 
-	std::vector<std::string> official_servers;
+	std::vector<std::string> official_arena_servers;
 
 	unit_tests_settings unit_tests;
 	augs::window_settings window;

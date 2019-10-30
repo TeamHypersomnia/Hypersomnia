@@ -87,6 +87,8 @@
 #include "game/cosmos/for_each_entity.h"
 #include "application/setups/client/demo_paths.h"
 
+#include "3rdparty/cpp-httplib/httplib.h"
+
 #define CANON_SHADER_FOLDER "content/necessary/shaders"
 #define LOCAL_SHADER_FOLDER CANON_SHADER_FOLDER
 
@@ -821,7 +823,7 @@ and then hitting Save settings.
 			window, 
 			config.default_client_start, 
 			config.client,
-			config.official_servers
+			config.official_arena_servers
 		);
 
 		if (perform_result || client_start_requested) {

@@ -6,7 +6,7 @@ hide_sidebar: true
 permalink: replicated_state
 summary: |
     A state is called **replicated** if, at any point in the code, efforts are made to replicate it *exactly* on a remote machine,  
-    whether by transferring its bytes directly, or by [inference](inferred_cache) of what has already been transferred.  
+    whether by transferring its bytes directly, or by [inference](inferred_cache) from what has already been transferred.  
 
     It is not to be confused with [significant state](significant_state).  
     Additionally, it should be clear that both significant state and [inferred state](inferred_cache) can be **replicated state**.

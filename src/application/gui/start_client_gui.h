@@ -34,6 +34,6 @@ public:
 		augs::window& window,
 		client_start_input&,
 		client_vars&,
-		const std::vector<std::string>& official_servers
+		const std::vector<std::string>& official_arena_servers
 	);
 };

@@ -37,7 +37,7 @@ bool start_client_gui_state::perform(
 	augs::window& window,
 	client_start_input& into_start,
 	client_vars& into_vars,
-	const std::vector<std::string>& official_servers
+	const std::vector<std::string>& official_arena_servers
 ) {
 	if (!show) {
 		return false;
@@ -74,8 +74,8 @@ bool start_client_gui_state::perform(
 			auto& preferred = into_start.preferred_official_address;
 
 			if (preferred.empty()) {
-				if (official_servers.size() > 0) {
-					preferred = official_servers[0];
+				if (official_arena_servers.size() > 0) {
+					preferred = official_arena_servers[0];
 				}
 			}
 

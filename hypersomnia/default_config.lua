@@ -3,7 +3,12 @@ return {
   log_to_live_file = false,
   perform_float_consistency_test = true,
 
-  official_servers = {
+  http_client = {
+    update_at_startup = true,
+	update_url = "https://hypersomnia.xyz/builds/latest"
+  },
+
+  official_arena_servers = {
 	"arena.hypersomnia.xyz" 
   },
 
