@@ -18,4 +18,5 @@ struct hypersomnia_version {
 	// END GEN INTROSPECTOR
 
 	std::string get_summary() const;
+	std::string get_version_number() const;
 };

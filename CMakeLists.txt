@@ -365,6 +365,7 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	# This should be the first one to build to catch errors early
 	"src/main.cpp"
 	"src/work.cpp"
+	"src/application/main/application_updates.cpp"
 	"src/view/rendering_scripts/illuminated_rendering.cpp"
 	"src/application/tests_of_traits.cpp"
 

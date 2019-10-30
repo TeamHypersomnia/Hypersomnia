@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/filesystem/path.h"
 #include "augs/math/rects.h"
+#include "augs/math/vec2.h"
 
 namespace augs {
 	enum class vsync_type {

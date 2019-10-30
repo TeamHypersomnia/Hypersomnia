@@ -49,6 +49,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/streaming/viewables_streaming.h"
 #include "view/frame_profiler.h"
+#include "view/shader_paths.h"
 
 #include "application/session_profiler.h"
 #include "application/config_lua_table.h"
@@ -87,10 +88,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "application/setups/client/demo_paths.h"
 
-#include "3rdparty/cpp-httplib/httplib.h"
-
-#define CANON_SHADER_FOLDER "content/necessary/shaders"
-#define LOCAL_SHADER_FOLDER CANON_SHADER_FOLDER
+#include "application/main/application_updates.h"
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
@@ -169,127 +167,15 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("Creating the ImGui atlas image.");
 	static const auto imgui_atlas_image = augs::imgui::create_atlas_image(config.gui_fonts.gui);
 
-	static augs::graphics::renderer_backend::result_info renderer_backend_result;
+	if (config.http_client.update_at_startup) {
+		const auto result = check_and_apply_updates(
+			imgui_atlas_image,
+			config.http_client.update_url,
+			config.window
+		);
 
-	{
-		using namespace augs::imgui;
-
-		const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
-		auto fix_background_color = scoped_style_color(ImGuiCol_WindowBg, ImVec4{win_bg.x, win_bg.y, win_bg.z, 1.f});
-
-		const auto window_size = vec2i(500, 150);
-		auto settings = config.window;
-		settings.size = window_size;
-		settings.fullscreen = false;
-		settings.raw_mouse_input = false;
-		settings.border = false;
-
-		augs::window window(settings);
-		const auto disp = window.get_display();
-
-		settings.position = vec2i { disp.w / 2 - window_size.x / 2, disp.h / 2 - window_size.y / 2 };
-		window.apply(settings);
-
-		augs::graphics::renderer_backend renderer_backend;
-
-		const auto imgui_atlas = augs::graphics::texture(imgui_atlas_image);
-
-		augs::local_entropy entropy;
-
-		augs::renderer renderer;
-
-		optional_shader standard;
-
-		LOG("Initializing the standard shader.");
-
-		try {
-			const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", CANON_SHADER_FOLDER, "standard");
-			const auto canon_fsh_path = typesafe_sprintf("%x/%x.fsh", CANON_SHADER_FOLDER, "standard");
-
-			standard.emplace(
-				canon_vsh_path,
-				canon_fsh_path
-			);
-		}
-		catch (const augs::graphics::shader_error& err) {
-			(void)err;
-		}
-
-		if (standard != std::nullopt) {
-			standard->set_as_current(renderer);
-			standard->set_projection(renderer, augs::orthographic_projection(vec2(window_size)));
-		}
-
-		renderer.set_viewport({ vec2i{0, 0}, window_size });
-
-		augs::timer frame_timer;
-
-		float cntr = 0.f;
-
-		while (cntr < 1.f) {
-			window.collect_entropy(entropy);
-
-			for (const auto& e : entropy) {
-				if (e.is_exit_message()) {
-					return EXIT_SUCCESS;
-				}
-			}
-
-			const auto frame_delta = frame_timer.extract_delta();
-			const auto dt_secs = frame_delta.in_seconds();
-
-			augs::imgui::setup_input(
-				entropy,
-				dt_secs,
-				window_size
-			);
-
-			ImGui::NewFrame();
-			center_next_window(1.f, ImGuiCond_Always);
-
-			cntr += dt_secs;
-
-			{
-				auto loading_window = scoped_window("Loading in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-
-				text_color("Upgrading Hypersomnia...", yellow);
-				ImGui::Separator();
-
-				if (cntr >= 0.f) {
-					ImGui::ProgressBar(cntr, ImVec2(-1.0f,0.0f));
-				}
-			}
-
-			augs::imgui::render();
-
-			renderer.clear_current_fbo();
-			renderer.draw_call_imgui(
-				imgui_atlas, 
-				nullptr, 
-				nullptr, 
-				nullptr
-			);
-
-			renderer_backend_result.clear();
-
-			{
-				auto& r = renderer;
-
-				renderer_backend.perform(
-					renderer_backend_result,
-					r.commands.data(),
-					r.commands.size(),
-					r.dedicated
-				);
-			}
-
-			for (const auto& f : renderer_backend_result.imgui_lists_to_delete) {
-				IM_DELETE(f);
-			}
-
-			window.swap_buffers();
-
-			renderer.next_frame();
+		if (result.type == application_update_result_type::EXIT) {
+			return EXIT_SUCCESS;
 		}
 	}
 
@@ -2626,6 +2512,8 @@ and then hitting Save settings.
 		get_write_buffer().should_quit = true;
 		should_quit = true;
 	};
+
+	static augs::graphics::renderer_backend::result_info renderer_backend_result;
 
 	static auto game_main_thread_synced_op = []() {
 		auto scope = measure_scope(game_thread_performance.synced_op);

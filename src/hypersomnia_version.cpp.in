@@ -21,14 +21,20 @@ hypersomnia_version::hypersomnia_version() :
 
 std::string hypersomnia_version::get_summary() const {
 	return typesafe_sprintf(
+		"Hypersomnia version %x\n",
 		"Revision no.: %x %x\n"
 		"Build date: %x\n"
 		"Commit message:\n%x\n",
+		get_version_number(),
 		commit_number ? std::to_string(commit_number) : "Unknown",
 		commit_number ? working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
 		commit_date,
 		commit_message.size() < 30 ? commit_message : commit_message.substr(0, 30) + "(...)"
 	);
+}
+
+std::string hypersomnia_version::get_version_number() const {
+	return typesafe_sprintf("1.0.%x", commit_number);
 }
 
 #else
@@ -44,6 +50,10 @@ hypersomnia_version::hypersomnia_version() :
 
 std::string hypersomnia_version::get_summary() const {
 	return "Unknown revision.\nVersion file generator was excluded from build.\n";
+}
+
+std::string hypersomnia_version::get_version_number() const {
+	return "unknown";
 }
 
 #endif

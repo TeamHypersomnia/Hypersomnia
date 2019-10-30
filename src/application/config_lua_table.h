@@ -43,6 +43,7 @@
 #include "application/app_intent_type.h"
 #include "application/network/simulation_receiver_settings.h"
 #include "application/performance_settings.h"
+#include "application/http_client/http_client_settings.h"
 
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
@@ -91,6 +92,7 @@ struct config_lua_table {
 
 	std::vector<std::string> official_arena_servers;
 
+	http_client_settings http_client;
 	unit_tests_settings unit_tests;
 	augs::window_settings window;
 	augs::renderer_settings renderer;

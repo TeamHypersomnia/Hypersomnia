@@ -34,6 +34,7 @@
 #include "application/gui/menu/creators_screen.h"
 
 #include "augs/readwrite/lua_readwrite.h"
+#include "hypersomnia_version.h"
 
 using namespace augs::event::keys;
 using namespace augs::gui::text;
@@ -205,4 +206,11 @@ void main_menu_setup::draw_overlays(
 			from_bbcode ( latest_news.get(), { gui_font, cyan } )
 		);
 	};
+
+	print_stroked(
+		output,
+		vec2i(0, screen_size.y),
+		from_bbcode ( typesafe_sprintf("Build %x", hypersomnia_version().get_version_number()), { gui_font, white } ),
+		{ augs::ralign::B }
+	);
 }
