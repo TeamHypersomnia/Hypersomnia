@@ -9,6 +9,8 @@
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Linux.tar.gz"> <img src="https://hypersomnia.xyz/linux_icon.svg" height=70 hspace=1 vspace=20> </a>
 <br>
 
+*[(for older versions click here)](https://hypersomnia.xyz/builds)*
+
 - [Hypersomnia](#hypersomnia)
 - [Gallery](#gallery)
 - [How to build](#how-to-build)

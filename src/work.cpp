@@ -87,6 +87,9 @@
 #include "game/cosmos/for_each_entity.h"
 #include "application/setups/client/demo_paths.h"
 
+#define CANON_SHADER_FOLDER "content/necessary/shaders"
+#define LOCAL_SHADER_FOLDER CANON_SHADER_FOLDER
+
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
 bool is_dedicated_server = false;
@@ -107,6 +110,186 @@ int work(const int argc, const char* const * const argv) try {
 
 	augs::create_directories(LOG_FILES_DIR);
 	augs::create_directories(SERVER_LOG_FILES_DIR);
+
+	static const auto canon_config_path = augs::path_type("default_config.lua");
+	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.lua");
+
+	LOG("Creating lua state.");
+	static auto lua = augs::create_lua_state();
+
+	LOG("Loading the config.");
+
+	static const auto canon_config = []() {
+		auto result = config_lua_table {
+			lua,
+			canon_config_path
+		};
+
+#if !IS_PRODUCTION_BUILD
+#if PLATFORM_UNIX
+		/* Some developer-friendly options */
+		result.default_client_start.chosen_address_type = connect_address_type::CUSTOM;
+		result.window.fullscreen = false;
+#endif
+#endif
+
+		return result;
+	}();
+
+	static auto config = []() {
+		if (augs::exists(local_config_path)) {
+			auto result = canon_config;
+			result.load_patch(lua, local_config_path);
+
+			return result;
+		}
+		else {
+			return canon_config;
+		}
+	}();
+
+	LOG("Initializing ImGui.");
+
+	static const auto imgui_ini_path = 
+		is_dedicated_server ? 
+		LOCAL_FILES_DIR "/server_imgui.ini"
+		: LOCAL_FILES_DIR "/imgui.ini"
+	;
+
+	static const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
+
+	augs::imgui::init(
+		imgui_ini_path,
+		imgui_log_path.c_str(),
+		config.gui_style
+	);
+
+	LOG("Creating the ImGui atlas image.");
+	static const auto imgui_atlas_image = augs::imgui::create_atlas_image(config.gui_fonts.gui);
+
+	static augs::graphics::renderer_backend::result_info renderer_backend_result;
+
+	{
+		using namespace augs::imgui;
+
+		const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
+		auto fix_background_color = scoped_style_color(ImGuiCol_WindowBg, ImVec4{win_bg.x, win_bg.y, win_bg.z, 1.f});
+
+		const auto window_size = vec2i(500, 150);
+		auto settings = config.window;
+		settings.size = window_size;
+		settings.fullscreen = false;
+		settings.raw_mouse_input = false;
+		settings.border = false;
+
+		augs::window window(settings);
+		const auto disp = window.get_display();
+
+		settings.position = vec2i { disp.w / 2 - window_size.x / 2, disp.h / 2 - window_size.y / 2 };
+		window.apply(settings);
+
+		augs::graphics::renderer_backend renderer_backend;
+
+		const auto imgui_atlas = augs::graphics::texture(imgui_atlas_image);
+
+		augs::local_entropy entropy;
+
+		augs::renderer renderer;
+
+		optional_shader standard;
+
+		LOG("Initializing the standard shader.");
+
+		try {
+			const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", CANON_SHADER_FOLDER, "standard");
+			const auto canon_fsh_path = typesafe_sprintf("%x/%x.fsh", CANON_SHADER_FOLDER, "standard");
+
+			standard.emplace(
+				canon_vsh_path,
+				canon_fsh_path
+			);
+		}
+		catch (const augs::graphics::shader_error& err) {
+			(void)err;
+		}
+
+		if (standard != std::nullopt) {
+			standard->set_as_current(renderer);
+			standard->set_projection(renderer, augs::orthographic_projection(vec2(window_size)));
+		}
+
+		renderer.set_viewport({ vec2i{0, 0}, window_size });
+
+		augs::timer frame_timer;
+
+		float cntr = 0.f;
+
+		while (cntr < 1.f) {
+			window.collect_entropy(entropy);
+
+			for (const auto& e : entropy) {
+				if (e.is_exit_message()) {
+					return EXIT_SUCCESS;
+				}
+			}
+
+			const auto frame_delta = frame_timer.extract_delta();
+			const auto dt_secs = frame_delta.in_seconds();
+
+			augs::imgui::setup_input(
+				entropy,
+				dt_secs,
+				window_size
+			);
+
+			ImGui::NewFrame();
+			center_next_window(1.f, ImGuiCond_Always);
+
+			cntr += dt_secs;
+
+			{
+				auto loading_window = scoped_window("Loading in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+				text_color("Upgrading Hypersomnia...", yellow);
+				ImGui::Separator();
+
+				if (cntr >= 0.f) {
+					ImGui::ProgressBar(cntr, ImVec2(-1.0f,0.0f));
+				}
+			}
+
+			augs::imgui::render();
+
+			renderer.clear_current_fbo();
+			renderer.draw_call_imgui(
+				imgui_atlas, 
+				nullptr, 
+				nullptr, 
+				nullptr
+			);
+
+			renderer_backend_result.clear();
+
+			{
+				auto& r = renderer;
+
+				renderer_backend.perform(
+					renderer_backend_result,
+					r.commands.data(),
+					r.commands.size(),
+					r.dedicated
+				);
+			}
+
+			for (const auto& f : renderer_backend_result.imgui_lists_to_delete) {
+				IM_DELETE(f);
+			}
+
+			window.swap_buffers();
+
+			renderer.next_frame();
+		}
+	}
 
 	static augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
@@ -140,41 +323,6 @@ int work(const int argc, const char* const * const argv) try {
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
-	static const auto canon_config_path = augs::path_type("default_config.lua");
-	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.lua");
-
-	LOG("Creating lua state.");
-	static auto lua = augs::create_lua_state();
-
-	LOG("Loading the config.");
-
-	static const auto canon_config = []() {
-		auto result = config_lua_table {
-			lua,
-			canon_config_path
-		};
-
-#if PLATFORM_UNIX
-		/* Some developer-friendly options */
-		result.default_client_start.chosen_address_type = connect_address_type::CUSTOM;
-		result.window.fullscreen = false;
-#endif
-
-		return result;
-	}();
-
-	static auto config = []() {
-		if (augs::exists(local_config_path)) {
-			auto result = canon_config;
-			result.load_patch(lua, local_config_path);
-
-			return result;
-		}
-		else {
-			return canon_config;
-		}
-	}();
-
 	static const auto float_tests_succeeded = 
 		config.perform_float_consistency_test 
 		? perform_float_consistency_tests() 
@@ -189,22 +337,6 @@ int work(const int argc, const char* const * const argv) try {
 		LOG("Live log was enabled due to a flag in config.");
 		LOG("Live log file created at %x", augs::date_time().get_readable());
 	}
-
-	LOG("Initializing ImGui.");
-
-	static const auto imgui_ini_path = 
-		is_dedicated_server ? 
-		LOCAL_FILES_DIR "/server_imgui.ini"
-		: LOCAL_FILES_DIR "/imgui.ini"
-	;
-
-	static const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
-
-	augs::imgui::init(
-		imgui_ini_path,
-		imgui_log_path.c_str(),
-		config.gui_style
-	);
 
 	static auto last_saved_config = config;
 
@@ -232,7 +364,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		last_exit_incorrect_popup = editor_popup {
 			"Warning",
-			typesafe_sprintf(R"(Looks like the game has crashed since last time.
+			typesafe_sprintf(R"(Looks like the game has crashed since the last time.
 Consider sending developers the log file located at:
 
 %x
@@ -402,8 +534,8 @@ and then hitting Save settings.
 	LOG("Initializing the necessary shaders.");
 	static all_necessary_shaders necessary_shaders(
 		get_general_renderer(),
-		"content/necessary/shaders",
-		"content/necessary/shaders",
+		CANON_SHADER_FOLDER,
+		LOCAL_SHADER_FOLDER,
 		config.drawing
 	);
 
@@ -418,9 +550,9 @@ and then hitting Save settings.
 		"content/necessary/gfx",
 		config.content_regeneration.regenerate_every_time
 	);
-	
+
 	LOG("Creating the ImGui atlas.");
-	static const auto imgui_atlas = augs::imgui::create_atlas(config.gui_fonts.gui);
+	static const auto imgui_atlas = augs::graphics::texture(imgui_atlas_image);
 
 	static const auto configurables = configuration_subscribers {
 		window,
@@ -2492,8 +2624,6 @@ and then hitting Save settings.
 		get_write_buffer().should_quit = true;
 		should_quit = true;
 	};
-
-	static augs::graphics::renderer_backend::result_info renderer_backend_result;
 
 	static auto game_main_thread_synced_op = []() {
 		auto scope = measure_scope(game_thread_performance.synced_op);
