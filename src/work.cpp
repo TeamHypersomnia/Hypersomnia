@@ -148,6 +148,26 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	}();
 
+	LOG("Parsing command-line parameters.");
+	static const auto params = cmd_line_params(argc, argv);
+
+	if (config.unit_tests.run) {
+		/* Needed by some unit tests */
+		augs::network_raii raii;
+
+		LOG("Running unit tests.");
+		augs::run_unit_tests(config.unit_tests);
+
+		LOG("All unit tests have passed.");
+
+		if (params.unit_tests_only) {
+			return EXIT_SUCCESS;
+		}
+	}
+	else {
+		LOG("Unit tests were disabled.");
+	}
+
 	LOG("Initializing ImGui.");
 
 	static const auto imgui_ini_path = 
@@ -267,9 +287,6 @@ and then hitting Save settings.
 		};
 	}
 
-	LOG("Parsing command-line parameters.");
-	static const auto params = cmd_line_params(argc, argv);
-
 	static augs::timer global_libraries_timer;
 
 	LOG("Initializing global libraries");
@@ -302,23 +319,6 @@ and then hitting Save settings.
 			p.value().emplace<T>(std::forward<decltype(args)>(args)...);
 		}
 	};
-
-	if (config.unit_tests.run) {
-		/* Needed by some unit tests */
-		augs::network_raii raii;
-
-		LOG("Running unit tests.");
-		augs::run_unit_tests(config.unit_tests);
-
-		LOG("All unit tests have passed.");
-
-		if (params.unit_tests_only) {
-			return EXIT_SUCCESS;
-		}
-	}
-	else {
-		LOG("Unit tests were disabled.");
-	}
 
 	if (params.start_dedicated_server) {
 		LOG("Starting the dedicated server at port: %x", config.default_server_start.port);
