@@ -56,10 +56,9 @@ namespace augs {
 }
 
 #elif PLATFORM_UNIX
+#include "augs/misc/scope_guard.h"
 
-#if TODO
 #include <X11/Xlib.h>
-#endif
 
 namespace augs {
 	bool set_display(const vec2i /* v */, const int /* bpp */) {
@@ -67,13 +66,13 @@ namespace augs {
 	}
 
 	xywhi get_display() {
-#if TODO
 		if (Display* d = XOpenDisplay(NULL)) {
+			auto guard = augs::scope_guard([d](){ XCloseDisplay(d); });
+
 			if (Screen*  s = DefaultScreenOfDisplay(d)) {
 				return { 0, 0, s->width, s->height };
 			}
 		}
-#endif
 
 		return {};
 	}
