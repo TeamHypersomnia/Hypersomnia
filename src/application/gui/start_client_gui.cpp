@@ -125,7 +125,7 @@ bool start_client_gui_state::perform(
 					}
 				}
 
-				const auto cached_file_path = LOCAL_FILES_DIR "/cached_avatar.png";
+				const auto cached_file_path = USER_FILES_DIR "/cached_avatar.png";
 				loaded_image.save_as_png(cached_file_path);
 
 				new_path = cached_file_path;

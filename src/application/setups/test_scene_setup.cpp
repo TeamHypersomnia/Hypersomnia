@@ -23,7 +23,7 @@ test_scene_setup::test_scene_setup(
 #endif
 
 	if (recording_type != input_recording_type::DISABLED) {
-		//if (player.try_to_load_or_save_new_session(LOCAL_FILES_DIR "/sessions/", "recorded.inputs")) {
+		//if (player.try_to_load_or_save_new_session(USER_FILES_DIR "/sessions/", "recorded.inputs")) {
 		//
 		//}
 	}

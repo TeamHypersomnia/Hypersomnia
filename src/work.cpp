@@ -108,11 +108,32 @@ bool is_dedicated_server = false;
 int work(const int argc, const char* const * const argv) try {
 	setup_float_flags();
 
-	augs::create_directories(LOG_FILES_DIR);
-	augs::create_directories(SERVER_LOG_FILES_DIR);
+	{
+		const auto all_created_directories = std::vector<std::string> {
+			LOG_FILES_DIR,
+			SERVER_LOG_FILES_DIR,
+			GENERATED_FILES_DIR,
+			USER_FILES_DIR,
+			DEMOS_DIR
+		};
+
+		{
+			std::string all;
+
+			for (const auto& a : all_created_directories) {
+				all += "\n" + a;
+			}
+
+			LOG("Creating directories:%x", all);
+		}
+
+		for (const auto& a : all_created_directories) {
+			augs::create_directories(a);
+		}
+	}
 
 	static const auto canon_config_path = augs::path_type("default_config.lua");
-	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.lua");
+	static const auto local_config_path = augs::path_type(USER_FILES_DIR "/config.lua");
 
 	LOG("Creating lua state.");
 	static auto lua = augs::create_lua_state();
@@ -172,8 +193,8 @@ int work(const int argc, const char* const * const argv) try {
 
 	static const auto imgui_ini_path = 
 		is_dedicated_server ? 
-		LOCAL_FILES_DIR "/server_imgui.ini"
-		: LOCAL_FILES_DIR "/imgui.ini"
+		USER_FILES_DIR "/server_imgui.ini"
+		: USER_FILES_DIR "/imgui.ini"
 	;
 
 	static const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
@@ -222,12 +243,6 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("If the game crashes repeatedly, consider deleting the \"cache\" folder.\n");
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
-
-	LOG("Creating directories: %x %x", GENERATED_FILES_DIR, LOCAL_FILES_DIR);
-
-	augs::create_directories(GENERATED_FILES_DIR);
-	augs::create_directories(LOCAL_FILES_DIR);
-	augs::create_directories(DEMOS_DIR);
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 

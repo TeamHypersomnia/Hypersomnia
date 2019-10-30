@@ -123,7 +123,7 @@ set(HYPERSOMNIA_GENERATED_FILES_DIR "cache")
 # Where the game will save untitled works from editor, gui layouts, user config etc.
 # Deleting this folder might possibly result in data loss, e.g. the untitled works and some user settings.
 
-set(HYPERSOMNIA_LOCAL_FILES_DIR "user")
+set(HYPERSOMNIA_USER_FILES_DIR "user")
 
 ## Building switches for functionality using 3rdparty libraries.
 
@@ -1388,7 +1388,7 @@ add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})
 
 add_definitions(-DOFFICIAL_CONTENT_DIR="${HYPERSOMNIA_OFFICIAL_CONTENT_DIR}")
 add_definitions(-DGENERATED_FILES_DIR="${HYPERSOMNIA_GENERATED_FILES_DIR}")
-add_definitions(-DLOCAL_FILES_DIR="${HYPERSOMNIA_LOCAL_FILES_DIR}")
+add_definitions(-DUSER_FILES_DIR="${HYPERSOMNIA_USER_FILES_DIR}")
 add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
 add_definitions(-DSERVER_LOG_FILES_DIR="${HYPERSOMNIA_SERVER_LOG_FILES_DIR}")
 

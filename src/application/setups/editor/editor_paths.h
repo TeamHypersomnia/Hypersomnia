@@ -5,7 +5,7 @@
 
 #include "application/arena/arena_paths.h"
 
-#define EDITOR_DIR LOCAL_FILES_DIR "/editor"
+#define EDITOR_DIR USER_FILES_DIR "/editor"
 
 inline auto get_last_folders_path() {
 	return EDITOR_DIR "/last_folders.lua";

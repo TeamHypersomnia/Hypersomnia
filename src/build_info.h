@@ -26,11 +26,11 @@ inline auto directories_info() {
 		"LOG_FILES_DIR=%x\n"
 		"SERVER_LOG_FILES_DIR=%x\n"
 		"GENERATED_FILES_DIR=%x\n"
-		"LOCAL_FILES_DIR=%x\n",
+		"USER_FILES_DIR=%x\n",
 		LOG_FILES_DIR,
 		SERVER_LOG_FILES_DIR,
 		GENERATED_FILES_DIR,
-		LOCAL_FILES_DIR
+		USER_FILES_DIR
 	);
 }
 

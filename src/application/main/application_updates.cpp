@@ -270,13 +270,6 @@ application_update_result check_and_apply_updates(
 				const auto total_bytes = readable_bytesize(total, "%2f");
 
 				const auto completion_mult = static_cast<double>(len) / total;
-
-				//const auto percent = completion_mult * 100;
-				//const auto percent_string = typesafe_sprintf("%x", percent) + " %";
-
-				//const auto downloading_string = typesafe_sprintf("Acquiring %x...\n\n", archive_filename);
-				//text(downloading_string);
-
 				const auto upstream_string = typesafe_sprintf("Mirror:     %x%x", host_url, update_path);
 
 
