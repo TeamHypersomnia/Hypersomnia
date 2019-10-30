@@ -93,21 +93,25 @@ void bake_fresh_atlas(
 		}
 	}
 
+	std::vector<const source_font_identifier*> fonts_to_skip;
+
 	{
 		auto scope = measure_scope(out.profiler.loading_fonts);
 
-		for (const auto& input_fnt_id : subjects.fonts) {
-			const auto it = loaded_fonts.try_emplace(input_fnt_id, input_fnt_id);
+		for (const auto& input_font_id : subjects.fonts) {
+			const auto it = loaded_fonts.try_emplace(input_font_id, input_font_id);
 
-			{
-				const bool is_font_unique = it.second;
-				(void)is_font_unique;
-				ensure(is_font_unique);
+			const bool is_font_unique = it.second;
+
+			if (!is_font_unique) {
+				fonts_to_skip.push_back(std::addressof(input_font_id));
+
+				continue;
 			}
 
 			const auto& fnt = (*it.first).second;
 
-			auto& out_fnt = baked.fonts[input_fnt_id];
+			auto& out_fnt = baked.fonts[input_font_id];
 			out_fnt.meta = fnt.meta;
 
 			for (const auto& g : fnt.glyph_bitmaps) {
@@ -361,6 +365,10 @@ void bake_fresh_atlas(
 		std::size_t current_rect = subjects.images.size();
 
 		for (auto& input_font_id : subjects.fonts) {
+			if (found_in(fonts_to_skip, std::addressof(input_font_id))) {
+				continue;
+			}
+
 			auto& output_font = baked.fonts[input_font_id];
 
 			const auto n = output_font.glyphs_in_atlas.size();

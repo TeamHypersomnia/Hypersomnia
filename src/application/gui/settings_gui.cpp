@@ -1063,7 +1063,7 @@ void settings_gui_state::perform(
 				if (auto node = scoped_tree_node("GUI font")) {
 					auto scope = scoped_indent();
 
-					revertable_slider("Size in pixels", config.gui_fonts.gui.size_in_pixels, 5.f, 30.f);
+					revertable_slider("Size in pixels", config.gui_fonts.gui.size_in_pixels, 5.f, 64.f);
 				}
 
 				text(

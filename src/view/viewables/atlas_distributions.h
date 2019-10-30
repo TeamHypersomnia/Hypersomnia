@@ -30,7 +30,7 @@ struct subjects_gathering_input {
 	const necessary_image_definitions_map& necessary_image_definitions;
 
 	const image_definitions_map image_definitions;
-	const all_gui_fonts_inputs& gui_font_inputs;
+	const all_gui_fonts_inputs gui_font_inputs;
 	const augs::path_type unofficial_project_dir;
 	atlas_progress_structs* const progress;
 };
