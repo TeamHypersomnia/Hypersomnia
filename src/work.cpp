@@ -187,7 +187,7 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("Creating the ImGui atlas image.");
 	static const auto imgui_atlas_image = augs::imgui::create_atlas_image(config.gui_fonts.gui);
 
-	if (config.http_client.update_at_startup) {
+	if (config.http_client.update_on_launch) {
 		const auto result = check_and_apply_updates(
 			imgui_atlas_image,
 			config.http_client,

@@ -4,7 +4,7 @@ return {
   perform_float_consistency_test = true,
 
   http_client = {
-    update_at_startup = true,
+    update_on_launch = false,
 	update_connection_timeout_secs = 2,
 	application_update_host = "hypersomnia.xyz",
 	application_update_path = "/builds/latest"
@@ -523,7 +523,7 @@ return {
     start_menu_music_at_secs = 0
   },
   session = {
-    automatically_hide_settings_ingame = false,
+    hide_settings_ingame = false,
     show_developer_console = false,
     camera_query_aabb_mult = 1.0
   },

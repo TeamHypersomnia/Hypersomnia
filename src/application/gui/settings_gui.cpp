@@ -255,7 +255,19 @@ void settings_gui_state::perform(
 				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
 
 				revertable_enum_radio("Vsync mode", config.window.vsync_mode);
-				revertable_checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame);
+				revertable_checkbox("Hide this window in-game", config.session.hide_settings_ingame);
+
+				{
+					auto& scope_cfg = config.http_client;
+
+					revertable_checkbox("Automatically update when the game starts", scope_cfg.update_on_launch);
+					revertable_slider(SCOPE_CFG_NVP(update_connection_timeout_secs), 1, 3600);
+
+					input_text<100>(SCOPE_CFG_NVP(application_update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.application_update_host);
+					input_text<100>(SCOPE_CFG_NVP(application_update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.application_update_path);
+				}
+
+				text_disabled("\n\n");
 
 				ImGui::Separator();
 

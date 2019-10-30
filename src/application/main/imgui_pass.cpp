@@ -47,7 +47,7 @@ void perform_imgui_pass(
 
 	if (
 		const bool should_hide_settings =
-			config.session.automatically_hide_settings_ingame
+			config.session.hide_settings_ingame
 			&& has_gameplay_setup
 			&& !ingame_menu_active
 		;
