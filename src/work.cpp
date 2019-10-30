@@ -194,7 +194,7 @@ int work(const int argc, const char* const * const argv) try {
 			config.window
 		);
 
-		if (result.type == application_update_result_type::EXIT) {
+		if (result.type == application_update_result_type::EXIT_APPLICATION) {
 			return EXIT_SUCCESS;
 		}
 	}

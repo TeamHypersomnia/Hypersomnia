@@ -2,9 +2,8 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #endif
 
-#include "3rdparty/cpp-httplib/httplib.h"
-
 #include "augs/log.h"
+#include "augs/string/typesafe_sscanf.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/math/matrix.h"
 #include "application/main/application_updates.h"
@@ -24,19 +23,31 @@
 #include "view/shader_paths.h"
 #include "augs/readwrite/byte_file.h"
 
+#include "3rdparty/cpp-httplib/httplib.h"
+
 #if BUILD_OPENSSL
 using client_type = httplib::SSLClient;
 #else
 using client_type = httplib::Client;
 #endif
 
+#include "hypersomnia_version.h"
+
 using response_ptr = std::shared_ptr<httplib::Response>;
 
-template <class F>
-decltype(auto) launch_download(client_type& client, const std::string& resource, F&& callback) {
-	return client.Get(resource.c_str(), [&callback](uint64_t len, uint64_t total) {
-		return callback(len, total);
-	});
+#if PLATFORM_UNIX
+#define PLATFORM_STRING "Linux"
+#define ARCHIVE_EXTENSION "tar.gz"
+#elif PLATFORM_WINDOWS
+#define PLATFORM_STRING "Windows"
+#define ARCHIVE_EXTENSION "zip"
+#else
+#error "UNSUPPORTED!"
+#endif
+
+template <class... F>
+decltype(auto) launch_download(client_type& client, const std::string& resource, F&&... args) {
+	return client.Get(resource.c_str(), std::forward<F>(args)...);
 }
 
 using R = application_update_result_type;
@@ -48,10 +59,75 @@ application_update_result check_and_apply_updates(
 ) {
 	using namespace augs::imgui;
 
+	application_update_result result;
+
+	const auto& host_url = http_settings.application_update_host;
+
+#if BUILD_OPENSSL
+	const auto port = 443;
+#else
+	const auto port = 80;
+#endif
+
+	client_type http_client(host_url.c_str(), port, http_settings.update_connection_timeout_secs);
+
+#if BUILD_OPENSSL
+	http_client.set_ca_cert_path("web/ca-bundle.crt");
+	http_client.enable_server_certificate_verification(true);
+#endif
+	http_client.follow_location(true);
+
+	const auto& update_path = http_settings.application_update_path;
+	const auto version_path = typesafe_sprintf("%x/version-%x.txt", update_path, PLATFORM_STRING);
+
+	auto log_null_response = [&http_client]() {
+#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
+		auto result = http_client.get_openssl_verify_result();
+
+		if (result) {
+			LOG("verify error: %x", X509_verify_cert_error_string(result));
+		}
+#endif
+
+		LOG("Response was null!");
+	};
+
+	std::string new_version;
+
+	{
+		const auto response = launch_download(http_client, version_path); 
+
+		if (response) {
+			const auto& contents = response->body;
+
+			std::string new_hash;
+			typesafe_sscanf(contents, "%x\n%x", new_version, new_hash);
+
+			const auto current_hash = hypersomnia_version().commit_hash;
+
+			if (new_hash == current_hash) {
+				LOG("The game is up to date. Commit hash: %x", current_hash);
+
+				result.type = R::UP_TO_DATE;
+				return result;
+			}
+
+			LOG("Commit hash differs. Requesting upgrade. \nOld: %x\nNew: %x", current_hash, new_hash);
+		}
+		else {
+			log_null_response();
+			result.type = R::FAILED;
+			return result;
+		}
+	}
+
+	const auto archive_path = typesafe_sprintf("%x/Hypersomnia-for-%x.%x", update_path, PLATFORM_STRING, ARCHIVE_EXTENSION);
+	LOG_NVPS(version_path, archive_path);
+
 	const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 	auto fix_background_color = scoped_style_color(ImGuiCol_WindowBg, ImVec4{win_bg.x, win_bg.y, win_bg.z, 1.f});
 
-	const auto window_size = vec2i(500, 220);
+	const auto window_size = vec2i(500, 250);
 
 	window_settings.size = window_size;
 	window_settings.fullscreen = false;
@@ -97,44 +173,6 @@ application_update_result check_and_apply_updates(
 
 	renderer.set_viewport({ vec2i{0, 0}, window_size });
 
-#if PLATFORM_UNIX
-	const auto platform_string = "Linux";
-	const auto archive_extension = "tar.gz";
-	(void)archive_extension;
-#elif PLATFORM_WINDOWS
-	const auto platform_string = "Windows";
-	const auto archive_extension = "zip";
-	(void)archive_extension;
-#else
-#error "UNSUPPORTED!"
-#endif
-
-	const auto& host_url = http_settings.application_update_host;
-	const auto& update_path = http_settings.application_update_path;
-
-	const auto hash_path = typesafe_sprintf("%x/commit_hash-%x.txt", update_path, platform_string);
-	const auto archive_path = typesafe_sprintf("%x/Hypersomnia-for-%x.%x", update_path, platform_string, archive_extension);
-
-	LOG_NVPS(hash_path, archive_path);
-
-#if BUILD_OPENSSL
-	const auto port = 443;
-#else
-	const auto port = 80;
-#endif
-
-	(void)port;
-	client_type http_client(host_url.c_str(), port, http_settings.update_connection_timeout_secs);
-
-#if BUILD_OPENSSL
-	LOG("SSL BUILT!");
-	http_client.set_ca_cert_path("web/ca-bundle.crt");
-	http_client.enable_server_certificate_verification(true);
-#endif
-	http_client.follow_location(true);
-
-	augs::timer frame_timer;
-
 	std::atomic<uint64_t> downloaded_bytes = 1;
 	std::atomic<uint64_t> total_bytes = 1;
 	std::atomic<bool> exit_requested = false;
@@ -146,7 +184,7 @@ application_update_result check_and_apply_updates(
 	auto future_response = std::async(
 		std::launch::async,
 		[&exit_requested, archive_path, &http_client, &downloaded_bytes, &total_bytes]() {
-			return launch_download(http_client, archive_path, [&](const auto len, const auto total) {
+			return launch_download(http_client, archive_path, [&](uint64_t len, uint64_t total) {
 				downloaded_bytes = len;
 				total_bytes = total;
 
@@ -163,8 +201,6 @@ application_update_result check_and_apply_updates(
 
 	bool should_quit = false;
 
-	application_update_result result;
-
 	auto interrupt = [&](const R r) {
 		result.type = r;
 		should_quit = true;
@@ -173,12 +209,14 @@ application_update_result check_and_apply_updates(
 		LOG("Interrupting the updater due to: %x", static_cast<int>(r));
 	};
 
+	augs::timer frame_timer;
+
 	while (!should_quit) {
 		window.collect_entropy(entropy);
 
 		for (const auto& e : entropy) {
 			if (e.is_exit_message()) {
-				interrupt(R::EXIT);
+				interrupt(R::EXIT_APPLICATION);
 			}
 		}
 
@@ -202,6 +240,7 @@ application_update_result check_and_apply_updates(
 				auto child = scoped_child("loading view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)), false, flags);
 
 				text_color("New version available!", yellow);
+
 				ImGui::Separator();
 
 				if (valid_and_is_ready(future_response)) {
@@ -216,19 +255,11 @@ application_update_result check_and_apply_updates(
 
 						augs::save_string_as_bytes(response->body, archive_filename);
 
-						interrupt(R::SUCCESS);
+						interrupt(R::UPGRADED);
 					}
 					else {
-#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
-						auto result = http_client.get_openssl_verify_result();
-						if (result) {
-							LOG("verify error: %x", X509_verify_cert_error_string(result));
-						}
-#endif
-
-						LOG("Response was null!");
-
-						interrupt(R::ERROR);
+						log_null_response();
+						interrupt(R::FAILED);
 					}
 				}
 
@@ -247,6 +278,29 @@ application_update_result check_and_apply_updates(
 				//text(downloading_string);
 
 				const auto upstream_string = typesafe_sprintf("Mirror:     %x%x", host_url, update_path);
+
+
+				{
+					const auto current_version = hypersomnia_version().get_version_number();
+
+					int major = 0;
+					int minor = 0;
+					int commit = 0;
+
+					typesafe_sscanf(new_version, "%x.%x.%x", major, minor, commit);
+
+					text(current_version);
+					ImGui::SameLine();
+					text("->");
+					ImGui::SameLine();
+					text(new_version);
+					ImGui::SameLine();
+
+					const auto num_revs = commit - hypersomnia_version().commit_number;
+					const auto revision_str = num_revs == 1 ? "revision" : "revisions";
+
+					text_disabled(typesafe_sprintf("(%x new %x)\n\n", num_revs, revision_str));
+				}
 
 				text_disabled(upstream_string);
 				text("Acquiring: ");

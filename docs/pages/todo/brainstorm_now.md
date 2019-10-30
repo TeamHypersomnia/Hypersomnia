@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Font-scale invariant update window
 
 - Build file server
 	- corner cases
