@@ -1551,7 +1551,7 @@ endif()
 if (BUILD_OPENSSL)
 	message("Building OpenSSL.")
 
-	set(OPENSSL_USE_STATIC_LIBS TRUE)
+	# set(OPENSSL_USE_STATIC_LIBS TRUE)
 
 	find_package(OpenSSL REQUIRED)
 	list(APPEND HYPERSOMNIA_LIBS OpenSSL::SSL OpenSSL::Crypto)

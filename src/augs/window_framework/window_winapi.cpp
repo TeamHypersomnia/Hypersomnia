@@ -837,6 +837,7 @@ namespace augs {
 
 	window::~window() {
 		destroy();
+		window_ptr = nullptr;
 	}
 }
 

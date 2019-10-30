@@ -296,7 +296,7 @@ application_update_result check_and_apply_updates(
 					text(new_version);
 					ImGui::SameLine();
 
-					const auto num_revs = commit - hypersomnia_version().commit_number;
+					const auto num_revs = static_cast<int>(commit) - static_cast<int>(hypersomnia_version().commit_number);
 					const auto revision_str = num_revs == 1 ? "revision" : "revisions";
 
 					text_disabled(typesafe_sprintf("(%x new %x)\n\n", num_revs, revision_str));
