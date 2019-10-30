@@ -829,6 +829,12 @@ namespace augs {
 		}
 	}
 
+	xywhi window::get_display() const {
+		static RECT rc;
+		GetWindowRect(GetDesktopWindow(), &rc);
+		return xywhi(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
+	}
+
 	window::~window() {
 		destroy();
 	}

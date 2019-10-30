@@ -969,6 +969,14 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		std::thread([shell_command](){ augs::shell(shell_command); }).detach();
 	}
 
+	xywhi window::get_display() const {
+		if (Screen* s = DefaultScreenOfDisplay(display)) {
+			return { 0, 0, s->width, s->height };
+		}
+
+		return {};
+	}
+
 	window::~window() {
 		destroy();
 	}

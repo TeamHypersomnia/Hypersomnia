@@ -17,6 +17,7 @@ namespace augs {
 	void window::set_fullscreen_hint(const bool) {}
 
 	xywhi window::get_window_rect_impl() const { return {}; }
+	xywhi window::get_display() const { return {}; }
 
 	void window::destroy() {}
 

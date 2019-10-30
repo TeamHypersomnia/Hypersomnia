@@ -161,6 +161,7 @@ namespace augs {
 		void set_cursor_visible(bool flag); 
 
 		bool is_active() const;
+		xywhi get_display() const;
 
 		void set(vsync_type);
 

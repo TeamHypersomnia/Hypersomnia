@@ -30,7 +30,7 @@ namespace augs {
 		return ChangeDisplaySettings(&screen, CDS_FULLSCREEN) == DISP_CHANGE_SUCCESSFUL;
 	}
 
-	xywhi get_display() {
+	xywhi get_display_no_window() {
 		static RECT rc;
 		GetWindowRect(GetDesktopWindow(), &rc);
 		return xywhi(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
@@ -65,7 +65,7 @@ namespace augs {
 		return true;
 	}
 
-	xywhi get_display() {
+	xywhi get_display_no_window() {
 		if (Display* d = XOpenDisplay(NULL)) {
 			auto guard = augs::scope_guard([d](){ XCloseDisplay(d); });
 

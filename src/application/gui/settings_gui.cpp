@@ -222,10 +222,8 @@ void settings_gui_state::perform(
 					auto indent = scoped_indent();
 					
 					{
-						const auto disp = augs::get_display();
-
-						revertable_drag_rect_bounded_vec2i("Window position", config.window.position, 0.3f, vec2i{ 0, 0 }, disp.get_size());
-						revertable_drag_rect_bounded_vec2i("Windowed size", config.window.size, 0.3f, vec2i{ 0, 0 }, disp.get_size());
+						revertable_drag_rect_bounded_vec2i("Window position", config.window.position, 0.3f, vec2i{ 0, 0 }, vec2i(10000, 10000));
+						revertable_drag_rect_bounded_vec2i("Windowed size", config.window.size, 0.3f, vec2i{ 0, 0 }, vec2i(10000, 10000));
 					}
 
 					revertable_checkbox(CONFIG_NVP(window.border));
