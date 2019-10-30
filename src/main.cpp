@@ -52,6 +52,12 @@ int main(const int argc, const char* const * const argv) {
 		return EXIT_SUCCESS;
 	}
 
+	if (params.version_only) {
+		std::cout << get_version_section() << std::endl;
+
+		return EXIT_SUCCESS;
+	}
+
 	const auto exit_code = work(argc, argv);
 
 	{

@@ -75,6 +75,7 @@ usage: Hypersomnia [options|editor_file_path]
 
 Options:
     -h, --help                  Show this help and quit.
+	-v, --version               Show version information along with compilation flags.
     --unit-tests-only           Perform unit tests only and quit.
     --connect [ADDRESS]         Connect to an arena server in accordance with default_client_start inside the config file.
                                 The ADDRESS argument is optional - if specified, it will override the connect_address field from the config file.
@@ -87,6 +88,9 @@ If editor_file_path is supplied and it is a directory,
 the game will automatically launch the editor to try and open the project inside it, if there is one. 
 
 )"
-+ complete_build_info()
 ;
+}
+
+inline auto get_version_section() {
+	return complete_build_info();
 }

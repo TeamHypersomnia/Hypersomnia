@@ -6,6 +6,7 @@ struct cmd_line_params {
 	augs::path_type editor_target;
 	bool unit_tests_only = false;
 	bool help_only = false;
+	bool version_only = false;
 	bool start_server = false;
 	bool start_dedicated_server = false;
 	bool should_connect = false;
@@ -22,6 +23,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--help" || a == "-h") {
 				help_only = true;
+			}
+			else if (a == "--version" || a == "-v") {
+				version_only = true;
 			}
 			else if (a == "--server") {
 				start_server = true;
