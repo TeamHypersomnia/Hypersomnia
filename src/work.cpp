@@ -190,7 +190,7 @@ int work(const int argc, const char* const * const argv) try {
 	if (config.http_client.update_at_startup) {
 		const auto result = check_and_apply_updates(
 			imgui_atlas_image,
-			config.http_client.update_url,
+			config.http_client,
 			config.window
 		);
 

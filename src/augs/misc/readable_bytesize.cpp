@@ -1,7 +1,7 @@
 #include "readable_bytesize.h"
 #include "augs/string/typesafe_sprintf.h"
 
-std::string readable_bytesize(const std::size_t _size) {
+std::string readable_bytesize(const std::size_t _size, const char* number_format) {
 	double size = static_cast<double>(_size);
 
 	int i = 0;
@@ -11,10 +11,12 @@ std::string readable_bytesize(const std::size_t _size) {
 		i++;
 	}
 
-	return typesafe_sprintf("%x %x", size, units[i]);
+	const auto number = typesafe_sprintf(number_format, size);
+
+	return typesafe_sprintf("%x %x", number, units[i]);
 }
 
-std::string readable_bitsize(const std::size_t _size) {
+std::string readable_bitsize(const std::size_t _size, const char* number_format) {
 	double size = static_cast<double>(_size);
 
 	int i = 0;
@@ -25,5 +27,7 @@ std::string readable_bitsize(const std::size_t _size) {
 		i++;
 	}
 
-	return typesafe_sprintf("%x %x", size, units[i]);
+	const auto number = typesafe_sprintf(number_format, size);
+
+	return typesafe_sprintf("%x %x", number, units[i]);
 }

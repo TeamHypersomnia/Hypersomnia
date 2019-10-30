@@ -130,6 +130,7 @@ set(HYPERSOMNIA_LOCAL_FILES_DIR "user")
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
 option(BUILD_NETWORKING "Build the networking backend." ${DEFAULT_OPT})
+option(BUILD_OPENSSL "Build SSL support. Required for secure automatic application updates." ${DEFAULT_OPT})
 option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
 option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
 option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ${DEFAULT_OPT})
@@ -1331,6 +1332,10 @@ if(BUILD_OPENGL)
 	add_definitions(-DBUILD_OPENGL=1)
 endif()
 
+if(BUILD_OPENSSL) 
+	add_definitions(-DBUILD_OPENSSL=1)
+endif()
+
 if(BUILD_SOUND_FORMAT_DECODERS) 
 	add_definitions(-DBUILD_SOUND_FORMAT_DECODERS=1)
 endif()
@@ -1541,6 +1546,22 @@ if (BUILD_NETWORKING)
 	prefer_shared_libraries()
 
 	list(APPEND HYPERSOMNIA_LIBS ${SODIUM} ${MBEDTLS} ${MBEDX509} ${MBEDCRYPTO})
+endif()
+
+if (BUILD_OPENSSL)
+	message("Building OpenSSL.")
+
+	set(OPENSSL_USE_STATIC_LIBS TRUE)
+
+	find_package(OpenSSL REQUIRED)
+	list(APPEND HYPERSOMNIA_LIBS OpenSSL::SSL OpenSSL::Crypto)
+
+	message("Found: ${OPENSSL_FOUND})")
+	message("Include dir: ${OPENSSL_INCLUDE_DIR})")
+	message("Crypto library: ${OPENSSL_CRYPTO_LIBRARY})")
+	message("SSL library: ${OPENSSL_SSL_LIBRARY})")
+	message("Libraries: ${OPENSSL_LIBRARIES})")
+	message("Version: ${OPENSSL_VERSION})")
 endif()
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "")

@@ -209,8 +209,8 @@ void main_menu_setup::draw_overlays(
 
 	print_stroked(
 		output,
-		vec2i(0, screen_size.y),
+		vec2i(screen_size.x, screen_size.y),
 		from_bbcode ( typesafe_sprintf("Build %x", hypersomnia_version().get_version_number()), { gui_font, white } ),
-		{ augs::ralign::B }
+		{ augs::ralign::R, augs::ralign::B }
 	);
 }

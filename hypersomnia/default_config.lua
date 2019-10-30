@@ -5,7 +5,9 @@ return {
 
   http_client = {
     update_at_startup = true,
-	update_url = "https://hypersomnia.xyz/builds/latest"
+	update_connection_timeout_secs = 2,
+	application_update_host = "hypersomnia.xyz",
+	application_update_path = "/builds/latest"
   },
 
   official_arena_servers = {
