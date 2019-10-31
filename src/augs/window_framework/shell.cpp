@@ -18,6 +18,17 @@ namespace augs {
 		const auto wide = widen(s);
 		return static_cast<int>(reinterpret_cast<INT_PTR>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW)));
 	}
+
+	void open_text_editor(const std::string& on_file) {
+		augs::shell("\"" + std::filesystem::absolute(augs::path_type(on_file)).string() + "\"");
+	}
+
+	int restart_application(const std::string& arguments) {
+		const auto wide = widen(arguments);
+		RegisterApplicationRestart(wide.c_str(), 0);
+
+		return EXIT_SUCCESS;
+	}
 }
 #elif PLATFORM_UNIX
 #include <cstdlib>
@@ -35,26 +46,20 @@ namespace augs {
 		LOG("SHELL COMMAND: %x", command);
 		return std::system(command.c_str());
 	}
-}
-#else
-#error "Unsupported platform!"
-#endif
 
-#if PLATFORM_WINDOWS
-namespace augs {
-	void open_text_editor(const std::string& on_file) {
-		augs::shell("\"" + std::filesystem::absolute(augs::path_type(on_file)).string() + "\"");
-	}
-}
-#elif PLATFORM_UNIX
-namespace augs {
 	void open_text_editor(const std::string& on_file) {
 		const auto full_path = std::filesystem::absolute(augs::path_type(on_file));
 		const auto command = augs::path_type("$VISUAL ") += full_path;
 
 		augs::shell(command.string());
 	}
+
+	int restart_application(const std::string& arguments) {
+		(void)arguments;
+		return 42;
+	}
 }
 #else
 #error "Unsupported platform!"
 #endif
+

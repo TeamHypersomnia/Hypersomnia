@@ -12,7 +12,8 @@ if [ -f "$EXE_PATH" ]; then
 	FILE_PATH="Hypersomnia-for-$PLATFORM.tar.gz"
 	UPLOAD_URL="https://hypersomnia.xyz/upload_artifact.php"
 
-	cp build/current/Hypersomnia hypersomnia
+	. cmake/linux_launcher_install.sh
+	cp build/current/Hypersomnia hypersomnia/.Hypersomnia
 	pushd hypersomnia
 	rm -r cache
 	popd

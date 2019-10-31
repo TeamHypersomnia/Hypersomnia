@@ -15,6 +15,7 @@
 #undef MAX
 #endif
 
+#include "augs/window_framework/create_process.h"
 #include "application/main/new_and_old_hypersomnia_path.h"
 #include "work_result.h"
 
@@ -76,7 +77,13 @@ int main(const int argc, const char* const * const argv) {
 				*/
 
 				std::filesystem::remove_all(NEW_HYPERSOMNIA);
-				std::filesystem::remove_all(OLD_HYPERSOMNIA);
+
+				try {
+					std::filesystem::remove_all(OLD_HYPERSOMNIA);
+				}
+				catch (const augs::filesystem_error&) {
+
+				}
 
 				return EXIT_SUCCESS;
 				break;
@@ -92,9 +99,7 @@ int main(const int argc, const char* const * const argv) {
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
-
-				return EXIT_SUCCESS;
-				break;
+				return augs::restart_application("--upgraded-successfuly");
 			}
 
 			default: 
