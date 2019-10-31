@@ -208,14 +208,16 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("Creating the ImGui atlas image.");
 	static const auto imgui_atlas_image = augs::imgui::create_atlas_image(config.gui_fonts.gui);
 
+	static auto last_update_result = application_update_result();
+
 	if (config.http_client.update_on_launch) {
-		const auto result = check_and_apply_updates(
+		last_update_result = check_and_apply_updates(
 			imgui_atlas_image,
 			config.http_client,
 			config.window
 		);
 
-		if (result.type == application_update_result_type::EXIT_APPLICATION) {
+		if (last_update_result.type == application_update_result_type::EXIT_APPLICATION) {
 			return EXIT_SUCCESS;
 		}
 	}
@@ -2123,6 +2125,7 @@ and then hitting Save settings.
 					const auto cursor = main_menu->gui.draw({ context, get_drawer() });
 
 					main_menu->draw_overlays(
+						last_update_result,
 						get_drawer(),
 						streaming.necessary_images_in_atlas,
 						streaming.get_loaded_gui_fonts().gui,

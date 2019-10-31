@@ -5,6 +5,8 @@
 #include "augs/image/image.h"
 
 enum class application_update_result_type {
+	NONE,
+
 	EXIT_APPLICATION,
 	FAILED,
 	CANCELLED,
@@ -15,7 +17,7 @@ enum class application_update_result_type {
 struct application_update_result {
 	using result_type = application_update_result_type;
 
-	result_type type = result_type::FAILED;
+	result_type type = result_type::NONE;
 };
 
 application_update_result check_and_apply_updates(

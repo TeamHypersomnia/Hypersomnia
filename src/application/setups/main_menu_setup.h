@@ -33,6 +33,7 @@
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 
+struct application_update_result;
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -144,6 +145,7 @@ public:
 	}
 
 	void draw_overlays(
+		const application_update_result& last_update_result,
 		const augs::drawer_with_default output,
 		const necessary_images_in_atlas_map& necessarys,
 		const augs::baked_font& gui_font,

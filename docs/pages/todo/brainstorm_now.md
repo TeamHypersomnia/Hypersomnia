@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Restarting the app
+	- https://www.gamedev.net/forums/topic/580762-how-can-i-restart-my-c-application/
+	- https://stackoverflow.com/questions/40022586/is-it-possible-to-restart-a-program-from-inside-a-program
+
 - Font-scale invariant update window
 
 - Build file server

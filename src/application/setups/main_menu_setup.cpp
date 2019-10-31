@@ -35,6 +35,7 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "hypersomnia_version.h"
+#include "application/main/application_updates.h"
 
 using namespace augs::event::keys;
 using namespace augs::gui::text;
@@ -185,6 +186,7 @@ main_menu_setup::main_menu_setup(
 }
 
 void main_menu_setup::draw_overlays(
+	const application_update_result& last_update_result,
 	const augs::drawer_with_default output,
 	const necessary_images_in_atlas_map& necessarys,
 	const augs::baked_font& gui_font,
@@ -207,10 +209,50 @@ void main_menu_setup::draw_overlays(
 		);
 	};
 
+	const auto s = style { gui_font, white };
+
+	using FS = formatted_string;
+	const auto build_number_text = FS(typesafe_sprintf("Build %x", hypersomnia_version().get_version_number()), s);
+
+	vec2i padding = { 6, 6 };
+
 	print_stroked(
 		output,
-		vec2i(screen_size.x, screen_size.y),
-		from_bbcode ( typesafe_sprintf("Build %x", hypersomnia_version().get_version_number()), { gui_font, white } ),
+		vec2i(screen_size.x, screen_size.y) - padding,
+		build_number_text,
+		{ augs::ralign::R, augs::ralign::B }
+	);
+
+	const auto bbox = get_text_bbox(build_number_text);
+
+	auto colored = [&](const auto& text, const auto& color) {
+		return FS(std::string(text) + " ", { gui_font, color });
+	};
+
+	const auto description = [&]() {
+		const auto t = last_update_result.type;
+		using R = application_update_result_type;
+
+		switch (t) {
+			case R::NONE:
+				return colored("Automatic updates are disabled.", gray);
+			case R::CANCELLED:
+				return colored("Automatic update was cancelled!", orange);
+			case R::UPGRADED:
+				return colored("Success! Hypersomnia was upgraded to the latest version.", green);
+			case R::UP_TO_DATE:
+				return colored("Hypersomnia is up to date.", green);
+			case R::FAILED:
+				return colored("Failed to connect with the update server.", red);
+
+			default: return colored("", white);
+		}
+	}();
+	
+	print_stroked(
+		output,
+		vec2i(screen_size.x - bbox.x, screen_size.y) - padding,
+		description,
 		{ augs::ralign::R, augs::ralign::B }
 	);
 }
