@@ -24,6 +24,8 @@
 #include "augs/readwrite/byte_file.h"
 
 #include "3rdparty/cpp-httplib/httplib.h"
+#include "application/main/extract_archive.h"
+#include "augs/filesystem/directory.h"
 
 #if BUILD_OPENSSL
 using client_type = httplib::SSLClient;
@@ -180,6 +182,11 @@ application_update_result check_and_apply_updates(
 	LOG("Launching download.");
 
 	const auto archive_filename = augs::path_type(archive_path).filename();
+	const auto target_archive_path = GENERATED_FILES_DIR / archive_filename;
+
+	const auto NEW_path = "NEW";
+	const auto OLD_path = "OLD";
+	(void)OLD_path;
 
 	auto future_response = std::async(
 		std::launch::async,
@@ -210,6 +217,20 @@ application_update_result check_and_apply_updates(
 	};
 
 	augs::timer frame_timer;
+
+	enum class state {
+		DOWNLOADING,
+		EXTRACTING
+	};
+
+	auto current_state = state::DOWNLOADING;
+	auto extractor = std::optional<archive_extractor>();
+
+#define TEST 0
+#if TEST
+	extractor.emplace(target_archive_path, NEW_path);
+	current_state = state::EXTRACTING;
+#endif
 
 	while (!should_quit) {
 		window.collect_entropy(entropy);
@@ -243,73 +264,99 @@ application_update_result check_and_apply_updates(
 
 				ImGui::Separator();
 
-				if (valid_and_is_ready(future_response)) {
-					const auto response = future_response.get();
+				{
+					const auto version_info_string = [&new_version]() {
+						const auto current_version = hypersomnia_version().get_version_number();
 
-					if (response) {
-						LOG_NVPS(response->body.length());
+						int major = 0;
+						int minor = 0;
+						int commit = 0;
 
-						if (response->body.length() < 2000) {
-							LOG(response->body);
+						typesafe_sscanf(new_version, "%x.%x.%x", major, minor, commit);
+
+						text(current_version);
+						ImGui::SameLine();
+						text("->");
+						ImGui::SameLine();
+						text(new_version);
+						ImGui::SameLine();
+
+						const auto num_revs = static_cast<int>(commit) - static_cast<int>(hypersomnia_version().commit_number);
+						const auto revision_str = num_revs == 1 ? "revision" : "revisions";
+
+						return typesafe_sprintf("(%x new %x)\n\n", num_revs, revision_str);
+					}();
+
+					text_disabled(version_info_string);
+				}
+
+				const auto upstream_string = typesafe_sprintf("Mirror:     %x%x", host_url, update_path);
+				text_disabled(upstream_string);
+
+				if (current_state == state::DOWNLOADING) {
+					if (valid_and_is_ready(future_response)) {
+						const auto response = future_response.get();
+
+						if (response) {
+							LOG_NVPS(response->body.length());
+
+							if (response->body.length() < 2000) {
+								LOG(response->body);
+							}
+
+							augs::save_string_as_bytes(response->body, target_archive_path);
+							augs::create_directories(NEW_path);
+							extractor.emplace(target_archive_path, NEW_path);
+							current_state = state::EXTRACTING;
 						}
+						else {
+							log_null_response();
+							interrupt(R::FAILED);
+						}
+					}
 
-						augs::save_string_as_bytes(response->body, archive_filename);
+					const auto len = downloaded_bytes.load();
+					const auto total = total_bytes.load();
 
+					const auto downloaded_bytes = readable_bytesize(len, "%2f");
+					const auto total_bytes = readable_bytesize(total, "%2f");
+
+					const auto completion_mult = static_cast<double>(len) / total;
+
+					text("Acquiring: ");
+					ImGui::SameLine();
+					text_color(archive_filename.string(), cyan);
+					text("\n");
+
+					const auto downloaded_string = typesafe_sprintf("Downloaded: %x", downloaded_bytes);
+					const auto total_string =      typesafe_sprintf("Total size: %x\n\n", total_bytes);
+
+					text(downloaded_string);
+					text(total_string);
+
+					ImGui::ProgressBar(static_cast<float>(completion_mult), ImVec2(-1.0f,0.0f));
+
+					text("\n");
+				}
+				else {
+					if (const bool finished = extractor->update()) {
 						interrupt(R::UPGRADED);
 					}
 					else {
-						log_null_response();
-						interrupt(R::FAILED);
+						text("Extracting:");
+
+						ImGui::SameLine();
+						text_color(archive_filename.string(), cyan);
+						text("\n");
+
+						text("Processed file:");
+
+						auto current_file = extractor->get_currently_processed();
+
+						cut_preffix(current_file, "hypersomnia/");
+						text(current_file);
 					}
 				}
-
-				const auto len = downloaded_bytes.load();
-				const auto total = total_bytes.load();
-
-				const auto downloaded_bytes = readable_bytesize(len, "%2f");
-				const auto total_bytes = readable_bytesize(total, "%2f");
-
-				const auto completion_mult = static_cast<double>(len) / total;
-				const auto upstream_string = typesafe_sprintf("Mirror:     %x%x", host_url, update_path);
-
-
-				{
-					const auto current_version = hypersomnia_version().get_version_number();
-
-					int major = 0;
-					int minor = 0;
-					int commit = 0;
-
-					typesafe_sscanf(new_version, "%x.%x.%x", major, minor, commit);
-
-					text(current_version);
-					ImGui::SameLine();
-					text("->");
-					ImGui::SameLine();
-					text(new_version);
-					ImGui::SameLine();
-
-					const auto num_revs = static_cast<int>(commit) - static_cast<int>(hypersomnia_version().commit_number);
-					const auto revision_str = num_revs == 1 ? "revision" : "revisions";
-
-					text_disabled(typesafe_sprintf("(%x new %x)\n\n", num_revs, revision_str));
-				}
-
-				text_disabled(upstream_string);
-				text("Acquiring: ");
-				ImGui::SameLine();
-				text_color(archive_filename, cyan);
-				text("\n");
-
-				const auto downloaded_string = typesafe_sprintf("Downloaded: %x", downloaded_bytes);
-				const auto total_string =      typesafe_sprintf("Total size: %x\n\n", total_bytes);
-
-				text(downloaded_string);
-				text(total_string);
-
-				ImGui::ProgressBar(static_cast<float>(completion_mult), ImVec2(-1.0f,0.0f));
-
-				text("\n");
 			}
 
 			{

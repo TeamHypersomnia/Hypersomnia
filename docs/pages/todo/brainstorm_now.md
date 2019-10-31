@@ -6,6 +6,42 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- While in the main menu, check for updates once every several seconds
+	- e.g. if the server has to restart due to an upgrade, the clients will follow with the update right away
+	- also trigger update check every time we enter the main menu from the client
+	- New version available!
+		- Do you want to restart and upgrade the game now?
+			- Upgrade
+			- Cancel
+				- Automatic update was cancelled.
+
+- Download archive to cache/Hypersomnia-for-Windows
+
+
+Say the game is in ``C:\hyp`` folder, so e.g. the executable is at ``C:\hyp\Hypersomnia.exe``
+
+Old client does:
+- Unpack the new, downloaded game to a new folder: ``C:\hyp\NEW``
+- Copy the player preferences from ``C:\hyp\user\config.lua`` to ``C:\hyp\NEW\user\config.lua``
+- Launch ``C:\hyp\NEW\Hypersomnia.exe --upgrade`` and exit
+
+New client does:
+- Recognize the ``--upgrade`` flag that tells us that the following actions are required 
+- Move everything inside ``C:\hyp`` (except ``C:\hyp\NEW``) to a new folder: ``C:\hyp\OLD``
+- Copy everything from inside ``C:\hyp\NEW`` into ``C:\hyp``
+- Launch ``C:\hyp\Hypersomnia.exe`` and exit
+
+The new client (in-place) does:
+- If it exists, remove ``C:\hyp\NEW``
+- If it exists, remove ``C:\hyp\OLD``
+
+
+Advantages:
+- If the new executable fails to launch, the old executable with all of its files remain completely untouched
+- The old files are removed only at the final step as a cleanup procedure (that is not even necessary for the game to function), when everything's confirmed to work
+- If shit hits the fan in the middle and something crashes, the user is left with nicely named NEW and OLD folders
+- We don't have to play with any paths outside of the game's tree, to which we may have no permissions
+
 - Restarting the app
 	- https://www.gamedev.net/forums/topic/580762-how-can-i-restart-my-c-application/
 	- https://stackoverflow.com/questions/40022586/is-it-possible-to-restart-a-program-from-inside-a-program
