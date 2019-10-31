@@ -9,6 +9,7 @@ struct cmd_line_params {
 	bool version_only = false;
 	bool start_server = false;
 	bool start_dedicated_server = false;
+	bool upgraded_successfully = false;
 	bool should_connect = false;
 	std::string connect_address;
 
@@ -29,6 +30,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--server") {
 				start_server = true;
+			}
+			else if (a == "--upgraded-successfully") {
+				upgraded_successfully = true;
 			}
 			else if (a == "--dedicated-server") {
 				start_dedicated_server = true;

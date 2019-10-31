@@ -11,7 +11,9 @@ enum class application_update_result_type {
 	FAILED,
 	CANCELLED,
 	UPGRADED,
-	UP_TO_DATE
+	UP_TO_DATE,
+
+	FIRST_LAUNCH_AFTER_UPGRADE
 };
 
 struct application_update_result {

@@ -238,7 +238,7 @@ void main_menu_setup::draw_overlays(
 				return colored("Automatic updates are disabled.", gray);
 			case R::CANCELLED:
 				return colored("Automatic update was cancelled!", orange);
-			case R::UPGRADED:
+			case R::FIRST_LAUNCH_AFTER_UPGRADE:
 				return colored("Success! Hypersomnia was upgraded to the latest version.", green);
 			case R::UP_TO_DATE:
 				return colored("Hypersomnia is up to date.", green);

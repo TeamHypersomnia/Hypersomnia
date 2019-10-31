@@ -210,24 +210,32 @@ work_result work(const int argc, const char* const * const argv) try {
 	static const auto imgui_atlas_image = augs::imgui::create_atlas_image(config.gui_fonts.gui);
 
 	static auto last_update_result = application_update_result();
-
+	
 	if (config.http_client.update_on_launch) {
+		using up_result = application_update_result_type;
+
 		last_update_result = check_and_apply_updates(
 			imgui_atlas_image,
 			config.http_client,
 			config.window
 		);
 
-		if (last_update_result.type == application_update_result_type::UPGRADED) {
+		if (last_update_result.type == up_result::UPGRADED) {
 			return work_result::RELAUNCH_UPGRADED;
 		}
 
-		if (last_update_result.type == application_update_result_type::EXIT_APPLICATION) {
+		if (last_update_result.type == up_result::EXIT_APPLICATION) {
 			return work_result::SUCCESS;
 		}
 
 		if (last_update_result.exit_with_failure_if_not_upgraded) {
 			return work_result::FAILURE;
+		}
+
+		if (last_update_result.type == up_result::UP_TO_DATE) {
+			if (params.upgraded_successfully) {
+				last_update_result.type = up_result::FIRST_LAUNCH_AFTER_UPGRADE;
+			}
 		}
 	}
 

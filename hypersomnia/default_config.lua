@@ -4,7 +4,7 @@ return {
   perform_float_consistency_test = true,
 
   http_client = {
-    update_on_launch = true,
+    update_on_launch = false,
 	update_connection_timeout_secs = 2,
 	application_update_host = "hypersomnia.xyz",
 	application_update_path = "/builds/latest"
