@@ -15,7 +15,10 @@
 #undef MAX
 #endif
 
-int work(const int argc, const char* const * const argv);
+#include "application/main/new_and_old_hypersomnia_path.h"
+#include "work_result.h"
+
+work_result work(const int argc, const char* const * const argv);
 
 #if PLATFORM_WINDOWS
 #if BUILD_IN_CONSOLE_MODE
@@ -58,21 +61,39 @@ int main(const int argc, const char* const * const argv) {
 		return EXIT_SUCCESS;
 	}
 
-	const auto exit_code = work(argc, argv);
+	const auto result = work(argc, argv);
 
 	{
 		const auto logs = program_log::get_current().get_complete(); 
 
-		switch (exit_code) {
-			case EXIT_SUCCESS: 
+		switch (result) {
+			case work_result::SUCCESS: 
 				augs::save_as_text(get_exit_success_path(), logs); 
+
+				/* 
+					Clean the remnants of the update if the new game version
+					has at least once exited successfully.
+				*/
+
+				std::filesystem::remove_all(NEW_HYPERSOMNIA);
+				std::filesystem::remove_all(OLD_HYPERSOMNIA);
+
+				return EXIT_SUCCESS;
 				break;
-			case EXIT_FAILURE: {
+
+			case work_result::FAILURE: {
 				const auto failure_log_path = get_exit_failure_path();
 
 				augs::save_as_text(failure_log_path, logs);
 				augs::open_text_editor(failure_log_path);
 
+				return EXIT_FAILURE;
+				break;
+			}
+
+			case work_result::RELAUNCH_UPGRADED: {
+
+				return EXIT_SUCCESS;
 				break;
 			}
 
@@ -81,6 +102,6 @@ int main(const int argc, const char* const * const argv) {
 		}
 	}
 
-	return exit_code;
+	return EXIT_FAILURE;
 }
 

@@ -75,6 +75,7 @@ struct archive_extractor {
 		const auto resolved_command = typesafe_sprintf(command_template, archive_path, destination_path);
 
 		completed_extraction = std::async(
+			std::launch::async,
 			[this, resolved_command]() {
 				pipe = std::shared_ptr<FILE>(popen(resolved_command.c_str(), "r"), pclose);
 

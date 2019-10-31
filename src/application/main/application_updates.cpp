@@ -26,6 +26,7 @@
 #include "3rdparty/cpp-httplib/httplib.h"
 #include "application/main/extract_archive.h"
 #include "augs/filesystem/directory.h"
+#include "application/main/new_and_old_hypersomnia_path.h"
 
 #if BUILD_OPENSSL
 using client_type = httplib::SSLClient;
@@ -53,6 +54,7 @@ decltype(auto) launch_download(client_type& client, const std::string& resource,
 }
 
 using R = application_update_result_type;
+namespace fs = std::filesystem;
 
 application_update_result check_and_apply_updates(
 	const augs::image& imgui_atlas_image,
@@ -184,9 +186,8 @@ application_update_result check_and_apply_updates(
 	const auto archive_filename = augs::path_type(archive_path).filename();
 	const auto target_archive_path = GENERATED_FILES_DIR / archive_filename;
 
-	const auto NEW_path = "NEW";
-	const auto OLD_path = "OLD";
-	(void)OLD_path;
+	const auto NEW_path = augs::path_type(NEW_HYPERSOMNIA);
+	const auto OLD_path = augs::path_type(OLD_HYPERSOMNIA);
 
 	auto future_response = std::async(
 		std::launch::async,
@@ -220,17 +221,22 @@ application_update_result check_and_apply_updates(
 
 	enum class state {
 		DOWNLOADING,
-		EXTRACTING
+		EXTRACTING,
+		MOVING_FILES_AROUND
 	};
 
 	auto current_state = state::DOWNLOADING;
 	auto extractor = std::optional<archive_extractor>();
+	//auto mover = std::optional<updated_files_mover>();
+	auto completed_move = std::future<void>();
 
 #define TEST 0
 #if TEST
 	extractor.emplace(target_archive_path, NEW_path);
 	current_state = state::EXTRACTING;
 #endif
+
+	double total_secs = 0;
 
 	while (!should_quit) {
 		window.collect_entropy(entropy);
@@ -243,6 +249,7 @@ application_update_result check_and_apply_updates(
 
 		const auto frame_delta = frame_timer.extract_delta();
 		const auto dt_secs = frame_delta.in_seconds();
+		total_secs += dt_secs;
 
 		augs::imgui::setup_input(
 			entropy,
@@ -265,7 +272,7 @@ application_update_result check_and_apply_updates(
 				ImGui::Separator();
 
 				{
-					const auto version_info_string = [&new_version]() {
+					const auto version_info_string = [&new_version, total_secs]() {
 						const auto current_version = hypersomnia_version().get_version_number();
 
 						int major = 0;
@@ -276,7 +283,17 @@ application_update_result check_and_apply_updates(
 
 						text(current_version);
 						ImGui::SameLine();
-						text("->");
+
+						const auto ms = total_secs * 1000;
+						const auto n = int(ms / 200);
+
+						if (n % 2 == 0) {
+							text("->");
+						}
+						else {
+							text(">-");
+						}
+
 						ImGui::SameLine();
 						text(new_version);
 						ImGui::SameLine();
@@ -305,6 +322,8 @@ application_update_result check_and_apply_updates(
 							}
 
 							augs::save_string_as_bytes(response->body, target_archive_path);
+
+							std::filesystem::remove_all(NEW_path);
 							augs::create_directories(NEW_path);
 							extractor.emplace(target_archive_path, NEW_path);
 							current_state = state::EXTRACTING;
@@ -338,9 +357,76 @@ application_update_result check_and_apply_updates(
 
 					text("\n");
 				}
-				else {
+				else if (current_state == state::EXTRACTING) {
 					if (const bool finished = extractor->update()) {
-						interrupt(R::UPGRADED);
+						result.exit_with_failure_if_not_upgraded = true;
+
+						/* Serious stuff begins here. */
+
+						current_state = state::MOVING_FILES_AROUND;
+
+						completed_move = std::async(
+							std::launch::async,
+							[NEW_path, OLD_path]() {
+								const auto NEW_root_path = NEW_path / "hypersomnia";
+
+								auto mv = [&](const auto& a, const auto& b) {
+									LOG("mv %x %x", a, b);
+									fs::rename(a, b);
+								};
+
+								auto cp_rf = [&](const auto& a, const auto& b) {
+									using opt = fs::copy_options;
+
+									LOG("cp -rf %x %x", a, b);
+									fs::copy(a, b, opt::recursive | opt::overwrite_existing);
+								};
+
+								auto copy_player_prefs = [&]() {
+									LOG("Copying player prefs.");
+									const auto source_dir = USER_FILES_DIR;
+									const auto target_dir = NEW_root_path / USER_FILES_DIR;
+
+									cp_rf(source_dir, target_dir);
+								};
+
+								auto move_old_content_to_OLD = [&]() {
+									LOG("Moving old content to OLD directory.");
+
+									std::filesystem::remove_all(OLD_path);
+									augs::create_directories(OLD_path);
+
+									auto do_move = [&](const auto& it) {
+										const auto fname = it.filename();
+
+										if (fname != OLD_path && fname != NEW_path) {
+											mv(fname, OLD_path / fname);
+										}
+										else {
+											LOG("Omitting the move of %x", fname);
+										}
+									};
+
+									augs::for_each_in_directory(".", do_move, do_move);
+								};
+
+								auto copy_new_content_to_current = [&]() {
+									LOG("Moving new content to current directory.");
+
+									const auto new_root = NEW_path / "hypersomnia";
+
+									auto do_move = [&](const auto& fname) {
+										mv(fname, fname.filename());
+									};
+
+									augs::for_each_in_directory(new_root, do_move, do_move);
+								};
+
+								copy_player_prefs();
+								move_old_content_to_OLD();
+								copy_new_content_to_current();
+							}
+						);
 					}
 					else {
 						text("Extracting:");
@@ -357,8 +443,18 @@ application_update_result check_and_apply_updates(
 						text(current_file);
 					}
 				}
+				else {
+					if (valid_and_is_ready(completed_move)) {
+						completed_move.get();
+
+						interrupt(R::UPGRADED);
+					}
+
+					text("Moving files around...");
+				}
 			}
 
+			if (current_state != state::MOVING_FILES_AROUND)
 			{
 				auto scope = scoped_child("Cancel");
 

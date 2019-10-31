@@ -18,6 +18,7 @@ struct application_update_result {
 	using result_type = application_update_result_type;
 
 	result_type type = result_type::NONE;
+	bool exit_with_failure_if_not_upgraded = false;
 };
 
 application_update_result check_and_apply_updates(

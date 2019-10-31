@@ -89,6 +89,7 @@
 #include "application/setups/client/demo_paths.h"
 
 #include "application/main/application_updates.h"
+#include "work_result.h"
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
@@ -105,7 +106,7 @@ bool is_dedicated_server = false;
 	This function will only be entered ONCE during the lifetime of the program.
 */
 
-int work(const int argc, const char* const * const argv) try {
+work_result work(const int argc, const char* const * const argv) try {
 	setup_float_flags();
 
 	{
@@ -182,7 +183,7 @@ int work(const int argc, const char* const * const argv) try {
 		LOG("All unit tests have passed.");
 
 		if (params.unit_tests_only) {
-			return EXIT_SUCCESS;
+			return work_result::SUCCESS;
 		}
 	}
 	else {
@@ -217,8 +218,16 @@ int work(const int argc, const char* const * const argv) try {
 			config.window
 		);
 
+		if (last_update_result.type == application_update_result_type::UPGRADED) {
+			return work_result::RELAUNCH_UPGRADED;
+		}
+
 		if (last_update_result.type == application_update_result_type::EXIT_APPLICATION) {
-			return EXIT_SUCCESS;
+			return work_result::SUCCESS;
+		}
+
+		if (last_update_result.exit_with_failure_if_not_upgraded) {
+			return work_result::FAILURE;
 		}
 	}
 
@@ -387,7 +396,7 @@ and then hitting Save settings.
 			server.sleep_until_next_tick();
 		}
 
-		return EXIT_SUCCESS;
+		return work_result::SUCCESS;
 	}
 
 	LOG("Initializing the audio context.");
@@ -2653,40 +2662,40 @@ and then hitting Save settings.
 		}
 	}
 
-	return EXIT_SUCCESS;
+	return work_result::SUCCESS;
 }
 catch (const config_read_error& err) {
 	LOG("Failed to read the initial config for the game!\n%x", err.what());
-	return EXIT_FAILURE;
+	return work_result::FAILURE;
 }
 catch (const augs::imgui_init_error& err) {
 	LOG("Failed init imgui:\n%x", err.what());
-	return EXIT_FAILURE;
+	return work_result::FAILURE;
 }
 catch (const augs::audio_error& err) {
 	LOG("Failed to establish the audio context:\n%x", err.what());
-	return EXIT_FAILURE;
+	return work_result::FAILURE;
 }
 catch (const augs::window_error& err) {
 	LOG("Failed to create an OpenGL window:\n%x", err.what());
-	return EXIT_FAILURE;
+	return work_result::FAILURE;
 }
 catch (const augs::graphics::renderer_error& err) {
 	LOG("Failed to initialize the renderer: %x", err.what());
-	return EXIT_FAILURE;
+	return work_result::FAILURE;
 }
 catch (const necessary_resource_loading_error& err) {
 	LOG("Failed to load a resource necessary for the game to function!\n%x", err.what());
-	return EXIT_FAILURE;
+	return work_result::FAILURE;
 }
 catch (const augs::lua_state_creation_error& err) {
 	LOG("Failed to create a lua state for the game!\n%x", err.what());
-	return EXIT_FAILURE;
+	return work_result::FAILURE;
 }
 catch (const augs::unit_test_session_error& err) {
 	LOG("Unit test session failure:\n%x\ncout:%x\ncerr:%x\nclog:%x\n", 
 		err.what(), err.cout_content, err.cerr_content, err.clog_content
 	);
 
-	return EXIT_FAILURE;
+	return work_result::FAILURE;
 }
