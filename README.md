@@ -292,7 +292,7 @@ To implement your own script for choosing a directory:
 
 ## MacOS instructions
 
-**WARNING: Building for MacOS is a work in progress! The window framework has yet to be ported. **
+**WARNING: Building for MacOS is a work in progress! The window framework has yet to be ported.**
 
 Generally, to build for MacOS, you can follow the instructions for Linux.
 Here are the things you need to know beforehand:
