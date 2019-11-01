@@ -16,11 +16,14 @@
 - [How to build](#how-to-build)
   - [Windows instructions](#windows-instructions)
   - [Linux instructions](#linux-instructions)
-    - [Dependencies](#dependencies)
+    - [Distribution-specific dependencies](#distribution-specific-dependencies)
     - [One-shot launch](#one-shot-launch)
     - [Detailed instructions](#detailed-instructions)
     - [Editor integration](#editor-integration)
       - [Opening and saving files](#opening-and-saving-files)
+  - [MacOS instructions](#macos-instructions)
+	- [Additional dependencies](#additional-dependencies)
+	- [Details](#details)
 - [Contributing](#contributing)
 
 Hypersomnia is an upcoming community-centered shooter released as free software,
@@ -54,8 +57,8 @@ Watch gameplays on YouTube:
 
 # How to build
 
-Currently, Hypersomnia is only buildable using ``clang`` (7.0.0 or newer), both on Linux and Windows.  
-Additionally, the system must be 64-bit.  
+Currently, Hypersomnia is only buildable using ``clang`` both on Linux and Windows.  
+Additionally, your operating system must be 64-bit.  
 
 <!--
 Formerly, the game was buildable under modern ``gcc`` versions,  
@@ -65,15 +68,17 @@ but it quickly became too much of a hassle to support these compilers as we use 
 -->
 
 The project's ``CMakeLists.txt`` contains clauses for both ``MSVC`` and ``gcc``,  
-so in the future, it might be possible to build the game under these compilers if they catch up with ``clang``.  
+so in the future, it might be possible to build the game under these compilers if they catch up to ``clang``.  
 
+Irrespectively of the OS, you will need the following software in order to build Hypersomnia:  
 
-Irrespectively of the OS, you will need some dependencies installed to build Hypersomnia:  
- - The newest **CMake**.
- - **git** to clone the respository and later generate version information.
- - Optional: **Python 3.6** or newer for the script that prepares an archive with the executable.
- - Optional: **7-Zip** so that the **Release** configuration can automatically create a compressed archive with the executable and game resources, ready to be sent to someone. 
-   - Note that Continuous Integration systems always upload the build artifacts anyway.
+- The newest **CMake**.
+- **git** to clone the respository and later generate version information.
+- [**ninja**](https://ninja-build.org/) to carry out the build.
+- [LLVM](https://releases.llvm.org/) toolchain version 8 or newer.
+	- For Windows, you can use [this installer](https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/LLVM-8.0.1-win64.exe), or a newer one. 
+	- For Linux, use your distro-specific package. Make sure to install ```libc++``` and ```lld``` as well.
+	- For MacOS, the version that comes pre-installed with **Xcode** is good enough.
 
 Once dependencies are installed, go to the directory where you wish to have your Hypersomnia project downloaded,
 open git bash and paste:
@@ -99,10 +104,7 @@ On all platforms, you can choose among three building configurations:
 ## Windows instructions
 
 Prerequisites:
-- **Visual Studio 2017 Preview** (Community) or newer.
-- ``ninja`` installed somewhere in PATH.
-- [LLVM](https://releases.llvm.org/) 7 toolchain (or newer).
-  - For example, use this installer: https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe
+- **Visual Studio 2019 Preview** (Community) or newer.
 
 Open up the terminal. Setup the environment:
 
@@ -110,12 +112,11 @@ Open up the terminal. Setup the environment:
 call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\VC\Auxiliary\Build\vcvarsall.bat" x64
 ```
 
-or:
+If the file cannot be found, you might need to look somewhere else for the ```vcvarsall.bat``` that comes with your particular Visual Studio installation. Another possible location is:
+
 ```
 call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 ```
-
-(for older Visual Studio versions)
 
 Next, run these commands:
 
@@ -127,8 +128,6 @@ set CONFIGURATION=Release
 cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 ..
 ninja
 ```
-
-Note: the path to ``vcvarsall.bat`` in the first line may differ if you're using a version of Visual Studio that is not **Visual Studio 2017 Preview Community**.
 
 Note: your computer **might start lagging heavily** for the duration of the build as ``ninja`` will use all available cores for compilation.
 
@@ -159,35 +158,19 @@ Current platforms are actively tested and supported:
 - Arch Linux with i3 window manager.
 - Ubuntu, but it is tested only through Travis builds.
 
-### Dependencies
-
-- ``git``
-- ``cmake``
-
-#### Additional, distro-specific
+#### Distribution-specific dependencies
 
 Arch Linux:
 
-- LLVM:
-  - ``clang``
-  - ``libc++``
-  - ``lld``
 - ``pkg-config``
 - ``libx11``
 - ``libxcb``
 - ``xcb-util-keysyms``
-- ``ninja``
 - ``mbedtls``
 - ``libsodium``
 
 Ubuntu:
 
-- LLVM:
-  - ``clang-7``
-  - ``lld-7``
-  - ``libc++-7-dev``
-  - ``libc++abi-7-dev``
-- ``ninja-build``
 - ``libxcb-keysyms1``
 - ``libxcb-keysyms1-dev``
 - ``libxi6``
@@ -201,37 +184,6 @@ Ubuntu:
 - ``libsodium-dev``
 
 
-<!--
-#### Compiler toolchain
-
-You will need 
-You can go with:
-
-- ``gcc 7.3`` or newer, or...
-- ...[``llvm``](https://llvm.org/) toolchain. Required components:
-	- ``clang 6.0.1`` or newer
-	- ``libc++``
-	- ``libc++abi``
-	- ``libc++experimental``
-	- ``lld``
-		- This one is optional, but it speeds up the relink time *a great deal*.
-
-If you don't know which one to choose, ``llvm`` is recommended.  
-Here are some test full-rebuild timings for ``Intel(R) Core(TM) i7-4770K CPU @ 3.50GHz``:
-
-```
-gcc:
-make all -j8 -C build/current  1115.80s user 55.62s system 660% cpu 2:57.26 total
-clang with gnu ld:
-make all -j8 -C build/current  789.00s user 34.62s system 668% cpu 2:03.24 total
-clang with lld:
-make all -j8 -C build/current  781.58s user 33.29s system 696% cpu 1:57.04 total
-```
-
-LLVM toolchain is expected to yield much faster build times, even on the order of minutes.  
-The generated binary is also more performant (e.g. a simple benchmark yielded ``700 FPS`` versus ``800 FPS`` on a default main menu scene)
--->
-
 ### One-shot launch
 
 Once the dependencies are all set, this is the complete script for building and launching the game from scratch, with RelWithDebInfo configuration:
@@ -244,7 +196,7 @@ cmake/build.sh RelWithDebInfo x64
 ninja run -C build/current
 ```
 
-#### Details
+#### Detailed instructions
  
 Use your favorite shell to enter the repository's directory.
 Then run:
@@ -336,6 +288,34 @@ To implement your own script for choosing a directory:
 - Use a ``$TERMINAL`` variable for file managers that need a terminal to run on.  
   Ensure your terminal supports ``-e`` flag that passes the commands to launch on startup. 
 - Output a ``$PWD/cache/last_file_path.txt`` file containg the result - which is the chosen path, e.g. ``/home/pbc/projects/my_map``.
+
+
+## MacOS instructions
+
+**WARNING: Building for MacOS is a work in progress! The window framework has yet to be ported. **
+
+Generally, to build for MacOS, you can follow the instructions for Linux.
+Here are the things you need to know beforehand:
+
+### Prerequisites
+
+- Xcode 11.1 or newer
+
+### Additional dependencies
+
+- ``mbedtls``
+- ``libsodium``
+- ``openssl``
+
+### Details
+
+To build, run from the repository's directory:
+
+```
+cmake/build.sh Release x64 -DBUILD_WINDOW_FRAMEWORK=0 -DBUILD_OPENGL=0 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
+```
+
+Note that the path to OpenSSL library must be set explicitly.
 
 # Contributing
 
