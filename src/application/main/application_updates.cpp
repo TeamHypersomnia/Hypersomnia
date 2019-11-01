@@ -435,7 +435,7 @@ application_update_result check_and_apply_updates(
 						text_color(archive_filename.string(), cyan);
 						text("\n");
 
-						text("Processed file:");
+						text("Processing file:");
 
 						auto current_file = extractor->get_currently_processed();
 
