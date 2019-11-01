@@ -233,7 +233,8 @@ namespace augs {
 				uniform_map[u] = get_uniform_location(enum_to_string(u));
 			});
 #else
-
+			(void)new_vertex;
+			(void)new_fragment;
 #endif
 		}
 

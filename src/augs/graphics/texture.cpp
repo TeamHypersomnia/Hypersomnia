@@ -64,6 +64,7 @@ namespace augs {
 
 		void texture::texImage2D(const vec2u new_size, const unsigned char* const source) {
 			(void)source;
+			(void)new_size;
 
 			GL_CHECK(glTexImage2D(
 				GL_TEXTURE_2D,

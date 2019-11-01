@@ -27,13 +27,11 @@ namespace augs {
 				0
 			));
 
+#if BUILD_OPENGL
 #if BUILD_STENCIL_BUFFER
 			if (opts.test(fbo_opt::WITH_STENCIL)) {
 				GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencil_id));
 			}
-#endif
-
-#if BUILD_STENCIL_BUFFER
 			// check FBO status
 
 			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -41,6 +39,7 @@ namespace augs {
 			if (status != GL_FRAMEBUFFER_COMPLETE) {
 				LOG("An error occured during FBO creation!");
 			}
+#endif
 #endif
 
 			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));

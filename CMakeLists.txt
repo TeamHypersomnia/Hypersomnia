@@ -26,13 +26,23 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	message("Building with Clang.")
 	set(CLANG ON)
 
+	set(FUSE_LD_FLAG "-fuse-ld=lld")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+	message("Building with AppleClang.")
+	set(CLANG ON)
+	set(APPLE_CLANG ON)
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	message("Building with gcc.")
+	set(GCC ON)
+else()
+	message("Unknown compiler: ${CMAKE_CXX_COMPILER_ID}")
+endif()
+
+if(CLANG)
 	EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE clang_full_version_string )
 	string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${clang_full_version_string})
 
 	message("Clang version: ${CLANG_VERSION_STRING}")
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	message("Building with gcc.")
-	set(GCC ON)
 endif()
 
 if(MSVC)
@@ -1070,7 +1080,7 @@ endif()
 # We configure additional flags for linker.
 
 if (CLANG AND NOT MSVC)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${FUSE_LD_FLAG}")
 endif()
 
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
@@ -1525,8 +1535,10 @@ elseif(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
 endif()
 
-if (UNIX)
-	list(APPEND HYPERSOMNIA_LIBS dl Xi)
+if (BUILD_WINDOW_FRAMEWORK)
+	if (UNIX)
+		list(APPEND HYPERSOMNIA_LIBS dl Xi)
+	endif()
 endif()
 
 if (BUILD_NETWORKING)

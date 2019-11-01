@@ -33,8 +33,10 @@ void buffer_data(
 
 /* A shortcut which will be heavily used from now on */
 
+#if BUILD_OPENGL
 template <class A, class B>
 constexpr bool same = std::is_same_v<A, B>;
+#endif
 
 namespace augs {
 	namespace graphics {
@@ -125,6 +127,7 @@ namespace augs {
 		}
 
 		void renderer_backend::perform(const drawcall_command& cmd) {
+#if BUILD_OPENGL
 			const auto& p = *platform;
 
 			const auto triangles = cmd.triangles;
@@ -155,6 +158,9 @@ namespace augs {
 			if (specials) {
 				disable_special_vertex_attribute();
 			}
+#else
+			(void)cmd;
+#endif
 		}
 
 		void renderer_backend::perform(
@@ -394,6 +400,7 @@ namespace augs {
 		}
 
 		void renderer_backend::set_scissor_bounds(const xywhi bounds) {
+			(void)bounds;
 			GL_CHECK(glScissor(bounds.x, bounds.y, bounds.w, bounds.h));
 		}
 

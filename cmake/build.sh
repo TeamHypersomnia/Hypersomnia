@@ -42,7 +42,7 @@ TARGET_DIR="$BUILD_DIR/$TARGET_FOLDER_NAME"
 
 echo "Building into $TARGET_DIR"
 
-mkdir --parents $TARGET_DIR
+mkdir -p $TARGET_DIR
 cd $TARGET_DIR
 
 export CC=$C_COMPILER

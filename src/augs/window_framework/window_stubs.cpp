@@ -60,4 +60,20 @@ namespace augs {
 	void window::reveal_in_explorer(const augs::path_type&) const {
 	
 	}
+
+	void window::set_cursor_visible_impl(bool) {
+
+	}
+
+	bool window::set_cursor_clipping_impl(bool) {
+		return true;
+	}
+
+	void window::set(vsync_type) {
+
+	}
+
+	window::~window() {
+
+	}
 }
