@@ -10,6 +10,16 @@
 struct archive_extractor {
 	std::shared_ptr<FILE> pipe;
 	std::string currently_processed;
+	int read_percent;
+	int percent_complete = 0;
+
+	struct info {
+		std::string processed = "";
+		int percent = 0;
+	};
+
+	info current;
+
 	std::array<char, BUF_SIZE> buffer;
 
 	std::future<void> completed_extraction;
@@ -17,25 +27,67 @@ struct archive_extractor {
 
 	bool can_read_lines = false;
 
-	auto lock_data() {
+	auto lock_info() {
 		return std::unique_lock<std::mutex>(mtx);
 	}
 
 	void worker() {
-		while (!feof(pipe.get())) {
-			if (fgets(buffer.data(), BUF_SIZE, pipe.get()) != NULL) {
-				auto lk = lock_data();
-				currently_processed = buffer.data();
+		std::string line;
+		bool read_till_backspace = false;
+
+		while (!std::feof(pipe.get())) {
+			if (const auto result = std::fgetc(pipe.get()); result != EOF) {
+				const auto new_char = static_cast<char>(result);
+
+				if (new_char == '%') {
+					if (const auto number = get_trailing_number(line)) {
+						line = std::to_string(*number) + "% ";
+						read_till_backspace = true;
+					}
+				}
+				else {
+					constexpr char BACKSPACE_v = 8;
+
+					if (new_char == BACKSPACE_v) {
+						if (read_till_backspace) {
+							int num_files = -1;
+							int percent = -1;
+							std::string processed;
+
+							LOG("Processing: %x", line);
+
+							if (typesafe_sscanf(line, "%x%  %x - %x", percent, num_files, processed)) {
+								if (processed.size() > 0) {
+									auto lk = lock_info();
+									current.processed = processed;
+									current.percent = percent;
+								}
+								else {
+									auto lk = lock_info();
+									current.percent = percent;
+								}
+							}
+							LOG_NVPS(percent, num_files, processed);
+
+							read_till_backspace = false;
+						}
+
+						line.clear();
+					}
+					else {
+						line += new_char;
+					}
+				}
 			}
 		}
 	}
 
-	auto get_currently_processed() {
-		std::string result;
+	auto get_info() {
+		info result;
 
 		{
-			auto lk = lock_data();
-			result = currently_processed;
+			auto lk = lock_info();
+			result = current;
 		}
 
 		return result;
@@ -56,14 +108,20 @@ struct archive_extractor {
 	) {
 		const auto ext = archive_path.extension().string();
 
-		const auto command_template = [&]() {
+		const auto resolved_command = [&]() {
+			const auto& source = archive_path;
+			const auto& target = destination_path;
+
 			if (ext == ".gz") {
-				auto ap = archive_path;
+				auto ap = source;
 				ap.replace_extension("");
 
 				if (ap.extension() == ".tar") {
-					return "tar -xvzf %x -C %x";
+					return typesafe_sprintf("tar -xvzf %x -C %x", source, target);
 				}
+			}
+			else if (ext == ".sfx" || ext == ".exe") {
+				return typesafe_sprintf("%x -o%x", source, target);
 			}
 			else if (ext == ".zip") {
 
@@ -71,8 +129,6 @@ struct archive_extractor {
 
 			throw std::runtime_error(typesafe_sprintf("Unknown archive format: %x", ext));
 		}();
-
-		const auto resolved_command = typesafe_sprintf(command_template, archive_path, destination_path);
 
 		completed_extraction = std::async(
 			std::launch::async,

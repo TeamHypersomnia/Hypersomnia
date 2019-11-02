@@ -41,7 +41,7 @@ Write-Host "Archiving the binary." -ForegroundColor yellow
 $platform = "Windows"
 $uploadUrl = "https://hypersomnia.xyz/upload_artifact.php"
 $apiKey = $artifact_upload_key
-$filePath = "Hypersomnia-for-$platform.zip"
+$filePath = "Hypersomnia-for-$platform.exe"
 $commitHash = $(git rev-parse HEAD)
 $commitNumber = $(git rev-list --count master)
 $version = "1.0.$commitNumber"
@@ -50,6 +50,6 @@ mv $target_exe Hypersomnia.exe
 Get-ChildItem
 Remove-item -Recurse -Force cache, logs, user, demos 
 cd ../
-7z a $filePath hypersomnia
+7z a -sfx $filePath hypersomnia
 
 curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" $uploadUrl

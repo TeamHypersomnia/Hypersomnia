@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Missing openssl dlls on Windows
+
 - While in the main menu, check for updates once every several seconds
 	- e.g. if the server has to restart due to an upgrade, the clients will follow with the update right away
 	- also trigger update check every time we enter the main menu from the client

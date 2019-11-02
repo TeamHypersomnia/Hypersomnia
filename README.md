@@ -5,8 +5,8 @@
 
 **Download for:**
 
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/windows_icon.svg" height=70 hspace=1> </a>
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Linux.tar.gz"> <img src="https://hypersomnia.xyz/linux_icon.svg" height=70 hspace=1 vspace=20> </a>
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.exe"> <img src="https://hypersomnia.xyz/windows_icon.svg" height=70 hspace=1> </a>
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Linux.sfx"> <img src="https://hypersomnia.xyz/linux_icon.svg" height=70 hspace=1 vspace=20> </a>
 <br>
 
 *[(for older versions click here)](https://hypersomnia.xyz/builds)*

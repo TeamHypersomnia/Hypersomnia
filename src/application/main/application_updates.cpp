@@ -40,10 +40,10 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 
 #if PLATFORM_UNIX
 #define PLATFORM_STRING "Linux"
-#define ARCHIVE_EXTENSION "tar.gz"
+#define ARCHIVE_EXTENSION "sfx"
 #elif PLATFORM_WINDOWS
 #define PLATFORM_STRING "Windows"
-#define ARCHIVE_EXTENSION "zip"
+#define ARCHIVE_EXTENSION "exe"
 #else
 #error "UNSUPPORTED!"
 #endif
@@ -232,6 +232,10 @@ application_update_result check_and_apply_updates(
 
 #define TEST 0
 #if TEST
+	std::filesystem::remove_all(NEW_path);
+	augs::create_directories(NEW_path);
+
+	fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
 	extractor.emplace(target_archive_path, NEW_path);
 	current_state = state::EXTRACTING;
 #endif
@@ -323,6 +327,8 @@ application_update_result check_and_apply_updates(
 
 							augs::save_string_as_bytes(response->body, target_archive_path);
 
+							fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
+
 							std::filesystem::remove_all(NEW_path);
 							augs::create_directories(NEW_path);
 							extractor.emplace(target_archive_path, NEW_path);
@@ -359,6 +365,10 @@ application_update_result check_and_apply_updates(
 				}
 				else if (current_state == state::EXTRACTING) {
 					if (const bool finished = extractor->update()) {
+#if TEST
+						interrupt(R::EXIT_APPLICATION);
+						continue;
+#endif
 						result.exit_with_failure_if_not_upgraded = true;
 
 						/* Serious stuff begins here. */
@@ -435,12 +445,19 @@ application_update_result check_and_apply_updates(
 						text_color(archive_filename.string(), cyan);
 						text("\n");
 
-						text("Processing file:");
+						auto info = extractor->get_info();
 
-						auto current_file = extractor->get_currently_processed();
+						if (info.processed.size() > 0) {
+							text("Processing file:");
+						}
+						else {
+							text("");
+						}
 
-						cut_preffix(current_file, "hypersomnia/");
-						text(current_file);
+						cut_preffix(info.processed, "hypersomnia/");
+						text(info.processed);
+
+						ImGui::ProgressBar(static_cast<float>(info.percent) / 100, ImVec2(-1.0f,0.0f));
 					}
 				}
 				else {

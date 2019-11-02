@@ -9,7 +9,7 @@ if [ -f "$EXE_PATH" ]; then
 	COMMIT_HASH=$(git rev-parse HEAD)
 	COMMIT_NUMBER=$(git rev-list --count master)
 	VERSION="1.0.$COMMIT_NUMBER"
-	FILE_PATH="Hypersomnia-for-$PLATFORM.tar.gz"
+	FILE_PATH="Hypersomnia-for-$PLATFORM.sfx"
 	UPLOAD_URL="https://hypersomnia.xyz/upload_artifact.php"
 
 	. cmake/linux_launcher_install.sh
@@ -17,7 +17,7 @@ if [ -f "$EXE_PATH" ]; then
 	pushd hypersomnia
 	rm -r cache
 	popd
-	tar -czf $FILE_PATH hypersomnia
+	7z a -sfx $FILE_PATH hypersomnia
 	curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" $UPLOAD_URL
 else
 	echo "No exe found. Not uploading."
