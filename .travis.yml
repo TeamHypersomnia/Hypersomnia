@@ -27,6 +27,7 @@ addons:
      - osspd
      - libasound2
      - libasound2-dev
+     - p7zip
     sources:
      - ubuntu-toolchain-r-test
      - llvm-toolchain-trusty-7
