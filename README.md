@@ -79,6 +79,8 @@ Irrespectively of the OS, you will need the following software in order to build
 	- For Windows, you can use [this installer](https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/LLVM-8.0.1-win64.exe), or a newer one. 
 	- For Linux, use your distro-specific package. Make sure to install ```libc++``` and ```lld``` as well.
 	- For MacOS, the version that comes pre-installed with **Xcode** is good enough.
+- [OpenSSL](https://www.openssl.org/) needed by the auto-updater to download latest game binaries over HTTPS.
+  - On Windows, you can get the appropriate installer here: https://slproweb.com/download/Win64OpenSSL-1_1_1d.exe
 
 Once dependencies are installed, go to the directory where you wish to have your Hypersomnia project downloaded,
 open git bash and paste:
@@ -305,7 +307,6 @@ Here are the things you need to know beforehand:
 
 - ``mbedtls``
 - ``libsodium``
-- ``openssl``
 
 ### Details
 

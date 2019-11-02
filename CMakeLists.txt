@@ -1567,7 +1567,7 @@ if (BUILD_OPENSSL)
 	set(OPENSSL_MSVC_STATIC_RT TRUE)
 
 	find_package(OpenSSL REQUIRED)
-	list(APPEND HYPERSOMNIA_LIBS OpenSSL::SSL OpenSSL::Crypto)
+	list(APPEND HYPERSOMNIA_LIBS OpenSSL::SSL OpenSSL::Crypto crypt32.lib)
 
 	message("Found: ${OPENSSL_FOUND})")
 	message("Include dir: ${OPENSSL_INCLUDE_DIR})")
