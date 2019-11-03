@@ -28,6 +28,7 @@ addons:
      - libasound2
      - libasound2-dev
      - p7zip
+     - p7zip-full
     sources:
      - ubuntu-toolchain-r-test
      - llvm-toolchain-trusty-7
