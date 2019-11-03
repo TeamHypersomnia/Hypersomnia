@@ -412,14 +412,7 @@ application_update_result check_and_apply_updates(
 									LOG("cp -rf %x %x", a, b);
 									fs::copy(a, b, opt::recursive | opt::overwrite_existing);
 								};
-
-								auto copy_player_prefs = [&]() {
-									LOG("Copying player prefs.");
-									const auto source_dir = USER_FILES_DIR;
-									const auto target_dir = NEW_root_path / USER_FILES_DIR;
-
-									cp_rf(source_dir, target_dir);
-								};
+								(void)cp_rf;
 
 								auto move_old_content_to_OLD = [&]() {
 									LOG("Moving old content to OLD directory.");
@@ -430,12 +423,19 @@ application_update_result check_and_apply_updates(
 									auto do_move = [&](const auto& it) {
 										const auto fname = it.filename();
 
-										if (fname != OLD_path && fname != NEW_path) {
-											mv(fname, OLD_path / fname);
-										}
-										else {
+										const auto kept_old_paths = std::array<augs::path_type, 4> {
+											OLD_path,
+											NEW_path,
+											LOG_FILES_DIR,
+											USER_FILES_DIR
+										};
+
+										if (found_in(kept_old_paths, fname)) {
 											LOG("Omitting the move of %x", fname);
+											return;
 										}
+
+										mv(fname, OLD_path / fname);
 									};
 
 									augs::for_each_in_directory(".", do_move, do_move);
@@ -453,7 +453,6 @@ application_update_result check_and_apply_updates(
 									augs::for_each_in_directory(new_root, do_move, do_move);
 								};
 
-								copy_player_prefs();
 								move_old_content_to_OLD();
 								copy_new_content_to_current();
 							}
@@ -475,7 +474,7 @@ application_update_result check_and_apply_updates(
 							text("");
 						}
 
-						cut_preffix(info.processed, "hypersomnia/");
+						cut_preffix(info.processed, (augs::path_type("hypersomnia") / "").string());
 						text(info.processed);
 
 						ImGui::ProgressBar(static_cast<float>(info.percent) / 100, ImVec2(-1.0f,0.0f));
