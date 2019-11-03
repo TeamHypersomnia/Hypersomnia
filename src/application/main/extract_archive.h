@@ -47,8 +47,9 @@ struct archive_extractor {
 				}
 				else {
 					constexpr char BACKSPACE_v = 8;
+					constexpr char CARRIAGE_RETURN_v = 13;
 
-					if (new_char == BACKSPACE_v) {
+					if (new_char == BACKSPACE_v || new_char == CARRIAGE_RETURN_v) {
 						if (read_till_backspace) {
 							int num_files = -1;
 							int percent = -1;
@@ -112,22 +113,7 @@ struct archive_extractor {
 			const auto& source = archive_path;
 			const auto& target = destination_path;
 
-			if (ext == ".gz") {
-				auto ap = source;
-				ap.replace_extension("");
-
-				if (ap.extension() == ".tar") {
-					return typesafe_sprintf("tar -xvzf %x -C %x", source, target);
-				}
-			}
-			else if (ext == ".sfx" || ext == ".exe") {
-				return typesafe_sprintf("%x -o%x", source, target);
-			}
-			else if (ext == ".zip") {
-
-			}
-
-			throw std::runtime_error(typesafe_sprintf("Unknown archive format: %x", ext));
+			return typesafe_sprintf("%x -o%x", source, target);
 		}();
 
 		completed_extraction = std::async(
