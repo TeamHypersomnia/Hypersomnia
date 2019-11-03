@@ -240,6 +240,10 @@ void main_menu_setup::draw_overlays(
 				return colored("Automatic update was cancelled!", orange);
 			case R::FIRST_LAUNCH_AFTER_UPGRADE:
 				return colored("Success! Hypersomnia was upgraded to the latest version.", green);
+			case R::VERSION_FILE_NOT_FOUND:
+				return colored("Version file not found on the update server!", red);
+			case R::BINARY_NOT_FOUND:
+				return colored("Latest binary not found on the update server!", red);
 			case R::UP_TO_DATE:
 				return colored("Hypersomnia is up to date.", green);
 			case R::FAILED:

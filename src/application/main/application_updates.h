@@ -9,6 +9,8 @@ enum class application_update_result_type {
 
 	EXIT_APPLICATION,
 	FAILED,
+	BINARY_NOT_FOUND,
+	VERSION_FILE_NOT_FOUND,
 	CANCELLED,
 	UPGRADED,
 	UP_TO_DATE,

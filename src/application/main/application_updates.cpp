@@ -48,6 +48,10 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 #error "UNSUPPORTED!"
 #endif
 
+bool successful(const int http_status_code) {
+	return http_status_code >= 200 && http_status_code < 300;
+}
+
 template <class... F>
 decltype(auto) launch_download(client_type& client, const std::string& resource, F&&... args) {
 	return client.Get(resource.c_str(), std::forward<F>(args)...);
@@ -101,28 +105,33 @@ application_update_result check_and_apply_updates(
 	{
 		const auto response = launch_download(http_client, version_path); 
 
-		if (response) {
-			const auto& contents = response->body;
-
-			std::string new_hash;
-			typesafe_sscanf(contents, "%x\n%x", new_version, new_hash);
-
-			const auto current_hash = hypersomnia_version().commit_hash;
-
-			if (new_hash == current_hash) {
-				LOG("The game is up to date. Commit hash: %x", current_hash);
-
-				result.type = R::UP_TO_DATE;
-				return result;
-			}
-
-			LOG("Commit hash differs. Requesting upgrade. \nOld: %x\nNew: %x", current_hash, new_hash);
-		}
-		else {
+		if (response == nullptr) {
 			log_null_response();
+			result.type = R::VERSION_FILE_NOT_FOUND;
+			return result;
+		}
+
+		if (!successful(response->status)) {
+			LOG("Request failed with status: %x", response->status);
 			result.type = R::FAILED;
 			return result;
 		}
+
+		const auto& contents = response->body;
+
+		std::string new_hash;
+		typesafe_sscanf(contents, "%x\n%x", new_version, new_hash);
+
+		const auto current_hash = hypersomnia_version().commit_hash;
+
+		if (new_hash == current_hash) {
+			LOG("The game is up to date. Commit hash: %x", current_hash);
+
+			result.type = R::UP_TO_DATE;
+			return result;
+		}
+
+		LOG("Commit hash differs. Requesting upgrade. \nOld: %x\nNew: %x", current_hash, new_hash);
 	}
 
 	const auto archive_path = typesafe_sprintf("%x/Hypersomnia-for-%x.%x", update_path, PLATFORM_STRING, ARCHIVE_EXTENSION);
@@ -264,7 +273,7 @@ application_update_result check_and_apply_updates(
 		ImGui::NewFrame();
 		center_next_window(1.f, ImGuiCond_Always);
 
-		{
+		auto advance_update_logic = [&]() {
 			const auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
 			auto loading_window = scoped_window("Loading in progress", nullptr, flags);
 
@@ -318,26 +327,38 @@ application_update_result check_and_apply_updates(
 					if (valid_and_is_ready(future_response)) {
 						const auto response = future_response.get();
 
-						if (response) {
-							LOG_NVPS(response->body.length());
-
-							if (response->body.length() < 2000) {
-								LOG(response->body);
-							}
-
-							augs::save_string_as_bytes(response->body, target_archive_path);
-
-							fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
-
-							std::filesystem::remove_all(NEW_path);
-							augs::create_directories(NEW_path);
-							extractor.emplace(target_archive_path, NEW_path);
-							current_state = state::EXTRACTING;
-						}
-						else {
+						if (response == nullptr) {
 							log_null_response();
 							interrupt(R::FAILED);
+							return;
 						}
+
+						if (!successful(response->status)) {
+							LOG("Request failed with status: %x", response->status);
+
+							if (response->status == 404) {
+								interrupt(R::BINARY_NOT_FOUND);
+								return;
+							}
+
+							interrupt(R::FAILED);
+							return;
+						}
+
+						LOG_NVPS(response->body.length());
+
+						if (response->body.length() < 2000) {
+							LOG(response->body);
+						}
+
+						augs::save_string_as_bytes(response->body, target_archive_path);
+
+						fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
+
+						std::filesystem::remove_all(NEW_path);
+						augs::create_directories(NEW_path);
+						extractor.emplace(target_archive_path, NEW_path);
+						current_state = state::EXTRACTING;
 					}
 
 					const auto len = downloaded_bytes.load();
@@ -367,7 +388,7 @@ application_update_result check_and_apply_updates(
 					if (const bool finished = extractor->update()) {
 #if TEST
 						interrupt(R::EXIT_APPLICATION);
-						continue;
+						return;
 #endif
 						result.exit_with_failure_if_not_upgraded = true;
 
@@ -481,8 +502,9 @@ application_update_result check_and_apply_updates(
 					interrupt(R::CANCELLED);
 				}
 			}
-		}
+		};
 
+		advance_update_logic();
 		augs::imgui::render();
 
 		renderer.clear_current_fbo();
