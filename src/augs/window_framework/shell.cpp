@@ -2,6 +2,7 @@
 #include "augs/filesystem/file.h"
 
 #include "augs/window_framework/shell.h"
+#include "augs/window_framework/create_process.h"
 #include "augs/string/string_templates.h"
 
 #if PLATFORM_WINDOWS
@@ -23,12 +24,12 @@ namespace augs {
 		augs::shell("\"" + std::filesystem::absolute(augs::path_type(on_file)).string() + "\"");
 	}
 
-	int restart_application(const std::string& arguments) {
-		LOG("Restarting application with arguments: %x", arguments);
-		const auto wide = widen(arguments);
-		RegisterApplicationRestart(wide.c_str(), 0);
+	int restart_application(const std::string& executable, const std::string& arguments) {
+		if (augs::spawn_detached_process(executable, arguments)) {
+			return EXIT_SUCCESS;
+		}
 
-		return EXIT_SUCCESS;
+		return EXIT_FAILURE;
 	}
 }
 #elif PLATFORM_UNIX
@@ -48,7 +49,8 @@ namespace augs {
 		augs::shell(command.string());
 	}
 
-	int restart_application(const std::string& arguments) {
+	int restart_application(const std::string& executable, const std::string& arguments) {
+		(void)executable;
 		(void)arguments;
 		return 42;
 	}

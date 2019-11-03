@@ -230,7 +230,10 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.window
 		);
 
+		LOG_NVPS(last_update_result.type);
+
 		if (last_update_result.type == up_result::UPGRADED) {
+			LOG("work: Upgraded successfully. Requesting relaunch.");
 			return work_result::RELAUNCH_UPGRADED;
 		}
 

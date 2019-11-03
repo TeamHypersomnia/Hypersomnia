@@ -63,14 +63,25 @@ int main(const int argc, const char* const * const argv) {
 	}
 
 	const auto result = work(argc, argv);
+	LOG_NVPS(result);
 
 	{
-		const auto logs = program_log::get_current().get_complete(); 
+		auto save_success_logs = [&]() {
+			const auto logs = program_log::get_current().get_complete(); 
+			augs::save_as_text(get_exit_success_path(), logs); 
+		};
+
+		auto save_failure_logs = [&]() {
+			const auto logs = program_log::get_current().get_complete(); 
+			const auto failure_log_path = get_exit_failure_path();
+
+			augs::save_as_text(failure_log_path, logs);
+			augs::open_text_editor(failure_log_path);
+		};
 
 		switch (result) {
 			case work_result::SUCCESS: 
-				augs::save_as_text(get_exit_success_path(), logs); 
-
+				save_success_logs();
 				/* 
 					Clean the remnants of the update if the new game version
 					has at least once exited successfully.
@@ -88,17 +99,15 @@ int main(const int argc, const char* const * const argv) {
 				return EXIT_SUCCESS;
 
 			case work_result::FAILURE: {
-				const auto failure_log_path = get_exit_failure_path();
-
-				augs::save_as_text(failure_log_path, logs);
-				augs::open_text_editor(failure_log_path);
-
+				save_failure_logs();
 				return EXIT_FAILURE;
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
-				augs::save_as_text(get_exit_success_path(), logs); 
-				return augs::restart_application("--upgraded-successfuly");
+				LOG("main: Application requested relaunch.");
+				save_success_logs();
+
+				return augs::restart_application(params.exe_path.string(), "--upgraded-successfully");
 			}
 
 			default: 
