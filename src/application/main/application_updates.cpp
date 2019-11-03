@@ -24,9 +24,9 @@
 #include "augs/readwrite/byte_file.h"
 
 #include "3rdparty/cpp-httplib/httplib.h"
-#include "application/main/extract_archive.h"
 #include "augs/filesystem/directory.h"
 #include "application/main/new_and_old_hypersomnia_path.h"
+#include "application/main/extract_archive.h"
 
 #if BUILD_OPENSSL
 using client_type = httplib::SSLClient;
@@ -231,6 +231,7 @@ application_update_result check_and_apply_updates(
 	enum class state {
 		DOWNLOADING,
 		EXTRACTING,
+		SAVING_ARCHIVE_TO_DISK,
 		MOVING_FILES_AROUND
 	};
 
@@ -238,10 +239,11 @@ application_update_result check_and_apply_updates(
 	auto extractor = std::optional<archive_extractor>();
 	//auto mover = std::optional<updated_files_mover>();
 	auto completed_move = std::future<void>();
+	auto completed_save = std::future<void>();
 
 #define TEST 0
 #if TEST
-	std::filesystem::remove_all(NEW_path);
+	fs::remove_all(NEW_path);
 	augs::create_directories(NEW_path);
 
 	fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
@@ -252,6 +254,11 @@ application_update_result check_and_apply_updates(
 	double total_secs = 0;
 
 	while (!should_quit) {
+		{
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(16ms);
+		}
+
 		window.collect_entropy(entropy);
 
 		for (const auto& e : entropy) {
@@ -325,7 +332,7 @@ application_update_result check_and_apply_updates(
 
 				if (current_state == state::DOWNLOADING) {
 					if (valid_and_is_ready(future_response)) {
-						const auto response = future_response.get();
+						auto response = future_response.get();
 
 						if (response == nullptr) {
 							log_null_response();
@@ -351,14 +358,19 @@ application_update_result check_and_apply_updates(
 							LOG(response->body);
 						}
 
-						augs::save_string_as_bytes(response->body, target_archive_path);
+						completed_save = std::async(
+							std::launch::async,
+							[resp_body = std::move(response->body), target_archive_path, NEW_path]() {
+								augs::save_string_as_bytes(resp_body, target_archive_path);
 
-						fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
+								fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
 
-						std::filesystem::remove_all(NEW_path);
-						augs::create_directories(NEW_path);
-						extractor.emplace(target_archive_path, NEW_path);
-						current_state = state::EXTRACTING;
+								fs::remove_all(NEW_path);
+								augs::create_directories(NEW_path);
+							}
+						);
+
+						current_state = state::SAVING_ARCHIVE_TO_DISK;
 					}
 
 					const auto len = downloaded_bytes.load();
@@ -384,10 +396,21 @@ application_update_result check_and_apply_updates(
 
 					text("\n");
 				}
+				else if (current_state == state::SAVING_ARCHIVE_TO_DISK) {
+					if (valid_and_is_ready(completed_save)) {
+						completed_save.get();
+						extractor.emplace(target_archive_path, NEW_path);
+						current_state = state::EXTRACTING;
+					}
+					
+					text("Saving:    ");
+					ImGui::SameLine();
+					text_color(archive_filename.string(), cyan);
+				}
 				else if (current_state == state::EXTRACTING) {
 					if (const bool finished = extractor->update()) {
 #if TEST
-						interrupt(R::EXIT_APPLICATION);
+						interrupt(R::UPGRADED);
 						return;
 #endif
 						result.exit_with_failure_if_not_upgraded = true;
@@ -417,7 +440,7 @@ application_update_result check_and_apply_updates(
 								auto move_old_content_to_OLD = [&]() {
 									LOG("Moving old content to OLD directory.");
 
-									std::filesystem::remove_all(OLD_path);
+									fs::remove_all(OLD_path);
 									augs::create_directories(OLD_path);
 
 									auto do_move = [&](const auto& it) {
@@ -453,8 +476,13 @@ application_update_result check_and_apply_updates(
 									augs::for_each_in_directory(new_root, do_move, do_move);
 								};
 
+								auto remove_now_empty_NEW_folder = [NEW_path]() {
+									fs::remove_all(NEW_path);
+								};
+
 								move_old_content_to_OLD();
 								copy_new_content_to_current();
+								remove_now_empty_NEW_folder();
 							}
 						);
 					}

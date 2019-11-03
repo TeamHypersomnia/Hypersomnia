@@ -24,6 +24,7 @@ namespace augs {
 	}
 
 	int restart_application(const std::string& arguments) {
+		LOG("Restarting application with arguments: %x", arguments);
 		const auto wide = widen(arguments);
 		RegisterApplicationRestart(wide.c_str(), 0);
 

@@ -86,7 +86,6 @@ int main(const int argc, const char* const * const argv) {
 				}
 
 				return EXIT_SUCCESS;
-				break;
 
 			case work_result::FAILURE: {
 				const auto failure_log_path = get_exit_failure_path();
@@ -95,10 +94,10 @@ int main(const int argc, const char* const * const argv) {
 				augs::open_text_editor(failure_log_path);
 
 				return EXIT_FAILURE;
-				break;
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
+				augs::save_as_text(get_exit_success_path(), logs); 
 				return augs::restart_application("--upgraded-successfuly");
 			}
 
