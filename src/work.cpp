@@ -170,7 +170,17 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	}();
 
+	if (config.log_to_live_file) {
+		augs::remove_file(get_path_in_log_files("live_debug.txt"));
+
+		log_to_live_file = true;
+
+		LOG("Live log was enabled due to a flag in config.");
+		LOG("Live log file created at %x", augs::date_time().get_readable());
+	}
+
 	LOG("Parsing command-line parameters.");
+
 	static const auto params = cmd_line_params(argc, argv);
 
 	if (config.unit_tests.run) {
@@ -270,15 +280,6 @@ work_result work(const int argc, const char* const * const argv) try {
 		? perform_float_consistency_tests() 
 		: true
 	;
-
-	if (config.log_to_live_file) {
-		augs::remove_file(get_path_in_log_files("live_debug.txt"));
-
-		log_to_live_file = true;
-
-		LOG("Live log was enabled due to a flag in config.");
-		LOG("Live log file created at %x", augs::date_time().get_readable());
-	}
 
 	static auto last_saved_config = config;
 
