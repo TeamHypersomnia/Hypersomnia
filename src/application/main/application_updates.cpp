@@ -238,26 +238,441 @@ application_update_result check_and_apply_updates(
 	auto current_state = state::DOWNLOADING;
 	auto extractor = std::optional<archive_extractor>();
 	//auto mover = std::optional<updated_files_mover>();
-	auto completed_move = std::future<void>();
-	auto completed_save = std::future<void>();
-
-#define TEST 0
-#if TEST
-	fs::remove_all(NEW_path);
-	augs::create_directories(NEW_path);
-
-	fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
-	extractor.emplace(target_archive_path, NEW_path);
-	current_state = state::EXTRACTING;
-#endif
+	auto completed_move = std::future<callback_result>();
+	auto completed_save = std::future<callback_result>();
 
 	double total_secs = 0;
 
-	while (!should_quit) {
+	auto mbox_guarded_action = [&window](auto&& action, const auto& action_name, const auto&... path) {
+		for (;;) {
+			try {
+				action();
+				return callback_result::CONTINUE;
+			}
+			catch (const augs::file_open_error& err) {
+				const auto format = "Cannot %x:\n%x\n\nPlease close the applications that might be using it, then try again!\n\nDetails:\n\n%x";
+				const auto error_text = typesafe_sprintf(format, action_name, path..., err.what());
+
+				if (window.retry_cancel("Hypersomnia Updater", error_text) == augs::message_box_button::CANCEL) {
+					return callback_result::ABORT;
+				}
+			}
+			catch (const fs::filesystem_error& err) {
+				const auto format = [&]() {
+					if (err.path2().empty()) {
+						return "Cannot %x:\n%x\n\nPlease close the applications that might be using it, then try again!\n\nDetails:\n\n%x";
+					}
+					else {
+						return "Cannot %x:\n%x:\nto:\n%x\n\nPlease close the applications that might be using them, then try again!\n\nDetails:\n\n%x";
+					}
+				}();
+
+				const auto error_text = [&]() {
+					if (err.path2().empty()) {
+						return typesafe_sprintf(format, action_name, err.path1(), err.what());
+					}
+					
+					return typesafe_sprintf(format, action_name, err.path1(), err.path2(), err.what());
+				}();
+
+				if (window.retry_cancel("Hypersomnia Updater", error_text) == augs::message_box_button::CANCEL) {
+					return callback_result::ABORT;
+				}
+			}
+		}
+	};
+
+	auto rm_rf = [&mbox_guarded_action](const auto& p) {
+		auto do_remove = [&]() {
+			LOG("rm -rf %x", p);
+			fs::remove_all(p);
+		};
+
+		return mbox_guarded_action(do_remove, "remove");
+	};
+	
+	auto mkdir_p = [&mbox_guarded_action](const auto& p) {
+		auto do_mkdir = [&]() {
+			LOG("mkdir -p %x", p);
+
+			augs::create_directories(p);
+		};
+
+		return mbox_guarded_action(do_mkdir, "create directory");
+	};
+
+	auto mv = [&mbox_guarded_action](const auto& a, const auto& b) {
+		auto do_rename = [&]() {
+			LOG("mv %x %x", a, b);
+
+			fs::rename(a, b);
+		};
+
+		return mbox_guarded_action(do_rename, "move");
+	};
+
+	auto make_executable = [&mbox_guarded_action](const auto& p) {
+		auto do_mkexe = [&]() {
+			LOG("chmod +x %x", p);
+			
+			fs::permissions(p, fs::perms::owner_all, fs::perm_options::add);
+		};
+
+		return mbox_guarded_action(do_mkexe, "make executable of");
+	};
+
+	auto guarded_save_as_bytes = [&](const std::string& contents, const augs::path_type& target) {
+		auto saver = [&]() {
+			LOG("Saving the executable as bytes.");
+			augs::save_string_as_bytes(contents, target);
+		};
+		
+		return mbox_guarded_action(saver, "save", target);
+	};
+
+#define TEST 0
+#if TEST
+	rm_rf(NEW_path);
+	mkdir_p(NEW_path);
+
+	make_executable(target_archive_path);
+	extractor.emplace(target_archive_path, NEW_path, exit_requested);
+	current_state = state::EXTRACTING;
+#endif
+
+	auto print_new_version_available = []() {
+		text_color("New version available!", yellow);
+
+		ImGui::Separator();
+	};
+	
+	auto print_version_transition_info = [&new_version, total_secs]() {
+		const auto version_info_string = [&]() {
+			const auto current_version = hypersomnia_version().get_version_number();
+
+			int major = 0;
+			int minor = 0;
+			int commit = 0;
+
+			typesafe_sscanf(new_version, "%x.%x.%x", major, minor, commit);
+
+			text(current_version);
+			ImGui::SameLine();
+
+			const auto ms = total_secs * 1000;
+			const auto n = int(ms / 200);
+
+			if (n % 2 == 0) {
+				text("->");
+			}
+			else {
+				text(">-");
+			}
+
+			ImGui::SameLine();
+			text(new_version);
+			ImGui::SameLine();
+
+			const auto num_revs = static_cast<int>(commit) - static_cast<int>(hypersomnia_version().commit_number);
+			const auto revision_str = num_revs == 1 ? "revision" : "revisions";
+
+			return typesafe_sprintf("(%x new %x)\n\n", num_revs, revision_str);
+		}();
+
+		text_disabled(version_info_string);
+	};
+
+	auto print_upstream = [&host_url, &update_path]() {
+		const auto upstream_string = typesafe_sprintf("Mirror:     %x%x", host_url, update_path);
+		text_disabled(upstream_string);
+	};
+
+	auto print_download_progress_bar = [&downloaded_bytes, &total_bytes, &archive_filename]() {
+		const auto len = downloaded_bytes.load();
+		const auto total = total_bytes.load();
+
+		const auto downloaded_bytes = readable_bytesize(len, "%2f");
+		const auto total_bytes = readable_bytesize(total, "%2f");
+
+		const auto completion_mult = static_cast<double>(len) / total;
+
+		text("Acquiring: ");
+		ImGui::SameLine();
+		text_color(archive_filename.string(), cyan);
+		text("\n");
+
+		const auto downloaded_string = typesafe_sprintf("Downloaded: %x", downloaded_bytes);
+		const auto total_string =      typesafe_sprintf("Total size: %x\n\n", total_bytes);
+
+		text(downloaded_string);
+		text(total_string);
+
+		ImGui::ProgressBar(static_cast<float>(completion_mult), ImVec2(-1.0f,0.0f));
+
+		text("\n");
+	};
+
+	auto print_saving_progress = [&archive_filename]() {
+		text("Saving:    ");
+		ImGui::SameLine();
+		text_color(archive_filename.string(), cyan);
+	};
+
+	auto print_extracting_progress = [&archive_filename, &extractor]() {
+		text("Extracting:");
+
+		ImGui::SameLine();
+		text_color(archive_filename.string(), cyan);
+		text("\n");
+
+		auto info = extractor->get_info();
+
+		if (info.processed.size() > 0) {
+			text("Processing file:");
+		}
+		else {
+			text("");
+		}
+
+		cut_preffix(info.processed, (augs::path_type("hypersomnia") / "").string());
+		text(info.processed);
+
+		ImGui::ProgressBar(static_cast<float>(info.percent) / 100, ImVec2(-1.0f,0.0f));
+	};
+
+	auto do_cancel_button = []() {
+		auto scope = scoped_child("Cancel");
+
+		ImGui::Separator();
+
+		return ImGui::Button("Cancel");
+	};
+
+	auto advance_update_logic = [&]() {
+		const auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+		auto loading_window = scoped_window("Loading in progress", nullptr, flags);
+
 		{
+			auto child = scoped_child("loading view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)), false, flags);
+
+			print_new_version_available();
+			print_version_transition_info();
+			print_upstream();
+
+			if (current_state == state::DOWNLOADING) {
+				if (valid_and_is_ready(future_response)) {
+					auto response = future_response.get();
+
+					if (response == nullptr) {
+						log_null_response();
+						interrupt(R::FAILED);
+						return;
+					}
+
+					if (!successful(response->status)) {
+						LOG("Request failed with status: %x", response->status);
+
+						if (response->status == 404) {
+							interrupt(R::BINARY_NOT_FOUND);
+							return;
+						}
+
+						interrupt(R::FAILED);
+						return;
+					}
+
+					LOG_NVPS(response->body.length());
+
+					if (response->body.length() < 2000) {
+						LOG(response->body);
+					}
+
+					completed_save = std::async(
+						std::launch::async,
+						[guarded_save_as_bytes, make_executable, rm_rf, mkdir_p, resp_body = std::move(response->body), target_archive_path, NEW_path]() {
+							auto failed = [](const auto e) {
+								return e == callback_result::ABORT;
+							};
+
+							if (failed(guarded_save_as_bytes(resp_body, target_archive_path))) {
+								return callback_result::ABORT;
+							}
+							
+							if (failed(make_executable(target_archive_path))) {
+								return callback_result::ABORT;
+							}
+							
+							if (failed(rm_rf(NEW_path))) {
+								return callback_result::ABORT;
+							}
+
+							if (failed(mkdir_p(NEW_path))) {
+								return callback_result::ABORT;
+							}
+							
+							return callback_result::CONTINUE;
+						}
+					);
+
+					current_state = state::SAVING_ARCHIVE_TO_DISK;
+				}
+
+				print_download_progress_bar();
+			}
+			else if (current_state == state::SAVING_ARCHIVE_TO_DISK) {
+				if (valid_and_is_ready(completed_save)) {
+					if (completed_save.get() == callback_result::CONTINUE) {
+						extractor.emplace(target_archive_path, NEW_path, exit_requested);
+						current_state = state::EXTRACTING;
+					}
+					else {
+						interrupt(R::CANCELLED);
+					}
+				}
+
+				print_saving_progress();
+			}
+			else if (current_state == state::EXTRACTING) {
+				if (extractor->has_completed()) {
+#if 0
+					interrupt(R::UPGRADED);
+					return;
+#endif
+					result.exit_with_failure_if_not_upgraded = true;
+
+					/* Serious stuff begins here. */
+
+					current_state = state::MOVING_FILES_AROUND;
+
+					completed_move = std::async(
+						std::launch::async,
+						[target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
+							const auto NEW_root_path = NEW_path / "hypersomnia";
+
+							auto move_content_to_current_from = [&](const auto& source_root) {
+								LOG("Moving content from %x to current directory.", source_root);
+
+								auto do_move = [&](const auto& fname) {
+									return mv(fname, fname.filename());
+								};
+
+								return augs::for_each_in_directory(source_root, do_move, do_move);
+							};
+
+							auto move_new_content_to_current = [&]() {
+								return move_content_to_current_from(NEW_path / "hypersomnia");
+							};
+
+							auto restore_content_back_from_old = [&]() {
+								move_content_to_current_from(OLD_path);
+							};
+							
+							auto move_old_content_to_OLD = [&]() {
+								LOG("Moving old content to OLD directory.");
+								
+								if (rm_rf(OLD_path) == callback_result::ABORT) {
+									return false;
+								}
+
+								if (mkdir_p(OLD_path) == callback_result::ABORT) {
+									return false;
+								}
+
+								auto do_move = [&](const auto& it) {
+									const auto fname = it.filename();
+
+									const auto paths_from_old_version_to_keep = std::array<augs::path_type, 4> {
+										OLD_path,
+										NEW_path,
+										LOG_FILES_DIR,
+										USER_FILES_DIR
+									};
+
+									if (found_in(paths_from_old_version_to_keep, fname)) {
+										LOG("Omitting the move of %x", fname);
+										return callback_result::CONTINUE;
+									}
+
+									return mv(fname, OLD_path / fname);
+								};
+
+								return augs::for_each_in_directory(".", do_move, do_move);
+							};
+
+							auto remove_now_unneeded_archive = [&]() {
+								rm_rf(target_archive_path);
+							};
+
+							auto remove_now_unneeded_NEW_folder = [&]() {
+								rm_rf(NEW_path);
+							};
+
+							remove_now_unneeded_archive();
+
+							if (move_old_content_to_OLD()) {
+								if (move_new_content_to_current()) {
+									remove_now_unneeded_NEW_folder();
+
+									return callback_result::CONTINUE;
+								}
+								else {
+									/* 
+										Very unlikely that this fails, 
+										but in this case the user will just be left with partial files in their game folder,
+										but with OLD_HYPERSOMNIA untouched.
+									*/
+								}
+							}
+							else {
+								/* 
+									Most likely case of failure:
+									Something in the game's files was opened and could not be moved.
+								*/
+								restore_content_back_from_old();
+							}
+
+							return callback_result::ABORT;
+						}
+					);
+				}
+				
+				print_extracting_progress();
+			}
+			else if (current_state == state::MOVING_FILES_AROUND) {
+				if (valid_and_is_ready(completed_move)) {
+					const auto result = completed_move.get();
+
+					if (result == callback_result::CONTINUE) {
+						interrupt(R::UPGRADED);
+					}
+					else if (result == callback_result::ABORT) {
+						interrupt(R::EXIT_APPLICATION);
+					}
+				}
+
+				text("Moving files around...");
+			}
+			else {
+				ensure(false && "Unknown state!");
+			}
+		}
+
+		if (current_state != state::MOVING_FILES_AROUND) {
+			if (do_cancel_button()) {
+				interrupt(R::CANCELLED);
+			}
+		}
+	};
+
+	while (!should_quit) {
+#if PLATFORM_WINDOWS
+		{
+			/* Sleep to be easy on the CPU */
+
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(16ms);
 		}
+#endif
 
 		window.collect_entropy(entropy);
 
@@ -267,270 +682,21 @@ application_update_result check_and_apply_updates(
 			}
 		}
 
-		const auto frame_delta = frame_timer.extract_delta();
-		const auto dt_secs = frame_delta.in_seconds();
-		total_secs += dt_secs;
+		{
+			const auto frame_delta = frame_timer.extract_delta();
+			const auto dt_secs = frame_delta.in_seconds();
+			total_secs += dt_secs;
 
-		augs::imgui::setup_input(
-			entropy,
-			dt_secs,
-			window_size
-		);
+			augs::imgui::setup_input(
+				entropy,
+				dt_secs,
+				window_size
+			);
+		}
 
 		ImGui::NewFrame();
 		center_next_window(1.f, ImGuiCond_Always);
-
-		auto advance_update_logic = [&]() {
-			const auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-			auto loading_window = scoped_window("Loading in progress", nullptr, flags);
-
-			{
-				auto child = scoped_child("loading view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)), false, flags);
-
-				text_color("New version available!", yellow);
-
-				ImGui::Separator();
-
-				{
-					const auto version_info_string = [&new_version, total_secs]() {
-						const auto current_version = hypersomnia_version().get_version_number();
-
-						int major = 0;
-						int minor = 0;
-						int commit = 0;
-
-						typesafe_sscanf(new_version, "%x.%x.%x", major, minor, commit);
-
-						text(current_version);
-						ImGui::SameLine();
-
-						const auto ms = total_secs * 1000;
-						const auto n = int(ms / 200);
-
-						if (n % 2 == 0) {
-							text("->");
-						}
-						else {
-							text(">-");
-						}
-
-						ImGui::SameLine();
-						text(new_version);
-						ImGui::SameLine();
-
-						const auto num_revs = static_cast<int>(commit) - static_cast<int>(hypersomnia_version().commit_number);
-						const auto revision_str = num_revs == 1 ? "revision" : "revisions";
-
-						return typesafe_sprintf("(%x new %x)\n\n", num_revs, revision_str);
-					}();
-
-					text_disabled(version_info_string);
-				}
-
-				const auto upstream_string = typesafe_sprintf("Mirror:     %x%x", host_url, update_path);
-				text_disabled(upstream_string);
-
-				if (current_state == state::DOWNLOADING) {
-					if (valid_and_is_ready(future_response)) {
-						auto response = future_response.get();
-
-						if (response == nullptr) {
-							log_null_response();
-							interrupt(R::FAILED);
-							return;
-						}
-
-						if (!successful(response->status)) {
-							LOG("Request failed with status: %x", response->status);
-
-							if (response->status == 404) {
-								interrupt(R::BINARY_NOT_FOUND);
-								return;
-							}
-
-							interrupt(R::FAILED);
-							return;
-						}
-
-						LOG_NVPS(response->body.length());
-
-						if (response->body.length() < 2000) {
-							LOG(response->body);
-						}
-
-						completed_save = std::async(
-							std::launch::async,
-							[resp_body = std::move(response->body), target_archive_path, NEW_path]() {
-								augs::save_string_as_bytes(resp_body, target_archive_path);
-
-								fs::permissions(target_archive_path, fs::perms::owner_all, fs::perm_options::add);
-
-								fs::remove_all(NEW_path);
-								augs::create_directories(NEW_path);
-							}
-						);
-
-						current_state = state::SAVING_ARCHIVE_TO_DISK;
-					}
-
-					const auto len = downloaded_bytes.load();
-					const auto total = total_bytes.load();
-
-					const auto downloaded_bytes = readable_bytesize(len, "%2f");
-					const auto total_bytes = readable_bytesize(total, "%2f");
-
-					const auto completion_mult = static_cast<double>(len) / total;
-
-					text("Acquiring: ");
-					ImGui::SameLine();
-					text_color(archive_filename.string(), cyan);
-					text("\n");
-
-					const auto downloaded_string = typesafe_sprintf("Downloaded: %x", downloaded_bytes);
-					const auto total_string =      typesafe_sprintf("Total size: %x\n\n", total_bytes);
-
-					text(downloaded_string);
-					text(total_string);
-
-					ImGui::ProgressBar(static_cast<float>(completion_mult), ImVec2(-1.0f,0.0f));
-
-					text("\n");
-				}
-				else if (current_state == state::SAVING_ARCHIVE_TO_DISK) {
-					if (valid_and_is_ready(completed_save)) {
-						completed_save.get();
-						extractor.emplace(target_archive_path, NEW_path);
-						current_state = state::EXTRACTING;
-					}
-					
-					text("Saving:    ");
-					ImGui::SameLine();
-					text_color(archive_filename.string(), cyan);
-				}
-				else if (current_state == state::EXTRACTING) {
-					if (const bool finished = extractor->update()) {
-#if TEST
-						interrupt(R::UPGRADED);
-						return;
-#endif
-						result.exit_with_failure_if_not_upgraded = true;
-
-						/* Serious stuff begins here. */
-
-						current_state = state::MOVING_FILES_AROUND;
-
-						completed_move = std::async(
-							std::launch::async,
-							[NEW_path, OLD_path]() {
-								const auto NEW_root_path = NEW_path / "hypersomnia";
-
-								auto mv = [&](const auto& a, const auto& b) {
-									LOG("mv %x %x", a, b);
-									fs::rename(a, b);
-								};
-
-								auto cp_rf = [&](const auto& a, const auto& b) {
-									using opt = fs::copy_options;
-
-									LOG("cp -rf %x %x", a, b);
-									fs::copy(a, b, opt::recursive | opt::overwrite_existing);
-								};
-								(void)cp_rf;
-
-								auto move_old_content_to_OLD = [&]() {
-									LOG("Moving old content to OLD directory.");
-
-									fs::remove_all(OLD_path);
-									augs::create_directories(OLD_path);
-
-									auto do_move = [&](const auto& it) {
-										const auto fname = it.filename();
-
-										const auto kept_old_paths = std::array<augs::path_type, 4> {
-											OLD_path,
-											NEW_path,
-											LOG_FILES_DIR,
-											USER_FILES_DIR
-										};
-
-										if (found_in(kept_old_paths, fname)) {
-											LOG("Omitting the move of %x", fname);
-											return;
-										}
-
-										mv(fname, OLD_path / fname);
-									};
-
-									augs::for_each_in_directory(".", do_move, do_move);
-								};
-
-								auto copy_new_content_to_current = [&]() {
-									LOG("Moving new content to current directory.");
-
-									const auto new_root = NEW_path / "hypersomnia";
-
-									auto do_move = [&](const auto& fname) {
-										mv(fname, fname.filename());
-									};
-
-									augs::for_each_in_directory(new_root, do_move, do_move);
-								};
-
-								auto remove_now_empty_NEW_folder = [NEW_path]() {
-									fs::remove_all(NEW_path);
-								};
-
-								move_old_content_to_OLD();
-								copy_new_content_to_current();
-								remove_now_empty_NEW_folder();
-							}
-						);
-					}
-					else {
-						text("Extracting:");
-
-						ImGui::SameLine();
-						text_color(archive_filename.string(), cyan);
-						text("\n");
-
-						auto info = extractor->get_info();
-
-						if (info.processed.size() > 0) {
-							text("Processing file:");
-						}
-						else {
-							text("");
-						}
-
-						cut_preffix(info.processed, (augs::path_type("hypersomnia") / "").string());
-						text(info.processed);
-
-						ImGui::ProgressBar(static_cast<float>(info.percent) / 100, ImVec2(-1.0f,0.0f));
-					}
-				}
-				else {
-					if (valid_and_is_ready(completed_move)) {
-						completed_move.get();
-
-						interrupt(R::UPGRADED);
-					}
-
-					text("Moving files around...");
-				}
-			}
-
-			if (current_state != state::MOVING_FILES_AROUND)
-			{
-				auto scope = scoped_child("Cancel");
-
-				ImGui::Separator();
-
-				if (ImGui::Button("Cancel")) {
-					interrupt(R::CANCELLED);
-				}
-			}
-		};
-
+		
 		advance_update_logic();
 		augs::imgui::render();
 

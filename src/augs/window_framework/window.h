@@ -45,6 +45,11 @@ namespace augs {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 	};
 
+	enum class message_box_button {
+		RETRY,
+		CANCEL
+	};
+
 	class window : public settable_as_current_mixin<window> {
 #if PLATFORM_WINDOWS
 		struct platform_data;
@@ -185,5 +190,10 @@ namespace augs {
 		) const;
 
 		void reveal_in_explorer(const augs::path_type&) const;
+		
+		message_box_button retry_cancel(
+			const std::string& caption,
+			const std::string& text
+		);
 	};
 }

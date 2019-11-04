@@ -45,6 +45,7 @@ public:
 						entry.is_official = official;
 
 						all_paths.emplace_back(std::move(entry));
+						return callback_result::CONTINUE;
 					};
 				};
 
@@ -53,7 +54,7 @@ public:
 						augs::for_each_in_directory(
 							official_path,
 							make_path_adder(true, official_path),
-							[](const auto&) {}
+							[](const auto&) { return callback_result::CONTINUE; }
 						);
 					}
 
@@ -61,7 +62,7 @@ public:
 						augs::for_each_in_directory(
 							community_path,
 							make_path_adder(false, community_path),
-							[](const auto&) {}
+							[](const auto&) { return callback_result::CONTINUE; }
 						);
 					}
 				}

@@ -82,20 +82,6 @@ int main(const int argc, const char* const * const argv) {
 		switch (result) {
 			case work_result::SUCCESS: 
 				save_success_logs();
-				/* 
-					Clean the remnants of the update if the new game version
-					has at least once exited successfully.
-				*/
-
-				std::filesystem::remove_all(NEW_HYPERSOMNIA);
-
-				try {
-					std::filesystem::remove_all(OLD_HYPERSOMNIA);
-				}
-				catch (const augs::filesystem_error&) {
-
-				}
-
 				return EXIT_SUCCESS;
 
 			case work_result::FAILURE: {

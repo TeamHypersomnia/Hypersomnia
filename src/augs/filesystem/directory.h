@@ -5,6 +5,7 @@
 #include <filesystem>
 
 #include "augs/filesystem/path.h"
+#include "augs/enums/callback_result.h"
 
 namespace augs {
 	bool create_directory(const path_type& dir_path);
@@ -35,7 +36,7 @@ namespace augs {
 	}
 
 	template <class D, class F>
-	void for_each_in_directory(
+	bool for_each_in_directory(
 		const path_type& dir_path,
 		D directory_callback,
 		F file_callback
@@ -46,11 +47,17 @@ namespace augs {
 			const auto p = i->path();
 
 			if (is_directory(p)) {
-				directory_callback(p);
+				if (directory_callback(p) == callback_result::ABORT) {
+					return false;
+				}
 			}
 			else {
-				file_callback(p);
+				if (file_callback(p) == callback_result::ABORT) {
+					return false;
+				}
 			}
 		}
+		
+		return true;
 	}
 }

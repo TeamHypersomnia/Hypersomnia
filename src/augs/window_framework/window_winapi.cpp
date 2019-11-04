@@ -835,6 +835,26 @@ namespace augs {
 		return xywhi(rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top);
 	}
 
+	static auto to_message_box_button(const int button_code) {
+		switch (button_code) {
+			case IDCANCEL:
+				return message_box_button::CANCEL;
+			case IDRETRY:
+				return message_box_button::RETRY;
+			default:
+				return message_box_button::CANCEL;
+		}
+	}
+	message_box_button window::retry_cancel(
+		const std::string& caption,
+		const std::string& text
+	) {
+		const auto wide_caption = widen(caption);
+		const auto wide_text = widen(text);
+
+		return to_message_box_button(MessageBox(platform->hwnd, wide_text.c_str(), wide_caption.c_str(), MB_RETRYCANCEL | MB_ICONEXCLAMATION));
+	}
+
 	window::~window() {
 		destroy();
 		window_ptr = nullptr;

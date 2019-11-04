@@ -12,8 +12,6 @@
 #undef min
 #undef max
 
-#define BUF_SIZE 4096
-
 namespace augs {
 	std::wstring widen(const std::string& s);
 }
@@ -35,7 +33,7 @@ struct archive_extractor {
 	std::optional<char> get_next_character() {
 		if (!std::feof(pipe.get())) {
 			if (const auto result = std::fgetc(pipe.get()); result != EOF) {
-				return static_cast<char>(*result);
+				return static_cast<char>(result);
 			}
 		}
 
@@ -132,11 +130,13 @@ struct archive_extractor {
 
 		return chBuf[0]; 
 	}
-
-	~archive_extractor() {
-		CloseHandle(g_hChildStd_OUT_Rd);
-	}
 #endif
+
+	void deinit_pipe() {
+#if PLATFORM_WINDOWS
+		CloseHandle(g_hChildStd_OUT_Rd);
+#endif
+	}
 
 	std::string currently_processed;
 	int read_percent;
@@ -149,22 +149,29 @@ struct archive_extractor {
 
 	info current;
 
-	std::array<char, BUF_SIZE> buffer;
-
 	std::future<void> completed_extraction;
 	std::mutex mtx;
-
-	bool can_read_lines = false;
 
 	auto lock_info() {
 		return std::unique_lock<std::mutex>(mtx);
 	}
 
+	std::atomic<bool>& exit_requested;
+
 	void worker() {
+		auto deinit_pipe_guard = augs::scope_guard([this]() {
+			deinit_pipe();
+		});
+	
 		std::string line;
 		bool read_till_backspace = false;
 
 		while (const auto maybe_new_char = get_next_character()) {
+			if (exit_requested.load()) {
+				LOG("Extraction worker: requested cancellation.");
+				return;
+			}
+
 			const auto new_char = *maybe_new_char;
 
 			if (new_char == '%') {
@@ -223,7 +230,7 @@ struct archive_extractor {
 		return result;
 	}
 
-	bool update() {
+	bool has_completed() {
 		if (valid_and_is_ready(completed_extraction)) {
 			completed_extraction.get();
 			return true;
@@ -234,8 +241,9 @@ struct archive_extractor {
 
 	archive_extractor(
 		const augs::path_type& archive_path,
-		const augs::path_type& destination_path
-	) {
+		const augs::path_type& destination_path,
+		std::atomic<bool>& exit_requested
+	) : exit_requested(exit_requested) {
 		const auto ext = archive_path.extension().string();
 
 		const auto resolved_command = [&]() {

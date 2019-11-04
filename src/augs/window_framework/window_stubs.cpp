@@ -73,6 +73,15 @@ namespace augs {
 
 	}
 
+	message_box_button window::retry_cancel(
+		const std::string& caption,
+		const std::string& text
+	) {
+		(void)caption;
+		(void)text;
+		return message_box_button::CANCEL;
+	}
+
 	window::~window() {
 
 	}
