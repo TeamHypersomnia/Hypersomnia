@@ -3877,3 +3877,81 @@ which can be done from Settings->Reset all settings to factory default.
 - jpg/jpeg file support for avatars
 	- stb_image
 
+- Another detailed state machine for repeatable steps
+	- "REMOVING NEW HYPERSOMNIA" etc.
+	- There will just be a loop until message box is pressed, though synchronous would be best
+
+- Missing openssl dlls on Windows
+
+- Download archive to cache/Hypersomnia-for-Windows
+
+Say the game is in ``C:\hyp`` folder, so e.g. the executable is at ``C:\hyp\Hypersomnia.exe``
+
+Old client does:
+- Unpack the new, downloaded game to a new folder: ``C:\hyp\NEW``
+- Copy the player preferences from ``C:\hyp\user\config.lua`` to ``C:\hyp\NEW\user\config.lua``
+- Launch ``C:\hyp\NEW\Hypersomnia.exe --upgrade`` and exit
+
+New client does:
+- Recognize the ``--upgrade`` flag that tells us that the following actions are required 
+- Move everything inside ``C:\hyp`` (except ``C:\hyp\NEW``) to a new folder: ``C:\hyp\OLD``
+- Copy everything from inside ``C:\hyp\NEW`` into ``C:\hyp``
+- Launch ``C:\hyp\Hypersomnia.exe`` and exit
+
+The new client (in-place) does:
+- If it exists, remove ``C:\hyp\NEW``
+- If it exists, remove ``C:\hyp\OLD``
+
+
+Advantages:
+- If the new executable fails to launch, the old executable with all of its files remain completely untouched
+- The old files are removed only at the final step as a cleanup procedure (that is not even necessary for the game to function), when everything's confirmed to work
+- If shit hits the fan in the middle and something crashes, the user is left with nicely named NEW and OLD folders
+- We don't have to play with any paths outside of the game's tree, to which we may have no permissions
+
+- Restarting the app
+	- https://www.gamedev.net/forums/topic/580762-how-can-i-restart-my-c-application/
+	- https://stackoverflow.com/questions/40022586/is-it-possible-to-restart-a-program-from-inside-a-program
+
+- Build file server
+	- corner cases
+		- What if linux build and windows build finish at the same time?
+			- either linux or windows build will stamp the build and it should be the one that takes longest
+				- so, windows
+		- What if two travis builds finish at the same time?
+			- they will have stamping disabled so nothing bad will happen
+		- Two appveyor builds can't finish at the same time because we've checked rolling builds
+		- What if windows build completes before linux?
+			- The app will detect a new version but won't be able to download the binary because it is not yet there
+			- We have to handle this case anyway
+	- security
+		- secure api key comparison
+		- are the denied file candidates left dangling in memory?
+	- Appveyor could hold a release_notes.txt artifact
+	- But we need retention so appveyor is a no-go 
+	- Folders
+		- builds/
+			- latest
+			- 1.0.1323
+				- windows
+					- Hypersomnia.7z
+					- commit_hash.txt
+				- linux
+				- Hypersomnia-x64-windows.7z
+				- Hypersomnia-x64-linux.7z
+				- Hypersomnia-linux-x64.7z
+
+				- hypersomnia-1.0.9430-linux.7z
+				- hypersomnia-1.0.9430-win64.zip
+					
+				- Hypersomnia-for-Linux.tar.gz
+				- Hypersomnia-for-Windows.zip
+
+				- commit_hash.txt
+					- for client-side version check
+				- whats_new.txt
+					- Optionally
+
+			- 1.0.4383
+			- latest
+

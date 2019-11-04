@@ -89,8 +89,15 @@ int main(const int argc, const char* const * const argv) {
 				return EXIT_FAILURE;
 			}
 
-			case work_result::RELAUNCH_UPGRADED: {
+			case work_result::RELAUNCH: {
 				LOG("main: Application requested relaunch.");
+				save_success_logs();
+
+				return augs::restart_application(params.exe_path.string(), "");
+			}
+
+			case work_result::RELAUNCH_UPGRADED: {
+				LOG("main: Application requested relaunch due to a successful upgrade.");
 				save_success_logs();
 
 				return augs::restart_application(params.exe_path.string(), "--upgraded-successfully");

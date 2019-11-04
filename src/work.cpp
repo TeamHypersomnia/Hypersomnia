@@ -152,6 +152,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		/* Some developer-friendly options */
 		result.default_client_start.chosen_address_type = connect_address_type::CUSTOM;
 		result.window.fullscreen = false;
+		result.http_client.update_on_launch = false;
 #endif
 #endif
 
@@ -221,7 +222,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto last_update_result = application_update_result();
 	
-	if (config.http_client.update_on_launch) {
+	if (params.force_update_check || config.http_client.update_on_launch) {
 		using up_result = application_update_result_type;
 
 		last_update_result = check_and_apply_updates(
