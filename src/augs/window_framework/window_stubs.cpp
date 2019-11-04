@@ -77,8 +77,8 @@ namespace augs {
 		const std::string& caption,
 		const std::string& text
 	) {
-		(void)caption;
-		(void)text;
+		LOG("RETRY CANCEL!!");
+		LOG_NVPS(caption, text);
 		return message_box_button::CANCEL;
 	}
 

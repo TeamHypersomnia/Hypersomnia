@@ -48,6 +48,23 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 #error "UNSUPPORTED!"
 #endif
 
+static auto get_first_folder_in(const augs::path_type& where) {
+	augs::path_type result;
+
+	augs::for_each_in_directory(
+		where,
+		[&result](const auto& dir) {
+			result = dir;
+			return callback_result::ABORT;
+		},
+		[](const auto&) {
+			return callback_result::CONTINUE;
+		}
+	);
+
+	return result;
+}
+
 bool successful(const int http_status_code) {
 	return http_status_code >= 200 && http_status_code < 300;
 }
@@ -107,6 +124,11 @@ application_update_result check_and_apply_updates(
 
 		if (response == nullptr) {
 			log_null_response();
+			result.type = R::FAILED;
+			return result;
+		}
+
+		if (response->status == 404 || response->status == 403) {
 			result.type = R::VERSION_FILE_NOT_FOUND;
 			return result;
 		}
@@ -434,8 +456,18 @@ application_update_result check_and_apply_updates(
 			text("");
 		}
 
-		cut_preffix(info.processed, (augs::path_type("hypersomnia") / "").string());
-		text(info.processed);
+		auto p = augs::path_type(info.processed);
+		auto displayed_path = p;
+
+		if (std::distance(p.begin(), p.end()) > 1) {
+			displayed_path = augs::path_type();
+
+			for (auto it = std::next(p.begin()); it != p.end(); ++it) {
+				displayed_path = displayed_path / *it;
+			}
+		}
+
+		text(displayed_path.string());
 
 		ImGui::ProgressBar(static_cast<float>(info.percent) / 100, ImVec2(-1.0f,0.0f));
 	};
@@ -472,7 +504,7 @@ application_update_result check_and_apply_updates(
 					if (!successful(response->status)) {
 						LOG("Request failed with status: %x", response->status);
 
-						if (response->status == 404) {
+						if (response->status == 404 || response->status == 403) {
 							interrupt(R::BINARY_NOT_FOUND);
 							return;
 						}
@@ -547,7 +579,9 @@ application_update_result check_and_apply_updates(
 					completed_move = std::async(
 						std::launch::async,
 						[target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
-							const auto NEW_root_path = NEW_path / "hypersomnia";
+							const auto resource_folder = get_first_folder_in(NEW_path);
+							const auto NEW_root_path = resource_folder;
+							LOG_NVPS(NEW_root_path);
 
 							auto move_content_to_current_from = [&](const auto& source_root) {
 								LOG("Moving content from %x to current directory.", source_root);

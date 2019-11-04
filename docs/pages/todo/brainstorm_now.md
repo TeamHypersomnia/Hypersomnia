@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Upgrade the server!!!! It has the old map
+
+- Research chat messages sometimes not working
+
 - Don't kick afk spectators
 - Test what happens without internet connection when launching Hypersomnia on Windows
 
