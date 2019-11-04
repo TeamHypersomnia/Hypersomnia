@@ -47,7 +47,6 @@ before_install:
  - initctl list || true
  - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
  - sudo add-apt-repository -y "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
- - sudo add-apt-repository -y "deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
  - sudo apt-get -q update
  - sudo apt-get -y install clang-9 lld-9 libc++-9-dev libc++abi-9-dev
 
