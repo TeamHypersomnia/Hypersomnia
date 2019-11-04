@@ -1,4 +1,5 @@
-Revision no.: 6968 (dirty)
-Build date: Mon Sep 2 16:15:24 2019
+Hypersomnia version Revision no.: 1.0.7039 7039
+Build date: (dirty)
 Commit message:
-Basic match management command(...)
+Mon Nov 4 15:54:48 2019
+
