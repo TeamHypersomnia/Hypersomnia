@@ -27,7 +27,7 @@ addons:
      - libasound2-dev
      - p7zip
      - p7zip-full
-     - libgl-dev
+     - libgl1-mesa-dev
     sources:
      - ubuntu-toolchain-r-test
      - llvm-toolchain-bionic-9
