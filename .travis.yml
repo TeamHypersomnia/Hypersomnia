@@ -46,9 +46,6 @@ before_install:
  - cat /etc/default/apport
  - service --status-all || true
  - initctl list || true
- - sudo add-apt-repository -y ppa:llvm-toolchain-bionic-9/main
- - sudo apt-get -q update
- - sudo apt-get -y install clang-9 lld-9 libc++-9-dev libc++abi-9-dev
 
 install:
   - python --version
