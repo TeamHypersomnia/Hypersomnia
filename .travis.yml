@@ -11,6 +11,7 @@ addons:
      - gdb
      - apport
      - cmake
+     - lld
      - ninja-build
      - libxcb-keysyms1
      - libxcb-keysyms1-dev
@@ -30,8 +31,8 @@ python:
 
 matrix:
   include:
-  - env: c_compiler=clang-9 cxx_compiler=clang++-9 config=Release other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=1"
-    compiler: clang-9
+  - env: c_compiler=clang cxx_compiler=clang++ config=Release other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=1"
+    compiler: clang
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
 #    compiler: gcc
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=RelWithDebInfo other_cmake_flags=""
