@@ -1,5 +1,4 @@
 #include "augs/log.h"
-#include "augs/misc/http/http_requests.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/misc/action_list/standard_actions.h"
 
@@ -78,26 +77,8 @@ void main_menu_setup::query_latest_news(const std::string& url) {
 	}
 
 	latest_news = std::async(std::launch::async, [&url]() noexcept {
+		(void)url;
 		return std::string("");
-
-		auto html = augs::http_get_request(url);
-		const auto delimiter = std::string("newsbegin");
-
-		const auto it = html.find(delimiter);
-
-		if (it != std::string::npos) {
-			html = html.substr(it + delimiter.length());
-
-			str_ops(html)
-				.multi_replace_all({ "\r", "\n" }, "")
-			;
-
-			if (html.size() > 0) {
-				return html;
-			}
-		}
-
-		return std::string("Couldn't download and/or parse the latest news.");
 	});
 }
 

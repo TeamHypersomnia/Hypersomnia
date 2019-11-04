@@ -6,6 +6,8 @@
 namespace augs {
 	namespace graphics {
 		fbo::fbo(const vec2u size, const fbo_opts& opts) : size(size), tex(size) {
+			(void)opts;
+
 			GL_CHECK(glGenFramebuffers(1, &id));
 			created = true;
 			

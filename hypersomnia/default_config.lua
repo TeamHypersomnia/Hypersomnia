@@ -514,7 +514,7 @@ return {
     speed = 1000
   },
   main_menu = {
-    latest_news_url = "http://hypersomnia.xyz/latest_post/",
+    latest_news_url = "hypersomnia.xyz/latest_post",
     menu_intro_scene_entropy_path = "abc",
     menu_intro_scene_intercosm_path = "abc",
     menu_theme_path = "",

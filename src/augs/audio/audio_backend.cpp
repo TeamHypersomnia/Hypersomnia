@@ -17,12 +17,16 @@ constexpr bool same = std::is_same_v<A, B>;
 
 namespace augs {
 	audio_backend::audio_backend() {
+#if BUILD_OPENAL
 		alGenFilters(1, &lowpass_filter_id);
 		alFilteri(lowpass_filter_id, AL_FILTER_TYPE, AL_FILTER_LOWPASS);
+#endif
 	}
 
 	audio_backend::~audio_backend() {
+#if BUILD_OPENAL
 		alDeleteFilters(1, &lowpass_filter_id);
+#endif
 	}
 
 	void audio_backend::perform(

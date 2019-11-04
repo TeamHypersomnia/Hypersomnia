@@ -26,6 +26,7 @@ void enqueue_illuminated_rendering_jobs(
 
 	const auto& viewed_character = in.camera.viewed_character;
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
+	(void)viewed_character_transform;
 
 	const auto& cosm = viewed_character.get_cosmos();
 	const auto& indicator_meta = in.indicator_meta;

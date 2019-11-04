@@ -90,12 +90,21 @@ endif()
 # Then, try to work from there.
 # The game should still run, even not having these features, although obviously, you won't see or hear anything.
 
-if(HYPERSOMNIA_BARE)
+if (HYPERSOMNIA_BARE)
 	message("Building Hypersomnia without... anything")
 	
 	set(DEFAULT_OPT OFF)
+	set(DEFAULT_NET_OPT OFF)
 else()
 	set(DEFAULT_OPT ON)
+	set(DEFAULT_NET_OPT ON)
+endif()
+
+if (HYPERSOMNIA_DEDICATED_SERVER)
+	message("Building a minimal executable required to run a dedicated server.")
+
+	set(DEFAULT_OPT OFF)
+	set(DEFAULT_NET_OPT ON)
 endif()
 
 # In the future, the switches will also differ depending on whether the target application is a client or a server.
@@ -139,18 +148,17 @@ set(HYPERSOMNIA_USER_FILES_DIR "user")
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
-option(BUILD_NETWORKING "Build the networking backend." ${DEFAULT_OPT})
-option(BUILD_OPENSSL "Build SSL support. Required for secure automatic application updates." ${DEFAULT_OPT})
+option(BUILD_NETWORKING "Build the networking backend." ${DEFAULT_NET_OPT})
+option(BUILD_OPENSSL "Build SSL support. Required for secure automatic application updates." ${DEFAULT_NET_OPT})
 option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
 option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
-option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ${DEFAULT_OPT})
-option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_OPT})
+option(BUILD_UNIT_TESTS "Build unit tests that are run on game startup." ${DEFAULT_NET_OPT})
 option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there is also no point in enabling OpenAL." ${DEFAULT_OPT})
 
 ## Switches for functionality originating from the Hypersomnia codebase.
 
-option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_OPT})
-option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_OPT})
+option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_NET_OPT})
+option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_NET_OPT})
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
 option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
 
@@ -231,17 +239,8 @@ else()
 	set(ADD_MCMODEL_LARGE_FLAG OFF CACHE STRING "Needed to suppress some crazy linker errors")
 endif()
 
-if(NOT BUILD_WINDOW_FRAMEWORK)
+if (NOT BUILD_WINDOW_FRAMEWORK)
 	set(BUILD_IN_CONSOLE_MODE "1")
-endif()
-
-if(UNIX)
-	# Set different default options for UNIX:
-	# Disable those that are not yet supported
-
-	message("Changing unsupported UNIX defaults to off...")
-	
-	set(BUILD_HTTP_REQUESTS OFF)
 endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -488,7 +487,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/window_framework/shell.cpp"
 	"src/augs/misc/action_list/action_list.cpp"
 	"src/augs/misc/enum/enum_bitset.cpp"
-	"src/augs/misc/http/http_requests.cpp"
 	"src/augs/misc/readable_bytesize.cpp"
 	"src/augs/misc/action_list/standard_actions.cpp"
 	"src/augs/readwrite/memory_stream.cpp"
@@ -1370,10 +1368,6 @@ if(BUILD_WINDOW_FRAMEWORK)
 	add_definitions(-DBUILD_WINDOW_FRAMEWORK=1)
 endif()
 
-if(BUILD_HTTP_REQUESTS) 
-	add_definitions(-DBUILD_HTTP_REQUESTS=1)
-endif()
-
 if(BUILD_VERSION_FILE_GENERATOR) 
 	add_definitions(-DWAS_VERSION_GENERATOR_BUILT=1)
 endif()
@@ -1486,7 +1480,7 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 endif()
 
 if(MSVC)
-	if(BUILD_NETWORKING OR BUILD_HTTP_REQUESTS)
+	if(BUILD_NETWORKING)
 		message("Appending winsock libraries")
 
 		list(APPEND HYPERSOMNIA_LIBS
@@ -1535,9 +1529,13 @@ elseif(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
 endif()
 
+if (UNIX)
+	list(APPEND HYPERSOMNIA_LIBS dl)
+endif()
+
 if (BUILD_WINDOW_FRAMEWORK)
 	if (UNIX)
-		list(APPEND HYPERSOMNIA_LIBS dl Xi)
+		list(APPEND HYPERSOMNIA_LIBS Xi)
 	endif()
 endif()
 
