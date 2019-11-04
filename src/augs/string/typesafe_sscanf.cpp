@@ -22,7 +22,6 @@ int test_scanf(
 }
 
 TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
-	LOG("WTF!!!!!");
 	{
 		const auto format = "%x";
 		const auto sprintfed = "1442";

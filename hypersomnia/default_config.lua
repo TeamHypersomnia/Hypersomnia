@@ -14,6 +14,10 @@ return {
 	"arena.hypersomnia.xyz" 
   },
 
+  official_arena_linux_servers = {
+	"arena-linux.hypersomnia.xyz" 
+  },
+
   default_client_start = {
   	default_port_when_no_specified = 8412,
 	chosen_address_type = "OFFICIAL",

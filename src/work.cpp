@@ -748,7 +748,11 @@ and then hitting Save settings.
 			window, 
 			config.default_client_start, 
 			config.client,
+#if PLATFORM_WINDOWS
 			config.official_arena_servers
+#elif PLATFORM_UNIX
+			config.official_arena_linux_servers
+#endif
 		);
 
 		if (perform_result || client_start_requested) {
