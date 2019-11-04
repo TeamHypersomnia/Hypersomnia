@@ -11,7 +11,6 @@ addons:
      - gdb
      - apport
      - cmake
-     - lld
      - ninja-build
      - libxcb-keysyms1
      - libxcb-keysyms1-dev
@@ -31,8 +30,8 @@ python:
 
 matrix:
   include:
-  - env: c_compiler=clang cxx_compiler=clang++ config=Release other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=1"
-    compiler: clang
+  - env: c_compiler=clang-9 cxx_compiler=clang++-9 config=Release other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=1"
+    compiler: clang-9
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
 #    compiler: gcc
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=RelWithDebInfo other_cmake_flags=""
@@ -46,6 +45,10 @@ before_install:
  - cat /etc/default/apport
  - service --status-all || true
  - initctl list || true
+ - sudo add-apt-repository -y "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
+ - sudo add-apt-repository -y "deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
+ - sudo apt-get -q update
+ - sudo apt-get -y install clang-9 lld-9 libc++-9-dev libc++abi-9-dev
 
 install:
   - python --version
