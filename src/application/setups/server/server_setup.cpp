@@ -1227,7 +1227,10 @@ bool safe_equal(const decltype(requested_client_settings::rcon_password)& candid
 
 	int matches = 0;
 
-	for (std::size_t i = 0; i < std::min(static_cast<std::size_t>(candidate_password.size()), actual_password.size()); ++i) {
+	const auto candidate_n = static_cast<std::size_t>(candidate_password.size());
+	const auto actual_n = actual_password.size();
+
+	for (std::size_t i = 0; i < std::min(candidate_n, actual_n); ++i) {
 		if (candidate_password.data()[i] == actual_password[i]) {
 			matches++;
 		}

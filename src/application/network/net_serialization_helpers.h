@@ -37,8 +37,6 @@ namespace net_messages {
 
 	template <class Stream, unsigned buffer_size>
 	bool serialize_fixed_size_str(Stream& stream, augs::constant_size_string<buffer_size>& str) {
-		const auto s = str.data();
-
 		int length = 0;
 		if ( Stream::IsWriting )
 		{
@@ -46,11 +44,11 @@ namespace net_messages {
 		}
 
 		serialize_int( stream, length, 0, buffer_size );
-		serialize_bytes( stream, (uint8_t*)s, length );
 
-		if ( Stream::IsReading ) {
-			s[length] = '\0';
-		}
+		str.resize_no_init(length);
+		const auto s = str.data();
+
+		serialize_bytes(stream, reinterpret_cast<uint8_t*>(s), length);
 
 		return true;
 	}
