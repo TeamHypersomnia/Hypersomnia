@@ -216,6 +216,4 @@ Gemfile.lock
 .ninja_log
 hypersomnia/.Hypersomnia
 hypersomnia/Hypersomnia
-hypersomnia/arenas/fy_minilab
-hypersomnia/arenas/minilab_bare
 *.hist
