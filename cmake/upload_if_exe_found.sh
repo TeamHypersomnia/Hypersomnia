@@ -15,7 +15,7 @@ if [ -f "$EXE_PATH" ]; then
 	. cmake/linux_launcher_install.sh
 	cp build/current/Hypersomnia hypersomnia/.Hypersomnia
 	pushd hypersomnia
-	rm -r cache, logs, user, demos 
+	rm -r cache logs user
 	popd
 	7z a -sfx $FILE_PATH hypersomnia
 	curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" $UPLOAD_URL

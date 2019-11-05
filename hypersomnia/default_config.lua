@@ -623,7 +623,7 @@ return {
 	max_bots = 0
   },
 
-  private_server_vars = {
+  private_server = {
     master_rcon_password = "",
     rcon_password = ""
   },
@@ -634,6 +634,7 @@ return {
 
   client = {
 	nickname = "Player",
+	rcon_password = "",
 
 	net = {
 	  jitter = {

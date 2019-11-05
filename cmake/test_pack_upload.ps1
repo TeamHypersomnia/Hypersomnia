@@ -48,7 +48,7 @@ $version = "1.0.$commitNumber"
 
 mv $target_exe Hypersomnia.exe
 Get-ChildItem
-Remove-item -Recurse -Force cache, logs, user, demos 
+Remove-item -Recurse -Force cache, logs, user
 cd ../
 7z a -sfx $filePath hypersomnia
 
