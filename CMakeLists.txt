@@ -170,6 +170,7 @@ set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 ## Build optimization switches.
 ## These may speed up build times.
 
+option(USE_O3 "Use -O3 switch in Release." OFF)
 option(LINK_TIME_OPTIMIZATION "Perform link-time optimization. Can drastically increase the build time." OFF)
 
 ## Debug information.
@@ -1063,6 +1064,15 @@ if(CLANG)
 	if (ENABLE_THREADSANITIZER)
 		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -fsanitize=thread")
 	endif()
+endif()
+
+if (NOT USE_O3)
+	message("Forcing use of O2.")
+
+	string(REPLACE "O3" "O2" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+else()
+	message("Forcing use of O3.")
+	string(REPLACE "O2" "O3" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 endif()
 
 if (LINK_TIME_OPTIMIZATION)
