@@ -105,8 +105,21 @@ bool is_dedicated_server = false;
 
 	This function will only be entered ONCE during the lifetime of the program.
 */
+#if PLATFORM_UNIX
+volatile std::sig_atomic_t signal_status = 0;
+#endif
 
 work_result work(const int argc, const char* const * const argv) try {
+#if PLATFORM_UNIX	
+	static auto signal_handler = [](const int signal_type) {
+   		signal_status = signal_type;
+	};
+
+	std::signal(SIGINT, signal_handler);
+	std::signal(SIGTERM, signal_handler);
+	std::signal(SIGSTOP, signal_handler);
+#endif
+
 	setup_float_flags();
 
 	{
@@ -236,7 +249,9 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto last_update_result = application_update_result();
 	
-	if (params.force_update_check || config.http_client.update_on_launch) {
+	const bool should_update_due_to_config = config.http_client.update_on_launch;
+
+	if (params.force_update_check || should_update_due_to_config) {
 		using up_result = application_update_result_type;
 
 		last_update_result = check_and_apply_updates(
@@ -269,18 +284,6 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
-
-#if PLATFORM_UNIX	
-	static volatile std::sig_atomic_t signal_status = 0;
- 
-	static auto signal_handler = [](const int signal_type) {
-   		signal_status = signal_type;
-	};
-
-	std::signal(SIGINT, signal_handler);
-	std::signal(SIGTERM, signal_handler);
-	std::signal(SIGSTOP, signal_handler);
-#endif
 
 	static session_profiler render_thread_performance;
 	static network_profiler network_performance;

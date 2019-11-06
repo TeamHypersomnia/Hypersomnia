@@ -3,5 +3,5 @@
 ./.Hypersomnia "$@"
 
 while [ $? -eq 42 ]; do
-    ./.Hypersomnia --upgraded-successfully
+    ./.Hypersomnia "$@" --upgraded-successfully
 done

@@ -1,3 +1,7 @@
+#if PLATFORM_UNIX
+#include <csignal>
+#endif
+
 #if BUILD_OPENSSL
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #endif
@@ -46,6 +50,10 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 #define ARCHIVE_EXTENSION "exe"
 #else
 #error "UNSUPPORTED!"
+#endif
+
+#if PLATFORM_UNIX
+extern volatile std::sig_atomic_t signal_status;
 #endif
 
 static auto get_first_folder_in(const augs::path_type& where) {
@@ -171,42 +179,51 @@ application_update_result check_and_apply_updates(
 	window_settings.raw_mouse_input = false;
 	window_settings.border = false;
 
-	augs::window window(window_settings);
-	const auto disp = window.get_display();
-
-	window_settings.position = vec2i { disp.w / 2 - window_size.x / 2, disp.h / 2 - window_size.y / 2 };
-	window.apply(window_settings);
-
-	augs::graphics::renderer_backend renderer_backend;
-	augs::graphics::renderer_backend::result_info renderer_backend_result;
-
-	const auto imgui_atlas = augs::graphics::texture(imgui_atlas_image);
-
-	augs::local_entropy entropy;
+	std::optional<augs::window> window;
+	std::optional<augs::graphics::renderer_backend> renderer_backend;
+	std::optional<augs::graphics::texture> imgui_atlas;
+	std::optional<augs::graphics::shader_program> standard;
 
 	augs::renderer renderer;
 
-	std::optional<augs::graphics::shader_program> standard;
-
-	LOG("Initializing the standard shader.");
-
 	try {
-		const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", CANON_SHADER_FOLDER, "standard");
-		const auto canon_fsh_path = typesafe_sprintf("%x/%x.fsh", CANON_SHADER_FOLDER, "standard");
+		window.emplace(window_settings);
+		const auto disp = window->get_display();
 
-		standard.emplace(
-			canon_vsh_path,
-			canon_fsh_path
-		);
+		window_settings.position = vec2i { disp.w / 2 - window_size.x / 2, disp.h / 2 - window_size.y / 2 };
+		window->apply(window_settings);
+
+		renderer_backend.emplace();
+		imgui_atlas.emplace(imgui_atlas_image);
+
+		LOG("Initializing the standard shader.");
+
+		try {
+			const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", CANON_SHADER_FOLDER, "standard");
+			const auto canon_fsh_path = typesafe_sprintf("%x/%x.fsh", CANON_SHADER_FOLDER, "standard");
+
+			standard.emplace(
+				canon_vsh_path,
+				canon_fsh_path
+			);
+		}
+		catch (const augs::graphics::shader_error& err) {
+			(void)err;
+		}
+
+		if (standard != std::nullopt) {
+			standard->set_as_current(renderer);
+			standard->set_projection(renderer, augs::orthographic_projection(vec2(window_size)));
+		}
 	}
-	catch (const augs::graphics::shader_error& err) {
-		(void)err;
+	catch (const augs::window_error& err) {
+		LOG("Failed to open the window:\n%x", err.what());
+		LOG("Updating in headless mode.");
 	}
 
-	if (standard != std::nullopt) {
-		standard->set_as_current(renderer);
-		standard->set_projection(renderer, augs::orthographic_projection(vec2(window_size)));
-	}
+	augs::graphics::renderer_backend::result_info renderer_backend_result;
+
+	augs::local_entropy entropy;
 
 	renderer.set_viewport({ vec2i{0, 0}, window_size });
 
@@ -277,7 +294,12 @@ application_update_result check_and_apply_updates(
 				const auto format = "Cannot %x:\n%x\n\nPlease close the applications that might be using it, then try again!\n\nDetails:\n\n%x";
 				const auto error_text = typesafe_sprintf(format, action_name, path..., err.what());
 
-				if (window.retry_cancel("Hypersomnia Updater", error_text) == augs::message_box_button::CANCEL) {
+				if (window == std::nullopt) {
+					LOG(error_text);
+					return callback_result::ABORT;
+				}
+
+				if (window->retry_cancel("Hypersomnia Updater", error_text) == augs::message_box_button::CANCEL) {
 					return callback_result::ABORT;
 				}
 			}
@@ -299,7 +321,12 @@ application_update_result check_and_apply_updates(
 					return typesafe_sprintf(format, action_name, err.path1(), err.path2(), err.what());
 				}();
 
-				if (window.retry_cancel("Hypersomnia Updater", error_text) == augs::message_box_button::CANCEL) {
+				if (window == std::nullopt) {
+					LOG(error_text);
+					return callback_result::ABORT;
+				}
+
+				if (window->retry_cancel("Hypersomnia Updater", error_text) == augs::message_box_button::CANCEL) {
 					return callback_result::ABORT;
 				}
 			}
@@ -558,6 +585,7 @@ application_update_result check_and_apply_updates(
 					if (completed_save.get() == callback_result::CONTINUE) {
 						extractor.emplace(target_archive_path, NEW_path, exit_requested);
 						current_state = state::EXTRACTING;
+						LOG("Extracting.");
 					}
 					else {
 						interrupt(R::CANCELLED);
@@ -576,6 +604,8 @@ application_update_result check_and_apply_updates(
 
 					/* Serious stuff begins here. */
 
+
+					LOG("Moving files around.");
 					current_state = state::MOVING_FILES_AROUND;
 
 					completed_move = std::async(
@@ -710,15 +740,32 @@ application_update_result check_and_apply_updates(
 		}
 #endif
 
-		window.collect_entropy(entropy);
+#if PLATFORM_UNIX
+			if (signal_status != 0) {
+				const auto sig = signal_status;
 
-		for (const auto& e : entropy) {
-			if (e.is_exit_message()) {
-				interrupt(R::EXIT_APPLICATION);
+				LOG("%x received.", strsignal(sig));
+
+				if(
+					sig == SIGINT
+					|| sig == SIGSTOP
+					|| sig == SIGTERM
+				) {
+					LOG("Gracefully shutting down.");
+					interrupt(R::EXIT_APPLICATION);
+				}
 			}
-		}
+#endif
 
-		{
+		if (window != std::nullopt) {
+			window->collect_entropy(entropy);
+
+			for (const auto& e : entropy) {
+				if (e.is_exit_message()) {
+					interrupt(R::EXIT_APPLICATION);
+				}
+			}
+
 			const auto frame_delta = frame_timer.extract_delta();
 			const auto dt_secs = frame_delta.in_seconds();
 			total_secs += dt_secs;
@@ -736,32 +783,38 @@ application_update_result check_and_apply_updates(
 		advance_update_logic();
 		augs::imgui::render();
 
-		renderer.clear_current_fbo();
-		renderer.draw_call_imgui(
-			imgui_atlas, 
-			nullptr, 
-			nullptr, 
-			nullptr
-		);
+		if (window != std::nullopt) {
+			ensure(imgui_atlas != std::nullopt);
 
-		renderer_backend_result.clear();
-
-		{
-			auto& r = renderer;
-
-			renderer_backend.perform(
-				renderer_backend_result,
-				r.commands.data(),
-				r.commands.size(),
-				r.dedicated
+			renderer.clear_current_fbo();
+			renderer.draw_call_imgui(
+				*imgui_atlas, 
+				nullptr, 
+				nullptr, 
+				nullptr
 			);
-		}
 
-		for (const auto& f : renderer_backend_result.imgui_lists_to_delete) {
-			IM_DELETE(f);
-		}
+			renderer_backend_result.clear();
 
-		window.swap_buffers();
+			{
+				auto& r = renderer;
+
+				ensure(renderer_backend != std::nullopt);
+
+				renderer_backend->perform(
+					renderer_backend_result,
+					r.commands.data(),
+					r.commands.size(),
+					r.dedicated
+				);
+			}
+
+			for (const auto& f : renderer_backend_result.imgui_lists_to_delete) {
+				IM_DELETE(f);
+			}
+
+			window->swap_buffers();
+		}
 
 		renderer.next_frame();
 	}

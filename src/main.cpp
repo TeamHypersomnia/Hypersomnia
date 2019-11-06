@@ -62,8 +62,8 @@ int main(const int argc, const char* const * const argv) {
 		return EXIT_SUCCESS;
 	}
 
-	const auto result = work(argc, argv);
-	LOG_NVPS(result);
+	const auto completed_work_result = work(argc, argv);
+	LOG_NVPS(completed_work_result);
 
 	{
 		auto save_success_logs = [&]() {
@@ -79,7 +79,7 @@ int main(const int argc, const char* const * const argv) {
 			augs::open_text_editor(failure_log_path);
 		};
 
-		switch (result) {
+		switch (completed_work_result) {
 			case work_result::SUCCESS: 
 				save_success_logs();
 				return EXIT_SUCCESS;
