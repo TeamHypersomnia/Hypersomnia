@@ -1,5 +1,5 @@
-Hypersomnia version Revision no.: 1.0.7039 7039
-Build date: (dirty)
+Hypersomnia version Revision no.: 1.0.7070 7070
+Build date: (clean)
 Commit message:
-Mon Nov 4 15:54:48 2019
+Thu Nov 7 00:02:23 2019
 

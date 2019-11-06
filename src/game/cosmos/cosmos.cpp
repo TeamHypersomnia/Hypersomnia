@@ -67,7 +67,7 @@ T cosmos::calculate_solvable_signi_hash() const {
 		for_each_having<components::sentience>(
 			[&](const auto& it) {
 				const auto& b = it.template get<components::rigid_body>();
-				const auto& c = b.get_raw_component();
+				const auto& c = b.get_raw_component().physics_transforms.m_xf;
 				const auto& s = it.template get<components::sentience>();
 
 				augs::write_bytes(ss, c);
