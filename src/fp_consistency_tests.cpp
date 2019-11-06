@@ -1,3 +1,4 @@
+#define FORCE_DISABLE_STREFLOP 1
 #include "augs/math/repro_math.h"
 
 #include "augs/log.h"
@@ -41,12 +42,14 @@ void ensure_float_flags_hold() {
 #include <bitset>
 #include <random>
 
+// Last stress test passes: 50000000
+
 #if PLATFORM_UNIX
-#define CANONICAL_RESULT_5000 "11000110000100011111111010011111"
-#define CANONICAL_RESULT_10000000 "11000110000100011111111010011111"
+#define CANONICAL_RESULT_5000 "00111111110010000001110101110001"
+#define CANONICAL_RESULT_STRESS_TEST "00111110100010111001110011111010"
 #elif PLATFORM_WINDOWS
-#define CANONICAL_RESULT_5000 "11000101010101111100011000110110"
-#define CANONICAL_RESULT_10000000 "11000110000100011111111010011111"
+#define CANONICAL_RESULT_5000 "00111111110010000001110101110001"
+#define CANONICAL_RESULT_STRESS_TEST "00111110100010111001110011111010"
 #endif
 
 bool perform_float_consistency_tests(const int passes) {
@@ -68,14 +71,21 @@ bool perform_float_consistency_tests(const int passes) {
 	*/
 
 
-	static constexpr auto num_operations = 5000;
-	static const auto num_threads = 2 * std::thread::hardware_concurrency();
+	static const auto num_threads = 2;
 
 	/* Perform a random walk with randomized mathematical operations */
 
 	std::vector<std::thread> workers;
 
 	std::atomic<bool> all_succeeded = true;
+
+	int nans = 0;
+
+	float op1 = 0.f;
+	float op2 = 0.f;
+
+#define OP1(a, b) (op1 = rng.randval(a+repro::fabs(total), b+repro::fabs(total)))
+#define OP2(a, b) (op2 = rng.randval(a+repro::fabs(total), b+repro::fabs(total)))
 
 	auto work_lambda = [&]() {
 		auto rng = randomization(1337u);
@@ -84,74 +94,77 @@ bool perform_float_consistency_tests(const int passes) {
 		real32 trash = 4938493.f;
 		real32 total = 0.f;
 
-		for (int i = 0; i < num_operations; ++i) {
-			const auto opcode = rng.randval(0, 20);
+		for (int i = 0; i < passes; ++i) {
+			const auto opcode = rng.randval(0, 21);
 
 			real32 r = 0.f;
 
 			switch(opcode) {
 				case 0:
-					r = rng.randval(0.f, 10.f) - rng.randval(-10.f, 10.f);
+					r = OP1(0.f, 10.f) - OP2(-10.f, 10.f);
 					break;
 				case 1:
-					r = rng.randval(-10.f, 10.f) + rng.randval(-10.f, 10.f);
+					r = OP1(-10.f, 10.f) + OP2(-10.f, 10.f);
 					break;
 				case 2:
-					r = rng.randval(0.f, 10.f) / rng.randval(0.5f, 100.f);
+					r = OP1(0.f, 10.f) / OP2(0.5f, 100.f);
 					break;
 				case 3:
-					r = rng.randval(-10.f, 10.f) * rng.randval(-10.f, 10.f);
+					r = OP1(-10.f, 10.f) * OP2(-10.f, 10.f);
 					break;
 				case 4:
-					r = rng.randval(0.f, 10.f) / 0.f;
+					r = OP1(0.f, 10.f) / 0.f;
 					break;
 				case 5:
-					r = repro::sqrt(rng.randval(0.f, 5400.f));
+					r = repro::sqrt(OP1(0.f, 0.0001f));
 					break;
 				case 6:
-					r = repro::sin(rng.randval(-1000.f, 1000.f));
+					r = repro::sin(OP1(-0.0001f, 0.0001f));
 					break;
 				case 7:
-					r = repro::cos(rng.randval(-1000.f, 1000.f));
+					r = repro::cos(OP1(-1000.f, 1000.f));
 					break;
 				case 8:
-					r = repro::atan2(rng.randval(-1000.f, 1000.f), rng.randval(-1000.f, 1000.f));
+					r = repro::atan2(OP1(-1000.f, 1000.f), OP2(-1000.f, 1000.f));
 					break;
 				case 9:
-					r = repro::acos(rng.randval(0.f, 1.f));
+					r = repro::acos(OP1(0.f, 1.f));
 					break;
 				case 10:
-					r = repro::fmod(rng.randval(-1000.f, 1000.f), rng.randval(-1000.f, 1000.f));
+					r = repro::fmod(OP1(-1000.f, 1000.f), OP2(-1000.f, 1000.f));
 					break;
 				case 11:
-					r = repro::nearbyint(rng.randval(-1000.f, 1000.f));
+					r = repro::nearbyint(OP1(-1000.f, 1000.f));
 					break;
 				case 12:
-					r = repro::exp(rng.randval(-10.f, 4.f));
+					r = repro::exp(OP1(-10.f, 4.f));
 					break;
 				case 13:
-					r = repro::exp2(rng.randval(-10.f, 4.f));
+					r = repro::exp2(OP1(-10.f, 4.f));
 					break;
 				case 14:
-					r = repro::log(rng.randval(-10.f, 100000.f));
+					r = repro::log(OP1(-10.f, 100000.f));
 					break;
 				case 15:
-					r = repro::log2(rng.randval(-10.f, 100000.f));
+					r = repro::log2(OP1(0.001f, 0.0000001f));
 					break;
 				case 16:
-					r = repro::trunc(rng.randval(-1000.f, 1000.f));
+					r = repro::trunc(OP1(-1.f, 1.f));
 					break;
 				case 17:
-					r = repro::fabs(rng.randval(-1000.f, 1000.f));
+					r = repro::fabs(OP1(-1.f, 1.f));
 					break;
 				case 18:
-					r = repro::copysignf(rng.randval(-1.f, 1.f), rng.randval(-1.f, 1.f));
+					r = repro::copysignf(OP1(-1.f, 1.f), OP2(-1.f, 1.f));
 					break;
 				case 19:
-					r = repro::pow(rng.randval(1.f, 8.f), rng.randval(-2.f, 2.f));
+					r = repro::pow(OP1(1.f, 8.f), OP2(-2.f, 2.f));
 					break;
 				case 20:
-					r = repro::sqrt(rng.randval(-5400.f, 0.f));
+					r = repro::sqrt(OP1(-5400.f, 0.f));
+					break;
+				case 21:
+					r = repro::sqrt(OP1(0.f, 5000.f));
 					break;
 
 				default:
@@ -163,14 +176,28 @@ bool perform_float_consistency_tests(const int passes) {
 			auto addition = rng.randval(-1.f, 1.f);
 
 			if (repro::isfinite(r)) {
-				addition *= r;
+			addition *= r;
 			}
-			else {
+			else { 
+				++nans;
+			}
 
-			}
+			auto division = rng.randval(0.01f, 10.f);
+			addition /= division;
+
+			auto subtraction = rng.randval(-1.f, 1.f);
+			addition -= subtraction;
 
 			//LOG_NVPS(total, addition);
 			total += addition;
+
+			if (repro::fabs(total) > 10) {
+				total /= repro::pow(10.f, int(repro::log10(repro::fabs(total))));
+			}
+
+			if (!repro::isfinite(r)) {
+				total /= 1000;
+			}
 
 			{
 				trash = 
@@ -194,7 +221,7 @@ bool perform_float_consistency_tests(const int passes) {
 		const auto bits_representation = std::bitset<32>(bits);
 		const auto test_result_representation = bits_representation.to_string();
 
-		const auto canonical_v = passes == 5000 ? CANONICAL_RESULT_5000 : CANONICAL_RESULT_10000000;
+		const auto canonical_v = passes == 5000 ? CANONICAL_RESULT_5000 : CANONICAL_RESULT_STRESS_TEST;
 
 		if (test_result_representation != canonical_v) {
 			LOG(
@@ -205,6 +232,9 @@ bool perform_float_consistency_tests(const int passes) {
 			);
 
 			all_succeeded.store(false);
+		}
+		else {
+			LOG("(FP consistency test) Representations match. Achieved value: %x", total);
 		}
 	};
 
@@ -222,6 +252,7 @@ bool perform_float_consistency_tests(const int passes) {
 	else {
 		LOG("(FP consistency test) Failed the test. Canonical result does not match the actual results.");
 	}
+	LOG_NVPS(nans);
 
 	return all_succeeded;
 }

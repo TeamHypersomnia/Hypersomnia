@@ -1632,7 +1632,7 @@ if(${CMAKE_GENERATOR} STREQUAL "Unix makefiles" OR ${CMAKE_GENERATOR} STREQUAL "
 	)
 
 	add_custom_target(tests
-		COMMAND Hypersomnia --unit-tests-only
+		COMMAND Hypersomnia --unit-tests-only --test-fp-consistency 50000000
 		DEPENDS Hypersomnia
 		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)

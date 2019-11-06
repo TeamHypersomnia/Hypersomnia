@@ -11,10 +11,10 @@ $fail_log = "logs/exit_failure_debug_log.txt"
 $ensr_log = "logs/ensure_failed_debug_log.txt"
 
 if ($console_mode -eq 1) { 
-	& $target_exe --unit-tests-only
+	& $target_exe --unit-tests-only --test-fp-consistency 50000000
 }
 else {
-	& $target_exe --unit-tests-only | Out-Null
+	& $target_exe --unit-tests-only --test-fp-consistency 50000000 | Out-Null
 }
 
 if ($LastExitCode -ne 0) { 
