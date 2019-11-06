@@ -46,7 +46,7 @@ before_install:
  - service --status-all || true
  - initctl list || true
  - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
- - sudo add-apt-repository -y "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
+ - sudo add-apt-repository -y "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-7 main"
  - sudo apt-get -q update
  - sudo apt-get -y install clang-7 lld-7 libc++-7-dev libc++abi-7-dev
 
