@@ -44,6 +44,7 @@ $apiKey = $artifact_upload_key
 $filePath = "Hypersomnia-for-$platform.exe"
 $commitHash = $(git rev-parse HEAD)
 $commitNumber = $(git rev-list --count master)
+$commitMessage = $(git log -1 --pretty=%B)
 $version = "1.0.$commitNumber"
 
 mv $target_exe Hypersomnia.exe
@@ -52,4 +53,4 @@ Remove-item -Recurse -Force cache, logs, user
 cd ../
 7z a -sfx $filePath hypersomnia
 
-curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" $uploadUrl
+curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" -F "commit_message=$commitMessage" $uploadUrl
