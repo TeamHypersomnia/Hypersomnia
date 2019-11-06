@@ -18,8 +18,8 @@ struct cmd_line_params {
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
 
-		if (argc > 1) {
-			const auto a = std::string(argv[1]);
+		for (int i = 1; i < argc;) {
+			const auto a = std::string(argv[i++]);
 
 			if (a == "--unit-tests-only") {
 				unit_tests_only = true;
@@ -43,13 +43,13 @@ struct cmd_line_params {
 				start_dedicated_server = true;
 			}
 			else if (a == "--test-fp-consistency") {
-				test_fp_consistency = std::atoi(argv[2]);
+				test_fp_consistency = std::atoi(argv[i++]);
 			}
 			else if (a == "--connect") {
 				should_connect = true;
 				
 				if (argc > 2) {
-					connect_address = argv[2];
+					connect_address = argv[i++];
 				}
 			}
 			else {

@@ -53,6 +53,8 @@ void ensure_float_flags_hold() {
 #endif
 
 bool perform_float_consistency_tests(const int passes) {
+	LOG("Performing %x floating point consistency passes.", passes);
+
 	if (passes == 0) {
 		return true;
 	}
