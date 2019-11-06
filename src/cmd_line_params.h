@@ -12,6 +12,7 @@ struct cmd_line_params {
 	bool start_dedicated_server = false;
 	bool upgraded_successfully = false;
 	bool should_connect = false;
+	int test_fp_consistency = -1;
 	std::string connect_address;
 
 	cmd_line_params(const int argc, const char* const * const argv) {
@@ -40,6 +41,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--dedicated-server") {
 				start_dedicated_server = true;
+			}
+			else if (a == "--test-fp-consistency") {
+				test_fp_consistency = std::atoi(argv[2]);
 			}
 			else if (a == "--connect") {
 				should_connect = true;

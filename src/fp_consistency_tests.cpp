@@ -42,12 +42,18 @@ void ensure_float_flags_hold() {
 #include <random>
 
 #if PLATFORM_UNIX
-#define CANONICAL_RESULT "11000110000100011111111010011111"
+#define CANONICAL_RESULT_5000 "11000110000100011111111010011111"
+#define CANONICAL_RESULT_10000000 "11000110000100011111111010011111"
 #elif PLATFORM_WINDOWS
-#define CANONICAL_RESULT "11000101010101111100011000110110"
+#define CANONICAL_RESULT_5000 "11000101010101111100011000110110"
+#define CANONICAL_RESULT_10000000 "11000110000100011111111010011111"
 #endif
 
-bool perform_float_consistency_tests() {
+bool perform_float_consistency_tests(const int passes) {
+	if (passes == 0) {
+		return true;
+	}
+
 	auto timer = augs::timer();
 	auto scope = augs::scope_guard(
 		[&]() {
@@ -188,10 +194,12 @@ bool perform_float_consistency_tests() {
 		const auto bits_representation = std::bitset<32>(bits);
 		const auto test_result_representation = bits_representation.to_string();
 
-		if (test_result_representation != CANONICAL_RESULT) {
+		const auto canonical_v = passes == 5000 ? CANONICAL_RESULT_5000 : CANONICAL_RESULT_10000000;
+
+		if (test_result_representation != canonical_v) {
 			LOG(
 				"(FP consistency test) Representations differ!\nCanonical: %x\nActual: %x (%x)",
-				CANONICAL_RESULT,
+				canonical_v,
 				test_result_representation,
 				total
 			);

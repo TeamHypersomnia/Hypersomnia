@@ -184,10 +184,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static const auto params = cmd_line_params(argc, argv);
 
+	static const auto fp_test_passes = 
+		params.test_fp_consistency != -1 ? params.test_fp_consistency : config.float_consistency_test_passes
+	;
+
 	static const auto float_tests_succeeded = 
-		config.perform_float_consistency_test 
-		? perform_float_consistency_tests() 
-		: true
+		perform_float_consistency_tests(fp_test_passes)
 	;
 
 	if (config.unit_tests.run) {
