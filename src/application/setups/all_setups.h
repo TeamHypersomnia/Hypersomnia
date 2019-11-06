@@ -8,7 +8,9 @@
 
 using setup_variant = std::variant<
 	test_scene_setup,
-	editor_setup,
-	client_setup,
-	server_setup
+	editor_setup
+#if BUILD_NETWORKING
+	, client_setup
+	, server_setup
+#endif
 >;

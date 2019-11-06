@@ -30,14 +30,12 @@ struct intercosm {
 	all_viewables_defs viewables;
 	// END GEN INTROSPECTOR
 
-#if BUILD_TEST_SCENES
 	void make_test_scene(
 		sol::state&, 
 		test_scene_settings,
 		test_mode_ruleset&,
 		bomb_mode_ruleset* = nullptr
 	);
-#endif
 
 	void load_from_bytes(const intercosm_paths&);
 	void save_as_bytes(const intercosm_paths&) const;

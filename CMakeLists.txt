@@ -381,11 +381,19 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 
 	"src/application/setups/editor/gui/editor_fae_gui.cpp"
 	"src/application/setups/editor/editor_setup.cpp"
-	"src/application/setups/server/server_setup.cpp"
-	"src/application/setups/client/client_setup.cpp"
 	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
 	"src/application/setups/editor/commands/change_property_command.cpp"
 )
+
+if(BUILD_NETWORKING)
+	list(APPEND HYPERSOMNIA_CPU_INTENSIVE_CPPS
+		"src/application/setups/server/server_setup.cpp"
+		"src/application/setups/client/client_setup.cpp"
+		"src/application/network/network_adapters.cpp"
+		"src/augs/network/network_types.cpp"
+	)
+endif()
+
 set(HYPERSOMNIA_CODEBASE_CPPS
 	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 
@@ -493,7 +501,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/time_utils.cpp"
 	"src/augs/string/typesafe_sprintf.cpp"
 	"src/augs/string/typesafe_sscanf.cpp"
-	"src/augs/network/network_types.cpp"
 	"src/augs/texture_atlas/bake_fresh_atlas.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/behaviour_tree.cpp"
@@ -674,7 +681,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/input/adjust_game_motions.cpp"
 	"src/application/network/simulation_receiver.cpp"
 	"src/application/setups/editor/gui/editor_tutorial_gui.cpp"
-	"src/application/network/network_adapters.cpp"
 	"src/application/arena/arena_paths.cpp"
 	"src/application/arena/intercosm_paths.cpp"
 	"src/augs/misc/compress.cpp"
@@ -1631,3 +1637,6 @@ if(${CMAKE_GENERATOR} STREQUAL "Unix makefiles" OR ${CMAKE_GENERATOR} STREQUAL "
 		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)
 endif()	
+
+get_target_property(OUT Hypersomnia LINK_LIBRARIES)
+message("ALL linked libraries: ${OUT}")

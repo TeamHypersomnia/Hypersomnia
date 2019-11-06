@@ -112,6 +112,8 @@ application_update_result check_and_apply_updates(
 		if (result) {
 			LOG("verify error: %x", X509_verify_cert_error_string(result));
 		}
+#else
+		(void)http_client;
 #endif
 
 		LOG("Response was null!");

@@ -38,7 +38,6 @@ void intercosm::clear() {
 #endif
 }
 
-#if BUILD_TEST_SCENES
 void intercosm::make_test_scene(
 	sol::state& lua, 
 	const test_scene_settings settings,
@@ -46,6 +45,8 @@ void intercosm::make_test_scene(
 	bomb_mode_ruleset* const bomb_mode
 ) {
 	clear();
+
+#if BUILD_TEST_SCENES
 
 #if !STATICALLY_ALLOCATE_ENTITIES
 	cosmic::reserve_storage_for_entities(world, 3000u);
@@ -93,8 +94,13 @@ void intercosm::make_test_scene(
 	else {
 		reloader(test_scenes::testbed());
 	}
-}
+#else
+	(void)lua;
+	(void)settings;
+	(void)test_mode;
+	(void)bomb_mode;
 #endif
+}
 
 void intercosm::save_as_lua(const intercosm_path_op op) const {
 	augs::save_as_lua_table(op.lua, *this, op.path);

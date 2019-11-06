@@ -74,10 +74,14 @@ namespace augs {
 
 
 	network_raii::network_raii() {
+#if BUILD_NETWORKING
 		network::init();
+#endif
 	}
 
 	network_raii::~network_raii() {
+#if BUILD_NETWORKING
 		network::deinit();
+#endif
 	}
 };

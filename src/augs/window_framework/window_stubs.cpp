@@ -1,4 +1,5 @@
 #include "augs/window_framework/window.h"
+#include "augs/log.h"
 
 namespace augs {
 	window::window(const window_settings& settings) {

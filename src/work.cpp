@@ -184,6 +184,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static const auto params = cmd_line_params(argc, argv);
 
+	static const auto float_tests_succeeded = 
+		config.perform_float_consistency_test 
+		? perform_float_consistency_tests() 
+		: true
+	;
+
 	if (config.unit_tests.run) {
 		/* Needed by some unit tests */
 		augs::network_raii raii;
@@ -279,12 +285,6 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
-	static const auto float_tests_succeeded = 
-		config.perform_float_consistency_test 
-		? perform_float_consistency_tests() 
-		: true
-	;
-
 	static auto last_saved_config = config;
 
 	static auto change_with_save = [&](auto setter) {
@@ -362,6 +362,7 @@ and then hitting Save settings.
 	if (params.start_dedicated_server) {
 		LOG("Starting the dedicated server at port: %x", config.default_server_start.port);
 
+#if BUILD_NETWORKING
 		emplace_current_setup(
 			std::in_place_type_t<server_setup>(),
 			lua,
@@ -408,6 +409,7 @@ and then hitting Save settings.
 
 			server.sleep_until_next_tick();
 		}
+#endif
 
 		return work_result::SUCCESS;
 	}
@@ -689,6 +691,7 @@ and then hitting Save settings.
 
 				break;
 
+#if BUILD_NETWORKING
 			case launch_type::CLIENT:
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<client_setup>(),
@@ -712,6 +715,7 @@ and then hitting Save settings.
 						std::nullopt
 					);
 				});
+#endif
 
 				break;
 
@@ -1015,9 +1019,11 @@ and then hitting Save settings.
 	static auto get_current_input_settings = [&](const auto& cfg) {
 		auto settings = cfg.input;
 
+#if BUILD_NETWORKING
 		on_specific_setup([&](client_setup& setup) {
 			settings.character = setup.get_current_requested_settings().public_settings.character_input;
 		});
+#endif
 
 		return settings;
 	};

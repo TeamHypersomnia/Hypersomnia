@@ -30,7 +30,7 @@ void setup_float_flags() {
 
 void ensure_float_flags_hold() {
 #if USE_STREFLOP
-	ensure_eq(streflop::fegetround(), streflop::FE_TONEAREST);
+	ensure_eq(streflop::fegetround(), static_cast<int>(streflop::FE_TONEAREST));
 #else
 	ensure_eq(std::fegetround(), FE_TONEAREST);
 #endif
