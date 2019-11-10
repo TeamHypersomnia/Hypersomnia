@@ -44,6 +44,7 @@
 #include "application/network/simulation_receiver_settings.h"
 #include "application/performance_settings.h"
 #include "application/http_client/http_client_settings.h"
+#include "fp_consistency_tests.h"
 
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
@@ -88,7 +89,8 @@ struct config_lua_table {
 	// GEN INTROSPECTOR struct config_lua_table
 	launch_type launch_mode = launch_type::TEST_SCENE;
 	bool log_to_live_file = false;
-	int float_consistency_test_passes = 5000;
+
+	float_consistency_test_settings float_consistency_test;
 
 	std::vector<std::string> official_arena_servers;
 	std::vector<std::string> official_arena_linux_servers;

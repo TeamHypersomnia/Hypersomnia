@@ -89,8 +89,8 @@ void perform_imgui_pass(
 				show = false;
 
 				if (dont_show) {
-					config.float_consistency_test_passes = 0;
-					last_saved_config.float_consistency_test_passes = 0;
+					config.float_consistency_test.passes = 0;
+					last_saved_config.float_consistency_test.passes = 0;
 
 					last_saved_config.save_patch(lua, canon_config, path_for_saving_config);
 				}

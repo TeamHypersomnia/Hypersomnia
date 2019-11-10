@@ -1,7 +1,12 @@
 return {
   launch_mode = "MAIN_MENU",
   log_to_live_file = false,
-  float_consistency_test_passes = 5000,
+
+  float_consistency_test = {
+	  passes = 5000
+	  , report_filename = ""
+	  --, report_filename = "report.bin"
+  },
 
   http_client = {
     update_on_launch = true,

@@ -1,4 +1,4 @@
-#define FORCE_DISABLE_STREFLOP 1
+#define FORCE_DISABLE_STREFLOP 0
 #include "augs/math/repro_math.h"
 
 #include "augs/log.h"
@@ -13,8 +13,13 @@
 #include "augs/misc/randomization.h"
 #include "augs/misc/timing/timer.h"
 #include "augs/misc/scope_guard.h"
+#include "augs/readwrite/byte_file.h"
 
 static_assert(std::is_same_v<streflop::Simple, float>);
+static_assert(std::is_same_v<real32, float>, "Make sure you actually want to change that.");
+static_assert(std::numeric_limits<real32>::is_iec559);
+
+#define USE_THREADS 0
 
 #if !USE_STREFLOP
 #include <cfenv>
@@ -52,17 +57,57 @@ void ensure_float_flags_hold() {
 #define CANONICAL_RESULT_STRESS_TEST "00111110100010111001110011111010"
 #endif
 
-bool perform_float_consistency_tests(const int passes) {
+struct operation_meta {
+	int opcode;
+	real32 op1;
+	real32 op2;
+	real32 r;
+	real32 added_term;
+	real32 total;
+};
+
+bool perform_float_consistency_tests(const float_consistency_test_settings& settings) {
+	const auto passes = settings.passes;
+
+	std::vector<operation_meta> all_ops;
+
 	LOG("Performing %x floating point consistency passes.", passes);
 
 	if (passes == 0) {
 		return true;
 	}
 
+	auto target_report_path = augs::path_type();
+
+	if (!settings.report_filename.empty()) {
+		target_report_path = settings.report_filename;
+	}
+
+	try {
+		augs::load_from_bytes(all_ops, target_report_path);
+	}
+	catch (const augs::file_open_error&) {
+
+	}
+
+	const bool supervised_test = all_ops.size() > 0;
+	const bool generate_op_report = !supervised_test && !target_report_path.empty();
+	bool supervision_failed_already = false;
+
+	if (supervised_test) {
+		LOG("(FP consistency test) Performing a supervised test with file: %x", target_report_path);
+	}
+
+	if (generate_op_report) {
+		LOG("(FP consistency test) Generating a fp consistency test report to: %x", target_report_path);
+	}
+
+	all_ops.resize(passes);
+
 	auto timer = augs::timer();
 	auto scope = augs::scope_guard(
 		[&]() {
-			LOG("FP consistency test took: %x ms", timer.get<std::chrono::milliseconds>());
+			LOG("(FP consistency test) Time taken: %x ms", timer.get<std::chrono::milliseconds>());
 		}
 	);
 
@@ -72,8 +117,6 @@ bool perform_float_consistency_tests(const int passes) {
 		Randomization + floating point cross-platform consistency test 
 	*/
 
-
-	static const auto num_threads = 2;
 
 	/* Perform a random walk with randomized mathematical operations */
 
@@ -175,26 +218,30 @@ bool perform_float_consistency_tests(const int passes) {
 					return;
 			};
 
-			auto addition = rng.randval(-1.f, 1.f);
+			auto added_term = rng.randval(-1.f, 1.f);
 
 			if (repro::isfinite(r)) {
-			addition *= r;
+				added_term *= r;
 			}
 			else { 
 				++nans;
 			}
 
+
 			auto division = rng.randval(0.01f, 10.f);
-			addition /= division;
+			added_term /= division;
 
 			auto subtraction = rng.randval(-1.f, 1.f);
-			addition -= subtraction;
+			added_term -= subtraction;
 
-			//LOG_NVPS(total, addition);
-			total += addition;
+			//LOG_NVPS(total, added_term);
+			total += added_term;
+
 
 			if (repro::fabs(total) > 10) {
-				total /= repro::pow(10.f, int(repro::log10(repro::fabs(total))));
+				const auto divisor = repro::pow(10.f, int(repro::log10(repro::fabs(total))));
+
+				total /= divisor;
 			}
 
 			if (!repro::isfinite(r)) {
@@ -210,6 +257,75 @@ bool perform_float_consistency_tests(const int passes) {
 					* repro::log(ndt_rng.randval(1.f, 1000.f))
 					/ ndt_rng.randval(-0.001f, 0.001f)
 				;
+			}
+
+			if (supervised_test && !supervision_failed_already) {
+				const auto& expected_meta = all_ops[i];
+				const auto& em = expected_meta;
+
+				std::string differences_content;
+
+				auto to_bit_string = [](const auto& val) {
+					uint32_t bits = 0;
+
+					static_assert(sizeof(val) == sizeof(bits));
+					std::memcpy(std::addressof(bits), std::addressof(val), sizeof(bits));
+
+					return std::bitset<32>(bits).to_string();
+				};
+
+				auto verify = [&](const auto& expected, const auto& actual, const auto label) {
+					const auto es = to_bit_string(expected);
+					const auto as = to_bit_string(actual);
+
+					if (es == as) {
+
+					}
+					else {
+						supervision_failed_already = true;
+						differences_content += typesafe_sprintf("Different %x!\nExpected: %x (%x)\nActual:   %x (%x)\n", label, expected, es, actual, as);
+					}
+				};
+
+				verify(em.opcode, opcode, "opcode");
+				verify(em.op1, op1, "op1");
+				verify(em.op2, op2, "op2");
+				verify(em.r, r, "r");
+				verify(em.added_term, added_term, "added_term");
+				verify(em.total, total, "total");
+
+				if (supervision_failed_already) {
+					std::string expected_vals;
+
+					auto print_val = [&](const auto& v, const auto label) {
+						expected_vals += typesafe_sprintf("%x: %x", label, v);
+
+						if constexpr(std::is_floating_point_v<remove_cref<decltype(v)>>) {
+							expected_vals += typesafe_sprintf("\t\t(%x)", to_bit_string(v));
+						}
+
+						expected_vals += "\n";
+					};
+
+					print_val(em.opcode, "opcode");
+					print_val(em.op1, "op1");
+					print_val(em.op2, "op2");
+					print_val(em.r, "r");
+					print_val(em.added_term, "added_term");
+					print_val(em.total, "total");
+
+					LOG("[%x] Failed. Expected results:\n\n%x\nDifferences:\n%x", i, expected_vals, differences_content);
+				}
+
+			}
+			else if (generate_op_report) {
+				auto& meta = all_ops[i];
+				meta.opcode = opcode;
+				meta.op1 = op1;
+				meta.op2 = op2;
+				meta.r = r;
+				meta.added_term = added_term;
+				meta.total = total;
 			}
 		}
 
@@ -238,7 +354,14 @@ bool perform_float_consistency_tests(const int passes) {
 		else {
 			LOG("(FP consistency test) Representations match. Achieved value: %x", total);
 		}
+
+		if (generate_op_report) {
+			augs::save_as_bytes(all_ops, target_report_path);
+		}
 	};
+
+#if USE_THREADS
+	static const auto num_threads = 2;
 
 	for (std::size_t i = 0; i < num_threads; ++i) {
 		workers.emplace_back(work_lambda);
@@ -247,7 +370,10 @@ bool perform_float_consistency_tests(const int passes) {
 	for (auto& w : workers) {
 		w.join();
 	}
-	
+#else
+	work_lambda();
+#endif
+
 	if (all_succeeded) {
 		LOG("(FP consistency test) Passed the test. Canonical result matches the actual results.");
 	}

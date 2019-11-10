@@ -712,6 +712,7 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 
 file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
     "src/hypersomnia_version.h"
+    "src/fp_consistency_tests.h"
 	"src/augs/*.h"
 	"src/game/*.h"
 	"src/view/*.h"

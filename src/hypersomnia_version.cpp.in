@@ -21,7 +21,7 @@ hypersomnia_version::hypersomnia_version() :
 
 std::string hypersomnia_version::get_summary() const {
 	return typesafe_sprintf(
-		"Hypersomnia version %x\n",
+		"Hypersomnia version %x\n"
 		"Revision no.: %x %x\n"
 		"Build date: %x\n"
 		"Commit message:\n%x\n",

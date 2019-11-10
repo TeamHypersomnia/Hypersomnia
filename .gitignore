@@ -217,3 +217,4 @@ Gemfile.lock
 hypersomnia/.Hypersomnia
 hypersomnia/Hypersomnia
 *.hist
+report.bin

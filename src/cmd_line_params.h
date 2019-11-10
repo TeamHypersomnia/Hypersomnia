@@ -4,6 +4,7 @@
 struct cmd_line_params {
 	augs::path_type exe_path;
 	augs::path_type editor_target;
+	augs::path_type consistency_report;
 	bool force_update_check = false;
 	bool unit_tests_only = false;
 	bool help_only = false;
@@ -44,6 +45,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--test-fp-consistency") {
 				test_fp_consistency = std::atoi(argv[i++]);
+			}
+			else if (a == "--consistency-report") {
+				consistency_report = argv[i++];
 			}
 			else if (a == "--connect") {
 				should_connect = true;

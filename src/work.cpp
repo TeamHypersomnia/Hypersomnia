@@ -197,18 +197,23 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static const auto params = cmd_line_params(argc, argv);
 
-	static const auto fp_test_passes = [&]() {
-		if (params.test_fp_consistency != -1) {
-			LOG("Forcing %x fp consistency passes.", params.test_fp_consistency);
+	static const auto fp_test_settings = [&]() {
+		auto result = config.float_consistency_test;
 
-			return params.test_fp_consistency;
+		if (params.test_fp_consistency != -1) {
+			result.passes = params.test_fp_consistency;
+			LOG("Forcing %x fp consistency passes.", params.test_fp_consistency);
 		}
 
-		return config.float_consistency_test_passes;
+		if (!params.consistency_report.empty()) {
+			result.report_filename = params.consistency_report;
+		}
+
+		return result;
 	}();	
 
 	static const auto float_tests_succeeded = 
-		perform_float_consistency_tests(fp_test_passes)
+		perform_float_consistency_tests(fp_test_settings)
 	;
 
 	if (config.unit_tests.run) {

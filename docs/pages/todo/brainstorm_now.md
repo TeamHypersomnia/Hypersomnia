@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add update links to settings
+- Rename Advanced to Debug
+
+- Disable HRTF by default if concurrent threads <= 4
+	- just remove the entry from default config and calculate it in main inside canon config lambda
+	
+- Store avatar in user
 - We should really review spectator thoroughly, especially with regards to what happens during disconnects or hard re-predictions
 - Rare crashes on disconnects of other people
 	- Maybe some untimely payload comes in after removed_player is handled?
