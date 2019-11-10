@@ -354,7 +354,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					missile.when_fired = now;
 				}
 				else {
-					const auto fuse_delay_steps = static_cast<unsigned>(missile_def.max_lifetime_ms / delta.in_milliseconds());
+					const auto fuse_delay_steps = static_cast<uint32_t>(missile_def.max_lifetime_ms / delta.in_milliseconds());
 					const auto when_detonates = missile.when_fired.step + fuse_delay_steps;
 
 					if (now.step >= when_detonates) {
