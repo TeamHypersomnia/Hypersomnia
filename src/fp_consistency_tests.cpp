@@ -1,4 +1,3 @@
-#define FORCE_DISABLE_STREFLOP 0
 #include "augs/math/repro_math.h"
 
 #include "augs/log.h"
