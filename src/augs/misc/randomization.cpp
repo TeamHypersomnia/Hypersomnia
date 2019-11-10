@@ -12,11 +12,10 @@ uint64_t next_seed(uint64_t x) {
 }
 
 template <class T>
-basic_randomization<T>::basic_randomization(const rng_seed_type seed) {
-	uint64_t ss = seed;
-
-	for (auto& s : generator.s) {
-		s = next_seed(ss);
+basic_randomization<T>::basic_randomization(rng_seed_type seed) {
+	for (int i = 0; i < 4; ++i) {
+		seed = next_seed(seed);
+		generator.s[i] = seed;
 	}
 }
 

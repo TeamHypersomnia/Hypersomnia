@@ -552,10 +552,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 									{
 										auto rng = cosm.get_nontemporal_rng_for(round_entity);
 
+										const auto muzzle_randomized_vel = rng.randval(gun_def.muzzle_velocity);
+
 										const auto missile_velocity = 
 											muzzle_transform.get_direction()
 											* missile_def.muzzle_velocity_mult
-											* rng.randval(gun_def.muzzle_velocity)
+											* muzzle_randomized_vel
 										;
 
 										{
@@ -743,7 +745,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 									int charges = { single_bullet_or_pellet_stack.get<components::item>().get_charges() };
 
-									auto rng = cosm.get_nontemporal_rng_for(single_bullet_or_pellet_stack);
+									const auto stack_seed = cosm.get_nontemporal_rng_seed_for(single_bullet_or_pellet_stack);
+									auto stack_rng = randomization(stack_seed);
 
 									while (charges--) {
 										const auto& cartridge_def = single_bullet_or_pellet_stack.get<invariants::cartridge>();
@@ -786,10 +789,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 													response.spawned_rounds.push_back(round_entity);
 
 													{
+														const auto muzzle_randomized_vel = stack_rng.randval(gun_def.muzzle_velocity);
+
 														const auto missile_velocity = 
 															considered_muzzle_transform.get_direction()
 															* missile_def.muzzle_velocity_mult
-															* rng.randval(gun_def.muzzle_velocity)
+															* muzzle_randomized_vel
 														;
 
 														round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
@@ -803,11 +808,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 												create_round(std::nullopt);
 											}
 											else {
-												const auto hv = rng.randval_h(cartridge_def.rounds_spread_degrees_variation / 2);
+												const auto hv = stack_rng.randval_h(cartridge_def.rounds_spread_degrees_variation / 2);
 												const auto h = (cartridge_def.rounds_spread_degrees + hv) / 2;
 
 												for (int r = 0; r < num_rounds; ++r) {
-													create_round(rng.randval_h(h));
+													const auto randomized_offset = stack_rng.randval_h(h);
+													create_round(randomized_offset);
 												}
 											}
 										}
