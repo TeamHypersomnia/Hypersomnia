@@ -145,16 +145,24 @@ bool perform_float_consistency_tests(const float_consistency_test_settings& sett
 
 			switch(opcode) {
 				case 0:
-					r = OP1(0.f, 10.f) - OP2(-10.f, 10.f);
+					OP1(0.f, 10.f);
+					OP2(-10.f, 10.f);
+					r = op1 - op2; 
 					break;
 				case 1:
-					r = OP1(-10.f, 10.f) + OP2(-10.f, 10.f);
+					OP1(-10.f, 10.f);
+					OP2(-10.f, 10.f);
+					r = op1 + op2;
 					break;
 				case 2:
-					r = OP1(0.f, 10.f) / OP2(0.5f, 100.f);
+					OP1(0.f, 10.f);
+					OP2(0.5f, 100.f);
+					r = op1 / op2;
 					break;
 				case 3:
-					r = OP1(-10.f, 10.f) * OP2(-10.f, 10.f);
+					OP1(-10.f, 10.f);
+					OP2(-10.f, 10.f);
+					r =  op1 * op2;
 					break;
 				case 4:
 					r = OP1(0.f, 10.f) / 0.f;
@@ -169,13 +177,17 @@ bool perform_float_consistency_tests(const float_consistency_test_settings& sett
 					r = repro::cos(OP1(-1000.f, 1000.f));
 					break;
 				case 8:
-					r = repro::atan2(OP1(-1000.f, 1000.f), OP2(-1000.f, 1000.f));
+					OP1(-1000.f, 1000.f);
+					OP2(-1000.f, 1000.f);
+					r = repro::atan2(op1, op2);
 					break;
 				case 9:
 					r = repro::acos(OP1(0.f, 1.f));
 					break;
 				case 10:
-					r = repro::fmod(OP1(-1000.f, 1000.f), OP2(-1000.f, 1000.f));
+					OP1(-1000.f, 1000.f);
+					OP2(-1000.f, 1000.f);
+					r = repro::fmod(op1, op2);
 					break;
 				case 11:
 					r = repro::nearbyint(OP1(-1000.f, 1000.f));
@@ -199,10 +211,14 @@ bool perform_float_consistency_tests(const float_consistency_test_settings& sett
 					r = repro::fabs(OP1(-1.f, 1.f));
 					break;
 				case 18:
-					r = repro::copysignf(OP1(-1.f, 1.f), OP2(-1.f, 1.f));
+					OP1(-1.f, 1.f);
+					OP2(-1.f, 1.f);
+					r = repro::copysignf(op1, op2);
 					break;
 				case 19:
-					r = repro::pow(OP1(1.f, 8.f), OP2(-2.f, 2.f));
+					OP1(1.f, 8.f);
+					OP2(-2.f, 2.f);
+					r = repro::pow(op1, op2);
 					break;
 				case 20:
 					r = repro::sqrt(OP1(-5400.f, 0.f));
