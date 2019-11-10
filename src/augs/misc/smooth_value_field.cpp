@@ -6,7 +6,7 @@ namespace augs {
 		const smoothing_settings<double> settings
 	) {
 		const double averaging_constant =
-			pow(settings.average_factor, dt.per_second(settings.averages_per_sec))
+			std::pow(settings.average_factor, dt.per_second(settings.averages_per_sec))
 		;
 
 		auto calculated_smoothed_value = value * averaging_constant + target_value * (1.0 - averaging_constant);

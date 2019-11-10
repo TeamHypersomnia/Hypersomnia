@@ -224,7 +224,7 @@ namespace augs {
 		const float dash_velocity,
 		const double global_time_seconds
 	) const {
-		float dash_end = static_cast<float>(fmod(global_time_seconds*dash_velocity, dash_length * 2));
+		float dash_end = static_cast<float>(std::fmod(global_time_seconds*dash_velocity, dash_length * 2));
 		float dash_begin = dash_end - dash_length;
 		dash_begin = std::max(dash_begin, 0.f);
 

@@ -86,7 +86,9 @@ struct basic_randomization {
 
 	template<class T>
 	auto randval(const augs::random_bound<T> r) {
-		return augs::bound<T>(randval(r.first), randval(r.second));
+		const auto chosen_first = randval(r.first);
+		const auto chosen_second = randval(r.second);
+		return augs::bound<T>(chosen_first, chosen_second);
 	}
 
 	template <class T>
@@ -100,7 +102,9 @@ struct basic_randomization {
 		const T min_radius,
 		const T max_radius
 	) {
-		return randval(min_radius, max_radius) * random_point_on_unit_circle<T>();
+		const auto point = random_point_on_unit_circle<T>();
+		const auto radius = randval(min_radius, max_radius);
+		return point * radius;
 	}
 
 	template <class T>
@@ -120,10 +124,10 @@ struct basic_randomization {
 		const basic_vec2<T> min_a, 
 		const basic_vec2<T> max_a
 	) {
-		return { 
-			randval(min_a.x, max_a.x), 
-			randval(min_a.y, max_a.y) 
-		};
+		const auto x = randval(min_a.x, max_a.x);
+		const auto y = randval(min_a.y, max_a.y);
+
+		return { x, y };
 	}
 
 	template <class C>

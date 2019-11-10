@@ -69,7 +69,7 @@ frame_type_t<T>& calc_current_frame_looped(
 	const real32 total_time_ms
 ) {
 	const auto& frames = animation.frames;
-	const auto idx = calc_current_frame_index<0>(frames, std::fmod(total_time_ms, ::calc_total_duration(frames)));
+	const auto idx = calc_current_frame_index<0>(frames, repro::fmod(total_time_ms, ::calc_total_duration(frames)));
 
 	return frames[idx];
 }

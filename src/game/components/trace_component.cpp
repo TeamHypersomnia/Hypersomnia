@@ -8,7 +8,11 @@ namespace components {
 		randomization& p
 	) {
 		lengthening_time_passed_ms = 0.f;
-		chosen_multiplier.set(p.randval(def.max_multiplier_x), p.randval(def.max_multiplier_y));
+
+		const auto chosen_x = p.randval(def.max_multiplier_x);
+		const auto chosen_y = p.randval(def.max_multiplier_y);
+
+		chosen_multiplier.set(chosen_x, chosen_y);
 		chosen_lengthening_duration_ms = p.randval(def.lengthening_duration_ms);
 	}
 }

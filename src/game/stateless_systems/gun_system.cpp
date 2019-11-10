@@ -53,7 +53,7 @@ bool gun_try_to_fire_and_reset(
 	augs::real_cooldown& current_cooldown_ms
 ) {
 	if (current_cooldown_ms <= 0.f) {
-		const auto rmdr = std::fmod(-current_cooldown_ms, clk.dt.in_milliseconds());
+		const auto rmdr = repro::fmod(-current_cooldown_ms, clk.dt.in_milliseconds());
 		current_cooldown_ms = cooldown_ms - rmdr;
 		return true;
 	}
