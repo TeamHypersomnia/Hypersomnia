@@ -57,7 +57,7 @@ real32 basic_randomization<T>::randval(
 
 	const auto x = xoshiro256ss(&generator);
 	const auto u01 = (x >> 11) * 0x1.0p-53;
-	return min + u01 * (max - min);
+	return min + static_cast<real32>(u01) * (max - min);
 }
 
 template <class T>

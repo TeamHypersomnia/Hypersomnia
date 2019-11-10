@@ -46,14 +46,14 @@ void ensure_float_flags_hold() {
 #include <bitset>
 #include <random>
 
-// Last stress test passes: 50000000
+// Last stress test passes: 20000000
 
 #if PLATFORM_UNIX
-#define CANONICAL_RESULT_5000 "00111111110010000001110101110001"
-#define CANONICAL_RESULT_STRESS_TEST "00111110100010111001110011111010"
+#define CANONICAL_RESULT_5000 "01000000010001000111011011000001"
+#define CANONICAL_RESULT_STRESS_TEST "00111111111011000100110111101110"
 #elif PLATFORM_WINDOWS
-#define CANONICAL_RESULT_5000 "00111111110010000001110101110001"
-#define CANONICAL_RESULT_STRESS_TEST "00111110100010111001110011111010"
+#define CANONICAL_RESULT_5000 "01000000010001000111011011000001"
+#define CANONICAL_RESULT_STRESS_TEST "00111111111011000100110111101110"
 #endif
 
 struct operation_meta {
@@ -234,8 +234,12 @@ bool perform_float_consistency_tests(const float_consistency_test_settings& sett
 			added_term -= subtraction;
 
 			//LOG_NVPS(total, added_term);
-			total += added_term;
-
+			if (rng.randval(0, 1)) {
+				total += added_term;
+			}
+			else {
+				total -= added_term;
+			}
 
 			if (repro::fabs(total) > 10) {
 				const auto divisor = repro::pow(10.f, int(repro::log10(repro::fabs(total))));
