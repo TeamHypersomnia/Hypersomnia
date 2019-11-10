@@ -1,10 +1,23 @@
 #include "augs/math/repro_math.h"
 #include "augs/misc/randomization.h"
 #include "augs/templates/algorithm_templates.h"
+#include "augs/misc/xorshift.hpp"
+#include "augs/log.h"
+
+uint64_t next_seed(uint64_t x) {
+	uint64_t z = (x += 0x9e3779b97f4a7c15);
+	z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
+	z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
+	return z ^ (z >> 31);
+}
 
 template <class T>
 basic_randomization<T>::basic_randomization(const rng_seed_type seed) {
-	streflop::RandomInit(seed, generator);
+	uint64_t ss = seed;
+
+	for (auto& s : generator.s) {
+		s = next_seed(ss);
+	}
 }
 
 template <class T>
@@ -16,7 +29,8 @@ int basic_randomization<T>::randval(
 		return min;
 	}
 
-	return streflop::RandomII<int>(min, max, generator);
+	const auto result = xoshiro256ss(&generator);
+	return min + result % (max - min + 1);
 }
 
 template <class T>
@@ -28,7 +42,8 @@ unsigned basic_randomization<T>::randval(
 		return min;
 	}
 
-	return streflop::RandomII<unsigned>(min, max, generator);
+	const auto result = xoshiro256ss(&generator);
+	return min + result % (max - min + 1);
 }
 
 template <class T>
@@ -40,19 +55,22 @@ real32 basic_randomization<T>::randval(
 		return min;
 	}
 
-	return streflop::RandomIE<real32>(min, max, generator);
+	const auto x = xoshiro256ss(&generator);
+	const auto u01 = (x >> 11) * 0x1.0p-53;
+	return min + u01 * (max - min);
 }
 
 template <class T>
 std::size_t basic_randomization<T>::randval(
-	std::size_t min, 
-	std::size_t max
+	const std::size_t min, 
+	const std::size_t max
 ) {
 	if (min == max) {
 		return min;
 	}
 
-	return streflop::RandomII<std::size_t>(min, max, generator);
+	const auto result = xoshiro256ss(&generator);
+	return min + result % (max - min + 1);
 }
 
 template <class T>
@@ -130,4 +148,4 @@ std::vector<real32> basic_randomization<T>::make_random_intervals(
 	return result;
 }
 
-template struct basic_randomization<streflop::RandomState>;
+template struct basic_randomization<xorshift_state>;

@@ -1,12 +1,13 @@
 #pragma once
 #include <vector>
 
-#include "3rdparty/streflop/streflop.h"
 #include "augs/misc/randomization_declaration.h"
 
 #include "augs/misc/bound.h"
 #include "augs/math/vec2.h"
 #include "augs/templates/variated.h"
+
+#include "augs/misc/xorshift_state.h"
 
 template <class generator_type>
 struct basic_randomization {
@@ -131,6 +132,6 @@ struct basic_randomization {
 	}
 };
 
-struct randomization : basic_randomization<streflop::RandomState> {
-	using basic_randomization<streflop::RandomState>::basic_randomization;
+struct randomization : basic_randomization<xorshift_state> {
+	using basic_randomization<xorshift_state>::basic_randomization;
 };

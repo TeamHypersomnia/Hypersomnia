@@ -69,7 +69,6 @@ SET(libm_flt32_source
 	"libm/flt-32/s_truncf.cpp"
 	"libm/flt-32/w_expf.cpp"
 	"SMath.cpp"
-	"Random.cpp"
 	"streflopC.cpp"
 	)
 
