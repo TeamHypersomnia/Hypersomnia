@@ -3956,3 +3956,12 @@ Advantages:
 			- latest
 
 - versions built on travis are fucked up
+- Add update links to settings
+- Rename Advanced to Debug
+
+- Disable HRTF by default if concurrent threads <= 4
+	- just remove the entry from default config and calculate it in main inside canon config lambda
+	
+- Store avatar in user
+- Upgrade the server!!!! It has the old map
+

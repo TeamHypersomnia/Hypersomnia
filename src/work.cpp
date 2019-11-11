@@ -169,6 +169,14 @@ work_result work(const int argc, const char* const * const argv) try {
 #endif
 #endif
 
+		/* Tweak performance defaults */
+
+		const auto concurrency = std::thread::hardware_concurrency();
+
+		if (concurrency <= 4) {
+			result.audio.enable_hrtf = false;
+		}
+
 		return result;
 	}();
 
