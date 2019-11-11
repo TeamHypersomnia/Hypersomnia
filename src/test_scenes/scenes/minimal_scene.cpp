@@ -77,6 +77,7 @@ namespace test_scenes {
 			r.generate_for(character, step);
 		};
 
+		if (0)
 		{
 			for (int i = 0; i < 1; ++i) {
 				transformr transform;
@@ -108,6 +109,7 @@ namespace test_scenes {
 			}
 		}
 
+		if (0)
 		{
 			const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
 			const auto total_floor_size = floor_size * 10;
@@ -126,8 +128,7 @@ namespace test_scenes {
 
 		cosmic::reinfer_all_entities(world);
 
-		give_weapon(transformr(), test_shootable_weapons::ZAMIEC);
-		give_weapon(transformr(), test_shootable_weapons::HPSR);
+		give_weapon(transformr(), test_shootable_weapons::AMPLIFIER_ARM);
 
 		//give_weapon(transformr(), test_shootable_weapons::BILMER2000);
 

@@ -1409,8 +1409,14 @@ and then hitting Save settings.
 		);
 	};
 
-	static auto setup_post_cleanup = [&](const const_logic_step step) {
-		(void)step;
+	static auto setup_post_cleanup = [&](const auto& cfg, const const_logic_step step) {
+		if (cfg.debug.log_solvable_hashes) {
+			const auto& cosm = step.get_cosmos();
+			const auto ts = cosm.get_timestamp().step;
+			const auto h = cosm.calculate_solvable_signi_hash<uint32_t>();
+
+			LOG_NVPS(ts, h);
+		}
 	};
 
 	static auto advance_setup = [&](
@@ -1436,7 +1442,7 @@ and then hitting Save settings.
 			auto callbacks = solver_callbacks(
 				setup_pre_solve,
 				setup_audiovisual_post_solve,
-				setup_post_cleanup
+				[&viewing_config](const const_logic_step& step) { setup_post_cleanup(viewing_config, step); }
 			);
 
 			const auto zoom = get_camera_eye().zoom;

@@ -14,5 +14,6 @@ struct debug_settings {
 	unsigned determinism_test_cloned_cosmoi_count = 0;
 	input_recording_type input_recording_mode = input_recording_type::DISABLED;
 	bool measure_atlas_uploading = false;
+	bool log_solvable_hashes = false;
 	// END GEN INTROSPECTOR
 };

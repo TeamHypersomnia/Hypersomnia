@@ -1203,7 +1203,7 @@ void settings_gui_state::perform(
 
 				break;
 			}
-			case settings_pane::ADVANCED: {
+			case settings_pane::DEBUG: {
 				const auto cwd = augs::get_current_working_directory();
 				text("Working directory: %x", cwd, std::filesystem::absolute(cwd));
 				text("Cache folder location: %x (%x)", GENERATED_FILES_DIR, std::filesystem::absolute(GENERATED_FILES_DIR));
@@ -1224,6 +1224,11 @@ void settings_gui_state::perform(
 				text(u8"Test: いい товарищ żółćńźś");
 #endif
 				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.debug;
+					revertable_checkbox(SCOPE_CFG_NVP(log_solvable_hashes));
+				}
 
 				revertable_checkbox("Show developer console", config.session.show_developer_console);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);

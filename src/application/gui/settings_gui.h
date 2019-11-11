@@ -17,7 +17,7 @@ enum class settings_pane {
 	EDITOR,
 	GUI,
 	PERFORMANCE,
-	ADVANCED,
+	DEBUG,
 
 	COUNT
 	// END GEN INTROSPECTOR
