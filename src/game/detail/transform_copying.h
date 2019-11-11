@@ -23,7 +23,11 @@ struct absolute_or_local {
 	}
 
 	bool operator==(const absolute_or_local b) const {
-		return target == b.target && offset == b.offset;
+		return target == b.target && offset == b.offset && face_velocity == b.face_velocity;
+	}
+
+	auto hash() const {
+		return augs::hash_multiple(target, offset, face_velocity);
 	}
 };
 
@@ -40,7 +44,7 @@ namespace std {
 	template <>
 	struct hash<absolute_or_local> {
 		std::size_t operator()(const absolute_or_local t) const {
-			return augs::simple_two_hash(t.target, t.offset);
+			return t.hash();
 		}
 	};
 }

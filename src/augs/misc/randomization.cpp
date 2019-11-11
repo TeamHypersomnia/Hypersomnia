@@ -3,19 +3,41 @@
 #include "augs/templates/algorithm_templates.h"
 #include "augs/misc/xorshift.hpp"
 #include "augs/log.h"
+#include "3rdparty/crc32/crc32.h"
 
-uint64_t next_seed(uint64_t x) {
+uint64_t next_seed(uint64_t& x) {
 	uint64_t z = (x += 0x9e3779b97f4a7c15);
 	z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
 	z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
 	return z ^ (z >> 31);
 }
 
+uint64_t portable_hash(float x) {
+	uint32_t i;
+	std::memcpy(&i, &x, sizeof(i));
+	return i;
+}
+
+uint64_t portable_hash(const std::string& x) {
+	return portable_hash(crc32buf(reinterpret_cast<const char*>(x.data()), x.length()));
+}
+
+uint64_t portable_hash(uint64_t x) {
+	return x;
+}
+
+uint64_t portable_hash(uint32_t x) {
+	return x;
+}
+
+uint64_t portable_hash(int32_t x) {
+	return x;
+}
+
 template <class T>
 basic_randomization<T>::basic_randomization(rng_seed_type seed) {
 	for (int i = 0; i < 4; ++i) {
-		seed = next_seed(seed);
-		generator.s[i] = seed;
+		generator.s[i] = next_seed(seed);
 	}
 }
 

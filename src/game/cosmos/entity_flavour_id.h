@@ -56,6 +56,10 @@ struct constrained_entity_flavour_id {
 
 	template <class F>
 	decltype(auto) dispatch(F) const;
+
+	auto hash() const {
+		return augs::hash_multiple(raw, type_id);
+	}
 };
 
 template <class... C>
@@ -102,6 +106,11 @@ struct typed_entity_flavour_id {
 	operator entity_flavour_id() const {
 		return { raw, entity_type_id::of<E>() };
 	}
+
+	auto hash() const {
+		return augs::hash_multiple(entity_type_id::of<E>(), raw);
+	}
+
 };
 
 template <class... C>
@@ -149,14 +158,14 @@ namespace std {
 	template <class... C>
 	struct hash<constrained_entity_flavour_id<C...>> {
 		std::size_t operator()(const constrained_entity_flavour_id<C...>& v) const {
-			return augs::simple_two_hash(v.raw, v.type_id);
+			return v.hash();
 		}
 	};
 
 	template <class T>
 	struct hash<typed_entity_flavour_id<T>> {
 		std::size_t operator()(const typed_entity_flavour_id<T>& v) const {
-			return augs::simple_two_hash(typeid(T).hash_code(), v.raw);
+			return v.hash(); 
 		}
 	};
 }

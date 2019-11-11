@@ -4,6 +4,7 @@
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/transform_types.h"
 #include "augs/templates/hash_fwd.h"
+#include "augs/templates/hash_templates.h"
 #include "augs/templates/remove_cref.h"
 #include "augs/ensure.h"
 
@@ -120,13 +121,17 @@ public:
 			std::forward<F>(callback)
 		);
 	}
+
+	auto hash() const {
+		return augs::hash_multiple(get_index());
+	}
 };
 
 namespace std {
 	template <class List>
 	struct hash<type_in_list_id<List>> {
 		std::size_t operator()(const type_in_list_id<List>& k) const {
-			return std::hash<decltype(k.get_index())>()(k.get_index());
+			return k.hash(); 
 		}
 	};
 }

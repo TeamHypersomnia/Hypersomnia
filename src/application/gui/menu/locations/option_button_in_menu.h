@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/ensure.h"
+#include "augs/templates/hash_fwd.h"
 
 template <class Enum, class Button>
 class option_button_in_menu {

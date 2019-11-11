@@ -1,6 +1,7 @@
 #pragma once
 #include <sstream>
 #include "augs/templates/hash_templates.h"
+#include "augs/templates/hash_fwd.h"
 
 namespace augs {
 	template <class size_type, class... keys>
@@ -21,6 +22,10 @@ namespace augs {
 
 		bool is_set() const {
 			return indirection_index != static_cast<size_type>(-1);
+		}
+
+		auto hash() const {
+			return hash_multiple(indirection_index);
 		}
 	};
 
@@ -79,6 +84,10 @@ namespace augs {
 
 			return indirection_index < b.indirection_index;
 		}
+
+		auto hash() const {
+			return hash_multiple(indirection_index, version);
+		}
 	};
 }
 
@@ -86,14 +95,14 @@ namespace std {
 	template <class S, class... K>
 	struct hash<augs::pooled_object_id<S, K...>> {
 		std::size_t operator()(const augs::pooled_object_id<S, K...> k) const {
-			return augs::simple_two_hash(k.indirection_index, k.version);
+			return k.hash();
 		}
 	};
 
 	template <class S, class... K>
 	struct hash<augs::unversioned_id<S, K...>> {
 		std::size_t operator()(const augs::unversioned_id<S, K...> k) const {
-			return std::hash<int>()(k.indirection_index);
+			return k.hash();
 		}
 	};
 }

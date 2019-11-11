@@ -94,10 +94,10 @@ rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
 	const auto passed = get_total_steps_passed();
 
 	if (const auto handle = operator[](id)) {
-		return augs::simple_two_hash(handle.get_id().raw.indirection_index, passed);
+		return augs::hash_multiple(handle.get_id().raw.indirection_index, passed);
 	}
 
-	return std::hash<std::remove_const_t<decltype(passed)>>()(passed);
+	return augs::hash_multiple(passed);
 }
 
 randomization cosmos::get_rng_for(const entity_id id) const {

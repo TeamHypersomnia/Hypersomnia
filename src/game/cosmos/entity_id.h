@@ -39,6 +39,10 @@ struct unversioned_entity_id {
 	bool operator!=(const unversioned_entity_id b) const {
 		return !operator==(b);
 	}
+
+	auto hash() const {
+		return augs::hash_multiple(raw, type_id);
+	}
 };
 
 struct child_entity_id;
@@ -101,6 +105,10 @@ struct entity_id {
 
 		return type_id < b.type_id;
 	}
+
+	auto hash() const {
+		return augs::hash_multiple(raw, type_id);
+	}
 }; 
 
 template <class E>
@@ -139,6 +147,10 @@ struct typed_entity_id {
 	bool operator<(const typed_entity_id<E>& b) const {
 		return raw < b.raw;
 	}
+
+	auto hash() const {
+		return augs::hash_multiple(raw);
+	}
 }; 
 
 template <class T>
@@ -165,25 +177,26 @@ inline entity_id::entity_id(
 	const child_entity_id& id
 ) : entity_id(static_cast<const entity_id&>(id)) {}
 
+
 namespace std {
 	template <>
 	struct hash<entity_id> {
 		std::size_t operator()(const entity_id v) const {
-			return augs::simple_two_hash(v.raw, v.type_id);
+			return v.hash();
 		}
 	};
 
 	template <class E>
 	struct hash<typed_entity_id<E>> {
 		std::size_t operator()(const typed_entity_id<E> v) const {
-			return hash<entity_id_base>()(v.raw);
+			return v.hash();
 		}
 	};
 
 	template <>
 	struct hash<unversioned_entity_id> {
 		std::size_t operator()(const unversioned_entity_id v) const {
-			return augs::simple_two_hash(v.raw, v.type_id);
+			return v.hash();
 		}
 	};
 }

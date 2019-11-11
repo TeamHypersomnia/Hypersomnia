@@ -41,6 +41,10 @@ namespace augs {
 		bool operator!=(const simple_pair& b) const {
 			return first != b.first || second != b.second;
 		}
+
+		auto hash() const {
+			return hash_multiple(first, second);
+		}
 	};
 }
 
@@ -58,7 +62,7 @@ namespace std {
 	template <class A, class B>
 	struct hash<augs::simple_pair<A, B>> {
 		std::size_t operator()(const augs::simple_pair<A, B>& p) const {
-			return augs::simple_two_hash(p.first, p.second); 
+			return p.hash();
 		}
 	};
 }

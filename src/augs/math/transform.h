@@ -226,6 +226,10 @@ struct basic_transform {
 			rotation
 		};
 	}
+
+	auto hash() const {
+		return augs::hash_multiple(pos, rotation);
+	}
 };
 
 template <class T>
@@ -260,7 +264,7 @@ namespace std {
 	template <class T>
 	struct hash<basic_transform<T>> {
 		std::size_t operator()(const basic_transform<T> t) const {
-			return augs::simple_two_hash(t.pos, t.rotation);
+			return t.hash();
 		}
 	};
 }

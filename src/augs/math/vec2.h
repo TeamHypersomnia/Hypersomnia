@@ -664,6 +664,10 @@ struct basic_vec2 {
 	basic_vec2& operator*=(const S d) { x *= d; y *= d; return *this; }
 	template <class S, class = std::enable_if_t<std::is_arithmetic_v<S>>>
 	basic_vec2& operator/=(const S d) { x /= d; y /= d; return *this; }
+
+	auto hash() const {
+		return augs::hash_multiple(x, y);
+	}
 };
 
 template <class type, class S, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator-(const basic_vec2<type> t, const S d) { return { t.x - d, t.y - d }; }
@@ -683,7 +687,7 @@ namespace std {
 	template <class T>
 	struct hash<basic_vec2<T>> {
 		std::size_t operator()(const basic_vec2<T> v) const {
-			return augs::simple_two_hash(v.x, v.y);
+			return v.hash();
 		}
 	};
 }

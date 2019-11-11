@@ -25,6 +25,10 @@ struct basic_inventory_slot_id {
 	bool operator!=(const basic_inventory_slot_id b) const;
 
 	bool is_valid() const;
+
+	auto hash() const {
+		return augs::hash_multiple(container_entity, type);
+	}
 };
 
 struct inventory_item_address {
@@ -36,7 +40,7 @@ namespace std {
 	template <>
 	struct hash<inventory_slot_id> {
 		std::size_t operator()(const inventory_slot_id k) const {
-			return augs::simple_two_hash(k.container_entity, k.type);
+			return k.hash();
 		}
 	};
 }

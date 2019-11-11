@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/network/network_types.h"
+#include "augs/templates/hash_templates.h"
 
 struct mode_player_id {
 	using id_value_type = uint32_t;
@@ -52,13 +53,17 @@ struct mode_player_id {
 	void unset() {
 		*this = {};
 	}
+
+	auto hash() const {
+		return augs::hash_multiple(value);
+	}
 };
 
 namespace std {
 	template <>
 	struct hash<mode_player_id> {
 		std::size_t operator()(const mode_player_id v) const {
-			return hash<mode_player_id::id_value_type>()(v.value);
+			return v.hash();
 		}
 	};
 }
