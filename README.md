@@ -1,7 +1,11 @@
-# Hypersomnia
+<div align="center">
+<img src="https://hypersomnia.xyz/menu_game_logo.png"></img>
 
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
+<a href="https://discord.gg/YC49E4G"><img src="https://discordapp.com/api/guilds/284464744411430912/embed.png"></img></a>
+
+A free and open source online shooter.
 
 **Download for:**
 
@@ -10,8 +14,9 @@
 <br>
 
 *[(for older versions click here)](https://hypersomnia.xyz/builds)*
+</div>
 
-- [Hypersomnia](#hypersomnia)
+- [Introduction](#introduction)
 - [Gallery](#gallery)
 - [How to build](#how-to-build)
   - [Windows instructions](#windows-instructions)
@@ -26,7 +31,9 @@
 	- [Details](#details)
 - [Contributing](#contributing)
 
-Hypersomnia is an upcoming community-centered shooter released as free software,
+## Introduction
+
+Hypersomnia is a fast-paced top-down arena shooter released as free software,
 with an aspiration to one day become an MMO with elements of RPG.
 
 Set in a hypothetical afterlife reality, it shall provide joy through altruistic behaviours, fierce fights, exploration, fulfillment of elaborate social roles or sowing panic as a traitor to benevolent ones.
