@@ -3,9 +3,11 @@
 
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 <a href="https://discord.gg/YC49E4G"><img src="https://discordapp.com/api/guilds/284464744411430912/embed.png"></img></a>
 
-A free and open source online shooter.
+An online shooter with ridiculously fast dynamics.  
+Forever free and open-source :heart: 
 
 **Download for:**
 
@@ -33,7 +35,7 @@ A free and open source online shooter.
 
 ## Introduction
 
-Hypersomnia is a fast-paced top-down arena shooter released as free software,
+Hypersomnia is a fast-paced top-down arena released as free software,
 with an aspiration to one day become an MMO with elements of RPG.
 
 Set in a hypothetical afterlife reality, it shall provide joy through altruistic behaviours, fierce fights, exploration, fulfillment of elaborate social roles or sowing panic as a traitor to benevolent ones.
