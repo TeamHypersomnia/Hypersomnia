@@ -20,7 +20,7 @@ return {
   },
 
   official_arena_linux_servers = {
-	"arena-linux.hypersomnia.xyz" 
+	"arena.hypersomnia.xyz" 
   },
 
   default_client_start = {
