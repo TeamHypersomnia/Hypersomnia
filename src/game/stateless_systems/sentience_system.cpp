@@ -142,7 +142,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	const auto delta = cosm.get_fixed_delta();
 
 	auto make_interval_in_steps = [delta](const auto& m) {
-		return static_cast<unsigned>(1 / delta.in_milliseconds() * m.regeneration_interval_ms);
+		return std::max(1u, static_cast<uint32_t>(1 / delta.in_milliseconds() * m.regeneration_interval_ms));
 	};
 
 	cosm.for_each_having<components::sentience>(

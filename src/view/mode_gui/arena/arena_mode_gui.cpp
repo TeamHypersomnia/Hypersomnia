@@ -207,7 +207,7 @@ void arena_gui_state::draw_mode_gui(
 		auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_buffer::DEATH_SUMMARY_AVATAR].triangles;
 
 		auto draw_death_summary = [&]() {
-			const auto viewed_player_id = spectator.show ? spectator.now_spectating : local_player_id;
+			const auto viewed_player_id = spectator.active ? spectator.now_spectating : local_player_id;
 			const auto viewed_player_data = typed_mode.find(viewed_player_id);
 
 			const auto window_padding = vec2i(16, 16);
@@ -989,7 +989,7 @@ void arena_gui_state::draw_mode_gui(
 			const bool draw_money = [&]() {
 				if (mode_input.rules.hide_details_when_spectating_enemies) {
 					if (local_player_faction && *local_player_faction != faction_type::SPECTATOR) {
-						const auto viewed_player_id = spectator.show ? spectator.now_spectating : local_player_id;
+						const auto viewed_player_id = spectator.active ? spectator.now_spectating : local_player_id;
 						const auto viewed_player_data = typed_mode.find(viewed_player_id);
 
 						if (viewed_player_data == nullptr) {

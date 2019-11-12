@@ -196,7 +196,7 @@ entity_id arena_gui_mixin<D>::get_game_gui_subject_id() const {
 					return self.get_viewed_character_id();
 				}
 
-				if (!arena_gui.spectator.show) {
+				if (!arena_gui.spectator.active) {
 					return self.get_viewed_character_id();
 				}
 
@@ -249,7 +249,7 @@ entity_id arena_gui_mixin<D>::get_viewed_character_id() const {
 			const auto local_id = self.get_local_player_id();
 			const auto local_character = typed_mode.lookup(local_id);
 
-			if (arena_gui.spectator.show) {
+			if (arena_gui.spectator.active) {
 				const auto spectating = arena_gui.spectator.now_spectating;
 
 				if (spectating.is_set()) {

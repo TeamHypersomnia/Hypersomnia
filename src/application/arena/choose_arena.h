@@ -32,6 +32,7 @@ inline void choose_arena(
 		handle.current_mode.choose(handle.rulesets.meta.server_default);
 	}
 	else {
+		LOG_NVPS(vars.override_default_ruleset);
 		ensure(false && "Not implemented!");
 	}
 }

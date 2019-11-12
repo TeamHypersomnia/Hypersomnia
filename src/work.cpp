@@ -1999,8 +1999,10 @@ and then hitting Save settings.
 						}
 
 						if (was_released || should_draw_game_gui()) {
-							if (game_gui.control_gui_world(create_game_gui_context(), e)) {
-								continue;
+							if (get_game_gui_subject()) {
+								if (game_gui.control_gui_world(create_game_gui_context(), e)) {
+									continue;
+								}
 							}
 						}
 					}

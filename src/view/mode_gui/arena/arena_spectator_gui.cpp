@@ -52,20 +52,9 @@ void arena_spectator_gui::draw_gui(
 	const typename M::const_input& mode_input
 ) const {
 	using namespace augs::gui::text;
-
-	has_been_drawn = false;
-
-	(void)typed_mode;
-	(void)mode_input;
 	(void)draw_in;
 
-	const bool should_show = show;
-
-	if (!should_show) {
-		return;
-	}
-
-	if (its_match_summary) {
+	if (!should_be_drawn(typed_mode)) {
 		return;
 	}
 
@@ -136,14 +125,12 @@ void arena_spectator_gui::draw_gui(
 			
 		draw_text_indicator_at(instructions, one_sixth_t + 2 * cell_h, rgba(0, 0, 0, 150));
 	}
-
-	has_been_drawn = true;
 }
 
 void arena_spectator_gui::hide() {
 	accept_inputs = false;
-	show = false;
-	its_match_summary = false;
+	active = false;
+
 	now_spectating = {};
 	cached_order = {};
 	when_local_player_knocked_out = std::nullopt;
@@ -156,8 +143,6 @@ void arena_spectator_gui::advance(
 	const typename M::const_input& in
 ) {
 	const auto& cosm = in.cosm;
-
-	its_match_summary = false;
 
 	auto local_faction = faction_type::DEFAULT;
 
@@ -185,7 +170,7 @@ void arena_spectator_gui::advance(
 
 	auto hide_if_match_summary = [&]() {
 		if (mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
-			its_match_summary = true;
+			hide();
 			return true;
 		}
 
@@ -193,7 +178,7 @@ void arena_spectator_gui::advance(
 	};
 
 	auto show_or_unshow_if_spectating_local = [&]() {
-		show = now_spectating != local_player;
+		active = now_spectating != local_player;
 	};
 
 	auto cache_order_of = [&](const mode_player_id& id) {

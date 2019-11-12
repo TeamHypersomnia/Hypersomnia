@@ -15,10 +15,8 @@ struct arena_spectator_gui {
 
 	int key_requested_offset = 0;
 
-	bool show = false;
-	bool its_match_summary = false;
+	bool active = false;
 	bool accept_inputs = false;
-	mutable bool has_been_drawn = false;
 
 	std::optional<augs::timer> when_local_player_knocked_out;
 
@@ -40,4 +38,9 @@ struct arena_spectator_gui {
 		const M& mode, 
 		const typename M::const_input&
 	) const;
+
+	template <class M>
+	bool should_be_drawn(const M& mode) const {
+		return active && mode.find(now_spectating) != nullptr;
+	}
 };

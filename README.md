@@ -106,11 +106,10 @@ Next steps depend on the platform you are on.
 On all platforms, you can choose among three building configurations:
 
 - ``Debug`` - the fastest to build and provides debug information.   
-	Recommended for normal development.
-- ``Release`` - takes AWFULLY long to build because of link-time optimizations.  
-	No debug information. Use only for production builds. Specifies ``IS_PRODUCTION_BUILD=1`` C++ preprocessor define.
-- ``RelWithDebInfo`` - Same as ``Release`` but with debug info and without link-time optimizations.  
-	Preferred choice for quickly testing how the game's mechanics play at normal speed, and also for debugging performance problems.
+	Recommended for day-to-day development.
+- ``Release`` - No debug information. Use only for production builds. Specifies ``IS_PRODUCTION_BUILD=1`` C++ preprocessor define that disables assertions in performance-critical areas.
+- ``RelWithDebInfo`` - Same as ``Release`` but with debug info and with many assertions ("ensures") compiled-in.
+	Preferred choice for testing the developed game while full speed is required.
 
 ## Windows instructions
 
@@ -146,11 +145,10 @@ If you intend to develop the game, it is best to use "Debug" configuration for t
 
 If you want to somehow customize your build, e.g. disable certain game features, refer to the beginning of ```CMakeLists.txt``` to see which options you can pass to the ```cmake``` command.
 
-If the game builds successfully, issue these commands to launch it:
+If the game builds successfully, issue this command to launch it:
 
 ```
-cd ../hypersomnia
-"../build/Hypersomnia.exe"
+ninja run
 ```
 
 <!-- Note that the 64-bit version is more likely to be kept up to date. -->
