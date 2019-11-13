@@ -3,6 +3,7 @@
 #include "augs/network/network_simulator_settings.h"
 #include "augs/misc/constant_size_string.h"
 #include "augs/network/network_types.h"
+#include "augs/misc/constant_size_vector.h"
 
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;

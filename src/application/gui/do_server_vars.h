@@ -4,6 +4,7 @@
 
 #include "application/gui/arena_chooser.h"
 #include "application/arena/arena_paths.h"
+#include "application/gui/config_nvp.h"
 
 inline void do_server_vars(
 	server_solvable_vars& vars,

@@ -67,15 +67,6 @@ class client_setup :
 	server_vars sv_vars;
 	server_solvable_vars sv_solvable_vars;
 
-	server_vars last_applied_sv_vars;
-	server_vars edited_sv_vars;
-
-	server_solvable_vars last_applied_sv_solvable_vars;
-	server_solvable_vars edited_sv_solvable_vars;
-
-	bool applying_sv_vars = false;
-	bool applying_sv_solvable_vars = false;
-
 	mode_player_id client_player_id;
 
 	cosmos predicted_cosmos;
@@ -97,7 +88,6 @@ class client_setup :
 	client_vars vars;
 	requested_client_settings requested_settings;
 	requested_client_settings current_requested_settings;
-	rcon_level_type rcon = rcon_level_type::NONE;
 
 	entropy_accumulator total_collected;
 	augs::serialization_buffers buffers;
@@ -596,5 +586,9 @@ public:
 
 	auto get_current_requested_settings() const {
 		return current_requested_settings;
+	}
+
+	rcon_level_type get_rcon_level() const {
+		return client_gui.rcon.level;
 	}
 };

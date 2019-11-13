@@ -7,7 +7,7 @@ enum class rcon_pane {
 	VARS,
 	RULESETS,
 	USERS,
-	ADVANCED,
+	MAINTENANCE,
 
 	COUNT
 	// END GEN INTROSPECTOR

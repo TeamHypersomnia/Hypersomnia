@@ -142,6 +142,11 @@ private:
 		F&& read_payload
 	);
 
+	template <class P>
+	message_handler_result handle_rcon_payload(
+		const P& payload
+	);
+
 	void init_client(const client_id_type&);
 	void unset_client(const client_id_type&);
 

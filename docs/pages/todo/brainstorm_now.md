@@ -6,16 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Changing map on the integrated server doesn't re-add the admin player
-
-- Rcon server vars application doesn't seem to work
-
+- Avatars are lost after changing the map
 - Fix mouse behaviour in fullscreen
 
 - Lua intercosms are exported a bit different on Linux and Windows
 	- We have something like 4.438729871 vs 4.438729872
-
-- Avatars are lost after changing the map
 
 - We should really review spectator thoroughly, especially with regards to what happens during disconnects or hard re-predictions
 

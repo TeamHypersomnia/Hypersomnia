@@ -24,6 +24,7 @@
 #include "application/gui/client/chat_gui.h"
 #include "application/network/payload_easily_movable.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
+#include "application/gui/client/rcon_gui.hpp"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -252,11 +253,16 @@ void server_setup::apply(const server_vars& new_vars, const bool force) {
 	const auto old_vars = vars;
 	vars = new_vars;
 
+	{
+		auto& rcon_gui = integrated_client_gui.rcon;
+		rcon_gui.on_arrived(new_vars);
+	}
+
 	if (any_difference) {
 		auto broadcast_new_vars_to_rcons = [&](const auto recipient_id, auto&) {
 			const auto rcon_level = get_rcon_level(recipient_id);
 
-			if (rcon_level != rcon_level_type::NONE) {
+			if (rcon_level >= rcon_level_type::BASIC) {
 				server->send_payload(
 					recipient_id,
 					game_channel_type::COMMUNICATIONS,
@@ -282,6 +288,12 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 
 	const auto old_vars = solvable_vars;
 	solvable_vars = new_vars;
+
+	{
+		auto& rcon_gui = integrated_client_gui.rcon;
+		rcon_gui.on_arrived(new_vars);
+		LOG("Set on arrived");
+	}
 
 	if (any_difference) {
 		auto broadcast_new_vars = [&](const auto recipient_id, auto&) {
@@ -320,9 +332,14 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 }
 
 void server_setup::apply(const config_lua_table& cfg) {
-	const bool force = false;
-	apply(cfg.server, force);
-	apply(cfg.server_solvable, force);
+	/* 
+		If we just apply the changes from game settings,
+		RCON would not work on the integrated server and it would be confusing.
+	*/
+
+	/* const bool force = false; */
+	/* apply(cfg.server, force); */
+	/* apply(cfg.server_solvable, force); */
 
 	integrated_client_vars = cfg.client;
 
@@ -351,6 +368,9 @@ void server_setup::choose_arena(const std::string& name) {
 		solvable_vars,
 		initial_signi
 	);
+
+	arena_gui.reset();
+	integrated_client_gui.rcon.show = false;
 
 	if (should_have_admin_character()) {
 		mode_entropy_general cmd;
@@ -554,7 +574,7 @@ void server_setup::advance_clients_state() {
 
 			const auto rcon_level = get_rcon_level(client_id);
 
-			if (rcon_level != rcon_level_type::NONE) {
+			if (rcon_level >= rcon_level_type::BASIC) {
 				server->send_payload(
 					client_id, 
 					game_channel_type::COMMUNICATIONS, 
@@ -662,13 +682,68 @@ void server_setup::advance_clients_state() {
 	for_each_id_and_client(process_client);
 }
 
+template <class P>
+message_handler_result server_setup::handle_rcon_payload(
+	const P& typed_payload
+) {
+	using namespace rcon_commands;
+	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
+	constexpr auto continue_v = message_handler_result::CONTINUE;
+
+	if constexpr(std::is_same_v<P, match_command>) {
+		local_collected.mode_general.special_command = typed_payload;
+
+		return continue_v;
+	}
+	else if constexpr(std::is_same_v<P, special>) {
+		switch (typed_payload) {
+			case special::SHUTDOWN: {
+				LOG("Shutting down due to rcon's request.");
+				schedule_shutdown = true;
+
+				server_broadcasted_chat message;
+				message.target = chat_target_type::SERVER_SHUTTING_DOWN;
+				message.recipient_shall_kindly_leave = true;
+
+				broadcast(message);
+
+				return continue_v;
+			}
+
+			default:
+				LOG("Unsupported rcon command.");
+				return continue_v;
+		}
+	}
+	else if constexpr(std::is_same_v<P, server_vars>) {
+		LOG("New server vars from the client.");
+
+		apply(typed_payload, true);
+
+		return continue_v;
+	}
+	else if constexpr(std::is_same_v<P, server_solvable_vars>) {
+		LOG("New server solvable vars from the client (%x).", typed_payload.current_arena);
+
+		apply(typed_payload, true);
+
+		return continue_v;
+	}
+	else if constexpr(std::is_same_v<P, std::monostate>) {
+		return abort_v;
+	}
+	else {
+		static_assert(always_false_v<P>, "Unhandled rcon command type!");
+		return abort_v;
+	}
+}
+
 template <class T, class F>
 message_handler_result server_setup::handle_client_message(
 	const client_id_type& client_id, 
 	F&& read_payload
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
-	constexpr auto continue_v = message_handler_result::CONTINUE;
 	constexpr bool is_easy_v = payload_easily_movable_v<T>;
 
 	std::conditional_t<is_easy_v, T, std::monostate> payload;
@@ -707,59 +782,10 @@ message_handler_result server_setup::handle_client_message(
 
 		LOG("Detected rcon level: %x", static_cast<int>(level));
 
-		if (level != rcon_level_type::NONE) {
+		if (level >= rcon_level_type::BASIC) {
 			const auto result = std::visit(
 				[&](const auto& typed_payload) {
-					using P = remove_cref<decltype(typed_payload)>;
-					using namespace rcon_commands;
-
-					if constexpr(std::is_same_v<P, match_command>) {
-						local_collected.mode_general.special_command = typed_payload;
-
-						return continue_v;
-					}
-					else if constexpr(std::is_same_v<P, special>) {
-						switch (typed_payload) {
-							case special::SHUTDOWN: {
-								LOG("Shutting down due to rcon's request.");
-								schedule_shutdown = true;
-
-								server_broadcasted_chat message;
-								message.target = chat_target_type::SERVER_SHUTTING_DOWN;
-								message.recipient_shall_kindly_leave = true;
-
-								broadcast(message);
-
-								return continue_v;
-							}
-
-							default:
-								LOG("Unsupported rcon command.");
-								return continue_v;
-						}
-					}
-					else if constexpr(std::is_same_v<P, server_vars>) {
-						LOG("New server vars from the client.");
-
-						apply(typed_payload, true);
-
-						return continue_v;
-					}
-					else if constexpr(std::is_same_v<P, server_solvable_vars>) {
-						LOG("New server solvable vars from the client (%x).", typed_payload.current_arena);
-
-
-						apply(typed_payload, true);
-
-						return continue_v;
-					}
-					else if constexpr(std::is_same_v<P, std::monostate>) {
-						return abort_v;
-					}
-					else {
-						static_assert(always_false_v<P>, "Unhandled rcon command type!");
-						return abort_v;
-					}
+					return handle_rcon_payload(typed_payload);
 				},
 				payload
 			);
@@ -1145,6 +1171,24 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 
 				chat.current_message.clear();
 			}
+
+			auto& rcon_gui = integrated_client_gui.rcon;
+
+			if (!arena_gui.scoreboard.show && rcon_gui.show) {
+				auto on_new_payload = [&](const auto& new_payload) {
+					handle_rcon_payload(new_payload);
+				};
+
+				const bool has_maintenance = false;
+
+				rcon_gui.level = rcon_level_type::MASTER;
+
+				::perform_rcon_gui(
+					rcon_gui,
+					has_maintenance,
+					on_new_payload
+				);
+			}
 		}
 	}
 
@@ -1168,7 +1212,7 @@ bool server_setup::is_running() const {
 }
 
 bool server_setup::should_have_admin_character() const {
-	return dedicated == std::nullopt;
+	return is_integrated();
 }
 
 void server_setup::sleep_until_next_tick() {
@@ -1243,6 +1287,14 @@ bool safe_equal(const decltype(requested_client_settings::rcon_password)& candid
 }
 
 rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const { 
+	if (is_integrated()) {
+		if (id == static_cast<client_id_type>(get_admin_player_id().value)) {
+			return rcon_level_type::MASTER;
+		}
+
+		return rcon_level_type::INTEGRATED_ONLY;
+	}
+
 	const auto& c = clients[id];
 
 	if (vars.auto_authorize_loopback_for_rcon) {
@@ -1264,7 +1316,7 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 
 	LOG("RCON disabled for this client.");
 
-	return rcon_level_type::NONE;
+	return rcon_level_type::DENIED;
 }
 
 void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {

@@ -26,10 +26,11 @@
 #include "game/cosmos/entity_type_traits.h"
 
 #include "application/gui/config_nvp.h"
-#include "application/gui/do_server_vars.h"
 
 #include "application/setups/client/rcon_pane.h"
 #include "application/gui/pretty_tabs.h"
+
+#include "application/gui/client/rcon_gui.hpp"
 
 void snap_interpolated_to_logical(cosmos&);
 
@@ -225,7 +226,7 @@ message_handler_result client_setup::handle_server_message(
 				);
 
 				arena_gui.reset();
-				client_gui.rcon = {};
+				client_gui.rcon.show = false;
 			}
 			catch (const augs::file_open_error& err) {
 				set_disconnect_reason(typesafe_sprintf(
@@ -247,19 +248,13 @@ message_handler_result client_setup::handle_server_message(
 		}
 
 		sv_solvable_vars = new_vars;
-		last_applied_sv_solvable_vars = new_vars;
-		edited_sv_solvable_vars = new_vars;
-
-		applying_sv_solvable_vars = false;
+		client_gui.rcon.on_arrived(new_vars);
 	}
 	else if constexpr (std::is_same_v<T, server_vars>) {
 		const auto& new_vars = payload;
 
 		sv_vars = new_vars;
-		last_applied_sv_vars = new_vars;
-		edited_sv_vars = new_vars;
-
-		applying_sv_vars = false;
+		client_gui.rcon.on_arrived(new_vars);
 	}
 	else if constexpr (std::is_same_v<T, server_broadcasted_chat>) {
 		const auto author_id = payload.author;
@@ -360,7 +355,7 @@ message_handler_result client_setup::handle_server_message(
 						signi,
 						current_mode,
 						read_client_id,
-						rcon
+						client_gui.rcon.level
 					}
 				);
 
@@ -624,7 +619,7 @@ void client_setup::send_pending_commands() {
 						scene.world.get_solvable().significant,
 						current_mode,
 						exchanged_client_id,
-						rcon
+						get_rcon_level()
 					}
 				);
 			};
@@ -817,125 +812,23 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	}
 
 	if (!arena_gui.scoreboard.show && rcon_gui.show) {
-		const auto window_name = "Remote Control (RCON)";
+		auto on_new_payload = [&](const auto& new_payload) {
+			rcon_command_variant payload;
+			payload = new_payload;
 
-		ImGui::SetNextWindowPosCenter();
+			adapter->send_payload(
+				game_channel_type::COMMUNICATIONS,
+				payload
+			);
+		};
 
-		ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.7f).operator ImVec2(), ImGuiCond_Once);
+		const bool has_maintenance = true;
 
-		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
-		centered_text(window_name);
-
-		if (rcon == rcon_level_type::NONE) {
-			text_color("Access denied.", red);
-			ImGui::Separator();
-		}
-		else {
-			do_pretty_tabs(rcon_gui.active_pane);
-
-			auto do_server_vars_panel = [&](
-				auto& edited,
-				auto& last_saved,
-				auto& applying_flag
-			) { 
-				{
-					auto child = scoped_child("settings view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
-					auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
-
-					do_server_vars(
-						edited,
-						last_saved
-					);
-				}
-
-				{
-					auto scope = scoped_child("save revert");
-
-					ImGui::Separator();
-
-					if (applying_flag) {
-						text_color("Applying changes...", yellow);
-					}
-					else if (!augs::introspective_equal(last_saved, edited)) {
-						if (ImGui::Button("Apply & Save")) {
-							rcon_command_variant payload;
-							payload = edited;
-
-							LOG("Sending new configuration (%x)", edited_sv_solvable_vars.current_arena);
-
-							adapter->send_payload(
-								game_channel_type::COMMUNICATIONS,
-								payload
-							);
-
-							applying_flag = true;
-						}
-
-						ImGui::SameLine();
-
-						if (ImGui::Button("Revert all")) {
-							edited = last_saved;
-						}
-					}
-				}
-			};
-
-			auto do_command_button = [&](const std::string& label, const auto cmd) {
-				if (ImGui::Button(label.c_str())) {
-					rcon_command_variant payload;
-					payload = cmd;
-
-					adapter->send_payload(
-						game_channel_type::COMMUNICATIONS,
-						payload
-					);
-
-					return true;
-				}
-
-				return false;
-			};
-
-			switch (rcon_gui.active_pane) {
-				case rcon_pane::ARENAS:
-					do_server_vars_panel(edited_sv_solvable_vars, last_applied_sv_solvable_vars, applying_sv_solvable_vars);
-					break;
-
-				case rcon_pane::MATCH:
-					using MC = match_command;
-
-					augs::for_each_enum_except_bounds([&](const MC cmd) {
-						do_command_button(format_enum(cmd), cmd);
-					});
-
-					break;
-
-				case rcon_pane::VARS:
-					do_server_vars_panel(edited_sv_vars, last_applied_sv_vars, applying_sv_vars);
-					break;
-
-				case rcon_pane::RULESETS:
-					break;
-
-				case rcon_pane::USERS:
-					break;
-
-				case rcon_pane::ADVANCED:
-					using RS = rcon_commands::special;
-
-					if (do_command_button("Shutdown server", RS::SHUTDOWN)) {
-						LOG("Requesting the server to shut down");
-					}
-
-					do_command_button("Download logs", RS::DOWNLOAD_LOGS);
-
-					break;
-
-				default: break;
-			}
-		}
-
-		ImGui::Separator();
+		perform_rcon_gui(
+			rcon_gui,
+			has_maintenance,
+			on_new_payload
+		);
 	}
 
 	{

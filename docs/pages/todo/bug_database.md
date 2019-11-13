@@ -5,6 +5,13 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Fatal bug: a mutable has_been_drawn could be written whilst GUI
+was processed, resulting in a potentially different cosmos being chosen
+for viewing, mid-way.
+
+This would cause the should_draw_gui check to pass whereas a dead
+character would later be chosen as a subject, causing a crash.
+
 - Strange performance problem when paused in editor?
 	- We had Unity and OBS turned on...
 

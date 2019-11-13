@@ -3965,3 +3965,9 @@ Advantages:
 - Store avatar in user
 - Upgrade the server!!!! It has the old map
 
+- Rcon server vars application doesn't seem to work
+	- They do but not on the integrated server, and probably rightly so
+
+- Changing map on the integrated server doesn't re-add the admin player
+	 - Actually it doesn't even change the map
+

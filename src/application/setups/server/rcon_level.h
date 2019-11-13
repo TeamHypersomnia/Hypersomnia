@@ -1,7 +1,8 @@
 #pragma once
 
 enum class rcon_level_type {
-	NONE,
+	INTEGRATED_ONLY,
+	DENIED,
 	BASIC,
 	MASTER
 };
