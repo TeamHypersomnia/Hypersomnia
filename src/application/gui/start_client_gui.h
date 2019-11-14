@@ -25,6 +25,7 @@ public:
 	bool do_initial_load = true;
 
 	bool allow_start = false;
+	bool mouse_has_to_move_off_browse = false;
 	std::optional<augs::frame_num_type> avatar_submitted_when;
 
 	bool perform(

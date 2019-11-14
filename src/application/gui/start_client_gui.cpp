@@ -169,7 +169,9 @@ bool start_client_gui_state::perform(
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Browse") && !error_popup) {
+		if (ImGui::Button("Browse") && !error_popup && !mouse_has_to_move_off_browse) {
+			mouse_has_to_move_off_browse = true;
+
 			avatar_loading_result = std::async(
 				std::launch::async,
 				[&window]() {
@@ -196,6 +198,10 @@ bool start_client_gui_state::perform(
 					return out;
 				}
 			);
+		}
+
+		if (!ImGui::IsItemHovered()) {
+			mouse_has_to_move_off_browse = false;
 		}
 
 		if (p.size() > 0) {
