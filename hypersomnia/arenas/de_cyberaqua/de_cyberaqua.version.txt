@@ -1,5 +1,5 @@
-Hypersomnia version Revision no.: 1.0.7070 7070
-Build date: (clean)
+Hypersomnia version 1.0.7087
+Revision no.: 7087 (dirty)
+Build date: Wed Nov 13 02:04:31 2019
 Commit message:
-Thu Nov 7 00:02:23 2019
-
+Refactor RCON: can also use it(...)
