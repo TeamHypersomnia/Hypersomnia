@@ -888,8 +888,6 @@ void bomb_mode::setup_round(
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
 
-	LOG_NVPS(clock_before_setup.now.step);
-
 	const auto former_ids = [&]() {
 		std::unordered_map<mode_player_id, entity_id> result;
 

@@ -3972,3 +3972,38 @@ Advantages:
 	 - Actually it doesn't even change the map
 
 - Avatars are lost after changing the map
+- Fix mouse behaviour in fullscreen
+
+- We should check if the spectator gui is ready for sudden complete changes to the sampled cosmos
+	- if some entities aren't actually dead for example
+
+- Write autoupdater so we don't have to save those avatar images in temporary
+	- We'll keep them in cache, just autoupdater will preserve some config values
+	- We might keep the entire config local lua intact, just per-push specify what config values to overwrite
+	- Maybe just preserve the local config and untitled editor works
+		- though with this everything could be preserved
+		- generated file checking should be pretty safe
+		- we have an option to get factory defaults
+		- one could easily delete the user_config.lua
+		- kay what if we only store the modified settings in the user_config.lua?
+		- like a delta
+		- we'll then always have defaults updated
+		- fix these imgui layouts though, "choose team" shouldn't be resized as well as maybe shop
+			- we'll just give a sensible multiplier
+			- close to fullscreen for shop
+
+
+- Automatic updater?
+	- Would also solve the problem with cache?
+
+- Hold user avatar/nickname/other identity in appdata folder
+	- so that we don't have to specify each time a new version comes out
+
+- Port fy_minilab
+	- though change "invariants" to "invariants_state" and same with components
+- Upgrade appveyor
+	- Things to update for windows
+		- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
+			- We had differing versions, the one on our computer is newer so it builds everything
+		- augs::date_time constructor for file write type, used to display last write times of lua meta files, although that's low priority
+

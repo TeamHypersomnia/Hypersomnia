@@ -6,38 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix openssl errors in build process on a clean arch linux
-
-- Fix mouse behaviour in fullscreen
-
-- Lua intercosms are exported a bit different on Linux and Windows
-	- We have something like 4.438729871 vs 4.438729872
-
-- Research chat messages sometimes not working
-
-- Don't kick afk spectators
-- Test what happens without internet connection when launching Hypersomnia on Windows
-
-- While in the main menu, check for updates once every several seconds
-	- e.g. if the server has to restart due to an upgrade, the clients will follow with the update right away
-	- also trigger update check every time we enter the main menu from the client
-	- New version available!
-		- Do you want to restart and upgrade the game now?
-			- Upgrade
-			- Cancel
-				- Automatic update was cancelled.
-
-- Font-scale invariant update window
-
-- Website
-
-- Server/client continuous integration
-	- Automatic client upgrade
-	- Automatic server upgrade
-
-- We should check if the spectator gui is ready for sudden complete changes to the sampled cosmos
-	- if some entities aren't actually dead for example
-
 - client_setup replay
 	- for now we can have entire client setups as snapshots
 	- adapter can have a pointer
@@ -54,26 +22,61 @@ summary: That which we are brainstorming at the moment.
 			- we could make it derive arena mixin with a singular arena gui and not at all care about the arena guis found in client setup snapshots
 		- since we want to be able to spectate all players, note that only our client will possess the actual prediction information
 
+- Benefits of demos
+	- Deterministic repros
+	- Can record without performance hit
+	- Can later record in highest quality only the highlights
+	- Fun moments will never be lost
+
+- We can automatically record demos for every server session
+	- Demos could just be network messages applied at step x
+	- We could pretty much resimulate the entire client setup this way, just without sending messages
+	- Also makes it easier to debug
+	- Snapshots could prove a little hard but we could just resimulate from the beginning if we want to seek backwards
+
+- plan for full server replays
+	- it's just about saving the entropies
+	- server shall be frozen and never advance when there are no players
+	- keeping timing information in arena server vars
+		- we will anyway have to commandize the changing of these rules somehow
+	- server entropy different from mode entropy
+		- since it will also store player information
+	- server entropy serializer
+
+
+- Fix openssl errors in build process on a clean arch linux
+	- Perhaps just use shared libraries if shared can't be found
+
+- While in the main menu, check for updates once every several seconds
+	- e.g. if the server has to restart due to an upgrade, the clients will follow with the update right away
+	- also trigger update check every time we enter the main menu from the client
+	- New version available!
+		- Do you want to restart and upgrade the game now?
+			- Upgrade
+			- Cancel
+				- Automatic update was cancelled.
+
+- Lua intercosms are exported a bit different on Linux and Windows
+	- We have something like 4.438729871 vs 4.438729872
+
+- Research chat messages sometimes not working
+
+- Don't kick afk spectators
+- Test what happens without internet connection when launching Hypersomnia on Windows
+
+- Font-scale invariant update window
+
+- Website
+
+- Server/client continuous integration
+	- Automatic client upgrade
+	- Automatic server upgrade
+
 - completely different approach to client setup replay: only record the relevant messages in some mini format?
 	- well it's less out of the box
 
 - custom chosen ruleset could be a part of mode solvable
 	- or actually client/server solvable (arena_handle)
-
-- Write autoupdater so we don't have to save those avatar images in temporary
-	- We'll keep them in cache, just autoupdater will preserve some config values
-	- We might keep the entire config local lua intact, just per-push specify what config values to overwrite
-	- Maybe just preserve the local config and untitled editor works
-		- though with this everything could be preserved
-		- generated file checking should be pretty safe
-		- we have an option to get factory defaults
-		- one could easily delete the user_config.lua
-		- kay what if we only store the modified settings in the user_config.lua?
-		- like a delta
-		- we'll then always have defaults updated
-		- fix these imgui layouts though, "choose team" shouldn't be resized as well as maybe shop
-			- we'll just give a sensible multiplier
-			- close to fullscreen for shop
 
 - We still have crashes on Windows, even after fixing swap buffers
 	- Perhaps it's a compiler bug since with our home-brewn build everything seemed to be fine
@@ -119,12 +122,6 @@ summary: That which we are brainstorming at the moment.
 		- A way to view dedicated server stats?
 	- Remember to keep the old master rcon password so that basic level rcons cannot change it
 
-- Automatic updater?
-	- Would also solve the problem with cache?
-
-- Hold user avatar/nickname/other identity in appdata folder
-	- so that we don't have to specify each time a new version comes out
-
 - We could set a limit to the number of allowed simultaneous muzzle sounds from the same gun
 	- similarly for health decrease sounds
 
@@ -135,27 +132,6 @@ summary: That which we are brainstorming at the moment.
 		- Even better just no allocations
 		- Though even something as trivial as draw debug details will do a lot of allocations
 	- Use hoard allocator?
-
-- Benefits of demos
-	- Deterministic repros
-	- Can record without performance hit
-	- Can later record in highest quality only the highlights
-	- Fun moments will never be lost
-
-- We can automatically record demos for every server session
-	- Demos could just be network messages applied at step x
-	- We could pretty much resimulate the entire client setup this way, just without sending messages
-	- Also makes it easier to debug
-	- Snapshots could prove a little hard but we could just resimulate from the beginning if we want to seek backwards
-
-- Port fy_minilab
-	- though change "invariants" to "invariants_state" and same with components
-
-- Upgrade appveyor
-	- Things to update for windows
-		- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
-			- We had differing versions, the one on our computer is newer so it builds everything
-		- augs::date_time constructor for file write type, used to display last write times of lua meta files, although that's low priority
 
 - blurred text if zoomed out
 
@@ -377,15 +353,6 @@ summary: That which we are brainstorming at the moment.
 	- we'd have to add remotes and assign branches to them
 
 - always calculate the tickrate from the referential player in case the tickrate suddenly changes
-
-- plan for full server replays
-	- it's just about saving the entropies
-	- server shall be frozen and never advance when there are no players
-	- keeping timing information in arena server vars
-		- we will anyway have to commandize the changing of these rules somehow
-	- server entropy different from mode entropy
-		- since it will also store player information
-	- server entropy serializer
 
 - Letting servers adjust the speed of the game
 	- bomb mode doesn't do timing, it just advances whenever asked, but it has to effecctively use the delta information
