@@ -163,26 +163,36 @@ struct bomb_mode_player_stats {
 
 struct bomb_mode_player {
 	// GEN INTROSPECTOR struct bomb_mode_player
+	player_session_data session;
 	entity_id controlled_character_id;
-	entity_name_str chosen_name;
 	rgba assigned_color = rgba::zero;
-	faction_type faction = faction_type::SPECTATOR;
 	bomb_mode_player_stats stats;
 	uint32_t round_when_chosen_faction = static_cast<uint32_t>(-1); 
 	bool is_bot = false;
-	session_id_type session_id = session_id_type::dead();
 	// END GEN INTROSPECTOR
 
-	bomb_mode_player(const entity_name_str& chosen_name = {}) : 
-		chosen_name(chosen_name) 
-	{}
+	bomb_mode_player(const entity_name_str& chosen_name = {}) {
+		session.chosen_name = chosen_name;
+	}
 
 	bool operator<(const bomb_mode_player& b) const;
 
 	bool is_set() const;
 
-	arena_player_order_info get_order() const {
-		return { chosen_name, stats.calc_score() };
+	const auto& get_chosen_name() const {
+		return session.chosen_name;
+	}
+
+	const auto& get_faction() const {
+		return session.faction;
+	}
+
+	const auto& get_session_id() const {
+		return session.id;
+	}
+
+	auto get_order() const {
+		return arena_player_order_info { get_chosen_name(), stats.calc_score() };
 	}
 };
 
@@ -251,6 +261,12 @@ public:
 
 		std::size_t size() const {
 			return 2;
+		}
+
+		auto get_all() const {
+			augs::constant_size_vector<faction_type, std::size_t(faction_type::COUNT)> result;
+			for_each([&result](const auto f) { result.push_back(f); });
+			return result;
 		}
 
 		void make_swapped(faction_type& f) const {
@@ -559,4 +575,7 @@ public:
 	auto get_next_session_id() const {
 		return next_session_id;
 	}
+
+	arena_migrated_session emigrate() const;
+	void migrate(input, const arena_migrated_session&);
 };

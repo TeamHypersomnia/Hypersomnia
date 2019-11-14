@@ -18,7 +18,7 @@ std::optional<camera_eye> arena_gui_mixin<D>::find_current_camera_eye() const {
 	return self.get_arena_handle().on_mode(
 		[&](const auto& typed_mode) -> std::optional<camera_eye> {
 			if (const auto player = typed_mode.find(self.get_local_player_id())) {
-				if (player->faction == faction_type::SPECTATOR) {
+				if (player->get_faction() == faction_type::SPECTATOR) {
 					return camera_eye();
 				}
 			}
@@ -210,11 +210,11 @@ entity_id arena_gui_mixin<D>::get_game_gui_subject_id() const {
 					return self.get_viewed_character_id();
 				}
 
-				if (local_player_data->faction == faction_type::SPECTATOR) {
+				if (local_player_data->get_faction() == faction_type::SPECTATOR) {
 					return self.get_viewed_character_id();
 				}
 
-				if (viewed_player_data->faction != local_player_data->faction) {
+				if (viewed_player_data->get_faction() != local_player_data->get_faction()) {
 					return local_player_data->controlled_character_id;
 				}
 

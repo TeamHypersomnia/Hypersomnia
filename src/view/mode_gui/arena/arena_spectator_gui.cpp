@@ -89,12 +89,12 @@ void arena_spectator_gui::draw_gui(
 		);
 	};
 
-	const auto num_conscious = typed_mode.num_conscious_players_in(mode_input.cosm, spectated->faction);
+	const auto num_conscious = typed_mode.num_conscious_players_in(mode_input.cosm, spectated->get_faction());
 
 	const auto one_sixth_t = in.screen_size.y / 5;
 
 	draw_text_indicator_at(fmt(top_caption, yellow), one_sixth_t);
-	draw_text_indicator_at(fmt(spectated->chosen_name, white), one_sixth_t + cell_h);
+	draw_text_indicator_at(fmt(spectated->get_chosen_name(), white), one_sixth_t + cell_h);
 
 	const auto& key_map = in.config.general_gui_controls;
 
@@ -154,7 +154,7 @@ void arena_spectator_gui::advance(
 			return true;
 		}
 
-		local_faction = player_data->faction;
+		local_faction = player_data->get_faction();
 
 		if (const auto controlled = cosm[player_data->controlled_character_id]) {
 			if (::sentient_and_conscious(controlled)) {

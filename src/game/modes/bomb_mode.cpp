@@ -1,4 +1,5 @@
 #include "augs/log.h"
+#include "augs/ensure_rel.h"
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/messages/health_event.h"
 #include "game/modes/bomb_mode.hpp"
@@ -98,8 +99,8 @@ static void delete_with_held_items(const input_type in, const logic_step step, c
 }
 
 bool bomb_mode_player::operator<(const bomb_mode_player& b) const {
-	const auto ao = arena_player_order { chosen_name, stats.calc_score() };
-	const auto bo = arena_player_order { b.chosen_name, b.stats.calc_score() };
+	const auto ao = arena_player_order { get_chosen_name(), stats.calc_score() };
+	const auto bo = arena_player_order { b.get_chosen_name(), b.stats.calc_score() };
 
 	return ao < bo;
 }
@@ -115,13 +116,13 @@ std::size_t bomb_mode::get_step_rng_seed(const cosmos& cosm) const {
 
 faction_choice_result bomb_mode::choose_faction(const const_input_type in, const mode_player_id& id, const faction_type faction) {
 	if (const auto entry = find(id)) {
-		const auto previous_faction = entry->faction;
+		const auto previous_faction = entry->get_faction();
 
 		if (previous_faction == faction) {
 			return faction_choice_result::THE_SAME;
 		}
 
-		entry->faction = faction;
+		entry->session.faction = faction;
 
 		on_faction_changed_for(in, previous_faction, id);
 
@@ -181,7 +182,7 @@ faction_type bomb_mode::calc_weakest_faction(const const_input_type in) const {
 
 faction_type bomb_mode::get_player_faction(const mode_player_id& id) const {
 	if (const auto entry = find(id)) {
-		return entry->faction;
+		return entry->get_faction();
 	}
 
 	return faction_type::SPECTATOR;
@@ -430,8 +431,8 @@ bool bomb_mode::add_player_custom(const input_type in, const add_player_input& a
 	}
 
 	LOG_NVPS(new_id.value, next_session_id.value);
-	new_player.chosen_name = add_in.name;
-	new_player.session_id = next_session_id;
+	new_player.session.chosen_name = add_in.name;
+	new_player.session.id = next_session_id;
 	++next_session_id;
 
 	if (state == arena_mode_state::WARMUP) {
@@ -460,7 +461,7 @@ mode_player_id bomb_mode::add_player(const input_type in, const entity_name_str&
 }
 
 bool bomb_mode_player::is_set() const {
-	return !chosen_name.empty();
+	return !get_chosen_name().empty();
 }
 
 void bomb_mode::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
@@ -469,7 +470,7 @@ void bomb_mode::remove_player(input_type in, const logic_step step, const mode_p
 	delete_with_held_items(in, step, in.cosm[controlled_character_id]);
 
 	if (const auto entry = find(id)) {
-		const auto previous_faction = entry->faction;
+		const auto previous_faction = entry->get_faction();
 		const auto free_color = entry->assigned_color;
 
 		erase_element(players, id);
@@ -575,11 +576,11 @@ void bomb_mode::assign_free_color_to_best_uncolored(const const_input_type in, c
 				return false;
 			}
 
-			if (a.second.faction != previous_faction) {
+			if (a.second.get_faction() != previous_faction) {
 				return true;
 			}
 
-			if (b.second.faction != previous_faction) {
+			if (b.second.get_faction() != previous_faction) {
 				return false;
 			}
 
@@ -590,7 +591,7 @@ void bomb_mode::assign_free_color_to_best_uncolored(const const_input_type in, c
 	auto& best = best_uncolored_player_of_this_faction.second;
 
 	if (best.assigned_color == fallback_color) {
-		if (best.faction == previous_faction) {
+		if (best.get_faction() == previous_faction) {
 			best.assigned_color = free_color;
 		}
 	}
@@ -605,7 +606,7 @@ void bomb_mode::on_faction_changed_for(const const_input_type in, const faction_
 
 		entry->assigned_color = rgba::zero;
 
-		if (entry->faction == faction_type::SPECTATOR) {
+		if (entry->get_faction() == faction_type::SPECTATOR) {
 			return;
 		}
 
@@ -616,7 +617,7 @@ void bomb_mode::on_faction_changed_for(const const_input_type in, const faction_
 				for (const auto& it : players) {
 					const auto& player_data = it.second;
 
-					if (player_data.faction == entry->faction) {
+					if (player_data.get_faction() == entry->get_faction()) {
 						if (player_data.assigned_color == candidate_color) {
 							collision_found = true;
 							break;
@@ -643,7 +644,7 @@ void bomb_mode::on_faction_changed_for(const const_input_type in, const faction_
 
 faction_choice_result bomb_mode::auto_assign_faction(const input_type in, const mode_player_id& id) {
 	if (const auto entry = find(id)) {
-		auto& f = entry->faction;
+		auto& f = entry->session.faction;
 		const auto previous_faction = f;
 		f = faction_type::SPECTATOR;
 
@@ -795,7 +796,7 @@ entity_id bomb_mode::create_character_for_player(
 		auto& cosm = in.cosm;
 
 		const auto handle = [&]() {
-			const auto faction = p.faction;
+			const auto faction = p.get_faction();
 
 			if (faction == faction_type::SPECTATOR) {
 				return cosm[entity_id()];
@@ -819,7 +820,7 @@ entity_id bomb_mode::create_character_for_player(
 		}();
 
 		if (handle.alive()) {
-			cosmic::set_specific_name(handle, p.chosen_name);
+			cosmic::set_specific_name(handle, p.get_chosen_name());
 
 			if (const auto sentience = handle.template find<components::sentience>()) {
 				if (in.rules.enable_player_colors) {
@@ -1097,8 +1098,8 @@ void bomb_mode::count_knockout(const input_type in, const entity_id victim, cons
 		if (const auto mode_id = lookup(handle.get_id()); mode_id.is_set()) {
 			if (const auto player_data = find(mode_id)) {
 				participant.id = mode_id;
-				participant.name = player_data->chosen_name;
-				participant.faction = player_data->faction;
+				participant.name = player_data->get_chosen_name();
+				participant.faction = player_data->get_faction();
 			}
 		}
 	};
@@ -1250,7 +1251,7 @@ void bomb_mode::make_win(const input_type in, const faction_type winner) {
 	
 	for (auto& p : players) {
 		const auto& player_id = p.first;
-		const auto faction = p.second.faction;
+		const auto faction = p.second.get_faction();
 
 		post_award(in, player_id, faction == winner ? winner_award : loser_award);
 	}
@@ -1422,7 +1423,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 void bomb_mode::swap_assigned_factions(const bomb_mode::participating_factions& p) {
 	for (auto& it : players) {
 		auto& player_data = it.second;
-		p.make_swapped(player_data.faction);
+		p.make_swapped(player_data.session.faction);
 	}
 }
 
@@ -1441,7 +1442,7 @@ void bomb_mode::scramble_assigned_factions(const bomb_mode::participating_factio
 	const auto off = rng.randval(0, 1); 
 
 	for (std::size_t i = 0; i < ptrs.size(); ++i) {
-		ptrs[i]->faction = (i + off) % 2 ? p.defusing : p.bombing;
+		ptrs[i]->session.faction = (i + off) % 2 ? p.defusing : p.bombing;
 	}
 }
 
@@ -1487,6 +1488,66 @@ void bomb_mode::handle_special_commands(const input_type in, const mode_entropy&
 	);
 }
 
+arena_migrated_session bomb_mode::emigrate() const {
+	arena_migrated_session session;
+
+	for (const auto& emigrated_player : players) {
+		arena_migrated_player_entry entry;
+		entry.mode_id = emigrated_player.first;
+		entry.data = emigrated_player.second.session;
+
+		session.players.emplace_back(std::move(entry));
+	}
+
+	session.next_session_id = next_session_id;
+	return session;
+}
+
+void bomb_mode::migrate(const input_type in, const arena_migrated_session& session) {
+	ensure(players.empty());
+	ensure_eq(0u, get_round_num());
+
+	std::unordered_map<faction_type, faction_type> faction_mapping;
+
+	for (const auto& migrated_player : session.players) {
+		const auto f = migrated_player.data.faction;
+
+		if (f != faction_type::SPECTATOR) {
+			faction_mapping[f] = f;
+		}
+	}
+
+	const auto participating = calc_participating_factions(in).get_all();
+	std::size_t i = 0;
+
+	for (auto& f : faction_mapping) {
+		const auto new_faction = participating[std::min(participating.size() - 1, i)];
+
+		LOG("Migrating faction: %x to faction: %x", format_enum(f.second), format_enum(new_faction));
+		f.second = new_faction;
+		++i;
+	}
+
+	faction_mapping[faction_type::SPECTATOR] = faction_type::SPECTATOR;
+
+	for (const auto& migrated_player : session.players) {
+		const auto mode_id = migrated_player.mode_id;
+		const auto& it = players.try_emplace(mode_id);
+		auto& new_player = (*it.first).second;
+
+		ensure(it.second);
+		ensure(!new_player.is_set());
+
+		new_player.session = migrated_player.data;
+
+		new_player.session.faction = faction_mapping.at(new_player.session.faction);
+		on_faction_changed_for(in, faction_type::DEFAULT, mode_id);
+		LOG("Moving %x to %x", new_player.get_chosen_name(), format_enum(new_player.get_faction()));
+	}
+
+	next_session_id = session.next_session_id;
+}
+
 void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	(void)step;
 
@@ -1501,7 +1562,7 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 			messages::game_notification notification;
 
 			notification.subject_mode_id = a.id;
-			notification.subject_name = entry->chosen_name;
+			notification.subject_name = entry->get_chosen_name();
 			notification.payload = messages::joined_or_left::JOINED;
 
 			step.post_message(std::move(notification));
@@ -1520,7 +1581,7 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 			messages::game_notification notification;
 
 			notification.subject_mode_id = g.removed_player;
-			notification.subject_name = entry->chosen_name;
+			notification.subject_name = entry->get_chosen_name();
 			notification.payload = messages::joined_or_left::LEFT;
 
 			step.post_message(std::move(notification));
@@ -1681,7 +1742,7 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 					});
 				}
 				else if constexpr(std::is_same_v<C, team_choice>) {
-					const auto previous_faction = player_data->faction;
+					const auto previous_faction = player_data->get_faction();
 
 					const auto requested_faction = typed_command;
 
@@ -1771,7 +1832,7 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 						return choose_faction(in, id, requested_faction);
 					}();
 
-					const auto final_faction = player_data->faction;
+					const auto final_faction = player_data->get_faction();
 
 					if (result == faction_choice_result::CHANGED) {
 						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(final_faction));
@@ -1787,7 +1848,7 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 
 					messages::game_notification notification;
 					notification.subject_mode_id = id;
-					notification.subject_name = player_data->chosen_name;
+					notification.subject_name = player_data->get_chosen_name();
 					notification.payload = choice;
 
 					step.post_message(std::move(notification));
@@ -2317,12 +2378,12 @@ auto bomb_mode::find_player_by_impl(S& self, const E& identifier) {
 		auto& player_data = it.second;
 
 		if constexpr(std::is_same_v<entity_name_str, E>) {
-			if (player_data.chosen_name == identifier) {
+			if (player_data.get_chosen_name() == identifier) {
 				return std::addressof(it);
 			}
 		}
 		else if constexpr(std::is_same_v<session_id_type, E>) {
-			if (player_data.session_id == identifier) {
+			if (player_data.get_session_id() == identifier) {
 				return std::addressof(it);
 			}
 		}
@@ -2446,14 +2507,14 @@ bool bomb_mode::suitable_for_spectating(
 	const real32 limit_in_seconds
 ) const {
 	if (const auto by_data = find(by)) {
-		const auto spectator_faction = by_data->faction;
+		const auto spectator_faction = by_data->get_faction();
 		const bool can_watch_anybody = spectator_faction == faction_type::SPECTATOR && in.rules.allow_spectator_to_see_both_teams;
 
 		const auto num_conscious_teammates = num_conscious_players_in(in.cosm, spectator_faction);
 		const bool all_teammates_unconscious = in.rules.allow_spectate_enemy_if_no_conscious_players && 0 == num_conscious_teammates;
 
 		if (const auto who_data = find(who)) {
-			if (can_watch_anybody || all_teammates_unconscious || who_data->faction == spectator_faction) {
+			if (can_watch_anybody || all_teammates_unconscious || who_data->get_faction() == spectator_faction) {
 				return conscious_or_can_still_spectate(in, who, limit_in_seconds);
 			}
 		}
@@ -2503,7 +2564,7 @@ mode_player_id bomb_mode::get_next_to_spectate(
 		return {};
 	}
 
-	const auto spectator_faction = spectator_data->faction;
+	const auto spectator_faction = spectator_data->get_faction();
 
 	auto can_still_spectate = [&](const auto& who) {
 		return conscious_or_can_still_spectate(in, who, limit_in_seconds);
@@ -2511,7 +2572,7 @@ mode_player_id bomb_mode::get_next_to_spectate(
 
 	auto gather_candidates_from_all_players = [&]() {
 		for (const auto& p : players) {
-			if (p.second.faction != faction_type::SPECTATOR) {
+			if (p.second.get_faction() != faction_type::SPECTATOR) {
 				if (can_still_spectate(p.first)) {
 					sorted_players.emplace_back(p.second.get_order());
 				}
@@ -2534,7 +2595,7 @@ mode_player_id bomb_mode::get_next_to_spectate(
 		}
 		else {
 			for (const auto& p : players) {
-				if (p.second.faction == spectator_faction) {
+				if (p.second.get_faction() == spectator_faction) {
 					if (can_still_spectate(p.first)) {
 						sorted_players.emplace_back(p.second.get_order());
 					}
@@ -2591,7 +2652,7 @@ augs::maybe<rgba> bomb_mode::get_current_fallback_color_for(const const_input_ty
 	for (const auto& it : players) {
 		const auto& player_data = it.second;
 
-		if (player_data.faction == faction) {
+		if (player_data.get_faction() == faction) {
 			++faction_count;
 		}
 	}

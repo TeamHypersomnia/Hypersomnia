@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "augs/drawing/drawing.hpp"
 #include "augs/gui/text/printer.h"
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
@@ -412,7 +413,7 @@ void arena_scoreboard_gui::draw_gui(
 
 			const auto local_player_faction = [&]() {
 				if (const auto p = typed_mode.find(draw_in.local_player_id)) {
-					return p->faction;
+					return p->get_faction();
 				}
 
 				return faction_type::SPECTATOR;
@@ -645,7 +646,7 @@ void arena_scoreboard_gui::draw_gui(
 			}
 
 			next_col();
-			col_text(player_data.chosen_name);
+			col_text(player_data.get_chosen_name());
 			//print_col_text(*current_column, "(Kierownik imprezy)", white, true);
 			next_col();
 
@@ -686,7 +687,6 @@ void arena_scoreboard_gui::draw_gui(
 	print_faction(participants.defusing, true);
 	print_faction(participants.bombing, false);
 
-
 	{
 		const auto faction = faction_type::SPECTATOR;
 
@@ -715,7 +715,7 @@ void arena_scoreboard_gui::draw_gui(
 			pen.y += cell_h;
 
 			for (const auto& p : sorted_players) {
-				print_col_text(columns[3], p.first.chosen_name, column_label_color);
+				print_col_text(columns[3], p.first.get_chosen_name(), column_label_color);
 				pen.y += cell_h;
 			}
 		}

@@ -9,6 +9,7 @@ inline void choose_arena(
 	cosmos_solvable_significant& initial_signi
 ) {
 	const auto& name = vars.current_arena;
+	const auto emigrated_session = handle.on_mode([](const auto& typed_mode) { return typed_mode.emigrate(); });
 
 	if (name.empty()) {
 		LOG_DIRECT("Arena name empty, so making a default one.");
@@ -35,5 +36,11 @@ inline void choose_arena(
 		LOG_NVPS(vars.override_default_ruleset);
 		ensure(false && "Not implemented!");
 	}
+
+	handle.on_mode_with_input(
+		[&emigrated_session](auto& typed_mode, const auto& input) {
+			typed_mode.migrate(input, emigrated_session);
+		}
+	);
 }
 

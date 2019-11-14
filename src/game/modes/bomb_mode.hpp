@@ -6,7 +6,7 @@
 template <class F>
 void bomb_mode::for_each_player_in(const faction_type faction, F&& callback) const {
 	for (auto& it : players) {
-		if (it.second.faction == faction) {
+		if (it.second.get_faction() == faction) {
 			if (continue_or_callback_result(std::forward<F>(callback), it.first, it.second) == callback_result::ABORT) {
 				return;
 			}

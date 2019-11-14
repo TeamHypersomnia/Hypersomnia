@@ -1,6 +1,10 @@
 #include "application/gui/client/client_gui_state.h"
 #include "augs/templates/container_templates.h"
 
+bool client_gui_state::requires_cursor() const {
+	return rcon.show;
+}
+
 bool client_gui_state::control(const handle_input_before_game_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;

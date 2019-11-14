@@ -10,8 +10,30 @@
 #include "game/modes/detail/item_purchase_structs.h"
 #include "game/modes/detail/fog_of_war_settings.h"
 #include "game/modes/arena_player_order.h"
+#include "game/modes/session_id.h"
 
 using mode_entity_id = entity_id;
+
+struct arena_migrated_player {
+	// GEN INTROSPECTOR struct arena_migrated_player
+	entity_name_str chosen_name;
+	session_id_type id = session_id_type::dead();
+	faction_type faction = faction_type::SPECTATOR;
+	// END GEN INTROSPECTOR
+};
+
+struct arena_migrated_player_entry {
+	mode_player_id mode_id;
+	arena_migrated_player data;
+};
+
+using arena_migrated_players = std::vector<arena_migrated_player_entry>;
+using player_session_data = arena_migrated_player;
+
+struct arena_migrated_session {
+	arena_migrated_players players;
+	session_id_type next_session_id;
+};
 
 struct arena_mode_win {
 	// GEN INTROSPECTOR struct arena_mode_win

@@ -436,4 +436,7 @@ public:
 		const server_client_state&,
 		const client_id_type& id
 	) const;
+
+	bool requires_cursor() const;
+	bool player_added_to_mode(mode_player_id) const;
 };

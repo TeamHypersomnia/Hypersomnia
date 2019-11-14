@@ -11,6 +11,15 @@ for viewing, mid-way.
 
 This would cause the should_draw_gui check to pass whereas a dead
 character would later be chosen as a subject, causing a crash.
+	- **With regards to:**
+		- We should really review spectator thoroughly, especially with regards to what happens during disconnects or hard re-predictions
+
+		- Rare crashes on disconnects of other people
+			- Maybe some untimely payload comes in after removed_player is handled?
+				- and we assume that the player still exists within the scene?
+			- untimely payloads aren't just limited to avatars, we still have pings for example
+			- spectator fucks up?
+
 
 - Strange performance problem when paused in editor?
 	- We had Unity and OBS turned on...

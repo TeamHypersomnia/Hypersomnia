@@ -111,7 +111,7 @@ mode_player_entropy arena_gui_state::perform_imgui(
 						mode_input.rules.view.square_logos,
 						factions,
 						mode_in.images_in_atlas,
-						p->faction
+						p->get_faction()
 					});
 
 					if (logically_set(choice)) {
@@ -183,7 +183,7 @@ void arena_gui_state::draw_mode_gui(
 
 		const auto local_player_faction = [&]() -> std::optional<faction_type> {
 			if (const auto p = typed_mode.find(local_player_id)) {
-				return p->faction;
+				return p->get_faction();
 			}
 
 			return std::nullopt;
@@ -319,7 +319,7 @@ void arena_gui_state::draw_mode_gui(
 
 				if (tool_owner.is_set()) {
 					if (const auto owner_data = typed_mode.find(tool_owner)) {
-						return owner_data->chosen_name + "'s";
+						return owner_data->get_chosen_name() + "'s";
 					}
 				}
 
@@ -964,7 +964,7 @@ void arena_gui_state::draw_mode_gui(
 				in.screen_size,
 				in.gui_fonts.gui,
 				viewed_player_handle,
-				viewed_player_data->faction,
+				viewed_player_data->get_faction(),
 				choose_team.show,
 				buy_menu.show,
 				in.is_cursor_released
@@ -996,7 +996,7 @@ void arena_gui_state::draw_mode_gui(
 							return false;
 						}
 
-						return viewed_player_data->faction == *local_player_faction;
+						return viewed_player_data->get_faction() == *local_player_faction;
 					}
 				}
 

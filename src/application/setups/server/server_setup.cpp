@@ -25,6 +25,7 @@
 #include "application/network/payload_easily_movable.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "application/gui/client/rcon_gui.hpp"
+#include "application/arena/arena_handle.hpp"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -152,7 +153,7 @@ std::optional<session_id_type> server_setup::find_session_id(const client_id_typ
 	return get_arena_handle().on_mode(
 		[&](const auto& mode) -> std::optional<session_id_type> {
 			if (const auto entry = mode.find(to_mode_player_id(id))) {
-				return entry->session_id;
+				return entry->get_session_id();
 			}
 
 			return std::nullopt;
@@ -201,7 +202,7 @@ std::string server_setup::find_client_nickname(const client_id_type& id) const {
 	get_arena_handle().on_mode(
 		[&](const auto& mode) {
 			if (const auto entry = mode.find(to_mode_player_id(id))) {
-				nickname = ": " + entry->chosen_name;
+				nickname = ": " + entry->get_chosen_name();
 			}
 		}
 	);
@@ -310,8 +311,6 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 		if (force || old_vars.current_arena != new_vars.current_arena) {
 			try {
 				choose_arena(new_vars.current_arena);
-
-				arena_gui.reset();
 			}
 			catch (const augs::file_open_error& err) {
 				/* 
@@ -362,27 +361,35 @@ void server_setup::choose_arena(const std::string& name) {
 
 	solvable_vars.current_arena = name;
 
+	const auto& arena = get_arena_handle();
+
 	::choose_arena(
 		lua,
-		get_arena_handle(),
+		arena,
 		solvable_vars,
 		initial_signi
 	);
 
 	arena_gui.reset();
+	arena_gui.choose_team.show = ::is_spectator(arena, get_local_player_id());
+
 	integrated_client_gui.rcon.show = false;
 
 	if (should_have_admin_character()) {
-		mode_entropy_general cmd;
+		const auto admin_id = get_admin_player_id();
 
-		cmd.added_player = add_player_input {
-			get_admin_player_id(),
-			integrated_client_vars.nickname,
-			faction_type::SPECTATOR
-		};
+		if (!player_added_to_mode(admin_id)) {
+			mode_entropy_general cmd;
 
-		local_collected.clear();
-		local_collected.control(cmd);
+			cmd.added_player = add_player_input {
+				get_admin_player_id(),
+				integrated_client_vars.nickname,
+				faction_type::SPECTATOR
+			};
+
+			local_collected.clear();
+			local_collected.control(cmd);
+		}
 	}
 }
 
@@ -427,14 +434,6 @@ void server_setup::advance_clients_state() {
 		return static_cast<uint32_t>(ms * inv_simulation_delta_ms);
 	};
 
-	auto character_exists_for = [&](const mode_player_id mode_id) {
-		return get_arena_handle().on_mode(
-			[&](const auto& typed_mode) {
-				return typed_mode.find(mode_id);
-			}
-		);
-	};
-
 	auto process_client = [&](const client_id_type client_id, auto& c) {
 		using S = client_state_type;
 		const auto mode_id = to_mode_player_id(client_id);
@@ -463,7 +462,7 @@ void server_setup::advance_clients_state() {
 
 		if (!c.is_set()) {
 			if (!removed_someone_already) {
-				if (character_exists_for(mode_id)) {
+				if (player_added_to_mode(mode_id)) {
 					ensure(!removed_someone_already);
 
 					mode_entropy_general cmd;
@@ -638,7 +637,7 @@ void server_setup::advance_clients_state() {
 
 		if (!added_someone_already) {
 			if (c.state > client_state_type::PENDING_WELCOME) {
-				if (!character_exists_for(mode_id)) {
+				if (!player_added_to_mode(mode_id)) {
 					if (add_client_to_mode()) {
 						if (c.state == S::WELCOME_ARRIVED) {
 							send_state_for_the_first_time();
@@ -1330,8 +1329,8 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 	auto sender_player_faction = faction_type::SPECTATOR;
 
 	if (sender_player != nullptr) {
-		sender_player_faction = sender_player->faction;
-		sender_player_nickname = sender_player->chosen_name;
+		sender_player_faction = sender_player->get_faction();
+		sender_player_nickname = sender_player->get_chosen_name();
 	}
 
 	bool integrated_received = false;
@@ -1355,7 +1354,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 				}
 			);
 
-			const auto recipient_player_faction = recipient_player ? recipient_player->faction : faction_type::SPECTATOR;
+			const auto recipient_player_faction = recipient_player ? recipient_player->get_faction() : faction_type::SPECTATOR;
 
 			if (sender_player_faction != recipient_player_faction) {
 				return;
@@ -1527,6 +1526,14 @@ void server_setup::log_performance() {
 			}
 		}
 	}
+}
+
+bool server_setup::requires_cursor() const {
+	return arena_base::requires_cursor() || integrated_client_gui.requires_cursor();
+}
+
+bool server_setup::player_added_to_mode(const mode_player_id mode_id) const {
+	return found_in(get_arena_handle(), mode_id);
 }
 
 #include "augs/readwrite/to_bytes.h"

@@ -8,4 +8,5 @@ struct client_gui_state {
 	rcon_gui_state rcon;
 
 	bool control(const handle_input_before_game_input in);
+	bool requires_cursor() const;
 };

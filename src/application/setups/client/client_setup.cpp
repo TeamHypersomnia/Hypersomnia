@@ -31,6 +31,7 @@
 #include "application/gui/pretty_tabs.h"
 
 #include "application/gui/client/rcon_gui.hpp"
+#include "application/arena/arena_handle.hpp"
 
 void snap_interpolated_to_logical(cosmos&);
 
@@ -218,14 +219,17 @@ message_handler_result client_setup::handle_server_message(
 			LOG("Client loads arena: %x", new_arena);
 
 			try {
+				const auto& referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
+
 				::choose_arena(
 					lua,
-					get_arena_handle(client_arena_type::REFERENTIAL),
+					referential_arena,
 					new_vars,
 					initial_signi
 				);
 
 				arena_gui.reset();
+				arena_gui.choose_team.show = ::is_spectator(referential_arena, get_local_player_id());
 				client_gui.rcon.show = false;
 			}
 			catch (const augs::file_open_error& err) {
@@ -269,8 +273,8 @@ message_handler_result client_setup::handle_server_message(
 		auto sender_player_faction = faction_type::SPECTATOR;
 
 		if (sender_player != nullptr) {
-			sender_player_faction = sender_player->faction;
-			sender_player_nickname = sender_player->chosen_name;
+			sender_player_faction = sender_player->get_faction();
+			sender_player_nickname = sender_player->get_chosen_name();
 		}
 		else {
 			if (!author_id.is_set()) {
@@ -1074,7 +1078,7 @@ std::optional<session_id_type> client_setup::find_session_id(const mode_player_i
 	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
 		[&](const auto& mode) -> std::optional<session_id_type> {
 			if (const auto entry = mode.find(id)) {
-				return entry->session_id;
+				return entry->session.id;
 			}
 
 			return std::nullopt;
@@ -1171,4 +1175,8 @@ void client_setup::handle_new_session(const add_player_input& in) {
 
 	erase_if(untimely_payloads, untimely_handler);
 	rebuild_player_meta_viewables = true;
+}
+
+bool client_setup::requires_cursor() const {
+	return arena_base::requires_cursor() || client_gui.requires_cursor();
 }

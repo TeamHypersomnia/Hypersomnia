@@ -3971,3 +3971,4 @@ Advantages:
 - Changing map on the integrated server doesn't re-add the admin player
 	 - Actually it doesn't even change the map
 
+- Avatars are lost after changing the map

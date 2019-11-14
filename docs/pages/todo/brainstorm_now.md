@@ -6,19 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Avatars are lost after changing the map
+- Fix openssl errors in build process on a clean arch linux
+
 - Fix mouse behaviour in fullscreen
 
 - Lua intercosms are exported a bit different on Linux and Windows
 	- We have something like 4.438729871 vs 4.438729872
-
-- We should really review spectator thoroughly, especially with regards to what happens during disconnects or hard re-predictions
-
-- Rare crashes on disconnects of other people
-	- Maybe some untimely payload comes in after removed_player is handled?
-		- and we assume that the player still exists within the scene?
-	- untimely payloads aren't just limited to avatars, we still have pings for example
-	- spectator fucks up?
 
 - Research chat messages sometimes not working
 

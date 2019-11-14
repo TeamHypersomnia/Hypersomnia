@@ -591,4 +591,6 @@ public:
 	rcon_level_type get_rcon_level() const {
 		return client_gui.rcon.level;
 	}
+
+	bool requires_cursor() const;
 };
