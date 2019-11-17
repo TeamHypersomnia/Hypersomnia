@@ -1,5 +1,5 @@
-Hypersomnia version 1.0.7083
-Revision no.: 7083 (dirty)
-Build date: Mon Nov 11 18:14:19 2019
+Hypersomnia version 1.0.7094
+Revision no.: 7094 (dirty)
+Build date: Sun Nov 17 12:42:52 2019
 Commit message:
-Fix linux server address
+Remove "GUI" audio volume; jus(...)
