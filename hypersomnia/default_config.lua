@@ -122,9 +122,9 @@ return {
 	sound_meters_per_second = 150
   },
   audio_volume = {
-    gui = 1,
-    music = 0.55,
-    sound_effects = 1
+    master = 1,
+    sound_effects = 1,
+    music = 0.55
   },
   sound = {
     processing_frequency = "EVERY_SIMULATION_STEP",

@@ -4,9 +4,9 @@
 namespace augs {
 	struct audio_volume_settings {
 		// GEN INTROSPECTOR struct augs::audio_volume_settings
+		float master = 1.f;
 		float sound_effects = 1.f;
 		float music = 1.f;
-		float gui = 1.f;
 		// END GEN INTROSPECTOR
 	};
 

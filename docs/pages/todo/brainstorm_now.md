@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- let GUI sound volume just be the sound effect volume
-- Master volume
-
 - client_setup replay
 	- for now we can have entire client setups as snapshots
 	- adapter can have a pointer

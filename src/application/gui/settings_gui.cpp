@@ -405,9 +405,9 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.audio_volume;
 
-					revertable_slider(SCOPE_CFG_NVP(music), 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(master), 0.f, 1.f);
 					revertable_slider(SCOPE_CFG_NVP(sound_effects), 0.f, 1.f);
-					revertable_slider("GUI", scope_cfg.gui, 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(music), 0.f, 1.f);
 				}
 
 				text_disabled("\n\n");

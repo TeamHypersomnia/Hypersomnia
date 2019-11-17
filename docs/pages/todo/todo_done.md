@@ -4007,3 +4007,6 @@ Advantages:
 			- We had differing versions, the one on our computer is newer so it builds everything
 		- augs::date_time constructor for file write type, used to display last write times of lua meta files, although that's low priority
 
+- let GUI sound volume just be the sound effect volume
+- Master volume
+

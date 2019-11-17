@@ -337,15 +337,17 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	const bool is_nonlinear = !is_linear && dist_model != augs::distance_model::NONE;
 
 	const auto mult_via_settings = [&]() {
+		const auto master = in.volume.master;
+
 		if (original.input.modifier.always_direct_listener) {
 			if (const auto buf = source.buffer_meta; buf.is_set()) {
 				if (buf.computed_length_in_seconds > in.settings.treat_as_music_sounds_longer_than_secs) {
-					return in.volume.music;
+					return master * in.volume.music;
 				}
 			}
 		}
 
-		return in.volume.sound_effects;
+		return master * in.volume.sound_effects;
 	}();
 
 	const auto flash_mult = in.owner.get_effective_flash_mult();
