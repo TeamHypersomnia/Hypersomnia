@@ -1,7 +1,9 @@
 #pragma once
 
 enum class client_arena_type {
-	PREDICTED,
-	REFERENTIAL
+	// GEN INTROSPECTOR enum class client_arena_type
+	REFERENTIAL,
+	PREDICTED
+	// END GEN INTROSPECTOR
 };
 

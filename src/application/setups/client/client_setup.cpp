@@ -133,7 +133,7 @@ bool client_setup::is_spectating_referential() const {
 		}
 	);
 	
-	return vars.spectate_referential_state && should_spectator_be_drawn;
+	return vars.spectated_arena_type == client_arena_type::REFERENTIAL && should_spectator_be_drawn;
 }
 
 client_arena_type client_setup::get_viewed_arena_type() const {
@@ -1179,4 +1179,12 @@ void client_setup::handle_new_session(const add_player_input& in) {
 
 bool client_setup::requires_cursor() const {
 	return arena_base::requires_cursor() || client_gui.requires_cursor();
+}
+
+void client_setup::ensure_handler() {
+	save_recorded_demo_chunks();
+}
+
+void client_setup::save_recorded_demo_chunks() {
+
 }

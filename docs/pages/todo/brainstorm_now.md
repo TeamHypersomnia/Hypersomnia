@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- client_setup replay (re-visited)
+	- let packets from server be saved on the message level
+	- I think adapter should just have if elses since client setup logic is way more important
+		- negliglible overhead really
+	- Design the file so that we periodically append
+
 - client_setup replay
 	- for now we can have entire client setups as snapshots
 	- adapter can have a pointer
@@ -21,6 +27,8 @@ summary: That which we are brainstorming at the moment.
 		- note that spectator gui should work in the demo replay setup
 			- we could make it derive arena mixin with a singular arena gui and not at all care about the arena guis found in client setup snapshots
 		- since we want to be able to spectate all players, note that only our client will possess the actual prediction information
+
+- Run thread sanitizer at least once
 
 - Benefits of demos
 	- Deterministic repros

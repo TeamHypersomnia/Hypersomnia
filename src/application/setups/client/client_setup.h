@@ -542,7 +542,8 @@ public:
 		return render_layer_filter::disabled();
 	}
 
-	void ensure_handler() {}
+	void ensure_handler();
+	void save_recorded_demo_chunks();
 
 	mode_player_id get_local_player_id() const;
 	std::optional<session_id_type> find_local_session_id() const;

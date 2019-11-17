@@ -849,12 +849,46 @@ void settings_gui_state::perform(
 
 				input_text<max_nickname_length_v>(label, scope_cfg.nickname);
 
+				input_text<max_rcon_password_length_v>(SCOPE_CFG_NVP(rcon_password)); revert(scope_cfg.rcon_password);
+
+				revertable_checkbox("Record demo", scope_cfg.demo_recording_path.is_enabled);
+
+				if (scope_cfg.demo_recording_path.is_enabled) {
+					auto scope = scoped_indent();
+					
+					input_text<512>("Target demo directory", scope_cfg.demo_recording_path.value, ImGuiInputTextFlags_EnterReturnsTrue); revert(scope_cfg.demo_recording_path.value);
+				}
+
 				{
 					auto& scope_cfg = config.arena_mode_gui;
 					revertable_checkbox(SCOPE_CFG_NVP(show_client_resyncing_notifier));
 				}
 
-				if (auto node = scoped_tree_node("Lag compensation techniques")) {
+				if (auto node = scoped_tree_node("Chat window")) {
+					auto& scope_cfg = config.client.client_chat;
+
+					revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
+					revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
+
+					revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 30u);
+					revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 30.f);
+				}
+
+				if (auto node = scoped_tree_node("Advanced")) {
+					revertable_enum_radio("Spectate:", scope_cfg.spectated_arena_type, true);
+					revertable_slider(SCOPE_CFG_NVP(max_buffered_server_commands), 0u, 10000u);
+					revertable_slider(SCOPE_CFG_NVP(max_predicted_client_commands), 0u, 3000u);
+				}
+
+				ImGui::Separator();
+
+				text_color("Lag compensation", yellow);
+
+				ImGui::Separator();
+
+				do_lag_simulator(config.client.network_simulator);
+
+				{
 					{
 						auto& scope_cfg = config.simulation_receiver;
 						revertable_slider(SCOPE_CFG_NVP(misprediction_smoothing_multiplier), 0.f, 3.f);
@@ -873,33 +907,18 @@ void settings_gui_state::perform(
 					}
 				}
 
-				if (auto node = scoped_tree_node("Requested network settings")) {
-					auto& scope_cfg = config.client.net.jitter;
+				ImGui::Separator();
 
-					if (auto node = scoped_tree_node("Jitter")) {
-						revertable_slider(SCOPE_CFG_NVP(buffer_at_least_steps), 0u, 10u);
-						revertable_slider(SCOPE_CFG_NVP(buffer_at_least_ms), 0u, 100u);
-						revertable_slider(SCOPE_CFG_NVP(max_commands_to_squash_at_once), uint8_t(0), uint8_t(255));
-					}
-				}
+				text_color("Jitter compensation", yellow);
 
-				revertable_slider(SCOPE_CFG_NVP(max_buffered_server_commands), 0u, 10000u);
-				revertable_slider(SCOPE_CFG_NVP(max_predicted_client_commands), 0u, 3000u);
-				revertable_checkbox(SCOPE_CFG_NVP(spectate_referential_state));
-
-				do_lag_simulator(config.client.network_simulator);
-
-				input_text<max_rcon_password_length_v>(SCOPE_CFG_NVP(rcon_password)); revert(scope_cfg.rcon_password);
-				text_disabled("The default rcon password to be sent to the server on init.");
+				ImGui::Separator();
 
 				{
-					auto& scope_cfg = config.client.client_chat;
+					auto& scope_cfg = config.client.net.jitter;
 
-					revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
-					revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
-
-					revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 30u);
-					revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 30.f);
+					revertable_slider(SCOPE_CFG_NVP(buffer_at_least_steps), 0u, 10u);
+					revertable_slider(SCOPE_CFG_NVP(buffer_at_least_ms), 0u, 100u);
+					revertable_slider(SCOPE_CFG_NVP(max_commands_to_squash_at_once), uint8_t(0), uint8_t(255));
 				}
 
 				break;

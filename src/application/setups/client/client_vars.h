@@ -4,6 +4,8 @@
 #include "augs/filesystem/path_declaration.h"
 #include "augs/graphics/rgba.h"
 #include "augs/misc/constant_size_string.h"
+#include "application/setups/client/demo_paths.h"
+#include "view/client_arena_type.h"
 
 using client_nickname_type = augs::constant_size_string<max_nickname_length_v>;
 
@@ -45,9 +47,10 @@ struct client_vars {
 	unsigned max_buffered_server_commands = 1000;
 	unsigned max_predicted_client_commands = 3000u;
 
-	bool spectate_referential_state = true;
+	client_arena_type spectated_arena_type = client_arena_type::REFERENTIAL;
 	std::string rcon_password = "";
 	client_chat_settings client_chat;
 	augs::path_type avatar_image_path;
+	augs::maybe<std::string> demo_recording_path = augs::maybe<std::string>::enabled(DEMOS_DIR);
 	// END GEN INTROSPECTOR
 };
