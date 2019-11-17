@@ -55,6 +55,7 @@ return {
     MiddleMouseButton = "THROW_ANY_FORCE",
     MouseButton5 = "THROW_ANY_FLASH",
     MouseButton4 = "THROW_ANY_PED",
+    J = "THROW_ANY_INTERFERENCE",
 
     WheelUp = "THROW_ANY_TWO_MELEES",
     WheelDown = "THROW_ANY_MELEE",
