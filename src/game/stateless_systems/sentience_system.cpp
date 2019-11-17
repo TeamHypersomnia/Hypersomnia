@@ -41,6 +41,8 @@
 
 #include "augs/math/collinearize_AB_with_C.h"
 
+constexpr real32 standard_cooldown_for_all_spells_ms = 2000.f;
+
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
 	flavour = handle.get_flavour_id();
@@ -56,8 +58,6 @@ void sentience_system::cast_spells(const logic_step step) const {
 	const auto& clk = cosm.get_clock();	
 	const auto now = clk.now;
 	const auto dt = clk.dt;
-
-	constexpr real32 standard_cooldown_for_all_spells_ms = 2000.f;
 
 	for (const auto& players : step.get_entropy().players) {
 		const auto subject = cosm[players.first];
@@ -357,6 +357,25 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 		case messages::health_event::target_type::CONSCIOUSNESS: {
 			const auto amount = h.effective_amount;
 			consciousness.value -= amount;
+
+			const auto wielded = subject.get_wielded_guns();
+			const auto now = cosm.get_timestamp();
+
+			sentience.time_of_last_received_damage = now;
+			sentience.time_of_last_exertion = now;
+
+			sentience.cast_cooldown_for_all_spells.set(
+				standard_cooldown_for_all_spells_ms,
+				now
+			);
+
+			for (const auto w : wielded) {
+				cosm[w].dispatch_on_having_all<components::gun>(
+					[&](const auto& typed_gun) {
+						typed_gun.template get<components::gun>().interfer_once = true;
+					}
+				);
+			}
 
 			if (!consciousness.is_positive()) {
 				if (allow_special_result()) {

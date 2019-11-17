@@ -43,7 +43,8 @@ namespace components {
 		real32 chambering_progress_ms = 0.f;
 
 		bool shell_drop_scheduled = false;
-		pad_bytes<3> pad;
+		bool interfer_once = false;
+		pad_bytes<2> pad;
 
 		real32 max_heat_after_steam_schedule = 0.f;
 

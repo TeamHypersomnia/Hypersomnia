@@ -335,11 +335,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					return out;
 				}();
 
+				bool& interfer_once = gun.interfer_once;
+
 				const bool secondary_is_burst = gun_def.num_burst_bullets > 0;
 				const bool has_secondary_function = secondary_is_burst;
 
 				const bool primary_trigger_pressed = 
-					triggers.test(weapon_action_type::PRIMARY)
+					triggers.test(weapon_action_type::PRIMARY) || (!secondary_is_burst && interfer_once)
 					//|| (!has_secondary_function && triggers.test(weapon_action_type::SECONDARY))
 				;
 
@@ -348,10 +350,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				*/
 
 				const bool secondary_trigger_pressed = 
-					!primary_trigger_pressed 
+					interfer_once ||
+					(!primary_trigger_pressed 
 					&& has_secondary_function
-					&& triggers.test(weapon_action_type::SECONDARY)
+					&& triggers.test(weapon_action_type::SECONDARY))
 				;
+
+				interfer_once = false;
 
 				bool& primary_just_pressed = 
 					gun.just_pressed[weapon_action_type::PRIMARY]
