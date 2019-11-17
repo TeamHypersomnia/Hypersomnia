@@ -575,7 +575,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					const auto epicentre_vec = flashbang.get_logic_transform().pos - d.point_of_impact;
 					const auto distance_from_epicentre = epicentre_vec.length();
 					const auto max_distance = explosive->explosion.effective_radius;
-					const auto r = repro::sqrt(1 - distance_from_epicentre / max_distance);
+					const auto r = repro::sqrt(std::max(0.f, 1 - distance_from_epicentre / max_distance));
 					{
 						auto& secs = sentience->audio_flash_secs;
 
