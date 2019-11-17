@@ -8,9 +8,18 @@
 #include "application/setups/editor/editor_popup.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/frame_num_type.h"
+#include "hypersomnia_version.h"
 
 namespace augs {
 	class window;
+};
+
+enum class demo_choice_result_type {
+	SHOULD_ANALYZE,
+
+	OK,
+	FILE_OPEN_ERROR,
+	MIGHT_BE_INCOMPATIBLE
 };
 
 class start_client_gui_state : public standard_window_mixin<start_client_gui_state> {
@@ -23,6 +32,9 @@ public:
 	bool was_shrinked = false;
 	bool will_be_upscaled = false;
 	bool do_initial_load = true;
+
+	hypersomnia_version demo_version;
+	demo_choice_result_type demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
 
 	bool allow_start = false;
 	bool mouse_has_to_move_off_browse = false;

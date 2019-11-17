@@ -2,6 +2,7 @@
 #include <string>
 #include "augs/network/port_type.h"
 #include "application/gui/connect_address_type.h"
+#include "augs/filesystem/path_declaration.h"
 
 struct address_and_port {
 	std::string connect_address = "127.0.0.1";
@@ -16,10 +17,9 @@ struct client_start_input {
 	std::string custom_address = "127.0.0.1";
 	std::string preferred_official_address = "";
 
-	bool record_demo = true;
+	augs::path_type replay_demo;
 	// END GEN INTROSPECTOR
 
 	address_and_port get_address_and_port() const;
 	void set_custom(const std::string& target);
 };
-

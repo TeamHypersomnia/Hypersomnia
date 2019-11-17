@@ -16,7 +16,14 @@ void separator_if_unofficials_ended(const C& entry, bool& flag) {
 	}
 }
 
-template <class F, class C>
+struct default_displayed_dir_callback {
+	template <class L>
+	std::string operator()(const L& l) {
+		return l.get_displayed_directory();
+	}
+};
+
+template <class F, class C, class D = default_displayed_dir_callback>
 void simple_browse_path_tree(
 	path_tree_settings& settings,
 	const C& all_paths,
@@ -25,7 +32,8 @@ void simple_browse_path_tree(
 
 	const C& disallowed_paths = {},
 	const std::string& disallowed_paths_displayed_name = "Busy paths",
-	const std::array<std::string, 2> custom_column_names = {}
+	const std::array<std::string, 2> custom_column_names = {},
+	D displayed_dir_callback = default_displayed_dir_callback()
 ) {
 	using namespace augs::imgui;
 
@@ -57,7 +65,7 @@ void simple_browse_path_tree(
 
 		for (const auto& l : all_paths) {
 			const auto prettified = settings.get_prettified(l.get_filename().string());
-			const auto displayed_dir = l.get_displayed_directory();
+			const auto displayed_dir = displayed_dir_callback(l);
 
 			if (!filter.PassFilter(prettified.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {
 				continue;

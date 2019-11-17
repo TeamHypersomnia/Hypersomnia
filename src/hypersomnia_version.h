@@ -19,4 +19,8 @@ struct hypersomnia_version {
 
 	std::string get_summary() const;
 	std::string get_version_number() const;
+
+	bool operator==(const hypersomnia_version& b) const {
+		return commit_hash == b.commit_hash;
+	}
 };

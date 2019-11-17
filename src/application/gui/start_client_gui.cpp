@@ -14,6 +14,10 @@
 #include "augs/filesystem/file.h"
 
 #include "augs/misc/imgui/imgui_enum_radio.h"
+#include "application/gui/demo_chooser.h"
+#include "application/setups/client/demo_file.h"
+#include "application/gui/pretty_tabs.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -55,13 +59,102 @@ bool start_client_gui_state::perform(
 
 	bool result = false;
 
+	if (into_start.chosen_address_type == connect_address_type::REPLAY) {
+		using D = demo_choice_result_type;
+
+		auto& demo_path = into_start.replay_demo;
+
+		{
+			auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
+			auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
+
+			do_pretty_tabs(into_start.chosen_address_type);
+
+			thread_local demo_chooser chooser;
+
+			chooser.perform(
+				"Demo to replay",
+				demo_path.string(),
+				augs::path_type(DEMOS_DIR),
+				[&](const auto& new_choice) {
+					demo_path = new_choice.path;
+					demo_choice_result = D::SHOULD_ANALYZE;
+				}
+			);
+
+			if (!demo_path.empty() && demo_choice_result == D::SHOULD_ANALYZE) {
+				try {
+					demo_file_meta meta;
+
+					auto t = augs::with_exceptions<std::ifstream>();
+					t.open(demo_path);
+
+					augs::read_bytes(t, meta);
+
+					demo_version = meta.version;
+
+					if (meta.version == hypersomnia_version()) {
+						demo_choice_result = D::OK;
+					}
+					else {
+						demo_choice_result = D::MIGHT_BE_INCOMPATIBLE;
+					}
+				}
+				catch (const std::ifstream::failure& err) {
+					demo_choice_result = D::FILE_OPEN_ERROR;
+				}
+			}
+
+			switch (demo_choice_result) {
+				case D::FILE_OPEN_ERROR:
+					text_color(typesafe_sprintf("Could not open:\n%x\n\nWrong path or the file might be corrupt.", demo_path), red);
+					break;
+				case D::MIGHT_BE_INCOMPATIBLE:
+					text_color(typesafe_sprintf("Your client differs from the one used to record this demo.\nYou may try replaying, but all bets are off - the game might even crash."), orange);
+					break;
+				case D::OK:
+					text_color(typesafe_sprintf("OK! The demo's version matches your client."), green);
+					break;
+				default:
+					break;
+			}
+
+			if (!demo_path.empty() && demo_choice_result != D::FILE_OPEN_ERROR) {
+				text(demo_version.get_summary());
+			}
+		}
+
+		{
+			auto scope = scoped_child("replay cancel");
+
+			ImGui::Separator();
+
+			{
+				const bool result_good = demo_choice_result == D::OK || demo_choice_result == D::MIGHT_BE_INCOMPATIBLE;
+
+				auto scope = maybe_disabled_cols({}, !result_good || demo_path.empty());
+
+				if (ImGui::Button("Replay!")) {
+					result = true;
+					//show = false;
+				}
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel")) {
+				show = false;
+			}
+		}
+
+		return result;
+	}
+
 	{
 		auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
-		enum_radio(into_start.chosen_address_type, true);
-
-		ImGui::Separator();
+		do_pretty_tabs(into_start.chosen_address_type);
 
 		// auto& scope_cfg = into;
 
@@ -300,7 +393,7 @@ bool start_client_gui_state::perform(
 
 		into_vars.avatar_image_path = p;
 
-		checkbox("Record demo", into_start.record_demo);
+		checkbox("Record demo", into_vars.demo_recording_path.is_enabled);
 
 		text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 	}

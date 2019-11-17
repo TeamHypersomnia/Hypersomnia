@@ -30,7 +30,7 @@ return {
 	preferred_official_address = "",
 	custom_address = "127.0.0.1",
 
-	record_demo = true
+	replay_demo = ""
   },
 
   app_controls = {
