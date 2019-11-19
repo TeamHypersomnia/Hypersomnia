@@ -34,6 +34,11 @@ void client_start_input::set_custom(const std::string& target) {
 	chosen_address_type = connect_address_type::CUSTOM;
 }
 
+void start_client_gui_state::clear_demo_choice() {
+	demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
+	demo_version = {};
+}
+
 bool start_client_gui_state::perform(
 	const augs::frame_num_type current_frame,
 	augs::renderer& renderer,
@@ -407,6 +412,8 @@ bool start_client_gui_state::perform(
 			auto scope = maybe_disabled_cols({}, !::nickname_len_in_range(into_vars.nickname.length()));
 
 			if (ImGui::Button("Connect!")) {
+				clear_demo_choice();
+				into_start.replay_demo = {};
 				result = true;
 				//show = false;
 			}

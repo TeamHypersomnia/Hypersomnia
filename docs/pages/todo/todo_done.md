@@ -4010,3 +4010,6 @@ Advantages:
 - let GUI sound volume just be the sound effect volume
 - Master volume
 
+- Watch out to properly recognize if connect or replay was pressed
+	- just clearing if non-replay button was pressed
+

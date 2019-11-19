@@ -40,6 +40,8 @@ public:
 	bool mouse_has_to_move_off_browse = false;
 	std::optional<augs::frame_num_type> avatar_submitted_when;
 
+	void clear_demo_choice();
+
 	bool perform(
 		augs::frame_num_type current_frame,
 		augs::renderer& renderer,
