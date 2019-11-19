@@ -32,8 +32,27 @@
 
 #include "application/gui/client/rcon_gui.hpp"
 #include "application/arena/arena_handle.hpp"
+#include "application/setups/client/demo_paths.h"
+#include "augs/misc/time_utils.h"
 
 void snap_interpolated_to_logical(cosmos&);
+
+void client_setup::play_demo_from(const augs::path_type&) {
+
+}
+
+void client_setup::record_demo_to(const augs::path_type&) {
+
+}
+
+template <class... Args>
+bool client_setup::send_payload(Args&&... args) {
+	if (is_replaying()) {
+		return true;
+	}
+
+	return adapter->send_payload(std::forward<Args>(args)...);
+}
 
 client_setup::client_setup(
 	sol::state& lua,
@@ -49,37 +68,49 @@ client_setup::client_setup(
 {
 	LOG("Initializing connection with %x", last_start.connect_address);
 
-	if (!nickname_len_in_range(vars.nickname.length())) {
-		const auto reason = typesafe_sprintf(
-			"The nickname should be between %x and %x bytes.", 
-			min_nickname_length_v,
-			max_nickname_length_v
-		);
+	const auto& input_demo_path = in.replay_demo;
 
-		set_disconnect_reason(reason);
+	if (!input_demo_path.empty()) {
+		play_demo_from(input_demo_path);
 	}
 	else {
-		augs::network::enable_detailed_logs(true);
-
-		const auto resolution = adapter->connect(last_start);
-
-		if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
+		if (!nickname_len_in_range(vars.nickname.length())) {
 			const auto reason = typesafe_sprintf(
-				"Couldn't resolve host: %x", 
-				resolution.host
-			);
-
-			set_disconnect_reason(reason);
-		}
-		else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
-			const auto reason = typesafe_sprintf(
-				"The address: \"%x\" is invalid!", last_start.connect_address
+				"The nickname should be between %x and %x bytes.", 
+				min_nickname_length_v,
+				max_nickname_length_v
 			);
 
 			set_disconnect_reason(reason);
 		}
 		else {
-			ensure_eq(resolution.result, resolve_result_type::OK);
+			augs::network::enable_detailed_logs(true);
+
+			const auto resolution = adapter->connect(last_start);
+
+			if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
+				const auto reason = typesafe_sprintf(
+					"Couldn't resolve host: %x", 
+					resolution.host
+				);
+
+				set_disconnect_reason(reason);
+			}
+			else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
+				const auto reason = typesafe_sprintf(
+					"The address: \"%x\" is invalid!", last_start.connect_address
+				);
+
+				set_disconnect_reason(reason);
+			}
+			else {
+				ensure_eq(resolution.result, resolve_result_type::OK);
+
+				const auto new_demo_fname = augs::date_time().get_readable_for_file() + ".dem";
+				const auto new_demo_path = augs::path_type(DEMOS_DIR) / new_demo_fname;
+
+				record_demo_to(new_demo_path);
+			}
 		}
 	}
 }
@@ -564,13 +595,18 @@ bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
 void client_setup::handle_server_messages() {
 	namespace N = net_messages;
 
-	auto& message_handler = *this;
+	if (is_replaying()) {
 
-	if (vars.network_simulator.value.loss_percent >= 100.f) {
-		return;
 	}
+	else {
+		if (vars.network_simulator.value.loss_percent >= 100.f) {
+			return;
+		}
 
-	adapter->advance(client_time, message_handler);
+		auto& message_handler = *this;
+
+		adapter->advance(client_time, message_handler);
+	}
 }
 
 #define STRESS_TEST_ARENA_SERIALIZATION 0
@@ -710,7 +746,7 @@ void client_setup::send_pending_commands() {
 	const bool resend_requested_settings = can_already_resend_settings && !augs::introspective_equal(current_requested_settings, requested_settings);
 
 	auto send_settings = [&]() {
-		adapter->send_payload(
+		send_payload(
 			game_channel_type::CLIENT_COMMANDS,
 			std::as_const(requested_settings)
 		);
@@ -748,7 +784,7 @@ void client_setup::send_pending_commands() {
 				if (payload.image_bytes.size() > 0 && payload.image_bytes.size() <= max_avatar_bytes_v) {
 					const auto dummy_client_id = session_id_type::dead();
 
-					adapter->send_payload(
+					send_payload(
 						game_channel_type::COMMUNICATIONS,
 
 						dummy_client_id,
@@ -774,7 +810,7 @@ void client_setup::send_pending_commands() {
 	if (pending_request == special_client_request::RESYNC) {
 		LOG("Sending the request resync command.");
 
-		adapter->send_payload(
+		send_payload(
 			game_channel_type::CLIENT_COMMANDS,
 			pending_request
 		);
@@ -784,11 +820,15 @@ void client_setup::send_pending_commands() {
 }
 
 void client_setup::send_packets_if_its_time() {
-	if (vars.network_simulator.value.loss_percent >= 100.f) {
-		return;
+	if (is_replaying()) {
 	}
+	else {
+		if (vars.network_simulator.value.loss_percent >= 100.f) {
+			return;
+		}
 
-	adapter->send_packets();
+		adapter->send_packets();
+	}
 }
 
 void client_setup::log_malicious_server() {
@@ -799,6 +839,24 @@ void client_setup::log_malicious_server() {
 #endif
 }
 
+void client_setup::perform_chat_input_bar() {
+	auto& chat = client_gui.chat;
+
+	if (chat.perform_input_bar(vars.client_chat)) {
+		::client_requested_chat message;
+
+		message.target = chat.target;
+		message.message = chat.current_message;
+
+		send_payload(
+			game_channel_type::COMMUNICATIONS,
+			message
+		);
+
+		chat.current_message.clear();
+	}
+}
+
 custom_imgui_result client_setup::perform_custom_imgui(
 	const perform_custom_imgui_input in
 ) {
@@ -807,11 +865,11 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 	arena_gui.resyncing_notifier = now_resyncing;
 
-	const bool is_gameplay_on = adapter->is_connected() && state == C::IN_GAME;
+	const bool is_gameplay_on = is_connected() && state == C::IN_GAME;
 
 	auto& rcon_gui = client_gui.rcon;
 
-	if (!adapter->is_connected()) {
+	if (!is_connected()) {
 		rcon_gui.show = false;
 	}
 
@@ -820,7 +878,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			rcon_command_variant payload;
 			payload = new_payload;
 
-			adapter->send_payload(
+			send_payload(
 				game_channel_type::COMMUNICATIONS,
 				payload
 			);
@@ -835,23 +893,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		);
 	}
 
-	{
-		auto& chat = client_gui.chat;
-
-		if (chat.perform_input_bar(vars.client_chat)) {
-			::client_requested_chat message;
-
-			message.target = chat.target;
-			message.message = chat.current_message;
-
-			adapter->send_payload(
-				game_channel_type::COMMUNICATIONS,
-				message
-			);
-
-			chat.current_message.clear();
-		}
-	}
+	perform_chat_input_bar();
 
 	if (is_gameplay_on) {
 		augs::network::enable_detailed_logs(false);
@@ -879,9 +921,35 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		const auto window_name = "Connection status";
 		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
-		const bool failed_after_connected = adapter->is_connecting() && state > C::INITIATING_CONNECTION;
+		if (is_connected()) {
+			augs::network::enable_detailed_logs(false);
 
-		if (state == C::INITIATING_CONNECTION && adapter->is_connecting()) {
+			text_color(typesafe_sprintf("Connected to %x.", last_start.connect_address), green);
+
+			if (state == C::INITIATING_CONNECTION) {
+				text("Initializing connection...");
+			}
+			else if (state == C::PENDING_WELCOME) {
+				text("Sending the client configuration.");
+			}
+			else if (state == C::RECEIVING_INITIAL_STATE) {
+				text("Receiving the initial state:");
+			}
+			else if (state == C::RECEIVING_INITIAL_STATE_CORRECTION) {
+				text("Receiving the initial state correction:");
+			}
+			else {
+				text("Unknown error.");
+			}
+
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Abort")) {
+				disconnect();
+			}
+		}
+		else if (state == C::INITIATING_CONNECTION && adapter->is_connecting()) {
 			text("Connecting to %x\nTime: %2f seconds", last_start.connect_address, get_current_time() - when_initiated_connection);
 
 			text("\n");
@@ -892,7 +960,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
-		else if (failed_after_connected || adapter->has_connection_failed()) {
+		else if (
+			const bool failed_after_connected = adapter->is_connecting() && state > C::INITIATING_CONNECTION; 
+			failed_after_connected || adapter->has_connection_failed()
+		) {
 			if (state == C::IN_GAME) {
 				text("Lost connection to the server.");
 			}
@@ -932,34 +1003,6 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
-		else if (adapter->is_connected()) {
-			augs::network::enable_detailed_logs(false);
-
-			text_color(typesafe_sprintf("Connected to %x.", last_start.connect_address), green);
-
-			if (state == C::INITIATING_CONNECTION) {
-				text("Initializing connection...");
-			}
-			else if (state == C::PENDING_WELCOME) {
-				text("Sending the client configuration.");
-			}
-			else if (state == C::RECEIVING_INITIAL_STATE) {
-				text("Receiving the initial state:");
-			}
-			else if (state == C::RECEIVING_INITIAL_STATE_CORRECTION) {
-				text("Receiving the initial state correction:");
-			}
-			else {
-				text("Unknown error.");
-			}
-
-			text("\n");
-			ImGui::Separator();
-
-			if (ImGui::Button("Abort")) {
-				disconnect();
-			}
-		}
 	}
 
 	return custom_imgui_result::NONE;
@@ -978,19 +1021,27 @@ void client_setup::apply(const config_lua_table& cfg) {
 }
 
 bool client_setup::is_connected() const {
+	if (is_replaying()) {
+		return true;
+	}
+
 	return adapter->is_connected();
 }
 
 void client_setup::send_to_server(
 	total_client_entropy& new_local_entropy
 ) {
-	adapter->send_payload(
+	send_payload(
 		game_channel_type::CLIENT_COMMANDS,
 		new_local_entropy
 	);
 }
 
 void client_setup::disconnect() {
+	if (is_replaying()) {
+		return;
+	}
+
 	adapter->disconnect();
 }
 
@@ -1187,4 +1238,8 @@ void client_setup::ensure_handler() {
 
 void client_setup::save_recorded_demo_chunks() {
 
+}
+
+bool client_setup::is_replaying() const {
+	return false;
 }

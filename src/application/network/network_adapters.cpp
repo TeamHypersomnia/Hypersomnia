@@ -459,8 +459,3 @@ yojimbo::Address server_adapter::get_client_address(const client_id_type& id) co
 	
 	return yojimbo::Address(buffer);
 }
-
-yojimbo::Address client_adapter::get_server_address() const {
-	return client.GetAddress();
-}
-

@@ -46,6 +46,8 @@
 
 struct config_lua_table;
 
+constexpr double default_inv_tickrate = 1 / 128.0;
+
 class client_adapter;
 
 class client_setup : 
@@ -96,8 +98,6 @@ class client_setup :
 	net_time_t client_time = 0.0;
 	net_time_t when_initiated_connection = 0.0;
 	net_time_t when_sent_client_settings = 0.0;
-
-	double default_inv_tickrate = 1 / 128.0;
 
 	std::string last_disconnect_reason;
 	bool print_only_disconnect_reason = false;
@@ -170,6 +170,10 @@ class client_setup :
 	auto get_controlled_character() const {
 		return get_viewed_cosmos()[get_controlled_character_id()];
 	}
+
+	void play_demo_from(const augs::path_type&);
+	void record_demo_to(const augs::path_type&);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -216,269 +220,117 @@ public:
 	}
 
 	template <class Callbacks>
-	void advance(
+	void advance_single_step(
 		const client_advance_input& in,
 		const Callbacks& callbacks
 	) {
-		const auto current_time = get_current_time();
+		const auto referential_solve_settings = [&]() {
+			solve_settings out;
+			out.effect_prediction = in.lag_compensation.effect_prediction;
+			return out;
+		}();
 
-		if (client_time <= current_time) {
-			const auto referential_solve_settings = [&]() {
-				solve_settings out;
-				out.effect_prediction = in.lag_compensation.effect_prediction;
-				return out;
-			}();
+		const auto repredicted_solve_settings = [&]() {
+			solve_settings out;
+			out.effect_prediction = in.lag_compensation.effect_prediction;
 
-			const auto repredicted_solve_settings = [&]() {
-				solve_settings out;
-				out.effect_prediction = in.lag_compensation.effect_prediction;
-
-				if (in.lag_compensation.confirm_controlled_character_death) {
-					out.disable_knockouts = get_viewed_character();
-				}
-
-				out.simulate_decorative_organisms = in.lag_compensation.simulate_decorative_organisms_during_reconciliation;
-
-				return out;
-			}();
-
-			const auto predicted_solve_settings = [&]() {
-				auto out = repredicted_solve_settings;
-				out.simulate_decorative_organisms = true;
-				return out;
-			}();
-
-			auto schedule_reprediction_if_inconsistent = [&](const auto result) {
-				if (result.state_inconsistent) {
-					receiver.schedule_reprediction = true;
-				}
-			};
-
-			auto& performance = in.network_performance;
-
-			{
-				auto scope = measure_scope(performance.receiving_messages);
-				handle_server_messages();
+			if (in.lag_compensation.confirm_controlled_character_death) {
+				out.disable_knockouts = get_viewed_character();
 			}
 
-			const auto new_local_entropy = [&]() -> std::optional<mode_entropy> {
-				if (is_gameplay_on()) {
-					return total_collected.extract(
-						get_controlled_character(), 
-						get_local_player_id(), 
-						make_accumulator_input(in)
-					);
-				}
+			out.simulate_decorative_organisms = in.lag_compensation.simulate_decorative_organisms_during_reconciliation;
 
-				return std::nullopt;
-			}();
+			return out;
+		}();
 
-			const bool in_game = new_local_entropy != std::nullopt;
+		const auto predicted_solve_settings = [&]() {
+			auto out = repredicted_solve_settings;
+			out.simulate_decorative_organisms = true;
+			return out;
+		}();
 
-			if (is_connected()) {
-				auto scope = measure_scope(performance.sending_messages);
+		auto schedule_reprediction_if_inconsistent = [&](const auto result) {
+			if (result.state_inconsistent) {
+				receiver.schedule_reprediction = true;
+			}
+		};
 
-				send_pending_commands();
+		auto& performance = in.network_performance;
 
-				if (in_game) {
-					auto new_client_entropy = new_local_entropy->get_for(
-						get_viewed_character(), 
-						get_local_player_id()
-					);
+		{
+			auto scope = measure_scope(performance.receiving_messages);
+			handle_server_messages();
+		}
 
-					send_to_server(new_client_entropy);
-				}
+		const auto new_local_entropy = [&]() -> std::optional<mode_entropy> {
+			if (is_gameplay_on()) {
+				return total_collected.extract(
+					get_controlled_character(), 
+					get_local_player_id(), 
+					make_accumulator_input(in)
+				);
 			}
 
-			{
-				auto scope = measure_scope(performance.sending_packets);
-				send_packets_if_its_time();
-			}
+			return std::nullopt;
+		}();
+
+		const bool in_game = new_local_entropy != std::nullopt;
+
+		if (is_connected()) {
+			auto scope = measure_scope(performance.sending_messages);
+
+			send_pending_commands();
 
 			if (in_game) {
-				auto referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
-				auto predicted_arena = get_arena_handle(client_arena_type::PREDICTED);
+				auto new_client_entropy = new_local_entropy->get_for(
+					get_viewed_character(), 
+					get_local_player_id()
+				);
 
-				auto audiovisual_post_solve = callbacks.post_solve;
+				send_to_server(new_client_entropy);
+			}
+		}
 
-				auto for_each_effect_queue = [&](const const_logic_step step, auto callback) {
-					namespace M = messages;
+		{
+			auto scope = measure_scope(performance.sending_packets);
+			send_packets_if_its_time();
+		}
 
-					auto& q = step.transient.messages;
+		if (in_game) {
+			auto referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
+			auto predicted_arena = get_arena_handle(client_arena_type::PREDICTED);
 
-					callback(q.get_queue<M::start_particle_effect>());
-					callback(q.get_queue<M::stop_particle_effect>());
+			auto audiovisual_post_solve = callbacks.post_solve;
 
-					callback(q.get_queue<M::start_sound_effect>());
-					callback(q.get_queue<M::stop_sound_effect>());
-					callback(q.get_queue<M::start_multi_sound_effect>());
+			auto for_each_effect_queue = [&](const const_logic_step step, auto callback) {
+				namespace M = messages;
 
-					callback(q.get_queue<M::thunder_effect>());
-					callback(q.get_queue<M::exploding_ring_effect>());
-				};
+				auto& q = step.transient.messages;
 
-				{
-					auto scope = measure_scope(performance.unpacking_remote_steps);
+				callback(q.get_queue<M::start_particle_effect>());
+				callback(q.get_queue<M::stop_particle_effect>());
 
-					auto referential_post_solve = [&](const const_logic_step step) {
-						audiovisual_post_solve_settings settings;
+				callback(q.get_queue<M::start_sound_effect>());
+				callback(q.get_queue<M::stop_sound_effect>());
+				callback(q.get_queue<M::start_multi_sound_effect>());
 
-						if (is_spectating_referential()) {
-							settings.prediction = prediction_input::offline();
-						}
-						else {
-							const auto input = prediction_input::unpredictable_for(get_viewed_character());
+				callback(q.get_queue<M::thunder_effect>());
+				callback(q.get_queue<M::exploding_ring_effect>());
+			};
 
-							auto erase_predictable_messages = [&](auto& from_queue) {
-								erase_if(
-									from_queue,
-									[&](const auto& m) {
-										return !m.get_predictability().should_play(input);
-									}
-								);
-							};
+			{
+				auto scope = measure_scope(performance.unpacking_remote_steps);
 
-							for_each_effect_queue(step, erase_predictable_messages);
-							settings.prediction = input;
-						}
+				auto referential_post_solve = [&](const const_logic_step step) {
+					audiovisual_post_solve_settings settings;
 
-						{
-							auto& notifications = step.get_queue<messages::game_notification>();
-
-							const auto current_time = get_current_time();
-
-							erase_if(notifications, [this, current_time](const auto& msg) {
-								return client_gui.chat.add_entry_from_game_notification(current_time, msg, get_local_player_id());
-							});
-						}
-
-						audiovisual_post_solve(step, settings);
-					};
-
-					auto referential_callbacks = solver_callbacks(
-						default_solver_callback(),
-						referential_post_solve,
-						default_solver_callback()
-					);
-
-					auto advance_referential = [&](const auto& entropy) {
-						referential_arena.advance(entropy, referential_callbacks, referential_solve_settings);
-
-						const auto& added = entropy.general.added_player;
-
-						if (logically_set(added)) {
-							handle_new_session(added);
-						}
-					};
-
-					auto advance_repredicted = [&](const auto& entropy) {
-						/* 
-							Note that we do not post-solve for the re-simulation process. 
-							We only post-solve once for the predicted cosmos, when we actually move forward in time.
-						*/
-
-						const auto reprediction_result = predicted_arena.advance(
-							entropy, 
-							solver_callbacks(), 
-							repredicted_solve_settings
-						);
-
-						schedule_reprediction_if_inconsistent(reprediction_result);
-					};
-
-					auto unpack = [&](const compact_server_step_entropy& entropy) {
-						auto mode_id_to_entity_id = [&](const mode_player_id& mode_id) {
-							return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-								[&](const auto& typed_mode) {
-									return typed_mode.lookup(mode_id);
-								}
-							);
-						};
-
-						auto get_settings_for = [&](const mode_player_id& mode_id) {
-							return player_metas[mode_id.value].public_settings.character_input;
-						};
-
-						return entropy.unpack(mode_id_to_entity_id, get_settings_for);
-					};
-
-					const auto result = receiver.unpack_deterministic_steps(
-						in.simulation_receiver,
-						in.interp,
-						in.past_infection,
-
-						get_viewed_character(),
-
-						unpack,
-
-						referential_arena,
-						predicted_arena,
-
-						advance_referential,
-						advance_repredicted
-					);
-
-					performance.accepted_commands.measure(result.total_accepted);
-
-					if (result.malicious_server) {
-						LOG("There was a problem unpacking steps from the server. Disconnecting.");
-						log_malicious_server();
-						disconnect();
+					if (is_spectating_referential()) {
+						settings.prediction = prediction_input::offline();
 					}
+					else {
+						const auto input = prediction_input::unpredictable_for(get_viewed_character());
 
-					if (result.desync && !now_resyncing) {
-						pending_request = special_client_request::RESYNC;
-						now_resyncing = true;
-
-#if DUMP_BEFORE_AND_AFTER_ROUND_START
-						const auto preffix = typesafe_sprintf("%x_desync%x_", augs::getpid(), referential_arena.get_round_num());
-
-						referential_arena.on_mode(
-							[&](const auto& mode) {
-								::dump_for_debugging(
-									lua,
-									preffix,
-									referential_arena.get_cosmos(),
-									mode
-								);
-							}
-						);
-#endif
-					}
-				}
-
-				{
-					auto scope = measure_scope(performance.stepping_forward);
-
-					{
-						auto& p = receiver.predicted_entropies;
-
-						const auto& max_commands = vars.max_predicted_client_commands;
-						const auto num_commands = p.size();
-
-						if (num_commands > max_commands) {
-							set_disconnect_reason(typesafe_sprintf(
-								"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
-								num_commands,
-								max_commands
-							));
-
-							disconnect();
-						}
-
-						performance.predicted_steps.measure(num_commands);
-
-						p.push_back(*new_local_entropy);
-					}
-
-					auto predicted_post_solve = [&](const const_logic_step step) {
-						if (is_spectating_referential()) {
-							return;
-						}
-
-						const auto input = prediction_input::predictable_for(get_viewed_character());
-
-						auto erase_unpredictable_messages = [&](auto& from_queue) {
+						auto erase_predictable_messages = [&](auto& from_queue) {
 							erase_if(
 								from_queue,
 								[&](const auto& m) {
@@ -487,45 +339,210 @@ public:
 							);
 						};
 
-						for_each_effect_queue(step, erase_unpredictable_messages);
-
-						audiovisual_post_solve_settings settings;
+						for_each_effect_queue(step, erase_predictable_messages);
 						settings.prediction = input;
+					}
 
-						audiovisual_post_solve(step, settings);
+					{
+						auto& notifications = step.get_queue<messages::game_notification>();
+
+						const auto current_time = get_current_time();
+
+						erase_if(notifications, [this, current_time](const auto& msg) {
+							return client_gui.chat.add_entry_from_game_notification(current_time, msg, get_local_player_id());
+						});
+					}
+
+					audiovisual_post_solve(step, settings);
+				};
+
+				auto referential_callbacks = solver_callbacks(
+					default_solver_callback(),
+					referential_post_solve,
+					default_solver_callback()
+				);
+
+				auto advance_referential = [&](const auto& entropy) {
+					referential_arena.advance(entropy, referential_callbacks, referential_solve_settings);
+
+					const auto& added = entropy.general.added_player;
+
+					if (logically_set(added)) {
+						handle_new_session(added);
+					}
+				};
+
+				auto advance_repredicted = [&](const auto& entropy) {
+					/* 
+						Note that we do not post-solve for the re-simulation process. 
+						We only post-solve once for the predicted cosmos, when we actually move forward in time.
+					*/
+
+					const auto reprediction_result = predicted_arena.advance(
+						entropy, 
+						solver_callbacks(), 
+						repredicted_solve_settings
+					);
+
+					schedule_reprediction_if_inconsistent(reprediction_result);
+				};
+
+				auto unpack = [&](const compact_server_step_entropy& entropy) {
+					auto mode_id_to_entity_id = [&](const mode_player_id& mode_id) {
+						return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+							[&](const auto& typed_mode) {
+								return typed_mode.lookup(mode_id);
+							}
+						);
 					};
 
-					auto predicted_callbacks = solver_callbacks(
-						default_solver_callback(),
-						predicted_post_solve,
-						default_solver_callback()
-					);
+					auto get_settings_for = [&](const mode_player_id& mode_id) {
+						return player_metas[mode_id.value].public_settings.character_input;
+					};
 
-#if USE_CLIENT_PREDICTION
-					const auto forward_step_result = predicted_arena.advance(
-						*new_local_entropy, 
-						predicted_callbacks, 
-						predicted_solve_settings
-					);
+					return entropy.unpack(mode_id_to_entity_id, get_settings_for);
+				};
 
-					schedule_reprediction_if_inconsistent(forward_step_result);
-#else
-					(void)predicted_solve_settings;
-					(void)predicted_callbacks;
-					(void)callbacks;
+				const auto result = receiver.unpack_deterministic_steps(
+					in.simulation_receiver,
+					in.interp,
+					in.past_infection,
+
+					get_viewed_character(),
+
+					unpack,
+
+					referential_arena,
+					predicted_arena,
+
+					advance_referential,
+					advance_repredicted
+				);
+
+				performance.accepted_commands.measure(result.total_accepted);
+
+				if (result.malicious_server) {
+					LOG("There was a problem unpacking steps from the server. Disconnecting.");
+					log_malicious_server();
+					disconnect();
+				}
+
+				if (result.desync && !now_resyncing) {
+					pending_request = special_client_request::RESYNC;
+					now_resyncing = true;
+
+#if DUMP_BEFORE_AND_AFTER_ROUND_START
+					const auto preffix = typesafe_sprintf("%x_desync%x_", augs::getpid(), referential_arena.get_round_num());
+
+					referential_arena.on_mode(
+						[&](const auto& mode) {
+							::dump_for_debugging(
+								lua,
+								preffix,
+								referential_arena.get_cosmos(),
+								mode
+							);
+						}
+					);
 #endif
 				}
 			}
 
-			if (in_game) {
-				client_time += get_inv_tickrate();
-			}
-			else {
-				client_time += default_inv_tickrate;
-			}
+			{
+				auto scope = measure_scope(performance.stepping_forward);
 
-			update_stats(in.network_stats);
-			total_collected.clear();
+				{
+					auto& p = receiver.predicted_entropies;
+
+					const auto& max_commands = vars.max_predicted_client_commands;
+					const auto num_commands = p.size();
+
+					if (num_commands > max_commands) {
+						set_disconnect_reason(typesafe_sprintf(
+							"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
+							num_commands,
+							max_commands
+						));
+
+						disconnect();
+					}
+
+					performance.predicted_steps.measure(num_commands);
+
+					p.push_back(*new_local_entropy);
+				}
+
+				auto predicted_post_solve = [&](const const_logic_step step) {
+					if (is_spectating_referential()) {
+						return;
+					}
+
+					const auto input = prediction_input::predictable_for(get_viewed_character());
+
+					auto erase_unpredictable_messages = [&](auto& from_queue) {
+						erase_if(
+							from_queue,
+							[&](const auto& m) {
+								return !m.get_predictability().should_play(input);
+							}
+						);
+					};
+
+					for_each_effect_queue(step, erase_unpredictable_messages);
+
+					audiovisual_post_solve_settings settings;
+					settings.prediction = input;
+
+					audiovisual_post_solve(step, settings);
+				};
+
+				auto predicted_callbacks = solver_callbacks(
+					default_solver_callback(),
+					predicted_post_solve,
+					default_solver_callback()
+				);
+
+#if USE_CLIENT_PREDICTION
+				const auto forward_step_result = predicted_arena.advance(
+					*new_local_entropy, 
+					predicted_callbacks, 
+					predicted_solve_settings
+				);
+
+				schedule_reprediction_if_inconsistent(forward_step_result);
+#else
+				(void)predicted_solve_settings;
+				(void)predicted_callbacks;
+				(void)callbacks;
+#endif
+			}
+		}
+
+		if (in_game) {
+			client_time += get_inv_tickrate();
+		}
+		else {
+			client_time += default_inv_tickrate;
+		}
+
+		update_stats(in.network_stats);
+		total_collected.clear();
+	}
+
+	template <class Callbacks>
+	void advance(
+		const client_advance_input& in,
+		const Callbacks& callbacks
+	) {
+		if (is_replaying()) {
+
+		}
+		else {
+			const auto current_time = get_current_time();
+
+			if (client_time <= current_time) {
+				advance_single_step(in, callbacks);
+			}
 		}
 	}
 
@@ -594,4 +611,10 @@ public:
 	}
 
 	bool requires_cursor() const;
+	bool is_replaying() const;
+
+	template <class... Args>
+	bool send_payload(Args&&... args);
+
+	void perform_chat_input_bar();
 };

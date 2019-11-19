@@ -27,6 +27,17 @@ class client_adapter {
 	template <class T>
 	auto create_message();
 
+	auto& get_specific() {
+		return client;
+	}
+
+	const auto& get_specific() const {
+		return client;
+	}
+
+	bool can_send_message(const game_channel_type&) const;
+	bool has_messages_to_send(const game_channel_type&) const;
+
 public:
 	client_adapter();
 	resolve_address_result connect(const address_and_port&);
@@ -38,9 +49,6 @@ public:
 	);
 
 	void send_packets();
-
-	bool can_send_message(const game_channel_type&) const;
-	bool has_messages_to_send(const game_channel_type&) const;
 
 	template <class... Args>
 	bool send_payload(
@@ -55,16 +63,6 @@ public:
 
 	void disconnect();
 
-	auto& get_specific() {
-		return client;
-	}
-
-	const auto& get_specific() const {
-		return client;
-	}
-
 	void set(augs::maybe_network_simulator);
 	network_info get_network_info() const;
-
-	yojimbo::Address get_server_address() const;
 };

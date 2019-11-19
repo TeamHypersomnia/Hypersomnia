@@ -15,18 +15,7 @@
 
 #include "application/network/network_messages.h"
 #include "application/network/custom_yojimbo_factory.h"
-
-enum class game_channel_type {
-#if RESYNCS_CHANNEL
-	RESYNCS,
-#endif
-	SERVER_SOLVABLE_AND_STEPS,
-	CLIENT_COMMANDS,
-	COMMUNICATIONS,
-	VOLATILE_STATISTICS,
-
-	COUNT
-};
+#include "application/network/game_channel_type.h"
 
 struct game_connection_config : yojimbo::ClientServerConfig {
 	game_connection_config();

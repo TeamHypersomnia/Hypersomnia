@@ -413,7 +413,7 @@ bool start_client_gui_state::perform(
 
 			if (ImGui::Button("Connect!")) {
 				clear_demo_choice();
-				into_start.replay_demo = {};
+				into_start.replay_demo.clear();
 				result = true;
 				//show = false;
 			}

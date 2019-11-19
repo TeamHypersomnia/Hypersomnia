@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We'll create a simple code for recording, but we might offload replays to snapshotted_player
+
 - client_setup replay (re-visited)
 	- let packets from server be saved on the message level
 	- I think adapter should just have if elses since client setup logic is way more important
@@ -79,6 +81,8 @@ summary: That which we are brainstorming at the moment.
 - Server/client continuous integration
 	- Automatic client upgrade
 	- Automatic server upgrade
+		- Remember to only pull an upgrade if both Windows and Linux versions match
+		- For now have a rcon command for "Schedule server update"
 
 - completely different approach to client setup replay: only record the relevant messages in some mini format?
 	- well it's less out of the box
