@@ -328,26 +328,29 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 			ensure_geq(health.value, static_cast<decltype(health.value)>(0));
 
-			sentience.time_of_last_received_damage = cosm.get_timestamp();
+			if (amount > 0) {
+				sentience.time_of_last_received_damage = cosm.get_timestamp();
 
-			auto& movement = subject.get<components::movement>();
-			movement.const_inertia_ms += h.effective_amount * sentience_def.const_inertia_damage_ratio;
-			//movement.linear_inertia_ms += h.effective_amount * sentience_def.linear_inertia_damage_ratio;
+				auto& movement = subject.get<components::movement>();
+				movement.const_inertia_ms += amount * sentience_def.const_inertia_damage_ratio;
 
-			const auto consciousness_ratio = consciousness.get_ratio();
-			const auto health_ratio = health.get_ratio();
+				//movement.linear_inertia_ms += amount * sentience_def.linear_inertia_damage_ratio;
 
-			const auto prev_consciousness = consciousness.value;
-			consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * consciousness.maximum);
+				const auto consciousness_ratio = consciousness.get_ratio();
+				const auto health_ratio = health.get_ratio();
 
-			if (!health.is_positive()) {
-				if (allow_special_result()) {
-					h.special_result = messages::health_event::result_type::DEATH;
-					h.was_conscious = was_conscious;
-				}
-				else {
-					/* Assume previous consciousness so that the running ability is unimpaired */
-					consciousness.value = prev_consciousness;
+				const auto prev_consciousness = consciousness.value;
+				consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * consciousness.maximum);
+
+				if (!health.is_positive()) {
+					if (allow_special_result()) {
+						h.special_result = messages::health_event::result_type::DEATH;
+						h.was_conscious = was_conscious;
+					}
+					else {
+						/* Assume previous consciousness so that the running ability is unimpaired */
+						consciousness.value = prev_consciousness;
+					}
 				}
 			}
 
@@ -358,28 +361,30 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			const auto amount = h.effective_amount;
 			consciousness.value -= amount;
 
-			const auto wielded = subject.get_wielded_guns();
-			const auto now = cosm.get_timestamp();
+			if (amount > 0) {
+				const auto wielded = subject.get_wielded_guns();
+				const auto now = cosm.get_timestamp();
 
-			sentience.time_of_last_received_damage = now;
-			sentience.time_of_last_exertion = now;
+				sentience.time_of_last_received_damage = now;
+				sentience.time_of_last_exertion = now;
 
-			sentience.cast_cooldown_for_all_spells.set(
-				standard_cooldown_for_all_spells_ms,
-				now
-			);
-
-			for (const auto w : wielded) {
-				cosm[w].dispatch_on_having_all<components::gun>(
-					[&](const auto& typed_gun) {
-						typed_gun.template get<components::gun>().interfer_once = true;
-					}
+				sentience.cast_cooldown_for_all_spells.set(
+					standard_cooldown_for_all_spells_ms,
+					now
 				);
-			}
 
-			if (!consciousness.is_positive()) {
-				if (allow_special_result()) {
-					h.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
+				for (const auto w : wielded) {
+					cosm[w].dispatch_on_having_all<components::gun>(
+						[&](const auto& typed_gun) {
+							typed_gun.template get<components::gun>().interfer_once = true;
+						}
+					);
+				}
+
+				if (!consciousness.is_positive()) {
+					if (allow_special_result()) {
+						h.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
+					}
 				}
 			}
 
@@ -390,8 +395,10 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			const auto amount = h.effective_amount;
 			personal_electricity.value -= amount;
 
-			if (!personal_electricity.is_positive()) {
-				h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
+			if (amount > 0) {
+				if (!personal_electricity.is_positive()) {
+					h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
+				}
 			}
 
 			break;
