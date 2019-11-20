@@ -7,7 +7,7 @@
 #include "augs/templates/corresponding_field.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/templates/container_templates.h"
-
+#include "augs/misc/scope_guard.h"
 
 #include <Windows.h>
 #include <shlobj.h>
@@ -722,6 +722,10 @@ namespace augs {
 
 		// Display the Open dialog box. 
 
+		auto show_after = scope_guard([this]() {
+			show();
+		});
+
 		if (GetOpenFileName(&ofn) == TRUE) {
 			auto result = augs::path_type(ofn.lpstrFile);
 			return str_ops(result.string()).replace_all("\\", "/");
@@ -770,6 +774,10 @@ namespace augs {
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 
 		// Display the Open dialog box. 
+
+		auto show_after = scope_guard([this]() {
+			show();
+		});
 
 		if (GetSaveFileName(&ofn) == TRUE) {
 			auto result = augs::path_type(ofn.lpstrFile);
