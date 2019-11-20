@@ -35,6 +35,7 @@
 #include "application/arena/arena_handle.hpp"
 #include "application/setups/client/demo_paths.h"
 #include "augs/misc/time_utils.h"
+#include "application/network/net_message_serializers.h"
 #include "augs/readwrite/byte_file.h"
 
 void snap_interpolated_to_logical(cosmos&);
