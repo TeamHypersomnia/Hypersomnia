@@ -36,7 +36,8 @@ void client_start_input::set_custom(const std::string& target) {
 
 void start_client_gui_state::clear_demo_choice() {
 	demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
-	demo_version = {};
+	demo_meta = {};
+	demo_size = {};
 }
 
 bool start_client_gui_state::perform(
@@ -54,7 +55,7 @@ bool start_client_gui_state::perform(
 	
 	using namespace augs::imgui;
 
-	centered_size_mult = 0.4f;
+	centered_size_mult = vec2(0.55f, 0.4f);
 	
 	auto imgui_window = make_scoped_window();
 
@@ -77,8 +78,11 @@ bool start_client_gui_state::perform(
 
 			thread_local demo_chooser chooser;
 
+			// text_disabled(typesafe_sprintf("The demos are stored inside \"%x\" folder.", DEMOS_DIR));
+
+			text(typesafe_sprintf("Choose demo to replay (from %x):", DEMOS_DIR));
 			chooser.perform(
-				"Demo to replay",
+				"",
 				demo_path.string(),
 				augs::path_type(DEMOS_DIR),
 				[&](const auto& new_choice) {
@@ -89,16 +93,13 @@ bool start_client_gui_state::perform(
 
 			if (!demo_path.empty() && demo_choice_result == D::SHOULD_ANALYZE) {
 				try {
-					demo_file_meta meta;
-
 					auto t = augs::with_exceptions<std::ifstream>();
 					t.open(demo_path);
 
-					augs::read_bytes(t, meta);
+					augs::read_bytes(t, demo_meta);
+					demo_size = readable_bytesize(augs::get_file_size(demo_path));
 
-					demo_version = meta.version;
-
-					if (meta.version == hypersomnia_version()) {
+					if (demo_meta.version == hypersomnia_version()) {
 						demo_choice_result = D::OK;
 					}
 					else {
@@ -125,7 +126,17 @@ bool start_client_gui_state::perform(
 			}
 
 			if (!demo_path.empty() && demo_choice_result != D::FILE_OPEN_ERROR) {
-				text(demo_version.get_summary());
+				text("Server address:");
+				ImGui::SameLine();
+				text_color(demo_meta.server_address, cyan);
+				text("Size:");
+				ImGui::SameLine();
+				text_color(demo_size, cyan);
+				text("\n");
+
+				text("Version information:");
+
+				text(demo_meta.version.get_summary());
 			}
 		}
 

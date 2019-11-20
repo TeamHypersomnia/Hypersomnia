@@ -47,6 +47,8 @@ struct client_vars {
 	unsigned max_buffered_server_commands = 1000;
 	unsigned max_predicted_client_commands = 3000u;
 
+	unsigned flush_demo_to_disk_once_every_secs = 10u;
+
 	client_arena_type spectated_arena_type = client_arena_type::REFERENTIAL;
 	std::string rcon_password = "";
 	client_chat_settings client_chat;

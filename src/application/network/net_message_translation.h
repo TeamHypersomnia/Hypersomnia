@@ -142,8 +142,7 @@ namespace net_messages {
 		if (has_motions) {
 			static_assert(int(game_motion_type::COUNT) == 1);
 
-			int pos_before = 0;
-			pos_before = s.GetBytesProcessed();
+			const auto pos_before = s.GetBytesProcessed();
 
 			int min_bound = 0;
 			int max_bound = 0;

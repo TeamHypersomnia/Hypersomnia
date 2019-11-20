@@ -20,6 +20,9 @@ constexpr std::size_t max_arena_name_length_v = 30;
 constexpr std::size_t max_ruleset_name_length_v = 30;
 constexpr std::size_t max_arenas_in_pool_v = 50;
 
+constexpr std::size_t max_block_size_v = 2 * 1024 * 1024; // 2 MB
+constexpr std::size_t max_packet_size_v = 2 * 1024; // 2 KB
+
 inline bool nickname_len_in_range(const std::size_t len) {
 	return len >= min_nickname_length_v && len <= max_chat_message_length_v;
 }

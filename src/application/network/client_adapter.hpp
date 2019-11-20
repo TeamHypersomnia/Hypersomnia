@@ -62,6 +62,8 @@ message_handler_result client_adapter::process_message(yojimbo::Message& m, H&& 
 				return message_handler_result::ABORT_AND_DISCONNECT;
 			}
 			else {
+				handler.handle_server_message(static_cast<net_message_type&>(m));
+
 				auto read_payload_into = [&m](auto&&... args) {
 					auto& typed_msg = static_cast<net_message_type&>(m);
 
@@ -72,7 +74,7 @@ message_handler_result client_adapter::process_message(yojimbo::Message& m, H&& 
 
 				using P = payload_of_t<net_message_type>;
 
-				return handler.template handle_server_message<remove_cref<P>>(std::move(read_payload_into));
+				return handler.template handle_server_payload<remove_cref<P>>(std::move(read_payload_into));
 			}
 		}
 	);

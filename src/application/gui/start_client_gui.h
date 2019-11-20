@@ -9,6 +9,7 @@
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/frame_num_type.h"
 #include "hypersomnia_version.h"
+#include "application/setups/client/demo_file.h"
 
 namespace augs {
 	class window;
@@ -33,8 +34,9 @@ public:
 	bool will_be_upscaled = false;
 	bool do_initial_load = true;
 
-	hypersomnia_version demo_version;
+	demo_file_meta demo_meta;
 	demo_choice_result_type demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
+	std::string demo_size;
 
 	bool allow_start = false;
 	bool mouse_has_to_move_off_browse = false;

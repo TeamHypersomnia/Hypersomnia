@@ -5,7 +5,7 @@
 
 namespace augs {
 	namespace imgui {
-		void center_next_window(float size_multiplier, ImGuiCond);
+		void center_next_window(vec2 size_multiplier, ImGuiCond);
 	}
 }
 
@@ -63,7 +63,7 @@ struct standard_window_mixin {
 	}
 
 protected:
-	std::optional<float> centered_size_mult;
+	std::optional<vec2> centered_size_mult;
 
 private:
 	std::string title;

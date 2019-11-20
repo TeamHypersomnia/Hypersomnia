@@ -129,7 +129,7 @@ void settings_gui_state::perform(
 
 	using namespace augs::imgui;
 
-	centered_size_mult = 0.65f;
+	centered_size_mult = vec2::square(0.65f);
 	
 	auto settings = make_scoped_window();
 
@@ -857,6 +857,7 @@ void settings_gui_state::perform(
 					auto scope = scoped_indent();
 					
 					input_text<512>("Target demo directory", scope_cfg.demo_recording_path.value, ImGuiInputTextFlags_EnterReturnsTrue); revert(scope_cfg.demo_recording_path.value);
+					revertable_slider(SCOPE_CFG_NVP(flush_demo_to_disk_once_every_secs), 1u, 120u);
 				}
 
 				{

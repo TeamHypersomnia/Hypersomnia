@@ -20,7 +20,7 @@ bool start_server_gui_state::perform(
 
 	bool result = false;
 
-	centered_size_mult = 0.45f;
+	centered_size_mult = vec2::square(0.45f);
 
 	auto window = make_scoped_window();
 

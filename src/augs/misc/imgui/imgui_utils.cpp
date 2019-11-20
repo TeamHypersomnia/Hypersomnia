@@ -267,7 +267,7 @@ namespace augs {
 			return false;// IsAnyItemHovered() && GetCurrentContext()->HoveredIdHandCursor;
 		}
 
-		void center_next_window(const float size_multiplier, const ImGuiCond cond) {
+		void center_next_window(const vec2 size_multiplier, const ImGuiCond cond) {
 			const auto screen_size = vec2(GetIO().DisplaySize);
 			const auto initial_settings_size = screen_size * size_multiplier;
 

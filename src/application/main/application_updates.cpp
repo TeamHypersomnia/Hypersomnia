@@ -778,7 +778,7 @@ application_update_result check_and_apply_updates(
 		}
 
 		ImGui::NewFrame();
-		center_next_window(1.f, ImGuiCond_Always);
+		center_next_window(vec2::square(1.f), ImGuiCond_Always);
 		
 		advance_update_logic();
 		augs::imgui::render();

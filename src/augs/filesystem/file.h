@@ -105,4 +105,10 @@ namespace augs {
 			out << text;
 		}
 	}
+
+	inline auto get_file_size(const path_type& path) {
+		auto in = with_exceptions<std::ifstream>(path, std::ifstream::ate | std::ifstream::binary);
+		return in.tellg(); 
+	};
+
 }

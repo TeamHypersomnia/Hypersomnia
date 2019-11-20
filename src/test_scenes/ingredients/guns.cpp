@@ -3236,7 +3236,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 2.2;
+			gun_def.damage_multiplier = 2.4;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 10.f;
@@ -3258,7 +3258,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 0.85f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false);
-			meta.get<invariants::item>().standard_price = 2300;
+			meta.get<invariants::item>().standard_price = 2050;
 			set_chambering_duration_ms(meta, 600.f);
 
 			auto& item = meta.get<invariants::item>();

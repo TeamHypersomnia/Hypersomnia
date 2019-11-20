@@ -5,8 +5,7 @@
 #include "augs/readwrite/memory_stream.h"
 #include "hypersomnia_version.h"
 
-#include "application/network/net_message_serialization.h"
-
+#include "application/network/net_message_serializers.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.c"
 #include "augs/readwrite/byte_readwrite.h"
 
@@ -47,7 +46,7 @@ game_connection_config::game_connection_config() {
 	{
 		auto& resyncs = channel[static_cast<int>(game_channel_type::RESYNCS)];
 		resyncs.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
-		resyncs.maxBlockSize = 1024 * 1024 * 2;
+		resyncs.maxBlockSize = max_block_size_v;
 		resyncs.sentPacketBufferSize = 16;
 		resyncs.messageResendTime = 0.f;
 		resyncs.messageSendQueueSize = 16;
@@ -59,7 +58,7 @@ game_connection_config::game_connection_config() {
 	{
 		auto& solvable_stream = channel[static_cast<int>(game_channel_type::SERVER_SOLVABLE_AND_STEPS)];
 		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
-		solvable_stream.maxBlockSize = 1024 * 1024 * 2;
+		solvable_stream.maxBlockSize = max_block_size_v;
 		solvable_stream.sentPacketBufferSize = 1024 * 2;
 		solvable_stream.maxMessagesPerPacket = 32;
 		solvable_stream.messageResendTime = 0.f;
@@ -99,7 +98,7 @@ game_connection_config::game_connection_config() {
 
 	networkSimulator = true;
 
-	set_max_packet_size(2 * 1024);
+	set_max_packet_size(max_packet_size_v);
 }
 
 void game_connection_config::set_max_packet_size(const unsigned s) {

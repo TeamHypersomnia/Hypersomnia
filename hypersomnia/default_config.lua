@@ -659,6 +659,7 @@ return {
 
 	max_buffered_server_commands = 10000,
 	max_predicted_client_commands = 1500,
+    flush_demo_to_disk_once_every_secs = 10,
     spectated_arena_type = "REFERENTIAL",
 
 	client_chat = {

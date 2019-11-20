@@ -1,4 +1,5 @@
 #pragma once
+#include <future>
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
 #include "application/setups/client/client_start_input.h"
@@ -114,6 +115,15 @@ class client_setup :
 	};
 
 	std::vector<untimely_payload> untimely_payloads;
+
+	net_time_t when_last_flushed_demo = 0.0;
+	augs::path_type recorded_demo_path;
+	demo_step_num_type recorded_demo_step = 0;
+	std::size_t written_messages = 0;
+
+	std::vector<demo_step_map::value_type> unflushed_demo_steps;
+	std::vector<demo_step_map::value_type> demo_steps_being_flushed;
+	std::future<void> future_flushed_demo;
 	/* No client state follows later in code. */
 
 	template <class U>
@@ -154,14 +164,17 @@ class client_setup :
 		}
 	}
 
-	void handle_server_messages();
+	void handle_server_payloads();
 	void send_pending_commands();
 	void send_packets_if_its_time();
 
 	template <class T, class F>
-	message_handler_result handle_server_message(
+	message_handler_result handle_server_payload(
 		F&& read_payload
 	);
+
+	template <class T>
+	void handle_server_message(T& message);
 
 	void send_to_server(total_client_entropy&);
 
@@ -259,7 +272,7 @@ public:
 
 		{
 			auto scope = measure_scope(performance.receiving_messages);
-			handle_server_messages();
+			handle_server_payloads();
 		}
 
 		const auto new_local_entropy = [&]() -> std::optional<mode_entropy> {
@@ -560,7 +573,6 @@ public:
 	}
 
 	void ensure_handler();
-	void save_recorded_demo_chunks();
 
 	mode_player_id get_local_player_id() const;
 	std::optional<session_id_type> find_local_session_id() const;
@@ -612,6 +624,11 @@ public:
 
 	bool requires_cursor() const;
 	bool is_replaying() const;
+	bool is_recording() const;
+	demo_step& get_currently_recorded_step();
+	void flush_demo_steps();
+	void wait_for_demo_flush();
+	bool demo_flushing_finished() const;
 
 	template <class... Args>
 	bool send_payload(Args&&... args);

@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Remember about proper locking when flushing with async
+	- e.g. protect when_last_flushed_demo and unflushed_demo_steps
+
+- is_replaying: just query the state from snapshotted player
+- Let's just do the recording first
+
 - We'll create a simple code for recording, but we might offload replays to snapshotted_player
 
 - client_setup replay (re-visited)

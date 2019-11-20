@@ -33,7 +33,7 @@ template <class List>
 class type_in_list_id {
 public:
 	using list_type = replace_list_type_t<List, type_list>;
-	using index_type = unsigned;
+	using index_type = uint32_t;
 private:
 
 	friend augs::introspection_access;

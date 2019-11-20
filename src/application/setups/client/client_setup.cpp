@@ -7,10 +7,12 @@
 
 #include "application/network/client_adapter.hpp"
 #include "application/network/net_message_translation.h"
+#include "application/setups/client/demo_step.h"
+#include "application/network/net_message_readwrite.h"
+#include "augs/templates/thread_templates.h"
 
 #include "game/cosmos/change_solvable_significant.h"
 
-#include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
 #include "application/arena/choose_arena.h"
@@ -19,7 +21,6 @@
 
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/gui/text/printer.h"
-#include "augs/readwrite/byte_file.h"
 #include "application/network/payload_easily_movable.h"
 #include "augs/misc/readable_bytesize.h"
 #include "game/cosmos/for_each_entity.h"
@@ -34,6 +35,7 @@
 #include "application/arena/arena_handle.hpp"
 #include "application/setups/client/demo_paths.h"
 #include "augs/misc/time_utils.h"
+#include "augs/readwrite/byte_file.h"
 
 void snap_interpolated_to_logical(cosmos&);
 
@@ -41,8 +43,64 @@ void client_setup::play_demo_from(const augs::path_type&) {
 
 }
 
-void client_setup::record_demo_to(const augs::path_type&) {
+void client_setup::flush_demo_steps() {
+	if (unflushed_demo_steps.empty()) {
+		return;
+	}
 
+	when_last_flushed_demo = client_time;
+
+	std::swap(demo_steps_being_flushed, unflushed_demo_steps);
+
+	future_flushed_demo = std::async(
+		std::launch::async,
+		[&]() {
+			auto out = augs::with_exceptions<std::ofstream>();
+			out.open(recorded_demo_path, std::ios::out | std::ios::binary | std::ios::app);
+
+			if (out.tellp() == 0) {
+				demo_file_meta meta;
+				meta.version = hypersomnia_version();
+				meta.server_address = last_start.connect_address;
+				augs::write_bytes(out, meta);
+
+				const auto version_info_path = augs::path_type(recorded_demo_path).replace_extension(".version.txt");
+				augs::save_as_text(version_info_path, meta.version.get_summary());
+			}
+
+			for (const auto& s : demo_steps_being_flushed) {
+				augs::write_bytes(out, s.first);
+				augs::write_bytes(out, s.second);
+			}
+
+			demo_steps_being_flushed.clear();
+		}
+	);
+}
+
+bool client_setup::is_replaying() const {
+	return false;
+}
+
+bool client_setup::demo_flushing_finished() const {
+	return !future_flushed_demo.valid();
+}
+
+bool client_setup::is_recording() const {
+	return !recorded_demo_path.empty();
+}
+
+demo_step& client_setup::get_currently_recorded_step() {
+	if (unflushed_demo_steps.empty() || unflushed_demo_steps.back().first != recorded_demo_step) {
+		unflushed_demo_steps.emplace_back(recorded_demo_step, demo_step());
+	}
+
+	return unflushed_demo_steps.back().second;
+}
+
+void client_setup::record_demo_to(const augs::path_type& p) {
+	recorded_demo_path = p;
+	when_last_flushed_demo = client_time;
 }
 
 template <class... Args>
@@ -120,6 +178,9 @@ client_setup::~client_setup() {
 	disconnect();
 
 	augs::network::enable_detailed_logs(false);
+
+	wait_for_demo_flush();
+	flush_demo_steps();
 }
 
 net_time_t client_setup::get_current_time() {
@@ -214,8 +275,16 @@ double client_setup::get_audiovisual_speed() const {
 
 using initial_payload = initial_arena_state_payload<false>;
 
+template <class T>
+void client_setup::handle_server_message(T& message) {
+	if (is_recording()) {
+		auto bytes = net_message_to_bytes(message);
+		get_currently_recorded_step().serialized_messages.emplace_back(std::move(bytes));
+	}
+}
+
 template <class T, class F>
-message_handler_result client_setup::handle_server_message(
+message_handler_result client_setup::handle_server_payload(
 	F&& read_payload
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
@@ -592,7 +661,7 @@ bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
 	return true;
 }
 
-void client_setup::handle_server_messages() {
+void client_setup::handle_server_payloads() {
 	namespace N = net_messages;
 
 	if (is_replaying()) {
@@ -606,6 +675,18 @@ void client_setup::handle_server_messages() {
 		auto& message_handler = *this;
 
 		adapter->advance(client_time, message_handler);
+
+		++recorded_demo_step;
+
+		if (client_time - when_last_flushed_demo > vars.flush_demo_to_disk_once_every_secs) {
+			if (::valid_and_is_ready(future_flushed_demo)) {
+				future_flushed_demo.get();
+			}
+
+			if (demo_flushing_finished()) {
+				flush_demo_steps();
+			}
+		}
 	}
 }
 
@@ -1233,13 +1314,12 @@ bool client_setup::requires_cursor() const {
 }
 
 void client_setup::ensure_handler() {
-	save_recorded_demo_chunks();
+	wait_for_demo_flush();
+	flush_demo_steps();
 }
 
-void client_setup::save_recorded_demo_chunks() {
-
-}
-
-bool client_setup::is_replaying() const {
-	return false;
+void client_setup::wait_for_demo_flush() {
+	if (future_flushed_demo.valid()) {
+		future_flushed_demo.wait();
+	}
 }

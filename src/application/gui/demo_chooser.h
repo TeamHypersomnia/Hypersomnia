@@ -12,6 +12,8 @@
 #include "view/asset_funcs.h"
 #include "augs/misc/time_utils.h"
 #include "augs/log.h"
+#include "augs/misc/readable_bytesize.h"
+#include "augs/readwrite/stream_read_error.h"
 
 class demo_chooser : keyboard_acquiring_popup {
 	using I = std::string;
@@ -23,7 +25,12 @@ class demo_chooser : keyboard_acquiring_popup {
 	std::vector<asset_widget_path_entry> all_paths;
 	path_tree_settings tree_settings;
 
-	std::unordered_map<augs::path_type, std::string> write_times;
+	struct path_meta {
+		std::string write_time = "Unknown";
+		std::string server_address = "Unknown";
+	};
+
+	std::unordered_map<augs::path_type, path_meta> path_metas;
 
 public:
 	template <class F>
@@ -37,9 +44,11 @@ public:
 
 		const auto displayed_str = current_source.empty() ? std::string("(None selected)") : current_source.string();
 
+		auto scoped_w = augs::imgui::scoped_item_width(ImGui::GetWindowWidth() - ImGui::CalcTextSize(label.c_str()).x - 20);
+
 		if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 			if (base::check_opened_first_time()) {
-				write_times.clear();
+				path_metas.clear();
 				all_paths.clear();
 
 				auto path_adder = [this](const auto& full_path) {
@@ -50,12 +59,27 @@ public:
 					maybe_official_path<I> entry;
 					entry.path = full_path;
 
+					path_meta meta;
+
 					try {
-						write_times[full_path] = augs::date_time(augs::last_write_time(full_path)).how_long_ago();
+						auto t = augs::with_exceptions<std::ifstream>(full_path, std::ios::in | std::ios::binary);
+						decltype(demo_file_meta::server_address) addr;
+						augs::read_bytes(t, addr);
+
+						meta.server_address = addr;
+						meta.write_time = augs::date_time(augs::last_write_time(full_path)).how_long_ago();
+					}
+					catch (const std::ifstream::failure&) {
+
+					}
+					catch (const augs::stream_read_error&) {
+
 					}
 					catch (const augs::filesystem_error&) {
-						write_times[full_path] = augs::date_time();
+
 					}
+
+					path_metas[full_path] = meta;
 
 					all_paths.emplace_back(std::move(entry));
 					return callback_result::CONTINUE;
@@ -77,36 +101,76 @@ public:
 
 			const bool acquire_keyboard = base::pop_acquire_keyboard();
 
-			path_tree_settings settings;
-			settings.linear_view = true;
-			settings.pretty_names = false;
+			auto path_callback = [&](const auto& path_entry, const auto displayed_name) {
+				const auto button_path = path_entry.get_full_path();
+				const bool is_current = button_path.path == current_source;
 
-			simple_browse_path_tree(
-				settings,
-				all_paths,
-				[&](const auto& path_entry, const auto displayed_name) {
-					const auto button_path = path_entry.get_full_path();
-					const bool is_current = button_path.path == current_source;
-
-					if (is_current && acquire_keyboard) {
-						ImGui::SetScrollHere();
-					}
-
-					if (ImGui::Selectable(displayed_name.c_str(), is_current)) {
-						ImGui::CloseCurrentPopup();
-
-						LOG("Choosing button path: %x ", button_path);
-						on_choice(button_path);
-					}
-				},
-				acquire_keyboard,
-				{},
-				"",
-				{ "Demo", "When recorded" },
-				[&](const auto& p) {
-					return write_times.at(p.get_full_path().path);
+				if (is_current && acquire_keyboard) {
+					ImGui::SetScrollHere();
 				}
-			);
+
+				if (ImGui::Selectable(displayed_name.c_str(), is_current)) {
+					ImGui::CloseCurrentPopup();
+
+					LOG("Choosing button path: %x ", button_path);
+					on_choice(button_path);
+				}
+			};
+
+			{
+				using namespace augs::imgui;
+
+				thread_local ImGuiTextFilter filter;
+				filter.Draw();
+
+				if (acquire_keyboard) {
+					ImGui::SetKeyboardFocusHere();
+				}
+
+				auto files_view = scoped_child("Files view", ImVec2(0, 20 * ImGui::GetTextLineHeightWithSpacing()));
+
+				ImGui::Columns(4);
+				ImGui::SetColumnWidth(0, ImGui::CalcTextSize("99.99.99999 at 99-99-99.dem").x);
+				ImGui::SetColumnWidth(1, ImGui::CalcTextSize("999999 years ago").x);
+				ImGui::SetColumnWidth(2, ImGui::CalcTextSize("9999999999999 MB").x);
+				ImGui::SetColumnWidth(3, ImGui::CalcTextSize("arena-blahblah.hypersomnia.xyz").x);
+
+				text_disabled("Filename");
+				ImGui::NextColumn();
+				text_disabled("Recorded");
+				ImGui::NextColumn();
+				text_disabled("File size");
+				ImGui::NextColumn();
+				text_disabled("Server");
+				ImGui::NextColumn();
+
+				ImGui::Separator();
+
+				for (const auto& l : all_paths) {
+					const auto filename = l.get_filename().string();
+					const auto& full_path = l.get_full_path().path;
+					const auto path_meta = path_metas.at(full_path);
+
+					const bool passes_anything = 
+						filter.PassFilter(filename.c_str())
+						||  filter.PassFilter(path_meta.server_address.c_str())
+						||  filter.PassFilter(path_meta.write_time.c_str())
+					;
+
+					if (!passes_anything) {
+						continue;
+					}
+
+					path_callback(l, filename);
+					ImGui::NextColumn();
+					text_disabled(path_meta.write_time);
+					ImGui::NextColumn();
+					text_disabled(readable_bytesize(augs::get_file_size(l.get_full_path().path)));
+					ImGui::NextColumn();
+					text_disabled(path_meta.server_address);
+					ImGui::NextColumn();
+				}
+			}
 		}
 		else {
 			base::mark_not_opened();
