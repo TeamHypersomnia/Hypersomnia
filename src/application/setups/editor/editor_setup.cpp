@@ -827,7 +827,7 @@ augs::path_type make_relative_if_possible(augs::path_type original) {
 	return relative;
 }
 
-auto make_chooser_lambda(const augs::window& window, const char* const message) {
+auto make_chooser_lambda(augs::window& window, const char* const message) {
 	return [&window, message](){
 		auto result = window.choose_directory_dialog(message);
 
@@ -839,7 +839,7 @@ auto make_chooser_lambda(const augs::window& window, const char* const message) 
 	};
 }
 
-void editor_setup::open(const augs::window& window) {
+void editor_setup::open(augs::window& window) {
 	if (ok_only_popup) {
 		return;
 	}
@@ -848,7 +848,7 @@ void editor_setup::open(const augs::window& window) {
 	open_folder_dialog = std::async(std::launch::async, make_chooser_lambda(window, message));
 }
 
-void editor_setup::save(const augs::window& window) {
+void editor_setup::save(augs::window& window) {
 	if (!anything_opened()) {
 		return;
 	}
@@ -861,7 +861,7 @@ void editor_setup::save(const augs::window& window) {
 	}
 }
 
-void editor_setup::export_for_compatibility(const augs::window& window) {
+void editor_setup::export_for_compatibility(augs::window& window) {
 	if (!anything_opened() || ok_only_popup) {
 		return;
 	}
@@ -874,7 +874,7 @@ void editor_setup::export_for_compatibility(const augs::window& window) {
 	);
 }
 
-void editor_setup::save_as(const augs::window& window) {
+void editor_setup::save_as(augs::window& window) {
 	if (!anything_opened() || ok_only_popup) {
 		return;
 	}
@@ -1005,7 +1005,7 @@ void editor_setup::go_to_entity() {
 	go_to_entity_gui.open();
 }
 
-void editor_setup::reveal_in_explorer(const augs::window& window) {
+void editor_setup::reveal_in_explorer(augs::window& window) {
 	window.reveal_in_explorer(folder().get_paths().version_info_file);
 }
 

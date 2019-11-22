@@ -41,24 +41,24 @@ namespace augs {
 	std::optional<std::string> window::open_file_dialog(
 		const std::vector<file_dialog_filter>&,
 		const std::string& 
-	) const {
+	) {
 		return std::nullopt;
 	}
 
 	std::optional<std::string> window::save_file_dialog(
 		const std::vector<file_dialog_filter>&,
 		const std::string& 
-	) const {
+	) {
 		return std::nullopt;
 	}
 
 	std::optional<std::string> window::choose_directory_dialog(
 		const std::string& 
-	) const {
+	) {
 		return std::nullopt;
 	}
 
-	void window::reveal_in_explorer(const augs::path_type&) const {
+	void window::reveal_in_explorer(const augs::path_type&) {
 	
 	}
 

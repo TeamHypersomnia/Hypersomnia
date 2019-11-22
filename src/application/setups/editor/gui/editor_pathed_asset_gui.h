@@ -45,7 +45,7 @@ public:
 	int move_currently_viewed_by = 0;
 
 	void perform(
-		const augs::window&,
+		augs::window&,
 		const property_editor_settings&, 
 		const images_in_atlas_map&, 
 		editor_command_input

@@ -698,7 +698,7 @@ namespace augs {
 	std::optional<std::string> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		const std::string& custom_title
-	) const {
+	) {
 		const auto filter = get_filter(filters);
 		const auto title = widen(custom_title);
 		
@@ -737,7 +737,7 @@ namespace augs {
 
 	std::optional<std::string> window::choose_directory_dialog(
 		const std::string& custom_title
-	) const {
+	) {
 		const auto title = widen(custom_title);
 		const auto choice = ::PickContainer(title);
 
@@ -751,7 +751,7 @@ namespace augs {
 	std::optional<std::string> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		const std::string& custom_title
-	) const {
+	) {
 		const auto filter = get_filter(filters);
 		const auto title = widen(custom_title);
 
@@ -796,7 +796,7 @@ namespace augs {
 		}
 	}
 
-	void window::reveal_in_explorer(const augs::path_type& p) const {
+	void window::reveal_in_explorer(const augs::path_type& p) {
 		/*
 			Could be implemented as:
 			augs::shell(p.string());

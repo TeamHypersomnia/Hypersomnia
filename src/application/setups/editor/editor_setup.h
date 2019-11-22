@@ -269,10 +269,10 @@ public:
 	setup_escape_result escape();
 	bool confirm_modal_popup();
 
-	void open(const augs::window& owner);
-	void save(const augs::window& owner);
-	void save_as(const augs::window& owner);
-	void export_for_compatibility(const augs::window& owner);
+	void open(augs::window& owner);
+	void save(augs::window& owner);
+	void save_as(augs::window& owner);
+	void export_for_compatibility(augs::window& owner);
 	void undo();
 	void redo();
 
@@ -290,7 +290,7 @@ public:
 	void go_to_all();
 	void go_to_entity();
 	void select_all_entities(bool has_ctrl);
-	void reveal_in_explorer(const augs::window& owner);
+	void reveal_in_explorer(augs::window& owner);
 
 	void finish_rectangular_selection();
 	void unhover();

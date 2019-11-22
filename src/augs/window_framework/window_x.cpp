@@ -939,24 +939,24 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 	std::optional<std::string> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
-	) const {
+	) {
 		return choose_path("scripts/unix/open_file.local");
 	}
 
 	std::optional<std::string> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
-	) const {
+	) {
 		return choose_path("scripts/unix/save_file.local");
 	}
 
 	std::optional<std::string> window::choose_directory_dialog(
 		const std::string& /* custom_title */
-	) const {
+	) {
 		return choose_path("scripts/unix/choose_directory.local");
 	}
 
-	void window::reveal_in_explorer(const augs::path_type& p) const {
+	void window::reveal_in_explorer(const augs::path_type& p) {
 		const auto script_path = "scripts/unix/reveal_file.local";
 
 		if (!augs::exists(script_path)) {

@@ -62,7 +62,7 @@ void editor_pathed_asset_gui<asset_id_type>::set_currently_viewed(const asset_id
 
 template <class asset_id_type>
 void editor_pathed_asset_gui<asset_id_type>::perform(
-	const augs::window& window,
+	augs::window& window,
 	const property_editor_settings& settings,
 	const images_in_atlas_map& game_atlas,
    	editor_command_input cmd_in
