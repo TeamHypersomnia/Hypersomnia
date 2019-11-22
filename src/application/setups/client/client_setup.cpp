@@ -299,6 +299,10 @@ entity_id client_setup::get_controlled_character_id() const {
 		return entity_id::dead();
 	}
 
+	if (is_replaying()) {
+		return entity_id::dead();
+	}
+
 	return on_mode_with_input(
 		[&](const auto& typed_mode, const auto& in) {
 			(void)in;

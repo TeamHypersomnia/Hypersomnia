@@ -7,7 +7,6 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Add spectated player's avatar to spectator overlay
-- Fix mouse inputs being applied during demo replay
 
 - next/prev round and death
 	- textbox with an offset for deaths

@@ -4018,3 +4018,4 @@ Advantages:
 
 - We'll create a simple code for recording, but we might offload replays to snapshotted_player
 
+- Fix mouse inputs being applied during demo replay
