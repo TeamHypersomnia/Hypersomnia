@@ -37,11 +37,103 @@
 #include "augs/misc/time_utils.h"
 #include "application/network/net_message_serializers.h"
 #include "augs/readwrite/byte_file.h"
+#include "application/gui/client/demo_player_gui.hpp"
 
-void snap_interpolated_to_logical(cosmos&);
+#include "application/setups/client/handle_server_payload.hpp"
 
-void client_setup::play_demo_from(const augs::path_type&) {
+void client_demo_player::play_demo_from(const augs::path_type& p) {
+	source_path = p;
+	auto source = augs::open_binary_input_stream(source_path);
 
+	augs::read_bytes(source, meta);
+	augs::read_vector_until_eof(source, demo_steps);
+
+	gui.open();
+}
+
+bool client_demo_player::control(const handle_input_before_game_input in) {
+	using namespace augs::event;
+	using namespace augs::event::keys;
+
+	const auto& state = in.common_input_state;
+	const bool has_alt{ state[key::LALT] };
+
+	const auto ch = in.e.get_key_change();
+
+	if (ch == key_change::PRESSED) {
+		const auto key = in.e.get_key();
+
+		if (in.e.was_any_key_pressed()) {
+			switch (key) {
+				case key::NUMPAD0: set_speed(1.0); return true;
+				case key::NUMPAD1: set_speed(0.01); return true;
+				case key::NUMPAD2: set_speed(0.05); return true;
+				case key::NUMPAD3: set_speed(0.1); return true;
+				case key::NUMPAD4: set_speed(0.5); return true;
+				case key::NUMPAD5: set_speed(2.0); return true;
+				case key::NUMPAD6: set_speed(4.0); return true;
+				case key::NUMPAD7: set_speed(10.0); return true;
+				case key::SPACE: paused = !paused; return true;
+				case key::ADD: seek_forward(1); return true;
+				case key::SUBTRACT: seek_backward(1); return true;
+				default: break;
+			}
+
+			if (has_alt) {
+				switch (key) {
+					case key::P: gui.show = !gui.show; return true;
+					default: break;
+				}
+			}
+		}
+
+	}
+
+	return false;
+}
+
+void client_setup::handle_server_messages_from(const demo_step& step) {
+	for (auto& s : step.serialized_messages) {
+		auto read_callback = [this](auto& typed_msg) -> message_handler_result {
+			using net_message_type = remove_cref<decltype(typed_msg)>;
+
+			auto read_payload_into = [&](auto&&... args) {
+				return typed_msg.read_payload(
+					std::forward<decltype(args)>(args)...
+				);
+			};
+
+			using P = payload_of_t<net_message_type>;
+
+			return handle_server_payload<remove_cref<P>>(std::move(read_payload_into));
+		};
+
+		try {
+			const auto result = ::on_read_net_message(s, read_callback);
+
+			if (result == message_handler_result::ABORT_AND_DISCONNECT) {
+				disconnect();
+				return;
+			}
+		}
+		catch (const augs::stream_read_error& err) {
+			set_demo_failed_reason(err.what());
+			disconnect();
+			break;
+		}
+	}
+}
+
+template <class T>
+void client_setup::handle_server_message(T& message) {
+	if (is_recording()) {
+		auto bytes = ::net_message_to_bytes(message);
+		get_currently_recorded_step().serialized_messages.emplace_back(std::move(bytes));
+	}
+}
+
+void client_setup::play_demo_from(const augs::path_type& p) {
+	demo_player.play_demo_from(p);
 }
 
 void client_setup::flush_demo_steps() {
@@ -62,7 +154,7 @@ void client_setup::flush_demo_steps() {
 			if (out.tellp() == 0) {
 				demo_file_meta meta;
 				meta.version = hypersomnia_version();
-				meta.server_address = last_start.connect_address;
+				meta.server_address = last_addr.connect_address;
 				augs::write_bytes(out, meta);
 
 				const auto version_info_path = augs::path_type(recorded_demo_path).replace_extension(".version.txt");
@@ -70,8 +162,7 @@ void client_setup::flush_demo_steps() {
 			}
 
 			for (const auto& s : demo_steps_being_flushed) {
-				augs::write_bytes(out, s.first);
-				augs::write_bytes(out, s.second);
+				augs::write_bytes(out, s);
 			}
 
 			demo_steps_being_flushed.clear();
@@ -80,7 +171,11 @@ void client_setup::flush_demo_steps() {
 }
 
 bool client_setup::is_replaying() const {
-	return false;
+	return !demo_player.source_path.empty();
+}
+
+bool client_setup::is_paused() const {
+	return demo_player.is_paused();
 }
 
 bool client_setup::demo_flushing_finished() const {
@@ -92,11 +187,7 @@ bool client_setup::is_recording() const {
 }
 
 demo_step& client_setup::get_currently_recorded_step() {
-	if (unflushed_demo_steps.empty() || unflushed_demo_steps.back().first != recorded_demo_step) {
-		unflushed_demo_steps.emplace_back(recorded_demo_step, demo_step());
-	}
-
-	return unflushed_demo_steps.back().second;
+	return unflushed_demo_steps.back();
 }
 
 void client_setup::record_demo_to(const augs::path_type& p) {
@@ -119,18 +210,33 @@ client_setup::client_setup(
 	const client_vars& initial_vars
 ) : 
 	lua(lua),
-	last_start(in.get_address_and_port()),
+	last_addr(in.get_address_and_port()),
 	vars(initial_vars),
 	adapter(std::make_unique<client_adapter>()),
 	client_time(get_current_time()),
 	when_initiated_connection(get_current_time())
 {
-	LOG("Initializing connection with %x", last_start.connect_address);
+	LOG("Initializing connection with %x", last_addr.connect_address);
 
 	const auto& input_demo_path = in.replay_demo;
 
 	if (!input_demo_path.empty()) {
-		play_demo_from(input_demo_path);
+		const auto error = typesafe_sprintf(
+			"Failed to open demo file:\n%x", 
+			input_demo_path
+		);
+
+		try {
+			play_demo_from(input_demo_path);
+		}
+		catch (const augs::file_open_error&) {
+			set_disconnect_reason(error, true);
+			disconnect();
+		}
+		catch (const augs::stream_read_error&) {
+			set_disconnect_reason(error, true);
+			disconnect();
+		}
 	}
 	else {
 		if (!nickname_len_in_range(vars.nickname.length())) {
@@ -145,7 +251,7 @@ client_setup::client_setup(
 		else {
 			augs::network::enable_detailed_logs(true);
 
-			const auto resolution = adapter->connect(last_start);
+			const auto resolution = adapter->connect(last_addr);
 
 			if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
 				const auto reason = typesafe_sprintf(
@@ -157,7 +263,7 @@ client_setup::client_setup(
 			}
 			else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
 				const auto reason = typesafe_sprintf(
-					"The address: \"%x\" is invalid!", last_start.connect_address
+					"The address: \"%x\" is invalid!", last_addr.connect_address
 				);
 
 				set_disconnect_reason(reason);
@@ -213,6 +319,11 @@ void client_setup::customize_for_viewing(config_lua_table& config) const {
 	if (is_gameplay_on()) {
 		get_arena_handle(client_arena_type::REFERENTIAL).adjust(config.drawing);
 	}
+
+	if (is_replaying()) {
+		config.arena_mode_gui.show_spectator_overlay = demo_player.gui.show_spectator_overlay;
+		config.client.spectated_arena_type = demo_player.gui.shown_arena_type;
+	}
 }
 
 void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
@@ -263,7 +374,7 @@ double client_setup::get_inv_tickrate() const {
 		return default_inv_tickrate;
 	}
 
-	return get_arena_handle().get_inv_tickrate();
+	return get_arena_handle(client_arena_type::REFERENTIAL).get_inv_tickrate();
 }
 
 double client_setup::get_audiovisual_speed() const {
@@ -271,333 +382,13 @@ double client_setup::get_audiovisual_speed() const {
 		return 1.0;
 	}
 
-	return get_arena_handle().get_audiovisual_speed();
-}
+	auto mult = 1.0;
 
-using initial_payload = initial_arena_state_payload<false>;
-
-template <class T>
-void client_setup::handle_server_message(T& message) {
-	if (is_recording()) {
-		auto bytes = net_message_to_bytes(message);
-		get_currently_recorded_step().serialized_messages.emplace_back(std::move(bytes));
-	}
-}
-
-template <class T, class F>
-message_handler_result client_setup::handle_server_payload(
-	F&& read_payload
-) {
-	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
-	constexpr auto continue_v = message_handler_result::CONTINUE;
-	constexpr bool is_easy_v = payload_easily_movable_v<T>;
-
-	std::conditional_t<is_easy_v, T, std::monostate> payload;
-
-	if constexpr(is_easy_v) {
-		if (!read_payload(payload)) {
-			return abort_v;
-		}
+	if (is_replaying()) {
+		mult = demo_player.get_speed();
 	}
 
-	if constexpr (std::is_same_v<T, server_solvable_vars>) {
-		const bool are_initial_vars = state == client_state_type::PENDING_WELCOME;
-		const auto& new_vars = payload;
-
-		if (are_initial_vars) {
-			LOG("Received initial vars from the server");
-			state = client_state_type::RECEIVING_INITIAL_STATE;
-		}
-		else {
-			LOG("Received corrected vars from the server");
-		}
-
-		const auto& new_arena = new_vars.current_arena;
-
-		LOG_NVPS(new_arena);
-
-		if (are_initial_vars || new_arena != sv_solvable_vars.current_arena) {
-			LOG("Client loads arena: %x", new_arena);
-
-			try {
-				const auto& referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
-
-				::choose_arena(
-					lua,
-					referential_arena,
-					new_vars,
-					initial_signi
-				);
-
-				arena_gui.reset();
-				arena_gui.choose_team.show = ::is_spectator(referential_arena, get_local_player_id());
-				client_gui.rcon.show = false;
-			}
-			catch (const augs::file_open_error& err) {
-				set_disconnect_reason(typesafe_sprintf(
-					"Failed to load arena: \"%x\".\n"
-					"The arena files might be corrupt, or they might be missing.\n"
-					"Please check if \"%x\" folder resides within \"%x\" directory.\n"
-					"\nDetails: \n%x",
-					new_arena,
-					new_arena,
-					"arenas",
-					err.what()
-				));
-
-				return abort_v;
-			}
-
-			/* Prepare the predicted cosmos. */
-			predicted_cosmos = scene.world;
-		}
-
-		sv_solvable_vars = new_vars;
-		client_gui.rcon.on_arrived(new_vars);
-	}
-	else if constexpr (std::is_same_v<T, server_vars>) {
-		const auto& new_vars = payload;
-
-		sv_vars = new_vars;
-		client_gui.rcon.on_arrived(new_vars);
-	}
-	else if constexpr (std::is_same_v<T, server_broadcasted_chat>) {
-		const auto author_id = payload.author;
-
-		const auto sender_player = get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-			[&](const auto& typed_mode) {
-				return typed_mode.find(author_id);
-			}
-		);
-
-		std::string sender_player_nickname;
-		auto sender_player_faction = faction_type::SPECTATOR;
-
-		if (sender_player != nullptr) {
-			sender_player_faction = sender_player->get_faction();
-			sender_player_nickname = sender_player->get_chosen_name();
-		}
-		else {
-			if (!author_id.is_set()) {
-				sender_player_nickname = "Client";
-			}
-			else {
-				sender_player_nickname = "Unknown player";
-			}
-		}
-
-		{
-			auto new_entry = chat_gui_entry::from(
-				payload,
-				get_current_time(),
-				sender_player_nickname,
-				sender_player_faction
-			);
-
-			LOG(new_entry.operator std::string());
-			client_gui.chat.add_entry(std::move(new_entry));
-		}
-
-		if (payload.recipient_shall_kindly_leave) {
-			if (payload.target == chat_target_type::SERVER_SHUTTING_DOWN) {
-				const auto msg = std::string(payload.message);
-
-				std::string reason_str;
-
-				if (msg.size() > 0) {
-					reason_str = "\n\n" + reason_str;
-				}
-
-				set_disconnect_reason(typesafe_sprintf(
-					"The server is shutting down.%x", 
-					reason_str
-				), true);
-			}
-			else {
-				std::string kicked_or_banned;
-
-				if (payload.target == chat_target_type::KICK) {
-					kicked_or_banned = "kicked";
-				}
-				else if (payload.target == chat_target_type::BAN) {
-					kicked_or_banned = "banned";
-				}
-
-				set_disconnect_reason(typesafe_sprintf(
-					"You were %x from the server.\nReason: %x", 
-					kicked_or_banned,
-					std::string(payload.message)
-				), true);
-			}
-
-			LOG_NVPS(last_disconnect_reason);
-
-			return abort_v;
-		}	
-	}
-	else if constexpr (std::is_same_v<T, initial_payload>) {
-		if (!now_resyncing && state != client_state_type::RECEIVING_INITIAL_STATE) {
-			LOG("The server has sent initial state early (state: %x). Disconnecting.", state);
-			log_malicious_server();
-			return abort_v;
-		}
-
-		const bool was_resyncing = now_resyncing;
-
-		now_resyncing = false;
-
-		uint32_t read_client_id;
-
-		cosmic::change_solvable_significant(
-			scene.world, 
-			[&](cosmos_solvable_significant& signi) {
-				read_payload(
-					buffers,
-
-					initial_signi,
-
-					initial_payload {
-						signi,
-						current_mode,
-						read_client_id,
-						client_gui.rcon.level
-					}
-				);
-
-				return changer_callback_result::REFRESH;
-			}
-		);
-
-		client_player_id = static_cast<mode_player_id>(read_client_id);
-
-		LOG("Received initial state from the server at step: %x.", scene.world.get_timestamp().step);
-		LOG("Received client id: %x", client_player_id.value);
-
-		state = client_state_type::IN_GAME;
-
-		auto predicted = get_arena_handle(client_arena_type::PREDICTED);
-		const auto referential = get_arena_handle(client_arena_type::REFERENTIAL);
-
-		auto& predicted_cosmos = predicted.advanced_cosm;
-
-		if (was_resyncing) {
-			::save_interpolations(receiver.transfer_caches, std::as_const(predicted_cosmos));
-		}
-
-		predicted.transfer_all_solvables(referential);
-
-		if (was_resyncing) {
-			::restore_interpolations(receiver.transfer_caches, predicted_cosmos);
-			receiver.schedule_reprediction = true;
-		}
-
-		receiver.clear_incoming();
-
-		if (!was_resyncing) {
-			snap_interpolated_to_logical(predicted_cosmos);
-		}
-	}
-#if CONTEXTS_SEPARATE
-	else if constexpr (std::is_same_v<T, prestep_client_context>) {
-		if (state != client_state_type::IN_GAME) {
-			LOG("The server has sent prestep context too early (state: %x). Disconnecting.", state);
-
-			log_malicious_server();
-			return abort_v;
-		}
-
-		receiver.acquire_next_server_entropy(payload);
-	}
-#endif
-	else if constexpr (std::is_same_v<T, networked_server_step_entropy>) {
-		if (state != client_state_type::IN_GAME) {
-			LOG("The server has sent entropy too early (state: %x). Disconnecting.", state);
-
-			log_malicious_server();
-			return abort_v;
-		}
-
-		receiver.acquire_next_server_entropy(
-			payload.context,
-			payload.meta, 
-			payload.payload
-		);
-
-		const auto& max_commands = vars.max_buffered_server_commands;
-		const auto num_commands = receiver.incoming_entropies.size();
-
-		if (num_commands > max_commands) {
-			set_disconnect_reason(typesafe_sprintf(
-				"Number of buffered server commands (%x) exceeded max_buffered_server_commands (%x).", 
-				num_commands,
-				max_commands
-			));
-
-			LOG_NVPS(last_disconnect_reason);
-
-			return abort_v;
-		}
-
-		//LOG("Received %x th entropy from the server", receiver.incoming_entropies.size());
-		//LOG_NVPS(payload.num_entropies_accepted);
-	}
-	else if constexpr (std::is_same_v<T, public_settings_update>) {
-		/* 
-			We can assign it right away and it won't desync,
-			because it only affects the incoming entropies and they are unpacked on the go
-			whenever networked_server_step_entropy arrives.
-
-			networked_server_step_entropy and public_settings_update are on the same channel.
-		*/
-
-		player_metas[payload.subject_id.value].public_settings = payload.new_settings;
-	}
-	else if constexpr (std::is_same_v<T, net_statistics_update>) {
-		const auto& ping_values = payload.ping_values;
-
-		int ping_value_i = 0;
-
-		get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-			[&](const auto& typed_mode) {
-				typed_mode.for_each_player_id(
-					[&](const mode_player_id& id) {
-						if (ping_value_i < static_cast<int>(ping_values.size())) {
-							player_metas[id.value].stats.ping = ping_values[ping_value_i++];
-
-							return callback_result::CONTINUE;
-						}
-
-						return callback_result::ABORT;
-					}
-				);
-			}
-		);
-
-	}
-	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
-		session_id_type session_id;
-		arena_player_avatar_payload new_avatar;
-
-		const bool result = read_payload(
-			session_id,
-			new_avatar
-		);
-
-		if (!result) {
-			return abort_v;
-		}
-
-		auto p = untimely_payload { session_id, std::move(new_avatar) };
-
-		if (!push_or_handle(p)) {
-			return abort_v;
-		}
-	}
-	else {
-		static_assert(always_false_v<T>, "Unhandled payload type.");
-	}
-
-	return continue_v;
+	return mult * get_arena_handle().get_audiovisual_speed();
 }
 
 bool client_setup::push_or_handle(untimely_payload& p) {
@@ -665,28 +456,25 @@ bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
 void client_setup::handle_server_payloads() {
 	namespace N = net_messages;
 
-	if (is_replaying()) {
-
+	if (vars.network_simulator.value.loss_percent >= 100.f) {
+		return;
 	}
-	else {
-		if (vars.network_simulator.value.loss_percent >= 100.f) {
-			return;
+
+	auto& message_handler = *this;
+
+	adapter->advance(client_time, message_handler);
+}
+
+void client_setup::advance_demo_recorder() {
+	++recorded_demo_step;
+
+	if (client_time - when_last_flushed_demo > vars.flush_demo_to_disk_once_every_secs) {
+		if (::valid_and_is_ready(future_flushed_demo)) {
+			future_flushed_demo.get();
 		}
 
-		auto& message_handler = *this;
-
-		adapter->advance(client_time, message_handler);
-
-		++recorded_demo_step;
-
-		if (client_time - when_last_flushed_demo > vars.flush_demo_to_disk_once_every_secs) {
-			if (::valid_and_is_ready(future_flushed_demo)) {
-				future_flushed_demo.get();
-			}
-
-			if (demo_flushing_finished()) {
-				flush_demo_steps();
-			}
+		if (demo_flushing_finished()) {
+			flush_demo_steps();
 		}
 	}
 }
@@ -903,14 +691,14 @@ void client_setup::send_pending_commands() {
 
 void client_setup::send_packets_if_its_time() {
 	if (is_replaying()) {
+		return;
 	}
-	else {
-		if (vars.network_simulator.value.loss_percent >= 100.f) {
-			return;
-		}
 
-		adapter->send_packets();
+	if (vars.network_simulator.value.loss_percent >= 100.f) {
+		return;
 	}
+
+	adapter->send_packets();
 }
 
 void client_setup::log_malicious_server() {
@@ -937,6 +725,10 @@ void client_setup::perform_chat_input_bar() {
 
 		chat.current_message.clear();
 	}
+}
+
+void client_setup::perform_demo_player_imgui(augs::window& window) {
+	demo_player.gui.perform(window, demo_player);
 }
 
 custom_imgui_result client_setup::perform_custom_imgui(
@@ -977,6 +769,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 	perform_chat_input_bar();
 
+	if (is_replaying()) {
+		perform_demo_player_imgui(in.window);
+	}
+
 	if (is_gameplay_on) {
 		augs::network::enable_detailed_logs(false);
 
@@ -1003,10 +799,24 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		const auto window_name = "Connection status";
 		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
+#if 0
+		if (is_replaying() && demo_replay_failed_reason.size() > 0) {
+			text("Error during demo replay:");
+			text(demo_replay_failed_reason);
+
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Go back")) {
+				return custom_imgui_result::GO_TO_MAIN_MENU;
+			}
+		}
+		else
+#endif
 		if (is_connected()) {
 			augs::network::enable_detailed_logs(false);
 
-			text_color(typesafe_sprintf("Connected to %x.", last_start.connect_address), green);
+			text_color(typesafe_sprintf("Connected to %x.", last_addr.connect_address), green);
 
 			if (state == C::INITIATING_CONNECTION) {
 				text("Initializing connection...");
@@ -1032,7 +842,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (state == C::INITIATING_CONNECTION && adapter->is_connecting()) {
-			text("Connecting to %x\nTime: %2f seconds", last_start.connect_address, get_current_time() - when_initiated_connection);
+			text("Connecting to %x\nTime: %2f seconds", last_addr.connect_address, get_current_time() - when_initiated_connection);
 
 			text("\n");
 			ImGui::Separator();
@@ -1050,10 +860,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				text("Lost connection to the server.");
 			}
 			else if (state == C::INITIATING_CONNECTION) {
-				text("Failed to establish connection with %x", last_start.connect_address);
+				text("Failed to establish connection with %x", last_addr.connect_address);
 			}
 			else {
-				text("Failed to join %x", last_start.connect_address);
+				text("Failed to join %x", last_addr.connect_address);
 			}
 
 			print_reason_if_any();
@@ -1093,6 +903,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 void client_setup::apply(const config_lua_table& cfg) {
 	vars = cfg.client;
 
+	if (is_replaying()) {
+		return;
+	}
+
 	auto& r = requested_settings;
 	r.chosen_nickname = vars.nickname;
 	r.rcon_password = vars.rcon_password;
@@ -1121,6 +935,7 @@ void client_setup::send_to_server(
 
 void client_setup::disconnect() {
 	if (is_replaying()) {
+		demo_player.source_path.clear();
 		return;
 	}
 
@@ -1167,6 +982,12 @@ bool client_setup::handle_input_before_game(
 
 	if (client_gui.control(in)) {
 		return true;
+	}
+
+	if (is_replaying()) {
+		if (demo_player.control(in)) {
+			return true;
+		}
 	}
 
 	return false;
@@ -1311,7 +1132,7 @@ void client_setup::handle_new_session(const add_player_input& in) {
 }
 
 bool client_setup::requires_cursor() const {
-	return arena_base::requires_cursor() || client_gui.requires_cursor();
+	return arena_base::requires_cursor() || client_gui.requires_cursor() || demo_player.gui.requires_cursor();
 }
 
 void client_setup::ensure_handler() {

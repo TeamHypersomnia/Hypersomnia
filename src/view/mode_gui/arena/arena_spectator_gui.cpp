@@ -54,13 +54,13 @@ void arena_spectator_gui::draw_gui(
 	using namespace augs::gui::text;
 	(void)draw_in;
 
-	if (!should_be_drawn(typed_mode)) {
-		return;
-	}
-
 	const auto spectated = typed_mode.find(now_spectating);
 
 	if (spectated == nullptr) {
+		return;
+	}
+
+	if (!should_be_drawn(typed_mode)) {
 		return;
 	}
 
@@ -140,7 +140,8 @@ template <class M>
 void arena_spectator_gui::advance(
 	const mode_player_id& local_player,
 	const M& mode, 
-	const typename M::const_input& in
+	const typename M::const_input& in,
+	const bool demo_replay_mode
 ) {
 	const auto& cosm = in.cosm;
 
@@ -207,7 +208,7 @@ void arena_spectator_gui::advance(
 	auto allow_inputs_if_knocked_out_for_long_enough = [&]() {
 		auto& when = when_local_player_knocked_out;
 
-		if (when.value().get<std::chrono::seconds>() > secs_before_accepting_inputs_after_death) {
+		if (demo_replay_mode || when.value().get<std::chrono::seconds>() > secs_before_accepting_inputs_after_death) {
 			accept_inputs = true;
 		}
 	};
@@ -232,7 +233,8 @@ void arena_spectator_gui::advance(
 
 	auto switch_if_current_unsuitable_already = [&]() {
 		const bool spectating_local = now_spectating == local_player;
-		const auto limit_secs = spectating_local ? 10000.f : secs_until_switching_dead_teammate;
+		const auto secs_until_switching_myself = demo_replay_mode ? secs_until_switching_dead_teammate : 10000.f;
+		const auto limit_secs = spectating_local ? secs_until_switching_myself : secs_until_switching_dead_teammate;
 
 		if (!mode.suitable_for_spectating(in, now_spectating, local_player, limit_secs)) {
 			switch_spectated_by(1);
@@ -250,8 +252,10 @@ void arena_spectator_gui::advance(
 
 	accept_inputs = false;
 
-	if (hide_if_local_is_conscious()) {
-		return;
+	if (!demo_replay_mode) {
+		if (hide_if_local_is_conscious()) {
+			return;
+		}
 	}
 
 	if (hide_if_match_summary()) {
@@ -261,7 +265,13 @@ void arena_spectator_gui::advance(
 	init_order_and_timer_if_showing_for_the_first_time();
 	allow_inputs_if_knocked_out_for_long_enough();
 
-	show_or_unshow_if_spectating_local();
+	if (demo_replay_mode) {
+		active = true;
+	}
+	else {
+		show_or_unshow_if_spectating_local();
+	}
+
 	switch_if_current_unsuitable_already();
 	switch_if_requested_by_key();
 }
@@ -277,5 +287,6 @@ template void arena_spectator_gui::draw_gui(
 template void arena_spectator_gui::advance(
 	const mode_player_id& local_player,
 	const bomb_mode& mode, 
-	const typename bomb_mode::const_input& in
+	const typename bomb_mode::const_input& in,
+	bool demo_replay_mode
 );

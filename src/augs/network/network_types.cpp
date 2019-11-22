@@ -1,4 +1,7 @@
 #include "3rdparty/yojimbo/yojimbo.h"
+#undef write_bytes
+#undef read_bytes
+
 #include "augs/network/network_types.h"
 #include "augs/log.h"
 #include <cstdio>

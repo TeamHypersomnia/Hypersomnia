@@ -59,6 +59,8 @@ struct server_advance_input {
 };
 
 struct client_advance_input {
+	const augs::delta frame_delta;
+
 	const vec2i& screen_size;
 	const input_settings settings;
 	const zoom_type zoom;
@@ -97,6 +99,8 @@ struct perform_custom_imgui_input {
 	augs::window& window;
 	const images_in_atlas_map& game_atlas;
 	const config_lua_table& config;
+
+	const bool demo_replay_mode;
 };
 
 struct handle_input_before_imgui_input {

@@ -2,6 +2,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/templates/byte_type_for.h"
 #include "augs/readwrite/byte_readwrite.h"
+#include "augs/filesystem/path_declaration.h"
 
 namespace augs {
 	inline auto file_to_bytes(const path_type& path, std::vector<std::byte>& output) {
@@ -73,5 +74,14 @@ namespace augs {
 		auto source = open_binary_input_stream(path);
 
 		read_map_until_eof(source, into);
+	}
+
+	template <class Source, class ContainerType>
+	void read_vector_until_eof(Source& source, ContainerType& into) {
+		while (source.peek() != EOF) {
+			typename ContainerType::value_type value;
+			augs::read_bytes(source, value);
+			into.emplace_back(std::move(value));
+		}
 	}
 }

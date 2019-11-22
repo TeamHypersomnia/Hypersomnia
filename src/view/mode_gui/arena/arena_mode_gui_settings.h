@@ -73,6 +73,8 @@ struct arena_mode_gui_settings {
 	float death_summary_offset_mult = 0.7f;
 
 	augs::maybe<arena_context_tip_settings> context_tip_settings;
+
+	bool show_spectator_overlay = true;
 	// END GEN INTROSPECTOR
 };
 

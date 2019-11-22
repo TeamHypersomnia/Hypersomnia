@@ -11,4 +11,6 @@ struct draw_mode_gui_input {
 	const mode_player_id local_player_id;
 	const images_in_atlas_map& images_in_atlas;
 	const config_lua_table& config;
+
+	const bool demo_replay_mode;
 };

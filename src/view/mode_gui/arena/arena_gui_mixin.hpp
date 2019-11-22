@@ -60,13 +60,14 @@ custom_imgui_result arena_gui_mixin<D>::perform_custom_imgui(
 		game_screen_top, 
 		self.get_local_player_id(), 
 		in.game_atlas,
-		in.config
+		in.config,
+		in.demo_replay_mode
 	};
 
 	auto perform_with = [&](const prediction_input input, const auto... args) {
 		self.get_arena_handle(args...).on_mode_with_input(
 			[&](const auto& typed_mode, const auto& mode_input) {
-				const auto new_entropy = arena_gui.perform_imgui(
+				const auto new_entropy = arena_gui.perform_imgui_and_advance(
 					draw_mode_in, 
 					typed_mode, 
 					mode_input,
@@ -139,7 +140,8 @@ void arena_gui_mixin<D>::draw_custom_gui(const draw_setup_gui_input& in) const {
 		game_screen_top,
 		self.get_local_player_id(), 
 		in.images_in_atlas,
-		in.config
+		in.config,
+		in.demo_replay_mode
 	};
 
 	auto draw_with = [&](const prediction_input input, const auto... args) {

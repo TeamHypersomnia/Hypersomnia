@@ -4,6 +4,9 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- fix predicted commands error for later debugging
+	- well, it's not important though
+
 - pretty print - check if convertible to string
 
 - Calculation might be off for orbital streams due to quick movements

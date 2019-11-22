@@ -6,13 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- next/prev round and death
+	- textbox with an offset for deaths
+	- 5 second threshold for rounds
+	- demo replay advance takes a lambda 'has_occured' that takes an enum demo_occurence_type KNOCKOUT/ROUND
+	- alternatively steppers may return some metadata with a bitset of occurences that happened, if it depends on post-solve
+		- but we can look into knockouts
+
+- Nickname should change if we change it in settings
+
 - Remember about proper locking when flushing with async
 	- e.g. protect when_last_flushed_demo and unflushed_demo_steps
-
-- is_replaying: just query the state from snapshotted player
-- Let's just do the recording first
-
-- We'll create a simple code for recording, but we might offload replays to snapshotted_player
 
 - client_setup replay (re-visited)
 	- let packets from server be saved on the message level

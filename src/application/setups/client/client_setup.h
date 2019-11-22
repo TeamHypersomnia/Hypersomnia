@@ -44,6 +44,9 @@
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "augs/texture_atlas/loaded_images_vector.h"
 #include "application/setups/client/demo_file.h"
+#include "application/setups/client/demo_step.h"
+#include "application/gui/client/demo_player_gui.h"
+#include "application/setups/client/client_demo_player.h"
 
 struct config_lua_table;
 
@@ -85,7 +88,7 @@ class client_setup :
 
 	simulation_receiver receiver;
 
-	address_and_port last_start;
+	address_and_port last_addr;
 	client_state_type state = client_state_type::INITIATING_CONNECTION;
 
 	client_vars vars;
@@ -121,9 +124,11 @@ class client_setup :
 	demo_step_num_type recorded_demo_step = 0;
 	std::size_t written_messages = 0;
 
-	std::vector<demo_step_map::value_type> unflushed_demo_steps;
-	std::vector<demo_step_map::value_type> demo_steps_being_flushed;
+	std::vector<demo_step> unflushed_demo_steps;
+	std::vector<demo_step> demo_steps_being_flushed;
 	std::future<void> future_flushed_demo;
+
+	client_demo_player demo_player;
 	/* No client state follows later in code. */
 
 	template <class U>
@@ -131,6 +136,12 @@ class client_setup :
 
 	bool push_or_handle(untimely_payload&);
 	void handle_new_session(const add_player_input& in);
+
+	template <class T>
+	void set_demo_failed_reason(T&& reason) {
+		last_disconnect_reason = typesafe_sprintf("Error during demo replay:\n%x", reason);
+		print_only_disconnect_reason = true;
+	}
 
 	template <class T>
 	void set_disconnect_reason(T&& reason, bool print_only_reason = false) {
@@ -187,44 +198,7 @@ class client_setup :
 	void play_demo_from(const augs::path_type&);
 	void record_demo_to(const augs::path_type&);
 
-public:
-	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
-	static constexpr bool handles_window_input = true;
-	static constexpr bool has_additional_highlights = false;
-
-	client_setup(
-		sol::state& lua,
-		const client_start_input&,
-		const client_vars& initial_vars
-	);
-
-	~client_setup();
-
-	const cosmos& get_viewed_cosmos() const;
-
-	auto get_interpolation_ratio() const {
-		const auto dt = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
-		return std::min(1.0, (get_current_time() - client_time) / dt);
-	}
-
-	auto get_viewed_character() const {
-		return get_viewed_cosmos()[get_viewed_character_id()];
-	}
-
-	entity_id get_controlled_character_id() const;
-
-	const auto& get_viewable_defs() const {
-		return scene.viewables;
-	}
-
-	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
-
-	void customize_for_viewing(config_lua_table&) const;
-
-	void apply(const config_lua_table&);
-
-	double get_audiovisual_speed() const;
-	double get_inv_tickrate() const;
+	void handle_server_messages_from(const demo_step&);
 
 	auto make_accumulator_input(const client_advance_input& in) {
 		auto accumulator_in = in.make_accumulator_input();
@@ -232,11 +206,37 @@ public:
 		return accumulator_in;
 	}
 
-	template <class Callbacks>
+	auto get_total_local_player_entropy(const client_advance_input& in) {
+		const auto assembled = total_collected.assemble(
+			get_controlled_character(), 
+			get_local_player_id(), 
+			make_accumulator_input(in)
+		);
+
+		total_collected.clear();
+
+		return assembled;
+	}
+
+	void advance_demo_recorder();
+
+	template <class Callbacks, class ServerPayloadProvider, class TotalLocalEntropyProvider>
 	void advance_single_step(
 		const client_advance_input& in,
-		const Callbacks& callbacks
+		const Callbacks& callbacks,
+		ServerPayloadProvider server_payload_provider,
+		TotalLocalEntropyProvider local_entropy_provider
 	) {
+		if (is_recording()) {
+			unflushed_demo_steps.emplace_back();
+		}
+
+		auto scope = augs::scope_guard([this]() {
+			if (is_recording()) {
+				advance_demo_recorder();
+			}
+		});
+
 		const auto referential_solve_settings = [&]() {
 			solve_settings out;
 			out.effect_prediction = in.lag_compensation.effect_prediction;
@@ -272,16 +272,19 @@ public:
 
 		{
 			auto scope = measure_scope(performance.receiving_messages);
-			handle_server_payloads();
+			server_payload_provider();
 		}
 
 		const auto new_local_entropy = [&]() -> std::optional<mode_entropy> {
 			if (is_gameplay_on()) {
-				return total_collected.extract(
-					get_controlled_character(), 
-					get_local_player_id(), 
-					make_accumulator_input(in)
-				);
+				const auto total = local_entropy_provider();
+
+				if (is_recording()) {
+					auto& recorded_step = get_currently_recorded_step();
+					recorded_step.local_entropy.emplace(total);
+				}
+
+				return total;
 			}
 
 			return std::nullopt;
@@ -542,20 +545,118 @@ public:
 		total_collected.clear();
 	}
 
+	void perform_demo_player_imgui(augs::window& window);
+
+	void log_malicious_server();
+
+public:
+	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
+	static constexpr bool handles_window_input = true;
+	static constexpr bool has_additional_highlights = false;
+
+	client_setup(
+		sol::state& lua,
+		const client_start_input&,
+		const client_vars& initial_vars
+	);
+
+	~client_setup();
+
+	const cosmos& get_viewed_cosmos() const;
+
+	auto get_interpolation_ratio() const {
+		const auto dt = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+		return std::min(1.0, (get_current_time() - client_time) / dt);
+	}
+
+	const_entity_handle get_viewed_character() const {
+		return get_viewed_cosmos()[get_viewed_character_id()];
+	}
+
+	entity_id get_controlled_character_id() const;
+
+	const auto& get_viewable_defs() const {
+		return scene.viewables;
+	}
+
+	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
+
+	void customize_for_viewing(config_lua_table&) const;
+
+	void apply(const config_lua_table&);
+
+	double get_audiovisual_speed() const;
+	double get_inv_tickrate() const;
+
 	template <class Callbacks>
 	void advance(
 		const client_advance_input& in,
 		const Callbacks& callbacks
 	) {
 		if (is_replaying()) {
+			auto advance_with = [&](const demo_step& step) {
+				const auto dt = get_inv_tickrate();
 
+				auto local_entropy_provider = [&]() {
+					return step.local_entropy ? *step.local_entropy : mode_entropy();
+				};
+
+				advance_single_step(in, callbacks, [&](){ handle_server_messages_from(step); }, local_entropy_provider);
+				return dt;
+			};
+
+			auto seeking_advance = [&](const demo_step& step) {
+				const auto dt = get_inv_tickrate();
+
+				auto local_entropy_provider = [&]() {
+					return step.local_entropy ? *step.local_entropy : mode_entropy();
+				};
+
+				advance_single_step(in, solver_callbacks(), [&](){ handle_server_messages_from(step); }, local_entropy_provider);
+				return dt;
+			};
+
+			auto rewind = [&]() {
+				client_demo_player player_backup = std::move(demo_player);
+
+				{
+					auto& l = lua;
+
+					client_start_input client_in;
+					client_in.replay_demo = player_backup.source_path;
+					const auto vars_backup = vars;
+
+					std::destroy_at(this);
+					new (this) client_setup(l, client_in, vars_backup);
+				}
+
+				demo_player = std::move(player_backup);
+			};
+
+			demo_player.advance(
+				in.frame_delta,
+				advance_with,
+				seeking_advance,
+				rewind,
+				get_inv_tickrate()
+			);
+
+			return;
 		}
-		else {
-			const auto current_time = get_current_time();
 
-			if (client_time <= current_time) {
-				advance_single_step(in, callbacks);
-			}
+		const auto current_time = get_current_time();
+
+		if (client_time <= current_time) {
+			auto local_entropy_provider = [&]() {
+				return get_total_local_player_entropy(in);
+			};
+
+			advance_single_step(
+				in, 
+				callbacks, 
+				[this](){ handle_server_payloads(); }, 
+				local_entropy_provider
+			);
 		}
 	}
 
@@ -581,8 +682,6 @@ public:
 
 	online_arena_handle<false> get_arena_handle(std::optional<client_arena_type> = std::nullopt);
 	online_arena_handle<true> get_arena_handle(std::optional<client_arena_type> = std::nullopt) const;
-
-	void log_malicious_server();
 
 	bool is_connected() const;
 	void disconnect();
@@ -624,6 +723,7 @@ public:
 
 	bool requires_cursor() const;
 	bool is_replaying() const;
+	bool is_paused() const;
 	bool is_recording() const;
 	demo_step& get_currently_recorded_step();
 	void flush_demo_steps();

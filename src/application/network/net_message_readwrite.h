@@ -30,6 +30,10 @@ decltype(auto) on_read_net_message(const std::vector<std::byte>& bytes, F&& call
 			else {
 				net_message_type msg;
 
+				auto release_msg = augs::scope_guard([&msg]() {
+					msg.Release();
+				});
+
 				if constexpr(is_block_message_v<net_message_type>) {
 					const auto pos = ar.get_read_pos();
 					const auto block_size = bytes.size() - pos;
@@ -38,10 +42,10 @@ decltype(auto) on_read_net_message(const std::vector<std::byte>& bytes, F&& call
 						throw augs::stream_read_error("block_size (%x) is too big!", block_size);
 					}
 
-					const auto block_bytes = YOJIMBO_ALLOCATE(allocator, block_size);
+					const auto block_bytes = reinterpret_cast<uint8_t*>(YOJIMBO_ALLOCATE(allocator, block_size));
 					augs::detail::read_raw_bytes(ar, block_bytes, block_size);
 
-					msg.AttachBlock(block_bytes, block_size);
+					msg.AttachBlock(allocator, block_bytes, block_size);
 
 					return callback(msg);
 				}
@@ -61,7 +65,7 @@ decltype(auto) on_read_net_message(const std::vector<std::byte>& bytes, F&& call
 template <class net_message_type>
 std::vector<std::byte> net_message_to_bytes(net_message_type& msg) {
 	using Id = type_in_list_id<server_message_variant>;
-	const auto id = Id::of<net_message_type>();
+	const auto id = Id::of<net_message_type*>();
 
 	std::vector<std::byte> output;
 	auto ar = augs::ref_memory_stream(output);
@@ -72,7 +76,7 @@ std::vector<std::byte> net_message_to_bytes(net_message_type& msg) {
 
 	if constexpr(is_block_message_v<net_message_type>) {
 		const auto block_bytes = reinterpret_cast<const std::byte*>(msg.GetBlockData());
-		const auto block_size = static_cast<int32_t>(msg.GetBlockSize());
+		const auto block_size = msg.GetBlockSize();
 
 		augs::detail::write_raw_bytes(ar, block_bytes, block_size);
 	}

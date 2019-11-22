@@ -1,4 +1,8 @@
 #pragma once
+#include "3rdparty/yojimbo/yojimbo.h"
+#undef write_bytes
+#undef read_bytes
+
 #include "augs/misc/constant_size_vector.h"
 #include "game/modes/mode_entropy.h"
 #include "augs/misc/serialization_buffers.h"
@@ -44,6 +48,10 @@ constexpr std::size_t total_header_bytes_v = (
 	so that a single message does never cause a packet to split. 
 */
 
+#define YOJIMBO_MESSAGE_BOILERPLATE() YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS(); \
+	using yojimbo::Message::Acquire; \
+	using yojimbo::Message::Release;
+
 constexpr std::size_t max_message_size_v = ((chosen_packet_size_v - total_header_bytes_v) / 4) * 4;
 
 using message_bytes_type = augs::constant_size_vector<std::byte, max_message_size_v>;
@@ -57,10 +65,7 @@ struct preserialized_message : public yojimbo::Message {
 	template <typename Stream>
 	bool Serialize(Stream& stream);
 
-	YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
-	using yojimbo::Message::Acquire;
-	using yojimbo::Message::Release;
+	YOJIMBO_MESSAGE_BOILERPLATE();
 };
 
 struct only_block_message : public yojimbo::BlockMessage {
@@ -73,10 +78,7 @@ struct only_block_message : public yojimbo::BlockMessage {
 		return true;
 	}
 
-	YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
-	using yojimbo::Message::Acquire;
-	using yojimbo::Message::Release;
+	YOJIMBO_MESSAGE_BOILERPLATE();
 };
 
 template <bool C>
@@ -107,10 +109,10 @@ namespace net_messages {
 		template <typename Stream>
 		bool Serialize(Stream& stream);
 
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
 		bool write_payload(const ::public_settings_update&);
 		bool read_payload(::public_settings_update&);
+
+		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
 	struct special_client_request : public yojimbo::Message {
@@ -122,10 +124,10 @@ namespace net_messages {
 
 		::special_client_request payload;
 
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
 		bool write_payload(const ::special_client_request&);
 		bool read_payload(::special_client_request&);
+
+		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
 	struct new_server_solvable_vars : preserialized_message {
@@ -173,10 +175,10 @@ namespace net_messages {
 		template <typename Stream>
 		bool Serialize(Stream& stream);
 
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
 		bool write_payload(const ::prestep_client_context&);
 		bool read_payload(::prestep_client_context&);
+
+		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 #endif
 
@@ -186,9 +188,6 @@ namespace net_messages {
 
 		bool write_payload(::networked_server_step_entropy&);
 		bool read_payload(::networked_server_step_entropy&);
-
-		using yojimbo::Message::Acquire;
-		using yojimbo::Message::Release;
 	};
 
 	struct client_entropy : preserialized_message {
@@ -208,10 +207,10 @@ namespace net_messages {
 
 		::rcon_command_variant payload;
 
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
 		bool write_payload(const ::rcon_command_variant&);
 		bool read_payload(::rcon_command_variant&);
+
+		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
 	struct client_requested_chat : public yojimbo::Message {
@@ -223,10 +222,10 @@ namespace net_messages {
 
 		::client_requested_chat payload;
 
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
 		bool write_payload(const ::client_requested_chat&);
 		bool read_payload(::client_requested_chat&);
+
+		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
 	struct server_broadcasted_chat : public yojimbo::Message {
@@ -238,10 +237,10 @@ namespace net_messages {
 
 		::server_broadcasted_chat payload;
 
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
 		bool write_payload(const ::server_broadcasted_chat&);
 		bool read_payload(::server_broadcasted_chat&);
+
+		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
 	struct net_statistics_update : public yojimbo::Message {
@@ -253,10 +252,10 @@ namespace net_messages {
 
 		::net_statistics_update payload;
 
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
 		bool write_payload(const ::net_statistics_update&);
 		bool read_payload(::net_statistics_update&);
+
+		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
 	struct player_avatar_exchange : only_block_message {

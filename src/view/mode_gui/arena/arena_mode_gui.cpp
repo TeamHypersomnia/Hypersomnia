@@ -16,6 +16,7 @@
 #include "augs/string/format_enum.h"
 #include "game/detail/damage_origin.hpp"
 #include "augs/misc/action_list/standard_actions.h"
+#include "augs/log.h"
 
 #include "view/mode_gui/arena/arena_context_tip.h"
 
@@ -72,7 +73,7 @@ bool arena_gui_state::escape() {
 }
 
 template <class M>
-mode_player_entropy arena_gui_state::perform_imgui(
+mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 	draw_mode_gui_input mode_in, 
 	const M& typed_mode, 
 	const typename M::const_input& mode_input,
@@ -121,7 +122,8 @@ mode_player_entropy arena_gui_state::perform_imgui(
 					spectator.advance(
 						player_id,
 						typed_mode,
-						mode_input
+						mode_input,
+						mode_in.demo_replay_mode
 					);
 				}
 			}
@@ -490,7 +492,9 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_spectator = [&]() {
-			spectator.draw_gui(in, mode_in, typed_mode, mode_input);
+			if (in.config.arena_mode_gui.show_spectator_overlay) {
+				spectator.draw_gui(in, mode_in, typed_mode, mode_input);
+			}
 		};
 
 		auto draw_money_and_awards = [&]() {
@@ -947,14 +951,29 @@ void arena_gui_state::draw_mode_gui(
 
 		auto draw_context_tip = [&]() {
 			auto general_drawer = get_drawer();
-			const auto viewed_player_data = typed_mode.find(local_player_id);
 
-			if (viewed_player_data == nullptr) {
-				return;
+			entity_id tipped_character_id;
+			auto tipped_faction = faction_type::SPECTATOR;
+			
+			if (in.demo_replay_mode) {
+				const auto viewed_player_id = spectator.active ? spectator.now_spectating : local_player_id;
+				const auto viewed_player_data = typed_mode.find(viewed_player_id);
+
+				if (viewed_player_data != nullptr) {
+					tipped_faction = viewed_player_data->get_faction();
+					tipped_character_id = viewed_player_data->controlled_character_id;
+				}
+			}
+			else {
+				const auto local_player_data = typed_mode.find(local_player_id);
+
+				if (local_player_data != nullptr) {
+					tipped_character_id = local_player_data->controlled_character_id;
+					tipped_faction = local_player_data->get_faction();
+				}
 			}
 
 			const auto& cosm = mode_input.cosm;
-			const auto viewed_player_handle = cosm[viewed_player_data->controlled_character_id];
 
 			::draw_context_tip(
 				typed_mode,
@@ -963,8 +982,8 @@ void arena_gui_state::draw_mode_gui(
 				general_drawer,
 				in.screen_size,
 				in.gui_fonts.gui,
-				viewed_player_handle,
-				viewed_player_data->get_faction(),
+				cosm[tipped_character_id],
+				tipped_faction,
 				choose_team.show,
 				buy_menu.show,
 				in.is_cursor_released
@@ -1064,14 +1083,14 @@ template void arena_gui_state::draw_mode_gui(
 	prediction_input
 ) const;
 
-template mode_player_entropy arena_gui_state::perform_imgui(
+template mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 	draw_mode_gui_input, 
 	const bomb_mode&, 
 	const typename bomb_mode::const_input&,
 	prediction_input
 );
 
-template mode_player_entropy arena_gui_state::perform_imgui(
+template mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 	draw_mode_gui_input, 
 	const test_mode&, 
 	const typename test_mode::const_input&,

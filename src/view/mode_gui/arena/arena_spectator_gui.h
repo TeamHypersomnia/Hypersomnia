@@ -27,7 +27,8 @@ struct arena_spectator_gui {
 	void advance(
 		const mode_player_id& local_player,
 		const M& mode, 
-		const typename M::const_input& in
+		const typename M::const_input& in,
+		const bool demo_replay_mode
 	);
 
 	template <class M>

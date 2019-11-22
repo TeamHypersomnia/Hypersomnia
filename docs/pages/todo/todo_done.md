@@ -4013,3 +4013,8 @@ Advantages:
 - Watch out to properly recognize if connect or replay was pressed
 	- just clearing if non-replay button was pressed
 
+- is_replaying: just query the state from snapshotted player
+- Let's just do the recording first
+
+- We'll create a simple code for recording, but we might offload replays to snapshotted_player
+

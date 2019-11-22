@@ -967,6 +967,16 @@ and then hitting Save settings.
 		});
 	};
 
+	static auto is_replaying_demo = [&]() {
+		bool result = false;
+
+		on_specific_setup([&](client_setup& setup) {
+			result = setup.is_replaying();
+		});
+
+		return result;
+	};
+
 	static auto perform_setup_custom_imgui = [&]() {
 		/*
 			The editor setup might want to use IMGUI to create views of entities or resources,
@@ -977,7 +987,7 @@ and then hitting Save settings.
 
 		visit_current_setup([&](auto& setup) {
 			const auto result = setup.perform_custom_imgui({ 
-				lua, window, streaming.images_in_atlas, config 
+				lua, window, streaming.images_in_atlas, config, is_replaying_demo()
 			});
 
 			if (result == custom_imgui_result::GO_TO_MAIN_MENU) {
@@ -1461,6 +1471,7 @@ and then hitting Save settings.
 
 				setup.advance(
 					{ 
+						frame_delta,
 						logic_get_screen_size(), 
 						input_cfg, 
 						zoom,
@@ -1473,6 +1484,10 @@ and then hitting Save settings.
 					},
 					callbacks
 				);
+
+				if (setup.is_replaying() && setup.is_paused()) {
+					pending_new_state_sample = true;
+				}
 			}
 			else if constexpr(std::is_same_v<S, server_setup>) {
 				setup.advance(
@@ -2144,7 +2159,8 @@ and then hitting Save settings.
 						streaming.get_loaded_gui_fonts(),
 						necessary_sounds,
 						player_metas,
-						game_gui_mode
+						game_gui_mode_flag,
+						is_replaying_demo()
 					});
 
 					chosen_renderer.call_and_clear_lines();
