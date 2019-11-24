@@ -10,6 +10,7 @@
 #include "game/modes/mode_helpers.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "augs/templates/logically_empty.h"
 
 const auto secs_before_accepting_inputs_after_death = 1.0;
 const auto secs_until_switching_dead_teammate = 1.0;
@@ -91,15 +92,17 @@ void arena_spectator_gui::draw_gui(
 
 	const auto num_conscious = typed_mode.num_conscious_players_in(mode_input.cosm, spectated->get_faction());
 
-	const auto one_sixth_t = in.screen_size.y / 5;
+	const auto one_sixth_t = in.screen_size.y / 4.5;
 
-	draw_text_indicator_at(fmt(top_caption, yellow), one_sixth_t);
-	draw_text_indicator_at(fmt(spectated->get_chosen_name(), white), one_sixth_t + cell_h);
+	auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_buffer::SPECTATOR_AVATAR].triangles;
 
-	const auto& key_map = in.config.general_gui_controls;
+	const auto& avatar_atlas_entry = in.avatars_in_atlas.at(now_spectating.value); 
+	const bool avatars_enabled = logically_set(in.general_atlas, in.avatar_atlas);
+	const bool avatar_displayed = avatar_atlas_entry.exists() && avatars_enabled;
 
-	const auto bound_left = key_or_default(key_map, general_gui_intent_type::SPECTATE_PREV);
-	const auto bound_right = key_or_default(key_map, general_gui_intent_type::SPECTATE_NEXT);
+	const auto displayed_avatar_size = vec2i::square(avatar_displayed ? max_avatar_side_v / 2 : 0);
+	const auto larger_font_h = in.gui_fonts.larger_gui.metrics.get_height();
+	const auto larger_cell_h = std::max(static_cast<unsigned>(displayed_avatar_size.y), larger_font_h) + cell_pad.y * 2;
 
 	const bool spectated_is_conscious = typed_mode.on_player_handle(mode_input.cosm, now_spectating, [&](const auto& player_handle) {
 		if constexpr(!is_nullopt_v<decltype(player_handle)>) {
@@ -111,19 +114,82 @@ void arena_spectator_gui::draw_gui(
 		return false;
 	});
 
-	if (num_conscious == 1 && spectated_is_conscious) {
-		draw_text_indicator_at(fmt("Last man standing!", orange), one_sixth_t + 2 * cell_h, rgba(200, 0, 0, 255));
+	const bool last_man_standing = num_conscious == 1 && spectated_is_conscious;
+	const auto name_text = formatted_string(spectated->get_chosen_name(), style(in.gui_fonts.larger_gui, white));
+
+	const auto& key_map = in.config.general_gui_controls;
+
+	const auto bound_left = key_or_default(key_map, general_gui_intent_type::SPECTATE_PREV);
+	const auto bound_right = key_or_default(key_map, general_gui_intent_type::SPECTATE_NEXT);
+
+	const auto instructions_text = 
+		fmt("<<< ", white)
+		+ fmt(key_to_string_shortened(bound_left), white)
+		+ fmt("   (change player)   ", gray4)
+		+ fmt(key_to_string_shortened(bound_right), white)
+		+ fmt(" >>>", white)
+	;
+
+	const auto window_padding = vec2i(32, 16);
+	const auto avatar_padding = window_padding / 4;
+
+	const auto predicted_size = [&]() {
+		const auto other_size = last_man_standing ? get_text_bbox(fmt("Last man standing!", orange)) : get_text_bbox(instructions_text);
+		const auto nick_text_size = get_text_bbox(name_text);
+		const auto nick_size = vec2i(displayed_avatar_size.x + nick_text_size.x, larger_cell_h);
+
+		return window_padding + vec2i(avatar_padding.x * 2 + std::max(nick_size.x, other_size.x), nick_size.y + cell_h * 2);
+	}();
+
+	const auto window_bg_pos = vec2(s.x / 2 - predicted_size.x / 2, one_sixth_t - window_padding.y / 2);
+	const auto window_bg_rect = ltrb(window_bg_pos, predicted_size);
+
+	auto general_drawer = in.get_drawer();
+
+	// TODO give it its own settings struct
+	{
+		const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
+
+		general_drawer.aabb_with_border(window_bg_rect, cfg.background_color, cfg.border_color);
+	}
+
+	draw_text_indicator_at(fmt(top_caption, yellow), one_sixth_t);
+
+	vec2i name_text_size;
+
+	{
+		const auto t = one_sixth_t + cell_h;
+
+		name_text_size = print_stroked(
+			in.get_drawer(),
+			{ s.x / 2 + displayed_avatar_size.x / 2 + avatar_padding.x, static_cast<int>(t) },
+			name_text,
+			{ augs::ralign::CX }
+		);
+	}
+
+	if (avatar_displayed) {
+		const auto pos = vec2(s.x / 2 - name_text_size.x / 2 - displayed_avatar_size.x / 2 - avatar_padding.x, one_sixth_t + cell_h);
+		const auto avatar_orig = ltrbi(pos, displayed_avatar_size);
+
+		auto avatar_output = augs::drawer { avatar_triangles };
+		avatar_output.aabb(avatar_atlas_entry, avatar_orig, white);
+	}
+
+	if (last_man_standing) {
+		draw_text_indicator_at(fmt("Last man standing!", orange), one_sixth_t + cell_h + larger_cell_h, rgba(200, 0, 0, 255));
 	}
 	else if (num_conscious > 0) {
-		const auto instructions = 
-			fmt("<<< ", white)
-			+ fmt(key_to_string_shortened(bound_left), white)
-			+ fmt("   (change player)   ", gray4)
-			+ fmt(key_to_string_shortened(bound_right), white)
-			+ fmt(" >>>", white)
-		;
-			
-		draw_text_indicator_at(instructions, one_sixth_t + 2 * cell_h, rgba(0, 0, 0, 150));
+		draw_text_indicator_at(instructions_text, one_sixth_t + cell_h + larger_cell_h, rgba(0, 0, 0, 150));
+	}
+
+	if (avatar_triangles.size() > 0) {
+		in.renderer.call_and_clear_triangles();
+
+		in.avatar_atlas->set_as_current(in.renderer);
+		in.renderer.call_triangles(std::move(avatar_triangles));
+
+		augs::graphics::texture::set_current_to_previous(in.renderer);
 	}
 }
 

@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Camera is moving strangely in slow motion
+
 - fix predicted commands error for later debugging
 	- well, it's not important though
 

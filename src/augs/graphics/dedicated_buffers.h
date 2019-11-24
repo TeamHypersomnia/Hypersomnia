@@ -5,6 +5,7 @@ namespace augs {
 	enum class dedicated_buffer {
 		AVATARS,
 		DEATH_SUMMARY_AVATAR,
+		SPECTATOR_AVATAR,
 
 		NICKNAMES,
 		HEALTH_NUMBERS,

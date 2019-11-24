@@ -4019,3 +4019,6 @@ Advantages:
 - We'll create a simple code for recording, but we might offload replays to snapshotted_player
 
 - Fix mouse inputs being applied during demo replay
+
+- Spectator inputs don't work
+	- and make it navigable without closing the demoui
