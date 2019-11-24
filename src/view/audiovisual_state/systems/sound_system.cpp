@@ -233,7 +233,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	const auto& input = original.input;
 	const auto& m = input.modifier;
 
-	const auto dt_this_frame = in.dt.in_seconds() * m.pitch * in.speed_multiplier;
+	const auto dt_this_frame = in.dt.in_seconds() * m.pitch;
 	const bool gain_dependent_lifetime = original.start.silent_trace_like;
 
 	if (!gain_dependent_lifetime) {

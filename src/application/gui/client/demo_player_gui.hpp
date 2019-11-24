@@ -115,6 +115,20 @@ inline void demo_player_gui::perform(
 	ImGui::SameLine();
 	text("/%x", player.get_total_steps());
 	text("Current time: %x", ::format_mins_secs_ms(current));
+	text("Playback speed: %xx", player.speed);
 
-	text_disabled("Press Alt+P to toggle this window visibility.");
+	text_disabled("Press Alt+P to toggle this window visibility.\n");
+
+	const auto hotkeys = R"(Hotkeys:
+
+Left/Right - Seek backward/forward 5 seconds
+Shift + Left/Right - Seek backward/forward 1 second
+Up/Down - Seek backward/forward 10 seconds
+Space - Pause/Resume
+L - Resume
+Esc - Pause
+Numpad keys control speed (0 resets to 1x)
+)";
+
+	text_disabled(hotkeys);
 }

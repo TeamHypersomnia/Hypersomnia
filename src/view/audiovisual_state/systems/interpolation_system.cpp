@@ -35,9 +35,12 @@ void interpolation_system::integrate_interpolated_transforms(
 	const interpolation_settings& settings,
 	const cosmos& cosm,
 	const augs::delta delta,
-	const augs::delta fixed_delta_for_slowdowns
+	const augs::delta fixed_delta_for_slowdowns,
+	const double speed_multiplier
 ) {
 	set_interpolation_enabled(settings.enabled);
+
+	(void)speed_multiplier;
 
 	if (!enabled) {
 		return;
@@ -49,6 +52,7 @@ void interpolation_system::integrate_interpolated_transforms(
 		return;
 	}
 
+	const auto speed = static_cast<float>(speed_multiplier);
 	const float slowdown_multipliers_decrease = seconds / fixed_delta_for_slowdowns.in_seconds();
 
 	cosm.for_each_having<invariants::interpolation>( 
@@ -81,7 +85,7 @@ void interpolation_system::integrate_interpolated_transforms(
 			const auto rotational_averaging_constant = 1.0f - static_cast<float>(std::pow(0.9f, considered_rotational_speed * seconds));
 
 			auto& integrated = info.interpolated_transform;
-			integrated = integrated.interp_separate(info.desired_transform, positional_averaging_constant, rotational_averaging_constant);
+			integrated = integrated.interp_separate(info.desired_transform, positional_averaging_constant * speed, rotational_averaging_constant);
 		}
 	);
 }

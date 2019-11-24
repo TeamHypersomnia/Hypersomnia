@@ -1299,8 +1299,9 @@ and then hitting Save settings.
 			interp.integrate_interpolated_transforms(
 				viewing_config.interpolation, 
 				cosm, 
-				augs::delta(frame_delta) *= speed_multiplier, 
-				cosm.get_fixed_delta()
+				frame_delta, 
+				cosm.get_fixed_delta(),
+				speed_multiplier
 			);
 		}
 

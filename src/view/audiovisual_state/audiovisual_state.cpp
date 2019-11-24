@@ -29,6 +29,15 @@
 #include "view/audiovisual_state/systems/wandering_pixels_system.hpp"
 #include "augs/audio/audio_command_buffers.h"
 
+template <class E>
+void interpolation_system::set_updated_interpolated_transform(
+	const E& subject,
+	const transformr updated_value
+) {
+	auto& info = get_corresponding<components::interpolation>(subject);
+	info.interpolated_transform = updated_value;
+}
+
 void audiovisual_state::clear() {
 	systems.for_each([](auto& sys) {
 		sys.clear();

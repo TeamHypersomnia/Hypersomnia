@@ -24,7 +24,8 @@ public:
 		const interpolation_settings&,
 		const cosmos&,
 		const augs::delta delta, 
-		const augs::delta fixed_delta_for_slowdowns
+		const augs::delta fixed_delta_for_slowdowns,
+		const double speed_multiplier
 	);
 
 	void update_desired_transforms(const cosmos&);
@@ -60,10 +61,7 @@ public:
 	void set_updated_interpolated_transform(
 		const E& subject,
 		const transformr updated_value
-	) {
-		auto& info = get_corresponding<components::interpolation>(subject);
-		info.interpolated_transform = updated_value;
-	}
+	);
 
 	void clear();
 
