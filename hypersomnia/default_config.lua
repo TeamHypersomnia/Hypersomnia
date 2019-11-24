@@ -223,6 +223,7 @@ return {
 	  angle = 150
 	},
 	draw_enemy_hud = false,
+	draw_hp_bar = true,
 	draw_cp_bar = true,
 	draw_pe_bar = false,
     radar_pos = {

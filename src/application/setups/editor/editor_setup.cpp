@@ -1210,11 +1210,11 @@ bool editor_setup::handle_input_before_imgui(
 bool editor_setup::handle_input_before_game(
 	const handle_input_before_game_input in
 ) {
-	const auto& state = in.common_input_state;
-	const auto& e = in.e;
-
 	using namespace augs::event;
 	using namespace augs::event::keys;
+
+	const auto& state = in.common_input_state;
+	const auto& e = in.e;
 
 	if (!anything_opened()) {
 		return false;
@@ -1240,6 +1240,28 @@ bool editor_setup::handle_input_before_game(
 	if (is_gameplay_on()) {
 		if (arena_base::handle_input_before_game(in)) {
 			return true;
+		}
+	}
+
+	if (player().has_testing_started()) {
+		if (e.was_any_key_pressed()) {
+			const auto k = e.data.key.key;
+
+			auto forward = [&](const auto& secs) {
+				player().request_steps(secs / get_inv_tickrate());
+			};
+
+			auto backward = [&](const auto& secs) {
+				player().seek_backward(secs / get_inv_tickrate(), make_command_input());
+			};
+
+			switch (k) {
+				case key::RIGHT: forward(has_shift ? 1 : 5); return true;
+				case key::LEFT: backward(has_shift ? 1 : 5); return true;
+				case key::UP: forward(has_shift ? 5 : 10); return true;
+				case key::DOWN: backward(has_shift ? 5 : 10); return true;
+				default: break;
+			}
 		}
 	}
 

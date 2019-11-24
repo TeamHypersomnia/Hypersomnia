@@ -68,11 +68,11 @@ struct client_demo_player {
 		return demo_steps[n];
 	}
 
-	void seek_backward(const int offset) {
-		seek_to(current_step - offset);
+	void seek_backward(const demo_step_num_type offset) {
+		seek_to(current_step - std::min(current_step, offset));
 	}
 
-	void seek_forward(const int offset) {
+	void seek_forward(const demo_step_num_type offset) {
 		seek_to(current_step + offset);
 	}
 

@@ -552,8 +552,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			int current_circle = 0;
 
-			set_center_uniform(circles[current_circle++]);
-			renderer.call_triangles(DV::SENTIENCE_HUDS, 0);
+			if (settings.draw_hp_bar) {
+				set_center_uniform(circles[current_circle++]);
+				renderer.call_triangles(DV::SENTIENCE_HUDS, 0);
+			}
 
 			if (settings.draw_pe_bar) {
 				set_center_uniform(circles[current_circle++]);

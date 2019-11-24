@@ -1022,6 +1022,35 @@ bool client_setup::handle_input_before_game(
 		if (demo_player.control(in)) {
 			return true;
 		}
+
+		const auto& state = in.common_input_state;
+		const auto& e = in.e;
+
+		if (e.was_any_key_pressed()) {
+			using namespace augs::event::keys;
+
+			const auto k = e.data.key.key;
+
+			auto forward = [&](const auto& secs) {
+				demo_player.seek_forward(secs / get_inv_tickrate());
+			};
+
+			auto backward = [&](const auto& secs) {
+				demo_player.seek_backward(secs / get_inv_tickrate());
+			};
+
+
+			const bool has_shift{ state[key::LSHIFT] };
+
+			switch (k) {
+				case key::RIGHT: forward(has_shift ? 1 : 5); return true;
+				case key::LEFT: backward(has_shift ? 1 : 5); return true;
+				case key::UP: forward(has_shift ? 5 : 10); return true;
+				case key::DOWN: backward(has_shift ? 5 : 10); return true;
+				default: break;
+			}
+		}
+
 	}
 
 	return false;

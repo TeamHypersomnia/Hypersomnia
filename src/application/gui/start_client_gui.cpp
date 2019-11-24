@@ -84,7 +84,7 @@ bool start_client_gui_state::perform(
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("Open folder in explorer")) {
+			if (ImGui::Button("Show folder in explorer")) {
 				window.reveal_in_explorer(DEMOS_DIR);
 			}
 

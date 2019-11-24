@@ -83,12 +83,14 @@ void enqueue_illuminated_rendering_jobs(
 		auto& target_vectors = dedicated[DV::SENTIENCE_HUDS];
 		target_vectors.resize(3);
 
-		requested_meters.push_back({ 
-			necessarys.at(circles[current_circle++]),
-			meter_id::of<health_meter_instance>(),
+		if (settings.draw_hp_bar) {
+			requested_meters.push_back({ 
+				necessarys.at(circles[current_circle++]),
+				meter_id::of<health_meter_instance>(),
 
-			target_vectors[0]
-		});
+				target_vectors[0]
+			});
+		}
 
 		if (settings.draw_pe_bar) {
 			requested_meters.push_back({

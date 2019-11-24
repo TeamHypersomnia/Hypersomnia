@@ -26,6 +26,7 @@ struct game_drawing_settings {
 	augs::maybe<float> draw_area_markers = augs::maybe<float>(0.5f, true);
 	augs::maybe<float> draw_callout_indicators = augs::maybe<float>(0.5f, true);
 	bool draw_enemy_hud = false;
+	bool draw_hp_bar = true;
 	bool draw_cp_bar = true;
 	bool draw_pe_bar = false;
 

@@ -736,6 +736,7 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.drawing;
 
 					if (auto node = scoped_tree_node("In-world HUD")) {
+						revertable_checkbox("Draw Health bar and ammo bar", config.drawing.draw_hp_bar);
 						revertable_checkbox("Draw Personal Electricity bar", config.drawing.draw_pe_bar);
 						revertable_checkbox("Draw Consciousness bar", config.drawing.draw_cp_bar);
 
