@@ -784,14 +784,18 @@ and then hitting Save settings.
 		);
 
 		if (perform_result || client_start_requested) {
-			client_start_requested = false;
-
 			change_with_save(
 				[&](auto& cfg) {
 					cfg.default_client_start = config.default_client_start;
 					cfg.client = config.client;
 				}
 			);
+
+			if (client_start_requested) {
+				config.default_client_start.replay_demo.clear();
+			}
+
+			client_start_requested = false;
 
 			launch_setup(launch_type::CLIENT);
 		}

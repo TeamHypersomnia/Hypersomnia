@@ -4022,3 +4022,42 @@ Advantages:
 
 - Spectator inputs don't work
 	- and make it navigable without closing the demoui
+- Add spectated player's avatar to spectator overlay
+
+- client_setup replay (re-visited)
+	- let packets from server be saved on the message level
+	- I think adapter should just have if elses since client setup logic is way more important
+		- negliglible overhead really
+	- Design the file so that we periodically append
+
+- client_setup replay
+	- for now we can have entire client setups as snapshots
+	- adapter can have a pointer
+	- we'll be able to re-use snapshotted player
+	- instead of copy assignment, just destroy and do placement new
+	- just move the client setup snapshopts
+	- other approach
+		- we might want to have a demo_replay_setup	
+			- it can manipulate client setup's local collected entropies (won't allow window inputs)
+			- it can also set the messages to appear in the given step
+		- i know it's gonna introduce setup boilerplate but it's worth it for control and separation
+		- it can have a vector of client setups
+		- note that spectator gui should work in the demo replay setup
+			- we could make it derive arena mixin with a singular arena gui and not at all care about the arena guis found in client setup snapshots
+		- since we want to be able to spectate all players, note that only our client will possess the actual prediction information
+
+
+- Remember about proper locking when flushing with async
+	- e.g. protect when_last_flushed_demo and unflushed_demo_steps
+- Benefits of demos
+	- Deterministic repros
+	- Can record without performance hit
+	- Can later record in highest quality only the highlights
+	- Fun moments will never be lost
+
+- We can automatically record demos for every server session
+	- Demos could just be network messages applied at step x
+	- We could pretty much resimulate the entire client setup this way, just without sending messages
+	- Also makes it easier to debug
+	- Snapshots could prove a little hard but we could just resimulate from the beginning if we want to seek backwards
+

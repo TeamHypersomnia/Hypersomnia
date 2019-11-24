@@ -485,3 +485,5 @@ summary: Just a hidden scratchpad.
 - flag for setting when transferred to 'now' when finished reloading?
 	- so that there's a delay between finished load and chambering sounds
 
+- Nickname should change if we change it in settings
+
