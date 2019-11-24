@@ -534,7 +534,7 @@ public:
 	mode_player_id get_next_to_spectate(
 		const_input, 
 		const arena_player_order_info& after, 
-		const mode_player_id& by_spectator, 
+		const faction_type& by_faction, 
 		int offset,
 		real32 limit_in_seconds
 	) const;

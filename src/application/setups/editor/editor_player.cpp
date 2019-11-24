@@ -29,6 +29,24 @@ void make_redoable_for_different_solvable(
 	std::visit(sanitize, command);
 }
 
+void editor_player::force_add_bots_if_quota_zero(editor_folder& folder) {
+	/* So that we have something to play with */
+	auto& current = folder.commanded;
+	const auto playtest_default = current->rulesets.meta.playtest_default;
+
+	playtest_default.type_id.dispatch([&](auto e) {
+		using E = decltype(e);
+
+		if constexpr(E::round_based) {
+			auto& rs = current->rulesets.all.get_for<E>()[playtest_default.raw];
+
+			if (rs.bot_quota == 0) {
+				rs.bot_quota = rs.bot_names.size();
+			}
+		}
+	});
+}
+
 void editor_player::save_state_before_start(editor_folder& folder) {
 	ensure(!has_testing_started());
 
@@ -42,18 +60,6 @@ void editor_player::save_state_before_start(editor_folder& folder) {
 
 	/* Generate a clone for the current state */
 	current = std::make_unique<editor_commanded_state>(*backup);
-
-	/* Force some bots so that we have something to play with */
-	const auto pd = current->rulesets.meta.playtest_default;
-
-	pd.type_id.dispatch([&](auto e) {
-		using E = decltype(e);
-
-		if constexpr(E::round_based) {
-			auto& rs = current->rulesets.all.get_for<E>()[pd.raw];
-			rs.bot_quota = rs.bot_names.size();
-		}
-	});
 
 	before_start.history = std::move(folder.history);
 	folder.history = {};
@@ -153,6 +159,8 @@ void editor_player::initialize_testing(editor_folder& f) {
 
 	save_state_before_start(f);
 	reset_mode();
+
+	force_add_bots_if_quota_zero(f);
 }
 
 void editor_player::begin_recording(editor_folder& f) {

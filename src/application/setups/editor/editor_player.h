@@ -187,6 +187,8 @@ public:
 
 	double get_audiovisual_speed(const editor_folder&) const;
 
+	void force_add_bots_if_quota_zero(editor_folder&);
+
 	std::size_t estimate_step_to_entropy_size() const;
 	const step_to_entropy_type& get_step_to_entropy() const;
 

@@ -75,8 +75,7 @@ namespace augs {
 			GetStyle() = initial_style;
 		}
 
-		void setup_input(
-			local_entropy& window_inputs,
+		void setup_io_settings(
 			const decltype(ImGuiIO::DeltaTime) delta_seconds,
 			const vec2i screen_size
 		) {
@@ -86,6 +85,15 @@ namespace augs {
 			auto& io = GetIO();
 
 			io.MouseDrawCursor = false;
+			io.DeltaTime = delta_seconds;
+			io.DisplaySize = ImVec2(screen_size);
+		}
+
+		void pass_inputs(local_entropy& window_inputs) {
+			using namespace event;
+			using namespace event::keys;
+
+			auto& io = GetIO();
 
 			for (const auto& in : window_inputs) {
 				if (in.msg == message::mousemotion) {
@@ -132,67 +140,8 @@ namespace augs {
 				io.KeyShift = io.KeysDown[static_cast<int>(keys::key::LSHIFT)] || io.KeysDown[static_cast<int>(keys::key::RSHIFT)];
 				io.KeyAlt = io.KeysDown[static_cast<int>(keys::key::LALT)] || io.KeysDown[static_cast<int>(keys::key::RALT)];
 			}
-
-			io.DeltaTime = delta_seconds;
-			io.DisplaySize = ImVec2(screen_size);
 		}
 
-#if 0
-		void setup_input(
-			event::state& state,
-			const decltype(ImGuiIO::DeltaTime) delta_seconds,
-			const vec2i screen_size
-		) {
-			using namespace event;
-			using namespace event::keys;
-
-			auto& io = GetIO();
-
-			io.MouseDrawCursor = false;
-			io.MousePos = vec2(state.mouse.pos);
-			io.MouseDown[0] = state.keys[key::LMOUSE];
-			io.MouseDown[1] = state.keys[key::RMOUSE];
-				else if (
-					in.msg == message::ldown
-					|| in.msg == message::ldoubleclick
-					|| in.msg == message::ltripleclick
-					) {
-					io.MouseDown[0] = true;
-				}
-				else if (in.msg == message::lup) {
-					io.MouseDown[0] = false;
-				}
-				else if (
-					in.msg == message::rdown
-					|| in.msg == message::rdoubleclick
-					) {
-					io.MouseDown[1] = true;
-				}
-				else if (in.msg == message::rup) {
-					io.MouseDown[1] = false;
-				}
-				else if (in.msg == message::wheel) {
-					io.MouseWheel = static_cast<float>(in.data.scroll.amount);
-				}
-				else if (in.msg == message::keydown) {
-					io.KeysDown[static_cast<int>(in.data.key.key)] = true;
-				}
-				else if (in.msg == message::keyup) {
-					io.KeysDown[static_cast<int>(in.data.key.key)] = false;
-				}
-				else if (in.msg == message::character) {
-					io.AddInputCharacter(in.data.character.code_point);
-				}
-			}
-
-			io.KeyCtrl = io.KeysDown[static_cast<int>(keys::key::LCTRL)] || io.KeysDown[static_cast<int>(keys::key::RCTRL)];
-			io.KeyShift = io.KeysDown[static_cast<int>(keys::key::LSHIFT)] || io.KeysDown[static_cast<int>(keys::key::RSHIFT)];
-			io.KeyAlt = io.KeysDown[static_cast<int>(keys::key::LALT)] || io.KeysDown[static_cast<int>(keys::key::RALT)];
-
-			io.DeltaTime = delta_seconds;
-			io.DisplaySize = vec2(screen_size);
-		}
-#endif
 		void render() {
 			Render();
 		}

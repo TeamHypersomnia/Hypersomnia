@@ -81,6 +81,13 @@ bool start_client_gui_state::perform(
 			// text_disabled(typesafe_sprintf("The demos are stored inside \"%x\" folder.", DEMOS_DIR));
 
 			text(typesafe_sprintf("Choose demo to replay (from %x):", DEMOS_DIR));
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Open folder in explorer")) {
+				window.reveal_in_explorer(DEMOS_DIR);
+			}
+
 			chooser.perform(
 				"",
 				demo_path.string(),

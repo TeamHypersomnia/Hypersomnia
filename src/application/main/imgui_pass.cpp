@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/timing/delta.h"
 
@@ -28,11 +29,12 @@ void perform_imgui_pass(
 
 	const bool float_tests_succeeded
 ) {
-	augs::imgui::setup_input(
-		window_inputs,
+	augs::imgui::setup_io_settings(
 		delta.in_seconds(),
 		screen_size
 	);
+
+	augs::imgui::pass_inputs(window_inputs);
 
 	if (should_freeze_cursor) {
 		augs::imgui::neutralize_mouse();

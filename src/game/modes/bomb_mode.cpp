@@ -2550,19 +2550,11 @@ bool bomb_mode::conscious_or_can_still_spectate(
 mode_player_id bomb_mode::get_next_to_spectate(
 	const const_input_type in, 
 	const arena_player_order_info& after, 
-	const mode_player_id& by_spectator, 
+	const faction_type& spectator_faction, 
 	const int offset,
 	const real32 limit_in_seconds
 ) const {
 	std::vector<arena_player_order_info> sorted_players;
-
-	const auto spectator_data = find(by_spectator);
-
-	if (spectator_data == nullptr) {
-		return {};
-	}
-
-	const auto spectator_faction = spectator_data->get_faction();
 
 	auto can_still_spectate = [&](const auto& who) {
 		return conscious_or_can_still_spectate(in, who, limit_in_seconds);

@@ -6,6 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Camera is moving strangely in slow motion
+
+- Nice autodirector facility
+	- Minimize the time we have to spend on editing the footage
+	- Highlights of each 10 second durations preceding ends of rounds
+		- for compact duel of honor recordings
+	- Smooth slow-motion seconds setting in gui
+		- augs::maybe
+
+- Spectator inputs don't work
+	- and make it navigable without closing the demoui
+
 - Add spectated player's avatar to spectator overlay
 
 - next/prev round and death

@@ -770,11 +770,12 @@ application_update_result check_and_apply_updates(
 			const auto dt_secs = frame_delta.in_seconds();
 			total_secs += dt_secs;
 
-			augs::imgui::setup_input(
-				entropy,
+			augs::imgui::setup_io_settings(
 				dt_secs,
 				window_size
 			);
+
+			augs::imgui::pass_inputs(entropy);
 		}
 
 		ImGui::NewFrame();

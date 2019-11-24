@@ -491,10 +491,15 @@ void arena_gui_state::draw_mode_gui(
 			scoreboard.draw_gui(in, mode_in, typed_mode, mode_input);
 		};
 
+		const bool spectator_gui_drawn = 
+			in.config.arena_mode_gui.show_spectator_overlay
+			&& spectator.should_be_drawn(typed_mode)
+			&& !scoreboard.show 
+			&& !choose_team.show
+		;
+
 		auto draw_spectator = [&]() {
-			if (in.config.arena_mode_gui.show_spectator_overlay) {
-				spectator.draw_gui(in, mode_in, typed_mode, mode_input);
-			}
+			spectator.draw_gui(in, mode_in, typed_mode, mode_input);
 		};
 
 		auto draw_money_and_awards = [&]() {
@@ -782,8 +787,13 @@ void arena_gui_state::draw_mode_gui(
 			draw_text_indicator_at(val, one_sixth_t);
 		};
 
+		auto is_game_commencing = [&]() {
+			const auto commencing_left = typed_mode.get_commencing_left_ms(); 
+			return commencing_left != -1.f;
+		};
+
 		auto draw_game_commencing = [&]() {
-			if (auto commencing_left = typed_mode.get_commencing_left_ms(); commencing_left != -1.f) {
+			if (const auto commencing_left = typed_mode.get_commencing_left_ms(); commencing_left != -1.f) {
 				// const auto c = std::ceil(commencing_left);
 				draw_info_indicator(colored("Game Commencing!", white));
 				return true;
@@ -1001,7 +1011,7 @@ void arena_gui_state::draw_mode_gui(
 			draw_death_summary();
 			draw_scoreboard();
 
-			if (!scoreboard.show && !choose_team.show) {
+			if (spectator_gui_drawn) {
 				draw_spectator();
 			}
 
@@ -1028,15 +1038,17 @@ void arena_gui_state::draw_mode_gui(
 
 			draw_knockouts();
 
-			if (now_is_warmup) {
-				draw_warmup_welcome();
-			}
-			else {
-				warmup.requested.clear();
-				warmup.current.clear();
-			}
+			if (!is_game_commencing()) {
+				if (now_is_warmup && !spectator_gui_drawn) {
+					draw_warmup_welcome();
+				}
+				else {
+					warmup.requested.clear();
+					warmup.current.clear();
+				}
 
-			draw_important_match_event();
+				draw_important_match_event();
+			}
 		}
 
 		if (prediction.play_predictable) {
@@ -1044,14 +1056,16 @@ void arena_gui_state::draw_mode_gui(
 				return;
 			}
 
-			if (now_is_warmup) {
-				draw_warmup_timer();
-			}
-			else {
-				warmup.requested.clear();
-				warmup.current.clear();
+			if (!is_game_commencing()) {
+				if (now_is_warmup) {
+					draw_warmup_timer();
+				}
+				else {
+					warmup.requested.clear();
+					warmup.current.clear();
 
-				draw_match_timers();
+					draw_match_timers();
+				}
 			}
 
 			draw_context_tip();

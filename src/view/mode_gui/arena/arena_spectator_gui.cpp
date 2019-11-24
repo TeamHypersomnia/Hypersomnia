@@ -220,13 +220,20 @@ void arena_spectator_gui::advance(
 			reference_order = data->get_order();
 		}
 
-		now_spectating = mode.get_next_to_spectate(
-			in, 
-			reference_order, 
-			local_player, 
-			off, 
-			secs_until_switching_dead_teammate
-		);
+		if (const auto data = mode.find(local_player)) {
+			const auto faction = demo_replay_mode ? faction_type::SPECTATOR : data->get_faction();
+
+			now_spectating = mode.get_next_to_spectate(
+				in, 
+				reference_order, 
+				faction, 
+				off, 
+				secs_until_switching_dead_teammate
+			);
+		}
+		else {
+			now_spectating = {};
+		}
 
 		cache_order_of(now_spectating);
 	};
@@ -236,8 +243,16 @@ void arena_spectator_gui::advance(
 		const auto secs_until_switching_myself = demo_replay_mode ? secs_until_switching_dead_teammate : 10000.f;
 		const auto limit_secs = spectating_local ? secs_until_switching_myself : secs_until_switching_dead_teammate;
 
-		if (!mode.suitable_for_spectating(in, now_spectating, local_player, limit_secs)) {
-			switch_spectated_by(1);
+		if (demo_replay_mode) {
+			/* Skip team constraints */
+			if (!mode.conscious_or_can_still_spectate(in, now_spectating, limit_secs)) {
+				switch_spectated_by(1);
+			}
+		}
+		else {
+			if (!mode.suitable_for_spectating(in, now_spectating, local_player, limit_secs)) {
+				switch_spectated_by(1);
+			}
 		}
 	};
 

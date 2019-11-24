@@ -100,6 +100,7 @@ auto editor_player::make_load_snapshot(const player_advance_input_t<C> in) {
 		if (n == 0) {
 			reset_mode();
 			*folder.commanded = *before_start.commanded;
+			force_add_bots_if_quota_zero(folder);
 			history.force_set_current_revision(history.get_first_revision());
 			return;
 		}

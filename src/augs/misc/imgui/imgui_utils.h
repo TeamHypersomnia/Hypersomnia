@@ -34,16 +34,13 @@ namespace augs {
 		image create_atlas_image(const font_loading_input&);
 		graphics::texture create_atlas(const font_loading_input&);
 
-		void setup_input(
-			local_entropy& window_inputs,
+		void setup_io_settings(
 			const decltype(ImGuiIO::DeltaTime) delta_seconds,
 			const vec2i screen_size
 		);
 
-		void setup_input(
-			event::state& state,
-			const decltype(ImGuiIO::DeltaTime) delta_seconds,
-			const vec2i screen_size
+		void pass_inputs(
+			local_entropy& window_inputs
 		);
 
 		void neutralize_mouse();
