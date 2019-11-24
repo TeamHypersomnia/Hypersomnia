@@ -225,6 +225,8 @@ mode_entity_id editor_player::lookup_character(const mode_player_id id) const {
 	);
 }
 
+void snap_interpolated_to_logical(cosmos&);
+
 template <class C>
 void editor_player::seek_to(
 	const editor_player::step_type requested_step, 
@@ -250,6 +252,7 @@ void editor_player::seek_to(
 	);
 
 	in.cmd_in.clear_dead_entities();
+	snap_interpolated_to_logical(in.cmd_in.get_cosmos());
 }
 
 void editor_player::seek_to(

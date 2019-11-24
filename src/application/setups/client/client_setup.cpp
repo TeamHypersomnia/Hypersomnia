@@ -74,6 +74,7 @@ bool client_demo_player::control(const handle_input_before_game_input in) {
 				case key::NUMPAD6: set_speed(4.0); return true;
 				case key::NUMPAD7: set_speed(10.0); return true;
 				case key::SPACE: paused = !paused; return true;
+				case key::L: paused = false; return true;
 				case key::ADD: seek_forward(1); return true;
 				case key::SUBTRACT: seek_backward(1); return true;
 				default: break;
@@ -327,6 +328,10 @@ void client_setup::customize_for_viewing(config_lua_table& config) const {
 	if (is_replaying()) {
 		config.arena_mode_gui.show_spectator_overlay = demo_player.gui.show_spectator_overlay;
 		config.client.spectated_arena_type = demo_player.gui.shown_arena_type;
+
+		if (is_paused()) {
+			config.interpolation.enabled = false;
+		}
 	}
 }
 
@@ -731,8 +736,24 @@ void client_setup::perform_chat_input_bar() {
 	}
 }
 
+void client_setup::snap_interpolation_of_viewed() {
+	auto snap_for = [&](const auto arena_type) {
+		snap_interpolated_to_logical(get_arena_handle(arena_type).get_cosmos());
+	};
+
+	snap_for(client_arena_type::PREDICTED);
+	snap_for(client_arena_type::REFERENTIAL);
+}
+
 void client_setup::perform_demo_player_imgui(augs::window& window) {
 	demo_player.gui.perform(window, demo_player);
+	
+	auto& pending_snap = demo_player.gui.pending_interpolation_snap;
+
+	if (pending_snap) {
+		snap_interpolation_of_viewed();
+		pending_snap = false;
+	}
 }
 
 custom_imgui_result client_setup::perform_custom_imgui(
@@ -955,7 +976,16 @@ setup_escape_result client_setup::escape() {
 		return setup_escape_result::GO_TO_MAIN_MENU;
 	}
 
-	return arena_base::escape();
+	if (arena_gui.escape()) {
+		return setup_escape_result::JUST_FETCH;
+	}
+
+	if (is_replaying() && !is_paused()) {
+		demo_player.pause();
+		return setup_escape_result::JUST_FETCH;
+	}
+
+	return setup_escape_result::LAUNCH_INGAME_MENU;
 }
 
 const cosmos& client_setup::get_viewed_cosmos() const {

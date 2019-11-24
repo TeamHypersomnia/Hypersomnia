@@ -548,6 +548,7 @@ class client_setup :
 	void perform_demo_player_imgui(augs::window& window);
 
 	void log_malicious_server();
+	void snap_interpolation_of_viewed();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -605,6 +606,8 @@ public:
 				return dt;
 			};
 
+			bool needs_snap = false;
+
 			auto seeking_advance = [&](const demo_step& step) {
 				const auto dt = get_inv_tickrate();
 
@@ -613,6 +616,7 @@ public:
 				};
 
 				advance_single_step(in, solver_callbacks(), [&](){ handle_server_messages_from(step); }, local_entropy_provider);
+				needs_snap = true;
 				return dt;
 			};
 
@@ -640,6 +644,10 @@ public:
 				rewind,
 				get_inv_tickrate()
 			);
+
+			if (needs_snap) {
+				snap_interpolation_of_viewed();
+			}
 
 			return;
 		}

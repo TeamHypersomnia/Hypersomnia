@@ -18,7 +18,12 @@ inline void demo_player_gui::perform(
 	}
 
 	checkbox("Show spectator overlay", show_spectator_overlay);
-	text("POV:"); ImGui::SameLine(); enum_radio(shown_arena_type, true);
+	text("POV:"); ImGui::SameLine(); 
+
+	if (enum_radio(shown_arena_type, true)) {
+		pending_interpolation_snap = true;
+	}
+
 	ImGui::SameLine();
 	text_disabled("(?)");
 
