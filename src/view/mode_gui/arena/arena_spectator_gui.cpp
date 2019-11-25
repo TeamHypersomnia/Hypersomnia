@@ -11,6 +11,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "augs/templates/logically_empty.h"
+#include "augs/drawing/drawing.hpp"
 
 const auto secs_before_accepting_inputs_after_death = 1.0;
 const auto secs_until_switching_dead_teammate = 1.0;
