@@ -1326,14 +1326,16 @@ if(BUILD_NETWORKING)
 endif()
 
 if(BUILD_FREETYPE)
+	message("Building Freetype.")
+
 	set(WITH_ZLIB OFF)
 	set(WITH_BZip2 OFF)
 	set(WITH_PNG OFF)
 	set(WITH_HarfBuzz OFF)
 	set(FREETYPE_NO_DIST ON)
 
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype")
-	
+	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/freetype2")
+
 	if(ADD_MCMODEL_LARGE_FLAG)
 		target_compile_options(freetype PUBLIC -mcmodel=large -no-pie)
 	endif()

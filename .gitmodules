@@ -4,9 +4,6 @@
 [submodule "3rdparty/lua"]
 	path = src/3rdparty/lua
 	url = https://github.com/lua/lua.git
-[submodule "3rdparty/freetype"]
-	path = src/3rdparty/freetype
-	url = https://git.savannah.gnu.org/git/freetype/freetype2.git
 [submodule "3rdparty/rectpack2D"]
 	path = src/3rdparty/rectpack2D
 	url = https://github.com/TeamHypersomnia/rectpack2D.git
