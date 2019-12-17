@@ -5,6 +5,10 @@
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"
 
+#if PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
+
 template<class t>
 static std::string leading_zero(const t component) {
 	std::stringstream out;
@@ -27,8 +31,6 @@ augs::date_time::date_time(
 {
 }
 
-// TODO: FIX date_time acquisition on Windows!!!!
-
 #if defined(__clang__) && defined(PLATFORM_UNIX) 
 augs::date_time::date_time(
 	const augs::file_time_type& tp
@@ -37,11 +39,20 @@ augs::date_time::date_time(
 {
 }
 #else
+
+static time_t filetime_to_timet(FILETIME const& ft) {
+    ULARGE_INTEGER ull;
+    ull.LowPart = ft.dwLowDateTime;
+    ull.HighPart = ft.dwHighDateTime;
+    return ull.QuadPart / 10000000ULL - 11644473600ULL;
+}
+
 augs::date_time::date_time(
-	const augs::file_time_type&
-) : 
-	date_time({}) 
-{
+	const augs::file_time_type& input_filetime
+) {
+	FILETIME ft;
+	std::memcpy(&ft, &input_filetime, sizeof(FILETIME));
+	t = filetime_to_timet(ft);
 }
 #endif
 

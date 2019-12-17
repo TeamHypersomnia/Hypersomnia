@@ -123,7 +123,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	setup_float_flags();
 
 	{
-		const auto all_created_directories = std::vector<std::string> {
+		const auto all_created_directories = std::vector<augs::path_type> {
 			LOG_FILES_DIR,
 			SERVER_LOG_FILES_DIR,
 			GENERATED_FILES_DIR,
@@ -135,7 +135,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			std::string all;
 
 			for (const auto& a : all_created_directories) {
-				all += "\n" + a;
+				all += "\n" + a.string();
 			}
 
 			LOG("Creating directories:%x", all);

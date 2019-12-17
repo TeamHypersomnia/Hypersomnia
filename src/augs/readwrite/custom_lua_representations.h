@@ -23,7 +23,7 @@ namespace augs {
 	}
 
 	inline auto to_lua_value(const path_type r) {
-		return to_forward_slashes(r.string());
+		return r.string();
 	}
 
 	template <class I>
