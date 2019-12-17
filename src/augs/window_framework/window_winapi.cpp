@@ -796,12 +796,28 @@ namespace augs {
 		}
 	}
 
+	static void BrowseToFile(LPCTSTR filename)
+	{
+		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
+    	const auto pidl = ILCreateFromPath(filename);
+    	
+		if (pidl) {
+			LOG("pidl non-null");
+        	SHOpenFolderAndSelectItems(pidl,0,0,0);
+        	ILFree(pidl);
+    	}
+		else {
+			LOG("pidl is null");
+		}
+
+		CoUninitialize();
+	}
+
 	void window::reveal_in_explorer(const augs::path_type& p) {
-		/*
-			Could be implemented as:
-			augs::shell(p.string());
-			At least for directories. What about files?
-		*/
+		const auto wide_path = std::filesystem::absolute(p).wstring();
+		LOG_NVPS(wide_path);
+		BrowseToFile(wide_path.c_str());
 	}
 
 	void window::set_cursor_pos(vec2i pos) {

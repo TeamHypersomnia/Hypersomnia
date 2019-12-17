@@ -83,8 +83,18 @@ bool start_client_gui_state::perform(
 			text(typesafe_sprintf("Choose demo to replay (from %x):", DEMOS_DIR));
 
 			ImGui::SameLine();
+			
+			{
+				auto scope = maybe_disabled_cols({}, demo_path.empty());
 
-			if (ImGui::Button("Show folder in explorer")) {
+				if (ImGui::Button("Demo in explorer")) {
+					window.reveal_in_explorer(demo_path);
+				}
+
+				ImGui::SameLine();
+			}
+
+			if (ImGui::Button("Folder in explorer")) {
 				window.reveal_in_explorer(DEMOS_DIR);
 			}
 
