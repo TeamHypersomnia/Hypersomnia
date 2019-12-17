@@ -3239,9 +3239,9 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 2.4;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 10.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 2.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(600);
-			gun_def.recoil_multiplier = 0.62;
+			gun_def.recoil_multiplier = 0.25;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
@@ -3256,7 +3256,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ZAMIEC, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 0.85f);
+			set_density_mult(meta, 0.6f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false);
 			meta.get<invariants::item>().standard_price = 2050;
 			set_chambering_duration_ms(meta, 600.f);
@@ -3814,7 +3814,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = { 6000.0f, 6000.0f };
-			gun_def.shot_cooldown_ms = 250.f;
+			gun_def.shot_cooldown_ms = 230.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
 

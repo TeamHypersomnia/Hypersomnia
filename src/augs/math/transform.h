@@ -192,7 +192,7 @@ struct basic_transform {
 		return pos.compare_abs(b.pos, positional_eps) && repro::fabs(rotation - b.rotation) <= rotational_eps;
 	}
 
-	bool negliglible() const {
+	bool negligible() const {
 		return compare({});
 	}
 

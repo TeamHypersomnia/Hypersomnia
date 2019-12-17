@@ -2,7 +2,7 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 60,
+      amplification = 190,
       light_colors = {
         "0 146 222 255"
       },
@@ -10,7 +10,7 @@ return {
         x = 80,
         y = 80
       },
-      standard_deviation = 6
+      standard_deviation = 8
     },
     generate_desaturation = false
   },
@@ -20,7 +20,28 @@ return {
         x = 0,
         y = 0
       },
+      chamber = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shell_spawn = {
         pos = {
           x = 0,
           y = 0
@@ -63,6 +84,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -70,6 +98,10 @@ return {
         x = 0,
         y = 0
       }
+    },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {}
     },
     torso = {
       back = {
@@ -106,7 +138,22 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      secondary_shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {

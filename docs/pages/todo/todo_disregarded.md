@@ -74,7 +74,7 @@ summary: Just a hidden scratchpad.
 		- First: just do neons maps and the rest distinction
 			- will rarely be switched anyway
 			- we'll probably stay with this at least until deathmatch is complete
-			- loading just proggyclean is really negliglible
+			- loading just proggyclean is really negligible
 			- and it takes up tiny amount of atlas space
 			- so it does not matter even if we duplicate this also with imgui
 			- we'll also probably not care much about our game_gui systems for now
@@ -314,7 +314,7 @@ summary: Just a hidden scratchpad.
 		- Well actually even requested initial eq has flavour ids, so it's a no-go.
 
 	- lua vs binary files
-		- The write time will be negliglible for such small amounts of information
+		- The write time will be negligible for such small amounts of information
 		- Well... anyway let's store it as binary for now, because flavour ids won't be human readable anyway
 			- Predefined configs might as well be edited in editor instead of a text file
 

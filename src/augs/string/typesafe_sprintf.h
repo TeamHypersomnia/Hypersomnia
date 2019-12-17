@@ -6,7 +6,6 @@
 #include <limits>
 
 #include "augs/string/pretty_print.h"
-#include "augs/templates/remove_cref.h"
 
 inline void typesafe_sprintf_detail(std::size_t, std::string&) {}
 

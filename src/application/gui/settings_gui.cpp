@@ -1299,8 +1299,6 @@ void settings_gui_state::perform(
 
 					ImGui::SameLine();
 
-					text_disabled("(for benchmarking)");
-
 					const auto concurrency = std::thread::hardware_concurrency();
 					const auto t_max = concurrency * 2;
 

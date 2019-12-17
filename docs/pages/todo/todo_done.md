@@ -1402,12 +1402,12 @@ we consider whole type overrides too complex architeciturally:
 					- More memory wasted
 						- Won't take more than a single shell, though
 			- Corner cases
-				- (negliglible) we don't want to assign it to hotbar nor want it to participate in selection setups
+				- (negligible) we don't want to assign it to hotbar nor want it to participate in selection setups
 					- actually that's easy because selection groups only ever look in hotbar items
-				- (negliglible) we want to drop all items from personal deposit, not the personal deposit item
+				- (negligible) we want to drop all items from personal deposit, not the personal deposit item
 		- ITEM DEPOSIT pros:
 			- Works out of box with hotbar
-			- (negliglible) Works out of box with drop_from_all_slots
+			- (negligible) Works out of box with drop_from_all_slots
 			- Dont have to create any new item
 		- ITEM DEPOSIT cons:
 			- **(HUGE)** Some shit corner cases in GUI
@@ -2428,7 +2428,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 					- and compare this to the header sizes
 		- Pro: Faster estimation
 		- Pro: Easier interaction with the server as we don't have to cast the void* pointer
-			- Should be negliglible?
+			- Should be negligible?
 		- Note that changing the way we write the messages won't really be that much since we will anyway read somehow from these bytes
 	- Keeping the struct
 		- Has to actually hold the data structure, e.g. a map
@@ -2754,7 +2754,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- doesnt play any effects AFAIK
 			- Only the tick sound
 			- and plays the welcome message
-			- these are negliglible
+			- these are negligible
 	- When to clear the dead entities from the audiovisual state?
 		- technically can the audiovisual state ever assume that the entities are alive?
 		- Standard post cleanup basically ONLY clears the dead entities
@@ -4027,7 +4027,7 @@ Advantages:
 - client_setup replay (re-visited)
 	- let packets from server be saved on the message level
 	- I think adapter should just have if elses since client setup logic is way more important
-		- negliglible overhead really
+		- negligible overhead really
 	- Design the file so that we periodically append
 
 - client_setup replay

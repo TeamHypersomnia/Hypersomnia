@@ -1044,7 +1044,7 @@ bool client_setup::handle_input_before_game(
 			};
 
 
-			const bool has_shift{ state[key::LSHIFT] };
+			const bool has_shift{ state[key::LSHIFT] || state[key::RSHIFT] };
 
 			switch (k) {
 				case key::RIGHT: forward(has_shift ? 1 : 5); return true;

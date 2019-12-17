@@ -6,6 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Wait with updating maps after changing stats, at least until we make a gameplay teaser
+
+- Buff bulldup: maybe higher rof?
+
+- Demos: optionally be able to add a synchronized audio track for scaling with the time
+	- If we recorded the voice separately for example
+	- It will synchronize with slow motion etc
+
+- Fix path problems with demos on Windows
+- Don't force spectated player switch upon match summary
+- We can make non-serialized snapshots easily
+
+- Fix haste blinking
+- Fix too many chat messages
+- Fix GUI subject for spectator demo replay
+- Fix explosives hud invisible on demo
+- Fix spectator sizing after death
+
+- Show death summary in spectator
+- Reset timer after seeking during play, because lag will force to advance again
+
 - Nice autodirector facility
 	- Minimize the time we have to spend on editing the footage
 	- Highlights of each 10 second durations preceding ends of rounds
