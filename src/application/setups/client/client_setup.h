@@ -127,6 +127,7 @@ class client_setup :
 	std::vector<demo_step> unflushed_demo_steps;
 	std::vector<demo_step> demo_steps_being_flushed;
 	std::future<void> future_flushed_demo;
+	bool was_demo_meta_written = false;
 
 	client_demo_player demo_player;
 	/* No client state follows later in code. */

@@ -152,7 +152,7 @@ void client_setup::flush_demo_steps() {
 			auto out = augs::with_exceptions<std::ofstream>();
 			out.open(recorded_demo_path, std::ios::out | std::ios::binary | std::ios::app);
 
-			if (out.tellp() == 0) {
+			if (!was_demo_meta_written) {
 				demo_file_meta meta;
 				meta.version = hypersomnia_version();
 				meta.server_address = last_addr.connect_address;
@@ -160,12 +160,15 @@ void client_setup::flush_demo_steps() {
 
 				const auto version_info_path = augs::path_type(recorded_demo_path).replace_extension(".version.txt");
 				augs::save_as_text(version_info_path, meta.version.get_summary());
+
+				was_demo_meta_written = true;
 			}
 
 			for (const auto& s : demo_steps_being_flushed) {
 				augs::write_bytes(out, s);
 			}
 
+			out.flush();
 			demo_steps_being_flushed.clear();
 		}
 	);
@@ -230,12 +233,12 @@ client_setup::client_setup(
 		try {
 			play_demo_from(input_demo_path);
 		}
-		catch (const augs::file_open_error&) {
-			set_disconnect_reason(error, true);
+		catch (const augs::file_open_error& err) {
+			set_disconnect_reason(error + "\n" + err.what(), true);
 			disconnect();
 		}
-		catch (const augs::stream_read_error&) {
-			set_disconnect_reason(error, true);
+		catch (const augs::stream_read_error& err) {
+			set_disconnect_reason(error + "\n" + err.what(), true);
 			disconnect();
 		}
 	}
@@ -289,6 +292,7 @@ client_setup::~client_setup() {
 
 	wait_for_demo_flush();
 	flush_demo_steps();
+	wait_for_demo_flush();
 }
 
 net_time_t client_setup::get_current_time() {
