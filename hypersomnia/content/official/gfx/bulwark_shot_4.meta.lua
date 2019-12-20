@@ -44,8 +44,8 @@ return {
       },
       shell_spawn = {
         pos = {
-          x = -20,
-          y = -7
+          x = 8,
+          y = -8
         },
         rotation = -90
       }
@@ -101,59 +101,8 @@ return {
       }
     },
     non_standard_shape = {
-      convex_partition = {
-        2,
-        3,
-        4,
-        5,
-        6,
-        1,
-        2,
-        0,
-        1,
-        6,
-        7,
-        8,
-        0
-      },
-      original_poly = {
-        {
-          x = -21,
-          y = 2
-        },
-        {
-          x = -16,
-          y = -2
-        },
-        {
-          x = -21,
-          y = -5
-        },
-        {
-          x = -21,
-          y = -9
-        },
-        {
-          x = 22,
-          y = -9.5
-        },
-        {
-          x = 20,
-          y = -2
-        },
-        {
-          x = -9,
-          y = -1
-        },
-        {
-          x = -15,
-          y = 9
-        },
-        {
-          x = -21,
-          y = 7
-        }
-      }
+      convex_partition = {},
+      original_poly = {}
     },
     torso = {
       back = {

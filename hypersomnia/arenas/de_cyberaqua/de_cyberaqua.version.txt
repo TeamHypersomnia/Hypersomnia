@@ -1,5 +1,5 @@
-Hypersomnia version 1.0.7095
-Revision no.: 7095 (dirty)
-Build date: Sun Nov 17 13:40:44 2019
+Hypersomnia version 1.0.7117
+Revision no.: 7117 (dirty)
+Build date: Mon Nov 25 12:31:53 2019
 Commit message:
-Improve client vars settings
+Fix linker error on Windows

@@ -4061,3 +4061,10 @@ Advantages:
 	- Also makes it easier to debug
 	- Snapshots could prove a little hard but we could just resimulate from the beginning if we want to seek backwards
 
+- Buff bulldup: maybe higher rof?
+
+- Fix path problems with demos on Windows
+
+- Wait with updating maps after changing stats, at least until we make a gameplay teaser
+	- That is because we have to record the demo somehow and otherwise the replay would diverge
+	- Okay, we can do it now!

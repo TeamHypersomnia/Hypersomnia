@@ -154,8 +154,8 @@ void client_setup::flush_demo_steps() {
 
 			if (!was_demo_meta_written) {
 				demo_file_meta meta;
-				meta.version = hypersomnia_version();
 				meta.server_address = last_addr.connect_address;
+				meta.version = hypersomnia_version();
 				augs::write_bytes(out, meta);
 
 				const auto version_info_path = augs::path_type(recorded_demo_path).replace_extension(".version.txt");

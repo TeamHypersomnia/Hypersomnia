@@ -4,6 +4,9 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Lua intercosms are exported a bit different on Linux and Windows
+	- We have something like 4.438729871 vs 4.438729872
+
 - Camera is moving strangely in slow motion
 
 - fix predicted commands error for later debugging

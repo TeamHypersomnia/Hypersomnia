@@ -4060,6 +4060,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.092f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BULWARK_SHOT);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HEAVY_PISTOL_CHAMBERING);

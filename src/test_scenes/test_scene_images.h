@@ -267,6 +267,7 @@ enum class test_scene_image_id {
 	BAKA47,
 
 	BULWARK,
+	BULWARK_SHOT_1,
 	BULWARK_MAGAZINE,
 
 	ZAMIEC,

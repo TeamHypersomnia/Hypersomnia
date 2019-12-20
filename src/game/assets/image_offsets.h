@@ -38,6 +38,7 @@ struct gun_offsets {
 	transformi chamber;
 	transformi chamber_magazine;
 	transformi shell_spawn;
+	transformi rail;
 	// END GEN INTROSPECTOR
 };
 
