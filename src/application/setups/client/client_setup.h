@@ -567,8 +567,13 @@ public:
 	const cosmos& get_viewed_cosmos() const;
 
 	auto get_interpolation_ratio() const {
-		const auto dt = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
-		return std::min(1.0, (get_current_time() - client_time) / dt);
+		const auto dt_secs = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+
+		if (is_replaying()) {
+			return demo_player.timer.fraction_of_step_until_next_step(dt_secs);
+		}
+
+		return std::min(1.0, (get_current_time() - client_time) / dt_secs);
 	}
 
 	const_entity_handle get_viewed_character() const {
