@@ -13,13 +13,7 @@ summary: That which we are brainstorming at the moment.
 - Don't force spectated player switch upon match summary
 - We can make non-serialized snapshots easily
 
-- Demo replay issues
-	- Something screwed with global time?
-	- Fix haste blinking
-	- Fix too many chat messages
-	- Fix GUI subject for spectator demo replay
-	- Fix explosives hud invisible on demo
-
+- Fix too many chat messages
 - Fix spectator sizing after death
 
 - Show death summary in spectator
@@ -177,8 +171,6 @@ summary: That which we are brainstorming at the moment.
 	- if not, we want to post it, because a predicted cosmos might have not predicted this effect occurring.
 	- this could be done for id-insensitive events like effects tied to weapons and characters
 	- and not necessarily for bullets 
-
-- there was a desync on win 8.1
 
 - why would a warx fq12 be reloaded?
 	- is another mag chosen for it?

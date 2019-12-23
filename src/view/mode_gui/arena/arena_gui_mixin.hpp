@@ -194,7 +194,9 @@ entity_id arena_gui_mixin<D>::get_game_gui_subject_id() const {
 			using M = remove_cref<decltype(typed_mode)>;
 
 			if constexpr(M::round_based) {
-				if (!mode_input.rules.hide_details_when_spectating_enemies) {
+				const bool show_details_of_enemies = !mode_input.rules.hide_details_when_spectating_enemies;
+
+				if (show_details_of_enemies) {
 					return self.get_viewed_character_id();
 				}
 
@@ -229,6 +231,10 @@ entity_id arena_gui_mixin<D>::get_game_gui_subject_id() const {
 	};
 
 	if constexpr(std::is_same_v<client_setup, D>) {
+		if (self.is_replaying()) {
+			return self.get_viewed_character_id();
+		}
+
 		return get_viewed_or_local_with(client_arena_type::PREDICTED);
 	}
 	else {
@@ -248,9 +254,6 @@ entity_id arena_gui_mixin<D>::get_viewed_character_id() const {
 		[&](const auto& typed_mode, const auto& in) {
 			(void)in;
 
-			const auto local_id = self.get_local_player_id();
-			const auto local_character = typed_mode.lookup(local_id);
-
 			if (arena_gui.spectator.active) {
 				const auto spectating = arena_gui.spectator.now_spectating;
 
@@ -258,6 +261,9 @@ entity_id arena_gui_mixin<D>::get_viewed_character_id() const {
 					return typed_mode.lookup(spectating);
 				}
 			}
+
+			const auto local_id = self.get_local_player_id();
+			const auto local_character = typed_mode.lookup(local_id);
 
 			return local_character;
 		}

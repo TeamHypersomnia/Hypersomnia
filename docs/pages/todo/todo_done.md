@@ -4068,3 +4068,4 @@ Advantages:
 - Wait with updating maps after changing stats, at least until we make a gameplay teaser
 	- That is because we have to record the demo somehow and otherwise the replay would diverge
 	- Okay, we can do it now!
+- Fix GUI subject for spectator demo replay

@@ -4,6 +4,12 @@ hide_sidebar: true
 permalink: bug_database
 summary: Notable bugs.
 ---
+- Demo replay issues
+	- Something screwed with global time?
+	- Fix haste blinking
+	- Fix explosives hud invisible on demo
+	- The problem was with interpolation ratio.
+
 
 - Fatal bug: a mutable has_been_drawn could be written whilst GUI
 was processed, resulting in a potentially different cosmos being chosen
