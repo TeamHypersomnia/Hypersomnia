@@ -305,6 +305,9 @@ enum class test_scene_image_id {
 	GALILEA_ROUND,
 	GALILEA_SHELL,
 
+	HUNTER,
+	HUNTER_MAGAZINE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
