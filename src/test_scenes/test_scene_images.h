@@ -308,6 +308,9 @@ enum class test_scene_image_id {
 	HUNTER,
 	HUNTER_MAGAZINE,
 
+	CYBERSPRAY,
+	CYBERSPRAY_MAGAZINE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
