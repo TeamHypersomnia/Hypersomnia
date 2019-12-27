@@ -3494,7 +3494,7 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 2.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(600);
-			gun_def.recoil_multiplier = 0.3;
+			gun_def.recoil_multiplier = 0.25;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
@@ -3509,7 +3509,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ZAMIEC, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 0.6f);
+			set_density_mult(meta, 0.9f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false);
 			meta.get<invariants::item>().standard_price = 2050;
 			set_chambering_duration_ms(meta, 600.f);
@@ -3544,7 +3544,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4150.f, 4800.f};
+			gun_def.muzzle_velocity = {4150.f, 4850.f};
 			gun_def.shot_cooldown_ms = 40.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3554,7 +3554,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 1.f;
-			gun_def.adversarial.knockout_award = static_cast<money_type>(400);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(450);
 			gun_def.recoil_multiplier = 0.25;
 
 			gun_def.maximum_heat = 2.f;
@@ -3571,7 +3571,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.2f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false);
-			meta.get<invariants::item>().standard_price = 2550;
+			meta.get<invariants::item>().standard_price = 2300;
 			set_chambering_duration_ms(meta, 300.f);
 
 			auto& item = meta.get<invariants::item>();
