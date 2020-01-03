@@ -487,3 +487,8 @@ summary: Just a hidden scratchpad.
 
 - Nickname should change if we change it in settings
 
+
+- Create randomized players like in the good olden times
+	- to test the predicted experience
+	- we might look into legacy sources for guidance
+	- fill in several artificial connections starting from the back of the client array

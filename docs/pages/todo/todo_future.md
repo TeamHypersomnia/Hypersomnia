@@ -5,6 +5,26 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Letting servers adjust the speed of the game
+	- bomb mode doesn't do timing, it just advances whenever asked, but it has to effecctively use the delta information
+		- which is obtained by ls / tickrate
+	- Remember to never let the incremented timers be treated as the system time
+		- Not so important for view of the arena modes as they are several mintues at most
+	- The tickrate and the logic speed multiplier (LSM) is transparent to the cosmos, it just gets a different delta
+	- dt_secs = LSM / tickrate;
+		- dt_secs here is not equal to the real passed time
+	- due to limitations, can only be set for when a new round starts
+		- could be in rules, and just applied whenever an initial cosmos is assigned from
+	- updaterate should as well be different, e.g. with 144 hz we might want to send packets at rate of 72 times per second
+	- If we are getting time values for an arena mode, they have to be multiplied by logic speed
+	- we should let a map select some sensible defaults?
+	- audiovisual state can accept speed mult separately
+		- which could be also changed when a proper tick is check
+
+- maps as git repositories
+	- how do we facilitate modifications on existing maps so that they don't have to be re-downloaded?
+	- we'd have to add remotes and assign branches to them
+
 - fix bots 
 	- They currently allocate ids supposed to be used by clients and it all gets screwed
 

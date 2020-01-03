@@ -4069,3 +4069,134 @@ Advantages:
 	- That is because we have to record the demo somehow and otherwise the replay would diverge
 	- Okay, we can do it now!
 - Fix GUI subject for spectator demo replay
+
+- Dedicated server communication
+	- Advanced RCON functionality
+		- Rcon can download the log
+		- Rcon should have a reserved slot to enter in case of emergency
+		- RCON password
+		- Switch teams
+		- Restart
+		- A way to view dedicated server stats?
+	- Remember to keep the old master rcon password so that basic level rcons cannot change it
+
+- We still have crashes on Windows, even after fixing swap buffers
+	- Perhaps it's a compiler bug since with our home-brewn build everything seemed to be fine
+	- Although I think it was the same with that mega.nz build
+
+
+- To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
+	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
+	- this way we are unpredictable about it but still deterministic
+	- Seed will have to be sent in the beginning anyway, along with the state
+	- Some amount of initial information will need to be transmitted anyway
+		- Like current players?
+		- Isn't this all a matter of sending the bomb mode state?
+ check how openal behaves on Windows when abruptly stopping sounds
+
+
+- Game events log and chat
+	- Positioning based on input box window
+		- Under the input box window, we can have tabs changeable by ctrl+tab and ctrl+shift+tab
+	- Don't show input box window when chat is not active
+	- Scroll can be added later
+		- If we ever have scrollbar, change range, not coords.
+	- Always show n recent commands. 
+
+- Sending large step infos through yojimbo?
+	- we probably want to handle it after DM milestone
+	- Don't rely on fragmentation
+
+- Chat-level logs
+	- server_setup has to expose events somehow
+	- can send them really as chat messages to all the clients
+		- we also need to redirect it to the server player
+- Step configuration for the cosmos
+	- Whether to process deaths, e.g. to never predict them on the client
+	- Whether to post audiovisual messages, always false for the server
+- Client-side
+	- When initial state is received, wait for the first entropy
+	- When it arrives, simply begin queuing inputs localy
+	- The server only sends a "client input accepted" byte in response
+		- when this happens, peel off the oldest input from out queue
+	- always re-simulate all inputs in the queue
+		- we don't have to calc some difference, this will happen naturally
+	- how does this approach scale when the effective latency suddenly decreases?
+		- so a server suddenly gets a burst of packets from the client
+			- if we unpack them evenly into steps, we don't decrease the effective latency
+		- since some steps were missed, now we have to squash inputs
+			- server sends a number of how many inputs were squashed?
+		- don't worry, by definition squashing will only occur in high-jitter environments
+			- squashed entropies should still preserve important behaviour
+			- e.g. you won't be left with a gun that shoots even though you've released the button already
+			- magnitude of movements might be malformed so we'll have a hitch, though nicely interpolated
+	- how does this approach scale when the effective latency suddenly increases?
+		- client just doesn't peel off inputs for a while from its queue
+	- to avoid squashing as much as possible we can have a server-side jitter buffer for clients
+		- though I remember we didn't have some good experience with it
+	- if the client input was not accepted, still peel off the back queue!
+		- simply treat it as a misprediction!
+		- well, this sucks, because we can possibly miss some important inputs like a button press
+		- suddenly our player stops moving!
+
+- Notes on assymetric latency
+	- Effectively, the client always shows AHEAD the server time by 
+	- Therefore it is the client->server latency that is the most important
+		- We should ALWAYS resend the earliest messages since traffic on this side will NOT be the bottleneck
+		- so set the delay to 0 on client-side config
+
+- Chosen solution for jitter buffer
+	- Handling latency increase and thus, unaccepted client commands 
+		- Client adjusts naturally, the same way as in the beginning of the play where latency is assumed to be 0
+	- Handling latency decrease and thus, packet bursts
+		- Two strategies
+			- One, squash on the server 
+				- Pro: simpler, so we'll for now go with this strat
+				- Pro: gets the client fastest on track
+				- Con: slight jerks when this happens
+				- Was the same not mentioned with snapping of the ticks?
+			- Second, slow down tickrate on the client and thus the rate with which the commands are generated
+				- Pro: no jerks when this happens
+				- Con: takes more to get the client faster on track
+
+- Server: accepting inputs
+	- I guess a simpler jitter buffer implementation could be in order
+		- e.g. just keep a vector and a maximum of steps to squash at once?
+	- jitter protects from latency increase, squashing from decrease
+
+
+- If we simply don't predict knockouts, we automatically don't predict the vulnerable win conditions in the mode
+	- Other win conditions are based on time so it won't be as bad
+- fix arena gui showing "Disconnected"
+	- somehow cache the nick or remove the entry?
+	- this is cool actually but if someone connects right away it will show his nickname as the victim
+		- due to id collision
+		- maybe store nickname?
+
+- Probably simply play win and death sounds in accordance with the referential cosmos
+	- Will avoid confusion
+	- Though will introduce lag
+	- If, on the other hand, we want to predict deaths, it would be best if these were death sound entities
+		- So that they get interrupted on mis-prediction
+	- From what I can see, we already had some lag on the death sounds due to empty beginnings
+		- Around 40-80ms
+		- And we never noticed
+		- So let's just always make death sounds referential
+
+
+- Admin panel
+	- Editor-like server vars tweaker accessible by pressing ESC server-side
+		- will have to be commandized properly, just like editor setup's
+	- Should we re-use change property command?
+		- we'll only need a dummy editor folder struct
+			- we could make it more flexible
+	
+- test O3 with and without flto?
+	- Could save us much of the build times for production
+
+- why would a warx fq12 be reloaded?
+	- is another mag chosen for it?
+	- do we use strict greater inequality to acquire the better mag?
+
+- fix client being unable to reconnect
+	- the effects are being made unpredictable due to being thrown

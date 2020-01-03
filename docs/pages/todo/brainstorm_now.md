@@ -6,83 +6,106 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Demos: optionally be able to add a synchronized audio track for scaling with the time
-	- If we recorded the voice separately for example
-	- It will synchronize with slow motion etc
+- Website server status
+	- Game servers have a built-in http server?
 
-- Don't force spectated player switch upon match summary
-- We can make non-serialized snapshots easily
+- Masterserver
 
-- Fix too many chat messages
-- Fix spectator sizing after death
 
-- Show death summary in spectator
-- Reset timer after seeking during play, because lag will force to advance again
+- Check official map version upon connection
+	- if mismatch
+		- custom? re-download
+		- official? disconnect
 
-- Nice autodirector facility
-	- Minimize the time we have to spend on editing the footage
-	- Highlights of each 10 second durations preceding ends of rounds
-		- for compact duel of honor recordings
-	- Smooth slow-motion seconds setting in gui
-		- augs::maybe
+- Leaderboards
+	- Columns: Avatar, Nickname, Kills, Assists, Deaths, Hours played
 
-- next/prev round and death
-	- textbox with an offset for deaths
-	- 5 second threshold for rounds
-	- demo replay advance takes a lambda 'has_occured' that takes an enum demo_occurence_type KNOCKOUT/ROUND
-	- alternatively steppers may return some metadata with a bitset of occurences that happened, if it depends on post-solve
-		- but we can look into knockouts
+- Setup a simple dev journal at hypersomnia.xyz
+
+- Advanced RCON functionality
+	- Kicking and banning users
+		- Rcon can download the log
+		- Rcon should have a reserved slot to enter in case of emergency
+		- Restart
+		- A way to view dedicated server stats?
+
+- Advanced demo replay functionality 
+	- Optionally be able to add a synchronized audio track for scaling with the time
+		- If we recorded the voice separately for example
+		- It will synchronize with slow motion etc
+	- We can make non-serialized snapshots easily
+	- Autodirector
+		- Minimize the time we have to spend on editing the footage
+		- Highlights of each 10 second durations preceding ends of rounds
+			- for compact duel of honor recordings
+		- Smooth slow-motion seconds setting in gui
+			- augs::maybe
+		- Somehow detect action?
+			- Or just show the player that is going to be killed next?
+	- next/prev round and death
+		- textbox with an offset for deaths
+		- 5 second threshold for rounds
+		- demo replay advance takes a lambda 'has_occured' that takes an enum demo_occurence_type KNOCKOUT/ROUND
+		- alternatively steppers may return some metadata with a bitset of occurences that happened, if it depends on post-solve
+			- but we can look into knockouts
+
+- Demo replay fixes
+	- Money is wrongly displayed on demos
+		- I guess it is shown for the the local character
+		- we should also show all moneys on the scoreboard
+	- Reset timer after seeking during play, because lag will force to advance again
+
+- Let shells not invoke any sound when hit by a grenade
+	- to lessen hrtf impact and occurences of sound interruptions
+
+- Update process fixes
+	- On update on linux, symbolic links to filesystem handlers are lost
+
+- Advanced update automatization
+	- CLI for editor re-exporting
+	- Server updates
+		- Check once every X minutes or everyday at a predefined hour
+		- Remember to only pull an upgrade if both Windows and Linux versions match
+		- For now have a rcon command for "Schedule server update"
+	- While in the main menu, check for updates once every several seconds
+		- e.g. if the server has to restart due to an upgrade, the clients will follow with the update right away
+		- also trigger update check every time we enter the main menu from the client
+		- New version available!
+			- Do you want to restart and upgrade the game now?
+				- Upgrade
+				- Cancel
+					- Automatic update was cancelled.
+	- Community map conversion
+
+- Faction win sounds sometimes get spatialized, when switching spectated person
+
+- Spectator fixes
+	- Don't force spectated player switch upon match summary
+	- Fix spectator sizing after death
+	- Show death summary in spectator
 
 - Run thread sanitizer at least once
-
-- plan for full server replays
-	- it's just about saving the entropies
-	- server shall be frozen and never advance when there are no players
-	- keeping timing information in arena server vars
-		- we will anyway have to commandize the changing of these rules somehow
-	- server entropy different from mode entropy
-		- since it will also store player information
-	- server entropy serializer
-
 
 - Fix openssl errors in build process on a clean arch linux
 	- Perhaps just use shared libraries if shared can't be found
 
-- While in the main menu, check for updates once every several seconds
-	- e.g. if the server has to restart due to an upgrade, the clients will follow with the update right away
-	- also trigger update check every time we enter the main menu from the client
-	- New version available!
-		- Do you want to restart and upgrade the game now?
-			- Upgrade
-			- Cancel
-				- Automatic update was cancelled.
-
-- Research chat messages sometimes not working
+- Chat messages bugs?
+	- Research chat messages sometimes not working
+	- Fix too many chat messages
 
 - Don't kick afk spectators
+	- send some heartbeat
+
+- Inventory GUI still acts up
+
 - Test what happens without internet connection when launching Hypersomnia on Windows
 
 - Font-scale invariant update window
 
 - Website
 
-- Server/client continuous integration
-	- Automatic client upgrade
-	- Automatic server upgrade
-		- Remember to only pull an upgrade if both Windows and Linux versions match
-		- For now have a rcon command for "Schedule server update"
-
-- completely different approach to client setup replay: only record the relevant messages in some mini format?
-	- well it's less out of the box
-
 - custom chosen ruleset could be a part of mode solvable
 	- or actually client/server solvable (arena_handle)
-
-- We still have crashes on Windows, even after fixing swap buffers
-	- Perhaps it's a compiler bug since with our home-brewn build everything seemed to be fine
-	- Although I think it was the same with that mega.nz build
-
-- Inventory GUI still acts up
 
 - Ruleset chooser might be a combo too
 	- it might only read the names or ids from the ruleset file
@@ -91,12 +114,17 @@ summary: That which we are brainstorming at the moment.
 
 - Update imgui later for cool features like builtin tabs
 
-- Map transmission
+- Community map transmission
 	- Maybe asynchronously compress the entire map to .7z
 
-- Maybe a separate folder for official arenas?
-
 - Disallow exporting to lua when playtesting
+
+- Gameplay fixes
+
+- Gameplay bugs
+	- The problems with walls
+		- Can walk through
+		- Can shoot through
 
 - LPM acts as Q when hands are empty
 	- Punches when no weapons
@@ -106,21 +134,10 @@ summary: That which we are brainstorming at the moment.
 	- That is because a single malicious RCON holder could avoid responsibility for their misdeeds
 	- Instead, just assign permissions to accounts, or just the private IDs
 
-- Check if we don't have some dump file on windows
-
 - Do we want to somehow let the user be able to rollback to older versions?
 	- How do we even do it? Build retention on appveyor?
 	- Not now, certainly not until editor is publicly usable
 
-- Dedicated server communication
-	- Advanced RCON functionality
-		- Rcon can download the log
-		- Rcon should have a reserved slot to enter in case of emergency
-		- RCON password
-		- Switch teams
-		- Restart
-		- A way to view dedicated server stats?
-	- Remember to keep the old master rcon password so that basic level rcons cannot change it
 
 - We could set a limit to the number of allowed simultaneous muzzle sounds from the same gun
 	- similarly for health decrease sounds
@@ -147,23 +164,13 @@ summary: That which we are brainstorming at the moment.
 - Dump logs once every 1000 or so
 - Write editor write date to version.txt file
 	
-- Radar
-	- Also show bomb
-
 - make layer with insects hoverable in editor
 
 - bomb falls outside the map
 
-
-- Indeed, there is a problem when importing project-specific gfx on windows, but not on linux
-
-- fix neon maps being generated in the project folder
-
 - Note that message buffer might overflow during resynchro, causing a disconnection
 
 - increase prices of uwota and triad? theyre soo op
-
-- do something about going through walls with bilmer and elon hrl
 
 - check if export/import of rulesets works correctly
 
@@ -171,13 +178,6 @@ summary: That which we are brainstorming at the moment.
 	- if not, we want to post it, because a predicted cosmos might have not predicted this effect occurring.
 	- this could be done for id-insensitive events like effects tied to weapons and characters
 	- and not necessarily for bullets 
-
-- why would a warx fq12 be reloaded?
-	- is another mag chosen for it?
-	- do we use strict greater inequality to acquire the better mag?
-
-- fix client being unable to reconnect
-	- the effects are being made unpredictable due to being thrown
 
 - when re-exporting
 	- fix spells
@@ -199,8 +199,6 @@ summary: That which we are brainstorming at the moment.
 	- always keep this personal deposit open
 	- recalculate hotbar on every round start?
 
-- could chambering sound be omitted under some occasions?
-
 - particles don't get properly predicted on deaths sometimes?
 
 - if the referential post solve determines that the predicted post solve has missed something predictable (e.g. a bullet impact)
@@ -210,18 +208,8 @@ summary: That which we are brainstorming at the moment.
 	- Never predict collisions of remote players
 		- This might be important for not exposing tactical information
 	- Predict collisions with items only if they weren't just recently dropped by a remote player
-	
-- test O3 with and without flto?
-	- Could save us much of the build times for production
 
-- Admin panel
-	- Editor-like server vars tweaker accessible by pressing ESC server-side
-		- will have to be commandized properly, just like editor setup's
-	- Should we re-use change property command?
-		- we'll only need a dummy editor folder struct
-			- we could make it more flexible
-
-- Properly sync client's changes to nickname, sensitivity or others.
+- Sync player's change to nickname
 
 - Equipment generators
 	- Should simply be markers that are used by the modes, depending on the flag
@@ -233,154 +221,13 @@ summary: That which we are brainstorming at the moment.
 - should rebuy previous also buy magazines bought?
 	- perhaps
 
-- Probably simply play win and death sounds in accordance with the referential cosmos
-	- Will avoid confusion
-	- Though will introduce lag
-	- If, on the other hand, we want to predict deaths, it would be best if these were death sound entities
-		- So that they get interrupted on mis-prediction
-	- From what I can see, we already had some lag on the death sounds due to empty beginnings
-		- Around 40-80ms
-		- And we never noticed
-		- So let's just always make death sounds referential
-
-- fix arena gui showing "Disconnected"
-	- somehow cache the nick or remove the entry?
-	- this is cool actually but if someone connects right away it will show his nickname as the victim
-		- due to id collision
-		- maybe store nickname?
-
-- Do something so that we don't lose work in playtesting mode
-
-- Create randomized players like in the good olden times
-	- to test the predicted experience
-	- we might look into legacy sources for guidance
-	- fill in several artificial connections starting from the back of the client array
-
-- If we simply don't predict knockouts, we automatically don't predict the vulnerable win conditions in the mode
-	- Other win conditions are based on time so it won't be as bad
-
-- Notes on assymetric latency
-	- Effectively, the client always shows AHEAD the server time by 
-	- Therefore it is the client->server latency that is the most important
-		- We should ALWAYS resend the earliest messages since traffic on this side will NOT be the bottleneck
-		- so set the delay to 0 on client-side config
-
-- Chosen solution for jitter buffer
-	- Handling latency increase and thus, unaccepted client commands 
-		- Client adjusts naturally, the same way as in the beginning of the play where latency is assumed to be 0
-	- Handling latency decrease and thus, packet bursts
-		- Two strategies
-			- One, squash on the server 
-				- Pro: simpler, so we'll for now go with this strat
-				- Pro: gets the client fastest on track
-				- Con: slight jerks when this happens
-				- Was the same not mentioned with snapping of the ticks?
-			- Second, slow down tickrate on the client and thus the rate with which the commands are generated
-				- Pro: no jerks when this happens
-				- Con: takes more to get the client faster on track
-
-- Server: accepting inputs
-	- I guess a simpler jitter buffer implementation could be in order
-		- e.g. just keep a vector and a maximum of steps to squash at once?
-	- jitter protects from latency increase, squashing from decrease
-
-- Client-side
-	- When initial state is received, wait for the first entropy
-	- When it arrives, simply begin queuing inputs localy
-	- The server only sends a "client input accepted" byte in response
-		- when this happens, peel off the oldest input from out queue
-	- always re-simulate all inputs in the queue
-		- we don't have to calc some difference, this will happen naturally
-	- how does this approach scale when the effective latency suddenly decreases?
-		- so a server suddenly gets a burst of packets from the client
-			- if we unpack them evenly into steps, we don't decrease the effective latency
-		- since some steps were missed, now we have to squash inputs
-			- server sends a number of how many inputs were squashed?
-		- don't worry, by definition squashing will only occur in high-jitter environments
-			- squashed entropies should still preserve important behaviour
-			- e.g. you won't be left with a gun that shoots even though you've released the button already
-			- magnitude of movements might be malformed so we'll have a hitch, though nicely interpolated
-	- how does this approach scale when the effective latency suddenly increases?
-		- client just doesn't peel off inputs for a while from its queue
-	- to avoid squashing as much as possible we can have a server-side jitter buffer for clients
-		- though I remember we didn't have some good experience with it
-	- if the client input was not accepted, still peel off the back queue!
-		- simply treat it as a misprediction!
-		- well, this sucks, because we can possibly miss some important inputs like a button press
-		- suddenly our player stops moving!
-
-- Step configuration for the cosmos
-	- Whether to process deaths, e.g. to never predict them on the client
-	- Whether to post audiovisual messages, always false for the server
-
-- Implement steps correction sending 
-
-- Chat-level logs
-	- server_setup has to expose events somehow
-	- can send them really as chat messages to all the clients
-		- we also need to redirect it to the server player
-
-- Sending large step infos through yojimbo?
-	- we probably want to handle it after DM milestone
-	- Don't rely on fragmentation
-
-- Game events log and chat
-	- Positioning based on input box window
-		- Under the input box window, we can have tabs changeable by ctrl+tab and ctrl+shift+tab
-	- Don't show input box window when chat is not active
-	- Scroll can be added later
-		- If we ever have scrollbar, change range, not coords.
-	- Always show n recent commands. 
-
-- we could begin by writing a simple chat server in order to test connections at all
-	- we could revive our textbox because it was battle tested
-		- actually, let's take imgui since we'll have tabs, collapsing etc for free
-		- note we don't need selection of text, we'll just log entire chat history the simplicity if someone wants to copy
-		- coloring could work by parsing actual content, instead of strangely structurizing commands
-			- e.g. nicknames would always be colorized depending on the faction
-		- wrapping will introduce a problem I guess but only the starting content will be colorized
-			- yeah only the preffix will ever have colors
-		- always wrap when inactive, but when active we can just as well wrap
-
-- Delta compress the solvable to send against the initial solvable
-
-- check how openal behaves on Windows when abruptly stopping sounds
-
-- maps as git repositories
-	- how do we facilitate modifications on existing maps so that they don't have to be re-downloaded?
-	- we'd have to add remotes and assign branches to them
-
-- always calculate the tickrate from the referential player in case the tickrate suddenly changes
-
-- Letting servers adjust the speed of the game
-	- bomb mode doesn't do timing, it just advances whenever asked, but it has to effecctively use the delta information
-		- which is obtained by ls / tickrate
-	- Remember to never let the incremented timers be treated as the system time
-		- Not so important for view of the arena modes as they are several mintues at most
-	- The tickrate and the logic speed multiplier (LSM) is transparent to the cosmos, it just gets a different delta
-	- dt_secs = LSM / tickrate;
-		- dt_secs here is not equal to the real passed time
-	- due to limitations, can only be set for when a new round starts
-		- could be in rules, and just applied whenever an initial cosmos is assigned from
-	- updaterate should as well be different, e.g. with 144 hz we might want to send packets at rate of 72 times per second
-	- If we are getting time values for an arena mode, they have to be multiplied by logic speed
-	- we should let a map select some sensible defaults?
-	- audiovisual state can accept speed mult separately
-		- which could be also changed when a proper tick is check
+- Do something so that we don't accidentally discard work in playtesting mode
 
 - Easily spawn loaded weapons or magazines
 	- For now, let instantiation load them all by default
 
 - Simplify workflow for creating new weapons?
 	- E.g. remove the need to specify finishing traces
-
-- To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
-	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
-	- this way we are unpredictable about it but still deterministic
-	- Seed will have to be sent in the beginning anyway, along with the state
-	- Some amount of initial information will need to be transmitted anyway
-		- Like current players?
-		- Isn't this all a matter of sending the bomb mode state?
 
 - matchmaking
 	- stats persistence

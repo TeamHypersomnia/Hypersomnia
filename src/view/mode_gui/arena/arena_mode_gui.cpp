@@ -503,9 +503,17 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_money_and_awards = [&]() {
+			const auto money_player_id = [&]() {
+				if (in.demo_replay_mode) {
+					return spectator.active ? spectator.now_spectating : local_player_id;
+				}
+
+				return local_player_id;
+			}();
+
 			// TODO: fix this for varying icon sizes
 
-			if (const auto p = typed_mode.find(local_player_id)) {
+			if (const auto p = typed_mode.find(money_player_id)) {
 				auto general_drawer = get_drawer();
 				const auto& stats = p->stats;
 
@@ -965,22 +973,19 @@ void arena_gui_state::draw_mode_gui(
 			entity_id tipped_character_id;
 			auto tipped_faction = faction_type::SPECTATOR;
 			
-			if (in.demo_replay_mode) {
-				const auto viewed_player_id = spectator.active ? spectator.now_spectating : local_player_id;
-				const auto viewed_player_data = typed_mode.find(viewed_player_id);
-
-				if (viewed_player_data != nullptr) {
-					tipped_faction = viewed_player_data->get_faction();
-					tipped_character_id = viewed_player_data->controlled_character_id;
+			const auto tipped_player_id = [&]() {
+				if (in.demo_replay_mode) {
+					return spectator.active ? spectator.now_spectating : local_player_id;
 				}
-			}
-			else {
-				const auto local_player_data = typed_mode.find(local_player_id);
 
-				if (local_player_data != nullptr) {
-					tipped_character_id = local_player_data->controlled_character_id;
-					tipped_faction = local_player_data->get_faction();
-				}
+				return local_player_id;
+			}();
+
+			const auto player_data = typed_mode.find(tipped_player_id);
+
+			if (player_data != nullptr) {
+				tipped_faction = player_data->get_faction();
+				tipped_character_id = player_data->controlled_character_id;
 			}
 
 			const auto& cosm = mode_input.cosm;
@@ -1016,6 +1021,10 @@ void arena_gui_state::draw_mode_gui(
 			}
 
 			const bool draw_money = [&]() {
+				if (in.demo_replay_mode) {
+					return true;
+				}
+
 				if (mode_input.rules.hide_details_when_spectating_enemies) {
 					if (local_player_faction && *local_player_faction != faction_type::SPECTATOR) {
 						const auto viewed_player_id = spectator.active ? spectator.now_spectating : local_player_id;

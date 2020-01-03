@@ -4,6 +4,17 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Delta compress the solvable to send against the initial solvable
+
+- plan for full server replays
+	- it's just about saving the entropies
+	- server shall be frozen and never advance when there are no players
+	- keeping timing information in arena server vars
+		- we will anyway have to commandize the changing of these rules somehow
+	- server entropy different from mode entropy
+		- since it will also store player information
+	- server entropy serializer
+
 - Lua intercosms are exported a bit different on Linux and Windows
 	- We have something like 4.438729871 vs 4.438729872
 

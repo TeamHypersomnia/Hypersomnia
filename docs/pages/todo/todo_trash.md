@@ -1197,3 +1197,15 @@ State
 		- updated every end of round
 - make it a struct passed to the buy menu as a whole
 - reset on warmup
+- we could begin by writing a simple chat server in order to test connections at all
+	- we could revive our textbox because it was battle tested
+		- actually, let's take imgui since we'll have tabs, collapsing etc for free
+		- note we don't need selection of text, we'll just log entire chat history the simplicity if someone wants to copy
+		- coloring could work by parsing actual content, instead of strangely structurizing commands
+			- e.g. nicknames would always be colorized depending on the faction
+		- wrapping will introduce a problem I guess but only the starting content will be colorized
+			- yeah only the preffix will ever have colors
+		- always wrap when inactive, but when active we can just as well wrap
+
+- Implement steps correction sending 
+
