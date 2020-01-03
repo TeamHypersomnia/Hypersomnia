@@ -215,6 +215,12 @@ void settings_gui_state::perform(
 
 		switch (active_pane) {
 			case settings_pane::GENERAL: {
+				{
+					auto& scope_cfg = config;
+
+					input_text<100>(SCOPE_CFG_NVP(masterserver_address), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.masterserver_address);
+				}
+
 				revertable_enum("Launch on game's startup", config.launch_mode);
 
 				revertable_checkbox("Fullscreen", config.window.fullscreen);

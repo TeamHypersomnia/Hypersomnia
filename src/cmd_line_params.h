@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/filesystem/path.h"
+#include "augs/app_type.h"
 
 struct cmd_line_params {
 	augs::path_type exe_path;
@@ -10,7 +11,7 @@ struct cmd_line_params {
 	bool help_only = false;
 	bool version_only = false;
 	bool start_server = false;
-	bool start_dedicated_server = false;
+	app_type type = app_type::GAME_CLIENT;
 	bool upgraded_successfully = false;
 	bool should_connect = false;
 	int test_fp_consistency = -1;
@@ -41,7 +42,10 @@ struct cmd_line_params {
 				force_update_check = true;
 			}
 			else if (a == "--dedicated-server") {
-				start_dedicated_server = true;
+				type = app_type::DEDICATED_SERVER;
+			}
+			else if (a == "--masterserver") {
+				type = app_type::MASTERSERVER;
 			}
 			else if (a == "--test-fp-consistency") {
 				test_fp_consistency = std::atoi(argv[i++]);

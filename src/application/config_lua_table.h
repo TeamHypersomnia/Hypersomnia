@@ -44,6 +44,7 @@
 #include "application/network/simulation_receiver_settings.h"
 #include "application/performance_settings.h"
 #include "application/http_client/http_client_settings.h"
+#include "application/masterserver/masterserver_settings.h"
 #include "fp_consistency_tests.h"
 
 enum class launch_type {
@@ -92,6 +93,8 @@ struct config_lua_table {
 
 	float_consistency_test_settings float_consistency_test;
 
+	std::string masterserver_address;
+	masterserver_settings masterserver;
 	std::vector<std::string> official_arena_servers;
 
 	http_client_settings http_client;

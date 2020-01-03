@@ -48,7 +48,7 @@ int main(const int argc, const char* const * const argv) {
 
 	const auto params = cmd_line_params(argc, argv);
 
-	::is_dedicated_server = params.start_dedicated_server;
+	::current_app_type = params.type;
 
 	if (params.help_only) {
 		std::cout << get_help_section() << std::endl;

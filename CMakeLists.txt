@@ -130,10 +130,6 @@ set(HYPERSOMNIA_OFFICIAL_CONTENT_DIR "content/official")
 
 set(HYPERSOMNIA_LOG_FILES_DIR "logs")
 
-# A separate log directory for the dedicated server, for convenience.
-
-set(HYPERSOMNIA_SERVER_LOG_FILES_DIR "logs/dedicated_server")
-
 # Where the game will save neon maps and other regenerable content.
 # Deleting this folder will have no effect on the game, except that some resources might take time to generate again.
 
@@ -1413,7 +1409,6 @@ add_definitions(-DOFFICIAL_CONTENT_DIR="${HYPERSOMNIA_OFFICIAL_CONTENT_DIR}")
 add_definitions(-DGENERATED_FILES_DIR="${HYPERSOMNIA_GENERATED_FILES_DIR}")
 add_definitions(-DUSER_FILES_DIR="${HYPERSOMNIA_USER_FILES_DIR}")
 add_definitions(-DLOG_FILES_DIR="${HYPERSOMNIA_LOG_FILES_DIR}")
-add_definitions(-DSERVER_LOG_FILES_DIR="${HYPERSOMNIA_SERVER_LOG_FILES_DIR}")
 
 # We build the main Hypersomnia executable.
 

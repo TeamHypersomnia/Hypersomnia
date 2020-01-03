@@ -6,7 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Multiple official servers
+	- Picking best
+	- Do this once we have pinging implemented, which we want with the list of community servers
+
 - Masterserver
+	- For now, we'll update it manually whenever the need arises
+	- NAT punchthrough builtin
+	- Connect on Browse
 
 - Website server status
 	- Game servers have a built-in http server?

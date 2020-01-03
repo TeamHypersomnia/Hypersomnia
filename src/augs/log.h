@@ -71,5 +71,3 @@ std::ostream& write_nvps(
 #else
 #define DEBUG_LOG(...)
 #endif
-
-extern bool is_dedicated_server;

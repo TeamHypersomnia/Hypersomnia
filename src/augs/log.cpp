@@ -20,11 +20,7 @@ std::mutex log_mutex;
 extern bool log_to_live_file;
 
 std::string get_path_in_log_files(const std::string& name) {
-	if (is_dedicated_server) {
-		return std::string(SERVER_LOG_FILES_DIR) + "/server_" + name;
-	}
-
-	return std::string(LOG_FILES_DIR) + "/" + name;
+	return std::string(LOG_FILES_DIR) + "/" + get_preffix_for(current_app_type) + name;
 }
 
 std::string find_last_incorrect_exit() {

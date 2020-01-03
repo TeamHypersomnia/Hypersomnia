@@ -93,7 +93,6 @@
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
-bool is_dedicated_server = false;
 
 /*
 	static is used for all variables because some take massive amounts of space.
@@ -125,7 +124,6 @@ work_result work(const int argc, const char* const * const argv) try {
 	{
 		const auto all_created_directories = std::vector<augs::path_type> {
 			LOG_FILES_DIR,
-			SERVER_LOG_FILES_DIR,
 			GENERATED_FILES_DIR,
 			USER_FILES_DIR,
 			DEMOS_DIR
@@ -243,16 +241,11 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	LOG("Initializing ImGui.");
 
-	static const auto imgui_ini_path = 
-		is_dedicated_server ? 
-		USER_FILES_DIR "/server_imgui.ini"
-		: USER_FILES_DIR "/imgui.ini"
-	;
-
+	static const auto imgui_ini_path = std::string(USER_FILES_DIR) + "/" + get_preffix_for(current_app_type) + "imgui.ini";
 	static const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
 
 	augs::imgui::init(
-		imgui_ini_path,
+		imgui_ini_path.c_str(),
 		imgui_log_path.c_str(),
 		config.gui_style
 	);
@@ -355,9 +348,9 @@ and then hitting Save settings.
 	LOG("Initializing global libraries");
 
 	static const auto libraries = 
-		params.start_dedicated_server 
-		? augs::global_libraries({}) 
-		: augs::global_libraries(augs::global_libraries::library::FREETYPE) 
+		params.type == app_type::GAME_CLIENT 
+		? augs::global_libraries(augs::global_libraries::library::FREETYPE) 
+		: augs::global_libraries({}) 
 	;
 
 	LOG("Initializing global libraries took: %x ms", global_libraries_timer.template extract<std::chrono::milliseconds>());
@@ -383,7 +376,13 @@ and then hitting Save settings.
 		}
 	};
 
-	if (params.start_dedicated_server) {
+	if (params.type == app_type::MASTERSERVER) {
+		LOG("Starting the masterserver at port: %x", config.masterserver.port);
+
+		return work_result::SUCCESS;
+	}
+
+	if (params.type == app_type::DEDICATED_SERVER) {
 		LOG("Starting the dedicated server at port: %x", config.default_server_start.port);
 
 #if BUILD_NETWORKING

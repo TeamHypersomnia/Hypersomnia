@@ -2,6 +2,13 @@ return {
   launch_mode = "MAIN_MENU",
   log_to_live_file = false,
 
+  masterserver_address = "masterserver.hypersomnia.xyz:8414",
+
+  masterserver_settings = {
+	port = 8414,
+	server_entry_timeout_secs = 60
+  },
+
   float_consistency_test = {
 	  passes = 5000
 	  , report_filename = ""
