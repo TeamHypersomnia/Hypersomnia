@@ -6,6 +6,23 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Procedure for the game server
+	- Once every 5 seconds, send statistics line to the masterserver
+		- Contains external/internal address:port info
+		- num of players and all these stats
+	- Masterserver smoothly registers the server every time it encounters this
+	- If no messages came for a minute, delete the server from the list
+	- Mapping by the external ip
+	- To send stats, use the socket already bound in yojimbo server, somehow extract it
+	- Responding to ping requests
+		- A potential game client will ping this server
+		- We only need to send a ping back
+	- It looks like we'll never send stats on-demand; only periodically - completely on our terms
+	- so netcode only needs a ping packet
+
+- Sending server stats
+- Actually it's better if stats come from the same port because nat will be less complex
+
 - Multiple official servers
 	- Picking best
 	- Do this once we have pinging implemented, which we want with the list of community servers

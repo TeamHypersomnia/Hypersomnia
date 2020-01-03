@@ -4,6 +4,7 @@
 
 #include "augs/log.h"
 #include "augs/math/vec2.h"
+#include "augs/app_type.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/string/string_templates.h"
@@ -18,6 +19,7 @@
 std::mutex log_mutex;
 
 extern bool log_to_live_file;
+app_type current_app_type;
 
 std::string get_path_in_log_files(const std::string& name) {
 	return std::string(LOG_FILES_DIR) + "/" + get_preffix_for(current_app_type) + name;
