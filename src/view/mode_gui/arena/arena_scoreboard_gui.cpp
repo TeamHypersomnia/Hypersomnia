@@ -657,7 +657,7 @@ void arena_scoreboard_gui::draw_gui(
 					col_text(typesafe_sprintf("%x$", stats.money));
 				};
 
-				if (mode_input.rules.view.show_money_of_opponents) {
+				if (draw_in.demo_replay_mode || mode_input.rules.view.show_money_of_opponents) {
 					do_money();
 				}
 				else {
