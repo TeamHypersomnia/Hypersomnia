@@ -6,11 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Website server status
-	- Game servers have a built-in http server?
-
 - Masterserver
 
+- Website server status
+	- Game servers have a built-in http server?
 
 - Check official map version upon connection
 	- if mismatch

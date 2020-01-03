@@ -93,7 +93,6 @@ struct config_lua_table {
 	float_consistency_test_settings float_consistency_test;
 
 	std::vector<std::string> official_arena_servers;
-	std::vector<std::string> official_arena_linux_servers;
 
 	http_client_settings http_client;
 	unit_tests_settings unit_tests;
