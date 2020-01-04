@@ -54,7 +54,7 @@ struct ingame_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::B)) {
-			button_callback(ingame_menu_button_type::BROWSE_COMMUNITY_SERVERS);
+			button_callback(ingame_menu_button_type::BROWSE_SERVERS);
 			return true;
 		}
 

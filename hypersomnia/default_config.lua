@@ -5,6 +5,7 @@ return {
   masterserver_address = "masterserver.hypersomnia.xyz:8414",
 
   masterserver_settings = {
+	ip = "127.0.0.1",
 	port = 8414,
 	server_entry_timeout_secs = 60
   },

@@ -31,6 +31,8 @@
 #include "application/gui/client/client_gui_state.h"
 #include "application/setups/server/server_profiler.h"
 
+#include "application/masterserver/masterserver.h"
+
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 #include "game/modes/dump_for_debugging.h"
 #endif
@@ -128,6 +130,7 @@ private:
 	void advance_clients_state();
 	void send_server_step_entropies(const compact_server_step_entropy& total);
 	void send_packets_if_its_time();
+	void send_masterserver_heartbeat_if_its_time();
 
 	void accept_entropy_of_client(
 		const mode_player_id,

@@ -57,7 +57,10 @@
 #include "application/gui/settings_gui.h"
 #include "application/gui/start_client_gui.h"
 #include "application/gui/start_server_gui.h"
+#include "application/gui/browse_servers_gui.h"
 #include "application/gui/ingame_menu_gui.h"
+
+#include "application/masterserver/masterserver.h"
 
 #include "application/network/network_common.h"
 #include "application/setups/all_setups.h"
@@ -379,6 +382,8 @@ and then hitting Save settings.
 	if (params.type == app_type::MASTERSERVER) {
 		LOG("Starting the masterserver at port: %x", config.masterserver.port);
 
+		perform_masterserver(config);
+
 		return work_result::SUCCESS;
 	}
 
@@ -538,6 +543,7 @@ and then hitting Save settings.
 	static settings_gui_state settings_gui = std::string("Settings");
 	static start_client_gui_state start_client_gui = std::string("Connect to server");
 	static start_server_gui_state start_server_gui = std::string("Host a server");
+	static browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
 
 	static ingame_menu_gui ingame_menu;
 
@@ -1122,7 +1128,12 @@ and then hitting Save settings.
 		using T = decltype(t);
 
 		switch (t) {
-			case T::CONNECT_TO_OFFICIAL_UNIVERSE:
+			case T::BROWSE_SERVERS:
+				browse_servers_gui.open();
+
+				break;
+
+			case T::CONNECT_TO_OFFICIAL_SERVER:
 				start_client_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
@@ -1134,7 +1145,7 @@ and then hitting Save settings.
 
 				break;
 
-			case T::CONNECT_TO_UNIVERSE:
+			case T::CONNECT_TO_SERVER:
 				start_client_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
@@ -1145,7 +1156,7 @@ and then hitting Save settings.
 
 				break;
 				
-			case T::HOST_UNIVERSE:
+			case T::HOST_SERVER:
 				start_server_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
@@ -1154,7 +1165,7 @@ and then hitting Save settings.
 
 				break;
 
-			case T::LOCAL_UNIVERSE:
+			case T::LOCAL_TEST_SCENE:
 				launch_setup(launch_type::TEST_SCENE);
 				break;
 

@@ -34,6 +34,10 @@ uint64_t portable_hash(int32_t x) {
 	return x;
 }
 
+uint64_t portable_hash(uint16_t x) {
+	return x;
+}
+
 template <class T>
 basic_randomization<T>::basic_randomization(rng_seed_type seed) {
 	for (int i = 0; i < 4; ++i) {

@@ -6,19 +6,103 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- just take sockname from the existing connection with masterserver over http
+	- when you downloaded the server list
+
 - Procedure for the game server
 	- Once every 5 seconds, send statistics line to the masterserver
 		- Contains external/internal address:port info
 		- num of players and all these stats
 	- Masterserver smoothly registers the server every time it encounters this
-	- If no messages came for a minute, delete the server from the list
-	- Mapping by the external ip
 	- To send stats, use the socket already bound in yojimbo server, somehow extract it
+	- Responding to nat open request
+		- same as ping just different enum and has a target address attached to it
+		- send back confirmation to source packet ip if different
 	- Responding to ping requests
 		- A potential game client will ping this server
 		- We only need to send a ping back
 	- It looks like we'll never send stats on-demand; only periodically - completely on our terms
 	- so netcode only needs a ping packet
+	- has to have a constant connection with the masterserver in case that it sends information about connection request
+
+- Procedure for the masterserver
+	- Open port 8413 at all times
+	- Receive:
+		- list requests
+			- HTTP get
+			- has to open NAT of all the servers, for the requester to know ping
+				- only open nat for servers behind a nat
+				- send nat open request every second, marking those which managed to receive the message
+			- at this scale we don't have to worry about it, just set a timeout for refreshes, like 10 secs
+		- detailed server info only on demand through http
+		- connection requests
+			- to external ip:port
+			- yojimbo provided socket
+		- heartbeats from servers
+			- yojimbo provided socket
+			- If no messages came for a minute, delete the server from the list
+				- Mapping by the external ip
+	- Respond with:
+		- list contents
+			- to clients
+			- to website
+			- http
+		- server details
+			- http
+		- connection requests
+			- but only to the target server
+
+- Procedure for a potential client
+	- Downloading list of servers
+		- We'll use HTTP because the masterserver will anyway have a http server for other uses
+- Use our test windows server to check how external ip resolution works on windows
+	- though it might be screwed up too
+
+- log detected internal ip on startup
+
+- don't change map structure until we finally make demo player improvements
+	- which we need for demo replay
+	- or make a branch for demo replay improvements and rebase unto the original commit later
+
+- I think let's just first do nat punch over external ips
+	- let's search for how people do those internal ips on the internet
+
+- check how getifaddrs works on the linux server to see if it properly returns external ip
+	- Well, it doesnt...
+
+- Later only respond to ping if the request packet is 1000 bytes or so
+	- to avoid ddos
+
+- Don't add the option to make MS "assist" your client in connecting to direct ip
+	- It will be anyway easier to just search for "Kumpel's Server" in the global server list than to paste an ip
+	- Servers most recently hosted will be checked for latency first
+
+- Add RCON to server and client in-game menu
+
+- Server name to server vars
+	- server sends it to masterserver next time
+
+- Info about official servers
+	- We still want official servers to send periodic info to masterserver 
+	- because they will be in the list in the main menu too
+	- Website just downloads list of masterservers
+	
+- Security concerns when rendering on site
+	- We need to consider that arbitrary string might be found inside server's name, map name or player username
+
+
+- Data format
+
+
+- Map version considerations
+	- Communiy map migration
+		- copy user folder to OLD_HYPERSOMNIA, in case there are some important maps too
+		- Solution for map conversions: just keep binary versions in caches?
+
+	- Check official map version upon connection
+		- if mismatch
+			- custom? re-download
+			- official? disconnect
 
 - Sending server stats
 - Actually it's better if stats come from the same port because nat will be less complex
@@ -34,11 +118,6 @@ summary: That which we are brainstorming at the moment.
 
 - Website server status
 	- Game servers have a built-in http server?
-
-- Check official map version upon connection
-	- if mismatch
-		- custom? re-download
-		- official? disconnect
 
 - Leaderboards
 	- Columns: Avatar, Nickname, Kills, Assists, Deaths, Hours played

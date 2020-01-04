@@ -85,10 +85,12 @@ as well as to test your skills in a laggy environment.
 
 #if NDEBUG && PLATFORM_UNIX
 	const bool is_dedicated = instance_type == server_instance_type::DEDICATED;
-	const bool is_disabled = is_dedicated;
+	const bool please_use_cmdline = is_dedicated;
 #else
-	const bool is_disabled = false;
+	const bool please_use_cmdline = false;
 #endif
+
+	const bool is_disabled = please_use_cmdline;
 
 	{
 		auto child = scoped_child("host view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
@@ -99,12 +101,14 @@ as well as to test your skills in a laggy environment.
 		input_text<100>("Address (IPv4 or IPv6)", into.ip);
 		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
 
-		{
-			auto chosen_port = static_cast<int>(into.port);
+		auto do_port = [&](const auto& label, auto& val) {
+			auto chosen_port = static_cast<int>(val);
 
-			ImGui::InputInt("Port", std::addressof(chosen_port), 0, 0);
-			into.port = static_cast<unsigned short>(std::clamp(chosen_port, 1024, 65535));
-		}
+			ImGui::InputInt(label, std::addressof(chosen_port), 0, 0);
+			val = static_cast<unsigned short>(std::clamp(chosen_port, 1024, 65535));
+		};
+
+		do_port("Port", into.port);
 
 		{
 			ImGui::Separator();

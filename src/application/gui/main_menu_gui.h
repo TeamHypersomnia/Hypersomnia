@@ -44,7 +44,7 @@ struct main_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::L)) {
-			button_callback(main_menu_button_type::LOCAL_UNIVERSE);
+			button_callback(main_menu_button_type::LOCAL_TEST_SCENE);
 			return true;
 		}
 
@@ -54,22 +54,22 @@ struct main_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::C)) {
-			button_callback(main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE);
+			button_callback(main_menu_button_type::CONNECT_TO_OFFICIAL_SERVER);
 			return true;
 		}
 
 		if (change.was_pressed(augs::event::keys::key::U)) {
-			button_callback(main_menu_button_type::CONNECT_TO_UNIVERSE);
+			button_callback(main_menu_button_type::CONNECT_TO_SERVER);
 			return true;
 		}
 
 		if (change.was_pressed(augs::event::keys::key::B)) {
-			button_callback(main_menu_button_type::BROWSE_COMMUNITY_SERVERS);
+			button_callback(main_menu_button_type::BROWSE_SERVERS);
 			return true;
 		}
 
 		if (change.was_pressed(augs::event::keys::key::H)) {
-			button_callback(main_menu_button_type::HOST_UNIVERSE);
+			button_callback(main_menu_button_type::HOST_SERVER);
 			return true;
 		}
 

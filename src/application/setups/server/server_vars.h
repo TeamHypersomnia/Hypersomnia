@@ -5,7 +5,6 @@
 #include "augs/network/network_types.h"
 #include "augs/misc/constant_size_vector.h"
 
-using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;
 
 struct arena_switching_settings {
@@ -30,6 +29,7 @@ struct server_vars {
 	static constexpr bool force_read_field_by_field = true;
 
 	// GEN INTROSPECTOR struct server_vars
+	server_name_type server_name = "";
 	unsigned kick_if_no_messages_for_secs = 60;
 	unsigned kick_if_away_from_keyboard_for_secs = 240;
 	unsigned time_limit_to_enter_game_since_connection = 10;
