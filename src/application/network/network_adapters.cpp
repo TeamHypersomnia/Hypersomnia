@@ -131,6 +131,35 @@ bool server_adapter::has_messages_to_send(const client_id_type& id, const game_c
 	return server.HasMessagesToSend(id, static_cast<channel_id_type>(channel));
 }
 
+void resolve_address_result::report() const {
+	if (result == resolve_result_type::OK) {
+		LOG("Successfully resolved %x to %x", host, ::ToString(addr));
+	}
+
+	if (result == resolve_result_type::INVALID_ADDRESS) {
+		LOG("Couldn't resolve %x: the address is invalid.", host);
+	}
+
+	if (result == resolve_result_type::INVALID_ADDRESS) {
+		LOG("Couldn't resolve %x: host unreachable.", host);
+	}
+}
+
+std::string ToString(const yojimbo::Address& addr) {
+	char buffer[256];
+	addr.ToString(buffer, sizeof(buffer));
+
+	return buffer;
+}
+
+std::string ToString(const netcode_address_t& addr) {
+	auto a = addr;
+	char buffer[256];
+	netcode_address_to_string(&a, buffer);
+
+	return buffer;
+}
+
 server_adapter::server_adapter(const server_start_input& in) :
 	connection_config(in),
 	adapter(this),
@@ -144,13 +173,7 @@ server_adapter::server_adapter(const server_start_input& in) :
 	)
 {
     server.Start(in.max_connections);
-
-	const auto addr = server.GetAddress();
-
-    char buffer[256];
-    addr.ToString(buffer, sizeof(buffer));
-
-	LOG("Server address is %x", buffer);
+	LOG("Server address is %x", ToString(server.GetAddress()));
 }
 
 void server_adapter::disconnect_client(const client_id_type& id) {
@@ -174,14 +197,98 @@ client_adapter::client_adapter() :
 {}
 
 std::optional<unsigned long> get_trailing_number(const std::string& s);
-std::string& cut_trailing_number(std::string& s);
+std::string cut_trailing_number(const std::string& s);
 
-static resolve_address_result resolve_address(const address_and_port& in) {
-	const auto& input = in.connect_address;
-	const auto default_port = in.default_port_when_no_specified;
+std::optional<netcode_address_t> hostname_to_netcode_address_t(const std::string& hostname, bool accept_ip4, bool accept_ip6) {
+	struct addrinfo hints, *res, *p;
+	int status;
+
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if ((status = getaddrinfo(hostname.c_str(), NULL, &hints, &res)) != 0) {
+		return std::nullopt;
+	}
+
+	std::optional<netcode_address_t> from;
+
+	for (p = res;p != NULL; p = p->ai_next) {
+		if (p->ai_family == AF_INET) {
+			struct sockaddr_in *addr_ipv4 = (struct sockaddr_in *)p->ai_addr;
+
+			if (accept_ip4) {
+				from.emplace();
+				from->type = NETCODE_ADDRESS_IPV4;
+				from->data.ipv4[0] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x000000FF ) );
+				from->data.ipv4[1] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x0000FF00 ) >> 8 );
+				from->data.ipv4[2] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x00FF0000 ) >> 16 );
+				from->data.ipv4[3] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0xFF000000 ) >> 24 );
+				from->port = ntohs( addr_ipv4->sin_port );
+			}
+		} 
+		else { 
+			struct sockaddr_in6 *addr_ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+
+			if (accept_ip6) {
+				from.emplace();
+				from->type = NETCODE_ADDRESS_IPV6;
+				int i;
+				for ( i = 0; i < 8; ++i )
+				{
+					from->data.ipv6[i] = ntohs( ( (uint16_t*) &addr_ipv6->sin6_addr ) [i] );
+				}
+				from->port = ntohs( addr_ipv6->sin6_port );
+			}
+		}
+
+		if (from != std::nullopt) {
+			break;
+		}
+	}
+
+	freeaddrinfo(res);
+
+	return from;
+}
+
+netcode_address_t to_netcode_addr(const yojimbo::Address& t) {
+	using namespace yojimbo;
+
+	netcode_address_t out;
+
+	out.port = t.GetPort();
+
+	if (t.GetType() == AddressType::ADDRESS_IPV4) {
+		out.type = NETCODE_ADDRESS_IPV4;
+		const auto n = std::size(out.data.ipv4);
+		std::copy(t.GetAddress4(), t.GetAddress4() + n, out.data.ipv4);
+	}
+
+	if (t.GetType() == AddressType::ADDRESS_IPV6) {
+		out.type = NETCODE_ADDRESS_IPV6;
+		const auto n = std::size(out.data.ipv6);
+		std::copy(t.GetAddress6(), t.GetAddress6() + n, out.data.ipv6);
+	}
+
+	return out;
+}
+
+yojimbo::Address to_yojimbo_addr(const netcode_address_t& t) {
+	if (t.type == NETCODE_ADDRESS_IPV4) {
+		return yojimbo::Address(t.data.ipv4, t.port);
+	}
+
+	return yojimbo::Address(t.data.ipv6, t.port);
+}
+
+resolve_address_result resolve_address(const address_and_port& in) {
+	const auto& input = in.address;
+	const auto default_port = in.default_port;
 
 	if (input.empty()) {
 		resolve_address_result out;
+		out.host = input;
 		out.result = resolve_result_type::INVALID_ADDRESS;
 		return out;
 	}
@@ -197,6 +304,8 @@ static resolve_address_result resolve_address(const address_and_port& in) {
 			}
 
 			out.addr = addr;
+			out.host = input.c_str();
+
 			return out;
 		}
 		else {
@@ -204,10 +313,8 @@ static resolve_address_result resolve_address(const address_and_port& in) {
 		}
 	}
 
-	const auto no_port = [&]() {
-		auto result = input;
-
-		cut_trailing_number(result);
+	auto no_port = [&]() {
+		auto result = cut_trailing_number(std::string(input));
 		
 		if (result.size() > 0 && result.back() == ':') {
 			result.pop_back();
@@ -224,18 +331,9 @@ static resolve_address_result resolve_address(const address_and_port& in) {
 		return result;
 	}();
 
-	const bool requested_ipv6 = input[0] == '[';
-	const bool requested_ipv4 = !requested_ipv6;
+	auto resolved_net_addr = hostname_to_netcode_address_t(no_port);
 
-	struct addrinfo hints, *res, *p;
-	int status;
-	char ipstr[INET6_ADDRSTRLEN];
-
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
-	if ((status = getaddrinfo(no_port.c_str(), NULL, &hints, &res)) != 0) {
+	if (resolved_net_addr == std::nullopt) {
 		resolve_address_result out;
 
 		out.result = resolve_result_type::COULDNT_RESOLVE_HOST;
@@ -243,37 +341,7 @@ static resolve_address_result resolve_address(const address_and_port& in) {
 		return out;
 	}
 
-	std::string resolved_ip;
-
-	for (p = res;p != NULL; p = p->ai_next) {
-		void *addr = nullptr;
-
-		if (p->ai_family == AF_INET) {
-			struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
-
-			if (requested_ipv4) {
-				addr = &(ipv4->sin_addr);
-			}
-		} 
-		else { 
-			struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
-
-			if (requested_ipv6) {
-				addr = &(ipv6->sin6_addr);
-			}
-		}
-
-		if (addr) {
-			inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
-			resolved_ip = ipstr;
-
-			break;
-		}
-	}
-
-	freeaddrinfo(res);
-
-	const auto specified_port = [&]() -> port_type {
+	resolved_net_addr->port = [&]() -> port_type {
 		if (const auto trailing = get_trailing_number(input)) {
 			return static_cast<port_type>(*trailing);
 		}
@@ -282,8 +350,9 @@ static resolve_address_result resolve_address(const address_and_port& in) {
 	}();
 
 	resolve_address_result out;
-	out.host = no_port;
-	out.addr = yojimbo::Address(resolved_ip.c_str(), specified_port);
+
+	out.host = std::move(no_port);
+	out.addr = to_yojimbo_addr(*resolved_net_addr);
 
 	return out;
 }
@@ -457,4 +526,17 @@ yojimbo::Address server_adapter::get_client_address(const client_id_type& id) co
 	netcode_address_to_string(&addr, buffer);
 	
 	return yojimbo::Address(buffer);
+}
+
+void server_adapter::send_udp_packet(const netcode_address_t& in_to, std::byte* const packet_data, const std::size_t packet_bytes) const {
+	auto* const s = server.GetServerDetail();
+
+	auto to = in_to;
+
+	if (to.type == NETCODE_ADDRESS_IPV4) {
+		netcode_socket_send_packet(&s->socket_holder.ipv4, &to, reinterpret_cast<void*>(packet_data), packet_bytes);
+	}
+	else if (to.type == NETCODE_ADDRESS_IPV6) {
+		netcode_socket_send_packet(&s->socket_holder.ipv6, &to, reinterpret_cast<void*>(packet_data), packet_bytes);
+	}
 }

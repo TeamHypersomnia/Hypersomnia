@@ -51,9 +51,17 @@ inline void do_server_vars(
 		revert(f);
 	};
 
+	auto revertable_input_text = [&](auto l, auto& f, auto&&... args) {
+		input_text(l, f, std::forward<decltype(args)>(args)...);
+		revert(f);
+	};
+
 	text_color("General", yellow);
 
 	ImGui::Separator();
+
+	revertable_input_text(SCOPE_CFG_NVP(masterserver_address.address));
+	revertable_input_text(SCOPE_CFG_NVP(server_name));
 
 	if (auto node = scoped_tree_node("Time limits")) {
 		revertable_slider(SCOPE_CFG_NVP(kick_if_no_messages_for_secs), 2u, 300u);

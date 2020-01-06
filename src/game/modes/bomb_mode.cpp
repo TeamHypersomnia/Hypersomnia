@@ -1791,11 +1791,9 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 						}
 
 						if (previous_faction == faction_type::SPECTATOR) {
-							const auto& game_limit = in.rules.max_players_per_team;
+							const auto game_limit = get_max_num_active_players(in);
 
-							const auto num_active_players = players.size() - num_players_in(faction_type::SPECTATOR);
-
-							if (game_limit && num_active_players >= game_limit) {
+							if (game_limit && get_num_active_players() >= game_limit) {
 								return faction_choice_result::TEAM_IS_FULL;
 							}
 						}
@@ -2652,4 +2650,16 @@ augs::maybe<rgba> bomb_mode::get_current_fallback_color_for(const const_input_ty
 	}
 
 	return {};
+}
+
+uint32_t bomb_mode::get_num_players() const {
+	return players.size();
+}
+
+uint32_t bomb_mode::get_num_active_players() const {
+	return get_num_players() - num_players_in(faction_type::SPECTATOR);
+}
+
+uint32_t bomb_mode::get_max_num_active_players(const const_input_type in) const {
+	return in.rules.max_players_per_team * 2;
 }

@@ -2,14 +2,7 @@
 #include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 #include "augs/network/network_simulator_settings.h"
-#include "application/network/resolve_result_type.h"
-
-struct resolve_address_result {
-	yojimbo::Address addr;
-	std::string host;
-
-	resolve_result_type result = resolve_result_type::OK;
-};
+#include "application/network/resolve_address.h"
 
 class client_adapter {
 	augs::network_raii raii;

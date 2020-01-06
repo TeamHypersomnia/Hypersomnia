@@ -1,4 +1,5 @@
 #pragma once
+#include <future>
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
 #include "application/setups/server/server_start_input.h"
@@ -30,8 +31,7 @@
 #include "application/setups/server/chat_structs.h"
 #include "application/gui/client/client_gui_state.h"
 #include "application/setups/server/server_profiler.h"
-
-#include "application/masterserver/masterserver.h"
+#include "3rdparty/yojimbo/netcode.io/netcode.h"
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 #include "game/modes/dump_for_debugging.h"
@@ -54,6 +54,8 @@ struct add_to_arena_input {
 };
 
 class server_adapter;
+
+struct resolve_address_result;
 
 class server_setup : 
 	public default_setup_settings,
@@ -97,6 +99,12 @@ class server_setup :
 	unsigned ticks_until_sending_hash = 0;
 	net_time_t when_last_sent_net_statistics = 0;
 	net_time_t when_last_sent_admin_public_settings = 0;
+	net_time_t when_last_sent_heartbeat_to_masterserver = 0;
+	net_time_t when_last_resolved_masterserver_addr = 0;
+
+	std::vector<std::byte> heartbeat_buffer;
+	std::future<resolve_address_result> future_resolved_masterserver_addr;
+	std::optional<netcode_address_t> resolved_masterserver_addr;
 
 	net_time_t server_time = 0.0;
 	bool schedule_shutdown = false;
@@ -130,7 +138,12 @@ private:
 	void advance_clients_state();
 	void send_server_step_entropies(const compact_server_step_entropy& total);
 	void send_packets_if_its_time();
-	void send_masterserver_heartbeat_if_its_time();
+
+	void send_heartbeat_to_masterserver();
+	void send_heartbeat_to_masterserver_if_its_time();
+
+	void resolve_masterserver();
+	void resolve_masterserver_if_its_time();
 
 	void accept_entropy_of_client(
 		const mode_player_id,
@@ -156,6 +169,7 @@ private:
 	mode_player_id get_admin_player_id() const;
 
 	void reinfer_if_necessary_for(const compact_server_step_entropy& entropy);
+	bool masterserver_enabled() const;
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -270,6 +284,9 @@ public:
 			{
 				auto scope = measure_scope(profiler.send_packets);
 				send_packets_if_its_time();
+
+				resolve_masterserver_if_its_time();
+				send_heartbeat_to_masterserver_if_its_time();
 			}
 
 			reinfer_if_necessary_for(step_collected);

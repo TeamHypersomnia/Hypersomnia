@@ -239,8 +239,7 @@ application_update_result check_and_apply_updates(
 	const auto NEW_path = augs::path_type(NEW_HYPERSOMNIA);
 	const auto OLD_path = augs::path_type(OLD_HYPERSOMNIA);
 
-	auto future_response = std::async(
-		std::launch::async,
+	auto future_response = launch_async(
 		[&exit_requested, archive_path, &http_client, &downloaded_bytes, &total_bytes]() {
 			return launch_download(http_client, archive_path, [&](uint64_t len, uint64_t total) {
 				downloaded_bytes = len;
@@ -548,8 +547,7 @@ application_update_result check_and_apply_updates(
 						LOG(response->body);
 					}
 
-					completed_save = std::async(
-						std::launch::async,
+					completed_save = launch_async(
 						[guarded_save_as_bytes, make_executable, rm_rf, mkdir_p, resp_body = std::move(response->body), target_archive_path, NEW_path]() {
 							auto failed = [](const auto e) {
 								return e == callback_result::ABORT;
@@ -608,8 +606,7 @@ application_update_result check_and_apply_updates(
 					LOG("Moving files around.");
 					current_state = state::MOVING_FILES_AROUND;
 
-					completed_move = std::async(
-						std::launch::async,
+					completed_move = launch_async(
 						[target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
 							const auto resource_folder = get_first_folder_in(NEW_path);
 							const auto NEW_root_path = resource_folder;

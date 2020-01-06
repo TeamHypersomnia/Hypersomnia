@@ -95,8 +95,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				avatar_pbo_fallback
 			};
 
-			future_avatar_atlas = std::async(
-				std::launch::async,
+			future_avatar_atlas = launch_async(
 				[avatar_atlas_in]() { 
 					return create_avatar_atlas(avatar_atlas_in);
 				}
@@ -205,8 +204,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				pbo_fallback
 			};
 
-			future_general_atlas = std::async(
-				std::launch::async,
+			future_general_atlas = launch_async(
 				[general_atlas_in, this]() { 
 					if (!rescan_for_modified_images) {
 						/* 
@@ -270,7 +268,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 		});
 
 		if (sound_requests.size() > 0) {
-			future_loaded_buffers = std::async(std::launch::async,
+			future_loaded_buffers = launch_async(
 				[&](){
 					using value_type = decltype(future_loaded_buffers.get());
 

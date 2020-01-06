@@ -23,3 +23,4 @@ using all_modes_variant = replace_list_type_t<all_modes, std::variant>;
 using all_online_modes_variant = replace_list_type_t<all_online_modes, std::variant>;
 
 using mode_type_id = type_in_list_id<all_modes>;
+using online_mode_type_id = type_in_list_id<all_online_modes>;

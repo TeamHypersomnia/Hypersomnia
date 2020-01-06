@@ -350,11 +350,11 @@ and then hitting Save settings.
 
 	LOG("Initializing global libraries");
 
-	static const auto libraries = 
-		params.type == app_type::GAME_CLIENT 
-		? augs::global_libraries(augs::global_libraries::library::FREETYPE) 
-		: augs::global_libraries({}) 
-	;
+	static auto freetype_library = std::optional<augs::freetype_raii>();
+
+	if (params.type == app_type::GAME_CLIENT) {
+		freetype_library.emplace();
+	}
 
 	LOG("Initializing global libraries took: %x ms", global_libraries_timer.template extract<std::chrono::milliseconds>());
 
@@ -382,6 +382,7 @@ and then hitting Save settings.
 	if (params.type == app_type::MASTERSERVER) {
 		LOG("Starting the masterserver at port: %x", config.masterserver.port);
 
+		augs::network_raii raii;
 		perform_masterserver(config);
 
 		return work_result::SUCCESS;
@@ -1025,6 +1026,7 @@ and then hitting Save settings.
 				if (!has_current_setup()) {
 					perform_start_client(frame_num);
 					perform_start_server();
+					browse_servers_gui.perform({ config.server_list_provider });
 				}
 
 				streaming.display_loading_progress();

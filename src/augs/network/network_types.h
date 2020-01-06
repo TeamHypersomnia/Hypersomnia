@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <cstdint>
 #include "augs/misc/constant_size_string.h"
+#include "augs/network/port_type.h"
 
 constexpr std::size_t max_avatar_bytes_v = 64 * 1024;
 constexpr std::size_t max_avatar_side_v = 80;
@@ -25,8 +26,11 @@ constexpr std::size_t max_arenas_in_pool_v = 50;
 constexpr std::size_t max_block_size_v = 2 * 1024 * 1024; // 2 MB
 constexpr std::size_t max_packet_size_v = 2 * 1024; // 2 KB
 
+constexpr std::size_t max_address_string_length_v = 255;
+
 using server_name_type = augs::constant_size_string<max_server_name_length_v>;
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
+using address_string_type = augs::constant_size_string<max_address_string_length_v>;
 
 inline bool nickname_len_in_range(const std::size_t len) {
 	return len >= min_nickname_length_v && len <= max_chat_message_length_v;

@@ -26,6 +26,9 @@
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "application/gui/client/rcon_gui.hpp"
 #include "application/arena/arena_handle.hpp"
+#include "application/masterserver/server_heartbeat.h"
+#include "application/network/resolve_address.h"
+#include "augs/templates/thread_templates.h"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -60,7 +63,16 @@ server_setup::server_setup(
 	server_time(yojimbo_time())
 {
 	const bool force = true;
-	apply(initial_vars, force);
+
+	{
+		auto initial_vars_modified = initial_vars;
+		auto source_server_name = std::string(initial_vars_modified.server_name);
+		str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.nickname));
+		initial_vars_modified.server_name = source_server_name;
+
+		apply(initial_vars_modified, force);
+	}
+
 	apply(private_initial_vars, force);
 	apply(initial_solvable_vars, force);
 
@@ -114,6 +126,123 @@ server_setup::server_setup(
 
 	if (!conditions_fulfilled) {
 		shutdown();
+	}
+
+	resolve_masterserver();
+}
+
+void server_setup::send_heartbeat_to_masterserver() {
+	ensure(resolved_masterserver_addr.has_value());
+
+	const auto& arena = get_arena_handle();
+
+	server_heartbeat heartbeat;
+
+	heartbeat.server_name = vars.server_name;
+	heartbeat.current_arena = solvable_vars.current_arena;
+	heartbeat.game_mode = arena.on_mode(
+		[&](const auto& m) {
+			using M = remove_cref<decltype(m)>;
+			return online_mode_type_id::of<M>();
+		}
+	);
+
+	heartbeat.max_online = last_start.max_connections;
+
+	arena.on_mode_with_input(
+		[&heartbeat](const auto& mode, const auto& input) {
+			heartbeat.num_online = mode.get_num_players();
+
+			heartbeat.num_fighting = mode.get_num_active_players();
+			heartbeat.max_fighting = mode.get_max_num_active_players(input);
+		}
+	);
+
+	// heartbeat.internal_network_address = ;
+
+	heartbeat_buffer.clear();
+
+	{
+		auto ss = augs::ref_memory_stream(heartbeat_buffer);
+		augs::write_bytes(ss, heartbeat);
+	}
+
+	const auto destination_address = resolved_masterserver_addr.value();
+	LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_buffer.size());
+
+	server->send_udp_packet(destination_address, heartbeat_buffer.data(), heartbeat_buffer.size());
+}
+
+void server_setup::resolve_masterserver() {
+	const auto& masterserver_address = vars.masterserver_address;
+
+	LOG("Requesting resolution of masterserver address at %x", masterserver_address.address);
+
+	future_resolved_masterserver_addr = launch_async(
+		[masterserver_address]() {
+			return resolve_address(masterserver_address);
+		}
+	);
+}
+
+bool server_setup::masterserver_enabled() const {
+	return vars.masterserver_address.address.size() > 0;
+}
+
+void server_setup::resolve_masterserver_if_its_time() {
+	if (!masterserver_enabled()) {
+		return;
+	}
+
+	auto& when_last = when_last_resolved_masterserver_addr;
+
+	if (valid_and_is_ready(future_resolved_masterserver_addr)) {
+		const auto result = future_resolved_masterserver_addr.get();
+
+		result.report();
+
+		if (result.result == resolve_result_type::OK) {
+			resolved_masterserver_addr = to_netcode_addr(result.addr); 
+		}
+	}
+
+	if (future_resolved_masterserver_addr.valid()) {
+		LOG("Masterserver resolution in progress. Delaying next trial.");
+		when_last = server_time;
+		return;
+	}
+
+	const auto since_last = server_time - when_last;
+	const auto resolve_every = vars.resolve_masterserver_address_once_every_secs;
+
+	if (resolved_masterserver_addr == std::nullopt || since_last >= resolve_every) {
+		resolve_masterserver();
+		when_last = server_time;
+	}
+}
+
+void server_setup::send_heartbeat_to_masterserver_if_its_time() {
+	if (!masterserver_enabled()) {
+		return;
+	}
+
+	auto& when_last = when_last_sent_heartbeat_to_masterserver;
+
+	if (resolved_masterserver_addr == std::nullopt) {
+		return;
+	}
+
+	const auto since_last = server_time - when_last;
+	const auto send_every = vars.send_heartbeat_to_masterserver_once_every_secs;
+
+	if (since_last >= send_every) {
+		const auto times = when_last == 0 ? 3 : 1;
+
+		for (int i = 0; i < times; ++i) {
+			send_heartbeat_to_masterserver();
+		}
+
+		when_last = server_time;
 	}
 }
 

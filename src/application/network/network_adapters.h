@@ -3,6 +3,8 @@
 #undef write_bytes
 #undef read_bytes
 
+#include "3rdparty/yojimbo/netcode.io/netcode.h"
+
 #include "application/setups/server/server_start_input.h"
 #include "application/setups/client/client_start_input.h"
 
@@ -47,3 +49,5 @@ using translated_payload_id = yojimbo::Message*;
 inline bool is_valid(const translated_payload_id& t) {
 	return t != nullptr;
 }
+
+std::optional<netcode_address_t> hostname_to_netcode_address_t(const std::string& hostname, bool accept_ip4 = true, bool accept_ip6 = false);

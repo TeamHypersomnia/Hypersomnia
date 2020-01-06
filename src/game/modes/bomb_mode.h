@@ -578,4 +578,9 @@ public:
 
 	arena_migrated_session emigrate() const;
 	void migrate(input, const arena_migrated_session&);
+
+	uint32_t get_num_players() const;
+	uint32_t get_num_active_players() const;
+
+	uint32_t get_max_num_active_players(const_input) const;
 };

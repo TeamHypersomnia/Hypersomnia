@@ -2,12 +2,15 @@ return {
   launch_mode = "MAIN_MENU",
   log_to_live_file = false,
 
-  masterserver_address = "masterserver.hypersomnia.xyz:8414",
+  server_list_provider = "masterserver.hypersomnia.xyz",
 
   masterserver_settings = {
 	ip = "127.0.0.1",
 	port = 8414,
-	server_entry_timeout_secs = 60
+	server_entry_timeout_secs = 60,
+
+	cert_pem_path = "",
+	key_pem_path = "",
   },
 
   float_consistency_test = {
@@ -28,11 +31,12 @@ return {
   },
 
   default_client_start = {
-  	default_port_when_no_specified = 8412,
+  	default_port = 8412,
+	custom_address = "127.0.0.1",
+
 	chosen_address_type = "OFFICIAL",
 
 	preferred_official_address = "",
-	custom_address = "127.0.0.1",
 
 	replay_demo = ""
   },
@@ -607,6 +611,14 @@ return {
   },
 
   server = {
+	server_name = "${MY_NICKNAME}'s server",
+
+	masterserver_address = {
+		address = "masterserver.hypersomnia.xyz",
+  		default_port = 8414
+	},
+
+	send_heartbeat_to_masterserver_once_every_secs = 10,
     sleep_mult = 0.1,
     log_performance_once_every_secs = 1,
 

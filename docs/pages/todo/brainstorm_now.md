@@ -6,6 +6,35 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- If someone connects at the last slot available, and there is no master RCON on the server, kick them if the rcon doesn't match
+	- So that we always have a slot registered for RCON
+
+- Detecting servers as official ones given just masterserver list 
+	- The client anyway has to resolve official server ip addresses for pinging
+	- match ips
+
+- Consider a tab for "official" and "community" in browse servers
+	- Actually maybe no because it'd be nice to have it condensed and compare best pings quickly
+
+- "Favorites" tab
+
+- Remember the official server to which we have connected
+
+- Determining best official server
+	- default: EU
+	- Once every second ping all official servers
+	- change_with_save to the first one that responds
+	- is later chosen as the default for Connect to official universe
+	- show ping live in that window next to the server name
+
+- Quick play
+	- From servers that have any players, find the one with best latency
+
+- Find best official server?
+
+- Resolve masterserver hostname once a minute or two, asynchronously?
+	- mutex onto result netcode_address_t
+
 - just take sockname from the existing connection with masterserver over http
 	- when you downloaded the server list
 

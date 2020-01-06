@@ -845,7 +845,7 @@ void editor_setup::open(augs::window& window) {
 	}
 
 	const auto message = "Open folder with project files";
-	open_folder_dialog = std::async(std::launch::async, make_chooser_lambda(window, message));
+	open_folder_dialog = launch_async(make_chooser_lambda(window, message));
 }
 
 void editor_setup::save(augs::window& window) {
@@ -866,12 +866,9 @@ void editor_setup::export_for_compatibility(augs::window& window) {
 		return;
 	}
 
-	export_folder_dialog = std::async(
-		std::launch::async,
-		[&](){
-			return window.choose_directory_dialog("Choose folder for the exported project files");
-		}
-	);
+	export_folder_dialog = launch_async([&](){
+		return window.choose_directory_dialog("Choose folder for the exported project files");
+	});
 }
 
 void editor_setup::save_as(augs::window& window) {
@@ -880,7 +877,7 @@ void editor_setup::save_as(augs::window& window) {
 	}
 
 	const auto message = "Choose folder for project files";
-	save_folder_dialog = std::async(std::launch::async, make_chooser_lambda(window, message));
+	save_folder_dialog = launch_async(make_chooser_lambda(window, message));
 }
 
 void editor_setup::undo() {

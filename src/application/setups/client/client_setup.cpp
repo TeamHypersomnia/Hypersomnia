@@ -146,15 +146,14 @@ void client_setup::flush_demo_steps() {
 
 	std::swap(demo_steps_being_flushed, unflushed_demo_steps);
 
-	future_flushed_demo = std::async(
-		std::launch::async,
+	future_flushed_demo = launch_async(
 		[&]() {
 			auto out = augs::with_exceptions<std::ofstream>();
 			out.open(recorded_demo_path, std::ios::out | std::ios::binary | std::ios::app);
 
 			if (!was_demo_meta_written) {
 				demo_file_meta meta;
-				meta.server_address = last_addr.connect_address;
+				meta.server_address = last_addr.address;
 				meta.version = hypersomnia_version();
 				augs::write_bytes(out, meta);
 
@@ -220,7 +219,7 @@ client_setup::client_setup(
 	client_time(get_current_time()),
 	when_initiated_connection(get_current_time())
 {
-	LOG("Initializing connection with %x", last_addr.connect_address);
+	LOG("Initializing connection with %x", last_addr.address);
 
 	const auto& input_demo_path = in.replay_demo;
 
@@ -267,7 +266,7 @@ client_setup::client_setup(
 			}
 			else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
 				const auto reason = typesafe_sprintf(
-					"The address: \"%x\" is invalid!", last_addr.connect_address
+					"The address: \"%x\" is invalid!", last_addr.address
 				);
 
 				set_disconnect_reason(reason);
@@ -845,7 +844,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		if (is_connected()) {
 			augs::network::enable_detailed_logs(false);
 
-			text_color(typesafe_sprintf("Connected to %x.", last_addr.connect_address), green);
+			text_color(typesafe_sprintf("Connected to %x.", last_addr.address), green);
 
 			if (state == C::INITIATING_CONNECTION) {
 				text("Initializing connection...");
@@ -871,7 +870,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (state == C::INITIATING_CONNECTION && adapter->is_connecting()) {
-			text("Connecting to %x\nTime: %2f seconds", last_addr.connect_address, get_current_time() - when_initiated_connection);
+			text("Connecting to %x\nTime: %2f seconds", last_addr.address, get_current_time() - when_initiated_connection);
 
 			text("\n");
 			ImGui::Separator();
@@ -889,10 +888,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				text("Lost connection to the server.");
 			}
 			else if (state == C::INITIATING_CONNECTION) {
-				text("Failed to establish connection with %x", last_addr.connect_address);
+				text("Failed to establish connection with %x", last_addr.address);
 			}
 			else {
-				text("Failed to join %x", last_addr.connect_address);
+				text("Failed to join %x", last_addr.address);
 			}
 
 			print_reason_if_any();

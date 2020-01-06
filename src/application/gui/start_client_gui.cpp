@@ -23,10 +23,10 @@
 
 address_and_port client_start_input::get_address_and_port() const {
 	if (chosen_address_type == connect_address_type::OFFICIAL) {
-		return { preferred_official_address, default_port_when_no_specified };
+		return { preferred_official_address, default_port };
 	}
 
-	return { custom_address, default_port_when_no_specified };
+	return { custom_address, default_port };
 }
 
 void client_start_input::set_custom(const std::string& target) { 
@@ -221,7 +221,7 @@ bool start_client_gui_state::perform(
 
 		const auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
 
-		input_text<max_nickname_length_v>(label, into_vars.nickname);
+		input_text(label, into_vars.nickname);
 
 		struct loading_result {
 			std::optional<std::string> new_path;
@@ -265,8 +265,7 @@ bool start_client_gui_state::perform(
 			const bool avatar_upload_completed = augs::has_completed(current_frame, avatar_submitted_when);
 
 			if (avatar_upload_completed && !avatar_loading_result.valid() && from_path.size() > 0) {
-				avatar_loading_result = std::async(
-					std::launch::async,
+				avatar_loading_result = launch_async(
 					[from_path]() {
 						loading_result out;
 						out.new_path = from_path;
@@ -298,8 +297,7 @@ bool start_client_gui_state::perform(
 		if (ImGui::Button("Browse") && !error_popup && !mouse_has_to_move_off_browse) {
 			mouse_has_to_move_off_browse = true;
 
-			avatar_loading_result = std::async(
-				std::launch::async,
+			avatar_loading_result = launch_async(
 				[&window]() {
 					const std::vector<augs::window::file_dialog_filter> filters = { {
 						"Image file",

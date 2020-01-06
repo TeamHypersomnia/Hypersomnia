@@ -18,6 +18,8 @@ namespace augs {
 	using cref_memory_stream = basic_ref_memory_stream<const std::vector<std::byte>>;
 
 	struct pointer_to_buffer;
+	struct cpointer_to_buffer;
 
-	using cptr_memory_stream = basic_ref_memory_stream<const pointer_to_buffer>;
+	using ptr_memory_stream = basic_ref_memory_stream<pointer_to_buffer>;
+	using cptr_memory_stream = basic_ref_memory_stream<const cpointer_to_buffer>;
 }

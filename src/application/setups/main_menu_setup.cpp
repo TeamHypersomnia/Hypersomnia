@@ -76,7 +76,7 @@ void main_menu_setup::query_latest_news(const std::string& url) {
 		latest_news.wait();
 	}
 
-	latest_news = std::async(std::launch::async, [&url]() noexcept {
+	latest_news = launch_async([&url]() noexcept {
 		(void)url;
 		return std::string("");
 	});

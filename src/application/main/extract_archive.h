@@ -253,8 +253,7 @@ struct archive_extractor {
 			return typesafe_sprintf("%x -o%x", source, target);
 		}();
 
-		completed_extraction = std::async(
-			std::launch::async,
+		completed_extraction = launch_async(
 			[this, resolved_command]() {
 				open_pipe(resolved_command);
 				worker();
