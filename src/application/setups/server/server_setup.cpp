@@ -34,6 +34,18 @@ const auto connected_and_integrated_v = server_setup::for_each_flags { server_se
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
 
 void server_setup::shutdown() {
+	if (has_sent_any_heartbeats() && resolved_masterserver_addr != std::nullopt) {
+		// Say goodbye
+
+		const auto destination_address = resolved_masterserver_addr.value();
+
+		auto goodbye = std::byte();
+
+		for (int i = 0; i < 4; ++i) {
+			server->send_udp_packet(destination_address, &goodbye, 1);
+		}
+	}
+
 	if (server->is_running()) {
 		server->send_packets();
 		LOG("Shutting down the server.");
@@ -235,6 +247,10 @@ void server_setup::resolve_masterserver_if_its_time() {
 	}
 }
 
+bool server_setup::has_sent_any_heartbeats() const {
+	return when_last_sent_heartbeat_to_masterserver != 0;
+}
+
 void server_setup::send_heartbeat_to_masterserver_if_its_time() {
 	if (!masterserver_enabled()) {
 		return;
@@ -249,10 +265,10 @@ void server_setup::send_heartbeat_to_masterserver_if_its_time() {
 	const auto since_last = server_time - when_last;
 	const auto send_every = vars.send_heartbeat_to_masterserver_once_every_secs;
 
-	const bool send_for_the_first_time = when_last == 0;
+	const bool send_for_the_first_time = !has_sent_any_heartbeats();
 
 	if (send_for_the_first_time || since_last >= send_every) {
-		const auto times = when_last == 0 ? 3 : 1;
+		const auto times = when_last == 0 ? 4 : 1;
 
 		for (int i = 0; i < times; ++i) {
 			send_heartbeat_to_masterserver();

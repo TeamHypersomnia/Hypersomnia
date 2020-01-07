@@ -108,10 +108,14 @@ void browse_servers_gui_state::show_server_list() {
 	using namespace augs::imgui;
 
 	for (const auto& sp : filtered_server_list) {
+		auto id = scoped_id(index_in(filtered_server_list, sp));
 		const auto& s = *sp;
 		const auto& d = s.data;
 
-		if (ImGui::Selectable(d.server_name.c_str(), selected_server == s.address, ImGuiSelectableFlags_SpanAllColumns)) {
+		const bool is_selected = selected_server == s.address;
+
+		if (ImGui::Selectable(d.server_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
+			LOG("select kurwa %x", s.address.port);
 			selected_server = s.address;
 		}
 

@@ -170,6 +170,8 @@ private:
 
 	void reinfer_if_necessary_for(const compact_server_step_entropy& entropy);
 	bool masterserver_enabled() const;
+	bool has_sent_any_heartbeats() const;
+	void shutdown();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -410,8 +412,6 @@ public:
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return local_collected;
 	}
-
-	void shutdown();
 
 	template <class F>
 	decltype(auto) on_mode_with_input(F&& callback) const {

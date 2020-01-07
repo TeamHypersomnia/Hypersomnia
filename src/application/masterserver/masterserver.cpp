@@ -140,6 +140,11 @@ void perform_masterserver(const config_lua_table& cfg) {
 
 	LOG("Hosting a HTTP masterserver at port: %x", http_port);
 
+	auto remove_from_list = [&](const auto& by_external_addr) {
+		server_list.erase(by_external_addr);
+		reserialize_list();
+	};
+
 	auto listening_thread = std::thread([&http]() {
 		http.listen("127.0.0.1", http_port);
 		LOG("The HTTP listening thread has quit.");
@@ -168,7 +173,13 @@ void perform_masterserver(const config_lua_table& cfg) {
 		struct netcode_address_t from;
 		const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, buffer, NETCODE_MAX_PACKET_BYTES);
 
-		if (packet_bytes > 0) {
+		if (packet_bytes == 1) {
+			if (const auto entry = mapped_or_nullptr(server_list, from)) {
+				LOG("The server at %x (%x) has sent a goodbye.", ::ToString(from), entry->last_heartbeat.server_name);
+				remove_from_list(from);
+			}
+		}
+		else if (packet_bytes > 0) {
 			MSR_LOG("Received packet bytes: %x", packet_bytes);
 
 			const auto buf = augs::cpointer_to_buffer{ reinterpret_cast<const std::byte*>(buffer), static_cast<std::size_t>(packet_bytes) };
@@ -195,7 +206,10 @@ void perform_masterserver(const config_lua_table& cfg) {
 				}
 			}
 			catch (...) {
-
+				if (const auto entry = mapped_or_nullptr(server_list, from)) {
+					LOG("The server at %x (%x) has sent invalid data.", ::ToString(from), entry->last_heartbeat.server_name);
+					remove_from_list(from);
+				}
 			}
 		}
 
