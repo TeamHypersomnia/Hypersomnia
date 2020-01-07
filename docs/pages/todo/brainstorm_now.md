@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add more commonly changed parameters to host a server menu
+	- Name and arena
+
 - Will TCP be available after nat punch?
 	- because we'll somehow need to transmit the map data...
 

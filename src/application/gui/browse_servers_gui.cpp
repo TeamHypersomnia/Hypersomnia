@@ -10,6 +10,11 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/setups/client/client_start_input.h"
 #include "augs/log.h"
+#include "application/setups/editor/detail/maybe_different_colors.h"
+
+bool server_list_entry::is_set() const {
+	return data.server_name.size() > 0;
+}
 
 browse_servers_gui_state::~browse_servers_gui_state() = default;
 
@@ -79,7 +84,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	official_server_addresses.clear();
 	error_message.clear();
 	server_list.clear();
-	selected_server.reset();
+	selected_server = {};
 
 	auto& http_opt = data->http;
 
@@ -116,11 +121,10 @@ std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 		const auto& s = *sp;
 		const auto& d = s.data;
 
-		const bool is_selected = selected_server == s.address;
+		const bool is_selected = selected_server.address == s.address;
 
 		if (ImGui::Selectable(d.server_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
-			LOG("select %x", s.address.port);
-			selected_server = s.address;
+			selected_server = s;
 		}
 
 		if (ImGui::IsItemClicked()) {
@@ -129,6 +133,11 @@ std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 
 				requested_connection = s.address;
 			}
+		}
+
+		if (ImGui::IsItemClicked(1)) {
+			selected_server = s;
+			server_details.open();
 		}
 
 		ImGui::NextColumn();
@@ -247,8 +256,14 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	filtered_server_list.clear();
 
 	for (auto& s : server_list) {
-		if (show_only_responding_servers) {
+		if (hide_unreachable) {
 			if (s.ping == -1) {
+				continue;
+			}
+		}
+
+		if (at_least_players.is_enabled) {
+			if (s.data.num_online < at_least_players.value) {
 				continue;
 			}
 		}
@@ -337,12 +352,50 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		ImGui::Separator();
 
-		checkbox("Only responding", show_only_responding_servers);
+		checkbox("Hide unreachable", hide_unreachable);
+		ImGui::SameLine();
+
+		checkbox("At least", at_least_players.is_enabled);
+
+		{
+			auto& val = at_least_players.value;
+			auto scoped = maybe_disabled_cols({}, !at_least_players.is_enabled);
+			auto width = scoped_item_width(ImGui::CalcTextSize("9").x * 4);
+
+			ImGui::SameLine();
+			auto input = std::to_string(val);
+			input_text(val == 1 ? "player###numbox" : "players###numbox", input);
+			val = std::clamp(std::atoi(input.c_str()), 1, int(max_incoming_connections_v));
+		}
+
+		{
+			auto scope = maybe_disabled_cols({}, !selected_server.is_set());
+
+			if (ImGui::Button("Connect")) {
+				requested_connection = selected_server.address;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Server details")) {
+				server_details.open();
+			}
+
+			ImGui::SameLine();
+		}
+
+		if (ImGui::Button("Refresh ping")) {
+			refresh_server_list(in);
+		}
+
+		ImGui::SameLine();
 
 		if (ImGui::Button("Refresh list")) {
 			refresh_server_list(in);
 		}
 	}
+	
+	server_details.perform(selected_server);
 
 	if (requested_connection != std::nullopt) {
 		in.client_start.set_custom(::ToString(*requested_connection));
@@ -351,4 +404,28 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 
 	return false;
+}
+
+void server_details_gui_state::perform(const server_list_entry& entry) {
+	using namespace augs::imgui;
+
+	auto window = make_scoped_window(ImGuiWindowFlags_AlwaysAutoResize);
+
+	if (!window) {
+		return;
+	}
+
+	if (!entry.is_set()) {
+		text_disabled("No server selected.");
+		return;
+	}
+
+	auto data = entry.data;
+	auto address = ::ToString(entry.address);
+
+	acquire_keyboard_once();
+	input_text("IP address", address, ImGuiInputTextFlags_ReadOnly);
+	input_text("Server name", data.server_name, ImGuiInputTextFlags_ReadOnly);
+
+	input_text("Arena", data.current_arena, ImGuiInputTextFlags_ReadOnly);
 }

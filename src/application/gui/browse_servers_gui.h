@@ -11,6 +11,8 @@ struct server_list_entry {
 	int ping = -1;
 	netcode_address_t address;
 	server_heartbeat data;
+
+	bool is_set() const;
 };
 
 struct client_start_input;
@@ -22,20 +24,31 @@ struct browse_servers_input {
 
 struct browse_servers_gui_internal;
 
+struct server_details_gui_state : public standard_window_mixin<server_details_gui_state> {
+	using base = standard_window_mixin<server_details_gui_state>;
+	using base::base;
+
+	void perform(const server_list_entry&);
+};
+
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
 	std::unique_ptr<browse_servers_gui_internal> data;
 
 	std::optional<netcode_address_t> show_server_list();
 
 	net_time_t when_last_downloaded_server_list = 0;
-	bool show_only_responding_servers = false;
 
 	std::string error_message;
 	std::vector<server_list_entry*> filtered_server_list;
 	std::vector<server_list_entry> server_list;
 
-	std::optional<netcode_address_t> selected_server;
+	server_list_entry selected_server;
 	std::vector<netcode_address_t> official_server_addresses;
+
+	server_details_gui_state server_details = std::string("Server details");
+
+	bool hide_unreachable = false;
+	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
 
 public:
 
