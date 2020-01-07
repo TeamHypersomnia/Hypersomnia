@@ -8,6 +8,7 @@
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/pointer_to_buffer.h"
 #include "augs/readwrite/byte_readwrite.h"
+#include "application/setups/client/client_start_input.h"
 #include "augs/log.h"
 
 browse_servers_gui_state::~browse_servers_gui_state() = default;
@@ -71,13 +72,14 @@ double yojimbo_time();
 void browse_servers_gui_state::refresh_server_list(const browse_servers_input in) {
 	using namespace httplib;
 
-	error_message.clear();
-	server_list.clear();
-	selected_server.reset();
-
 	if (data->future_response.valid()) {
 		return;
 	}
+
+	official_server_addresses.clear();
+	error_message.clear();
+	server_list.clear();
+	selected_server.reset();
 
 	auto& http_opt = data->http;
 
@@ -104,8 +106,10 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	when_last_downloaded_server_list = yojimbo_time();
 }
 
-void browse_servers_gui_state::show_server_list() {
+std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 	using namespace augs::imgui;
+
+	auto requested_connection = std::optional<netcode_address_t>();
 
 	for (const auto& sp : filtered_server_list) {
 		auto id = scoped_id(index_in(filtered_server_list, sp));
@@ -115,13 +119,15 @@ void browse_servers_gui_state::show_server_list() {
 		const bool is_selected = selected_server == s.address;
 
 		if (ImGui::Selectable(d.server_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
-			LOG("select kurwa %x", s.address.port);
+			LOG("select %x", s.address.port);
 			selected_server = s.address;
 		}
 
 		if (ImGui::IsItemClicked()) {
 			if (ImGui::IsMouseDoubleClicked(0)) {
-				LOG("Selected server list entry: %x (%x)", ToString(s.address), d.server_name);
+				LOG("Double-clicked server list entry: %x (%x). Connecting.", ToString(s.address), d.server_name);
+
+				requested_connection = s.address;
 			}
 		}
 
@@ -140,7 +146,6 @@ void browse_servers_gui_state::show_server_list() {
 		}
 
 		ImGui::NextColumn();
-
 
 		const auto max_players = std::min(d.max_fighting, d.max_online);
 		text(typesafe_sprintf("%x/%x", d.num_fighting, max_players));
@@ -170,13 +175,15 @@ void browse_servers_gui_state::show_server_list() {
 
 		ImGui::NextColumn();
 	}
+
+	return requested_connection;
 }
 
 bool successful(const int http_status_code);
 
-void browse_servers_gui_state::perform(const browse_servers_input in) {
+bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	if (!show) {
-		return;
+		return false;
 	}
 
 	using namespace augs::imgui;
@@ -186,7 +193,7 @@ void browse_servers_gui_state::perform(const browse_servers_input in) {
 	auto imgui_window = make_scoped_window();
 
 	if (!imgui_window) {
-		return;
+		return false;
 	}
 
 	const auto couldnt_download = std::string("Couldn't download the server list.\n");
@@ -246,7 +253,11 @@ void browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 		}
 
-		if (filter.PassFilter(s.data.server_name.c_str())) {
+		const auto& name = s.data.server_name;
+		const auto& arena = s.data.current_arena;
+		const auto effective_name = std::string(name) + " " + std::string(arena);
+
+		if (filter.PassFilter(effective_name.c_str())) {
 			filtered_server_list.push_back(&s);
 		}
 	}
@@ -257,12 +268,15 @@ void browse_servers_gui_state::perform(const browse_servers_input in) {
 		refresh_server_list(in);
 	}
 
+	auto requested_connection = std::optional<netcode_address_t>();
+
 	{
 		auto child = scoped_child("list view", ImVec2(0, 2 * -(ImGui::GetFrameHeightWithSpacing() + 4)));
 
 
 		const auto num_filtered_results = filtered_server_list.size();
-		const auto servers_label = typesafe_sprintf("Servers (%x)", num_filtered_results);
+
+		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", num_filtered_results);
 
 		ImGui::Columns(6);
 		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9").x * 80);
@@ -272,7 +286,7 @@ void browse_servers_gui_state::perform(const browse_servers_input in) {
 		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("9").x * (max_arena_name_length_v + 1));
 		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("999999").x);
 
-		text_disabled(servers_label.c_str());
+		text_color(official_servers_label, yellow);
 		ImGui::NextColumn();
 		text_disabled("Game mode");
 		ImGui::NextColumn();
@@ -304,9 +318,18 @@ void browse_servers_gui_state::perform(const browse_servers_input in) {
 				}
 			}
 			else {
-				show_server_list();
+				requested_connection = show_server_list();
 			}
 		}
+
+		text_disabled("\n\n");
+
+		const auto community_servers_label = typesafe_sprintf("Community servers");
+		ImGui::Separator();
+		text_color(community_servers_label, orange);
+
+		next_columns(6);
+		ImGui::Separator();
 	}
 
 	{
@@ -320,4 +343,12 @@ void browse_servers_gui_state::perform(const browse_servers_input in) {
 			refresh_server_list(in);
 		}
 	}
+
+	if (requested_connection != std::nullopt) {
+		in.client_start.set_custom(::ToString(*requested_connection));
+
+		return true;
+	}
+
+	return false;
 }

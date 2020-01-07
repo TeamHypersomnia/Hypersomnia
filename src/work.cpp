@@ -774,6 +774,30 @@ and then hitting Save settings.
 	static bool client_start_requested = false;
 	static bool server_start_requested = false;
 
+	static auto start_client_setup = []() {
+		change_with_save(
+			[&](auto& cfg) {
+				cfg.default_client_start = config.default_client_start;
+				cfg.client = config.client;
+			}
+		);
+
+		client_start_requested = false;
+
+		launch_setup(launch_type::CLIENT);
+	};
+
+	static auto perform_browse_servers = []() {
+		const bool perform_result = browse_servers_gui.perform({ 
+			config.server_list_provider,
+			config.default_client_start
+		});
+
+		if (perform_result) {
+			start_client_setup();
+		}
+	};
+
 	static auto perform_start_client = [](const auto frame_num) {
 		const bool perform_result = start_client_gui.perform(
 			frame_num,
@@ -786,20 +810,7 @@ and then hitting Save settings.
 		);
 
 		if (perform_result || client_start_requested) {
-			change_with_save(
-				[&](auto& cfg) {
-					cfg.default_client_start = config.default_client_start;
-					cfg.client = config.client;
-				}
-			);
-
-			if (client_start_requested) {
-				config.default_client_start.replay_demo.clear();
-			}
-
-			client_start_requested = false;
-
-			launch_setup(launch_type::CLIENT);
+			start_client_setup();
 		}
 	};
 
@@ -1026,7 +1037,7 @@ and then hitting Save settings.
 				if (!has_current_setup()) {
 					perform_start_client(frame_num);
 					perform_start_server();
-					browse_servers_gui.perform({ config.server_list_provider });
+					perform_browse_servers();
 				}
 
 				streaming.display_loading_progress();

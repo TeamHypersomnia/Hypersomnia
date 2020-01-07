@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Will TCP be available after nat punch?
+	- because we'll somehow need to transmit the map data...
+
 - If someone connects at the last slot available, and there is no master RCON on the server, kick them if the rcon doesn't match
 	- So that we always have a slot registered for RCON
 

@@ -223,7 +223,7 @@ client_setup::client_setup(
 
 	const auto& input_demo_path = in.replay_demo;
 
-	if (!input_demo_path.empty()) {
+	if (!input_demo_path.empty() && in.chosen_address_type == connect_address_type::REPLAY) {
 		const auto error = typesafe_sprintf(
 			"Failed to open demo file:\n%x", 
 			input_demo_path

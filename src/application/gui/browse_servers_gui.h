@@ -13,8 +13,11 @@ struct server_list_entry {
 	server_heartbeat data;
 };
 
+struct client_start_input;
+
 struct browse_servers_input {
 	const std::string& server_list_provider;
+	client_start_input& client_start;
 };
 
 struct browse_servers_gui_internal;
@@ -22,7 +25,7 @@ struct browse_servers_gui_internal;
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
 	std::unique_ptr<browse_servers_gui_internal> data;
 
-	void show_server_list();
+	std::optional<netcode_address_t> show_server_list();
 
 	net_time_t when_last_downloaded_server_list = 0;
 	bool show_only_responding_servers = false;
@@ -32,6 +35,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::vector<server_list_entry> server_list;
 
 	std::optional<netcode_address_t> selected_server;
+	std::vector<netcode_address_t> official_server_addresses;
 
 public:
 
@@ -40,5 +44,5 @@ public:
 	~browse_servers_gui_state();
 
 	void refresh_server_list(browse_servers_input);
-	void perform(browse_servers_input);
+	bool perform(browse_servers_input);
 };
