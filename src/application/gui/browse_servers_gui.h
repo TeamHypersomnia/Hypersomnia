@@ -31,6 +31,8 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::vector<server_list_entry*> filtered_server_list;
 	std::vector<server_list_entry> server_list;
 
+	std::optional<netcode_address_t> selected_server;
+
 public:
 
 	using base = standard_window_mixin<browse_servers_gui_state>;

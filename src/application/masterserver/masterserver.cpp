@@ -182,6 +182,7 @@ void perform_masterserver(const config_lua_table& cfg) {
 
 				const auto heartbeat_before = server_entry.last_heartbeat;
 				augs::read_bytes(ss, server_entry.last_heartbeat);
+				server_entry.last_heartbeat.validate();
 
 				server_entry.time_of_last_heartbeat = current_time;
 

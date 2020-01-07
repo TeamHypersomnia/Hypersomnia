@@ -1,6 +1,7 @@
 #include <future>
 
 #include "application/gui/browse_servers_gui.h"
+#include "augs/network/netcode_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "3rdparty/cpp-httplib/httplib.h"
 #include "augs/templates/thread_templates.h"
@@ -72,6 +73,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	error_message.clear();
 	server_list.clear();
+	selected_server.reset();
 
 	if (data->future_response.valid()) {
 		return;
@@ -109,15 +111,30 @@ void browse_servers_gui_state::show_server_list() {
 		const auto& s = *sp;
 		const auto& d = s.data;
 
-		text(d.server_name.c_str());
+		if (ImGui::Selectable(d.server_name.c_str(), selected_server == s.address, ImGuiSelectableFlags_SpanAllColumns)) {
+			selected_server = s.address;
+		}
+
+		if (ImGui::IsItemClicked()) {
+			if (ImGui::IsMouseDoubleClicked(0)) {
+				LOG("Selected server list entry: %x (%x)", ToString(s.address), d.server_name);
+			}
+		}
+
 		ImGui::NextColumn();
 
-		const auto game_mode_name = d.game_mode.dispatch([](auto d) {
-			using D = decltype(d);
-			return format_field_name(get_type_name<D>());
-		});
+		if (d.game_mode.is_set()) {
+			const auto game_mode_name = d.game_mode.dispatch([](auto d) {
+				using D = decltype(d);
+				return format_field_name(get_type_name<D>());
+			});
 
-		text(game_mode_name);
+			text(game_mode_name);
+		}
+		else {
+			text("<unknown>");
+		}
+
 		ImGui::NextColumn();
 
 
@@ -130,6 +147,9 @@ void browse_servers_gui_state::show_server_list() {
 		const auto max_spectators = d.max_online - d.num_fighting;
 
 		text(typesafe_sprintf("%x/%x", num_spectators, max_spectators));
+
+		ImGui::NextColumn();
+		text(d.current_arena);
 
 		ImGui::NextColumn();
 
@@ -237,22 +257,26 @@ void browse_servers_gui_state::perform(const browse_servers_input in) {
 		auto child = scoped_child("list view", ImVec2(0, 2 * -(ImGui::GetFrameHeightWithSpacing() + 4)));
 
 
-		const auto servers_label = typesafe_sprintf("Servers (%x)", filtered_server_list.size());
+		const auto num_filtered_results = filtered_server_list.size();
+		const auto servers_label = typesafe_sprintf("Servers (%x)", num_filtered_results);
 
-		ImGui::Columns(5);
+		ImGui::Columns(6);
 		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9").x * 80);
 		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * 30);
 		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("Players  ").x);
 		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Spectators  ").x);
-		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("999999").x);
+		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("9").x * (max_arena_name_length_v + 1));
+		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("999999").x);
 
-		text_disabled("Servers");
+		text_disabled(servers_label.c_str());
 		ImGui::NextColumn();
 		text_disabled("Game mode");
 		ImGui::NextColumn();
 		text_disabled("Players");
 		ImGui::NextColumn();
 		text_disabled("Spectators");
+		ImGui::NextColumn();
+		text_disabled("Arena");
 		ImGui::NextColumn();
 		text_disabled("Ping");
 		ImGui::NextColumn();
@@ -263,6 +287,10 @@ void browse_servers_gui_state::perform(const browse_servers_input in) {
 			text_color(error_message, red);
 		}
 		else {
+			if (num_filtered_results == 0 && server_list.size() > 0) {
+				text_disabled("No servers match applied filters.");
+			}
+
 			if (server_list.empty()) {
 				if (data->future_response.valid()) {
 					text_disabled("Downloading the server list...");

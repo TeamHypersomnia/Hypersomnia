@@ -46,6 +46,16 @@ server_setup::~server_setup() {
 	shutdown();
 }
 
+void server_heartbeat::validate() {
+	if (server_name.empty()) {
+		server_name = "Hypersomnia Server";
+	}
+
+	if (current_arena.empty()) {
+		current_arena = "<unknown>";
+	}
+}
+
 server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in,
@@ -160,6 +170,7 @@ void server_setup::send_heartbeat_to_masterserver() {
 
 	// heartbeat.internal_network_address = ;
 
+	heartbeat.validate();
 	heartbeat_buffer.clear();
 
 	{
@@ -167,10 +178,13 @@ void server_setup::send_heartbeat_to_masterserver() {
 		augs::write_bytes(ss, heartbeat);
 	}
 
+	const auto heartbeat_bytes = heartbeat_buffer.size();
 	const auto destination_address = resolved_masterserver_addr.value();
-	LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_buffer.size());
+	LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_bytes);
 
-	server->send_udp_packet(destination_address, heartbeat_buffer.data(), heartbeat_buffer.size());
+	if (heartbeat_bytes > 0) {
+		server->send_udp_packet(destination_address, heartbeat_buffer.data(), heartbeat_bytes);
+	}
 }
 
 void server_setup::resolve_masterserver() {
@@ -186,7 +200,7 @@ void server_setup::resolve_masterserver() {
 }
 
 bool server_setup::masterserver_enabled() const {
-	return vars.masterserver_address.address.size() > 0;
+	return server->is_running() && vars.masterserver_address.address.size() > 0;
 }
 
 void server_setup::resolve_masterserver_if_its_time() {
@@ -235,7 +249,9 @@ void server_setup::send_heartbeat_to_masterserver_if_its_time() {
 	const auto since_last = server_time - when_last;
 	const auto send_every = vars.send_heartbeat_to_masterserver_once_every_secs;
 
-	if (since_last >= send_every) {
+	const bool send_for_the_first_time = when_last == 0;
+
+	if (send_for_the_first_time || since_last >= send_every) {
 		const auto times = when_last == 0 ? 3 : 1;
 
 		for (int i = 0; i < times; ++i) {

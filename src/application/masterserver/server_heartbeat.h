@@ -18,4 +18,6 @@ struct server_heartbeat {
 
 	netcode_address_t internal_network_address;
 	// END GEN INTROSPECTOR
+
+	void validate();
 };
