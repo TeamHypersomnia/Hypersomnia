@@ -236,7 +236,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	auto handle_response = [&](auto response) {
 		if (response == nullptr) {
-			error_message = "Could not establish connection with the server list host.";
+			error_message = "Couldn't connect to the server list host.";
 			return;
 		}
 
@@ -313,7 +313,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	auto requested_connection = std::optional<netcode_address_t>();
 
-	{
+	auto do_list_view = [&](bool disable_content_view) {
 		auto child = scoped_child("list view", ImVec2(0, 2 * -(ImGui::GetFrameHeightWithSpacing() + 4)));
 
 
@@ -321,53 +321,64 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", num_filtered_results);
 
+		if (disable_content_view) {
+			return;
+		}
+
+		int current_col = 0;
+
+		auto do_column = [&](std::string label, std::optional<rgba> col = std::nullopt) {
+			const bool is_current = current_col == sort_by_column;
+
+			if (is_current) {
+				label += ascending ? "▲" : "▼";
+			}
+
+			const auto& style = ImGui::GetStyle();
+
+			rgba final_color = is_current ? style.Colors[ImGuiCol_Text] : style.Colors[ImGuiCol_TextDisabled];
+
+			if (col != std::nullopt) {
+				final_color = *col;
+			}
+
+			auto col_scope = scoped_style_color(ImGuiCol_Text, final_color);
+
+			if (ImGui::Selectable(label.c_str())) {
+				if (is_current) {
+					ascending = !ascending;
+				}
+				else 
+				{
+					sort_by_column = current_col;
+					ascending = true;
+				}
+			}
+
+			++current_col;
+			ImGui::NextColumn();
+		};
+
 		ImGui::Columns(7);
-		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("999999").x);
+		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9999999").x);
 		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * 80);
 		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("9").x * 30);
-		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Players  ").x);
-		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("Spectators  ").x);
+		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Players  9").x);
+		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("Spectators  9").x);
 		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("9").x * (max_arena_name_length_v + 1));
 		ImGui::SetColumnWidth(6, ImGui::CalcTextSize("9").x * 25);
 
-		text_disabled("Ping");
-		ImGui::NextColumn();
-
-		text_color(official_servers_label, yellow);
-		ImGui::NextColumn();
-		text_disabled("Game mode");
-		ImGui::NextColumn();
-		text_disabled("Players");
-		ImGui::NextColumn();
-		text_disabled("Spectators");
-		ImGui::NextColumn();
-		text_disabled("Arena");
-		ImGui::NextColumn();
-		text_disabled("Created");
-		ImGui::NextColumn();
+		do_column("Ping");
+		do_column(official_servers_label, yellow);
+		do_column("Game mode");
+		do_column("Players");
+		do_column("Spectators");
+		do_column("Arena");
+		do_column("Created");
 
 		ImGui::Separator();
 
-		if (error_message.size() > 0) {
-			text_color(error_message, red);
-		}
-		else {
-			if (num_filtered_results == 0 && server_list.size() > 0) {
-				text_disabled("No servers match applied filters.");
-			}
-
-			if (server_list.empty()) {
-				if (data->future_response.valid()) {
-					text_disabled("Downloading the server list...");
-				}
-				else {
-					text_disabled("No servers are currently online.");
-				}
-			}
-			else {
-				requested_connection = show_server_list();
-			}
-		}
+		requested_connection = show_server_list();
 
 		text_disabled("\n\n");
 
@@ -376,8 +387,38 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		ImGui::NextColumn();
 		text_color(community_servers_label, orange);
 
-		next_columns(6);
+		next_columns(7);
 		ImGui::Separator();
+	};
+
+
+	{
+		bool disable_content_view = false;
+
+		if (error_message.size() > 0) {
+			text_color(error_message, red);
+			disable_content_view = true;
+		}
+
+#if 0
+		if (num_filtered_results == 0 && server_list.size() > 0) {
+			text_disabled("No servers match applied filters.");
+		}
+
+		if (server_list.empty()) {
+			if (data->future_response.valid()) {
+				text_disabled("Downloading the server list...");
+			}
+		}
+		else {
+		}
+#endif
+		if (data->future_response.valid()) {
+			text_disabled("Downloading the server list...");
+			disable_content_view = true;
+		}
+
+		do_list_view(disable_content_view);
 	}
 
 	{

@@ -52,6 +52,9 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	bool hide_unreachable = false;
 	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
 
+	int sort_by_column = 0;
+	bool ascending = true;
+
 	void refresh_server_list(browse_servers_input);
 	void refresh_server_pings();
 

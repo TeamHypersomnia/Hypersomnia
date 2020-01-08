@@ -164,6 +164,8 @@ namespace augs {
 			int height = 0;
 
 			std::vector<ImWchar> ranges;
+			ranges.push_back(0x25B2);
+			ranges.push_back(0x25BC);
 
 			{
 				auto unicode_ranges = in.unicode_ranges;
