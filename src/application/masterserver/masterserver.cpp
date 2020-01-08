@@ -251,4 +251,6 @@ void perform_masterserver(const config_lua_table& cfg) {
 	http.stop();
 	LOG("Joining the HTTP listening thread.");
 	listening_thread.join();
+
+	netcode_socket_destroy(&socket);
 }

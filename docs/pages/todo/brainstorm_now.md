@@ -6,13 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- When appeared
-	- So that new servers can easily be found
+- Let the client manage the nat punching for all the servers on its own
+	- Server would be too vulnerable if it would send a ping after getting just a single packet
+	- At least it will depend on the upload strength of the client
+	- Masterserver doesn't have to worry about current punching state, just relays reverse requests
+
+- Somehow limit the amount of possible nat requests existent on the server
 
 - Let's just do ping synchronously for now, we'd have to have like thousands of servers for async to make a difference
 	- synchronously receive packets in perform imgui
 
 - Watch out because perform logic might suddenly stop being run since the user can just close the window
+
+- It's safe to send at least 64 ping packets per perform tick
+	- Since it's tied to the frame rate and a hypothetical server must be able to handle that
 
 - Already when the server list is requested, masterserver should request a reverse ping from all servers 
 	- Then just automatically re-ping all servers once every 20 seconds

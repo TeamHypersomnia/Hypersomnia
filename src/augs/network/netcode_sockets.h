@@ -27,6 +27,7 @@ struct netcode_socket_t
 	netcode_socket_handle_t handle;
 };
 
+void netcode_socket_destroy( struct netcode_socket_t * socket );
 int netcode_socket_create( struct netcode_socket_t * s, struct netcode_address_t * address, int send_buffer_size, int receive_buffer_size );
 int netcode_socket_receive_packet( struct netcode_socket_t * socket, struct netcode_address_t * from, void * packet_data, int max_packet_size );
 void netcode_socket_send_packet( struct netcode_socket_t * socket, struct netcode_address_t * to, void * packet_data, int packet_bytes );

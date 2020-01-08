@@ -4200,3 +4200,5 @@ Advantages:
 
 - fix client being unable to reconnect
 	- the effects are being made unpredictable due to being thrown
+- When appeared
+	- So that new servers can easily be found
