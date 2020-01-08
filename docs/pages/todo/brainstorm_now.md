@@ -6,6 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- When appeared
+	- So that new servers can easily be found
+
+- Let's just do ping synchronously for now, we'd have to have like thousands of servers for async to make a difference
+	- synchronously receive packets in perform imgui
+
+- Watch out because perform logic might suddenly stop being run since the user can just close the window
+
+- Already when the server list is requested, masterserver should request a reverse ping from all servers 
+	- Then just automatically re-ping all servers once every 20 seconds
+
+- By default show most recent servers on top
+	- nah, actually the closest
+
+- Later, upon choosing a server list entry, re-request the masterserver to aid in the connection, just in case
+
 - Add more commonly changed parameters to host a server menu
 	- Name and arena
 

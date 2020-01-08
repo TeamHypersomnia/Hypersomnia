@@ -6,10 +6,12 @@
 #include "augs/misc/timing/timer.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include <chrono>
 
 struct server_list_entry {
 	int ping = -1;
 	netcode_address_t address;
+	double appeared_when;
 	server_heartbeat data;
 
 	bool is_set() const;
@@ -50,12 +52,14 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	bool hide_unreachable = false;
 	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
 
+	void refresh_server_list(browse_servers_input);
+	void refresh_server_pings();
+
 public:
 
 	using base = standard_window_mixin<browse_servers_gui_state>;
 	browse_servers_gui_state(const std::string& title);
 	~browse_servers_gui_state();
 
-	void refresh_server_list(browse_servers_input);
 	bool perform(browse_servers_input);
 };

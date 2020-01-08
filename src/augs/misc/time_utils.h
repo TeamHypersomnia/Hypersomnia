@@ -23,11 +23,13 @@ namespace augs {
 		std::string get_readable() const;
 		std::string get_readable_for_file() const;
 
-		unsigned long long seconds_ago() const;
+		uint64_t seconds_ago() const;
 		std::string how_long_ago() const;
 		std::string how_long_ago_tell_seconds() const;
 
+		static std::string format_how_long_ago(bool tell_seconds, const uint64_t secs);
+
 	private:
-		std::string how_long_ago(bool) const;
+		std::string how_long_ago(bool tell_seconds) const;
 	};
 }

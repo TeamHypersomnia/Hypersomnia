@@ -11,6 +11,7 @@
 #include "application/setups/client/client_start_input.h"
 #include "augs/log.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
+#include "augs/misc/time_utils.h"
 
 bool server_list_entry::is_set() const {
 	return data.server_name.size() > 0;
@@ -21,6 +22,12 @@ browse_servers_gui_state::~browse_servers_gui_state() = default;
 struct browse_servers_gui_internal {
 	std::optional<httplib::Client> http;
 	std::future<std::shared_ptr<httplib::Response>> future_response;
+	std::future<void> ping_sending_progress;
+	uint32_t ping_sequence_counter = 0;
+
+	bool refresh_op_in_progress() const {
+		return future_response.valid() || ping_sending_progress.valid();
+	}
 };
 
 
@@ -77,7 +84,7 @@ double yojimbo_time();
 void browse_servers_gui_state::refresh_server_list(const browse_servers_input in) {
 	using namespace httplib;
 
-	if (data->future_response.valid()) {
+	if (data->refresh_op_in_progress()) {
 		return;
 	}
 
@@ -111,6 +118,18 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	when_last_downloaded_server_list = yojimbo_time();
 }
 
+void browse_servers_gui_state::refresh_server_pings() {
+	if (data->refresh_op_in_progress()) {
+		return;
+	}
+
+	data->ping_sending_progress = launch_async(
+		[&]() {
+
+		}
+	);
+}
+
 std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 	using namespace augs::imgui;
 
@@ -122,6 +141,21 @@ std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 		const auto& d = s.data;
 
 		const bool is_selected = selected_server.address == s.address;
+
+		{
+			const auto ping = s.ping;
+
+			if (ping != -1) {
+				if (ping > 999) {
+					text("999>");
+				}
+				else {
+					text(typesafe_sprintf("%x", ping));
+				}
+			}
+		}
+
+		ImGui::NextColumn();
 
 		if (ImGui::Selectable(d.server_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
 			selected_server = s;
@@ -171,16 +205,9 @@ std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 
 		ImGui::NextColumn();
 
-		const auto ping = s.ping;
-
-		if (ping != -1) {
-			if (ping > 999) {
-				text("999>");
-			}
-			else {
-				text(typesafe_sprintf("%x", ping));
-			}
-		}
+		const auto diff = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
+		const auto secs_ago = diff.count() - s.appeared_when;
+		text_disabled(augs::date_time::format_how_long_ago(true, secs_ago));
 
 		ImGui::NextColumn();
 	}
@@ -235,6 +262,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				server_list_entry entry;
 
 				augs::read_bytes(ss, entry.address);
+				augs::read_bytes(ss, entry.appeared_when);
 				augs::read_bytes(ss, entry.data);
 
 				server_list.emplace_back(std::move(entry));
@@ -293,13 +321,17 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", num_filtered_results);
 
-		ImGui::Columns(6);
-		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9").x * 80);
-		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * 30);
-		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("Players  ").x);
-		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Spectators  ").x);
-		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("9").x * (max_arena_name_length_v + 1));
-		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("999999").x);
+		ImGui::Columns(7);
+		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("999999").x);
+		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * 80);
+		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("9").x * 30);
+		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Players  ").x);
+		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("Spectators  ").x);
+		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("9").x * (max_arena_name_length_v + 1));
+		ImGui::SetColumnWidth(6, ImGui::CalcTextSize("9").x * 25);
+
+		text_disabled("Ping");
+		ImGui::NextColumn();
 
 		text_color(official_servers_label, yellow);
 		ImGui::NextColumn();
@@ -311,7 +343,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		ImGui::NextColumn();
 		text_disabled("Arena");
 		ImGui::NextColumn();
-		text_disabled("Ping");
+		text_disabled("Created");
 		ImGui::NextColumn();
 
 		ImGui::Separator();
@@ -341,6 +373,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		const auto community_servers_label = typesafe_sprintf("Community servers");
 		ImGui::Separator();
+		ImGui::NextColumn();
 		text_color(community_servers_label, orange);
 
 		next_columns(6);
@@ -384,14 +417,18 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			ImGui::SameLine();
 		}
 
-		if (ImGui::Button("Refresh ping")) {
-			refresh_server_list(in);
-		}
+		{
+			auto scope = maybe_disabled_cols({}, data->refresh_op_in_progress());
 
-		ImGui::SameLine();
+			if (ImGui::Button("Refresh ping")) {
+				refresh_server_list(in);
+			}
 
-		if (ImGui::Button("Refresh list")) {
-			refresh_server_list(in);
+			ImGui::SameLine();
+
+			if (ImGui::Button("Refresh list")) {
+				refresh_server_list(in);
+			}
 		}
 	}
 	

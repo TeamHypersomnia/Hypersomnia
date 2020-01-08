@@ -82,19 +82,18 @@ std::string augs::date_time::get_readable() const {
 }
 
 std::string augs::date_time::how_long_ago() const {
-	return how_long_ago(false);
+	return format_how_long_ago(false, seconds_ago());
 }
 
 std::string augs::date_time::how_long_ago_tell_seconds() const {
-	return how_long_ago(true);
+	return format_how_long_ago(true, seconds_ago());
 }
 
-unsigned long long augs::date_time::seconds_ago() const {
-	return static_cast<unsigned long long>(std::difftime(std::time(nullptr), t));
+uint64_t augs::date_time::seconds_ago() const {
+	return static_cast<uint64_t>(std::difftime(std::time(nullptr), t));
 }
 
-std::string augs::date_time::how_long_ago(const bool tell_seconds) const {
-	const auto secs = seconds_ago();
+std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const uint64_t secs) {
 	const auto mins = secs / 60;
 	const auto hrs = mins / 60;
 	const auto days = hrs / 24;
@@ -110,7 +109,7 @@ std::string augs::date_time::how_long_ago(const bool tell_seconds) const {
 		return typesafe_sprintf("A minute ago", mins);
 	}
 	else if (mins < 60) {
-		return typesafe_sprintf("%x mins ago", mins);
+		return typesafe_sprintf("%x minutes ago", mins);
 	}
 	else if (hrs == 1) {
 		return typesafe_sprintf("An hour ago", hrs);

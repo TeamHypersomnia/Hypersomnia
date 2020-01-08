@@ -14,6 +14,7 @@
 #include "application/masterserver/server_heartbeat.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/templates/thread_templates.h"
+#include "augs/misc/time_utils.h"
 
 std::string ToString(const netcode_address_t&);
 
@@ -38,8 +39,18 @@ void MSR_LOG(Args&&... args) {
 #define MSR_LOG_NVPS MSR_LOG
 #endif
 
+struct masterserver_client_meta {
+	double appeared_when;
+
+	masterserver_client_meta() {
+		appeared_when = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	}
+};
+
 struct masterserver_client {
 	double time_of_last_heartbeat;
+
+	masterserver_client_meta meta;
 	server_heartbeat last_heartbeat;
 };
 
@@ -109,6 +120,7 @@ void perform_masterserver(const config_lua_table& cfg) {
 
 		for (auto& server : server_list) {
 			augs::write_bytes(ss, server.first);
+			augs::write_bytes(ss, server.second.meta.appeared_when);
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
 	};
