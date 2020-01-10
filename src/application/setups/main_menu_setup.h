@@ -32,6 +32,7 @@
 #include "game/modes/test_mode.h"
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
+#include "augs/network/netcode_sockets.h"
 
 struct application_update_result;
 struct config_lua_table;

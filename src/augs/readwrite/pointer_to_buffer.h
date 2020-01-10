@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/ensure_rel.h"
 
 namespace augs {
 	struct pointer_to_buffer {
@@ -15,6 +16,11 @@ namespace augs {
 
 		auto size() const {
 			return byte_count;
+		}
+
+		void resize(std::size_t n) {
+			/* Should never have to resize to a different number than byte_count! */
+			ensure_eq(byte_count, n);
 		}
 	};
 

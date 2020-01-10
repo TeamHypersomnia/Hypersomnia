@@ -29,6 +29,7 @@
 #include "application/masterserver/server_heartbeat.h"
 #include "application/network/resolve_address.h"
 #include "augs/templates/thread_templates.h"
+#include "application/masterserver/masterserver.h"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -187,6 +188,7 @@ void server_setup::send_heartbeat_to_masterserver() {
 
 	{
 		auto ss = augs::ref_memory_stream(heartbeat_buffer);
+		augs::write_bytes(ss, masterserver_udp_command::HEARTBEAT);
 		augs::write_bytes(ss, heartbeat);
 	}
 
@@ -200,15 +202,10 @@ void server_setup::send_heartbeat_to_masterserver() {
 }
 
 void server_setup::resolve_masterserver() {
-	const auto& masterserver_address = vars.masterserver_address;
+	const auto& in = vars.masterserver_address;
 
-	LOG("Requesting resolution of masterserver address at %x", masterserver_address.address);
-
-	future_resolved_masterserver_addr = launch_async(
-		[masterserver_address]() {
-			return resolve_address(masterserver_address);
-		}
-	);
+	LOG("Requesting resolution of masterserver address at %x", in.address);
+	future_resolved_masterserver_addr = async_resolve_address(in);
 }
 
 bool server_setup::masterserver_enabled() const {
@@ -228,7 +225,7 @@ void server_setup::resolve_masterserver_if_its_time() {
 		result.report();
 
 		if (result.result == resolve_result_type::OK) {
-			resolved_masterserver_addr = to_netcode_addr(result.addr); 
+			resolved_masterserver_addr = result.addr; 
 		}
 	}
 

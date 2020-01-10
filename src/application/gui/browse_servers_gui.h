@@ -8,20 +8,49 @@
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include <chrono>
 
-struct server_list_entry {
+struct netcode_socket_t;
+struct address_and_port;
+
+enum class server_entry_state {
+	GIVEN_UP,
+
+	AWAITING_RESPONSE,
+
+	PUNCHED,
+	PING_MEASURED
+};
+
+struct nat_progress {
 	int ping = -1;
+	uint64_t ping_sequence = -1;
+
+	net_time_t when_sent_first_ping = 0;
+	net_time_t when_sent_last_ping = 0;
+
+	net_time_t when_last_nat_request = 0;
+	net_time_t when_first_nat_request = 0;
+
+	server_entry_state state = server_entry_state::AWAITING_RESPONSE;
+};
+
+struct server_list_entry {
 	netcode_address_t address;
-	double appeared_when;
+	net_time_t appeared_when;
 	server_heartbeat data;
 
+	nat_progress progress;
+
 	bool is_set() const;
+	bool is_behind_nat() const;
 };
 
 struct client_start_input;
 
 struct browse_servers_input {
 	const std::string& server_list_provider;
+	const address_and_port& nat_punch_provider;
 	client_start_input& client_start;
+	const netcode_socket_t* nat_puncher_socket;
 };
 
 struct browse_servers_gui_internal;
@@ -49,14 +78,18 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	server_details_gui_state server_details = std::string("Server details");
 
-	bool hide_unreachable = false;
+	bool only_responding = false;
 	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
 
 	int sort_by_column = 0;
 	bool ascending = true;
+	std::string loading_dots;
+	uint64_t ping_sequence_counter = 0;
 
 	void refresh_server_list(browse_servers_input);
 	void refresh_server_pings();
+
+	server_list_entry* find(const netcode_address_t&);
 
 public:
 
@@ -65,4 +98,7 @@ public:
 	~browse_servers_gui_state();
 
 	bool perform(browse_servers_input);
+	void advance_ping_and_nat_logic(browse_servers_input);
+
+	void request_nat_reopen();
 };

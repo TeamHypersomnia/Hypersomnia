@@ -8,6 +8,9 @@
 #include "application/network/net_message_serializers.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.c"
 #include "augs/readwrite/byte_readwrite.h"
+#include "application/network/resolve_address_result.h"
+#include "application/network/resolve_address.h"
+#include "augs/templates/thread_templates.h"
 
 #undef SendMessage
 #undef SetPort
@@ -184,12 +187,12 @@ void server_adapter::send_packets() {
 	server.SendPackets();
 }
 
-client_adapter::client_adapter() :
+client_adapter::client_adapter(const std::optional<port_type> preferred_binding_port) :
 	connection_config(),
 	adapter(nullptr),
 	client(
 		yojimbo::GetDefaultAllocator(), 
-		yojimbo::Address("0.0.0.0"), 
+		preferred_binding_port ? yojimbo::Address("0.0.0.0", *preferred_binding_port) : yojimbo::Address("0.0.0.0"), 
 		connection_config, 
 		adapter, 
 		yojimbo_time()
@@ -282,6 +285,10 @@ yojimbo::Address to_yojimbo_addr(const netcode_address_t& t) {
 	return yojimbo::Address(t.data.ipv6, t.port);
 }
 
+std::future<resolve_address_result> async_resolve_address(const address_and_port& in) {
+	return launch_async([in]() { return resolve_address(in); });
+}
+
 resolve_address_result resolve_address(const address_and_port& in) {
 	const auto& input = in.address;
 	const auto default_port = in.default_port;
@@ -296,20 +303,13 @@ resolve_address_result resolve_address(const address_and_port& in) {
 	{
 		resolve_address_result out;
 
-		auto addr = yojimbo::Address(input.c_str());
-
-		if (addr.IsValid()) {
-			if (addr.GetPort() == 0) {
-				addr.SetPort(default_port);
+		if (netcode_parse_address(input.c_str(), &out.addr) == NETCODE_OK) {
+			if (out.addr.port == 0) {
+				out.addr.port = default_port;
 			}
 
-			out.addr = addr;
 			out.host = input.c_str();
-
 			return out;
-		}
-		else {
-			LOG("INV: %x", input);
 		}
 	}
 
@@ -352,7 +352,7 @@ resolve_address_result resolve_address(const address_and_port& in) {
 	resolve_address_result out;
 
 	out.host = std::move(no_port);
-	out.addr = to_yojimbo_addr(*resolved_net_addr);
+	out.addr = *resolved_net_addr;
 
 	return out;
 }
@@ -367,7 +367,7 @@ resolve_address_result client_adapter::connect(const address_and_port& in) {
 		return resolved_addr;
 	}
 
-	const auto& target_addr = resolved_addr.addr;
+	const auto& target_addr = to_yojimbo_addr(resolved_addr.addr);
 
 	auto local_addr = yojimbo::Address("127.0.0.1", 8412);
 
@@ -539,4 +539,16 @@ void server_adapter::send_udp_packet(const netcode_address_t& in_to, std::byte* 
 	else if (to.type == NETCODE_ADDRESS_IPV6) {
 		netcode_socket_send_packet(&s->socket_holder.ipv6, &to, reinterpret_cast<void*>(packet_data), packet_bytes);
 	}
+}
+
+const netcode_socket_t* client_adapter::find_underlying_socket() const {
+	if (client.IsDisconnected()) {
+		return nullptr;
+	}
+
+	if (auto* const s = client.GetClientDetail()) {
+		return &s->socket_holder.ipv4;
+	}
+
+	return nullptr;
 }

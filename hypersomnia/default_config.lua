@@ -4,7 +4,12 @@ return {
 
   server_list_provider = "masterserver.hypersomnia.xyz",
 
-  masterserver_settings = {
+  nat_punch_provider = {
+	  address = "masterserver.hypersomnia.xyz",
+	  default_port = 8414
+  },
+
+  masterserver = {
 	ip = "127.0.0.1",
 	port = 8414,
 	server_entry_timeout_secs = 60,

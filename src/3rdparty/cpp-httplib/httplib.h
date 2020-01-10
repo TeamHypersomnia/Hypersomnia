@@ -2096,21 +2096,6 @@ get_range_offset_and_length(const Request &req, const Response &res,
 
   return std::make_pair(r.first, r.second - r.first + 1);
 }
-
-#ifdef _WIN32
-class WSInit {
-public:
-  WSInit() {
-    WSADATA wsaData;
-    WSAStartup(0x0002, &wsaData);
-  }
-
-  ~WSInit() { WSACleanup(); }
-};
-
-static WSInit wsinit_;
-#endif
-
 } // namespace detail
 
 // Header utilities

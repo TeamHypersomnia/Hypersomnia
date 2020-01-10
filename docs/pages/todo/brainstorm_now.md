@@ -6,6 +6,58 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- It's not really a problem if the server list is recalculated in the background.
+	- The bandwidth used is minimal, especially since we've imposed a limit on the number of packets there.
+	- So let the advancer just go all the time.
+
+- later determine why heartbeats mismatch every time
+
+- We should give up on opening hosts that don't respond
+
+- Just pass a lambda for ingame menu which buttons are available
+	- Later we'll properly hide them but for now they'll just be inactive
+
+- Only allow browse servers
+
+- IPv6 fixes
+	- ip-agnostic find_underlying_socket
+
+- Blindly request whenever we connect anywhere, in client_setup
+	- But do this asynchronously to the connection attempt
+	- won't hurt to send the nat open request once again upon connect from the list
+	- Main menu can pass resolved netcode address of masterserver
+	- If starting client setup from scratch, we have to resolve it
+	- So, two overloads?
+		- Just one but have on optional resolved
+	- Well, we don't have the resolved masterserver address because it's from httplib
+
+- Browse window logistics
+	- Main menu holds a server list socket
+	- In-game, the yojimbo's socket is used
+	- Close upon entering but when launching another setup, ask to re-open when going back to menu
+	- Re-calculate server details for showing in-game
+		- Though we won't show internal ip address but it's okay
+
+- Problem: we can't browse servers in-game unless we use the socket provided by yojimbo
+	- What if we overwrite the socket in yojimbo?
+		- nah, we have no way of tampering the connection process
+	- let browse gui hold a pointer to the used socket
+	- let main menu hold such socket
+		- hold it in main menu even if we don't allow to watch the server list from the game
+			- because we anyway have to destroy it before connecting 
+	- later the socket will be destroyed along with the main menu
+
+- We have no choice but to simply pass around the preferred port as a value and hope for the best
+
+- advance only advances pings and nats already requested
+	- but it is only the imgui-performing function that requests the pings and nats in the first place
+		- and only if it detects that there is a need for them and a sufficient interval has passed
+
+- For now, don't save in custom config after connecting from the list
+
+- Client-side, on receiving server list:
+	- 
+
 - Let the client manage the nat punching for all the servers on its own
 	- Server would be too vulnerable if it would send a ping after getting just a single packet
 	- At least it will depend on the upload strength of the client

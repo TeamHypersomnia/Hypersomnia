@@ -31,3 +31,43 @@ void netcode_socket_destroy( struct netcode_socket_t * socket );
 int netcode_socket_create( struct netcode_socket_t * s, struct netcode_address_t * address, int send_buffer_size, int receive_buffer_size );
 int netcode_socket_receive_packet( struct netcode_socket_t * socket, struct netcode_address_t * from, void * packet_data, int max_packet_size );
 void netcode_socket_send_packet( struct netcode_socket_t * socket, struct netcode_address_t * to, void * packet_data, int packet_bytes );
+
+#include "augs/ensure_rel.h"
+#include "augs/templates/exception_templates.h"
+
+struct netcode_socket_raii_error : error_with_typesafe_sprintf {
+	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+};
+
+struct netcode_socket_raii {
+	netcode_socket_t socket;
+
+private:
+	void bind_to(netcode_address_t address) {
+		const auto buf_size = 4 * 1024 * 1024;
+
+		if (const auto result = netcode_socket_create(&socket, &address, buf_size, buf_size); result != NETCODE_SOCKET_ERROR_NONE) {
+			throw netcode_socket_raii_error("netcode_socket_create failed with code: %x", result);
+		}
+	}
+public:
+
+	netcode_socket_raii(port_type port) {
+		netcode_address_t address;
+		ensure_eq(NETCODE_OK, netcode_parse_address("0.0.0.0", &address));
+
+		address.port = port;
+
+		bind_to(address);
+	}
+
+	netcode_socket_raii() {
+		netcode_address_t address;
+		ensure_eq(NETCODE_OK, netcode_parse_address("0.0.0.0", &address));
+		bind_to(address);
+	}
+
+	~netcode_socket_raii() {
+		netcode_socket_destroy(&socket);
+	}
+};

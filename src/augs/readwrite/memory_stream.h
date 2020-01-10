@@ -220,11 +220,13 @@ namespace augs {
 		using base::get_write_pos;
 
 		basic_ref_memory_stream(B& b) : buffer(b) {
-			set_write_pos(b.size());
+			if constexpr(is_const_ptr_v<decltype(buffer.data())>) {
+				set_write_pos(b.size());
+			}
 		}
 
 		~basic_ref_memory_stream() {
-			if constexpr(!is_const_ref_v<B>) {
+			if constexpr(!is_const_ptr_v<decltype(buffer.data())>) {
 				buffer.resize(get_write_pos());
 			}
 		}

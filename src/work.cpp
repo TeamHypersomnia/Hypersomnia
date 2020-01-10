@@ -225,9 +225,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		perform_float_consistency_tests(fp_test_settings)
 	;
 
+	LOG("Initializing network RAII.");
+
+	static auto network_raii = augs::network_raii();
+
 	if (config.unit_tests.run) {
 		/* Needed by some unit tests */
-		augs::network_raii raii;
 
 		LOG("Running unit tests.");
 		augs::run_unit_tests(config.unit_tests);
@@ -346,17 +349,13 @@ and then hitting Save settings.
 		};
 	}
 
-	static augs::timer global_libraries_timer;
-
-	LOG("Initializing global libraries");
+	LOG("Initializing freetype");
 
 	static auto freetype_library = std::optional<augs::freetype_raii>();
 
 	if (params.type == app_type::GAME_CLIENT) {
 		freetype_library.emplace();
 	}
-
-	LOG("Initializing global libraries took: %x ms", global_libraries_timer.template extract<std::chrono::milliseconds>());
 
 	static std::optional<setup_variant> current_setup;
 
@@ -382,7 +381,6 @@ and then hitting Save settings.
 	if (params.type == app_type::MASTERSERVER) {
 		LOG("Starting the masterserver at port: %x", config.masterserver.port);
 
-		augs::network_raii raii;
 		perform_masterserver(config);
 
 		return work_result::SUCCESS;
@@ -702,6 +700,26 @@ and then hitting Save settings.
 		});
 	};
 
+	static auto nat_puncher_socket = std::make_optional<netcode_socket_raii>();
+
+	/* 
+		In case we're launching a client, 
+		bind to the same port that was used for NAT punching in the server browser.
+
+		It will re-use the same port if we're launching the client setup again.
+	*/
+
+	static const auto get_preferred_client_port = []() {
+		return nat_puncher_socket->socket.address.port;
+	};
+
+	ensure(get_preferred_client_port() != 0);
+	LOG_NVPS(get_preferred_client_port());
+
+	static auto find_nat_puncher_socket = []() -> const netcode_socket_t* {
+		return &nat_puncher_socket->socket;
+	};
+
 	static auto launch_setup = [&](const launch_type mode) {
 		LOG("Launched mode: %x", augs::enum_to_string(mode));
 
@@ -724,11 +742,28 @@ and then hitting Save settings.
 #if BUILD_NETWORKING
 			case launch_type::CLIENT:
 				setup_launcher([&]() {
+					/*
+						We've saved the port so we're safe to delete the socket.
+					*/
+
+					nat_puncher_socket.reset();
+
+					LOG("Starting client setup. Binding to a preferred port: %x", get_preferred_client_port());
+
 					emplace_current_setup(std::in_place_type_t<client_setup>(),
 						lua,
 						config.default_client_start,
-						config.client
+						config.client,
+						config.nat_punch_provider,
+						get_preferred_client_port()
 					);
+
+					/*
+						Create a new one for the browser.
+					*/
+
+					nat_puncher_socket.emplace();
+					browse_servers_gui.request_nat_reopen();
 				});
 
 				break;
@@ -787,11 +822,17 @@ and then hitting Save settings.
 		launch_setup(launch_type::CLIENT);
 	};
 
-	static auto perform_browse_servers = []() {
-		const bool perform_result = browse_servers_gui.perform({ 
+	static auto get_browse_servers_input = []() {
+		return browse_servers_input {
 			config.server_list_provider,
-			config.default_client_start
-		});
+			config.nat_punch_provider,
+			config.default_client_start,
+			find_nat_puncher_socket()
+		};
+	};
+
+	static auto perform_browse_servers = []() {
+		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
 			start_client_setup();
@@ -1034,6 +1075,8 @@ and then hitting Save settings.
 			audio,
 			lua,
 			[&]() {
+				browse_servers_gui.advance_ping_and_nat_logic(get_browse_servers_input());
+
 				if (!has_current_setup()) {
 					perform_start_client(frame_num);
 					perform_start_server();
@@ -2792,5 +2835,9 @@ catch (const augs::unit_test_session_error& err) {
 		err.what(), err.cout_content, err.cerr_content, err.clog_content
 	);
 
+	return work_result::FAILURE;
+}
+catch (const netcode_socket_raii_error& err) {
+	LOG("Failed to create a socket for server browser:\n%x", err.what());
 	return work_result::FAILURE;
 }

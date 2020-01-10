@@ -12,6 +12,25 @@
 #include "augs/log.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "augs/misc/time_utils.h"
+#include "augs/network/netcode_sockets.h"
+#include "application/masterserver/nat_puncher_client.h"
+
+#define LOG_BROWSER !NDEBUG
+
+template <class... Args>
+void BRW_LOG(Args&&... args) {
+#if LOG_BROWSER
+	LOG(std::forward<Args>(args)...);
+#else
+	((void)args, ...);
+#endif
+}
+
+#if LOG_MASTERSERVER
+#define BRW_LOG_NVPS LOG_NVPS
+#else
+#define BRW_LOG_NVPS BRW_LOG
+#endif
 
 bool server_list_entry::is_set() const {
 	return data.server_name.size() > 0;
@@ -22,11 +41,12 @@ browse_servers_gui_state::~browse_servers_gui_state() = default;
 struct browse_servers_gui_internal {
 	std::optional<httplib::Client> http;
 	std::future<std::shared_ptr<httplib::Response>> future_response;
-	std::future<void> ping_sending_progress;
-	uint32_t ping_sequence_counter = 0;
+	netcode_socket_t socket;
+
+	nat_puncher_client nat;
 
 	bool refresh_op_in_progress() const {
-		return future_response.valid() || ping_sending_progress.valid();
+		return future_response.valid() || nat.is_resolving_host();
 	}
 };
 
@@ -95,6 +115,8 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	auto& http_opt = data->http;
 
+	data->nat.resolve_relay_host(in.nat_punch_provider);
+
 	data->future_response = launch_async(
 		[&http_opt, host_url = in.server_list_provider]() {
 			const auto timeout = 5;
@@ -119,15 +141,169 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 }
 
 void browse_servers_gui_state::refresh_server_pings() {
-	if (data->refresh_op_in_progress()) {
+	for (auto& s : server_list) {
+		s.progress = {};
+	}
+}
+
+bool server_list_entry::is_behind_nat() const {
+	return address != data.internal_network_address;
+}
+
+server_list_entry* browse_servers_gui_state::find(const netcode_address_t& address) {
+	for (auto& s : server_list) {
+		if (s.address == address) {
+			return &s;
+		}
+	}
+
+	return nullptr;
+}
+
+void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_input in) {
+	if (in.nat_puncher_socket == nullptr) {
 		return;
 	}
 
-	data->ping_sending_progress = launch_async(
-		[&]() {
+	auto udp_socket = *in.nat_puncher_socket;
+	auto& nat = data->nat;
 
+	nat.advance_relay_host_resolution();
+
+	const auto current_time = yojimbo_time();
+
+	{
+
+		const auto num_dots = uint64_t(current_time * 3) % 3 + 1;
+		loading_dots = std::string(num_dots, '.');
+	}
+
+	{
+		struct netcode_address_t from;
+		uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
+
+		while (true) {
+			const auto packet_bytes = netcode_socket_receive_packet(&udp_socket, &from, packet_buffer, NETCODE_MAX_PACKET_BYTES);
+
+			if (packet_bytes == 0) {
+				break;
+			}
+
+			BRW_LOG("Packet arrived!");
+
+			if (packet_bytes != 1 + sizeof(uint64_t)) {
+				BRW_LOG("Wrong num of bytes: %x!", packet_bytes);
+				continue;
+			}
+
+			const auto command = packet_buffer[0];
+
+			if (command == NETCODE_PING_RESPONSE_PACKET) {
+				BRW_LOG("Ping response!");
+				if (const auto entry = find(from)) {
+					uint64_t sequence;
+					std::memcpy(&sequence, packet_buffer + 1, sizeof(uint64_t));
+
+					auto& progress = entry->progress;
+
+					BRW_LOG("Has entry! Sequence: %x; entry sequence: %x", sequence, progress.ping_sequence);
+
+					if (sequence == uint64_t(-1)) {
+						progress.state = server_entry_state::PUNCHED;
+					}
+					else if (sequence == progress.ping_sequence) {
+						BRW_LOG("Sequence matches!");
+						progress.ping = static_cast<int>(current_time - progress.when_sent_last_ping);
+						progress.state = server_entry_state::PING_MEASURED;
+					}
+				}
+			}
 		}
-	);
+	}
+
+	int packets_left = 64;
+
+	if (server_list.empty()) {
+		return;
+	}
+
+	const auto nat_request_interval = 0.5;
+	const auto ping_retry_interval = 1;
+	const auto ping_nat_keepalive_interval = 10;
+	const auto server_entry_timeout = 5;
+
+	for (auto& s : server_list) {
+		if (packets_left <= 0) {
+			break;
+		}
+
+		auto& p = s.progress;
+
+		using S = server_entry_state;
+
+		auto request_ping = [&]() {
+			p.when_sent_last_ping = current_time;
+			p.ping_sequence = ping_sequence_counter++;
+
+			send_ping_request(udp_socket, p.ping_sequence, s.address);
+			--packets_left;
+		};
+
+		if (p.state == S::AWAITING_RESPONSE) {
+			if (s.is_behind_nat()) {
+				if (nat.relay_host_resolved()) {
+					auto& when_first = p.when_first_nat_request;
+					auto& when_last = p.when_last_nat_request;
+
+					if (when_last == 0 || current_time - when_last >= nat_request_interval) {
+						when_last = current_time;
+
+						if (when_first == 0) {
+							when_first = current_time;
+						}
+
+						nat.punched_server_addr = s.address;
+						nat.request_punch(udp_socket);
+
+						--packets_left;
+					}
+
+					if (when_first != 0 && current_time - when_first >= server_entry_timeout) {
+						p.state = server_entry_state::GIVEN_UP;
+						continue;
+					}
+				}
+			}
+		}
+
+		if (p.state == S::AWAITING_RESPONSE || p.state == S::PUNCHED) {
+			BRW_LOG("State needs pinging");
+			auto& when_first = p.when_sent_first_ping;
+			auto& when_last = p.when_sent_last_ping;
+
+			if (when_last == 0 || current_time - when_last >= ping_retry_interval) {
+				if (when_first == 0) {
+					when_first = current_time;
+				}
+
+				BRW_LOG("Requesting ping");
+				request_ping();
+			}
+
+			if (when_first != 0 && current_time - when_first >= server_entry_timeout) {
+				p.state = server_entry_state::GIVEN_UP;
+				continue;
+			}
+		}
+
+		if (p.state == S::PING_MEASURED) {
+			auto& when_last = p.when_sent_last_ping;
+
+			if (current_time - when_last >= ping_nat_keepalive_interval) {
+				request_ping();
+			}
+		}
+	}
 }
 
 std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
@@ -135,30 +311,52 @@ std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 
 	auto requested_connection = std::optional<netcode_address_t>();
 
+	const auto& style = ImGui::GetStyle();
+
 	for (const auto& sp : filtered_server_list) {
 		auto id = scoped_id(index_in(filtered_server_list, sp));
 		const auto& s = *sp;
+		const auto& progress = s.progress;
 		const auto& d = s.data;
+
+		const bool given_up = progress.state == server_entry_state::GIVEN_UP;
+		const auto color = rgba(given_up ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
+
+		auto do_text = [&](const auto& t) {
+			text_color(t, color);
+		};
 
 		const bool is_selected = selected_server.address == s.address;
 
 		{
-			const auto ping = s.ping;
+			const auto ping = progress.ping;
 
 			if (ping != -1) {
 				if (ping > 999) {
-					text("999>");
+					do_text("999>");
 				}
 				else {
-					text(typesafe_sprintf("%x", ping));
+					do_text(typesafe_sprintf("%x", ping));
+				}
+			}
+			else {
+				if (given_up) {
+					do_text("?");
+				}
+				else {
+					do_text(loading_dots);
 				}
 			}
 		}
 
 		ImGui::NextColumn();
 
-		if (ImGui::Selectable(d.server_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
-			selected_server = s;
+		{
+			auto col_scope = scoped_style_color(ImGuiCol_Text, color);
+
+			if (ImGui::Selectable(d.server_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
+				selected_server = s;
+			}
 		}
 
 		if (ImGui::IsItemClicked()) {
@@ -182,26 +380,26 @@ std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 				return format_field_name(get_type_name<D>());
 			});
 
-			text(game_mode_name);
+			do_text(game_mode_name);
 		}
 		else {
-			text("<unknown>");
+			do_text("<unknown>");
 		}
 
 		ImGui::NextColumn();
 
 		const auto max_players = std::min(d.max_fighting, d.max_online);
-		text(typesafe_sprintf("%x/%x", d.num_fighting, max_players));
+		do_text(typesafe_sprintf("%x/%x", d.num_fighting, max_players));
 
 		ImGui::NextColumn();
 
 		const auto num_spectators = d.num_online - d.num_fighting;
 		const auto max_spectators = d.max_online - d.num_fighting;
 
-		text(typesafe_sprintf("%x/%x", num_spectators, max_spectators));
+		do_text(typesafe_sprintf("%x/%x", num_spectators, max_spectators));
 
 		ImGui::NextColumn();
-		text(d.current_arena);
+		do_text(d.current_arena);
 
 		ImGui::NextColumn();
 
@@ -284,8 +482,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	filtered_server_list.clear();
 
 	for (auto& s : server_list) {
-		if (hide_unreachable) {
-			if (s.ping == -1) {
+		if (only_responding) {
+			if (s.progress.ping == -1) {
 				continue;
 			}
 		}
@@ -426,7 +624,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		ImGui::Separator();
 
-		checkbox("Hide unreachable", hide_unreachable);
+		checkbox("Only responding", only_responding);
 		ImGui::SameLine();
 
 		checkbox("At least", at_least_players.is_enabled);
@@ -462,7 +660,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			auto scope = maybe_disabled_cols({}, data->refresh_op_in_progress());
 
 			if (ImGui::Button("Refresh ping")) {
-				refresh_server_list(in);
+				refresh_server_pings();
 			}
 
 			ImGui::SameLine();
@@ -506,4 +704,12 @@ void server_details_gui_state::perform(const server_list_entry& entry) {
 	input_text("Server name", data.server_name, ImGuiInputTextFlags_ReadOnly);
 
 	input_text("Arena", data.current_arena, ImGuiInputTextFlags_ReadOnly);
+}
+
+void browse_servers_gui_state::request_nat_reopen() {
+	for (auto& s : server_list) {
+		if (s.is_behind_nat()) {
+			s.progress = {};
+		}
+	}
 }

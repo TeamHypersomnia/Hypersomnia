@@ -2,11 +2,11 @@
 #include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 #include "augs/network/network_simulator_settings.h"
-#include "application/network/resolve_address.h"
+
+struct netcode_socket_t;
+struct resolve_address_result;
 
 class client_adapter {
-	augs::network_raii raii;
-
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;
@@ -32,7 +32,7 @@ class client_adapter {
 	bool has_messages_to_send(const game_channel_type&) const;
 
 public:
-	client_adapter();
+	client_adapter(std::optional<port_type> preferred_binding_port);
 	resolve_address_result connect(const address_and_port&);
 
 	template <class H>
@@ -58,4 +58,6 @@ public:
 
 	void set(augs::maybe_network_simulator);
 	network_info get_network_info() const;
+
+	const netcode_socket_t* find_underlying_socket() const;
 };

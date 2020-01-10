@@ -7,14 +7,15 @@
 #include "3rdparty/cpp-httplib/httplib.h"
 #include "augs/log.h"
 
+#include "application/config_lua_table.h"
 #include "augs/network/netcode_sockets.h"
-#include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/pointer_to_buffer.h"
 #include "augs/readwrite/memory_stream.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/time_utils.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 std::string ToString(const netcode_address_t&);
 
@@ -47,6 +48,27 @@ struct masterserver_client_meta {
 	}
 };
 
+struct nat_punch_request {
+	static uint64_t request_counter;
+
+	explicit nat_punch_request(
+		net_time_t current_time,
+		netcode_address_t client,
+		netcode_address_t server
+	) : when_created(current_time), client(client), server(server)
+	{
+		request_id = request_counter++;
+	}
+
+	net_time_t when_created;
+	uint64_t request_id;
+
+	netcode_address_t client;
+	netcode_address_t server;
+};
+
+uint64_t nat_punch_request::request_counter = 0;
+
 struct masterserver_client {
 	double time_of_last_heartbeat;
 
@@ -62,6 +84,12 @@ bool operator==(const netcode_address_t& a, const netcode_address_t& b) {
 	auto aa = a;
 	auto bb = b;
 	return 1 == netcode_address_equal(&aa, &bb);
+}
+
+bool operator!=(const netcode_address_t& a, const netcode_address_t& b) {
+	auto aa = a;
+	auto bb = b;
+	return 0 == netcode_address_equal(&aa, &bb);
 }
 
 namespace std {
@@ -102,7 +130,7 @@ void perform_masterserver(const config_lua_table& cfg) {
 		}
 	}
 
-	char buffer[NETCODE_MAX_PACKET_BYTES];
+	LOG("Created masterserver at: %x", ::ToString(socket.address));
 
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
 
@@ -119,7 +147,9 @@ void perform_masterserver(const config_lua_table& cfg) {
 		auto ss = augs::ref_memory_stream(serialized_list);
 
 		for (auto& server : server_list) {
-			augs::write_bytes(ss, server.first);
+			const auto address = server.first;
+
+			augs::write_bytes(ss, address);
 			augs::write_bytes(ss, server.second.meta.appeared_when);
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
@@ -130,14 +160,16 @@ void perform_masterserver(const config_lua_table& cfg) {
 	using namespace httplib;
 
 	auto make_list_streamer_lambda = [&]() {
-    	std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
-
 		return [data=serialized_list](uint64_t offset, uint64_t length, DataSink sink) {
 			sink(reinterpret_cast<const char*>(&data[offset]), length);
 		};
 	};
 
+	std::vector<nat_punch_request> nat_requests;
+
 	http.Get("/server_list_binary", [&](const Request&, Response& res) {
+		std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
+
 		if (serialized_list.size() > 0) {
 			MSR_LOG("List request arrived. Sending list of size: %x", serialized_list.size());
 
@@ -162,6 +194,8 @@ void perform_masterserver(const config_lua_table& cfg) {
 		LOG("The HTTP listening thread has quit.");
 	});
 
+	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
+
 	while (true) {
 #if PLATFORM_UNIX
 		if (signal_status != 0) {
@@ -183,7 +217,7 @@ void perform_masterserver(const config_lua_table& cfg) {
 		const auto current_time = yojimbo_time();
 
 		struct netcode_address_t from;
-		const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, buffer, NETCODE_MAX_PACKET_BYTES);
+		const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, packet_buffer, NETCODE_MAX_PACKET_BYTES);
 
 		if (packet_bytes == 1) {
 			if (const auto entry = mapped_or_nullptr(server_list, from)) {
@@ -194,27 +228,56 @@ void perform_masterserver(const config_lua_table& cfg) {
 		else if (packet_bytes > 0) {
 			MSR_LOG("Received packet bytes: %x", packet_bytes);
 
-			const auto buf = augs::cpointer_to_buffer{ reinterpret_cast<const std::byte*>(buffer), static_cast<std::size_t>(packet_bytes) };
+			const auto buf = augs::cpointer_to_buffer{ reinterpret_cast<const std::byte*>(packet_buffer), static_cast<std::size_t>(packet_bytes) };
 			auto ss = augs::cptr_memory_stream(buf);
 
 			try {
-				auto it = server_list.try_emplace(from);
+				masterserver_udp_command command;
+				augs::read_bytes(ss, command);
 
-				const bool is_new_server = it.second;
-				auto& server_entry = (*it.first).second;
+				if (command == masterserver_udp_command::HEARTBEAT) {
+					auto it = server_list.try_emplace(from);
 
-				const auto heartbeat_before = server_entry.last_heartbeat;
-				augs::read_bytes(ss, server_entry.last_heartbeat);
-				server_entry.last_heartbeat.validate();
+					const bool is_new_server = it.second;
+					auto& server_entry = (*it.first).second;
 
-				server_entry.time_of_last_heartbeat = current_time;
+					const auto heartbeat_before = server_entry.last_heartbeat;
+					augs::read_bytes(ss, server_entry.last_heartbeat);
+					server_entry.last_heartbeat.validate();
 
-				const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
+					server_entry.time_of_last_heartbeat = current_time;
 
-				MSR_LOG_NVPS(is_new_server, heartbeats_mismatch);
+					const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
 
-				if (is_new_server || heartbeats_mismatch) {
-					reserialize_list();
+					MSR_LOG_NVPS(is_new_server, heartbeats_mismatch);
+
+					if (is_new_server || heartbeats_mismatch) {
+						reserialize_list();
+					}
+				}
+				else if (command == masterserver_udp_command::NAT_PUNCH_REQUEST) {
+					netcode_address_t target_server;
+					augs::read_bytes(ss, target_server);
+
+					std::byte out_buf[sizeof(masterserver_udp_command) + sizeof(netcode_address_t) + sizeof(uint64_t)];
+
+					auto buf = augs::pointer_to_buffer{out_buf, sizeof(out_buf)};
+					auto out = augs::ptr_memory_stream(buf);
+
+					const auto sequence_dummy = uint64_t(-1);
+
+					augs::write_bytes(out, uint8_t(NETCODE_PING_REQUEST_PACKET));
+					augs::write_bytes(out, sequence_dummy);
+					augs::write_bytes(out, from);
+
+					if (const auto entry = mapped_or_nullptr(server_list, target_server)) {
+						const bool is_behind_nat = entry->last_heartbeat.internal_network_address != target_server;
+
+						if (is_behind_nat) {
+							MSR_LOG("Sending NAT open request from %x to %x", ::ToString(from), ::ToString(target_server));
+							netcode_socket_send_packet(&socket, &target_server, out_buf, sizeof(out_buf));
+						}
+					}
 				}
 			}
 			catch (...) {
@@ -227,11 +290,18 @@ void perform_masterserver(const config_lua_table& cfg) {
 
 		const auto timeout_secs = settings.server_entry_timeout_secs;
 
+		auto process_entry_logic = [&](auto& server_entry) {
+			(void)server_entry;
+		};
+
 		auto erase_if_dead = [&](auto& server_entry) {
 			const bool timed_out = current_time - server_entry.second.time_of_last_heartbeat >= timeout_secs;
 
 			if (timed_out) {
 				LOG("The server at %x (%x) has timed out.", ::ToString(server_entry.first), server_entry.second.last_heartbeat.server_name);
+			}
+			else {
+				process_entry_logic(server_entry);
 			}
 
 			return timed_out;

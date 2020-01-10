@@ -54,6 +54,9 @@ constexpr double default_inv_tickrate = 1 / 128.0;
 
 class client_adapter;
 
+struct nat_puncher_client;
+struct netcode_socket_t;
+
 class client_setup : 
 	public default_setup_settings,
 	public arena_gui_mixin<client_setup>
@@ -102,6 +105,7 @@ class client_setup :
 	net_time_t client_time = 0.0;
 	net_time_t when_initiated_connection = 0.0;
 	net_time_t when_sent_client_settings = 0.0;
+	net_time_t when_sent_nat_punch_request = 0.0;
 
 	std::string last_disconnect_reason;
 	bool print_only_disconnect_reason = false;
@@ -130,6 +134,8 @@ class client_setup :
 	bool was_demo_meta_written = false;
 
 	client_demo_player demo_player;
+
+	augs::propagate_const<std::unique_ptr<nat_puncher_client>> nat;
 	/* No client state follows later in code. */
 
 	template <class U>
@@ -179,6 +185,7 @@ class client_setup :
 	void handle_server_payloads();
 	void send_pending_commands();
 	void send_packets_if_its_time();
+	void send_nat_asssitance_requests_if_its_time();
 
 	template <class T, class F>
 	message_handler_result handle_server_payload(
@@ -311,6 +318,7 @@ class client_setup :
 		{
 			auto scope = measure_scope(performance.sending_packets);
 			send_packets_if_its_time();
+			send_nat_asssitance_requests_if_its_time();
 		}
 
 		if (in_game) {
@@ -559,7 +567,9 @@ public:
 	client_setup(
 		sol::state& lua,
 		const client_start_input&,
-		const client_vars& initial_vars
+		const client_vars& initial_vars,
+		const address_and_port& nat_punch_provider,
+		port_type preferred_binding_port
 	);
 
 	~client_setup();
@@ -637,7 +647,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(l, client_in, vars_backup);
+					new (this) client_setup(l, client_in, vars_backup, address_and_port(), port_type(0));
 				}
 
 				demo_player = std::move(player_backup);
@@ -748,4 +758,6 @@ public:
 	bool send_payload(Args&&... args);
 
 	void perform_chat_input_bar();
+
+	const netcode_socket_t* find_underlying_socket() const;
 };

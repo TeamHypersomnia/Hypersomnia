@@ -275,6 +275,7 @@ void settings_gui_state::perform(
 						auto& scope_cfg = config;
 
 						input_text<100>(SCOPE_CFG_NVP(server_list_provider), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider);
+						input_text("NAT punch provider", config.nat_punch_provider.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_punch_provider);
 					}
 				}
 

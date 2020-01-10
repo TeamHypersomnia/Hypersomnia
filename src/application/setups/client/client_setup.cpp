@@ -40,6 +40,10 @@
 #include "application/gui/client/demo_player_gui.hpp"
 
 #include "application/setups/client/handle_server_payload.hpp"
+#include "application/network/resolve_address.h"
+#include "augs/network/netcode_sockets.h"
+#include "application/network/resolve_address_result.h"
+#include "application/masterserver/nat_puncher_client.h"
 
 void client_demo_player::play_demo_from(const augs::path_type& p) {
 	source_path = p;
@@ -210,14 +214,17 @@ bool client_setup::send_payload(Args&&... args) {
 client_setup::client_setup(
 	sol::state& lua,
 	const client_start_input& in,
-	const client_vars& initial_vars
+	const client_vars& initial_vars,
+	const address_and_port& nat_punch_provider,
+	port_type preferred_binding_port
 ) : 
 	lua(lua),
 	last_addr(in.get_address_and_port()),
 	vars(initial_vars),
-	adapter(std::make_unique<client_adapter>()),
+	adapter(std::make_unique<client_adapter>(preferred_binding_port)),
 	client_time(get_current_time()),
-	when_initiated_connection(get_current_time())
+	when_initiated_connection(get_current_time()),
+	nat(std::make_unique<nat_puncher_client>())
 {
 	LOG("Initializing connection with %x", last_addr.address);
 
@@ -272,6 +279,9 @@ client_setup::client_setup(
 				set_disconnect_reason(reason);
 			}
 			else {
+				nat->punched_server_addr = resolution.addr;
+				nat->resolve_relay_host(nat_punch_provider);
+
 				ensure_eq(resolution.result, resolve_result_type::OK);
 
 				const auto new_demo_fname = augs::date_time().get_readable_for_file() + ".dem";
@@ -698,6 +708,39 @@ void client_setup::send_pending_commands() {
 		);
 
 		pending_request = special_client_request::NONE;
+	}
+}
+
+const netcode_socket_t* client_setup::find_underlying_socket() const {
+	return adapter->find_underlying_socket();
+}
+
+void client_setup::send_nat_asssitance_requests_if_its_time() {
+	if (is_replaying()) {
+		return;
+	}
+
+	if (!adapter->is_connecting()) {
+		return;
+	}
+
+	nat->advance_relay_host_resolution();
+
+	if (!nat->relay_host_resolved()) {
+		return;
+	}
+
+	const auto nat_request_interval_ms = 200;
+
+	auto& when_last = when_sent_nat_punch_request;
+
+	if (client_time - when_last >= nat_request_interval_ms) {
+		if (auto socket = adapter->find_underlying_socket()) {
+			LOG("Client requesting NAT assistance just in case");
+			nat->request_punch(*socket);
+
+			when_last = client_time;
+		}
 	}
 }
 
