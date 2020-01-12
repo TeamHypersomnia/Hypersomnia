@@ -845,7 +845,8 @@ and then hitting Save settings.
 			config.server_list_provider,
 			config.nat_punch_provider,
 			config.default_client_start,
-			find_nat_puncher_socket()
+			find_nat_puncher_socket(),
+			config.official_arena_servers
 		};
 	};
 

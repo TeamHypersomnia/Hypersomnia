@@ -53,6 +53,8 @@ struct browse_servers_input {
 	const address_and_port& nat_punch_provider;
 	client_start_input& client_start;
 	const netcode_socket_t* nat_puncher_socket;
+
+	const std::vector<std::string>& official_arena_servers;
 };
 
 struct browse_servers_gui_internal;

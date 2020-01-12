@@ -49,10 +49,12 @@ struct browse_servers_gui_internal {
 	std::future<std::shared_ptr<httplib::Response>> future_response;
 	netcode_socket_t socket;
 
+	std::future<std::vector<netcode_address_t>> future_official_addresses;
+
 	nat_puncher_client nat;
 
 	bool refresh_op_in_progress() const {
-		return future_response.valid() || nat.is_resolving_host();
+		return future_official_addresses.valid() || future_response.valid() || nat.is_resolving_host();
 	}
 };
 
@@ -80,6 +82,30 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	auto& http_opt = data->http;
 
 	data->nat.resolve_relay_host(in.nat_punch_provider);
+
+	data->future_official_addresses = launch_async(
+		[addresses=in.official_arena_servers]() {
+			std::vector<netcode_address_t> result_addresses;
+
+			LOG("Resolving %x official arena hosts for the server list.", addresses.size());
+
+			for (const auto& a : addresses) {
+				address_and_port in;
+
+				in.address = a;
+				in.default_port = 0;
+
+				const auto result = resolve_address(in);
+				result.report();
+
+				if (result.result == resolve_result_type::OK) {
+					result_addresses.push_back(result.addr);
+				}
+			}
+
+			return result_addresses;
+		}
+	);
 
 	data->future_response = launch_async(
 		[&http_opt, address = in.server_list_provider]() -> std::shared_ptr<Response> {
@@ -478,6 +504,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		handle_response(data->future_response.get());
 	}
 
+	if (valid_and_is_ready(data->future_official_addresses)) {
+		official_server_addresses = data->future_official_addresses.get();
+	}
+
 	thread_local ImGuiTextFilter filter;
 
 	filter.Draw();
@@ -507,7 +537,10 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				local_server_list.push_back(&s);
 			}
 			else {
-				if (found_in(official_server_addresses, s.address)) {
+				auto searched_official_addr = s.address;
+				searched_official_addr.port = 0;
+
+				if (found_in(official_server_addresses, searched_official_addr)) {
 					official_server_list.push_back(&s);
 				}
 				else {
