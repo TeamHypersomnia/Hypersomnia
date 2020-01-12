@@ -201,6 +201,48 @@ client_adapter::client_adapter(const std::optional<port_type> preferred_binding_
 std::optional<unsigned long> get_trailing_number(const std::string& s);
 std::string cut_trailing_number(const std::string& s);
 
+netcode_address_t to_netcode_addr(sockaddr_in* addr_ipv4) {
+	netcode_address_t out;
+	out.type = NETCODE_ADDRESS_IPV4;
+
+	out.data.ipv4[0] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x000000FF ) );
+	out.data.ipv4[1] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x0000FF00 ) >> 8 );
+	out.data.ipv4[2] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x00FF0000 ) >> 16 );
+	out.data.ipv4[3] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0xFF000000 ) >> 24 );
+
+	out.port = ntohs( addr_ipv4->sin_port );
+
+	return out;
+}
+
+netcode_address_t to_netcode_addr(sockaddr_in6* addr_ipv6) {
+	netcode_address_t out;
+	out.type = NETCODE_ADDRESS_IPV6;
+
+	int i;
+
+	for ( i = 0; i < 8; ++i )
+	{
+		out.data.ipv6[i] = ntohs( ( (uint16_t*) &addr_ipv6->sin6_addr ) [i] );
+	}
+
+	out.port = ntohs( addr_ipv6->sin6_port );
+
+	return out;
+}
+
+std::optional<netcode_address_t> to_netcode_addr(addrinfo* p) {
+	if (p->ai_family == AF_INET) {
+		return to_netcode_addr((struct sockaddr_in *)p->ai_addr);
+
+	} 
+	else if (p->ai_family == AF_INET6) { 
+		return to_netcode_addr((struct sockaddr_in6 *)p->ai_addr);
+	}
+
+	return std::nullopt;
+}
+
 std::optional<netcode_address_t> hostname_to_netcode_address_t(const std::string& hostname, bool accept_ip4, bool accept_ip6) {
 	struct addrinfo hints, *res, *p;
 	int status;
@@ -216,35 +258,21 @@ std::optional<netcode_address_t> hostname_to_netcode_address_t(const std::string
 	std::optional<netcode_address_t> from;
 
 	for (p = res;p != NULL; p = p->ai_next) {
-		if (p->ai_family == AF_INET) {
-			struct sockaddr_in *addr_ipv4 = (struct sockaddr_in *)p->ai_addr;
+		const auto out = to_netcode_addr(p);
 
-			if (accept_ip4) {
-				from.emplace();
-				from->type = NETCODE_ADDRESS_IPV4;
-				from->data.ipv4[0] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x000000FF ) );
-				from->data.ipv4[1] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x0000FF00 ) >> 8 );
-				from->data.ipv4[2] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0x00FF0000 ) >> 16 );
-				from->data.ipv4[3] = (uint8_t) ( ( addr_ipv4->sin_addr.s_addr & 0xFF000000 ) >> 24 );
-				from->port = ntohs( addr_ipv4->sin_port );
-			}
-		} 
-		else { 
-			struct sockaddr_in6 *addr_ipv6 = (struct sockaddr_in6 *)p->ai_addr;
-
-			if (accept_ip6) {
-				from.emplace();
-				from->type = NETCODE_ADDRESS_IPV6;
-				int i;
-				for ( i = 0; i < 8; ++i )
-				{
-					from->data.ipv6[i] = ntohs( ( (uint16_t*) &addr_ipv6->sin6_addr ) [i] );
-				}
-				from->port = ntohs( addr_ipv6->sin6_port );
-			}
+		if (out == std::nullopt) {
+			continue;
 		}
 
-		if (from != std::nullopt) {
+		if (accept_ip4 && out->type == NETCODE_ADDRESS_IPV4) 
+		{
+			from = out;
+			break;
+		}
+
+		if (accept_ip6 && out->type == NETCODE_ADDRESS_IPV6) 
+		{
+			from = out;
 			break;
 		}
 	}
@@ -362,6 +390,48 @@ resolve_address_result resolve_address(const address_and_port& in) {
 	out.addr = *resolved_net_addr;
 
 	return out;
+}
+
+std::optional<netcode_address_t> get_internal_network_address() {
+	const char* google_dns_server = "8.8.8.8";
+	int dns_port = 53;
+
+	struct sockaddr_in serv;
+	int sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+	if (sock < 0)
+	{
+		return std::nullopt;
+	}
+
+	memset(&serv, 0, sizeof(serv));
+	serv.sin_family = AF_INET;
+	serv.sin_addr.s_addr = inet_addr(google_dns_server);
+	serv.sin_port = htons(dns_port);
+
+	int err = connect(sock, (const struct sockaddr*)&serv, sizeof(serv));
+
+	if (err < 0)
+	{
+		return std::nullopt;
+	}
+
+	struct sockaddr_in name;
+	socklen_t namelen = sizeof(name);
+	err = getsockname(sock, (struct sockaddr*)&name, &namelen);
+
+	if (err < 0)
+	{
+		return std::nullopt;
+	}
+
+	close(sock);
+
+	return to_netcode_addr(&name);
+}
+
+std::future<std::optional<netcode_address_t>> async_get_internal_network_address() {
+	return launch_async([]() { return get_internal_network_address(); });
 }
 
 resolve_address_result client_adapter::connect(const address_and_port& in) {
