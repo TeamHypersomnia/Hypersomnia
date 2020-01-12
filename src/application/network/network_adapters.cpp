@@ -425,7 +425,13 @@ std::optional<netcode_address_t> get_internal_network_address() {
 		return std::nullopt;
 	}
 
+	#if NETCODE_PLATFORM == NETCODE_PLATFORM_MAC || NETCODE_PLATFORM == NETCODE_PLATFORM_UNIX
 	close(sock);
+	#elif NETCODE_PLATFORM == NETCODE_PLATFORM_WINDOWS
+	closesocket(sock);
+	#else
+	#error unsupported platform
+	#endif
 
 	return to_netcode_addr(&name);
 }
