@@ -177,6 +177,37 @@ server_list_entry* browse_servers_gui_state::find_by_internal_network_address(co
 	return nullptr;
 }
 
+static bool is_internal(const netcode_address_t& address) {
+	if (address.type == NETCODE_ADDRESS_IPV4) {
+		auto ip = address.data.ipv4;
+
+		if (ip[0] == 127) {
+			return true;
+		}
+
+		if (ip[0] == 10) {
+			return true;
+		}
+
+		if (ip[0] == 172) {
+			if (ip[1] >= 16) {
+				if (ip[2] <= 31) {
+					return true;
+				}
+			}
+		}
+
+		if (ip[0] == 192) {
+			if (ip[1] == 168) {
+				return true;
+			}
+		}
+	}
+
+	// TODO
+	return false;
+}
+
 void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_input in) {
 	if (in.nat_puncher_socket == nullptr) {
 		return;
@@ -275,7 +306,11 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			--packets_left;
 
 			const auto& internal_address = s.data.internal_network_address;
-			const bool maybe_reachable_internally = behind_nat && internal_address != std::nullopt;
+			const bool maybe_reachable_internally = 
+				behind_nat
+				&& internal_address != std::nullopt
+				&& is_internal(*internal_address)
+			;
 
 			if (maybe_reachable_internally) {
 				send_ping_request(udp_socket, *internal_address, p.ping_sequence);
