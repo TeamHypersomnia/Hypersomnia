@@ -66,6 +66,9 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 	void perform(const server_list_entry&);
 };
 
+struct resolve_address_result;
+using official_addrs = std::vector<resolve_address_result>;
+
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
 	std::unique_ptr<browse_servers_gui_internal> data;
 
@@ -83,7 +86,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	std::vector<server_list_entry> server_list;
 
 	server_list_entry selected_server;
-	std::vector<netcode_address_t> official_server_addresses;
+	official_addrs official_server_addresses;
 
 	server_details_gui_state server_details = std::string("Server details");
 
@@ -100,6 +103,8 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	server_list_entry* find(const netcode_address_t&);
 	server_list_entry* find_by_internal_network_address(const netcode_address_t&, uint64_t ping_sequence);
+
+	const resolve_address_result* find_resolved_official(const netcode_address_t&);
 
 public:
 

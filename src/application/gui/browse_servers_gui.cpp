@@ -49,7 +49,7 @@ struct browse_servers_gui_internal {
 	std::future<std::shared_ptr<httplib::Response>> future_response;
 	netcode_socket_t socket;
 
-	std::future<std::vector<netcode_address_t>> future_official_addresses;
+	std::future<official_addrs> future_official_addresses;
 
 	nat_puncher_client nat;
 
@@ -85,7 +85,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	data->future_official_addresses = launch_async(
 		[addresses=in.official_arena_servers]() {
-			std::vector<netcode_address_t> result_addresses;
+			official_addrs results;
 
 			LOG("Resolving %x official arena hosts for the server list.", addresses.size());
 
@@ -99,11 +99,11 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 				result.report();
 
 				if (result.result == resolve_result_type::OK) {
-					result_addresses.push_back(result.addr);
+					results.emplace_back(result);
 				}
 			}
 
-			return result_addresses;
+			return results;
 		}
 	);
 
@@ -449,6 +449,22 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 
 bool successful(const int http_status_code);
 
+const resolve_address_result* browse_servers_gui_state::find_resolved_official(const netcode_address_t& n) {
+	for (const auto& o : official_server_addresses) {
+		auto compared_for_officiality = o.addr;
+		compared_for_officiality.port = 0;
+
+		auto candidate = n;
+		candidate.port = 0;
+
+		if (candidate == compared_for_officiality) {
+			return &o;
+		}
+	}
+
+	return nullptr;
+}
+
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	if (!show) {
 		return false;
@@ -557,12 +573,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			push_if_passes(local_server_list);
 		}
 		else {
-			auto searched_official_addr = s.address;
-			searched_official_addr.port = 0;
-
-			if (found_in(official_server_addresses, searched_official_addr)) {
+			if (const auto resolved = find_resolved_official(s.address)) {
 				has_official_servers = true;
 				push_if_passes(official_server_list);
+
+				if (std::string(name) == "Player's server") {
+					s.data.server_name = resolved->host;
+				}
 			}
 			else {
 				has_community_servers = true;
