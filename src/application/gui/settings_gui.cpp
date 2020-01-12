@@ -992,7 +992,7 @@ void settings_gui_state::perform(
 						auto& scope_cfg = config.editor.test_scene;
 						
 						revertable_slider(SCOPE_CFG_NVP(scene_tickrate), 10u, 300u);
-						revertable_checkbox(SCOPE_CFG_NVP(start_bomb_mode));
+						revertable_checkbox(SCOPE_CFG_NVP(start_bomb_defusal));
 					}
 				}	
 				

@@ -7,7 +7,7 @@
 class cosmos;
 class loaded_image_caches_map;
 struct test_mode_ruleset;
-struct bomb_mode_ruleset;
+struct bomb_defusal_ruleset;
 
 namespace test_scenes {
 	class minimal_scene {
@@ -23,6 +23,6 @@ namespace test_scenes {
 		}
 
 		void setup(test_mode_ruleset&);
-		void setup(bomb_mode_ruleset&);
+		void setup(bomb_defusal_ruleset&);
 	};
 }

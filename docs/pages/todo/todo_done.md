@@ -1249,7 +1249,7 @@ we consider whole type overrides too complex architeciturally:
 
 - 3 magazine slots on torso so we don't have to buy backpack for some already viable setups
 
-- bomb_mode is inherently two-faction, rules don't make sense for three
+- bomb_defusal is inherently two-faction, rules don't make sense for three
 	- but both factions can have bombs, why not! Let's code a generalization straight away.
 		- actually, let's not do this for now
 		- calculate the bombing faction by finding the first bombsite marker

@@ -17,7 +17,7 @@ struct intercosm_path_op {
 struct test_scene_settings;
 
 struct test_mode_ruleset;
-struct bomb_mode_ruleset;
+struct bomb_defusal_ruleset;
 
 void post_load_state_correction(
 	cosmos_common_significant&,
@@ -34,7 +34,7 @@ struct intercosm {
 		sol::state&, 
 		test_scene_settings,
 		test_mode_ruleset&,
-		bomb_mode_ruleset* = nullptr
+		bomb_defusal_ruleset* = nullptr
 	);
 
 	void load_from_bytes(const intercosm_paths&);

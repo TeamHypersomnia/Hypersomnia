@@ -2,7 +2,7 @@
 #include <variant>
 #include <unordered_map>
 #include "game/modes/test_mode.h"
-#include "game/modes/bomb_mode.h"
+#include "game/modes/bomb_defusal.h"
 
 #include "augs/templates/per_type.h"
 #include "augs/templates/type_in_list_id.h"
@@ -10,7 +10,7 @@
 #include "augs/templates/list_utils.h"
 
 using all_online_modes = type_list<
-	bomb_mode
+	bomb_defusal
 >;
 
 using rest_of_modes = type_list<

@@ -36,7 +36,7 @@
 
 #include "test_scenes/scenes/test_scene_node.h"
 #include "game/modes/test_mode.h"
-#include "game/modes/bomb_mode.h"
+#include "game/modes/bomb_defusal.h"
 #include "game/detail/inventory/generate_equipment.h"
 
 namespace test_scenes {
@@ -52,7 +52,7 @@ namespace test_scenes {
 		fill_range(rs.initial_eq.spells_to_give, true);
 	}
 
-	void testbed::setup(bomb_mode_ruleset& rs) {
+	void testbed::setup(bomb_defusal_ruleset& rs) {
 		rs.bot_names = {
 			"daedalus lkjgfdskl kljf8394833",
 			"icarus",
@@ -215,7 +215,7 @@ namespace test_scenes {
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::BOMB_MODE_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
+				create(test_point_markers::BOMB_DEFUSAL_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
 			}
 		}
 
@@ -228,7 +228,7 @@ namespace test_scenes {
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::BOMB_MODE_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
+				create(test_point_markers::BOMB_DEFUSAL_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
 			}
 		}
 

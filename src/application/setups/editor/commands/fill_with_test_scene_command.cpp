@@ -40,7 +40,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	view_ids = {};
 
 	test_mode_ruleset test_ruleset;
-	bomb_mode_ruleset bomb_ruleset;
+	bomb_defusal_ruleset bomb_ruleset;
 
 #if !IS_PRODUCTION_BUILD
 	bomb_ruleset.warmup_secs = 0;
@@ -61,13 +61,13 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	auto& player_id = view.local_player_id;
 
-	const bool pick_bomb_mode = settings.start_bomb_mode && !minimal;
+	const bool pick_bomb_defusal = settings.start_bomb_defusal && !minimal;
 
 	{
 		const auto test_ruleset_id = raw_ruleset_id(0);
 		all.get_for<test_mode>().try_emplace(test_ruleset_id, std::move(test_ruleset));
 
-		if (!pick_bomb_mode) {
+		if (!pick_bomb_defusal) {
 			const auto arbitrary_player_id = mode_player_id::first();
 			player_id = arbitrary_player_id;
 
@@ -82,15 +82,15 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	{
 		const auto bomb_ruleset_id = raw_ruleset_id(0);
-		all.get_for<bomb_mode>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));
+		all.get_for<bomb_defusal>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));
 
-		if (pick_bomb_mode) {
+		if (pick_bomb_defusal) {
 			const auto arbitrary_player_id = mode_player_id::first();
 			player_id = arbitrary_player_id;
 
 			auto& def = rulesets.meta.playtest_default;
 
-			def.type_id.set<bomb_mode>();
+			def.type_id.set<bomb_defusal>();
 			def.raw = bomb_ruleset_id;
 
 			rulesets.meta.server_default = def;

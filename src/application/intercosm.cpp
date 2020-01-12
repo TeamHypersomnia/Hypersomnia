@@ -19,7 +19,7 @@
 #include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/byte_file.h"
 
-#include "game/modes/bomb_mode.h"
+#include "game/modes/bomb_defusal.h"
 #include "game/modes/test_mode.h"
 
 static_assert(has_introspect_base_v<const entity_solvable<const controlled_character>>);
@@ -42,7 +42,7 @@ void intercosm::make_test_scene(
 	sol::state& lua, 
 	const test_scene_settings settings,
 	test_mode_ruleset& test_mode,
-	bomb_mode_ruleset* const bomb_mode
+	bomb_defusal_ruleset* const bomb_defusal
 ) {
 	clear();
 
@@ -66,8 +66,8 @@ void intercosm::make_test_scene(
 			return changer_callback_result::REFRESH;
 		});
 
-		if (bomb_mode) {
-			bomb_mode->speeds.tickrate = settings.scene_tickrate;
+		if (bomb_defusal) {
+			bomb_defusal->speeds.tickrate = settings.scene_tickrate;
 		}
 
 		populator.populate_with_entities(caches, { world, {}, solve_settings() });
@@ -81,8 +81,8 @@ void intercosm::make_test_scene(
 
 		populator.setup(test_mode);
 
-		if (bomb_mode != nullptr) {
-			populator.setup(*bomb_mode);
+		if (bomb_defusal != nullptr) {
+			populator.setup(*bomb_defusal);
 		}
 
 		snap_interpolated_to_logical(world);
@@ -98,7 +98,7 @@ void intercosm::make_test_scene(
 	(void)lua;
 	(void)settings;
 	(void)test_mode;
-	(void)bomb_mode;
+	(void)bomb_defusal;
 #endif
 }
 

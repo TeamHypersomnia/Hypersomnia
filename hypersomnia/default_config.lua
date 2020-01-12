@@ -282,7 +282,7 @@ return {
     },
     test_scene = {
       scene_tickrate = 60,
-      start_bomb_mode = true
+      start_bomb_defusal = true
     },
     camera = {
       panning_speed = 1

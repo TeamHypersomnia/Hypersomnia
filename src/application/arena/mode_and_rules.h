@@ -5,7 +5,7 @@
 template <class VariantType>
 struct basic_mode_and_rules {
 	// GEN INTROSPECTOR struct basic_mode_and_rules class VariantType
-	VariantType state = bomb_mode();
+	VariantType state = bomb_defusal();
 	raw_ruleset_id rules_id = raw_ruleset_id();
 	// END GEN INTROSPECTOR
 

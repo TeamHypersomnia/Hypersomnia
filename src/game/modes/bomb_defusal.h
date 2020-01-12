@@ -24,15 +24,15 @@
 class cosmos;
 struct cosmos_solvable_significant;
 
-struct bomb_mode_faction_rules {
-	// GEN INTROSPECTOR struct bomb_mode_faction_rules
+struct bomb_defusal_faction_rules {
+	// GEN INTROSPECTOR struct bomb_defusal_faction_rules
 	requested_equipment initial_eq;
 	requested_equipment warmup_initial_eq;
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_economy_rules {
-	// GEN INTROSPECTOR struct bomb_mode_economy_rules
+struct bomb_defusal_economy_rules {
+	// GEN INTROSPECTOR struct bomb_defusal_economy_rules
 	money_type initial_money = 2000;
 	money_type maximum_money = 20000;
 	money_type warmup_initial_money = 20000;
@@ -55,19 +55,19 @@ struct bomb_mode_economy_rules {
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_view_rules : arena_mode_view_rules {
+struct bomb_defusal_view_rules : arena_mode_view_rules {
 	using base = arena_mode_view_rules;
 	using introspect_base = base;
 	using theme_flavour_type = base::theme_flavour_type;
 
-	// GEN INTROSPECTOR struct bomb_mode_view_rules
+	// GEN INTROSPECTOR struct bomb_defusal_view_rules
 	theme_flavour_type bomb_soon_explodes_theme;
 	unsigned secs_until_detonation_to_start_theme = 10;
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_ruleset {
-	// GEN INTROSPECTOR struct bomb_mode_ruleset
+struct bomb_defusal_ruleset {
+	// GEN INTROSPECTOR struct bomb_defusal_ruleset
 	std::string name = "Unnamed bomb mode ruleset";
 
 	std::vector<entity_name_str> bot_names;
@@ -91,7 +91,7 @@ struct bomb_mode_ruleset {
 	unsigned match_summary_seconds = 15;
 	unsigned game_commencing_seconds = 3;
 	meter_value_type minimal_damage_for_assist = 41;
-	per_actual_faction<bomb_mode_faction_rules> factions;
+	per_actual_faction<bomb_defusal_faction_rules> factions;
 
 	constrained_entity_flavour_id<invariants::explosive, invariants::hand_fuse> bomb_flavour;
 	bool delete_lying_items_on_round_start = false;
@@ -107,8 +107,8 @@ struct bomb_mode_ruleset {
 	bool enable_item_shop = true;
 	bool warmup_enable_item_shop = false;
 
-	bomb_mode_economy_rules economy;
-	bomb_mode_view_rules view;
+	bomb_defusal_economy_rules economy;
+	bomb_defusal_view_rules view;
 
 	augs::speed_vars speeds;
 	augs::maybe<sentience_shake_settings> override_shake;
@@ -120,8 +120,8 @@ struct bomb_mode_ruleset {
 	}
 };
 
-struct bomb_mode_faction_state {
-	// GEN INTROSPECTOR struct bomb_mode_faction_state
+struct bomb_defusal_faction_state {
+	// GEN INTROSPECTOR struct bomb_defusal_faction_state
 	unsigned current_spawn_index = 0;
 	unsigned score = 0;
 	unsigned consecutive_losses = 0;
@@ -142,8 +142,8 @@ struct arena_mode_player_round_state {
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_player_stats {
-	// GEN INTROSPECTOR struct bomb_mode_player_stats
+struct bomb_defusal_player_stats {
+	// GEN INTROSPECTOR struct bomb_defusal_player_stats
 	money_type money = 0;
 
 	int knockouts = 0;
@@ -161,21 +161,21 @@ struct bomb_mode_player_stats {
 	int calc_score() const;
 };
 
-struct bomb_mode_player {
-	// GEN INTROSPECTOR struct bomb_mode_player
+struct bomb_defusal_player {
+	// GEN INTROSPECTOR struct bomb_defusal_player
 	player_session_data session;
 	entity_id controlled_character_id;
 	rgba assigned_color = rgba::zero;
-	bomb_mode_player_stats stats;
+	bomb_defusal_player_stats stats;
 	uint32_t round_when_chosen_faction = static_cast<uint32_t>(-1); 
 	bool is_bot = false;
 	// END GEN INTROSPECTOR
 
-	bomb_mode_player(const entity_name_str& chosen_name = {}) {
+	bomb_defusal_player(const entity_name_str& chosen_name = {}) {
 		session.chosen_name = chosen_name;
 	}
 
-	bool operator<(const bomb_mode_player& b) const;
+	bool operator<(const bomb_defusal_player& b) const;
 
 	bool is_set() const;
 
@@ -208,14 +208,14 @@ enum class arena_mode_state {
 
 using cosmos_clock = augs::stepped_clock;
 
-using bomb_mode_win = arena_mode_win;
-using bomb_mode_knockout = arena_mode_knockout;
-using bomb_mode_knockouts_vector = arena_mode_knockouts_vector;
+using bomb_defusal_win = arena_mode_win;
+using bomb_defusal_knockout = arena_mode_knockout;
+using bomb_defusal_knockouts_vector = arena_mode_knockouts_vector;
 
-struct bomb_mode_round_state {
-	// GEN INTROSPECTOR struct bomb_mode_round_state
+struct bomb_defusal_round_state {
+	// GEN INTROSPECTOR struct bomb_defusal_round_state
 	bool cache_players_frozen = false;
-	bomb_mode_win last_win;
+	bomb_defusal_win last_win;
 	arena_mode_knockouts_vector knockouts;
 	mode_player_id bomb_planter;
 	// END GEN INTROSPECTOR
@@ -228,9 +228,9 @@ enum class round_start_type {
 
 struct editor_property_accessors;
 
-class bomb_mode {
+class bomb_defusal {
 public:
-	using ruleset_type = bomb_mode_ruleset;
+	using ruleset_type = bomb_defusal_ruleset;
 	static constexpr bool needs_initial_signi = true;
 	static constexpr bool round_based = true;
 
@@ -288,7 +288,7 @@ public:
 	bool is_halfway_round(const_input) const;
 	bool is_final_round(const_input) const;
 
-	bomb_mode_player_stats* stats_of(const mode_player_id&);
+	bomb_defusal_player_stats* stats_of(const mode_player_id&);
 
 private:
 	struct transferred_inventory {
@@ -402,21 +402,21 @@ private:
 
 	void post_award(input, mode_player_id, money_type amount);
 
-	bomb_mode_player* find_player_by(const entity_name_str& chosen_name);
-	bomb_mode_player* find(const mode_player_id&);
+	bomb_defusal_player* find_player_by(const entity_name_str& chosen_name);
+	bomb_defusal_player* find(const mode_player_id&);
 
 	template <class C, class F>
 	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
-	// GEN INTROSPECTOR class bomb_mode
+	// GEN INTROSPECTOR class bomb_defusal
 	unsigned rng_seed_offset = 0;
 
 	entity_id bomb_entity;
 	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
-	per_actual_faction<bomb_mode_faction_state> factions;
-	std::map<mode_player_id, bomb_mode_player> players;
-	bomb_mode_round_state current_round;
+	per_actual_faction<bomb_defusal_faction_state> factions;
+	std::map<mode_player_id, bomb_defusal_player> players;
+	bomb_defusal_round_state current_round;
 
 	bool should_commence_when_ready = false;
 	real32 commencing_timer_ms = -1.f;
@@ -472,10 +472,10 @@ public:
 
 	unsigned get_score(faction_type) const;
 
-	const bomb_mode_player* find_player_by(const entity_name_str& chosen_name) const;
-	const bomb_mode_player* find(const mode_player_id&) const;
+	const bomb_defusal_player* find_player_by(const entity_name_str& chosen_name) const;
+	const bomb_defusal_player* find(const mode_player_id&) const;
 
-	const bomb_mode_player* find(const session_id_type&) const;
+	const bomb_defusal_player* find(const session_id_type&) const;
 	mode_player_id lookup(const session_id_type&) const;
 
 	template <class F>

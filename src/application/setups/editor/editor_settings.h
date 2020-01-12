@@ -50,7 +50,7 @@ struct editor_grid_settings {
 struct editor_test_scene_settings {
 	// GEN INTROSPECTOR struct editor_test_scene_settings
 	unsigned scene_tickrate = 144;
-	bool start_bomb_mode = false; 
+	bool start_bomb_defusal = false; 
 	// END GEN INTROSPECTOR
 };
 

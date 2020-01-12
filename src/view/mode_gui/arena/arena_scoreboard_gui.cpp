@@ -4,7 +4,7 @@
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/modes/bomb_mode.hpp"
+#include "game/modes/bomb_defusal.hpp"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_lua_table.h"
 #include "game/modes/mode_helpers.h"
@@ -281,7 +281,7 @@ void arena_scoreboard_gui::draw_gui(
 
 		const auto& cosm = mode_input.cosm;
 
-		std::vector<std::pair<bomb_mode_player, mode_player_id>> sorted_players;
+		std::vector<std::pair<bomb_defusal_player, mode_player_id>> sorted_players;
 
 		typed_mode.for_each_player_in(faction, [&](
 			const auto& id, 
@@ -690,7 +690,7 @@ void arena_scoreboard_gui::draw_gui(
 	{
 		const auto faction = faction_type::SPECTATOR;
 
-		std::vector<std::pair<bomb_mode_player, mode_player_id>> sorted_players;
+		std::vector<std::pair<bomb_defusal_player, mode_player_id>> sorted_players;
 
 		typed_mode.for_each_player_in(faction, [&](
 			const auto& id, 
@@ -740,6 +740,6 @@ template void arena_scoreboard_gui::draw_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&, 
 
-	const bomb_mode& mode, 
-	const typename bomb_mode::const_input&
+	const bomb_defusal& mode, 
+	const typename bomb_defusal::const_input&
 ) const;

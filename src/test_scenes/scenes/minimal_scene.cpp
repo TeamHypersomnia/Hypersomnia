@@ -17,7 +17,7 @@
 #include "view/viewables/image_cache.h"
 
 #include "test_scenes/scenes/test_scene_node.h"
-#include "game/modes/bomb_mode.h"
+#include "game/modes/bomb_defusal.h"
 #include "augs/math/cascade_aligner.h"
 #include "game/modes/test_mode.h"
 
@@ -27,7 +27,7 @@ namespace test_scenes {
 		rs.name = "Minimal test ruleset";
 	}
 
-	void minimal_scene::setup(bomb_mode_ruleset& rs) {
+	void minimal_scene::setup(bomb_defusal_ruleset& rs) {
 		rs.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
 
 		rs.player_colors = {
@@ -132,7 +132,7 @@ namespace test_scenes {
 
 		//give_weapon(transformr(), test_shootable_weapons::BILMER2000);
 
-		create(test_point_markers::BOMB_MODE_SPAWN, transformr()).set_associated_faction(faction_type::METROPOLIS);
+		create(test_point_markers::BOMB_DEFUSAL_SPAWN, transformr()).set_associated_faction(faction_type::METROPOLIS);
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}

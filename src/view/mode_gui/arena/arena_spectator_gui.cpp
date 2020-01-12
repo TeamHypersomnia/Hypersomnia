@@ -4,7 +4,7 @@
 #include "augs/gui/text/printer.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/modes/bomb_mode.hpp"
+#include "game/modes/bomb_defusal.hpp"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_lua_table.h"
 #include "game/modes/mode_helpers.h"
@@ -362,13 +362,13 @@ template void arena_spectator_gui::draw_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&, 
 
-	const bomb_mode& mode, 
-	const typename bomb_mode::const_input&
+	const bomb_defusal& mode, 
+	const typename bomb_defusal::const_input&
 ) const;
 
 template void arena_spectator_gui::advance(
 	const mode_player_id& local_player,
-	const bomb_mode& mode, 
-	const typename bomb_mode::const_input& in,
+	const bomb_defusal& mode, 
+	const typename bomb_defusal::const_input& in,
 	bool demo_replay_mode
 );

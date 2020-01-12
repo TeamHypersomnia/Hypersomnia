@@ -1,7 +1,7 @@
 #pragma once
 #include "game/modes/mode_player_id.h"
 #include "game/modes/arena_player_order.h"
-#include "game/modes/bomb_mode.h"
+#include "game/modes/bomb_defusal.h"
 #include "application/app_intent_type.h"
 #include "augs/misc/timing/timer.h"
 

@@ -253,7 +253,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_point_markers::BOMB_MODE_SPAWN);
+			auto& meta = get_test_flavour(flavours, test_point_markers::BOMB_DEFUSAL_SPAWN);
 			invariants::point_marker marker;
 			marker.type = point_marker_type::TEAM_SPAWN;
 
