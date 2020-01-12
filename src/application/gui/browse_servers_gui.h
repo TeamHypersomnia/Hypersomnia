@@ -33,6 +33,10 @@ struct nat_progress {
 	server_entry_state state = server_entry_state::AWAITING_RESPONSE;
 
 	bool found_on_internal_network = false;
+
+	void set_ping_from(const net_time_t current_time) {
+		ping = static_cast<int>((current_time - when_sent_last_ping) * 1000);
+	}
 };
 
 struct server_list_entry {
@@ -92,6 +96,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	bool only_responding = false;
 	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
+	augs::maybe<int> at_most_ping = augs::maybe<int>(100, false);
 
 	int sort_by_column = 0;
 	bool ascending = true;

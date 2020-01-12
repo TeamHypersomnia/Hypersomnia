@@ -230,7 +230,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 					}
 					else if (sequence == progress.ping_sequence) {
 						BRW_LOG("Sequence matches!");
-						progress.ping = static_cast<int>(current_time - progress.when_sent_last_ping);
+						progress.set_ping_from(current_time);
 						progress.state = server_entry_state::PING_MEASURED;
 					}
 				}
@@ -241,7 +241,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 					BRW_LOG("Found a server on the internal network! Sequence: %", sequence);
 					BRW_LOG("Sequence matches!");
 
-					progress.ping = static_cast<int>(current_time - progress.when_sent_last_ping);
+					progress.set_ping_from(current_time);
 					progress.state = server_entry_state::PING_MEASURED;
 					progress.found_on_internal_network = true;
 				}
@@ -559,6 +559,12 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				}
 			}
 
+			if (at_most_ping.is_enabled) {
+				if (s.progress.ping > at_most_ping.value) {
+					return;
+				}
+			}
+
 			if (!filter.PassFilter(effective_name.c_str())) {
 				return;
 			}
@@ -836,6 +842,22 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			auto input = std::to_string(val);
 			input_text(val == 1 ? "player###numbox" : "players###numbox", input);
 			val = std::clamp(std::atoi(input.c_str()), 1, int(max_incoming_connections_v));
+		}
+
+
+		ImGui::SameLine();
+
+		checkbox("At most", at_most_ping.is_enabled);
+		
+		{
+			auto& val = at_most_ping.value;
+			auto scoped = maybe_disabled_cols({}, !at_most_ping.is_enabled);
+			auto width = scoped_item_width(ImGui::CalcTextSize("9").x * 5);
+
+			ImGui::SameLine();
+			auto input = std::to_string(val);
+			input_text(val == 1 ? "ping###numbox" : "ping###numbox", input);
+			val = std::clamp(std::atoi(input.c_str()), 0, int(999));
 		}
 
 		{
