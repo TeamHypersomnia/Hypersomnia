@@ -339,10 +339,19 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 	}
 }
 
-void browse_servers_gui_state::show_server_list(const std::vector<server_list_entry*>& server_list) {
+constexpr auto num_columns = 7;
+
+void browse_servers_gui_state::show_server_list(const std::string& label, const std::vector<server_list_entry*>& server_list) {
 	using namespace augs::imgui;
 
 	const auto& style = ImGui::GetStyle();
+
+	if (server_list.empty()) {
+		ImGui::NextColumn();
+		text_disabled(typesafe_sprintf("No %x servers match the applied filters.", label));
+		next_columns(num_columns - 1);
+		return;
+	}
 
 	for (const auto& sp : server_list) {
 		auto id = scoped_id(index_in(server_list, sp));
@@ -512,37 +521,52 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	official_server_list.clear();
 	community_server_list.clear();
 
+	bool has_local_servers = false;
+	bool has_official_servers = false;
+	bool has_community_servers = false;
+
 	for (auto& s : server_list) {
-		if (only_responding) {
-			if (s.progress.ping == -1) {
-				continue;
-			}
-		}
-
-		if (at_least_players.is_enabled) {
-			if (s.data.num_fighting < at_least_players.value) {
-				continue;
-			}
-		}
-
 		const auto& name = s.data.server_name;
 		const auto& arena = s.data.current_arena;
 		const auto effective_name = std::string(name) + " " + std::string(arena);
 
-		if (filter.PassFilter(effective_name.c_str())) {
-			if (s.progress.found_on_internal_network) {
-				local_server_list.push_back(&s);
+		auto push_if_passes = [&](auto& target_list) {
+			if (only_responding) {
+				if (s.progress.ping == -1) {
+					return;
+				}
+			}
+
+			if (at_least_players.is_enabled) {
+				if (s.data.num_fighting < at_least_players.value) {
+					return;
+				}
+			}
+
+			if (!filter.PassFilter(effective_name.c_str())) {
+				return;
+			}
+
+			target_list.push_back(&s);
+		};
+
+		const bool is_internal = s.progress.found_on_internal_network;
+
+		if (is_internal) {
+			has_local_servers = true;
+			push_if_passes(local_server_list);
+		}
+		else {
+			auto searched_official_addr = s.address;
+			searched_official_addr.port = 0;
+
+			if (found_in(official_server_addresses, searched_official_addr)) {
+				has_official_servers = true;
+				push_if_passes(official_server_list);
 			}
 			else {
-				auto searched_official_addr = s.address;
-				searched_official_addr.port = 0;
-
-				if (found_in(official_server_addresses, searched_official_addr)) {
-					official_server_list.push_back(&s);
-				}
-				else {
-					community_server_list.push_back(&s);
-				}
+				has_community_servers = true;
+				push_if_passes(community_server_list);
 			}
 		}
 	}
@@ -654,8 +678,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			return;
 		}
 
-		const auto num_columns = 7;
-
 		ImGui::Columns(num_columns);
 		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9999999").x);
 		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * 80);
@@ -729,22 +751,37 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			ImGui::Separator();
 		};
 
-		if (num_locals > 0) {
+		if (has_local_servers) {
 			do_column_labels(local_servers_label, green);
-			show_server_list(local_server_list);
+			show_server_list("local", local_server_list);
 		}
 
-		if (num_locals == 0) {
+		if (!has_local_servers) {
 			do_column_labels(official_servers_label, yellow);
 		}
 		else {
 			separate_with_label_only(official_servers_label, yellow);
 		}
 
-		show_server_list(official_server_list);
+		if (has_official_servers) {
+			show_server_list("official", official_server_list);
+		}
+		else {
+			ImGui::NextColumn();
+			text_disabled("No official servers are online at the time.");
+			next_columns(num_columns - 1);
+		}
 
 		separate_with_label_only(community_servers_label, orange);
-		show_server_list(community_server_list);
+
+		if (has_community_servers) {
+			show_server_list("community", community_server_list);
+		}
+		else {
+			ImGui::NextColumn();
+			text_disabled("No community servers are online at the time.");
+			next_columns(num_columns - 1);
+		}
 	};
 
 	{
@@ -755,19 +792,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			disable_content_view = true;
 		}
 
-#if 0
-		if (num_filtered_results == 0 && server_list.size() > 0) {
-			text_disabled("No servers match applied filters.");
-		}
-
-		if (server_list.empty()) {
-			if (data->future_response.valid()) {
-				text_disabled("Downloading the server list...");
-			}
-		}
-		else {
-		}
-#endif
 		if (data->future_response.valid()) {
 			text_disabled("Downloading the server list...");
 			disable_content_view = true;

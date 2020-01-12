@@ -69,7 +69,7 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
 	std::unique_ptr<browse_servers_gui_internal> data;
 
-	void show_server_list(const std::vector<server_list_entry*>&);
+	void show_server_list(const std::string& label, const std::vector<server_list_entry*>&);
 	std::optional<netcode_address_t> requested_connection;
 
 	net_time_t when_last_downloaded_server_list = 0;
