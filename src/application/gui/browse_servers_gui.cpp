@@ -654,9 +654,11 @@ void server_details_gui_state::perform(const server_list_entry& entry) {
 		return;
 	}
 
+	const auto& internal_addr = entry.data.internal_network_address;
+
 	auto data = entry.data;
 	auto external_address = ::ToString(entry.address);
-	auto internal_address = ::ToString(entry.data.internal_network_address);
+	auto internal_address = internal_addr ? ::ToString(*internal_addr) : std::string("Unknown yet");
 
 	acquire_keyboard_once();
 	input_text("External IP address", external_address, ImGuiInputTextFlags_ReadOnly);

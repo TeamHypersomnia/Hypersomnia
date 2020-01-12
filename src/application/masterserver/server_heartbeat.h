@@ -16,7 +16,7 @@ struct server_heartbeat {
 	uint8_t num_online;
 	uint8_t max_online;
 
-	netcode_address_t internal_network_address;
+	std::optional<netcode_address_t> internal_network_address;
 	// END GEN INTROSPECTOR
 
 	void validate();

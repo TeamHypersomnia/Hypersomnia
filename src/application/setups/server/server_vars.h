@@ -36,6 +36,8 @@ struct server_vars {
 	unsigned send_heartbeat_to_server_list_once_every_secs = 10;
 	unsigned resolve_server_list_address_once_every_secs = 60;
 
+	unsigned resolve_internal_address_once_every_secs = 60 * 10;
+
 	unsigned kick_if_no_messages_for_secs = 60;
 	unsigned kick_if_away_from_keyboard_for_secs = 240;
 	unsigned time_limit_to_enter_game_since_connection = 10;

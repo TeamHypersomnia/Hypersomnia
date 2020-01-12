@@ -30,6 +30,7 @@
 #include "application/network/resolve_address.h"
 #include "augs/templates/thread_templates.h"
 #include "application/masterserver/masterserver.h"
+#include "augs/network/netcode_utils.h"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -171,6 +172,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	);
 
 	heartbeat.max_online = last_start.max_connections;
+	heartbeat.internal_network_address = internal_address;
 
 	arena.on_mode_with_input(
 		[&heartbeat](const auto& mode, const auto& input) {
@@ -225,6 +227,10 @@ void server_setup::resolve_server_list_if_its_time() {
 		result.report();
 
 		if (result.result == resolve_result_type::OK) {
+			if (result.addr != resolved_server_list_addr) {
+				request_immediate_heartbeat();
+			}
+
 			resolved_server_list_addr = result.addr; 
 		}
 	}
@@ -242,6 +248,46 @@ void server_setup::resolve_server_list_if_its_time() {
 		resolve_server_list();
 		when_last = server_time;
 	}
+}
+
+void server_setup::resolve_internal_address_if_its_time() {
+	if (!server_list_enabled()) {
+		return;
+	}
+
+	if (valid_and_is_ready(future_internal_address)) {
+		auto new_address = future_internal_address.get();
+
+		if (new_address != std::nullopt) {
+			new_address->port = last_start.port;
+
+			if (new_address != internal_address) {
+				request_immediate_heartbeat();
+			}
+
+			internal_address = new_address;
+
+			LOG("Resolved internal network address to be: %x", ::ToString(*new_address));
+		}
+
+		return;
+	}
+
+	auto& when_last = when_last_resolved_internal_address;
+
+	const auto since_last = server_time - when_last;
+	const auto resolve_every = vars.resolve_internal_address_once_every_secs;
+
+	if (internal_address == std::nullopt || since_last >= resolve_every) {
+		LOG("Requesting resolution of internal network address.");
+		future_internal_address = async_get_internal_network_address();
+		when_last = server_time;
+	}
+}
+
+void server_setup::request_immediate_heartbeat() {
+	when_last_sent_heartbeat_to_server_list = 0;
+	LOG("Requesting immediate heartbeat to the server list.");
 }
 
 bool server_setup::has_sent_any_heartbeats() const {

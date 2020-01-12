@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Apparently, clipboard prevents connection to any server...
+	- Because it can't bind the socket
+
+- We'll detect whether the server is internal at the server browser stage.
+	- Because we'll ping both addresses.
+
 - The masterserver should dump entire state before restarting for update
 	- To give servers a chance, set time of last heartbeat to current time after starting up
 

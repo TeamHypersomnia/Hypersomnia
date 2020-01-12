@@ -101,10 +101,14 @@ class server_setup :
 	net_time_t when_last_sent_admin_public_settings = 0;
 	net_time_t when_last_sent_heartbeat_to_server_list = 0;
 	net_time_t when_last_resolved_server_list_addr = 0;
+	net_time_t when_last_resolved_internal_address = 0;
 
 	std::vector<std::byte> heartbeat_buffer;
 	std::future<resolve_address_result> future_resolved_server_list_addr;
 	std::optional<netcode_address_t> resolved_server_list_addr;
+
+	std::future<std::optional<netcode_address_t>> future_internal_address;
+	std::optional<netcode_address_t> internal_address;
 
 	net_time_t server_time = 0.0;
 	bool schedule_shutdown = false;
@@ -144,6 +148,9 @@ private:
 
 	void resolve_server_list();
 	void resolve_server_list_if_its_time();
+	void resolve_internal_address_if_its_time();
+
+	void request_immediate_heartbeat();
 
 	void accept_entropy_of_client(
 		const mode_player_id,
@@ -287,6 +294,7 @@ public:
 				auto scope = measure_scope(profiler.send_packets);
 				send_packets_if_its_time();
 
+				resolve_internal_address_if_its_time();
 				resolve_server_list_if_its_time();
 				send_heartbeat_to_server_list_if_its_time();
 			}
