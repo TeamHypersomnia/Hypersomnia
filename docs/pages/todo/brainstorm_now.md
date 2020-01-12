@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- bomb_mode -> bomb_defusal
+
 - Apparently, clipboard prevents connection to any server...
 	- Because it can't bind the socket
 

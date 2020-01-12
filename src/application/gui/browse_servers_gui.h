@@ -37,7 +37,7 @@ struct nat_progress {
 
 struct server_list_entry {
 	netcode_address_t address;
-	net_time_t appeared_when;
+	double appeared_when;
 	server_heartbeat data;
 
 	nat_progress progress;

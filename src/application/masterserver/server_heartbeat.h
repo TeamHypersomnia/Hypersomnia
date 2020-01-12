@@ -20,4 +20,12 @@ struct server_heartbeat {
 	// END GEN INTROSPECTOR
 
 	void validate();
+
+	int get_num_spectators() const {
+		return num_online - num_fighting;
+	}
+
+	int get_max_spectators() const {
+		return max_online - num_fighting;
+	}
 };

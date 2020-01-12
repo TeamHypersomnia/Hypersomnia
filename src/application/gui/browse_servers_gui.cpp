@@ -424,10 +424,7 @@ void browse_servers_gui_state::show_server_list(const std::vector<server_list_en
 
 		ImGui::NextColumn();
 
-		const auto num_spectators = d.num_online - d.num_fighting;
-		const auto max_spectators = d.max_online - d.num_fighting;
-
-		do_text(typesafe_sprintf("%x/%x", num_spectators, max_spectators));
+		do_text(typesafe_sprintf("%x/%x", d.get_num_spectators(), d.get_max_spectators()));
 
 		ImGui::NextColumn();
 		do_text(d.current_arena);
@@ -523,7 +520,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 
 		if (at_least_players.is_enabled) {
-			if (s.data.num_online < at_least_players.value) {
+			if (s.data.num_fighting < at_least_players.value) {
 				continue;
 			}
 		}
@@ -548,6 +545,98 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				}
 			}
 		}
+	}
+
+	{
+		using T = const server_list_entry*;
+
+		auto by_ping = [](const T& a, const T& b) {
+			return a->progress.ping < b->progress.ping;
+		};
+
+		auto by_name = [](const T& a, const T& b) {
+			return a->data.server_name < b->data.server_name;
+		};
+
+		auto by_mode = [](const T& a, const T& b) {
+			return a->data.game_mode < b->data.game_mode;
+		};
+
+		auto by_players = [](const T& a, const T& b) {
+			return a->data.num_fighting < b->data.num_fighting;
+		};
+
+		auto by_spectators = [](const T& a, const T& b) {
+			return a->data.get_num_spectators() < b->data.get_num_spectators();
+		};
+
+		auto by_arena = [](const T& a, const T& b) {
+			return a->data.current_arena < b->data.current_arena;
+		};
+
+		auto by_appeared = [](const T& a, const T& b) {
+			return a->appeared_when > b->appeared_when;
+		};
+
+		auto make_comparator = [&](auto op1, auto op2, auto op3) {
+			bool asc = ascending;
+
+			return [asc, op1, op2, op3](const T& a, const T& b) {
+				const auto a_less_b = op1(a, b);
+				const auto b_less_a = op1(b, a);
+
+				if (!a_less_b && !b_less_a) {
+					const auto _2_a_less_b = op2(a, b);
+					const auto _2_b_less_a = op2(b, a);
+
+					if (!_2_a_less_b && !_2_b_less_a) {
+						return op3(a, b);
+					}
+
+					return _2_a_less_b;
+				}
+				
+				return asc ? a_less_b : b_less_a;
+			};
+		};
+
+		auto sort_entries = [&]() {
+			const auto c = sort_by_column;
+
+			auto sort_by = [&](auto... cmps) {
+				sort_range(local_server_list, make_comparator(cmps...));
+				sort_range(official_server_list, make_comparator(cmps...));
+				sort_range(community_server_list, make_comparator(cmps...));
+			};
+
+			switch (c) {
+				case 0: 
+					return sort_by(by_ping, by_appeared, by_name);
+
+				case 1: 
+					return sort_by(by_name, by_ping, by_appeared);
+
+				case 2: 
+					return sort_by(by_mode, by_ping, by_appeared);
+
+				case 3: 
+					return sort_by(by_players, by_ping, by_appeared);
+
+				case 4: 
+					return sort_by(by_spectators, by_ping, by_appeared);
+
+				case 5: 
+					return sort_by(by_arena, by_ping, by_appeared);
+
+				case 6: 
+					return sort_by(by_appeared, by_ping, by_players);
+					
+				default:
+					return sort_by(by_ping, by_appeared, by_name);
+			}
+		};
+
+		sort_entries();
 	}
 
 	ImGui::Separator();

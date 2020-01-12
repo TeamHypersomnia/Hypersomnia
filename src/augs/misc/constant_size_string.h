@@ -45,6 +45,11 @@ namespace augs {
 			return !operator==(b);
 		}
 
+		template <unsigned B>
+		bool operator<(const constant_size_string<B>& b) const {
+			return std::strcmp(c_str(), b.c_str()) < 0;
+		}
+
 		const auto* c_str() const {
 			return arr.data();
 		}
