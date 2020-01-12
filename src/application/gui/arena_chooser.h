@@ -9,6 +9,7 @@
 #include "application/setups/editor/property_editor/browsed_path_entry_base.h"
 #include "application/setups/editor/property_editor/widgets/keyboard_acquiring_popup.h"
 #include "view/asset_funcs.h"
+#include "augs/log.h"
 
 class arena_chooser : keyboard_acquiring_popup {
 	using I = std::string;

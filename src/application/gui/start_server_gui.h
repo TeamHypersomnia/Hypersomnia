@@ -5,6 +5,9 @@
 #include "application/setups/server/server_instance_type.h"
 #include "augs/misc/timing/timer.h"
 
+struct server_vars;
+struct server_solvable_vars;
+
 class start_server_gui_state : public standard_window_mixin<start_server_gui_state> {
 public:
 	using base = standard_window_mixin<start_server_gui_state>;
@@ -15,6 +18,8 @@ public:
 	bool show_help = false;
 
 	bool perform(
-		server_start_input& into
+		server_start_input& into,
+		server_vars&,
+		server_solvable_vars&
 	);
 };

@@ -4,11 +4,17 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "augs/misc/imgui/imgui_enum_radio.h"
+#include "application/gui/do_server_vars.h"
+#include "application/setups/server/server_vars.h"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
+void perform_arena_chooser(arena_identifier& current_arena);
+
 bool start_server_gui_state::perform(
-	server_start_input& into
+	server_start_input& into,
+	server_vars& into_vars,
+	server_solvable_vars& into_solvable_vars
 ) {
 	// int field_id = 0;
 
@@ -97,6 +103,9 @@ as well as to test your skills in a laggy environment.
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
 		// auto& scope_cfg = into;
+
+		perform_arena_chooser(into_solvable_vars.current_arena);
+		input_text("Server name", into_vars.server_name);
 
 		input_text<100>("Address (IPv4 or IPv6)", into.ip);
 		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");

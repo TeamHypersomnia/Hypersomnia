@@ -856,13 +856,15 @@ and then hitting Save settings.
 	};
 
 	static auto perform_start_server = []() {
-		if (start_server_gui.perform(config.default_server_start) || server_start_requested) {
+		if (start_server_gui.perform(config.default_server_start, config.server, config.server_solvable) || server_start_requested) {
 			server_start_requested = false;
 
 			change_with_save(
 				[&](auto& cfg) {
 					cfg.default_server_start = config.default_server_start;
 					cfg.client = config.client;
+					cfg.server = config.server;
+					cfg.server_solvable = config.server_solvable;
 				}
 			);
 

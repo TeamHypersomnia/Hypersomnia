@@ -572,7 +572,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		do_column("Players");
 		do_column("Spectators");
 		do_column("Arena");
-		do_column("Created");
+		do_column("First appeared");
 
 		ImGui::Separator();
 
