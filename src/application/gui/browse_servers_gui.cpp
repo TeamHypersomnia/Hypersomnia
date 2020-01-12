@@ -403,7 +403,12 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 			if (ImGui::IsMouseDoubleClicked(0)) {
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", ToString(s.address), d.server_name);
 
-				requested_connection = s.address;
+				if (s.progress.found_on_internal_network) {
+					requested_connection = s.data.internal_network_address;
+				}
+				else {
+					requested_connection = s.address;
+				}
 			}
 		}
 
