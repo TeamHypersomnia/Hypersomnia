@@ -32,7 +32,7 @@ struct nat_progress {
 
 	server_entry_state state = server_entry_state::AWAITING_RESPONSE;
 
-	bool found_in_internal = false;
+	bool found_on_internal_network = false;
 };
 
 struct server_list_entry {
@@ -67,12 +67,17 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
 	std::unique_ptr<browse_servers_gui_internal> data;
 
-	std::optional<netcode_address_t> show_server_list();
+	void show_server_list(const std::vector<server_list_entry*>&);
+	std::optional<netcode_address_t> requested_connection;
 
 	net_time_t when_last_downloaded_server_list = 0;
 
 	std::string error_message;
-	std::vector<server_list_entry*> filtered_server_list;
+
+	std::vector<server_list_entry*> local_server_list;
+	std::vector<server_list_entry*> official_server_list;
+	std::vector<server_list_entry*> community_server_list;
+
 	std::vector<server_list_entry> server_list;
 
 	server_list_entry selected_server;
@@ -92,6 +97,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void refresh_server_pings();
 
 	server_list_entry* find(const netcode_address_t&);
+	server_list_entry* find_by_internal_network_address(const netcode_address_t&, uint64_t ping_sequence);
 
 public:
 

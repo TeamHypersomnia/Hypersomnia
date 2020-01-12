@@ -138,6 +138,18 @@ server_list_entry* browse_servers_gui_state::find(const netcode_address_t& addre
 	return nullptr;
 }
 
+server_list_entry* browse_servers_gui_state::find_by_internal_network_address(const netcode_address_t& address, const uint64_t ping_sequence) {
+	for (auto& s : server_list) {
+		if (s.progress.ping_sequence == ping_sequence) {
+			if (s.data.internal_network_address == address) {
+				return &s;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_input in) {
 	if (in.nat_puncher_socket == nullptr) {
 		return;
@@ -178,10 +190,11 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 
 			if (command == NETCODE_PING_RESPONSE_PACKET) {
 				BRW_LOG("Ping response!");
-				if (const auto entry = find(from)) {
-					uint64_t sequence;
-					std::memcpy(&sequence, packet_buffer + 1, sizeof(uint64_t));
 
+				uint64_t sequence;
+				std::memcpy(&sequence, packet_buffer + 1, sizeof(uint64_t));
+
+				if (const auto entry = find(from)) {
 					auto& progress = entry->progress;
 
 					BRW_LOG("Has entry! Sequence: %x; entry sequence: %x", sequence, progress.ping_sequence);
@@ -194,6 +207,17 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 						progress.ping = static_cast<int>(current_time - progress.when_sent_last_ping);
 						progress.state = server_entry_state::PING_MEASURED;
 					}
+				}
+
+				if (const auto entry = find_by_internal_network_address(from, sequence)) {
+					auto& progress = entry->progress;
+
+					BRW_LOG("Found a server on the internal network! Sequence: %", sequence);
+					BRW_LOG("Sequence matches!");
+
+					progress.ping = static_cast<int>(current_time - progress.when_sent_last_ping);
+					progress.state = server_entry_state::PING_MEASURED;
+					progress.found_on_internal_network = true;
 				}
 			}
 		}
@@ -289,15 +313,13 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 	}
 }
 
-std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
+void browse_servers_gui_state::show_server_list(const std::vector<server_list_entry*>& server_list) {
 	using namespace augs::imgui;
-
-	auto requested_connection = std::optional<netcode_address_t>();
 
 	const auto& style = ImGui::GetStyle();
 
-	for (const auto& sp : filtered_server_list) {
-		auto id = scoped_id(index_in(filtered_server_list, sp));
+	for (const auto& sp : server_list) {
+		auto id = scoped_id(index_in(server_list, sp));
 		const auto& s = *sp;
 		const auto& progress = s.progress;
 		const auto& d = s.data;
@@ -391,8 +413,6 @@ std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 
 		ImGui::NextColumn();
 	}
-
-	return requested_connection;
 }
 
 bool successful(const int http_status_code);
@@ -461,7 +481,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	thread_local ImGuiTextFilter filter;
 
 	filter.Draw();
-	filtered_server_list.clear();
+	local_server_list.clear();
+	official_server_list.clear();
+	community_server_list.clear();
 
 	for (auto& s : server_list) {
 		if (only_responding) {
@@ -481,7 +503,17 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		const auto effective_name = std::string(name) + " " + std::string(arena);
 
 		if (filter.PassFilter(effective_name.c_str())) {
-			filtered_server_list.push_back(&s);
+			if (s.progress.found_on_internal_network) {
+				local_server_list.push_back(&s);
+			}
+			else {
+				if (found_in(official_server_addresses, s.address)) {
+					official_server_list.push_back(&s);
+				}
+				else {
+					community_server_list.push_back(&s);
+				}
+			}
 		}
 	}
 
@@ -491,19 +523,25 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		refresh_server_list(in);
 	}
 
-	auto requested_connection = std::optional<netcode_address_t>();
+	requested_connection = std::nullopt;
 
 	auto do_list_view = [&](bool disable_content_view) {
 		auto child = scoped_child("list view", ImVec2(0, 2 * -(ImGui::GetFrameHeightWithSpacing() + 4)));
 
-
-		const auto num_filtered_results = filtered_server_list.size();
-
-		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", num_filtered_results);
-
 		if (disable_content_view) {
 			return;
 		}
+
+		const auto num_columns = 7;
+
+		ImGui::Columns(num_columns);
+		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9999999").x);
+		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * 80);
+		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("9").x * 30);
+		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Players  9").x);
+		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("Spectators  9").x);
+		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("9").x * (max_arena_name_length_v + 1));
+		ImGui::SetColumnWidth(6, ImGui::CalcTextSize("9").x * 25);
 
 		int current_col = 0;
 
@@ -539,38 +577,53 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			ImGui::NextColumn();
 		};
 
-		ImGui::Columns(7);
-		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9999999").x);
-		ImGui::SetColumnWidth(1, ImGui::CalcTextSize("9").x * 80);
-		ImGui::SetColumnWidth(2, ImGui::CalcTextSize("9").x * 30);
-		ImGui::SetColumnWidth(3, ImGui::CalcTextSize("Players  9").x);
-		ImGui::SetColumnWidth(4, ImGui::CalcTextSize("Spectators  9").x);
-		ImGui::SetColumnWidth(5, ImGui::CalcTextSize("9").x * (max_arena_name_length_v + 1));
-		ImGui::SetColumnWidth(6, ImGui::CalcTextSize("9").x * 25);
+		auto do_column_labels = [&](const auto& with_label, const auto& col) {
+			do_column("Ping");
+			do_column(with_label, col);
+			do_column("Game mode");
+			do_column("Players");
+			do_column("Spectators");
+			do_column("Arena");
+			do_column("First appeared");
 
-		do_column("Ping");
-		do_column(official_servers_label, yellow);
-		do_column("Game mode");
-		do_column("Players");
-		do_column("Spectators");
-		do_column("Arena");
-		do_column("First appeared");
+			ImGui::Separator();
+		};
 
-		ImGui::Separator();
+		const auto num_locals = local_server_list.size();
+		const auto num_officials = official_server_list.size();
+		const auto num_communities = community_server_list.size();
 
-		requested_connection = show_server_list();
+		const auto local_servers_label = typesafe_sprintf("Local servers (%x)", num_locals);
+		const auto official_servers_label = typesafe_sprintf("Official servers (%x)", num_officials);
+		const auto community_servers_label = typesafe_sprintf("Community servers (%x)", num_communities);
 
-		text_disabled("\n\n");
+		auto separate_with_label_only = [&](const auto& label, const auto& color) {
+			text_disabled("\n\n");
 
-		const auto community_servers_label = typesafe_sprintf("Community servers");
-		ImGui::Separator();
-		ImGui::NextColumn();
-		text_color(community_servers_label, orange);
+			ImGui::Separator();
+			ImGui::NextColumn();
+			text_color(label, color);
+			next_columns(num_columns - 1);
+			ImGui::Separator();
+		};
 
-		next_columns(7);
-		ImGui::Separator();
+		if (num_locals > 0) {
+			do_column_labels(local_servers_label, green);
+			show_server_list(local_server_list);
+		}
+
+		if (num_locals == 0) {
+			do_column_labels(official_servers_label, yellow);
+		}
+		else {
+			separate_with_label_only(official_servers_label, yellow);
+		}
+
+		show_server_list(official_server_list);
+
+		separate_with_label_only(community_servers_label, orange);
+		show_server_list(community_server_list);
 	};
-
 
 	{
 		bool disable_content_view = false;
