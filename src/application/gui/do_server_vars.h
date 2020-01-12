@@ -60,7 +60,7 @@ inline void do_server_vars(
 
 	ImGui::Separator();
 
-	revertable_input_text(SCOPE_CFG_NVP(masterserver_address.address));
+	revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
 	revertable_input_text(SCOPE_CFG_NVP(server_name));
 
 	if (auto node = scoped_tree_node("Time limits")) {

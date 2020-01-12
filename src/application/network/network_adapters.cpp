@@ -254,6 +254,14 @@ std::optional<netcode_address_t> hostname_to_netcode_address_t(const std::string
 	return from;
 }
 
+netcode_address_t to_netcode_addr(const std::string& ip, const port_type port) {
+	struct netcode_address_t addr;
+	netcode_parse_address(ip.c_str(), &addr);
+	addr.port = port;
+
+	return addr;
+}
+
 netcode_address_t to_netcode_addr(const yojimbo::Address& t) {
 	using namespace yojimbo;
 

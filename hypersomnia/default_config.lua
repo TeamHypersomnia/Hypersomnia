@@ -618,12 +618,13 @@ return {
   server = {
 	server_name = "${MY_NICKNAME}'s server",
 
-	masterserver_address = {
+	notified_server_list = {
 		address = "masterserver.hypersomnia.xyz",
   		default_port = 8414
 	},
 
-	send_heartbeat_to_masterserver_once_every_secs = 10,
+	send_heartbeat_to_server_list_once_every_secs = 10,
+	resolve_server_list_address_once_every_secs = 60,
     sleep_mult = 0.1,
     log_performance_once_every_secs = 1,
 

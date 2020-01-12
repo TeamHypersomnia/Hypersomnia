@@ -52,6 +52,10 @@ private:
 	}
 public:
 
+	netcode_socket_raii(netcode_address_t address) {
+		bind_to(address);
+	}
+
 	netcode_socket_raii(port_type port) {
 		netcode_address_t address;
 		ensure_eq(NETCODE_OK, netcode_parse_address("0.0.0.0", &address));

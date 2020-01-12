@@ -93,6 +93,10 @@ uint64_t augs::date_time::seconds_ago() const {
 	return static_cast<uint64_t>(std::difftime(std::time(nullptr), t));
 }
 
+double augs::date_time::secs_since_epoch() {
+	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
+
 std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const uint64_t secs) {
 	const auto mins = secs / 60;
 	const auto hrs = mins / 60;

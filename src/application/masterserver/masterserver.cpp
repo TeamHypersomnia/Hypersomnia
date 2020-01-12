@@ -16,6 +16,7 @@
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/time_utils.h"
 #include "augs/readwrite/byte_readwrite.h"
+#include "application/network/resolve_address.h"
 
 std::string ToString(const netcode_address_t&);
 
@@ -44,30 +45,9 @@ struct masterserver_client_meta {
 	double appeared_when;
 
 	masterserver_client_meta() {
-		appeared_when = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		appeared_when = augs::date_time::secs_since_epoch();
 	}
 };
-
-struct nat_punch_request {
-	static uint64_t request_counter;
-
-	explicit nat_punch_request(
-		net_time_t current_time,
-		netcode_address_t client,
-		netcode_address_t server
-	) : when_created(current_time), client(client), server(server)
-	{
-		request_id = request_counter++;
-	}
-
-	net_time_t when_created;
-	uint64_t request_id;
-
-	netcode_address_t client;
-	netcode_address_t server;
-};
-
-uint64_t nat_punch_request::request_counter = 0;
 
 struct masterserver_client {
 	double time_of_last_heartbeat;
@@ -112,30 +92,25 @@ namespace std {
 double yojimbo_time();
 void yojimbo_sleep(double);
 
-void perform_masterserver(const config_lua_table& cfg) {
+void perform_masterserver(const config_lua_table& cfg) try {
+	using namespace httplib;
+
 	const auto& settings = cfg.masterserver;
+	const auto http_port = 8080;
 
-	struct netcode_socket_t socket;
+	auto socket_raii = netcode_socket_raii(to_netcode_addr(settings.ip, settings.port));
+	auto& socket = socket_raii.socket;
 
-	{
-		struct netcode_address_t addr;
-		netcode_parse_address(settings.ip.c_str(), &addr);
-		addr.port = settings.port;
-
-		const auto bufsize = 4 * 1024 * 1024;
-
-		if (netcode_socket_create(&socket, &addr, bufsize, bufsize) != NETCODE_SOCKET_ERROR_NONE) {
-			LOG("netcode_socket_create failed. Returning.");
-			return;
-		}
-	}
-
-	LOG("Created masterserver at: %x", ::ToString(socket.address));
+	LOG("Created masterserver socket at: %x", ::ToString(socket.address));
 
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
 
 	std::vector<std::byte> serialized_list;
 	std::shared_mutex serialized_list_mutex;
+
+	httplib::Server http;
+
+	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
 
 	auto reserialize_list = [&]() {
 		MSR_LOG("Reserializing the server list.");
@@ -155,46 +130,40 @@ void perform_masterserver(const config_lua_table& cfg) {
 		}
 	};
 
-	httplib::Server http;
-
-	using namespace httplib;
-
 	auto make_list_streamer_lambda = [&]() {
 		return [data=serialized_list](uint64_t offset, uint64_t length, DataSink sink) {
 			sink(reinterpret_cast<const char*>(&data[offset]), length);
 		};
 	};
 
-	std::vector<nat_punch_request> nat_requests;
-
-	http.Get("/server_list_binary", [&](const Request&, Response& res) {
-		std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
-
-		if (serialized_list.size() > 0) {
-			MSR_LOG("List request arrived. Sending list of size: %x", serialized_list.size());
-
-			res.set_content_provider(
-				serialized_list.size(),
-				make_list_streamer_lambda()
-			);
-		}
-	});
-
-	const auto http_port = 8080;
-
-	LOG("Hosting a HTTP masterserver at port: %x", http_port);
-
 	auto remove_from_list = [&](const auto& by_external_addr) {
 		server_list.erase(by_external_addr);
 		reserialize_list();
 	};
 
+	auto define_http_server = [&]() {
+		http.Get("/server_list_binary", [&](const Request&, Response& res) {
+			std::shared_lock<std::shared_mutex> lock(serialized_list_mutex);
+
+			if (serialized_list.size() > 0) {
+				MSR_LOG("List request arrived. Sending list of size: %x", serialized_list.size());
+
+				res.set_content_provider(
+					serialized_list.size(),
+					make_list_streamer_lambda()
+				);
+			}
+		});
+	};
+
+	define_http_server();
+
+	LOG("Hosting a HTTP masterserver at port: %x", http_port);
+
 	auto listening_thread = std::thread([&http]() {
 		http.listen("127.0.0.1", http_port);
 		LOG("The HTTP listening thread has quit.");
 	});
-
-	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
 
 	while (true) {
 #if PLATFORM_UNIX
@@ -323,4 +292,7 @@ void perform_masterserver(const config_lua_table& cfg) {
 	listening_thread.join();
 
 	netcode_socket_destroy(&socket);
+}
+catch (const netcode_socket_raii_error& err) {
+	LOG(err.what());
 }

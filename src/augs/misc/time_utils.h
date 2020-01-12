@@ -28,6 +28,7 @@ namespace augs {
 		std::string how_long_ago_tell_seconds() const;
 
 		static std::string format_how_long_ago(bool tell_seconds, const uint64_t secs);
+		static double secs_since_epoch();
 
 	private:
 		std::string how_long_ago(bool tell_seconds) const;

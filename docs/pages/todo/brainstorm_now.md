@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- The masterserver should dump entire state before restarting for update
+	- To give servers a chance, set time of last heartbeat to current time after starting up
+
 - It's not really a problem if the server list is recalculated in the background.
 	- The bandwidth used is minimal, especially since we've imposed a limit on the number of packets there.
 	- So let the advancer just go all the time.

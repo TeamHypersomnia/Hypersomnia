@@ -15,6 +15,12 @@
 #include "augs/network/netcode_sockets.h"
 #include "application/masterserver/nat_puncher_client.h"
 
+constexpr auto nat_request_interval = 0.5;
+constexpr auto ping_retry_interval = 1;
+constexpr auto ping_nat_keepalive_interval = 10;
+constexpr auto server_entry_timeout = 5;
+constexpr auto max_packets_per_frame_v = 64;
+
 #define LOG_BROWSER !NDEBUG
 
 template <class... Args>
@@ -221,16 +227,11 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 		}
 	}
 
-	int packets_left = 64;
+	int packets_left = max_packets_per_frame_v;
 
 	if (server_list.empty()) {
 		return;
 	}
-
-	const auto nat_request_interval = 0.5;
-	const auto ping_retry_interval = 1;
-	const auto ping_nat_keepalive_interval = 10;
-	const auto server_entry_timeout = 5;
 
 	for (auto& s : server_list) {
 		if (packets_left <= 0) {
@@ -403,8 +404,7 @@ std::optional<netcode_address_t> browse_servers_gui_state::show_server_list() {
 
 		ImGui::NextColumn();
 
-		const auto diff = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
-		const auto secs_ago = diff.count() - s.appeared_when;
+		const auto secs_ago = augs::date_time::secs_since_epoch() - s.appeared_when;
 		text_disabled(augs::date_time::format_how_long_ago(true, secs_ago));
 
 		ImGui::NextColumn();

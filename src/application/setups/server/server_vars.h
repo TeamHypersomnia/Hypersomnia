@@ -31,10 +31,10 @@ struct server_vars {
 
 	// GEN INTROSPECTOR struct server_vars
 	server_name_type server_name;
-	address_and_port masterserver_address;
+	address_and_port notified_server_list;
 
-	unsigned send_heartbeat_to_masterserver_once_every_secs = 10;
-	unsigned resolve_masterserver_address_once_every_secs = 60;
+	unsigned send_heartbeat_to_server_list_once_every_secs = 10;
+	unsigned resolve_server_list_address_once_every_secs = 60;
 
 	unsigned kick_if_no_messages_for_secs = 60;
 	unsigned kick_if_away_from_keyboard_for_secs = 240;

@@ -35,10 +35,10 @@ const auto connected_and_integrated_v = server_setup::for_each_flags { server_se
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
 
 void server_setup::shutdown() {
-	if (has_sent_any_heartbeats() && resolved_masterserver_addr != std::nullopt) {
+	if (has_sent_any_heartbeats() && resolved_server_list_addr != std::nullopt) {
 		// Say goodbye
 
-		const auto destination_address = resolved_masterserver_addr.value();
+		const auto destination_address = resolved_server_list_addr.value();
 
 		auto goodbye = std::byte();
 
@@ -151,11 +151,11 @@ server_setup::server_setup(
 		shutdown();
 	}
 
-	resolve_masterserver();
+	resolve_server_list();
 }
 
-void server_setup::send_heartbeat_to_masterserver() {
-	ensure(resolved_masterserver_addr.has_value());
+void server_setup::send_heartbeat_to_server_list() {
+	ensure(resolved_server_list_addr.has_value());
 
 	const auto& arena = get_arena_handle();
 
@@ -193,7 +193,7 @@ void server_setup::send_heartbeat_to_masterserver() {
 	}
 
 	const auto heartbeat_bytes = heartbeat_buffer.size();
-	const auto destination_address = resolved_masterserver_addr.value();
+	const auto destination_address = resolved_server_list_addr.value();
 	LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_bytes);
 
 	if (heartbeat_bytes > 0) {
@@ -201,66 +201,66 @@ void server_setup::send_heartbeat_to_masterserver() {
 	}
 }
 
-void server_setup::resolve_masterserver() {
-	const auto& in = vars.masterserver_address;
+void server_setup::resolve_server_list() {
+	const auto& in = vars.notified_server_list;
 
-	LOG("Requesting resolution of masterserver address at %x", in.address);
-	future_resolved_masterserver_addr = async_resolve_address(in);
+	LOG("Requesting resolution of server_list address at %x", in.address);
+	future_resolved_server_list_addr = async_resolve_address(in);
 }
 
-bool server_setup::masterserver_enabled() const {
-	return server->is_running() && vars.masterserver_address.address.size() > 0;
+bool server_setup::server_list_enabled() const {
+	return server->is_running() && vars.notified_server_list.address.size() > 0;
 }
 
-void server_setup::resolve_masterserver_if_its_time() {
-	if (!masterserver_enabled()) {
+void server_setup::resolve_server_list_if_its_time() {
+	if (!server_list_enabled()) {
 		return;
 	}
 
-	auto& when_last = when_last_resolved_masterserver_addr;
+	auto& when_last = when_last_resolved_server_list_addr;
 
-	if (valid_and_is_ready(future_resolved_masterserver_addr)) {
-		const auto result = future_resolved_masterserver_addr.get();
+	if (valid_and_is_ready(future_resolved_server_list_addr)) {
+		const auto result = future_resolved_server_list_addr.get();
 
 		result.report();
 
 		if (result.result == resolve_result_type::OK) {
-			resolved_masterserver_addr = result.addr; 
+			resolved_server_list_addr = result.addr; 
 		}
 	}
 
-	if (future_resolved_masterserver_addr.valid()) {
-		LOG("Masterserver resolution in progress. Delaying next trial.");
+	if (future_resolved_server_list_addr.valid()) {
+		LOG("server_list resolution in progress. Delaying next trial.");
 		when_last = server_time;
 		return;
 	}
 
 	const auto since_last = server_time - when_last;
-	const auto resolve_every = vars.resolve_masterserver_address_once_every_secs;
+	const auto resolve_every = vars.resolve_server_list_address_once_every_secs;
 
-	if (resolved_masterserver_addr == std::nullopt || since_last >= resolve_every) {
-		resolve_masterserver();
+	if (resolved_server_list_addr == std::nullopt || since_last >= resolve_every) {
+		resolve_server_list();
 		when_last = server_time;
 	}
 }
 
 bool server_setup::has_sent_any_heartbeats() const {
-	return when_last_sent_heartbeat_to_masterserver != 0;
+	return when_last_sent_heartbeat_to_server_list != 0;
 }
 
-void server_setup::send_heartbeat_to_masterserver_if_its_time() {
-	if (!masterserver_enabled()) {
+void server_setup::send_heartbeat_to_server_list_if_its_time() {
+	if (!server_list_enabled()) {
 		return;
 	}
 
-	auto& when_last = when_last_sent_heartbeat_to_masterserver;
+	auto& when_last = when_last_sent_heartbeat_to_server_list;
 
-	if (resolved_masterserver_addr == std::nullopt) {
+	if (resolved_server_list_addr == std::nullopt) {
 		return;
 	}
 
 	const auto since_last = server_time - when_last;
-	const auto send_every = vars.send_heartbeat_to_masterserver_once_every_secs;
+	const auto send_every = vars.send_heartbeat_to_server_list_once_every_secs;
 
 	const bool send_for_the_first_time = !has_sent_any_heartbeats();
 
@@ -268,7 +268,7 @@ void server_setup::send_heartbeat_to_masterserver_if_its_time() {
 		const auto times = when_last == 0 ? 4 : 1;
 
 		for (int i = 0; i < times; ++i) {
-			send_heartbeat_to_masterserver();
+			send_heartbeat_to_server_list();
 		}
 
 		when_last = server_time;
