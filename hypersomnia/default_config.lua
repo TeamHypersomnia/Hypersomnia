@@ -2,7 +2,10 @@ return {
   launch_mode = "MAIN_MENU",
   log_to_live_file = false,
 
-  server_list_provider = "masterserver.hypersomnia.xyz",
+  server_list_provider = {
+	  address = "masterserver.hypersomnia.xyz",
+	  default_port = 8420
+  },
 
   nat_punch_provider = {
 	  address = "masterserver.hypersomnia.xyz",
@@ -14,6 +17,7 @@ return {
 	port = 8414,
 	server_entry_timeout_secs = 60,
 
+	http_server_port = 8420,
 	cert_pem_path = "",
 	key_pem_path = "",
   },

@@ -214,7 +214,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	LOG("Hosting a HTTP masterserver at port: %x", http_port);
 
 	auto listening_thread = std::thread([&http]() {
-		http.listen("127.0.0.1", http_port);
+		http.listen("0.0.0.0", http_port);
 		LOG("The HTTP listening thread has quit.");
 	});
 

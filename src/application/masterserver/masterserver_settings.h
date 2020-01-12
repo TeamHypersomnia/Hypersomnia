@@ -7,6 +7,7 @@ struct masterserver_settings {
 	port_type port = 8414;
 	unsigned server_entry_timeout_secs = 60;
 
+	port_type http_server_port = 8146;
 	augs::path_type cert_pem_path;
 	augs::path_type key_pem_path;
 	// END GEN INTROSPECTOR

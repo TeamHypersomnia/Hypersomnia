@@ -82,10 +82,24 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	data->nat.resolve_relay_host(in.nat_punch_provider);
 
 	data->future_response = launch_async(
-		[&http_opt, host_url = in.server_list_provider]() {
+		[&http_opt, address = in.server_list_provider]() -> std::shared_ptr<Response> {
+			const auto resolved = resolve_address(address);
+			resolved.report();
+
+			if (resolved.result != resolve_result_type::OK) {
+				return nullptr;
+			}
+
+			auto resolved_addr = resolved.addr;
+			const auto intended_port = resolved_addr.port;
+			resolved_addr.port = 0;
+
+			const auto address_str = ::ToString(resolved_addr);
 			const auto timeout = 5;
-			http_opt.emplace(host_url.c_str(), 8080, timeout);
-			LOG("Refreshing server list from %x.", host_url);
+
+			LOG("Connecting to server list at ip (no port): %x", address_str);
+
+			http_opt.emplace(address_str.c_str(), intended_port, timeout);
 
 			auto progress = [](uint64_t len, uint64_t total) {
 				(void)len;

@@ -31,6 +31,8 @@ struct nat_progress {
 	net_time_t when_first_nat_request = 0;
 
 	server_entry_state state = server_entry_state::AWAITING_RESPONSE;
+
+	bool found_in_internal = false;
 };
 
 struct server_list_entry {
@@ -47,7 +49,7 @@ struct server_list_entry {
 struct client_start_input;
 
 struct browse_servers_input {
-	const std::string& server_list_provider;
+	const address_and_port& server_list_provider;
 	const address_and_port& nat_punch_provider;
 	client_start_input& client_start;
 	const netcode_socket_t* nat_puncher_socket;

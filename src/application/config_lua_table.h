@@ -94,7 +94,7 @@ struct config_lua_table {
 
 	float_consistency_test_settings float_consistency_test;
 
-	std::string server_list_provider;
+	address_and_port server_list_provider;
 	address_and_port nat_punch_provider;
 
 	masterserver_settings masterserver;
