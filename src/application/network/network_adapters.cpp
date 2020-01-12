@@ -1,3 +1,4 @@
+#include "application/network/resolve_address.h"
 #include "application/network/server_adapter.h"
 #include "application/network/client_adapter.h"
 
@@ -8,8 +9,6 @@
 #include "application/network/net_message_serializers.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.c"
 #include "augs/readwrite/byte_readwrite.h"
-#include "application/network/resolve_address_result.h"
-#include "application/network/resolve_address.h"
 #include "augs/templates/thread_templates.h"
 
 #undef SendMessage

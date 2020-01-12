@@ -7,6 +7,8 @@ namespace yojimbo {
 	class Address;
 }
 
+struct address_and_port;
+
 std::string ToString(const yojimbo::Address&);
 std::string ToString(const netcode_address_t&);
 
