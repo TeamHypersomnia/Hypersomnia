@@ -97,9 +97,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	using namespace httplib;
 
 	const auto& settings = cfg.masterserver;
-	const auto http_port = 8080;
 
-	auto socket_raii = netcode_socket_raii(to_netcode_addr(settings.ip, settings.port));
+	auto socket_raii = netcode_socket_raii(to_netcode_addr(settings.ip, settings.nat_punch_port));
 	auto& socket = socket_raii.socket;
 
 	LOG("Created masterserver socket at: %x", ::ToString(socket.address));
@@ -211,10 +210,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	define_http_server();
 
-	LOG("Hosting a HTTP masterserver at port: %x", http_port);
+	LOG("Hosting a server list at port: %x (HTTP)", settings.server_list_port);
 
-	auto listening_thread = std::thread([&http]() {
-		http.listen("0.0.0.0", http_port);
+	auto listening_thread = std::thread([&http, in_settings=settings]() {
+		http.listen(in_settings.ip.c_str(), in_settings.server_list_port);
 		LOG("The HTTP listening thread has quit.");
 	});
 

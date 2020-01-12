@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/filesystem/path.h"
 #include "augs/app_type.h"
+#include "augs/network/network_types.h"
 
 struct cmd_line_params {
 	augs::path_type exe_path;
@@ -16,6 +17,9 @@ struct cmd_line_params {
 	bool should_connect = false;
 	int test_fp_consistency = -1;
 	std::string connect_address;
+
+	std::optional<port_type> nat_punch_port;
+	std::optional<port_type> server_list_port;
 
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
@@ -49,6 +53,12 @@ struct cmd_line_params {
 			}
 			else if (a == "--test-fp-consistency") {
 				test_fp_consistency = std::atoi(argv[i++]);
+			}
+			else if (a == "--nat-punch-port") {
+				nat_punch_port = std::atoi(argv[i++]);
+			}
+			else if (a == "--server-list-port") {
+				server_list_port = std::atoi(argv[i++]);
 			}
 			else if (a == "--consistency-report") {
 				consistency_report = argv[i++];

@@ -13,11 +13,12 @@ return {
   },
 
   masterserver = {
-	ip = "127.0.0.1",
-	port = 8414,
+	ip = "0.0.0.0",
 	server_entry_timeout_secs = 60,
 
-	http_server_port = 8420,
+	nat_punch_port = 8414,
+	server_list_port = 8420,
+
 	cert_pem_path = "",
 	key_pem_path = "",
   },

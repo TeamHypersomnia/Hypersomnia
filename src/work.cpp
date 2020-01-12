@@ -178,6 +178,10 @@ work_result work(const int argc, const char* const * const argv) try {
 			result.audio.enable_hrtf = false;
 		}
 
+#if !NDEBUG
+		result.audio.enable_hrtf = false;
+#endif
+
 		return result;
 	}();
 
@@ -379,7 +383,21 @@ and then hitting Save settings.
 	};
 
 	if (params.type == app_type::MASTERSERVER) {
-		LOG("Starting the masterserver at port: %x", config.masterserver.port);
+		auto cfg = config;
+
+		if (params.nat_punch_port != std::nullopt) {
+			cfg.masterserver.nat_punch_port = *params.nat_punch_port;
+		}
+
+		if (params.server_list_port != std::nullopt) {
+			cfg.masterserver.server_list_port = *params.server_list_port;
+		}
+
+		LOG(
+			"Starting the masterserver at ports: %x (Server list), %x (NAT punch)",
+			config.masterserver.server_list_port,
+			config.masterserver.nat_punch_port
+		);
 
 		perform_masterserver(config);
 

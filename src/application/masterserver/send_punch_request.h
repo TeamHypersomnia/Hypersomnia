@@ -15,7 +15,7 @@ inline void send_punch_request(const netcode_socket_t& socket, netcode_address_t
 	netcode_socket_send_packet(&s, &relay_host_address, out.data(), out.get_write_pos());
 }
 
-inline void send_ping_request(const netcode_socket_t& socket, uint64_t sequence, netcode_address_t target_server) {
+inline void send_ping_request(const netcode_socket_t& socket, netcode_address_t target_server, uint64_t sequence) {
 	std::byte bytes[1 + sizeof(sequence)];
 
 	auto buf = augs::pointer_to_buffer {bytes, sizeof(bytes)}; 

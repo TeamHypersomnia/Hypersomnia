@@ -210,6 +210,8 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			break;
 		}
 
+		const bool behind_nat = s.is_behind_nat();
+
 		auto& p = s.progress;
 
 		using S = server_entry_state;
@@ -218,12 +220,20 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			p.when_sent_last_ping = current_time;
 			p.ping_sequence = ping_sequence_counter++;
 
-			send_ping_request(udp_socket, p.ping_sequence, s.address);
+			send_ping_request(udp_socket, s.address, p.ping_sequence);
 			--packets_left;
+
+			const auto& internal_address = s.data.internal_network_address;
+			const bool maybe_reachable_internally = behind_nat && internal_address != std::nullopt;
+
+			if (maybe_reachable_internally) {
+				send_ping_request(udp_socket, *internal_address, p.ping_sequence);
+				--packets_left;
+			}
 		};
 
 		if (p.state == S::AWAITING_RESPONSE) {
-			if (s.is_behind_nat()) {
+			if (behind_nat) {
 				if (nat.relay_host_resolved()) {
 					auto& when_first = p.when_first_nat_request;
 					auto& when_last = p.when_last_nat_request;
