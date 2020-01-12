@@ -18,6 +18,7 @@
 constexpr auto nat_request_interval = 0.5;
 constexpr auto ping_retry_interval = 1;
 constexpr auto ping_nat_keepalive_interval = 10;
+constexpr auto reopen_nat_after_seconds = 15;
 constexpr auto server_entry_timeout = 5;
 constexpr auto max_packets_per_frame_v = 64;
 
@@ -332,8 +333,32 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 		if (p.state == S::PING_MEASURED) {
 			auto& when_last = p.when_sent_last_ping;
 
-			if (current_time - when_last >= ping_nat_keepalive_interval) {
-				request_ping();
+			auto reping_if_its_time = [&]() {
+				if (!show) {
+					/* Never reping if the window is hidden. */
+					return;
+				}
+
+				if (current_time - when_last >= ping_nat_keepalive_interval) {
+					request_ping();
+				}
+			};
+
+			if (behind_nat) {
+				if (current_time - when_last >= reopen_nat_after_seconds * 2) {
+					/* 
+						If it weren't pinged for such a long time for any reason,
+						consider the NAT holes dead. Refresh the server.
+					*/
+
+					p = {};
+				}
+				else {
+					reping_if_its_time();
+				}
+			}
+			else {
+				reping_if_its_time();
 			}
 		}
 	}

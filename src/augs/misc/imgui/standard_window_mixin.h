@@ -21,6 +21,10 @@ struct standard_window_mixin {
 		ImGui::SetWindowFocus(title.c_str());
 	}
 
+	void close() {
+		show = false;
+	}
+
 	template <class... Args>
 	auto make_scoped_window(Args&&... args) {
 		if (show) {

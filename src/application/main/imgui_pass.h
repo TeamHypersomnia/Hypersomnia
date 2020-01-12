@@ -26,6 +26,7 @@ void perform_imgui_pass(
 	const augs::audio_context& audio,
 	sol::state& lua,
 	std::function<void()> custom_imgui_logic,
+	std::function<void()> custom_imgui_logic_hide_in_menu,
 
 	const bool ingame_menu_active,
 	const bool has_gameplay_setup,

@@ -560,6 +560,8 @@ and then hitting Save settings.
 	static settings_gui_state settings_gui = std::string("Settings");
 	static start_client_gui_state start_client_gui = std::string("Connect to server");
 	static start_server_gui_state start_server_gui = std::string("Host a server");
+
+	static bool was_browser_open_in_main_menu = false;
 	static browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
 
 	static ingame_menu_gui ingame_menu;
@@ -695,6 +697,12 @@ and then hitting Save settings.
 		network_stats = {};
 		server_stats = {};
 
+		if (main_menu.has_value()) {
+			was_browser_open_in_main_menu = browse_servers_gui.show;
+		}
+
+		browse_servers_gui.close();
+
 		main_menu.reset();
 		current_setup.reset();
 		ingame_menu.show = false;
@@ -708,6 +716,12 @@ and then hitting Save settings.
 				load_all(setup.get_viewable_defs());
 			}
 		});
+
+		if (main_menu.has_value()) {
+			if (was_browser_open_in_main_menu) {
+				browse_servers_gui.open();
+			}
+		}
 	};
 
 	static auto launch_editor = [&](auto&&... args) {
@@ -1097,17 +1111,19 @@ and then hitting Save settings.
 			lua,
 			[&]() {
 				browse_servers_gui.advance_ping_and_nat_logic(get_browse_servers_input());
+				perform_browse_servers();
 
 				if (!has_current_setup()) {
 					perform_start_client(frame_num);
 					perform_start_server();
-					perform_browse_servers();
 				}
 
 				streaming.display_loading_progress();
-
-				perform_setup_custom_imgui();
 				perform_last_exit_incorrect();
+			},
+
+			[&]() {
+				perform_setup_custom_imgui();
 			},
 
 			/* Flags controlling IMGUI behaviour */
@@ -1270,6 +1286,10 @@ and then hitting Save settings.
 		using T = decltype(t);
 
 		switch (t) {
+			case T::BROWSE_SERVERS:
+				browse_servers_gui.open();
+				break;
+
 			case T::RESUME:
 				ingame_menu.show = false;
 				break;
