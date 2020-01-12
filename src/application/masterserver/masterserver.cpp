@@ -17,6 +17,7 @@
 #include "augs/misc/time_utils.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/network/resolve_address.h"
+#include "augs/readwrite/byte_file.h"
 
 std::string ToString(const netcode_address_t&);
 
@@ -112,6 +113,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
 
+	const auto masterserver_dump_path = augs::path_type(USER_FILES_DIR) / "masterserver.dump";
+
 	auto reserialize_list = [&]() {
 		MSR_LOG("Reserializing the server list.");
 
@@ -129,6 +132,56 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			augs::write_bytes(ss, server.second.last_heartbeat);
 		}
 	};
+
+	auto dump_server_list_to_file = [&]() {
+		const auto n = server_list.size();
+
+		if (n > 0) {
+			LOG("Saving %x servers to %x", n, masterserver_dump_path);
+			augs::bytes_to_file(std::as_const(serialized_list), masterserver_dump_path);
+		}
+		else {
+			LOG("The server list is empty: deleting the dump file.");
+			augs::remove_file(masterserver_dump_path);
+		}
+	};
+
+	auto load_server_list_from_file = [&]() {
+		try {
+			auto source = augs::open_binary_input_stream(masterserver_dump_path);
+
+			LOG("%x found.\nLoading the server list from file.", masterserver_dump_path);
+
+			const auto current_time = yojimbo_time();
+
+			while (source.peek() != EOF) {
+				netcode_address_t address;
+				masterserver_client entry;
+
+				augs::read_bytes(source, address);
+				augs::read_bytes(source, entry.meta.appeared_when);
+				augs::read_bytes(source, entry.last_heartbeat);
+
+				entry.time_of_last_heartbeat = current_time;
+
+				server_list.try_emplace(address, std::move(entry));
+			}
+
+			reserialize_list();
+		}
+		catch (const augs::file_open_error& err) {
+			LOG("Could not load the server list file: %x.\nStarting from an empty server list. Details:\n%x", masterserver_dump_path, err.what());
+
+			server_list.clear();
+		}
+		catch (const augs::stream_read_error& err) {
+			LOG("Failed to read the server list from file: %x.\nStarting from an empty server list. Details:\n%x", masterserver_dump_path, err.what());
+
+			server_list.clear();
+		}
+	};
+
+	load_server_list_from_file();
 
 	auto make_list_streamer_lambda = [&]() {
 		return [data=serialized_list](uint64_t offset, uint64_t length, DataSink sink) {
@@ -292,6 +345,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	listening_thread.join();
 
 	netcode_socket_destroy(&socket);
+
+	dump_server_list_to_file();
 }
 catch (const netcode_socket_raii_error& err) {
 	LOG(err.what());
