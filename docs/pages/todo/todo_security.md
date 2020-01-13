@@ -5,6 +5,13 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Protect masterserver from:
+	- spoofing
+		- just send a challenge packet
+	- impersonating server heartbeats
+		- actually requires encryption
+	- perhaps let's just use yojimbo for all udp commands?
+
 - Cooldowns for chat
 	- Both client side and server side
 	- Although maybe later, at least we'll ban griefers early

@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Remember to not send goodbye for when the servers are automatically updating
+
 - bomb_defusal -> bomb_defusal
 
 - Apparently, clipboard prevents connection to any server...

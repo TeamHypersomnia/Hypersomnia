@@ -730,11 +730,11 @@ void client_setup::send_nat_asssitance_requests_if_its_time() {
 		return;
 	}
 
-	const auto nat_request_interval_ms = 200;
+	const auto nat_request_interval = 0.2;
 
 	auto& when_last = when_sent_nat_punch_request;
 
-	if (client_time - when_last >= nat_request_interval_ms) {
+	if (when_sent_nat_punch_request == 0 || client_time - when_last >= nat_request_interval) {
 		if (auto socket = adapter->find_underlying_socket()) {
 			LOG("Client requesting NAT assistance just in case");
 			nat->request_punch(*socket);
