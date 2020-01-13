@@ -11,6 +11,8 @@ inline void send_punch_request(const netcode_socket_t& socket, netcode_address_t
 	augs::write_bytes(out, masterserver_udp_command::NAT_PUNCH_REQUEST);
 	augs::write_bytes(out, punched_server);
 
+	LOG("Requesting %x to punch %x!", ::ToString(relay_host_address), ::ToString(punched_server));
+
 	auto s = socket;
 	netcode_socket_send_packet(&s, &relay_host_address, out.data(), out.get_write_pos());
 }
