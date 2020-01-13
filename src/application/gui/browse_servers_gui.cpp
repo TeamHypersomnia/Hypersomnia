@@ -22,7 +22,7 @@ constexpr auto reopen_nat_after_seconds = 15;
 constexpr auto server_entry_timeout = 5;
 constexpr auto max_packets_per_frame_v = 64;
 
-#define LOG_BROWSER !NDEBUG
+#define LOG_BROWSER 1
 
 template <class... Args>
 void BRW_LOG(Args&&... args) {
@@ -258,6 +258,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 					BRW_LOG("Has entry! Sequence: %x; entry sequence: %x", sequence, progress.ping_sequence);
 
 					if (sequence == uint64_t(-1)) {
+						BRW_LOG("Punched server: %x", ::ToString(from));
 						progress.state = server_entry_state::PUNCHED;
 					}
 					else if (sequence == progress.ping_sequence) {
@@ -331,7 +332,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 							when_first = current_time;
 						}
 
-						nat.punched_server_addr = s.address;
+						nat.punched_server_addr = *s.data.internal_network_address;
 						nat.request_punch(udp_socket);
 
 						--packets_left;
@@ -345,7 +346,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			}
 		}
 
-		if (p.state == S::AWAITING_RESPONSE || p.state == S::PUNCHED) {
+		if (p.state == S::PUNCHED) {
 			BRW_LOG("State needs pinging");
 			auto& when_first = p.when_sent_first_ping;
 			auto& when_last = p.when_sent_last_ping;

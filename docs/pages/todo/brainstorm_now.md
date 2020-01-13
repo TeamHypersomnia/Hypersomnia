@@ -6,8 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Turn off logs of masterserver and browser later
+
+- Implement sending the current version to the server
+
 - If both masterserver and server are on the same machine then nat punch request might not arrive on the lane masterserver->server
 	- Which is why we're seeing official server offline when testing without pre-emptive ping
+	- To test, temporarily just send a nat punch request to localhost on masterserver
+	- For testing, just request to punch the internal server's address
 
 - Remember to not send goodbye for when the servers are automatically updating
 

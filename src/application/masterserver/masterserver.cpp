@@ -25,7 +25,7 @@ std::string ToString(const netcode_address_t&);
 extern volatile std::sig_atomic_t signal_status;
 #endif
 
-#define LOG_MASTERSERVER !NDEBUG
+#define LOG_MASTERSERVER 1
 
 template <class... Args>
 void MSR_LOG(Args&&... args) {
@@ -280,6 +280,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					netcode_address_t target_server;
 					augs::read_bytes(ss, target_server);
 
+					MSR_LOG("A request arrived from %x to punch %x", ::ToString(from), ::ToString(target_server));
+
 					std::byte out_buf[sizeof(masterserver_udp_command) + sizeof(netcode_address_t) + sizeof(uint64_t)];
 
 					auto buf = augs::pointer_to_buffer{out_buf, sizeof(out_buf)};
@@ -291,13 +293,27 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					augs::write_bytes(out, sequence_dummy);
 					augs::write_bytes(out, from);
 
-					if (const auto entry = mapped_or_nullptr(server_list, target_server)) {
-						const bool is_behind_nat = entry->last_heartbeat.internal_network_address != target_server;
+					const bool should_send_request = [&]() {
+						if (const auto entry = mapped_or_nullptr(server_list, target_server)) {
+							MSR_LOG("Found the requested server.");
 
-						if (is_behind_nat) {
-							MSR_LOG("Sending NAT open request from %x to %x", ::ToString(from), ::ToString(target_server));
-							netcode_socket_send_packet(&socket, &target_server, out_buf, sizeof(out_buf));
+							const bool is_behind_nat = entry->last_heartbeat.internal_network_address != target_server;
+
+							if (is_behind_nat) {
+								MSR_LOG("The requested server is behind NAT. Deciding to send the request.");
+								return true;
+							}
+
+							MSR_LOG("The requested server is not behind NAT. Ignoring the request.");
+							return false;
 						}
+
+						MSR_LOG("The requested server was not found.");
+						return false;
+					}();
+
+					if (should_send_request || LOG_MASTERSERVER) {
+						netcode_socket_send_packet(&socket, &target_server, out_buf, sizeof(out_buf));
 					}
 				}
 			}
