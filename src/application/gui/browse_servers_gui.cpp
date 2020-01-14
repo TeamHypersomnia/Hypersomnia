@@ -346,8 +346,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			}
 		}
 
-		if (p.state == S::PUNCHED) {
-			BRW_LOG("State needs pinging");
+		if (p.state == S::AWAITING_RESPONSE || p.state == S::PUNCHED) {
 			auto& when_first = p.when_sent_first_ping;
 			auto& when_last = p.when_sent_last_ping;
 
@@ -356,7 +355,6 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 					when_first = current_time;
 				}
 
-				BRW_LOG("Requesting ping");
 				request_ping();
 			}
 
