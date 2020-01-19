@@ -389,6 +389,10 @@ and then hitting Save settings.
 			cfg.masterserver.nat_punch_port = *params.nat_punch_port;
 		}
 
+		if (params.nat_punch_port != std::nullopt) {
+			cfg.masterserver.nat_punch_port = *params.nat_punch_port;
+		}
+
 		if (params.server_list_port != std::nullopt) {
 			cfg.masterserver.server_list_port = *params.server_list_port;
 		}

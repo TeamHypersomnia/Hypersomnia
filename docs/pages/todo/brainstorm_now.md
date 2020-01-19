@@ -6,6 +6,29 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Symmetric nat punch
+	- We can easily determine server's port allocation rule
+		- if both are address sensitive 
+		- if both are port sensitive we're fugged
+	- Also client's port allocation rule
+	- And with just the masterserver. It will just open another port that will respond
+	- https://sketchboard.me/zBYca50ZCLaL#/
+
+- Fix crash when the read value is a value and lua readwriter expects a table
+	- and the other way too
+	- just handle an exception probably
+
+- Let's just do a simple quadratic approach for now
+	- You can't send just a single packet from the target server, beacuse that port is reserved for my communication with the master server
+		- But at the very least it can be linear on the server-side
+		- You just send at like 100 sequential destination ports and call it a day
+		- Then you brute force bind e.g. 100 sockets on client side and for each of them, open all possible source ports at which any from the 100 server packets can arrive
+
+- Symmetric nat punch
+	- https://github.com/ph4r05/NATPaper
+	- https://github.com/P2PSP/core/blob/master/doc/NTS/NAT_traversal.md
+	- https://doc-kurento.readthedocs.io/en/6.11.0/knowledge/nat.html
+
 - Turn off logs of masterserver and browser later
 
 - Implement sending the current version to the server

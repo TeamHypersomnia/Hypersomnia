@@ -47,6 +47,7 @@
 #include "application/setups/client/demo_step.h"
 #include "application/gui/client/demo_player_gui.h"
 #include "application/setups/client/client_demo_player.h"
+#include "application/masterserver/nat_punch_provider_settings.h"
 
 struct config_lua_table;
 
@@ -568,7 +569,7 @@ public:
 		sol::state& lua,
 		const client_start_input&,
 		const client_vars& initial_vars,
-		const address_and_port& nat_punch_provider,
+		const nat_punch_provider_settings& nat_punch_provider,
 		port_type preferred_binding_port
 	);
 
@@ -647,7 +648,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(l, client_in, vars_backup, address_and_port(), port_type(0));
+					new (this) client_setup(l, client_in, vars_backup, nat_punch_provider_settings(), port_type(0));
 				}
 
 				demo_player = std::move(player_backup);

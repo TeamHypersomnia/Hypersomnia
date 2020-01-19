@@ -271,8 +271,8 @@ void settings_gui_state::perform(
 					input_text<100>(SCOPE_CFG_NVP(application_update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.application_update_host);
 					input_text<100>(SCOPE_CFG_NVP(application_update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.application_update_path);
 
-					input_text("Server list provider", config.server_list_provider.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider);
-					input_text("NAT punch provider", config.nat_punch_provider.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_punch_provider);
+					input_text("Server list provider", config.server_list_provider.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider.address);
+					input_text("NAT punch provider", config.nat_punch_provider.address.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_punch_provider.address.address);
 				}
 
 				text_disabled("\n\n");

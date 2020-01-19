@@ -7,9 +7,12 @@ struct masterserver_settings {
 	unsigned server_entry_timeout_secs = 60;
 
 	port_type nat_punch_port = 8414;
+	port_type extra_address_resolution_port = 8415;
 	port_type server_list_port = 8420;
 
 	augs::path_type cert_pem_path;
 	augs::path_type key_pem_path;
+
+	float sleep_ms = 8;
 	// END GEN INTROSPECTOR
 };

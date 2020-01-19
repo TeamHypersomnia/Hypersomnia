@@ -41,7 +41,7 @@ void server_setup::shutdown() {
 
 		const auto destination_address = resolved_server_list_addr.value();
 
-		auto goodbye = std::byte();
+		auto goodbye = std::byte(masterserver_udp_command::SERVER_GOODBYE);
 
 		for (int i = 0; i < 4; ++i) {
 			server->send_udp_packet(destination_address, &goodbye, 1);

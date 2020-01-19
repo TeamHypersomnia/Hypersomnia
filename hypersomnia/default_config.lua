@@ -8,8 +8,12 @@ return {
   },
 
   nat_punch_provider = {
-	  address = "masterserver.hypersomnia.xyz",
-	  default_port = 8414
+	  address = {
+		  address = "masterserver.hypersomnia.xyz",
+		  default_port = 8414
+	  },
+
+	  extra_address_resolution_port = 8415
   },
 
   masterserver = {
@@ -17,6 +21,8 @@ return {
 	server_entry_timeout_secs = 60,
 
 	nat_punch_port = 8414,
+	extra_address_resolution_port = 8415,
+	sleep_ms = 8,
 	server_list_port = 8420,
 
 	cert_pem_path = "",

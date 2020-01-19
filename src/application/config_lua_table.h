@@ -46,6 +46,7 @@
 #include "application/performance_settings.h"
 #include "application/http_client/http_client_settings.h"
 #include "application/masterserver/masterserver_settings.h"
+#include "application/masterserver/nat_punch_provider_settings.h"
 #include "fp_consistency_tests.h"
 
 enum class launch_type {
@@ -95,7 +96,8 @@ struct config_lua_table {
 	float_consistency_test_settings float_consistency_test;
 
 	address_and_port server_list_provider;
-	address_and_port nat_punch_provider;
+	nat_punch_provider_settings nat_punch_provider;
+	address_and_port extra_address_resolution_port;
 
 	masterserver_settings masterserver;
 

@@ -17,6 +17,14 @@ inline void send_punch_request(const netcode_socket_t& socket, netcode_address_t
 	netcode_socket_send_packet(&s, &relay_host_address, out.data(), out.get_write_pos());
 }
 
+inline void send_address_resolution_request(const netcode_socket_t& socket, netcode_address_t target_server) {
+	LOG("Requesting address resolution from %x", ::ToString(target_server));
+
+	auto s = socket;
+	auto cmd = uint8_t(masterserver_udp_command::RESOLVE_EXTERNAL_ADDRESS);
+	netcode_socket_send_packet(&s, &target_server, &cmd, 1);
+}
+
 inline void send_ping_request(const netcode_socket_t& socket, netcode_address_t target_server, uint64_t sequence) {
 	std::byte bytes[1 + sizeof(sequence)];
 
