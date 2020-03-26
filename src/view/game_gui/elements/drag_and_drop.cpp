@@ -63,25 +63,28 @@ void drag_and_drop_callback(
 			}
 		}
 		else if constexpr (std::is_same_v<T, drop_for_hotbar_assignment>) {
-			const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
+			const auto target_button = context.dereference_location(transfer_data.assign_to);
+			ensure(target_button != nullptr);
+
+			const auto target_button_index = target_button.get_location().index;
+
 			const auto new_assigned_item = cosm[transfer_data.item_id];
 			const auto owner_transfer_capability = context.get_subject_entity();
-
-			ensure(dereferenced_button != nullptr);
 
 			const auto source_hotbar_location = context.dereference_location(transfer_data.source_hotbar_button_id);
 			
 			if (source_hotbar_location != nullptr) {
-				const auto item_to_be_swapped = dereferenced_button->get_assigned_entity(owner_transfer_capability);
+				const auto item_to_be_swapped = target_button->get_assigned_entity(owner_transfer_capability);
 
-				gui.assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+				gui.assign_item_to_hotbar_button(target_button_index, owner_transfer_capability, new_assigned_item);
 				
 				if (item_to_be_swapped.alive()) {
-					gui.assign_item_to_hotbar_button(source_hotbar_location.get_location().index, owner_transfer_capability, item_to_be_swapped);
+					const auto source_button_index = source_hotbar_location.get_location().index;
+					gui.assign_item_to_hotbar_button(source_button_index, owner_transfer_capability, item_to_be_swapped);
 				}
 			}
 			else {
-				gui.assign_item_to_hotbar_button(dereferenced_button.get_location().index, owner_transfer_capability, new_assigned_item);
+				gui.assign_item_to_hotbar_button(target_button_index, owner_transfer_capability, new_assigned_item);
 			}
 		}
 		else {

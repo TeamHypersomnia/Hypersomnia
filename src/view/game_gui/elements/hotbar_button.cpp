@@ -24,12 +24,15 @@ const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle
 	const auto& cosm = owner_transfer_capability.get_cosmos();
 	const auto handle = cosm[last_assigned_entity];
 
-	if (
-		handle.alive() 
-		&& handle.get_owning_transfer_capability() == owner_transfer_capability
-		&& !(handle.get_current_slot()->is_mounted_slot() && handle.get_current_slot().get_type() != slot_function::TORSO_ARMOR)
-	) {
-		return handle;
+	if (handle.alive()) {
+		if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
+			const auto slot = handle.get_current_slot();
+			const bool should_ignore = slot->is_mounted_slot() && slot.get_type() != slot_function::TORSO_ARMOR;
+
+			if (!should_ignore) {
+				return handle;
+			}
+		}
 	}
 
 	return cosm[entity_id()];

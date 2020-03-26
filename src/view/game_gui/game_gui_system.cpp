@@ -381,10 +381,8 @@ void game_gui_system::advance(
 	if (settings.autocollapse_hotbar_buttons) {
 		static_assert(std::is_trivially_copyable_v<hotbar_button>);
 
-		auto& h = context.get_character_gui().hotbar_buttons;
-
-		auto is_tied_to_right = [&](const auto& b) {
-			const auto assigned_item = b.get_assigned_entity(subject);
+		auto is_tied_to_right = [&](const auto& button) {
+			const auto assigned_item = button.get_assigned_entity(subject);
 
 			if (assigned_item.dead()) {
 				return false;
@@ -393,8 +391,8 @@ void game_gui_system::advance(
 			return should_fill_hotbar_from_right(assigned_item);
 		};
 
-		auto is_tied_to_left = [&](const auto& b) {
-			const auto assigned_item = b.get_assigned_entity(subject);
+		auto is_tied_to_left = [&](const auto& button) {
+			const auto assigned_item = button.get_assigned_entity(subject);
 
 			if (assigned_item.dead()) {
 				return false;
@@ -403,18 +401,20 @@ void game_gui_system::advance(
 			return !should_fill_hotbar_from_right(assigned_item);
 		};
 
-		auto is_unassigned = [&](const auto& b) {
-			return b.get_assigned_entity(subject).dead();
+		auto is_unassigned = [&](const auto& button) {
+			return button.get_assigned_entity(subject).dead();
 		};
 
-		const auto right_bound = find_in_if(h, is_tied_to_right);
-		const auto rright_bound = rfind_in_if(h, is_tied_to_left);
+		auto& buttons = context.get_character_gui().hotbar_buttons;
 
-		for (auto it = std::remove_if(h.begin(), right_bound, is_unassigned); it != right_bound; ++it) {
+		const auto right_bound = find_in_if(buttons, is_tied_to_right);
+		const auto rright_bound = rfind_in_if(buttons, is_tied_to_left);
+
+		for (auto it = std::remove_if(buttons.begin(), right_bound, is_unassigned); it != right_bound; ++it) {
 			*it = {};
 		}
 
-		for (auto it = std::remove_if(h.rbegin(), rright_bound, is_unassigned); it != rright_bound; ++it) {
+		for (auto it = std::remove_if(buttons.rbegin(), rright_bound, is_unassigned); it != rright_bound; ++it) {
 			*it = {};
 		}
 	}
