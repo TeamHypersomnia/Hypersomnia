@@ -8,6 +8,10 @@ struct my_address_info
 		net_time_t when_last = 0;
 		std::optional<netcode_address_t> resolved;
 		netcode_address_t destination;
+
+		bool completed() const {
+			return resolved != std::nullopt;
+		}
 	};
 
 	resolution_state first;
@@ -20,7 +24,7 @@ struct my_network_details_gui_state : public standard_window_mixin<my_network_de
 
 	my_address_info info;
 
-	void handle_requesting_resolution(netcode_socket_t& udp_socket, const netcode_address_t& resolution_host, port_type);
+	void advance_address_resolution(netcode_socket_t& udp_socket, const netcode_address_t& resolution_host, port_type);
 	void handle_response(const netcode_address_t& resolution_host, const netcode_address_t& resolved_addr);
 	void perform();
 	void reset();

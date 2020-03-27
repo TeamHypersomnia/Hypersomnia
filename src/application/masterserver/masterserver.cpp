@@ -284,13 +284,15 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					else if (command == masterserver_udp_command::TELL_ME_MY_ADDRESS) {
 						std::byte out_buf[sizeof(masterserver_udp_command) + sizeof(netcode_address_t)];
 
-						auto buf = augs::pointer_to_buffer{out_buf, sizeof(out_buf)};
-						auto out = augs::ptr_memory_stream(buf);
+						{
+							auto buf = augs::pointer_to_buffer{out_buf, sizeof(out_buf)};
+							auto out = augs::ptr_memory_stream(buf);
 
-						const auto& client_external_address = from;
+							const auto& client_external_address = from;
 
-						augs::write_bytes(out, uint8_t(masterserver_udp_command::TELL_ME_MY_ADDRESS_RESPONSE));
-						augs::write_bytes(out, client_external_address);
+							augs::write_bytes(out, uint8_t(masterserver_udp_command::TELL_ME_MY_ADDRESS_RESPONSE));
+							augs::write_bytes(out, client_external_address);
+						}
 
 						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						netcode_socket_send_packet(&socket, &from, out_buf, sizeof(out_buf));

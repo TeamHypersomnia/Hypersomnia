@@ -30,36 +30,27 @@ void my_network_details_gui_state::reset() {
 	info = {};
 }
 
-void my_network_details_gui_state::handle_requesting_resolution(netcode_socket_t& udp_socket, const netcode_address_t& resolution_host, const port_type extra_port) {
-	auto handle_addr_resolution = [&](auto& info, const std::optional<port_type> alternate_port = std::nullopt) {
-		auto& when_last = info.when_last;
-
-		if (info.resolved != std::nullopt)
-		{
+void my_network_details_gui_state::advance_address_resolution(netcode_socket_t& udp_socket, const netcode_address_t& resolution_host, const port_type extra_port) {
+	auto advance_resolution_of = [&](auto& info, const std::optional<port_type> alternate_port = std::nullopt) {
+		if (info.completed()) {
 			return;
 		}
 
-		const auto current_time = yojimbo_time();
-
-		if (when_last == 0 || current_time - when_last >= address_resolution_interval)
-		{
+		if (try_fire_interval(address_resolution_interval, info.when_last)) {
 			auto serv_addr = resolution_host;
 
-			if (alternate_port != std::nullopt)
-			{
+			if (alternate_port != std::nullopt) {
 				serv_addr.port = *alternate_port;
 			}
 
 			info.destination = serv_addr;
 
 			::tell_me_my_address(udp_socket, serv_addr);
-
-			when_last = current_time;
 		}
 	};
 
-	handle_addr_resolution(info.first);
-	handle_addr_resolution(info.second, extra_port);
+	advance_resolution_of(info.first);
+	advance_resolution_of(info.second, extra_port);
 }
 
 void my_network_details_gui_state::perform() {

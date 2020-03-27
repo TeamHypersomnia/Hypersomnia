@@ -162,6 +162,19 @@ std::string ToString(const netcode_address_t& addr) {
 	return buffer;
 }
 
+bool try_fire_interval(const double interval, net_time_t& when_last, const double current_time) {
+	if (when_last == 0 || current_time - when_last >= interval) {
+		when_last = current_time;
+		return true;
+	}
+
+	return false;
+}
+
+bool try_fire_interval(const double interval, net_time_t& when_last) {
+	return try_fire_interval(interval, when_last, yojimbo_time());
+}
+
 server_adapter::server_adapter(const server_start_input& in) :
 	connection_config(in),
 	adapter(this),

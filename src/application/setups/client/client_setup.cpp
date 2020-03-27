@@ -44,6 +44,7 @@
 #include "augs/network/netcode_sockets.h"
 #include "application/network/resolve_address_result.h"
 #include "application/masterserver/nat_puncher_client.h"
+#include "augs/network/netcode_utils.h"
 
 void client_demo_player::play_demo_from(const augs::path_type& p) {
 	source_path = p;
@@ -730,16 +731,12 @@ void client_setup::punch_this_server_if_required() {
 		return;
 	}
 
-	const auto nat_request_interval = 0.2;
+	if (auto socket = adapter->find_underlying_socket()) {
+		const auto nat_request_interval = 0.2;
 
-	auto& when_last = when_sent_nat_punch_request;
-
-	if (when_sent_nat_punch_request == 0 || client_time - when_last >= nat_request_interval) {
-		if (auto socket = adapter->find_underlying_socket()) {
+		if (try_fire_interval(nat_request_interval, when_sent_nat_punch_request, client_time)) {
 			LOG("Punching %x simultaneously with the client connection attempt, just in case.", ::ToString(resolved_server_address));
 			nat->punch_this_server(*socket, resolved_server_address);
-
-			when_last = client_time;
 		}
 	}
 }

@@ -145,7 +145,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 		}
 	);
 
-	when_last_downloaded_server_list = yojimbo_time();
+	when_last_started_refreshing_server_list = yojimbo_time();
 }
 
 void browse_servers_gui_state::refresh_server_pings() {
@@ -223,9 +223,13 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 
 	const auto current_time = yojimbo_time();
 
+	auto interval_passed = [current_time](const auto last, const auto interval) {
+		return current_time - last >= interval;
+	};
+
 	if (nat.relay_host_resolved())
 	{
-		my_network_details.handle_requesting_resolution(udp_socket, *nat.relay_host_addr, in.nat_punch_provider.extra_address_resolution_port);
+		my_network_details.advance_address_resolution(udp_socket, *nat.relay_host_addr, in.nat_punch_provider.extra_address_resolution_port);
 	}
 
 	{
@@ -342,14 +346,11 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 		if (p.state == S::AWAITING_RESPONSE) {
 			if (behind_nat) {
 				if (nat.relay_host_resolved()) {
-					auto& when_first = p.when_first_nat_request;
-					auto& when_last = p.when_last_nat_request;
+					auto& when_first_punch = p.when_first_nat_request;
 
-					if (when_last == 0 || current_time - when_last >= nat_request_interval) {
-						when_last = current_time;
-
-						if (when_first == 0) {
-							when_first = current_time;
+					if (try_fire_interval(nat_request_interval, p.when_last_nat_request, current_time)) {
+						if (when_first_punch == 0) {
+							when_first_punch = current_time;
 						}
 
 						nat.punch_this_server(udp_socket, s.address);
@@ -357,7 +358,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 						--packets_left;
 					}
 
-					if (when_first != 0 && current_time - when_first >= server_entry_timeout) {
+					if (when_first_punch != 0 && interval_passed(server_entry_timeout, when_first_punch)) {
 						p.state = server_entry_state::GIVEN_UP;
 						continue;
 					}
@@ -366,25 +367,25 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 		}
 
 		if (p.state == S::AWAITING_RESPONSE || p.state == S::PUNCHED) {
-			auto& when_first = p.when_sent_first_ping;
-			auto& when_last = p.when_sent_last_ping;
+			auto& when_first_ping = p.when_sent_first_ping;
+			auto& when_last_ping = p.when_sent_last_ping;
 
-			if (when_last == 0 || current_time - when_last >= ping_retry_interval) {
-				if (when_first == 0) {
-					when_first = current_time;
+			if (try_fire_interval(ping_retry_interval, when_last_ping, current_time)) {
+				if (when_first_ping == 0) {
+					when_first_ping = current_time;
 				}
 
 				request_ping();
 			}
 
-			if (when_first != 0 && current_time - when_first >= server_entry_timeout) {
+			if (when_first_ping != 0 && interval_passed(server_entry_timeout, when_first_ping)) {
 				p.state = server_entry_state::GIVEN_UP;
 				continue;
 			}
 		}
 
 		if (p.state == S::PING_MEASURED) {
-			auto& when_last = p.when_sent_last_ping;
+			auto& when_last_ping = p.when_sent_last_ping;
 
 			auto reping_if_its_time = [&]() {
 				if (!show) {
@@ -392,13 +393,13 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 					return;
 				}
 
-				if (current_time - when_last >= ping_nat_keepalive_interval) {
+				if (interval_passed(ping_nat_keepalive_interval, when_last_ping)) {
 					request_ping();
 				}
 			};
 
 			if (behind_nat) {
-				if (current_time - when_last >= reopen_nat_after_seconds * 2) {
+				if (interval_passed(reopen_nat_after_seconds * 2, when_last_ping)) {
 					/* 
 						If it weren't pinged for such a long time for any reason,
 						consider the NAT holes dead. Refresh the server.
@@ -771,7 +772,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	ImGui::Separator();
 
-	if (when_last_downloaded_server_list == 0) {
+	if (when_last_started_refreshing_server_list == 0) {
 		refresh_server_list(in);
 	}
 
