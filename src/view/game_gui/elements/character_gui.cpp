@@ -87,11 +87,11 @@ xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
 		case slot_function::GUN_CHAMBER_MAGAZINE: return xywh(0, unit, 33, 33);
 		case slot_function::GUN_CHAMBER: return xywh(0, -unit, 33, 33);
 		case slot_function::GUN_MUZZLE: return xywh(-unit, 0, 33, 33);
+
+		default:
+			LOG("WARNING! Non-existent slot detected.");
+			return xywh(0, 0, 0, 0);
 	}
-
-	LOG("WARNING! Non-existent slot detected.");
-
-	return xywh(0, 0, 0, 0);
 }
 
 vec2i character_gui::get_initial_position_for(const vec2i screen_size, const drag_and_drop_target_drop_item&) const {

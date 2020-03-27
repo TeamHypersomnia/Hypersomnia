@@ -262,16 +262,16 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 
 			const auto command = packet_buffer[0];
 
-			if (command == uint8_t(masterserver_udp_command::RESOLVE_EXTERNAL_ADDRESS)) {
+			if (command == uint8_t(masterserver_udp_command::TELL_ME_MY_ADDRESS)) {
 				if (packet_bytes != 1 + sizeof(netcode_address_t)) {
-					BRW_LOG("Wrong num of bytes for RESOLVE_EXTERNAL_ADDRESS: %x!", packet_bytes);
+					BRW_LOG("Wrong num of bytes for TELL_ME_MY_ADDRESS: %x!", packet_bytes);
 					continue;
 				}
 
 				netcode_address_t resolved_address;
 				std::memcpy(&resolved_address, packet_buffer + 1, sizeof(netcode_address_t));
 
-				BRW_LOG("RESOLVE_EXTERNAL_ADDRESS response!");
+				BRW_LOG("TELL_ME_MY_ADDRESS response!");
 				my_network_details.handle_response(from, resolved_address);
 			}
 			else if (command == NETCODE_PING_RESPONSE_PACKET) {
@@ -365,7 +365,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 							when_first = current_time;
 						}
 
-						nat.punched_server_addr = *s.data.internal_network_address;
+						nat.punched_server_addr = s.address;
 						nat.request_punch(udp_socket);
 
 						--packets_left;
@@ -1032,7 +1032,7 @@ void my_network_details_gui_state::handle_requesting_resolution(netcode_socket_t
 
 			info.destination = serv_addr;
 
-			::send_address_resolution_request(udp_socket, serv_addr);
+			::tell_me_my_address(udp_socket, serv_addr);
 
 			when_last = current_time;
 		}
