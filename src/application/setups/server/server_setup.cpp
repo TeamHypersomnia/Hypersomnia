@@ -41,10 +41,11 @@ void server_setup::shutdown() {
 
 		const auto destination_address = resolved_server_list_addr.value();
 
-		auto goodbye = std::byte(masterserver_udp_command::SERVER_GOODBYE);
+		const auto goodbye = masterserver_request(masterserver_in::goodbye {});
+		auto goodbye_bytes = augs::to_bytes(goodbye);
 
 		for (int i = 0; i < 4; ++i) {
-			server->send_udp_packet(destination_address, &goodbye, 1);
+			server->send_udp_packet(destination_address, goodbye_bytes.data(), goodbye_bytes.size());
 		}
 	}
 
@@ -190,15 +191,15 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	{
 		auto ss = augs::ref_memory_stream(heartbeat_buffer);
-		augs::write_bytes(ss, masterserver_udp_command::HEARTBEAT);
-		augs::write_bytes(ss, heartbeat);
+		augs::write_bytes(ss, masterserver_request(std::move(heartbeat)));
 	}
 
 	const auto heartbeat_bytes = heartbeat_buffer.size();
-	const auto destination_address = resolved_server_list_addr.value();
-	LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_bytes);
 
 	if (heartbeat_bytes > 0) {
+		const auto destination_address = resolved_server_list_addr.value();
+		LOG("Sending heartbeat through UDP to %x (%x). Bytes: %x", ToString(to_yojimbo_addr(destination_address)), destination_address.type, heartbeat_bytes);
+
 		server->send_udp_packet(destination_address, heartbeat_buffer.data(), heartbeat_bytes);
 	}
 }

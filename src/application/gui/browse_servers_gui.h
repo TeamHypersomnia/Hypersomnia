@@ -108,10 +108,18 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	void refresh_server_list(browse_servers_input);
 	void refresh_server_pings();
 
-	server_list_entry* find(const netcode_address_t&);
-	server_list_entry* find_by_internal_network_address(const netcode_address_t&, uint64_t ping_sequence);
+	server_list_entry* find_entry(const netcode_address_t&);
+	server_list_entry* find_entry_by_internal_address(const netcode_address_t&, uint64_t ping_sequence);
 
 	const resolve_address_result* find_resolved_official(const netcode_address_t&);
+
+	template <class R>
+	void handle_masterserver_response(const R& typed_response, const netcode_address_t& from);
+	bool handle_gameserver_response(uint8_t* packet_buffer, std::size_t packet_bytes, const netcode_address_t& from);
+
+	void animate_dot_column();
+	void handle_incoming_udp_packets(netcode_socket_t&);
+	void send_pings_and_punch_requests(netcode_socket_t&);
 
 public:
 

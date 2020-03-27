@@ -158,7 +158,7 @@ bool server_list_entry::is_behind_nat() const {
 	return address != data.internal_network_address;
 }
 
-server_list_entry* browse_servers_gui_state::find(const netcode_address_t& address) {
+server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t& address) {
 	for (auto& s : server_list) {
 		if (s.address == address) {
 			return &s;
@@ -168,7 +168,7 @@ server_list_entry* browse_servers_gui_state::find(const netcode_address_t& addre
 	return nullptr;
 }
 
-server_list_entry* browse_servers_gui_state::find_by_internal_network_address(const netcode_address_t& address, const uint64_t ping_sequence) {
+server_list_entry* browse_servers_gui_state::find_entry_by_internal_address(const netcode_address_t& address, const uint64_t ping_sequence) {
 	for (auto& s : server_list) {
 		if (s.progress.ping_sequence == ping_sequence) {
 			if (s.data.internal_network_address == address) {
@@ -211,101 +211,159 @@ static bool is_internal(const netcode_address_t& address) {
 	return false;
 }
 
+static std::optional<uint64_t> read_ping_response(uint8_t* packet_buffer, std::size_t packet_bytes) {
+	if (packet_bytes < 1) {
+		return std::nullopt;
+	}
+
+	const auto command = packet_buffer[0];
+
+	if (command == NETCODE_PING_RESPONSE_PACKET) {
+		if (packet_bytes != 1 + sizeof(uint64_t)) {
+			BRW_LOG("Wrong num of bytes for NETCODE_PING_RESPONSE_PACKET: %x!", packet_bytes);
+			return std::nullopt;
+		}
+
+		uint64_t sequence;
+		std::memcpy(&sequence, packet_buffer + 1, sizeof(uint64_t));
+
+		return sequence;
+	}
+
+	return std::nullopt;
+}
+
+template <class R>
+void browse_servers_gui_state::handle_masterserver_response(
+	const R& typed_response, 
+	const netcode_address_t& from
+) {
+	namespace OUT = masterserver_out;
+
+	if constexpr(std::is_same_v<R, OUT::tell_me_my_address>) {
+		const auto& our_external_address = typed_response.address;
+
+		BRW_LOG("tell_me_my_address response: %x -> %x", ::ToString(from), ::ToString(our_external_address));
+		my_network_details.handle_response(from, our_external_address);
+	}
+}
+
+bool browse_servers_gui_state::handle_gameserver_response(uint8_t* packet_buffer, std::size_t packet_bytes, const netcode_address_t& from) {
+	const auto current_time = yojimbo_time();
+
+	if (const auto maybe_sequence = read_ping_response(packet_buffer, packet_bytes)) {
+		const auto sequence = *maybe_sequence;
+
+		if (const auto entry = find_entry(from)) {
+			BRW_LOG("Received a pingback (seq=%x) from an EXTERNAL game server at: %x", sequence, ::ToString(from));
+
+			auto& progress = entry->progress;
+
+			if (sequence == uint64_t(-1)) {
+				BRW_LOG("Punched server: %x", ::ToString(from));
+
+				progress.state = server_entry_state::PUNCHED;
+			}
+			else if (sequence == progress.ping_sequence) {
+				BRW_LOG("Properly measured ping to %x: %x", ::ToString(from), progress.ping);
+
+				progress.set_ping_from(current_time);
+				progress.state = server_entry_state::PING_MEASURED;
+			}
+		}
+		else if (const auto entry = find_entry_by_internal_address(from, sequence)) {
+			auto& progress = entry->progress;
+
+			BRW_LOG("Received a pingback (seq=%x) from an INTERNAL game server at: %x", sequence, ::ToString(from));
+
+			progress.set_ping_from(current_time);
+			progress.state = server_entry_state::PING_MEASURED;
+			progress.found_on_internal_network = true;
+		}
+		else {
+			BRW_LOG("WARNING! Received a pingback (seq=%x) from an UNKNOWN game server at: %x", sequence, ::ToString(from));
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& socket) {
+	netcode_address_t from;
+	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
+
+	while (true) {
+		const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, packet_buffer, NETCODE_MAX_PACKET_BYTES);
+
+		if (packet_bytes < 1) {
+			break;
+		}
+
+		if (handle_gameserver_response(packet_buffer, packet_bytes, from)) {
+			continue;
+		}
+
+		try {
+			auto handle = [&](const auto& typed_response) {
+				handle_masterserver_response(typed_response, from);
+			};
+
+			auto buf = augs::cpointer_to_buffer { 
+				reinterpret_cast<const std::byte*>(packet_buffer), 
+				static_cast<std::size_t>(packet_bytes) 
+			};
+
+			auto cptr = augs::cptr_memory_stream(buf);
+
+			const auto response = augs::read_bytes<masterserver_response>(cptr);
+			std::visit(handle, response);
+		}
+		catch (const augs::stream_read_error& err) {
+			LOG("Invalid response from the masterserver. Details:\n%x", err.what());
+		}
+	}
+}
+
+void browse_servers_gui_state::animate_dot_column() {
+	const auto current_time = yojimbo_time();
+
+	const auto num_dots = uint64_t(current_time * 3) % 3 + 1;
+	loading_dots = std::string(num_dots, '.');
+}
+
 void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_input in) {
 	if (in.nat_puncher_socket == nullptr) {
 		return;
 	}
 
+	animate_dot_column();
+
 	auto udp_socket = *in.nat_puncher_socket;
-	auto& nat = data->nat;
 
-	nat.advance_relay_host_resolution();
+	{
+		auto& nat = data->nat;
 
+		nat.advance_relay_host_resolution();
+
+		if (nat.relay_host_resolved()) {
+			my_network_details.advance_address_resolution(udp_socket, *nat.relay_host_addr, in.nat_punch_provider.extra_address_resolution_port);
+		}
+	}
+
+	handle_incoming_udp_packets(udp_socket);
+	send_pings_and_punch_requests(udp_socket);
+}
+
+void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& socket) {
 	const auto current_time = yojimbo_time();
 
 	auto interval_passed = [current_time](const auto last, const auto interval) {
 		return current_time - last >= interval;
 	};
 
-	if (nat.relay_host_resolved())
-	{
-		my_network_details.advance_address_resolution(udp_socket, *nat.relay_host_addr, in.nat_punch_provider.extra_address_resolution_port);
-	}
-
-	{
-
-		const auto num_dots = uint64_t(current_time * 3) % 3 + 1;
-		loading_dots = std::string(num_dots, '.');
-	}
-
-	{
-		struct netcode_address_t from;
-		uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
-
-		while (true) {
-			const auto packet_bytes = netcode_socket_receive_packet(&udp_socket, &from, packet_buffer, NETCODE_MAX_PACKET_BYTES);
-
-			if (packet_bytes < 1) {
-				break;
-			}
-
-			BRW_LOG("Packet arrived!");
-
-			const auto command = packet_buffer[0];
-
-			if (command == uint8_t(masterserver_udp_command::TELL_ME_MY_ADDRESS)) {
-				if (packet_bytes != 1 + sizeof(netcode_address_t)) {
-					BRW_LOG("Wrong num of bytes for TELL_ME_MY_ADDRESS: %x!", packet_bytes);
-					continue;
-				}
-
-				netcode_address_t resolved_address;
-				std::memcpy(&resolved_address, packet_buffer + 1, sizeof(netcode_address_t));
-
-				BRW_LOG("TELL_ME_MY_ADDRESS response!");
-				my_network_details.handle_response(from, resolved_address);
-			}
-			else if (command == NETCODE_PING_RESPONSE_PACKET) {
-				if (packet_bytes != 1 + sizeof(uint64_t)) {
-					BRW_LOG("Wrong num of bytes for NETCODE_PING_RESPONSE_PACKET: %x!", packet_bytes);
-					continue;
-				}
-
-				BRW_LOG("Ping response!");
-
-				uint64_t sequence;
-				std::memcpy(&sequence, packet_buffer + 1, sizeof(uint64_t));
-
-				if (const auto entry = find(from)) {
-					auto& progress = entry->progress;
-
-					BRW_LOG("Has entry! Sequence: %x; entry sequence: %x", sequence, progress.ping_sequence);
-
-					if (sequence == uint64_t(-1)) {
-						BRW_LOG("Punched server: %x", ::ToString(from));
-						progress.state = server_entry_state::PUNCHED;
-					}
-					else if (sequence == progress.ping_sequence) {
-						BRW_LOG("Sequence matches!");
-						progress.set_ping_from(current_time);
-						progress.state = server_entry_state::PING_MEASURED;
-					}
-				}
-
-				if (const auto entry = find_by_internal_network_address(from, sequence)) {
-					auto& progress = entry->progress;
-
-					BRW_LOG("Found a server on the internal network! Sequence: %", sequence);
-					BRW_LOG("Sequence matches!");
-
-					progress.set_ping_from(current_time);
-					progress.state = server_entry_state::PING_MEASURED;
-					progress.found_on_internal_network = true;
-				}
-			}
-		}
-	}
-
+	auto& nat = data->nat;
 	int packets_left = max_packets_per_frame_v;
 
 	if (server_list.empty()) {
@@ -327,7 +385,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			p.when_sent_last_ping = current_time;
 			p.ping_sequence = ping_sequence_counter++;
 
-			ping_this_server(udp_socket, s.address, p.ping_sequence);
+			ping_this_server(socket, s.address, p.ping_sequence);
 			--packets_left;
 
 			const auto& internal_address = s.data.internal_network_address;
@@ -338,7 +396,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			;
 
 			if (maybe_reachable_internally) {
-				ping_this_server(udp_socket, *internal_address, p.ping_sequence);
+				ping_this_server(socket, *internal_address, p.ping_sequence);
 				--packets_left;
 			}
 		};
@@ -353,7 +411,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 							when_first_punch = current_time;
 						}
 
-						nat.punch_this_server(udp_socket, s.address);
+						nat.punch_this_server(socket, s.address);
 
 						--packets_left;
 					}

@@ -13,5 +13,5 @@ struct is_size_sufficient {
 template <class T>
 using get_index_type_for_size_of_t = find_matching_type_in_list<
 	is_size_sufficient<T>::template type,
-	type_list<unsigned char, unsigned short, unsigned int>
+	type_list<uint8_t, uint16_t, uint32_t>
 >;

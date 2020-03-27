@@ -18,6 +18,8 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/network/resolve_address.h"
 #include "augs/readwrite/byte_file.h"
+#include "augs/readwrite/to_bytes.h"
+#include "application/masterserver/netcode_ping_request.h"
 
 std::string ToString(const netcode_address_t&);
 
@@ -158,10 +160,9 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			const auto current_time = yojimbo_time();
 
 			while (source.peek() != EOF) {
-				netcode_address_t address;
-				masterserver_client entry;
+				const auto address = augs::read_bytes<netcode_address_t>(source);
 
-				augs::read_bytes(source, address);
+				masterserver_client entry;
 				augs::read_bytes(source, entry.meta.appeared_when);
 				augs::read_bytes(source, entry.last_heartbeat);
 
@@ -248,97 +249,92 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			if (packet_bytes > 0) {
 				MSR_LOG("Received packet bytes: %x", packet_bytes);
 
-				const auto buf = augs::cpointer_to_buffer{ reinterpret_cast<const std::byte*>(packet_buffer), static_cast<std::size_t>(packet_bytes) };
-				auto ss = augs::cptr_memory_stream(buf);
-
 				try {
-					masterserver_udp_command command;
-					augs::read_bytes(ss, command);
+					auto send_back = [&](const auto& typed_response) {
+						auto bytes = augs::to_bytes(masterserver_response(typed_response));
+						netcode_socket_send_packet(&socket, &from, bytes.data(), bytes.size());
+					};
 
-					if (command == masterserver_udp_command::SERVER_GOODBYE) {
-						if (const auto entry = mapped_or_nullptr(server_list, from)) {
-							LOG("The server at %x (%x) has sent a goodbye.", ::ToString(from), entry->last_heartbeat.server_name);
-							remove_from_list(from);
+					auto handle = [&](const auto& typed_request) {
+						using R = remove_cref<decltype(typed_request)>;
+						namespace IN = masterserver_in;
+						namespace OUT = masterserver_out;
+
+						if constexpr(std::is_same_v<R, IN::goodbye>) {
+							if (const auto entry = mapped_or_nullptr(server_list, from)) {
+								LOG("The server at %x (%x) has sent a goodbye.", ::ToString(from), entry->last_heartbeat.server_name);
+								remove_from_list(from);
+							}
 						}
-					}
-					else if (command == masterserver_udp_command::HEARTBEAT) {
-						auto it = server_list.try_emplace(from);
+						else if constexpr(std::is_same_v<R, IN::heartbeat>) {
+							auto it = server_list.try_emplace(from);
 
-						const bool is_new_server = it.second;
-						auto& server_entry = (*it.first).second;
+							const bool is_new_server = it.second;
+							auto& server_entry = (*it.first).second;
 
-						const auto heartbeat_before = server_entry.last_heartbeat;
-						augs::read_bytes(ss, server_entry.last_heartbeat);
-						server_entry.last_heartbeat.validate();
+							const auto heartbeat_before = server_entry.last_heartbeat;
+							server_entry.last_heartbeat = typed_request;
+							server_entry.time_of_last_heartbeat = current_time;
 
-						server_entry.time_of_last_heartbeat = current_time;
+							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
 
-						const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
+							MSR_LOG_NVPS(is_new_server, heartbeats_mismatch);
 
-						MSR_LOG_NVPS(is_new_server, heartbeats_mismatch);
-
-						if (is_new_server || heartbeats_mismatch) {
-							reserialize_list();
+							if (is_new_server || heartbeats_mismatch) {
+								reserialize_list();
+							}
 						}
-					}
-					else if (command == masterserver_udp_command::TELL_ME_MY_ADDRESS) {
-						std::byte out_buf[sizeof(masterserver_udp_command) + sizeof(netcode_address_t)];
+						else if constexpr(std::is_same_v<R, IN::tell_me_my_address>) {
+							OUT::tell_me_my_address response;
+							response.address = from;
 
-						{
-							auto buf = augs::pointer_to_buffer{out_buf, sizeof(out_buf)};
-							auto out = augs::ptr_memory_stream(buf);
-
-							const auto& client_external_address = from;
-
-							augs::write_bytes(out, uint8_t(masterserver_udp_command::TELL_ME_MY_ADDRESS_RESPONSE));
-							augs::write_bytes(out, client_external_address);
+							MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
+							send_back(response);
 						}
+						else if constexpr(std::is_same_v<R, IN::punch_this_server>) {
+							auto punched_server = typed_request.address;
+							const auto& pingback_address = from;
 
-						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
-						netcode_socket_send_packet(&socket, &from, out_buf, sizeof(out_buf));
-					}
-					else if (command == masterserver_udp_command::PUNCH_THIS_SERVER) {
-						netcode_address_t punched_server;
-						augs::read_bytes(ss, punched_server);
+							const bool should_send_request = [&]() {
+								if (const auto entry = mapped_or_nullptr(server_list, punched_server)) {
+									MSR_LOG("Found the requested server.");
 
-						MSR_LOG("A request arrived from %x to punch %x", ::ToString(from), ::ToString(punched_server));
+									const bool is_behind_nat = entry->last_heartbeat.internal_network_address != punched_server;
 
-						std::byte out_buf[sizeof(masterserver_udp_command) + sizeof(netcode_address_t) + sizeof(uint64_t)];
+									if (is_behind_nat) {
+										MSR_LOG("The requested server is behind NAT. Deciding to send the request.");
+										return true;
+									}
 
-						{
-							auto buf = augs::pointer_to_buffer{out_buf, sizeof(out_buf)};
-							auto out = augs::ptr_memory_stream(buf);
-
-							const auto sequence_dummy = uint64_t(-1);
-
-							augs::write_bytes(out, uint8_t(NETCODE_PING_REQUEST_PACKET));
-							augs::write_bytes(out, sequence_dummy);
-							augs::write_bytes(out, from);
-						}
-
-						const bool should_send_request = [&]() {
-							if (const auto entry = mapped_or_nullptr(server_list, punched_server)) {
-								MSR_LOG("Found the requested server.");
-
-								const bool is_behind_nat = entry->last_heartbeat.internal_network_address != punched_server;
-
-								if (is_behind_nat) {
-									MSR_LOG("The requested server is behind NAT. Deciding to send the request.");
-									return true;
+									MSR_LOG("The requested server is not behind NAT. Ignoring the request.");
+									return false;
 								}
 
-								MSR_LOG("The requested server is not behind NAT. Ignoring the request.");
+								MSR_LOG("The requested server was not found.");
 								return false;
+							}();
+
+							MSR_LOG("A request arrived from %x to punch %x", ::ToString(from), ::ToString(punched_server));
+
+							if (should_send_request || LOG_MASTERSERVER) {
+								auto punching_ping_bytes = make_ping_request_message_bytes(
+									pingback_address
+								);
+
+								netcode_socket_send_packet(&socket, &punched_server, punching_ping_bytes.data(), punching_ping_bytes.size());
 							}
-
-							MSR_LOG("The requested server was not found.");
-							return false;
-						}();
-
-						if (should_send_request || LOG_MASTERSERVER) {
-							netcode_socket_send_packet(&socket, &punched_server, out_buf, sizeof(out_buf));
 						}
-					}
+					};
+
+					const auto buf = augs::cpointer_to_buffer { 
+						reinterpret_cast<const std::byte*>(packet_buffer), 
+						static_cast<std::size_t>(packet_bytes) 
+					};
+
+					auto ss = augs::cptr_memory_stream(buf);
+
+					const auto request = augs::read_bytes<masterserver_request>(ss);
+					std::visit(handle, request);
 				}
 				catch (...) {
 					if (const auto entry = mapped_or_nullptr(server_list, from)) {

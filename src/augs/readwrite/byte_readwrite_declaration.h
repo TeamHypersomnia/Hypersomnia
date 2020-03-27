@@ -10,6 +10,9 @@ namespace augs {
 		void write_raw_bytes(Archive& ar, const Serialized* const location, const std::size_t object_count);
 	}
 
+	template <class Serialized, class Archive>
+	Serialized read_bytes(Archive& ar);
+
 	template <class Archive, class Serialized>
 	void read_bytes(Archive&, Serialized&);
 

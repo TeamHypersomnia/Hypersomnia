@@ -1,5 +1,5 @@
 #pragma once
-#include "application/masterserver/nat_puncher_commands.h"
+#include "application/masterserver/masterserver_requests.h"
 #include "application/network/resolve_address.h"
 
 struct nat_puncher_client {

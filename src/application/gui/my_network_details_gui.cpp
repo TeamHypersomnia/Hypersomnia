@@ -8,7 +8,7 @@
 #include "application/gui/my_network_details_gui.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
-#include "application/masterserver/nat_puncher_commands.h"
+#include "application/masterserver/masterserver_requests.h"
 
 double yojimbo_time();
 

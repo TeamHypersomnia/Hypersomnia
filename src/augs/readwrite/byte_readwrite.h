@@ -112,10 +112,10 @@ namespace augs {
 			}
 		}
 		else if constexpr(is_variant_v<Serialized>) {
-			auto type_id = static_cast<unsigned>(-1);
+			auto type_id = static_cast<uint8_t>(-1);
 			read_bytes(ar, type_id);
 
-			if (type_id != static_cast<unsigned>(-1)) {
+			if (type_id != static_cast<uint8_t>(-1)) {
 				for_each_type_in_list<Serialized>(
 					[&](const auto& dummy) {
 						using T = remove_cref<decltype(dummy)>;
@@ -181,6 +181,13 @@ namespace augs {
 		}
 	}
 
+	template <class Serialized, class Archive>
+	Serialized read_bytes(Archive& ar) {
+		Serialized storage;
+		augs::read_bytes(ar, storage);
+		return storage;
+	}
+
 	namespace detail {
 		template <class Archive, class Serialized>
 		void write_bytes_n(
@@ -227,11 +234,13 @@ namespace augs {
 		else if constexpr(is_variant_v<Serialized>) {
 			const auto index = storage.index();
 
+			static_assert(num_types_in_list_v<Serialized> < static_cast<uint8_t>(-1));
+
 			if (index == std::variant_npos) {
-				write_bytes(ar, static_cast<unsigned>(-1));
+				write_bytes(ar, static_cast<uint8_t>(-1));
 			}
 			else {
-				write_bytes(ar, static_cast<unsigned>(index));
+				write_bytes(ar, static_cast<uint8_t>(index));
 
 				std::visit(
 					[&](const auto& object) {
