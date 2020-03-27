@@ -1,5 +1,5 @@
 #pragma once
-#include "application/masterserver/send_punch_request.h"
+#include "application/masterserver/nat_puncher_commands.h"
 #include "application/network/resolve_address.h"
 
 struct nat_puncher_client {
@@ -32,8 +32,8 @@ struct nat_puncher_client {
 		return relay_host_addr != std::nullopt;
 	}
 
-	void request_punch(const netcode_socket_t& socket) {
-		::send_punch_request(socket, *relay_host_addr, punched_server_addr);
+	void punch_this_server(const netcode_socket_t& socket, const netcode_address_t& punched_server) {
+		::punch_this_server(socket, *relay_host_addr, punched_server);
 	}
 };
 

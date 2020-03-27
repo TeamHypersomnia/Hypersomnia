@@ -2,13 +2,13 @@
 #include "application/masterserver/masterserver.h"
 #include "augs/readwrite/pointer_to_buffer.h"
 
-inline void send_punch_request(const netcode_socket_t& socket, netcode_address_t relay_host_address, const netcode_address_t& punched_server) {
+inline void punch_this_server(const netcode_socket_t& socket, netcode_address_t relay_host_address, const netcode_address_t& punched_server) {
 	std::byte bytes[1 + sizeof(netcode_address_t)];
 
 	auto buf = augs::pointer_to_buffer {bytes, sizeof(bytes)}; 
 	auto out = augs::ptr_memory_stream { buf };
 
-	augs::write_bytes(out, masterserver_udp_command::NAT_PUNCH_REQUEST);
+	augs::write_bytes(out, masterserver_udp_command::PUNCH_THIS_SERVER);
 	augs::write_bytes(out, punched_server);
 
 	LOG("Requesting %x to punch %x!", ::ToString(relay_host_address), ::ToString(punched_server));
@@ -25,7 +25,7 @@ inline void tell_me_my_address(const netcode_socket_t& socket, netcode_address_t
 	netcode_socket_send_packet(&s, &resolution_server, &cmd, 1);
 }
 
-inline void send_ping_request(const netcode_socket_t& socket, netcode_address_t target_server, uint64_t sequence) {
+inline void ping_this_server(const netcode_socket_t& socket, netcode_address_t target_server, uint64_t sequence) {
 	std::byte bytes[1 + sizeof(sequence)];
 
 	auto buf = augs::pointer_to_buffer {bytes, sizeof(bytes)}; 

@@ -48,6 +48,7 @@
 #include "application/gui/client/demo_player_gui.h"
 #include "application/setups/client/client_demo_player.h"
 #include "application/masterserver/nat_punch_provider_settings.h"
+#include "3rdparty/yojimbo/netcode.io/netcode.h"
 
 struct config_lua_table;
 
@@ -93,6 +94,7 @@ class client_setup :
 	simulation_receiver receiver;
 
 	address_and_port last_addr;
+	netcode_address_t resolved_server_address;
 	client_state_type state = client_state_type::INITIATING_CONNECTION;
 
 	client_vars vars;
@@ -186,7 +188,7 @@ class client_setup :
 	void handle_server_payloads();
 	void send_pending_commands();
 	void send_packets_if_its_time();
-	void send_nat_asssitance_requests_if_its_time();
+	void punch_this_server_if_required();
 
 	template <class T, class F>
 	message_handler_result handle_server_payload(
@@ -319,7 +321,7 @@ class client_setup :
 		{
 			auto scope = measure_scope(performance.sending_packets);
 			send_packets_if_its_time();
-			send_nat_asssitance_requests_if_its_time();
+			punch_this_server_if_required();
 		}
 
 		if (in_game) {

@@ -295,7 +295,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						netcode_socket_send_packet(&socket, &from, out_buf, sizeof(out_buf));
 					}
-					else if (command == masterserver_udp_command::NAT_PUNCH_REQUEST) {
+					else if (command == masterserver_udp_command::PUNCH_THIS_SERVER) {
 						netcode_address_t punched_server;
 						augs::read_bytes(ss, punched_server);
 

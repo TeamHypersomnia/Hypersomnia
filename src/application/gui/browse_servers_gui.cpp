@@ -336,7 +336,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			p.when_sent_last_ping = current_time;
 			p.ping_sequence = ping_sequence_counter++;
 
-			send_ping_request(udp_socket, s.address, p.ping_sequence);
+			ping_this_server(udp_socket, s.address, p.ping_sequence);
 			--packets_left;
 
 			const auto& internal_address = s.data.internal_network_address;
@@ -347,7 +347,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 			;
 
 			if (maybe_reachable_internally) {
-				send_ping_request(udp_socket, *internal_address, p.ping_sequence);
+				ping_this_server(udp_socket, *internal_address, p.ping_sequence);
 				--packets_left;
 			}
 		};
@@ -365,8 +365,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 							when_first = current_time;
 						}
 
-						nat.punched_server_addr = s.address;
-						nat.request_punch(udp_socket);
+						nat.punch_this_server(udp_socket, s.address);
 
 						--packets_left;
 					}

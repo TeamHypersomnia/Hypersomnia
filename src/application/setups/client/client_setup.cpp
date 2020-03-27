@@ -279,7 +279,7 @@ client_setup::client_setup(
 				set_disconnect_reason(reason);
 			}
 			else {
-				nat->punched_server_addr = resolution.addr;
+				resolved_server_address = resolution.addr;
 				nat->resolve_relay_host(nat_punch_provider.address);
 
 				ensure_eq(resolution.result, resolve_result_type::OK);
@@ -715,7 +715,7 @@ const netcode_socket_t* client_setup::find_underlying_socket() const {
 	return adapter->find_underlying_socket();
 }
 
-void client_setup::send_nat_asssitance_requests_if_its_time() {
+void client_setup::punch_this_server_if_required() {
 	if (is_replaying()) {
 		return;
 	}
@@ -736,8 +736,8 @@ void client_setup::send_nat_asssitance_requests_if_its_time() {
 
 	if (when_sent_nat_punch_request == 0 || client_time - when_last >= nat_request_interval) {
 		if (auto socket = adapter->find_underlying_socket()) {
-			LOG("Client requesting NAT assistance just in case");
-			nat->request_punch(*socket);
+			LOG("Punching %x simultaneously with the client connection attempt, just in case.", ::ToString(resolved_server_address));
+			nat->punch_this_server(*socket, resolved_server_address);
 
 			when_last = client_time;
 		}
