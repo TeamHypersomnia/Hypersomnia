@@ -1,6 +1,9 @@
 #pragma once
 #include "application/masterserver/masterserver.h"
+#include "augs/readwrite/memory_stream_declaration.h"
+#include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/pointer_to_buffer.h"
+#include "augs/log.h"
 
 inline void punch_this_server(const netcode_socket_t& socket, netcode_address_t relay_host_address, const netcode_address_t& punched_server) {
 	std::byte bytes[1 + sizeof(netcode_address_t)];

@@ -6,10 +6,18 @@
 #include "augs/misc/timing/timer.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "application/gui/my_network_details_gui.h"
+
 #include <chrono>
 
+struct client_start_input;
+struct nat_punch_provider_settings;
+struct browse_servers_gui_internal;
 struct netcode_socket_t;
 struct address_and_port;
+struct resolve_address_result;
+
+using official_addrs = std::vector<resolve_address_result>;
 
 enum class server_entry_state {
 	GIVEN_UP,
@@ -50,9 +58,6 @@ struct server_list_entry {
 	bool is_behind_nat() const;
 };
 
-struct client_start_input;
-struct nat_punch_provider_settings;
-
 struct browse_servers_input {
 	const address_and_port& server_list_provider;
 	const nat_punch_provider_settings& nat_punch_provider;
@@ -62,42 +67,12 @@ struct browse_servers_input {
 	const std::vector<std::string>& official_arena_servers;
 };
 
-struct browse_servers_gui_internal;
-
 struct server_details_gui_state : public standard_window_mixin<server_details_gui_state> {
 	using base = standard_window_mixin<server_details_gui_state>;
 	using base::base;
 
 	void perform(const server_list_entry&);
 };
-
-struct addr_resolution_state
-{
-	net_time_t when_last = 0;
-	std::optional<netcode_address_t> resolved;
-	netcode_address_t destination;
-};
-
-struct my_address_info
-{
-	addr_resolution_state first;
-	addr_resolution_state second;
-};
-
-struct my_network_details_gui_state : public standard_window_mixin<my_network_details_gui_state> {
-	using base = standard_window_mixin<my_network_details_gui_state>;
-	using base::base;
-
-	my_address_info info;
-
-	void handle_requesting_resolution(netcode_socket_t& udp_socket, const netcode_address_t& resolution_host, port_type);
-	void handle_response(const netcode_address_t& resolution_host, const netcode_address_t& resolved_addr);
-	void perform();
-	void reset();
-};
-
-struct resolve_address_result;
-using official_addrs = std::vector<resolve_address_result>;
 
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
 	std::unique_ptr<browse_servers_gui_internal> data;
