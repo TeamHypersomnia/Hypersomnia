@@ -16,10 +16,8 @@
 #include "application/nat/nat_puncher_client.h"
 #include "application/nat/nat_traversal_settings.h"
 
-constexpr auto nat_request_interval = 0.5;
 constexpr auto ping_retry_interval = 1;
-constexpr auto ping_nat_keepalive_interval = 10;
-constexpr auto reopen_nat_after_seconds = 15;
+constexpr auto reping_interval = 10;
 constexpr auto server_entry_timeout = 5;
 constexpr auto max_packets_per_frame_v = 64;
 
@@ -53,10 +51,8 @@ struct browse_servers_gui_internal {
 
 	std::future<official_addrs> future_official_addresses;
 
-	nat_puncher_client nat;
-
 	bool refresh_op_in_progress() const {
-		return future_official_addresses.valid() || future_response.valid() || nat.is_resolving_host();
+		return future_official_addresses.valid() || future_response.valid();
 	}
 };
 
@@ -84,8 +80,6 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	selected_server = {};
 
 	auto& http_opt = data->http;
-
-	data->nat.resolve_relay_host(in.nat_traversal.port_probing_host);
 
 	data->future_official_addresses = launch_async(
 		[addresses=in.official_arena_servers]() {
@@ -155,7 +149,7 @@ void browse_servers_gui_state::refresh_server_pings() {
 }
 
 bool server_list_entry::is_behind_nat() const {
-	return address != data.internal_network_address;
+	return data.is_behind_nat();
 }
 
 server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t& address) {
@@ -259,12 +253,7 @@ bool browse_servers_gui_state::handle_gameserver_response(uint8_t* packet_buffer
 
 			auto& progress = entry->progress;
 
-			if (sequence == uint64_t(-1)) {
-				BRW_LOG("Punched server: %x", ::ToString(from));
-
-				progress.state = server_entry_state::PUNCHED;
-			}
-			else if (sequence == progress.ping_sequence) {
+			if (sequence == progress.ping_sequence) {
 				BRW_LOG("Properly measured ping to %x: %x", ::ToString(from), progress.ping);
 
 				progress.set_ping_from(current_time);
@@ -333,24 +322,14 @@ void browse_servers_gui_state::animate_dot_column() {
 	loading_dots = std::string(num_dots, '.');
 }
 
-void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_input in) {
-	if (in.nat_puncher_socket == nullptr) {
+void browse_servers_gui_state::advance_ping_logic(const browse_servers_input in) {
+	if (in.general_udp_socket == nullptr) {
 		return;
 	}
 
 	animate_dot_column();
 
-	auto udp_socket = *in.nat_puncher_socket;
-
-	{
-		auto& nat = data->nat;
-
-		nat.advance_relay_host_resolution();
-
-		if (nat.relay_host_resolved()) {
-			my_network_details.advance_address_resolution(udp_socket, *nat.relay_host_addr, in.nat_traversal.num_ports_probed);
-		}
-	}
+	auto udp_socket = *in.general_udp_socket;
 
 	handle_incoming_udp_packets(udp_socket);
 	send_pings_and_punch_requests(udp_socket);
@@ -363,7 +342,6 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 		return current_time - last >= interval;
 	};
 
-	auto& nat = data->nat;
 	int packets_left = max_packets_per_frame_v;
 
 	if (server_list.empty()) {
@@ -374,8 +352,6 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 		if (packets_left <= 0) {
 			break;
 		}
-
-		const bool behind_nat = s.is_behind_nat();
 
 		auto& p = s.progress;
 
@@ -390,8 +366,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 			const auto& internal_address = s.data.internal_network_address;
 			const bool maybe_reachable_internally = 
-				behind_nat
-				&& internal_address != std::nullopt
+				internal_address != std::nullopt
 				&& is_internal(*internal_address)
 			;
 
@@ -402,29 +377,6 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 		};
 
 		if (p.state == S::AWAITING_RESPONSE) {
-			if (behind_nat) {
-				if (nat.relay_host_resolved()) {
-					auto& when_first_punch = p.when_first_nat_request;
-
-					if (try_fire_interval(nat_request_interval, p.when_last_nat_request, current_time)) {
-						if (when_first_punch == 0) {
-							when_first_punch = current_time;
-						}
-
-						nat.punch_this_server(socket, s.address);
-
-						--packets_left;
-					}
-
-					if (when_first_punch != 0 && interval_passed(server_entry_timeout, when_first_punch)) {
-						p.state = server_entry_state::GIVEN_UP;
-						continue;
-					}
-				}
-			}
-		}
-
-		if (p.state == S::AWAITING_RESPONSE || p.state == S::PUNCHED) {
 			auto& when_first_ping = p.when_sent_first_ping;
 			auto& when_last_ping = p.when_sent_last_ping;
 
@@ -451,27 +403,12 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 					return;
 				}
 
-				if (interval_passed(ping_nat_keepalive_interval, when_last_ping)) {
+				if (interval_passed(reping_interval, when_last_ping)) {
 					request_ping();
 				}
 			};
 
-			if (behind_nat) {
-				if (interval_passed(reopen_nat_after_seconds * 2, when_last_ping)) {
-					/* 
-						If it weren't pinged for such a long time for any reason,
-						consider the NAT holes dead. Refresh the server.
-					*/
-
-					p = {};
-				}
-				else {
-					reping_if_its_time();
-				}
-			}
-			else {
-				reping_if_its_time();
-			}
+			reping_if_its_time();
 		}
 	}
 }
@@ -1080,10 +1017,8 @@ void server_details_gui_state::perform(const server_list_entry& entry) {
 	input_text("Arena", data.current_arena, ImGuiInputTextFlags_ReadOnly);
 }
 
-void browse_servers_gui_state::request_nat_reopen() {
+void browse_servers_gui_state::reping_all_servers() {
 	for (auto& s : server_list) {
-		if (s.is_behind_nat()) {
-			s.progress = {};
-		}
+		s.progress = {};
 	}
 }

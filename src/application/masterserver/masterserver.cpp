@@ -305,7 +305,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 								if (const auto entry = mapped_or_nullptr(server_list, punched_server)) {
 									MSR_LOG("Found the requested server.");
 
-									const bool is_behind_nat = entry->last_heartbeat.internal_network_address != punched_server;
+									const bool is_behind_nat = entry->last_heartbeat.is_behind_nat();
 
 									if (is_behind_nat) {
 										MSR_LOG("The requested server is behind NAT. Deciding to send the request.");

@@ -1,6 +1,7 @@
 #pragma once
 #include "game/modes/all_mode_includes.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "application/nat/nat_type_detector.h"
 
 struct server_heartbeat {
 	static constexpr bool force_read_field_by_field = true;
@@ -17,9 +18,14 @@ struct server_heartbeat {
 	uint8_t max_online;
 
 	std::optional<netcode_address_t> internal_network_address;
+	nat_type nat = nat_type::PUBLIC_INTERNET;
 	// END GEN INTROSPECTOR
 
 	void validate();
+
+	bool is_behind_nat() const {
+		return nat != nat_type::PUBLIC_INTERNET;
+	}
 
 	int get_num_spectators() const {
 		return num_online - num_fighting;

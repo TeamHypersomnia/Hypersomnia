@@ -734,21 +734,21 @@ and then hitting Save settings.
 		});
 	};
 
-	static auto nat_puncher_socket = std::optional<netcode_socket_raii>();
+	static auto general_udp_socket = std::optional<netcode_socket_raii>();
 
 	{
 		const auto preferred_port = config.preferred_source_client_port;
 
 		try {
-			nat_puncher_socket.emplace(preferred_port);
+			general_udp_socket.emplace(preferred_port);
 
 			LOG("Successfully bound the client socket to the preferred port: %x.", preferred_port);
 		}
 		catch (const netcode_socket_raii_error&) {
 			LOG("WARNING! Could not bind the client socket to the preferred port: %x.", preferred_port);
 
-			nat_puncher_socket.reset();
-			nat_puncher_socket.emplace();
+			general_udp_socket.reset();
+			general_udp_socket.emplace();
 		}
 	}
 
@@ -760,14 +760,14 @@ and then hitting Save settings.
 	*/
 
 	static const auto get_preferred_client_port = []() {
-		return nat_puncher_socket->socket.address.port;
+		return general_udp_socket->socket.address.port;
 	};
 
 	ensure(get_preferred_client_port() != 0);
 	LOG_NVPS(get_preferred_client_port());
 
-	static auto find_nat_puncher_socket = []() -> const netcode_socket_t* {
-		return &nat_puncher_socket->socket;
+	static auto find_general_udp_socket = []() -> const netcode_socket_t* {
+		return &general_udp_socket->socket;
 	};
 
 	static auto launch_setup = [&](const launch_type mode) {
@@ -796,7 +796,7 @@ and then hitting Save settings.
 						We've saved the port so we're safe to delete the socket.
 					*/
 
-					nat_puncher_socket.reset();
+					general_udp_socket.reset();
 
 					LOG("Starting client setup. Binding to a preferred port: %x", get_preferred_client_port());
 
@@ -812,8 +812,8 @@ and then hitting Save settings.
 						Create a new one for the browser.
 					*/
 
-					nat_puncher_socket.emplace();
-					browse_servers_gui.request_nat_reopen();
+					general_udp_socket.emplace();
+					browse_servers_gui.reping_all_servers();
 				});
 
 				break;
@@ -875,9 +875,8 @@ and then hitting Save settings.
 	static auto get_browse_servers_input = []() {
 		return browse_servers_input {
 			config.server_list_provider,
-			config.nat_traversal,
 			config.default_client_start,
-			find_nat_puncher_socket(),
+			find_general_udp_socket(),
 			config.official_arena_servers
 		};
 	};
@@ -1128,7 +1127,7 @@ and then hitting Save settings.
 			audio,
 			lua,
 			[&]() {
-				browse_servers_gui.advance_ping_and_nat_logic(get_browse_servers_input());
+				browse_servers_gui.advance_ping_logic(get_browse_servers_input());
 				perform_browse_servers();
 
 				if (!has_current_setup()) {

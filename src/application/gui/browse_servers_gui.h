@@ -21,10 +21,7 @@ using official_addrs = std::vector<resolve_address_result>;
 
 enum class server_entry_state {
 	GIVEN_UP,
-
 	AWAITING_RESPONSE,
-
-	PUNCHED,
 	PING_MEASURED
 };
 
@@ -34,9 +31,6 @@ struct ping_progress {
 
 	net_time_t when_sent_first_ping = 0;
 	net_time_t when_sent_last_ping = 0;
-
-	net_time_t when_last_nat_request = 0;
-	net_time_t when_first_nat_request = 0;
 
 	server_entry_state state = server_entry_state::AWAITING_RESPONSE;
 
@@ -60,9 +54,8 @@ struct server_list_entry {
 
 struct browse_servers_input {
 	const address_and_port& server_list_provider;
-	const nat_traversal_settings& nat_traversal;
 	client_start_input& client_start;
-	const netcode_socket_t* nat_puncher_socket;
+	const netcode_socket_t* general_udp_socket;
 
 	const std::vector<std::string>& official_arena_servers;
 };
@@ -128,7 +121,7 @@ public:
 	~browse_servers_gui_state();
 
 	bool perform(browse_servers_input);
-	void advance_ping_and_nat_logic(browse_servers_input);
+	void advance_ping_logic(browse_servers_input);
 
-	void request_nat_reopen();
+	void reping_all_servers();
 };
