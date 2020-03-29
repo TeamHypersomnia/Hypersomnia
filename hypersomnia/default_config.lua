@@ -7,6 +7,8 @@ return {
 	  default_port = 8420
   },
 
+  preferred_source_client_port = 8411,
+
   nat_punch_provider = {
 	  address = {
 		  address = "masterserver.hypersomnia.xyz",

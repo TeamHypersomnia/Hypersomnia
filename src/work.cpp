@@ -736,7 +736,23 @@ and then hitting Save settings.
 		});
 	};
 
-	static auto nat_puncher_socket = std::make_optional<netcode_socket_raii>();
+	static auto nat_puncher_socket = std::optional<netcode_socket_raii>();
+
+	{
+		const auto preferred_port = config.preferred_source_client_port;
+
+		try {
+			nat_puncher_socket.emplace(preferred_port);
+
+			LOG("Successfully bound the client socket to the preferred port: %x.", preferred_port);
+		}
+		catch (const netcode_socket_raii_error&) {
+			LOG("WARNING! Could not bind the client socket to the preferred port: %x.", preferred_port);
+
+			nat_puncher_socket.reset();
+			nat_puncher_socket.emplace();
+		}
+	}
 
 	/* 
 		In case we're launching a client, 

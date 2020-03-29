@@ -58,7 +58,8 @@ public:
 
 	netcode_socket_raii(port_type port) {
 		netcode_address_t address;
-		ensure_eq(NETCODE_OK, netcode_parse_address("0.0.0.0", &address));
+		const auto result = netcode_parse_address("0.0.0.0", &address);
+		ensure_eq(NETCODE_OK, result);
 
 		address.port = port;
 
@@ -67,7 +68,8 @@ public:
 
 	netcode_socket_raii() {
 		netcode_address_t address;
-		ensure_eq(NETCODE_OK, netcode_parse_address("0.0.0.0", &address));
+		const auto result = netcode_parse_address("0.0.0.0", &address);
+		ensure_eq(NETCODE_OK, result);
 		bind_to(address);
 	}
 
