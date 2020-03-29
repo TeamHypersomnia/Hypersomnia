@@ -30,7 +30,7 @@ void my_network_details_gui_state::reset() {
 	info = {};
 }
 
-void my_network_details_gui_state::advance_address_resolution(netcode_socket_t& udp_socket, const netcode_address_t& resolution_host, const port_type extra_port) {
+void my_network_details_gui_state::advance_address_resolution(netcode_socket_t& udp_socket, const netcode_address_t& resolution_host, const int num_ports_probed) {
 	auto advance_resolution_of = [&](auto& info, const std::optional<port_type> alternate_port = std::nullopt) {
 		if (info.completed()) {
 			return;
@@ -49,8 +49,10 @@ void my_network_details_gui_state::advance_address_resolution(netcode_socket_t& 
 		}
 	};
 
+	(void)num_ports_probed;
+
 	advance_resolution_of(info.first);
-	advance_resolution_of(info.second, extra_port);
+	advance_resolution_of(info.second, resolution_host.port + 1);
 }
 
 void my_network_details_gui_state::perform() {

@@ -6,8 +6,9 @@ struct masterserver_settings {
 	std::string ip = "127.0.0.1";
 	unsigned server_entry_timeout_secs = 60;
 
-	port_type nat_punch_port = 8414;
-	port_type extra_address_resolution_port = 8415;
+	port_type first_udp_command_port = 8414;
+	int num_udp_command_ports = 5;
+
 	port_type server_list_port = 8420;
 
 	augs::path_type cert_pem_path;
@@ -15,4 +16,8 @@ struct masterserver_settings {
 
 	float sleep_ms = 8;
 	// END GEN INTROSPECTOR
+
+	port_type get_last_udp_command_port() const {
+		return first_udp_command_port + num_udp_command_ports - 1;
+	}
 };

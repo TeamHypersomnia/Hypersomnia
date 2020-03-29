@@ -11,7 +11,7 @@
 #include <chrono>
 
 struct client_start_input;
-struct nat_punch_provider_settings;
+struct nat_traversal_settings;
 struct browse_servers_gui_internal;
 struct netcode_socket_t;
 struct address_and_port;
@@ -28,7 +28,7 @@ enum class server_entry_state {
 	PING_MEASURED
 };
 
-struct nat_progress {
+struct ping_progress {
 	int ping = -1;
 	uint64_t ping_sequence = -1;
 
@@ -52,7 +52,7 @@ struct server_list_entry {
 	double appeared_when;
 	server_heartbeat data;
 
-	nat_progress progress;
+	ping_progress progress;
 
 	bool is_set() const;
 	bool is_behind_nat() const;
@@ -60,7 +60,7 @@ struct server_list_entry {
 
 struct browse_servers_input {
 	const address_and_port& server_list_provider;
-	const nat_punch_provider_settings& nat_punch_provider;
+	const nat_traversal_settings& nat_traversal;
 	client_start_input& client_start;
 	const netcode_socket_t* nat_puncher_socket;
 

@@ -100,14 +100,20 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	const auto& settings = cfg.masterserver;
 
-	auto socket_raii = netcode_socket_raii(to_netcode_addr(settings.ip, settings.nat_punch_port));
-	auto extra_socket_raii = netcode_socket_raii(to_netcode_addr(settings.ip, settings.extra_address_resolution_port));
+	auto udp_command_sockets = std::vector<netcode_socket_raii>();
 
-	auto& standard_socket = socket_raii.socket;
-	auto& extra_socket = extra_socket_raii.socket;
+	const auto num_sockets = settings.num_udp_command_ports;
 
-	LOG("Created masterserver socket at: %x", ::ToString(standard_socket.address));
-	LOG("Created extra socket for address resolution at: %x", ::ToString(extra_socket.address));
+	LOG("Creating %x masterserver sockets for UDP commands.", num_sockets);
+
+	for (int i = 0; i < num_sockets; ++i) {
+		const auto new_port = settings.first_udp_command_port + i;
+		const auto new_local_address = to_netcode_addr(settings.ip, new_port);
+
+		udp_command_sockets.emplace_back(new_local_address);
+
+		LOG("Created masterserver socket at: %x", ::ToString(udp_command_sockets.back().socket.address));
+	}
 
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
 
@@ -345,8 +351,9 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			}
 		};
 
-		process_socket_messages(standard_socket);
-		process_socket_messages(extra_socket);
+		for (auto& s : udp_command_sockets) {
+			process_socket_messages(s.socket);
+		}
 
 		const auto timeout_secs = settings.server_entry_timeout_secs;
 
@@ -381,9 +388,6 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	http.stop();
 	LOG("Joining the HTTP listening thread.");
 	listening_thread.join();
-
-	netcode_socket_destroy(&standard_socket);
-	netcode_socket_destroy(&extra_socket);
 
 	dump_server_list_to_file();
 }

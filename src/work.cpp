@@ -383,27 +383,25 @@ and then hitting Save settings.
 	};
 
 	if (params.type == app_type::MASTERSERVER) {
-		auto cfg = config;
+		auto adjusted_config = config;
+		auto& masterserver = adjusted_config.masterserver;
 
-		if (params.nat_punch_port != std::nullopt) {
-			cfg.masterserver.nat_punch_port = *params.nat_punch_port;
-		}
-
-		if (params.nat_punch_port != std::nullopt) {
-			cfg.masterserver.nat_punch_port = *params.nat_punch_port;
+		if (params.first_udp_command_port != std::nullopt) {
+			masterserver.first_udp_command_port = *params.first_udp_command_port;
 		}
 
 		if (params.server_list_port != std::nullopt) {
-			cfg.masterserver.server_list_port = *params.server_list_port;
+			masterserver.server_list_port = *params.server_list_port;
 		}
 
 		LOG(
-			"Starting the masterserver at ports: %x (Server list), %x (NAT punch)",
-			config.masterserver.server_list_port,
-			config.masterserver.nat_punch_port
+			"Starting the masterserver at ports: %x (Server list), %x-%x (UDP commands ports)",
+			masterserver.server_list_port,
+			masterserver.first_udp_command_port,
+			masterserver.get_last_udp_command_port()
 		);
 
-		perform_masterserver(config);
+		perform_masterserver(adjusted_config);
 
 		return work_result::SUCCESS;
 	}
@@ -806,7 +804,7 @@ and then hitting Save settings.
 						lua,
 						config.default_client_start,
 						config.client,
-						config.nat_punch_provider,
+						config.nat_traversal,
 						get_preferred_client_port()
 					);
 
@@ -877,7 +875,7 @@ and then hitting Save settings.
 	static auto get_browse_servers_input = []() {
 		return browse_servers_input {
 			config.server_list_provider,
-			config.nat_punch_provider,
+			config.nat_traversal,
 			config.default_client_start,
 			find_nat_puncher_socket(),
 			config.official_arena_servers

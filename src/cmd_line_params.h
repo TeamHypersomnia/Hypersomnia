@@ -18,8 +18,7 @@ struct cmd_line_params {
 	int test_fp_consistency = -1;
 	std::string connect_address;
 
-	std::optional<port_type> nat_punch_port;
-	std::optional<port_type> extra_address_resolution_port;
+	std::optional<port_type> first_udp_command_port;
 	std::optional<port_type> server_list_port;
 
 	cmd_line_params(const int argc, const char* const * const argv) {
@@ -56,10 +55,7 @@ struct cmd_line_params {
 				test_fp_consistency = std::atoi(argv[i++]);
 			}
 			else if (a == "--nat-punch-port") {
-				nat_punch_port = std::atoi(argv[i++]);
-			}
-			else if (a == "--extra-address-resolution-port") {
-				extra_address_resolution_port = std::atoi(argv[i++]);
+				first_udp_command_port = std::atoi(argv[i++]);
 			}
 			else if (a == "--server-list-port") {
 				server_list_port = std::atoi(argv[i++]);

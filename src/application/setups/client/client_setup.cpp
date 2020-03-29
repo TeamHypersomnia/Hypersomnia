@@ -216,7 +216,7 @@ client_setup::client_setup(
 	sol::state& lua,
 	const client_start_input& in,
 	const client_vars& initial_vars,
-	const nat_punch_provider_settings& nat_punch_provider,
+	const nat_traversal_settings& nat_traversal,
 	port_type preferred_binding_port
 ) : 
 	lua(lua),
@@ -281,7 +281,7 @@ client_setup::client_setup(
 			}
 			else {
 				resolved_server_address = resolution.addr;
-				nat->resolve_relay_host(nat_punch_provider.address);
+				nat->resolve_relay_host(nat_traversal.port_probing_host);
 
 				ensure_eq(resolution.result, resolve_result_type::OK);
 

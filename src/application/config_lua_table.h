@@ -46,7 +46,7 @@
 #include "application/performance_settings.h"
 #include "application/http_client/http_client_settings.h"
 #include "application/masterserver/masterserver_settings.h"
-#include "application/nat/nat_punch_provider_settings.h"
+#include "application/nat/nat_traversal_settings.h"
 #include "fp_consistency_tests.h"
 
 enum class launch_type {
@@ -98,7 +98,7 @@ struct config_lua_table {
 	port_type preferred_source_client_port = 8411;
 
 	address_and_port server_list_provider;
-	nat_punch_provider_settings nat_punch_provider;
+	nat_traversal_settings nat_traversal;
 	address_and_port extra_address_resolution_port;
 
 	masterserver_settings masterserver;

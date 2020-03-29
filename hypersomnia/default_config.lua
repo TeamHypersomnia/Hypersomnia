@@ -9,21 +9,30 @@ return {
 
   preferred_source_client_port = 8411,
 
-  nat_punch_provider = {
-	  address = {
+  nat_traversal = {
+	  port_probing_host = {
 		  address = "masterserver.hypersomnia.xyz",
 		  default_port = 8414
 	  },
 
-	  extra_address_resolution_port = 8415
+	  num_ports_probed = 5,
+
+	  stun_server_list = {
+		  { address = "stun.l.google.com:19302" },
+		  { address = "stun1.l.google.com:19302" },
+		  { address = "stun2.l.google.com:19302" },
+		  { address = "stun3.l.google.com:19302" },
+		  { address = "stun4.l.google.com:19302" },
+	  }
   },
 
   masterserver = {
 	ip = "0.0.0.0",
 	server_entry_timeout_secs = 60,
 
-	nat_punch_port = 8414,
-	extra_address_resolution_port = 8415,
+	first_udp_command_port = 8414,
+	num_udp_command_ports = 5,
+
 	sleep_ms = 8,
 	server_list_port = 8420,
 

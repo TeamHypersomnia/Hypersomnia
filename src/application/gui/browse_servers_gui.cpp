@@ -14,7 +14,7 @@
 #include "augs/misc/time_utils.h"
 #include "augs/network/netcode_sockets.h"
 #include "application/nat/nat_puncher_client.h"
-#include "application/nat/nat_punch_provider_settings.h"
+#include "application/nat/nat_traversal_settings.h"
 
 constexpr auto nat_request_interval = 0.5;
 constexpr auto ping_retry_interval = 1;
@@ -85,7 +85,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 
 	auto& http_opt = data->http;
 
-	data->nat.resolve_relay_host(in.nat_punch_provider.address);
+	data->nat.resolve_relay_host(in.nat_traversal.port_probing_host);
 
 	data->future_official_addresses = launch_async(
 		[addresses=in.official_arena_servers]() {
@@ -348,7 +348,7 @@ void browse_servers_gui_state::advance_ping_and_nat_logic(const browse_servers_i
 		nat.advance_relay_host_resolution();
 
 		if (nat.relay_host_resolved()) {
-			my_network_details.advance_address_resolution(udp_socket, *nat.relay_host_addr, in.nat_punch_provider.extra_address_resolution_port);
+			my_network_details.advance_address_resolution(udp_socket, *nat.relay_host_addr, in.nat_traversal.num_ports_probed);
 		}
 	}
 
