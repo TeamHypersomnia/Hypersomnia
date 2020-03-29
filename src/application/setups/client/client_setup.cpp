@@ -43,7 +43,7 @@
 #include "application/network/resolve_address.h"
 #include "augs/network/netcode_sockets.h"
 #include "application/network/resolve_address_result.h"
-#include "application/masterserver/nat_puncher_client.h"
+#include "application/nat/nat_puncher_client.h"
 #include "augs/network/netcode_utils.h"
 
 void client_demo_player::play_demo_from(const augs::path_type& p) {

@@ -47,7 +47,7 @@
 #include "application/setups/client/demo_step.h"
 #include "application/gui/client/demo_player_gui.h"
 #include "application/setups/client/client_demo_player.h"
-#include "application/masterserver/nat_punch_provider_settings.h"
+#include "application/nat/nat_punch_provider_settings.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 
 struct config_lua_table;

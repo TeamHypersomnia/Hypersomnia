@@ -1,10 +1,8 @@
 #pragma once
 #include "augs/network/netcode_sockets.h"
 
-struct my_address_info
-{
-	struct resolution_state
-	{
+struct my_address_info {
+	struct resolution_state {
 		net_time_t when_last = 0;
 		std::optional<netcode_address_t> resolved;
 		netcode_address_t destination;

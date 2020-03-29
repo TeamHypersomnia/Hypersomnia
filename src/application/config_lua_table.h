@@ -46,7 +46,7 @@
 #include "application/performance_settings.h"
 #include "application/http_client/http_client_settings.h"
 #include "application/masterserver/masterserver_settings.h"
-#include "application/masterserver/nat_punch_provider_settings.h"
+#include "application/nat/nat_punch_provider_settings.h"
 #include "fp_consistency_tests.h"
 
 enum class launch_type {
