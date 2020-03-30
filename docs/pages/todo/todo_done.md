@@ -4202,3 +4202,5 @@ Advantages:
 	- the effects are being made unpredictable due to being thrown
 - When appeared
 	- So that new servers can easily be found
+- remember to shut down the aux server
+

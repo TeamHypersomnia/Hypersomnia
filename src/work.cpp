@@ -72,6 +72,7 @@
 #include "application/main/flash_afterimage.h"
 #include "application/setups/editor/editor_player.hpp"
 
+#include "application/nat/nat_detection_session.h"
 #include "application/input/input_pass_result.h"
 
 #include "application/setups/draw_setup_gui_input.h"
@@ -406,8 +407,66 @@ and then hitting Save settings.
 		return work_result::SUCCESS;
 	}
 
+	static auto chosen_server_port = [](){
+		return config.default_server_start.port;
+	};
+
+	static const bool allow_nat_traversal = config.allow_nat_traversal && !params.disallow_nat_traversal;
+
+	static auto current_stun_server = stun_counter_type(0);
+	static std::optional<nat_detection_session> nat_detection;
+
+	static auto restart_nat_detection = []() {
+		if (allow_nat_traversal) {
+			nat_detection.emplace(config.nat_traversal, current_stun_server);
+		}
+	};
+
+	static auto get_nat_type = []() {
+		if (nat_detection == std::nullopt) {
+			return nat_type::PUBLIC_INTERNET;
+		}
+
+		if (const auto detected_nat = nat_detection->query_result()) {
+			return detected_nat->type;
+		}
+
+		return nat_type::PUBLIC_INTERNET;
+	};
+
+	restart_nat_detection();
+
+	static auto auxiliary_socket = std::optional<netcode_socket_raii>();
+	static auto last_requested_local_port = port_type(0);
+
+	static auto get_bound_local_port = []() {
+		return auxiliary_socket->socket.address.port;
+	};
+
+	static auto recreate_auxiliary_socket = []() {
+		const auto preferred_port = chosen_server_port();
+		last_requested_local_port = preferred_port;
+
+		try {
+			auxiliary_socket.emplace(preferred_port);
+
+			LOG("Successfully bound the nat detection socket to the preferred server port: %x.", preferred_port);
+		}
+		catch (const netcode_socket_raii_error&) {
+			LOG("WARNING! Could not bind the nat detection socket to the preferred server port: %x.", preferred_port);
+
+			auxiliary_socket.reset();
+			auxiliary_socket.emplace();
+		}
+
+		LOG_NVPS(get_bound_local_port());
+		ensure(get_bound_local_port() != 0);
+	};
+
+	recreate_auxiliary_socket();
+
 	if (params.type == app_type::DEDICATED_SERVER) {
-		LOG("Starting the dedicated server at port: %x", config.default_server_start.port);
+		LOG("Starting the dedicated server at port: %x", chosen_server_port());
 
 #if BUILD_NETWORKING
 		emplace_current_setup(
@@ -441,6 +500,18 @@ and then hitting Save settings.
 			}
 #endif
 
+			if (nat_detection != std::nullopt) {
+				const auto socket = server.find_underlying_socket();
+
+#if !IS_PRODUCTION_BUILD
+
+				ensure(socket != nullptr);
+#endif
+				if (socket) {
+					nat_detection->advance(*socket);
+				}
+			}
+
 			const auto zoom = 1.f;
 
 			server.advance(
@@ -448,6 +519,7 @@ and then hitting Save settings.
 					vec2i(),
 					config.input,
 					zoom,
+					get_nat_type(),
 					network_performance,
 					server_stats
 				},
@@ -723,6 +795,11 @@ and then hitting Save settings.
 			if (was_browser_open_in_main_menu) {
 				browse_servers_gui.open();
 			}
+
+			if (auxiliary_socket == std::nullopt) {
+				recreate_auxiliary_socket();
+				restart_nat_detection();
+			}
 		}
 	};
 
@@ -732,42 +809,6 @@ and then hitting Save settings.
 				std::forward<decltype(args)>(args)...
 			);
 		});
-	};
-
-	static auto general_udp_socket = std::optional<netcode_socket_raii>();
-
-	{
-		const auto preferred_port = config.preferred_source_client_port;
-
-		try {
-			general_udp_socket.emplace(preferred_port);
-
-			LOG("Successfully bound the client socket to the preferred port: %x.", preferred_port);
-		}
-		catch (const netcode_socket_raii_error&) {
-			LOG("WARNING! Could not bind the client socket to the preferred port: %x.", preferred_port);
-
-			general_udp_socket.reset();
-			general_udp_socket.emplace();
-		}
-	}
-
-	/* 
-		In case we're launching a client, 
-		bind to the same port that was used for NAT punching in the server browser.
-
-		It will re-use the same port if we're launching the client setup again.
-	*/
-
-	static const auto get_preferred_client_port = []() {
-		return general_udp_socket->socket.address.port;
-	};
-
-	ensure(get_preferred_client_port() != 0);
-	LOG_NVPS(get_preferred_client_port());
-
-	static auto find_general_udp_socket = []() -> const netcode_socket_t* {
-		return &general_udp_socket->socket;
 	};
 
 	static auto launch_setup = [&](const launch_type mode) {
@@ -792,33 +833,31 @@ and then hitting Save settings.
 #if BUILD_NETWORKING
 			case launch_type::CLIENT:
 				setup_launcher([&]() {
-					/*
-						We've saved the port so we're safe to delete the socket.
-					*/
+					const auto bound_port = get_bound_local_port();
+					auxiliary_socket.reset();
 
-					general_udp_socket.reset();
-
-					LOG("Starting client setup. Binding to a preferred port: %x", get_preferred_client_port());
+					LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
 					emplace_current_setup(std::in_place_type_t<client_setup>(),
 						lua,
 						config.default_client_start,
 						config.client,
 						config.nat_traversal,
-						get_preferred_client_port()
+						bound_port
 					);
-
-					/*
-						Create a new one for the browser.
-					*/
-
-					general_udp_socket.emplace();
-					browse_servers_gui.reping_all_servers();
 				});
 
 				break;
 
-			case launch_type::SERVER:
+			case launch_type::SERVER: {
+				const auto bound_port = get_bound_local_port();
+				auxiliary_socket.reset();
+
+				LOG("Starting server  setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
+
+				auto start = config.default_server_start;
+				start.port = bound_port;
+
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<server_setup>(),
 						lua,
@@ -833,6 +872,7 @@ and then hitting Save settings.
 #endif
 
 				break;
+			}
 
 			case launch_type::EDITOR:
 				launch_editor(lua);
@@ -876,7 +916,6 @@ and then hitting Save settings.
 		return browse_servers_input {
 			config.server_list_provider,
 			config.default_client_start,
-			find_general_udp_socket(),
 			config.official_arena_servers
 		};
 	};
@@ -906,7 +945,14 @@ and then hitting Save settings.
 	};
 
 	static auto perform_start_server = []() {
-		if (start_server_gui.perform(config.default_server_start, config.server, config.server_solvable) || server_start_requested) {
+		const bool launched_from_server_start_gui = start_server_gui.perform(
+			config.default_server_start, 
+			config.server, 
+			config.server_solvable,
+			nat_detection != std::nullopt ? std::addressof(*nat_detection) : nullptr
+		);
+
+		if (launched_from_server_start_gui || server_start_requested) {
 			server_start_requested = false;
 
 			change_with_save(
@@ -923,7 +969,7 @@ and then hitting Save settings.
 			}
 			else {
 				augs::spawn_detached_process(params.exe_path.string(), "--dedicated-server");
-				config.default_client_start.set_custom(typesafe_sprintf("%x:%x", config.default_server_start.ip, config.default_server_start.port));
+				config.default_client_start.set_custom(typesafe_sprintf("%x:%x", config.default_server_start.ip, chosen_server_port()));
 
 				launch_setup(launch_type::CLIENT);
 			}
@@ -1127,7 +1173,18 @@ and then hitting Save settings.
 			audio,
 			lua,
 			[&]() {
-				browse_servers_gui.advance_ping_logic(get_browse_servers_input());
+				if (last_requested_local_port != chosen_server_port()) {
+					recreate_auxiliary_socket();
+					restart_nat_detection();
+				}
+
+				if (nat_detection != std::nullopt) {
+					if (auxiliary_socket != std::nullopt) {
+						nat_detection->advance(auxiliary_socket->socket);
+					}
+				}
+
+				browse_servers_gui.advance_ping_logic();
 				perform_browse_servers();
 
 				if (!has_current_setup()) {
@@ -1620,6 +1677,7 @@ and then hitting Save settings.
 						logic_get_screen_size(), 
 						input_cfg, 
 						zoom,
+						get_nat_type(),
 						network_performance,
 						server_stats
 					},

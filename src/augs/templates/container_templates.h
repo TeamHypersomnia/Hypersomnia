@@ -121,6 +121,13 @@ A& concatenate(A& a, const B& b) {
 	return a;
 }
 
+template<class A, class B>
+A concatenated(const A& a, const B& b) {
+	auto tmp = a;
+	concatenate(tmp, b);
+	return tmp;
+}
+
 template<class Container, class K>
 auto find_in(Container& v, const K& key) {
 	static_assert(!has_member_find_v<Container, K>, "Use mapped_or_nullptr instead of find_in.");
@@ -131,6 +138,11 @@ auto find_in(Container& v, const K& key) {
 template<class Container, class C>
 auto find_in_if(Container& v, C callback) {
 	return std::find_if(v.begin(), v.end(), callback);
+}
+
+template <class Container, class C>
+auto all_equal_to(Container& v, const C& value) {
+	return v.end() == std::find_if_not(v.begin(), v.end(), [&value](const auto& candidate) { return candidate == value; });
 }
 
 template<class Container, class C>

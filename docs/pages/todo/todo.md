@@ -6,6 +6,13 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Game Guides
+- Recon grenade
+
+- We have to renew that certificate or people will be unable to update the game
+	- somehow it still works
+	- as it's done over ssl
+
 - Randomized tips
 	- Stay still to regenerate stamina faster.
 	- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.

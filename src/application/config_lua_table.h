@@ -95,9 +95,9 @@ struct config_lua_table {
 
 	float_consistency_test_settings float_consistency_test;
 
-	port_type preferred_source_client_port = 8411;
-
 	address_and_port server_list_provider;
+
+	bool allow_nat_traversal = true;
 	nat_traversal_settings nat_traversal;
 	address_and_port extra_address_resolution_port;
 

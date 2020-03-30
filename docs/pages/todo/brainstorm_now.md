@@ -6,10 +6,42 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Symmetric nat punch (finally)
+	- Punching servers one by one
+	- While sending a punch request to masterserver, include our own last predicted port
+		- If we're punching for the first time, we can get it from the my network details window state
+	- Let's first acquire all data
+	- Server can too send its nat type to the masterserver
+	- links:
+		- https://slideplayer.com/slide/3159695/
+
+- Investigate the mysterious crash
+	- Happened when we finished drag and dropping on hotbar 
+	- All buttons on hotbar were assigned
+	- The item we dragged was hidden in backpack and *possibly* unassigned to hotbar yet
+
+- Camera should also ease towards new positions instead of resetting completely
+
+- Test results:
+	- Two totally different addresses gave us proximate ports, so there's a chance for us
+		- 35.205.19.61:43214 -> 31.182.205.239:28794
+		- 35.205.19.61:43215 -> 31.182.205.239:28795
+		- 104.199.81.130:8414 -> 31.182.205.239:28778
+		- 104.199.81.130:8415 -> 31.182.205.239:28776
+		- later 31.182.205.239:28816 and 31.182.205.239:28817 for the official server
+
+- after testing with another nat masterserver, looks like ports are assigned similarly here
+	- just incremented
+	- we'll see it on another day
+	- test with a completely different port at the server
+	- test on Windows server
+
 - Symmetric nat punch
 	- We can easily determine server's port allocation rule
 		- if both are address sensitive 
 		- if both are port sensitive we're fugged
+		- if at least one is non-port sensitive it should be relatively easy to establish connection with bruteforce
+	- remember to punch nats one after another
 	- Also client's port allocation rule
 	- And with just the masterserver. It will just open another port that will respond
 	- https://sketchboard.me/zBYca50ZCLaL#/

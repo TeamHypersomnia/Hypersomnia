@@ -18,6 +18,8 @@ struct cmd_line_params {
 	int test_fp_consistency = -1;
 	std::string connect_address;
 
+	bool disallow_nat_traversal = false;
+
 	std::optional<port_type> first_udp_command_port;
 	std::optional<port_type> server_list_port;
 
@@ -47,6 +49,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--dedicated-server") {
 				type = app_type::DEDICATED_SERVER;
+			}
+			else if (a == "--disallow-nat-traversal") {
+				disallow_nat_traversal = true;
 			}
 			else if (a == "--masterserver") {
 				type = app_type::MASTERSERVER;

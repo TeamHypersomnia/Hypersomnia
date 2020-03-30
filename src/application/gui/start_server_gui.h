@@ -7,6 +7,7 @@
 
 struct server_vars;
 struct server_solvable_vars;
+class nat_detection_session;
 
 class start_server_gui_state : public standard_window_mixin<start_server_gui_state> {
 public:
@@ -16,10 +17,13 @@ public:
 	server_instance_type instance_type = server_instance_type::INTEGRATED;
 
 	bool show_help = false;
+	bool show_nat_details = false;
 
 	bool perform(
 		server_start_input& into,
 		server_vars&,
-		server_solvable_vars&
+		server_solvable_vars&,
+
+		const nat_detection_session*
 	);
 };

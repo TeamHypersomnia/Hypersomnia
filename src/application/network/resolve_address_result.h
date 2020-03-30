@@ -7,5 +7,5 @@ struct resolve_address_result {
 
 	resolve_result_type result = resolve_result_type::OK;
 
-	void report() const;
+	std::string report() const;
 };

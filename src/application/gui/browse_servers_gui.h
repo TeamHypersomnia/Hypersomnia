@@ -55,8 +55,6 @@ struct server_list_entry {
 struct browse_servers_input {
 	const address_and_port& server_list_provider;
 	client_start_input& client_start;
-	const netcode_socket_t* general_udp_socket;
-
 	const std::vector<std::string>& official_arena_servers;
 };
 
@@ -68,6 +66,8 @@ struct server_details_gui_state : public standard_window_mixin<server_details_gu
 };
 
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
+	netcode_socket_raii server_browser_socket;
+
 	std::unique_ptr<browse_servers_gui_internal> data;
 
 	void show_server_list(const std::string& label, const std::vector<server_list_entry*>&);
@@ -121,7 +121,7 @@ public:
 	~browse_servers_gui_state();
 
 	bool perform(browse_servers_input);
-	void advance_ping_logic(browse_servers_input);
+	void advance_ping_logic();
 
 	void reping_all_servers();
 };

@@ -32,6 +32,7 @@
 #include "application/gui/client/client_gui_state.h"
 #include "application/setups/server/server_profiler.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "application/nat/nat_type.h"
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 #include "game/modes/dump_for_debugging.h"
@@ -40,6 +41,7 @@
 #include "augs/misc/getpid.h"
 #include "application/setups/server/rcon_level.h"
 
+struct netcode_socket_t;
 struct config_lua_table;
 struct draw_setup_gui_input;
 struct public_settings_update;
@@ -467,4 +469,6 @@ public:
 
 	bool requires_cursor() const;
 	bool player_added_to_mode(mode_player_id) const;
+
+	const netcode_socket_t* find_underlying_socket() const;
 };

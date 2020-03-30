@@ -691,6 +691,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/gui/browse_servers_gui.cpp"
 	"src/application/gui/my_network_details_gui.cpp"
 	"src/application/masterserver/masterserver.cpp"
+	"src/application/nat/nat_detection_session.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

@@ -94,7 +94,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 				in.default_port = 0;
 
 				const auto result = resolve_address(in);
-				result.report();
+				LOG(result.report());
 
 				if (result.result == resolve_result_type::OK) {
 					results.emplace_back(result);
@@ -108,7 +108,7 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	data->future_response = launch_async(
 		[&http_opt, address = in.server_list_provider]() -> std::shared_ptr<Response> {
 			const auto resolved = resolve_address(address);
-			resolved.report();
+			LOG(resolved.report());
 
 			if (resolved.result != resolve_result_type::OK) {
 				return nullptr;
@@ -322,14 +322,10 @@ void browse_servers_gui_state::animate_dot_column() {
 	loading_dots = std::string(num_dots, '.');
 }
 
-void browse_servers_gui_state::advance_ping_logic(const browse_servers_input in) {
-	if (in.general_udp_socket == nullptr) {
-		return;
-	}
-
+void browse_servers_gui_state::advance_ping_logic() {
 	animate_dot_column();
 
-	auto udp_socket = *in.general_udp_socket;
+	auto& udp_socket = server_browser_socket.socket;
 
 	handle_incoming_udp_packets(udp_socket);
 	send_pings_and_punch_requests(udp_socket);

@@ -6,6 +6,7 @@
 #include "augs/misc/imgui/imgui_enum_radio.h"
 #include "application/gui/do_server_vars.h"
 #include "application/setups/server/server_vars.h"
+#include "application/nat/nat_detection_session.h"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -14,7 +15,9 @@ void perform_arena_chooser(arena_identifier& current_arena);
 bool start_server_gui_state::perform(
 	server_start_input& into,
 	server_vars& into_vars,
-	server_solvable_vars& into_solvable_vars
+	server_solvable_vars& into_solvable_vars,
+
+	const nat_detection_session* nat_detection
 ) {
 	// int field_id = 0;
 
@@ -89,6 +92,20 @@ as well as to test your skills in a laggy environment.
 		}
 	}
 
+	if (show_nat_details && nat_detection != nullptr) {
+		const auto log_text = nat_detection->get_full_log();
+
+		if (ImGui::Button("Copy to clipboard")) {
+			ImGui::SetClipboardText(log_text.c_str());
+		}
+
+		const auto log_color = rgba(210, 210, 210, 255);
+
+		auto result = augs::imgui::cond_scoped_window(show_nat_details, "NAT detection details", &show_nat_details, ImGuiWindowFlags_AlwaysAutoResize);
+
+		text_color(log_text, log_color);
+	}
+
 #if NDEBUG && PLATFORM_UNIX
 	const bool is_dedicated = instance_type == server_instance_type::DEDICATED;
 	const bool please_use_cmdline = is_dedicated;
@@ -148,6 +165,29 @@ as well as to test your skills in a laggy environment.
 			text_disabled("See Settings->Server for more options to tweak.\n\n");
 
 			text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
+		}
+
+		text("\n\n");
+
+		if (nat_detection == nullptr) {
+			text_color("NAT detection and traversal was disabled for this launch.", red);
+		}
+		else {
+			if (const auto result = nat_detection->query_result()) {
+				const rgba nat_colors[4] = { green, yellow, yellow, orange };
+				const auto color_index = static_cast<int>(result->type);
+
+				text_color(result->describe(), nat_colors[color_index]);
+			}
+			else {
+				text_color("NAT detection in progress...", red);
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Details")) {
+				show_nat_details = true;
+			}
 		}
 	}
 

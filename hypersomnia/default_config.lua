@@ -7,7 +7,7 @@ return {
 	  default_port = 8420
   },
 
-  preferred_source_client_port = 8411,
+  allow_nat_traversal = true,
 
   nat_traversal = {
 	  port_probing_host = {
@@ -15,7 +15,7 @@ return {
 		  default_port = 8414
 	  },
 
-	  num_ports_probed = 5,
+	  num_ports_probed = 3,
 
 	  stun_server_list = {
 		  { address = "stun.l.google.com:19302" },

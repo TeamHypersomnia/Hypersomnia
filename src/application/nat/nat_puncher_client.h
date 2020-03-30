@@ -16,7 +16,7 @@ struct nat_puncher_client {
 		if (valid_and_is_ready(future_relay_host_addr)) {
 			const auto result = future_relay_host_addr.get();
 
-			result.report();
+			LOG(result.report());
 
 			if (result.result == resolve_result_type::OK) {
 				relay_host_addr = result.addr;

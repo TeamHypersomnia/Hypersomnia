@@ -225,7 +225,7 @@ void server_setup::resolve_server_list_if_its_time() {
 	if (valid_and_is_ready(future_resolved_server_list_addr)) {
 		const auto result = future_resolved_server_list_addr.get();
 
-		result.report();
+		LOG(result.report());
 
 		if (result.result == resolve_result_type::OK) {
 			if (result.addr != resolved_server_list_addr) {
@@ -1739,6 +1739,10 @@ bool server_setup::requires_cursor() const {
 
 bool server_setup::player_added_to_mode(const mode_player_id mode_id) const {
 	return found_in(get_arena_handle(), mode_id);
+}
+
+const netcode_socket_t* server_setup::find_underlying_socket() const {
+	return server->find_underlying_socket();
 }
 
 #include "augs/readwrite/to_bytes.h"

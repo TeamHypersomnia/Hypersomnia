@@ -5,6 +5,7 @@
 #include "application/app_intent_type.h"
 #include "augs/math/camera_cone.h"
 #include "application/input/entropy_accumulator.h"
+#include "application/nat/nat_type.h"
 
 enum class custom_imgui_result {
 	NONE,
@@ -45,6 +46,8 @@ struct server_advance_input {
 	const vec2i screen_size;
 	const input_settings settings;
 	const zoom_type zoom;
+
+	const nat_type last_known_nat_type;
 
 	network_profiler& network_performance;
 	server_network_info& server_stats;

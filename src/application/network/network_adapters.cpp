@@ -133,17 +133,16 @@ bool server_adapter::has_messages_to_send(const client_id_type& id, const game_c
 	return server.HasMessagesToSend(id, static_cast<channel_id_type>(channel));
 }
 
-void resolve_address_result::report() const {
-	if (result == resolve_result_type::OK) {
-		LOG("Successfully resolved %x to %x", host, ::ToString(addr));
-	}
-
-	if (result == resolve_result_type::INVALID_ADDRESS) {
-		LOG("Couldn't resolve %x: the address is invalid.", host);
-	}
-
-	if (result == resolve_result_type::INVALID_ADDRESS) {
-		LOG("Couldn't resolve %x: host unreachable.", host);
+std::string resolve_address_result::report() const {
+	switch (result) {
+		case resolve_result_type::OK:
+			return typesafe_sprintf("Successfully resolved %x to %x", host, ::ToString(addr));
+		case resolve_result_type::COULDNT_RESOLVE_HOST:
+			return typesafe_sprintf("Couldn't resolve %x: host unreachable.", host);
+		case resolve_result_type::INVALID_ADDRESS:
+			return typesafe_sprintf("Couldn't resolve %x: the address is invalid.", host);
+		default:
+			return typesafe_sprintf("Couldn't resolve %x: unknown error.", host);
 	}
 }
 
@@ -643,7 +642,19 @@ const netcode_socket_t* client_adapter::find_underlying_socket() const {
 	}
 
 	if (auto* const s = client.GetClientDetail()) {
-		return &s->socket_holder.ipv4;
+		return std::addressof(s->socket_holder.ipv4);
+	}
+
+	return nullptr;
+}
+
+const netcode_socket_t* server_adapter::find_underlying_socket() const {
+	if (!server.IsRunning()) {
+		return nullptr;
+	}
+
+	if (auto* const s = server.GetServerDetail()) {
+		return std::addressof(s->socket_holder.ipv4);
 	}
 
 	return nullptr;

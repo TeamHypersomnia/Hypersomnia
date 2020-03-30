@@ -2,6 +2,8 @@
 #include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 
+struct netcode_socket_t;
+
 class server_adapter {
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;
@@ -86,4 +88,5 @@ public:
 	yojimbo::Address get_client_address(const client_id_type& id) const;
 
 	void send_udp_packet(const netcode_address_t& to, std::byte*, std::size_t n) const;
+	const netcode_socket_t* find_underlying_socket() const;
 };

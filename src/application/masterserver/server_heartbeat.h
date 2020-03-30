@@ -1,7 +1,7 @@
 #pragma once
 #include "game/modes/all_mode_includes.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
-#include "application/nat/nat_type_detector.h"
+#include "application/nat/nat_detection_session.h"
 
 struct server_heartbeat {
 	static constexpr bool force_read_field_by_field = true;
