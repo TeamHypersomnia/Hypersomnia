@@ -689,7 +689,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/gui/client/chat_gui.cpp"
 	"src/application/gui/client/client_gui_state.cpp"
 	"src/application/gui/browse_servers_gui.cpp"
-	"src/application/gui/my_network_details_gui.cpp"
 	"src/application/masterserver/masterserver.cpp"
 	"src/application/nat/nat_detection_session.cpp"
 )

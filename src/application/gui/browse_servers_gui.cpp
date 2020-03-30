@@ -72,8 +72,6 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 		return;
 	}
 
-	my_network_details.reset();
-
 	official_server_addresses.clear();
 	error_message.clear();
 	server_list.clear();
@@ -227,21 +225,6 @@ static std::optional<uint64_t> read_ping_response(uint8_t* packet_buffer, std::s
 	return std::nullopt;
 }
 
-template <class R>
-void browse_servers_gui_state::handle_masterserver_response(
-	const R& typed_response, 
-	const netcode_address_t& from
-) {
-	namespace OUT = masterserver_out;
-
-	if constexpr(std::is_same_v<R, OUT::tell_me_my_address>) {
-		const auto& our_external_address = typed_response.address;
-
-		BRW_LOG("tell_me_my_address response: %x -> %x", ::ToString(from), ::ToString(our_external_address));
-		my_network_details.handle_response(from, our_external_address);
-	}
-}
-
 bool browse_servers_gui_state::handle_gameserver_response(uint8_t* packet_buffer, std::size_t packet_bytes, const netcode_address_t& from) {
 	const auto current_time = yojimbo_time();
 
@@ -292,25 +275,6 @@ void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& soc
 
 		if (handle_gameserver_response(packet_buffer, packet_bytes, from)) {
 			continue;
-		}
-
-		try {
-			auto handle = [&](const auto& typed_response) {
-				handle_masterserver_response(typed_response, from);
-			};
-
-			auto buf = augs::cpointer_to_buffer { 
-				reinterpret_cast<const std::byte*>(packet_buffer), 
-				static_cast<std::size_t>(packet_bytes) 
-			};
-
-			auto cptr = augs::cptr_memory_stream(buf);
-
-			const auto response = augs::read_bytes<masterserver_response>(cptr);
-			std::visit(handle, response);
-		}
-		catch (const augs::stream_read_error& err) {
-			LOG("Invalid response from the masterserver. Details:\n%x", err.what());
 		}
 	}
 }
@@ -951,10 +915,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			ImGui::SameLine();
 		}
 
-		if (ImGui::Button("My network details")) {
-			my_network_details.open();
-		}
-
 		ImGui::SameLine();
 
 		{
@@ -973,7 +933,6 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	}
 	
 	server_details.perform(selected_server);
-	my_network_details.perform();
 
 	if (requested_connection != std::nullopt) {
 		in.client_start.set_custom(::ToString(*requested_connection));

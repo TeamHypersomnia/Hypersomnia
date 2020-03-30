@@ -6,7 +6,7 @@
 #include "augs/misc/timing/timer.h"
 #include "application/masterserver/server_heartbeat.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
-#include "application/gui/my_network_details_gui.h"
+#include "augs/network/netcode_sockets.h"
 
 #include <chrono>
 
@@ -87,7 +87,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 	official_addrs official_server_addresses;
 
 	server_details_gui_state server_details = std::string("Server details");
-	my_network_details_gui_state my_network_details = std::string("My network details");
 
 	bool only_responding = false;
 	augs::maybe<int> at_least_players = augs::maybe<int>(1, false);
@@ -106,8 +105,6 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	const resolve_address_result* find_resolved_official(const netcode_address_t&);
 
-	template <class R>
-	void handle_masterserver_response(const R& typed_response, const netcode_address_t& from);
 	bool handle_gameserver_response(uint8_t* packet_buffer, std::size_t packet_bytes, const netcode_address_t& from);
 
 	void animate_dot_column();
