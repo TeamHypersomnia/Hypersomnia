@@ -15,7 +15,7 @@ return {
 		  default_port = 8414
 	  },
 
-	  num_ports_probed = 3,
+	  num_ports_probed = 2,
 
 	  stun_server_list = {
 		  { address = "stun.l.google.com:19302" },

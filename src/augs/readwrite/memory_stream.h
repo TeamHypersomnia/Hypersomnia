@@ -27,6 +27,10 @@ namespace augs {
 			return write_pos - read_pos;
 		}
 
+		bool has_unread_bytes() const {
+			return get_unread_bytes() > 0;
+		}
+
 		void set_write_pos(const std::size_t new_pos) {
 			write_pos = new_pos;
 		}

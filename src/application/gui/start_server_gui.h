@@ -24,6 +24,7 @@ public:
 		server_vars&,
 		server_solvable_vars&,
 
-		const nat_detection_session*
+		const nat_detection_session*,
+		const port_type currently_bound_port
 	);
 };

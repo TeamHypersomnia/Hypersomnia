@@ -418,6 +418,7 @@ and then hitting Save settings.
 
 	static auto restart_nat_detection = []() {
 		if (allow_nat_traversal) {
+			nat_detection.reset();
 			nat_detection.emplace(config.nat_traversal, current_stun_server);
 		}
 	};
@@ -949,7 +950,8 @@ and then hitting Save settings.
 			config.default_server_start, 
 			config.server, 
 			config.server_solvable,
-			nat_detection != std::nullopt ? std::addressof(*nat_detection) : nullptr
+			nat_detection != std::nullopt ? std::addressof(*nat_detection) : nullptr,
+			get_bound_local_port()
 		);
 
 		if (launched_from_server_start_gui || server_start_requested) {

@@ -17,7 +17,8 @@ bool start_server_gui_state::perform(
 	server_vars& into_vars,
 	server_solvable_vars& into_solvable_vars,
 
-	const nat_detection_session* nat_detection
+	const nat_detection_session* nat_detection,
+	const port_type currently_bound_port
 ) {
 	// int field_id = 0;
 
@@ -93,6 +94,8 @@ as well as to test your skills in a laggy environment.
 	}
 
 	if (show_nat_details && nat_detection != nullptr) {
+		auto result = augs::imgui::cond_scoped_window(show_nat_details, "NAT detection details", &show_nat_details, ImGuiWindowFlags_AlwaysAutoResize);
+
 		const auto log_text = nat_detection->get_full_log();
 
 		if (ImGui::Button("Copy to clipboard")) {
@@ -100,9 +103,6 @@ as well as to test your skills in a laggy environment.
 		}
 
 		const auto log_color = rgba(210, 210, 210, 255);
-
-		auto result = augs::imgui::cond_scoped_window(show_nat_details, "NAT detection details", &show_nat_details, ImGuiWindowFlags_AlwaysAutoResize);
-
 		text_color(log_text, log_color);
 	}
 
@@ -130,11 +130,44 @@ as well as to test your skills in a laggy environment.
 		auto do_port = [&](const auto& label, auto& val) {
 			auto chosen_port = static_cast<int>(val);
 
-			ImGui::InputInt(label, std::addressof(chosen_port), 0, 0);
+			ImGui::InputInt(label, std::addressof(chosen_port), 0, 0, ImGuiInputTextFlags_EnterReturnsTrue);
 			val = static_cast<unsigned short>(std::clamp(chosen_port, 1024, 65535));
 		};
 
 		do_port("Port", into.port);
+
+		const bool port_bound_successfully = into.port == currently_bound_port;
+
+		text("Currently bound port:");
+		ImGui::SameLine();
+
+		text_color(std::to_string(currently_bound_port), port_bound_successfully ? green : orange);
+
+		if (!port_bound_successfully) {
+			ImGui::SameLine();
+			text_color("(Could not bind to %x!)", orange);
+		}
+
+		if (nat_detection == nullptr) {
+			text_color("NAT detection and traversal was disabled for this launch.", red);
+		}
+		else {
+			if (const auto result = nat_detection->query_result()) {
+				const rgba nat_colors[4] = { green, yellow, yellow, orange };
+				const auto color_index = static_cast<int>(result->type);
+
+				text_color(result->describe(), nat_colors[color_index]);
+			}
+			else {
+				text_color(typesafe_sprintf("NAT detection for port %x in progress...", currently_bound_port), red);
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Details")) {
+				show_nat_details = true;
+			}
+		}
 
 		{
 			ImGui::Separator();
@@ -165,29 +198,6 @@ as well as to test your skills in a laggy environment.
 			text_disabled("See Settings->Server for more options to tweak.\n\n");
 
 			text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
-		}
-
-		text("\n\n");
-
-		if (nat_detection == nullptr) {
-			text_color("NAT detection and traversal was disabled for this launch.", red);
-		}
-		else {
-			if (const auto result = nat_detection->query_result()) {
-				const rgba nat_colors[4] = { green, yellow, yellow, orange };
-				const auto color_index = static_cast<int>(result->type);
-
-				text_color(result->describe(), nat_colors[color_index]);
-			}
-			else {
-				text_color("NAT detection in progress...", red);
-			}
-
-			ImGui::SameLine();
-
-			if (ImGui::Button("Details")) {
-				show_nat_details = true;
-			}
 		}
 	}
 

@@ -538,7 +538,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		auto ss = augs::cptr_memory_stream{ buffer_ptr };
 
 		try {
-			while (ss.get_unread_bytes() > 0) {
+			while (ss.has_unread_bytes()) {
 				server_list_entry entry;
 
 				augs::read_bytes(ss, entry.address);

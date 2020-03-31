@@ -1,3 +1,4 @@
+#include <random>
 #include <numeric>
 #include "application/nat/nat_detection_session.h"
 #include "augs/string/typesafe_sprintf.h"
@@ -11,6 +12,7 @@
 #include "augs/readwrite/pointer_to_buffer.h"
 #include "application/masterserver/masterserver.h"
 #include "augs/readwrite/byte_readwrite.h"
+#include "application/nat/stun_request.h"
 
 std::string nat_detection_result::describe() const {
 	using N = nat_type;
@@ -19,11 +21,11 @@ std::string nat_detection_result::describe() const {
 		case N::PUBLIC_INTERNET:
 			return "This computer appears to be directly in the public internet.";
 		case N::CONE:
-			return typesafe_sprintf("Detected a cone-like NAT. Delta: %x ", port_delta);
+			return typesafe_sprintf("Detected a cone-like NAT.\nDelta: %x ", port_delta);
 		case N::ADDRESS_SENSITIVE:
-			return typesafe_sprintf("Detected a symmetric NAT. It is address-sensitive. Delta: %x ", port_delta);
+			return typesafe_sprintf("Detected a symmetric NAT.\nIt is address-sensitive. Delta: %x ", port_delta);
 		case N::PORT_SENSITIVE:
-			return typesafe_sprintf("Detected a symmetric NAT. It is port-sensitive. Delta: %x ", port_delta);
+			return typesafe_sprintf("Detected a symmetric NAT.\nIt is port-sensitive. Delta: %x ", port_delta);
 		default: return "Unknown result.";
 	}
 }
@@ -54,8 +56,6 @@ nat_detection_session::nat_detection_session(
 	future_port_probing_host(async_resolve_address(in.port_probing_host))
 {
 	log_info("---- BEGIN NAT ANALYSIS ----");
-
-	port_probing_requests.resize(in.num_ports_probed);
 
 	auto n = in.num_stun_hosts_used_for_detection;
 
@@ -94,7 +94,18 @@ void nat_detection_session::advance_resolution_of_stun_hosts() {
 				resolved_stun_hosts.emplace_back(result.addr);
 
 				if (enough_stun_hosts_resolved()) {
-					break;
+					log_info(typesafe_sprintf("All %x stun hosts resolved. Generating requests.", resolved_stun_hosts.size()));
+
+					auto rng = randomization(std::random_device()());
+
+					for (const auto& stun_host : resolved_stun_hosts) {
+						auto request = stun_request_state(stun_host);
+						request.source_request = make_stun_request(rng);
+
+						stun_requests.emplace_back(std::move(request));
+					}
+
+					return;
 				}
 			}
 			else {
@@ -121,14 +132,16 @@ void nat_detection_session::advance_resolution_of_port_probing_host() {
 		if (result.result == resolve_result_type::OK) {
 			target = result.addr;
 
-			for (std::size_t i = 0; i < port_probing_requests.size(); ++i) {
-				auto& probation = port_probing_requests[i];
+			const auto n = settings.num_ports_probed;
 
+			for (int i = 0; i < n; ++i) {
 				auto this_probe_addr = result.addr;
 				this_probe_addr.port += i;
 
-				probation.destination = this_probe_addr;
+				port_probing_requests.emplace_back(this_probe_addr);
 			}
+
+			return;
 		}
 		else {
 			retry_resolve_port_probing_host();
@@ -137,6 +150,10 @@ void nat_detection_session::advance_resolution_of_port_probing_host() {
 }
 
 void nat_detection_session::send_one_packet(netcode_socket_t socket) {
+	if (queued_packets.empty()) {
+		return;
+	}
+
 	auto packet = queued_packets.front();
 	auto& bytes = packet.second;
 	auto& address = packet.first;
@@ -147,7 +164,7 @@ void nat_detection_session::send_one_packet(netcode_socket_t socket) {
 }
 
 void nat_detection_session::send_packets(netcode_socket_t socket) {
-	if (try_fire_interval(settings.packet_interval_ms, when_last_sent_packet)) {
+	if (try_fire_interval(settings.packet_interval_ms / 1000.0, when_last_sent_packet)) {
 		send_one_packet(socket);
 	}
 }
@@ -156,15 +173,25 @@ bool nat_detection_session::enough_stun_hosts_resolved() const {
 	return static_cast<int>(resolved_stun_hosts.size()) == settings.num_stun_hosts_used_for_detection;
 }
 
+bool nat_detection_session::all_required_hosts_resolved() const {
+	return enough_stun_hosts_resolved() && resolved_port_probing_host != std::nullopt;
+}
+
 void nat_detection_session::send_requests() {
-	if (!enough_stun_hosts_resolved() || resolved_port_probing_host == std::nullopt) {
+	if (!all_required_hosts_resolved()) {
 		/* Must be fired one after another. */
 		return;
 	}
 
-	if (try_fire_interval(settings.request_interval_ms, when_last_queued_packets)) {
-		{
-			//const auto& stun_addr = stun_host->addr;
+	const bool first_time = when_last_made_requests == 0.0;
+
+	if (try_fire_interval(settings.request_interval_ms / 1000.0, when_last_made_requests)) {
+		if (first_time) {
+			log_info("Firing request packets.");
+		}
+
+		for (auto& request : stun_requests) {
+			queued_packets.emplace_back(request.destination, augs::to_bytes(request.source_request));
 		}
 
 		{
@@ -189,6 +216,9 @@ static nat_detection_result calculate_from(
 
 	F log_info
 ) {
+	ensure_greater(int(address_unique_translations.size()), 1);
+	ensure_greater(int(port_unique_translations.size()), 1);
+
 	auto make_deltas = [&](const auto& ports) {
 		std::vector<int> deltas;
 
@@ -287,6 +317,10 @@ void nat_detection_session::analyze_results(const port_type source_port) {
 		return;
 	}
 
+	if (!all_required_hosts_resolved()) {
+		return;
+	}
+
 	auto all_complete = [](const auto& requests) {
 		for (const auto& s : requests) {
 			if (!s.completed()) {
@@ -381,6 +415,19 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 
 		return false;
 	};
+
+	for (auto& request : stun_requests) {
+		const auto bytes = reinterpret_cast<const std::byte*>(packet_buffer);
+
+		if (const auto translated = read_stun_response(request.source_request, bytes, packet_bytes)) {
+			const auto& our_external_address = *translated;
+
+			log_info(typesafe_sprintf("received STUN response: %x -> %x", ::ToString(from), ::ToString(our_external_address)));
+
+			request.translated_address = our_external_address;
+			return;
+		}
+	}
 
 	if (try_read_masterserver_response()) {
 		return;

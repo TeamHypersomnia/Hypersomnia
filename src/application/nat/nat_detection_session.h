@@ -10,6 +10,8 @@
 #include "application/network/resolve_address_result.h"
 #include "application/nat/nat_type.h"
 
+#include "application/nat/stun_request_structs.h"
+
 using log_sink_type = std::function<void(const std::string&)>;
 
 struct netcode_socket_t;
@@ -29,13 +31,21 @@ class nat_detection_session {
 		netcode_address_t destination;
 		std::optional<netcode_address_t> translated_address;
 
+		request_state(const netcode_address_t& destination) : destination(destination) {}
+
 		bool completed() const {
 			return translated_address != std::nullopt;
 		}
 	};
 
+	struct stun_request_state : request_state {
+		using request_state::request_state;
+
+		STUNMessageHeader source_request;
+	};
+
 	net_time_t when_last_sent_packet = 0;
-	net_time_t when_last_queued_packets = 0;
+	net_time_t when_last_made_requests = 0;
 
 	const nat_traversal_settings settings;
 	stun_counter_type& current_stun_index;
@@ -48,7 +58,7 @@ class nat_detection_session {
 	std::vector<netcode_address_t> resolved_stun_hosts;
 	std::optional<netcode_address_t> resolved_port_probing_host;
 
-	std::vector<request_state> stun_requests;
+	std::vector<stun_request_state> stun_requests;
 	std::vector<request_state> port_probing_requests;
 
 	void send_requests();
@@ -70,6 +80,7 @@ class nat_detection_session {
 	void retry_resolve_port_probing_host();
 
 	bool enough_stun_hosts_resolved() const;
+	bool all_required_hosts_resolved() const;
 
 	void log_info(const std::string&);
 	void handle_packet(const netcode_address_t& from, uint8_t* buffer, const int bytes_received);
