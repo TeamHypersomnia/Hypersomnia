@@ -26,6 +26,7 @@ using stun_counter_type = int;
 
 class nat_detection_session {
 	struct request_state {
+		netcode_address_t destination;
 		std::optional<netcode_address_t> translated_address;
 
 		bool completed() const {
@@ -71,6 +72,10 @@ class nat_detection_session {
 	bool enough_stun_hosts_resolved() const;
 
 	void log_info(const std::string&);
+	void handle_packet(const netcode_address_t& from, uint8_t* buffer, const int bytes_received);
+	void receive_packets(netcode_socket_t socket);
+
+	void finish_port_probe(const netcode_address_t& from, const netcode_address_t& result);
 
 public:
 	using session_input = ::nat_traversal_settings;

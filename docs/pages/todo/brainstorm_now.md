@@ -6,6 +6,52 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Show the source port for which nat detection was performed, inside server_start_gui
+	- like "NAT detection result for port: %x"
+
+- In a single app run, keep a dictionary of opened servers and ping them regularly
+	- could even perhaps ping them from the browser window
+	- so, the browser window could fulfill that role entirely
+	- for that, the browser window will have to use the auxiliary socket too, but why not
+
+- I guess client connecting screen will just show a separate window with autoresizing, same as in server start gui
+	- Can only show the last log line in the small status window
+	- and full log in details?
+	- nah, maybe let's just show everything in the small window somehow and forget the separate window (?)
+
+- Even though for reconnects, we can bind a new source port for the client,
+	- with server it's not so possible
+	- so if server has symmetric nat we'll still have to somehow remember the port it has opened for us
+	- masterserver could somehow keep it but I have no idea how
+	- app of course could keep it
+	- if we restart the client though, we can get a new port
+		- and then the server will map a new port anyway
+		- so ironically it's worse if the server is address sensitive and not port sensitive
+ 
+- for now nat_detection will never return PUBLIC_INTERNET, just assume CONE
+	- so that we always enforce sending back a packet just in case
+	- public_internet will only be set with an explicit disallow flag, for serious dedicated servers
+
+- CONE and a separate enum: CONE_PRESERVING
+	- actually, does it matter?
+
+- On connection, skip nat traversal logic if we have measured ping from server list
+	- ACTUALLY, DON'T
+	- If we don't need nat punch we'll connect anyway
+	- and this doesn't fix reconnecting after having just disconnected
+
+- Don't query the stun servers/port probes again if we want to reconnect right away
+	- We might want to reuse the ports for reconnection
+
+- If one is at most conic and the other symmetric, let the symmetric initiate connection 
+	- Even if it's the server. The client will just "request_nat_hole"
+	- this even handles client being a public internet host and the server being symmetric nat
+	- if both are symmetric, it doesn't matter which one resolves new port first
+
+- Look for imgui demo's Console for a nice copyable log text field
+	- separator under button
+
+
 - Symmetric nat punch (finally)
 	- Punching servers one by one
 	- While sending a punch request to masterserver, include our own last predicted port

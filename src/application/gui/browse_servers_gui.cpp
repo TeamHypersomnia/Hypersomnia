@@ -225,7 +225,7 @@ static std::optional<uint64_t> read_ping_response(uint8_t* packet_buffer, std::s
 	return std::nullopt;
 }
 
-bool browse_servers_gui_state::handle_gameserver_response(uint8_t* packet_buffer, std::size_t packet_bytes, const netcode_address_t& from) {
+bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes) {
 	const auto current_time = yojimbo_time();
 
 	if (const auto maybe_sequence = read_ping_response(packet_buffer, packet_bytes)) {
@@ -263,20 +263,13 @@ bool browse_servers_gui_state::handle_gameserver_response(uint8_t* packet_buffer
 }
 
 void browse_servers_gui_state::handle_incoming_udp_packets(netcode_socket_t& socket) {
-	netcode_address_t from;
-	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
-
-	while (true) {
-		const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, packet_buffer, NETCODE_MAX_PACKET_BYTES);
-
-		if (packet_bytes < 1) {
-			break;
+	auto packet_handler = [&](const auto& from, uint8_t* buffer, const int bytes_received) {
+		if (handle_gameserver_response(from, buffer, bytes_received)) {
+			return;
 		}
+	};
 
-		if (handle_gameserver_response(packet_buffer, packet_bytes, from)) {
-			continue;
-		}
-	}
+	::receive_netcode_packets(socket, packet_handler);
 }
 
 void browse_servers_gui_state::animate_dot_column() {

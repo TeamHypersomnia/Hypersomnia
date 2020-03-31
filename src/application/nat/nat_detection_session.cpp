@@ -8,6 +8,9 @@
 #include "augs/network/netcode_utils.h"
 #include "application/masterserver/masterserver.h"
 #include "augs/readwrite/to_bytes.h"
+#include "augs/readwrite/pointer_to_buffer.h"
+#include "application/masterserver/masterserver.h"
+#include "augs/readwrite/byte_readwrite.h"
 
 std::string nat_detection_result::describe() const {
 	using N = nat_type;
@@ -117,6 +120,15 @@ void nat_detection_session::advance_resolution_of_port_probing_host() {
 
 		if (result.result == resolve_result_type::OK) {
 			target = result.addr;
+
+			for (std::size_t i = 0; i < port_probing_requests.size(); ++i) {
+				auto& probation = port_probing_requests[i];
+
+				auto this_probe_addr = result.addr;
+				this_probe_addr.port += i;
+
+				probation.destination = this_probe_addr;
+			}
 		}
 		else {
 			retry_resolve_port_probing_host();
@@ -156,17 +168,12 @@ void nat_detection_session::send_requests() {
 		}
 
 		{
-			for (std::size_t i = 0; i < port_probing_requests.size(); ++i) {
-				auto& probation = port_probing_requests[i];
-
+			for (auto& probation : port_probing_requests) {
 				if (probation.translated_address == std::nullopt) {
-					auto this_probe_addr = *resolved_port_probing_host;
-					this_probe_addr.port += i;
-
 					const auto request = masterserver_in::tell_me_my_address {};
 					auto bytes = augs::to_bytes(masterserver_request(request));
 
-					queued_packets.emplace_back(this_probe_addr, bytes);
+					queued_packets.emplace_back(probation.destination, bytes);
 				}
 			}
 		}
@@ -321,6 +328,73 @@ void nat_detection_session::analyze_results(const port_type source_port) {
 	log_info("---- FINISH NAT ANALYSIS ----");
 }
 
+const std::string& nat_detection_session::get_full_log() const {
+	return full_log;
+}
+
+using port_probe_response = masterserver_out::tell_me_my_address;
+
+void nat_detection_session::finish_port_probe(const netcode_address_t& from, const netcode_address_t& result) {
+	for (auto& probation : port_probing_requests) {
+		if (from == probation.destination) {
+			probation.translated_address = result;
+		}
+	}
+}
+
+void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t* packet_buffer, const int packet_bytes) {
+	auto handle_port_probe_response = [this, from](
+		const auto& response
+	) {
+		using R = remove_cref<decltype(response)>;
+		namespace OUT = masterserver_out;
+
+		if constexpr(std::is_same_v<R, OUT::tell_me_my_address>) {
+			const auto& our_external_address = response.address;
+
+			log_info(typesafe_sprintf("port probe response: %x -> %x", ::ToString(from), ::ToString(our_external_address)));
+
+			finish_port_probe(from, our_external_address);
+
+			return true;
+		}
+
+		return false;
+	};
+
+	auto try_read_masterserver_response = [&]() {
+		try {
+			auto buf = augs::cpointer_to_buffer { 
+				reinterpret_cast<const std::byte*>(packet_buffer), 
+				static_cast<std::size_t>(packet_bytes) 
+			};
+
+			auto cptr = augs::cptr_memory_stream(buf);
+
+			const auto response = augs::read_bytes<masterserver_response>(cptr);
+
+			return std::visit(handle_port_probe_response, response);
+		}
+		catch (const augs::stream_read_error& err) {
+
+		}
+
+		return false;
+	};
+
+	if (try_read_masterserver_response()) {
+		return;
+	}
+}
+
+void nat_detection_session::receive_packets(netcode_socket_t socket) {
+	auto handle = [&](auto&&... args) {
+		handle_packet(std::forward<decltype(args)>(args)...);
+	};
+
+	::receive_netcode_packets(socket, handle);
+}
+
 void nat_detection_session::advance(netcode_socket_t socket) {
 	if (detected_nat != std::nullopt) {
 		return;
@@ -329,11 +403,9 @@ void nat_detection_session::advance(netcode_socket_t socket) {
 	advance_resolution_of_stun_hosts();
 	advance_resolution_of_port_probing_host();
 
+	receive_packets(socket);
+
 	send_requests();
 	send_packets(socket);
 	analyze_results(socket.address.port);
-}
-
-const std::string& nat_detection_session::get_full_log() const {
-	return full_log;
 }

@@ -105,7 +105,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	const resolve_address_result* find_resolved_official(const netcode_address_t&);
 
-	bool handle_gameserver_response(uint8_t* packet_buffer, std::size_t packet_bytes, const netcode_address_t& from);
+	bool handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes);
 
 	void animate_dot_column();
 	void handle_incoming_udp_packets(netcode_socket_t&);
