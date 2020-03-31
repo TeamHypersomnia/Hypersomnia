@@ -162,7 +162,7 @@ std::string ToString(const netcode_address_t& addr) {
 }
 
 bool try_fire_interval(const double interval, net_time_t& when_last, const double current_time) {
-	if (when_last == 0 || current_time - when_last >= interval) {
+	if (when_last < 0.0 || current_time - when_last >= interval) {
 		when_last = current_time;
 		return true;
 	}

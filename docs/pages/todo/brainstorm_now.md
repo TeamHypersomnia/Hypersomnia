@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Later fix number of probed ports to like 3 maybe
+
 - Fix flashbang sound volume
 
 - Show the source port for which nat detection was performed, inside server_start_gui

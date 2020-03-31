@@ -29,8 +29,8 @@ struct ping_progress {
 	int ping = -1;
 	uint64_t ping_sequence = -1;
 
-	net_time_t when_sent_first_ping = 0;
-	net_time_t when_sent_last_ping = 0;
+	net_time_t when_sent_first_ping = -1;
+	net_time_t when_sent_last_ping = -1;
 
 	server_entry_state state = server_entry_state::AWAITING_RESPONSE;
 

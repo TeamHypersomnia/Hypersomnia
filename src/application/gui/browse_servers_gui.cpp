@@ -334,14 +334,14 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 			auto& when_last_ping = p.when_sent_last_ping;
 
 			if (try_fire_interval(ping_retry_interval, when_last_ping, current_time)) {
-				if (when_first_ping == 0) {
+				if (when_first_ping < 0.0) {
 					when_first_ping = current_time;
 				}
 
 				request_ping();
 			}
 
-			if (when_first_ping != 0 && interval_passed(server_entry_timeout, when_first_ping)) {
+			if (when_first_ping >= 0.0 && interval_passed(server_entry_timeout, when_first_ping)) {
 				p.state = server_entry_state::GIVEN_UP;
 				continue;
 			}

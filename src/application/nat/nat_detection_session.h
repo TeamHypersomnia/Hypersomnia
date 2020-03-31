@@ -44,8 +44,8 @@ class nat_detection_session {
 		STUNMessageHeader source_request;
 	};
 
-	net_time_t when_last_sent_packet = 0;
-	net_time_t when_last_made_requests = 0;
+	net_time_t when_last_sent_packet = -1;
+	net_time_t when_last_made_requests = -1;
 
 	const nat_traversal_settings settings;
 	stun_counter_type& current_stun_index;

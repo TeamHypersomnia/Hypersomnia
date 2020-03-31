@@ -107,8 +107,8 @@ class client_setup :
 	augs::propagate_const<std::unique_ptr<client_adapter>> adapter;
 	net_time_t client_time = 0.0;
 	net_time_t when_initiated_connection = 0.0;
-	net_time_t when_sent_client_settings = 0.0;
-	net_time_t when_sent_nat_punch_request = 0.0;
+	net_time_t when_sent_client_settings = -1;
+	net_time_t when_sent_nat_punch_request = -1;
 
 	std::string last_disconnect_reason;
 	bool print_only_disconnect_reason = false;
