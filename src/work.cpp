@@ -15,6 +15,7 @@
 #include "augs/templates/history.hpp"
 #include "augs/templates/traits/in_place.h"
 #include "augs/templates/thread_pool.h"
+#include "augs/templates/introspection_utils/introspective_equal.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"

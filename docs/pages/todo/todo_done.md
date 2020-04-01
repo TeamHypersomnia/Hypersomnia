@@ -4204,3 +4204,20 @@ Advantages:
 	- So that new servers can easily be found
 - remember to shut down the aux server
 
+- server_vars: allow_nat_traversal
+
+
+- Show the source port for which nat detection was performed, inside server_start_gui
+	- like "NAT detection result for port: %x"
+- for now nat_detection will never return PUBLIC_INTERNET, just assume CONE
+	- so that we always enforce sending back a packet just in case
+	- public_internet will only be set with an explicit disallow flag, for serious dedicated servers
+
+- CONE and a separate enum: CONE_PRESERVING
+	- actually, does it matter?
+
+ 
+- On connection, skip nat traversal logic if we have measured ping from server list
+	- ACTUALLY, DON'T
+	- If we don't need nat punch we'll connect anyway
+	- and this doesn't fix reconnecting after having just disconnected

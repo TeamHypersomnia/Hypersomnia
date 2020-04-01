@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- server_vars: allow_nat_traversal
-
 - Don't use client/server's underlying socket for other stuff!!!
 	- It might break netcode logic because netcode packets will be hijacked by the other logic
 
@@ -16,11 +14,6 @@ summary: That which we are brainstorming at the moment.
 	- test masterserver locally beforehand
 
 - Later fix number of probed ports to like 3 maybe
-
-- Fix flashbang sound volume
-
-- Show the source port for which nat detection was performed, inside server_start_gui
-	- like "NAT detection result for port: %x"
 
 - In a single app run, keep a dictionary of opened servers and ping them regularly
 	- could even perhaps ping them from the browser window
@@ -40,18 +33,6 @@ summary: That which we are brainstorming at the moment.
 	- if we restart the client though, we can get a new port
 		- and then the server will map a new port anyway
 		- so ironically it's worse if the server is address sensitive and not port sensitive
- 
-- for now nat_detection will never return PUBLIC_INTERNET, just assume CONE
-	- so that we always enforce sending back a packet just in case
-	- public_internet will only be set with an explicit disallow flag, for serious dedicated servers
-
-- CONE and a separate enum: CONE_PRESERVING
-	- actually, does it matter?
-
-- On connection, skip nat traversal logic if we have measured ping from server list
-	- ACTUALLY, DON'T
-	- If we don't need nat punch we'll connect anyway
-	- and this doesn't fix reconnecting after having just disconnected
 
 - Don't query the stun servers/port probes again if we want to reconnect right away
 	- We might want to reuse the ports for reconnection
@@ -64,7 +45,6 @@ summary: That which we are brainstorming at the moment.
 - Look for imgui demo's Console for a nice copyable log text field
 	- separator under button
 
-
 - Symmetric nat punch (finally)
 	- Punching servers one by one
 	- While sending a punch request to masterserver, include our own last predicted port
@@ -73,6 +53,8 @@ summary: That which we are brainstorming at the moment.
 	- Server can too send its nat type to the masterserver
 	- links:
 		- https://slideplayer.com/slide/3159695/
+
+- Fix flashbang sound volume
 
 - Investigate the mysterious crash
 	- Happened when we finished drag and dropping on hotbar 
