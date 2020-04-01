@@ -12,10 +12,11 @@ return {
   nat_traversal = {
 	  port_probing_host = {
 		  address = "masterserver.hypersomnia.xyz",
-		  default_port = 8414
+		  default_port = 8430
 	  },
 
-	  num_ports_probed = 2,
+	  num_ports_probed = 3,
+	  num_stun_hosts_used_for_detection = 2,
 
 	  stun_server_list = {
 		  { address = "stun.l.google.com:19302" },
@@ -30,8 +31,8 @@ return {
 	ip = "0.0.0.0",
 	server_entry_timeout_secs = 60,
 
-	first_udp_command_port = 8414,
-	num_udp_command_ports = 5,
+	first_udp_command_port = 8430,
+	num_udp_command_ports = 10,
 
 	sleep_ms = 8,
 	server_list_port = 8420,
@@ -642,7 +643,7 @@ return {
 
 	notified_server_list = {
 		address = "masterserver.hypersomnia.xyz",
-  		default_port = 8414
+  		default_port = 8430
 	},
 
 	send_heartbeat_to_server_list_once_every_secs = 10,

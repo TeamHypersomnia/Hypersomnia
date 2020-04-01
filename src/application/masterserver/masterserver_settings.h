@@ -6,7 +6,7 @@ struct masterserver_settings {
 	std::string ip = "127.0.0.1";
 	unsigned server_entry_timeout_secs = 60;
 
-	port_type first_udp_command_port = 8414;
+	port_type first_udp_command_port = 8430;
 	int num_udp_command_ports = 5;
 
 	port_type server_list_port = 8420;

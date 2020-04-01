@@ -80,7 +80,7 @@ summary: That which we are brainstorming at the moment.
 	- Two totally different addresses gave us proximate ports, so there's a chance for us
 		- 35.205.19.61:43214 -> 31.182.205.239:28794
 		- 35.205.19.61:43215 -> 31.182.205.239:28795
-		- 104.199.81.130:8414 -> 31.182.205.239:28778
+		- 104.199.81.130:8430 -> 31.182.205.239:28778
 		- 104.199.81.130:8415 -> 31.182.205.239:28776
 		- later 31.182.205.239:28816 and 31.182.205.239:28817 for the official server
 
