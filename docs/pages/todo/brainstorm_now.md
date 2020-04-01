@@ -55,6 +55,7 @@ summary: That which we are brainstorming at the moment.
 		- https://slideplayer.com/slide/3159695/
 
 - Fix flashbang sound volume
+- Make server save RCON changes to the config
 
 - Investigate the mysterious crash
 	- Happened when we finished drag and dropping on hotbar 

@@ -447,7 +447,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto restart_nat_detection = []() {
 		nat_detection.reset();
-		nat_detection.emplace(config.nat_traversal, current_stun_server);
+		nat_detection.emplace(config.nat_detection, current_stun_server);
 	};
 
 	static auto get_detected_nat = []() {
@@ -955,7 +955,7 @@ work_result work(const int argc, const char* const * const argv) try {
 						lua,
 						config.default_client_start,
 						config.client,
-						config.nat_traversal,
+						config.nat_detection,
 						bound_port
 					);
 				});
@@ -1303,7 +1303,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				}
 
 				if (nat_detection != std::nullopt) {
-					if (!augs::introspective_equal(config.nat_traversal, nat_detection->get_settings())) {
+					if (!augs::introspective_equal(config.nat_detection, nat_detection->get_settings())) {
 						restart_nat_detection();
 					}
 

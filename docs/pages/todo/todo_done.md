@@ -4221,3 +4221,7 @@ Advantages:
 	- ACTUALLY, DON'T
 	- If we don't need nat punch we'll connect anyway
 	- and this doesn't fix reconnecting after having just disconnected
+- why is "firing requests" logged at such a weird moment...
+	- perhaps something's wrong with the == ?
+		- just use bool...
+

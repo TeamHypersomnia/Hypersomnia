@@ -185,12 +185,12 @@ void nat_detection_session::send_requests() {
 		return;
 	}
 
-	const bool first_time = when_last_made_requests == 0.0;
-
 	if (try_fire_interval(settings.request_interval_ms / 1000.0, when_last_made_requests)) {
-		if (first_time) {
+		if (times_sent_requests == 0) {
 			log_info("Firing request packets.");
 		}
+
+		times_sent_requests++;
 
 		for (auto& request : stun_requests) {
 			if (!request.completed()) {
@@ -370,7 +370,7 @@ const std::string& nat_detection_session::get_full_log() const {
 	return full_log;
 }
 
-const nat_traversal_settings& nat_detection_session::get_settings() {
+const nat_detection_settings& nat_detection_session::get_settings() {
 	return settings;
 }
 

@@ -11,7 +11,7 @@
 #include <chrono>
 
 struct client_start_input;
-struct nat_traversal_settings;
+struct nat_detection_settings;
 struct browse_servers_gui_internal;
 struct netcode_socket_t;
 struct address_and_port;

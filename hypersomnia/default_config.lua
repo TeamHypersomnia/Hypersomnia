@@ -7,7 +7,7 @@ return {
 	  default_port = 8420
   },
 
-  nat_traversal = {
+  nat_detection = {
 	  port_probing_host = {
 		  address = "masterserver.hypersomnia.xyz",
 		  default_port = 8430
@@ -23,6 +23,10 @@ return {
 		  { address = "stun3.l.google.com:19302" },
 		  { address = "stun4.l.google.com:19302" },
 	  }
+  },
+
+  nat_traversal = {
+	  short_ttl = 2
   },
 
   masterserver = {

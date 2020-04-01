@@ -46,6 +46,7 @@
 #include "application/performance_settings.h"
 #include "application/http_client/http_client_settings.h"
 #include "application/masterserver/masterserver_settings.h"
+#include "application/nat/nat_detection_settings.h"
 #include "application/nat/nat_traversal_settings.h"
 #include "fp_consistency_tests.h"
 
@@ -97,7 +98,9 @@ struct config_lua_table {
 
 	address_and_port server_list_provider;
 
+	nat_detection_settings nat_detection;
 	nat_traversal_settings nat_traversal;
+
 	address_and_port extra_address_resolution_port;
 
 	masterserver_settings masterserver;

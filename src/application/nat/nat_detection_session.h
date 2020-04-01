@@ -6,7 +6,7 @@
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 
 #include "application/network/address_and_port.h"
-#include "application/nat/nat_traversal_settings.h"
+#include "application/nat/nat_detection_settings.h"
 #include "application/network/resolve_address_result.h"
 #include "application/nat/nat_type.h"
 
@@ -36,10 +36,12 @@ class nat_detection_session {
 		STUNMessageHeader source_request;
 	};
 
+	int times_sent_requests = 0;
+
 	net_time_t when_last_sent_packet = -1;
 	net_time_t when_last_made_requests = -1;
 
-	const nat_traversal_settings settings;
+	const nat_detection_settings settings;
 	stun_counter_type& current_stun_index;
 	log_sink_type log_sink;
 	std::string full_log;
@@ -81,7 +83,7 @@ class nat_detection_session {
 	void finish_port_probe(const netcode_address_t& from, const netcode_address_t& result);
 
 public:
-	using session_input = ::nat_traversal_settings;
+	using session_input = ::nat_detection_settings;
 
 	nat_detection_session(session_input, stun_counter_type&);
 	nat_detection_session(session_input, stun_counter_type&, log_sink_type);
@@ -91,5 +93,5 @@ public:
 	std::optional<nat_detection_result> query_result() const;
 
 	const std::string& get_full_log() const;
-	const nat_traversal_settings& get_settings();
+	const nat_detection_settings& get_settings();
 };

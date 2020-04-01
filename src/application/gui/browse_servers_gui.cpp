@@ -14,7 +14,7 @@
 #include "augs/misc/time_utils.h"
 #include "augs/network/netcode_sockets.h"
 #include "application/nat/nat_puncher_client.h"
-#include "application/nat/nat_traversal_settings.h"
+#include "application/nat/nat_detection_settings.h"
 
 constexpr auto ping_retry_interval = 1;
 constexpr auto reping_interval = 10;
