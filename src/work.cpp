@@ -531,6 +531,54 @@ work_result work(const int argc, const char* const * const argv) try {
 	if (params.type == app_type::DEDICATED_SERVER) {
 		LOG("Starting the dedicated server at port: %x", chosen_server_port());
 
+		auto handle_sigint = []() {
+#if PLATFORM_UNIX
+			if (signal_status != 0) {
+				const auto sig = signal_status;
+
+				LOG("%x received.", strsignal(sig));
+
+				if(
+					sig == SIGINT
+					|| sig == SIGSTOP
+					|| sig == SIGTERM
+				) {
+					LOG("Gracefully shutting down.");
+					return true;
+				}
+			}
+#endif
+
+			return false;
+
+		};
+
+		if (config.server.allow_nat_traversal) {
+			if (nat_detection != std::nullopt) {
+				if (auxiliary_socket != std::nullopt) {
+					LOG("Waiting for NAT detection to complete...");
+
+					while (nat_detection_in_progress()) {
+						nat_detection->advance(auxiliary_socket->socket);
+
+						if (handle_sigint()) {
+							return work_result::SUCCESS;
+						}
+
+						yojimbo_sleep(1.0 / 1000);
+					}
+				}
+			}
+		}
+
+		const auto bound_port = get_bound_local_port();
+		auxiliary_socket.reset();
+
+		LOG("Starting a dedicated server. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
+
+		auto start = config.default_server_start;
+		start.port = bound_port;
+
 #if BUILD_NETWORKING
 		emplace_current_setup(
 			std::in_place_type_t<server_setup>(),
@@ -546,36 +594,11 @@ work_result work(const int argc, const char* const * const argv) try {
 		auto& server = std::get<server_setup>(*current_setup);
 
 		while (server.is_running()) {
-#if PLATFORM_UNIX
-			if (signal_status != 0) {
-				const auto sig = signal_status;
-
-				LOG("%x received.", strsignal(sig));
-
-				if(
-					sig == SIGINT
-					|| sig == SIGSTOP
-					|| sig == SIGTERM
-				) {
-					LOG("Gracefully shutting down.");
-					break;
-				}
-			}
-#endif
-
-			if (nat_detection != std::nullopt) {
-				const auto socket = server.find_underlying_socket();
-
-#if !IS_PRODUCTION_BUILD
-
-				ensure(socket != nullptr);
-#endif
-				if (socket) {
-					nat_detection->advance(*socket);
-				}
-			}
-
 			const auto zoom = 1.f;
+
+			if (handle_sigint()) {
+				return work_result::SUCCESS;
+			}
 
 			server.advance(
 				{
