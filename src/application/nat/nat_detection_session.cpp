@@ -311,9 +311,9 @@ static nat_detection_result calculate_from(
 	}();
 
 	const auto last_resolved_port = port_unique_translations.back();
-	const auto next_predicted_port = static_cast<port_type>(last_resolved_port + predicted_port_step);
+	const auto predicted_next_port = static_cast<port_type>(last_resolved_port + predicted_port_step);
 
-	return nat_detection_result { type, predicted_port_step, next_predicted_port };
+	return nat_detection_result { type, predicted_port_step, predicted_next_port };
 }
 
 void nat_detection_session::analyze_results(const port_type source_port) {
@@ -368,6 +368,10 @@ void nat_detection_session::analyze_results(const port_type source_port) {
 
 const std::string& nat_detection_session::get_full_log() const {
 	return full_log;
+}
+
+const nat_traversal_settings& nat_detection_session::get_settings() {
+	return settings;
 }
 
 using port_probe_response = masterserver_out::tell_me_my_address;

@@ -108,9 +108,14 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	for (int i = 0; i < num_sockets; ++i) {
 		const auto new_port = settings.first_udp_command_port + i;
-		const auto new_local_address = to_netcode_addr(settings.ip, new_port);
 
-		udp_command_sockets.emplace_back(new_local_address);
+		if (const auto new_local_address = to_netcode_addr(settings.ip, new_port)) {
+			udp_command_sockets.emplace_back(*new_local_address);
+		}
+		else {
+			LOG("There was a problem binding masterserver to %x:%x! Quitting.", settings.ip, new_port);
+			return;
+		}
 
 		LOG("Created masterserver socket at: %x", ::ToString(udp_command_sockets.back().socket.address));
 	}

@@ -97,7 +97,6 @@ struct config_lua_table {
 
 	address_and_port server_list_provider;
 
-	bool allow_nat_traversal = true;
 	nat_traversal_settings nat_traversal;
 	address_and_port extra_address_resolution_port;
 

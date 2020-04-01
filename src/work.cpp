@@ -433,28 +433,32 @@ work_result work(const int argc, const char* const * const argv) try {
 		return config.default_server_start.port;
 	};
 
-	static const bool allow_nat_traversal = config.allow_nat_traversal && !params.disallow_nat_traversal;
-
 	static auto current_stun_server = stun_counter_type(0);
 	static std::optional<nat_detection_session> nat_detection;
 
-	static auto restart_nat_detection = []() {
-		if (allow_nat_traversal) {
-			nat_detection.reset();
-			nat_detection.emplace(config.nat_traversal, current_stun_server);
+	static auto nat_detection_in_progress = []() {
+		if (nat_detection == std::nullopt) {
+			return false;
 		}
+
+		return nat_detection->query_result() == std::nullopt;
 	};
 
-	static auto get_nat_type = []() {
+	static auto restart_nat_detection = []() {
+		nat_detection.reset();
+		nat_detection.emplace(config.nat_traversal, current_stun_server);
+	};
+
+	static auto get_detected_nat = []() {
 		if (nat_detection == std::nullopt) {
-			return nat_type::PUBLIC_INTERNET;
+			return nat_detection_result();
 		}
 
 		if (const auto detected_nat = nat_detection->query_result()) {
-			return detected_nat->type;
+			return *detected_nat;
 		}
 
-		return nat_type::PUBLIC_INTERNET;
+		return nat_detection_result();
 	};
 
 	restart_nat_detection();
@@ -464,6 +468,42 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto get_bound_local_port = []() {
 		return auxiliary_socket->socket.address.port;
+	};
+
+	static auto launch_after_nat_resolution = std::optional<launch_type>();
+
+	static auto opened_pending_popup = std::optional<std::string>();
+
+	static auto do_pending_launch_popup = []() {
+		using namespace augs::imgui;
+
+		if (launch_after_nat_resolution == std::nullopt) {
+			if (opened_pending_popup != std::nullopt) {
+				ImGui::CloseCurrentPopup();
+				opened_pending_popup = std::nullopt;
+			}
+
+			return;
+		}
+
+		const auto pending_launch = *launch_after_nat_resolution;
+		const auto title = "Launching " + format_enum(pending_launch) + "...";
+
+		if (auto popup = scoped_modal_popup(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+			opened_pending_popup = title;
+			text(typesafe_sprintf("NAT detection for port %x is in progress...\nPlease be patient.", get_bound_local_port()));
+
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Abort")) {
+				launch_after_nat_resolution = std::nullopt;
+
+				change_with_save([](config_lua_table& cfg) {
+					cfg.launch_mode = launch_type::MAIN_MENU;
+				});
+			}
+		}
 	};
 
 	static auto recreate_auxiliary_socket = []() {
@@ -542,7 +582,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					vec2i(),
 					config.input,
 					zoom,
-					get_nat_type(),
+					get_detected_nat(),
 					network_performance,
 					server_stats
 				},
@@ -660,6 +700,10 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static bool was_browser_open_in_main_menu = false;
 	static browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
+
+	static auto find_chosen_server_info = []() {
+		return browse_servers_gui.find_entry(config.default_client_start);
+	};
 
 	static ingame_menu_gui ingame_menu;
 
@@ -784,6 +828,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto setup_launcher = [&](auto&& setup_init_callback) {
+		get_audiovisuals().get<particles_simulation_system>().clear();
+		
 		game_gui_mode_flag = false;
 
 		audio_buffers.finish();
@@ -837,24 +883,44 @@ work_result work(const int argc, const char* const * const argv) try {
 	static auto launch_setup = [&](const launch_type mode) {
 		LOG("Launched mode: %x", augs::enum_to_string(mode));
 
-		get_audiovisuals().get<particles_simulation_system>().clear();
-		
 		change_with_save([mode](config_lua_table& cfg) {
 			cfg.launch_mode = mode;
 		});
 
+		auto launch_main_menu = [&]() {
+			if (!has_main_menu()) {
+				setup_launcher([&]() {
+					emplace_main_menu(lua, config.main_menu);
+				});
+			}
+		};
+
 		switch (mode) {
 			case launch_type::MAIN_MENU:
-				setup_launcher([&]() {
-					if (!has_main_menu()) {
-						emplace_main_menu(lua, config.main_menu);
-					}
-				});
-
+				launch_main_menu();
 				break;
 
 #if BUILD_NETWORKING
 			case launch_type::CLIENT:
+				if (auto info = find_chosen_server_info()) {
+					LOG("Found the chosen server in the browser list.");
+
+					if (info->heartbeat.is_behind_nat()) {
+						LOG("The chosen server is behind NAT.");
+
+						if (nat_detection_in_progress()) {
+							launch_after_nat_resolution = launch_type::CLIENT;
+
+							LOG("NAT detection in progress. Delaying the client launch.");
+							launch_main_menu();
+							break;
+						}
+					}
+				}
+				else {
+					LOG("The chosen server was not found in the browser list.");
+				}
+
 				setup_launcher([&]() {
 					const auto bound_port = get_bound_local_port();
 					auxiliary_socket.reset();
@@ -873,6 +939,16 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case launch_type::SERVER: {
+				if (config.server.allow_nat_traversal) {
+					if (nat_detection_in_progress()) {
+						launch_after_nat_resolution = launch_type::SERVER;
+
+						LOG("NAT detection in progress. Delaying the server launch.");
+						launch_main_menu();
+						break;
+					}
+				}
+
 				const auto bound_port = get_bound_local_port();
 				auxiliary_socket.reset();
 
@@ -1203,6 +1279,10 @@ work_result work(const int argc, const char* const * const argv) try {
 				}
 
 				if (nat_detection != std::nullopt) {
+					if (!augs::introspective_equal(config.nat_traversal, nat_detection->get_settings())) {
+						restart_nat_detection();
+					}
+
 					if (auxiliary_socket != std::nullopt) {
 						nat_detection->advance(auxiliary_socket->socket);
 					}
@@ -1218,6 +1298,15 @@ work_result work(const int argc, const char* const * const argv) try {
 				}
 
 				streaming.display_loading_progress();
+
+				if (launch_after_nat_resolution != std::nullopt) {
+					if (!nat_detection_in_progress()) {
+						launch_setup(*launch_after_nat_resolution);
+						launch_after_nat_resolution = std::nullopt;
+					}
+				}
+
+				do_pending_launch_popup();
 			},
 
 			[&]() {
@@ -1701,7 +1790,7 @@ work_result work(const int argc, const char* const * const argv) try {
 						logic_get_screen_size(), 
 						input_cfg, 
 						zoom,
-						get_nat_type(),
+						get_detected_nat(),
 						network_performance,
 						server_stats
 					},

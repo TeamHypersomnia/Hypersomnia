@@ -121,6 +121,8 @@ class server_setup :
 	client_gui_state integrated_client_gui;
 	std::string failure_reason;
 
+	nat_detection_result last_detected_nat;
+
 public:
 	net_time_t last_logged_at = 0;
 	server_profiler profiler;
@@ -245,6 +247,13 @@ public:
 			shutdown();
 			schedule_shutdown = false;
 			return;
+		}
+
+		if (vars.allow_nat_traversal) {
+			last_detected_nat = in.last_detected_nat;
+		}
+		else {
+			last_detected_nat = nat_detection_result();
 		}
 
 		const auto current_time = get_current_time();

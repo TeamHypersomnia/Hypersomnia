@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- server_vars: allow_nat_traversal
+
+- Don't use client/server's underlying socket for other stuff!!!
+	- It might break netcode logic because netcode packets will be hijacked by the other logic
+
 - Perhaps it's the time to upload the masterserver
 	- don't forget about the dedicated server
 	- test masterserver locally beforehand

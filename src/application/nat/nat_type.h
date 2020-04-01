@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/network/port_type.h"
 
 enum class nat_type : uint8_t {
 	PUBLIC_INTERNET,
@@ -7,3 +8,16 @@ enum class nat_type : uint8_t {
 	ADDRESS_SENSITIVE,
 	PORT_SENSITIVE
 };
+
+struct nat_detection_result {
+	static constexpr bool force_read_field_by_field = true;
+
+	// GEN INTROSPECTOR struct nat_detection_result
+	nat_type type = nat_type::PUBLIC_INTERNET;
+	int port_delta = 0;
+	port_type predicted_next_port = 0;
+	// END GEN INTROSPECTOR
+
+	std::string describe() const;
+};
+

@@ -47,7 +47,7 @@ struct server_advance_input {
 	const input_settings settings;
 	const zoom_type zoom;
 
-	const nat_type last_known_nat_type;
+	const nat_detection_result last_detected_nat;
 
 	network_profiler& network_performance;
 	server_network_info& server_stats;

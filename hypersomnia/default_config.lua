@@ -7,8 +7,6 @@ return {
 	  default_port = 8420
   },
 
-  allow_nat_traversal = true,
-
   nat_traversal = {
 	  port_probing_host = {
 		  address = "masterserver.hypersomnia.xyz",
@@ -640,6 +638,8 @@ return {
 
   server = {
 	server_name = "${MY_NICKNAME}'s server",
+
+	allow_nat_traversal = true,
 
 	notified_server_list = {
 		address = "masterserver.hypersomnia.xyz",

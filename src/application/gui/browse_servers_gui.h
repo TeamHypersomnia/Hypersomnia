@@ -44,7 +44,7 @@ struct ping_progress {
 struct server_list_entry {
 	netcode_address_t address;
 	double appeared_when;
-	server_heartbeat data;
+	server_heartbeat heartbeat;
 
 	ping_progress progress;
 
@@ -121,4 +121,6 @@ public:
 	void advance_ping_logic();
 
 	void reping_all_servers();
+
+	const server_list_entry* find_entry(const client_start_input& in) const;
 };

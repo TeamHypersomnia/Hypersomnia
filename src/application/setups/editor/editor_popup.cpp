@@ -44,10 +44,6 @@ editor_popup editor_popup::sum_all(const std::vector<editor_popup>& popups) {
 int editor_popup::perform(const std::vector<button>& buttons) {
 	using namespace augs::imgui;
 
-	if (!ImGui::IsPopupOpen(title.c_str())) {
-		ImGui::OpenPopup(title.c_str());
-	}
-
 	if (auto popup = scoped_modal_popup(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		text(message);
 

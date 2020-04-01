@@ -18,13 +18,13 @@ struct server_heartbeat {
 	uint8_t max_online;
 
 	std::optional<netcode_address_t> internal_network_address;
-	nat_type nat = nat_type::PUBLIC_INTERNET;
+	nat_detection_result nat;
 	// END GEN INTROSPECTOR
 
 	void validate();
 
 	bool is_behind_nat() const {
-		return nat != nat_type::PUBLIC_INTERNET;
+		return nat.type != nat_type::PUBLIC_INTERNET;
 	}
 
 	int get_num_spectators() const {

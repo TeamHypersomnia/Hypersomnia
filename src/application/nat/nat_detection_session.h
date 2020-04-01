@@ -16,14 +16,6 @@ using log_sink_type = std::function<void(const std::string&)>;
 
 struct netcode_socket_t;
 
-struct nat_detection_result {
-	nat_type type;
-	int port_delta = 0;
-	port_type predicted_next_port;
-
-	std::string describe() const;
-};
-
 using stun_counter_type = int;
 
 class nat_detection_session {
@@ -99,4 +91,5 @@ public:
 	std::optional<nat_detection_result> query_result() const;
 
 	const std::string& get_full_log() const;
+	const nat_traversal_settings& get_settings();
 };

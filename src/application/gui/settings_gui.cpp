@@ -1408,12 +1408,19 @@ void do_server_vars(
 		revert(f);
 	};
 
+	auto revertable_checkbox = [&](auto l, auto& f, auto&&... args) {
+		checkbox(l, f, std::forward<decltype(args)>(args)...);
+		revert(f);
+	};
+
 	text_color("General", yellow);
 
 	ImGui::Separator();
 
 	revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
 	revertable_input_text(SCOPE_CFG_NVP(server_name));
+
+	revertable_checkbox("Allow NAT traversal", scope_cfg.allow_nat_traversal);
 
 	if (auto node = scoped_tree_node("Time limits")) {
 		revertable_slider(SCOPE_CFG_NVP(kick_if_no_messages_for_secs), 2u, 300u);

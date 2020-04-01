@@ -136,6 +136,8 @@ as well as to test your skills in a laggy environment.
 
 		do_port("Port", into.port);
 
+		checkbox("Allow NAT traversal", into_vars.allow_nat_traversal);
+
 		const bool port_bound_successfully = into.port == currently_bound_port;
 
 		text("Currently bound port:");
@@ -145,7 +147,7 @@ as well as to test your skills in a laggy environment.
 
 		if (!port_bound_successfully) {
 			ImGui::SameLine();
-			text_color("(Could not bind to %x!)", orange);
+			text_color(typesafe_sprintf("(Could not bind to %x!)", into.port), orange);
 		}
 
 		if (nat_detection == nullptr) {

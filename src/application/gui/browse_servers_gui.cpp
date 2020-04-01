@@ -39,7 +39,7 @@ void BRW_LOG(Args&&... args) {
 #endif
 
 bool server_list_entry::is_set() const {
-	return data.server_name.size() > 0;
+	return heartbeat.server_name.size() > 0;
 }
 
 browse_servers_gui_state::~browse_servers_gui_state() = default;
@@ -147,7 +147,7 @@ void browse_servers_gui_state::refresh_server_pings() {
 }
 
 bool server_list_entry::is_behind_nat() const {
-	return data.is_behind_nat();
+	return heartbeat.is_behind_nat();
 }
 
 server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t& address) {
@@ -163,7 +163,7 @@ server_list_entry* browse_servers_gui_state::find_entry(const netcode_address_t&
 server_list_entry* browse_servers_gui_state::find_entry_by_internal_address(const netcode_address_t& address, const uint64_t ping_sequence) {
 	for (auto& s : server_list) {
 		if (s.progress.ping_sequence == ping_sequence) {
-			if (s.data.internal_network_address == address) {
+			if (s.heartbeat.internal_network_address == address) {
 				return &s;
 			}
 		}
@@ -317,7 +317,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 			ping_this_server(socket, s.address, p.ping_sequence);
 			--packets_left;
 
-			const auto& internal_address = s.data.internal_network_address;
+			const auto& internal_address = s.heartbeat.internal_network_address;
 			const bool maybe_reachable_internally = 
 				internal_address != std::nullopt
 				&& is_internal(*internal_address)
@@ -384,7 +384,7 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 		auto id = scoped_id(index_in(server_list, sp));
 		const auto& s = *sp;
 		const auto& progress = s.progress;
-		const auto& d = s.data;
+		const auto& d = s.heartbeat;
 
 		const bool given_up = progress.state == server_entry_state::GIVEN_UP;
 		const auto color = rgba(given_up ? style.Colors[ImGuiCol_TextDisabled] : style.Colors[ImGuiCol_Text]);
@@ -431,7 +431,7 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", ToString(s.address), d.server_name);
 
 				if (s.progress.found_on_internal_network) {
-					requested_connection = s.data.internal_network_address;
+					requested_connection = s.heartbeat.internal_network_address;
 				}
 				else {
 					requested_connection = s.address;
@@ -543,7 +543,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 				augs::read_bytes(ss, entry.address);
 				augs::read_bytes(ss, entry.appeared_when);
-				augs::read_bytes(ss, entry.data);
+				augs::read_bytes(ss, entry.heartbeat);
 
 				server_list.emplace_back(std::move(entry));
 			}
@@ -574,8 +574,8 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	bool has_community_servers = false;
 
 	for (auto& s : server_list) {
-		const auto& name = s.data.server_name;
-		const auto& arena = s.data.current_arena;
+		const auto& name = s.heartbeat.server_name;
+		const auto& arena = s.heartbeat.current_arena;
 		const auto effective_name = std::string(name) + " " + std::string(arena);
 
 		auto push_if_passes = [&](auto& target_list) {
@@ -586,7 +586,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 
 			if (at_least_players.is_enabled) {
-				if (s.data.num_fighting < at_least_players.value) {
+				if (s.heartbeat.num_fighting < at_least_players.value) {
 					return;
 				}
 			}
@@ -616,7 +616,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				push_if_passes(official_server_list);
 
 				if (std::string(name) == "Player's server") {
-					s.data.server_name = resolved->host;
+					s.heartbeat.server_name = resolved->host;
 				}
 			}
 			else {
@@ -634,23 +634,23 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		auto by_name = [](const T& a, const T& b) {
-			return a->data.server_name < b->data.server_name;
+			return a->heartbeat.server_name < b->heartbeat.server_name;
 		};
 
 		auto by_mode = [](const T& a, const T& b) {
-			return a->data.game_mode < b->data.game_mode;
+			return a->heartbeat.game_mode < b->heartbeat.game_mode;
 		};
 
 		auto by_players = [](const T& a, const T& b) {
-			return a->data.num_fighting < b->data.num_fighting;
+			return a->heartbeat.num_fighting < b->heartbeat.num_fighting;
 		};
 
 		auto by_spectators = [](const T& a, const T& b) {
-			return a->data.get_num_spectators() < b->data.get_num_spectators();
+			return a->heartbeat.get_num_spectators() < b->heartbeat.get_num_spectators();
 		};
 
 		auto by_arena = [](const T& a, const T& b) {
-			return a->data.current_arena < b->data.current_arena;
+			return a->heartbeat.current_arena < b->heartbeat.current_arena;
 		};
 
 		auto by_appeared = [](const T& a, const T& b) {
@@ -936,6 +936,25 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	return false;
 }
 
+const server_list_entry* browse_servers_gui_state::find_entry(const client_start_input& in) const {
+	const auto connected_address = to_netcode_addr(in.get_address_and_port());
+
+	if (connected_address == std::nullopt) {
+		return nullptr;
+	}
+
+	LOG("Finding the server entry by: %x", ::ToString(*connected_address));
+	LOG("Number of servers in the browser: %x", server_list.size());
+
+	for (auto& s : server_list) {
+		if (s.address == *connected_address) {
+			return &s;
+		}
+	}
+
+	return nullptr;
+}
+
 void server_details_gui_state::perform(const server_list_entry& entry) {
 	using namespace augs::imgui;
 
@@ -950,9 +969,9 @@ void server_details_gui_state::perform(const server_list_entry& entry) {
 		return;
 	}
 
-	const auto& internal_addr = entry.data.internal_network_address;
+	auto heartbeat = entry.heartbeat;
+	const auto& internal_addr = heartbeat.internal_network_address;
 
-	auto data = entry.data;
 	auto external_address = ::ToString(entry.address);
 	auto internal_address = internal_addr ? ::ToString(*internal_addr) : std::string("Unknown yet");
 
@@ -960,9 +979,34 @@ void server_details_gui_state::perform(const server_list_entry& entry) {
 	input_text("External IP address", external_address, ImGuiInputTextFlags_ReadOnly);
 	input_text("Internal IP address", internal_address, ImGuiInputTextFlags_ReadOnly);
 
-	input_text("Server name", data.server_name, ImGuiInputTextFlags_ReadOnly);
+	input_text("Server name", heartbeat.server_name, ImGuiInputTextFlags_ReadOnly);
 
-	input_text("Arena", data.current_arena, ImGuiInputTextFlags_ReadOnly);
+	input_text("Arena", heartbeat.current_arena, ImGuiInputTextFlags_ReadOnly);
+
+	auto nat = [&]() -> std::string {
+		switch (heartbeat.nat.type) {
+			case nat_type::PUBLIC_INTERNET: 
+				return "Public Internet";
+			case nat_type::PORT_PRESERVING_CONE: 
+				return "Port-preserving cone";
+			case nat_type::CONE: 
+				return "Cone";
+			case nat_type::ADDRESS_SENSITIVE: 
+				return "Symmetric (address sensitive)";
+			case nat_type::PORT_SENSITIVE: 
+				return "Symmetric (port sensitive)";
+
+			default:
+				return "Unknown";
+		}
+	}();
+
+	input_text("NAT type", nat, ImGuiInputTextFlags_ReadOnly);
+	auto delta = std::to_string(heartbeat.nat.port_delta);
+
+	if (heartbeat.nat.type != nat_type::PUBLIC_INTERNET) {
+		input_text("Port delta", delta, ImGuiInputTextFlags_ReadOnly);
+	}
 }
 
 void browse_servers_gui_state::reping_all_servers() {

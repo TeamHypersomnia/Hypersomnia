@@ -163,6 +163,7 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	server_heartbeat heartbeat;
 
+	heartbeat.nat = last_detected_nat;
 	heartbeat.server_name = vars.server_name;
 	heartbeat.current_arena = solvable_vars.current_arena;
 	heartbeat.game_mode = arena.on_mode(

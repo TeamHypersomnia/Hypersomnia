@@ -294,12 +294,15 @@ std::optional<netcode_address_t> hostname_to_netcode_address_t(const std::string
 	return from;
 }
 
-netcode_address_t to_netcode_addr(const std::string& ip, const port_type port) {
+std::optional<netcode_address_t> to_netcode_addr(const std::string& ip, const port_type port) {
 	struct netcode_address_t addr;
-	netcode_parse_address(ip.c_str(), &addr);
-	addr.port = port;
 
-	return addr;
+	if (NETCODE_OK == netcode_parse_address(ip.c_str(), &addr)) {
+		addr.port = port;
+		return addr;
+	}
+
+	return std::nullopt;
 }
 
 netcode_address_t to_netcode_addr(const yojimbo::Address& t) {
@@ -334,6 +337,29 @@ yojimbo::Address to_yojimbo_addr(const netcode_address_t& t) {
 
 std::future<resolve_address_result> async_resolve_address(const address_and_port& in) {
 	return launch_async([in]() { return resolve_address(in); });
+}
+
+std::optional<netcode_address_t> to_netcode_addr(const address_and_port& in) {
+	const auto& input = in.address;
+	const auto default_port = in.default_port;
+
+	if (input.empty()) {
+		return std::nullopt;
+	}
+
+	{
+		netcode_address_t out;
+
+		if (netcode_parse_address(input.c_str(), &out) == NETCODE_OK) {
+			if (out.port == 0) {
+				out.port = default_port;
+			}
+
+			return out;
+		}
+	}
+
+	return std::nullopt;
 }
 
 resolve_address_result resolve_address(const address_and_port& in) {

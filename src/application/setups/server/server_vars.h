@@ -33,6 +33,8 @@ struct server_vars {
 	server_name_type server_name;
 	address_and_port notified_server_list;
 
+	bool allow_nat_traversal = true;
+
 	unsigned send_heartbeat_to_server_list_once_every_secs = 10;
 	unsigned resolve_server_list_address_once_every_secs = 60;
 

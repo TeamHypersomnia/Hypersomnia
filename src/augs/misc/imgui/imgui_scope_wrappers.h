@@ -116,6 +116,10 @@ namespace augs {
 
 		template <class... T>
 		auto scoped_modal_popup(const std::string& label, T&&... args) {
+			if (!ImGui::IsPopupOpen(label.c_str())) {
+				ImGui::OpenPopup(label.c_str());
+			}
+
 			const auto result = ImGui::BeginPopupModal(label.c_str(), std::forward<T>(args)...);
 
 			auto opt = scope_guard([]() { { ImGui::EndPopup(); }});
