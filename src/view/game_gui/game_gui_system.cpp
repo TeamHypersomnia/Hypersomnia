@@ -31,6 +31,29 @@
 #include "augs/templates/logically_empty.h"
 #include "game/detail/explosive/like_explosive.h"
 
+template <class E>
+bool should_fill_hotbar_from_right(const E& handle) {
+	const auto& item = handle.template get<invariants::item>();
+
+	if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
+		return true;
+	}
+
+	if (item.categories_for_slot_compatibility.test(item_category::OVER_BACK_WEARABLE)) {
+		return true;
+	}
+
+	if (item.categories_for_slot_compatibility.test(item_category::BELT_WEARABLE)) {
+		return true;
+	}
+
+	if (item.categories_for_slot_compatibility.test(item_category::TORSO_ARMOR)) {
+		return true;
+	}
+
+	return false;
+}
+
 static int to_hotbar_index(const inventory_gui_intent_type type) {
 	switch (type) {
 	case inventory_gui_intent_type::HOTBAR_BUTTON_0: return 0;
@@ -578,29 +601,6 @@ void game_gui_system::rebuild_layouts(
 	}
 
 	world.rebuild_layouts(context);
-}
-
-template <class E>
-bool should_fill_hotbar_from_right(const E& handle) {
-	const auto& item = handle.template get<invariants::item>();
-
-	if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
-		return true;
-	}
-
-	if (item.categories_for_slot_compatibility.test(item_category::OVER_BACK_WEARABLE)) {
-		return true;
-	}
-
-	if (item.categories_for_slot_compatibility.test(item_category::BELT_WEARABLE)) {
-		return true;
-	}
-
-	if (item.categories_for_slot_compatibility.test(item_category::TORSO_ARMOR)) {
-		return true;
-	}
-
-	return false;
 }
 
 void game_gui_system::standard_post_solve(
