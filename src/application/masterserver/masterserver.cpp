@@ -271,16 +271,14 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 				auto handle = [&](const auto& typed_request) {
 					using R = remove_cref<decltype(typed_request)>;
-					namespace IN = masterserver_in;
-					namespace OUT = masterserver_out;
 
-					if constexpr(std::is_same_v<R, IN::goodbye>) {
+					if constexpr(std::is_same_v<R, masterserver_in::goodbye>) {
 						if (const auto entry = mapped_or_nullptr(server_list, from)) {
 							LOG("The server at %x (%x) has sent a goodbye.", ::ToString(from), entry->last_heartbeat.server_name);
 							remove_from_list(from);
 						}
 					}
-					else if constexpr(std::is_same_v<R, IN::heartbeat>) {
+					else if constexpr(std::is_same_v<R, masterserver_in::heartbeat>) {
 						auto it = server_list.try_emplace(from);
 
 						const bool is_new_server = it.second;
@@ -298,14 +296,14 @@ void perform_masterserver(const config_lua_table& cfg) try {
 							reserialize_list();
 						}
 					}
-					else if constexpr(std::is_same_v<R, IN::tell_me_my_address>) {
-						OUT::tell_me_my_address response;
+					else if constexpr(std::is_same_v<R, masterserver_in::tell_me_my_address>) {
+						masterserver_out::tell_me_my_address response;
 						response.address = from;
 
 						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						send_back(response);
 					}
-					else if constexpr(std::is_same_v<R, IN::punch_this_server>) {
+					else if constexpr(std::is_same_v<R, masterserver_in::punch_this_server>) {
 						auto punched_server = typed_request.address;
 						const auto& pingback_address = from;
 

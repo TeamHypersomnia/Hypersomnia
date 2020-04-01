@@ -389,9 +389,8 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 		const auto& response
 	) {
 		using R = remove_cref<decltype(response)>;
-		namespace OUT = masterserver_out;
 
-		if constexpr(std::is_same_v<R, OUT::tell_me_my_address>) {
+		if constexpr(std::is_same_v<R, masterserver_out::tell_me_my_address>) {
 			const auto& our_external_address = response.address;
 
 			log_info(typesafe_sprintf("port probe response: %x -> %x", ::ToString(from), ::ToString(our_external_address)));
