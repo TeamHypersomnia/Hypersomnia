@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Perhaps it's the time to upload the masterserver
+	- don't forget about the dedicated server
+	- test masterserver locally beforehand
+
 - Later fix number of probed ports to like 3 maybe
 
 - Fix flashbang sound volume

@@ -125,6 +125,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	setup_float_flags();
 
+	const bool log_directory_existed = augs::exists(LOG_FILES_DIR);
+
 	{
 		const auto all_created_directories = std::vector<augs::path_type> {
 			LOG_FILES_DIR,
@@ -332,27 +334,47 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	if (const auto last_failure_log = find_last_incorrect_exit(); last_failure_log.size() > 0) {
-		change_with_save([](config_lua_table& cfg) {
-			cfg.launch_mode = launch_type::MAIN_MENU;
-		});
+	if (log_directory_existed) {
+		if (const auto last_failure_log = find_last_incorrect_exit()) {
+			change_with_save([](config_lua_table& cfg) {
+				cfg.launch_mode = launch_type::MAIN_MENU;
+			});
 
-		last_exit_incorrect_popup = editor_popup {
-			"Warning",
-			typesafe_sprintf(R"(Looks like the game has crashed since the last time.
-Consider sending developers the log file located at:
+			const auto notice_pre_content = "Looks like the game has crashed since the last time.\n\n";
 
-%x
+			const auto notice_content = last_failure_log == "" ? 
+				"It was most likely a segmentation fault.\n"
+#if PLATFORM_UNIX
+				"Consider sending developers the core file generated upon crash.\n\n"
+#else
+				"Consider contacting developers about the problem,\n"
+				"describing exactly the game's behavior prior to the crash.\n\n"
+#endif
+				:
 
-If you experience repeated crashes, 
-you might try resetting all your settings,
-which can be done by pressing "Reset to factory default" in Settings->General,
-and then hitting Save settings.
+				"Consider sending developers the log file located at:\n"
+				"%x\n\n"
+			;
 
-)", last_failure_log),
-			""
-		};
+			const auto notice_post_content =
+				"If you experience repeated crashes,\n"
+				"you might try resetting all your settings,\n"
+				"which can be done by pressing \"Reset to factory default\" in Settings->General,\n"
+				"and then hitting Save settings."
+			;
+
+			const auto full_content = 
+				notice_pre_content 
+				+ typesafe_sprintf(notice_content, *last_failure_log) 
+				+ notice_post_content
+			;
+
+			last_exit_incorrect_popup = editor_popup { "Warning", full_content, "" };
+		}
 	}
+
+	augs::remove_file(get_crashed_controllably_path());
+	augs::remove_file(get_exit_success_path());
 
 	LOG("Initializing freetype");
 
@@ -1190,12 +1212,12 @@ and then hitting Save settings.
 				perform_browse_servers();
 
 				if (!has_current_setup()) {
+					perform_last_exit_incorrect();
 					perform_start_client(frame_num);
 					perform_start_server();
 				}
 
 				streaming.display_loading_progress();
-				perform_last_exit_incorrect();
 			},
 
 			[&]() {

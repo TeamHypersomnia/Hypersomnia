@@ -77,6 +77,7 @@ int main(const int argc, const char* const * const argv) {
 
 			augs::save_as_text(failure_log_path, logs);
 			augs::open_text_editor(failure_log_path);
+			mark_as_controlled_crash();
 		};
 
 		switch (completed_work_result) {

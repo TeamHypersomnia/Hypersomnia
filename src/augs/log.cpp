@@ -25,46 +25,49 @@ std::string get_path_in_log_files(const std::string& name) {
 	return std::string(LOG_FILES_DIR) + "/" + get_preffix_for(current_app_type) + name;
 }
 
-std::string find_last_incorrect_exit() {
-	const auto en_path = get_ensure_failed_path();
-	const auto fa_path = get_exit_failure_path();
+std::optional<std::string> find_last_incorrect_exit() {
+	const auto co_path = get_crashed_controllably_path();
+	const auto last_was_controllable_crash = augs::exists(co_path);
 
-	const auto ensure_exists = augs::exists(en_path);
-	const auto failure_exists = augs::exists(fa_path);
+	if (last_was_controllable_crash) {
+		const auto en_path = get_ensure_failed_path();
+		const auto fa_path = get_exit_failure_path();
 
-	if (!ensure_exists && !failure_exists) {
-		return std::string();
-	}
+		const auto ensure_exists = augs::exists(en_path);
+		const auto failure_exists = augs::exists(fa_path);
 
-	const auto recent_one = [&]() {
-		if (ensure_exists && failure_exists) {
-			return 
-				augs::last_write_time(en_path) > augs::last_write_time(fa_path) ?
-				en_path :
-				fa_path
-			;
+		if (!ensure_exists && !failure_exists) {
+			return std::string();
 		}
 
-		if (ensure_exists) {
-			return en_path;
+		const auto recent_one = [&]() {
+			if (ensure_exists && failure_exists) {
+				return 
+					augs::last_write_time(en_path) > augs::last_write_time(fa_path) ?
+					en_path :
+					fa_path
+				;
+			}
+
+			if (ensure_exists) {
+				return en_path;
+			}
+
+			return fa_path;
+		}();
+
+		return recent_one;
+	}
+	else {
+		/* Either success or an uncontrollable crash */
+		const auto success_exists = augs::exists(get_exit_success_path());
+
+		if (success_exists) {
+			return std::nullopt;
 		}
 
-		return fa_path;
-	}();
-
-	const auto su_exists = augs::exists(get_exit_success_path());
-
-	if (!su_exists) {
-		return recent_one;
+		return "";
 	}
-
-	const auto last_succ = augs::last_write_time(get_exit_success_path());
-
-	if (last_succ < augs::last_write_time(recent_one)) {
-		return recent_one;
-	}
-	
-	return std::string();
 }
 
 std::string get_ensure_failed_path() {
@@ -77,6 +80,14 @@ std::string get_exit_success_path() {
 
 std::string get_exit_failure_path() {
 	return get_path_in_log_files("exit_failure_debug_log.txt");
+}
+
+std::string get_crashed_controllably_path() {
+	return get_path_in_log_files("crashed_controllably");
+}
+
+void mark_as_controlled_crash() {
+	augs::save_as_text(get_crashed_controllably_path(), "a");
 }
 
 std::string get_dumped_log_path() {
