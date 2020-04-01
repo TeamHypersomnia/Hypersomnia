@@ -153,7 +153,7 @@ as well as to test your skills in a laggy environment.
 		}
 		else {
 			if (const auto result = nat_detection->query_result()) {
-				const rgba nat_colors[4] = { green, yellow, yellow, orange };
+				const rgba nat_colors[5] = { green, green, yellow, yellow, orange };
 				const auto color_index = static_cast<int>(result->type);
 
 				text_color(result->describe(), nat_colors[color_index]);

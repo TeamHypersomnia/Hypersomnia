@@ -20,6 +20,8 @@ std::string nat_detection_result::describe() const {
 	switch (type) {
 		case N::PUBLIC_INTERNET:
 			return "This computer appears to be directly in the public internet.";
+		case N::PORT_PRESERVING_CONE:
+			return typesafe_sprintf("Detected a port-preserving, cone-like NAT.");
 		case N::CONE:
 			return typesafe_sprintf("Detected a cone-like NAT.\nDelta: %x ", port_delta);
 		case N::ADDRESS_SENSITIVE:
@@ -256,7 +258,7 @@ static nat_detection_result calculate_from(
 
 			if (preserved_between_ports) {
 				if (source_port == port_unique_translations[0]) {
-					return nat_type::PUBLIC_INTERNET;
+					return nat_type::PORT_PRESERVING_CONE;
 				}
 
 				return nat_type::CONE;
