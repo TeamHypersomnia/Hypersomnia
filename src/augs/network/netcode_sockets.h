@@ -1,5 +1,6 @@
 #pragma once
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "augs/log.h"
 
 #define NETCODE_SOCKET_ERROR_NONE                               0
 #define NETCODE_PLATFORM_WINDOWS    1
@@ -43,14 +44,54 @@ struct netcode_socket_raii {
 	netcode_socket_t socket;
 
 private:
+	bool initialized = false;
+
 	void bind_to(netcode_address_t address) {
 		const auto buf_size = 4 * 1024 * 1024;
+
+		LOG("netcode_socket_raii ctor");
 
 		if (const auto result = netcode_socket_create(&socket, &address, buf_size, buf_size); result != NETCODE_SOCKET_ERROR_NONE) {
 			throw netcode_socket_raii_error("netcode_socket_create failed with code: %x", result);
 		}
+
+		initialized = true;
+	}
+
+	void reset() {
+		initialized = false;
+		socket = {};
+	}
+
+	void destroy() {
+		if (initialized) {
+			LOG("netcode_socket_raii dtor");
+			netcode_socket_destroy(&socket);
+
+			reset();
+		}
 	}
 public:
+
+	netcode_socket_raii(const netcode_socket_raii&) = delete;
+	netcode_socket_raii& operator=(const netcode_socket_raii&) = delete;
+
+	netcode_socket_raii(netcode_socket_raii&& b) 
+		: socket(b.socket), initialized(b.initialized) 
+	{
+		b.reset();
+	}
+
+	netcode_socket_raii& operator=(netcode_socket_raii&& b)  {
+		destroy();
+
+		socket = b.socket;
+		initialized = b.initialized;
+
+		b.reset();
+
+		return *this;
+	}
 
 	netcode_socket_raii(netcode_address_t address) {
 		bind_to(address);
@@ -74,6 +115,6 @@ public:
 	}
 
 	~netcode_socket_raii() {
-		netcode_socket_destroy(&socket);
+		destroy();
 	}
 };
