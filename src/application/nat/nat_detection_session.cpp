@@ -191,12 +191,14 @@ void nat_detection_session::send_requests() {
 		}
 
 		for (auto& request : stun_requests) {
-			queued_packets.emplace_back(request.destination, augs::to_bytes(request.source_request));
+			if (!request.completed()) {
+				queued_packets.emplace_back(request.destination, augs::to_bytes(request.source_request));
+			}
 		}
 
 		{
 			for (auto& probation : port_probing_requests) {
-				if (probation.translated_address == std::nullopt) {
+				if (!probation.completed()) {
 					const auto request = masterserver_in::tell_me_my_address {};
 					auto bytes = augs::to_bytes(masterserver_request(request));
 
