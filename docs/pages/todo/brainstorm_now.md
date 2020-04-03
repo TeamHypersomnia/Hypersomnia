@@ -6,9 +6,33 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Yeah let's also write a linear pseudo-code with ifs and elses
+	- Actually think which way will be easier to comprehend...
+	- Pre-stun stage
+		1. Do we need to stun?
+			- Only if at least symmetric
+		2. Can we ping right after stun?
+			- Only if the server is at most symmetric
+		3. If stunned, wait
+		4. Determine traversal session timeout.
+			- Both conic? 5s because the only 
+		4. (repeated in intervals) Notify masterserver. If stunned, include the information.
+			- timeout?
+		5. Pingback from the game server.
+			- Launch the full connection.
+		5. Response from masterserver.
+			- Server is at least symmetric? Get predicted port from info.
+			- 
+		
+			
+
+- It's most advantageous for the CLIENT to send low ttl packets
+	- And it makes most sense.
+	- As they won't reach the server, multiple clients connecting there won't trigger some security measures
+	- More difficult to take the server down. The server will only respond to what masterserver relays from the client, not to client's pings
+		- perhaps its important somehow for our logistics?
 - We'll need to somehow preffix all our udp traffic with command indices I guess
 	- or just new masterserver request types right?
-
 
 - Remember that a changed source port MUST result in a different translated port on all NATs
 	- otherwise we'd have no way to know which app the packet was delivered to
@@ -22,14 +46,6 @@ summary: That which we are brainstorming at the moment.
 		- well it's a good heuristic anyway and we really have to bruteforce in case of a Sym-AS
 			- since changing the source port on the opposite side won't work
 	- Sym-PS can just pick a new port and re-stun
-
-
-- It's most advantageous for the CLIENT to send low ttl packets
-	- And it makes most sense.
-	- As they won't reach the server, multiple clients connecting there won't trigger some security measures
-	- More difficult to take the server down. The server will only respond to what masterserver relays from the client, not to client's pings
-		- perhaps its important somehow for our logistics?
-
 
 - Client traversal logic
 	- The subject never does multi-prediction When the other party is a cone

@@ -74,6 +74,7 @@
 #include "application/setups/editor/editor_player.hpp"
 
 #include "application/nat/nat_detection_session.h"
+#include "application/nat/nat_traversal_state.h"
 #include "application/input/input_pass_result.h"
 
 #include "application/setups/draw_setup_gui_input.h"
@@ -463,6 +464,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	restart_nat_detection();
+
+	static auto nat_traversal = nat_traversal_state();
 
 	static auto auxiliary_socket = std::optional<netcode_socket_raii>();
 	static auto last_requested_local_port = port_type(0);

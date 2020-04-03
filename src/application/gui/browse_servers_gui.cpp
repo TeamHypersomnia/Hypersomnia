@@ -13,8 +13,9 @@
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "augs/misc/time_utils.h"
 #include "augs/network/netcode_sockets.h"
-#include "application/nat/nat_puncher_client.h"
 #include "application/nat/nat_detection_settings.h"
+#include "application/network/resolve_address.h"
+#include "application/masterserver/masterserver_requests.h"
 
 constexpr auto ping_retry_interval = 1;
 constexpr auto reping_interval = 10;

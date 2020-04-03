@@ -56,7 +56,6 @@ constexpr double default_inv_tickrate = 1 / 128.0;
 
 class client_adapter;
 
-struct nat_puncher_client;
 struct netcode_socket_t;
 
 class client_setup : 
@@ -137,8 +136,6 @@ class client_setup :
 	bool was_demo_meta_written = false;
 
 	client_demo_player demo_player;
-
-	augs::propagate_const<std::unique_ptr<nat_puncher_client>> nat;
 	/* No client state follows later in code. */
 
 	template <class U>
@@ -188,7 +185,7 @@ class client_setup :
 	void handle_server_payloads();
 	void send_pending_commands();
 	void send_packets_if_its_time();
-	void punch_this_server_if_required();
+	void traverse_nat_if_required();
 
 	template <class T, class F>
 	message_handler_result handle_server_payload(
@@ -321,7 +318,7 @@ class client_setup :
 		{
 			auto scope = measure_scope(performance.sending_packets);
 			send_packets_if_its_time();
-			punch_this_server_if_required();
+			traverse_nat_if_required();
 		}
 
 		if (in_game) {

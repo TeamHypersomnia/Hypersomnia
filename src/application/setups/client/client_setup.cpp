@@ -43,7 +43,6 @@
 #include "application/network/resolve_address.h"
 #include "augs/network/netcode_sockets.h"
 #include "application/network/resolve_address_result.h"
-#include "application/nat/nat_puncher_client.h"
 #include "augs/network/netcode_utils.h"
 
 void client_demo_player::play_demo_from(const augs::path_type& p) {
@@ -224,9 +223,10 @@ client_setup::client_setup(
 	vars(initial_vars),
 	adapter(std::make_unique<client_adapter>(preferred_binding_port)),
 	client_time(get_current_time()),
-	when_initiated_connection(get_current_time()),
-	nat(std::make_unique<nat_puncher_client>())
+	when_initiated_connection(get_current_time())
 {
+	(void)nat_detection;
+
 	LOG("Initializing connection with %x", last_addr.address);
 
 	const auto& input_demo_path = in.replay_demo;
@@ -281,7 +281,6 @@ client_setup::client_setup(
 			}
 			else {
 				resolved_server_address = resolution.addr;
-				nat->resolve_relay_host(nat_detection.port_probing_host);
 
 				ensure_eq(resolution.result, resolve_result_type::OK);
 
@@ -716,28 +715,13 @@ const netcode_socket_t* client_setup::find_underlying_socket() const {
 	return adapter->find_underlying_socket();
 }
 
-void client_setup::punch_this_server_if_required() {
+void client_setup::traverse_nat_if_required() {
 	if (is_replaying()) {
 		return;
 	}
 
 	if (!adapter->is_connecting()) {
 		return;
-	}
-
-	nat->advance_relay_host_resolution();
-
-	if (!nat->relay_host_resolved()) {
-		return;
-	}
-
-	if (auto socket = adapter->find_underlying_socket()) {
-		const auto nat_request_interval = 0.2;
-
-		if (try_fire_interval(nat_request_interval, when_sent_nat_punch_request, client_time)) {
-			LOG("Punching %x simultaneously with the client connection attempt, just in case.", ::ToString(resolved_server_address));
-			nat->punch_this_server(*socket, resolved_server_address);
-		}
 	}
 }
 
