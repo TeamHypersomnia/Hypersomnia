@@ -25,6 +25,10 @@ addons:
      - p7zip-full
      - libgl1-mesa-dev
 
+branches:
+  only:
+  - master
+
 python:
   - "3.6"
 
@@ -93,7 +97,7 @@ script:
   - popd
   - ls -l hypersomnia
   - cmake/print_bt_if_core_found.sh hypersomnia/core
-  - cmake/upload_if_exe_found.sh $artifact_upload_key
+  - if ["$TRAVIS_BRANCH" = "master"]; then cmake/upload_if_exe_found.sh $artifact_upload_key fi
 
 notfications:
   email: false
