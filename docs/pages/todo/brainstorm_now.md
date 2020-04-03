@@ -6,6 +6,138 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We'll need to somehow preffix all our udp traffic with command indices I guess
+	- or just new masterserver request types right?
+
+
+- Remember that a changed source port MUST result in a different translated port on all NATs
+	- otherwise we'd have no way to know which app the packet was delivered to
+
+- Retrying connections
+	- Sym-AS can be bounded with two stuns and bruted
+		- Do we really need the upper bound? We'll just always send as many as we can... probably?
+		- Having the upper bound might speed things up in the case that the port is allocated close to it
+		- there is the case where the port is allocated in the middle between the two, but it's unlikely 
+			- in this case we do worse
+		- well it's a good heuristic anyway and we really have to bruteforce in case of a Sym-AS
+			- since changing the source port on the opposite side won't work
+	- Sym-PS can just pick a new port and re-stun
+
+
+- It's most advantageous for the CLIENT to send low ttl packets
+	- And it makes most sense.
+	- As they won't reach the server, multiple clients connecting there won't trigger some security measures
+	- More difficult to take the server down. The server will only respond to what masterserver relays from the client, not to client's pings
+		- perhaps its important somehow for our logistics?
+
+
+- Client traversal logic
+	- The subject never does multi-prediction When the other party is a cone
+	- Server is cone
+		- Client is cone
+			- (repeat, timeout=5s) notify
+			- ping
+			- response? LAUNCH
+		- Client is symmetric (AS or PS)
+			- stun
+			- ping
+			- wait
+			- (repeat, timeout=1s) notify
+				- no response might be due to server's misprediction (client port might actually be absolute shit) so less timeout
+				- timeout?
+					- change source port
+					- next stun
+					- ping
+					- wait
+					- (...) ad infinitum
+			- response? LAUNCH
+	- Server is symmetric (AS or PS)
+		- Client is cone
+			- notify (repeat, timeout=5s)
+			- info? predict next port, open multiple holes (low ttl)
+			- (repeat, timeout=1s) notify
+				- no response might be due to client's misprediction (incoming server's port might actually be absolute shit) so less timeout
+				- timeout?
+					- Server is PS?
+						- change source port
+						- notify
+						- (...) ad infinitum
+					- Server is AS?
+						- We're fucked.
+							- Client opens holes by brute-force.
+			- response? LAUNCH
+		- Client is symmetric (AS or PS)
+			- stun
+			- wait
+			- (repeat, timeout=5s) notify
+			- info? predict next port, open multiple holes (low ttl)
+				- AS->AS?
+					- Open multiple holes
+					- (repeat, timeout=1s) notify	
+						- timeout? 
+							- We're fucked.
+								- Client opens holes by brute-force.
+				- PS->AS? (draw this out please)
+					- Open multiple holes
+					- (repeat, timeout=1s) notify	
+						- timeout? 
+							- We're fucked.
+								- Client opens holes by brute-force.
+				- AS->PS?
+					- Open more multiple holes (to account for ports going up at the server side) (low ttl)
+					- (repeat, timeout=1s) notify
+						- timeout? 
+							- change source port 
+							- next stun 
+							- (...) ad infinitum
+				- PS->PS?
+					- Open one or two holes
+					- (repeat, timeout=1s) notify	
+						- timeout? 
+							- change source port
+							- next stun 
+							- (...) ad infinitum
+
+				- no response might be due to either's misprediction (client/server port might actually be absolute shit) so less timeout
+				- timeout? next stun 
+				- change source port and ping
+				- wait
+				- (...) ad infinitum
+			- response? LAUNCH
+
+- Traversal logic
+	- masterserver could hold open mappings too
+		- possibly scales very poorly
+		- at least in the beginning
+		- just a vector for each server heartbeat
+	- The client shall let masterserver know what kind of NAT it has.
+	- Client should always be the one to ultimately decide to launch the connection now.
+		- So client always sends low ttl's to open hole for the server
+	- Client is cone/cone preserving, and server is cone/cone preserving
+		- Same procedure for all combinations.
+			- client requests the masterserver to request a pingback
+				- masterserver relays the client's source port straight from the request packet
+			- client pings the server
+			- server receives request from masterserver
+			- server pings the client
+			- when client receives a pingback, launch the full connection
+		- Client is cone/cone preserving, and server is address-sensitive
+			- client requests the masterserver to request a pingback
+				- masterserver relays the client's source port straight from the request packet
+			- server receives request from masterserver
+			- at the same time:
+				- server sends STUN request
+				- server pings client right away
+			- server receives STUN response and relays it to the masterserver
+			- masterserver receives the new server's port and relays it to the client
+			- client predicts the game server port from masterserver's info + known delta
+			- client pings the server at predicted and many successive ports
+			- server responds to any arrived pings of client
+			- when client receives a pingback, launch the full connection
+		- Client is cone/cone preserving, and server is port-sensitive
+			- Same story as above
+			- Except that the server 
+
 - Don't use client/server's underlying socket for other stuff!!!
 	- It might break netcode logic because netcode packets will be hijacked by the other logic
 
