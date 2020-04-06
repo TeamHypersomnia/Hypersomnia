@@ -4225,3 +4225,5 @@ Advantages:
 	- perhaps something's wrong with the == ?
 		- just use bool...
 
+- fix crash notice with multiple clients
+	- or just disable the notice whatsoever in non-production builds

@@ -6,11 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix vim's premature build successful
-- fix crash notice with multiple clients
-	- or just disable the notice whatsoever in non-production builds
-- implement a keycombo to dump and open current logs (multiple clients)
+- "Are you sure you want to quit?" from the ingame main menu
 
+- fix vim's premature build successful
+- implement a keycombo to dump and open current logs (multiple clients)
 
 - Use port 0 by default
 	- only add a tick for a custom port

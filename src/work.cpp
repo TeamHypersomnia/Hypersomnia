@@ -1355,7 +1355,9 @@ work_result work(const int argc, const char* const * const argv) try {
 				perform_browse_servers();
 
 				if (!has_current_setup()) {
+#if IS_PRODUCTION_BUILD
 					perform_last_exit_incorrect();
+#endif
 					perform_start_client(frame_num);
 					perform_start_server();
 				}
