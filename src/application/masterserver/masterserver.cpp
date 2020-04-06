@@ -351,6 +351,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 							auto step_request = masterserver_out::nat_traversal_step();
 
 							step_request.source_address = from;
+							step_request.session_guid = typed_request.session_guid;
 
 							const auto predicted_next_port = typed_request.source_external_port;
 

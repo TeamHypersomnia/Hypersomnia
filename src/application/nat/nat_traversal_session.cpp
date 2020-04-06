@@ -11,11 +11,14 @@ using traversal_step = masterserver_in::nat_traversal_step;
 
 double yojimbo_time();
 
-nat_traversal_session::nat_traversal_session(const nat_traversal_input& input) 
-	: input(input), when_began(yojimbo_time())
+nat_traversal_session::nat_traversal_session(const nat_traversal_input& input) : 
+	input(input), 
+	session_guid(randomization().randval(uint64_t(0), std::numeric_limits<uint64_t>::max() - 1)),
+	when_began(yojimbo_time())
 {
 	log_info("---- BEGIN NAT TRAVERSAL ----");
 	log_info("Begin traversing %x.", ::ToString(input.traversed_address));
+	log_info("Session guid: %xh", session_guid);
 }
 
 static bool symmetric(const nat_type t) {
@@ -58,6 +61,14 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 		return;
 	}
 
+	auto make_traversal_step = [&]() {
+		auto step = traversal_step();
+		step.target_server = input.traversed_address;
+		step.session_guid = session_guid;
+
+		return step;
+	};
+
 	receive_packets(socket);
 
 	auto request = [&](const auto& step) {
@@ -77,7 +88,7 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 			target_address.port = *override_port;
 		}
 
-		ping_this_server(socket, target_address, -1);
+		ping_this_server(socket, target_address, session_guid);
 	};
 	
 	if (conic(input.client.type) && conic(input.server.type)) {
@@ -87,8 +98,7 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 
 		if (current_state == state::TRAVERSING) {
 			if (try_fire_interval(input.traversal_settings.request_interval_ms / 1000.0, when_last_sent_request)) {
-				auto step = traversal_step();
-				step.target_server = input.traversed_address;
+				auto step = make_traversal_step();
 
 				/* 
 					This will take the port with which the request 
@@ -110,13 +120,27 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 	}
 }
 
-void nat_traversal_session::handle_packet(const netcode_address_t& from, uint8_t* packet_buffer, const int packet_bytes) {
-	if (host_equal(from, input.traversed_address)) {
-		log_info("Successfully traversed the host.\nSuccess packet came from: %x", ::ToString(from));
-		log_info("---- FINISH NAT TRAVERSAL ----");
+std::optional<uint64_t> read_ping_response(const uint8_t* packet_buffer, std::size_t packet_bytes);
 
-		current_state = state::TRAVERSAL_COMPLETE;
-		opened_port = from.port;
+void nat_traversal_session::handle_packet(const netcode_address_t& from, uint8_t* packet_buffer, const int packet_bytes) {
+	if (current_state == state::TRAVERSAL_COMPLETE) {
+		return;
+	}
+
+	if (host_equal(from, input.traversed_address)) {
+		if (const auto maybe_sequence = read_ping_response(packet_buffer, packet_bytes)) {
+			if (*maybe_sequence == session_guid) {
+				log_info("Success packet came from: %x (session guid: %xh)", ::ToString(from), *maybe_sequence);
+				log_info("Successfully traversed the host.");
+				log_info("---- FINISH NAT TRAVERSAL ----");
+
+				current_state = state::TRAVERSAL_COMPLETE;
+				opened_port = from.port;
+			}
+			else {
+				log_info("Received a response from the host, but with the session does not match: %xh", *maybe_sequence);
+			}
+		}
 
 		return;
 	}

@@ -204,7 +204,7 @@ static bool is_internal(const netcode_address_t& address) {
 	return false;
 }
 
-static std::optional<uint64_t> read_ping_response(uint8_t* packet_buffer, std::size_t packet_bytes) {
+std::optional<uint64_t> read_ping_response(const uint8_t* const packet_buffer, const std::size_t packet_bytes) {
 	try {
 		const auto response = augs::from_bytes<gameserver_ping_response>(packet_buffer, packet_bytes);
 		return response.sequence;

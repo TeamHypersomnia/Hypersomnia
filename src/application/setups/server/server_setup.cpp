@@ -114,7 +114,10 @@ void server_setup::handle_auxiliary_command(
 				LOG("Received traversal step from masterserver: %x", ::ToString(masterserver_address));
 				LOG("NAT: Pinging back %x.", ::ToString(typed_request.source_address));
 
-				respond(typed_request.source_address, gameserver_ping_response());
+				auto response = gameserver_ping_response();
+				response.sequence = typed_request.session_guid;
+
+				respond(typed_request.source_address, response);
 			}
 		}
 		else {

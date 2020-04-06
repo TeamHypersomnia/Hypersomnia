@@ -18,6 +18,7 @@ namespace masterserver_in {
 	struct goodbye {};
 
 	struct nat_traversal_step { 
+		uint64_t session_guid;
 		netcode_address_t target_server;
 		port_type source_external_port = 0;
 		nat_traversal_step_params params;
@@ -30,6 +31,7 @@ namespace masterserver_out {
 	};
 
 	struct nat_traversal_step { 
+		uint64_t session_guid;
 		netcode_address_t source_address;
 		nat_traversal_step_params params;
 	};

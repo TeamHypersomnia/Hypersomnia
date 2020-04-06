@@ -31,6 +31,8 @@ public:
 	const nat_traversal_input input;
 
 private:
+	const uint64_t session_guid;
+
 	state current_state = state::INIT;
 
 	net_time_t when_last_sent_request = -1;
