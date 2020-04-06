@@ -1,6 +1,13 @@
 #!/usr/bin/env bash 
 EXE_PATH="build/current/Hypersomnia"
 
+GIT_BRANCH=$2
+
+if [ "$GIT_BRANCH" != "master" ]; then
+	echo "Branch is $GIT_BRANCH. Skipping upload."
+	exit 0
+fi
+
 if [ -f "$EXE_PATH" ]; then
 	echo "Exe found. Uploading."
 
