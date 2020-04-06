@@ -5,6 +5,10 @@ hide_sidebar: true
 permalink: todo
 summary: Just a hidden scratchpad.
 ---
+- "Are you sure you want to quit?" from the ingame main menu
+
+- fix vim's premature build successful
+- implement a keycombo to dump and open current logs (multiple clients)
 
 - Nerf PRO90
 	- less bullets please

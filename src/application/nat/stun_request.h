@@ -34,7 +34,7 @@ auto make_stun_request(randomization& rng) {
 	request.cookie = htonl(0x2112A442);
 
 	for (auto& id : request.identifier) {
-		id = rng.randval(uint32_t(0), std::numeric_limits<uint32_t>::max() - 1);
+		id = rng.make_guid<uint32_t>();
 	}
 
 	return request;

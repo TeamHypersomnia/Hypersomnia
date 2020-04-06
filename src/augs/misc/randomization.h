@@ -25,15 +25,18 @@ struct basic_randomization {
 		int variation
 	);
 
-	unsigned randval(
-		unsigned min, 
-		unsigned max
+	uint32_t randval(
+		uint32_t min, 
+		uint32_t max
 	);
 
-	std::size_t randval(
-		std::size_t min, 
-		std::size_t max
+	uint64_t randval(
+		uint64_t min, 
+		uint64_t max
 	);
+
+	template <class T>
+	T make_guid();
 
 	real32 randval(
 		real32 min, 

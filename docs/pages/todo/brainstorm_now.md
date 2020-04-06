@@ -6,11 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- "Are you sure you want to quit?" from the ingame main menu
-
-- fix vim's premature build successful
-- implement a keycombo to dump and open current logs (multiple clients)
-
 - Use port 0 by default
 	- only add a tick for a custom port
 	- We may copy the address to clipboard automatically
@@ -29,7 +24,7 @@ summary: That which we are brainstorming at the moment.
 			- Pingback at a specific port, optionally open multiple ports in a sequence.
 				- With a flag to multi-send. The count will be specified at the server
 				- Optionally with more parameters specifying bounds for bruteforce.
-			- A re-stun.
+			- A re-stun info.
 				- This would be best if we could just handle this in C++ code in server_setup, look for packet receive overrides
 					- Separate enum: NETCODE_AUXILIARY_COMMAND
 						- Should actually handle ping too
@@ -44,9 +39,9 @@ summary: That which we are brainstorming at the moment.
 	- Actually think which way will be easier to comprehend...
 	- Pre-stun stage
 		1. Do we need to stun?
-			- Only if at least symmetric
+			- Only if client is symmetric
 		2. Can we ping right after stun?
-			- Only if the server is at most symmetric
+			- Only if server is conic
 		3. If stunned, wait
 		4. Determine traversal session timeout.
 			- Both conic? 5s because the only 

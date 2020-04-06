@@ -45,6 +45,17 @@ basic_randomization<T>::basic_randomization(rng_seed_type seed) {
 	}
 }
 
+template <class generator_type>
+template <class T>
+T basic_randomization<generator_type>::make_guid() {
+	if constexpr (std::is_same_v<uint64_t, T>) {
+		return xoshiro256ss(&generator);
+	}
+	else {
+		return randval(std::numeric_limits<T>::min(), std::numeric_limits<T>::max() - 1);
+	}
+}
+
 template <class T>
 int basic_randomization<T>::randval(
 	const int min, 
@@ -59,9 +70,9 @@ int basic_randomization<T>::randval(
 }
 
 template <class T>
-unsigned basic_randomization<T>::randval(
-	const unsigned min, 
-	const unsigned max
+uint32_t basic_randomization<T>::randval(
+	const uint32_t min, 
+	const uint32_t max
 ) {
 	if (min == max) {
 		return min;
@@ -86,9 +97,9 @@ real32 basic_randomization<T>::randval(
 }
 
 template <class T>
-std::size_t basic_randomization<T>::randval(
-	const std::size_t min, 
-	const std::size_t max
+uint64_t basic_randomization<T>::randval(
+	const uint64_t min, 
+	const uint64_t max
 ) {
 	if (min == max) {
 		return min;
@@ -174,3 +185,6 @@ std::vector<real32> basic_randomization<T>::make_random_intervals(
 }
 
 template struct basic_randomization<xorshift_state>;
+
+template uint32_t basic_randomization<xorshift_state>::make_guid<uint32_t>();
+template uint64_t basic_randomization<xorshift_state>::make_guid<uint64_t>();

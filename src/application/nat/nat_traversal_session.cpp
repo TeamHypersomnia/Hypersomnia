@@ -13,7 +13,7 @@ double yojimbo_time();
 
 nat_traversal_session::nat_traversal_session(const nat_traversal_input& input) : 
 	input(input), 
-	session_guid(randomization().randval(uint64_t(0), std::numeric_limits<uint64_t>::max() - 1)),
+	session_guid(randomization().make_guid<uint64_t>()),
 	when_began(yojimbo_time())
 {
 	log_info("---- BEGIN NAT TRAVERSAL ----");
