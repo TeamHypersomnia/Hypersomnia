@@ -1,14 +1,20 @@
 #pragma once
+#include <functional>
 #include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 
 struct netcode_socket_t;
 
+using auxiliary_command_callback_type = std::function<void (const netcode_address_t&, const std::byte*, std::size_t n)>;
+
 class server_adapter {
+	friend void auxiliary_command_function(void* context, struct netcode_address_t* from, uint8_t* packet, int bytes);
+
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;
 	yojimbo::Server server;
+	auxiliary_command_callback_type auxiliary_command_callback;
 
 	struct connection_event {
 		client_id_type client_id = -1;
@@ -32,7 +38,7 @@ class server_adapter {
 	auto create_message(const client_id_type&);
 
 public:
-	server_adapter(const server_start_input&);
+	server_adapter(const server_start_input&, auxiliary_command_callback_type);
 
 	template <class H>
 	void advance(

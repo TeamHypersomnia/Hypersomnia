@@ -94,4 +94,6 @@ public:
 
 	const std::string& get_full_log() const;
 	const nat_detection_settings& get_settings();
+
+	const std::optional<netcode_address_t>& get_resolved_port_probing_host() const;
 };

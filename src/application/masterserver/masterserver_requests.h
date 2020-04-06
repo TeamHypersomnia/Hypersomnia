@@ -5,8 +5,33 @@
 #include "augs/readwrite/pointer_to_buffer.h"
 #include "augs/log.h"
 
-#include "application/masterserver/netcode_ping_request.h"
 #include "augs/readwrite/to_bytes.h"
+
+struct gameserver_command_wrapper {
+	uint8_t marker = NETCODE_AUXILIARY_COMMAND_PACKET;
+	gameserver_command payload;
+};
+
+template <class... T>
+gameserver_command read_gameserver_command(T&&... args) {
+	auto t = augs::from_bytes<gameserver_command_wrapper>(std::forward<T>(args)...);
+
+	if (t.marker != NETCODE_AUXILIARY_COMMAND_PACKET) {
+		throw augs::stream_read_error(
+			"Failed to read gameserver_command_wrapper: it does not begin with NETCODE_AUXILIARY_COMMAND_PACKET."
+		);
+	}
+
+	return t.payload;
+}
+
+template <class T>
+auto make_gameserver_command_bytes(T&& command) {
+	auto wrapper = gameserver_command_wrapper();
+	wrapper.payload = std::forward<T>(command);
+
+	return augs::to_bytes(wrapper);
+}
 
 template <class R>
 void netcode_send_to_masterserver(netcode_socket_t socket, netcode_address_t masterserver_address, const R& typed_request) {
@@ -14,23 +39,9 @@ void netcode_send_to_masterserver(netcode_socket_t socket, netcode_address_t mas
 	netcode_socket_send_packet(&socket, &masterserver_address, bytes.data(), bytes.size());
 }
 
-inline void punch_this_server(const netcode_socket_t& socket, const netcode_address_t& masterserver_address, const netcode_address_t& punched_server) {
-	LOG("Requesting %x to punch %x!", ::ToString(masterserver_address), ::ToString(punched_server));
-
-	const auto request = masterserver_in::punch_this_server { punched_server };
-	netcode_send_to_masterserver(socket, masterserver_address, request);
-}
-
-inline void tell_me_my_address(const netcode_socket_t& socket, netcode_address_t masterserver_address) {
-	LOG("Requesting address resolution from %x", ::ToString(masterserver_address));
-
-	const auto request = masterserver_in::tell_me_my_address {};
-	netcode_send_to_masterserver(socket, masterserver_address, request);
-}
-
-inline void ping_this_server(netcode_socket_t socket, netcode_address_t target_server, uint64_t sequence) {
+inline void ping_this_server(netcode_socket_t socket, netcode_address_t target_server, const uint64_t sequence) {
 	LOG("Pinging %x", ::ToString(target_server));
 
-	auto bytes = make_ping_request_message_bytes(sequence);
+	auto bytes = make_gameserver_command_bytes(gameserver_ping_request { sequence });
 	netcode_socket_send_packet(&socket, &target_server, bytes.data(), bytes.size());
 }

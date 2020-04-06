@@ -1,5 +1,6 @@
 #pragma once
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "augs/network/port_type.h"
 #include "augs/log.h"
 
 #define NETCODE_SOCKET_ERROR_NONE                               0

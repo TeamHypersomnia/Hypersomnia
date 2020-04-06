@@ -6,6 +6,11 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Nerf PRO90
+	- less bullets please
+
+- Make the bomb a lot lighter
+- Fix bomb planted reward
 - Game Guides
 - Recon grenade
 
@@ -18,6 +23,10 @@ summary: Just a hidden scratchpad.
 	- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
 	- Melee blows are stronger when you run.
 	- Electric Shield lets you live longer, but slows down your movement.
+
+- Config folder with delta configs
+	- like in linux
+	- sorted by filenames
 
 - It would be nice if we didn't crash on loading a corrupted map, at least if we manage to hit an ensure before sigsegv
 

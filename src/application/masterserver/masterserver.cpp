@@ -19,7 +19,7 @@
 #include "application/network/resolve_address.h"
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/to_bytes.h"
-#include "application/masterserver/netcode_ping_request.h"
+#include "application/masterserver/masterserver_requests.h"
 
 std::string ToString(const netcode_address_t&);
 
@@ -73,6 +73,15 @@ bool operator!=(const netcode_address_t& a, const netcode_address_t& b) {
 	auto aa = a;
 	auto bb = b;
 	return 0 == netcode_address_equal(&aa, &bb);
+}
+
+bool host_equal(const netcode_address_t& a, const netcode_address_t& b) {
+	auto aa = a;
+	auto bb = b;
+	aa.port = 0;
+	bb.port = 0;
+
+	return 1 == netcode_address_equal(&aa, &bb);
 }
 
 namespace std {
@@ -269,6 +278,11 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					netcode_socket_send_packet(&socket, &from, bytes.data(), bytes.size());
 				};
 
+				auto send_to_gameserver = [&](const auto& typed_command, netcode_address_t server_address) {
+					auto bytes = make_gameserver_command_bytes(typed_command);
+					netcode_socket_send_packet(&socket, &server_address, bytes.data(), bytes.size());
+				};
+
 				auto handle = [&](const auto& typed_request) {
 					using R = remove_cref<decltype(typed_request)>;
 
@@ -303,11 +317,18 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						send_back(response);
 					}
-					else if constexpr(std::is_same_v<R, masterserver_in::punch_this_server>) {
-						auto punched_server = typed_request.address;
-						const auto& pingback_address = from;
+					else if constexpr(std::is_same_v<R, masterserver_in::nat_traversal_step>) {
+						auto punched_server = typed_request.target_server;
+
+						const auto address_string = ::ToString(punched_server);
+						MSR_LOG("A request arrived from %x to traverse %x", ::ToString(from), address_string);
 
 						const bool should_send_request = [&]() {
+							if (address_string == "NONE" || punched_server.type == NETCODE_ADDRESS_NONE) {
+								MSR_LOG("The target address was invalid. Dropping the request.");
+								return false;
+							}
+
 							if (const auto entry = mapped_or_nullptr(server_list, punched_server)) {
 								MSR_LOG("Found the requested server.");
 
@@ -326,26 +347,25 @@ void perform_masterserver(const config_lua_table& cfg) try {
 							return false;
 						}();
 
-						MSR_LOG("A request arrived from %x to punch %x", ::ToString(from), ::ToString(punched_server));
+						if (should_send_request) {
+							auto step_request = masterserver_out::nat_traversal_step();
 
-						if (should_send_request || LOG_MASTERSERVER) {
-							auto punching_ping_bytes = make_ping_request_message_bytes(
-								pingback_address
-							);
+							step_request.source_address = from;
 
-							netcode_socket_send_packet(&socket, &punched_server, punching_ping_bytes.data(), punching_ping_bytes.size());
+							const auto predicted_next_port = typed_request.source_external_port;
+
+							if (predicted_next_port != 0) {
+								step_request.source_address.port = predicted_next_port;
+							}
+
+							step_request.params = typed_request.params;
+
+							send_to_gameserver(step_request, punched_server);
 						}
 					}
 				};
 
-				const auto buf = augs::cpointer_to_buffer { 
-					reinterpret_cast<const std::byte*>(packet_buffer), 
-					static_cast<std::size_t>(packet_bytes) 
-				};
-
-				auto ss = augs::cptr_memory_stream(buf);
-
-				const auto request = augs::read_bytes<masterserver_request>(ss);
+				const auto request = augs::from_bytes<masterserver_request>(packet_buffer, packet_bytes);
 				std::visit(handle, request);
 			}
 			catch (...) {

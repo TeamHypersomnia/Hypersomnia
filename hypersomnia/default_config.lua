@@ -26,7 +26,11 @@ return {
   },
 
   nat_traversal = {
-	  short_ttl = 2
+	  short_ttl = 2,
+
+	  request_interval_ms = 200,
+	  prediction_attempt_timeout_secs = 1,
+	  total_timeout_secs = 10
   },
 
   masterserver = {

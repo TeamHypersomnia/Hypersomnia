@@ -174,7 +174,12 @@ bool try_fire_interval(const double interval, net_time_t& when_last) {
 	return try_fire_interval(interval, when_last, yojimbo_time());
 }
 
-server_adapter::server_adapter(const server_start_input& in) :
+void auxiliary_command_function(void* context,struct netcode_address_t* from,uint8_t* packet,int bytes) {
+	auto* adapter = reinterpret_cast<server_adapter*>(context);
+	adapter->auxiliary_command_callback(*from, reinterpret_cast<const std::byte*>(packet), bytes);
+}
+
+server_adapter::server_adapter(const server_start_input& in, auxiliary_command_callback_type auxiliary_command_callback) :
 	connection_config(in),
 	adapter(this),
 	server(
@@ -184,10 +189,16 @@ server_adapter::server_adapter(const server_start_input& in) :
 		connection_config, 
 		adapter, 
 		yojimbo_time()
-	)
+	),
+	auxiliary_command_callback(auxiliary_command_callback)
 {
     server.Start(in.max_connections);
 	LOG("Server address is %x", ToString(server.GetAddress()));
+
+	if (auto detail = server.GetServerDetail()) {
+		detail->config.auxiliary_command_function = auxiliary_command_function;
+		detail->config.auxiliary_command_context = this;
+	}
 }
 
 void server_adapter::disconnect_client(const client_id_type& id) {
@@ -640,25 +651,33 @@ std::size_t server_adapter::num_connected_clients() const {
 }
 
 yojimbo::Address server_adapter::get_client_address(const client_id_type& id) const {
-	const auto s = server.GetServerDetail();
-	auto addr = s->client_address[id];
+	if (const auto s = server.GetServerDetail()) {
+		auto addr = s->client_address[id];
 
-	char buffer[NETCODE_MAX_ADDRESS_STRING_LENGTH];
-	netcode_address_to_string(&addr, buffer);
-	
-	return yojimbo::Address(buffer);
+		char buffer[NETCODE_MAX_ADDRESS_STRING_LENGTH];
+		netcode_address_to_string(&addr, buffer);
+
+		return yojimbo::Address(buffer);
+	}
+	else {
+		LOG("WARNING! Trying to get_client_address with a null netcode_server_t!");
+		return yojimbo::Address();
+	}
 }
 
 void server_adapter::send_udp_packet(const netcode_address_t& in_to, std::byte* const packet_data, const std::size_t packet_bytes) const {
-	auto* const s = server.GetServerDetail();
+	if (auto* const s = server.GetServerDetail()) {
+		auto to = in_to;
 
-	auto to = in_to;
-
-	if (to.type == NETCODE_ADDRESS_IPV4) {
-		netcode_socket_send_packet(&s->socket_holder.ipv4, &to, reinterpret_cast<void*>(packet_data), packet_bytes);
+		if (to.type == NETCODE_ADDRESS_IPV4) {
+			netcode_socket_send_packet(&s->socket_holder.ipv4, &to, reinterpret_cast<void*>(packet_data), packet_bytes);
+		}
+		else if (to.type == NETCODE_ADDRESS_IPV6) {
+			netcode_socket_send_packet(&s->socket_holder.ipv6, &to, reinterpret_cast<void*>(packet_data), packet_bytes);
+		}
 	}
-	else if (to.type == NETCODE_ADDRESS_IPV6) {
-		netcode_socket_send_packet(&s->socket_holder.ipv6, &to, reinterpret_cast<void*>(packet_data), packet_bytes);
+	else {
+		LOG("WARNING! Trying to send an UDP packet with a null netcode_server_t!");
 	}
 }
 

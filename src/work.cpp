@@ -71,13 +71,16 @@
 #include "application/main/draw_debug_lines.h"
 #include "application/main/release_flags.h"
 #include "application/main/flash_afterimage.h"
+#include "application/main/abortable_popup.h"
 #include "application/setups/editor/editor_player.hpp"
 
 #include "application/nat/nat_detection_session.h"
-#include "application/nat/nat_traversal_state.h"
+#include "application/nat/nat_traversal_session.h"
 #include "application/input/input_pass_result.h"
+#include "application/main/nat_traversal_details_window.h"
 
 #include "application/setups/draw_setup_gui_input.h"
+#include "application/network/resolve_address.h"
 
 #include "cmd_line_params.h"
 #include "build_info.h"
@@ -435,80 +438,15 @@ work_result work(const int argc, const char* const * const argv) try {
 		return config.default_server_start.port;
 	};
 
-	static auto current_stun_server = stun_counter_type(0);
-	static std::optional<nat_detection_session> nat_detection;
-
-	static auto nat_detection_in_progress = []() {
-		if (nat_detection == std::nullopt) {
-			return false;
-		}
-
-		return nat_detection->query_result() == std::nullopt;
-	};
-
-	static auto restart_nat_detection = []() {
-		nat_detection.reset();
-		nat_detection.emplace(config.nat_detection, current_stun_server);
-	};
-
-	static auto get_detected_nat = []() {
-		if (nat_detection == std::nullopt) {
-			return nat_detection_result();
-		}
-
-		if (const auto detected_nat = nat_detection->query_result()) {
-			return *detected_nat;
-		}
-
-		return nat_detection_result();
-	};
-
-	restart_nat_detection();
-
-	static auto nat_traversal = nat_traversal_state();
+	static auto chosen_server_nat = nat_detection_result();
 
 	static auto auxiliary_socket = std::optional<netcode_socket_raii>();
-	static auto last_requested_local_port = port_type(0);
 
 	static auto get_bound_local_port = []() {
 		return auxiliary_socket->socket.address.port;
 	};
 
-	static auto launch_after_nat_resolution = std::optional<launch_type>();
-
-	static auto opened_pending_popup = std::optional<std::string>();
-
-	static auto do_pending_launch_popup = []() {
-		using namespace augs::imgui;
-
-		if (launch_after_nat_resolution == std::nullopt) {
-			if (opened_pending_popup != std::nullopt) {
-				ImGui::CloseCurrentPopup();
-				opened_pending_popup = std::nullopt;
-			}
-
-			return;
-		}
-
-		const auto pending_launch = *launch_after_nat_resolution;
-		const auto title = "Launching " + format_enum(pending_launch) + "...";
-
-		if (auto popup = scoped_modal_popup(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			opened_pending_popup = title;
-			text(typesafe_sprintf("NAT detection for port %x is in progress...\nPlease be patient.", get_bound_local_port()));
-
-			text("\n");
-			ImGui::Separator();
-
-			if (ImGui::Button("Abort")) {
-				launch_after_nat_resolution = std::nullopt;
-
-				change_with_save([](config_lua_table& cfg) {
-					cfg.launch_mode = launch_type::MAIN_MENU;
-				});
-			}
-		}
-	};
+	static auto last_requested_local_port = port_type(0);
 
 	static auto recreate_auxiliary_socket = []() {
 		const auto preferred_port = chosen_server_port();
@@ -531,6 +469,90 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	recreate_auxiliary_socket();
+
+	static auto pending_launch = std::optional<launch_type>();
+
+	static auto current_stun_server = stun_counter_type(0);
+
+	static auto nat_detection = std::optional<nat_detection_session>();
+	static auto nat_detection_popup = abortable_popup_state();
+
+	static auto nat_detection_complete = []() {
+		if (nat_detection == std::nullopt) {
+			return false;
+		}
+
+		return nat_detection->query_result() != std::nullopt;
+	};
+
+	static auto restart_nat_detection = []() {
+		nat_detection.reset();
+		nat_detection.emplace(config.nat_detection, current_stun_server);
+	};
+
+	static auto get_detected_nat = []() {
+		if (nat_detection == std::nullopt) {
+			return nat_detection_result();
+		}
+
+		if (const auto detected_nat = nat_detection->query_result()) {
+			return *detected_nat;
+		}
+
+		return nat_detection_result();
+	};
+
+	restart_nat_detection();
+
+	static auto nat_traversal = std::optional<nat_traversal_session>();
+	static auto nat_traversal_details = nat_traversal_details_window();
+
+	static auto launch_nat_traversal = [](
+		const nat_detection_result& server_nat, 
+		const netcode_address_t& traversed_address
+	) {
+		ensure(nat_detection_complete());
+
+		const auto masterserver_address = nat_detection->get_resolved_port_probing_host();
+
+		ensure(masterserver_address != std::nullopt);
+
+		nat_traversal.reset();
+		nat_traversal.emplace(nat_traversal_input {
+			*masterserver_address,
+			traversed_address,
+
+			get_detected_nat(),
+			server_nat,
+			config.nat_detection,
+			config.nat_traversal
+		});
+	};
+
+	static auto do_traversal_details_popup = []() {
+		if (const bool aborted = nat_traversal_details.perform(get_bound_local_port(), nat_traversal)) {
+			nat_traversal.reset();
+			pending_launch = std::nullopt;
+		}
+	};
+
+	static auto do_detection_details_popup = []() {
+		const auto message = 
+			typesafe_sprintf("NAT detection for port %x is in progress...\nPlease be patient.", get_bound_local_port())
+		;
+
+		if (pending_launch != std::nullopt && !nat_detection_complete()) {
+			const auto pending = *pending_launch;
+			const auto title = "Launching " + format_enum(pending) + "...";
+
+			if (const bool aborted = nat_detection_popup.perform(title, message)) {
+				pending_launch = std::nullopt;
+			}
+		}
+		else {
+			nat_detection_popup.close();
+		}
+	};
 
 	if (params.type == app_type::DEDICATED_SERVER) {
 		LOG("Starting the dedicated server at port: %x", chosen_server_port());
@@ -562,7 +584,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				if (auxiliary_socket != std::nullopt) {
 					LOG("Waiting for NAT detection to complete...");
 
-					while (nat_detection_in_progress()) {
+					while (!nat_detection_complete()) {
 						nat_detection->advance(auxiliary_socket->socket);
 
 						if (handle_sigint()) {
@@ -894,7 +916,10 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			if (auxiliary_socket == std::nullopt) {
 				recreate_auxiliary_socket();
-				restart_nat_detection();
+
+				if (!nat_detection_complete()) {
+					restart_nat_detection();
+				}
 			}
 		}
 	};
@@ -907,12 +932,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	static auto launch_setup = [&](const launch_type mode) {
+	static auto launch_setup = [&](const launch_type mode, const bool ignore_nat_check = false) {
 		LOG("Launched mode: %x", augs::enum_to_string(mode));
-
-		change_with_save([mode](config_lua_table& cfg) {
-			cfg.launch_mode = mode;
-		});
 
 		auto launch_main_menu = [&]() {
 			if (!has_main_menu()) {
@@ -929,23 +950,28 @@ work_result work(const int argc, const char* const * const argv) try {
 
 #if BUILD_NETWORKING
 			case launch_type::CLIENT:
-				if (auto info = find_chosen_server_info()) {
-					LOG("Found the chosen server in the browser list.");
-
-					if (info->heartbeat.is_behind_nat()) {
-						LOG("The chosen server is behind NAT.");
-
-						if (nat_detection_in_progress()) {
-							launch_after_nat_resolution = launch_type::CLIENT;
-
-							LOG("NAT detection in progress. Delaying the client launch.");
-							launch_main_menu();
-							break;
-						}
-					}
+				if (ignore_nat_check) {
+					LOG("Finished NAT traversal. Connecting immediately.");
 				}
 				else {
-					LOG("The chosen server was not found in the browser list.");
+					if (auto info = find_chosen_server_info()) {
+						LOG("Found the chosen server in the browser list.");
+
+						if (info->heartbeat.is_behind_nat()) {
+							LOG("The chosen server is behind NAT. Delaying the client launch until it is traversed.");
+
+							chosen_server_nat = info->heartbeat.nat;
+							pending_launch = launch_type::CLIENT;
+							launch_main_menu();
+							return;
+						}
+						else {
+							LOG("The chosen server is in the public internet. Connecting immediately.");
+						}
+					}
+					else {
+						LOG("The chosen server was not found in the browser list.");
+					}
 				}
 
 				setup_launcher([&]() {
@@ -967,12 +993,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			case launch_type::SERVER: {
 				if (config.server.allow_nat_traversal) {
-					if (nat_detection_in_progress()) {
-						launch_after_nat_resolution = launch_type::SERVER;
-
+					if (!nat_detection_complete()) {
 						LOG("NAT detection in progress. Delaying the server launch.");
+
+						pending_launch = launch_type::SERVER;
 						launch_main_menu();
-						break;
+						return;
 					}
 				}
 
@@ -1020,6 +1046,10 @@ work_result work(const int argc, const char* const * const argv) try {
 				ensure(false && "The launch_setup mode you have chosen is currently out of service.");
 				break;
 		}
+
+		change_with_save([mode](config_lua_table& cfg) {
+			cfg.launch_mode = mode;
+		});
 	};
 
 	static bool client_start_requested = false;
@@ -1315,6 +1345,12 @@ work_result work(const int argc, const char* const * const argv) try {
 					}
 				}
 
+				if (nat_traversal != std::nullopt) {
+					if (auxiliary_socket != std::nullopt) {
+						nat_traversal->advance(auxiliary_socket->socket);
+					}
+				}
+
 				browse_servers_gui.advance_ping_logic();
 				perform_browse_servers();
 
@@ -1326,14 +1362,46 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				streaming.display_loading_progress();
 
-				if (launch_after_nat_resolution != std::nullopt) {
-					if (!nat_detection_in_progress()) {
-						launch_setup(*launch_after_nat_resolution);
-						launch_after_nat_resolution = std::nullopt;
+				if (pending_launch != std::nullopt) {
+					const auto l = pending_launch;
+
+					auto finalize_pending_launch = [&](const bool ignore_nat_check = false) {
+						launch_setup(*pending_launch, ignore_nat_check);
+						pending_launch = std::nullopt;
+					};
+
+					if (l == launch_type::SERVER) {
+						if (nat_detection_complete()) {
+							finalize_pending_launch();
+						}
+					}
+
+					if (l == launch_type::CLIENT) {
+						if (nat_detection_complete()) {
+							if (nat_traversal == std::nullopt) {
+								const auto& client_start = config.default_client_start;
+								const auto traversed_server_addr = to_netcode_addr(client_start.get_address_and_port());
+
+								ensure(traversed_server_addr != std::nullopt);
+
+								launch_nat_traversal(chosen_server_nat, *traversed_server_addr);
+							}
+
+							const auto state = nat_traversal->get_current_state();
+
+							if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
+								config.default_client_start.set_custom(::ToString(nat_traversal->get_opened_address()));
+								nat_traversal.reset();
+
+								const bool ignore_nat_check = true;
+								finalize_pending_launch(ignore_nat_check);
+							}
+						}
 					}
 				}
 
-				do_pending_launch_popup();
+				do_traversal_details_popup();
+				do_detection_details_popup();
 			},
 
 			[&]() {

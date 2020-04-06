@@ -31,6 +31,7 @@
 #include "augs/templates/thread_templates.h"
 #include "application/masterserver/masterserver.h"
 #include "augs/network/netcode_utils.h"
+#include "application/masterserver/masterserver_requests.h"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -71,6 +72,65 @@ void server_heartbeat::validate() {
 	}
 }
 
+void server_setup::handle_auxiliary_command(
+	const netcode_address_t& from,
+	const std::byte* packet_buffer,
+	const std::size_t packet_bytes
+) {
+	auto socket = *find_underlying_socket();
+
+	auto respond = [&](netcode_address_t to, const auto& typed_response) {
+		auto bytes = augs::to_bytes(typed_response);
+		netcode_socket_send_packet(&socket, &to, bytes.data(), bytes.size());
+	};
+
+	auto send_back = [&](const auto& typed_response, std::optional<port_type> override_port = std::nullopt) {
+		auto target_address = from;
+
+		if (override_port != std::nullopt) {
+			target_address.port = *override_port;
+		}
+
+		respond(target_address, typed_response);
+	};
+
+	auto handle = [&](const auto& typed_request) {
+		using T = remove_cref<decltype(typed_request)>;
+
+		if constexpr(std::is_same_v<T, gameserver_ping_request>) {
+			auto response = gameserver_ping_response();
+			response.sequence = typed_request.sequence;
+
+			send_back(response);
+		}
+		else if constexpr(std::is_same_v<T, masterserver_out::nat_traversal_step>) {
+			if (last_detected_nat.type == nat_type::PUBLIC_INTERNET) {
+				return;
+			}
+
+			const auto masterserver_address = resolved_server_list_addr.value();
+
+			if (from == masterserver_address) {
+				LOG("Received traversal step from masterserver: %x", ::ToString(masterserver_address));
+				LOG("NAT: Pinging back %x.", ::ToString(typed_request.source_address));
+
+				respond(typed_request.source_address, gameserver_ping_response());
+			}
+		}
+		else {
+			static_assert(always_false_v<T>, "No command handler for this type");
+		}
+	};
+
+	try {
+		const auto request = read_gameserver_command(packet_buffer, packet_bytes);
+		std::visit(handle, request);
+	}
+	catch (const augs::stream_read_error&) {
+
+	}
+}
+
 server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in,
@@ -84,7 +144,14 @@ server_setup::server_setup(
 	lua(lua),
 	last_start(in),
 	dedicated(dedicated),
-	server(std::make_unique<server_adapter>(in)),
+	server(
+		std::make_unique<server_adapter>(
+			in,
+			[this](auto&&... args) {
+				handle_auxiliary_command(std::forward<decltype(args)>(args)...); 
+			}
+		)
+	),
 	server_time(yojimbo_time())
 {
 	const bool force = true;

@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/network/port_type.h"
+#include "augs/graphics/rgba.h"
 
 enum class nat_type : uint8_t {
 	PUBLIC_INTERNET,
@@ -21,3 +22,5 @@ struct nat_detection_result {
 	std::string describe() const;
 };
 
+std::string nat_type_to_string(nat_type);
+rgba nat_type_to_color(nat_type);

@@ -1,11 +1,13 @@
 #pragma once
 #include <string>
 #include "augs/network/netcode_sockets.h"
+#include "augs/network/network_types.h"
 
 struct netcode_address_t;
 
 std::string ToString(const netcode_address_t&);
 bool operator==(const netcode_address_t& a, const netcode_address_t& b);
+bool host_equal(const netcode_address_t& a, const netcode_address_t& b);
 bool operator!=(const netcode_address_t& a, const netcode_address_t& b);
 
 bool try_fire_interval(double interval, net_time_t& when_last);

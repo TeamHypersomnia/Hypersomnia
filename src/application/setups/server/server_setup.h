@@ -184,6 +184,8 @@ private:
 	bool has_sent_any_heartbeats() const;
 	void shutdown();
 
+	void handle_auxiliary_command(const netcode_address_t&, const std::byte*, std::size_t n);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

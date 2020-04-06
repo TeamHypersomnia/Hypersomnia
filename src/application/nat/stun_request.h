@@ -46,10 +46,9 @@ inline std::optional<netcode_address_t> read_stun_response(
 	const std::size_t packet_bytes
 ) {
 	try {
-		auto buf = augs::cpointer_to_buffer { packet_buffer, packet_bytes };
-		auto cptr = augs::cptr_memory_stream(buf);
+		auto stream = augs::make_read_stream(packet_buffer, packet_bytes);
 
-		const auto response = augs::read_bytes<STUNMessageHeader>(cptr);
+		const auto response = augs::read_bytes<STUNMessageHeader>(stream);
 
 		if (response.type != htons(0x0101)) {
 			return std::nullopt;
@@ -59,11 +58,11 @@ inline std::optional<netcode_address_t> read_stun_response(
 			return std::nullopt;
 		}
 
-		while (cptr.has_unread_bytes()) {
-			const auto header = augs::read_bytes<STUNAttributeHeader>(cptr);
+		while (stream.has_unread_bytes()) {
+			const auto header = augs::read_bytes<STUNAttributeHeader>(stream);
 
             if (header.type == htons(XOR_MAPPED_ADDRESS_TYPE)) {
-				const auto xorAddress = augs::read_bytes<STUNXORMappedIPv4Address>(cptr);
+				const auto xorAddress = augs::read_bytes<STUNXORMappedIPv4Address>(stream);
 
 				const uint32_t address = htonl(xorAddress.address) ^ 0x2112A442;
 				const uint16_t port = ntohs(xorAddress.port) ^ 0x2112;

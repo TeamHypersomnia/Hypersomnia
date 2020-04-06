@@ -158,7 +158,7 @@ namespace augs {
 
 	template <class B>
 	class basic_memory_stream : public memory_stream_mixin<basic_memory_stream<B>> {
-		using base = memory_stream_mixin<memory_stream>;
+		using base = memory_stream_mixin<basic_memory_stream<B>>;
 		friend base;
 
 		B buffer;

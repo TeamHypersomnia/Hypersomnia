@@ -6,6 +6,41 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix vim's premature build successful
+- fix crash notice with multiple clients
+	- or just disable the notice whatsoever in non-production builds
+- implement a keycombo to dump and open current logs (multiple clients)
+
+
+- Use port 0 by default
+	- only add a tick for a custom port
+	- We may copy the address to clipboard automatically
+	- but we'll be visible in the server browser anyway
+
+- Performance fix: sleep the remaining frame time
+
+- Gameserver commands
+	- stunned_ping
+	- ah, let's just have a single struct with flags anyways
+	- nat_traversal_step
+		
+- Coordination of server operations
+	- What the client needs from the server for its traversal logic?
+		- Two things.
+			- Pingback at a specific port, optionally open multiple ports in a sequence.
+				- With a flag to multi-send. The count will be specified at the server
+				- Optionally with more parameters specifying bounds for bruteforce.
+			- A re-stun.
+				- This would be best if we could just handle this in C++ code in server_setup, look for packet receive overrides
+					- Separate enum: NETCODE_AUXILIARY_COMMAND
+						- Should actually handle ping too
+						- It's a draft really, we'll later need a secure connection
+
+	- The client, in its traversal logic, can request a specific pingback at a specific port, from the game server
+		- Security: The client will later need a separate, secure connection with the masterserver with proof of identity (e.g. a challenge packet)
+			- can use yojimbo for that 
+		- Security: The server will later likewise need a secure connection with the masterserver
+
 - Yeah let's also write a linear pseudo-code with ifs and elses
 	- Actually think which way will be easier to comprehend...
 	- Pre-stun stage

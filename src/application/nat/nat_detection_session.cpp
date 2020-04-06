@@ -405,15 +405,7 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 
 	auto try_read_masterserver_response = [&]() {
 		try {
-			auto buf = augs::cpointer_to_buffer { 
-				reinterpret_cast<const std::byte*>(packet_buffer), 
-				static_cast<std::size_t>(packet_bytes) 
-			};
-
-			auto cptr = augs::cptr_memory_stream(buf);
-
-			const auto response = augs::read_bytes<masterserver_response>(cptr);
-
+			const auto response = augs::from_bytes<masterserver_response>(packet_buffer, packet_bytes);
 			return std::visit(handle_port_probe_response, response);
 		}
 		catch (const augs::stream_read_error& err) {
@@ -462,4 +454,8 @@ void nat_detection_session::advance(netcode_socket_t socket) {
 	send_requests();
 	send_packets(socket);
 	analyze_results(socket.address.port);
+}
+
+const std::optional<netcode_address_t>& nat_detection_session::get_resolved_port_probing_host() const {
+	return resolved_port_probing_host;
 }

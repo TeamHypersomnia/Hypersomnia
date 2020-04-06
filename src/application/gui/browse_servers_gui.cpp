@@ -205,25 +205,13 @@ static bool is_internal(const netcode_address_t& address) {
 }
 
 static std::optional<uint64_t> read_ping_response(uint8_t* packet_buffer, std::size_t packet_bytes) {
-	if (packet_bytes < 1) {
+	try {
+		const auto response = augs::from_bytes<gameserver_ping_response>(packet_buffer, packet_bytes);
+		return response.sequence;
+	}
+	catch (const augs::stream_read_error&) {
 		return std::nullopt;
 	}
-
-	const auto command = packet_buffer[0];
-
-	if (command == NETCODE_PING_RESPONSE_PACKET) {
-		if (packet_bytes != 1 + sizeof(uint64_t)) {
-			BRW_LOG("Wrong num of bytes for NETCODE_PING_RESPONSE_PACKET: %x!", packet_bytes);
-			return std::nullopt;
-		}
-
-		uint64_t sequence;
-		std::memcpy(&sequence, packet_buffer + 1, sizeof(uint64_t));
-
-		return sequence;
-	}
-
-	return std::nullopt;
 }
 
 bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes) {
@@ -534,17 +522,15 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		LOG("Server list response bytes: %x", bytes.size());
 
-		const auto buffer_ptr = augs::cpointer_to_buffer{ reinterpret_cast<const std::byte*>(bytes.data()), bytes.size() };
-
-		auto ss = augs::cptr_memory_stream{ buffer_ptr };
+		auto stream = augs::make_read_stream(bytes.data(), bytes.size());
 
 		try {
-			while (ss.has_unread_bytes()) {
+			while (stream.has_unread_bytes()) {
 				server_list_entry entry;
 
-				augs::read_bytes(ss, entry.address);
-				augs::read_bytes(ss, entry.appeared_when);
-				augs::read_bytes(ss, entry.heartbeat);
+				augs::read_bytes(stream, entry.address);
+				augs::read_bytes(stream, entry.appeared_when);
+				augs::read_bytes(stream, entry.heartbeat);
 
 				server_list.emplace_back(std::move(entry));
 			}
@@ -984,23 +970,7 @@ void server_details_gui_state::perform(const server_list_entry& entry) {
 
 	input_text("Arena", heartbeat.current_arena, ImGuiInputTextFlags_ReadOnly);
 
-	auto nat = [&]() -> std::string {
-		switch (heartbeat.nat.type) {
-			case nat_type::PUBLIC_INTERNET: 
-				return "Public Internet";
-			case nat_type::PORT_PRESERVING_CONE: 
-				return "Port-preserving cone";
-			case nat_type::CONE: 
-				return "Cone";
-			case nat_type::ADDRESS_SENSITIVE: 
-				return "Symmetric (address sensitive)";
-			case nat_type::PORT_SENSITIVE: 
-				return "Symmetric (port sensitive)";
-
-			default:
-				return "Unknown";
-		}
-	}();
+	auto nat = nat_type_to_string(heartbeat.nat.type); 
 
 	input_text("NAT type", nat, ImGuiInputTextFlags_ReadOnly);
 	auto delta = std::to_string(heartbeat.nat.port_delta);
