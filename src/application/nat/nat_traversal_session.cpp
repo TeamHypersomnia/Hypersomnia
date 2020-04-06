@@ -61,6 +61,8 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 		return;
 	}
 
+	receive_packets(socket);
+
 	auto make_traversal_step = [&]() {
 		auto step = traversal_step();
 		step.target_server = input.traversed_address;
@@ -68,8 +70,6 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 
 		return step;
 	};
-
-	receive_packets(socket);
 
 	auto request = [&](const auto& step) {
 		netcode_send_to_masterserver(socket, input.masterserver_address, step);
@@ -90,6 +90,10 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 
 		ping_this_server(socket, target_address, session_guid);
 	};
+
+	auto try_request_interval = [&]() {
+		return try_fire_interval(input.traversal_settings.request_interval_ms / 1000.0, when_last_sent_request);
+	};
 	
 	if (conic(input.client.type) && conic(input.server.type)) {
 		if (current_state == state::INIT) {
@@ -97,7 +101,7 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 		}
 
 		if (current_state == state::TRAVERSING) {
-			if (try_fire_interval(input.traversal_settings.request_interval_ms / 1000.0, when_last_sent_request)) {
+			if (try_request_interval()) {
 				auto step = make_traversal_step();
 
 				/* 
@@ -115,12 +119,24 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 		return;
 	}
 
-	if (symmetric(input.client.type)) {
+	/* A symmetric host on either side is involved. */
 
+	auto restun_first = [&]() {
+		current_state = state::AWAITING_STUN_RESPONSE;
+	};
+
+	if (current_state == state::INIT) {
+		if (symmetric(input.client.type)) {
+			restun_first();
+		}
+	}
+
+	if (current_state == state::TRAVERSING) {
+		if (try_request_interval()) {
+
+		}
 	}
 }
-
-std::optional<uint64_t> read_ping_response(const uint8_t* packet_buffer, std::size_t packet_bytes);
 
 void nat_traversal_session::handle_packet(const netcode_address_t& from, uint8_t* packet_buffer, const int packet_bytes) {
 	if (current_state == state::TRAVERSAL_COMPLETE) {

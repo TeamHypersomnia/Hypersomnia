@@ -12,6 +12,16 @@ struct gameserver_command_wrapper {
 	gameserver_command payload;
 };
 
+inline std::optional<uint64_t> read_ping_response(const uint8_t* const packet_buffer, const std::size_t packet_bytes) {
+	try {
+		const auto response = augs::from_bytes<gameserver_ping_response>(packet_buffer, packet_bytes);
+		return response.sequence;
+	}
+	catch (const augs::stream_read_error&) {
+		return std::nullopt;
+	}
+}
+
 template <class... T>
 gameserver_command read_gameserver_command(T&&... args) {
 	auto t = augs::from_bytes<gameserver_command_wrapper>(std::forward<T>(args)...);

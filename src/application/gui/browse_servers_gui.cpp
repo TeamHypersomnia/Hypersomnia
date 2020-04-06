@@ -204,16 +204,6 @@ static bool is_internal(const netcode_address_t& address) {
 	return false;
 }
 
-std::optional<uint64_t> read_ping_response(const uint8_t* const packet_buffer, const std::size_t packet_bytes) {
-	try {
-		const auto response = augs::from_bytes<gameserver_ping_response>(packet_buffer, packet_bytes);
-		return response.sequence;
-	}
-	catch (const augs::stream_read_error&) {
-		return std::nullopt;
-	}
-}
-
 bool browse_servers_gui_state::handle_gameserver_response(const netcode_address_t& from, uint8_t* packet_buffer, std::size_t packet_bytes) {
 	const auto current_time = yojimbo_time();
 
