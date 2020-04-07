@@ -528,7 +528,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			server_nat,
 			config.nat_detection,
 			config.nat_traversal
-		});
+		}, current_stun_server);
 	};
 
 	static auto do_traversal_details_popup = []() {
@@ -554,6 +554,15 @@ work_result work(const int argc, const char* const * const argv) try {
 		else {
 			nat_detection_popup.close();
 		}
+	};
+
+	static auto make_server_nat_traversal_input = []() {
+		return server_nat_traversal_input {
+			config.nat_detection,
+			config.nat_traversal,
+
+			current_stun_server
+		};
 	};
 
 	if (params.type == app_type::DEDICATED_SERVER) {
@@ -616,7 +625,9 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.server_solvable,
 			config.client,
 			config.private_server,
-			config.dedicated_server
+			config.dedicated_server,
+
+			make_server_nat_traversal_input()
 		);
 
 		auto& server = std::get<server_setup>(*current_setup);
@@ -1020,7 +1031,9 @@ work_result work(const int argc, const char* const * const argv) try {
 						config.server_solvable,
 						config.client,
 						config.private_server,
-						std::nullopt
+						std::nullopt,
+
+						make_server_nat_traversal_input()
 					);
 				});
 #endif

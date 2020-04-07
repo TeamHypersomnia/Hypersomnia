@@ -174,9 +174,9 @@ bool try_fire_interval(const double interval, net_time_t& when_last) {
 	return try_fire_interval(interval, when_last, yojimbo_time());
 }
 
-void auxiliary_command_function(void* context,struct netcode_address_t* from,uint8_t* packet,int bytes) {
+bool auxiliary_command_function(void* context, struct netcode_address_t* from, uint8_t* packet, int bytes) {
 	auto* adapter = reinterpret_cast<server_adapter*>(context);
-	adapter->auxiliary_command_callback(*from, reinterpret_cast<const std::byte*>(packet), bytes);
+	return adapter->auxiliary_command_callback(*from, reinterpret_cast<const std::byte*>(packet), bytes);
 }
 
 server_adapter::server_adapter(const server_start_input& in, auxiliary_command_callback_type auxiliary_command_callback) :

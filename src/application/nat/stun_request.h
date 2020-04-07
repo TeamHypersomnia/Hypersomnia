@@ -27,7 +27,7 @@ struct STUNXORMappedIPv4Address
     uint32_t address;
 };
 
-auto make_stun_request(randomization& rng) {
+inline auto make_stun_request(randomization& rng) {
 	STUNMessageHeader request;
 	request.type = htons(0x0001);
 	request.length = htons(0x0000);
@@ -72,6 +72,7 @@ inline std::optional<netcode_address_t> read_stun_response(
 				result.port = port;
 
 				std::memcpy(&result.data.ipv4, &address, sizeof(address));
+				std::reverse(result.data.ipv4, result.data.ipv4 + sizeof(result.data.ipv4) / sizeof(uint8_t));
 
 				return result;
 			}

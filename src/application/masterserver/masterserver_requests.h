@@ -6,34 +6,7 @@
 #include "augs/log.h"
 
 #include "augs/readwrite/to_bytes.h"
-
-struct gameserver_command_wrapper {
-	uint8_t marker = NETCODE_AUXILIARY_COMMAND_PACKET;
-	gameserver_command payload;
-};
-
-inline std::optional<uint64_t> read_ping_response(const uint8_t* const packet_buffer, const std::size_t packet_bytes) {
-	try {
-		const auto response = augs::from_bytes<gameserver_ping_response>(packet_buffer, packet_bytes);
-		return response.sequence;
-	}
-	catch (const augs::stream_read_error&) {
-		return std::nullopt;
-	}
-}
-
-template <class... T>
-gameserver_command read_gameserver_command(T&&... args) {
-	auto t = augs::from_bytes<gameserver_command_wrapper>(std::forward<T>(args)...);
-
-	if (t.marker != NETCODE_AUXILIARY_COMMAND_PACKET) {
-		throw augs::stream_read_error(
-			"Failed to read gameserver_command_wrapper: it does not begin with NETCODE_AUXILIARY_COMMAND_PACKET."
-		);
-	}
-
-	return t.payload;
-}
+#include "application/masterserver/gameserver_commands.h"
 
 template <class T>
 auto make_gameserver_command_bytes(T&& command) {
@@ -49,9 +22,14 @@ void netcode_send_to_masterserver(netcode_socket_t socket, netcode_address_t mas
 	netcode_socket_send_packet(&socket, &masterserver_address, bytes.data(), bytes.size());
 }
 
+inline netcode_queued_packet ping_this_server(netcode_address_t target_server, const uint64_t sequence) {
+	auto bytes = make_gameserver_command_bytes(gameserver_ping_request { sequence });
+	return { target_server, bytes };
+}
+
 inline void ping_this_server(netcode_socket_t socket, netcode_address_t target_server, const uint64_t sequence) {
 	LOG("Pinging %x", ::ToString(target_server));
 
-	auto bytes = make_gameserver_command_bytes(gameserver_ping_request { sequence });
-	netcode_socket_send_packet(&socket, &target_server, bytes.data(), bytes.size());
+	auto packet = ping_this_server(target_server, sequence);
+	netcode_socket_send_packet(&socket, &packet.first, packet.second.data(), packet.second.size());
 }

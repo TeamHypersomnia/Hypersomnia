@@ -6,6 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Remember setting the low ttl
+- Consider using client_holes_opened to open holes only once
+
+- Remember to account for duplicate requests to restun on the server
+	- we'll keep a map of session guid to address with a timeout
+
+- looks like time since epoch is counted in seconds...
+	- actually we can make it finer
+	- so just use that to discard all old sessions
+	- this can be used as a session guid too
+ 
+- Actually we won't need to ping masterserver periodically
 - Use port 0 by default
 	- only add a tick for a custom port
 	- We may copy the address to clipboard automatically

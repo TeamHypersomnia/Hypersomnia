@@ -20,6 +20,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/to_bytes.h"
 #include "application/masterserver/masterserver_requests.h"
+#include "application/masterserver/netcode_address_hash.h"
 
 std::string ToString(const netcode_address_t&);
 
@@ -82,23 +83,6 @@ bool host_equal(const netcode_address_t& a, const netcode_address_t& b) {
 	bb.port = 0;
 
 	return 1 == netcode_address_equal(&aa, &bb);
-}
-
-namespace std {
-	template <>
-	struct hash<netcode_address_t> {
-		size_t operator()(const netcode_address_t& k) const {
-			if (k.type == NETCODE_ADDRESS_IPV4) {
-				uint32_t ip;
-				std::memcpy(&ip, &k.data.ipv4, sizeof(ip));
-				return augs::hash_multiple(ip, k.port);
-			}
-
-			uint64_t ip_parts[2];
-			std::memcpy(&ip_parts, &k.data.ipv6, sizeof(ip_parts));
-			return augs::hash_multiple(ip_parts[0], ip_parts[1], k.port);
-		}
-	};
 }
 
 double yojimbo_time();
@@ -273,9 +257,13 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			MSR_LOG("Received packet bytes: %x", packet_bytes);
 
 			try {
-				auto send_back = [&](const auto& typed_response) {
+				auto send_to = [&](auto to, const auto& typed_response) {
 					auto bytes = augs::to_bytes(masterserver_response(typed_response));
-					netcode_socket_send_packet(&socket, &from, bytes.data(), bytes.size());
+					netcode_socket_send_packet(&socket, &to, bytes.data(), bytes.size());
+				};
+
+				auto send_back = [&](const auto& typed_response) {
+					send_to(from, typed_response);
 				};
 
 				auto send_to_gameserver = [&](const auto& typed_command, netcode_address_t server_address) {
@@ -317,6 +305,15 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						send_back(response);
 					}
+					else if constexpr(std::is_same_v<R, masterserver_in::stun_result_info>) {
+						/* Just relay this */
+						auto response = masterserver_out::stun_result_info();
+
+						response.session_guid = typed_request.session_guid;
+						response.resolved_external_port = typed_request.resolved_external_port;
+
+						send_to(typed_request.source_client, response);
+					}
 					else if constexpr(std::is_same_v<R, masterserver_in::nat_traversal_step>) {
 						auto punched_server = typed_request.target_server;
 
@@ -350,16 +347,17 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						if (should_send_request) {
 							auto step_request = masterserver_out::nat_traversal_step();
 
-							step_request.source_address = from;
-							step_request.session_guid = typed_request.session_guid;
+							step_request.predicted_open_address = from;
 
-							const auto predicted_next_port = typed_request.source_external_port;
+							{
+								const auto port_opened = typed_request.port_opened_for_server;
 
-							if (predicted_next_port != 0) {
-								step_request.source_address.port = predicted_next_port;
+								if (port_opened != 0) {
+									step_request.predicted_open_address.port = port_opened;
+								}
 							}
 
-							step_request.params = typed_request.params;
+							step_request.payload = typed_request.payload;
 
 							send_to_gameserver(step_request, punched_server);
 						}

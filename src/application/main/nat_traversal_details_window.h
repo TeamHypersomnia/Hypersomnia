@@ -1,6 +1,6 @@
 #pragma once
 
-inline std::string nat_traversal_state_to_string(const nat_traversal_session::state state) {
+std::string nat_traversal_state_to_string(const nat_traversal_session::state state) {
 	using S = nat_traversal_session::state;
 
 	switch (state) {
@@ -8,6 +8,12 @@ inline std::string nat_traversal_state_to_string(const nat_traversal_session::st
 			return "Initializing";
 		case S::TRAVERSING:
 			return "Traversing";
+		case S::CLIENT_STUN_REQUIREMENT_MET:
+			return "Client STUN requirement met";
+		case S::SERVER_STUN_REQUIREMENT_MET:
+			return "Server STUN requirement met";
+		case S::REQUESTING_REMOTE_PORT_INFO:
+			return "Requesting remote port info";
 		case S::AWAITING_STUN_RESPONSE:
 			return "Awaiting STUN response";
 		case S::TRAVERSAL_COMPLETE:
@@ -20,13 +26,19 @@ inline std::string nat_traversal_state_to_string(const nat_traversal_session::st
 	}
 }
 
-inline rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
+rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
 	using S = nat_traversal_session::state;
 
 	switch (state) {
 		case S::INIT:
 			return orange;
 		case S::AWAITING_STUN_RESPONSE:
+			return yellow;
+		case S::CLIENT_STUN_REQUIREMENT_MET:
+			return cyan;
+		case S::SERVER_STUN_REQUIREMENT_MET:
+			return cyan;
+		case S::REQUESTING_REMOTE_PORT_INFO:
 			return yellow;
 		case S::TRAVERSING:
 			return cyan;

@@ -94,7 +94,7 @@ uint64_t augs::date_time::seconds_ago() const {
 }
 
 double augs::date_time::secs_since_epoch() {
-	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	return std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const uint64_t secs) {

@@ -133,7 +133,7 @@ bool perform_float_consistency_tests(const float_consistency_test_settings& sett
 
 	auto work_lambda = [&]() {
 		auto rng = randomization(1337u);
-		auto ndt_rng = randomization(std::random_device()());
+		auto ndt_rng = randomization::from_random_device();
 
 		real32 trash = 4938493.f;
 		real32 total = 0.f;

@@ -16,6 +16,7 @@
 #include "application/nat/nat_detection_settings.h"
 #include "application/network/resolve_address.h"
 #include "application/masterserver/masterserver_requests.h"
+#include "application/masterserver/gameserver_command_readwrite.h"
 
 constexpr auto ping_retry_interval = 1;
 constexpr auto reping_interval = 10;

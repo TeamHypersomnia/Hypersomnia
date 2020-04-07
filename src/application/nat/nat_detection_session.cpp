@@ -33,14 +33,7 @@ std::string nat_detection_result::describe() const {
 }
 
 address_and_port nat_detection_session::get_next_stun_host() {
-	const auto& servers = settings.stun_server_list;
-	return servers[current_stun_index++ % servers.size()];
-}
-
-
-void nat_detection_session::log_info(const std::string& contents) {
-	full_log += contents + "\n";
-	log_sink(contents);
+	return settings.get_next_stun_host(current_stun_index);
 }
 
 nat_detection_session::nat_detection_session(nat_detection_session::session_input in, stun_counter_type& current_stun_index) 
@@ -96,9 +89,9 @@ void nat_detection_session::advance_resolution_of_stun_hosts() {
 				resolved_stun_hosts.emplace_back(result.addr);
 
 				if (enough_stun_hosts_resolved()) {
-					log_info(typesafe_sprintf("All %x stun hosts resolved. Generating requests.", resolved_stun_hosts.size()));
+					log_info("All %x stun hosts resolved. Generating requests.", resolved_stun_hosts.size());
 
-					auto rng = randomization(std::random_device()());
+					auto rng = randomization::from_random_device();
 
 					for (const auto& stun_host : resolved_stun_hosts) {
 						auto request = stun_request_state(stun_host);
@@ -151,26 +144,6 @@ void nat_detection_session::advance_resolution_of_port_probing_host() {
 	}
 }
 
-void nat_detection_session::send_one_packet(netcode_socket_t socket) {
-	if (queued_packets.empty()) {
-		return;
-	}
-
-	auto packet = queued_packets.front();
-	auto& bytes = packet.second;
-	auto& address = packet.first;
-
-	netcode_socket_send_packet(&socket, &address, bytes.data(), bytes.size());
-
-	queued_packets.erase(queued_packets.begin());
-}
-
-void nat_detection_session::send_packets(netcode_socket_t socket) {
-	if (try_fire_interval(settings.packet_interval_ms / 1000.0, when_last_sent_packet)) {
-		send_one_packet(socket);
-	}
-}
-
 bool nat_detection_session::enough_stun_hosts_resolved() const {
 	return static_cast<int>(resolved_stun_hosts.size()) == settings.num_stun_hosts_used_for_detection;
 }
@@ -194,7 +167,7 @@ void nat_detection_session::send_requests() {
 
 		for (auto& request : stun_requests) {
 			if (!request.completed()) {
-				queued_packets.emplace_back(request.destination, augs::to_bytes(request.source_request));
+				packet_queue(request.destination, augs::to_bytes(request.source_request));
 			}
 		}
 
@@ -204,7 +177,7 @@ void nat_detection_session::send_requests() {
 					const auto request = masterserver_in::tell_me_my_address {};
 					auto bytes = augs::to_bytes(masterserver_request(request));
 
-					queued_packets.emplace_back(probation.destination, bytes);
+					packet_queue(probation.destination, bytes);
 				}
 			}
 		}
@@ -374,8 +347,6 @@ const nat_detection_settings& nat_detection_session::get_settings() {
 	return settings;
 }
 
-using port_probe_response = masterserver_out::tell_me_my_address;
-
 void nat_detection_session::finish_port_probe(const netcode_address_t& from, const netcode_address_t& result) {
 	for (auto& probation : port_probing_requests) {
 		if (from == probation.destination) {
@@ -393,7 +364,7 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 		if constexpr(std::is_same_v<R, masterserver_out::tell_me_my_address>) {
 			const auto& our_external_address = response.address;
 
-			log_info(typesafe_sprintf("port probe response: %x -> %x", ::ToString(from), ::ToString(our_external_address)));
+			log_info("port probe response: %x -> %x", ::ToString(from), ::ToString(our_external_address));
 
 			finish_port_probe(from, our_external_address);
 
@@ -421,7 +392,7 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 		if (const auto translated = read_stun_response(request.source_request, bytes, packet_bytes)) {
 			const auto& our_external_address = *translated;
 
-			log_info(typesafe_sprintf("received STUN response: %x -> %x", ::ToString(from), ::ToString(our_external_address)));
+			log_info("received STUN response: %x -> %x", ::ToString(from), ::ToString(our_external_address));
 
 			request.translated_address = our_external_address;
 			return;
@@ -452,10 +423,30 @@ void nat_detection_session::advance(netcode_socket_t socket) {
 	receive_packets(socket);
 
 	send_requests();
-	send_packets(socket);
+	packet_queue.send_some(socket, settings.packet_interval_ms / 1000.0);
 	analyze_results(socket.address.port);
 }
 
 const std::optional<netcode_address_t>& nat_detection_session::get_resolved_port_probing_host() const {
 	return resolved_port_probing_host;
+}
+
+void netcode_packet_queue::send_one(netcode_socket_t socket) {
+	if (queue.empty()) {
+		return;
+	}
+
+	auto packet = queue.front();
+	auto& bytes = packet.second;
+	auto& address = packet.first;
+
+	netcode_socket_send_packet(&socket, &address, bytes.data(), bytes.size());
+
+	queue.erase(queue.begin());
+}
+
+void netcode_packet_queue::send_some(netcode_socket_t socket, const double interval_seconds) {
+	if (try_fire_interval(interval_seconds, when_last)) {
+		send_one(socket);
+	}
 }

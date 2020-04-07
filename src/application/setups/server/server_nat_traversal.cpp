@@ -1,0 +1,222 @@
+#include "application/masterserver/netcode_address_hash.h"
+#include "application/setups/server/server_nat_traversal.h"
+#include "application/nat/stun_session.h"
+#include "augs/templates/container_templates.h"
+#include "application/masterserver/gameserver_commands.h"
+#include "augs/readwrite/to_bytes.h"
+#include "application/masterserver/gameserver_command_readwrite.h"
+#include "augs/network/netcode_utils.h"
+#include "augs/readwrite/byte_readwrite.h"
+#include "augs/templates/bit_cast.h"
+
+double yojimbo_time();
+
+server_nat_traversal::server_nat_traversal(const server_nat_traversal_input& input) : input(input) {}
+
+void server_nat_traversal::send_packets(netcode_socket_t socket) {
+	const auto interval_secs = input.detection_settings.packet_interval_ms / 1000.0;
+	packet_queue.send_some(socket, interval_secs);
+}
+
+void server_nat_traversal::advance() {
+	const auto request_interval_secs = input.detection_settings.request_interval_ms / 1000.0;
+	const auto stun_timeout_secs = input.detection_settings.stun_session_timeout_secs;
+
+	erase_if(traversals, [&](auto& entry) {
+		auto& traversal = entry.second;
+
+		if (try_fire_interval(input.traversal_settings.session_timeout_secs, traversal.when_appeared)) {
+			return true;
+		}
+
+		auto& stun = traversal.stun;
+
+		if (stun != std::nullopt) {
+			if (stun->has_timed_out(stun_timeout_secs)) {
+				return false;
+			}
+
+			if (const auto request_packet = stun->advance(request_interval_secs, stun_rng)) {
+				LOG("Sending a STUN request packet.");
+				packet_queue(*request_packet);
+
+				if (!traversal.holes_opened) {
+					LOG("Opening holes for the client right away to increase the chance of an adjacent port.");
+					const auto client_address = entry.first;
+					traversal.open_holes(client_address, packet_queue);
+				}
+			}
+		}
+
+		return false;
+	});
+}
+
+bool server_nat_traversal::handle_auxiliary_command(
+	const netcode_address_t& from,
+	const std::byte* packet_buffer,
+	const std::size_t packet_bytes
+) {
+	const bool is_auxiliary_cmd = packet_buffer[0] == static_cast<std::byte>(NETCODE_AUXILIARY_COMMAND_PACKET);
+
+	if (!is_auxiliary_cmd && !handle_stun_packet(packet_buffer, packet_bytes)) {
+		return false;
+	}
+
+	auto respond = [&](netcode_address_t to, const auto& typed_response) {
+		auto bytes = augs::to_bytes(typed_response);
+		packet_queue(to, bytes);
+	};
+
+	auto send_back = [&](const auto& typed_response, std::optional<port_type> override_port = std::nullopt) {
+		auto target_address = from;
+
+		if (override_port != std::nullopt) {
+			target_address.port = *override_port;
+		}
+
+		respond(target_address, typed_response);
+	};
+
+	auto handle = [&](const auto& typed_request) {
+		using T = remove_cref<decltype(typed_request)>;
+
+		if constexpr(std::is_same_v<T, gameserver_ping_request>) {
+			const auto sequence = typed_request.sequence;
+			LOG("Received ping request from: %x (sequence: %x / %f)", ::ToString(from), sequence, augs::bit_cast<double>(sequence));
+
+			auto response = gameserver_ping_response();
+			response.sequence = sequence;
+
+			send_back(response);
+		}
+		else if constexpr(std::is_same_v<T, masterserver_out::nat_traversal_step>) {
+			if (last_detected_nat.type == nat_type::PUBLIC_INTERNET) {
+				return;
+			}
+
+			LOG("Received traversal step from masterserver.");
+
+			const auto& client_address = typed_request.predicted_open_address;
+			const auto& payload = typed_request.payload;
+
+			auto create_fresh_entry = [&]() {
+				traversals.erase(client_address);
+
+				auto traversal = session();
+				traversal.session_guid = payload.session_guid;
+
+				LOG("Creating fresh entry for %x. Session timestamp: %f", ::ToString(client_address), traversal.session_guid);
+				traversals.try_emplace(client_address, std::move(traversal));
+			};
+
+			if (auto entry = mapped_or_nullptr(traversals, client_address)) {
+				if (payload.session_guid < entry->session_guid) {
+					return;
+				}
+
+				if (payload.session_guid > entry->session_guid) {
+					create_fresh_entry();
+				}
+			}
+			else {
+				const auto sane_limit_traversals = 30;
+
+				if (traversals.size() < sane_limit_traversals) {
+					create_fresh_entry();
+				}
+				else {
+					LOG("Too many traversal entries for now. Ignoring request.");
+				}
+			}
+
+			auto& traversal = traversals[client_address];
+			traversal.last_payload = payload;
+
+			switch (payload.type) {
+				case nat_traversal_step_type::RESTUN: {
+					auto& stun = traversal.stun;
+
+					if (stun != std::nullopt) {
+						LOG("STUN session for this traversal already in progress. Ignoring request.");
+						break;
+					}
+
+					LOG("Launching a STUN session this traversal.");
+
+					const auto next_host = input.detection_settings.get_next_stun_host(input.current_stun_index);
+
+					auto log_info = [](const std::string& s) { LOG(s); };
+					stun.emplace(next_host, log_info);
+				}
+
+				case nat_traversal_step_type::PINGBACK:
+					traversal.open_holes(client_address, packet_queue);
+					break;
+
+				default:
+					break;
+			}
+		}
+		else {
+			static_assert(always_false_v<T>, "No command handler for this type");
+		}
+	};
+
+	try {
+		const auto request = read_gameserver_command(packet_buffer, packet_bytes);
+		std::visit(handle, request);
+		return true;
+	}
+	catch (const augs::stream_read_error&) {
+		return false;
+	}
+}
+
+server_nat_traversal::session::session() 
+	: when_appeared(yojimbo_time()) 
+{}
+
+void server_nat_traversal::session::open_holes(
+	netcode_address_t predicted_open_address,
+	netcode_packet_queue& queue
+) {
+	auto response = gameserver_ping_response();
+	response.sequence = session_guid;
+
+	const auto port_dt = last_payload.source_port_delta;
+
+	LOG("Opening NAT holes for the predicted client address: %x\nPort dt: %x", ::ToString(predicted_open_address), port_dt);
+
+	queue(predicted_open_address, augs::to_bytes(response));
+
+	if (last_payload.ping_back_at_multiple_ports) {
+		// TODO: ping
+		LOG("Pinging at multiple ports to increase the chance of success.");
+	}
+
+	holes_opened = true;
+}
+
+bool server_nat_traversal::handle_stun_packet(const std::byte* packet_buffer, const std::size_t packet_bytes) {
+	if (!is_behind_nat()) {
+		return false;
+	}
+
+	for (auto& entry : traversals) {
+		auto& stun = entry.second.stun;
+
+		if (stun != std::nullopt) {
+			if (stun->handle_packet(packet_buffer, packet_bytes)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool server_nat_traversal::is_behind_nat() const {
+	return last_detected_nat.type != nat_type::PUBLIC_INTERNET;
+}
+

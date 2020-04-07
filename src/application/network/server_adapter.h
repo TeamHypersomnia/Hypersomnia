@@ -5,10 +5,10 @@
 
 struct netcode_socket_t;
 
-using auxiliary_command_callback_type = std::function<void (const netcode_address_t&, const std::byte*, std::size_t n)>;
+using auxiliary_command_callback_type = std::function<bool (const netcode_address_t&, const std::byte*, std::size_t n)>;
 
 class server_adapter {
-	friend void auxiliary_command_function(void* context, struct netcode_address_t* from, uint8_t* packet, int bytes);
+	friend bool auxiliary_command_function(void* context, struct netcode_address_t* from, uint8_t* packet, int bytes);
 
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;

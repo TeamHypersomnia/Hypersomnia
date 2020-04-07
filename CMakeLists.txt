@@ -692,6 +692,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/masterserver/masterserver.cpp"
 	"src/application/nat/nat_detection_session.cpp"
 	"src/application/nat/nat_traversal_session.cpp"
+	"src/application/setups/server/server_nat_traversal.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

@@ -1,5 +1,6 @@
 #pragma once
 #include <future>
+#include "application/masterserver/netcode_address_hash.h"
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
 #include "application/setups/server/server_start_input.h"
@@ -33,6 +34,7 @@
 #include "application/setups/server/server_profiler.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "application/nat/nat_type.h"
+#include "application/setups/server/server_nat_traversal.h"
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 #include "game/modes/dump_for_debugging.h"
@@ -121,7 +123,7 @@ class server_setup :
 	client_gui_state integrated_client_gui;
 	std::string failure_reason;
 
-	nat_detection_result last_detected_nat;
+	server_nat_traversal nat_traversal;
 
 public:
 	net_time_t last_logged_at = 0;
@@ -151,7 +153,7 @@ private:
 	void send_heartbeat_to_server_list_if_its_time();
 
 	void resolve_server_list();
-	void resolve_server_list_if_its_time();
+	void resolve_heartbeat_host_if_its_time();
 	void resolve_internal_address_if_its_time();
 
 	void request_immediate_heartbeat();
@@ -183,9 +185,6 @@ private:
 	bool server_list_enabled() const;
 	bool has_sent_any_heartbeats() const;
 	void shutdown();
-
-	void handle_auxiliary_command(const netcode_address_t&, const std::byte*, std::size_t n);
-
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -198,7 +197,9 @@ public:
 		const server_solvable_vars&,
 		const client_vars& integrated_client_vars,
 		const private_server_vars&,
-		std::optional<augs::dedicated_server_input>
+		std::optional<augs::dedicated_server_input>,
+
+		const server_nat_traversal_input& nat_traversal_input
 	);
 
 	~server_setup();
@@ -252,10 +253,10 @@ public:
 		}
 
 		if (vars.allow_nat_traversal) {
-			last_detected_nat = in.last_detected_nat;
+			nat_traversal.last_detected_nat = in.last_detected_nat;
 		}
 		else {
-			last_detected_nat = nat_detection_result();
+			nat_traversal.last_detected_nat = nat_detection_result();
 		}
 
 		const auto current_time = get_current_time();
@@ -303,12 +304,14 @@ public:
 				send_server_step_entropies(step_collected);
 			}
 
+			nat_traversal.advance();
+
 			{
 				auto scope = measure_scope(profiler.send_packets);
 				send_packets_if_its_time();
 
 				resolve_internal_address_if_its_time();
-				resolve_server_list_if_its_time();
+				resolve_heartbeat_host_if_its_time();
 				send_heartbeat_to_server_list_if_its_time();
 			}
 

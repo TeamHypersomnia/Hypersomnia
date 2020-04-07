@@ -1,3 +1,5 @@
+#include <random>
+
 #include "augs/math/repro_math.h"
 #include "augs/misc/randomization.h"
 #include "augs/templates/algorithm_templates.h"
@@ -43,6 +45,10 @@ basic_randomization<T>::basic_randomization(rng_seed_type seed) {
 	for (int i = 0; i < 4; ++i) {
 		generator.s[i] = next_seed(seed);
 	}
+}
+
+randomization randomization::from_random_device() {
+	return randomization(std::random_device()());
 }
 
 template <class generator_type>

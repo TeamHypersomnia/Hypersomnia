@@ -512,7 +512,7 @@ void client_setup::advance_demo_recorder() {
 
 void client_setup::send_pending_commands() {
 #if STRESS_TEST_ARENA_SERIALIZATION
-	static auto ndt_rng = randomization(std::random_device()());
+	static auto ndt_rng = randomization::from_random_device();
 
 	const auto times = ndt_rng.randval(0, 4);
 

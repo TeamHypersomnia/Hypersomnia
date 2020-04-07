@@ -11,12 +11,12 @@
 #include "application/nat/nat_type.h"
 
 #include "application/nat/stun_request_structs.h"
+#include "application/nat/netcode_packet_queue.h"
+#include "application/nat/stun_counter_type.h"
 
 using log_sink_type = std::function<void(const std::string&)>;
 
 struct netcode_socket_t;
-
-using stun_counter_type = int;
 
 class nat_detection_session {
 	struct request_state {
@@ -38,7 +38,6 @@ class nat_detection_session {
 
 	int times_sent_requests = 0;
 
-	net_time_t when_last_sent_packet = -1;
 	net_time_t when_last_made_requests = -1;
 
 	const nat_detection_settings settings;
@@ -58,10 +57,8 @@ class nat_detection_session {
 	void send_requests();
 
 	std::optional<nat_detection_result> detected_nat;
+	netcode_packet_queue packet_queue;
 
-	std::vector<std::pair<netcode_address_t, std::vector<std::byte>>> queued_packets;
-	void send_one_packet(netcode_socket_t);
-	void send_packets(netcode_socket_t);
 	void analyze_results(port_type source_port);
 
 	address_and_port get_next_stun_host();
@@ -76,7 +73,14 @@ class nat_detection_session {
 	bool enough_stun_hosts_resolved() const;
 	bool all_required_hosts_resolved() const;
 
-	void log_info(const std::string&);
+	template <class... Args>
+	void log_info(Args&&... args) {
+		const auto s = typesafe_sprintf(std::forward<Args>(args)...);
+
+		full_log += s + "\n";
+		LOG(s);
+	}
+
 	void handle_packet(const netcode_address_t& from, uint8_t* buffer, const int bytes_received);
 	void receive_packets(netcode_socket_t socket);
 

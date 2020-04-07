@@ -53,7 +53,7 @@ void standard_solve(const logic_step step) {
 		auto& s_rng = step.step_rng;
 
 		if (const auto v = s_rng.randval(0, 4); v == 4) {
-			auto rrr = randomization(std::random_device()());
+			auto rrr = randomization::from_random_device();
 			const auto times = rrr.randval(1, 9);
 
 			for (int i = 0; i < times; ++i) {

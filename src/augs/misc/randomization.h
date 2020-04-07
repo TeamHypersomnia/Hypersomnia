@@ -141,4 +141,5 @@ struct basic_randomization {
 
 struct randomization : basic_randomization<xorshift_state> {
 	using basic_randomization<xorshift_state>::basic_randomization;
+	static randomization from_random_device();
 };
