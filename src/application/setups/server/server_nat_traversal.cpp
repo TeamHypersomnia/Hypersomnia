@@ -91,10 +91,22 @@ void server_nat_traversal::advance() {
 					}
 				}
 			}
+			else if (state == stun_session::state::COULD_NOT_RESOLVE_STUN_HOST) {
+				LOG("Could not resolve STUN host: %x. Picking the next one.", stun->host.address);
+				relaunch(stun);
+			}
 		}
 
 		return false;
 	});
+}
+
+void server_nat_traversal::relaunch(std::optional<stun_session>& stun_session) {
+	stun_session.reset();
+	const auto next_host = input.detection_settings.get_next_stun_host(input.current_stun_index);
+
+	auto log_info = [](const std::string& s) { LOG(s); };
+	stun_session.emplace(next_host, log_info);
 }
 
 bool server_nat_traversal::handle_auxiliary_command(
@@ -208,12 +220,8 @@ bool server_nat_traversal::handle_auxiliary_command(
 						break;
 					}
 
-					LOG("Launching a STUN session this traversal.");
-
-					const auto next_host = input.detection_settings.get_next_stun_host(input.current_stun_index);
-
-					auto log_info = [](const std::string& s) { LOG(s); };
-					stun.emplace(next_host, log_info);
+					LOG("Launching a STUN session for this traversal.");
+					relaunch(stun);
 				}
 
 				case nat_traversal_step_type::PINGBACK:
@@ -247,8 +255,8 @@ void server_nat_traversal::session::open_holes(
 	netcode_address_t predicted_open_address,
 	netcode_packet_queue& queue
 ) {
-	auto response = gameserver_ping_response();
-	response.sequence = session_guid;
+	auto response = gameserver_nat_traversal_response_packet();
+	response.session_guid = session_guid;
 
 	const auto port_dt = last_payload.source_port_delta;
 

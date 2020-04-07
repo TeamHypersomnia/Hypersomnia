@@ -42,6 +42,7 @@ class server_nat_traversal {
 	bool handle_stun_response(const std::byte*, std::size_t n);
 	void open_holes_for_client(netcode_address_t);
 	bool handle_stun_packet(const std::byte* packet_buffer, const std::size_t packet_bytes);
+	void relaunch(std::optional<stun_session>&);
 
 public:
 	nat_detection_result last_detected_nat;

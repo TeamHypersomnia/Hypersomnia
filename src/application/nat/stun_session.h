@@ -17,11 +17,13 @@ class stun_session {
 	STUNMessageHeader source_request;
 
 	net_time_t when_began;
-	net_time_t when_generated_last_packet;
+	net_time_t when_generated_last_packet = -1;
 
 	std::function<void(const std::string&)> log_info;
 
 public: 
+	const address_and_port host;
+
 	enum class state {
 		RESOLVING,
 		COULD_NOT_RESOLVE_STUN_HOST,

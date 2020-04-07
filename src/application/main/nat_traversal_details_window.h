@@ -74,7 +74,7 @@ struct nat_traversal_details_window {
 		const auto& log_text = session->get_full_log();
 		const auto title = "Traversing NAT...";
 
-		center_next_window(vec2(0.55f, 0.4f), ImGuiCond_Always);
+		center_next_window(vec2(0.8f, 0.7f), ImGuiCond_Always);
 
 		const auto flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
 

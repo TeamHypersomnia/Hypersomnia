@@ -4227,3 +4227,6 @@ Advantages:
 
 - fix crash notice with multiple clients
 	- or just disable the notice whatsoever in non-production builds
+
+- Make the server restun right away if we could not resolve a stun host
+

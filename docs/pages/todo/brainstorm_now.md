@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-
 - Retry logic
 	- Cumulative traversal log
 		- Copy current to clipboard

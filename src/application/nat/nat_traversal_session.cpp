@@ -368,7 +368,8 @@ stun_session::stun_session(
 ) : 
 	future_stun_host(async_resolve_address(host)), 
 	when_began(yojimbo_time()),
-	log_info(log_info)
+	log_info(log_info),
+	host(host)
 {
 
 }

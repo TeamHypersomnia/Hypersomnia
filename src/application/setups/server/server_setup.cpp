@@ -196,8 +196,6 @@ void server_setup::send_heartbeat_to_server_list() {
 		}
 	);
 
-	// heartbeat.internal_network_address = ;
-
 	heartbeat.validate();
 	heartbeat_buffer.clear();
 
