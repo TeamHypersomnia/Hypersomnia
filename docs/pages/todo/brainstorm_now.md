@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- disallow nat on official
+ - f7 on config
+
 - Retry logic
 	- Cumulative traversal log
 		- Copy current to clipboard
@@ -13,6 +16,8 @@ summary: That which we are brainstorming at the moment.
 	- Count the total timeout from the moment we begin to traverse
 	- We will retry traversals indefinitely
 		- until the user presses Abort
+	- We need to automatically wait when we exhaust stun servers
+		- on the server too
 
 - stun_result_info
 	- remember to keep stun session in optional so that it is never initialized twice per session

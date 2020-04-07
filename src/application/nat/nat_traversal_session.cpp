@@ -177,10 +177,8 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 
 		const auto stun_state = stun_in_progress->get_current_state();
 
-		if (stun_state == stun_session::state::RESOLVING) {
-			if (stun_in_progress->has_timed_out(stun_timeout_secs)) {
-				restun();
-			}
+		if (stun_in_progress->has_timed_out(stun_timeout_secs)) {
+			restun();
 		}
 		else if (stun_state == stun_session::state::COULD_NOT_RESOLVE_STUN_HOST) {
 			restun();
@@ -419,7 +417,11 @@ stun_session::state stun_session::get_current_state() const {
 }
 
 bool stun_session::has_timed_out(const double timeout_secs) const { 
-	return yojimbo_time() - when_began >= timeout_secs;
+	if (get_current_state() == stun_session::state::RESOLVING) {
+		return yojimbo_time() - when_began >= timeout_secs;
+	}
+
+	return false;
 }
 
 std::optional<netcode_address_t> stun_session::query_result() const {
