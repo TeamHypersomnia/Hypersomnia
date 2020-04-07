@@ -6,8 +6,7 @@ struct nat_traversal_settings {
 	// GEN INTROSPECTOR struct nat_traversal_settings
 	int short_ttl = 2;
 
-	double session_timeout_secs = 10;
-	double prediction_attempt_timeout_secs = 1;
+	double traversal_attempt_timeout_secs = 5;
 	// END GEN INTROSPECTOR
 };
 

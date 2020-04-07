@@ -21,13 +21,20 @@ class server_nat_traversal {
 		net_time_t when_appeared;
 		std::optional<stun_session> stun;
 		bool holes_opened = false;
+		bool has_stun_timed_out = false;
 		nat_traversal_step_payload last_payload;
+		port_type masterserver_visible_client_port;
+
+		int times_sent_stun_info = 0;
+
+		void send_stun_result(netcode_address_t client_address, netcode_address_t masterserver_address, netcode_packet_queue&);
 
 		session();
 
 		void open_holes(netcode_address_t, netcode_packet_queue&);
 	};
 
+	const std::optional<netcode_address_t>& masterserver_address;
 	randomization stun_rng = randomization::from_random_device();
 	netcode_packet_queue packet_queue;
 	std::unordered_map<netcode_address_t, session> traversals;
@@ -40,7 +47,7 @@ public:
 	nat_detection_result last_detected_nat;
 	server_nat_traversal_input input;
 
-	server_nat_traversal(const server_nat_traversal_input&);
+	server_nat_traversal(const server_nat_traversal_input&, const std::optional<netcode_address_t>& masterserver_address);
 
 	void advance();
 

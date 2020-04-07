@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- Retry logic
+	- Cumulative traversal log
+		- Copy current to clipboard
+		- Copy cumulative to clipboard
+	- Count the total timeout from the moment we begin to traverse
+	- We will retry traversals indefinitely
+		- until the user presses Abort
+
+- stun_result_info
+	- remember to keep stun session in optional so that it is never initialized twice per session
+		- it makes sense because it forces the client to start a new session to re-stun
+
 - Remember setting the low ttl
 - Consider using client_holes_opened to open holes only once
 
@@ -16,6 +29,7 @@ summary: That which we are brainstorming at the moment.
 	- actually we can make it finer
 	- so just use that to discard all old sessions
 	- this can be used as a session guid too
+
  
 - Actually we won't need to ping masterserver periodically
 - Use port 0 by default

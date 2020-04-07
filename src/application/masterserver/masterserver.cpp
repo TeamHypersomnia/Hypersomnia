@@ -307,12 +307,19 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::stun_result_info>) {
 						/* Just relay this */
+
+						const auto& recipient = typed_request.recipient_client;
+						const auto resolved_port = typed_request.resolved_external_port;
+						const auto session_guid = typed_request.session_guid;
+
+						MSR_LOG("Received stun_result_info from a gameserver (session guid: %f, resolved port: %x). Relaying this to: %x", session_guid, resolved_port, ::ToString(recipient));
+
 						auto response = masterserver_out::stun_result_info();
 
-						response.session_guid = typed_request.session_guid;
-						response.resolved_external_port = typed_request.resolved_external_port;
+						response.session_guid = session_guid;
+						response.resolved_external_port = resolved_port;
 
-						send_to(typed_request.source_client, response);
+						send_to(recipient, response);
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::nat_traversal_step>) {
 						auto punched_server = typed_request.target_server;
@@ -348,6 +355,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 							auto step_request = masterserver_out::nat_traversal_step();
 
 							step_request.predicted_open_address = from;
+							step_request.masterserver_visible_client_port = from.port;
 
 							{
 								const auto port_opened = typed_request.port_opened_for_server;

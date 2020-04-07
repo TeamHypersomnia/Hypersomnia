@@ -58,13 +58,12 @@ bool nat_traversal_session::timed_out() {
 	}
 
 	const auto& settings = input.traversal_settings;
-	const auto session_timeout_secs = settings.session_timeout_secs;
+	const auto traversal_attempt_timeout_secs = settings.traversal_attempt_timeout_secs;
 
-	if (try_fire_interval(session_timeout_secs, when_began)) {
-		log_info("Failed to traverse NAT: timed out (%xs).", session_timeout_secs);
-		log_info("---- FINISH NAT TRAVERSAL ----");
-
+	if (try_fire_interval(traversal_attempt_timeout_secs, when_began)) {
+		log_info("Failed to traverse NAT: timed out (%xs).", traversal_attempt_timeout_secs);
 		set(state::TIMED_OUT);
+		log_info("---- FINISH NAT TRAVERSAL ----");
 		return true;
 	}
 
@@ -82,7 +81,7 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 
 	const auto packet_interval_secs = input.detection_settings.packet_interval_ms / 1000.0;
 	const auto request_interval_secs = input.detection_settings.request_interval_ms / 1000.0;
-	const auto stun_timeout_secs = input.detection_settings.stun_session_timeout_secs;
+	const auto stun_timeout_secs = input.detection_settings.stun_session_timeout_ms / 1000.0;
 
 	packet_queue.send_some(socket, packet_interval_secs);
 	receive_packets(socket);
@@ -284,26 +283,7 @@ void nat_traversal_session::handle_packet(const netcode_address_t& from, uint8_t
 		}
 	}
 
-	if (host_equal(from, input.traversed_address)) {
-		if (const auto maybe_sequence = read_ping_response(packet_buffer, packet_bytes)) {
-			const auto arrived_timestamp = augs::bit_cast<double>(*maybe_sequence);
-
-			if (arrived_timestamp == session_guid) {
-				log_info("Success packet arrived from: %x (session timestamp: %f)", ::ToString(from), arrived_timestamp);
-				log_info("Successfully traversed the host.");
-				set(state::TRAVERSAL_COMPLETE);
-				log_info("---- FINISH NAT TRAVERSAL ----");
-
-				opened_remote_port = from.port;
-			}
-			else {
-				log_info("Success packet arrived from the host, but the session timestamp does not match: %f", augs::bit_cast<double>(*maybe_sequence));
-			}
-		}
-
-		return;
-	}
-	else if (from == input.masterserver_address) {
+	if (from == input.masterserver_address) {
 		auto handle_server_stun_result = [this](
 			const auto& response
 		) {
@@ -336,6 +316,24 @@ void nat_traversal_session::handle_packet(const netcode_address_t& from, uint8_t
 
 		}
 	}
+	else if (host_equal(from, input.traversed_address)) {
+		if (const auto maybe_session_guid = read_nat_traversal_success_packet(packet_buffer, packet_bytes)) {
+
+			if (*maybe_session_guid == session_guid) {
+				log_info("Success packet arrived from: %x (session timestamp: %f)", ::ToString(from), *maybe_session_guid);
+				log_info("Successfully traversed the host.");
+				set(state::TRAVERSAL_COMPLETE);
+				log_info("---- FINISH NAT TRAVERSAL ----");
+
+				opened_remote_port = from.port;
+			}
+			else {
+				log_info("Success packet arrived from the host, but the session timestamp does not match: %f", *maybe_session_guid);
+			}
+		}
+
+		return;
+	}
 }
 
 void nat_traversal_session::receive_packets(netcode_socket_t socket) {
@@ -364,8 +362,13 @@ netcode_address_t nat_traversal_session::get_opened_address() const {
 	return result;
 }
 
-stun_session::stun_session(const address_and_port& host, std::function<void(const std::string&)> log_info) 
-	: future_stun_host(async_resolve_address(host)), log_info(log_info)
+stun_session::stun_session(
+	const address_and_port& host,
+	std::function<void(const std::string&)> log_info
+) : 
+	future_stun_host(async_resolve_address(host)), 
+	when_began(yojimbo_time()),
+	log_info(log_info)
 {
 
 }

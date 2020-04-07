@@ -96,7 +96,7 @@ server_setup::server_setup(
 		)
 	),
 	server_time(yojimbo_time()),
-	nat_traversal(nat_traversal_input)
+	nat_traversal(nat_traversal_input, resolved_server_list_addr)
 {
 	const bool force = true;
 

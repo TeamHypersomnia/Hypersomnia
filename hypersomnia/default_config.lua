@@ -22,14 +22,14 @@ return {
 		  { address = "stun2.l.google.com:19302" },
 		  { address = "stun3.l.google.com:19302" },
 		  { address = "stun4.l.google.com:19302" },
+		  { address = "stun.schlund.de:3478" },
+		  { address = "stun.1und1.de:3478" }
 	  }
   },
 
   nat_traversal = {
 	  short_ttl = 2,
-
-	  session_timeout_secs = 10,
-	  prediction_attempt_timeout_secs = 1
+	  traversal_attempt_timeout_secs = 5
   },
 
   masterserver = {

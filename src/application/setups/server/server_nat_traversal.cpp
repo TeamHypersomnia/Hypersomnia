@@ -8,24 +8,52 @@
 #include "augs/network/netcode_utils.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/templates/bit_cast.h"
+#include "application/masterserver/masterserver.h"
 
 double yojimbo_time();
 
-server_nat_traversal::server_nat_traversal(const server_nat_traversal_input& input) : input(input) {}
+server_nat_traversal::server_nat_traversal(
+	const server_nat_traversal_input& input,
+	const std::optional<netcode_address_t>& masterserver_address
+) : 
+	masterserver_address(masterserver_address),
+	input(input)
+{}
 
 void server_nat_traversal::send_packets(netcode_socket_t socket) {
 	const auto interval_secs = input.detection_settings.packet_interval_ms / 1000.0;
 	packet_queue.send_some(socket, interval_secs);
 }
 
+void server_nat_traversal::session::send_stun_result(
+	netcode_address_t client_address,
+	netcode_address_t masterserver_address,
+	netcode_packet_queue& queue
+) {
+	if (const auto result = stun->query_result()) {
+		auto result_info = masterserver_in::stun_result_info();
+
+		result_info.session_guid = session_guid;
+		result_info.recipient_client = client_address;
+		result_info.recipient_client.port = masterserver_visible_client_port;
+
+		result_info.resolved_external_port = result->port;
+
+		const auto info_bytes = augs::to_bytes(masterserver_request(result_info));
+		queue(masterserver_address, info_bytes);
+		++times_sent_stun_info;
+	}
+}
+
 void server_nat_traversal::advance() {
 	const auto request_interval_secs = input.detection_settings.request_interval_ms / 1000.0;
-	const auto stun_timeout_secs = input.detection_settings.stun_session_timeout_secs;
+	const auto stun_timeout_secs = input.detection_settings.stun_session_timeout_ms / 1000.0;
 
 	erase_if(traversals, [&](auto& entry) {
+		const auto client_address = entry.first;
 		auto& traversal = entry.second;
 
-		if (try_fire_interval(input.traversal_settings.session_timeout_secs, traversal.when_appeared)) {
+		if (try_fire_interval(input.traversal_settings.traversal_attempt_timeout_secs, traversal.when_appeared)) {
 			return true;
 		}
 
@@ -33,6 +61,11 @@ void server_nat_traversal::advance() {
 
 		if (stun != std::nullopt) {
 			if (stun->has_timed_out(stun_timeout_secs)) {
+				if (!traversal.has_stun_timed_out) {
+					traversal.has_stun_timed_out = true;
+					LOG("Stun request has timed out.");
+				}
+
 				return false;
 			}
 
@@ -42,8 +75,20 @@ void server_nat_traversal::advance() {
 
 				if (!traversal.holes_opened) {
 					LOG("Opening holes for the client right away to increase the chance of an adjacent port.");
-					const auto client_address = entry.first;
 					traversal.open_holes(client_address, packet_queue);
+				}
+			}
+
+			const auto state = stun->get_current_state();
+
+			if (state == stun_session::state::COMPLETED) {
+				if (masterserver_address != std::nullopt) {
+					const auto& times = traversal.times_sent_stun_info;
+
+					if (times == 0) {
+						LOG("Sending the STUN result info for the first time.");
+						traversal.send_stun_result(client_address, *masterserver_address, packet_queue);
+					}
 				}
 			}
 		}
@@ -95,6 +140,10 @@ bool server_nat_traversal::handle_auxiliary_command(
 				return;
 			}
 
+			if (from != masterserver_address) {
+				return;
+			}
+
 			LOG("Received traversal step from masterserver.");
 
 			const auto& client_address = typed_request.predicted_open_address;
@@ -132,13 +181,30 @@ bool server_nat_traversal::handle_auxiliary_command(
 
 			auto& traversal = traversals[client_address];
 			traversal.last_payload = payload;
+			traversal.masterserver_visible_client_port = typed_request.masterserver_visible_client_port;
 
 			switch (payload.type) {
 				case nat_traversal_step_type::RESTUN: {
 					auto& stun = traversal.stun;
 
 					if (stun != std::nullopt) {
-						LOG("STUN session for this traversal already in progress. Ignoring request.");
+						const auto state = stun->get_current_state();
+
+						if (state == stun_session::state::COMPLETED) {
+							const auto max_times_resend_stun_result = 5;
+
+							if (traversal.times_sent_stun_info <= max_times_resend_stun_result) {
+								if (masterserver_address != std::nullopt) {
+									LOG("Resending the STUN result.");
+
+									traversal.send_stun_result(client_address, *masterserver_address, packet_queue);
+								}
+							}
+						}
+						else {
+							// LOG("Already launched a STUN session in this traversal. Ignoring further requests until STUN completes.");
+						}
+
 						break;
 					}
 
