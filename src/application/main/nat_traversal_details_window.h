@@ -90,37 +90,31 @@ struct nat_traversal_details_window {
 	) {
 		using namespace augs::imgui;
 
-		if (session == std::nullopt) {
-			if (is_open) {
-				ImGui::CloseCurrentPopup();
-				is_open = false;
-			}
-
-			return false;
-		}
-
-		const auto title = "Traversing NAT...";
-
-		{
-			auto& current_attempt = attempts[current_attempt_index];
-
-			if (!aborted) {
-				const auto& log_text = session->get_full_log();
-
-				current_attempt.log_text = log_text;
-				current_attempt.bound_port = bound_local_port;
-			}
-		}
-
-		const auto& shown_attempt = attempts[current_attempt_index];
-
-		center_next_window(vec2(0.8f, 0.7f), ImGuiCond_Always);
-
 		const auto flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
+		const auto title = "Traversing NAT...";
 
 		bool result = false;
 
-		if (auto popup = scoped_modal_popup(title, nullptr, flags)) {
+		const bool should_be_open = session != std::nullopt;
+
+		if (should_be_open) {
+			center_next_window(vec2(0.8f, 0.7f), ImGuiCond_Always);
+		}
+
+		if (auto popup = cond_scoped_modal_popup(should_be_open, title, nullptr, flags)) {
+			{
+				auto& current_attempt = attempts[current_attempt_index];
+
+				if (!aborted) {
+					const auto& log_text = session->get_full_log();
+
+					current_attempt.log_text = log_text;
+					current_attempt.bound_port = bound_local_port;
+				}
+			}
+
+			const auto& shown_attempt = attempts[current_attempt_index];
+
 			is_open = true;
 
 			const auto client_type = session->input.client.type;
@@ -217,6 +211,7 @@ struct nat_traversal_details_window {
 					ImGui::SameLine();
 
 					if (ImGui::Button("Cancel")) {
+						ImGui::CloseCurrentPopup();
 						result = true;
 					}
 				}

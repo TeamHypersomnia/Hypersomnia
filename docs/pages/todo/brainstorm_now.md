@@ -6,11 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Config fixes Remove duplicate STUN Better packet interval - 1 ms sometimes yields out of order, 10 is too much, 5 is just about right
+- assign port to the internal network address
 
-- maybe somehow save that port number when the textbox deactivates...
-- disallow nat on official
- - f7 on config
+- port number in start server gui: maybe somehow save that port number when the textbox deactivates...
+
+- disallow nat on official server
+ - use vim_run in a folder with a config file to deploy it to all servers
 
 - Retry logic
 	- Cumulative traversal log

@@ -527,16 +527,15 @@ work_result work(const int argc, const char* const * const argv) try {
 			typesafe_sprintf("NAT detection for port %x is in progress...\nPlease be patient.", get_bound_local_port())
 		;
 
-		if (pending_launch != std::nullopt && !nat_detection_complete()) {
-			const auto pending = *pending_launch;
-			const auto title = "Launching " + format_enum(pending) + "...";
+		const bool should_be_open = 
+			pending_launch != std::nullopt 
+			&& !nat_detection_complete()
+		;
 
-			if (const bool aborted = nat_detection_popup.perform(title, message)) {
-				pending_launch = std::nullopt;
-			}
-		}
-		else {
-			nat_detection_popup.close();
+		const auto title = "Launching setup...";
+
+		if (const bool aborted = nat_detection_popup.perform(should_be_open, title, message)) {
+			pending_launch = std::nullopt;
 		}
 	};
 
@@ -1431,6 +1430,10 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				streaming.display_loading_progress();
 
+				advance_nat_traversal();
+				do_traversal_details_popup(window);
+				do_detection_details_popup();
+
 				if (pending_launch != std::nullopt) {
 					const auto l = pending_launch;
 
@@ -1446,14 +1449,10 @@ work_result work(const int argc, const char* const * const argv) try {
 								start_nat_traversal();
 							}
 
-							advance_nat_traversal();
-							do_traversal_details_popup(window);
 							check_nat_traversal_result();
 						}
 					}
 				}
-
-				do_detection_details_popup();
 			},
 
 			[&]() {

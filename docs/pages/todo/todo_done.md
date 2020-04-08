@@ -4230,3 +4230,6 @@ Advantages:
 
 - Make the server restun right away if we could not resolve a stun host
 
+- fix those modal popups
+	- nat detection too
+

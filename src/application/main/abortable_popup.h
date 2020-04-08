@@ -1,30 +1,23 @@
 #pragma once
 
-class abortable_popup_state {
-	bool is_open = false;
-public:
-
-	bool perform(const std::string& title, const std::string& message) {
+struct abortable_popup_state {
+	bool perform(
+		const bool should_popup_be_open, 
+		const std::string& title, 
+		const std::string& message
+	) {
 		using namespace augs::imgui;
 
-		if (auto popup = scoped_modal_popup(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			is_open = true;
-
+		if (auto popup = cond_scoped_modal_popup(should_popup_be_open, title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 			text(message + "\n");
 			ImGui::Separator();
 
 			if (ImGui::Button("Abort")) {
+				ImGui::CloseCurrentPopup();
 				return true;
 			}
 		}
 
 		return false;
-	}
-	
-	void close() {
-		if (is_open) {
-			ImGui::CloseCurrentPopup();
-			is_open = false;
-		}
 	}
 };

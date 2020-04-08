@@ -115,6 +115,31 @@ namespace augs {
 		}
 
 		template <class... T>
+		auto cond_scoped_modal_popup(const bool should_be_open, const std::string& label, T&&... args) {
+			if (should_be_open) {
+				if (!ImGui::IsPopupOpen(label.c_str())) {
+					ImGui::OpenPopup(label.c_str());
+				}
+			}
+
+			const auto is_open = ImGui::BeginPopupModal(label.c_str(), std::forward<T>(args)...);
+
+			if (is_open) {
+				if (!should_be_open) {
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			auto opt = scope_guard([]() { { ImGui::EndPopup(); }});
+
+			if (!is_open) {
+				opt.release();
+			}
+
+			return opt;
+		}
+
+		template <class... T>
 		auto scoped_modal_popup(const std::string& label, T&&... args) {
 			if (!ImGui::IsPopupOpen(label.c_str())) {
 				ImGui::OpenPopup(label.c_str());
