@@ -510,28 +510,6 @@ work_result work(const int argc, const char* const * const argv) try {
 	static auto nat_traversal = std::optional<nat_traversal_session>();
 	static auto nat_traversal_details = nat_traversal_details_window();
 
-	static auto launch_nat_traversal = [](
-		const nat_detection_result& server_nat, 
-		const netcode_address_t& traversed_address
-	) {
-		ensure(nat_detection_complete());
-
-		const auto masterserver_address = nat_detection->get_resolved_port_probing_host();
-
-		ensure(masterserver_address != std::nullopt);
-
-		nat_traversal.reset();
-		nat_traversal.emplace(nat_traversal_input {
-			*masterserver_address,
-			traversed_address,
-
-			get_detected_nat(),
-			server_nat,
-			config.nat_detection,
-			config.nat_traversal
-		}, stun_provider);
-	};
-
 	static auto do_traversal_details_popup = []() {
 		if (const bool aborted = nat_traversal_details.perform(get_bound_local_port(), nat_traversal)) {
 			nat_traversal.reset();
@@ -1068,6 +1046,47 @@ work_result work(const int argc, const char* const * const argv) try {
 		});
 	};
 
+	static auto finalize_pending_launch = [](const bool ignore_nat_check = false) {
+		launch_setup(*pending_launch, ignore_nat_check);
+		pending_launch = std::nullopt;
+	};
+
+	static auto launch_nat_traversal = []() {
+		const auto& server_nat = chosen_server_nat;
+		const auto& client_start = config.default_client_start;
+		const auto traversed_address = to_netcode_addr(client_start.get_address_and_port());
+
+		ensure(traversed_address != std::nullopt);
+		ensure(nat_detection_complete());
+
+		const auto masterserver_address = nat_detection->get_resolved_port_probing_host();
+
+		ensure(masterserver_address != std::nullopt);
+
+		nat_traversal.reset();
+		nat_traversal.emplace(nat_traversal_input {
+			*masterserver_address,
+			*traversed_address,
+
+			get_detected_nat(),
+			server_nat,
+			config.nat_detection,
+			config.nat_traversal
+		}, stun_provider);
+	};
+
+	static auto advance_nat_traversal = []() {
+		const auto state = nat_traversal->get_current_state();
+
+		if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
+			config.default_client_start.set_custom(::ToString(nat_traversal->get_opened_address()));
+			nat_traversal.reset();
+
+			const bool ignore_nat_check = true;
+			finalize_pending_launch(ignore_nat_check);
+		}
+	};
+
 	static bool client_start_requested = false;
 	static bool server_start_requested = false;
 
@@ -1395,23 +1414,10 @@ work_result work(const int argc, const char* const * const argv) try {
 					if (l == launch_type::CLIENT) {
 						if (nat_detection_complete()) {
 							if (nat_traversal == std::nullopt) {
-								const auto& client_start = config.default_client_start;
-								const auto traversed_server_addr = to_netcode_addr(client_start.get_address_and_port());
-
-								ensure(traversed_server_addr != std::nullopt);
-
-								launch_nat_traversal(chosen_server_nat, *traversed_server_addr);
+								launch_nat_traversal();
 							}
 
-							const auto state = nat_traversal->get_current_state();
-
-							if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
-								config.default_client_start.set_custom(::ToString(nat_traversal->get_opened_address()));
-								nat_traversal.reset();
-
-								const bool ignore_nat_check = true;
-								finalize_pending_launch(ignore_nat_check);
-							}
+							advance_nat_traversal();
 						}
 					}
 				}
