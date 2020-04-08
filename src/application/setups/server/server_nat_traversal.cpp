@@ -222,6 +222,7 @@ bool server_nat_traversal::handle_auxiliary_command(
 
 					LOG("Launching a STUN session for this traversal.");
 					relaunch(stun);
+					break;
 				}
 
 				case nat_traversal_step_type::PINGBACK:
