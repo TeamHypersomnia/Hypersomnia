@@ -8,6 +8,8 @@ return {
   },
 
   nat_detection = {
+	  packet_interval_ms = 5,
+
 	  port_probing_host = {
 		  address = "masterserver.hypersomnia.xyz",
 		  default_port = 8430
@@ -22,13 +24,13 @@ return {
 		  { address = "stun2.l.google.com:19302" },
 		  { address = "stun3.l.google.com:19302" },
 		  { address = "stun4.l.google.com:19302" },
-		  { address = "stun.schlund.de:3478" },
-		  { address = "stun.1und1.de:3478" }
+		  { address = "stun.schlund.de:3478" }
 	  }
   },
 
   nat_traversal = {
 	  short_ttl = 2,
+	  num_brute_force_packets = 5,
 	  traversal_attempt_timeout_secs = 5
   },
 

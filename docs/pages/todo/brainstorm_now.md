@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Config fixes Remove duplicate STUN Better packet interval - 1 ms sometimes yields out of order, 10 is too much, 5 is just about right
+
+- maybe somehow save that port number when the textbox deactivates...
 - disallow nat on official
  - f7 on config
 

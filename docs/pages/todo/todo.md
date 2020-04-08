@@ -5,6 +5,11 @@ hide_sidebar: true
 permalink: todo
 summary: Just a hidden scratchpad.
 ---
+
+- Inventory improvements
+	- When a melee weapon is involved in akimbo, pressing its corresponding button results in a throw
+	- When two melee weapons are wielded, pressing its button results in both thrown at once
+
 - "Are you sure you want to quit?" from the ingame main menu
 
 - fix vim's premature build successful

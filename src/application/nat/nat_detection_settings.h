@@ -12,7 +12,7 @@ struct nat_detection_settings {
 
 	uint32_t stun_session_timeout_ms = 1000;
 	uint32_t request_interval_ms = 200;
-	uint32_t packet_interval_ms = 10;
+	uint32_t packet_interval_ms = 5;
 	// END GEN INTROSPECTOR
 
 	template <class T>
