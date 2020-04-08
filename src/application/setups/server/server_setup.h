@@ -254,6 +254,12 @@ public:
 
 		if (vars.allow_nat_traversal) {
 			nat_traversal.last_detected_nat = in.last_detected_nat;
+
+			if (auto socket = find_underlying_socket()) {
+				nat_traversal.send_packets(*socket);
+			}
+
+			nat_traversal.advance();
 		}
 		else {
 			nat_traversal.last_detected_nat = nat_detection_result();
@@ -303,8 +309,6 @@ public:
 				auto scope = measure_scope(profiler.send_entropies);
 				send_server_step_entropies(step_collected);
 			}
-
-			nat_traversal.advance();
 
 			{
 				auto scope = measure_scope(profiler.send_packets);

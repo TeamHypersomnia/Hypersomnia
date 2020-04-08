@@ -44,7 +44,7 @@ nat_detection_session::nat_detection_session(nat_detection_session::session_inpu
 nat_detection_session::nat_detection_session(
 	nat_detection_session::session_input in,
 	stun_server_provider& stun_provider,
-	log_sink_type log_sink
+	log_function log_sink
 ) :
 	settings(in),
 	stun_provider(stun_provider),
@@ -433,7 +433,25 @@ const std::optional<netcode_address_t>& nat_detection_session::get_resolved_port
 	return resolved_port_probing_host;
 }
 
-void netcode_packet_queue::send_one(netcode_socket_t socket) {
+std::string stringize_bytes(const std::vector<std::byte>& bytes) {
+	std::string bytes_str;
+
+	for (const auto& b : bytes) {
+		bytes_str += typesafe_sprintf("%xh ", b);
+	}
+
+	bytes_str.pop_back();
+
+	return bytes_str;
+}
+
+double yojimbo_time();
+
+std::string describe_packet(const netcode_queued_packet& p) {
+	return typesafe_sprintf("[PACKET] [%f] %x (%x bytes): %x", yojimbo_time(), ToString(p.first), p.second.size(), stringize_bytes(p.second));
+}
+
+void netcode_packet_queue::send_one(netcode_socket_t socket, log_function log_sink) {
 	if (queue.empty()) {
 		return;
 	}
@@ -442,13 +460,15 @@ void netcode_packet_queue::send_one(netcode_socket_t socket) {
 	auto& bytes = packet.second;
 	auto& address = packet.first;
 
+	log_sink(describe_packet(packet));
+
 	netcode_socket_send_packet(&socket, &address, bytes.data(), bytes.size());
 
 	queue.erase(queue.begin());
 }
 
-void netcode_packet_queue::send_some(netcode_socket_t socket, const double interval_seconds) {
+void netcode_packet_queue::send_some(netcode_socket_t socket, const double interval_seconds, log_function log_sink) {
 	if (try_fire_interval(interval_seconds, when_last)) {
-		send_one(socket);
+		send_one(socket, log_sink);
 	}
 }

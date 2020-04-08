@@ -1318,10 +1318,6 @@ void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& e
 }
 
 void server_setup::send_packets_if_its_time() {
-	if (auto socket = find_underlying_socket()) {
-		nat_traversal.send_packets(*socket);
-	}
-
 	auto& ticks_remaining = ticks_until_sending_packets;
 
 	if (ticks_remaining == 0) {

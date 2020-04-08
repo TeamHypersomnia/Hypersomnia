@@ -156,7 +156,7 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 			target_address.port = target_port;
 
 			const auto sequence = augs::bit_cast<std::uint64_t>(session_guid);
-			packet_queue(ping_this_server(target_address, sequence));
+			packet_queue(make_ping_packet(target_address, sequence));
 		};
 
 		if (last_server_stunned_port != 0) {
@@ -363,7 +363,7 @@ netcode_address_t nat_traversal_session::get_opened_address() const {
 
 stun_session::stun_session(
 	const address_and_port& host,
-	std::function<void(const std::string&)> log_info
+	log_function log_info
 ) : 
 	future_stun_host(async_resolve_address(host)), 
 	when_began(yojimbo_time()),

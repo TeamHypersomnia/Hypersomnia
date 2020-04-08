@@ -4233,3 +4233,5 @@ Advantages:
 - fix those modal popups
 	- nat detection too
 
+- assign port to the internal network address
+

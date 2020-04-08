@@ -12,8 +12,7 @@
 
 #include "application/nat/stun_request_structs.h"
 #include "application/nat/netcode_packet_queue.h"
-
-using log_sink_type = std::function<void(const std::string&)>;
+#include "augs/misc/log_function.h"
 
 struct stun_server_provider;
 struct netcode_socket_t;
@@ -42,7 +41,7 @@ class nat_detection_session {
 
 	const nat_detection_settings settings;
 	stun_server_provider& stun_provider;
-	log_sink_type log_sink;
+	log_function log_sink;
 	std::string full_log;
 
 	std::vector<std::future<resolve_address_result>> future_stun_hosts;
@@ -90,7 +89,7 @@ public:
 	using session_input = ::nat_detection_settings;
 
 	nat_detection_session(session_input, stun_server_provider&);
-	nat_detection_session(session_input, stun_server_provider&, log_sink_type);
+	nat_detection_session(session_input, stun_server_provider&, log_function);
 
 	void advance(netcode_socket_t);
 

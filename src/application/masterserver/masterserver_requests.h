@@ -22,7 +22,7 @@ void netcode_send_to_masterserver(netcode_socket_t socket, netcode_address_t mas
 	netcode_socket_send_packet(&socket, &masterserver_address, bytes.data(), bytes.size());
 }
 
-inline netcode_queued_packet ping_this_server(netcode_address_t target_server, const uint64_t sequence) {
+inline netcode_queued_packet make_ping_packet(netcode_address_t target_server, const uint64_t sequence) {
 	auto bytes = make_gameserver_command_bytes(gameserver_ping_request { sequence });
 	return { target_server, bytes };
 }
@@ -30,6 +30,6 @@ inline netcode_queued_packet ping_this_server(netcode_address_t target_server, c
 inline void ping_this_server(netcode_socket_t socket, netcode_address_t target_server, const uint64_t sequence) {
 	LOG("Pinging %x", ::ToString(target_server));
 
-	auto packet = ping_this_server(target_server, sequence);
+	auto packet = make_ping_packet(target_server, sequence);
 	netcode_socket_send_packet(&socket, &packet.first, packet.second.data(), packet.second.size());
 }

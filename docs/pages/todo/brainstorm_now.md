@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- assign port to the internal network address
-
 - port number in start server gui: maybe somehow save that port number when the textbox deactivates...
 
 - disallow nat on official server
@@ -18,6 +16,7 @@ summary: That which we are brainstorming at the moment.
 		- Copy current to clipboard
 		- Copy cumulative to clipboard
 	- Count the total timeout from the moment we begin to traverse
+		- Actually safer to just count from the beginning
 	- We will retry traversals indefinitely
 		- until the user presses Abort
 	- We need to automatically wait when we exhaust stun servers

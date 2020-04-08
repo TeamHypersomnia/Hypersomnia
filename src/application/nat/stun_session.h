@@ -6,6 +6,7 @@
 #include "application/network/address_and_port.h"
 #include "augs/network/network_types.h"
 #include "application/nat/netcode_packet_queue.h"
+#include "augs/misc/log_function.h"
 
 struct randomization;
 
@@ -21,7 +22,7 @@ class stun_session {
 	net_time_t when_completed = -1;
 	net_time_t when_generated_last_packet = -1;
 
-	std::function<void(const std::string&)> log_info;
+	log_function log_info;
 
 public: 
 	const address_and_port host;
@@ -33,7 +34,7 @@ public:
 		COMPLETED
 	};
 
-	stun_session(const address_and_port& host, std::function<void(const std::string&)> log_info);
+	stun_session(const address_and_port& host, log_function log_info);
 
 	std::optional<netcode_address_t> query_result() const;
 
