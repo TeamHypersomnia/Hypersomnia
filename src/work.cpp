@@ -451,8 +451,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto last_requested_local_port = port_type(0);
 
-	static auto recreate_auxiliary_socket = []() {
-		const auto preferred_port = chosen_server_port();
+	static auto recreate_auxiliary_socket = [](std::optional<port_type> temporary_port = std::nullopt) {
+		const auto preferred_port = temporary_port != std::nullopt ? *temporary_port : chosen_server_port();
 		last_requested_local_port = preferred_port;
 
 		try {
@@ -510,10 +510,15 @@ work_result work(const int argc, const char* const * const argv) try {
 	static auto nat_traversal = std::optional<nat_traversal_session>();
 	static auto nat_traversal_details = nat_traversal_details_window();
 
-	static auto do_traversal_details_popup = []() {
-		if (const bool aborted = nat_traversal_details.perform(get_bound_local_port(), nat_traversal)) {
+	static auto do_traversal_details_popup = [](auto& window) {
+		if (const bool aborted = nat_traversal_details.perform(window, get_bound_local_port(), nat_traversal)) {
 			nat_traversal.reset();
 			pending_launch = std::nullopt;
+
+			if (chosen_server_port() == 0) {
+				const auto next_port = get_bound_local_port();
+				recreate_auxiliary_socket(next_port + 1);
+			}
 		}
 	};
 
@@ -1051,7 +1056,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		pending_launch = std::nullopt;
 	};
 
-	static auto launch_nat_traversal = []() {
+	static auto next_nat_traversal_attempt = []() {
 		const auto& server_nat = chosen_server_nat;
 		const auto& client_start = config.default_client_start;
 		const auto traversed_address = to_netcode_addr(client_start.get_address_and_port());
@@ -1062,6 +1067,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		const auto masterserver_address = nat_detection->get_resolved_port_probing_host();
 
 		ensure(masterserver_address != std::nullopt);
+
+		nat_traversal_details.next_attempt();
 
 		nat_traversal.reset();
 		nat_traversal.emplace(nat_traversal_input {
@@ -1075,7 +1082,25 @@ work_result work(const int argc, const char* const * const argv) try {
 		}, stun_provider);
 	};
 
+	static auto start_nat_traversal = []() {
+		nat_traversal_details.reset();
+
+		next_nat_traversal_attempt();
+	};
+	
 	static auto advance_nat_traversal = []() {
+		if (nat_traversal_details.aborted) {
+			return;
+		}
+
+		if (nat_traversal != std::nullopt) {
+			if (auxiliary_socket != std::nullopt) {
+				nat_traversal->advance(auxiliary_socket->socket);
+			}
+		}
+	};
+
+	static auto check_nat_traversal_result = []() {
 		const auto state = nat_traversal->get_current_state();
 
 		if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
@@ -1084,6 +1109,11 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			const bool ignore_nat_check = true;
 			finalize_pending_launch(ignore_nat_check);
+		}
+		else if (state == nat_traversal_session::state::TIMED_OUT) {
+			const auto next_port = get_bound_local_port();
+			recreate_auxiliary_socket(next_port + 1);
+			next_nat_traversal_attempt();
 		}
 	};
 
@@ -1365,25 +1395,29 @@ work_result work(const int argc, const char* const * const argv) try {
 			audio,
 			lua,
 			[&]() {
-				if (last_requested_local_port != chosen_server_port()) {
-					recreate_auxiliary_socket();
-					restart_nat_detection();
-				}
-
-				if (nat_detection != std::nullopt) {
-					if (!augs::introspective_equal(config.nat_detection, nat_detection->get_settings())) {
+				auto do_nat_detection_logic = []() {
+					if (last_requested_local_port != chosen_server_port()) {
+						recreate_auxiliary_socket();
 						restart_nat_detection();
 					}
 
-					if (auxiliary_socket != std::nullopt) {
-						nat_detection->advance(auxiliary_socket->socket);
-					}
-				}
+					if (nat_detection != std::nullopt) {
+						if (!augs::introspective_equal(config.nat_detection, nat_detection->get_settings())) {
+							restart_nat_detection();
+						}
 
-				if (nat_traversal != std::nullopt) {
-					if (auxiliary_socket != std::nullopt) {
-						nat_traversal->advance(auxiliary_socket->socket);
+						if (auxiliary_socket != std::nullopt) {
+							nat_detection->advance(auxiliary_socket->socket);
+						}
 					}
+				};
+
+				/* 
+					Prevent nat detection from tampering with traversal logic, 
+					as we'll rebind the local port frequently 
+				*/
+				if (nat_traversal == std::nullopt) {
+					do_nat_detection_logic();
 				}
 
 				browse_servers_gui.advance_ping_logic();
@@ -1400,11 +1434,6 @@ work_result work(const int argc, const char* const * const argv) try {
 				if (pending_launch != std::nullopt) {
 					const auto l = pending_launch;
 
-					auto finalize_pending_launch = [&](const bool ignore_nat_check = false) {
-						launch_setup(*pending_launch, ignore_nat_check);
-						pending_launch = std::nullopt;
-					};
-
 					if (l == launch_type::SERVER) {
 						if (nat_detection_complete()) {
 							finalize_pending_launch();
@@ -1414,15 +1443,16 @@ work_result work(const int argc, const char* const * const argv) try {
 					if (l == launch_type::CLIENT) {
 						if (nat_detection_complete()) {
 							if (nat_traversal == std::nullopt) {
-								launch_nat_traversal();
+								start_nat_traversal();
 							}
 
 							advance_nat_traversal();
+							do_traversal_details_popup(window);
+							check_nat_traversal_result();
 						}
 					}
 				}
 
-				do_traversal_details_popup();
 				do_detection_details_popup();
 			},
 

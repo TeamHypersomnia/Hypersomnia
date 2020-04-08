@@ -16,8 +16,8 @@ return {
 	  },
 	  max_ports_for_probing = 40,
 
-	  num_ports_probed = 4,
-	  num_stun_hosts_used_for_detection = 1,
+	  num_ports_probed = 3,
+	  num_stun_hosts_used_for_detection = 2,
 
 	  nat_translation_entry_timeout_secs = 30,
 

@@ -274,7 +274,8 @@ static nat_detection_result calculate_from(
 
 	const auto predicted_port_step = [&]() {
 		if (type == nat_type::PORT_SENSITIVE) {
-			return predict_port_from(concatenated(cross_address_deltas, cross_ports_deltas));
+			const auto concatenated_deltas = concatenated(cross_address_deltas, cross_ports_deltas);
+			return predict_port_from(concatenated_deltas);
 		}
 
 		if (type == nat_type::ADDRESS_SENSITIVE) {

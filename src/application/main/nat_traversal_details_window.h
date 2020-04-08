@@ -1,4 +1,7 @@
 #pragma once
+#include "augs/log_path_getters.h"
+#include "augs/filesystem/file.h"
+#include "application/setups/editor/detail/maybe_different_colors.h"
 
 std::string nat_traversal_state_to_string(const nat_traversal_session::state state) {
 	using S = nat_traversal_session::state;
@@ -54,11 +57,34 @@ rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
 
 
 struct nat_traversal_details_window {
-	bool is_open = false;
+	bool rechoose_random_port_on_start = false;
 
-	std::vector<std::string> attempt_logs;
+	bool is_open = false;
+	bool aborted = false;
+
+	struct attempt_log {
+		port_type bound_port;
+		std::string log_text;
+	};
+
+	int current_attempt_index = -1;
+	std::vector<attempt_log> attempts;
+	
+	void next_attempt() {
+		++current_attempt_index;
+		attempts.emplace_back();
+	}
+
+	void reset() {
+		rechoose_random_port_on_start = true;
+
+		attempts.clear();
+		current_attempt_index = -1;
+		aborted = false;
+	}
 
 	bool perform(
+		augs::window& window,
 		const port_type bound_local_port,
 		const std::optional<nat_traversal_session>& session
 	) {
@@ -73,16 +99,28 @@ struct nat_traversal_details_window {
 			return false;
 		}
 
-		const auto& log_text = session->get_full_log();
 		const auto title = "Traversing NAT...";
+
+		{
+			auto& current_attempt = attempts[current_attempt_index];
+
+			if (!aborted) {
+				const auto& log_text = session->get_full_log();
+
+				current_attempt.log_text = log_text;
+				current_attempt.bound_port = bound_local_port;
+			}
+		}
+
+		const auto& shown_attempt = attempts[current_attempt_index];
 
 		center_next_window(vec2(0.8f, 0.7f), ImGuiCond_Always);
 
 		const auto flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
 
-		bool op = true;
+		bool result = false;
 
-		if (auto popup = scoped_modal_popup(title, &op, flags)) {
+		if (auto popup = scoped_modal_popup(title, nullptr, flags)) {
 			is_open = true;
 
 			const auto client_type = session->input.client.type;
@@ -91,9 +129,9 @@ struct nat_traversal_details_window {
 			{
 				auto child = scoped_child("details view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 
-				text_disabled("Currently bound port:");
+				text_disabled("Bound port for this attempt:");
 				ImGui::SameLine();
-				text(std::to_string(bound_local_port));
+				text(std::to_string(shown_attempt.bound_port));
 
 				text("Client NAT:");
 				ImGui::SameLine();
@@ -106,16 +144,33 @@ struct nat_traversal_details_window {
 				text("Progress:");
 				ImGui::SameLine();
 
-				const auto state = session->get_current_state();
-				text_color(nat_traversal_state_to_string(state), nat_traversal_state_to_color(state));
+				if (aborted) {
+					text_color("Aborted", red);
+				}
+				else {
+					const auto state = session->get_current_state();
+					text_color(nat_traversal_state_to_string(state), nat_traversal_state_to_color(state));
+				}
+
+				{
+					auto disabled = ::maybe_disabled_cols({}, !aborted);
+
+					if (aborted) {
+						auto width = scoped_item_width(200);
+						text("Showing attempt");
+						ImGui::SameLine();
+						slider("##Showing attempt", current_attempt_index, 0, int(attempts.size()) - 1);
+					}
+					else {
+						text("Attempt number %x", 1 + current_attempt_index);
+					}
+				}
 
 				ImGui::Separator();
 
 				const auto log_color = rgba(210, 210, 210, 255);
-				text_color(log_text, log_color);
+				text_color(shown_attempt.log_text, log_color);
 			}
-
-			bool result = false;
 
 			{
 				auto scope = scoped_child("abort");
@@ -123,19 +178,51 @@ struct nat_traversal_details_window {
 				ImGui::Separator();
 
 				if (ImGui::Button("Copy to clipboard")) {
-					ImGui::SetClipboardText(log_text.c_str());
+					ImGui::SetClipboardText(shown_attempt.log_text.c_str());
 				}
 
 				ImGui::SameLine();
 
-				if (ImGui::Button("Abort")) {
-					result = true;
+				if (ImGui::Button("Dump full log")) {
+					auto full_log = std::string();
+
+					for (std::size_t i = 0; i < attempts.size(); ++i) {
+						const auto& a = attempts[i];
+
+						full_log += typesafe_sprintf("\nPerforming traversal attempt no.: %x. Locally bound port: %x\n%x", i, a.bound_port, a.log_text);
+					}
+
+					/* delete first newline */
+					full_log.erase(full_log.begin());
+
+					const auto log_path = get_path_in_log_files("dumped_traversal_log.txt");
+					augs::save_as_text(log_path, full_log);
+
+					window.reveal_in_explorer(log_path);
+				}
+
+				ImGui::SameLine();
+
+				{
+					auto disabled = ::maybe_disabled_cols({}, aborted);
+
+					if (ImGui::Button("Abort")) {
+						aborted = true;
+					}
+				}
+
+				{
+					//auto disabled = ::maybe_disabled_cols({}, !aborted);
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Cancel")) {
+						result = true;
+					}
 				}
 			}
-
-			return result;
 		}
 
-		return !op;
+		return result;
 	}
 };
