@@ -17,6 +17,8 @@ class stun_session {
 	STUNMessageHeader source_request;
 
 	net_time_t when_began;
+	net_time_t when_sent_first_request = -1;
+	net_time_t when_completed = -1;
 	net_time_t when_generated_last_packet = -1;
 
 	std::function<void(const std::string&)> log_info;
@@ -25,7 +27,7 @@ public:
 	const address_and_port host;
 
 	enum class state {
-		RESOLVING,
+		RESOLVING_STUN_HOST,
 		COULD_NOT_RESOLVE_STUN_HOST,
 		SENDING_REQUEST_PACKETS,
 		COMPLETED
@@ -40,4 +42,6 @@ public:
 	
 	std::optional<netcode_queued_packet> advance(double request_interval_secs, randomization& rng);
 	bool handle_packet(const std::byte* buffer, const int bytes_received);
+
+	double get_ping_seconds() const;
 };

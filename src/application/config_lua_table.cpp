@@ -60,11 +60,30 @@ stun_server_provider::stun_server_provider(const augs::path_type& list_file) {
 	load(list_file);
 }
 
+namespace augs {
+	auto file_to_lines(const augs::path_type& path) {
+		auto content = file_to_string(path);
+		auto s = std::stringstream(content);
+
+		std::vector<std::string> out;
+
+		for (std::string line; std::getline(s, line); ) {
+			out.emplace_back(line);
+		}
+
+		return out;
+	}
+}
+
 void stun_server_provider::load(const augs::path_type& list_file) {
 	servers = augs::file_to_lines(list_file);
 }
 
 address_and_port stun_server_provider::get_next() {
+	if (servers.empty()) {
+		return {};
+	}
+
 	auto result = address_and_port();
 	result.default_port = 3478;
 	result.address = servers[current_stun_server++ % servers.size()];

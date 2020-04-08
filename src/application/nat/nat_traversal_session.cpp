@@ -394,6 +394,7 @@ std::optional<netcode_queued_packet> stun_session::advance(const double request_
 
 	if (stun_host != std::nullopt) {
 		if (try_fire_interval(request_interval_secs, when_generated_last_packet)) {
+			when_sent_first_request = yojimbo_time();
 			return netcode_queued_packet { *stun_host, augs::to_bytes(source_request) };
 		}
 	}
@@ -407,18 +408,20 @@ stun_session::state stun_session::get_current_state() const {
 	}
 
 	if (!future_stun_host.valid()) {
-		if (stun_host == std::nullopt) {
+		if (stun_host != std::nullopt) {
+			return state::SENDING_REQUEST_PACKETS;
+		}
+		else {
 			return state::COULD_NOT_RESOLVE_STUN_HOST;
 		}
-
-		return state::SENDING_REQUEST_PACKETS;
 	}
-
-	return state::RESOLVING;
+	else {
+		return state::RESOLVING_STUN_HOST;
+	}
 }
 
 bool stun_session::has_timed_out(const double timeout_secs) const { 
-	if (get_current_state() == stun_session::state::RESOLVING) {
+	if (get_current_state() == stun_session::state::SENDING_REQUEST_PACKETS) {
 		return yojimbo_time() - when_began >= timeout_secs;
 	}
 
@@ -432,10 +435,16 @@ std::optional<netcode_address_t> stun_session::query_result() const {
 bool stun_session::handle_packet(const std::byte* const packet_buffer, const int num_bytes_received) {
 	if (const auto translated = read_stun_response(source_request, packet_buffer, num_bytes_received)) {
 		log_info(typesafe_sprintf("received STUN response: %x -> %x", ::ToString(*stun_host), ::ToString(*translated)));
+
+		when_completed = yojimbo_time();
 		external_address = *translated;
 
 		return true;
 	}
 
 	return false;
+}
+
+double stun_session::get_ping_seconds() const {
+	return when_completed - when_sent_first_request;
 }

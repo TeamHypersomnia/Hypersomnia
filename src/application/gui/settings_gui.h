@@ -33,9 +33,41 @@ namespace augs {
 	class audio_context;
 };
 
+#include "augs/misc/randomization.h"
+#include "application/nat/stun_server_provider.h"
+#include "application/nat/stun_session.h"
+#include <set>
+
+class stun_server_tester {
+	netcode_socket_raii socket;
+	randomization rng;
+
+public:
+	stun_server_provider provider;
+	std::vector<std::unique_ptr<stun_session>> current_sessions;
+
+	stun_server_tester(const stun_server_provider&);
+	std::set<std::pair<double, std::string>> resolved_servers;
+
+	int num_failed_servers = 0;
+
+	void advance();
+};
+
+struct stun_manager_window : public standard_window_mixin<stun_manager_window> {
+	using base = standard_window_mixin<stun_manager_window>;
+	using base::base;
+
+	std::optional<stun_server_provider> all_candidates;
+	std::optional<stun_server_tester> tester;
+
+	void perform();
+};
+
 class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	settings_pane active_pane = settings_pane::GENERAL;
 
+	stun_manager_window stun_manager = std::string("STUN manager");
 
 	std::optional<editor_popup> already_bound_popup;
 

@@ -82,6 +82,129 @@ int performance_settings::get_num_pool_workers() const {
 	return get_default_num_pool_workers();
 }
 
+#include "augs/network/netcode_utils.h"
+
+void stun_server_tester::advance() {
+	constexpr auto max_num_sessions = 10;
+	constexpr auto request_interval = 0.2;
+	constexpr auto timeout = 2;
+
+	while (current_sessions.size() < max_num_sessions) {
+		if (provider.current_stun_server < static_cast<int>(provider.servers.size())) {
+			current_sessions.emplace_back(std::make_unique<stun_session>(provider.get_next(), [](const std::string&){}));
+		}
+		else {
+			break;
+		}
+	}
+
+	auto handle = [&](const netcode_address_t&, uint8_t* packet_buffer, const int packet_bytes) {
+		for (auto& session : current_sessions) {
+			if (session->handle_packet(reinterpret_cast<const std::byte*>(packet_buffer), packet_bytes)) {
+				return;
+			}
+		}
+	};
+
+	::receive_netcode_packets(socket.socket, handle);
+
+	erase_if(current_sessions, [&](auto& session_ptr) {
+		auto& session = *session_ptr;
+		const auto state = session.get_current_state();
+
+		if (auto new_packet = session.advance(request_interval, rng)) {
+			socket.send(*new_packet);
+		}
+		
+		if (state == stun_session::state::COMPLETED) {
+			resolved_servers.emplace(session.get_ping_seconds(), session.host.address);
+			return true;
+		}
+		else {
+			if (session.has_timed_out(timeout)) {
+				++num_failed_servers;
+				return true;
+			}
+
+			if (state == stun_session::state::COULD_NOT_RESOLVE_STUN_HOST) {
+				++num_failed_servers;
+				return true;
+			}
+		}
+
+		return false;
+	});
+}
+
+stun_server_tester::stun_server_tester(const stun_server_provider& provider) : provider(provider) {
+
+}
+
+void stun_manager_window::perform() {
+	using namespace augs::imgui;
+
+	if (tester != std::nullopt) {
+		tester->advance();
+	}
+
+	centered_size_mult = vec2(0.4f, 0.7f);
+
+	auto manager = make_scoped_window();
+
+	if (!manager) {
+		return;
+	}
+
+	if (all_candidates == std::nullopt) {
+		all_candidates.emplace(augs::path_type("web/candidate_stun_servers.txt"));
+	}
+
+	if (ImGui::Button("Start analysis")) {
+		if (all_candidates != std::nullopt) {
+			tester.reset();
+			tester.emplace(*all_candidates);
+		}
+	}
+
+	std::string all_resolved_servers;
+	std::string all_latencies;
+
+	if (tester != std::nullopt) {
+		for (const auto& resolved : tester->resolved_servers) {
+			all_resolved_servers += resolved.second + "\n";
+		}
+
+		for (const auto& resolved : tester->resolved_servers) {
+			all_latencies += typesafe_sprintf("%x ms", int(resolved.first * 1000)) + "\n";
+		}
+	}
+
+	ImGui::Columns(2);
+	text("Resolved servers");
+
+	{
+		auto width = scoped_item_width(-1.0f);
+		input_multiline_text<200000>("##Resolved servers", all_resolved_servers, 20, ImGuiInputTextFlags_ReadOnly);
+	}
+
+	ImGui::NextColumn();
+
+	text("Latencies");
+
+	{
+		auto width = scoped_item_width(-1.0f);
+		input_multiline_text<200000>("##Latencies", all_latencies, 20, ImGuiInputTextFlags_ReadOnly);
+	}
+
+
+	ImGui::NextColumn();
+
+	if (tester != std::nullopt) {
+		text("Resolved %x servers out of %x.", tester->resolved_servers.size(), tester->provider.servers.size());
+		text("Failed to resolve %x servers.", tester->num_failed_servers);
+	}
+}
+
 void settings_gui_state::perform(
 	sol::state& lua,
 	const augs::audio_context& audio,
@@ -91,6 +214,8 @@ void settings_gui_state::perform(
 	config_lua_table& last_saved_config,
 	vec2i screen_size
 ) {
+	stun_manager.perform();
+
 	auto for_each_input_map = [&](auto callback) {
 		callback(config.app_controls);
 		callback(config.game_controls);
@@ -1246,6 +1371,12 @@ void settings_gui_state::perform(
 
 					augs::open_text_editor(failure_log_path.string());
 					augs::open_text_editor(failure_log_path.replace_filename("").string());
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Open STUN manager")) {
+					stun_manager.open();
 				}
 
 #if !PLATFORM_WINDOWS

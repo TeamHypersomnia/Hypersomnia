@@ -41,6 +41,8 @@ struct netcode_socket_raii_error : error_with_typesafe_sprintf {
 	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 };
 
+using netcode_queued_packet = std::pair<netcode_address_t, std::vector<std::byte>>;
+
 struct netcode_socket_raii {
 	netcode_socket_t socket;
 
@@ -117,5 +119,12 @@ public:
 
 	~netcode_socket_raii() {
 		destroy();
+	}
+
+	void send(netcode_queued_packet& packet) {
+		auto& bytes = packet.second;
+		auto& address = packet.first;
+
+		netcode_socket_send_packet(&socket, &address, bytes.data(), bytes.size());
 	}
 };
