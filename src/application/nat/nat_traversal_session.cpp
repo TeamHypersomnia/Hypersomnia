@@ -84,7 +84,7 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 	const auto request_interval_secs = input.detection_settings.request_interval_ms / 1000.0;
 	const auto stun_timeout_secs = input.detection_settings.stun_session_timeout_ms / 1000.0;
 
-	packet_queue.send_some(socket, packet_interval_secs);
+	packet_queue.send_some(socket, packet_interval_secs, [&](const std::string& l) { log_info(l); });
 	receive_packets(socket);
 
 	const auto client_type = input.client.type;
@@ -160,7 +160,8 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 		};
 
 		if (last_server_stunned_port != 0) {
-			open_hole_directed_at(last_server_stunned_port);
+			const auto dt = input.server.port_delta;
+			open_hole_directed_at(dt + last_server_stunned_port);
 		}
 		else {
 			open_hole_directed_at(input.traversed_address.port);
@@ -254,8 +255,8 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 
 			case state::TRAVERSING: {
 				if (try_request_interval()) {
-					request_masterserver(make_traversal_step());
 					open_holes_for_server();
+					request_masterserver(make_traversal_step());
 				}
 
 				break;

@@ -425,7 +425,7 @@ void nat_detection_session::advance(netcode_socket_t socket) {
 	receive_packets(socket);
 
 	send_requests();
-	packet_queue.send_some(socket, settings.packet_interval_ms / 1000.0);
+	packet_queue.send_some(socket, settings.packet_interval_ms / 1000.0, [&](const std::string& l) { log_info(l); });
 	analyze_results(socket.address.port);
 }
 
@@ -437,10 +437,18 @@ std::string stringize_bytes(const std::vector<std::byte>& bytes) {
 	std::string bytes_str;
 
 	for (const auto& b : bytes) {
-		bytes_str += typesafe_sprintf("%xh ", b);
+		const auto bb = typesafe_sprintf("%h", int(b));
+
+		if (bb.size() == 1) {
+			bytes_str += "0";
+		}
+
+		bytes_str += bb + " ";
 	}
 
-	bytes_str.pop_back();
+	if (bytes_str.size() > 0) {
+		bytes_str.pop_back();
+	}
 
 	return bytes_str;
 }

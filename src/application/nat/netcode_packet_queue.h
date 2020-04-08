@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/network/netcode_sockets.h"
+#include "augs/misc/log_function.h"
 
 using netcode_queued_packet = std::pair<netcode_address_t, std::vector<std::byte>>;
 

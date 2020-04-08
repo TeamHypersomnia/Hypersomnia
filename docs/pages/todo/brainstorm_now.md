@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- tell me my address should include a session guid too...
+
 - port number in start server gui: maybe somehow save that port number when the textbox deactivates...
 
 - disallow nat on official server

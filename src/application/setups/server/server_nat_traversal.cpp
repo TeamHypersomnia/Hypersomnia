@@ -23,7 +23,7 @@ server_nat_traversal::server_nat_traversal(
 
 void server_nat_traversal::send_packets(netcode_socket_t socket) {
 	const auto interval_secs = input.detection_settings.packet_interval_ms / 1000.0;
-	packet_queue.send_some(socket, interval_secs);
+	packet_queue.send_some(socket, interval_secs, make_LOG());
 }
 
 void server_nat_traversal::session::send_stun_result(
