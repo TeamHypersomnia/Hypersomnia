@@ -445,6 +445,10 @@ bool stun_session::handle_packet(const std::byte* const packet_buffer, const int
 	return false;
 }
 
+const std::optional<netcode_address_t>& stun_session::get_resolved_stun_host() const {
+	return stun_host;
+}
+
 double stun_session::get_ping_seconds() const {
 	return when_completed - when_sent_first_request;
 }

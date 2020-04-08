@@ -37,19 +37,27 @@ namespace augs {
 #include "application/nat/stun_server_provider.h"
 #include "application/nat/stun_session.h"
 #include <set>
+#include <unordered_set>
+#include "application/masterserver/netcode_address_hash.h"
 
 class stun_server_tester {
-	netcode_socket_raii socket;
 	randomization rng;
 
+	std::unordered_set<netcode_address_t> resolved_stun_hosts;
+	std::unordered_set<netcode_address_t> resolved_my_addresses;
+
 public:
+	netcode_socket_raii socket;
+
 	stun_server_provider provider;
 	std::vector<std::unique_ptr<stun_session>> current_sessions;
 
-	stun_server_tester(const stun_server_provider&);
-	std::set<std::pair<double, std::string>> resolved_servers;
+	stun_server_tester(const stun_server_provider&, port_type source_port);
+	std::set<std::tuple<double, std::string, std::string>> resolved_servers;
 
 	int num_failed_servers = 0;
+	int num_duplicate_servers = 0;
+	int num_duplicate_resolved_addresses = 0;
 
 	void advance();
 };

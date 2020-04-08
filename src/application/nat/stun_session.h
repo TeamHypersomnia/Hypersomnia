@@ -43,5 +43,6 @@ public:
 	std::optional<netcode_queued_packet> advance(double request_interval_secs, randomization& rng);
 	bool handle_packet(const std::byte* buffer, const int bytes_received);
 
+	const std::optional<netcode_address_t>& get_resolved_stun_host() const;
 	double get_ping_seconds() const;
 };

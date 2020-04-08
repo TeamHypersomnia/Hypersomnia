@@ -83,11 +83,12 @@ int performance_settings::get_num_pool_workers() const {
 }
 
 #include "augs/network/netcode_utils.h"
+#include "augs/templates/container_templates.h"
 
 void stun_server_tester::advance() {
-	constexpr auto max_num_sessions = 10;
-	constexpr auto request_interval = 0.2;
-	constexpr auto timeout = 2;
+	constexpr auto max_num_sessions = 1;
+	constexpr auto request_interval = 0.1;
+	constexpr auto timeout = 0.4;
 
 	while (current_sessions.size() < max_num_sessions) {
 		if (provider.current_stun_server < static_cast<int>(provider.servers.size())) {
@@ -117,7 +118,31 @@ void stun_server_tester::advance() {
 		}
 		
 		if (state == stun_session::state::COMPLETED) {
-			resolved_servers.emplace(session.get_ping_seconds(), session.host.address);
+			const auto resolved_stun_host = *session.get_resolved_stun_host();
+			const auto resolved_my_address = *session.query_result();
+
+			bool duplicate = false;
+
+			if (found_in(resolved_stun_hosts, resolved_stun_host)) {
+				++num_duplicate_servers;
+				duplicate = true;
+			}
+			else if (found_in(resolved_my_addresses, resolved_my_address)) {
+				++num_duplicate_resolved_addresses;
+				duplicate = true;
+			}
+			
+			if (!duplicate) {
+				auto new_one = std::tuple<double, std::string, std::string>();
+				std::get<0>(new_one) = session.get_ping_seconds();
+				std::get<1>(new_one) = session.host.address;
+				std::get<2>(new_one) = ::ToString(resolved_my_address);
+
+				resolved_servers.emplace(new_one);
+				resolved_stun_hosts.emplace(resolved_stun_host);
+				resolved_my_addresses.emplace(resolved_my_address);
+			}
+
 			return true;
 		}
 		else {
@@ -136,7 +161,7 @@ void stun_server_tester::advance() {
 	});
 }
 
-stun_server_tester::stun_server_tester(const stun_server_provider& provider) : provider(provider) {
+stun_server_tester::stun_server_tester(const stun_server_provider& provider, port_type port) : socket(port), provider(provider) {
 
 }
 
@@ -147,7 +172,7 @@ void stun_manager_window::perform() {
 		tester->advance();
 	}
 
-	centered_size_mult = vec2(0.4f, 0.7f);
+	centered_size_mult = vec2(0.6f, 0.8f);
 
 	auto manager = make_scoped_window();
 
@@ -162,24 +187,30 @@ void stun_manager_window::perform() {
 	if (ImGui::Button("Start analysis")) {
 		if (all_candidates != std::nullopt) {
 			tester.reset();
-			tester.emplace(*all_candidates);
+			auto rng = randomization::from_random_device();
+			tester.emplace(*all_candidates, rng.randval(1024, 60000));
 		}
 	}
 
 	std::string all_resolved_servers;
 	std::string all_latencies;
+	std::string all_ports;
 
 	if (tester != std::nullopt) {
 		for (const auto& resolved : tester->resolved_servers) {
-			all_resolved_servers += resolved.second + "\n";
+			all_resolved_servers += std::get<1>(resolved) + "\n";
 		}
 
 		for (const auto& resolved : tester->resolved_servers) {
-			all_latencies += typesafe_sprintf("%x ms", int(resolved.first * 1000)) + "\n";
+			all_latencies += typesafe_sprintf("%x ms", int(std::get<0>(resolved) * 1000)) + "\n";
+		}
+
+		for (const auto& resolved : tester->resolved_servers) {
+			all_ports += typesafe_sprintf("%x", std::get<2>(resolved)) + "\n";
 		}
 	}
 
-	ImGui::Columns(2);
+	ImGui::Columns(3);
 	text("Resolved servers");
 
 	{
@@ -193,15 +224,29 @@ void stun_manager_window::perform() {
 
 	{
 		auto width = scoped_item_width(-1.0f);
-		input_multiline_text<200000>("##Latencies", all_latencies, 20, ImGuiInputTextFlags_ReadOnly);
+		input_multiline_text<100000>("##Latencies", all_latencies, 20, ImGuiInputTextFlags_ReadOnly);
 	}
 
+	ImGui::NextColumn();
+
+	text("Resolved ports");
+
+	{
+		auto width = scoped_item_width(-1.0f);
+		input_multiline_text<100000>("##Ports", all_ports, 20, ImGuiInputTextFlags_ReadOnly);
+	}
 
 	ImGui::NextColumn();
 
 	if (tester != std::nullopt) {
-		text("Resolved %x servers out of %x.", tester->resolved_servers.size(), tester->provider.servers.size());
+		const auto processed = tester->num_duplicate_resolved_addresses + tester->num_failed_servers + tester->num_duplicate_servers + tester->resolved_servers.size();
+
+		text("Chosen source port: %x", tester->socket.socket.address.port);
+		text("Processed %x out of %x servers.", processed, tester->provider.servers.size());
+		text("Resolved %x servers.", tester->resolved_servers.size());
 		text("Failed to resolve %x servers.", tester->num_failed_servers);
+		text("Duplicate servers: %x", tester->num_duplicate_servers);
+		text("Servers with duplicate resolved addresses: %x", tester->num_duplicate_resolved_addresses);
 	}
 }
 
