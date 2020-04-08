@@ -110,7 +110,7 @@ void game_connection_config::set_max_packet_size(const unsigned s) {
     maxPacketFragments = (int) ceil( maxPacketSize / packetFragmentSize );
 }
 
-game_connection_config::game_connection_config(const server_start_input& in) : game_connection_config() {
+game_connection_config::game_connection_config(const augs::server_listen_input& in) : game_connection_config() {
 	(void)in;
 #if 0
 	set_max_packet_size(in.max_packet_size);
@@ -179,7 +179,7 @@ bool auxiliary_command_function(void* context, struct netcode_address_t* from, u
 	return adapter->auxiliary_command_callback(*from, reinterpret_cast<const std::byte*>(packet), bytes);
 }
 
-server_adapter::server_adapter(const server_start_input& in, auxiliary_command_callback_type auxiliary_command_callback) :
+server_adapter::server_adapter(const augs::server_listen_input& in, auxiliary_command_callback_type auxiliary_command_callback) :
 	connection_config(in),
 	adapter(this),
 	server(

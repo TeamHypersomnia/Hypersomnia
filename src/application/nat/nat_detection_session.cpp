@@ -194,7 +194,7 @@ static nat_detection_result calculate_from(
 
 	F log_info
 ) {
-	ensure_greater(int(address_unique_translations.size()), 1);
+	ensure_greater(int(address_unique_translations.size()), 0);
 	ensure_greater(int(port_unique_translations.size()), 1);
 
 	auto make_deltas = [&](const auto& ports) {

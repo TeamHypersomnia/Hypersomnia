@@ -75,7 +75,7 @@ void server_heartbeat::validate() {
 
 server_setup::server_setup(
 	sol::state& lua,
-	const server_start_input& in,
+	const augs::server_listen_input& in,
 	const server_vars& initial_vars,
 	const server_solvable_vars& initial_solvable_vars,
 	const client_vars& integrated_client_vars,

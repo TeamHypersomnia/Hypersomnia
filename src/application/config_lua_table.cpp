@@ -77,7 +77,10 @@ namespace augs {
 
 void stun_server_provider::load(const augs::path_type& list_file) {
 	servers = augs::file_to_lines(list_file);
+	usage_timestamps.resize(servers.size(), net_time_t(-1));
 }
+
+double yojimbo_time();
 
 address_and_port stun_server_provider::get_next() {
 	if (servers.empty()) {
@@ -86,7 +89,19 @@ address_and_port stun_server_provider::get_next() {
 
 	auto result = address_and_port();
 	result.default_port = 3478;
+	usage_timestamps[current_stun_server] = yojimbo_time();
 	result.address = servers[current_stun_server++ % servers.size()];
 
 	return result;
+}
+
+double stun_server_provider::seconds_to_wait_for_next(const double usage_cooldown_secs) const {
+	const auto& ts = usage_timestamps[current_stun_server];
+
+	if (ts == -1) {
+		return 0.0;
+	}
+
+	const auto passed = yojimbo_time() - ts;
+	return usage_cooldown_secs - passed;
 }

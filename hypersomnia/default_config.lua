@@ -14,17 +14,20 @@ return {
 		  address = "masterserver.hypersomnia.xyz",
 		  default_port = 8430
 	  },
+	  max_ports_for_probing = 40,
 
-	  num_ports_probed = 3,
-	  num_stun_hosts_used_for_detection = 2,
+	  num_ports_probed = 4,
+	  num_stun_hosts_used_for_detection = 1,
+
+	  nat_translation_entry_timeout_secs = 30,
 
 	  stun_server_list = "web/stun_server_list.txt"
   },
 
   nat_traversal = {
 	  short_ttl = 2,
-	  num_brute_force_packets = 5,
-	  traversal_attempt_timeout_secs = 5
+	  num_brute_force_packets = 25,
+	  traversal_attempt_timeout_secs = 4
   },
 
   masterserver = {
@@ -32,7 +35,7 @@ return {
 	server_entry_timeout_secs = 60,
 
 	first_udp_command_port = 8430,
-	num_udp_command_ports = 10,
+	num_udp_command_ports = 40,
 
 	sleep_ms = 8,
 	server_list_port = 8420,
@@ -56,6 +59,12 @@ return {
 
   official_arena_servers = {
 	"arena.hypersomnia.xyz" 
+  },
+
+  default_server_start = {
+	ip = "127.0.0.1",
+	port = 0,
+	max_connections = 64
   },
 
   default_client_start = {
@@ -620,12 +629,6 @@ return {
 		  background_dark = "47 10 0 255"
 	  }
 	}
-  },
-
-  default_server_start = {
-	ip = "127.0.0.1",
-	port = 8412,
-	max_connections = 64
   },
 
   server_solvable = {

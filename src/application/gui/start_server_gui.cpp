@@ -131,23 +131,50 @@ as well as to test your skills in a laggy environment.
 			auto chosen_port = static_cast<int>(val);
 
 			ImGui::InputInt(label, std::addressof(chosen_port), 0, 0, ImGuiInputTextFlags_EnterReturnsTrue);
-			val = static_cast<unsigned short>(std::clamp(chosen_port, 1024, 65535));
+			val = static_cast<unsigned short>(std::clamp(chosen_port, 0, 65535));
 		};
 
-		do_port("Port", into.port);
+
+		{
+			const bool has_custom_port = into.port != 0;
+			bool ticked = has_custom_port;
+
+			if (checkbox("Use custom port", ticked)) {
+				into.port = ticked ? previous_chosen_port : 0;
+			}
+		}
+
+		const bool has_custom_port = into.port != 0;
+
+		if (has_custom_port) {
+			auto ind = scoped_indent();
+
+			previous_chosen_port = into.port;
+			do_port("##Port", into.port);
+		}
 
 		checkbox("Allow NAT traversal", into_vars.allow_nat_traversal);
 
 		const bool port_bound_successfully = into.port == currently_bound_port;
 
-		text("Currently bound port:");
-		ImGui::SameLine();
+		if (has_custom_port) {
+			text("Currently bound port:");
 
-		text_color(std::to_string(currently_bound_port), port_bound_successfully ? green : orange);
-
-		if (!port_bound_successfully) {
 			ImGui::SameLine();
-			text_color(typesafe_sprintf("(Could not bind to %x!)", into.port), orange);
+
+			text_color(std::to_string(currently_bound_port), port_bound_successfully ? green : orange);
+
+			if (!port_bound_successfully) {
+				ImGui::SameLine();
+				text_color(typesafe_sprintf("(Could not bind to %x!)", into.port), orange);
+			}
+		}
+		else {
+			text("Randomly selected port:");
+
+			ImGui::SameLine();
+
+			text_color(std::to_string(currently_bound_port), green);
 		}
 
 		if (nat_detection == nullptr) {

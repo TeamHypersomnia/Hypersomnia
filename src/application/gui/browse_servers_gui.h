@@ -1,5 +1,4 @@
 #pragma once
-#include "application/setups/server/server_start_input.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "application/setups/server/server_instance_type.h"

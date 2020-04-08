@@ -84,7 +84,7 @@ class server_setup :
 	/* The rest is server-specific */
 	sol::state& lua;
 
-	server_start_input last_start;
+	augs::server_listen_input last_start;
 	std::optional<augs::dedicated_server_input> dedicated;
 
 	server_step_type current_simulation_step = 0;
@@ -192,7 +192,7 @@ public:
 
 	server_setup(
 		sol::state& lua,
-		const server_start_input&,
+		const augs::server_listen_input&,
 		const server_vars&,
 		const server_solvable_vars&,
 		const client_vars& integrated_client_vars,

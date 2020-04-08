@@ -38,7 +38,7 @@ class server_adapter {
 	auto create_message(const client_id_type&);
 
 public:
-	server_adapter(const server_start_input&, auxiliary_command_callback_type);
+	server_adapter(const augs::server_listen_input&, auxiliary_command_callback_type);
 
 	template <class H>
 	void advance(

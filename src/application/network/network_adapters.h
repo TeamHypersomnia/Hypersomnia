@@ -21,7 +21,7 @@
 
 struct game_connection_config : yojimbo::ClientServerConfig {
 	game_connection_config();
-	game_connection_config(const server_start_input&);
+	game_connection_config(const augs::server_listen_input&);
 
 	void set_max_packet_size(unsigned);
 };
