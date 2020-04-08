@@ -12,10 +12,10 @@
 
 #include "application/nat/stun_request_structs.h"
 #include "application/nat/netcode_packet_queue.h"
-#include "application/nat/stun_counter_type.h"
 
 using log_sink_type = std::function<void(const std::string&)>;
 
+struct stun_server_provider;
 struct netcode_socket_t;
 
 class nat_detection_session {
@@ -41,7 +41,7 @@ class nat_detection_session {
 	net_time_t when_last_made_requests = -1;
 
 	const nat_detection_settings settings;
-	stun_counter_type& current_stun_index;
+	stun_server_provider& stun_provider;
 	log_sink_type log_sink;
 	std::string full_log;
 
@@ -89,8 +89,8 @@ class nat_detection_session {
 public:
 	using session_input = ::nat_detection_settings;
 
-	nat_detection_session(session_input, stun_counter_type&);
-	nat_detection_session(session_input, stun_counter_type&, log_sink_type);
+	nat_detection_session(session_input, stun_server_provider&);
+	nat_detection_session(session_input, stun_server_provider&, log_sink_type);
 
 	void advance(netcode_socket_t);
 

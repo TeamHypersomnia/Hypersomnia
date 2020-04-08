@@ -9,6 +9,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/templates/bit_cast.h"
 #include "application/masterserver/masterserver.h"
+#include "application/nat/stun_server_provider.h"
 
 double yojimbo_time();
 
@@ -103,7 +104,7 @@ void server_nat_traversal::advance() {
 
 void server_nat_traversal::relaunch(std::optional<stun_session>& stun_session) {
 	stun_session.reset();
-	const auto next_host = input.detection_settings.get_next_stun_host(input.current_stun_index);
+	const auto next_host = input.stun_provider.get_next();
 
 	auto log_info = [](const std::string& s) { LOG(s); };
 	stun_session.emplace(next_host, log_info);

@@ -6,6 +6,7 @@
 #include "augs/window_framework/window.h"
 
 #include "application/config_lua_table.h"
+#include "application/nat/stun_server_provider.h"
 
 config_lua_table::config_lua_table(sol::state& lua, const augs::path_type& config_lua_path) {
 	load(lua, config_lua_path);
@@ -53,4 +54,20 @@ bool config_lua_table::operator==(const config_lua_table& b) const {
 
 bool config_lua_table::operator!=(const config_lua_table& b) const {
 	return !operator==(b);
+}
+
+stun_server_provider::stun_server_provider(const augs::path_type& list_file) {
+	load(list_file);
+}
+
+void stun_server_provider::load(const augs::path_type& list_file) {
+	servers = augs::file_to_lines(list_file);
+}
+
+address_and_port stun_server_provider::get_next() {
+	auto result = address_and_port();
+	result.default_port = 3478;
+	result.address = servers[current_stun_server++ % servers.size()];
+
+	return result;
 }

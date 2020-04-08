@@ -5,11 +5,12 @@
 #include "application/nat/nat_traversal_settings.h"
 #include "application/nat/nat_detection_settings.h"
 #include "application/nat/netcode_packet_queue.h"
-#include "application/nat/stun_counter_type.h"
 #include "application/nat/stun_session.h"
 #include "augs/network/port_type.h"
 #include "augs/misc/randomization.h"
 #include "application/masterserver/nat_traversal_step_payload.h"
+
+struct stun_server_provider;
 
 struct nat_traversal_input {
 	netcode_address_t masterserver_address;
@@ -42,7 +43,7 @@ public:
 	const nat_traversal_input input;
 
 private:
-	stun_counter_type& current_stun_index;
+	stun_server_provider& stun_provider;
 	randomization stun_rng = randomization::from_random_device();
 	const nat_session_guid_type session_guid;
 
@@ -79,7 +80,7 @@ private:
 	void set(state);
 
 public:
-	nat_traversal_session(const nat_traversal_input&, stun_counter_type& current_stun_index); 
+	nat_traversal_session(const nat_traversal_input&, stun_server_provider& stun_provider); 
 
 	void advance(const netcode_socket_t&);
 	state get_current_state() const;

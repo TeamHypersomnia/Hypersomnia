@@ -81,6 +81,19 @@ namespace augs {
 		return buffer.str();
 	}
 
+	inline auto file_to_lines(const path_type& path) {
+		auto t = with_exceptions<std::ifstream>();
+		t.open(path);
+
+		auto out = std::vector<std::string>();
+
+		for (auto line = std::string(); std::getline(t, line); ) {
+			out.emplace_back(line);
+		}
+
+		return out;
+	}
+
 	inline bool file_exists_and_non_empty(const path_type& path) {
 		try {
 			return file_to_string(path).size() > 0;

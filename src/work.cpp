@@ -96,6 +96,7 @@
 #include "view/rendering_scripts/for_each_vis_request.h"
 #include "game/cosmos/for_each_entity.h"
 #include "application/setups/client/demo_paths.h"
+#include "application/nat/stun_server_provider.h"
 
 #include "application/main/application_updates.h"
 #include "work_result.h"
@@ -474,7 +475,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto pending_launch = std::optional<launch_type>();
 
-	static auto current_stun_server = stun_counter_type(0);
+	static auto stun_provider = stun_server_provider(config.nat_detection.stun_server_list);
 
 	static auto nat_detection = std::optional<nat_detection_session>();
 	static auto nat_detection_popup = abortable_popup_state();
@@ -489,7 +490,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto restart_nat_detection = []() {
 		nat_detection.reset();
-		nat_detection.emplace(config.nat_detection, current_stun_server);
+		nat_detection.emplace(config.nat_detection, stun_provider);
 	};
 
 	static auto get_detected_nat = []() {
@@ -528,7 +529,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			server_nat,
 			config.nat_detection,
 			config.nat_traversal
-		}, current_stun_server);
+		}, stun_provider);
 	};
 
 	static auto do_traversal_details_popup = []() {
@@ -561,7 +562,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.nat_detection,
 			config.nat_traversal,
 
-			current_stun_server
+			stun_provider
 		};
 	};
 

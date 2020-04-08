@@ -13,6 +13,7 @@
 #include "augs/templates/bit_cast.h"
 #include "augs/misc/time_utils.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
+#include "application/nat/stun_server_provider.h"
 
 using traversal_step = masterserver_in::nat_traversal_step;
 
@@ -21,9 +22,9 @@ std::string nat_type_to_string(const nat_type type);
 
 double yojimbo_time();
 
-nat_traversal_session::nat_traversal_session(const nat_traversal_input& input, stun_counter_type& current_stun_index) : 
+nat_traversal_session::nat_traversal_session(const nat_traversal_input& input, stun_server_provider& stun_provider) : 
 	input(input), 
-	current_stun_index(current_stun_index),
+	stun_provider(stun_provider),
 	session_guid(augs::date_time().secs_since_epoch()),
 	when_began(yojimbo_time())
 {
@@ -137,7 +138,7 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 	auto restun = [&]() {
 		set(state::AWAITING_STUN_RESPONSE);
 
-		const auto next_stun_host = input.detection_settings.get_next_stun_host(current_stun_index);
+		const auto next_stun_host = stun_provider.get_next();
 
 		stun_in_progress.reset();
 		stun_in_progress.emplace(next_stun_host, [this](const std::string& s) { log_info(s); });

@@ -56,6 +56,8 @@ rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
 struct nat_traversal_details_window {
 	bool is_open = false;
 
+	std::vector<std::string> attempt_logs;
+
 	bool perform(
 		const port_type bound_local_port,
 		const std::optional<nat_traversal_session>& session

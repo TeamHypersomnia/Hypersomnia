@@ -13,6 +13,7 @@
 #include "application/masterserver/masterserver.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/nat/stun_request.h"
+#include "application/nat/stun_server_provider.h"
 
 std::string nat_detection_result::describe() const {
 	using N = nat_type;
@@ -33,20 +34,20 @@ std::string nat_detection_result::describe() const {
 }
 
 address_and_port nat_detection_session::get_next_stun_host() {
-	return settings.get_next_stun_host(current_stun_index);
+	return stun_provider.get_next();
 }
 
-nat_detection_session::nat_detection_session(nat_detection_session::session_input in, stun_counter_type& current_stun_index) 
-	: nat_detection_session(in, current_stun_index, [](const auto& s) { LOG(s); })
+nat_detection_session::nat_detection_session(nat_detection_session::session_input in, stun_server_provider& stun_provider) 
+	: nat_detection_session(in, stun_provider, [](const auto& s) { LOG(s); })
 {}
 
 nat_detection_session::nat_detection_session(
 	nat_detection_session::session_input in,
-	stun_counter_type& current_stun_index,
+	stun_server_provider& stun_provider,
 	log_sink_type log_sink
 ) :
 	settings(in),
-	current_stun_index(current_stun_index),
+	stun_provider(stun_provider),
 	log_sink(log_sink),
 	future_port_probing_host(async_resolve_address(in.port_probing_host))
 {

@@ -1,18 +1,19 @@
 #pragma once
 #include <unordered_map>
 #include "application/nat/stun_session.h"
-#include "application/nat/stun_counter_type.h"
 #include "application/nat/nat_detection_settings.h"
 #include "application/nat/nat_traversal_settings.h"
 #include "application/masterserver/nat_traversal_step_payload.h"
 #include "augs/misc/randomization.h"
 #include "application/nat/nat_type.h"
 
+struct stun_server_provider;
+
 struct server_nat_traversal_input {
 	nat_detection_settings detection_settings;
 	nat_traversal_settings traversal_settings;
 
-	stun_counter_type& current_stun_index;
+	stun_server_provider& stun_provider;
 };
 
 class server_nat_traversal {

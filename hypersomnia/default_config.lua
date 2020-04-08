@@ -18,14 +18,7 @@ return {
 	  num_ports_probed = 3,
 	  num_stun_hosts_used_for_detection = 2,
 
-	  stun_server_list = {
-		  { address = "stun.l.google.com:19302" },
-		  { address = "stun1.l.google.com:19302" },
-		  { address = "stun2.l.google.com:19302" },
-		  { address = "stun3.l.google.com:19302" },
-		  { address = "stun4.l.google.com:19302" },
-		  { address = "stun.schlund.de:3478" }
-	  }
+	  stun_server_list = "web/stun_server_list.txt"
   },
 
   nat_traversal = {
