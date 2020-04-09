@@ -1395,6 +1395,10 @@ work_result work(const int argc, const char* const * const argv) try {
 			lua,
 			[&]() {
 				auto do_nat_detection_logic = []() {
+					if (has_current_setup()) {
+						return;
+					}
+
 					if (last_requested_local_port != chosen_server_port()) {
 						recreate_auxiliary_socket();
 						restart_nat_detection();
