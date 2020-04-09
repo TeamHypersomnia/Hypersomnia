@@ -115,9 +115,13 @@ bool server_nat_traversal::handle_auxiliary_command(
 	const std::byte* packet_buffer,
 	const std::size_t packet_bytes
 ) {
+	if (handle_stun_packet(packet_buffer, packet_bytes)) {
+		return true;
+	}
+
 	const bool is_auxiliary_cmd = packet_buffer[0] == static_cast<std::byte>(NETCODE_AUXILIARY_COMMAND_PACKET);
 
-	if (!is_auxiliary_cmd && !handle_stun_packet(packet_buffer, packet_bytes)) {
+	if (!is_auxiliary_cmd) {
 		return false;
 	}
 
@@ -245,8 +249,10 @@ bool server_nat_traversal::handle_auxiliary_command(
 		return true;
 	}
 	catch (const augs::stream_read_error&) {
-		return false;
+
 	}
+
+	return false;
 }
 
 server_nat_traversal::session::session() 

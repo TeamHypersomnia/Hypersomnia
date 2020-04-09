@@ -509,7 +509,7 @@ resolve_address_result client_adapter::connect(const address_and_port& in) {
 
 	local_addr.SetPort(target_addr.GetPort());
 
-	yojimbo::Address addrs[2] = {
+	yojimbo::Address addresses[2] = {
 		target_addr,
 		local_addr
 	};
@@ -517,7 +517,7 @@ resolve_address_result client_adapter::connect(const address_and_port& in) {
 	client.InsecureConnect(
 		privateKey.data(), 
 		clientId,
-		addrs,
+		addresses,
 		2
 	);
 

@@ -711,10 +711,6 @@ void client_setup::send_pending_commands() {
 	}
 }
 
-const netcode_socket_t* client_setup::find_underlying_socket() const {
-	return adapter->find_underlying_socket();
-}
-
 void client_setup::traverse_nat_if_required() {
 	if (is_replaying()) {
 		return;

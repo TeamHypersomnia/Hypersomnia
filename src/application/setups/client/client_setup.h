@@ -758,6 +758,4 @@ public:
 	bool send_payload(Args&&... args);
 
 	void perform_chat_input_bar();
-
-	const netcode_socket_t* find_underlying_socket() const;
 };
