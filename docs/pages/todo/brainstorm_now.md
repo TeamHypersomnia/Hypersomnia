@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- same state set: awaiting stun response -> awaiting stun response???
+
 - strange crashes on quit
 	- path type destructor in nat detection settings 
 	- seriously wtf...
@@ -45,7 +47,6 @@ summary: That which we are brainstorming at the moment.
 	- so just use that to discard all old sessions
 	- this can be used as a session guid too
 
- 
 - Actually we won't need to ping masterserver periodically
 - Use port 0 by default
 	- only add a tick for a custom port

@@ -20,7 +20,7 @@ struct warmup_welcome_cache {
 	augs::gui::text::formatted_string current;
 	augs::gui::text::formatted_string requested;
 	std::optional<float> last_seconds_value;
-	float completed_at_secs = -1.f;
+	float completed_at_warmup_secs_left = -1.f;
 };
 
 namespace augs {

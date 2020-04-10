@@ -445,7 +445,7 @@ public:
 
 	unsigned get_round_num() const;
 
-	float get_total_seconds(const_input) const;
+	float get_seconds_passed_in_cosmos(const_input) const;
 
 	float get_warmup_seconds_left(const_input) const;
 	float get_match_begins_in_seconds(const_input) const;

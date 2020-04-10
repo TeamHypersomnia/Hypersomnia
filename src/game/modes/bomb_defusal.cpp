@@ -2165,11 +2165,11 @@ void bomb_defusal::respawn_the_dead(const input_type in, const logic_step step, 
 	}
 }
 
-const float match_begins_in_secs = 4.f;
+const float match_begins_in_secs_v = 4.f;
 
 float bomb_defusal::get_warmup_seconds_left(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
-		return static_cast<float>(in.rules.warmup_secs) - get_total_seconds(in);
+		return static_cast<float>(in.rules.warmup_secs) - get_seconds_passed_in_cosmos(in);
 	}
 
 	return -1.f;
@@ -2177,10 +2177,19 @@ float bomb_defusal::get_warmup_seconds_left(const const_input_type in) const {
 
 float bomb_defusal::get_match_begins_in_seconds(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
-		const auto secs = get_total_seconds(in);
+		const auto secs = get_seconds_passed_in_cosmos(in);
 		const auto warmup_secs = static_cast<float>(in.rules.warmup_secs);
 
 		if (secs >= warmup_secs) {
+			// TODO: Remove this once we fix the map format
+			const auto match_begins_in_secs = [&]() {
+				if (in.rules.name.find("de_labs2")) {
+					return 5.f;
+				}
+
+				return match_begins_in_secs_v;
+			}();
+
 			/* It's after the warmup. */
 			return warmup_secs + match_begins_in_secs - secs;
 		}
@@ -2189,16 +2198,16 @@ float bomb_defusal::get_match_begins_in_seconds(const const_input_type in) const
 	return -1.f;
 }
 
-float bomb_defusal::get_total_seconds(const const_input_type in) const {
+float bomb_defusal::get_seconds_passed_in_cosmos(const const_input_type in) const {
 	return in.cosm.get_clock().now.in_seconds(round_speeds.calc_ticking_delta());
 }
 
 float bomb_defusal::get_round_seconds_passed(const const_input_type in) const {
-	return get_total_seconds(in) - static_cast<float>(in.rules.freeze_secs);
+	return get_seconds_passed_in_cosmos(in) - static_cast<float>(in.rules.freeze_secs);
 }
 
 float bomb_defusal::get_freeze_seconds_left(const const_input_type in) const {
-	return static_cast<float>(in.rules.freeze_secs) - get_total_seconds(in);
+	return static_cast<float>(in.rules.freeze_secs) - get_seconds_passed_in_cosmos(in);
 }
 
 float bomb_defusal::get_buy_seconds_left(const const_input_type in) const {
@@ -2214,11 +2223,11 @@ float bomb_defusal::get_buy_seconds_left(const const_input_type in) const {
 		return 0.f;
 	}
 
-	return static_cast<float>(in.rules.freeze_secs + in.rules.buy_secs_after_freeze) - get_total_seconds(in);
+	return static_cast<float>(in.rules.freeze_secs + in.rules.buy_secs_after_freeze) - get_seconds_passed_in_cosmos(in);
 }
 
 float bomb_defusal::get_round_seconds_left(const const_input_type in) const {
-	return static_cast<float>(in.rules.round_secs) + in.rules.freeze_secs - get_total_seconds(in);
+	return static_cast<float>(in.rules.round_secs) + in.rules.freeze_secs - get_seconds_passed_in_cosmos(in);
 }
 
 float bomb_defusal::get_seconds_since_win(const const_input_type in) const {

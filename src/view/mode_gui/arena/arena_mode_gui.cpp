@@ -864,19 +864,19 @@ void arena_gui_state::draw_mode_gui(
 					if (!populator->is_complete()) {
 						target += colored("|", white);
 					}
-					else if (warmup.completed_at_secs > 0.f) {
-						const auto fade_delay = 5.f;
-						const auto diff = warmup.completed_at_secs - warmup_left;
+					else if (warmup.completed_at_warmup_secs_left > 0.f) {
+						const auto delay_fade_by_secs = 5.f;
+						const auto passed_since_completed_population = warmup.completed_at_warmup_secs_left - warmup_left;
 
-						if (diff > fade_delay) {
+						if (passed_since_completed_population > delay_fade_by_secs) {
 							const auto fade_duration = 5.f;
-							const auto mult = 1.f - std::min(1.f, (diff - fade_delay) / fade_duration);
+							const auto mult = 1.f - std::min(1.f, (passed_since_completed_population - delay_fade_by_secs) / fade_duration);
 							alpha_mult = mult;
 							target.mult_alpha(mult);
 						}
 					}
 					else {
-						warmup.completed_at_secs = warmup_left;
+						warmup.completed_at_warmup_secs_left = warmup_left;
 					}
 
 					auto general_drawer = get_drawer();

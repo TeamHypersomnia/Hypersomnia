@@ -37,7 +37,13 @@ nat_traversal_session::nat_traversal_session(const nat_traversal_input& input, s
 }
 
 void nat_traversal_session::set(const state new_state) {
-	log_info("[%x] -> [%x]", nat_traversal_state_to_string(traversal_state), nat_traversal_state_to_string(new_state));
+	if (new_state == traversal_state) {
+		log_info("[%x] (Re-entered)", nat_traversal_state_to_string(new_state));
+	}
+	else {
+		log_info("[%x] -> [%x]", nat_traversal_state_to_string(traversal_state), nat_traversal_state_to_string(new_state));
+	}
+
 	traversal_state = new_state;
 }
 
