@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Ping back even without NAT traversal
+
 - same state set: awaiting stun response -> awaiting stun response???
 
 - strange crashes on quit
