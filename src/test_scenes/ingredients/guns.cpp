@@ -4169,7 +4169,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 1000.f);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 7500;
+			meta.get<invariants::item>().standard_price = 7000;
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("13.0");
 
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
