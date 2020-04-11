@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- (Update script) Sync config.lua against the user folder in the home dir, not in hypersomnia dir
+	- otherwise we have to call vim_build AND vim_run later
+
 - Post-map-format-fixes
 	- match begins in seconds for de_labs2 in bomb_defusal.cpp
 	- ultimate wrath of the aeons FX fields are used for electric triad
