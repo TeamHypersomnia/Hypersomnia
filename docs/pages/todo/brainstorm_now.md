@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- The aborted sounds end abruplty if we have less than 1.0 master/sfx gain in settings
+
 - (Update script) Sync config.lua against the user folder in the home dir, not in hypersomnia dir
 	- otherwise we have to call vim_build AND vim_run later
 
