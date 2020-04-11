@@ -2103,27 +2103,33 @@ void bomb_defusal::mode_post_solve(const input_type in, const mode_entropy& entr
 		}
 	}
 
-	if (state == arena_mode_state::LIVE) {
-		if (bomb_planted(in)) {
-			on_bomb_entity(in, [&](const auto& typed_bomb) {
-				if constexpr(!is_nullopt_v<decltype(typed_bomb)>) {
-					const auto& clk = cosm.get_clock();
+	const bool is_bomb_planted = bomb_planted(in);
 
-					if (typed_bomb.template get<components::hand_fuse>().when_armed == clk.now) {
+	if (is_bomb_planted) {
+		on_bomb_entity(in, [&](const auto& typed_bomb) {
+			if constexpr(!is_nullopt_v<decltype(typed_bomb)>) {
+				const auto& clk = cosm.get_clock();
+
+				if (typed_bomb.template get<components::hand_fuse>().when_armed == clk.now) {
+					if (state == arena_mode_state::LIVE) {
 						play_sound_for(in, step, battle_event::BOMB_PLANTED, never_predictable_v);
-
-						auto& planter = current_round.bomb_planter;
-						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender]);
-
-						if (const auto s = stats_of(planter)) {
-							s->bomb_plants += 1;
-						}
-
-						post_award(in, planter, in.rules.economy.bomb_plant_award);
 					}
-				}
-			});
 
+					auto& planter = current_round.bomb_planter;
+					planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender]);
+
+					if (const auto s = stats_of(planter)) {
+						s->bomb_plants += 1;
+					}
+
+					post_award(in, planter, in.rules.economy.bomb_plant_award);
+				}
+			}
+		});
+	}
+
+	if (state == arena_mode_state::LIVE) {
+		if (is_bomb_planted) {
 			if (get_critical_seconds_left(in) <= in.rules.view.secs_until_detonation_to_start_theme) {
 				if (!bomb_detonation_theme.is_set()) {
 					const auto theme = in.rules.view.bomb_soon_explodes_theme;
