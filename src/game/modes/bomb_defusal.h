@@ -49,7 +49,7 @@ struct bomb_defusal_economy_rules {
 
 	money_type bomb_plant_award = 600;
 	money_type bomb_explosion_award = 1000;
-	money_type bomb_defuse_award = 1300;
+	money_type bomb_defuse_award = 1000;
 
 	bool give_extra_mags_on_first_purchase = true;
 	// END GEN INTROSPECTOR
