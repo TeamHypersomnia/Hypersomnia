@@ -190,6 +190,7 @@ namespace test_flavours {
 					slot_def.category_allowed = item_category::OVER_BACK_WEARABLE;
 					slot_def.make_attachment_with_max_space();
 					slot_def.always_allow_exactly_one_item = true;
+					slot_def.attachment_density_multiplier = 0.f;
 					container.slots[slot_function::OVER_BACK] = slot_def;
 				}
 

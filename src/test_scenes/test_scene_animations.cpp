@@ -304,6 +304,8 @@ void load_test_scene_animations(
 				anim.frames.push_back(anim.frames[new_frames[i]]);
 			}
 
+			anim.frames.back().duration_milliseconds *= 100;
+
 			return anim;
 		};
 

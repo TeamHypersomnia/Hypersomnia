@@ -12,101 +12,81 @@
 #include "game/cosmos/just_create_entity_functional.h"
 
 bool electric_triad_instance::are_additional_conditions_for_casting_fulfilled(const const_entity_handle caster) const {
-	constexpr float standard_triad_radius = 800.f;
-
-	const bool is_any_hostile_in_proximity = get_closest_hostiles(
-		caster,
-		caster,
-		standard_triad_radius,
-		filters[predefined_filter_type::FLYING_ITEM]
-	).size() > 0;
-
-	return is_any_hostile_in_proximity;
+	(void)caster;
+	return true;
 }
 
 void electric_triad_instance::perform_logic(const spell_logic_input in) {
-	const auto subject = in.get_subject();
-	const auto& spell_data = std::get<electric_triad>(subject.get_cosmos().get_common_significant().spells);
-	const auto caster_transform = subject.get_logic_transform();
+	auto& cosm = in.step.get_cosmos();
+	const auto caster = in.get_subject();
+	const auto& spell_data = std::get<electric_triad>(caster.get_cosmos().get_common_significant().spells);
+	const auto caster_transform = caster.get_logic_transform();
 
-	ignite_cast_sparkles(spell_data, in.step, subject);
-	play_cast_successful_sound(spell_data, in.step, subject);
+	const auto clk = cosm.get_clock();	
+	const auto now = clk.now;
+	const auto dt = clk.dt;
+	const auto when_casted = in.when_casted;
 
-	constexpr float standard_triad_radius = 800.f;
-	const auto caster = subject;
-	auto& cosm = caster.get_cosmos();
+	const auto first_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(0.8f / dt.in_seconds()) };
+	const auto second_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.0f / dt.in_seconds()) };
+	const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.2f / dt.in_seconds()) };
 
-	if (!spell_data.missile_flavour.is_set()) {
+	if (now == when_casted) {
+		const auto& charging_data = std::get<ultimate_wrath_of_the_aeons>(cosm.get_common_significant().spells);
+
+		play_cast_successful_sound(spell_data, in.step, caster);
+		ignite_cast_sparkles(spell_data, in.step, caster);
+		ignite_charging_particles(charging_data, in.step, caster, cyan);
+		ignite_charging_particles(charging_data, in.step, caster, white);
+		play_cast_charging_sound(charging_data, in.step, caster);
 		return;
 	}
-	
-	const auto hostiles = get_closest_hostiles(
-		caster,
-		caster,
-		standard_triad_radius,
-		filters[predefined_filter_type::FLYING_ITEM]
-	);
 
-	if (hostiles.empty()) {
-		return;
-	}
+	auto create_nth = [&](const auto i) {
+		ignite_cast_sparkles(spell_data, in.step, caster);
+		play_cast_successful_sound(spell_data, in.step, caster);
 
-	const auto num_enemies = hostiles.size();
+		if (!spell_data.missile_flavour.is_set()) {
+			return;
+		}
+		
+		const auto spread = spell_data.spread_in_absence_of_hostiles;
 
-	for (std::size_t i = 0; i < 3; ++i) {
-		const auto next_hostile = cosm[hostiles[std::min(i, num_enemies - 1)]];
-#if MORE_LOGS
-		LOG_NVPS(next_hostile.get_id());
-#endif
+		{
+			just_create_entity(
+				cosm, 
+				spell_data.missile_flavour,
+				[&](const entity_handle new_energy_ball) {
+					auto new_energy_ball_transform = caster_transform;
+					auto& rot = new_energy_ball_transform.rotation;
 
-		just_create_entity(
-			cosm, 
-			spell_data.missile_flavour,
-			[&](const entity_handle new_energy_ball) {
-				const auto target_vector = next_hostile.get_logic_transform().pos - caster_transform.pos;
-				const auto target_degrees = target_vector.degrees();
-
-				auto new_energy_ball_transform = caster_transform;
-
-				auto& rot = new_energy_ball_transform.rotation;
-
-				{
-					const bool lacking_hostiles = num_enemies < i + 1;
-
-					if (lacking_hostiles) {
-						if (num_enemies == 1) {
-							const auto spread = spell_data.spread_in_absence_of_hostiles;
-
-							rot = target_degrees;
-
-							if (i == 1) {
-								rot += spread / 2;
-							}
-							else {
-								rot -= spread / 2;
-							}
-						}
-						else if (num_enemies == 2) {
-							const auto prev_hostile = cosm[hostiles[0]];
-							const auto prev_target_vector = prev_hostile.get_logic_transform().pos - caster_transform.pos;
-							const auto avg_vector = (prev_target_vector + target_vector) / 2;
-
-							rot = avg_vector.degrees();
-						}
-					}	
-					else {
-						rot = target_degrees;
+					if (i == 1) {
+						rot += spread / 2;
 					}
+					else if (i == 2) {
+						rot -= spread / 2;
+					}
+
+					new_energy_ball.set_logic_transform(new_energy_ball_transform);
+
+					new_energy_ball.template get<components::sender>().set(caster);
+
+					const auto energy_ball_velocity = new_energy_ball_transform.get_direction() * spell_data.missile_velocity;
+					new_energy_ball.template get<components::rigid_body>().set_velocity(energy_ball_velocity);
 				}
+			);
+		}
+	};
 
-				new_energy_ball.set_logic_transform(new_energy_ball_transform);
+	if (now == first_at) {
+		create_nth(0);
+	}
 
-				new_energy_ball.template get<components::sender>().set(caster);
-				new_energy_ball.template get<components::missile>().particular_homing_target = next_hostile;
+	if (now == second_at) {
+		create_nth(1);
+	}
 
-				const auto energy_ball_velocity = new_energy_ball_transform.get_direction() * spell_data.missile_velocity;
-				new_energy_ball.template get<components::rigid_body>().set_velocity(energy_ball_velocity);
-			}
-		);
+	if (now == third_at) {
+		create_nth(2);
 	}
 }

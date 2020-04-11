@@ -10,6 +10,7 @@ public:
 	bool surface_is_item = false;
 	bool surface_is_held_item = false;
 	bool surface_is_lying_item = false;
+	bool surface_is_missile = false;
 
 	entity_id surface_capability;
 
@@ -43,6 +44,7 @@ public:
 		/* Also don't allow the missile to collide with any held item/motorcycle of the source character */
 		ignore_altogether = missile_sender.is_sender_subject(surface);
 		surface_is_item = surface.template has<components::item>();
+		surface_is_missile = surface.template has<components::missile>();
 
 		if (surface_is_item) {
 			const auto capability = surface.get_owning_transfer_capability();
@@ -52,7 +54,7 @@ public:
 		}
 
 		surface_is_lying_item = surface_is_item && !surface_capability.is_set();
-		is_fly_through = ignore_altogether || surface_is_lying_item || surface.template get<invariants::fixtures>().bullets_fly_through;
+		is_fly_through = surface_is_missile || ignore_altogether || surface_is_lying_item || surface.template get<invariants::fixtures>().bullets_fly_through;
 	}
 
 	bool should_ignore_altogether() const {
@@ -68,6 +70,11 @@ public:
 	}
 
 	bool should_detonate() const {
+		if (surface_is_missile) {
+			/* Never detonate missile against missile. */
+			return false;
+		}
+
 		return !is_fly_through;
 	}
 };

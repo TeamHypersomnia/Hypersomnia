@@ -46,6 +46,8 @@
 #include "game/detail/calc_ammo_info.hpp"
 #include "game/modes/detail/item_purchase_logic.hpp"
 
+#include "augs/log.h"
+
 template <class T>
 bool gun_try_to_fire_and_reset(
 	const cosmos_clock& clk,
@@ -355,6 +357,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					&& has_secondary_function
 					&& triggers.test(weapon_action_type::SECONDARY))
 				;
+
+				if (interfer_once) {
+					gun.current_heat = gun_def.maximum_heat;
+				}
 
 				interfer_once = false;
 
@@ -671,6 +677,20 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							These serve purely for managing the rotating magazine - thus, aesthetic reasons.
 						*/
 
+						if (gun_def.minimum_heat_to_shoot > 0.f) {
+							if (gun.current_heat > 0.f) {
+								if (!primary_trigger_pressed) {
+									auto stop = messages::stop_sound_effect(predictability);
+									stop.match_chased_subject = gun_entity;
+									stop.match_effect_id = gun_def.heavy_heat_start_sound.id;
+									step.post_message(stop);
+
+									stop.match_effect_id = gun_def.light_heat_start_sound.id;
+									step.post_message(stop);
+								}
+							}
+						}
+
 						if (gun.current_heat < gun_def.minimum_heat_to_shoot) {
 							if (primary_trigger_pressed) {
 								auto& heat = gun.current_heat;
@@ -933,7 +953,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						const auto& wielded_items = owning_capability.get_wielded_items();
 
 						if (wielded_items.size() == 2) {
-							total_recoil *= 2.2f;
+							total_recoil *= 1.3f;
 							total_kickback *= 1.5f;
 
 							if (was_reloading) {

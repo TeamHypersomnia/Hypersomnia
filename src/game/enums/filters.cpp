@@ -11,7 +11,7 @@ static auto make_flags(Args... enums) {
 }
 
 static auto standard_participation_bitset() {
-	return augs::enum_bitset<C>(C::QUERY, C::FLYING, C::CHARACTER, C::LYING_ITEM, C::WALL, C::GROUND, C::TRIGGER, C::BULLET, C::SHELL, C::GLASS_OBSTACLE);
+	return augs::enum_bitset<C>(C::QUERY, C::BULLET, C::WALL, C::CHARACTER, C::LYING_ITEM, C::GROUND, C::FLYING, C::TRIGGER, C::SHELL, C::GLASS_OBSTACLE);
 }
 
 static auto standard_participation() {
@@ -61,6 +61,13 @@ namespace predefined_queries {
 		return out;
 	}
 	
+	b2Filter force_explosion() {
+		b2Filter out;
+		out.categoryBits = make_flags(C::QUERY);
+		out.maskBits = standard_participation_except(C::BULLET);
+		return out;
+	}
+
 	b2Filter renderable() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
@@ -104,12 +111,6 @@ predefined_filters::predefined_filters() {
 		auto& out = filters[predefined_filter_type::FLYING_BULLET];
 		out.categoryBits = make_flags(C::BULLET);
 		out.maskBits = standard_participation_except(C::BULLET);
-	}
-	{
-
-		auto& out = filters[predefined_filter_type::FLYING_COLLIDING_BULLET];
-		out.categoryBits = make_flags(C::BULLET);
-		out.maskBits = standard_participation();
 	}
 	{
 

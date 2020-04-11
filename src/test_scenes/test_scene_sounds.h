@@ -229,6 +229,8 @@ enum class test_scene_sound_id {
 	CYBERSPRAY_MUZZLE,
 	CYBERSPRAY_CHAMBERING,
 
+	ELON_HRL_LEVER,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

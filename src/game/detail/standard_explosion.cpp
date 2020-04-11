@@ -166,7 +166,7 @@ void standard_explosion_input::instantiate(
 		physics.for_each_intersection_with_triangle(
 			cosm.get_si(),
 			damaging_triangle,
-			filters[predefined_filter_type::WALL],
+			predefined_queries::force_explosion(),
 			[&](
 				const b2Fixture& fix,
 				const vec2 point_a,

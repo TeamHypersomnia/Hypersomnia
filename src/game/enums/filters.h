@@ -29,6 +29,7 @@ namespace predefined_queries {
 	filter_type crosshair_laser();
 	filter_type pathfinding();
 	filter_type renderable();
+	filter_type force_explosion();
 };
 
 enum class predefined_filter_type {
@@ -38,7 +39,6 @@ enum class predefined_filter_type {
 	GROUND,
 	LYING_ITEM,
 	FLYING_BULLET,
-	FLYING_COLLIDING_BULLET,
 	FLYING_ITEM,
 	SHELL,
 	PLANTED_EXPLOSIVE,

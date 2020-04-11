@@ -6,7 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Ping back even without NAT traversal
+- Post-map-format-fixes
+	- match begins in seconds for de_labs2 in bomb_defusal.cpp
+	- ultimate wrath of the aeons FX fields are used for electric triad
+
+- Ping back even without NAT traversal allowed
 
 - same state set: awaiting stun response -> awaiting stun response???
 

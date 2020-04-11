@@ -37,6 +37,6 @@ struct electric_triad {
 	// END GEN INTROSPECTOR
 
 	unsigned get_spell_logic_duration_ms() const {
-		return 0u;
+		return 3000u;
 	}
 };

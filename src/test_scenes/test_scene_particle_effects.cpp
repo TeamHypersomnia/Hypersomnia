@@ -2270,9 +2270,9 @@ void load_test_scene_particle_effects(
 
 		{
 			particles_emission em;
-			em.spread_degrees = float_range(2, 8);
+			em.spread_degrees = float_range(2, 25);
 			em.particles_per_sec = float_range(130, 150);
-			em.stream_lifetime_ms = float_range(3000, 3200);
+			em.stream_lifetime_ms = float_range(15000, 15200);
 			em.base_speed = float_range(20, 300);
 			em.rotation_speed = float_range(0, 0);
 			em.particle_lifetime_ms = float_range(600, 800);
@@ -2317,7 +2317,7 @@ void load_test_scene_particle_effects(
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
 			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(3.f, 5.f);
-			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(10.f, 15.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(30.f, 55.f);
 
 			effect.emissions.push_back(em);
 		}

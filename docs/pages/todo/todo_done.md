@@ -4235,3 +4235,6 @@ Advantages:
 
 - assign port to the internal network address
 
+- 3-4 bullets less for uzi
+- 15-200 bullets less for pro90
+

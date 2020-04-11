@@ -142,7 +142,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.standard_price = 650;
+			item.standard_price = 550;
 			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
