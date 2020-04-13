@@ -1,0 +1,2 @@
+- We still need to enforce timeouts for the server connections if we exhaust all stuns
+- And use port probations

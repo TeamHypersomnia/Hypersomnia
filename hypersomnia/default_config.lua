@@ -15,7 +15,7 @@ return {
 		  default_port = 8430
 	  },
 
-	  max_ports_for_probing = 40,
+	  max_ports_for_probing = 5,
 
 	  num_ports_probed = 3,
 	  num_stun_hosts_used_for_detection = 2,
@@ -36,7 +36,7 @@ return {
 	server_entry_timeout_secs = 60,
 
 	first_udp_command_port = 8430,
-	num_udp_command_ports = 40,
+	num_udp_command_ports = 5,
 
 	sleep_ms = 8,
 	server_list_port = 8420,
