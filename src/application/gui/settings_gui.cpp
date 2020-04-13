@@ -114,7 +114,8 @@ void stun_server_tester::advance() {
 		const auto state = session.get_current_state();
 
 		if (auto new_packet = session.advance(request_interval, rng)) {
-			socket.send(*new_packet);
+			packet_queue(*new_packet);
+			packet_queue.send_one(socket.socket, make_LOG());
 		}
 		
 		if (state == stun_session::state::COMPLETED) {

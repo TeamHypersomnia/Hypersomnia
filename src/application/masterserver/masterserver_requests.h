@@ -7,6 +7,7 @@
 
 #include "augs/readwrite/to_bytes.h"
 #include "application/masterserver/gameserver_commands.h"
+#include "augs/network/netcode_queued_packet.h"
 
 template <class T>
 auto make_gameserver_command_bytes(T&& command) {
@@ -31,5 +32,5 @@ inline void ping_this_server(netcode_socket_t socket, netcode_address_t target_s
 	LOG("Pinging %x", ::ToString(target_server));
 
 	auto packet = make_ping_packet(target_server, sequence);
-	netcode_socket_send_packet(&socket, &packet.first, packet.second.data(), packet.second.size());
+	netcode_socket_send_packet(&socket, &packet.to, packet.bytes.data(), packet.bytes.size());
 }

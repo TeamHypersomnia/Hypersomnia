@@ -7,6 +7,7 @@
 #include "augs/network/network_types.h"
 #include "application/nat/netcode_packet_queue.h"
 #include "augs/misc/log_function.h"
+#include "augs/network/netcode_queued_packet.h"
 
 struct randomization;
 

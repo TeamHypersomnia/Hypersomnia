@@ -16,6 +16,7 @@
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/time_utils.h"
 #include "augs/readwrite/byte_readwrite.h"
+#include "augs/network/netcode_socket_raii.h"
 #include "application/network/resolve_address.h"
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/to_bytes.h"

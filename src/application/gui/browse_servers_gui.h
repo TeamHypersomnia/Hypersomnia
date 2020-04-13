@@ -6,6 +6,7 @@
 #include "application/masterserver/server_heartbeat.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "augs/network/netcode_sockets.h"
+#include "augs/network/netcode_socket_raii.h"
 
 #include <chrono>
 

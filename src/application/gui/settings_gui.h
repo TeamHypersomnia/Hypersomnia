@@ -2,6 +2,7 @@
 #include "augs/filesystem/path.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "application/setups/editor/editor_popup.h"
+#include "augs/network/netcode_socket_raii.h"
 
 struct config_lua_table;
 
@@ -48,6 +49,7 @@ class stun_server_tester {
 
 public:
 	netcode_socket_raii socket;
+	netcode_packet_queue packet_queue;
 
 	stun_server_provider provider;
 	std::vector<std::unique_ptr<stun_session>> current_sessions;

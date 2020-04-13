@@ -4245,3 +4245,8 @@ Advantages:
 
 - tell me my address should include a session guid too...
 
+- We'll need to somehow preffix all our udp traffic with command indices I guess
+	- or just new masterserver request types right?
+
+
+- bomb_defusal -> bomb_defusal

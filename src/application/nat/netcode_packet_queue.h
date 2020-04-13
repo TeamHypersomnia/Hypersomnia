@@ -1,8 +1,7 @@
 #pragma once
 #include "augs/network/netcode_sockets.h"
 #include "augs/misc/log_function.h"
-
-using netcode_queued_packet = std::pair<netcode_address_t, std::vector<std::byte>>;
+#include "augs/network/netcode_queued_packet.h"
 
 struct netcode_packet_queue {
 	std::vector<netcode_queued_packet> queue;
@@ -13,7 +12,8 @@ struct netcode_packet_queue {
 	void send_some(netcode_socket_t, double interval_ms, log_function log_sink);
 
 	template <class... Args>
-	void operator()(Args&&... args) {
+	auto& operator()(Args&&... args) {
 		queue.emplace_back(std::forward<Args>(args)...);
+		return *this;
 	}
 };

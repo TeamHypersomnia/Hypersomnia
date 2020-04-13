@@ -81,6 +81,7 @@
 
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/network/resolve_address.h"
+#include "augs/network/netcode_socket_raii.h"
 
 #include "cmd_line_params.h"
 #include "build_info.h"

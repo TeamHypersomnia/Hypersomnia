@@ -76,7 +76,7 @@ void server_nat_traversal::advance() {
 
 				if (!traversal.holes_opened) {
 					LOG("Opening holes for the client right away to increase the chance of an adjacent port.");
-					traversal.open_holes(client_address, packet_queue);
+					traversal.open_holes(input.traversal_settings, client_address, packet_queue);
 				}
 			}
 
@@ -211,7 +211,7 @@ bool server_nat_traversal::handle_auxiliary_command(
 				}
 
 				case nat_traversal_step_type::PINGBACK:
-					traversal.open_holes(client_address, packet_queue);
+					traversal.open_holes(input.traversal_settings, client_address, packet_queue);
 					break;
 
 				default:
@@ -240,7 +240,8 @@ server_nat_traversal::session::session()
 {}
 
 void server_nat_traversal::session::open_holes(
-	netcode_address_t predicted_open_address,
+	const nat_traversal_settings& settings,
+	const netcode_address_t predicted_open_address,
 	netcode_packet_queue& queue
 ) {
 	auto response = gameserver_nat_traversal_response_packet();
@@ -250,11 +251,26 @@ void server_nat_traversal::session::open_holes(
 
 	LOG("Opening NAT holes for the predicted client address: %x\nPort dt: %x", ::ToString(predicted_open_address), port_dt);
 
-	queue(predicted_open_address, augs::to_bytes(response));
+	const auto ping_bytes = augs::to_bytes(response);
+
+	queue(predicted_open_address, ping_bytes);
 
 	if (last_payload.ping_back_at_multiple_ports) {
-		// TODO: ping
-		LOG("Pinging at multiple ports to increase the chance of success.");
+		if (!holes_opened) {
+			LOG("Pinging at multiple ports to increase the chance of success.");
+
+			const auto first_predicted_port = predicted_open_address.port;
+
+			for (int i = 1; i <= settings.num_brute_force_packets; ++i) {
+				const auto offset = i * port_dt;
+				const auto next_port = offset + first_predicted_port;
+
+				auto next_predicted_address = predicted_open_address;
+				next_predicted_address.port = next_port;
+
+				queue(next_predicted_address, ping_bytes);
+			}
+		}
 	}
 
 	holes_opened = true;

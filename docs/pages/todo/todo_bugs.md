@@ -5,6 +5,11 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Investigate the mysterious hotbar crash
+	- Happened when we finished drag and dropping on hotbar 
+	- All buttons on hotbar were assigned
+	- The item we dragged was hidden in backpack and *possibly* unassigned to hotbar yet
+
 - remember to fix your system time before hosting
 	- fix that damn connect token
 

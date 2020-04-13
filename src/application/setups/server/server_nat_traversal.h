@@ -32,7 +32,11 @@ class server_nat_traversal {
 
 		session();
 
-		void open_holes(netcode_address_t, netcode_packet_queue&);
+		void open_holes(
+			const nat_traversal_settings& settings,
+			netcode_address_t,
+			netcode_packet_queue&
+		);
 	};
 
 	const std::optional<netcode_address_t>& masterserver_address;

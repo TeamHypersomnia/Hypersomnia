@@ -464,7 +464,7 @@ std::string stringize_bytes(const std::vector<std::byte>& bytes) {
 double yojimbo_time();
 
 std::string describe_packet(const netcode_queued_packet& p) {
-	return typesafe_sprintf("[PACKET] [%f] %x (%x bytes): %x", yojimbo_time(), ToString(p.first), p.second.size(), stringize_bytes(p.second));
+	return typesafe_sprintf("[PACKET%x] [%f] %x (%x bytes): %x", p.ttl ? typesafe_sprintf(" TTL = %x", *p.ttl) : "", yojimbo_time(), ToString(p.to), p.bytes.size(), stringize_bytes(p.bytes));
 }
 
 void netcode_packet_queue::send_one(netcode_socket_t socket, log_function log_sink) {
@@ -473,12 +473,23 @@ void netcode_packet_queue::send_one(netcode_socket_t socket, log_function log_si
 	}
 
 	auto packet = queue.front();
-	auto& bytes = packet.second;
-	auto& address = packet.first;
+	auto& address = packet.to;
+	auto& bytes = packet.bytes;
 
 	log_sink(describe_packet(packet));
 
+	auto saved_ttl = std::optional<int>();
+
+	if (packet.ttl != std::nullopt) {
+		saved_ttl = netcode_socket_get_ttl(&socket);
+		netcode_socket_set_ttl(&socket, *packet.ttl);
+	}
+
 	netcode_socket_send_packet(&socket, &address, bytes.data(), bytes.size());
+
+	if (saved_ttl != std::nullopt) {
+		netcode_socket_set_ttl(&socket, *saved_ttl);
+	}
 
 	queue.erase(queue.begin());
 }

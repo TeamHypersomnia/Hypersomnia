@@ -14,6 +14,7 @@ return {
 		  address = "masterserver.hypersomnia.xyz",
 		  default_port = 8430
 	  },
+
 	  max_ports_for_probing = 40,
 
 	  num_ports_probed = 3,
@@ -25,7 +26,7 @@ return {
   },
 
   nat_traversal = {
-	  short_ttl = 2,
+	  short_ttl = 3,
 	  num_brute_force_packets = 25,
 	  traversal_attempt_timeout_secs = 4
   },

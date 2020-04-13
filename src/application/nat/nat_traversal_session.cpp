@@ -96,6 +96,11 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 	const auto client_type = input.client.type;
 	const auto server_type = input.server.type;
 
+	const bool both_SYMPS = 
+		server_type == nat_type::PORT_SENSITIVE 
+		&& client_type == nat_type::PORT_SENSITIVE
+	;
+
 	auto make_traversal_step = [&]() {
 		const auto port_dt = input.client.port_delta;
 
@@ -127,6 +132,11 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 		payload.source_port_delta = port_dt;
 		payload.ping_back_at_multiple_ports = symmetric(client_type);
 
+		if (both_SYMPS) {
+			/* Give it a break. Brute-force very unlikely to work in this case. */
+			payload.ping_back_at_multiple_ports = false;
+		}
+
 		return step;
 	};
 
@@ -155,19 +165,40 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 	};
 
 	auto open_holes_for_server = [&]() {
+		const auto& settings = input.traversal_settings;
+
 		client_holes_opened = true;
 
-		auto open_hole_directed_at = [&](const port_type target_port) {
+		auto open_hole_directed_at = [&](const port_type target_port, bool short_ttl = false) {
 			auto target_address = input.traversed_address;
 			target_address.port = target_port;
 
 			const auto sequence = augs::bit_cast<std::uint64_t>(session_guid);
-			packet_queue(make_ping_packet(target_address, sequence));
+
+			auto packet = make_ping_packet(target_address, sequence);
+
+			if (short_ttl) {
+				packet.ttl = settings.short_ttl;
+			}
+
+			packet_queue(packet);
 		};
 
 		if (last_server_stunned_port != 0) {
-			const auto dt = input.server.port_delta;
-			open_hole_directed_at(dt + last_server_stunned_port);
+			const auto port_dt = input.server.port_delta;
+			const auto first_predicted_port = port_dt + last_server_stunned_port;
+
+			open_hole_directed_at(first_predicted_port);
+
+			if (both_SYMPS) {
+				/* Give it a break. Brute-force very unlikely to work in this case. */
+			}
+			else {
+				for (int i = 1; i <= settings.num_brute_force_packets; ++i) {
+					const auto offset = i * port_dt;
+					open_hole_directed_at(offset + first_predicted_port, true);
+				}
+			}
 		}
 		else {
 			open_hole_directed_at(input.traversed_address.port);
