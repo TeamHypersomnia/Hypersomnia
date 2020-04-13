@@ -14,6 +14,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/nat/stun_request.h"
 #include "application/nat/stun_server_provider.h"
+#include "augs/misc/time_utils.h"
 
 std::string nat_detection_result::describe() const {
 	using N = nat_type;
@@ -49,7 +50,8 @@ nat_detection_session::nat_detection_session(
 	settings(in),
 	stun_provider(stun_provider),
 	log_sink(log_sink),
-	future_port_probing_host(async_resolve_address(in.port_probing_host))
+	future_port_probing_host(async_resolve_address(in.port_probing_host)),
+	session_timestamp(augs::date_time().secs_since_epoch())
 {
 	log_info("---- BEGIN NAT ANALYSIS ----");
 
@@ -175,7 +177,7 @@ void nat_detection_session::send_requests() {
 		{
 			for (auto& probation : port_probing_requests) {
 				if (!probation.completed()) {
-					const auto request = masterserver_in::tell_me_my_address {};
+					const auto request = masterserver_in::tell_me_my_address { session_timestamp };
 					auto bytes = augs::to_bytes(masterserver_request(request));
 
 					packet_queue(probation.destination, bytes);
@@ -364,6 +366,12 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 		using R = remove_cref<decltype(response)>;
 
 		if constexpr(std::is_same_v<R, masterserver_out::tell_me_my_address>) {
+			if (response.session_timestamp != session_timestamp) {
+				log_info("received tell_me_my_address, but the session_timestamp does not match: %x != %x (ours)", response.session_timestamp, session_timestamp);
+
+				return false;
+			}
+
 			const auto& our_external_address = response.address;
 
 			log_info("port probe response: %x -> %x", ::ToString(from), ::ToString(our_external_address));

@@ -4243,3 +4243,5 @@ Advantages:
 	- well, makes sense on restun
 - Ping back even without NAT traversal allowed
 
+- tell me my address should include a session guid too...
+

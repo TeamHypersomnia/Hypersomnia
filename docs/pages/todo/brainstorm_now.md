@@ -21,8 +21,6 @@ summary: That which we are brainstorming at the moment.
 		- also some double free, so maybe it's that
 	- so be sure to make that shift+f1 hotkey or something else
 
-- tell me my address should include a session guid too...
-
 - port number in start server gui: maybe somehow save that port number when the textbox deactivates...
 
 - disallow nat on official server

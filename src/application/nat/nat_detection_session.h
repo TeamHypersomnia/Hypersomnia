@@ -40,6 +40,7 @@ class nat_detection_session {
 	net_time_t when_last_made_requests = -1;
 
 	const nat_detection_settings settings;
+
 	stun_server_provider& stun_provider;
 	log_function log_sink;
 	std::string full_log;
@@ -52,6 +53,8 @@ class nat_detection_session {
 
 	std::vector<stun_request_state> stun_requests;
 	std::vector<request_state> port_probing_requests;
+
+	const double session_timestamp;
 
 	void send_requests();
 

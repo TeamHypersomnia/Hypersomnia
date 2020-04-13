@@ -301,6 +301,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					else if constexpr(std::is_same_v<R, masterserver_in::tell_me_my_address>) {
 						masterserver_out::tell_me_my_address response;
 						response.address = from;
+						response.session_timestamp = typed_request.session_timestamp;
 
 						MSR_LOG("TELL_ME_MY_ADDRESS arrived from: %x", ::ToString(from));
 						send_back(response);
