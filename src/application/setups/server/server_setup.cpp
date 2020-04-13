@@ -33,6 +33,8 @@
 #include "augs/network/netcode_utils.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/nat/stun_session.h"
+#include "augs/templates/bit_cast.h"
+#include "application/masterserver/gameserver_command_readwrite.h"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -73,6 +75,41 @@ void server_heartbeat::validate() {
 	}
 }
 
+bool server_setup::respond_to_ping_requests(
+	const netcode_address_t& from,
+	const std::byte* packet_buffer,
+	const std::size_t packet_bytes
+) {
+	auto handle = [&](const auto& typed_request) {
+		using T = remove_cref<decltype(typed_request)>;
+
+		if constexpr(std::is_same_v<T, gameserver_ping_request>) {
+			const auto sequence = typed_request.sequence;
+			LOG("Received ping request from: %x (sequence: %x / %f)", ::ToString(from), sequence, augs::bit_cast<double>(sequence));
+
+			auto response = gameserver_ping_response();
+			response.sequence = sequence;
+
+			auto bytes = augs::to_bytes(response);
+			server->send_udp_packet(from, bytes.data(), bytes.size());
+
+			return true;
+		}
+
+		return false;
+	};
+
+	try {
+		const auto request = read_gameserver_command(packet_buffer, packet_bytes);
+		return std::visit(handle, request);
+	}
+	catch (const augs::stream_read_error&) {
+
+	}
+
+	return false;
+}
+
 server_setup::server_setup(
 	sol::state& lua,
 	const augs::server_listen_input& in,
@@ -91,6 +128,10 @@ server_setup::server_setup(
 		std::make_unique<server_adapter>(
 			in,
 			[this](auto&&... args) {
+				if (respond_to_ping_requests(std::forward<decltype(args)>(args)...)) {
+					return true;
+				}
+
 				return nat_traversal.handle_auxiliary_command(std::forward<decltype(args)>(args)...); 
 			}
 		)

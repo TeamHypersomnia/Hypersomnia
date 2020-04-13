@@ -125,32 +125,12 @@ bool server_nat_traversal::handle_auxiliary_command(
 		return false;
 	}
 
-	auto respond = [&](netcode_address_t to, const auto& typed_response) {
-		auto bytes = augs::to_bytes(typed_response);
-		packet_queue(to, bytes);
-	};
-
-	auto send_back = [&](const auto& typed_response, std::optional<port_type> override_port = std::nullopt) {
-		auto target_address = from;
-
-		if (override_port != std::nullopt) {
-			target_address.port = *override_port;
-		}
-
-		respond(target_address, typed_response);
-	};
-
 	auto handle = [&](const auto& typed_request) {
 		using T = remove_cref<decltype(typed_request)>;
 
 		if constexpr(std::is_same_v<T, gameserver_ping_request>) {
-			const auto sequence = typed_request.sequence;
-			LOG("Received ping request from: %x (sequence: %x / %f)", ::ToString(from), sequence, augs::bit_cast<double>(sequence));
-
-			auto response = gameserver_ping_response();
-			response.sequence = sequence;
-
-			send_back(response);
+			/* Handled elsewhere */
+			return;
 		}
 		else if constexpr(std::is_same_v<T, masterserver_out::nat_traversal_step>) {
 			if (last_detected_nat.type == nat_type::PUBLIC_INTERNET) {

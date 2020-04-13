@@ -15,10 +15,6 @@ summary: That which we are brainstorming at the moment.
 	- match begins in seconds for de_labs2 in bomb_defusal.cpp
 	- ultimate wrath of the aeons FX fields are used for electric triad
 
-- Ping back even without NAT traversal allowed
-
-- same state set: awaiting stun response -> awaiting stun response???
-
 - strange crashes on quit
 	- path type destructor in nat detection settings 
 	- seriously wtf...

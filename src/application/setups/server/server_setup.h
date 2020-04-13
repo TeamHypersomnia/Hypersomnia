@@ -185,6 +185,13 @@ private:
 	bool server_list_enabled() const;
 	bool has_sent_any_heartbeats() const;
 	void shutdown();
+
+	bool respond_to_ping_requests(
+		const netcode_address_t& from,
+		const std::byte* packet_buffer,
+		const std::size_t packet_bytes
+	);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

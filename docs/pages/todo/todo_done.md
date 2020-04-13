@@ -4238,3 +4238,8 @@ Advantages:
 - 3-4 bullets less for uzi
 - 15-200 bullets less for pro90
 
+
+- same state set: awaiting stun response -> awaiting stun response???
+	- well, makes sense on restun
+- Ping back even without NAT traversal allowed
+
