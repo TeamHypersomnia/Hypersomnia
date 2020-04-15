@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Wtf with those mags appearing at the center of the map?
+- Also you can still sometimes get a magazine in hand if you buy HPSR with little inventory space
+- And you still sometimes need to reload weapons after the round is restarted
+
+- Player can see the opposing team's inventory post-mortem
+
 - The aborted sounds end abruplty if we have less than 1.0 master/sfx gain in settings
 
 - (Update script) Sync config.lua against the user folder in the home dir, not in hypersomnia dir
@@ -14,11 +20,6 @@ summary: That which we are brainstorming at the moment.
 - Post-map-format-fixes
 	- match begins in seconds for de_labs2 in bomb_defusal.cpp
 	- ultimate wrath of the aeons FX fields are used for electric triad
-
-- looks like time since epoch is counted in seconds...
-	- actually we can make it finer
-	- so just use that to discard all old sessions
-	- this can be used as a session guid too
 
 - Energy consumption fix: sleep the remaining frame time
 
@@ -59,52 +60,11 @@ summary: That which we are brainstorming at the moment.
 - IPv6 fixes
 	- ip-agnostic find_underlying_socket
 
-- Browse window logistics
-	- Main menu holds a server list socket
-	- In-game, the yojimbo's socket is used
-	- Close upon entering but when launching another setup, ask to re-open when going back to menu
-	- Re-calculate server details for showing in-game
-		- Though we won't show internal ip address but it's okay
-
-- We have no choice but to simply pass around the preferred port as a value and hope for the best
-
 - advance only advances pings and nats already requested
 	- but it is only the imgui-performing function that requests the pings and nats in the first place
 		- and only if it detects that there is a need for them and a sufficient interval has passed
 
 - For now, don't save in custom config after connecting from the list
-
-- Client-side, on receiving server list:
-	- 
-
-- Let the client manage the nat punching for all the servers on its own
-	- Server would be too vulnerable if it would send a ping after getting just a single packet
-	- At least it will depend on the upload strength of the client
-	- Masterserver doesn't have to worry about current punching state, just relays reverse requests
-
-- Somehow limit the amount of possible nat requests existent on the server
-
-- Let's just do ping synchronously for now, we'd have to have like thousands of servers for async to make a difference
-	- synchronously receive packets in perform imgui
-
-- Watch out because perform logic might suddenly stop being run since the user can just close the window
-
-- It's safe to send at least 64 ping packets per perform tick
-	- Since it's tied to the frame rate and a hypothetical server must be able to handle that
-
-- Already when the server list is requested, masterserver should request a reverse ping from all servers 
-	- Then just automatically re-ping all servers once every 20 seconds
-
-- By default show most recent servers on top
-	- nah, actually the closest
-
-- Later, upon choosing a server list entry, re-request the masterserver to aid in the connection, just in case
-
-- Add more commonly changed parameters to host a server menu
-	- Name and arena
-
-- Will TCP be available after nat punch?
-	- because we'll somehow need to transmit the map data...
 
 - If someone connects at the last slot available, and there is no master RCON on the server, kick them if the rcon doesn't match
 	- So that we always have a slot registered for RCON
@@ -113,23 +73,6 @@ summary: That which we are brainstorming at the moment.
 	- The client anyway has to resolve official server ip addresses for pinging
 	- match ips
 
-- Consider a tab for "official" and "community" in browse servers
-	- Actually maybe no because it'd be nice to have it condensed and compare best pings quickly
-
-- "Favorites" tab
-
-- Remember the official server to which we have connected
-
-- Determining best official server
-	- default: EU
-	- Once every second ping all official servers
-	- change_with_save to the first one that responds
-	- is later chosen as the default for Connect to official universe
-	- show ping live in that window next to the server name
-
-- Quick play
-	- From servers that have any players, find the one with best latency
-
 - Find best official server?
 
 - Resolve masterserver hostname once a minute or two, asynchronously?
@@ -137,57 +80,6 @@ summary: That which we are brainstorming at the moment.
 
 - just take sockname from the existing connection with masterserver over http
 	- when you downloaded the server list
-
-- Procedure for the game server
-	- Once every 5 seconds, send statistics line to the masterserver
-		- Contains external/internal address:port info
-		- num of players and all these stats
-	- Masterserver smoothly registers the server every time it encounters this
-	- To send stats, use the socket already bound in yojimbo server, somehow extract it
-	- Responding to nat open request
-		- same as ping just different enum and has a target address attached to it
-		- send back confirmation to source packet ip if different
-	- Responding to ping requests
-		- A potential game client will ping this server
-		- We only need to send a ping back
-	- It looks like we'll never send stats on-demand; only periodically - completely on our terms
-	- so netcode only needs a ping packet
-	- has to have a constant connection with the masterserver in case that it sends information about connection request
-
-- Procedure for the masterserver
-	- Open port 8413 at all times
-	- Receive:
-		- list requests
-			- HTTP get
-			- has to open NAT of all the servers, for the requester to know ping
-				- only open nat for servers behind a nat
-				- send nat open request every second, marking those which managed to receive the message
-			- at this scale we don't have to worry about it, just set a timeout for refreshes, like 10 secs
-		- detailed server info only on demand through http
-		- connection requests
-			- to external ip:port
-			- yojimbo provided socket
-		- heartbeats from servers
-			- yojimbo provided socket
-			- If no messages came for a minute, delete the server from the list
-				- Mapping by the external ip
-	- Respond with:
-		- list contents
-			- to clients
-			- to website
-			- http
-		- server details
-			- http
-		- connection requests
-			- but only to the target server
-
-- Procedure for a potential client
-	- Downloading list of servers
-		- We'll use HTTP because the masterserver will anyway have a http server for other uses
-- Use our test windows server to check how external ip resolution works on windows
-	- though it might be screwed up too
-
-- log detected internal ip on startup
 
 - don't change map structure until we finally make demo player improvements
 	- which we need for demo replay
@@ -220,15 +112,6 @@ summary: That which we are brainstorming at the moment.
 	- We need to consider that arbitrary string might be found inside server's name, map name or player username
 
 - Sending server stats
-
-- Multiple official servers
-	- Picking best
-	- Do this once we have pinging implemented, which we want with the list of community servers
-
-- Masterserver
-	- For now, we'll update it manually whenever the need arises
-	- NAT punchthrough builtin
-	- Connect on Browse
 
 - Website server status
 	- Game servers have a built-in http server?
@@ -310,7 +193,9 @@ summary: That which we are brainstorming at the moment.
 	- Fix too many chat messages
 
 - Don't kick afk spectators
-	- send some heartbeat
+	- send some heartbeat on mouse movement
+	- or just not kick at all
+	- actually instead of kicking, just move players to spectator for an indefinite period of time
 
 - Inventory GUI still acts up
 

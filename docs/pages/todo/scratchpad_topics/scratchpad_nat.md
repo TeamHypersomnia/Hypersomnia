@@ -40,6 +40,9 @@
 
 ## DISREGARDED
 
+- Will TCP be available after nat punch?
+	- because we'll somehow need to transmit the map data...
+
 - Blindly request whenever we connect anywhere, in client_setup
 	- But do this asynchronously to the connection attempt
 	- won't hurt to send the nat open request once again upon connect from the list

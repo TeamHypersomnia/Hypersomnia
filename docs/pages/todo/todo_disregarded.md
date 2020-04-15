@@ -492,3 +492,6 @@ summary: Just a hidden scratchpad.
 	- to test the predicted experience
 	- we might look into legacy sources for guidance
 	- fill in several artificial connections starting from the back of the client array
+- Already when the server list is requested, masterserver should request a reverse ping from all servers 
+	- Then just automatically re-ping all servers once every 20 seconds
+

@@ -4,6 +4,13 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Determining best official server
+	- default: EU
+	- Once every second ping all official servers
+	- change_with_save to the first one that responds
+	- is later chosen as the default for Connect to official universe
+	- show ping live in that window next to the server name
+
 - Delta compress the solvable to send against the initial solvable
 
 - plan for full server replays

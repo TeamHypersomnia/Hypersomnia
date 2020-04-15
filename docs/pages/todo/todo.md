@@ -6,6 +6,17 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Multiple official servers
+	- Picking best
+	- Do this once we have pinging implemented, which we want with the list of community servers
+
+- Consider a tab for "official" and "community" in browse servers
+	- Actually maybe no because it'd be nice to have it condensed and compare best pings quickly
+- "Favorites" tab
+
+- Quick play
+	- From servers that have any players, find the one with best latency
+
 - Make server save RCON changes to the config
 
 - Inventory improvements

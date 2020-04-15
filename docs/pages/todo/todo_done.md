@@ -4261,3 +4261,89 @@ Advantages:
 		- hold it in main menu even if we don't allow to watch the server list from the game
 			- because we anyway have to destroy it before connecting 
 	- later the socket will be destroyed along with the main menu
+- looks like time since epoch is counted in seconds...
+	- actually we can make it finer
+	- so just use that to discard all old sessions
+	- this can be used as a session guid too
+
+
+- Browse window logistics
+	- Main menu holds a server list socket
+	- In-game, the yojimbo's socket is used
+	- Close upon entering but when launching another setup, ask to re-open when going back to menu
+	- Re-calculate server details for showing in-game
+		- Though we won't show internal ip address but it's okay
+- We have no choice but to simply pass around the preferred port as a value and hope for the best
+
+- Client-side, on receiving server list:
+	- 
+- Let the client manage the nat punching for all the servers on its own
+	- Server would be too vulnerable if it would send a ping after getting just a single packet
+	- At least it will depend on the upload strength of the client
+	- Masterserver doesn't have to worry about current punching state, just relays reverse requests
+
+- Somehow limit the amount of possible nat requests existent on the server
+
+- Let's just do ping synchronously for now, we'd have to have like thousands of servers for async to make a difference
+	- synchronously receive packets in perform imgui
+
+- It's safe to send at least 64 ping packets per perform tick
+	- Since it's tied to the frame rate and a hypothetical server must be able to handle that
+
+- By default show most recent servers on top
+	- nah, actually the closest
+
+- Add more commonly changed parameters to host a server menu
+	- Name and arena
+
+- Procedure for the game server
+	- Once every 5 seconds, send statistics line to the masterserver
+		- Contains external/internal address:port info
+		- num of players and all these stats
+	- Masterserver smoothly registers the server every time it encounters this
+	- To send stats, use the socket already bound in yojimbo server, somehow extract it
+	- Responding to nat open request
+		- same as ping just different enum and has a target address attached to it
+		- send back confirmation to source packet ip if different
+	- Responding to ping requests
+		- A potential game client will ping this server
+		- We only need to send a ping back
+	- It looks like we'll never send stats on-demand; only periodically - completely on our terms
+	- so netcode only needs a ping packet
+	- has to have a constant connection with the masterserver in case that it sends information about connection request
+
+- Procedure for the masterserver
+	- Open port 8413 at all times
+	- Receive:
+		- list requests
+			- HTTP get
+			- has to open NAT of all the servers, for the requester to know ping
+				- only open nat for servers behind a nat
+				- send nat open request every second, marking those which managed to receive the message
+			- at this scale we don't have to worry about it, just set a timeout for refreshes, like 10 secs
+		- detailed server info only on demand through http
+		- connection requests
+			- to external ip:port
+			- yojimbo provided socket
+		- heartbeats from servers
+			- yojimbo provided socket
+			- If no messages came for a minute, delete the server from the list
+				- Mapping by the external ip
+	- Respond with:
+		- list contents
+			- to clients
+			- to website
+			- http
+		- server details
+			- http
+		- connection requests
+			- but only to the target server
+
+- Procedure for a potential client
+	- Downloading list of servers
+		- We'll use HTTP because the masterserver will anyway have a http server for other uses
+- Use our test windows server to check how external ip resolution works on windows
+	- though it might be screwed up too
+
+- log detected internal ip on startup
+
