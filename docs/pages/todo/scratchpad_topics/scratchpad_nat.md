@@ -40,6 +40,26 @@
 
 ## DISREGARDED
 
+- Blindly request whenever we connect anywhere, in client_setup
+	- But do this asynchronously to the connection attempt
+	- won't hurt to send the nat open request once again upon connect from the list
+	- Main menu can pass resolved netcode address of masterserver
+	- If starting client setup from scratch, we have to resolve it
+	- So, two overloads?
+		- Just one but have on optional resolved
+	- Well, we don't have the resolved masterserver address because it's from httplib
+
+- If both masterserver and server are on the same machine then nat punch request might not arrive on the lane masterserver->server
+	- Which is why we're seeing official server offline when testing without pre-emptive ping
+	- To test, temporarily just send a nat punch request to localhost on masterserver
+	- For testing, just request to punch the internal server's address
+
+- Let's just do a simple quadratic approach for now
+	- You can't send just a single packet from the target server, beacuse that port is reserved for my communication with the master server
+		- But at the very least it can be linear on the server-side
+		- You just send at like 100 sequential destination ports and call it a day
+		- Then you brute force bind e.g. 100 sockets on client side and for each of them, open all possible source ports at which any from the 100 server packets can arrive
+
 - In a single app run, keep a dictionary of opened servers and ping them regularly
 	- could even perhaps ping them from the browser window
 	- so, the browser window could fulfill that role entirely

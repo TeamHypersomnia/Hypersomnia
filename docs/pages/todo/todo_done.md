@@ -4250,3 +4250,14 @@ Advantages:
 
 
 - bomb_defusal -> bomb_defusal
+- We'll detect whether the server is internal at the server browser stage.
+	- Because we'll ping both addresses.
+
+- Problem: we can't browse servers in-game unless we use the socket provided by yojimbo
+	- What if we overwrite the socket in yojimbo?
+		- nah, we have no way of tampering the connection process
+	- let browse gui hold a pointer to the used socket
+	- let main menu hold such socket
+		- hold it in main menu even if we don't allow to watch the server list from the game
+			- because we anyway have to destroy it before connecting 
+	- later the socket will be destroyed along with the main menu

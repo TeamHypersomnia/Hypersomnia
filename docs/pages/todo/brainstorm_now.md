@@ -33,28 +33,14 @@ summary: That which we are brainstorming at the moment.
 	- and the other way too
 	- just handle an exception probably
 
-- Let's just do a simple quadratic approach for now
-	- You can't send just a single packet from the target server, beacuse that port is reserved for my communication with the master server
-		- But at the very least it can be linear on the server-side
-		- You just send at like 100 sequential destination ports and call it a day
-		- Then you brute force bind e.g. 100 sockets on client side and for each of them, open all possible source ports at which any from the 100 server packets can arrive
-
 - Turn off logs of masterserver and browser later
 
 - Implement sending the current version to the server
 
-- If both masterserver and server are on the same machine then nat punch request might not arrive on the lane masterserver->server
-	- Which is why we're seeing official server offline when testing without pre-emptive ping
-	- To test, temporarily just send a nat punch request to localhost on masterserver
-	- For testing, just request to punch the internal server's address
-
 - Remember to not send goodbye for when the servers are automatically updating
 
 - Apparently, clipboard prevents connection to any server...
-	- Because it can't bind the socket
-
-- We'll detect whether the server is internal at the server browser stage.
-	- Because we'll ping both addresses.
+	- Because it can't bind the socket. lol
 
 - The masterserver should dump entire state before restarting for update
 	- To give servers a chance, set time of last heartbeat to current time after starting up
@@ -70,19 +56,8 @@ summary: That which we are brainstorming at the moment.
 - Just pass a lambda for ingame menu which buttons are available
 	- Later we'll properly hide them but for now they'll just be inactive
 
-- Only allow browse servers
-
 - IPv6 fixes
 	- ip-agnostic find_underlying_socket
-
-- Blindly request whenever we connect anywhere, in client_setup
-	- But do this asynchronously to the connection attempt
-	- won't hurt to send the nat open request once again upon connect from the list
-	- Main menu can pass resolved netcode address of masterserver
-	- If starting client setup from scratch, we have to resolve it
-	- So, two overloads?
-		- Just one but have on optional resolved
-	- Well, we don't have the resolved masterserver address because it's from httplib
 
 - Browse window logistics
 	- Main menu holds a server list socket
@@ -90,15 +65,6 @@ summary: That which we are brainstorming at the moment.
 	- Close upon entering but when launching another setup, ask to re-open when going back to menu
 	- Re-calculate server details for showing in-game
 		- Though we won't show internal ip address but it's okay
-
-- Problem: we can't browse servers in-game unless we use the socket provided by yojimbo
-	- What if we overwrite the socket in yojimbo?
-		- nah, we have no way of tampering the connection process
-	- let browse gui hold a pointer to the used socket
-	- let main menu hold such socket
-		- hold it in main menu even if we don't allow to watch the server list from the game
-			- because we anyway have to destroy it before connecting 
-	- later the socket will be destroyed along with the main menu
 
 - We have no choice but to simply pass around the preferred port as a value and hope for the best
 
@@ -253,22 +219,7 @@ summary: That which we are brainstorming at the moment.
 - Security concerns when rendering on site
 	- We need to consider that arbitrary string might be found inside server's name, map name or player username
 
-
-- Data format
-
-
-- Map version considerations
-	- Communiy map migration
-		- copy user folder to OLD_HYPERSOMNIA, in case there are some important maps too
-		- Solution for map conversions: just keep binary versions in caches?
-
-	- Check official map version upon connection
-		- if mismatch
-			- custom? re-download
-			- official? disconnect
-
 - Sending server stats
-- Actually it's better if stats come from the same port because nat will be less complex
 
 - Multiple official servers
 	- Picking best
