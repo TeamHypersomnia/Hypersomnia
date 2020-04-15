@@ -208,6 +208,30 @@ server_setup::server_setup(
 	resolve_server_list();
 }
 
+uint32_t server_setup::get_max_connections() const {
+	return last_start.max_connections;
+}
+
+uint32_t server_setup::get_num_connected() const {
+	const auto& arena = get_arena_handle();
+
+	return arena.on_mode_with_input(
+		[&](const auto& mode, const auto&) {
+			return mode.get_num_players();
+		}
+	);
+}
+
+uint32_t server_setup::get_num_active_players() const {
+	const auto& arena = get_arena_handle();
+
+	return arena.on_mode_with_input(
+		[&](const auto& mode, const auto&) {
+			return mode.get_num_active_players();
+		}
+	);
+}
+
 void server_setup::send_heartbeat_to_server_list() {
 	ensure(resolved_server_list_addr.has_value());
 
@@ -228,11 +252,11 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.max_online = last_start.max_connections;
 	heartbeat.internal_network_address = internal_address;
 
+	heartbeat.num_online = get_num_connected();
+	heartbeat.num_fighting = get_num_active_players();
+
 	arena.on_mode_with_input(
 		[&heartbeat](const auto& mode, const auto& input) {
-			heartbeat.num_online = mode.get_num_players();
-
-			heartbeat.num_fighting = mode.get_num_active_players();
 			heartbeat.max_fighting = mode.get_max_num_active_players(input);
 		}
 	);
