@@ -12,8 +12,10 @@
 
 /* A shortcut which will be heavily used from now on */
 
+#if BUILD_OPENAL
 template <class A, class B>
 constexpr bool same = std::is_same_v<A, B>;
+#endif
 
 namespace augs {
 	audio_backend::audio_backend() {
