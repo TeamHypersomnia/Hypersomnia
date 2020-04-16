@@ -162,8 +162,8 @@ void nat_detection_session::send_requests() {
 	}
 
 	if (try_fire_interval(settings.request_interval_ms / 1000.0, when_last_made_requests)) {
-		if (times_sent_requests == 0) {
-			log_info("Firing request packets.");
+		if (times_sent_requests % 5 == 0) {
+			log_info("Firing packets for NAT resolution.");
 		}
 
 		times_sent_requests++;
@@ -433,7 +433,7 @@ void nat_detection_session::advance(netcode_socket_t socket) {
 	receive_packets(socket);
 
 	send_requests();
-	packet_queue.send_some(socket, settings.packet_interval_ms / 1000.0, [&](const std::string& l) { log_info(l); });
+	packet_queue.send_some(socket, settings.packet_interval_ms / 1000.0, no_LOG());
 	analyze_results(socket.address.port);
 }
 
