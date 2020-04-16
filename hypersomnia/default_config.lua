@@ -59,7 +59,8 @@ return {
   },
 
   official_arena_servers = {
-	"arena.hypersomnia.xyz" 
+	"arena.hypersomnia.xyz",
+	"penthouse.hypersomnia.xyz" 
   },
 
   default_server_start = {
