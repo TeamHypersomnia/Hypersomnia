@@ -312,7 +312,6 @@ void server_setup::resolve_heartbeat_host_if_its_time() {
 	}
 
 	if (future_resolved_server_list_addr.valid()) {
-		LOG("server_list resolution in progress. Delaying next trial.");
 		when_last = server_time;
 		return;
 	}
