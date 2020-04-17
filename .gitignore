@@ -171,6 +171,7 @@ pip-log.txt
 /hypersomnia/cache
 /hypersomnia/logs
 /hypersomnia/user
+!hypersomnia/user/config.lua.example
 /hypersomnia/choreographic/voices
 
 *.log
