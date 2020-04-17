@@ -172,7 +172,10 @@ application_update_result check_and_apply_updates(
 	const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 	auto fix_background_color = scoped_style_color(ImGuiCol_WindowBg, ImVec4{win_bg.x, win_bg.y, win_bg.z, 1.f});
 
-	const auto window_size = vec2i(500, 250);
+	const auto line_height = 24;
+	const auto num_lines = 13;
+
+	const auto window_size = vec2i(500, line_height * num_lines);
 
 	window_settings.size = window_size;
 	window_settings.fullscreen = false;
@@ -433,8 +436,11 @@ application_update_result check_and_apply_updates(
 	};
 
 	auto print_upstream = [&host_url, &update_path]() {
-		const auto upstream_string = typesafe_sprintf("Mirror:     %x%x", host_url, update_path);
+		text_disabled("Mirror:");
+		ImGui::NextColumn();
+		const auto upstream_string = typesafe_sprintf("%x%x", host_url, update_path);
 		text_disabled(upstream_string);
+		ImGui::NextColumn();
 	};
 
 	auto print_download_progress_bar = [&downloaded_bytes, &total_bytes, &archive_filename]() {
@@ -446,16 +452,32 @@ application_update_result check_and_apply_updates(
 
 		const auto completion_mult = static_cast<double>(len) / total;
 
-		text("Acquiring: ");
-		ImGui::SameLine();
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("DDDownloaded:").x);
+
+		text("Acquiring:");
+		ImGui::NextColumn();
 		text_color(archive_filename.string(), cyan);
+
+		ImGui::NextColumn();
 		text("\n");
 
-		const auto downloaded_string = typesafe_sprintf("Downloaded: %x", downloaded_bytes);
-		const auto total_string =      typesafe_sprintf("Total size: %x\n\n", total_bytes);
+		const auto downloaded_string = typesafe_sprintf("%x", downloaded_bytes);
+		const auto total_string =      typesafe_sprintf("%x", total_bytes);
 
+		text("Downloaded:");
+		ImGui::NextColumn();
+		text("\n");
 		text(downloaded_string);
+		ImGui::NextColumn();
+
+		text("Total size:");
+		ImGui::NextColumn();
 		text(total_string);
+		ImGui::NextColumn();
+		ImGui::Columns(1);
+
+		text("\n");
 
 		ImGui::ProgressBar(static_cast<float>(completion_mult), ImVec2(-1.0f,0.0f));
 
@@ -517,7 +539,9 @@ application_update_result check_and_apply_updates(
 
 			print_new_version_available();
 			print_version_transition_info();
+			ImGui::Columns(2);
 			print_upstream();
+			ImGui::Columns(1);
 
 			if (current_state == state::DOWNLOADING) {
 				if (valid_and_is_ready(future_response)) {

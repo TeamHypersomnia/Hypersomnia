@@ -366,11 +366,11 @@ return {
 		  { 0x0020, 0x00FF }, -- Basic Latin + Latin Supplement
 		  { 0x0100, 0x017F }  -- Latin Extended-A
 		},
-		size_in_pixels = 16,
+		size_in_pixels = 20,
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "ONLY_IN_PRODUCTION",
 		settings = {},
-		source_font_path = "content/necessary/fonts/unifont.ttf"
+		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
 	  },
 	  larger_gui = {
 		unicode_ranges = {
@@ -381,7 +381,7 @@ return {
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "ONLY_IN_PRODUCTION",
 		settings = {},
-		source_font_path = "content/necessary/fonts/unifont.ttf"
+		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
 	  },
 	  large_numbers = {
 		unicode_ranges = {
