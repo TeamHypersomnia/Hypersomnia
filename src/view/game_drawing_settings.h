@@ -34,6 +34,7 @@ struct game_drawing_settings {
 	bool draw_offscreen_callouts = true;
 	bool draw_nicknames = true;
 	bool draw_health_numbers = true;
+	bool draw_damage_indicators = false;
 
 	bool occlude_neons_under_sentiences = true;
 	bool occlude_neons_under_other_bodies = false;

@@ -616,11 +616,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.standard->set_as_current(renderer);
 
-	flying_numbers.draw_numbers(
-		gui_font,
-		get_drawer(), 
-		cone
-	);
+	if (settings.draw_damage_indicators) {
+		flying_numbers.draw_numbers(
+			gui_font,
+			get_drawer(), 
+			cone
+		);
+	}
 
 	renderer.call_and_clear_triangles();
 	renderer.call_and_clear_lines();

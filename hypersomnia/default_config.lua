@@ -245,6 +245,7 @@ return {
 	enabled_draw_callout_indicators = 0.8,
 	draw_nicknames = false,
 	draw_health_numbers = true,
+	draw_damage_indicators = false,
 	occlude_neons_under_sentiences = true,
 	occlude_neons_under_other_bodies = true,
     draw_offscreen_indicators = true,
