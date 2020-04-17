@@ -186,7 +186,7 @@ namespace augs {
 
 			const auto* label = label_s.c_str();
 			PushID(label);
-			PushMultiItemsWidths(3);
+			PushMultiItemsWidths(3, CalcItemWidth());
 
 			PushID(0);
 			value_changed |= DragScalar("##v", pos_data_type, &into.pos.x, speed, &v_min, &v_max, fmt);

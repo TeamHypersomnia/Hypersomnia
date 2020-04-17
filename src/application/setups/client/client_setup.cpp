@@ -827,9 +827,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		arena_base::perform_custom_imgui(in);
 	}
 	else {
-		ImGui::SetNextWindowPosCenter();
-
-		ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.3f).operator ImVec2(), ImGuiCond_FirstUseEver);
+		center_next_window(vec2::square(0.7f), ImGuiCond_FirstUseEver);
 
 		auto print_reason_if_any = [&]() {
 			if (last_disconnect_reason.empty()) {

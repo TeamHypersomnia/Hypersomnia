@@ -210,45 +210,51 @@ struct ImVec4;
 			F f,
 			Instances&... _t_
 		) {
-			FIELD(Alpha);
-			FIELD(WindowPadding);
-			FIELD(WindowRounding);
-			FIELD(WindowBorderSize);
-			FIELD(WindowMinSize);
-			FIELD(WindowTitleAlign);
-			FIELD(ChildRounding);
-			FIELD(ChildBorderSize);
-			FIELD(PopupRounding);
-			FIELD(PopupBorderSize);
-			FIELD(FramePadding);
-			FIELD(FrameRounding);
-			FIELD(FrameBorderSize);
-			FIELD(ItemSpacing);
-			FIELD(ItemInnerSpacing);
-			FIELD(TouchExtraPadding);
-			FIELD(IndentSpacing);
-			FIELD(ColumnsMinSpacing);
-			FIELD(ScrollbarSize);
-			FIELD(ScrollbarRounding);
-			FIELD(GrabMinSize);
-			FIELD(GrabRounding);
-			FIELD(ButtonTextAlign);
-			FIELD(DisplayWindowPadding);
-			FIELD(DisplaySafeAreaPadding);
-			FIELD(MouseCursorScale);
-			FIELD(AntiAliasedLines);
-			FIELD(AntiAliasedFill);
-			FIELD(CurveTessellationTol);
+			FIELD(Alpha);                      
+			FIELD(WindowPadding);              
+			FIELD(WindowRounding);             
+			FIELD(WindowBorderSize);           
+			FIELD(WindowMinSize);              
+			FIELD(WindowTitleAlign);           
+			FIELD(WindowMenuButtonPosition);   
+			FIELD(ChildRounding);              
+			FIELD(ChildBorderSize);            
+			FIELD(PopupRounding);              
+			FIELD(PopupBorderSize);            
+			FIELD(FramePadding);               
+			FIELD(FrameRounding);              
+			FIELD(FrameBorderSize);            
+			FIELD(ItemSpacing);                
+			FIELD(ItemInnerSpacing);           
+			FIELD(TouchExtraPadding);          
+			FIELD(IndentSpacing);              
+			FIELD(ColumnsMinSpacing);          
+			FIELD(ScrollbarSize);              
+			FIELD(ScrollbarRounding);          
+			FIELD(GrabMinSize);                
+			FIELD(GrabRounding);               
+			FIELD(TabRounding);                
+			FIELD(TabBorderSize);              
+			FIELD(ColorButtonPosition);        
+			FIELD(ButtonTextAlign);            
+			FIELD(SelectableTextAlign);        
+			FIELD(DisplayWindowPadding);       
+			FIELD(DisplaySafeAreaPadding);     
+			FIELD(MouseCursorScale);           
+			FIELD(AntiAliasedLines);           
+			FIELD(AntiAliasedFill);            
+			FIELD(CurveTessellationTol);       
+			FIELD(CircleSegmentMaxError);      
 
 #define imcol(x) f(#x, _t_.Colors[static_cast<std::size_t>(imguicol_helper::x)]...)
 			imcol(ImGuiCol_Text);
 			imcol(ImGuiCol_TextDisabled);
 			imcol(ImGuiCol_WindowBg);              // Background of normal windows
 			imcol(ImGuiCol_ChildBg);               // Background of child windows
-			imcol(ImGuiCol_PopupBg);               // Background of popups, menus, tooltips windows
+			imcol(ImGuiCol_PopupBg);               // Background of popups; menus; tooltips windows
 			imcol(ImGuiCol_Border);
 			imcol(ImGuiCol_BorderShadow);
-			imcol(ImGuiCol_FrameBg);               // Background of checkbox, radio button, plot, slider, text input
+			imcol(ImGuiCol_FrameBg);               // Background of checkbox; radio button; plot; slider; text input
 			imcol(ImGuiCol_FrameBgHovered);
 			imcol(ImGuiCol_FrameBgActive);
 			imcol(ImGuiCol_TitleBg);
@@ -265,7 +271,7 @@ struct ImVec4;
 			imcol(ImGuiCol_Button);
 			imcol(ImGuiCol_ButtonHovered);
 			imcol(ImGuiCol_ButtonActive);
-			imcol(ImGuiCol_Header);
+			imcol(ImGuiCol_Header);                // Header* colors are used for CollapsingHeader; TreeNode; Selectable; MenuItem
 			imcol(ImGuiCol_HeaderHovered);
 			imcol(ImGuiCol_HeaderActive);
 			imcol(ImGuiCol_Separator);
@@ -274,16 +280,23 @@ struct ImVec4;
 			imcol(ImGuiCol_ResizeGrip);
 			imcol(ImGuiCol_ResizeGripHovered);
 			imcol(ImGuiCol_ResizeGripActive);
+			imcol(ImGuiCol_Tab);
+			imcol(ImGuiCol_TabHovered);
+			imcol(ImGuiCol_TabActive);
+			imcol(ImGuiCol_TabUnfocused);
+			imcol(ImGuiCol_TabUnfocusedActive);
+			imcol(ImGuiCol_DockingPreview);        // Preview overlay color when about to docking something
+			imcol(ImGuiCol_DockingEmptyBg);        // Background color for empty node (e.g. CentralNode with no window docked into it)
 			imcol(ImGuiCol_PlotLines);
 			imcol(ImGuiCol_PlotLinesHovered);
 			imcol(ImGuiCol_PlotHistogram);
 			imcol(ImGuiCol_PlotHistogramHovered);
 			imcol(ImGuiCol_TextSelectedBg);
 			imcol(ImGuiCol_DragDropTarget);
-			imcol(ImGuiCol_NavHighlight);
-			imcol(ImGuiCol_NavWindowingHighlight);
-			imcol(ImGuiCol_NavWindowingDimBg);
-			imcol(ImGuiCol_ModalWindowDimBg);
+			imcol(ImGuiCol_NavHighlight);          // Gamepad/keyboard: current highlighted item
+			imcol(ImGuiCol_NavWindowingHighlight); // Highlight window when using CTRL+TAB
+			imcol(ImGuiCol_NavWindowingDimBg);     // Darken/colorize entire screen behind the CTRL+TAB window list; when active
+			imcol(ImGuiCol_ModalWindowDimBg);      // Darken/colorize entire screen behind a modal window; when one is active
 #undef imcol
 		}
 

@@ -70,9 +70,7 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 		return std::nullopt;
 	}
 
-	ImGui::SetNextWindowPosCenter();
-
-	ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.4f).operator ImVec2(), ImGuiCond_Once);
+	center_next_window(vec2::square(0.4f), ImGuiCond_Once);
 
 	const auto window_name = "Choose your faction";
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);

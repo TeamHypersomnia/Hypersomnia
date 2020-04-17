@@ -488,7 +488,7 @@ void detail_general_edit_properties(
 							auto whole_column = augs::imgui::scoped_item_width(-1);
 
 							const auto num_members = static_cast<int>(augs::count_members(altered));
-							ImGui::PushMultiItemsWidths(num_members);
+							ImGui::PushMultiItemsWidths(num_members, ImGui::CalcItemWidth());
 
 							auto further_inline = [&](const std::string& l, auto& m) {
 								detail_general_edit_properties<Behaviour, pass_notifier_through, true>(input, equality_predicate, notify_change_of, l, m);

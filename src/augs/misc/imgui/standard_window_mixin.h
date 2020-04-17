@@ -29,7 +29,7 @@ struct standard_window_mixin {
 	auto make_scoped_window(Args&&... args) {
 		if (show) {
 			if (centered_size_mult != std::nullopt) {
-				augs::imgui::center_next_window(*centered_size_mult);
+				augs::imgui::center_next_window(*centered_size_mult, ImGuiCond_FirstUseEver);
 			}
 			else {
 				ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);

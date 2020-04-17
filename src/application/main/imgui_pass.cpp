@@ -73,7 +73,7 @@ void perform_imgui_pass(
 		thread_local bool dont_show = false;
 
 		if (!float_tests_succeeded && show) {
-			augs::imgui::center_next_window(vec2::square(0.2f));
+			augs::imgui::center_next_window(vec2::square(0.2f), ImGuiCond_Always);
 
 			auto warning = augs::imgui::scoped_window("Warning", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 

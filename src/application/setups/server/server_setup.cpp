@@ -1404,9 +1404,7 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 	if (!server->is_running()) {
 		using namespace augs::imgui;
 
-		ImGui::SetNextWindowPosCenter();
-
-		ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.3f).operator ImVec2(), ImGuiCond_FirstUseEver);
+		center_next_window(vec2::square(0.3f), ImGuiCond_FirstUseEver);
 
 		const auto window_name = "Connection status";
 		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);

@@ -5,6 +5,7 @@
 #include "view/viewables/streaming/viewables_streaming.h"
 #include "view/audiovisual_state/systems/sound_system.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
+#include "augs/misc/imgui/imgui_utils.h"
 
 #include "augs/audio/audio_command_buffers.h"
 #include "augs/audio/audio_backend.h"
@@ -426,7 +427,7 @@ void viewables_streaming::display_loading_progress() const {
 	if (loading_message.size() > 0) {
 		loading_message += "\n";
 
-		ImGui::SetNextWindowPosCenter();
+		center_next_window(ImGuiCond_Always);
 		auto loading_window = scoped_window("Loading in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
 		text_color("The game is regenerating resources. Please be patient.\n", yellow);

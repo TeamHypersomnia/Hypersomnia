@@ -79,7 +79,7 @@ namespace ImGui {
 
 			if (sumX == 0.f) sumX = style.WindowPadding.x + ImGui::GetItemRectSize().x; // First element of a line
 
-			if (ImGui::IsItemHoveredRect()) {
+			if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly)) {
 				if (tabOrder) {
 					// tab reordering
 					if (isMouseDragging) {

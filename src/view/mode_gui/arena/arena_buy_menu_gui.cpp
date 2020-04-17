@@ -165,9 +165,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		return {};
 	}
 
-	ImGui::SetNextWindowPosCenter();
-
-	ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.7f).operator ImVec2(), ImGuiCond_Once);
+	center_next_window(vec2::square(0.7f), ImGuiCond_Once);
 
 	const auto window_name = "Buy menu";
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);

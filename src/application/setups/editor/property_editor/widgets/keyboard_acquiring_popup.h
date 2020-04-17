@@ -10,8 +10,8 @@ struct keyboard_acquiring_popup {
 	bool check_opened_first_time() {
 		const auto& g = *ImGui::GetCurrentContext();
 
-		if (currently_opened != g.OpenPopupStack[g.CurrentPopupStack.Size - 1].PopupId) {
-			currently_opened = g.OpenPopupStack[g.CurrentPopupStack.Size - 1].PopupId;
+		if (currently_opened != g.OpenPopupStack[g.OpenPopupStack.Size - 1].PopupId) {
+			currently_opened = g.OpenPopupStack[g.OpenPopupStack.Size - 1].PopupId;
 			acquire_keyboard_times = 2;
 			return true;
 		}

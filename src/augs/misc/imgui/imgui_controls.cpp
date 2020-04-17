@@ -38,7 +38,7 @@ namespace ImGui {
 		bool value_changed = false;
 		BeginGroup();
 		PushID(label);
-		PushMultiItemsWidths(components);
+		PushMultiItemsWidths(components, CalcItemWidth());
 		for (int i = 0; i < components; i++)
 		{
 			PushID(i);

@@ -2,6 +2,7 @@
 #include "application/gui/do_server_vars.h"
 #include "application/gui/client/rcon_gui.h"
 #include "application/gui/pretty_tabs.h"
+#include "augs/misc/imgui/imgui_utils.h"
 
 template <class F>
 void perform_rcon_gui(
@@ -13,9 +14,7 @@ void perform_rcon_gui(
 
 	const auto window_name = "Remote Control (RCON)";
 
-	ImGui::SetNextWindowPosCenter();
-
-	ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.7f).operator ImVec2(), ImGuiCond_Once);
+	center_next_window(vec2::square(0.7f), ImGuiCond_Once);
 
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
 	centered_text(window_name);
