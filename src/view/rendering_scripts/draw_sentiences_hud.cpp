@@ -230,6 +230,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					float angle;
 					formatted_string text;
 					bool is_nickname = false;
+					float circle_radius_mult_for_text = 1.f;
 				};
 
 				std::vector<circle_info> textual_infos;
@@ -240,6 +241,8 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					}
 				};
 
+				bool drawn_melee_count_once = false;
+
 				if (should_draw_ammo && v == watched_character) {
 					const auto examine_item_slot = [&](
 						const const_inventory_slot_handle hand,
@@ -249,6 +252,35 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					) {
 						if (hand.alive() && hand.has_items()) {
 							const auto weapon = cosm[hand.get_items_inside()[0]];
+
+							if (weapon.find<components::melee>() && in.settings.draw_remaining_ammo && !drawn_melee_count_once) {
+								drawn_melee_count_once = true;
+								int count_melees = 0;
+
+								watched_character.for_each_contained_item_recursive(
+									[&](const auto& typed_item) {
+										if (typed_item.template find<components::melee>()) {
+											++count_melees;
+										}
+									},
+									std::nullopt
+								);
+
+								circle_info new_info;
+
+								auto remaining_ammo_color = white;
+								remaining_ammo_color.a = 200;
+
+								const auto remaining_ammo_text = std::to_string(count_melees);
+								new_info.text = formatted_string { remaining_ammo_text, { in.gui_font, remaining_ammo_color } };
+								new_info.angle = lower_outside;
+								new_info.circle_radius_mult_for_text = 0.85f;
+
+								push_textual_info(new_info);
+
+								return;
+							}
+
 							const auto ammo_info = calc_ammo_info(weapon);
 
 							int total_ammo_for_this_weapon = 0;
@@ -319,8 +351,8 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 						}
 					};
 
-					examine_item_slot(v.get_secondary_hand(), starting_health_angle + 90.f + 22.5f, 45.f, false);
 					examine_item_slot(v.get_primary_hand(), starting_health_angle - 22.5f - 45.f, 45.f, true);
+					examine_item_slot(v.get_secondary_hand(), starting_health_angle + 90.f + 22.5f, 45.f, false);
 				}
 
 				const auto empty_health_amount = static_cast<int>((1 - hr) * 90);
@@ -348,7 +380,8 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					
 					const auto cam = in.text_camera;
 					const vec2i screen_space_circle_center = cam.to_screen_space(transform.pos);
-					const auto text_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(cam.eye.zoom * (circle_radius + 6.f), bbox, info.angle) - bbox / 2;
+					const auto radius = circle_radius * info.circle_radius_mult_for_text;
+					const auto text_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(cam.eye.zoom * (radius + 6.f), bbox, info.angle) - bbox / 2;
 					//health_points.pos = screen_space_circle_center + vec2::from_degrees(in.angle).set_length(circle_displacement_length);
 
 					augs::gui::text::print_stroked(
