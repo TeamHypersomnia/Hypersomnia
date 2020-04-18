@@ -256,14 +256,27 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 							const auto charge_flavour = ::calc_default_charge_flavour(weapon);
 
+							auto traversed_slots = slot_flags();
+
+							for (auto& f : traversed_slots) {
+								f = true;
+							}
+
+							traversed_slots.set(slot_function::PRIMARY_HAND, false);
+							traversed_slots.set(slot_function::SECONDARY_HAND, false);
+
 							watched_character.for_each_contained_item_recursive(
 								[&](const auto& typed_item) {
+									if (typed_item.get_current_slot().is_hand_slot()) {
+										return;
+									}
+
 									if (entity_flavour_id(typed_item.get_flavour_id()) == charge_flavour) {
 										total_ammo_for_this_weapon += typed_item.template get<components::item>().get_charges();
 										total_ammo_space_occupied += *typed_item.find_space_occupied();
 									}
 								},
-								std::nullopt
+								traversed_slots
 							);
 
 							if (ammo_info.total_ammo_space > 0) {
@@ -292,10 +305,8 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 								const auto current_ammo_text = std::to_string(ammo_info.total_charges);
 								new_info.text = formatted_string { current_ammo_text, { in.gui_font, ammo_color } };
 
-								const auto current_ammo_space_occupied = ammo_info.total_ammo_space - ammo_info.available_ammo_space;
-								const auto remaining_ammo_space_occupied = total_ammo_space_occupied - current_ammo_space_occupied;
-
-								const auto remaining_ammo = total_ammo_for_this_weapon - ammo_info.total_charges;
+								const auto remaining_ammo_space_occupied = total_ammo_space_occupied;
+								const auto remaining_ammo = total_ammo_for_this_weapon;
 								const auto remaining_ratio = std::min(1.f, float(remaining_ammo_space_occupied) / ammo_info.total_ammo_space);
 
 								auto remaining_ammo_color = augs::interp(white, red_violet, (1 - remaining_ratio)* (1 - remaining_ratio));
