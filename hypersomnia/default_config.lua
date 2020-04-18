@@ -274,6 +274,7 @@ return {
 	draw_hp_bar = true,
 	draw_cp_bar = true,
 	draw_pe_bar = false,
+	draw_remaining_ammo = true,
     radar_pos = {
 		x = -201,
 		y = 84
@@ -498,9 +499,9 @@ return {
   arena_mode_gui = {
     show_client_resyncing_notifier = true,
 
-    between_knockout_boxes_pad = 6,
-    inside_knockout_box_pad = 4,
-    weapon_icon_horizontal_pad = 10,
+    between_knockout_boxes_pad = 8,
+    inside_knockout_box_pad = 6,
+    weapon_icon_horizontal_pad = 14,
     show_recent_knockouts_num = 7,
     keep_recent_knockouts_for_seconds = 8,
 

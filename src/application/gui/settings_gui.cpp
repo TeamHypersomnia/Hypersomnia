@@ -918,6 +918,7 @@ void settings_gui_state::perform(
 						revertable_checkbox("Draw Health bar and ammo bar", config.drawing.draw_hp_bar);
 						revertable_checkbox("Draw Personal Electricity bar", config.drawing.draw_pe_bar);
 						revertable_checkbox("Draw Consciousness bar", config.drawing.draw_cp_bar);
+						revertable_checkbox("Draw remaining ammo", config.drawing.draw_remaining_ammo);
 						revertable_checkbox("Draw damage indicators", config.drawing.draw_damage_indicators);
 
 						revertable_checkbox(SCOPE_CFG_NVP(draw_weapon_laser));

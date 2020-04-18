@@ -26,6 +26,10 @@
 #include "game/detail/calc_ammo_info.hpp"
 #include "game/detail/get_hovered_world_entity.h"
 
+#include "game/modes/detail/item_purchase_logic.hpp"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+#include "augs/log.h"
+
 using namespace augs::gui::text;
 
 void draw_sentiences_hud(const draw_sentiences_hud_input in) {
@@ -224,8 +228,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				struct circle_info {
 					float angle;
-					std::string text;
-					rgba color;
+					formatted_string text;
 					bool is_nickname = false;
 				};
 
@@ -239,15 +242,29 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				if (should_draw_ammo && v == watched_character) {
 					const auto examine_item_slot = [&](
-						const const_inventory_slot_handle id,
+						const const_inventory_slot_handle hand,
 						const float lower_outside,
 						const float max_angular_length,
 						const bool ccw
 					) {
-						if (id.alive() && id.has_items()) {
-							const auto item = cosm[id.get_items_inside()[0]];
+						if (hand.alive() && hand.has_items()) {
+							const auto weapon = cosm[hand.get_items_inside()[0]];
+							const auto ammo_info = calc_ammo_info(weapon);
 
-							const auto ammo_info = calc_ammo_info(item);
+							int total_ammo_for_this_weapon = 0;
+							inventory_space_type total_ammo_space_occupied = 0;
+
+							const auto charge_flavour = ::calc_default_charge_flavour(weapon);
+
+							watched_character.for_each_contained_item_recursive(
+								[&](const auto& typed_item) {
+									if (entity_flavour_id(typed_item.get_flavour_id()) == charge_flavour) {
+										total_ammo_for_this_weapon += typed_item.template get<components::item>().get_charges();
+										total_ammo_space_occupied += *typed_item.find_space_occupied();
+									}
+								},
+								std::nullopt
+							);
 
 							if (ammo_info.total_ammo_space > 0) {
 								const auto ammo_ratio = ammo_info.get_ammo_ratio();
@@ -272,8 +289,22 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 									new_info.angle = lower_outside + empty_amount / 2;
 								}
 
-								new_info.text = std::to_string(ammo_info.total_charges);
-								new_info.color = ammo_color;
+								const auto current_ammo_text = std::to_string(ammo_info.total_charges);
+								new_info.text = formatted_string { current_ammo_text, { in.gui_font, ammo_color } };
+
+								const auto current_ammo_space_occupied = ammo_info.total_ammo_space - ammo_info.available_ammo_space;
+								const auto remaining_ammo_space_occupied = total_ammo_space_occupied - current_ammo_space_occupied;
+
+								const auto remaining_ammo = total_ammo_for_this_weapon - ammo_info.total_charges;
+								const auto remaining_ratio = std::min(1.f, float(remaining_ammo_space_occupied) / ammo_info.total_ammo_space);
+
+								auto remaining_ammo_color = augs::interp(white, red_violet, (1 - remaining_ratio)* (1 - remaining_ratio));
+								remaining_ammo_color.a = 200;
+
+								if (in.settings.draw_remaining_ammo) {
+									const auto remaining_ammo_text = " /" + std::to_string(remaining_ammo);
+									new_info.text += formatted_string { remaining_ammo_text, { in.gui_font, remaining_ammo_color } };
+								}
 
 								push_textual_info(new_info);
 							}
@@ -288,15 +319,13 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				push_textual_info({
 					starting_health_angle + 90 - empty_health_amount / 2,
-					std::to_string(int(value) == 0 ? 1 : int(value)),
-					health_col,
+					formatted_string { std::to_string(int(value) == 0 ? 1 : int(value)), { in.gui_font, health_col } },
 					false
 				});
 
 				push_textual_info({
 					starting_health_angle,
-					get_bbcoded_entity_name(v),
-					health_col,
+					formatted_string { get_bbcoded_entity_name(v), { in.gui_font, health_col } },
 					true
 				});
 
@@ -306,7 +335,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					}
 
 					//const auto circle_displacement_length = health_points.get_bbox().bigger_side() + circle_radius;
-					const auto text = formatted_string { info.text,{ in.gui_font, info.color } };
+					const auto& text = info.text;
 					const auto bbox = get_text_bbox(text);
 					
 					const auto cam = in.text_camera;

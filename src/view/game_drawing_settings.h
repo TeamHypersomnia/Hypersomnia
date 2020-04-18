@@ -29,6 +29,7 @@ struct game_drawing_settings {
 	bool draw_hp_bar = true;
 	bool draw_cp_bar = true;
 	bool draw_pe_bar = false;
+	bool draw_remaining_ammo = true;
 
 	bool draw_offscreen_indicators = true;
 	bool draw_offscreen_callouts = true;
