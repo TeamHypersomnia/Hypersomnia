@@ -256,28 +256,25 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 							const auto charge_flavour = ::calc_default_charge_flavour(weapon);
 
-							auto traversed_slots = slot_flags();
+							{
+								watched_character.for_each_contained_item_recursive(
+									[&](const auto& typed_item) {
+										if (entity_flavour_id(typed_item.get_flavour_id()) == weapon.get_flavour_id()) {
+											return recursive_callback_result::CONTINUE_DONT_RECURSE;
+										}
 
-							for (auto& f : traversed_slots) {
-								f = true;
+										if (entity_flavour_id(typed_item.get_flavour_id()) == charge_flavour) {
+											total_ammo_for_this_weapon += typed_item.template get<components::item>().get_charges();
+											total_ammo_space_occupied += *typed_item.find_space_occupied();
+
+											return recursive_callback_result::CONTINUE_DONT_RECURSE;
+										}
+
+										return recursive_callback_result::CONTINUE_AND_RECURSE;
+									},
+									std::nullopt
+								);
 							}
-
-							traversed_slots.set(slot_function::PRIMARY_HAND, false);
-							traversed_slots.set(slot_function::SECONDARY_HAND, false);
-
-							watched_character.for_each_contained_item_recursive(
-								[&](const auto& typed_item) {
-									if (typed_item.get_current_slot().is_hand_slot()) {
-										return;
-									}
-
-									if (entity_flavour_id(typed_item.get_flavour_id()) == charge_flavour) {
-										total_ammo_for_this_weapon += typed_item.template get<components::item>().get_charges();
-										total_ammo_space_occupied += *typed_item.find_space_occupied();
-									}
-								},
-								traversed_slots
-							);
 
 							if (ammo_info.total_ammo_space > 0) {
 								const auto ammo_ratio = ammo_info.get_ammo_ratio();
