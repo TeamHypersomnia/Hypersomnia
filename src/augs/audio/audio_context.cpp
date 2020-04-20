@@ -148,6 +148,7 @@ namespace augs {
 		ALCint attrs[] = {
 			ALC_HRTF_SOFT, settings.enable_hrtf, /* request HRTF */
 			ALC_MONO_SOURCES, static_cast<ALCint>(settings.max_number_of_sound_sources),
+			ALC_OUTPUT_LIMITER_SOFT, AL_TRUE,
 		   	0	/* end of list */
 		};
 
