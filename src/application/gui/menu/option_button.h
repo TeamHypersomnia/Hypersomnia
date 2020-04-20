@@ -62,8 +62,8 @@ public:
 
 	template <class C, class D>
 	static void advance_elements(const C context, const D this_id, const augs::delta dt) {
-		this_id->click_sound.set_gain(context.get_audio_volume().sound_effects);
-		this_id->hover_sound.set_gain(context.get_audio_volume().sound_effects);
+		this_id->click_sound.set_gain(context.get_audio_volume().get_sound_effects_volume());
+		this_id->hover_sound.set_gain(context.get_audio_volume().get_sound_effects_volume());
 
 		if (this_id->detector.is_hovered) {
 			this_id->elapsed_hover_time_ms += dt.in_milliseconds();

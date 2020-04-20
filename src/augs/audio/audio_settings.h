@@ -8,6 +8,10 @@ namespace augs {
 		float sound_effects = 1.f;
 		float music = 1.f;
 		// END GEN INTROSPECTOR
+
+		float get_sound_effects_volume() const {
+			return std::clamp(master * sound_effects, 0.f, 1.f);
+		}
 	};
 
 	struct audio_settings {

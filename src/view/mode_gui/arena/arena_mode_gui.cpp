@@ -763,7 +763,7 @@ void arena_gui_state::draw_mode_gui(
 
 				tick_sound.just_play(
 					alarm ? in.sounds.alarm_tick : in.sounds.round_clock_tick, 
-					vol.sound_effects
+					vol.get_sound_effects_volume()
 				);
 			};
 

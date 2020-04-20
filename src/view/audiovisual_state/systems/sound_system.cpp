@@ -21,6 +21,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "view/audiovisual_state/flashbang_math.h"
 #include "game/detail/find_absolute_or_local_transform.h"
+#include "augs/log.h"
 
 struct shouldnt_play {};
 
@@ -336,7 +337,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const bool is_nonlinear = !is_linear && dist_model != augs::distance_model::NONE;
 
-	const auto mult_via_settings = [&]() {
+	const auto mult_via_settings = std::clamp([&]() {
 		const auto master = in.volume.master;
 
 		if (original.input.modifier.always_direct_listener) {
@@ -348,7 +349,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		}
 
 		return master * in.volume.sound_effects;
-	}();
+	}(), 0.f, 1.f);
 
 	const auto flash_mult = in.owner.get_effective_flash_mult();
 
@@ -376,7 +377,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	cmd.proxy_id = source.id;
 	cmd.si = cosm.get_si();
 	cmd.position = current_transform.pos;
-	cmd.gain = std::clamp((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * std::clamp(mult_via_settings, 0.f, 1.f) * custom_dist_gain_mult, 0.f, 1.f);
+	cmd.gain = std::clamp((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * mult_via_settings * custom_dist_gain_mult, 0.f, 1.f);
 	cmd.pitch = m.pitch * in.speed_multiplier;
 	cmd.doppler_factor = std::max(0.f, m.doppler_factor);
 	cmd.reference_distance = ref_dist;
@@ -647,7 +648,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		if (auto buf = mapped_or_nullptr(in.manager, effect.id)) {
 			augs::update_flash_noise cmd;
 			cmd.buffer = buf;
-			cmd.gain = last_mult * in.volume.sound_effects;
+			cmd.gain = last_mult * in.volume.get_sound_effects_volume();
 			renderer.push_command(cmd);
 		}
 	}
