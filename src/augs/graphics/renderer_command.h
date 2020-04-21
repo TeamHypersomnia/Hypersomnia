@@ -40,7 +40,9 @@ namespace augs {
 			static_object_command<const shader_program, settable_as_current_op_type>,
 
 			object_command<const fbo, settable_as_current_op_type>,
-			static_object_command<const fbo, settable_as_current_op_type>
+			static_object_command<const fbo, settable_as_current_op_type>,
+
+			make_screenshot
 		>;
 
 		struct renderer_command {

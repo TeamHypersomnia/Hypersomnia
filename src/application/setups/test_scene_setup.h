@@ -158,4 +158,7 @@ public:
 	const arena_player_metas* find_player_metas() const {
 		return nullptr;
 	}
+
+	void after_all_drawcalls(game_frame_buffer&) {}
+	void do_game_main_thread_synced_op(renderer_backend_result&) {}
 };

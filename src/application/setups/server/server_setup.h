@@ -500,4 +500,7 @@ public:
 	uint32_t get_max_connections() const;
 	uint32_t get_num_connected() const;
 	uint32_t get_num_active_players() const;
+
+	void after_all_drawcalls(game_frame_buffer&) {}
+	void do_game_main_thread_synced_op(renderer_backend_result&) {}
 };

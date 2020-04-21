@@ -103,6 +103,7 @@ namespace augs {
 		);
 		
 		void fill(const rgba fill_color);
+		void flip_y();
 
 		void execute(const paint_command_variant&);
 
@@ -140,7 +141,11 @@ namespace augs {
 			so let them be inlined even in builds without link-time optimization enabled.
 		*/
 
-		const rgba_channel* get_data() const {
+		rgba_channel* data() {
+			return std::addressof(v.data()->r);
+		}
+
+		const rgba_channel* data() const {
 			return std::addressof(v.data()->r);
 		}
 
@@ -219,11 +224,11 @@ namespace augs {
 
 		void fill(const rgba fill_color);
 
-		auto* get_data() {
+		auto* data() {
 			return std::addressof(v->r);
 		}
 
-		const auto* get_data() const {
+		const auto* data() const {
 			return std::addressof(v->r);
 		}
 

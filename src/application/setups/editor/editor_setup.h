@@ -51,9 +51,12 @@
 #include "application/input/entropy_accumulator.h"
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/arena/arena_handle.h"
+#include "application/main/miniature_generator.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
+struct game_frame_buffer;
+struct renderer_backend_result;
 
 namespace augs {
 	class window;
@@ -120,6 +123,7 @@ class editor_setup : public arena_gui_mixin<editor_setup> {
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;
+	std::optional<miniature_generator_state> miniature_generator;
 
 	editor_destructor_input destructor_input;
 
@@ -449,4 +453,7 @@ public:
 	const arena_player_metas* find_player_metas() const {
 		return nullptr;
 	}
+
+	void after_all_drawcalls(game_frame_buffer&);
+	void do_game_main_thread_synced_op(renderer_backend_result&);
 };

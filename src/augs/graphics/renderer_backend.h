@@ -4,10 +4,21 @@
 #include "augs/graphics/rgba.h"
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"
+#include "augs/image/image.h"
 
 #include "augs/templates/exception_templates.h"
 
 struct ImDrawList;
+
+struct renderer_backend_result {
+	std::vector<ImDrawList*> imgui_lists_to_delete;
+	std::optional<augs::image> result_screenshot;
+
+	void clear() {
+		imgui_lists_to_delete.clear();
+		result_screenshot.reset();
+	}
+};
 
 namespace augs {
 	struct dedicated_buffers;
@@ -68,16 +79,8 @@ namespace augs {
 			renderer_backend(const renderer_backend&) = delete;
 			renderer_backend& operator=(const renderer_backend&) = delete;
 
-			struct result_info {
-				std::vector<ImDrawList*> imgui_lists_to_delete;
-
-				void clear() {
-					imgui_lists_to_delete.clear();
-				}
-			};
-
 			void perform(
-				result_info& output,
+				renderer_backend_result& output,
 				const renderer_command*, 
 				std::size_t n,
 				const dedicated_buffers&

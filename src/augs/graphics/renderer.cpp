@@ -191,6 +191,10 @@ namespace augs {
 		}
 	}
 
+	void renderer::screenshot(const xywhi bounds) {
+		push_command(make_screenshot { bounds });
+	}
+
 	void renderer::draw_debug_lines(
 		const debug_lines& logic_step_lines,
 		const debug_lines& persistent_lines,

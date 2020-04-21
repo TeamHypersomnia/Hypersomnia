@@ -27,7 +27,7 @@ namespace augs {
 		}
 
 		void texture::texImage2D(renderer& r, const image& rgba_source) {
-			texImage2D(r, rgba_source.get_size(), rgba_source.get_data());
+			texImage2D(r, rgba_source.get_size(), rgba_source.data());
 		}
 
 		void texture::set_filtering(renderer& r, const filtering_type type) {
@@ -59,7 +59,7 @@ namespace augs {
 		}
 
 		void texture::texImage2D(const image& source) {
-			texImage2D(source.get_size(), source.get_data());
+			texImage2D(source.get_size(), source.data());
 		}
 
 		void texture::texImage2D(const vec2u new_size, const unsigned char* const source) {

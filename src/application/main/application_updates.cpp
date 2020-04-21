@@ -224,7 +224,7 @@ application_update_result check_and_apply_updates(
 		LOG("Updating in headless mode.");
 	}
 
-	augs::graphics::renderer_backend::result_info renderer_backend_result;
+	renderer_backend_result rendering_result;
 
 	augs::local_entropy entropy;
 
@@ -816,7 +816,7 @@ application_update_result check_and_apply_updates(
 				nullptr
 			);
 
-			renderer_backend_result.clear();
+			rendering_result.clear();
 
 			{
 				auto& r = renderer;
@@ -824,14 +824,14 @@ application_update_result check_and_apply_updates(
 				ensure(renderer_backend != std::nullopt);
 
 				renderer_backend->perform(
-					renderer_backend_result,
+					rendering_result,
 					r.commands.data(),
 					r.commands.size(),
 					r.dedicated
 				);
 			}
 
-			for (const auto& f : renderer_backend_result.imgui_lists_to_delete) {
+			for (const auto& f : rendering_result.imgui_lists_to_delete) {
 				IM_DELETE(f);
 			}
 

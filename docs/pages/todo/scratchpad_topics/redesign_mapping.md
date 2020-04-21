@@ -1,4 +1,50 @@
-## Editor GUI
+# Editor GUI
+
+- Problem: We want a general editor for both grid-aligned maps and some arbitrary soldat-like maps.
+
+## Interface
+
+- Docking
+	- Left-down corner dock
+		- Filesystem
+			- Project (default)
+			- Official
+				- From here you can drag and drop stuff like aquarium and others
+				- BEGIN BY DRAG AND DROPPING SOME PREFABS TO THE SCREEN
+			- what about other maps? We might want to use existing collections
+				- what if they later get removed from these maps?
+
+
+- Layout tool
+	- Biomes to select
+	- Perhaps an easy layout builder?
+		- Problematically, we have to lay out the walls somehow automatically?
+
+
+- Only one project will be open
+	- To avoid confusion and overly complex architecture
+	- We might want to auto-save only the opened and unsaved nodes (like text files)
+		- as well as camera view
+		- Well, other common stuff too
+
+
+
+
+
+
+
+
+
+
+- I think let's leave the radar/minimap for later.
+	- Most of the current miniature generation functionality will be useful for editor somehow.
+
+- Miniature generation
+	- For prefabs, we can just do a single zoomed-out SS
+	- For maps, a full-fledged miniature generator would be handy
+		- for miniatures, only later - IN GAME - overlay the A/B/C/buyzone markers 
+			- especially since we might want to parametrize/scale it
+	- make a set of singled-out entities to hide for miniature generation too
 
 - General synchronization between nodes and actual entities on scene
 	- cosmic entity data -> proxy nodes
@@ -21,25 +67,5 @@
 
 	
 
-- Only one project will be open
-	- To avoid confusion and overly complex architecture
-	- We might want to auto-save only the opened and unsaved nodes (like text files)
-		- as well as camera view
-		- Well, other common stuff too
 
 
-- Layout tool
-	- Biomes
-
-- Perhaps an easy layout builder?
-	- Problematically, we have to lay out the walls somehow automatically?
-
-
-- Left-down corner dock
-	- Filesystem
-		- Project (default)
-		- Official
-			- From here you can drag and drop stuff like aquarium and others
-			- BEGIN BY DRAG AND DROPPING SOME PREFABS TO THE SCREEN
-		- what about other maps? We might want to use existing collections
-			- what if they later get removed from these maps?

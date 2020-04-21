@@ -164,7 +164,7 @@ namespace augs {
 		}
 
 		void renderer_backend::perform(
-			result_info& output,
+			renderer_backend_result& output,
 			const renderer_command* const c, 
 			const std::size_t n,
 			const dedicated_buffers& dedicated
@@ -241,6 +241,15 @@ namespace augs {
 						cmd_i = 0;
 						idx_buffer_offset = nullptr;
 					}
+					else if constexpr(same<C, make_screenshot>) {
+						const auto& bounds = typed_cmd.bounds;
+						const auto screenshot_size = bounds.get_size();
+
+						auto& screenshot_buffer = output.result_screenshot;
+						screenshot_buffer.emplace(screenshot_size);
+
+						GL_CHECK(glReadPixels(bounds.x, bounds.y, bounds.w, bounds.h, GL_RGBA, GL_UNSIGNED_BYTE, screenshot_buffer->data()));
+					}
 					else if constexpr(same<C, no_arg_command>) {
 						using N = no_arg_command;
 
@@ -269,6 +278,7 @@ namespace augs {
 								idx_buffer_offset += cc.ElemCount;
 								break;
 							}
+
 						}
 
 					}

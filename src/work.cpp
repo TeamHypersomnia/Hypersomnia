@@ -3026,6 +3026,10 @@ work_result work(const int argc, const char* const * const argv) try {
 					r.call_and_clear_triangles();
 				}
 
+				visit_current_setup([&](auto& s) {
+					return s.after_all_drawcalls(get_write_buffer());
+				});
+
 				game_thread_performance.num_triangles.measure(extract_num_total_drawn_triangles());
 
 				buffer_swapper.wait_swap();
@@ -3058,7 +3062,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		should_quit = true;
 	};
 
-	static augs::graphics::renderer_backend::result_info renderer_backend_result;
+	static renderer_backend_result rendering_result;
 
 	static auto game_main_thread_synced_op = []() {
 		auto scope = measure_scope(game_thread_performance.synced_op);
@@ -3087,9 +3091,13 @@ work_result work(const int argc, const char* const * const argv) try {
 			get_audiovisuals().performance.prepare_summary_info();
 		}
 
-		for (const auto& f : renderer_backend_result.imgui_lists_to_delete) {
+		for (const auto& f : rendering_result.imgui_lists_to_delete) {
 			IM_DELETE(f);
 		}
+
+		visit_current_setup([&](auto& s) {
+			s.do_game_main_thread_synced_op(rendering_result);
+		});
 	};
 
 	for (;;) {
@@ -3117,11 +3125,11 @@ work_result work(const int argc, const char* const * const argv) try {
 			{
 				auto scope = measure_scope(render_thread_performance.renderer_commands);
 
-				renderer_backend_result.clear();
+				rendering_result.clear();
 
 				for (auto& r : read_buffer.renderers.all) {
 					renderer_backend.perform(
-						renderer_backend_result,
+						rendering_result,
 						r.commands.data(),
 						r.commands.size(),
 						r.dedicated

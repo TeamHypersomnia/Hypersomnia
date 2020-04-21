@@ -402,6 +402,6 @@ void bake_fresh_atlas(
 	}
 
 #if TEST_SAVE_ATLAS
-	augs::image(output_image.get_data(), output_image.get_size()).save_as_image("/tmp/atl.image");
+	augs::image(output_image.data(), output_image.get_size()).save_as_image("/tmp/atl.image");
 #endif
 }

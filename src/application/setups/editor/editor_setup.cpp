@@ -109,6 +109,10 @@ void editor_setup::unhover() {
 }
 
 bool editor_setup::is_editing_mode() const {
+	if (miniature_generator != std::nullopt) {
+		return false;
+	}
+
 	return anything_opened() ? player().is_editing_mode() : false;
 }
 
@@ -117,6 +121,10 @@ bool editor_setup::is_gameplay_on() const {
 }
 
 std::optional<camera_eye> editor_setup::find_current_camera_eye() const {
+	if (miniature_generator != std::nullopt) {
+		return miniature_generator->get_current_camera();
+	}
+
 	if (anything_opened()) {
 		return editor_detail::calculate_camera(player(), view(), get_matching_go_to_entity(), get_viewed_character());
 	}
@@ -241,6 +249,13 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.interpolation.enabled = false;
 		config.drawing.draw_area_markers = {};
 		config.drawing.draw_callout_indicators = {};
+	}
+
+	if (miniature_generator != std::nullopt) {
+		config.drawing.draw_aabb_highlighter = false;
+		config.interpolation.enabled = false;
+		config.drawing.draw_area_markers.is_enabled = false;
+		config.drawing.draw_callout_indicators.is_enabled = false;
 	}
 
 	if (is_gameplay_on()) {
@@ -1539,7 +1554,14 @@ augs::path_type editor_setup::get_unofficial_content_dir() const {
 	return {};
 }
 
+
+render_layer_filter get_layer_filter_for_miniature();
+
 augs::maybe<render_layer_filter> editor_setup::get_render_layer_filter() const {
+	if (miniature_generator != std::nullopt) {
+		return get_layer_filter_for_miniature();
+	}
+
 	if (const auto v = find_view()) {
 		return v->viewing_filter;
 	}
@@ -2142,6 +2164,25 @@ bool editor_setup::requires_cursor() const {
 	}
 
 	return true;
+}
+
+#include "application/main/game_frame_buffer.h"
+#include "augs/graphics/renderer_backend.h"
+
+void editor_setup::after_all_drawcalls(game_frame_buffer& write_buffer) {
+	if (miniature_generator != std::nullopt) {
+		miniature_generator->request_screenshot(write_buffer.renderers.all[renderer_type::GENERAL]);
+	}
+}
+
+void editor_setup::do_game_main_thread_synced_op(renderer_backend_result& result) {
+	if (miniature_generator != std::nullopt) {
+		auto& ss = result.result_screenshot;
+
+		if (ss != std::nullopt) {
+			miniature_generator->acquire(*ss);
+		}
+	}
 }
 
 template struct augs::marks<camera_eye>;

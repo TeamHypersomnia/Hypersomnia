@@ -160,6 +160,21 @@ void editor_summary_gui::perform(editor_setup& setup) {
 	}
 }
 
+render_layer_filter get_layer_filter_for_miniature() {
+	auto result = render_layer_filter::all();
+	auto& l = result.layers;
+
+	for (auto i = render_layer::INVALID; i <= render_layer::DIM_WANDERING_PIXELS; i = render_layer(int(i) + 1)) {
+		l[i] = false;
+	}
+
+	return result;
+}
+
+#include "application/setups/editor/gui/find_aabb_of.h"
+#include "application/setups/editor/editor_paths.h"
+#include "game/cosmos/for_each_entity.h"
+
 void editor_coordinates_gui::perform(
 	editor_setup& setup,
 	const vec2i screen_size,
@@ -213,5 +228,50 @@ void editor_coordinates_gui::perform(
 	}
 	else {
 		text("No entity selected");
+	}
+
+	auto& miniature_generator = setup.miniature_generator;
+	auto& f = setup.folder();
+
+	thread_local int requested_size = 400;
+
+	if (miniature_generator == std::nullopt) {
+		ImGui::SliderInt("Miniature size", &requested_size, 16, 10000);
+
+		if (ImGui::Button("Create miniature")) {
+			const auto filter = get_layer_filter_for_miniature();
+
+			const auto& cosm = setup.work().world;
+
+			auto for_each_target = [&](auto combiner) {
+				cosm.for_each_entity(
+					[&](const auto& typed_entity) {
+						if (filter.passes(typed_entity)) {
+							combiner(typed_entity);
+						}
+					}
+				);
+			};
+
+			if (const auto world_captured_region = ::find_aabb_of(cosm, for_each_target)) {
+				miniature_generator_state request;
+				auto cam = setup.find_current_camera_eye();
+
+				request.output_path = f.get_paths().arena.miniature_file;
+				request.world_captured_region = *world_captured_region;
+				request.zoom = cam ? cam->zoom : 1.0f;
+
+				request.screen_size = screen_size;
+				request.max_miniature_size = requested_size;
+
+				miniature_generator.emplace(std::move(request));
+			}
+		}
+	}
+
+	if (miniature_generator != std::nullopt) {
+		if (miniature_generator->complete()) {
+			miniature_generator.reset();
+		}
 	}
 }

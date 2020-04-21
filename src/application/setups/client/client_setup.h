@@ -758,4 +758,7 @@ public:
 	bool send_payload(Args&&... args);
 
 	void perform_chat_input_bar();
+
+	void after_all_drawcalls(game_frame_buffer&) {}
+	void do_game_main_thread_synced_op(renderer_backend_result&) {}
 };

@@ -186,5 +186,6 @@ namespace augs {
 		void stencil_reverse_test();
 
 		void next_frame();
+		void screenshot(xywhi bounds);
 	};
 }

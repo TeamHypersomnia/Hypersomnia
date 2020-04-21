@@ -64,6 +64,10 @@ namespace augs {
 		xywhi bounds;
 	};
 
+	struct make_screenshot {
+		xywhi bounds;
+	};
+
 	struct setup_imgui_list {
 		ImDrawList* cmd_list;
 		int fb_height = -1;
