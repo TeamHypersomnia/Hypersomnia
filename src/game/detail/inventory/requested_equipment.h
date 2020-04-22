@@ -14,6 +14,9 @@ struct requested_equipment {
 	int num_given_ammo_pieces = -1;
 
 	item_flavour_id back_wearable;
+#if 0
+	item_flavour_id over_back_wearable;
+#endif
 	item_flavour_id belt_wearable;
 	item_flavour_id personal_deposit_wearable;
 	item_flavour_id shoulder_wearable;

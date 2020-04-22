@@ -73,6 +73,9 @@ entity_id requested_equipment::generate_for(
 	};
 
 	make_wearable(eq.back_wearable, slot_function::BACK);
+#if 0
+	make_wearable(eq.over_back_wearable, slot_function::OVER_BACK);
+#endif
 	make_wearable(eq.belt_wearable, slot_function::BELT);
 	make_wearable(eq.personal_deposit_wearable, slot_function::PERSONAL_DEPOSIT);
 	make_wearable(eq.shoulder_wearable, slot_function::SHOULDER);

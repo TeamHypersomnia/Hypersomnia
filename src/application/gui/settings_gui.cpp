@@ -391,6 +391,12 @@ void settings_gui_state::perform(
 
 		switch (active_pane) {
 			case settings_pane::GENERAL: {
+				ImGui::Separator();
+
+				text_color("Application", yellow);
+
+				ImGui::Separator();
+
 				revertable_enum("Launch on game's startup", config.launch_mode);
 
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
@@ -433,6 +439,12 @@ void settings_gui_state::perform(
 				revertable_enum_radio("Vsync mode", config.window.vsync_mode);
 				revertable_checkbox("Hide this window in-game", config.session.hide_settings_ingame);
 
+				ImGui::Separator();
+
+				text_color("Automatic updates", yellow);
+
+				ImGui::Separator();
+
 				{
 					auto& scope_cfg = config.http_client;
 
@@ -441,6 +453,12 @@ void settings_gui_state::perform(
 
 					input_text<100>(SCOPE_CFG_NVP(application_update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.application_update_host);
 					input_text<100>(SCOPE_CFG_NVP(application_update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.application_update_path);
+
+					ImGui::Separator();
+
+					text_color("Masterserver", yellow);
+
+					ImGui::Separator();
 
 					input_text("Server list provider", config.server_list_provider.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.server_list_provider.address);
 					input_text("Port probing host", config.nat_detection.port_probing_host.address, ImGuiInputTextFlags_EnterReturnsTrue); revert(config.nat_detection.port_probing_host.address);
@@ -623,7 +641,7 @@ void settings_gui_state::perform(
 				text_disabled("\n\n");
 
 				ImGui::Separator();
-				text_color("Miscellaneous", yellow);
+				text_color("Sound physics", yellow);
 				ImGui::Separator();
 
 				revertable_slider("Speed of sound (m/s)", config.audio.sound_meters_per_second, 50.f, 400.f);
@@ -647,6 +665,8 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.input.game_gui;
 					revertable_checkbox(SCOPE_CFG_NVP(allow_switching_to_bare_hands_as_previous_wielded_weapon));
 				}
+
+				text_disabled("\n");
 
 				const auto binding_text_color = rgba(255, 255, 255, 255);
 				const auto bindings_title_color = rgba(255, 255, 0, 255);

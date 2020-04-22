@@ -44,10 +44,13 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::CYBERSPRAY);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_SHIELD_ARMOR);
 		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::MINI_KNIFE);
+#if 0
+		rs.initial_eq.over_back_wearable = to_entity_flavour_id(test_hand_explosives::BOMB);
+#endif
 
 		fill_range(rs.initial_eq.spells_to_give, true);
 	}

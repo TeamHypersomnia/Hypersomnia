@@ -583,7 +583,7 @@ return {
     start_menu_music_at_secs = 0
   },
   session = {
-    hide_settings_ingame = false,
+    hide_settings_ingame = true,
     show_developer_console = false,
     camera_query_aabb_mult = 1.0
   },
