@@ -286,18 +286,26 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 							int total_ammo_for_this_weapon = 0;
 							inventory_space_type total_ammo_space_occupied = 0;
 
-							const auto charge_flavour = ::calc_default_charge_flavour(weapon);
+							const auto ammo_piece_flavour = ::calc_purchasable_ammo_piece(weapon);
 
 							{
 								watched_character.for_each_contained_item_recursive(
-									[&](const auto& typed_item) {
-										if (entity_flavour_id(typed_item.get_flavour_id()) == weapon.get_flavour_id()) {
+									[&](const auto& ammo_piece) {
+										if (entity_flavour_id(ammo_piece.get_flavour_id()) == weapon.get_flavour_id()) {
 											return recursive_callback_result::CONTINUE_DONT_RECURSE;
 										}
 
-										if (entity_flavour_id(typed_item.get_flavour_id()) == charge_flavour) {
-											total_ammo_for_this_weapon += typed_item.template get<components::item>().get_charges();
-											total_ammo_space_occupied += *typed_item.find_space_occupied();
+										if (entity_flavour_id(ammo_piece.get_flavour_id()) == ammo_piece_flavour) {
+											auto count_charge_stack = [&](const auto& ammo_stack) {
+												if (ammo_stack.template has<invariants::cartridge>()) {
+													total_ammo_for_this_weapon += ammo_stack.template get<components::item>().get_charges();
+													total_ammo_space_occupied += *ammo_stack.find_space_occupied();
+												}
+											};
+
+											count_charge_stack(ammo_piece);
+											
+											ammo_piece.for_each_contained_item_recursive(count_charge_stack);
 
 											return recursive_callback_result::CONTINUE_DONT_RECURSE;
 										}

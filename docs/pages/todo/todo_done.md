@@ -4347,3 +4347,4 @@ Advantages:
 
 - log detected internal ip on startup
 
+- and ammo counting for pistols

@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix those mag refills please
+
 - Wtf with those mags appearing at the center of the map?
 - Also you can still sometimes get a magazine in hand if you buy HPSR with little inventory space
 - And you still sometimes need to reload weapons after the round is restarted
