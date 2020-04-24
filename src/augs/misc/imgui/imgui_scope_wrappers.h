@@ -249,6 +249,18 @@ namespace augs {
 			return opt;
 		}
 
+		inline auto scoped_menu_bar() {
+			const auto result = ImGui::BeginMenuBar();
+
+			auto opt = scope_guard([]() { { ImGui::EndMenuBar(); }});
+
+			if (!result) {
+				opt.release();
+			}
+
+			return opt;
+		}
+
 		inline auto scoped_main_menu_bar() {
 			const auto result = ImGui::BeginMainMenuBar();
 

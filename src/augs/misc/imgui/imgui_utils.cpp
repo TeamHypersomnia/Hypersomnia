@@ -100,6 +100,9 @@ namespace augs {
 			io.MouseDrawCursor = false;
 			io.DeltaTime = delta_seconds;
 			io.DisplaySize = ImVec2(screen_size);
+
+			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+			io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
 		}
 
 		void pass_inputs(local_entropy& window_inputs) {

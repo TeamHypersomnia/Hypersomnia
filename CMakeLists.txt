@@ -697,6 +697,10 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/server/server_nat_traversal.cpp"
 	"src/application/main/miniature_generator.cpp"
 	"src/application/setups/builder/builder_setup.cpp"
+	"src/application/setups/builder/builder_setup_imgui.cpp"
+	"src/application/setups/builder/gui/builder_inspector_gui.cpp"
+	"src/application/setups/builder/gui/builder_project_files_gui.cpp"
+	"src/application/setups/builder/gui/builder_hierarchy_gui.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

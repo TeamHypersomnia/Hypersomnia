@@ -1,0 +1,96 @@
+#include "game/cosmos/logic_step.h"
+#include "game/organization/all_messages_includes.h"
+
+#include "view/viewables/viewables_loading_type.h"
+
+#include "application/config_lua_table.h"
+#include "application/setups/builder/builder_setup.h"
+
+#include "augs/misc/imgui/imgui_utils.h"
+#include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "3rdparty/imgui/imgui_internal.h"
+
+void builder_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
+	using namespace augs::imgui;
+
+	(void)in;
+
+	auto window_border_size = scoped_style_var(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	auto frame_border_size = scoped_style_var(ImGuiStyleVar_FrameBorderSize, 0.0f);
+
+	auto item_if_tabs_and = [&](const bool condition, const char* label, const char* shortcut = nullptr) {
+		return ImGui::MenuItem(label, shortcut, nullptr, condition);
+	};
+
+	auto item_if_tabs = [&](const char* label, const char* shortcut = nullptr) {
+		return item_if_tabs_and(true, label, shortcut);
+	};
+
+	if (auto main_menu = scoped_menu_bar()) {
+		if (auto menu = scoped_menu("Project")) {
+
+		}
+
+		if (auto menu = scoped_menu("Edit")) {
+
+		}
+
+		if (auto menu = scoped_menu("Window")) {
+			auto do_window_entry = [&](auto& win, const auto shortcut) {
+				const auto s = std::string("ALT+") + shortcut;
+				if (item_if_tabs(win.get_title().c_str(), s.c_str())) {
+					win.open();
+				}
+			};
+
+			do_window_entry(gui.hierarchy, "R");
+			do_window_entry(gui.project_files, "P");
+			do_window_entry(gui.inspector, "I");
+		}
+	}
+}
+
+custom_imgui_result builder_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
+	(void)in;
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+	{
+		const auto viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->GetWorkPos());
+		ImGui::SetNextWindowSize(viewport->GetWorkSize());
+		ImGui::SetNextWindowViewport(viewport->ID);
+	}
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+	ImGui::Begin("DockSpace Demo", nullptr, window_flags);
+
+	ImGui::PopStyleVar(3);
+
+	{
+		const auto dockspace_id = ImGui::GetID("MyDockSpace");
+
+		const auto dockspace_flags = 
+			ImGuiDockNodeFlags_NoWindowMenuButton
+			| ImGuiDockNodeFlags_NoCloseButton
+			| ImGuiDockNodeFlags_PassthruCentralNode
+		;
+
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+	}
+
+	perform_main_menu_bar(in);
+
+	gui.inspector.perform({});
+	gui.hierarchy.perform({});
+	gui.project_files.perform({});
+
+	ImGui::End();
+
+	return custom_imgui_result::NONE;
+}

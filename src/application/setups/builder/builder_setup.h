@@ -17,12 +17,22 @@
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 
+#include "application/setups/builder/gui/builder_inspector_gui.h"
+#include "application/setups/builder/gui/builder_hierarchy_gui.h"
+#include "application/setups/builder/gui/builder_project_files_gui.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
 namespace sol {
 	class state;
 }
+
+struct builder_gui {
+	builder_inspector_gui inspector = std::string("Inspector");
+	builder_hierarchy_gui hierarchy = std::string("Hierarchy");
+	builder_project_files_gui project_files = std::string("Project files");
+};
 
 class builder_setup : public default_setup_settings {
 	test_mode mode;
@@ -33,6 +43,8 @@ class builder_setup : public default_setup_settings {
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	entity_id viewed_character_id;
 	mode_player_id local_player_id;
+
+	builder_gui gui;
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -67,6 +79,7 @@ public:
 		return scene.viewables;
 	}
 
+	void perform_main_menu_bar(perform_custom_imgui_input);
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 
 	void customize_for_viewing(config_lua_table&) const;
