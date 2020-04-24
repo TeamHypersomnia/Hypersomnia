@@ -56,7 +56,7 @@ enum class launch_type {
 
 	TEST_SCENE,
 
-	EDITOR,
+	ARENA_BUILDER,
 	LEGACY_EDITOR,
 
 	LOCAL_DETERMINISM_TEST,

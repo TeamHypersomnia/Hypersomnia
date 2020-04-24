@@ -147,7 +147,7 @@ main_menu_setup::main_menu_setup(
 	gui.root.buttons[main_menu_button_type::HOST_SERVER].set_appearing_caption("Host server");
 	gui.root.buttons[main_menu_button_type::CONNECT_TO_SERVER].set_appearing_caption("Connect to server");
 	gui.root.buttons[main_menu_button_type::LOCAL_TEST_SCENE].set_appearing_caption("Local test scene");
-	gui.root.buttons[main_menu_button_type::EDITOR].set_appearing_caption("Editor");
+	gui.root.buttons[main_menu_button_type::ARENA_BUILDER].set_appearing_caption("Editor");
 	gui.root.buttons[main_menu_button_type::LEGACY_EDITOR].set_appearing_caption("Editor (LEGACY)");
 	gui.root.buttons[main_menu_button_type::SETTINGS].set_appearing_caption("Settings");
 	gui.root.buttons[main_menu_button_type::CREATORS].set_appearing_caption("Founders");

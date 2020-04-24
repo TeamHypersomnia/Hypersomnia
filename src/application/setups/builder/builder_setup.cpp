@@ -17,3 +17,8 @@ void builder_setup::customize_for_viewing(config_lua_table& config) const {
 void builder_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 	control(events);
 }
+
+custom_imgui_result builder_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
+	(void)in;
+	return custom_imgui_result::NONE;
+}

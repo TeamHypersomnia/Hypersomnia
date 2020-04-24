@@ -1037,7 +1037,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				break;
 
-			case launch_type::EDITOR:
+			case launch_type::ARENA_BUILDER:
 				setup_launcher([&]() {
 					emplace_current_setup(
 						std::in_place_type_t<builder_setup>()
@@ -1620,8 +1620,8 @@ work_result work(const int argc, const char* const * const argv) try {
 				launch_setup(launch_type::LEGACY_EDITOR);
 				break;
 
-			case T::EDITOR:
-				launch_setup(launch_type::EDITOR);
+			case T::ARENA_BUILDER:
+				launch_setup(launch_type::ARENA_BUILDER);
 				break;
 
 			case T::SETTINGS:

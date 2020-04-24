@@ -38,12 +38,12 @@ struct main_menu_gui {
 		const augs::event::change change,
 		B button_callback
 	) {
-		if (change.was_pressed(augs::event::keys::key::E)) {
-			button_callback(main_menu_button_type::EDITOR);
+		if (change.was_pressed(augs::event::keys::key::A)) {
+			button_callback(main_menu_button_type::ARENA_BUILDER);
 			return true;
 		}
 
-		if (change.was_pressed(augs::event::keys::key::G)) {
+		if (change.was_pressed(augs::event::keys::key::E)) {
 			button_callback(main_menu_button_type::LEGACY_EDITOR);
 			return true;
 		}
