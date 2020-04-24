@@ -55,7 +55,9 @@ enum class launch_type {
 	MAIN_MENU,
 
 	TEST_SCENE,
+
 	EDITOR,
+	LEGACY_EDITOR,
 
 	LOCAL_DETERMINISM_TEST,
 

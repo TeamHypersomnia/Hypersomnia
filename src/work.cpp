@@ -928,7 +928,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	static auto launch_editor = [&](auto&&... args) {
+	static auto launch_legacy_editor = [&](auto&&... args) {
 		setup_launcher([&]() {
 			emplace_current_setup(std::in_place_type_t<editor_setup>(),
 				std::forward<decltype(args)>(args)...
@@ -1032,8 +1032,17 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 			}
 
+			case launch_type::LEGACY_EDITOR:
+				launch_legacy_editor(lua);
+
+				break;
+
 			case launch_type::EDITOR:
-				launch_editor(lua);
+				setup_launcher([&]() {
+					emplace_current_setup(
+						std::in_place_type_t<builder_setup>()
+					);
+				});
 
 				break;
 
@@ -1607,6 +1616,10 @@ work_result work(const int argc, const char* const * const argv) try {
 				launch_setup(launch_type::TEST_SCENE);
 				break;
 
+			case T::LEGACY_EDITOR:
+				launch_setup(launch_type::LEGACY_EDITOR);
+				break;
+
 			case T::EDITOR:
 				launch_setup(launch_type::EDITOR);
 				break;
@@ -1991,7 +2004,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	if (!params.editor_target.empty()) {
-		launch_editor(lua, params.editor_target);
+		launch_legacy_editor(lua, params.editor_target);
 	}
 	else if (params.start_server) {
 		launch_setup(launch_type::SERVER);

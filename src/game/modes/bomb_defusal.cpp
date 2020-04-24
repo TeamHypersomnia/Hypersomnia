@@ -233,8 +233,8 @@ void bomb_defusal::init_spawned(
 
 				{
 					/* 
-						If we are refilling, don't create entities for magazines and chambers,
-						because we will do it manually.
+						If we are refilling, don't create cartridges now,
+						because we will do it manually for each magazine and chamber magazine.
 					*/
 
 					const auto target_container = cosm[target_container_id];

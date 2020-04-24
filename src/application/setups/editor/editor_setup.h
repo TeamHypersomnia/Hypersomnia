@@ -202,6 +202,9 @@ class editor_setup : public arena_gui_mixin<editor_setup> {
 
 	mode_player_id get_local_player_id() const;
 
+	editor_arena_handle<false> get_arena_handle();
+	editor_arena_handle<true> get_arena_handle() const;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -429,9 +432,6 @@ public:
 
 	void finish_and_discard();
 	void finish_and_reapply();
-
-	editor_arena_handle<false> get_arena_handle();
-	editor_arena_handle<true> get_arena_handle() const;
 
 	bool requires_cursor() const;
 
