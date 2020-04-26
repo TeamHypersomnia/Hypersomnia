@@ -26,7 +26,7 @@
 std::string ToString(const netcode_address_t&);
 
 #if PLATFORM_UNIX
-extern volatile std::sig_atomic_t signal_status;
+static std::atomic<int> signal_status = 0;
 #endif
 
 #define LOG_MASTERSERVER 1
@@ -230,7 +230,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	while (true) {
 #if PLATFORM_UNIX
 		if (signal_status != 0) {
-			const auto sig = signal_status;
+			const auto sig = signal_status.load();
 
 			LOG("%x received.", strsignal(sig));
 

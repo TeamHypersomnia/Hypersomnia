@@ -116,7 +116,8 @@ bool log_to_live_file = false;
 	This function will only be entered ONCE during the lifetime of the program.
 */
 #if PLATFORM_UNIX
-volatile std::sig_atomic_t signal_status = 0;
+static std::atomic<int> signal_status = 0;
+static_assert(std::atomic<int>::is_always_lock_free);
 #endif
 
 work_result work(const int argc, const char* const * const argv) try {
@@ -555,7 +556,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		auto handle_sigint = []() {
 #if PLATFORM_UNIX
 			if (signal_status != 0) {
-				const auto sig = signal_status;
+				const auto sig = signal_status.load();
 
 				LOG("%x received.", strsignal(sig));
 
@@ -2121,7 +2122,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			auto should_quit_due_to_signal = []() {
 #if PLATFORM_UNIX
 				if (signal_status != 0) {
-					const auto sig = signal_status;
+					const auto sig = signal_status.load();
 
 					LOG("%x received.", strsignal(sig));
 

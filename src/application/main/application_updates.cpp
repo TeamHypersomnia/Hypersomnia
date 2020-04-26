@@ -53,7 +53,7 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 #endif
 
 #if PLATFORM_UNIX
-extern volatile std::sig_atomic_t signal_status;
+static std::atomic<int> signal_status = 0;
 #endif
 
 static auto get_first_folder_in(const augs::path_type& where) {
@@ -763,7 +763,7 @@ application_update_result check_and_apply_updates(
 
 #if PLATFORM_UNIX
 			if (signal_status != 0) {
-				const auto sig = signal_status;
+				const auto sig = signal_status.load();
 
 				LOG("%x received.", strsignal(sig));
 
