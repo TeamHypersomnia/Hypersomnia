@@ -2962,6 +2962,8 @@ work_result work(const int argc, const char* const * const argv) try {
 				draw_game_gui(game_gui_renderer, new_viewing_config);
 			};
 
+			auto menu_chosen_cursor = assets::necessary_image_id::INVALID;
+
 			auto post_game_gui_job = [&]() {
 				auto& chosen_renderer = post_game_gui_renderer;
 
@@ -2974,10 +2976,15 @@ work_result work(const int argc, const char* const * const argv) try {
 				}
 
 				/* #5 */
-				const auto menu_chosen_cursor = draw_and_choose_menu_cursor(chosen_renderer, create_menu_context);
+				menu_chosen_cursor = draw_and_choose_menu_cursor(chosen_renderer, create_menu_context);
 
 				/* #6 */
 				draw_call_imgui(chosen_renderer);
+
+			};
+
+			auto place_final_drawcalls_synchronously = [&]() {
+				auto& chosen_renderer = post_game_gui_renderer;
 
 				/* #7 */
 				draw_non_menu_cursor(chosen_renderer, new_viewing_config, menu_chosen_cursor);
@@ -3014,6 +3021,14 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			thread_pool.help_until_no_tasks();
 			thread_pool.wait_for_all_tasks_to_complete();
+
+			/* 
+				This task is dependent upon completion of two other tasks: 
+				- game_gui_job
+				- post_game_gui_job
+			*/
+
+			place_final_drawcalls_synchronously();
 		};
 
 		while (!should_quit) {
