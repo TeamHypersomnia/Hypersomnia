@@ -75,6 +75,34 @@ custom_imgui_result builder_setup::perform_custom_imgui(const perform_custom_img
 	{
 		const auto dockspace_id = ImGui::GetID("MyDockSpace");
 
+		auto open_default_windows = [&]() {
+			gui.inspector.open();
+			gui.hierarchy.open();
+			gui.project_files.open();
+		};
+
+		auto make_default_layout = [&]() {
+			ImGui::DockBuilderRemoveNode(dockspace_id); // Clear out existing layout
+			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace); // Add empty node
+			ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetContentRegionAvail());
+
+			ImGuiID dock_main_id = dockspace_id; // This variable will track the document node, however we are not using it here as we aren't docking anything into it.
+
+			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.20f, NULL, &dock_main_id);
+			ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.20f, NULL, &dock_main_id);
+			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
+
+			ImGui::DockBuilderDockWindow(gui.project_files.get_title().c_str(), dock_id_bottom);
+			ImGui::DockBuilderDockWindow(gui.hierarchy.get_title().c_str(), dock_id_left);
+			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
+			ImGui::DockBuilderFinish(dockspace_id);
+		};
+
+		if (ImGui::DockBuilderGetNode(dockspace_id) == NULL) {
+			open_default_windows();
+			make_default_layout();
+		}
+
 		const auto dockspace_flags = 
 			ImGuiDockNodeFlags_NoWindowMenuButton
 			| ImGuiDockNodeFlags_NoCloseButton

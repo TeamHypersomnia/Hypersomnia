@@ -271,7 +271,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	static const auto imgui_ini_path = std::string(USER_FILES_DIR) + "/" + get_preffix_for(current_app_type) + "imgui.ini";
 	static const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
 
-	augs::imgui::init(
+	static const auto imgui_raii = augs::imgui::context_raii(
 		imgui_ini_path.c_str(),
 		imgui_log_path.c_str(),
 		config.gui_style

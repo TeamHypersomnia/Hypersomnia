@@ -41,9 +41,13 @@ static void augs_SetClipboardText(void*, const char* text) {
 
 namespace augs {
 	namespace imgui {
-		void init(
-			const char* const ini_filename,
-			const char* const log_filename,
+		context_raii::~context_raii() {
+			ImGui::DestroyContext();
+		}
+
+		context_raii::context_raii(
+			const char* const ini_path,
+			const char* const log_path,
 			const ImGuiStyle& initial_style
 		) {
 			ImGui::CreateContext();
@@ -76,8 +80,8 @@ namespace augs {
 			map_key(ImGuiKey_Y, key::Y);
 			map_key(ImGuiKey_Z, key::Z);
 
-			io.IniFilename = ini_filename;
-			io.LogFilename = log_filename;
+			io.IniFilename = ini_path;
+			io.LogFilename = log_path;
 
 #if PLATFORM_UNIX && !USE_GLFW
 			io.SetClipboardTextFn = augs_SetClipboardText;

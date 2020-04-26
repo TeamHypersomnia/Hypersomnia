@@ -25,11 +25,22 @@ namespace augs {
 			}
 		}
 
-		void init(
-			const char* const ini_filename,
-			const char* const log_filename,
-			const ImGuiStyle& initial_style
-		);
+		class context_raii { 
+		public:
+			context_raii(
+				const char* const ini_filename,
+				const char* const log_filename,
+				const ImGuiStyle& initial_style
+			);
+
+			~context_raii();
+
+			context_raii(const context_raii&) = delete;
+			context_raii& operator=(const context_raii&) = delete;
+
+			context_raii(context_raii&&) = delete;
+			context_raii& operator=(context_raii&&) = delete;
+		};
 
 		image create_atlas_image(const font_loading_input&);
 		graphics::texture create_atlas(const font_loading_input&);

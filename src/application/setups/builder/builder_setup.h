@@ -29,9 +29,11 @@ namespace sol {
 }
 
 struct builder_gui {
+	// GEN INTROSPECTOR struct builder_gui
 	builder_inspector_gui inspector = std::string("Inspector");
 	builder_hierarchy_gui hierarchy = std::string("Hierarchy");
 	builder_project_files_gui project_files = std::string("Project files");
+	// END GEN INTROSPECTOR
 };
 
 class builder_setup : public default_setup_settings {
@@ -46,10 +48,14 @@ class builder_setup : public default_setup_settings {
 
 	builder_gui gui;
 
+	void load_gui_state();
+	void save_gui_state();
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 
 	builder_setup();
+	~builder_setup();
 
 	auto get_audiovisual_speed() const {
 		return 1.0;

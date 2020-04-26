@@ -9,6 +9,8 @@ summary: Just a hidden scratchpad.
 	- Happened when we finished drag and dropping on hotbar 
 	- All buttons on hotbar were assigned
 	- The item we dragged was hidden in backpack and *possibly* unassigned to hotbar yet
+	- NEW: The crash happened EXACTLY when pressing an AWP that was in the backpack
+		- But it was presuambly not in the hotbar since we pressed it
 
 - remember to fix your system time before hosting
 	- fix that damn connect token
