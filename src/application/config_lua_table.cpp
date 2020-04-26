@@ -89,14 +89,20 @@ address_and_port stun_server_provider::get_next() {
 
 	auto result = address_and_port();
 	result.default_port = 3478;
-	usage_timestamps[current_stun_server] = yojimbo_time();
-	result.address = servers[current_stun_server++ % servers.size()];
+
+	const auto current_server_i = current_stun_server % servers.size();
+
+	usage_timestamps[current_server_i] = yojimbo_time();
+	result.address = servers[current_server_i];
+
+	++current_stun_server;
 
 	return result;
 }
 
 double stun_server_provider::seconds_to_wait_for_next(const double usage_cooldown_secs) const {
-	const auto& ts = usage_timestamps[current_stun_server];
+	const auto current_server_i = current_stun_server % servers.size();
+	const auto& ts = usage_timestamps[current_server_i];
 
 	if (ts == -1) {
 		return 0.0;
