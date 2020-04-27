@@ -15,6 +15,8 @@ struct entropy_accumulator {
 		const zoom_type zoom;
 	};
 
+	static const entropy_accumulator zero;
+
 	mode_player_entropy mode;
 	cosmic_player_entropy cosmic;
 

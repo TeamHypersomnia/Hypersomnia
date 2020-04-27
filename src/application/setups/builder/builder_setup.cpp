@@ -21,11 +21,7 @@ builder_setup::~builder_setup() {
 }
 
 void builder_setup::customize_for_viewing(config_lua_table& config) const {
-	config.window.name = "Hypersomnia test scene";
-}
-
-void builder_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
-	control(events);
+	config.window.name = "Arena builder";
 }
 
 void builder_setup::load_gui_state() {
@@ -42,4 +38,3 @@ void builder_setup::load_gui_state() {
 void builder_setup::save_gui_state() {
 	augs::save_as_bytes(gui, get_builder_gui_state_path());
 }
-

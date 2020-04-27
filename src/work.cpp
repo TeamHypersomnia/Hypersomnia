@@ -1044,6 +1044,13 @@ work_result work(const int argc, const char* const * const argv) try {
 					);
 				});
 
+			case launch_type::ARENA_BUILDER_PROJECT_SELECTOR:
+				setup_launcher([&]() {
+					emplace_current_setup(
+						std::in_place_type_t<project_selector_setup>()
+					);
+				});
+
 				break;
 
 			case launch_type::TEST_SCENE:
@@ -1621,7 +1628,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::ARENA_BUILDER:
-				launch_setup(launch_type::ARENA_BUILDER);
+				launch_setup(launch_type::ARENA_BUILDER_PROJECT_SELECTOR);
 				break;
 
 			case T::SETTINGS:

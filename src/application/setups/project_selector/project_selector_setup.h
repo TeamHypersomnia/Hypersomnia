@@ -17,10 +17,6 @@
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 
-#include "application/setups/builder/gui/builder_inspector_gui.h"
-#include "application/setups/builder/gui/builder_hierarchy_gui.h"
-#include "application/setups/builder/gui/builder_project_files_gui.h"
-
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -28,53 +24,33 @@ namespace sol {
 	class state;
 }
 
-struct builder_gui {
-	// GEN INTROSPECTOR struct builder_gui
-	builder_inspector_gui inspector = std::string("Inspector");
-	builder_hierarchy_gui hierarchy = std::string("Hierarchy");
-	builder_project_files_gui project_files = std::string("Project files");
-	// END GEN INTROSPECTOR
-};
-
-class builder_setup : public default_setup_settings {
-	test_mode mode;
-	test_mode_ruleset ruleset;
-
-	intercosm scene;
-	entropy_accumulator total_collected;
-	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	entity_id viewed_character_id;
-	mode_player_id local_player_id;
-
-	builder_gui gui;
-
-	void load_gui_state();
-	void save_gui_state();
+class project_selector_setup : public default_setup_settings {
+	all_viewables_defs viewables;
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 
-	builder_setup();
-	~builder_setup();
+	project_selector_setup();
+	~project_selector_setup();
 
 	auto get_audiovisual_speed() const {
 		return 1.0;
 	}
 
 	const auto& get_viewed_cosmos() const {
-		return scene.world;
+		return cosmos::zero;
 	}
 
 	auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
+		return 1.0;
 	}
 
 	auto get_viewed_character_id() const {
-		return viewed_character_id;
+		return entity_id();
 	}
 
 	auto get_controlled_character_id() const {
-		return get_viewed_character_id();
+		return entity_id();
 	}
 
 	auto get_viewed_character() const {
@@ -82,12 +58,10 @@ public:
 	}
 
 	const auto& get_viewable_defs() const {
-		return scene.viewables;
+		return viewables;
 	}
 
-	void perform_main_menu_bar(perform_custom_imgui_input);
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
-
 	void customize_for_viewing(config_lua_table&) const;
 
 	void apply(const config_lua_table&) {
@@ -98,8 +72,8 @@ public:
 		return setup_escape_result::IGNORE;
 	}
 
-	auto get_inv_tickrate() const {
-		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+	double get_inv_tickrate() const {
+		return 1.0 / 60;
 	}
 
 	template <class C>
@@ -107,29 +81,13 @@ public:
 		const setup_advance_input& in,
 		const C& callbacks
 	) {
-		timer.advance(in.frame_delta);
-
-		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
-
-		while (steps--) {
-			const auto total = total_collected.extract(
-				get_viewed_character(), 
-				local_player_id, 
-				in.make_accumulator_input()
-			);
-
-			mode.advance(
-				{ ruleset, scene.world },
-				total,
-				callbacks,
-				solve_settings()
-			);
-		}
+		(void)in;
+		(void)callbacks;
 	}
 
 	template <class T>
-	void control(const T& t) {
-		total_collected.control(t);
+	void control(const T&) {
+
 	}
 
 	void accept_game_gui_events(const game_gui_entropy_type&) {}
@@ -152,13 +110,11 @@ public:
 	bool requires_cursor() const { return false; }
 
 	const entropy_accumulator& get_entropy_accumulator() const {
-		return total_collected;
+		return entropy_accumulator::zero;
 	}
 
 	template <class F>
-	void on_mode_with_input(F&& callback) const {
-		callback(mode, test_mode::const_input { ruleset, scene.world });
-	}
+	void on_mode_with_input(F&&) const {}
 
 	auto get_game_gui_subject_id() const {
 		return get_viewed_character_id();

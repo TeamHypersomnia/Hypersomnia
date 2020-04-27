@@ -5,6 +5,8 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Editor slowed down when looking at a grid far away from the center
+
 - Profile interpolation rewrite
 
 - Looks like we have drastically less FPS with character on screen compared to no character
