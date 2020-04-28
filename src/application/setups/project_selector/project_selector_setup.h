@@ -37,6 +37,7 @@ enum class project_tab_type {
 struct projects_list_view {
 	// GEN INTROSPECTOR struct projects_list_view
 	project_tab_type current_tab;
+	int sort_by_column = 0;
 
 	augs::path_type source_project_path;
 	augs::path_type target_project_path;

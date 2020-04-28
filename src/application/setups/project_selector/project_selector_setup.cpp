@@ -13,6 +13,7 @@
 #include "application/gui/pretty_tabs.h"
 
 #include "augs/misc/imgui/imgui_utils.h"
+#include "augs/misc/imgui/imgui_control_wrappers.h"
 
 const entropy_accumulator entropy_accumulator::zero;
 
@@ -30,30 +31,80 @@ void project_selector_setup::customize_for_viewing(config_lua_table& config) con
 	config.window.name = "Arena builder - project selector";
 }
 
+template <class E, class... Args>
+void do_pretty_selectables(E& active_pane, Args&&... args) {
+	using namespace augs::imgui;
+
+	{
+		auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
+
+		{
+			static auto labels = []() {
+				static augs::enum_array<std::string, E> label_strs;
+				augs::enum_array<const char*, E> c_strs;
+
+				augs::for_each_enum_except_bounds([&c_strs](const E s) {
+					label_strs[s] = format_enum(s);
+					c_strs[s] = label_strs[s].c_str();
+				});
+
+				return c_strs;
+			}();
+
+			for (std::size_t i = 0; i < labels.size(); ++i) {
+				const auto current_enum = static_cast<E>(i);
+				const bool selected = current_enum == active_pane;
+
+				if (ImGui::Selectable(labels[current_enum], selected, std::forward<Args>(args)...)) {
+					active_pane = current_enum;
+				}
+			}
+		}
+	}
+}
+
 bool projects_list_view::perform() {
 	using namespace augs::imgui;
 
-	auto buttons_column_size = ImGui::CalcTextSize("New Project  ");
+	auto left_buttons_column_size = ImGui::CalcTextSize("Community arenas  ");
+	auto root = scoped_child("Selector main");
 
-	auto child = scoped_child("Project list view", ImVec2(-buttons_column_size.x, 0));
+	auto perform_arena_list = [&]() {
+		switch (current_tab) {
+			case project_tab_type::MY_PROJECTS:
 
-	do_pretty_tabs(current_tab);
+				break;
 
-	switch (current_tab) {
-		case project_tab_type::MY_PROJECTS:
+			case project_tab_type::OFFICIAL_TEMPLATES:
 
-			break;
+				break;
 
-		case project_tab_type::OFFICIAL_TEMPLATES:
+			case project_tab_type::COMMUNITY_ARENAS:
 
-			break;
+				break;
 
-		case project_tab_type::COMMUNITY_ARENAS:
+			default:
+				break;
+		}
+	};
 
-			break;
+	centered_text("Arena Builder 2.0 - Project Manager");
 
-		default:
-			break;
+	{
+		auto list_view = scoped_child("Project categories view", ImVec2(left_buttons_column_size.x, 0));
+
+		const auto selectable_size = ImVec2(left_buttons_column_size.x, left_buttons_column_size.y * 2);
+		do_pretty_selectables(current_tab, ImGuiSelectableFlags_None, selectable_size);
+	}
+
+	ImGui::SameLine();
+
+	{
+		//const auto button_size = ImVec2(left_buttons_column_size.x, 0);
+
+		auto actions = scoped_child("Project list view");
+
+		perform_arena_list();
 	}
 
 	return false;
@@ -71,9 +122,10 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 		ImGuiWindowFlags_NoDecoration
 		| ImGuiWindowFlags_NoInputs
 		| ImGuiWindowFlags_NoNav
+		| ImGuiWindowFlags_NoBringToFrontOnFocus
 	;
 
-	auto scope = scoped_window("Project selector", nullptr, window_flags);
+	auto scope = scoped_window("Project selector main", nullptr, window_flags);
 
 	gui.projects_view.perform();
 
