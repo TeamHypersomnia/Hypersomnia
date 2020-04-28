@@ -107,7 +107,7 @@ bool bomb_defusal_player::operator<(const bomb_defusal_player& b) const {
 
 std::size_t bomb_defusal::get_round_rng_seed(const cosmos& cosm) const {
 	(void)cosm;
-	return rng_seed_offset + clock_before_setup.now.step + get_round_num(); 
+	return rng_seed_offset + clock_before_setup.now.step + get_current_round_number(); 
 }
 
 std::size_t bomb_defusal::get_step_rng_seed(const cosmos& cosm) const {
@@ -441,7 +441,7 @@ bool bomb_defusal::add_player_custom(const input_type in, const add_player_input
 	else {
 		new_player.stats.money = in.rules.economy.initial_money;
 
-		if (get_round_num() != 0) {
+		if (get_current_round_number() != 0) {
 			new_player.stats.money /= 2;
 		}
 	}
@@ -872,7 +872,7 @@ void bomb_defusal::setup_round(
 		thread_local auto lua = augs::create_lua_state();
 
 		const auto pid = augs::getpid();
-		const auto preffix = typesafe_sprintf("%x_befset%x_", pid, get_round_num());
+		const auto preffix = typesafe_sprintf("%x_befset%x_", pid, get_current_round_number());
 
 		::dump_for_debugging(
 			lua,
@@ -1194,27 +1194,27 @@ void bomb_defusal::count_knockouts_for_unconscious_players_in(const input_type i
 }
 
 bool bomb_defusal::is_halfway_round(const const_input_type in) const {
-	const auto n = in.rules.get_num_rounds();
-	const auto current_round = get_round_num();
+	const auto max_rounds = in.rules.get_num_rounds();
+	const auto current_round = get_current_round_number();
 
-	return current_round == n / 2;
+	return current_round == max_rounds / 2;
 }
 
 bool bomb_defusal::is_final_round(const const_input_type in) const {
-	const auto n = in.rules.get_num_rounds();
-	const auto current_round = get_round_num();
+	const auto max_rounds = in.rules.get_num_rounds();
+	const auto current_round = get_current_round_number();
 
 	bool someone_has_over_half = false;
 
 	const auto p = calc_participating_factions(in);
 	
 	p.for_each([&](const auto f) {
-		if (get_score(f) > n / 2) {
+		if (get_score(f) > max_rounds / 2) {
 			someone_has_over_half = true;
 		}
 	});
 
-	return someone_has_over_half || current_round == n;
+	return someone_has_over_half || current_round >= max_rounds;
 }
 
 void bomb_defusal::make_win(const input_type in, const faction_type winner) {
@@ -1503,7 +1503,7 @@ arena_migrated_session bomb_defusal::emigrate() const {
 
 void bomb_defusal::migrate(const input_type in, const arena_migrated_session& session) {
 	ensure(players.empty());
-	ensure_eq(0u, get_round_num());
+	ensure_eq(0u, get_current_round_number());
 
 	std::unordered_map<faction_type, faction_type> faction_mapping;
 
@@ -1598,7 +1598,7 @@ mode_player_id bomb_defusal::find_first_free_player() const {
 }
 
 void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& entropy, const logic_step step) {
-	const auto current_round = get_round_num();
+	const auto current_round = get_current_round_number();
 	auto& cosm = in.cosm;
 
 	for (const auto& p : entropy.players) {
@@ -2351,7 +2351,7 @@ float bomb_defusal::get_seconds_since_planting(const const_input_type in) const 
 	});
 }
 
-unsigned bomb_defusal::get_round_num() const {
+unsigned bomb_defusal::get_current_round_number() const {
 	unsigned total = 0;
 
 	for_each_faction([&](const auto f) {

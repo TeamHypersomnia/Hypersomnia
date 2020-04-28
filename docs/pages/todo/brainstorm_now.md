@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+<<<<<<< HEAD
 - inspect that new crash please before we forget the date
 
 - Emphasize the items laying on the ground
@@ -34,6 +35,19 @@ summary: That which we are brainstorming at the moment.
 - Right now "USE_GLFW" is synonymous with building on Mac. Perhaps a better naming is in order?
 
 - Fix those mag refills please
+=======
+- Look for some filesystem implementation for imgui
+	- We'll also replace the system viewers? At least some of them?
+		- Only reveal in explorer will be useful at this point
+
+- A setup needs to be able to launch another setup easily
+	- A callback with a launcher passed?
+
+- Rock the vote for modes, schemes and difficulties
+
+- We can pay someone to properly re-map all of the official maps in the new editor.
+	- The ultimate test.
+>>>>>>> 3c333086a... Massive planning progress
 
 - Wtf with those mags appearing at the center of the map?
 - Also you can still sometimes get a magazine in hand if you buy HPSR with little inventory space

@@ -8,8 +8,8 @@ arena_paths::arena_paths(
 		return target_folder / (arena_name + ext);
 	};
 
-	rulesets_file = in_folder(".rulesets");
-	miniature_file = in_folder(".miniature.png");
+	rulesets_file_path = in_folder(".rulesets");
+	miniature_file_path = in_folder(".miniature.png");
 }
 
 arena_paths::arena_paths(const std::string& arena_name) 

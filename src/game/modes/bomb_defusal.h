@@ -443,7 +443,7 @@ public:
 	mode_entity_id lookup(const mode_player_id&) const;
 	mode_player_id lookup(const mode_entity_id&) const;
 
-	unsigned get_round_num() const;
+	unsigned get_current_round_number() const;
 
 	float get_seconds_passed_in_cosmos(const_input) const;
 

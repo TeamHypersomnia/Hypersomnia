@@ -257,7 +257,7 @@ void editor_coordinates_gui::perform(
 				miniature_generator_state request;
 				auto cam = setup.find_current_camera_eye();
 
-				request.output_path = f.get_paths().arena.miniature_file;
+				request.output_path = f.get_paths().arena.miniature_file_path;
 				request.world_captured_region = *world_captured_region;
 				request.zoom = cam ? cam->zoom : 1.0f;
 

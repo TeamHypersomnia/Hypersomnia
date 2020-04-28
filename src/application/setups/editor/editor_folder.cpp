@@ -21,7 +21,7 @@ void load_arena_from(
 	scene.load_from_bytes(paths.int_paths);
 
 	try {
-		augs::load_from_bytes(rulesets, paths.rulesets_file);
+		augs::load_from_bytes(rulesets, paths.rulesets_file_path);
 	}
 	catch (const augs::file_open_error&) {
 		/* Just let it happen */
@@ -78,7 +78,7 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	commanded->work.save_as_bytes(paths.arena.int_paths);
 
 	augs::save_as_bytes(commanded->view_ids, paths.view_ids_file);
-	augs::save_as_bytes(commanded->rulesets, paths.arena.rulesets_file);
+	augs::save_as_bytes(commanded->rulesets, paths.arena.rulesets_file_path);
 	augs::save_as_bytes(view, paths.view_file);
 	augs::save_as_bytes(history, paths.hist_file);
 	augs::save_as_bytes(player, paths.player_file);

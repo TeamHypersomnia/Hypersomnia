@@ -374,7 +374,7 @@ public:
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 				if (arena.get_cosmos().get_total_steps_passed() == 1) {
 					const auto pid = augs::getpid();
-					const auto preffix = typesafe_sprintf("%x_server_aftset%x_", pid, arena.get_round_num());
+					const auto preffix = typesafe_sprintf("%x_server_aftset%x_", pid, arena.get_current_round_number());
 
 					arena.on_mode(
 						[&](const auto& mode) {

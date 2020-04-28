@@ -24,8 +24,40 @@ namespace sol {
 	class state;
 }
 
+enum class project_tab_type {
+	// GEN INTROSPECTOR enum class project_tab_type
+	MY_PROJECTS,
+	OFFICIAL_TEMPLATES,
+	COMMUNITY_ARENAS,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+struct projects_list_view {
+	// GEN INTROSPECTOR struct projects_list_view
+	project_tab_type current_tab;
+
+	augs::path_type source_project_path;
+	augs::path_type target_project_path;
+	// END GEN INTROSPECTOR
+
+	bool perform();
+};
+
+struct project_selector_gui {
+	// GEN INTROSPECTOR struct project_selector_gui
+	projects_list_view projects_view;
+	// END GEN INTROSPECTOR
+};
+
 class project_selector_setup : public default_setup_settings {
 	all_viewables_defs viewables;
+
+	project_selector_gui gui;
+
+	void load_gui_state();
+	void save_gui_state();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;

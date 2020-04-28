@@ -82,7 +82,7 @@ public:
 		return this->on_mode_with_rules_impl(*this, std::forward<Args>(args)...);
 	}
 
-	auto get_round_num() const {
+	auto get_current_round_number() const {
 		return this->on_mode(
 			[&](const auto& typed_mode) {
 				using M = remove_cref<decltype(typed_mode)>;
@@ -91,7 +91,7 @@ public:
 					return 0u;
 				}
 				else {
-					return typed_mode.get_round_num();
+					return typed_mode.get_current_round_number();
 				}
 			}
 		);

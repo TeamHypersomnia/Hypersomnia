@@ -1,5 +1,7 @@
 #pragma once
 #include "augs/templates/enum_introspect.h"
+#include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/string/format_enum.h"
 
 template <class E, class F>
 void do_pretty_tabs(E& active_pane, F custom_name) {

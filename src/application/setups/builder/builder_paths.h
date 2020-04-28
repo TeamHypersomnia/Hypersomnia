@@ -7,8 +7,8 @@
 
 #define BUILDER_DIR (augs::path_type(USER_FILES_DIR) / "builder")
 
-inline auto get_recent_arenas_path() {
-	return BUILDER_DIR / "editor_recent_paths.lua";
+inline auto get_project_selector_gui_state_path() {
+	return BUILDER_DIR / "project_selector.lua";
 }
 
 inline auto get_builder_gui_state_path() {
