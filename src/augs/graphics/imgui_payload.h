@@ -3,8 +3,9 @@
 namespace augs {
 	enum class imgui_atlas_type {
 		IMGUI,
+		GAME,
 		AVATARS,
 		AVATAR_PREVIEW,
-		GAME
+		AD_HOC
 	};
 }

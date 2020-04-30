@@ -7,6 +7,7 @@ summary: That which we are brainstorming at the moment.
 ---
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 - inspect that new crash please before we forget the date
 
 - Emphasize the items laying on the ground
@@ -36,6 +37,11 @@ summary: That which we are brainstorming at the moment.
 
 - Fix those mag refills please
 =======
+=======
+- Leaderboards shown in the main menu
+- "Host a server" button right in the arena builder
+
+>>>>>>> c76b822c9... Drafting, Create New Arena button
 - Look for some filesystem implementation for imgui
 	- We'll also replace the system viewers? At least some of them?
 		- Only reveal in explorer will be useful at this point

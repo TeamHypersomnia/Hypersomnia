@@ -859,10 +859,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		const auto frame_num = current_frame.load();
 
 		std::optional<arena_player_metas> new_player_metas;
+		std::optional<ad_hoc_atlas_subjects> new_ad_hoc_images;
 
-		if (streaming.finished_loading_player_metas(frame_num)) {
+		if (streaming.avatars.work_slot_free(frame_num)) {
 			visit_current_setup([&](auto& setup) {
 				new_player_metas = setup.get_new_player_metas();
+				new_ad_hoc_images = setup.get_new_ad_hoc_images();
 			});
 		}
 
@@ -876,7 +878,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			get_general_renderer(),
 			renderer_backend.get_max_texture_size(),
 
-			new_player_metas
+			new_player_metas,
+			new_ad_hoc_images
 		});
 	};
 
@@ -1388,7 +1391,13 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		visit_current_setup([&](auto& setup) {
 			const auto result = setup.perform_custom_imgui({ 
-				lua, window, streaming.images_in_atlas, config, is_replaying_demo()
+				lua,
+				window,
+				streaming.images_in_atlas,
+				streaming.ad_hoc.in_atlas,
+				streaming.necessary_images_in_atlas,
+				config,
+				is_replaying_demo()
 			});
 
 			if (result == custom_imgui_result::GO_TO_MAIN_MENU) {
@@ -2625,9 +2634,9 @@ work_result work(const int argc, const char* const * const argv) try {
 						new_viewing_config,
 						streaming.necessary_images_in_atlas,
 						std::addressof(streaming.general_atlas),
-						std::addressof(streaming.avatar_atlas),
+						std::addressof(streaming.avatars.texture),
 						streaming.images_in_atlas,
-						streaming.avatars_in_atlas,
+						streaming.avatars.in_atlas,
 						chosen_renderer,
 						common_input_state.mouse.pos,
 						screen_size,
@@ -2806,8 +2815,9 @@ work_result work(const int argc, const char* const * const argv) try {
 				chosen_renderer.draw_call_imgui(
 					imgui_atlas, 
 					std::addressof(streaming.general_atlas), 
-					std::addressof(streaming.avatar_atlas), 
-					std::addressof(streaming.avatar_preview_tex)
+					std::addressof(streaming.avatars.texture), 
+					std::addressof(streaming.avatar_preview_tex),
+					std::addressof(streaming.ad_hoc.texture)
 				);
 			};
 

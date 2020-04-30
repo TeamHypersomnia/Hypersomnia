@@ -192,6 +192,10 @@ public:
 		return std::nullopt;
 	}
 
+	std::nullopt_t get_new_ad_hoc_images() {
+		return std::nullopt;
+	}
+
 	const arena_player_metas* find_player_metas() const {
 		return nullptr;
 	}

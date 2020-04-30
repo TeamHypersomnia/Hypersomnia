@@ -31,9 +31,8 @@ void viewables_streaming::finalize_pending_tasks() {
 		future_general_atlas.get();
 	}
 
-	if (future_avatar_atlas.valid()) {
-		future_avatar_atlas.get();
-	}
+	avatars.finalize_tasks_if_any();
+	ad_hoc.finalize_tasks_if_any();
 }
 
 viewables_streaming::~viewables_streaming() {
@@ -64,10 +63,6 @@ static auto make_current_registry_of_write_times(const D& dir, const F& from_def
 	return output;
 };
 
-bool viewables_streaming::finished_loading_player_metas(const augs::frame_num_type current_frame) const {
-	return !future_avatar_atlas.valid() && augs::has_completed(current_frame, avatar_atlas_submitted_when);
-}
-
 bool viewables_streaming::finished_generating_atlas() const {
 	return !future_general_atlas.valid();
 }
@@ -84,23 +79,35 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	const auto max_atlas_size = in.max_atlas_size;
 
 	/* Avatar atlas pass */
-	if (finished_loading_player_metas(current_frame)) {
+	if (avatars.work_slot_free(current_frame)) {
 		if (in.new_player_metas != std::nullopt) {
-			avatar_pbo_fallback.clear();
-
 			auto avatar_atlas_in = avatar_atlas_input {
 				std::move(*in.new_player_metas),
 				max_atlas_size,
 
 				nullptr,
-				avatar_pbo_fallback
+				avatars.pbo_fallback
 			};
 
-			future_avatar_atlas = launch_async(
-				[avatar_atlas_in]() { 
-					return create_avatar_atlas(avatar_atlas_in);
-				}
-			);
+			avatars.submit_work([avatar_atlas_in]() { 
+				return create_avatar_atlas(avatar_atlas_in);
+			});
+		}
+	}
+
+	if (ad_hoc.work_slot_free(current_frame)) {
+		if (in.ad_hoc_subjects != std::nullopt) {
+			auto ad_hoc_atlas_in = ad_hoc_atlas_input {
+				std::move(*in.ad_hoc_subjects),
+				max_atlas_size,
+
+				nullptr,
+				ad_hoc.pbo_fallback
+			};
+
+			ad_hoc.submit_work([ad_hoc_atlas_in]() { 
+				return create_ad_hoc_atlas(ad_hoc_atlas_in);
+			});
 		}
 	}
 
@@ -302,21 +309,27 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	}
 }
 
+template <class output_type>
+void texture_in_progress<output_type>::finalize_load(augs::renderer& renderer) {
+	if (valid_and_is_ready(future_output)) {
+		auto result = future_output.get();
+
+		in_atlas = std::move(result.atlas_entries);
+
+		const auto atlas_size = result.atlas_size;
+		texture.texImage2D(renderer, atlas_size, std::addressof(pbo_fallback.data()->r));
+		texture.set_filtering(renderer, augs::filtering_type::LINEAR);
+
+		augs::graphics::texture::set_current_to_previous(renderer);
+	}
+}
+
 void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	const auto current_frame = in.current_frame;
 	auto& now_all_defs = now_loaded_viewables_defs;
 
-	if (valid_and_is_ready(future_avatar_atlas)) {
-		auto result = future_avatar_atlas.get();
-
-		avatars_in_atlas = std::move(result.atlas_entries);
-
-		const auto atlas_size = result.atlas_size;
-		avatar_atlas.texImage2D(in.renderer, atlas_size, std::addressof(avatar_pbo_fallback.data()->r));
-		avatar_atlas.set_filtering(in.renderer, augs::filtering_type::LINEAR);
-
-		augs::graphics::texture::set_current_to_previous(in.renderer);
-	}
+	avatars.finalize_load(in.renderer);
+	ad_hoc.finalize_load(in.renderer);
 
 	/* Unpack results of asynchronous asset loading */
 

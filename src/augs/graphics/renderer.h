@@ -77,7 +77,8 @@ namespace augs {
 			const graphics::texture& imgui_atlas,
 			const graphics::texture* game_world_atlas,
 			const graphics::texture* avatar_atlas,
-			const graphics::texture* avatar_preview_atlas
+			const graphics::texture* avatar_preview_atlas,
+			const graphics::texture* ad_hoc_texture
 		);
 
 		void draw_debug_lines(

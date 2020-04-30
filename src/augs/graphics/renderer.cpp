@@ -124,7 +124,8 @@ namespace augs {
 		const graphics::texture& imgui_atlas,
 		const graphics::texture* game_world_atlas,
 		const graphics::texture* avatar_atlas,
-		const graphics::texture* avatar_preview_atlas
+		const graphics::texture* avatar_preview_atlas,
+		const graphics::texture* ad_hoc_atlas
 	) {
 		const auto* const draw_data = ImGui::GetDrawData();
 
@@ -156,27 +157,20 @@ namespace augs {
 
 					bool rebind = false;
 
-					if (atlas_type == augs::imgui_atlas_type::GAME) {
-						if (game_world_atlas != nullptr) {
-							game_world_atlas->set_as_current(*this);
-							rebind = true;
+					auto bind_if = [this, atlas_type, &rebind](const augs::imgui_atlas_type type, auto* atlas) {
+						if (atlas_type == type) {
+							if (atlas != nullptr) {
+								atlas->set_as_current(*this);
+								rebind = true;
+							}
 						}
-					}
+					};
 
-					if (atlas_type == augs::imgui_atlas_type::AVATARS) {
-						if (avatar_atlas != nullptr) {
-							avatar_atlas->set_as_current(*this);
-							rebind = true;
-						}
-					}
-					
-					if (atlas_type == augs::imgui_atlas_type::AVATAR_PREVIEW) {
-						if (avatar_preview_atlas != nullptr) {
-							avatar_preview_atlas->set_as_current(*this);
-							rebind = true;
-						}
-					}
-					
+					bind_if(augs::imgui_atlas_type::GAME, game_world_atlas);
+					bind_if(augs::imgui_atlas_type::AVATARS, avatar_atlas);
+					bind_if(augs::imgui_atlas_type::AVATAR_PREVIEW, avatar_preview_atlas);
+					bind_if(augs::imgui_atlas_type::AD_HOC, ad_hoc_atlas);
+
 					push_no_arg(no_arg_command::IMGUI_CMD);
 
 					if (rebind) {

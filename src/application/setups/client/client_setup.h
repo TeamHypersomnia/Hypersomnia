@@ -733,6 +733,10 @@ public:
 
 	std::optional<arena_player_metas> get_new_player_metas();
 
+	std::nullopt_t get_new_ad_hoc_images() {
+		return std::nullopt;
+	}
+
 	const arena_player_metas* find_player_metas() const {
 		return std::addressof(player_metas);
 	}

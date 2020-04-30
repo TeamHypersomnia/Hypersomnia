@@ -463,6 +463,10 @@ public:
 	const arena_player_metas* find_player_metas() const;
 	std::optional<arena_player_metas> get_new_player_metas();
 
+	std::nullopt_t get_new_ad_hoc_images() {
+		return std::nullopt;
+	}
+
 	enum class for_each_flag {
 		ONLY_CONNECTED,
 		WITH_INTEGRATED,

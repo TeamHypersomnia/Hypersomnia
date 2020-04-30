@@ -8,6 +8,8 @@
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "view/viewables/avatars_in_atlas_map.h"
+#include "view/viewables/ad_hoc_in_atlas_map.h"
+#include "view/viewables/ad_hoc_atlas_subject.h"
 #include "augs/texture_atlas/loaded_images_vector.h"
 
 /* 
@@ -77,3 +79,18 @@ struct avatar_atlas_input {
 };
 
 avatar_atlas_output create_avatar_atlas(avatar_atlas_input in);
+
+struct ad_hoc_atlas_output {
+	ad_hoc_in_atlas_map atlas_entries;
+	vec2u atlas_size;
+};
+
+struct ad_hoc_atlas_input {
+	ad_hoc_atlas_subjects subjects;
+	const unsigned max_atlas_size;
+
+	rgba* const atlas_image_output;
+	std::vector<rgba>& fallback_output;
+};
+
+ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in);

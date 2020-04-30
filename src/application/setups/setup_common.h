@@ -6,6 +6,7 @@
 #include "augs/math/camera_cone.h"
 #include "application/input/entropy_accumulator.h"
 #include "application/nat/nat_type.h"
+#include "view/viewables/ad_hoc_in_atlas_map.h"
 
 enum class custom_imgui_result {
 	NONE,
@@ -101,6 +102,8 @@ struct perform_custom_imgui_input {
 	sol::state& lua;
 	augs::window& window;
 	const images_in_atlas_map& game_atlas;
+	const ad_hoc_in_atlas_map& ad_hoc_in_atlas;
+	const necessary_images_in_atlas_map& necessary_images;
 	const config_lua_table& config;
 
 	const bool demo_replay_mode;

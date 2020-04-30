@@ -104,88 +104,142 @@ void regenerate_and_gather_subjects(
 
 		augs::introspect([&](auto, auto& in) {
 			output.fonts.emplace_back(in);	
-			}, in.gui_font_inputs);
-		}
+		}, in.gui_font_inputs);
+	}
+}
+
+general_atlas_output create_general_atlas(
+	const general_atlas_input in,
+	atlas_profiler& performance
+) {
+	auto total = measure_scope(performance.whole_regeneration);
+
+	thread_local auto atlas_subjects = atlas_input_subjects();
+
+	{
+		auto scope = measure_scope(performance.gathering_subjects);
+		regenerate_and_gather_subjects(in.subjects, atlas_subjects);
 	}
 
-	general_atlas_output create_general_atlas(
-		const general_atlas_input in,
-		atlas_profiler& performance
-	) {
-		auto total = measure_scope(performance.whole_regeneration);
+	thread_local baked_atlas baked;
+	baked.clear();
 
-		thread_local auto atlas_subjects = atlas_input_subjects();
-
+	bake_fresh_atlas(
 		{
-			auto scope = measure_scope(performance.gathering_subjects);
-			regenerate_and_gather_subjects(in.subjects, atlas_subjects);
+			atlas_subjects,
+			in.max_atlas_size,
+			in.subjects.settings.atlas_blitting_threads
+		},
+		{
+			in.atlas_image_output,
+			in.fallback_output,
+			baked,
+			performance
+		}
+	);
+
+	auto scope = measure_scope(performance.unpacking_results);
+
+	auto& subjects = in.subjects;
+
+	general_atlas_output out;
+
+	out.atlas_size = baked.atlas_image_size;
+
+	augs::introspect(
+		[](auto, auto& output, const auto& input) {
+			output.unpack_from(baked.fonts.at(input));
+		}, 
+		out.gui_fonts, 
+		subjects.gui_font_inputs
+	);
+
+	{
+		for (const auto& r : subjects.necessary_image_definitions) {
+			out.necessary_atlas_entries[r.first] = baked.images.at(r.second.get_source_path().path);
 		}
 
-		thread_local baked_atlas baked;
-		baked.clear();
+		auto make_view = [&subjects](const auto& def) {
+			return image_definition_view(subjects.unofficial_project_dir, def);
+		};
 
-		bake_fresh_atlas(
-			{
-				atlas_subjects,
-				in.max_atlas_size,
-				in.subjects.settings.atlas_blitting_threads
-			},
-			{
-				in.atlas_image_output,
-				in.fallback_output,
-				baked,
-				performance
-			}
-		);
+		for_each_id_and_object(subjects.image_definitions, [&](const auto id, const auto& d) {
+			const auto def = make_view(d);
 
-		auto scope = measure_scope(performance.unpacking_results);
+			auto& output_viewable = out.atlas_entries[id];
+			auto& maps = output_viewable;
 
-		auto& subjects = in.subjects;
+			maps.diffuse = baked.images.at(def.get_source_image_path());
 
-		general_atlas_output out;
+			auto set_if_baked = [&](auto& m, const auto path) {
+				if (auto found = mapped_or_nullptr(baked.images, path)) {
+					m = *found;
+					return true;
+				}
 
-		out.atlas_size = baked.atlas_image_size;
-
-		augs::introspect(
-			[](auto, auto& output, const auto& input) {
-				output.unpack_from(baked.fonts.at(input));
-			}, 
-			out.gui_fonts, 
-			subjects.gui_font_inputs
-		);
-
-		{
-			for (const auto& r : subjects.necessary_image_definitions) {
-				out.necessary_atlas_entries[r.first] = baked.images.at(r.second.get_source_path().path);
-			}
-
-			auto make_view = [&subjects](const auto& def) {
-				return image_definition_view(subjects.unofficial_project_dir, def);
+				return false;
 			};
 
-			for_each_id_and_object(subjects.image_definitions, [&](const auto id, const auto& d) {
-				const auto def = make_view(d);
+			set_if_baked(maps.neon_map, def.calc_generated_neon_map_path());
+			set_if_baked(maps.neon_map, def.calc_custom_neon_map_path());
 
-				auto& output_viewable = out.atlas_entries[id];
-				auto& maps = output_viewable;
+			set_if_baked(maps.desaturated, def.calc_desaturation_path());
+		});
+	}
 
-				maps.diffuse = baked.images.at(def.get_source_image_path());
+	return out;
+}
 
-				auto set_if_baked = [&](auto& m, const auto path) {
-					if (auto found = mapped_or_nullptr(baked.images, path)) {
-						m = *found;
-						return true;
-					}
+#include "augs/readwrite/byte_file.h"
 
-					return false;
-				};
+ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
+	thread_local atlas_input_subjects atlas_subjects;
+	thread_local std::vector<ad_hoc_entry_id> identificators;
+	thread_local baked_atlas baked;
 
-				set_if_baked(maps.neon_map, def.calc_generated_neon_map_path());
-				set_if_baked(maps.neon_map, def.calc_custom_neon_map_path());
+	identificators.clear();
+	atlas_subjects.clear();
+	baked.clear();
 
-				set_if_baked(maps.desaturated, def.calc_desaturation_path());
-			});
+	const auto num_subjects = static_cast<int>(in.subjects.size());
+
+	atlas_subjects.loaded_images.resize(num_subjects);
+	identificators.resize(num_subjects);
+
+	for (int i = 0; i < num_subjects; ++i) {
+		const auto& entry = in.subjects[i];
+
+		augs::file_to_bytes(entry.image_path, atlas_subjects.loaded_images[i]);
+		identificators[i] = entry.id;
+	}
+
+	atlas_profiler performance;
+
+	bake_fresh_atlas(
+		{
+			atlas_subjects,
+			in.max_atlas_size,
+			1
+		},
+		{
+			in.atlas_image_output,
+			in.fallback_output,
+			baked,
+			performance
 		}
+	);
 
-		return out;
+	ad_hoc_atlas_output out;
+	out.atlas_size = baked.atlas_image_size;
+
+	ensure_eq(identificators.size(), baked.loaded_images.size());
+
+	for (int i = 0; i < static_cast<int>(identificators.size()); ++i) {
+		const auto& id = identificators[i];
+		const auto& baked_image = baked.loaded_images[i];
+
+		out.atlas_entries[id] = baked_image;
+	}
+
+	return out;
 }
