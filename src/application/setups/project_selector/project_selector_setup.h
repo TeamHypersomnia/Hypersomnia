@@ -51,9 +51,9 @@ struct projects_list_tab_state {
 	// GEN INTROSPECTOR struct projects_list_tab_state
 	int sort_by_column = 0;
 	bool ascending = false;
-	augs::path_type selected_arena_path;
 	// END GEN INTROSPECTOR
 
+	augs::path_type selected_arena_path;
 	project_list_entries entries;
 
 	bool perform_list(

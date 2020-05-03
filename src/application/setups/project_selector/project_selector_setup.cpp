@@ -16,9 +16,20 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/time_utils.h"
 #include "augs/misc/imgui/imgui_game_image.h"
+#include "augs/log.h"
 
 const entropy_accumulator entropy_accumulator::zero;
 constexpr auto miniature_size_v = 80;
+
+static auto push_selectable_colors(const rgba normal, const rgba hovered, const rgba active) {
+	using namespace augs::imgui;
+
+	return std::make_tuple(
+		scoped_style_color(ImGuiCol_Header, normal),
+		scoped_style_color(ImGuiCol_HeaderHovered, hovered),
+		scoped_style_color(ImGuiCol_HeaderActive, active)
+	);
+}
 
 static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 	switch (tab_type) {
@@ -72,10 +83,18 @@ void project_selector_setup::scan_for_all_arenas() {
 			new_entry.timestamp = augs::date_time().secs_since_epoch();
 			new_entry.miniature_index = miniature_index_counter++;
 
+			auto& view = gui.projects_view;
+			view.tabs[type].entries.push_back(new_entry);
+
 			return callback_result::CONTINUE; 
 		};
 
-		augs::for_each_in_directory(source_directory, register_arena, [](auto&&...) { return callback_result::CONTINUE; });
+		try {
+			augs::for_each_in_directory(source_directory, register_arena, [](auto&&...) { return callback_result::CONTINUE; });
+		}
+		catch (const augs::filesystem_error& err) {
+			//LOG("No folder: %x", source_directory);
+		}
 	};
 
 	scan_for(project_tab_type::MY_PROJECTS);
@@ -89,6 +108,7 @@ project_selector_setup::project_selector_setup() {
 	augs::create_directories(BUILDER_DIR);
 
 	load_gui_state();
+	scan_for_all_arenas();
 }
 
 project_selector_setup::~project_selector_setup() {
@@ -148,13 +168,21 @@ bool projects_list_tab_state::perform_list(
 		}
 	};
 
+	//ImGui::Separator();
+
 	ImGui::Columns(num_columns);
+
+	if (num_columns > 1) {
+		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9").x * 65);
+	}
 
 	do_column("Name");
 
 	if (timestamp_column_name != std::nullopt) {
 		do_column(*timestamp_column_name);
 	}
+
+	ImGui::Separator();
 
 	const auto line_h = ImGui::GetTextLineHeight();
 
@@ -169,38 +197,58 @@ bool projects_list_tab_state::perform_list(
 
 		const auto local_pos = ImGui::GetCursorPos();
 
-		if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_None, selectable_size)) {
-			selected_arena_path = path;
+		{
+			auto darkened_selectables = push_selectable_colors(
+				rgba(255, 255, 255, 20),
+				rgba(255, 255, 255, 30),
+				rgba(255, 255, 255, 60)
+			);
+
+			if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_None, selectable_size)) {
+				selected_arena_path = path;
+			}
 		}
+
+		const auto after_pos = ImGui::GetCursorPos();
 
 		ImGui::SetCursorPos(local_pos);
 
 		ImGui::SameLine();
 
-		const auto image_padding = vec2(0, 4);
-		const auto miniature_size = vec2::square(miniature_size_v);
+		const auto image_padding = vec2(0, 0);
 		const auto miniature_entry = mapped_or_nullptr(ad_hoc_in_atlas, entry.miniature_index);
+		const auto target_miniature_size = vec2::square(miniature_size_v);
 
 		if (miniature_entry != nullptr) {
-			game_image(*miniature_entry, miniature_size, white, image_padding);
+			const auto miniature_size = miniature_entry->get_original_size();
+			const auto offset = (target_miniature_size - miniature_size) / 2;
+			game_image(*miniature_entry, miniature_size, white, offset + image_padding, augs::imgui_atlas_type::AD_HOC);
 		}
 
-		invisible_button("", miniature_size + image_padding);
+		invisible_button("", target_miniature_size + image_padding);
+
+		ImGui::SameLine();
 
 		const auto x = ImGui::GetCursorPosX();
+		const auto prev_y = ImGui::GetCursorPosY() + line_h;
 
 		text(arena_name);
 
-		const auto prev_y = ImGui::GetCursorPosY() + line_h;
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
 
 		text_disabled("Arena description");
 
-		ImGui::NextColumn();
+		ImGui::SetCursorPos(after_pos);
 
-		const auto secs_ago = augs::date_time::secs_since_epoch() - entry.timestamp;
-		text_disabled(augs::date_time::format_how_long_ago(true, secs_ago));
+		if (num_columns > 1) {
+			ImGui::NextColumn();
+
+			const auto secs_ago = augs::date_time::secs_since_epoch() - entry.timestamp;
+			text_disabled(augs::date_time::format_how_long_ago(true, secs_ago));
+
+			ImGui::NextColumn();
+		}
 	}
 
 	return false;
@@ -220,16 +268,16 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 
 		switch (current_tab) {
 			case project_tab_type::MY_PROJECTS:
-				return tab.perform_list(ad_hoc, "Last modified");
+			return tab.perform_list(ad_hoc, "Last modified");
 
 			case project_tab_type::OFFICIAL_TEMPLATES:
-				return tab.perform_list(ad_hoc, std::nullopt);
+			return tab.perform_list(ad_hoc, "Last updated");
 
 			case project_tab_type::COMMUNITY_ARENAS:
-				return tab.perform_list(ad_hoc, "When downloaded");
+			return tab.perform_list(ad_hoc, "When downloaded");
 
 			default:
-				return false;
+			return false;
 		}
 	};
 
@@ -244,16 +292,11 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 		const auto before_pos = ImGui::GetCursorPos();
 
 		{
-			auto darken_selectables = []() {
-				return std::make_tuple(
-					scoped_style_color(ImGuiCol_HeaderHovered, rgba(0, 50, 0, 255)),
-					scoped_style_color(ImGuiCol_HeaderActive, rgba(0, 100, 0, 255)),
-					scoped_style_color(ImGuiCol_Header, rgba(10, 30, 10, 255))
-				);
-			};
-
-
-			auto darkened = darken_selectables();
+			auto greened_selectables = push_selectable_colors(
+				rgba(10, 30, 10, 255),
+				rgba(0, 50, 0, 255),
+				rgba(0, 100, 0, 255)
+			);
 
 			if (ImGui::Selectable("##CreateNew", true, ImGuiSelectableFlags_None, create_button_size)) {
 				current_tab = project_tab_type::MY_PROJECTS;
@@ -292,6 +335,13 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 		//const auto button_size = ImVec2(left_buttons_column_size.x, 0);
 
 		auto actions = scoped_child("Project list view");
+
+		thread_local ImGuiTextFilter filter;
+		filter.Draw();
+
+		//const auto line_h = ImGui::GetTextLineHeight();
+
+		//shift_cursor(vec2(0, line_h));
 
 		if (const bool choice_performed = perform_arena_list()) {
 			auto& tab = tabs[current_tab];
