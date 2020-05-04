@@ -855,34 +855,11 @@ entity_id bomb_defusal::create_character_for_player(
 	return entity_id::dead();
 }
 
-#include "augs/build_settings/setting_dump.h"
-#if DUMP_BEFORE_AND_AFTER_ROUND_START
-
-#include "game/modes/dump_for_debugging.h"
-#include "augs/misc/getpid.h"
-#endif
-
 void bomb_defusal::setup_round(
 	const input_type in, 
 	const logic_step step, 
 	const bomb_defusal::round_transferred_players& transfers
 ) {
-#if DUMP_BEFORE_AND_AFTER_ROUND_START
-	{
-		thread_local auto lua = augs::create_lua_state();
-
-		const auto pid = augs::getpid();
-		const auto preffix = typesafe_sprintf("%x_befset%x_", pid, get_current_round_number());
-
-		::dump_for_debugging(
-			lua,
-			preffix,
-			in.cosm,
-			*this
-		);
-	}
-#endif
-
 	clear_players_round_state(in);
 
 	auto& cosm = in.cosm;

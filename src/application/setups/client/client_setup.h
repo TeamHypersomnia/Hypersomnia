@@ -33,9 +33,6 @@
 #include "application/session_profiler.h"
 #include "application/setups/client/lag_compensation_settings.h"
 
-#include "augs/misc/getpid.h"
-#include "game/modes/dump_for_debugging.h"
-
 #include "view/client_arena_type.h"
 #include "application/network/special_client_request.h"
 #include "application/gui/client/rcon_gui.h"
@@ -455,21 +452,6 @@ class client_setup :
 				if (result.desync && !now_resyncing) {
 					pending_request = special_client_request::RESYNC;
 					now_resyncing = true;
-
-#if DUMP_BEFORE_AND_AFTER_ROUND_START
-					const auto preffix = typesafe_sprintf("%x_desync%x_", augs::getpid(), referential_arena.get_current_round_number());
-
-					referential_arena.on_mode(
-						[&](const auto& mode) {
-							::dump_for_debugging(
-								lua,
-								preffix,
-								referential_arena.get_cosmos(),
-								mode
-							);
-						}
-					);
-#endif
 				}
 			}
 

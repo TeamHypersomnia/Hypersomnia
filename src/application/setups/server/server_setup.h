@@ -28,7 +28,6 @@
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/network/network_common.h"
 
-#include "augs/build_settings/setting_dump.h"
 #include "application/setups/server/chat_structs.h"
 #include "application/gui/client/client_gui_state.h"
 #include "application/setups/server/server_profiler.h"
@@ -36,11 +35,6 @@
 #include "application/nat/nat_type.h"
 #include "application/setups/server/server_nat_traversal.h"
 
-#if DUMP_BEFORE_AND_AFTER_ROUND_START
-#include "game/modes/dump_for_debugging.h"
-#endif
-
-#include "augs/misc/getpid.h"
 #include "application/setups/server/rcon_level.h"
 
 struct netcode_socket_t;
@@ -370,24 +364,6 @@ public:
 						handle_new_session(unpacked.general.added_player);
 					}
 				}
-
-#if DUMP_BEFORE_AND_AFTER_ROUND_START
-				if (arena.get_cosmos().get_total_steps_passed() == 1) {
-					const auto pid = augs::getpid();
-					const auto preffix = typesafe_sprintf("%x_server_aftset%x_", pid, arena.get_current_round_number());
-
-					arena.on_mode(
-						[&](const auto& mode) {
-							::dump_for_debugging(
-								lua,
-								preffix,
-								arena.get_cosmos(),
-								mode
-							);
-						}
-					);
-				}
-#endif
 			}
 
 			++current_simulation_step;
