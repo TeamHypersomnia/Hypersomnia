@@ -12,6 +12,7 @@ struct arena_paths {
 
 	augs::path_type rulesets_file_path;
 	augs::path_type miniature_file_path;
+	augs::path_type meta_file_path;
 
 	arena_paths(
 		const augs::path_type& target_folder

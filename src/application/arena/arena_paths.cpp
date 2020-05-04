@@ -16,6 +16,7 @@ arena_paths::arena_paths(
 
 	rulesets_file_path = in_folder(".rulesets");
 	miniature_file_path = target_folder / "miniature.png";
+	meta_file_path = target_folder / "arena.meta.yml";
 }
 
 arena_paths::arena_paths(const std::string& arena_name) 

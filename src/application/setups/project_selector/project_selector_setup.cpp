@@ -75,6 +75,8 @@ void project_selector_setup::scan_for_all_arenas() {
 		const auto source_directory = get_arenas_directory(type);
 
 		auto register_arena = [&](const auto& arena_folder_path) {
+			const auto paths = arena_paths(arena_folder_path);
+
 			auto new_entry = project_list_entry();
 			new_entry.arena_path = arena_folder_path;
 
@@ -82,6 +84,8 @@ void project_selector_setup::scan_for_all_arenas() {
 
 			new_entry.timestamp = augs::date_time().secs_since_epoch();
 			new_entry.miniature_index = miniature_index_counter++;
+			//new_entry.meta = 
+			(void)paths;
 
 			auto& view = gui.projects_view;
 			view.tabs[type].entries.push_back(new_entry);

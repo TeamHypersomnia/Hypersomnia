@@ -19,6 +19,7 @@
 #include "augs/texture_atlas/atlas_entry.h"
 #include "view/viewables/ad_hoc_atlas_subject.h"
 #include "view/viewables/ad_hoc_in_atlas_map.h"
+#include "application/setups/builder/project/builder_project_meta.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -41,6 +42,7 @@ struct project_list_entry {
 	double timestamp;
 	augs::path_type arena_path;
 	ad_hoc_entry_id miniature_index = 0;
+	builder_project_meta meta;
 
 	augs::path_type get_miniature_path() const;
 };
