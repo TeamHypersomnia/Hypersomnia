@@ -223,8 +223,10 @@ bool projects_list_tab_state::perform_list(
 
 		if (miniature_entry != nullptr) {
 			const auto miniature_size = miniature_entry->get_original_size();
-			const auto offset = (target_miniature_size - miniature_size) / 2;
-			game_image(*miniature_entry, miniature_size, white, offset + image_padding, augs::imgui_atlas_type::AD_HOC);
+			const auto resized_miniature_size = vec2i(vec2(miniature_size) * (static_cast<float>(miniature_size_v) / miniature_size.bigger_side()));
+
+			const auto offset = (target_miniature_size - resized_miniature_size) / 2;
+			game_image(*miniature_entry, resized_miniature_size, white, offset + image_padding, augs::imgui_atlas_type::AD_HOC);
 		}
 
 		invisible_button("", target_miniature_size + image_padding);

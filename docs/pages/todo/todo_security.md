@@ -5,6 +5,11 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Validation of downloaded arenas
+	- Enforce small miniature size when loading it in the project selector
+		- or someone might upload a map with a nasty miniature size
+		- we might just prevent from downloading it actually
+
 - Protect masterserver from:
 	- spoofing
 		- just send a challenge packet
