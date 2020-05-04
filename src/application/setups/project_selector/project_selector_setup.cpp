@@ -170,10 +170,12 @@ bool projects_list_tab_state::perform_list(
 
 	//ImGui::Separator();
 
+	const auto avail = ImGui::GetContentRegionAvail();
+
 	ImGui::Columns(num_columns);
 
 	if (num_columns > 1) {
-		ImGui::SetColumnWidth(0, ImGui::CalcTextSize("9").x * 65);
+		ImGui::SetColumnWidth(0, avail.x * 0.7f);
 	}
 
 	do_column("Name");
@@ -204,7 +206,7 @@ bool projects_list_tab_state::perform_list(
 				rgba(255, 255, 255, 60)
 			);
 
-			if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_None, selectable_size)) {
+			if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
 				selected_arena_path = path;
 			}
 		}
@@ -254,11 +256,62 @@ bool projects_list_tab_state::perform_list(
 	return false;
 }
 
+static auto selectable_with_icon(
+	const augs::atlas_entry& icon,
+	const std::string& label,
+	const float size_mult,
+	const float padding_mult,
+	const rgba label_color,
+	const std::array<rgba, 3> bg_cols
+) {
+	using namespace augs::imgui;
+
+	const auto text_h = ImGui::GetTextLineHeight();
+	const auto button_size = ImVec2(0, text_h * size_mult);
+
+	shift_cursor(vec2(0, text_h * padding_mult));
+
+	const auto before_pos = ImGui::GetCursorPos();
+
+	{
+		auto colored_selectable = push_selectable_colors(
+			bg_cols[0],
+			bg_cols[1],
+			bg_cols[2]
+		);
+
+		auto id = scoped_id(label.c_str());
+
+		if (ImGui::Selectable("###Button", true, ImGuiSelectableFlags_None, button_size)) {
+			return true;
+		}
+	}
+
+	const auto after_pos = ImGui::GetCursorPos();
+
+	ImGui::SetCursorPos(before_pos);
+
+	const auto icon_size = icon.get_original_size();
+	const auto icon_padding = vec2(icon_size);/// 1.5f;
+
+	const auto image_offset = vec2(icon_padding.x, button_size.y / 2 - icon_size.y / 2);
+	game_image(icon, icon_size, label_color, image_offset);
+
+	const auto text_pos = vec2(before_pos) + image_offset + vec2(icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
+	ImGui::SetCursorPos(ImVec2(text_pos));
+	text_color(label, label_color);
+
+	ImGui::SetCursorPos(after_pos);
+	shift_cursor(vec2(0, text_h * padding_mult));
+
+	return false;
+}
+
 std::optional<projects_list_result> projects_list_view::perform(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
 
 	auto left_buttons_column_size = ImGui::CalcTextSize("Community arenas  ");
-	auto root = scoped_child("Selector main");
+	auto root = scoped_child("Selector main", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	(void)left_buttons_column_size;
 
@@ -283,45 +336,24 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 
 	centered_text("Arena Builder 2.0 - Project Manager");
 
-	{
-		const auto text_h = ImGui::GetTextLineHeight();
-		const auto create_button_size = ImVec2(0, text_h * 3);
+	const auto button_size_mult = 3.0f;
+	const auto button_padding_mult = 0.5f;
 
-		shift_cursor(vec2(0, text_h / 2));
-
-		const auto before_pos = ImGui::GetCursorPos();
-
+	const bool create_pressed = selectable_with_icon(
+		in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CREATE],
+		"CREATE NEW ARENA",
+		button_size_mult,
+		button_padding_mult,
+		rgba(100, 255, 100, 255),
 		{
-			auto greened_selectables = push_selectable_colors(
-				rgba(10, 30, 10, 255),
-				rgba(0, 50, 0, 255),
-				rgba(0, 100, 0, 255)
-			);
-
-			if (ImGui::Selectable("##CreateNew", true, ImGuiSelectableFlags_None, create_button_size)) {
-				current_tab = project_tab_type::MY_PROJECTS;
-			}
+			rgba(10, 50, 10, 255),
+			rgba(20, 70, 20, 255),
+			rgba(20, 90, 20, 255)
 		}
+	);
 
-		const auto after_pos = ImGui::GetCursorPos();
-
-		ImGui::SetCursorPos(before_pos);
-
-		const auto& create_icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CREATE];
-		const auto create_icon_size = create_icon.get_original_size();
-		const auto icon_padding = vec2(create_icon_size);/// 1.5f;
-
-		const auto bright_green = rgba(100, 255, 100, 255);
-
-		const auto image_offset = vec2(icon_padding.x, create_button_size.y / 2 - create_icon_size.y / 2);
-		game_image(create_icon, create_icon_size, bright_green, image_offset);
-
-		const auto text_pos = vec2(before_pos) + image_offset + vec2(create_icon_size.x + icon_padding.x, create_icon_size.y / 2 - text_h / 2);
-		ImGui::SetCursorPos(ImVec2(text_pos));
-		text_color("CREATE NEW ARENA", bright_green);
-
-		ImGui::SetCursorPos(after_pos);
-		shift_cursor(vec2(0, text_h / 2));
+	if (create_pressed) {
+		current_tab = project_tab_type::MY_PROJECTS;
 	}
 
 	{
@@ -334,30 +366,88 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 		do_pretty_tabs(current_tab);
 		//const auto button_size = ImVec2(left_buttons_column_size.x, 0);
 
-		auto actions = scoped_child("Project list view");
+		const auto avail = ImGui::GetContentRegionAvail();
+		const auto proj_list_width = avail.x * 0.6f;
+		const auto proj_desc_width = avail.x * 0.4f;
+
+		const auto text_h = ImGui::GetTextLineHeight();
+		const auto space_for_clone_button = text_h * (button_padding_mult * 2 + button_size_mult);
 
 		thread_local ImGuiTextFilter filter;
 		filter.Draw();
 
-		//const auto line_h = ImGui::GetTextLineHeight();
+		{
+			auto scope = scoped_child("Project list view", ImVec2(proj_list_width, -space_for_clone_button));
 
-		//shift_cursor(vec2(0, line_h));
+			//const auto line_h = ImGui::GetTextLineHeight();
 
-		if (const bool choice_performed = perform_arena_list()) {
-			auto& tab = tabs[current_tab];
+			//shift_cursor(vec2(0, line_h));
 
-			const bool can_open_directly = current_tab == project_tab_type::MY_PROJECTS;
-			const bool needs_to_clone_before_open = !can_open_directly;
+			if (const bool choice_performed = perform_arena_list()) {
+				auto& tab = tabs[current_tab];
 
-			const auto& source_project_path = tab.selected_arena_path;
+				const bool can_open_directly = current_tab == project_tab_type::MY_PROJECTS;
+				const bool needs_to_clone_before_open = !can_open_directly;
 
-			if (can_open_directly) {
-				const auto& target_project_path = source_project_path;
+				const auto& source_project_path = tab.selected_arena_path;
 
-				(void)target_project_path;
+				if (can_open_directly) {
+					const auto& target_project_path = source_project_path;
 
+					(void)target_project_path;
+
+				}
+				else if (needs_to_clone_before_open) {
+
+				}
 			}
-			else if (needs_to_clone_before_open) {
+		}
+
+		ImGui::SameLine();
+
+		{
+			//auto window_border_size = scoped_style_var(ImGuiStyleVar_ChildBorderSize, 2.0f);
+
+			//const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_ChildBg];
+			auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.2f});
+
+			auto scope = scoped_child("Project description view", ImVec2(proj_desc_width, -space_for_clone_button), true);
+			text_disabled("(No project selected)");
+		}
+
+		auto& tab = tabs[current_tab];
+
+		const bool something_selected = !tab.selected_arena_path.empty();
+
+		if (something_selected) {
+			const bool is_template = current_tab != project_tab_type::MY_PROJECTS;
+
+			const auto label = 
+				is_template ?
+				"CLONE TEMPLATE" :
+				"OPEN"
+			;
+
+			const auto icon = 
+				is_template ? 
+				assets::necessary_image_id::EDITOR_ICON_CLONE : 
+				assets::necessary_image_id::EDITOR_ICON_OPEN
+			;
+
+			const bool clone_pressed = selectable_with_icon(
+				in.necessary_images[icon],
+				label,
+				button_size_mult,
+				button_padding_mult,
+				rgba(120, 220, 255, 255),
+				{
+					rgba(15, 40, 70, 255),
+					rgba(35, 60, 90, 255),
+					rgba(55, 80, 110, 255)
+				}
+			);
+
+			if (clone_pressed) {
 
 			}
 		}
