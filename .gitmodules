@@ -34,3 +34,6 @@
 [submodule "src/3rdparty/yojimbo"]
 	path = src/3rdparty/yojimbo
 	url = https://github.com/TeamHypersomnia/yojimbo.git
+[submodule "src/3rdparty/yaml-cpp"]
+	path = src/3rdparty/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
