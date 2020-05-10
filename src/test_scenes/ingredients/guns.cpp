@@ -2970,7 +2970,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("1.9");
+			charge_deposit_def.space_available = to_space_units("1.8");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::ORANGE_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -4374,7 +4374,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CALICO_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4100.f, 4100.f};
+			gun_def.muzzle_velocity = {4250.f, 4250.f};
 			gun_def.shot_cooldown_ms = 110.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -4383,7 +4383,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 4.f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.recoil_multiplier = 1.25f;
+			gun_def.recoil_multiplier = 1.05f;
 			gun_def.kickback_towards_wielder = kickback_mult * 30.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(600);
 
