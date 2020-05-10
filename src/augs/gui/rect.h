@@ -43,7 +43,7 @@ namespace augs {
 
 				auto absolute_clipped_rect = rc;
 				auto absolute_pos = vec2i(rc.get_position());
-				auto absolute_clipping_rect = ltrb(0.f, 0.f, std::numeric_limits<int>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
+				auto absolute_clipping_rect = ltrb(0.f, 0.f, std::numeric_limits<float>::max() / 2.f, std::numeric_limits<int>::max() / 2.f);
 
 				/* if we have parent */
 				if (context.alive(parent_id)) {

@@ -47,7 +47,7 @@ namespace test_flavours {
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("1.0");
-			item.standard_price = 900;
+			item.standard_price = 1000;
 			meta.set(item);
 
 			{
@@ -59,7 +59,7 @@ namespace test_flavours {
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
 				fuse.additional_secondary_release_impulse.linear = 2000.f;
-				fuse.fuse_delay_ms = 1100.f;
+				fuse.fuse_delay_ms = 1200.f;
 
 				meta.set(fuse);
 			}
