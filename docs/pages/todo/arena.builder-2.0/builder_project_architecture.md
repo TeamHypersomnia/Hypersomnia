@@ -64,6 +64,25 @@
 
 # Implementation details
 
+## Prefabs 
+
+### General
+
+Instead of per-instance overrides (which might be a pain in the ass)
+we might want to have "init parameters".
+- Perhaps it doesn't make sense but at least think about it.
+- Might be simple or complex.
+- Perfect for aquarium - we can pass a wall texture, a floor texture to fill it with, list of fish to instantiate etc.
+	- In case of aquarium we don't want to just modify the instances by hand but just specify nice parameters for each instance.
+
+
+### Unpacking (instances too) into flavours
+
+- Prefab modification and flavour generation workflow
+	- First, there exist only prefabs and their instantiations
+		- with their arbitrary structue, but certainly different than that of flavours in some respects
+		- e.g. resource paths instead of viewable ids
+
 ## Duality of state. Hierarchy vs Caches
 
 - General synchronization between nodes and actual entities on scene
@@ -110,13 +129,6 @@
 		- We'll want arbitrary placement depth though
 
 - .arena file has settings and the path to root node
-
-## Unpacking prefabs (instances too) into flavours
-
-- Prefab modification and flavour generation workflow
-	- First, there exist only prefabs and their instantiations
-		- with their arbitrary structue, but certainly different than that of flavours in some respects
-		- e.g. resource paths instead of viewable ids
 
 # (REJECTED) Option: having components in hierarchies
 

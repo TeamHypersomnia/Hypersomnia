@@ -45,6 +45,7 @@ struct project_list_entry {
 	builder_project_meta meta;
 
 	augs::path_type get_miniature_path() const;
+	std::string get_arena_name() const;
 };
 
 using project_list_entries = std::vector<project_list_entry>;
@@ -62,6 +63,8 @@ struct projects_list_tab_state {
 		const ad_hoc_in_atlas_map& ad_hoc_in_atlas,
 		std::optional<std::string> timestamp_column_name
 	);
+
+	project_list_entry* find_selected();
 };
 
 struct projects_list_result {

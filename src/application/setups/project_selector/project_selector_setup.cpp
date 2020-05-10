@@ -19,7 +19,9 @@
 #include "augs/log.h"
 
 const entropy_accumulator entropy_accumulator::zero;
+
 constexpr auto miniature_size_v = 80;
+constexpr auto preview_size_v = 250;
 
 static auto push_selectable_colors(const rgba normal, const rgba hovered, const rgba active) {
 	using namespace augs::imgui;
@@ -52,6 +54,10 @@ augs::path_type project_list_entry::get_miniature_path() const {
 	return arena_paths(arena_path).miniature_file_path;
 }
 
+std::string  project_list_entry::get_arena_name() const {
+	return arena_path.filename();
+}
+
 std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_images() {
 	if (rebuild_miniatures) {
 		rebuild_miniatures = false;
@@ -70,6 +76,36 @@ std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_imag
 	return std::nullopt;
 }
 
+static auto default_meta(const augs::path_type& p) {
+	builder_project_meta out;
+
+	if (p.filename() == "de_labs2") {
+		out.roles.push_back({"Mapping & graphics", "lia"});
+		out.roles.push_back({"Music", "Marcel Windys"});
+
+		out.short_description = "Resistance has been tipped about sensitive information\nsitting in the depths of an abandoned rocket silo.";
+		out.full_description = "This first map ever to be created by the community will test your CQB to the utmost limit.\nApart from a highly tactical gameplay, this map features a very creepy atmosphere -\nexpect uneasing ambience and lots of inexplicable sounds.";
+	}
+
+	if (p.filename() == "fy_minilab") {
+		out.roles.push_back({"Mapping", "Patryk B. Czachurski"});
+		out.roles.push_back({"Graphics", "Spicmir"});
+
+		out.short_description = "A timeless 2017 classic and the first map ever created.";
+		out.full_description = "Remember: true gentlemen don't pick up the rocket launcher.";
+	}
+
+	if (p.filename() == "de_cyberaqua") {
+		out.roles.push_back({"Mapping", "Patryk B. Czachurski"});
+		out.roles.push_back({"Graphics", "Spicmir"});
+
+		out.short_description = "An experimental underwater biotech laboratory is under attack by a bombing squad.\nDon't let them lay hands on any expensive equipment.";
+		out.full_description = "Protect the fish!";
+	}
+
+	return out;
+}
+
 void project_selector_setup::scan_for_all_arenas() {
 	auto scan_for = [&](const project_tab_type type) {
 		const auto source_directory = get_arenas_directory(type);
@@ -84,7 +120,7 @@ void project_selector_setup::scan_for_all_arenas() {
 
 			new_entry.timestamp = augs::date_time().secs_since_epoch();
 			new_entry.miniature_index = miniature_index_counter++;
-			//new_entry.meta = 
+			new_entry.meta = default_meta(arena_folder_path);
 			(void)paths;
 
 			auto& view = gui.projects_view;
@@ -126,6 +162,12 @@ void project_selector_setup::customize_for_viewing(config_lua_table& config) con
 void shift_cursor(const vec2 offset) {
 	ImGui::SetCursorPos(ImVec2(vec2(ImGui::GetCursorPos()) + offset));
 }
+
+auto scoped_preserve_cursor() {
+	const auto before_pos = ImGui::GetCursorPos();
+
+	return augs::scope_guard([before_pos]() { ImGui::SetCursorPos(before_pos); });
+};
 
 bool projects_list_tab_state::perform_list(
 	const ad_hoc_in_atlas_map& ad_hoc_in_atlas,
@@ -194,7 +236,7 @@ bool projects_list_tab_state::perform_list(
 
 	for (const auto& entry : entries) {
 		const auto& path = entry.arena_path;
-		const auto arena_name = path.filename();
+		const auto arena_name = entry.get_arena_name();
 
 		const auto selectable_size = ImVec2(0, 1 + miniature_size_v);
 		auto id = scoped_id(entry.miniature_index);
@@ -245,7 +287,7 @@ bool projects_list_tab_state::perform_list(
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
 
-		text_disabled("Arena description");
+		text_disabled(entry.meta.short_description);
 
 		ImGui::SetCursorPos(after_pos);
 
@@ -293,24 +335,39 @@ static auto selectable_with_icon(
 		}
 	}
 
-	const auto after_pos = ImGui::GetCursorPos();
+	{
+		auto scope = scoped_preserve_cursor();
 
-	ImGui::SetCursorPos(before_pos);
+		ImGui::SetCursorPos(before_pos);
 
-	const auto icon_size = icon.get_original_size();
-	const auto icon_padding = vec2(icon_size);/// 1.5f;
+		const auto icon_size = icon.get_original_size();
+		const auto icon_padding = vec2(icon_size);/// 1.5f;
 
-	const auto image_offset = vec2(icon_padding.x, button_size.y / 2 - icon_size.y / 2);
-	game_image(icon, icon_size, label_color, image_offset);
+		const auto image_offset = vec2(icon_padding.x, button_size.y / 2 - icon_size.y / 2);
+		game_image(icon, icon_size, label_color, image_offset);
 
-	const auto text_pos = vec2(before_pos) + image_offset + vec2(icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
-	ImGui::SetCursorPos(ImVec2(text_pos));
-	text_color(label, label_color);
+		const auto text_pos = vec2(before_pos) + image_offset + vec2(icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
+		ImGui::SetCursorPos(ImVec2(text_pos));
+		text_color(label, label_color);
+	}
 
-	ImGui::SetCursorPos(after_pos);
 	shift_cursor(vec2(0, text_h * padding_mult));
 
 	return false;
+}
+
+project_list_entry* projects_list_tab_state::find_selected() {
+	if (selected_arena_path.empty()) {
+		return nullptr;
+	}
+
+	for (auto& e : entries) {
+		if (e.arena_path == selected_arena_path) {
+			return std::addressof(e);
+		}
+	}
+
+	return nullptr;
 }
 
 std::optional<projects_list_result> projects_list_view::perform(const perform_custom_imgui_input in) {
@@ -411,21 +468,109 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 
 		ImGui::SameLine();
 
+		auto& tab = tabs[current_tab];
+		const auto selected_entry = tab.find_selected();
+
 		{
 			//auto window_border_size = scoped_style_var(ImGuiStyleVar_ChildBorderSize, 2.0f);
 
 			//const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_ChildBg];
-			auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.2f});
+			auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
 
-			auto scope = scoped_child("Project description view", ImVec2(proj_desc_width, -space_for_clone_button), true);
-			text_disabled("(No project selected)");
+			auto scope = scoped_child("Project description view", ImVec2(proj_desc_width, -space_for_clone_button), false);
+
+			if (selected_entry != nullptr) {
+				auto& entry = *selected_entry;
+				auto& meta = entry.meta;
+				(void)meta;
+
+				//const auto image_offset = vec2(icon_padding.x, button_size.y / 2 - icon_size.y / 2);
+
+				//const auto line_h = ImGui::GetTextLineHeight();
+
+				const auto image_padding = vec2(5, 5);
+				const auto image_internal_padding = vec2i(15, 15);
+				const auto preview_entry = mapped_or_nullptr(in.ad_hoc_in_atlas, entry.miniature_index);
+				const auto target_preview_size = vec2::square(preview_size_v);
+
+				if (preview_entry != nullptr) {
+					const auto preview_size = preview_entry->get_original_size();
+					const auto resized_preview_size = vec2i(vec2(preview_size) * (static_cast<float>(preview_size_v) / preview_size.bigger_side()));
+
+					const auto offset = (target_preview_size - resized_preview_size) / 2;
+
+					auto bg_size = target_preview_size + image_internal_padding * 2;
+					bg_size.x = ImGui::GetContentRegionAvail().x;
+
+					game_image(in.necessary_images[assets::necessary_image_id::BLANK], bg_size, rgba(0, 0, 0, 100), image_padding, augs::imgui_atlas_type::GAME);
+					game_image(*preview_entry, resized_preview_size, white, offset + image_padding + image_internal_padding, augs::imgui_atlas_type::AD_HOC);
+
+					/* { */
+					/* 	auto scope = scoped_preserve_cursor(); */
+					/* 	shift_cursor(vec2(text_h / 2, text_h / 2)); */
+
+					/* 	text(entry.get_arena_name() + "\n\n"); */
+					/* } */
+
+					invisible_button("", target_preview_size + image_padding + image_internal_padding * 2);
+
+					//ImGui::SameLine();
+
+					//{
+						//auto scope = scoped_preserve_cursor();
+						//text(entry.get_arena_name() + "\n\n");
+						//}
+
+						//shift_cursor(vec2(0, (target_preview_size + image_padding + image_internal_padding * 2).x));
+
+					auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
+
+					shift_cursor(image_padding);
+
+					auto scope = scoped_child("descview", ImVec2(0, 0), true);
+
+					text(entry.get_arena_name() + "\n\n");
+
+					ImGui::Columns(2);
+
+					float max_w = 0;
+
+					for (const auto& r : meta.roles) {
+						max_w = std::max(max_w, ImGui::CalcTextSize(r.role.c_str()).x);
+					}
+
+					ImGui::SetColumnWidth(0, max_w + text_h);
+
+					for (const auto& r : meta.roles) {
+						text_disabled(r.role + ": ");
+						ImGui::NextColumn();
+
+						text(r.person);
+						ImGui::NextColumn();
+					}
+
+					ImGui::Columns(1);
+
+					text("\n");
+					/* ImGui::Separator(); */
+					/* text("\n"); */
+
+					/* text_disabled(meta.short_description); */
+
+					/* text("\n"); */
+					ImGui::PushTextWrapPos();
+
+					text_color(meta.full_description, rgba(210, 210, 210, 255));
+
+					ImGui::PopTextWrapPos();
+				}
+			}
+			else {
+				text_disabled("(No project selected)");
+			}
 		}
 
-		auto& tab = tabs[current_tab];
-
-		const bool something_selected = !tab.selected_arena_path.empty();
-
-		if (something_selected) {
+		if (selected_entry != nullptr) {
 			const bool is_template = current_tab != project_tab_type::MY_PROJECTS;
 
 			const auto label = 

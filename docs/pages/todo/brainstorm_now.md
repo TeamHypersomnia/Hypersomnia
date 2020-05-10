@@ -8,6 +8,7 @@ summary: That which we are brainstorming at the moment.
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 - inspect that new crash please before we forget the date
 
 - Emphasize the items laying on the ground
@@ -38,6 +39,29 @@ summary: That which we are brainstorming at the moment.
 - Fix those mag refills please
 =======
 =======
+=======
+- Possible balancing for revolver: longer loading time? Perhaps even longer than deagle
+	- Because it's really OP with its burst fire mode
+
+- Akimbo sn69 are really op, they're better than an SMG
+- balance kek9 against sn69?
+	- Maybe a little more damage, to the point that it just takes one less hit with armor but takes same amount of hits without armor
+
+
+- Fixing wallbangs and wall teleportation
+	- A short raycast sensor in front of the player
+		- Detect all convex shapes of walls in front of him
+		- Just take all vertices of all detected convexes
+		- And create a single trapezoid body
+	- Don't do raycast
+		- simply query the  right before the physics step (after applying the crosshair's direction to player rotation)
+
+- Also it's critical to lengthen the hand for pistol
+
+- USP
+	- RoF: 160-170
+
+>>>>>>> 226578dc8... Project selector interface drafts
 - Leaderboards shown in the main menu
 - "Host a server" button right in the arena builder
 

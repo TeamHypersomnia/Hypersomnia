@@ -69,6 +69,14 @@
 
 ### Inspector
 
+#### TWO TABS! 
+
+- Summary and Details
+- Summary has stuff like color or image path
+- Details has stuff like neon map colors
+
+#### Details
+
 - Determining what to show in the inspector might prove non-trivial
 
 - Inspector retains focus until another inspectable object is clicked?
