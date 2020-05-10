@@ -1046,6 +1046,7 @@ work_result work(const int argc, const char* const * const argv) try {
 						std::in_place_type_t<builder_setup>()
 					);
 				});
+				break;
 
 			case launch_type::ARENA_BUILDER_PROJECT_SELECTOR:
 				setup_launcher([&]() {
