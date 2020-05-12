@@ -116,8 +116,8 @@ namespace augs {
 
 		LOG("GLFW: setting version hints via glfwWindowHint.");
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
 		LOG("GLFW: calling glfwCreateWindow.");
 
