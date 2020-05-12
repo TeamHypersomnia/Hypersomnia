@@ -31,6 +31,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
 	message("Building with AppleClang.")
 	set(CLANG ON)
 	set(APPLE_CLANG ON)
+	set(USE_GLFW ON)
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	message("Building with gcc.")
 	set(GCC ON)
@@ -731,7 +732,14 @@ file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
 # Conditional inclusion of source files happens here.
 
 if(BUILD_WINDOW_FRAMEWORK)
-	if(MSVC)
+	if(USE_GLFW)
+		message("Using GLFW as the window framework.")
+
+		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
+			"src/augs/window_framework/window_glfw.cpp"
+			"src/augs/window_framework/translate_glfw_enums.cpp"
+		)
+	elseif(MSVC)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_winapi.cpp"
 			"src/augs/window_framework/translate_winapi_enums.cpp"
@@ -1389,6 +1397,10 @@ if(BUILD_WINDOW_FRAMEWORK)
 	add_definitions(-DBUILD_WINDOW_FRAMEWORK=1)
 endif()
 
+if(USE_GLFW)
+	add_definitions(-DUSE_GLFW=1)
+endif()
+
 if(BUILD_VERSION_FILE_GENERATOR) 
 	add_definitions(-DWAS_VERSION_GENERATOR_BUILT=1)
 endif()
@@ -1449,20 +1461,21 @@ endif()
 set(HYPERSOMNIA_LIBS lua streflop)
 
 if(BUILD_OPENGL)
-	message("OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}")
 	find_package(OpenGL REQUIRED)
 
 	target_link_libraries(Hypersomnia OpenGL::GL)
-	#target_link_libraries(Hypersomnia OpenGL::GLX)
 	target_include_directories(Hypersomnia PUBLIC OpenGL::GL)
-	#target_include_directories(Hypersomnia PUBLIC OpenGL::GLX)
 
 	message("OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}")
-	message("OPENGL_glx_LIBRARY: ${OPENGL_glx_LIBRARY}")
 endif()
 
 if(BUILD_WINDOW_FRAMEWORK)
-	if(UNIX)
+	if(USE_GLFW)
+		message("Linking GLFW libraries.")
+		find_package(glfw3 3.3 REQUIRED)
+		target_link_libraries(Hypersomnia glfw)
+		message("GLFW_LIBRARIES: ${glfw_LIBRARIES}")
+	elseif(UNIX)
 		find_package(X11 REQUIRED)
 		list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/extra-cmake-modules/find-modules")
 		find_package(XCB REQUIRED COMPONENTS XCB GLX )

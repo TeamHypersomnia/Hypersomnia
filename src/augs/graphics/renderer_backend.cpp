@@ -11,6 +11,7 @@
 #include "augs/graphics/shader.h"
 #include "augs/graphics/fbo.h"
 #include "augs/graphics/texture.h"
+#include "augs/log.h"
 
 #if PLATFORM_UNIX
 #define USE_BUFFER_SUB_DATA 0
@@ -50,11 +51,20 @@ namespace augs {
 		renderer_backend::~renderer_backend() = default;
 
 		renderer_backend::renderer_backend() : platform(std::make_unique<renderer_backend::platform_data>()) {
-#if BUILD_OPENGL
-			LOG_DIRECT("Calling gladLoadGL.");
+			const char* fname = "gladLoadGL";
+#if USE_GLFW 
+			fname = "gladLoadGLLoader";
+#endif
 
+#if BUILD_OPENGL
+			LOG("Calling %x.", fname);
+
+#if USE_GLFW 
+			if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+#else
 			if (!gladLoadGL()) {
-				LOG_DIRECT("Calling gladLoadGL failed.");
+#endif
+				LOG("Calling %x failed.", fname);
 				throw renderer_error("Failed to initialize GLAD!"); 		
 			}
 #endif

@@ -4,7 +4,9 @@
 #if BUILD_OPENGL
 #include <glad/glad.h>
 
-#if PLATFORM_WINDOWS
+#if USE_GLFW
+#include <GLFW/glfw3.h>
+#elif PLATFORM_WINDOWS
 #include <GL/GL.h>
 #undef min
 #undef max

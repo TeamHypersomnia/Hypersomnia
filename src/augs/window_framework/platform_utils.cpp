@@ -13,7 +13,22 @@ namespace augs {
 
 #if BUILD_WINDOW_FRAMEWORK
 
-#if PLATFORM_WINDOWS
+#if USE_GLFW
+namespace augs {
+	bool set_display(const vec2i, const int) {
+		return true;
+	}
+
+	xywhi get_display() {
+		return {};
+	}
+
+	std::optional<vec2i> find_cursor_pos() {
+		return std::nullopt;
+	}
+}
+
+#elif PLATFORM_WINDOWS
 #include <Windows.h>
 #undef min
 #undef max
@@ -45,14 +60,6 @@ namespace augs {
 
 		return std::nullopt;
 	}
-
-	void set_clipboard_data(const std::string&) {
-
-	}
-
-	std::string get_clipboard_data() {
-		return {};
-	}
 }
 
 #elif PLATFORM_UNIX
@@ -81,15 +88,6 @@ namespace augs {
 		return std::nullopt;
 	}
 
-	void set_clipboard_data(const std::string& abc) {
-		const auto p = augs::path_type("/tmp/augs_clipboard_data.txt"); 
-		augs::save_as_text(p, abc);
-		augs::shell("xclip -selection CLIPBOARD -in " + p.string());
-	}
-
-	std::string get_clipboard_data() {
-		return exec("xclip -selection CLIPBOARD -out");
-	}
 }
 
 #else
@@ -108,14 +106,6 @@ namespace augs {
 
 	std::optional<vec2i> find_cursor_pos() {
 		return std::nullopt;
-	}
-
-	void set_clipboard_data(const std::string&) {
-
-	}
-
-	std::string get_clipboard_data() {
-		return {};
 	}
 }
 

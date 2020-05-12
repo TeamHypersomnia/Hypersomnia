@@ -15,14 +15,27 @@
 using namespace ImGui;
 
 #if PLATFORM_UNIX
+#include "augs/window_framework/shell.h"
+#include "augs/window_framework/exec.h"
+
+void unix_set_clipboard_data(const std::string& abc) {
+	const auto p = augs::path_type("/tmp/augs_clipboard_data.txt"); 
+	augs::save_as_text(p, abc);
+	augs::shell("xclip -selection CLIPBOARD -in " + p.string());
+}
+
+std::string unix_get_clipboard_data() {
+	return augs::exec("xclip -selection CLIPBOARD -out");
+}
+
 static const char* augs_GetClipboardText(void*) {
 	thread_local std::string sss;
-	sss = augs::get_clipboard_data();
+	sss = unix_get_clipboard_data();
 	return sss.c_str();
 }
 
 static void augs_SetClipboardText(void*, const char* text) {
-	augs::set_clipboard_data(text);
+	unix_set_clipboard_data(text);
 }
 #endif
 
