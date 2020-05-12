@@ -1,0 +1,29 @@
+name: Build MacOS binary
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkout submodules
+      uses: textbook/git-checkout-submodule-action@2.1.1
+    - name: Install ninja
+      run: brew install ninja
+    - name: Install sodium
+      run: brew install libsodium
+    - name: Install mbedtls
+      run: brew install mbedtls
+    - name: Install glfw
+      run: brew install glfw
+    - name: Generate CMake files
+      run: cmake/build.sh Release x64 '-DUSE_GLFW=1 -DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0'
+    - name: Build
+      run: pushd build/current && ninja tests -k 0 && popd
