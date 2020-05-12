@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- MacOS fixes
+	- Fix alt/ctrl buttons and the tilde
+	- Though not sure if it isn't just our keyboard screwed up
+
+- Right now "USE_GLFW" is synonymous with building on Mac. Perhaps a better naming is in order?
+- Enable VSync by default on mac or just don't set the interval?
+
 - Fix those mag refills please
 
 - Wtf with those mags appearing at the center of the map?
