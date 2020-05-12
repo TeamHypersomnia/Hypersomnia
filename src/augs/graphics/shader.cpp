@@ -71,7 +71,12 @@ namespace augs {
 			const type shader_type,
 			const path_type& path
 		) try {
-			create(shader_type, "// " + path.string() + "\n" + file_to_string(path));
+#if USE_GLFW
+			const auto glsl_version = "#version 150";
+#else
+			const auto glsl_version = "#version 130";
+#endif
+			create(shader_type, std::string(glsl_version) + "\n" + "// " + path.string() + "\n" + file_to_string(path));
 		}
 		catch (const augs::file_open_error& err) {
 			throw shader_error(

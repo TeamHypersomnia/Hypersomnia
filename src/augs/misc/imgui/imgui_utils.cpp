@@ -14,7 +14,7 @@
 
 using namespace ImGui;
 
-#if PLATFORM_UNIX
+#if PLATFORM_UNIX && !USE_GLFW
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/exec.h"
 
@@ -79,7 +79,7 @@ namespace augs {
 			io.IniFilename = ini_filename;
 			io.LogFilename = log_filename;
 
-#if PLATFORM_UNIX
+#if PLATFORM_UNIX && !USE_GLFW
 			io.SetClipboardTextFn = augs_SetClipboardText;
 			io.GetClipboardTextFn = augs_GetClipboardText;
 #endif

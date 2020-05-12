@@ -68,8 +68,9 @@ namespace augs {
 				throw renderer_error("Failed to initialize GLAD!"); 		
 			}
 #endif
+			GL_CHECK(LOG("GL Version: %x", glGetString(GL_VERSION)));
 
-			LOG_DIRECT("Calling gladLoadGL succeeded.");
+			LOG("Calling %x succeeded.", fname);
 
 			set_blending(true);
 
