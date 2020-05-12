@@ -135,7 +135,7 @@ struct basic_randomization {
 
 	template <class C>
 	auto choose_from(C& container) {
-		return container[randval(static_cast<std::size_t>(0), container.size() - 1)];
+		return container[randval(static_cast<uint64_t>(0), static_cast<uint64_t>(container.size() - 1))];
 	}
 };
 
