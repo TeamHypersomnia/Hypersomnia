@@ -42,6 +42,11 @@ summary: That which we are brainstorming at the moment.
 =======
 - Possible balancing for revolver: longer loading time? Perhaps even longer than deagle
 	- Because it's really OP with its burst fire mode
+	- 1200 -> 1500. At least as long as the scout.
+
+- Calico longer to reload than bulwark?
+	- 1500 -> 1200
+	- Or just the same
 
 - Akimbo sn69 are really op, they're better than an SMG
 - balance kek9 against sn69?

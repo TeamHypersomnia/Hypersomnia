@@ -44,7 +44,7 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::COVERT);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_SHIELD_ARMOR);
 		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::MINI_KNIFE);
@@ -482,6 +482,7 @@ namespace test_scenes {
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::CALICO);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::WARX_FQ12);
 
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::COVERT);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::HPSR);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::HUNTER);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::BULLDUP2000);
