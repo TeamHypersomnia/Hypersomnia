@@ -1567,7 +1567,7 @@ if (UNIX)
 endif()
 
 if (BUILD_WINDOW_FRAMEWORK)
-	if (UNIX)
+	if (UNIX AND NOT USE_GLFW)
 		list(APPEND HYPERSOMNIA_LIBS Xi)
 	endif()
 endif()
