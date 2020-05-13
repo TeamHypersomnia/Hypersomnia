@@ -116,6 +116,7 @@ namespace augs {
 
 		LOG("GLFW: setting version hints via glfwWindowHint.");
 
+		glfwWindowHint(GLFW_DECORATED, settings.border);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -155,15 +156,18 @@ namespace augs {
 		glfwSetWindowFocusCallback(window, glfw_callbacks::focus_callback);
 
 		set_as_current();
-		apply(settings, true);
+		set(settings.vsync_mode);
+
+		current_settings = settings;
+		current_rect = get_window_rect_impl();
 	}
 
 	void window::set_window_name(const std::string& name) {
 		glfwSetWindowTitle(platform->window, name.c_str());
 	}
 
-	void window::set_window_border_enabled(const bool) {
-	
+	void window::set_window_border_enabled(const bool decorated) {
+		glfwSetWindowAttrib(platform->window, GLFW_DECORATED, decorated ? GLFW_TRUE : GLFW_FALSE);
 	}
 
 	bool window::swap_buffers() { 
@@ -205,6 +209,12 @@ namespace augs {
 			}
 
 			ch.data.key.key = translate_glfw_key(key.key);
+
+			if (get_current_settings().log_keystrokes) {
+				LOG("Keycode down: %x", static_cast<int>(key.key));
+				LOG("Scancode down: %x", static_cast<int>(key.scancode));
+				LOG("Output enum: %x", int(ch.data.key.key));
+			}
 
 			handle_event(ch);
 		}
@@ -303,6 +313,7 @@ namespace augs {
 
 	void window::set_window_rect(const xywhi r) {
 		auto& window = platform->window;
+					LOG("SETTING WINDOW RECT: %x", r);
 
 		glfwSetWindowPos(window, r.x, r.y);
 		glfwSetWindowSize(window, r.w, r.h);

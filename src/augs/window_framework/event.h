@@ -190,6 +190,8 @@ namespace augs {
 				APOSTROPHE,
 				WHEELUP,
 				WHEELDOWN,
+				WORLD1,
+				WORLD2,
 
 				COUNT = 256,
 			};

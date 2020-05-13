@@ -421,6 +421,8 @@ namespace augs {
 				case key::APOSTROPHE: return "Apostrophe"; break;
 				case key::WHEELUP: return "Wheel Up"; break;
 				case key::WHEELDOWN: return "Wheel Down"; break;
+				case key::WORLD1: return "World 1"; break;
+				case key::WORLD2: return "World 2"; break;
 				default: return "Invalid key"; break;
 				}
 			}

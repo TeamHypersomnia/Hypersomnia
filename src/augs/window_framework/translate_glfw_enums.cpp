@@ -141,6 +141,9 @@ key translate_glfw_key(const int m) {
 	case GLFW_KEY_KP_7: return key::NUMPAD7;
 	case GLFW_KEY_KP_8: return key::NUMPAD8;
 	case GLFW_KEY_KP_9: return key::NUMPAD9;
+
+	case GLFW_KEY_WORLD_1: return key::WORLD1;
+	case GLFW_KEY_WORLD_2: return key::WORLD2;
 	default: return key::INVALID;
 	}
 }
