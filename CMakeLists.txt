@@ -1464,7 +1464,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 	if(USE_GLFW)
 		message("Linking GLFW statically.")
 
-		set(GLFW_ROOT "${PROJECT_SOURCE_DIR}/src/glfw")
+		set(GLFW_ROOT "${PROJECT_SOURCE_DIR}/src/3rdparty/glfw")
 		set(GLFW_HINTS "${GLFW_ROOT}/lib-macos")
 
 		prefer_static_libraries()
