@@ -55,9 +55,11 @@ namespace augs {
 	}
 
 	int restart_application(const std::string& executable, const std::string& arguments) {
-		(void)executable;
-		(void)arguments;
-		return 42;
+		if (augs::spawn_detached_process(executable, arguments)) {
+			return EXIT_SUCCESS;
+		}
+
+		return EXIT_FAILURE;
 	}
 }
 #else

@@ -19,14 +19,15 @@ if [ -f "$EXE_PATH" ]; then
 	FILE_PATH="Hypersomnia-for-$PLATFORM.sfx"
 	UPLOAD_URL="https://hypersomnia.xyz/upload_artifact.php"
 
-	. cmake/linux_launcher_install.sh
+	# . cmake/linux_launcher_install.sh
+
+	cp build/current/Hypersomnia hypersomnia/Hypersomnia
 
 	if [[ "$PLATFORM" = "MacOS-updater" ]]
 	then
 		mv hypersomnia/Hypersomnia hypersomnia/Hypersomnia.command
 	fi
 
-	cp build/current/Hypersomnia hypersomnia/.Hypersomnia
 	pushd hypersomnia
 	rm -r cache logs user
 	popd

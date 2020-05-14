@@ -22,13 +22,9 @@ namespace augs {
 		(void)executable;
 		(void)arguments;
 
-		const auto cmd = "nohup \"" + executable + "\" " + arguments + " &";
+		const auto cmd = "( \"" + executable + "\" " + arguments + " & )";
 		augs::shell(cmd);
 
-#if NDEBUG
-		// TODO IMPLEMENT THIS IN A WAY THAT WORKS!!!
-		ensure(false && "NOT IMPLEMENTED!!");
-#endif
 		return true;
 
 #elif PLATFORM_WINDOWS

@@ -9,6 +9,34 @@
 #include "cmd_line_params.h"
 #include "build_info.h"
 
+#if USE_GLFW
+#include <mach-o/dyld.h>
+
+augs::path_type get_current_exe_path() {
+	char path[1024];
+	uint32_t size = sizeof(path);
+
+	if (_NSGetExecutablePath(path, &size) == 0) {
+		return path;
+	}
+
+	return augs::path_type();
+}
+#elif PLATFORM_UNIX
+#include <unistd.h>
+augs::path_type get_current_exe_path() {
+	char dest[PATH_MAX];
+	memset(dest,0,sizeof(dest)); // readlink does not null terminate!
+	if (readlink("/proc/self/exe", dest, PATH_MAX) == -1) {
+
+		} else {
+			return dest;
+		}
+
+	return augs::path_type();
+}
+#endif
+
 #if PLATFORM_WINDOWS
 #include <Windows.h>
 #undef MIN
@@ -38,6 +66,17 @@ int main(const int argc, const char* const * const argv) {
 #else
 #error "Unsupported platform!"
 #endif
+
+#if !PLATFORM_WINDOWS && !BUILD_IN_CONSOLE_MODE
+	{
+		if (auto exe_path = get_current_exe_path(); !exe_path.empty()) {
+			exe_path.replace_filename("");
+			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
+			std::filesystem::current_path(exe_path);
+		}
+	}
+#endif
+
 	/* 
 		At least on Linux, 
 		we need to call this in order to be able to write non-English characters. 
