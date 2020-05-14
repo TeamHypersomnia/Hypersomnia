@@ -67,16 +67,6 @@ int main(const int argc, const char* const * const argv) {
 #error "Unsupported platform!"
 #endif
 
-#if !PLATFORM_WINDOWS && !BUILD_IN_CONSOLE_MODE
-	{
-		if (auto exe_path = get_current_exe_path(); !exe_path.empty()) {
-			exe_path.replace_filename("");
-			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
-			std::filesystem::current_path(exe_path);
-		}
-	}
-#endif
-
 	/* 
 		At least on Linux, 
 		we need to call this in order to be able to write non-English characters. 
@@ -86,6 +76,17 @@ int main(const int argc, const char* const * const argv) {
 	std::setlocale(LC_NUMERIC, "C");
 
 	const auto params = cmd_line_params(argc, argv);
+
+	if (!params.keep_cwd) {
+#if !PLATFORM_WINDOWS && !BUILD_IN_CONSOLE_MODE
+		if (auto exe_path = get_current_exe_path(); !exe_path.empty()) {
+			exe_path.replace_filename("");
+			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
+			std::filesystem::current_path(exe_path);
+			std::cout << "CHANGED CWD TO: " << exe_path.string() << std::endl;
+		}
+#endif
+	}
 
 	::current_app_type = params.type;
 

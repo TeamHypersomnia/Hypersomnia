@@ -15,6 +15,7 @@ struct cmd_line_params {
 	app_type type = app_type::GAME_CLIENT;
 	bool upgraded_successfully = false;
 	bool should_connect = false;
+	bool keep_cwd = false;
 	int test_fp_consistency = -1;
 	std::string connect_address;
 
@@ -31,6 +32,7 @@ struct cmd_line_params {
 
 			if (a == "--unit-tests-only") {
 				unit_tests_only = true;
+				keep_cwd = true;
 			}
 			else if (a == "--help" || a == "-h") {
 				help_only = true;
@@ -58,6 +60,7 @@ struct cmd_line_params {
 			}
 			else if (a == "--test-fp-consistency") {
 				test_fp_consistency = std::atoi(argv[i++]);
+				keep_cwd = true;
 			}
 			else if (a == "--nat-punch-port") {
 				first_udp_command_port = std::atoi(argv[i++]);
