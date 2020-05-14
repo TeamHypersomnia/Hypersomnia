@@ -1,6 +1,7 @@
 #!/usr/bin/env bash 
 EXE_PATH="build/current/Hypersomnia"
 
+PLATFORM=$1
 GIT_BRANCH=$2
 
 if [ "$GIT_BRANCH" != "master" ]; then
@@ -11,8 +12,6 @@ fi
 if [ -f "$EXE_PATH" ]; then
 	echo "Exe found. Uploading."
 
-	API_KEY=$1
-	PLATFORM=Linux
 	COMMIT_HASH=$(git rev-parse HEAD)
 	COMMIT_NUMBER=$(git rev-list --count master)
 	COMMIT_MESSAGE=$(git log -1 --pretty=%B)
@@ -27,6 +26,17 @@ if [ -f "$EXE_PATH" ]; then
 	popd
 	7z a -sfx $FILE_PATH hypersomnia
 	curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
+
+	if [[ "$PLATFORM" = "MacOS-updater" ]]
+	then
+		# Also upload a plain zip file for first-time downloads on MacOS
+
+		PLATFORM="MacOS"
+		FILE_PATH="Hypersomnia-for-$PLATFORM.zip"
+		zip -r -sfx $FILE_PATH hypersomnia
+
+		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
+	fi
 else
 	echo "No exe found. Not uploading."
 fi

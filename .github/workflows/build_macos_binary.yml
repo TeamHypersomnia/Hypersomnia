@@ -21,9 +21,11 @@ jobs:
       run: brew install libsodium
     - name: Install mbedtls
       run: brew install mbedtls
-    - name: Install glfw
-      run: brew install glfw
     - name: Generate CMake files
       run: cmake/build.sh Release x64 '-DUSE_GLFW=1 -DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl'
     - name: Build
       run: pushd build/current && ninja tests -k 0 && popd
+    - name: "Upload build to hypersomnia.xyz/builds/latest"
+      env:
+        ARTIFACT_UPLOAD_KEY: ${{ secrets.artifact_upload_key }}
+      run: API_KEY=$ARTIFACT_UPLOAD_KEY cmake/upload_if_exe_found.sh MacOS-updater master
