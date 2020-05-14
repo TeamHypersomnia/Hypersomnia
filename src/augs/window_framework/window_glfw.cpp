@@ -4,6 +4,7 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/translate_glfw_enums.h"
 #include "augs/log.h"
+#include "augs/window_framework/shell.h"
 
 struct unhandled_key {
 	int key, scancode, action, mods;
@@ -410,8 +411,9 @@ namespace augs {
 		return std::nullopt;
 	}
 
-	void window::reveal_in_explorer(const augs::path_type&) {
-	
+	void window::reveal_in_explorer(const augs::path_type& full_path) {
+		const auto command = augs::path_type(typesafe_sprintf("open -a Finder \"%x\"", full_path));
+		shell(command);
 	}
 
 	void window::set_cursor_visible_impl(bool) {

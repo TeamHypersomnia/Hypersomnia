@@ -44,7 +44,12 @@ namespace augs {
 
 	void open_text_editor(const std::string& on_file) {
 		const auto full_path = std::filesystem::absolute(augs::path_type(on_file));
+
+#if USE_GLFW
+		const auto command = augs::path_type(typesafe_sprintf("open \"%x\"", full_path));
+#else
 		const auto command = augs::path_type("$VISUAL ") += full_path;
+#endif
 
 		augs::shell(command.string());
 	}
