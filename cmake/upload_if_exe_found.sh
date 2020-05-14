@@ -23,7 +23,7 @@ if [ -f "$EXE_PATH" ]; then
 
 	if [[ "$PLATFORM" = "MacOS-updater" ]]
 	then
-		mv hypersomnia Hypersomnia.command
+		mv hypersomnia/Hypersomnia hypersomnia/Hypersomnia.command
 	fi
 
 	cp build/current/Hypersomnia hypersomnia/.Hypersomnia
@@ -36,10 +36,11 @@ if [ -f "$EXE_PATH" ]; then
 	if [[ "$PLATFORM" = "MacOS-updater" ]]
 	then
 		# Also upload a plain zip file for first-time downloads on MacOS
+		echo "Uploading a zip file too, since it's MacOS."
 
 		PLATFORM="MacOS"
 		FILE_PATH="Hypersomnia-for-$PLATFORM.zip"
-		zip -r -sfx $FILE_PATH hypersomnia
+		zip -r $FILE_PATH hypersomnia
 
 		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 	fi
