@@ -25,6 +25,8 @@ Forever free and open-source :heart:
 
 - [Introduction](#introduction)
 - [Gallery](#gallery)
+- [Quick gameplay instructions](#quick-gameplay-instructions)
+  - [Controls](#controls)
 - [How to build](#how-to-build)
   - [Windows instructions](#windows-instructions)
   - [Linux instructions](#linux-instructions)
@@ -34,8 +36,6 @@ Forever free and open-source :heart:
     - [Editor integration](#editor-integration)
       - [Opening and saving files](#opening-and-saving-files)
   - [MacOS instructions](#macos-instructions)
-- [Quick gameplay instructions](#quick-gameplay-instructions)
-  - [Controls](#controls)
 - [Contributing](#contributing)
 
 ## Introduction
@@ -57,6 +57,38 @@ Watch gameplays on YouTube:
 
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/Aey0L1jZpiA/0.jpg)](https://www.youtube.com/watch?v=Aey0L1jZpiA "Video Title")
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/0vlUOO5l0jw/0.jpg)](https://www.youtube.com/watch?v=0vlUOO5l0jw "Video Title")
+
+# Quick gameplay instructions
+
+## Controls
+
+- WSAD: move around
+- Shift - sprint, it drains stamina.
+- Space - dash, it drains quite a lot of stamina.
+- Left control - move quietly and pick up items. You have to hold the left control, and your character needs to touch the item you want to pick, simultaneously.
+- T - open the shop. Usually, the shop is off during warmup.
+- O - change team. You should just pick Auto-assign to preserve balance.
+- G - drop the most recently wielded item.
+- H - hide the most recently wielded item. Can fail if you have no space in your inventory!
+- E - defuse the bomb. If you move when defusing, the timer is reset, so stay still. You can shoot, though. Just remember to keep the trigger in the bomb's range, they have to touch.
+- C - pull out the bomb (as a terrorist)
+- Wheel Down - quickly throw a knife (or another melee weapon you happen to have).
+- Wheel Up - quickly throw two knives (or other melee weapons you happen to have).
+- Middle mouse button - quickly throw a Force grenade.
+- Mouse4 - quickly throw a Flashbang.
+- Mouse5 - quickly throw a PED grenade (destroys Personal Electricity).
+- Q - quickly switch to the most recently drawn weapon - or any other at your disposal. Can fail if you have no space in your inventory for the currently held weapon! 
+- 0, 1, 2, ..., 9 - choose weapons from the hotbar. Usually, 0 has the bomb or the armor.
+- TAB - match statistics, e.g. the players and their scores.
+- F8 - admininistration panel for your server.
+- Tilde (~) - release the mouse cursor to let you interact with GUI. You probably won't use it often, but it's useful if you want to drop a specific item from your inventory - simply press the right mouse button whilst dragging it. Pressing the tilde again puts you back into the game and lets you regain control over the crosshair. 
+- LMB: 
+  - Use the item in your right hand, so:
+  - for the bomb: plant it
+  - for a nade: unpin it
+  - for a firearm: shoot it
+  - for a melee weapon: a wide swing
+- RMB - Use the item in your left hand, or a secondary function of the item in your right hand (only if your left hand is unoccupied), for example - burst fire for the AO44 revolver. Also: a narrow, powerful swing for a melee weapon. Unpins the nade to throw it under your feet, instead of throwing it far.
 
 # How to build
 
@@ -300,31 +332,6 @@ To implement your own script for choosing a directory:
 ## MacOS instructions
 
 Refer to [macos_build.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/.github/workflows/macos_build.yml) file for up-to-date instructions.
-
-# Quick gameplay instructions
-
-## Controls
-
-- WSAD: move around
-- Shift - sprint, it drains stamina.
-- Space - dash, it drains quite a lot of stamina.
-- Left control - move quietly and pick up items. You have to hold the left control, and your character needs to touch the item you want to pick, simultaneously.
-- T - open the shop. Usually, the shop is off during warmup.
-- O - change team. You should just pick Auto-assign to preserve balance.
-- G - drop the most recently wielded item.
-- H - hide the most recently wielded item. Can fail if you have no space in your inventory!
-- E - defuse the bomb. If you move when defusing, the timer is reset, so stay still. You can shoot, though. Just remember to keep the trigger in the bomb's range, they have to touch.
-- C - pull out the bomb (as a terrorist)
-- Wheel Down - quickly throw a knife (or another melee weapon you happen to have).
-- Wheel Up - quickly throw two knives (or other melee weapons you happen to have).
-- Middle mouse button - quickly throw a Force grenade.
-- Mouse4 - quickly throw a Flashbang.
-- Mouse5 - quickly throw a PED grenade (destroys Personal Electricity).
-- Q - quickly switch to the most recently drawn weapon - or any other at your disposal. Can fail if you have no space in your inventory for the currently held weapon! 
-- 0, 1, 2, ..., 9 - choose weapons from the hotbar. Usually, 0 has the bomb or the armor.
-- TAB - match statistics, e.g. the players and their scores.
-- F8 - admininistration panel for your server.
-- Tilde (~) - release the mouse cursor to let you interact with GUI. You probably won't use it often, but it's useful if you want to drop a specific item from your inventory - simply press the right mouse button whilst dragging it. Pressing the tilde again puts you back into the game and lets you regain control over the crosshair. 
 
 # Contributing
 
