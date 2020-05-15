@@ -158,6 +158,9 @@ namespace augs {
 
 		glfwSetWindowFocusCallback(window, glfw_callbacks::focus_callback);
 
+		glfwFocusWindow(window);
+		active = glfwGetWindowAttrib(window, GLFW_FOCUSED);
+
 		set_as_current();
 		set(settings.vsync_mode);
 
