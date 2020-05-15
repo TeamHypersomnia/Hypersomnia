@@ -83,6 +83,10 @@ namespace augs {
 		return message_box_button::CANCEL;
 	}
 
+	int window::get_refresh_rate() {
+		return -1;
+	}
+
 	window::~window() {
 
 	}

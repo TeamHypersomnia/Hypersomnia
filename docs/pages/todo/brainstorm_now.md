@@ -7,6 +7,7 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Left-handed option
+- because of the mv really?
 
 - Duplicate the updaters to exe/sfx files without "updater" suffix for old clients to update successfully
 - Update existing links on Discord

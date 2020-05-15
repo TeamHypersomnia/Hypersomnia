@@ -319,8 +319,10 @@ void settings_gui_state::perform(
 		auto revert = make_revert_button_lambda(config, last_saved_config);
 
 		auto revertable_checkbox = [&](auto l, auto& f, auto&&... args) {
-			checkbox(l, f, std::forward<decltype(args)>(args)...);
-			revert(f);
+			bool result = checkbox(l, f, std::forward<decltype(args)>(args)...);
+			bool rresult = revert(f);
+
+			return result || rresult;
 		};
 
 		auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
@@ -409,6 +411,19 @@ void settings_gui_state::perform(
 				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
 
 				revertable_enum_radio("Vsync mode", config.window.vsync_mode);
+
+				{
+					auto& mf = config.window.max_fps;
+
+					revertable_checkbox("Limit maximum FPS", mf.is_enabled);
+
+					if (mf.is_enabled) {
+						auto scope = scoped_indent();
+
+						revertable_slider("Max FPS", mf.value, 1, 1000);
+					}
+				}
+
 				revertable_checkbox("Hide this window in-game", config.session.hide_settings_ingame);
 
 				ImGui::Separator();

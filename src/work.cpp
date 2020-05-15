@@ -195,7 +195,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 #if USE_GLFW
 		result.window.fullscreen = false;
-		result.window.vsync_mode = augs::vsync_type::ON;
+		result.window.vsync_mode = augs::vsync_type::OFF;
+		result.window.max_fps.is_enabled = true;
 #endif
 
 		return result;
@@ -2275,6 +2276,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				configurables.apply(viewing_config);
 				write_buffer.new_settings = viewing_config.window;
 				write_buffer.swap_when = viewing_config.performance.swap_window_buffers_when;
+				write_buffer.max_fps = viewing_config.window.max_fps;
 				decide_on_cursor_clipping(in_direct_gameplay, viewing_config);
 
 				releases.set_due_to_imgui(ImGui::GetIO());
@@ -3121,9 +3123,11 @@ work_result work(const int argc, const char* const * const argv) try {
 		});
 	};
 
+	augs::timer this_frame_timer;
+
 	for (;;) {
 		auto scope = measure_scope(render_thread_performance.fps);
-		
+
 		auto swap_window_buffers = [&]() {
 			auto scope = measure_scope(render_thread_performance.swap_window_buffers);
 			window.swap_buffers();
@@ -3188,6 +3192,17 @@ work_result work(const int argc, const char* const * const argv) try {
 			{
 				auto scope = measure_scope(render_thread_performance.render_wait);
 				buffer_swapper.swap_buffers(game_main_thread_synced_op);
+
+				const auto max_fps = get_read_buffer().max_fps;
+				const auto target_delay_ms = max_fps.value >= 0 ? 1000.0 / max_fps.value : 0.0;
+
+				const auto passed_ms = this_frame_timer.extract<std::chrono::milliseconds>();
+
+				if (max_fps.is_enabled != 0 && passed_ms < target_delay_ms) {
+					const auto to_sleep_ms = target_delay_ms - passed_ms;
+
+					std::this_thread::sleep_for(std::chrono::duration<double>(to_sleep_ms / 1000.0));
+				}
 			}
 		}
 

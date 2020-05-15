@@ -2,6 +2,7 @@
 #include "augs/filesystem/path.h"
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"
+#include "augs/templates/maybe.h"
 
 namespace augs {
 	enum class vsync_type {
@@ -24,6 +25,7 @@ namespace augs {
 		bool raw_mouse_input = true;
 		bool log_keystrokes = false;
 		vsync_type vsync_mode = vsync_type::OFF;
+		maybe<int> max_fps = maybe<int>::disabled(60);
 		// END GEN INTROSPECTOR
 
 		xywhi make_window_rect() const {
@@ -31,10 +33,6 @@ namespace augs {
 		}
 
 		bool is_raw_mouse_input() const {
-			if (fullscreen) {
-				return true;
-			}
-
 			return raw_mouse_input;
 		}
 	};

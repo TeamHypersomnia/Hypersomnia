@@ -447,6 +447,20 @@ namespace augs {
 		return message_box_button::CANCEL;
 	}
 
+	int window::get_refresh_rate() {
+		GLFWmonitor* primary = glfwGetPrimaryMonitor();
+
+		if (primary) {
+			const GLFWvidmode* mode = glfwGetVideoMode(primary);
+
+			if (mode) {
+				return mode->refreshRate;
+			}
+		}
+
+		return -1;
+	}
+
 	window::~window() {
 		destroy();
 	}

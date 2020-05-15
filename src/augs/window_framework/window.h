@@ -174,6 +174,8 @@ namespace augs {
 		bool is_active() const;
 		xywhi get_display() const;
 
+		int get_refresh_rate();
+
 		void set(vsync_type);
 
 		struct file_dialog_filter {

@@ -879,6 +879,10 @@ namespace augs {
 		return to_message_box_button(MessageBox(platform->hwnd, wide_text.c_str(), wide_caption.c_str(), MB_RETRYCANCEL | MB_ICONEXCLAMATION));
 	}
 
+	int window::get_refresh_rate() {
+		return -1;
+	}
+
 	window::~window() {
 		destroy();
 		window_ptr = nullptr;
