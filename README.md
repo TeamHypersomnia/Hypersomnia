@@ -62,6 +62,8 @@ Watch gameplays on YouTube:
 
 ## Controls
 
+You can reconfigure all bindings by going to Settings->Controls tab.
+
 - WSAD: move around
 - Shift - sprint, it drains stamina.
 - Space - dash, it drains quite a lot of stamina.
