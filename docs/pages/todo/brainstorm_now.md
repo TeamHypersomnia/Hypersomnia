@@ -7,6 +7,8 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - MacOS fixes
+	- GLFW_SAMPLES to 0
+	- Research the option to making this an app.zip
 	- Fix alt/ctrl buttons and the tilde
 	- Though not sure if it isn't just our keyboard screwed up
 

@@ -117,6 +117,8 @@ namespace augs {
 
 		LOG("GLFW: setting version hints via glfwWindowHint.");
 
+		glfwWindowHint(GLFW_SAMPLES, 0);
+		glfwWindowHint(GLFW_DEPTH_BITS, 0);
 		glfwWindowHint(GLFW_DECORATED, settings.border);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
