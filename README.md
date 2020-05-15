@@ -58,7 +58,7 @@ Watch gameplays on YouTube:
 
 # How to build
 
-Currently, Hypersomnia is only buildable using ``clang`` both on Linux and Windows.  
+Currently, Hypersomnia is only buildable using ``clang``.
 Additionally, your operating system must be 64-bit.  
 
 <!--
@@ -66,10 +66,10 @@ Formerly, the game was buildable under modern ``gcc`` versions,
 and also using ``MSVC`` (the Microsoft's compiler shipping with Visual Studio),  
 but it quickly became too much of a hassle to support these compilers as we use **modern C++ constructs** throughout the entire codebase.  
 ``gcc``, for example, would sometimes simply crash on some really template-heavy code.  
--->
 
 The project's ``CMakeLists.txt`` contains clauses for both ``MSVC`` and ``gcc``,  
 so in the future, it might be possible to build the game under these compilers if they catch up to ``clang``.  
+-->
 
 Irrespectively of the OS, you will need the following software in order to build Hypersomnia:  
 
