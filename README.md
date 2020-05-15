@@ -14,7 +14,7 @@ Forever free and open-source :heart:
 
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/windows_icon.svg" height=70 hspace=1> </a>
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Linux.tar.gz"> <img src="https://hypersomnia.xyz/linux_icon.svg" height=70 hspace=1 vspace=20> </a>
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.zip"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" height=70 hspace=1 vspace=20> </a>
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.app.zip"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" height=70 hspace=1 vspace=20> </a>
 <br>
 
 *[(for older versions click here)](https://hypersomnia.xyz/builds)*
