@@ -80,9 +80,9 @@ You can reconfigure all bindings by going to Settings->Controls tab.
 - Mouse4 - quickly throw a Flashbang.
 - Mouse5 - quickly throw a PED grenade (destroys Personal Electricity).
 - Q - quickly switch to the most recently drawn weapon - or any other at your disposal. Can fail if you have no space in your inventory for the currently held weapon! 
-- 0, 1, 2, ..., 9 - choose weapons from the hotbar. Usually, 0 has the bomb or the armor.
+- 0, 1, 2, ..., 9 - choose weapons from the hotbar.
 - TAB - match statistics, e.g. the players and their scores.
-- F8 - admininistration panel for your server.
+- F8 - admininistration panel for your server where you can change maps or restart the match.
 - Tilde (~) - release the mouse cursor to let you interact with GUI. You probably won't use it often, but it's useful if you want to drop a specific item from your inventory - simply press the right mouse button whilst dragging it. Pressing the tilde again puts you back into the game and lets you regain control over the crosshair. 
 - LMB: 
   - Use the item in your right hand, so:
