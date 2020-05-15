@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Enter for the max fps slider
+
 - Left-handed option
 - because of the mv really?
 

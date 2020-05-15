@@ -5,6 +5,9 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Why the f... is the cursor still on when in the game
+	- active flag wasn't initialized to true 
+
 - The delay on debug is probably because HRTF tries to catch up when the tick is sent
 	- shouldn't be a problem on release
 

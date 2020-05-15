@@ -187,6 +187,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		if (concurrency <= 4) {
 			result.audio.enable_hrtf = false;
+			result.window.max_fps.value = 60;
 		}
 
 #if !NDEBUG
@@ -196,7 +197,6 @@ work_result work(const int argc, const char* const * const argv) try {
 #if USE_GLFW
 		result.window.fullscreen = false;
 		result.window.vsync_mode = augs::vsync_type::OFF;
-		result.window.max_fps.is_enabled = true;
 #endif
 
 		return result;

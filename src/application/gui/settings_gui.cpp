@@ -420,7 +420,7 @@ void settings_gui_state::perform(
 					if (mf.is_enabled) {
 						auto scope = scoped_indent();
 
-						revertable_slider("Max FPS", mf.value, 1, 1000);
+						revertable_slider("Max FPS", mf.value, 15, 400);
 					}
 				}
 

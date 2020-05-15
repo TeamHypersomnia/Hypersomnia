@@ -613,7 +613,8 @@ return {
       x = 1200,
       y = 700
     },
-	vsync_mode = "OFF"
+	vsync_mode = "OFF",
+	enabled_max_fps = 300,
   },
   faction_view = {
 	colors = {
