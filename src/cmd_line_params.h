@@ -30,7 +30,10 @@ struct cmd_line_params {
 		for (int i = 1; i < argc;) {
 			const auto a = std::string(argv[i++]);
 
-			if (a == "--unit-tests-only") {
+			if (begins_with(a, "-psn")) {
+				continue;
+			}
+			else if (a == "--unit-tests-only") {
 				unit_tests_only = true;
 				keep_cwd = true;
 			}

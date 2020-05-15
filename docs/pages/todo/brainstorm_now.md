@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Left-handed option
+
 - Duplicate the updaters to exe/sfx files without "updater" suffix for old clients to update successfully
 - Update existing links on Discord
 

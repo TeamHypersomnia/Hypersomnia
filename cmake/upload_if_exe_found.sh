@@ -21,11 +21,6 @@ if [ -f "$EXE_PATH" ]; then
 
 	cp build/current/Hypersomnia hypersomnia/Hypersomnia
 
-	if [[ "$PLATFORM" = "MacOS" ]]
-	then
-		mv hypersomnia/Hypersomnia hypersomnia/Hypersomnia.command
-	fi
-
 	pushd hypersomnia
 	rm -r cache logs user
 	popd
@@ -34,11 +29,22 @@ if [ -f "$EXE_PATH" ]; then
 
 	if [[ "$PLATFORM" = "MacOS" ]]
 	then
-		# Also upload a plain zip file for first-time downloads on MacOS
-		echo "Uploading a zip file for first-time downloads on MacOS."
-		FILE_PATH="Hypersomnia-for-$PLATFORM.zip"
-		zip -r $FILE_PATH hypersomnia
+		# Prepare an app.zip file for first-time downloads on MacOS
+		echo "Uploading an app.zip file for first-time downloads on MacOS."
 
+		APP_PATH="Hypersomnia-for-$PLATFORM.app"
+		ZIP_PATH="$APP_PATH.zip"
+
+		APPNAME="Hypersomnia"
+		CONTENTS_DIR="$APPNAME.app/Contents"
+
+		mkdir -p "$CONTENTS_DIR"
+
+		mv hypersomnia "$CONTENTS_DIR/MacOS"
+
+		zip -r $APP_PATH $ZIP_PATH
+
+		FILE_PATH=$ZIP_PATH
 		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 	fi
 
