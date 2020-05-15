@@ -18,6 +18,9 @@ Forever free and open-source :heart:
 <br>
 
 *[(for older versions click here)](https://hypersomnia.xyz/builds)*
+
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/X7m2vDXIaxA/0.jpg)](https://www.youtube.com/watch?v=X7m2vDXIaxA "Video Title")
+
 </div>
 
 - [Introduction](#introduction)
@@ -31,8 +34,6 @@ Forever free and open-source :heart:
     - [Editor integration](#editor-integration)
       - [Opening and saving files](#opening-and-saving-files)
   - [MacOS instructions](#macos-instructions)
-	- [Additional dependencies](#additional-dependencies)
-	- [Details](#details)
 - [Contributing](#contributing)
 
 ## Introduction
@@ -52,19 +53,8 @@ To understand the repository's folder structure, make sure to read the [document
 
 Watch gameplays on YouTube:
 
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/d_G1mRqKlb0/0.jpg)](https://www.youtube.com/watch?v=d_G1mRqKlb0 "Video Title")
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/Aey0L1jZpiA/0.jpg)](https://www.youtube.com/watch?v=Aey0L1jZpiA "Video Title")
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/0vlUOO5l0jw/0.jpg)](https://www.youtube.com/watch?v=0vlUOO5l0jw "Video Title")
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/mxvuWvD53tY/0.jpg)](https://www.youtube.com/watch?v=mxvuWvD53tY "Video Title")
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/f0cHnds9UuU/0.jpg)](https://www.youtube.com/watch?v=f0cHnds9UuU "Video Title")
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/XsSKj6hJH0w/0.jpg)](https://www.youtube.com/watch?v=XsSKj6hJH0w "Video Title")
-
-![enter image description here][8]
-![enter image description here][3]
-![enter image description here][4]
-
-  [8]: https://gifyu.com/images/16.main_menu_reup.png
-  [3]: https://gifyu.com/images/23.light.png
-  [4]: https://gifyu.com/images/30.smoke.png
 
 # How to build
 
@@ -115,6 +105,8 @@ On all platforms, you can choose among three building configurations:
 
 ## Windows instructions
 
+Refer to [appveyor.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/appveyor.yml) file for up-to-date building procedure. A short overview of the process now follows.
+
 Prerequisites:
 - **Visual Studio 2019 Preview** (Community) or newer.
 
@@ -164,6 +156,8 @@ Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7**
 If, for some reason, some step fails, refer to the latest working Appveyor build and the relevant ```appveyor.yml``` file.
 
 ## Linux instructions
+
+Refer to [.travis.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/.travis.yml) file for up-to-date building procedure. A short overview of the process now follows.
 
 Current platforms are actively tested and supported:
 - Arch Linux with i3 window manager.
@@ -303,29 +297,7 @@ To implement your own script for choosing a directory:
 
 ## MacOS instructions
 
-**WARNING: Building for MacOS is a work in progress! The window framework has yet to be ported.**
-
-Generally, to build for MacOS, you can follow the instructions for Linux.
-Here are the things you need to know beforehand:
-
-### Prerequisites
-
-- Xcode 11.1 or newer
-
-### Additional dependencies
-
-- ``mbedtls``
-- ``libsodium``
-
-### Details
-
-To build, run from the repository's directory:
-
-```
-cmake/build.sh Release x64 -DBUILD_WINDOW_FRAMEWORK=0 -DBUILD_OPENGL=0 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
-```
-
-Note that the path to OpenSSL library must be set explicitly.
+Refer to [macos_build.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/.github/workflows/macos_build.yml) file for up-to-date instructions.
 
 # Contributing
 
