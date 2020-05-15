@@ -9,7 +9,7 @@
 #include "cmd_line_params.h"
 #include "build_info.h"
 
-#if defined(APPLE)
+#ifdef __APPLE__   
 #include "CoreFoundation/CoreFoundation.h"
 #include <unistd.h>
 #include <libgen.h>
@@ -80,7 +80,7 @@ int main(const int argc, const char* const * const argv) {
 
 		CFRelease(exeURL);
 
-		auto p = augs::path_type(p);
+		auto p = augs::path_type(path);
 		p.replace_filename("");
 
 		auto s = p.string();
