@@ -402,36 +402,8 @@ void settings_gui_state::perform(
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
 				if (!config.window.fullscreen) {
 					auto indent = scoped_indent();
-					
-					{
-						revertable_drag_rect_bounded_vec2i("Window position", config.window.position, 0.3f, vec2i{ 0, 0 }, vec2i(10000, 10000));
-						revertable_drag_rect_bounded_vec2i("Windowed size", config.window.size, 0.3f, vec2i{ 0, 0 }, vec2i(10000, 10000));
-					}
 
 					revertable_checkbox(CONFIG_NVP(window.border));
-
-					text("GUI cursor input source");
-
-					int e = config.window.raw_mouse_input ? 1 : 0;
-					ImGui::RadioButton("Raw (traps cursor inside the window)", &e, 1);
-					
-					if (ImGui::IsItemHovered()) {
-						text_tooltip("Game draws its own cursor.\nWhen in GUI mode,\nforces the cursor inside the window.");
-					}
-#if TODO
-					if (config.window.raw_mouse_input) {
-						auto indent = scoped_indent();
-
-						revertable_checkbox("But use system cursor for GUI", config.session.use_system_cursor_for_gui);
-					}
-#endif
-					ImGui::RadioButton("System cursor", &e, 0);
-
-					if (ImGui::IsItemHovered()) {
-						text_tooltip("When in GUI mode,\nlets the cursor go outside the window.");
-					}
-
-					config.window.raw_mouse_input = e != 0;
 				}
 
 				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);

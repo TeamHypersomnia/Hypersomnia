@@ -9,6 +9,9 @@ summary: That which we are brainstorming at the moment.
 - Duplicate the updaters to exe/sfx files without "updater" suffix for old clients to update successfully
 - Update existing links on Discord
 
+- Fullscreen issue on mac
+	- Perhaps always use system cursor
+
 - MacOS fixes
 	- GLFW_SAMPLES to 0
 	- Research the option to making this an app.zip
