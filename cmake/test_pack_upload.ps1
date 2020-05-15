@@ -41,7 +41,7 @@ Write-Host "Archiving the binary." -ForegroundColor yellow
 $platform = "Windows"
 $uploadUrl = "https://hypersomnia.xyz/upload_artifact.php"
 $apiKey = $artifact_upload_key
-$filePath = "Hypersomnia-for-$platform-updater.exe"
+$filePath = "Hypersomnia-for-$platform.exe"
 $commitHash = $(git rev-parse HEAD)
 $commitNumber = $(git rev-list --count master)
 $commitMessage = $(git log -1 --pretty=%B)

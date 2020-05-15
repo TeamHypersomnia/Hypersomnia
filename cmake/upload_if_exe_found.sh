@@ -21,7 +21,7 @@ if [ -f "$EXE_PATH" ]; then
 
 	cp build/current/Hypersomnia hypersomnia/Hypersomnia
 
-	if [[ "$PLATFORM" = "MacOS-updater" ]]
+	if [[ "$PLATFORM" = "MacOS" ]]
 	then
 		mv hypersomnia/Hypersomnia hypersomnia/Hypersomnia.command
 	fi
@@ -32,25 +32,20 @@ if [ -f "$EXE_PATH" ]; then
 	7z a -sfx $FILE_PATH hypersomnia
 	curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 
-	if [[ "$PLATFORM" = "MacOS-updater" ]]
+	if [[ "$PLATFORM" = "MacOS" ]]
 	then
 		# Also upload a plain zip file for first-time downloads on MacOS
 		echo "Uploading a zip file for first-time downloads on MacOS."
-
-		PLATFORM="MacOS"
 		FILE_PATH="Hypersomnia-for-$PLATFORM.zip"
 		zip -r $FILE_PATH hypersomnia
 
 		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 	fi
 
-	if [[ "$PLATFORM" = "Linux-updater" ]]
+	if [[ "$PLATFORM" = "Linux" ]]
 	then
 		echo "Uploading a tar.gz archive for first-time downloads on Linux."
-
-		PLATFORM="Linux"
 		FILE_PATH="Hypersomnia-for-$PLATFORM.tar.gz"
-
 		tar -czf $FILE_PATH hypersomnia
 
 		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL

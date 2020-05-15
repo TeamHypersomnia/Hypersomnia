@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Duplicate the updaters to exe/sfx files without "updater" suffix for old clients to update successfully
+- Update existing links on Discord
+
 - MacOS fixes
 	- GLFW_SAMPLES to 0
 	- Research the option to making this an app.zip

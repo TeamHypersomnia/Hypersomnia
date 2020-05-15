@@ -97,7 +97,7 @@ script:
   - popd
   - ls -l hypersomnia
   - cmake/print_bt_if_core_found.sh hypersomnia/core
-  - API_KEY=$artifact_upload_key cmake/upload_if_exe_found.sh Linux-updater $TRAVIS_BRANCH
+  - API_KEY=$artifact_upload_key cmake/upload_if_exe_found.sh Linux $TRAVIS_BRANCH
 
 notfications:
   email: false

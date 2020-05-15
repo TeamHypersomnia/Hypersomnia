@@ -43,13 +43,13 @@ using client_type = httplib::Client;
 using response_ptr = std::shared_ptr<httplib::Response>;
 
 #if USE_GLFW
-#define PLATFORM_STRING "MacOS-updater"
+#define PLATFORM_STRING "MacOS"
 #define ARCHIVE_EXTENSION "sfx"
 #elif PLATFORM_UNIX
-#define PLATFORM_STRING "Linux-updater"
+#define PLATFORM_STRING "Linux"
 #define ARCHIVE_EXTENSION "sfx"
 #elif PLATFORM_WINDOWS
-#define PLATFORM_STRING "Windows-updater"
+#define PLATFORM_STRING "Windows"
 #define ARCHIVE_EXTENSION "exe"
 #else
 #error "UNSUPPORTED!"
