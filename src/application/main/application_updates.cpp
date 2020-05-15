@@ -46,10 +46,10 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 #define PLATFORM_STRING "MacOS-updater"
 #define ARCHIVE_EXTENSION "sfx"
 #elif PLATFORM_UNIX
-#define PLATFORM_STRING "Linux"
+#define PLATFORM_STRING "Linux-updater"
 #define ARCHIVE_EXTENSION "sfx"
 #elif PLATFORM_WINDOWS
-#define PLATFORM_STRING "Windows"
+#define PLATFORM_STRING "Windows-updater"
 #define ARCHIVE_EXTENSION "exe"
 #else
 #error "UNSUPPORTED!"

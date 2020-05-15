@@ -19,8 +19,6 @@ if [ -f "$EXE_PATH" ]; then
 	FILE_PATH="Hypersomnia-for-$PLATFORM.sfx"
 	UPLOAD_URL="https://hypersomnia.xyz/upload_artifact.php"
 
-	# . cmake/linux_launcher_install.sh
-
 	cp build/current/Hypersomnia hypersomnia/Hypersomnia
 
 	if [[ "$PLATFORM" = "MacOS-updater" ]]
@@ -37,11 +35,23 @@ if [ -f "$EXE_PATH" ]; then
 	if [[ "$PLATFORM" = "MacOS-updater" ]]
 	then
 		# Also upload a plain zip file for first-time downloads on MacOS
-		echo "Uploading a zip file too, since it's MacOS."
+		echo "Uploading a zip file for first-time downloads on MacOS."
 
 		PLATFORM="MacOS"
 		FILE_PATH="Hypersomnia-for-$PLATFORM.zip"
 		zip -r $FILE_PATH hypersomnia
+
+		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
+	fi
+
+	if [[ "$PLATFORM" = "Linux-updater" ]]
+	then
+		echo "Uploading a tar.gz archive for first-time downloads on Linux."
+
+		PLATFORM="Linux"
+		FILE_PATH="Hypersomnia-for-$PLATFORM.tar.gz"
+
+		tar -czf $FILE_PATH hypersomnia
 
 		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 	fi
