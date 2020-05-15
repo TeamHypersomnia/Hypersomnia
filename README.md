@@ -315,8 +315,8 @@ Refer to [macos_build.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/m
 - H - hide the most recently wielded item. Can fail if you have no space in your inventory!
 - E - defuse the bomb. If you move when defusing, the timer is reset, so stay still. You can shoot, though. Just remember to keep the trigger in the bomb's range, they have to touch.
 - C - pull out the bomb (as a terrorist)
-- Wheel Up - quickly throw a knife (or another melee weapon you happen to have).
-- Wheel Down - quickly throw two knives (or other melee weapons you happen to have).
+- Wheel Down - quickly throw a knife (or another melee weapon you happen to have).
+- Wheel Up - quickly throw two knives (or other melee weapons you happen to have).
 - Middle mouse button - quickly throw a Force grenade.
 - Mouse4 - quickly throw a Flashbang.
 - Mouse5 - quickly throw a PED grenade (destroys Personal Electricity).
