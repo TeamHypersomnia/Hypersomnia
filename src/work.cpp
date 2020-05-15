@@ -193,6 +193,11 @@ work_result work(const int argc, const char* const * const argv) try {
 		result.audio.enable_hrtf = false;
 #endif
 
+#if USE_GLFW
+		result.window.fullscreen = false;
+		result.window.vsync_mode = augs::vsync_type::ON;
+#endif
+
 		return result;
 	}();
 
