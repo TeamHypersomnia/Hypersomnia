@@ -9,19 +9,10 @@
 #include "cmd_line_params.h"
 #include "build_info.h"
 
-#if USE_GLFW
-#include <mach-o/dyld.h>
-
-augs::path_type get_current_exe_path() {
-	char path[1024];
-	uint32_t size = sizeof(path);
-
-	if (_NSGetExecutablePath(path, &size) == 0) {
-		return path;
-	}
-
-	return augs::path_type();
-}
+#if defined(APPLE)
+#include "CoreFoundation/CoreFoundation.h"
+#include <unistd.h>
+#include <libgen.h>
 #elif PLATFORM_UNIX
 #include <unistd.h>
 augs::path_type get_current_exe_path() {
@@ -78,7 +69,29 @@ int main(const int argc, const char* const * const argv) {
 	const auto params = cmd_line_params(argc, argv);
 
 	if (!params.keep_cwd) {
-#if !PLATFORM_WINDOWS && !BUILD_IN_CONSOLE_MODE
+#ifdef __APPLE__    
+		CFBundleRef mainBundle = CFBundleGetMainBundle();
+		CFURLRef exeURL = CFBundleCopyExecutableURL(mainBundle);
+		char path[PATH_MAX];
+		if (!CFURLGetFileSystemRepresentation(exeURL, TRUE, (UInt8 *)path, PATH_MAX))
+		{
+			// error!
+		}
+
+		CFRelease(exeURL);
+
+		auto p = augs::path_type(p);
+		p.replace_filename("");
+
+		auto s = p.string();
+
+		std::cout << "CHANGING CWD TO: " << s << std::endl;
+
+		chdir(s.c_str());
+
+		std::cout << "CHANGED CWD TO: " << std::filesystem::current_path().string() << std::endl;
+
+#elif PLATFORM_UNIX && !BUILD_IN_CONSOLE_MODE
 		if (auto exe_path = get_current_exe_path(); !exe_path.empty()) {
 			exe_path.replace_filename("");
 			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;
