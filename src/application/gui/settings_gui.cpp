@@ -337,7 +337,9 @@ void settings_gui_state::perform(
 
 		int field_id = 0;
 
-		do_pretty_tabs(active_pane);
+		do_pretty_tabs(active_pane, [](const settings_pane) -> std::optional<std::string> { 
+			return std::nullopt; 
+		});
 
 		auto revert = make_revert_button_lambda(config, last_saved_config);
 
@@ -349,8 +351,9 @@ void settings_gui_state::perform(
 		};
 
 		auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
-			slider(l, f, std::forward<decltype(args)>(args)...);
-			revert(f);
+			bool result = slider(l, f, std::forward<decltype(args)>(args)...);
+			bool rresult = revert(f);
+			return result || rresult;
 		};
 
 		auto revertable_drag_rect_bounded_vec2i = [&](auto l, auto& f, auto&&... args) {
@@ -484,7 +487,11 @@ void settings_gui_state::perform(
 
 				break;
 			}
-			case settings_pane::RENDERING: {
+			case settings_pane::GRAPHICS: {
+				text_color("Rendering", yellow);
+
+				ImGui::Separator();
+
 				enum_combo("Default filtering", config.renderer.default_filtering);
 
 				{
@@ -507,68 +514,60 @@ void settings_gui_state::perform(
 
 				revertable_checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
 
-				if (auto node = scoped_tree_node("Arena mode GUI")) {
-					if (auto node = scoped_tree_node("Scoreboard")) {
-						auto scope = scoped_indent();
-						auto& scope_cfg = config.arena_mode_gui.scoreboard_settings;
+				ImGui::Separator();
 
-						revertable_slider(SCOPE_CFG_NVP(cell_bg_alpha), 0.f, 1.f);
-						
-						revertable_drag_vec2(SCOPE_CFG_NVP(player_row_inner_padding), 1.f, 0, 20);
+				text_color("Effects", yellow);
 
-						revertable_color_edit(SCOPE_CFG_NVP(background_color));
-						revertable_color_edit(SCOPE_CFG_NVP(border_color));
+				ImGui::Separator();
 
-						revertable_slider(SCOPE_CFG_NVP(bg_lumi_mult), 0.f, 5.f);
-						revertable_slider(SCOPE_CFG_NVP(text_lumi_mult), 0.f, 5.f);
-						revertable_slider(SCOPE_CFG_NVP(current_player_bg_lumi_mult), 0.f, 5.f);
-						revertable_slider(SCOPE_CFG_NVP(current_player_text_lumi_mult), 0.f, 5.f);
-						revertable_slider(SCOPE_CFG_NVP(dead_player_bg_lumi_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(dead_player_bg_alpha_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(dead_player_text_alpha_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(dead_player_text_lumi_mult), 0.f, 1.f);
+				{
+					auto& scope_cfg = config.performance.special_effects;
+					revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(particle_burst_amount), 0.f, 1.f);
+				}
 
-						revertable_slider(SCOPE_CFG_NVP(text_stroke_lumi_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(faction_logo_alpha), 0.f, 1.f);
-						revertable_checkbox(SCOPE_CFG_NVP(dark_color_overlay_under_score));
-					}
+				ImGui::Separator();
 
-					if (auto node = scoped_tree_node("Buy menu")) {
-						auto scope = scoped_indent();
-						auto& scope_cfg = config.arena_mode_gui.buy_menu_settings;
+				text_color("Explosion effects intensity", yellow);
 
-						revertable_color_edit(SCOPE_CFG_NVP(disabled_bg));
-						revertable_color_edit(SCOPE_CFG_NVP(disabled_active_bg));
+				ImGui::Separator();
 
-						revertable_color_edit(SCOPE_CFG_NVP(already_owns_bg));
-						revertable_color_edit(SCOPE_CFG_NVP(already_owns_active_bg));
+				{
+					auto& scope_cfg = config.performance.special_effects.explosions;
 
-						revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_bg));
-						revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_active_bg));
-					}
+					revertable_slider(SCOPE_CFG_NVP(sparkle_amount), 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(thunder_amount), 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(smoke_amount), 0.f, 1.f);
+				}
 
-					auto& scope_cfg = config.arena_mode_gui;
+				ImGui::Separator();
 
-					if (auto node = scoped_tree_node("Knockouts indicators")) {
-						auto scope = scoped_indent();
+				text_color("Lighting", yellow);
 
-						revertable_slider(SCOPE_CFG_NVP(between_knockout_boxes_pad), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(inside_knockout_box_pad), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(weapon_icon_horizontal_pad), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(keep_recent_knockouts_for_seconds), 0.f, 20.f);
-						revertable_slider("Max weapon icon height (0 for no limit)", scope_cfg.max_weapon_icon_height, 0u, 100u);
-					}
+				ImGui::Separator();
 
-					if (auto node = scoped_tree_node("Money indicator")) {
-						auto scope = scoped_indent();
+				{
+					auto& scope_cfg = config.drawing;
+					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_sentiences));
+					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_other_bodies));
+				}
 
-						revertable_drag_rect_bounded_vec2i("Money indicator position", scope_cfg.money_indicator_pos, 0.3f, -vec2i(screen_size), vec2i(screen_size));
-						revertable_color_edit("Money indicator color", scope_cfg.money_indicator_color);
-						revertable_color_edit("Award indicator color", scope_cfg.award_indicator_color);
-						revertable_slider(SCOPE_CFG_NVP(show_recent_awards_num), 0u, 20u);
-						revertable_slider(SCOPE_CFG_NVP(keep_recent_awards_for_seconds), 0.f, 20.f);
-					}
+
+				{
+					auto& scope_cfg = config.performance;
+					revertable_enum_radio(SCOPE_CFG_NVP(wall_light_drawing_precision));
+				}
+
+				ImGui::Separator();
+
+				text_color("Decorations", yellow);
+
+				ImGui::Separator();
+
+				auto& scope_cfg = config.lag_compensation;
+
+				{
+					revertable_checkbox(SCOPE_CFG_NVP(simulate_decorative_organisms_during_reconciliation));
 				}
 
 				break;
@@ -590,7 +589,7 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
-				text_color("Sound effect spatialization", yellow);
+				text_color("Spatialization", yellow);
 
 				ImGui::Separator();
 
@@ -626,15 +625,52 @@ void settings_gui_state::perform(
 				revertable_slider("Speed of sound (m/s)", config.audio.sound_meters_per_second, 50.f, 400.f);
 				revertable_slider("Max object speed for doppler calculation", config.sound.max_speed_for_doppler_calculation, 0.f, 10000.f);
 
+				text_color("Sound quality", yellow);
+
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.sound;
+
+					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
+					revertable_slider(SCOPE_CFG_NVP(max_simultaneous_bullet_trace_sounds), 0, 20);
+					revertable_slider(SCOPE_CFG_NVP(max_short_sounds), 0, static_cast<int>(SOUNDS_SOURCES_IN_POOL));
+
+					revertable_slider(SCOPE_CFG_NVP(missile_impact_sound_cooldown_duration), 1.f, 100.f);
+					revertable_slider(SCOPE_CFG_NVP(missile_impact_occurences_before_cooldown), 0, 10);
+				}
 
 				break;
 			}
+
 			case settings_pane::CONTROLS: {
 				auto& scope_cfg = config.input;
 
 				{
 					auto& scope_cfg = config.input.character;
-					revertable_drag_vec2(SCOPE_CFG_NVP(crosshair_sensitivity));
+
+					if (separate_sensitivity_axes == std::nullopt) {
+						separate_sensitivity_axes = scope_cfg.crosshair_sensitivity.x != scope_cfg.crosshair_sensitivity.y;
+					}
+
+					auto& separate_axes = *separate_sensitivity_axes;
+
+					if (separate_axes) {
+						revertable_slider("Horizontal sensitivity", scope_cfg.crosshair_sensitivity.x, 0.1f, 5.0f, "%.1f");
+						revertable_slider("Vertical sensitivity", scope_cfg.crosshair_sensitivity.y, 0.1f, 5.0f, "%.1f");
+					}
+					else {
+						if (revertable_slider("Mouse sensitivity", scope_cfg.crosshair_sensitivity.x, 0.1f, 5.0f, "%.1f")) {
+							scope_cfg.crosshair_sensitivity.y = scope_cfg.crosshair_sensitivity.x;
+						}
+					}
+
+					if (checkbox("Separate sensitivity axes", separate_axes)) {
+						if (separate_axes == false) {
+							scope_cfg.crosshair_sensitivity.y = scope_cfg.crosshair_sensitivity.x;
+						}
+					}
+
 					revertable_checkbox(SCOPE_CFG_NVP(keep_movement_forces_relative_to_crosshair));
 				}
 
@@ -645,7 +681,13 @@ void settings_gui_state::perform(
 					revertable_checkbox(SCOPE_CFG_NVP(allow_switching_to_bare_hands_as_previous_wielded_weapon));
 				}
 
-				text_disabled("\n");
+				{
+					auto& scope_cfg = config.game_gui;
+
+					revertable_checkbox(SCOPE_CFG_NVP(autodrop_magazines_of_dropped_weapons));
+					// revertable_checkbox(SCOPE_CFG_NVP(autodrop_holstered_armed_explosives));
+					revertable_checkbox(SCOPE_CFG_NVP(autocollapse_hotbar_buttons));
+				}
 
 				const auto binding_text_color = rgba(255, 255, 255, 255);
 				const auto bindings_title_color = rgba(255, 255, 0, 255);
@@ -885,6 +927,7 @@ void settings_gui_state::perform(
 
 				break;
 			}
+
 			case settings_pane::GAMEPLAY: {
 				{
 					auto& scope_cfg = config.arena_mode_gui;
@@ -995,14 +1038,6 @@ void settings_gui_state::perform(
 						}
 
 					}
-				}
-
-				if (auto node = scoped_tree_node("Inventory behaviour")) {
-					auto& scope_cfg = config.game_gui;
-
-					revertable_checkbox(SCOPE_CFG_NVP(autodrop_magazines_of_dropped_weapons));
-					revertable_checkbox(SCOPE_CFG_NVP(autodrop_holstered_armed_explosives));
-					revertable_checkbox(SCOPE_CFG_NVP(autocollapse_hotbar_buttons));
 				}
 
 				if (auto node = scoped_tree_node("Fog of war")) {
@@ -1277,15 +1312,79 @@ void settings_gui_state::perform(
 
 				break;
 			}
-			case settings_pane::GUI: {
+			case settings_pane::INTERFACE: {
 				if (auto node = scoped_tree_node("GUI font")) {
 					auto scope = scoped_indent();
 
 					revertable_slider("Size in pixels", config.gui_fonts.gui.size_in_pixels, 5.f, 64.f);
 				}
 
+				if (auto node = scoped_tree_node("Arena mode GUI")) {
+					if (auto node = scoped_tree_node("Scoreboard")) {
+						auto scope = scoped_indent();
+						auto& scope_cfg = config.arena_mode_gui.scoreboard_settings;
+
+						revertable_slider(SCOPE_CFG_NVP(cell_bg_alpha), 0.f, 1.f);
+						
+						revertable_drag_vec2(SCOPE_CFG_NVP(player_row_inner_padding), 1.f, 0, 20);
+
+						revertable_color_edit(SCOPE_CFG_NVP(background_color));
+						revertable_color_edit(SCOPE_CFG_NVP(border_color));
+
+						revertable_slider(SCOPE_CFG_NVP(bg_lumi_mult), 0.f, 5.f);
+						revertable_slider(SCOPE_CFG_NVP(text_lumi_mult), 0.f, 5.f);
+						revertable_slider(SCOPE_CFG_NVP(current_player_bg_lumi_mult), 0.f, 5.f);
+						revertable_slider(SCOPE_CFG_NVP(current_player_text_lumi_mult), 0.f, 5.f);
+						revertable_slider(SCOPE_CFG_NVP(dead_player_bg_lumi_mult), 0.f, 1.f);
+						revertable_slider(SCOPE_CFG_NVP(dead_player_bg_alpha_mult), 0.f, 1.f);
+						revertable_slider(SCOPE_CFG_NVP(dead_player_text_alpha_mult), 0.f, 1.f);
+						revertable_slider(SCOPE_CFG_NVP(dead_player_text_lumi_mult), 0.f, 1.f);
+
+						revertable_slider(SCOPE_CFG_NVP(text_stroke_lumi_mult), 0.f, 1.f);
+						revertable_slider(SCOPE_CFG_NVP(faction_logo_alpha), 0.f, 1.f);
+						revertable_checkbox(SCOPE_CFG_NVP(dark_color_overlay_under_score));
+					}
+
+					if (auto node = scoped_tree_node("Buy menu")) {
+						auto scope = scoped_indent();
+						auto& scope_cfg = config.arena_mode_gui.buy_menu_settings;
+
+						revertable_color_edit(SCOPE_CFG_NVP(disabled_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(disabled_active_bg));
+
+						revertable_color_edit(SCOPE_CFG_NVP(already_owns_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(already_owns_active_bg));
+
+						revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(already_owns_other_type_active_bg));
+					}
+
+					auto& scope_cfg = config.arena_mode_gui;
+
+					if (auto node = scoped_tree_node("Knockouts indicators")) {
+						auto scope = scoped_indent();
+
+						revertable_slider(SCOPE_CFG_NVP(between_knockout_boxes_pad), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(inside_knockout_box_pad), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(weapon_icon_horizontal_pad), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(keep_recent_knockouts_for_seconds), 0.f, 20.f);
+						revertable_slider("Max weapon icon height (0 for no limit)", scope_cfg.max_weapon_icon_height, 0u, 100u);
+					}
+
+					if (auto node = scoped_tree_node("Money indicator")) {
+						auto scope = scoped_indent();
+
+						revertable_drag_rect_bounded_vec2i("Money indicator position", scope_cfg.money_indicator_pos, 0.3f, -vec2i(screen_size), vec2i(screen_size));
+						revertable_color_edit("Money indicator color", scope_cfg.money_indicator_color);
+						revertable_color_edit("Award indicator color", scope_cfg.award_indicator_color);
+						revertable_slider(SCOPE_CFG_NVP(show_recent_awards_num), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(keep_recent_awards_for_seconds), 0.f, 20.f);
+					}
+				}
+
 				text(
-					"Note: this is the original ImGui style tweaker.\n"
+					"Note: what follows is the original ImGui style tweaker.\n"
 					"It is used because imgui is being continuously improved,\n"
 					"so keeping it up to date by ourselves would be pretty hard.\n\n"
 					"To save your changes to the local configuration file,\n"
@@ -1297,121 +1396,8 @@ void settings_gui_state::perform(
 
 				break;
 			}
-			case settings_pane::PERFORMANCE: {
-				text_color("Sound quality", yellow);
 
-				ImGui::Separator();
-
-				{
-					auto& scope_cfg = config.sound;
-
-					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
-					revertable_slider(SCOPE_CFG_NVP(max_simultaneous_bullet_trace_sounds), 0, 20);
-					revertable_slider(SCOPE_CFG_NVP(max_short_sounds), 0, static_cast<int>(SOUNDS_SOURCES_IN_POOL));
-
-					revertable_slider(SCOPE_CFG_NVP(missile_impact_sound_cooldown_duration), 1.f, 100.f);
-					revertable_slider(SCOPE_CFG_NVP(missile_impact_occurences_before_cooldown), 0, 10);
-				}
-
-				ImGui::Separator();
-
-				text_color("General effects", yellow);
-
-				ImGui::Separator();
-
-				{
-					auto& scope_cfg = config.performance.special_effects;
-					revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
-					revertable_slider(SCOPE_CFG_NVP(particle_burst_amount), 0.f, 1.f);
-				}
-
-				ImGui::Separator();
-
-				text_color("Explosion effects intensity", yellow);
-
-				ImGui::Separator();
-
-				{
-					auto& scope_cfg = config.performance.special_effects.explosions;
-
-					revertable_slider(SCOPE_CFG_NVP(sparkle_amount), 0.f, 1.f);
-					revertable_slider(SCOPE_CFG_NVP(thunder_amount), 0.f, 1.f);
-					revertable_slider(SCOPE_CFG_NVP(smoke_amount), 0.f, 1.f);
-				}
-
-				ImGui::Separator();
-
-				text_color("Light", yellow);
-
-				ImGui::Separator();
-
-				{
-					auto& scope_cfg = config.drawing;
-					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_sentiences));
-					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_other_bodies));
-				}
-
-
-				{
-					auto& scope_cfg = config.performance;
-					revertable_enum_radio(SCOPE_CFG_NVP(wall_light_drawing_precision));
-				}
-
-				ImGui::Separator();
-
-				text_color("Decorations", yellow);
-
-				ImGui::Separator();
-
-				auto& scope_cfg = config.lag_compensation;
-
-				{
-					revertable_checkbox(SCOPE_CFG_NVP(simulate_decorative_organisms_during_reconciliation));
-				}
-
-				ImGui::Separator();
-
-				text_color("Multithreading", yellow);
-
-				ImGui::Separator();
-
-				{
-					auto& scope_cfg = config.performance;
-
-					revertable_enum_radio(SCOPE_CFG_NVP(swap_window_buffers_when));
-
-					const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
-
-					{
-						text("Concurrent hardware threads:");
-						ImGui::SameLine();
-						text_color(typesafe_sprintf("%x", concurrency), green);
-					}
-
-					{
-						const auto default_n = performance_settings::get_default_num_pool_workers();
-						text("Default number of thread pool workers:");
-						ImGui::SameLine();
-						text_color(typesafe_sprintf("%x\n\n", default_n), default_n == 0 ? red : green);
-					}
-
-
-					{
-						auto& cn = scope_cfg.custom_num_pool_workers;
-						revertable_checkbox("Custom number of thread pool workers", cn.is_enabled);
-
-						if (cn.is_enabled) {
-							auto indent = scoped_indent();
-							revertable_slider("##ThreadCount", cn.value, 0, concurrency * 3);
-						}
-					}
-
-					revertable_slider(SCOPE_CFG_NVP(max_particles_in_single_job), 1000, 20000);
-				}
-
-				break;
-			}
-			case settings_pane::DEBUG: {
+			case settings_pane::ADVANCED: {
 				const auto cwd = augs::get_current_working_directory();
 				text("Working directory: %x", cwd, std::filesystem::absolute(cwd));
 				text("Cache folder location: %x (%x)", GENERATED_FILES_DIR, std::filesystem::absolute(GENERATED_FILES_DIR));
@@ -1500,6 +1486,46 @@ void settings_gui_state::perform(
 
 					revertable_slider(SCOPE_CFG_NVP(atlas_blitting_threads), 1u, t_max);
 					revertable_slider(SCOPE_CFG_NVP(neon_regeneration_threads), 1u, t_max);
+				}
+
+				ImGui::Separator();
+
+				text_color("Multithreading", yellow);
+
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.performance;
+
+					revertable_enum_radio(SCOPE_CFG_NVP(swap_window_buffers_when));
+
+					const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
+
+					{
+						text("Concurrent hardware threads:");
+						ImGui::SameLine();
+						text_color(typesafe_sprintf("%x", concurrency), green);
+					}
+
+					{
+						const auto default_n = performance_settings::get_default_num_pool_workers();
+						text("Default number of thread pool workers:");
+						ImGui::SameLine();
+						text_color(typesafe_sprintf("%x\n\n", default_n), default_n == 0 ? red : green);
+					}
+
+
+					{
+						auto& cn = scope_cfg.custom_num_pool_workers;
+						revertable_checkbox("Custom number of thread pool workers", cn.is_enabled);
+
+						if (cn.is_enabled) {
+							auto indent = scoped_indent();
+							revertable_slider("##ThreadCount", cn.value, 0, concurrency * 3);
+						}
+					}
+
+					revertable_slider(SCOPE_CFG_NVP(max_particles_in_single_job), 1000, 20000);
 				}
 
 				break;

@@ -110,7 +110,8 @@ return {
     E = "USE",
 	R = "RELOAD",
 
-	C = "WIELD_BOMB"
+	C = "WIELD_BOMB",
+    Backspace = "SWITCH_CAMERA_MODE"
   },
 
   general_gui_controls = {
@@ -126,9 +127,7 @@ return {
 	F8 = "SERVER_ADMIN_PANEL",
 
 	RightMouseButton = "SPECTATE_PREVIOUS",
-	LeftMouseButton = "SPECTATE_NEXT",
-
-    Backspace = "CLEAR_DEBUG_LINES"
+	LeftMouseButton = "SPECTATE_NEXT"
   },
 
   inventory_gui_controls = {

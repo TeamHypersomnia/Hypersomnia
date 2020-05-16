@@ -1,20 +1,22 @@
 #pragma once
 #include "augs/templates/enum_introspect.h"
 
-template <class E>
-void do_pretty_tabs(E& active_pane) {
+template <class E, class F>
+void do_pretty_tabs(E& active_pane, F custom_name) {
 	using namespace augs::imgui;
 
 	{
 		auto style = scoped_style_var(ImGuiStyleVar_FramePadding, []() { auto padding = ImGui::GetStyle().FramePadding; padding.x *= 4; return padding; }());
 
 		{
-			static auto labels = []() {
+			static auto labels = [custom_name]() {
 				static augs::enum_array<std::string, E> label_strs;
 				augs::enum_array<const char*, E> c_strs;
 
-				augs::for_each_enum_except_bounds([&c_strs](const E s) {
-					label_strs[s] = format_enum(s);
+				augs::for_each_enum_except_bounds([&c_strs, custom_name](const E s) {
+					const auto custom = custom_name(s);
+
+					label_strs[s] = custom != std::nullopt ? *custom : format_enum(s);
 					c_strs[s] = label_strs[s].c_str();
 				});
 
@@ -32,3 +34,9 @@ void do_pretty_tabs(E& active_pane) {
 		ImGui::Separator();
 	}
 }
+
+template <class E>
+void do_pretty_tabs(E& active_pane) {
+	do_pretty_tabs(active_pane, [](const E) -> std::optional<std::string> { return std::nullopt; });
+}
+

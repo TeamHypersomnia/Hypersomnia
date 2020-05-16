@@ -9,16 +9,15 @@ struct config_lua_table;
 enum class settings_pane {
 	// GEN INTROSPECTOR enum class settings_pane
 	GENERAL,
-	RENDERING,
-	AUDIO,
 	CONTROLS,
 	GAMEPLAY,
+	GRAPHICS,
+	AUDIO,
 	CLIENT,
 	SERVER,
 	EDITOR,
-	GUI,
-	PERFORMANCE,
-	DEBUG,
+	INTERFACE,
+	ADVANCED,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -83,6 +82,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	key_hijack_request reassignment_request;
 	key_hijack_request hijacking;
+	std::optional<bool> separate_sensitivity_axes;
 
 public:
 	using base = standard_window_mixin<settings_gui_state>;
