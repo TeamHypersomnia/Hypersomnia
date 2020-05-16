@@ -30,7 +30,7 @@ if [ -f "$EXE_PATH" ]; then
 		echo "Preparing the application bundle."
 
 		APP_PATH="Hypersomnia.app"
-		ZIP_PATH="Hypersomnia-for-$PLATFORM.app.zip"
+		ZIP_PATH="Hypersomnia-for-$PLATFORM.zip"
 		SFX_PATH="Hypersomnia-for-$PLATFORM.app.sfx"
 		CONTENTS_DIR="$APP_PATH/Contents"
 
@@ -44,7 +44,10 @@ if [ -f "$EXE_PATH" ]; then
 		FILE_PATH=$SFX_PATH
 		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 
-		zip -r $ZIP_PATH $APP_PATH 
+		WRAPPER_PATH="Hypersomnia for MacOS"
+		mkdir "$WRAPPER_PATH"
+		mv $APP_PATH "$WRAPPER_PATH"
+		zip -r $ZIP_PATH "$WRAPPER_PATH" 
 
 		echo "Uploading an app.zip file for first-time downloads on MacOS."
 		FILE_PATH=$ZIP_PATH
