@@ -28,9 +28,6 @@
 [submodule "src/3rdparty/vorbis"]
 	path = src/3rdparty/vorbis
 	url = https://github.com/xiph/vorbis
-[submodule "hypersomnia/scripts/serpent"]
-	path = hypersomnia/scripts/serpent
-	url = https://github.com/pkulchenko/serpent.git
 [submodule "src/3rdparty/imgui"]
 	path = src/3rdparty/imgui
 	url = https://github.com/ocornut/imgui
