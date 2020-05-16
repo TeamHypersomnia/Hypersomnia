@@ -86,7 +86,7 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::CHARACTER];
 		out.categoryBits = make_flags(C::CHARACTER);
-		out.maskBits = standard_participation_except(C::LYING_ITEM);
+		out.maskBits = standard_participation_except();
 	}
 	{
 
