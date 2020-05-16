@@ -33,7 +33,7 @@ void intent_contextualization_system::handle_use_button_presses(const logic_step
 	for (auto& e : intents) {
 		const auto subject = cosm[e.subject];
 
-		if (e.intent == game_intent_type::USE) {
+		if (e.intent == game_intent_type::INTERACT) {
 			if (const auto sentience = subject.find<components::sentience>()) {
 				auto& u = sentience->use_button;
 
@@ -130,10 +130,10 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 		subject.dispatch_on_having_all<components::sentience>([&](const auto& typed_subject) {
 			auto requested_index = static_cast<std::size_t>(-1);
 
-			if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
+			if (it.intent == game_intent_type::SHOOT) {
 				requested_index = 0;
 			}
-			else if (it.intent == game_intent_type::CROSSHAIR_SECONDARY_ACTION) {
+			else if (it.intent == game_intent_type::SHOOT_SECONDARY) {
 				requested_index = 1;
 			}
 
@@ -217,7 +217,7 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 				|| e.intent == game_intent_type::MOVE_BACKWARD
 				|| e.intent == game_intent_type::MOVE_LEFT
 				|| e.intent == game_intent_type::MOVE_RIGHT
-				|| e.intent == game_intent_type::WALK
+				|| e.intent == game_intent_type::WALK_SILENTLY
 				|| e.intent == game_intent_type::SPRINT
 			) {
 				callee = maybe_driver->owned_vehicle;

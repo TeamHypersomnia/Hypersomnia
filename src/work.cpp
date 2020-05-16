@@ -1509,7 +1509,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		using T = decltype(intent);
 
 		switch (intent) {
-			case T::SWITCH_DEVELOPER_CONSOLE: {
+			case T::SHOW_DEVELOPER_DETAILS: {
 				change_with_save([](config_lua_table& cfg) {
 					bool& f = cfg.session.show_developer_console;
 					f = !f;
@@ -1530,7 +1530,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				DEBUG_PERSISTENT_LINES.clear();
 				return true;
 
-			case T::SWITCH_WEAPON_LASER: {
+			case T::TOGGLE_WEAPON_LASER: {
 				bool& f = config.drawing.draw_weapon_laser;
 				f = !f;
 				return true;

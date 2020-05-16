@@ -146,7 +146,7 @@ inline void draw_context_tip(
 				}
 
 				text("Press");
-				hotkey(general_gui_intent_type::OPEN_BUY_MENU);
+				hotkey(general_gui_intent_type::BUY_MENU);
 				text("to buy items.");
 			}
 
@@ -203,7 +203,7 @@ inline void draw_context_tip(
 		if (is_bomb_in_hand) {
 			if (::bombsite_in_range(bomb)) {
 				text("Press and hold");
-				hotkey(bomb_hand_index == 0 ? game_intent_type::CROSSHAIR_PRIMARY_ACTION : game_intent_type::CROSSHAIR_SECONDARY_ACTION);
+				hotkey(bomb_hand_index == 0 ? game_intent_type::SHOOT : game_intent_type::SHOOT_SECONDARY);
 				text("to plant the bomb.");
 
 				return total_text;
@@ -245,7 +245,7 @@ inline void draw_context_tip(
 
 		if (defuse_request.success()) {
 			text("Press");
-			hotkey(game_intent_type::USE);
+			hotkey(game_intent_type::INTERACT);
 			text("to defuse the bomb.");
 
 			return total_text;

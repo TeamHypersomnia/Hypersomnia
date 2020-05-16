@@ -251,6 +251,29 @@ void stun_manager_window::perform() {
 	}
 }
 
+std::string get_custom_binding_name(const game_intent_type intent) {
+	switch (intent) {
+		case game_intent_type::SHOOT:
+			return "Shoot";
+		case game_intent_type::SHOOT_SECONDARY:
+			return "Shoot secondary/Weapon function";
+		default:
+			return "";
+	}
+}
+
+std::string get_custom_binding_name(const general_gui_intent_type) {
+	return "";
+}
+
+std::string get_custom_binding_name(const inventory_gui_intent_type) {
+	return "";
+}
+
+std::string get_custom_binding_name(const app_intent_type) {
+	return "";
+}
+
 void settings_gui_state::perform(
 	sol::state& lua,
 	const augs::audio_context& audio,
@@ -713,7 +736,15 @@ void settings_gui_state::perform(
 						};
 
 						const bool capturing_this_action = hijacking.for_idx == control_i;
-						const auto label = format_enum(a);
+						const auto label = [&]() {
+							const auto custom_name = get_custom_binding_name(a);
+
+							if (custom_name != "") {
+								return custom_name;
+							}
+
+							return format_enum(a);
+						}();
 
 						{
 							auto scope = scoped_style_color(ImGuiCol_Text, binding_text_color);
@@ -860,13 +891,13 @@ void settings_gui_state::perform(
 				text_disabled("Alternative key");
 				ImGui::NextColumn();
 
-				do_bindings_map("Top-level application bindings", config.app_controls);
+				do_bindings_map("Combat controls", config.game_controls);
 				text_disabled("\n\n");
-				do_bindings_map("Gameplay bindings", config.game_controls);
+				do_bindings_map("GUI controls", config.general_gui_controls);
 				text_disabled("\n\n");
-				do_bindings_map("General GUI bindings", config.general_gui_controls);
+				do_bindings_map("Inventory controls", config.inventory_gui_controls);
 				text_disabled("\n\n");
-				do_bindings_map("Inventory GUI bindings", config.inventory_gui_controls);
+				do_bindings_map("General application controls", config.app_controls);
 				text_disabled("\n\n");
 
 				ImGui::Columns(1);

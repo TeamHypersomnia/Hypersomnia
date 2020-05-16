@@ -56,16 +56,16 @@ bool should_fill_hotbar_from_right(const E& handle) {
 
 static int to_hotbar_index(const inventory_gui_intent_type type) {
 	switch (type) {
-	case inventory_gui_intent_type::HOTBAR_BUTTON_0: return 0;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_1: return 1;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_2: return 2;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_3: return 3;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_4: return 4;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_5: return 5;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_6: return 6;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_7: return 7;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_8: return 8;
-	case inventory_gui_intent_type::HOTBAR_BUTTON_9: return 9;
+	case inventory_gui_intent_type::HOTBAR_0: return 0;
+	case inventory_gui_intent_type::HOTBAR_1: return 1;
+	case inventory_gui_intent_type::HOTBAR_2: return 2;
+	case inventory_gui_intent_type::HOTBAR_3: return 3;
+	case inventory_gui_intent_type::HOTBAR_4: return 4;
+	case inventory_gui_intent_type::HOTBAR_5: return 5;
+	case inventory_gui_intent_type::HOTBAR_6: return 6;
+	case inventory_gui_intent_type::HOTBAR_7: return 7;
+	case inventory_gui_intent_type::HOTBAR_8: return 8;
+	case inventory_gui_intent_type::HOTBAR_9: return 9;
 	default: return -1;
 	}
 }
@@ -369,7 +369,7 @@ void game_gui_system::control_hotbar_and_action_button(
 				}
 			}
 		}
-		else if (i.intent == inventory_gui_intent_type::PREVIOUSLY_WIELDED_WEAPON && i.was_pressed()) {
+		else if (i.intent == inventory_gui_intent_type::LAST_USED_WEAPON && i.was_pressed()) {
 			const auto wielding = gui.make_wielding_setup_for_last_hotbar_selection_setup(gui_entity, input);
 
 			//if (!wielding.same_as_in(gui_entity)) {

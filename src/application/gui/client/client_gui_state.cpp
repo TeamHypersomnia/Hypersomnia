@@ -15,7 +15,7 @@ bool client_gui_state::control(const handle_input_before_game_input in) {
 		const auto key = in.e.get_key();
 
 		if (const auto it = mapped_or_nullptr(in.app_controls, key)) {
-			if (*it == general_gui_intent_type::OPEN_RCON_MENU) {
+			if (*it == general_gui_intent_type::SERVER_ADMIN_PANEL) {
 				auto& s = rcon.show;
 				s = !s;
 				return true;
@@ -25,12 +25,12 @@ bool client_gui_state::control(const handle_input_before_game_input in) {
 				chat.open_input_bar(t);
 			};
 
-			if (*it == general_gui_intent_type::OPEN_CHAT) {
+			if (*it == general_gui_intent_type::CHAT) {
 				invoke_chat(chat_target_type::GENERAL);
 				return true;
 			}
 
-			if (*it == general_gui_intent_type::OPEN_TEAM_CHAT) {
+			if (*it == general_gui_intent_type::TEAM_CHAT) {
 				invoke_chat(chat_target_type::TEAM_ONLY);
 				return true;
 			}

@@ -4348,3 +4348,15 @@ Advantages:
 - log detected internal ip on startup
 
 - and ammo counting for pistols
+- Enter for the max fps slider
+	- Let's just leave it at low extents
+- Fullscreen issue on mac
+	- Perhaps always use system cursor
+
+- MacOS fixes
+	- GLFW_SAMPLES to 0
+	- Research the option to making this an app.zip
+	- Fix alt/ctrl buttons and the tilde
+	- Though not sure if it isn't just our keyboard screwed up
+
+- Enable VSync by default on mac or just don't set the interval?

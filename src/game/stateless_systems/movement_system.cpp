@@ -79,7 +79,7 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 						case game_intent_type::MOVE_RIGHT:
 							movement->flags.right = it.was_pressed();
 							break;
-						case game_intent_type::WALK:
+						case game_intent_type::WALK_SILENTLY:
 							movement->flags.walking = it.was_pressed();
 							break;
 						case game_intent_type::SPRINT:
@@ -88,7 +88,7 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 						case game_intent_type::DASH:
 							movement->flags.dashing = it.was_pressed();
 							break;
-						case game_intent_type::PICK_TOUCHING_ITEMS:
+						case game_intent_type::PICK_UP_ITEMS:
 							movement->flags.picking = it.was_pressed();
 							break;
 

@@ -81,7 +81,7 @@ return {
   },
 
   app_controls = {
-    F1 = "SWITCH_DEVELOPER_CONSOLE"
+    F1 = "SHOW_DEVELOPER_DETAILS"
   },
 
   game_controls = {
@@ -93,19 +93,19 @@ return {
     LeftShift = "SPRINT",
     Space = "DASH",
 
-    LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
-    RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
+    LeftMouseButton = "SHOOT",
+    RightMouseButton = "SHOOT_SECONDARY",
 
-    LeftControl = "PICK_TOUCHING_ITEMS",
+    LeftControl = "PICK_UP_ITEMS",
     G = "DROP",
 
-    MiddleMouseButton = "THROW_ANY_FORCE",
-    MouseButton5 = "THROW_ANY_FLASH",
-    MouseButton4 = "THROW_ANY_PED",
-    J = "THROW_ANY_INTERFERENCE",
+    MiddleMouseButton = "THROW_FORCE_GRENADE",
+    MouseButton5 = "THROW_FLASHBANG",
+    MouseButton4 = "THROW_PED_GRENADE",
+    J = "THROW_INTERFERENCE_GRENADE",
 
-    WheelUp = "THROW_ANY_TWO_MELEES",
-    WheelDown = "THROW_ANY_MELEE",
+    WheelUp = "THROW_TWO_KNIVES",
+    WheelDown = "THROW_KNIFE",
 
     E = "USE",
 	R = "RELOAD",
@@ -115,17 +115,17 @@ return {
 
   general_gui_controls = {
     Tilde = "TOGGLE_MOUSE_CURSOR",
-    F = "SWITCH_WEAPON_LASER",
-	Tab = "OPEN_SCOREBOARD",
-	T = "OPEN_BUY_MENU",
+    F = "TOGGLE_WEAPON_LASER",
+	Tab = "SCOREBOARD",
+	T = "BUY_MENU",
 	O = "CHOOSE_TEAM",
 
-	Y = "OPEN_CHAT",
-	U = "OPEN_TEAM_CHAT",
+	Y = "CHAT",
+	U = "TEAM_CHAT",
 
-	F8 = "OPEN_RCON_MENU",
+	F8 = "SERVER_ADMIN_PANEL",
 
-	RightMouseButton = "SPECTATE_PREV",
+	RightMouseButton = "SPECTATE_PREVIOUS",
 	LeftMouseButton = "SPECTATE_NEXT",
 
     Backspace = "CLEAR_DEBUG_LINES"
@@ -157,7 +157,7 @@ return {
     F7 = "SPECIAL_ACTION_BUTTON_12",
 
     H = "HOLSTER",
-    Q = "PREVIOUSLY_WIELDED_WEAPON"
+    Q = "LAST_USED_WEAPON"
   },
   renderer = {
     default_filtering = "NEAREST_NEIGHBOR" -- alternatively: "LINEAR"

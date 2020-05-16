@@ -6,7 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Enter for the max fps slider
+- A keyboard map guide
+	- hotbar_button_0 -> hotbar 0
+	- hotbar_button_1 -> hotbar 1
+	- special_action_button_1 -> spell 1
+	- maybe just Support spell
+		- Offensive spell
+		- Defensive spell
+	- Then we can rebind B to buy menu
 
 - Left-handed option
 - because of the mv really?
@@ -14,17 +21,7 @@ summary: That which we are brainstorming at the moment.
 - Duplicate the updaters to exe/sfx files without "updater" suffix for old clients to update successfully
 - Update existing links on Discord
 
-- Fullscreen issue on mac
-	- Perhaps always use system cursor
-
-- MacOS fixes
-	- GLFW_SAMPLES to 0
-	- Research the option to making this an app.zip
-	- Fix alt/ctrl buttons and the tilde
-	- Though not sure if it isn't just our keyboard screwed up
-
 - Right now "USE_GLFW" is synonymous with building on Mac. Perhaps a better naming is in order?
-- Enable VSync by default on mac or just don't set the interval?
 
 - Fix those mag refills please
 

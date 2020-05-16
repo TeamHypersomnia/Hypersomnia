@@ -23,7 +23,7 @@ bool arena_scoreboard_gui::control(general_gui_intent_input in) {
 		const auto key = in.e.get_key();
 
 		if (const auto it = mapped_or_nullptr(in.controls, key)) {
-			if (*it == general_gui_intent_type::OPEN_SCOREBOARD) {
+			if (*it == general_gui_intent_type::SCOREBOARD) {
 				show = ch == key_change::PRESSED;
 				return true;
 			}

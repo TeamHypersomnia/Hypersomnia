@@ -240,7 +240,7 @@ void hotbar_button::draw(
 					const auto intent_for_this_button = 
 						static_cast<inventory_gui_intent_type>(
 							static_cast<int>(
-								inventory_gui_intent_type::HOTBAR_BUTTON_0
+								inventory_gui_intent_type::HOTBAR_0
 							) + this_id.get_location().index
 						)
 					;
