@@ -571,37 +571,6 @@ void settings_gui_state::perform(
 					}
 				}
 
-				if (auto node = scoped_tree_node("Faction view")) {
-					auto nha = [&](auto& f) {
-						auto& scope_cfg = f;
-
-						revertable_color_edit(SCOPE_CFG_NVP(normal));
-						revertable_color_edit(SCOPE_CFG_NVP(hovered));
-						revertable_color_edit(SCOPE_CFG_NVP(active));
-					};
-
-					auto for_faction = [&](const faction_type f) {
-						auto& scope_cfg = config.faction_view.colors[f];
-
-						revertable_color_edit(SCOPE_CFG_NVP(standard));
-						revertable_color_edit(SCOPE_CFG_NVP(current_player_text));
-						revertable_color_edit(SCOPE_CFG_NVP(background_dark));
-
-						text("Background");
-
-						{
-							auto scope = scoped_indent();
-							nha(scope_cfg.background);
-						}
-					};
-
-					augs::for_each_enum_except_bounds([&](const faction_type f) {
-						text(format_enum(f));
-						auto scope = scoped_indent();
-						for_faction(f);
-					});
-				}
-
 				break;
 			}
 			case settings_pane::AUDIO: {
