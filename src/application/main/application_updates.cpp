@@ -44,7 +44,7 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 
 #if USE_GLFW
 #define PLATFORM_STRING "MacOS"
-#define ARCHIVE_EXTENSION "sfx"
+#define ARCHIVE_EXTENSION "app.sfx"
 #elif PLATFORM_UNIX
 #define PLATFORM_STRING "Linux"
 #define ARCHIVE_EXTENSION "sfx"
@@ -58,23 +58,6 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 #if PLATFORM_UNIX
 static std::atomic<int> signal_status = 0;
 #endif
-
-static auto get_first_folder_in(const augs::path_type& where) {
-	augs::path_type result;
-
-	augs::for_each_in_directory(
-		where,
-		[&result](const auto& dir) {
-			result = dir;
-			return callback_result::ABORT;
-		},
-		[](const auto&) {
-			return callback_result::CONTINUE;
-		}
-	);
-
-	return result;
-}
 
 bool successful(const int http_status_code) {
 	return http_status_code >= 200 && http_status_code < 300;
@@ -635,10 +618,78 @@ application_update_result check_and_apply_updates(
 
 					completed_move = launch_async(
 						[target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
-							const auto resource_folder = get_first_folder_in(NEW_path);
-							const auto NEW_root_path = resource_folder;
-							LOG_NVPS(NEW_root_path);
+							const auto paths_from_old_version_to_keep = std::array<augs::path_type, 2> {
+								LOG_FILES_DIR,
+								USER_FILES_DIR
+							};
 
+							auto remove_dangling_OLD_path = [&]() {
+								return rm_rf(OLD_path) == callback_result::CONTINUE;
+							};
+
+#ifdef __APPLE__
+							{
+								/* 
+									For MacOS, simply move around the Contents folders.
+									We don't even create any folders out of thin air.
+								*/
+
+								(void)mkdir_p;
+
+								const auto BUNDLE_path = get_bundle_directory();
+								const auto CURRENT_path = BUNDLE_path / "Contents";
+								
+								auto backup_user_files = [&]() {
+									for (const auto& u : paths_from_old_version_to_keep) {
+										if (mv(CURRENT_path / u, BUNDLE_path / u) == callback_result::ABORT) {
+											return false;
+										}
+									}
+
+									return true;
+								};
+
+								auto move_old_content_to_OLD = [&]() {
+									return mv(CURRENT_path, OLD_path) == callback_result::CONTINUE;
+								};
+								
+								auto move_NEW_to_CURRENT = [&]() {
+									return mv(NEW_path, CURRENT_path) == callback_result::CONTINUE;
+								};
+
+								auto restore_user_files = [&]() {
+									for (const auto& u : paths_from_old_version_to_keep) {
+										if (mv(BUNDLE_path / u, CURRENT_path / u) == callback_result::ABORT) {
+											return false;
+										}
+									}
+
+									return true;
+								};
+
+								if (!remove_dangling_OLD_path()) {
+									return callback_result::ABORT;
+								}
+
+								if (!backup_user_files()) {
+									return callback_result::ABORT;
+								}
+
+								if (!move_old_content_to_OLD()) {
+									return callback_result::ABORT;
+								}
+
+								if (!move_NEW_to_CURRENT()) {
+									return callback_result::ABORT;
+								}
+
+								if (!restore_user_files()) {
+									return callback_result::ABORT;
+								}
+
+								return callback_result::CONTINUE;
+							}
+#else
 							auto move_content_to_current_from = [&](const auto& source_root) {
 								LOG("Moving content from %x to current directory.", source_root);
 
@@ -656,11 +707,11 @@ application_update_result check_and_apply_updates(
 							auto restore_content_back_from_old = [&]() {
 								move_content_to_current_from(OLD_path);
 							};
-							
+
 							auto move_old_content_to_OLD = [&]() {
 								LOG("Moving old content to OLD directory.");
 								
-								if (rm_rf(OLD_path) == callback_result::ABORT) {
+								if (!remove_dangling_OLD_path()) {
 									return false;
 								}
 
@@ -671,14 +722,12 @@ application_update_result check_and_apply_updates(
 								auto do_move = [&](const auto& it) {
 									const auto fname = it.filename();
 
-									const auto paths_from_old_version_to_keep = std::array<augs::path_type, 4> {
+									const auto intermediate_paths_to_keep = std::array<augs::path_type, 2> {
 										OLD_path,
-										NEW_path,
-										LOG_FILES_DIR,
-										USER_FILES_DIR
+										NEW_path
 									};
 
-									if (found_in(paths_from_old_version_to_keep, fname)) {
+									if (found_in(paths_from_old_version_to_keep, fname) || found_in(intermediate_paths_to_keep, fname)) {
 										LOG("Omitting the move of %x", fname);
 										return callback_result::CONTINUE;
 									}
@@ -720,6 +769,7 @@ application_update_result check_and_apply_updates(
 								*/
 								restore_content_back_from_old();
 							}
+#endif
 
 							return callback_result::ABORT;
 						}

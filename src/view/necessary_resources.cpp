@@ -143,6 +143,9 @@ catch (const augs::graphics::shader_compilation_error& err) {
 catch (const augs::graphics::shader_program_build_error& err) {
 	throw necessary_resource_loading_error("Failed to link a necessary shader. Details: %x", err.what());
 }
+catch (const augs::graphics::shader_error& err) {
+	throw necessary_resource_loading_error("Failed to load a necessary shader. Details: %x", err.what());
+}
 
 all_necessary_sounds::all_necessary_sounds(
 	const augs::path_type& directory

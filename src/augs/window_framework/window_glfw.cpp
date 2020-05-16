@@ -109,9 +109,14 @@ namespace augs {
 
 		glfwSetErrorCallback(error_callback);
 
+		const auto previous_path = std::filesystem::current_path();
+
 		if (!glfwInit()) {
+			std::filesystem::current_path(previous_path);
 			throw window_error("glfwInit failed.");
 		}
+		
+		std::filesystem::current_path(previous_path);
 
 		auto& window = platform->window;
 

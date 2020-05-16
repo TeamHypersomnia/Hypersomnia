@@ -35,7 +35,6 @@ augs::path_type get_current_exe_path() {
 #endif
 
 #include "augs/window_framework/create_process.h"
-#include "application/main/new_and_old_hypersomnia_path.h"
 #include "work_result.h"
 
 work_result work(const int argc, const char* const * const argv);
@@ -87,7 +86,7 @@ int main(const int argc, const char* const * const argv) {
 
 		std::cout << "CHANGING CWD TO: " << s << std::endl;
 
-		chdir(s.c_str());
+		std::filesystem::current_path(p);
 
 		std::cout << "CHANGED CWD TO: " << std::filesystem::current_path().string() << std::endl;
 
