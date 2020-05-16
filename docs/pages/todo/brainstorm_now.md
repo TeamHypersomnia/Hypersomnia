@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Emphasize the items laying on the ground
+	- Like in hotline miami, they might fly a bit to upper-left direction
+	- with a little shadow behind
+		- just use existing color overlay shader for that - it will be rendered as the first
+	- screw velocity check, just identify the physical filter for it to certainly be the lying item (we don't want to apply it to grenades)
+	- a little cyclic shine on the top (might also be done with the overlay shader
+
+
 - A keyboard map guide
 	- hotbar_button_0 -> hotbar 0
 	- hotbar_button_1 -> hotbar 1
