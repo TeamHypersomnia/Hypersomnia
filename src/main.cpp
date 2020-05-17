@@ -13,6 +13,20 @@
 #include "CoreFoundation/CoreFoundation.h"
 #include <unistd.h>
 #include <libgen.h>
+
+augs::path_type get_executable_path() {
+	CFBundleRef mainBundle = CFBundleGetMainBundle();
+	CFURLRef exeURL = CFBundleCopyExecutableURL(mainBundle);
+	char path[PATH_MAX];
+	if (!CFURLGetFileSystemRepresentation(exeURL, TRUE, (UInt8 *)path, PATH_MAX))
+	{
+		// error!
+	}
+	CFRelease(exeURL);
+
+	return path;
+}
+
 #elif PLATFORM_UNIX
 #include <unistd.h>
 augs::path_type get_current_exe_path() {
@@ -66,28 +80,19 @@ int main(const int argc, const char* const * const argv) {
 	std::setlocale(LC_NUMERIC, "C");
 
 	const auto params = cmd_line_params(argc, argv);
+#ifdef __APPLE__    
+	const auto exe_path = get_executable_path();
+#else
+	const auto exe_path = params.exe_path;
+#endif
 
 	if (!params.keep_cwd) {
 #ifdef __APPLE__    
-		CFBundleRef mainBundle = CFBundleGetMainBundle();
-		CFURLRef exeURL = CFBundleCopyExecutableURL(mainBundle);
-		char path[PATH_MAX];
-		if (!CFURLGetFileSystemRepresentation(exeURL, TRUE, (UInt8 *)path, PATH_MAX))
-		{
-			// error!
-		}
+		auto exe_dir = get_executable_path();
+		exe_dir.replace_filename("");
 
-		CFRelease(exeURL);
-
-		auto p = augs::path_type(path);
-		p.replace_filename("");
-
-		auto s = p.string();
-
-		std::cout << "CHANGING CWD TO: " << s << std::endl;
-
-		std::filesystem::current_path(p);
-
+		std::cout << "CHANGING CWD TO: " << exe_dir << std::endl;
+		std::filesystem::current_path(exe_dir);
 		std::cout << "CHANGED CWD TO: " << std::filesystem::current_path().string() << std::endl;
 
 #elif PLATFORM_UNIX && !BUILD_IN_CONSOLE_MODE
@@ -146,14 +151,12 @@ int main(const int argc, const char* const * const argv) {
 				LOG("main: Application requested relaunch.");
 				save_success_logs();
 
-				return augs::restart_application(params.exe_path.string(), "");
+				return augs::restart_application(exe_path.string(), "");
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
 				LOG("main: Application requested relaunch due to a successful upgrade.");
-				save_success_logs();
-
-				return augs::restart_application(params.exe_path.string(), "--upgraded-successfully");
+				return augs::restart_application(exe_path.string(), "--upgraded-successfully");
 			}
 
 			default: 

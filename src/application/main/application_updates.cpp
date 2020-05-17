@@ -638,10 +638,11 @@ application_update_result check_and_apply_updates(
 
 								const auto BUNDLE_path = get_bundle_directory();
 								const auto CURRENT_path = BUNDLE_path / "Contents";
+								const auto EXE_dir = augs::path_type(get_executable_path()).replace_filename("");
 								
 								auto backup_user_files = [&]() {
 									for (const auto& u : paths_from_old_version_to_keep) {
-										if (mv(CURRENT_path / u, BUNDLE_path / u) == callback_result::ABORT) {
+										if (mv(EXE_dir / u, BUNDLE_path / u) == callback_result::ABORT) {
 											return false;
 										}
 									}
@@ -654,12 +655,12 @@ application_update_result check_and_apply_updates(
 								};
 								
 								auto move_NEW_to_CURRENT = [&]() {
-									return mv(NEW_path, CURRENT_path) == callback_result::CONTINUE;
+									return mv(NEW_path / "Hypersomnia.app" / "Contents", CURRENT_path) == callback_result::CONTINUE;
 								};
 
 								auto restore_user_files = [&]() {
 									for (const auto& u : paths_from_old_version_to_keep) {
-										if (mv(BUNDLE_path / u, CURRENT_path / u) == callback_result::ABORT) {
+										if (mv(BUNDLE_path / u, EXE_dir / u) == callback_result::ABORT) {
 											return false;
 										}
 									}

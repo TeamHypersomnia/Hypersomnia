@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <libgen.h>
 
+augs::path_type get_executable_path();
+
 static auto get_bundle_directory() {
 			CFBundleRef mainBundle = CFBundleGetMainBundle();
 		CFURLRef exeURL = CFBundleCopyBundleURL(mainBundle);
