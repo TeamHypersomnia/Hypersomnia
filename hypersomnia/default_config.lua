@@ -107,7 +107,7 @@ return {
     WheelUp = "THROW_TWO_KNIVES",
     WheelDown = "THROW_KNIFE",
 
-    E = "USE",
+    E = "INTERACT",
 	R = "RELOAD",
 
 	C = "WIELD_BOMB",
@@ -131,16 +131,16 @@ return {
   },
 
   inventory_gui_controls = {
-    ["0"] = "HOTBAR_BUTTON_9",
-    ["1"] = "HOTBAR_BUTTON_0",
-    ["2"] = "HOTBAR_BUTTON_1",
-    ["3"] = "HOTBAR_BUTTON_2",
-    ["4"] = "HOTBAR_BUTTON_3",
-    ["5"] = "HOTBAR_BUTTON_4",
-    ["6"] = "HOTBAR_BUTTON_5",
-    ["7"] = "HOTBAR_BUTTON_6",
-    ["8"] = "HOTBAR_BUTTON_7",
-    ["9"] = "HOTBAR_BUTTON_8",
+    ["0"] = "HOTBAR_9",
+    ["1"] = "HOTBAR_0",
+    ["2"] = "HOTBAR_1",
+    ["3"] = "HOTBAR_2",
+    ["4"] = "HOTBAR_3",
+    ["5"] = "HOTBAR_4",
+    ["6"] = "HOTBAR_5",
+    ["7"] = "HOTBAR_6",
+    ["8"] = "HOTBAR_7",
+    ["9"] = "HOTBAR_8",
 
     Z = "SPECIAL_ACTION_BUTTON_1",
     X = "SPECIAL_ACTION_BUTTON_2",
