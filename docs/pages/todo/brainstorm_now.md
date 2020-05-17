@@ -6,11 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-- inspect that new crash please before we forget the date
-
 - Emphasize the items laying on the ground
 	- Like in hotline miami, they might fly a bit to upper-left direction
 	- with a little shadow behind
@@ -37,9 +32,7 @@ summary: That which we are brainstorming at the moment.
 - Right now "USE_GLFW" is synonymous with building on Mac. Perhaps a better naming is in order?
 
 - Fix those mag refills please
-=======
-=======
-=======
+
 - Possible balancing for revolver: longer loading time? Perhaps even longer than deagle
 	- Because it's really OP with its burst fire mode
 	- 1200 -> 1500. At least as long as the scout.
@@ -66,11 +59,9 @@ summary: That which we are brainstorming at the moment.
 - USP
 	- RoF: 160-170
 
->>>>>>> 226578dc8... Project selector interface drafts
 - Leaderboards shown in the main menu
 - "Host a server" button right in the arena builder
 
->>>>>>> c76b822c9... Drafting, Create New Arena button
 - Look for some filesystem implementation for imgui
 	- We'll also replace the system viewers? At least some of them?
 		- Only reveal in explorer will be useful at this point
@@ -82,7 +73,6 @@ summary: That which we are brainstorming at the moment.
 
 - We can pay someone to properly re-map all of the official maps in the new editor.
 	- The ultimate test.
->>>>>>> 3c333086a... Massive planning progress
 
 - Wtf with those mags appearing at the center of the map?
 - Also you can still sometimes get a magazine in hand if you buy HPSR with little inventory space

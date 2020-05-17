@@ -2,9 +2,21 @@
 
 ## Official
 
-- arenas/mine
-- arenas/official
-- arenas/community
+- Don't do this:
+	- arenas/mine
+	- arenas/official
+	- arenas/community
+- Rather, have:
+	- content/official/
+		- arenas
+		- prefabs
+	- Indeed we'll hold together things like calico muzzle and calico sprite
+	- user/community/arenas
+		- or "downloads/arenas"
+	- user/projects
+
+
+
 - Server-specific content packages
 	- What if we want to introduce some funny sounds on deaths or purchases?
 		- Best if it is not tied to the map
