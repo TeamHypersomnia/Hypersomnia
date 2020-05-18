@@ -42,10 +42,10 @@ using client_type = httplib::Client;
 
 using response_ptr = std::shared_ptr<httplib::Response>;
 
-#if USE_GLFW
+#if PLATFORM_MACOS
 #define PLATFORM_STRING "MacOS"
 #define ARCHIVE_EXTENSION "app.sfx"
-#elif PLATFORM_UNIX
+#elif PLATFORM_LINUX
 #define PLATFORM_STRING "Linux"
 #define ARCHIVE_EXTENSION "sfx"
 #elif PLATFORM_WINDOWS

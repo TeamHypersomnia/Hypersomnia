@@ -4360,3 +4360,5 @@ Advantages:
 	- Though not sure if it isn't just our keyboard screwed up
 
 - Enable VSync by default on mac or just don't set the interval?
+- Right now "USE_GLFW" is synonymous with building on Mac. Perhaps a better naming is in order?
+

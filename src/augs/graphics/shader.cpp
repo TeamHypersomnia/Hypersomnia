@@ -71,7 +71,7 @@ namespace augs {
 			const type shader_type,
 			const path_type& path
 		) try {
-#if USE_GLFW
+#if PLATFORM_MACOS
 			const auto glsl_version = "#version 150";
 #else
 			const auto glsl_version = "#version 130";

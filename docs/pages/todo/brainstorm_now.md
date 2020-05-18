@@ -24,12 +24,6 @@ summary: That which we are brainstorming at the moment.
 	- Then we can rebind B to buy menu
 
 - Left-handed option
-- because of the mv really?
-
-- Duplicate the updaters to exe/sfx files without "updater" suffix for old clients to update successfully
-- Update existing links on Discord
-
-- Right now "USE_GLFW" is synonymous with building on Mac. Perhaps a better naming is in order?
 
 - Fix those mag refills please
 
