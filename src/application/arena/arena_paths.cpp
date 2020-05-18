@@ -2,7 +2,7 @@
 
 arena_paths::arena_paths(
 	const augs::path_type& target_folder
-) : arena_paths(target_folder, target_folder.filename()) {
+) : arena_paths(target_folder, target_folder.filename().string()) {
 
 }
 
