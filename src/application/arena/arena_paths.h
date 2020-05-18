@@ -2,9 +2,9 @@
 #include "augs/filesystem/path.h"
 #include "application/arena/intercosm_paths.h"
 
-#define OFFICIAL_ARENAS_DIR "arenas/official"
-#define COMMUNITY_ARENAS_DIR "arenas/community"
-#define USER_ARENAS_DIR "arenas/projects"
+#define OFFICIAL_ARENAS_DIR "arenas/"
+#define COMMUNITY_ARENAS_DIR USER_FILES_DIR "/community/arenas"
+#define USER_ARENAS_DIR USER_FILES_DIR "/projects"
 
 struct arena_paths {
 	intercosm_paths int_paths;
