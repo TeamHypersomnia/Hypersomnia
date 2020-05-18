@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- inspect that new crash please before we forget the date
+
 - Emphasize the items laying on the ground
 	- Like in hotline miami, they might fly a bit to upper-left direction
 	- with a little shadow behind

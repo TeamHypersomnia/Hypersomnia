@@ -44,7 +44,10 @@ if [ -f "$EXE_PATH" ]; then
 		FILE_PATH=$SFX_PATH
 		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 
-		create-dmg $APP_PATH $DMG_PATH
+		create-dmg $APP_PATH
+		mv "Hypersomnia.dmg" $DMG_PATH
+
+		ls -alh
 
 		echo "Uploading the dmg file for first-time downloads on MacOS."
 		FILE_PATH=$DMG_PATH
