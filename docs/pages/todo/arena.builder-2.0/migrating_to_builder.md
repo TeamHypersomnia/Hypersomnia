@@ -1,3 +1,6 @@
+# render_layer reworked
+
+
 # Migrating existing maps
 
 - Honestly, we should get ready to make these three maps from scratch again.
@@ -20,7 +23,7 @@
 		- e.g. then we can disable only AWPs on a map like fy_snow
 
 - Keep the variable names really short for the inspector to look good
-- View->Window
+- rename View to Window
 
 - Refresh imgui font when changing size in settings
 

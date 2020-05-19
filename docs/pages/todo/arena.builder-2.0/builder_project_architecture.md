@@ -9,7 +9,21 @@
 	- I do figure it might make little sense to have a viewable id in an editor's sprite structure where we clearly want to serialize paths to resources
 	- For simpler stuff, we can just alias types from logic to types for editor 
 
-# Scene hierarchy
+# Scene hierarchy (RETHINK IF WE WANT THIS)
+
+- We could ditch the hierarchization for now because it won't be such a demanded feature
+- Layers will cut it
+- Well won't these be the same?
+	- It's just whether we allow mixing, e.g. an object layer will only have objects
+	- and also whether we support nesting which we don't want for now
+
+- Yeah for now we could ditch prefabs with hierarchies.
+	- This also lets us forget about prefab previews
+		- well maybe except for special stuff like aquarium
+		- but we don't necessarily have to produce previews for them either
+- Let's just have singular sprite-per-object objects/tiles
+
+## Thoughts
 
 - The root node...
 	- Do we want it?

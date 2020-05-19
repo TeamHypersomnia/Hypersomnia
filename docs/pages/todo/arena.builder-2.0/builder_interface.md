@@ -6,6 +6,7 @@
 # Interface
 
 ## World
+
 - Selecting the topmost 
 	- simply gather all candidates that were hit by the query, sort by their nodes and select topmost
 
@@ -21,7 +22,7 @@
 
 ### Transformations
 
-- We can re-use currently implemented group behaviour for moving children along with the parent
+- We can re-use (code of) currently implemented group behaviour for moving children along with the parent
 	- Instead of playing with those
 
 ## Builder UI
@@ -37,6 +38,11 @@
 ### Play button
 
 - Launches a playtesting_setup on the current scene or prefab
+
+### Window: Layers
+
+- player layer placeholder
+	- can't be deleted or placed into a group
 
 ### Window: Errors and warnings
 

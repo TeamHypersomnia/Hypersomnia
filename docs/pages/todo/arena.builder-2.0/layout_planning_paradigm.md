@@ -6,10 +6,6 @@
 
 - Minimap
 
-- Eyedropper tool under "i" or something
-	- Pressing LPM shows tiles from all visible layers to the left?
-		- Scrolling iterates through the list
-
 Let go of prefabs and per-variable overrides, for now.
 Just have simple set of "initial" parameters to tweak.
 We might have instantiation templates.
@@ -57,18 +53,12 @@ We can implement dungeon-like layout planner later and for now just stick to squ
 - Floor chunks
 	- Object based because they will later let us specify order simply
 
-- Paint floor polygonally
-	- For those diagonal rooms
-
 - Polygonal "fill" later
 
 We want to have a layout tool that will easily let us create room-based axis-aligned layouts as well
 as arbitrarily polygonal dungeons.
 
 We might want to use an advanced polygon math library for stuff like additions, subtractions.
-
-- Square/diagonal/cave brushes
-	- Apart from carving polygons, we might want to paint polygons on a per-tile basis
 
 ## Procedural layout generation?
 

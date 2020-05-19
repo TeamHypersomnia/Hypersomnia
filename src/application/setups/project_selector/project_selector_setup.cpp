@@ -54,8 +54,8 @@ augs::path_type project_list_entry::get_miniature_path() const {
 	return arena_paths(arena_path).miniature_file_path;
 }
 
-std::string  project_list_entry::get_arena_name() const {
-	return arena_path.filename();
+std::string project_list_entry::get_arena_name() const {
+	return arena_path.filename().string();
 }
 
 std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_images() {
