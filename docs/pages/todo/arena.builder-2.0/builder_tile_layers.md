@@ -19,6 +19,13 @@
 - So aquarium is a special object
 	- What does layer placement mean for it?
 
+- Now we have a problem of whether we want to "unpack" the special objects
+	- Well in Unity you have unpackable prefabs right
+
+- Problem: for performance, we really want to imply a specific order of rendering for given layer functionalities
+
+- Maybe create a layer folder for any special object?
+
 - Layers inside Sorting layers could be separated by imgui separators
 	- but where does aquarium fit in?
 	- do we force it into a ground sorting layer?
