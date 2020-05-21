@@ -30,6 +30,9 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 		else if constexpr(H::template has<invariants::missile>()) {
 			return render_layer::FLYING_BULLETS;
 		}
+		else if constexpr(H::template has<invariants::sentience>()) {
+			return render_layer::SENTIENCES;
+		}
 		else if constexpr(H::template has<components::wandering_pixels>()) {
 			return 
 				handle.template get<components::wandering_pixels>().illuminate ? 

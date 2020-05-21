@@ -4,6 +4,8 @@
 using entities_with_render_layer = entity_types_having_any_of<
 	invariants::render,
 	invariants::item,
+	invariants::missile,
+	invariants::sentience,
 	invariants::light,
 	invariants::continuous_particles,
 	invariants::continuous_sound,

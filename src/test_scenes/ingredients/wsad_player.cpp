@@ -36,13 +36,6 @@ namespace test_flavours {
 			meta.get<invariants::text_details>().description = "Professional Metropolis Commando.";
 
 			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SENTIENCES;
-
-				meta.set(render_def);
-			}
-
-			{
 				invariants::melee_fighter melee_fighter;
 				melee_fighter.throw_cooldown_ms = 300.f;
 

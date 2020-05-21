@@ -27,7 +27,6 @@ struct controlled_character {
 		invariants::melee_fighter,
 
 		invariants::sprite,
-		invariants::render,
 		invariants::torso,
 		invariants::head,
 
