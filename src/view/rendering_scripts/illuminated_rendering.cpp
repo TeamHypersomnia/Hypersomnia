@@ -239,6 +239,199 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		}
 	};
 
+	auto draw_sentience_HUDs = [&]() {
+		const auto set_center_uniform = [&](const auto& tex_id) {
+			set_uniform(shaders.circular_bars, U::texture_center, necessarys[tex_id].get_center());
+		};
+
+		if (viewed_character) {
+			std::array<assets::necessary_image_id, 3> circles = {
+				assets::necessary_image_id::CIRCULAR_BAR_LARGE,
+				assets::necessary_image_id::CIRCULAR_BAR_UNDER_LARGE,
+				assets::necessary_image_id::CIRCULAR_BAR_UNDER_UNDER_LARGE
+			};
+
+			int current_circle = 0;
+
+			if (settings.draw_hp_bar) {
+				set_center_uniform(circles[current_circle++]);
+				renderer.call_triangles(DV::SENTIENCE_HUDS, 0);
+			}
+
+			if (settings.draw_pe_bar) {
+				set_center_uniform(circles[current_circle++]);
+				renderer.call_triangles(DV::SENTIENCE_HUDS, 1);
+			}
+
+			if (settings.draw_cp_bar) {
+				set_center_uniform(circles[current_circle++]);
+				renderer.call_triangles(DV::SENTIENCE_HUDS, 2);
+			}
+		}
+
+		{
+			int current_hud = 0;
+
+			auto draw_explosives_hud = [&](const auto tex_id) {
+				set_center_uniform(tex_id);
+				renderer.call_triangles(DV::EXPLOSIVE_HUDS, current_hud++);
+			};
+
+			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_SMALL);
+			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_MEDIUM);
+			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_OVER_MEDIUM);
+		}
+	};
+
+	auto draw_fog_of_war_overlay = [&]() {
+		if (!fog_of_war_effective) {
+			return;
+		}
+
+		const auto& appearance = settings.fog_of_war_appearance;
+
+		renderer.call_and_clear_triangles();
+		renderer.set_stencil(true);
+
+		if (appearance.overlay_color_on_visible) {
+			renderer.stencil_positive_test();
+		}
+		else {
+			renderer.stencil_reverse_test();
+		}
+
+		set_shader_with_matrix(shaders.pure_color_highlight);
+
+		const auto fow_size = settings.fog_of_war.get_real_size();
+
+		get_drawer().aabb(
+			ltrb::center_and_size(viewed_character_transform->pos, fow_size),
+			appearance.overlay_color
+		);
+
+		renderer.call_and_clear_triangles();
+		renderer.set_stencil(false);
+	};
+
+	auto draw_interaction_sensor = [&]() {
+		if (!viewed_character) {
+			return;
+		}
+
+		if (const auto sentience = viewed_character.find<components::sentience>()) {
+			if (const auto sentience_def = viewed_character.find<invariants::sentience>()) {
+				if (sentience->use_button != use_button_state::IDLE) {
+					if (const auto tr = viewed_character.find_viewing_transform(interp)) {
+						const auto& a = sentience_def->use_button_angle;
+						const auto& r = sentience_def->use_button_radius;
+
+						const bool is_querying = sentience->use_button == use_button_state::QUERYING;
+						auto col = is_querying ? gray : rgba(255, 0, 0, 180);
+
+						if (is_querying && sentience->last_use_result == use_button_query_result::IN_RANGE_BUT_CANT) {
+							col = green;
+						}
+
+						if (r > 0.f) {
+							const auto& p = tr->pos;
+							const auto dash_len = 5.f;
+
+							get_line_drawer().dashed_circular_sector(
+								p,
+								r,
+								col,
+								tr->rotation,
+								a,
+								dash_len
+							);
+						}
+					}
+				}
+			}
+		}
+	};
+
+	auto draw_area_markers = [&]() {
+		const auto& markers = settings.draw_area_markers;
+
+		if (!markers.is_enabled) {
+			return;
+		}
+
+		visible.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto e) {
+			e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
+				const auto where = typed_handle.get_logic_transform();
+				const auto& marker_alpha = markers.value;
+				::draw_area_indicator(typed_handle, get_line_drawer(), where, marker_alpha, drawn_indicator_type::INGAME);
+			});
+		});
+	};
+
+	auto draw_crosshairs = [&]() {
+		if (!settings.draw_crosshairs) {
+			return;
+		}
+
+		auto draw_crosshair = [&](const auto it) {
+			if (const auto s = it.find_crosshair_def()) {
+				auto drawing_input = make_drawing_input();
+				auto sprite_in = drawing_input.make_input_for<invariants::sprite>();
+
+				sprite_in.global_time_seconds = global_time_seconds;
+				sprite_in.renderable_transform = it.get_world_crosshair_transform(interp) + in.pre_step_crosshair_displacement;
+
+				if (is_zoomed_out) {
+					sprite_in.renderable_transform.pos = cone.to_screen_space(sprite_in.renderable_transform.pos);
+				}
+
+				augs::draw(s->appearance, game_images, sprite_in);
+			}
+		};
+
+		if (viewed_character) {
+			if (is_zoomed_out) {
+				renderer.call_and_clear_triangles();
+				shaders.standard->set_projection(renderer, non_zoomed_matrix);
+			}
+
+			draw_crosshair(viewed_character);
+
+			if (is_zoomed_out) {
+				renderer.call_and_clear_triangles();
+				shaders.standard->set_projection(renderer, matrix);
+			}
+		}
+	};
+
+	auto draw_weapon_laser = [&]() {
+		if (settings.draw_weapon_laser && viewed_character.alive()) {
+			const auto laser = necessarys.at(assets::necessary_image_id::LASER);
+			
+			draw_crosshair_lasers({
+				line_output_wrapper { get_line_drawer(), laser },
+				dashed_line_output_wrapper  { get_line_drawer(), laser, 10.f, 40.f, global_time_seconds },
+				interp, 
+				viewed_character,
+				in.pre_step_crosshair_displacement
+			});
+
+			renderer.call_and_clear_lines();
+		}
+	};
+
+	auto draw_pure_color_highlights = [&]() {
+		shaders.pure_color_highlight->set_as_current(renderer);
+
+		auto drawing_input = make_drawing_input();
+		highlights.draw_highlights(cosm, drawing_input);
+
+		for (const auto& h : in.additional_highlights) {
+			draw_color_highlight(cosm[h.id], h.col, drawing_input);
+		}
+
+		renderer.call_and_clear_triangles();
+	};
+
 	auto occlude_neons = [&]() {
 		auto& shader = shaders.neon_occluder;
 
@@ -345,6 +538,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		light.render_all_lights(light_input);
 	};
 
+	/* Flow */
+
 	if (in.general_atlas) {
 		bind_and_update_filtering(*in.general_atlas);
 	}
@@ -393,53 +588,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_and_clear_triangles();
 
-	{
-		const auto& markers = settings.draw_area_markers;
-
-		if (markers.is_enabled) {
-			visible.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto e) {
-				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
-					const auto where = typed_handle.get_logic_transform();
-					const auto& marker_alpha = markers.value;
-					::draw_area_indicator(typed_handle, get_line_drawer(), where, marker_alpha, drawn_indicator_type::INGAME);
-				});
-			});
-		}
-	}
-
-	if (viewed_character) {
-		if (const auto sentience = viewed_character.find<components::sentience>()) {
-			if (const auto sentience_def = viewed_character.find<invariants::sentience>()) {
-				if (sentience->use_button != use_button_state::IDLE) {
-					if (const auto tr = viewed_character.find_viewing_transform(interp)) {
-						const auto& a = sentience_def->use_button_angle;
-						const auto& r = sentience_def->use_button_radius;
-
-						const bool is_querying = sentience->use_button == use_button_state::QUERYING;
-						auto col = is_querying ? gray : rgba(255, 0, 0, 180);
-
-						if (is_querying && sentience->last_use_result == use_button_query_result::IN_RANGE_BUT_CANT) {
-							col = green;
-						}
-
-						if (r > 0.f) {
-							const auto& p = tr->pos;
-							const auto dash_len = 5.f;
-
-							get_line_drawer().dashed_circular_sector(
-								p,
-								r,
-								col,
-								tr->rotation,
-								a,
-								dash_len
-							);
-						}
-					}
-				}
-			}
-		}
-	}
+	draw_area_markers();
+	draw_interaction_sensor();
 
 	renderer.call_and_clear_lines();
 
@@ -449,32 +599,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);
 	renderer.call_triangles(D::SMALL_AND_GLASS_BODIES);
 
-	if (fog_of_war_effective) {
-		const auto& appearance = settings.fog_of_war_appearance;
-
-		renderer.call_and_clear_triangles();
-		renderer.set_stencil(true);
-
-		if (appearance.overlay_color_on_visible) {
-			renderer.stencil_positive_test();
-		}
-		else {
-			renderer.stencil_reverse_test();
-		}
-
-		set_shader_with_matrix(shaders.pure_color_highlight);
-
-		const auto fow_size = settings.fog_of_war.get_real_size();
-
-		get_drawer().aabb(
-			ltrb::center_and_size(viewed_character_transform->pos, fow_size),
-			appearance.overlay_color
-		);
-
-		renderer.call_and_clear_triangles();
-		renderer.set_stencil(false);
-	}
-
+	draw_fog_of_war_overlay();
 	draw_sentiences(*shaders.illuminated);
 
 	renderer.call_triangles(D::INSECTS);
@@ -493,51 +618,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	
 	renderer.call_triangles(D::CAPTIONS_AND_BULLETS);
 
-	if (settings.draw_crosshairs) {
-		auto draw_crosshair = [&](const auto it) {
-			if (const auto s = it.find_crosshair_def()) {
-				auto drawing_input = make_drawing_input();
-				auto sprite_in = drawing_input.make_input_for<invariants::sprite>();
-
-				sprite_in.global_time_seconds = global_time_seconds;
-				sprite_in.renderable_transform = it.get_world_crosshair_transform(interp) + in.pre_step_crosshair_displacement;
-
-				if (is_zoomed_out) {
-					sprite_in.renderable_transform.pos = cone.to_screen_space(sprite_in.renderable_transform.pos);
-				}
-
-				augs::draw(s->appearance, game_images, sprite_in);
-			}
-		};
-
-		if (viewed_character) {
-			if (is_zoomed_out) {
-				renderer.call_and_clear_triangles();
-				shaders.standard->set_projection(renderer, non_zoomed_matrix);
-			}
-
-			draw_crosshair(viewed_character);
-
-			if (is_zoomed_out) {
-				renderer.call_and_clear_triangles();
-				shaders.standard->set_projection(renderer, matrix);
-			}
-		}
-	}
-	
-	if (settings.draw_weapon_laser && viewed_character.alive()) {
-		const auto laser = necessarys.at(assets::necessary_image_id::LASER);
-		
-		draw_crosshair_lasers({
-			line_output_wrapper { get_line_drawer(), laser },
-			dashed_line_output_wrapper  { get_line_drawer(), laser, 10.f, 40.f, global_time_seconds },
-			interp, 
-			viewed_character,
-			in.pre_step_crosshair_displacement
-		});
-
-		renderer.call_and_clear_lines();
-	}
+	draw_crosshairs();
+	draw_weapon_laser();
 
 	draw_particles(particle_layer::NEONING_PARTICLES);
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
@@ -545,50 +627,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::ILLUMINATING_WANDERING_PIXELS);
 
 	set_shader_with_matrix(shaders.circular_bars);
-
-	{
-		const auto set_center_uniform = [&](const auto& tex_id) {
-			set_uniform(shaders.circular_bars, U::texture_center, necessarys[tex_id].get_center());
-		};
-
-		if (viewed_character) {
-			std::array<assets::necessary_image_id, 3> circles = {
-				assets::necessary_image_id::CIRCULAR_BAR_LARGE,
-				assets::necessary_image_id::CIRCULAR_BAR_UNDER_LARGE,
-				assets::necessary_image_id::CIRCULAR_BAR_UNDER_UNDER_LARGE
-			};
-
-			int current_circle = 0;
-
-			if (settings.draw_hp_bar) {
-				set_center_uniform(circles[current_circle++]);
-				renderer.call_triangles(DV::SENTIENCE_HUDS, 0);
-			}
-
-			if (settings.draw_pe_bar) {
-				set_center_uniform(circles[current_circle++]);
-				renderer.call_triangles(DV::SENTIENCE_HUDS, 1);
-			}
-
-			if (settings.draw_cp_bar) {
-				set_center_uniform(circles[current_circle++]);
-				renderer.call_triangles(DV::SENTIENCE_HUDS, 2);
-			}
-		}
-
-		{
-			int current_hud = 0;
-
-			auto draw_explosives_hud = [&](const auto tex_id) {
-				set_center_uniform(tex_id);
-				renderer.call_triangles(DV::EXPLOSIVE_HUDS, current_hud++);
-			};
-
-			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_SMALL);
-			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_MEDIUM);
-			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_OVER_MEDIUM);
-		}
-	}
+	draw_sentience_HUDs();
 
 	set_shader_with_non_zoomed_matrix(shaders.standard);
 
@@ -606,20 +645,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.exploding_rings);
 
 	renderer.call_triangles(D::EXPLODING_RINGS);
-
-	shaders.pure_color_highlight->set_as_current(renderer);
-
-	{
-		auto drawing_input = make_drawing_input();
-		highlights.draw_highlights(cosm, drawing_input);
-
-		for (const auto& h : in.additional_highlights) {
-			draw_color_highlight(cosm[h.id], h.col, drawing_input);
-		}
-
-		renderer.call_and_clear_triangles();
-	}
-
+	draw_pure_color_highlights();
 	renderer.call_triangles(D::THUNDERS);
 
 	shaders.standard->set_as_current(renderer);
