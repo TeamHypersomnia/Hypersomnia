@@ -1,60 +1,19 @@
 #pragma once
 #include "game/detail/visible_entities.h"
+#include "augs/templates/enum_introspect.h"
 
 using layer_order_t = std::array<render_layer, static_cast<int>(render_layer::COUNT) - 1>;
 
 inline auto get_default_layer_order() {
-	using R = render_layer;
+	layer_order_t result;
 
-	return layer_order_t {
-		R::INSECTS,
+	auto i = std::size_t(0);
 
-		R::OVERLAID_CALLOUT_MARKERS,
-		R::CALLOUT_MARKERS,
+	augs::for_each_enum_except_bounds([&](const render_layer layer) {
+		result[i++] = layer;
+	});
 
-		R::POINT_MARKERS,
-		R::AREA_MARKERS,
-		R::LIGHTS,
-		R::ILLUMINATING_WANDERING_PIXELS,
-		R::CONTINUOUS_PARTICLES,
-		R::CONTINUOUS_SOUNDS,
-		R::DIM_WANDERING_PIXELS,
-
-		R::NEON_CAPTIONS,
-		R::FLYING_BULLETS,
-
-		R::OVER_SENTIENCES,
-		R::SENTIENCES,
-
-		R::GLASS_BODY,
-		R::OVER_SMALL_DYNAMIC_BODY,
-		R::SMALL_DYNAMIC_BODY,
-		R::OVER_DYNAMIC_BODY,
-		R::NEON_OCCLUDING_DYNAMIC_BODY,
-		R::DYNAMIC_BODY,
-
-		R::CAR_WHEEL,
-		R::CAR_INTERIOR,
-
-		R::WATER_SURFACES,
-		R::WATER_COLOR_OVERLAYS,
-		R::AQUARIUM_BUBBLES,
-		R::UPPER_FISH,
-		R::BOTTOM_FISH,
-		R::AQUARIUM_DUNES,
-		R::AQUARIUM_FLOWERS,
-
-		R::PLANTED_BOMBS,
-
-		R::FLOOR_NEON_OVERLAY,
-		R::BODY_NEON_OVERLAY,
-
-		R::ON_ON_FLOOR,
-		R::ON_FLOOR,
-		R::FLOOR_AND_ROAD,
-		R::GROUND,
-		R::UNDER_GROUND,
-	};
+	return result;
 }
 
 template <class F>
