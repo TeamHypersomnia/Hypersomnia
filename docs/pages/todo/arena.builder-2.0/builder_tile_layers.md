@@ -35,6 +35,12 @@
 	- Background
 	- Walls
 
+- We can't treat when_born as render order because entities will be created in a single step
+	- No matter, we can spare a single int in render component
+
+- But really for some stuff it doesn't even make sense to have render invariants
+	- the layer is implied for shootable weapon and all those item entity types
+
 - Maybe create a layer folder for any special object?
 
 - Layers inside Sorting layers could be separated by imgui separators

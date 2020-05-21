@@ -68,11 +68,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_ENGINE_BODY);
 
-			invariants::render render_def;
-			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-			meta.set(render_def);
-
 			add_sprite(meta, caches, test_scene_image_id::TRUCK_ENGINE);
 		}
 #endif

@@ -100,7 +100,6 @@ struct shootable_weapon {
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::sprite,
-		invariants::render,
 
 		invariants::interpolation
 	>;
@@ -135,7 +134,6 @@ struct melee_weapon {
 
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::render,
 
 		invariants::interpolation,
 		invariants::continuous_particles,
@@ -171,7 +169,6 @@ struct shootable_charge {
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::sprite,
-		invariants::render,
 
 		invariants::interpolation
 	>;
@@ -257,7 +254,6 @@ struct hand_explosive {
 		invariants::sprite,
 		invariants::animation,
 		invariants::item,
-		invariants::render,
 		invariants::hand_fuse,
 		invariants::explosive,
 		invariants::rigid_body,
@@ -345,7 +341,6 @@ struct container_item {
 		invariants::fixtures,
 
 		invariants::sprite,
-		invariants::render,
 
 		invariants::container,
 		invariants::item,
@@ -400,7 +395,6 @@ struct remnant_body {
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::sprite,
-		invariants::render,
 		invariants::ground,
 
 		invariants::interpolation,
@@ -527,7 +521,6 @@ struct tool_item {
 		invariants::sprite,
 		invariants::animation,
 		invariants::item,
-		invariants::render,
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::tool,

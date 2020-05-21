@@ -49,6 +49,9 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 		else if constexpr(H::template has<invariants::continuous_sound>()) {
 			return render_layer::CONTINUOUS_SOUNDS;
 		}
+		else if constexpr(H::template has<invariants::item>()) {
+			return render_layer::SMALL_DYNAMIC_BODY;
+		}
 		else {
 			return render_layer::INVALID;
 		}

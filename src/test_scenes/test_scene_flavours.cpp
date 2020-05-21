@@ -322,12 +322,9 @@ namespace test_flavours {
 
 
 		{
-			auto& meta = flavour_with_sprite(
-				test_tool_items::ELECTRIC_ARMOR,
-				test_scene_image_id::ELECTRIC_ARMOR,
-				render_layer::SMALL_DYNAMIC_BODY
-			);
+			auto& meta = get_test_flavour(flavours, test_tool_items::ELECTRIC_ARMOR);
 
+			test_flavours::add_sprite(meta, in.caches, test_scene_image_id::ELECTRIC_ARMOR);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
@@ -350,12 +347,9 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = flavour_with_sprite(
-				test_tool_items::DEFUSE_KIT,
-				test_scene_image_id::DEFUSE_KIT,
-				render_layer::SMALL_DYNAMIC_BODY
-			);
+			auto& meta = get_test_flavour(flavours, test_tool_items::DEFUSE_KIT);
 
+			test_flavours::add_sprite(meta, in.caches, test_scene_image_id::DEFUSE_KIT);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;

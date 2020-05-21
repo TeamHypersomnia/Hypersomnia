@@ -28,13 +28,6 @@ namespace test_flavours {
 		) -> auto& {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, image_id, white);
 
 			{

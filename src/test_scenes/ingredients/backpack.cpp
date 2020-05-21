@@ -19,11 +19,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::METROPOLIS_BACKPACK);
 
-			invariants::render render_def;
-			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-			meta.set(render_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::METROPOLIS_BACKPACK, white);
 
 			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
@@ -60,11 +55,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::STANDARD_PERSONAL_DEPOSIT);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-			meta.set(render_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STANDARD_PERSONAL_DEPOSIT, white);
 			test_flavours::add_lying_item_dynamic_body(meta);

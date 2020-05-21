@@ -199,13 +199,6 @@ namespace test_flavours {
 				auto& meta = get_test_flavour(flavours, flavour_id);
 
 				{
-					invariants::render render_def;
-					render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-					meta.set(render_def);
-				}
-
-				{
 					invariants::remnant remnant_def;
 					remnant_def.lifetime_secs = 1.f * lifetime_mult;
 					remnant_def.start_shrinking_when_remaining_ms = 350.f * lifetime_mult;
@@ -1701,13 +1694,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::CYAN_SHELL);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
@@ -1719,13 +1705,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::HPSR_SHELL);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
@@ -1739,13 +1718,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::BULLDUP2000_SHELL);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
@@ -1758,13 +1730,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::HUNTER_SHELL);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
@@ -1776,13 +1741,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::GALILEA_SHELL);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
@@ -1797,13 +1755,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::SHOTGUN_RED_SHELL);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
@@ -1815,13 +1766,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::GRADOBICIE_SHELL);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GRADOBICIE_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
@@ -1835,13 +1779,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::SKULL_ROCKET_SHELL);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
@@ -1853,13 +1790,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::STEEL_SHELL);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
@@ -1883,13 +1813,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::ORANGE_SHELL);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
@@ -1902,13 +1825,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_remnant_bodies::DEAGLE_SHELL);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
@@ -1920,13 +1836,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::CYAN_CHARGE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -1954,13 +1863,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::COVERT_CYAN_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -1986,13 +1888,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::SZTURM_CHARGE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2020,13 +1915,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::PISTOL_CYAN_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2052,13 +1940,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::PRO90_CHARGE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2091,13 +1972,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::STEEL_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, steel_color);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2123,13 +1997,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::HPSR_CHARGE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, steel_color);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2158,13 +2025,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::BULLDUP2000_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, steel_color);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2191,13 +2051,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::HUNTER_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, steel_color);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2223,13 +2076,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::GALILEA_CHARGE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, steel_color);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2266,13 +2112,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::SKULL_ROCKET);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2301,13 +2140,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::ORANGE_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2334,13 +2166,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::DEAGLE_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2366,13 +2191,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::SHOTGUN_RED_CHARGE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2405,13 +2223,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::ZAMIEC_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GRADOBICIE_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2440,13 +2251,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::CYBERSPRAY_CHARGE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2474,13 +2278,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::GRADOBICIE_CHARGE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GRADOBICIE_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2522,13 +2319,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::BILMER2000_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2557,13 +2347,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::SZTURM_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SZTURM_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2594,13 +2377,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::DATUM_GUN_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2629,13 +2405,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::BAKA47_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BAKA47_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2666,13 +2435,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::GALILEA_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2701,13 +2463,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::KEK9_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2738,13 +2493,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::SN69_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SN69_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2773,13 +2521,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::WARX_FQ12_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::WARX_FQ12_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2810,13 +2551,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::BULLDUP2000_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2846,13 +2580,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::PRO90_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2881,13 +2608,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::ZAMIEC_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ZAMIEC_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2922,13 +2642,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::CYBERSPRAY_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYBERSPRAY_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -2957,13 +2670,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::AO44_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2994,13 +2700,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::HPSR_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -3029,13 +2728,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::HUNTER_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HUNTER_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -3066,13 +2758,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::CALICO_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CALICO_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -3102,13 +2787,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::DEAGLE_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -3137,13 +2815,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::BULWARK_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -3209,13 +2880,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::LEWSII_MAGAZINE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -3442,13 +3106,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BILMER2000);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			meta.get<invariants::text_details>().description =
 				"Standard issue silenced rifle."
 			;
@@ -3500,13 +3157,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::SZTURM);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			meta.get<invariants::text_details>().description =
 				"Standard issue assault carbine."
 			;
@@ -3554,13 +3204,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::PRO90);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			meta.get<invariants::text_details>().description =
 				"Pretty good SMG."
@@ -3610,13 +3253,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::ZAMIEC);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			meta.get<invariants::text_details>().description =
 				"Pretty good SMG."
@@ -3676,13 +3312,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::CYBERSPRAY);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			meta.get<invariants::text_details>().description =
 				"Pretty good SMG."
 			;
@@ -3738,13 +3367,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BAKA47);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			meta.get<invariants::text_details>().description =
 				"Standard issue sample rifle."
 			;
@@ -3793,13 +3415,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::GALILEA);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			meta.get<invariants::text_details>().description =
 				"Standard issue sample rifle."
 			;
@@ -3846,13 +3461,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::LEWSII);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			meta.get<invariants::text_details>().description =
 				"Standard issue sample rifle."
@@ -3910,13 +3518,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::DATUM_GUN);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			meta.get<invariants::text_details>().description =
 				"Standard issue sample rifle."
 			;
@@ -3966,13 +3567,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::KEK9);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
@@ -4016,13 +3610,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::SN69);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
@@ -4064,13 +3651,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::HPSR);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			invariants::gun gun_def;
 
@@ -4125,13 +3705,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::HUNTER);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::HUNTER_MUZZLE);
@@ -4184,13 +3757,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AO44);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			invariants::gun gun_def;
 
@@ -4246,13 +3812,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::ELON_HRL);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			invariants::gun gun_def;
 
@@ -4328,13 +3887,6 @@ namespace test_flavours {
 
 			meta.template get<invariants::text_details>().name = "BullDup 2000";
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_MUZZLE);
@@ -4384,13 +3936,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::WARX_FQ12);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::WARX_FQ12_MUZZLE);
@@ -4436,13 +3981,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::GRADOBICIE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			invariants::gun gun_def;
 
@@ -4509,13 +4047,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::CALICO);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CALICO_MUZZLE);
@@ -4559,13 +4090,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BULWARK);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			invariants::gun gun_def;
 
@@ -4611,13 +4135,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::COVERT);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			invariants::gun gun_def;
 
@@ -4668,13 +4185,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::DEAGLE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::DEAGLE_MUZZLE);
@@ -4724,13 +4234,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AMPLIFIER_ARM);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
@@ -4763,13 +4266,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BLUNAZ);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			invariants::gun gun_def;
 

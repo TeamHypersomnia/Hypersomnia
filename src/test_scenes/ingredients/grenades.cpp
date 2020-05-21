@@ -34,14 +34,6 @@ namespace test_flavours {
 			meta.get<invariants::text_details>().description =
 				"Throwable explosive with a one second delay.\nDeals damage to [color=red]Health[/color]."
 			;
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-
-			}
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::FORCE_GRENADE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -131,13 +123,6 @@ namespace test_flavours {
 			meta.get<invariants::text_details>().description =
 				"Throwable explosive with a one second delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
 			;
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::INTERFERENCE_GRENADE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -221,13 +206,6 @@ namespace test_flavours {
 			meta.get<invariants::text_details>().description =
 				"Throwable explosive with a one second delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
 			;
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::FLASHBANG, white);
 			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
 			fixtures.restitution = 1.f;
@@ -279,13 +257,6 @@ namespace test_flavours {
 			meta.get<invariants::text_details>().description =
 				"Throwable explosive with a one second delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
 			;
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PED_GRENADE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
@@ -511,13 +482,6 @@ namespace test_flavours {
 			meta.get<invariants::text_details>().description =
 				"Can be planted. Deals massive damage nearby."
 			;
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BOMB_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
