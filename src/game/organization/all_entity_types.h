@@ -213,8 +213,7 @@ struct wandering_pixels_decoration {
 	static constexpr std::size_t statically_allocated_flavours = 20;
 
 	using invariant_list = type_list<
-		invariants::wandering_pixels,
-		invariants::render
+		invariants::wandering_pixels
 	>;
 
 	using component_list = type_list<

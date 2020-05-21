@@ -50,27 +50,17 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_wandering_pixels_decorations::WANDERING_PIXELS);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ILLUMINATING_WANDERING_PIXELS;
-
-				meta.set(render_def);
-			}
-
 			invariants::wandering_pixels wandering;
 			wandering.animation_id = to_animation_id(test_scene_plain_animation_id::WANDERING_PIXELS_ANIMATION);
 			meta.set(wandering);
+
+			components::wandering_pixels initial_wandering;
+			initial_wandering.illuminate = true;
+			meta.set(initial_wandering);
 		}
 
 		{
 			auto& meta = get_test_flavour(flavours, test_wandering_pixels_decorations::AQUARIUM_PIXELS_LIGHT);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ILLUMINATING_WANDERING_PIXELS;
-
-				meta.set(render_def);
-			}
 
 			{
 				invariants::wandering_pixels wandering;
@@ -86,6 +76,7 @@ namespace test_flavours {
 				wandering.keep_particles_within_bounds = true;
 				wandering.colorize = { 234, 228, 201, 255 };
 				wandering.particles_count = 15;
+				wandering.illuminate = true;
 				meta.set(wandering);
 
 				components::overridden_geo s;
@@ -96,13 +87,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_wandering_pixels_decorations::AQUARIUM_PIXELS_DIM);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::DIM_WANDERING_PIXELS;
-
-				meta.set(render_def);
-			}
 
 			{
 				invariants::wandering_pixels wandering;

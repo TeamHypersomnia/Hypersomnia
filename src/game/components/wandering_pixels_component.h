@@ -9,7 +9,8 @@ namespace components {
 		rgba colorize = white;
 		unsigned particles_count = 0u;
 		bool keep_particles_within_bounds = false;
-		pad_bytes<3> pad;
+		bool illuminate = false;
+		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 	};
 }
