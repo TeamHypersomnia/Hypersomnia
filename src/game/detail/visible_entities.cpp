@@ -237,6 +237,7 @@ void visible_entities::register_visible(const cosmos& cosm, const entity_id id) 
 }
 
 void visible_entities::sort_car_interiors(const cosmos& cosm) {
+#if TODO_CARS
 	auto& car_interior_layer = per_layer[render_layer::CAR_INTERIOR];
 
 	if (car_interior_layer.size() > 1) {
@@ -247,4 +248,7 @@ void visible_entities::sort_car_interiors(const cosmos& cosm) {
 			}
 		);
 	}
+#else
+	(void)cosm;
+#endif
 }

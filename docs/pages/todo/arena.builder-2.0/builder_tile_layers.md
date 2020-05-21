@@ -23,6 +23,17 @@
 	- Well in Unity you have unpackable prefabs right
 
 - Problem: for performance, we really want to imply a specific order of rendering for given layer functionalities
+	- Point is we can force a single drawcall on them
+
+- Now what about objects whose render layer is implied like wandering pixels?
+	- should it be implied?
+
+- We might allow for unpacking later, why not
+
+- Tabs?
+	- Foreground
+	- Background
+	- Walls
 
 - Maybe create a layer folder for any special object?
 

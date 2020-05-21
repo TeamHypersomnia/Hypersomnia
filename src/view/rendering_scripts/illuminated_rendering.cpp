@@ -611,7 +611,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		shaders.illuminated->set_as_current(renderer);
 	}
 
-	/* Sorting layer: Ground */
+	/* Sorting layer: Walls */
 
 	renderer.call_triangles(D::WALL_LIGHTED_BODIES);
 	renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);

@@ -302,8 +302,6 @@ void enqueue_illuminated_rendering_jobs(
 					render_layer::FLYING_BULLETS,
 					render_layer::WATER_COLOR_OVERLAYS,
 					render_layer::WATER_SURFACES,
-					render_layer::CAR_INTERIOR,
-					render_layer::CAR_WHEEL,
 					render_layer::NEON_CAPTIONS,
 					render_layer::PLANTED_BOMBS,
 					render_layer::AQUARIUM_FLOWERS,
@@ -387,9 +385,7 @@ void enqueue_illuminated_rendering_jobs(
 			auto job = [h1 = make_helper(D::WATER_AND_CARS), h2 = make_helper(D::INSECTS), h3 = make_helper(D::CAPTIONS_AND_BULLETS)]() {
 				h1.draw<
 					render_layer::WATER_COLOR_OVERLAYS,
-					render_layer::WATER_SURFACES,
-					render_layer::CAR_INTERIOR,
-					render_layer::CAR_WHEEL
+					render_layer::WATER_SURFACES
 				>();
 
 				h2.draw<

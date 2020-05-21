@@ -15,9 +15,7 @@ render_layer_filter aabb_highlighter::get_filter() {
 		render_layer::SENTIENCES,
 		render_layer::OVER_DYNAMIC_BODY,
 		render_layer::DYNAMIC_BODY,
-		render_layer::GLASS_BODY,
-		render_layer::CAR_INTERIOR,
-		render_layer::CAR_WHEEL
+		render_layer::GLASS_BODY
 	);
 }
 
