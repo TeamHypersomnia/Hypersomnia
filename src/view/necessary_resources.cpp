@@ -116,12 +116,6 @@ all_necessary_shaders::all_necessary_shaders(
 		illuminating_smoke->set_uniform(renderer, U::smoke_texture, 3);
 	}
 
-	if (specular_highlights) {
-		specular_highlights->set_as_current(renderer);
-		specular_highlights->set_uniform(renderer, U::basic_texture, 0);
-		specular_highlights->set_uniform(renderer, U::light_texture, 2);
-	}
-
 	if (textured_light) {
 		textured_light->set_as_current(renderer);
 		textured_light->set_uniform(renderer, U::basic_texture, 0);

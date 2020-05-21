@@ -1,5 +1,23 @@
 # General
 
+- Something like this:
+	- https://twitter.com/probabletrain/status/1260571939208388612
+	- This would generate a set of default wall polygon entities
+		- We can later use clipper for the user to be able to e.g. make a rectangular selection to split this polygon
+			- so they can assign different prefabs to the walls
+	- We could either write a parser or write a simplified tool
+		- But it's enought that we introduce another object type: a polygonal wall
+			- such that it is possible to carve and split it later
+		- wall layer? lol
+		- or just an object
+	- Floors could later be tile layers just fine, the polygons will be drawn over them
+	- We could still create tiled wall layers for nice transitions
+	- or paint with tiles over the polygons
+
+- The polygonal wall could just be another object type rendered over everything
+	- the artist would choose how they'd like to go about creating wall layouts
+
+
 - Set a reasonable minimum for a tile.
 	- let's go and create a full blown tile architecture.
 	- 

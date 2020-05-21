@@ -361,11 +361,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_triangles(D::GROUND_FLOORS_DECORS);
 	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
-
-	set_shader_with_matrix(shaders.specular_highlights);
-
-	shaders.illuminated->set_as_current(renderer);
-
 	renderer.call_triangles(D::WATER_AND_CARS);
 
 	set_shader_with_matrix(shaders.pure_color_highlight);

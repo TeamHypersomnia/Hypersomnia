@@ -61,7 +61,6 @@ struct all_necessary_shaders {
 	// GEN INTROSPECTOR struct all_necessary_shaders
 	optional_shader standard;
 	optional_shader illuminated;
-	optional_shader specular_highlights;
 	optional_shader pure_color_highlight;
 	optional_shader fog_of_war;
 	optional_shader circular_bars;
