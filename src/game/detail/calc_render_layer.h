@@ -24,6 +24,12 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 
 			return handle.template get<invariants::render>().layer;
 		}
+		else if constexpr(H::template has<invariants::item>()) {
+			return render_layer::SMALL_DYNAMIC_BODY;
+		}
+		else if constexpr(H::template has<invariants::missile>()) {
+			return render_layer::FLYING_BULLETS;
+		}
 		else if constexpr(H::template has<invariants::point_marker>()) {
 			return render_layer::POINT_MARKERS;
 		}
@@ -48,9 +54,6 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 		}
 		else if constexpr(H::template has<invariants::continuous_sound>()) {
 			return render_layer::CONTINUOUS_SOUNDS;
-		}
-		else if constexpr(H::template has<invariants::item>()) {
-			return render_layer::SMALL_DYNAMIC_BODY;
 		}
 		else {
 			return render_layer::INVALID;

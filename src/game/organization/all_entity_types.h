@@ -286,7 +286,6 @@ struct plain_missile {
 		invariants::fixtures,
 
 		invariants::sprite,
-		invariants::render,
 
 		invariants::trace,
 
@@ -316,7 +315,6 @@ struct finishing_trace {
 
 	using invariant_list = type_list<
 		invariants::sprite,
-		invariants::render,
 		invariants::trace,
 		invariants::interpolation
 	>;

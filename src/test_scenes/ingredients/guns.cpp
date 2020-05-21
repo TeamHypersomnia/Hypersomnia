@@ -250,13 +250,6 @@ namespace test_flavours {
 
 			meta.template get<invariants::text_details>().name = "Skull rocket";
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
 
 			{
 				invariants::flags flags_def;
@@ -321,13 +314,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			{
@@ -398,13 +384,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::GALILEA_ROUND);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
 
 			{
 				invariants::flags flags_def;
@@ -473,13 +452,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::HUNTER_ROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			{
@@ -551,13 +523,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::BULLDUP2000_ROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			{
@@ -645,13 +610,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::ORANGE_ROUND);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
 
 			{
 				invariants::flags flags_def;
@@ -719,13 +677,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::DEAGLE_ROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			{
@@ -799,13 +750,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::PISTOL_CYAN_ROUND);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
 
 			{
 				invariants::flags flags_def;
@@ -873,13 +817,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::HPSR_ROUND);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
 
 			{
 				invariants::flags flags_def;
@@ -945,13 +882,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::SHOTGUN_RED_ROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			{
@@ -1019,13 +949,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::GRADOBICIE_ROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			{
@@ -1097,13 +1020,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::ZAMIEC_ROUND);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
 
 			{
 				invariants::flags flags_def;
@@ -1171,13 +1087,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::PRO90_ROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			{
@@ -1248,13 +1157,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
 
 			{
 				invariants::flags flags_def;
@@ -1318,13 +1220,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::COVERT_CYAN_ROUND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			{
@@ -1391,13 +1286,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::SZTURM_ROUND);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
-
 
 			{
 				invariants::flags flags_def;
@@ -1460,13 +1348,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::BLUNAZ_MISSILE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
@@ -1575,13 +1456,6 @@ namespace test_flavours {
 
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-			}
 
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
@@ -2912,13 +2786,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, cyan);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, cyan);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND).get<invariants::trace>());
@@ -2928,13 +2796,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::HPSR_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, cyan);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_ROUND, cyan);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::HPSR_ROUND).get<invariants::trace>());
@@ -2944,13 +2806,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::BULLDUP2000_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::BULLDUP2000_ROUND).get<invariants::trace>());
@@ -2960,13 +2816,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::HUNTER_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::HUNTER_ROUND).get<invariants::trace>());
@@ -2976,13 +2826,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::GALILEA_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::GALILEA_ROUND).get<invariants::trace>());
@@ -2993,13 +2837,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::DEAGLE_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::DEAGLE_ROUND).get<invariants::trace>());
@@ -3009,13 +2847,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::STEEL_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND).get<invariants::trace>());
@@ -3025,13 +2857,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::ORANGE_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::ORANGE_ROUND).get<invariants::trace>());
@@ -3041,13 +2867,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::SHOTGUN_RED_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::SHOTGUN_RED_ROUND).get<invariants::trace>());
@@ -3057,13 +2877,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::GRADOBICIE_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::GRADOBICIE_ROUND).get<invariants::trace>());
@@ -3073,13 +2887,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::PRO90_ROUND_FINISHING_TRACE);
 			
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::SHOTGUN_RED_ROUND).get<invariants::trace>());
@@ -3089,13 +2897,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::ELECTRIC_MISSILE_FINISHING_TRACE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLYING_BULLETS;
-
-				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
-			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE).get<invariants::trace>());
