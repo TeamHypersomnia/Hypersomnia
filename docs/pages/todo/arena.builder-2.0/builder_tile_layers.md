@@ -1,3 +1,29 @@
+
+- What about layers for complex predefined objects like an aquarium?
+	- Well we certainly don't want to expose all those shit with fish to the artist unless they really want to
+		- They will NOT want to edit the individual fish positions okay...
+	- well can't we just hide it and make uninteractable? Should be no problem
+	- but it needs to be an object at the very least
+	- Adjustable layer offset
+		- Determined from all layers below
+
+- The index is calculated cross-layer because there might be more than one "ground" object layer
+		
+- Let's think of an example of a layered map
+	- Floor tiles
+	- On floor tiles
+
+- Perhaps object-based after all? Just that each has a layer and tile objects too have one
+	- Though it might be cool to arrange objects into layer-like folders
+
+- So aquarium is a special object
+	- What does layer placement mean for it?
+
+- Layers inside Sorting layers could be separated by imgui separators
+	- but where does aquarium fit in?
+	- do we force it into a ground sorting layer?
+		- and if there is no layer in that sorting layer, create one?
+
 - We might just have a "layers" and "objects" view
 
 - For the case where we have tiles with another material on the edge

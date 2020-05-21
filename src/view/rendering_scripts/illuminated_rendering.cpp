@@ -220,6 +220,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		else {
 			renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
 		}
+
+		renderer.call_and_clear_triangles();
 	};
 
 	auto draw_sentiences = [&](auto& shader) {
@@ -240,6 +242,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	auto draw_sentience_HUDs = [&]() {
+		set_shader_with_matrix(shaders.circular_bars);
+
 		const auto set_center_uniform = [&](const auto& tex_id) {
 			set_uniform(shaders.circular_bars, U::texture_center, necessarys[tex_id].get_center());
 		};
@@ -538,6 +542,18 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		light.render_all_lights(light_input);
 	};
 
+	auto overlay_smoke_texture = [&]() {
+		renderer.set_active_texture(1);
+		bind_and_update_filtering(fbos.smoke->get_texture());
+		renderer.set_active_texture(0);
+
+		shaders.smoke->set_as_current(renderer);
+
+		renderer.fullscreen_quad();
+
+		shaders.standard->set_as_current(renderer);
+	};
+
 	/* Flow */
 
 	if (in.general_atlas) {
@@ -578,22 +594,24 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	set_shader_with_matrix(shaders.illuminated);
 
+	/* Sorting layer: Ground */
+
 	renderer.call_triangles(D::GROUND_FLOORS_DECORS);
 	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
 	renderer.call_triangles(D::WATER_AND_CARS);
 
-	set_shader_with_matrix(shaders.pure_color_highlight);
+	{
+		set_shader_with_matrix(shaders.pure_color_highlight);
 
-	draw_sentience_borders();
+		draw_sentience_borders();
+		draw_area_markers();
+		draw_interaction_sensor();
 
-	renderer.call_and_clear_triangles();
+		renderer.call_and_clear_lines();
+		shaders.illuminated->set_as_current(renderer);
+	}
 
-	draw_area_markers();
-	draw_interaction_sensor();
-
-	renderer.call_and_clear_lines();
-
-	shaders.illuminated->set_as_current(renderer);
+	/* Sorting layer: Ground */
 
 	renderer.call_triangles(D::WALL_LIGHTED_BODIES);
 	renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);
@@ -605,16 +623,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_triangles(D::INSECTS);
 	renderer.call_triangles(D::OVER_SENTIENCES);
 
-	renderer.set_active_texture(1);
-
-	bind_and_update_filtering(fbos.smoke->get_texture());
-	renderer.set_active_texture(0);
-
-	shaders.smoke->set_as_current(renderer);
-
-	renderer.fullscreen_quad();
-
-	shaders.standard->set_as_current(renderer);
+	overlay_smoke_texture();
 	
 	renderer.call_triangles(D::CAPTIONS_AND_BULLETS);
 
@@ -626,7 +635,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_triangles(D::ILLUMINATING_WANDERING_PIXELS);
 
-	set_shader_with_matrix(shaders.circular_bars);
 	draw_sentience_HUDs();
 
 	set_shader_with_non_zoomed_matrix(shaders.standard);
