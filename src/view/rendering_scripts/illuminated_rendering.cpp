@@ -55,31 +55,21 @@
 #include "view/rendering_scripts/enqueue_illuminated_rendering_jobs.hpp"
 
 void illuminated_rendering(const illuminated_rendering_input in) {
+	using U = augs::common_uniform_name;
 	using D = augs::dedicated_buffer;
 	using DV = augs::dedicated_buffer_vector;
 
-	const auto& additional_highlights = in.additional_highlights;
-	augs::graphics::fbo::mark_current(in.renderer);
+	const auto& av = in.audiovisuals;
+	const auto& interp = av.get<interpolation_system>();
 
-	auto& profiler = in.frame_performance;
-	auto& renderer = in.renderer;
-
-	using U = augs::common_uniform_name;
-
-	auto set_uniform = [&](auto&& sh, auto&&... args) {
-		sh->set_uniform(renderer, std::forward<decltype(args)>(args)...);
-	};
-	
 	const auto viewed_character = in.camera.viewed_character;
+	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
+	const auto& cosm = viewed_character.get_cosmos();
 
 	const auto cone = in.camera.cone;
 	const auto screen_size = cone.screen_size;
-
-	const auto& cosm = viewed_character.get_cosmos();
 	
-	const auto& av = in.audiovisuals;
 	const auto& light = av.get<light_system>();
-	const auto& interp = av.get<interpolation_system>();
 	const auto& exploding_rings = av.get<exploding_ring_system>();
 	const auto& flying_numbers = av.get<flying_number_indicator_system>();
 	const auto& highlights = av.get<pure_color_highlight_system>();
@@ -89,11 +79,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	const bool is_zoomed_out = cone.eye.zoom < 1.f;
 
-	auto non_zoomed_cone = cone;
-	non_zoomed_cone.eye.zoom = 1.f;
-	non_zoomed_cone.eye.transform.pos = screen_size / 2;
+	const auto non_zoomed_matrix = [&]() {
+		auto non_zoomed_cone = cone;
+		non_zoomed_cone.eye.zoom = 1.f;
+		non_zoomed_cone.eye.transform.pos = screen_size / 2;
 
-	const auto non_zoomed_matrix = non_zoomed_cone.get_projection_matrix();
+		return non_zoomed_cone.get_projection_matrix();
+	}();
 
 	const auto& visible = in.all_visible;
 	const auto& shaders = in.shaders;
@@ -103,36 +95,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto blank = necessarys.at(assets::necessary_image_id::BLANK);
 	const auto& gui_font = in.gui_font;
 
-	auto get_drawer = [&]() {
-		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank };
-	};
-
-	auto get_line_drawer = [&]() {
-		return augs::line_drawer_with_default{ renderer.get_line_buffer(), blank };
-	};
-
-	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 	const auto queried_cone = in.queried_cone;
 
-#if BUILD_STENCIL_BUFFER
-	const bool fog_of_war_effective = 
-		viewed_character_transform != std::nullopt 
-		&& settings.fog_of_war.is_enabled()
-	;
-#else
-	const bool fog_of_war_effective = false;
-#endif
+	auto& profiler = in.frame_performance;
+	auto& renderer = in.renderer;
 
-	const auto filtering = in.renderer_settings.default_filtering;
+	/* Shader manipulation lambdas */
 
-	auto bind_and_set_filter = [&](auto& tex) {
-		tex.set_as_current(renderer);
-		tex.set_filtering(renderer, filtering);
+	auto set_uniform = [&](auto&& sh, auto&&... args) {
+		sh->set_uniform(renderer, std::forward<decltype(args)>(args)...);
 	};
-
-	if (in.general_atlas) {
-		bind_and_set_filter(*in.general_atlas);
-	}
 
 	auto set_shader_with_matrix = [&](auto& shader) {
 		shader->set_as_current(renderer);
@@ -144,13 +116,39 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		shader->set_projection(renderer, non_zoomed_matrix);
 	};
 
-	set_shader_with_matrix(shaders.standard);
+	auto bind_and_update_filtering = [&](auto& tex) {
+		const auto filtering = in.renderer_settings.default_filtering;
 
-	fbos.smoke->set_as_current(renderer);
+		tex.set_as_current(renderer);
+		tex.set_filtering(renderer, filtering);
+	};
 
-	renderer.clear_current_fbo();
-	renderer.set_additive_blending();
-	
+	/* Output buffer getters */
+
+	auto get_drawer = [&]() {
+		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank };
+	};
+
+	auto get_line_drawer = [&]() {
+		return augs::line_drawer_with_default{ renderer.get_line_buffer(), blank };
+	};
+
+	auto make_drawing_input = [&]() {
+		return draw_renderable_input { 
+			{
+				get_drawer(), 
+				game_images, 
+				global_time_seconds,
+				flip_flags(),
+				av.randomizing,
+				queried_cone
+			},
+			interp
+		};
+	};
+
+	/* Drawing lambdas */
+
 	auto draw_particles = [&](const particle_layer layer) {
 		renderer.call_triangles(in.drawn_particles.diffuse[layer]);
 	};
@@ -158,6 +156,28 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	auto draw_particles_neons = [&]() {
 		renderer.call_triangles(in.drawn_particles.neons);
 	};
+
+#if BUILD_STENCIL_BUFFER
+	const bool fog_of_war_effective = 
+		viewed_character_transform != std::nullopt 
+		&& settings.fog_of_war.is_enabled()
+	;
+#else
+	const bool fog_of_war_effective = false;
+#endif
+
+	if (in.general_atlas) {
+		bind_and_update_filtering(*in.general_atlas);
+	}
+
+	augs::graphics::fbo::mark_current(in.renderer);
+
+	set_shader_with_matrix(shaders.standard);
+
+	fbos.smoke->set_as_current(renderer);
+
+	renderer.clear_current_fbo();
+	renderer.set_additive_blending();
 
 	draw_particles(particle_layer::DIM_SMOKES);
 	draw_particles(particle_layer::ILLUMINATING_SMOKES);
@@ -179,20 +199,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto glow_edge_tex = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
 
 	const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
-
-	auto make_drawing_input = [&]() {
-		return draw_renderable_input { 
-			{
-				get_drawer(), 
-				game_images, 
-				global_time_seconds,
-				flip_flags(),
-				av.randomizing,
-				queried_cone
-			},
-			interp
-		};
-	};
 
 	auto write_fow_to_stencil = [&]() {
 		if (viewed_character.dead()) {
@@ -324,7 +330,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			})();
 
 			renderer.set_active_texture(3);
-			bind_and_set_filter(fbos.illuminating_smoke->get_texture());
+			bind_and_update_filtering(fbos.illuminating_smoke->get_texture());
 			renderer.set_active_texture(0);
 
 			shaders.illuminating_smoke->set_as_current(renderer);
@@ -469,7 +475,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.set_active_texture(1);
 
-	bind_and_set_filter(fbos.smoke->get_texture());
+	bind_and_update_filtering(fbos.smoke->get_texture());
 	renderer.set_active_texture(0);
 
 	shaders.smoke->set_as_current(renderer);
@@ -600,7 +606,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		auto drawing_input = make_drawing_input();
 		highlights.draw_highlights(cosm, drawing_input);
 
-		for (const auto& h : additional_highlights) {
+		for (const auto& h : in.additional_highlights) {
 			draw_color_highlight(cosm[h.id], h.col, drawing_input);
 		}
 
