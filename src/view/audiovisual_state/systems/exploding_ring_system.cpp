@@ -220,7 +220,7 @@ void exploding_ring_system::draw_rings(
 	}
 }
 
-void exploding_ring_system::draw_highlights_of_rings(
+void exploding_ring_system::draw_highlights_of_explosions(
 	const augs::drawer output,
 	const augs::atlas_entry highlight_tex,
 	const camera_cone cone

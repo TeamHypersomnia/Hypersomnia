@@ -166,40 +166,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const bool fog_of_war_effective = false;
 #endif
 
-	if (in.general_atlas) {
-		bind_and_update_filtering(*in.general_atlas);
-	}
-
-	augs::graphics::fbo::mark_current(in.renderer);
-
-	set_shader_with_matrix(shaders.standard);
-
-	fbos.smoke->set_as_current(renderer);
-
-	renderer.clear_current_fbo();
-	renderer.set_additive_blending();
-
-	draw_particles(particle_layer::DIM_SMOKES);
-	draw_particles(particle_layer::ILLUMINATING_SMOKES);
-
-	renderer.call_and_clear_triangles();
-
-	fbos.illuminating_smoke->set_as_current(renderer);
-	renderer.clear_current_fbo();
-
-	draw_particles(particle_layer::ILLUMINATING_SMOKES);
-
-	renderer.call_and_clear_triangles();
-	
-	renderer.set_standard_blending();
-
-	augs::graphics::fbo::set_current_to_marked(in.renderer);
-
-	const auto laser_glow = necessarys.at(assets::necessary_image_id::LASER_GLOW);
-	const auto glow_edge_tex = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
-
-	const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
-
 	auto write_fow_to_stencil = [&]() {
 		if (viewed_character.dead()) {
 			return;
@@ -241,6 +207,21 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.set_stencil(false);
 	};
 
+	auto draw_sentience_borders = [&]() {
+		if (fog_of_war_effective) {
+			renderer.set_stencil(true);
+			renderer.stencil_positive_test();
+
+			renderer.call_triangles(D::BORDERS_ENEMY_SENTIENCES);
+			renderer.set_stencil(false);
+
+			renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
+		}
+		else {
+			renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
+		}
+	};
+
 	auto draw_sentiences = [&](auto& shader) {
 		if (fog_of_war_effective) {
 			renderer.stencil_positive_test();
@@ -258,7 +239,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		}
 	};
 
-	auto neon_occlusion_callback = [&]() {
+	auto occlude_neons = [&]() {
 		auto& shader = shaders.neon_occluder;
 
 		set_shader_with_matrix(shader);
@@ -267,7 +248,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_uniform(shader, U::global_color, ambient_color);
 
 		if (settings.occlude_neons_under_sentiences) {
-			//renderer.clear_current_fbo();
 			draw_sentiences(*shader);
 		}
 
@@ -276,92 +256,130 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		}
 	};
 
-	const auto light_input = light_system_input {
-		renderer,
-		profiler,
-		cosm, 
-		matrix,
-		fbos.light.value(),
-		*shaders.light, 
-		*shaders.textured_light, 
-		*shaders.standard, 
-		neon_occlusion_callback,
-		[&]() {
-			draw_particles_neons();
+	auto light_pass = [&]() {
+		const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
 
-			if (viewed_character) {
-				draw_crosshair_lasers({
-					[&](const vec2 from, const vec2 to, const rgba col) {
-						if (!settings.draw_weapon_laser) {
-							return;
-						}
+		const auto light_input = light_system_input {
+			renderer,
+			profiler,
+			cosm, 
+			matrix,
+			fbos.light.value(),
+			*shaders.light, 
+			*shaders.textured_light, 
+			*shaders.standard, 
+			occlude_neons,
+			[&]() {
+				draw_particles_neons();
 
-						const vec2 edge_size = static_cast<vec2>(glow_edge_tex.get_original_size());
+				if (viewed_character) {
+					const auto laser_glow = necessarys.at(assets::necessary_image_id::LASER_GLOW);
+					const auto glow_edge_tex = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
 
-						get_drawer().line(laser_glow, from, to, edge_size.y / 3.f, col);
+					draw_crosshair_lasers({
+						[&](const vec2 from, const vec2 to, const rgba col) {
+							if (!settings.draw_weapon_laser) {
+								return;
+							}
 
-						const auto edge_dir = (to - from).normalize();
-						const auto edge_offset = edge_dir * edge_size.x;
+							const vec2 edge_size = static_cast<vec2>(glow_edge_tex.get_original_size());
 
-						get_drawer().line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
-						get_drawer().line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 3.f, col, flip_flags::make_horizontally());
-					},
-					[](const vec2, const vec2, const rgba) {},
+							get_drawer().line(laser_glow, from, to, edge_size.y / 3.f, col);
+
+							const auto edge_dir = (to - from).normalize();
+							const auto edge_offset = edge_dir * edge_size.x;
+
+							get_drawer().line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
+							get_drawer().line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 3.f, col, flip_flags::make_horizontally());
+						},
+						[](const vec2, const vec2, const rgba) {},
+						interp,
+						viewed_character,
+						in.pre_step_crosshair_displacement
+					});
+				}
+
+				draw_explosion_body_highlights({
+					get_drawer(),
+					queried_cone,
 					interp,
-					viewed_character,
-					in.pre_step_crosshair_displacement
+					cosm,
+					global_time_seconds,
+					cast_highlight
 				});
-			}
 
-			draw_explosion_body_highlights({
-				get_drawer(),
-				queried_cone,
-				interp,
-				cosm,
-				global_time_seconds,
-				cast_highlight
-			});
+				draw_beep_lights({
+					get_drawer(),
+					interp,
+					cosm,
+					cast_highlight
+				})();
 
-			draw_beep_lights({
-				get_drawer(),
-				interp,
-				cosm,
-				cast_highlight
-			})();
+				renderer.set_active_texture(3);
+				bind_and_update_filtering(fbos.illuminating_smoke->get_texture());
+				renderer.set_active_texture(0);
 
-			renderer.set_active_texture(3);
-			bind_and_update_filtering(fbos.illuminating_smoke->get_texture());
-			renderer.set_active_texture(0);
+				shaders.illuminating_smoke->set_as_current(renderer);
 
-			shaders.illuminating_smoke->set_as_current(renderer);
+				renderer.fullscreen_quad();
 
-			renderer.fullscreen_quad();
+				shaders.standard->set_as_current(renderer);
 
-			shaders.standard->set_as_current(renderer);
+				exploding_rings.draw_highlights_of_explosions(
+					get_drawer(),
+					cast_highlight,
+					queried_cone
+				);
+			},
+			write_fow_to_stencil,
+			cone,
+			fog_of_war_effective ? viewed_character : std::optional<entity_id>(),
+			in.queried_cone,
+			visible,
+			cast_highlight,
+			make_drawing_input,
+			in.perf_settings,
+			in.light_requests
+		};
 
-			exploding_rings.draw_highlights_of_rings(
-				get_drawer(),
-				cast_highlight,
-				queried_cone
-			);
-		},
-		write_fow_to_stencil,
-		cone,
-		fog_of_war_effective ? viewed_character : std::optional<entity_id>(),
-		in.queried_cone,
-		visible,
-		cast_highlight,
-		make_drawing_input,
-		in.perf_settings,
-		in.light_requests
+		light.render_all_lights(light_input);
 	};
+
+	if (in.general_atlas) {
+		bind_and_update_filtering(*in.general_atlas);
+	}
+
+	augs::graphics::fbo::mark_current(in.renderer);
+
+	set_shader_with_matrix(shaders.standard);
+
+	fbos.smoke->set_as_current(renderer);
+
+	renderer.clear_current_fbo();
+	renderer.set_additive_blending();
+
+	draw_particles(particle_layer::DIM_SMOKES);
+	draw_particles(particle_layer::ILLUMINATING_SMOKES);
+
+	renderer.call_and_clear_triangles();
+
+	fbos.illuminating_smoke->set_as_current(renderer);
+	renderer.clear_current_fbo();
+
+	draw_particles(particle_layer::ILLUMINATING_SMOKES);
+
+	renderer.call_and_clear_triangles();
+	
+	renderer.set_standard_blending();
+
+	augs::graphics::fbo::set_current_to_marked(in.renderer);
 
 	if (fog_of_war_effective) {
 		renderer.call_and_clear_triangles();
 		write_fow_to_stencil();
 	}
 
-	light.render_all_lights(light_input);
+	light_pass();
 
 	set_shader_with_matrix(shaders.illuminated);
 
@@ -371,18 +389,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
 
-	if (fog_of_war_effective) {
-		renderer.set_stencil(true);
-		renderer.stencil_positive_test();
-
-		renderer.call_triangles(D::BORDERS_ENEMY_SENTIENCES);
-		renderer.set_stencil(false);
-
-		renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
-	}
-	else {
-		renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
-	}
+	draw_sentience_borders();
 
 	renderer.call_and_clear_triangles();
 
