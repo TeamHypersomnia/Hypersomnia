@@ -72,9 +72,7 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 	else {
 		return handle.template conditional_dispatch_ret<entities_with_render_layer>(
 			[&](const auto& typed_handle) -> render_layer {
-				using E = remove_cref<decltype(typed_handle)>;
-
-				if constexpr(is_nullopt_v<E>) {
+				if constexpr(is_nullopt_v<decltype(typed_handle)>) {
 					return render_layer::INVALID;
 				}
 				else {

@@ -56,6 +56,7 @@ summary: That which we are brainstorming at the moment.
 		- just use existing color overlay shader for that - it will be rendered as the first
 	- screw velocity check, just identify the physical filter for it to certainly be the lying item (we don't want to apply it to grenades)
 	- a little cyclic shine on the top (might also be done with the overlay shader
+	- We could disable emphasis for the empty mags
 
 
 - A keyboard map guide

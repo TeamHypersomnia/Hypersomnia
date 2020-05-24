@@ -25,51 +25,6 @@ namespace test_flavours {
 	void populate_car_flavours(const populate_flavours_input in) {
 		(void)in;
 #if TODO_CARS
-		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_FRONT);
-			
-			invariants::render render_def;
-			render_def.layer = render_layer::DYNAMIC_BODY;
-
-			meta.set(render_def);
-
-			invariants::polygon poly;
-			const auto b = caches.at(to_image_id(test_scene_image_id::TRUCK_FRONT)).make_box();
-			poly.add_convex_polygons(b.convex_polys);
-			poly.texture_map_id = to_image_id(test_scene_image_id::TRUCK_FRONT);
-
-			meta.set(poly);
-
-		}
-		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_INTERIOR);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::CAR_INTERIOR;
-
-			meta.set(render_def);
-
-			add_sprite(meta, caches, test_scene_image_id::TRUCK_INSIDE);
-
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_LEFT_WHEEL);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::CAR_WHEEL;
-
-			meta.set(render_def);
-			invariants::sprite sprite_def;
-			sprite_def.set(to_image_id(test_scene_image_id::BLANK), vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
-			meta.set(sprite_def);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_ENGINE_BODY);
-
-			add_sprite(meta, caches, test_scene_image_id::TRUCK_ENGINE);
-		}
 #endif
 	}
 }

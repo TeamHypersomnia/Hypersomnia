@@ -16,7 +16,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_complex_decorations::ROTATING_FAN,
 				test_scene_image_id::FAN,
-				render_layer::ON_FLOOR
+				test_ground_order::ON_FLOOR
 			);
 
 			{
@@ -159,7 +159,7 @@ namespace test_flavours {
 				test_complex_decorations::CONSOLE_LIGHT,
 				test_scene_image_id::CONSOLE_LIGHT_1,
 				test_scene_plain_animation_id::CONSOLE_LIGHT,
-				render_layer::ON_ON_FLOOR
+				test_ground_order::ON_ON_FLOOR
 			);
 
 			meta.get<invariants::sprite>().neon_intensity_vibration.is_enabled = true;
@@ -221,38 +221,38 @@ namespace test_flavours {
 		flavour_with_sprite(
 			test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY,
 			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_BODY,
-			render_layer::ON_ON_FLOOR
+			test_ground_order::ON_ON_FLOOR
 		);
 
 		flavour_with_sprite(
 			test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT,
 			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_LIGHT,
-			render_layer::ON_ON_FLOOR
+			test_ground_order::ON_ON_FLOOR
 		);
 
 		flavour_with_sprite(
 			test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY,
 			test_scene_image_id::AQUARIUM_HALOGEN_1_BODY,
-			render_layer::ON_ON_FLOOR
+			test_ground_order::ON_ON_FLOOR
 		);
 
 		flavour_with_sprite(
 			test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT,
 			test_scene_image_id::AQUARIUM_HALOGEN_1_LIGHT,
-			render_layer::ON_ON_FLOOR
+			test_ground_order::ON_ON_FLOOR
 		);
 
 		flavour_with_sprite(
 			test_sprite_decorations::AQUARIUM_SAND_1,
 			test_scene_image_id::AQUARIUM_SAND_1,
-			render_layer::ON_FLOOR,
+			test_ground_order::ON_FLOOR,
 			sand_color
 		);
 
 		flavour_with_sprite(
 			test_sprite_decorations::AQUARIUM_SAND_2,
 			test_scene_image_id::AQUARIUM_SAND_2,
-			render_layer::ON_FLOOR,
+			test_ground_order::ON_FLOOR,
 			sand_color
 		);
 

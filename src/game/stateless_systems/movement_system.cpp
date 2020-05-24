@@ -409,13 +409,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 							return false;
 						},
-						render_layer_filter::whitelist(
-							render_layer::ON_ON_FLOOR,
-							render_layer::ON_FLOOR,
-							render_layer::FLOOR_AND_ROAD,
-							render_layer::GROUND,
-							render_layer::UNDER_GROUND
-						)
+						render_layer_filter::whitelist(render_layer::GROUND)
 					);
 
 					const auto drag_mult = 1 - chosen_speed_mult;

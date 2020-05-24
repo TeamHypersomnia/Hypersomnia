@@ -20,15 +20,22 @@ template <class F>
 entity_id visible_entities::get_first_fulfilling(F condition) const {
 	const auto order = get_default_layer_order();
 
+	auto result = entity_id();
+
 	for (const auto& layer : order) {
-		for (const auto candidate : per_layer[layer]) {
-			if (condition(candidate)) {
-				return candidate;
+		per_layer[layer].for_each(
+			[&](const auto& candidate) {
+				if (condition(candidate)) {
+					result = candidate;
+					return callback_result::ABORT;
+				}
+
+				return callback_result::CONTINUE;
 			}
-		}
+		);
 	}
 
-	return {};
+	return result;
 }
 
 template <class F>

@@ -66,6 +66,7 @@ struct plain_sprited_body {
 		invariants::fixtures,
 		invariants::sprite,
 		invariants::render,
+		invariants::sorting_order,
 		invariants::ground,
 
 		invariants::interpolation
@@ -193,6 +194,7 @@ struct sprite_decoration {
 	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::render,
+		invariants::sorting_order,
 		invariants::ground
 	>;
 
@@ -365,6 +367,7 @@ struct complex_decoration {
 		invariants::sprite,
 		invariants::animation,
 		invariants::render,
+		invariants::sorting_order,
 		invariants::ground,
 		invariants::movement_path
 	>;

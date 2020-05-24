@@ -7,10 +7,14 @@
 
 #include "augs/pad_bytes.h"
 
+using sorting_order_type = uint32_t;
+
+constexpr sorting_order_type max_sorting_layer_v = 64;
+
 namespace invariants {
-	struct render {
-		// GEN INTROSPECTOR struct invariants::render
-		render_layer layer = render_layer::GROUND;
+	struct sorting_order {
+		// GEN INTROSPECTOR struct invariants::sorting_order
+		sorting_order_type order = 0;
 		// END GEN INTROSPECTOR
 	};
 }

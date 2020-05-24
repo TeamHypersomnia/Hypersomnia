@@ -596,7 +596,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	/* Sorting layer: Ground */
 
-	renderer.call_triangles(D::GROUND_FLOORS_DECORS);
+	renderer.call_triangles(D::GROUND_AND_DECORS);
 	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
 	renderer.call_triangles(D::WATER_AND_CARS);
 

@@ -49,6 +49,7 @@ namespace invariants {
 	struct tool;
 	struct melee;
 	struct melee_fighter;
+	struct sorting_order;
 }
 
 namespace components {
@@ -104,7 +105,8 @@ using assert_always_together = type_list<
 	type_pair<invariants::animation, components::animation>,
 	type_pair<invariants::remnant, components::remnant>,
 	type_pair<invariants::cascade_explosion, components::cascade_explosion>,
-	type_pair<invariants::melee, components::melee>
+	type_pair<invariants::melee, components::melee>,
+	type_pair<invariants::render, invariants::sorting_order>
 >;
 
 using assert_first_implies_second = type_list<
@@ -175,6 +177,7 @@ using invariant_list_t = List<
 	invariants::flags,
 	invariants::gun,
 	invariants::render,
+	invariants::sorting_order,
 	invariants::shape_polygon,
 	invariants::shape_circle,
 	invariants::polygon,

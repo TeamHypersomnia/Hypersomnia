@@ -114,7 +114,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_tiled_sprite(
 				test_sprite_decorations::SOIL,
 				test_scene_image_id::SOIL,
-				render_layer::GROUND,
+				test_ground_order::SOIL,
 				gray1
 			);
 
@@ -135,7 +135,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_sprite_decorations::ROAD_DIRT,
 				test_scene_image_id::ROAD_FRONT_DIRT,
-				render_layer::FLOOR_AND_ROAD
+				test_ground_order::FLOOR_AND_ROAD
 			);
 
 			invariants::ground ground_def;
@@ -154,7 +154,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_tiled_sprite(
 				test_sprite_decorations::ROAD,
 				test_scene_image_id::ROAD,
-				render_layer::FLOOR_AND_ROAD
+				test_ground_order::FLOOR_AND_ROAD
 			);
 
 			invariants::ground ground_def;
@@ -173,7 +173,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_tiled_sprite(
 				test_sprite_decorations::FLOOR,
 				test_scene_image_id::FLOOR,
-				render_layer::FLOOR_AND_ROAD
+				test_ground_order::FLOOR_AND_ROAD
 			);
 
 			invariants::ground ground_def;
@@ -192,7 +192,7 @@ namespace test_flavours {
 				auto& meta = flavour_with_tiled_sprite(
 					test_sprite_decorations::WATER_ROOM_FLOOR,
 					test_scene_image_id::WATER_ROOM_FLOOR,
-					render_layer::FLOOR_AND_ROAD
+					test_ground_order::FLOOR_AND_ROAD
 				);
 
 				meta.get<invariants::sprite>().color = { 132, 132, 132, 255 };

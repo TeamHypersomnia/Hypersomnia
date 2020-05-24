@@ -28,10 +28,41 @@ struct visible_entities_query {
 template <class T>
 using per_render_layer_t = augs::enum_array<T, render_layer>;
 
+
 class visible_entities {
 	using id_type = entity_id;
-	
-	using per_layer_type = per_render_layer_t<std::vector<id_type>>;
+
+	struct layer_register {
+		sorting_order_type max_order = 0;
+
+		std::array<
+			std::vector<id_type>,
+			max_sorting_layer_v
+		> per_order;
+
+		template <class F>
+		void for_each(F&& callback) const {
+			for (auto i = sorting_order_type(0); i < max_order; ++i) {
+				for (const auto& p : per_order[i]) {
+					if constexpr(std::is_same_v<callback_result, decltype(callback(p))>) {
+						if (callback_result::ABORT == callback(p)) {
+							return;
+						}
+					}
+					else {
+						callback(p);
+					}
+				}
+			}
+		}
+
+		void register_visible(const entity_id id, const sorting_order_type order);
+
+		void clear();
+		std::size_t size() const;
+	};
+
+	using per_layer_type = per_render_layer_t<layer_register>;
 	per_layer_type per_layer;
 
 	void register_visible(const cosmos&, entity_id);
@@ -53,28 +84,26 @@ public:
 	void acquire_physical(const visible_entities_query);
 	void acquire_non_physical(const visible_entities_query);
 	
-	void clear_dead_entities(const cosmos&);
 	void clear();
 
 	template <class F, class O>
 	auto for_all_ids_ordered(F&& callback, const O& order) const {
 		for (const auto& layer : order) {
-			for (const auto id : per_layer[layer]) {
-				callback(id);
-			}
+			per_layer[layer].for_each(std::forward<F>(callback));
+
 		}
 	}
 
-	auto count_all() const {
+	std::size_t count_all() const {
 		return ::accumulate_sizes(per_layer);
 	}
 
 	template <class C, class F>
 	void for_all(C& cosm, F&& callback) const {
 		for (const auto& layer : per_layer) {
-			for (const auto id : layer) {
+			layer.for_each([&](const auto id) {
 				callback(cosm[id]);
-			}
+			});
 		}
 	}
 
@@ -87,17 +116,22 @@ public:
 				return;
 			}
 
-			for (const auto& e : per_layer[l]) {
-				if constexpr(std::is_same_v<callback_result, decltype(callback(cosm[e]))>) {
-					if (callback_result::ABORT == callback(cosm[e])) {
-						broken = true;
-						break;
+			per_layer[l].for_each(
+				[&](const auto& e) {
+					if constexpr(std::is_same_v<callback_result, decltype(callback(cosm[e]))>) {
+						const auto result = callback(cosm[e]);
+
+						if (callback_result::ABORT == result) {
+							broken = true;
+						}
+
+						return result;
+					}
+					else {
+						callback(cosm[e]);
 					}
 				}
-				else {
-					callback(cosm[e]);
-				}
-			}
+			);
 		};
 
 		(looper(Args), ...);

@@ -10,6 +10,7 @@
 #include "game/enums/filters.h"
 #include "view/viewables/image_cache.h"
 #include "test_scenes/test_scene_images.h"
+#include "test_scenes/test_sorting_orders.h"
 
 namespace test_flavours {
 	template <class E>
@@ -43,17 +44,21 @@ namespace test_flavours {
 		auto lbd = [&](
 			const auto flavour_id,
 			const auto image_id,
-			const render_layer layer,
+			const auto layer,
 			const rgba color = white,
 			const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE,
 			const float effect_speed = 1.f
 		) -> auto& {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
-			{
-				invariants::render render_def;
-				render_def.layer = layer;
-				meta.set(render_def);
+			invariants::render render_def;
+			render_def.layer = get_layer_for_order_type(layer);
+			meta.set(render_def);
+
+			if constexpr(!std::is_same_v<const render_layer, decltype(layer)>) {
+				invariants::sorting_order order_def;
+				order_def.order = static_cast<sorting_order_type>(layer);
+				meta.set(order_def);
 			}
 
 			test_flavours::add_sprite(meta, caches, image_id, color, effect).effect_speed_multiplier = effect_speed;

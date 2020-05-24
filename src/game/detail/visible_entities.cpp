@@ -18,9 +18,18 @@
 
 #include "game/detail/passes_filter.h"
 #include "game/detail/calc_render_layer.h"
+#include "game/detail/calc_sorting_order.h"
 #include "augs/templates/enum_introspect.h"
 
 static constexpr auto EXACT = accuracy_type::EXACT;
+
+void visible_entities::layer_register::clear() {
+	for (sorting_order_type i = 0; i < max_order; ++i) {
+		per_order[i].clear();
+	}
+
+	max_order = 0;
+}
 
 visible_entities::visible_entities(const visible_entities_query input) {
 	reacquire_all_and_sort(input);
@@ -222,18 +231,32 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 	);
 }
 
-void visible_entities::clear_dead_entities(const cosmos& cosm) {
-	auto dead_deleter = [&cosm](const entity_id e) {
-		return cosm[e].dead();
-	};
-
-	for (auto& layer : per_layer) {
-		erase_if(layer, dead_deleter);
-	}
+void visible_entities::layer_register::register_visible(const entity_id id, const sorting_order_type order) {
+	max_order = std::max(max_order, 1 + order);
+	per_order[order].emplace_back(id);
 }
 
 void visible_entities::register_visible(const cosmos& cosm, const entity_id id) {
-	per_layer[::calc_render_layer(cosm[id])].push_back(id);
+	cosm[id].template conditional_dispatch_ret<entities_with_render_layer>(
+		[&](const auto& typed_handle) {
+			if constexpr(!is_nullopt_v<decltype(typed_handle)>) {
+				const auto layer = ::calc_render_layer(typed_handle);
+				const auto order = ::calc_sorting_order(typed_handle);
+
+				per_layer[layer].register_visible(id, order);
+			}
+		}
+	);
+}
+
+std::size_t visible_entities::layer_register::size() const {
+	std::size_t n = 0;
+
+	for (auto i = sorting_order_type(0); i < max_order; ++i) {
+		n += per_order[i].size();
+	}
+
+	return n;
 }
 
 void visible_entities::sort_car_interiors(const cosmos& cosm) {

@@ -334,13 +334,11 @@ void enqueue_illuminated_rendering_jobs(
 		{
 			auto job = [h1 = make_helper(D::FLOOR_NEONS), h2 = make_helper(D::FLOOR_NEON_OVERLAYS)]() {
 				h1.draw_neons<
-					render_layer::FLOOR_AND_ROAD,
-					render_layer::ON_FLOOR,
-					render_layer::ON_ON_FLOOR
+					render_layer::GROUND
 				>();
 
 				h2.draw<
-					render_layer::FLOOR_NEON_OVERLAY
+					render_layer::GROUND_NEON_OVERLAY
 				>();
 			};
 
@@ -360,13 +358,9 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [h = make_helper(D::GROUND_FLOORS_DECORS)]() {
+			auto job = [h = make_helper(D::GROUND_AND_DECORS)]() {
 				h.draw<
-					render_layer::UNDER_GROUND,
 					render_layer::GROUND,
-					render_layer::FLOOR_AND_ROAD,
-					render_layer::ON_FLOOR,
-					render_layer::ON_ON_FLOOR,
 
 					render_layer::PLANTED_BOMBS,
 
