@@ -2,7 +2,7 @@
 
 template <class V>
 constexpr bool never_changes_in_game = is_one_of_v<V,
-	make_entity_pool<sprite_decoration>,
+	make_entity_pool<static_decoration>,
 	make_entity_pool<box_marker>,
 	make_entity_pool<particles_decoration>,
 	make_entity_pool<wandering_pixels_decoration>,
@@ -13,8 +13,8 @@ constexpr bool never_changes_in_game = is_one_of_v<V,
 using physics_bodies = make_entity_pool<plain_sprited_body>;
 using physics_bodies_vector = typename physics_bodies::object_pool_type;
 
-using complex_decorations = make_entity_pool<complex_decoration>;
-using complex_decorations_vector = typename complex_decorations::object_pool_type;
+using dynamic_decorations = make_entity_pool<dynamic_decoration>;
+using dynamic_decorations_vector = typename dynamic_decorations::object_pool_type;
 
 struct net_solvable_stream_ref : augs::ref_memory_stream {
 	using base = augs::ref_memory_stream;
@@ -89,7 +89,7 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 		});
 	}
 
-	void special_write(const complex_decorations_vector& storage) {
+	void special_write(const dynamic_decorations_vector& storage) {
 		special_write_static_or_not(storage, [&](const auto& flav) {
 			return flav.template get<invariants::animation>().is_irrelevant_to_logic;
 		});
@@ -149,9 +149,9 @@ struct net_solvable_stream_cref : augs::cref_memory_stream {
 		special_read_static_or_not(storage);
 	}
 
-	void special_read(complex_decorations_vector& storage) {
+	void special_read(dynamic_decorations_vector& storage) {
 		special_read_static_or_not(storage);
 	}
 };
 
-static_assert(augs::has_special_read_v<net_solvable_stream_cref, complex_decorations_vector>);
+static_assert(augs::has_special_read_v<net_solvable_stream_cref, dynamic_decorations_vector>);

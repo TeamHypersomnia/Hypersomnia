@@ -14,7 +14,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_sprite(
-				test_complex_decorations::ROTATING_FAN,
+				test_dynamic_decorations::ROTATING_FAN,
 				test_scene_image_id::FAN,
 				test_ground_order::ON_FLOOR
 			);
@@ -135,21 +135,21 @@ namespace test_flavours {
 		}
 
 		flavour_with_animation(
-			test_complex_decorations::FLOWER_PINK,
+			test_dynamic_decorations::FLOWER_PINK,
 			test_scene_image_id::FLOWER_PINK_1,
 			test_scene_plain_animation_id::FLOWER_PINK,
 			test_ground_order::AQUARIUM_FLOWERS
 		);
 
 		flavour_with_animation(
-			test_complex_decorations::PINK_CORAL,
+			test_dynamic_decorations::PINK_CORAL,
 			test_scene_image_id::PINK_CORAL_1,
 			test_scene_plain_animation_id::PINK_CORAL,
 			test_ground_order::AQUARIUM_FLOWERS
 		);
 
 		flavour_with_animation(
-			test_complex_decorations::FLOWER_CYAN,
+			test_dynamic_decorations::FLOWER_CYAN,
 			test_scene_image_id::FLOWER_CYAN_1,
 			test_scene_plain_animation_id::FLOWER_CYAN,
 			test_ground_order::AQUARIUM_FLOWERS
@@ -157,7 +157,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_animation(
-				test_complex_decorations::CONSOLE_LIGHT,
+				test_dynamic_decorations::CONSOLE_LIGHT,
 				test_scene_image_id::CONSOLE_LIGHT_1,
 				test_scene_plain_animation_id::CONSOLE_LIGHT,
 				test_ground_order::ON_ON_FLOOR
@@ -167,35 +167,35 @@ namespace test_flavours {
 		}
 
 		fish_flavour(
-			test_complex_decorations::YELLOW_FISH,
+			test_dynamic_decorations::YELLOW_FISH,
 			test_scene_image_id::YELLOW_FISH_1,
 			test_scene_plain_animation_id::YELLOW_FISH,
 			test_ground_order::UPPER_FISH
 		);
 
 		fish_flavour(
-			test_complex_decorations::DARKBLUE_FISH,
+			test_dynamic_decorations::DARKBLUE_FISH,
 			test_scene_image_id::DARKBLUE_FISH_1,
 			test_scene_plain_animation_id::DARKBLUE_FISH,
 			test_ground_order::UPPER_FISH
 		);
 		
 		fish_flavour(
-			test_complex_decorations::CYANVIOLET_FISH,
+			test_dynamic_decorations::CYANVIOLET_FISH,
 			test_scene_image_id::CYANVIOLET_FISH_1,
 			test_scene_plain_animation_id::CYANVIOLET_FISH,
 			test_ground_order::UPPER_FISH
 		);
 
 		fish_flavour(
-			test_complex_decorations::JELLYFISH,
+			test_dynamic_decorations::JELLYFISH,
 			test_scene_image_id::JELLYFISH_1,
 			test_scene_plain_animation_id::JELLYFISH,
 			test_ground_order::UPPER_FISH
 		);
 
 		fish_flavour(
-			test_complex_decorations::DRAGON_FISH,
+			test_dynamic_decorations::DRAGON_FISH,
 			test_scene_image_id::DRAGON_FISH_1,
 			test_scene_plain_animation_id::DRAGON_FISH,
 			test_ground_order::BOTTOM_FISH,
@@ -204,7 +204,7 @@ namespace test_flavours {
 		);
 
 		fish_flavour(
-			test_complex_decorations::RAINBOW_DRAGON_FISH,
+			test_dynamic_decorations::RAINBOW_DRAGON_FISH,
 			test_scene_image_id::DRAGON_FISH_1,
 			test_scene_plain_animation_id::DRAGON_FISH,
 			test_ground_order::BOTTOM_FISH,
@@ -214,72 +214,72 @@ namespace test_flavours {
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::LAB_WALL_A2,
+			test_static_decorations::LAB_WALL_A2,
 			test_scene_image_id::LAB_WALL_A2,
 			render_layer::ITEMS_ON_GROUND
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY,
+			test_static_decorations::AQUARIUM_BOTTOM_LAMP_BODY,
 			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_BODY,
 			test_ground_order::ON_ON_FLOOR
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT,
+			test_static_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT,
 			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_LIGHT,
 			test_ground_order::ON_ON_FLOOR
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY,
+			test_static_decorations::AQUARIUM_HALOGEN_1_BODY,
 			test_scene_image_id::AQUARIUM_HALOGEN_1_BODY,
 			test_ground_order::ON_ON_FLOOR
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT,
+			test_static_decorations::AQUARIUM_HALOGEN_1_LIGHT,
 			test_scene_image_id::AQUARIUM_HALOGEN_1_LIGHT,
 			test_ground_order::ON_ON_FLOOR
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AQUARIUM_SAND_1,
+			test_static_decorations::AQUARIUM_SAND_1,
 			test_scene_image_id::AQUARIUM_SAND_1,
 			test_ground_order::ON_FLOOR,
 			sand_color
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AQUARIUM_SAND_2,
+			test_static_decorations::AQUARIUM_SAND_2,
 			test_scene_image_id::AQUARIUM_SAND_2,
 			test_ground_order::ON_FLOOR,
 			sand_color
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AQUARIUM_SAND_EDGE,
+			test_static_decorations::AQUARIUM_SAND_EDGE,
 			test_scene_image_id::AQUARIUM_SAND_EDGE,
 			test_ground_order::AQUARIUM_DUNES,
 			sand_color
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AQUARIUM_SAND_CORNER,
+			test_static_decorations::AQUARIUM_SAND_CORNER,
 			test_scene_image_id::AQUARIUM_SAND_CORNER,
 			render_layer::ITEMS_ON_GROUND,
 			sand_color
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::DUNE_SMALL,
+			test_static_decorations::DUNE_SMALL,
 			test_scene_image_id::DUNE_SMALL,
 			test_ground_order::AQUARIUM_DUNES,
 			sand_color
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::DUNE_BIG,
+			test_static_decorations::DUNE_BIG,
 			test_scene_image_id::DUNE_BIG,
 			test_ground_order::AQUARIUM_DUNES,
 			sand_color
@@ -287,7 +287,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_sprite(
-				test_sprite_decorations::WATER_COLOR_OVERLAY,
+				test_static_decorations::WATER_COLOR_OVERLAY,
 				test_scene_image_id::BLANK,
 				test_ground_order::WATER_COLOR_OVERLAYS,
 				rgba(0, 75, 255, 46)
@@ -298,7 +298,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_sprite(
-				test_complex_decorations::WATER_SURFACE,
+				test_dynamic_decorations::WATER_SURFACE,
 				test_scene_image_id::WATER_SURFACE_1,
 				test_ground_order::WATER_SURFACES
 			);

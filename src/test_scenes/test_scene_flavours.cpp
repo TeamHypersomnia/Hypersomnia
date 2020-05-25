@@ -112,7 +112,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_tiled_sprite(
-				test_sprite_decorations::SOIL,
+				test_static_decorations::SOIL,
 				test_scene_image_id::SOIL,
 				test_ground_order::SOIL,
 				gray1
@@ -133,7 +133,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_sprite(
-				test_sprite_decorations::ROAD_DIRT,
+				test_static_decorations::ROAD_DIRT,
 				test_scene_image_id::ROAD_FRONT_DIRT,
 				test_ground_order::FLOOR_AND_ROAD
 			);
@@ -152,7 +152,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_tiled_sprite(
-				test_sprite_decorations::ROAD,
+				test_static_decorations::ROAD,
 				test_scene_image_id::ROAD,
 				test_ground_order::FLOOR_AND_ROAD
 			);
@@ -171,7 +171,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_tiled_sprite(
-				test_sprite_decorations::FLOOR,
+				test_static_decorations::FLOOR,
 				test_scene_image_id::FLOOR,
 				test_ground_order::FLOOR_AND_ROAD
 			);
@@ -190,7 +190,7 @@ namespace test_flavours {
 
 			{
 				auto& meta = flavour_with_tiled_sprite(
-					test_sprite_decorations::WATER_ROOM_FLOOR,
+					test_static_decorations::WATER_ROOM_FLOOR,
 					test_scene_image_id::WATER_ROOM_FLOOR,
 					test_ground_order::FLOOR_AND_ROAD
 				);
@@ -202,13 +202,13 @@ namespace test_flavours {
 		}
 
 		flavour_with_sprite(
-			test_sprite_decorations::HAVE_A_PLEASANT,
+			test_static_decorations::HAVE_A_PLEASANT,
 			test_scene_image_id::HAVE_A_PLEASANT,
 			render_layer::FOREGROUND_GLOWS
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::AWAKENING,
+			test_static_decorations::AWAKENING,
 			test_scene_image_id::AWAKENING,
 			render_layer::FOREGROUND_GLOWS,
 			white,
@@ -216,13 +216,13 @@ namespace test_flavours {
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::METROPOLIS,
+			test_static_decorations::METROPOLIS,
 			test_scene_image_id::METROPOLIS,
 			render_layer::FOREGROUND_GLOWS
 		);
 
 		flavour_with_sprite(
-			test_sprite_decorations::SNACKBAR_CAPTION,
+			test_static_decorations::SNACKBAR_CAPTION,
 			test_scene_image_id::SNACKBAR_CAPTION,
 			render_layer::FOREGROUND_GLOWS,
 			white,

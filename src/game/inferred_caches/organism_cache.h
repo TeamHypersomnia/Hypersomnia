@@ -10,7 +10,7 @@ class cosmos;
 
 class organism_cache {
 public:
-	using organism_id_type = typed_entity_id<complex_decoration>;
+	using organism_id_type = typed_entity_id<dynamic_decoration>;
 private:
 
 	struct grid {

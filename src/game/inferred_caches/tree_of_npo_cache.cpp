@@ -38,7 +38,7 @@ constexpr bool is_npo_entity_v = tree_of_npo_cache::concerned_with<E>::value;
 
 static_assert(!is_npo_entity_v<controlled_character>);
 static_assert(!is_npo_entity_v<plain_sprited_body>);
-static_assert(is_npo_entity_v<sprite_decoration>);
+static_assert(is_npo_entity_v<static_decoration>);
 
 void tree_of_npo_cache::infer_cache_for(const entity_handle& e) {
 	e.conditional_dispatch<npo_entities>([this](const auto& handle) {

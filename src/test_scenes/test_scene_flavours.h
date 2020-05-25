@@ -25,8 +25,8 @@ enum class test_static_lights {
 	// END GEN INTROSPECTOR
 };
 
-enum class test_sprite_decorations {
-	// GEN INTROSPECTOR enum class test_sprite_decorations
+enum class test_static_decorations {
+	// GEN INTROSPECTOR enum class test_static_decorations
 	HAVE_A_PLEASANT,
 	SOIL,
 	ROAD_DIRT,
@@ -263,8 +263,8 @@ enum class test_container_items {
 	// END GEN INTROSPECTOR
 };
 
-enum class test_complex_decorations {
-	// GEN INTROSPECTOR enum class test_complex_decorations
+enum class test_dynamic_decorations {
+	// GEN INTROSPECTOR enum class test_dynamic_decorations
 	ROTATING_FAN,
 	YELLOW_FISH,
 	DARKBLUE_FISH,
@@ -404,8 +404,8 @@ using test_flavours_map = type_map<
 	type_pair<test_shootable_weapons, shootable_weapon>,
 	type_pair<test_melee_weapons, melee_weapon>,
 	type_pair<test_shootable_charges, shootable_charge>,
-	type_pair<test_sprite_decorations, sprite_decoration>,
-	type_pair<test_complex_decorations, complex_decoration>,
+	type_pair<test_static_decorations, static_decoration>,
+	type_pair<test_dynamic_decorations, dynamic_decoration>,
 	type_pair<test_wandering_pixels_decorations, wandering_pixels_decoration>,
 	type_pair<test_static_lights, static_light>,
 	type_pair<test_hand_explosives, hand_explosive>,

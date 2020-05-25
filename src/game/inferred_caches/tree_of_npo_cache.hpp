@@ -9,7 +9,7 @@ auto* find_tree_of_npo_cache(const E& handle) {
 	return general_find_cache<tree_of_npo_cache_data>(handle);
 }
 
-static auto render_layer_to_tonpo_type(const render_layer layer) {
+inline auto render_layer_to_tonpo_type(const render_layer layer) {
 	switch (layer) {
 		case render_layer::CONTINUOUS_PARTICLES:
 			return tree_of_npo_type::PARTICLE_STREAMS;

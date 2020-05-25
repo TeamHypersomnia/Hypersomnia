@@ -425,14 +425,14 @@ namespace test_scenes {
 
 
 			{
-				create(test_sprite_decorations::HAVE_A_PLEASANT, transformr(vec2(-42, -32)));
+				create(test_static_decorations::HAVE_A_PLEASANT, transformr(vec2(-42, -32)));
 
 				create(test_plain_sprited_bodies::SNACKBAR, transformr(vec2(1504, -96)));
-				create(test_sprite_decorations::SNACKBAR_CAPTION, transformr(vec2(1504, -86)));
+				create(test_static_decorations::SNACKBAR_CAPTION, transformr(vec2(1504, -86)));
 				create(test_sound_decorations::HUMMING_DISABLED, transformr(vec2(1504, -86)));
 
-				create(test_sprite_decorations::AWAKENING, transformr(vec2(-42, 8)));
-				create(test_sprite_decorations::METROPOLIS, transformr(vec2(1106, 3)));
+				create(test_static_decorations::AWAKENING, transformr(vec2(-42, 8)));
+				create(test_static_decorations::METROPOLIS, transformr(vec2(1106, 3)));
 
 
 				//const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
@@ -447,7 +447,7 @@ namespace test_scenes {
 					);
 				};
 
-				floor_align(test_sprite_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
+				floor_align(test_static_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
 				floor_align(test_box_markers::ROOM).set_size(total_floor_size);
 
 				floor_align(test_plain_sprited_bodies::BRICK_WALL)
@@ -455,8 +455,8 @@ namespace test_scenes {
 					.ro().bi().nr().extend_r(2).again()
 					.ro().bo().extend_l(2).extend_b(1).again()
 					.lo().ti().stretch_b().again()
-					.lo().bo().extend_r(2).extend_b(1).next(test_sprite_decorations::ROAD_DIRT)
-					.ro().bi().next(test_sprite_decorations::ROAD)
+					.lo().bo().extend_r(2).extend_b(1).next(test_static_decorations::ROAD_DIRT)
+					.ro().bi().next(test_static_decorations::ROAD)
 					.mult_size({ 1, 38 }).bo()
 				;
 
@@ -464,7 +464,7 @@ namespace test_scenes {
 					const auto soil_origin = vec2(0, 0);
 					const auto total_soil_size = vec2i(1024 * 10, 1024 * 10);
 
-					create(test_sprite_decorations::SOIL, transformr(soil_origin)).set_logical_size(total_soil_size);
+					create(test_static_decorations::SOIL, transformr(soil_origin)).set_logical_size(total_soil_size);
 				}
 			}
 		}
@@ -524,7 +524,7 @@ namespace test_scenes {
 
 		create(sample_backpack, vec2(200, -750));
 		create(brown_backpack, vec2(280, -750));
-		create(test_complex_decorations::ROTATING_FAN, vec2(380, -750));
+		create(test_dynamic_decorations::ROTATING_FAN, vec2(380, -750));
 
 		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 		const auto whole_aquarium_size = aquarium_size * 2;
@@ -543,19 +543,19 @@ namespace test_scenes {
 			{
 				{
 					const auto bub = test_particles_decorations::FLOWER_BUBBLES;
-					const auto flpink = test_complex_decorations::FLOWER_PINK;
+					const auto flpink = test_dynamic_decorations::FLOWER_PINK;
 
 					aquarium_align(flpink)
 						.li().ti().nr().nr().nd().prepend(bub).dup()
 						.nd().nd().prepend(bub).dup()
 						.nl().nd().prepend(bub)
-						.again(test_complex_decorations::FLOWER_CYAN)
+						.again(test_dynamic_decorations::FLOWER_CYAN)
 						.ri().ti().nl().nd().nd().nd().prepend(bub).dup()
 						.nl().nd().prepend(bub).dup()
 						.nd().prepend(bub)
 					;
 
-					aquarium_align(test_complex_decorations::PINK_CORAL)
+					aquarium_align(test_dynamic_decorations::PINK_CORAL)
 						.ti().nl().nd().nd().nd().dup()
 						.nd().nl().nl().rot_90().next(flpink).ro().prepend(bub).dup().nu().prepend(bub)
 					;
@@ -567,7 +567,7 @@ namespace test_scenes {
 					.ro().bo()
 					.again(test_sound_decorations::LOUDY_FAN)
 					.to()
-					.again(test_sprite_decorations::LAB_WALL_A2).flip_v()
+					.again(test_static_decorations::LAB_WALL_A2).flip_v()
 					.to()
 				;
 
@@ -658,13 +658,13 @@ namespace test_scenes {
 
 				for (int i = 0; i < N; ++i) {
 					const auto target = caustics[i] + aquarium_tr;
-					auto ent = create(test_complex_decorations::WATER_SURFACE, target);
+					auto ent = create(test_dynamic_decorations::WATER_SURFACE, target);
 					ent.get<components::animation>().state.frame_num = caustics_offsets[i];
 				}
 
 				for (int i = 0; i < DN; ++i) {
 					const auto target = dim_caustics[i] + aquarium_tr;
-					auto ent = create(test_complex_decorations::WATER_SURFACE, target);
+					auto ent = create(test_dynamic_decorations::WATER_SURFACE, target);
 					ent.get<components::animation>().state.frame_num = dim_caustics_offsets[i];
 					ent.get<components::sprite>().colorize.a = 79;
 				}
@@ -692,12 +692,12 @@ namespace test_scenes {
 					const auto target = halogens[i] + aquarium_tr;
 					
 					{
-						auto ent = create(test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY, target);
+						auto ent = create(test_static_decorations::AQUARIUM_HALOGEN_1_BODY, target);
 						ent.get<components::sprite>().colorize = halogens_bodies_cols[i];
 					}
 
 					{
-						auto ent = create(test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT, target);
+						auto ent = create(test_static_decorations::AQUARIUM_HALOGEN_1_LIGHT, target);
 						ent.get<components::sprite>().colorize = halogens_light_cols[i];
 					}
 				}
@@ -709,12 +709,12 @@ namespace test_scenes {
 				const auto target = bottom_lamp_tr + aquarium_tr;
 
 				{
-					auto ent = create(test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY, target);
+					auto ent = create(test_static_decorations::AQUARIUM_BOTTOM_LAMP_BODY, target);
 					ent.get<components::sprite>().colorize = rgba(0, 122, 255, 255);
 				}
 
 				{
-					auto ent = create(test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT, target);
+					auto ent = create(test_static_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT, target);
 					ent.get<components::sprite>().colorize = rgba(96, 255, 255, 255);
 				}
 			}
@@ -745,28 +745,28 @@ namespace test_scenes {
 				const auto h = edge_size / 2;
 
 				for (int g = 0; g < (aquarium_size * 2).x / s.x; ++g) {
-					create(test_sprite_decorations::AQUARIUM_SAND_EDGE, aquarium_origin.pos + aquarium_size + vec2(-h.x, -h.y) - vec2(s.x * g, 0));
+					create(test_static_decorations::AQUARIUM_SAND_EDGE, aquarium_origin.pos + aquarium_size + vec2(-h.x, -h.y) - vec2(s.x * g, 0));
 				}
 			}
 
-			create(test_sprite_decorations::WATER_COLOR_OVERLAY, aquarium_origin);
+			create(test_static_decorations::WATER_COLOR_OVERLAY, aquarium_origin);
 
-			create(test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr);
-			create(test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));
-			create(test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(aquarium_size.x, aquarium_size.y)));
-			create(test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(0, aquarium_size.y)));
+			create(test_static_decorations::AQUARIUM_SAND_1, aquarium_tr);
+			create(test_static_decorations::AQUARIUM_SAND_1, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));
+			create(test_static_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(aquarium_size.x, aquarium_size.y)));
+			create(test_static_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(0, aquarium_size.y)));
 
-			create(test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-193, -193) + vec2(52, -22)));
-			create(test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-237, 255)));
-			create(test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(-74, -48)));
-			create(test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(161, 126)));
+			create(test_static_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-193, -193) + vec2(52, -22)));
+			create(test_static_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-237, 255)));
+			create(test_static_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(-74, -48)));
+			create(test_static_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(161, 126)));
 
-			const auto yellowfish = test_complex_decorations::YELLOW_FISH;
-			const auto darkbluefish = test_complex_decorations::DARKBLUE_FISH;
-			const auto cyanvioletfish = test_complex_decorations::CYANVIOLET_FISH;
-			const auto jellyfish = test_complex_decorations::JELLYFISH;
-			const auto dragon_fish = test_complex_decorations::DRAGON_FISH;
-			const auto rainbow_dragon_fish = test_complex_decorations::RAINBOW_DRAGON_FISH;
+			const auto yellowfish = test_dynamic_decorations::YELLOW_FISH;
+			const auto darkbluefish = test_dynamic_decorations::DARKBLUE_FISH;
+			const auto cyanvioletfish = test_dynamic_decorations::CYANVIOLET_FISH;
+			const auto jellyfish = test_dynamic_decorations::JELLYFISH;
+			const auto dragon_fish = test_dynamic_decorations::DRAGON_FISH;
+			const auto rainbow_dragon_fish = test_dynamic_decorations::RAINBOW_DRAGON_FISH;
 
 			const auto origin_entity = create(test_box_markers::ORGANISM_AREA, aquarium_origin).set_logical_size(aquarium_size * 2);
 
@@ -845,7 +845,7 @@ namespace test_scenes {
 		make_cascade_aligner(
 			orig1 + aquarium_size / 2, 
 			whole_aquarium_size + vec2i::square(2 * lab_wall_size.y),
-			test_scene_node { world, test_complex_decorations::CONSOLE_LIGHT }
+			test_scene_node { world, test_dynamic_decorations::CONSOLE_LIGHT }
 		).ro()
 		.next(test_sound_decorations::HUMMING_DISABLED);
 	}

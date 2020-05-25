@@ -186,7 +186,7 @@ struct shootable_charge {
 
 /* E.g. floors, neon captions like "Welcome to metropolis" */
 
-struct sprite_decoration {
+struct static_decoration {
 	static constexpr std::size_t statically_allocated_entities = 20000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
@@ -208,7 +208,7 @@ struct sprite_decoration {
 	>;
 };
 
-struct complex_decoration {
+struct dynamic_decoration {
 	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 

@@ -8,8 +8,8 @@ struct plain_missile;
 struct shootable_weapon;
 struct shootable_charge;
 struct melee_weapon;
-struct sprite_decoration;
-struct complex_decoration;
+struct static_decoration;
+struct dynamic_decoration;
 struct wandering_pixels_decoration;
 struct static_light;
 struct hand_explosive;
@@ -30,8 +30,8 @@ using all_entity_types = type_list<
 	shootable_weapon,
 	shootable_charge,
 	melee_weapon,
-	sprite_decoration,
-	complex_decoration,
+	static_decoration,
+	dynamic_decoration,
 	wandering_pixels_decoration,
 	static_light,
 	hand_explosive,
@@ -53,8 +53,8 @@ using all_entity_types = type_list<
 	MACRO(shootable_weapon) \
 	MACRO(shootable_charge) \
 	MACRO(melee_weapon) \
-	MACRO(sprite_decoration) \
-	MACRO(complex_decoration) \
+	MACRO(static_decoration) \
+	MACRO(dynamic_decoration) \
 	MACRO(wandering_pixels_decoration) \
 	MACRO(static_light) \
 	MACRO(hand_explosive) \
