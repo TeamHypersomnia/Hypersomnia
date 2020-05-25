@@ -17,19 +17,19 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 		}
 		else if constexpr(H::template has<invariants::hand_fuse>()) {
 			if (is_like_planted_bomb(handle)) {
-				return render_layer::PLANTED_BOMBS;
+				return render_layer::PLANTED_ITEMS;
 			} 
 
-			return render_layer::DROPPED_ITEMS;
+			return render_layer::ITEMS_ON_GROUND;
 		}
 		else if constexpr(H::template has<invariants::item>()) {
-			return render_layer::DROPPED_ITEMS;
+			return render_layer::ITEMS_ON_GROUND;
 		}
 		else if constexpr(H::template has<invariants::remnant>()) {
-			return render_layer::DROPPED_ITEMS;
+			return render_layer::ITEMS_ON_GROUND;
 		}
 		else if constexpr(H::template has<invariants::missile>()) {
-			return render_layer::GLOWING_FOREGROUND;
+			return render_layer::FOREGROUND_GLOWS;
 		}
 		else if constexpr(H::template has<invariants::sentience>()) {
 			return render_layer::SENTIENCES;

@@ -38,7 +38,6 @@ struct game_drawing_settings {
 	bool draw_damage_indicators = false;
 
 	bool occlude_neons_under_sentiences = true;
-	bool occlude_neons_under_other_bodies = false;
 
 	offscreen_reference_type offscreen_reference_mode = offscreen_reference_type::CHARACTER_POSITION;
 

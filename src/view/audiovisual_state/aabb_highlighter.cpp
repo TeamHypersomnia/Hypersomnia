@@ -11,10 +11,9 @@
 
 render_layer_filter aabb_highlighter::get_filter() {
 	return render_layer_filter::whitelist(
-		render_layer::DROPPED_ITEMS,
+		render_layer::ITEMS_ON_GROUND,
 		render_layer::SENTIENCES,
-		render_layer::SOLID_OBSTACLES,
-		render_layer::GLASS_OBSTACLES
+		render_layer::SOLID_OBSTACLES
 	);
 }
 

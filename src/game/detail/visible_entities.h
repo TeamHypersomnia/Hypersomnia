@@ -13,6 +13,7 @@
 
 #include "game/components/sorting_order_type.h"
 #include "augs/enums/accuracy_type.h"
+#include "game/detail/special_render_function.h"
 
 struct visible_entities_query {
 	const cosmos& cosm;
@@ -82,6 +83,9 @@ class visible_entities {
 	using per_layer_type = per_render_layer_t<layer_register>;
 	per_layer_type per_layer;
 
+	using per_function_type = augs::enum_array<std::vector<id_type>, special_render_function>;
+	per_function_type per_function;
+
 	void register_visible(const cosmos&, entity_id);
 	void sort_car_interiors(const cosmos&);
 
@@ -121,6 +125,34 @@ public:
 				callback(cosm[id]);
 			});
 		}
+	}
+
+	template <special_render_function... Args, class C, class F>
+	void for_each(C& cosm, F&& callback) const {
+		bool broken = false;
+
+		auto looper = [&](const special_render_function l) {
+			if (broken) {
+				return;
+			}
+
+			for (const auto& e : per_function[l]) {
+				if constexpr(std::is_same_v<callback_result, decltype(callback(cosm[e]))>) {
+					const auto result = callback(cosm[e]);
+
+					if (callback_result::ABORT == result) {
+						broken = true;
+					}
+
+					return result;
+				}
+				else {
+					callback(cosm[e]);
+				}
+			}
+		};
+
+		(looper(Args), ...);
 	}
 
 	template <render_layer... Args, class C, class F>

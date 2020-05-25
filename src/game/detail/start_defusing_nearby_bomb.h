@@ -32,7 +32,7 @@ auto query_defusing_nearby_bomb(const E& subject) {
 		cosm,
 		camera_cone(camera_eye(where, 1.f), vec2i::square(max_defuse_radius * 2)),
 		accuracy_type::EXACT,
-		render_layer_filter::whitelist(render_layer::PLANTED_BOMBS),
+		render_layer_filter::whitelist(render_layer::PLANTED_ITEMS),
 		{ { tree_of_npo_type::RENDERABLES } }
 	});
 
@@ -41,7 +41,7 @@ auto query_defusing_nearby_bomb(const E& subject) {
 	defuse_nearby_bomb_result result;
 	result.result = U::NONE_FOUND;
 
-	entities.for_each<render_layer::PLANTED_BOMBS>(cosm, [&](const auto& bomb_handle) {
+	entities.for_each<render_layer::PLANTED_ITEMS>(cosm, [&](const auto& bomb_handle) {
 		bomb_handle.template dispatch_on_having_all<components::hand_fuse>([&](const auto typed_bomb) -> callback_result {
 			const auto& fuse = typed_bomb.template get<components::hand_fuse>();
 			const auto character_now_defusing = cosm[fuse.character_now_defusing];

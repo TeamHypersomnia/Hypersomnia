@@ -17,6 +17,11 @@ enum class test_ground_order : sorting_order_type {
 	WATER_SURFACES
 };
 
+enum class test_obstacle_order : sorting_order_type {
+	OPAQUE,
+	GLASS
+};
+
 template <class T>
 render_layer get_layer_for_order_type(const T t) {
 	if constexpr(std::is_same_v<T, render_layer>) {
@@ -24,6 +29,9 @@ render_layer get_layer_for_order_type(const T t) {
 	}
 	else if constexpr(std::is_same_v<T, test_ground_order>) {
 		return render_layer::GROUND;
+	}
+	else if constexpr(std::is_same_v<T, test_obstacle_order>) {
+		return render_layer::SOLID_OBSTACLES;
 	}
 
 	return render_layer::INVALID;

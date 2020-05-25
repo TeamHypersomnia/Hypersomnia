@@ -260,9 +260,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 				light.color.rgb()
 			);
 
-			renderer.call_triangles(D::SOLID_OBSTACLES);
-			renderer.call_triangles(D::SOLID_OBSTACLES_OCCLUDING_NEONS);
-			renderer.call_triangles(D::FOREGROUND);
+			renderer.call_triangles(D::WALL_ILLUMINATIONS);
 		}
 	};
 
@@ -310,7 +308,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	renderer.call_triangles(D::GROUND_NEONS);
 	renderer.set_standard_blending();
 	in.neon_occlusion_callback();
-	renderer.call_triangles(D::GROUND_NEON_OVERLAYS);
+	renderer.call_triangles(D::GROUND_NEON_OCCLUDERS);
 	renderer.set_additive_blending();
 
 	setup_light_shader();

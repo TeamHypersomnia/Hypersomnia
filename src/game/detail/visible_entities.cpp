@@ -39,6 +39,10 @@ void visible_entities::clear() {
 	for (auto& layer : per_layer) {
 		layer.clear();
 	}
+
+	for (auto& f : per_function) {
+		f.clear();
+	}
 }
 
 visible_entities& visible_entities::reacquire_all_and_sort(const visible_entities_query input) {
@@ -244,6 +248,18 @@ void visible_entities::register_visible(const cosmos& cosm, const entity_id id) 
 				const auto order = ::calc_sorting_order(typed_handle);
 
 				per_layer[layer].register_visible(id, order);
+
+				using E = remove_cref<decltype(typed_handle)>;
+
+				if constexpr(E::template has<invariants::render>()) {
+					const auto& functions = typed_handle.template get<invariants::render>().special_functions;
+
+					for (int i = 0; i < static_cast<int>(functions.size()); ++i) {
+						if (functions[i]) {
+							per_function[i].emplace_back(id);
+						}
+					}
+				}
 			}
 		}
 	);

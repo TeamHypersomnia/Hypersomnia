@@ -204,13 +204,13 @@ namespace test_flavours {
 		flavour_with_sprite(
 			test_sprite_decorations::HAVE_A_PLEASANT,
 			test_scene_image_id::HAVE_A_PLEASANT,
-			render_layer::GLOWING_FOREGROUND
+			render_layer::FOREGROUND_GLOWS
 		);
 
 		flavour_with_sprite(
 			test_sprite_decorations::AWAKENING,
 			test_scene_image_id::AWAKENING,
-			render_layer::GLOWING_FOREGROUND,
+			render_layer::FOREGROUND_GLOWS,
 			white,
 			augs::sprite_special_effect::COLOR_WAVE
 		);
@@ -218,13 +218,13 @@ namespace test_flavours {
 		flavour_with_sprite(
 			test_sprite_decorations::METROPOLIS,
 			test_scene_image_id::METROPOLIS,
-			render_layer::GLOWING_FOREGROUND
+			render_layer::FOREGROUND_GLOWS
 		);
 
 		flavour_with_sprite(
 			test_sprite_decorations::SNACKBAR_CAPTION,
 			test_scene_image_id::SNACKBAR_CAPTION,
-			render_layer::GLOWING_FOREGROUND,
+			render_layer::FOREGROUND_GLOWS,
 			white,
 			augs::sprite_special_effect::COLOR_WAVE
 		);
@@ -356,7 +356,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_plain_sprited_bodies::DETACHED_RESISTANCE_HEAD,
 				test_scene_image_id::RESISTANCE_HEAD,
-				render_layer::DROPPED_ITEMS
+				render_layer::ITEMS_ON_GROUND
 			);
 
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
@@ -368,7 +368,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD,
 				test_scene_image_id::METROPOLIS_HEAD,
-				render_layer::DROPPED_ITEMS
+				render_layer::ITEMS_ON_GROUND
 			);
 
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);

@@ -1,4 +1,10 @@
 
+- Structuring
+	- Either Tabs or Separators: Ground/Foreground
+		- Flavours?
+			- where it makes sense:
+				- Items on ground -> BAKA47s
+
 - We can show a tile pallette always when a tile layer is selected
 	- Conversely, when an object layer is selected, we can show relevant objects to be placed in a filesystem-like structure
 		- Perhaps filtered by the layer type too?

@@ -8,6 +8,13 @@ struct helper_drawer {
 	const cosmos& cosm;
 	const draw_renderable_input in;
 
+	template <special_render_function... r>
+	void draw() const {
+		visible.for_each<r...>(cosm, [&](const auto& handle) {
+			::draw_entity(handle, in);
+		});
+	}
+
 	template <render_layer... r>
 	void draw() const {
 		visible.for_each<r...>(cosm, [&](const auto& handle) {

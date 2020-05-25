@@ -549,7 +549,6 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.drawing;
 					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_sentiences));
-					revertable_checkbox(SCOPE_CFG_NVP(occlude_neons_under_other_bodies));
 				}
 
 

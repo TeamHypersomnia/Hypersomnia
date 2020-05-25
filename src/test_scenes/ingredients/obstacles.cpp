@@ -18,7 +18,6 @@ namespace test_flavours {
 		) {
 			meta.template get<invariants::sprite>().tile_excess_size = true;
 
-
 			test_flavours::add_standard_static_body(meta);
 
 			auto& fixtures_def = meta.template get<invariants::fixtures>();
@@ -27,6 +26,8 @@ namespace test_flavours {
 			fixtures_def.density = 100.f;
 			fixtures_def.max_ricochet_angle = max_ricochet_angle;
 			fixtures_def.material = to_physical_material_id(material);
+
+			meta.template get<invariants::render>().special_functions.set(special_render_function::WALL_ILLUMINATION);
 		};
 
 		const auto glass_alpha = 60;
@@ -45,6 +46,7 @@ namespace test_flavours {
 
 			meta.template get<invariants::sprite>().color.a = glass_alpha;
 			meta.template get<invariants::sprite>().neon_color.a = glass_neon_alpha;
+			meta.template get<invariants::render>().special_functions.set(special_render_function::WALL_ILLUMINATION, false);
 		};
 
 		auto dynamic_obstacle = [&](
@@ -58,13 +60,16 @@ namespace test_flavours {
 			fixtures_def.restitution = 0.8f;
 			fixtures_def.density = 0.7f;
 			fixtures_def.material = to_physical_material_id(material);
+
+			meta.template get<invariants::render>().special_functions.set(special_render_function::WALL_ILLUMINATION);
+			meta.template get<invariants::render>().special_functions.set(special_render_function::OCCLUDE_GROUND_NEONS);
 		};
 
 		dynamic_obstacle(
 			flavour_with_sprite(
 				test_plain_sprited_bodies::CRATE,
 				test_scene_image_id::CRATE,
-				render_layer::SOLID_OBSTACLES
+				test_obstacle_order::OPAQUE
 			),
 			test_scene_physical_material_id::WOOD
 		);
@@ -73,7 +78,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::BRICK_WALL,
 				test_scene_image_id::BRICK_WALL,
-				render_layer::SOLID_OBSTACLES
+				test_obstacle_order::OPAQUE
 			),
 			test_scene_physical_material_id::WOOD
 		);
@@ -82,7 +87,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::SNACKBAR,
 				test_scene_image_id::SNACKBAR,
-				render_layer::SOLID_OBSTACLES
+				test_obstacle_order::OPAQUE
 			),
 
 			test_scene_physical_material_id::AIR_DUCT,
@@ -94,7 +99,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::LAB_WALL_SMOOTH_END,
 				test_scene_image_id::LAB_WALL_SMOOTH_END,
-				render_layer::SOLID_OBSTACLES
+				test_obstacle_order::OPAQUE
 			),
 			test_scene_physical_material_id::METAL,
 			0.2f,
@@ -105,7 +110,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::LAB_WALL_CORNER_CUT,
 				test_scene_image_id::LAB_WALL_CORNER_CUT,
-				render_layer::SOLID_OBSTACLES
+				test_obstacle_order::OPAQUE
 			),
 			test_scene_physical_material_id::METAL,
 			0.2f,
@@ -116,7 +121,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::LAB_WALL_CORNER_SQUARE,
 				test_scene_image_id::LAB_WALL_CORNER_SQUARE,
-				render_layer::SOLID_OBSTACLES
+				test_obstacle_order::OPAQUE
 			),
 			test_scene_physical_material_id::METAL,
 			0.2f,
@@ -127,7 +132,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::LAB_WALL,
 				test_scene_image_id::LAB_WALL,
-				render_layer::SOLID_OBSTACLES
+				test_obstacle_order::OPAQUE
 			),
 			test_scene_physical_material_id::METAL,
 			0.2f,
@@ -138,7 +143,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::AQUARIUM_GLASS,
 				test_scene_image_id::AQUARIUM_GLASS,
-				render_layer::GLASS_OBSTACLES
+				test_obstacle_order::GLASS
 			)
 		);
 
@@ -146,7 +151,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::AQUARIUM_GLASS_START,
 				test_scene_image_id::AQUARIUM_GLASS_START,
-				render_layer::GLASS_OBSTACLES
+				test_obstacle_order::GLASS
 			)
 		);
 	}

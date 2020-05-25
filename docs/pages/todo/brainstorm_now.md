@@ -47,6 +47,8 @@ summary: That which we are brainstorming at the moment.
 - Why are indices wrong in shop?
 	- Though perhaps it's for the better?
 
+- I think we need to let go of the concept that "render_layer" will directly correspond to the stuff in "Separators"
+
 - Do we really want to expose "wall lighting" option to ground layer even when it will make little sense?
 	- Perhaps make it only appear for the wall layers and all wall flavours will have it on by default
 

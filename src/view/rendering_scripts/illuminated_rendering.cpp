@@ -447,10 +447,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		if (settings.occlude_neons_under_sentiences) {
 			draw_sentiences(*shader);
 		}
-
-		if (settings.occlude_neons_under_other_bodies) {
-			renderer.call_triangles(D::SOLID_OBSTACLES_OCCLUDING_NEONS);
-		}
 	};
 
 	auto light_pass = [&]() {
@@ -592,9 +588,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	set_shader_with_matrix(shaders.illuminated);
 
-	/* Sorting layer: Ground */
-
-	renderer.call_triangles(D::GROUND_AND_DECORS);
+	renderer.call_triangles(D::GROUND);
 	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
 
 	{
@@ -608,11 +602,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		shaders.illuminated->set_as_current(renderer);
 	}
 
-	/* Sorting layer: Walls */
-
 	renderer.call_triangles(D::SOLID_OBSTACLES);
-	renderer.call_triangles(D::SOLID_OBSTACLES_OCCLUDING_NEONS);
-	renderer.call_triangles(D::GLASS_AND_DROPPED_ITEMS);
+	renderer.call_triangles(D::DROPPED_ITEMS);
 
 	draw_fog_of_war_overlay();
 	draw_sentiences(*shaders.illuminated);
@@ -622,7 +613,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	overlay_smoke_texture();
 	
 	shaders.standard->set_as_current(renderer);
-	renderer.call_triangles(D::GLOWING_FOREGROUND);
+	renderer.call_triangles(D::FOREGROUND_GLOWS);
 
 	draw_crosshairs();
 	draw_weapon_laser();
