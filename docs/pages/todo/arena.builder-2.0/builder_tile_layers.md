@@ -1,4 +1,7 @@
 
+- decoration_layer vs render_layer
+	- Maybe let's not complicate it further at this point
+
 - Structuring
 	- Either Tabs or Separators: Ground/Foreground
 		- Flavours?

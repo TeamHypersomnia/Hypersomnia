@@ -216,7 +216,7 @@ namespace test_flavours {
 		flavour_with_sprite(
 			test_static_decorations::LAB_WALL_A2,
 			test_scene_image_id::LAB_WALL_A2,
-			render_layer::ITEMS_ON_GROUND
+			render_layer::FOREGROUND
 		);
 
 		flavour_with_sprite(
@@ -267,7 +267,7 @@ namespace test_flavours {
 		flavour_with_sprite(
 			test_static_decorations::AQUARIUM_SAND_CORNER,
 			test_scene_image_id::AQUARIUM_SAND_CORNER,
-			render_layer::ITEMS_ON_GROUND,
+			test_ground_order::AQUARIUM_DUNES,
 			sand_color
 		);
 

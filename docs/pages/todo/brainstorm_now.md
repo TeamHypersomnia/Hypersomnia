@@ -47,6 +47,15 @@ summary: That which we are brainstorming at the moment.
 - Why are indices wrong in shop?
 	- Though perhaps it's for the better?
 
+- Area marker variation (?)
+
+- All obstacles should be on a well-defined layer
+	- like in jj2
+	- Well what about detached heads?
+- The point is what the user can see
+	- Ground and Foreground will not be physical
+- What about mixing physical and non-physical tiles on the same tile layer?
+
 - I think we need to let go of the concept that "render_layer" will directly correspond to the stuff in "Separators"
 
 - Do we really want to expose "wall lighting" option to ground layer even when it will make little sense?
@@ -74,6 +83,11 @@ summary: That which we are brainstorming at the moment.
 
 - Fix version numbering on MacOS
 	- It's probably because of the shallow clone
+
+- Fix item attachment rendering order
+	- for_each_attachment_recursive won't work here because draw_under_container is only started being considered at children
+	- why not just split for_each_attachment_recursive into one for rendering and one for common operations
+		- though we still need to do complex shit with it for physics calculations so it will be almost the same probably
 
 - Emphasize the items laying on the ground
 	- Like in hotline miami, they might fly a bit to upper-left direction

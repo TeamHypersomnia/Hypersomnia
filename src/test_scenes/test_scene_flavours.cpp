@@ -358,7 +358,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_plain_sprited_bodies::DETACHED_RESISTANCE_HEAD,
 				test_scene_image_id::RESISTANCE_HEAD,
-				render_layer::ITEMS_ON_GROUND
+				render_layer::SOLID_OBSTACLES
 			);
 
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
@@ -370,7 +370,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD,
 				test_scene_image_id::METROPOLIS_HEAD,
-				render_layer::ITEMS_ON_GROUND
+				render_layer::SOLID_OBSTACLES
 			);
 
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);

@@ -25,18 +25,3 @@ enum class render_layer {
 	COUNT
 	// END GEN INTROSPECTOR
 };
-
-enum class decoration_layer {
-	GROUND,
-	FOREGROUND,
-	FOREGROUND_GLOWS
-};
-
-enum class builder_render_layer {
-	GROUND,
-	SOLID_OBSTACLES,
-	OVER_CHARACTERS,
-	OVER_CHARACTERS_LIGHT,
-
-	COUNT
-};
