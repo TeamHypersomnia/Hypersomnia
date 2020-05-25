@@ -6,16 +6,31 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
-struct fish_movement_def {
-	// GEN INTROSPECTOR struct fish_movement_def
+using avoidance_rank_type = int8_t;
+
+enum class scare_source {
+	// GEN INTROSPECTOR enum class scare_source
+	MELEE,
+	GUNS_AND_EXPLOSIONS,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+struct organism_wandering_def {
+	// GEN INTROSPECTOR struct organism_wandering_def
 	real32 sine_speed_boost = 100.f;
 	real32 base_speed = 80.f;
 	real32 base_bubble_interval_ms = 1000.f;
-	unsigned seed_offset = 0u;
+	uint32_t seed_offset = 0u;
 	particle_effect_input bubble_effect;
 
 	real32 sine_wandering_amplitude = 10.f;
 	real32 sine_wandering_period = 50.f;
+	augs::enum_boolset<scare_source> susceptible_to = augs::enum_boolset<scare_source> { scare_source::GUNS_AND_EXPLOSIONS };
+	avoidance_rank_type avoidance_rank = 0;
+	bool enable_flocking = true;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 };
 
@@ -23,7 +38,7 @@ namespace invariants {
 	struct movement_path {
 		// GEN INTROSPECTOR struct invariants::movement_path
 		real32 continuous_rotation_speed = 0.f;
-		augs::maybe<fish_movement_def> fish_movement;
+		augs::maybe<organism_wandering_def> organism_wandering;
 		// END GEN INTROSPECTOR
 	};
 }

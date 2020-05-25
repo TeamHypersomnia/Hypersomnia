@@ -2,6 +2,7 @@
 #include "game/inferred_caches/tree_of_npo_cache.h"
 #include "game/detail/calc_render_layer.h"
 #include "game/cosmos/find_cache.h"
+#include "game/inferred_caches/is_organism.h"
 
 template <class E>
 auto* find_tree_of_npo_cache(const E& handle) {
@@ -13,18 +14,14 @@ std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 	constexpr bool is_physical = E::template has<invariants::fixtures>() || E::template has<invariants::rigid_body>();
 	static_assert(!is_physical);
 
-	const auto layer = calc_render_layer(handle);
+	const auto layer = ::calc_render_layer(handle);
 
 	if (const auto aabb = handle.find_aabb()) {
 		tree_of_npo_node_input result;
 
 		result.aabb = *aabb;
 
-		if (
-			layer == render_layer::UPPER_FISH 
-			|| layer == render_layer::BOTTOM_FISH
-			|| layer == render_layer::INSECTS
-		) {
+		if (::is_organism(handle)) {
 			/* Handled by the grids in organism cache */
 			return std::nullopt;
 		}

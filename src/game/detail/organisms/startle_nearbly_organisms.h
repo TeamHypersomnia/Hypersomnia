@@ -11,9 +11,5 @@ void startle_nearby_organisms(
 	real32 startle_radius,
 	real32 startle_force,
 	startle_type,
-	render_layer_filter = render_layer_filter::whitelist(
-		render_layer::UPPER_FISH,
-		render_layer::BOTTOM_FISH,
-		render_layer::INSECTS
-	)
+	scare_source = scare_source::GUNS_AND_EXPLOSIONS
 );

@@ -43,14 +43,14 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				transform.rotation += rotation_speed * delta.in_seconds();
 			}
 
-			if (movement_path_def.fish_movement.is_enabled) {
+			if (movement_path_def.organism_wandering.is_enabled) {
 				auto& movement_path = subject.template get<components::movement_path>();
 
 				const auto& transform = subject.template get<components::transform>();
 				const auto& pos = transform.pos;
 				const auto tip_pos = subject.get_logical_tip(transform);
 
-				const auto& def = movement_path_def.fish_movement.value;
+				const auto& def = movement_path_def.organism_wandering.value;
 
 				const auto origin = cosm[movement_path.origin];
 
@@ -86,10 +86,10 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto wandering_sine = repro::sin(real32(global_time / def.sine_wandering_period * current_speed_mult)) * def.sine_wandering_amplitude * current_speed_mult;
 				const auto perpendicular_dir = current_dir.perpendicular_cw();
 
-				const auto subject_layer = subject.template get<invariants::render>().layer;
+				const auto subject_avoidance_rank = def.avoidance_rank;
 
 				auto for_each_neighbor_within = [&](const auto radius, auto callback) {
-					if (subject_layer == render_layer::INSECTS) {
+					if (!def.enable_flocking) {
 						return;
 					}
 
@@ -162,17 +162,15 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					auto greatest_avoidance = vec2::zero;
 
 					for_each_neighbor_within(comfort_zone_radius, [&](const auto& typed_neighbor, const auto& neighbor_transform, const auto& neighbor_tip) {
-						const auto neighbor_layer = typed_neighbor.template get<invariants::render>().layer;
-
-						if (int(subject_layer) > int(neighbor_layer)) {
-							/* Don't avoid smaller species. */
-							return;
-						}
-
-						const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
+						const auto& neighbor_wandering_def = typed_neighbor.template get<invariants::movement_path>().organism_wandering;
 						const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
 
-						if (neighbor_path_def.fish_movement.is_enabled) {
+						if (neighbor_wandering_def.is_enabled) {
+							if (subject_avoidance_rank > neighbor_wandering_def.value.avoidance_rank) {
+								/* Don't care about lesser species. */
+								return;
+							}
+
 							const auto neighbor_vel = neighbor_transform.get_direction() * neighbor_path.last_speed;
 
 							const auto avoidance = augs::immediate_avoidance(

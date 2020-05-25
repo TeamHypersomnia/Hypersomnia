@@ -11,7 +11,7 @@ void startle_nearby_organisms(
 	const real32 startle_radius,
 	const real32 startle_force,
 	const startle_type type,
-	const render_layer_filter organism_types
+	const scare_source source
 ) {
 	auto& neighbors = thread_local_visible_entities();
 
@@ -20,12 +20,18 @@ void startle_nearby_organisms(
 		cosm,
 		{ camera_eye(startle_origin), vec2::square(startle_radius * 2) },
 		accuracy_type::PROXIMATE,
-		organism_types,
+		render_layer_filter::all(),
 		{ tree_of_npo_type::ORGANISMS }
 	});
 
 	neighbors.for_all(cosm, [&](const auto handle) {
 		handle.template dispatch_on_having_all<components::movement_path>([&](const auto& typed_neighbor) {
+			const bool susceptible = typed_neighbor.template get<invariants::movement_path>().organism_wandering.value.susceptible_to.test(source);
+
+			if (!susceptible) {
+				return;
+			}
+
 			const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 			const auto target_offset = neighbor_tip - startle_origin;
 			const auto target_dist = target_offset.length();

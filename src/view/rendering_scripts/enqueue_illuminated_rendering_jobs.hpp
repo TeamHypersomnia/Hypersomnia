@@ -300,15 +300,9 @@ void enqueue_illuminated_rendering_jobs(
 			auto job = [h = make_helper(D::DECORATION_NEONS)]() {
 				h.draw_neons<
 					render_layer::FLYING_BULLETS,
-					render_layer::WATER_COLOR_OVERLAYS,
-					render_layer::WATER_SURFACES,
 					render_layer::NEON_CAPTIONS,
 					render_layer::PLANTED_BOMBS,
-					render_layer::AQUARIUM_FLOWERS,
-					render_layer::BOTTOM_FISH,
-					render_layer::UPPER_FISH,
-					render_layer::INSECTS,
-					render_layer::AQUARIUM_BUBBLES
+					render_layer::INSECTS
 				>();
 			};
 
@@ -338,7 +332,7 @@ void enqueue_illuminated_rendering_jobs(
 				>();
 
 				h2.draw<
-					render_layer::GROUND_NEON_OVERLAY
+					render_layer::GROUND_NEON_ERASER
 				>();
 			};
 
@@ -361,14 +355,7 @@ void enqueue_illuminated_rendering_jobs(
 			auto job = [h = make_helper(D::GROUND_AND_DECORS)]() {
 				h.draw<
 					render_layer::GROUND,
-
-					render_layer::PLANTED_BOMBS,
-
-					render_layer::AQUARIUM_FLOWERS,
-					render_layer::AQUARIUM_DUNES,
-					render_layer::BOTTOM_FISH,
-					render_layer::UPPER_FISH,
-					render_layer::AQUARIUM_BUBBLES
+					render_layer::PLANTED_BOMBS
 				>();
 			};
 
@@ -376,12 +363,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [h1 = make_helper(D::WATER_AND_CARS), h2 = make_helper(D::INSECTS), h3 = make_helper(D::CAPTIONS_AND_BULLETS)]() {
-				h1.draw<
-					render_layer::WATER_COLOR_OVERLAYS,
-					render_layer::WATER_SURFACES
-				>();
-
+			auto job = [h2 = make_helper(D::INSECTS), h3 = make_helper(D::CAPTIONS_AND_BULLETS)]() {
 				h2.draw<
 					render_layer::INSECTS
 				>();

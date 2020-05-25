@@ -99,23 +99,24 @@ namespace augs {
 				if (v_max == v_min) {
 					/* Fix default bounds */
 
-					if constexpr(std::is_same_v<T, int>) {
+					if constexpr(std::is_same_v<T, int32_t>) {
 						/* Correct case, do nothing */
 					}
-					else if constexpr(std::is_same_v<T, unsigned>) {
+					else if constexpr(std::is_same_v<T, uint32_t>) {
 						/* Prevent ImGui from setting negative values */
 						v_min = 0;
-						v_max = static_cast<T>(std::numeric_limits<int>::max());
+						v_max = static_cast<T>(std::numeric_limits<int32_t>::max());
 					}
 					else if constexpr(
-						std::is_same_v<T, unsigned short>
-						|| std::is_same_v<T, unsigned char>
+						std::is_same_v<T, uint16_t>
+						|| std::is_same_v<T, uint8_t>
 					) {
 						v_min = 0;
 						v_max = std::numeric_limits<T>::max();
 					}
 					else if constexpr(
-						std::is_same_v<T, short>
+						std::is_same_v<T, int16_t>
+						|| std::is_same_v<T, int8_t>
 						|| std::is_same_v<T, char>
 					) {
 						v_min = std::numeric_limits<T>::min();

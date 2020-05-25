@@ -268,7 +268,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 							damage_def.base * startle_mult * 1.4f,
 							damage_def.base * startle_mult,
 							startle_type::IMMEDIATE,
-							render_layer_filter::whitelist(render_layer::INSECTS)
+							scare_source::MELEE
 						);
 					}
 

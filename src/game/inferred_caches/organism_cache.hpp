@@ -1,6 +1,7 @@
 #pragma once
 #include "game/enums/marker_type.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/inferred_caches/is_organism.h"
 
 constexpr real32 movement_path_neighbor_query_radius_v = 50.f;
 constexpr int grid_cell_size_v = static_cast<int>(movement_path_neighbor_query_radius_v * 2);
@@ -10,27 +11,34 @@ using cell_type = organism_cache::cell_type;
 
 template <class E>
 bool organism_cache::assign_to_grid(const E& organism) {
-	const auto& movement_path = organism.template get<components::movement_path>();
+	if (!::is_organism(organism)) {
+		return false;
+	}
+	
 	const auto& cosm = organism.get_cosmos();
+	const auto& movement_path = organism.template get<components::movement_path>();
+	const auto origin = cosm[movement_path.origin];
 
-	if (const auto origin = cosm[movement_path.origin]) {
-		const auto grid_id = origin.get_id();
-		auto& grid = grids[grid_id];
+	if (!origin.alive()) {
+		return false;
+	}
 
-		if (!grid.is_set()) {
-			if (!reset_grid_for(origin)) {
-				return false;
-			}
+	const auto grid_id = origin.get_id();
+	auto& grid = grids[grid_id];
+
+	if (!grid.is_set()) {
+		if (!reset_grid_for(origin)) {
+			return false;
 		}
+	}
 
-		if (const auto t = organism.find_logic_transform()) {
-			const auto p = t->pos;
+	if (const auto t = organism.find_logic_transform()) {
+		const auto p = t->pos;
 
-			auto& cell = grid.get_cell_at_world(p);
-			cell.organisms.emplace_back(organism.get_id());
+		auto& cell = grid.get_cell_at_world(p);
+		cell.organisms.emplace_back(organism.get_id());
 
-			return true;
-		}
+		return true;
 	}
 
 	return false;

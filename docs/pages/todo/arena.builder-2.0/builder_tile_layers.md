@@ -1,4 +1,11 @@
 
+- We can show a tile pallette always when a tile layer is selected
+	- Conversely, when an object layer is selected, we can show relevant objects to be placed in a filesystem-like structure
+		- Perhaps filtered by the layer type too?
+
+- Clicking on a palette selects whole logical tile
+	- Dragging can select in smaller chunks or just multiple
+
 - What about layers for complex predefined objects like an aquarium?
 	- Well we certainly don't want to expose all those shit with fish to the artist unless they really want to
 		- They will NOT want to edit the individual fish positions okay...

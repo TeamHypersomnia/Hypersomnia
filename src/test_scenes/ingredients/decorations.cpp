@@ -101,9 +101,10 @@ namespace test_flavours {
 
 			{
 				invariants::movement_path movement_path_def;
-				auto& fish = movement_path_def.fish_movement;
-				auto& def = fish.value;
-				fish.is_enabled = true;
+				auto& wandering = movement_path_def.organism_wandering;
+				auto& def = wandering.value;
+				wandering.is_enabled = true;
+				def.avoidance_rank = static_cast<avoidance_rank_type>(layer);
 				def.base_speed = base_speed;
 				def.sine_speed_boost = sine_speed_boost;
 				def.bubble_effect.id = to_particle_effect_id(test_scene_particle_effect_id::FISH_BUBBLE);
@@ -137,21 +138,21 @@ namespace test_flavours {
 			test_complex_decorations::FLOWER_PINK,
 			test_scene_image_id::FLOWER_PINK_1,
 			test_scene_plain_animation_id::FLOWER_PINK,
-			render_layer::AQUARIUM_FLOWERS
+			test_ground_order::AQUARIUM_FLOWERS
 		);
 
 		flavour_with_animation(
 			test_complex_decorations::PINK_CORAL,
 			test_scene_image_id::PINK_CORAL_1,
 			test_scene_plain_animation_id::PINK_CORAL,
-			render_layer::AQUARIUM_FLOWERS
+			test_ground_order::AQUARIUM_FLOWERS
 		);
 
 		flavour_with_animation(
 			test_complex_decorations::FLOWER_CYAN,
 			test_scene_image_id::FLOWER_CYAN_1,
 			test_scene_plain_animation_id::FLOWER_CYAN,
-			render_layer::AQUARIUM_FLOWERS
+			test_ground_order::AQUARIUM_FLOWERS
 		);
 
 		{
@@ -169,35 +170,35 @@ namespace test_flavours {
 			test_complex_decorations::YELLOW_FISH,
 			test_scene_image_id::YELLOW_FISH_1,
 			test_scene_plain_animation_id::YELLOW_FISH,
-			render_layer::UPPER_FISH
+			test_ground_order::UPPER_FISH
 		);
 
 		fish_flavour(
 			test_complex_decorations::DARKBLUE_FISH,
 			test_scene_image_id::DARKBLUE_FISH_1,
 			test_scene_plain_animation_id::DARKBLUE_FISH,
-			render_layer::UPPER_FISH
+			test_ground_order::UPPER_FISH
 		);
 		
 		fish_flavour(
 			test_complex_decorations::CYANVIOLET_FISH,
 			test_scene_image_id::CYANVIOLET_FISH_1,
 			test_scene_plain_animation_id::CYANVIOLET_FISH,
-			render_layer::UPPER_FISH
+			test_ground_order::UPPER_FISH
 		);
 
 		fish_flavour(
 			test_complex_decorations::JELLYFISH,
 			test_scene_image_id::JELLYFISH_1,
 			test_scene_plain_animation_id::JELLYFISH,
-			render_layer::UPPER_FISH
+			test_ground_order::UPPER_FISH
 		);
 
 		fish_flavour(
 			test_complex_decorations::DRAGON_FISH,
 			test_scene_image_id::DRAGON_FISH_1,
 			test_scene_plain_animation_id::DRAGON_FISH,
-			render_layer::BOTTOM_FISH,
+			test_ground_order::BOTTOM_FISH,
 			160,
 			200
 		);
@@ -206,7 +207,7 @@ namespace test_flavours {
 			test_complex_decorations::RAINBOW_DRAGON_FISH,
 			test_scene_image_id::DRAGON_FISH_1,
 			test_scene_plain_animation_id::DRAGON_FISH,
-			render_layer::BOTTOM_FISH,
+			test_ground_order::BOTTOM_FISH,
 			160,
 			200,
 			augs::sprite_special_effect::COLOR_WAVE
@@ -259,7 +260,7 @@ namespace test_flavours {
 		flavour_with_sprite(
 			test_sprite_decorations::AQUARIUM_SAND_EDGE,
 			test_scene_image_id::AQUARIUM_SAND_EDGE,
-			render_layer::AQUARIUM_DUNES,
+			test_ground_order::AQUARIUM_DUNES,
 			sand_color
 		);
 
@@ -273,14 +274,14 @@ namespace test_flavours {
 		flavour_with_sprite(
 			test_sprite_decorations::DUNE_SMALL,
 			test_scene_image_id::DUNE_SMALL,
-			render_layer::AQUARIUM_DUNES,
+			test_ground_order::AQUARIUM_DUNES,
 			sand_color
 		);
 
 		flavour_with_sprite(
 			test_sprite_decorations::DUNE_BIG,
 			test_scene_image_id::DUNE_BIG,
-			render_layer::AQUARIUM_DUNES,
+			test_ground_order::AQUARIUM_DUNES,
 			sand_color
 		);
 
@@ -288,7 +289,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_sprite_decorations::WATER_COLOR_OVERLAY,
 				test_scene_image_id::BLANK,
-				render_layer::WATER_COLOR_OVERLAYS,
+				test_ground_order::WATER_COLOR_OVERLAYS,
 				rgba(0, 75, 255, 46)
 			);
 
@@ -299,7 +300,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_complex_decorations::WATER_SURFACE,
 				test_scene_image_id::WATER_SURFACE_1,
-				render_layer::WATER_SURFACES
+				test_ground_order::WATER_SURFACES
 			);
 
 			meta.get<invariants::sprite>().color.a = 0;

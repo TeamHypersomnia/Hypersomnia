@@ -47,6 +47,8 @@ summary: That which we are brainstorming at the moment.
 - Why are indices wrong in shop?
 	- Though perhaps it's for the better?
 
+- Sentience -> Character please
+
 - Fix version numbering on MacOS
 	- It's probably because of the shallow clone
 

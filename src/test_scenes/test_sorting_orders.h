@@ -5,7 +5,16 @@ enum class test_ground_order : sorting_order_type {
 	SOIL,
 	FLOOR_AND_ROAD,
 	ON_FLOOR,
-	ON_ON_FLOOR
+	ON_ON_FLOOR,
+
+	AQUARIUM_FLOWERS,
+	AQUARIUM_DUNES,
+
+	BOTTOM_FISH,
+	UPPER_FISH,
+
+	WATER_COLOR_OVERLAYS,
+	WATER_SURFACES
 };
 
 template <class T>
