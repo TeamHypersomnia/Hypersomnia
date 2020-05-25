@@ -329,7 +329,7 @@ void editor_entity_selector::do_mousemotion(
 		remove_non_hovering_icons_from(ids, world_cursor_pos);
 
 		if (ids.size() > 0) {
-			hovered = ids[0];
+			hovered = ids.back();
 		}
 	}
 }

@@ -14,7 +14,7 @@ inline auto get_current_callout(const cosmos& cosm, const vec2 pos) {
 		tree_types
 	});
 
-	if (const auto result = entities.get_first_fulfilling([](auto&&...){ return true; }); result.is_set()) {
+	if (const auto result = entities.get_topmost_fulfilling([](auto&&...){ return true; }); result.is_set()) {
 		return result;
 	}
 

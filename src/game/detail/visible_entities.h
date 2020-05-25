@@ -56,6 +56,22 @@ class visible_entities {
 			}
 		}
 
+		template <class F>
+		void for_each_reverse(F&& callback) const {
+			for (auto i = static_cast<int>(max_order) - 1; i >= 0; --i) {
+				for (const auto& p : per_order[i]) {
+					if constexpr(std::is_same_v<callback_result, decltype(callback(p))>) {
+						if (callback_result::ABORT == callback(p)) {
+							return;
+						}
+					}
+					else {
+						callback(p);
+					}
+				}
+			}
+		}
+
 		void register_visible(const entity_id id, const sorting_order_type order);
 
 		void clear();
@@ -90,7 +106,6 @@ public:
 	auto for_all_ids_ordered(F&& callback, const O& order) const {
 		for (const auto& layer : order) {
 			per_layer[layer].for_each(std::forward<F>(callback));
-
 		}
 	}
 
@@ -139,7 +154,7 @@ public:
 
 
 	template <class F>
-	entity_id get_first_fulfilling(F condition) const;
+	entity_id get_topmost_fulfilling(F condition) const;
 };
 
 inline auto& thread_local_visible_entities() {

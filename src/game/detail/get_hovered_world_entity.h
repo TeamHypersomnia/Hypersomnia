@@ -16,14 +16,27 @@ inline auto get_default_layer_order() {
 	return result;
 }
 
+inline auto get_reverse_layer_order() {
+	layer_order_t result;
+
+	auto i = std::size_t(0);
+
+	augs::for_each_enum_except_bounds([&](const render_layer layer) {
+		++i;
+		result[result.size() - i] = layer;
+	});
+
+	return result;
+}
+
 template <class F>
-entity_id visible_entities::get_first_fulfilling(F condition) const {
-	const auto order = get_default_layer_order();
+entity_id visible_entities::get_topmost_fulfilling(F condition) const {
+	const auto order = get_reverse_layer_order();
 
 	auto result = entity_id();
 
 	for (const auto& layer : order) {
-		per_layer[layer].for_each(
+		per_layer[layer].for_each_reverse(
 			[&](const auto& candidate) {
 				if (condition(candidate)) {
 					result = candidate;
@@ -55,5 +68,5 @@ entity_id get_hovered_world_entity(
 		tree_of_npo_filter::all_drawables()
 	});
 
-	return entities.get_first_fulfilling(std::forward<F>(is_hoverable));
+	return entities.get_topmost_fulfilling(std::forward<F>(is_hoverable));
 }
