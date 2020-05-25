@@ -470,6 +470,7 @@ struct box_marker {
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariant_list = type_list<
+		invariants::sorting_order,
 		invariants::box_marker
 	>;
 

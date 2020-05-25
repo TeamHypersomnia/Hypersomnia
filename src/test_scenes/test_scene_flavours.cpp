@@ -284,16 +284,18 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_box_markers::T_SPAWN);
 
 			invariants::box_marker marker;
-			marker.type = area_marker_type::OVERLAID_CALLOUT;
+			marker.type = area_marker_type::CALLOUT;
 			meta.set(marker);
+			meta.get<invariants::sorting_order>().order = static_cast<sorting_order_type>(test_marker_order::CALLOUT_NESTED);
 		}
 
 		{
 			auto& meta = get_test_flavour(flavours, test_box_markers::CT_SPAWN);
 
 			invariants::box_marker marker;
-			marker.type = area_marker_type::OVERLAID_CALLOUT;
+			marker.type = area_marker_type::CALLOUT;
 			meta.set(marker);
+			meta.get<invariants::sorting_order>().order = static_cast<sorting_order_type>(test_marker_order::CALLOUT_NESTED);
 		}
 
 		{

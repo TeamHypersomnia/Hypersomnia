@@ -22,6 +22,11 @@ enum class test_obstacle_order : sorting_order_type {
 	GLASS
 };
 
+enum class test_marker_order : sorting_order_type {
+	CALLOUT,
+	CALLOUT_NESTED
+};
+
 template <class T>
 render_layer get_layer_for_order_type(const T t) {
 	if constexpr(std::is_same_v<T, render_layer>) {

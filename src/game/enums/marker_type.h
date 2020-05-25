@@ -18,8 +18,7 @@ enum class area_marker_type {
 
 	ORGANISM_AREA,
 
-	CALLOUT,
-	OVERLAID_CALLOUT
+	CALLOUT
 	// END GEN INTROSPECTOR
 };
 

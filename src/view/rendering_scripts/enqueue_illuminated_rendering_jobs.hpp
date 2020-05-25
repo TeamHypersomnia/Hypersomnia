@@ -229,7 +229,7 @@ void enqueue_illuminated_rendering_jobs(
 			const auto& callouts = settings.draw_callout_indicators;
 
 			if (callouts.is_enabled) {
-				visible.for_each<render_layer::CALLOUT_MARKERS, render_layer::OVERLAID_CALLOUT_MARKERS>(cosm, [&](const auto e) {
+				visible.for_each<render_layer::CALLOUT_MARKERS>(cosm, [&](const auto e) {
 					e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
 						const auto where = typed_handle.get_logic_transform();
 						const auto& callout_alpha = callouts.value;

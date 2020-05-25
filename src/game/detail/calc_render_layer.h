@@ -51,10 +51,6 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 				return render_layer::CALLOUT_MARKERS;
 			}
 
-			if (m.type == area_marker_type::OVERLAID_CALLOUT) {
-				return render_layer::OVERLAID_CALLOUT_MARKERS;
-			}
-
 			return render_layer::AREA_MARKERS;
 		}
 		else if constexpr(H::template has<invariants::light>()) {

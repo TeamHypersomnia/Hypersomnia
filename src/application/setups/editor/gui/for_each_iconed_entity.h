@@ -31,7 +31,7 @@ struct marker_icon {
 			id = I::EDITOR_ICON_ORGANISM_AREA;
 			col = green;
 		}
-		else if (type == area_marker_type::CALLOUT || type == area_marker_type::OVERLAID_CALLOUT) {
+		else if (type == area_marker_type::CALLOUT) {
 			id = I::INVALID;
 			col = white;
 		}
@@ -140,7 +140,7 @@ void for_each_iconed_entity(
 		);
 	});
 
-	visible.for_each<render_layer::CALLOUT_MARKERS, render_layer::OVERLAID_CALLOUT_MARKERS>(cosm, [&](const auto& handle) {
+	visible.for_each<render_layer::CALLOUT_MARKERS>(cosm, [&](const auto& handle) {
 		callback(
 			handle,
 			assets::necessary_image_id::INVALID, 
