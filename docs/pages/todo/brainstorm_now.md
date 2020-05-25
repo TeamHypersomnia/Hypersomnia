@@ -47,6 +47,27 @@ summary: That which we are brainstorming at the moment.
 - Why are indices wrong in shop?
 	- Though perhaps it's for the better?
 
+- Do we really want to expose "wall lighting" option to ground layer even when it will make little sense?
+	- Perhaps make it only appear for the wall layers and all wall flavours will have it on by default
+
+- Notice that we will have to make likewise "separators" for callout markers, lights and whatnot
+	- So shouldn't they be render layers too?
+	- We could call it a special layer
+	- All special layers will be a heterogenous tuple of arrays of possible id type vectors
+	- I'd divide it into tabs
+		- Foreground
+		- Background
+		- Special
+	- Though it would be enough to just have a single sub-layer of lights and of markers
+		- instead of whole separators
+
+- Maybe instead of "glass obstacles" and "solid obstacles" have just solid obstacles and a bool whether we want to apply additional wall light
+	- similarly with foreground?
+	- but the glows would anyways be rendered on top so it'd be counterintuitive
+		- similarly with neon erasers
+		- we can have though instead of SOLID_OBSTACLES_OCCLUDING_NEONS just a single solid obstacle layer and just a flag if to occlude floor neons
+			- since it will anyways be shown always above the ground layer 
+
 - Sentience -> Character please
 
 - Fix version numbering on MacOS

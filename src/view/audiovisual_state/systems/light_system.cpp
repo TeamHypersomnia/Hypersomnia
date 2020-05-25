@@ -260,15 +260,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 				light.color.rgb()
 			);
 
-			renderer.call_triangles(D::WALL_LIGHTED_BODIES);
-			renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);
-			renderer.call_triangles(D::OVER_SENTIENCES);
+			renderer.call_triangles(D::SOLID_OBSTACLES);
+			renderer.call_triangles(D::SOLID_OBSTACLES_OCCLUDING_NEONS);
+			renderer.call_triangles(D::FOREGROUND);
 		}
 	};
 
 	auto draw_sentience_neons = [&]() {
-		renderer.call_triangles(D::BODY_NEONS);
-
 		if (const auto fog_of_war_character = cosm[in.fog_of_war_character ? *in.fog_of_war_character : entity_id()]) {
 			renderer.call_and_clear_triangles();
 			renderer.stencil_positive_test();
@@ -309,10 +307,10 @@ void light_system::render_all_lights(const light_system_input in) const {
 	renderer.set_additive_blending();
 	standard_shader.set_as_current(renderer);
 
-	renderer.call_triangles(D::FLOOR_NEONS);
+	renderer.call_triangles(D::GROUND_NEONS);
 	renderer.set_standard_blending();
 	in.neon_occlusion_callback();
-	renderer.call_triangles(D::FLOOR_NEON_OVERLAYS);
+	renderer.call_triangles(D::GROUND_NEON_OVERLAYS);
 	renderer.set_additive_blending();
 
 	setup_light_shader();
@@ -327,7 +325,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	draw_sentience_neons();
 
-	renderer.call_triangles(D::DECORATION_NEONS);
+	renderer.call_triangles(D::FOREGROUND_NEONS);
 
 	in.neon_callback();
 	renderer.call_and_clear_triangles();

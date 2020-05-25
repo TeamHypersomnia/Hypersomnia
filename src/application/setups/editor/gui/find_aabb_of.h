@@ -6,7 +6,7 @@ template <class T>
 std::optional<ltrb> find_editor_aabb_of(const T handle) {
 	if (const auto tr = handle.find_logic_transform()) {
 		const auto pos = tr->pos;
-		const auto layer = calc_render_layer(handle);
+		const auto layer = ::calc_render_layer(handle);
 
 		if (
 			layer == render_layer::LIGHTS

@@ -67,7 +67,6 @@ struct plain_sprited_body {
 		invariants::sprite,
 		invariants::render,
 		invariants::sorting_order,
-		invariants::ground,
 
 		invariants::interpolation
 	>;
@@ -394,8 +393,6 @@ struct remnant_body {
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::sprite,
-		invariants::ground,
-
 		invariants::interpolation,
 		invariants::remnant
 	>;

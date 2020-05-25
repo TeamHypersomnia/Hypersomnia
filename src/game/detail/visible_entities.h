@@ -11,6 +11,7 @@
 #include "game/detail/tree_of_npo_filter.h"
 #include "augs/enums/callback_result.h"
 
+#include "game/components/sorting_order_type.h"
 #include "augs/enums/accuracy_type.h"
 
 struct visible_entities_query {

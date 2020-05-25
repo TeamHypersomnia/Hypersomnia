@@ -449,7 +449,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		}
 
 		if (settings.occlude_neons_under_other_bodies) {
-			renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);
+			renderer.call_triangles(D::SOLID_OBSTACLES_OCCLUDING_NEONS);
 		}
 	};
 
@@ -550,8 +550,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		shaders.smoke->set_as_current(renderer);
 
 		renderer.fullscreen_quad();
-
-		shaders.standard->set_as_current(renderer);
 	};
 
 	/* Flow */
@@ -612,19 +610,19 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	/* Sorting layer: Walls */
 
-	renderer.call_triangles(D::WALL_LIGHTED_BODIES);
-	renderer.call_triangles(D::NEON_OCCLUDING_DYNAMIC_BODY);
-	renderer.call_triangles(D::SMALL_AND_GLASS_BODIES);
+	renderer.call_triangles(D::SOLID_OBSTACLES);
+	renderer.call_triangles(D::SOLID_OBSTACLES_OCCLUDING_NEONS);
+	renderer.call_triangles(D::GLASS_AND_DROPPED_ITEMS);
 
 	draw_fog_of_war_overlay();
 	draw_sentiences(*shaders.illuminated);
 
-	renderer.call_triangles(D::INSECTS);
-	renderer.call_triangles(D::OVER_SENTIENCES);
+	renderer.call_triangles(D::FOREGROUND);
 
 	overlay_smoke_texture();
 	
-	renderer.call_triangles(D::CAPTIONS_AND_BULLETS);
+	shaders.standard->set_as_current(renderer);
+	renderer.call_triangles(D::GLOWING_FOREGROUND);
 
 	draw_crosshairs();
 	draw_weapon_laser();

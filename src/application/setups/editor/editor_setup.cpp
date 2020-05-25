@@ -29,6 +29,7 @@
 #include "application/setups/editor/editor_selection_groups.hpp"
 
 #include "game/detail/weapon_like.h"
+#include "game/detail/calc_render_layer.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
@@ -1483,7 +1484,7 @@ void editor_setup::hide_layers_of_selected_entities() {
 
 			for_each_selected_entity(
 				[&](const auto e) {
-					const auto l = calc_render_layer(cosm[e]);
+					const auto l = ::calc_render_layer(cosm[e]);
 					vf.value.layers[l] = false;
 				}
 			);

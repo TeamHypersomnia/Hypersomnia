@@ -5,7 +5,6 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/messages/start_sound_effect.h"
-#include "game/detail/visible_entities.h"
 #include "game/detail/physics/shape_overlapping.hpp"
 #include "game/detail/bombsite_in_range.h"
 #include "game/messages/battle_event_message.h"

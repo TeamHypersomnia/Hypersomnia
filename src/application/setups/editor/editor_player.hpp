@@ -4,6 +4,7 @@
 #include "augs/templates/snapshotted_player.hpp"
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/editor_paths.h"
+#include "augs/templates/traits/is_nullopt.h"
 
 #include "application/arena/arena_handle.h"
 

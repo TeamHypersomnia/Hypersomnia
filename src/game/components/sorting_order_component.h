@@ -6,10 +6,7 @@
 #include "augs/graphics/rgba.h"
 
 #include "augs/pad_bytes.h"
-
-using sorting_order_type = uint32_t;
-
-constexpr sorting_order_type max_sorting_layer_v = 64;
+#include "game/components/sorting_order_type.h"
 
 namespace invariants {
 	struct sorting_order {

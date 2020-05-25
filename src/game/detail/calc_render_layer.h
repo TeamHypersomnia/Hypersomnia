@@ -6,29 +6,30 @@
 #include "game/cosmos/entity_type_traits.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/detail/entities_with_render_layer.h"
+#include "augs/log.h"
 #include "game/detail/explosive/like_explosive.h"
 
 template <class H>
 FORCE_INLINE auto calc_render_layer(const H& handle) {
 	if constexpr(H::is_specific) {
 		if constexpr(H::template has<invariants::render>()) {
-			if constexpr(H::template has<invariants::hand_fuse>()) {
-				if (is_like_planted_bomb(handle)) {
-					return render_layer::PLANTED_BOMBS;
-				} 
-
-				if (is_like_thrown_explosive(handle)) {
-					return render_layer::OVER_SMALL_DYNAMIC_BODY;
-				} 
-			}
-
 			return handle.template get<invariants::render>().layer;
 		}
+		else if constexpr(H::template has<invariants::hand_fuse>()) {
+			if (is_like_planted_bomb(handle)) {
+				return render_layer::PLANTED_BOMBS;
+			} 
+
+			return render_layer::DROPPED_ITEMS;
+		}
 		else if constexpr(H::template has<invariants::item>()) {
-			return render_layer::SMALL_DYNAMIC_BODY;
+			return render_layer::DROPPED_ITEMS;
+		}
+		else if constexpr(H::template has<invariants::remnant>()) {
+			return render_layer::DROPPED_ITEMS;
 		}
 		else if constexpr(H::template has<invariants::missile>()) {
-			return render_layer::FLYING_BULLETS;
+			return render_layer::GLOWING_FOREGROUND;
 		}
 		else if constexpr(H::template has<invariants::sentience>()) {
 			return render_layer::SENTIENCES;

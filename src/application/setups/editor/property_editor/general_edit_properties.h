@@ -21,6 +21,7 @@
 
 #include "augs/templates/traits/is_enum_map.h"
 #include "augs/misc/enum/enum_map.h"
+#include "augs/templates/traits/is_nullopt.h"
 
 #define HIDE_DISABLED_MAYBES 1
 

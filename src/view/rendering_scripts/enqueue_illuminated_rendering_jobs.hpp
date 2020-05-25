@@ -278,18 +278,17 @@ void enqueue_illuminated_rendering_jobs(
 		};
 
 		{
-			auto job = [h1 = make_helper(D::WALL_LIGHTED_BODIES), h2 = make_helper(D::OVER_SENTIENCES), h3 = make_helper(D::NEON_OCCLUDING_DYNAMIC_BODY)]() {
+			auto job = [h1 = make_helper(D::SOLID_OBSTACLES), h2 = make_helper(D::FOREGROUND), h3 = make_helper(D::SOLID_OBSTACLES_OCCLUDING_NEONS)]() {
 				h1.draw<
-					render_layer::DYNAMIC_BODY,
-					render_layer::OVER_DYNAMIC_BODY
+					render_layer::SOLID_OBSTACLES
 				>();
 
 				h2.draw<
-					render_layer::OVER_SENTIENCES
+					render_layer::FOREGROUND
 				>();
 
 				h3.draw<
-					render_layer::NEON_OCCLUDING_DYNAMIC_BODY
+					render_layer::SOLID_OBSTACLES_OCCLUDING_NEONS
 				>();
 			};
 
@@ -297,11 +296,15 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [h = make_helper(D::DECORATION_NEONS)]() {
+			auto job = [h = make_helper(D::FOREGROUND_NEONS)]() {
 				h.draw_neons<
-					render_layer::FLYING_BULLETS,
-					render_layer::NEON_CAPTIONS,
 					render_layer::PLANTED_BOMBS,
+					render_layer::SOLID_OBSTACLES_OCCLUDING_NEONS,
+					render_layer::GLOWING_FOREGROUND,
+					render_layer::SOLID_OBSTACLES,
+					render_layer::GLASS_OBSTACLES,
+					render_layer::DROPPED_ITEMS,
+					render_layer::FOREGROUND,
 					render_layer::INSECTS
 				>();
 			};
@@ -310,23 +313,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [h = make_helper(D::BODY_NEONS)]() {
-				h.draw_neons<
-					render_layer::DYNAMIC_BODY,
-					render_layer::OVER_DYNAMIC_BODY,
-					render_layer::GLASS_BODY,
-					render_layer::SMALL_DYNAMIC_BODY,
-					render_layer::OVER_SMALL_DYNAMIC_BODY,
-					render_layer::OVER_SENTIENCES,
-					render_layer::NEON_OCCLUDING_DYNAMIC_BODY
-				>();
-			};
-
-			pool.enqueue(job);
-		}
-
-		{
-			auto job = [h1 = make_helper(D::FLOOR_NEONS), h2 = make_helper(D::FLOOR_NEON_OVERLAYS)]() {
+			auto job = [h1 = make_helper(D::GROUND_NEONS), h2 = make_helper(D::GROUND_NEON_OVERLAYS)]() {
 				h1.draw_neons<
 					render_layer::GROUND
 				>();
@@ -340,11 +327,10 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [h = make_helper(D::SMALL_AND_GLASS_BODIES)]() {
+			auto job = [h = make_helper(D::GLASS_AND_DROPPED_ITEMS)]() {
 				h.draw<
-					render_layer::SMALL_DYNAMIC_BODY,
-					render_layer::OVER_SMALL_DYNAMIC_BODY,
-					render_layer::GLASS_BODY
+					render_layer::DROPPED_ITEMS,
+					render_layer::GLASS_OBSTACLES
 				>();
 			};
 
@@ -363,14 +349,13 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [h2 = make_helper(D::INSECTS), h3 = make_helper(D::CAPTIONS_AND_BULLETS)]() {
+			auto job = [h2 = make_helper(D::INSECTS), h3 = make_helper(D::GLOWING_FOREGROUND)]() {
 				h2.draw<
 					render_layer::INSECTS
 				>();
 
 				h3.draw<
-					render_layer::FLYING_BULLETS,
-					render_layer::NEON_CAPTIONS
+					render_layer::GLOWING_FOREGROUND
 				>();
 			};
 

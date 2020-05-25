@@ -2,6 +2,7 @@
 #include "augs/math/vec2.h"
 #include "game/enums/startle_type.h"
 #include "game/detail/render_layer_filter.h"
+#include "game/detail/organisms/scare_source.h"
 
 class cosmos;
 

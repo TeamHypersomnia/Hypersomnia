@@ -11,11 +11,10 @@
 
 render_layer_filter aabb_highlighter::get_filter() {
 	return render_layer_filter::whitelist(
-		render_layer::SMALL_DYNAMIC_BODY,
+		render_layer::DROPPED_ITEMS,
 		render_layer::SENTIENCES,
-		render_layer::OVER_DYNAMIC_BODY,
-		render_layer::DYNAMIC_BODY,
-		render_layer::GLASS_BODY
+		render_layer::SOLID_OBSTACLES,
+		render_layer::GLASS_OBSTACLES
 	);
 }
 

@@ -2,9 +2,7 @@
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/templates/maybe.h"
-
-#include "game/components/render_component.h"
-#include "game/detail/calc_render_layer.h"
+#include "game/enums/render_layer.h"
 
 struct render_layer_filter {
 	// GEN INTROSPECTOR struct render_layer_filter
@@ -29,9 +27,7 @@ struct render_layer_filter {
 	}
 
 	template <class E>
-	bool passes(const E& handle) const {
-		return layers[calc_render_layer(handle)];
-	}
+	bool passes(const E& handle) const;
 };
 
 using maybe_layer_filter = augs::maybe<render_layer_filter>;

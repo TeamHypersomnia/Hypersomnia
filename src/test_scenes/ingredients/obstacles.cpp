@@ -64,7 +64,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::CRATE,
 				test_scene_image_id::CRATE,
-				render_layer::DYNAMIC_BODY
+				render_layer::SOLID_OBSTACLES
 			),
 			test_scene_physical_material_id::WOOD
 		);
@@ -73,7 +73,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::BRICK_WALL,
 				test_scene_image_id::BRICK_WALL,
-				render_layer::DYNAMIC_BODY
+				render_layer::SOLID_OBSTACLES
 			),
 			test_scene_physical_material_id::WOOD
 		);
@@ -82,7 +82,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::SNACKBAR,
 				test_scene_image_id::SNACKBAR,
-				render_layer::DYNAMIC_BODY
+				render_layer::SOLID_OBSTACLES
 			),
 
 			test_scene_physical_material_id::AIR_DUCT,
@@ -94,7 +94,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::LAB_WALL_SMOOTH_END,
 				test_scene_image_id::LAB_WALL_SMOOTH_END,
-				render_layer::DYNAMIC_BODY
+				render_layer::SOLID_OBSTACLES
 			),
 			test_scene_physical_material_id::METAL,
 			0.2f,
@@ -105,7 +105,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::LAB_WALL_CORNER_CUT,
 				test_scene_image_id::LAB_WALL_CORNER_CUT,
-				render_layer::DYNAMIC_BODY
+				render_layer::SOLID_OBSTACLES
 			),
 			test_scene_physical_material_id::METAL,
 			0.2f,
@@ -116,7 +116,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::LAB_WALL_CORNER_SQUARE,
 				test_scene_image_id::LAB_WALL_CORNER_SQUARE,
-				render_layer::DYNAMIC_BODY
+				render_layer::SOLID_OBSTACLES
 			),
 			test_scene_physical_material_id::METAL,
 			0.2f,
@@ -127,7 +127,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::LAB_WALL,
 				test_scene_image_id::LAB_WALL,
-				render_layer::DYNAMIC_BODY
+				render_layer::SOLID_OBSTACLES
 			),
 			test_scene_physical_material_id::METAL,
 			0.2f,
@@ -138,7 +138,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::AQUARIUM_GLASS,
 				test_scene_image_id::AQUARIUM_GLASS,
-				render_layer::GLASS_BODY
+				render_layer::GLASS_OBSTACLES
 			)
 		);
 
@@ -146,7 +146,7 @@ namespace test_flavours {
 			flavour_with_sprite(
 				test_plain_sprited_bodies::AQUARIUM_GLASS_START,
 				test_scene_image_id::AQUARIUM_GLASS_START,
-				render_layer::GLASS_BODY
+				render_layer::GLASS_OBSTACLES
 			)
 		);
 	}

@@ -5,17 +5,9 @@
 #include "game/enums/startle_type.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/organisms/scare_source.h"
 
 using avoidance_rank_type = int8_t;
-
-enum class scare_source {
-	// GEN INTROSPECTOR enum class scare_source
-	MELEE,
-	GUNS_AND_EXPLOSIONS,
-
-	COUNT
-	// END GEN INTROSPECTOR
-};
 
 struct organism_wandering_def {
 	// GEN INTROSPECTOR struct organism_wandering_def
