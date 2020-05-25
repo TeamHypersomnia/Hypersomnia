@@ -9,6 +9,21 @@ auto* find_tree_of_npo_cache(const E& handle) {
 	return general_find_cache<tree_of_npo_cache_data>(handle);
 }
 
+static auto render_layer_to_tonpo_type(const render_layer layer) {
+	switch (layer) {
+		case render_layer::CONTINUOUS_PARTICLES:
+			return tree_of_npo_type::PARTICLE_STREAMS;
+		case render_layer::CONTINUOUS_SOUNDS:
+			return tree_of_npo_type::SOUND_SOURCES;
+		case render_layer::LIGHTS:
+			return tree_of_npo_type::LIGHTS;
+		case render_layer::CALLOUT_MARKERS:
+			return tree_of_npo_type::CALLOUT_MARKERS;
+		default:
+			return tree_of_npo_type::RENDERABLES;
+	}
+}
+
 template <class E>
 std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 	constexpr bool is_physical = E::template has<invariants::fixtures>() || E::template has<invariants::rigid_body>();
@@ -25,21 +40,8 @@ std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 			/* Handled by the grids in organism cache */
 			return std::nullopt;
 		}
-		else if (layer == render_layer::CONTINUOUS_PARTICLES) {
-			result.type = tree_of_npo_type::PARTICLE_STREAMS;
-		}
-		else if (layer == render_layer::CONTINUOUS_SOUNDS) {
-			result.type = tree_of_npo_type::SOUND_SOURCES;
-		}
-		else if (layer == render_layer::LIGHTS) {
-			result.type = tree_of_npo_type::LIGHTS;
-		}
-		else if (layer == render_layer::CALLOUT_MARKERS) {
-			result.type = tree_of_npo_type::CALLOUT_MARKERS;
-		}
-		else {
-			result.type = tree_of_npo_type::RENDERABLES;
-		}
+
+		result.type = ::render_layer_to_tonpo_type(layer);
 
 		return result;
 	}

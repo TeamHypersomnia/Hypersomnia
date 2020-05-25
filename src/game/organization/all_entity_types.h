@@ -208,6 +208,32 @@ struct sprite_decoration {
 	>;
 };
 
+struct complex_decoration {
+	static constexpr std::size_t statically_allocated_entities = 2000;
+	static constexpr std::size_t statically_allocated_flavours = 300;
+
+	using invariant_list = type_list<
+		invariants::sprite,
+		invariants::animation,
+		invariants::render,
+		invariants::sorting_order,
+		invariants::ground,
+		invariants::movement_path
+	>;
+
+	using component_list = type_list<
+		components::sprite,
+		components::animation,
+		components::transform,
+		components::movement_path
+	>;
+
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
+};
+
+
 struct wandering_pixels_decoration {
 	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 20;
@@ -355,31 +381,6 @@ struct container_item {
 		items_of_slots_cache,
 		rigid_body_cache,
 		colliders_cache
-	>;
-};
-
-struct complex_decoration {
-	static constexpr std::size_t statically_allocated_entities = 2000;
-	static constexpr std::size_t statically_allocated_flavours = 300;
-
-	using invariant_list = type_list<
-		invariants::sprite,
-		invariants::animation,
-		invariants::render,
-		invariants::sorting_order,
-		invariants::ground,
-		invariants::movement_path
-	>;
-
-	using component_list = type_list<
-		components::sprite,
-		components::animation,
-		components::transform,
-		components::movement_path
-	>;
-
-	using synchronized_arrays = type_list<
-		tree_of_npo_cache_data
 	>;
 };
 
