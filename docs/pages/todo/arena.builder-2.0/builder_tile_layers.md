@@ -1,3 +1,33 @@
+- Well in Construct we have default layers for the object types
+	- Still we can change on per-object basis
+
+- Okay why can't we just have arbitrary layers with arbitrary objects inside, fully reorderable?
+	- We could then add an aquarium easily as a separate layer
+	- Or a group with a tile and object layer
+		- aquarium folder would be special? And would have parameters?
+- Newly dragged objects just end up on top of everything else
+- Firstmost found object layer
+	- Though might be a pain if it lands somewhere like in aquarium
+
+- Problem: Default object placement in a layer
+	- When we drag and drop from a filesystem
+	- Construct has the default layer encoded in the object type 
+		- what if it gets deleted?
+	- We can later have some elaborate proximity detection
+		- Like always place above the hovered object
+	- There's nothing wrong with iterating through the folders too
+		- Because if we want to add something to the aquarium, why not
+	- (Unassigned layer)
+		- Always on top, immutable
+		- Could be for stuff we didn't automatically find a suitable layer for
+
+- Z order window should, understandably, only show layers from the same sorting layer
+	- Is a great help in selecting objects too
+
+- Selecting always navigates to the object in layers
+
+- Prefab bundles? Lol
+
 - If we allow mixing physical and non-physical tiles, it makes little sense to have two separate tabs for ground and solids
 	- Well we'll need to split these for the game code anyway
 

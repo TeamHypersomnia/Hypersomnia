@@ -50,6 +50,11 @@ summary: That which we are brainstorming at the moment.
 - Well.. it's a pain but we'll still somehow need to order entities within an order
 	- Unless we spam with these flavours like crazy
 	- Well what if we want to have the same decor in both background and foreground? Makes little sense to make another prefab for this, better just auto-generate two different flavours
+	- we can always put the sorting order in a component instead of invariant
+		- since, at this rate, it's pretty much something like a transform
+	- We could screw the sorting order and just sort by ids
+		- Fast, though is this what we truly want?
+		- Not really. Consider different entity types
 
 - New entity type: tile layer?
 	- Shouldn't really be rocket-sciency to support animations later

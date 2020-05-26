@@ -17,13 +17,15 @@ bool buy_area_in_range(const E& subject) {
 
 	auto& entities = thread_local_visible_entities();
 
-	entities.reacquire_all_and_sort({
+	entities.reacquire_all({
 		cosm,
 		camera_cone::from_aabb(subject),
 		accuracy_type::PROXIMATE,
 		render_layer_filter::whitelist(render_layer::AREA_MARKERS),
 		{ { tree_of_npo_type::RENDERABLES } }
 	});
+
+	entities.sort(cosm);
 
 	bool found = false;
 

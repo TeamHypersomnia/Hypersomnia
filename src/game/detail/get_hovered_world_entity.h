@@ -60,13 +60,15 @@ entity_id get_hovered_world_entity(
 ) {
 	auto& entities = thread_local_visible_entities();
 
-	entities.reacquire_all_and_sort({
+	entities.reacquire_all({
 		cosm,
 		camera_cone(camera_eye(world_cursor_position, 1.f), vec2i::square(1)),
 		accuracy_type::EXACT,
 		filter,
 		tree_of_npo_filter::all_drawables()
 	});
+
+	entities.sort(cosm);
 
 	return entities.get_topmost_fulfilling(std::forward<F>(is_hoverable));
 }

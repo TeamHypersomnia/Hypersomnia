@@ -28,7 +28,7 @@ auto query_defusing_nearby_bomb(const E& subject) {
 
 	auto& entities = thread_local_visible_entities();
 
-	entities.reacquire_all_and_sort({
+	entities.reacquire_all({
 		cosm,
 		camera_cone(camera_eye(where, 1.f), vec2i::square(max_defuse_radius * 2)),
 		accuracy_type::EXACT,

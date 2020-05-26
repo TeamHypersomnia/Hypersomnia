@@ -273,7 +273,8 @@ void editor_entity_selector::do_mousemotion(
 			tree_of_npo_filter::all()
 		};
 
-		vis.reacquire_all_and_sort(query);
+		vis.reacquire_all(query);
+		vis.sort(cosm);
 
 		vis.for_all_ids_ordered([&](const auto id) {
 			emplace_element(in_rectangular_selection, id);
@@ -311,13 +312,15 @@ void editor_entity_selector::do_mousemotion(
 		}
 	}
 	else {
-		vis.reacquire_all_and_sort({
+		vis.reacquire_all({
 			cosm,
 			camera_cone(camera_eye(world_cursor_pos, 1.f), vec2i::square(1)),
 			accuracy_type::EXACT,
 			filter,
 			tree_of_npo_filter::all()
 		});
+
+		vis.sort(cosm);
 
 		thread_local std::vector<entity_id> ids;
 		ids.clear();

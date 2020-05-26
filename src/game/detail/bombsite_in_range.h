@@ -12,7 +12,7 @@ bool bombsite_in_range_of_entity(const E& queried_entity) {
 
 	auto& entities = thread_local_visible_entities();
 
-	entities.reacquire_all_and_sort({
+	entities.reacquire_all({
 		cosm,
 		camera_cone::from_aabb(queried_entity),
 		accuracy_type::PROXIMATE,

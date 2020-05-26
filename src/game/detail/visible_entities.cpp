@@ -31,10 +31,6 @@ void visible_entities::layer_register::clear() {
 	max_order = 0;
 }
 
-visible_entities::visible_entities(const visible_entities_query input) {
-	reacquire_all_and_sort(input);
-}
-
 void visible_entities::clear() {
 	for (auto& layer : per_layer) {
 		layer.clear();
@@ -45,13 +41,16 @@ void visible_entities::clear() {
 	}
 }
 
-visible_entities& visible_entities::reacquire_all_and_sort(const visible_entities_query input) {
+visible_entities& visible_entities::reacquire_all(const visible_entities_query input) {
 	clear();
 	acquire_non_physical(input);
 	acquire_physical(input);
-	sort_car_interiors(input.cosm);
 
 	return *this;
+}
+
+void visible_entities::sort(const cosmos& cosm) {
+	sort_car_interiors(cosm);
 }
 
 /* We're using our own flags instead of unordered_set implementation for it to be deterministic */

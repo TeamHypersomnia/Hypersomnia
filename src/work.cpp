@@ -1718,14 +1718,17 @@ work_result work(const int argc, const char* const * const argv) try {
 		queried_eye.zoom /= viewing_config.session.camera_query_aabb_mult;
 
 		const auto queried_cone = camera_cone(queried_eye, screen_size);
+		const auto& cosm = viewed_character.get_cosmos();
 
-		all_visible.reacquire_all_and_sort({ 
-			viewed_character.get_cosmos(), 
+		all_visible.reacquire_all({ 
+			cosm, 
 			queried_cone, 
 			accuracy_type::PROXIMATE,
 			get_render_layer_filter(),
 			tree_of_npo_filter::all()
 		});
+
+		all_visible.sort(cosm);
 
 		game_thread_performance.num_visible_entities.measure(all_visible.count_all());
 	};
