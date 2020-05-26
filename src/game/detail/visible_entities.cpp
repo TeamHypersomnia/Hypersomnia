@@ -28,11 +28,11 @@ std::size_t visible_entities::count_all() const {
 }
 
 void visible_entities::layer_register::clear() {
-	for (sorting_order_type i = 0; i < max_order; ++i) {
-		per_order[i].clear();
-	}
+	with_orders.clear();
+}
 
-	max_order = 0;
+void visible_entities::layer_register::sort() {
+	sort_range(with_orders);
 }
 
 void visible_entities::clear() {
@@ -55,6 +55,10 @@ visible_entities& visible_entities::reacquire_all(const visible_entities_query i
 
 void visible_entities::sort(const cosmos& cosm) {
 	sort_car_interiors(cosm);
+
+	for (auto& layer : per_layer) {
+		layer.sort();
+	}
 }
 
 /* We're using our own flags instead of unordered_set implementation for it to be deterministic */
@@ -239,8 +243,7 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 }
 
 void visible_entities::layer_register::register_visible(const entity_id id, const sorting_order_type order) {
-	max_order = std::max(max_order, 1 + order);
-	per_order[order].emplace_back(id);
+	with_orders.emplace_back(order, id);
 }
 
 void visible_entities::register_visible(const cosmos& cosm, const entity_id id) {
@@ -269,13 +272,7 @@ void visible_entities::register_visible(const cosmos& cosm, const entity_id id) 
 }
 
 std::size_t visible_entities::layer_register::size() const {
-	std::size_t n = 0;
-
-	for (auto i = sorting_order_type(0); i < max_order; ++i) {
-		n += per_order[i].size();
-	}
-
-	return n;
+	return with_orders.size();
 }
 
 void visible_entities::sort_car_interiors(const cosmos& cosm) {

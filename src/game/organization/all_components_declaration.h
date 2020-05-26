@@ -49,7 +49,6 @@ namespace invariants {
 	struct tool;
 	struct melee;
 	struct melee_fighter;
-	struct sorting_order;
 }
 
 namespace components {
@@ -86,6 +85,7 @@ namespace components {
 	struct cascade_explosion;
 	struct melee_fighter;
 	struct marker;
+	struct sorting_order;
 }
 
 using assert_always_together = type_list<
@@ -167,7 +167,8 @@ using component_list_t = List<
 	components::continuous_particles,
 	components::overridden_geo,
 	components::cascade_explosion,
-	components::marker
+	components::marker,
+	components::sorting_order
 >;
 
 template <template <class...> class List>
@@ -176,7 +177,6 @@ using invariant_list_t = List<
 	invariants::flags,
 	invariants::gun,
 	invariants::render,
-	invariants::sorting_order,
 	invariants::shape_polygon,
 	invariants::shape_circle,
 	invariants::polygon,

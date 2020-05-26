@@ -286,7 +286,7 @@ namespace test_flavours {
 			invariants::box_marker marker;
 			marker.type = area_marker_type::CALLOUT;
 			meta.set(marker);
-			meta.get<invariants::sorting_order>().order = static_cast<sorting_order_type>(test_marker_order::CALLOUT_NESTED);
+			meta.get<components::sorting_order>().order = static_cast<sorting_order_type>(test_marker_order::CALLOUT_NESTED);
 		}
 
 		{
@@ -295,7 +295,7 @@ namespace test_flavours {
 			invariants::box_marker marker;
 			marker.type = area_marker_type::CALLOUT;
 			meta.set(marker);
-			meta.get<invariants::sorting_order>().order = static_cast<sorting_order_type>(test_marker_order::CALLOUT_NESTED);
+			meta.get<components::sorting_order>().order = static_cast<sorting_order_type>(test_marker_order::CALLOUT_NESTED);
 		}
 
 		{

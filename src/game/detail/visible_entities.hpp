@@ -3,32 +3,28 @@
 
 template <class F>
 void visible_entities::layer_register::for_each(F&& callback) const {
-	for (auto i = sorting_order_type(0); i < max_order; ++i) {
-		for (const auto& p : per_order[i]) {
-			if constexpr(std::is_same_v<callback_result, decltype(callback(p))>) {
-				if (callback_result::ABORT == callback(p)) {
-					return;
-				}
+	for (const auto& p : with_orders) {
+		if constexpr(std::is_same_v<callback_result, decltype(callback(p.second))>) {
+			if (callback_result::ABORT == callback(p.second)) {
+				return;
 			}
-			else {
-				callback(p);
-			}
+		}
+		else {
+			callback(p.second);
 		}
 	}
 }
 
 template <class F>
 void visible_entities::layer_register::for_each_reverse(F&& callback) const {
-	for (auto i = static_cast<int>(max_order) - 1; i >= 0; --i) {
-		for (const auto& p : per_order[i]) {
-			if constexpr(std::is_same_v<callback_result, decltype(callback(p))>) {
-				if (callback_result::ABORT == callback(p)) {
-					return;
-				}
+	for (const auto& p : with_orders) {
+		if constexpr(std::is_same_v<callback_result, decltype(callback(p.second))>) {
+			if (callback_result::ABORT == callback(p.second)) {
+				return;
 			}
-			else {
-				callback(p);
-			}
+		}
+		else {
+			callback(p.second);
 		}
 	}
 }

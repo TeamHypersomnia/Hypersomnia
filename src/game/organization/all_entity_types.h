@@ -66,13 +66,13 @@ struct plain_sprited_body {
 		invariants::fixtures,
 		invariants::sprite,
 		invariants::render,
-		invariants::sorting_order,
 
 		invariants::interpolation
 	>;
 
 	using component_list = type_list<
 		components::sprite,
+		components::sorting_order,
 		components::overridden_geo,
 		components::rigid_body
 	>;
@@ -193,12 +193,12 @@ struct static_decoration {
 	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::render,
-		invariants::sorting_order,
 		invariants::ground
 	>;
 
 	using component_list = type_list<
 		components::sprite,
+		components::sorting_order,
 		components::transform,
 		components::overridden_geo
 	>;
@@ -216,13 +216,13 @@ struct dynamic_decoration {
 		invariants::sprite,
 		invariants::animation,
 		invariants::render,
-		invariants::sorting_order,
 		invariants::ground,
 		invariants::movement_path
 	>;
 
 	using component_list = type_list<
 		components::sprite,
+		components::sorting_order,
 		components::animation,
 		components::transform,
 		components::movement_path
@@ -471,11 +471,11 @@ struct box_marker {
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariant_list = type_list<
-		invariants::sorting_order,
 		invariants::box_marker
 	>;
 
 	using component_list = type_list<
+		components::sorting_order,
 		components::marker,
 		components::transform,
 		components::overridden_geo

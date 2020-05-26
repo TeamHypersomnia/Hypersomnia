@@ -35,12 +35,8 @@ class visible_entities {
 	using id_type = entity_id;
 
 	struct layer_register {
-		sorting_order_type max_order = 0;
-
-		std::array<
-			std::vector<id_type>,
-			max_sorting_layer_v
-		> per_order;
+		using ordered_entities_type = std::vector<std::pair<sorting_order_type, id_type>>;
+		ordered_entities_type with_orders;
 
 		template <class F>
 		void for_each(F&& callback) const;
@@ -52,6 +48,8 @@ class visible_entities {
 
 		void clear();
 		std::size_t size() const;
+
+		void sort();
 	};
 
 	using per_layer_type = per_render_layer_t<layer_register>;

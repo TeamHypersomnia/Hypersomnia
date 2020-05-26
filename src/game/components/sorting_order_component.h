@@ -8,9 +8,9 @@
 #include "augs/pad_bytes.h"
 #include "game/components/sorting_order_type.h"
 
-namespace invariants {
+namespace components {
 	struct sorting_order {
-		// GEN INTROSPECTOR struct invariants::sorting_order
+		// GEN INTROSPECTOR struct components::sorting_order
 		sorting_order_type order = 0;
 		// END GEN INTROSPECTOR
 	};

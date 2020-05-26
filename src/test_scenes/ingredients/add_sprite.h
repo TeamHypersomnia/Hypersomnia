@@ -56,7 +56,7 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			if constexpr(!std::is_same_v<const render_layer, decltype(layer)>) {
-				invariants::sorting_order order_def;
+				components::sorting_order order_def;
 				order_def.order = static_cast<sorting_order_type>(layer);
 				meta.set(order_def);
 			}
