@@ -214,8 +214,6 @@ bool projects_list_tab_state::perform_list(
 		}
 	};
 
-	//ImGui::Separator();
-
 	const auto avail = ImGui::GetContentRegionAvail();
 
 	ImGui::Columns(num_columns);
@@ -420,14 +418,7 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 	}
 
 	{
-		//auto list_view = scoped_child("Project categories view", ImVec2(left_buttons_column_size.x, 0));
-
-		//const auto selectable_size = ImVec2(left_buttons_column_size.x, left_buttons_column_size.y * 2);
-	}
-
-	{
 		do_pretty_tabs(current_tab);
-		//const auto button_size = ImVec2(left_buttons_column_size.x, 0);
 
 		const auto avail = ImGui::GetContentRegionAvail();
 		const auto proj_list_width = avail.x * 0.6f;
@@ -441,10 +432,6 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 
 		{
 			auto scope = scoped_child("Project list view", ImVec2(proj_list_width, -space_for_clone_button));
-
-			//const auto line_h = ImGui::GetTextLineHeight();
-
-			//shift_cursor(vec2(0, line_h));
 
 			if (const bool choice_performed = perform_arena_list()) {
 				auto& tab = tabs[current_tab];
@@ -472,9 +459,6 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 		const auto selected_entry = tab.find_selected();
 
 		{
-			//auto window_border_size = scoped_style_var(ImGuiStyleVar_ChildBorderSize, 2.0f);
-
-			//const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_ChildBg];
 			auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
 
 			auto scope = scoped_child("Project description view", ImVec2(proj_desc_width, -space_for_clone_button), false);
@@ -483,10 +467,6 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 				auto& entry = *selected_entry;
 				auto& meta = entry.meta;
 				(void)meta;
-
-				//const auto image_offset = vec2(icon_padding.x, button_size.y / 2 - icon_size.y / 2);
-
-				//const auto line_h = ImGui::GetTextLineHeight();
 
 				const auto image_padding = vec2(5, 5);
 				const auto image_internal_padding = vec2i(15, 15);
@@ -505,23 +485,7 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 					game_image(in.necessary_images[assets::necessary_image_id::BLANK], bg_size, rgba(0, 0, 0, 100), image_padding, augs::imgui_atlas_type::GAME);
 					game_image(*preview_entry, resized_preview_size, white, offset + image_padding + image_internal_padding, augs::imgui_atlas_type::AD_HOC);
 
-					/* { */
-					/* 	auto scope = scoped_preserve_cursor(); */
-					/* 	shift_cursor(vec2(text_h / 2, text_h / 2)); */
-
-					/* 	text(entry.get_arena_name() + "\n\n"); */
-					/* } */
-
 					invisible_button("", target_preview_size + image_padding + image_internal_padding * 2);
-
-					//ImGui::SameLine();
-
-					//{
-						//auto scope = scoped_preserve_cursor();
-						//text(entry.get_arena_name() + "\n\n");
-						//}
-
-						//shift_cursor(vec2(0, (target_preview_size + image_padding + image_internal_padding * 2).x));
 
 					auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
 
@@ -552,12 +516,7 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 					ImGui::Columns(1);
 
 					text("\n");
-					/* ImGui::Separator(); */
-					/* text("\n"); */
 
-					/* text_disabled(meta.short_description); */
-
-					/* text("\n"); */
 					ImGui::PushTextWrapPos();
 
 					text_color(meta.full_description, rgba(210, 210, 210, 255));

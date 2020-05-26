@@ -1,19 +1,55 @@
-
-- decoration_layer vs render_layer
-	- Maybe let's not complicate it further at this point
+- If we allow mixing physical and non-physical tiles, it makes little sense to have two separate tabs for ground and solids
+	- Well we'll need to split these for the game code anyway
 
 - Structuring
-	- Either Tabs or Separators: Ground/Foreground
+	- Either Tabs or Separators: Ground/Foreground/Solids/Items/Special
 		- Flavours?
 			- where it makes sense:
 				- Items on ground -> BAKA47s
+	- What about Lights/Wandering pixels?
+		- Their ordering makes little sense
+		- User should just see "Particles" instead of wandering pixels/smokes etc
+	- All tabs
+		- Ground
+		- Solids (?)
+		- Foreground
+	- All special objects
+		- Lights
+		- Particles
+		- Sounds
+		- Areas
+		- Spots
+		- Callouts
+	- Each tab has an eye icon for quick hiding
+	- Also selecting each category quick-writes a filter in the filesystem
+		- Not sure though because it'd make little sense for flavoured layers later perhaps
+
+
+- Material objects could be used for mulitple tile types
+	- Though this would mostly be for the ground invariant
+	- Ground material
+	- Solid material
+
+- decoration_layer vs render_layer
+	- Let's not complicate it further at this point
+	- Because this API will anyway be transparent to the user
+	- and we'll have some builder's ad-hoc enums for these
+
+- Hovering over a palette highlights the whole logical tile
+	- Clicking selects it whole
+	- Dragging can select in smaller chunks or just multiple
+
+- Right-clicking tile on scene works similar
+	- drag selects many, rightclick selects logical
+
+- Dragging mouse while painting should move the brush by the stamp size and not by just a single tile
+
+- We'll just have category presets like "Glass" that'll initially set those special function flags to false 
 
 - We can show a tile pallette always when a tile layer is selected
 	- Conversely, when an object layer is selected, we can show relevant objects to be placed in a filesystem-like structure
 		- Perhaps filtered by the layer type too?
 
-- Clicking on a palette selects whole logical tile
-	- Dragging can select in smaller chunks or just multiple
 
 - What about layers for complex predefined objects like an aquarium?
 	- Well we certainly don't want to expose all those shit with fish to the artist unless they really want to

@@ -47,6 +47,17 @@ summary: That which we are brainstorming at the moment.
 - Why are indices wrong in shop?
 	- Though perhaps it's for the better?
 
+- Well.. it's a pain but we'll still somehow need to order entities within an order
+	- Unless we spam with these flavours like crazy
+	- Well what if we want to have the same decor in both background and foreground? Makes little sense to make another prefab for this, better just auto-generate two different flavours
+
+- New entity type: tile layer?
+	- Shouldn't really be rocket-sciency to support animations later
+	- Do we mix tile sizes? Preferably not...
+
+- We'll move insects and other stuff to official only once we have a general outlook at the editor
+	- No point in doing this now
+
 - Area marker variation (?)
 
 - All obstacles should be on a well-defined layer
