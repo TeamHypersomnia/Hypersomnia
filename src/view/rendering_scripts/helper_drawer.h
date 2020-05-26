@@ -2,6 +2,7 @@
 #include "view/rendering_scripts/draw_entity.h"
 #include "game/cosmos/cosmos.h"
 #include "game/detail/visible_entities.h"
+#include "game/detail/visible_entities.hpp"
 
 struct helper_drawer {
 	const visible_entities& visible;

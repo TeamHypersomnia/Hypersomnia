@@ -12,6 +12,7 @@
 #include "application/setups/editor/gui/editor_entity_selector.hpp"
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/get_hovered_world_entity.h"
+#include "game/detail/visible_entities.hpp"
 
 void editor_entity_selector::reset_held_params() {
 	flavour_of_held = {};

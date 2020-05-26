@@ -1,5 +1,6 @@
 #pragma once
 #include "view/rendering_scripts/draw_character_glow.h"
+#include "game/detail/visible_entities.hpp"
 
 void enqueue_illuminated_rendering_jobs(
 	augs::thread_pool& pool, 

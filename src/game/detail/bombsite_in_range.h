@@ -1,5 +1,5 @@
 #pragma once
-#include "game/detail/visible_entities.h"
+#include "game/detail/visible_entities.hpp"
 #include "game/detail/physics/shape_overlapping.hpp"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 

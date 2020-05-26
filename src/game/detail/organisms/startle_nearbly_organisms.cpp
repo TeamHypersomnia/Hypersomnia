@@ -4,6 +4,7 @@
 #include "game/components/movement_path_component.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/visible_entities.hpp"
 
 void startle_nearby_organisms(
 	cosmos& cosm,

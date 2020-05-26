@@ -1,6 +1,6 @@
 #pragma once
-#include "game/detail/visible_entities.h"
 #include "augs/templates/enum_introspect.h"
+#include "game/detail/visible_entities.hpp"
 
 using layer_order_t = std::array<render_layer, static_cast<int>(render_layer::COUNT) - 1>;
 
@@ -30,6 +30,28 @@ inline auto get_reverse_layer_order() {
 }
 
 template <class F>
+entity_id get_hovered_world_entity(
+	const cosmos& cosm,
+	const vec2 world_cursor_position,
+	F&& is_hoverable,
+	const augs::maybe<render_layer_filter>& filter
+) {
+	auto& entities = thread_local_visible_entities();
+
+	entities.reacquire_all({
+		cosm,
+		camera_cone(camera_eye(world_cursor_position, 1.f), vec2i::square(1)),
+		accuracy_type::EXACT,
+		filter,
+		tree_of_npo_filter::all_drawables()
+	});
+
+	entities.sort(cosm);
+
+	return entities.get_topmost_fulfilling(std::forward<F>(is_hoverable));
+}
+
+template <class F>
 entity_id visible_entities::get_topmost_fulfilling(F condition) const {
 	const auto order = get_reverse_layer_order();
 
@@ -51,24 +73,3 @@ entity_id visible_entities::get_topmost_fulfilling(F condition) const {
 	return result;
 }
 
-template <class F>
-entity_id get_hovered_world_entity(
-	const cosmos& cosm,
-	const vec2 world_cursor_position,
-	F&& is_hoverable,
-	const augs::maybe<render_layer_filter>& filter
-) {
-	auto& entities = thread_local_visible_entities();
-
-	entities.reacquire_all({
-		cosm,
-		camera_cone(camera_eye(world_cursor_position, 1.f), vec2i::square(1)),
-		accuracy_type::EXACT,
-		filter,
-		tree_of_npo_filter::all_drawables()
-	});
-
-	entities.sort(cosm);
-
-	return entities.get_topmost_fulfilling(std::forward<F>(is_hoverable));
-}

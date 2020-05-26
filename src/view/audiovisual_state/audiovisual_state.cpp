@@ -28,6 +28,7 @@
 #include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
 #include "view/audiovisual_state/systems/wandering_pixels_system.hpp"
 #include "augs/audio/audio_command_buffers.h"
+#include "game/detail/visible_entities.hpp"
 
 template <class E>
 void interpolation_system::set_updated_interpolated_transform(

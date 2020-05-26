@@ -2,6 +2,7 @@
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/setups/editor/gui/for_each_iconed_entity.h"
+#include "game/detail/visible_entities.h"
 #include "augs/drawing/general_border.h"
 
 template <class F>

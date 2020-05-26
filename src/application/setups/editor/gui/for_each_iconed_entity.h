@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/visible_entities.h"
 #include "view/faction_view_settings.h"
+#include "game/detail/visible_entities.hpp"
 
 struct marker_icon {
 	using I = assets::necessary_image_id;

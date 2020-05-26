@@ -27,6 +27,7 @@
 #include "game/detail/snap_interpolation_to_logical.h"
 
 #include "game/cosmos/just_create_entity_functional.h"
+#include "game/detail/visible_entities.hpp"
 
 #define LOG_BOMB_DEFUSAL 0
 

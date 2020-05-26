@@ -23,6 +23,10 @@
 
 static constexpr auto EXACT = accuracy_type::EXACT;
 
+std::size_t visible_entities::count_all() const {
+	return ::accumulate_sizes(per_layer);
+}
+
 void visible_entities::layer_register::clear() {
 	for (sorting_order_type i = 0; i < max_order; ++i) {
 		per_order[i].clear();

@@ -4,7 +4,6 @@
 #include "augs/templates/wrap_templates.h"
 
 #include "game/assets/all_logical_assets.h"
-#include "game/detail/visible_entities.h"
 
 #include "view/necessary_image_id.h"
 #include "view/necessary_resources.h"
@@ -53,6 +52,7 @@
 #include "application/arena/arena_handle.h"
 #include "application/main/miniature_generator.h"
 
+class visible_entities;
 struct config_lua_table;
 struct draw_setup_gui_input;
 struct game_frame_buffer;

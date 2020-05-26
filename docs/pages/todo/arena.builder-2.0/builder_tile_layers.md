@@ -1,3 +1,17 @@
+- What about grouping (foldering) in special layers?
+	- Well you can create a separate Lights layer too, why not
+	- Will work pretty much the same way as objects layers
+	
+
+- Selecting tile layer for the brushing tools
+	- We could even implement the tile layers later?
+- I'd guess tile layers shouldn't initially be selectable from the scene itself
+	- At most in the z order list or just in the context menu when pressing shift or so
+
+- Stamps across the foreground/background layers
+	- Screw this for now. We will anyway want to have locations look unique everywhere
+		- We'll later implement streaming
+
 - Well in Construct we have default layers for the object types
 	- Still we can change on per-object basis
 
