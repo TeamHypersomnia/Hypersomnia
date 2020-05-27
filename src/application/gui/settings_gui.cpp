@@ -425,7 +425,7 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
-				revertable_enum("Launch on game's startup", config.launch_mode);
+				revertable_enum("Launch on game's startup", config.launch_on_game_start);
 
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
 				if (!config.window.fullscreen) {

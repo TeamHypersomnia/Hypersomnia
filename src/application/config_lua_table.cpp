@@ -41,7 +41,7 @@ void config_lua_table::save_patch(sol::state& lua, const config_lua_table& sourc
 }
 
 launch_type config_lua_table::get_launch_mode() const {
-	return launch_mode;
+	return launch_on_game_start;
 }
 
 input_recording_type config_lua_table::get_input_recording_mode() const {

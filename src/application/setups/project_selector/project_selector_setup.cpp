@@ -368,7 +368,7 @@ project_list_entry* projects_list_tab_state::find_selected() {
 	return nullptr;
 }
 
-std::optional<projects_list_result> projects_list_view::perform(const perform_custom_imgui_input in) {
+custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
 
 	auto left_buttons_column_size = ImGui::CalcTextSize("Community arenas  ");
@@ -544,7 +544,7 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 				assets::necessary_image_id::EDITOR_ICON_OPEN
 			;
 
-			const bool clone_pressed = selectable_with_icon(
+			const bool bottom_button_pressed = selectable_with_icon(
 				in.necessary_images[icon],
 				label,
 				button_size_mult,
@@ -557,13 +557,26 @@ std::optional<projects_list_result> projects_list_view::perform(const perform_cu
 				}
 			);
 
-			if (clone_pressed) {
+			if (bottom_button_pressed) {
+				if (is_template) {
 
+				}
+				else {
+					return custom_imgui_result::OPEN_PROJECT;
+				}
 			}
 		}
 	}
 
-	return std::nullopt;
+	return custom_imgui_result::NONE;
+}
+
+augs::path_type projects_list_view::get_selected_project_path() const {
+	return tabs[current_tab].selected_arena_path;
+}
+
+augs::path_type project_selector_setup::get_selected_project_path() const {
+	return gui.projects_view.get_selected_project_path();
 }
 
 custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
@@ -581,9 +594,7 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 
 	auto scope = scoped_window("Project selector main", nullptr, window_flags);
 
-	gui.projects_view.perform(in);
-
-	return custom_imgui_result::NONE;
+	return gui.projects_view.perform(in);
 }
 
 void project_selector_setup::load_gui_state() {

@@ -1,3 +1,7 @@
+- Flavour-based layers are really pointless and will be confusing. So no.
+
+- In Specials tab, don't have fixed layers, only show all possibilities once we try to add something
+
 - What about grouping (foldering) in special layers?
 	- Well you can create a separate Lights layer too, why not
 	- Will work pretty much the same way as objects layers

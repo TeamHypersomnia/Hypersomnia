@@ -28,6 +28,7 @@ namespace test_flavours {
 			fixtures_def.material = to_physical_material_id(material);
 
 			meta.template get<invariants::render>().special_functions.set(special_render_function::WALL_ILLUMINATION);
+			meta.template get<invariants::render>().special_functions.set(special_render_function::OCCLUDE_GROUND_NEONS);
 		};
 
 		const auto glass_alpha = 60;
@@ -47,6 +48,7 @@ namespace test_flavours {
 			meta.template get<invariants::sprite>().color.a = glass_alpha;
 			meta.template get<invariants::sprite>().neon_color.a = glass_neon_alpha;
 			meta.template get<invariants::render>().special_functions.set(special_render_function::WALL_ILLUMINATION, false);
+			meta.template get<invariants::render>().special_functions.set(special_render_function::OCCLUDE_GROUND_NEONS, false);
 		};
 
 		auto dynamic_obstacle = [&](

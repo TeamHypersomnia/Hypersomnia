@@ -55,6 +55,8 @@ public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 
 	builder_setup();
+	builder_setup(const augs::path_type& project_path);
+	
 	~builder_setup();
 
 	auto get_audiovisual_speed() const {

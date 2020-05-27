@@ -140,7 +140,10 @@ work_result work(const int argc, const char* const * const argv) try {
 			LOG_FILES_DIR,
 			GENERATED_FILES_DIR,
 			USER_FILES_DIR,
-			DEMOS_DIR
+			DEMOS_DIR,
+
+			COMMUNITY_ARENAS_DIR,
+			USER_ARENAS_DIR
 		};
 
 		{
@@ -352,7 +355,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	if (log_directory_existed) {
 		if (const auto last_failure_log = find_last_incorrect_exit()) {
 			change_with_save([](config_lua_table& cfg) {
-				cfg.launch_mode = launch_type::MAIN_MENU;
+				cfg.launch_on_game_start = launch_type::MAIN_MENU;
 			});
 
 			const auto notice_pre_content = "Looks like the game has crashed since the last time.\n\n";
@@ -938,16 +941,78 @@ work_result work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	static auto launch_setup = [&](const launch_type mode, const bool ignore_nat_check = false) {
-		LOG("Launched mode: %x", augs::enum_to_string(mode));
+	static auto launch_on_game_start = [](const launch_type mode) {
+		change_with_save([mode](config_lua_table& cfg) {
+			cfg.launch_on_game_start = mode;
+		});
+	};
 
-		auto launch_main_menu = [&]() {
-			if (!has_main_menu()) {
-				setup_launcher([&]() {
-					emplace_main_menu(lua, config.main_menu);
-				});
+	static auto launch_main_menu = []() {
+		if (!has_main_menu()) {
+			setup_launcher([&]() {
+				emplace_main_menu(lua, config.main_menu);
+			});
+		}
+	};
+
+	static auto launch_client = [](const bool ignore_nat_check) {
+		if (ignore_nat_check) {
+			LOG("Finished NAT traversal. Connecting immediately.");
+		}
+		else {
+			if (auto info = find_chosen_server_info()) {
+				LOG("Found the chosen server in the browser list.");
+
+				if (info->heartbeat.is_behind_nat()) {
+					LOG("The chosen server is behind NAT. Delaying the client launch until it is traversed.");
+
+					chosen_server_nat = info->heartbeat.nat;
+					pending_launch = launch_type::CLIENT;
+					launch_main_menu();
+					return false;
+				}
+				else {
+					LOG("The chosen server is in the public internet. Connecting immediately.");
+				}
 			}
-		};
+			else {
+				LOG("The chosen server was not found in the browser list.");
+			}
+		}
+
+		setup_launcher([&]() {
+			const auto bound_port = get_bound_local_port();
+			auxiliary_socket.reset();
+
+			LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
+
+			emplace_current_setup(std::in_place_type_t<client_setup>(),
+				lua,
+				config.default_client_start,
+				config.client,
+				config.nat_detection,
+				bound_port
+			);
+		});
+
+		launch_on_game_start(launch_type::CLIENT);
+
+		return true;
+	};
+
+	static auto launch_builder = [](auto&&... args) {
+		setup_launcher([&]() {
+			emplace_current_setup(
+				std::in_place_type_t<builder_setup>(),
+				std::forward<decltype(args)>(args)...
+			);
+		});
+
+		launch_on_game_start(launch_type::ARENA_BUILDER);
+	};
+
+	static auto launch_setup = [&](const launch_type mode) {
+		LOG("Launched mode: %x", augs::enum_to_string(mode));
 
 		switch (mode) {
 			case launch_type::MAIN_MENU:
@@ -955,47 +1020,15 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 #if BUILD_NETWORKING
-			case launch_type::CLIENT:
-				if (ignore_nat_check) {
-					LOG("Finished NAT traversal. Connecting immediately.");
+			case launch_type::CLIENT: {
+				const bool ignore_nat_check = false;
+
+				if (!launch_client(ignore_nat_check)) {
+					return;
 				}
-				else {
-					if (auto info = find_chosen_server_info()) {
-						LOG("Found the chosen server in the browser list.");
-
-						if (info->heartbeat.is_behind_nat()) {
-							LOG("The chosen server is behind NAT. Delaying the client launch until it is traversed.");
-
-							chosen_server_nat = info->heartbeat.nat;
-							pending_launch = launch_type::CLIENT;
-							launch_main_menu();
-							return;
-						}
-						else {
-							LOG("The chosen server is in the public internet. Connecting immediately.");
-						}
-					}
-					else {
-						LOG("The chosen server was not found in the browser list.");
-					}
-				}
-
-				setup_launcher([&]() {
-					const auto bound_port = get_bound_local_port();
-					auxiliary_socket.reset();
-
-					LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
-
-					emplace_current_setup(std::in_place_type_t<client_setup>(),
-						lua,
-						config.default_client_start,
-						config.client,
-						config.nat_detection,
-						bound_port
-					);
-				});
 
 				break;
+			}
 
 			case launch_type::SERVER: {
 				if (config.server.allow_nat_traversal) {
@@ -1040,11 +1073,8 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case launch_type::ARENA_BUILDER:
-				setup_launcher([&]() {
-					emplace_current_setup(
-						std::in_place_type_t<builder_setup>()
-					);
-				});
+				launch_builder();
+
 				break;
 
 			case launch_type::ARENA_BUILDER_PROJECT_SELECTOR:
@@ -1072,13 +1102,18 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 		}
 
-		change_with_save([mode](config_lua_table& cfg) {
-			cfg.launch_mode = mode;
-		});
+		launch_on_game_start(mode);
 	};
 
-	static auto finalize_pending_launch = [](const bool ignore_nat_check = false) {
-		launch_setup(*pending_launch, ignore_nat_check);
+	static auto finalize_pending_launch = []() {
+		if (pending_launch == launch_type::CLIENT) {
+			const bool ignore_nat_check = true;
+			launch_client(ignore_nat_check);
+		}
+		else {
+			launch_setup(*pending_launch);
+		}
+
 		pending_launch = std::nullopt;
 	};
 
@@ -1133,8 +1168,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.default_client_start.set_custom(::ToString(nat_traversal->get_opened_address()));
 			nat_traversal.reset();
 
-			const bool ignore_nat_check = true;
-			finalize_pending_launch(ignore_nat_check);
+			finalize_pending_launch();
 		}
 		else if (state == nat_traversal_session::state::TIMED_OUT) {
 			const auto next_port = get_bound_local_port();
@@ -1400,16 +1434,28 @@ work_result work(const int argc, const char* const * const argv) try {
 				is_replaying_demo()
 			});
 
-			if (result == custom_imgui_result::GO_TO_MAIN_MENU) {
-				launch_setup(launch_type::MAIN_MENU);
-			}
-
 			using S = remove_cref<decltype(setup)>;
 
-			if constexpr(std::is_same_v<S, client_setup>) {
-				if (result == custom_imgui_result::RETRY) {
-					launch_setup(launch_type::CLIENT);
-				}
+			switch (result) {
+				case custom_imgui_result::GO_TO_MAIN_MENU:
+					launch_setup(launch_type::MAIN_MENU);
+					break;
+
+				case custom_imgui_result::RETRY:
+					if constexpr(std::is_same_v<S, client_setup>) {
+						launch_setup(launch_type::ARENA_BUILDER);
+					}
+
+					break;
+
+				case custom_imgui_result::OPEN_PROJECT:
+					if constexpr(std::is_same_v<S, project_selector_setup>) {
+						launch_builder(setup.get_selected_project_path());
+					}
+
+					break;
+
+				default: break;
 			}
 		});
 	};

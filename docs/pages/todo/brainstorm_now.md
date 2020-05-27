@@ -47,6 +47,16 @@ summary: That which we are brainstorming at the moment.
 - Why are indices wrong in shop?
 	- Though perhaps it's for the better?
 
+- Leave the project selector final touches for later
+	- Sorting
+	- Filtering
+	- Create new arena window
+		- We'll only really know what to put in there once we have the editor done
+
+- Makes sense to keep arenas outside of content/official 
+	- since we might want to have arena-specific files that won't be intended to be used for custom maps
+		- like warmup themes. Not that it will be disallowed but it will encourage own creations
+
 - Well.. it's a pain but we'll still somehow need to order entities within an order
 	- Unless we spam with these flavours like crazy
 	- Well what if we want to have the same decor in both background and foreground? Makes little sense to make another prefab for this, better just auto-generate two different flavours

@@ -9,9 +9,18 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/byte_file.h"
+#include "augs/log.h"
 
 builder_setup::builder_setup() {
 	augs::create_directories(BUILDER_DIR);
+	LOG("Loading the last opened builder project.");
+
+	load_gui_state();
+}
+
+builder_setup::builder_setup(const augs::path_type& project_path) {
+	augs::create_directories(BUILDER_DIR);
+	LOG("Loading builder project at: %x", project_path);
 
 	load_gui_state();
 }

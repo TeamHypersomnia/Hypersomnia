@@ -40,8 +40,7 @@ struct projects_list_tab_state {
 };
 
 struct projects_list_result {
-	augs::path_type source_project_path;
-	augs::path_type target_project_path;
+	augs::path_type opened_project_path;
 };
 
 struct projects_list_view {
@@ -50,7 +49,8 @@ struct projects_list_view {
 	project_tab_type current_tab = project_tab_type::MY_PROJECTS;
 	// END GEN INTROSPECTOR
 
-	std::optional<projects_list_result> perform(perform_custom_imgui_input);
+	custom_imgui_result perform(perform_custom_imgui_input);
+	augs::path_type get_selected_project_path() const;
 };
 
 struct project_selector_gui {

@@ -1,5 +1,5 @@
 return {
-  launch_mode = "MAIN_MENU",
+  launch_on_game_start = "MAIN_MENU",
   log_to_live_file = false,
 
   server_list_provider = {

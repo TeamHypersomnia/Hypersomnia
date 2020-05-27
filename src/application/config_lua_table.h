@@ -95,7 +95,7 @@ struct config_lua_table {
 	config_lua_table(sol::state&, const augs::path_type& config_lua_path);
 
 	// GEN INTROSPECTOR struct config_lua_table
-	launch_type launch_mode = launch_type::TEST_SCENE;
+	launch_type launch_on_game_start = launch_type::TEST_SCENE;
 	bool log_to_live_file = false;
 
 	float_consistency_test_settings float_consistency_test;
