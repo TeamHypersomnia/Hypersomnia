@@ -1,3 +1,4 @@
+<a name="intro"></a>
 <div align="center">
 <img src="https://hypersomnia.xyz/menu_game_logo.png"></img>
 
