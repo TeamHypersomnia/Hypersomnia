@@ -9,6 +9,8 @@
 <a href="https://discord.gg/YC49E4G"><img src="https://discordapp.com/api/guilds/284464744411430912/embed.png"></img></a>
 
 An online shooter with ridiculously fast dynamics.  
+Challenge your friend to an intense duel, or gather two clans to hold a spectacular skirmish.  
+
 Forever free and open-source :heart: 
 
 **Download binaries for:**
