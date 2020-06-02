@@ -26,7 +26,7 @@
 std::string ToString(const netcode_address_t&);
 
 #if PLATFORM_UNIX
-static std::atomic<int> signal_status = 0;
+extern std::atomic<int> signal_status;
 #endif
 
 #define LOG_MASTERSERVER 1

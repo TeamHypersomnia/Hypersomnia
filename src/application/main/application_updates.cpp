@@ -56,7 +56,7 @@ using response_ptr = std::shared_ptr<httplib::Response>;
 #endif
 
 #if PLATFORM_UNIX
-static std::atomic<int> signal_status = 0;
+extern std::atomic<int> signal_status;
 #endif
 
 bool successful(const int http_status_code) {

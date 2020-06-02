@@ -300,7 +300,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 			const auto& internal_address = s.heartbeat.internal_network_address;
 			const bool maybe_reachable_internally = 
 				internal_address != std::nullopt
-				&& is_internal(*internal_address)
+				&& ::is_internal(*internal_address)
 			;
 
 			if (maybe_reachable_internally) {

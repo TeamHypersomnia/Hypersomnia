@@ -116,7 +116,7 @@ bool log_to_live_file = false;
 	This function will only be entered ONCE during the lifetime of the program.
 */
 #if PLATFORM_UNIX
-static std::atomic<int> signal_status = 0;
+std::atomic<int> signal_status = 0;
 static_assert(std::atomic<int>::is_always_lock_free);
 #endif
 
