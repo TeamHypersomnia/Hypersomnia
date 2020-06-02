@@ -1434,6 +1434,8 @@ void settings_gui_state::perform(
 						auto indent = scoped_indent();
 						revertable_slider("TTL", st.value, 1, 255);
 					}
+
+					revertable_slider("Num brute-force packets during NAT traversal", scope_cfg.num_brute_force_packets, 0, 25);
 				}
 
 				{
