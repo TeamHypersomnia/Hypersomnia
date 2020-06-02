@@ -178,7 +178,9 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 			auto packet = make_ping_packet(target_address, sequence);
 
 			if (short_ttl) {
-				packet.ttl = settings.short_ttl;
+				if (settings.short_ttl.is_enabled) {
+					packet.ttl = settings.short_ttl.value;
+				}
 			}
 
 			packet_queue(packet);

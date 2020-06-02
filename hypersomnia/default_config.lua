@@ -26,7 +26,6 @@ return {
   },
 
   nat_traversal = {
-	  short_ttl = 3,
 	  num_brute_force_packets = 25,
 	  traversal_attempt_timeout_secs = 4
   },

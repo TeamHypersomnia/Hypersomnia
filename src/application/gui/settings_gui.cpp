@@ -1426,6 +1426,17 @@ void settings_gui_state::perform(
 				ImGui::Separator();
 
 				{
+					auto& scope_cfg = config.nat_traversal;
+					auto& st = scope_cfg.short_ttl;
+					revertable_checkbox("Enable short TTL for traversal packets", st.is_enabled);
+
+					if (st.is_enabled) {
+						auto indent = scoped_indent();
+						revertable_slider("TTL", st.value, 1, 255);
+					}
+				}
+
+				{
 					auto& scope_cfg = config.debug;
 					revertable_checkbox(SCOPE_CFG_NVP(log_solvable_hashes));
 				}
