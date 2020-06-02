@@ -15,6 +15,7 @@
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
 
+#include "game/detail/passes_filter.h"
 #include "application/network/net_solvable_stream.h"
 
 void editor_summary_gui::perform(editor_setup& setup) {

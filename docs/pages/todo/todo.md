@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- More camera modes for Spectator
+
 - Multiple official servers
 	- Picking best
 	- Do this once we have pinging implemented, which we want with the list of community servers

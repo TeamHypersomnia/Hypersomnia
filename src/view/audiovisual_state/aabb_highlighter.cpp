@@ -8,6 +8,7 @@
 
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/aabb_highlighter.h"
+#include "game/detail/passes_filter.h"
 
 render_layer_filter aabb_highlighter::get_filter() {
 	return render_layer_filter::whitelist(

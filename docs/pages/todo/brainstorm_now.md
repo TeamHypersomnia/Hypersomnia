@@ -47,6 +47,16 @@ summary: That which we are brainstorming at the moment.
 - Why are indices wrong in shop?
 	- Though perhaps it's for the better?
 
+- Show cursor when chat is open
+	- And allow for scrolling/selecting the history
+
+- "X killed Y with Z" chat notifications
+- Really fix those spectators being kicked
+- Dump those logs periodically to files or implement this dump command
+	- For masterserver too somehow
+
+- A progress bar for the rocket launcher
+
 - Leave the project selector final touches for later
 	- Sorting
 	- Filtering

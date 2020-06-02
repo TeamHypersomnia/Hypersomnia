@@ -20,6 +20,9 @@
 		- a simple for loop in main
 			- and an i index for get_viewed_cosmos
 
+- I believe for what we want just a single view is fine, like in Tiled
+	- Because we won't be editing prefabs for now
+
 ### Transformations
 
 - We can re-use (code of) currently implemented group behaviour for moving children along with the parent
