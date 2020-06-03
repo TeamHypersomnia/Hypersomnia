@@ -86,6 +86,8 @@ class server_setup :
 	augs::serialization_buffers buffers;
 
 	entropy_accumulator local_collected;
+	std::vector<mode_player_id> moved_to_spectators;
+
 	compact_server_step_entropy step_collected;
 	bool reinference_necessary = false;
 
@@ -152,6 +154,7 @@ private:
 
 	void request_immediate_heartbeat();
 
+	void perform_automoves_to_spectators();
 	void accept_entropy_of_client(
 		const mode_player_id,
 		const total_client_entropy&
@@ -303,6 +306,8 @@ public:
 				}
 
 				step_collected.general += local_collected.mode_general;
+				perform_automoves_to_spectators();
+
 				local_collected.clear();
 			}
 

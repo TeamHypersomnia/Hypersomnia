@@ -659,7 +659,8 @@ return {
     sleep_mult = 0.1,
     log_performance_once_every_secs = 1,
 
-	kick_if_no_payloads_for_secs = 10,
+	kick_if_no_network_payloads_for_secs = 10,
+	move_to_spectators_if_afk_for_secs = 120,
 	kick_if_afk_for_secs = 180,
 	time_limit_to_enter_game_since_connection = 15,
 

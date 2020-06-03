@@ -40,8 +40,9 @@ struct server_vars {
 
 	uint32_t resolve_internal_address_once_every_secs = 60 * 10;
 
-	uint32_t kick_if_no_payloads_for_secs = 60;
-	uint32_t kick_if_afk_for_secs = 240;
+	uint32_t move_to_spectators_if_afk_for_secs = 120;
+	uint32_t kick_if_afk_for_secs = 180;
+	uint32_t kick_if_no_network_payloads_for_secs = 10;
 	uint32_t time_limit_to_enter_game_since_connection = 10;
 
 	uint32_t reset_resync_timer_once_every_secs = 10;

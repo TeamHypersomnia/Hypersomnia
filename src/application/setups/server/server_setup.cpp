@@ -693,6 +693,19 @@ void server_setup::disconnect_and_unset(const client_id_type& id) {
 	unset_client(id);
 }
 
+void server_setup::perform_automoves_to_spectators() {
+	for (const auto& moved_mode_id : moved_to_spectators) {
+		const auto choice = mode_commands::team_choice { faction_type::SPECTATOR };
+
+		total_mode_player_entropy choice_entropy;
+		choice_entropy.mode = choice;
+
+		accept_entropy_of_client(moved_mode_id, choice_entropy);
+	}
+
+	moved_to_spectators.clear();
+}
+
 void server_setup::accept_entropy_of_client(
 	const mode_player_id mode_id,
 	const total_client_entropy& entropy
@@ -935,6 +948,22 @@ void server_setup::advance_clients_state() {
 		if (c.state == client_state_type::IN_GAME) {
 			if (c.should_kick_due_to_afk(vars, server_time)) {
 				kick(client_id, "AFK!");
+			}
+
+			if (c.should_move_to_spectators_due_to_afk(vars, server_time)) {
+				const auto moved_player_faction = get_arena_handle().on_mode(
+					[&](const auto& typed_mode) {
+						if (const auto data = typed_mode.find(mode_id)) {
+							return data->get_faction();
+						}
+
+						return faction_type::SPECTATOR;
+					}
+				);
+
+				if (moved_player_faction != faction_type::SPECTATOR) {
+					moved_to_spectators.push_back(mode_id);
+				}
 			}
 		}
 

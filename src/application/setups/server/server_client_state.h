@@ -31,24 +31,34 @@ struct server_client_state {
 	arena_player_meta meta;
 
 	server_client_state() = default;
-
 	server_client_state(const net_time_t server_time) {
 		init(server_time);
 	}
 
+	bool should_move_to_spectators_due_to_afk(const server_vars& v, const net_time_t server_time) const {
+		const auto diff = server_time - last_keyboard_activity_time;
+		const auto bare_minimum_afk = 10u;
+
+		return diff > std::max(bare_minimum_afk, v.move_to_spectators_if_afk_for_secs);
+	}
+
 	bool should_kick_due_to_afk(const server_vars& v, const net_time_t server_time) const {
 		const auto diff = server_time - last_keyboard_activity_time;
-		return diff > std::max(20u, v.kick_if_afk_for_secs);
+		const auto bare_minimum_afk = 10u;
+
+		return diff > std::max(bare_minimum_afk, v.kick_if_afk_for_secs);
 	}
 
 	bool should_kick_due_to_inactivity(const server_vars& v, const net_time_t server_time) const {
 		const auto diff = server_time - last_valid_payload_time;
 
 		if (state == type::IN_GAME) {
-			return diff > std::max(2u, v.kick_if_no_payloads_for_secs);
+			const auto bare_minimum_limit = 2u;
+			return diff > std::max(bare_minimum_limit, v.kick_if_no_network_payloads_for_secs);
 		}
 
-		return diff > std::max(5u, v.time_limit_to_enter_game_since_connection);
+		const auto bare_minimum_limit = 5u;
+		return diff > std::max(bare_minimum_limit, v.time_limit_to_enter_game_since_connection);
 	}
 
 	void set_in_game(const net_time_t at_time) {
