@@ -1649,7 +1649,7 @@ void do_server_vars(
 
 	if (auto node = scoped_tree_node("Time limits")) {
 		revertable_slider(SCOPE_CFG_NVP(move_to_spectators_if_afk_for_secs), 10u, 6000u);
-		revertable_slider(SCOPE_CFG_NVP(kick_if_afk_for_secs), 10u, 6000u);
+		revertable_slider(SCOPE_CFG_NVP(kick_if_afk_for_secs), 10u, 2 * 3600u);
 		revertable_slider(SCOPE_CFG_NVP(kick_if_no_network_payloads_for_secs), 2u, 300u);
 		revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 5u, 300u);
 	}
