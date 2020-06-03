@@ -54,6 +54,7 @@ namespace test_flavours {
 				item.specific_to = specific_to;
 				item.categories_for_slot_compatibility.set(item_category::SHOULDER_WEARABLE);
 				item.wear_sound.id = to_sound_id(test_scene_sound_id::SHEATH_KNIFE);
+				item.draw_over_hands = false;
 
 				meta.set(item);
 			}

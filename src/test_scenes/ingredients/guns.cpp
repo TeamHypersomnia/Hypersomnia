@@ -133,6 +133,9 @@ namespace test_flavours {
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			item.gratis_ammo_pieces_with_first = 3;
 
+			const bool under_hands = stance == item_holding_stance::HEAVY_LIKE || stance == item_holding_stance::PISTOL_LIKE;
+			item.draw_over_hands = !under_hands; 
+
 			default_gun_props(meta);
 
 			auto& mag = meta.template get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE];
