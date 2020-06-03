@@ -14,8 +14,9 @@
 #include "view/game_drawing_settings.h"
 #include "game/detail/gun/shell_offset.h"
 #include "game/detail/gun/gun_cooldowns.h"
+#include "augs/log.h"
 
-void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
+void draw_circular_progresses(const draw_circular_progresses_input in) {
 	using C = circular_bar_type;
 
 	const auto dt = in.cosm.get_fixed_delta();
@@ -156,27 +157,35 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 					draw_circle(C::SMALL, it, amount, white, red_violet, shell_spawn_offset.pos);
 				};
 
-				if (const auto chambering_duration = ::calc_current_chambering_duration(it); augs::is_positive_epsilon(chambering_duration)) {
-					const auto& progress = gun.chambering_progress_ms;
+				const auto& chambering_progress = gun.chambering_progress_ms;
+				const auto chambering_duration = ::calc_current_chambering_duration(it);
 
-					if (progress > 0.f) {
-						if (!enemy_hud) { 
-							if (const auto c = it.get_owning_transfer_capability()) {
-								if (!viewer_faction_matches(c)) {
-									return;
-								}
+				if (chambering_progress > 0.f && augs::is_positive_epsilon(chambering_duration)) {
+					if (!enemy_hud) { 
+						if (const auto c = it.get_owning_transfer_capability()) {
+							if (!viewer_faction_matches(c)) {
+								return;
 							}
 						}
-
-						draw_progress(progress / chambering_duration);
 					}
+
+					draw_progress(chambering_progress / chambering_duration);
 				}
 				else {
 					const auto& gun_def = it.template get<invariants::gun>();
-					const auto cooldown = gun_def.shot_cooldown_ms;
 
-					if (cooldown > 1000.f) {
+					auto is_wielded = [&]() {
 						if (const auto slot = it.get_current_slot(); slot && slot.is_hand_slot()) {
+							return true;
+						}
+
+						return false;
+					};
+
+					{
+						const auto cooldown = gun_def.shot_cooldown_ms;
+
+						if (cooldown > 1000.f && is_wielded()) {
 							const auto r = clk.get_ratio_of_remaining_time(cooldown, gun.fire_cooldown_object);
 							const auto transfer_r = clk.get_ratio_of_remaining_time(
 								gun_def.get_transfer_shot_cooldown(), 
@@ -188,6 +197,19 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 							if (augs::is_positive_epsilon(later_r)) {
 								draw_progress(1.f - later_r);
 							}
+						}
+					}
+
+					const auto chamber_slot = it[slot_function::GUN_CHAMBER];
+					const auto chamber_requirement_fulfilled = chamber_slot.dead() || chamber_slot.get_items_inside().size() > 0;
+
+					const auto heat_to_shoot = gun_def.minimum_heat_to_shoot;
+
+					if (heat_to_shoot > 0.f && chamber_requirement_fulfilled && is_wielded()) {
+						const auto current_heat = gun.current_heat;
+
+						if (augs::is_positive_epsilon(current_heat) && current_heat <= heat_to_shoot) {
+							draw_progress(current_heat / heat_to_shoot);
 						}
 					}
 				}

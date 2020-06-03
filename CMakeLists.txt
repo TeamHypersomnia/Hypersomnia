@@ -467,7 +467,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/rendering_scripts/draw_sentiences_hud.cpp"
 	"src/view/rendering_scripts/draw_explosion_body_highlights.cpp"
 	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
-	"src/view/rendering_scripts/draw_hud_for_explosives.cpp"
+	"src/view/rendering_scripts/draw_circular_progresses.cpp"
 	"src/view/audiovisual_state/world_camera.cpp"
 	"src/view/necessary_resources.cpp"
 	"src/view/audiovisual_state/audiovisual_state.cpp"

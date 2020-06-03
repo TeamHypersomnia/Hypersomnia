@@ -174,7 +174,7 @@ void enqueue_illuminated_rendering_jobs(
 			std::addressof(target_vectors[current_hud++])
 		};
 
-		draw_hud_for_explosives({
+		draw_circular_progresses({
 			settings,
 			requests,
 			interp,

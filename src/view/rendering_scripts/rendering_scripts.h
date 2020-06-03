@@ -98,7 +98,7 @@ enum class circular_bar_type {
 
 using requested_explosive_huds = augs::enum_array<requested_explosive_hud, circular_bar_type>;
 
-struct draw_hud_for_explosives_input {
+struct draw_circular_progresses_input {
 	const game_drawing_settings& settings;
 	const requested_explosive_huds requests;
 	const interpolation_system& interpolation;
@@ -117,7 +117,7 @@ struct draw_crosshair_lasers_input {
 
 void draw_sentiences_hud(const draw_sentiences_hud_input);
 void draw_explosion_body_highlights(const draw_explosion_body_highlights_input);
-void draw_hud_for_explosives(const draw_hud_for_explosives_input);
+void draw_circular_progresses(const draw_circular_progresses_input);
 void draw_crosshair_lasers(const draw_crosshair_lasers_input);
 
 struct draw_beep_lights {

@@ -5,6 +5,16 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- NAT traversal does not always work with our symmetric port-sensitive
+	- Working connections:
+		- filemon -> Billan
+		- Pythagoras <-> Billan
+		- Pythagoras <-> Shuncio
+		- Pythagoras -> cold dimensions
+		- Pythagoras -> Wojteg
+	- Not working:
+		- filemon <-> Pythagoras
+
 - Investigate the mysterious hotbar crash
 	- Happened when we finished drag and dropping on hotbar 
 	- All buttons on hotbar were assigned
