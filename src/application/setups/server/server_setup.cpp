@@ -39,6 +39,10 @@
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
 
+void server_setup::reset_afk_timer() {
+	integrated_client.last_keyboard_activity_time = server_time;
+}
+
 void server_setup::shutdown() {
 	if (has_sent_any_heartbeats() && resolved_server_list_addr != std::nullopt) {
 		// Say goodbye
@@ -412,13 +416,17 @@ void server_setup::for_each_id_and_client(F&& callback, const server_setup::for_
 
 	if (is_integrated()) {
 		if (flags[for_each_flag::WITH_INTEGRATED]) {
-			callback(static_cast<client_id_type>(get_admin_player_id().value), integrated_client);
+			callback(get_integrated_client_id(), integrated_client);
 		}
 	}
 }
 
-mode_player_id server_setup::get_admin_player_id() const {
+mode_player_id server_setup::get_integrated_player_id() const {
 	return mode_player_id::machine_admin();
+}
+
+client_id_type server_setup::get_integrated_client_id() const {
+	return static_cast<client_id_type>(get_integrated_player_id().value);
 }
 
 mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
@@ -655,13 +663,13 @@ void server_setup::choose_arena(const std::string& name) {
 	integrated_client_gui.rcon.show = false;
 
 	if (should_have_admin_character()) {
-		const auto admin_id = get_admin_player_id();
+		const auto admin_id = get_integrated_player_id();
 
 		if (!player_added_to_mode(admin_id)) {
 			mode_entropy_general cmd;
 
 			cmd.added_player = add_player_input {
-				get_admin_player_id(),
+				get_integrated_player_id(),
 				integrated_client_vars.nickname,
 				faction_type::SPECTATOR
 			};
@@ -724,6 +732,26 @@ void server_setup::advance_clients_state() {
 
 	auto in_steps = [inv_simulation_delta_ms](const auto ms) {
 		return static_cast<uint32_t>(ms * inv_simulation_delta_ms);
+	};
+
+	auto automove_to_spectators_if_afk = [&](const client_id_type client_id, auto& c) {
+		if (c.should_move_to_spectators_due_to_afk(vars, server_time)) {
+			const auto mode_id = to_mode_player_id(client_id);
+
+			const auto moved_player_faction = get_arena_handle().on_mode(
+				[&](const auto& typed_mode) {
+					if (const auto data = typed_mode.find(mode_id)) {
+						return data->get_faction();
+					}
+
+					return faction_type::SPECTATOR;
+				}
+			);
+
+			if (moved_player_faction != faction_type::SPECTATOR) {
+				moved_to_spectators.push_back(mode_id);
+			}
+		}
 	};
 
 	auto process_client = [&](const client_id_type client_id, auto& c) {
@@ -950,21 +978,7 @@ void server_setup::advance_clients_state() {
 				kick(client_id, "AFK!");
 			}
 
-			if (c.should_move_to_spectators_due_to_afk(vars, server_time)) {
-				const auto moved_player_faction = get_arena_handle().on_mode(
-					[&](const auto& typed_mode) {
-						if (const auto data = typed_mode.find(mode_id)) {
-							return data->get_faction();
-						}
-
-						return faction_type::SPECTATOR;
-					}
-				);
-
-				if (moved_player_faction != faction_type::SPECTATOR) {
-					moved_to_spectators.push_back(mode_id);
-				}
-			}
+			automove_to_spectators_if_afk(client_id, c);
 		}
 
 		if (c.state > client_state_type::INITIATING_CONNECTION) {
@@ -987,6 +1001,10 @@ void server_setup::advance_clients_state() {
 	};
 
 	for_each_id_and_client(process_client);
+
+	{
+		automove_to_spectators_if_afk(get_integrated_client_id(), integrated_client);
+	}
 }
 
 template <class P>
@@ -1469,7 +1487,7 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 			if (chat.perform_input_bar(integrated_client_vars.client_chat)) {
 				server_broadcasted_chat message;
 
-				const auto session_id = find_session_id(static_cast<client_id_type>(get_admin_player_id().value));
+				const auto session_id = find_session_id(get_integrated_client_id());
 				ensure(session_id != std::nullopt);
 
 				message.author = *session_id;
@@ -1597,7 +1615,7 @@ bool safe_equal(const decltype(requested_client_settings::rcon_password)& candid
 
 rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const { 
 	if (is_integrated()) {
-		if (id == static_cast<client_id_type>(get_admin_player_id().value)) {
+		if (id == get_integrated_client_id()) {
 			return rcon_level_type::MASTER;
 		}
 
@@ -1671,7 +1689,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 			}
 		}
 
-		if (to_mode_player_id(recipient_client_id) == get_admin_player_id()) {
+		if (to_mode_player_id(recipient_client_id) == get_integrated_player_id()) {
 			integrated_received = true;
 		}
 		else {

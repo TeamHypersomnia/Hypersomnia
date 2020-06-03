@@ -2445,6 +2445,10 @@ work_result work(const int argc, const char* const * const argv) try {
 								client.reset_afk_timer();
 							});
 
+							on_specific_setup([](server_setup& client) {
+								client.reset_afk_timer();
+							});
+
 							continue;
 						}
 					}

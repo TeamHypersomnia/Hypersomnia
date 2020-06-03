@@ -176,7 +176,8 @@ private:
 	void init_client(const client_id_type&);
 	void unset_client(const client_id_type&);
 
-	mode_player_id get_admin_player_id() const;
+	mode_player_id get_integrated_player_id() const;
+	client_id_type get_integrated_client_id() const;
 
 	void reinfer_if_necessary_for(const compact_server_step_entropy& entropy);
 	bool server_list_enabled() const;
@@ -296,12 +297,13 @@ public:
 				{
 					const auto admin_entropy = local_collected.assemble_for(
 						get_viewed_character(), 
-						get_admin_player_id(),
+						get_integrated_player_id(),
 						in.make_accumulator_input()
 					);
 
 					if (!admin_entropy.empty()) {
-						step_collected += { get_admin_player_id(), admin_entropy };
+						step_collected += { get_integrated_player_id(), admin_entropy };
+						reset_afk_timer();
 					}
 				}
 
@@ -406,7 +408,7 @@ public:
 	void ban(const client_id_type&, const std::string& reason);
 
 	mode_player_id get_local_player_id() const {
-		return get_admin_player_id();
+		return get_integrated_player_id();
 	}
 
 	bool is_gameplay_on() const;
@@ -488,4 +490,6 @@ public:
 
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
+
+	void reset_afk_timer();
 };
