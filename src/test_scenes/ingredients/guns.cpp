@@ -135,6 +135,7 @@ namespace test_flavours {
 
 			const bool under_hands = stance == item_holding_stance::HEAVY_LIKE || stance == item_holding_stance::PISTOL_LIKE;
 			item.draw_over_hands = !under_hands; 
+			item.draw_over_hands_when_reloading = stance != item_holding_stance::HEAVY_LIKE;
 
 			default_gun_props(meta);
 

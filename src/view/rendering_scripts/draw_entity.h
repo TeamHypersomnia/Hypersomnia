@@ -331,24 +331,24 @@ FORCE_INLINE void specific_entity_drawer(
 					: false
 				;
 
-				auto should_draw_under_torso = [&](const auto attachment_entity) {
+				auto should_draw_over_torso = [&](const auto attachment_entity) {
 					const auto slot = attachment_entity.get_current_slot();
 
 					if (slot.get_type() == slot_function::BELT) {
-						return true;
+						return false;
 					}
 
 					if (slot.is_hand_slot()) {
 						const auto& item_def = attachment_entity.template get<invariants::item>();
 
 						if (currently_reloading) {
-							return !item_def.draw_over_hands_when_reloading;
+							return item_def.draw_over_hands_when_reloading;
 						}
 
-						return !item_def.draw_over_hands;
+						return item_def.draw_over_hands;
 					}
 
-					return false;
+					return true;
 				};
 
 				auto get_offsets_by_torso = [stance_offsets]() {
@@ -361,50 +361,63 @@ FORCE_INLINE void specific_entity_drawer(
 					: false
 				;
 
-				auto draw_items_recursively = [&](const bool under_torso = true) {
-					typed_handle.for_each_attachment_recursive(
-						[&](
-							const auto attachment_entity,
-							const auto attachment_offset
-						) {
-							attachment_entity.template dispatch_on_having_all<invariants::item>(
-								[&](const auto typed_attachment_handle) {
-									const bool additional_flip = [&]() {
-										if (!currently_reloading) {
-											return false;
-										}
-
-										const auto type = typed_attachment_handle.get_current_slot().get_type();
-
-										if (
-											type == slot_function::PRIMARY_HAND 
-											|| type == slot_function::SECONDARY_HAND
-											|| type == slot_function::GUN_DETACHABLE_MAGAZINE
-											|| type == slot_function::GUN_MUZZLE
-										) {
-											return flip_for_reloading;
-										}
-
+				auto draw_items_recursively = [&](const bool over_torso = false) {
+					auto draw_attachment = [&](
+						const auto attachment_entity,
+						const auto attachment_offset
+					) {
+						attachment_entity.template dispatch_on_having_all<invariants::item>(
+							[&](const auto typed_attachment_handle) {
+								const bool additional_flip = [&]() {
+									if (!currently_reloading) {
 										return false;
-									}();
+									}
 
-									detail_specific_entity_drawer(
-										typed_attachment_handle,
-										in,
-										render_visitor,
-										viewing_transform * attachment_offset,
-										additional_flip
-									);
-								}
-							);
-						},
-						[under_torso, &should_draw_under_torso](const auto& attachment_entity) {
-							if (attachment_entity.get_current_slot().is_hand_slot()) {
-								return under_torso == should_draw_under_torso(attachment_entity);
+									const auto type = typed_attachment_handle.get_current_slot().get_type();
+
+									/* 
+										We can infer from the slot type itself
+										if we come from a parent that is being reloaded now.
+
+										No need to iterate upwards.
+									*/
+
+									const bool is_descendant_of_reloaded_object = 
+										type == slot_function::PRIMARY_HAND 
+										|| type == slot_function::SECONDARY_HAND
+										|| type == slot_function::GUN_DETACHABLE_MAGAZINE
+										|| type == slot_function::GUN_MUZZLE
+									;
+
+									if (is_descendant_of_reloaded_object) {
+										return flip_for_reloading;
+									}
+
+									return false;
+								}();
+
+								detail_specific_entity_drawer(
+									typed_attachment_handle,
+									in,
+									render_visitor,
+									viewing_transform * attachment_offset,
+									additional_flip
+								);
 							}
+						);
+					};
 
-							return true;
-						},
+					auto should_recurse = [over_torso, &should_draw_over_torso](const auto& attachment_entity) {
+						if (attachment_entity.get_current_slot().is_hand_slot()) {
+							return over_torso == should_draw_over_torso(attachment_entity);
+						}
+
+						return true;
+					};
+
+					typed_handle.for_each_attachment_recursive(
+						draw_attachment,
+						should_recurse,
 						get_offsets_by_torso,
 						attachment_offset_settings::for_rendering(),
 						!draw_mag_over
@@ -427,7 +440,7 @@ FORCE_INLINE void specific_entity_drawer(
 					render_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees });
 				}
 
-				draw_items_recursively(false);
+				draw_items_recursively(true);
 
 				const auto& sentience = typed_handle.template get<components::sentience>();
 
