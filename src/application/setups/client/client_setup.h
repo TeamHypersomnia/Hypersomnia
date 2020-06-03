@@ -79,7 +79,7 @@ class client_setup :
 	cosmos predicted_cosmos;
 	online_mode_and_rules predicted_mode;
 
-	special_client_request pending_request = special_client_request::NONE;
+	std::vector<special_client_request> pending_requests;
 	bool now_resyncing = false;
 
 	arena_player_metas player_metas;
@@ -450,7 +450,7 @@ class client_setup :
 				}
 
 				if (result.desync && !now_resyncing) {
-					pending_request = special_client_request::RESYNC;
+					pending_requests.push_back(special_client_request::RESYNC);
 					now_resyncing = true;
 				}
 			}
@@ -670,6 +670,8 @@ public:
 	void control(const T& t) {
 		total_collected.control(t);
 	}
+
+	void reset_afk_timer();
 
 	void accept_game_gui_events(const game_gui_entropy_type&);
 

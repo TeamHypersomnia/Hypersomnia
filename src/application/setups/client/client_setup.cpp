@@ -571,16 +571,18 @@ void client_setup::send_pending_commands() {
 		}
 	}
 
-	if (pending_request == special_client_request::RESYNC) {
-		LOG("Sending the request resync command.");
-
+	for (const auto& pending_request : pending_requests) {
 		send_payload(
 			game_channel_type::CLIENT_COMMANDS,
 			pending_request
 		);
-
-		pending_request = special_client_request::NONE;
 	}
+
+	pending_requests.clear();
+}
+
+void client_setup::reset_afk_timer() {
+	pending_requests.push_back(special_client_request::RESET_AFK_TIMER);
 }
 
 void client_setup::traverse_nat_if_required() {

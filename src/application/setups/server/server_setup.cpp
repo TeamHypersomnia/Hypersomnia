@@ -1155,6 +1155,10 @@ message_handler_result server_setup::handle_client_message(
 	}
 	else if constexpr (std::is_same_v<T, special_client_request>) {
 		switch (payload) {
+			case special_client_request::RESET_AFK_TIMER:
+				c.last_keyboard_activity_time = server_time;
+				break;
+
 			case special_client_request::RESYNC:
 				if (server_time >= c.last_resync_counter_reset_at + vars.reset_resync_timer_once_every_secs) {
 					c.resyncs_counter = 0;

@@ -1,9 +1,8 @@
 #pragma once
 
 enum class special_client_request {
-	NONE,
-
 	RESYNC,
+	RESET_AFK_TIMER,
 
 	COUNT
 };
