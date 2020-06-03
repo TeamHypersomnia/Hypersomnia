@@ -249,50 +249,9 @@ void game_gui_system::control_hotbar_and_action_button(
 			};
 
 			if (r.intent == inventory_gui_intent_type::HOLSTER) {
-				const auto& cosm = gui_entity.get_cosmos();
-
 				const auto current_setup = wielding_setup::from_current(gui_entity);
-
-				auto hide = [&](const auto& item, const auto n) {
-					(void)item;
-
-					if constexpr(is_nullopt_v<decltype(item)>) {
-						return false;
-					}
-					else {
-						auto new_setup = current_setup;
-						new_setup.hand_selections[n].unset();
-						request_setup(new_setup, current_setup);
-						return true;
-					}
-				};
-
-				if (current_setup.on_more_recent_item(cosm, hide)) {
-					return;
-				}
-			}
-
-			auto requested_index = static_cast<std::size_t>(-1);
-
-			if (r.intent == inventory_gui_intent_type::HOLSTER) {
-				requested_index = 0;
-			}
-			else if (r.intent == inventory_gui_intent_type::HOLSTER_SECONDARY) {
-				requested_index = 1;
-			}
-
-			if (requested_index != static_cast<std::size_t>(-1)) {
-				const auto resolved_index = gui_entity.calc_hand_action(requested_index).hand_index;
-
-				if (resolved_index != static_cast<std::size_t>(-1)) {
-					const auto current_setup = wielding_setup::from_current(gui_entity);
-
-					auto new_setup = current_setup;
-					new_setup.hand_selections[resolved_index].unset();
-
-					request_setup(new_setup, current_setup);
-					return;
-				}
+				request_setup(wielding_setup::bare_hands(), current_setup);
+				return;
 			}
 		}
 	}

@@ -11,7 +11,6 @@ enum class inventory_gui_intent_type {
 	LAST_USED_WEAPON,
 
 	HOLSTER,
-	HOLSTER_SECONDARY,
 
 	HOTBAR_0,
 	HOTBAR_1,
