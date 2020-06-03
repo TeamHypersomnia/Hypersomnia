@@ -366,7 +366,7 @@ inventory_space_type calc_space_occupied_with_children(const const_entity_handle
 
 		for (const auto& slot : container->slots) {
 			if (slot.second.contributes_to_space_occupied) {
-				for (const auto entity_in_slot : get_items_inside(item_entity, slot.first)) {
+				for (const auto entity_in_slot : item_entity[slot.first].get_items_inside()) {
 					space_occupied += calc_space_occupied_with_children(item_entity.get_cosmos()[entity_in_slot]);
 				}
 			}

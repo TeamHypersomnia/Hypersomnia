@@ -208,7 +208,7 @@ void entity_deleter(
 		const auto& container = typed_handle.template get<invariants::container>();
 
 		for (const auto& s : container.slots) {
-			concatenate(dependent_items, get_items_inside(typed_handle, s.first));
+			concatenate(dependent_items, typed_handle[s.first].get_items_inside());
 		}
 	});
 

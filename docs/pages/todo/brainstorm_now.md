@@ -6,6 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Vote pause the game
+- Simple commands for chat
+	- time
+
+- Holster should always try to hide both
+- Release notes
+	- release_notes.txt holding last 100 commits
+	- Updated on each upload
+
+- Why are indices wrong in shop?
+	- Though perhaps it's for the better?
+
 - Fix version numbering on MacOS
 	- It's probably because of the shallow clone
 

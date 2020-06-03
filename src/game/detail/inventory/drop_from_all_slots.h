@@ -6,7 +6,7 @@ void drop_from_all_slots(const invariants::container& container, const E handle,
 	auto& cosm = handle.get_cosmos();
 
 	for (const auto& s : container.slots) {
-		const auto items = get_items_inside(handle, s.first);
+		const auto items = handle[s.first].get_items_inside();
 
 		for (const auto item : items) {
 			auto drop_item = [&](const auto& dropped_item) {
@@ -14,7 +14,7 @@ void drop_from_all_slots(const invariants::container& container, const E handle,
 			};
 
 			if (s.first == slot_function::PERSONAL_DEPOSIT) {
-				const auto depoed_items = get_items_inside(cosm[item], slot_function::ITEM_DEPOSIT);
+				const auto depoed_items = cosm[item][slot_function::ITEM_DEPOSIT].get_items_inside();
 
 				for (const auto depoed_item : depoed_items) {
 					drop_item(depoed_item);

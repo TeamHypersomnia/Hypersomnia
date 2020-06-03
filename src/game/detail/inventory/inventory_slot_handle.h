@@ -106,11 +106,6 @@ auto subscript_handle_getter(C& cosm, const inventory_slot_id id)
 }
 
 template <class E>
-const auto& get_items_inside(const E h, const slot_function s) {
-	return h.get_cosmos()[inventory_slot_id{s, h.get_id()}].get_items_inside();  
-}
-
-template <class E>
 inline basic_inventory_slot_handle<E>::basic_inventory_slot_handle(owner_reference owner, const inventory_slot_id raw_id) : owner(owner), raw_id(raw_id) {}
 
 template <class E>

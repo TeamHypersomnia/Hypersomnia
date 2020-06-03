@@ -36,7 +36,7 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 					continue;
 				}
 				else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
-					const auto items = get_items_inside(typed_container, s.first);
+					const auto items = typed_container[s.first].get_items_inside();
 					
 					for (const auto& id : items) {
 						const auto result = cosm[id].template dispatch_on_having_all_ret<components::item>(
@@ -149,7 +149,7 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 						if (s.second.makes_physical_connection()) {
 							const auto this_container_id = this_container.get_id();
 
-							for (const auto& id : get_items_inside(this_container, type)) {
+							for (const auto& id : this_container[type].get_items_inside()) {
 								const auto inside_item_handle = cosm[id];
 
 								if (!should_recurse(inside_item_handle)) {
@@ -158,35 +158,48 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 
 								auto insert_where = container_stack.size();
 
-								if (flip_hands_order && type == slot_function::SECONDARY_HAND && container_stack.back().parent.type == slot_function::PRIMARY_HAND) {
-									insert_where--;
+								if (flip_hands_order) {
+									if (type == slot_function::SECONDARY_HAND) {
+										if (container_stack.back().parent.type == slot_function::PRIMARY_HAND) {
+											insert_where--;
+										}
+									}
 								}
 
 								{
 									const auto& maybe_gun = inside_item_handle;
 
+									/* Insert early */
+
 									if (const auto mag_slot = maybe_gun[slot_function::GUN_DETACHABLE_MAGAZINE]; mag_slot && mag_slot.has_items()) {
 										if (mag_slot->draw_under_container) {
 											const auto mag_inside = mag_slot.get_item_if_any();
+											const auto where_it = container_stack.begin() + insert_where;
+											const auto attachment_offset = total_offset * get_attachment_offset_for(this_container, maybe_gun, type);
+											const auto next_node = node { 
+												mag_slot, 
+												mag_inside.get_id(), 
+												attachment_offset
+											};
 
-											container_stack.insert(
-												container_stack.begin() + insert_where, 
-												{ 
-													{ slot_function::GUN_DETACHABLE_MAGAZINE, maybe_gun.get_id() }, 
-													mag_inside.get_id(), 
-													total_offset * get_attachment_offset_for(this_container, maybe_gun, type) 
-												}
-											);
-
+											container_stack.insert(where_it, next_node);
 											++insert_where;
 										}
 									}
 									else if (const auto slot = inside_item_handle.get_current_slot(); slot && slot.get_type() == slot_function::GUN_DETACHABLE_MAGAZINE && slot->draw_under_container) {
+										/* Was earlier inserted */
 										continue;
 									}
 								}
 
-								container_stack.insert(container_stack.begin() + insert_where, { { type, this_container_id }, id, total_offset });
+								const auto where_it = container_stack.begin() + insert_where;
+								const auto next_node = node { 
+									{ type, this_container_id }, 
+									id, 
+									total_offset
+							   	};
+
+								container_stack.insert(where_it, next_node);
 							}
 						}
 					}

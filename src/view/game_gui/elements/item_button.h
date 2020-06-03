@@ -71,7 +71,7 @@ struct item_button : game_gui_rect_node {
 						generic_call(context.dereference_location(child_slot_location));
 					}
 
-					const auto items_inside = ::get_items_inside(typed_container, s.first);
+					const auto items_inside = typed_container[s.first].get_items_inside();
 
 					for (std::size_t i = 0; i < items_inside.size(); ++i) {
 						const auto& in = items_inside[i];
