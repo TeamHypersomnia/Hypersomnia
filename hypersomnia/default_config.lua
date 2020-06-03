@@ -659,8 +659,8 @@ return {
     sleep_mult = 0.1,
     log_performance_once_every_secs = 1,
 
-	kick_if_no_messages_for_secs = 10,
-	kick_if_away_from_keyboard_for_secs = 180,
+	kick_if_no_payloads_for_secs = 10,
+	kick_if_afk_for_secs = 180,
 	time_limit_to_enter_game_since_connection = 15,
 
 	send_packets_once_every_tick = 1,

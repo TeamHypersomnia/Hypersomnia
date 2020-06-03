@@ -1218,7 +1218,7 @@ message_handler_result server_setup::handle_client_message(
 		static_assert(always_false_v<T>, "Unhandled payload type.");
 	}
 
-	c.last_valid_message_time = server_time;
+	c.last_valid_payload_time = server_time;
 	return message_handler_result::CONTINUE;
 }
 

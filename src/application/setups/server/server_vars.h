@@ -35,23 +35,23 @@ struct server_vars {
 
 	bool allow_nat_traversal = true;
 
-	unsigned send_heartbeat_to_server_list_once_every_secs = 10;
-	unsigned resolve_server_list_address_once_every_secs = 60;
+	uint32_t send_heartbeat_to_server_list_once_every_secs = 10;
+	uint32_t resolve_server_list_address_once_every_secs = 60;
 
-	unsigned resolve_internal_address_once_every_secs = 60 * 10;
+	uint32_t resolve_internal_address_once_every_secs = 60 * 10;
 
-	unsigned kick_if_no_messages_for_secs = 60;
-	unsigned kick_if_away_from_keyboard_for_secs = 240;
-	unsigned time_limit_to_enter_game_since_connection = 10;
+	uint32_t kick_if_no_payloads_for_secs = 60;
+	uint32_t kick_if_afk_for_secs = 240;
+	uint32_t time_limit_to_enter_game_since_connection = 10;
 
-	unsigned reset_resync_timer_once_every_secs = 10;
-	unsigned max_client_resyncs = 3;
+	uint32_t reset_resync_timer_once_every_secs = 10;
+	uint32_t max_client_resyncs = 3;
 
-	unsigned send_packets_once_every_tick = 1;
+	uint32_t send_packets_once_every_tick = 1;
 
-	unsigned max_buffered_client_commands = 1000;
+	uint32_t max_buffered_client_commands = 1000;
 
-	unsigned state_hash_once_every_tick = 1;
+	uint32_t state_hash_once_every_tick = 1;
 	float send_net_statistics_update_once_every_secs = 1;
 
 	float max_kick_ban_linger_secs = 2;
@@ -59,8 +59,8 @@ struct server_vars {
 	augs::maybe_network_simulator network_simulator;
 
 	bool auto_authorize_loopback_for_rcon = true;
-	unsigned max_unauthorized_rcon_commands = 100;
-	unsigned max_bots = 0;
+	uint32_t max_unauthorized_rcon_commands = 100;
+	uint32_t max_bots = 0;
 	float log_performance_once_every_secs = 1;
 	float sleep_mult = 0.1f;
 	// END GEN INTROSPECTOR

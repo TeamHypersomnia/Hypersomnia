@@ -1648,8 +1648,8 @@ void do_server_vars(
 	revertable_checkbox("Allow NAT traversal", scope_cfg.allow_nat_traversal);
 
 	if (auto node = scoped_tree_node("Time limits")) {
-		revertable_slider(SCOPE_CFG_NVP(kick_if_no_messages_for_secs), 2u, 300u);
-		revertable_slider(SCOPE_CFG_NVP(kick_if_away_from_keyboard_for_secs), 20u, 6000u);
+		revertable_slider(SCOPE_CFG_NVP(kick_if_no_payloads_for_secs), 2u, 300u);
+		revertable_slider(SCOPE_CFG_NVP(kick_if_afk_for_secs), 20u, 6000u);
 		revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 5u, 300u);
 	}
 
