@@ -2280,6 +2280,7 @@ namespace test_flavours {
 			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.stackable = true;
 			item.standard_price = static_cast<money_type>(1000);
+			item.draw_over_hands_when_reloading = false;
 
 			meta.set(item);
 
@@ -3236,6 +3237,7 @@ namespace test_flavours {
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 200;
+				item.draw_over_hands_when_reloading = false;
 				meta.set(item);
 			}
 

@@ -331,12 +331,6 @@ FORCE_INLINE void specific_entity_drawer(
 					: false
 				;
 
-				const bool draw_mag_over = 
-					currently_reloading
-					? cosm[reloading_movement->weapon].template get<invariants::item>().draw_mag_over_when_reloading
-					: false
-				;
-
 				auto should_draw_under_torso = [&](const auto attachment_entity) {
 					const auto slot = attachment_entity.get_current_slot();
 
@@ -344,16 +338,14 @@ FORCE_INLINE void specific_entity_drawer(
 						return true;
 					}
 
-					if (currently_reloading) {
-						if (stance_id != item_holding_stance::HEAVY_LIKE) {
-							/* Always reload heavies under the hands */
-							return false;
-						}
-					}
-
 					if (slot.is_hand_slot()) {
-						const bool over_hands = attachment_entity.template get<invariants::item>().draw_over_hands;
-						return !over_hands;
+						const auto& item_def = attachment_entity.template get<invariants::item>();
+
+						if (currently_reloading) {
+							return !item_def.draw_over_hands_when_reloading;
+						}
+
+						return !item_def.draw_over_hands;
 					}
 
 					return false;
@@ -362,6 +354,12 @@ FORCE_INLINE void specific_entity_drawer(
 				auto get_offsets_by_torso = [stance_offsets]() {
 					return stance_offsets;
 				};
+
+				const bool draw_mag_over = 
+					currently_reloading
+					? cosm[reloading_movement->weapon].template get<invariants::item>().draw_mag_over_when_reloading
+					: false
+				;
 
 				auto draw_items_recursively = [&](const bool under_torso = true) {
 					typed_handle.for_each_attachment_recursive(

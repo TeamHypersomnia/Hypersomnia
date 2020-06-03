@@ -53,7 +53,7 @@ namespace invariants {
 		bool flip_when_reloading = true;
 		bool draw_mag_over_when_reloading = true;
 		bool draw_over_hands = true;
-		pad_bytes<1> pad2;
+		bool draw_over_hands_when_reloading = true;
 
 		faction_type specific_to = faction_type::SPECTATOR;
 		unsigned gratis_ammo_pieces_with_first = 0;
