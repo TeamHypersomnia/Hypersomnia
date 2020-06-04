@@ -12,6 +12,7 @@ enum class buy_menu_type {
 	SHOTGUNS,
 	GRENADES,
 	SPELLS,
+	ARMORS,
 	TOOLS
 	// END GEN INTROSPECTOR
 };

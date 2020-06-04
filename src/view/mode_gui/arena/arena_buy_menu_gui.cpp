@@ -82,7 +82,8 @@ static auto make_hotkey_map() {
 	m[key::_6] = buy_menu_type::SHOTGUNS;
 	m[key::_7] = buy_menu_type::GRENADES;
 	m[key::_8] = buy_menu_type::SPELLS;
-	m[key::_9] = buy_menu_type::TOOLS;
+	m[key::_9] = buy_menu_type::ARMORS;
+	m[key::_0] = buy_menu_type::TOOLS;
 
 	return m;
 }
@@ -909,7 +910,23 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					}
 				);
 
-				cosm.for_each_flavour_having<invariants::tool>(callback);
+				cosm.for_each_flavour_having<invariants::tool>(
+					[&](const auto& id, const auto& flavour) {
+						if (!::is_armor_like(flavour)) {
+							callback(id, flavour);
+						}
+					}
+				);
+			};
+
+			auto for_each_armor = [&](auto&& callback) {
+				cosm.for_each_flavour_having<invariants::tool>(
+					[&](const auto& id, const auto& flavour) {
+						if (::is_armor_like(flavour)) {
+							callback(id, flavour);
+						}
+					}
+				);
 			};
 
 			auto for_each_grenade = [&](auto&& callback) {
@@ -974,6 +991,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					do_item_menu(
 						std::nullopt,
 						for_each_grenade
+					);
+
+					break;
+				}
+
+				case buy_menu_type::ARMORS: {
+					do_item_menu(
+						std::nullopt,
+						for_each_armor
 					);
 
 					break;
