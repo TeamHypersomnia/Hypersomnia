@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- this with_each_attachment_recursive sucks really bad
+	- it doesn't even show the attachments on hotbar properly
+
 - Vote pause the game
 - Simple commands for chat
 	- time

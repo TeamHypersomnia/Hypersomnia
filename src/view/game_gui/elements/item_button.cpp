@@ -140,13 +140,18 @@ ltrb item_button::calc_button_layout(
 ) {
 	(void)defs;
 
-	auto aabb = component_owner.get_aabb(transformr());
-	
-	if (include_attachments) {
-		aabb.contain(component_owner.calc_attachments_aabb([](){ return torso_offsets(); }));
-	}
+	return component_owner.dispatch_on_having_all_ret<invariants::item>([&](const auto& typed_item) {
+		if constexpr(is_nullopt_v<decltype(typed_item)>) {
+			return ltrb();
+		}
+		else {
+			if (include_attachments) {
+				return typed_item.calc_aabb_with_attachments();
+			}
 
-	return aabb;
+			return typed_item.get_aabb(transformr());
+		}
+	});
 }
 
 vec2 item_button::griddify_size(const vec2 size, const vec2 expander) {
@@ -246,38 +251,33 @@ void item_button::draw_proc(
 		};
 
 		auto drawer = [&](
-			const const_entity_handle attachment_handle, 
+			const auto& typed_attachment_handle, 
 			const transformr where
 		) {
-			attachment_handle.dispatch_on_having_all<invariants::item>([&](const auto typed_attachment_handle) {
-				detail_specific_entity_drawer<true>(
-					typed_attachment_handle,
-					drawing_in,
-					render_visitor,
-					where
-				);
-			});
+			detail_specific_entity_drawer<true>(
+				typed_attachment_handle,
+				drawing_in,
+				render_visitor,
+				where
+			);
 		};
 
-		drawer(item, viewing_transform);
-
-		if (draw_attachments) {
-			item.for_each_attachment_recursive(
-				[&](
-					const auto attachment_entity,
-					const auto attachment_offset
-				) {
-					drawer(attachment_entity, viewing_transform * attachment_offset);
-				},
-				[](const auto&) {
-					return true;
-				},
-				[]() {
-					return torso_offsets();
-				},
-				attachment_offset_settings::for_logic()
-			);
-		}
+		item.dispatch_on_having_all<invariants::item>([&](const auto& typed_item) {
+			if (draw_attachments) {
+				typed_item.with_each_attachment_recursive(
+					[&](
+						const auto attachment_entity,
+						const auto attachment_offset
+					) {
+						drawer(attachment_entity, viewing_transform * attachment_offset);
+					},
+					attachment_offset_settings::for_logic()
+				);
+			}
+			else {
+				drawer(typed_item, viewing_transform);
+			}
+		});
 
 		if (f.draw_charges) {
 			const auto item_data = item.get<components::item>();

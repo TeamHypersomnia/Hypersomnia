@@ -77,132 +77,147 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 
 template <class E>
 template <class A, class B, class G>
-void inventory_mixin<E>::for_each_attachment_recursive(
+void inventory_mixin<E>::recurse_character_attachments(
 	A attachment_callback,
 	B should_recurse,
 	G get_offsets_by_torso,
 	const attachment_offset_settings& settings,
 	const bool flip_hands_order
 ) const {
-	struct node {
-		inventory_slot_id parent;
-		entity_id child;
-		transformr offset;
+	const auto character = *static_cast<const E*>(this);
+
+	auto get_offset_for = [&](
+		const auto for_attachment,
+		const auto for_type
+	) {
+		return direct_attachment_offset(
+			character,
+			for_attachment,
+			get_offsets_by_torso,
+			settings,
+			for_type
+		);
 	};
 
-	thread_local std::vector<node> container_stack;
-	container_stack.clear();
+	auto do_callback_for = [&](const slot_function type) {
+		const auto slot = character[type];
 
-	const auto root_container = *static_cast<const E*>(this);
-	auto& cosm = root_container.get_cosmos();
+		if (!should_recurse(slot)) {
+			return;
+		}
 
-	container_stack.push_back({ {}, root_container, transformr() });
-
-	std::size_t stack_i = 0;
-
-	while (stack_i < container_stack.size()) {
-		const auto it = container_stack[stack_i++];
-
-		cosm[it.child].template dispatch_on_having_any<invariants::container, components::item>(
-			[&](const auto this_attachment) {
-				auto get_attachment_offset_for = [&settings, &get_offsets_by_torso](
-					const auto for_container,
-					const auto for_attachment,
-					const auto for_type
-				) {
-					return direct_attachment_offset(
-						for_container,
-						for_attachment,
-						get_offsets_by_torso,
-						settings,
-						for_type
-					);
-				};
-
-				const auto total_offset = [&]() {
-					if (it.parent.container_entity.is_set()) {
-						/* Don't do it for the root */
-						const auto next_offset = get_attachment_offset_for(
-							cosm[it.parent.container_entity],
-							this_attachment,
-							it.parent.type
-						);
-
-						const auto total_offset = it.offset * next_offset;
-
-						this_attachment.template dispatch_on_having_all<components::item>([&](const auto& typed_attachment) {
-							attachment_callback(typed_attachment, total_offset);
-						});
-
-						return total_offset;
-					}
-
-					return it.offset;
-				}();
-
-				const auto& this_container = this_attachment;
-
-				if (const auto container = this_container.template find<invariants::container>()) {
-					for (const auto& s : container->slots) {
-						if (!s.second.makes_physical_connection()) {
-							continue;
-						}
-
-						const auto type = s.first;
-						const auto this_slot = this_container[type];
-
-						for (const auto& id : this_slot.get_items_inside()) {
-							const auto inside_item_handle = cosm[id];
-
-							if (!should_recurse(inside_item_handle)) {
-								continue;
-							}
-
-							auto insert_where = container_stack.size();
-
-							if (flip_hands_order) {
-								if (type == slot_function::SECONDARY_HAND) {
-									if (container_stack.back().parent.type == slot_function::PRIMARY_HAND) {
-										insert_where--;
-									}
-								}
-							}
-
-							{
-								const auto& maybe_gun = inside_item_handle;
-
-								/* Insert early */
-
-								if (const auto mag_slot = maybe_gun[slot_function::GUN_DETACHABLE_MAGAZINE]; mag_slot && mag_slot.has_items()) {
-									if (mag_slot->draw_under_container) {
-										const auto mag_inside = mag_slot.get_item_if_any();
-										const auto where_it = container_stack.begin() + insert_where;
-										const auto attachment_offset = total_offset * get_attachment_offset_for(this_container, maybe_gun, type);
-										const auto next_node = node { 
-											mag_slot, 
-											mag_inside.get_id(), 
-											attachment_offset
-										};
-
-										container_stack.insert(where_it, next_node);
-										++insert_where;
-									}
-								}
-								else if (const auto slot = inside_item_handle.get_current_slot(); slot && slot.get_type() == slot_function::GUN_DETACHABLE_MAGAZINE && slot->draw_under_container) {
-									/* Was earlier inserted */
-									continue;
-								}
-							}
-
-							const auto where_it = container_stack.begin() + insert_where;
-							const auto next_node = node { this_slot, id, total_offset };
-
-							container_stack.insert(where_it, next_node);
-						}
-					}
-				}
+		slot.dispatch_on_item_inside(
+			[&](const auto& typed_inside) {
+				const auto total_offset = get_offset_for(typed_inside, type);
+				attachment_callback(typed_inside, total_offset);
 			}
 		);
+	};
+
+	auto recurse_attachments_in = [&](const slot_function type) {
+		const auto slot = character[type];
+
+		if (!should_recurse(slot)) {
+			return;
+		}
+
+		slot.dispatch_on_item_inside(
+			[&](const auto& typed_inside) {
+				const auto total_offset = get_offset_for(typed_inside, type);
+
+				typed_inside.with_each_attachment_recursive(
+					attachment_callback,
+					settings,
+					total_offset
+				);
+			}
+		);
+	};
+
+	auto hand_1 = slot_function::PRIMARY_HAND;
+	auto hand_2 = slot_function::SECONDARY_HAND;
+
+	if (flip_hands_order) {
+		std::swap(hand_1, hand_2);
+	}
+
+	recurse_attachments_in(hand_1);
+	recurse_attachments_in(hand_2);
+
+	do_callback_for(slot_function::BELT);
+	do_callback_for(slot_function::BACK);
+	do_callback_for(slot_function::OVER_BACK);
+	do_callback_for(slot_function::SHOULDER);
+}
+
+template <class E>
+template <class A>
+void inventory_mixin<E>::with_each_attachment_recursive(
+	A attachment_callback,
+	const attachment_offset_settings& settings,
+	const transformr initial_offset
+) const {
+	const auto item_with_attachments = *static_cast<const E*>(this);
+
+	auto get_offset_for = [&](
+		const auto for_attachment,
+		const auto for_type
+	) {
+		return initial_offset * direct_attachment_offset(
+			item_with_attachments,
+			for_attachment,
+			[]() { return torso_offsets(); },
+			settings,
+			for_type
+		);
+	};
+
+	if constexpr(E::template has<invariants::gun>()) {
+		auto do_callback_for = [&](const slot_function type, const bool only_under) {
+			const auto slot = item_with_attachments[type];
+
+			if (slot.dead()) {
+				return;
+			}
+
+			const bool should_process = slot->makes_physical_connection();
+
+			if (!should_process) {
+				return;
+			}
+
+			if (only_under != slot->draw_under_container) {
+				return;
+			}
+
+			slot.dispatch_on_item_inside(
+				[&](const auto& typed_inside) {
+					const auto total_offset = get_offset_for(typed_inside, type);
+					attachment_callback(typed_inside, total_offset);
+				}
+			);
+		};
+
+		const auto gun_attachments = std::array<slot_function, 5> {
+			slot_function::GUN_CHAMBER_MAGAZINE,
+			slot_function::GUN_CHAMBER,
+			slot_function::GUN_DETACHABLE_MAGAZINE,
+			slot_function::GUN_RAIL,
+			slot_function::GUN_MUZZLE
+		};
+
+		for (const auto& s : gun_attachments) {
+			do_callback_for(s, true);
+		}
+
+		attachment_callback(item_with_attachments, initial_offset);
+
+		for (const auto& s : gun_attachments) {
+			do_callback_for(s, false);
+		}
+	}
+	else {
+		attachment_callback(item_with_attachments, initial_offset);
 	}
 }
 
@@ -227,21 +242,16 @@ void inventory_mixin<E>::for_each_contained_slot_recursive(S&& slot_callback, co
 }
 
 template <class E>
-template <class G>
-ltrb inventory_mixin<E>::calc_attachments_aabb(G&& get_offsets_by_torso) const {
+ltrb inventory_mixin<E>::calc_aabb_with_attachments() const {
 	ltrb result;
 
-	for_each_attachment_recursive(
+	with_each_attachment_recursive(
 		[&result](
 			const auto attachment_entity,
 			const auto attachment_offset
 		) {
 			result.contain(attachment_entity.get_aabb(attachment_offset));
 		},
-		[](const auto&) {
-			return true;
-		},
-		std::forward<G>(get_offsets_by_torso),
 		attachment_offset_settings::for_logic()
 	);
 

@@ -55,6 +55,10 @@ public:
 	bool can_contain_whole(const entity_id) const;
 
 	entity_handle_type get_item_if_any() const;
+
+	template <class F>
+	void dispatch_on_item_inside(F&&) const;
+
 	entity_handle_type get_container() const;
 	slot_function get_type() const;
 
@@ -186,6 +190,16 @@ bool basic_inventory_slot_handle<E>::has_items() const {
 template <class E>
 E basic_inventory_slot_handle<E>::get_item_if_any() const {
 	return get_cosmos()[(has_items() ? (*this).get_items_inside()[0] : entity_id())];
+}
+
+template <class E>
+template <class F>
+void basic_inventory_slot_handle<E>::dispatch_on_item_inside(F&& callback) const {
+	if (const auto inside = get_item_if_any()) {
+		inside.template dispatch_on_having_all<invariants::item>([&](const auto& typed_inside) {
+			callback(typed_inside);
+		});
+	}
 }
 
 template <class E>

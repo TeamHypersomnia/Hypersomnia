@@ -235,8 +235,28 @@ FORCE_INLINE void specific_entity_drawer(
 	const auto viewing_transform = typed_handle.get_viewing_transform(in.interp);
 
 	if constexpr (H::template has<components::item>()) {
-		if (typed_handle.get_owning_transfer_capability().alive()) {
+		if (typed_handle.get_current_slot().alive()) {
 			/* Will be drawn when the capability itself is drawn. */
+			return;
+		}
+		else {
+			auto draw_attachment = [&](
+				const auto attachment_entity,
+				const auto attachment_offset
+			) {
+				detail_specific_entity_drawer(
+					attachment_entity,
+					in,
+					render_visitor,
+					viewing_transform * attachment_offset
+				);
+			};
+
+			typed_handle.with_each_attachment_recursive(
+				draw_attachment,
+				attachment_offset_settings::for_rendering()
+			);
+
 			return;
 		}
 	}
@@ -407,15 +427,17 @@ FORCE_INLINE void specific_entity_drawer(
 						);
 					};
 
-					auto should_recurse = [over_torso, &should_draw_over_torso](const auto& attachment_entity) {
-						if (attachment_entity.get_current_slot().is_hand_slot()) {
-							return over_torso == should_draw_over_torso(attachment_entity);
+					auto should_recurse = [over_torso, &should_draw_over_torso](const auto& slot) {
+						if (slot.is_hand_slot()) {
+							if (const auto held_item = slot.get_item_if_any()) {
+								return over_torso == should_draw_over_torso(held_item);
+							}
 						}
 
 						return true;
 					};
 
-					typed_handle.for_each_attachment_recursive(
+					typed_handle.recurse_character_attachments(
 						draw_attachment,
 						should_recurse,
 						get_offsets_by_torso,

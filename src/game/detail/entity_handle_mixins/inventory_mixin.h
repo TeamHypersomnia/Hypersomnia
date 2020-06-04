@@ -132,13 +132,20 @@ public:
 		const optional_slot_flags& filter
 	) const;
 
+	template <class A>
+	void with_each_attachment_recursive(
+		A attachment_callback,
+		const attachment_offset_settings& settings,
+		transformr initial_offset = transformr()
+	) const;
+
 	template <class A, class B, class G>
-	void for_each_attachment_recursive(
+	void recurse_character_attachments(
 		A attachment_callback,
 		B should_recurse,
 		G get_offsets_by_torso,
 		const attachment_offset_settings& settings,
-		const bool reverse_hand_order = false
+		const bool flip_hands_order
 	) const;
 
 	template <class I>
@@ -147,8 +154,7 @@ public:
 	template <class S>
 	void for_each_contained_slot_recursive(S&& slot_callback, const optional_slot_flags& filter = std::nullopt) const;
 
-	template <class G>
-	ltrb calc_attachments_aabb(G&& get_offsets_by_torso) const;
+	ltrb calc_aabb_with_attachments() const;
 
 	auto find_mounting_progress() const;
 };
