@@ -19,10 +19,14 @@ const adversarial_meta* find_adversarial_meta(const E& from) {
 }
 
 template <class F>
-auto get_knockout_award(const F& flavour) {
-	if (const auto* adversarial = find_adversarial_meta(flavour)) {
-		return adversarial->knockout_award;
-	}
+auto get_knockout_award(const cosmos& cosm, const F& flavour_id) {
+	return cosm.on_flavour(flavour_id, [&](const auto& typed_flavour) -> std::optional<money_type> {
+		if constexpr(!is_nullopt_v<decltype(typed_flavour)>) {
+			if (const auto* adversarial = find_adversarial_meta(typed_flavour)) {
+				return adversarial->knockout_award;
+			}
+		}
 
-	return static_cast<money_type>(0);
+		return std::nullopt;
+	});
 }

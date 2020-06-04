@@ -19,9 +19,38 @@
 #include "augs/log.h"
 
 #include "view/mode_gui/arena/arena_context_tip.h"
+#include "augs/drawing/sprite_helpers.h"
 
 #include "augs/math/simple_calculations.h"
 #include "game/detail/flavour_presentation.h"
+
+void draw_weapon_flavour_with_attachments(
+	augs::vertex_triangle_buffer& output_buffer,
+	const ltrb precalculated_aabb,
+	const vec2 lt_pos,
+	const images_in_atlas_map& images_in_atlas,
+	const cosmos& cosm,
+	const item_flavour_id& flavour
+) {
+	using namespace augs::imgui;
+	const auto lt_offset = -precalculated_aabb.left_top();
+
+	auto draw = [&](
+		const auto& attachment_image,
+		const auto& attachment_offset
+	) {
+		const auto& entry = images_in_atlas.at(attachment_image).diffuse;
+		const auto final_pos = lt_pos + lt_offset + attachment_offset.pos;
+
+		augs::detail_sprite(output_buffer, entry, final_pos, attachment_offset.rotation, white);
+	};
+
+	presentational_with_attachments(
+		draw,
+		cosm,
+		flavour
+	);
+}
 
 const bool show_death_summary_for_teammates = false;
 
@@ -182,6 +211,7 @@ void arena_gui_state::draw_mode_gui(
 	if constexpr(M::round_based) {
 		using namespace augs::gui::text;
 
+		const auto death_fallback_icon = mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON];
 		const auto local_player_id = mode_in.local_player_id;
 
 		const auto local_player_faction = [&]() -> std::optional<faction_type> {
@@ -274,11 +304,14 @@ void arena_gui_state::draw_mode_gui(
 			mode_player_id tool_owner;
 
 			const auto tool_name = killer_origin.on_tool_used(cosm, [&](const auto& tool) -> std::string {
-				if constexpr(is_spell_v<decltype(tool)>) {
+				if constexpr(is_nullopt_v<decltype(tool)>) {
+					return "";
+				}
+				else if constexpr(is_spell_v<decltype(tool)>) {
 					return tool.appearance.name;
 				}
 				else {
-					return tool.get_name();
+					return get_flavour_name(cosm, tool);
 				}
 			});
 
@@ -333,14 +366,14 @@ void arena_gui_state::draw_mode_gui(
 
 			auto total_subtext = colored(std::string("  ") + killed_you_str, killed_color);
 
-			if (tool_name) {
+			if (!tool_name.empty()) {
 				total_subtext += colored(" with ", killed_color);
 
 				if (owner_str.size() > 0) {
 					total_subtext += colored(owner_str + " ", killed_color);
 				}
 
-				total_subtext += colored(*tool_name, cyan);
+				total_subtext += colored(tool_name, cyan);
 			}
 
 			total_subtext += colored("\n", white);
@@ -390,15 +423,18 @@ void arena_gui_state::draw_mode_gui(
 			const auto free_w_for_tool = total_text_size.x - killer_nickname_text_size.x;
 
 			const auto tool_image_id = killer_origin.on_tool_used(cosm, [&](const auto& tool) -> assets::image_id {
-				if constexpr(is_spell_v<decltype(tool)>) {
+				if constexpr(is_nullopt_v<decltype(tool)>) {
+					return death_fallback_icon;
+				}
+				else if constexpr(is_spell_v<decltype(tool)>) {
 					return tool.appearance.icon;
 				}
 				else {
-					return tool.get_image_id();
+					return get_flavour_image(cosm, tool);
 				}
 			});
 
-			const auto& tool_image_entry = tool_image_id != std::nullopt ? in.images_in_atlas.at(*tool_image_id).diffuse : augs::atlas_entry();
+			const auto& tool_image_entry = in.images_in_atlas.at(tool_image_id).diffuse;
 
 			const bool tool_image_drawn = tool_image_entry.exists();
 			const auto tool_image_size = static_cast<vec2i>(tool_image_entry.get_original_size());
@@ -648,20 +684,67 @@ void arena_gui_state::draw_mode_gui(
 				cols.background.mult_alpha(bg_alpha);
 				cols.border.mult_alpha(bg_alpha);
 
-				const auto tool_image_id = ko.origin.on_tool_used(cosm, [&](const auto& tool) -> assets::image_id {
-					if constexpr(is_spell_v<decltype(tool)>) {
-						return tool.appearance.icon;
+				struct tool_layout_meta {
+					ltrb aabb;
+					std::function<void(ltrb)> draw;
+
+					auto get_size() const {
+						return aabb.get_size();
+					}
+				};
+
+				const auto layout = ko.origin.on_tool_used(cosm, [&](const auto& tool) -> tool_layout_meta {
+					auto from_image = [&](const auto image_id) {
+						const auto& entry = in.images_in_atlas.at(image_id).diffuse;
+
+						auto meta = tool_layout_meta();
+
+						meta.aabb = ltrb(vec2::zero, entry.get_original_size());
+						meta.draw = [&](const ltrb target_aabb) {
+							get_drawer().base::aabb(
+								entry,
+								target_aabb,
+								white
+							);
+						};
+
+						return meta;
+					};
+
+					if constexpr(is_nullopt_v<decltype(tool)>) {
+						return from_image(death_fallback_icon);
+					}
+					else if constexpr(is_spell_v<decltype(tool)>) {
+						return from_image(tool.appearance.icon);
+					}
+					else if constexpr(std::is_convertible_v<remove_cref<decltype(tool)>, item_flavour_id>) {
+						auto meta = tool_layout_meta();
+
+						const auto total_aabb = aabb_of_game_image_with_attachments(in.images_in_atlas, cosm, tool);
+
+						meta.aabb = total_aabb;
+						meta.draw = [&, tool, total_aabb](const auto& target_aabb) {
+							const auto lt_pos = target_aabb.left_top();
+
+							::draw_weapon_flavour_with_attachments(
+								get_drawer().output_buffer,
+								total_aabb, 
+								lt_pos,
+								in.images_in_atlas,
+								cosm,
+								tool
+							);
+						};
+
+						return meta;
 					}
 					else {
-						return tool.get_image_id();
+						return from_image(death_fallback_icon);
 					}
 				});
 
-				const auto death_fallback_icon = in.images_in_atlas.at(mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON]);
-				const auto& entry = tool_image_id != std::nullopt ? in.images_in_atlas.at(*tool_image_id) : death_fallback_icon;
-
 				const auto tool_size = [&]() {
-					const auto original_tool_size = static_cast<vec2i>(entry.get_original_size());
+					const auto original_tool_size = static_cast<vec2i>(layout.get_size());
 					const auto max_tool_height = cfg.max_weapon_icon_height;
 
 					if (max_tool_height == 0) {
@@ -722,13 +805,7 @@ void arena_gui_state::draw_mode_gui(
 				pen.x += lhs_bbox.x;
 				pen.x += cfg.weapon_icon_horizontal_pad;
 
-				{
-					general_drawer.base::aabb(
-						entry.diffuse,
-						icon_drawn_aabb,
-						white
-					);
-				}
+				layout.draw(icon_drawn_aabb);
 
 				pen.x += tool_size.x;
 				pen.x += cfg.weapon_icon_horizontal_pad;

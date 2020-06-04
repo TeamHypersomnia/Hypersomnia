@@ -1124,12 +1124,15 @@ void bomb_defusal::count_knockout(const input_type in, const arena_mode_knockout
 		if (knockouts_dt > 0) {
 			auto& cosm = in.cosm;
 
-			const auto award = ko.origin.on_tool_used(cosm, [&](const auto& tool) {
+			const auto award = ko.origin.on_tool_used(cosm, [&](const auto& tool) -> std::optional<money_type> {
 				if constexpr(is_spell_v<decltype(tool)>) {
 					return tool.common.adversarial.knockout_award;
 				}
+				else if constexpr(is_nullopt_v<decltype(tool)>) {
+					return std::nullopt;
+				}
 				else {
-					return ::get_knockout_award(tool);
+					return ::get_knockout_award(cosm, tool);
 				}
 			});
 

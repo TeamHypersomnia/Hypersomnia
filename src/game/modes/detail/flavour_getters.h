@@ -33,6 +33,16 @@ inline const inventory_slot* find_slot_def_of(
 	});
 }
 
+template <class F>
+inline auto get_flavour_name(const cosmos& cosm, const F& flavour) {
+	return cosm.get_flavour(flavour).get_name();
+}
+
+template <class F>
+inline auto get_flavour_image(const cosmos& cosm, const F& flavour) {
+	return cosm.get_flavour(flavour).get_image_id();
+}
+
 inline item_flavour_id get_allowed_flavour_of(
 	const cosmos& cosm, 
 	const item_flavour_id& container_flavour_id, 

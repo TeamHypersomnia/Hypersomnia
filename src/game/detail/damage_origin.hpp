@@ -63,15 +63,15 @@ auto damage_origin::get_guilty_of_damaging(const E& victim_handle) const {
 
 template <class C, class F>
 auto damage_origin::on_tool_used(C& cosm, F callback) const {
-	using R = decltype(callback(haste()));
-	using opt_R = std::optional<R>;
-
 	if (cause.spell.is_set()) {
-		return cause.spell.dispatch([&](auto s) -> opt_R {
+		return cause.spell.dispatch([&](auto s) {
 			using S = decltype(s);
 			return callback(std::get<S>(cosm.get_common_significant().spells));
 		});
 	}
+
+	using R = decltype(callback(haste()));
+	using opt_R = std::optional<R>;
 
 	auto from_flavour = [&](const auto flavour_id) -> opt_R {
 		if (!flavour_id.is_set()) {
@@ -84,7 +84,7 @@ auto damage_origin::on_tool_used(C& cosm, F callback) const {
 					return std::nullopt;
 				}
 				else {
-					return callback(*flavour);
+					return callback(typed_flavour_id);
 				}
 			}
 
@@ -92,15 +92,13 @@ auto damage_origin::on_tool_used(C& cosm, F callback) const {
 		});
 	};
 
-	;
-
 	if (const auto result = from_flavour(sender.direct_sender_flavour)) {
-		return result;
+		return *result;
 	}
 
 	if (const auto result = from_flavour(cause.flavour)) {
-		return result;
+		return *result;
 	}
 
-	return opt_R(std::nullopt);
+	return callback(std::nullopt);
 }
