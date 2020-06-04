@@ -38,8 +38,8 @@ namespace augs {
 		}
 
 		template <class T>
-		void game_image(const augs::atlas_entry& entry, const T& size, const rgba col = white, const vec2 offset = vec2::zero, const imgui_atlas_type atlas_type = imgui_atlas_type::GAME) {
-			const auto imsize = static_cast<ImVec2>(size);
+		void game_image(const augs::atlas_entry& entry, const T& size, const rgba col = white, const vec2 offset = vec2::zero, const imgui_atlas_type atlas_type = imgui_atlas_type::GAME, float rotation = 0.f) {
+			const auto imsize = static_cast<vec2>(size);
 
 			std::array<vec2, 4> texcoords = {
 				vec2(0.f, 0.f),
@@ -54,12 +54,28 @@ namespace augs {
 
 			const auto cpos = vec2(ImGui::GetCursorScreenPos()) + offset;
 
-			ImGui::GetWindowDrawList()->AddImageQuad(
-				reinterpret_cast<ImTextureID>(atlas_type),
-				static_cast<ImVec2>(cpos),
+			auto points = std::array<vec2, 4> {
+				cpos,
 				{ cpos.x + imsize.x, cpos.y },
 				{ cpos.x + imsize.x, cpos.y + imsize.y },
-				{ cpos.x, cpos.y + imsize.y },
+				{ cpos.x, cpos.y + imsize.y }
+			};
+
+			if (rotation != 0.f) {
+				const auto origin = cpos + imsize * 0.5f;
+
+				for (auto& p : points) {
+					p.rotate(rotation, origin);
+				}
+			}
+
+			ImGui::GetWindowDrawList()->AddImageQuad(
+				reinterpret_cast<ImTextureID>(atlas_type),
+
+				static_cast<ImVec2>(points[0]),
+				static_cast<ImVec2>(points[1]),
+				static_cast<ImVec2>(points[2]),
+				static_cast<ImVec2>(points[3]),
 
 				static_cast<ImVec2>(texcoords[0]),
 				static_cast<ImVec2>(texcoords[1]),

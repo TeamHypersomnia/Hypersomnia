@@ -38,6 +38,59 @@ struct attachment_offset_settings {
 	}
 };
 
+template <class L>
+transformr presentational_direct_attachment_offset(
+	const L& logicals,
+	const assets::image_id root_image_id,
+	const assets::image_id attachment_image_id,
+	const slot_function type
+) {
+	const auto anchors = [&]() {
+		if (const auto image_id = attachment_image_id; image_id.is_set()) {
+			return logicals.get_offsets(image_id).item;
+		}
+
+		return item_offsets();
+	}();
+
+	auto get_offsets_by_gun = [&]() {
+		const auto image_id = root_image_id;
+
+		if (image_id.is_set()) {
+			return logicals.get_offsets(image_id).gun;
+		}
+
+		return gun_offsets();
+	};
+
+	transformi attachment_offset;
+	transformi anchor;
+
+	switch (type) {
+		case slot_function::GUN_DETACHABLE_MAGAZINE: 
+			attachment_offset = get_offsets_by_gun().detachable_magazine;
+			anchor = anchors.attachment_anchor;
+			break;
+
+		case slot_function::GUN_CHAMBER: 
+			attachment_offset = get_offsets_by_gun().chamber;
+			anchor = anchors.attachment_anchor;
+			break;
+
+		case slot_function::GUN_CHAMBER_MAGAZINE: 
+			attachment_offset = get_offsets_by_gun().chamber_magazine;
+			anchor = anchors.attachment_anchor;
+			break;
+
+		default:
+			attachment_offset = {};
+			anchor = {};
+			break;
+	}
+
+	return get_anchored_offset(attachment_offset, anchor);
+}
+
 template <class A, class B, class C>
 transformr direct_attachment_offset(
 	const A& container, 

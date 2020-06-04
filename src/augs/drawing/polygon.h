@@ -99,7 +99,7 @@ namespace augs {
 				v.pos += transform.pos;
 			}
 
-			return augs::get_aabb(
+			return augs::calc_vertices_aabb(
 				model_transformed,
 				[](const vertex& p) { return p.pos.x; },
 				[](const vertex& p) { return p.pos.y; }

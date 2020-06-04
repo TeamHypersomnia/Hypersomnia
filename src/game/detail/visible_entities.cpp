@@ -87,7 +87,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 		
 		physics.for_each_intersection_with_polygon(
 			cosm.get_si(),
-			camera_aabb.get_vertices<real32>(),
+			camera_aabb.get_vertices(),
 			predefined_queries::renderable(),
 			[&](const b2Fixture& fix, auto, auto) {
 				const auto owning_entity_id = cosm.get_versioned(get_entity_that_owns(fix));

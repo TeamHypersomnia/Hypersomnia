@@ -293,16 +293,6 @@ struct basic_ltrb {
 		return m.x >= l && m.y >= t && m.x <= r && m.y <= b;
 	}
 
-	template <class S>
-	std::array<basic_vec2<S>, 4> get_vertices() const {
-		return {
-			basic_vec2<S>(l, t),
-			basic_vec2<S>(r, t),
-			basic_vec2<S>(r, b),
-			basic_vec2<S>(l, b)
-		};
-	}
-
 	template <typename type>
 	void snap_point(basic_vec2<type>& v) const {
 		if (v.x < l) v.x = static_cast<type>(l);
@@ -385,15 +375,24 @@ struct basic_ltrb {
 		return result;
 	}
 
-	auto make_vertices() const {
-		std::array<vec2_type, 4> result;
+	auto get_vertices() const {
+		return std::array<vec2_type, 4> {
+			vec2_type(l, t),
+			vec2_type(r, t),
+			vec2_type(r, b),
+			vec2_type(l, b)
+		};
+	}
 
-		result[0] = vec2_type(l, t);
-		result[1] = vec2_type(r, t);
-		result[2] = vec2_type(r, b);
-		result[3] = vec2_type(l, b);
+	auto get_vertices(const real32 rotation) const {
+		const auto center = get_center();
+		auto v = get_vertices();
 
-		return result;
+		for (auto& p : v) {
+			p.rotate(rotation, center);
+		}
+
+		return v;
 	}
 };
 
@@ -588,15 +587,24 @@ struct basic_xywh {
 		return result;
 	}
 
-	auto make_vertices() const {
-		std::array<vec2_type, 4> result;
+	auto get_vertices() const {
+		return std::array<vec2_type, 4> {
+			vec2_type(x, y),
+			vec2_type(x + w, y),
+			vec2_type(x + w, y + h),
+			vec2_type(x, y + h)
+		};
+	}
 
-		result[0] = vec2_type(x, y);
-		result[1] = vec2_type(x + w, y);
-		result[2] = vec2_type(x + w, y + h);
-		result[3] = vec2_type(x, y + h);
+	auto get_vertices(const real32 rotation) const {
+		const auto center = get_center();
+		auto v = get_vertices();
 
-		return result;
+		for (auto& p : v) {
+			p.rotate(rotation, center);
+		}
+
+		return v;
 	}
 };
 

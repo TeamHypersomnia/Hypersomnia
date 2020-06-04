@@ -16,11 +16,11 @@ namespace augs {
 		return make_rect_points<reproducible>(pos, size, degrees);
 	}
 
-	FORCE_INLINE ltrb sprite_aabb(
+	FORCE_INLINE ltrb calc_sprite_aabb(
 		const transformr where,
 		const vec2i size
 	) {
-		return augs::get_aabb(
+		return calc_vertices_aabb(
 			make_sprite_points<true>(where.pos, size, where.rotation)
 		);
 	}

@@ -149,7 +149,7 @@ public:
 			const auto& s = overridden_geo.get();
 
 			if (s.is_enabled) {
-				return augs::sprite_aabb(transform, s.value);
+				return augs::calc_sprite_aabb(transform, s.value);
 			}
 		}
 

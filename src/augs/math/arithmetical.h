@@ -107,7 +107,7 @@ namespace augs {
 	}
 
 	template <class C, class Xp, class Yp>
-	auto get_aabb(const C& v, Xp x_pred, Yp y_pred) {
+	auto calc_vertices_aabb(const C& v, Xp x_pred, Yp y_pred) {
 		const auto lower_x = x_pred(minimum_of(v, [&x_pred](const auto a, const auto b) { return x_pred(a) < x_pred(b); }));
 		const auto lower_y = y_pred(minimum_of(v, [&y_pred](const auto a, const auto b) { return y_pred(a) < y_pred(b); }));
 		const auto upper_x = x_pred(maximum_of(v, [&x_pred](const auto a, const auto b) { return x_pred(a) < x_pred(b); }));
@@ -117,8 +117,8 @@ namespace augs {
 	}
 
 	template <class C>
-	auto get_aabb(const C& container) {
-		return get_aabb(container,
+	auto calc_vertices_aabb(const C& container) {
+		return calc_vertices_aabb(container,
 			[](const auto p) { return p.x; },
 			[](const auto p) { return p.y; }
 		);

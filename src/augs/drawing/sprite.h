@@ -115,7 +115,7 @@ namespace augs {
 		}
 
 		ltrb get_aabb(const transformr where) const {
-			return augs::sprite_aabb(where, size);
+			return augs::calc_sprite_aabb(where, size);
 		}
 	};
 }

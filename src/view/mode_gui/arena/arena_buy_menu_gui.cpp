@@ -22,6 +22,150 @@
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "game/detail/buy_area_in_range.h"
 
+assets::image_id image_of(
+	const cosmos& cosm,
+	const item_flavour_id& of
+) {
+	if (!::is_alive(cosm, of)) {
+		return assets::image_id();
+	}
+
+	return cosm.on_flavour(of, [&](const auto& typed_flavour) {
+		return typed_flavour.get_image_id();
+	});
+}
+
+assets::image_id get_spell_image(
+	const cosmos& cosm,
+	const spell_id& id
+) {
+	auto getter = [&](const auto& spell_data) {
+		return spell_data.appearance.icon;
+	};
+
+	return ::on_spell(cosm, id, getter);
+}
+
+template <class F>
+void presentational_with_attachments(
+	F&& callback,
+	const cosmos& cosm,
+	const item_flavour_id& flavour
+) {
+	const auto container_image = image_of(cosm, flavour);
+
+	auto do_callback_for = [&](const slot_function type, const bool only_under) {
+		const auto def = find_slot_def_of(cosm, flavour, type);
+
+		if (def == nullptr) {
+			return;
+		}
+
+		const bool should_process = def->makes_physical_connection();
+
+		if (!should_process) {
+			return;
+		}
+
+		const auto attachment_flavour = def->only_allow_flavour;
+		const auto attachment_image = image_of(cosm, attachment_flavour);
+
+		if (!should_process) {
+			return;
+		}
+
+		if (only_under != def->draw_under_container) {
+			return;
+		}
+
+		const auto presentational_offset = ::presentational_direct_attachment_offset(cosm.get_logical_assets(), container_image, attachment_image, type);
+
+		callback(attachment_image, presentational_offset);
+	};
+
+	const auto presented_gun_attachments = std::array<slot_function, 5> {
+		slot_function::GUN_CHAMBER,
+		slot_function::GUN_DETACHABLE_MAGAZINE
+	};
+
+	for (const auto& s : presented_gun_attachments) {
+		do_callback_for(s, true);
+	}
+
+	callback(container_image, transformr());
+
+	for (const auto& s : presented_gun_attachments) {
+		do_callback_for(s, false);
+	}
+}
+
+template <class I>
+ltrb aabb_of_game_image_with_attachments(
+	const images_in_atlas_map& images_in_atlas,
+	const cosmos& cosm,
+	const I& flavour
+) {
+	ltrb result;
+
+	auto get_entry = [&](const auto id) {
+		return images_in_atlas.at(id).diffuse;
+	};
+
+	auto contain = [&](
+		const auto& attachment_image,
+		const auto& attachment_offset
+	) {
+		const auto& entry = get_entry(attachment_image);
+		const auto& rotated_aabb = augs::calc_sprite_aabb(attachment_offset, entry.get_original_size());
+
+		result.contain(rotated_aabb);
+	};
+
+	presentational_with_attachments(
+		contain,
+		cosm,
+		flavour
+	);
+
+	return result;
+}
+
+void game_image_with_attachments(
+	const ltrb precalculated_aabb,
+	const vec2 image_padding,
+	const images_in_atlas_map& images_in_atlas,
+	const cosmos& cosm,
+	const item_flavour_id& flavour
+) {
+	using namespace augs::imgui;
+
+	const auto total_size = precalculated_aabb.get_size(); 
+	const auto lt_offset = -precalculated_aabb.left_top();
+
+	auto get_entry = [&](const auto id) {
+		return images_in_atlas.at(id).diffuse;
+	};
+
+	auto draw = [&](
+		const auto& attachment_image,
+		const auto& attachment_offset
+	) {
+		const auto& entry = get_entry(attachment_image);
+		const auto size = entry.get_original_size();
+
+		const auto final_pos = image_padding + lt_offset + attachment_offset.pos - size / 2;
+		game_image(entry, size, white, final_pos, augs::imgui_atlas_type::GAME, attachment_offset.rotation);
+	};
+
+	presentational_with_attachments(
+		draw,
+		cosm,
+		flavour
+	);
+
+	invisible_button("", total_size + image_padding);
+}
+
 bool should_close_after_purchase(buy_menu_type b) {
 	switch (b) {
 		case buy_menu_type::TOOLS: return false;
@@ -181,27 +325,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	const auto& spells = cosm.get_common_significant().spells;
 
-	auto _on_spell = [&](const spell_id& id, auto&& f) -> decltype(auto) {
-		return ::on_spell(cosm, id, std::forward<decltype(f)>(f));
-	};
-
-	auto image_of = [&](const auto& of) {
-		if constexpr(std::is_same_v<decltype(of), const item_flavour_id&>) {
-			if (!is_alive(cosm, of)) {
-				return assets::image_id();
-			}
-
-			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
-				return typed_flavour.get_image_id();
-			});
-		}
-		else {
-			return _on_spell(of, [&](const auto& spell_data) {
-				return spell_data.appearance.icon;
-			});
-		}
-	};
-
 	auto price_of = [&](const auto& of) {
 		return *::find_price_of(cosm, of);
 	};
@@ -212,7 +335,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	};
 
 	auto draw_owned_weapon = [&](const item_flavour_id& f_id) {
-		if (const auto& entry = in.images_in_atlas.at(image_of(f_id)).diffuse; entry.exists()) {
+		if (const auto& entry = in.images_in_atlas.at(::image_of(cosm, f_id)).diffuse; entry.exists()) {
 			const auto image_padding = vec2(0, 4);
 			const auto size = vec2(entry.get_original_size());
 			game_image(entry, size, white, image_padding);
@@ -258,7 +381,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	};
 
 	auto general_purchase_button = [&](
-		const auto& object, 
+		auto purchasable_graphic_size,
+		auto draw_purchasable_callback,
+		const auto& flavour_or_spell, 
 		const auto& selected,
 		const owning_type owning,
 		const std::optional<int> num_carryable,
@@ -268,20 +393,14 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		auto&& name_callback,
 		auto&& price_callback
 	) {
-		const auto& entry = in.images_in_atlas.at(image_of(object)).diffuse;
-
-		if (!entry.exists()) {
-			return false;
-		}
-
-		const auto price = price_of(object);
+		const auto size = static_cast<vec2>(purchasable_graphic_size);
+		const auto price = price_of(flavour_or_spell);
 
 		if (price == 0) {
 			return false;
 		}
 
 		const auto local_pos = ImGui::GetCursorPos();
-		const auto size = vec2(entry.get_original_size());
 		const auto button_h = std::max(size.y, line_h * 2) + item_spacing.y;
 
 		const auto num_affordable = in.available_money / price;
@@ -321,9 +440,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		text_disabled(hotkey_text);
 		ImGui::SameLine();
 
-		const auto image_padding = vec2(0, 4);
-		game_image(entry, size, white, image_padding);
-		invisible_button("", size + image_padding);
+		draw_purchasable_callback();
 
 		ImGui::SameLine();
 
@@ -341,7 +458,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			text("Owned other item of the same type");
 		}
 		else {
-			text_color(typesafe_sprintf("%x$", price_of(object)), money_color);
+			text_color(typesafe_sprintf("%x$", price), money_color);
 			ImGui::SameLine();
 
 			price_callback(num_affordable);
@@ -367,7 +484,25 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		const bool learnt = subject.template get<components::sentience>().is_learnt(s_id);
 
+		const auto image = ::get_spell_image(cosm, s_id);
+		const auto& entry = in.images_in_atlas.at(image).diffuse;
+
+		if (!entry.exists()) {
+			return false;
+		}
+
+		const auto size = entry.get_original_size();
+
+		auto draw_callback = [&]() {
+			const auto image_padding = vec2(0, 4);
+
+			game_image(entry, size, white, image_padding);
+			invisible_button("", size + image_padding);
+		};
+
 		return general_purchase_button(
+			size,
+			draw_callback,
 			s_id,
 			selected,
 			learnt ? owning_type::OWNED : owning_type::UNOWNED,
@@ -376,7 +511,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			additional_id,
 			hotkey_text,
 			[&]() {
-				_on_spell(s_id, [&](const auto& spell_data) {
+				::on_spell(cosm, s_id, [&](const auto& spell_data) {
 					const auto col = spell_data.appearance.name_color;
 					text_color(spell_data.appearance.name, col);
 					ImGui::SameLine();
@@ -396,7 +531,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					}
 				}
 
-				_on_spell(s_id,  [&](const auto& spell_data) {
+				::on_spell(cosm, s_id,  [&](const auto& spell_data) {
 					(void)spell_data;
 					text_disabled("(Can buy");
 					ImGui::SameLine();
@@ -459,7 +594,31 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			return num_owned_of_same_once_category >= 1 ? owning_type::OWNED_OF_THE_SAME_TYPE : owning_type::UNOWNED;
 		}();
 
+		const auto aabb = ::aabb_of_game_image_with_attachments(
+			in.images_in_atlas,
+			cosm,
+			f_id
+		);
+
+		if (!aabb.good()) {
+			return false;
+		}
+
+		auto draw_callback = [&]() {
+			const auto image_padding = vec2(0, 4);
+
+			::game_image_with_attachments(
+				aabb,
+				image_padding,
+				in.images_in_atlas,
+				cosm,
+				f_id
+			);
+		};
+
 		return general_purchase_button(
+			aabb.get_size(),
+			draw_callback,
 			f_id,
 			selected,
 			owned_status,
@@ -539,10 +698,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	auto price_comparator = [&](const auto& a, const auto& b) {
 		const auto pa = price_of(a);
 		const auto pb = price_of(b);
-
-		if (pa == pb) {
-			return image_of(a).indirection_index < image_of(b).indirection_index;
-		}
 
 		return pa > pb;
 	};

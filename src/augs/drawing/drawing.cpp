@@ -45,7 +45,7 @@ namespace augs {
 			in.get_total_expansion(),
 			in.width,
 			[&](const ltrb line) {
-				auto verts = line.get_vertices<real32>();
+				auto verts = line.get_vertices();
 
 				for (auto& v : verts) {
 					v.rotate(rotation, pos);
@@ -336,7 +336,7 @@ namespace augs {
 			in.get_total_expansion(),
 			in.width,
 			[&](const ltrb line) {
-				auto verts = line.get_vertices<real32>();
+				auto verts = line.get_vertices();
 
 				for (auto& v : verts) {
 					v.rotate(rotation, pos);

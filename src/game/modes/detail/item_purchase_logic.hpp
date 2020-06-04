@@ -99,16 +99,36 @@ inline auto get_buy_slot_opts() {
 	};
 }
 
-inline item_flavour_id get_allowed_flavour_of_deposit(const cosmos& cosm, const item_flavour_id& mag_id) {
-	return cosm.on_flavour(mag_id, [&](const auto& typed_flavour) {
+inline const inventory_slot* find_slot_def_of(
+	const cosmos& cosm, 
+	const item_flavour_id& container_flavour_id, 
+	const slot_function f
+) {
+	return cosm.on_flavour(container_flavour_id, [&](const auto& typed_flavour) -> const inventory_slot* {
 		if (const auto c = typed_flavour.template find<invariants::container>()) {
-			if (const auto depo = mapped_or_nullptr(c->slots, slot_function::ITEM_DEPOSIT)) {
-				return depo->only_allow_flavour;
+			if (const auto slot_def = mapped_or_nullptr(c->slots, f)) {
+				return slot_def;
 			}
 		}
 
-		return item_flavour_id();
+		return nullptr;
 	});
+}
+
+inline item_flavour_id get_allowed_flavour_of(
+	const cosmos& cosm, 
+	const item_flavour_id& container_flavour_id, 
+	const slot_function f
+) {
+	if (const auto def = find_slot_def_of(cosm, container_flavour_id, f)) {
+		return def->only_allow_flavour;
+	}
+
+	return item_flavour_id();
+}
+
+inline item_flavour_id get_allowed_flavour_of_deposit(const cosmos& cosm, const item_flavour_id& mag_id) {
+	return get_allowed_flavour_of(cosm, mag_id, slot_function::ITEM_DEPOSIT);
 }
 
 inline bool is_magazine_like(const cosmos& cosm, const item_flavour_id& id) {

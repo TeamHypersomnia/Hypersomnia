@@ -78,7 +78,7 @@ struct camera_cone {
 			eye.transform.rotation
 		);
 
-		return augs::get_aabb(rotated_rect_verts);
+		return augs::calc_vertices_aabb(rotated_rect_verts);
 	}
 	
 	auto get_projection_matrix() const {

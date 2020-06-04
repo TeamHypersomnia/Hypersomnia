@@ -154,7 +154,7 @@ void wandering_pixels_system::advance_for(
 			p.pos += augs::steer_to_avoid_edges(
 				velocity,
 				p.pos,
-				current_reach.make_vertices(),
+				current_reach.get_vertices(),
 				current_reach.get_center(),
 				30.f,
 				1.f
