@@ -69,6 +69,8 @@ tool_layout_meta make_tool_layout(
 	const images_in_atlas_map& images_in_atlas
 ) {
 	return origin.on_tool_used(cosm, [&](const auto& tool) -> tool_layout_meta {
+		using T = remove_cref<decltype(tool)>;
+
 		auto from_image = [&](const auto image_id) {
 			const auto& entry = images_in_atlas.at(image_id).diffuse;
 
@@ -86,32 +88,37 @@ tool_layout_meta make_tool_layout(
 			return meta;
 		};
 
-		if constexpr(is_nullopt_v<decltype(tool)>) {
+		if constexpr(is_nullopt_v<T>) {
 			return from_image(death_fallback_icon);
 		}
-		else if constexpr(is_spell_v<decltype(tool)>) {
+		else if constexpr(is_spell_v<T>) {
 			return from_image(tool.appearance.icon);
 		}
-		else if constexpr(std::is_convertible_v<remove_cref<decltype(tool)>, item_flavour_id>) {
-			auto meta = tool_layout_meta();
+		else if constexpr(is_flavour_id_v<T>) {
+			if constexpr(std::is_convertible_v<T, item_flavour_id>) {
+				auto meta = tool_layout_meta();
 
-			const auto total_aabb = aabb_of_game_image_with_attachments(images_in_atlas, cosm, tool);
+				const auto total_aabb = aabb_of_game_image_with_attachments(images_in_atlas, cosm, tool);
 
-			meta.aabb = total_aabb;
-			meta.draw = [&, tool, total_aabb](const auto& target_aabb) {
-				const auto lt_pos = target_aabb.left_top();
+				meta.aabb = total_aabb;
+				meta.draw = [&, tool, total_aabb](const auto& target_aabb) {
+					const auto lt_pos = target_aabb.left_top();
 
-				::draw_weapon_flavour_with_attachments(
-					output_buffer,
-					total_aabb, 
-					lt_pos,
-					images_in_atlas,
-					cosm,
-					tool
-				);
-			};
+					::draw_weapon_flavour_with_attachments(
+						output_buffer,
+						total_aabb, 
+						lt_pos,
+						images_in_atlas,
+						cosm,
+						tool
+					);
+				};
 
-			return meta;
+				return meta;
+			}
+			else {
+				return from_image(::get_flavour_image(cosm, tool));
+			}
 		}
 		else {
 			return from_image(death_fallback_icon);
