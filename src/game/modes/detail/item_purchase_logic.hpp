@@ -1,6 +1,8 @@
 #pragma once
 #include "game/detail/flavour_scripts.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "game/modes/detail/flavour_getters.h"
+#include "game/modes/detail/spell_getters.h"
 
 template <class E>
 int num_carryable_pieces(
@@ -46,33 +48,6 @@ int num_carryable_pieces(
 	return total_fitting;
 }
 
-template <class F>
-decltype(auto) on_spell(const cosmos& cosm, const spell_id& id, F&& callback) {
-	return id.dispatch(
-		[&](auto s) -> decltype(auto) {
-			using S = decltype(s);
-			return callback(std::get<S>(cosm.get_common_significant().spells));
-		}
-	);
-};
-
-inline bool is_alive(const cosmos& cosm, const item_flavour_id& t) {
-	if (!t.is_set()) {
-		return false;
-	}
-
-	return t.dispatch(
-		[&](const auto& typed_id) {
-			return nullptr != cosm.find_flavour(typed_id);
-		}
-	);
-};
-
-inline bool is_alive(const cosmos& cosm, const spell_id& t) {
-	(void)cosm;
-	return t.is_set();
-}
-
 template <class E>
 std::optional<money_type> find_price_of(const cosmos& cosm, const E& object) {
 	if constexpr(std::is_same_v<E, item_flavour_id>) {
@@ -97,38 +72,6 @@ inline auto get_buy_slot_opts() {
 		candidate_holster_type::HANDS,
 		candidate_holster_type::CONTAINERS
 	};
-}
-
-inline const inventory_slot* find_slot_def_of(
-	const cosmos& cosm, 
-	const item_flavour_id& container_flavour_id, 
-	const slot_function f
-) {
-	return cosm.on_flavour(container_flavour_id, [&](const auto& typed_flavour) -> const inventory_slot* {
-		if (const auto c = typed_flavour.template find<invariants::container>()) {
-			if (const auto slot_def = mapped_or_nullptr(c->slots, f)) {
-				return slot_def;
-			}
-		}
-
-		return nullptr;
-	});
-}
-
-inline item_flavour_id get_allowed_flavour_of(
-	const cosmos& cosm, 
-	const item_flavour_id& container_flavour_id, 
-	const slot_function f
-) {
-	if (const auto def = find_slot_def_of(cosm, container_flavour_id, f)) {
-		return def->only_allow_flavour;
-	}
-
-	return item_flavour_id();
-}
-
-inline item_flavour_id get_allowed_flavour_of_deposit(const cosmos& cosm, const item_flavour_id& mag_id) {
-	return get_allowed_flavour_of(cosm, mag_id, slot_function::ITEM_DEPOSIT);
 }
 
 inline bool is_magazine_like(const cosmos& cosm, const item_flavour_id& id) {

@@ -21,6 +21,7 @@
 #include "view/mode_gui/arena/arena_context_tip.h"
 
 #include "augs/math/simple_calculations.h"
+#include "game/detail/flavour_presentation.h"
 
 const bool show_death_summary_for_teammates = false;
 

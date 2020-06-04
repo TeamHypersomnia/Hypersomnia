@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Flip secondary hand item
+
 - this with_each_attachment_recursive sucks really bad
 	- it doesn't even show the attachments on hotbar properly
 
