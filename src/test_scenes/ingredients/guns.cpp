@@ -3667,7 +3667,7 @@ namespace test_flavours {
 			only_allow_mag(meta, test_container_items::ZAMIEC_MAGAZINE);
 			item.flip_when_reloading = true;
 			item.draw_mag_over_when_reloading = false;
-			//meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 
 			auto& mag = meta.template get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE];
 			mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);

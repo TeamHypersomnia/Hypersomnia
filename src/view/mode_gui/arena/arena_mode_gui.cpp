@@ -727,25 +727,31 @@ void arena_gui_state::draw_mode_gui(
 				const auto lhs_bbox = get_text_bbox(lhs_text);
 				const auto rhs_bbox = get_text_bbox(rhs_text);
 
-				const auto bg_alpha = 0.9f;
-
 				struct colors {
 					rgba background;
 					rgba border;
 				} cols = [&]() -> colors {
 					if (local_player_id == ko.victim.id) {
-						return { rgba(150, 0, 0, 170), rgba::zero };
+						return { rgba(120, 0, 0, 170), black };
 					}
 
 					if (local_player_id == ko.knockouter.id || local_player_id == ko.assist.id) {
-						return { black, rgba(180, 0, 0, 255) };
+						auto bg = get_col(ko.knockouter);
+						bg.multiply_rgb(15.0 / 255);
+						bg.mult_alpha(0.9f);
+
+						return { bg, get_col(ko.knockouter) };
 					}
 					
-					return { { 0, 0, 0, 80 }, rgba::zero };
-				}();
+					auto col = get_col(ko.knockouter);
+					col.a = 80;
 
-				cols.background.mult_alpha(bg_alpha);
-				cols.border.mult_alpha(bg_alpha);
+					auto bg = col;
+					bg.multiply_rgb(80.0 / 255);
+					bg.a = 80;
+
+					return { bg, col };
+				}();
 
 				const auto layout = make_tool_layout(
 					death_fallback_icon,
