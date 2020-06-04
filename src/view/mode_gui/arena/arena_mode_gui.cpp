@@ -52,6 +52,73 @@ void draw_weapon_flavour_with_attachments(
 	);
 }
 
+struct tool_layout_meta {
+	ltrb aabb;
+	std::function<void(ltrb)> draw;
+
+	auto get_size() const {
+		return aabb.get_size();
+	}
+};
+
+tool_layout_meta make_tool_layout(
+	const assets::image_id death_fallback_icon,
+	augs::vertex_triangle_buffer& output_buffer,
+	const damage_origin& origin,
+	const cosmos& cosm,
+	const images_in_atlas_map& images_in_atlas
+) {
+	return origin.on_tool_used(cosm, [&](const auto& tool) -> tool_layout_meta {
+		auto from_image = [&](const auto image_id) {
+			const auto& entry = images_in_atlas.at(image_id).diffuse;
+
+			auto meta = tool_layout_meta();
+
+			meta.aabb = ltrb(vec2::zero, entry.get_original_size());
+			meta.draw = [&](const ltrb target_aabb) {
+				augs::drawer{ output_buffer }.aabb(
+					entry,
+					target_aabb,
+					white
+				);
+			};
+
+			return meta;
+		};
+
+		if constexpr(is_nullopt_v<decltype(tool)>) {
+			return from_image(death_fallback_icon);
+		}
+		else if constexpr(is_spell_v<decltype(tool)>) {
+			return from_image(tool.appearance.icon);
+		}
+		else if constexpr(std::is_convertible_v<remove_cref<decltype(tool)>, item_flavour_id>) {
+			auto meta = tool_layout_meta();
+
+			const auto total_aabb = aabb_of_game_image_with_attachments(images_in_atlas, cosm, tool);
+
+			meta.aabb = total_aabb;
+			meta.draw = [&, tool, total_aabb](const auto& target_aabb) {
+				const auto lt_pos = target_aabb.left_top();
+
+				::draw_weapon_flavour_with_attachments(
+					output_buffer,
+					total_aabb, 
+					lt_pos,
+					images_in_atlas,
+					cosm,
+					tool
+				);
+			};
+
+			return meta;
+		}
+		else {
+			return from_image(death_fallback_icon);
+		}
+	});
+}
+
 const bool show_death_summary_for_teammates = false;
 
 const auto default_popul = augs::populate_with_delays_impl(
@@ -422,30 +489,21 @@ void arena_gui_state::draw_mode_gui(
 
 			const auto free_w_for_tool = total_text_size.x - killer_nickname_text_size.x;
 
-			const auto tool_image_id = killer_origin.on_tool_used(cosm, [&](const auto& tool) -> assets::image_id {
-				if constexpr(is_nullopt_v<decltype(tool)>) {
-					return death_fallback_icon;
-				}
-				else if constexpr(is_spell_v<decltype(tool)>) {
-					return tool.appearance.icon;
-				}
-				else {
-					return get_flavour_image(cosm, tool);
-				}
-			});
+			const auto layout = make_tool_layout(
+				death_fallback_icon,
+				get_drawer().output_buffer,
+				killer_origin,
+				cosm,
+				in.images_in_atlas
+			);
 
-			const auto& tool_image_entry = in.images_in_atlas.at(tool_image_id).diffuse;
-
-			const bool tool_image_drawn = tool_image_entry.exists();
-			const auto tool_image_size = static_cast<vec2i>(tool_image_entry.get_original_size());
+			const auto tool_image_size = static_cast<vec2i>(layout.get_size());
 
 			const auto w_for_tool_image = [&]() {
-				if (tool_image_drawn) {
-					const auto requested_w = tool_image_size.x;
+				const auto requested_w = tool_image_size.x;
 
-					if (requested_w > free_w_for_tool) {
-						return requested_w - free_w_for_tool;
-					}
+				if (requested_w > free_w_for_tool) {
+					return requested_w - free_w_for_tool;
 				}
 
 				return 0;
@@ -499,20 +557,18 @@ void arena_gui_state::draw_mode_gui(
 				total_text
 			);
 
-			if (tool_image_drawn) {
-				const auto tool_image_padding = window_padding;
-				const auto tool_window_size = tool_image_size + tool_image_padding * 2;
-				const auto tool_window_orig = ltrbi(window_bg_rect.right_top() + vec2i(-tool_window_size.x, 0), tool_window_size);
+			const auto tool_image_padding = window_padding;
+			const auto tool_window_size = tool_image_size + tool_image_padding * 2;
+			const auto tool_window_orig = ltrbi(window_bg_rect.right_top() + vec2i(-tool_window_size.x, 0), tool_window_size);
 
-				// TODO give it its own settings struct
-				{
-					//const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
-					//general_drawer.aabb_with_border(tool_window_orig, cfg.background_color, cfg.border_color);
-				}
-
-				const auto tool_image_orig = ltrbi(tool_window_orig.left_top() + tool_image_padding, tool_image_size);
-				general_drawer.base::aabb(tool_image_entry, tool_image_orig, white);
+			// TODO give it its own settings struct
+			{
+				//const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
+				//general_drawer.aabb_with_border(tool_window_orig, cfg.background_color, cfg.border_color);
 			}
+
+			const auto tool_image_orig = ltrbi(tool_window_orig.left_top() + tool_image_padding, tool_image_size);
+			layout.draw(tool_image_orig);
 
 			if (avatar_triangles.size() > 0) {
 				in.renderer.call_and_clear_triangles();
@@ -684,64 +740,13 @@ void arena_gui_state::draw_mode_gui(
 				cols.background.mult_alpha(bg_alpha);
 				cols.border.mult_alpha(bg_alpha);
 
-				struct tool_layout_meta {
-					ltrb aabb;
-					std::function<void(ltrb)> draw;
-
-					auto get_size() const {
-						return aabb.get_size();
-					}
-				};
-
-				const auto layout = ko.origin.on_tool_used(cosm, [&](const auto& tool) -> tool_layout_meta {
-					auto from_image = [&](const auto image_id) {
-						const auto& entry = in.images_in_atlas.at(image_id).diffuse;
-
-						auto meta = tool_layout_meta();
-
-						meta.aabb = ltrb(vec2::zero, entry.get_original_size());
-						meta.draw = [&](const ltrb target_aabb) {
-							get_drawer().base::aabb(
-								entry,
-								target_aabb,
-								white
-							);
-						};
-
-						return meta;
-					};
-
-					if constexpr(is_nullopt_v<decltype(tool)>) {
-						return from_image(death_fallback_icon);
-					}
-					else if constexpr(is_spell_v<decltype(tool)>) {
-						return from_image(tool.appearance.icon);
-					}
-					else if constexpr(std::is_convertible_v<remove_cref<decltype(tool)>, item_flavour_id>) {
-						auto meta = tool_layout_meta();
-
-						const auto total_aabb = aabb_of_game_image_with_attachments(in.images_in_atlas, cosm, tool);
-
-						meta.aabb = total_aabb;
-						meta.draw = [&, tool, total_aabb](const auto& target_aabb) {
-							const auto lt_pos = target_aabb.left_top();
-
-							::draw_weapon_flavour_with_attachments(
-								get_drawer().output_buffer,
-								total_aabb, 
-								lt_pos,
-								in.images_in_atlas,
-								cosm,
-								tool
-							);
-						};
-
-						return meta;
-					}
-					else {
-						return from_image(death_fallback_icon);
-					}
-				});
+				const auto layout = make_tool_layout(
+					death_fallback_icon,
+					get_drawer().output_buffer,
+					ko.origin,
+					cosm,
+					in.images_in_atlas
+				);
 
 				const auto tool_size = [&]() {
 					const auto original_tool_size = static_cast<vec2i>(layout.get_size());
