@@ -737,10 +737,13 @@ void arena_gui_state::draw_mode_gui(
 
 					if (local_player_id == ko.knockouter.id || local_player_id == ko.assist.id) {
 						auto bg = get_col(ko.knockouter);
-						bg.multiply_rgb(15.0 / 255);
+						bg.multiply_rgb(30.0 / 255);
 						bg.mult_alpha(0.9f);
 
-						return { bg, get_col(ko.knockouter) };
+						auto border = get_col(ko.knockouter) ;
+						border.mult_alpha(0.8f);
+
+						return { bg, border };
 					}
 					
 					auto col = get_col(ko.knockouter);
