@@ -6,6 +6,37 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Use ESC to close the rcon please
+
+- update maps
+- Separate inventory category: Armors
+	- In place of current tools
+	- Tools with a separate binding or perhaps even with none
+
+- We should just show a complete inventory screen on pressing Tilde
+	- Escape then goes back to the game
+
+- In akimbo, when ammo depletes for the secondary weapon, move it to the primary hand instead of leaving it in the secondary
+	- Though remember to reset the recoil penalty
+
+- New inventory system
+	- Picking up a weapon should also pick up mags in close vicinity
+		- Hover too
+	- We can't cycle through same weapon types by repeatedly pressing same button
+		- it's because we want to allow akimbo
+		- Would make sense with nades though
+		- But we have enough numbers to just assign nade types separately
+
+- The fact that we don't want to allow to holster a heavy weapon without a backpack is making it incredibly complicated
+	- We might let it switch for both of the weapons
+	- or for primary
+
+- Without backpack:
+	- Can always have a maximum of two weapons
+	- Scenario: heavy gun picked
+		- Q just drops it
+
+
 - Flip secondary hand item
 
 - this with_each_attachment_recursive sucks really bad

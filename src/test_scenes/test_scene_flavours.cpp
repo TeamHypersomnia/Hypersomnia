@@ -323,8 +323,8 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_sprite(
-				test_tool_items::ELECTRIC_SHIELD_ARMOR,
-				test_scene_image_id::ELECTRIC_SHIELD_ARMOR,
+				test_tool_items::ELECTRIC_ARMOR,
+				test_scene_image_id::ELECTRIC_ARMOR,
 				render_layer::SMALL_DYNAMIC_BODY
 			);
 

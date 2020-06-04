@@ -1,5 +1,5 @@
-Hypersomnia version 1.0.7282
-Revision no.: 7282 (dirty)
-Build date: Mon May 4 23:47:55 2020
+Hypersomnia version 1.0.7377
+Revision no.: 7377 (dirty)
+Build date: Thu May 21 23:04:06 2020
 Commit message:
-Remove old round dumping code
+Clean unused render layers
