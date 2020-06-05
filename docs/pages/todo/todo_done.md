@@ -4362,3 +4362,13 @@ Advantages:
 - Enable VSync by default on mac or just don't set the interval?
 - Right now "USE_GLFW" is synonymous with building on Mac. Perhaps a better naming is in order?
 
+- update maps
+- Separate inventory category: Armors
+	- In place of current tools
+	- Tools with a separate binding or perhaps even with none
+
+
+- this with_each_attachment_recursive sucks really bad
+	- it doesn't even show the attachments on hotbar properly
+
+- Holster should always try to hide both

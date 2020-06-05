@@ -6,12 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Use ESC to close the rcon please
+- Update server
 
-- update maps
-- Separate inventory category: Armors
-	- In place of current tools
-	- Tools with a separate binding or perhaps even with none
+- Use ESC to close the rcon please
 
 - We should just show a complete inventory screen on pressing Tilde
 	- Escape then goes back to the game
@@ -36,17 +33,12 @@ summary: That which we are brainstorming at the moment.
 	- Scenario: heavy gun picked
 		- Q just drops it
 
-
 - Flip secondary hand item
-
-- this with_each_attachment_recursive sucks really bad
-	- it doesn't even show the attachments on hotbar properly
 
 - Vote pause the game
 - Simple commands for chat
 	- time
 
-- Holster should always try to hide both
 - Release notes
 	- release_notes.txt holding last 100 commits
 	- Updated on each upload
