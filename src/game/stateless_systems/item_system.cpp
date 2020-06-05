@@ -268,7 +268,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 						return 0u;
 					}();
 
-					if (count_charges_in_deposit(old_mag) <= static_cast<int>(keep_mags_above_charges)) {
+					if (count_charges_in_deposit(old_mag) < static_cast<int>(keep_mags_above_charges)) {
 						drop_mag_to_ground(old_mag);
 					}
 				};
