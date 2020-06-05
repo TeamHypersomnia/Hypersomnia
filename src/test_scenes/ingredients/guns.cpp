@@ -3181,7 +3181,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK_MAGAZINE, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::COVERT_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::container container; 
@@ -4234,8 +4234,8 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.5f);
-			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false, "0.1");
+			set_density_mult(meta, 1.6f);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 1000;
 			set_chambering_duration_ms(meta, 200.f);
@@ -4599,7 +4599,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.85f);
-			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1300.f, 0.f, false, "0.01");
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1400.f, 0.f, false, "0.01");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 			set_chambering_duration_ms(meta, 450.f);
@@ -4632,7 +4632,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
-			gun_def.damage_multiplier = 3.4f;
+			gun_def.damage_multiplier = 3.5f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 3;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.low_ammo_cue_sound.modifier.reference_distance = 300.f;
@@ -4645,14 +4645,14 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.092f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
-			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BULWARK_SHOT);
+			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::COVERT_SHOT);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HEAVY_PISTOL_CHAMBERING);
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::COVERT, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1400.f, 0.f, false, "0.01");

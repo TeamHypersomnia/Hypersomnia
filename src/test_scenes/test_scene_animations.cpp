@@ -224,6 +224,23 @@ void load_test_scene_animations(
 
 		{
 			auto& anim = make_plain(
+				test_id_type::COVERT_SHOT,
+				test_scene_image_id::COVERT_SHOT_1,
+				20.0f
+			);
+
+			anim.frames[0].duration_milliseconds = 10.f;
+			//anim.frames[1].duration_milliseconds = 20.f;
+			//anim.frames[2].duration_milliseconds = 20.f;
+			//anim.frames[3].duration_milliseconds = 20.f;
+
+			ping_pong_range(anim.frames);
+
+			make_shoot_durations(anim.frames, 1.f);
+		} 
+
+		{
+			auto& anim = make_plain(
 				test_id_type::BLUNAZ_SHOT,
 				test_scene_image_id::BLUNAZ_SHOT_1,
 				1500.f / 6
