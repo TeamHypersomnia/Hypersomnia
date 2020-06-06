@@ -4372,3 +4372,8 @@ Advantages:
 	- it doesn't even show the attachments on hotbar properly
 
 - Holster should always try to hide both
+
+- In akimbo, when ammo depletes for the secondary weapon, move it to the primary hand instead of leaving it in the secondary
+	- actually works this way
+	- Though remember to reset the recoil penalty
+

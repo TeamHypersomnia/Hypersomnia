@@ -13,9 +13,6 @@ summary: That which we are brainstorming at the moment.
 - We should just show a complete inventory screen on pressing Tilde
 	- Escape then goes back to the game
 
-- In akimbo, when ammo depletes for the secondary weapon, move it to the primary hand instead of leaving it in the secondary
-	- Though remember to reset the recoil penalty
-
 - New inventory system
 	- Picking up a weapon should also pick up mags in close vicinity
 		- Hover too

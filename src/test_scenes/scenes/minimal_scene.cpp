@@ -68,7 +68,7 @@ namespace test_scenes {
 			r.weapon = to_entity_flavour_id(w);
 
 			if constexpr(std::is_same_v<const transformr&, decltype(character)>) {
-				r.num_given_ammo_pieces = 8;
+				r.num_given_ammo_pieces = 2;
 			}
 			else {
 				r.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
@@ -128,7 +128,7 @@ namespace test_scenes {
 
 		cosmic::reinfer_all_entities(world);
 
-		give_weapon(transformr(), test_shootable_weapons::ELON_HRL);
+		give_weapon(transformr(), test_shootable_weapons::CYBERSPRAY);
 
 		//give_weapon(transformr(), test_shootable_weapons::BILMER2000);
 
