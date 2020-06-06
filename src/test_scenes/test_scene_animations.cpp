@@ -230,9 +230,9 @@ void load_test_scene_animations(
 			);
 
 			anim.frames[0].duration_milliseconds = 10.f;
-			//anim.frames[1].duration_milliseconds = 20.f;
-			//anim.frames[2].duration_milliseconds = 20.f;
-			//anim.frames[3].duration_milliseconds = 20.f;
+			anim.frames[1].duration_milliseconds = 20.f;
+			anim.frames[2].duration_milliseconds = 20.f;
+			anim.frames[3].duration_milliseconds = 20.f;
 
 			ping_pong_range(anim.frames);
 
