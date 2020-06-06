@@ -353,16 +353,6 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		constructed_fixtures.emplace_back(new_fix);
 	};
 
-	if (const auto* const shape_polygon = handle.template find<invariants::shape_polygon>()) {
-		from_convex_partition(shape_polygon->shape);
-		return;
-	}
-
-	if (const auto shape_circle = handle.template find<invariants::shape_circle>()) {
-		from_circle_shape(shape_circle->get_radius());
-		return;
-	}
-
 	if (is_like_thrown_explosive(handle)) {
 		if (const auto fuse = handle.template find<invariants::hand_fuse>()) {
 			from_circle_shape(fuse->circle_shape_radius_when_released);
@@ -385,7 +375,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			from_convex_partition(shape);
 		}
 		else {
-			const auto stance_rotation = [&]() {
+			const auto additional_rotation = [&]() {
 				const auto& typed_self = handle;
 
 				if (const auto torso = typed_self.template find<invariants::torso>()) {
@@ -402,7 +392,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 								considered_offsets.flip_vertically();
 							}
 
-							return considered_offsets.back.rotation;
+							const auto stance_rotation = considered_offsets.back.rotation;
+							return stance_rotation;
 						}
 					}
 				}
@@ -428,7 +419,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			verts[3].set(-hx,  hy);
 
 			const auto off_meters = si.get_meters(connection.shape_offset.pos);
-			const auto total_rotation = stance_rotation + connection.shape_offset.rotation;
+			const auto total_rotation = additional_rotation + connection.shape_offset.rotation;
 
 			for (auto& v : verts) {
 				v.rotate(total_rotation);
