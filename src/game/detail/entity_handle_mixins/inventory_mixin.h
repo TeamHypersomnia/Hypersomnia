@@ -79,7 +79,6 @@ public:
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
 
 	colliders_connection calc_connection_to_topmost_container() const;
-	colliders_connection calc_connection_until_container(const entity_id until) const;
 
 	template <class F>
 	void for_each_candidate_slot(
