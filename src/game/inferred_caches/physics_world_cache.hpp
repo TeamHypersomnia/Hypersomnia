@@ -292,7 +292,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 	auto flips = handle.calc_flip_flags();
 
-	if (connection.flip_vertically) {
+	if (connection.flip_geometry) {
 		flips->vertically = !flips->vertically;
 	}
 

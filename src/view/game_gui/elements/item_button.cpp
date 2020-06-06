@@ -269,7 +269,7 @@ void item_button::draw_proc(
 						const auto attachment_entity,
 						const auto attachment_offset
 					) {
-						drawer(attachment_entity, viewing_transform * attachment_offset);
+						drawer(attachment_entity, viewing_transform * attachment_offset.offset);
 					},
 					attachment_offset_settings::for_logic()
 				);

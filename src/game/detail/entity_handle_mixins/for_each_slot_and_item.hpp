@@ -155,7 +155,7 @@ template <class A>
 void inventory_mixin<E>::with_each_attachment_recursive(
 	A attachment_callback,
 	const attachment_offset_settings& settings,
-	const transformr initial_offset
+	const attachment_offset initial_offset
 ) const {
 	const auto item_with_attachments = *static_cast<const E*>(this);
 
@@ -250,7 +250,7 @@ ltrb inventory_mixin<E>::calc_aabb_with_attachments() const {
 			const auto attachment_entity,
 			const auto attachment_offset
 		) {
-			result.contain(attachment_entity.get_aabb(attachment_offset));
+			result.contain(attachment_entity.get_aabb(attachment_offset.offset));
 		},
 		attachment_offset_settings::for_logic()
 	);

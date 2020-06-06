@@ -22,7 +22,28 @@ return {
         x = 0,
         y = 0
       },
+      chamber = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      rail = {
         pos = {
           x = 0,
           y = 0
@@ -116,14 +137,14 @@ return {
       primary_hand = {
         pos = {
           x = 29,
-          y = 31
+          y = 32
         },
         rotation = 0
       },
       secondary_hand = {
         pos = {
           x = 40,
-          y = -32
+          y = -31
         },
         rotation = 0
       },

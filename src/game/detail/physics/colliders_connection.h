@@ -7,7 +7,7 @@ struct colliders_connection {
 	// GEN INTROSPECTOR struct colliders_connection
 	entity_id owner;
 	transformr shape_offset;
-	bool flip_vertically = false;
+	bool flip_geometry = false;
 	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 

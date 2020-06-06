@@ -1,6 +1,8 @@
 #pragma once
 #include "game/components/gun_component.h"
 #include "game/components/sprite_component.h"
+#include "game/inferred_caches/find_physics_cache.h"
+#include "game/detail/gun/is_geometry_flipped.h"
 
 template <class T>
 vec2i get_bullet_spawn_offset(const T& gun_handle) {
@@ -10,7 +12,13 @@ vec2i get_bullet_spawn_offset(const T& gun_handle) {
 		const auto reference_id = sprite->image_id;
 		const auto& offsets = cosm.get_logical_assets().get_offsets(reference_id);
 
-		return offsets.gun.bullet_spawn;
+		auto offset = offsets.gun.bullet_spawn;
+
+		if (::is_geometry_flipped(gun_handle)) {
+			offset.y = -offset.y;
+		}
+
+		return offset;
 	}
 
 	return {};

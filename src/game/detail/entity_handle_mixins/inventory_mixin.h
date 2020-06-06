@@ -14,6 +14,7 @@
 #include "game/organization/special_flavour_id_types.h"
 #include "game/detail/inventory/wielding_setup.h"
 #include "game/enums/weapon_action_type.h"
+#include "game/detail/inventory/attachment_offset.h"
 
 struct attachment_offset_settings;
 struct colliders_connection;
@@ -52,7 +53,7 @@ using candidate_holster_types = augs::constant_size_vector<candidate_holster_typ
 
 template <class derived_handle_type>
 class inventory_mixin {
-	using offset_vector = std::vector<transformr>;
+	using offset_vector = std::vector<attachment_offset>;
 
 public:
 	static constexpr bool is_const = is_handle_const_v<derived_handle_type>;
@@ -135,7 +136,7 @@ public:
 	void with_each_attachment_recursive(
 		A attachment_callback,
 		const attachment_offset_settings& settings,
-		transformr initial_offset = transformr()
+		attachment_offset initial_offset = attachment_offset()
 	) const;
 
 	template <class A, class B, class G>

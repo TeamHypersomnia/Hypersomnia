@@ -248,7 +248,7 @@ FORCE_INLINE void specific_entity_drawer(
 					attachment_entity,
 					in,
 					render_visitor,
-					viewing_transform * attachment_offset
+					viewing_transform * attachment_offset.offset
 				);
 			};
 
@@ -345,11 +345,6 @@ FORCE_INLINE void specific_entity_drawer(
 
 				const auto reloading_movement = ::calc_reloading_movement(typed_handle.get_cosmos(), wielded_items);
 				const bool currently_reloading = reloading_movement != std::nullopt;
-				const bool flip_for_reloading = 
-					currently_reloading
-					? cosm[reloading_movement->weapon].template get<invariants::item>().flip_when_reloading
-					: false
-				;
 
 				auto should_draw_over_torso = [&](const auto attachment_entity) {
 					const auto slot = attachment_entity.get_current_slot();
@@ -388,46 +383,12 @@ FORCE_INLINE void specific_entity_drawer(
 					) {
 						attachment_entity.template dispatch_on_having_all<invariants::item>(
 							[&](const auto typed_attachment_handle) {
-								bool additional_flip = false;
-
-								const bool flip_due_to_reload = [&]() {
-									if (!currently_reloading) {
-										return false;
-									}
-
-									const auto type = typed_attachment_handle.get_current_slot().get_type();
-
-									/* 
-										We can infer from the slot type itself
-										if we come from a parent that is being reloaded now.
-
-										No need to iterate upwards.
-									*/
-
-									const bool is_descendant_of_reloaded_object = 
-										type == slot_function::PRIMARY_HAND 
-										|| type == slot_function::SECONDARY_HAND
-										|| type == slot_function::GUN_DETACHABLE_MAGAZINE
-										|| type == slot_function::GUN_MUZZLE
-									;
-
-									if (is_descendant_of_reloaded_object) {
-										return flip_for_reloading;
-									}
-
-									return false;
-								}();
-
-								if (flip_due_to_reload) {
-									additional_flip = !additional_flip;
-								}
-
 								detail_specific_entity_drawer(
 									typed_attachment_handle,
 									in,
 									render_visitor,
-									viewing_transform * attachment_offset,
-									additional_flip
+									viewing_transform * attachment_offset.offset,
+									attachment_offset.flip_geometry
 								);
 							}
 						);

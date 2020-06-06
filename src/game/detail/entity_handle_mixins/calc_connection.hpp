@@ -5,7 +5,7 @@
 
 template <class A, class Csm, class E, class C>
 void detail_save_and_forward(
-	colliders_connection& result, 
+	entity_id& topmost_owner, 
 	const A& slot,
 	const Csm& cosm, 
 	E& current_attachment,
@@ -15,17 +15,18 @@ void detail_save_and_forward(
 	const auto item_entity = cosm[current_attachment];
 	const auto container_entity = slot.get_container();
 
-	offsets.push_back(
-		direct_attachment_offset(
+	{
+		const auto next_offset = direct_attachment_offset(
 			container_entity, 
 			item_entity, 
 			attachment_offset_settings::for_logic(), 
 			it.type
-		)
-	);
+		);
 
-	result.owner = container_entity;
+		offsets.push_back(next_offset);
+	}
 
+	topmost_owner = container_entity;
 	current_attachment = container_entity.get_id();
 	it = container_entity.get_current_slot();
 }
@@ -40,7 +41,7 @@ colliders_connection inventory_mixin<E>::calc_connection_to_topmost_container() 
 
 	const auto& cosm = self.get_cosmos();
 
-	auto result = colliders_connection::none();
+	entity_id topmost_owner;
 
 	auto it = self.get_current_slot().get_id();
 	entity_id current_attachment = self.get_id();
@@ -61,13 +62,20 @@ colliders_connection inventory_mixin<E>::calc_connection_to_topmost_container() 
 			behaviour must be slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY.
 		*/
 
-		detail_save_and_forward(result, slot, cosm, current_attachment, offsets, it);
+		detail_save_and_forward(topmost_owner, slot, cosm, current_attachment, offsets, it);
 	}
 
-	for (const auto& o : reverse(offsets)) {
-		result.shape_offset = result.shape_offset * o;
+	auto result_offset = attachment_offset();
+
+	for (auto o : reverse(offsets)) {
+		result_offset = result_offset * o;
 	}
 	
+	auto result = colliders_connection::none();
+	result.owner = topmost_owner;
+	result.shape_offset = result_offset.offset;
+	result.flip_geometry = result_offset.flip_geometry;
+
 	return result;
 }
 
