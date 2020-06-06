@@ -134,7 +134,7 @@ return {
       },
       primary_hand = {
         pos = {
-          x = 34,
+          x = 33,
           y = 32
         },
         rotation = 0
@@ -142,7 +142,7 @@ return {
       secondary_hand = {
         pos = {
           x = 36,
-          y = -31
+          y = -32
         },
         rotation = 0
       },
