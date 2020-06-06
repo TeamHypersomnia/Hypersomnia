@@ -26,7 +26,7 @@ public:
 	}
 
 	const colliders_connection* find_colliders_connection() const;
-	std::optional<colliders_connection> calc_colliders_connection() const;
+	colliders_connection calc_colliders_connection() const;
 
 	/* Shortcut for getting only the entity handle without shape offset */
 	generic_handle_type get_owner_of_colliders() const;

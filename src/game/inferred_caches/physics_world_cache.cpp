@@ -152,12 +152,8 @@ void physics_world_cache::infer_joint(const entity_handle&) {
 
 void physics_world_cache::infer_colliders_from_scratch(const entity_handle& handle) {
 	handle.dispatch_on_having_all<invariants::fixtures>([this](const auto& typed_handle) {
-		if (const auto connection = typed_handle.calc_colliders_connection()) {
-			specific_infer_colliders_from_scratch(typed_handle, *connection);
-		}
-		else {
-			specific_infer_colliders_from_scratch(typed_handle, colliders_connection());
-		}
+		const auto connection = typed_handle.calc_colliders_connection();
+		specific_infer_colliders_from_scratch(typed_handle, connection);
 	});
 }
 
@@ -167,12 +163,8 @@ void physics_world_cache::infer_all(cosmos& cosm) {
 	});
 
 	cosm.for_each_having<invariants::fixtures>([this](const auto& typed_handle) {
-		if (const auto connection = typed_handle.calc_colliders_connection()) {
-			specific_infer_colliders_from_scratch(typed_handle, *connection);
-		}
-		else {
-			specific_infer_colliders_from_scratch(typed_handle, colliders_connection());
-		}
+		const auto connection = typed_handle.calc_colliders_connection();
+		specific_infer_colliders_from_scratch(typed_handle, connection);
 	});
 }
 

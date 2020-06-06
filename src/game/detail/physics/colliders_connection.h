@@ -8,6 +8,10 @@ struct colliders_connection {
 	transformr shape_offset;
 	// END GEN INTROSPECTOR
 
+	static auto none() {
+		return colliders_connection();
+	}
+
 	bool operator==(const colliders_connection& b) const {
 		return owner == b.owner && shape_offset == b.shape_offset;
 	}

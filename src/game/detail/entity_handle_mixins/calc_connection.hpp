@@ -31,7 +31,7 @@ void detail_save_and_forward(
 }
 
 template <class E>
-std::optional<colliders_connection> inventory_mixin<E>::calc_connection_to_topmost_container() const {
+colliders_connection inventory_mixin<E>::calc_connection_to_topmost_container() const {
 	thread_local offset_vector offsets;
 	offsets.clear();
 
@@ -40,7 +40,7 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_to_topmo
 
 	const auto& cosm = self.get_cosmos();
 
-	colliders_connection result;
+	auto result = colliders_connection::none();
 
 	auto it = self.get_current_slot().get_id();
 	entity_id current_attachment = self.get_id();
@@ -53,7 +53,7 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_to_topmo
 				that the fixtures for this item should be deactivated now.
 			*/
 
-			return std::nullopt;
+			return colliders_connection::none();
 		}
 
 		/* 
@@ -72,7 +72,7 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_to_topmo
 }
 
 template <class E>
-std::optional<colliders_connection> inventory_mixin<E>::calc_connection_until_container(const entity_id until) const {
+colliders_connection inventory_mixin<E>::calc_connection_until_container(const entity_id until) const {
 	thread_local offset_vector offsets;
 	offsets.clear();
 
@@ -87,7 +87,7 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_until_co
 		return colliders_connection { self, {} };
 	}
 
-	colliders_connection result;
+	auto result = colliders_connection::none();
 
 	auto it = self.get_current_slot().get_id();
 	entity_id current_attachment = self.get_id();
@@ -97,12 +97,12 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_until_co
 
 		if (slot.dead()) {
 			/* Failed: found a dead slot before could reach "until" */
-			return std::nullopt;
+			return colliders_connection::none();
 		}
 
 		if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
 			/* Failed: "until" not found before meeting an item deposit. */
-			return std::nullopt;
+			return colliders_connection::none();
 		}
 
 		/* 
@@ -121,13 +121,13 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_until_co
 }
 
 template <class E>
-std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection() const {
+colliders_connection physics_mixin<E>::calc_colliders_connection() const {
 	const auto self = *static_cast<const E*>(this);
 	const auto& cosm = self.get_cosmos();
 	
-	std::optional<colliders_connection> result;
+	auto result = colliders_connection::none();
 
-	self.template dispatch_on_having_all<invariants::fixtures>([&cosm, &result](const auto typed_self) {
+	self.template dispatch_on_having_all<invariants::fixtures>([&](const auto typed_self) {
 		if (const auto overridden = typed_self.template find<components::specific_colliders_connection>()) {
 			result = overridden->connection;
 			return;
@@ -135,23 +135,7 @@ std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection(
 
 		if (const auto item = typed_self.template find<components::item>()) {
 			if (const auto slot = cosm[item->get_current_slot()]) {
-				if (const auto topmost_container = typed_self.calc_connection_to_topmost_container()) {
-					if (auto topmost_container_connection = 
-						cosm[topmost_container->owner].calc_colliders_connection()
-					) {
-						const auto owner = topmost_container_connection->owner;
-	#if MORE_LOGS
-						LOG("%x (item) owned by %x", typed_self, cosm[owner]);
-	#endif
-						result = colliders_connection {
-							owner,
-							topmost_container->shape_offset * topmost_container_connection->shape_offset
-						};
-
-						return;
-					}
-				}
-
+				result = typed_self.calc_connection_to_topmost_container();
 				return;
 			}
 		}
@@ -160,7 +144,7 @@ std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection(
 	#if MORE_LOGS
 			LOG("%x (body) owned by itself", typed_self);
 	#endif
-			result = colliders_connection { typed_self, {} };
+			result = { typed_self, {} };
 			return;
 		}
 	});
