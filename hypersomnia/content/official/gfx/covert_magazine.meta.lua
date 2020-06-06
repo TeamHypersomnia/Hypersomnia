@@ -12,7 +12,7 @@ return {
         x = 80,
         y = 80
       },
-      standard_deviation = 7
+      standard_deviation = 9
     },
     generate_desaturation = false
   },

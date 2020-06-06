@@ -12,7 +12,7 @@ return {
         x = 80,
         y = 80
       },
-      standard_deviation = 7
+      standard_deviation = 9
     },
     generate_desaturation = false
   },
@@ -109,8 +109,54 @@ return {
       }
     },
     non_standard_shape = {
-      convex_partition = {},
-      original_poly = {}
+      convex_partition = {
+        6,
+        7,
+        0,
+        5,
+        6,
+        2,
+        3,
+        4,
+        5,
+        0,
+        1,
+        2
+      },
+      original_poly = {
+        {
+          x = -22,
+          y = -2
+        },
+        {
+          x = -24,
+          y = -3
+        },
+        {
+          x = -23,
+          y = -9
+        },
+        {
+          x = 24,
+          y = -9
+        },
+        {
+          x = 24,
+          y = -3
+        },
+        {
+          x = -14,
+          y = -2
+        },
+        {
+          x = -19,
+          y = 10
+        },
+        {
+          x = -25,
+          y = 10
+        }
+      }
     },
     torso = {
       back = {
