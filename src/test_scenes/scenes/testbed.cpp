@@ -42,12 +42,12 @@
 namespace test_scenes {
 	void testbed::setup(test_mode_ruleset& rs) {
 		rs.name = "Standard test ruleset";
-		rs.spawned_faction = faction_type::RESISTANCE;
+		rs.spawned_faction = faction_type::METROPOLIS;
 
 		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::COVERT);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		//rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
-		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::MINI_KNIFE);
+		rs.initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 #if 0
 		rs.initial_eq.over_back_wearable = to_entity_flavour_id(test_hand_explosives::BOMB);
 #endif
@@ -189,7 +189,7 @@ namespace test_scenes {
 		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
 		const auto flash_type = test_hand_explosives::FLASHBANG;
 
-		const auto sample_backpack = test_container_items::SAMPLE_BACKPACK;
+		const auto sample_backpack = test_container_items::METROPOLIS_BACKPACK;
 		const auto brown_backpack = test_container_items::RESISTANCE_BACKPACK;
 
 #if TODO_CARS
@@ -218,7 +218,7 @@ namespace test_scenes {
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::BOMB_DEFUSAL_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
+				create(test_point_markers::BOMB_DEFUSAL_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
 			}
 		}
 
@@ -231,7 +231,7 @@ namespace test_scenes {
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::BOMB_DEFUSAL_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
+				create(test_point_markers::BOMB_DEFUSAL_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
 			}
 		}
 
@@ -830,11 +830,11 @@ namespace test_scenes {
 		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
 
-		create(test_box_markers::BUY_AREA, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
-		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_box_markers::BUY_AREA, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
 
-		create(test_box_markers::CT_SPAWN, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
-		create(test_box_markers::T_SPAWN, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_box_markers::CT_SPAWN, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_box_markers::T_SPAWN, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
 
 		create(test_box_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));
 

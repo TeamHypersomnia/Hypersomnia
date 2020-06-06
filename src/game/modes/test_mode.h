@@ -31,7 +31,7 @@ struct test_mode_ruleset {
 
 	real32 respawn_after_ms = 3000;
 	requested_equipment initial_eq;
-	faction_type spawned_faction = faction_type::RESISTANCE;
+	faction_type spawned_faction = faction_type::METROPOLIS;
 	int spawned_chars = 1;
 	test_mode_view_rules view;
 	// END GEN INTROSPECTOR

@@ -17,7 +17,7 @@ namespace test_flavours {
 		auto& caches = in.caches;
 
 		{
-			auto& meta = get_test_flavour(flavours, test_container_items::SAMPLE_BACKPACK);
+			auto& meta = get_test_flavour(flavours, test_container_items::METROPOLIS_BACKPACK);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
