@@ -388,7 +388,9 @@ FORCE_INLINE void specific_entity_drawer(
 					) {
 						attachment_entity.template dispatch_on_having_all<invariants::item>(
 							[&](const auto typed_attachment_handle) {
-								const bool additional_flip = [&]() {
+								bool additional_flip = false;
+
+								const bool flip_due_to_reload = [&]() {
 									if (!currently_reloading) {
 										return false;
 									}
@@ -415,6 +417,10 @@ FORCE_INLINE void specific_entity_drawer(
 
 									return false;
 								}();
+
+								if (flip_due_to_reload) {
+									additional_flip = !additional_flip;
+								}
 
 								detail_specific_entity_drawer(
 									typed_attachment_handle,

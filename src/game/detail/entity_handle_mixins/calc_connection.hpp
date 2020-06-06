@@ -95,7 +95,7 @@ colliders_connection physics_mixin<E>::calc_colliders_connection() const {
 	#if MORE_LOGS
 			LOG("%x (body) owned by itself", typed_self);
 	#endif
-			result = { typed_self, {} };
+			result.owner = typed_self;
 			return;
 		}
 	});

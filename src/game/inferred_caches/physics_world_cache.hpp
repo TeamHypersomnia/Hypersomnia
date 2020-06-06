@@ -290,7 +290,12 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	auto& constructed_fixtures = cache.constructed_fixtures;
 	ensure(constructed_fixtures.empty());
 
-	const auto flips = handle.calc_flip_flags();
+	auto flips = handle.calc_flip_flags();
+
+	if (connection.flip_vertically) {
+		flips->vertically = !flips->vertically;
+	}
+
 	const bool flip_order = flips && flips->vertically != flips->horizontally;
 
 	auto from_convex_partition = [&](auto shape) {
