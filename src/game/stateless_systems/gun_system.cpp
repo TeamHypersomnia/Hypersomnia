@@ -45,6 +45,7 @@
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/calc_ammo_info.hpp"
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "game/detail/gun/gun_getters.h"
 
 #include "augs/log.h"
 
@@ -408,10 +409,26 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					}
 
 					{
-						/* Don't try to shoot if we're about to start reloading */
+						/* Don't try to shoot if we're about to re-wield from mid-akimbo chambering */
 
-						if (transfers.pending_reload_on_setup.is_set()) {
-							//return std::nullopt;
+						if (transfers.mid_akimbo_chambered_gun == gun_entity) {
+							const bool another_one_still_in_order = [&]() {
+								if (const auto other_to_check = cosm[transfers.wield_after_mid_akimbo_chambering.get_other_than(gun_entity)]) {
+									if (requires_two_hands_to_chamber(other_to_check)) {
+										if (!gun_shot_cooldown(other_to_check) && chambering_in_order(other_to_check)) {
+											return true;
+										}
+									}
+								}
+
+								return false;
+							}();
+
+							const bool the_other_complete = !another_one_still_in_order;
+
+							if (the_other_complete) {
+								return std::nullopt;
+							}
 						}
 					}
 

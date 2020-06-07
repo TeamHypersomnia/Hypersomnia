@@ -43,6 +43,12 @@ struct basic_wielding_setup  {
 	}
 
 	template <class E>
+	id_type get_other_than(const E& wielded_item) const;
+
+	template <class E>
+	void clear_hand_with(const E& wielded_item);
+
+	template <class E>
 	auto make_viable_setup(const E& character_entity) const;
 
 	template <class C>

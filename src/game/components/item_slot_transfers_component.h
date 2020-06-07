@@ -38,6 +38,9 @@ namespace components {
 
 		reloading_context current_reloading_context;
 		akimbo_reload_state akimbo;
+
+		entity_id mid_akimbo_chambered_gun;
+		signi_wielding_setup wield_after_mid_akimbo_chambering;
 		// END GEN INTROSPECTOR
 	};
 }

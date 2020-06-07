@@ -52,6 +52,30 @@ auto basic_wielding_setup<I>::make_viable_setup(const E& gui_entity) const {
 }
 
 template <class I>
+template <class E>
+I basic_wielding_setup<I>::get_other_than(const E& wielded_item) const {
+	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
+		const auto& other = hand_selections[i];
+
+		if (other != wielded_item) {
+			return other;
+		}
+	}
+
+	return {};
+}
+
+template <class I>
+template <class E>
+void basic_wielding_setup<I>::clear_hand_with(const E& wielded_item) {
+	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
+		if (hand_selections[i] == wielded_item) {
+			hand_selections[i] = {};
+		}
+	}
+}
+
+template <class I>
 template <class C>
 bool basic_wielding_setup<I>::is_akimbo(const C& cosm) const {
 	for (const auto& s : hand_selections) {

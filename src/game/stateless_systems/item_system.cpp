@@ -51,6 +51,8 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/inventory/calc_reloading_context.hpp"
 
+#include "game/detail/gun/gun_getters.h"
+
 enum class reload_advance_result {
 	DIFFERENT_VIABLE,
 	INTERRUPT,
@@ -103,29 +105,6 @@ void maybe_reload_akimbo(components::item_slot_transfers& transfers, const T& ca
 	else {
 		LOG("No context found to consider for akimbo extension");
 	}
-}
-
-template <class E>
-bool chambering_in_order(const E& gun_entity) {
-	if (const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER]) {
-		if (chamber_slot.is_empty_slot()) {
-			if (const auto mag_chamber = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE]) {
-				if (mag_chamber.has_items()) {
-					return true;
-				}
-			}
-
-			if (const auto mag_slot = gun_entity[slot_function::GUN_DETACHABLE_MAGAZINE]) {
-				if (const auto mag_inside = mag_slot.get_item_if_any()) {
-					if (0 != count_charges_in_deposit(mag_inside)) {
-						return true;
-					}
-				}
-			}
-		}
-	}
-
-	return false;
 }
 
 template <class E>
@@ -519,6 +498,101 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				transfers.pending_reload_on_setup = {};
 			}
 		}
+
+		[&]() {
+			if (is_context_alive()) {
+				/* 
+					Otherwise we won't have a chance of starting the reload mid-way because we're constantly chambering,
+					thus keeping the guns in action.
+				*/
+
+				return;
+			}
+
+			if (const auto mid_chambered_gun = cosm[transfers.mid_akimbo_chambered_gun]) {
+				const auto wielded_items = capability.get_wielded_items();
+				const bool continuity_kept = wielded_items.size() == 1 && wielded_items[0] == mid_chambered_gun;
+				const bool was_interrupted = !continuity_kept;
+
+				if (was_interrupted) {
+					transfers.mid_akimbo_chambered_gun = {};
+					return;
+				}
+
+				const bool mid_chambering_in_progress = chambering_in_order(mid_chambered_gun) || gun_shot_cooldown(mid_chambered_gun);
+
+				if (mid_chambering_in_progress) {
+					return;
+				}
+
+				const bool continue_with_another_one = [&]() {
+					if (const auto other_to_check = cosm[transfers.wield_after_mid_akimbo_chambering.get_other_than(mid_chambered_gun)]) {
+						if (requires_two_hands_to_chamber(other_to_check)) {
+							if (!gun_shot_cooldown(other_to_check) && chambering_in_order(other_to_check)) {
+								transfers.mid_akimbo_chambered_gun = other_to_check;
+
+								auto setup_for_chambering = wielding_setup::bare_hands();
+								setup_for_chambering.hand_selections[0] = other_to_check;
+
+								::perform_wielding(
+									step,
+									it,
+									setup_for_chambering
+								);
+
+								return true;
+							}
+						}
+					}
+
+					return false;
+				}();
+
+				const bool can_restore_already = !continue_with_another_one;
+
+				if (can_restore_already) {
+					::perform_wielding(
+						step,
+						it,
+						transfers.wield_after_mid_akimbo_chambering
+					);
+
+					transfers.mid_akimbo_chambered_gun = {};
+				}
+			}
+			else {
+				/* No current mid-chambering. Check if it is necessary on any of the dual-wielded weapons. */
+
+				const auto wielded_items = capability.get_wielded_items();
+
+				if (wielded_items.size() == 2) {
+					const auto& cosm = capability.get_cosmos();
+
+					for (auto& w : wielded_items) {
+						const auto gun = cosm[w];
+
+						if (requires_two_hands_to_chamber(gun)) {
+							if (!gun_shot_cooldown(gun) && chambering_in_order(gun)) {
+								const auto current_setup = wielding_setup::from_current(capability);
+								transfers.wield_after_mid_akimbo_chambering = current_setup;
+								transfers.mid_akimbo_chambered_gun = gun;
+
+								auto setup_for_chambering = current_setup;
+								setup_for_chambering.clear_hand_with(current_setup.get_other_than(gun));
+
+								::perform_wielding(
+									step,
+									it,
+									setup_for_chambering
+								);
+
+								break;
+							}
+						}
+					}
+				}
+			}
+		}();
 
 		for (int c = 0; c < 4; ++c) {
 			if (is_context_alive()) {
