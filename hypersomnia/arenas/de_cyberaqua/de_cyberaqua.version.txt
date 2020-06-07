@@ -1,5 +1,5 @@
-Hypersomnia version 1.0.7409
-Revision no.: 7409 (clean)
-Build date: Sat Jun 6 01:58:22 2020
+Hypersomnia version 1.0.7377
+Revision no.: 7377 (dirty)
+Build date: Thu May 21 23:04:06 2020
 Commit message:
-Prototypical graphics for Cove(...)
+Clean unused render layers
