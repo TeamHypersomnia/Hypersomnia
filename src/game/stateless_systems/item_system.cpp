@@ -72,6 +72,76 @@ void drop_mag_to_ground(const E& mag) {
 	}
 }
 
+template <class T>
+void maybe_reload_akimbo(components::item_slot_transfers& transfers, const T& capability) {
+	auto& ctx = transfers.current_reloading_context;
+	auto& akimbo = transfers.akimbo;
+
+	auto& cosm = capability.get_cosmos();
+
+	LOG("Resetting akimbo in maybe_reload_akimbo");
+	akimbo = {};
+
+	if (ctx.alive(cosm)) {
+		const auto wielded_guns = capability.get_wielded_guns();
+
+		if (wielded_guns.size() == 2) {
+			const auto slot = cosm[ctx.concerned_slot];
+			ensure(slot.alive());
+			const auto reloaded_weapon = slot.get_container();
+
+			const auto next_to_reload_idx = wielded_guns[0] == reloaded_weapon ? 1 : 0;
+
+			akimbo.next = wielded_guns[next_to_reload_idx];
+			akimbo.wield_on_complete = wielding_setup::from_current(capability);
+			LOG_NVPS(next_to_reload_idx, akimbo.next);
+		}
+		else {
+			LOG("No two guns found to consider for akimbo");
+		}
+	}
+	else {
+		LOG("No context found to consider for akimbo extension");
+	}
+}
+
+template <class E>
+bool chambering_in_order(const E& gun_entity) {
+	if (const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER]) {
+		if (chamber_slot.is_empty_slot()) {
+			if (const auto mag_chamber = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE]) {
+				if (mag_chamber.has_items()) {
+					return true;
+				}
+			}
+
+			if (const auto mag_slot = gun_entity[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+				if (const auto mag_inside = mag_slot.get_item_if_any()) {
+					if (0 != count_charges_in_deposit(mag_inside)) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+template <class E>
+bool has_any_guns_in_action(const E& capability) {
+	const auto wielded_items = capability.get_wielded_items();
+	const auto& cosm = capability.get_cosmos();
+
+	for (auto& w : wielded_items) {
+		if (chambering_in_order(cosm[w]) || gun_shot_cooldown(cosm[w])) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void item_system::handle_reload_intents(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& requests = step.get_queue<messages::intent_message>();
@@ -97,8 +167,7 @@ void item_system::handle_reload_intents(const logic_step step) {
 						drop_mag_to_ground(cosm[ctx.old_ammo_source]);
 					}
 					else {
-						const auto new_context = calc_reloading_context(capability);
-						ctx = new_context;
+						transfers->pending_reload_on_setup = wielding_setup::from_current(capability);
 					}
 				}
 			}
@@ -127,7 +196,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 		auto& ctx = transfers.current_reloading_context;
 
 		auto is_context_alive = [&]() {
-			return cosm[ctx.concerned_slot].alive();
+			return ctx.alive(cosm);
 		};
 
 		if (transfers.when_throw_requested.was_set()) {
@@ -145,9 +214,19 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			if (wielded.size() > 0) {
 				auto weapons_needing_reload = std::size_t(0);
 				auto candidate_weapons = std::size_t(0);
+				auto populated_chambers = std::size_t(0);
 
 				for (const auto& w : wielded) {
 					const auto h = cosm[w];
+
+					if (auto chamber = h[slot_function::GUN_CHAMBER]) {
+						if (!chamber.is_empty_slot()) {
+							++populated_chambers;
+						}
+					}
+					else {
+						continue;
+					}
 
 					if (const auto mag = h[slot_function::GUN_DETACHABLE_MAGAZINE]) {
 						++candidate_weapons;
@@ -176,12 +255,11 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					}
 				}
 
-				if (weapons_needing_reload == candidate_weapons) {
-					RLD_LOG("Starting reload automatically.");
-					ctx = calc_reloading_context(it);
+				const bool still_to_early_to_break_akimbo = weapons_needing_reload == 2 && populated_chambers > 0;
 
-					if (cosm[ctx.concerned_slot].dead()) {
-						RLD_LOG("But the context is still dead.");
+				if (weapons_needing_reload > 0 && weapons_needing_reload == candidate_weapons) {
+					if (!still_to_early_to_break_akimbo) {
+						transfers.pending_reload_on_setup = wielding_setup::from_current(it);
 					}
 				}
 			}
@@ -200,7 +278,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			return false;
 		};
 
-		auto advance_context = [&]() -> reload_advance_result {
+		auto check_context_result = [&]() -> reload_advance_result {
 			const auto concerned_slot = cosm[ctx.concerned_slot];
 
 			{
@@ -224,6 +302,28 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			if (is_different_viable()) {
 				return reload_advance_result::DIFFERENT_VIABLE;
 			}
+
+			if (const auto new_mag = cosm[ctx.new_ammo_source]) {
+				const auto new_mag_slot = new_mag.get_current_slot();
+
+				//RLD_LOG_NVPS(new_mag_slot.get_container(), new_mag_slot.get_type());
+
+				if (new_mag_slot.get_id() == concerned_slot.get_id()) {
+					RLD_LOG("New mag already mounted. Reload complete.");
+					return reload_advance_result::COMPLETE;
+				}
+			}
+
+			if (cosm[ctx.new_ammo_source].dead()) {
+				RLD_LOG("(Begin) New ammo source is dead. Reload complete.");
+				return reload_advance_result::COMPLETE;
+			}
+
+			return reload_advance_result::CONTINUE;
+		};
+
+		auto advance_context = [&]() -> reload_advance_result {
+			const auto concerned_slot = cosm[ctx.concerned_slot];
 
 			auto try_hide_other_item = [&]() {
 				const auto redundant_item = it.get_wielded_other_than(concerned_slot.get_container());
@@ -395,35 +495,74 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				}
 			}
 
-			if (cosm[ctx.new_ammo_source].dead()) {
-				RLD_LOG("(Begin) New ammo source is dead. Reload complete.");
-				return reload_advance_result::COMPLETE;
-			}
-
 			return reload_advance_result::INTERRUPT;
 		};
 
-		for (int c = 0; c < 2; ++c) {
+		const auto& capability = it;
+
+		if (transfers.pending_reload_on_setup.is_set()) {
+			const auto current_setup = wielding_setup::from_current(capability);
+
+			if (current_setup == transfers.pending_reload_on_setup) {
+				if (has_any_guns_in_action(capability)) {
+					return;
+				}
+				else {
+					const auto new_context = calc_reloading_context(capability);
+					ctx = new_context;
+
+					maybe_reload_akimbo(transfers, capability);
+					transfers.pending_reload_on_setup = {};
+				}
+			}
+			else {
+				transfers.pending_reload_on_setup = {};
+			}
+		}
+
+		for (int c = 0; c < 4; ++c) {
 			if (is_context_alive()) {
 				const auto& concerned_slot = ctx.concerned_slot;
 				const auto slot = cosm[concerned_slot];
 
 				const auto gun_entity = slot.get_container();
 
-				if (gun_shot_cooldown_or_chambering(gun_entity)) {
-					if (is_different_viable()) {
-						ctx = {};
+				const bool still_in_hands = [&]() {
+					if (const auto slot = gun_entity.get_current_slot()) {
+						if (slot.is_hand_slot()) {
+							return true;
+						}
 					}
+
+					return false;
+				}();
+
+				if (!still_in_hands) {
+					LOG("No longer in hands. Cancel reload.");
+					ctx = {};
+					transfers.akimbo = {};
 
 					break;
 				}
 
-				const auto result = advance_context();
+				auto maybe_complete = check_context_result();
 
-				if (result != reload_advance_result::CONTINUE) {
+				if (maybe_complete == reload_advance_result::CONTINUE) {
+					if (gun_shot_cooldown(gun_entity)) {
+						continue;
+					}
+
+					if (chambering_in_order(gun_entity)) {
+						continue;
+					}
+
+					maybe_complete = advance_context();
+				}
+
+				if (maybe_complete != reload_advance_result::CONTINUE) {
 					ctx = {};
 
-					if (result == reload_advance_result::COMPLETE) {
+					if (maybe_complete == reload_advance_result::COMPLETE) {
 						if (slot.get_type() == slot_function::GUN_CHAMBER_MAGAZINE) {
 							if (const auto chamber = slot.get_container()[slot_function::GUN_CHAMBER]) {
 								if (chamber.get_item_if_any()) {
@@ -432,6 +571,74 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 									}
 								}
 							}
+						}
+					}
+				}
+			}
+			else {
+				auto& akimbo = transfers.akimbo;
+
+				if (akimbo.is_set()) {
+					const auto wielded_items = it.get_wielded_items();
+
+					if (wielded_items.size() == 1) {
+						const auto gun_entity = cosm[wielded_items[0]];
+
+						auto restore_akimbo_after_reload = [&]() {
+							::perform_wielding(
+								step,
+								it,
+								akimbo.wield_on_complete
+							);
+
+							akimbo = {};
+						};
+
+						if (gun_shot_cooldown(gun_entity)) {
+							continue;
+						}
+
+						if (chambering_in_order(gun_entity)) {
+							continue;
+						}
+
+						if (const auto next_to_reload = cosm[akimbo.next]) {
+							LOG("Akimbo reload: has next");
+							if (const auto new_ctx = calc_reloading_context_for(it, next_to_reload)) {
+								LOG("Akimbo reload: has next context");
+								ctx = *new_ctx;
+								akimbo.next = {};
+
+								auto new_setup = wielding_setup::bare_hands();
+								new_setup.hand_selections[0] = next_to_reload;
+
+								::perform_wielding(
+									step,
+									it,
+									new_setup
+								);
+							}
+							else {
+								LOG("Akimbo reload: no next context. Restoring");
+
+								/*
+									If there is no next context, it might be due to no more ammo for this weapon,
+									or it is just full. In case there is no ammo, don't restore the stance and just drop it instead.
+								*/
+
+								const auto ammo_info = calc_ammo_info(next_to_reload);
+
+								if (ammo_info.total_ammo_space > 0 && ammo_info.total_charges == 0) {
+									perform_transfer(item_slot_transfer_request::drop(next_to_reload), step);
+								}
+								else {
+									restore_akimbo_after_reload();
+								}
+							}
+						}
+						else if (akimbo.wield_on_complete.is_set()) {
+							LOG("Akimbo reload: next complete, restoring");
+							restore_akimbo_after_reload();
 						}
 					}
 				}

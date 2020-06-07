@@ -1,6 +1,8 @@
 #pragma once
 #include "game/detail/inventory/weapon_reloading.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/detail/inventory/inventory_utils.h"
+#include "game/detail/gun/gun_cooldowns.h"
 
 inline bool reloading_context::significantly_different_from(const reloading_context& b) const {
 	return 
@@ -26,7 +28,7 @@ struct reloading_movement {
 };
 
 template <class E>
-bool gun_shot_cooldown_or_chambering(const E& gun_entity) {
+bool gun_shot_cooldown(const E& gun_entity) {
 	const auto& cosm = gun_entity.get_cosmos();
 
 	if (const auto gun_def = gun_entity.template find<invariants::gun>()) {
@@ -44,17 +46,40 @@ bool gun_shot_cooldown_or_chambering(const E& gun_entity) {
 			if (!transfer_cooldown_passed || !shot_cooldown_passed) {
 				return true;
 			}
-
-			if (gun_entity[slot_function::GUN_CHAMBER].is_empty_slot()) {
-				if (const auto mag_chamber = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE]) {
-					if (mag_chamber.has_items()) {
-						return true;
-					}
-				}
-			}
 		}
 	}
 	
+	return false;
+}
+
+template <class E>
+bool gun_shot_cooldown_or_chambering_from_chamber_mag(const E& gun_entity) {
+	if (gun_shot_cooldown(gun_entity)) {
+		return true;
+	}
+	
+	if (gun_entity[slot_function::GUN_CHAMBER].is_empty_slot()) {
+		if (const auto mag_chamber = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE]) {
+			if (mag_chamber.has_items()) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+template <class E>
+bool currently_chambering(const E& gun_entity) {
+	if (const auto gun_def = gun_entity.template find<invariants::gun>()) {
+		if (const auto gun = gun_entity.template find<components::gun>()) {
+			const auto& chambering_progress = gun->chambering_progress_ms;
+			const auto chambering_duration = ::calc_current_chambering_duration(gun_entity);
+
+			return chambering_progress > 0.f && augs::is_positive_epsilon(chambering_duration);
+		}
+	}
+
 	return false;
 }
 
@@ -68,6 +93,10 @@ std::optional<reloading_movement> calc_reloading_movement(
 	if (n == 0) {
 		return std::nullopt;
 	}
+
+	auto is_during_shot_action = [](const auto& gun) {
+		return gun_shot_cooldown(gun) || currently_chambering(gun);
+	};
 
 	{
 		/* Context-full reloading. Will happen most of the time, e.g. when R is pressed or it is initialied automatically. */
@@ -90,7 +119,7 @@ std::optional<reloading_movement> calc_reloading_movement(
 
 				const auto container = w0.get_container();
 
-				if (gun_shot_cooldown_or_chambering(container)) {
+				if (is_during_shot_action(container)) {
 					return std::nullopt;
 				}
 
@@ -109,7 +138,7 @@ std::optional<reloading_movement> calc_reloading_movement(
 	if (n == 1) {
 		const auto w0 = cosm[wielded_items[0]];
 
-		if (gun_shot_cooldown_or_chambering(w0)) {
+		if (is_during_shot_action(w0)) {
 			return std::nullopt;
 		}
 
@@ -140,7 +169,7 @@ std::optional<reloading_movement> calc_reloading_movement(
 			if (detachable_mag_slot || chamber_mag_slot) {
 				if (const auto new_source = cosm[wielded_items[1 - i]]) {
 					if (const auto progress = new_source.find_mounting_progress(); progress && progress->progress_ms > 0.f) {
-						if (gun_shot_cooldown_or_chambering(wi)) {
+						if (is_during_shot_action(wi)) {
 							return std::nullopt;
 						}
 

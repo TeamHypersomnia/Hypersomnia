@@ -394,6 +394,27 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				};
 
 				auto try_to_fire_interval = [&]() -> std::optional<weapon_action_type> {
+					const auto& transfers = capability.template get<components::item_slot_transfers>();
+					const bool finished_reloading = !transfers.current_reloading_context.alive(cosm);
+
+					if (finished_reloading) {
+						/* Don't try to shoot if we're about to re-wield akimbo */
+						const auto& akimbo = transfers.akimbo;
+
+						if (!akimbo.next.is_set() && akimbo.wield_on_complete.is_set()) {
+							LOG("We're about to rewield");
+							return std::nullopt;
+						}
+					}
+
+					{
+						/* Don't try to shoot if we're about to start reloading */
+
+						if (transfers.pending_reload_on_setup.is_set()) {
+							//return std::nullopt;
+						}
+					}
+
 					if (gun.remaining_burst_shots > 0) {
 						if (gun_try_to_fire_and_reset(clk, gun_def.burst_interval_ms, gun.fire_cooldown_object)) {
 							gun.when_last_played_trigger_effect = clk.now;
@@ -510,24 +531,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								owning_capability,
 								requested_wield
 							);
-						}
-						else if (wielding == wielding_type::DUAL_WIELDED) {
-							/* 
-								Otherwise if in akimbo, try to hide in inventory,
-								but only if we have a weapon-like thing in the other hand.
-
-								This prevents the wield when the other item is not a weapon, e.g. we are reloading.
-							*/
-
-							const auto other_item = cosm[requested_wield.hand_selections[0]];
-
-							if (other_item && ::is_weapon_like(other_item)) {
-								::perform_wielding(
-									step,
-									owning_capability,
-									requested_wield
-								);
-							}
 						}
 					}
 				};
@@ -1010,10 +1013,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					drop_if_empty();
 
-					auto& transfers = capability.template get<components::item_slot_transfers>();
+					/* Interrupt fluid reloads, like the pump shotgun */
+					if (const auto chamber_magazine_slot = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE]) {
+						auto& transfers = capability.template get<components::item_slot_transfers>();
 
-					/* Interrupt any reloading context */
-					transfers.current_reloading_context = {};
+						transfers.current_reloading_context = {};
+					}
 				}
 				else if (decrease_heat_in_aftermath) {
 					cooldown_gun_heat(step, muzzle_transform, gun_entity);

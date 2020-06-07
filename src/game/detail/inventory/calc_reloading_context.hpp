@@ -165,7 +165,10 @@ auto calc_reloading_context(const E& capability) {
 	const auto& cosm = capability.get_cosmos();
 	const auto items = capability.get_wielded_items();
 
-	/* First, find reloadable weapon. We prioritize the primary hand - the order of get_wielded_items facilitates this. */
+	/* 
+		First, find reloadable weapon. 
+		We prioritize the primary hand - the order of items returned by get_wielded_items makes it so.
+	*/
 
 	for (const auto& i : items) {
 		if (const auto new_ctx = calc_reloading_context_for(capability, cosm[i])) {

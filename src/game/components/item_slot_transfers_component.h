@@ -34,7 +34,10 @@ namespace components {
 		bool pick_all_touched_items_if_list_to_pick_empty = true;
 		pad_bytes<3> pad;
 
+		signi_wielding_setup pending_reload_on_setup;
+
 		reloading_context current_reloading_context;
+		akimbo_reload_state akimbo;
 		// END GEN INTROSPECTOR
 	};
 }

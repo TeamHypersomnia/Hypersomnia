@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- First reload the one that has less ammo
+- Consider not stopping the reloading context on shooting e.g. the gradobicie
+
 - Fixing akimbo and the flipping system
 	- Sometimes only the weapon might be inside the same hand
 	- But sometimes the whole weapon placement might need to be flipped because we're holding it in a secondary hand
