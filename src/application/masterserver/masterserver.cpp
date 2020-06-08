@@ -114,6 +114,17 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		LOG("Created masterserver socket at: %x", ::ToString(udp_command_sockets.back().socket.address));
 	}
 
+	auto find_socket_by_port = [&](const port_type port) -> netcode_socket_raii* {
+		const auto first = settings.first_udp_command_port;
+		const auto index = static_cast<std::size_t>(port - first);
+
+		if (index < udp_command_sockets.size()) {
+			return std::addressof(udp_command_sockets[index]);
+		}
+
+		return nullptr;
+	};
+
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
 
 	std::vector<std::byte> serialized_list;
@@ -258,9 +269,13 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			MSR_LOG("Received packet bytes: %x", packet_bytes);
 
 			try {
-				auto send_to = [&](auto to, const auto& typed_response) {
+				auto send_to_with_socket = [&](auto which_socket, auto to, const auto& typed_response) {
 					auto bytes = augs::to_bytes(masterserver_response(typed_response));
-					netcode_socket_send_packet(&socket, &to, bytes.data(), bytes.size());
+					netcode_socket_send_packet(&which_socket, &to, bytes.data(), bytes.size());
+				};
+
+				auto send_to = [&](auto to, const auto& typed_response) {
+					send_to_with_socket(socket, to, typed_response);
 				};
 
 				auto send_back = [&](const auto& typed_response) {
@@ -268,8 +283,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 				};
 
 				auto send_to_gameserver = [&](const auto& typed_command, netcode_address_t server_address) {
+					auto& socket_readable_by_gameserver_address = udp_command_sockets[0];
+
 					auto bytes = make_gameserver_command_bytes(typed_command);
-					netcode_socket_send_packet(&socket, &server_address, bytes.data(), bytes.size());
+					netcode_socket_send_packet(&socket_readable_by_gameserver_address.socket, &server_address, bytes.data(), bytes.size());
 				};
 
 				auto handle = [&](const auto& typed_request) {
@@ -310,18 +327,36 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					else if constexpr(std::is_same_v<R, masterserver_in::stun_result_info>) {
 						/* Just relay this */
 
-						const auto& recipient = typed_request.recipient_client;
-						const auto resolved_port = typed_request.resolved_external_port;
 						const auto session_guid = typed_request.session_guid;
 
-						MSR_LOG("Received stun_result_info from a gameserver (session guid: %f, resolved port: %x). Relaying this to: %x", session_guid, resolved_port, ::ToString(recipient));
-
 						auto response = masterserver_out::stun_result_info();
-
 						response.session_guid = session_guid;
-						response.resolved_external_port = resolved_port;
 
-						send_to(recipient, response);
+						{
+							const auto resolved_port = typed_request.resolved_external_port;
+
+							if (resolved_port == 0) {
+								/* Let masterserver resolve it */
+								const auto masterserver_visible_port = from.port;
+								response.resolved_external_port = masterserver_visible_port;
+							}
+							else {
+								/* Result of server STUNning on its own */
+								response.resolved_external_port = resolved_port;
+							}
+						}
+
+						const auto& recipient = typed_request.client_origin;
+						const auto client_used_probe = recipient.probe;
+
+						MSR_LOG("Received stun_result_info from a gameserver (session guid: %f, resolved port: %x). Relaying this to: %x (original probe port: %x)", session_guid, response.resolved_external_port, ::ToString(recipient.address), client_used_probe);
+
+						if (const auto socket = find_socket_by_port(client_used_probe)) {
+							send_to_with_socket(socket->socket, recipient.address, response);
+						}
+						else {
+							MSR_LOG("Invalid client_used_probe: %x", client_used_probe); 
+						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::nat_traversal_step>) {
 						auto punched_server = typed_request.target_server;
@@ -356,17 +391,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						if (should_send_request) {
 							auto step_request = masterserver_out::nat_traversal_step();
 
-							step_request.predicted_open_address = from;
-							step_request.masterserver_visible_client_port = from.port;
-
-							{
-								const auto port_opened = typed_request.port_opened_for_server;
-
-								if (port_opened != 0) {
-									step_request.predicted_open_address.port = port_opened;
-								}
-							}
-
+							step_request.client_origin = { from, socket.address.port };
 							step_request.payload = typed_request.payload;
 
 							send_to_gameserver(step_request, punched_server);

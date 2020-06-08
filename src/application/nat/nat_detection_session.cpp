@@ -50,7 +50,7 @@ nat_detection_session::nat_detection_session(
 	settings(in),
 	stun_provider(stun_provider),
 	log_sink(log_sink),
-	future_port_probing_host(async_resolve_address(in.port_probing_host)),
+	future_port_probing_host(async_resolve_address(in.port_probing.host)),
 	session_timestamp(augs::date_time().secs_since_epoch())
 {
 	log_info("---- BEGIN NAT ANALYSIS ----");
@@ -68,7 +68,7 @@ std::optional<nat_detection_result> nat_detection_session::query_result() const 
 
 void nat_detection_session::retry_resolve_port_probing_host() {
 	resolved_port_probing_host.reset();
-	future_port_probing_host = async_resolve_address(settings.port_probing_host);
+	future_port_probing_host = async_resolve_address(settings.port_probing.host);
 
 	log_info("Retrying resolution of the port probing host.");
 }
@@ -130,11 +130,11 @@ void nat_detection_session::advance_resolution_of_port_probing_host() {
 		if (result.result == resolve_result_type::OK) {
 			target = result.addr;
 
-			const auto n = settings.num_ports_probed;
+			const auto n = settings.port_probing.num_probed_for_detection;
 
 			for (int i = 0; i < n; ++i) {
 				auto this_probe_addr = result.addr;
-				this_probe_addr.port += i;
+				this_probe_addr.port = stun_provider.get_next_port_probe(settings.port_probing).default_port;
 
 				port_probing_requests.emplace_back(this_probe_addr);
 			}

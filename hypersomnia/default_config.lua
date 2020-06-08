@@ -10,14 +10,16 @@ return {
   nat_detection = {
 	  packet_interval_ms = 5,
 
-	  port_probing_host = {
-		  address = "masterserver.hypersomnia.xyz",
-		  default_port = 8430
+	  port_probing = {
+	    num_available = 15,
+	    num_probed_for_detection = 3,
+
+	    host = {
+	      address = "masterserver.hypersomnia.xyz",
+	      default_port = 8430
+	    }
 	  },
 
-	  max_ports_for_probing = 5,
-
-	  num_ports_probed = 3,
 	  num_stun_hosts_used_for_detection = 2,
 
 	  nat_translation_entry_timeout_secs = 30,
@@ -35,7 +37,7 @@ return {
 	server_entry_timeout_secs = 60,
 
 	first_udp_command_port = 8430,
-	num_udp_command_ports = 5,
+	num_udp_command_ports = 15,
 
 	sleep_ms = 8,
 	server_list_port = 8420,

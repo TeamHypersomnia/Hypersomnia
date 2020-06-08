@@ -100,6 +100,20 @@ address_and_port stun_server_provider::get_next() {
 	return result;
 }
 
+address_and_port stun_server_provider::get_next_port_probe(const nat_port_probing_settings& settings) {
+	auto result = settings.host;
+
+	const auto num_available_without_first = settings.num_available - 1;
+	const auto first_port_offset = 1;
+
+	const auto current_port_i = first_port_offset + current_probed_port % num_available_without_first;
+	result.default_port += current_port_i;
+
+	++current_probed_port;
+
+	return result;
+}
+
 double stun_server_provider::seconds_to_wait_for_next(const double usage_cooldown_secs) const {
 	const auto current_server_i = current_stun_server % servers.size();
 	const auto& ts = usage_timestamps[current_server_i];

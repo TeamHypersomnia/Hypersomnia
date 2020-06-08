@@ -3,7 +3,7 @@
 using nat_session_guid_type = double;
 
 enum class nat_traversal_step_type : uint8_t {
-	RESTUN,
+	PORT_RESOLUTION_REQUEST,
 	PINGBACK
 };
 

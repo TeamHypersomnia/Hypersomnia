@@ -3,12 +3,18 @@
 #include "application/network/address_and_port.h"
 #include "augs/filesystem/path_declaration.h"
 
+struct nat_port_probing_settings {
+	// GEN INTROSPECTOR struct nat_port_probing_settings
+	address_and_port host;
+
+	int num_available = 15;
+	int num_probed_for_detection = 3;
+	// END GEN INTROSPECTOR
+};
+
 struct nat_detection_settings {
 	// GEN INTROSPECTOR struct nat_detection_settings
-	address_and_port port_probing_host;
-	int max_ports_for_probing = 40;
-
-	int num_ports_probed = 5;
+	nat_port_probing_settings port_probing;
 
 	augs::path_type stun_server_list = "web/stun_server_list.txt";
 	int num_stun_hosts_used_for_detection = 2;

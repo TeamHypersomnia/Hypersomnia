@@ -24,9 +24,9 @@ double yojimbo_time();
 
 nat_traversal_session::nat_traversal_session(const nat_traversal_input& input, stun_server_provider& stun_provider) : 
 	input(input), 
-	stun_provider(stun_provider),
 	session_guid(augs::date_time().secs_since_epoch()),
-	when_began(yojimbo_time())
+	when_began(yojimbo_time()),
+	chosen_masterserver_port_probe(stun_provider.get_next_port_probe(input.detection_settings.port_probing).default_port)
 {
 	log_info("---- BEGIN NAT TRAVERSAL ----");
 	log_info("Begin traversing %x.", ::ToString(input.traversed_address));
@@ -77,6 +77,13 @@ bool nat_traversal_session::timed_out() {
 	return false;
 }
 
+netcode_address_t nat_traversal_session::get_current_masterserver_address() const {
+	auto target_address = input.masterserver_address;
+	target_address.port = chosen_masterserver_port_probe;
+
+	return target_address;
+}
+
 void nat_traversal_session::advance(const netcode_socket_t& socket) {
 	if (traversal_state == state::TRAVERSAL_COMPLETE) {
 		return;
@@ -88,7 +95,6 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 
 	const auto packet_interval_secs = input.detection_settings.packet_interval_ms / 1000.0;
 	const auto request_interval_secs = input.detection_settings.request_interval_ms / 1000.0;
-	const auto stun_timeout_secs = input.detection_settings.stun_session_timeout_ms / 1000.0;
 
 	packet_queue.send_some(socket, packet_interval_secs, [&](const std::string& l) { log_info(l); });
 	receive_packets(socket);
@@ -104,28 +110,8 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 	auto make_traversal_step = [&]() {
 		const auto port_dt = input.client.port_delta;
 
-		const auto port_opened_for_server = [&]() {
-			if (conic(client_type)) {
-				/* 
-					Trivial case.
-					This will command the masterserver to relay the port with which the request arrives.
-				*/
-
-				return port_type(0);
-			}
-			else {
-				/* 
-					A step won't be sent from a symmetric client before stun completes.
-				*/
-
-				ensure(last_client_stunned_port != 0);
-				return static_cast<port_type>(last_client_stunned_port + port_dt);
-			}
-		}();
-
 		auto step = traversal_step();
 		step.target_server = input.traversed_address;
-		step.port_opened_for_server = port_opened_for_server;
 
 		auto& payload = step.payload;
 		payload.session_guid = session_guid;
@@ -142,22 +128,13 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 
 	auto request_masterserver = [&](const auto& step) {
 		const auto payload = augs::to_bytes(masterserver_request(step));
-		packet_queue(input.masterserver_address, payload);
+		packet_queue(get_current_masterserver_address(), payload);
 
 		if (requests_fired % 5 == 0) {
 			log_info("Firing requests.");
 		}
 
 		++requests_fired;
-	};
-
-	auto restun = [&]() {
-		set(state::AWAITING_STUN_RESPONSE);
-
-		const auto next_stun_host = stun_provider.get_next();
-
-		stun_in_progress.reset();
-		stun_in_progress.emplace(next_stun_host, [this](const std::string& s) { log_info(s); });
 	};
 
 	auto reset_request_timer = [&]() {
@@ -207,34 +184,6 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 		}
 	};
 
-	auto advance_client_stun = [&]() {
-		if (const auto stun_request = stun_in_progress->advance(request_interval_secs, stun_rng)) {
-			packet_queue(*stun_request);
-
-			if (conic(server_type)) {
-				open_holes_for_server();
-			}
-		}
-
-		const auto stun_state = stun_in_progress->get_current_state();
-
-		if (stun_in_progress->has_timed_out(stun_timeout_secs)) {
-			restun();
-		}
-		else if (stun_state == stun_session::state::COULD_NOT_RESOLVE_STUN_HOST) {
-			restun();
-		}
-		else if (stun_state == stun_session::state::COMPLETED) {
-			const auto external_address = stun_in_progress->query_result();
-			ensure(external_address != std::nullopt);
-			stun_in_progress.reset();
-
-			last_client_stunned_port = external_address->port;
-			set(state::CLIENT_STUN_REQUIREMENT_MET);
-			reset_request_timer();
-		}
-	};
-
 	auto start_requesting_remote_port_info = [&]() {
 		set(state::REQUESTING_REMOTE_PORT_INFO);
 		reset_request_timer();
@@ -244,19 +193,12 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 		return try_fire_interval(request_interval_secs, when_last_masterserver_request);
 	};
 
-	/* A symmetric host on either side is involved. */
-
 	/* Advance operations in progress */
-
-	if (stun_in_progress != std::nullopt) {
-		advance_client_stun();
-		return;
-	}
 
 	if (traversal_state == state::REQUESTING_REMOTE_PORT_INFO) {
 		if (try_request_interval()) {
 			auto step = make_traversal_step();
-			step.payload.type = nat_traversal_step_type::RESTUN;
+			step.payload.type = nat_traversal_step_type::PORT_RESOLUTION_REQUEST;
 
 			request_masterserver(step);
 		}
@@ -269,16 +211,6 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 	do {
 		switch (traversal_state) {
 			case state::INIT:
-				if (conic(client_type)) {
-					set(state::CLIENT_STUN_REQUIREMENT_MET);
-					continue;
-				}
-				else {
-					restun();
-					break;
-				}
-
-			case state::CLIENT_STUN_REQUIREMENT_MET:
 				if (conic(server_type)) {
 					set(state::SERVER_STUN_REQUIREMENT_MET);
 					continue;
@@ -301,6 +233,7 @@ void nat_traversal_session::advance(const netcode_socket_t& socket) {
 				break;
 			}
 
+			case state::REQUESTING_REMOTE_PORT_INFO:
 			case state::TRAVERSAL_COMPLETE:
 			case state::TIMED_OUT:
 			default:
@@ -322,7 +255,7 @@ void nat_traversal_session::handle_packet(const netcode_address_t& from, uint8_t
 		}
 	}
 
-	if (from == input.masterserver_address) {
+	if (from == get_current_masterserver_address()) {
 		auto handle_server_stun_result = [this](
 			const auto& response
 		) {

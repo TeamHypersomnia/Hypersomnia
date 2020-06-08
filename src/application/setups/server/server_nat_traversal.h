@@ -6,6 +6,7 @@
 #include "application/masterserver/nat_traversal_step_payload.h"
 #include "augs/misc/randomization.h"
 #include "application/nat/nat_type.h"
+#include "application/masterserver/nat_traversal_step.h"
 
 struct stun_server_provider;
 
@@ -23,12 +24,14 @@ class server_nat_traversal {
 		std::optional<stun_session> stun;
 		bool holes_opened = false;
 		bool has_stun_timed_out = false;
-		nat_traversal_step_payload last_payload;
-		port_type masterserver_visible_client_port;
 
-		int times_sent_stun_info = 0;
+		masterserver_out::nat_traversal_step request;
 
-		void send_stun_result(netcode_address_t client_address, netcode_address_t masterserver_address, netcode_packet_queue&);
+		port_type chosen_port_probe = 0;
+		int times_sent_port_info = 0;
+
+		void relay_stun_result(netcode_address_t masterserver_address, netcode_packet_queue&);
+		void relay_port_direct(netcode_address_t masterserver_address, netcode_packet_queue&);
 
 		session();
 

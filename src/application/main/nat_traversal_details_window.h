@@ -11,14 +11,10 @@ std::string nat_traversal_state_to_string(const nat_traversal_session::state sta
 			return "Initializing";
 		case S::TRAVERSING:
 			return "Traversing";
-		case S::CLIENT_STUN_REQUIREMENT_MET:
-			return "Client STUN requirement met";
 		case S::SERVER_STUN_REQUIREMENT_MET:
 			return "Server STUN requirement met";
 		case S::REQUESTING_REMOTE_PORT_INFO:
 			return "Requesting remote port info";
-		case S::AWAITING_STUN_RESPONSE:
-			return "Awaiting STUN response";
 		case S::TRAVERSAL_COMPLETE:
 			return "Traversal complete";
 		case S::TIMED_OUT:
@@ -35,10 +31,6 @@ rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
 	switch (state) {
 		case S::INIT:
 			return orange;
-		case S::AWAITING_STUN_RESPONSE:
-			return yellow;
-		case S::CLIENT_STUN_REQUIREMENT_MET:
-			return cyan;
 		case S::SERVER_STUN_REQUIREMENT_MET:
 			return cyan;
 		case S::REQUESTING_REMOTE_PORT_INFO:

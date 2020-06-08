@@ -6,6 +6,29 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Look.
+	- When we retry traversal, we change ports.
+	- If we have PSes on both sides, we first send the result to the masterserver.
+		- WE GET ASSIGNED A NEW PORT HERE! 
+	- So we need to send a dummy packet first to the masterserver, BEFORE sending stun resolution packet.
+	- Does this explain why were we not able to connect to filemon?
+		- Same stuff might happen upon the first connection attempt perhaps...
+		- ...since the server browser has its own socket?
+
+
+- Remember to make masterserver send outgoing commands (to a different party) on a default channel like 8430
+
+
+
+
+
+- Fix akimbo after throwing grenade
+
+- Fix drop so that it moves the remaining weapon to the primary hand
+- Fix akimbo mid-chambering: switch to the other weapon when we drop the current during mid-akimbo
+	- If the currently mid-chambered doesn't match AND IT'S ALREADY GONE from inventory, switch to the second 
+	- It's okay if it's also due to the manual drop
+
 - First reload the one that has less ammo
 - Consider not stopping the reloading context on shooting e.g. the gradobicie
 

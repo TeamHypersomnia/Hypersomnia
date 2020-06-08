@@ -27,10 +27,6 @@ public:
 	enum class state {
 		INIT,
 
-		AWAITING_STUN_RESPONSE,
-
-		CLIENT_STUN_REQUIREMENT_MET,
-
 		REQUESTING_REMOTE_PORT_INFO,
 		SERVER_STUN_REQUIREMENT_MET,
 
@@ -43,7 +39,6 @@ public:
 	const nat_traversal_input input;
 
 private:
-	stun_server_provider& stun_provider;
 	randomization stun_rng = randomization::from_random_device();
 	const nat_session_guid_type session_guid;
 
@@ -54,7 +49,7 @@ private:
 	net_time_t when_began = -1;
 
 	std::string full_log;
-	port_type last_client_stunned_port = 0;
+	port_type chosen_masterserver_port_probe = 0;
 	port_type last_server_stunned_port = 0;
 
 	port_type opened_remote_port = 0;
@@ -78,6 +73,8 @@ private:
 	void receive_packets(netcode_socket_t socket);
 
 	void set(state);
+
+	netcode_address_t get_current_masterserver_address() const;
 
 public:
 	nat_traversal_session(const nat_traversal_input&, stun_server_provider& stun_provider); 

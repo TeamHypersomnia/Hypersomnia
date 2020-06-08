@@ -26,8 +26,7 @@ void server_nat_traversal::send_packets(netcode_socket_t socket) {
 	packet_queue.send_some(socket, interval_secs, no_LOG());
 }
 
-void server_nat_traversal::session::send_stun_result(
-	netcode_address_t client_address,
+void server_nat_traversal::session::relay_stun_result(
 	netcode_address_t masterserver_address,
 	netcode_packet_queue& queue
 ) {
@@ -35,15 +34,35 @@ void server_nat_traversal::session::send_stun_result(
 		auto result_info = masterserver_in::stun_result_info();
 
 		result_info.session_guid = session_guid;
-		result_info.recipient_client = client_address;
-		result_info.recipient_client.port = masterserver_visible_client_port;
-
+		result_info.client_origin = request.client_origin;
 		result_info.resolved_external_port = result->port;
 
 		const auto info_bytes = augs::to_bytes(masterserver_request(result_info));
 		queue(masterserver_address, info_bytes);
-		++times_sent_stun_info;
+		++times_sent_port_info;
 	}
+}
+
+void server_nat_traversal::session::relay_port_direct(
+	netcode_address_t masterserver_address,
+	netcode_packet_queue& queue
+) {
+	auto result_info = masterserver_in::stun_result_info();
+
+	result_info.session_guid = session_guid;
+	result_info.client_origin = request.client_origin;
+
+	/*
+		Use the masterserver-visible port
+	*/
+
+	result_info.resolved_external_port = 0;
+
+	const auto info_bytes = augs::to_bytes(masterserver_request(result_info));
+
+	masterserver_address.port = chosen_port_probe;
+	queue(masterserver_address, info_bytes);
+	++times_sent_port_info;
 }
 
 void server_nat_traversal::advance() {
@@ -84,11 +103,15 @@ void server_nat_traversal::advance() {
 
 			if (state == stun_session::state::COMPLETED) {
 				if (masterserver_address != std::nullopt) {
-					const auto& times = traversal.times_sent_stun_info;
+					const auto& times = traversal.times_sent_port_info;
 
 					if (times == 0) {
 						LOG("Sending the STUN result info for the first time.");
-						traversal.send_stun_result(client_address, *masterserver_address, packet_queue);
+
+						traversal.relay_stun_result(
+							*masterserver_address, 
+							packet_queue
+						);
 					}
 				}
 			}
@@ -143,7 +166,16 @@ bool server_nat_traversal::handle_auxiliary_command(
 
 			LOG("Received traversal step from masterserver.");
 
-			const auto& client_address = typed_request.predicted_open_address;
+			const auto masterserver_visible_client_address = typed_request.client_origin.address;
+
+			const auto predicted_open_client_address = [&]() {
+				auto origin_address = masterserver_visible_client_address;
+				origin_address.port += typed_request.payload.source_port_delta;
+
+				return origin_address;
+			}();
+
+			const auto& client_address = predicted_open_client_address;
 			const auto& payload = typed_request.payload;
 
 			auto create_fresh_entry = [&]() {
@@ -177,36 +209,60 @@ bool server_nat_traversal::handle_auxiliary_command(
 			}
 
 			auto& traversal = traversals[client_address];
-			traversal.last_payload = payload;
-			traversal.masterserver_visible_client_port = typed_request.masterserver_visible_client_port;
+			traversal.request = typed_request;
+
+			if (last_detected_nat.type == nat_type::PORT_SENSITIVE) {
+				traversal.chosen_port_probe = input.stun_provider.get_next_port_probe(input.detection_settings.port_probing).default_port;
+			}
 
 			switch (payload.type) {
-				case nat_traversal_step_type::RESTUN: {
-					auto& stun = traversal.stun;
+				case nat_traversal_step_type::PORT_RESOLUTION_REQUEST: {
+					const auto max_times_resend_port_info = 5;
 
-					if (stun != std::nullopt) {
-						const auto state = stun->get_current_state();
-
-						if (state == stun_session::state::COMPLETED) {
-							const auto max_times_resend_stun_result = 5;
-
-							if (traversal.times_sent_stun_info <= max_times_resend_stun_result) {
-								if (masterserver_address != std::nullopt) {
-									LOG("Resending the STUN result.");
-
-									traversal.send_stun_result(client_address, *masterserver_address, packet_queue);
-								}
-							}
-						}
-						else {
-							// LOG("Already launched a STUN session in this traversal. Ignoring further requests until STUN completes.");
-						}
-
+					if (traversal.times_sent_port_info > max_times_resend_port_info) {
 						break;
 					}
 
-					LOG("Launching a STUN session for this traversal.");
-					relaunch(stun);
+					if (masterserver_address == std::nullopt) {
+						break;
+					}
+
+					if (last_detected_nat.type == nat_type::ADDRESS_SENSITIVE) {
+						auto& stun = traversal.stun;
+
+						if (stun != std::nullopt) {
+							const auto state = stun->get_current_state();
+
+							if (state == stun_session::state::COMPLETED) {
+								LOG("Resending the STUN result.");
+
+								traversal.relay_stun_result(
+									*masterserver_address,
+									packet_queue
+								);
+							}
+							else {
+								// LOG("Already launched a STUN session in this traversal. Ignoring further requests until STUN completes.");
+							}
+
+							break;
+						}
+
+						LOG("Launching a STUN session for this traversal.");
+						relaunch(stun);
+					}
+					else if (last_detected_nat.type == nat_type::PORT_SENSITIVE) {
+						traversal.relay_port_direct(
+							*masterserver_address,
+							packet_queue
+						);
+
+						if (!traversal.holes_opened) {
+							LOG("Opening holes for the client right away to increase the chance of an adjacent port.");
+							traversal.open_holes(input.traversal_settings, client_address, packet_queue);
+						}
+					}
+
 					break;
 				}
 
@@ -247,7 +303,7 @@ void server_nat_traversal::session::open_holes(
 	auto response = gameserver_nat_traversal_response_packet();
 	response.session_guid = session_guid;
 
-	const auto port_dt = last_payload.source_port_delta;
+	const auto port_dt = request.payload.source_port_delta;
 
 	LOG("Opening NAT holes for the predicted client address: %x\nPort dt: %x", ::ToString(predicted_open_address), port_dt);
 
@@ -255,7 +311,7 @@ void server_nat_traversal::session::open_holes(
 
 	queue(predicted_open_address, ping_bytes);
 
-	if (last_payload.ping_back_at_multiple_ports) {
+	if (request.payload.ping_back_at_multiple_ports) {
 		if (!holes_opened) {
 			LOG("Pinging at multiple ports to increase the chance of success.");
 
