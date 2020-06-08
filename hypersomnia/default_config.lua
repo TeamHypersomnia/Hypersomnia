@@ -11,7 +11,7 @@ return {
 	  packet_interval_ms = 5,
 
 	  port_probing = {
-	    num_available = 15,
+	    num_available = 30,
 	    num_probed_for_detection = 3,
 
 	    host = {
@@ -29,7 +29,7 @@ return {
 
   nat_traversal = {
 	  num_brute_force_packets = 1,
-	  traversal_attempt_timeout_secs = 4
+	  traversal_attempt_timeout_secs = 2
   },
 
   masterserver = {
@@ -37,7 +37,7 @@ return {
 	server_entry_timeout_secs = 60,
 
 	first_udp_command_port = 8430,
-	num_udp_command_ports = 15,
+	num_udp_command_ports = 30,
 
 	sleep_ms = 8,
 	server_list_port = 8420,
