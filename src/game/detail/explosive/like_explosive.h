@@ -44,3 +44,14 @@ bool is_like_thrown_explosive(const E& self) {
 	return false;
 }
 
+template <class E>
+bool is_armed_explosive(const E& self) {
+	if (const auto fuse = self.template find<components::hand_fuse>()) {
+		if (const auto fuse_def = self.template find<invariants::hand_fuse>()) {
+			return fuse->armed();
+		}
+	}
+
+	return false;
+}
+

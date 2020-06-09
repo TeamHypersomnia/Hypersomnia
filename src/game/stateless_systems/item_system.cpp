@@ -569,6 +569,19 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					const auto& cosm = capability.get_cosmos();
 
 					for (auto& w : wielded_items) {
+						const auto item = cosm[w];
+
+						if (::is_armed_explosive(item)) {
+							/* 
+								Prevent mid-chambering from starting
+								when we have an armed explosive in hands!!!
+							*/
+
+							return;
+						}
+					}
+
+					for (auto& w : wielded_items) {
 						const auto gun = cosm[w];
 
 						if (requires_two_hands_to_chamber(gun)) {
