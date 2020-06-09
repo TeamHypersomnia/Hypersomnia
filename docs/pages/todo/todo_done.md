@@ -4377,3 +4377,14 @@ Advantages:
 	- actually works this way
 	- Though remember to reset the recoil penalty
 
+
+- Look.
+	- When we retry traversal, we change ports.
+	- If we have PSes on both sides, we first send the result to the masterserver.
+		- WE GET ASSIGNED A NEW PORT HERE! 
+	- So we need to send a dummy packet first to the masterserver, BEFORE sending stun resolution packet.
+	- Does this explain why were we not able to connect to filemon?
+		- Same stuff might happen upon the first connection attempt perhaps...
+		- ...since the server browser has its own socket?
+- Remember to make masterserver send outgoing commands (to a different party) on a default channel like 8430
+

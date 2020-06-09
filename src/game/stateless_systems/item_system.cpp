@@ -836,6 +836,20 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			request.params.set_source_root_as_sender = is_throw;
 
 			perform_transfer(request, step);
+
+			if (const auto secondary_hand = typed_subject[slot_function::SECONDARY_HAND]) {
+				if (const auto item_in_wrong_hand = secondary_hand.get_item_if_any()) {
+					LOG("Moving the other item to the primary hand for convenience.");
+
+					auto fixing_transfer = item_slot_transfer_request::standard(item_in_wrong_hand, typed_subject[slot_function::PRIMARY_HAND]);
+
+					fixing_transfer.params.play_transfer_sounds = false;
+					fixing_transfer.params.play_transfer_particles = false;
+					fixing_transfer.params.perform_recoils = false;
+
+					perform_transfer(fixing_transfer, step);
+				}
+			}
 		};
 
 		if (is_throw) {
