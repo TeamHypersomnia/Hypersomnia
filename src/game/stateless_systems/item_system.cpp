@@ -61,6 +61,22 @@ enum class reload_advance_result {
 };
 
 template <class E>
+bool holds_armed_explosive(const E& handle) {
+	const auto wielded_items = handle.get_wielded_items();
+	const auto& cosm = handle.get_cosmos();
+
+	for (auto& w : wielded_items) {
+		const auto item = cosm[w];
+
+		if (::is_armed_explosive(item)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+template <class E>
 void drop_mag_to_ground(const E& mag) {
 	auto& cosm = mag.get_cosmos();
 
@@ -182,7 +198,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			return;
 		}
 
-		if (!is_context_alive()) {
+		if (!is_context_alive() && !::holds_armed_explosive(it)) {
 			/* 
 				No current context. 
 				Automatically check if we should reload. 
@@ -565,21 +581,17 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 				const auto wielded_items = capability.get_wielded_items();
 
+				if (::holds_armed_explosive(capability)) {
+					/* 
+						Prevent mid-chambering from starting
+						when we have an armed explosive in hands!!!
+					*/
+
+					return;
+				}
+
 				if (wielded_items.size() == 2) {
 					const auto& cosm = capability.get_cosmos();
-
-					for (auto& w : wielded_items) {
-						const auto item = cosm[w];
-
-						if (::is_armed_explosive(item)) {
-							/* 
-								Prevent mid-chambering from starting
-								when we have an armed explosive in hands!!!
-							*/
-
-							return;
-						}
-					}
 
 					for (auto& w : wielded_items) {
 						const auto gun = cosm[w];
@@ -1042,9 +1054,16 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					return;
 				}
 
-				if (r.was_pressed() && !arm_explosive_cooldown_passed(typed_subject)) {
-					/* Forbid unarming and throwing nades when cooldown is still on */
-					return;
+				if (r.was_pressed()) {
+					if (!arm_explosive_cooldown_passed(typed_subject)) {
+						/* Forbid unarming nades when cooldown is still on */
+						return;
+					}
+
+					if (::holds_armed_explosive(typed_subject)) {
+						/* Forbid unarming nades when another nade is still being unarmed (repeated press) */
+						return;
+					}
 				}
 
 				auto intended_force_type = adverse_element_type::INVALID;
@@ -1095,7 +1114,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 										maybe_required.template dispatch_on_having_all<invariants::hand_fuse>([&](const auto& typed_candidate) { 
 											const auto fuse_logic = fuse_logic_provider(typed_candidate, step);
 
-											if (fuse_logic.fuse.armed()) {
+											if (fuse_logic.fuse.armed() && fuse_logic.fuse.arming_source == arming_source_type::THROW_INTENT) {
 												fuse_logic.release_explosive_if_armed();
 												released = true;
 
@@ -1164,7 +1183,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 							cosm[found_fused].template dispatch_on_having_all<invariants::hand_fuse>([&](const auto& typed_candidate) { 
 								if (typed_candidate.get_current_slot().is_hand_slot()) {
 									const auto fuse_logic = fuse_logic_provider(typed_candidate, step);
-									fuse_logic.arm_explosive();
+									fuse_logic.arm_explosive(arming_source_type::THROW_INTENT);
 								}
 							});
 

@@ -7,8 +7,18 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/faction_type.h"
 
+// TODO: Fix those byte-sized enums finally in introspector generator
+
 namespace components {
 	struct hand_fuse {
+		enum arming_source_type {
+			NONE,
+
+			THROW_INTENT,
+			SHOOT_INTENT,
+			SHOOT_SECONDARY_INTENT
+		};
+
 		// GEN INTROSPECTOR struct components::hand_fuse
 		augs::stepped_timestamp when_armed;
 
@@ -18,7 +28,7 @@ namespace components {
 		augs::stepped_timestamp when_last_beep;
 
 		bool arming_requested = false;
-		bool armed_as_secondary_action = false;
+		uint8_t arming_source = arming_source_type::NONE;
 		pad_bytes<2> pad;
 
 		signi_entity_id character_now_defusing;
@@ -29,6 +39,8 @@ namespace components {
 		bool defused() const;
 	};
 }
+
+using arming_source_type = components::hand_fuse::arming_source_type;
 
 namespace invariants {
 	struct hand_fuse {

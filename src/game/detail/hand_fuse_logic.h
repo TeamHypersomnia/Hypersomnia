@@ -189,7 +189,7 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 		base(fused_entity), step(step) 
 	{}
 
-	void arm_explosive() const {
+	void arm_explosive(const arming_source_type source_type) const {
 		if (::arm_explosive_cooldown_passed(holder)) {
 			auto& transfers = holder.template get<components::item_slot_transfers>();
 			transfers.when_last_armed_explosive = clk.now;
@@ -198,6 +198,7 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 			return;
 		}
 
+		fuse.arming_source = source_type;
 		fuse.when_armed = clk.now;
 		fuse.slot_when_armed = fused_entity.get_current_slot().get_type();
 
@@ -243,7 +244,7 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 
 		const auto total_impulse = [&]() {
 			if (const auto capability = holder.template find<invariants::item_slot_transfers>()) {
-				if (fuse.armed_as_secondary_action) {
+				if (fuse.arming_source == arming_source_type::SHOOT_SECONDARY_INTENT) {
 					return capability->standard_drop_impulse + fuse_def.additional_secondary_release_impulse;
 				}
 
@@ -347,7 +348,7 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 			if (!fuse.armed()) {
 				if (arming_requested()) {
 					if (arming_delay_complete()) {
-						arm_explosive();
+						arm_explosive(arming_source_type::SHOOT_INTENT);
 						return;
 					}
 

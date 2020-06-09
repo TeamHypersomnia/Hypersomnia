@@ -185,11 +185,19 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 					}
 					else {
 						if (it.was_pressed()) {
-							fuse_logic.arm_explosive();
-							fuse_logic.fuse.armed_as_secondary_action = action_type == weapon_action_type::SECONDARY;
+							const auto source = action_type == weapon_action_type::SECONDARY ?
+								arming_source_type::SHOOT_INTENT : 
+								arming_source_type::SHOOT_SECONDARY_INTENT
+							;
+
+							fuse_logic.arm_explosive(source);
 						}
 						else {
-							fuse_logic.release_explosive_if_armed();
+							const auto source = fuse_logic.fuse.arming_source;
+
+							if (source == arming_source_type::SHOOT_INTENT || source == arming_source_type::SHOOT_SECONDARY_INTENT) {
+								fuse_logic.release_explosive_if_armed();
+							}
 						}
 					}
 				}
