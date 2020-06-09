@@ -511,7 +511,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 			if (const auto mid_chambered_gun = cosm[transfers.mid_akimbo_chambered_gun]) {
 				const auto wielded_items = capability.get_wielded_items();
-				const bool continuity_kept = wielded_items.size() == 1 && wielded_items[0] == mid_chambered_gun;
+				const bool continuity_kept = found_in(wielded_items, mid_chambered_gun);
 				const bool was_interrupted = !continuity_kept;
 
 				if (was_interrupted) {
@@ -1029,6 +1029,11 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					return;
 				}
 
+				if (r.was_pressed() && !arm_explosive_cooldown_passed(typed_subject)) {
+					/* Forbid unarming and throwing nades when cooldown is still on */
+					return;
+				}
+
 				auto intended_force_type = adverse_element_type::INVALID;
 
 				switch (r.intent) {
@@ -1055,7 +1060,11 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 						int target_index = 1;
 
-						auto requested_wield = wielding_setup::from_current(typed_subject);
+						const auto current_wielding = wielding_setup::from_current(typed_subject);
+						auto requested_wield = current_wielding;
+
+						auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
+						auto& wield_after_throwing_explosive = transfers_state.wield_after_mid_akimbo_chambering;
 
 						if (requested_wield.is_bare_hands(cosm)) {
 							/* Only engage the primary hand if both are free, though this probably won't happen often */
@@ -1076,6 +1085,16 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 											if (fuse_logic.fuse.armed()) {
 												fuse_logic.release_explosive_if_armed();
 												released = true;
+
+												if (wield_after_throwing_explosive.is_set() && !transfers_state.mid_akimbo_chambered_gun.is_set()) {
+													::perform_wielding(
+														step,
+														typed_subject,
+														wield_after_throwing_explosive
+													);
+
+													wield_after_throwing_explosive = {};
+												}
 											}
 										});
 
@@ -1119,6 +1138,10 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						typed_subject.for_each_contained_item_recursive(finder);
 
 						if (found_fused.is_set()) {
+							if (current_wielding.is_akimbo(cosm)) {
+								wield_after_throwing_explosive = current_wielding;
+							}
+
 							::perform_wielding(
 								step,
 								typed_subject,

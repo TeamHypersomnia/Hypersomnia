@@ -143,6 +143,19 @@ struct stepless_fuse_logic_provider {
 	}
 };
 
+template <class H>
+bool arm_explosive_cooldown_passed(const H& holder) {
+	if (const auto transfers = holder.template find<components::item_slot_transfers>()) {
+		if (const auto transfers_def = holder.template find<invariants::item_slot_transfers>()) {
+			if (holder.get_cosmos().get_clock().is_ready(transfers_def->arm_explosive_cooldown_ms, transfers->when_last_armed_explosive)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 template <class E>
 struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 	using base = stepless_fuse_logic_provider<E>;
@@ -177,14 +190,12 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 	{}
 
 	void arm_explosive() const {
-		if (const auto transfers = holder.template find<components::item_slot_transfers>()) {
-			if (const auto transfers_def = holder.template find<invariants::item_slot_transfers>()) {
-				if (clk.lasts(transfers_def->arm_explosive_cooldown_ms, transfers->when_last_armed_explosive)) {
-					return;
-				}
-			}
-
-			transfers->when_last_armed_explosive = clk.now;
+		if (::arm_explosive_cooldown_passed(holder)) {
+			auto& transfers = holder.template get<components::item_slot_transfers>();
+			transfers.when_last_armed_explosive = clk.now;
+		}
+		else {
+			return;
 		}
 
 		fuse.when_armed = clk.now;
