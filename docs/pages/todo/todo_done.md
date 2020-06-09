@@ -4388,3 +4388,18 @@ Advantages:
 		- ...since the server browser has its own socket?
 - Remember to make masterserver send outgoing commands (to a different party) on a default channel like 8430
 
+- Fix akimbo after throwing grenade
+
+- Fix drop so that it moves the remaining weapon to the primary hand
+
+- Looks like the proper thing to do for direct_attachment_offset is to
+	- In case of a torso attachment, return an attachment_offset that considers flipping intricacies of the torso
+		- Like reloading, secondary hand flipping etc
+	- However to return an offset for a mag, it needs to know if the weapon itself is flipped and thus recalculate
+		- So it would be better if it just returned a raw offset for non-torso attachment
+		- but we have to take it into account
+	- In case of a weapon attachment or later, return raw
+	- We need a general approach for the collision connection
+
+- Update server
+

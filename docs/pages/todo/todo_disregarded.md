@@ -5,6 +5,10 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Fix akimbo mid-chambering: switch to the other weapon when we drop the current during mid-akimbo
+	- Implementation: If the currently mid-chambered doesn't match AND IT'S ALREADY GONE from inventory, switch to the second 
+	- It's okay if it's also due to the manual drop
+
 - Maybe let's try using clang's stdlib on Windows?
 
 - Default camera mode in settings, maybe controls?

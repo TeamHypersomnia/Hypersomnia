@@ -186,8 +186,8 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 					else {
 						if (it.was_pressed()) {
 							const auto source = action_type == weapon_action_type::SECONDARY ?
-								arming_source_type::SHOOT_INTENT : 
-								arming_source_type::SHOOT_SECONDARY_INTENT
+								arming_source_type::SHOOT_SECONDARY_INTENT : 
+								arming_source_type::SHOOT_INTENT
 							;
 
 							fuse_logic.arm_explosive(source);

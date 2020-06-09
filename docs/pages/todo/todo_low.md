@@ -4,6 +4,17 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Fixing akimbo and the flipping system
+	- Sometimes only the weapon might be inside the same hand
+	- But sometimes the whole weapon placement might need to be flipped because we're holding it in a secondary hand
+		- which is when torso offsets are flipped
+	- For flipping the second weapon in akimbo, we don't flip entire torso offset
+		- Torso offset is intact, we only flip the anchor and further down the weapon attachments
+	- For such complexity, it makes sense for direct attachment offset to manage flipping
+		- just it needs to communicate that the geometry itself is to be flipped
+		- for now we only need to fix it here
+	- We'll need to overhaul the animation frames to remove the need for this crappy logic code
+
 - Determining best official server
 	- default: EU
 	- Once every second ping all official servers

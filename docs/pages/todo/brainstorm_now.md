@@ -6,38 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix akimbo after throwing grenade
-
-- Fix drop so that it moves the remaining weapon to the primary hand
-
-- Fix akimbo mid-chambering: switch to the other weapon when we drop the current during mid-akimbo
-	- Implementation: If the currently mid-chambered doesn't match AND IT'S ALREADY GONE from inventory, switch to the second 
-	- It's okay if it's also due to the manual drop
-
 - First reload the one that has less ammo
 - Consider not stopping the reloading context on shooting e.g. the gradobicie
-
-- Fixing akimbo and the flipping system
-	- Sometimes only the weapon might be inside the same hand
-	- But sometimes the whole weapon placement might need to be flipped because we're holding it in a secondary hand
-		- which is when torso offsets are flipped
-	- For flipping the second weapon in akimbo, we don't flip entire torso offset
-		- Torso offset is intact, we only flip the anchor and further down the weapon attachments
-	- For such complexity, it makes sense for direct attachment offset to manage flipping
-		- just it needs to communicate that the geometry itself is to be flipped
-		- for now we only need to fix it here
-	- We'll need to overhaul the animation frames to remove the need for this crappy logic code
-		
-- Looks like the proper thing to do for direct_attachment_offset is to
-	- In case of a torso attachment, return an attachment_offset that considers flipping intricacies of the torso
-		- Like reloading, secondary hand flipping etc
-	- However to return an offset for a mag, it needs to know if the weapon itself is flipped and thus recalculate
-		- So it would be better if it just returned a raw offset for non-torso attachment
-		- but we have to take it into account
-	- In case of a weapon attachment or later, return raw
-	- We need a general approach for the collision connection
-
-- Update server
 
 - Use ESC to close the rcon please
 
