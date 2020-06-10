@@ -656,11 +656,11 @@ void settings_gui_state::perform(
 					auto& separate_axes = *separate_sensitivity_axes;
 
 					if (separate_axes) {
-						revertable_slider("Horizontal sensitivity", scope_cfg.crosshair_sensitivity.x, 0.1f, 5.0f, "%.1f");
-						revertable_slider("Vertical sensitivity", scope_cfg.crosshair_sensitivity.y, 0.1f, 5.0f, "%.1f");
+						revertable_slider("Horizontal sensitivity", scope_cfg.crosshair_sensitivity.x, 0.1f, 5.0f, "%.3f");
+						revertable_slider("Vertical sensitivity", scope_cfg.crosshair_sensitivity.y, 0.1f, 5.0f, "%.3f");
 					}
 					else {
-						if (revertable_slider("Mouse sensitivity", scope_cfg.crosshair_sensitivity.x, 0.1f, 5.0f, "%.1f")) {
+						if (revertable_slider("Mouse sensitivity", scope_cfg.crosshair_sensitivity.x, 0.1f, 5.0f, "%.3f")) {
 							scope_cfg.crosshair_sensitivity.y = scope_cfg.crosshair_sensitivity.x;
 						}
 					}

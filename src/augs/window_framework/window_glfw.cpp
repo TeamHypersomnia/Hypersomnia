@@ -5,6 +5,7 @@
 #include "augs/window_framework/translate_glfw_enums.h"
 #include "augs/log.h"
 #include "augs/window_framework/shell.h"
+#include "augs/filesystem/file.h"
 
 struct unhandled_key {
 	int key, scancode, action, mods;
@@ -163,6 +164,10 @@ namespace augs {
 
 		glfwSetWindowFocusCallback(window, glfw_callbacks::focus_callback);
 
+		if (glfwRawMouseMotionSupported()) {
+			glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+		}
+
 		glfwFocusWindow(window);
 		active = glfwGetWindowAttrib(window, GLFW_FOCUSED);
 
@@ -270,6 +275,7 @@ namespace augs {
 			platform->last_mouse_pos = new_mouse_pos;
 
 			if (is_active() && (current_settings.is_raw_mouse_input() || mouse_pos_paused)) {
+				LOG_NVPS(dt.x, dt.y);
 				auto ch = do_raw_motion({
 					static_cast<short>(dt.x),
 					static_cast<short>(dt.y) 
@@ -401,24 +407,62 @@ namespace augs {
 	
 	}
 
+#if PLATFORM_LINUX
+	static std::optional<std::string> read_chosen_path(const augs::path_type& script_path) {
+		const auto& temp_result = GENERATED_FILES_DIR "/last_file_path.txt";
+
+		try {
+			const auto result = file_to_string(temp_result);
+			remove_file(temp_result);
+			return result;
+		}
+		catch (const augs::file_open_error&) {
+			LOG("Error: %x did not produce %x", script_path, temp_result);
+			return std::nullopt;
+		}
+	}
+
+	static std::optional<std::string> choose_path(const augs::path_type& script_path) {
+		if (!augs::exists(script_path)) {
+			LOG("WARNING! Could not find the script file: %x.", script_path);
+			return std::nullopt;
+		}
+
+		augs::shell(script_path);
+		return read_chosen_path(script_path);
+	}
+#endif
+
 	std::optional<std::string> window::open_file_dialog(
-		const std::vector<file_dialog_filter>&,
-		const std::string& 
+		const std::vector<file_dialog_filter>& /* filters */,
+		const std::string& /* custom_title */
 	) {
+#if PLATFORM_LINUX
+		return choose_path("scripts/unix/open_file.local");
+#else
 		return std::nullopt;
+#endif
 	}
 
 	std::optional<std::string> window::save_file_dialog(
-		const std::vector<file_dialog_filter>&,
-		const std::string& 
+		const std::vector<file_dialog_filter>& /* filters */,
+		const std::string& /* custom_title */
 	) {
+#if PLATFORM_LINUX
+		return choose_path("scripts/unix/save_file.local");
+#else
 		return std::nullopt;
+#endif
 	}
 
 	std::optional<std::string> window::choose_directory_dialog(
-		const std::string& 
+		const std::string& /* custom_title */
 	) {
+#if PLATFORM_LINUX
+		return choose_path("scripts/unix/choose_directory.local");
+#else
 		return std::nullopt;
+#endif
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& full_path) {

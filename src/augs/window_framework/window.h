@@ -16,6 +16,7 @@ typedef XID GLXWindow;
 typedef XID GLXDrawable;
 
 typedef uint32_t xcb_window_t;
+typedef unsigned long Window;
 
 struct _XDisplay;
 typedef struct _XDisplay Display;
@@ -80,6 +81,9 @@ namespace augs {
 		);
 
 #elif PLATFORM_UNIX
+		double smallest_raw_x_unit = 1.0;
+		double smallest_raw_y_unit = 1.0;
+
 		xcb_timestamp_t last_ldown_time_ms = 0;
 
 		GLXContext context = 0;
@@ -87,6 +91,7 @@ namespace augs {
 		xcb_window_t window_id = 0;
 		GLXDrawable drawable = 0;
 		Display *display = nullptr;
+		Window root = 0;
 		xcb_connection_t *connection = nullptr;
 
 		xcb_key_symbols_t* syms = nullptr;

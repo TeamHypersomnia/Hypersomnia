@@ -99,6 +99,7 @@ namespace augs {
 
 		LOG("X: Getting default screen.");
 		int default_screen = DefaultScreen(display);
+		root = RootWindow(display, default_screen);
 
 		/* Get the XCB connection from the display */
 		LOG("X: calling XGetXCBConnection.");
@@ -338,19 +339,16 @@ namespace augs {
 		{
 			auto dpy = display;
 
-			XIEventMask mask;
+			XIEventMask em;
+			unsigned char mask[XIMaskLen(XI_RawMotion)] = { 0 };
 
-			mask.deviceid = XIAllMasterDevices;
-			mask.mask_len = XIMaskLen(XI_RawMotion);
-			mask.mask = reinterpret_cast<unsigned char*>(std::calloc(mask.mask_len, sizeof(unsigned char)));
+			em.deviceid = XIAllMasterDevices;
+			em.mask_len = sizeof(mask);
+			em.mask = mask;
+			XISetMask(mask, XI_RawMotion);
 
-			mask.deviceid = XIAllMasterDevices;
-			memset(mask.mask, 0, mask.mask_len);
-			XISetMask(mask.mask, XI_RawMotion);
+			XISelectEvents(dpy, root, &em, 1);
 
-			XISelectEvents(dpy, DefaultRootWindow(dpy), &mask, 1);
-
-			free(mask.mask);
 			XSync(dpy, True);
 		}
 	}
@@ -617,6 +615,12 @@ namespace augs {
 		}
 	}
 
+	static inline double fp3232val(xcb_input_fp3232_t* val)
+	{
+		//LOG_NVPS(val->integral, val->frac, val->frac / (double)UINT_MAX);
+		return val->integral + val->frac / (double)UINT_MAX;
+	}
+
 	void window::collect_entropy(local_entropy& output) {
 		auto keysym_getter = [this](const xcb_keycode_t keycode){
 			return xcb_key_symbols_get_keysym(syms, keycode, 0);
@@ -669,19 +673,26 @@ namespace augs {
 					&& generic_event->extension == xi_opcode 
 					&& generic_event->event_type == XI_RawMotion
 				) {
-					const auto mot = reinterpret_cast<xcb_input_raw_button_press_event_t*>(generic_event);
+					const auto mot = reinterpret_cast<xcb_input_raw_motion_event_t*>(generic_event);
 					const auto axis_n = xcb_input_raw_button_press_axisvalues_raw_length(mot);
 
 					if (2 == axis_n) {
 						const auto axes = xcb_input_raw_button_press_axisvalues(mot);
+						const auto x = fp3232val(&axes[0]);
+						const auto y = fp3232val(&axes[1]);
 
-						const auto x = axes[0].integral;
-						const auto y = axes[1].integral;
+						if (x != 0.0) {
+							smallest_raw_x_unit = std::min(std::abs(x), smallest_raw_x_unit);
+						}
+
+						if (y != 0.0) {
+							smallest_raw_y_unit = std::min(std::abs(y), smallest_raw_y_unit);
+						}
 
 						if (is_active() && (current_settings.is_raw_mouse_input() || mouse_pos_paused)) {
 							auto ch = do_raw_motion({
-								static_cast<short>(x),
-								static_cast<short>(y) 
+								static_cast<short>(x / smallest_raw_x_unit),
+								static_cast<short>(y / smallest_raw_y_unit) 
 							});
 
 							output.push_back(ch);

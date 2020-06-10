@@ -55,6 +55,8 @@ typedef struct xcb_input_raw_button_press_event_t {
     uint32_t              full_sequence;
 } xcb_input_raw_button_press_event_t;
 
+typedef xcb_input_raw_button_press_event_t xcb_input_raw_motion_event_t;
+
 uint32_t *
 xcb_input_raw_button_press_valuator_mask (const xcb_input_raw_button_press_event_t *R)
 {
