@@ -66,6 +66,28 @@ I basic_wielding_setup<I>::get_other_than(const E& wielded_item) const {
 }
 
 template <class I>
+template <class C>
+std::size_t basic_wielding_setup<I>::least_weapon_index(const C& cosm) const {
+	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
+		const auto selection = cosm[hand_selections[i]];
+
+		if (selection.dead()) {
+			return i;
+		}
+	}
+
+	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
+		const auto selection = cosm[hand_selections[i]];
+
+		if (nullptr == selection.template find<components::gun>()) {
+			return i;
+		}
+	}
+
+	return 0;
+}
+
+template <class I>
 template <class E>
 void basic_wielding_setup<I>::clear_hand_with(const E& wielded_item) {
 	for (std::size_t i = 0; i < hand_selections.size(); ++i) {

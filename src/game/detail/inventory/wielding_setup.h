@@ -42,6 +42,9 @@ struct basic_wielding_setup  {
 		return hand_selections == b.hand_selections;  
 	}
 
+	template <class C>
+	std::size_t least_weapon_index(const C&) const;
+
 	template <class E>
 	id_type get_other_than(const E& wielded_item) const;
 

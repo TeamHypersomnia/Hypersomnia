@@ -77,6 +77,11 @@ bool holds_armed_explosive(const E& handle) {
 }
 
 template <class E>
+bool is_throwing_melee(const E& handle) {
+	return handle.template get<components::item_slot_transfers>().when_throw_requested.was_set();
+}
+
+template <class E>
 void drop_mag_to_ground(const E& mag) {
 	auto& cosm = mag.get_cosmos();
 
@@ -194,7 +199,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			return ctx.alive(cosm);
 		};
 
-		if (transfers.when_throw_requested.was_set()) {
+		if (is_throwing_melee(it)) {
 			return;
 		}
 
@@ -840,7 +845,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			return;
 		}
 
-		auto do_drop = [&](const auto& item) {
+		auto do_drop = [&](const auto& item, const bool fix_secondary = false) {
 			if (item.dead()) {
 				return;
 			}
@@ -862,17 +867,19 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 			perform_transfer(request, step);
 
-			if (const auto secondary_hand = typed_subject[slot_function::SECONDARY_HAND]) {
-				if (const auto item_in_wrong_hand = secondary_hand.get_item_if_any()) {
-					LOG("Moving the other item to the primary hand for convenience.");
+			if (fix_secondary) {
+				if (const auto secondary_hand = typed_subject[slot_function::SECONDARY_HAND]) {
+					if (const auto item_in_wrong_hand = secondary_hand.get_item_if_any()) {
+						LOG("Moving the other item to the primary hand for convenience.");
 
-					auto fixing_transfer = item_slot_transfer_request::standard(item_in_wrong_hand, typed_subject[slot_function::PRIMARY_HAND]);
+						auto fixing_transfer = item_slot_transfer_request::standard(item_in_wrong_hand, typed_subject[slot_function::PRIMARY_HAND]);
 
-					fixing_transfer.params.play_transfer_sounds = false;
-					fixing_transfer.params.play_transfer_particles = false;
-					fixing_transfer.params.perform_recoils = false;
+						fixing_transfer.params.play_transfer_sounds = false;
+						fixing_transfer.params.play_transfer_particles = false;
+						fixing_transfer.params.perform_recoils = false;
 
-					perform_transfer(fixing_transfer, step);
+						perform_transfer(fixing_transfer, step);
+					}
 				}
 			}
 		};
@@ -967,6 +974,18 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 					auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
 					transfers_state.when_throw_requested = {};
+
+					auto& wield_after_throwing_knives = transfers_state.wield_after_throw_operation;
+
+					if (wield_after_throwing_knives.is_set()) {
+						::perform_wielding(
+							step,
+							typed_subject,
+							wield_after_throwing_knives
+						);
+
+						wield_after_throwing_knives = {};
+					}
 				}
 
 				return;
@@ -993,7 +1012,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					return false;
 				}
 				else {
-					do_drop(item);
+					do_drop(item, true);
 					return true;
 				}
 			};
@@ -1014,7 +1033,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 		if (requested_index != static_cast<std::size_t>(-1)) {
 			const auto& item_inside = typed_subject.calc_hand_action(requested_index).held_item;
-			do_drop(cosm[item_inside]);
+			do_drop(cosm[item_inside], true);
 		}
 	};
 
@@ -1048,20 +1067,24 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				}
 			}
 
-			{
-				if (typed_subject.is_frozen()) {
-					/* Forbid unarming and throwing nades when frozen */
-					return;
-				}
+			if (typed_subject.is_frozen()) {
+				/* Forbid throwing anything when frozen */
+				return;
+			}
 
+			auto handle_grenade_throw_intents = [&]() {
 				if (r.was_pressed()) {
 					if (!arm_explosive_cooldown_passed(typed_subject)) {
 						/* Forbid unarming nades when cooldown is still on */
 						return;
 					}
 
+					if (::is_throwing_melee(typed_subject)) {
+						return;
+					}
+
 					if (::holds_armed_explosive(typed_subject)) {
-						/* Forbid unarming nades when another nade is still being unarmed (repeated press) */
+						/* Forbid unarming nades when another nade is still being unarmed to not screw things up */
 						return;
 					}
 				}
@@ -1090,19 +1113,13 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 							return false;
 						};
 
-						int target_index = 1;
-
 						const auto current_wielding = wielding_setup::from_current(typed_subject);
 						auto requested_wield = current_wielding;
 
 						auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
-						auto& wield_after_throwing_explosive = transfers_state.wield_after_mid_akimbo_chambering;
+						auto& wield_after_throwing_explosive = transfers_state.wield_after_throw_operation;
 
-						if (requested_wield.is_bare_hands(cosm)) {
-							/* Only engage the primary hand if both are free, though this probably won't happen often */
-							target_index = 0;
-						}
-
+						const auto target_index = current_wielding.least_weapon_index(cosm);
 						const auto wielded_items = typed_subject.get_wielded_items();
 
 						if (r.was_released()) {
@@ -1195,11 +1212,16 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 					try_with(intended_force_type);
 				}
-			}
+			};
 
-			if (r.was_pressed()) {
-				if (typed_subject.is_frozen()) {
-					/* Forbid throwing knives when frozen */
+			auto handle_throw_melee_presses = [&]() {
+				if (::holds_armed_explosive(typed_subject)) {
+					/* Forbid interfering with another armed explosive */
+					return;
+				}
+
+				if (::is_throwing_melee(typed_subject)) {
+					/* Forbid interfering with another thrown melee */
 					return;
 				}
 
@@ -1214,61 +1236,60 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
 
 				if (requested_knives > 0) {
-					const auto n = typed_subject.get_wielded_melees().size();
+					const auto num_wielded_melees = typed_subject.get_wielded_melees().size();
+					const auto num_wielded_items = typed_subject.get_wielded_items().size();
 
-					if (n == 2) {
-						/* Special case: if we already have a two melees in hands and don't require a throw, just require a throw. */
-						if (!transfers_state.when_throw_requested.was_set()) {
-							transfers_state.when_throw_requested = clk.now;
-						}
+					{
+						/* 
+							Handle pre-wielded melees.
+							This block will only pass-through if the character:
+						   	- has zero knives and wants to throw some
+							- has a single knife and wants to throw two
 
-						return;
-					}
+							since these are the only cases that require additional wielding.
+						*/
 
-					if (n == 1) {
-						if (requested_knives == 1) {
-							if (n == 1 && typed_subject.get_wielded_items().size() == 1) {
-								/* Special case: if we already have a melee in hand and nothing else in the other, prevent the pulling of another knife if we want to only throw one at a time. */
-
-								if (!transfers_state.when_throw_requested.was_set()) {
-									transfers_state.when_throw_requested = clk.now;
-								}
-
-								return;
-							}
-						}
-
-						if (typed_subject.get_wielded_items().size() == 2) {
-							/* Special case: if we already have a melee in hand and something else in the other, and don't require a throw, just require a throw. */
-
+						auto request_throw = [&]() {
 							if (!transfers_state.when_throw_requested.was_set()) {
 								transfers_state.when_throw_requested = clk.now;
 							}
+						};
 
+						if (num_wielded_melees == 2) {
+							/* Special case: if we already have a two melees in hands and don't require a throw, just require a throw. */
+							request_throw();
 							return;
+						}
+
+						if (num_wielded_melees == 1) {
+							if (requested_knives == 1) {
+								if (num_wielded_items == num_wielded_melees) {
+									/* Special case: if we already have a melee in hand and nothing else in the other, prevent the pulling of another knife if we want to only throw one at a time. */
+									request_throw();
+									return;
+								}
+							}
+
+							if (num_wielded_items == 2) {
+								/* Special case: if we already have a melee in hand and something else in the other, and don't require a throw, just require a throw. */
+								request_throw();
+								return;
+							}
 						}
 					}
 
 
-					auto requested_wield = wielding_setup::from_current(typed_subject);
+					const auto current_wielding = wielding_setup::from_current(typed_subject);
+					auto requested_wield = current_wielding;
 
 					auto is_melee_like = [&](const auto& entity) {
 						return entity.template has<components::melee>();
 					};
 
-					int target_index = 1;
+					auto target_index = current_wielding.least_weapon_index(cosm);
 
-					if (cosm[requested_wield.hand_selections[0]].dead()) {
-						/* Only engage the primary hand if both are free, though this probably won't happen often */
-						target_index = 0;
-					}
-
-					if (const auto maybe_melee_already = cosm[requested_wield.hand_selections[target_index]]) {
-						if (is_melee_like(maybe_melee_already)) {
-							return;
-						}
-					}
-
+					int num_found_melees = 0;
+					auto num_additional_melees = requested_knives - num_wielded_melees;
 					bool any_found = false;
 
 					typed_subject.for_each_contained_item_recursive(
@@ -1279,16 +1300,32 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 							if (is_melee_like(candidate_item)) {
 								requested_wield.hand_selections[target_index] = candidate_item;
+								target_index = 1 - target_index;
+								++num_found_melees;
+								--num_additional_melees;
+
 								any_found = true;
 
-								return recursive_callback_result::ABORT;
+								return num_additional_melees > 0 ? recursive_callback_result::CONTINUE_AND_RECURSE : recursive_callback_result::ABORT;
 							}
 
 							return recursive_callback_result::CONTINUE_AND_RECURSE;
 						}
 					);
 
+					const auto total_wielded_melees = num_found_melees + num_wielded_melees;
+
 					if (any_found) {
+						const bool any_item_was_replaced = 
+							current_wielding.is_akimbo(cosm) || 
+							total_wielded_melees == 2
+						;
+
+						if (any_item_was_replaced) {
+							auto& wield_after_throwing_knives = transfers_state.wield_after_throw_operation;
+							wield_after_throwing_knives = current_wielding;
+						}
+
 						::perform_wielding(
 							step,
 							typed_subject,
@@ -1298,6 +1335,11 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						transfers_state.when_throw_requested = clk.now;
 					}
 					else if (typed_subject.get_wielded_melees().size() > 0) {
+						/*
+							Will happen if we want to throw two knives,
+							but we only possess a single one that is hand already.
+						*/
+
 						transfers_state.when_throw_requested = clk.now;
 					}
 
@@ -1306,6 +1348,12 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						because the request will not pass a test of checking "when_throw_requested" against "when_transferred" of a held_item.
 					*/
 				}
+			};
+
+			handle_grenade_throw_intents();
+
+			if (r.was_pressed()) {
+				handle_throw_melee_presses();
 			}
 		});
 	}

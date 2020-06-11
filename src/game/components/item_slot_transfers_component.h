@@ -41,6 +41,7 @@ namespace components {
 
 		entity_id mid_akimbo_chambered_gun;
 		signi_wielding_setup wield_after_mid_akimbo_chambering;
+		signi_wielding_setup wield_after_throw_operation;
 		// END GEN INTROSPECTOR
 	};
 }

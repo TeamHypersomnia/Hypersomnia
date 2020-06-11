@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Allow baking nades when reloading
+- Fix akimbo after throwing knife
+
 - First reload the one that has less ammo
 - Consider not stopping the reloading context on shooting e.g. the gradobicie
 
