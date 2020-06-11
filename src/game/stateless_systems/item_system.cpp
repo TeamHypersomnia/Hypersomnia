@@ -199,11 +199,15 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			return ctx.alive(cosm);
 		};
 
-		if (is_throwing_melee(it)) {
+		if (::is_throwing_melee(it)) {
 			return;
 		}
 
-		if (!is_context_alive() && !::holds_armed_explosive(it)) {
+		if (::holds_armed_explosive(it)) {
+			return;
+		}
+
+		if (!is_context_alive()) {
 			/* 
 				No current context. 
 				Automatically check if we should reload. 

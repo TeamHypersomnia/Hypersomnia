@@ -412,9 +412,11 @@ void game_gui_system::advance(
 						const auto& fuse = expl.template get<components::hand_fuse>();
 
 						if (fuse.armed() && fuse.slot_when_armed != expl.get_current_slot().get_type()) {
+							LOG_NVPS(fuse.slot_when_armed, expl.get_current_slot().get_type());
 							const auto impulse = subject.template get<invariants::item_slot_transfers>().standard_throw_impulse;
 							auto request = item_slot_transfer_request::drop(typed_item, impulse);
 
+							LOG("AUTO DROP");
 							queue_transfer(subject, request);
 						}
 					}

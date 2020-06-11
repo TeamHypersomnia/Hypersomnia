@@ -4403,3 +4403,6 @@ Advantages:
 
 - Update server
 
+- Allow baking nades when reloading
+- Fix akimbo after throwing knife
+
