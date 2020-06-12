@@ -45,12 +45,19 @@ return {
         },
         rotation = 0
       },
+      rail = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       shell_spawn = {
         pos = {
-          x = 26,
-          y = -6
+          x = -6,
+          y = -1
         },
-        rotation = -69.443954467773438
+        rotation = 90
       }
     },
     item = {

@@ -58,10 +58,9 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 		}
 	};
 
-	auto draw_circle = [&](const auto& reh_id, const auto& it, const auto highlight_amount, const rgba first_col, const rgba second_col, const vec2 offset = vec2::zero) {
+	auto draw_circle = [&](const auto& reh_id, const auto& it, const auto highlight_amount, const rgba first_col, const rgba second_col, const transformr offset = transformr()) {
 		if (auto tr = it.find_viewing_transform(in.interpolation)) {
-			tr->pos += offset;
-			draw_circle_at(reh_id, *tr, highlight_amount, first_col, second_col);
+			draw_circle_at(reh_id, *tr * offset, highlight_amount, first_col, second_col);
 		}
 	};
 
@@ -145,16 +144,22 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 
 	const bool enemy_hud = in.settings.draw_enemy_hud;
 
+	auto calc_appropriate_offset = [&](const auto& container) {
+		if (container.template find<components::gun>()) {
+			const auto offset = ::calc_shell_offset(container);
+			return transformr(offset.pos, offset.rotation);
+		}
+
+		return transformr();
+	};
+
 	cosm.for_each_having<components::gun>(
 		[&](const auto& it) {
 			if (const auto tr = it.find_viewing_transform(in.interpolation)) {
 				const auto& gun = it.template get<components::gun>();
 
 				auto draw_progress = [&](const auto& amount) {
-					auto shell_spawn_offset = ::calc_shell_offset(it);
-					shell_spawn_offset.pos.rotate(tr->rotation);
-
-					draw_circle(C::SMALL, it, amount, white, red_violet, shell_spawn_offset.pos);
+					draw_circle(C::SMALL, it, amount, white, red_violet, calc_appropriate_offset(it));
 				};
 
 				const auto& chambering_progress = gun.chambering_progress_ms;
@@ -243,12 +248,13 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 
 			if (!request.is_unmounting(item)) {
 				if (const auto slot = cosm[request.target]) {
-					const auto tr = slot.get_container().find_viewing_transform(in.interpolation);
-					draw_circle_at(C::SMALL, *tr, highlight_amount, white, red_violet);
+					const auto container = slot.get_container();
+					draw_circle(C::SMALL, container, highlight_amount, white, red_violet, calc_appropriate_offset(container));
 				}
 			}
 			else {
-				draw_circle(C::SMALL, item, highlight_amount, white, red_violet);
+				const auto container = item.get_current_slot().get_container();
+				draw_circle(C::SMALL, item, highlight_amount, white, red_violet, calc_appropriate_offset(container));
 			}
 		}
 	}
