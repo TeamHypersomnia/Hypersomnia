@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Hold symlinks in user/ so that they don't get deleted on update
+- Position the nade progress circle correctly when reloading
+
 - First reload the one that has less ammo
 - Consider not stopping the reloading context on shooting e.g. the gradobicie
 
