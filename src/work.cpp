@@ -1457,7 +1457,14 @@ work_result work(const int argc, const char* const * const argv) try {
 				}
 
 				browse_servers_gui.advance_ping_logic();
-				perform_browse_servers();
+
+				{
+					const bool show_server_browser = !has_current_setup() || ingame_menu.show;
+
+					if (show_server_browser) {
+						perform_browse_servers();
+					}
+				}
 
 				if (!has_current_setup()) {
 					perform_last_exit_incorrect();
