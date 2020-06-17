@@ -1527,6 +1527,10 @@ setup_escape_result server_setup::escape() {
 		return setup_escape_result::GO_TO_MAIN_MENU;
 	}
 
+	if (integrated_client_gui.rcon.escape()) {
+		return setup_escape_result::JUST_FETCH;
+	}
+
 	return arena_base::escape();
 }
 

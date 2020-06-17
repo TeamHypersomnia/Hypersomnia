@@ -31,4 +31,13 @@ struct rcon_gui_state {
 
 		applying_sv_solvable_vars = false;
 	}
+
+	bool escape() {
+		if (show) {
+			show = false;
+			return true;
+		}
+
+		return false;
+	}
 };
