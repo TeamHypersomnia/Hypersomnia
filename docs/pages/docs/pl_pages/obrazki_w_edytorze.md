@@ -39,7 +39,7 @@ Z dźwiękami będziemy mieli ten sam schemat, tylko że zamiast folderu ``gfx`
 Pomysł jest taki.
 Gdziekolwiek w edytorze będziemy mieli do wyboru obrazek, będziemy mieli takie oto combo:
 
-{% include image.html file="pages/todo/pl_pages/przykladowy_combo.png" %}
+{% include image.html file="pages/docs/pl_pages/przykladowy_combo.png" %}
 
 Będzie to miniaturkowy hierarchiczny widok na strukturę obu folderów: oficjalnego i specyficznego dla projektu.  
 

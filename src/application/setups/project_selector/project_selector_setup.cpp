@@ -319,6 +319,8 @@ static auto selectable_with_icon(
 
 	const auto before_pos = ImGui::GetCursorPos();
 
+	bool result = false;
+
 	{
 		auto colored_selectable = push_selectable_colors(
 			bg_cols[0],
@@ -328,9 +330,7 @@ static auto selectable_with_icon(
 
 		auto id = scoped_id(label.c_str());
 
-		if (ImGui::Selectable("###Button", true, ImGuiSelectableFlags_None, button_size)) {
-			return true;
-		}
+		result = ImGui::Selectable("###Button", true, ImGuiSelectableFlags_None, button_size);
 	}
 
 	{
@@ -351,7 +351,7 @@ static auto selectable_with_icon(
 
 	shift_cursor(vec2(0, text_h * padding_mult));
 
-	return false;
+	return result;
 }
 
 project_list_entry* projects_list_tab_state::find_selected() {

@@ -33,17 +33,17 @@ to nie może być to *istotny* element obrazka.
 Powiedzmy, że chcemy dodać światełko do muszki broni.  
 Może nas podkusić aby po prostu zostawić taki piksel:
 
-{% include image.html file="pages/todo/pl_pages/bilmer_one_px.png" %}
+{% include image.html file="pages/docs/pl_pages/bilmer_one_px.png" %}
 Jest to jednak broń -  bronie są w grze często **obracane**.
 Niestety, pixel-art ma to do siebie, że traci jakość podczas obrotu.  
 Następujący artefakt może mieć miejsce:  
 
-{% include image.html file="pages/todo/pl_pages/one_pixel_problem.png" %}
+{% include image.html file="pages/docs/pl_pages/one_pixel_problem.png" %}
 
 Jak widać, algorytm może czasami usunąć istotny dla nas jasny piksel.  
 Rozwiązaniem tego problemu jest dodanie sąsiedniego piksela:
 
-{% include image.html file="pages/todo/pl_pages/bilmer_two_px.png" %}
+{% include image.html file="pages/docs/pl_pages/bilmer_two_px.png" %}
 
 W tym przypadku, nawet gdy przy obrocie zostanie utracony jeden piksel, drugi zawsze będzie widoczny i artefakt nie będzie miał miejsca.  
 
@@ -57,7 +57,7 @@ Ze względu na rozbudowane, dynamiczne oświetlenie w grze, artysta **nie może 
 
 Idealnym wzorem do naśladowania jest laboratoryjna podłoga - mamy charakterystyczne szramy które, przez to że są wnękami, są odrobinę ciemniejsze od reszty:
 
-{% include image.html file="pages/todo/pl_pages/floor.png" %}
+{% include image.html file="pages/docs/pl_pages/floor.png" %}
 
 Oczywiście, ta technika musi być stosowana z umiarem aby rezultat nie przypominał pillow shadingu.  
 
@@ -151,7 +151,7 @@ Między klatkami pojedynczej animacji, środek wizualny może już trochę się
 
 Dlatego odległości między dłońmi na animacji muszą być **stałe**, aby broń nie "pływała" nam po rękach:  
 
-{% include image.html file="pages/todo/pl_pages/plywanie.gif" %}
+{% include image.html file="pages/docs/pl_pages/plywanie.gif" %}
 
 Naturalnym jest, że lewa dłoń będzie robiła większe ruchy od prawej, jako że lewa jest bardziej wyciągnięta do przodu.  
 Oto sposób na to aby zachowywać stałą odległość między dłońmi podczas animowania, gdy chcemy aby jedna dłoń ruszała się mniej od drugiej:  
@@ -162,7 +162,7 @@ Drugą taką samą linię zaczęto obracać wokół pierwszej dłoni. Tam, gdzie
 
 Dzięki temu będzie wizualnie uzasadnione to, że broń w rzucie z lotu ptaka ma ciągle taką samą długość.  
 
-{% include image.html file="pages/todo/pl_pages/linia_obrot.gif" %}
+{% include image.html file="pages/docs/pl_pages/linia_obrot.gif" %}
 
 Najlepiej stworzyć sobie takie linie w edytorze, z kolorowymi kropkami po obu stronach, i nadzorować czy odległość ciągle wypada taka sama.
 
@@ -173,7 +173,7 @@ Najlepiej stworzyć sobie takie linie w edytorze, z kolorowymi kropkami po obu s
 
 	Przykład poprawnej animacji:  
 
-	{% include image.html file="pages/todo/pl_pages/torso_bare.png" %}
+	{% include image.html file="pages/docs/pl_pages/torso_bare.png" %}
 
 	Ta animacja będzie dodatkowo służyć jako domyślna animacja trzymania itemów, do których nie ma żadnej specjalnej animacji.  
 	Istotnie, ta animacja nie wygląda źle z małymi itemami.  
@@ -191,7 +191,7 @@ Najlepiej stworzyć sobie takie linie w edytorze, z kolorowymi kropkami po obu s
 
 	Przykład poprawnej animacji:
 
-	{% include image.html file="pages/todo/pl_pages/torso_rifle.png" %}
+	{% include image.html file="pages/docs/pl_pages/torso_rifle.png" %}
 
 	- Pierwsza klatka będzie wyświetlana dodatkowo dla **gracza który stoi w miejscu**.
 
@@ -200,7 +200,7 @@ Najlepiej stworzyć sobie takie linie w edytorze, z kolorowymi kropkami po obu s
 
 	Przykład poprawnej animacji:  
 
-	{% include image.html file="pages/todo/pl_pages/torso_rifle_shoot.png" %}
+	{% include image.html file="pages/docs/pl_pages/torso_rifle_shoot.png" %}
 
 	- Uwaga: artysta musi **samodzielnie ustawić klatki powrotne** w edytorze.
 		- To robi sens, ponieważ przy strzale ramię szybciej odskoczy niż powróci na miejsce.
@@ -265,7 +265,7 @@ Jako bonus, to sprawi, że nasze nogi będą kompatybilne również z "chudszymi
 
 	Przykład poprawnej animacji:  
 
-	{% include image.html file="pages/todo/pl_pages/legs_forward.png" %}
+	{% include image.html file="pages/docs/pl_pages/legs_forward.png" %}
 
 2. Animacja nóg podczas chodzenia **prostopadłego** do kierunku patrzenia.  
 	**Ilość klatek: 2n lub 4n (10 lub 20).** 
@@ -276,7 +276,7 @@ Jako bonus, to sprawi, że nasze nogi będą kompatybilne również z "chudszymi
 
 	Przykład poprawnej animacji:  
 
-	{% include image.html file="pages/todo/pl_pages/legs_strafe.png" %}
+	{% include image.html file="pages/docs/pl_pages/legs_strafe.png" %}
 
 	- Uwaga: w przeciwieństwie do animacji chodzenia prosto, artysta *zawsze* samodzielnie rysuje animację powrotną.
 		- Przy strafowaniu wygląda to na konieczne.
@@ -299,11 +299,11 @@ Gra jest bardzo dynamiczna, dlatego animacja powinna:
 
 To jest przykład animacji, która będzie praktycznie niezauważalna w całym chaosie rozgrywki:
 
-{% include image.html file="pages/todo/pl_pages/vindicator.gif" %}
+{% include image.html file="pages/docs/pl_pages/vindicator.gif" %}
 
 To jest za to idealny przykład animacji która zmienia kształt broni i będzie bardzo zauważalna, osiągając zamierzony efekt:
 
-{% include image.html file="pages/todo/pl_pages/gral3.gif" %}
+{% include image.html file="pages/docs/pl_pages/gral3.gif" %}
 
 
 ## Kategoria: Dekoracje

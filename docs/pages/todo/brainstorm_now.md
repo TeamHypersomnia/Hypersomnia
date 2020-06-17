@@ -34,8 +34,6 @@ summary: That which we are brainstorming at the moment.
 	- Scenario: heavy gun picked
 		- Q just drops it
 
-- Flip secondary hand item
-
 - Vote pause the game
 - Simple commands for chat
 	- time
