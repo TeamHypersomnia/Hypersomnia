@@ -2719,13 +2719,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::COVERT_MAGAZINE);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
-
-				meta.set(render_def);
-			}
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::COVERT_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 

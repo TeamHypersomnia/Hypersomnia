@@ -52,6 +52,7 @@
 #include "game/detail/inventory/calc_reloading_context.hpp"
 
 #include "game/detail/gun/gun_getters.h"
+#include "game/detail/explosive/like_explosive.h"
 
 enum class reload_advance_result {
 	DIFFERENT_VIABLE,
