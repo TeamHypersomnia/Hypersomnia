@@ -5,29 +5,12 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
-- We'll separate servers by tickrate
-	- So for now don't bother worrying about calculating tickrate based on number of players
-
-- Ensure that the main's presolve doesn't change the solvable
-	- Indeed it is only about debug lines
-
-- Force autosaving for when setting a value in editor causes a crash?
-	- Actually this is pretty interactive so the cause will be readily known; not necessary
-
-- It makes little sense to enable editor GUI inside gameplay mode.
-	- We'll just make it possible to interact with imgui controls in-game.
-	- We don't have some fancy replay-preview stuff like in that other game we saw somewhere...
-	- and anyway it's better to move some important objects while paused, while we can snap to grid, etc.
-
-- For now, don't make commands for creating/deleting/duplicating mode rulesets
-	- Just in testbed populate all types with one ruleset instance
-
-- For now don't worry about maximum size, it's enough until DM
+- For now don't worry about maximum texture size, it's enough until DM
 	- In production, we will always reserve max used ever on startup
 		- we'll reserve the maximum (which will probably be half the maximum texture GPU size)
 	- In debug builds, we'll really do whatever
 
-- Further parallelizing the neon maps is not quite worth the effort.
+- Finer-grained parallelization of the neon maps is not quite worth the effort.
 	- Ultimately, we won't have such giants anyway.
 
 - We will keep the audiovisual state global for all setups.
@@ -43,17 +26,7 @@ summary: We don't need to do this yet, because...
 		- Also removing a currently used id will be forbidden.
 	- E.g. sprites, animations or other invariants.
 
-- two animation usages will most probably only ever differ by speed.
-
-- Later if we really need it for descriptions, we can retrieve the old values by accessing the field address, in just the same way as the command logic does.
-
-- for now we'll put an animation id inside wandering pixels,
-	- so let's just leave the unique_ptr<field_address> actually_element for later
-		- i think we will be able to do this nicely
-	- struct_field_address that will be returned by make_struct_field_address
-
 - We will never be met with a situation where no images are in the project.
 	- That is because common will always use some,
 		- and will be initialized with sensible values from the start
 	- and you can't erase images if they are used.
-

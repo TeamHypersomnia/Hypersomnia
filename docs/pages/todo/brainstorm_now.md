@@ -131,16 +131,6 @@ summary: That which we are brainstorming at the moment.
 	- a little cyclic shine on the top (might also be done with the overlay shader
 	- We could disable emphasis for the empty mags
 
-
-- A keyboard map guide
-	- hotbar_button_0 -> hotbar 0
-	- hotbar_button_1 -> hotbar 1
-	- special_action_button_1 -> spell 1
-	- maybe just Support spell
-		- Offensive spell
-		- Defensive spell
-	- Then we can rebind B to buy menu
-
 - Left-handed option
 
 - Fix those mag refills please
