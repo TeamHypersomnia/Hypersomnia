@@ -5,6 +5,7 @@ using entities_with_render_layer = entity_types_having_any_of<
 	invariants::render,
 	invariants::item,
 	invariants::missile,
+	invariants::trace,
 	invariants::sentience,
 	invariants::remnant,
 	invariants::light,

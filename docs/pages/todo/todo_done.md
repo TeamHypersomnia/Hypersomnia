@@ -4406,3 +4406,6 @@ Advantages:
 - Allow baking nades when reloading
 - Fix akimbo after throwing knife
 
+- wtf again with those traces? why are they missing?
+	- we were making an overhaul in guns.cpp so perhaps something got lost in heat of the moment
+

@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- wtf again with those traces? why are they missing?
-
 - Corpses explode with a white flasbang-like explosion
 	- Though they don't blind or apply damage, maybe at most a kickback like interference nade
 
