@@ -24,6 +24,7 @@ void enqueue_illuminated_rendering_jobs(
 	const auto& interp = av.template get<interpolation_system>();
 	const auto& gui_font = in.gui_font;
 	const auto& game_images = in.game_images;
+	const auto pre_step_crosshair_displacement = in.pre_step_crosshair_displacement;
 
 	const auto& viewed_character = in.camera.viewed_character;
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
@@ -70,7 +71,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::line_drawer_with_default { dedicated[d].lines, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto sentience_hud_job = [&cosm, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, &indicator_meta]() {
+	auto sentience_hud_job = [&cosm, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, &indicator_meta, viewed_character_transform, fog_of_war_effective, pre_step_crosshair_displacement]() {
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
 		std::array<assets::necessary_image_id, 3> circles = {
@@ -123,11 +124,50 @@ void enqueue_illuminated_rendering_jobs(
 		auto& nicknames_output = dedicated[D::NICKNAMES].triangles;
 		auto& health_numbers_output = dedicated[D::HEALTH_NUMBERS].triangles;
 		auto& indicators_output = dedicated[D::SENTIENCE_INDICATORS].triangles;
+		auto& small_health_bars_output = dedicated[D::SMALL_HEALTH_BARS].triangles;
+
+		auto is_reasonably_in_view = [&](const const_entity_handle character) {
+			if (!fog_of_war_effective) {
+				return false;
+			}
+
+			if (viewed_character.dead() || viewed_character_transform == std::nullopt) {
+				return false;
+			}
+
+			const auto from = viewed_character_transform->pos;
+			const auto to = character.get_viewing_transform(interp).pos;
+
+			auto look_dir = calc_crosshair_displacement(viewed_character) + pre_step_crosshair_displacement;
+
+			if (look_dir.is_zero()) {
+				look_dir.set(1, 0);
+			}
+
+			look_dir.normalize();
+			const auto target_dir = (to - from).normalize();
+
+			if (look_dir.degrees_between(target_dir) <= settings.fog_of_war.angle / 2) {
+				const auto& physics = cosm.get_solvable_inferred().physics;
+
+				const auto line_of_sight = physics.ray_cast_px(
+					cosm.get_si(), 
+					from, 
+					to, 
+					predefined_queries::line_of_sight()
+				);
+
+				return !line_of_sight.hit;
+			}
+
+			return false;
+		};
 
 		const auto input = draw_sentiences_hud_input {
 			nicknames_output,
 			health_numbers_output,
 			indicators_output,
+			small_health_bars_output,
 			cone,
 			sentience_queried_cone,
 			visible,
@@ -139,6 +179,7 @@ void enqueue_illuminated_rendering_jobs(
 			gui_font,
 			requested_meters,
 
+			necessarys.at(assets::necessary_image_id::BLANK),
 			necessarys.at(assets::necessary_image_id::BIG_COLOR_INDICATOR),
 			necessarys.at(assets::necessary_image_id::DANGER_INDICATOR),
 			necessarys.at(assets::necessary_image_id::DEATH_INDICATOR),
@@ -146,7 +187,8 @@ void enqueue_illuminated_rendering_jobs(
 			necessarys.at(assets::necessary_image_id::DEFUSING_INDICATOR),
 
 			color_indicator_angle,
-			indicator_meta
+			indicator_meta,
+			is_reasonably_in_view
 		};
 
 		draw_sentiences_hud(input);

@@ -6,6 +6,7 @@
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_player_id.h"
 #include "game/modes/detail/fog_of_war_settings.h"
+#include "view/character_hud_type.h"
 
 using mode_entity_id = entity_id;
 
@@ -17,7 +18,7 @@ struct test_mode_view_rules {
 	// GEN INTROSPECTOR struct test_mode_view_rules
 	double audiovisual_speed = 1.0;
 	fog_of_war_settings fog_of_war;
-	bool show_enemy_hud = true;
+	character_hud_type enemy_hud_mode = character_hud_type::SMALL_HEALTH_BAR;
 
 	bool enable_danger_indicators = true;
 	bool enable_teammate_indicators = true;

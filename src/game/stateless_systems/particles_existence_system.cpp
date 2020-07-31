@@ -170,17 +170,21 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 			const auto& e = d.damage.effects;
 
-			const bool sentient = sentient_and_vulnerable(subject);
+			const bool sentient = subject.template has<components::sentience>();
+			const bool vulnerable = sentient_and_vulnerable(subject);
 
 			if (d.inflictor_destructed) {
-				do_effect(e.destruction);
-
-				if (sentient && e.sentience_impact.particles.id.is_set()) {
-					do_effect(e.sentience_impact);
+				if (sentient) {
+					if (e.sentience_impact.particles.id.is_set()) {
+						do_effect(e.sentience_impact);
+					}
+				}
+				else {
+					do_effect(e.destruction);
 				}
 			}
 			else {
-				if (sentient && e.sentience_impact.particles.id.is_set()) {
+				if (vulnerable && e.sentience_impact.particles.id.is_set()) {
 					do_effect(e.sentience_impact);
 				}
 				else {
@@ -287,10 +291,10 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					ring.maximum_duration_seconds = 0.20f;
 
-					ring.color = red;
+					ring.color = white;
 					ring.center = h.point_of_impact;
 
-					step.post_message(std::move(msg));
+					//step.post_message(std::move(msg));
 				}
 
 				{
@@ -307,27 +311,27 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					ring.maximum_duration_seconds = 0.20f;
 
-					ring.color = red;
+					ring.color = white;
 					ring.center = h.point_of_impact;
 					
-					step.post_message(std::move(msg));
+					//step.post_message(std::move(msg));
 				}
 
 				{
 					auto msg = make_thunder_input();
 					auto& th = msg.payload;
 
-					th.delay_between_branches_ms = { 5.f, 17.f };
-					th.max_branch_lifetime_ms = { 30.f, 55.f };
-					th.branch_length = { 10.f, 60.f };
+					th.delay_between_branches_ms = { 8.f, 17.f };
+					th.max_branch_lifetime_ms = { 50.f, 80.f };
+					th.branch_length = { 40.f, 70.f };
 
 					th.max_all_spawned_branches = static_cast<unsigned>(h.effective_amount);
 					++th.max_all_spawned_branches;
-					th.max_branch_children = 3;
+					th.max_branch_children = 4;
 
 					th.first_branch_root = h.point_of_impact;
 					th.first_branch_root.rotation = (-h.impact_velocity).degrees();
-					th.branch_angle_spread = 60.f;
+					th.branch_angle_spread = 45.f;
 
 					th.color = white;
 

@@ -101,7 +101,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 						&& sentience.cast_cooldown_for_all_spells.is_ready(clk)
 						&& spell_instance_data.are_additional_conditions_for_casting_fulfilled(subject)
 					;
-					
+
 					if (can_cast_already) {
 						sentience.currently_casted_spell = spell;
 						sentience.time_of_last_spell_cast = now;
@@ -113,7 +113,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 							static_cast<float>(common.cooldown_ms), 
 							now
 						);
-						
+
 						sentience.cast_cooldown_for_all_spells.set(
 							std::max(standard_cooldown_for_all_spells_ms, static_cast<float>(meta.get_spell_logic_duration_ms())),
 							now
@@ -126,7 +126,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 							msg.transform = subject.get_logic_transform();
 
 							step.post_message(msg);
-							
+
 							sentience.time_of_last_exhausted_cast = now;
 						}
 					}
@@ -225,7 +225,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 
 						const auto& spell_meta = std::get<S>(cosm.get_common_significant().spells);
 						const auto spell_logic_duration_ms = spell_meta.get_spell_logic_duration_ms();
-						
+
 						const auto when_casted = sentience.time_of_last_spell_cast;
 
 						if ((now - when_casted).in_milliseconds(delta) <= spell_logic_duration_ms) {
@@ -451,7 +451,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.effective_amount = 0;
 		event_template.special_result = messages::health_event::result_type::NONE;
 		event_template.origin = d.origin;
-		
+
 		auto process_and_post_health = [&](const auto& event) {
 			process_and_post_health_event(event, step);
 		};
@@ -542,7 +542,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					}
 				}
 			}
-			
+
 			else if (d.type == adverse_element_type::INTERFERENCE && consciousness.is_enabled()) {
 				auto event = event_template;
 
@@ -574,7 +574,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					apply_ped(amount);
 				}
 			}
-			
+
 			else if (d.type == adverse_element_type::FLASH) {
 				const auto flashbang = cosm[d.origin.cause.entity];
 
@@ -695,7 +695,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 			}
 
 			const auto subject_transform = subject.get_logic_transform();
-			
+
 			std::optional<float> requested_angle;
 
 			if (const auto crosshair = subject.find_crosshair()) {
@@ -805,11 +805,11 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 			}
 
 			if (auto rigid_body = subject.template find<components::rigid_body>();
-				rigid_body != nullptr && requested_angle
-			) {
-				rigid_body.set_transform({ rigid_body.get_position(), *requested_angle });
-				rigid_body.set_angular_velocity(0);
-			}
+			rigid_body != nullptr && requested_angle
+		) {
+			rigid_body.set_transform({ rigid_body.get_position(), *requested_angle });
+			rigid_body.set_angular_velocity(0);
 		}
-	);
+	}
+);
 }

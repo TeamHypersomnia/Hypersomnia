@@ -194,7 +194,7 @@ namespace test_flavours {
 			auto make_round_remnant_flavour = [&](
 				const auto flavour_id,
 				const auto image_id,
-				const float lifetime_mult = 1.f
+				const float lifetime_mult = 0.3f
 			) {
 				auto& meta = get_test_flavour(flavours, flavour_id);
 

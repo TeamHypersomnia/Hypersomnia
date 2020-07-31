@@ -557,7 +557,7 @@ void audiovisual_state::standard_post_solve(
 				new_highlight.target = h.subject;
 				new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
 
-				new_highlight.maximum_duration_seconds = 0.10f;
+				new_highlight.maximum_duration_seconds = 0.11f;
 				new_highlight.color = cols.highlight;
 
 				highlights.add(new_highlight);

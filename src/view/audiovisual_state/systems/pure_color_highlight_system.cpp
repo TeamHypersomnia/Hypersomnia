@@ -68,7 +68,7 @@ void pure_color_highlight_system::draw_highlights(
 		
 		const auto target_color = rgba { 
 			r.in.color.rgb(),
-			static_cast<rgba_channel>(255.f * sqrt(sqrt(ratio)) * r.in.starting_alpha_ratio)
+			static_cast<rgba_channel>(255.f * std::sqrt(std::sqrt(ratio)) * r.in.starting_alpha_ratio)
 		};
 
 		draw_color_highlight(subject, target_color, in);

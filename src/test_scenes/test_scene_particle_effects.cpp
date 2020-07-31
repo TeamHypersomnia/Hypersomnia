@@ -478,7 +478,8 @@ void load_test_scene_particle_effects(
 			em.should_particles_look_towards_velocity = false;
 			em.randomize_acceleration = true;
 
-			effect.emissions.push_back(em);
+			(void)effect;
+			//effect.emissions.push_back(em);
 		}
 
 		particles_emission em;
@@ -516,7 +517,7 @@ void load_test_scene_particle_effects(
 		em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 		em.initial_rotation_variation = 180;
 
-		effect.emissions.push_back(em);
+		//effect.emissions.push_back(em);
 	}
 
 	{

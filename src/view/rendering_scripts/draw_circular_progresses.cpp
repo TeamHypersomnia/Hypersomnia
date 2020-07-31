@@ -142,7 +142,7 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 		}
 	);
 
-	const bool enemy_hud = in.settings.draw_enemy_hud;
+	const auto enemy_hud = in.settings.enemy_hud_mode;
 
 	auto calc_appropriate_offset = [&](const auto& container) {
 		if (container.template find<components::gun>()) {
@@ -166,7 +166,7 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 				const auto chambering_duration = ::calc_current_chambering_duration(it);
 
 				if (chambering_progress > 0.f && augs::is_positive_epsilon(chambering_duration)) {
-					if (!enemy_hud) { 
+					if (enemy_hud != character_hud_type::FULL) { 
 						if (const auto c = it.get_owning_transfer_capability()) {
 							if (!viewer_faction_matches(c)) {
 								return;
@@ -238,7 +238,7 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 		if (progress > 0.f) {
 			const auto highlight_amount = 1.f - (progress / request.get_mounting_duration_ms(item));
 
-			if (!enemy_hud) { 
+			if (enemy_hud != character_hud_type::FULL) { 
 				if (const auto c = item.get_owning_transfer_capability()) {
 					if (!viewer_faction_matches(c)) {
 						return;

@@ -53,6 +53,7 @@ struct draw_sentiences_hud_input {
 	augs::vertex_triangle_buffer& nicknames;
 	augs::vertex_triangle_buffer& health_numbers;
 	augs::vertex_triangle_buffer& indicators;
+	augs::vertex_triangle_buffer& small_health_bars;
 
 	const camera_cone text_camera;
 	const camera_cone queried_cone;
@@ -68,6 +69,7 @@ struct draw_sentiences_hud_input {
 
 	const augs::constant_size_vector<requested_sentience_meter, 3> meters;
 
+	const augs::atlas_entry small_health_bar_tex;
 	const augs::atlas_entry color_indicator_tex;
 	const augs::atlas_entry danger_indicator_tex;
 	const augs::atlas_entry death_indicator_tex;
@@ -76,6 +78,8 @@ struct draw_sentiences_hud_input {
 
 	const real32 color_indicator_angle;
 	const special_indicator_meta& indicator_meta;
+
+	const std::function<bool(const_entity_handle)> is_character_reasonably_in_view;
 };
 
 struct draw_explosion_body_highlights_input {

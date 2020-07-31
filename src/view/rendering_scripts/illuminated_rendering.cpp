@@ -635,6 +635,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.call_triangles(D::HEALTH_NUMBERS);
 	}
 
+	if (settings.draw_small_health_bars) {
+		renderer.call_triangles(D::SMALL_HEALTH_BARS);
+	}
+
 	renderer.call_triangles(D::SENTIENCE_INDICATORS);
 	renderer.call_triangles(D::INDICATORS_AND_CALLOUTS);
 

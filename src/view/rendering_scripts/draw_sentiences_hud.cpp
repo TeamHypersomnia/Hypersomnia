@@ -30,6 +30,8 @@
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "augs/log.h"
 
+#include "game/detail/sentience/sentience_getters.h"
+
 using namespace augs::gui::text;
 
 void draw_sentiences_hud(const draw_sentiences_hud_input in) {
@@ -51,11 +53,12 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	const auto timestamp_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
 	const auto outermost_circle_radius = static_cast<int>(in.meters[0].tex.get_original_size().x / 2);
 
-	auto draw_sentience = [&](const auto& v) {
-		const auto& sentience = v.template get<components::sentience>();
+	auto draw_character = [&](const auto& drawn_character) {
+		const auto& sentience = drawn_character.template get<components::sentience>();
 		const bool is_conscious = sentience.is_conscious();
 
-		const bool is_enemy = !viewer_faction_matches(v);
+		const bool is_enemy = !viewer_faction_matches(drawn_character);
+		const auto transform = drawn_character.get_viewing_transform(interp);
 
 		if (is_enemy) {
 			const auto& danger_indicators = in.settings.draw_danger_indicators;
@@ -64,7 +67,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 				const auto show_danger_secs = in.settings.show_danger_indicator_for_seconds;
 				const auto fade_danger_secs = in.settings.fade_danger_indicator_for_seconds;
 
-				const auto since_danger = ::secs_since_caused_danger(v);
+				const auto since_danger = ::secs_since_caused_danger(drawn_character);
 				const bool dangered_recently = since_danger && since_danger <= show_danger_secs;
 
 				if (dangered_recently) {
@@ -120,19 +123,97 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 				}
 			}
 
-			if (!in.settings.draw_enemy_hud) {
-				return;
+			switch (in.settings.enemy_hud_mode) {
+				case character_hud_type::NONE:
+					return;
+				case character_hud_type::SMALL_HEALTH_BAR: {
+					if (!in.is_character_reasonably_in_view(drawn_character)) {
+						return;
+					}
+
+					const auto shield = ::get_shield_ratio(drawn_character);
+					const auto health = ::get_health_ratio(drawn_character);
+
+					const bool draw_shield = shield > 0.0f;
+
+					const auto& meter_metas = cosm.get_common_significant().meters;
+					const auto chosen_ratio = draw_shield ? shield : health;
+
+					const auto& chosen_appearance = draw_shield ? std::get<personal_electricity_meter>(meter_metas).appearance : std::get<health_meter>(meter_metas).appearance;
+
+					const auto bar_color = chosen_appearance.bar_color;
+
+					auto bright_bar_color = bar_color;
+
+					if (!draw_shield)
+					{
+						// brighten up the health bar a little
+						auto h = bright_bar_color.get_hsl();
+						h.l *= 1.25f;
+						bright_bar_color.set_hsl(h);
+					}
+
+					auto dark_bar_color = rgba(bar_color) * 0.4f;
+					// now we have a bit less alpha too
+					dark_bar_color.a = 200;
+
+					const auto bar_center = in.text_camera.to_screen_space(transform.pos + vec2(0, outermost_circle_radius));
+
+					const auto internal_border_size = 0;
+					const auto external_border_size = 1;
+					const auto internal_bar_size = vec2i(72, 3);
+
+					const auto internal_current_width = is_conscious ? std::max(1, static_cast<int>(static_cast<float>(internal_bar_size.x) * chosen_ratio)) : 0;
+					const auto internal_bar_current_size = vec2i(internal_current_width, internal_bar_size.y);
+
+					const int total_border_extent = internal_border_size + external_border_size;
+
+					const auto total_size = internal_bar_size + 2 * vec2i(total_border_extent, total_border_extent);
+
+					auto bars_output = augs::drawer { in.small_health_bars };
+
+					const auto bigger_origin = ltrb::center_and_size(bar_center, total_size);
+
+					const auto smaller_left = bigger_origin.l + total_border_extent;
+					const auto smaller_origin = ltrb(smaller_left, bigger_origin.t + total_border_extent, smaller_left + internal_bar_current_size.x, bigger_origin.b - total_border_extent);
+
+					const auto tex = in.small_health_bar_tex;
+
+					if (is_conscious) {
+						bars_output.aabb(tex, bigger_origin, dark_bar_color);
+						bars_output.aabb(tex, smaller_origin, bright_bar_color);
+
+						const bool draw_partial_borders = false;
+
+						if (draw_partial_borders && chosen_ratio < 1.0f) {
+							const auto top_border =     ltrb(bigger_origin.l-1, bigger_origin.t-1, smaller_origin.r, bigger_origin.t);
+							const auto left_border =    ltrb(bigger_origin.l-1, bigger_origin.t,   bigger_origin.l, bigger_origin.b);
+							const auto bottom_border =  ltrb(bigger_origin.l-1, bigger_origin.b,   smaller_origin.r, bigger_origin.b+1);
+							//const auto right_border =   ltrb(bigger_origin.r  , bigger_origin.t,   bigger_origin.r+1, bigger_origin.b);
+
+							bars_output.aabb(tex, left_border, bright_bar_color);
+							bars_output.aabb(tex, top_border, bright_bar_color);
+							bars_output.aabb(tex, bottom_border, bright_bar_color);
+							//bars_output.aabb(tex, right_border, bright_bar_color);
+						}
+						else {
+							bars_output.border(in.small_health_bar_tex, bigger_origin, bright_bar_color);
+						}
+					}
+
+					return;
+				}
+				case character_hud_type::FULL:
+					break;
 			}
 		}
 
-		const auto transform = v.get_viewing_transform(interp);
-
 		const auto starting_health_angle = [&]() {
-			if (v == watched_character) {
+			if (drawn_character == watched_character) {
 				return watched_character_transform.rotation + 135;
 			}
 
-			return (v.get_viewing_transform(interp).pos - watched_character_transform.pos).degrees() - 45;
+			return (drawn_character.get_viewing_transform(interp).pos - watched_character_transform.pos).degrees() - 45;
 		}();
 
 		for (const auto& meter : in.meters) {
@@ -183,7 +264,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 			const auto hr = info.ratio;
 
 			const auto ending_health_angle = [&]() {
-				if (v == watched_character) {
+				if (drawn_character == watched_character) {
 					return starting_health_angle + hr * 90.f;
 				}
 
@@ -243,7 +324,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				bool drawn_melee_count_once = false;
 
-				if (should_draw_ammo && v == watched_character) {
+				if (should_draw_ammo && drawn_character == watched_character) {
 					const auto examine_item_slot = [&](
 						const const_inventory_slot_handle hand,
 						const float lower_outside,
@@ -359,8 +440,8 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 						}
 					};
 
-					examine_item_slot(v.get_primary_hand(), starting_health_angle - 22.5f - 45.f, 45.f, true);
-					examine_item_slot(v.get_secondary_hand(), starting_health_angle + 90.f + 22.5f, 45.f, false);
+					examine_item_slot(drawn_character.get_primary_hand(), starting_health_angle - 22.5f - 45.f, 45.f, true);
+					examine_item_slot(drawn_character.get_secondary_hand(), starting_health_angle + 90.f + 22.5f, 45.f, false);
 				}
 
 				const auto empty_health_amount = static_cast<int>((1 - hr) * 90);
@@ -373,7 +454,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				push_textual_info({
 					starting_health_angle,
-					formatted_string { get_bbcoded_entity_name(v), { in.gui_font, health_col } },
+					formatted_string { get_bbcoded_entity_name(drawn_character), { in.gui_font, health_col } },
 					true
 				});
 
@@ -406,7 +487,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 		const auto show_ko_secs = in.settings.show_death_indicator_for_seconds;
 		const auto fade_ko_secs = in.settings.fade_death_indicator_for_seconds;
 
-		const auto since_ko = ::secs_since_knockout(v);
+		const auto since_ko = ::secs_since_knockout(drawn_character);
 		const bool koed_recently = since_ko && since_ko <= show_ko_secs;
 
 		const auto indicator_tex = is_conscious ? in.color_indicator_tex : in.death_indicator_tex;
@@ -435,11 +516,11 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 			std::optional<augs::atlas_entry> next_tex;
 
-			if (in.indicator_meta.bomb_owner == v.get_id()) {
+			if (in.indicator_meta.bomb_owner == drawn_character.get_id()) {
 				next_tex = in.bomb_indicator_tex;
 			}
 
-			if (in.indicator_meta.now_defusing == v.get_id()) {
+			if (in.indicator_meta.now_defusing == drawn_character.get_id()) {
 				next_tex = in.defusing_indicator_tex;
 			}
 
@@ -451,7 +532,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				if (fallback_color.is_enabled) {
 					if (col == fallback_color.value) {
-						secondary_text = v.get_name();
+						secondary_text = drawn_character.get_name();
 
 						const auto max_char_count = static_cast<std::size_t>(in.settings.nickname_characters_for_offscreen_indicators);
 
@@ -465,12 +546,12 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 			}
 
 			if (in.settings.draw_offscreen_callouts) {
-				if (const auto callout = cosm[::get_current_callout(v, interp)]) {
+				if (const auto callout = cosm[::get_current_callout(drawn_character, interp)]) {
 					primary_text = callout.get_name();
 				}
 			}
 
-			const bool its_somebody_else = watched_character != v;
+			const bool its_somebody_else = watched_character != drawn_character;
 			const bool draw_offscreen = its_somebody_else && in.settings.draw_offscreen_indicators;
 			const bool draw_onscreen = true;
 
@@ -498,13 +579,13 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	};
 
 	if (in.settings.draw_offscreen_indicators) {
-		cosm.for_each_having<components::sentience>(draw_sentience);
+		cosm.for_each_having<components::sentience>(draw_character);
 	}
 	else {
-		auto draw_sentience_callback = [&](const auto& v) {
-			v.template dispatch_on_having_all<components::sentience>(
+		auto draw_sentience_callback = [&](const auto& drawn_character) {
+			drawn_character.template dispatch_on_having_all<components::sentience>(
 				[&](const auto& typed_sentience) {
-					draw_sentience(typed_sentience);
+					draw_character(typed_sentience);
 				}
 			);
 		};

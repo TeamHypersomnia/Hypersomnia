@@ -262,12 +262,12 @@ static rgba::rgb_type HSLToRGB(hsl input) {
 	return rgba::rgb_type(r, g, b);
 }
 
-FORCE_INLINE rgba& rgba::set_hsl(const hsl input) {
+rgba& rgba::set_hsl(const hsl input) {
 	set_rgb(HSLToRGB(input));
 	return *this;
 }
 
-FORCE_INLINE hsl rgba::get_hsl() const {
+hsl rgba::get_hsl() const {
 	return RGBToHSL(rgb());
 }
 

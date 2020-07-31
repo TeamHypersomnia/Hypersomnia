@@ -3,6 +3,7 @@
 #include "augs/templates/maybe.h"
 #include "augs/graphics/rgba.h"
 #include "game/modes/detail/fog_of_war_settings.h"
+#include "view/character_hud_type.h"
 
 struct fog_of_war_appearance_settings {
 	// GEN INTROSPECTOR struct fog_of_war_appearance_settings
@@ -18,6 +19,7 @@ enum class offscreen_reference_type {
 	// END GEN INTROSPECTOR
 };
 
+
 struct game_drawing_settings {
 	// GEN INTROSPECTOR struct game_drawing_settings
 	bool draw_crosshairs = true;
@@ -25,7 +27,7 @@ struct game_drawing_settings {
 	bool draw_aabb_highlighter = true;
 	augs::maybe<float> draw_area_markers = augs::maybe<float>(0.5f, true);
 	augs::maybe<float> draw_callout_indicators = augs::maybe<float>(0.5f, true);
-	bool draw_enemy_hud = false;
+	character_hud_type enemy_hud_mode = character_hud_type::SMALL_HEALTH_BAR;
 	bool draw_hp_bar = true;
 	bool draw_cp_bar = true;
 	bool draw_pe_bar = false;
@@ -34,6 +36,7 @@ struct game_drawing_settings {
 	bool draw_offscreen_indicators = true;
 	bool draw_offscreen_callouts = true;
 	bool draw_nicknames = true;
+	bool draw_small_health_bars = true;
 	bool draw_health_numbers = true;
 	bool draw_damage_indicators = false;
 

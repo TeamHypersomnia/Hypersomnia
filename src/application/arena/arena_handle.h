@@ -209,7 +209,7 @@ public:
 			[&](const auto&, const auto& in) {
 				const auto& r = in.rules.view;
 
-				settings.draw_enemy_hud = r.show_enemy_hud;
+				settings.enemy_hud_mode = r.enemy_hud_mode;
 				settings.fog_of_war = r.fog_of_war;
 
 				if (!r.enable_danger_indicators) {

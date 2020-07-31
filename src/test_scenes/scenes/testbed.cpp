@@ -44,9 +44,10 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::METROPOLIS;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::COVERT);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 #if 0
 		rs.initial_eq.over_back_wearable = to_entity_flavour_id(test_hand_explosives::BOMB);

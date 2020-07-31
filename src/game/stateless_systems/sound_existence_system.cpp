@@ -318,13 +318,16 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			const auto& e = d.damage.effects;
 
 			if (d.inflictor_destructed) {
-				auto eff = e.destruction;
-				eff.sound.modifier.pitch *= step.step_rng.randval(0.8f, 1.2f);
+				if (sentient) {
+					if (e.sentience_impact.sound.id.is_set()) {
+						do_effect(e.sentience_impact);
+					}
+				}
+				else {
+					auto eff = e.destruction;
+					eff.sound.modifier.pitch *= step.step_rng.randval(0.8f, 1.2f);
 
-				do_effect(eff);
-
-				if (sentient && e.sentience_impact.sound.id.is_set()) {
-					do_effect(e.sentience_impact);
+					do_effect(eff);
 				}
 			}
 			else {

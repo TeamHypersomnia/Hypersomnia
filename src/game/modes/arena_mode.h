@@ -11,6 +11,7 @@
 #include "game/modes/detail/fog_of_war_settings.h"
 #include "game/modes/arena_player_order.h"
 #include "game/modes/session_id.h"
+#include "view/character_hud_type.h"
 
 using mode_entity_id = entity_id;
 
@@ -112,7 +113,7 @@ struct arena_mode_view_rules {
 	per_actual_faction<assets::image_id> square_logos;
 	bool show_money_of_opponents = false;
 	bool show_info_icons_of_opponents = false;
-	bool show_enemy_hud = false;
+	character_hud_type enemy_hud_mode = character_hud_type::SMALL_HEALTH_BAR;
 
 	augs::enum_array<assets::image_id, scoreboard_icon_type> icons;
 	assets::image_id money_icon;

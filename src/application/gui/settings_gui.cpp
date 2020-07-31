@@ -974,6 +974,7 @@ void settings_gui_state::perform(
 						revertable_checkbox(SCOPE_CFG_NVP(draw_crosshairs));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_nicknames));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_health_numbers));
+						revertable_checkbox(SCOPE_CFG_NVP(draw_small_health_bars));
 
 						revertable_checkbox("Draw teammate indicators", config.drawing.draw_teammate_indicators.is_enabled);
 

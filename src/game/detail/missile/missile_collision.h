@@ -110,6 +110,8 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			}
 		}
 
+		const bool surface_sentient = surface_handle.template has<components::sentience>();
+
 		// delete only once
 		if (charges == 0) {
 			step.queue_deletion_of(typed_missile, "Missile collision");
@@ -117,14 +119,16 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 			auto rng = cosm.get_nontemporal_rng_for(typed_missile);
 
-			spawn_bullet_remnants(
-				step,
-				rng,
-				missile_def.remnant_flavours,
-				collision_normal,
-				impact_dir,
-				point
-			);
+			if (!surface_sentient) {
+				spawn_bullet_remnants(
+					step,
+					rng,
+					missile_def.remnant_flavours,
+					collision_normal,
+					impact_dir,
+					point
+				);
+			}
 		}
 	}
 

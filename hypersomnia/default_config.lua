@@ -269,7 +269,7 @@ return {
 	  enabled = true,
 	  angle = 150
 	},
-	draw_enemy_hud = false,
+	enemy_hud_mode = "SMALL_HEALTH_BAR",
 	draw_hp_bar = true,
 	draw_cp_bar = true,
 	draw_pe_bar = false,
