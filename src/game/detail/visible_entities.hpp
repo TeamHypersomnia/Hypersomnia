@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/visible_entities.h"
+#include "augs/templates/reversion_wrapper.h"
 
 template <class F>
 void visible_entities::layer_register::for_each(F&& callback) const {
@@ -17,7 +18,7 @@ void visible_entities::layer_register::for_each(F&& callback) const {
 
 template <class F>
 void visible_entities::layer_register::for_each_reverse(F&& callback) const {
-	for (const auto& p : with_orders) {
+	for (const auto& p : reverse(with_orders)) {
 		if constexpr(std::is_same_v<callback_result, decltype(callback(p.second))>) {
 			if (callback_result::ABORT == callback(p.second)) {
 				return;
