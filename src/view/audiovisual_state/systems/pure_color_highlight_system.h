@@ -24,23 +24,19 @@ public:
 	struct highlight {
 		struct input {
 			float maximum_duration_seconds = 0.f;
-
 			float starting_alpha_ratio = 0.f;
-
-			entity_id target;
 			rgba color = white;
 		} in;
 		
 		double time_of_occurence_seconds = 0.0;
 	};
 
-
 private:
 	double global_time_seconds = 0.0;
-	augs::constant_size_vector<highlight, MAX_PURE_COLOR_HIGHLIGHTS> highlights;
+	std::unordered_map<entity_id, highlight> highlights;
 public:
 	
-	void add(highlight::input);
+	void add(entity_id, highlight::input);
 	void advance(const augs::delta dt);
 	
 	void draw_highlights(

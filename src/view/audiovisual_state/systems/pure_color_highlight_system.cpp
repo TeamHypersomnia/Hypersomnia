@@ -19,26 +19,12 @@ void pure_color_highlight_system::clear() {
 	highlights.clear();
 }
 
-void pure_color_highlight_system::add(const highlight::input new_in) {
-	if (container_full(highlights)) {
-		return;
-	}
-
-	bool found = false;
-
-	highlight new_highlight;
+void pure_color_highlight_system::add(const entity_id target, const highlight::input new_in) {
+	auto new_highlight = highlight();
 	new_highlight.in = new_in;
 	new_highlight.time_of_occurence_seconds = global_time_seconds;
 
-	for (auto& r : highlights) {
-		if (r.in.target == new_in.target) {
-			r = new_highlight;
-		}
-	}
-
-	if (!found) {
-		highlights.push_back(new_highlight);
-	}
+	highlights[target] = new_highlight;
 }
 
 void pure_color_highlight_system::advance(const augs::delta dt) {
@@ -46,7 +32,9 @@ void pure_color_highlight_system::advance(const augs::delta dt) {
 	
 	erase_if(
 		highlights, 
-		[this](const highlight& h) {
+		[this](const auto& entry) {
+			const auto& h = entry.second;
+
 			return (global_time_seconds - h.time_of_occurence_seconds) > h.in.maximum_duration_seconds;
 		}
 	);
@@ -56,8 +44,9 @@ void pure_color_highlight_system::draw_highlights(
 	const cosmos& cosm,
 	const draw_renderable_input& in
 ) const {
-	for (const auto& r : highlights) {
-		const auto subject = cosm[r.in.target];
+	for (const auto& entry : highlights) {
+		const auto subject = cosm[entry.first];
+		const auto& r = entry.second;
 
 		if (subject.dead()) {
 			continue;
