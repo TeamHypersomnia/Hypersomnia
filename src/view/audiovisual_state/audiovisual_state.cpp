@@ -29,6 +29,8 @@
 #include "view/audiovisual_state/systems/wandering_pixels_system.hpp"
 #include "augs/audio/audio_command_buffers.h"
 #include "game/detail/visible_entities.hpp"
+#include "game/detail/sentience/sentience_getters.h"
+#include "view/damage_indication_settings.h"
 
 template <class E>
 void interpolation_system::set_updated_interpolated_transform(
@@ -124,7 +126,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	};
 
 	auto advance_damage_indication = [&]() {
-		damage_indication.advance(dt);
+		damage_indication.advance(input.damage_indication, dt);
 	};
 
 	auto advance_highlights = [&]() {
@@ -496,52 +498,38 @@ void audiovisual_state::standard_post_solve(
 		auto& damage_indication = get<damage_indication_system>();
 
 		for (const auto& h : healths) {
-			auto make_vn_input = [&]() {
-				damage_indication_system::number::input vn;
+			const auto number_value = h.effective_amount;
 
-				vn.impact_velocity = h.impact_velocity;
-				vn.maximum_duration_seconds = 0.7f;
+			if (number_value < 0.0) {
+				// TODO: Support healing events
+				continue;
+			}
 
-				return vn;
-			};
+			using damage_event = damage_indication_system::damage_event;
 
-			const bool destroyed = h.special_result != messages::health_event::result_type::NONE;
+			auto de = damage_event::input();
+
+			de.amount = number_value;
+			de.pos = h.point_of_impact;
+
+			float original_ratio = 0.0f;
 
 			if (h.target == messages::health_event::target_type::HEALTH) {
-				if (h.effective_amount > 0) {
-					if (destroyed) {
-						auto vn = make_vn_input();
-						vn.text = "Death";
-						vn.color = red;
+				de.type = damage_event::event_type::HEALTH;
 
-						if (const auto subject = cosm[h.subject]) {
-							if (const auto transform = subject.find_logic_transform()) {
-								vn.pos = transform->pos;
-								damage_indication.add(vn);
-							}
-						}
-					}
-				}
+				original_ratio = ::get_health_ratio(cosm[h.subject]) + h.ratio_effective_to_maximum;
 			}
-			else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
-				if (h.effective_amount > 0) {
-					if (destroyed) {
-						auto vn = make_vn_input();
-						vn.text = "Unconscious";
-						vn.color = orange;
-					}
-				}
+			else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
+				de.type = damage_event::event_type::SHIELD;
+
+				original_ratio = ::get_shield_ratio(cosm[h.subject]) + h.ratio_effective_to_maximum;
+			}
+			else {
+				continue;
 			}
 
-			const auto number_value = static_cast<int>(h.effective_amount);
-
-			auto vn = make_vn_input();
-			vn.text = std::to_string(std::abs(number_value ? number_value : 1));
-			const auto cols = color_info(h);
-			vn.color = cols.number;
-			vn.pos = h.point_of_impact;
-
-			damage_indication.add(vn);
+			damage_indication.add(h.subject, de);
+			damage_indication.add_white_highlight(h.subject, h.target, original_ratio);
 		}
 	}
 
@@ -555,7 +543,7 @@ void audiovisual_state::standard_post_solve(
 				pure_color_highlight_system::highlight::input new_highlight;
 
 				new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
-				new_highlight.maximum_duration_seconds = 0.11f;
+				new_highlight.maximum_duration_seconds = input.damage_indication.character_silhouette_damage_highlight_secs;
 				new_highlight.color = cols.highlight;
 
 				highlights.add(h.subject, new_highlight);

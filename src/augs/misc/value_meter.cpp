@@ -28,8 +28,8 @@ meter_value_type value_meter::get_value() const {
 	return static_cast<meter_value_type>(value);
 }
 
-float value_meter::get_ratio() const {
-	return value / static_cast<float>(maximum);
+real32 value_meter::get_ratio() const {
+	return value / static_cast<real32>(maximum);
 }
 
 value_meter::damage_result value_meter::calc_damage_result(
@@ -60,7 +60,7 @@ value_meter::damage_result value_meter::calc_damage_result(
 		}
 	}
 
-	result.ratio_effective_to_maximum = repro::fabs(result.effective) / static_cast<float>(maximum);
+	result.ratio_effective_to_maximum = repro::fabs(result.effective) / static_cast<real32>(maximum);
 
 	return result;
 }

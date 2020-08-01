@@ -1930,6 +1930,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			get_general_renderer().dedicated,
 			pending_new_state_sample ? state_changed_timer.extract_delta() : std::optional<augs::delta>(),
 
+			viewing_config.damage_indication,
+
 			thread_pool
 		});
 
@@ -1955,6 +1957,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				viewing_config.sound,
 				get_character_camera(),
 				viewing_config.performance,
+				viewing_config.damage_indication,
 				settings
 			});
 		}
@@ -2845,7 +2848,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					get_audiovisuals(),
 					viewing_config.drawing,
 					streaming.necessary_images_in_atlas,
-					streaming.get_loaded_gui_fonts().gui,
+					streaming.get_loaded_gui_fonts(),
 					streaming.images_in_atlas,
 					get_interpolation_ratio(),
 					chosen_renderer,
@@ -2860,6 +2863,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					special_indicators,
 					indicator_meta,
 					write_buffer.particle_buffers,
+					viewing_config.damage_indication,
 					cached_visibility.light_requests,
 					thread_pool
 				};

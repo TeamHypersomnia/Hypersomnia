@@ -27,6 +27,7 @@
 #include "view/faction_view_settings.h"
 #include "view/gui_fonts.h"
 #include "view/game_gui/elements/game_gui_settings.h"
+#include "view/damage_indication_settings.h"
 #include "application/input/input_settings.h"
 
 #include "test_scenes/test_scene_settings.h"
@@ -145,6 +146,7 @@ struct config_lua_table {
 
 	arena_mode_gui_settings arena_mode_gui;
 	faction_view_settings faction_view;
+	damage_indication_settings damage_indication;
 
 	server_start_input default_server_start;
 	server_vars server;

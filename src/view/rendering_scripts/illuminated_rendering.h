@@ -8,6 +8,8 @@
 #include "view/audiovisual_state/particle_triangle_buffers.h"
 #include "augs/graphics/renderer_settings.h"
 #include "game/stateless_systems/visibility_system.h"
+#include "view/gui_fonts.h"
+#include "view/damage_indication_settings.h"
 
 namespace augs {
 	class thread_pool;
@@ -46,7 +48,7 @@ struct illuminated_rendering_input {
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
 	const necessary_images_in_atlas_map& necessary_images;
-	const augs::baked_font& gui_font;
+	const all_loaded_gui_fonts& fonts;
 	const images_in_atlas_map& game_images;
 	const double interpolation_ratio = 0.0;
 	augs::renderer& renderer;
@@ -61,6 +63,8 @@ struct illuminated_rendering_input {
 	const std::vector<special_indicator>& special_indicators;
 	const special_indicator_meta& indicator_meta;
 	const particle_triangle_buffers& drawn_particles;
+
+	const damage_indication_settings damage_indication;
 	
 	const std::vector<visibility_request>& light_requests;
 	augs::thread_pool& pool;

@@ -35,6 +35,7 @@ namespace augs {
 }
 
 struct character_camera;
+struct damage_indication_settings;
 
 struct audiovisual_post_solve_input {
 	const augs::audio_renderer* audio_renderer;
@@ -44,6 +45,7 @@ struct audiovisual_post_solve_input {
 	const sound_system_settings& sound_settings;
 	const character_camera& camera;
 	const performance_settings& performance;
+	const damage_indication_settings& damage_indication;
 	const audiovisual_post_solve_settings settings;
 };
 
@@ -69,6 +71,8 @@ struct audiovisual_advance_input {
 	particle_triangle_buffers& particles_output;
 	augs::dedicated_buffers& dedicated;
 	const std::optional<augs::delta> new_state_delta;
+
+	const damage_indication_settings& damage_indication;
 
 	augs::thread_pool& pool;
 };

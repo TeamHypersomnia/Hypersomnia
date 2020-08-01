@@ -10,6 +10,7 @@ struct per_gui_font {
 	// GEN INTROSPECTOR struct per_gui_font class What
 	What gui;
 	What larger_gui;
+	What medium_numbers;
 	What large_numbers;
 	// END GEN INTROSPECTOR
 };

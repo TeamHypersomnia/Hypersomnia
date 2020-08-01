@@ -245,7 +245,7 @@ return {
 	enabled_draw_callout_indicators = 0.8,
 	draw_nicknames = false,
 	draw_health_numbers = true,
-	draw_damage_indicators = false,
+	draw_damage_indicators = true,
 	occlude_neons_under_sentiences = true,
     draw_offscreen_indicators = true,
     print_current_character_callout = true,
@@ -373,6 +373,7 @@ return {
 		settings = {},
 		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
 	  },
+
 	  larger_gui = {
 		unicode_ranges = {
 		  { 0x0020, 0x00FF }, -- Basic Latin + Latin Supplement
@@ -384,6 +385,18 @@ return {
 		settings = {},
 		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
 	  },
+
+	  medium_numbers = {
+		unicode_ranges = {
+		  { 0x0030, 0x0039 }, -- Only numbers
+		},
+		size_in_pixels = 48,
+		add_japanese_ranges = "NEVER",
+		add_cyrillic_ranges = "NEVER",
+		settings = {},
+		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
+	  },
+
 	  large_numbers = {
 		unicode_ranges = {
 		  { 0x0030, 0x0039 }, -- Only numbers
@@ -633,6 +646,34 @@ return {
 		  background_dark = "47 10 0 255"
 	  }
 	}
+  },
+
+  damage_indication = {
+    enabled_numbers_accumulation_speed = 1000,
+    critical_color = "255 255 0 255",
+    friendly_damage_border_color = "255 40 40 255",
+    indicator_fading_duration_secs = 0.5,
+    single_indicator_lifetime_secs = 1,
+    accumulative_indicator_idle_lifetime_secs = 1,
+    indicator_rising_speed = 50,
+    small_damage_threshold = 25,
+    medium_damage_threshold = 61,
+
+    single_indicator_offsets = {
+      { x = 0, y = 0 },
+      { x = -10, y = 30 },
+      { x = 30, y = -20 },
+      { x = 30, y = -50 },
+      { x = 20, y = -70 },
+      { x = 0, y = 20 }
+    },
+
+    accumulative_indicator_offset = {
+      x = 0, y = -80
+    },
+
+    white_damage_highlight_secs = 0.15,
+    character_silhouette_damage_highlight_secs = 0.12
   },
 
   server_solvable = {

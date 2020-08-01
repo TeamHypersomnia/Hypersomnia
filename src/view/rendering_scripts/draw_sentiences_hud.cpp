@@ -29,6 +29,7 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "augs/log.h"
+#include "view/audiovisual_state/systems/damage_indication_system.h"
 
 #include "game/detail/sentience/sentience_getters.h"
 
@@ -143,15 +144,8 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 					const auto bar_color = chosen_appearance.bar_color;
 
-					auto bright_bar_color = bar_color;
-
-					if (!draw_shield)
-					{
-						// brighten up the health bar a little
-						auto h = bright_bar_color.get_hsl();
-						h.l *= 1.25f;
-						bright_bar_color.set_hsl(h);
-					}
+					// brighten up the health bar a little
+					const auto bright_bar_color = draw_shield ? rgba(bar_color).mult_brightness(1.25f) : bar_color;
 
 					auto dark_bar_color = rgba(bar_color) * 0.4f;
 					// now we have a bit less alpha too
@@ -179,13 +173,18 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 					const auto tex = in.small_health_bar_tex;
 
+					const bool draw_partial_borders = true;
+
 					if (is_conscious) {
 						bars_output.aabb(tex, bigger_origin, dark_bar_color);
 						bars_output.aabb(tex, smaller_origin, bright_bar_color);
 
-						const bool draw_partial_borders = false;
-
 						if (draw_partial_borders && chosen_ratio < 1.0f) {
+							{
+								const auto dim_border_col = rgba(bar_color).mult_brightness(0.5f);
+								bars_output.border(in.small_health_bar_tex, bigger_origin, dim_border_col);
+							}
+
 							const auto top_border =     ltrb(bigger_origin.l-1, bigger_origin.t-1, smaller_origin.r, bigger_origin.t);
 							const auto left_border =    ltrb(bigger_origin.l-1, bigger_origin.t,   bigger_origin.l, bigger_origin.b);
 							const auto bottom_border =  ltrb(bigger_origin.l-1, bigger_origin.b,   smaller_origin.r, bigger_origin.b+1);
@@ -198,6 +197,30 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 						}
 						else {
 							bars_output.border(in.small_health_bar_tex, bigger_origin, bright_bar_color);
+						}
+					}
+
+					if (const auto highlight = in.damage_indication_sys.find_white_highlight(drawn_character, in.damage_indication_settings)) {
+						const auto white_bar_width_inclusive = static_cast<int>(static_cast<float>(internal_bar_size.x) * highlight->original_ratio);
+
+						const auto white_bar_origin = ltrb(
+							smaller_origin.r,
+							smaller_origin.t,
+							smaller_left + white_bar_width_inclusive,
+							smaller_origin.b
+						);
+
+						auto white_bar_color = white;
+						white_bar_color.mult_alpha(1.0f - highlight->passed_mult);
+
+						bars_output.aabb(tex, white_bar_origin, white_bar_color);
+
+						if (draw_partial_borders) {
+							const auto top_border =     ltrb(white_bar_origin.l, bigger_origin.t-1, white_bar_origin.r, bigger_origin.t);
+							const auto bottom_border =  ltrb(white_bar_origin.l, bigger_origin.b,   white_bar_origin.r, bigger_origin.b+1);
+
+							bars_output.aabb(tex, top_border, white_bar_color);
+							bars_output.aabb(tex, bottom_border, white_bar_color);
 						}
 					}
 

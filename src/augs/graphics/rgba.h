@@ -82,6 +82,7 @@ struct rgba {
 
 	rgba& mult_alpha(float);
 	rgba& multiply_rgb(float);
+	rgba& mult_brightness(float);
 
 	rgba operator*(const float) const;
 	rgba operator+(const rgba b) const;

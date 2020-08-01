@@ -16,6 +16,8 @@ namespace augs {
 
 class cosmos;
 class interpolation_system;
+class damage_indication_system;
+struct damage_indication_settings;
 
 class visible_entities;
 struct game_drawing_settings;
@@ -63,6 +65,9 @@ struct draw_sentiences_hud_input {
 	const cosmos& cosm;
 	const entity_id viewed_character_id;
 	const interpolation_system& interpolation;
+	const damage_indication_system& damage_indication_sys;
+	const damage_indication_settings& damage_indication_settings;
+
 	const double global_time_seconds;
 
 	const augs::baked_font& gui_font;

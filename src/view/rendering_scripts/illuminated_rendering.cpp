@@ -93,7 +93,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& necessarys = in.necessary_images;
 	const auto& game_images = in.game_images;
 	const auto blank = necessarys.at(assets::necessary_image_id::BLANK);
-	const auto& gui_font = in.gui_font;
 
 	const auto queried_cone = in.queried_cone;
 
@@ -652,7 +651,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	if (settings.draw_damage_indicators) {
 		damage_indication.draw_indicators(
-			gui_font,
+			viewed_character,
+			interp,
+			in.damage_indication,
+			game_images,
+			in.fonts,
 			get_drawer(), 
 			cone
 		);

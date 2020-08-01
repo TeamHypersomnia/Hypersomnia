@@ -271,4 +271,10 @@ hsl rgba::get_hsl() const {
 	return RGBToHSL(rgb());
 }
 
+rgba& rgba::mult_brightness(const float mult) {
+	auto h = get_hsl();
+	h.l *= mult;
+	return set_hsl(h);
+}
+
 rgba rgba::zero = rgba(0, 0, 0, 0);

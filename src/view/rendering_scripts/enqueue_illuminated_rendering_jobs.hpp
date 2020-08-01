@@ -19,10 +19,12 @@ void enqueue_illuminated_rendering_jobs(
 	const auto& exploding_rings = av.get<exploding_ring_system>();
 	const auto& screen_size = cone.screen_size;
 	const auto& settings = in.drawing;
+	const auto& damage_indication_settings = in.damage_indication;
 	const auto& queried_cone = in.queried_cone;
 	const auto& visible = in.all_visible;
 	const auto& interp = av.template get<interpolation_system>();
-	const auto& gui_font = in.gui_font;
+	const auto& damage_indication = av.template get<damage_indication_system>();
+	const auto& gui_font = in.fonts.gui;
 	const auto& game_images = in.game_images;
 	const auto pre_step_crosshair_displacement = in.pre_step_crosshair_displacement;
 
@@ -71,7 +73,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::line_drawer_with_default { dedicated[d].lines, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto sentience_hud_job = [&cosm, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, &indicator_meta, viewed_character_transform, fog_of_war_effective, pre_step_crosshair_displacement]() {
+	auto sentience_hud_job = [&cosm, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, &indicator_meta, viewed_character_transform, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
 		std::array<assets::necessary_image_id, 3> circles = {
@@ -175,6 +177,8 @@ void enqueue_illuminated_rendering_jobs(
 			cosm,
 			viewed_character,
 			interp,
+			damage_indication,
+			damage_indication_settings,
 			global_time_seconds,
 			gui_font,
 			requested_meters,
