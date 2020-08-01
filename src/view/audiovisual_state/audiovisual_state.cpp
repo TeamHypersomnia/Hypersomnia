@@ -85,7 +85,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto& sounds = get<sound_system>();
 	auto& thunders = get<thunder_system>();
 	auto& exploding_rings = get<exploding_ring_system>();
-	auto& flying_numbers = get<flying_number_indicator_system>();
+	auto& damage_indication = get<damage_indication_system>();
 	auto& highlights = get<pure_color_highlight_system>();
 	auto& interp = get<interpolation_system>();
 	auto& particles = get<particles_simulation_system>();
@@ -123,8 +123,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		thunders.advance(rng, cosm, queried_cone, input.particle_effects, dt, particles);
 	};
 
-	auto advance_flying_numbers = [&]() {
-		flying_numbers.advance(dt);
+	auto advance_damage_indication = [&]() {
+		damage_indication.advance(dt);
 	};
 
 	auto advance_highlights = [&]() {
@@ -158,7 +158,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		particles.remove_dead_particles(cosm);
 		particles.preallocate_particle_buffers(input.particles_output);
 
-		advance_flying_numbers();
+		advance_damage_indication();
 	};
 
 	auto launch_particle_jobs = [&]() {
@@ -348,7 +348,7 @@ void audiovisual_state::standard_post_solve(
 	const auto& settings = input.settings;
 
 	const auto correct_interpolations = always_predictable_v;
-	const auto acquire_flying_numbers = never_predictable_v;
+	const auto acquire_damage_indication = never_predictable_v;
 	const auto acquire_highlights = always_predictable_v;
 
 	if (correct_interpolations.should_play(settings.prediction)) {
@@ -492,12 +492,12 @@ void audiovisual_state::standard_post_solve(
 		}
 	};
 
-	if (acquire_flying_numbers.should_play(settings.prediction)) {
-		auto& flying_numbers = get<flying_number_indicator_system>();
+	if (acquire_damage_indication.should_play(settings.prediction)) {
+		auto& damage_indication = get<damage_indication_system>();
 
 		for (const auto& h : healths) {
 			auto make_vn_input = [&]() {
-				flying_number_indicator_system::number::input vn;
+				damage_indication_system::number::input vn;
 
 				vn.impact_velocity = h.impact_velocity;
 				vn.maximum_duration_seconds = 0.7f;
@@ -517,7 +517,7 @@ void audiovisual_state::standard_post_solve(
 						if (const auto subject = cosm[h.subject]) {
 							if (const auto transform = subject.find_logic_transform()) {
 								vn.pos = transform->pos;
-								flying_numbers.add(vn);
+								damage_indication.add(vn);
 							}
 						}
 					}
@@ -541,7 +541,7 @@ void audiovisual_state::standard_post_solve(
 			vn.color = cols.number;
 			vn.pos = h.point_of_impact;
 
-			flying_numbers.add(vn);
+			damage_indication.add(vn);
 		}
 	}
 

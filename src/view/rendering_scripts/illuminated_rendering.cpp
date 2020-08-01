@@ -71,7 +71,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	
 	const auto& light = av.get<light_system>();
 	const auto& exploding_rings = av.get<exploding_ring_system>();
-	const auto& flying_numbers = av.get<flying_number_indicator_system>();
+	const auto& damage_indication = av.get<damage_indication_system>();
 	const auto& highlights = av.get<pure_color_highlight_system>();
 	const auto global_time_seconds = cosm.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
@@ -651,7 +651,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	shaders.standard->set_as_current(renderer);
 
 	if (settings.draw_damage_indicators) {
-		flying_numbers.draw_numbers(
+		damage_indication.draw_indicators(
 			gui_font,
 			get_drawer(), 
 			cone

@@ -4,13 +4,13 @@
 
 #include "augs/gui/text/printer.h"
 
-#include "view/audiovisual_state/systems/flying_number_indicator_system.h"
+#include "view/audiovisual_state/systems/damage_indication_system.h"
 
-void flying_number_indicator_system::clear() {
+void damage_indication_system::clear() {
 	numbers.clear();
 }
 
-void flying_number_indicator_system::add(const number::input new_in) {
+void damage_indication_system::add(const number::input new_in) {
 	if (container_full(numbers)) {
 		return;
 	}
@@ -22,7 +22,7 @@ void flying_number_indicator_system::add(const number::input new_in) {
 	numbers.push_back(new_number);
 }
 
-void flying_number_indicator_system::advance(const augs::delta dt) {
+void damage_indication_system::advance(const augs::delta dt) {
 	global_time_seconds += dt.in_seconds();
 
 	erase_if(
@@ -34,7 +34,7 @@ void flying_number_indicator_system::advance(const augs::delta dt) {
 	);
 }
 
-void flying_number_indicator_system::draw_numbers(
+void damage_indication_system::draw_indicators(
 	const augs::baked_font& font,
 	const augs::drawer output,
 	const camera_cone cone

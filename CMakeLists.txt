@@ -423,7 +423,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/audiovisual_state/systems/pure_color_highlight_system.cpp"
 	"src/view/audiovisual_state/systems/sound_system.cpp"
 	"src/view/audiovisual_state/systems/thunder_system.cpp"
-	"src/view/audiovisual_state/systems/flying_number_indicator_system.cpp"
+	"src/view/audiovisual_state/systems/damage_indication_system.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"
 	"src/game/stateless_systems/demolitions_system.cpp"
 	"src/game/stateless_systems/melee_system.cpp"

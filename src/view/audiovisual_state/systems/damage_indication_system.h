@@ -16,7 +16,7 @@ namespace augs {
 	struct drawer;
 }
 
-class flying_number_indicator_system {
+class damage_indication_system {
 public:
 	struct number {
 		struct input {
@@ -47,7 +47,7 @@ public:
 	void add(const number::input);
 	void advance(const augs::delta dt);
 
-	void draw_numbers(
+	void draw_indicators(
 		const augs::baked_font& font,
 		const augs::drawer output,
 		const camera_cone
