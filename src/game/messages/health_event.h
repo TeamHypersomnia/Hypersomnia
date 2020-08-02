@@ -25,8 +25,7 @@ namespace messages {
 
 		damage_origin origin;
 
-		float ratio_effective_to_maximum = 1.f;
-		meter_value_type effective_amount = 0;
+		value_meter::damage_result damage;
 
 		bool was_conscious = true;
 
@@ -40,7 +39,6 @@ namespace messages {
 			output.subject = of_whom;
 			output.point_of_impact = point_of_impact;
 			output.impact_velocity = direction;
-			output.effective_amount = 0;
 			output.special_result = result_type::DEATH;
 			output.origin = origin;
 			output.target = target_type::HEALTH;

@@ -462,7 +462,7 @@ void audiovisual_state::standard_post_solve(
 
 		color_info(const messages::health_event& h) {
 			if (h.target == messages::health_event::target_type::HEALTH) {
-				if (h.effective_amount > 0) {
+				if (h.damage.effective > 0) {
 					number = red;
 					highlight = white;
 				}
@@ -472,7 +472,7 @@ void audiovisual_state::standard_post_solve(
 				}
 			}
 			else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
-				if (h.effective_amount > 0) {
+				if (h.damage.effective > 0) {
 					number = turquoise;
 					highlight = turquoise;
 				}
@@ -482,7 +482,7 @@ void audiovisual_state::standard_post_solve(
 				}
 			}
 			else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
-				if (h.effective_amount > 0) {
+				if (h.damage.effective > 0) {
 					number = orange;
 					highlight = orange;
 				}
@@ -498,9 +498,7 @@ void audiovisual_state::standard_post_solve(
 		auto& damage_indication = get<damage_indication_system>();
 
 		for (const auto& h : healths) {
-			const auto number_value = h.effective_amount;
-
-			if (number_value < 0.0) {
+			if (h.damage.effective < 0.0) {
 				// TODO: Support healing events
 				continue;
 			}
@@ -509,20 +507,21 @@ void audiovisual_state::standard_post_solve(
 
 			auto de = damage_event::input();
 
-			de.amount = number_value;
 			de.pos = h.point_of_impact;
 
 			float original_ratio = 0.0f;
 
 			if (h.target == messages::health_event::target_type::HEALTH) {
 				de.type = damage_event::event_type::HEALTH;
+				de.amount = h.damage.get_total();
 
-				original_ratio = ::get_health_ratio(cosm[h.subject]) + h.ratio_effective_to_maximum;
+				original_ratio = ::get_health_ratio(cosm[h.subject]) + h.damage.ratio_effective_to_maximum;
 			}
 			else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 				de.type = damage_event::event_type::SHIELD;
+				de.amount = h.damage.effective;
 
-				original_ratio = ::get_shield_ratio(cosm[h.subject]) + h.ratio_effective_to_maximum;
+				original_ratio = ::get_shield_ratio(cosm[h.subject]) + h.damage.ratio_effective_to_maximum;
 			}
 			else {
 				continue;
@@ -537,12 +536,12 @@ void audiovisual_state::standard_post_solve(
 		auto& highlights = get<pure_color_highlight_system>();
 
 		for (const auto& h : healths) {
-			if (augs::is_nonzero(h.effective_amount)) {
+			if (augs::is_nonzero(h.damage.effective)) {
 				const auto cols = color_info(h);
 
 				pure_color_highlight_system::highlight::input new_highlight;
 
-				new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
+				new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.damage.ratio_effective_to_maximum * 5);
 				new_highlight.maximum_duration_seconds = input.damage_indication.character_silhouette_damage_highlight_secs;
 				new_highlight.color = cols.highlight;
 

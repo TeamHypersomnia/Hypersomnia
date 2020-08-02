@@ -253,6 +253,11 @@ void damage_indication_system::draw_indicators(
 			const auto fading_progress = passed - settings.single_indicator_lifetime_secs;
 
 			const auto round_amount = static_cast<int>(e.displayed_amount);
+
+			if (round_amount == 0) {
+				continue;
+			}
+
 			const auto indicator_number_text = std::to_string(round_amount);
 
 			const auto& indicator_font = get_indicator_font(round_amount);
@@ -271,9 +276,11 @@ void damage_indication_system::draw_indicators(
 			auto border = border_color;
 			border.a = text_color.a;
 
+			const auto pixel_perfect_text_pos = vec2i(text_pos);
+
 			augs::gui::text::print_stroked(
 				output,
-				text_pos,
+				pixel_perfect_text_pos,
 				{ indicator_number_text, { indicator_font, text_color } },
 				{ augs::ralign::R },
 				border
@@ -281,7 +288,7 @@ void damage_indication_system::draw_indicators(
 
 			if (e.in.type == damage_event::event_type::SHIELD) {
 				if (const auto& entry = game_images.at(shield_icon).diffuse; entry.exists()) {
-					const auto shield_icon_pos = text_pos - vec2i(0, indicator_font.metrics.descender);
+					const auto shield_icon_pos = pixel_perfect_text_pos - vec2i(0, indicator_font.metrics.descender);
 
 					output.aabb_lt(entry, shield_icon_pos, text_color);
 				}

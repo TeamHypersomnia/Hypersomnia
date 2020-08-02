@@ -214,7 +214,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				effect = sentience.death_sound;
 				predictability = never_predictable_v;
 			}
-			else if (h.effective_amount > 0) {
+			else if (h.damage.effective > 0) {
 				effect = sentience.health_decrease_sound;
 			}
 			else {
@@ -222,9 +222,9 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			}
 		}
 		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
-			if (h.effective_amount > 0.f) {
+			if (h.damage.effective > 0.f) {
 				effect = cosm.get_common_assets().ped_shield_impact_sound;
-				effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
+				effect.modifier.pitch *= 1.2f + h.damage.effective / 100.f;
 
 				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
 					effect = cosm.get_common_assets().ped_shield_destruction_sound;
@@ -238,9 +238,9 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			}
 		}
 		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
-			if (h.effective_amount > 0.f) {
+			if (h.damage.effective > 0.f) {
 				effect = sentience.consciousness_decrease_sound;
-				effect.modifier.pitch *= 1.2f + h.effective_amount / 100.f;
+				effect.modifier.pitch *= 1.2f + h.damage.effective / 100.f;
 
 				if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
 					effect = sentience.loss_of_consciousness_sound;

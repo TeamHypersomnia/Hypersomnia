@@ -8,6 +8,8 @@ struct value_meter {
 		meter_value_type effective = 0;
 		meter_value_type excessive = 0;
 		real32 ratio_effective_to_maximum = 0.f;
+
+		meter_value_type get_total() const;
 	};
 
 	// GEN INTROSPECTOR struct value_meter

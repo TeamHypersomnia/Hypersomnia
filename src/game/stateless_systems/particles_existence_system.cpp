@@ -230,7 +230,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			const auto& sentience = subject.get<invariants::sentience>();
 
-			if (h.effective_amount > 0) {
+			if (h.damage.effective > 0) {
 				auto effect = sentience.health_decrease_particles;
 
 				if (destroyed) {
@@ -242,8 +242,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					effect.modifier.colorize = red;
 
 					/* Fix it when we can specify modifiers per-emission */
-					effect.modifier.scale_amounts = std::min(1.f, h.effective_amount / 100.f);// (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
-					effect.modifier.scale_lifetimes = 1.25f + std::min(1.f, h.effective_amount / 100.f);
+					effect.modifier.scale_amounts = std::min(1.f, h.damage.effective / 100.f);// (1.25f + h.damage.ratio_effective_to_maximum)*(1.25f + h.damage.ratio_effective_to_maximum);
+					effect.modifier.scale_lifetimes = 1.25f + std::min(1.f, h.damage.effective / 100.f);
 				}
 
 				{
@@ -274,8 +274,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		};
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
-			if (h.effective_amount > 0) {
-				const auto base_radius = destroyed ? 80.f : h.effective_amount * 1.5f;
+			if (h.damage.effective > 0) {
+				const auto base_radius = destroyed ? 80.f : h.damage.effective * 1.5f;
 
 				{
 					auto msg = make_ring_input();
@@ -325,7 +325,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					th.max_branch_lifetime_ms = { 50.f, 80.f };
 					th.branch_length = { 40.f, 70.f };
 
-					th.max_all_spawned_branches = static_cast<unsigned>(h.effective_amount);
+					th.max_all_spawned_branches = static_cast<unsigned>(h.damage.effective);
 					++th.max_all_spawned_branches;
 					th.max_branch_children = 4;
 
@@ -340,8 +340,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			}
 		}
 		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
-			if (h.effective_amount > 0) {
-				const auto base_radius = destroyed ? 250.f : h.effective_amount * 1.2f;
+			if (h.damage.effective > 0) {
+				const auto base_radius = destroyed ? 250.f : h.damage.effective * 1.2f;
 
 				{
 					auto msg = make_ring_input();
@@ -385,8 +385,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			}
 		}
 		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
-			if (h.effective_amount > 0) {
-				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
+			if (h.damage.effective > 0) {
+				const auto base_radius = destroyed ? 80.f : h.damage.effective * 2.f;
 				{
 					auto msg = make_ring_input();
 					auto& ring = msg.payload;

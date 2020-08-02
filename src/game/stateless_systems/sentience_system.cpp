@@ -322,7 +322,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 	switch (h.target) {
 		case messages::health_event::target_type::HEALTH: {
-			const auto amount = h.effective_amount;
+			const auto amount = h.damage.effective;
 
 			health.value -= amount;
 
@@ -358,7 +358,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 		}
 
 		case messages::health_event::target_type::CONSCIOUSNESS: {
-			const auto amount = h.effective_amount;
+			const auto amount = h.damage.effective;
 			consciousness.value -= amount;
 
 			if (amount > 0) {
@@ -392,7 +392,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 		}
 
 		case messages::health_event::target_type::PERSONAL_ELECTRICITY: {
-			const auto amount = h.effective_amount;
+			const auto amount = h.damage.effective;
 			personal_electricity.value -= amount;
 
 			if (amount > 0) {
@@ -448,7 +448,6 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.subject = d.subject;
 		event_template.point_of_impact = d.point_of_impact;
 		event_template.impact_velocity = d.impact_velocity;
-		event_template.effective_amount = 0;
 		event_template.special_result = messages::health_event::result_type::NONE;
 		event_template.origin = d.origin;
 
@@ -506,17 +505,14 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				auto event = event_template;
 
 				event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY;
+				event.damage = personal_electricity.calc_damage_result(amount);
+				reported_pe_damage = event.damage.effective;
 
-				const auto damaged = personal_electricity.calc_damage_result(amount);
-				event.effective_amount = damaged.effective;
-				reported_pe_damage = damaged.effective;
-
-				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
-				if (event.effective_amount != 0) {
+				if (event.damage.effective != 0) {
 					process_and_post_health(event);
 				}
 
-				return damaged;
+				return event.damage;
 			};
 
 			if (d.type == adverse_element_type::FORCE && health.is_enabled()) {
@@ -532,12 +528,10 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				if (after_shield_damage > 0) {
 					event.target = messages::health_event::target_type::HEALTH;
 
-					const auto damaged = health.calc_damage_result(after_shield_damage);
-					event.effective_amount = damaged.effective;
-					reported_hp_damage = damaged.effective;
-					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
+					event.damage = health.calc_damage_result(after_shield_damage);
+					reported_hp_damage = event.damage.effective;
 
-					if (event.effective_amount != 0) {
+					if (event.damage.effective != 0) {
 						process_and_post_health(event);
 					}
 				}
@@ -555,12 +549,9 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 				if (after_shield_damage > 0) {
 					event.target = messages::health_event::target_type::CONSCIOUSNESS;
+					event.damage = consciousness.calc_damage_result(after_shield_damage);
 
-					const auto damaged = consciousness.calc_damage_result(after_shield_damage);
-					event.effective_amount = damaged.effective;
-					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
-
-					if (event.effective_amount != 0) {
+					if (event.damage.effective != 0) {
 						process_and_post_health(event);
 					}
 				}

@@ -4,6 +4,10 @@
 #include "augs/misc/value_meter.h"
 #include "augs/ensure.h"
 
+meter_value_type value_meter::damage_result::get_total() const {
+	return effective + excessive;
+}
+
 bool value_meter::is_enabled() const {
 	return maximum > 0.f;
 }

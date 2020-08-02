@@ -661,11 +661,12 @@ return {
 
     single_indicator_offsets = {
       { x = 0, y = 0 },
-      { x = -10, y = 30 },
-      { x = 30, y = -20 },
-      { x = 30, y = -50 },
-      { x = 20, y = -70 },
-      { x = 0, y = 20 }
+      { x = -15, y = 25 },
+      { x = 35, y = -25 },
+      { x = 45, y = -55 },
+      { x = 25, y = -75 },
+      { x = 0, y = 25 },
+      { x = 35, y = 25 }
     },
 
     accumulative_indicator_offset = {

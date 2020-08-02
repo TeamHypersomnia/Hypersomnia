@@ -31,15 +31,12 @@ void exaltation_instance::perform_logic(const spell_logic_input in) {
 
 	auto& health = in.sentience.get<health_meter_instance>();
 
-	const auto result = health.calc_damage_result(-spell_data.basic_healing_amount);
-
 	messages::health_event event;
 	event.subject = subject;
 	event.point_of_impact = subject.get_logic_transform().pos;
 	event.impact_velocity = { 0, -200 };
-	event.effective_amount = result.effective;
+	event.damage = health.calc_damage_result(-spell_data.basic_healing_amount);
 	event.target = messages::health_event::target_type::HEALTH;
-	event.ratio_effective_to_maximum = result.ratio_effective_to_maximum;
 
 	sentience_system().process_and_post_health_event(event, in.step);
 }
