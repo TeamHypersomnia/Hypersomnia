@@ -75,6 +75,22 @@ std::optional<vec2> calc_head_position(const E& typed_handle) {
 	return std::nullopt;
 }
 
+inline bool headshot_detected_finite_ray(
+	const vec2 from,
+	const vec2 to,
+	const vec2 head_center,
+	const real32 head_radius
+) {
+	const auto result = ::circle_ray_intersection(
+		from,
+		to,
+		head_center,
+		head_radius
+	);
+
+	return result.hit;
+}
+
 inline bool headshot_detected(
 	const vec2 missile_center,
 	const vec2 missile_direction,
