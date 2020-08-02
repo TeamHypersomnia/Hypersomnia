@@ -51,7 +51,7 @@ struct melee_attack_definition {
 	bool returning_animation_on_finish = false;
 	pad_bytes<3> pad;
 
-	real32 headshot_multiplier = 1.0f;
+	real32 headshot_multiplier = 2.0f;
 	// END GEN INTROSPECTOR
 };
 
