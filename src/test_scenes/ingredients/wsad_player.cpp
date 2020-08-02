@@ -253,7 +253,10 @@ namespace test_flavours {
 			sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
 
 			sentience.health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
+			sentience.headshot_sound.id = to_sound_id(test_scene_sound_id::HEADSHOT);
 			sentience.death_sound.id = to_sound_id(test_scene_sound_id::DEATH);
+
+			sentience.head_hitbox_radius = 13.7f;
 
 			sentience.loss_of_consciousness_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 			sentience.consciousness_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);

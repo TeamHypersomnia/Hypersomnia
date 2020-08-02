@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/physics/missile_surface_info.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/missile/headshot_detection.hpp"
 
 struct missile_collision_result {
 	transformr transform_of_impact;
@@ -96,6 +97,9 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	damage_msg.damage = missile_def.damage;
 	damage_msg.damage *= missile.power_multiplier_of_sender;
 
+	const auto sentience = surface_handle.template find<invariants::sentience>();
+	const bool surface_sentient = sentience != nullptr;
+
 	if (info.should_detonate() && missile_def.destroy_upon_damage) {
 		--charges;
 		
@@ -109,8 +113,6 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 				startle_nearby_organisms(cosm, point, total_damage_amount * 6.f, 50.f + total_damage_amount * 2.f, startle_type::IMMEDIATE);
 			}
 		}
-
-		const bool surface_sentient = surface_handle.template has<components::sentience>();
 
 		// delete only once
 		if (charges == 0) {
@@ -133,6 +135,56 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	}
 
 	if (send_damage && contact_start) {
+		if (surface_sentient) {
+			const auto missile_pos = point;
+			const auto head_pos = ::calc_head_position(surface_handle);
+			const auto head_radius = sentience->head_hitbox_radius;
+
+			if (head_pos != std::nullopt) {
+#if DEBUG_HEADSHOTS
+				DEBUG_PERSISTENT_LINES.emplace_back(
+					cyan,
+					missile_pos,
+					missile_pos + impact_dir * 100
+				);
+
+				DEBUG_PERSISTENT_LINES.emplace_back(
+					red,
+					*head_pos,
+					*head_pos + vec2(0, head_radius)
+				);
+
+				DEBUG_PERSISTENT_LINES.emplace_back(
+					red,
+					*head_pos,
+					*head_pos + vec2(head_radius, 0)
+				);
+
+				DEBUG_PERSISTENT_LINES.emplace_back(
+					red,
+					*head_pos,
+					*head_pos + vec2(-head_radius, 0)
+				);
+
+				DEBUG_PERSISTENT_LINES.emplace_back(
+					red,
+					*head_pos,
+					*head_pos + vec2(0, -head_radius)
+				);
+#endif
+
+				if (::headshot_detected(
+					missile_pos,
+					impact_dir,
+					*head_pos,
+					head_radius
+				)) {
+					damage_msg.damage *= missile.headshot_multiplier_of_sender;
+					damage_msg.headshot = true;
+				}
+			}
+		}
+
 		damage_msg.origin = damage_origin(typed_missile);
 		damage_msg.subject = surface_handle;
 		damage_msg.impact_velocity = impact_velocity;

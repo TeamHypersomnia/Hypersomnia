@@ -167,6 +167,7 @@ namespace invariants {
 
 		sound_effect_input health_decrease_sound;
 		sound_effect_input consciousness_decrease_sound;
+		sound_effect_input headshot_sound;
 
 		sound_effect_input death_sound;
 		sound_effect_input loss_of_consciousness_sound;
@@ -198,6 +199,8 @@ namespace invariants {
 
 		real32 flash_visual_damage_mult = 0.5f;
 		real32 soften_flash_until_look_mult = 0.4f;
+
+		real32 head_hitbox_radius = 8.0f;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -38,6 +38,7 @@ public:
 			real32 amount = 0.0f;
 			vec2 pos;
 
+			bool critical = false;
 		};
 
 		input in;

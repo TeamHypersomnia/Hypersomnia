@@ -30,6 +30,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::missile
 		int damage_charges_before_destruction = 1;
 		real32 power_multiplier_of_sender = 1.f;
+		real32 headshot_multiplier_of_sender = 1.f;
 		real32 initial_speed = 0.f;
 
 		augs::stepped_timestamp when_last_ricocheted;

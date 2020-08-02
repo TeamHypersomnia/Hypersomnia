@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Show a sum and a broken shield instead of two numbers when a shield breaks
+
+- To be able to nicely hear both the headshot and the corpse's explosion...
+	- Introduce a 500ms delay between 'reaching a breaking point' and actual corpse explosion
+
 - Show blue without shield icon if we're just destroying PED
 
 - Corpses explode with a white flasbang-like explosion

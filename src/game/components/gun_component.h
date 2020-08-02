@@ -84,6 +84,7 @@ namespace invariants {
 		augs::bound<real32> muzzle_velocity = { 2000.f, 2000.f };
 
 		real32 damage_multiplier = 1.f;
+		real32 headshot_multiplier = 3.0f;
 
 		augs::bound<real32> shell_velocity = { 300.f, 1700.f };
 		augs::bound<real32> shell_angular_velocity = { 2.f, 14.f };

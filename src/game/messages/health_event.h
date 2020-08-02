@@ -28,6 +28,7 @@ namespace messages {
 		adverse_element_type source_adversity = adverse_element_type::FORCE;
 		value_meter::damage_result damage;
 
+		bool headshot = false;
 		bool was_conscious = true;
 
 		static auto request_death(

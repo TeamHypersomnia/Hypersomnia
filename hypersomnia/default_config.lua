@@ -661,7 +661,7 @@ return {
 
   damage_indication = {
     enabled_numbers_accumulation_speed = 1000,
-    critical_color = "255 255 0 255",
+    critical_color = "255 255 50 255",
     friendly_damage_border_color = "255 40 40 255",
     indicator_fading_duration_secs = 0.5,
     single_indicator_lifetime_secs = 1,

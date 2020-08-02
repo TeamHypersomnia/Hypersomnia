@@ -12,6 +12,7 @@ namespace messages {
 	struct damage_message : public message {
 		bool inflictor_destructed = false;
 		bool create_destruction_effects = true;
+		bool headshot = false;
 		damage_definition damage;
 		damage_origin origin;
 		vec2 impact_velocity;

@@ -232,7 +232,7 @@ enum class test_scene_sound_id {
 	ELON_HRL_LEVER,
 	
 	COVERT_MUZZLE,
-	COVERT_CHAMBERING,
+	HEADSHOT,
 
 	COUNT
 	// END GEN INTROSPECTOR

@@ -180,8 +180,12 @@ void damage_indication_system::draw_indicators(
 		return fonts.large_numbers;
 	};
 
-	auto get_indicator_color = [&](const damage_event::event_type e) {
-		switch (e) {
+	auto get_indicator_color = [&](const auto& in) {
+		if (in.critical) {
+			return settings.critical_color;
+		}
+
+		switch (in.type) {
 			case damage_event::event_type::HEALTH:
 				return white;
 			case damage_event::event_type::CRITICAL:
@@ -273,7 +277,7 @@ void damage_indication_system::draw_indicators(
 			}
 
 			auto text_pos = cone.to_screen_space(world_pos + current_offset * offset_mult);
-			auto text_color = get_indicator_color(e.in.type);
+			auto text_color = get_indicator_color(e.in);
 
 			if (fading_progress >= 0.0f) {
 				const auto fading_mult = std::sqrt(fading_progress / settings.indicator_fading_duration_secs);

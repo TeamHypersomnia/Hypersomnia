@@ -205,6 +205,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		const auto subject = cosm[h.subject];
 		const auto& sentience = subject.get<invariants::sentience>();
 
+		bool play_headshot = false;
+
 		sound_effect_input effect;
 
 		auto predictability = always_predictable_v;
@@ -213,8 +215,16 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			if (h.special_result == messages::health_event::result_type::DEATH) {
 				effect = sentience.death_sound;
 				predictability = never_predictable_v;
+
+				if (h.headshot) {
+					play_headshot = true;
+				}
 			}
 			else if (h.damage.effective > 0) {
+				if (h.headshot) {
+					play_headshot = true;
+				}
+
 				effect = sentience.health_decrease_sound;
 			}
 			else {
@@ -231,6 +241,10 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 					effect.modifier.pitch *= 1.5f;
 
 					predictability = never_predictable_v;
+				}
+
+				if (h.headshot) {
+					play_headshot = true;
 				}
 			}
 			else {
@@ -271,11 +285,23 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			start.clear_when_target_alive = true;
 		}
 
-		effect.start(
-			step,
-			start,
-			predictability
-		);
+		if (effect.id.is_set()) {
+			effect.start(
+				step,
+				start,
+				predictability
+			);
+		}
+
+		if (play_headshot) {
+			auto hs_effect = sentience.headshot_sound;
+
+			hs_effect.start(
+				step,
+				sound_effect_start_input::at_listener(subject),
+				always_predictable_v
+			);
+		}
 	}
 
 	for (const auto& d : damages) {
@@ -320,10 +346,12 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			if (d.inflictor_destructed) {
 				if (sentient) {
 					if (e.sentience_impact.sound.id.is_set()) {
+						// Bullet against body sound, but currently there are no sounds like this in the game
 						do_effect(e.sentience_impact);
 					}
 				}
 				else {
+					// Bullet against wall sound
 					auto eff = e.destruction;
 					eff.sound.modifier.pitch *= step.step_rng.randval(0.8f, 1.2f);
 
@@ -331,10 +359,14 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				}
 			}
 			else {
-				if (sentient && e.sentience_impact.sound.id.is_set()) {
-					do_effect(e.sentience_impact);
+				if (sentient) {
+					if (e.sentience_impact.sound.id.is_set()) {
+						// E.g. knife against body sound
+						do_effect(e.sentience_impact);
+					}
 				}
 				else {
+					// E.g. knife against wall sound
 					do_effect(e.impact);
 				}
 			}

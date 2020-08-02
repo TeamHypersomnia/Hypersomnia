@@ -533,6 +533,10 @@ void audiovisual_state::standard_post_solve(
 				continue;
 			}
 
+			if (h.headshot) {
+				de.critical = true;
+			}
+
 			damage_indication.add(h.subject, de);
 			damage_indication.add_white_highlight(h.subject, h.target, original_ratio);
 		}
