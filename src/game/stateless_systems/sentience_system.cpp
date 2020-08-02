@@ -38,6 +38,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/sentience/tool_getters.h"
 #include "augs/templates/logically_empty.h"
+#include "game/detail/missile/headshot_detection.hpp"
 
 #include "augs/math/collinearize_AB_with_C.h"
 
@@ -802,6 +803,35 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 		) {
 			rigid_body.set_transform({ rigid_body.get_position(), *requested_angle });
 			rigid_body.set_angular_velocity(0);
+		}
+
+		if (DEBUG_DRAWING.draw_headshot_detection) {
+			const auto head_pos = *::calc_head_position(subject);
+			const auto head_radius = subject.template get<invariants::sentience>().head_hitbox_radius;
+
+			DEBUG_LOGIC_STEP_LINES.emplace_back(
+				orange,
+				head_pos,
+				head_pos + vec2(0, head_radius)
+			);
+
+			DEBUG_LOGIC_STEP_LINES.emplace_back(
+				orange,
+				head_pos,
+				head_pos + vec2(head_radius, 0)
+			);
+
+			DEBUG_LOGIC_STEP_LINES.emplace_back(
+				orange,
+				head_pos,
+				head_pos + vec2(-head_radius, 0)
+			);
+
+			DEBUG_LOGIC_STEP_LINES.emplace_back(
+				orange,
+				head_pos,
+				head_pos + vec2(0, -head_radius)
+			);
 		}
 	}
 );

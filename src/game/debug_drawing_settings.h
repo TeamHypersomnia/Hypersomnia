@@ -38,6 +38,7 @@ struct debug_drawing_settings {
 	bool draw_npo_tree_nodes = false;
 
 	bool draw_camera_query = false;
+	bool draw_headshot_detection = false;
 	// END GEN INTROSPECTOR
 };
 

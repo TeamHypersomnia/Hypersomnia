@@ -141,37 +141,37 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			const auto head_radius = sentience->head_hitbox_radius;
 
 			if (head_pos != std::nullopt) {
-#if DEBUG_HEADSHOTS
-				DEBUG_PERSISTENT_LINES.emplace_back(
-					cyan,
-					missile_pos,
-					missile_pos + impact_dir * 100
-				);
+				if (DEBUG_DRAWING.draw_headshot_detection) {
+					DEBUG_PERSISTENT_LINES.emplace_back(
+						cyan,
+						missile_pos,
+						missile_pos + impact_dir * 100
+					);
 
-				DEBUG_PERSISTENT_LINES.emplace_back(
-					red,
-					*head_pos,
-					*head_pos + vec2(0, head_radius)
-				);
+					DEBUG_PERSISTENT_LINES.emplace_back(
+						red,
+						*head_pos,
+						*head_pos + vec2(0, head_radius)
+					);
 
-				DEBUG_PERSISTENT_LINES.emplace_back(
-					red,
-					*head_pos,
-					*head_pos + vec2(head_radius, 0)
-				);
+					DEBUG_PERSISTENT_LINES.emplace_back(
+						red,
+						*head_pos,
+						*head_pos + vec2(head_radius, 0)
+					);
 
-				DEBUG_PERSISTENT_LINES.emplace_back(
-					red,
-					*head_pos,
-					*head_pos + vec2(-head_radius, 0)
-				);
+					DEBUG_PERSISTENT_LINES.emplace_back(
+						red,
+						*head_pos,
+						*head_pos + vec2(-head_radius, 0)
+					);
 
-				DEBUG_PERSISTENT_LINES.emplace_back(
-					red,
-					*head_pos,
-					*head_pos + vec2(0, -head_radius)
-				);
-#endif
+					DEBUG_PERSISTENT_LINES.emplace_back(
+						red,
+						*head_pos,
+						*head_pos + vec2(0, -head_radius)
+					);
+				}
 
 				if (::headshot_detected(
 					missile_pos,
