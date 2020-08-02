@@ -289,6 +289,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 						auto& m = simulated_missile;
 						m.damage_charges_before_destruction = 1;
 						m.power_multiplier_of_sender = 1.f;
+						m.headshot_multiplier_of_sender = throw_def.headshot_multiplier;
 					}
 
 					if (const auto result = collide_missile_against_surface(
