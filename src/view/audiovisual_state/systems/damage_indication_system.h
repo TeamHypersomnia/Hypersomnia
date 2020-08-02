@@ -29,6 +29,7 @@ public:
 		enum class event_type {
 			HEALTH,
 			SHIELD,
+			SHIELD_DESTRUCTION,
 			SHIELD_DRAIN,
 			CRITICAL
 		};
@@ -95,7 +96,8 @@ public:
 
 	void add(
 		const entity_id subject,
-		const damage_event::input
+		const damage_event::input,
+		bool merge
 	);
 
 	void add_white_highlight(

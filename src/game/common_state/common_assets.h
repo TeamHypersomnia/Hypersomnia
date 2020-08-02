@@ -30,5 +30,7 @@ struct common_assets {
 	particle_effect_input standard_learnt_spell_particles;
 
 	sound_effect_input flash_noise_sound;
+
+	assets::image_id broken_shield_icon;
 	// END GEN INTROSPECTOR
 };

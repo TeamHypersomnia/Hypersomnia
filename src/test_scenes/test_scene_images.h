@@ -315,6 +315,8 @@ enum class test_scene_image_id {
 	COVERT_SHOT_1,
 	COVERT_MAGAZINE,
 
+	BROKEN_SHIELD_ICON,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -526,6 +526,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				if (is_shield_enabled) {
 					const auto mult = std::max(0.01f, absorption->first.hp);
 					after_shield_damage = apply_ped(amount / mult).excessive * mult;
+					event.is_remainder_after_shield_destruction = true;
 				}
 
 				if (after_shield_damage > 0) {

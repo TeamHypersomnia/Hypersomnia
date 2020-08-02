@@ -35,13 +35,23 @@ void damage_indication_system::add_white_highlight(
 	highlight.time_of_occurence_seconds = global_time_seconds;
 }
 
-void damage_indication_system::add(const entity_id subject, const damage_event::input new_in) {
+void damage_indication_system::add(const entity_id subject, const damage_event::input new_in, bool merge) {
+	auto& streak = streaks[subject];
+
+	if (merge) {
+		auto& events = streak.events;
+
+		if (events.size() > 0) {
+			events.back().in.amount += new_in.amount;
+			streak.total += new_in.amount;
+			return;
+		}
+	}
+
 	damage_event new_event;
 
 	new_event.in = new_in;
 	new_event.time_of_occurence_seconds = global_time_seconds;
-
-	auto& streak = streaks[subject];
 	new_event.offset_slot = streak.current_event_slot_offset++;
 
 	streak.events.push_back(new_event);
@@ -160,6 +170,7 @@ void damage_indication_system::draw_indicators(
 
 	const auto& meter_metas = cosm.get_common_significant().meters;
 	const auto shield_icon = std::get<electric_shield_perk>(cosm.get_common_significant().perks).appearance.icon;
+	const auto shield_destruction_icon = cosm.get_common_assets().broken_shield_icon;
 	const auto shield_color = rgba(std::get<personal_electricity_meter>(meter_metas).appearance.bar_color).mult_brightness(1.5f);
 
 	// const auto& cumulative_damage_font = fonts.large_numbers;
@@ -193,6 +204,8 @@ void damage_indication_system::draw_indicators(
 			case damage_event::event_type::SHIELD:
 			case damage_event::event_type::SHIELD_DRAIN:
 				return shield_color;
+			case damage_event::event_type::SHIELD_DESTRUCTION:
+				return rgba(shield_color).mult_brightness(1.25f);
 		}
 	};
 
@@ -301,6 +314,13 @@ void damage_indication_system::draw_indicators(
 
 			if (e.in.type == damage_event::event_type::SHIELD) {
 				if (const auto& entry = game_images.at(shield_icon).diffuse; entry.exists()) {
+					const auto shield_icon_pos = pixel_perfect_text_pos - vec2i(0, indicator_font.metrics.descender);
+
+					output.aabb_lt(entry, shield_icon_pos, text_color);
+				}
+			}
+			else if (e.in.type == damage_event::event_type::SHIELD_DESTRUCTION) {
+				if (const auto& entry = game_images.at(shield_destruction_icon).diffuse; entry.exists()) {
 					const auto shield_icon_pos = pixel_perfect_text_pos - vec2i(0, indicator_font.metrics.descender);
 
 					output.aabb_lt(entry, shield_icon_pos, text_color);

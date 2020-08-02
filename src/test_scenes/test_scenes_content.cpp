@@ -100,6 +100,7 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 	common_assets.thunder_remnants = to_particle_effect_id(test_scene_particle_effect_id::THUNDER_REMNANTS);
 
 	common_assets.haste_footstep_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HASTE_FOOTSTEP);
+	common_assets.broken_shield_icon = to_image_id(test_scene_image_id::BROKEN_SHIELD_ICON);
 
 	common_assets.standard_learnt_spell_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_LEARNT_SPELL);
 	common_assets.standard_learnt_spell_sound.id = to_sound_id(test_scene_sound_id::STANDARD_LEARNT_SPELL);

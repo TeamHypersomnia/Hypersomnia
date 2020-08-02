@@ -3016,6 +3016,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 1.1;
+			gun_def.headshot_multiplier = 2.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 15.f;
@@ -3123,6 +3124,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 1.2;
+			gun_def.headshot_multiplier = 2.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 7;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 1.f;
@@ -3374,6 +3376,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.f;
+			gun_def.headshot_multiplier = 2.5f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 8;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 
@@ -3417,6 +3420,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
 			gun_def.damage_multiplier = 1.8f;
+			gun_def.headshot_multiplier = 2.5f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 9;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 0.4f;
@@ -3748,6 +3752,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {900.f, 3500.f};
 			gun_def.damage_multiplier = 0.8f;
+			gun_def.headshot_multiplier = 2;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.3f;
@@ -3794,6 +3799,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 13.f;
 			gun_def.shell_velocity = {900.f, 3500.f};
 			gun_def.damage_multiplier = 1.2f;
+			gun_def.headshot_multiplier = 2.0f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 5;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.9f;

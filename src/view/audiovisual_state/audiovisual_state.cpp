@@ -525,6 +525,10 @@ void audiovisual_state::standard_post_solve(
 					de.type = damage_event::event_type::SHIELD;
 				}
 
+				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
+					de.type = damage_event::event_type::SHIELD_DESTRUCTION;
+				}
+
 				de.amount = h.damage.effective;
 
 				original_ratio = ::get_shield_ratio(cosm[h.subject]) + h.damage.ratio_effective_to_maximum;
@@ -537,7 +541,9 @@ void audiovisual_state::standard_post_solve(
 				de.critical = true;
 			}
 
-			damage_indication.add(h.subject, de);
+			const bool should_merge = h.is_remainder_after_shield_destruction;
+
+			damage_indication.add(h.subject, de, should_merge);
 			damage_indication.add_white_highlight(h.subject, h.target, original_ratio);
 		}
 	}
