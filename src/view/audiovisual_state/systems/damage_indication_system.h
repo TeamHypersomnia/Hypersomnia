@@ -62,6 +62,8 @@ private:
 
 		uint32_t current_event_slot_offset = 0;
 		uint32_t total_damage_events = 0;
+
+		mutable std::optional<vec2> last_visible_pos;
 	};
 
 	double global_time_seconds = 0.0;
@@ -103,6 +105,7 @@ public:
 	void advance(const damage_indication_settings& settings, const augs::delta dt);
 
 	void draw_indicators(
+		const std::function<bool(const_entity_handle)> is_reasonably_in_view,
 		const const_entity_handle& viewed_character,
 		const interpolation_system& interp,
 		const damage_indication_settings& settings,

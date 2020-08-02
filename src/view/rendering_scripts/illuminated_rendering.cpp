@@ -649,8 +649,23 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.standard->set_as_current(renderer);
 
+	auto is_reasonably_in_view = [&](const const_entity_handle character) {
+		if (!fog_of_war_effective) {
+			return true;
+		}
+
+		return ::is_reasonably_in_view(
+			viewed_character,
+			character,
+			in.pre_step_crosshair_displacement,
+			interp,
+			settings.fog_of_war.angle
+		);
+	};
+
 	if (settings.draw_damage_indicators) {
 		damage_indication.draw_indicators(
+			is_reasonably_in_view,
 			viewed_character,
 			interp,
 			in.damage_indication,

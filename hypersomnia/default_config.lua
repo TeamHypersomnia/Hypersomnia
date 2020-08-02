@@ -654,7 +654,7 @@ return {
     friendly_damage_border_color = "255 40 40 255",
     indicator_fading_duration_secs = 0.5,
     single_indicator_lifetime_secs = 1,
-    accumulative_indicator_idle_lifetime_secs = 1,
+    accumulative_indicator_idle_lifetime_secs = 0.0,
     indicator_rising_speed = 50,
     small_damage_threshold = 25,
     medium_damage_threshold = 61,
@@ -672,7 +672,7 @@ return {
       x = 0, y = -80
     },
 
-    white_damage_highlight_secs = 0.15,
+    white_damage_highlight_secs = 0.25,
     character_silhouette_damage_highlight_secs = 0.12
   },
 

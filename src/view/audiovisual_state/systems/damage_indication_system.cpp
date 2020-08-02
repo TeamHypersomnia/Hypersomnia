@@ -147,6 +147,7 @@ void damage_indication_system::advance(
 #include "augs/log.h"
 
 void damage_indication_system::draw_indicators(
+	const std::function<bool(const_entity_handle)> is_reasonably_in_view,
 	const const_entity_handle& viewed_character,
 	const interpolation_system& interp,
 	const damage_indication_settings& settings,
@@ -159,7 +160,7 @@ void damage_indication_system::draw_indicators(
 
 	const auto& meter_metas = cosm.get_common_significant().meters;
 	const auto shield_icon = std::get<electric_shield_perk>(cosm.get_common_significant().perks).appearance.icon;
-	const auto shield_color = rgba(std::get<personal_electricity_meter>(meter_metas).appearance.bar_color).mult_brightness(1.25f);
+	const auto shield_color = rgba(std::get<personal_electricity_meter>(meter_metas).appearance.bar_color).mult_brightness(1.5f);
 
 	// const auto& cumulative_damage_font = fonts.large_numbers;
 
@@ -193,7 +194,9 @@ void damage_indication_system::draw_indicators(
 	const auto indicator_offsets = settings.single_indicator_offsets;
 
 	for (const auto& s : streaks) {
-		const auto subject = s.first;
+		const auto subject_id = s.first;
+		const auto subject = cosm[subject_id];
+
 		const auto& streak = s.second;
 
 		const auto border_color = subject == viewed_character ? red : black;
@@ -202,8 +205,12 @@ void damage_indication_system::draw_indicators(
 			/* Render the streak itself */
 
 			if (streak.total_damage_events > 1) {
-				if (const auto transform = cosm[subject].find_viewing_transform(interp)) {
-					auto text_pos = cone.to_screen_space(transform->pos + settings.accumulative_indicator_offset);
+				if (const auto transform = subject.find_viewing_transform(interp)) {
+					if (streak.last_visible_pos == std::nullopt || is_reasonably_in_view(subject)) {
+						streak.last_visible_pos = transform->pos;
+					}
+
+					auto text_pos = cone.to_screen_space(*streak.last_visible_pos + settings.accumulative_indicator_offset);
 					auto text_color = white;
 
 					if (streak.events.empty()) {
@@ -245,7 +252,13 @@ void damage_indication_system::draw_indicators(
 			const auto current_offset = indicator_offsets[e.offset_slot % indicator_offsets.size()];
 			const auto fading_progress = passed - settings.single_indicator_lifetime_secs;
 
-			auto text_pos = cone.to_screen_space(e.in.pos + current_offset);
+			const auto round_amount = static_cast<int>(e.displayed_amount);
+			const auto indicator_number_text = std::to_string(round_amount);
+
+			const auto& indicator_font = get_indicator_font(round_amount);
+			const auto offset_mult = static_cast<float>(indicator_font.metrics.get_height()) / fonts.gui.metrics.get_height();
+
+			auto text_pos = cone.to_screen_space(e.in.pos + current_offset * offset_mult);
 			auto text_color = get_indicator_color(e.in.type);
 
 			if (fading_progress >= 0.0f) {
@@ -255,25 +268,22 @@ void damage_indication_system::draw_indicators(
 				text_color.mult_alpha(1 - fading_mult);
 			}
 
-			const auto round_amount = static_cast<int>(e.displayed_amount);
-			const auto indicator_number_text = std::to_string(round_amount);
-
 			auto border = border_color;
 			border.a = text_color.a;
 
 			augs::gui::text::print_stroked(
 				output,
 				text_pos,
-				{ indicator_number_text, { get_indicator_font(round_amount), text_color } },
+				{ indicator_number_text, { indicator_font, text_color } },
 				{ augs::ralign::R },
 				border
 			);
 
 			if (e.in.type == damage_event::event_type::SHIELD) {
 				if (const auto& entry = game_images.at(shield_icon).diffuse; entry.exists()) {
-					const auto shield_icon_pos = text_pos;
+					const auto shield_icon_pos = text_pos - vec2i(0, indicator_font.metrics.descender);
 
-					output.aabb_lt(entry, shield_icon_pos, white);
+					output.aabb_lt(entry, shield_icon_pos, text_color);
 				}
 			}
 		}

@@ -128,7 +128,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 				case character_hud_type::NONE:
 					return;
 				case character_hud_type::SMALL_HEALTH_BAR: {
-					if (!in.is_character_reasonably_in_view(drawn_character)) {
+					if (!in.is_reasonably_in_view(drawn_character)) {
 						return;
 					}
 

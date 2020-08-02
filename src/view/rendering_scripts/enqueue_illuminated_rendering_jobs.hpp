@@ -1,6 +1,7 @@
 #pragma once
 #include "view/rendering_scripts/draw_character_glow.h"
 #include "game/detail/visible_entities.hpp"
+#include "view/rendering_scripts/is_reasonably_in_view.hpp"
 
 void enqueue_illuminated_rendering_jobs(
 	augs::thread_pool& pool, 
@@ -73,7 +74,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::line_drawer_with_default { dedicated[d].lines, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto sentience_hud_job = [&cosm, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, &indicator_meta, viewed_character_transform, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
+	auto sentience_hud_job = [&cosm, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, &indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
 		std::array<assets::necessary_image_id, 3> circles = {
@@ -130,39 +131,16 @@ void enqueue_illuminated_rendering_jobs(
 
 		auto is_reasonably_in_view = [&](const const_entity_handle character) {
 			if (!fog_of_war_effective) {
-				return false;
+				return true;
 			}
 
-			if (viewed_character.dead() || viewed_character_transform == std::nullopt) {
-				return false;
-			}
-
-			const auto from = viewed_character_transform->pos;
-			const auto to = character.get_viewing_transform(interp).pos;
-
-			auto look_dir = calc_crosshair_displacement(viewed_character) + pre_step_crosshair_displacement;
-
-			if (look_dir.is_zero()) {
-				look_dir.set(1, 0);
-			}
-
-			look_dir.normalize();
-			const auto target_dir = (to - from).normalize();
-
-			if (look_dir.degrees_between(target_dir) <= settings.fog_of_war.angle / 2) {
-				const auto& physics = cosm.get_solvable_inferred().physics;
-
-				const auto line_of_sight = physics.ray_cast_px(
-					cosm.get_si(), 
-					from, 
-					to, 
-					predefined_queries::line_of_sight()
-				);
-
-				return !line_of_sight.hit;
-			}
-
-			return false;
+			return ::is_reasonably_in_view(
+				viewed_character,
+				character,
+				pre_step_crosshair_displacement,
+				interp,
+				settings.fog_of_war.angle
+			);
 		};
 
 		const auto input = draw_sentiences_hud_input {

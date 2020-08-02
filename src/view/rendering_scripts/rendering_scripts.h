@@ -84,7 +84,7 @@ struct draw_sentiences_hud_input {
 	const real32 color_indicator_angle;
 	const special_indicator_meta& indicator_meta;
 
-	const std::function<bool(const_entity_handle)> is_character_reasonably_in_view;
+	const std::function<bool(const_entity_handle)> is_reasonably_in_view;
 };
 
 struct draw_explosion_body_highlights_input {
