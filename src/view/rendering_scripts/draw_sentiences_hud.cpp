@@ -155,7 +155,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 					const auto internal_border_size = 0;
 					const auto external_border_size = 1;
-					const auto internal_bar_size = vec2i(72, 3);
+					const auto internal_bar_size = vec2i(72, 4);
 
 					const auto internal_current_width = is_conscious ? std::max(1, static_cast<int>(static_cast<float>(internal_bar_size.x) * chosen_ratio)) : 0;
 					const auto internal_bar_current_size = vec2i(internal_current_width, internal_bar_size.y);

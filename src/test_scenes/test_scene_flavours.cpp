@@ -324,7 +324,7 @@ namespace test_flavours {
 			meta.set(item);
 
 			invariants::tool tool;
-			tool.pe_absorption.hp = 0.3f;
+			tool.pe_absorption.hp = 1.0f;
 			tool.pe_absorption.cp = 6.f;
 			tool.glow_color = turquoise;
 			tool.glow_color.a = 210;

@@ -12,6 +12,7 @@ struct per_gui_font {
 	What larger_gui;
 	What medium_numbers;
 	What large_numbers;
+	What very_large_numbers;
 	// END GEN INTROSPECTOR
 };
 

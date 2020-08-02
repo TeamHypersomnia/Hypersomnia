@@ -64,7 +64,7 @@ void arena_scoreboard_gui::draw_gui(
 	};
 
 	auto fmt_large = [&](const auto& text, const rgba col = white) {
-		return formatted_string(text, style(in.gui_fonts.large_numbers, col));
+		return formatted_string(text, style(in.gui_fonts.very_large_numbers, col));
 	};
 
 	auto calc_size = [&](const auto& text) {

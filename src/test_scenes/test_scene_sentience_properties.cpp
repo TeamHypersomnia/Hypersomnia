@@ -25,7 +25,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<haste>(spells);
 		d.common.cooldown_ms = 5000;
-		d.common.personal_electricity_required = 120;
+		d.common.personal_electricity_required = 36;
 		d.common.associated_color = green_spell_color;
 		d.perk_duration_seconds = 15;
 
@@ -49,7 +49,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<exaltation>(spells);
 		d.common.cooldown_ms = 5000;
-		d.common.personal_electricity_required = 100;
+		d.common.personal_electricity_required = 40;
 		d.common.associated_color = green;
 
 		d.appearance.incantation = "efforia";
@@ -74,7 +74,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<echoes_of_the_higher_realms>(spells);
 		d.common.cooldown_ms = 2000;
-		d.common.personal_electricity_required = 90;
+		d.common.personal_electricity_required = 27;
 		d.common.associated_color = yellow;
 
 		d.appearance.incantation = "armonia";
@@ -99,7 +99,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<fury_of_the_aeons>(spells);
 		d.common.cooldown_ms = 2000;
-		d.common.personal_electricity_required = 100;
+		d.common.personal_electricity_required = 30;
 		d.common.associated_color = blue_spell_border;
 
 		d.appearance.incantation = "mania aiones";
@@ -141,7 +141,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<electric_triad>(spells);
 		d.common.cooldown_ms = 3000;
-		d.common.personal_electricity_required = 250;
+		d.common.personal_electricity_required = 75;
 		d.common.associated_color = blue_spell_border;
 
 		d.appearance.incantation = "energeia triada";
@@ -164,7 +164,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<ultimate_wrath_of_the_aeons>(spells);
 		d.common.cooldown_ms = 2000;
-		d.common.personal_electricity_required = 250;
+		d.common.personal_electricity_required = 75;
 		d.common.associated_color = blue_spell_border;
 
 		d.appearance.incantation = "megalyteri aiones via";

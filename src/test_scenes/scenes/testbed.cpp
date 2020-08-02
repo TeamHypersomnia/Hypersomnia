@@ -312,8 +312,8 @@ namespace test_scenes {
 			sentience.get<consciousness_meter_instance>().set_maximum_value(400);
 			sentience.get<consciousness_meter_instance>().set_value(400);
 
-			sentience.get<personal_electricity_meter_instance>().set_maximum_value(400);
-			sentience.get<personal_electricity_meter_instance>().set_value(400);
+			sentience.get<personal_electricity_meter_instance>().set_maximum_value(100);
+			sentience.get<personal_electricity_meter_instance>().set_value(100);
 
 			new_character.get<components::attitude>().maximum_divergence_angle_before_shooting = 25;
 

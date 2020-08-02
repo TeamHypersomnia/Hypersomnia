@@ -390,7 +390,7 @@ return {
 		unicode_ranges = {
 		  { 0x0030, 0x0039 }, -- Only numbers
 		},
-		size_in_pixels = 48,
+		size_in_pixels = 42,
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "NEVER",
 		settings = {},
@@ -398,6 +398,17 @@ return {
 	  },
 
 	  large_numbers = {
+		unicode_ranges = {
+		  { 0x0030, 0x0039 }, -- Only numbers
+		},
+		size_in_pixels = 52,
+		add_japanese_ranges = "NEVER",
+		add_cyrillic_ranges = "NEVER",
+		settings = {},
+		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
+	  },
+
+	  very_large_numbers = {
 		unicode_ranges = {
 		  { 0x0030, 0x0039 }, -- Only numbers
 		},
