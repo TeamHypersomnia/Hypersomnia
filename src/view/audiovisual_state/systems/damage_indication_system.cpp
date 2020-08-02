@@ -245,10 +245,6 @@ void damage_indication_system::draw_indicators(
 		for (const auto& e : streak.events) {
 			const auto passed = global_time_seconds - e.time_of_occurence_seconds;
 
-			if (!e.first_camera_space_pos.has_value()) {
-				e.first_camera_space_pos = cone.to_screen_space(e.in.pos);
-			}
-
 			const auto current_offset = indicator_offsets[e.offset_slot % indicator_offsets.size()];
 			const auto fading_progress = passed - settings.single_indicator_lifetime_secs;
 
@@ -263,7 +259,19 @@ void damage_indication_system::draw_indicators(
 			const auto& indicator_font = get_indicator_font(round_amount);
 			const auto offset_mult = static_cast<float>(indicator_font.metrics.get_height()) / fonts.gui.metrics.get_height();
 
-			auto text_pos = cone.to_screen_space(e.in.pos + current_offset * offset_mult);
+			auto world_pos = e.in.pos;
+
+			if (viewed_character == subject) {
+				const auto viewed_pos = subject.get_viewing_transform(interp).pos;
+
+				if (!e.first_pos.has_value()) {
+					e.first_pos = viewed_pos;
+				}
+
+				world_pos += viewed_pos - *e.first_pos;
+			}
+
+			auto text_pos = cone.to_screen_space(world_pos + current_offset * offset_mult);
 			auto text_color = get_indicator_color(e.in.type);
 
 			if (fading_progress >= 0.0f) {

@@ -44,7 +44,7 @@ public:
 		real32 displayed_amount = 0.0f;
 		double time_of_occurence_seconds = 0.0;
 		uint32_t offset_slot = 0;
-		mutable std::optional<vec2> first_camera_space_pos;
+		mutable std::optional<vec2> first_pos;
 
 		bool is_set() const {
 			return in.amount != 0.0f;
