@@ -29,6 +29,7 @@ public:
 		enum class event_type {
 			HEALTH,
 			SHIELD,
+			SHIELD_DRAIN,
 			CRITICAL
 		};
 

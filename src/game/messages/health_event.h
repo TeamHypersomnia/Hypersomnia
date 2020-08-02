@@ -25,6 +25,7 @@ namespace messages {
 
 		damage_origin origin;
 
+		adverse_element_type source_adversity = adverse_element_type::FORCE;
 		value_meter::damage_result damage;
 
 		bool was_conscious = true;

@@ -4409,3 +4409,17 @@ Advantages:
 - wtf again with those traces? why are they missing?
 	- we were making an overhaul in guns.cpp so perhaps something got lost in heat of the moment
 
+- maybe try with disappearing (replacing) the old streak number if another one begins after all events are gone
+
+- brighten the blue for shield damages too
+- fix shield icon positioning
+- Show excessive damage with indicators
+- it's not showing total damage for viewed character if we kill ourselves with a nade
+	- try recording it because it doesn't always work
+
+- Increase the distance offsets proportionally to font size 
+
+- On the small health bars, we could still show a border for the part that is depleted - albeit a bit dimmer 
+
+- Make just the borders reddish when our character is the one to receive damage
+

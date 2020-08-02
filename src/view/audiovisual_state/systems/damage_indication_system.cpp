@@ -187,6 +187,7 @@ void damage_indication_system::draw_indicators(
 			case damage_event::event_type::CRITICAL:
 				return settings.critical_color;
 			case damage_event::event_type::SHIELD:
+			case damage_event::event_type::SHIELD_DRAIN:
 				return shield_color;
 		}
 	};

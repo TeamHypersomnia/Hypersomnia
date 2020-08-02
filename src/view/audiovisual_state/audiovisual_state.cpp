@@ -518,7 +518,13 @@ void audiovisual_state::standard_post_solve(
 				original_ratio = ::get_health_ratio(cosm[h.subject]) + h.damage.ratio_effective_to_maximum;
 			}
 			else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
-				de.type = damage_event::event_type::SHIELD;
+				if (h.source_adversity == adverse_element_type::PED) {
+					de.type = damage_event::event_type::SHIELD_DRAIN;
+				}
+				else {
+					de.type = damage_event::event_type::SHIELD;
+				}
+
 				de.amount = h.damage.effective;
 
 				original_ratio = ::get_shield_ratio(cosm[h.subject]) + h.damage.ratio_effective_to_maximum;

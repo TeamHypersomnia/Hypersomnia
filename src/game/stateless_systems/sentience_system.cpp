@@ -450,6 +450,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.impact_velocity = d.impact_velocity;
 		event_template.special_result = messages::health_event::result_type::NONE;
 		event_template.origin = d.origin;
+		event_template.source_adversity = d.type;
 
 		auto process_and_post_health = [&](const auto& event) {
 			process_and_post_health_event(event, step);
