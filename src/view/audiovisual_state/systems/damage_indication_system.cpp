@@ -11,6 +11,8 @@
 #include "view/audiovisual_state/systems/damage_indication_system.h"
 #include "view/damage_indication_settings.h"
 
+#include "augs/drawing/sprite_helpers.h"
+
 void damage_indication_system::clear() {
 	streaks.clear();
 }
@@ -43,6 +45,7 @@ void damage_indication_system::add(const entity_id subject, const damage_event::
 
 		if (events.size() > 0) {
 			events.back().in.amount += new_in.amount;
+			events.back().in.is_death = events.back().in.is_death || new_in.is_death;
 			streak.total += new_in.amount;
 			return;
 		}
@@ -168,9 +171,10 @@ void damage_indication_system::draw_indicators(
 ) const {
 	const auto& cosm = viewed_character.get_cosmos();
 
+	const auto& common_assets = cosm.get_common_assets();
 	const auto& meter_metas = cosm.get_common_significant().meters;
 	const auto shield_icon = std::get<electric_shield_perk>(cosm.get_common_significant().perks).appearance.icon;
-	const auto shield_destruction_icon = cosm.get_common_assets().broken_shield_icon;
+	const auto shield_destruction_icon = common_assets.broken_shield_icon;
 	const auto shield_color = rgba(std::get<personal_electricity_meter>(meter_metas).appearance.bar_color).mult_brightness(1.5f);
 
 	// const auto& cumulative_damage_font = fonts.large_numbers;
@@ -203,9 +207,12 @@ void damage_indication_system::draw_indicators(
 				return settings.critical_color;
 			case damage_event::event_type::SHIELD:
 			case damage_event::event_type::SHIELD_DRAIN:
-				return shield_color;
-			case damage_event::event_type::SHIELD_DESTRUCTION:
-				return rgba(shield_color).mult_brightness(1.25f);
+				if (in.ped_destroyed) {
+					return rgba(shield_color).mult_brightness(1.25f);
+				}
+				else {
+					return shield_color;
+				}
 		}
 	};
 
@@ -217,7 +224,7 @@ void damage_indication_system::draw_indicators(
 
 		const auto& streak = s.second;
 
-		const auto border_color = subject == viewed_character ? red : black;
+		const auto border_color = subject.get_official_faction() == viewed_character.get_official_faction() ? red : black;
 
 		{
 			/* Render the streak itself */
@@ -313,17 +320,40 @@ void damage_indication_system::draw_indicators(
 			);
 
 			if (e.in.type == damage_event::event_type::SHIELD) {
-				if (const auto& entry = game_images.at(shield_icon).diffuse; entry.exists()) {
+				const auto icon = e.in.ped_destroyed ? shield_destruction_icon : shield_icon;
+
+				if (const auto& entry = game_images.at(icon).diffuse; entry.exists()) {
 					const auto shield_icon_pos = pixel_perfect_text_pos - vec2i(0, indicator_font.metrics.descender);
 
 					output.aabb_lt(entry, shield_icon_pos, text_color);
 				}
 			}
-			else if (e.in.type == damage_event::event_type::SHIELD_DESTRUCTION) {
-				if (const auto& entry = game_images.at(shield_destruction_icon).diffuse; entry.exists()) {
-					const auto shield_icon_pos = pixel_perfect_text_pos - vec2i(0, indicator_font.metrics.descender);
 
-					output.aabb_lt(entry, shield_icon_pos, text_color);
+			if (e.in.critical) {
+				const auto passed_mult = passed / settings.single_indicator_lifetime_secs;
+
+				if (passed_mult <= 1.0f) {
+					const auto faction = subject.get_official_faction();
+					const auto icon = e.in.is_death ? common_assets.broken_head_icons[faction] : common_assets.head_icons[faction];
+
+					const auto head_offset = (std::sqrt(passed_mult)) * settings.indicator_rising_speed * 1.5;
+
+					auto head_pos = cone.to_screen_space(e.in.head_transform.pos);
+					head_pos.y -= head_offset;
+
+					auto col = text_color;
+					col.a = 255;
+					col.mult_alpha(1 - passed_mult*passed_mult*passed_mult);
+
+					if (const auto& entry = game_images.at(icon).diffuse; entry.exists()) {
+						augs::detail_sprite(
+							output,
+							entry,
+							vec2i(head_pos),
+							e.in.head_transform.rotation,
+							col
+						);
+					}
 				}
 			}
 		}

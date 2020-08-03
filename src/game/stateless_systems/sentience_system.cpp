@@ -453,6 +453,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.origin = d.origin;
 		event_template.source_adversity = d.type;
 		event_template.headshot = d.headshot;
+		event_template.head_transform = d.head_transform;
 
 		auto process_and_post_health = [&](const auto& event) {
 			process_and_post_health_event(event, step);
@@ -800,40 +801,41 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 			}
 
 			if (auto rigid_body = subject.template find<components::rigid_body>();
-			rigid_body != nullptr && requested_angle
-		) {
-			rigid_body.set_transform({ rigid_body.get_position(), *requested_angle });
-			rigid_body.set_angular_velocity(0);
+				rigid_body != nullptr && requested_angle
+			) {
+				rigid_body.set_transform({ rigid_body.get_position(), *requested_angle });
+				rigid_body.set_angular_velocity(0);
+			}
+
+			if (DEBUG_DRAWING.draw_headshot_detection) {
+				const auto head_transform = ::calc_head_transform(subject);
+				const auto head_radius = subject.template get<invariants::sentience>().head_hitbox_radius;
+				const auto head_pos = head_transform->pos;
+
+				DEBUG_LOGIC_STEP_LINES.emplace_back(
+					orange,
+					head_pos,
+					head_pos + vec2(0, head_radius)
+				);
+
+				DEBUG_LOGIC_STEP_LINES.emplace_back(
+					orange,
+					head_pos,
+					head_pos + vec2(head_radius, 0)
+				);
+
+				DEBUG_LOGIC_STEP_LINES.emplace_back(
+					orange,
+					head_pos,
+					head_pos + vec2(-head_radius, 0)
+				);
+
+				DEBUG_LOGIC_STEP_LINES.emplace_back(
+					orange,
+					head_pos,
+					head_pos + vec2(0, -head_radius)
+				);
+			}
 		}
-
-		if (DEBUG_DRAWING.draw_headshot_detection) {
-			const auto head_pos = *::calc_head_position(subject);
-			const auto head_radius = subject.template get<invariants::sentience>().head_hitbox_radius;
-
-			DEBUG_LOGIC_STEP_LINES.emplace_back(
-				orange,
-				head_pos,
-				head_pos + vec2(0, head_radius)
-			);
-
-			DEBUG_LOGIC_STEP_LINES.emplace_back(
-				orange,
-				head_pos,
-				head_pos + vec2(head_radius, 0)
-			);
-
-			DEBUG_LOGIC_STEP_LINES.emplace_back(
-				orange,
-				head_pos,
-				head_pos + vec2(-head_radius, 0)
-			);
-
-			DEBUG_LOGIC_STEP_LINES.emplace_back(
-				orange,
-				head_pos,
-				head_pos + vec2(0, -head_radius)
-			);
-		}
-	}
-);
+	);
 }

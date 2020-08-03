@@ -28,6 +28,7 @@ namespace messages {
 		adverse_element_type source_adversity = adverse_element_type::FORCE;
 		value_meter::damage_result damage;
 
+		transformr head_transform;
 		bool headshot = false;
 		bool was_conscious = true;
 		bool is_remainder_after_shield_destruction = false;

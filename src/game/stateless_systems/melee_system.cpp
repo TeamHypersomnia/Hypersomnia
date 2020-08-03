@@ -585,10 +585,12 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 												const auto missile_begin = point_of_impact;
 												const auto missile_end = missile_begin + impact_dir * (to.pos - from.pos).length();
 
-												const auto head_pos = ::calc_head_position(victim);
+												const auto head_transform = ::calc_head_transform(victim);
 												const auto head_radius = victim_sentience->head_hitbox_radius;
 
-												if (head_pos != std::nullopt) {
+												if (head_transform != std::nullopt) {
+													const auto head_pos = head_transform->pos;
+
 													if (DEBUG_DRAWING.draw_headshot_detection) {
 														DEBUG_PERSISTENT_LINES.emplace_back(
 															cyan,
@@ -598,45 +600,46 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 														DEBUG_PERSISTENT_LINES.emplace_back(
 															red,
-															*head_pos,
-															*head_pos + vec2(0, head_radius)
+															head_pos,
+															head_pos + vec2(0, head_radius)
 														);
 
 														DEBUG_PERSISTENT_LINES.emplace_back(
 															red,
-															*head_pos,
-															*head_pos + vec2(head_radius, 0)
+															head_pos,
+															head_pos + vec2(head_radius, 0)
 														);
 
 														DEBUG_PERSISTENT_LINES.emplace_back(
 															red,
-															*head_pos,
-															*head_pos + vec2(-head_radius, 0)
+															head_pos,
+															head_pos + vec2(-head_radius, 0)
 														);
 
 														DEBUG_PERSISTENT_LINES.emplace_back(
 															red,
-															*head_pos,
-															*head_pos + vec2(0, -head_radius)
+															head_pos,
+															head_pos + vec2(0, -head_radius)
 														);
 													}
 
 													const bool detected_first = ::headshot_detected_finite_ray(
 														missile_begin,
 														missile_end,
-														*head_pos,
+														head_pos,
 														head_radius
 													);
 
 													const bool detected_second = ::headshot_detected_finite_ray(
 														missile_end,
 														missile_begin,
-														*head_pos,
+														head_pos,
 														head_radius
 													);
 
 													if (detected_first || detected_second) {
 														damage_msg.damage *= current_attack_def.headshot_multiplier;
+														damage_msg.head_transform = *head_transform;
 														damage_msg.headshot = true;
 													}
 												}

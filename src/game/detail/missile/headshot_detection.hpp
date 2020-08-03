@@ -5,7 +5,7 @@
 #include "game/detail/inventory/direct_attachment_offset.h"
 
 template <class E>
-std::optional<vec2> calc_head_position(const E& typed_handle) {
+std::optional<transformr> calc_head_transform(const E& typed_handle) {
 	// CHUNKS COPIED DIRECTLY FROM RENDERING CODE
 
 	const auto& torso = typed_handle.template get<invariants::torso>();
@@ -69,7 +69,7 @@ std::optional<vec2> calc_head_position(const E& typed_handle) {
 		const auto target_offset = ::get_anchored_offset(stance_offsets_for_head.head, anchor_for_head);
 		const auto target_transform = viewing_transform * target_offset;
 
-		return target_transform.pos;
+		return target_transform;
 	}
 
 	return std::nullopt;

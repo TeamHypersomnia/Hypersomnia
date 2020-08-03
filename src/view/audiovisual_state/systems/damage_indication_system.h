@@ -29,7 +29,6 @@ public:
 		enum class event_type {
 			HEALTH,
 			SHIELD,
-			SHIELD_DESTRUCTION,
 			SHIELD_DRAIN,
 			CRITICAL
 		};
@@ -38,8 +37,13 @@ public:
 			event_type type = event_type::HEALTH;
 			real32 amount = 0.0f;
 			vec2 pos;
+			transformr head_transform;
 
+			messages::health_event::result_type special_result = messages::health_event::result_type::NONE;
 			bool critical = false;
+
+			bool ped_destroyed = false;
+			bool is_death = false;
 		};
 
 		input in;

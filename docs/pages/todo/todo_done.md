@@ -4423,3 +4423,5 @@ Advantages:
 
 - Make just the borders reddish when our character is the one to receive damage
 
+- Show a sum and a broken shield instead of two numbers when a shield breaks
+

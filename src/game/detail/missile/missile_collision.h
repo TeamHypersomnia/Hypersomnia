@@ -137,10 +137,12 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	if (send_damage && contact_start) {
 		if (surface_sentient) {
 			const auto missile_pos = point;
-			const auto head_pos = ::calc_head_position(surface_handle);
+			const auto head_transform = ::calc_head_transform(surface_handle);
 			const auto head_radius = sentience->head_hitbox_radius;
 
-			if (head_pos != std::nullopt) {
+			if (head_transform != std::nullopt) {
+				const auto head_pos = head_transform->pos;
+
 				if (DEBUG_DRAWING.draw_headshot_detection) {
 					DEBUG_PERSISTENT_LINES.emplace_back(
 						cyan,
@@ -150,37 +152,38 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 					DEBUG_PERSISTENT_LINES.emplace_back(
 						red,
-						*head_pos,
-						*head_pos + vec2(0, head_radius)
+						head_pos,
+						head_pos + vec2(0, head_radius)
 					);
 
 					DEBUG_PERSISTENT_LINES.emplace_back(
 						red,
-						*head_pos,
-						*head_pos + vec2(head_radius, 0)
+						head_pos,
+						head_pos + vec2(head_radius, 0)
 					);
 
 					DEBUG_PERSISTENT_LINES.emplace_back(
 						red,
-						*head_pos,
-						*head_pos + vec2(-head_radius, 0)
+						head_pos,
+						head_pos + vec2(-head_radius, 0)
 					);
 
 					DEBUG_PERSISTENT_LINES.emplace_back(
 						red,
-						*head_pos,
-						*head_pos + vec2(0, -head_radius)
+						head_pos,
+						head_pos + vec2(0, -head_radius)
 					);
 				}
 
 				if (::headshot_detected(
 					missile_pos,
 					impact_dir,
-					*head_pos,
+					head_pos,
 					head_radius
 				)) {
 					damage_msg.damage *= missile.headshot_multiplier_of_sender;
 					damage_msg.headshot = true;
+					damage_msg.head_transform = *head_transform;
 				}
 			}
 		}

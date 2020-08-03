@@ -6,7 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Show a sum and a broken shield instead of two numbers when a shield breaks
+- Show a nice headshot indicator over the place where bullet impacts head
+	- Maybe make them from actual head sprites?
+		- With a bullet flying through (shown if enemy was killed by the headshot and also in hud in the left top)
+		- or with a bullet about to fly through (if the enemy's not dead)
+			- or with a partial shear
+	- Make it fly upwards right away
+		- Consider making it fly in the impact direction
+		- Rotated along with initial head position - at the very least
+			- pass that info in damage/health message since it will already be calculated
+	- Position it in the original head's position instead of point of impact
 
 - To be able to nicely hear both the headshot and the corpse's explosion...
 	- Introduce a 500ms delay between 'reaching a breaking point' and actual corpse explosion

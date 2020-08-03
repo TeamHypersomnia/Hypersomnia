@@ -13,6 +13,8 @@ namespace messages {
 		bool inflictor_destructed = false;
 		bool create_destruction_effects = true;
 		bool headshot = false;
+		transformr head_transform;
+
 		damage_definition damage;
 		damage_origin origin;
 		vec2 impact_velocity;

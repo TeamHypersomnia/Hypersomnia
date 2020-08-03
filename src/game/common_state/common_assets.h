@@ -32,5 +32,8 @@ struct common_assets {
 	sound_effect_input flash_noise_sound;
 
 	assets::image_id broken_shield_icon;
+
+	per_actual_faction<assets::image_id> head_icons;
+	per_actual_faction<assets::image_id> broken_head_icons;
 	// END GEN INTROSPECTOR
 };
