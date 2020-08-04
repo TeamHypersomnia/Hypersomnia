@@ -13,5 +13,5 @@ struct basic_detached_body_parts {
 	// END GEN INTROSPECTOR
 };
 
-using detached_body_parts = basic_detached_body_parts<child_entity_id>;
+using detached_body_parts = basic_detached_body_parts<entity_id>;
 using detached_body_parts_flavours = basic_detached_body_parts<body_part_flavour>;

@@ -34,6 +34,20 @@ using entities_with_renderables = entity_types_having_any_of<
 	invariants::animation
 >;
 
+enum class head_drawing_type {
+	NONE,
+	DIM,
+	NORMAL
+};
+
+inline auto calc_head_drawing_type(const components::sentience& sentience) {
+	if (!sentience.is_dead()) {
+		return head_drawing_type::NORMAL;
+	}
+
+	return sentience.detached.head.is_set() ? head_drawing_type::NONE : head_drawing_type::DIM;
+}
+
 template <bool for_gui = false, class E, class T>
 FORCE_INLINE void detail_specific_entity_drawer(
 	const cref_typed_entity_handle<E> typed_handle,
@@ -220,7 +234,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	}
 }
 
-template <class E, class T>
+template <bool is_neon = false, class E, class T>
 FORCE_INLINE void specific_entity_drawer(
 	const cref_typed_entity_handle<E> typed_handle,
 	const draw_renderable_input& in,
@@ -433,7 +447,9 @@ FORCE_INLINE void specific_entity_drawer(
 
 				const auto& sentience = typed_handle.template get<components::sentience>();
 
-				if (!sentience.is_dead()) {
+				const auto head_drawing = calc_head_drawing_type(sentience);
+
+				if (head_drawing != head_drawing_type::NONE) {
 					if constexpr(typed_handle.template has<components::head>()) {
 						const auto& head = typed_handle.template get<components::head>();
 						const auto& head_def = typed_handle.template get<invariants::head>();
@@ -464,7 +480,16 @@ FORCE_INLINE void specific_entity_drawer(
 						input.renderable_transform = target_transform;
 						input.renderable_transform.rotation += head.shake_rotation_amount;
 
-						render_visitor(sprite, in.manager, input);
+						const auto head_dim = head_drawing == head_drawing_type::DIM;
+						const bool should_draw_dim_but_this_is_neon = head_dim && is_neon;
+
+						if (head_dim) {
+							input.colorize.multiply_rgb(0.75f);
+						}
+
+						if (!should_draw_dim_but_this_is_neon) {
+							render_visitor(sprite, in.manager, input);
+						}
 					}
 				}
 			}
@@ -568,7 +593,7 @@ FORCE_INLINE void specific_draw_neon_map(
 		augs::draw(renderable, manager, input);
 	};
 
-	specific_entity_drawer(typed_handle, in, neon_maker);
+	specific_entity_drawer<true>(typed_handle, in, neon_maker);
 }
 
 /* Dispatching helpers */

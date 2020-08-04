@@ -28,6 +28,7 @@
 
 #include "game/cosmos/just_create_entity_functional.h"
 #include "game/detail/visible_entities.hpp"
+#include "game/detail/sentience/sentience_logic.h"
 
 #define LOG_BOMB_DEFUSAL 0
 
@@ -355,7 +356,7 @@ void bomb_defusal::init_spawned(
 
 		{
 			auto& sentience = typed_handle.template get<components::sentience>();
-			for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
+			resurrect(sentience);
 		}
 
 		if (transferred != std::nullopt) {

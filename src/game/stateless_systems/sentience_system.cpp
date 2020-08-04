@@ -264,7 +264,7 @@ static void handle_special_result(const logic_step step, const messages::health_
 	const auto& origin = h.origin;
 
 	auto knockout = [&]() {
-		perform_knockout(subject, step, impact_dir, origin);
+		perform_knockout(subject, step, impact_dir, origin, h.headshot);
 	};
 
 	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {

@@ -6,11 +6,17 @@
 #include "game/detail/inventory/drop_from_all_slots.h"
 #include "game/cosmos/just_create_entity_functional.h"
 
+void resurrect(components::sentience& sentience) {
+	for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
+	sentience.detached = {};
+}
+
 void perform_knockout(
 	const entity_id& subject_id, 
 	const logic_step step, 
 	const vec2 direction,
-	const damage_origin& origin
+	const damage_origin& origin,
+	const bool was_headshot
 ) {
 	auto& cosm = step.get_cosmos(); 
 
@@ -57,12 +63,14 @@ void perform_knockout(
 		sentience.when_knocked_out = cosm.get_timestamp();
 		sentience.knockout_origin = origin;
 
-		if (sentience.is_dead()) {
+		if (sentience.is_dead() && was_headshot) {
 			auto spawn_detached_body_part = [&](const auto& flavour) {
 				just_create_entity(
 					cosm,
 					flavour,
 					[&](const entity_handle& typed_entity) {
+						sentience.detached.head = typed_entity;
+
 						typed_entity.set_logic_transform(typed_subject.get_logic_transform());
 
 						const auto& rigid_body = typed_entity.template get<components::rigid_body>();

@@ -7,11 +7,14 @@
 
 struct damage_origin;
 
+void resurrect(components::sentience&);
+
 void perform_knockout(
 	const entity_id& subject_id, 
 	const logic_step step, 
 	const vec2 direction,
-	const damage_origin& origin
+	const damage_origin& origin,
+	const bool was_headshot
 );
 
 template <class E>

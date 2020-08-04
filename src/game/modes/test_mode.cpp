@@ -8,6 +8,8 @@
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/detail/snap_interpolation_to_logical.h"
 
+#include "game/detail/sentience/sentience_logic.h"
+
 using input_type = test_mode::input;
 
 mode_entity_id test_mode::lookup(const mode_player_id& id) const {
@@ -35,8 +37,7 @@ void test_mode::init_spawned(const input_type in, const entity_id id, const logi
 		in.rules.initial_eq.generate_for(typed_handle, step, 1);
 
 		auto& sentience = typed_handle.template get<components::sentience>();
-
-		for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
+		resurrect(sentience);
 
 		fill_range(sentience.learnt_spells, true);
 	});
