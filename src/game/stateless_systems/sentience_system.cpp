@@ -430,7 +430,13 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			auto considered_impulse = def.impact_impulse;
 
 			if (considered_impulse > 0.f) {
-				if (sentient_and_vulnerable(subject)) {
+				if (sentient_and_conscious(subject)) {
+					/*
+						Note: armored players will experience a greater kickback from an interference explosion,
+						but that is not a scripted behaviour. It is because without armor, the Consciousness Points are depleted almost instantaneously,
+						thus forcibly stopping the sprint, which is implemented via an increase in inertia.
+					*/
+
 					considered_impulse *= def.impulse_multiplier_against_sentience;
 				}
 
