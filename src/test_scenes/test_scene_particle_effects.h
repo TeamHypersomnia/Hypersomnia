@@ -65,6 +65,8 @@ enum class test_scene_particle_effect_id {
 
 	COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION,
 
+	CORPSE_CATCH_FIRE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix this..
+	- const auto next_explosion_in_ms = rng.randval(0.f, cascade_def.explosion_interval_ms.value);
+
+- Let's ditch the vector of special result types for now...
+	- just process everything right from the place where we subtract health directly
+		- just keep it in sentience logic
+
+- when the body explodes, spectator automatically switches from the killed person to another
+
 - The corpses could explode interferentially, albeit preferably with a different sound
 - Disable neons on attached heads of dead bodies
 

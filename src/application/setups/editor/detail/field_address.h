@@ -53,6 +53,7 @@ using flavour_field_type_id = type_in_list_id<
 		std::string,
 		wandering_pixels_frames,
 		remnant_flavour_vector,
+		corpse_remnant_flavour_vector,
 		container_slots_type
 	>
 >;

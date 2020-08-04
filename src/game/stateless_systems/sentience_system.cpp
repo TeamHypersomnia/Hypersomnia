@@ -152,6 +152,13 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			const auto& sentience_def = subject.template get<invariants::sentience>();
 			components::sentience& sentience = subject.template get<components::sentience>();
 
+			::handle_corpse_detonation(
+				step,
+				subject,
+				sentience,
+				sentience_def
+			);
+
 			auto& health = sentience.get<health_meter_instance>();
 			auto& consciousness = sentience.get<consciousness_meter_instance>();
 			auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
@@ -267,24 +274,36 @@ static void handle_special_result(const logic_step step, const messages::health_
 		perform_knockout(subject, step, impact_dir, origin, h.headshot);
 	};
 
-	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
-		sentience.get<electric_shield_perk_instance>() = electric_shield_perk_instance();
+	using result_type = messages::health_event::result_type;
 
-		personal_electricity.value = 0.f;
+	switch (h.special_result) {
+		case result_type::PERSONAL_ELECTRICITY_DESTRUCTION:
+			sentience.get<electric_shield_perk_instance>() = electric_shield_perk_instance();
 
-		if (const auto active_absorption = ::find_active_pe_absorption(subject)) {
-			step.queue_deletion_of(active_absorption->second, "Absorption provider destructed due to PE destruction");
-		}
-	}
-	else if (h.special_result == messages::health_event::result_type::DEATH) {
-		health.value = 0.f;
-		personal_electricity.value = 0.f;
-		consciousness.value = 0.f;
-		knockout();
-	}
-	else if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
-		consciousness.value = 0.f;
-		//knockout();
+			personal_electricity.value = 0.f;
+
+			if (const auto active_absorption = ::find_active_pe_absorption(subject)) {
+				step.queue_deletion_of(active_absorption->second, "Absorption provider destructed due to PE destruction");
+			}
+
+			break;
+
+		case result_type::DEATH:
+			health.value = std::min(health.value, 0.f);
+			personal_electricity.value = 0.f;
+			consciousness.value = 0.f;
+			knockout();
+
+			break;
+
+		case result_type::LOSS_OF_CONSCIOUSNESS:
+			consciousness.value = 0.f;
+			//knockout();
+
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -309,6 +328,10 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
 	const bool was_conscious = health.value > 0.f; //&& consciousness.value > 0.f;
+	const bool was_dead = health.value <= 0.f; //&& consciousness.value > 0.f;
+
+	h.was_conscious = was_conscious;
+	h.was_dead = was_dead;
 
 	auto allow_special_result = [&]() {
 		const auto disable_knockouts = step.get_settings().disable_knockouts;
@@ -348,7 +371,6 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 				if (!health.is_positive()) {
 					if (allow_special_result()) {
 						h.special_result = messages::health_event::result_type::DEATH;
-						h.was_conscious = was_conscious;
 					}
 					else {
 						/* Assume previous consciousness so that the running ability is unimpaired */
@@ -356,6 +378,13 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 					}
 				}
 			}
+
+			::handle_corpse_damage(
+				step,
+				subject,
+				sentience,
+				sentience_def
+			);
 
 			break;
 		}

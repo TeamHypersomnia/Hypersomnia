@@ -354,10 +354,7 @@ void bomb_defusal::init_spawned(
 			eq.generate_for(typed_handle, step, 1);
 		}
 
-		{
-			auto& sentience = typed_handle.template get<components::sentience>();
-			resurrect(sentience);
-		}
+		::resurrect(typed_handle);
 
 		if (transferred != std::nullopt) {
 			typed_handle.template get<components::movement>().flags = transferred->player.movement;

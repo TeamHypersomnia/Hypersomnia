@@ -7,7 +7,34 @@
 
 struct damage_origin;
 
-void resurrect(components::sentience&);
+template <class E>
+void resurrect(const E& typed_handle) {
+	auto& sentience = typed_handle.template get<components::sentience>();
+
+	for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
+	sentience.detached = {};
+	sentience.when_corpse_catched_fire = {};
+
+	if (sentience.has_exploded) {
+		sentience.has_exploded = false;
+
+		typed_handle.infer_colliders_from_scratch();
+	}
+}
+
+void handle_corpse_damage(
+	const logic_step step,
+	const entity_handle subject,
+	components::sentience& sentience,
+	const invariants::sentience& sentience_def
+);
+
+void handle_corpse_detonation(
+	const logic_step step,
+	const entity_handle subject,
+	components::sentience& sentience,
+	const invariants::sentience& sentience_def
+);
 
 void perform_knockout(
 	const entity_id& subject_id, 

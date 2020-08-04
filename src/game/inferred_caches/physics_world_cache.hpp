@@ -76,6 +76,12 @@ auto calc_filters(const E& handle) {
 		}
 	}
 
+	if (const auto sentience = handle.template find<components::sentience>()) {
+		if (sentience->has_exploded) {
+			return filter_type();
+		}
+	}
+
 	return colliders_data.filter;
 }
 
@@ -284,6 +290,12 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	fixdef.restitution = colliders_data.restitution;
 	fixdef.isSensor = colliders_data.sensor;
 	fixdef.filter = calc_filters(handle);
+
+	if (const auto sentience = handle.template find<components::sentience>()) {
+		if (sentience->has_exploded) {
+			fixdef.isSensor = true;
+		}
+	}
 
 	cached_connection = connection;
 

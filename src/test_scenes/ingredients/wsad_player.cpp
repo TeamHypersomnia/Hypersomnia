@@ -253,6 +253,7 @@ namespace test_flavours {
 			sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
 
 			sentience.health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
+			sentience.corpse_health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 			sentience.headshot_sound.id = to_sound_id(test_scene_sound_id::HEADSHOT);
 			sentience.death_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 
@@ -279,6 +280,84 @@ namespace test_flavours {
 			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(350);
 			sentience_inst.get<consciousness_meter_instance>().regeneration_unit = 10;
 			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 130;
+
+			{
+				auto& explosive = sentience.corpse_explosion;
+
+				auto& in = explosive.explosion;
+				auto& dmg = in.damage;
+
+				dmg.base = 10.f;
+				in.inner_ring_color = orange;
+				in.outer_ring_color = yellow;
+				in.effective_radius = 350.f;
+				dmg.impact_impulse = 2.f;
+				dmg.impulse_multiplier_against_sentience = 300.f;
+				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
+				//in.sound.modifier.pitch = 0.8f;
+				in.sound.modifier.max_distance = 6000.f;
+				in.sound.modifier.reference_distance = 2000.f;
+				in.type = adverse_element_type::INTERFERENCE;
+				in.wave_shake_radius_mult = 10;
+
+				dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+				dmg.shake.duration_ms = 2500.f;
+				dmg.shake.mult = 2.5f;
+
+				{
+					auto e = in;
+					e *= 0.6f;
+					e.damage.impact_impulse = 2.f * 0.6f;
+					e.wave_shake_radius_mult = 6;
+					e.sound.id = to_sound_id(test_scene_sound_id::FLASHBANG_EXPLOSION);
+					e.sound.modifier.pitch = 0.75f;
+					e.sound.modifier.max_distance = 6000.f;
+					e.sound.modifier.reference_distance = 2000.f;
+					e.ring_duration_seconds = 0.3f;
+
+					{
+						auto& meta = get_test_flavour(flavours, test_explosion_bodies::METROPOLIS_CORPSE_EXPLOSION_CASCADE);
+						auto& c = meta.get<invariants::cascade_explosion>();
+						e.inner_ring_color = white;
+						e.outer_ring_color = white;
+						c.explosion = e;
+						c.explosion_interval_ms = { 500.f, 1.f };
+						c.circle_collider_radius = 50.f;
+						c.max_explosion_angle_displacement = 10.f;
+
+						test_flavours::add_explosion_body(meta);
+					}
+
+					{
+						auto& meta = get_test_flavour(flavours, test_explosion_bodies::RESISTANCE_CORPSE_EXPLOSION_CASCADE);
+						auto& c = meta.get<invariants::cascade_explosion>();
+						e.inner_ring_color = white;
+						e.outer_ring_color = white;
+						c.explosion = e;
+						c.explosion_interval_ms = { 500.f, 1.f };
+						c.circle_collider_radius = 50.f;
+						c.max_explosion_angle_displacement = 10.f;
+
+						test_flavours::add_explosion_body(meta);
+					}
+				}
+
+				{
+					auto& c = explosive.cascade[0];
+					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::METROPOLIS_CORPSE_EXPLOSION_CASCADE);
+					c.num_spawned = 2;
+					c.num_explosions = { 1, 0 };
+					c.initial_speed = { 500.f, 0.3f };
+				}
+			}
+
+			sentience.damage_required_for_corpse_explosion = 70.f;
+			sentience.corpse_burning_seconds = 1.f;
+			sentience.corpse_catch_fire_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CORPSE_CATCH_FIRE);
+			sentience.corpse_catch_fire_particles.modifier.colorize = pink;
+			sentience.corpse_catch_fire_sound.id = to_sound_id(test_scene_sound_id::CORPSE_CATCH_FIRE);
+			sentience.corpse_catch_fire_sound.modifier.max_distance = 5500.f;
+			sentience.corpse_catch_fire_sound.modifier.reference_distance = 1000.f;
 
 			meta.set(sentience);
 			meta.set(sentience_inst);
@@ -342,6 +421,21 @@ namespace test_flavours {
 
 			meta.get<invariants::sentience>().detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_HEAD);
 			meta.get<invariants::sentience>().detached_head_particles.modifier.colorize = red;
+			meta.get<invariants::sentience>().corpse_catch_fire_particles.modifier.colorize = red;
+
+
+			{
+				auto& explosive = meta.get<invariants::sentience>().corpse_explosion;
+
+				auto& in = explosive.explosion;
+				in.inner_ring_color = orange;
+				in.outer_ring_color = yellow;
+
+				{
+					auto& c = explosive.cascade[0];
+					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::RESISTANCE_CORPSE_EXPLOSION_CASCADE);
+				}
+			}
 
 			meta.get<invariants::sprite>().image_id = to_image_id(test_scene_image_id::RESISTANCE_TORSO_BARE_WALK_SHOT_1);
 

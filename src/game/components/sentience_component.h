@@ -34,6 +34,7 @@
 #include "game/enums/use_button_query_result.h"
 #include "game/enums/weapon_action_type.h"
 #include "game/detail/inventory/hand_count.h"
+#include "game/components/explosive_component.h"
 
 struct damage_owner {
 	// GEN INTROSPECTOR struct damage_owner
@@ -75,6 +76,7 @@ namespace components {
 
 		augs::stepped_timestamp time_of_last_shake;
 		augs::stepped_timestamp when_knocked_out;
+		augs::stepped_timestamp when_corpse_catched_fire;
 		sentience_shake shake = sentience_shake::zero();
 
 		use_button_state use_button = use_button_state::IDLE;
@@ -87,7 +89,7 @@ namespace components {
 
 		std::array<bool, hand_count_v> hand_flags = {};
 		bool block_flag = false;
-		pad_bytes<1> pad;
+		bool has_exploded = false;
 
 		std::array<augs::stepped_timestamp, hand_count_v> when_hand_pressed = {};
 
@@ -146,6 +148,17 @@ namespace components {
 	};
 }
 
+using remnant_flavour_id = constrained_entity_flavour_id<invariants::remnant>;
+
+struct corpse_remnant_def {
+	// GEN INTROSPECTOR struct corpse_remnant_def
+	vec2 offset;
+	remnant_flavour_id flavour_id;
+	// END GEN INTROSPECTOR
+};
+
+using corpse_remnant_flavour_vector = augs::constant_size_vector<corpse_remnant_def, 5>;
+
 namespace invariants {
 	struct sentience {
 		// GEN INTROSPECTOR struct invariants::sentience
@@ -166,6 +179,8 @@ namespace invariants {
 		impulse_mults knockout_impulse = { 1000.f, 80.f };
 
 		sound_effect_input health_decrease_sound;
+		sound_effect_input corpse_health_decrease_sound;
+
 		sound_effect_input consciousness_decrease_sound;
 		sound_effect_input headshot_sound;
 
@@ -201,6 +216,16 @@ namespace invariants {
 		real32 soften_flash_until_look_mult = 0.4f;
 
 		real32 head_hitbox_radius = 8.0f;
+
+		particle_effect_input corpse_catch_fire_particles;
+		sound_effect_input corpse_catch_fire_sound;
+
+		real32 damage_required_for_corpse_explosion = 60.f;
+		real32 corpse_burning_seconds = 0.5f;
+
+		invariants::explosive corpse_explosion;
+
+		corpse_remnant_flavour_vector corpse_remnant_defs;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -225,7 +225,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 					play_headshot = true;
 				}
 
-				effect = sentience.health_decrease_sound;
+				effect = h.was_dead ? sentience.corpse_health_decrease_sound : sentience.health_decrease_sound;
 			}
 			else {
 				continue;

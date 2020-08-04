@@ -5,10 +5,95 @@
 #include "game/stateless_systems/driver_system.h"
 #include "game/detail/inventory/drop_from_all_slots.h"
 #include "game/cosmos/just_create_entity_functional.h"
+#include "game/detail/explosive/detonate.h"
 
-void resurrect(components::sentience& sentience) {
-	for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
-	sentience.detached = {};
+#include "augs/log.h"
+void handle_corpse_damage(
+	const logic_step step,
+	const entity_handle subject,
+	components::sentience& sentience,
+	const invariants::sentience& sentience_def
+) {
+	auto& health = sentience.get<health_meter_instance>();
+	auto& when_ignited = sentience.when_corpse_catched_fire;
+
+	const auto& cosm = subject.get_cosmos();
+	const auto now = cosm.get_timestamp();
+
+	auto ignite_corpse = [&]() {
+		when_ignited = now;
+
+		{
+			const auto& effect = sentience_def.corpse_catch_fire_particles;
+
+			effect.start(
+				step,
+				particle_effect_start_input::orbit_local(subject, { vec2::zero, 180 } ),
+				never_predictable_v
+			);
+		}
+
+		{
+			const auto& effect = sentience_def.corpse_catch_fire_sound;
+
+			effect.start(
+				step,
+				sound_effect_start_input::at_listener(subject),
+				never_predictable_v
+			);
+		}
+	};
+
+	const auto damage_past_breaking_point = -health.value - sentience_def.damage_required_for_corpse_explosion;
+	const bool is_ignited = when_ignited.was_set();
+
+	if (damage_past_breaking_point > 0) {
+		if (!is_ignited) {
+			ignite_corpse();
+		}
+	}
+}
+
+void handle_corpse_detonation(
+	const logic_step step,
+	const entity_handle subject,
+	components::sentience& sentience,
+	const invariants::sentience& sentience_def
+) {
+	if (sentience.has_exploded) {
+		return;
+	}
+
+	const auto& cosm = subject.get_cosmos();
+	const auto& clk = cosm.get_clock();
+
+	auto explode_corpse = [&]() {
+		::detonate({
+			step,
+			subject,
+			sentience_def.corpse_explosion,
+			subject.get_logic_transform()
+		}, false);
+
+		sentience.has_exploded = true;
+
+		/* This will cause the corpse to disappear */
+		subject.infer_colliders_from_scratch();
+	};
+
+	const auto& when_ignited = sentience.when_corpse_catched_fire;
+	const auto& health = sentience.get<health_meter_instance>();
+	const auto damage_past_breaking_point = -health.value - sentience_def.damage_required_for_corpse_explosion;
+	const bool is_ignited = when_ignited.was_set();
+
+	if (is_ignited) {
+		const auto secs_simulated_by_damaging = (damage_past_breaking_point * 2) / 1000.f;
+		const auto passed_secs = clk.get_passed_secs(when_ignited);
+
+		if (passed_secs + secs_simulated_by_damaging >= sentience_def.corpse_burning_seconds) {
+			explode_corpse();
+		}
+	}
 }
 
 void perform_knockout(

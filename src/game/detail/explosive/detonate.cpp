@@ -21,7 +21,7 @@ auto vectorize_array(const std::array<T, I>& arr, F&& predicate) {
 	return output;
 }
 
-void detonate(const detonate_input in) {
+void detonate(const detonate_input in, const bool destroy_subject) {
 	const auto& e = in.explosive;
 
 	if (!e.is_set()) {
@@ -34,7 +34,10 @@ void detonate(const detonate_input in) {
 	const auto subject = cosm[in.subject];
 
 	e.explosion.instantiate(step, in.location, damage_cause(subject));
-	step.queue_deletion_of(subject, "Detonation");
+
+	if (destroy_subject) {
+		step.queue_deletion_of(subject, "Detonation");
+	}
 
 	const auto cascade_inputs = vectorize_array(e.cascade, [](const auto& f) { return f.flavour_id.is_set(); });
 
@@ -62,9 +65,11 @@ void detonate(const detonate_input in) {
 				cosm,
 				c_in.flavour_id,
 				[&](const auto typed_handle, auto&&...) {
-					auto& cascade_sender = typed_handle.template get<components::sender>();
-					cascade_sender = subject.get<components::sender>();
-					cascade_sender.set_direct(subject);
+					if (const auto subject_sender = subject.find<components::sender>()) {
+						auto cascade_sender = typed_handle.template get<components::sender>();
+						cascade_sender = *subject_sender;
+						cascade_sender.set_direct(subject);
+					}
 
 					{
 						const auto target_transform = transformr(t.pos, vel_angle);

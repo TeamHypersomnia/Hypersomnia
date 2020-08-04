@@ -17,7 +17,7 @@ struct detonate_input {
 	const transformr location;
 };
 
-void detonate(detonate_input);
+void detonate(detonate_input, bool destroy_subject = true);
 
 template <class E>
 void detonate_if(const E& handle, const logic_step& step) {

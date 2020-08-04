@@ -622,6 +622,8 @@ void particles_simulation_system::advance_visible_streams(
 
 				vec2 final_particle_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
 				
+				const auto& emission = instance.source_emission;
+
 				if (
 					instance.randomize_spawn_point_within_circle_of_inner_radius > 0.f
 					|| instance.randomize_spawn_point_within_circle_of_outer_radius > 0.f
@@ -629,7 +631,7 @@ void particles_simulation_system::advance_visible_streams(
 					const auto size_mult = augs::interp(
 						instance.starting_spawn_circle_size_multiplier,
 						instance.ending_spawn_circle_size_multiplier,
-						stream_alivity_mult
+						emission.use_sqrt_to_ease_spawn_circle ? std::sqrt(std::sqrt(stream_alivity_mult)) : stream_alivity_mult
 					);
 					
 					final_particle_position += rng.random_point_in_ring(
@@ -637,8 +639,6 @@ void particles_simulation_system::advance_visible_streams(
 						size_mult * instance.randomize_spawn_point_within_circle_of_outer_radius
 					);
 				}
-
-				const auto& emission = instance.source_emission;
 
 				/* MSVC ICE workaround */
 				auto& _rng = rng;

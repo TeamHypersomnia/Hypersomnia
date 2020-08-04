@@ -51,7 +51,7 @@ struct melee_attack_definition {
 	bool returning_animation_on_finish = false;
 	pad_bytes<3> pad;
 
-	real32 headshot_multiplier = 2.0f;
+	real32 headshot_multiplier = 3.0f;
 	// END GEN INTROSPECTOR
 };
 
@@ -66,7 +66,7 @@ struct melee_throw_def {
 	real32 clash_angular_speed = 360 * 20.f;
 	real32 after_transfer_throw_cooldown_mult = 0.5f;
 
-	real32 headshot_multiplier = 2.0f;
+	real32 headshot_multiplier = 3.0f;
 	// END GEN INTROSPECTOR
 };
 

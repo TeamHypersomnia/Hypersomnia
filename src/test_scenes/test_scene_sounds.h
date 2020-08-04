@@ -234,6 +234,9 @@ enum class test_scene_sound_id {
 	COVERT_MUZZLE,
 	HEADSHOT,
 
+	CORPSE_CATCH_FIRE,
+	CORPSE_EXPLOSION,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

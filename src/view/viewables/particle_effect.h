@@ -47,6 +47,7 @@ struct particles_emission {
 
 	bound starting_spawn_circle_size_multiplier = bound(1.f, 1.f);
 	bound ending_spawn_circle_size_multiplier = bound(1.f, 1.f);
+	bool use_sqrt_to_ease_spawn_circle = false;
 
 	bound starting_homing_force = bound(0.f, 0.f);
 	bound ending_homing_force = bound(0.f, 0.f);
