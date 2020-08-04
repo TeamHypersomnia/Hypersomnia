@@ -234,7 +234,7 @@ namespace test_flavours {
 			sentience.shake_settings.duration_mult = 0.65f;
 			sentience.shake_settings.final_mult = 0.7f;
 
-			sentience.knockout_impulse.linear *= 1.3f;
+			sentience.knockout_impulse.linear *= 0.7f;
 
 			sentience.flash_effect_delay_ms = 150.f;
 			sentience.flash_audio_easing_secs = 3.0f;

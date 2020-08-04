@@ -324,13 +324,14 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 	switch (h.target) {
 		case messages::health_event::target_type::HEALTH: {
-			const auto amount = h.damage.effective;
+			const auto amount = h.damage.total();
+			const bool was_dead_already = health.value <= 0.f;
 
 			health.value -= amount;
 
-			ensure_geq(health.value, static_cast<decltype(health.value)>(0));
+			//ensure_geq(health.value, static_cast<decltype(health.value)>(0));
 
-			if (amount > 0) {
+			if (!was_dead_already && amount > 0) {
 				sentience.time_of_last_received_damage = cosm.get_timestamp();
 
 				auto& movement = subject.get<components::movement>();
