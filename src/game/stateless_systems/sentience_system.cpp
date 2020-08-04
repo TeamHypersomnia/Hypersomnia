@@ -426,11 +426,13 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		const auto subject = cosm[d.subject];
 		const auto& def = d.damage;
 
+		const bool should_still_apply_impact = sentient_and_conscious(subject);
+
 		auto apply_impact_impulse = [&]() {
 			auto considered_impulse = def.impact_impulse;
 
 			if (considered_impulse > 0.f) {
-				if (sentient_and_conscious(subject)) {
+				if (should_still_apply_impact) {
 					/*
 						Note: armored players will experience a greater kickback from an interference explosion,
 						but that is not a scripted behaviour. It is because without armor, the Consciousness Points are depleted almost instantaneously,
