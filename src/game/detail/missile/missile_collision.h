@@ -181,8 +181,8 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 					head_pos,
 					head_radius
 				)) {
-					damage_msg.damage *= missile.headshot_multiplier_of_sender;
 					damage_msg.headshot = true;
+					damage_msg.headshot_mult = missile.headshot_multiplier_of_sender;
 					damage_msg.head_transform = *head_transform;
 				}
 			}

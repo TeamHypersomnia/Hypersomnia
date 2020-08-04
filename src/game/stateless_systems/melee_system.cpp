@@ -638,8 +638,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 													);
 
 													if (detected_first || detected_second) {
-														damage_msg.damage *= current_attack_def.headshot_multiplier;
 														damage_msg.head_transform = *head_transform;
+														damage_msg.headshot_mult = current_attack_def.headshot_multiplier;
 														damage_msg.headshot = true;
 													}
 												}

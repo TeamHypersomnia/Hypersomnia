@@ -4,7 +4,7 @@
 #include "augs/misc/value_meter.h"
 #include "augs/ensure.h"
 
-meter_value_type value_meter::damage_result::get_total() const {
+meter_value_type value_meter::damage_result::total() const {
 	return effective + excessive;
 }
 

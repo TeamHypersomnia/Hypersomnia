@@ -6,6 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- The corpses could explode interferentially, albeit preferably with a different sound
+- Disable neons on attached heads of dead bodies
+
+- Show a violet "fire circle" when the corpse catches fire after reaching the breaking point
+
+- Let heads fall off only after headshots
+	- Otherwise show them dim
+
+- Draw borders for head icons
+	- Properly colored - black or red
+- Properly color the borders for shield icons too
+
 - Show a nice headshot indicator over the place where bullet impacts head
 	- Maybe make them from actual head sprites?
 		- With a bullet flying through (shown if enemy was killed by the headshot and also in hud in the left top)
@@ -47,7 +59,7 @@ summary: That which we are brainstorming at the moment.
 
 - Dash animation
 	- With all body parts skinned of course
-	- Only shows when not shooting
+	-Show Only shows when not shooting
 
 - Hide enemy health bars when they are under ferns or other object that's supposed to hide them
 

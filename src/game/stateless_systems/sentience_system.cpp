@@ -39,6 +39,7 @@
 #include "game/detail/sentience/tool_getters.h"
 #include "augs/templates/logically_empty.h"
 #include "game/detail/missile/headshot_detection.hpp"
+#include "game/detail/sentience/sentience_getters.h"
 
 #include "augs/math/collinearize_AB_with_C.h"
 
@@ -424,7 +425,6 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 	for (const auto& d : damages) {
 		const auto subject = cosm[d.subject];
 		const auto& def = d.damage;
-		const auto& amount = def.base;
 
 		auto apply_impact_impulse = [&]() {
 			auto considered_impulse = def.impact_impulse;
@@ -454,6 +454,13 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.source_adversity = d.type;
 		event_template.headshot = d.headshot;
 		event_template.head_transform = d.head_transform;
+
+		if (!sentient_and_alive(subject)) {
+			/* Disallow headshots on corpses */
+			event_template.headshot = false;
+		}
+
+		const auto& amount = def.base * (event_template.headshot ? d.headshot_mult : 1.0f);
 
 		auto process_and_post_health = [&](const auto& event) {
 			process_and_post_health_event(event, step);
@@ -536,7 +543,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					event.damage = health.calc_damage_result(after_shield_damage);
 					reported_hp_damage = event.damage.effective;
 
-					if (event.damage.effective != 0) {
+					if (event.damage.effective != 0 || event.damage.excessive != 0) {
 						process_and_post_health(event);
 					}
 				}
