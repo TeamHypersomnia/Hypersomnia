@@ -272,6 +272,12 @@ namespace test_flavours {
 			melee.throw_def.damage.effects.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
 			melee.throw_def.clash.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_CLASH);
 			melee.throw_def.throw_angular_speed = 360.f * 25.f;
+			melee.throw_def.head_radius_multiplier = 0.7f;
+
+			for (auto& a : melee.actions) {
+				a.head_radius_multiplier = 0.7f;
+			}
+
 			melee.adversarial.knockout_award = static_cast<money_type>(700); 
 
 			{

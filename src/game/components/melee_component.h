@@ -52,6 +52,7 @@ struct melee_attack_definition {
 	pad_bytes<3> pad;
 
 	real32 headshot_multiplier = 3.0f;
+	real32 head_radius_multiplier = 0.9f;
 	// END GEN INTROSPECTOR
 };
 
@@ -67,6 +68,7 @@ struct melee_throw_def {
 	real32 after_transfer_throw_cooldown_mult = 0.5f;
 
 	real32 headshot_multiplier = 3.0f;
+	real32 head_radius_multiplier = 1.0f;
 	// END GEN INTROSPECTOR
 };
 

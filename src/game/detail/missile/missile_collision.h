@@ -143,7 +143,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 		if (surface_sentient) {
 			const auto missile_pos = point;
 			const auto head_transform = ::calc_head_transform(surface_handle);
-			const auto head_radius = sentience->head_hitbox_radius;
+			const auto head_radius = sentience->head_hitbox_radius * missile.head_radius_multiplier_of_sender;
 
 			if (head_transform != std::nullopt) {
 				const auto head_pos = head_transform->pos;

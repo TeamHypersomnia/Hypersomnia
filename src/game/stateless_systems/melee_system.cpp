@@ -586,7 +586,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 												const auto missile_end = missile_begin + impact_dir * (to.pos - from.pos).length();
 
 												const auto head_transform = ::calc_head_transform(victim);
-												const auto head_radius = victim_sentience->head_hitbox_radius;
+												const auto head_radius = victim_sentience->head_hitbox_radius * current_attack_def.head_radius_multiplier;
 
 												if (head_transform != std::nullopt) {
 													const auto head_pos = head_transform->pos;
