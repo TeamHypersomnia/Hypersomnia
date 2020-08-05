@@ -65,11 +65,13 @@ void detonate(const detonate_input in, const bool destroy_subject) {
 				cosm,
 				c_in.flavour_id,
 				[&](const auto typed_handle, auto&&...) {
+					auto& cascade_sender = typed_handle.template get<components::sender>();
+
 					if (const auto subject_sender = subject.find<components::sender>()) {
-						auto cascade_sender = typed_handle.template get<components::sender>();
 						cascade_sender = *subject_sender;
-						cascade_sender.set_direct(subject);
 					}
+
+					cascade_sender.set_direct(subject);
 
 					{
 						const auto target_transform = transformr(t.pos, vel_angle);
