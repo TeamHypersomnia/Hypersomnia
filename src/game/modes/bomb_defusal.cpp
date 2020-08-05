@@ -1195,7 +1195,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 		if (const auto victim_info = find(ko.victim.id)) {
 			const auto victim_faction = victim_info->get_faction();
 
-			if (1 == num_players_in(victim_faction)) {
+			if (1 == num_conscious_players_in(in.cosm, victim_faction)) {
 				const auto p = calc_participating_factions(in);
 
 				bool any_enemy_has_nonzero = false;
@@ -1203,7 +1203,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 
 				p.for_each([&](const auto faction) {
 					if (faction != victim_faction) {
-						const auto n = num_players_in(faction);
+						const auto n = num_conscious_players_in(in.cosm, faction);
 
 						if (n > 0) {
 							any_enemy_has_nonzero = true;

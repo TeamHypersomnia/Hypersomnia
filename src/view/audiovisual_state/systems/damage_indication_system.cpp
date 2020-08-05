@@ -195,28 +195,6 @@ namespace augs {
 	}
 }
 
-
-template <class T>
-static void aabb_bordered(
-	T& output, 
-	const augs::atlas_entry entry,
-	const ltrb origin,
-	const rgba inside_color,
-	const rgba border_color
-) {
-	const vec2i offsets[4] = {
-		vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
-	};
-
-	for (const auto o : offsets) {
-		const auto offset_origin = ltrb(origin) += o;
-
-		output.aabb(entry, offset_origin, border_color);
-	}
-
-	output.aabb(entry, origin, inside_color);
-}
-
 void damage_indication_system::draw_indicators(
 	const std::function<bool(const_entity_handle)> is_reasonably_in_view,
 	const const_entity_handle& viewed_character,
@@ -384,7 +362,7 @@ void damage_indication_system::draw_indicators(
 					const auto shield_icon_pos = pixel_perfect_text_pos - vec2i(0, indicator_font.metrics.descender) + vec2i(2, 0);
 					const auto origin = ltrb(shield_icon_pos, entry.get_original_size());
 
-					::aabb_bordered(output, entry, origin, text_color, border);
+					output.aabb_bordered(entry, origin, text_color, border);
 				}
 			}
 

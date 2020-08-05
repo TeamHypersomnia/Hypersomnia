@@ -13,6 +13,26 @@ namespace augs {
 		return aabb(tex, { { 0, 0 }, { screen_size } }, color, flip);
 	}
 
+	FORCE_INLINE const drawer& drawer::aabb_bordered(
+		const atlas_entry entry,
+		const ltrb origin,
+		const rgba inside_color,
+		const rgba border_color
+	) const {
+		const vec2i offsets[4] = {
+			vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
+		};
+
+		for (const auto o : offsets) {
+			const auto offset_origin = ltrb(origin) += o;
+
+			aabb(entry, offset_origin, border_color);
+		}
+
+		aabb(entry, origin, inside_color);
+		return *this;
+	}
+
 	FORCE_INLINE const drawer& drawer::aabb(
 		const atlas_entry tex,
 		const ltrb origin,

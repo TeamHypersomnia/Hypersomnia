@@ -3,7 +3,7 @@
 
 inline bool damage_cause::is_humiliating(const cosmos& cosm) const {
 	if (flavour.is_set()) {
-		cosm.on_flavour(
+		return cosm.on_flavour(
 			flavour,
 			[&](const auto& typed_flavour) {
 				return typed_flavour.template has<invariants::melee>();

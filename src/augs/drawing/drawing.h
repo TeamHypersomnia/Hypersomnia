@@ -166,6 +166,13 @@ namespace augs {
 			const grid_render_settings&
 		) const;
 
+		self aabb_bordered(
+			const atlas_entry entry,
+			const ltrb origin,
+			const rgba inside_color,
+			const rgba border_color
+		) const;
+
 		template <class... Args>
 		self push(Args&&... args) const {
 			output_buffer.emplace_back(std::forward<Args>(args)...);

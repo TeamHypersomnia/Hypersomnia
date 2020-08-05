@@ -842,11 +842,15 @@ void arena_gui_state::draw_mode_gui(
 				if (was_headshot) {
 					auto col = rgba(get_col(ko.victim)).mult_brightness(1.25f);
 					col.a = 255;
+					col = rgba(255, 255, 200, 255);
 
-					general_drawer.base::aabb_lt(
+					const auto origin = ltrb(pen - vec2i(0, headshot_icon_size.y / 2), headshot_icon_size);
+
+					general_drawer.aabb_bordered(
 						headshot_entry,
-						pen - vec2i(0, headshot_icon_size.y / 2),
-						col
+						origin,
+						col,
+						black
 					);
 
 					pen.x += headshot_icon_size.x;

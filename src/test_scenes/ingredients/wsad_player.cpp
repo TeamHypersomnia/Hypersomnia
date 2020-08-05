@@ -257,7 +257,7 @@ namespace test_flavours {
 			sentience.headshot_sound.id = to_sound_id(test_scene_sound_id::HEADSHOT);
 			sentience.death_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 
-			sentience.head_hitbox_radius = 11.0f;
+			sentience.head_hitbox_radius = 11.5f;
 
 			sentience.loss_of_consciousness_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 			sentience.consciousness_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
@@ -301,7 +301,7 @@ namespace test_flavours {
 				in.wave_shake_radius_mult = 6;
 
 				dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-				dmg.shake.duration_ms = 2300.f;
+				dmg.shake.duration_ms = 2200.f;
 				dmg.shake.mult = 2.5f;
 
 				{
