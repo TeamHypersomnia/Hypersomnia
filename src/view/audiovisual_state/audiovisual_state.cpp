@@ -503,11 +503,6 @@ void audiovisual_state::standard_post_solve(
 				continue;
 			}
 
-			if (h.damage.effective == 0.0f) {
-				// Hide post-mortem damage indicators
-				continue;
-			}
-
 			using damage_event = damage_indication_system::damage_event;
 
 			const auto subject = cosm[h.subject];

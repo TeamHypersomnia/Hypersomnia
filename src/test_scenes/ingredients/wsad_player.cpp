@@ -287,21 +287,21 @@ namespace test_flavours {
 				auto& in = explosive.explosion;
 				auto& dmg = in.damage;
 
-				dmg.base = 10.f;
+				dmg.base = 30.f;
 				in.inner_ring_color = orange;
 				in.outer_ring_color = yellow;
 				in.effective_radius = 350.f;
 				dmg.impact_impulse = 2.f;
-				dmg.impulse_multiplier_against_sentience = 300.f;
+				dmg.impulse_multiplier_against_sentience = 1000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 				//in.sound.modifier.pitch = 0.8f;
 				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
 				in.type = adverse_element_type::INTERFERENCE;
-				in.wave_shake_radius_mult = 10;
+				in.wave_shake_radius_mult = 6;
 
 				dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-				dmg.shake.duration_ms = 2500.f;
+				dmg.shake.duration_ms = 2300.f;
 				dmg.shake.mult = 2.5f;
 
 				{

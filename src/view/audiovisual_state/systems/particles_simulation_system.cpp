@@ -631,7 +631,7 @@ void particles_simulation_system::advance_visible_streams(
 					const auto size_mult = augs::interp(
 						instance.starting_spawn_circle_size_multiplier,
 						instance.ending_spawn_circle_size_multiplier,
-						emission.use_sqrt_to_ease_spawn_circle ? std::sqrt(std::sqrt(stream_alivity_mult)) : stream_alivity_mult
+						emission.use_sqrt_to_ease_spawn_circle ? std::sqrt(stream_alivity_mult) : stream_alivity_mult
 					);
 					
 					final_particle_position += rng.random_point_in_ring(

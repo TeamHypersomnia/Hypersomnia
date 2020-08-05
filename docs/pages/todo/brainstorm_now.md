@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Show a flame icon when we apply damage to a burning corpse
+	- Big one on ignition, smaller ones when we help
+
 - fix this..
 	- const auto next_explosion_in_ms = rng.randval(0.f, cascade_def.explosion_interval_ms.value);
 

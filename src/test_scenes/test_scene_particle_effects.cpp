@@ -4546,9 +4546,9 @@ void load_test_scene_particle_effects(
 		{
 			particles_emission em;
 			em.spread_degrees = float_range(0, 1);
-			em.particles_per_sec = float_range(500, 500);
+			em.particles_per_sec = float_range(600, 600);
 			em.stream_lifetime_ms = float_range(1000, 1000);
-			em.base_speed = float_range(40, 160);
+			em.base_speed = float_range(70, 200);
 			em.rotation_speed = float_range(0, 0);
 			em.particle_lifetime_ms = float_range(400, 1200);
 			em.num_of_particles_to_spawn_initially.set(20, 50);
@@ -4616,11 +4616,11 @@ void load_test_scene_particle_effects(
 			em.swing_spread_change_rate.set(0.8, 0.9);
 
 			em.spread_degrees = float_range(1, 1);
-			em.particles_per_sec.set(400, 400);
+			em.particles_per_sec.set(500, 500);
 			em.num_of_particles_to_spawn_initially.set(180, 190);
 			em.stream_lifetime_ms = float_range(800, 800);
 
-			em.base_speed = float_range(10, 120);
+			em.base_speed = float_range(10, 150);
 
 			em.rotation_speed = float_range(8.5f*RAD_TO_DEG<float>, 8.8f*RAD_TO_DEG<float>);
 			em.particle_lifetime_ms = float_range(400, 500);
