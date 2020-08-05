@@ -188,6 +188,8 @@ namespace test_scenes {
 		rs.view.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
 		rs.view.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);
 		rs.view.logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_LOGO);
+		rs.view.headshot_icons[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
+		rs.view.headshot_icons[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
 
 		rs.view.square_logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
 		// TODO: add atlantis logo

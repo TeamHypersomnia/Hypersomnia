@@ -784,10 +784,18 @@ void arena_gui_state::draw_mode_gui(
 					return static_cast<vec2i>(s);
 				}();
 
+				const bool was_headshot = ko.origin.circumstances.headshot;
+				const auto headshot_icon = mode_input.rules.view.headshot_icons[ko.victim.faction];
+
+				const auto& headshot_entry = in.images_in_atlas.at(headshot_icon).diffuse;
+				const auto headshot_icon_size = was_headshot ? headshot_entry.get_original_size() : vec2u::zero;
+
+				const auto times_padded = was_headshot ? 3 : 2;
+
 				const auto total_bbox = xywhi(
 					pen.x,
 					pen.y,
-					cfg.inside_knockout_box_pad * 2 + cfg.weapon_icon_horizontal_pad * 2 + tool_size.x + lhs_bbox.x + rhs_bbox.x, 
+					cfg.inside_knockout_box_pad * 2 + cfg.weapon_icon_horizontal_pad * times_padded + headshot_icon_size.x + tool_size.x + lhs_bbox.x + rhs_bbox.x, 
 					cfg.inside_knockout_box_pad * 2 + std::max(tool_size.y, std::max(lhs_bbox.y, rhs_bbox.y))
 				);
 
@@ -830,6 +838,20 @@ void arena_gui_state::draw_mode_gui(
 
 				pen.x += tool_size.x;
 				pen.x += cfg.weapon_icon_horizontal_pad;
+
+				if (was_headshot) {
+					auto col = rgba(get_col(ko.victim)).mult_brightness(1.25f);
+					col.a = 255;
+
+					general_drawer.base::aabb_lt(
+						headshot_entry,
+						pen - vec2i(0, headshot_icon_size.y / 2),
+						col
+					);
+
+					pen.x += headshot_icon_size.x;
+					pen.x += cfg.weapon_icon_horizontal_pad;
+				}
 
 				print_stroked(
 					general_drawer,
