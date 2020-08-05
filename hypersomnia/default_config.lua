@@ -176,6 +176,7 @@ return {
   sound = {
     processing_frequency = "EVERY_SIMULATION_STEP",
 	sync_sounds_longer_than_secs = 5,
+treat_as_music_sounds_longer_than_secs = 5,
     max_speed_for_doppler_calculation = 5000,
 	missile_impact_sound_cooldown_duration = 60,
 	missile_impact_occurences_before_cooldown = 1,
