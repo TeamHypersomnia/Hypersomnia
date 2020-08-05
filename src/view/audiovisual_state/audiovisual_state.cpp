@@ -505,6 +505,7 @@ void audiovisual_state::standard_post_solve(
 
 			using damage_event = damage_indication_system::damage_event;
 
+			const bool was_headshot = h.origin.circumstances.headshot;
 			const auto subject = cosm[h.subject];
 			auto de = damage_event::input();
 
@@ -534,7 +535,7 @@ void audiovisual_state::standard_post_solve(
 				continue;
 			}
 
-			if (h.headshot) {
+			if (was_headshot) {
 				de.critical = true;
 				de.head_transform = h.head_transform;
 			}

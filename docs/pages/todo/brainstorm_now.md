@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We have improve the nomenclature for playing event sounds in bomb defusal code
+	- Maybe when we refactor the mode code
+
 - HUD messages for streaks and 1v1 events
 
 - Show a flame icon when we apply damage to a burning corpse
@@ -14,42 +17,7 @@ summary: That which we are brainstorming at the moment.
 - fix this..
 	- const auto next_explosion_in_ms = rng.randval(0.f, cascade_def.explosion_interval_ms.value);
 
-- Let's ditch the vector of special result types for now...
-	- just process everything right from the place where we subtract health directly
-		- just keep it in sentience logic
-
 - when the body explodes, spectator automatically switches from the killed person to another
-
-- The corpses could explode interferentially, albeit preferably with a different sound
-- Disable neons on attached heads of dead bodies
-
-- Show a violet "fire circle" when the corpse catches fire after reaching the breaking point
-
-- Let heads fall off only after headshots
-	- Otherwise show them dim
-
-- Draw borders for head icons
-	- Properly colored - black or red
-- Properly color the borders for shield icons too
-
-- Show a nice headshot indicator over the place where bullet impacts head
-	- Maybe make them from actual head sprites?
-		- With a bullet flying through (shown if enemy was killed by the headshot and also in hud in the left top)
-		- or with a bullet about to fly through (if the enemy's not dead)
-			- or with a partial shear
-	- Make it fly upwards right away
-		- Consider making it fly in the impact direction
-		- Rotated along with initial head position - at the very least
-			- pass that info in damage/health message since it will already be calculated
-	- Position it in the original head's position instead of point of impact
-
-- To be able to nicely hear both the headshot and the corpse's explosion...
-	- Introduce a 500ms delay between 'reaching a breaking point' and actual corpse explosion
-
-- Show blue without shield icon if we're just destroying PED
-
-- Corpses explode with a white flasbang-like explosion
-	- Though they don't blind or apply damage, maybe at most a kickback like interference nade
 
 - Headshots
 	- Would be shown in yellow like critical damage in crosscode
@@ -58,9 +26,6 @@ summary: That which we are brainstorming at the moment.
 	- Actually some op smgs should have 2x at most
 		- like cyberspray or pro90
 
-- We can implement "corpse" health as negative health with a threshold
-	- To not alter much the "is conscious" logic
-	- Notice though we'll have to destroy the sentience entity itself. It could somehow prove dangerous n the game mode code.
 
 - Multiple "camera schemes" in settings
 	- Fluid (current, hotline miami-like)

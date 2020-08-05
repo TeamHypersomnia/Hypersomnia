@@ -93,6 +93,16 @@ enum class scoreboard_icon_type {
 	// END GEN INTROSPECTOR
 };
 
+struct knockout_streak_def {
+	// GEN INTROSPECTOR struct knockout_streak_def
+	int required_knockouts = 2;
+
+	assets::sound_id announcement_sound;
+	// END GEN INTROSPECTOR
+};
+
+using knockout_streak_def_vector = std::vector<knockout_streak_def>;
+
 struct arena_mode_view_rules {
 	using theme_flavour_type = constrained_entity_flavour_id<
 		invariants::continuous_sound
@@ -108,6 +118,8 @@ struct arena_mode_view_rules {
 
 	per_actual_faction<per_actual_faction<assets::sound_id>> win_sounds;
 	per_actual_faction<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
+
+	knockout_streak_def_vector streak_defs;
 
 	per_actual_faction<assets::image_id> logos;
 	per_actual_faction<assets::image_id> square_logos;
@@ -126,6 +138,16 @@ struct arena_mode_view_rules {
 	bool enable_teammate_indicators = true;
 	bool enable_tactical_indicators = true;
 	// END GEN INTROSPECTOR
+
+	const knockout_streak_def* find_streak(const int current_streak_count) const {
+		for (const auto& def : streak_defs) {
+			if (def.required_knockouts == current_streak_count) {
+				return std::addressof(def);
+			}
+		}
+
+		return nullptr;
+	}
 };
 
 struct arena_mode_match_result {

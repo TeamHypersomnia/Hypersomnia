@@ -29,7 +29,6 @@ namespace messages {
 		value_meter::damage_result damage;
 
 		transformr head_transform;
-		bool headshot = false;
 		bool was_dead = false;
 		bool was_conscious = true;
 		bool is_remainder_after_shield_destruction = false;

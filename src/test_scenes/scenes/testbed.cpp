@@ -44,7 +44,7 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::METROPOLIS;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
 		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
@@ -128,12 +128,40 @@ namespace test_scenes {
 			mt[battle_event::BOMB_DEFUSED] = to_sound_id(test_scene_sound_id::MT_BOMB_DEFUSED);
 			mt[battle_event::IM_DEFUSING_THE_BOMB] = to_sound_id(test_scene_sound_id::RE_SECURING_OBJECTIVE);
 			mt[battle_event::ITS_TOO_LATE_RUN] = to_sound_id(test_scene_sound_id::MT_ITS_TOO_LATE_RUN);
+
+			mt[battle_event::ONE_VERSUS_ONE] = to_sound_id(test_scene_sound_id::ANNOUNCE_MAYTHEFORCE);
+			mt[battle_event::ONE_VERSUS_MANY] = to_sound_id(test_scene_sound_id::ANNOUNCE_ONEANDONLY);
+			mt[battle_event::HEADSHOT] = to_sound_id(test_scene_sound_id::ANNOUNCE_HEADSHOT);
+			mt[battle_event::HUMILIATION] = to_sound_id(test_scene_sound_id::ANNOUNCE_HUMILIATION);
+
+			mt[battle_event::PREPARE_TO_FIGHT] = to_sound_id(test_scene_sound_id::ANNOUNCE_PREPARE);
+			mt[battle_event::FIRST_BLOOD] = to_sound_id(test_scene_sound_id::ANNOUNCE_FIRSTBLOOD);
 		}
 
 		{
 			auto& re = rs.view.event_sounds[faction_type::RESISTANCE];
 			re = rs.view.event_sounds[faction_type::METROPOLIS];
 			re[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::RE_BOMB_PLANTED);
+		}
+
+		{
+			auto& streaks = rs.view.streak_defs;
+
+			auto add_streak = [&](const int num, const auto sound) {
+				streaks.push_back({ num, to_sound_id(sound) });
+			};
+
+			add_streak(3,  test_scene_sound_id::ANNOUNCE_MULTIKILL);
+			add_streak(4,  test_scene_sound_id::ANNOUNCE_MEGAKILL);
+			add_streak(5,  test_scene_sound_id::ANNOUNCE_ULTRAKILL);
+			add_streak(6,  test_scene_sound_id::ANNOUNCE_MONSTERKILL);
+			add_streak(7,  test_scene_sound_id::ANNOUNCE_KILLINGSPREE);
+			add_streak(8,  test_scene_sound_id::ANNOUNCE_WICKEDSICK);
+			add_streak(9,  test_scene_sound_id::ANNOUNCE_RAMPAGE);
+			add_streak(10, test_scene_sound_id::ANNOUNCE_LUDACRISSKILL);
+			add_streak(11, test_scene_sound_id::ANNOUNCE_UNSTOPPABLE);
+			add_streak(12, test_scene_sound_id::ANNOUNCE_GODLIKE);
+			add_streak(13, test_scene_sound_id::ANNOUNCE_HOLYSHIT);
 		}
 
 		for (auto& t : rs.view.win_themes.items) {

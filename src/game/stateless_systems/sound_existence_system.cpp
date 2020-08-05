@@ -206,6 +206,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		const auto& sentience = subject.get<invariants::sentience>();
 
 		bool play_headshot = false;
+		const bool was_headshot = h.origin.circumstances.headshot;
 
 		sound_effect_input effect;
 
@@ -216,12 +217,12 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				effect = sentience.death_sound;
 				predictability = never_predictable_v;
 
-				if (h.headshot) {
+				if (was_headshot) {
 					play_headshot = true;
 				}
 			}
 			else if (h.damage.total() > 0) {
-				if (h.headshot) {
+				if (was_headshot) {
 					play_headshot = true;
 				}
 
@@ -243,7 +244,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 					predictability = never_predictable_v;
 				}
 
-				if (h.headshot) {
+				if (was_headshot) {
 					play_headshot = true;
 				}
 			}

@@ -854,6 +854,38 @@ entity_id bomb_defusal::create_character_for_player(
 	return entity_id::dead();
 }
 
+void bomb_defusal::play_start_round_sound(const input_type in, const const_logic_step step) { 
+
+	const auto start_event = 
+		is_first_round_in_half(in) ?
+		battle_event::PREPARE_TO_FIGHT :
+		battle_event::START
+	;
+
+	if (start_event == battle_event::PREPARE_TO_FIGHT) {
+		// Custom logic: Distribute "PREPARE" sounds evenly
+
+		const auto p = calc_participating_factions(in);
+
+		p.for_each([&](const faction_type t) {
+			if (const auto sound_id = in.rules.view.event_sounds[t][start_event]; sound_id.is_set()) {
+				sound_effect_input effect;
+				effect.id = sound_id;
+				effect.modifier.always_direct_listener = true;
+
+				sound_effect_start_input input;
+				input.variation_number = prepare_to_fight_counter++;
+				input.listener_faction = t;
+
+				effect.start(step, input, always_predictable_v);
+			}
+		});
+	}
+	else {
+		play_sound_for(in, step, start_event, always_predictable_v);
+	}
+}
+
 void bomb_defusal::setup_round(
 	const input_type in, 
 	const logic_step step, 
@@ -939,7 +971,7 @@ void bomb_defusal::setup_round(
 		}
 	}
 	else {
-		play_sound_for(in, step, battle_event::START, always_predictable_v);
+		play_start_round_sound(in, step);
 	}
 
 	if (state != arena_mode_state::WARMUP) {
@@ -1042,7 +1074,7 @@ mode_player_id bomb_defusal::lookup(const entity_id& controlled_character_id) co
 	return mode_player_id::dead();
 }
 
-void bomb_defusal::count_knockout(const input_type in, const entity_id victim, const components::sentience& sentience) {
+void bomb_defusal::count_knockout(const const_logic_step step, const input_type in, const entity_id victim, const components::sentience& sentience) {
 	const auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 	const auto& origin = sentience.knockout_origin;
@@ -1095,7 +1127,7 @@ void bomb_defusal::count_knockout(const input_type in, const entity_id victim, c
 	make_participant(ko.knockouter, knockouter);
 	make_participant(ko.victim, victim_handle);
 
-	count_knockout(in, ko);
+	count_knockout(step, in, ko);
 }
 
 bomb_defusal_player_stats* bomb_defusal::stats_of(const mode_player_id& id) {
@@ -1106,8 +1138,93 @@ bomb_defusal_player_stats* bomb_defusal::stats_of(const mode_player_id& id) {
 	return nullptr;
 }
 
-void bomb_defusal::count_knockout(const input_type in, const arena_mode_knockout ko) {
+void bomb_defusal::count_knockout(const const_logic_step step, const input_type in, const arena_mode_knockout ko) {
 	current_round.knockouts.push_back(ko);
+
+	auto on_counted_knockout = [&](const auto stats, const auto knockouts_dt) {
+		const auto controlled_character_id = lookup(ko.knockouter.id);
+
+		if (state == arena_mode_state::WARMUP) {
+			return;
+		}
+
+		if (knockouts_dt > 0) {
+			if (const auto controlled = in.cosm[controlled_character_id]) {
+				/* Count streaks only if we are conscious, not ones post-mortem */
+
+				if (sentient_and_conscious(controlled)) {
+					stats->knockout_streak += knockouts_dt;
+				}
+
+				/*
+					Priority:
+					- First Blood
+					- Streak
+					- Headshot
+					- Humiliation
+				*/
+
+				if (was_first_blood) {
+					if (const auto current_streak = in.rules.view.find_streak(stats->knockout_streak)) {
+						play_sound_globally(step, current_streak->announcement_sound, never_predictable_v);
+					}
+					else if (ko.origin.circumstances.headshot) {
+						play_sound_for(in, step, battle_event::HEADSHOT, never_predictable_v);
+					}
+					else if (ko.origin.cause.is_humiliating(in.cosm)) {
+						play_sound_for(in, step, battle_event::HUMILIATION, never_predictable_v);
+					}
+				}
+			}
+		}
+	};
+
+	auto on_counted_death = [&](const auto stats) {
+		stats->knockout_streak = 0;
+
+		if (state == arena_mode_state::WARMUP) {
+			return;
+		}
+
+		if (!was_first_blood) {
+			play_sound_for(in, step, battle_event::FIRST_BLOOD, never_predictable_v);
+
+			was_first_blood = true;
+		}
+
+		if (const auto victim_info = find(ko.victim.id)) {
+			const auto victim_faction = victim_info->get_faction();
+
+			if (1 == num_players_in(victim_faction)) {
+				const auto p = calc_participating_factions(in);
+
+				bool any_enemy_has_nonzero = false;
+				bool any_enemy_has_more_than_one = false;
+
+				p.for_each([&](const auto faction) {
+					if (faction != victim_faction) {
+						const auto n = num_players_in(faction);
+
+						if (n > 0) {
+							any_enemy_has_nonzero = true;
+						}
+
+						if (n > 1) {
+							any_enemy_has_more_than_one = true;
+						}
+					}
+				});
+
+				if (any_enemy_has_more_than_one) {
+					play_faction_sound_for(in, step, battle_event::ONE_VERSUS_MANY, victim_faction, never_predictable_v);
+				}
+				else if (any_enemy_has_nonzero) {
+					/* All enemies have at most one. It's a duel/truel situation. */
+					play_sound_for(in, step, battle_event::ONE_VERSUS_ONE, never_predictable_v);
+				}
+			}
+		}
+	};
 
 	{
 		int knockouts_dt = 1;
@@ -1142,10 +1259,12 @@ void bomb_defusal::count_knockout(const input_type in, const arena_mode_knockout
 
 		if (const auto s = stats_of(ko.knockouter.id)) {
 			s->knockouts += knockouts_dt;
+			on_counted_knockout(s, knockouts_dt);
 		}
 
 		if (const auto s = stats_of(ko.victim.id)) {
 			s->deaths += 1;
+			on_counted_death(s);
 		}
 	}
 
@@ -1160,16 +1279,6 @@ void bomb_defusal::count_knockout(const input_type in, const arena_mode_knockout
 			s->assists += assists_dt;
 		}
 	}
-}
-
-void bomb_defusal::count_knockouts_for_unconscious_players_in(const input_type in, const faction_type faction) {
-	for_each_player_handle_in(in.cosm, faction, [&](const auto& typed_player) {
-		const auto& sentience = typed_player.template get<components::sentience>();
-
-		if (sentience.unconscious_but_alive()) {
-			count_knockout(in, typed_player, sentience);
-		}
-	});
 }
 
 bool bomb_defusal::is_halfway_round(const const_input_type in) const {
@@ -1240,13 +1349,25 @@ void bomb_defusal::make_win(const input_type in, const faction_type winner) {
 	}
 }
 
+void bomb_defusal::play_sound_globally(const const_logic_step step, const assets::sound_id sound_id, const predictability_info info) const {
+	sound_effect_input effect;
+	effect.id = sound_id;
+	effect.modifier.always_direct_listener = true;
+
+	sound_effect_start_input input;
+	input.variation_number = get_step_rng_seed(step.get_cosmos());
+
+	effect.start(step, input, info);
+}
+
 void bomb_defusal::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id, const predictability_info info) const {
 	sound_effect_input effect;
 	effect.id = id;
+	effect.modifier.always_direct_listener = true;
 
 	sound_effect_start_input input;
-	input.listener_faction = f;
 	input.variation_number = get_step_rng_seed(step.get_cosmos());
+	input.listener_faction = f;
 
 	effect.start(step, input, info);
 }
@@ -1952,6 +2073,10 @@ void bomb_defusal::end_warmup_and_go_live(const input_type in, const logic_step 
 	setup_round(in, step);
 }
 
+bool bomb_defusal::is_first_round_in_half(const const_input_type in) const { 
+	return is_halfway_round(in) || get_current_round_number() == 0;
+}
+
 void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	if (state == arena_mode_state::INIT) {
 		restart(in, step);
@@ -1986,7 +2111,7 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 	else if (state == arena_mode_state::LIVE) {
 		if (get_freeze_seconds_left(in) <= 0.f) {
 			if (current_round.cache_players_frozen) {
-				play_sound_for(in, step, battle_event::START, always_predictable_v);
+				play_start_round_sound(in, step);
 			}
 
 			set_players_frozen(in, false);
@@ -2012,6 +2137,8 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 			}
 			else {
 				swap_assigned_factions(p);
+
+				was_first_blood = false;
 
 				std::swap(factions[p.bombing].score, factions[p.defusing].score);
 
@@ -2062,7 +2189,7 @@ void bomb_defusal::mode_post_solve(const input_type in, const mode_entropy& entr
 		for (const auto& e : events) {
 			if (const auto victim = cosm[e.subject]) {
 				auto make_it_count = [&]() {
-					count_knockout(in, victim, victim.get<components::sentience>());
+					count_knockout(step, in, victim, victim.get<components::sentience>());
 				};
 
 				/*

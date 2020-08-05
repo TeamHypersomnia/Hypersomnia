@@ -100,8 +100,7 @@ void perform_knockout(
 	const entity_id& subject_id, 
 	const logic_step step, 
 	const vec2 direction,
-	const damage_origin& origin,
-	const bool was_headshot
+	const damage_origin& origin
 ) {
 	auto& cosm = step.get_cosmos(); 
 
@@ -148,7 +147,7 @@ void perform_knockout(
 		sentience.when_knocked_out = cosm.get_timestamp();
 		sentience.knockout_origin = origin;
 
-		if (sentience.is_dead() && was_headshot) {
+		if (sentience.is_dead() && origin.circumstances.headshot) {
 			auto spawn_detached_body_part = [&](const auto& flavour) {
 				just_create_entity(
 					cosm,

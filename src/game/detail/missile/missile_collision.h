@@ -135,6 +135,11 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	}
 
 	if (send_damage && contact_start) {
+		damage_msg.origin = damage_origin(typed_missile);
+		damage_msg.subject = surface_handle;
+		damage_msg.impact_velocity = impact_velocity;
+		damage_msg.point_of_impact = point;
+
 		if (surface_sentient) {
 			const auto missile_pos = point;
 			const auto head_transform = ::calc_head_transform(surface_handle);
@@ -181,17 +186,13 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 					head_pos,
 					head_radius
 				)) {
-					damage_msg.headshot = true;
+					damage_msg.origin.circumstances.headshot = true;
 					damage_msg.headshot_mult = missile.headshot_multiplier_of_sender;
 					damage_msg.head_transform = *head_transform;
 				}
 			}
 		}
 
-		damage_msg.origin = damage_origin(typed_missile);
-		damage_msg.subject = surface_handle;
-		damage_msg.impact_velocity = impact_velocity;
-		damage_msg.point_of_impact = point;
 		step.post_message(damage_msg);
 	}
 

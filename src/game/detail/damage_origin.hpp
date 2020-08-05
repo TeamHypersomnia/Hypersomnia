@@ -1,6 +1,19 @@
 #pragma once
 #include "game/detail/damage_origin.h"
 
+inline bool damage_cause::is_humiliating(const cosmos& cosm) const {
+	if (flavour.is_set()) {
+		cosm.on_flavour(
+			flavour,
+			[&](const auto& typed_flavour) {
+				return typed_flavour.template has<invariants::melee>();
+			}
+		);
+	}
+
+	return false;
+}
+
 template <class E>
 void damage_origin::copy_sender_from(const E& causing_handle) {
 	if (const auto s = causing_handle.template find<components::sender>()) {

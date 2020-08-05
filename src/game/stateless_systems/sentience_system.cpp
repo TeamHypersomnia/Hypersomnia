@@ -271,7 +271,7 @@ static void handle_special_result(const logic_step step, const messages::health_
 	const auto& origin = h.origin;
 
 	auto knockout = [&]() {
-		perform_knockout(subject, step, impact_dir, origin, h.headshot);
+		perform_knockout(subject, step, impact_dir, origin);
 	};
 
 	using result_type = messages::health_event::result_type;
@@ -486,15 +486,16 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.special_result = messages::health_event::result_type::NONE;
 		event_template.origin = d.origin;
 		event_template.source_adversity = d.type;
-		event_template.headshot = d.headshot;
 		event_template.head_transform = d.head_transform;
+
+		auto& is_headshot = event_template.origin.circumstances.headshot;
 
 		if (!sentient_and_alive(subject)) {
 			/* Disallow headshots on corpses */
-			event_template.headshot = false;
+			is_headshot = false;
 		}
 
-		const auto& amount = def.base * (event_template.headshot ? d.headshot_mult : 1.0f);
+		const auto& amount = def.base * (is_headshot ? d.headshot_mult : 1.0f);
 
 		auto process_and_post_health = [&](const auto& event) {
 			process_and_post_health_event(event, step);

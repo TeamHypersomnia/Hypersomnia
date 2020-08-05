@@ -12,7 +12,6 @@ namespace messages {
 	struct damage_message : public message {
 		bool inflictor_destructed = false;
 		bool create_destruction_effects = true;
-		bool headshot = false;
 		transformr head_transform;
 		real32 headshot_mult = 1.0f;
 

@@ -40,8 +40,7 @@ void perform_knockout(
 	const entity_id& subject_id, 
 	const logic_step step, 
 	const vec2 direction,
-	const damage_origin& origin,
-	const bool was_headshot
+	const damage_origin& origin
 );
 
 template <class E>

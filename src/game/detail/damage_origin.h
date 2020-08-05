@@ -16,6 +16,15 @@ struct damage_cause {
 
 	spell_id spell;
 	// END GEN INTROSPECTOR
+
+	bool is_humiliating(const cosmos& cosm) const;
+};
+
+struct damage_circumstances {
+	// GEN INTROSPECTOR struct damage_circumstances
+	bool headshot = false;
+	pad_bytes<3> pad;
+	// END GEN INTROSPECTOR
 };
 
 struct damage_origin {
@@ -25,6 +34,7 @@ struct damage_origin {
 	// GEN INTROSPECTOR struct damage_origin
 	damage_cause cause;
 	cause_sender sender;
+	damage_circumstances circumstances;
 	// END GEN INTROSPECTOR
 
 	template <class E>

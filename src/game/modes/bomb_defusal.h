@@ -146,6 +146,8 @@ struct bomb_defusal_player_stats {
 	// GEN INTROSPECTOR struct bomb_defusal_player_stats
 	money_type money = 0;
 
+	int knockout_streak = 0;
+
 	int knockouts = 0;
 	int assists = 0;
 	int deaths = 0;
@@ -349,12 +351,16 @@ private:
 	entity_id get_character_who_defused_bomb(const_input) const;
 	bool bomb_planted(const_input) const;
 
+	void play_start_round_sound(input, const_logic_step);
+
 	void play_faction_sound(const_logic_step, faction_type, assets::sound_id, predictability_info) const;
 	void play_faction_sound_for(input, const_logic_step, battle_event, faction_type, predictability_info) const;
 
 	void play_sound_for(input, const_logic_step, battle_event, predictability_info) const;
 	void play_win_sound(input, const_logic_step, faction_type) const;
 	void play_win_theme(input, const_logic_step, faction_type) const;
+
+	void play_sound_globally(const_logic_step, assets::sound_id, predictability_info) const;
 
 	void play_bomb_defused_sound(input, const_logic_step, faction_type) const;
 
@@ -363,10 +369,8 @@ private:
 	std::size_t get_round_rng_seed(const cosmos&) const;
 	std::size_t get_step_rng_seed(const cosmos&) const;
 
-	void count_knockouts_for_unconscious_players_in(input, faction_type);
-
-	void count_knockout(input, entity_id victim, const components::sentience&);
-	void count_knockout(input, arena_mode_knockout);
+	void count_knockout(const_logic_step, input, entity_id victim, const components::sentience&);
+	void count_knockout(const_logic_step, input, arena_mode_knockout);
 
 	entity_handle spawn_bomb(input);
 	bool give_bomb_to_random_player(input, logic_step);
@@ -418,6 +422,7 @@ private:
 	std::map<mode_player_id, bomb_defusal_player> players;
 	bomb_defusal_round_state current_round;
 
+	bool was_first_blood = false;
 	bool should_commence_when_ready = false;
 	real32 commencing_timer_ms = -1.f;
 	unsigned current_num_bots = 0;
@@ -425,6 +430,7 @@ private:
 	augs::speed_vars round_speeds;
 	session_id_type next_session_id = session_id_type::first();
 	unsigned scramble_counter = 0;
+	unsigned prepare_to_fight_counter = 0;
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
@@ -444,6 +450,7 @@ public:
 	mode_player_id lookup(const mode_entity_id&) const;
 
 	unsigned get_current_round_number() const;
+	bool is_first_round_in_half(const const_input in) const;
 
 	float get_seconds_passed_in_cosmos(const_input) const;
 

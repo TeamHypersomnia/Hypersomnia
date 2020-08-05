@@ -93,7 +93,8 @@ using mode_field_type_id  = type_in_list_id<
 		arena_mode_awards_vector,
 		std::vector<mode_player_id>,
 		other_equipment_vector,
-		item_purchases_vector
+		item_purchases_vector,
+		knockout_streak_def_vector
 	>
 >;
 
