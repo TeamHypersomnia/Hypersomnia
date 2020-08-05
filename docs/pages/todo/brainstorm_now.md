@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- HUD messages for streaks and 1v1 events
+
 - Show a flame icon when we apply damage to a burning corpse
 	- Big one on ignition, smaller ones when we help
 

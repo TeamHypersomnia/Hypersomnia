@@ -159,6 +159,64 @@ void damage_indication_system::advance(
 
 #include "augs/log.h"
 
+namespace augs {
+	template <class T>
+	void detail_sprite_bordered(
+		vertex_triangle_buffer& output_buffer,
+		const T& entry,
+		const vec2i pos,
+		const float rotation_degrees,
+		const rgba color,
+		const rgba border_color
+	) {
+		const vec2i offsets[4] = {
+			vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
+		};
+
+		for (const auto o : offsets) {
+			const auto offset_pos = pos + o;
+
+			augs::detail_sprite(
+				output_buffer,
+				entry,
+				offset_pos,
+				rotation_degrees,
+				border_color
+			);
+		}
+
+		augs::detail_sprite(
+			output_buffer,
+			entry,
+			pos,
+			rotation_degrees,
+			color
+		);
+	}
+}
+
+
+template <class T>
+static void aabb_bordered(
+	T& output, 
+	const augs::atlas_entry entry,
+	const ltrb origin,
+	const rgba inside_color,
+	const rgba border_color
+) {
+	const vec2i offsets[4] = {
+		vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
+	};
+
+	for (const auto o : offsets) {
+		const auto offset_origin = ltrb(origin) += o;
+
+		output.aabb(entry, offset_origin, border_color);
+	}
+
+	output.aabb(entry, origin, inside_color);
+}
+
 void damage_indication_system::draw_indicators(
 	const std::function<bool(const_entity_handle)> is_reasonably_in_view,
 	const const_entity_handle& viewed_character,
@@ -323,9 +381,10 @@ void damage_indication_system::draw_indicators(
 				const auto icon = e.in.ped_destroyed ? shield_destruction_icon : shield_icon;
 
 				if (const auto& entry = game_images.at(icon).diffuse; entry.exists()) {
-					const auto shield_icon_pos = pixel_perfect_text_pos - vec2i(0, indicator_font.metrics.descender);
+					const auto shield_icon_pos = pixel_perfect_text_pos - vec2i(0, indicator_font.metrics.descender) + vec2i(2, 0);
+					const auto origin = ltrb(shield_icon_pos, entry.get_original_size());
 
-					output.aabb_lt(entry, shield_icon_pos, text_color);
+					::aabb_bordered(output, entry, origin, text_color, border);
 				}
 			}
 
@@ -345,13 +404,18 @@ void damage_indication_system::draw_indicators(
 					col.a = 255;
 					col.mult_alpha(1 - passed_mult*passed_mult*passed_mult);
 
+					auto head_border = border;
+					head_border.a = col.a;
+					//head_border.mult_alpha(0.8f);
+
 					if (const auto& entry = game_images.at(icon).diffuse; entry.exists()) {
-						augs::detail_sprite(
+						augs::detail_sprite_bordered(
 							output,
 							entry,
 							vec2i(head_pos),
 							e.in.head_transform.rotation,
-							col
+							col,
+							head_border
 						);
 					}
 				}
