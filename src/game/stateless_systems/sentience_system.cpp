@@ -456,21 +456,17 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		const auto subject = cosm[d.subject];
 		const auto& def = d.damage;
 
-		const bool should_still_apply_impact = sentient_and_conscious(subject);
-
 		auto apply_impact_impulse = [&]() {
 			auto considered_impulse = def.impact_impulse;
 
 			if (considered_impulse > 0.f) {
-				if (should_still_apply_impact) {
-					/*
-						Note: armored players will experience a greater kickback from an interference explosion,
-						but that is not a scripted behaviour. It is because without armor, the Consciousness Points are depleted almost instantaneously,
-						thus forcibly stopping the sprint, which is implemented via an increase in inertia.
-					*/
+				/*
+					Note: armored players will experience a greater kickback from an interference explosion,
+					but that is not a scripted behaviour. It is because without armor, the Consciousness Points are depleted almost instantaneously,
+					thus forcibly stopping the sprint, which is implemented via an increase in inertia.
+				*/
 
-					considered_impulse *= def.impulse_multiplier_against_sentience;
-				}
+				considered_impulse *= def.impulse_multiplier_against_sentience;
 
 				const auto subject_of_impact = subject.get_owner_of_colliders().template get<components::rigid_body>();
 				const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
