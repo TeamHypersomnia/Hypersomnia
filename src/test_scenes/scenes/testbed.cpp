@@ -44,8 +44,8 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::METROPOLIS;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
 		rs.initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
 		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
@@ -58,7 +58,7 @@ namespace test_scenes {
 
 	void testbed::setup(bomb_defusal_ruleset& rs) {
 		rs.bot_names = {
-			"daedalus lkjgfdskl kljf8394833",
+			"daedalus",
 			"icarus",
 			"geneotech",
 			"pbc",
@@ -109,6 +109,7 @@ namespace test_scenes {
 			resistance.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			metropolis.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
+#define GIVE_FULL 1
 #define GIVE_AMMO 1
 
 #if GIVE_AMMO
@@ -117,6 +118,17 @@ namespace test_scenes {
 
 			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SN69);
 			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::KEK9);
+#endif
+
+#if GIVE_FULL
+			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
+			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
+
+			metropolis.initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+			metropolis.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+
+			resistance.initial_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
+			resistance.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 #endif
 		}
 

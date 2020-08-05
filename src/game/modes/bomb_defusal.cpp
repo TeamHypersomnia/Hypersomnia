@@ -874,12 +874,14 @@ void bomb_defusal::play_start_round_sound(const input_type in, const const_logic
 				effect.modifier.always_direct_listener = true;
 
 				sound_effect_start_input input;
-				input.variation_number = prepare_to_fight_counter++;
+				input.variation_number = prepare_to_fight_counter;
 				input.listener_faction = t;
 
 				effect.start(step, input, always_predictable_v);
 			}
 		});
+
+		++prepare_to_fight_counter;
 	}
 	else {
 		play_sound_for(in, step, start_event, always_predictable_v);

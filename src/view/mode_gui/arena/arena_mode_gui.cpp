@@ -840,10 +840,7 @@ void arena_gui_state::draw_mode_gui(
 				pen.x += cfg.weapon_icon_horizontal_pad;
 
 				if (was_headshot) {
-					auto col = rgba(get_col(ko.victim)).mult_brightness(1.25f);
-					col.a = 255;
-					col = rgba(255, 255, 200, 255);
-
+					auto col = rgba(get_col(ko.victim));
 					const auto origin = ltrb(pen - vec2i(0, headshot_icon_size.y / 2), headshot_icon_size);
 
 					general_drawer.aabb_bordered(
