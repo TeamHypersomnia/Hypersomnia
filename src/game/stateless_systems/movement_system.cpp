@@ -525,6 +525,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			}
 
 			if (constant_inertia) {
+				movement.const_inertia_ms = std::min(300.f, movement.const_inertia_ms);
 				movement.const_inertia_ms -= delta_ms;
 			}
 

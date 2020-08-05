@@ -359,7 +359,6 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 				auto& movement = subject.get<components::movement>();
 				movement.const_inertia_ms += amount * sentience_def.const_inertia_damage_ratio;
-
 				//movement.linear_inertia_ms += amount * sentience_def.linear_inertia_damage_ratio;
 
 				const auto consciousness_ratio = consciousness.get_ratio();

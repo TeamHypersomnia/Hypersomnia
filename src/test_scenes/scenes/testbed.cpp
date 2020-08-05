@@ -873,11 +873,11 @@ namespace test_scenes {
 		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
 
-		create(test_box_markers::BUY_AREA, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
-		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
+		create(test_box_markers::BUY_AREA, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
 
-		create(test_box_markers::CT_SPAWN, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
-		create(test_box_markers::T_SPAWN, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
+		create(test_box_markers::CT_SPAWN, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_box_markers::T_SPAWN, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
 
 		create(test_box_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));
 
