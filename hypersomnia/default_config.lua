@@ -164,8 +164,8 @@ return {
     text_color = "255 255 255 255",
     background_color = "255 255 255 10",
     background_border_color = "255 255 255 40",
-    message_lifetime_secs = 5,
-    max_simultaneous_messages = 2,
+    message_lifetime_secs = 4,
+    max_simultaneous_messages = 3,
     message_fading_secs = 0.5,
     box_padding = { x = 32, y = 8 },
     box_separation = 1.1
@@ -533,6 +533,7 @@ treat_as_music_sounds_longer_than_secs = 5,
   },
   arena_mode_gui = {
     show_client_resyncing_notifier = true,
+    death_summary_offset_mult = 0.5,
 
     between_knockout_boxes_pad = 8,
     inside_knockout_box_pad = 6,
@@ -659,6 +660,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 	  },
       METROPOLIS = {
 		  standard = "230 40 255 255",
+		  current_player_text = "240 70 255 255",
 		  background_dark = "20 0 75 255"
 	  },
       ATLANTIS = {
@@ -666,6 +668,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 	  },
       RESISTANCE = {
 		  standard = "255 37 0 255",
+		  current_player_text = "255 80 0 255",
 		  background_dark = "47 10 0 255"
 	  }
 	}

@@ -416,6 +416,9 @@ inline const rgba gray(0x80, 0x80, 0x80, 0xff);
 
 inline const rgba ltblue(0, 122, 204, 255);
 inline const rgba dark_green(0, 144, 66, 255);
+inline const rgba lightgreen(153, 229, 80, 255);
+inline const rgba lightyellow(251, 242, 54, 255);
+inline const rgba lightred(255, 53, 21, 255);
 inline const rgba pink(255, 0, 255, 255);
 inline const rgba violet(164, 68, 195, 255);
 inline const rgba red_violet(200, 68, 195, 255);

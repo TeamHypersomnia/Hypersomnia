@@ -499,3 +499,16 @@ summary: Just a hidden scratchpad.
 - Already when the server list is requested, masterserver should request a reverse ping from all servers 
 	- Then just automatically re-ping all servers once every 20 seconds
 
+- when the body explodes, spectator automatically switches from the killed person to another
+
+- Enlarge the health bars a little upon damage taken and health increase
+	- Also enlarge when no more stamina for dash? Though then we'd have to scale entire bar along with health
+
+- Dead body should not show number indicators for damage given
+
+
+- Knockout notifiers could show whether the kill was "bloody"
+
+- After death, perhaps the camera should follow the head instead of the dead body
+	- Especially since the body may explode
+	- And there will be dynamics for the head

@@ -9,23 +9,11 @@ summary: That which we are brainstorming at the moment.
 - We have improve the nomenclature for playing event sounds in bomb defusal code
 	- Maybe when we refactor the mode code
 
-- HUD messages for streaks and 1v1 events
-
 - Show a flame icon when we apply damage to a burning corpse
 	- Big one on ignition, smaller ones when we help
 
 - fix this..
 	- const auto next_explosion_in_ms = rng.randval(0.f, cascade_def.explosion_interval_ms.value);
-
-- when the body explodes, spectator automatically switches from the killed person to another
-
-- Headshots
-	- Would be shown in yellow like critical damage in crosscode
-	- 2x for snipers, 3x for all other weapons
-		- So that the scout doesn't one-hit armored opponents
-	- Actually some op smgs should have 2x at most
-		- like cyberspray or pro90
-
 
 - Multiple "camera schemes" in settings
 	- Fluid (current, hotline miami-like)
@@ -41,46 +29,11 @@ summary: That which we are brainstorming at the moment.
 	-Show Only shows when not shooting
 
 - Hide enemy health bars when they are under ferns or other object that's supposed to hide them
-
-- Three different sizes for partial damages
-	- Small, medium, large
-	- another size for the cumulative
-
-- Cumulative damage starts disappearing once there is no partial damage visible on the screen
-- But it is reset only once cumulative damage itself disappears
-
-
-- First damage could show as the summatory damage
-	- Just to not repeat two numbers?
-	- actually no, just show summatory the second time
-
 - Maybe a little more shake for the explosions of electric triad?
-
-- White color for enemy damage given notifiers
-	- orange for friendly damage taken notifiers
-	- a more red for ours
-
-- Enlarge the health bars a little upon damage taken and health increase
-	- Also enlarge when no more stamina for dash? Though then we'd have to scale entire bar along with health
-
-- We have to think whether to show the bigger counter for the first time
-	- Let's play crosscode demo actually
-
-- Dead body should not show number indicators for damage given
-
-- Think about scaling the final knockout impulse with the last damage given
-
-- Knockout notifiers could show whether the kill was "bloody"
 
 - Killstreaks/combos could add HP
 	- To balance one versus multiple situations
 	- But people could fight over the frag then
-
-- Just cast a ray in order to know whether to show the total counter above enemy's head
-
-- After death, perhaps the camera should follow the head instead of the dead body
-	- Especially since the body may explode
-	- And there will be dynamics for the head
 
 - Blood traces after tearing the body would be cool
 	- These need to be entities for proper sync
@@ -95,21 +48,6 @@ summary: That which we are brainstorming at the moment.
 		- and we could use a more snappy sound for normal damage
 			- e.g. glass breakage
 				- maybe something combined with current analog impact sounds (albeit in way shorter version)
-
-- Better damage indicators
-	- Show partial damages around the enemy's head in circles
-	- show total tamage in bigger text exactly above the enemy's head
-	- Mana should be scaled down to 100?
-		- since it's not an MMO...
-		- awp will still work as expected - it will two hit armors (since it will take around 170 dmg)
-		- more intuitive to think of 'armored' having 200 hp, unarmored having 100 hp
-		- exact correspondence between mp and hp
-	- Same with stamina I guess
-
-- Disable bullet destruction effects upon succesful damage hit.
-	- Make the experience of hitting clean
-	- Except hpsr's ring explosion
-	- The destruction effects should only be a clue that a wall is being hit
 
 - Hold symlinks in user/ so that they don't get deleted on update
 - Position the nade progress circle correctly when reloading

@@ -44,9 +44,9 @@ void hud_messages_gui::standard_post_solve(
 				};
 
 				add_text(typed_payload.preffix, hud_settings.text_color, typed_payload.bbcode);
-				add_text(typed_payload.first_name, settings.colors[typed_payload.first_faction].standard);
+				add_text(typed_payload.first_name, settings.colors[typed_payload.first_faction].current_player_text);
 				add_text(typed_payload.mid, hud_settings.text_color, typed_payload.bbcode);
-				add_text(typed_payload.second_name, settings.colors[typed_payload.second_faction].standard);
+				add_text(typed_payload.second_name, settings.colors[typed_payload.second_faction].current_player_text);
 				add_text(typed_payload.suffix, hud_settings.text_color, typed_payload.bbcode);
 
 				msg.text = total_text;

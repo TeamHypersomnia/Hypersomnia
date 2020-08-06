@@ -4464,3 +4464,49 @@ Advantages:
 - We can implement "corpse" health as negative health with a threshold
 	- To not alter much the "is conscious" logic
 	- Notice though we'll have to destroy the sentience entity itself. It could somehow prove dangerous n the game mode code.
+- HUD messages for streaks and 1v1 events
+
+- Headshots
+	- Would be shown in yellow like critical damage in crosscode
+	- 2x for snipers, 3x for all other weapons
+		- So that the scout doesn't one-hit armored opponents
+	- Actually some op smgs should have 2x at most
+		- like cyberspray or pro90
+
+- Cumulative damage starts disappearing once there is no partial damage visible on the screen
+- But it is reset only once cumulative damage itself disappears
+
+- First damage could show as the summatory damage
+	- Just to not repeat two numbers?
+	- actually no, just show summatory the second time
+
+- Three different sizes for partial damages
+	- Small, medium, large
+	- another size for the cumulative
+
+- White color for enemy damage given notifiers
+	- orange for friendly damage taken notifiers
+	- a more red for ours
+
+- We have to think whether to show the bigger counter for the first time
+	- Let's play crosscode demo actually
+
+- Think about scaling the final knockout impulse with the last damage given
+
+- Just cast a ray in order to know whether to show the total counter above enemy's head
+
+- Better damage indicators
+	- Show partial damages around the enemy's head in circles
+	- show total tamage in bigger text exactly above the enemy's head
+	- Mana should be scaled down to 100?
+		- since it's not an MMO...
+		- awp will still work as expected - it will two hit armors (since it will take around 170 dmg)
+		- more intuitive to think of 'armored' having 200 hp, unarmored having 100 hp
+		- exact correspondence between mp and hp
+	- Same with stamina I guess
+
+- Disable bullet destruction effects upon succesful damage hit.
+	- Make the experience of hitting clean
+	- Except hpsr's ring explosion
+	- The destruction effects should only be a clue that a wall is being hit
+

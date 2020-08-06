@@ -1216,23 +1216,23 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 
 					bool streak_messaged = false;
 
+					auto preffix = std::string("");
+
+					if (ko.origin.circumstances.headshot) {
+						preffix = "[color=orange]::HEADSHOT:: [/color]";
+					}
+					else if (ko.origin.cause.is_humiliating(in.cosm)) {
+						preffix = "[color=orange]HUMILIATION!!! [/color]";
+					}
+
 					if (current_streak == nullptr && in.rules.view.past_all_streaks(num_kos)) {
-						auto preffix = std::string("");
-
-						if (ko.origin.circumstances.headshot) {
-							preffix = "[color=orange]::HEADSHOT:: [/color]";
-						}
-						else if (ko.origin.cause.is_humiliating(in.cosm)) {
-							preffix = "[color=orange]HUMILIATION!!! [/color]";
-						}
-
 						hud_message_1_player(step, preffix, typesafe_sprintf(" is on a killstreak with [color=orange]%x[/color] kills!", num_kos), find(ko.knockouter.id), true);
 						streak_messaged = true;
 					}
 
 					if (current_streak) {
 						play_sound_globally(step, current_streak->announcement_sound, never_predictable_v);
-						hud_message_1_player(step, "", ": " + current_streak->message, find(ko.knockouter.id));
+						hud_message_1_player(step, preffix, ": " + current_streak->message, find(ko.knockouter.id), true);
 					}
 					else if (ko.origin.circumstances.headshot) {
 						play_sound_for(in, step, battle_event::HEADSHOT, never_predictable_v);
@@ -1330,21 +1330,21 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 					if (victim_faction_id != std::nullopt && enemy_id != std::nullopt) {
 						auto get_hp_col = [&](const auto hp) {
 							if (hp > 70.f) {
-								return "green";
+								return "lightgreen";
 							}
 
 							if (hp > 40.f) {
-								return "yellow";
+								return "lightyellow";
 							}
 
 							if (hp > 20.f) {
 								return "orange";
 							}
 
-							return "red";
+							return "lightred";
 						};
 
-						hud_message_2_players(step, "[color=orange]..::THE FINAL DUEL::.. [/color]", typesafe_sprintf("[color=vslightgray] ([color=%x]%x HP[/color])[/color] VS ", get_hp_col(*victim_faction_hp), *victim_faction_hp), typesafe_sprintf("[color=vslightgray] ([color=%x]%x HP[/color])[/color] !", get_hp_col(enemy_hp), enemy_hp), find(*victim_faction_id), find(*enemy_id), true);
+						hud_message_2_players(step, "[color=orange]..::THE FINAL DUEL::.. [/color]", typesafe_sprintf("[color=%x] (%x HP)[/color] VS ", get_hp_col(*victim_faction_hp), *victim_faction_hp), typesafe_sprintf("[color=%x] (%x HP)[/color] !", get_hp_col(enemy_hp), enemy_hp), find(*victim_faction_id), find(*enemy_id), true);
 
 					}
 				}
