@@ -30,6 +30,15 @@ void hud_messages_gui::standard_post_solve(
 			if constexpr(std::is_same_v<T, formatted_string>) {
 				msg.text = typed_payload;
 			}
+			else if constexpr(std::is_same_v<T, messages::special_hud_command>) {
+				switch (typed_payload) {
+					case messages::special_hud_command::CLEAR:
+						messages.clear();
+						break;
+				}
+
+				return;
+			}
 			else {
 				auto total_text = formatted_string();
 				auto& placeholder = augs::baked_font::zero;

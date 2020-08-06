@@ -17,7 +17,11 @@ namespace messages {
 		bool bbcode = false;
 	};
 
-	using message_variant = std::variant<augs::gui::text::formatted_string, two_player_message>;
+	enum class special_hud_command {
+		CLEAR
+	};
+
+	using message_variant = std::variant<special_hud_command, augs::gui::text::formatted_string, two_player_message>;
 
 	struct hud_message {
 		message_variant payload;

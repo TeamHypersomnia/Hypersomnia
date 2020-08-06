@@ -989,6 +989,8 @@ void bomb_defusal::setup_round(
 
 		just_create_entity(cosm, theme);
 	}
+
+	step.post_message(messages::hud_message { messages::special_hud_command::CLEAR });
 }
 
 bomb_defusal::round_transferred_players bomb_defusal::make_transferred_players(const input_type in) const {
