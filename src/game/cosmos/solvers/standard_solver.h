@@ -7,18 +7,18 @@
 #include "game/cosmos/solvers/solve_structs.h"
 
 #include "game/cosmos/solvers/solver_callbacks.h"
-#include "game/organization/all_messages_includes.h"
 
 void standard_solve(const logic_step step);
 
 struct standard_solver {
+	static data_living_one_step& get_thread_local_queues();
+
 	template <class C>
 	solve_result operator()(
 		logic_step_input input,
 		C&& callbacks
 	) {
-		thread_local data_living_one_step queues;
-		queues.clear();
+		auto& queues = get_thread_local_queues();
 
 		auto step_rng = randomization(input.cosm.get_total_steps_passed());
 

@@ -18,3 +18,4 @@
 #include "game/messages/changed_identities_message.h"
 #include "game/messages/battle_event_message.h"
 #include "game/messages/game_notification.h"
+#include "game/messages/hud_message.h"

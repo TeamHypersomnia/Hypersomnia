@@ -95,6 +95,7 @@
 #include "augs/graphics/frame_num_type.h"
 #include "view/rendering_scripts/launch_visibility_jobs.h"
 #include "view/rendering_scripts/for_each_vis_request.h"
+#include "view/hud_messages/hud_messages_gui.h"
 #include "game/cosmos/for_each_entity.h"
 #include "application/setups/client/demo_paths.h"
 #include "application/nat/stun_server_provider.h"
@@ -854,6 +855,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	/* TODO: We need to have one game gui per cosmos. */
 	static game_gui_system game_gui;
 	static bool game_gui_mode_flag = false;
+
+	static hud_messages_gui hud_messages;
 
 	static std::atomic<augs::frame_num_type> current_frame = 0;
 
@@ -1852,6 +1855,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			calc_pre_step_crosshair_displacement(viewing_config)
 		);
 
+		hud_messages.advance(viewing_config.hud_messages.value);
+
 		reacquire_visible_entities(screen_size, viewed_character, viewing_config);
 
 		const auto inv_tickrate = visit_current_setup([](const auto& setup) {
@@ -1966,6 +1971,14 @@ work_result work(const int argc, const char* const * const argv) try {
 			step, 
 			{ settings.prediction }
 		);
+
+		if (never_predictable_v.should_play(settings.prediction)) {
+			hud_messages.standard_post_solve(
+				step,
+				viewing_config.faction_view,
+				viewing_config.hud_messages.value
+			);
+		}
 	};
 
 	static auto setup_post_cleanup = [&](const auto& cfg, const const_logic_step step) {
@@ -2716,6 +2729,17 @@ work_result work(const int argc, const char* const * const argv) try {
 
 					chosen_renderer.call_and_clear_lines();
 				});
+
+				if (new_viewing_config.hud_messages.is_enabled) {
+					hud_messages.draw(
+						chosen_renderer,
+						get_blank_texture(),
+						streaming.get_loaded_gui_fonts().gui,
+						screen_size,
+						new_viewing_config.hud_messages.value,
+						frame_delta
+					);
+				}
 			};
 
 			auto fallback_overlay_gray_color = [&](augs::renderer& chosen_renderer) {

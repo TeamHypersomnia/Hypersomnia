@@ -72,6 +72,8 @@ namespace augs {
 	};
 
 	struct baked_font {
+		static const baked_font zero;
+
 		struct internal_glyph {
 			font_glyph_metadata meta;
 			augs::atlas_entry in_atlas;

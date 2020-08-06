@@ -37,11 +37,20 @@
 #include "game/stateless_systems/animation_system.h"
 #include "game/stateless_systems/remnant_system.h"
 
+#include "game/organization/all_messages_includes.h"
+
 #define STRESS_TEST_REINFERENCES 0
 
 #if STRESS_TEST_REINFERENCES
 #include <random>
 #endif
+
+data_living_one_step& standard_solver::get_thread_local_queues() {
+	thread_local data_living_one_step queues;
+	queues.clear();
+
+	return queues;
+}
 
 void standard_solve(const logic_step step) {
 	auto& cosm = step.get_cosmos();

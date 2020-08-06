@@ -705,6 +705,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/builder/gui/builder_project_files_gui.cpp"
 	"src/application/setups/builder/gui/builder_hierarchy_gui.cpp"
 	"src/application/setups/project_selector/project_selector_setup.cpp"
+	"src/view/hud_messages/hud_messages_gui.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

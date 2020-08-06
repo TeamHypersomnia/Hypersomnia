@@ -28,6 +28,8 @@
 
 #include "game/cosmos/just_create_entity_functional.h"
 #include "game/detail/visible_entities.hpp"
+#include "game/messages/game_notification.h"
+#include "game/messages/hud_message.h"
 #include "game/detail/sentience/sentience_logic.h"
 
 #define LOG_BOMB_DEFUSAL 0
@@ -1140,6 +1142,48 @@ bomb_defusal_player_stats* bomb_defusal::stats_of(const mode_player_id& id) {
 	return nullptr;
 }
 
+
+template <class T>
+void hud_message_2_players(
+	const const_logic_step step,
+	std::string preffix,
+	std::string mid,
+	std::string suffix,
+	const T* first,
+	const T* second,
+	bool bbcode = false
+) {
+	messages::two_player_message msg;
+
+	if (first) {
+		msg.first_name = first->get_chosen_name();
+		msg.first_faction = first->get_faction();
+	}
+
+	if (second) {
+		msg.second_name = second->get_chosen_name();
+		msg.second_faction = second->get_faction();
+	}
+
+	msg.preffix = std::move(preffix);
+	msg.mid = std::move(mid);
+	msg.suffix = std::move(suffix);
+	msg.bbcode = bbcode;
+
+	step.post_message(messages::hud_message { std::move(msg) });
+}
+
+template <class T>
+void hud_message_1_player(
+	const const_logic_step step,
+	std::string preffix,
+	std::string suffix,
+	const T* first,
+	bool bbcode = false
+) {
+	hud_message_2_players(step, preffix, "", suffix, first, (T*)nullptr, bbcode);
+}
+
 void bomb_defusal::count_knockout(const const_logic_step step, const input_type in, const arena_mode_knockout ko) {
 	current_round.knockouts.push_back(ko);
 
@@ -1167,14 +1211,42 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 				*/
 
 				if (was_first_blood) {
-					if (const auto current_streak = in.rules.view.find_streak(stats->knockout_streak)) {
+					const auto num_kos = stats->knockout_streak;
+					const auto current_streak = in.rules.view.find_streak(num_kos);
+
+					bool streak_messaged = false;
+
+					if (current_streak == nullptr && in.rules.view.past_all_streaks(num_kos)) {
+						auto preffix = std::string("");
+
+						if (ko.origin.circumstances.headshot) {
+							preffix = "[color=orange]::HEADSHOT:: [/color]";
+						}
+						else if (ko.origin.cause.is_humiliating(in.cosm)) {
+							preffix = "[color=orange]HUMILIATION!!! [/color]";
+						}
+
+						hud_message_1_player(step, preffix, typesafe_sprintf(" is on a killstreak with [color=orange]%x[/color] kills!", num_kos), find(ko.knockouter.id), true);
+						streak_messaged = true;
+					}
+
+					if (current_streak) {
 						play_sound_globally(step, current_streak->announcement_sound, never_predictable_v);
+						hud_message_1_player(step, "", ": " + current_streak->message, find(ko.knockouter.id));
 					}
 					else if (ko.origin.circumstances.headshot) {
 						play_sound_for(in, step, battle_event::HEADSHOT, never_predictable_v);
+
+						if (!streak_messaged) {
+							hud_message_2_players(step, "[color=orange]::HEADSHOT:: [/color]", " just owned ", " !", find(ko.knockouter.id), find(ko.victim.id), true);
+						}
 					}
 					else if (ko.origin.cause.is_humiliating(in.cosm)) {
 						play_sound_for(in, step, battle_event::HUMILIATION, never_predictable_v);
+
+						if (!streak_messaged) {
+							hud_message_2_players(step, "[color=orange]HUMILIATION!!! [/color]", " sliced and diced ", " !", find(ko.knockouter.id), find(ko.victim.id), true);
+						}
 					}
 				}
 			}
@@ -1190,6 +1262,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 
 		if (!was_first_blood) {
 			play_sound_for(in, step, battle_event::FIRST_BLOOD, never_predictable_v);
+			hud_message_2_players(step, "[color=orange]FIRST BLOOD!![/color] ", " drew first blood on ", " !", find(ko.knockouter.id), find(ko.victim.id), true);
 
 			was_first_blood = true;
 		}

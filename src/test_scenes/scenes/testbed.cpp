@@ -159,21 +159,21 @@ namespace test_scenes {
 		{
 			auto& streaks = rs.view.streak_defs;
 
-			auto add_streak = [&](const int num, const auto sound) {
-				streaks.push_back({ num, to_sound_id(sound) });
+			auto add_streak = [&](const int num, const auto& message, const auto sound) {
+				streaks.push_back({ num, message, to_sound_id(sound) });
 			};
 
-			add_streak(3,  test_scene_sound_id::ANNOUNCE_MULTIKILL);
-			add_streak(4,  test_scene_sound_id::ANNOUNCE_MEGAKILL);
-			add_streak(5,  test_scene_sound_id::ANNOUNCE_ULTRAKILL);
-			add_streak(6,  test_scene_sound_id::ANNOUNCE_MONSTERKILL);
-			add_streak(7,  test_scene_sound_id::ANNOUNCE_KILLINGSPREE);
-			add_streak(8,  test_scene_sound_id::ANNOUNCE_WICKEDSICK);
-			add_streak(9,  test_scene_sound_id::ANNOUNCE_RAMPAGE);
-			add_streak(10, test_scene_sound_id::ANNOUNCE_LUDACRISSKILL);
-			add_streak(11, test_scene_sound_id::ANNOUNCE_UNSTOPPABLE);
-			add_streak(12, test_scene_sound_id::ANNOUNCE_GODLIKE);
-			add_streak(13, test_scene_sound_id::ANNOUNCE_HOLYSHIT);
+			add_streak(3,  "Multi-Kill!", test_scene_sound_id::ANNOUNCE_MULTIKILL);
+			add_streak(4,  "Mega-Kill!", test_scene_sound_id::ANNOUNCE_MEGAKILL);
+			add_streak(5,  "Ultra-Kill!", test_scene_sound_id::ANNOUNCE_ULTRAKILL);
+			add_streak(6,  "Monster-Kill!", test_scene_sound_id::ANNOUNCE_MONSTERKILL);
+			add_streak(7,  "Killing Spree!", test_scene_sound_id::ANNOUNCE_KILLINGSPREE);
+			add_streak(8,  "Wicked Sick!", test_scene_sound_id::ANNOUNCE_WICKEDSICK);
+			add_streak(9,  "Rampage!", test_scene_sound_id::ANNOUNCE_RAMPAGE);
+			add_streak(10, "Ludacriss-Kill!", test_scene_sound_id::ANNOUNCE_LUDACRISSKILL);
+			add_streak(11, "Unstoppable!", test_scene_sound_id::ANNOUNCE_UNSTOPPABLE);
+			add_streak(12, "Godlike!", test_scene_sound_id::ANNOUNCE_GODLIKE);
+			add_streak(13, "Holy Shit!", test_scene_sound_id::ANNOUNCE_HOLYSHIT);
 		}
 
 		for (auto& t : rs.view.win_themes.items) {

@@ -96,6 +96,7 @@ enum class scoreboard_icon_type {
 struct knockout_streak_def {
 	// GEN INTROSPECTOR struct knockout_streak_def
 	int required_knockouts = 2;
+	std::string message;
 
 	assets::sound_id announcement_sound;
 	// END GEN INTROSPECTOR
@@ -139,6 +140,14 @@ struct arena_mode_view_rules {
 	bool enable_teammate_indicators = true;
 	bool enable_tactical_indicators = true;
 	// END GEN INTROSPECTOR
+
+	bool past_all_streaks(const int current_streak_count) const {
+		if (streak_defs.empty()) {
+			return true;
+		}
+
+		return current_streak_count > streak_defs.back().required_knockouts;
+	}
 
 	const knockout_streak_def* find_streak(const int current_streak_count) const {
 		for (const auto& def : streak_defs) {

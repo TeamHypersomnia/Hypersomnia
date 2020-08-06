@@ -28,6 +28,7 @@
 #include "view/gui_fonts.h"
 #include "view/game_gui/elements/game_gui_settings.h"
 #include "view/damage_indication_settings.h"
+#include "view/hud_messages/hud_message_settings.h"
 #include "application/input/input_settings.h"
 
 #include "test_scenes/test_scene_settings.h"
@@ -157,6 +158,8 @@ struct config_lua_table {
 	client_start_input default_client_start;
 	client_vars client;
 	performance_settings performance;
+
+	augs::maybe<hud_message_settings> hud_messages;
 
 #if TODO
 	augs::path_type db_path;

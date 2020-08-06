@@ -159,6 +159,17 @@ return {
     H = "HOLSTER",
     Q = "LAST_USED_WEAPON"
   },
+  enabled_hud_messages = {
+    offset_mult = 0.8,
+    text_color = "255 255 255 255",
+    background_color = "255 255 255 10",
+    background_border_color = "255 255 255 40",
+    message_lifetime_secs = 5,
+    max_simultaneous_messages = 2,
+    message_fading_secs = 0.5,
+    box_padding = { x = 32, y = 8 },
+    box_separation = 1.1
+  },
   renderer = {
     default_filtering = "NEAREST_NEIGHBOR" -- alternatively: "LINEAR"
   },
@@ -577,7 +588,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
 
     enabled_context_tip_settings = {
-      tip_offset_mult = 0.8,
+      tip_offset_mult = 0.65,
       tip_text_color = "255 255 255 255",
       bound_key_color = "255 255 0 255"
 	}

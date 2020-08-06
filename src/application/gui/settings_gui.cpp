@@ -943,6 +943,23 @@ void settings_gui_state::perform(
 					}
 				}
 
+				{
+					auto& scope_cfg = config;
+					revertable_checkbox("Show HUD messages", scope_cfg.hud_messages.is_enabled);
+
+					if (scope_cfg.hud_messages.is_enabled) {
+						auto& scope_cfg = config.hud_messages.value;
+						auto indent = scoped_indent();
+
+						revertable_slider(SCOPE_CFG_NVP(offset_mult), 0.f, 1.f);
+
+						revertable_color_edit(SCOPE_CFG_NVP(text_color));
+						revertable_slider(SCOPE_CFG_NVP(message_lifetime_secs), 1.0f, 20.0f);
+						revertable_slider(SCOPE_CFG_NVP(message_fading_secs), 0.0f, 2.f);
+						revertable_slider(SCOPE_CFG_NVP(max_simultaneous_messages), 1, 10);
+					}
+				}
+
 				if (auto node = scoped_tree_node("Camera")) {
 					auto& scope_cfg = config.camera;
 
