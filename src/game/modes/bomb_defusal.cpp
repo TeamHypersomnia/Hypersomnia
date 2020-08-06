@@ -1276,9 +1276,26 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 				bool any_enemy_has_nonzero = false;
 				bool any_enemy_has_more_than_one = false;
 
+				std::optional<int> victim_faction_hp;
+				std::optional<mode_player_id> victim_faction_id;
+
+				for_each_player_handle_in(in.cosm, victim_faction, [&](const auto& handle) {
+					if (sentient_and_conscious(handle)) {
+						victim_faction_hp = std::max(1, static_cast<int>(handle.template get<components::sentience>().template get<health_meter_instance>().value));
+						victim_faction_id = lookup(handle.get_id());
+					}
+				});
+
+				std::optional<int> enemy_hp;
+				std::optional<mode_player_id> enemy_id;
+				
+				int total_enemies = 0;
+
 				p.for_each([&](const auto faction) {
 					if (faction != victim_faction) {
 						const auto n = num_conscious_players_in(in.cosm, faction);
+
+						total_enemies += n;
 
 						if (n > 0) {
 							any_enemy_has_nonzero = true;
@@ -1287,15 +1304,49 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 						if (n > 1) {
 							any_enemy_has_more_than_one = true;
 						}
+
+						if (n == 1) {
+							for_each_player_handle_in(in.cosm, faction, [&](const auto& handle) {
+								if (sentient_and_conscious(handle)) {
+									enemy_hp = std::max(1, static_cast<int>(handle.template get<components::sentience>().template get<health_meter_instance>().value));
+									enemy_id = lookup(handle.get_id());
+								}
+							});
+						}
 					}
 				});
 
 				if (any_enemy_has_more_than_one) {
 					play_faction_sound_for(in, step, battle_event::ONE_VERSUS_MANY, victim_faction, never_predictable_v);
+
+					if (victim_faction_id != std::nullopt) {
+						hud_message_1_player(step, "", typesafe_sprintf(" is clutching against [color=orange]%x[/color] enemies! All depends on you!", total_enemies), find(*victim_faction_id), true);
+					}
 				}
 				else if (any_enemy_has_nonzero) {
 					/* All enemies have at most one. It's a duel/truel situation. */
 					play_sound_for(in, step, battle_event::ONE_VERSUS_ONE, never_predictable_v);
+
+					if (victim_faction_id != std::nullopt && enemy_id != std::nullopt) {
+						auto get_hp_col = [&](const auto hp) {
+							if (hp > 70.f) {
+								return "green";
+							}
+
+							if (hp > 40.f) {
+								return "yellow";
+							}
+
+							if (hp > 20.f) {
+								return "orange";
+							}
+
+							return "red";
+						};
+
+						hud_message_2_players(step, "[color=orange]..::THE FINAL DUEL::.. [/color]", typesafe_sprintf("[color=vslightgray] ([color=%x]%x HP[/color])[/color] VS ", get_hp_col(*victim_faction_hp), *victim_faction_hp), typesafe_sprintf("[color=vslightgray] ([color=%x]%x HP[/color])[/color] !", get_hp_col(enemy_hp), enemy_hp), find(*victim_faction_id), find(*enemy_id), true);
+
+					}
 				}
 			}
 		}

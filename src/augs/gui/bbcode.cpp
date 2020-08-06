@@ -145,6 +145,7 @@ namespace augs {
 							{"black", black},
 							{"silver", silver},
 							{"gray", gray},
+							{"gray4", gray4},
 
 							// custom colors
 							{"vsyellow", vsyellow},
