@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Item emphasis implementation
+	- First pass: shadows
+		- Just render all items with pure color shader, with varying intensity (the closer the item to ground, the less shadow)
+	- Second pass: actual items
+		- Just render the item
+	- Third pass: white overlay
+		- Just render all items with pure color shader, with varying intensity (the closer the item to ground, the more highlight)
+
 - Emphasize the items laying on the ground
 	- Like in hotline miami, they might fly a bit to upper-left direction
 	- with a little shadow behind

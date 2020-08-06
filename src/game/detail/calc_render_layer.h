@@ -26,7 +26,7 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 			return render_layer::ITEMS_ON_GROUND;
 		}
 		else if constexpr(H::template has<invariants::remnant>()) {
-			return render_layer::ITEMS_ON_GROUND;
+			return render_layer::REMNANTS;
 		}
 		else if constexpr(H::template has<invariants::missile>()) {
 			return render_layer::FOREGROUND_GLOWS;

@@ -222,6 +222,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		return;
 	}
 
+#if 0
 	if constexpr(H::template has<invariants::polygon>()) {
 		auto input = in.make_input_for<invariants::polygon>();
 
@@ -232,6 +233,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		render_visitor(*polygon, in.manager, input);
 		return;
 	}
+#endif
 }
 
 template <bool is_neon = false, class E, class T>
@@ -506,13 +508,21 @@ FORCE_INLINE void specific_entity_drawer(
 	);
 }
 
-template <class E>
+struct default_customize_input {
+	template <class I>
+	decltype(auto) operator()(I&& input) const {
+		return std::forward<I>(input);
+	}
+};
+
+template <class E, class F = default_customize_input>
 FORCE_INLINE void specific_draw_entity(
 	const cref_typed_entity_handle<E> typed_handle,
-	const draw_renderable_input& in
+	const draw_renderable_input& in,
+	F&& customize_input = default_customize_input()
 ) {
-	auto callback = [](const auto& renderable, auto&&... args) {
-		augs::draw(renderable, std::forward<decltype(args)>(args)...);
+	auto callback = [&customize_input](const auto& renderable, const auto& manager, const auto& input) {
+		augs::draw(renderable, manager, customize_input(input));
 	};
 
 	specific_entity_drawer(typed_handle, in, callback);
@@ -543,24 +553,26 @@ FORCE_INLINE void specific_draw_border(
 	}
 }
 
-template <class E>
+template <class E, class F = default_customize_input>
 FORCE_INLINE void specific_draw_color_highlight(
 	const cref_typed_entity_handle<E> typed_handle,
 	const rgba color,
-	const draw_renderable_input& in
+	const draw_renderable_input& in,
+	F&& customize_input = default_customize_input()
 ) {
-	auto highlight_maker = [color](auto renderable, const auto& manager, const auto& input) {
+	auto highlight_maker = [color, &customize_input](auto renderable, const auto& manager, const auto& input) {
 		renderable.set_color(color);
-		augs::draw(renderable, manager, input);
+		augs::draw(renderable, manager, customize_input(input));
 	};
 
 	specific_entity_drawer(typed_handle, in, highlight_maker);
 }
 
-template <class E>
+template <class E, class F = default_customize_input>
 FORCE_INLINE void specific_draw_neon_map(
 	const cref_typed_entity_handle<E> typed_handle,
-	const draw_renderable_input& in
+	const draw_renderable_input& in,
+	F&& customize_input = default_customize_input()
 ) {
 	if constexpr(typed_handle.template has<components::sprite>()) {
 		if (typed_handle.template get<components::sprite>().disable_neon_map) {
@@ -590,7 +602,7 @@ FORCE_INLINE void specific_draw_neon_map(
 			}
 		}
 
-		augs::draw(renderable, manager, input);
+		augs::draw(renderable, manager, customize_input(input));
 	};
 
 	specific_entity_drawer<true>(typed_handle, in, neon_maker);

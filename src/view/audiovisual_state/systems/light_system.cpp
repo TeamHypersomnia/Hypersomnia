@@ -324,6 +324,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	draw_sentience_neons();
 
 	renderer.call_triangles(D::FOREGROUND_NEONS);
+	renderer.call_triangles(D::DROPPED_ITEMS_NEONS);
 
 	in.neon_callback();
 	renderer.call_and_clear_triangles();

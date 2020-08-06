@@ -325,7 +325,7 @@ void enqueue_illuminated_rendering_jobs(
 				h.draw_neons<
 					render_layer::PLANTED_ITEMS,
 					render_layer::SOLID_OBSTACLES,
-					render_layer::ITEMS_ON_GROUND,
+					render_layer::REMNANTS,
 					/* Sentiences would come here if not for the fact that they have special neon logic */
 					render_layer::FOREGROUND,
 					render_layer::FOREGROUND_GLOWS
@@ -350,10 +350,79 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
-			auto job = [h = make_helper(D::DROPPED_ITEMS)]() {
+			auto job = [h = make_helper(D::REMNANTS)]() {
 				h.draw<
-					render_layer::ITEMS_ON_GROUND
+					render_layer::REMNANTS
 				>();
+			};
+
+			pool.enqueue(job);
+		}
+
+		{
+			auto job = [
+				&visible,
+				&cosm,
+				global_time_seconds,
+				shadows  = make_drawing_input(D::DROPPED_ITEMS_SHADOWS),
+				diffuse  = make_drawing_input(D::DROPPED_ITEMS_DIFFUSE),
+				neons    = make_drawing_input(D::DROPPED_ITEMS_NEONS),
+				overlays = make_drawing_input(D::DROPPED_ITEMS_OVERLAYS)
+			]() {
+				std::optional<sprite_drawing_input> offset_input;
+
+				visible.for_each<render_layer::ITEMS_ON_GROUND>(
+					cosm,
+					[&](const auto& handle) {
+						handle.template dispatch_on_having_all<invariants::item>([&](const auto& typed_item) {
+							const auto is_laying_on_ground = [&]() {
+								if (const auto cache = find_colliders_cache(typed_item)) {
+									if (cache->constructed_fixtures.size() > 0) {
+										if (cache->constructed_fixtures[0]->GetFilterData() == filters[predefined_filter_type::LYING_ITEM]) {
+											return true;
+										}
+									}
+								}
+
+								return false;
+							}();
+
+
+							if (!is_laying_on_ground) {
+								::specific_draw_entity(typed_item, diffuse);
+								::specific_draw_neon_map(typed_item, neons);
+
+								return;
+							}
+
+							const auto bounce_dir = vec2(-1, -1);
+							const auto bounce_height = 8.f;
+							const auto bounce_variation_secs = 2.0 * double(typed_item.get_id().raw.indirection_index);
+							const auto bounce_progress = static_cast<float>((1.0 + std::sin(1.5 * (global_time_seconds + bounce_variation_secs) * PI<double>)) / 2.0);
+
+							const auto shadow_alpha = bounce_progress;
+							const auto overlay_alpha = 1.0f - bounce_progress;
+							const auto bounce_elevation = bounce_progress * bounce_height * bounce_dir;
+
+							auto make_offset_input = [bounce_elevation, &offset_input](const auto& original) -> const auto& {
+								offset_input.emplace(original);
+								offset_input->renderable_transform += bounce_elevation;
+								return *offset_input;
+							};
+
+							auto shadow_color = rgba(0, 0, 0, 120);
+							shadow_color.mult_alpha(shadow_alpha);
+
+							auto overlay_color = rgba(255, 255, 255, 40);
+							overlay_color.mult_alpha(overlay_alpha);
+
+							::specific_draw_color_highlight(typed_item, shadow_color, shadows);
+							::specific_draw_entity(typed_item, diffuse, make_offset_input);
+							::specific_draw_neon_map(typed_item, neons, make_offset_input);
+							::specific_draw_color_highlight(typed_item, overlay_color, overlays, make_offset_input);
+						});
+					}
+				);
 			};
 
 			pool.enqueue(job);

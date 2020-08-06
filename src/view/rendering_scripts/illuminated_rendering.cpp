@@ -602,7 +602,18 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	renderer.call_triangles(D::SOLID_OBSTACLES);
-	renderer.call_triangles(D::DROPPED_ITEMS);
+	renderer.call_triangles(D::REMNANTS);
+
+	set_shader_with_matrix(shaders.pure_color_highlight);
+	renderer.call_triangles(D::DROPPED_ITEMS_SHADOWS);
+
+	set_shader_with_matrix(shaders.illuminated);
+	renderer.call_triangles(D::DROPPED_ITEMS_DIFFUSE);
+
+	set_shader_with_matrix(shaders.pure_color_highlight);
+	renderer.call_triangles(D::DROPPED_ITEMS_OVERLAYS);
+
+	set_shader_with_matrix(shaders.illuminated);
 
 	draw_fog_of_war_overlay();
 	draw_sentiences(*shaders.illuminated);

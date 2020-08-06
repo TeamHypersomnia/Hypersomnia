@@ -1322,7 +1322,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 					play_faction_sound_for(in, step, battle_event::ONE_VERSUS_MANY, victim_faction, never_predictable_v);
 
 					if (victim_faction_id != std::nullopt) {
-						hud_message_1_player(step, "", typesafe_sprintf(" is clutching against [color=orange]%x[/color] enemies! All depends on you!", total_enemies), find(*victim_faction_id), true);
+						hud_message_1_player(step, "", typesafe_sprintf(" is clutching against [color=orange]%x[/color] enemies! [color=yellow]All depends on you![/color]", total_enemies), find(*victim_faction_id), true);
 					}
 				}
 				else if (any_enemy_has_nonzero) {
@@ -1346,7 +1346,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 							return "lightred";
 						};
 
-						hud_message_2_players(step, "[color=orange]..::THE FINAL DUEL::.. [/color]", typesafe_sprintf("[color=%x] (%x HP)[/color] VS ", get_hp_col(*victim_faction_hp), *victim_faction_hp), typesafe_sprintf("[color=%x] (%x HP)[/color] !", get_hp_col(enemy_hp), enemy_hp), find(*victim_faction_id), find(*enemy_id), true);
+						hud_message_2_players(step, "[color=yellow]..::THE FINAL DUEL::.. [/color]", typesafe_sprintf("[color=%x] (%x HP)[/color] VS ", get_hp_col(*victim_faction_hp), *victim_faction_hp), typesafe_sprintf("[color=%x] (%x HP)[/color] !", get_hp_col(enemy_hp), enemy_hp), find(*victim_faction_id), find(*enemy_id), true);
 
 					}
 				}
