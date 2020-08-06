@@ -258,9 +258,19 @@ void damage_indication_system::draw_indicators(
 		const auto subject_id = s.first;
 		const auto subject = cosm[subject_id];
 
+		if (subject.dead()) {
+			continue;
+		}
+
 		const auto& streak = s.second;
 
-		const auto border_color = subject.get_official_faction() == viewed_character.get_official_faction() ? red : black;
+		const auto border_color = [&]() {
+			if (viewed_character.dead()) {
+				return black;
+			}
+
+			return subject.get_official_faction() == viewed_character.get_official_faction() ? red : black;
+		}();
 
 		{
 			/* Render the streak itself */
