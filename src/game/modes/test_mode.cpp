@@ -34,7 +34,7 @@ void test_mode::init_spawned(const input_type in, const entity_id id, const logi
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		in.rules.initial_eq.generate_for(typed_handle, step, 1);
+		in.rules.factions[typed_handle.get_official_faction()].initial_eq.generate_for(typed_handle, step, 1);
 
 		::resurrect(typed_handle);
 

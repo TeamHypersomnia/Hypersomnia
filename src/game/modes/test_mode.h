@@ -14,6 +14,12 @@ struct entity_id;
 
 class cosmos;
 
+struct test_mode_faction_rules {
+	// GEN INTROSPECTOR struct test_mode_faction_rules
+	requested_equipment initial_eq;
+	// END GEN INTROSPECTOR
+};
+
 struct test_mode_view_rules {
 	// GEN INTROSPECTOR struct test_mode_view_rules
 	double audiovisual_speed = 1.0;
@@ -31,7 +37,7 @@ struct test_mode_ruleset {
 	std::string name = "Unnamed test scene mode vars";
 
 	real32 respawn_after_ms = 3000;
-	requested_equipment initial_eq;
+	per_actual_faction<test_mode_faction_rules> factions;
 	faction_type spawned_faction = faction_type::METROPOLIS;
 	int spawned_chars = 1;
 	test_mode_view_rules view;

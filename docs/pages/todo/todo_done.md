@@ -4510,3 +4510,8 @@ Advantages:
 	- Except hpsr's ring explosion
 	- The destruction effects should only be a clue that a wall is being hit
 
+- Fix item attachment rendering order
+	- for_each_attachment_recursive won't work here because draw_under_container is only started being considered at children
+	- why not just split for_each_attachment_recursive into one for rendering and one for common operations
+		- though we still need to do complex shit with it for physics calculations so it will be almost the same probably
+

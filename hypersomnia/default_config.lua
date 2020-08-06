@@ -160,15 +160,15 @@ return {
     Q = "LAST_USED_WEAPON"
   },
   enabled_hud_messages = {
-    offset_mult = 0.8,
+    offset_mult = 0.82,
     text_color = "255 255 255 255",
     background_color = "255 255 255 10",
     background_border_color = "255 255 255 40",
     message_lifetime_secs = 4,
     max_simultaneous_messages = 3,
     message_fading_secs = 0.5,
-    box_padding = { x = 32, y = 8 },
-    box_separation = 1.1
+    box_padding = { x = 32, y = 6 },
+    box_separation = 1.05
   },
   renderer = {
     default_filtering = "NEAREST_NEIGHBOR" -- alternatively: "LINEAR"

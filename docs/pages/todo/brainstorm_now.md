@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Emphasize the items laying on the ground
+	- Like in hotline miami, they might fly a bit to upper-left direction
+	- with a little shadow behind
+		- just use existing color overlay shader for that - it will be rendered as the first
+	- screw velocity check, just identify the physical filter for it to certainly be the lying item (we don't want to apply it to grenades)
+	- a little cyclic shine on the top (might also be done with the overlay shader
+	- We could disable emphasis for the empty mags
+
 - We have improve the nomenclature for playing event sounds in bomb defusal code
 	- Maybe when we refactor the mode code
 
@@ -160,19 +168,6 @@ summary: That which we are brainstorming at the moment.
 
 - Fix version numbering on MacOS
 	- It's probably because of the shallow clone
-
-- Fix item attachment rendering order
-	- for_each_attachment_recursive won't work here because draw_under_container is only started being considered at children
-	- why not just split for_each_attachment_recursive into one for rendering and one for common operations
-		- though we still need to do complex shit with it for physics calculations so it will be almost the same probably
-
-- Emphasize the items laying on the ground
-	- Like in hotline miami, they might fly a bit to upper-left direction
-	- with a little shadow behind
-		- just use existing color overlay shader for that - it will be rendered as the first
-	- screw velocity check, just identify the physical filter for it to certainly be the lying item (we don't want to apply it to grenades)
-	- a little cyclic shine on the top (might also be done with the overlay shader
-	- We could disable emphasis for the empty mags
 
 - Left-handed option
 
