@@ -252,15 +252,16 @@ namespace test_flavours {
 			sentience.detached_head_particles.modifier.colorize = pink;
 
 			sentience.health_decrease_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES);
-			sentience.health_decrease_particles.modifier.colorize = red;
-			sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
+			sentience.health_decrease_particles.modifier.colorize = white;//rgba(251, 255, 181, 255);
+			sentience.health_decrease_particles.modifier.scale_amounts = 1.75f;
+			sentience.health_decrease_particles.modifier.scale_lifetimes = 0.8f;
 
 			sentience.health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 			sentience.corpse_health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 			sentience.headshot_sound.id = to_sound_id(test_scene_sound_id::HEADSHOT);
 			sentience.death_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 
-			sentience.head_hitbox_radius = 11.5f;
+			sentience.head_hitbox_radius = 13.0f;
 
 			sentience.loss_of_consciousness_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 			sentience.consciousness_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);

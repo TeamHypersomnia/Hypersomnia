@@ -233,18 +233,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			if (h.damage.total() > 0) {
 				auto effect = sentience.health_decrease_particles;
 
-				if (destroyed) {
-					effect.modifier.scale_amounts = 0.6f;
-					effect.modifier.scale_lifetimes = 1.25f;
-					effect.modifier.colorize = red;
-				}
-				else {
-					effect.modifier.colorize = red;
-
-					/* Fix it when we can specify modifiers per-emission */
-					effect.modifier.scale_amounts = std::min(1.f, h.damage.total() / 100.f);// (1.25f + h.damage.ratio_effective_to_maximum)*(1.25f + h.damage.ratio_effective_to_maximum);
-					effect.modifier.scale_lifetimes = 1.25f + std::min(1.f, h.damage.total() / 100.f);
-				}
+				effect.modifier.scale_amounts *= std::min(1.f, h.damage.total() / 100.f);// (1.25f + h.damage.ratio_effective_to_maximum)*(1.25f + h.damage.ratio_effective_to_maximum);
+				//effect.modifier.scale_lifetimes *= std::min(1.f, h.damage.total() / 100.f);
 
 				{
 					auto stop = messages::stop_particle_effect(predictability);
@@ -254,7 +244,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					step.post_message(stop);
 				}
 
-				auto start_in = particle_effect_start_input::orbit_local(h.subject, { vec2::zero, (h.impact_velocity).degrees() });
+				auto start_in = particle_effect_start_input::orbit_absolute(cosm[h.subject], { h.point_of_impact, (-h.impact_velocity).degrees() });
 				start_in.homing_target = h.subject;
 
 				effect.start(

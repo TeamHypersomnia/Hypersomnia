@@ -114,6 +114,7 @@ namespace test_flavours {
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 1700.f;
 					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+					a.head_radius_multiplier = 0.9f;
 
 					auto& eff = a.damage.effects;
 
@@ -158,6 +159,7 @@ namespace test_flavours {
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 1700.f;
 					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+					a.head_radius_multiplier = 0.9f;
 
 					auto& eff = a.damage.effects;
 
