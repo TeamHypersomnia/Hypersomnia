@@ -22,6 +22,7 @@
 #include "augs/templates/traits/is_enum_map.h"
 #include "augs/misc/enum/enum_map.h"
 #include "augs/templates/traits/is_nullopt.h"
+#include "augs/misc/enum/is_enum_boolset.h"
 
 #define HIDE_DISABLED_MAYBES 1
 
@@ -292,19 +293,19 @@ void detail_general_edit_properties(
 				detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, label, altered.value, nodify);
 #endif
 			}
-			else if constexpr(is_std_array_v<T> || is_enum_array_v<T>) {
+			else if constexpr(is_std_array_v<T> || is_enum_array_v<T> || is_enum_boolset_v<T>) {
 				auto further = [&]() {
 					for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
 						std::string element_label;
 
-						if constexpr(is_enum_array_v<T>) {
+						if constexpr(is_enum_array_v<T> || is_enum_boolset_v<T>) {
 							element_label = format_enum(static_cast<typename T::enum_type>(i));
 						}
 						else {
 							element_label = std::to_string(i);
 						}
 
-						detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, element_label, altered[i]);
+						detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, element_label, *(altered.begin() + i));
 					}
 				};
 
