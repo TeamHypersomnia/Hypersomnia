@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include <functional>
 
 #include "augs/math/vec2.h"
 #include "augs/misc/timing/delta.h"
