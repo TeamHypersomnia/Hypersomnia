@@ -398,12 +398,12 @@ void movement_system::apply_movement_forces(const logic_step step) {
 #endif
 						[&](const auto ground_id) {
 							if (const auto ground_entity = cosm[ground_id]) {
-								const auto& ground = ground_entity.template get<invariants::ground>();
-
-								if (ground.footstep_effect.is_enabled) {
-									chosen_effect = ground.footstep_effect.value;
-									chosen_speed_mult = ground.movement_speed_mult;
-									return true;
+								if (const auto ground = ground_entity.template find<invariants::ground>()) {
+									if (ground->footstep_effect.is_enabled) {
+										chosen_effect = ground->footstep_effect.value;
+										chosen_speed_mult = ground->movement_speed_mult;
+										return true;
+									}
 								}
 							}
 
