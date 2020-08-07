@@ -20,6 +20,7 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "augs/gui/formatted_string.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
+#include "game/detail/visible_entities.hpp"
 #include "game/detail/buy_area_in_range.h"
 
 #include "game/detail/flavour_presentation.h"
