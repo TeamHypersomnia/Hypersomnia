@@ -116,7 +116,7 @@ namespace test_scenes {
 			resistance.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			metropolis.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
-#define GIVE_FULL 1
+#define GIVE_FULL 0
 #define GIVE_AMMO 1
 
 #if GIVE_AMMO
@@ -345,6 +345,13 @@ namespace test_scenes {
 			r.generate_for(character, step);
 		};
 
+		auto give_armor = [&](const auto& character) {
+			requested_equipment r;
+			r.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+
+			r.generate_for(character, step);
+		};
+
 		const auto metropolis_type = test_controlled_characters::METROPOLIS_SOLDIER;
 		const auto resistance_type = test_controlled_characters::RESISTANCE_SOLDIER;
 
@@ -385,6 +392,10 @@ namespace test_scenes {
 				/* Give some stuff to three test characters */
 				give_weapon(new_character, test_shootable_weapons::BILMER2000);
 				give_backpack(new_character, is_metropolis ? sample_backpack : brown_backpack);
+			}
+
+			if (i == 3) {
+				give_armor(new_character);
 			}
 		}
 
