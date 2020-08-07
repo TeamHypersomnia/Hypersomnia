@@ -4,6 +4,8 @@ enum class render_layer {
 	// GEN INTROSPECTOR enum class render_layer
 	INVALID,
 
+	DISABLED,
+
 	GROUND,
 
 	PLANTED_ITEMS,
