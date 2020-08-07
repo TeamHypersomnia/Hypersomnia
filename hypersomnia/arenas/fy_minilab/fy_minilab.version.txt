@@ -1,5 +1,5 @@
 Hypersomnia version 1.0.7437
-Revision no.: 7437 (dirty)
-Build date: Sat Aug 1 16:05:02 2020
+Revision no.: 7437 (clean)
+Build date: Thu Aug 6 21:21:31 2020
 Commit message:
-Rename "flying_number_indicato(...)
+Highlight lying items like in (...)
