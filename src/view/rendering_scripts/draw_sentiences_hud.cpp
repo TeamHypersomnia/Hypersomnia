@@ -140,7 +140,11 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					const auto& meter_metas = cosm.get_common_significant().meters;
 					const auto chosen_ratio = draw_shield ? shield : health;
 
-					const auto& chosen_appearance = draw_shield ? std::get<personal_electricity_meter>(meter_metas).appearance : std::get<health_meter>(meter_metas).appearance;
+					const auto& chosen_appearance = 
+						draw_shield ? 
+						std::get<personal_electricity_meter>(meter_metas).appearance : 
+						std::get<health_meter>(meter_metas).appearance
+					;
 
 					const auto bar_color = chosen_appearance.bar_color;
 

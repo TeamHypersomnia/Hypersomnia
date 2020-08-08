@@ -17,8 +17,8 @@ struct scoreboard_gui_settings {
 	// GEN INTROSPECTOR struct scoreboard_gui_settings
 	vec2i player_row_inner_padding = vec2i(2, 4);
 	vec2i window_padding = vec2i(4, 8);
-	rgba background_color;
-	rgba border_color;
+	rgba background_color = black;
+	rgba border_color = white;
 	float cell_bg_alpha = 0.8f;
 
 	float bg_lumi_mult = 0.5f;
