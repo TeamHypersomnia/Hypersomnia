@@ -300,7 +300,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			hs_effect.start(
 				step,
 				sound_effect_start_input::at_listener(subject),
-				always_predictable_v
+				never_predictable_v
 			);
 		}
 	}
