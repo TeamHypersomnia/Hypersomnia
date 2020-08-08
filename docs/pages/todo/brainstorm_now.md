@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Let only the headshot sound wait for confirmation
+- Fix first blood being counted during warmup
+- Make the shield a bit lighter for balance
+
 - Item emphasis implementation
 	- First pass: shadows
 		- Just render all items with pure color shader, with varying intensity (the closer the item to ground, the less shadow)
