@@ -161,7 +161,9 @@ void value_bar::draw(
 		);
 
 		auto current_value_bar_rect = value_bar_rect;
-		const auto bar_width = static_cast<int>(current_value_bar_rect.w() * current_value_ratio);
+
+		const auto bar_width = std::max(0, static_cast<int>(current_value_bar_rect.w() * current_value_ratio));
+
 		current_value_bar_rect.w(static_cast<float>(bar_width));
 
 		output.aabb(current_value_bar_rect, bar_col);
