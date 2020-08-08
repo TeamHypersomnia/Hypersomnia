@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Check if we don't assume too much about the subject in damage indication system
+	- or in draw sentiences hud for that matter
+- both should abort early if the subject is not sentient
+- be wary of any state that you hold in damage indication system
+	- because the ids might change identities or become dead suddenly
+
 - Let only the headshot sound wait for confirmation
 - Fix first blood being counted during warmup
 - Make the shield a bit lighter for balance

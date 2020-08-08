@@ -1496,7 +1496,7 @@ namespace test_flavours {
 			missile.damage.impact_impulse = 450.f;
 			missile.damage.impulse_multiplier_against_sentience = 1.f;
 			missile.ricochet_born_cooldown_ms = 17.f;
-			missile.pe_damage_ratio = 0.4f;
+			missile.pe_damage_ratio = 0.15f;
 			missile.max_lifetime_ms = 1000.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
@@ -4048,6 +4048,8 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {1450.f, 1450.f};
 			gun_def.shot_cooldown_ms = 500.f;
+			gun_def.headshot_multiplier = 2.0f;
+			gun_def.head_radius_multiplier = 0.2f;
 
 			gun_def.damage_multiplier = 1.f;
 
