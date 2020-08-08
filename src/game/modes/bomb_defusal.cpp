@@ -2672,6 +2672,8 @@ const bomb_defusal_player* bomb_defusal::find_player_by(const entity_name_str& c
 void bomb_defusal::restart(const input_type in, const logic_step step) {
 	reset_players_stats(in);
 	factions = {};
+	was_first_blood = false;
+	prepare_to_fight_counter = 0;
 
 	if (in.rules.warmup_secs > 4) {
 		state = arena_mode_state::WARMUP;
