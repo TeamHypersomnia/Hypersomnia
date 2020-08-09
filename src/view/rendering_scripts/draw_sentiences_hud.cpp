@@ -51,7 +51,6 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 		return watched_character.get_official_faction() == f.get_official_faction();
 	};
 
-	const auto timestamp_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
 	const auto outermost_circle_radius = static_cast<int>(in.meters[0].tex.get_original_size().x / 2);
 
 	auto draw_character = [&](const auto& drawn_character) {
@@ -262,19 +261,26 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 						using I = decltype(d);
 						using M = typename I::meta_type;
 
-						bar_info out;
 						const auto& m = sentience.template get<I>();
 
-						out.ratio = m.get_ratio();
+						auto out = bar_info();
+						out.ratio = std::max(0.0f, m.get_ratio());
 						out.value = m.value;
 
 						if constexpr(std::is_same_v<M, health_meter>) {
 							out.is_health = true;
 
-							const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - out.ratio));
-							const float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
+							const auto single_pulse_cycle_ms = static_cast<int>(1250 - 1000 * (1 - out.ratio));
 
-							out.color = sentience.calc_health_color(time_pulse_ratio);
+							if (single_pulse_cycle_ms > 0) {
+								const auto global_time_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
+								const float time_pulse_ratio = (global_time_ms % single_pulse_cycle_ms) / static_cast<float>(single_pulse_cycle_ms);
+
+								out.color = sentience.calc_health_color(time_pulse_ratio);
+							}
+							else {
+								out.color = sentience.calc_health_color(1.0f);
+							}
 						}
 						else {
 							const auto& meta = std::get<M>(cosm.get_common_significant().meters);

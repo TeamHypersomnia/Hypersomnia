@@ -656,6 +656,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 	colors = {
       SPECTATOR = {
 		  standard = "200 200 200 255",
+		  current_player_text = "215 215 215 255",
 		  background_dark = "0 0 0 0"
 	  },
       METROPOLIS = {
