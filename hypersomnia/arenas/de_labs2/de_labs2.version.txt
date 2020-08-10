@@ -1,5 +1,5 @@
-Hypersomnia version 1.0.7437
-Revision no.: 7437 (dirty)
-Build date: Sat Aug 1 16:05:02 2020
+Hypersomnia version 1.0.7526
+Revision no.: 7526 (clean)
+Build date: Sun Aug 9 18:38:28 2020
 Commit message:
-Rename "flying_number_indicato(...)
+Fix division by zero. Thanks m(...)
