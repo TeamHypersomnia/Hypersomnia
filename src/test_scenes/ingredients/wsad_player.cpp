@@ -261,7 +261,7 @@ namespace test_flavours {
 			sentience.headshot_sound.id = to_sound_id(test_scene_sound_id::HEADSHOT);
 			sentience.death_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 
-			sentience.head_hitbox_radius = 12.0f;
+			sentience.head_hitbox_radius = 11.0f;
 
 			sentience.loss_of_consciousness_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 			sentience.consciousness_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
