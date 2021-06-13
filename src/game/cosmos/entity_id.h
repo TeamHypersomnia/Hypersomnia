@@ -132,6 +132,14 @@ struct typed_entity_id {
 		return { raw, entity_type_id::of<E>() };
 	}
 
+	bool operator==(const entity_id b) const {
+		return entity_id(*this) == b;
+	}
+
+	bool operator!=(const entity_id b) const {
+		return !operator==(b);
+	}
+
 	bool operator==(const typed_entity_id<E> b) const {
 		return raw == b.raw;
 	}

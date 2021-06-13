@@ -343,6 +343,16 @@ public:
 		return owner;
 	}
 
+	template <bool BC>
+	bool operator==(const basic_entity_handle<BC>& h) {
+		return this->get_id() == h.get_id();
+	}
+
+	template <bool BC>
+	bool operator!=(const basic_entity_handle<BC>& h) {
+		return this->get_id() != h.get_id();
+	}
+
 	bool operator==(const this_handle_type& h) const {
 		return this->get_id() == h.get_id();
 	}
