@@ -343,19 +343,13 @@ public:
 		return owner;
 	}
 
-	bool operator==(const basic_entity_handle<false>& h) const {
+	template <bool BC>
+	bool operator==(const basic_entity_handle<BC>& h) const {
 		return this->get_id() == h.get_id();
 	}
 
-	bool operator!=(const basic_entity_handle<false>& h) const {
-		return this->get_id() != h.get_id();
-	}
-
-	bool operator==(const basic_entity_handle<true>& h) const {
-		return this->get_id() == h.get_id();
-	}
-
-	bool operator!=(const basic_entity_handle<true>& h) const {
+	template <bool BC>
+	bool operator!=(const basic_entity_handle<BC>& h) const {
 		return this->get_id() != h.get_id();
 	}
 
