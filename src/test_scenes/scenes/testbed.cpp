@@ -409,7 +409,7 @@ namespace test_scenes {
 				{ 1200, 30400 },
 			};
 
-			for (const auto c : coords) {
+			for (const auto& c : coords) {
 				create(crate_type, c + vec2(-100, 400) );
 				create(crate_type, c + vec2(300, 300) );
 				create(crate_type, c + vec2(100, -200) );
