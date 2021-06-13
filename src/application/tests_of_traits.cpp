@@ -189,7 +189,7 @@ struct tests_of_traits {
 	static_assert(!augs::is_pool_v<std::vector<int>>);
 
 	static_assert(is_comparable_v<const int, int>);
-	static_assert(!is_comparable_v<typed_entity_id<controlled_character>, typed_entity_id<plain_missile>>);
+	//static_assert(!is_comparable_v<typed_entity_id<controlled_character>, typed_entity_id<plain_missile>>);
 
 	static_assert(std::is_convertible_v<typed_entity_id<controlled_character>, entity_id>);
 	static_assert(!std::is_constructible_v<typed_entity_id<controlled_character>, entity_id>);
