@@ -1,4 +1,4 @@
-#include <sol2/sol.hpp>
+#include <sol/sol.hpp>
 
 #include "augs/log.h"
 #include "augs/ensure.h"

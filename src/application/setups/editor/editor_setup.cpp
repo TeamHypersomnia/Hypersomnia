@@ -1812,7 +1812,7 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 
 }
 
-#include "3rdparty/sol2/sol/unicode.hpp"
+#include <sol/unicode.hpp>
 
 void editor_setup::draw_marks_gui(const draw_setup_gui_input& in) {
 	if (anything_opened() && is_editing_mode()) {

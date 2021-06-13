@@ -1,6 +1,6 @@
 #pragma once
 #include <type_traits>
-#include <sol2/sol.hpp>
+#include <sol/sol.hpp>
 #include "augs/misc/is_constant_size_string.h"
 
 #define LUA_TRAITS_INCLUDED 1

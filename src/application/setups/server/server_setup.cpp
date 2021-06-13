@@ -1877,7 +1877,7 @@ const netcode_socket_t* server_setup::find_underlying_socket() const {
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
 #include "augs/misc/lua/lua_utils.h"
-#include <sol2/sol.hpp>
+#include <sol/sol.hpp>
 #include "augs/readwrite/lua_file.h"
 
 TEST_CASE("NetSerialization EmptyEntropies") {

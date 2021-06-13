@@ -5,7 +5,7 @@
 #include <string>
 #include <optional>
 
-#include <sol2/sol.hpp>
+#include <sol/sol.hpp>
 
 #include "augs/math/camera_cone.h"
 #include "augs/templates/thread_templates.h"
