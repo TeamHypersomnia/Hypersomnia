@@ -1,7 +1,7 @@
 environment:
   ARTIFACT_UPLOAD_KEY:
-    secure: BunFdgloJyh1ho/GH4LAOdEIADDDYuz2qN+WzJWUHXz/3G3C8YuXXMeFV06MedP4VN87yPJ7LC525SqfknmoaOIG9WSeZNQvgODCXWytaKqm/2VvENSv+I44arrmhzhCHwc91eFITSy0AEO/aPyyKx2jwmHMGmzpYlU8Lvs0yGDRFx5NUmCk+Tm0ljoquSWp
-
+    secure: RHbu43tdJM7+jbxWijmedDv+BQmwu2J7AaGCKYfsj1nUO/T4rpKRgQwpA5hPwu6og+oMiWrNMTQfRVuHlAYhL5wRTCV0SQOJbCbi0PcDYbdlawbin03g294IIOxYWxBB
+    
 version: 1.0.{build}
 branches:
   only:
