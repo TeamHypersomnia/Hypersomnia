@@ -90,7 +90,7 @@ namespace augs {
 			return arr.begin() + size();
 		}
 
-		static constexpr std::size_t max_size() {
+		constexpr std::size_t max_size() {
 			return const_count;
 		}
 

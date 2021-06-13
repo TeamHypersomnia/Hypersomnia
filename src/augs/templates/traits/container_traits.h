@@ -13,17 +13,11 @@ template <class T, class = void>
 struct has_constexpr_max_size : std::false_type {};
 
 template <class T>
-struct has_constexpr_max_size<T, decltype(constexpr_tester<T::max_size()>(), void())> : std::true_type {};
-
-template <class T>
 struct has_constexpr_max_size<T, decltype(constexpr_tester<T().max_size()>(), void())> : std::true_type {};
 
 
 template <class T, class = void>
 struct has_constexpr_size : std::false_type {};
-
-template <class T>
-struct has_constexpr_size<T, decltype(constexpr_tester<T::size()>(), void())> : std::true_type {};
 
 template <class T>
 struct has_constexpr_size<T, decltype(constexpr_tester<T().size()>(), void())> : std::true_type {};
