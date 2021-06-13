@@ -161,8 +161,16 @@ public:
 		return raw_id == h.raw_id;
 	}
 
+	bool operator!=(const this_handle_type& h) const {
+		return raw_id != h.raw_id;
+	}
+
 	bool operator==(const basic_entity_handle<!is_const>& h) const {
 		return raw_id == h.raw_id;
+	}
+
+	bool operator!=(const basic_entity_handle<!is_const>& h) const {
+		return raw_id != h.raw_id;
 	}
 
 	bool operator==(const entity_id id) const {

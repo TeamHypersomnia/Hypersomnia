@@ -343,13 +343,19 @@ public:
 		return owner;
 	}
 
-	template <bool BC>
-	bool operator==(const basic_entity_handle<BC>& h) {
+	bool operator==(const basic_entity_handle<false>& h) const {
 		return this->get_id() == h.get_id();
 	}
 
-	template <bool BC>
-	bool operator!=(const basic_entity_handle<BC>& h) {
+	bool operator!=(const basic_entity_handle<false>& h) const {
+		return this->get_id() != h.get_id();
+	}
+
+	bool operator==(const basic_entity_handle<true>& h) const {
+		return this->get_id() == h.get_id();
+	}
+
+	bool operator!=(const basic_entity_handle<true>& h) const {
 		return this->get_id() != h.get_id();
 	}
 
@@ -357,8 +363,16 @@ public:
 		return this->get_id() == h.get_id();
 	}
 
+	bool operator!=(const this_handle_type& h) const {
+		return this->get_id() != h.get_id();
+	}
+
 	bool operator==(const specific_entity_handle<!is_const, entity_type, identifier_provider>& h) const {
 		return this->get_id() == h.get_id();
+	}
+
+	bool operator!=(const specific_entity_handle<!is_const, entity_type, identifier_provider>& h) const {
+		return this->get_id() != h.get_id();
 	}
 
 	bool operator==(const entity_id id) const {
