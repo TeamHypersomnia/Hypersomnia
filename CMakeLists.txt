@@ -963,7 +963,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/lua"
-	"${PROJECT_SOURCE_DIR}/src/3rdparty/sol2"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/sol2/include"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable.io"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode.io"
