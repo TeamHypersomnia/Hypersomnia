@@ -543,7 +543,7 @@ FORCE_INLINE void specific_draw_border(
 				vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
 			};
 
-			for (const auto o : offsets) {
+			for (const auto& o : offsets) {
 				input.renderable_transform.pos = source_pos + o;
 				augs::draw(renderable, manager, input);
 			}

@@ -173,7 +173,7 @@ namespace augs {
 			vec2i(-1, 0), vec2i(1, 0), vec2i(0, 1), vec2i(0, -1)
 		};
 
-		for (const auto o : offsets) {
+		for (const auto& o : offsets) {
 			const auto offset_pos = pos + o;
 
 			augs::detail_sprite(
