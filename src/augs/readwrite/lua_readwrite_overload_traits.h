@@ -1,5 +1,5 @@
 #pragma once
-#include <sol2/sol/forward.hpp>
+#include <sol/forward.hpp>
 #include <type_traits>
 
 #define LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED 1
