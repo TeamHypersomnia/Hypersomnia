@@ -18,7 +18,7 @@ using cosmos_id_type = int;
 class cosmos {
 	template <class C, class F>
 	static void for_each_in_impl(C& self, const processing_subjects f, F callback) {
-		for (const auto subject : self.get_solvable_inferred().processing.get(f)) {
+		for (auto&& subject : self.get_solvable_inferred().processing.get(f)) {
 			callback(self[subject]);
 		}
 	}

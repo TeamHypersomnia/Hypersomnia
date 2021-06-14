@@ -18,7 +18,7 @@ void regenerate_and_gather_subjects(
 	{
 		output.clear();
 
-		for (const auto& r : in.necessary_image_definitions) {
+		for (auto&& r : in.necessary_image_definitions) {
 			output.images.emplace_back(r.second.get_source_path().path);
 		}
 
@@ -155,7 +155,7 @@ general_atlas_output create_general_atlas(
 	);
 
 	{
-		for (const auto& r : subjects.necessary_image_definitions) {
+		for (auto&& r : subjects.necessary_image_definitions) {
 			out.necessary_atlas_entries[r.first] = baked.images.at(r.second.get_source_path().path);
 		}
 

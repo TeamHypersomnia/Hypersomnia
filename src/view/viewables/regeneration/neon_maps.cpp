@@ -139,7 +139,7 @@ void make_neon(
 	scan_and_hide_undesired_pixels(source, input.light_colors, pixel_coordinates);
 	generate_gauss_kernel(input, kernel);
 
-	for (const auto p : pixel_coordinates) {
+	for (const auto& p : pixel_coordinates) {
 		pixels_original.emplace_back(source.pixel(p));
 	}
 
