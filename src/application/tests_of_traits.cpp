@@ -151,8 +151,6 @@ struct tests_of_traits {
 	static_assert(same<test_type_map::at<float>, const char*>);
 	static_assert(same<test_type_map::at<const int>, std::string>);
 
-	static_assert(augs::constant_size_vector_base<int, 20>().capacity() == 20, "Trait has failed");
-
 	static_assert(augs::is_byte_stream_v<augs::memory_stream>);
 	static_assert(augs::is_byte_stream_v<augs::cref_memory_stream>);
 	static_assert(augs::is_byte_stream_v<derivedstreamtest>);
