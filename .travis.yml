@@ -24,7 +24,7 @@ addons:
      - p7zip
      - p7zip-full
      - libgl1-mesa-dev
-     - libglx0
+     - libxcb-glx0-dev
 
 branches:
   only:
