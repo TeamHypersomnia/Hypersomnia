@@ -83,11 +83,11 @@ namespace augs {
 
 		explicit pool(const size_type slot_count) {
 			if constexpr(constexpr_max_size) {
-				static_assert(
-					object_pool_type().max_size() <= 
-					std::numeric_limits<size_type>::max() - 1,
-					"The container can hold more elements than the pool can index with size_type!"
-				);
+				//static_assert(
+					//objects.max_size() <= 
+					//std::numeric_limits<size_type>::max() - 1,
+					//"The container can hold more elements than the pool can index with size_type!"
+				//);
 			}
 
 			reserve(slot_count);

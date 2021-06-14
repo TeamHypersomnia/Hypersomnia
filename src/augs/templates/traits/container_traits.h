@@ -5,38 +5,25 @@
 
 #include "augs/templates/traits/has_begin_and_end.h"
 #include "augs/templates/traits/is_std_array.h"
-
-template <int t>
-struct constexpr_tester {};
-
-template <class T, class = void>
-struct has_constexpr_max_size : std::false_type {};
-
-template <class T>
-struct has_constexpr_max_size<T, decltype(constexpr_tester<T().max_size()>(), void())> : std::true_type {};
-
-
-template <class T, class = void>
-struct has_constexpr_size : std::false_type {};
-
-template <class T>
-struct has_constexpr_size<T, decltype(constexpr_tester<T().size()>(), void())> : std::true_type {};
-
-/*	
-	Unfortunately, there are problems detecting constexpr-ness in MSVC, 
-	so we need to make a special case for std::array. 
-*/
+#include "augs/templates/traits/is_enum_map.h"
+#include "augs/misc/is_constant_size_vector.h"
+#include "augs/misc/is_constant_size_string.h"
+#include "augs/misc/enum/is_enum_boolset.h"
 
 template <class T>
 constexpr bool has_constexpr_max_size_v =
 	is_std_array_v<T> 
-	|| has_constexpr_max_size<T>::value
+	|| is_enum_array_v<T>
+	|| is_constant_size_vector_v<T> 
+	|| is_constant_size_string_v<T>
+	|| is_enum_map_v<T>
 ;
 
 template <class T>
 constexpr bool has_constexpr_size_v =
-	is_std_array_v<T> 
-	|| has_constexpr_size<T>::value
+	is_std_array_v<T>
+	|| is_enum_array_v<T> 
+	|| is_enum_boolset_v<T> 
 ;
 
 template <class T, class = void>

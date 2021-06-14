@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- has_size_limit easily just check if the max_size is in sensible range
+- sort out those damn max_size/size constexpr traits or get rid of them altogether
+	- there is one in explicit pool(const size_type slot_count) {
+- move is constant size vector/string to traits
 - sort out the max_fps problem
 - neons aren't occluded beneath the sentiences again (pixel format problem again?)
 
