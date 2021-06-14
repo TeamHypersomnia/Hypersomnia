@@ -164,7 +164,7 @@ public:
 
 	template <bool AA, class BB, template <class> class CC>
 	bool operator!=(const specific_entity_handle<AA, BB, CC>& other_handle) const {
-		return get_id() == other_handle.get_id(); 
+		return get_id() != other_handle.get_id(); 
 	}
 
 	bool operator==(const this_handle_type& h) const {
