@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- sort out the max_fps problem
+- neons aren't occluded beneath the sentiences again (pixel format problem again?)
+
 - Check if we don't assume too much about the subject in damage indication system
 	- or in draw sentiences hud for that matter
 - both should abort early if the subject is not sentient

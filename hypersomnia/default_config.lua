@@ -650,7 +650,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       y = 700
     },
 	vsync_mode = "OFF",
-	enabled_max_fps = 300,
+	disabled_max_fps = 300,
   },
   faction_view = {
 	colors = {
