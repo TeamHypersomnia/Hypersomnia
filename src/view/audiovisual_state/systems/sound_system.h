@@ -144,7 +144,7 @@ class sound_system {
 		recorded_meta recorded;
 	};
 
-	augs::simple_id_pool<augs::constant_size_vector<augs::sound_source_proxy_id, SOUNDS_SOURCES_IN_POOL>> id_pool;
+	augs::simple_id_pool<augs::constant_size_vector<augs::sound_source_proxy_id, SOUNDS_SOURCES_IN_POOL>> id_pool = SOUNDS_SOURCES_IN_POOL;
 
 	audiovisual_cache_map<continuous_sound_cache> firearm_engine_caches;
 	audiovisual_cache_map<continuous_sound_cache> continuous_sound_caches;

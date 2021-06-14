@@ -1,6 +1,5 @@
 #pragma once
 #include <optional>
-#include "augs/templates/traits/container_traits.h"
 
 namespace augs {
 	template <class Container>
@@ -9,10 +8,10 @@ namespace augs {
 
 		Container ids;
 	public:
-		static_assert(has_constexpr_max_size_v<Container>);
-
-		simple_id_pool() {
-			reset();
+		simple_id_pool() = default;
+		
+		simple_id_pool(const std::size_t max_size) {
+			reset(max_size);
 		}
 
 		id_type allocate() {
@@ -30,8 +29,7 @@ namespace augs {
 			return ids.empty();
 		}
 
-		void reset() {
-			const auto max_size = ids.max_size();
+		void reset(const std::size_t max_size) {
 			ids.resize(max_size);
 
 			for (std::size_t i = 0; i < max_size; ++i) {

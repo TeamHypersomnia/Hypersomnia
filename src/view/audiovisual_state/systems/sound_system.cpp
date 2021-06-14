@@ -49,7 +49,7 @@ void sound_system::clear() {
 	continuous_sound_caches.clear();
 	collision_sound_cooldowns.clear();
 	damage_sound_cooldowns.clear();
-	id_pool.reset();
+	id_pool.reset(SOUNDS_SOURCES_IN_POOL);
 }
 
 void sound_system::generic_sound_cache::stop_and_free(const update_properties_input& in) {
