@@ -18,7 +18,7 @@ inline void draw_pixel_line_connector(
 	const ltrb& target,
 	const rgba col
 ) {
-	for (const auto l : get_connecting_pixel_lines(origin, target)) {
+	for (const auto& l : get_connecting_pixel_lines(origin, target)) {
 		drawer.line(l[0], l[1], 1.f, col);
 	}
 }

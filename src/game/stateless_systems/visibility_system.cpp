@@ -451,13 +451,13 @@ void visibility_system::calc_visibility(
 				lines.emplace_back(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), vis_rect_col);
 			}
 
-			for (const auto v : output) {
+			for (const auto& v : output) {
 				push_vertex_on_boundary(v);
 			}
 		}
 
 		/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
-		for (const auto v : whole_vision) {
+		for (const auto& v : whole_vision) {
 			push_vertex_on_boundary(v);
 		}
 

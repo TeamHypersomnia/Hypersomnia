@@ -404,7 +404,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 					now
 				);
 
-				for (const auto w : wielded) {
+				for (const auto& w : wielded) {
 					cosm[w].dispatch_on_having_all<components::gun>(
 						[&](const auto& typed_gun) {
 							typed_gun.template get<components::gun>().interfer_once = true;

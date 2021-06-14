@@ -79,7 +79,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			}
 		};
 
-		for (const auto subject_item_id : in.character.get_wielded_items()) {
+		for (const auto& subject_item_id : in.character.get_wielded_items()) {
 			const auto subject_item = cosm[subject_item_id];
 
 			if (subject_item.has<components::gun>() || is_weapon_like(subject_item)) {
