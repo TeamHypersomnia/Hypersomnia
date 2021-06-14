@@ -34,7 +34,7 @@ python:
 
 matrix:
   include:
-  - env: c_compiler=clang-12 cxx_compiler=clang++-12 config=Release other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"
+  - env: c_compiler=clang-12 cxx_compiler=clang++-12 config=Release other_cmake_flags="-DUSE_GLFW=1 -DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"
     compiler: clang-12
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
 #    compiler: gcc
