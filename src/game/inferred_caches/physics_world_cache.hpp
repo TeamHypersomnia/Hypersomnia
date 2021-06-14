@@ -302,28 +302,30 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	auto& constructed_fixtures = cache.constructed_fixtures;
 	ensure(constructed_fixtures.empty());
 
-	auto flips = handle.calc_flip_flags();
+	auto flips = flip_flags();
 
-	if (connection.flip_geometry) {
-		flips->vertically = !flips->vertically;
+	if (const auto overridden_flip = handle.calc_flip_flags()) {
+		flips = *overridden_flip;
 	}
 
-	const bool flip_order = flips && flips->vertically != flips->horizontally;
+	if (connection.flip_geometry) {
+		flips.vertically = !flips.vertically;
+	}
+
+	const bool flip_order = flips.vertically != flips.horizontally;
 
 	auto from_convex_partition = [&](auto shape) {
 		shape.offset_vertices(connection.shape_offset);
 
-		if (flips) {
-			if (flips->horizontally) {
-				for (auto& v : shape.original_poly) {
-					v.neg_x();
-				}
+		if (flips.horizontally) {
+			for (auto& v : shape.original_poly) {
+				v.neg_x();
 			}
+		}
 
-			if (flips->vertically) {
-				for (auto& v : shape.original_poly) {
-					v.neg_y();
-				}
+		if (flips.vertically) {
+			for (auto& v : shape.original_poly) {
+				v.neg_y();
 			}
 		}
 
