@@ -10,7 +10,6 @@ namespace augs {
 		using base::any;
 		using base::all;
 		using base::operator==;
-		using base::operator!=;
 		using base::size;
 		using base::to_ulong;
 		using base::to_ullong;
@@ -20,7 +19,7 @@ namespace augs {
 		}
 
 		bool operator!=(const enum_bitset& b) const {
-			return base::operator!=(b);
+			return !operator==(b);
 		}
 
 		bool test(const _enum f) const {
