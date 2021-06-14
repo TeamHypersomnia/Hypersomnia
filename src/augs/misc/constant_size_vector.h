@@ -283,11 +283,11 @@ namespace augs {
 			return static_cast<std::size_t>(count);
 		}
 
-		constexpr std::size_t max_size() {
+		constexpr std::size_t max_size() const noexcept {
 			return const_count;
 		}
 
-		constexpr std::size_t capacity() {
+		constexpr std::size_t capacity() const noexcept {
 			return const_count;
 		}
 
