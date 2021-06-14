@@ -33,7 +33,7 @@ void input_system::make_input_messages(const logic_step step) {
 			step.post_message(msg);
 		}
 
-		for (const auto& motion : commands.motions) {
+		for (const auto motion : commands.motions) {
 			auto msg = messages::motion_message();
 
 			const auto type = motion.first;

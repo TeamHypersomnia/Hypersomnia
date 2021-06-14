@@ -787,7 +787,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 								ensure_greater(static_cast<int>(bullet_stacks.size()), 0);
 
-								for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
+								for (const auto& single_bullet_or_pellet_stack_id : bullet_stacks) {
 									const auto single_bullet_or_pellet_stack = cosm[single_bullet_or_pellet_stack_id];
 
 									int charges = { single_bullet_or_pellet_stack.get<components::item>().get_charges() };

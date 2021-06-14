@@ -1,3 +1,5 @@
+- neons aren't occluded beneath the sentiences again (pixel format problem again?)
+	- it's actually ok, it's just that there is a corner case on ct spawn on cyberaqua
 
 - minimize use of b2Rot() constructor for angle, use SetIdentity
 

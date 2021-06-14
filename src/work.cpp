@@ -2408,7 +2408,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				/* Distribution of all the remaining input happens here. */
 
-				for (const auto e : new_window_entropy) {
+				for (const auto& e : new_window_entropy) {
 					using namespace augs::event;
 					using namespace keys;
 					

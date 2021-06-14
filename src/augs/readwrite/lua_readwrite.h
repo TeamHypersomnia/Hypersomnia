@@ -468,7 +468,7 @@ namespace augs {
 			else {
 				int counter = 1;
 
-				for (const auto& element : from) {
+				for (auto&& element : from) {
 					if constexpr(is_associative_v<Container>) {
 						auto key_value_pair_table = output_table.create();
 
