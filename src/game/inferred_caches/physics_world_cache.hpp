@@ -332,7 +332,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		unsigned ci = 0;
 
 		auto add_convex = [&](const auto& convex) {
-			augs::constant_size_vector<b2Vec2, decltype(logic_convex_poly::original_poly)().max_size()> b2verts(
+			augs::constant_size_vector<b2Vec2, POLY_VERTEX_COUNT> b2verts(
 				convex.begin(), 
 				convex.end()
 			);

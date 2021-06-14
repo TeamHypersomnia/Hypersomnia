@@ -84,7 +84,7 @@ template <class K>
 basic_player_commands<K>& basic_player_commands<K>::operator+=(const basic_player_commands<K>& r) {
 	concatenate(intents, r.intents);
 	
-	for (const auto& it : r.motions) {
+	for (const auto it : r.motions) {
 		if (auto m = mapped_or_nullptr(motions, it.first)) {
 			*m += it.second;
 		}

@@ -343,7 +343,7 @@ int count_charges_in_deposit(const const_entity_handle item) {
 int count_charges_inside(const const_inventory_slot_handle id) {
 	int charges = 0;
 
-	for (const auto i : id.get_items_inside()) {
+	for (const auto& i : id.get_items_inside()) {
 		charges += id.get_cosmos()[i].get<components::item>().get_charges();
 	}
 
@@ -364,7 +364,7 @@ inventory_space_type calc_space_occupied_with_children(const const_entity_handle
 	if (auto* const container = item_entity.find<invariants::container>()) {
 		ensure_eq(item_entity.get<components::item>().get_charges(), 1);
 
-		for (const auto& slot : container->slots) {
+		for (const auto slot : container->slots) {
 			if (slot.second.contributes_to_space_occupied) {
 				for (const auto entity_in_slot : item_entity[slot.first].get_items_inside()) {
 					space_occupied += calc_space_occupied_with_children(item_entity.get_cosmos()[entity_in_slot]);

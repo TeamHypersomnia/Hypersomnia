@@ -63,7 +63,7 @@ struct item_button : game_gui_rect_node {
 			[&](const auto& typed_container) {
 				const auto& container = typed_container.template get<invariants::container>();
 
-				for (const auto& s : container.slots) {
+				for (const auto s : container.slots) {
 					{
 						slot_button_in_container child_slot_location;
 						child_slot_location.slot_id.type = s.first;
