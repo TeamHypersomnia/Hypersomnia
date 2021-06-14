@@ -438,7 +438,7 @@ namespace augs {
 			*/
 
 			if constexpr(is_associative_v<Container> && key_representable_as_lua_value_v<Container>) {
-				for (const auto& element : from) {
+				for (auto&& element : from) {
 					write_table_or_field(output_table, element.second, general_to_lua_value(element.first));
 				}
 			}
