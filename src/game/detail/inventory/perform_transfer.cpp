@@ -243,7 +243,7 @@ perform_transfer_result perform_transfer_impl::operator()(
 
 		entity_id stack_target_id;
 
-		for (const auto potential_stack_target : target_slot.get_items_inside()) {
+		for (const auto& potential_stack_target : target_slot.get_items_inside()) {
 			if (can_stack_entities(transferred_item, cosm[potential_stack_target])) {
 				stack_target_id = potential_stack_target;
 				break;

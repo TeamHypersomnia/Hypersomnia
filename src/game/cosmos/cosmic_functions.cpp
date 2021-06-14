@@ -207,7 +207,7 @@ void entity_deleter(
 	handle.dispatch_on_having_all<invariants::container>([&](const auto& typed_handle) {
 		const auto& container = typed_handle.template get<invariants::container>();
 
-		for (const auto& s : container.slots) {
+		for (auto&& s : container.slots) {
 			concatenate(dependent_items, typed_handle[s.first].get_items_inside());
 		}
 	});

@@ -67,7 +67,7 @@ namespace augs {
 
 					static_assert(std::size(corresp_table) == std::size_t(tag_type::COUNT));
 
-					for(const auto corresp_entry : corresp_table) {
+					for(const auto& corresp_entry : corresp_table) {
 						if(std::equal(
 							current_token, tag_name_token_end,
 							corresp_entry.name.begin(), corresp_entry.name.end(),

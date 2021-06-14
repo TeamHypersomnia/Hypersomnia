@@ -21,7 +21,7 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 		else {
 			auto& container = typed_container.template get<invariants::container>();
 
-			for (const auto& s : container.slots) {
+			for (auto&& s : container.slots) {
 				if (filter && !filter->test(s.first)) {
 					continue;
 				}

@@ -219,7 +219,7 @@ slot_function get_slot_with_compatible_category(const const_entity_handle item, 
 			return slot_function::ITEM_DEPOSIT;
 		}
 
-		for (const auto& s : container->slots) {
+		for (auto&& s : container->slots) {
 			if (s.second.is_category_compatible_with(item)) {
 				return s.first;
 			}
@@ -364,9 +364,9 @@ inventory_space_type calc_space_occupied_with_children(const const_entity_handle
 	if (auto* const container = item_entity.find<invariants::container>()) {
 		ensure_eq(item_entity.get<components::item>().get_charges(), 1);
 
-		for (const auto slot : container->slots) {
+		for (auto&& slot : container->slots) {
 			if (slot.second.contributes_to_space_occupied) {
-				for (const auto entity_in_slot : item_entity[slot.first].get_items_inside()) {
+				for (const auto& entity_in_slot : item_entity[slot.first].get_items_inside()) {
 					space_occupied += calc_space_occupied_with_children(item_entity.get_cosmos()[entity_in_slot]);
 				}
 			}

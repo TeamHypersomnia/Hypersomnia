@@ -702,7 +702,7 @@ void settings_gui_state::perform(
 					thread_local std::unordered_map<A, std::vector<K>> action_to_keys;
 					action_to_keys.clear();
 
-					for (const auto& ka : m) {
+					for (auto&& ka : m) {
 						action_to_keys[ka.second].push_back(ka.first);
 					}
 

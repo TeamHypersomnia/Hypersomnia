@@ -346,7 +346,7 @@ namespace augs {
 		const enum_map<Enum, T>& left, 
 		const enum_map<Enum, T>& right
 	) {
-		for (const auto& it : left) {
+		for (auto&& it : left) {
 			const auto ptr = mapped_or_nullptr(right, it.first);
 
 			if (ptr == nullptr) {
