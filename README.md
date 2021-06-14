@@ -161,6 +161,12 @@ If the file cannot be found, you might need to look somewhere else for the ```vc
 call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 ```
 
+or:
+
+```
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+```
+
 Next, run these commands:
 
 ```

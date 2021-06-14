@@ -815,8 +815,9 @@ namespace augs {
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& p) {
-		const auto wide_path = std::filesystem::absolute(p).wstring();
-		LOG_NVPS(wide_path);
+		auto absolute_path = std::filesystem::absolute(p);
+		const auto wide_path = absolute_path.wstring();
+		LOG_NVPS(absolute_path.string());
 		BrowseToFile(wide_path.c_str());
 	}
 
