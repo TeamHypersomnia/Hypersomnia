@@ -457,7 +457,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	static auto auxiliary_socket = std::optional<netcode_socket_raii>();
 
 	static auto get_bound_local_port = []() {
-		return auxiliary_socket->socket.address.port;
+		return auxiliary_socket ? auxiliary_socket->socket.address.port : 0;
 	};
 
 	static auto last_requested_local_port = port_type(0);
