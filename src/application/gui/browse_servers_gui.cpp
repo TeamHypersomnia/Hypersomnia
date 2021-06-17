@@ -187,10 +187,8 @@ static bool is_internal(const netcode_address_t& address) {
 		}
 
 		if (ip[0] == 172) {
-			if (ip[1] >= 16) {
-				if (ip[2] <= 31) {
-					return true;
-				}
+			if (ip[1] >= 16 && ip[1] <= 31) {
+				return true;
 			}
 		}
 

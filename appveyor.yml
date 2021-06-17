@@ -25,7 +25,7 @@ install:
   - set PATH=C:\projects\deps\ninja;%PATH%
   - ninja --version
 
-  - appveyor DownloadFile https://github.com/llvm/llvm-project/releases/download/llvmorg-11.1.0/LLVM-11.1.0-win64.exe -FileName llvm-installer.exe
+  - appveyor DownloadFile https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/LLVM-12.0.0-win64.exe -FileName llvm-installer.exe
   - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
 
 notifications:
@@ -45,7 +45,7 @@ build_script:
   - cd nin
   - mkdir %CONFIGURATION%
   - cd %CONFIGURATION%
-  - cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 -DOPENSSL_ROOT_DIR=C:\OpenSSL-v111-Win64 ../..
+  - cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 -DBUILD_PROPERTY_EDITOR=0 -DOPENSSL_ROOT_DIR=C:\OpenSSL-v111-Win64 ../..
   - ninja
 
 test_script:
