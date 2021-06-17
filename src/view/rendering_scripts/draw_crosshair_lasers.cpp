@@ -51,13 +51,33 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 		const auto make_laser_from_to = [&](
 			const const_entity_handle subject,
 			const vec2 line_from,
-			const vec2 line_to
+			vec2 line_to
 		) {
+			auto detected_color = cyan;
+
+			{
+				const auto raycast = physics.ray_cast_px(
+					cosm.get_si(),
+					line_from,
+					line_to,
+					predefined_queries::crosshair_laser(),
+					subject
+				);
+
+				if (raycast.hit)
+				{
+					detected_color = calc_color(cosm[raycast.what_entity]);
+				}
+			}
+			
+			const auto laser_dir = (line_to - line_from).normalize();
+			line_to += laser_dir * 10000;
+
 			const auto raycast = physics.ray_cast_px(
 				cosm.get_si(),
 				line_from,
 				line_to,
-				predefined_queries::crosshair_laser(),
+				predefined_queries::crosshair_laser_except_characters(),
 				subject
 			);
 
@@ -67,14 +87,14 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				in.callback(
 					line_from, 
 					raycast.intersection, 
-					calc_color(cosm[raycast.what_entity])
+					detected_color
 				);
 			}
 			else {
 				in.callback(
 					line_from,
 					line_to,
-					cyan
+					detected_color
 				);
 			}
 		};

@@ -415,7 +415,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				dashed_line_output_wrapper  { get_line_drawer(), laser, 10.f, 40.f, global_time_seconds },
 				interp, 
 				viewed_character,
-				in.pre_step_crosshair_displacement
+				in.pre_step_crosshair_displacement,
+				screen_size
 			});
 
 			renderer.call_and_clear_lines();
@@ -469,20 +470,22 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					const auto glow_edge_tex = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
 
 					draw_crosshair_lasers({
-						[&](const vec2 from, const vec2 to, const rgba col) {
+						[&](const vec2 from, const vec2 to, rgba col) {
 							if (!settings.draw_weapon_laser) {
 								return;
 							}
 
+							col.mult_alpha(0.5f);
+
 							const vec2 edge_size = static_cast<vec2>(glow_edge_tex.get_original_size());
 
-							get_drawer().line(laser_glow, from, to, edge_size.y / 3.f, col);
+							get_drawer().line(laser_glow, from, to, edge_size.y / 5.f, col);
 
 							const auto edge_dir = (to - from).normalize();
 							const auto edge_offset = edge_dir * edge_size.x;
 
 							get_drawer().line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
-							get_drawer().line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 3.f, col, flip_flags::make_horizontally());
+							get_drawer().line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 5.f, col, flip_flags::make_horizontally());
 						},
 						[](const vec2, const vec2, const rgba) {},
 						interp,

@@ -122,6 +122,7 @@ struct draw_crosshair_lasers_input {
 	const interpolation_system& interpolation;
 	const const_entity_handle character;
 	const vec2 crosshair_displacement;
+	const vec2i screen_size;
 };
 
 void draw_sentiences_hud(const draw_sentiences_hud_input);
