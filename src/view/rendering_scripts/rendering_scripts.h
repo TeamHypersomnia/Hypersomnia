@@ -130,6 +130,15 @@ void draw_explosion_body_highlights(const draw_explosion_body_highlights_input);
 void draw_circular_progresses(const draw_circular_progresses_input);
 void draw_crosshair_lasers(const draw_crosshair_lasers_input);
 
+struct crosshair_drawing_settings;
+
+void draw_crosshair_procedurally(
+	const crosshair_drawing_settings& settings,
+	augs::drawer_with_default target,
+	vec2 center,
+	float recoil_amount
+);
+
 struct draw_beep_lights {
 	const augs::drawer output;
 	const interpolation_system& interpolation;

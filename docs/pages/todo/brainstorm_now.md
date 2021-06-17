@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- sort out the crosshair rendering when zoomed out (though we're going to redo the whole thing soon)
 - has_size_limit easily just check if the max_size is in sensible range
 - sort out those damn max_size/size constexpr traits or get rid of them altogether
 	- there is one in explicit pool(const size_type slot_count) {

@@ -217,7 +217,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
     angled_look_length = 100,
     enable_smoothing = true,
-	adjust_zoom_to_available_fog_of_war_size = true,
+	adjust_zoom_to_available_fog_of_war_size = false,
 	adjust_zoom_if_fov_bigger_by_pixels = 10,
     look_bound_expand = 0.5,
     smoothing = {
@@ -249,6 +249,15 @@ treat_as_music_sounds_longer_than_secs = 5,
     enabled = false
   },
   drawing = {
+    crosshair = {
+      scale = 3,
+      border_width = 1,
+      show_dot = true,
+      dot_size = 1,
+      segment_length = 10,
+      recoil_expansion_base = 5,
+      recoil_expansion_mult = 25
+    },
     draw_character_gui = true,
     draw_crosshairs = true,
     draw_weapon_laser = true,

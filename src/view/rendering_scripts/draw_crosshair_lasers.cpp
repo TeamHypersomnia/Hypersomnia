@@ -12,10 +12,73 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "view/game_drawing_settings.h"
 #include "game/detail/weapon_like.h"
 #include "game/detail/crosshair_math.hpp"
 
 #include "augs/drawing/drawing.hpp"
+#include "augs/log.h"
+
+void draw_crosshair_procedurally(
+	const crosshair_drawing_settings& settings,
+	augs::drawer_with_default target,
+	vec2 center,
+	float recoil_amount
+) {
+	const auto in_col = settings.inside_color;
+	const auto bo_col = settings.border_color;
+	auto round_center = center;
+
+	auto borders = border_input();
+	borders.width = settings.border_width;
+
+	if (settings.scale % 2 == 1)
+	{
+		round_center = vec2(vec2(center).discard_fract() + vec2(0.5f, 0.5f));
+	}
+
+	const auto dot_size = vec2::square(1 * settings.dot_size * settings.scale);
+
+	if (settings.show_dot)
+	{
+		const auto dot_origin = ltrb::center_and_size(round_center, dot_size);
+
+		target.aabb_with_border(dot_origin, in_col, bo_col, borders);
+	}
+
+	const auto hori_segment_size = vec2(settings.scale * settings.segment_length, settings.scale);
+	const auto vert_segment_size = hori_segment_size.transposed();
+
+	float total_offset = settings.recoil_expansion_base;
+	total_offset += recoil_amount * settings.recoil_expansion_mult;
+
+	total_offset *= settings.scale;
+
+	const auto l_segment_origin = ltrb::center_and_size(
+		vec2(round_center.x - hori_segment_size.x / 2 - dot_size.x / 2 - total_offset, round_center.y),
+		hori_segment_size
+	);
+	
+	const auto r_segment_origin = ltrb::center_and_size(
+		vec2(round_center.x + hori_segment_size.x / 2 + dot_size.x / 2 + total_offset, round_center.y),
+		hori_segment_size
+	);
+
+	const auto t_segment_origin = ltrb::center_and_size(
+		vec2(round_center.x, round_center.y - vert_segment_size.y / 2 - dot_size.y / 2- total_offset),
+		vert_segment_size
+	);
+	
+	const auto b_segment_origin = ltrb::center_and_size(
+		vec2(round_center.x, round_center.y + vert_segment_size.y / 2 + dot_size.x / 2 + total_offset),
+		vert_segment_size
+	);
+
+	target.aabb_with_border(l_segment_origin, in_col, bo_col, borders);
+	target.aabb_with_border(r_segment_origin, in_col, bo_col, borders);
+	target.aabb_with_border(t_segment_origin, in_col, bo_col, borders);
+	target.aabb_with_border(b_segment_origin, in_col, bo_col, borders);
+}
 
 void line_output_wrapper::operator()(const vec2 from, const vec2 to, const rgba col) const {
 	output.line(line_tex, from, to, col);

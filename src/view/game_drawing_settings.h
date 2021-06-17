@@ -19,6 +19,19 @@ enum class offscreen_reference_type {
 	// END GEN INTROSPECTOR
 };
 
+struct crosshair_drawing_settings {
+	// GEN INTROSPECTOR struct crosshair_drawing_settings
+	int scale = 3;
+	int border_width = 1;
+	bool show_dot = true;
+	float dot_size = 1.0f;
+	float segment_length = 10.0f;
+	float recoil_expansion_base = 5.0f;
+	float recoil_expansion_mult = 1.0f;
+	rgba inside_color = white;
+	rgba border_color = black;
+	// END GEN INTROSPECTOR
+};
 
 struct game_drawing_settings {
 	// GEN INTROSPECTOR struct game_drawing_settings
@@ -60,5 +73,6 @@ struct game_drawing_settings {
 
 	fog_of_war_settings fog_of_war;
 	fog_of_war_appearance_settings fog_of_war_appearance;
+	crosshair_drawing_settings crosshair;
 	// END GEN INTROSPECTOR
 };

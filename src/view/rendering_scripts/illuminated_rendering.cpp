@@ -376,19 +376,17 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		}
 
 		auto draw_crosshair = [&](const auto it) {
-			if (const auto s = it.find_crosshair_def()) {
-				auto drawing_input = make_drawing_input();
-				auto sprite_in = drawing_input.make_input_for<invariants::sprite>();
+			const vec2 world_space_pos = it.get_world_crosshair_transform(interp).pos + in.pre_step_crosshair_displacement;
+			//const vec2 screen_space_pos = cone.to_screen_space(world_space_pos);
 
-				sprite_in.global_time_seconds = global_time_seconds;
-				sprite_in.renderable_transform = it.get_world_crosshair_transform(interp) + in.pre_step_crosshair_displacement;
+			float maximum_heat = 0.0f;
 
-				if (is_zoomed_out) {
-					sprite_in.renderable_transform.pos = cone.to_screen_space(sprite_in.renderable_transform.pos);
-				}
-
-				augs::draw(s->appearance, game_images, sprite_in);
+			for (const auto& gun_id : it.get_wielded_guns())
+			{
+				maximum_heat = std::max(maximum_heat, cosm[gun_id].template get<components::gun>().current_heat);
 			}
+
+			::draw_crosshair_procedurally(settings.crosshair, get_drawer(), world_space_pos, maximum_heat);
 		};
 
 		if (viewed_character) {

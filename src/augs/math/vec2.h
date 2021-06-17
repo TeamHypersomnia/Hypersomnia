@@ -325,6 +325,10 @@ struct basic_vec2 {
 		return !(x_fract == 0 && y_fract == 0);
 	}
 
+	basic_vec2 transposed() const {
+		return basic_vec2(y, x);
+	}
+
 	basic_vec2 perpendicular_ccw() const {
 		return basic_vec2(y, -x);
 	}
