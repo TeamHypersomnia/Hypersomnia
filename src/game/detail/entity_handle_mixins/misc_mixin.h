@@ -18,7 +18,7 @@
 void unset_input_flags_of_orphaned_entity(const entity_handle&);
 
 template <class E>
-vec2 calc_crosshair_displacement(const E& self);
+vec2 calc_crosshair_displacement(const E& self, bool consider_recoil_position = true);
 
 template <class E>
 class misc_mixin {
@@ -92,9 +92,9 @@ public:
 	}
 
 	template <class I>
-	auto get_world_crosshair_transform(I& interp) const {
+	auto get_world_crosshair_transform(I& interp, bool consider_recoil_position) const {
 		const auto self = *static_cast<const E*>(this);
-		return self.get_viewing_transform(interp) + ::calc_crosshair_displacement(self);
+		return self.get_viewing_transform(interp) + ::calc_crosshair_displacement(self, consider_recoil_position);
 	};
 
 	auto get_world_crosshair_transform() const {

@@ -3486,6 +3486,7 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(250);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.recoil.pattern_progress_per_shot *= 9.0f;
 
 			meta.set(gun_def);
 
@@ -3540,6 +3541,7 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(800);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.recoil.pattern_progress_per_shot *= 6.0f;
 
 			meta.set(gun_def);
 
@@ -3593,6 +3595,7 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(700);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.recoil.pattern_progress_per_shot *= 4.0f;
 
 			gun_def.burst_spread_degrees = 11.f;
 			gun_def.burst_spread_degrees_variation = 0.f;
@@ -3649,6 +3652,7 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(100);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.recoil.pattern_progress_per_shot *= 12.0f;
 			gun_def.allow_chambering_with_akimbo = true;
 
 			meta.set(gun_def);
@@ -3767,6 +3771,7 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(150);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.recoil.pattern_progress_per_shot *= 3.0f;
 
 			meta.set(gun_def);
 
@@ -3814,7 +3819,8 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(700);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
-
+			gun_def.recoil.pattern_progress_per_shot *= 5.0f;
+			
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GRADOBICIE, white);
@@ -4020,6 +4026,8 @@ namespace test_flavours {
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::DEAGLE_SHOT);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.recoil.pattern_progress_per_shot *= 2.5f;
+
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::DEAGLE_CHAMBERING);
 
 			meta.set(gun_def);

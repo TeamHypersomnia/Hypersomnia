@@ -376,28 +376,33 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		}
 
 		auto draw_crosshair = [&](const auto it) {
-			const vec2 world_space_pos = it.get_world_crosshair_transform(interp).pos + in.pre_step_crosshair_displacement;
-			//const vec2 screen_space_pos = cone.to_screen_space(world_space_pos);
+			//const vec2 screen_space_pos = screen_size / 2 + ::calc_crosshair_displacement(it) + in.pre_step_crosshair_displacement;
+			//LOG_NVPS(screen_space_pos.x, screen_space_pos.y, screen_size.x);
+
+			const vec2 world_space_pos = it.get_world_crosshair_transform(interp, false).pos + in.pre_step_crosshair_displacement;
+			const vec2 projection_space_pos = cone.to_screen_space(world_space_pos);
 
 			float maximum_heat = 0.0f;
 
 			for (const auto& gun_id : it.get_wielded_guns())
 			{
-				maximum_heat = std::max(maximum_heat, cosm[gun_id].template get<components::gun>().current_heat);
+				maximum_heat = std::max(maximum_heat, cosm[gun_id].template get<components::gun>().recoil.pattern_progress);
 			}
 
-			::draw_crosshair_procedurally(settings.crosshair, get_drawer(), world_space_pos, maximum_heat);
+			::draw_crosshair_procedurally(settings.crosshair, get_drawer(), projection_space_pos, maximum_heat);
 		};
 
 		if (viewed_character) {
-			if (is_zoomed_out) {
+			//if (is_zoomed_out)
+			{
 				renderer.call_and_clear_triangles();
 				shaders.standard->set_projection(renderer, non_zoomed_matrix);
 			}
 
 			draw_crosshair(viewed_character);
 
-			if (is_zoomed_out) {
+			//if (is_zoomed_out)
+			{
 				renderer.call_and_clear_triangles();
 				shaders.standard->set_projection(renderer, matrix);
 			}
@@ -488,7 +493,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 						[](const vec2, const vec2, const rgba) {},
 						interp,
 						viewed_character,
-						in.pre_step_crosshair_displacement
+						in.pre_step_crosshair_displacement,
+						screen_size
 					});
 				}
 

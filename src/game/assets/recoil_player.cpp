@@ -5,10 +5,9 @@ real32 recoil_player_instance::shoot_and_get_impulse(
 	const recoil_player_instance_def& def,
 	const recoil_player& meta
 ) {
-	const auto heat = current_heat;
-	current_heat += def.heat_per_shot;
+	const auto index = static_cast<std::size_t>(pattern_progress);
 
-	const auto index = static_cast<std::size_t>(heat);
+	pattern_progress += def.pattern_progress_per_shot;
 
 	if (index >= meta.offsets.size()) {
 		auto rng = randomization(static_cast<rng_seed_type>(index));
@@ -20,7 +19,7 @@ real32 recoil_player_instance::shoot_and_get_impulse(
 
 void recoil_player_instance::cooldown(
 	const recoil_player_instance_def& def,
-	real32 amount_ms
+	real32 dt_secs
 ) {
-	current_heat -= std::min(current_heat, def.heat_cooldown_per_ms * amount_ms);
+	pattern_progress = augs::damp(pattern_progress, dt_secs, def.pattern_progress_damping);
 }

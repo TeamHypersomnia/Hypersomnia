@@ -149,7 +149,7 @@ static void cooldown_gun_heat(
 
 	if (clk.is_ready(gun_def.shot_cooldown_ms, gun.fire_cooldown_object)) {
 		/* Apply idle cooldown */
-		gun.recoil.cooldown(gun_def.recoil, delta.in_milliseconds());
+		gun.recoil.cooldown(gun_def.recoil, delta.in_seconds());
 		heat = std::max(0.f, heat - (gun_def.heat_cooldown_speed_mult * delta.in_seconds()) / gun_def.maximum_heat);
 		gun.magazine.damp(delta.in_seconds(), 2.f);
 
@@ -271,6 +271,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					gun.fire_cooldown_object -= delta_ms;
 				}
 			}
+		
+			//gun.recoil.cooldown(gun_def.recoil, delta.in_seconds());
 
 			const bool transfer_cooldown_passed = clk.is_ready(
 				gun_def.get_transfer_shot_cooldown(), 

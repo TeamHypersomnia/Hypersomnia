@@ -222,7 +222,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     look_bound_expand = 0.5,
     smoothing = {
       average_factor = 0.5,
-      averages_per_sec = 25
+      averages_per_sec = 30
     }
   },
   content_regeneration = {
@@ -256,7 +256,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       dot_size = 1,
       segment_length = 10,
       recoil_expansion_base = 5,
-      recoil_expansion_mult = 25
+      recoil_expansion_mult = 2
     },
     draw_character_gui = true,
     draw_crosshairs = true,

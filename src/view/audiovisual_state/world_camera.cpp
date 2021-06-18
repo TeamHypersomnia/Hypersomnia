@@ -10,6 +10,14 @@
 #include "game/detail/crosshair_math.hpp"
 #include "view/audiovisual_state/flashbang_math.h"
 
+camera_eye world_camera::get_current_eye() const
+{
+	auto output_eye = current_eye;
+	//output_eye.transform.pos.x = (int(output_eye.transform.pos.x) / 3) * 3; 
+	//output_eye.transform.pos.y = (int(output_eye.transform.pos.y) / 3) * 3; 
+	return output_eye;
+}
+
 void world_camera::tick(
 	const vec2i screen_size,
 	const fog_of_war_settings& fog_of_war,

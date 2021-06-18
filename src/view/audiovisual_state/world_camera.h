@@ -35,9 +35,7 @@ struct world_camera {
 
 	augs::smooth_value_field additional_position_smoothing;
 
-	auto get_current_eye() const {
-		return current_eye;
-	}
+	camera_eye get_current_eye() const;
 
 	void tick(
 		const vec2i screen_size,

@@ -3,7 +3,7 @@
 #include "game/enums/melee_fighter_state.h"
 
 template <class E>
-vec2 calc_crosshair_displacement(const E& self) {
+vec2 calc_crosshair_displacement(const E& self, bool consider_recoil_position) {
 	if (const auto crosshair = self.find_crosshair()) {
 		auto considered_base_offset = crosshair->base_offset;
 		const auto& recoil = crosshair->recoil;
@@ -14,7 +14,11 @@ vec2 calc_crosshair_displacement(const E& self) {
 			considered_base_offset.set(4, 0);
 		}
 
-		considered_base_offset += recoil.position;
+		if (consider_recoil_position)
+		{
+			considered_base_offset += recoil.position;
+		}
+		
 		considered_base_offset.rotate(recoil.rotation);
 
 		return considered_base_offset;
