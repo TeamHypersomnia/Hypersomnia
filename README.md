@@ -2,7 +2,7 @@
 <div align="center">
 <img src="https://hypersomnia.xyz/menu_game_logo.png"></img>
 
-[![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
+[![Build Status](https://travis-ci.com/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 [![Build MacOS binary](https://github.com/TeamHypersomnia/Hypersomnia/workflows/MacOS%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
