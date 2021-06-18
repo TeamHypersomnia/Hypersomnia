@@ -256,7 +256,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       dot_size = 1,
       segment_length = 10,
       recoil_expansion_base = 5,
-      recoil_expansion_mult = 2
+      recoil_expansion_mult = 1
     },
     draw_character_gui = true,
     draw_crosshairs = true,
