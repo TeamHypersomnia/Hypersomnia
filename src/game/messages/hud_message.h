@@ -7,8 +7,8 @@ namespace messages {
 		std::string first_name;
 		std::string second_name;
 
-		faction_type first_faction = faction_type::COUNT;
-		faction_type second_faction = faction_type::COUNT;
+		faction_type first_faction = faction_type::SPECTATOR;
+		faction_type second_faction = faction_type::SPECTATOR;
 
 		std::string preffix;
 		std::string mid;

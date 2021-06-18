@@ -110,19 +110,23 @@ void hud_messages_gui::draw(
 			break;
 		}
 
-		const auto& msg = messages[i];
-
-		const auto passed = now - *msg.first_appeared;
-
-		const auto appearing_mult = std::min(1.f, (std::sqrt(float(passed / settings.message_fading_secs))));
-		const auto fading_progress = passed - settings.message_lifetime_secs;
-
 		const auto target_spatial_index = float(i);
+		const auto& msg = messages[i];
 
 		if (msg.first_appeared == std::nullopt && !is_any_fading) {
 			msg.first_appeared = now;
 			msg.spatial_index = target_spatial_index;
 		}
+
+		if (msg.first_appeared == std::nullopt)
+		{
+			continue;
+		}
+
+		const auto passed = now - *msg.first_appeared;
+
+		const auto appearing_mult = std::min(1.f, (std::sqrt(float(passed / settings.message_fading_secs))));
+		const auto fading_progress = passed - settings.message_lifetime_secs;
 
 		auto target_text_alpha = appearing_mult;
 
