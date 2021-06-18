@@ -77,7 +77,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto settings = in.drawing;
 	const auto matrix = cone.get_projection_matrix();
 
-	const bool is_zoomed_out = cone.eye.zoom < 1.f;
+	//const bool is_zoomed_out = cone.eye.zoom < 1.f;
 
 	const auto non_zoomed_matrix = [&]() {
 		auto non_zoomed_cone = cone;
