@@ -7,11 +7,15 @@ real32 recoil_player_instance::shoot_and_get_impulse(
 ) {
 	const auto index = static_cast<std::size_t>(pattern_progress);
 
-	pattern_progress += def.pattern_progress_per_shot;
-
 	if (index >= meta.offsets.size()) {
-		auto rng = randomization(static_cast<rng_seed_type>(index));
+		pattern_progress += def.pattern_progress_per_shot * 0.01;
+
+		auto rng = randomization(static_cast<rng_seed_type>(pattern_progress * 1000));
 		return rng.randval(-1.f, 1.f);
+	}
+	else
+	{
+		pattern_progress += def.pattern_progress_per_shot;
 	}
 
 	return meta.offsets[index];
