@@ -38,7 +38,7 @@ void game_image_with_attachments(
 	const auto lt_offset = -precalculated_aabb.left_top();
 
 	auto get_entry = [&](const auto id) {
-		return images_in_atlas.at(id).diffuse;
+		return images_in_atlas.find_or(id).diffuse;
 	};
 
 	auto draw = [&](
@@ -212,7 +212,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	centered_text(window_name);
 
-	if (const auto& entry = in.images_in_atlas.at(in.money_icon).diffuse; entry.exists()) {
+	if (const auto& entry = in.images_in_atlas.find_or(in.money_icon).diffuse; entry.exists()) {
 		game_image_button("#moneyicon", entry);
 		ImGui::SameLine();
 	}
@@ -231,7 +231,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	};
 
 	auto draw_owned_weapon = [&](const item_flavour_id& f_id) {
-		if (const auto& entry = in.images_in_atlas.at(::image_of(cosm, f_id)).diffuse; entry.exists()) {
+		if (const auto& entry = in.images_in_atlas.find_or(::image_of(cosm, f_id)).diffuse; entry.exists()) {
 			const auto image_padding = vec2(0, 4);
 			const auto size = vec2(entry.get_original_size());
 			game_image(entry, size, white, image_padding);
@@ -381,7 +381,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const bool learnt = subject.template get<components::sentience>().is_learnt(s_id);
 
 		const auto image = ::get_spell_image(cosm, s_id);
-		const auto& entry = in.images_in_atlas.at(image).diffuse;
+		const auto& entry = in.images_in_atlas.find_or(image).diffuse;
 
 		if (!entry.exists()) {
 			return false;

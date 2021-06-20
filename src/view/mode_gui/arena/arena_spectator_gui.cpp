@@ -97,7 +97,7 @@ void arena_spectator_gui::draw_gui(
 
 	auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_buffer::SPECTATOR_AVATAR].triangles;
 
-	const auto& avatar_atlas_entry = in.avatars_in_atlas.at(now_spectating.value); 
+	const auto avatar_atlas_entry = in.avatars_in_atlas.at(now_spectating.value); 
 	const bool avatars_enabled = logically_set(in.general_atlas, in.avatar_atlas);
 	const bool avatar_displayed = avatar_atlas_entry.exists() && avatars_enabled;
 

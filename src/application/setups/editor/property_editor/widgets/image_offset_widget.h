@@ -44,7 +44,7 @@ struct image_offset_widget {
 		auto iw = scoped_item_width(80);
 
 		auto perform_widget = [&]() {
-			const auto& entry = game_atlas.at(id);
+			const auto& entry = game_atlas.find_or(id);
 
 			const auto is = vec2i(entry.get_original_size());
 			const auto zoom = 4;

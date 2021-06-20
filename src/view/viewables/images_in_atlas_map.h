@@ -15,21 +15,42 @@ class images_in_atlas_map {
 	;
 
 	images_in_atlas_map_type entries;
+	image_in_atlas fallback;
 
 public:
-	decltype(auto) operator[](const assets::image_id id) {
+	image_in_atlas& at(const assets::image_id id) {
 		const auto idx = static_cast<std::size_t>(id.get_cache_index());
 		return entries[idx];
 	}
 
-	decltype(auto) at(const assets::image_id id) {
+	const image_in_atlas& at(const assets::image_id id) const {
 		const auto idx = static_cast<std::size_t>(id.get_cache_index());
 		return entries[idx];
 	}
 
-	decltype(auto) at(const assets::image_id id) const {
+	image_in_atlas& operator[](const assets::image_id id) {
 		const auto idx = static_cast<std::size_t>(id.get_cache_index());
 		return entries[idx];
+	}
+	
+	bool contains(const assets::image_id id) const
+	{
+		const auto idx = static_cast<std::size_t>(id.get_cache_index());
+		return idx < entries.size();
+	}
+
+	const image_in_atlas& find_or(const assets::image_id id) const {
+		if (contains(id))
+		{
+			return at(id);
+		}
+
+		return fallback;
+	}
+
+	auto size() const
+	{
+		return entries.size();
 	}
 
 	void clear() {

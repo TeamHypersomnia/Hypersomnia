@@ -42,7 +42,7 @@ struct non_standard_shape_widget {
 				object.clear();
 			}
 
-			const auto& entry = game_atlas.at(id);
+			const auto& entry = game_atlas.find_or(id);
 
 			const auto is = vec2i(entry.get_original_size());
 			const auto zoom = 4;

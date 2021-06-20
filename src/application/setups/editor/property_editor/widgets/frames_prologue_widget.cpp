@@ -35,7 +35,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 		const auto considered_time = std::fmod(total_time, total_duration);
 		const auto current_frame = ::calc_current_frame(anim, considered_time);
 
-		const auto& entry = game_atlas.at(current_frame->image_id);
+		const auto& entry = game_atlas.find_or(current_frame->image_id);
 
 		const auto is = vec2i(entry.get_original_size());
 

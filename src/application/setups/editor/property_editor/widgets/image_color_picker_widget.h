@@ -49,7 +49,7 @@ struct image_color_picker_widget {
 
 		auto perform_widget = [&]() {
 			const auto zoom = 4;
-			const auto& entry = game_atlas.at(id).diffuse;
+			const auto& entry = game_atlas.find_or(id).diffuse;
 
 			if (const auto picked = image_color_picker(zoom, entry, current_preview.image)) {
 				object.emplace_back(*picked);
@@ -85,7 +85,7 @@ struct image_color_picker_widget {
 
 		auto perform_widget = [&]() {
 			const auto zoom = 4;
-			const auto& entry = game_atlas.at(id).diffuse;
+			const auto& entry = game_atlas.find_or(id).diffuse;
 
 			if (const auto picked = image_color_picker(zoom, entry, current_preview.image)) {
 				object = *picked;

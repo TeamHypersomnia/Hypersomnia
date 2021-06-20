@@ -39,7 +39,7 @@ void draw_weapon_flavour_with_attachments(
 		const auto& attachment_image,
 		const auto& attachment_offset
 	) {
-		const auto& entry = images_in_atlas.at(attachment_image).diffuse;
+		const auto& entry = images_in_atlas.find_or(attachment_image).diffuse;
 		const auto final_pos = lt_pos + lt_offset + attachment_offset.pos;
 
 		augs::detail_sprite(output_buffer, entry, final_pos, attachment_offset.rotation, white);
@@ -72,7 +72,8 @@ tool_layout_meta make_tool_layout(
 		using T = remove_cref<decltype(tool)>;
 
 		auto from_image = [&](const auto image_id) {
-			const auto& entry = images_in_atlas.at(image_id).diffuse;
+			//LOG_NVPS(image_id.get_cache_index(), static_cast<std::size_t>(image_id.get_cache_index()), images_in_atlas.size());
+			const auto& entry = images_in_atlas.find_or(image_id).diffuse;
 
 			auto meta = tool_layout_meta();
 
@@ -516,7 +517,7 @@ void arena_gui_state::draw_mode_gui(
 				return 0;
 			}();
 
-			const auto& avatar_atlas_entry = in.avatars_in_atlas.at(killer_player_id.value); 
+			const auto avatar_atlas_entry = in.avatars_in_atlas.at(killer_player_id.value); 
 			const bool avatars_enabled = logically_set(in.general_atlas, in.avatar_atlas);
 			const bool avatar_displayed = avatar_atlas_entry.exists() && avatars_enabled;
 
@@ -787,7 +788,7 @@ void arena_gui_state::draw_mode_gui(
 				const bool was_headshot = ko.origin.circumstances.headshot;
 				const auto headshot_icon = mode_input.rules.view.headshot_icons[ko.victim.faction];
 
-				const auto& headshot_entry = in.images_in_atlas.at(headshot_icon).diffuse;
+				const auto& headshot_entry = in.images_in_atlas.find_or(headshot_icon).diffuse;
 				const auto headshot_icon_size = was_headshot ? headshot_entry.get_original_size() : vec2u::zero;
 
 				const auto times_padded = was_headshot ? 3 : 2;

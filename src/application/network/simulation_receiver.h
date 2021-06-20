@@ -148,7 +148,7 @@ public:
 		}
 
 		{
-			auto p_i = static_cast<std::size_t>(0);
+			auto num_total_accepted_entropies = static_cast<std::size_t>(0);
 
 			for (std::size_t i = 0; i < entropies.size(); ++i) {
 				/* If a new player was added, always reinfer. */
@@ -216,10 +216,20 @@ public:
 
 						advance_referential(actual_server_entropy);
 
-						if (!repredict) {
-							const auto& predicted_server_entropy = predicted_entropies[p_i];
+						const bool already_found_reason_to_repredict = repredict;
 
-							if (shall_reinfer || !(actual_server_entropy == predicted_server_entropy)) {
+						if (!already_found_reason_to_repredict) {
+							if (num_total_accepted_entropies < predicted_entropies.size())
+							{
+								const auto& predicted_server_entropy = predicted_entropies[num_total_accepted_entropies];
+
+								if (shall_reinfer || !(actual_server_entropy == predicted_server_entropy)) {
+									repredict = true;
+								}
+							}
+							else
+							{
+								LOG("The client has fallen back behind the server. Repredicting the world just in case.");
 								repredict = true;
 							}
 						}
@@ -235,25 +245,24 @@ public:
 						repredict = true;
 					}
 
-					p_i += num_accepted;
+					num_total_accepted_entropies += num_accepted;
 				}
 			}
 
 			erase_first_n(incoming_contexts, entropies.size());
 			entropies.clear();
 
-			const auto& total_accepted = p_i;
-			result.total_accepted = total_accepted;
+			result.total_accepted = num_total_accepted_entropies;
 
 			auto& predicted = predicted_entropies;
 
-			// LOG("TA: %x", total_accepted);
+			// LOG("TA: %x", num_total_accepted_entropies);
 
-			if (total_accepted <= predicted.size()) {
-				erase_first_n(predicted, total_accepted);
+			if (num_total_accepted_entropies <= predicted.size()) {
+				erase_first_n(predicted, num_total_accepted_entropies);
 			}
 			else {
-				LOG_NVPS(total_accepted, predicted.size());
+				LOG_NVPS(num_total_accepted_entropies, predicted.size());
 				result.malicious_server = true;
 				return result;
 			}

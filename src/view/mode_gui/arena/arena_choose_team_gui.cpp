@@ -110,7 +110,7 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 				return augs::imgui::colors_nha::standard();
 			}();
 
-			const auto& entry = in.images_in_atlas.at(in.button_logos[f]).diffuse; 
+			const auto& entry = in.images_in_atlas.find_or(in.button_logos[f]).diffuse; 
 			const bool button_confirmed = entry.exists() && game_image_button(label, entry, color_scheme);
 
 			if (!is_full) {

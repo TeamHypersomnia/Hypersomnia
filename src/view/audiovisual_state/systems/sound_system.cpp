@@ -256,6 +256,11 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const auto& cosm = listening_character.get_cosmos();
 	const auto maybe_transform = in.find_transform(positioning);
+	
+	if (maybe_transform == std::nullopt)
+	{
+		return;
+	}
 
 	augs::update_multiple_properties cmd;
 

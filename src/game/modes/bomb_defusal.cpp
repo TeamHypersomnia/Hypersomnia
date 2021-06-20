@@ -555,7 +555,7 @@ std::size_t bomb_defusal::num_players_in(const faction_type faction) const {
 	return total;
 }
 
-void bomb_defusal::assign_free_color_to_best_uncolored(const const_input_type in, const faction_type previous_faction, const rgba free_color) {
+void bomb_defusal::assign_free_color_to_best_uncolored(const const_input_type in, const faction_type in_faction, const rgba free_color) {
 	const auto fallback_color = in.rules.excess_player_color;
 
 	if (free_color == rgba::zero) {
@@ -566,34 +566,28 @@ void bomb_defusal::assign_free_color_to_best_uncolored(const const_input_type in
 		return;
 	}
 
-	auto& best_uncolored_player_of_this_faction = maximum_of(
-		players,
-		[&](const auto& a, const auto& b) {
-			if (a.second.assigned_color != fallback_color) {
-				return true;
-			}
+	bool found_any_player = false;
+	int best_score = std::numeric_limits<int>::min();
+	mode_player_id best_player = mode_player_id();
 
-			if (b.second.assigned_color != fallback_color) {
-				return false;
-			}
+	for_each_player_in(in_faction, [&](const auto& mode_id, const auto& data) {
+		if (data.get_faction() == in_faction && data.assigned_color == fallback_color) {
+			const int score = data.stats.calc_score();
 
-			if (a.second.get_faction() != previous_faction) {
-				return true;
+			if (score > best_score || !found_any_player)
+			{
+				best_score = score;
+				best_player = mode_id;
+				found_any_player = true;
 			}
-
-			if (b.second.get_faction() != previous_faction) {
-				return false;
-			}
-
-			return a.second.stats.calc_score() < b.second.stats.calc_score();
 		}
-	);
 
-	auto& best = best_uncolored_player_of_this_faction.second;
+		return callback_result::CONTINUE;
+	});
 
-	if (best.assigned_color == fallback_color) {
-		if (best.get_faction() == previous_faction) {
-			best.assigned_color = free_color;
+	if (found_any_player) {
+		if (const auto entry = find(best_player)) {
+			entry->assigned_color = free_color;
 		}
 	}
 }

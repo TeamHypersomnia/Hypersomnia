@@ -347,7 +347,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		text_disabled(typesafe_sprintf("%x", resolved_path.string()));
 
 		if constexpr(is_image_type) {
-			const auto& entry = game_atlas.at(currently_viewed_entry->id).diffuse;
+			const auto& entry = game_atlas.find_or(currently_viewed_entry->id).diffuse;
 
 			const bool is_missing =
 				range_of_currently_viewed == std::addressof(missing_paths)
@@ -432,7 +432,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			}
 
 			if constexpr(is_image_type) {
-				const auto& entry = game_atlas.at(id).diffuse;
+				const auto& entry = game_atlas.find_or(id).diffuse;
 
 				if (entry.exists()) {
 					if (ImGui::IsItemHovered()) {

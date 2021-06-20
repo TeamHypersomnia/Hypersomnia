@@ -56,7 +56,7 @@ auto shape_overlaps_entity(
 			si,
 			shape_transform,
 			fixture
-		); result->overlap) {
+		); result != std::nullopt && result->overlap) {
 			return result;
 		}
 
@@ -164,7 +164,7 @@ auto circular_sector_overlaps_entity(
 		&shape,
 		shape_transform,
 		handle
-	); result && result->overlap) {
+	); result != std::nullopt && result->overlap) {
 		return result;
 	}
 

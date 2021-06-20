@@ -1100,6 +1100,7 @@ bool client_setup::requires_cursor() const {
 void client_setup::ensure_handler() {
 	wait_for_demo_flush();
 	flush_demo_steps();
+	wait_for_demo_flush();
 }
 
 void client_setup::wait_for_demo_flush() {

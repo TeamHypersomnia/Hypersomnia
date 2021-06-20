@@ -117,7 +117,7 @@ ltrb aabb_of_game_image_with_attachments(
 	ltrb result;
 
 	auto get_entry = [&](const auto id) {
-		return images_in_atlas.at(id).diffuse;
+		return images_in_atlas.find_or(id).diffuse;
 	};
 
 	auto contain = [&](

@@ -343,7 +343,7 @@ void arena_scoreboard_gui::draw_gui(
 
 			if (sorted_players.size() > 0) {
 				if (const auto& head_image = mode_input.rules.view.logos[faction]; head_image.is_set()) {
-					if (const auto& entry = draw_in.images_in_atlas.at(head_image).diffuse; entry.exists()) {
+					if (const auto& entry = draw_in.images_in_atlas.find_or(head_image).diffuse; entry.exists()) {
 						const auto size = entry.get_original_size();
 						auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
 
@@ -554,7 +554,7 @@ void arena_scoreboard_gui::draw_gui(
 					if (icon != std::nullopt) {
 						const auto icon_image = mode_input.rules.view.icons.at(*icon);
 
-						if (const auto& entry = draw_in.images_in_atlas.at(icon_image).diffuse; entry.exists()) {
+						if (const auto& entry = draw_in.images_in_atlas.find_or(icon_image).diffuse; entry.exists()) {
 							const auto size = entry.get_original_size();
 
 							const auto& c = *current_column;
@@ -599,7 +599,7 @@ void arena_scoreboard_gui::draw_gui(
 			next_col();
 
 			if (avatars_enabled) {
-				if (const auto& entry = in.avatars_in_atlas.at(player_id.value); entry.exists()) {
+				if (const auto entry = in.avatars_in_atlas.at(player_id.value); entry.exists()) {
 					const auto& c = *current_column;
 					const auto& cell_orig = ltrbi(c.l + 1, 1, c.r, cell_h);
 
