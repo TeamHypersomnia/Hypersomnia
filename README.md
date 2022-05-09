@@ -147,25 +147,15 @@ On all platforms, you can choose among three building configurations:
 Refer to [appveyor.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/appveyor.yml) file for up-to-date building procedure. A short overview of the process now follows.
 
 Prerequisites:
-- **Visual Studio 2019 Preview** (Community) or newer.
+- **Visual Studio 2022 Community** or newer.
 
 Open up the terminal. Setup the environment:
 
 ```
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\VC\Auxiliary\Build\vcvarsall.bat" x64
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 ```
 
-If the file cannot be found, you might need to look somewhere else for the ```vcvarsall.bat``` that comes with your particular Visual Studio installation. Another possible location is:
-
-```
-call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-```
-
-or:
-
-```
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-```
+(If the file cannot be found, it means you are not using Visual Studio 2022 Community. You will have to look for a corresponding ``vcvarsall.bat`` location on your own.)
 
 Next, run these commands:
 

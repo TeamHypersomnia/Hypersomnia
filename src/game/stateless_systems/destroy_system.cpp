@@ -1,4 +1,3 @@
-#include "augs/templates/introspect.h"
 #include "destroy_system.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_id.h"

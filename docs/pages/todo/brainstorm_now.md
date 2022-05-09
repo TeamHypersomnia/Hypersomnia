@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- disable automatic updates if not in production build
+
 - maybe: properly trim the crosshair raycast to the end of screen and change its color accordingly 
 - sort out the crosshair rendering when zoomed out (though we're going to redo the whole thing soon)
 - has_size_limit easily just check if the max_size is in sensible range

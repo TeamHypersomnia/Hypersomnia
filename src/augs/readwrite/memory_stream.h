@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <algorithm>
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/templates/maybe_const.h"

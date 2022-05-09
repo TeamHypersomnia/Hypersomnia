@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <typeinfo>
 
 #include "augs/templates/remove_cref.h"
 #include "augs/templates/traits/is_std_array.h"

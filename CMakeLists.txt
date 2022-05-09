@@ -726,8 +726,8 @@ macro(file_flag path flags)
 	set_source_files_properties(${path} PROPERTIES COMPILE_FLAGS ${flags})
 endmacro()
 
-file_flag("src/3rdparty/imgui/imgui.cpp" "-Wno-unused-but-set-variable")
-file_flag("src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp" "-Wno-unused-but-set-variable")
+file_flag("src/3rdparty/imgui/imgui.cpp" "-Wno-error")
+file_flag("src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp" "-Wno-error")
 
 # These headers will be input to the Introspector-generator.
 

@@ -36,8 +36,8 @@ python:
 
 matrix:
   include:
-  - env: c_compiler=clang-12 cxx_compiler=clang++-12 config=Release other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"
-    compiler: clang-12
+  - env: c_compiler=clang-13 cxx_compiler=clang++-13 config=Release other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"
+    compiler: clang-13
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
 #    compiler: gcc
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=RelWithDebInfo other_cmake_flags=""
@@ -52,9 +52,9 @@ before_install:
  - service --status-all || true
  - initctl list || true
  - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
- - sudo add-apt-repository -y "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main"
+ - sudo add-apt-repository -y "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
  - sudo apt-get -q update
- - sudo apt-get -y install clang-12 lld-12 libc++-12-dev libc++abi-12-dev
+ - sudo apt-get -y install clang-13 lld-13 libc++-13-dev libc++abi-13-dev
 
 install:
   - python --version
