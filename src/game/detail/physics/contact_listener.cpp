@@ -161,6 +161,8 @@ void contact_listener::BeginContact(b2Contact* contact) {
 
 					sys.rechoose_owner_friction_body(collider.get_owner_of_colliders());
 				}
+#else
+				(void)found_suitable;
 #endif
 			}
 		}

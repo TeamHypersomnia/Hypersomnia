@@ -722,6 +722,13 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/crc32/crc32.c"
 )
 
+macro(file_flag path flags)
+	set_source_files_properties(${path} PROPERTIES COMPILE_FLAGS ${flags})
+endmacro()
+
+file_flag("src/3rdparty/imgui/imgui.cpp" "-Wno-unused-but-set-variable")
+file_flag("src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp" "-Wno-unused-but-set-variable")
+
 # These headers will be input to the Introspector-generator.
 
 file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES
@@ -967,6 +974,8 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable.io"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode.io"
+	# Only for v3
+	# "${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/src"
 )
 
 if (MSVC)
@@ -1188,6 +1197,8 @@ elseif(UNIX)
 		add_definitions(-DPLATFORM_LINUX=1)
 	endif()
 endif()
+
+add_definitions(-DYOJIMBO_WITH_MBEDTLS=0)
 
 # Additionally, we mark Release as the production build.
 
@@ -1596,21 +1607,26 @@ if (BUILD_NETWORKING)
 
 	prefer_static_libraries()
 
-	find_library(MBEDTLS NAMES mbedtls HINTS ${SODIUM_HINTS})
-	find_library(MBEDX509 NAMES mbedx509 HINTS ${SODIUM_HINTS})
-	find_library(MBEDCRYPTO NAMES mbedcrypto HINTS ${SODIUM_HINTS})
 	find_library(SODIUM NAMES sodium HINTS ${SODIUM_HINTS})
 
 	prefer_shared_libraries()
 
-	list(APPEND HYPERSOMNIA_LIBS ${SODIUM} ${MBEDTLS} ${MBEDX509} ${MBEDCRYPTO})
+	list(APPEND HYPERSOMNIA_LIBS ${SODIUM})
 endif()
 
 if (BUILD_OPENSSL)
 	message("Building OpenSSL.")
 
-	set(OPENSSL_USE_STATIC_LIBS TRUE)
-	set(OPENSSL_MSVC_STATIC_RT TRUE)
+	# Static linking of SSL makes compilation on Linux a pain.
+	# Let's do it for Windows and Apple only
+
+	if (NOT LINUX)
+		set(OPENSSL_USE_STATIC_LIBS TRUE)
+	endif()
+
+	if (MSVC)
+		set(OPENSSL_MSVC_STATIC_RT TRUE)
+	endif()
 
 	find_package(OpenSSL REQUIRED)
 	list(APPEND HYPERSOMNIA_LIBS OpenSSL::SSL OpenSSL::Crypto)

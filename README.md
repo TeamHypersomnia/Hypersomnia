@@ -216,7 +216,6 @@ Arch Linux:
 - ``libx11``
 - ``libxcb``
 - ``xcb-util-keysyms``
-- ``mbedtls``
 - ``libsodium``
 
 Ubuntu:
@@ -230,7 +229,6 @@ Ubuntu:
 - ``osspd``
 - ``libasound2``
 - ``libasound2-dev``
-- ``libmbedtls-dev``
 - ``libsodium-dev``
 
 

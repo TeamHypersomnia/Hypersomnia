@@ -101,7 +101,9 @@ void hud_messages_gui::draw(
 	const auto separation = float(line_h + box_padding.y * 2) * settings.box_separation;
 	const auto fading_height = separation;
 
+	// TODO: use this?
 	auto fading_mult_of_previous = 0.f;
+	(void)fading_mult_of_previous;
 
 	bool is_any_fading = false;
 

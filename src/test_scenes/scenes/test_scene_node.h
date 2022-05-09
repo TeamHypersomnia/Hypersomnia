@@ -21,7 +21,6 @@ class test_scene_node {
 	> enum_id;
 public:
 	test_scene_node() = default;
-	test_scene_node(const test_scene_node&) = default;
 
 	template <class E>
 	test_scene_node(cosmos& csm, const E e) : 

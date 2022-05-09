@@ -15,7 +15,6 @@ struct cascade_aligner_node {
 	bool was_flipped = false;
 
 	cascade_aligner_node() = default;
-	cascade_aligner_node(const cascade_aligner_node&) = default;
 
 	cascade_aligner_node(
 		const P& p, 

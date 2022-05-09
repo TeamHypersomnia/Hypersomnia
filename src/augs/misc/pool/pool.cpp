@@ -22,17 +22,17 @@ TEST_CASE("Pool SimpleBackAndForth") {
 		REQUIRE(p.empty());
 
 		for (unsigned i = 0; i < keys.size(); ++i) {
-			keys[i] = p.allocate(i).key;
+			keys[i] = p.allocate(static_cast<int>(i)).key;
 		}
 
 		REQUIRE(p.full());
 
 		for (unsigned i = 0; i < keys.size(); ++i) {
-			REQUIRE(p.get(keys[i]) == i);
+			REQUIRE(p.get(keys[i]) == static_cast<int>(i));
 		}
 
 		for (unsigned i = 0; i < keys.size(); ++i) {
-			REQUIRE(p.get(keys[i]) == i);
+			REQUIRE(p.get(keys[i]) == static_cast<int>(i));
 			p.free(keys[i]);
 		}
 
@@ -57,7 +57,7 @@ TEST_CASE("Pool UndoAllocations") {
 		for (int idx = static_cast<int>(keys.size()) - 1; idx >= 0; --idx) {
 			auto i = static_cast<unsigned>(idx);
 
-			REQUIRE(p.get(keys[i]) == i);
+			REQUIRE(p.get(keys[i]) == idx);
 			p.undo_last_allocate(keys[i]);
 		}
 
@@ -72,7 +72,7 @@ TEST_CASE("Pool UndoAllocations") {
 		for (int idx = static_cast<int>(keys.size()) - 1; idx >= 0; --idx) {
 			auto i = static_cast<unsigned>(idx);
 
-			REQUIRE(p.get(keys[i]) == i);
+			REQUIRE(p.get(keys[i]) == idx);
 			p.undo_last_allocate(keys[i]);
 		}
 	}
@@ -98,7 +98,7 @@ TEST_CASE("Pool UndoDeletes") {
 		// forward direction frees
 		{
 			for (unsigned i = 0; i < keys.size(); ++i) {
-				REQUIRE(p.get(keys[i]) == i);
+				REQUIRE(p.get(keys[i]) == static_cast<int>(i));
 				undos[i] = *p.free(keys[i]);
 			}
 
@@ -108,7 +108,7 @@ TEST_CASE("Pool UndoDeletes") {
 				unsigned i = static_cast<unsigned>(idx);
 
 				p.undo_free(undos[i], i);
-				REQUIRE(p.get(keys[i]) == i);
+				REQUIRE(p.get(keys[i]) == idx);
 			}
 		}
 			
@@ -117,7 +117,7 @@ TEST_CASE("Pool UndoDeletes") {
 			for (int idx = static_cast<int>(keys.size()) - 1; idx >= 0; --idx) {
 				unsigned i = static_cast<unsigned>(idx);
 
-				REQUIRE(p.get(keys[i]) == i);
+				REQUIRE(p.get(keys[i]) == static_cast<int>(i));
 				undos[i] = *p.free(keys[i]);
 			}
 
@@ -125,13 +125,13 @@ TEST_CASE("Pool UndoDeletes") {
 
 			for (unsigned i = 0; i < keys.size(); ++i) {
 				p.undo_free(undos[i], i);
-				REQUIRE(p.get(keys[i]) == i);
+				REQUIRE(p.get(keys[i]) == static_cast<int>(i));
 			}
 		}
 
 		/* cleanup */
 		for (unsigned i = 0; i < keys.size(); ++i) {
-			REQUIRE(p.get(keys[i]) == i);
+			REQUIRE(p.get(keys[i]) == static_cast<int>(i));
 			p.free(keys[i]);
 		}
 	}

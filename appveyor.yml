@@ -7,7 +7,7 @@ branches:
   only:
     - master
 
-image: Visual Studio 2019 Preview
+image: Visual Studio 2022
 configuration: Release
 build:
   verbosity: detailed
@@ -25,7 +25,7 @@ install:
   - set PATH=C:\projects\deps\ninja;%PATH%
   - ninja --version
 
-  - appveyor DownloadFile https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/LLVM-12.0.0-win64.exe -FileName llvm-installer.exe
+  - appveyor DownloadFile https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/LLVM-13.0.1-win64.exe -FileName llvm-installer.exe
   - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
 
 notifications:

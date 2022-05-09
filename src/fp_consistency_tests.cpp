@@ -348,6 +348,7 @@ bool perform_float_consistency_tests(const float_consistency_test_settings& sett
 			}
 		}
 
+		(void)trash;
 #if 0
 		LOG("Trash stuff: %x", trash);
 #endif

@@ -17,8 +17,6 @@ struct session_id_type {
 	session_id_type() = default;
 	explicit session_id_type(const id_value_type b) : value(b) {}
 	
-	session_id_type& operator=(const session_id_type& b) = default;
-
 	bool operator==(const session_id_type& b) const {
 		return value == b.value;
 	}

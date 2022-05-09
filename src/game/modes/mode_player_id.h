@@ -23,8 +23,6 @@ struct mode_player_id {
 	mode_player_id() = default;
 	explicit mode_player_id(const id_value_type b) : value(b) {}
 	
-	mode_player_id& operator=(const mode_player_id& b) = default;
-
 	bool operator==(const mode_player_id& b) const {
 		return value == b.value;
 	}
