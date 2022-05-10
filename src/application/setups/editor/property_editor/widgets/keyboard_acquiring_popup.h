@@ -29,7 +29,9 @@ struct keyboard_acquiring_popup {
 	}
 
 	void mark_not_opened() {
-		if (currently_opened && !ImGui::IsPopupOpen(*currently_opened)) {
+		const auto flags = 0;
+
+		if (currently_opened && !ImGui::IsPopupOpen(*currently_opened, flags)) {
 			currently_opened = std::nullopt;
 		}
 	}

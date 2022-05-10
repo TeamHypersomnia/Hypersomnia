@@ -715,6 +715,7 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/polypartition/src/polypartition.cpp"
 	"src/3rdparty/imgui/imgui.cpp"
 	"src/3rdparty/imgui/imgui_widgets.cpp"
+	"src/3rdparty/imgui/imgui_tables.cpp"
 	"src/3rdparty/imgui/imgui_draw.cpp"
 	"src/3rdparty/imgui/imgui_demo.cpp"
 	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"

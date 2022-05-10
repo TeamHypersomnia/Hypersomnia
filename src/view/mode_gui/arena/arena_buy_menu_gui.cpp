@@ -313,17 +313,17 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		if (owning == owning_type::OWNED) {
 			const auto col = active ? in.settings.already_owns_active_bg : in.settings.already_owns_bg;
-			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y + button_h);
+			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvail().x, 2 * item_spacing.y + button_h);
 			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
 		}
 		else if (owning == owning_type::OWNED_OF_THE_SAME_TYPE) {
 			const auto col = active ? in.settings.already_owns_other_type_active_bg : in.settings.already_owns_other_type_bg;
-			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y + button_h);
+			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvail().x, 2 * item_spacing.y + button_h);
 			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
 		}
 		else if (is_disabled) {
 			const auto col = active ? in.settings.disabled_active_bg : in.settings.disabled_bg;
-			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y + button_h);
+			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvail().x, 2 * item_spacing.y + button_h);
 			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
 		}
 		else {

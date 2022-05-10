@@ -6,7 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- disable automatic updates if not in production build
+- manual deployment only after all of the binaries are built
+	- so that the server and clients can go up at the same time
 
 - maybe: properly trim the crosshair raycast to the end of screen and change its color accordingly 
 - sort out the crosshair rendering when zoomed out (though we're going to redo the whole thing soon)

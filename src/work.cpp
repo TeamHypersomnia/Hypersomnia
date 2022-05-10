@@ -177,11 +177,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		};
 
 #if !IS_PRODUCTION_BUILD
-#if PLATFORM_UNIX
 		/* Some developer-friendly options */
+		result.http_client.update_on_launch = false;
+
+#if PLATFORM_UNIX
 		result.default_client_start.chosen_address_type = connect_address_type::CUSTOM;
 		result.window.fullscreen = false;
-		result.http_client.update_on_launch = false;
 #endif
 #endif
 

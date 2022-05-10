@@ -105,7 +105,7 @@ struct flavour_widget {
 					const bool is_current = flavour_id == new_id;
 
 					if (is_current && acquire_keyboard) {
-						ImGui::SetScrollHere();
+						ImGui::SetScrollHereY();
 					}
 
 					if (ImGui::Selectable(name.c_str(), is_current)) {

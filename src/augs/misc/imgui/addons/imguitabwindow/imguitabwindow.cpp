@@ -387,7 +387,7 @@ void RenderTextVertical(const ImFont* font,ImDrawList* draw_list, float size, Im
 
     // Align to be pixel perfect
     pos.x = (float)(int)pos.x;// + (rotateCCW ? (font->FontSize-font->DisplayOffset.y) : 0);  // Not sure it's correct
-    pos.y = (float)(int)pos.y + font->DisplayOffset.x;
+	pos.y = (float)(int)pos.y + font->ConfigData->GlyphOffset.x;
 
 
     float x = pos.x;
@@ -690,7 +690,7 @@ static bool OldBeginChild(const char* str_id, const ImVec2& size_arg = ImVec2(0,
     //if (!(parent_window->Flags & ImGuiWindowFlags_ShowBorders)) child_window->Flags &= ~ImGuiWindowFlags_ShowBorders;
 
     // Process navigation-in immediately so NavInit can run on first frame
-    if (!(flags & ImGuiWindowFlags_NavFlattened) && (child_window->DC.NavLayerActiveMask != 0 || child_window->DC.NavHasScroll) && GImGui->NavActivateId == id)
+    if (!(flags & ImGuiWindowFlags_NavFlattened) && (child_window->DC.NavLayersActiveMask != 0 || child_window->DC.NavHasScroll) && GImGui->NavActivateId == id)
     {
         ImGui::FocusWindow(child_window);
         ImGui::NavInitWindow(child_window, false);
@@ -2044,6 +2044,7 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
                     //hoveredTab = &tab;
                     if (tab.tooltip && mhs.isWindowHovered && strlen(tab.tooltip)>0 && (&tab!=mhs.tabLabelPopup || GImGui->OpenPopupStack.size()==0) )  ImGui::SetTooltip("%s",tab.tooltip);
 
+					ImGuiWindow* root_window = g.HoveredWindow ? g.HoveredWindow->RootWindow : NULL;
                     if (isDraggingCorrectly) {
                         if (mhs.isMouseDraggingJustStarted)  {
                             if (!dd.draggingTabSrc) {
@@ -2081,11 +2082,11 @@ void TabWindowNode::render(const ImVec2 &windowSize, MyTabWindowHelperStruct *pt
                             }
                         }
                     }
-                    else if (dd.draggingTabSrc && dd.draggingTabSrc!=&tab && g.HoveredRootWindow && g.CurrentWindow) {
+                    else if (dd.draggingTabSrc && dd.draggingTabSrc!=&tab && root_window && g.CurrentWindow) {
                         // This code should execute only on a drop AFAIK
-                        const int len1 = strlen(g.HoveredRootWindow->Name);
+                        const int len1 = strlen(root_window->Name);
                         const int len2 = strlen(g.CurrentWindow->Name);
-                        if (strncmp(g.HoveredRootWindow->Name,g.CurrentWindow->Name,len1)==0 && (len1<=len2 || g.CurrentWindow->Name[len1]=='.'))    {
+                        if (strncmp(root_window->Name,g.CurrentWindow->Name,len1)==0 && (len1<=len2 || g.CurrentWindow->Name[len1]=='.'))    {
                             //fprintf(stderr,"g.HoveredRootWindow=%s g.CurrentWindow=%s\n",g.HoveredRootWindow?g.HoveredRootWindow->Name:"NULL",g.CurrentWindow?g.CurrentWindow->Name:"NULL");
                             dd.draggingTabDst = &tab;
                             dd.draggingTabNodeDst = this;
@@ -2342,7 +2343,8 @@ void TabWindow::render()
     static const ImGuiWindow* HoveredCorrectChildWindow = NULL;
 
     // Draw dragging stuff and Apply drag logic -------------------------------------------
-    if (g.HoveredRootWindow==ImGui::GetCurrentWindow())
+	ImGuiWindow* root_window = g.HoveredWindow ? g.HoveredWindow->RootWindow : NULL;
+    if (root_window==ImGui::GetCurrentWindow())
     {
         ImGuiStyle& style = ImGui::GetStyle();
         int hoversInt = 0;  // 1 = center, 3 = center-top, 4 = center-right, 5 = center-bottom, 2 = center-left,

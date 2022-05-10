@@ -4517,3 +4517,4 @@ Advantages:
 	- why not just split for_each_attachment_recursive into one for rendering and one for common operations
 		- though we still need to do complex shit with it for physics calculations so it will be almost the same probably
 
+- disable automatic updates if not in production build

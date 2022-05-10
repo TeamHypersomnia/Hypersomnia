@@ -106,7 +106,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 		| ImGuiWindowFlags_NoSavedSettings
 	);
 
-	static auto arrow_callback = [](ImGuiTextEditCallbackData* data) {
+	static auto arrow_callback = [](auto* data) {
 		auto& input = *reinterpret_cast<text_edit_callback_input*>(data->UserData);
 		auto& self = input.self;
 		auto& cosm = input.cosm;

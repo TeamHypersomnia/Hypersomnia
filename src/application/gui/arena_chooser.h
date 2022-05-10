@@ -85,7 +85,7 @@ public:
 					const bool is_current = button_path.path.string() == current_source;
 
 					if (is_current && acquire_keyboard) {
-						ImGui::SetScrollHere();
+						ImGui::SetScrollHereY();
 					}
 
 					if (ImGui::Selectable(displayed_name.c_str(), is_current)) {
