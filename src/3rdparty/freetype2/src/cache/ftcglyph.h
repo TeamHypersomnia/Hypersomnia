@@ -4,7 +4,7 @@
  *
  *   FreeType abstract glyph cache (specification).
  *
- * Copyright (C) 2000-2019 by
+ * Copyright (C) 2000-2022 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -117,7 +117,6 @@
 #define FTCGLYPH_H_
 
 
-#include <ft2build.h>
 #include "ftcmanag.h"
 
 
@@ -141,8 +140,8 @@ FT_BEGIN_HEADER
 
   } FTC_FamilyRec, *FTC_Family;
 
-#define  FTC_FAMILY(x)    ( (FTC_Family)(x) )
-#define  FTC_FAMILY_P(x)  ( (FTC_Family*)(x) )
+#define  FTC_FAMILY( x )    ( (FTC_Family)(x) )
+#define  FTC_FAMILY_P( x )  ( (FTC_Family*)(x) )
 
 
   typedef struct  FTC_GNodeRec_
@@ -246,7 +245,7 @@ FT_BEGIN_HEADER
 #define FTC_GCACHE_CLASS( x )  ((FTC_GCacheClass)(x))
 
 #define FTC_CACHE_GCACHE_CLASS( x ) \
-          FTC_GCACHE_CLASS( FTC_CACHE(x)->org_class )
+          FTC_GCACHE_CLASS( FTC_CACHE( x )->org_class )
 #define FTC_CACHE_FAMILY_CLASS( x ) \
           ( (FTC_MruListClass)FTC_CACHE_GCACHE_CLASS( x )->family_class )
 
