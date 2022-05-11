@@ -970,7 +970,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					auto total_kickback = total_recoil;
 
-					if (sentience.use_button == use_button_state::DEFUSING) {
+					if (sentience.use_button == use_button_state::LOCKED_IN_INTERACTION) {
 						total_recoil *= 1.5f;
 						total_kickback *= 1.5f;
 					}

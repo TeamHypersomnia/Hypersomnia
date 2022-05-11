@@ -12,7 +12,7 @@ struct defuse_nearby_bomb_result {
 	bool defusing_already = false;
 
 	bool success() const {
-		return result == use_button_query_result::SUCCESS;
+		return result == use_button_query_result::STARTED_INTERACTION;
 	}
 
 	void perform(cosmos& cosm) const {
@@ -36,10 +36,8 @@ auto query_defusing_nearby_bomb(const E& subject) {
 		{ { tree_of_npo_type::RENDERABLES } }
 	});
 
-	using U = use_button_query_result;
-
 	defuse_nearby_bomb_result result;
-	result.result = U::NONE_FOUND;
+	result.result = use_button_query_result::NONE_FOUND;
 
 	entities.for_each<render_layer::PLANTED_ITEMS>(cosm, [&](const auto& bomb_handle) {
 		bomb_handle.template dispatch_on_having_all<components::hand_fuse>([&](const auto typed_bomb) -> callback_result {
@@ -53,12 +51,12 @@ auto query_defusing_nearby_bomb(const E& subject) {
 					if (fuse_logic.defusing_conditions_fulfilled(subject)) {
 						result.bomb_subject = typed_bomb;
 						result.defusing_subject = subject;
-						result.result = U::SUCCESS;
+						result.result = use_button_query_result::STARTED_INTERACTION;
 
 						return callback_result::ABORT;
 					}
 					else {
-						result.result = U::IN_RANGE_BUT_CANT;
+						result.result = use_button_query_result::IN_RANGE_BUT_CANT;
 					}
 				}
 			}

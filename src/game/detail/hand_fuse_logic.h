@@ -138,7 +138,7 @@ struct stepless_fuse_logic_provider {
 	}
 
 	bool defusing_requested() const {
-		return character_now_defusing.alive() && character_now_defusing.template get<components::sentience>().use_button == use_button_state::DEFUSING; 
+		return character_now_defusing.alive() && character_now_defusing.template get<components::sentience>().use_button == use_button_state::LOCKED_IN_INTERACTION;
 	}
 };
 
@@ -228,7 +228,7 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 			if (const auto sentience = character_now_defusing.template find<components::sentience>()) {
 				auto& u = sentience->use_button;
 
-				if (u == use_button_state::DEFUSING) {
+				if (u == use_button_state::LOCKED_IN_INTERACTION) {
 					u = use_button_state::QUERYING;
 				}
 			}

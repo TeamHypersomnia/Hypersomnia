@@ -59,20 +59,18 @@ void intent_contextualization_system::advance_use_button(const logic_step step) 
 
 			if (sentience.use_button == use_button_state::QUERYING) {
 				if (const auto transform = subject.find_logic_transform()) {
-					auto& u = sentience.last_use_result;
-
 					const auto result = query_defusing_nearby_bomb(subject);
-					u = result.result;
+					sentience.last_use_query_result = result.result;
 
 					if (result.success()) {
 						result.perform(cosm);
-						sentience.use_button = use_button_state::DEFUSING;
+						sentience.use_button = use_button_state::LOCKED_IN_INTERACTION;
 						return;
 					}
 				}
 			}
 			else {
-				sentience.last_use_result = use_button_query_result::NONE_FOUND;
+				sentience.last_use_query_result = use_button_query_result::NONE_FOUND;
 			}
 
 			{

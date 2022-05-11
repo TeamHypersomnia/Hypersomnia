@@ -5,6 +5,6 @@ enum class use_button_state {
 	IDLE,
 	QUERYING,
 
-	DEFUSING
+	LOCKED_IN_INTERACTION
 	// END GEN INTROSPECTOR
 };

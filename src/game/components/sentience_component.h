@@ -80,7 +80,7 @@ namespace components {
 		sentience_shake shake = sentience_shake::zero();
 
 		use_button_state use_button = use_button_state::IDLE;
-		use_button_query_result last_use_result = use_button_query_result::NONE_FOUND;
+		use_button_query_result last_use_query_result = use_button_query_result::NONE_FOUND;
 
 		damage_owners_vector damage_owners;
 		damage_origin knockout_origin;

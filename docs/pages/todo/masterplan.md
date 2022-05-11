@@ -8,6 +8,13 @@ summary: We need to set our priorities straight.
 
 Top-level topics that are most important.
 
+# Better controls
+
+## Picking up items
+
+We can do it first to warm up again to the game's architecture.
+We'll need to deploy a new version for this so maybe a simple separate function in upload_artifact will do.
+
 # Builder
 
 ## Map format
@@ -39,6 +46,4 @@ We might need incremental update procedures.
 Perhaps we won't do this with just a simple find/replace (or it might affect the string),
 but with some yaml node traversal logic so that only keys are affected.
 - Anyways, this is for later! Once we actually have lots of community maps.
-
-# Better controls
 

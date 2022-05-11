@@ -323,17 +323,31 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		if (const auto sentience = viewed_character.find<components::sentience>()) {
 			if (const auto sentience_def = viewed_character.find<invariants::sentience>()) {
-				if (sentience->use_button != use_button_state::IDLE) {
+				const auto use_state = sentience->use_button;
+				const bool is_active = use_state != use_button_state::IDLE;
+
+				if (is_active) {
 					if (const auto tr = viewed_character.find_viewing_transform(interp)) {
-						const auto& a = sentience_def->use_button_angle;
-						const auto& r = sentience_def->use_button_radius;
+						auto col = gray;
 
-						const bool is_querying = sentience->use_button == use_button_state::QUERYING;
-						auto col = is_querying ? gray : rgba(255, 0, 0, 180);
-
-						if (is_querying && sentience->last_use_result == use_button_query_result::IN_RANGE_BUT_CANT) {
+						if (use_state == use_button_state::LOCKED_IN_INTERACTION) {
 							col = green;
 						}
+						else if (use_state == use_button_state::QUERYING) {
+							switch (sentience->last_use_query_result) {
+								case use_button_query_result::IN_RANGE_BUT_CANT:
+									col = yellow;
+									break;
+								case use_button_query_result::STARTED_INTERACTION:
+									col = green;
+									break;
+								default:
+									break;
+							}
+						}
+
+						const auto& a = sentience_def->use_button_angle;
+						const auto& r = sentience_def->use_button_radius;
 
 						if (r > 0.f) {
 							const auto& p = tr->pos;
