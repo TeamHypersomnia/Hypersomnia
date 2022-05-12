@@ -12,9 +12,10 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v2.1.0
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
+        fetch-depth: 0
     - name: Install p7zip
       run: brew install p7zip
     - name: Install ImageMagick for create-dmg
