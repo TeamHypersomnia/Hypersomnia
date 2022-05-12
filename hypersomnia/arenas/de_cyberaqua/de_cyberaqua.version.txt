@@ -1,5 +1,5 @@
-Hypersomnia version 1.0.7552
-Revision no.: 7552 (dirty)
-Build date: Mon Jun 14 14:48:56 2021
+Hypersomnia version 1.0.7583
+Revision no.: 7583 (dirty)
+Build date: Thu May 12 18:10:31 2022
 Commit message:
-Resolve ambiguity in operator=(...)
+Renames for clarity (use_butto(...)
