@@ -181,6 +181,16 @@ vec2 get_interaction_query_center(
 	return tr.pos + tr.get_direction() * sentience_def.use_button_radius / 2;
 }
 
+template <class A>
+vec2 get_interaction_query_top(
+	const A& handle
+) {
+	const auto& sentience_def = handle.template get<invariants::sentience>();
+	const auto tr = handle.get_logic_transform();
+
+	return tr.pos + tr.get_direction() * sentience_def.use_button_radius;
+}
+
 template <class A, class B>
 auto use_button_overlaps(
 	const A& handle,

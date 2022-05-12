@@ -4,6 +4,8 @@
 #include "game/enums/interaction_result_type.h"
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
+#include "game/enums/filters.h"
+#include "game/inferred_caches/physics_world_cache.hpp"
 
 struct bomb_defuse_interaction {
 	entity_id bomb_subject;
@@ -158,8 +160,13 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 	auto best_item = entity_id();
 	auto best_distance = 0.0f;
 
-	const auto si = cosm.get_si();
-	const auto query_center = ::get_interaction_query_center(subject);
+	//const auto si = cosm.get_si();
+	//const auto query_center = ::get_interaction_query_center(subject);
+	const auto query_top = ::get_interaction_query_top(subject);
+
+	const auto transform = subject.get_logic_transform();
+	const auto segment_a = transform.pos; 
+	const auto segment_b = query_top; 
 
 	entities.for_each<render_layer::ITEMS_ON_GROUND>(cosm, [&](const const_entity_handle& item_handle) {
 		auto handle_candidate = [&](const auto& typed_item) {
@@ -176,9 +183,19 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 				return;
 			}
 
+			if (::calc_filters(item_handle) != filters[predefined_filter_type::LYING_ITEM]) {
+				/* 
+					Only match objects with physics of lying items.
+					Otherwise we might pick up a defused bomb, for example.
+				*/
+
+				return;
+			}
+
 			if (const auto overlap = ::use_button_overlaps(subject, item_handle)) {
-				const auto overlap_location = vec2(si.get_pixels(overlap->pointB));
-				const auto distance = (overlap_location - query_center).length_sq();
+				// const auto overlap_location = vec2(si.get_pixels(overlap->pointA));
+				// const auto distance = (overlap_location - query_center).length_sq();
+				const auto distance = item_handle.get_logic_transform().pos.sq_distance_from_segment(segment_a, segment_b); 
 
 				if (!best_item.is_set() || distance < best_distance) {
 					best_item = item_handle.get_id();
