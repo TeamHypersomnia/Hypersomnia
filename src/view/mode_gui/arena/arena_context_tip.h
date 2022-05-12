@@ -66,17 +66,52 @@ inline void draw_context_tip(
 	const auto final_pos = vec2i(screen_size.x / 2, settings.tip_offset_mult * screen_size.y);
 	const auto line_height = font.metrics.get_height();
 
-	auto pen = final_pos;
+	std::vector<formatted_string> lines;
 
-	auto do_line = [&](const auto& with_text) {
-		print_stroked(
-			out,
-			pen,
-			with_text,
-			{ augs::ralign::CX, augs::ralign::CY }
-		);
+	auto do_line = [&](auto with_text) {
+		lines.emplace_back(std::move(with_text));
+	};
 
-		pen.y += line_height;
+	auto draw_everything = [&]() {
+		const auto& cfg = config.arena_mode_gui.scoreboard_settings;
+		vec2i total_bbox = {0, 0};
+
+		bool any_text = false;
+
+		for (const auto& line_text : lines) {
+			if (!line_text.empty()) {
+				any_text = true;
+			}
+
+			const auto bbox = get_text_bbox(line_text);
+
+			total_bbox.x = std::max(total_bbox.x, bbox.x);
+			total_bbox.y += bbox.y;
+		}
+
+		if (!any_text) {
+			return;
+		}
+
+		const auto window_padding = vec2i(32, 16);
+
+		const auto popup_lt = vec2(final_pos.x - total_bbox.x / 2, final_pos.y - line_height / 2);
+		const auto window_bg_rect = ltrb(popup_lt, total_bbox).expand_from_center(window_padding);
+
+		out.aabb_with_border(window_bg_rect, cfg.background_color, cfg.border_color);
+
+		auto pen = final_pos;
+
+		for (const auto& line_text : lines) {
+			print_stroked(
+				out,
+				pen,
+				line_text,
+				{ augs::ralign::CX, augs::ralign::CY }
+			);
+
+			pen.y += line_height;
+		}
 	};
 
 	const auto total_text = [&]() {
@@ -134,21 +169,6 @@ inline void draw_context_tip(
 			text("You have released the cursor and can now interact with GUI.");
 			break_line();
 			text("To control the crosshair, press"); hotkey(general_gui_intent_type::TOGGLE_MOUSE_CURSOR); text("again.");
-
-			return total_text;
-		}
-
-		if (::buy_area_in_range(viewed_character)) {
-			if (!buy_menu_opened) {
-				if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
-					text("It is too late to buy items.");
-					return total_text;
-				}
-
-				text("Press");
-				hotkey(general_gui_intent_type::BUY_MENU);
-				text("to buy items.");
-			}
 
 			return total_text;
 		}
@@ -263,6 +283,23 @@ inline void draw_context_tip(
 
 		if (const auto potential_interaction = ::query_use_interaction(viewed_character)) {
 			std::visit(interaction_tip, *potential_interaction);
+
+			return total_text;
+		}
+
+		if (::buy_area_in_range(viewed_character)) {
+			if (!buy_menu_opened) {
+				if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
+					text("It is too late to buy items.");
+					return total_text;
+				}
+
+				text("Press");
+				hotkey(general_gui_intent_type::BUY_MENU);
+				text("to buy items.");
+			}
+
+			return total_text;
 		}
 
 		(void)viewed_character;
@@ -270,4 +307,6 @@ inline void draw_context_tip(
 	}();
 
 	do_line(total_text);
+
+	draw_everything();
 }

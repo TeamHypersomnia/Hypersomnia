@@ -193,9 +193,11 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 			}
 
 			if (const auto overlap = ::interaction_hitbox_overlaps(subject, item_handle)) {
-				// const auto overlap_location = vec2(si.get_pixels(overlap->pointA));
-				// const auto distance = (overlap_location - query_center).length_sq();
-				const auto distance = item_handle.get_logic_transform().pos.sq_distance_from_segment(segment_a, segment_b); 
+				const auto item_center = item_handle.get_logic_transform().pos;
+
+				//const auto overlap_location = vec2(si.get_pixels(overlap->pointA));
+				//const auto distance = (overlap_location - query_center).length_sq();
+				const auto distance = item_center.sq_distance_from_segment(segment_a, segment_b); 
 
 				if (!best_item.is_set() || distance < best_distance) {
 					best_item = item_handle.get_id();
