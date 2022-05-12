@@ -3,8 +3,6 @@
 enum class use_button_state {
 	// GEN INTROSPECTOR enum class use_button_state
 	IDLE,
-	QUERYING,
-
-	LOCKED_IN_INTERACTION
+	QUERYING
 	// END GEN INTROSPECTOR
 };

@@ -115,13 +115,13 @@ struct stepless_fuse_logic_provider {
 	}
 
 	template <class C>
-	bool defusing_conditions_fulfilled(const C& candidate) const {
+	bool defusing_conditions_fulfilled(const C& defusing_character) const {
 		return 
 			fuse_def.defusing_enabled()
-			&& candidate.alive() 
-			&& ::sentient_and_conscious(candidate)
-			&& candidate.get_official_faction() != fused_entity.get_official_faction()
-			&& is_standing_still(candidate)
+			&& defusing_character.alive() 
+			&& ::sentient_and_conscious(defusing_character)
+			&& defusing_character.get_official_faction() != fused_entity.get_official_faction()
+			&& is_standing_still(defusing_character)
 		;
 	}
 
@@ -138,7 +138,7 @@ struct stepless_fuse_logic_provider {
 	}
 
 	bool defusing_requested() const {
-		return character_now_defusing.alive() && character_now_defusing.template get<components::sentience>().use_button == use_button_state::LOCKED_IN_INTERACTION;
+		return character_now_defusing.alive() && character_now_defusing.template get<components::sentience>().is_interacting();
 	}
 };
 
@@ -223,16 +223,6 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 		msg.subject = character_now_defusing;
 		msg.event = battle_event::INTERRUPTED_DEFUSING;
 		step.post_message(msg);
-
-		if (character_now_defusing.alive()) {
-			if (const auto sentience = character_now_defusing.template find<components::sentience>()) {
-				auto& u = sentience->use_button;
-
-				if (u == use_button_state::LOCKED_IN_INTERACTION) {
-					u = use_button_state::QUERYING;
-				}
-			}
-		}
 
 		fuse.character_now_defusing = {}; 
 		fuse.amount_defused = -1.f;

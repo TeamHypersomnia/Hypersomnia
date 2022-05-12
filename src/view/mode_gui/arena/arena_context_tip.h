@@ -2,7 +2,7 @@
 #include "game/detail/buy_area_in_range.h"
 #include "game/detail/bombsite_in_range.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
-#include "game/detail/start_defusing_nearby_bomb.h"
+#include "game/detail/use_button_logic.h"
 
 template <class E, class M, class I>
 inline void draw_context_tip(
@@ -226,29 +226,43 @@ inline void draw_context_tip(
 			}
 		}
 
-		const auto defuse_request = ::query_defusing_nearby_bomb(viewed_character); 
+		auto interaction_tip = [&](const auto& typed_interaction) {
+			using T = remove_cref<decltype(typed_interaction)>;
 
-		if (defuse_request.defusing_already) {
-			text("Stay still while defusing.");
+			if constexpr(std::is_same_v<T, item_pickup>) {
+				text("Press");
+				hotkey(game_intent_type::INTERACT);
+				text("to pick up ");
 
-			if (viewed_character.get_wielded_items().size() > 0) {
-				break_line();
-				text("Hide items with");
-				hotkey(inventory_gui_intent_type::HOLSTER);
-				text("or drop them with");
-				hotkey(game_intent_type::DROP);
-				text("to defuse faster!");
+				const auto& item_name = cosm[typed_interaction.item].get_name();
+				total_text += colored(item_name, settings.item_name_color);
+
+				text(".");
 			}
+			else if constexpr(std::is_same_v<T, bomb_defuse_interaction>) {
+				if (typed_interaction.is_in_progress()) {
+					text("Stay still while defusing.");
 
-			return total_text;
-		}
+					if (viewed_character.get_wielded_items().size() > 0) {
+						break_line();
+						text("Hide items with");
+						hotkey(inventory_gui_intent_type::HOLSTER);
+						text("or drop them with");
+						hotkey(game_intent_type::DROP);
+						text("to defuse faster!");
+					}
+				}
 
-		if (defuse_request.success()) {
-			text("Press");
-			hotkey(game_intent_type::INTERACT);
-			text("to defuse the bomb.");
+				if (typed_interaction.can_begin_interaction()) {
+					text("Press");
+					hotkey(game_intent_type::INTERACT);
+					text("to defuse the bomb.");
+				}
+			}
+		};
 
-			return total_text;
+		if (const auto potential_interaction = ::query_use_interaction(viewed_character)) {
+			std::visit(interaction_tip, *potential_interaction);
 		}
 
 		(void)viewed_character;

@@ -105,7 +105,7 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::LYING_ITEM];
 		out.categoryBits = make_flags(C::LYING_ITEM);
-		out.maskBits = standard_participation();
+		out.maskBits = standard_participation_except(C::CHARACTER);
 	}
 	{
 

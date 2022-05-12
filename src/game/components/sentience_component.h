@@ -31,10 +31,11 @@
 #include "game/detail/damage_origin.h"
 
 #include "game/detail/sentience/detached_body_parts.h"
-#include "game/enums/use_button_query_result.h"
+#include "game/enums/interaction_result_type.h"
 #include "game/enums/weapon_action_type.h"
 #include "game/detail/inventory/hand_count.h"
 #include "game/components/explosive_component.h"
+#include "augs/pad_bytes.h"
 
 struct damage_owner {
 	// GEN INTROSPECTOR struct damage_owner
@@ -79,8 +80,9 @@ namespace components {
 		augs::stepped_timestamp when_corpse_catched_fire;
 		sentience_shake shake = sentience_shake::zero();
 
-		use_button_state use_button = use_button_state::IDLE;
-		use_button_query_result last_use_query_result = use_button_query_result::NONE_FOUND;
+		bool is_requesting_interaction = false;
+		pad_bytes<3> pad;
+		interaction_result_type last_interaction_result = interaction_result_type::NOTHING_FOUND;
 
 		damage_owners_vector damage_owners;
 		damage_origin knockout_origin;
@@ -103,6 +105,13 @@ namespace components {
 		augs::stepped_timestamp time_of_last_caused_danger;
 		real32 radius_of_last_caused_danger = 0.f;
 		// END GEN INTROSPECTOR
+
+		bool is_interacting() const {
+			const bool just_begun = last_interaction_result == interaction_result_type::CAN_BEGIN;
+			const bool in_progress = last_interaction_result == interaction_result_type::IN_PROGRESS;
+
+			return just_begun || in_progress;
+		}
 
 		bool is_learnt(const spell_id id) const {
 			ensure(id.is_set());

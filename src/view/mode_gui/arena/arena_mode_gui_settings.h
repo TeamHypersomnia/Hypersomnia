@@ -47,6 +47,7 @@ struct arena_context_tip_settings {
 	float tip_offset_mult = 0.7f;
 	rgba tip_text_color = white;
 	rgba bound_key_color = yellow;
+	rgba item_name_color = yellow;
 	// END GEN INTROSPECTOR
 };
 

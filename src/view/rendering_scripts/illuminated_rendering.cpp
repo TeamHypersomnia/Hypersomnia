@@ -323,27 +323,20 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		if (const auto sentience = viewed_character.find<components::sentience>()) {
 			if (const auto sentience_def = viewed_character.find<invariants::sentience>()) {
-				const auto use_state = sentience->use_button;
-				const bool is_active = use_state != use_button_state::IDLE;
-
-				if (is_active) {
+				if (sentience->is_requesting_interaction) {
 					if (const auto tr = viewed_character.find_viewing_transform(interp)) {
 						auto col = gray;
 
-						if (use_state == use_button_state::LOCKED_IN_INTERACTION) {
-							col = green;
-						}
-						else if (use_state == use_button_state::QUERYING) {
-							switch (sentience->last_use_query_result) {
-								case use_button_query_result::IN_RANGE_BUT_CANT:
-									col = yellow;
-									break;
-								case use_button_query_result::STARTED_INTERACTION:
-									col = green;
-									break;
-								default:
-									break;
-							}
+						switch (sentience->last_interaction_result) {
+							case interaction_result_type::IN_RANGE_BUT_CANT:
+								col = yellow;
+								break;
+							case interaction_result_type::CAN_BEGIN:
+							case interaction_result_type::IN_PROGRESS:
+								col = green;
+								break;
+							default:
+								break;
 						}
 
 						const auto& a = sentience_def->use_button_angle;

@@ -17,7 +17,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
-#include "game/detail/start_defusing_nearby_bomb.h"
+#include "game/detail/use_button_logic.h"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
@@ -35,16 +35,7 @@ void intent_contextualization_system::handle_use_button_presses(const logic_step
 
 		if (e.intent == game_intent_type::INTERACT) {
 			if (const auto sentience = subject.find<components::sentience>()) {
-				auto& u = sentience->use_button;
-
-				if (e.was_pressed()) {
-					if (u == use_button_state::IDLE) {
-						u = use_button_state::QUERYING;
-					}
-				}
-				else {
-					u = use_button_state::IDLE;
-				}
+				sentience->is_requesting_interaction = e.was_pressed();
 			}
 		}
 	}
@@ -55,22 +46,30 @@ void intent_contextualization_system::advance_use_button(const logic_step step) 
 
 	cosm.for_each_having<components::sentience>(
 		[&](const auto subject) {
+			const auto transform = subject.find_logic_transform();
+
+			if (transform == std::nullopt) {
+				return;
+			}
+
 			auto& sentience = subject.template get<components::sentience>();
 
-			if (sentience.use_button == use_button_state::QUERYING) {
-				if (const auto transform = subject.find_logic_transform()) {
-					const auto result = query_defusing_nearby_bomb(subject);
-					sentience.last_use_query_result = result.result;
-
-					if (result.success()) {
-						result.perform(cosm);
-						sentience.use_button = use_button_state::LOCKED_IN_INTERACTION;
-						return;
-					}
-				}
+			if (!sentience.is_conscious()) {
+				sentience.last_interaction_result = interaction_result_type::NOTHING_FOUND;
+				return;
 			}
-			else {
-				sentience.last_use_query_result = use_button_query_result::NONE_FOUND;
+
+			/* Nothing found unless there is */
+			sentience.last_interaction_result = interaction_result_type::NOTHING_FOUND;
+
+			if (sentience.is_requesting_interaction) {
+				if (const auto result = ::query_use_interaction(subject)) {
+					auto process_interaction = [&](const auto& typed_interaction) {
+						return typed_interaction.process(step, subject.get_id());
+					};
+
+					sentience.last_interaction_result = std::visit(process_interaction, *result);
+				}
 			}
 
 			{

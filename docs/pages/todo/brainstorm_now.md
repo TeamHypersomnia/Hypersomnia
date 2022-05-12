@@ -6,6 +6,45 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add background to arena context tip so it is noticeable
+
+- Picking up items
+	- Always prioritize other things like bombs
+	- Items as the last when interacting with stuff
+		- We could also make items slightly move when we walk over them, but programatically, not physically
+	- ~World-space popups whenever our virtual pickup "dot" is over an item~
+		- Actually the dot will be only used to sort by distance
+	- Actually it will be better to have a fixed-position popup on the bottom of the screen
+		- More ergonomic and less likely to cover items on the screen
+			- We'll anyway highlight the pickable item with a border with a proper color (yellow/green? if pickable, red if no space in inventory)
+				- We could exchange weapons like in cs go if there is no space
+	- Use button states, just these three:
+		- None
+		- Querying
+		- During interaction
+	- Use button query results might be more
+		- None,
+		- 
+	- However we also query during interaction
+		- But we first check the current one for correctness
+		- How do we know what's current?
+			- We might actually recalculate it every frame deterministically
+			- If the resulting interaction is the same, then we change nothing
+	- Notice that any time we're interacting, we're also querying
+		- So we don't need a separate state for being locked in interaction.
+		- Only a boolean whether we're querying or not and the last query result.
+		- The target interaction type might have a method to determine whether it is already running or not.
+	- Easy, we should always deterministically infer the current interaction and advance it
+		
+
+- Fix that camera flying somewhere upon the last kill
+
+- don't give money to spectators
+	- just set the money to starting whenever a team is chosen
+
+- item overlaps: choose the item whose overlap point's distance is the smallest to the query center
+	- we'll be able to move the center around a circle with just the mouse so it should be cool
+
 - manual deployment only after all of the binaries are built
 	- so that the server and clients can go up at the same time
 

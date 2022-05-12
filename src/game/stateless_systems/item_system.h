@@ -6,7 +6,6 @@ class cosmos;
 
 class item_system {
 public:
-	void pick_up_touching_items(const logic_step step);
 	void handle_throw_item_intents(const logic_step step);
 
 	void handle_reload_intents(const logic_step step);

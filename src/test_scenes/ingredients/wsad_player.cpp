@@ -230,6 +230,8 @@ namespace test_flavours {
 			invariants::sentience sentience; 
 			components::sentience sentience_inst;
 
+			sentience.use_button_angle = 180;
+
 			sentience.shake_settings.max_duration_ms = 1800.f;
 			sentience.shake_settings.duration_mult = 0.65f;
 			sentience.shake_settings.final_mult = 0.7f;
