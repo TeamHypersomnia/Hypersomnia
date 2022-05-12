@@ -388,7 +388,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 		  { 0x0020, 0x00FF }, -- Basic Latin + Latin Supplement
 		  { 0x0100, 0x017F }  -- Latin Extended-A
 		},
-		size_in_pixels = 20,
+		size_in_pixels = 24,
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "ONLY_IN_PRODUCTION",
 		settings = {},

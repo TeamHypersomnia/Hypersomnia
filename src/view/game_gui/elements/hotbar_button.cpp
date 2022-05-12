@@ -233,7 +233,9 @@ void hotbar_button::draw(
 				}
 
 				if (part_visibility_flag(type)) {
-					output.aabb(necessarys.at(id), drawn_rc, col, corners.flip);
+					if (type != button_corner_type::RB_INTERNAL_BORDER && type != button_corner_type::RB_BORDER) {
+						output.aabb(necessarys.at(id), drawn_rc, col, corners.flip);
+					}
 				}
 				
 				if (type == button_corner_type::LB_COMPLEMENT) {
@@ -344,7 +346,7 @@ void hotbar_button::draw(
 		f.decrease_alpha = false;
 		f.decrease_border_alpha = false;
 		f.draw_container_opened_mark = false;
-		f.draw_charges = true;
+		f.draw_charges = false;
 		f.always_draw_charges_as_closed = true;
 		f.draw_attachments_even_if_open = true;
 		f.expand_size_to_grid = false;
