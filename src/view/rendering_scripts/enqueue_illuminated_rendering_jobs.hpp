@@ -366,12 +366,21 @@ void enqueue_illuminated_rendering_jobs(
 			auto pickable_item_to_highlight = entity_id();
 			auto pickable_color = white;
 
+			const auto bad_color = rgba(255, 50, 50, 255);
+
 			if (potential_interaction != std::nullopt) {
 				auto handle_interaction = [&](const auto& typed_interaction) {
 					using T = remove_cref<decltype(typed_interaction)>;
 
 					if constexpr(std::is_same_v<T, item_pickup>) {
+						const auto item_handle = cosm[typed_interaction.item];
+						const auto pickup_slot = viewed_character.find_pickup_target_slot_for(item_handle, { slot_finding_opt::OMIT_MOUNTED_SLOTS });
+
 						pickable_item_to_highlight = typed_interaction.item;
+
+						if (pickup_slot.dead()) {
+							pickable_color = bad_color;
+						}
 					}
 				};
 

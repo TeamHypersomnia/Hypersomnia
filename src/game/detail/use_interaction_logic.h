@@ -37,16 +37,14 @@ struct item_pickup {
 		const auto picker = cosm[character];
 
 		auto handle_pickup = [&](const auto& typed_item) {
-			if (is_like_thrown_melee(typed_item)) {
-				if (const auto sender = typed_item.template find<components::sender>()) {
-					if (!sender->is_sender_subject(picker)) {
-						return;
-					}
-				}
-			}
-
 			picker.dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_picker) {
 				auto& transfers = typed_picker.template get<components::item_slot_transfers>();
+				auto c = typed_item.get_special_physics().dropped_or_created_cooldown;
+				c.cooldown_duration_ms = 80.f;
+
+				if (!c.is_ready(clk)) {
+					return;
+				}
 
 				const auto& pick_list = transfers.only_pick_these_items;
 				const bool found_on_subscription_list = found_in(pick_list, typed_item.get_id());
@@ -55,19 +53,16 @@ struct item_pickup {
 					(pick_list.empty() && transfers.pick_all_touched_items_if_list_to_pick_empty)
 					|| found_on_subscription_list
 				) {
+					const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);
+
+					if (!can_pick_already) {
+						return;
+					}
+
 					const auto pickup_slot = typed_picker.find_pickup_target_slot_for(typed_item, { slot_finding_opt::OMIT_MOUNTED_SLOTS });
 
 					if (pickup_slot.alive()) {
-						const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);
-
-						if (can_pick_already) {
-							auto c = typed_item.get_special_physics().dropped_or_created_cooldown;
-							c.cooldown_duration_ms = 80.f;
-
-							if (c.is_ready(clk)) {
-								perform_transfer(item_slot_transfer_request::standard(entity_id(typed_item.get_id()), pickup_slot), step);
-							}
-						}
+						perform_transfer(item_slot_transfer_request::standard(entity_id(typed_item.get_id()), pickup_slot), step);
 					}
 				}
 			});

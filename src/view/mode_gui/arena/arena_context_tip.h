@@ -22,6 +22,7 @@ inline void draw_context_tip(
 	using namespace augs::event;
 
 	const auto& cosm = mode_input.cosm;
+	const auto bad_color = rgba(255, 50, 50, 255);
 
 	auto colored = [&](const auto& text, const auto& c) {
 		const auto text_style = style(font, c);
@@ -65,6 +66,8 @@ inline void draw_context_tip(
 
 	const auto final_pos = vec2i(screen_size.x / 2, settings.tip_offset_mult * screen_size.y);
 	const auto line_height = font.metrics.get_height();
+	const auto& cfg = config.arena_mode_gui.scoreboard_settings;
+	auto border_color = cfg.border_color;
 
 	std::vector<formatted_string> lines;
 
@@ -73,7 +76,6 @@ inline void draw_context_tip(
 	};
 
 	auto draw_everything = [&]() {
-		const auto& cfg = config.arena_mode_gui.scoreboard_settings;
 		vec2i total_bbox = {0, 0};
 
 		bool any_text = false;
@@ -98,7 +100,7 @@ inline void draw_context_tip(
 		const auto popup_lt = vec2(final_pos.x - total_bbox.x / 2, final_pos.y - line_height / 2);
 		const auto window_bg_rect = ltrb(popup_lt, total_bbox).expand_from_center(window_padding);
 
-		out.aabb_with_border(window_bg_rect, cfg.background_color, cfg.border_color);
+		out.aabb_with_border(window_bg_rect, cfg.background_color, border_color);
 
 		auto pen = final_pos;
 
@@ -145,6 +147,10 @@ inline void draw_context_tip(
 
 		auto text = [&](const auto& str) {
 			total_text += colored(str, settings.tip_text_color);
+		};
+
+		auto text_colored = [&](const auto& str, auto col) {
+			total_text += colored(str, col);
 		};
 
 		if (current_faction == faction_type::SPECTATOR) {
@@ -250,14 +256,30 @@ inline void draw_context_tip(
 			using T = remove_cref<decltype(typed_interaction)>;
 
 			if constexpr(std::is_same_v<T, item_pickup>) {
-				text("Press");
-				hotkey(game_intent_type::INTERACT);
-				text("to pick up ");
+				const auto item_handle = cosm[typed_interaction.item];
+				const auto pickup_slot = viewed_character.find_pickup_target_slot_for(item_handle, { slot_finding_opt::OMIT_MOUNTED_SLOTS });
 
-				const auto& item_name = cosm[typed_interaction.item].get_name();
-				total_text += colored(item_name, settings.item_name_color);
+				if (pickup_slot.alive()) {
+					text("Press");
+					hotkey(game_intent_type::INTERACT);
+					text("to pick up ");
 
-				text(".");
+					const auto& item_name = item_handle.get_name();
+					total_text += colored(item_name, settings.item_name_color);
+
+					text(".");
+				}
+				else {
+					border_color = bad_color;
+
+					text("Inventory is ");
+					text_colored("full", bad_color);
+					text(".");
+					break_line();
+					text("Buy a ");
+					text_colored("Backpack", settings.bound_key_color);
+					text(" to carry a lot of items.");
+				}
 			}
 			else if constexpr(std::is_same_v<T, bomb_defuse_interaction>) {
 				if (typed_interaction.is_in_progress()) {
