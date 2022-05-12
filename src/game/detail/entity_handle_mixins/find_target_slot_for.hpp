@@ -87,7 +87,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 
 	ensure(item.alive()) 
 	ensure(searched_root_container.alive());
-	ensure(item.get_id() != searched_root_container.get_id());
+	ensure(entity_id(item.get_id()) != entity_id(searched_root_container.get_id()));
 
 	inventory_slot_id target_slot;
 
