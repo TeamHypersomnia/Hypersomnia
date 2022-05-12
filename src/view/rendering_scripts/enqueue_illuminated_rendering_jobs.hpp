@@ -2,6 +2,7 @@
 #include "view/rendering_scripts/draw_character_glow.h"
 #include "game/detail/visible_entities.hpp"
 #include "view/rendering_scripts/is_reasonably_in_view.hpp"
+#include "game/detail/use_button_logic.h"
 
 void enqueue_illuminated_rendering_jobs(
 	augs::thread_pool& pool, 
@@ -30,6 +31,8 @@ void enqueue_illuminated_rendering_jobs(
 	const auto pre_step_crosshair_displacement = in.pre_step_crosshair_displacement;
 
 	const auto& viewed_character = in.camera.viewed_character;
+	const auto potential_interaction = viewed_character.alive() ? ::query_use_interaction(viewed_character) : std::optional<use_interaction_variant>();
+
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 	(void)viewed_character_transform;
 
@@ -360,11 +363,29 @@ void enqueue_illuminated_rendering_jobs(
 		}
 
 		{
+			auto pickable_item_to_highlight = entity_id();
+			auto pickable_color = white;
+
+			if (potential_interaction != std::nullopt) {
+				auto handle_interaction = [&](const auto& typed_interaction) {
+					using T = remove_cref<decltype(typed_interaction)>;
+
+					if constexpr(std::is_same_v<T, item_pickup>) {
+						pickable_item_to_highlight = typed_interaction.item;
+					}
+				};
+
+				std::visit(handle_interaction, *potential_interaction);
+			}
+
 			auto job = [
 				&visible,
 				&cosm,
 				global_time_seconds,
+				pickable_item_to_highlight,
+				pickable_color,
 				shadows  = make_drawing_input(D::DROPPED_ITEMS_SHADOWS),
+				borders  = make_drawing_input(D::DROPPED_ITEMS_BORDERS),
 				diffuse  = make_drawing_input(D::DROPPED_ITEMS_DIFFUSE),
 				neons    = make_drawing_input(D::DROPPED_ITEMS_NEONS),
 				overlays = make_drawing_input(D::DROPPED_ITEMS_OVERLAYS)
@@ -416,10 +437,24 @@ void enqueue_illuminated_rendering_jobs(
 							auto overlay_color = rgba(255, 255, 255, 40);
 							overlay_color.mult_alpha(overlay_alpha);
 
+							const bool pickable = typed_item.get_id() == pickable_item_to_highlight;
+
 							::specific_draw_color_highlight(typed_item, shadow_color, shadows);
 							::specific_draw_entity(typed_item, diffuse, make_offset_input);
 							::specific_draw_neon_map(typed_item, neons, make_offset_input);
-							::specific_draw_color_highlight(typed_item, overlay_color, overlays, make_offset_input);
+
+							if (!pickable) {
+								::specific_draw_color_highlight(typed_item, overlay_color, overlays, make_offset_input);
+							}
+
+							if (pickable) {
+								auto standard_border_provider = [pickable_color](const auto& typed_handle) -> std::optional<rgba> {
+									(void)typed_handle;
+									return pickable_color;
+								};
+
+								::specific_draw_border(typed_item, borders, standard_border_provider, make_offset_input);
+							}
 						});
 					}
 				);

@@ -528,14 +528,17 @@ FORCE_INLINE void specific_draw_entity(
 	specific_entity_drawer(typed_handle, in, callback);
 }
 
-template <class E, class border_provider>
+template <class E, class border_provider, class F = default_customize_input>
 FORCE_INLINE void specific_draw_border(
 	const cref_typed_entity_handle<E> typed_handle,
 	const draw_renderable_input& in,
-	const border_provider& borders
+	const border_provider& borders,
+	F&& customize_input = default_customize_input()
 ) {
 	if (const auto border_info = borders(typed_handle)) {
-		auto border_maker = [border_info](const auto& renderable, const auto& manager, auto& input) {
+		auto border_maker = [border_info, customize_input](const auto& renderable, const auto& manager, auto& pre_input) {
+			auto input = customize_input(pre_input);
+
 			const auto source_pos = input.renderable_transform.pos;
 			input.colorize = *border_info;
 

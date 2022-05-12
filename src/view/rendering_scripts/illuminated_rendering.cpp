@@ -620,6 +620,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
 	renderer.call_triangles(D::DROPPED_ITEMS_SHADOWS);
+	renderer.call_triangles(D::DROPPED_ITEMS_BORDERS);
 
 	set_shader_with_matrix(shaders.illuminated);
 	renderer.call_triangles(D::DROPPED_ITEMS_DIFFUSE);
