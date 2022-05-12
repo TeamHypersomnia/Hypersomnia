@@ -339,8 +339,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 								break;
 						}
 
-						const auto& a = sentience_def->use_button_angle;
-						const auto& r = sentience_def->use_button_radius;
+						const auto& a = sentience_def->interaction_hitbox_range;
+						const auto& r = sentience_def->interaction_hitbox_radius;
 
 						if (r > 0.f) {
 							const auto& p = tr->pos;

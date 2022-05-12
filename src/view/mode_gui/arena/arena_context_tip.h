@@ -2,7 +2,7 @@
 #include "game/detail/buy_area_in_range.h"
 #include "game/detail/bombsite_in_range.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
-#include "game/detail/use_button_logic.h"
+#include "game/detail/use_interaction_logic.h"
 
 template <class E, class M, class I>
 inline void draw_context_tip(

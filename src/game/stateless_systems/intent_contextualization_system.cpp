@@ -17,7 +17,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
-#include "game/detail/use_button_logic.h"
+#include "game/detail/use_interaction_logic.h"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
@@ -41,7 +41,7 @@ void intent_contextualization_system::handle_use_button_presses(const logic_step
 	}
 }
 
-void intent_contextualization_system::advance_use_button(const logic_step step) {
+void intent_contextualization_system::advance_use_interactions(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 
 	cosm.for_each_having<components::sentience>(

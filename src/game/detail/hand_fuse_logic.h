@@ -110,7 +110,7 @@ struct stepless_fuse_logic_provider {
 	bool defusing_character_in_range(const C& candidate) const {
 		return 
 			candidate.get_official_faction() != fused_entity.get_official_faction() 
-			&& use_button_overlaps(candidate, fused_entity).has_value()
+			&& interaction_hitbox_overlaps(candidate, fused_entity).has_value()
 		;
 	}
 

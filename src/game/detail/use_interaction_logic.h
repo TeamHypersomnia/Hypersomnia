@@ -87,7 +87,7 @@ using use_interaction_variant = std::variant<
 template <class E>
 std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 	auto& cosm = subject.get_cosmos();
-	const auto max_defuse_radius = subject.template get<invariants::sentience>().use_button_radius;
+	const auto max_defuse_radius = subject.template get<invariants::sentience>().interaction_hitbox_radius;
 	const auto where = subject.get_logic_transform().pos;
 
 	auto& entities = thread_local_visible_entities();
@@ -192,7 +192,7 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 				return;
 			}
 
-			if (const auto overlap = ::use_button_overlaps(subject, item_handle)) {
+			if (const auto overlap = ::interaction_hitbox_overlaps(subject, item_handle)) {
 				// const auto overlap_location = vec2(si.get_pixels(overlap->pointA));
 				// const auto distance = (overlap_location - query_center).length_sq();
 				const auto distance = item_handle.get_logic_transform().pos.sq_distance_from_segment(segment_a, segment_b); 

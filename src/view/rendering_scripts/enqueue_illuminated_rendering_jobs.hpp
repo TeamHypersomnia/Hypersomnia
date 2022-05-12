@@ -2,7 +2,7 @@
 #include "view/rendering_scripts/draw_character_glow.h"
 #include "game/detail/visible_entities.hpp"
 #include "view/rendering_scripts/is_reasonably_in_view.hpp"
-#include "game/detail/use_button_logic.h"
+#include "game/detail/use_interaction_logic.h"
 
 void enqueue_illuminated_rendering_jobs(
 	augs::thread_pool& pool, 

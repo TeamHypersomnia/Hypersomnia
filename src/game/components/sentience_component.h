@@ -18,8 +18,6 @@
 
 #include "game/components/transform_component.h"
 
-#include "game/enums/use_button_state.h"
-
 #include "game/detail/all_sentience_meters.h"
 #include "augs/math/physics_structs.h"
 #include "game/detail/spells/all_spells.h"
@@ -178,8 +176,8 @@ namespace invariants {
 		real32 minimum_danger_amount_to_evade = 20.f;
 		real32 danger_amount_from_hostile_attitude = 100.f;
 
-		real32 use_button_radius = 100.f;
-		real32 use_button_angle = 90.f;
+		real32 interaction_hitbox_radius = 100.f;
+		real32 interaction_hitbox_range = 90.f;
 
 		real32 aimpunch_mult = 1.f;
 		real32 const_inertia_damage_ratio = 2.f;

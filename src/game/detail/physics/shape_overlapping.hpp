@@ -178,7 +178,7 @@ vec2 get_interaction_query_center(
 	const auto& sentience_def = handle.template get<invariants::sentience>();
 	const auto tr = handle.get_logic_transform();
 
-	return tr.pos + tr.get_direction() * sentience_def.use_button_radius / 2;
+	return tr.pos + tr.get_direction() * sentience_def.interaction_hitbox_radius / 2;
 }
 
 template <class A>
@@ -188,11 +188,11 @@ vec2 get_interaction_query_top(
 	const auto& sentience_def = handle.template get<invariants::sentience>();
 	const auto tr = handle.get_logic_transform();
 
-	return tr.pos + tr.get_direction() * sentience_def.use_button_radius;
+	return tr.pos + tr.get_direction() * sentience_def.interaction_hitbox_radius;
 }
 
 template <class A, class B>
-auto use_button_overlaps(
+auto interaction_hitbox_overlaps(
 	const A& handle,
 	const B& other
 ) -> std::optional<b2TestOverlapOutput> {
@@ -201,9 +201,9 @@ auto use_button_overlaps(
 
 	if (const auto result = circular_sector_overlaps_entity(
 		tr.pos,
-		sentience_def.use_button_radius,
+		sentience_def.interaction_hitbox_radius,
 		tr.rotation,
-		sentience_def.use_button_angle,
+		sentience_def.interaction_hitbox_range,
 		other
 	)) {
 		return result;
