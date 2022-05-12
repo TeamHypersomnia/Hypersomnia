@@ -205,7 +205,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		return {};
 	}
 
-	center_next_window(vec2::square(0.7f), ImGuiCond_Once);
+	center_next_window(vec2::square(0.9f), ImGuiCond_Once);
 
 	const auto window_name = "Buy menu";
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
@@ -356,7 +356,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		else {
 			text_color(typesafe_sprintf("%x$", price), money_color);
 			ImGui::SameLine();
-
+			ImGui::SetCursorPosY(prev_y);
 			price_callback(num_affordable);
 		}
 
@@ -429,10 +429,19 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				::on_spell(cosm, s_id,  [&](const auto& spell_data) {
 					(void)spell_data;
+					const bool show_how_many_spells = false;
+
+					if (!show_how_many_spells) {
+						return;
+					}
+
+					const auto prev_y = ImGui::GetCursorPosY();
 					text_disabled("(Can buy");
 					ImGui::SameLine();
+					ImGui::SetCursorPosY(prev_y);
 					text_color(typesafe_sprintf("%x", num_affordable), num_affordable == 0 ? red : money_color);
 					ImGui::SameLine();
+					ImGui::SetCursorPosY(prev_y);
 					text_disabled("more)");
 				});
 			}
@@ -568,17 +577,26 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					}
 
 					(void)typed_flavour;
-					text_disabled("(Can buy");
-					ImGui::SameLine();
-					text_color(typesafe_sprintf("%x", num_affordable), num_affordable == 0 ? red : money_color);
-					ImGui::SameLine();
-					text_disabled("more)");
-					ImGui::SameLine();
+
+					const auto prev_y = ImGui::GetCursorPosY();
+
+					if (b == button_type::REPLENISHABLE) {
+						text_disabled("(Can buy");
+						ImGui::SameLine();
+						ImGui::SetCursorPosY(prev_y);
+						text_color(typesafe_sprintf("%x", num_affordable), num_affordable == 0 ? red : money_color);
+						ImGui::SameLine();
+						ImGui::SetCursorPosY(prev_y);
+						text_disabled("more)");
+						ImGui::SameLine();
+						ImGui::SetCursorPosY(prev_y);
+					}
 
 					const auto space_rhs = num_owned + num_carryable;
 
 					text_disabled("Space:");
 					ImGui::SameLine();
+					ImGui::SetCursorPosY(prev_y);
 
 					if (num_carryable == 0) {
 						text_color(typesafe_sprintf("%x/%x", num_owned, space_rhs), red);
