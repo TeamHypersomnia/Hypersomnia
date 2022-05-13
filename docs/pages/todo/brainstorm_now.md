@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Cast a ray to the overlap point to not be able to pick up items through walls
 - Add background to arena context tip so it is noticeable
 
 - Picking up items
