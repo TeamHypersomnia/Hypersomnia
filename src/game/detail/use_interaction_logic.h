@@ -39,13 +39,6 @@ struct item_pickup {
 		auto handle_pickup = [&](const auto& typed_item) {
 			picker.dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_picker) {
 				auto& transfers = typed_picker.template get<components::item_slot_transfers>();
-				auto c = typed_item.get_special_physics().dropped_or_created_cooldown;
-				c.cooldown_duration_ms = 80.f;
-
-				if (!c.is_ready(clk)) {
-					return;
-				}
-
 				const auto& pick_list = transfers.only_pick_these_items;
 				const bool found_on_subscription_list = found_in(pick_list, typed_item.get_id());
 
@@ -163,22 +156,33 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 	const auto segment_a = transform.pos; 
 	const auto segment_b = query_top; 
 
-	entities.for_each<render_layer::ITEMS_ON_GROUND>(cosm, [&](const const_entity_handle& item_handle) {
-		auto handle_candidate = [&](const auto& typed_item) {
-			if (is_like_thrown_melee(typed_item)) {
-				if (const auto sender = typed_item.template find<components::sender>()) {
+	entities.for_each<render_layer::ITEMS_ON_GROUND>(cosm, [&](const const_entity_handle& touched_item_part) {
+		auto handle_candidate = [&](const auto& typed_root_item) {
+			{
+				const auto& clk = cosm.get_clock();
+
+				auto c = typed_root_item.get_special_physics().dropped_or_created_cooldown;
+				c.cooldown_duration_ms = 80.f;
+
+				if (!c.is_ready(clk)) {
+					return;
+				}
+			}
+
+			if (is_like_thrown_melee(typed_root_item)) {
+				if (const auto sender = typed_root_item.template find<components::sender>()) {
 					if (!sender->is_sender_subject(subject)) {
 						return;
 					}
 				}
 			}
 
-			if (typed_item.get_owning_transfer_capability().alive()) {
+			if (typed_root_item.get_owning_transfer_capability().alive()) {
 				/* Item is somehow used by someone else */
 				return;
 			}
 
-			if (::calc_filters(item_handle) != filters[predefined_filter_type::LYING_ITEM]) {
+			if (::calc_filters(typed_root_item) != filters[predefined_filter_type::LYING_ITEM]) {
 				/* 
 					Only match objects with physics of lying items.
 					Otherwise we might pick up a defused bomb, for example.
@@ -187,26 +191,29 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 				return;
 			}
 
-			if (const auto overlap = ::interaction_hitbox_overlaps(subject, item_handle)) {
-				const auto item_center = item_handle.get_logic_transform().pos;
+			if (const auto overlap = ::interaction_hitbox_overlaps(subject, touched_item_part)) {
+				const auto item_center = touched_item_part.get_logic_transform().pos;
 
 				//const auto overlap_location = vec2(si.get_pixels(overlap->pointA));
 				//const auto distance = (overlap_location - query_center).length_sq();
 				const auto distance = item_center.sq_distance_from_segment(segment_a, segment_b); 
 
 				if (!best_item.is_set() || distance < best_distance) {
-					best_item = item_handle.get_id();
-
-					if (typed_item.get_current_slot().alive()) {
-						best_item = typed_item.get_current_slot().get_root_container();
-					}
-
+					best_item = typed_root_item.get_id();
 					best_distance = distance;
 				}
 			}
 		};
 
-		item_handle.dispatch_on_having_all<invariants::item>(handle_candidate);
+		const const_entity_handle considered_root = [&]() {
+			if (touched_item_part.get_current_slot().alive()) {
+				return touched_item_part.get_current_slot().get_root_container();
+			}
+
+			return touched_item_part;
+		}();
+
+		considered_root.dispatch_on_having_all<invariants::item>(handle_candidate);
 	});
 
 	if (best_item.is_set()) {
