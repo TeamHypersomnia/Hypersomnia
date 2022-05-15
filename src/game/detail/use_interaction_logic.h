@@ -205,6 +205,24 @@ std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
 			}
 		};
 
+		{
+			const auto& physics = cosm.get_solvable_inferred().physics;
+			const auto ray_a = transform.pos;
+			const auto ray_b = touched_item_part.get_logic_transform().pos;
+
+			const auto ray = physics.ray_cast_px(
+				cosm.get_si(),
+				ray_a,
+				ray_b,
+				predefined_queries::pathfinding(),
+				touched_item_part
+			);
+
+			if (ray.hit) {
+				return;
+			}
+		}
+
 		const const_entity_handle considered_root = [&]() {
 			if (touched_item_part.get_current_slot().alive()) {
 				return touched_item_part.get_current_slot().get_root_container();
