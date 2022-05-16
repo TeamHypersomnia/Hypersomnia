@@ -252,7 +252,7 @@ application_update_result check_and_apply_updates(
 	const auto NEW_path = augs::path_type(NEW_HYPERSOMNIA);
 	const auto OLD_path = augs::path_type(OLD_HYPERSOMNIA);
 
-	const auto version_verification_file_path = NEW_path / "release_notes.txt";
+	const auto version_verification_file_path = NEW_path / "hypersomnia" / "release_notes.txt";
 
 	auto future_response = launch_async(
 		/* Using optional as the return type only to fix the compilation error on Windows */
@@ -837,7 +837,7 @@ application_update_result check_and_apply_updates(
 						}
 					}
 					catch (const augs::file_open_error& err) {
-						LOG("Error: %x couldn't verify the downloaded game's version (%x).\n%x", new_version, err.what());
+						LOG("Error: couldn't open %x to verify the downloaded game's version (%x).\n%x", version_verification_file_path, new_version, err.what());
 					}
 
 					const bool was_successful = current_state == state::MOVING_FILES_AROUND;

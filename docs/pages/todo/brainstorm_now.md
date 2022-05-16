@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Devops
+	- Maybe add somewhere that commit hash?
+
 - Fix that camera flying somewhere upon the last kill
 
 - don't give money to spectators
