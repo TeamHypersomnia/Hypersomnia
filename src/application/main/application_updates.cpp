@@ -33,6 +33,7 @@
 #include "augs/filesystem/directory.h"
 #include "application/main/new_and_old_hypersomnia_path.h"
 #include "application/main/extract_archive.h"
+#include "signing_keys.h"
 
 #if BUILD_OPENSSL
 using client_type = httplib::SSLClient;
@@ -130,7 +131,7 @@ application_update_result check_and_apply_updates(
 		}
 
 		if (response->status == 404 || response->status == 403) {
-			result.type = R::VERSION_FILE_NOT_FOUND;
+			result.type = R::COULDNT_DOWNLOAD_VERSION_FILE;
 			return result;
 		}
 
@@ -232,6 +233,8 @@ application_update_result check_and_apply_updates(
 	const auto NEW_path = augs::path_type(NEW_HYPERSOMNIA);
 	const auto OLD_path = augs::path_type(OLD_HYPERSOMNIA);
 
+	const auto version_verification_file_path = NEW_path / "release_notes.txt";
+
 	auto future_response = launch_async(
 		/* Using optional as the return type only to fix the compilation error on Windows */
 		[&exit_requested, archive_path, &http_client, &downloaded_bytes, &total_bytes]() -> std::optional<httplib::Result> {
@@ -264,8 +267,8 @@ application_update_result check_and_apply_updates(
 
 	enum class state {
 		DOWNLOADING,
-		EXTRACTING,
 		SAVING_ARCHIVE_TO_DISK,
+		EXTRACTING,
 		MOVING_FILES_AROUND
 	};
 
@@ -550,7 +553,7 @@ application_update_result check_and_apply_updates(
 						LOG("Request failed with status: %x", response->status);
 
 						if (response->status == 404 || response->status == 403) {
-							interrupt(R::BINARY_NOT_FOUND);
+							interrupt(R::COULDNT_DOWNLOAD_BINARY);
 							return;
 						}
 
@@ -560,8 +563,22 @@ application_update_result check_and_apply_updates(
 
 					LOG_NVPS(response->body.length());
 
-					if (response->body.length() < 2000) {
+					const auto response_length = response->body.length();
+					const bool is_an_error_message_instead_of_binary = response_length < 2000;
+
+					if (is_an_error_message_instead_of_binary) {
 						LOG(response->body);
+						interrupt(R::COULDNT_DOWNLOAD_BINARY);
+						return;
+					}
+
+					{
+						const bool authentic = ::verifySignature(::SIGNING_PUBLIC_KEY, response->body, new_signature.c_str());
+
+						if (!authentic) {
+							interrupt(R::FAILED_TO_VERIFY_BINARY);
+							return;
+						}
 					}
 
 					completed_save = launch_async(
@@ -578,6 +595,8 @@ application_update_result check_and_apply_updates(
 								return callback_result::ABORT;
 							}
 							
+							/* Create fresh NEW_HYPERSOMNIA folder - remove the old one */
+
 							if (failed(rm_rf(NEW_path))) {
 								return callback_result::ABORT;
 							}
@@ -611,179 +630,204 @@ application_update_result check_and_apply_updates(
 			}
 			else if (current_state == state::EXTRACTING) {
 				if (extractor->has_completed()) {
-#if 0
-					interrupt(R::UPGRADED);
-					return;
-#endif
-					result.exit_with_failure_if_not_upgraded = true;
+					auto move_files_around_procedure = [target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
+						const auto paths_from_old_version_to_keep = std::array<augs::path_type, 2> {
+							LOG_FILES_DIR,
+							USER_FILES_DIR
+						};
 
-					/* Serious stuff begins here. */
-
-
-					LOG("Moving files around.");
-					current_state = state::MOVING_FILES_AROUND;
-
-					completed_move = launch_async(
-						[target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
-							const auto paths_from_old_version_to_keep = std::array<augs::path_type, 2> {
-								LOG_FILES_DIR,
-								USER_FILES_DIR
-							};
-
-							auto remove_dangling_OLD_path = [&]() {
-								return rm_rf(OLD_path) == callback_result::CONTINUE;
-							};
+						auto remove_dangling_OLD_path = [&]() {
+							return rm_rf(OLD_path) == callback_result::CONTINUE;
+						};
 
 #ifdef __APPLE__
-							{
-								/* 
-									For MacOS, simply move around the Contents folders.
-									We don't even create any folders out of thin air.
-								*/
+						{
+							/* 
+								For MacOS, simply move around the Contents folders.
+								We don't even create any folders out of thin air.
+							*/
 
-								(void)mkdir_p;
+							(void)mkdir_p;
 
-								const auto BUNDLE_path = get_bundle_directory();
-								const auto CURRENT_path = BUNDLE_path / "Contents";
-								const auto EXE_dir = augs::path_type(get_executable_path()).replace_filename("");
-								
-								auto backup_user_files = [&]() {
-									for (const auto& u : paths_from_old_version_to_keep) {
-										if (mv(EXE_dir / u, BUNDLE_path / u) == callback_result::ABORT) {
-											return false;
-										}
+							const auto BUNDLE_path = get_bundle_directory();
+							const auto CURRENT_path = BUNDLE_path / "Contents";
+							const auto EXE_dir = augs::path_type(get_executable_path()).replace_filename("");
+							
+							auto backup_user_files = [&]() {
+								for (const auto& u : paths_from_old_version_to_keep) {
+									if (mv(EXE_dir / u, BUNDLE_path / u) == callback_result::ABORT) {
+										return false;
 									}
-
-									return true;
-								};
-
-								auto move_old_content_to_OLD = [&]() {
-									return mv(CURRENT_path, OLD_path) == callback_result::CONTINUE;
-								};
-								
-								auto move_NEW_to_CURRENT = [&]() {
-									return mv(NEW_path / "Hypersomnia.app" / "Contents", CURRENT_path) == callback_result::CONTINUE;
-								};
-
-								auto restore_user_files = [&]() {
-									for (const auto& u : paths_from_old_version_to_keep) {
-										if (mv(BUNDLE_path / u, EXE_dir / u) == callback_result::ABORT) {
-											return false;
-										}
-									}
-
-									return true;
-								};
-
-								if (!remove_dangling_OLD_path()) {
-									return callback_result::ABORT;
 								}
 
-								if (!backup_user_files()) {
-									return callback_result::ABORT;
-								}
-
-								if (!move_old_content_to_OLD()) {
-									return callback_result::ABORT;
-								}
-
-								if (!move_NEW_to_CURRENT()) {
-									return callback_result::ABORT;
-								}
-
-								if (!restore_user_files()) {
-									return callback_result::ABORT;
-								}
-
-								return callback_result::CONTINUE;
-							}
-#else
-							auto move_content_to_current_from = [&](const auto& source_root) {
-								LOG("Moving content from %x to current directory.", source_root);
-
-								auto do_move = [&](const auto& fname) {
-									return mv(fname, fname.filename());
-								};
-
-								return augs::for_each_in_directory(source_root, do_move, do_move);
-							};
-
-							auto move_new_content_to_current = [&]() {
-								return move_content_to_current_from(NEW_path / "hypersomnia");
-							};
-
-							auto restore_content_back_from_old = [&]() {
-								move_content_to_current_from(OLD_path);
+								return true;
 							};
 
 							auto move_old_content_to_OLD = [&]() {
-								LOG("Moving old content to OLD directory.");
-								
-								if (!remove_dangling_OLD_path()) {
-									return false;
-								}
+								return mv(CURRENT_path, OLD_path) == callback_result::CONTINUE;
+							};
+							
+							auto move_NEW_to_CURRENT = [&]() {
+								return mv(NEW_path / "Hypersomnia.app" / "Contents", CURRENT_path) == callback_result::CONTINUE;
+							};
 
-								if (mkdir_p(OLD_path) == callback_result::ABORT) {
-									return false;
-								}
-
-								auto do_move = [&](const auto& it) {
-									const auto fname = it.filename();
-
-									const auto intermediate_paths_to_keep = std::array<augs::path_type, 2> {
-										OLD_path,
-										NEW_path
-									};
-
-									if (found_in(paths_from_old_version_to_keep, fname) || found_in(intermediate_paths_to_keep, fname)) {
-										LOG("Omitting the move of %x", fname);
-										return callback_result::CONTINUE;
+							auto restore_user_files = [&]() {
+								for (const auto& u : paths_from_old_version_to_keep) {
+									if (mv(BUNDLE_path / u, EXE_dir / u) == callback_result::ABORT) {
+										return false;
 									}
+								}
 
-									return mv(fname, OLD_path / fname);
+								return true;
+							};
+
+							if (!remove_dangling_OLD_path()) {
+								return callback_result::ABORT;
+							}
+
+							if (!backup_user_files()) {
+								return callback_result::ABORT;
+							}
+
+							if (!move_old_content_to_OLD()) {
+								return callback_result::ABORT;
+							}
+
+							if (!move_NEW_to_CURRENT()) {
+								return callback_result::ABORT;
+							}
+
+							if (!restore_user_files()) {
+								return callback_result::ABORT;
+							}
+
+							return callback_result::CONTINUE;
+						}
+#else
+						auto move_content_to_current_from = [&](const auto& source_root) {
+							LOG("Moving content from %x to current directory.", source_root);
+
+							auto do_move = [&](const auto& fname) {
+								return mv(fname, fname.filename());
+							};
+
+							return augs::for_each_in_directory(source_root, do_move, do_move);
+						};
+
+						auto move_new_content_to_current = [&]() {
+							return move_content_to_current_from(NEW_path / "hypersomnia");
+						};
+
+						auto restore_content_back_from_old = [&]() {
+							move_content_to_current_from(OLD_path);
+						};
+
+						auto move_old_content_to_OLD = [&]() {
+							LOG("Moving old content to OLD directory.");
+							
+							if (!remove_dangling_OLD_path()) {
+								return false;
+							}
+
+							if (mkdir_p(OLD_path) == callback_result::ABORT) {
+								return false;
+							}
+
+							auto do_move = [&](const auto& it) {
+								const auto fname = it.filename();
+
+								const auto intermediate_paths_to_keep = std::array<augs::path_type, 2> {
+									OLD_path,
+									NEW_path
 								};
 
-								return augs::for_each_in_directory(".", do_move, do_move);
-							};
-
-							auto remove_now_unneeded_archive = [&]() {
-								rm_rf(target_archive_path);
-							};
-
-							auto remove_now_unneeded_NEW_folder = [&]() {
-								rm_rf(NEW_path);
-							};
-
-							remove_now_unneeded_archive();
-
-							if (move_old_content_to_OLD()) {
-								if (move_new_content_to_current()) {
-									remove_now_unneeded_NEW_folder();
-
+								if (found_in(paths_from_old_version_to_keep, fname) || found_in(intermediate_paths_to_keep, fname)) {
+									LOG("Omitting the move of %x", fname);
 									return callback_result::CONTINUE;
 								}
-								else {
-									/* 
-										Very unlikely that this fails, 
-										but in this case the user will just be left with partial files in their game folder,
-										but with OLD_HYPERSOMNIA untouched.
-									*/
-								}
+
+								return mv(fname, OLD_path / fname);
+							};
+
+							return augs::for_each_in_directory(".", do_move, do_move);
+						};
+
+						auto remove_now_unneeded_archive = [&]() {
+							rm_rf(target_archive_path);
+						};
+
+						auto remove_now_unneeded_NEW_folder = [&]() {
+							rm_rf(NEW_path);
+						};
+
+						remove_now_unneeded_archive();
+
+						if (move_old_content_to_OLD()) {
+							if (move_new_content_to_current()) {
+								remove_now_unneeded_NEW_folder();
+
+								return callback_result::CONTINUE;
 							}
 							else {
 								/* 
-									Most likely case of failure:
-									Something in the game's files was opened and could not be moved.
+									Very unlikely that this fails, 
+									but in this case the user will just be left with partial files in their game folder,
+									but with OLD_HYPERSOMNIA untouched.
 								*/
-								restore_content_back_from_old();
 							}
+						}
+						else {
+							/* 
+								Most likely case of failure:
+								Something in the game's files was opened and could not be moved.
+							*/
+							restore_content_back_from_old();
+						}
 #endif
 
-							return callback_result::ABORT;
+						return callback_result::ABORT;
+					};
+
+					try {
+						/* 
+							Verify that the version is the same as the claimed new one.
+							The claimed one is already known to be more recent.
+
+							This time verify this on a signed version file,
+							so that we are immune to a rollback attack.
+						*/
+
+						const auto signed_downloaded_version = augs::file_read_first_line(version_verification_file_path);
+
+						if (signed_downloaded_version == new_version) {
+							LOG("Downloaded version matches the claimed one (%x).", signed_downloaded_version);
+
+							current_state = state::MOVING_FILES_AROUND;
+
+							result.exit_with_failure_if_not_upgraded = true;
+
+							/* Serious stuff begins here. */
+
+							LOG("Moving files around.");
+
+							current_state = state::MOVING_FILES_AROUND;
+							completed_move = launch_async(move_files_around_procedure);
 						}
-					);
+						else {
+							LOG("Downloaded version DOES NOT MATCH the claimed one! (%x != %x). Possible rollback attack!", signed_downloaded_version, new_version);
+						}
+					}
+					catch (const augs::file_open_error& err) {
+						LOG("Error: %x couldn't verify the downloaded game's version (%x).\n%x", new_version, err.what());
+					}
+
+					const bool was_successful = current_state == state::MOVING_FILES_AROUND;
+
+					if (!was_successful) {
+						interrupt(R::DOWNLOADED_BINARY_WAS_OLDER);
+					}
 				}
-				
+
 				print_extracting_progress();
 			}
 			else if (current_state == state::MOVING_FILES_AROUND) {

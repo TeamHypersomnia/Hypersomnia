@@ -78,12 +78,12 @@ void Base64Decode(const char* b64message, unsigned char** buffer, size_t* length
   BIO_free_all(bio);
 }
 
-bool verifySignature(std::string publicKey, const std::byte* const data, const int n, char* signatureBase64) {
+bool verifySignature(std::string publicKey, const std::string& data, const char* signatureBase64) {
   RSA* publicRSA = createPublicRSA(publicKey);
   unsigned char* encMessage;
   size_t encMessageLength;
   bool authentic;
   Base64Decode(signatureBase64, &encMessage, &encMessageLength);
-  bool result = RSAVerifySignature(publicRSA, encMessage, encMessageLength, reinterpret_cast<const char*>(data), n, &authentic);
+  bool result = RSAVerifySignature(publicRSA, encMessage, encMessageLength, data.c_str(), data.length(), &authentic);
   return result & authentic;
 }
