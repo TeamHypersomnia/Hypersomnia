@@ -27,13 +27,14 @@ jobs:
       run: sudo apt-get install cmake ninja-build libxcb-keysyms1 libxcb-keysyms1-dev libxi6 libxi-dev alsa-oss osspd-alsa osspd libasound2 libasound2-dev p7zip p7zip-full libgl1-mesa-dev libxcb-glx0-dev libx11-xcb-dev 
 
     - name: Install LLVM
-      run: . cmake/install_llvm.sh
+      run: . cmake/linux_actions/install_llvm.sh
 
     - name: Install Libsodium
-      run: . cmake/install_libsodium.sh
+      run: . cmake/linux_actions/install_libsodium.sh
 
     - name: Generate CMake files
-      run: export CC=clang-13; export CXX=clang++-13; export LDFLAGS="${LDFLAGS} -L /usr/local/lib"; other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"; cmake/build.sh ${{env.BUILD_TYPE}} x64 "${other_cmake_flags}"
+      run: . cmake/linux_actions/generate_cmake_files.sh
+
     - run: pushd build/current
     - name: Ninja build
       run: ninja tests -k 0
