@@ -35,10 +35,9 @@ jobs:
     - name: Generate CMake files
       run: . cmake/linux_actions/generate_cmake_files.sh
 
-    - run: pushd build/current
-    - name: Ninja build
-      run: ninja tests -k 0
-    - run: popd
+    - name: Build
+      run: pushd build/current && ninja tests -k 0 && popd
+
     - name: Prepare archives
       run: API_KEY="none"; cmake/archive_and_upload.sh Linux $TRAVIS_BRANCH
 
