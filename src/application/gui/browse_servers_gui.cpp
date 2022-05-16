@@ -51,7 +51,7 @@ bool server_list_entry::is_set() const {
 browse_servers_gui_state::~browse_servers_gui_state() = default;
 
 struct browse_servers_gui_internal {
-	std::future<httplib::Result> future_response;
+	std::future<std::optional<httplib::Result>> future_response;
 	netcode_socket_t socket;
 
 	std::future<official_addrs> future_official_addresses;
@@ -107,12 +107,12 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	);
 
 	data->future_response = launch_async(
-		[address = in.server_list_provider]() -> httplib::Result {
+		[address = in.server_list_provider]() -> std::optional<httplib::Result> {
 			const auto resolved = resolve_address(address);
 			LOG(resolved.report());
 
 			if (resolved.result != resolve_result_type::OK) {
-				return httplib::Result(nullptr, Error::Unknown);
+				return std::nullopt;
 			}
 
 			auto resolved_addr = resolved.addr;
@@ -486,12 +486,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	const auto couldnt_download = std::string("Couldn't download the server list.\n");
 
-	auto handle_response = [&](auto response) {
-		if (response == nullptr) {
+	auto handle_response = [&](const auto& result) {
+		if (result == std::nullopt || result.value() == nullptr) {
 			error_message = "Couldn't connect to the server list host.";
 			return;
 		}
 
+		const auto& response = result.value();
 		const auto status = response->status;
 
 		LOG("Server list response status: %x", status);

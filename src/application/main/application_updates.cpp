@@ -6,6 +6,8 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #endif
 
+#include "3rdparty/openssl_helpers.h"
+
 #include "augs/log.h"
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/templates/thread_templates.h"
@@ -39,8 +41,6 @@ using client_type = httplib::Client;
 #endif
 
 #include "hypersomnia_version.h"
-
-using response_ptr = std::shared_ptr<httplib::Response>;
 
 #if PLATFORM_MACOS
 #define PLATFORM_STRING "MacOS"
@@ -116,6 +116,9 @@ application_update_result check_and_apply_updates(
 	};
 
 	std::string new_version;
+	std::string new_commit_hash;
+	std::string new_signature;
+	const auto current_version = hypersomnia_version().get_version_string();
 
 	{
 		const auto response = launch_download(http_client, version_path); 
@@ -139,19 +142,18 @@ application_update_result check_and_apply_updates(
 
 		const auto& contents = response->body;
 
-		std::string new_hash;
-		typesafe_sscanf(contents, "%x\n%x", new_version, new_hash);
+		typesafe_sscanf(contents, "%x\n%x\n%x", new_version, new_commit_hash, new_signature);
 
-		const auto current_hash = hypersomnia_version().commit_hash;
+		const bool more_recent = ::is_more_recent(new_version, current_version);
 
-		if (new_hash == current_hash) {
-			LOG("The game is up to date. Commit hash: %x", current_hash);
+		if (!more_recent) {
+			LOG("The game is up to date. Version: %x", current_version);
 
 			result.type = R::UP_TO_DATE;
 			return result;
 		}
 
-		LOG("Commit hash differs. Requesting upgrade. \nOld: %x\nNew: %x", current_hash, new_hash);
+		LOG("Newer version available. Requesting upgrade. \nOld: %x\nNew: %x", current_version, new_version);
 	}
 
 	const auto archive_path = typesafe_sprintf("%x/Hypersomnia-for-%x.%x", update_path, PLATFORM_STRING, ARCHIVE_EXTENSION);
@@ -231,7 +233,8 @@ application_update_result check_and_apply_updates(
 	const auto OLD_path = augs::path_type(OLD_HYPERSOMNIA);
 
 	auto future_response = launch_async(
-		[&exit_requested, archive_path, &http_client, &downloaded_bytes, &total_bytes]() {
+		/* Using optional as the return type only to fix the compilation error on Windows */
+		[&exit_requested, archive_path, &http_client, &downloaded_bytes, &total_bytes]() -> std::optional<httplib::Result> {
 			return launch_download(http_client, archive_path, [&](uint64_t len, uint64_t total) {
 				downloaded_bytes = len;
 				total_bytes = total;
@@ -533,13 +536,15 @@ application_update_result check_and_apply_updates(
 
 			if (current_state == state::DOWNLOADING) {
 				if (valid_and_is_ready(future_response)) {
-					auto response = future_response.get();
+					auto result = future_response.get();
 
-					if (response == nullptr) {
+					if (result == std::nullopt || result.value() == nullptr) {
 						log_null_response();
 						interrupt(R::FAILED);
 						return;
 					}
+
+					const auto& response = result.value();
 
 					if (!successful(response->status)) {
 						LOG("Request failed with status: %x", response->status);
