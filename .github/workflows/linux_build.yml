@@ -1,4 +1,4 @@
-name: CMake
+name: Linux build
 
 on:
   push:
@@ -20,20 +20,40 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+    - name: Install packages
+      run: sudo apt-get install cmake ninja-build libxcb-keysyms1 libxcb-keysyms1-dev libxi6 libxi-dev alsa-oss osspd-alsa osspd libasound2 libasound2-dev p7zip p7zip-full libgl1-mesa-dev libxcb-glx0-dev libx11-xcb-dev 
+
+    - name: Install LLVM
+      run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+      run: sudo add-apt-repository -y "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
+      run: sudo apt-get -q update
+      run: sudo apt-get -y install clang-13 lld-13 libc++-13-dev libc++abi-13-dev
+
+    - name: Install Libsodium
+      run: wget https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz -O /tmp/libsodium.tar.gz
+      run: pushd .
+      run: cd /tmp
+      run: tar -zxvf /tmp/libsodium.tar.gz
+      run: cd libsodium-*
+      run: ./configure --disable-shared
+      run: make
+      run: sudo make install
+      run: popd
+      run: sudo ldconfig
 
     - name: Build
-      # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: c_compiler=clang-13; cxx_compiler=clang++-13; config=Release; 
+      run: other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"
+      run: ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version
+      run: export CC=${c_compiler}
+      run: export CXX=${cxx_compiler}
+      run: export LDFLAGS="${LDFLAGS} -L /usr/local/lib"
+      run: cmake/build.sh ${config} x64 "${other_cmake_flags}"
+      run: pushd build/current
+      run: ninja tests -k 0
+      run: popd
+      run: API_KEY="none"; cmake/archive_and_upload.sh Linux $TRAVIS_BRANCH
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
     - uses: actions/upload-artifact@v3
       with:
         name: binaries

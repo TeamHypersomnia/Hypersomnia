@@ -2,14 +2,11 @@ git:
   depth: false
 
 os: linux
-language: python
 sudo: required
 dist: focal
 addons:
   apt:
     packages:
-     - gdb
-     - apport
      - cmake
      - ninja-build
      - libxcb-keysyms1
@@ -31,37 +28,18 @@ branches:
   only:
   - master
 
-python:
-  - "3.6"
-
 matrix:
   include:
   - env: c_compiler=clang-13 cxx_compiler=clang++-13 config=Release other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"
     compiler: clang-13
-#  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
-#    compiler: gcc
-#  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=RelWithDebInfo other_cmake_flags=""
-#    compiler: gcc
 
 before_install:
- - ulimit -c
- - ulimit -a -S
- - ulimit -a -H
- - cat /proc/sys/kernel/core_pattern
- - cat /etc/default/apport
- - service --status-all || true
- - initctl list || true
  - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
  - sudo add-apt-repository -y "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
  - sudo apt-get -q update
  - sudo apt-get -y install clang-13 lld-13 libc++-13-dev libc++abi-13-dev
 
 install:
-  - python --version
-  - pip install urllib3
-  - pushd /usr/local/lib
-  - ls
-  - popd
   - wget https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz -O /tmp/libsodium.tar.gz
   - pushd .
   - cd /tmp
@@ -71,25 +49,19 @@ install:
   - make
   - sudo make install
   - popd
-  - pushd /usr/local/lib
-  - ls
-  - popd
   - sudo ldconfig
 
 script:
-  - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
+  - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version
   - export CC=${c_compiler}
   - export CXX=${cxx_compiler}
   - export LDFLAGS="${LDFLAGS} -L /usr/local/lib"
   - cmake/build.sh ${config} x64 "${other_cmake_flags}"
-  - cat build/current/build.ninja
-  - ulimit -c unlimited -S
   - pushd build/current
   - ninja tests -k 0
   - ls -l
   - popd
   - ls -l hypersomnia
-  - cmake/print_bt_if_core_found.sh hypersomnia/core
   - API_KEY=$artifact_upload_key cmake/archive_and_upload.sh Linux $TRAVIS_BRANCH
 
 notfications:
