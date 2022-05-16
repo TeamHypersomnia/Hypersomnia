@@ -53,9 +53,11 @@ Remove-item -Recurse -Force cache, logs, user
 cd ../
 7z a -sfx $filePath hypersomnia
 
-curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" -F "commit_message=$commitMessage" $uploadUrl
+Push-AppveyorArtifact $filePath
+# curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" -F "commit_message=$commitMessage" $uploadUrl
 
 $filePath = "Hypersomnia-for-$platform.zip"
 7z a $filePath hypersomnia
 
-curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" -F "commit_message=$commitMessage" $uploadUrl
+Push-AppveyorArtifact $filePath
+# curl.exe -F "key=$apiKey" -F "platform=$platform" -F "commit_hash=$commitHash" -F "version=$version" -F "artifact=@$filePath" -F "commit_message=$commitMessage" $uploadUrl
