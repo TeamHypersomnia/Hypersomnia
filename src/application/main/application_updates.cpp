@@ -117,7 +117,6 @@ application_update_result check_and_apply_updates(
 	};
 
 	std::string new_version;
-	std::string new_commit_hash;
 	std::string new_signature;
 	const auto current_version = hypersomnia_version().get_version_string();
 
@@ -143,7 +142,23 @@ application_update_result check_and_apply_updates(
 
 		const auto& contents = response->body;
 
-		typesafe_sscanf(contents, "%x\n%x\n%x", new_version, new_commit_hash, new_signature);
+		auto s = std::stringstream(contents);
+
+		if (!std::getline(s, new_version)) {
+			result.type = R::COULDNT_DOWNLOAD_VERSION_FILE;
+			return result;
+		}
+
+		std::string dummy;
+
+		if (!std::getline(s, dummy)) {
+			result.type = R::COULDNT_DOWNLOAD_VERSION_FILE;
+			return result;
+		}
+
+		for (std::string line; std::getline(s, line); ) {
+			new_signature += line;
+		}
 
 		const bool more_recent = ::is_more_recent(new_version, current_version);
 
