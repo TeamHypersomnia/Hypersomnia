@@ -158,6 +158,10 @@ application_update_result check_and_apply_updates(
 
 		for (std::string line; std::getline(s, line); ) {
 			new_signature += line;
+
+			if (s.good()) {
+				new_signature += "\n";
+			}
 		}
 
 		const bool more_recent = ::is_more_recent(new_version, current_version);
