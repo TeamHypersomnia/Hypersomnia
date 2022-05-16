@@ -16,6 +16,7 @@ if [ -f "$EXE_PATH" ]; then
 	COMMIT_NUMBER=$(git rev-list --count master)
 	COMMIT_MESSAGE=$(git log -1 --pretty=%B)
 	VERSION="1.0.$COMMIT_NUMBER"
+	RELEASE_NOTES_FILENAME="release_notes.txt"
 	FILE_PATH="Hypersomnia-for-$PLATFORM.sfx"
 	UPLOAD_URL="https://hypersomnia.xyz/upload_artifact.php"
 
@@ -23,6 +24,9 @@ if [ -f "$EXE_PATH" ]; then
 
 	pushd hypersomnia
 	rm -r cache logs user
+
+	echo "Creating $RELEASE_NOTES_FILENAME"
+	echo $VERSION > $RELEASE_NOTES_FILENAME
 	popd
 	
 	if [[ "$PLATFORM" = "MacOS" ]]

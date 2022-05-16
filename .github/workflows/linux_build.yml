@@ -39,7 +39,7 @@ jobs:
       run: pushd build/current && ninja tests -k 0 && popd
 
     - name: Prepare archives
-      run: API_KEY="none"; cmake/archive_and_upload.sh Linux $TRAVIS_BRANCH
+      run: API_KEY="none"; cmake/archive_and_upload.sh Linux master
 
     - uses: actions/upload-artifact@v3
       with:
