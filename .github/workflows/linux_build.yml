@@ -24,34 +24,24 @@ jobs:
       run: sudo apt-get install cmake ninja-build libxcb-keysyms1 libxcb-keysyms1-dev libxi6 libxi-dev alsa-oss osspd-alsa osspd libasound2 libasound2-dev p7zip p7zip-full libgl1-mesa-dev libxcb-glx0-dev libx11-xcb-dev 
 
     - name: Install LLVM
-      run: wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-      run: sudo add-apt-repository -y "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main"
-      run: sudo apt-get -q update
-      run: sudo apt-get -y install clang-13 lld-13 libc++-13-dev libc++abi-13-dev
+      run: . cmake/install_llvm.sh
 
     - name: Install Libsodium
-      run: wget https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz -O /tmp/libsodium.tar.gz
-      run: pushd .
-      run: cd /tmp
-      run: tar -zxvf /tmp/libsodium.tar.gz
-      run: cd libsodium-*
-      run: ./configure --disable-shared
-      run: make
-      run: sudo make install
-      run: popd
-      run: sudo ldconfig
+      run: . cmake/install_libsodium.sh
 
-    - name: Build
-      run: c_compiler=clang-13; cxx_compiler=clang++-13; config=Release; 
-      run: other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"
+    - name: Setup flags
+      run: c_compiler=clang-13; cxx_compiler=clang++-13; config=Release; other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0";
+    - name: Check versions
       run: ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version
-      run: export CC=${c_compiler}
-      run: export CXX=${cxx_compiler}
-      run: export LDFLAGS="${LDFLAGS} -L /usr/local/lib"
+    - name: Export flags
+      run: export CC=${c_compiler}; export CXX=${cxx_compiler}; export LDFLAGS="${LDFLAGS} -L /usr/local/lib"
+    - name: Generate CMake files
       run: cmake/build.sh ${config} x64 "${other_cmake_flags}"
-      run: pushd build/current
+    - run: pushd build/current
+    - name: Ninja build
       run: ninja tests -k 0
-      run: popd
+    - run: popd
+    - name: Prepare archives
       run: API_KEY="none"; cmake/archive_and_upload.sh Linux $TRAVIS_BRANCH
 
     - uses: actions/upload-artifact@v3
