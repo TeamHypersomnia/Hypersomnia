@@ -202,8 +202,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	load_server_list_from_file();
 
 	auto make_list_streamer_lambda = [&]() {
-		return [data=serialized_list](uint64_t offset, uint64_t length, DataSink sink) {
-			sink(reinterpret_cast<const char*>(&data[offset]), length);
+		return [data=serialized_list](uint64_t offset, uint64_t length, DataSink& sink) {
+			return sink.write(reinterpret_cast<const char*>(&data[offset]), length);
 		};
 	};
 
@@ -221,6 +221,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 				res.set_content_provider(
 					serialized_list.size(),
+					"application/octet-stream",
 					make_list_streamer_lambda()
 				);
 			}

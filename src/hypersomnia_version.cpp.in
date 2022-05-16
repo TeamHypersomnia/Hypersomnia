@@ -8,6 +8,7 @@
 #if WAS_VERSION_GENERATOR_BUILT
 #include "augs/string/typesafe_sprintf.h"
 #include "game/cosmos/entity_id.h"
+#include "augs/string/typesafe_sscanf.h"
 
 hypersomnia_version::hypersomnia_version() :
 	commit_number(%x),
@@ -19,13 +20,42 @@ hypersomnia_version::hypersomnia_version() :
 {
 }
 
+bool is_more_recent(const std::string& next_version, const std::string& current_version) {
+	int major_a = 0;
+	int minor_a = 0;
+	int revision_a = 0;
+	int major_b = 0;
+	int minor_b = 0;
+	int revision_b = 0;
+
+	const auto format = "%x.%x.%x";
+
+	if (
+		   typesafe_sscanf(   next_version, format, major_a, minor_a, revision_a)
+		&& typesafe_sscanf(current_version, format, major_b, minor_b, revision_b)
+	
+	) {
+		if (major_a != major_b) {
+			return major_a > major_b;
+		}
+		if (minor_a != minor_b) {
+			return minor_a > minor_b;
+		}
+		if (revision_a != revision_b) {
+			return revision_a > revision_b;
+		}
+	}
+
+	return false;
+}
+
 std::string hypersomnia_version::get_summary() const {
 	return typesafe_sprintf(
 		"Hypersomnia version %x\n"
 		"Revision no.: %x %x\n"
 		"Build date: %x\n"
 		"Commit message:\n%x\n",
-		get_version_number(),
+		get_version_string(),
 		commit_number ? std::to_string(commit_number) : "Unknown",
 		commit_number ? working_tree_changes.empty() ? "(clean)" : "(dirty)" : "",
 		commit_date,
@@ -33,7 +63,7 @@ std::string hypersomnia_version::get_summary() const {
 	);
 }
 
-std::string hypersomnia_version::get_version_number() const {
+std::string hypersomnia_version::get_version_string() const {
 	return typesafe_sprintf("1.0.%x", commit_number);
 }
 
@@ -52,7 +82,7 @@ std::string hypersomnia_version::get_summary() const {
 	return "Unknown revision.\nVersion file generator was excluded from build.\n";
 }
 
-std::string hypersomnia_version::get_version_number() const {
+std::string hypersomnia_version::get_version_string() const {
 	return "unknown";
 }
 

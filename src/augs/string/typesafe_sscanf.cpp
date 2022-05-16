@@ -21,7 +21,21 @@ int test_scanf(
 	);
 }
 
+bool is_more_recent(const std::string& next_version, const std::string& current_version);
+
 TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
+	REQUIRE(!is_more_recent("", ""));
+	REQUIRE(!is_more_recent("0.", ""));
+	REQUIRE(!is_more_recent("", "0."));
+	REQUIRE(!is_more_recent("klfjdlskj", "0klfjdlskj"));
+	REQUIRE(!is_more_recent("1.0.0", "1.0.1"));
+	REQUIRE(!is_more_recent("1.0.438", "1.1.0"));
+	REQUIRE(is_more_recent("1.1.0", "1.0.438"));
+	REQUIRE(!is_more_recent("1.0.38", "1.0.38"));
+	REQUIRE(!is_more_recent("2.0.0", "3.0.0"));
+	REQUIRE(!is_more_recent("2.999.43", "3.0.0"));
+	REQUIRE(is_more_recent("3.0.0", "2.999.43"));
+
 	{
 		const auto format = "%x";
 		const auto sprintfed = "1442";
@@ -29,6 +43,20 @@ TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 		unsigned s1 = 0xdeadbeef;
 		REQUIRE(1 == test_scanf(sprintfed, format, s1));
 		REQUIRE(1442 == s1);
+	}
+
+	{
+		const auto format = "%x.%x.%x";
+		const auto sprintfed = "1.0.1023";
+
+		unsigned major = 0xdeadbeef;
+		unsigned minor = 0xdeadbeef;
+		unsigned revision = 0xdeadbeef;
+
+		REQUIRE(3 == test_scanf(sprintfed, format, major, minor, revision));
+		REQUIRE(major == 1);
+		REQUIRE(minor == 0);
+		REQUIRE(revision == 1023);
 	}
 
 	{

@@ -192,7 +192,7 @@ void main_menu_setup::draw_overlays(
 	const auto s = style { gui_font, white };
 
 	using FS = formatted_string;
-	const auto build_number_text = FS(typesafe_sprintf("Build %x", hypersomnia_version().get_version_number()), s);
+	const auto build_number_text = FS(typesafe_sprintf("Build %x", hypersomnia_version().get_version_string()), s);
 
 	vec2i padding = { 6, 6 };
 

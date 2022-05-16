@@ -88,13 +88,15 @@ application_update_result check_and_apply_updates(
 	const auto port = 80;
 #endif
 
-	client_type http_client(host_url.c_str(), port, http_settings.update_connection_timeout_secs);
+	client_type http_client(host_url.c_str(), port);
 
 #if BUILD_OPENSSL
 	http_client.set_ca_cert_path("web/ca-bundle.crt");
 	http_client.enable_server_certificate_verification(true);
 #endif
-	http_client.follow_location(true);
+	http_client.set_follow_location(true);
+	http_client.set_read_timeout(http_settings.update_connection_timeout_secs);
+	http_client.set_write_timeout(http_settings.update_connection_timeout_secs);
 
 	const auto& update_path = http_settings.application_update_path;
 	const auto version_path = typesafe_sprintf("%x/version-%x.txt", update_path, PLATFORM_STRING);
@@ -387,7 +389,7 @@ application_update_result check_and_apply_updates(
 	
 	auto print_version_transition_info = [&new_version, total_secs]() {
 		const auto version_info_string = [&]() {
-			const auto current_version = hypersomnia_version().get_version_number();
+			const auto current_version = hypersomnia_version().get_version_string();
 
 			int major = 0;
 			int minor = 0;

@@ -18,9 +18,11 @@ struct hypersomnia_version {
 	// END GEN INTROSPECTOR
 
 	std::string get_summary() const;
-	std::string get_version_number() const;
+	std::string get_version_string() const;
 
 	bool operator==(const hypersomnia_version& b) const {
 		return commit_hash == b.commit_hash;
 	}
 };
+
+bool is_more_recent(const std::string& next_version, const std::string& current_version);

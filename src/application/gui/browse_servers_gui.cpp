@@ -1,3 +1,7 @@
+#if BUILD_OPENSSL
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#endif
+
 #include <future>
 
 #include "application/gui/browse_servers_gui.h"
@@ -47,8 +51,7 @@ bool server_list_entry::is_set() const {
 browse_servers_gui_state::~browse_servers_gui_state() = default;
 
 struct browse_servers_gui_internal {
-	std::optional<httplib::Client> http;
-	std::future<std::shared_ptr<httplib::Response>> future_response;
+	std::future<httplib::Result> future_response;
 	netcode_socket_t socket;
 
 	std::future<official_addrs> future_official_addresses;
@@ -79,8 +82,6 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	server_list.clear();
 	selected_server = {};
 
-	auto& http_opt = data->http;
-
 	data->future_official_addresses = launch_async(
 		[addresses=in.official_arena_servers]() {
 			official_addrs results;
@@ -106,12 +107,12 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 	);
 
 	data->future_response = launch_async(
-		[&http_opt, address = in.server_list_provider]() -> std::shared_ptr<Response> {
+		[address = in.server_list_provider]() -> httplib::Result {
 			const auto resolved = resolve_address(address);
 			LOG(resolved.report());
 
 			if (resolved.result != resolve_result_type::OK) {
-				return nullptr;
+				return httplib::Result(nullptr, Error::Unknown);
 			}
 
 			auto resolved_addr = resolved.addr;
@@ -121,21 +122,14 @@ void browse_servers_gui_state::refresh_server_list(const browse_servers_input in
 			const auto address_str = ::ToString(resolved_addr);
 			const auto timeout = 5;
 
-			LOG("Connecting to server list at ip (no port): %x", address_str);
+			LOG("Connecting to server list at: %x:%x", address_str, intended_port);
 
-			http_opt.emplace(address_str.c_str(), intended_port, timeout);
+			httplib::Client cli(address_str.c_str(), intended_port);
+			cli.set_write_timeout(timeout);
+			cli.set_read_timeout(timeout);
+			cli.set_follow_location(true);
 
-			auto progress = [](uint64_t len, uint64_t total) {
-				(void)len;
-				(void)total;
-
-				return true;
-			};
-
-			auto& http = *http_opt;
-			http.follow_location(true);
-
-			return http.Get("/server_list_binary", progress);
+			return cli.Get("/server_list_binary");
 		}
 	);
 
