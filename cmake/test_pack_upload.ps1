@@ -50,7 +50,10 @@ $version = "1.0.$commitNumber"
 mv $target_exe Hypersomnia.exe
 Get-ChildItem
 Remove-item -Recurse -Force cache, logs, user
-"$version" | out-file -filepath "release_notes.txt"
+$releaseNotesPath = "release_notes.txt"
+"$version" | out-file -filepath $releaseNotesPath
+
+Push-AppveyorArtifact $releaseNotesPath
 
 cd ../
 7z a -sfx $filePath hypersomnia

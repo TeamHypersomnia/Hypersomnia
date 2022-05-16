@@ -38,4 +38,6 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: binaries
-        path: Hypersomnia-for-*
+        path: |
+          Hypersomnia-for-*
+          hypersomnia/release_notes.txt
