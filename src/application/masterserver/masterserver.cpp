@@ -3,6 +3,10 @@
 #endif
 #include <shared_mutex>
 
+#if BUILD_OPENSSL
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#endif
+
 #include "application/masterserver/masterserver.h"
 #include "3rdparty/cpp-httplib/httplib.h"
 #include "augs/log.h"
