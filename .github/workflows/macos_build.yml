@@ -33,4 +33,4 @@ jobs:
     - name: "Upload build to hypersomnia.xyz/builds/latest"
       env:
         ARTIFACT_UPLOAD_KEY: ${{ secrets.artifact_upload_key }}
-      run: API_KEY=$ARTIFACT_UPLOAD_KEY cmake/upload_if_exe_found.sh MacOS master
+      run: API_KEY=$ARTIFACT_UPLOAD_KEY cmake/archive_and_upload.sh MacOS master

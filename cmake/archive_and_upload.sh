@@ -42,7 +42,7 @@ if [ -f "$EXE_PATH" ]; then
 
 		echo "Uploading a highly compressed sfx archive for updates on MacOS."
 		FILE_PATH=$SFX_PATH
-		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
+		# curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 
 		create-dmg $APP_PATH
 		mv "Hypersomnia undefined.dmg" $DMG_PATH
@@ -51,20 +51,20 @@ if [ -f "$EXE_PATH" ]; then
 
 		echo "Uploading the dmg file for first-time downloads on MacOS."
 		FILE_PATH=$DMG_PATH
-		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
+		# curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 	fi
 
 	if [[ "$PLATFORM" = "Linux" ]]
 	then
 		echo "Uploading a highly compressed sfx archive for updates on Linux."
 		7z a -sfx $FILE_PATH hypersomnia
-		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
+		# curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 
 		echo "Uploading a tar.gz archive for first-time downloads on Linux."
 		FILE_PATH="Hypersomnia-for-$PLATFORM.tar.gz"
 		tar -czf $FILE_PATH hypersomnia
 
-		curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
+		# curl -F "key=$API_KEY" -F "platform=$PLATFORM" -F "commit_hash=$COMMIT_HASH" -F "version=$VERSION" -F "artifact=@$FILE_PATH" -F "commit_message=$COMMIT_MESSAGE" $UPLOAD_URL
 	fi
 else
 	echo "No exe found. Not uploading."
