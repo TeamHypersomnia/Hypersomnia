@@ -42,6 +42,8 @@ jobs:
       run: API_KEY="none"; cmake/archive_and_upload.sh Linux master
 
     - uses: actions/upload-artifact@v3
-      path: |
-        Hypersomnia-for-*
-        hypersomnia/release_notes.txt
+      with:
+        name: binaries
+        path: |
+          Hypersomnia-for-*
+          hypersomnia/release_notes.txt
