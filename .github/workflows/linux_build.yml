@@ -29,14 +29,8 @@ jobs:
     - name: Install Libsodium
       run: . cmake/install_libsodium.sh
 
-    - name: Setup flags
-      run: c_compiler=clang-13; cxx_compiler=clang++-13; config=Release; other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0";
-    - name: Check versions
-      run: ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version
-    - name: Export flags
-      run: export CC=${c_compiler}; export CXX=${cxx_compiler}; export LDFLAGS="${LDFLAGS} -L /usr/local/lib"
     - name: Generate CMake files
-      run: cmake/build.sh ${config} x64 "${other_cmake_flags}"
+      run: export CC=clang-13; export CXX=clang++-13; export LDFLAGS="${LDFLAGS} -L /usr/local/lib"; other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=0"; cmake/build.sh ${{env.BUILD_TYPE}} x64 "${other_cmake_flags}"
     - run: pushd build/current
     - name: Ninja build
       run: ninja tests -k 0

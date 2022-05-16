@@ -34,3 +34,8 @@ jobs:
       env:
         ARTIFACT_UPLOAD_KEY: ${{ secrets.artifact_upload_key }}
       run: API_KEY=$ARTIFACT_UPLOAD_KEY cmake/archive_and_upload.sh MacOS master
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: binaries
+        path: Hypersomnia-for-*
