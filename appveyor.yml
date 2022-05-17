@@ -1,7 +1,3 @@
-environment:
-  ARTIFACT_UPLOAD_KEY:
-    secure: xukZvGw6KB1WAGopzJKSOi88Xs+CvljlItMguKJ5AUL7XesfcFYTBqjPWmNufZwyN4hqV3n2ZD+aP/PsEcv3CyjLPZ5+7doRFSoNcVWfoboA55sVWGIqaVZmzsvM9Pu02L1Rtb0teJdsqFOIPZMDwzSQfeBeCflTdzFC1pw47GaKUvfRFkCZZFgvcWPKw+cZwa0DUqwRvTIl7qqkBXuKqYinXk/eONsT7MubZMAeJdR06grGJaVMDOqMMpMJ5EjOWL368a+v1lMzibR8SdjZcI3ZJq27xoMI2GdWOKqD/JCP9FwwRmFZziYh7EQpbaeyDWZgvQeZLqsJnZV9IqoeFlwQ58x3ntmfS3yyIZUD9BCyDr+DS5dNP+NjX/D50TtdLJQvkQMifKBjmZfMNxg8k8mSU950uNZdIPYjO/0vW/QPAWsvIVbR/AGPWhW9DdkxcZYSxw6Jrdtbw1y4prEZ516J/2zJMfI5yQLd6Fn1HdPBxI02AOWJhC/tninGdjqM1dHf7UQ0W4rWzYHUZhkVHYwwyw9a/6MAmUCEipPXiE+xVtaI7QqpVFdXS9rc5f0vZfHTp50klLBp5w5jfCkXC2mW5VNE0e9UaMDdcozB7HGmRNisWoPQd20xbrEFmWFU46exVHR/SlNb8BiEjoHdBZaTJJF4DMM6BFJW6zq9n9pNiGjc9ei/3IBFFPBaa/mc37QCd6DlpyXnqj3GYPivmtAWgi/4/7uOmzt/QFO+2UwdcxxrrqAgk4VeU99MTeICttfb+hU3I/qWC8WNm1Vt11ye73qq6YVL1jMhmcT8p+if/pjEIpjsR9dAjueAqPdbAEoV8DuV48ncnmpHkoeOuG06+G8Sz/AVFC9HXCisYQnF6zmNgoJV/oI7pwJRGZiBsuX+f9G1ddfAGnD3bEypfw==
-    
 version: 1.0.{build}
 branches:
   only:
@@ -50,5 +46,5 @@ build_script:
 
 test_script:
   - cd ../../hypersomnia
-  - ps: '& ../cmake/test_pack_upload.ps1 -artifact_upload_key $env:ARTIFACT_UPLOAD_KEY -configuration $env:CONFIGURATION -console_mode 0'
+  - ps: '& ../cmake/test_pack_upload.ps1 -configuration $env:CONFIGURATION -console_mode 0'
 

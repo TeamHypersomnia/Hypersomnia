@@ -42,12 +42,12 @@ jobs:
     - name: Build
       run: pushd build/current && ninja tests -k 0 && popd
 
-    - name: Prepare archives
-      run: API_KEY="none"; cmake/archive_and_upload.sh Linux master
+    - name: Archivize the build
+      run: cmake/archive_and_upload.sh Linux master
 
     - uses: actions/upload-artifact@v3
       with:
-        name: binaries
+        name: Linux-binaries
         path: |
           Hypersomnia-for-*
           hypersomnia/release_notes.txt
