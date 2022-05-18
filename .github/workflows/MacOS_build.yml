@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
     runs-on: macos-latest
 
     steps:
