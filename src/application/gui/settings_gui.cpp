@@ -293,7 +293,7 @@ void settings_gui_state::perform(
 	};
 
 	if (already_bound_popup) {
-		const auto buttons = std::vector<editor_popup::button> {
+		const auto buttons = std::vector<simple_popup::button> {
 			{
 				"Reassign",
 				rgba(200, 80, 0, 255),
@@ -846,7 +846,7 @@ void settings_gui_state::perform(
 
 									reassignment_request = hijacking;
 
-									already_bound_popup = editor_popup {
+									already_bound_popup = simple_popup {
 										"Failed",
 										description,
 										""

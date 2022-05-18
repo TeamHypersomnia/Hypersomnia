@@ -5,7 +5,7 @@
 #include "augs/math/vec2.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "augs/graphics/texture.h"
-#include "application/setups/editor/editor_popup.h"
+#include "augs/misc/imgui/simple_popup.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/frame_num_type.h"
 #include "hypersomnia_version.h"
@@ -28,7 +28,7 @@ public:
 	using base = standard_window_mixin<start_client_gui_state>;
 	using base::base;
 
-	std::optional<editor_popup> error_popup;
+	std::optional<simple_popup> error_popup;
 
 	bool was_shrinked = false;
 	bool will_be_upscaled = false;

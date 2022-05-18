@@ -393,7 +393,7 @@ bool start_client_gui_state::perform(
 			will_be_upscaled = false;
 
 			if (error_msg.size() > 0) {
-				error_popup = editor_popup();
+				error_popup = simple_popup();
 				error_popup->title = "Error";
 				error_popup->message = error_msg;
 			}

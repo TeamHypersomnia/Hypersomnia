@@ -1,9 +1,9 @@
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
-#include "application/setups/editor/editor_popup.h"
+#include "augs/misc/imgui/simple_popup.h"
 
-editor_popup editor_popup::sum_all(const std::vector<editor_popup>& popups) {
-	editor_popup result;
+simple_popup simple_popup::sum_all(const std::vector<simple_popup>& popups) {
+	simple_popup result;
 
 	// for example: 11 Error(s), 23 Warning(s)
 
@@ -41,7 +41,7 @@ editor_popup editor_popup::sum_all(const std::vector<editor_popup>& popups) {
 	return result;
 }
 
-int editor_popup::perform(const std::vector<button>& buttons) {
+int simple_popup::perform(const std::vector<button>& buttons) {
 	using namespace augs::imgui;
 
 	if (auto popup = scoped_modal_popup(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {

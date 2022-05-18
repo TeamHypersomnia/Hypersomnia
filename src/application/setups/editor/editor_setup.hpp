@@ -18,7 +18,7 @@ void editor_setup::try_to_open_new_folder(F&& new_folder_provider) {
 		new_folder_provider(new_folder);
 		set_current(new_index);
 	}
-	catch (const editor_popup& p) {
+	catch (const simple_popup& p) {
 		signi.folders.erase(signi.folders.begin() + new_index);
 		set_popup(p);
 	}

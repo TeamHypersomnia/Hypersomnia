@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/filesystem/path.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
-#include "application/setups/editor/editor_popup.h"
+#include "augs/misc/imgui/simple_popup.h"
 #include "augs/network/netcode_socket_raii.h"
 
 struct config_lua_table;
@@ -78,7 +78,7 @@ class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 
 	stun_manager_window stun_manager = std::string("STUN manager");
 
-	std::optional<editor_popup> already_bound_popup;
+	std::optional<simple_popup> already_bound_popup;
 
 	key_hijack_request reassignment_request;
 	key_hijack_request hijacking;

@@ -89,7 +89,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "view/game_gui/special_indicator_logic.h"
 #include "augs/window_framework/create_process.h"
-#include "application/setups/editor/editor_popup.h"
+#include "augs/misc/imgui/simple_popup.h"
 #include "application/main/game_frame_buffer.h"
 #include "application/main/cached_visibility_data.h"
 #include "augs/graphics/frame_num_type.h"
@@ -342,7 +342,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		last_saved_config.save_patch(lua, canon_config, local_config_path);
 	};
 
-	static auto last_exit_incorrect_popup = std::optional<editor_popup>();
+	static auto last_exit_incorrect_popup = std::optional<simple_popup>();
 
 	static auto perform_last_exit_incorrect = [&]() {
 		if (last_exit_incorrect_popup != std::nullopt) {
@@ -389,7 +389,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				+ notice_post_content
 			;
 
-			last_exit_incorrect_popup = editor_popup { "Warning", full_content, "" };
+			last_exit_incorrect_popup = simple_popup { "Warning", full_content, "" };
 		}
 	}
 

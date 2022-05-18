@@ -145,7 +145,7 @@ void editor_setup::on_folder_changed() {
 	selector.clear();
 }
 
-void editor_setup::set_popup(const editor_popup p) {
+void editor_setup::set_popup(const simple_popup p) {
 	ok_only_popup = p;
 
 	const auto logged = typesafe_sprintf(

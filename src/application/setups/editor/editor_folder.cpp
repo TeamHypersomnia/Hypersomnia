@@ -3,7 +3,7 @@
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_paths.h"
-#include "application/setups/editor/editor_popup.h"
+#include "augs/misc/imgui/simple_popup.h"
 #include "augs/misc/maybe_official_path.h"
 
 #include "augs/readwrite/byte_file.h"
@@ -108,7 +108,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 		);
 	}
 	catch (const std::exception& err) {
-		editor_popup p;
+		simple_popup p;
 
 		p.title = "Error";
 		p.message = typesafe_sprintf("A problem occured when trying to load project folder \"%x\".", augs::filename_first(from));
@@ -172,7 +172,7 @@ std::optional<editor_warning> editor_folder::open_most_relevant_content(sol::sta
 	}
 	catch (const std::exception& err) {
 		ensure(false);
-		editor_popup p;
+		simple_popup p;
 
 		p.title = "Error";
 		p.message = typesafe_sprintf("A problem occured when trying to import %x.", augs::filename_first(real_path));
@@ -215,7 +215,7 @@ std::optional<editor_warning> editor_folder::open_most_relevant_content(sol::sta
 			return editor_warning { "Warning", message, "" };
 		}
 	}
-	catch (const editor_popup& p) {
+	catch (const simple_popup& p) {
 		/* If no autosave folder was found, try the real path. */
 		*this = editor_folder(real_path);
 		load_folder();

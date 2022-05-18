@@ -2,7 +2,7 @@
 
 #include "application/intercosm.h"
 
-#include "application/setups/editor/editor_popup.h"
+#include "augs/misc/imgui/simple_popup.h"
 #include "application/setups/editor/editor_autosave.h"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_significant.h"
@@ -46,7 +46,7 @@ void open_last_folders(
 ) {
 	ensure(signi.folders.empty());
 
-	std::vector<editor_popup> failures;
+	std::vector<simple_popup> failures;
 
 	try {
 		const auto opened_folders = augs::load_from_lua_table<editor_last_folders>(lua, get_last_folders_path());
@@ -61,7 +61,7 @@ void open_last_folders(
 
 				signi.folders.emplace_back(std::move(new_folder));
 			}
-			catch (const editor_popup& p) {
+			catch (const simple_popup& p) {
 				/* Could load neither from autosave nor the real path. Utter failure. */
 				failures.push_back(p);
 			}
@@ -84,7 +84,7 @@ void open_last_folders(
 	}
 
 	if (!failures.empty()) {
-		throw editor_popup::sum_all(failures);
+		throw simple_popup::sum_all(failures);
 	}
 }
 

@@ -18,7 +18,7 @@
 
 #include "application/setups/setup_common.h"
 
-#include "application/setups/editor/editor_popup.h"
+#include "augs/misc/imgui/simple_popup.h"
 #include "application/setups/editor/editor_significant.h"
 #include "application/setups/editor/editor_autosave.h"
 #include "application/setups/editor/editor_settings.h"
@@ -122,7 +122,7 @@ class editor_setup : public arena_gui_mixin<editor_setup> {
 	editor_particle_effects_gui particle_effects_gui = std::string("Particle effects");
 	// END GEN INTROSPECTOR
 
-	std::optional<editor_popup> ok_only_popup;
+	std::optional<simple_popup> ok_only_popup;
 	std::optional<miniature_generator_state> miniature_generator;
 
 	editor_destructor_input destructor_input;
@@ -139,7 +139,7 @@ class editor_setup : public arena_gui_mixin<editor_setup> {
 		try {
 			callback();
 		}
-		catch (const editor_popup& p) {
+		catch (const simple_popup& p) {
 			set_popup(p);
 		}
 	}
@@ -152,7 +152,7 @@ class editor_setup : public arena_gui_mixin<editor_setup> {
 
 	std::future<std::optional<std::string>> export_folder_dialog;
 
-	void set_popup(const editor_popup);
+	void set_popup(const simple_popup);
 	
 	using path_operation = intercosm_path_op;
 

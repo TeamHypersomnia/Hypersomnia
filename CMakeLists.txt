@@ -402,7 +402,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_history_gui.cpp"
 	"src/application/setups/editor/gui/editor_go_to_gui.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
-	"src/application/setups/editor/editor_popup.cpp"
+	"src/augs/misc/imgui/simple_popup.cpp"
 	"src/application/setups/editor/editor_command_input.cpp"
 	"src/application/setups/editor/commands/fill_with_test_scene_command.cpp"
 	"src/application/setups/editor/commands/delete_entities_command.cpp"
