@@ -2,7 +2,7 @@
 <div align="center">
 <img src="https://hypersomnia.xyz/menu_game_logo.png"></img>
 
-[![Build Status](https://travis-ci.com/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
+[![Build Status](https://github.com/TeamHypersomnia/Hypersomnia/workflows/Linux%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 [![Build MacOS binary](https://github.com/TeamHypersomnia/Hypersomnia/workflows/MacOS%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -98,7 +98,7 @@ You can reconfigure all bindings by going to Settings->Controls tab.
 # How to build
 
 Currently, Hypersomnia is only buildable using ``clang``.
-Additionally, your operating system must be 64-bit.  
+Your operating system must be 64-bit.  
 
 <!--
 Formerly, the game was buildable under modern ``gcc`` versions,  
@@ -115,9 +115,9 @@ Irrespectively of the OS, you will need the following software in order to build
 - The newest **CMake**.
 - **git** to clone the respository and later generate version information.
 - [**ninja**](https://ninja-build.org/) to carry out the build.
-- [LLVM](https://releases.llvm.org/) toolchain version 8 or newer.
-	- For Windows, you can use [this installer](https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/LLVM-8.0.1-win64.exe), or a newer one. 
-	- For Linux, use your distro-specific package. Make sure to install ```libc++``` and ```lld``` as well.
+- [LLVM](https://releases.llvm.org/) toolchain version 13 or newer.
+	- For Windows, you can use [this installer](https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/LLVM-13.0.1-win64.exe), or a newer one. 
+	- For Linux, use your distro-specific package. Make sure to install ```libc++```, ```libc++abi``` and ```lld``` as well.
 	- For MacOS, the version that comes pre-installed with **Xcode** is good enough.
 - [OpenSSL](https://www.openssl.org/) needed by the auto-updater to download latest game binaries over HTTPS.
   - On Windows, you can get the appropriate installer here: https://slproweb.com/download/Win64OpenSSL-1_1_1d.exe
@@ -192,11 +192,12 @@ If, for some reason, some step fails, refer to the latest working Appveyor build
 
 ## Linux instructions
 
-Refer to [.travis.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/.travis.yml) file for up-to-date building procedure. A short overview of the process now follows.
+Refer to [.travis.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/.github/workflows/Linux_build.yml) file for up-to-date building procedure - it is constantly in flux. A short overview of the process now follows.
 
 Current platforms are actively tested and supported:
-- Arch Linux with i3 window manager.
-- Ubuntu, but it is tested only through Travis builds.
+
+- Arch Linux with i3 window manager - the developer's machine.
+- Ubuntu, as this is where the dedicated server is deployed.
 
 #### Distribution-specific dependencies
 
@@ -207,20 +208,13 @@ Arch Linux:
 - ``libxcb``
 - ``xcb-util-keysyms``
 - ``libsodium``
+- Might need more - you are on your own here (like very Arch user).
 
 Ubuntu:
 
-- ``libxcb-keysyms1``
-- ``libxcb-keysyms1-dev``
-- ``libxi6``
-- ``libxi-dev``
-- ``alsa-oss``
-- ``osspd-alsa``
-- ``osspd``
-- ``libasound2``
-- ``libasound2-dev``
-- ``libsodium-dev``
-
+```
+sudo apt-get install cmake ninja-build libxcb-keysyms1 libxcb-keysyms1-dev libxi6 libxi-dev alsa-oss osspd-alsa osspd libasound2 libasound2-dev p7zip p7zip-full libgl1-mesa-dev libxcb-glx0-dev libx11-xcb-dev
+```
 
 ### One-shot launch
 
@@ -338,9 +332,9 @@ Pull requests are welcomed, should they even be typo fixes, missing const guaran
 If you however plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
 because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
 
-For documentation, please make sure to read the [wiki](https://wiki.hypersomnia.xyz) to learn about the game and the source code.
+A WIP documentation can be found at [wiki](https://wiki.hypersomnia.xyz).
 
-You will be added to [TeamHypersomnia](https://github.com/TeamHypersomnia) organization once at least one of your pull requests is accepted.
+Make sure to check out [TeamHypersomnia](https://github.com/TeamHypersomnia) for other repositories that are useful when setting up your own custom servers.
 
 If you have questions or you fail to build Hypersomnia, create an [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues).
 Or if you just can't wait to utter some brilliant ideas with regard to the game, please do so, too!
