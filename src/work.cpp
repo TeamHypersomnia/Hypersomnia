@@ -100,7 +100,7 @@
 #include "application/setups/client/demo_paths.h"
 #include "application/nat/stun_server_provider.h"
 
-#include "application/main/application_updates.h"
+#include "application/main/self_updater.h"
 #include "work_result.h"
 
 std::function<void()> ensure_handler;
@@ -284,12 +284,12 @@ work_result work(const int argc, const char* const * const argv) try {
 	LOG("Creating the ImGui atlas image.");
 	static const auto imgui_atlas_image = augs::imgui::create_atlas_image(config.gui_fonts.gui);
 
-	static auto last_update_result = application_update_result();
+	static auto last_update_result = self_update_result();
 	
 	const bool should_update_due_to_config = config.http_client.update_on_launch;
 
 	if (params.force_update_check || should_update_due_to_config) {
-		using up_result = application_update_result_type;
+		using up_result = self_update_result_type;
 
 		last_update_result = check_and_apply_updates(
 			imgui_atlas_image,

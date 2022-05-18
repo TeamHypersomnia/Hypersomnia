@@ -464,8 +464,8 @@ void settings_gui_state::perform(
 					revertable_checkbox("Automatically update when the game starts", scope_cfg.update_on_launch);
 					revertable_slider(SCOPE_CFG_NVP(update_connection_timeout_secs), 1, 3600);
 
-					input_text<100>(SCOPE_CFG_NVP(application_update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.application_update_host);
-					input_text<100>(SCOPE_CFG_NVP(application_update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.application_update_path);
+					input_text<100>(SCOPE_CFG_NVP(self_update_host), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.self_update_host);
+					input_text<100>(SCOPE_CFG_NVP(self_update_path), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.http_client.self_update_path);
 
 					ImGui::Separator();
 

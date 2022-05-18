@@ -34,7 +34,7 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 #include "hypersomnia_version.h"
-#include "application/main/application_updates.h"
+#include "application/main/self_updater.h"
 
 using namespace augs::event::keys;
 using namespace augs::gui::text;
@@ -166,7 +166,7 @@ main_menu_setup::main_menu_setup(
 }
 
 void main_menu_setup::draw_overlays(
-	const application_update_result& last_update_result,
+	const self_update_result& last_update_result,
 	const augs::drawer_with_default output,
 	const necessary_images_in_atlas_map& necessarys,
 	const augs::baked_font& gui_font,
@@ -211,7 +211,7 @@ void main_menu_setup::draw_overlays(
 
 	const auto description = [&]() {
 		const auto t = last_update_result.type;
-		using R = application_update_result_type;
+		using R = self_update_result_type;
 
 		switch (t) {
 			case R::NONE:

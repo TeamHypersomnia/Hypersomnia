@@ -4,7 +4,7 @@
 #include "application/http_client/http_client_settings.h"
 #include "augs/image/image.h"
 
-enum class application_update_result_type {
+enum class self_update_result_type {
 	NONE,
 
 	EXIT_APPLICATION,
@@ -20,14 +20,14 @@ enum class application_update_result_type {
 	FIRST_LAUNCH_AFTER_UPGRADE
 };
 
-struct application_update_result {
-	using result_type = application_update_result_type;
+struct self_update_result {
+	using result_type = self_update_result_type;
 
 	result_type type = result_type::NONE;
 	bool exit_with_failure_if_not_upgraded = false;
 };
 
-application_update_result check_and_apply_updates(
+self_update_result check_and_apply_updates(
 	const augs::image& imgui_atlas_image,
 	const http_client_settings& settings,
 	augs::window_settings window_settings

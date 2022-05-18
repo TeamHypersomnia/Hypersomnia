@@ -55,8 +55,8 @@ return {
   http_client = {
     update_on_launch = true,
 	update_connection_timeout_secs = 2,
-	application_update_host = "hypersomnia.xyz",
-	application_update_path = "/builds/latest"
+	self_update_host = "hypersomnia.xyz",
+	self_update_path = "/builds/latest"
   },
 
   official_arena_servers = {

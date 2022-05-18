@@ -12,7 +12,7 @@
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/math/matrix.h"
-#include "application/main/application_updates.h"
+#include "application/main/self_updater.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/renderer_backend.h"
 #include "augs/misc/timing/timer.h"
@@ -69,19 +69,19 @@ decltype(auto) launch_download(client_type& client, const std::string& resource,
 	return client.Get(resource.c_str(), std::forward<F>(args)...);
 }
 
-using R = application_update_result_type;
+using R = self_update_result_type;
 namespace fs = std::filesystem;
 
-application_update_result check_and_apply_updates(
+self_update_result check_and_apply_updates(
 	const augs::image& imgui_atlas_image,
 	const http_client_settings& http_settings,
 	augs::window_settings window_settings
 ) {
 	using namespace augs::imgui;
 
-	application_update_result result;
+	self_update_result result;
 
-	const auto& host_url = http_settings.application_update_host;
+	const auto& host_url = http_settings.self_update_host;
 
 #if BUILD_OPENSSL
 	const auto port = 443;
@@ -99,7 +99,7 @@ application_update_result check_and_apply_updates(
 	http_client.set_read_timeout(http_settings.update_connection_timeout_secs);
 	http_client.set_write_timeout(http_settings.update_connection_timeout_secs);
 
-	const auto& update_path = http_settings.application_update_path;
+	const auto& update_path = http_settings.self_update_path;
 	const auto version_path = typesafe_sprintf("%x/version-%x.txt", update_path, PLATFORM_STRING);
 
 	auto log_null_response = [&http_client]() {
