@@ -226,6 +226,10 @@ void main_menu_setup::draw_overlays(
 				return colored("Latest binary not found on the update server!", red);
 			case R::FAILED_TO_VERIFY_BINARY:
 				return colored("FAILED TO AUTHENTICATE THE UPDATE! The official server might be compromised!!!", red);
+			case R::COULDNT_SAVE_BINARY:
+				return colored("Failed to save the downloaded binary! Ensure you have sufficient space.", red);
+			case R::FAILED_TO_OPEN_SSH_KEYGEN:
+				return colored("Failed to open ssh-keygen! The updated version's signature could not be verified.", red);
 			case R::DOWNLOADED_BINARY_WAS_OLDER:
 				return colored("The update server has provided an older version of the game.", red);
 			case R::UP_TO_DATE:

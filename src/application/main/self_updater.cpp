@@ -6,8 +6,6 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #endif
 
-#include "3rdparty/openssl_helpers.h"
-
 #include "augs/log.h"
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/templates/thread_templates.h"
@@ -18,9 +16,9 @@
 #include "augs/misc/timing/timer.h"
 #include "augs/window_framework/window.h"
 
+#include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
-#include "augs/misc/imgui/imgui_utils.h"
 
 #include "augs/graphics/shader.h"
 #include "augs/graphics/texture.h"
@@ -58,6 +56,12 @@ using client_type = httplib::Client;
 
 #if PLATFORM_UNIX
 extern std::atomic<int> signal_status;
+#endif
+
+#if PLATFORM_WINDOWS
+#define SSH_KEYGEN_BINARY "scripts/ssh/ssh-keygen.exe"
+#else
+#define SSH_KEYGEN_BINARY "ssh-keygen"
 #endif
 
 bool successful(const int http_status_code) {
@@ -295,7 +299,7 @@ self_update_result check_and_apply_updates(
 	auto extractor = std::optional<archive_extractor>();
 	//auto mover = std::optional<updated_files_mover>();
 	auto completed_move = std::future<callback_result>();
-	auto completed_save = std::future<callback_result>();
+	auto completed_save = std::future<self_update_result_type>();
 
 	double total_secs = 0;
 
@@ -591,40 +595,68 @@ self_update_result check_and_apply_updates(
 						return;
 					}
 
-					{
-						const bool authentic = ::verifySignature(::SIGNING_PUBLIC_KEY, response->body, new_signature.c_str());
-
-						if (!authentic) {
-							interrupt(R::FAILED_TO_VERIFY_BINARY);
-							return;
-						}
-					}
-
 					completed_save = launch_async(
-						[guarded_save_as_bytes, make_executable, rm_rf, mkdir_p, resp_body = std::move(response->body), target_archive_path, NEW_path]() {
+						[guarded_save_as_bytes, make_executable, rm_rf, mkdir_p, new_signature, new_binary_bytes = std::move(response->body), target_archive_path, NEW_path]() {
 							auto failed = [](const auto e) {
 								return e == callback_result::ABORT;
 							};
 
-							if (failed(guarded_save_as_bytes(resp_body, target_archive_path))) {
-								return callback_result::ABORT;
+							if (failed(guarded_save_as_bytes(new_binary_bytes, target_archive_path))) {
+								return R::COULDNT_SAVE_BINARY;
 							}
 							
+							{
+								const auto target_signature_path = augs::path_type(GENERATED_FILES_DIR) / "last_updater_signature.sig";
+								const auto target_allowed_signers_path = augs::path_type(GENERATED_FILES_DIR) / "allowed_signers";
+
+								augs::save_as_text(target_allowed_signers_path, ::SIGNING_PUBLIC_KEY);
+								augs::save_as_text(target_signature_path, new_signature);
+
+								const auto verification_command = typesafe_sprintf(
+									"%x -Y verify -f %x -I hypersomnia -n self_updater -s %x < %x",
+									SSH_KEYGEN_BINARY,
+									target_allowed_signers_path,
+									target_signature_path,
+									target_archive_path
+								);
+
+								const auto verification_success = "Good \"self_updater\" signature for hypersomnia with";
+
+								try {
+									LOG("Pipe command: %x", verification_command);
+									const auto verification_result = augs::pipe::execute(verification_command);
+									LOG("Pipe result: %x", verification_result);
+									const bool authentic = ::begins_with(verification_result, verification_success);
+
+									if (!authentic) {
+										rm_rf(target_archive_path);
+										return R::FAILED_TO_VERIFY_BINARY;
+									}
+
+									LOG("Successfully verified the new binary's signature. Continuing update.");
+								}
+								catch (const std::runtime_error& err) {
+									LOG("Failed to open ssh-keygen for signature verification: %x", err.what());
+
+									return R::FAILED_TO_OPEN_SSH_KEYGEN;
+								}
+							}
+
 							if (failed(make_executable(target_archive_path))) {
-								return callback_result::ABORT;
+								return R::COULDNT_SAVE_BINARY;
 							}
 							
 							/* Create fresh NEW_HYPERSOMNIA folder - remove the old one */
 
 							if (failed(rm_rf(NEW_path))) {
-								return callback_result::ABORT;
+								return R::COULDNT_SAVE_BINARY;
 							}
 
 							if (failed(mkdir_p(NEW_path))) {
-								return callback_result::ABORT;
+								return R::COULDNT_SAVE_BINARY;
 							}
-							
-							return callback_result::CONTINUE;
+
+							return R::NONE;
 						}
 					);
 
@@ -635,13 +667,16 @@ self_update_result check_and_apply_updates(
 			}
 			else if (current_state == state::SAVING_ARCHIVE_TO_DISK) {
 				if (valid_and_is_ready(completed_save)) {
-					if (completed_save.get() == callback_result::CONTINUE) {
+					const auto NO_ERROR = R::NONE;
+					const auto exit_code = completed_save.get();
+
+					if (exit_code == NO_ERROR) {
 						extractor.emplace(target_archive_path, NEW_path, exit_requested);
 						current_state = state::EXTRACTING;
 						LOG("Extracting.");
 					}
 					else {
-						interrupt(R::CANCELLED);
+						interrupt(exit_code);
 					}
 				}
 
@@ -671,7 +706,7 @@ self_update_result check_and_apply_updates(
 							const auto BUNDLE_path = get_bundle_directory();
 							const auto CURRENT_path = BUNDLE_path / "Contents";
 							const auto EXE_dir = augs::path_type(get_executable_path()).replace_filename("");
-							
+
 							auto backup_user_files = [&]() {
 								for (const auto& u : paths_from_old_version_to_keep) {
 									if (mv(EXE_dir / u, BUNDLE_path / u) == callback_result::ABORT) {
@@ -685,7 +720,7 @@ self_update_result check_and_apply_updates(
 							auto move_old_content_to_OLD = [&]() {
 								return mv(CURRENT_path, OLD_path) == callback_result::CONTINUE;
 							};
-							
+
 							auto move_NEW_to_CURRENT = [&]() {
 								return mv(NEW_path / "Hypersomnia.app" / "Contents", CURRENT_path) == callback_result::CONTINUE;
 							};
@@ -743,7 +778,7 @@ self_update_result check_and_apply_updates(
 
 						auto move_old_content_to_OLD = [&]() {
 							LOG("Moving old content to OLD directory.");
-							
+
 							if (!remove_dangling_OLD_path()) {
 								return false;
 							}
@@ -886,20 +921,20 @@ self_update_result check_and_apply_updates(
 #endif
 
 #if PLATFORM_UNIX
-			if (signal_status != 0) {
-				const auto sig = signal_status.load();
+		if (signal_status != 0) {
+			const auto sig = signal_status.load();
 
-				LOG("%x received.", strsignal(sig));
+			LOG("%x received.", strsignal(sig));
 
-				if(
-					sig == SIGINT
-					|| sig == SIGSTOP
-					|| sig == SIGTERM
-				) {
-					LOG("Gracefully shutting down.");
-					interrupt(R::EXIT_APPLICATION);
-				}
+			if(
+				sig == SIGINT
+				|| sig == SIGSTOP
+				|| sig == SIGTERM
+			) {
+				LOG("Gracefully shutting down.");
+				interrupt(R::EXIT_APPLICATION);
 			}
+		}
 #endif
 
 		if (window != std::nullopt) {
@@ -925,7 +960,7 @@ self_update_result check_and_apply_updates(
 
 		ImGui::NewFrame();
 		center_next_window(vec2::square(1.f), ImGuiCond_Always);
-		
+
 		advance_update_logic();
 		augs::imgui::render();
 

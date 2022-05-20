@@ -24,6 +24,9 @@ struct cmd_line_params {
 	std::optional<port_type> first_udp_command_port;
 	std::optional<port_type> server_list_port;
 
+	augs::path_type verified_archive;
+	augs::path_type verified_signature;
+
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
 
@@ -73,6 +76,12 @@ struct cmd_line_params {
 			}
 			else if (a == "--consistency-report") {
 				consistency_report = argv[i++];
+			}
+			else if (a == "--verify") {
+				verified_archive = argv[i++];
+			}
+			else if (a == "--signature") {
+				verified_signature = argv[i++];
 			}
 			else if (a == "--connect") {
 				should_connect = true;

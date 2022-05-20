@@ -45,8 +45,10 @@ $filePath = "Hypersomnia-for-$platform.exe"
 $commitHash = $(git rev-parse HEAD)
 $commitNumber = $(git rev-list --count master)
 $commitMessage = $(git log -1 --pretty=%B)
-$version = "1.0.$commitNumber"
+$version = "1.1.$commitNumber"
 
+mkdir scripts/ssh
+mv ../OpenSSH-Win64/ssh-keygen.exe scripts/ssh/ssh-keygen.exe
 mv $target_exe Hypersomnia.exe
 Get-ChildItem
 Remove-item -Recurse -Force cache, logs, user
