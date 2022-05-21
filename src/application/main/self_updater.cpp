@@ -162,6 +162,8 @@ self_update_result check_and_apply_updates(
 			}
 		}
 
+		new_version = "2.9.9";
+
 		const bool more_recent = ::is_more_recent(new_version, current_version);
 
 		if (!more_recent) {
@@ -180,10 +182,10 @@ self_update_result check_and_apply_updates(
 	const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 	auto fix_background_color = scoped_style_color(ImGuiCol_WindowBg, ImVec4{win_bg.x, win_bg.y, win_bg.z, 1.f});
 
-	const auto line_height = 24;
+	const auto line_height = 28;
 	const auto num_lines = 13;
 
-	const auto window_size = vec2i(500, line_height * num_lines);
+	const auto window_size = vec2i(600, line_height * num_lines);
 
 	window_settings.size = window_size;
 	window_settings.fullscreen = false;
