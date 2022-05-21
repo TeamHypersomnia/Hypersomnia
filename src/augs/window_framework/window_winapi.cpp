@@ -25,7 +25,7 @@
 
 #include "augs/window_framework/translate_winapi_enums.h"
 
-#if BUILD_IN_CONSOLE_MODE
+#if !BUILD_IN_CONSOLE_MODE
 extern HINSTANCE g_myhinst;
 
 auto get_hinstance() {

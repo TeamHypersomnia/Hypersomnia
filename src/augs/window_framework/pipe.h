@@ -13,7 +13,11 @@ namespace augs {
 #if PLATFORM_UNIX
 		std::shared_ptr<FILE> pipe_fd;
 
-		void open_pipe(const std::string& resolved_command) {
+		void open_pipe(std::string resolved_command, const std::string& stdin_file) {
+			if (!stdin_file.empty()) {
+				resolved_command += " < " + stdin_file;
+			}
+
 			pipe_fd = std::shared_ptr<FILE>(popen(resolved_command.c_str(), "r"), pclose);
 
 			if (!pipe_fd) {
@@ -37,9 +41,50 @@ namespace augs {
 		}
 
 #elif PLATFORM_WINDOWS
+		HANDLE g_hChildStd_IN_Rd = NULL;
+		HANDLE g_hChildStd_IN_Wr = NULL;
 		HANDLE g_hChildStd_OUT_Rd = NULL;
 		HANDLE g_hChildStd_OUT_Wr = NULL;
-		
+
+		void WriteToPipe(const std::string& stdin_file) { 
+			const auto wide_stdin = augs::widen(stdin_file);
+
+			HANDLE g_hInputFile = CreateFile(
+				wide_stdin.c_str(), 
+				GENERIC_READ, 
+				0, 
+				NULL, 
+				OPEN_EXISTING, 
+				FILE_ATTRIBUTE_READONLY, 
+				NULL
+			); 
+
+			if ( g_hInputFile == INVALID_HANDLE_VALUE ) {
+				ErrorExit(("CreateFile")); 
+			}
+
+			constexpr std::size_t BUFSIZE = 64 * 1024;
+
+			DWORD dwRead, dwWritten; 
+			CHAR chBuf[BUFSIZE];
+			BOOL bSuccess = FALSE;
+
+			for (;;) { 
+				bSuccess = ReadFile(g_hInputFile, chBuf, BUFSIZE, &dwRead, NULL);
+				if ( ! bSuccess || dwRead == 0 ) break; 
+
+				bSuccess = WriteFile(g_hChildStd_IN_Wr, chBuf, dwRead, &dwWritten, NULL);
+				if ( ! bSuccess ) break; 
+			} 
+
+			// Close the pipe handle so the child process stops reading. 
+
+			if ( ! CloseHandle(g_hChildStd_IN_Wr) ) 
+			ErrorExit("StdInWr CloseHandle");
+
+			CloseHandle(g_hInputFile);
+		} 
+
 		void ErrorExit(std::string content) {
 			LOG("Error: %x", content);
 			throw std::runtime_error(content);
@@ -53,6 +98,12 @@ namespace augs {
 			si.cb = sizeof(si);
 			
 			si.hStdOutput = g_hChildStd_OUT_Wr;
+
+			if (g_hChildStd_IN_Rd != NULL) {
+				LOG("Has g_hChildStd_IN_Rd. Set hStdInput");
+				si.hStdInput = g_hChildStd_IN_Rd;
+			}
+
 			si.dwFlags |= STARTF_USESTDHANDLES;
 
 			ZeroMemory( &pi, sizeof(pi) );
@@ -86,15 +137,21 @@ namespace augs {
 				CloseHandle(pi.hProcess);
 				CloseHandle(pi.hThread);
 				CloseHandle(g_hChildStd_OUT_Wr);
+
+				if (g_hChildStd_IN_Rd != NULL) {
+					CloseHandle(g_hChildStd_IN_Rd);
+				}
 			}
 		}
 
-		void open_pipe(const std::string& resolved_command) {
+		void open_pipe(const std::string& resolved_command, const std::string& stdin_file) {
 			SECURITY_ATTRIBUTES saAttr; 
 
 			saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
 			saAttr.bInheritHandle = TRUE; 
-			saAttr.lpSecurityDescriptor = NULL; 
+			saAttr.lpSecurityDescriptor = NULL;
+
+			const bool has_stdin = !stdin_file.empty();
 
 			LOG("Create a pipe for the child process's STDOUT. ");
 
@@ -103,12 +160,31 @@ namespace augs {
 
 			LOG("Ensure the read handle to the pipe for STDOUT is not inherited.");
 
-			if ( ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) )
-			ErrorExit(("Stdout SetHandleInformation")); 
+			if ( ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) ) {
+				ErrorExit(("Stdout SetHandleInformation")); 
+			}
+
+			if (has_stdin) {
+				LOG("Create a pipe for the child process's STDIN.");
+
+				if (! CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0)) {
+					ErrorExit(("Stdin CreatePipe")); 
+				}
+
+				LOG("Ensure the write handle to the pipe for STDIN is not inherited.");
+
+				if ( ! SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0) ) {
+					ErrorExit(("Stdin SetHandleInformation")); 
+				}
+			}
 
 			LOG("Create the child process."); 
 
 			CreateChildProcess(resolved_command);
+
+			if (has_stdin) {
+				WriteToPipe(stdin_file);
+			}
 		}
 		
 		void deinit_pipe() {
@@ -133,8 +209,8 @@ namespace augs {
 		}
 #endif
 
-		static std::string execute(const std::string& resolved_command) {
-			auto p = pipe(resolved_command);
+		static std::string execute(const std::string& resolved_command, const std::string& stdin_file = "") {
+			auto p = pipe(resolved_command, stdin_file);
 
 			std::string result;
 
@@ -145,8 +221,8 @@ namespace augs {
 			return result;
 		}
 
-		pipe(const std::string& resolved_command) {
-			open_pipe(resolved_command);
+		pipe(const std::string& resolved_command, const std::string& stdin_file = "") {
+			open_pipe(resolved_command, stdin_file);
 		}
 
 		pipe(const pipe&) = delete;

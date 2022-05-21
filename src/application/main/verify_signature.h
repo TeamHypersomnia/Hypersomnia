@@ -3,7 +3,7 @@
 #include "signing_keys.h"
 
 #if PLATFORM_WINDOWS
-#define SSH_KEYGEN_BINARY "scripts/ssh/ssh-keygen.exe"
+#define SSH_KEYGEN_BINARY (augs::path_type("scripts") / "ssh" / "ssh-keygen.exe")
 #else
 #define SSH_KEYGEN_BINARY "ssh-keygen"
 #endif
@@ -30,19 +30,18 @@ inline ssh_verification_result verify_ssh_signature(
 	augs::save_as_text(allowed_signers, ::SIGNING_PUBLIC_KEY);
 
 	const auto verification_command = typesafe_sprintf(
-		"%x -Y verify -f %x -I hypersomnia -n %x -s %x < %x",
+		"%x -Y verify -f %x -I hypersomnia -n %x -s %x",
 		SSH_KEYGEN_BINARY,
 		allowed_signers,
 		ssh_namespace,
-		signature,
-		verified_file
+		signature
 	);
 
-	const auto verification_success = "Good \"self_updater\" signature for hypersomnia with";
+	const std::string verification_success = std::string("Good \"") + ssh_namespace + "\" signature for hypersomnia with";
 
 	try {
 		LOG("Pipe command: %x", verification_command);
-		const auto verification_result = augs::pipe::execute(verification_command);
+		const auto verification_result = augs::pipe::execute(verification_command, verified_file.string());
 		LOG("Pipe result: %x", verification_result);
 
 		if (::begins_with(verification_result, verification_success)) {
