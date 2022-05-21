@@ -6,13 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Implement --verify and --signature flags
-
-- Bump version to 1.1.X after introducing signed builds
-	- test_pack_upload.ps1
-	- hypersomnia_version.cpp.in
-	- archive_and_upload.sh
-	- Somewhere else? We'll later automate it properly
+- A centered popup with the after-update message
+	- The current right-bottom notice is hard to notice
 
 - Devops
 	- Maybe add somewhere that commit hash?

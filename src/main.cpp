@@ -6,6 +6,8 @@
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/shell.h"
 
+#include "application/main/verify_signature.h"
+
 #include "cmd_line_params.h"
 #include "build_info.h"
 
@@ -117,6 +119,24 @@ int main(const int argc, const char* const * const argv) {
 		std::cout << get_version_section() << std::endl;
 
 		return EXIT_SUCCESS;
+	}
+
+	if (!params.verified_archive.empty()) {
+		const auto type = params.is_updater ? verified_object_type::UPDATER : verified_object_type::GAME;
+		const auto result = ::verify_ssh_signature(params.verified_archive, params.verified_signature, type);
+
+		if (result == ssh_verification_result::OK) {
+			std::cout << "Signature Ok." << std::endl;
+			return EXIT_SUCCESS;
+		}
+		else if (result == ssh_verification_result::NO_KEYGEN) {
+			std::cout << "Failed to verify signature: couldn't open ssh-keygen." << std::endl;
+			return EXIT_FAILURE;
+		}
+		else if (result == ssh_verification_result::FAILED_VERIFICATION) {
+			std::cout << "Wrong signature." << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
 
 	const auto completed_work_result = work(argc, argv);

@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Automate version bumping (write it in one place instead of three)
+
 - Fixing akimbo and the flipping system
 	- Sometimes only the weapon might be inside the same hand
 	- But sometimes the whole weapon placement might need to be flipped because we're holding it in a secondary hand

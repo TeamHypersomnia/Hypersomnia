@@ -7,8 +7,6 @@
 #include "augs/window_framework/pipe.h"
 
 struct archive_extractor {
-	augs::timer extraction_timer;
-
 	std::string currently_processed;
 	int read_percent;
 	int percent_complete = 0;
@@ -82,8 +80,6 @@ struct archive_extractor {
 				}
 			}
 		}
-
-		LOG("Extraction took: %x secs", extraction_timer.get<std::chrono::seconds>());
 	}
 
 	auto get_info() {

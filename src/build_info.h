@@ -73,7 +73,17 @@ usage: Hypersomnia [options|editor_file_path]
 
 Options:
     -h, --help                  Show this help and quit.
-	-v, --version               Show version information along with compilation flags.
+    -v, --version               Show version information along with compilation flags.
+    --verify [PATH]             Verify a manually downloaded game copy at PATH.
+    --verify-updater [PATH]     Verify a manually downloaded game updater at PATH. Contrary to an ordinary game copy,
+                                an updater is a self-extracting archive designed to make it easy to unpack programatically.
+    --signature [PATH]          Specify the SSH signature against which to verify the game or updater.
+                                This flag too must be specified if either --verify or --verify-updater was set!
+                                Examples:
+
+                                --verify Hypersomnia-for-Windows.zip --signature Hypersomnia-for-Windows.zip.sig
+                                --verify-updater Hypersomnia-for-Windows.exe --signature Hypersomnia-for-Windows.exe.sig
+
     --unit-tests-only           Perform unit tests only and quit.
     --connect [ADDRESS]         Connect to an arena server in accordance with default_client_start inside the config file.
                                 The ADDRESS argument is optional - if specified, it will override the connect_address field from the config file.
@@ -83,9 +93,7 @@ Options:
                                 For example - the game will be started without a window.
 
 If editor_file_path is supplied and it is a directory,
-the game will automatically launch the editor to try and open the project inside it, if there is one. 
-
-)"
+the game will automatically launch the editor to try and open the project inside it, if there is one.)"
 ;
 }
 

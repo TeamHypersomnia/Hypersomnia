@@ -81,7 +81,6 @@ namespace augs {
 				ErrorExit("CreateProcess");
 			}
 			else{ 
-				extraction_timer.reset();
 				LOG("Closing unnecessary handles.");
 
 				CloseHandle(pi.hProcess);

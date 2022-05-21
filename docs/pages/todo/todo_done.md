@@ -4551,4 +4551,10 @@ Advantages:
 		- The target interaction type might have a method to determine whether it is already running or not.
 	- Easy, we should always deterministically infer the current interaction and advance it
 		
+- Implement --verify and --signature flags
+
+- Bump version to 1.1.X after introducing signed builds
+	- test_pack_upload.ps1
+	- hypersomnia_version.cpp.in
+	- archive_and_upload.sh
 

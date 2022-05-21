@@ -30,8 +30,8 @@
 #include "3rdparty/cpp-httplib/httplib.h"
 #include "augs/filesystem/directory.h"
 #include "application/main/new_and_old_hypersomnia_path.h"
+#include "application/main/verify_signature.h"
 #include "application/main/extract_archive.h"
-#include "signing_keys.h"
 
 #if BUILD_OPENSSL
 using client_type = httplib::SSLClient;
@@ -56,12 +56,6 @@ using client_type = httplib::Client;
 
 #if PLATFORM_UNIX
 extern std::atomic<int> signal_status;
-#endif
-
-#if PLATFORM_WINDOWS
-#define SSH_KEYGEN_BINARY "scripts/ssh/ssh-keygen.exe"
-#else
-#define SSH_KEYGEN_BINARY "ssh-keygen"
 #endif
 
 bool successful(const int http_status_code) {
@@ -607,38 +601,25 @@ self_update_result check_and_apply_updates(
 							
 							{
 								const auto target_signature_path = augs::path_type(GENERATED_FILES_DIR) / "last_updater_signature.sig";
-								const auto target_allowed_signers_path = augs::path_type(GENERATED_FILES_DIR) / "allowed_signers";
-
-								augs::save_as_text(target_allowed_signers_path, ::SIGNING_PUBLIC_KEY);
 								augs::save_as_text(target_signature_path, new_signature);
 
-								const auto verification_command = typesafe_sprintf(
-									"%x -Y verify -f %x -I hypersomnia -n self_updater -s %x < %x",
-									SSH_KEYGEN_BINARY,
-									target_allowed_signers_path,
-									target_signature_path,
-									target_archive_path
+								const auto result = ::verify_ssh_signature(
+									target_archive_path,
+									target_signature_path
 								);
 
-								const auto verification_success = "Good \"self_updater\" signature for hypersomnia with";
-
-								try {
-									LOG("Pipe command: %x", verification_command);
-									const auto verification_result = augs::pipe::execute(verification_command);
-									LOG("Pipe result: %x", verification_result);
-									const bool authentic = ::begins_with(verification_result, verification_success);
-
-									if (!authentic) {
-										rm_rf(target_archive_path);
-										return R::FAILED_TO_VERIFY_BINARY;
-									}
-
+								if (result == ssh_verification_result::OK) {
 									LOG("Successfully verified the new binary's signature. Continuing update.");
 								}
-								catch (const std::runtime_error& err) {
-									LOG("Failed to open ssh-keygen for signature verification: %x", err.what());
+								else {
+									rm_rf(target_archive_path);
 
-									return R::FAILED_TO_OPEN_SSH_KEYGEN;
+									if (result == ssh_verification_result::NO_KEYGEN) {
+										return R::FAILED_TO_OPEN_SSH_KEYGEN;
+									}
+									else {
+										return R::FAILED_TO_VERIFY_BINARY;
+									}
 								}
 							}
 
@@ -667,10 +648,10 @@ self_update_result check_and_apply_updates(
 			}
 			else if (current_state == state::SAVING_ARCHIVE_TO_DISK) {
 				if (valid_and_is_ready(completed_save)) {
-					const auto NO_ERROR = R::NONE;
+					const auto code_successful = R::NONE;
 					const auto exit_code = completed_save.get();
 
-					if (exit_code == NO_ERROR) {
+					if (exit_code == code_successful) {
 						extractor.emplace(target_archive_path, NEW_path, exit_requested);
 						current_state = state::EXTRACTING;
 						LOG("Extracting.");
