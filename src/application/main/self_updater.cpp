@@ -115,6 +115,7 @@ self_update_result check_and_apply_updates(
 	};
 
 	std::string new_version;
+	std::string new_commit_hash; // unused yet
 	std::string new_signature;
 	const auto current_version = hypersomnia_version().get_version_string();
 
@@ -147,9 +148,7 @@ self_update_result check_and_apply_updates(
 			return result;
 		}
 
-		std::string dummy;
-
-		if (!std::getline(s, dummy)) {
+		if (!std::getline(s, new_commit_hash)) {
 			result.type = R::COULDNT_DOWNLOAD_VERSION_FILE;
 			return result;
 		}
@@ -161,8 +160,6 @@ self_update_result check_and_apply_updates(
 				new_signature += "\n";
 			}
 		}
-
-		new_version = "2.9.9";
 
 		const bool more_recent = ::is_more_recent(new_version, current_version);
 
