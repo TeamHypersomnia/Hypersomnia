@@ -53,7 +53,7 @@ mv $target_exe Hypersomnia.exe
 Get-ChildItem
 Remove-item -Recurse -Force cache, logs, user
 $releaseNotesPath = "release_notes.txt"
-"$version" | out-file -filepath $releaseNotesPath
+"$version\n$commitHash\n$commitMessage" | out-file -filepath $releaseNotesPath
 
 Push-AppveyorArtifact $releaseNotesPath
 
