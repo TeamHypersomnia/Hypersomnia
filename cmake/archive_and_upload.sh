@@ -26,7 +26,11 @@ if [ -f "$EXE_PATH" ]; then
 	rm -r cache logs user
 
 	echo "Creating $RELEASE_NOTES_FILENAME"
-	echo "$VERSION\n$COMMIT_HASH\n$COMMIT_MESSAGE" > $RELEASE_NOTES_FILENAME
+
+	echo "$VERSION" > $RELEASE_NOTES_FILENAME
+	echo "$COMMIT_HASH" >> $RELEASE_NOTES_FILENAME
+	echo "$COMMIT_MESSAGE" >> $RELEASE_NOTES_FILENAME
+
 	popd
 	
 	if [[ "$PLATFORM" = "MacOS" ]]
