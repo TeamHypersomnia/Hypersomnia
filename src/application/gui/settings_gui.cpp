@@ -1461,7 +1461,17 @@ void settings_gui_state::perform(
 				}
 
 #if !PLATFORM_WINDOWS
-				text(u8"Test: いい товарищ żółćńźś");
+				{
+					auto s = std::basic_string<char8_t>(u8"Test: いい товарищ żółćńźś");
+
+					std::string u8str;
+
+					for (auto c : s) {
+						u8str += c;
+					}
+
+					text(u8str);
+				}
 #endif
 				ImGui::Separator();
 

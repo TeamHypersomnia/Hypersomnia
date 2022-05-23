@@ -1,4 +1,5 @@
 #pragma once
+#include <compare>
 #include "augs/math/vec2.h"
 #include "game/cosmos/entity_id.h"
 #include "3rdparty/Box2D/Dynamics/b2Filter.h"
@@ -42,7 +43,7 @@ struct pathfinding_session {
 	float temporary_ignore_discontinuities_shorter_than = 0.f;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const pathfinding_session&) const;
+	friend bool operator==(const pathfinding_session&, const pathfinding_session&) = default;
 };
 
 namespace components {

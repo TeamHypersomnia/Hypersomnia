@@ -1,9 +1,4 @@
 #include "pathfinding_component.h"
-#include "augs/templates/introspection_utils/introspective_equal.h"
-
-bool pathfinding_session::operator==(const pathfinding_session& b) const {
-	return augs::introspective_equal(*this, b);
-}
 
 namespace components {
 	pathfinding_session& pathfinding::session() {

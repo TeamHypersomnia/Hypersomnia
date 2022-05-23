@@ -23,7 +23,7 @@ int detail_typesafe_scanf_value(
 	T cp;
 
 	if (read_chunk >> cp) {
-		into = cp;
+		into = std::move(cp);
 		return 1;
 	}
 

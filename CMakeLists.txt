@@ -1026,6 +1026,8 @@ if(CLANG)
 	endif()
 
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
+
+	file_flag("src/augs/image/image.cpp" "-Wno-error")
 endif()
 
 if(GCC)
@@ -1074,7 +1076,7 @@ if(MSVC)
 	
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /std:c++latest /fp:strict /bigobj /permissive-")
 else()
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -std=gnu++1z")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -std=c++20")
 endif()
 
 if (PREFER_LIBCXX AND CLANG AND NOT MSVC)
