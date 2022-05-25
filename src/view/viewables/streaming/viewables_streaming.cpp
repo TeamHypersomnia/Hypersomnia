@@ -4,7 +4,6 @@
 #include "augs/templates/thread_templates.h"
 #include "view/viewables/streaming/viewables_streaming.h"
 #include "view/audiovisual_state/systems/sound_system.h"
-#include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/misc/imgui/imgui_utils.h"
 
 #include "augs/audio/audio_command_buffers.h"
@@ -148,7 +147,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				});
 			}
 
-			if (!augs::introspective_equal(gui_fonts, now_loaded_gui_font_defs)) {
+			if (gui_fonts != now_loaded_gui_font_defs) {
 				new_atlas_required = true;
 			}
 		}

@@ -15,12 +15,16 @@ struct client_jitter_vars {
 	uint32_t buffer_at_least_ms = 20;
 	uint8_t max_commands_to_squash_at_once = 255;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const client_jitter_vars&) const = default;
 };
 
 struct client_net_vars {
 	// GEN INTROSPECTOR struct client_net_vars
 	client_jitter_vars jitter;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const client_net_vars&) const = default;
 };
 
 struct client_chat_settings {

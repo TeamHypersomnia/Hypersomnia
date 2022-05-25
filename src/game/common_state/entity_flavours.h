@@ -3,7 +3,6 @@
 
 #include "augs/pad_bytes.h"
 #include "augs/misc/pool/pool.h"
-#include "augs/templates/introspect_declaration.h"
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"
@@ -103,10 +102,6 @@ public:
 	template <class D>
 	void set(const D& something) {
 		get<D>() = something;
-	}
-
-	bool operator==(const entity_flavour& b) const {
-		return augs::introspective_equal(*this, b);
 	}
 };
 

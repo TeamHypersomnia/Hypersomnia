@@ -1,4 +1,5 @@
 #pragma once
+#include <compare>
 #include "augs/pad_bytes.h"
 
 #include "augs/templates/maybe.h"
@@ -6,7 +7,6 @@
 #include "augs/math/transform.h"
 #include "augs/math/rects.h"
 
-#include "augs/templates/introspect_declaration.h"
 #include "augs/templates/traits/container_traits.h"
 
 #include "augs/graphics/rgba.h"
@@ -18,6 +18,8 @@ struct intensity_vibration_input {
 	rgba_channel upper = 255;
 	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const intensity_vibration_input&) const = default;
 };
 
 struct sprite_drawing_input;
@@ -106,9 +108,7 @@ namespace augs {
 		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 
-		bool operator==(const sprite& b) const {
-			return introspective_equal(*this, b);
-		}
+		bool operator==(const sprite<id_type>&) const = default;
 
 		size_type get_size() const {
 			return size;

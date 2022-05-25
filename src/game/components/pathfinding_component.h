@@ -43,7 +43,7 @@ struct pathfinding_session {
 	float temporary_ignore_discontinuities_shorter_than = 0.f;
 	// END GEN INTROSPECTOR
 
-	friend bool operator==(const pathfinding_session&, const pathfinding_session&) = default;
+	bool operator==(const pathfinding_session&) const = default;
 };
 
 namespace components {

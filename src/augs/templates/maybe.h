@@ -35,16 +35,8 @@ namespace augs {
 		explicit operator bool() const {
 			return is_enabled;
 		}
+
+		friend bool operator==(const maybe<T>&, const maybe<T>&) = default;
 	};
-
-	template <class T, class = std::enable_if_t<is_comparable_v<T, T>>>
-	bool operator==(const maybe<T>& a, const maybe<T>& b) {
-		return a.value == b.value && a.is_enabled == b.is_enabled;
-	}
-
-	template <class T, class = std::enable_if_t<is_comparable_v<T, T>>>
-	bool operator!=(const maybe<T>& a, const maybe<T>& b) {
-		return !(a == b);
-	}
 }
 

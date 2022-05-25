@@ -10,6 +10,8 @@ struct nat_port_probing_settings {
 	int num_available = 15;
 	int num_probed_for_detection = 3;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const nat_port_probing_settings&) const = default;
 };
 
 struct nat_detection_settings {
@@ -25,5 +27,7 @@ struct nat_detection_settings {
 	uint32_t request_interval_ms = 200;
 	uint32_t packet_interval_ms = 5;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const nat_detection_settings&) const = default;
 };
 

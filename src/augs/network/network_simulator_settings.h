@@ -1,4 +1,5 @@
 #pragma once
+#include <compare>
 #include "augs/templates/maybe.h"
 
 namespace augs {
@@ -14,18 +15,7 @@ namespace augs {
 			return network_simulator_settings();
 		}
 
-		bool operator==(const network_simulator_settings& b) const {
-			return 
-				latency_ms == b.latency_ms
-				&& jitter_ms == b.jitter_ms
-				&& loss_percent == b.loss_percent
-				&& duplicates_percent == b.duplicates_percent
-			;
-		}
-
-		bool operator!=(const network_simulator_settings& b) const {
-			return !operator==(b);
-		}
+		bool operator==(const network_simulator_settings&) const = default;
 	};
 
 	using maybe_network_simulator = maybe<network_simulator_settings>;

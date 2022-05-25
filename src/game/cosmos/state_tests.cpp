@@ -27,6 +27,8 @@ TEST_CASE("StateTest0 PaddingSanityCheck1") {
 		int b;
 		bool c;
 
+		bool operator==(const ok&) const = default;
+
 		ok() : a(false), b(1), c(false) {
 
 		}
@@ -56,6 +58,8 @@ TEST_CASE("StateTest1 PaddingSanityCheck2") {
 		bool a = false;
 		int b = 1;
 		bool c = false;
+
+		bool operator==(const ok&) const = default;
 	};
 
 	typedef ok checked_type;

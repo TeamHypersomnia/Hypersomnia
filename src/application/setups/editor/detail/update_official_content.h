@@ -5,8 +5,6 @@
 #include "augs/templates/introspection_utils/on_dynamic_content.h"
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/pool/pool_allocate.h"
-#include "augs/templates/introspection_utils/introspective_equal.h"
-
 #include "application/setups/editor/detail/find_asset_id.h"
 
 template <class T, class F>

@@ -23,7 +23,6 @@
 #include "application/arena/choose_arena.h"
 #include "application/gui/client/chat_gui.h"
 #include "application/network/payload_easily_movable.h"
-#include "augs/templates/introspection_utils/introspective_equal.h"
 #include "application/gui/client/rcon_gui.hpp"
 #include "application/arena/arena_handle.hpp"
 #include "application/masterserver/server_heartbeat.h"
@@ -535,7 +534,7 @@ void server_setup::apply(const private_server_vars& private_new_vars, const bool
 void server_setup::apply(const server_vars& new_vars, const bool force) {
 	const bool any_difference = 
 		force || 
-		!augs::introspective_equal(new_vars, vars)
+		new_vars != vars
 	;
 
 	const auto old_vars = vars;
@@ -571,7 +570,7 @@ void server_setup::apply(const server_vars& new_vars, const bool force) {
 void server_setup::apply(const server_solvable_vars& new_vars, const bool force) {
 	const bool any_difference = 
 		force || 
-		!augs::introspective_equal(new_vars, solvable_vars)
+		new_vars != solvable_vars
 	;
 
 	const auto old_vars = solvable_vars;
@@ -635,7 +634,7 @@ void server_setup::apply(const config_lua_table& cfg) {
 	requested_settings.character_input = cfg.input.character;
 
 	const bool can_already_resend_settings = server_time - when_last_sent_admin_public_settings > 1.0;
-	const bool resend_requested_settings = can_already_resend_settings && !augs::introspective_equal(current_requested_settings, requested_settings);
+	const bool resend_requested_settings = can_already_resend_settings && current_requested_settings != requested_settings;
 
 	if (resend_requested_settings) {
 		current_requested_settings = requested_settings;

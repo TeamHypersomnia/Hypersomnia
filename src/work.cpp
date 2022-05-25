@@ -15,7 +15,6 @@
 #include "augs/templates/history.hpp"
 #include "augs/templates/traits/in_place.h"
 #include "augs/templates/thread_pool.h"
-#include "augs/templates/introspection_utils/introspective_equal.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -1488,7 +1487,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					}
 
 					if (nat_detection != std::nullopt) {
-						if (!augs::introspective_equal(config.nat_detection, nat_detection->get_settings())) {
+						if (config.nat_detection != nat_detection->get_settings()) {
 							restart_nat_detection();
 						}
 

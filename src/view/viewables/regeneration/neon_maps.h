@@ -1,4 +1,5 @@
 #pragma once
+#include <compare>
 #include <vector>
 #include <cstddef>
 #include <chrono>
@@ -16,6 +17,8 @@ struct neon_map_input {
 
 	std::vector<rgba> light_colors;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const neon_map_input&) const = default;
 
 	bool valid() const {
 		return radius.neither_zero();

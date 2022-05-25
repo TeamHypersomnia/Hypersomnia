@@ -16,7 +16,6 @@
 #include "augs/readwrite/pointer_to_buffer.h"
 #include "augs/readwrite/memory_stream.h"
 #include "application/masterserver/server_heartbeat.h"
-#include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/misc/time_utils.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -64,10 +63,6 @@ struct masterserver_client {
 	masterserver_client_meta meta;
 	server_heartbeat last_heartbeat;
 };
-
-bool operator!=(const server_heartbeat& a, const server_heartbeat& b) {
-	return !augs::introspective_equal(a, b);
-}
 
 bool operator==(const netcode_address_t& a, const netcode_address_t& b) {
 	auto aa = a;

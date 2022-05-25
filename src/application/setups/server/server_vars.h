@@ -9,6 +9,8 @@
 using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;
 
 struct arena_switching_settings {
+	bool operator==(const arena_switching_settings&) const = default;
+
 	// GEN INTROSPECTOR struct arena_switching_settings
 	int switch_once_every_n_matches = 2;
 	int vote_rounds_before = 0;
@@ -17,6 +19,8 @@ struct arena_switching_settings {
 
 struct server_solvable_vars {
 	static constexpr bool force_read_field_by_field = true;
+
+	bool operator==(const server_solvable_vars&) const = default;
 
 	// GEN INTROSPECTOR struct server_solvable_vars
 	arena_switching_settings arena_switching;
@@ -28,6 +32,8 @@ struct server_solvable_vars {
 
 struct server_vars {
 	static constexpr bool force_read_field_by_field = true;
+
+	bool operator==(const server_vars&) const = default;
 
 	// GEN INTROSPECTOR struct server_vars
 	server_name_type server_name;

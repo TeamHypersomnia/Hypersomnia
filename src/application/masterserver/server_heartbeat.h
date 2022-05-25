@@ -3,6 +3,9 @@
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "application/nat/nat_detection_session.h"
 
+bool operator==(const netcode_address_t& a, const netcode_address_t& b);
+bool operator!=(const netcode_address_t& a, const netcode_address_t& b);
+
 struct server_heartbeat {
 	static constexpr bool force_read_field_by_field = true;
 
@@ -20,6 +23,8 @@ struct server_heartbeat {
 	std::optional<netcode_address_t> internal_network_address;
 	nat_detection_result nat;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const server_heartbeat&) const = default;
 
 	void validate();
 

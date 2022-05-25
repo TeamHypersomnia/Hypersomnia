@@ -55,7 +55,7 @@ void perform_rcon_gui(
 				if (applying_flag) {
 					text_color("Applying changes...", yellow);
 				}
-				else if (!augs::introspective_equal(last_saved, edited)) {
+				else if (last_saved != edited) {
 					if (ImGui::Button("Apply & Save")) {
 						applying_flag = true;
 

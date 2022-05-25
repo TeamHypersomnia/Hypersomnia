@@ -1,4 +1,5 @@
 #pragma once
+#include <compare>
 
 namespace augs {
 	struct baked_font;
@@ -14,6 +15,8 @@ struct per_gui_font {
 	What large_numbers;
 	What very_large_numbers;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const per_gui_font<What>&) const = default;
 };
 
 using all_gui_fonts_inputs = per_gui_font<augs::font_loading_input>;

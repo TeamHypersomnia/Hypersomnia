@@ -19,7 +19,6 @@
 
 #include "augs/filesystem/file.h"
 
-#include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/gui/text/printer.h"
 #include "application/network/payload_easily_movable.h"
 #include "augs/misc/readable_bytesize.h"
@@ -507,7 +506,7 @@ void client_setup::send_pending_commands() {
 	const bool init_send = state == C::INITIATING_CONNECTION;
 
 	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
-	const bool resend_requested_settings = can_already_resend_settings && !augs::introspective_equal(current_requested_settings, requested_settings);
+	const bool resend_requested_settings = can_already_resend_settings && current_requested_settings != requested_settings;
 
 	auto send_settings = [&]() {
 		send_payload(

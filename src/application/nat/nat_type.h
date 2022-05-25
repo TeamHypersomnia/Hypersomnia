@@ -19,6 +19,8 @@ struct nat_detection_result {
 	port_type predicted_next_port = 0;
 	// END GEN INTROSPECTOR
 
+	bool operator==(const nat_detection_result&) const = default;
+
 	std::string describe() const;
 };
 

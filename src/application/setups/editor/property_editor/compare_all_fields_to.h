@@ -4,7 +4,6 @@
 
 #include "augs/templates/traits/container_traits.h"
 #include "augs/enums/callback_result.h"
-#include "augs/templates/introspection_utils/introspective_equal.h"
 #include "application/setups/editor/commands/detail/editor_property_accessors.h"
 
 namespace augs {

@@ -8,6 +8,8 @@ struct public_client_settings {
 	// GEN INTROSPECTOR struct public_client_settings
 	per_character_input_settings character_input;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const public_client_settings&) const = default;
 };
 
 using rcon_password_type = augs::constant_size_string<max_rcon_password_length_v>;
@@ -20,4 +22,6 @@ struct requested_client_settings {
 	public_client_settings public_settings;
 	client_net_vars net;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const requested_client_settings&) const = default;
 };

@@ -6,8 +6,6 @@
 #include "view/viewables/image_definition.h"
 #include "view/viewables/regeneration/desaturations.h"
 
-#include "augs/templates/introspection_utils/introspective_equal.h"
-
 augs::path_type get_neon_map_path(augs::path_type from_source_path) {
 	return augs::path_type(GENERATED_FILES_DIR) / from_source_path.relative_path().replace_extension(".neon_map.png").string();
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <compare>
 #include "augs/math/vec2.h"
 #include "augs/drawing/flip.h"
 
@@ -20,10 +21,7 @@ struct image_extra_loadables {
 	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const image_extra_loadables& b) const;
-	bool operator!=(const image_extra_loadables& b) const {
-		return !operator==(b);
-	}
+	bool operator==(const image_extra_loadables&) const = default;
 
 	bool should_generate_desaturation() const {
 		return generate_desaturation;
