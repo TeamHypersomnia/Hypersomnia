@@ -209,7 +209,13 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 	for (int i = 0; i < num_subjects; ++i) {
 		const auto& entry = in.subjects[i];
 
-		augs::file_to_bytes(entry.image_path, atlas_subjects.loaded_images[i]);
+		try {
+			augs::file_to_bytes(entry.image_path, atlas_subjects.loaded_images[i]);
+		}
+		catch (...) {
+
+		}
+
 		identificators[i] = entry.id;
 	}
 

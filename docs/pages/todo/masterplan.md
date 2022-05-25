@@ -8,10 +8,105 @@ summary: We need to set our priorities straight.
 
 # Builder
 
+- poszukac jakiegos przykladu imgui filesystem z miniaturkami
+	- ale nie ma biedy też bo zawsze można manualnie prosty sklepać 
+	- wtedy wieksza kontrole nad drag and dropem na mape tez bysmy mieli
+
+- Na razie bym sie nie spieszyl z tym wywalaniem tego edytora starego bo bedziemy referowac sie do niego jesli chodzi o gui
+- Warto przemyslec asynchronicznosc dla szybkosci iteracji jakby ktos modyfikowal grafiki w zewnetrznym programie i chcial od razu widziec jak wyglada w grze
+
+- also mozna dac tick na official content jak w unrealu show engine content
+	- to bedzie read only wiadomo i nie przebudowywane nigdy tylko raz ew. wczytane do plikow i tekstur
+
+- Ok czyli jeszcze raz - aktywacja okna:
+	- Rebuild whole filesystem
+		- po primo budujemy hierarchie dla eksplorera czyli
+		- dla kazdego znalezionego pliku rekursywnie
+
+		- ofc jak mam reprezentacje w pamieci z timestampem takim samym to nie musze przeladowywac
+	- i co teraz
+		- Sprawdzamy czy coś z istniejacych rzeczy nie zostalo wyjebane
+		- (TYLKO JAK MAMY NIEZAPISANE ZMIANY NA NIM!) Jak timestamp sie zmienil to komunikat - changed on disk, do you want these files: reload (yes/cancel)
+
+
+	- Mozna wczytac do pamieci wszystkie pliki obrazkow, nawet do tekstur bo i tak zakladamy ze na razie sie pomiesci wszystko
+		- Mapy i tak juz beda w dobrym formacie wiec jak bedzie trzeba to ulepszymy performance pozniej bez strat w ludziach
+
+- Czy trackujemy wszystkie rekursywnie w filesystemie? Czy tylko te ktorych uzywamy aktualnie na scenie?
+	- To jest bardziej rozkmina chyba typu czy chcesz pokazywac dla wszystkich nawet nieuzywanych komunikaty o popsutych sciezkach
+		- a poza tym to lazyloadowanie wszystkiego chyba niewiele ci da
+		- latwiej bedzie i bardziej modularnie jak zbudujemy caly filesystem to mozemy od razu podac do logiki okienka
+		- i tak chcemy te mapy cale ladowac do gry wiec jak tu sie bedzie za wolno wczytywac to tym bardziej do gry
+			- potem jak bedziemy mieli giga giga mapy to mozemy robic to lazy wczytywanie
+	- Do widoku filesystemu w dolnym panelu i tak musimy jakos ladowac te wszystkie png
+		- ale to chyba oddzielna kwestia jest
+		- i nie wiem czy bym i tak nie odswiezal tego widoku jesli chodzi o same filenamy przynajmniej a cachowac ewentualnie obrazki same?
+
+- wydaje mi sie ze ten lazy loading niewiele nam da a aktywacja okna to jest dobra granica miedzy potencjalnymi zmianami w filesystemie
+	- wiadomo ze i tak nie bedziemy generowali yamlow wszystkich od razu
+
+- Co dokładnie przeładowujemy na aktywacje okna - procedura
+	- W momencie rozpoczęcia przeładowywania będziemy mieli w pamięci reprezentacje yamlów tak jak ostatnio były writeoutowane 
+		- i to info posłuży nam do łatwego znalezienia przekierowania
+		- a jak akurat bedzie wtedy wylaczony edytor to ewentualnie w jakims keszu zeby dalo sie wykryc
+	- i tylko skanujemy czy wywalony zostal ktorys z uzywanych na scenie
+		- reszta ktora ktos dodaje zupelnie nas nie interesuje dopoki to nie jest wciepane na scene
+	- Najpierw musimy przeskanować to czego nie ma żeby potem powiązać z rzeczami które zostały przeniesione a byłyby potraktowane jako nowe?
+		- Choć tak naprawdę po prostu rebuild od nowa wyjdzie na to samo
+	- tylko nas interesuje skan tych rzeczy co uzywamy
+	- myslimy o tym tylko jako o edytorze dla tego pliku .project 
+		- a reszta tych yamlow/plikow w ogole nie musi istniec w pamieci ich reprezentacja dopoki nie sa uzywane na scenie
+
+	- Dobra to mając ten path system
+		- Aktualnie jedyne co potrzebujemy przeladowywac na start to UZYWANE sciezki - wiec to musimy trackowac
+	- A `nowe` sciezki tylko jak otwieramy w dialogu dany folder - czyli przeladowujemy tylko folder filesystemu obecnie widoczny
+	- i od razu obczajamy last write time i przeladowujemy (ale tylko yamle bo przeladowywaniem pngow sie zajmuje viewable streaming)
+		- wiec jakby tutaj pngow samych edytor nie widzi w kwestii stanu a one sluza tylko do tego zeby wiedziec ze trzeba wygenerowac nowy yaml
+
+
+	- Musimy sprawdzić czy coś nowego się nie pojawiło więc i tak O(n) trzeba przelecieć rekursywnie cały folder
+		- Więc od razu możemy pobrać write timy istniejących
+		- I pamiętaj że "nowy" to może być zmieniona lokacja starego
+			- takze sciezki nic nie mowia chyba
+			- i by trzeba bylo ladowac mety cale
+	- Co jak ktoś skopiuje yamla i zostawi ten sam meta id?
+		- Wtedy ten ze starszym write time powinnismy brac ale tbh to nie ma znaczenia na razie
+		- po prostu jeden z nich zostanie wybrany a potem jak ktos usunie z dysku i przeladuje znowu to i tak wroci do normy bo to powinno byc resilient takie wlasnie
+		- a skoro zduplikowany to bedzie tak samo wygladalo wiec nawet uzytkownik nie odczuje ze cos jest nie tak
+		- wiec nie przejmowalbym sie duplikatami na teraz
+		- no dobra chociaz w sumie komunikat by sie przydal
+	- 
+- also uzywajmy relatywnych sciezek, w yamlu z animacja np.
+	- latwiej wtedy przerzucic sama taka animacje czy folder z obiektami pokoju do innego projektu
+	- praktycznie od strzala
+
+- asynchroniczny scanner zwroci nam tylko jakby liste affected sciezek
+	- ale to walic na razie, synchronicznie zrobimy bo na razie to małe jest i bedzie bardziej clean less error prone
+
 - Implementation
 	- albo jedziemy z tego co mamy w editor setupie i wywalamy niepotrzebne
 	- albo od nowa
 	- wydaje mi sie ze od nowa lepiej bo tu sie bedzie wszystko roznic praktycznie
+		- na pewno nam się okienka przydadzą zaimplementowane niektóre i jakies skróty porobione
+	- zostawiamy stare zrodla w projekcie?
+		- pod starym master branchem mozna
+		- nie ma co sie bawic chyba w zamienianie
+		- to sie nam przyda chyba jednak jako taki inspector
+			- tylko bym nie budowal go do release albo nawet w ogole domyslnie
+		- faktem jest że nie opłaca nam sie za bardzo tego utrzymywać
+			- reward jest zbyt niski na tak długie czasy kompilacji i poprawianie errorów
+			- jakby kiedyś to było critical to wtedy można przywrócić
+
+- Raczej nie robiłbym zapisywania per-plik
+	- miejmy jeden monolityczny writeout który wszystkie niezapisane zmiany do plików wypuszcza
+		- unity chyba tak samo robi
+	- te zmiany na plikach nie są samodzielnie tak znaczace żeby trzeba było je oddzielnie zapisywać, bez sensu by to było
+	- ofc w pamieci binarnie robimy tylko liste niezapisanych zmian
+		- i ten blob bedzie lecial do pliku raz naczas i to bedzie nasz autosave
+		- nie bedzie nic nawet do autosavowania jak wrzucisz mase nowych plikow bo im sie od razu robi writeout na nowych yamlach
+
+- Zmienia nam się autosave
+	- Zróbmy jeden blob 
 
 - Zanim zrobimy prosty kejs ze spritami to musimy na pewno rozkminić:
 	- Ta strukture prefabów
@@ -64,26 +159,6 @@ summary: We need to set our priorities straight.
 		- a zawsze mozna uproscic
 
 
-- Co dokładnie przeładowujemy na aktywacje okna - procedura
-	- Dobra to mając ten path system
-		- Aktualnie jedyne co potrzebujemy przeladowywac na start to UZYWANE sciezki - wiec to musimy trackowac
-	- A `nowe` sciezki tylko jak otwieramy w dialogu dany folder - czyli przeladowujemy tylko folder filesystemu obecnie widoczny
-	- i od razu obczajamy last write time i przeladowujemy (ale tylko yamle bo przeladowywaniem pngow sie zajmuje viewable streaming)
-		- wiec jakby tutaj pngow samych edytor nie widzi w kwestii stanu a one sluza tylko do tego zeby wiedziec ze trzeba wygenerowac nowy yaml
-
-
-	- Musimy sprawdzić czy coś nowego się nie pojawiło więc i tak O(n) trzeba przelecieć rekursywnie cały folder
-		- Więc od razu możemy pobrać write timy istniejących
-		- I pamiętaj że "nowy" to może być zmieniona lokacja starego
-			- takze sciezki nic nie mowia chyba
-			- i by trzeba bylo ladowac mety cale
-	- Co jak ktoś skopiuje yamla i zostawi ten sam meta id?
-		- Wtedy ten ze starszym write time powinnismy brac ale tbh to nie ma znaczenia na razie
-		- po prostu jeden z nich zostanie wybrany a potem jak ktos usunie z dysku i przeladuje znowu to i tak wroci do normy bo to powinno byc resilient takie wlasnie
-		- a skoro zduplikowany to bedzie tak samo wygladalo wiec nawet uzytkownik nie odczuje ze cos jest nie tak
-		- wiec nie przejmowalbym sie duplikatami na teraz
-		- no dobra chociaz w sumie komunikat by sie przydal
-	- 
 		
 
 - History actions vs filesystem
@@ -102,8 +177,12 @@ summary: We need to set our priorities straight.
 	- zmiana nazwy yamla - meta hash ten sam - ale wtedy nie sczyta obrazka, importuje tamten na nowo chyba ze nazwe zmienimy
 	- animacja yaml:
 	
-
 - Animacje (z punktu widzenia struk. prefabow)
+	- To że się wywali png jakis przez przypadek albo inaczej nazwie to sie nic nie dzieje
+		- po prostu sie pokaza pytajniki
+		- liczy sie jakby to co na poczatku zostalo wygenerowane defaultowo
+			- a to i tak jest tylko default
+		- w animacji zostana metadane tych obrazkow ze sciezkami
 	- Tu jest kwestia tylko wygenerowania defaulta
 		- Bo wiadomo że w edytorze bedzie można potem przekładać framy i durations
 			- zeby wlasnie nie kopiowac milion razy tych samych framow
