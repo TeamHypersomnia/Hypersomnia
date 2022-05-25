@@ -9,9 +9,6 @@ summary: That which we are brainstorming at the moment.
 - A centered popup with the after-update message
 	- The current right-bottom notice is hard to notice
 
-- Devops
-	- Maybe add somewhere that commit hash?
-
 - Fix that camera flying somewhere upon the last kill
 
 - don't give money to spectators

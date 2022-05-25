@@ -6,6 +6,12 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Equip z prawej w jak w ceesie najlepiej
+	- equip load pasek bardzo widoczny nad wszystkimi slotami
+
+- W winter stories czy czymś takim elementem gameplayu jak nie masz ammo jest rzucanie melee i zbieranie z podłogi z powrotem
+	- jak w duelach
+
 - More camera modes for Spectator
 
 - Multiple official servers

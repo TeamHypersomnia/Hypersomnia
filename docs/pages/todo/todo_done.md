@@ -4558,3 +4558,6 @@ Advantages:
 	- hypersomnia_version.cpp.in
 	- archive_and_upload.sh
 
+- Devops
+	- Maybe add somewhere that commit hash?
+

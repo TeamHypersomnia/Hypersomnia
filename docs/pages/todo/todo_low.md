@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- z jakiegos powodu nie pokazuje used lokacji dla flavorow w legacy editorze
+
 - Automate version bumping (write it in one place instead of three)
 
 - Fixing akimbo and the flipping system
