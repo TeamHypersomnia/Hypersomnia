@@ -1,6 +1,6 @@
 <a name="intro"></a>
 <div align="center">
-<img src="https://hypersomnia.xyz/menu_game_logo.png"></img>
+<img src="https://hypersomnia.xyz/images/menu_game_logo.png"></img>
 
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 [![Build Status](https://github.com/TeamHypersomnia/Hypersomnia/workflows/Linux%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
