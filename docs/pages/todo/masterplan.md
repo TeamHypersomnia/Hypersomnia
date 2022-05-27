@@ -8,6 +8,14 @@ summary: We need to set our priorities straight.
 
 # Builder
 
+- Pamietaj ze PoC nie musi byc turboresponsywny na kazdym kroku
+	- Mapa bedzie juz w dobym przenosnym formacie to jest najwazniejsze. Potem to mozna stopniowo ulepszac
+
+- No i git przypomnielismy sobie jak dzialaja ad hoc atlasy
+	- tam można wrzucać zawsze mapke z idami dla obecnego folderu/calego filesystemu na start
+
+- Btw. ctrl+s to juz writeout do wszystkich plikow zmodyfikowanych bez wariowania z rozpatrzaniem plikow osobno
+
 - poszukac jakiegos przykladu imgui filesystem z miniaturkami
 	- ale nie ma biedy też bo zawsze można manualnie prosty sklepać 
 	- wtedy wieksza kontrole nad drag and dropem na mape tez bysmy mieli
@@ -289,9 +297,25 @@ summary: We need to set our priorities straight.
 - floor/wall materials no to pewnie oddzielne yamle
 	- tylko po prostu juz duzo wbudowanych bedzie ze ludziom nie bedzie trzeba nowych tworzyc raczej
 
+## Interacting with the built game world representation
+
+- It's only a matter of mapping the hovered game-world object to the source in-memory only recipe object
+- We can always remember what game-world object was created for a given map object
+	- and this way straightforwardly have a bidirectional mapping
+- with a bidirectional mapping we pretty much have everything
+- we process highlights and clicks on the world entity and e.g. show the corresponding map object in inspector
+	- "Show meta" button in inspector when an instance is selected
+		- this shows the prefab in the filesystem panel
+		- not sure about the naming but I thing "meta" is alright, let's not imply straight away that it's yaml I guess?
+
 ## Layers
 
 Layery pewnie oddzielne fizyczne i niefizyczne, bez specyfikacji czy dany png ma byc fizykiem czy nie
+	- nienienie, przy pngu bedziemy wybierali jakis typ zeby pokazywac tylko relewantne propty
+	- tylko tu jest pytanie czy mamy np. warstwy fore/back i w kazdej moga byc i fizyczne i niefizyczne
+		- bo niby teoretycznie jakies fizyczne ksztalty moga sie zarowno nad nami jak i pod nami rysowac
+	- czy po po prostu jedna warstwa specjalna na same fizyki
+	- w jj2 np. taki jest podzial
 
 ## "Compiling" map representation
 
@@ -348,6 +372,15 @@ Layery pewnie oddzielne fizyczne i niefizyczne, bez specyfikacji czy dany png ma
 
 - Specjalne obiekty i tak nie beda skryptowane edytorze bo chcemy max performance
 	- one beda w c++
+
+## Folder structure
+
+- Project itself will be stored in yml
+	- the about section I think might be separate for the purposes of quick browsing
+
+- project.yml
+- project.about.yml
+- project.miniature.png
 
 ## Map format
 

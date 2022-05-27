@@ -19,7 +19,7 @@
 #include "augs/texture_atlas/atlas_entry.h"
 #include "view/viewables/ad_hoc_atlas_subject.h"
 #include "view/viewables/ad_hoc_in_atlas_map.h"
-#include "application/setups/builder/project/builder_project_meta.h"
+#include "application/setups/builder/project/builder_project_about.h"
 #include "application/setups/project_selector/project_selector_gui.h"
 
 struct config_lua_table;

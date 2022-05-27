@@ -7,9 +7,9 @@ struct builder_project_role_info {
 	// END GEN INTROSPECTOR
 };
 
-struct builder_project_meta {
-	// GEN INTROSPECTOR struct builder_project_meta
-	std::vector<builder_project_role_info> roles;
+struct builder_project_about {
+	// GEN INTROSPECTOR struct builder_project_about
+	std::vector<builder_project_role_info> credits;
 
 	std::string short_description;
 	std::string full_description;

@@ -80,27 +80,27 @@ std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_imag
 }
 
 static auto default_meta(const augs::path_type& p) {
-	builder_project_meta out;
+	builder_project_about out;
 
 	if (p.filename() == "de_labs2") {
-		out.roles.push_back({"Mapping & graphics", "lia"});
-		out.roles.push_back({"Music", "Marcel Windys"});
+		out.credits.push_back({"Mapping & graphics", "lia"});
+		out.credits.push_back({"Music", "Marcel Windys"});
 
 		out.short_description = "Resistance has been tipped about sensitive information\nsitting in the depths of an abandoned rocket silo.";
 		out.full_description = "This first map ever to be created by the community will test your CQB to the utmost limit.\nApart from a highly tactical gameplay, this map features a very creepy atmosphere -\nexpect uneasing ambience and lots of inexplicable sounds.";
 	}
 
 	if (p.filename() == "fy_minilab") {
-		out.roles.push_back({"Mapping", "Patryk B. Czachurski"});
-		out.roles.push_back({"Graphics", "Spicmir"});
+		out.credits.push_back({"Mapping", "Patryk B. Czachurski"});
+		out.credits.push_back({"Graphics", "Spicmir"});
 
 		out.short_description = "A timeless 2017 classic and the first map ever created.";
 		out.full_description = "Remember: true gentlemen don't pick up the rocket launcher.";
 	}
 
 	if (p.filename() == "de_cyberaqua") {
-		out.roles.push_back({"Mapping", "Patryk B. Czachurski"});
-		out.roles.push_back({"Graphics", "Spicmir"});
+		out.credits.push_back({"Mapping", "Patryk B. Czachurski"});
+		out.credits.push_back({"Graphics", "Spicmir"});
 
 		out.short_description = "An experimental underwater biotech laboratory is under attack by a bombing squad.\nDon't let them lay hands on any expensive equipment.";
 		out.full_description = "Protect the fish!";
@@ -502,13 +502,13 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 
 					float max_w = 0;
 
-					for (const auto& r : meta.roles) {
+					for (const auto& r : meta.credits) {
 						max_w = std::max(max_w, ImGui::CalcTextSize(r.role.c_str()).x);
 					}
 
 					ImGui::SetColumnWidth(0, max_w + text_h);
 
-					for (const auto& r : meta.roles) {
+					for (const auto& r : meta.credits) {
 						text_disabled(r.role + ": ");
 						ImGui::NextColumn();
 
