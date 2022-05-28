@@ -951,24 +951,24 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
 	) {
-		return choose_path("scripts/unix/open_file.local");
+		return choose_path(DETAIL_DIR "/unix/open_file.local");
 	}
 
 	std::optional<std::string> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
 	) {
-		return choose_path("scripts/unix/save_file.local");
+		return choose_path(DETAIL_DIR "/unix/save_file.local");
 	}
 
 	std::optional<std::string> window::choose_directory_dialog(
 		const std::string& /* custom_title */
 	) {
-		return choose_path("scripts/unix/choose_directory.local");
+		return choose_path(DETAIL_DIR "/unix/choose_directory.local");
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& p) {
-		const auto script_path = "scripts/unix/reveal_file.local";
+		const auto script_path = DETAIL_DIR "/unix/reveal_file.local";
 
 		if (!augs::exists(script_path)) {
 			LOG("WARNING! Could not find the script file: %x.", script_path);

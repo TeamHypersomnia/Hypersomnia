@@ -12,6 +12,24 @@ summary: We need to set our priorities straight.
 
 ### ALL PROJECTS
 
+- content/arenas/de_cyberaqua
+- user/arenas/de_cyberaqua
+- user/builder/de_cyberaqua
+czy
+- user/projects/de_cyberaqua
+
+community maps musi isc do usera! bo to jest zachowywane przy upgradowaniu gierki
+chyba ze community tez osobno zachowujemy?
+	- moze jednak miejmy folder
+	- moznaby sie klocic ze user a community to jednak rozne rzeczy
+		- ale jednak fajnie bedzie miec w jednym folderze wszystko co jest potrzebne do migracji uzytkownika
+
+raczej nie:
+
+- content/arenas
+- community/arenas
+- user/projects
+
 - content/official/arenas
 - content/community/arenas
 - user/arenas

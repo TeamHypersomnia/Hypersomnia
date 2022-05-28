@@ -34,7 +34,7 @@ namespace augs {
 			} 
 		};
 		
-		const auto utils_path = "scripts/utils.lua";
+		const auto utils_path = DETAIL_DIR "/utils.lua";
 		const auto pfr = lua.do_file(utils_path);
 
 		if (!pfr.valid()) {

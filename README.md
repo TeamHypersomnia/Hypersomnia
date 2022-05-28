@@ -293,9 +293,9 @@ If you plan to use the Hypersomnia editor on Linux, you might want to follow som
 The Hypersomnia editor can choose directories for opening projects and saving them.  
 On Windows, this is accomplished through an ``IFileDialog``.  
 Needless to say, such a class does not exist on Linux.  
-Hypersomnia provides shell scripts for common file managers in ``hypersomnia/scripts/unix/managers``.  
+Hypersomnia provides shell scripts for common file managers in ``hypersomnia/detail/unix/managers``.  
 You'll need one for choosing a directory and one for revealing files in explorer.  
-``cd`` to ``hypersomnia/scripts/unix`` and, assuming you want to use ``ranger`` as your file manager, create symlinks as such:  
+``cd`` to ``hypersomnia/detail/unix`` and, assuming you want to use ``ranger`` as your file manager, create symlinks as such:  
 
 ```
 ln -s managers/choose_directory_ranger.zsh choose_directory.local

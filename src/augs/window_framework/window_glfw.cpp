@@ -438,7 +438,7 @@ namespace augs {
 		const std::string& /* custom_title */
 	) {
 #if PLATFORM_LINUX
-		return choose_path("scripts/unix/open_file.local");
+		return choose_path(DETAIL_DIR "/unix/open_file.local");
 #else
 		return std::nullopt;
 #endif
@@ -449,7 +449,7 @@ namespace augs {
 		const std::string& /* custom_title */
 	) {
 #if PLATFORM_LINUX
-		return choose_path("scripts/unix/save_file.local");
+		return choose_path(DETAIL_DIR "/unix/save_file.local");
 #else
 		return std::nullopt;
 #endif
@@ -459,7 +459,7 @@ namespace augs {
 		const std::string& /* custom_title */
 	) {
 #if PLATFORM_LINUX
-		return choose_path("scripts/unix/choose_directory.local");
+		return choose_path(DETAIL_DIR "/unix/choose_directory.local");
 #else
 		return std::nullopt;
 #endif

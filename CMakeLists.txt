@@ -130,6 +130,9 @@ option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
 set(HYPERSOMNIA_OFFICIAL_CONTENT_DIR "content/official")
 
+# Some essentials lua scripts, ssh-keygen, and internal data files needed by the executable.
+set(HYPERSOMNIA_DETAIL_DIR "detail")
+
 # Where the game will save logs.
 # Deleting this folder will have no effect on the game.
 
@@ -1435,6 +1438,7 @@ add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES=${STATICALLY_ALLOCATE_ENTITIES})
 add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS=${STATICALLY_ALLOCATE_ENTITY_FLAVOURS})
 add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})
 
+add_definitions(-DDETAIL_DIR="${HYPERSOMNIA_DETAIL_DIR}")
 add_definitions(-DOFFICIAL_CONTENT_DIR="${HYPERSOMNIA_OFFICIAL_CONTENT_DIR}")
 add_definitions(-DGENERATED_FILES_DIR="${HYPERSOMNIA_GENERATED_FILES_DIR}")
 add_definitions(-DUSER_FILES_DIR="${HYPERSOMNIA_USER_FILES_DIR}")

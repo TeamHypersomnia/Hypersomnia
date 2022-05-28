@@ -47,8 +47,8 @@ $commitNumber = $(git rev-list --count master)
 $commitMessage = $(git log -1 --pretty=%B)
 $version = "1.1.$commitNumber"
 
-mkdir scripts/ssh
-mv ../OpenSSH-Win64/ssh-keygen.exe scripts/ssh/ssh-keygen.exe
+mkdir detail/ssh
+mv ../OpenSSH-Win64/ssh-keygen.exe detail/ssh/ssh-keygen.exe
 mv $target_exe Hypersomnia.exe
 Get-ChildItem
 Remove-item -Recurse -Force cache, logs, user

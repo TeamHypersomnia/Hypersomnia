@@ -1,5 +1,5 @@
-local serpent = require("scripts.serpent.src.serpent")
-local ltdiff = require("scripts.ltdiff")
+local serpent = require("detail.serpent.src.serpent")
+local ltdiff = require("detail.ltdiff")
 
 function table_to_string(table, name_of_table)
 	return serpent.block(table, { name = name_of_table, comment = false })
