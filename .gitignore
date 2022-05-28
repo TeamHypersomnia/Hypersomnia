@@ -218,6 +218,6 @@ hypersomnia/.Hypersomnia
 hypersomnia/Hypersomnia
 *.hist
 report.bin
-hypersomnia/arenas/*/autosave/
+hypersomnia/content/arenas/*/autosave/
 hypersomnia/NEW_HYPERSOMNIA
 hypersomnia/OLD_HYPERSOMNIA

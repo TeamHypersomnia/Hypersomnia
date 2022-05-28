@@ -128,7 +128,7 @@ option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
 # From where will the game pull its official resources.
 
-set(HYPERSOMNIA_OFFICIAL_CONTENT_DIR "content/official")
+set(HYPERSOMNIA_OFFICIAL_CONTENT_DIR "content")
 
 # Some essentials lua scripts, ssh-keygen, and internal data files needed by the executable.
 set(HYPERSOMNIA_DETAIL_DIR "detail")

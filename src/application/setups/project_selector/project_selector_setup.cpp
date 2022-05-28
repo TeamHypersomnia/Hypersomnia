@@ -36,9 +36,9 @@ static auto push_selectable_colors(const rgba normal, const rgba hovered, const 
 static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 	switch (tab_type) {
 		case project_tab_type::MY_PROJECTS:
-			return USER_ARENAS_DIR;
+			return BUILDER_PROJECTS_DIR;
 
-		case project_tab_type::OFFICIAL_TEMPLATES:
+		case project_tab_type::OFFICIAL_ARENAS:
 			return OFFICIAL_ARENAS_DIR;
 
 		case project_tab_type::COMMUNITY_ARENAS:
@@ -141,14 +141,14 @@ void project_selector_setup::scan_for_all_arenas() {
 	};
 
 	scan_for(project_tab_type::MY_PROJECTS);
-	scan_for(project_tab_type::OFFICIAL_TEMPLATES);
+	scan_for(project_tab_type::OFFICIAL_ARENAS);
 	scan_for(project_tab_type::COMMUNITY_ARENAS);
 
 	rebuild_miniatures = true;
 }
 
 project_selector_setup::project_selector_setup() {
-	augs::create_directories(BUILDER_DIR);
+	augs::create_directories(BUILDER_PROJECTS_DIR);
 
 	load_gui_state();
 	scan_for_all_arenas();
@@ -387,7 +387,7 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 			case project_tab_type::MY_PROJECTS:
 			return tab.perform_list(ad_hoc, "Last modified");
 
-			case project_tab_type::OFFICIAL_TEMPLATES:
+			case project_tab_type::OFFICIAL_ARENAS:
 			return tab.perform_list(ad_hoc, "Last updated");
 
 			case project_tab_type::COMMUNITY_ARENAS:
@@ -601,7 +601,7 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 }
 
 void project_selector_setup::load_gui_state() {
-	// TODO: Read/write as yaml
+	// TODO: Read/write as lua
 
 	try {
 		augs::load_from_bytes(gui, get_project_selector_gui_state_path());

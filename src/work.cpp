@@ -65,6 +65,8 @@
 #include "application/network/network_common.h"
 #include "application/setups/all_setups.h"
 
+#include "application/setups/builder/builder_paths.h"
+
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_debug_details.h"
 #include "application/main/draw_debug_lines.h"
@@ -143,7 +145,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			DEMOS_DIR,
 
 			COMMUNITY_ARENAS_DIR,
-			USER_ARENAS_DIR
+			BUILDER_PROJECTS_DIR
 		};
 
 		{

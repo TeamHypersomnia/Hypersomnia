@@ -3,7 +3,7 @@
 enum class project_tab_type {
 	// GEN INTROSPECTOR enum class project_tab_type
 	MY_PROJECTS,
-	OFFICIAL_TEMPLATES,
+	OFFICIAL_ARENAS,
 	COMMUNITY_ARENAS,
 
 	COUNT
