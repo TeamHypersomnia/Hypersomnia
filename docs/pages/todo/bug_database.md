@@ -66,7 +66,7 @@ Hypersomnia: xcb_io.c:643: _XReply: Assertion `!xcb_xlib_threads_sequence_lost' 
 - HRTF
 	- Windows was crashing when HRTF was unsupported, but only on release. Now as HRTF can find the mhr files, it does not crash
 	- But you need drivers for it to work properly, or a different frequency was set by default for my headphones
-	- A drop in quality even for stereo sounds could be heard if 32khz mhr file was found in content/hrtf
+	- A drop in quality even for stereo sounds could be heard if 32khz mhr file was found in detail/hrtf
 		- It is particularly evident for the knife wielding sound
 
 
