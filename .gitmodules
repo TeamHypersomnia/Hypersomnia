@@ -34,3 +34,6 @@
 [submodule "src/3rdparty/yojimbo"]
 	path = src/3rdparty/yojimbo
 	url = https://github.com/TeamHypersomnia/yojimbo.git
+[submodule "src/3rdparty/rapidjson"]
+	path = src/3rdparty/rapidjson
+	url = https://github.com/Tencent/rapidjson
