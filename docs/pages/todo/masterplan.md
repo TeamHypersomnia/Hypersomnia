@@ -8,6 +8,127 @@ summary: We need to set our priorities straight.
 
 # Builder
 
+## Format danych
+
+- json ma takie zalety ze jest wszedzie
+	- i nie musielibysmy tak naprawde pisac oddzielnego readwrite bo bymsy na razie zrobili ad-hoc
+
+- Rapidjson wyglada pro i szybko bedzie przekompilowywal
+- Takze do map chyba json
+
+- Configi i tak zostawimy w lua bo one sa trusted i przydaja sie takie rzeczy jak pobieranie rcon passworda
+
+
+- Generalnie lua i tak musimy predzej czy pozniej zsandboxowac
+	- takze chyba lua do wszystkiego na ten moment i sandbox za pomoca sola
+	- ewentualnie json ale..
+
+- myslalem jeszcze czy angelscripta nie uzyc bo w jj2 jest uzywany i tam tez chyba bezpiecznie sandboxuja
+	- on jest domyslnie sandboxed co na plus
+	- ale strasznie duzo roboty by bylo z tym wiec chyba posandboxujemy z lua
+
+- jeszcze mozna rozkminic czy nie warto trzymac na razie wszystkiego w jednym bin pliku
+	- i po prostu konwertowac wszystko do lua ale tylko przy updejcie tak ze to praktycznie niewidoczne jest
+	- i jak ktos chce mapy hostowac w jakichs workshopach to trudno niech postuje binarki zawsze aktualne
+	- szczerze mowiac w jednym pliku jakby bylo to nawet latwiej przekonwertowac na jakas nowsza wersje zamiast wszystko na raz
+
+- Jeszcze co do rzeczy typu description i credits to mozemy miec takie podejscie ze sa oddzielne pliki na to i ze to tez jako pliki sie w samym edytorze otwiera
+	- Szczerze mowiac to nie ma sensu jak juz bedziemy mieli ogarniety ten bezpieczny format, wtedy to juz co to za roznica
+		- about osobny tak, wiadomo, ale tego bym nie rozbijal
+
+
+	- project.about.txt
+		- pierwsze dwie linijki short description a kolejne dlugie
+	- project.credits.txt
+		Music: John Doe
+		Music: Another
+		po dwukropku rozbicie
+	- zamiast w jakims menu z gory
+	- wiadomo ze undeletable
+
+- sol2 sandboxing?
+
+- Problem: autoupdate breaks unsaved changes to maps (if in binary)
+
+- nawet jesli zezwalamy na skrypty to przynajmniej jeden mniej wektor ataku bedzie jak przynajmniej te nieskryptowe dane porobimy w jakims jsonie albo prostymtomlu albo innym ini
+	- ok to moze po prostu dokokszony jakis sandboxing zrobmy bo nawet do zwyklych danych powinno byc prosciej
+	- i tak chcemy ten clientside scripting kurde no
+	- a nawet jak nie clientside to i tak skrypty serwerowe trzeba bedzie jakos testowac nie
+
+- Co jak ludzie zaczna hostowac mapki? Ciezko zeby dawali binarki tylko najlepiej source
+	- jakby po prostu dawal notice przy probowaniu odpalenia zewnetrznej mapy ze niebezpiecznie?
+		- tak czy siak jesli chcemy clientside scripting to musimy gdzies taki zawrzec notice 
+			- chyba ze naprawde dokokszony bedzie ten sandboxing
+
+- When do we recompile maps?
+	- We'll always decompile into json and the editor will keep json files all the time
+	- Probably all community/custom maps upon updating the game?
+		- Then show all errors if any
+	- Does the same binary hold all the data for which there hasn't happened a writeout?
+		- So it's at the same time an autosave
+		- Actually no because it would also have to store history
+			- I guess then the unsaved changes would be purged upon updating the game
+				- a little dangerous because the game auto-updates!
+				- note that even if we only recompile on demand, an auto-update still breaks our last unsaved changes
+
+- Wiec na razie sie nie potrzebujemy martwic safe loadem tych danych dopoki nie mamy clientside scripting
+	- bo ustalilismy ze przesylamy binarnie i dekompilujemy po stronie klienta
+		- a swoja droga serializacja szybsza duzo niz deserializacja bedzie
+	- wiec moglibysmy lua teoretycznie do tego uzyc
+
+- Lua pros:
+	- Nie musimy pisac ani dodawac do budowania bo juz zrobione
+	- Bedziemy mieli juz jeden format do skryptow i do danych
+	- mozna nawet skrypty w lua pisac ktore konwertuja miedzy wersjami bo moga ladowac tablice i zmieniac nazwy keyom latwo
+	- cos mi sie zdaje ze bedzie szybsza od yamla
+- Yaml pros:
+	- Ladniejszy
+
+- Wlasciwie to czemu nie lua? Bysmy mieli gotowe od razu
+	- Ogolnie my to potrzebujemy tylko do wersjonowania i backwards compatibility
+	- Teoretycznie mozna zrobic ze zawsze community mapki sa sciagane w binarnych plikach
+		- mozna tez zrobic ze serwer ma wyslac tobie w odpowiedniej dla ciebie wersji binarnej
+			- ale wtedy rownie dobrze mozemy nie uzywac tych tekstowych dla kompatybilnosci wstecznej
+				- bo to zaklada ze mamy procedury na binarne wersje
+				- a jakbysmy wysylali tekstowo to po prostu latwo w nowej wersji porobic ify na kazda wersje
+				- albo nawet konwertery jakies napisac
+			- ewentualnie mozemy zalozyc ze zawsze wszyscy beda aktualizowali do najnowszej wersji chcac grac
+				- i serwer zawsze bedzie wysylal binarna najnowsza wersje a skad on sobie wzial wczesniejsza ze byl w stanie przekonwertowac do obecnej to juznie ma znaczenia
+			- nie kumam bo i tak zakladamy ze ABI identykos jest miedzy klientem a serwerem (albo nawet ze wersja ta sama)
+				- wiec zakladamy ze zawsze binarny format mapy bedzie ten sam
+					- musi byc przeciez dla determinizmu symulacji
+				- wiec wtedy to jest normalna konwersja w te i z powrotem zawsze
+
+
+			- wiadomo ze po sciagnieciu od razu "odpakowywujemy" do kompatybilnej wersji
+			- i tak samo oficjalne mapki trzymamy wylacznie w tej kompatybilnej wersji
+			- i tez wtedy nie musisz wysylac per kazdy png przez siec
+		- "skompilowane" bo wtedy i mniejsze sa
+		- od razu mozna porobic ze te abouty to sa z constant size stringami
+
+
+
+- Ok ale yaml przekonuje mnie tym że typ jest przez kod definiowany dzieki czemu syntax jest bardziej przejrzysty (brak "")
+	- unity tez uzywa wiec da sie da sie
+	- i struktury beda w razie czego
+
+- Dobra to yaml
+	- Czy potrzebujemy generalnych serializatorow do yamla?
+		- prawdopodobnie bedziemy pisali reczne kiedys dla ewentualnej kompatybilnosci wstecznej
+	- Regardless, introspektorow i tak potrzebujemy zeby przesylac mapy binarnie
+
+- Najlepiej dwie funkcje ręcznie napisane do serializacji też żeby było jasne jak co idzie i z jaką nazwą
+
+
+- Może TOML?
+	- Dobrze byłoby już nie komplikować z jakimiś strukturami strasznymi typu light.attenuation.linear itp
+		- nawet jak cos po stronie C++ trzymamy typu light.color to zapiszemy tutaj jako light_color
+		- jakby nawet komendy jakieś walił typu set light_color to też można łatwiej
+		- problem tylko sie pojawia jak chcemy listy jakichs struktur
+			- ale pomyślmy gdzie tak naprawde tego potrzebujemy
+		- tak czy siak 99% casow to bedzie wlasnie jeden level i dobrze byloby wybrac taki format ktory pod to jest zdesignowany
+## General
+
 - Pamietaj ze PoC nie musi byc turboresponsywny na kazdym kroku
 	- Mapa bedzie juz w dobym przenosnym formacie to jest najwazniejsze. Potem to mozna stopniowo ulepszac
 

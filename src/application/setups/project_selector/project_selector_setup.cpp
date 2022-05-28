@@ -509,7 +509,7 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 					ImGui::SetColumnWidth(0, max_w + text_h);
 
 					for (const auto& r : meta.credits) {
-						text_disabled(r.role + ": ");
+						text_disabled(std::string(r.role) + ": ");
 						ImGui::NextColumn();
 
 						text(r.person);
