@@ -182,7 +182,7 @@ void stun_manager_window::perform() {
 	}
 
 	if (all_candidates == std::nullopt) {
-		all_candidates.emplace(augs::path_type("web/candidate_stun_servers.txt"));
+		all_candidates.emplace(augs::path_type(DETAIL_DIR "/web/candidate_stun_servers.txt"));
 	}
 
 	if (ImGui::Button("Start analysis")) {

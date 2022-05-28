@@ -90,7 +90,7 @@ self_update_result check_and_apply_updates(
 	client_type http_client(host_url.c_str(), port);
 
 #if BUILD_OPENSSL
-	http_client.set_ca_cert_path("web/ca-bundle.crt");
+	http_client.set_ca_cert_path(DETAIL_DIR "/web/ca-bundle.crt");
 	http_client.enable_server_certificate_verification(true);
 #endif
 	http_client.set_follow_location(true);

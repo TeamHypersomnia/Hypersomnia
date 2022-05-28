@@ -18,7 +18,7 @@ struct nat_detection_settings {
 	// GEN INTROSPECTOR struct nat_detection_settings
 	nat_port_probing_settings port_probing;
 
-	augs::path_type stun_server_list = "web/stun_server_list.txt";
+	augs::path_type stun_server_list = DETAIL_DIR "/web/stun_server_list.txt";
 	int num_stun_hosts_used_for_detection = 2;
 
 	double nat_translation_entry_timeout_secs = 30;

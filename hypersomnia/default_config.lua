@@ -24,7 +24,7 @@ return {
 
 	  nat_translation_entry_timeout_secs = 30,
 
-	  stun_server_list = "web/stun_server_list.txt"
+	  stun_server_list = "detail/web/stun_server_list.txt"
   },
 
   nat_traversal = {
