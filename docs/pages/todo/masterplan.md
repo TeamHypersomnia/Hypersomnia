@@ -8,125 +8,193 @@ summary: We need to set our priorities straight.
 
 # Builder
 
+## Folder structure
+
+### ALL PROJECTS
+
+- content/official/arenas
+- content/community/arenas
+- user/arenas
+
+or
+
+- content/arenas
+- community/arenas
+- user/arenas
+
+### ONE PROJECT
+
+with project name being de_cyberaqua
+
+- .cache
+	- de_cyberaqua.autosave
+	- de_cyberaqua.history
+		- we can trivially have history with a single binary file holding everything
+- de_cyberaqua.arena
+- de_cyberaqua.arena.json (optional, only if once exported for compat)
+	- Can show inside file explorer, but instead of inspector, you have a hint what to do with this, when last saved and last exported version.
+- de
+	- the about section I think might be separate for the purposes of quick browsing
+
 ## Format danych
 
-- json ma takie zalety ze jest wszedzie
-	- i nie musielibysmy tak naprawde pisac oddzielnego readwrite bo bymsy na razie zrobili ad-hoc
-
-- Rapidjson wyglada pro i szybko bedzie przekompilowywal
-- Takze do map chyba json
-
-- Configi i tak zostawimy w lua bo one sa trusted i przydaja sie takie rzeczy jak pobieranie rcon passworda
-
-
-- Generalnie lua i tak musimy predzej czy pozniej zsandboxowac
-	- takze chyba lua do wszystkiego na ten moment i sandbox za pomoca sola
-	- ewentualnie json ale..
-
-- myslalem jeszcze czy angelscripta nie uzyc bo w jj2 jest uzywany i tam tez chyba bezpiecznie sandboxuja
-	- on jest domyslnie sandboxed co na plus
-	- ale strasznie duzo roboty by bylo z tym wiec chyba posandboxujemy z lua
-
-- jeszcze mozna rozkminic czy nie warto trzymac na razie wszystkiego w jednym bin pliku
-	- i po prostu konwertowac wszystko do lua ale tylko przy updejcie tak ze to praktycznie niewidoczne jest
-	- i jak ktos chce mapy hostowac w jakichs workshopach to trudno niech postuje binarki zawsze aktualne
-	- szczerze mowiac w jednym pliku jakby bylo to nawet latwiej przekonwertowac na jakas nowsza wersje zamiast wszystko na raz
-
-- Jeszcze co do rzeczy typu description i credits to mozemy miec takie podejscie ze sa oddzielne pliki na to i ze to tez jako pliki sie w samym edytorze otwiera
-	- Szczerze mowiac to nie ma sensu jak juz bedziemy mieli ogarniety ten bezpieczny format, wtedy to juz co to za roznica
-		- about osobny tak, wiadomo, ale tego bym nie rozbijal
+- COMPATIBILITY/EXPORTING WORKFLOW
+	- Co ważne ten export for compatibility nie powinien już pytać o lokacje
+		- Po prostu F12 albo File->Export for compatibility tworzy od strzała project.arena.json
+	- Nic tu nie ma trudnego, po prostu jak bedziesz chciał wrzucić folder na serwis to serwis ci zwroci komunikat gdyby nie było jsona
+		- "Press F12 in your project to export json for compatibility with future versions of the game."
+	- Corner cases
+		- Jakby sie cos przy updatowaniu zwaliło
+			- Ale to jakos atomicznie mozna zrobic moze? 
+				- Czy moze to weryfikowac na koncu ze jest git? - nie kontynuowac dopoki nie 
+		- Jakby ktos komus przyslal mapke z inna wersja
+			- Bo edytował długo i w miedzyczasie wyszedl update
+			- no to jest mega unlikely raczej
 
 
-	- project.about.txt
-		- pierwsze dwie linijki short description a kolejne dlugie
-	- project.credits.txt
-		Music: John Doe
-		Music: Another
-		po dwukropku rozbicie
-	- zamiast w jakims menu z gory
-	- wiadomo ze undeletable
+- Uważam że lepiej optymalizować na to co będziemy robić 99% czasu a nie na 1% corner casów
+	- W tym przypadku:
+		- Gdy używamy jednego bina i 0 jsonów to cały workflow z edytowaniem i przesyłaniem jest szybszy i łatwiejszy dla twórcy
+	- A więc COMPATIBILITY MODE
+	- Tylko jak bardzo error prone bedzie recompile przy upgradach?
+		- Musimy zdekompilowac wszystko jak wykryjemy nowa wersje i powrzucac do cache
+		- "Exporting user and community arenas for the next version..."
 
-- sol2 sandboxing?
+- Wydaje mi się też że przy exporcie powinien być jeden json i już olać to bawienie się w jsony sąsiadujące z pngami
+	- Łatwiejsza logistyka
+	- I tiled chyba też tylko jeden json exportuje
 
-- Problem: autoupdate breaks unsaved changes to maps (if in binary)
+- Coraz bardziej zaczynam sie sklaniac ku opcji ze normalne codzienne edytowanie to do bina jednego leci i tyle
+	- Pros:
+		- Less complexity z tym sprawdzaniem czy ktos nie wywalil/nie edytowal mi jakiegos jsona itp
+		- Szybciej sie zapisuje, mniejsza frykcja dla tworcy do stworzenia czegos prostego
+		- Mniejszy clutter w fs
+		- Cały folder razu gotowy do wyslania przez siec bez tańcowania z ignorami.
+			- Ignorujesz tylko folder .cache.
+	- Cons:
+		- Podwójny styl zapisywania
+			- Bo areny w officialu będą zawsze jsonach a tu edytujemy na binach
+		- Nie da sie natychmiastowo przekopiować png z całymi proptami do innego projektu
+			- Ale to nie problem, zawsze możemy w projekcie walnąć exporta
+			- Latwiejszym kopiowaniem mozemy zajac sie pozniej
+	- Uwaga: tak samo oficjalne mapy możemy shipować binarne, czemu nie? Wystarczy w CI przeleciec wszystkie z jakas flaga --compile.
+	- Czyli z tym approachem w praktyce trzeba tylko ogarnac u siebie jakis workflow z compatibility mode
+		- Bo graczowi z automatu bedzie rekompilowało przy update
+			- exported json leci do cache ale to nawet jeden plik
+		- U nas moze wykrywac ze wczytanie pliku binarnego sie nie powiodlo w jakims catchu
+			- I wtedy dialog pyta czy wczytac z ostatniego wyeksportowanego jsona
+			- Compatibility mode moze z automatu wskakiwac jak edytujemy official arene (i mozemy to zrobic tyko jak nie jestesmy w prodzie)
+	- Na jakichs serwisach z mapami ludzie mogą chciec hostować mapy w compatibility mode do kompilacji
 
-- nawet jesli zezwalamy na skrypty to przynajmniej jeden mniej wektor ataku bedzie jak przynajmniej te nieskryptowe dane porobimy w jakims jsonie albo prostymtomlu albo innym ini
-	- ok to moze po prostu dokokszony jakis sandboxing zrobmy bo nawet do zwyklych danych powinno byc prosciej
-	- i tak chcemy ten clientside scripting kurde no
-	- a nawet jak nie clientside to i tak skrypty serwerowe trzeba bedzie jakos testowac nie
 
-- Co jak ludzie zaczna hostowac mapki? Ciezko zeby dawali binarki tylko najlepiej source
-	- jakby po prostu dawal notice przy probowaniu odpalenia zewnetrznej mapy ze niebezpiecznie?
-		- tak czy siak jesli chcemy clientside scripting to musimy gdzies taki zawrzec notice 
-			- chyba ze naprawde dokokszony bedzie ten sandboxing
+- Ofc generujemy foldery gfx/sfx
 
-- When do we recompile maps?
+
+- BINARY/JSON MAP REPRESENTATION AND LIFETIMES
+	- No wiec teraz nas gryzie najbardziej ze jakbysmy wysylali przez siec mape..
+		- ..to musimy jakies tańce z ignorowaniem plikow (tu zamiast jsona wyslij bin, tutaj tych jsonow w ogole)
+		- zamiast po prostu wysylac jeden folder od strzala
+		- tylko czy to jest az takie zle?
+	- Jedno jest pewne: przez siec chcemy wysylac binarna wersje bo jsonowa bedzie o rzad wielkosci wieksza
+		- nie ma czasu tego konwertowac zreszta za duzy load na serwer by byl
+	
+	- project.autosave/project.unsaved
+	- project.compiled (zeby ladniej wygladalo podczas przesylania do moze de_cyberaqua.project albo de_cyberaqua.arena - potem de_cyberaqua.arena.json)
+	- a wiec project.arena
+		- od razu intercosm?
+			- no niekoniecznie, bo jak disk io jest botleneckiem to intercosm moze byc wolniejszy od tej wersji pre. 
+			- nie nie to niemoze byc intercosm bo jak przesylamy przez siec to chcemy po odbiorze miec mozliwosc dekompilacji tego.
+				- zeby user tez mogl edytowac przeciez.
+			- To po prostu ta network-ready wersja do przesylu.
+	- project.history?
+	- Folder .cache? Byc moze. Mamy dwie binarki wiec uzasadnione
+	- tylko w sumie po co osobny projekt.bin (.compiled)? Czy nie mozemy miec tylko project.autosave?
+		- i nawet miec tam historii i wszystko?
+			- nie bo chcemy miec gotowy do wczytania jeden plik na potrzeby samej gry i do przesylu przez siec bez zbednych formalnosci
+		- zatem .cache i wiecej niz jedna binarka
+	- Najbardziej intuicyjnie --chyba-- jakby był ten folder .cache i nawet przez siec juz przesylamy same te jsony
+	- kmina #1:
+		- Na początku nie ma nic
+		- 
+	- kmina #2: konwertowac wszystko do jsonow itp ale tylko przy updejcie tak ze to nigdy standalone nie istnieje
+		- i jak ktos chce mapy hostowac w jakichs workshopach to trudno niech postuje binarki zawsze aktualne
+
+- When do we store jsons? When do we recompile maps?
+	- In the beginning there was nothing
 	- We'll always decompile into json and the editor will keep json files all the time
 	- Probably all community/custom maps upon updating the game?
 		- Then show all errors if any
-	- Does the same binary hold all the data for which there hasn't happened a writeout?
-		- So it's at the same time an autosave
-		- Actually no because it would also have to store history
-			- I guess then the unsaved changes would be purged upon updating the game
-				- a little dangerous because the game auto-updates!
-				- note that even if we only recompile on demand, an auto-update still breaks our last unsaved changes
 
-- Wiec na razie sie nie potrzebujemy martwic safe loadem tych danych dopoki nie mamy clientside scripting
-	- bo ustalilismy ze przesylamy binarnie i dekompilujemy po stronie klienta
-		- a swoja droga serializacja szybsza duzo niz deserializacja bedzie
-	- wiec moglibysmy lua teoretycznie do tego uzyc
+- Problem: autoupdate breaks unsaved changes (autosave) to maps saved in binary, including history.
+	- Autoupdater musi sprawdzić czy istnieją autosavy
+		- Ale tylko w folderze z projektami; nie pozwalamy gdzie indziej edytować na ten moment
+		- Jeśli tak to po prostu cancel update
 
-- Lua pros:
-	- Nie musimy pisac ani dodawac do budowania bo juz zrobione
-	- Bedziemy mieli juz jeden format do skryptow i do danych
-	- mozna nawet skrypty w lua pisac ktore konwertuja miedzy wersjami bo moga ladowac tablice i zmieniac nazwy keyom latwo
-	- cos mi sie zdaje ze bedzie szybsza od yamla
-- Yaml pros:
-	- Ladniejszy
+- Używamy JSON:
+	- Do kompatybilnego zapisu map.
+		- Rapidjson wyglada pro i szybko bedzie przekompilowywal
+		- json ma takie zalety ze jest wszedzie
+			- i na razie nie piszemy oddzielnego zgeneralizowanego readwrite, na razie ad-hoc
+	- Czemu nie LUA?
+		- Nawet jesli sandboxujemy skrypty to przynajmniej jeden mniej wektor ataku bedzie jak przynajmniej te nieskryptowe dane porobimy w jakims jsonie.
+		- Json bedzie mega szybszy do parsowania i mniej error prone
+		- Json bedzie latwiej wczytac w jakims toolu webowym czy tam katalogu mapek
+			- A tak to by taki tool tez musial sandboxowac lua albo konwertowac se, bez sensu
+	- Czemu nie TOML
+		- Owszem to była dobra rozkmina żeby już używać tylko jednego poziomu głębokości ale to już zależy tylko od nas
+			- a w razie czego mamy taką możliwość
+				- do świateł się przyda (moze)
+					- tu nawet i tak mozna sekwencjami te atenuacje robic
+						- albo i nie
+				- wall_attenuation_quadratic zamiast wall: attenutation: { quadratic = 2 } itp
+				- bo i tak bym trzymal chyba wszystko na jednym poziomie
 
-- Wlasciwie to czemu nie lua? Bysmy mieli gotowe od razu
-	- Ogolnie my to potrzebujemy tylko do wersjonowania i backwards compatibility
-	- Teoretycznie mozna zrobic ze zawsze community mapki sa sciagane w binarnych plikach
-		- mozna tez zrobic ze serwer ma wyslac tobie w odpowiedniej dla ciebie wersji binarnej
-			- ale wtedy rownie dobrze mozemy nie uzywac tych tekstowych dla kompatybilnosci wstecznej
-				- bo to zaklada ze mamy procedury na binarne wersje
-				- a jakbysmy wysylali tekstowo to po prostu latwo w nowej wersji porobic ify na kazda wersje
-				- albo nawet konwertery jakies napisac
-			- ewentualnie mozemy zalozyc ze zawsze wszyscy beda aktualizowali do najnowszej wersji chcac grac
-				- i serwer zawsze bedzie wysylal binarna najnowsza wersje a skad on sobie wzial wczesniejsza ze byl w stanie przekonwertowac do obecnej to juznie ma znaczenia
-			- nie kumam bo i tak zakladamy ze ABI identykos jest miedzy klientem a serwerem (albo nawet ze wersja ta sama)
-				- wiec zakladamy ze zawsze binarny format mapy bedzie ten sam
-					- musi byc przeciez dla determinizmu symulacji
-				- wiec wtedy to jest normalna konwersja w te i z powrotem zawsze
+- Uzywamy LUA:
+	- Do user configow (default_config.lua i user/config.lua) 
+		- bo one sa trusted i przydaja sie takie rzeczy jak pobieranie rcon passworda
 
+- Uzywamy SANDBOXED LUA (pozniej). Jednym slowem dokakszamy sandboxing ZEBY NAWET NIE TRZEBA BYLO OSTRZEGAC.
+	- Do client-side/server-side skryptowania. Dlaczego nie angelscript?
+		- lua będzie lepsza bo będzie bardziej portowalna do przyszłych wersji
+			- Wiesz jj2 już się nie zmieni
+		- latwiejsza do nauczenia sie dla ludzi
+		- sol2 sandboxing?
+			- tak da sie bo jest sol::environment i mozna go dac do dofile itp
+	- Nawet jesli chcemy tylko server-side, i tak chcemy sandboxowac lua.
+		- Dlatego ze skrypty serwerowe i tak bedzie mozna sciagac z neta, i trzeba bedzie je jakos testowac. To chcemy w edytorze miec.
+		- Swoja droga wtedy juz prawdopodobnie nie beda potrzebne purely server-side skrypty albo beda minimalne bo client-side script bedzie caly gameplay ogarnial
 
+- Dopoki nie mamy client/server scripting nie przejmujemy sie niczym
+	- bo i nawet jak ktos sciagnie mapke z neta to tylko w jsonie
+		- i nawet bysmy mogli przesylac jsony zamiast binarek
+		- i tak ustalilismy ze przesylamy binarnie i dekompilujemy po stronie klienta
+			- a swoja droga serializacja szybsza duzo niz deserializacja bedzie
+
+- Przesył mapy od serwera do klienta bedzie BINARNY w calosci.
+	- "skompilowane" i jeszcze przeleciane lz4 bo wtedy i mniejsze beda
+	- mozemy zalozyc ze zawsze wszyscy beda aktualizowali do najnowszej wersji chcac grac
+		- i serwer zawsze bedzie wysylal binarna najnowsza wersje a skad on sobie wzial wczesniejsza ze byl w stanie przekonwertowac do obecnej to juznie ma znaczenia
+	- i tak zakladamy ze ABI identykos jest miedzy klientem a serwerem (albo nawet ze wersja ta sama)
+		- wiec zakladamy ze zawsze binarny format mapy bedzie ten sam
+			- musi byc przeciez dla determinizmu symulacji
+		- wiec wtedy to jest normalna konwersja w te i z powrotem zawsze
 			- wiadomo ze po sciagnieciu od razu "odpakowywujemy" do kompatybilnej wersji
 			- i tak samo oficjalne mapki trzymamy wylacznie w tej kompatybilnej wersji
-			- i tez wtedy nie musisz wysylac per kazdy png przez siec
-		- "skompilowane" bo wtedy i mniejsze sa
+			- i tez wtedy nie musisz wysylac jsonow per kazdy png przez siec
 		- od razu mozna porobic ze te abouty to sa z constant size stringami
 
+- Jeszcze co do rzeczy typu description i credits to mozemy miec takie podejscie ze sa oddzielne pliki na to i ze to tez jako pliki sie w samym edytorze otwiera
+	- Zamiast w jakims menu z gory
+	- Jeden osobny plik: project.about.json
+		- Credits/description do szybkiego wczytania dla exploratora
+	- Wiadomo ze te specjalne pliki undeletable
 
+- Na razie najlepiej dwie funkcje ręcznie napisane do serializacji też żeby było jasne jak co idzie i z jaką nazwą
 
-- Ok ale yaml przekonuje mnie tym że typ jest przez kod definiowany dzieki czemu syntax jest bardziej przejrzysty (brak "")
-	- unity tez uzywa wiec da sie da sie
-	- i struktury beda w razie czego
+- Does the same binary hold all the data for which there hasn't happened a writeout?
+	- No, a compiled arena file is just that. Last saved arena.
+	- The unsaved changes file = autosave file.
 
-- Dobra to yaml
-	- Czy potrzebujemy generalnych serializatorow do yamla?
-		- prawdopodobnie bedziemy pisali reczne kiedys dla ewentualnej kompatybilnosci wstecznej
-	- Regardless, introspektorow i tak potrzebujemy zeby przesylac mapy binarnie
-
-- Najlepiej dwie funkcje ręcznie napisane do serializacji też żeby było jasne jak co idzie i z jaką nazwą
-
-
-- Może TOML?
-	- Dobrze byłoby już nie komplikować z jakimiś strukturami strasznymi typu light.attenuation.linear itp
-		- nawet jak cos po stronie C++ trzymamy typu light.color to zapiszemy tutaj jako light_color
-		- jakby nawet komendy jakieś walił typu set light_color to też można łatwiej
-		- problem tylko sie pojawia jak chcemy listy jakichs struktur
-			- ale pomyślmy gdzie tak naprawde tego potrzebujemy
-		- tak czy siak 99% casow to bedzie wlasnie jeden level i dobrze byloby wybrac taki format ktory pod to jest zdesignowany
 ## General
 
 - Pamietaj ze PoC nie musi byc turboresponsywny na kazdym kroku
@@ -493,17 +561,6 @@ Layery pewnie oddzielne fizyczne i niefizyczne, bez specyfikacji czy dany png ma
 
 - Specjalne obiekty i tak nie beda skryptowane edytorze bo chcemy max performance
 	- one beda w c++
-
-## Folder structure
-
-- Project itself will be stored in yml
-	- the about section I think might be separate for the purposes of quick browsing
-
-- project.yml
-- project.about.yml
-- project.miniature.png
-
-## Map format
 
 ### Safety
 

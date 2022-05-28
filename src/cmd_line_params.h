@@ -7,7 +7,6 @@ struct cmd_line_params {
 	augs::path_type exe_path;
 	augs::path_type editor_target;
 	augs::path_type consistency_report;
-	bool force_update_check = false;
 	bool unit_tests_only = false;
 	bool help_only = false;
 	bool version_only = false;
@@ -52,9 +51,6 @@ struct cmd_line_params {
 			}
 			else if (a == "--upgraded-successfully") {
 				upgraded_successfully = true;
-			}
-			else if (a == "--force-update-check") {
-				force_update_check = true;
 			}
 			else if (a == "--dedicated-server") {
 				type = app_type::DEDICATED_SERVER;

@@ -285,10 +285,14 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto last_update_result = self_update_result();
 	
-	const bool should_update_due_to_config = config.http_client.update_on_launch;
+	if (config.http_client.update_on_launch) {
+		/* 
+			TODO: SKIP UPDATING IF THERE ARE UNSAVED CHANGES IN EDITOR PROJECTS! 
+			This could potentially erase someone's work because of breaking changes to editor files' binary structure!
+		*/
 
-	if (params.force_update_check || should_update_due_to_config) {
-		using up_result = self_update_result_type;
+
+		using update_result = self_update_result_type;
 
 		last_update_result = check_and_apply_updates(
 			imgui_atlas_image,
@@ -298,12 +302,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		LOG_NVPS(last_update_result.type);
 
-		if (last_update_result.type == up_result::UPGRADED) {
+		if (last_update_result.type == update_result::UPGRADED) {
 			LOG("work: Upgraded successfully. Requesting relaunch.");
 			return work_result::RELAUNCH_UPGRADED;
 		}
 
-		if (last_update_result.type == up_result::EXIT_APPLICATION) {
+		if (last_update_result.type == update_result::EXIT_APPLICATION) {
 			return work_result::SUCCESS;
 		}
 
@@ -311,9 +315,9 @@ work_result work(const int argc, const char* const * const argv) try {
 			return work_result::FAILURE;
 		}
 
-		if (last_update_result.type == up_result::UP_TO_DATE) {
+		if (last_update_result.type == update_result::UP_TO_DATE) {
 			if (params.upgraded_successfully) {
-				last_update_result.type = up_result::FIRST_LAUNCH_AFTER_UPGRADE;
+				last_update_result.type = update_result::FIRST_LAUNCH_AFTER_UPGRADE;
 			}
 		}
 	}
