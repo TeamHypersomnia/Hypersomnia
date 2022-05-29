@@ -714,13 +714,13 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	LOG("Initializing the necessary sounds.");
 	static all_necessary_sounds necessary_sounds(
-		"content/necessary/sfx"
+		"content/sfx/necessary"
 	);
 
 	LOG("Initializing the necessary image definitions.");
 	static const necessary_image_definitions_map necessary_image_definitions(
 		lua,
-		"content/necessary/gfx",
+		"content/gfx/necessary",
 		config.content_regeneration.regenerate_every_time
 	);
 

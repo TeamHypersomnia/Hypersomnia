@@ -682,7 +682,7 @@ we consider whole type overrides too complex architeciturally:
 
 - crashfix with no images in atlas?
 	Regenerating texture atlas: cache/atlases/game_world_atlas.bin
-	Loading font content/necessary/fonts/unifont.ttf
+	Loading font content/fonts/unifont.ttf
 	ensure_less(static_cast<size_type>(i), count) failed with expansion:
 	9 < 0
 	file: ../../src/augs/misc/constant_size_vector.h

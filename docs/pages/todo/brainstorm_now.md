@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Balance szturm, either way more expensive or less velocity
+	- it's way more powerful than e.g. szturm
+
 - A centered popup with the after-update message
 	- The current right-bottom notice is hard to notice
 

@@ -7,7 +7,7 @@
 #include "augs/filesystem/path.h"
 
 TEST_CASE("Type-safe sprintf", "Several tests") {
-	REQUIRE("content/necessary/shaders/nice.vsh" == to_forward_slashes(typesafe_sprintf("%x/%x", augs::path_type("content/necessary/shaders"), "nice.vsh")));
+	REQUIRE("foo/bar/nice.vsh" == to_forward_slashes(typesafe_sprintf("%x/%x", augs::path_type("foo/bar"), "nice.vsh")));
 
 	// corner cases
 	REQUIRE("%x%x%%%%f%c%ddasdfs" == typesafe_sprintf("%x%x%%%%f%c%ddasdfs"));

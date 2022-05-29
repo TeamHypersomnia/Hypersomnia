@@ -66,7 +66,7 @@ std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_imag
 
 		for (const auto& tab : gui.projects_view.tabs) {
 			for (const auto& entry : tab.entries) {
-				const auto blank_path = "content/necessary/gfx/blank_transparent.png";
+				const auto blank_path = "content/gfx/necessary/blank_transparent.png";
 				const auto miniature_path = entry.get_miniature_path();
 
 				new_subjects.push_back({ entry.miniature_index, augs::exists(miniature_path) ? miniature_path : blank_path });

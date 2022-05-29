@@ -391,7 +391,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "ONLY_IN_PRODUCTION",
 		settings = {},
-		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
+		source_font_path = "content/fonts/LiberationSans-Regular.ttf"
 	  },
 
 	  larger_gui = {
@@ -403,7 +403,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "ONLY_IN_PRODUCTION",
 		settings = {},
-		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
+		source_font_path = "content/fonts/LiberationSans-Regular.ttf"
 	  },
 
 	  medium_numbers = {
@@ -414,7 +414,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "NEVER",
 		settings = {},
-		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
+		source_font_path = "content/fonts/LiberationSans-Regular.ttf"
 	  },
 
 	  large_numbers = {
@@ -425,7 +425,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "NEVER",
 		settings = {},
-		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
+		source_font_path = "content/fonts/LiberationSans-Regular.ttf"
 	  },
 
 	  very_large_numbers = {
@@ -436,7 +436,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 		add_japanese_ranges = "NEVER",
 		add_cyrillic_ranges = "NEVER",
 		settings = {},
-		source_font_path = "content/necessary/fonts/LiberationSans-Regular.ttf"
+		source_font_path = "content/fonts/LiberationSans-Regular.ttf"
 	  }
   },
   gui_style = {
@@ -643,7 +643,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     run = true
   },
   window = {
-    app_icon_path = "content/necessary/gfx/app.ico",
+    app_icon_path = "content/gfx/necessary/app.ico",
     border = true,
     bpp = 32,
     fullscreen = true,
