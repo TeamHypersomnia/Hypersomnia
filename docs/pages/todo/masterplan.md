@@ -12,40 +12,23 @@ summary: We need to set our priorities straight.
 
 ### ALL PROJECTS
 
-- content/arenas/de_cyberaqua
-- user/arenas/de_cyberaqua
-- user/builder/de_cyberaqua
-czy
-- user/projects/de_cyberaqua
+Ostatecznie:
+
+- content/arenas
+- user/downloads/arenas
+- user/projects
+
+- Po deliberacji chcemy jednak osobny folder na downloady 
+	- żeby było zupełnie jasne dla mniej doświadczonych co im zżera miejsca najwięcej
 
 - community maps musi isc do usera! bo tylko user i logs sa zachowywane przy upgradowaniu gierki
-	- czemu nie osobno obok usera
+	- czemu nie osobno obok usera?
 		- moznaby sie klocic ze user a community to jednak rozne rzeczy
 			- ale jednak fajnie bedzie miec w jednym folderze wszystko co jest potrzebne do migracji uzytkownika
 
 - no i ok, wszystkie downloady w userze to juz ustalone
 	- pytanie czy do user/community/arenas, czy user/arenas? Czy user/builder razem ze wszystkim?
-	
-- content/arenas
-- user/arenas
-- user/projects
-
-
-raczej nie:
-
-- content/arenas
-- community/arenas
-- user/projects
-
-- content/official/arenas
-- content/community/arenas
-- user/arenas
-
-or
-
-- content/arenas
-- community/arenas
-- user/arenas
+- Najbardziej jasne bedzie user/downloads/arenas, user/downloads/mods itp
 
 ### ONE PROJECT
 

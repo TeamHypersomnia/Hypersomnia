@@ -6,6 +6,28 @@ permalink: masterplan
 summary: What we've already determined won't work.
 ---
 
+- content/arenas/de_cyberaqua
+- user/arenas/de_cyberaqua
+- user/builder/de_cyberaqua
+czy
+- user/projects/de_cyberaqua
+
+raczej nie:
+
+- content/arenas
+- community/arenas
+- user/projects
+
+- content/official/arenas
+- content/community/arenas
+- user/arenas
+
+or
+
+- content/arenas
+- community/arenas
+- user/arenas
+
 - Nad angelscriptem do samego skryptowania zastanowimy się potem bo nie ma przeszkód żeby do samego skryptowania potem zrobić angelscripta zamiast lua
 	- Ale myślę że lua będzie lepsza bo będzie bardziej portowalna do przyszłych wersji
 	- Wiesz jj2 już się nie zmieni

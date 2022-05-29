@@ -42,7 +42,7 @@ static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 			return OFFICIAL_ARENAS_DIR;
 
 		case project_tab_type::COMMUNITY_ARENAS:
-			return COMMUNITY_ARENAS_DIR;
+			return DOWNLOADED_ARENAS_DIR;
 
 		default:
 			return "";

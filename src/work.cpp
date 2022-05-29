@@ -144,7 +144,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			USER_FILES_DIR,
 			DEMOS_DIR,
 
-			COMMUNITY_ARENAS_DIR,
+			DOWNLOADED_ARENAS_DIR,
 			BUILDER_PROJECTS_DIR
 		};
 

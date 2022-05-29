@@ -3353,11 +3353,11 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN, white);
 
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.5f);
+			set_density_mult(meta, 1.6f);
 
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
-			meta.get<invariants::item>().standard_price = 3800;
+			meta.get<invariants::item>().standard_price = 3900;
 			set_chambering_duration_ms(meta, 900.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::DATUM_GUN_MAGAZINE);
@@ -4078,7 +4078,7 @@ namespace test_flavours {
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
 			item.gratis_ammo_pieces_with_first = 0;
 			meta.set(item);
-			meta.get<invariants::item>().standard_price = 4000;
+			meta.get<invariants::item>().standard_price = 4100;
 		}
 
 		{
