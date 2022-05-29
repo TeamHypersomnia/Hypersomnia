@@ -13,10 +13,12 @@ namespace augs {
 			sol::lib::base,
 			sol::lib::package,
 			sol::lib::string,
+			sol::lib::os,
 			sol::lib::math,
 			sol::lib::table,
 			sol::lib::debug,
 			sol::lib::bit32,
+			sol::lib::io,
 			sol::lib::utf8
 		);
 		
