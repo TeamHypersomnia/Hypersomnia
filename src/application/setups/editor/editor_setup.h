@@ -112,7 +112,9 @@ class editor_setup : public arena_gui_mixin<editor_setup> {
 	editor_summary_gui summary_gui = std::string("Summary");
 	editor_coordinates_gui coordinates_gui = std::string("Coordinates");
 	editor_layers_gui layers_gui = std::string("Layers");
+#if 0
 	editor_tutorial_gui tutorial_gui = std::string("Editor tutorial");
+#endif
 	imgui_tutorial_gui imgui_tutorial = std::string("ImGui tutorial");
 
 	editor_images_gui images_gui = std::string("Images");
