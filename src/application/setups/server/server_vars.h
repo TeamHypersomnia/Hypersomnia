@@ -5,6 +5,7 @@
 #include "augs/network/network_types.h"
 #include "augs/misc/constant_size_vector.h"
 #include "application/network/address_and_port.h"
+#include "application/setups/server/server_webhook_vars.h"
 
 using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;
 
@@ -70,6 +71,8 @@ struct server_vars {
 	uint32_t max_bots = 0;
 	float log_performance_once_every_secs = 1;
 	float sleep_mult = 0.1f;
+
+	server_webhook_vars webhooks;
 	// END GEN INTROSPECTOR
 };
 
@@ -77,5 +80,7 @@ struct private_server_vars {
 	// GEN INTROSPECTOR struct private_server_vars
 	std::string master_rcon_password = "";
 	std::string rcon_password = "";
+
+	std::string webhook_url = "";
 	// END GEN INTROSPECTOR
 };

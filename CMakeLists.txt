@@ -976,6 +976,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable.io"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode.io"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/rapidjson/include"
 	# Only for v3
 	# "${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/src"
 )

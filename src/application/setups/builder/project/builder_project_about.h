@@ -14,7 +14,7 @@ struct builder_project_about {
 	// GEN INTROSPECTOR struct builder_project_about
 	augs::constant_size_vector<builder_project_role_info, 10> credits;
 
-	augs::constant_size_string<100> short_description;
+	augs::constant_size_string<200> short_description;
 	augs::constant_size_string<1000> full_description;
 
 	augs::constant_size_string<20> game_version;

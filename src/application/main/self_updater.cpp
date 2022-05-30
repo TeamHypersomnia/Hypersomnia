@@ -2,10 +2,6 @@
 #include <csignal>
 #endif
 
-#if BUILD_OPENSSL
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#endif
-
 #include "augs/log.h"
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/templates/thread_templates.h"
@@ -15,6 +11,7 @@
 #include "augs/graphics/renderer_backend.h"
 #include "augs/misc/timing/timer.h"
 #include "augs/window_framework/window.h"
+#include "3rdparty/include_httplib.h"
 
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
@@ -27,18 +24,11 @@
 #include "view/shader_paths.h"
 #include "augs/readwrite/byte_file.h"
 
-#include "3rdparty/cpp-httplib/httplib.h"
 #include "augs/filesystem/directory.h"
+#include "application/detail_file_paths.h"
 #include "application/main/new_and_old_hypersomnia_path.h"
 #include "application/main/verify_signature.h"
 #include "application/main/extract_archive.h"
-
-#if BUILD_OPENSSL
-using client_type = httplib::SSLClient;
-#else
-using client_type = httplib::Client;
-#endif
-
 #include "hypersomnia_version.h"
 
 #if PLATFORM_MACOS
@@ -63,7 +53,7 @@ bool successful(const int http_status_code) {
 }
 
 template <class... F>
-decltype(auto) launch_download(client_type& client, const std::string& resource, F&&... args) {
+decltype(auto) launch_download(http_client_type& client, const std::string& resource, F&&... args) {
 	return client.Get(resource.c_str(), std::forward<F>(args)...);
 }
 
@@ -79,18 +69,13 @@ self_update_result check_and_apply_updates(
 
 	self_update_result result;
 
+	const auto ca_path = CA_CERT_PATH;
 	const auto& host_url = http_settings.self_update_host;
 
-#if BUILD_OPENSSL
-	const auto port = 443;
-#else
-	const auto port = 80;
-#endif
-
-	client_type http_client(host_url.c_str(), port);
+	http_client_type http_client(host_url.c_str());
 
 #if BUILD_OPENSSL
-	http_client.set_ca_cert_path(DETAIL_DIR "/web/ca-bundle.crt");
+	http_client.set_ca_cert_path(ca_path.c_str());
 	http_client.enable_server_certificate_verification(true);
 #endif
 	http_client.set_follow_location(true);

@@ -55,6 +55,8 @@ with project name being de_cyberaqua
 		- Jakby sie cos przy updatowaniu zwaliło
 			- Ale to jakos atomicznie mozna zrobic moze? 
 				- Czy moze to weryfikowac na koncu ze jest git? - nie kontynuowac dopoki nie 
+			- Mozna jeszcze zrobic ze przesuwamy binarny project.arena do project.arena-old zamiast nadpisywac
+				- albo zostawiac w jsonie
 		- Jakby ktos komus przyslal mapke z inna wersja
 			- Bo edytował długo i w miedzyczasie wyszedl update
 			- no to jest mega unlikely raczej

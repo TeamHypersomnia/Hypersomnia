@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Let's be sure those webhooks work after changing the map
+
 - NAT wasn't working with setup:
 	- client = Cone
 	- server = symmetric with random increments

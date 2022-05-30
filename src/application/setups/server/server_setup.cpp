@@ -2,6 +2,7 @@
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/compress.h"
+#include "augs/string/parse_url.h"
 
 #include "application/setups/server/server_setup.h"
 #include "application/config_lua_table.h"
@@ -34,6 +35,9 @@
 #include "application/nat/stun_session.h"
 #include "augs/templates/bit_cast.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
+#include "application/detail_file_paths.h"
+#include "3rdparty/include_httplib.h"
+#include "application/setups/server/webhooks.h"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -76,6 +80,92 @@ void server_heartbeat::validate() {
 	if (current_arena.empty()) {
 		current_arena = "<unknown>";
 	}
+}
+
+template <class F>
+void server_setup::push_webhook_job(F&& f, mode_player_id id) {
+	auto ptr = std::make_unique<std::future<std::string>>(
+		std::async(std::launch::async, std::forward<F>(f))
+	);
+
+	pending_jobs.emplace_back(webhook_job{ id, std::move(ptr) });
+}
+
+void server_setup::push_connected_webhook(const mode_player_id id) {
+	auto state = find_client_state(id);
+
+	if (state == nullptr) {
+		return;
+	}
+
+	if (state->pushed_connected_webhook) {
+		return;
+	}
+
+	state->pushed_connected_webhook = true;
+
+	auto webhook_url = parsed_url(private_vars.webhook_url);
+	auto server_name = get_server_name();
+	auto avatar = state->meta.avatar.image_bytes;
+	auto connected_player_nickname = state->get_nickname();
+	auto all_nicknames = get_all_nicknames();
+	auto current_arena_name = get_current_arena_name();
+
+	push_webhook_job(
+		[webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
+			const auto ca_path = CA_CERT_PATH;
+			http_client_type http_client(webhook_url.host);
+
+		#if BUILD_OPENSSL
+			http_client.set_ca_cert_path(ca_path.c_str());
+			http_client.enable_server_certificate_verification(true);
+		#endif
+			http_client.set_follow_location(true);
+			http_client.set_read_timeout(5);
+			http_client.set_write_timeout(5);
+
+			auto items = discord_webhooks::form_player_connected(
+				avatar,
+				server_name,
+				connected_player_nickname,
+				all_nicknames,
+				current_arena_name
+			);
+
+			auto response = http_client.Post(webhook_url.location.c_str(), items);
+
+			LOG_NVPS(webhook_url.location);
+			LOG("PUSH RESPONSE:");
+
+			if (response) {
+				LOG_NVPS(response->body);
+
+				return discord_webhooks::find_attachment_url(response->body);
+			}
+			else {
+				LOG("Response was null");
+			}
+
+			return "";
+		}, 
+		id
+	);
+}
+
+void server_setup::finalize_webhook_jobs() {
+	auto finalize = [&](auto& webhook_job) {
+		if (is_ready(*webhook_job.job)) {
+			if (auto client = find_client_state(webhook_job.player_id)) {
+				client->uploaded_avatar_url = webhook_job.job->get();
+			}
+
+			return true;
+		}
+
+		return false;
+	};
+
+	erase_if(pending_jobs, finalize);
 }
 
 bool server_setup::respond_to_ping_requests(
@@ -166,6 +256,7 @@ server_setup::server_setup(
 
 	if (dedicated == std::nullopt) {
 		integrated_client.init(server_time);
+		integrated_client.settings.chosen_nickname = integrated_client_vars.nickname;
 
 		if (!integrated_client_vars.avatar_image_path.empty()) {
 			auto& image_bytes = integrated_client.meta.avatar.image_bytes;
@@ -183,6 +274,8 @@ server_setup::server_setup(
 				image_bytes.clear();
 			}
 		}
+
+		push_connected_webhook(to_mode_player_id(get_integrated_client_id()));
 
 		rebuild_player_meta_viewables = true;
 	}
@@ -399,10 +492,10 @@ void server_setup::send_heartbeat_to_server_list_if_its_time() {
 	}
 }
 
-template <class F>
-void server_setup::for_each_id_and_client(F&& callback, const server_setup::for_each_flags flags) {
-	for (auto& c : clients) {
-		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
+template <class T, class F>
+void server_setup::for_each_id_and_client_impl(T& self, F&& callback, const server_setup::for_each_flags flags) {
+	for (auto& c : self.clients) {
+		const auto client_id = static_cast<client_id_type>(index_in(self.clients, c));
 
 		if (flags[for_each_flag::ONLY_CONNECTED]) {
 			if (!c.is_set()) {
@@ -413,11 +506,21 @@ void server_setup::for_each_id_and_client(F&& callback, const server_setup::for_
 		callback(client_id, c);
 	}
 
-	if (is_integrated()) {
+	if (self.is_integrated()) {
 		if (flags[for_each_flag::WITH_INTEGRATED]) {
-			callback(get_integrated_client_id(), integrated_client);
+			callback(self.get_integrated_client_id(), self.integrated_client);
 		}
 	}
+}
+
+template <class F>
+void server_setup::for_each_id_and_client(F&& callback, const server_setup::for_each_flags flags) {
+	for_each_id_and_client_impl(*this, std::forward<F>(callback), flags);
+}
+
+template <class F>
+void server_setup::for_each_id_and_client(F&& callback, const server_setup::for_each_flags flags) const {
+	for_each_id_and_client_impl(*this, std::forward<F>(callback), flags);
 }
 
 mode_player_id server_setup::get_integrated_player_id() const {
@@ -494,7 +597,7 @@ std::string server_setup::find_client_nickname(const client_id_type& id) const {
 	);
 
 	if (nickname.empty()) {
-		nickname = c.settings.chosen_nickname;
+		nickname = c.get_nickname();
 	}
 
 	return nickname;
@@ -846,22 +949,8 @@ void server_setup::advance_clients_state() {
 		};
 
 		auto add_client_to_mode = [&]() {
-			auto final_nickname = get_arena_handle().on_mode(
-				[&](const auto& typed_mode) -> std::string {
-					if (nullptr == typed_mode.find(mode_id)) {
-						auto nickname = std::string(c.settings.chosen_nickname);
-
-						while (typed_mode.find_player_by(nickname)) {
-							nickname += std::to_string(client_id);
-						}
-
-						return nickname;
-					}
-
-					return "";
-				}
-			);
-
+			auto final_nickname = c.get_nickname(); 
+			
 			if (final_nickname.empty()) {
 				return false;
 			}
@@ -1091,10 +1180,49 @@ message_handler_result server_setup::handle_client_message(
 			even outside of the PENDING_WELCOME state
 		*/
 
+		auto& new_nick = payload.chosen_nickname;
+
+		if (new_nick.empty()) {
+			new_nick = "Player";
+		}
+
+		if (find_client_state(new_nick) != nullptr) {
+			{
+				auto candidate = std::string(new_nick);
+
+				for (int i = 1; i < 100; ++i) {
+					const auto new_index = std::to_string(i);
+
+					if (candidate.length() + new_index.length() > max_nickname_length_v) {
+						if (candidate.size() > 0) {
+							candidate.pop_back();
+						}
+					}
+
+					const auto candidate_nick = candidate + new_index;
+
+					if (find_client_state(candidate_nick) == nullptr) {
+						new_nick = candidate_nick;
+						break;
+					}
+				}
+			}
+
+			if (new_nick.empty() || find_client_state(new_nick) != nullptr) {
+				const auto reason = typesafe_sprintf(
+					"Nickname: '%x' was already taken.\nPlease choose a different one.",
+					new_nick
+				);
+
+				kick(client_id, reason);
+				return abort_v;
+			}
+		}
+
 		c.settings = std::move(payload);
 
 		if (c.state == S::PENDING_WELCOME) {
-			LOG("Client %x requested nickname: %x", client_id, std::string(c.settings.chosen_nickname));
+			LOG("Client %x requested nickname: %x", client_id, c.get_nickname());
 			c.state = S::WELCOME_ARRIVED;
 		}
 
@@ -1226,37 +1354,44 @@ message_handler_result server_setup::handle_client_message(
 			arena_player_avatar_payload payload;
 
 			if (read_payload(dummy_id, payload)) {
-				try {
-					const auto size = augs::image::get_size(payload.image_bytes);
+				if (payload.image_bytes.empty()) {
+					/* We interpret it as a signal that there won't be any avatar. */
+					push_connected_webhook(to_mode_player_id(client_id));
+				}
+				else {
+					try {
+						const auto size = augs::image::get_size(payload.image_bytes);
 
-					if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
-						const auto disconnect_reason = typesafe_sprintf("sending an avatar of size %xx%x", size.x, size.y);
-						kick(client_id, disconnect_reason);
-					}
-					else {
-						c.meta.avatar = std::move(payload);
-
-						if (const auto session_id_of_avatar = find_session_id(client_id)) {
-							auto broadcast_avatar = [this, session_id_of_avatar, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
-								server->send_payload(
-									recipient_client_id,
-									game_channel_type::COMMUNICATIONS,
-
-									*session_id_of_avatar,
-									client_with_updated_avatar.meta.avatar
-								);
-							};
-
-							for_each_id_and_client(broadcast_avatar, only_connected_v);
-							rebuild_player_meta_viewables = true;
+						if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+							const auto disconnect_reason = typesafe_sprintf("sending an avatar of size %xx%x", size.x, size.y);
+							kick(client_id, disconnect_reason);
 						}
 						else {
-							kick(client_id, "sending an avatar too early");
+							c.meta.avatar = std::move(payload);
+							push_connected_webhook(to_mode_player_id(client_id));
+
+							if (const auto session_id_of_avatar = find_session_id(client_id)) {
+								auto broadcast_avatar = [this, session_id_of_avatar, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
+									server->send_payload(
+										recipient_client_id,
+										game_channel_type::COMMUNICATIONS,
+
+										*session_id_of_avatar,
+										client_with_updated_avatar.meta.avatar
+									);
+								};
+
+								for_each_id_and_client(broadcast_avatar, only_connected_v);
+								rebuild_player_meta_viewables = true;
+							}
+							else {
+								kick(client_id, "sending an avatar too early");
+							}
 						}
 					}
-				}
-				catch (...) {
-					kick(client_id, "sending an invalid avatar");
+					catch (...) {
+						kick(client_id, "sending an invalid avatar");
+					}
 				}
 			}
 			else {
@@ -1561,6 +1696,76 @@ void server_setup::update_stats(server_network_info& info) const {
 	info = server->get_server_network_info();
 }
 
+server_client_state* server_setup::find_client_state(const mode_player_id id) {
+	if (id.is_set()) {
+		return std::addressof(get_client_state(id));
+	}
+
+	return nullptr;
+}
+
+const server_client_state* server_setup::find_client_state(const std::string& nickname) const {
+	const server_client_state* result = nullptr;
+
+	auto check_nickname = [&](const auto, const auto& c) {
+		if (c.get_nickname() == nickname) {
+			result = std::addressof(c);
+
+			return callback_result::ABORT;
+		}
+
+		return callback_result::CONTINUE;
+	};
+
+	for_each_id_and_client(check_nickname, connected_and_integrated_v);
+
+	return result;
+}
+
+const server_client_state* server_setup::find_client_state(const mode_player_id id) const {
+	if (id.is_set()) {
+		return std::addressof(get_client_state(id));
+	}
+
+	return nullptr;
+}
+
+server_client_state& server_setup::get_client_state(const mode_player_id id) {
+	if (id == get_integrated_player_id()) {
+		return integrated_client;
+	}
+
+	return clients[id.value];
+}
+
+const server_client_state& server_setup::get_client_state(const mode_player_id id) const {
+	if (id == get_integrated_player_id()) {
+		return integrated_client;
+	}
+
+	return clients[id.value];
+}
+
+std::vector<std::string> server_setup::get_all_nicknames() const {
+	std::vector<std::string> nicknames;
+
+	auto add_nick = [&nicknames](const auto, const auto& c) {
+		nicknames.push_back(c.get_nickname());
+	};
+
+	for_each_id_and_client(add_nick, connected_and_integrated_v);
+
+	return nicknames;
+}
+
+const server_name_type& server_setup::get_server_name() const {
+	return vars.server_name;
+}
+
+std::string server_setup::get_current_arena_name() const {
+	return solvable_vars.current_arena;
+}
+
 server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) const {
 	auto mode_id_to_entity_id = [&](const mode_player_id& mode_id) {
 		return get_arena_handle().on_mode(
@@ -1571,11 +1776,7 @@ server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) c
 	};
 
 	auto get_settings_for = [&](const mode_player_id& mode_id) {
-		if (mode_id == mode_player_id::machine_admin()) {
-			return integrated_client.settings.public_settings.character_input;
-		}
-
-		return clients[mode_id.value].settings.public_settings.character_input;
+		return get_client_state(mode_id).settings.public_settings.character_input;
 	};
 
 	return n.unpack(mode_id_to_entity_id, get_settings_for);
@@ -1728,6 +1929,8 @@ message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type
 
 void server_setup::kick(const client_id_type& kicked_id, const std::string& reason) {
 	auto& c = clients[kicked_id];
+
+	LOG_NVPS(reason);
 
 	if (!c.is_set()) {
 		return;

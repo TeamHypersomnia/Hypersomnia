@@ -28,6 +28,9 @@ struct server_client_state {
 	unsigned unauthorized_rcon_commands = 0;
 	std::optional<net_time_t> when_kicked;
 
+	std::string uploaded_avatar_url;
+	bool pushed_connected_webhook = false;
+
 	arena_player_meta meta;
 
 	server_client_state() = default;
@@ -80,5 +83,9 @@ struct server_client_state {
 
 	void unset() {
 		*this = {};
+	}
+
+	std::string get_nickname() const {
+		return settings.chosen_nickname;
 	}
 };

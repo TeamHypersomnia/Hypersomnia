@@ -121,6 +121,20 @@ class server_setup :
 
 	server_nat_traversal nat_traversal;
 
+	struct webhook_job {
+		mode_player_id player_id;
+		std::unique_ptr<std::future<std::string>> job;
+	};
+
+	std::vector<webhook_job> pending_jobs;
+
+	template <class F>
+	void push_webhook_job(F&& f, mode_player_id = mode_player_id());
+
+	void finalize_webhook_jobs();
+
+	void push_connected_webhook(mode_player_id);
+
 public:
 	net_time_t last_logged_at = 0;
 	server_profiler profiler;
@@ -459,8 +473,14 @@ public:
 
 	using for_each_flags = augs::enum_boolset<for_each_flag>;
 
+	template <class T, class F>
+	static void for_each_id_and_client_impl(T& self, F&& callback, for_each_flags);
+
 	template <class F>
 	void for_each_id_and_client(F&& callback, for_each_flags = {});
+
+	template <class F>
+	void for_each_id_and_client(F&& callback, for_each_flags = {}) const;
 
 	bool handle_input_before_game(
 		const handle_input_before_game_input in
@@ -492,4 +512,18 @@ public:
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
 
 	void reset_afk_timer();
+
+	server_client_state& get_client_state(mode_player_id);
+	const server_client_state& get_client_state(mode_player_id) const;
+
+	const server_client_state* find_client_state(const std::string& nickname) const;
+
+	server_client_state* find_client_state(mode_player_id);
+	const server_client_state* find_client_state(mode_player_id) const;
+
+	std::vector<std::string> get_all_nicknames() const;
+
+	const server_name_type& get_server_name() const;
+	std::string get_current_arena_name() const;
+
 };

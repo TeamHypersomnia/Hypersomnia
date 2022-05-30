@@ -38,10 +38,16 @@ struct ingame_menu_gui {
 		const augs::event::change change,
 		B button_callback
 	) {
+		/*
+			It's useful during development but can really easily cause me to exit the game mid-match
+		*/
+
+#if !IS_PRODUCTION_BUILD
 		if (change.was_pressed(augs::event::keys::key::Q)) {
 			button_callback(ingame_menu_button_type::QUIT_TO_MENU);
 			return true;
 		}
+#endif
 
 		if (change.was_pressed(augs::event::keys::key::R)) {
 			button_callback(ingame_menu_button_type::RESUME);
