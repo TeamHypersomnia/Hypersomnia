@@ -533,8 +533,21 @@ void client_setup::send_pending_commands() {
 	const auto& avatar_path = vars.avatar_image_path;
 
 	if (state == C::IN_GAME) {
-		if (last_sent_avatar.empty()) {
-			if (!avatar_path.empty()) {
+		if (!has_sent_avatar) {
+			if (avatar_path.empty()) {
+				/* Send an empty payload to signal that there won't be any avatar. */
+				arena_player_avatar_payload payload;
+
+				const auto dummy_client_id = session_id_type::dead();
+
+				send_payload(
+					game_channel_type::COMMUNICATIONS,
+
+					dummy_client_id,
+					payload
+				);
+			}
+			else {
 				arena_player_avatar_payload payload;
 
 				try {
@@ -566,7 +579,7 @@ void client_setup::send_pending_commands() {
 				}
 			}
 
-			last_sent_avatar = avatar_path;
+			has_sent_avatar = true;
 		}
 	}
 

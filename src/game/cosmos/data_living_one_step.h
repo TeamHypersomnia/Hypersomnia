@@ -11,5 +11,5 @@ struct data_living_one_step {
 	all_message_queues messages;
 	calculated_visibility_map calculated_visibility;
 
-	void clear();
+	void flush_everything();
 };

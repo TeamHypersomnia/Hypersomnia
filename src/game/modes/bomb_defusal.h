@@ -488,6 +488,8 @@ public:
 	template <class F>
 	void for_each_player_in(faction_type, F&& callback) const;
 
+	mode_player_id find_best_player_in(faction_type) const;
+
 	template <class C>
 	decltype(auto) advance(
 		const input in, 
@@ -590,4 +592,6 @@ public:
 	uint32_t get_num_active_players() const;
 
 	uint32_t get_max_num_active_players(const_input) const;
+
+	void handle_duel_of_honor(input, logic_step);
 };

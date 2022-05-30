@@ -47,7 +47,7 @@
 
 data_living_one_step& standard_solver::get_thread_local_queues() {
 	thread_local data_living_one_step queues;
-	queues.clear();
+	queues.flush_everything();
 
 	return queues;
 }

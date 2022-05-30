@@ -68,6 +68,59 @@ namespace discord_webhooks {
 		return result;
 	}
 
+	inline httplib::MultipartFormDataItems form_duel_of_honor(
+		const std::string& hook_username,
+		const std::string& first_player,
+		const std::string& second_player,
+		const std::string& duel_picture_url
+	) {
+		const auto payload = [&]()
+		{
+			using namespace rapidjson;
+
+			const auto duel_notice = typesafe_sprintf(
+				"**%x** and **%x** have agreed to a duel of honor.",
+				escaped_nick(first_player),
+				escaped_nick(second_player)
+			);
+
+			StringBuffer s;
+			Writer<StringBuffer> writer(s);
+
+			writer.StartObject();
+			writer.Key("username");
+			writer.String(hook_username.c_str());
+			writer.Key("embeds");
+			writer.StartArray();
+			{
+				writer.StartObject();
+				{
+					writer.Key("image");
+					writer.StartObject();
+					{
+						writer.Key("url");
+						writer.String(duel_picture_url.c_str());
+					}
+					writer.EndObject();
+
+					writer.Key("description");
+					writer.String(duel_notice.c_str());
+				}
+				writer.EndObject();
+			}
+			writer.EndArray();
+			writer.EndObject();
+
+			return std::string(s.GetString());
+		}();
+
+		LOG("Generated payload: %x", payload);
+
+		return {
+			{ "payload_json", payload, "", "" }
+		};
+	}
+
 	inline httplib::MultipartFormDataItems form_player_connected(
 		const std::vector<std::byte> avatar,
 		const std::string& hook_username,
@@ -75,9 +128,7 @@ namespace discord_webhooks {
 		std::vector<std::string> other_players,
 		const std::string& current_map
 	) {
-		LOG_NVPS(connected_player, other_players);
 		erase_element(other_players, connected_player);
-		LOG_NVPS(other_players);
 
 		const auto payload = [&]()
 		{

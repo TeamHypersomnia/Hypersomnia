@@ -128,12 +128,16 @@ class server_setup :
 
 	std::vector<webhook_job> pending_jobs;
 
+	uint32_t duel_pic_counter = 0;
+
 	template <class F>
 	void push_webhook_job(F&& f, mode_player_id = mode_player_id());
 
 	void finalize_webhook_jobs();
 
 	void push_connected_webhook(mode_player_id);
+	void push_duel_of_honor_webhook(const std::string& first, const std::string& second);
+	std::string get_next_duel_pic_link();
 
 public:
 	net_time_t last_logged_at = 0;
@@ -350,9 +354,20 @@ public:
 				const auto arena = get_arena_handle();
 
 				if (is_dedicated()) {
+					auto post_solve = [&](auto old_callback, const const_logic_step step) {
+						default_server_post_solve(step);
+						old_callback(step);
+					};
+
+					auto new_callbacks = callbacks.combine(
+						default_solver_callback(),
+						post_solve,
+						default_solver_callback()
+					);
+
 					arena.advance(
 						unpacked, 
-						callbacks, 
+						new_callbacks, 
 						solve_settings()
 					);
 				}
@@ -366,6 +381,7 @@ public:
 							return integrated_client_gui.chat.add_entry_from_game_notification(current_time, msg, get_local_player_id());
 						});
 
+						default_server_post_solve(step);
 						old_callback(step);
 					};
 
@@ -526,4 +542,5 @@ public:
 	const server_name_type& get_server_name() const;
 	std::string get_current_arena_name() const;
 
+	void default_server_post_solve(const const_logic_step step);
 };

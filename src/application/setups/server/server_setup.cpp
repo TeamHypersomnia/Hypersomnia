@@ -38,6 +38,7 @@
 #include "application/detail_file_paths.h"
 #include "3rdparty/include_httplib.h"
 #include "application/setups/server/webhooks.h"
+#include "game/messages/hud_message.h"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -91,6 +92,55 @@ void server_setup::push_webhook_job(F&& f, mode_player_id id) {
 	pending_jobs.emplace_back(webhook_job{ id, std::move(ptr) });
 }
 
+void server_setup::default_server_post_solve(const const_logic_step step) {
+	const auto& duels = step.get_queue<messages::duel_of_honor_message>();
+
+	for (const auto& duel : duels) {
+		push_duel_of_honor_webhook(duel.first_player, duel.second_player);
+	}
+}
+
+std::string server_setup::get_next_duel_pic_link() {
+	auto pattern = vars.webhooks.duel_of_honor_pic_link_pattern;
+	auto duel_pic_i = duel_pic_counter % vars.webhooks.num_duel_pics;
+	++duel_pic_counter;
+
+	return typesafe_sprintf(pattern, duel_pic_i + 1);
+}
+
+void server_setup::push_duel_of_honor_webhook(const std::string& first, const std::string& second) {
+	auto webhook_url = parsed_url(private_vars.webhook_url);
+	auto server_name = get_server_name();
+
+	LOG("pushing duel webhook with %x versus %x", first, second);
+
+	push_webhook_job(
+		[first, second, webhook_url, server_name, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
+			const auto ca_path = CA_CERT_PATH;
+			http_client_type http_client(webhook_url.host);
+
+#if BUILD_OPENSSL
+			http_client.set_ca_cert_path(ca_path.c_str());
+			http_client.enable_server_certificate_verification(true);
+#endif
+			http_client.set_follow_location(true);
+			http_client.set_read_timeout(5);
+			http_client.set_write_timeout(5);
+
+			auto items = discord_webhooks::form_duel_of_honor(
+				server_name,
+				first,
+				second,
+				duel_pic_link
+			);
+
+			http_client.Post(webhook_url.location.c_str(), items);
+
+			return "";
+		}
+	);
+}
+
 void server_setup::push_connected_webhook(const mode_player_id id) {
 	auto state = find_client_state(id);
 
@@ -116,10 +166,10 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 			const auto ca_path = CA_CERT_PATH;
 			http_client_type http_client(webhook_url.host);
 
-		#if BUILD_OPENSSL
+#if BUILD_OPENSSL
 			http_client.set_ca_cert_path(ca_path.c_str());
 			http_client.enable_server_certificate_verification(true);
-		#endif
+#endif
 			http_client.set_follow_location(true);
 			http_client.set_read_timeout(5);
 			http_client.set_write_timeout(5);

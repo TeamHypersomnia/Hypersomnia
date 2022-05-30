@@ -110,7 +110,7 @@ class client_setup :
 	bool print_only_disconnect_reason = false;
 
 	bool rebuild_player_meta_viewables = false;
-	augs::path_type last_sent_avatar;
+	bool has_sent_avatar = false;
 	client_gui_state client_gui;
 
 	using untimely_payload_variant = std::variant<arena_player_avatar_payload>;

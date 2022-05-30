@@ -597,7 +597,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
 
     enabled_context_tip_settings = {
-      tip_offset_mult = 0.78,
+      tip_offset_mult = 0.75,
       tip_text_color = "255 255 255 255",
       bound_key_color = "255 255 0 255",
       item_name_color = "255 255 0 255"

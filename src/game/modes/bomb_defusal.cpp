@@ -917,7 +917,7 @@ void bomb_defusal::setup_round(
 		they become invalid when we assign the initial_signi.
 	*/
 
-	step.transient.clear();
+	step.transient.flush_everything();
 
 	cosm.set_fixed_delta(round_speeds.calc_fixed_delta());
 
@@ -1697,6 +1697,13 @@ void bomb_defusal::handle_special_commands(const input_type in, const mode_entro
 						restart(in, step);
 						break;
 
+					case C::TEST_ANNOUNCE_DUEL:
+						handle_duel_of_honor(in, step);
+						break;
+
+					case C::TEST_ANNOUNCE_MATCH_RESULT:
+						break;
+
 					default: break;
 				}
 			}
@@ -2199,6 +2206,48 @@ bool bomb_defusal::is_first_round_in_half(const const_input_type in) const {
 	return is_halfway_round(in) || get_current_round_number() == 0;
 }
 
+mode_player_id bomb_defusal::find_best_player_in(faction_type faction) const {
+	auto best = mode_player_id::dead();
+	std::optional<int> best_score;
+
+	for_each_player_in(faction, [&](const auto& id, const auto& data) {
+		const int score = data.stats.calc_score();
+
+		if (best_score == std::nullopt || score > *best_score) {
+			best = id;
+			best_score = score;
+		}
+	});
+
+	return best;
+}
+
+void bomb_defusal::handle_duel_of_honor(const input_type in, const logic_step step) {
+	const auto p = calc_participating_factions(in);
+
+	LOG("Checking if there is a duel of honor.");
+
+	if (p.size() == 2) {
+		if (num_players_in(p.bombing) == 1) {
+			if (num_players_in(p.defusing) == 1) {
+				LOG("There is a duel indeed.");
+				const auto first = find(find_best_player_in(p.bombing));
+				const auto second = find(find_best_player_in(p.defusing));
+
+				if (first != nullptr && second != nullptr) {
+					hud_message_2_players(step, "", " and ", " have agreed to a [color=orange]duel of honor[/color].", first, second, true);
+
+					messages::duel_of_honor_message duel;
+					duel.first_player = first->get_chosen_name();
+					duel.second_player = second->get_chosen_name();
+
+					step.post_message(duel);
+				}
+			}
+		}
+	}
+}
+
 void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	if (state == arena_mode_state::INIT) {
 		restart(in, step);
@@ -2227,6 +2276,7 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 
 			if (get_match_begins_in_seconds(in) <= 0.f) {
 				end_warmup_and_go_live(in, step);
+				handle_duel_of_honor(in, step);
 			}
 		}
 	}

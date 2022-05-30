@@ -26,4 +26,9 @@ namespace messages {
 	struct hud_message {
 		message_variant payload;
 	};
+
+	struct duel_of_honor_message {
+		std::string first_player;
+		std::string second_player;
+	};
 }

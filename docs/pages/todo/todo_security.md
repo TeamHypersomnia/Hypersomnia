@@ -5,6 +5,9 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Test if nicknames can't be exploited somehow
+	- Either by maximum/minimum length, duplicate names logic, special characters etc.
+
 - Validation of downloaded arenas
 	- Enforce small miniature size when loading it in the project selector
 		- or someone might upload a map with a nasty miniature size
