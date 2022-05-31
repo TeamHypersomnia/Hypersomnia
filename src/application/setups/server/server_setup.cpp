@@ -99,6 +99,12 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 		push_duel_of_honor_webhook(duel.first_player, duel.second_player);
 	}
 
+	const auto& duel_interrupts = step.get_queue<messages::duel_interrupted_message>();
+
+	for (const auto& duel_interrupt : duel_interrupts) {
+		push_duel_interrupted_webhook(duel_interrupt);
+	}
+
 	const auto& summaries = step.get_queue<messages::match_summary_message>();
 
 	for (const auto& summary : summaries) {
@@ -112,6 +118,44 @@ std::string server_setup::get_next_duel_pic_link() {
 	++duel_pic_counter;
 
 	return typesafe_sprintf(pattern, duel_pic_i + 1);
+}
+
+void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupted_message& interrupt_info) {
+	finalize_webhook_jobs();
+
+	auto webhook_url = parsed_url(private_vars.webhook_url);
+	auto server_name = get_server_name();
+
+	LOG("pushing duel interrupted webhook.");
+
+	auto fled = vars.webhooks.fled_pic_link;
+	auto reconsidered = vars.webhooks.reconsidered_pic_link;
+
+	push_webhook_job(
+		[webhook_url, server_name, fled, reconsidered, interrupt_info]() -> std::string {
+			const auto ca_path = CA_CERT_PATH;
+			http_client_type http_client(webhook_url.host);
+
+#if BUILD_OPENSSL
+			http_client.set_ca_cert_path(ca_path.c_str());
+			http_client.enable_server_certificate_verification(true);
+#endif
+			http_client.set_follow_location(true);
+			http_client.set_read_timeout(5);
+			http_client.set_write_timeout(5);
+
+			auto items = discord_webhooks::form_duel_interrupted(
+				server_name,
+				fled,
+				reconsidered,
+				interrupt_info
+			);
+
+			http_client.Post(webhook_url.location.c_str(), items);
+
+			return "";
+		}
+	);
 }
 
 void server_setup::push_match_summary_webhook(const messages::match_summary_message& summary) {

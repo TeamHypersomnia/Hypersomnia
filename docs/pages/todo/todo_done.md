@@ -4561,3 +4561,4 @@ Advantages:
 - Devops
 	- Maybe add somewhere that commit hash?
 
+- check afk

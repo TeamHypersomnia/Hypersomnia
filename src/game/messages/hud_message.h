@@ -33,6 +33,22 @@ namespace messages {
 		std::string second_player;
 	};
 
+	struct duel_interrupted_message {
+		int deserter_score = 0;
+		int opponent_score = 0;
+
+		std::string deserter_nickname;
+		std::string opponent_nickname;
+
+		bool is_truce() const {
+			return deserter_score >= opponent_score;
+		}
+
+		bool was_winning() const {
+			return deserter_score > opponent_score;
+		}
+	};
+
 	struct match_summary_message {
 		struct player_entry {
 			int kills = 0;

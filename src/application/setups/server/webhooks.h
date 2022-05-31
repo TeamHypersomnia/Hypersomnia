@@ -85,6 +85,93 @@ namespace discord_webhooks {
 		return result;
 	}
 
+	inline httplib::MultipartFormDataItems form_duel_interrupted(
+		const std::string& hook_username,
+		const std::string& fled_pic_link,
+		const std::string& truce_pic_link,
+		const messages::duel_interrupted_message& info
+	) {
+		const auto payload = [&]()
+		{
+			using namespace rapidjson;
+
+			const bool is_truce = info.is_truce();
+			const bool was_winning = info.was_winning();
+
+			const auto deserter = escaped_nick(info.deserter_nickname);
+			const auto opponent = escaped_nick(info.opponent_nickname);
+
+			const auto result_notice = [&]() -> std::string {
+				if (is_truce) {
+					return "Duel ended with a truce.";
+				}
+
+				return typesafe_sprintf("%x has surrendered.", deserter);
+			}();
+				
+			const auto detail_notice = [&]() {
+				if (is_truce) {
+					return typesafe_sprintf(
+						"**%x**, %x %x:%x, no longer wants to fight **%x**.",
+						deserter,
+						was_winning ? "winning" : "tied",
+						info.deserter_score,
+						info.opponent_score,
+						opponent
+					);
+				}
+
+				return typesafe_sprintf(
+					"**%x** was winning %x:%x when **%x** shamefully left the duel.",
+					opponent,
+					info.opponent_score,
+					info.deserter_score,
+					deserter
+				);
+			}();
+
+			const auto& chosen_picture = is_truce ? truce_pic_link : fled_pic_link;
+
+			StringBuffer s;
+			Writer<StringBuffer> writer(s);
+
+			writer.StartObject();
+			writer.Key("username");
+			writer.String(hook_username.c_str());
+			writer.Key("embeds");
+			writer.StartArray();
+			{
+				writer.StartObject();
+				{
+					writer.Key("title");
+					writer.String(result_notice.c_str());
+
+					writer.Key("image");
+					writer.StartObject();
+					{
+						writer.Key("url");
+						writer.String(chosen_picture.c_str());
+					}
+					writer.EndObject();
+
+					writer.Key("description");
+					writer.String(detail_notice.c_str());
+				}
+				writer.EndObject();
+			}
+			writer.EndArray();
+			writer.EndObject();
+
+			return std::string(s.GetString());
+		}();
+
+		LOG("Generated payload: %x", payload);
+
+		return {
+			{ "payload_json", payload, "", "" }
+		};
+	}
+
 	inline httplib::MultipartFormDataItems form_match_summary(
 		const std::string& hook_username,
 		const std::string& mvp_name,

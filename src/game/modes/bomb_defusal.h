@@ -398,7 +398,7 @@ private:
 	faction_choice_result auto_assign_faction(input, const mode_player_id&);
 	faction_choice_result choose_faction(const_input, const mode_player_id&, const faction_type faction);
 
-	void restart(input, logic_step);
+	void restart_match(input, logic_step);
 
 	void reset_players_stats(input);
 	void set_players_money_to_initial(input);
@@ -431,6 +431,9 @@ private:
 	session_id_type next_session_id = session_id_type::first();
 	unsigned scramble_counter = 0;
 	unsigned prepare_to_fight_counter = 0;
+
+	mode_player_id duellist_1 = mode_player_id::dead();
+	mode_player_id duellist_2 = mode_player_id::dead();
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
@@ -445,6 +448,7 @@ private:
 public:
 
 	faction_type get_player_faction(const mode_player_id&) const;
+	faction_type get_opposing_faction(const_input, faction_type) const;
 
 	mode_entity_id lookup(const mode_player_id&) const;
 	mode_player_id lookup(const mode_entity_id&) const;
@@ -601,5 +605,10 @@ public:
 	uint32_t get_max_num_active_players(const_input) const;
 
 	void check_duel_of_honor(input, logic_step);
+	bool is_a_duellist(const mode_player_id&) const;
+	mode_player_id get_opponent_duellist(const mode_player_id&) const;
+	void clear_duel();
+
+	void handle_duel_desertion(input, logic_step, const mode_player_id&);
 	void report_match_result(input, logic_step);
 };

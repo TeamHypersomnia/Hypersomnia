@@ -162,6 +162,12 @@ bomb_defusal::participating_factions bomb_defusal::calc_participating_factions(c
 	return output;
 }
 
+faction_type bomb_defusal::get_opposing_faction(const const_input_type in, const faction_type faction) const {
+	const auto participating = calc_participating_factions(in);
+
+	return faction == participating.bombing ? participating.defusing : participating.bombing;
+}
+
 faction_type bomb_defusal::calc_weakest_faction(const const_input_type in) const {
 	const auto participating = calc_participating_factions(in);
 
@@ -466,6 +472,8 @@ bool bomb_defusal_player::is_set() const {
 }
 
 void bomb_defusal::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
+	handle_duel_desertion(in, step, id);
+
 	const auto controlled_character_id = lookup(id);
 
 	delete_with_held_items(in, step, in.cosm[controlled_character_id]);
@@ -1681,22 +1689,22 @@ void bomb_defusal::handle_special_commands(const input_type in, const mode_entro
 			else if constexpr(std::is_same_v<C, match_command>) {
 				switch (cmd) {
 					case C::RESTART_MATCH:
-						restart(in, step);
+						restart_match(in, step);
 						break;
 
 					case C::RESTART_MATCH_NO_WARMUP:
-						restart(in, step);
+						restart_match(in, step);
 						end_warmup_and_go_live(in, step);
 						break;
 
 					case C::SWAP_TEAMS:
 						swap_assigned_factions(calc_participating_factions(in));
-						restart(in, step);
+						restart_match(in, step);
 						break;
 
 					case C::SCRAMBLE_TEAMS:
 						scramble_assigned_factions(calc_participating_factions(in));
-						restart(in, step);
+						restart_match(in, step);
 						break;
 
 					case C::TEST_ANNOUNCE_DUEL:
@@ -2063,6 +2071,13 @@ void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& en
 					const auto final_faction = player_data->get_faction();
 
 					if (result == faction_choice_result::CHANGED) {
+						/* 
+							Note: moving to AFK is also implemented in terms of mode_commands::team choice,
+							so in practice, there are no more ways to defect the duel.
+						*/
+
+						handle_duel_desertion(in, step, id);
+
 						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(final_faction));
 
 						if (death_request != std::nullopt) {
@@ -2163,7 +2178,7 @@ void bomb_defusal::handle_game_commencing(const input_type in, const logic_step 
 
 		if (commencing_timer_ms <= 0.f) {
 			commencing_timer_ms = -1.f;
-			restart(in, step);
+			restart_match(in, step);
 		}
 
 		return;
@@ -2312,11 +2327,17 @@ void bomb_defusal::check_duel_of_honor(const input_type in, const logic_step ste
 		if (num_players_in(p.bombing) == 1) {
 			if (num_players_in(p.defusing) == 1) {
 				LOG("There is a duel indeed.");
-				const auto first = find(find_best_player_in(p.bombing));
-				const auto second = find(find_best_player_in(p.defusing));
+				const auto first_id = find_best_player_in(p.bombing);
+				const auto second_id = find_best_player_in(p.defusing);
+
+				const auto first = find(first_id);
+				const auto second = find(second_id);
 
 				if (first != nullptr && second != nullptr) {
 					hud_message_2_players(step, "", " and ", " have agreed to a [color=orange]duel of honor[/color].", first, second, true);
+
+					duellist_1 = first_id;
+					duellist_2 = second_id;
 
 					messages::duel_of_honor_message duel;
 					duel.first_player = first->get_chosen_name();
@@ -2331,7 +2352,7 @@ void bomb_defusal::check_duel_of_honor(const input_type in, const logic_step ste
 
 void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	if (state == arena_mode_state::INIT) {
-		restart(in, step);
+		restart_match(in, step);
 	}
 
 	spawn_and_kick_bots(in, step);
@@ -2386,7 +2407,7 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 			const auto p = calc_participating_factions(in);
 
 			if (is_final_round(in)) {
-				restart(in, step);
+				restart_match(in, step);
 			}
 			else {
 				swap_assigned_factions(p);
@@ -2805,11 +2826,12 @@ const bomb_defusal_player* bomb_defusal::find_player_by(const entity_name_str& c
 	return nullptr;
 }
 
-void bomb_defusal::restart(const input_type in, const logic_step step) {
+void bomb_defusal::restart_match(const input_type in, const logic_step step) {
 	reset_players_stats(in);
 	factions = {};
 	was_first_blood = false;
 	prepare_to_fight_counter = 0;
+	clear_duel();
 
 	if (in.rules.warmup_secs > 4) {
 		state = arena_mode_state::WARMUP;
@@ -3050,3 +3072,45 @@ uint32_t bomb_defusal::get_num_active_players() const {
 uint32_t bomb_defusal::get_max_num_active_players(const const_input_type in) const {
 	return in.rules.max_players_per_team * 2;
 }
+
+void bomb_defusal::handle_duel_desertion(const input_type in, const logic_step step, const mode_player_id& deserter_id) { 
+	if (is_a_duellist(deserter_id)) {
+		auto deserter_state = find(deserter_id);
+		auto opponent_state = find(get_opponent_duellist(deserter_id));
+
+		if (deserter_state != nullptr && opponent_state != nullptr) {
+			messages::duel_interrupted_message duel_interrupted;
+
+			/* 
+				Desertion might have been due to a changed faction,
+				so take the opponent's faction as reference.
+			*/
+
+			const auto opponent_faction = opponent_state->get_faction();
+			const auto deserter_faction = get_opposing_faction(in, opponent_faction);
+
+			duel_interrupted.deserter_score = get_score(deserter_faction);
+			duel_interrupted.opponent_score = get_score(opponent_faction);
+			duel_interrupted.deserter_nickname = deserter_state->get_chosen_name();
+			duel_interrupted.opponent_nickname = opponent_state->get_chosen_name();
+
+			step.post_message(duel_interrupted);
+		}
+
+		clear_duel();
+	}
+}
+
+mode_player_id bomb_defusal::get_opponent_duellist(const mode_player_id& id) const {
+	 return id == duellist_1 ? duellist_2 : duellist_1;
+}
+
+bool bomb_defusal::is_a_duellist(const mode_player_id& id) const {
+	return id == duellist_1 || id == duellist_2;
+}
+
+void bomb_defusal::clear_duel() {
+	duellist_1 = mode_player_id::dead();
+	duellist_2 = mode_player_id::dead();
+}
+

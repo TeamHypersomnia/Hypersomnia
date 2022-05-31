@@ -138,6 +138,7 @@ class server_setup :
 	void push_connected_webhook(mode_player_id);
 	void push_duel_of_honor_webhook(const std::string& first, const std::string& second);
 	void push_match_summary_webhook(const messages::match_summary_message& summary);
+	void push_duel_interrupted_webhook(const messages::duel_interrupted_message& summary);
 	std::string get_next_duel_pic_link();
 
 public:
