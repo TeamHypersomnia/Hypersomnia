@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- rcon messages should be send via blocks because they can easily exceed the max packet size!!!
+	- This causes a crash when connecting to the server
+
 - libcrypto.dll is missing on Windows if there's no OpenSSH installed
 - check code_escaped_nick for \`
 - jeszcze hook na nowy serv

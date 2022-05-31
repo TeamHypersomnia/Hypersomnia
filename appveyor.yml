@@ -11,8 +11,6 @@ clone_script:
   - git clone --recurse-submodules https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
 
 install:
-  - echo "abc" > test.txt
-  - dos2unix test.txt
   - mkdir C:\projects\deps
   - cd C:\projects\deps
 
