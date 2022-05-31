@@ -188,7 +188,7 @@ namespace discord_webhooks {
 				}
 
 				return typesafe_sprintf(
-					"**%x** was winning %x:%x...\nand **%x** shamefully left the duel.",
+					"**%x** was winning %x:%x...\nbut **%x** shamefully left the duel.",
 					opponent,
 					info.opponent_score,
 					info.deserter_score,
