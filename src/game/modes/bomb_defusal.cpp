@@ -3076,6 +3076,11 @@ uint32_t bomb_defusal::get_max_num_active_players(const const_input_type in) con
 }
 
 void bomb_defusal::handle_duel_desertion(const input_type in, const logic_step step, const mode_player_id& deserter_id) { 
+	if (is_match_summary() && is_final_round(in)) {
+		/* Not a desertion when the outcome is known already */
+		return;
+	}
+
 	if (is_a_duellist(deserter_id)) {
 		auto deserter_state = find(deserter_id);
 		auto opponent_state = find(get_opponent_duellist(deserter_id));
