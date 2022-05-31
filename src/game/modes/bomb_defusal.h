@@ -323,7 +323,7 @@ private:
 	round_transferred_players make_transferred_players(input) const;
 
 	bool still_freezed() const;
-	void make_win(input, faction_type);
+	void make_win(input, logic_step, faction_type);
 
 	entity_id create_character_for_player(input, logic_step, mode_player_id, std::optional<transfer_meta> = std::nullopt);
 
@@ -475,7 +475,7 @@ public:
 
 	mode_player_id find_first_free_player() const;
 
-	std::optional<arena_mode_match_result> calc_match_result(const_input) const;
+	arena_mode_match_result calc_match_result(const_input) const;
 
 	unsigned get_score(faction_type) const;
 
@@ -487,6 +487,9 @@ public:
 
 	template <class F>
 	void for_each_player_in(faction_type, F&& callback) const;
+
+	template <class F>
+	void for_each_player_best_to_worst_in(faction_type, F&& callback) const;
 
 	mode_player_id find_best_player_in(faction_type) const;
 
@@ -534,6 +537,10 @@ public:
 
 	auto get_state() const {
 		return state;
+	}
+
+	bool is_match_summary() const {
+		return state == arena_mode_state::MATCH_SUMMARY;
 	}
 
 	const auto& get_factions_state() const {
@@ -593,5 +600,6 @@ public:
 
 	uint32_t get_max_num_active_players(const_input) const;
 
-	void handle_duel_of_honor(input, logic_step);
+	void check_duel_of_honor(input, logic_step);
+	void report_match_result(input, logic_step);
 };

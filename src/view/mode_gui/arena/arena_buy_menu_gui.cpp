@@ -58,7 +58,7 @@ void game_image_with_attachments(
 		flavour
 	);
 
-	invisible_button("", total_size + image_padding);
+	invisible_button("invisible_gmimg", total_size + image_padding);
 }
 
 bool should_close_after_purchase(buy_menu_type b) {
@@ -235,7 +235,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			const auto image_padding = vec2(0, 4);
 			const auto size = vec2(entry.get_original_size());
 			game_image(entry, size, white, image_padding);
-			invisible_button("", size + image_padding);
+			invisible_button("invisible_owned", size + image_padding);
 		}
 	};
 
@@ -393,7 +393,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			const auto image_padding = vec2(0, 4);
 
 			game_image(entry, size, white, image_padding);
-			invisible_button("", size + image_padding);
+			invisible_button("invisible_spell", size + image_padding);
 		};
 
 		return general_purchase_button(

@@ -276,7 +276,7 @@ bool projects_list_tab_state::perform_list(
 			game_image(*miniature_entry, resized_miniature_size, white, offset + image_padding, augs::imgui_atlas_type::AD_HOC);
 		}
 
-		invisible_button("", target_miniature_size + image_padding);
+		invisible_button("invisible_miniature", target_miniature_size + image_padding);
 
 		ImGui::SameLine();
 
@@ -488,7 +488,7 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 					game_image(in.necessary_images[assets::necessary_image_id::BLANK], bg_size, rgba(0, 0, 0, 100), image_padding, augs::imgui_atlas_type::GAME);
 					game_image(*preview_entry, resized_preview_size, white, offset + image_padding + image_internal_padding, augs::imgui_atlas_type::AD_HOC);
 
-					invisible_button("", target_preview_size + image_padding + image_internal_padding * 2);
+					invisible_button("invisible_preview", target_preview_size + image_padding + image_internal_padding * 2);
 
 					auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <variant>
 #include "augs/gui/formatted_string.h"
+#include "game/modes/mode_player_id.h"
 
 namespace messages {
 	struct two_player_message {
@@ -30,5 +31,32 @@ namespace messages {
 	struct duel_of_honor_message {
 		std::string first_player;
 		std::string second_player;
+	};
+
+	struct match_summary_message {
+		struct player_entry {
+			int kills = 0;
+			int assists = 0;
+			int deaths = 0;
+
+			std::string nickname;
+		};
+
+		int first_team_score = 0;
+		int second_team_score = 0;
+
+		std::vector<player_entry> first_faction;
+		std::vector<player_entry> second_faction;
+
+		mode_player_id mvp_player_id;
+
+		bool is_tie() const {
+			return first_team_score == second_team_score;
+		}
+
+		void flip_teams() {
+			std::swap(first_team_score, second_team_score);
+			std::swap(first_faction, second_faction);
+		}
 	};
 }

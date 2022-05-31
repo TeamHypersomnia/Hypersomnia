@@ -98,6 +98,12 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 	for (const auto& duel : duels) {
 		push_duel_of_honor_webhook(duel.first_player, duel.second_player);
 	}
+
+	const auto& summaries = step.get_queue<messages::match_summary_message>();
+
+	for (const auto& summary : summaries) {
+		push_match_summary_webhook(summary);
+	}
 }
 
 std::string server_setup::get_next_duel_pic_link() {
@@ -106,6 +112,50 @@ std::string server_setup::get_next_duel_pic_link() {
 	++duel_pic_counter;
 
 	return typesafe_sprintf(pattern, duel_pic_i + 1);
+}
+
+void server_setup::push_match_summary_webhook(const messages::match_summary_message& summary) {
+	finalize_webhook_jobs();
+
+	auto webhook_url = parsed_url(private_vars.webhook_url);
+	auto server_name = get_server_name();
+
+	const auto mvp_state = find_client_state(summary.mvp_player_id);
+
+	if (mvp_state == nullptr) {
+		return;
+	}
+
+	auto mvp_nickname = mvp_state->get_nickname();
+	auto mvp_player_avatar_url = mvp_state->uploaded_avatar_url;
+
+	LOG("pushing match summary webhook.");
+
+	push_webhook_job(
+		[webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, summary]() -> std::string {
+			const auto ca_path = CA_CERT_PATH;
+			http_client_type http_client(webhook_url.host);
+
+#if BUILD_OPENSSL
+			http_client.set_ca_cert_path(ca_path.c_str());
+			http_client.enable_server_certificate_verification(true);
+#endif
+			http_client.set_follow_location(true);
+			http_client.set_read_timeout(5);
+			http_client.set_write_timeout(5);
+
+			auto items = discord_webhooks::form_match_summary(
+				server_name,
+				mvp_nickname,
+				mvp_player_avatar_url,
+				summary
+			);
+
+			http_client.Post(webhook_url.location.c_str(), items);
+
+			return "";
+		}
+	);
 }
 
 void server_setup::push_duel_of_honor_webhook(const std::string& first, const std::string& second) {
@@ -184,7 +234,6 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 
 			auto response = http_client.Post(webhook_url.location.c_str(), items);
 
-			LOG_NVPS(webhook_url.location);
 			LOG("PUSH RESPONSE:");
 
 			if (response) {

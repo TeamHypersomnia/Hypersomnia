@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- check code_escaped_nick for \`
 - jeszcze hook na nowy serv
 
 - Let's be sure those webhooks work after changing the map

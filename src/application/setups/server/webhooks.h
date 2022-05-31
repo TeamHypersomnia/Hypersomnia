@@ -6,6 +6,8 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#include "game/messages/hud_message.h"
+
 inline std::string bytes_to_string(const std::vector<std::byte>& bytes) {
 	std::string result;
 	result.resize(bytes.size());
@@ -44,6 +46,21 @@ namespace discord_webhooks {
 		return "";
 	}
 
+	inline std::string code_escaped_nick(const std::string& n) {
+		std::string result;
+
+		for (auto c : n) {
+			if (c == '`') {
+				result += "'";
+				continue;
+			}
+
+			result += c;
+		}
+
+		return result;
+	}
+
 	inline std::string escaped_nick(const std::string& n) {
 		std::string result;
 
@@ -66,6 +83,189 @@ namespace discord_webhooks {
 		}
 
 		return result;
+	}
+
+	inline httplib::MultipartFormDataItems form_match_summary(
+		const std::string& hook_username,
+		const std::string& mvp_name,
+		const std::string& mvp_avatar_link,
+		const messages::match_summary_message& info
+	) {
+		const auto embed_color = 52479;
+
+		const auto payload = [&]()
+		{
+			using namespace rapidjson;
+
+			const bool was_mvp_alone = info.first_faction.size() == 1;
+			const int num_against_mvp = info.second_faction.size();
+			const bool is_duel = was_mvp_alone && num_against_mvp == 1;
+
+			const auto summary_notice = [&]() {
+				const auto preffix = is_duel ? "Duel" : "Match";
+
+				if (info.is_tie()) {
+					return typesafe_sprintf(
+						"%x ended with a tie.",
+						preffix
+					);
+				}
+
+				return typesafe_sprintf(
+					"%x ended with %x:%x.",
+					preffix,
+					info.first_team_score,
+					info.second_team_score
+				);
+			}();
+
+			const auto mvp_notice_suffix = [&]() -> std::string {
+
+				if (info.is_tie()) {
+					if (was_mvp_alone) {
+						if (num_against_mvp > 1) {
+							return "tied against overwhelming odds.";
+						}
+
+						if (num_against_mvp == 1) {
+							/* If tied in a duel, no MVPs. */
+							return "";
+						}
+					}
+					else {
+						return "was the strongest of them all.";
+					}
+				}
+
+				if (was_mvp_alone) {
+					if (num_against_mvp > 1) {
+						return "won against overwhelming odds.";
+					}
+
+					if (num_against_mvp == 1) {
+						return "has upheld his honor.";
+					}
+				}
+
+				return "led his team to victory.";
+			}();
+
+			const bool is_any_mvp = mvp_notice_suffix != "";
+			const auto mvp_notice = mvp_notice_suffix == "" ? "They stand on equal ground." : typesafe_sprintf(
+				"**%x** %x",
+				escaped_nick(mvp_name),
+				mvp_notice_suffix
+			);
+
+			const auto first_team_name = std::string(info.is_tie() ? "First team:" : "Winning team:");
+			const auto second_team_name = std::string(info.is_tie() ? "Second team:" : "Losing team:");
+
+			std::size_t num_width = 2;
+			auto format_num = [&](auto num){
+				// todo: support larger numbers
+				num = std::clamp(num, -9, 99);
+
+				auto s = std::to_string(num);
+
+				if (s.length() < num_width) {
+					const auto n = num_width - s.length();
+					auto preffix = std::string(n, ' ');
+
+					s = preffix + s;
+				}
+
+				return s;
+			};
+
+			auto make_stat_str = [&](const auto& entry) {
+				const auto k = format_num(entry.kills);
+				const auto a = format_num(entry.assists);
+				const auto d = format_num(entry.deaths);
+
+				return typesafe_sprintf("%x|%x|%x", k, a, d);
+			};
+
+			auto length_of = [](const auto& a, const auto& b) {
+				return a.nickname.length() < b.nickname.length();
+			};
+
+			const auto longest_nick_len = std::max(
+				maximum_of(info.first_faction,  length_of).nickname.length(),
+				maximum_of(info.second_faction, length_of).nickname.length()
+			);
+
+			std::size_t nick_stat_padding = 8;
+			std::size_t min_nick_col_width = 20;
+
+			const auto nick_col_width = std::max(min_nick_col_width, longest_nick_len + nick_stat_padding);
+
+			auto make_team_members = [&](const auto& members) {
+				std::string output;
+
+				for (const auto& m : members) {
+					const auto padding = nick_col_width - m.nickname.length();
+					output += code_escaped_nick(m.nickname) + std::string(padding, ' ') + make_stat_str(m) + "\n";
+				}
+
+				if (output.size() > 0) {
+					output.pop_back();
+				}
+
+				return output;
+			};
+
+			std::string total_description;
+			total_description += mvp_notice;
+			total_description += "\n\n";
+			total_description += "**" + first_team_name + "**";
+			total_description += "```" + make_team_members(info.first_faction) + "```";
+			total_description += "\n";
+			total_description += "**" + second_team_name + "**";
+			total_description += "```" + make_team_members(info.second_faction) + "```";
+
+			StringBuffer s;
+			Writer<StringBuffer> writer(s);
+
+			writer.StartObject();
+			writer.Key("username");
+			writer.String(hook_username.c_str());
+			writer.Key("embeds");
+			writer.StartArray();
+			{
+				writer.StartObject();
+				{
+					if (is_any_mvp && mvp_avatar_link.size() > 0) {
+						writer.Key("thumbnail");
+						writer.StartObject();
+						{
+							writer.Key("url");
+							writer.String(mvp_avatar_link.c_str());
+						}
+						writer.EndObject();
+					}
+
+					writer.Key("title");
+					writer.String(summary_notice.c_str());
+
+					writer.Key("color");
+					writer.Uint(embed_color);
+
+					writer.Key("description");
+					writer.String(total_description.c_str());
+				}
+				writer.EndObject();
+			}
+			writer.EndArray();
+			writer.EndObject();
+
+			return std::string(s.GetString());
+		}();
+
+		LOG("Generated payload: %x", payload);
+
+		return {
+			{ "payload_json", payload, "", "" }
+		};
 	}
 
 	inline httplib::MultipartFormDataItems form_duel_of_honor(

@@ -31,6 +31,7 @@ namespace messages {
 	struct game_notification;
 	struct hud_message;
 	struct duel_of_honor_message;
+	struct match_summary_message;
 }
 
 using all_message_queues = augs::storage_for_message_queues<
@@ -68,5 +69,6 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::game_notification,
 	messages::hud_message,
 
-	messages::duel_of_honor_message
+	messages::duel_of_honor_message,
+	messages::match_summary_message
 >;

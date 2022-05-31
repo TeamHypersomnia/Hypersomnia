@@ -49,8 +49,7 @@ void arena_scoreboard_gui::draw_gui(
 		return;
 	}
 
-	const auto match_result = typed_mode.calc_match_result(mode_input);
-	const bool is_halftime = match_result != std::nullopt && typed_mode.is_halfway_round(mode_input);
+	const bool is_halftime = typed_mode.is_match_summary() && typed_mode.is_halfway_round(mode_input);
 
 	const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
@@ -304,8 +303,9 @@ void arena_scoreboard_gui::draw_gui(
 				aabb(faction_bg_orig, bg_dark);
 			}
 
-			if (match_result != std::nullopt) {
-				const bool tied = match_result->is_tie();
+			if (typed_mode.is_match_summary()) {
+				const auto match_result = typed_mode.calc_match_result(mode_input);
+				const bool tied = match_result.is_tie();
 				auto label = std::string(tied ? "TIED" : "WON");
 
 				if (is_halftime) {
@@ -331,7 +331,7 @@ void arena_scoreboard_gui::draw_gui(
 					}
 				}
 				else {
-					if (match_result->winner == faction) {
+					if (match_result.winner == faction) {
 						do_draw();
 					}
 				}

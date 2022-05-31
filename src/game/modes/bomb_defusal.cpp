@@ -1427,7 +1427,7 @@ bool bomb_defusal::is_final_round(const const_input_type in) const {
 	return someone_has_over_half || current_round >= max_rounds;
 }
 
-void bomb_defusal::make_win(const input_type in, const faction_type winner) {
+void bomb_defusal::make_win(const input_type in, const logic_step step, const faction_type winner) {
 	const auto p = calc_participating_factions(in);
 	const auto loser = winner == p.defusing ? p.bombing : p.defusing;
 
@@ -1468,6 +1468,8 @@ void bomb_defusal::make_win(const input_type in, const faction_type winner) {
 		state = arena_mode_state::MATCH_SUMMARY;
 		set_players_frozen(in, true);
 		release_triggers_of_weapons_of_players(in);
+
+		report_match_result(in, step);
 	}
 }
 
@@ -1571,7 +1573,7 @@ void bomb_defusal::process_win_conditions(const input_type in, const logic_step 
 	const auto p = calc_participating_factions(in);
 
 	auto standard_win = [&](const auto winner) {
-		make_win(in, winner);
+		make_win(in, step, winner);
 		play_win_theme(in, step, winner);
 		play_win_sound(in, step, winner);
 	};
@@ -1608,7 +1610,7 @@ void bomb_defusal::process_win_conditions(const input_type in, const logic_step 
 		}
 
 		post_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
-		make_win(in, winner);
+		make_win(in, step, winner);
 		play_win_theme(in, step, winner);
 
 		play_bomb_defused_sound(in, step, winner);
@@ -1698,10 +1700,11 @@ void bomb_defusal::handle_special_commands(const input_type in, const mode_entro
 						break;
 
 					case C::TEST_ANNOUNCE_DUEL:
-						handle_duel_of_honor(in, step);
+						check_duel_of_honor(in, step);
 						break;
 
 					case C::TEST_ANNOUNCE_MATCH_RESULT:
+						report_match_result(in, step);
 						break;
 
 					default: break;
@@ -2222,7 +2225,85 @@ mode_player_id bomb_defusal::find_best_player_in(faction_type faction) const {
 	return best;
 }
 
-void bomb_defusal::handle_duel_of_honor(const input_type in, const logic_step step) {
+void bomb_defusal::report_match_result(const input_type in, const logic_step step) {
+	const auto p = calc_participating_factions(in);
+
+	const auto result = calc_match_result(in);
+
+	if (!result.is_tie()) {
+		if (!result.winner.has_value() || !result.loser.has_value()) {
+			LOG("Wrong match result.");
+
+			return;
+		}
+	}
+
+	messages::match_summary_message summary;
+
+	summary.first_team_score = result.winner_score;
+	summary.second_team_score = result.loser_score;
+
+	const auto first_team  = result.is_tie()  ? p.defusing  : *result.winner;
+	const auto second_team = result.is_tie()  ? p.bombing   : *result.loser;
+
+	auto make_entry = [](const auto& player) {
+		messages::match_summary_message::player_entry new_entry;
+
+		new_entry.kills = player.stats.knockouts;
+		new_entry.assists = player.stats.assists;
+		new_entry.deaths = player.stats.deaths;
+		new_entry.nickname = player.get_chosen_name();
+
+		return new_entry;
+	};
+
+	auto strongest_in_first = mode_player_id::dead();
+	auto strongest_in_second = mode_player_id::dead();
+
+	for_each_player_best_to_worst_in(
+		first_team,
+		[&](const auto& id, const auto& player) {
+			if (strongest_in_first == mode_player_id::dead()) {
+				strongest_in_first = id;
+			}
+
+			summary.first_faction.emplace_back(make_entry(player));
+		}
+	);
+
+	for_each_player_best_to_worst_in(
+		second_team,
+		[&](const auto& id, const auto& player) {
+			if (strongest_in_second == mode_player_id::dead()) {
+				strongest_in_second = id;
+			}
+
+			summary.second_faction.emplace_back(make_entry(player));
+		}
+	);
+
+	auto strongest_1 = find(strongest_in_first);
+	auto strongest_2 = find(strongest_in_second);
+
+	if (strongest_1 == nullptr || strongest_2 == nullptr) {
+		LOG("There are no opposing players. No match summary to be reported");
+
+		return;
+	}
+
+	// Note it's LESS because stronger come first
+	const auto stronger_of_the_two = (*strongest_1 < *strongest_2) ? strongest_in_first : strongest_in_second;
+	summary.mvp_player_id = result.is_tie() ? stronger_of_the_two : strongest_in_first;
+
+	if (stronger_of_the_two == strongest_in_second) {
+		// Flip teams so that the first is where the mvp is
+		summary.flip_teams();
+	}
+
+	step.post_message(summary);
+}
+
+void bomb_defusal::check_duel_of_honor(const input_type in, const logic_step step) {
 	const auto p = calc_participating_factions(in);
 
 	LOG("Checking if there is a duel of honor.");
@@ -2276,7 +2357,7 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 
 			if (get_match_begins_in_seconds(in) <= 0.f) {
 				end_warmup_and_go_live(in, step);
-				handle_duel_of_honor(in, step);
+				check_duel_of_honor(in, step);
 			}
 		}
 	}
@@ -2643,19 +2724,30 @@ unsigned bomb_defusal::get_score(const faction_type f) const {
 	return factions[f].score;
 }
 
-std::optional<arena_mode_match_result> bomb_defusal::calc_match_result(const const_input_type in) const {
-	if (state != arena_mode_state::MATCH_SUMMARY) {
-		return std::nullopt;
-	}
-
+arena_mode_match_result bomb_defusal::calc_match_result(const const_input_type in) const {
 	const auto p = calc_participating_factions(in);
 
 	if (get_score(p.bombing) == get_score(p.defusing)) {
-		return arena_mode_match_result::make_tie();
+		auto tie = arena_mode_match_result::make_tie();
+		tie.winner_score = tie.loser_score = get_score(p.bombing);
+
+		return tie;
 	}
 
 	arena_mode_match_result result;
-	result.winner = get_score(p.bombing) > get_score(p.defusing) ? p.bombing : p.defusing;
+
+	if (get_score(p.bombing) > get_score(p.defusing)) {
+		result.winner = p.bombing;
+		result.loser  = p.defusing;
+	}
+	else {
+		result.winner = p.defusing;
+		result.loser  = p.bombing;
+	}
+
+	result.winner_score = get_score(*result.winner);
+	result.loser_score =  get_score(*result.loser);
+
 	return result;
 }
 

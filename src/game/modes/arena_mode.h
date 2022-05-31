@@ -162,6 +162,10 @@ struct arena_mode_view_rules {
 
 struct arena_mode_match_result {
 	std::optional<faction_type> winner;
+	std::optional<faction_type> loser;
+
+	int winner_score = 0;
+	int loser_score  = 0;
 
 	static auto make_tie() {
 		return arena_mode_match_result();
