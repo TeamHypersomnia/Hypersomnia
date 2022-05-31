@@ -54,6 +54,7 @@ Get-ChildItem
 Remove-item -Recurse -Force cache, logs, user
 $releaseNotesPath = "release_notes.txt"
 "$version`n$commitHash`n$commitMessage" | out-file -filepath $releaseNotesPath
+dos2unix $releaseNotesPath
 
 Push-AppveyorArtifact $releaseNotesPath
 
