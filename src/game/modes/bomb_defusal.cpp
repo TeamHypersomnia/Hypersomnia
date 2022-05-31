@@ -1477,7 +1477,9 @@ void bomb_defusal::make_win(const input_type in, const logic_step step, const fa
 		set_players_frozen(in, true);
 		release_triggers_of_weapons_of_players(in);
 
-		report_match_result(in, step);
+		if (is_final_round(in)) {
+			report_match_result(in, step);
+		}
 	}
 }
 
