@@ -178,9 +178,9 @@ namespace discord_webhooks {
 			const auto detail_notice = [&]() {
 				if (is_truce) {
 					return typesafe_sprintf(
-						"**%x**, %x %x:%x, no longer wants to fight **%x**.",
+						"**%x** %x %x:%x and no longer wants to fight **%x**.",
 						deserter,
-						was_winning ? "winning" : "tied",
+						was_winning ? "wins" : "ties",
 						info.deserter_score,
 						info.opponent_score,
 						opponent
@@ -188,7 +188,7 @@ namespace discord_webhooks {
 				}
 
 				return typesafe_sprintf(
-					"**%x** was winning %x:%x when **%x** shamefully left the duel.",
+					"**%x** was winning %x:%x...\nand **%x** shamefully left the duel.",
 					opponent,
 					info.opponent_score,
 					info.deserter_score,
