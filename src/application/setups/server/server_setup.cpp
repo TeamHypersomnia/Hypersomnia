@@ -172,11 +172,13 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 
 	auto mvp_nickname = mvp_state->get_nickname();
 	auto mvp_player_avatar_url = mvp_state->uploaded_avatar_url;
+	const auto this_duel_index = (duel_pic_counter - 1) % vars.webhooks.num_duel_pics;
+	auto duel_victory_pic_link = typesafe_sprintf(vars.webhooks.duel_victory_pic_link_pattern, this_duel_index);
 
 	LOG("pushing match summary webhook.");
 
 	push_webhook_job(
-		[webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, summary]() -> std::string {
+		[webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary]() -> std::string {
 			const auto ca_path = CA_CERT_PATH;
 			http_client_type http_client(webhook_url.host);
 
@@ -192,6 +194,7 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 				server_name,
 				mvp_nickname,
 				mvp_player_avatar_url,
+				duel_victory_pic_link,
 				summary
 			);
 

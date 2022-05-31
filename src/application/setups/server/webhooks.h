@@ -242,6 +242,7 @@ namespace discord_webhooks {
 		const std::string& hook_username,
 		const std::string& mvp_name,
 		const std::string& mvp_avatar_link,
+		const std::string& duel_victory_pic_link,
 		const messages::match_summary_message& info
 	) {
 		const auto embed_color = 52479;
@@ -253,6 +254,7 @@ namespace discord_webhooks {
 			const bool was_mvp_alone = info.first_faction.size() == 1;
 			const int num_against_mvp = info.second_faction.size();
 			const bool is_duel = was_mvp_alone && num_against_mvp == 1;
+			const bool is_duel_victory = is_duel && !info.is_tie();
 
 			const auto summary_notice = [&]() {
 				const auto preffix = is_duel ? "Duel" : "Match";
@@ -393,6 +395,16 @@ namespace discord_webhooks {
 						{
 							writer.Key("url");
 							writer.String(mvp_avatar_link.c_str());
+						}
+						writer.EndObject();
+					}
+
+					if (is_duel_victory) {
+						writer.Key("image");
+						writer.StartObject();
+						{
+							writer.Key("url");
+							writer.String(duel_victory_pic_link.c_str());
 						}
 						writer.EndObject();
 					}
