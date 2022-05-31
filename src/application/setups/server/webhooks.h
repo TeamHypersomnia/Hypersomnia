@@ -85,6 +85,72 @@ namespace discord_webhooks {
 		return result;
 	}
 
+	inline httplib::MultipartFormDataItems form_new_community_server(
+		const std::string& hook_username,
+		const std::string& new_server_name,
+		const std::string& new_server_ip,
+		const std::string& arena_name,
+		const std::string& game_mode,
+		const int num_slots,
+		const std::string& nat_type
+	) {
+		const auto payload = [&]()
+		{
+			using namespace rapidjson;
+
+			const auto embed_color = 16763904;
+
+			std::string full_description;
+			full_description += "IP:    " + code_escaped_nick(new_server_ip) + "\n";
+			full_description += "Map:   " + code_escaped_nick(arena_name) + "\n";
+			full_description += "Mode:  " + code_escaped_nick(game_mode) + "\n";
+			full_description += "Slots: " + std::to_string(num_slots) + "\n";
+			full_description += "NAT:   " + code_escaped_nick(nat_type);
+			full_description = "```" + full_description + "```";
+
+			StringBuffer s;
+			Writer<StringBuffer> writer(s);
+
+			writer.StartObject();
+			writer.Key("username");
+			writer.String(hook_username.c_str());
+			writer.Key("embeds");
+			writer.StartArray();
+			{
+				writer.StartObject();
+				{
+					writer.Key("author");
+					writer.StartObject();
+					{
+						writer.Key("name");
+						writer.String("New community server!");
+					}
+					writer.EndObject();
+
+					writer.Key("title");
+					writer.String(new_server_name.c_str());
+
+					writer.Key("color");
+					writer.Uint(embed_color);
+
+					writer.Key("description");
+					writer.String(full_description.c_str());
+				}
+				writer.EndObject();
+			}
+			writer.EndArray();
+			writer.EndObject();
+
+			return std::string(s.GetString());
+		}();
+
+		LOG("Generated payload: %x", payload);
+
+		return {
+			{ "payload_json", payload, "", "" }
+		};
+	}
+
 	inline httplib::MultipartFormDataItems form_duel_interrupted(
 		const std::string& hook_username,
 		const std::string& fled_pic_link,

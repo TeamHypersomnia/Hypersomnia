@@ -22,6 +22,7 @@ struct server_heartbeat {
 
 	std::optional<netcode_address_t> internal_network_address;
 	nat_detection_result nat;
+	bool suppress_new_community_server_webhook = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_heartbeat&) const = default;

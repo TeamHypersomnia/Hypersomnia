@@ -39,6 +39,7 @@ struct server_vars {
 	// GEN INTROSPECTOR struct server_vars
 	server_name_type server_name;
 	address_and_port notified_server_list;
+	bool suppress_new_community_server_webhook = false;
 
 	bool allow_nat_traversal = true;
 

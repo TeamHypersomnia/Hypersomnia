@@ -2,13 +2,8 @@
 #include <csignal>
 #endif
 #include <shared_mutex>
-
-#if BUILD_OPENSSL
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#endif
-
 #include "application/masterserver/masterserver.h"
-#include "3rdparty/cpp-httplib/httplib.h"
+#include "3rdparty/include_httplib.h"
 #include "augs/log.h"
 
 #include "application/config_lua_table.h"
@@ -25,6 +20,9 @@
 #include "augs/readwrite/to_bytes.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/netcode_address_hash.h"
+#include "augs/string/parse_url.h"
+#include "application/detail_file_paths.h"
+#include "application/setups/server/webhooks.h"
 
 std::string ToString(const netcode_address_t&);
 
@@ -238,6 +236,68 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	uint8_t packet_buffer[NETCODE_MAX_PACKET_BYTES];
 
+	struct webhook_job {
+		std::unique_ptr<std::future<std::string>> job;
+	};
+
+	std::vector<webhook_job> pending_jobs;
+
+	auto finalize_webhook_jobs = [&]() {
+		auto finalize = [&](auto& webhook_job) {
+			return is_ready(*webhook_job.job);
+		};
+
+		erase_if(pending_jobs, finalize);
+	};
+
+	auto push_webhook_job = [&](auto&& f) {
+		auto ptr = std::make_unique<std::future<std::string>>(
+			std::async(std::launch::async, std::forward<decltype(f)>(f))
+		);
+
+		pending_jobs.emplace_back(webhook_job{ std::move(ptr) });
+	};
+
+	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
+		const auto ip_str = ::ToString(from);
+
+		auto webhook_url = parsed_url(cfg.private_server.webhook_url);
+
+		push_webhook_job(
+			[ip_str, data, webhook_url]() -> std::string {
+				const auto ca_path = CA_CERT_PATH;
+				http_client_type http_client(webhook_url.host);
+
+#if BUILD_OPENSSL
+				http_client.set_ca_cert_path(ca_path.c_str());
+				http_client.enable_server_certificate_verification(true);
+#endif
+				http_client.set_follow_location(true);
+				http_client.set_read_timeout(5);
+				http_client.set_write_timeout(5);
+
+				const auto game_mode_name = data.game_mode.dispatch([](auto d) {
+					using D = decltype(d);
+					return format_field_name(get_type_name<D>());
+				});
+
+				auto items = discord_webhooks::form_new_community_server(
+					"Server list",
+					data.server_name,
+					ip_str,
+					data.current_arena,
+					game_mode_name,
+					data.max_online,
+					nat_type_to_string(data.nat.type)
+				);
+
+				http_client.Post(webhook_url.location.c_str(), items);
+
+				return "";
+			}
+		);
+	};
+
 	while (true) {
 #if PLATFORM_UNIX
 		if (signal_status != 0) {
@@ -257,6 +317,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 #endif
 
 		const auto current_time = yojimbo_time();
+
+		finalize_webhook_jobs();
 
 		auto process_socket_messages = [&](auto& socket) {
 			netcode_address_t from;
@@ -309,6 +371,12 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						server_entry.time_of_last_heartbeat = current_time;
 
 						const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
+
+						if (is_new_server) {
+							if (!typed_request.suppress_new_community_server_webhook) {
+								push_new_server_webhook(from, typed_request);
+							}
+						}
 
 						MSR_LOG_NVPS(is_new_server, heartbeats_mismatch);
 

@@ -488,6 +488,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		}
 	);
 
+	heartbeat.suppress_new_community_server_webhook = vars.suppress_new_community_server_webhook;
 	heartbeat.max_online = last_start.max_connections;
 	heartbeat.internal_network_address = internal_address;
 
