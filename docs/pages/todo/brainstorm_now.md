@@ -6,8 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- masterserver -> serverlist maybe
+- also server shoudn't crash when receiving a packet over max size
+
 - rcon messages should be send via blocks because they can easily exceed the max packet size!!!
 	- This causes a crash when connecting to the server
+	- and anyways why would the client send all the rcon vars at the start?
 
 - libcrypto.dll is missing on Windows if there's no OpenSSH installed
 - check code_escaped_nick for \`

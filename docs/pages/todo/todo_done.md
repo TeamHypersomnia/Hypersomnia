@@ -4562,3 +4562,4 @@ Advantages:
 	- Maybe add somewhere that commit hash?
 
 - check afk
+- [silent] mode will be useful for development when we're active

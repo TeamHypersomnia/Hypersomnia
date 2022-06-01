@@ -5,6 +5,15 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- audit properly what happens upon death
+	- it's consistently the only time the clients crash
+	- sprawdzic na nagraniu czy to sie dzieje na spekcie czy od razu
+		- chodz moze byc trudno stwierdzic bo nie od razu sie disconectuje
+		- mozna sprawdzic jaki jest limit czasowy tez
+- SOLUTION: Again, we were dividing by zero in health color calculation, this time in sentience_component.cpp (previous was in draw_sentiences_hud.cpp)
+	- Interestingly SIGFPE was thrown even though we were dividing by a floating-point zero
+		- but maybe there were some optimizations in play, who knows
+
 - Why the f... is the cursor still on when in the game
 	- active flag wasn't initialized to true 
 

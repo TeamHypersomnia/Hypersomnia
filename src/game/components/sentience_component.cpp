@@ -41,14 +41,20 @@ namespace components {
 			const auto one_less_hr = 1.f - hr;
 
 			const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
-			const auto time_pulse_ratio = (timestamp_ms % pulse_duration) / static_cast<float>(pulse_duration);
 
-			hr *= 1.f - (0.2f * time_pulse_ratio);
+			if (pulse_duration > 0) {
+				const auto time_pulse_ratio = (timestamp_ms % pulse_duration) / static_cast<float>(pulse_duration);
 
-			if (hr < 1.f) {
-				const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
+				hr *= 1.f - (0.2f * time_pulse_ratio);
 
-				return { { 255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier) } };
+				if (hr < 1.f) {
+					const auto alpha_multiplier = one_less_hr * one_less_hr * one_less_hr * one_less_hr * time_pulse_ratio;
+
+					return { { 255, 0, 0, static_cast<rgba_channel>(255 * alpha_multiplier) } };
+				}
+			}
+			else {
+				return { { 255, 0, 0, 255 } };
 			}
 		}
 

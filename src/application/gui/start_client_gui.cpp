@@ -99,7 +99,7 @@ bool start_client_gui_state::perform(
 			}
 
 			chooser.perform(
-				"",
+				"replay_demo_chooser",
 				demo_path.string(),
 				augs::path_type(DEMOS_DIR),
 				[&](const auto& new_choice) {
