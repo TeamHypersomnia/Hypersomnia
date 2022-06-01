@@ -46,6 +46,8 @@ struct client_vars {
 	client_nickname_type nickname = "Player";
 	client_net_vars net;
 
+	bool suppress_webhooks = false;
+
 	augs::maybe_network_simulator network_simulator;
 
 	unsigned max_buffered_server_commands = 1000;

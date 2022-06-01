@@ -841,6 +841,7 @@ void client_setup::apply(const config_lua_table& cfg) {
 
 	auto& r = requested_settings;
 	r.chosen_nickname = vars.nickname;
+	r.suppress_webhooks = vars.suppress_webhooks;
 	r.rcon_password = vars.rcon_password;
 	r.net = vars.net;
 	r.public_settings.character_input = cfg.input.character;

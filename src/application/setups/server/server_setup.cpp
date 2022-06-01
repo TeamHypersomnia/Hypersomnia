@@ -1503,7 +1503,9 @@ message_handler_result server_setup::handle_client_message(
 			if (read_payload(dummy_id, payload)) {
 				if (payload.image_bytes.empty()) {
 					/* We interpret it as a signal that there won't be any avatar. */
-					push_connected_webhook(to_mode_player_id(client_id));
+					if (!c.settings.suppress_webhooks) {
+						push_connected_webhook(to_mode_player_id(client_id));
+					}
 				}
 				else {
 					try {
@@ -1515,7 +1517,10 @@ message_handler_result server_setup::handle_client_message(
 						}
 						else {
 							c.meta.avatar = std::move(payload);
-							push_connected_webhook(to_mode_player_id(client_id));
+
+							if (!c.settings.suppress_webhooks) {
+								push_connected_webhook(to_mode_player_id(client_id));
+							}
 
 							if (const auto session_id_of_avatar = find_session_id(client_id)) {
 								auto broadcast_avatar = [this, session_id_of_avatar, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
