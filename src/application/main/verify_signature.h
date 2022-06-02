@@ -3,7 +3,7 @@
 #include "signing_keys.h"
 
 #if PLATFORM_WINDOWS
-#define SSH_KEYGEN_BINARY (augs::path_type(DETAIL_DIR) / "ssh" / "ssh-keygen.exe")
+#define SSH_KEYGEN_BINARY "ssh-keygen"
 #else
 #define SSH_KEYGEN_BINARY "ssh-keygen"
 #endif

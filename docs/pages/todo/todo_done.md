@@ -4624,3 +4624,11 @@ Advantages:
 		- we could try tomorrow with more sent packets
 			- i.e. with more settings.num_brute_force_packets
 
+- Brakuje libcrypto.dll dla keygena na windowsie jak nie ma openssh.
+	- wywalmy to na razie i polegajmy na zainstalowanym openssh
+		- walic win 7
+			- rownie dobrze by moglo to nie dzialac tam
+		- po prostu na win7 trzeba bedzie albo recznie updatowac (co latwe bo user folder tylko przekopiowac) albo manualnie doinstalowac openssh
+			- ale to nawet jak bedziemy mieli instalator kiedys to moze sam dodawac razem z innym shitem potrzebnym jakby kiedys byl (git lol, nie no moze bez przesady)
+
+		

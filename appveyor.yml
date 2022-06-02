@@ -23,9 +23,6 @@ install:
   - appveyor DownloadFile https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/LLVM-13.0.1-win64.exe -FileName llvm-installer.exe
   - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
 
-  - appveyor DownloadFile https://github.com/PowerShell/Win32-OpenSSH/releases/latest/download/OpenSSH-Win64.zip
-  - 7z x OpenSSH-Win64.zip -oC:\projects\hypersomnia > nul
-
 notifications:
   - provider: Email
     to:
