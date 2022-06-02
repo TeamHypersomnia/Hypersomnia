@@ -17,15 +17,12 @@ struct initial_arena_state_payload {
 	maybe_const_ref_t<C, rcon_level_type> rcon;
 };
 
-using ref_net_stream = augs::basic_ref_memory_stream<message_bytes_type>;
-using cref_net_stream = augs::basic_ref_memory_stream<const message_bytes_type>;
-
 template <class T, class P>
 bool unsafe_read_message(
 	T& msg,
 	P& payload
 ) {
-	auto s = cref_net_stream(msg.bytes);
+	auto s = augs::basic_ref_memory_stream<const decltype(msg.bytes)>(msg.bytes);
 	augs::read_bytes(s, payload);
 
 	return true;
@@ -36,7 +33,7 @@ bool unsafe_write_message(
 	T& msg,
 	const P& payload
 ) {
-	auto s = ref_net_stream(msg.bytes);
+	auto s = augs::basic_ref_memory_stream<decltype(msg.bytes)>(msg.bytes);
 	augs::write_bytes(s, payload);
 
 	return true;
@@ -448,7 +445,13 @@ namespace net_messages {
 		// TODO SECURITY: don't blindly trust the server!!!
 		// TODO BANDWIDTH: optimize vars i/o
 
-		return unsafe_read_message(*this, output);
+		try {
+			return unsafe_read_message(*this, output);
+		}
+		catch (const augs::stream_read_error& err) {
+			LOG_NVPS("Failed to read new_server_vars: %x", err.what());
+			return false;
+		}
 	}
 
 	inline bool new_server_vars::write_payload(
@@ -463,7 +466,13 @@ namespace net_messages {
 		// TODO SECURITY: don't blindly trust the server!!!
 		// TODO BANDWIDTH: optimize vars i/o
 
-		return unsafe_read_message(*this, output);
+		try {
+			return unsafe_read_message(*this, output);
+		}
+		catch (const augs::stream_read_error& err) {
+			LOG_NVPS("Failed to read new_server_solvable_vars: %x", err.what());
+			return false;
+		}
 	}
 
 	inline bool new_server_solvable_vars::write_payload(

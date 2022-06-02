@@ -11,6 +11,7 @@
 #include "application/network/rcon_command.h"
 #include "application/setups/server/chat_structs.h"
 #include "application/setups/server/net_statistics_update.h"
+#include "application/setups/server/server_vars.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "game/common_state/entity_flavours.h"
 #include "application/setups/server/public_settings_update.h"
@@ -54,19 +55,55 @@ constexpr std::size_t total_header_bytes_v = (
 
 constexpr std::size_t max_message_size_v = ((chosen_packet_size_v - total_header_bytes_v) / 4) * 4;
 
-using message_bytes_type = augs::constant_size_vector<std::byte, max_message_size_v>;
-
 struct server_vars;
 struct server_solvable_vars;
 
-struct preserialized_message : public yojimbo::Message {
-	message_bytes_type bytes;
+template <class B>
+struct basic_preserialized_message : public yojimbo::Message {
+	static_assert(is_constant_size_vector_v<B>);
+
+	B bytes;
 
 	template <typename Stream>
-	bool Serialize(Stream& stream);
+	bool Serialize(Stream& stream) {
+		int length = 0;
+
+		if (Stream::IsWriting) {
+			length = static_cast<int>(bytes.size());
+		}
+
+		serialize_int(stream, length, 0, bytes.max_size());
+
+		if (Stream::IsReading) {
+			bytes.resize(length);
+		}
+
+		serialize_bytes(stream, (uint8_t*)bytes.data(), length);
+
+		return true;
+	}
 
 	YOJIMBO_MESSAGE_BOILERPLATE();
 };
+
+template <class T>
+struct preserialized_message_type_for {
+	/* 
+		To properly get a bound on its maximum size,
+		this type needs to be trivially copyable.
+	*/
+	static_assert(std::is_trivially_copyable_v<T>);
+	static constexpr std::size_t max_size_v = sizeof(T);
+
+	using buffer_type = augs::constant_size_vector<std::byte, max_size_v>;
+	using type = basic_preserialized_message<buffer_type>;
+};
+
+template <class T>
+using preserialized_message_type_for_t = typename preserialized_message_type_for<T>::type;
+
+using message_bytes_type = augs::constant_size_vector<std::byte, max_message_size_v>;
+using default_preserialized_message = preserialized_message_type_for_t<message_bytes_type>;
 
 struct only_block_message : public yojimbo::BlockMessage {
 	static constexpr bool server_to_client = true;
@@ -130,7 +167,7 @@ namespace net_messages {
 		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
-	struct new_server_solvable_vars : preserialized_message {
+	struct new_server_solvable_vars : preserialized_message_type_for_t<server_solvable_vars> {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
 
@@ -138,7 +175,7 @@ namespace net_messages {
 		bool read_payload(server_solvable_vars&);
 	};
 
-	struct new_server_vars : preserialized_message {
+	struct new_server_vars : preserialized_message_type_for_t<server_vars> {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
 
@@ -182,7 +219,7 @@ namespace net_messages {
 	};
 #endif
 
-	struct server_step_entropy : preserialized_message {
+	struct server_step_entropy : default_preserialized_message {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
 
@@ -190,7 +227,7 @@ namespace net_messages {
 		bool read_payload(::networked_server_step_entropy&);
 	};
 
-	struct client_entropy : preserialized_message {
+	struct client_entropy : default_preserialized_message {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
 

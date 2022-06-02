@@ -120,7 +120,13 @@ namespace net_messages {
 
 		auto length = static_cast<int>(bytes.size());
 
-		serialize_int(s, length, 0, sizeof(server_vars));
+		/* 
+			To properly get a bound on its maximum size,
+			this type needs to be trivially copyable.
+		*/
+
+		static_assert(std::is_trivially_copyable_v<T>);
+		serialize_int(s, length, 0, sizeof(T));
 
 		if (Stream::IsReading) {
 			bytes.resize(length);

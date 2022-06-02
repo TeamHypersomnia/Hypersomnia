@@ -96,9 +96,9 @@ bool client_demo_player::control(const handle_input_before_game_input in) {
 	return false;
 }
 
-void client_setup::handle_server_messages_from(const demo_step& step) {
+void client_setup::demo_replay_server_messages_from(const demo_step& step) {
 	for (auto& s : step.serialized_messages) {
-		auto read_callback = [this](auto& typed_msg) -> message_handler_result {
+		auto replay_message = [this](auto& typed_msg) -> message_handler_result {
 			using net_message_type = remove_cref<decltype(typed_msg)>;
 
 			auto read_payload_into = [&](auto&&... args) {
@@ -113,7 +113,7 @@ void client_setup::handle_server_messages_from(const demo_step& step) {
 		};
 
 		try {
-			const auto result = ::on_read_net_message(s, read_callback);
+			const auto result = ::replay_serialized_net_message(s, replay_message);
 
 			if (result == message_handler_result::ABORT_AND_DISCONNECT) {
 				disconnect();
@@ -129,7 +129,7 @@ void client_setup::handle_server_messages_from(const demo_step& step) {
 }
 
 template <class T>
-void client_setup::handle_server_message(T& message) {
+void client_setup::demo_record_server_message(T& message) {
 	if (is_recording()) {
 		auto bytes = ::net_message_to_bytes(message);
 		get_currently_recorded_step().serialized_messages.emplace_back(std::move(bytes));

@@ -62,7 +62,7 @@ message_handler_result client_adapter::process_message(yojimbo::Message& m, H&& 
 				return message_handler_result::ABORT_AND_DISCONNECT;
 			}
 			else {
-				handler.handle_server_message(static_cast<net_message_type&>(m));
+				handler.demo_record_server_message(static_cast<net_message_type&>(m));
 
 				auto read_payload_into = [&m](auto&&... args) {
 					auto& typed_msg = static_cast<net_message_type&>(m);

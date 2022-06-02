@@ -6,12 +6,41 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- masterserver -> serverlist maybe
 - also server shoudn't crash when receiving a packet over max size
+	- Apparently, for net i/o, we've chosen a constant_size_vector of maximum size of ~1000
+		- Originally because we want to have preserialized messages faster to read and write
+			- We actually don't use this.. byte counter stream is only used in initial arena state transmission
+			- so it's probably to optimize memory allocations and properly take advantage of tlsf
+				- but it's pointless since we can serialize in place
+		- But throwing an exception is also a good warning if we accidentally make our messages too large
+			- like was the case with rcon
+			- it's probably better that it warns us early like that instead of producing some problems with bandwidth and lags
+		- Note however that yojimbo's bit serializers only assert, they don't gracefully return false when the buffer overflows
+			- Only readers do, writers always return true
+		- So currently the server trusts the logic that it won't produce a message longer than that
+		- Well then, it's prooobably okay to crash like that in order to warn us
+		- and server vars should actually be sent in a block since they're so large
+			- it's non-essential so it will go through communications channel and only affect rcons, don't worry
+		- then shouldn't unsafe_read_message at least check for exceptions?
+			- it probably should as it might come from an untrusted source
+			- otherwise, for development reasons, write and read are symmetric so the write will crash first and warn us of a problem with oversized messages
+		- watch out for unsafe_serialize in net_serialization_helpers.h too!!!
+			- server actually reads the new server vars unsafely!!
+				- but wait.. this one is actually implemented in terms of std::vector
+				- so overflow shouldn't be a problem when sending vars to server, it's not as unsafe
+		- rcon_command is sent through yojimbo::Message so it doesn't need to be taken care of
+		- new_server_vars does
+			- so for now let's just use a bigger vector for it
+		- preserialized_message_type_for_t is the solution if the type is trivially copyable (most will be)
+		- however server_step_entropy is not t-c and it's written to preserialized message.
+			- we should check if it's safe.
+
+- masterserver -> serverlist maybe
 
 - rcon messages should be send via blocks because they can easily exceed the max packet size!!!
 	- This causes a crash when connecting to the server
 	- and anyways why would the client send all the rcon vars at the start?
+		- he doesn't; it's actually because of a server sending and crashing itself
 
 - libcrypto.dll is missing on Windows if there's no OpenSSH installed
 - check code_escaped_nick for \`

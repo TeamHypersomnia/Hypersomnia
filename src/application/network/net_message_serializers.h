@@ -1,25 +1,6 @@
 #pragma once
 #include "application/network/net_serialization_helpers.h"
 
-template <typename Stream>
-bool preserialized_message::Serialize(Stream& stream) {
-	int length = 0;
-
-	if (Stream::IsWriting) {
-		length = static_cast<int>(bytes.size());
-	}
-
-	serialize_int(stream, length, 0, max_message_size_v);
-
-	if (Stream::IsReading) {
-		bytes.resize(length);
-	}
-
-	serialize_bytes(stream, (uint8_t*)bytes.data(), length);
-
-	return true;
-}
-
 namespace net_messages {
 #if CONTEXTS_SEPARATE
 	template <typename Stream>

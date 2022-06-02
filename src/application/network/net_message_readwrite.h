@@ -4,7 +4,7 @@ template <class T>
 constexpr bool is_block_message_v = std::is_base_of_v<only_block_message, T>;
 
 template <class F>
-decltype(auto) on_read_net_message(const std::vector<std::byte>& bytes, F&& callback) {
+decltype(auto) replay_serialized_net_message(const std::vector<std::byte>& bytes, F&& callback) {
 	using Id = type_in_list_id<server_message_variant>;
 
 	auto ar = augs::cref_memory_stream(bytes);

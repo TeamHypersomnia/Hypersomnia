@@ -5,6 +5,8 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Check if the things using default_preserialized_messages are actually serialized correctly
+
 - Test if nicknames can't be exploited somehow
 	- Either by maximum/minimum length, duplicate names logic, special characters etc.
 

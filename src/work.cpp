@@ -181,6 +181,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		/* Some developer-friendly options */
 		result.http_client.update_on_launch = false;
 		result.client.suppress_webhooks = true;
+		result.server.suppress_new_community_server_webhook = true;
 
 #if PLATFORM_UNIX
 		result.default_client_start.chosen_address_type = connect_address_type::CUSTOM;

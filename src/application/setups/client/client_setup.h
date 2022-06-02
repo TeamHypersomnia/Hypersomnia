@@ -190,7 +190,7 @@ class client_setup :
 	);
 
 	template <class T>
-	void handle_server_message(T& message);
+	void demo_record_server_message(T& message);
 
 	void send_to_server(total_client_entropy&);
 
@@ -203,7 +203,7 @@ class client_setup :
 	void play_demo_from(const augs::path_type&);
 	void record_demo_to(const augs::path_type&);
 
-	void handle_server_messages_from(const demo_step&);
+	void demo_replay_server_messages_from(const demo_step&);
 
 	auto make_accumulator_input(const client_advance_input& in) {
 		auto accumulator_in = in.make_accumulator_input();
@@ -600,7 +600,7 @@ public:
 					return step.local_entropy ? *step.local_entropy : mode_entropy();
 				};
 
-				advance_single_step(in, callbacks, [&](){ handle_server_messages_from(step); }, local_entropy_provider);
+				advance_single_step(in, callbacks, [&](){ demo_replay_server_messages_from(step); }, local_entropy_provider);
 				return dt;
 			};
 
@@ -613,7 +613,7 @@ public:
 					return step.local_entropy ? *step.local_entropy : mode_entropy();
 				};
 
-				advance_single_step(in, solver_callbacks(), [&](){ handle_server_messages_from(step); }, local_entropy_provider);
+				advance_single_step(in, solver_callbacks(), [&](){ demo_replay_server_messages_from(step); }, local_entropy_provider);
 				needs_snap = true;
 				return dt;
 			};
