@@ -4,6 +4,7 @@
 #include "application/setups/server/public_settings_update.h"
 #include "augs/readwrite/to_bytes.h"
 #include "game/modes/mode_commands/match_command.h"
+#include "augs/window_framework/mouse_rel_bound.h"
 
 namespace net_messages {
 	template <class Stream, class V>
@@ -262,4 +263,245 @@ namespace net_messages {
 		return result;
 	}
 
+	template <class Stream>
+	bool serialize(Stream& s, total_mode_player_entropy& payload) {
+		auto& m = payload.mode;
+		auto& c = payload.cosmic;
+
+		auto get_motion = [&]() -> auto& {
+			return c.motions[game_motion_type::MOVE_CROSSHAIR];
+		};
+
+		bool has_mode_command = logically_set(m);
+
+		bool has_cast_spell = logically_set(c.cast_spell);
+		bool has_wield = logically_set(c.wield);
+		bool has_intents = logically_set(c.intents);
+		bool has_motions = logically_set(c.motions);
+		bool has_transfer = logically_set(c.transfer);
+
+		auto one_byte_pred = [&](const auto& coord) {
+			return coord >= -7 && coord <= 8;
+		};
+
+		auto two_byte_pred = [&](const auto& coord) {
+			return coord >= -127 && coord <= 128;
+		};
+
+		bool motion_writable_in_one_byte = has_motions && one_byte_pred(get_motion().x) && one_byte_pred(get_motion().y);
+		bool motion_writable_in_two_bytes = has_motions && two_byte_pred(get_motion().x) && two_byte_pred(get_motion().y);
+
+		serialize_bool(s, has_mode_command);
+		serialize_bool(s, has_cast_spell);
+		serialize_bool(s, has_wield);
+		serialize_bool(s, has_intents);
+		serialize_bool(s, has_motions);
+		serialize_bool(s, has_transfer);
+
+		serialize_bool(s, motion_writable_in_one_byte);
+		serialize_bool(s, motion_writable_in_two_bytes);
+
+		if (has_mode_command) {
+			if (!serialize(s, m)) {
+				return false;
+			}
+		}
+
+		if (has_cast_spell) {
+			if (!serialize_trivial_as_bytes(s, c.cast_spell)) {
+				return false;
+			}
+		}
+
+		if (has_wield) {
+			if (!serialize(s, c.wield)) {
+				return false;
+			}
+		}
+
+		if (has_intents) {
+			auto& ints = c.intents;
+			auto num_intents = static_cast<uint8_t>(ints.size());
+
+			/*
+				6 bits for the number of intents
+
+				1 bit for whether it was pressed or released
+				currently 5 bits for the intent id
+
+				= ~6 bits per intent
+			*/
+
+			serialize_int(s, num_intents, 1, 64);
+
+			if (Stream::IsReading) {
+				ints.resize(num_intents);
+			}
+
+			static_assert(int(game_intent_type::COUNT) < 128);
+
+			for (auto& i : ints) {
+				auto pressed = i.change == intent_change::PRESSED;
+				auto intent = int(i.intent);
+
+				serialize_bool(s, pressed);
+				serialize_int(s, intent, 0, int(game_intent_type::COUNT) - 1);
+
+				i.change = pressed ? intent_change::PRESSED : intent_change::RELEASED;
+				i.intent = static_cast<game_intent_type>(intent);
+			}
+
+			serialize_align(s);
+		}
+
+		if (has_motions) {
+			static_assert(int(game_motion_type::COUNT) == 1);
+
+			const auto pos_before = s.GetBytesProcessed();
+
+			int min_bound = 0;
+			int max_bound = 0;
+
+			if (motion_writable_in_one_byte) {
+				min_bound = -7;
+				max_bound = 8;
+			}
+			else if (motion_writable_in_two_bytes) {
+				min_bound = -127;
+				max_bound = 128;
+			}
+			else {
+				min_bound = mouse_rel_min_v;
+				max_bound = mouse_rel_max_v;
+			}
+
+			const auto offset = -min_bound;
+
+			const auto min_io_bound = 0;
+			const auto max_io_bound = max_bound + offset;
+
+			if (Stream::IsReading) {
+				auto& mot = get_motion();
+
+				serialize_int(s, mot.x, min_io_bound, max_io_bound);
+				serialize_int(s, mot.y, min_io_bound, max_io_bound);
+
+				mot.x -= offset;
+				mot.y -= offset;
+			}
+			else {
+				auto mot = get_motion();
+
+				mot.x += offset;
+				mot.y += offset;
+
+				serialize_int(s, mot.x, min_io_bound, max_io_bound);
+				serialize_int(s, mot.y, min_io_bound, max_io_bound);
+			}
+
+			{
+				const auto pos_after = s.GetBytesProcessed();
+
+				if (motion_writable_in_one_byte) {
+					ensure_eq(1, pos_after - pos_before);
+				}
+				else if (motion_writable_in_two_bytes) {
+					ensure_eq(2, pos_after - pos_before);
+				}
+				else {
+					ensure_eq(3, pos_after - pos_before);
+				}
+			}
+		}
+
+		if (has_transfer) {
+			if (!serialize_trivial_as_bytes(s, c.transfer)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, ::networked_server_step_entropy& total_networked) {
+		auto& i = total_networked.payload;
+		auto& g = i.general;
+
+#if !CONTEXTS_SEPARATE
+		if (!serialize(s, total_networked.context)) {
+			return false;
+		}
+#endif
+
+		auto& state_hash = total_networked.meta.state_hash;
+		bool has_state_hash = logically_set(state_hash);
+
+		bool has_players = logically_set(i.players);
+		bool has_added_player = logically_set(g.added_player);
+		bool has_removed_player = logically_set(g.removed_player);
+		bool has_special_command = logically_set(g.special_command);
+
+		serialize_bool(s, has_state_hash);
+		serialize_bool(s, has_players);
+		serialize_bool(s, has_added_player);
+		serialize_bool(s, has_removed_player);
+		serialize_bool(s, has_special_command);
+
+		serialize_bool(s, total_networked.meta.reinference_necessary);
+
+		serialize_align(s);
+
+		if (has_state_hash) {
+			if (state_hash == std::nullopt) {
+				state_hash.emplace();
+			}
+
+			serialize_uint32(s, *state_hash);
+		}
+		else {
+			state_hash = std::nullopt;
+		}
+
+		if (has_players) {
+			auto& p = i.players;
+			auto cnt = static_cast<int>(p.size());
+
+			serialize_int(s, cnt, 1, max_mode_players_v);
+
+			if (Stream::IsReading) {
+				p.resize(cnt);
+			}
+
+			for (auto& pp : p) {
+				if (!serialize(s, pp.player_id)) {
+					return false;
+				}
+
+				if (!serialize(s, pp.total)) {
+					return false;
+				}
+			}
+		}
+
+		if (has_added_player) {
+			if (!serialize(s, g.added_player)) {
+				return false;
+			}
+		}
+
+		if (has_removed_player) {
+			if (!serialize(s, g.removed_player)) {
+				return false;
+			}
+		}
+
+		if (has_special_command) {
+			if (!serialize(s, g.special_command)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

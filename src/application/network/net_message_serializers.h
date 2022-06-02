@@ -1,6 +1,16 @@
 #pragma once
 #include "application/network/net_serialization_helpers.h"
 
+template <class P>
+template <typename Stream>
+bool net_message_with_payload<P>::Serialize(Stream& stream) {
+	if (!net_messages::serialize(stream, payload)) {
+		return false;
+	}
+
+	return true;
+}
+
 namespace net_messages {
 #if CONTEXTS_SEPARATE
 	template <typename Stream>

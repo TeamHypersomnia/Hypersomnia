@@ -105,6 +105,30 @@ using preserialized_message_type_for_t = typename preserialized_message_type_for
 using message_bytes_type = augs::constant_size_vector<std::byte, max_message_size_v>;
 using default_preserialized_message = preserialized_message_type_for_t<message_bytes_type>;
 
+template <class P>
+struct net_message_with_payload : yojimbo::Message {
+	P payload;
+
+	template <typename Stream>
+	bool Serialize(Stream& stream);
+
+	inline bool read_payload(
+		P& output
+	) {
+		output = std::move(payload);
+		return true;
+	}
+
+	inline bool write_payload(
+		const P& input
+	) {
+		payload = input;
+		return true;
+	}
+
+	YOJIMBO_MESSAGE_BOILERPLATE();
+};
+
 struct only_block_message : public yojimbo::BlockMessage {
 	static constexpr bool server_to_client = true;
 	static constexpr bool client_to_server = false;
@@ -219,20 +243,14 @@ namespace net_messages {
 	};
 #endif
 
-	struct server_step_entropy : default_preserialized_message {
+	struct server_step_entropy : net_message_with_payload<networked_server_step_entropy> {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
-
-		bool write_payload(::networked_server_step_entropy&);
-		bool read_payload(::networked_server_step_entropy&);
 	};
 
-	struct client_entropy : default_preserialized_message {
+	struct client_entropy : net_message_with_payload<total_client_entropy> {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
-
-		bool write_payload(total_client_entropy&);
-		bool read_payload(total_client_entropy&);
 	};
 
 	struct rcon_command : public yojimbo::Message {

@@ -2228,6 +2228,9 @@ const netcode_socket_t* server_setup::find_underlying_socket() const {
 
 #include "augs/readwrite/to_bytes.h"
 
+// TODO: rewrite unit tests to use streams since we're no longer using preserialized_message 
+
+#undef BUILD_UNIT_TESTS
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
 #include "augs/misc/lua/lua_utils.h"
