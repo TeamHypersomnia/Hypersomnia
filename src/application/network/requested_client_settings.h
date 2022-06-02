@@ -14,6 +14,14 @@ struct public_client_settings {
 
 using rcon_password_type = augs::constant_size_string<max_rcon_password_length_v>;
 
+/* 
+	NOTE: this struct, as well as many other important network structs,
+   	is serialized manually in net_serialize.h!!!
+
+	It's not enough to just add fields here.
+	You have to apply properties in client_setup::apply as well as in the relevant network serialize function.
+*/
+
 struct requested_client_settings {
 	static constexpr bool force_read_field_by_field = true;
 

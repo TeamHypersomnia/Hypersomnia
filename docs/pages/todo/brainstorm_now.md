@@ -9,21 +9,9 @@ summary: That which we are brainstorming at the moment.
 - masterserver -> serverlist maybe
 
 - libcrypto.dll is missing on Windows if there's no OpenSSH installed
-- check code_escaped_nick for \`
-- jeszcze hook na nowy serv
+- test code_escaped_nick against \`
 
-- Let's be sure those webhooks work after changing the map
-
-- NAT wasn't working with setup:
-	- client = Cone
-	- server = symmetric with random increments
-		- actually.. given random increments it is impossible to do without traversing the entire range by the conic side
-		- with normal symmetric the conic side would just brute it and be very likely to succeed on this or the next session
-		- so our traversal works as intended for now
-		- we could try tomorrow with more sent packets
-			- i.e. with more settings.num_brute_force_packets
-
-- Balance szturm, either way more expensive or less velocity
+- Balance datum, either way more expensive or less velocity
 	- it's way more powerful than e.g. szturm
 
 - A centered popup with the after-update message

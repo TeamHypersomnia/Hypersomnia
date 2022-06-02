@@ -292,6 +292,7 @@ namespace net_messages {
 		serialize_uint32(stream, payload.net.jitter.buffer_at_least_steps);
 		serialize_uint32(stream, payload.net.jitter.buffer_at_least_ms);
 		serialize_int(stream, payload.net.jitter.max_commands_to_squash_at_once, 0, 255);
+		serialize_bool(stream, payload.suppress_webhooks);
 
 		return true;
 	}

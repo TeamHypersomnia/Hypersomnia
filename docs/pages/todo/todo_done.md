@@ -4611,3 +4611,16 @@ Advantages:
 	- and anyways why would the client send all the rcon vars at the start?
 		- he doesn't; it's actually because of a server sending and crashing itself
 
+- jeszcze hook na nowy serv
+
+- Let's be sure those webhooks work after changing the map
+
+- NAT wasn't working with setup:
+	- client = Cone
+	- server = symmetric with random increments
+		- actually.. given random increments it is impossible to do without traversing the entire range by the conic side
+		- with normal symmetric the conic side would just brute it and be very likely to succeed on this or the next session
+		- so our traversal works as intended for now
+		- we could try tomorrow with more sent packets
+			- i.e. with more settings.num_brute_force_packets
+
