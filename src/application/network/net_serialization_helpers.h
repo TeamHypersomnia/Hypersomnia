@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/log.h"
 #include "augs/readwrite/byte_readwrite_traits.h"
+#include "augs/readwrite/byte_readwrite.h"
 #include "application/setups/server/public_settings_update.h"
 #include "augs/readwrite/to_bytes.h"
 #include "game/modes/mode_commands/match_command.h"
@@ -261,6 +262,51 @@ namespace net_messages {
 		);
 
 		return result;
+	}
+
+	template <typename Stream>
+	bool serialize(Stream& stream, ::special_client_request& payload) {
+		if (!serialize_enum(stream, payload)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	template <typename Stream>
+	bool serialize(Stream& stream, ::requested_client_settings& payload) {
+		{
+			if (!serialize_fixed_size_str(stream, payload.chosen_nickname)) {
+				return false;
+			}
+
+			if (!serialize_fixed_size_str(stream, payload.rcon_password)) {
+				return false;
+			}
+		}
+
+		if (!serialize(stream, payload.public_settings)) {
+			return false;
+		}
+
+		serialize_uint32(stream, payload.net.jitter.buffer_at_least_steps);
+		serialize_uint32(stream, payload.net.jitter.buffer_at_least_ms);
+		serialize_int(stream, payload.net.jitter.max_commands_to_squash_at_once, 0, 255);
+
+		return true;
+	}
+
+	template <typename Stream>
+	bool serialize(Stream& stream, ::public_settings_update& payload) {
+		if (!serialize(stream, payload.subject_id)) {
+			return false;
+		}
+
+		if (!serialize(stream, payload.new_settings)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	template <class Stream>

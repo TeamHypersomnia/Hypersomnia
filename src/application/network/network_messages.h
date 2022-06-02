@@ -16,6 +16,7 @@
 #include "game/common_state/entity_flavours.h"
 #include "application/setups/server/public_settings_update.h"
 #include "game/modes/session_id.h"
+#include "application/network/net_serialization_helpers.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -110,7 +111,13 @@ struct net_message_with_payload : yojimbo::Message {
 	P payload;
 
 	template <typename Stream>
-	bool Serialize(Stream& stream);
+	bool Serialize(Stream& stream) {
+		if (!net_messages::serialize(stream, payload)) {
+			return false;
+		}
+
+		return true;
+	}
 
 	inline bool read_payload(
 		P& output
@@ -146,49 +153,33 @@ template <bool C>
 struct initial_arena_state_payload;
 
 namespace net_messages {
-	struct client_welcome : public yojimbo::Message {
+	struct client_welcome : net_message_with_payload<requested_client_settings> {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
-
-		requested_client_settings payload;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream);
-
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
-		bool write_payload(const requested_client_settings&);
-		bool read_payload(requested_client_settings&);
 	};
 
-	struct public_settings_update : public yojimbo::Message {
+	struct public_settings_update : net_message_with_payload<::public_settings_update> {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
-
-		::public_settings_update payload;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream);
-
-		bool write_payload(const ::public_settings_update&);
-		bool read_payload(::public_settings_update&);
-
-		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
-	struct special_client_request : public yojimbo::Message {
+	//struct initial_steps_correction : only_block_message {};
+
+#if CONTEXTS_SEPARATE
+	struct prestep_client_context : net_message_with_payload<::prestep_client_context> {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+	};
+#endif
+
+	struct server_step_entropy : net_message_with_payload<networked_server_step_entropy> {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+	};
+
+	struct client_entropy : net_message_with_payload<total_client_entropy> {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream);
-
-		::special_client_request payload;
-
-		bool write_payload(const ::special_client_request&);
-		bool read_payload(::special_client_request&);
-
-		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
 	struct new_server_solvable_vars : preserialized_message_type_for_t<server_solvable_vars> {
@@ -207,6 +198,31 @@ namespace net_messages {
 		bool read_payload(server_vars&);
 	};
 
+	struct special_client_request : net_message_with_payload<::special_client_request> {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+	};
+
+	struct rcon_command : net_message_with_payload<::rcon_command_variant> {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+	};
+
+	struct client_requested_chat : net_message_with_payload<::client_requested_chat> {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+	};
+
+	struct server_broadcasted_chat : net_message_with_payload<::server_broadcasted_chat> {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+	};
+
+	struct net_statistics_update : net_message_with_payload<::net_statistics_update> {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+	};
+
 	struct initial_arena_state : only_block_message {
 		bool read_payload(
 			augs::serialization_buffers&,
@@ -222,95 +238,6 @@ namespace net_messages {
 			const all_entity_flavours& all_flavours,
 			initial_arena_state_payload<true>
 		);
-	};
-
-	//struct initial_steps_correction : only_block_message {};
-
-#if CONTEXTS_SEPARATE
-	struct prestep_client_context : yojimbo::Message {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-
-		::prestep_client_context payload;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream);
-
-		bool write_payload(const ::prestep_client_context&);
-		bool read_payload(::prestep_client_context&);
-
-		YOJIMBO_MESSAGE_BOILERPLATE();
-	};
-#endif
-
-	struct server_step_entropy : net_message_with_payload<networked_server_step_entropy> {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-	};
-
-	struct client_entropy : net_message_with_payload<total_client_entropy> {
-		static constexpr bool server_to_client = false;
-		static constexpr bool client_to_server = true;
-	};
-
-	struct rcon_command : public yojimbo::Message {
-		static constexpr bool server_to_client = false;
-		static constexpr bool client_to_server = true;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream);
-
-		::rcon_command_variant payload;
-
-		bool write_payload(const ::rcon_command_variant&);
-		bool read_payload(::rcon_command_variant&);
-
-		YOJIMBO_MESSAGE_BOILERPLATE();
-	};
-
-	struct client_requested_chat : public yojimbo::Message {
-		static constexpr bool server_to_client = false;
-		static constexpr bool client_to_server = true;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream);
-
-		::client_requested_chat payload;
-
-		bool write_payload(const ::client_requested_chat&);
-		bool read_payload(::client_requested_chat&);
-
-		YOJIMBO_MESSAGE_BOILERPLATE();
-	};
-
-	struct server_broadcasted_chat : public yojimbo::Message {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream);
-
-		::server_broadcasted_chat payload;
-
-		bool write_payload(const ::server_broadcasted_chat&);
-		bool read_payload(::server_broadcasted_chat&);
-
-		YOJIMBO_MESSAGE_BOILERPLATE();
-	};
-
-	struct net_statistics_update : public yojimbo::Message {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream);
-
-		::net_statistics_update payload;
-
-		bool write_payload(const ::net_statistics_update&);
-		bool read_payload(::net_statistics_update&);
-
-		YOJIMBO_MESSAGE_BOILERPLATE();
 	};
 
 	struct player_avatar_exchange : only_block_message {

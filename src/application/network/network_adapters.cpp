@@ -704,11 +704,3 @@ const netcode_socket_t* server_adapter::find_underlying_socket() const {
 
 	return nullptr;
 }
-
-#define INSTANTIATE_FOR(name) \
-template bool net_message_with_payload<name>::Serialize<yojimbo::MeasureStream>(yojimbo::MeasureStream&);\
-template bool net_message_with_payload<name>::Serialize<yojimbo::ReadStream>(yojimbo::ReadStream&); \
-template bool net_message_with_payload<name>::Serialize<yojimbo::WriteStream>(yojimbo::WriteStream&);
-
-INSTANTIATE_FOR(total_mode_player_entropy)
-INSTANTIATE_FOR(networked_server_step_entropy)
