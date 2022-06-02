@@ -4,7 +4,7 @@
 #include "augs/misc/compress.h"
 #include "augs/misc/readable_bytesize.h"
 #include "augs/templates/logically_empty.h"
-#include "application/network/net_serialization_helpers.h"
+#include "application/network/net_serialize.h"
 #include "application/network/net_solvable_stream.h"
 
 template <bool C>

@@ -6,7 +6,7 @@
 #include "augs/readwrite/memory_stream.h"
 #include "hypersomnia_version.h"
 
-#include "application/network/net_message_serializers.h"
+#include "application/network/net_serialize.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.c"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/templates/thread_templates.h"

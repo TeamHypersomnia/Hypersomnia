@@ -14,7 +14,7 @@
 #include "application/arena/arena_paths.h"
 
 #include "application/network/net_message_translation.h"
-#include "application/network/net_message_serializers.h"
+#include "application/network/net_serialize.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"

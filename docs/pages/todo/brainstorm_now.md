@@ -8,11 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 - masterserver -> serverlist maybe
 
-- rcon messages should be send via blocks because they can easily exceed the max packet size!!!
-	- This causes a crash when connecting to the server
-	- and anyways why would the client send all the rcon vars at the start?
-		- he doesn't; it's actually because of a server sending and crashing itself
-
 - libcrypto.dll is missing on Windows if there's no OpenSSH installed
 - check code_escaped_nick for \`
 - jeszcze hook na nowy serv

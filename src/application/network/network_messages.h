@@ -16,7 +16,7 @@
 #include "game/common_state/entity_flavours.h"
 #include "application/setups/server/public_settings_update.h"
 #include "game/modes/session_id.h"
-#include "application/network/net_serialization_helpers.h"
+#include "application/network/net_serialize.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 

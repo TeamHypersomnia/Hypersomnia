@@ -4,6 +4,9 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- later rcon messages and server vars generally could be sent via blocks
+	- but this works well enough with low packet loss
+
 - z jakiegos powodu nie pokazuje used lokacji dla flavorow w legacy editorze
 
 - Automate version bumping (write it in one place instead of three)

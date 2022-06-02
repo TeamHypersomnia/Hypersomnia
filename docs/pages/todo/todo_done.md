@@ -4593,7 +4593,7 @@ Advantages:
 		- then shouldn't unsafe_read_message at least check for exceptions?
 			- it probably should as it might come from an untrusted source
 			- otherwise, for development reasons, write and read are symmetric so the write will crash first and warn us of a problem with oversized messages
-		- watch out for unsafe_serialize in net_serialization_helpers.h too!!!
+		- watch out for unsafe_serialize in net_serialize.h too!!!
 			- server actually reads the new server vars unsafely!!
 				- but wait.. this one is actually implemented in terms of std::vector
 				- so overflow shouldn't be a problem when sending vars to server, it's not as unsafe
@@ -4605,4 +4605,9 @@ Advantages:
 			- we should check if it's safe.
 
 - Check if the things using default_preserialized_messages are actually serialized correctly
+
+- rcon messages should be send via blocks because they can easily exceed the max packet size!!!
+	- This causes a crash when connecting to the server
+	- and anyways why would the client send all the rcon vars at the start?
+		- he doesn't; it's actually because of a server sending and crashing itself
 
