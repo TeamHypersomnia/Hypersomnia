@@ -6,6 +6,61 @@ permalink: masterplan
 summary: What we've already determined won't work.
 ---
 
+with project name being de_cyberaqua
+
+- .cache
+	- de_cyberaqua.autosave
+	- de_cyberaqua.history
+		- we can trivially have history with a single binary file holding everything
+- de_cyberaqua.arena
+- de_cyberaqua.arena.json (optional, only if once exported for compat)
+	- Can show inside file explorer, but instead of inspector, you have a hint what to do with this, when last saved and last exported version.
+- de
+
+	- z drugiej strony.. tych rzeczy do ignora jest malo
+	- a ktos kto mapke robi moze chciec zostawic dla potomnosci jakies nieuzywane obiekty?
+		- tylko ze one i tak nie beda signowane wtedy
+		- bez sensu, wysylamy tylko to co autor podpisuje faktycznie
+
+- mozemy trzymac w jsonie tak
+	- path = ["gfx", "some_folder", "to", "filename", "jpg"]
+		- You would have to worry about the path being too long anyways
+		- we only allow _abc...7890
+			- but the editor will have to enforce it somehow
+				- no prob, doable
+		- last is always extension and we can also check if it's one of the allowed ones for that file
+		- this is also good because we don't use slashes
+
+
+
+	- the about section I think might be separate for the purposes of quick browsing
+- But why not just keep a cache with binary for loading, save there directly, and always asynchronously save to json?
+	- Do we really care that much about folder structure?
+	- Well, it seems less error prone, but maybe it's illusory
+	- for one, somebody could close the game while it's still saving (with binary it's less probable) and the update would break the binary save
+	- when we rely exclusively on binary save it's less likely to happen, still, an extreme case
+	- we could even force the game not to close until the json save is written out
+		- in case of autosave too so it waits even if we have unsaved changes
+		- hmm, i dont know
+- Zero asynchroniczności na razie (procz autosave), prostota prostota
+
+- COMPATIBILITY/EXPORTING WORKFLOW
+	- Co ważne ten export for compatibility nie powinien już pytać o lokacje
+		- Po prostu F12 albo File->Export for compatibility tworzy od strzała project.arena.json
+	- Nic tu nie ma trudnego, po prostu jak bedziesz chciał wrzucić folder na serwis to serwis ci zwroci komunikat gdyby nie było jsona
+		- "Press F12 in your project to export json for compatibility with future versions of the game."
+	- Corner cases
+		- Jakby sie cos przy updatowaniu zwaliło
+			- Ale to jakos atomicznie mozna zrobic moze? 
+				- Czy moze to weryfikowac na koncu ze jest git? - nie kontynuowac dopoki nie 
+			- Mozna jeszcze zrobic ze przesuwamy binarny project.arena do project.arena-old zamiast nadpisywac
+				- albo zostawiac w jsonie
+		- Jakby ktos komus przyslal mapke z inna wersja
+			- Bo edytował długo i w miedzyczasie wyszedl update
+			- no to jest mega unlikely raczej
+
+
+
 - content/arenas/de_cyberaqua
 - user/arenas/de_cyberaqua
 - user/builder/de_cyberaqua

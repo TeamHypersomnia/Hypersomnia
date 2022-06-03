@@ -189,6 +189,11 @@ work_result work(const int argc, const char* const * const argv) try {
 #endif
 #endif
 
+#if IS_PRODUCTION_BUILD
+		result.client.suppress_webhooks = false;
+		result.server.suppress_new_community_server_webhook = false;
+#endif
+
 		/* Tweak performance defaults */
 
 		const auto concurrency = std::thread::hardware_concurrency();

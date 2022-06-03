@@ -361,27 +361,29 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::heartbeat>) {
-						auto it = server_list.try_emplace(from);
+						if (typed_request.is_valid()) {
+							auto it = server_list.try_emplace(from);
 
-						const bool is_new_server = it.second;
-						auto& server_entry = (*it.first).second;
+							const bool is_new_server = it.second;
+							auto& server_entry = (*it.first).second;
 
-						const auto heartbeat_before = server_entry.last_heartbeat;
-						server_entry.last_heartbeat = typed_request;
-						server_entry.time_of_last_heartbeat = current_time;
+							const auto heartbeat_before = server_entry.last_heartbeat;
+							server_entry.last_heartbeat = typed_request;
+							server_entry.time_of_last_heartbeat = current_time;
 
-						const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
+							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
 
-						if (is_new_server) {
-							if (!typed_request.suppress_new_community_server_webhook) {
-								push_new_server_webhook(from, typed_request);
+							if (is_new_server) {
+								if (!typed_request.suppress_new_community_server_webhook) {
+									push_new_server_webhook(from, typed_request);
+								}
 							}
-						}
 
-						MSR_LOG_NVPS(is_new_server, heartbeats_mismatch);
+							MSR_LOG_NVPS(is_new_server, heartbeats_mismatch);
 
-						if (is_new_server || heartbeats_mismatch) {
-							reserialize_list();
+							if (is_new_server || heartbeats_mismatch) {
+								reserialize_list();
+							}
 						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::tell_me_my_address>) {

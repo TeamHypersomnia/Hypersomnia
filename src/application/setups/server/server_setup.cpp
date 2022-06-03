@@ -79,8 +79,12 @@ void server_heartbeat::validate() {
 	}
 
 	if (current_arena.empty()) {
-		current_arena = "<unknown>";
+		current_arena = "NONE";
 	}
+}
+
+bool server_heartbeat::is_valid() const {
+	return max_online >= 2 && !server_name.empty() && !current_arena.empty();
 }
 
 template <class F>
@@ -454,6 +458,14 @@ uint32_t server_setup::get_max_connections() const {
 	return last_start.max_connections;
 }
 
+uint32_t server_setup::get_max_players() const {
+	if (is_integrated()) {
+		return 1 + get_max_connections();
+	}
+
+	return get_max_connections();
+}
+
 uint32_t server_setup::get_num_connected() const {
 	const auto& arena = get_arena_handle();
 
@@ -492,7 +504,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	);
 
 	heartbeat.suppress_new_community_server_webhook = vars.suppress_new_community_server_webhook;
-	heartbeat.max_online = last_start.max_connections;
+	heartbeat.max_online = get_max_players();
 	heartbeat.internal_network_address = internal_address;
 
 	heartbeat.num_online = get_num_connected();

@@ -8,6 +8,59 @@ summary: We need to set our priorities straight.
 
 # Builder
 
+Dobra:
+
+# Podsumowanie
+
+## Format danych
+
+- I/O DO JSONA; poki trwa zapisywanie w UI nie da sie nic zrobic.
+	- Tiled tez ma taki workflow że przy zapisywaniu z automatu reeksportuje do ostatnio exportowanej lokacji
+- promptujemy o zapisanie przy wyjsciu (inaczej ludzi bedzie zaskakiwalo)
+	- Save before closing?
+[Save] [Discard] [Cancel]
+
+## Organizacja plików projektu
+
+### Root
+
+- .cache (\_)
+	- project.json.lz4
+	- project.json.lz4.stamp
+- gfx (^)
+- sfx (^)
+- scripts (^)
+- project.json
+- project.old.json
+- project.tmp.json (\*)
+- project.autosave.json (\*)
+- project.resources.json (\_)
+
+(\*) - istniejace tylko podczas działania aplikacji; poza tym niewidoczne dla uzytkownika
+(\_) - zawsze bezpieczne do wywalenia bez utraty danych
+(^)  - pliki dostarczane przez użytkownika; edytor nic tam nie zapisuje
+
+### Role plików
+
+- gfx, sfx, scripts na start puste, wygenerowane automatycznie, to tylko dla użytkownika
+- .cache 
+	- project.json.lz4 - rekompresowane przez serwer na kazdy start
+	- project.json.lz4.stamp - timestamp pliku project.json na ktorym project.json.lz4 byl wygenerowany
+- project.json - plik sceny
+- Odzyskiwanie
+	- project.old.json - plik zapisany przed poprzednim
+	- istniejace tylko podczas dzialania aplikacji (czyli jak po zamknieciu widac to znaczy ze cos sie zjebalo)
+		- project.tmp.json - nowy pisany plik
+		- project.json.autosave
+		- Te dwa wbrew pozorom powinny być oddzielne
+			- Jeśli autosave jest nieaktualny i wywali nas przy pisaniu do niego nowego pliku, to tracimy wszystkie niezapisane zmiany
+	- Przy wczytywaniu projektu
+		- Najpierw sprawdzamy czy istnieje .tmp.json
+			- zawsze będzie aktualniejszy od autosave, bo jeśli istnieje, to znaczy że nas wywaliło zaraz przed końcem zapisywania 
+				- Choć to mało prawodpodobne
+		- Potem sprawdzamy czy istnieje .autosave
+			- 99% przypadków crasha
+		- Jeśli którykolwiek to nakładamy go jako nową zmianę
 ## Folder structure
 
 ### ALL PROJECTS
@@ -30,36 +83,136 @@ Ostatecznie:
 	- pytanie czy do user/community/arenas, czy user/arenas? Czy user/builder razem ze wszystkim?
 - Najbardziej jasne bedzie user/downloads/arenas, user/downloads/mods itp
 
-### ONE PROJECT
 
-with project name being de_cyberaqua
+- Przesyłanie mapy
+	- najpierw sanityzujemy nazwe mapy
+		- alfanumeryczna i <= 30 znakow (pełna nazwa mapy może być dłuższa)
+		- z tego na kliencie sobie derywujemy nazwy plików resources, json itp, sami dokładamy extensions
+			- nazwa może być dowolna
+	- Sciagamy najpierw mape, resources.json i sygnature, hashujemy mape i resources i sprawdzamy przeciwko sygnaturze
+	- jak git to sanityzujemy sciezki i zaciągamy pliki:
+		- Path sanitization
+			- mapa: 
+			- secure_read_resources
+				- po weryfikacji sygnatury wczytujemy sciagniety plik project.resources.json
+				- 
 
-- .cache
-	- de_cyberaqua.autosave
-	- de_cyberaqua.history
-		- we can trivially have history with a single binary file holding everything
-- de_cyberaqua.arena
-- de_cyberaqua.arena.json (optional, only if once exported for compat)
-	- Can show inside file explorer, but instead of inspector, you have a hint what to do with this, when last saved and last exported version.
-- de
-	- the about section I think might be separate for the purposes of quick browsing
 
-## Format danych
+	- autosave leci do .cache co 2 min i co zejscie z aktywnego okienka
+- To nie jest sublime text!!! To ma byc standard do ktorego wszyscy sa przyzwyczajeni
+- nazwa mapy musi byc alphanumeric_
 
-- COMPATIBILITY/EXPORTING WORKFLOW
-	- Co ważne ten export for compatibility nie powinien już pytać o lokacje
-		- Po prostu F12 albo File->Export for compatibility tworzy od strzała project.arena.json
-	- Nic tu nie ma trudnego, po prostu jak bedziesz chciał wrzucić folder na serwis to serwis ci zwroci komunikat gdyby nie było jsona
-		- "Press F12 in your project to export json for compatibility with future versions of the game."
-	- Corner cases
-		- Jakby sie cos przy updatowaniu zwaliło
-			- Ale to jakos atomicznie mozna zrobic moze? 
-				- Czy moze to weryfikowac na koncu ze jest git? - nie kontynuowac dopoki nie 
-			- Mozna jeszcze zrobic ze przesuwamy binarny project.arena do project.arena-old zamiast nadpisywac
-				- albo zostawiac w jsonie
-		- Jakby ktos komus przyslal mapke z inna wersja
-			- Bo edytował długo i w miedzyczasie wyszedl update
-			- no to jest mega unlikely raczej
+- Also i tak chcemy konwencje filenamow zachowac alfanumeryczna nawet nie tylko ze wzgledu bezpieczenstwa ale portowalnosci na inne systemy 
+
+- Ogólnie ściąganie i tak nie będzie piękne bo najpierw trzeba będzie poprosić o sygnaturę
+	- Choć to głównie przy updatowaniu
+		- Np. Sprawdzić czy nie jest zrevokowany key jakiś
+	- Więc Najpierw ściągasz resources file
+		- Najpierw tworzysz wszystkie foldery od razu żeby symlinków potem nie dało sie zrobić
+	
+- Autor signuje tylko mape i resources
+	- jakby signowal same hashe w jsonie to nie signowałby sciezek a to niefajnie raczej
+- W ogole przy updacie jak bede mial hashe w project.resources.json to trywialnie mozna zrobic zaciaganie tylko nowych/zmienionych 
+
+- Path sanitization
+	- w jsonie moga byc roznie dziwne sciezki wpisane do wczytania
+	- i jak ktos przysyla plik to tez moze glupoty wpisac w filename
+	- najbezpieczniej byloby przeslac cale jako archiwum a w jsonie poslugiwac sie guidami ale znowusz tak nie robimy
+	- https://snyk.io/blog/exploring-3-types-of-directory-traversal-vulnerabilities-in-c-c/
+	- https://portswigger.net/web-security/file-path-traversal
+		- wystarczy chyba to co pisza na koncu i tyle
+	- https://stackoverflow.com/questions/55610499/can-filesystemcanonical-be-used-to-prevent-filepath-injection-for-filepaths-pa
+	- https://gamedev.net/forums/topic/334548-file-automatic-download-security/334548/
+		- a czy nie moglibysmy dla czytelnosci w jsonie normalnie do wersjonowania trzymac "gfx/some_folder/to"?
+			- mozna tak samo sparsowac to przeciez na podstawie '/' i potem sprawdzic czy tylko alfanumeryczne
+				- na poczatku jeszcze moze byc slash...
+				- ok ale manualnie konstruujemy sciezke z samych alfanumerycznych komponentow
+		- aha tylko co z symlinkami
+			- ktos by se mogl stworzyc binarny symlink i potem ustawic jego jako docelowy folder
+		- mozna niby sprawdzac czy sciezka nie ma tego co sciagnelismy ale eh
+	- chyba ze std::filesystem::canonical i spokoj?
+	- Obczaj że to jest jeszcze pół biedy bo my tu `piszemy` a nie czytamy więc najgorsze co sie stanie to sie wjebie do jakiegoś folderu dziwnego
+		- bez roota/admina i tak nie narobi
+		- i nic nie nadpisze bo zawsze bedziemy sprawdzać czy istnieje plik wcześniej
+
+- secure_send_resources
+	- Dobra ale to możemy wysłać po prostu jeden string z max size 256 żeby netcode był łatwiejszy
+		- i zrobić na nim strtok albo std::view::split 
+			- niewazne czy to dobrze zadziała bo i tak zweryfikujemy porzadnie wektor z rezultatami, tam kazdy musi byc alfanumeryczny i tyle
+		- no extension jeszcze mozna oddzielnie
+		- ok w kazdym razie do zrobienia bo najwazniejsze ze ustalamy konwencje
+		- i i tak jeszcze ostatnia linia obrony to bedzie ten absolute file path
+
+	- W jednym miejscu resolvujemy już wszystkie ścieżki do plików żeby nie było zaskoczeń
+	- po prostu przez sieć leci plik project.resources.json przetłumaczony do bezpiecznej struktury
+		- dosłownie wektor alfa_numerycznych wyrazów
+			- taką konwencję robimy i chuj
+	- Wtedy przed wysłaniem jsona konwertujemy go tak żeby wszystkie ścieżki zawierały hashe
+		- albo niekoniecznie, możemy sobie potem bezpiecznie mapować
+		- jeśli ścieżka jest taka jak być powinna to 1:1 deterministycznie się odtworzy z builder_secure_resources
+			- wtedy to co w jsonie jest posłuży jako string do mapowania z tym co jest w resources json
+	- taki resources json nawet jest dobrą czytelną specyfikacją tego co potrzebuje mapa
+
+
+- Note that if we hash files and keep them in the json, we need to re-save that json... so that it holds regenerated hashes
+	- it sucks a bit and complicates workflow
+	- ACTUALLY we can keep those in a separate file! For which there is no history or anything like that
+	- project.resources.json
+
+
+
+- No i dobra co sie dzieje jak historii nie mamy i autosave wczytamy czyli to co niezapisane było
+	- ctrl z cofa do ostatnio zapisanej wersji?
+	- a teraz jak nie zapiszemy to co?
+		- no to nic, po wczytaniu juz nie bedzie dostepny ten autosave wtedy
+
+		
+
+- .cache generalnie powinien byc safe do wyjebania wiec moze autosave trzymajmy obok i ignorujmy?
+	- no dobra tylko ze historia tez teoretyczni nie jest safe do wyjebki
+	- chyba ze historii nie zapisujemy? 
+		- chyba bym nie zapisywal bo:
+			- po updejcie nagle i tak sie rozpierdoli a jak bysmy zapisywali w jsonie to bylaby mega ogromna
+			- o tyle szybszy bedzie zapis a historia sie bedzie rozrastac mocno
+
+- za to sam autosave mozna zapisywac w .lz4 bezprzypalowo
+
+- Server na start kompiluje wszystkie mapy do cache/project.9.lz4
+	- Na startupie komunikat: Compressing CUSTOM maps for transmission...
+		- no oficjalnych nie bedzie musial bo wszyscy maja
+	- A skad wie ze trzeba skompresowac? No normalnie stampy tak samo jak w cache/ to dziala klasycznie
+
+- Okazuje sie ze zhashowanie wszystkich plikow i zapisywanie hashy w jsonie bedzie calkiem przydatne
+	+ Gdyby hashować wszystkie resourcy w jsonie to potem nie trzeba będzie hashować całego folderu żeby sprawdzić czy sygnatura jest git
+	+ Łatwiej edytorowi potem rozpoznac jakby zmienila sie nazwa pliku gdzie on sie znajduje i zaproponowac redirecta
+	- Gitara bo nawet mamy blake2/sha256 w libsodium a to juz mamy
+		- albo nawet to: https://github.com/BLAKE3-team/BLAKE3/tree/master/c
+			- duzo okejek ma i latwo zbudowac bedzie takze lajt
+			- najlepiej od razu bedzie to wziac
+	- Teraz czy tak samo robimy dla specjalnych plików np. z efektami?
+		- Czy w ogóle trzymamy je oddzielnie jako pliki?
+			- Myśle że nie i pokażemy je po prostu w UI jakoś ładnie jako specjalne obiekty które się nie zaliczają ani do gfx ani do sfx
+			- a w filesystemie rzeczy tylko z konieczności
+			- niech siedzi w tym jednym pliku wszystko co jest potrzebne do deterministycznej integralności mapy (to sie jeszcze przyda)
+		- no skrypty i tak by pasowało chyba w oddzielnych plikach
+			- bo przeciez jakos trzeba je edytowac w sensownym edytorze
+		- ale to tylko skrypty bo one sa zewnetrznie edytowane
+		- czyli nic za zapisywanie czego jest odpowiedzialny edytor bym nie zapisywal w oddzielnych plikach dla prostoty
+			- latwiej bedzie tez zrobic safe writing of files z tym replacem i bakiem
+	
+	- chlopie sciezka moze byc nawet dluzsza wiec taki hash to nic rozmiarowo
+
+- Na dysk bym zapisywal w json normalnie bez lz4 dla latwosci wersjonowania i obrobki
+- Serwer moze na start asynchronicznie skompresowac mape w lz4 z -9
+- Przy przesyłaniu mapy serwer->klient bedziemy rozstrzygali na podstawie rozszerzenia czy idzie skompresowane w lz4
+	- I to nawet bez wzgledu na to czy binaryzujemy mape przed wyslaniem
+
+- Note: mozemy chciec przesylac przez neta jednak jsony zamiast binarnych wersji bo:
+	- jak zweryfikujemy sygnature gdy bedziemy aktualizowali mapke ze to jest tego samego kolesia?
+		- serializacja musialaby byc w pelni deterministyczna co do bita a tego nie jestesmy w stanie zagwarantowac przy floatach
+	- jak ktos bedzie chcial modowac gierke i zmienic abi to przypał jak sie bedzie laczyl
+		
+
 
 
 - Uważam że lepiej optymalizować na to co będziemy robić 99% czasu a nie na 1% corner casów
@@ -69,6 +222,7 @@ with project name being de_cyberaqua
 	- Tylko jak bardzo error prone bedzie recompile przy upgradach?
 		- Musimy zdekompilowac wszystko jak wykryjemy nowa wersje i powrzucac do cache
 		- "Exporting user and community arenas for the next version..."
+- Nie: tu akurat bardziej wazna jest super intuicyjna prostota niz jakas turbo wydajnosc bo mapki na start beda bardzo male
 
 - Wydaje mi się też że przy exporcie powinien być jeden json i już olać to bawienie się w jsony sąsiadujące z pngami
 	- Łatwiejsza logistyka
@@ -599,4 +753,9 @@ We might need incremental update procedures.
 Perhaps we won't do this with just a simple find/replace (or it might affect the string),
 but with some yaml node traversal logic so that only keys are affected.
 - Anyways, this is for later! Once we actually have lots of community maps.
+
+## Przesyłanie map
+
+Trzeba będzie wstrzymać przesyłanie solvable streama i uważać czy nas nie wywali od nieaktywności przez ten czas
+Dopiero jak odbierzemy to wtedy server od razu wysyła initial solvable state aktualny
 

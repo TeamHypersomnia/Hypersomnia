@@ -523,6 +523,8 @@ public:
 	const netcode_socket_t* find_underlying_socket() const;
 
 	uint32_t get_max_connections() const;
+	uint32_t get_max_players() const;
+
 	uint32_t get_num_connected() const;
 	uint32_t get_num_active_players() const;
 

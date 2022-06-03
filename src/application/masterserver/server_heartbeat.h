@@ -28,6 +28,7 @@ struct server_heartbeat {
 	bool operator==(const server_heartbeat&) const = default;
 
 	void validate();
+	bool is_valid() const;
 
 	bool is_behind_nat() const {
 		return nat.type != nat_type::PUBLIC_INTERNET;
