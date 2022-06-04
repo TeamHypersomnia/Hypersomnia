@@ -6,152 +6,246 @@ permalink: masterplan
 summary: We need to set our priorities straight.
 ---
 
-# Builder
-
-Dobra:
-
 # Podsumowanie
 
 ## Format danych
 
-- I/O DO JSONA; poki trwa zapisywanie w UI nie da sie nic zrobic.
+- I/O SCENY CAŁKOWICIE DO JSONA.
+	- Póki trwa zapisywanie, w interfejsie nie da się nic zrobic.
+		- To i tak powinien być ułamek sekundy przy tej skali.
 	- Tiled tez ma taki workflow że przy zapisywaniu z automatu reeksportuje do ostatnio exportowanej lokacji
-- promptujemy o zapisanie przy wyjsciu (inaczej ludzi bedzie zaskakiwalo)
+- Jedyne co będzie binarne to skompresowane wersje jsonów, w folderach .cache, dla przesyłania przez sieć.
+- Nie bawimy się w binarki bezpośrednie na razie, nie ta skala. A bardziej oczywiste jest zachowywanie kompatybilności.
+
+## UI zapisywania i odzyskiwania, ogólnie persystencji
+
+- Promptujemy o zapisanie przy wyjsciu (inaczej ludzi bedzie zaskakiwalo)
 	- Save before closing?
 [Save] [Discard] [Cancel]
+- Edytor panuje tylko nad jednym plikiem. Jeden save zapisuje wszystkie zmiany do sceny i wszystkich prefabów itp.
 
 ## Organizacja plików projektu
+
+### Konwencja nazw folderów i plików
+
+Tylko alfanumeryczne z _
+- Nie tylko ze wzgledu bezpieczenstwa ale portowalności na inne systemy 
+- Maksymalna ścieżka: 256
+- To wszystko będzie sprawdzane przez edytor i wywalało błąd podczas edytowania
+	- Please rename and/or move the following files:
 
 ### Root
 
 - .cache (\_)
 	- project.json.lz4
 	- project.json.lz4.stamp
+	- resource_hashes.bin
 - gfx (^)
 - sfx (^)
 - scripts (^)
 - project.json
+	- bez project.about.json osobno; to info będzie w środku na samym samym początku
+	- i tak musimy mieć osobno prefabs = {} i objects = {} więc about = {} nie wprowadzi nam dodatkowej indentacji
 - project.old.json
 - project.tmp.json (\*)
 - project.autosave.json (\*)
-- project.resources.json (\_)
+- project.signature (\_)
 
 (\*) - istniejace tylko podczas działania aplikacji; poza tym niewidoczne dla uzytkownika
 (\_) - zawsze bezpieczne do wywalenia bez utraty danych
+	- caveat: project.signature może być bezstratnie wywalony u twórcy, ale nie u tego kto ściągnął
+		- potem by nie bylo jak zaktualizowac
 (^)  - pliki dostarczane przez użytkownika; edytor nic tam nie zapisuje
 
 ### Role plików
 
 - gfx, sfx, scripts na start puste, wygenerowane automatycznie, to tylko dla użytkownika
-- .cache 
-	- project.json.lz4 - rekompresowane przez serwer na kazdy start
-	- project.json.lz4.stamp - timestamp pliku project.json na ktorym project.json.lz4 byl wygenerowany
 - project.json - plik sceny
-- Odzyskiwanie
-	- project.old.json - plik zapisany przed poprzednim
-	- istniejace tylko podczas dzialania aplikacji (czyli jak po zamknieciu widac to znaczy ze cos sie zjebalo)
-		- project.tmp.json - nowy pisany plik
-		- project.json.autosave
-		- Te dwa wbrew pozorom powinny być oddzielne
-			- Jeśli autosave jest nieaktualny i wywali nas przy pisaniu do niego nowego pliku, to tracimy wszystkie niezapisane zmiany
-	- Przy wczytywaniu projektu
-		- Najpierw sprawdzamy czy istnieje .tmp.json
-			- zawsze będzie aktualniejszy od autosave, bo jeśli istnieje, to znaczy że nas wywaliło zaraz przed końcem zapisywania 
-				- Choć to mało prawodpodobne
-		- Potem sprawdzamy czy istnieje .autosave
-			- 99% przypadków crasha
-		- Jeśli którykolwiek to nakładamy go jako nową zmianę
-## Folder structure
 
-### ALL PROJECTS
+#### project.signature - signing & verification
+
+- Co signuje autor?
+	- Tylko dwie rzeczy
+		- project.json
+		- Tekstowa lista par <ścieżka:hash> wszystkich zasobów w gfx/sfx/scripts 
+			- posortowana LEKSYKOGRAFICZNIE, nie naturalnie, po ścieżce
+				- tak bardziej deterministycznie
+			- Skąd wzięta?
+				- Z punktu widzenia edytora - zawsze będzie w pamięci ostatnio wypisany resource_hashes.bin
+					- Oczywiście integrity check poleci przed podpisaniem 
+
+##### Proces signowania przez edytor
+
+- Kiedy i jak wywołujemy signing?
+
+Dwa przypadki:
+
+- a) PO ZAPISANIU project.json. 
+	- Asynchronicznie żeby użytkownik mógł już robić rzeczy, pasek na dole móże wyświetlać tylko status.
+	- Jedyne co to będzie powstrzymywało kolejny zapis aż to się dokończy, bo nie ma jak zinterruptować keygena.
+- b) NA AKTYWACJĘ OKIENKA po wykryciu zmian w hashach po przeliczeniu resource_hashes.
+	- I ten policzony na nowo można od razu wykorzystać
+	- To wstrzyma też ctrl+s na moment.
+
+Sygnatura ma być tylko w stosunku do ostatnio zapisanej wersji. Autosave tutaj nie będzie nic wywoływał ani grał roli.
+
+Procedura signowania:
+
+- 1) standardowe ponowne obliczenie resource_hashes.bin, DOKŁADNIE tak jak na aktywację okienka.
+	- Iterujemy faktyczne ścieżki w filesystemie (nie te co istnieją w resource_hashes.bin)
+		- Sprawdzamy czy istnieje wpis w ostatnio wygenerowanym resource_hashes.bin w pamięci
+		- Jeśli tak, i się zgadza timestamp, pomijamy hashowanie; bierzemy ten obliczony
+			- I tutaj omijamy ponownego hashowanie wszystkiego żeby nie tracić czasu. Dlatego że to się dzieje na każdy ctrl+s.
+				- Ponownie hashować będziemy tylko project.json
+		- Jeśli nie to liczymy hash jeszcze raz (mało prawdopodobne bo przy aktywacji okienka to robimy), nic straconego.
+- 2) Nowy wygenerowany resource_hashes.bin i tak jest writeoutowany (po prostu nie sprawdzamy czy jest taki sam).
+- 3) Liczymy tekstową posortowaną listę ścieżek i hashy.
+	- Bierzemy content binarny (std::map) dokładnie ten który poszedł do pliku resource_hashes.bin
+	- Czytamy z niego tylko te dwie potrzebne dane, porzucając timestamp
+	- Czyli robimy dokładnie to samo co byśmy liczyli przy weryfikacji sygnatury - to ważne
+- 4) sign
+	- Konkatenacja project.json + ściezek
+	- Możemy od razu to przemielic przez blake3 i ten rezultat dac do ssh-keygena zeby bylo szybciej i przez stdin od razu
+		- Nawet nie musimy tu być zależni od ssh-keygena (wolno sie bedzie na windowsie odpalać)
+		- tweetnacl + blake3 i będzie bardzo szybko działało
+- 5) writeout project.signature
+
+Zauważmy że najpierw jest writeoutowany resource_hashes.bin a potem dopiero sygnatura.
+	- W przeciwnym wypadku jeśli sygnatura by się dobrze zapisała a resource_hashes niezbyt, to...?
+	- W sumie nie wiem dlaczego na razie to jest ważne, ale może jest
+
+#### lz4
+
+- .cache 
+	- project.json.lz4 - Silnie rekompresowane przez serwer na kazdy start
+	- project.json.lz4.stamp - timestamp pliku project.json na ktorym project.json.lz4 byl wygenerowany
+
+#### resource_hashes.bin
+
+- Struktura
+- std::map<augs::path_type, entry>
+	- Będzie przy okazji zapisane od razu posortowane, teoretycznie możnaby to wektorem potem wczytać
+- Jeden wpis:
+	- Ścieżka do pliku (klucz)
+	- Wartość:
+		- hash pliku blake3
+		- timestamp pliku gdy był ostatnio shashowany
+
+- Dlaczego trzymamy to w pliku, kto z tego korzysta?
+	- Edytor na starcie wczytuje i dzięki temu może sprawdzić czy pliki nie zostały przesunięte
+	- Serwer na starcie nie musi hashować wszystkiego od nowa
+		- Gdyby ktoś nie zdążył zapisać dobrze to serwer zawsze może trywialnie sprawdzić integralność wszystkich hashy bo będą timestampy
+		- i zobaczy zresztą wtedy że sygnatura byłaby nie tak bo najpierw i tak jest zapisywany resource_hashes a potem dopiero robiony podpis, więc sygnatura by się najpierw nie zgadzała
+	- Teoretycznie serwer by mógł sobie przehashować po swojemu od nowa - dlatego to tylko w .cache jest - ale można od razu to wykorzystać
+
+- .cache
+	- resource_hashes.bin
+
+- to mapa hashy WSZYSTKICH zasobów w projekcie (gfx/, sfx/, scripts/) posortowana - leksykograficznie, nie naturalnie!
+	- leksykograficzna dlatego ze to nie ma byc dla czlowieka tylko dla komputera zeby deterministycznie policzył hash
+- Binarna bo tu layout się nigdy nie zmieni, bez const size vectorów bo to nie leci przez sieć (nie bezpośrednio)
+
+#### Autosave
+
+- Co 2 minuty i co deaktywację okienka
+- Asynchronicznie
+- project.autosave.json
+	- Martwimy się autosavem tylko jednego pliku: project.json!
+		- Reszta - jak widać z tabelki w ## Organizacja plików projektu - jest albo
+			- a) Odzyskiwalna przez edytor po usunięciu (.cache, resources.json, sygnatura)
+			- b) Poza odpowiedzialnością edytora (gfx, sfx, scripts)
+
+- Tu już chyba nie ma więcej do kminienia
+
+#### Odzyskiwanie
+
+Źródla odzyskiwania (w kolejności aktualności, a zatem i w kolejności próbowania).
+Przy wczytywaniu projektu próbujemy:
+
+1) project.tmp.json
+	- zawsze będzie aktualniejszy od autosave, bo jeśli istnieje, to znaczy że nas wywaliło zaraz przed końcem zapisywania 
+		- Choć to mało prawodpodobne
+2) project.autosave
+	- 99% przypadków crasha
+3) jeśli istnieje project.json to tu sie zatrzymujemy i nic nie odzyskujemy
+4) project.old.json
+
+- Jeśli którykolwiek z 1) 2) to nakładamy go jako nową zmianę
+	- Ale chcemy zeby dalo sie zinspektowac to co zostalo zrecoverowane wiec najlepiej tak:
+		- Message box z okejka
+		- "Automatically recovered lost changes from project.autosave.json.
+			To see the last saved state, press Undo."
+- Jeśli 4) to też dajemy komunikat ze couldnt load project.json, loaded previously saved version instead.
+
+- project.old.json - plik zapisany przed poprzednim
+- istniejace tylko podczas dzialania aplikacji (czyli jak po zamknieciu widac to znaczy ze cos sie zjebalo)
+	- project.tmp.json - nowy pisany plik
+	- project.json.autosave
+	- Te dwa wbrew pozorom powinny być oddzielne
+		- Jeśli autosave jest nieaktualny i wywali nas przy pisaniu do niego nowego pliku, to tracimy wszystkie niezapisane zmiany
+
+## Przesyłanie map
+
+- Najpierw pobieramy i sanityzujemy nazwe mapy
+	- alfanumeryczna_ i <= 30 znakow (pełna nazwa mapy może być dłuższa)
+		- Pełna nazwa może być dowolna
+- Sciagamy w kolejności:
+	- 0) project.about.json
+		- Chcemy wcześnie odrzucać stare wersje map i przypadkowo stworzone przez kogoś innego mapy o tej samej nazwie (public key bedzie inny)
+			- 99% w ktorym inna wersja mapy bedzie odrzucana to jak community serwer zahostuje uczciwie stara wersje mapy (bo jeszcze nie zaktualizowal)
+			- więc możemy na tym polegać spokojnie bo potem i tak będzie weryfikowane to
+		- ale to nie musi być oddzielny plik też
+			- i tak najpierw będziemy mieli to w pamięci jako json więc możemy to od razu zweryfikować
+			- a tak normalnie to może być część pliku
+		- chcieliśmy tylko wcześniej żeby to było oddzielnie
+		- ale to będzie signowane też więc już wygodniej serio byłoby w środku mieć
+		- jedyny powód dla którego chcieliśmy mieć to oddzielnie to jakaś strona jakby chciała sobie wczytać
+			- ale to na lajcie może sobie raz sparsować ten plik albo tylko zacząć
+			- to też będzie pierwsza rzecz do wypisania
+	- 0) aktualnie ta meta ktorej potrzebujemy zmiesci sie w reliable messagu spokojnie
+		- name <= 30 bytes
+		- version (np. timestamp zapisania) <= 32 bytes
+		- public key = <= 100 bytes
+		- to już nam mówi wszystko czy jest aktualna, nowa, stara, albo czy duplikat z taka sama nazwa
+		- also nawet jeśli to wyślemy masterserverowi to klientowi też chcemy bo miedzy tym co jest na ms a na serwerze mogła się zmienić mapa
+	- 1) project.json
+	- 2) project.resources.json 
+	- 3) project.signature i sygnature
+- Serwer nie daje nam nazw tych plików. Sami je obliczamy razem z rozszerzeniami z nazwy mapy i bezpiecznie zapisujemy.
+	- Wiemy jaka jest kolejność. Beda tylko opcody na typ pliku i bedziemy weryfikowac czy zgadza sie koeljnosc
+- hashujemy skonkatenowane 1) + 2) i sprawdzamy przeciwko 3)
+- jak jest dobrze to sanityzujemy sciezki i zaciągamy pliki:
+
+### Path Sanitization
+
+- secure_read_resources - wczytujemy sciagniety plik project.resources.json
+	- Każdy path to jeden string z max size 256 żeby netcode był łatwiejszy
+		- robimy na tym strtok albo std::view::split 
+			- ta implementacja nawet jak bedzie zbugowana to nie bedzie tragedii
+			- i tak zweryfikujemy porzadnie wektor z rezultatami, tam kazdy musi byc alfa_numeryczny i tyle
+		- osobno extension! Wtedy nie trzeba nawet sprawdzac kropek
+	- i teraz tak
+		- tworzysz wszystkie foldery od razu żeby symlinków potem nie dało sie zrobić
+
+### Actual Downloading
+
+
+### Updating
+
+- Tylko jak sygnatura sie zgadza
+- Mając wszystkie hashe w project.resources.json trywialnie można zrobic zaciąganie tylko nowych/zmienionych plików
+	- usuwanie chyba walić
+
+## Organizacja wszystkich projektów
 
 Ostatecznie:
 
-- content/arenas
-- user/downloads/arenas
-- user/projects
+- content/arenas - oficjalne
+- user/downloads/arenas - sciagniete
+- user/projects - lokalne projekty
 
-- Po deliberacji chcemy jednak osobny folder na downloady 
-	- żeby było zupełnie jasne dla mniej doświadczonych co im zżera miejsca najwięcej
-
-- community maps musi isc do usera! bo tylko user i logs sa zachowywane przy upgradowaniu gierki
-	- czemu nie osobno obok usera?
-		- moznaby sie klocic ze user a community to jednak rozne rzeczy
-			- ale jednak fajnie bedzie miec w jednym folderze wszystko co jest potrzebne do migracji uzytkownika
-
-- no i ok, wszystkie downloady w userze to juz ustalone
-	- pytanie czy do user/community/arenas, czy user/arenas? Czy user/builder razem ze wszystkim?
-- Najbardziej jasne bedzie user/downloads/arenas, user/downloads/mods itp
-
-
-- Przesyłanie mapy
-	- najpierw sanityzujemy nazwe mapy
-		- alfanumeryczna i <= 30 znakow (pełna nazwa mapy może być dłuższa)
-		- z tego na kliencie sobie derywujemy nazwy plików resources, json itp, sami dokładamy extensions
-			- nazwa może być dowolna
-	- Sciagamy najpierw mape, resources.json i sygnature, hashujemy mape i resources i sprawdzamy przeciwko sygnaturze
-	- jak git to sanityzujemy sciezki i zaciągamy pliki:
-		- Path sanitization
-			- mapa: 
-			- secure_read_resources
-				- po weryfikacji sygnatury wczytujemy sciagniety plik project.resources.json
-				- 
-
-
-	- autosave leci do .cache co 2 min i co zejscie z aktywnego okienka
 - To nie jest sublime text!!! To ma byc standard do ktorego wszyscy sa przyzwyczajeni
-- nazwa mapy musi byc alphanumeric_
 
-- Also i tak chcemy konwencje filenamow zachowac alfanumeryczna nawet nie tylko ze wzgledu bezpieczenstwa ale portowalnosci na inne systemy 
-
-- Ogólnie ściąganie i tak nie będzie piękne bo najpierw trzeba będzie poprosić o sygnaturę
-	- Choć to głównie przy updatowaniu
-		- Np. Sprawdzić czy nie jest zrevokowany key jakiś
-	- Więc Najpierw ściągasz resources file
-		- Najpierw tworzysz wszystkie foldery od razu żeby symlinków potem nie dało sie zrobić
-	
-- Autor signuje tylko mape i resources
-	- jakby signowal same hashe w jsonie to nie signowałby sciezek a to niefajnie raczej
-- W ogole przy updacie jak bede mial hashe w project.resources.json to trywialnie mozna zrobic zaciaganie tylko nowych/zmienionych 
-
-- Path sanitization
-	- w jsonie moga byc roznie dziwne sciezki wpisane do wczytania
-	- i jak ktos przysyla plik to tez moze glupoty wpisac w filename
-	- najbezpieczniej byloby przeslac cale jako archiwum a w jsonie poslugiwac sie guidami ale znowusz tak nie robimy
-	- https://snyk.io/blog/exploring-3-types-of-directory-traversal-vulnerabilities-in-c-c/
-	- https://portswigger.net/web-security/file-path-traversal
-		- wystarczy chyba to co pisza na koncu i tyle
-	- https://stackoverflow.com/questions/55610499/can-filesystemcanonical-be-used-to-prevent-filepath-injection-for-filepaths-pa
-	- https://gamedev.net/forums/topic/334548-file-automatic-download-security/334548/
-		- a czy nie moglibysmy dla czytelnosci w jsonie normalnie do wersjonowania trzymac "gfx/some_folder/to"?
-			- mozna tak samo sparsowac to przeciez na podstawie '/' i potem sprawdzic czy tylko alfanumeryczne
-				- na poczatku jeszcze moze byc slash...
-				- ok ale manualnie konstruujemy sciezke z samych alfanumerycznych komponentow
-		- aha tylko co z symlinkami
-			- ktos by se mogl stworzyc binarny symlink i potem ustawic jego jako docelowy folder
-		- mozna niby sprawdzac czy sciezka nie ma tego co sciagnelismy ale eh
-	- chyba ze std::filesystem::canonical i spokoj?
-	- Obczaj że to jest jeszcze pół biedy bo my tu `piszemy` a nie czytamy więc najgorsze co sie stanie to sie wjebie do jakiegoś folderu dziwnego
-		- bez roota/admina i tak nie narobi
-		- i nic nie nadpisze bo zawsze bedziemy sprawdzać czy istnieje plik wcześniej
-
-- secure_send_resources
-	- Dobra ale to możemy wysłać po prostu jeden string z max size 256 żeby netcode był łatwiejszy
-		- i zrobić na nim strtok albo std::view::split 
-			- niewazne czy to dobrze zadziała bo i tak zweryfikujemy porzadnie wektor z rezultatami, tam kazdy musi byc alfanumeryczny i tyle
-		- no extension jeszcze mozna oddzielnie
-		- ok w kazdym razie do zrobienia bo najwazniejsze ze ustalamy konwencje
-		- i i tak jeszcze ostatnia linia obrony to bedzie ten absolute file path
-
-	- W jednym miejscu resolvujemy już wszystkie ścieżki do plików żeby nie było zaskoczeń
-	- po prostu przez sieć leci plik project.resources.json przetłumaczony do bezpiecznej struktury
-		- dosłownie wektor alfa_numerycznych wyrazów
-			- taką konwencję robimy i chuj
-	- Wtedy przed wysłaniem jsona konwertujemy go tak żeby wszystkie ścieżki zawierały hashe
-		- albo niekoniecznie, możemy sobie potem bezpiecznie mapować
-		- jeśli ścieżka jest taka jak być powinna to 1:1 deterministycznie się odtworzy z builder_secure_resources
-			- wtedy to co w jsonie jest posłuży jako string do mapowania z tym co jest w resources json
-	- taki resources json nawet jest dobrą czytelną specyfikacją tego co potrzebuje mapa
 
 
 - Note that if we hash files and keep them in the json, we need to re-save that json... so that it holds regenerated hashes
@@ -182,23 +276,6 @@ Ostatecznie:
 		- no oficjalnych nie bedzie musial bo wszyscy maja
 	- A skad wie ze trzeba skompresowac? No normalnie stampy tak samo jak w cache/ to dziala klasycznie
 
-- Okazuje sie ze zhashowanie wszystkich plikow i zapisywanie hashy w jsonie bedzie calkiem przydatne
-	+ Gdyby hashować wszystkie resourcy w jsonie to potem nie trzeba będzie hashować całego folderu żeby sprawdzić czy sygnatura jest git
-	+ Łatwiej edytorowi potem rozpoznac jakby zmienila sie nazwa pliku gdzie on sie znajduje i zaproponowac redirecta
-	- Gitara bo nawet mamy blake2/sha256 w libsodium a to juz mamy
-		- albo nawet to: https://github.com/BLAKE3-team/BLAKE3/tree/master/c
-			- duzo okejek ma i latwo zbudowac bedzie takze lajt
-			- najlepiej od razu bedzie to wziac
-	- Teraz czy tak samo robimy dla specjalnych plików np. z efektami?
-		- Czy w ogóle trzymamy je oddzielnie jako pliki?
-			- Myśle że nie i pokażemy je po prostu w UI jakoś ładnie jako specjalne obiekty które się nie zaliczają ani do gfx ani do sfx
-			- a w filesystemie rzeczy tylko z konieczności
-			- niech siedzi w tym jednym pliku wszystko co jest potrzebne do deterministycznej integralności mapy (to sie jeszcze przyda)
-		- no skrypty i tak by pasowało chyba w oddzielnych plikach
-			- bo przeciez jakos trzeba je edytowac w sensownym edytorze
-		- ale to tylko skrypty bo one sa zewnetrznie edytowane
-		- czyli nic za zapisywanie czego jest odpowiedzialny edytor bym nie zapisywal w oddzielnych plikach dla prostoty
-			- latwiej bedzie tez zrobic safe writing of files z tym replacem i bakiem
 	
 	- chlopie sciezka moze byc nawet dluzsza wiec taki hash to nic rozmiarowo
 

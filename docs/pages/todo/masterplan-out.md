@@ -6,6 +6,12 @@ permalink: masterplan
 summary: What we've already determined won't work.
 ---
 
+			- "Recover lost changes from project.autosave|tmp.json?
+				[Yes] [Discard]"
+			- Nie promptujmy, chcemy zeby dalo sie zinspektowac jakie te zmiany byly
+			- Zatrzymac autosave gdy prompt sie pyta!!! Najlepiej nie otwierac projektu zanim wybor zostanie dokonany
+			  To revert back to the last saved version."
+
 with project name being de_cyberaqua
 
 - .cache
