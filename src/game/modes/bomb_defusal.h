@@ -531,6 +531,10 @@ public:
 		return commencing_timer_ms;
 	}
 
+	bool is_game_commencing() const {
+		return commencing_timer_ms != -1.0f;
+	}
+
 	const auto& get_current_round() const {
 		return current_round;
 	}

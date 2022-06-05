@@ -2189,15 +2189,15 @@ void bomb_defusal::handle_game_commencing(const input_type in, const logic_step 
 	const bool are_factions_ready = [&]() {
 		const auto p = calc_participating_factions(in);
 
-		bool all_ready = true;
+		bool all_have_at_least_one = true;
 
 		p.for_each([&](const faction_type f) {
 			if (num_players_in(f) == 0) {
-				all_ready = false;
+				all_have_at_least_one = false;
 			}
 		});
 
-		return all_ready;
+		return all_have_at_least_one;
 	}();
 
 	if (!should_commence_when_ready && !are_factions_ready) {
@@ -2393,7 +2393,9 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 			set_players_frozen(in, false);
 		}
 
-		process_win_conditions(in, step);
+		if (!is_game_commencing()) {
+			process_win_conditions(in, step);
+		}
 	}
 	else if (state == arena_mode_state::ROUND_END_DELAY) {
 		if (get_round_end_seconds_left(in) <= 0.f) {

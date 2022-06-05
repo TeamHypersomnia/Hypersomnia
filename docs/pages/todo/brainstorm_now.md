@@ -6,14 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Zamienić editor_setup -> inspector_setup
+- builder_setup -> editor_setup
+Nie nazywajmy tego arena builder tylko użyjmy najbardziej oczywistej nazwy
+
 - Breaking changes that e.g. change signature verification scheme could be done by changing the builds/latest to e.g. builds/latest-2
 	- In practice, builds/latest would always have the latest version so that it's easy to link it for people who don't have a binary yet
 	- but the binaries would have defaults that point to symlinks like builds/latest-1, builds/latest-2 etc.
 	- Not for now but good to have this planned
 
 - masterserver -> serverlist maybe
-
-- libcrypto.dll is missing on Windows if there's no OpenSSH installed
 - test code_escaped_nick against \`
 
 - Balance datum, either way more expensive or less velocity

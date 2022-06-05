@@ -4632,3 +4632,4 @@ Advantages:
 			- ale to nawet jak bedziemy mieli instalator kiedys to moze sam dodawac razem z innym shitem potrzebnym jakby kiedys byl (git lol, nie no moze bez przesady)
 
 		
+- libcrypto.dll is missing on Windows if there's no OpenSSH installed
