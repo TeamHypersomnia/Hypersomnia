@@ -1083,7 +1083,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 			}
 
-			case launch_type::LEGACY_EDITOR:
+			case launch_type::DEBUGGER:
 				launch_legacy_editor(lua);
 
 				break;
@@ -1433,7 +1433,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto perform_setup_custom_imgui = [&]() {
 		/*
-			The editor setup might want to use IMGUI to create views of entities or resources,
+			The debugger setup might want to use IMGUI to create views of entities or resources,
 			thus we ask the current setup for its custom ImGui logic.
 
 			Similarly, client and server setups might want to perform ImGui for things like team selection.
@@ -1702,7 +1702,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::LEGACY_EDITOR:
-				launch_setup(launch_type::LEGACY_EDITOR);
+				launch_setup(launch_type::DEBUGGER);
 				break;
 
 			case T::ARENA_BUILDER:

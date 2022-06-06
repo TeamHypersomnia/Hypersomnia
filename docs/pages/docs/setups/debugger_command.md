@@ -2,9 +2,9 @@
 title: Editor command
 tags: [topics, editor] 
 hide_sidebar: true
-permalink: editor_command
+permalink: debugger_command
 summary: |
-    An **``editor_command``** is an object representing a single, indivisible operation of the [author](author).  
+    An **``debugger_command``** is an object representing a single, indivisible operation of the [author](author).  
     It can be **undone** or **redone** (executed).
 ---
 

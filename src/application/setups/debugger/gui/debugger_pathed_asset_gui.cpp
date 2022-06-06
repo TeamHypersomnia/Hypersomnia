@@ -2,7 +2,7 @@
 
 #include "application/setups/debugger/gui/debugger_pathed_asset_gui.h"
 
-#if BUILD_PROPERTY_EDITOR
+#if BUILD_PROPERTY_DEBUGGER
 #include "augs/string/string_templates.h"
 
 #include "augs/window_framework/window.h"
@@ -67,7 +67,7 @@ void debugger_pathed_asset_gui<asset_id_type>::perform(
 	const images_in_atlas_map& game_atlas,
    	debugger_command_input cmd_in
 ) {
-#if BUILD_PROPERTY_EDITOR
+#if BUILD_PROPERTY_DEBUGGER
 	constexpr bool is_image_type = std::is_same_v<asset_id_type, assets::image_id>;
 	const bool show_properties_column = path_browser_settings.show_properties_column;
 

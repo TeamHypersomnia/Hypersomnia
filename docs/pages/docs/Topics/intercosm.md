@@ -8,7 +8,7 @@ summary: |
     An **intercosm**, a short for an *interactive cosmos*, is an object that holds a [cosmos](cosmos), [viewables](viewable) and extra information like [id](entity_id) of the [entity](entity) that is to be controlled during the game.  
 
     It serves a purpose that is similar to that of **game maps** in other projects.  
-    It is the highest-level object that the [editor setup](editor_setup) works with; other setups usually just read and play it to fit their purpose, e.g. a server may use it for its deathmatch session.
+    It is the highest-level object that the [debugger setup](editor_setup) works with; other setups usually just read and play it to fit their purpose, e.g. a server may use it for its deathmatch session.
 ---
 
 ## Overview

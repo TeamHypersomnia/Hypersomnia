@@ -164,7 +164,7 @@ option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there 
 option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_NET_OPT})
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_NET_OPT})
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
-option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
+option(BUILD_PROPERTY_DEBUGGER "Build property debugger code for the debugger setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
 
 option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
@@ -1425,7 +1425,7 @@ if(ADD_APPLICATION_ICON)
 	add_definitions(-DADD_APPLICATION_ICON)
 endif()
 
-if(BUILD_PROPERTY_EDITOR)
+if(BUILD_PROPERTY_DEBUGGER)
 	add_definitions(-DBUILD_PROPERTY_EDITOR)
 endif()
 

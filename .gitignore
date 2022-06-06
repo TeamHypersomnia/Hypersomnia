@@ -1,3 +1,5 @@
+# Just so rg doesn't search it
+.git
 #################
 ## Eclipse
 #################

@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Zamienić editor_setup -> inspector_setup
 - builder_setup -> editor_setup
 Nie nazywajmy tego arena builder tylko użyjmy najbardziej oczywistej nazwy
 

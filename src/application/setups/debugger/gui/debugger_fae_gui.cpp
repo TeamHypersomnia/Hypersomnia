@@ -9,7 +9,7 @@ void debugger_fae_gui_base::interrupt_tweakers() {
 	property_debugger_data.reset();
 }
 
-#if BUILD_PROPERTY_EDITOR
+#if BUILD_PROPERTY_DEBUGGER
 
 #include "augs/templates/for_each_std_get.h"
 #include "augs/misc/simple_pair.h"
@@ -186,7 +186,7 @@ fae_tree_output debugger_selected_fae_gui::perform(
 	const debugger_fae_gui_input in,
 	const fae_selections_type& matches
 ) {
-#if BUILD_PROPERTY_EDITOR
+#if BUILD_PROPERTY_DEBUGGER
 	using namespace augs::imgui;
 
 	auto entities = make_scoped_window();
@@ -289,7 +289,7 @@ fae_tree_output debugger_fae_gui::perform(
 	const debugger_fae_gui_input in, 
 	fae_selections_type& all_selections
 ) {
-#if BUILD_PROPERTY_EDITOR
+#if BUILD_PROPERTY_DEBUGGER
 	using namespace augs::imgui;
 
 	auto entities = make_scoped_window();

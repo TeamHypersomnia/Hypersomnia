@@ -424,7 +424,7 @@ To nie jest sublime text! To ma byc standard do ktorego wszyscy sa przyzwyczajen
 	- ale to walic na razie, synchronicznie zrobimy bo na razie to małe jest i bedzie bardziej clean less error prone
 
 - Implementation
-	- albo jedziemy z tego co mamy w editor setupie i wywalamy niepotrzebne
+	- albo jedziemy z tego co mamy w debugger setupie i wywalamy niepotrzebne
 	- albo od nowa
 	- wydaje mi sie ze od nowa lepiej bo tu sie bedzie wszystko roznic praktycznie
 		- na pewno nam się okienka przydadzą zaimplementowane niektóre i jakies skróty porobione

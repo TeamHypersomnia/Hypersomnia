@@ -485,7 +485,7 @@ we consider whole type overrides too complex architeciturally:
 - Grouping & ungrouping
 	- Shift + click could always highlight&select a group
 
-- Move summary to somewhere else, even if we pass it the editor setup reference
+- Move summary to somewhere else, even if we pass it the debugger setup reference
 	- what would be wrong with it?
 
 - Automatic group generation for duplications and mirrors
@@ -4188,7 +4188,7 @@ Advantages:
 
 - Admin panel
 	- Editor-like server vars tweaker accessible by pressing ESC server-side
-		- will have to be commandized properly, just like editor setup's
+		- will have to be commandized properly, just like debugger setup's
 	- Should we re-use change property command?
 		- we'll only need a dummy editor folder struct
 			- we could make it more flexible
@@ -4633,3 +4633,4 @@ Advantages:
 
 		
 - libcrypto.dll is missing on Windows if there's no OpenSSH installed
+- Zamienić editor_setup -> inspector_setup

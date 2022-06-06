@@ -5,22 +5,22 @@
 
 #include "application/arena/arena_paths.h"
 
-#define EDITOR_DIR (augs::path_type(USER_FILES_DIR) / "editor")
+#define DEBUGGER_DIR (augs::path_type(USER_FILES_DIR) / "debugger")
 
 inline auto get_last_folders_path() {
-	return EDITOR_DIR / "last_folders.lua";
+	return DEBUGGER_DIR / "last_folders.lua";
 }
 
 inline auto get_recent_paths_path() {
-	return EDITOR_DIR / "debugger_recent_paths.lua";
+	return DEBUGGER_DIR / "debugger_recent_paths.lua";
 }
 
 inline auto get_debugger_gui_state_path() {
-	return EDITOR_DIR / "debugger_gui_state.bin";
+	return DEBUGGER_DIR / "debugger_gui_state.bin";
 }
 
 inline auto get_untitled_dir() {
-	return EDITOR_DIR / "untitled";
+	return DEBUGGER_DIR / "untitled";
 }
 
 inline bool is_untitled_path(augs::path_type path) {

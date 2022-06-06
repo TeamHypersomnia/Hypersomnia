@@ -1,7 +1,7 @@
 #include "application/setups/debugger/gui/debugger_common_state_gui.h"
 #include "application/setups/debugger/debugger_command_input.h"
 
-#if BUILD_PROPERTY_EDITOR
+#if BUILD_PROPERTY_DEBUGGER
 
 #include "augs/misc/simple_pair.h"
 #include "augs/templates/for_each_std_get.h"

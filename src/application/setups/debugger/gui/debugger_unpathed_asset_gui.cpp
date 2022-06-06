@@ -2,7 +2,7 @@
 
 #include "application/setups/debugger/gui/debugger_unpathed_asset_gui.h"
 
-#if BUILD_PROPERTY_EDITOR
+#if BUILD_PROPERTY_DEBUGGER
 
 #include "augs/string/string_templates.h"
 
@@ -65,7 +65,7 @@ void debugger_unpathed_asset_gui<asset_id_type>::perform(
 	const images_in_atlas_map& game_atlas,
    	const debugger_command_input cmd_in
 ) {
-#if BUILD_PROPERTY_EDITOR
+#if BUILD_PROPERTY_DEBUGGER
 	using namespace augs::imgui;
 
 	auto window = base::make_scoped_window();

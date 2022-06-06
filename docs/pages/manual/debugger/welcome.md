@@ -1,4 +1,4 @@
-Welcome to the editor setup!
+Welcome to the debugger setup!
 This tutorial will teach you everything you need to become a proficient mapper.
 It will always show you only the information that is relevant to what you are currently doing.
 If you close this window, you can always re-open it by going to View->Tutorial, or simply by pressing Alt+X. 

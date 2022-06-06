@@ -113,7 +113,7 @@ especially if it is some kind of curvy corridor or dungeon.
 These terrain pieces might, to the exception of their shape, behave identically, so it would make sense to have just one flavour for them.
 
 ~~Another case is names and custom names.~~  
-Names are completely transparent to the logic so custom names will be managed only by domains that need it (client setup with custom nicknames, editor setup with custom overridden names just for marking, etc).
+Names are completely transparent to the logic so custom names will be managed only by domains that need it (client setup with custom nicknames, debugger setup with custom overridden names just for marking, etc).
 
 In that case, we may:
 - Leave things as they are.
