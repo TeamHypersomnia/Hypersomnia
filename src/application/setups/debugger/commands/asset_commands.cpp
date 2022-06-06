@@ -2,7 +2,7 @@
 
 #include "view/get_asset_pool.h"
 #include "application/setups/debugger/commands/asset_commands.h"
-#include "application/setups/debugger/editor_folder.h"
+#include "application/setups/debugger/debugger_folder.h"
 #include "application/intercosm.h"
 #include "application/setups/debugger/detail/find_free_name.h"
 
@@ -35,7 +35,7 @@ std::string create_unpathed_asset_id_command<I>::describe() const {
 }
 
 template <class I>
-void create_unpathed_asset_id_command<I>::redo(const editor_command_input in) {
+void create_unpathed_asset_id_command<I>::redo(const debugger_command_input in) {
 	auto& pool = access_asset_pool<I>(in, {});
 	auto& new_object = base::redo(pool);
 
@@ -60,7 +60,7 @@ void create_unpathed_asset_id_command<I>::redo(const editor_command_input in) {
 }
 
 template <class I>
-void create_unpathed_asset_id_command<I>::undo(const editor_command_input in) {
+void create_unpathed_asset_id_command<I>::undo(const debugger_command_input in) {
 	base::undo(access_asset_pool<I>(in, {}));
 }
 
@@ -70,7 +70,7 @@ std::string create_pathed_asset_id_command<I>::describe() const {
 }
 
 template <class I>
-void create_pathed_asset_id_command<I>::redo(const editor_command_input in) {
+void create_pathed_asset_id_command<I>::redo(const debugger_command_input in) {
 	base::redo(get_asset_pool<I>(in), construct_from);
 
 	if constexpr(std::is_same_v<I, assets::image_id>) {
@@ -79,7 +79,7 @@ void create_pathed_asset_id_command<I>::redo(const editor_command_input in) {
 }
 
 template <class I>
-void create_pathed_asset_id_command<I>::undo(const editor_command_input in) {
+void create_pathed_asset_id_command<I>::undo(const debugger_command_input in) {
 	base::undo(get_asset_pool<I>(in));
 }
 
@@ -89,12 +89,12 @@ std::string forget_asset_id_command<I>::describe() const {
 }
 
 template <class I>
-void forget_asset_id_command<I>::redo(const editor_command_input in) {
+void forget_asset_id_command<I>::redo(const debugger_command_input in) {
 	base::redo(access_asset_pool<I>(in, {}));
 }
 
 template <class I>
-void forget_asset_id_command<I>::undo(const editor_command_input in) {
+void forget_asset_id_command<I>::undo(const debugger_command_input in) {
 	base::undo(access_asset_pool<I>(in, {}));
 }
 
@@ -104,7 +104,7 @@ std::string duplicate_asset_command<I>::describe() const {
 }
 
 template <class I>
-void duplicate_asset_command<I>::redo(const editor_command_input in) {
+void duplicate_asset_command<I>::redo(const debugger_command_input in) {
 	base::redo_and_copy(access_asset_pool<I>(in, {}), duplicate_from);
 }
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "application/setups/debugger/property_editor/general_edit_properties.h"
+#include "application/setups/debugger/property_debugger/general_edit_properties.h"
 #include "application/setups/debugger/detail/read_write_defaults_buttons.h"
-#include "application/setups/debugger/property_editor/special_widgets.h"
+#include "application/setups/debugger/property_debugger/special_widgets.h"
 #include "application/setups/debugger/detail/pathed_asset_entry.h"
 #include "application/setups/debugger/detail/rewrite_last_change.h"
 
@@ -13,14 +13,14 @@ struct pathed_asset_properties_behaviour {
 template <class asset_id_type, class A, class B, class C>
 void do_pathed_asset_properties(
 	const path_tree_settings& tree_settings,
-	const property_editor_input& prop_in,
-	const editor_command_input cmd_in,
+	const property_debugger_input& prop_in,
+	const debugger_command_input cmd_in,
 	const pathed_asset_entry<asset_id_type>& path_entry,
 	const A& ticked_in_range,
 	const B& ticked_ids,
 	const bool is_current_ticked,
 	const C& game_atlas,
-	editor_image_preview& preview,
+	debugger_image_preview& preview,
 	const int num_cols,
 	const bool nodeize_image_widgets = false
 ) {
@@ -81,7 +81,7 @@ void do_pathed_asset_properties(
 		augs::assign_bytes(cmd.value_after_change, new_content);
 		cmd.built_description = description + property_location;
 
-		post_editor_command(cmd_in, std::move(cmd));
+		post_debugger_command(cmd_in, std::move(cmd));
 	};
 
 	auto rewrite_last_change = make_rewrite_last_change<cmd_type>(

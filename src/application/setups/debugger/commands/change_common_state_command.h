@@ -1,5 +1,5 @@
 #pragma once
-#include "application/setups/debugger/commands/editor_command_structs.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
 #include "application/setups/debugger/commands/change_property_command.h"
 
 #include "application/setups/debugger/detail/field_address.h"

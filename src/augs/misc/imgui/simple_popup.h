@@ -18,5 +18,3 @@ struct simple_popup {
 	bool details_expanded = false;
 	int perform(const std::vector<button>& buttons = {});
 };
-
-using editor_warning = simple_popup;

@@ -1,6 +1,6 @@
 #include "application/setups/debugger/commands/change_grouping_command.h"
-#include "application/setups/debugger/editor_folder.h"
-#include "application/setups/debugger/editor_selection_groups.hpp"
+#include "application/setups/debugger/debugger_folder.h"
+#include "application/setups/debugger/debugger_selection_groups.hpp"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
@@ -17,7 +17,7 @@ void change_grouping_command::push_entry(const entity_id id) {
 	affected_entities.push_back(id);
 }
 
-void change_grouping_command::sanitize(editor_command_input in) {
+void change_grouping_command::sanitize(debugger_command_input in) {
 	std::vector<bool> to_erase;
 	to_erase.resize(affected_entities.size());
 
@@ -43,7 +43,7 @@ void change_grouping_command::clear_undo_state() {
 	group_indices_before.clear();
 }
 
-void change_grouping_command::redo(const editor_command_input in) {
+void change_grouping_command::redo(const debugger_command_input in) {
 	clear_undo_state();
 
 	/* First, ungroup the affected entities */
@@ -75,7 +75,7 @@ void change_grouping_command::redo(const editor_command_input in) {
 	}
 }
 
-void change_grouping_command::undo(const editor_command_input in) {
+void change_grouping_command::undo(const debugger_command_input in) {
 	ensure_eq(group_indices_before.size(), affected_entities.size());
 
 	auto& groups = in.folder.commanded->view_ids.selection_groups;

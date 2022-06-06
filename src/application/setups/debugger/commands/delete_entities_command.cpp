@@ -1,12 +1,12 @@
 #include "game/cosmos/entity_handle.h"
 
 #include "application/intercosm.h"
-#include "application/setups/debugger/editor_command_input.h"
-#include "application/setups/debugger/editor_folder.h"
+#include "application/setups/debugger/debugger_command_input.h"
+#include "application/setups/debugger/debugger_folder.h"
 #include "game/cosmos/create_entity.hpp"
 
 #include "application/setups/debugger/commands/delete_entities_command.h"
-#include "application/setups/debugger/commands/editor_command_sanitizer.h"
+#include "application/setups/debugger/commands/debugger_command_sanitizer.h"
 
 std::string delete_entities_command::describe() const {
 	return built_description;
@@ -25,7 +25,7 @@ bool delete_entities_command::empty() const {
 	return size() == 0;
 }
 
-void delete_entities_command::redo(const editor_command_input in) {
+void delete_entities_command::redo(const debugger_command_input in) {
 	deleted_grouping.redo(in);
 
 	in.interrupt_tweakers();
@@ -39,7 +39,7 @@ void delete_entities_command::redo(const editor_command_input in) {
 	});
 }
 
-void delete_entities_command::undo(const editor_command_input in) {
+void delete_entities_command::undo(const debugger_command_input in) {
 	deleted_grouping.undo(in);
 
 	auto& f = in.folder;
@@ -64,7 +64,7 @@ void delete_entities_command::undo(const editor_command_input in) {
 	cosmic::reinfer_all_entities(cosm);
 }
 
-void delete_entities_command::sanitize(const editor_command_input in) {
+void delete_entities_command::sanitize(const debugger_command_input in) {
 	deleted_grouping.sanitize(in);
 
 	sanitize_affected_entities(in, deleted_entities, [](const auto& entry) {

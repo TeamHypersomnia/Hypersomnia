@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
  
-#include "application/setups/debugger/property_editor/browsed_path_entry_base.h"
+#include "application/setups/debugger/property_debugger/browsed_path_entry_base.h"
 
 template <class id_type>
 struct pathed_asset_entry : public browsed_path_entry_base<id_type> {

@@ -1,14 +1,14 @@
 #include "augs/string/string_templates.h"
 #include "application/setups/debugger/commands/flavour_commands.h"
-#include "application/setups/debugger/editor_folder.h"
+#include "application/setups/debugger/debugger_folder.h"
 #include "application/intercosm.h"
 #include "application/setups/debugger/commands/asset_commands.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/create_entity.hpp"
 
-#include "application/setups/debugger/property_editor/widgets/asset_sane_default_provider.h"
-#include "application/setups/debugger/property_editor/widgets/pathed_asset_widget.h"
+#include "application/setups/debugger/property_debugger/widgets/asset_sane_default_provider.h"
+#include "application/setups/debugger/property_debugger/widgets/pathed_asset_widget.h"
 #include "application/setups/debugger/detail/find_free_name.h"
 #include "augs/misc/pool/pool_allocate.h"
 
@@ -16,11 +16,11 @@ std::string create_flavour_command::describe() const {
 	return built_description;
 }
 
-void create_flavour_command::redo(const editor_command_input in) {
+void create_flavour_command::redo(const debugger_command_input in) {
 	redo_and_copy(in, {});
 }
 
-void create_flavour_command::redo_and_copy(const editor_command_input in, const raw_entity_flavour_id source) {
+void create_flavour_command::redo_and_copy(const debugger_command_input in, const raw_entity_flavour_id source) {
 	type_id.dispatch(
 		[&](auto e) {
 			using E = decltype(e);
@@ -69,7 +69,7 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 	);
 }
 
-void create_flavour_command::undo(const editor_command_input in) {
+void create_flavour_command::undo(const debugger_command_input in) {
 	type_id.dispatch(
 		[&](auto e) {
 			using E = decltype(e);
@@ -83,11 +83,11 @@ void create_flavour_command::undo(const editor_command_input in) {
 	);
 }
 
-void duplicate_flavour_command::redo(const editor_command_input in) {
+void duplicate_flavour_command::redo(const debugger_command_input in) {
 	base::redo_and_copy(in, duplicate_from);
 }
 
-void delete_flavour_command::redo(const editor_command_input in) {
+void delete_flavour_command::redo(const debugger_command_input in) {
 	type_id.dispatch(
 		[&](auto e) {
 			using E = decltype(e);
@@ -104,7 +104,7 @@ void delete_flavour_command::redo(const editor_command_input in) {
 	);
 }
 
-void delete_flavour_command::undo(const editor_command_input in) {
+void delete_flavour_command::undo(const debugger_command_input in) {
 	type_id.dispatch(
 		[&](auto e) {
 			using E = decltype(e);
@@ -127,7 +127,7 @@ std::string instantiate_flavour_command::describe() const {
 	return built_description;
 }
 
-void instantiate_flavour_command::redo(const editor_command_input in) {
+void instantiate_flavour_command::redo(const debugger_command_input in) {
 	ensure(!created_id.is_set());
 
 	instantiated_id.type_id.dispatch(
@@ -168,7 +168,7 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 	);
 }
 
-void instantiate_flavour_command::undo(const editor_command_input in) {
+void instantiate_flavour_command::undo(const debugger_command_input in) {
 	auto& work = in.folder.commanded->work;
 	auto& cosm = work.world;
 

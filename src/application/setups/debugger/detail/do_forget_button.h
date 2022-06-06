@@ -1,11 +1,11 @@
 #pragma once
 #include "augs/templates/algorithm_templates.h"
-#include "application/setups/debugger/editor_command_input.h"
+#include "application/setups/debugger/debugger_command_input.h"
 #include "application/setups/debugger/detail/pathed_asset_entry.h"
 
 template <class asset_id_type, class A>
 bool do_forget_button(
-	const editor_command_input cmd_in,
+	const debugger_command_input cmd_in,
 	const pathed_asset_entry<asset_id_type>& path_entry,
 	const A& ticked_in_range,
 	const bool is_current_ticked,
@@ -29,7 +29,7 @@ bool do_forget_button(
 				;
 
 				cmd.common.has_parent = has_parent;
-				post_editor_command(cmd_in, std::move(cmd));
+				post_debugger_command(cmd_in, std::move(cmd));
 
 				has_parent = true;
 			};

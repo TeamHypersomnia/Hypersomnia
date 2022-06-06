@@ -73,7 +73,7 @@
 #include "application/main/release_flags.h"
 #include "application/main/flash_afterimage.h"
 #include "application/main/abortable_popup.h"
-#include "application/setups/debugger/editor_player.hpp"
+#include "application/setups/debugger/debugger_player.hpp"
 
 #include "application/nat/nat_detection_session.h"
 #include "application/nat/nat_traversal_session.h"
@@ -951,7 +951,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto launch_legacy_editor = [&](auto&&... args) {
 		setup_launcher([&]() {
-			emplace_current_setup(std::in_place_type_t<editor_setup>(),
+			emplace_current_setup(std::in_place_type_t<debugger_setup>(),
 				std::forward<decltype(args)>(args)...
 			);
 		});
@@ -1340,7 +1340,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		{
 			bool should = true;
 
-			on_specific_setup([&](editor_setup& setup) {
+			on_specific_setup([&](debugger_setup& setup) {
 				if (!setup.anything_opened() || setup.is_editing_mode()) {
 					should = false;
 				}
@@ -2070,7 +2070,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				);
 			}
 			else {
-				if constexpr(std::is_same_v<S, editor_setup>) {
+				if constexpr(std::is_same_v<S, debugger_setup>) {
 					if (setup.is_editing_mode()) {
 						pending_new_state_sample = true;
 					}
@@ -2104,8 +2104,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		);
 	};
 
-	if (!params.editor_target.empty()) {
-		launch_legacy_editor(lua, params.editor_target);
+	if (!params.debugger_target.empty()) {
+		launch_legacy_editor(lua, params.debugger_target);
 	}
 	else if (params.start_server) {
 		launch_setup(launch_type::SERVER);
@@ -2183,7 +2183,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
 
-		on_specific_setup([](editor_setup& setup) {
+		on_specific_setup([](debugger_setup& setup) {
 			setup.unhover();
 		});
 	};
@@ -2407,7 +2407,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				if (game_gui_mode && should_draw_game_gui() && game_gui.world.wants_to_capture_mouse(create_game_gui_context())) {
 					if (current_setup) {
-						if (auto* editor = std::get_if<editor_setup>(&*current_setup)) {
+						if (auto* editor = std::get_if<debugger_setup>(&*current_setup)) {
 							editor->unhover();
 						}
 					}

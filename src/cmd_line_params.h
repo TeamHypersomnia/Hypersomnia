@@ -5,7 +5,7 @@
 
 struct cmd_line_params {
 	augs::path_type exe_path;
-	augs::path_type editor_target;
+	augs::path_type debugger_target;
 	augs::path_type consistency_report;
 	bool unit_tests_only = false;
 	bool help_only = false;
@@ -92,7 +92,7 @@ struct cmd_line_params {
 				}
 			}
 			else {
-				editor_target = a;
+				debugger_target = a;
 			}
 		}
 	}

@@ -3,16 +3,16 @@
 #include "augs/misc/maybe_official_path.h"
 
 #include "view/load_meta_lua.h"
-#include "application/setups/debugger/editor_history.h"
-#include "application/setups/debugger/editor_command_input.h"
-#include "application/setups/debugger/editor_history.hpp"
+#include "application/setups/debugger/debugger_history.h"
+#include "application/setups/debugger/debugger_command_input.h"
+#include "application/setups/debugger/debugger_history.hpp"
 
 template <class I, class P>
 I get_id_or_import(
 	const maybe_official_path<I>& source_path,
 	const augs::path_type& project_path,
 	const P& definitions, 
-	const editor_command_input in,
+	const debugger_command_input in,
 	const bool has_parent = false
 ) {
 	if (const auto asset_id = ::find_asset_id_by_path(source_path, definitions)) {

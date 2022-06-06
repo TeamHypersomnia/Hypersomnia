@@ -3,9 +3,9 @@
 #include "game/cosmos/specific_entity_handle.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "application/intercosm.h"
-#include "application/setups/debugger/editor_folder.h"
+#include "application/setups/debugger/debugger_folder.h"
 
-#include "application/setups/debugger/editor_command_input.h"
+#include "application/setups/debugger/debugger_command_input.h"
 #include "application/setups/debugger/commands/change_entity_property_command.h"
 #include "application/setups/debugger/commands/change_flavour_property_command.h"
 #include "application/setups/debugger/commands/change_common_state_command.h"
@@ -13,12 +13,12 @@
 #include "application/setups/debugger/commands/change_property_command.h"
 #include "application/setups/debugger/commands/asset_commands.h"
 
-#include "application/setups/debugger/commands/detail/editor_property_accessors.h"
+#include "application/setups/debugger/commands/detail/debugger_property_accessors.h"
 #include "augs/misc/from_concave_polygon.h"
 
 #include "augs/readwrite/to_bytes.h"
 #include "augs/readwrite/byte_readwrite.h"
-#include "application/setups/debugger/commands/editor_command_sanitizer.h"
+#include "application/setups/debugger/commands/debugger_command_sanitizer.h"
 
 template <class D>
 std::string change_property_command<D>::describe() const {
@@ -26,7 +26,7 @@ std::string change_property_command<D>::describe() const {
 }
 
 template <class D>
-void change_property_command<D>::refresh_other_state(const editor_command_input in) {
+void change_property_command<D>::refresh_other_state(const debugger_command_input in) {
 	(void)in;
 
 	if constexpr(std::is_same_v<D, change_asset_property_command<assets::image_id>>) {
@@ -65,13 +65,13 @@ void change_property_command<D>::refresh_other_state(const editor_command_input 
 
 template <class D>
 void change_property_command<D>::rewrite_change_internal(
-	const editor_command_input in
+	const debugger_command_input in
 ) {
 	auto& self = *static_cast<D*>(this);
 
 	common.reset_timestamp();
 
-	editor_property_accessors::access_each_property(
+	debugger_property_accessors::access_each_property(
 		self,
 		in,
 		[&](auto& field) {
@@ -108,7 +108,7 @@ static void read_object_or_trivial_marker(Archive& ar, T& to, const std::size_t 
 }
 
 template <class D>
-void change_property_command<D>::redo(const editor_command_input in) {
+void change_property_command<D>::redo(const debugger_command_input in) {
 	auto& self = *static_cast<D*>(this);
 
 	self.clear_undo_state();
@@ -118,7 +118,7 @@ void change_property_command<D>::redo(const editor_command_input in) {
 	auto before_change_data = augs::ref_memory_stream(values_before_change);
 	auto after_change_data = augs::cref_memory_stream(value_after_change);
 
-	editor_property_accessors::access_each_property(
+	debugger_property_accessors::access_each_property(
 		self,
 		in,
 		[&](auto& field) {
@@ -134,14 +134,14 @@ void change_property_command<D>::redo(const editor_command_input in) {
 }
 
 template <class D>
-void change_property_command<D>::undo(const editor_command_input in) {
+void change_property_command<D>::undo(const debugger_command_input in) {
 	auto& self = *static_cast<D*>(this);
 
 	const auto trivial_element_size = values_before_change.size() / self.count_affected();
 
 	auto before_change_data = augs::cref_memory_stream(values_before_change);
 
-	editor_property_accessors::access_each_property(
+	debugger_property_accessors::access_each_property(
 		self,
 		in,
 		[&](auto& field) {
@@ -176,7 +176,7 @@ template class change_property_command<change_asset_property_command<assets::sou
 template class change_property_command<change_asset_property_command<assets::plain_animation_id>>;
 template class change_property_command<change_asset_property_command<assets::particle_effect_id>>;
 
-void change_entity_property_command::sanitize(const editor_command_input in) {
+void change_entity_property_command::sanitize(const debugger_command_input in) {
 	sanitize_affected_entities(in, affected_entities, [this](const auto& entry) {
 		entity_id target;
 		target.type_id = type_id;
@@ -185,4 +185,4 @@ void change_entity_property_command::sanitize(const editor_command_input in) {
 	});
 }
 
-static_assert(has_member_sanitize_v<change_entity_property_command, editor_command_input>);
+static_assert(has_member_sanitize_v<change_entity_property_command, debugger_command_input>);

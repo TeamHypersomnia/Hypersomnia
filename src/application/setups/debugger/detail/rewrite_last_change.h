@@ -1,13 +1,13 @@
 #pragma once
 #include "augs/templates/identity_templates.h"
-#include "application/setups/debugger/commands/editor_command_traits.h"
+#include "application/setups/debugger/commands/debugger_command_traits.h"
 #include "augs/readwrite/to_bytes.h"
 
 template <class derived>
 template <class T>
 void change_property_command<derived>::rewrite_change(
 	const T& new_value,
-	const editor_command_input in
+	const debugger_command_input in
 ) {
 	augs::assign_bytes(value_after_change, new_value);
 	rewrite_change_internal(in);
@@ -38,7 +38,7 @@ auto make_rewrite_last_change(
 				auto cloned_cmd = *cmd;
 				cloned_cmd.built_description = description + property_location;
 
-				if constexpr(has_member_sanitize_v<cmd_type, editor_command_input>) {
+				if constexpr(has_member_sanitize_v<cmd_type, debugger_command_input>) {
 					cloned_cmd.sanitize(cmd_in);
 				}
 
@@ -47,7 +47,7 @@ auto make_rewrite_last_change(
 				augs::assign_bytes(cloned_cmd.value_after_change, new_content);
 				cloned_cmd.common.has_parent = true;
 
-				::post_editor_command(cmd_in, cloned_cmd);
+				::post_debugger_command(cmd_in, cloned_cmd);
 			}
 		}
 	};

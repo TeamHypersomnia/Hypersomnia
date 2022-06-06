@@ -36,7 +36,7 @@
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
 #include "application/setups/main_menu_settings.h"
-#include "application/setups/debugger/editor_settings.h"
+#include "application/setups/debugger/debugger_settings.h"
 #include "application/setups/server/server_start_input.h"
 #include "application/setups/server/server_vars.h"
 #include "application/setups/client/client_start_input.h"
@@ -141,7 +141,7 @@ struct config_lua_table {
 	debug_settings debug;
 	session_settings session;
 	test_scene_settings test_scene;
-	editor_settings debugger;
+	debugger_settings debugger;
 	all_gui_fonts_inputs gui_fonts;
 	input_settings input;
 

@@ -2,9 +2,9 @@
 #include <memory>
 #include <string>
 #include <cstddef>
-#include "application/setups/debugger/commands/editor_command_structs.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
 
-struct editor_command_input;
+struct debugger_command_input;
 
 namespace augs {
 	struct introspection_access;
@@ -14,7 +14,7 @@ struct fill_with_test_scene_command {
 	friend augs::introspection_access;
 
 	// GEN INTROSPECTOR struct fill_with_test_scene_command
-	editor_command_common common;
+	debugger_command_common common;
 private:
 	std::vector<std::byte> before_fill;
 	bool minimal = false;
@@ -26,8 +26,8 @@ public:
 
 	std::string describe() const;
 
-	void redo(editor_command_input);
-	void undo(editor_command_input);
+	void redo(debugger_command_input);
+	void undo(debugger_command_input);
 
 	void clear_undo_state();
 };

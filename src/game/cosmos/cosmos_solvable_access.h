@@ -9,7 +9,7 @@ class move_entities_command;
 class flip_entities_command;
 class resize_entities_command;
 
-struct editor_property_accessors;
+struct debugger_property_accessors;
 
 template <class derived_handle_type>
 struct stored_id_provider;
@@ -27,7 +27,7 @@ class cosmos_solvable_access {
 	friend flip_entities_command;
 	friend resize_entities_command;
 
-	friend editor_property_accessors;
+	friend debugger_property_accessors;
 
 	template <class C, class E>
 	friend auto subscript_handle_getter(C& cosm, typed_entity_id<E>) 

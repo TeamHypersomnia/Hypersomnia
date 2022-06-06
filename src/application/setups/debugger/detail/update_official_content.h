@@ -62,7 +62,7 @@ struct update_official_content_settings {
 	bool overwrite_perks = true;
 };
 
-inline void update_official_content(const editor_command_input cmd_in, update_official_content_settings settings) {
+inline void update_official_content(const debugger_command_input cmd_in, update_official_content_settings settings) {
 	auto& folder = cmd_in.folder;
 
 	auto test = std::make_unique<intercosm>();

@@ -9,7 +9,7 @@
 #include "game/cosmos/per_entity_type.h"
 #include "game/cosmos/entity_solvable.h"
 
-#include "application/setups/debugger/commands/editor_command_structs.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
 
 namespace augs {
 	struct introspection_access;
@@ -28,7 +28,7 @@ struct duplicate_entities_command {
 	using make_data_vector = std::vector<duplicated_entry<T>>;
 
 	// GEN INTROSPECTOR struct duplicate_entities_command
-	editor_command_common common;
+	debugger_command_common common;
 private:
 	per_entity_type_container<make_data_vector> duplicated_entities;
 	change_grouping_command created_grouping;
@@ -39,8 +39,8 @@ public:
 
 	void push_entry(const_entity_handle);
 
-	void redo(editor_command_input);
-	void undo(editor_command_input);
+	void redo(debugger_command_input);
+	void undo(debugger_command_input);
 
 	auto size() const {
 		return duplicated_entities.size();
@@ -49,6 +49,6 @@ public:
 	bool empty() const;
 	std::string describe() const;
 
-	void sanitize(editor_command_input);
+	void sanitize(debugger_command_input);
 	void clear_undo_state();
 };

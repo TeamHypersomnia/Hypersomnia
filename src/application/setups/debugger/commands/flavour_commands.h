@@ -1,8 +1,8 @@
 #pragma once
 #include "game/organization/all_entity_types_declaration.h"
 
-#include "application/setups/debugger/editor_command_input.h"
-#include "application/setups/debugger/commands/editor_command_structs.h"
+#include "application/setups/debugger/debugger_command_input.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
 #include "application/setups/debugger/commands/id_allocating_command.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/cosmos/entity_id.h"
@@ -26,11 +26,11 @@ public:
 
 	std::string describe() const;
 
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 
 protected:
-	void redo_and_copy(const editor_command_input in, raw_entity_flavour_id);
+	void redo_and_copy(const debugger_command_input in, raw_entity_flavour_id);
 };
 
 struct duplicate_flavour_command : create_flavour_command {
@@ -49,7 +49,7 @@ struct duplicate_flavour_command : create_flavour_command {
 		duplicate_from = id.raw;
 	}
 
-	void redo(const editor_command_input in);
+	void redo(const debugger_command_input in);
 	using base::undo;
 };
 
@@ -75,13 +75,13 @@ public:
 
 	std::string describe() const;
 
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 };
 
 struct instantiate_flavour_command {
 	// GEN INTROSPECTOR struct instantiate_flavour_command
-	editor_command_common common;
+	debugger_command_common common;
 	entity_flavour_id instantiated_id;
 	transformr where;
 private:
@@ -97,6 +97,6 @@ public:
 
 	std::string describe() const;
 
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 };

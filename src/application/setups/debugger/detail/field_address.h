@@ -21,7 +21,7 @@
 #include "game/modes/detail/item_purchase_structs.h"
 #include "game/assets/image_offsets.h"
 
-#include "application/setups/debugger/property_editor/property_editor_structs.h"
+#include "application/setups/debugger/property_debugger/property_debugger_structs.h"
 
 struct sound_meta;
 struct image_meta;

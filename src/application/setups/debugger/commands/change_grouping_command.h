@@ -4,12 +4,12 @@
 
 #include "game/cosmos/entity_id.h"
 #include "application/setups/debugger/commands/change_property_command.h"
-#include "application/setups/debugger/commands/editor_command_structs.h"
-#include "application/setups/debugger/editor_command_input.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
+#include "application/setups/debugger/debugger_command_input.h"
 
 struct change_grouping_command {
 	// GEN INTROSPECTOR struct change_grouping_command
-	editor_command_common common;
+	debugger_command_common common;
 	std::vector<entity_id> affected_entities;
 	std::vector<unsigned> group_indices_before;
 	std::vector<unsigned> group_indices_after;
@@ -19,14 +19,14 @@ struct change_grouping_command {
 
 	void push_entry(entity_id);
 
-	void redo(editor_command_input);
-	void undo(editor_command_input);
+	void redo(debugger_command_input);
+	void undo(debugger_command_input);
 	std::string describe() const;
 
 	std::size_t size() const;
 	bool empty() const;
 
-	void sanitize(editor_command_input);
+	void sanitize(debugger_command_input);
 	void clear_undo_state();
 };
 

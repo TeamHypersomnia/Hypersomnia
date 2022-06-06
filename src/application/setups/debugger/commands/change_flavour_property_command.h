@@ -3,7 +3,7 @@
 #include "game/organization/all_components_declaration.h"
 #include "game/cosmos/entity_flavour_id.h"
 
-#include "application/setups/debugger/commands/editor_command_structs.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
 #include "application/setups/debugger/commands/change_property_command.h"
 
 #include "application/setups/debugger/commands/detail/flavour_property_id.h"

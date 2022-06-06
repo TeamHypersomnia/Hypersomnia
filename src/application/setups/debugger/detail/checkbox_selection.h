@@ -49,7 +49,7 @@ ImGuiTreeNodeFlags do_selection_checkbox(
 
 template <class C, class A, class I>
 ImGuiTreeNodeFlags do_tick_all_checkbox(
-	const property_editor_settings& settings,
+	const property_debugger_settings& settings,
 	C& current_selections, 
 	A for_each_item,
 	const I& checkbox_id

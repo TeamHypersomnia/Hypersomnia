@@ -1,12 +1,12 @@
 #include "game/cosmos/entity_handle.h"
-#include "application/setups/debugger/editor_command_input.h"
+#include "application/setups/debugger/debugger_command_input.h"
 
 #if TODO
 
 #include "application/intercosm.h"
 #include "game/cosmos/create_entity.hpp"
-#include "application/setups/debugger/editor_command_input.h"
-#include "application/setups/debugger/editor_folder.h"
+#include "application/setups/debugger/debugger_command_input.h"
+#include "application/setups/debugger/debugger_folder.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #endif
 
@@ -35,7 +35,7 @@ bool paste_entities_command::empty() const {
 	return size() == 0;
 }
 
-void paste_entities_command::redo(const editor_command_input in) {
+void paste_entities_command::redo(const debugger_command_input in) {
 	(void)in;
 #if TODO
 	in.purge_selections();
@@ -64,7 +64,7 @@ void paste_entities_command::redo(const editor_command_input in) {
 #endif
 }
 
-void paste_entities_command::undo(const editor_command_input in) const {
+void paste_entities_command::undo(const debugger_command_input in) const {
 	(void)in;
 #if TODO
 	in.purge_selections();

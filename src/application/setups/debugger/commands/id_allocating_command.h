@@ -1,5 +1,5 @@
 #pragma once
-#include "application/setups/debugger/editor_command_input.h"
+#include "application/setups/debugger/debugger_command_input.h"
 #include "augs/ensure_rel.h"
 #include "augs/ensure_rel_util.h"
 #include "augs/readwrite/memory_stream.h"
@@ -13,7 +13,7 @@ template <class id_type>
 struct id_allocating_command {
 	friend augs::introspection_access;
 	// GEN INTROSPECTOR struct id_allocating_command class id_type
-	editor_command_common common;
+	debugger_command_common common;
 private:
 	id_type allocated_id;
 public:
@@ -61,7 +61,7 @@ public:
 template <class id_type>
 struct id_freeing_command {
 	// GEN INTROSPECTOR struct id_freeing_command class id_type
-	editor_command_common common;
+	debugger_command_common common;
 
 	id_type freed_id;
 

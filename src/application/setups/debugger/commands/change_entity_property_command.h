@@ -1,7 +1,7 @@
 #pragma once
 #include "game/organization/all_components_declaration.h"
 
-#include "application/setups/debugger/commands/editor_command_structs.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
 #include "application/setups/debugger/commands/change_property_command.h"
 
 #include "application/setups/debugger/commands/detail/entity_property_id.h"
@@ -21,5 +21,5 @@ struct change_entity_property_command : change_property_command<change_entity_pr
 		return affected_entities.size();
 	}
 
-	void sanitize(editor_command_input);
+	void sanitize(debugger_command_input);
 };

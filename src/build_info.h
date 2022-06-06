@@ -69,7 +69,7 @@ inline auto get_help_section() {
 return
 	std::string("Hypersomnia\nA community-centered shooter released as free software.\n") 
 	+ R"(
-usage: Hypersomnia [options|editor_file_path]
+usage: Hypersomnia [options|debugger_file_path]
 
 Options:
     -h, --help                  Show this help and quit.
@@ -92,7 +92,7 @@ Options:
     --dedicated-server          The same as --server, but applies some settings suitable for a dedicated server instance.
                                 For example - the game will be started without a window.
 
-If editor_file_path is supplied and it is a directory,
+If debugger_file_path is supplied and it is a directory,
 the game will automatically launch the editor to try and open the project inside it, if there is one.)"
 ;
 }

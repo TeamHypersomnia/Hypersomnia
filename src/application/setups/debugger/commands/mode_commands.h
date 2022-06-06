@@ -7,8 +7,8 @@
 #include "game/modes/mode_player_id.h"
 #include "game/modes/ruleset_id.h"
 #include "application/setups/debugger/commands/change_property_command.h"
-#include "application/setups/debugger/commands/editor_command_structs.h"
-#include "application/setups/debugger/editor_command_input.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
+#include "application/setups/debugger/debugger_command_input.h"
 #include "application/setups/debugger/detail/field_address.h"
 
 struct change_ruleset_property_command : change_property_command<change_ruleset_property_command> {

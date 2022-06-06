@@ -1,8 +1,8 @@
 #include "game/cosmos/entity_handle.h"
 
 #include "application/intercosm.h"
-#include "application/setups/debugger/editor_command_input.h"
-#include "application/setups/debugger/editor_folder.h"
+#include "application/setups/debugger/debugger_command_input.h"
+#include "application/setups/debugger/debugger_folder.h"
 
 #include "application/setups/debugger/commands/fill_with_test_scene_command.h"
 
@@ -10,13 +10,13 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
-#include "application/setups/debugger/editor_settings.h"
+#include "application/setups/debugger/debugger_settings.h"
 
 std::string fill_with_test_scene_command::describe() const {
 	return typesafe_sprintf("Filled with %x", minimal ? "minimal test scene" : "test scene");
 }
 
-void fill_with_test_scene_command::redo(const editor_command_input in) {
+void fill_with_test_scene_command::redo(const debugger_command_input in) {
 	/* Reset to zero if it happened while playtesting */
 	common.when_happened = 0;
 
@@ -98,7 +98,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	}
 }
 
-void fill_with_test_scene_command::undo(const editor_command_input in) {
+void fill_with_test_scene_command::undo(const debugger_command_input in) {
 	in.purge_selections();
 
 	auto ms = augs::cref_memory_stream(before_fill);

@@ -2,13 +2,13 @@
 #include "game/cosmos/cosmic_functions.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "application/intercosm.h"
-#include "application/setups/debugger/editor_folder.h"
-#include "application/setups/debugger/editor_command_input.h"
+#include "application/setups/debugger/debugger_folder.h"
+#include "application/setups/debugger/debugger_command_input.h"
 #include "application/setups/debugger/commands/move_entities_command.h"
-#include "application/setups/debugger/gui/editor_entity_selector.h"
+#include "application/setups/debugger/gui/debugger_entity_selector.h"
 #include "application/setups/debugger/gui/find_aabb_of.h"
-#include "application/setups/debugger/detail/editor_transform_utils.h"
-#include "application/setups/debugger/commands/editor_command_sanitizer.h"
+#include "application/setups/debugger/detail/debugger_transform_utils.h"
+#include "application/setups/debugger/commands/debugger_command_sanitizer.h"
 #include "game/inferred_caches/organism_cache.hpp"
 
 #include "augs/readwrite/memory_stream.h"
@@ -464,7 +464,7 @@ void move_entities_command::move_entities(cosmos& cosm) {
 
 void move_entities_command::rewrite_change(
 	const delta_type& new_value,
-	const editor_command_input in
+	const debugger_command_input in
 ) {
 	auto& cosm = in.get_cosmos();
 
@@ -476,7 +476,7 @@ void move_entities_command::rewrite_change(
 	reinfer_moved(cosm);
 }
 
-void move_entities_command::redo(const editor_command_input in) {
+void move_entities_command::redo(const debugger_command_input in) {
 	clear_undo_state();
 
 	auto& cosm = in.get_cosmos();
@@ -495,7 +495,7 @@ void move_entities_command::redo(const editor_command_input in) {
 	});
 }
 
-void move_entities_command::undo(const editor_command_input in) {
+void move_entities_command::undo(const debugger_command_input in) {
 	auto& cosm = in.get_cosmos();
 
 	unmove_entities(cosm);
@@ -506,7 +506,7 @@ void move_entities_command::undo(const editor_command_input in) {
 	in.folder.commanded->view_ids.select(moved_entities);
 }
 
-void move_entities_command::sanitize(const editor_command_input in) {
+void move_entities_command::sanitize(const debugger_command_input in) {
 	sanitize_affected_entities(in, moved_entities);
 }
 
@@ -597,7 +597,7 @@ void resize_entities_command::resize_entities(cosmos& cosm) {
 
 void resize_entities_command::rewrite_change(
 	const point_type& new_reference_point,
-	const editor_command_input in
+	const debugger_command_input in
 ) {
 	auto& cosm = in.get_cosmos();
 
@@ -611,7 +611,7 @@ void resize_entities_command::rewrite_change(
 	reinfer_resized(cosm);
 }
 
-void resize_entities_command::redo(const editor_command_input in) {
+void resize_entities_command::redo(const debugger_command_input in) {
 	clear_undo_state();
 
 	auto& cosm = in.get_cosmos();
@@ -627,7 +627,7 @@ void resize_entities_command::redo(const editor_command_input in) {
 	in.folder.commanded->view_ids.select(resized_entities);
 }
 
-void resize_entities_command::undo(const editor_command_input in) {
+void resize_entities_command::undo(const debugger_command_input in) {
 	auto& cosm = in.get_cosmos();
 
 	auto before_change_data = augs::cref_memory_stream(values_before_change);
@@ -640,7 +640,7 @@ void resize_entities_command::undo(const editor_command_input in) {
 	in.folder.commanded->view_ids.select(resized_entities);
 }
 
-void resize_entities_command::sanitize(const editor_command_input in) {
+void resize_entities_command::sanitize(const debugger_command_input in) {
 	sanitize_affected_entities(in, resized_entities);
 }
 
@@ -670,7 +670,7 @@ void flip_entities_command::push_entry(const const_entity_handle handle) {
 	});
 }
 
-void flip_entities_command::sanitize(const editor_command_input in) {
+void flip_entities_command::sanitize(const debugger_command_input in) {
 	sanitize_affected_entities(in, flipped_entities);
 }
 
@@ -739,7 +739,7 @@ void flip_entities_command::flip_entities(cosmos& cosm) {
 	}
 }
 
-void flip_entities_command::redo(const editor_command_input in) {
+void flip_entities_command::redo(const debugger_command_input in) {
 	clear_undo_state();
 
 	auto& cosm = in.get_cosmos();
@@ -764,7 +764,7 @@ void flip_entities_command::unmove_entities(cosmos& cosm) {
 	::unmove_entities({}, cosm, flipped_entities, before_change_data);
 }
 
-void flip_entities_command::undo(const editor_command_input in) {
+void flip_entities_command::undo(const debugger_command_input in) {
 	auto& cosm = in.get_cosmos();
 
 	unmove_entities(cosm);

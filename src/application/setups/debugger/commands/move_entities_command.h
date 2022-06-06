@@ -10,9 +10,9 @@
 #include "game/cosmos/entity_handle_declaration.h"
 
 #include "augs/drawing/flip.h"
-#include "application/setups/debugger/commands/editor_command_structs.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
 
-struct editor_command_input;
+struct debugger_command_input;
 
 namespace augs {
 	struct introspection_access;
@@ -37,7 +37,7 @@ public:
 	using delta_type = transformr;
 
 	// GEN INTROSPECTOR class move_entities_command
-	editor_command_common common;
+	debugger_command_common common;
 
 private:
 	moved_entities_type moved_entities;
@@ -65,16 +65,16 @@ public:
 
 	void rewrite_change(
 		const delta_type& new_value,
-		const editor_command_input in
+		const debugger_command_input in
 	);
 	
 	void unmove_entities(cosmos& cosm);
 	void reinfer_moved(cosmos& cosm);
 
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 
-	void sanitize(editor_command_input);
+	void sanitize(debugger_command_input);
 	void clear_undo_state();
 };
 
@@ -89,7 +89,7 @@ public:
 	using delta_type = transformr;
 
 	// GEN INTROSPECTOR class flip_entities_command
-	editor_command_common common;
+	debugger_command_common common;
 private:
 	flipped_entities_type flipped_entities;
 	std::vector<std::byte> values_before_change;
@@ -110,10 +110,10 @@ public:
 		return size() == 0;
 	}
 
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 
-	void sanitize(editor_command_input);
+	void sanitize(debugger_command_input);
 	void clear_undo_state();
 };
 
@@ -154,7 +154,7 @@ public:
 	using point_type = resizing_reference_point;
 
 	// GEN INTROSPECTOR class resize_entities_command
-	editor_command_common common;
+	debugger_command_common common;
 
 private:
 	resized_entities_type resized_entities;
@@ -182,16 +182,16 @@ public:
 
 	void rewrite_change(
 		const point_type& new_reference_point,
-		const editor_command_input in
+		const debugger_command_input in
 	);
 	
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 
 	auto get_active_edges() const {
 		return edges;
 	}
 
-	void sanitize(editor_command_input);
+	void sanitize(debugger_command_input);
 	void clear_undo_state();
 };

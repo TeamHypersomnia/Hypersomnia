@@ -3,15 +3,15 @@
 #include "game/cosmos/cosmic_functions.h"
 
 #include "application/intercosm.h"
-#include "application/setups/debugger/editor_command_input.h"
-#include "application/setups/debugger/editor_folder.h"
-#include "application/setups/debugger/gui/editor_entity_selector.h"
+#include "application/setups/debugger/debugger_command_input.h"
+#include "application/setups/debugger/debugger_folder.h"
+#include "application/setups/debugger/gui/debugger_entity_selector.h"
 
 #include "application/setups/debugger/commands/duplicate_entities_command.h"
 #include "application/setups/debugger/gui/find_aabb_of.h"
-#include "application/setups/debugger/detail/editor_transform_utils.h"
-#include "application/setups/debugger/commands/editor_command_sanitizer.h"
-#include "application/setups/debugger/editor_selection_groups.hpp"
+#include "application/setups/debugger/detail/debugger_transform_utils.h"
+#include "application/setups/debugger/commands/debugger_command_sanitizer.h"
+#include "application/setups/debugger/debugger_selection_groups.hpp"
 
 std::string duplicate_entities_command::describe() const {
 	return built_description;
@@ -28,7 +28,7 @@ bool duplicate_entities_command::empty() const {
 	return size() == 0;
 }
 
-void duplicate_entities_command::redo(const editor_command_input in) {
+void duplicate_entities_command::redo(const debugger_command_input in) {
 	clear_undo_state();
 
 	in.purge_selections();
@@ -216,7 +216,7 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 	cosmic::reinfer_all_entities(cosm);
 }
 
-void duplicate_entities_command::undo(const editor_command_input in) {
+void duplicate_entities_command::undo(const debugger_command_input in) {
 	// FIXME: Parametrize this?
 	//created_grouping.undo(in);
 
@@ -250,7 +250,7 @@ void duplicate_entities_command::undo(const editor_command_input in) {
 	clear_undo_state();
 }
 
-void duplicate_entities_command::sanitize(const editor_command_input in) {
+void duplicate_entities_command::sanitize(const debugger_command_input in) {
 	created_grouping.sanitize(in);
 
 	sanitize_affected_entities(in, duplicated_entities, [](const auto& entry) {

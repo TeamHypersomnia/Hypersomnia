@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/filesystem/path.h"
 #include "game/assets/ids/asset_ids.h"
-#include "application/setups/debugger/editor_command_input.h"
-#include "application/setups/debugger/commands/editor_command_structs.h"
+#include "application/setups/debugger/debugger_command_input.h"
+#include "application/setups/debugger/commands/debugger_command_structs.h"
 #include "application/setups/debugger/commands/change_property_command.h"
 #include "application/setups/debugger/commands/id_allocating_command.h"
 #include "application/setups/debugger/detail/field_address.h"
@@ -32,8 +32,8 @@ struct create_pathed_asset_id_command : id_allocating_command<id_type> {
 	// END GEN INTROSPECTOR
 
 	std::string describe() const;
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 };
 
 template <class id_type>
@@ -42,8 +42,8 @@ struct create_unpathed_asset_id_command : id_allocating_command<id_type> {
 	using introspect_base = base;
 
 	std::string describe() const;
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 };
 
 template <class id_type>
@@ -59,7 +59,7 @@ struct duplicate_asset_command : create_unpathed_asset_id_command<id_type> {
 	duplicate_asset_command(const id_type duplicate_from) : duplicate_from(duplicate_from) {}
 
 	std::string describe() const;
-	void redo(const editor_command_input in);
+	void redo(const debugger_command_input in);
 	using base::undo;
 };
 
@@ -75,8 +75,8 @@ struct forget_asset_id_command : id_freeing_command<id_type> {
 	// END GEN INTROSPECTOR
 
 	std::string describe() const;
-	void redo(const editor_command_input in);
-	void undo(const editor_command_input in);
+	void redo(const debugger_command_input in);
+	void undo(const debugger_command_input in);
 };
 
 template <class id_type>
@@ -89,7 +89,7 @@ struct change_asset_property_command : change_property_command<change_asset_prop
 	using introspect_base = change_property_command<change_asset_property_command>;
 
 	// GEN INTROSPECTOR struct change_asset_property_command class id_type
-	editor_command_common common;
+	debugger_command_common common;
 
 	asset_property_id<id_type> property_id;
 	std::vector<id_type> affected_assets;

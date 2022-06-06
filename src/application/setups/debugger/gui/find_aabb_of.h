@@ -3,7 +3,7 @@
 #include "game/detail/calc_render_layer.h"
 
 template <class T>
-std::optional<ltrb> find_editor_aabb_of(const T handle) {
+std::optional<ltrb> find_debugger_aabb_of(const T handle) {
 	if (const auto tr = handle.find_logic_transform()) {
 		const auto pos = tr->pos;
 		const auto layer = ::calc_render_layer(handle);
@@ -28,7 +28,7 @@ template <class C>
 void combine_aabb_of(ltrb& total, C& cosm, const entity_id id) {
 	const auto handle = cosm[id];
 
-	if (const auto aabb = find_editor_aabb_of(handle)) {
+	if (const auto aabb = find_debugger_aabb_of(handle)) {
 		total.contain(*aabb);
 	}
 };

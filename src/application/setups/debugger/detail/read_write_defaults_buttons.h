@@ -4,14 +4,14 @@
 
 #include "view/load_meta_lua.h"
 
-#include "application/setups/debugger/property_editor/property_editor_settings.h"
+#include "application/setups/debugger/property_debugger/property_debugger_settings.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/readwrite/to_bytes.h"
 
 template <class Defs, class I, class T>
 void read_write_defaults_buttons(
-	const property_editor_settings& settings,
-	const editor_command_input cmd_in,
+	const property_debugger_settings& settings,
+	const debugger_command_input cmd_in,
 	const Defs& definitions,
 	const I id,
 	const bool is_current_ticked,
@@ -44,7 +44,7 @@ void read_write_defaults_buttons(
 				augs::assign_bytes(cmd.value_after_change, new_meta);
 				cmd.built_description = "Read defaults from " + augs::filename_first(meta_lua_path);
 
-				post_editor_command(cmd_in, std::move(cmd));
+				post_debugger_command(cmd_in, std::move(cmd));
 			}
 			catch (...) {
 
