@@ -1024,7 +1024,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			);
 		});
 
-		launch_on_game_start(launch_type::ARENA_BUILDER);
+		launch_on_game_start(launch_type::EDITOR);
 	};
 
 	static auto launch_setup = [&](const launch_type mode) {
@@ -1088,12 +1088,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				break;
 
-			case launch_type::ARENA_BUILDER:
+			case launch_type::EDITOR:
 				launch_builder();
 
 				break;
 
-			case launch_type::ARENA_BUILDER_PROJECT_SELECTOR:
+			case launch_type::EDITOR_PROJECT_SELECTOR:
 				setup_launcher([&]() {
 					emplace_current_setup(
 						std::in_place_type_t<project_selector_setup>()
@@ -1459,7 +1459,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				case custom_imgui_result::RETRY:
 					if constexpr(std::is_same_v<S, client_setup>) {
-						launch_setup(launch_type::ARENA_BUILDER);
+						launch_setup(launch_type::EDITOR);
 					}
 
 					break;
@@ -1701,8 +1701,8 @@ work_result work(const int argc, const char* const * const argv) try {
 				launch_setup(launch_type::TEST_SCENE);
 				break;
 
-			case T::ARENA_BUILDER:
-				launch_setup(launch_type::ARENA_BUILDER_PROJECT_SELECTOR);
+			case T::EDITOR:
+				launch_setup(launch_type::EDITOR_PROJECT_SELECTOR);
 				break;
 
 			case T::SETTINGS:

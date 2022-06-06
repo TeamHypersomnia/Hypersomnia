@@ -39,7 +39,7 @@ struct main_menu_gui {
 		B button_callback
 	) {
 		if (change.was_pressed(augs::event::keys::key::A)) {
-			button_callback(main_menu_button_type::ARENA_BUILDER);
+			button_callback(main_menu_button_type::EDITOR);
 			return true;
 		}
 

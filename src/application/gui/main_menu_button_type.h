@@ -7,7 +7,7 @@ enum class main_menu_button_type {
 	HOST_SERVER,
 	CONNECT_TO_SERVER,
 	LOCAL_TEST_SCENE,
-	ARENA_BUILDER,
+	EDITOR,
 	SETTINGS,
 	CREATORS,
 	QUIT,
