@@ -949,7 +949,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	static auto launch_legacy_editor = [&](auto&&... args) {
+	static auto launch_debugger = [&](auto&&... args) {
 		setup_launcher([&]() {
 			emplace_current_setup(std::in_place_type_t<debugger_setup>(),
 				std::forward<decltype(args)>(args)...
@@ -1084,7 +1084,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			}
 
 			case launch_type::DEBUGGER:
-				launch_legacy_editor(lua);
+				launch_debugger(lua);
 
 				break;
 
@@ -1701,10 +1701,6 @@ work_result work(const int argc, const char* const * const argv) try {
 				launch_setup(launch_type::TEST_SCENE);
 				break;
 
-			case T::LEGACY_EDITOR:
-				launch_setup(launch_type::DEBUGGER);
-				break;
-
 			case T::ARENA_BUILDER:
 				launch_setup(launch_type::ARENA_BUILDER_PROJECT_SELECTOR);
 				break;
@@ -2105,7 +2101,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	if (!params.debugger_target.empty()) {
-		launch_legacy_editor(lua, params.debugger_target);
+		launch_debugger(lua, params.debugger_target);
 	}
 	else if (params.start_server) {
 		launch_setup(launch_type::SERVER);
@@ -2470,6 +2466,11 @@ work_result work(const int argc, const char* const * const argv) try {
 					{
 						auto control_main_menu = [&]() {
 							if (has_main_menu() && !has_current_setup()) {
+								if (e.was_pressed(augs::event::keys::key::D)) {
+									launch_debugger(lua);
+									return true;
+								}
+
 								if (main_menu->gui.show) {
 									main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
 								}

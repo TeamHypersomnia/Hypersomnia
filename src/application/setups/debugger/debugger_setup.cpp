@@ -239,10 +239,10 @@ void debugger_setup::accept_game_gui_events(const game_gui_entropy_type& entropy
 
 void debugger_setup::customize_for_viewing(config_lua_table& config) const {
 	if (anything_opened()) {
-		config.window.name = "Hypersomnia Editor - " + folder().get_display_path();
+		config.window.name = "Hypersomnia Debugger - " + folder().get_display_path();
 	}
 	else {
-		config.window.name = "Hypersomnia Editor";
+		config.window.name = "Hypersomnia Debugger";
 	}
 
 	if (!anything_opened() || is_editing_mode()) {

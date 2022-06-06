@@ -43,11 +43,6 @@ struct main_menu_gui {
 			return true;
 		}
 
-		if (change.was_pressed(augs::event::keys::key::E)) {
-			button_callback(main_menu_button_type::LEGACY_EDITOR);
-			return true;
-		}
-
 		if (change.was_pressed(augs::event::keys::key::L)) {
 			button_callback(main_menu_button_type::LOCAL_TEST_SCENE);
 			return true;

@@ -8,7 +8,6 @@ enum class main_menu_button_type {
 	CONNECT_TO_SERVER,
 	LOCAL_TEST_SCENE,
 	ARENA_BUILDER,
-	LEGACY_EDITOR,
 	SETTINGS,
 	CREATORS,
 	QUIT,
