@@ -299,7 +299,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 		y = 84
 	}
   },
-  editor = {
+  debugger = {
 	player = {
 		snapshot_interval_in_steps = 800
 	},

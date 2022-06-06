@@ -267,9 +267,9 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 }
 
 void editor_setup::apply(const config_lua_table& cfg) {
-	settings = cfg.editor;
+	settings = cfg.debugger;
 
-	if (cfg.editor.save_entropies_to_live_file) {
+	if (cfg.debugger.save_entropies_to_live_file) {
 		settings.player.snapshot_interval_in_steps = 0;
 	}
 
@@ -1583,7 +1583,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	auto triangles = in.get_drawer();
 	auto lines = in.get_line_drawer();
 	const auto screen_size = in.screen_size;
-	auto& editor_cfg = in.config.editor;
+	auto& editor_cfg = in.config.debugger;
 
 	for_each_icon(
 		in.all_visible,

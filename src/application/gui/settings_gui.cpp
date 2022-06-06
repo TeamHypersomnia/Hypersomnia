@@ -1225,26 +1225,26 @@ void settings_gui_state::perform(
 			}
 			case settings_pane::EDITOR: {
 				if (auto node = scoped_tree_node("General")) {
-					revertable_checkbox("Enable autosave", config.editor.autosave.enabled);
+					revertable_checkbox("Enable autosave", config.debugger.autosave.enabled);
 	
-					if (config.editor.autosave.enabled) {
+					if (config.debugger.autosave.enabled) {
 						auto scope = scoped_indent();
 						text("Autosave once per");
 						ImGui::SameLine();
-						revertable_drag("minutes", config.editor.autosave.once_every_min, 0.002, 0.05, 2000.0);
+						revertable_drag("minutes", config.debugger.autosave.once_every_min, 0.002, 0.05, 2000.0);
 
-						revertable_checkbox("Autosave when window loses focus", config.editor.autosave.on_lost_focus);
+						revertable_checkbox("Autosave when window loses focus", config.debugger.autosave.on_lost_focus);
 					}
 					
 #if TODO
 					text("Remember last");
 					ImGui::SameLine();
 
-					revertable_drag("commands for undoing", config.editor.remember_last_n_commands, 1, 10, 2000);
+					revertable_drag("commands for undoing", config.debugger.remember_last_n_commands, 1, 10, 2000);
 #endif
 
 					if (auto node = scoped_tree_node("Test scene generation")) {
-						auto& scope_cfg = config.editor.test_scene;
+						auto& scope_cfg = config.debugger.test_scene;
 						
 						revertable_slider(SCOPE_CFG_NVP(scene_tickrate), 10u, 300u);
 						revertable_checkbox(SCOPE_CFG_NVP(start_bomb_defusal));
@@ -1253,7 +1253,7 @@ void settings_gui_state::perform(
 				
 				if (auto node = scoped_tree_node("Interface")) {
 					if (auto node = scoped_tree_node("Grid")) {
-						auto& scope_cfg = config.editor.grid.render;
+						auto& scope_cfg = config.debugger.grid.render;
 
 						if (auto lines = scoped_tree_node("Line colors")) {
 							for (std::size_t i = 0; i < scope_cfg.line_colors.size(); ++i) {
@@ -1274,23 +1274,23 @@ void settings_gui_state::perform(
 					}
 
 					if (auto node = scoped_tree_node("Camera")) {
-						revertable_drag("Panning speed", config.editor.camera.panning_speed, 0.001f, -10.f, 10.f);
+						revertable_drag("Panning speed", config.debugger.camera.panning_speed, 0.001f, -10.f, 10.f);
 					}
 
 					if (auto node = scoped_tree_node("\"Go to\" dialogs")) {
-						revertable_slider("Width", config.editor.go_to.dialog_width, 30u, static_cast<unsigned>(screen_size.x));
-						revertable_slider("Number of lines to show", config.editor.go_to.num_lines, 1u, 300u);
+						revertable_slider("Width", config.debugger.go_to.dialog_width, 30u, static_cast<unsigned>(screen_size.x));
+						revertable_slider("Number of lines to show", config.debugger.go_to.num_lines, 1u, 300u);
 					}
 
 					if (auto node = scoped_tree_node("Entity selections")) {
-						auto& scope_cfg = config.editor;
+						auto& scope_cfg = config.debugger;
 						revertable_checkbox(SCOPE_CFG_NVP(keep_source_entities_selected_on_mirroring));
 					}
 				}
 
 				if (auto node = scoped_tree_node("Appearance")) {
 					if (auto node = scoped_tree_node("Property editor")) {
-						auto& scope_cfg = config.editor.property_editor;
+						auto& scope_cfg = config.debugger.property_editor;
 
 						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_bg));
 						revertable_color_edit(SCOPE_CFG_NVP(different_values_frame_hovered_bg));
@@ -1299,7 +1299,7 @@ void settings_gui_state::perform(
 
 					if (auto node = scoped_tree_node("Entity highlights")) {
 						{
-							auto& scope_cfg = config.editor.entity_selector;
+							auto& scope_cfg = config.debugger.entity_selector;
 
 							revertable_color_edit(SCOPE_CFG_NVP(hovered_color));
 							revertable_color_edit(SCOPE_CFG_NVP(hovered_dashed_line_color));
@@ -1309,7 +1309,7 @@ void settings_gui_state::perform(
 						}
 
 						{
-							auto& scope_cfg = config.editor;
+							auto& scope_cfg = config.debugger;
 
 							revertable_color_edit(SCOPE_CFG_NVP(controlled_entity_color));
 							revertable_color_edit(SCOPE_CFG_NVP(matched_entity_color));
@@ -1317,7 +1317,7 @@ void settings_gui_state::perform(
 					}
 
 					if (auto node = scoped_tree_node("Action indicator")) {
-						auto& scope_cfg = config.editor.action_indicator;
+						auto& scope_cfg = config.debugger.action_indicator;
 
 						revertable_color_edit(SCOPE_CFG_NVP(bg_color));
 						revertable_color_edit(SCOPE_CFG_NVP(bg_border_color));
@@ -1331,7 +1331,7 @@ void settings_gui_state::perform(
 						revertable_drag_vec2(SCOPE_CFG_NVP(offset));
 					}
 
-					auto& scope_cfg = config.editor;
+					auto& scope_cfg = config.debugger;
 
 					revertable_color_edit(SCOPE_CFG_NVP(tutorial_text_color));
 					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_color));
@@ -1339,13 +1339,13 @@ void settings_gui_state::perform(
 				}
 
 				if (auto node = scoped_tree_node("Player")) {
-					auto& scope_cfg = config.editor.player;
+					auto& scope_cfg = config.debugger.player;
 
 					revertable_slider(SCOPE_CFG_NVP(snapshot_interval_in_steps), 400u, 5000u);
 				}
 
 				if (auto node = scoped_tree_node("Debug")) {
-					auto& scope_cfg = config.editor;
+					auto& scope_cfg = config.debugger;
 
 					revertable_checkbox(SCOPE_CFG_NVP(save_entropies_to_live_file));
 				}

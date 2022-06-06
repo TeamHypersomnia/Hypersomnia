@@ -141,7 +141,7 @@ struct config_lua_table {
 	debug_settings debug;
 	session_settings session;
 	test_scene_settings test_scene;
-	editor_settings editor;
+	editor_settings debugger;
 	all_gui_fonts_inputs gui_fonts;
 	input_settings input;
 
