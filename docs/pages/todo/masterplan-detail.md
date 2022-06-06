@@ -197,7 +197,7 @@ Chyba jednak nie robimy osobno pliku resources.
 			- taką konwencję robimy i chuj
 	- Wtedy przed wysłaniem jsona konwertujemy go tak żeby wszystkie ścieżki zawierały hashe
 		- albo niekoniecznie, możemy sobie potem bezpiecznie mapować
-		- jeśli ścieżka jest taka jak być powinna to 1:1 deterministycznie się odtworzy z builder_secure_resources
+		- jeśli ścieżka jest taka jak być powinna to 1:1 deterministycznie się odtworzy z editor_secure_resources
 			- wtedy to co w jsonie jest posłuży jako string do mapowania z tym co jest w resources json
 	- taki resources json nawet jest dobrą czytelną specyfikacją tego co potrzebuje mapa
 
@@ -297,7 +297,7 @@ Chyba jednak nie robimy osobno pliku resources.
 			- ale jednak fajnie bedzie miec w jednym folderze wszystko co jest potrzebne do migracji uzytkownika
 
 - no i ok, wszystkie downloady w userze to juz ustalone
-	- pytanie czy do user/community/arenas, czy user/arenas? Czy user/builder razem ze wszystkim?
+	- pytanie czy do user/community/arenas, czy user/arenas? Czy user/editor razem ze wszystkim?
 
 - Najbardziej jasne bedzie user/downloads/arenas, user/downloads/mods itp
 

@@ -38,7 +38,7 @@ struct main_menu_gui {
 		const augs::event::change change,
 		B button_callback
 	) {
-		if (change.was_pressed(augs::event::keys::key::A)) {
+		if (change.was_pressed(augs::event::keys::key::E)) {
 			button_callback(main_menu_button_type::EDITOR);
 			return true;
 		}

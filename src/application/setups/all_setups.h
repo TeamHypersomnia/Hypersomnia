@@ -7,7 +7,7 @@
 #endif
 #include "application/setups/client/client_setup.h"
 #include "application/setups/server/server_setup.h"
-#include "application/setups/builder/builder_setup.h"
+#include "application/setups/editor/editor_setup.h"
 #include "application/setups/project_selector/project_selector_setup.h"
 
 using setup_variant = std::variant<
@@ -15,7 +15,7 @@ using setup_variant = std::variant<
 #if BUILD_DEBUGGER_SETUP
 	debugger_setup,
 #endif
-	builder_setup,
+	editor_setup,
 	project_selector_setup
 #if BUILD_NETWORKING
 	, client_setup

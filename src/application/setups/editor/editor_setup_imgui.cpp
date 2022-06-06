@@ -4,13 +4,13 @@
 #include "view/viewables/viewables_loading_type.h"
 
 #include "application/config_lua_table.h"
-#include "application/setups/builder/builder_setup.h"
+#include "application/setups/editor/editor_setup.h"
 
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "3rdparty/imgui/imgui_internal.h"
 
-void builder_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
+void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
 
 	(void)in;
@@ -50,7 +50,7 @@ void builder_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	}
 }
 
-custom_imgui_result builder_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
+custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	(void)in;
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;

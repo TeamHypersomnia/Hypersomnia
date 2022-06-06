@@ -28,7 +28,7 @@
 - We can re-use (code of) currently implemented group behaviour for moving children along with the parent
 	- Instead of playing with those
 
-## Builder UI
+## editor UI
 
 ### General
 
@@ -73,7 +73,7 @@
 ### Layout tool
 
 - Biomes to select
-- Perhaps an easy layout builder?
+- Perhaps an easy layout editor?
 	- Problematically, we have to lay out the walls somehow automatically?
 
 ### Inspector

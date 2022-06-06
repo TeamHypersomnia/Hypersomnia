@@ -65,7 +65,7 @@
 #include "application/network/network_common.h"
 #include "application/setups/all_setups.h"
 
-#include "application/setups/builder/builder_paths.h"
+#include "application/setups/editor/editor_paths.h"
 
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_debug_details.h"
@@ -147,7 +147,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			DEMOS_DIR,
 
 			DOWNLOADED_ARENAS_DIR,
-			BUILDER_PROJECTS_DIR
+			editor_PROJECTS_DIR
 		};
 
 		{
@@ -1024,10 +1024,10 @@ work_result work(const int argc, const char* const * const argv) try {
 		return true;
 	};
 
-	static auto launch_builder = [](auto&&... args) {
+	static auto launch_editor = [](auto&&... args) {
 		setup_launcher([&]() {
 			emplace_current_setup(
-				std::in_place_type_t<builder_setup>(),
+				std::in_place_type_t<editor_setup>(),
 				std::forward<decltype(args)>(args)...
 			);
 		});
@@ -1097,7 +1097,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case launch_type::EDITOR:
-				launch_builder();
+				launch_editor();
 
 				break;
 
@@ -1476,7 +1476,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				case custom_imgui_result::OPEN_PROJECT:
 					if constexpr(std::is_same_v<S, project_selector_setup>) {
-						launch_builder(setup.get_selected_project_path());
+						launch_editor(setup.get_selected_project_path());
 					}
 
 					break;

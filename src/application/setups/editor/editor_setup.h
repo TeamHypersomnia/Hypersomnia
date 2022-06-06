@@ -17,9 +17,9 @@
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 
-#include "application/setups/builder/gui/builder_inspector_gui.h"
-#include "application/setups/builder/gui/builder_hierarchy_gui.h"
-#include "application/setups/builder/gui/builder_project_files_gui.h"
+#include "application/setups/editor/gui/editor_inspector_gui.h"
+#include "application/setups/editor/gui/editor_hierarchy_gui.h"
+#include "application/setups/editor/gui/editor_project_files_gui.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -28,15 +28,15 @@ namespace sol {
 	class state;
 }
 
-struct builder_gui {
-	// GEN INTROSPECTOR struct builder_gui
-	builder_inspector_gui inspector = std::string("Inspector");
-	builder_hierarchy_gui hierarchy = std::string("Hierarchy");
-	builder_project_files_gui project_files = std::string("Project files");
+struct editor_gui {
+	// GEN INTROSPECTOR struct editor_gui
+	editor_inspector_gui inspector = std::string("Inspector");
+	editor_hierarchy_gui hierarchy = std::string("Hierarchy");
+	editor_project_files_gui project_files = std::string("Project files");
 	// END GEN INTROSPECTOR
 };
 
-class builder_setup : public default_setup_settings {
+class editor_setup : public default_setup_settings {
 	test_mode mode;
 	test_mode_ruleset ruleset;
 
@@ -46,7 +46,7 @@ class builder_setup : public default_setup_settings {
 	entity_id viewed_character_id;
 	mode_player_id local_player_id;
 
-	builder_gui gui;
+	editor_gui gui;
 
 	void load_gui_state();
 	void save_gui_state();
@@ -54,10 +54,10 @@ class builder_setup : public default_setup_settings {
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 
-	builder_setup();
-	builder_setup(const augs::path_type& project_path);
+	editor_setup();
+	editor_setup(const augs::path_type& project_path);
 	
-	~builder_setup();
+	~editor_setup();
 
 	auto get_audiovisual_speed() const {
 		return 1.0;

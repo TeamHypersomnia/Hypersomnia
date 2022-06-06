@@ -41,4 +41,4 @@
 	- We'll just translate the state of all prefab instances into the required flavors
 		- We'll thus essentially implement COWs
 	- actually most of properties will only concern flavours
-		- we'll probably code GUI for all properties in Builder by hand
+		- we'll probably code GUI for all properties in editor by hand

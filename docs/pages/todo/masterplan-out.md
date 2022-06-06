@@ -104,7 +104,7 @@ with project name being de_cyberaqua
 
 - content/arenas/de_cyberaqua
 - user/arenas/de_cyberaqua
-- user/builder/de_cyberaqua
+- user/editor/de_cyberaqua
 czy
 - user/projects/de_cyberaqua
 

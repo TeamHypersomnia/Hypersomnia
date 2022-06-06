@@ -6,8 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- builder_setup -> editor_setup
-Nie nazywajmy tego arena builder tylko użyjmy najbardziej oczywistej nazwy
+- editor_setup -> editor_setup
+Nie nazywajmy tego arena editor tylko użyjmy najbardziej oczywistej nazwy
 
 - Breaking changes that e.g. change signature verification scheme could be done by changing the builds/latest to e.g. builds/latest-2
 	- In practice, builds/latest would always have the latest version so that it's easy to link it for people who don't have a binary yet
@@ -236,7 +236,7 @@ Nie nazywajmy tego arena builder tylko użyjmy najbardziej oczywistej nazwy
 		- simply query the  right before the physics step (after applying the crosshair's direction to player rotation)
 
 - Leaderboards shown in the main menu
-- "Host a server" button right in the arena builder
+- "Host a server" button right in the arena editor
 
 - Look for some filesystem implementation for imgui
 	- We'll also replace the system viewers? At least some of them?

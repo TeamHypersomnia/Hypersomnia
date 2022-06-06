@@ -422,7 +422,7 @@
 	- It can have its own tabs, the ones implemented in editor_setup
 		- An advantage of that is they will automatically be not dockable into other windows, only between each other
 	- We'll just make another setup getter - get_custom_viewport
-		- In the builder, this will always take the rendered view coordinates MINUS the tabs
+		- In the editor, this will always take the rendered view coordinates MINUS the tabs
 
 - Project settings
 	- Map miniature
@@ -465,7 +465,7 @@
 	- We'll just translate the state of all prefab instances into the required flavors
 		- We'll thus essentially implement COWs
 	- actually most of properties will only concern flavours
-		- we'll probably code GUI for all properties in Builder by hand
+		- we'll probably code GUI for all properties in editor by hand
 
 - Total revamp inside render layers
 	- Or do we just translate the editor's stuff into proper render_layers?
@@ -514,7 +514,7 @@
 
 - Layout tool
 	- Biomes to select
-	- Perhaps an easy layout builder?
+	- Perhaps an easy layout editor?
 		- Problematically, we have to lay out the walls somehow automatically?
 
 

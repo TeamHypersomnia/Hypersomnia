@@ -2,9 +2,9 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
-#include "application/setups/builder/gui/builder_project_files_gui.h"
+#include "application/setups/editor/gui/editor_inspector_gui.h"
 
-void builder_project_files_gui::perform(const builder_project_files_input in) {
+void editor_inspector_gui::perform(const editor_inspector_input in) {
 	using namespace augs::imgui;
 
 	(void)in;

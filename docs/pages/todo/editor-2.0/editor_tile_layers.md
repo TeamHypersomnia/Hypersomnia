@@ -81,7 +81,7 @@
 - decoration_layer vs render_layer
 	- Let's not complicate it further at this point
 	- Because this API will anyway be transparent to the user
-	- and we'll have some builder's ad-hoc enums for these
+	- and we'll have some editor's ad-hoc enums for these
 
 - Hovering over a palette highlights the whole logical tile
 	- Clicking selects it whole

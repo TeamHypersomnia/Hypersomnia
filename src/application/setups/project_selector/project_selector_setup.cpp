@@ -9,7 +9,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/byte_file.h"
 
-#include "application/setups/builder/builder_paths.h"
+#include "application/setups/editor/editor_paths.h"
 #include "application/gui/pretty_tabs.h"
 
 #include "augs/misc/imgui/imgui_utils.h"
@@ -36,7 +36,7 @@ static auto push_selectable_colors(const rgba normal, const rgba hovered, const 
 static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 	switch (tab_type) {
 		case project_tab_type::MY_PROJECTS:
-			return BUILDER_PROJECTS_DIR;
+			return editor_PROJECTS_DIR;
 
 		case project_tab_type::OFFICIAL_ARENAS:
 			return OFFICIAL_ARENAS_DIR;
@@ -80,7 +80,7 @@ std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_imag
 }
 
 static auto default_meta(const augs::path_type& p) {
-	builder_project_about out;
+	editor_project_about out;
 
 	if (p.filename() == "de_labs2") {
 		out.credits.push_back({"Mapping & graphics", "lia"});
@@ -148,7 +148,7 @@ void project_selector_setup::scan_for_all_arenas() {
 }
 
 project_selector_setup::project_selector_setup() {
-	augs::create_directories(BUILDER_PROJECTS_DIR);
+	augs::create_directories(editor_PROJECTS_DIR);
 
 	load_gui_state();
 	scan_for_all_arenas();
@@ -159,7 +159,7 @@ project_selector_setup::~project_selector_setup() {
 }
 
 void project_selector_setup::customize_for_viewing(config_lua_table& config) const {
-	config.window.name = "Arena builder - project selector";
+	config.window.name = "Arena editor - project selector";
 }
 
 void shift_cursor(const vec2 offset) {
