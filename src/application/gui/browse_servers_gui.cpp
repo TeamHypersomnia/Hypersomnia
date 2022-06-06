@@ -14,7 +14,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/setups/client/client_start_input.h"
 #include "augs/log.h"
-#include "application/setups/editor/detail/maybe_different_colors.h"
+#include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/misc/time_utils.h"
 #include "augs/network/netcode_sockets.h"
 #include "application/nat/nat_detection_settings.h"

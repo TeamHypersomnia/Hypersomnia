@@ -36,7 +36,7 @@
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
 #include "application/setups/main_menu_settings.h"
-#include "application/setups/editor/editor_settings.h"
+#include "application/setups/debugger/editor_settings.h"
 #include "application/setups/server/server_start_input.h"
 #include "application/setups/server/server_vars.h"
 #include "application/setups/client/client_start_input.h"

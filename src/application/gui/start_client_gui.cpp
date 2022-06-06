@@ -6,7 +6,7 @@
 #include "augs/misc/imgui/imgui_utils.h"
 
 #include "augs/network/network_types.h"
-#include "application/setups/editor/detail/maybe_different_colors.h"
+#include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/window_framework/window.h"
 

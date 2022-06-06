@@ -65,7 +65,7 @@ generated-file-format:
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/container_templates.h"
 #include "game/cosmos/entity_id_declaration.h"
-#include "application/setups/editor/editor_history_declaration.h"
+#include "application/setups/debugger/editor_history_declaration.h"
 
 #define FIELD(x) f(#x, _t_.x...)
 #define TYPEOF(x) decltype(__T::x)

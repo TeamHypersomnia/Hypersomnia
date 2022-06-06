@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/log_path_getters.h"
 #include "augs/filesystem/file.h"
-#include "application/setups/editor/detail/maybe_different_colors.h"
+#include "application/setups/debugger/detail/maybe_different_colors.h"
 
 std::string nat_traversal_state_to_string(const nat_traversal_session::state state) {
 	using S = nat_traversal_session::state;

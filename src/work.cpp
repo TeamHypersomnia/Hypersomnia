@@ -73,7 +73,7 @@
 #include "application/main/release_flags.h"
 #include "application/main/flash_afterimage.h"
 #include "application/main/abortable_popup.h"
-#include "application/setups/editor/editor_player.hpp"
+#include "application/setups/debugger/editor_player.hpp"
 
 #include "application/nat/nat_detection_session.h"
 #include "application/nat/nat_traversal_session.h"
