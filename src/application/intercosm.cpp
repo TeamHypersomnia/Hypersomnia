@@ -22,9 +22,27 @@
 #include "game/modes/bomb_defusal.h"
 #include "game/modes/test_mode.h"
 
+#include "application/arena/arena_paths.h"
+#include "application/predefined_rulesets.h"
+
 static_assert(has_introspect_base_v<const entity_solvable<const controlled_character>>);
 static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_assets>);
 static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
+
+void load_arena_from(
+	const arena_paths& paths,
+	intercosm& scene,
+	predefined_rulesets& rulesets
+) {
+	scene.load_from_bytes(paths.int_paths);
+
+	try {
+		augs::load_from_bytes(rulesets, paths.rulesets_file_path);
+	}
+	catch (const augs::file_open_error&) {
+		/* Just let it happen */
+	}
+}
 
 void snap_interpolated_to_logical(cosmos&);
 

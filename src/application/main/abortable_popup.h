@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/misc/imgui/imgui_control_wrappers.h"
 
 struct abortable_popup_state {
 	bool perform(
@@ -9,7 +10,7 @@ struct abortable_popup_state {
 		using namespace augs::imgui;
 
 		if (auto popup = cond_scoped_modal_popup(should_popup_be_open, title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-			text(message + "\n");
+			augs::imgui::text(message + "\n");
 			ImGui::Separator();
 
 			if (ImGui::Button("Abort")) {

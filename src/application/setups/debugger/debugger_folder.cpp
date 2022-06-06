@@ -13,20 +13,7 @@
 #include "application/arena/arena_utils.h"
 #include "hypersomnia_version.h"
 
-void load_arena_from(
-	const arena_paths& paths,
-	intercosm& scene,
-	predefined_rulesets& rulesets
-) {
-	scene.load_from_bytes(paths.int_paths);
-
-	try {
-		augs::load_from_bytes(rulesets, paths.rulesets_file_path);
-	}
-	catch (const augs::file_open_error&) {
-		/* Just let it happen */
-	}
-}
+#include "application/arena/arena_handle.hpp"
 
 std::string debugger_folder::get_display_path() const {
 	return ::get_project_name(current_path);

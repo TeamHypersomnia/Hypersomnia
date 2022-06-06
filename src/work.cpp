@@ -73,7 +73,9 @@
 #include "application/main/release_flags.h"
 #include "application/main/flash_afterimage.h"
 #include "application/main/abortable_popup.h"
+#if BUILD_DEBUGGER_SETUP
 #include "application/setups/debugger/debugger_player.hpp"
+#endif
 
 #include "application/nat/nat_detection_session.h"
 #include "application/nat/nat_traversal_session.h"
@@ -949,6 +951,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	};
 
+#if BUILD_DEBUGGER_SETUP
 	static auto launch_debugger = [&](auto&&... args) {
 		setup_launcher([&]() {
 			emplace_current_setup(std::in_place_type_t<debugger_setup>(),
@@ -956,6 +959,11 @@ work_result work(const int argc, const char* const * const argv) try {
 			);
 		});
 	};
+#else
+	static auto launch_debugger = [&](auto&&...) {
+
+	};
+#endif
 
 	static auto launch_on_game_start = [](const launch_type mode) {
 		change_with_save([mode](config_lua_table& cfg) {
@@ -1340,11 +1348,13 @@ work_result work(const int argc, const char* const * const argv) try {
 		{
 			bool should = true;
 
+#if BUILD_DEBUGGER_SETUP
 			on_specific_setup([&](debugger_setup& setup) {
 				if (!setup.anything_opened() || setup.is_editing_mode()) {
 					should = false;
 				}
 			});
+#endif
 
 			if (has_main_menu() && !has_current_setup()) {
 				should = false;
@@ -2066,11 +2076,13 @@ work_result work(const int argc, const char* const * const argv) try {
 				);
 			}
 			else {
+#if BUILD_DEBUGGER_SETUP
 				if constexpr(std::is_same_v<S, debugger_setup>) {
 					if (setup.is_editing_mode()) {
 						pending_new_state_sample = true;
 					}
 				}
+#endif
 
 				setup.advance(
 					{ 
@@ -2179,9 +2191,11 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
 
+#if BUILD_DEBUGGER_SETUP
 		on_specific_setup([](debugger_setup& setup) {
 			setup.unhover();
 		});
+#endif
 	};
 
 	static auto advance_game_gui = [&](const auto context, const auto frame_delta) {
@@ -2403,9 +2417,11 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				if (game_gui_mode && should_draw_game_gui() && game_gui.world.wants_to_capture_mouse(create_game_gui_context())) {
 					if (current_setup) {
+#if BUILD_DEBUGGER_SETUP
 						if (auto* editor = std::get_if<debugger_setup>(&*current_setup)) {
 							editor->unhover();
 						}
+#endif
 					}
 				}
 

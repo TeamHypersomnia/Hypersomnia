@@ -143,7 +143,7 @@ set(HYPERSOMNIA_LOG_FILES_DIR "logs")
 
 set(HYPERSOMNIA_GENERATED_FILES_DIR "cache")
 
-# Where the game will save untitled works from editor, gui layouts, user config etc.
+# Where the game will save user arenas, all downloaded arenas, gui layouts, user config etc.
 # Deleting this folder might possibly result in data loss, e.g. the untitled works and some user settings.
 
 set(HYPERSOMNIA_USER_FILES_DIR "user")
@@ -164,7 +164,6 @@ option(BUILD_SOUND_FORMAT_DECODERS "Build ogg and vorbis. If this is off, there 
 option(BUILD_VERSION_FILE_GENERATOR "Build version file generator to generate commit information." ${DEFAULT_NET_OPT})
 option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFAULT_NET_OPT})
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
-option(BUILD_PROPERTY_DEBUGGER "Build property debugger code for the debugger setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
 
 option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
@@ -180,6 +179,7 @@ option(LINK_TIME_OPTIMIZATION "Perform link-time optimization. Can drastically i
 ## Debug information.
 
 option(GENERATE_DEBUG_INFORMATION "Generate source-level debug information. If 0, -g flag will be removed to speed up the build." ${DEFAULT_OPT})
+option(BUILD_DEBUGGER_SETUP "Build debugger setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." OFF)
 
 ## Thread sanitizer.
 
@@ -189,6 +189,18 @@ if (ENABLE_THREADSANITIZER)
 	message("Game will build with the thread sanitizer.")
 	set(GENERATE_DEBUG_INFORMATION ON)
 	message("Forcing GENERATE_DEBUG_INFORMATION to ON.")
+endif()
+
+if (GENERATE_DEBUG_INFORMATION)
+	message("Generating debug information. Compilation will take a while.")
+else()
+	message("Not generating debug information.")
+endif()
+
+if (BUILD_DEBUGGER_SETUP)
+	message("Building with debugger setup. Compilation will take a while.")
+else()
+	message("Building without debugger setup.")
 endif()
 
 ## Static allocation switches. Possible values are one or zero.
@@ -384,28 +396,17 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	"src/view/rendering_scripts/illuminated_rendering.cpp"
 	"src/application/tests_of_traits.cpp"
 
+)
+
+if(BUILD_DEBUGGER_SETUP)
+set(HYPERSOMNIA_DEBUGGER_SETUP_CPPS
 	"src/application/setups/debugger/gui/debugger_fae_gui.cpp"
 	"src/application/setups/debugger/debugger_setup.cpp"
 	"src/application/setups/debugger/gui/debugger_common_state_gui.cpp"
 	"src/application/setups/debugger/commands/change_property_command.cpp"
-)
-
-if(BUILD_NETWORKING)
-	list(APPEND HYPERSOMNIA_CPU_INTENSIVE_CPPS
-		"src/application/setups/server/server_setup.cpp"
-		"src/application/setups/client/client_setup.cpp"
-		"src/application/network/network_adapters.cpp"
-		"src/augs/network/network_types.cpp"
-	)
-endif()
-
-set(HYPERSOMNIA_CODEBASE_CPPS
-	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
-
 	"src/application/setups/debugger/gui/debugger_history_gui.cpp"
 	"src/application/setups/debugger/gui/debugger_go_to_gui.cpp"
 	"src/application/setups/debugger/debugger_camera.cpp"
-	"src/augs/misc/imgui/simple_popup.cpp"
 	"src/application/setups/debugger/debugger_command_input.cpp"
 	"src/application/setups/debugger/commands/fill_with_test_scene_command.cpp"
 	"src/application/setups/debugger/commands/delete_entities_command.cpp"
@@ -419,6 +420,44 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/debugger/gui/debugger_selection_groups_gui.cpp"
 	"src/application/setups/debugger/gui/debugger_summary_gui.cpp"
 	"src/application/setups/debugger/gui/debugger_entity_mover.cpp"
+	"src/application/setups/debugger/debugger_folder.cpp"
+	"src/application/setups/debugger/debugger_recent_paths.cpp"
+	"src/application/setups/debugger/gui/debugger_layers_gui.cpp"
+	"src/application/setups/debugger/debugger_autosave.cpp"
+	"src/application/setups/debugger/debugger_paths.cpp"
+	"src/application/setups/debugger/debugger_history.cpp"
+	"src/application/setups/debugger/debugger_view.cpp"
+	"src/application/setups/debugger/gui/debugger_pathed_asset_gui.cpp"
+	"src/application/setups/debugger/commands/asset_commands.cpp"
+	"src/application/setups/debugger/gui/asset_path_browser_settings.cpp"
+	"src/application/setups/debugger/commands/flavour_commands.cpp"
+	"src/application/setups/debugger/gui/debugger_unpathed_asset_gui.cpp"
+	"src/application/setups/debugger/property_debugger/widgets/frames_prologue_widget.cpp"
+	"src/application/setups/debugger/property_debugger/property_debugger_structs.cpp"
+	"src/application/setups/debugger/property_debugger/update_size_if_tex_changed.cpp"
+	"src/application/setups/debugger/gui/debugger_player_gui.cpp"
+	"src/application/setups/debugger/gui/debugger_modes_gui.cpp"
+	"src/application/setups/debugger/debugger_player.cpp"
+	"src/application/setups/debugger/gui/debugger_tutorial_gui.cpp"
+)
+else()
+	set(HYPERSOMNIA_DEBUGGER_SETUP_CPPS "")
+endif()
+
+if(BUILD_NETWORKING)
+	list(APPEND HYPERSOMNIA_CPU_INTENSIVE_CPPS
+		"src/application/setups/server/server_setup.cpp"
+		"src/application/setups/client/client_setup.cpp"
+		"src/application/network/network_adapters.cpp"
+		"src/augs/network/network_types.cpp"
+	)
+endif()
+
+set(HYPERSOMNIA_CODEBASE_CPPS
+	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
+	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
+
+	"src/augs/misc/imgui/simple_popup.cpp"
 	"src/application/config_lua_table.cpp"
 	"src/view/audiovisual_state/systems/interpolation_system.cpp"
 	"src/view/audiovisual_state/systems/particles_simulation_system.cpp"
@@ -558,8 +597,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/names_and_descriptions.cpp"
 	"src/game/cosmos/cosmos_solvable_significant.cpp"
 	"src/application/setups/test_scene_setup.cpp"
-	"src/application/setups/debugger/debugger_folder.cpp"
-	"src/application/setups/debugger/debugger_recent_paths.cpp"
 	"src/application/setups/main_menu_setup.cpp"
 	"src/application/web_daemon/session_report.cpp"
 	"src/augs/global_libraries.cpp"
@@ -612,7 +649,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/unit_tests.cpp"
 	"src/game/cosmos/cosmic_profiler.cpp"
 	"src/application/main/draw_debug_lines.cpp"
-	"src/application/setups/debugger/gui/debugger_layers_gui.cpp"
 	"src/application/main/draw_debug_details.cpp"
 	"src/application/main/imgui_pass.cpp"
 	"src/application/main/release_flags.cpp"
@@ -633,42 +669,28 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/inferred_caches/processing_lists_cache.cpp"
 	"src/game/cosmos/entity_id.cpp"
 	"src/augs/misc/children_vector_tracker.cpp"
-	"src/application/setups/debugger/debugger_autosave.cpp"
-	"src/application/setups/debugger/debugger_paths.cpp"
 	"src/augs/templates/container_templates.cpp"
-	"src/application/setups/debugger/debugger_history.cpp"
 	"src/augs/templates/history.cpp"
 	"src/game/cosmos/state_tests.cpp"
 	"src/build_info.cpp"
 	"src/augs/misc/pool/pool.cpp"
 	"src/augs/math/snapping_grid.cpp"
-	"src/application/setups/debugger/debugger_view.cpp"
 	"src/game/detail/sentience_shake.cpp"
 	"src/augs/string/get_type_name.cpp"
-	"src/application/setups/debugger/gui/debugger_pathed_asset_gui.cpp"
-	"src/application/setups/debugger/commands/asset_commands.cpp"
 	"src/augs/misc/imgui/path_tree_structs.cpp"
-	"src/application/setups/debugger/gui/asset_path_browser_settings.cpp"
-	"src/application/setups/debugger/commands/flavour_commands.cpp"
 	"src/augs/texture_atlas/atlas_profiler.cpp"
 	"src/augs/graphics/pbo.cpp"
 	"src/view/viewables/streaming/viewables_streaming.cpp"
 	"src/view/viewables/streaming/viewables_streaming_profiler.cpp"
-	"src/application/setups/debugger/gui/debugger_unpathed_asset_gui.cpp"
-	"src/application/setups/debugger/property_debugger/widgets/frames_prologue_widget.cpp"
-	"src/application/setups/debugger/property_debugger/property_debugger_structs.cpp"
-	"src/application/setups/debugger/property_debugger/update_size_if_tex_changed.cpp"
 	"src/game/stateless_systems/movement_path_system.cpp"
 	"src/game/stateless_systems/animation_system.cpp"
 	"src/game/detail/organisms/startle_nearbly_organisms.cpp"
 	"src/game/stateless_systems/remnant_system.cpp"
 	"src/view/audiovisual_state/systems/randomizing_system.cpp"
 	"src/game/modes/test_mode.cpp"
-	"src/application/setups/debugger/gui/debugger_player_gui.cpp"
 	"src/game/components/hand_fuse_component.cpp"
 	"src/game/debug_draw.cpp"
 	"src/game/detail/explosive/detonate.cpp"
-	"src/application/setups/debugger/gui/debugger_modes_gui.cpp"
 	"src/game/modes/bomb_defusal.cpp"
 	"src/view/mode_gui/arena/arena_mode_gui.cpp"
 	"src/view/asset_funcs.cpp"
@@ -679,11 +701,9 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/enum/enum_map.cpp"
 	"src/view/mode_gui/arena/arena_buy_menu_gui.cpp"
 	"src/game/detail/flavour_scripts.cpp"
-	"src/application/setups/debugger/debugger_player.cpp"
 	"src/game/modes/mode_entropy.cpp"
 	"src/application/input/adjust_game_motions.cpp"
 	"src/application/network/simulation_receiver.cpp"
-	"src/application/setups/debugger/gui/debugger_tutorial_gui.cpp"
 	"src/application/arena/arena_paths.cpp"
 	"src/application/arena/intercosm_paths.cpp"
 	"src/augs/misc/compress.cpp"
@@ -1250,6 +1270,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
 )
 
 message("GENERATE_DEBUG_INFORMATION: ${GENERATE_DEBUG_INFORMATION}")
+message("BUILD_DEBUGGER_SETUP: ${BUILD_DEBUGGER_SETUP}")
 
 if(GENERATE_DEBUG_INFORMATION)
 else()
@@ -1425,7 +1446,8 @@ if(ADD_APPLICATION_ICON)
 	add_definitions(-DADD_APPLICATION_ICON)
 endif()
 
-if(BUILD_PROPERTY_DEBUGGER)
+if(BUILD_DEBUGGER_SETUP)
+	add_definitions(-DBUILD_DEBUGGER_SETUP)
 	add_definitions(-DBUILD_PROPERTY_DEBUGGER)
 endif()
 
