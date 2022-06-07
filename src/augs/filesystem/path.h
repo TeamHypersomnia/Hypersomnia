@@ -72,6 +72,7 @@ namespace augs {
 
 }
 
+#if !PLATFORM_WINDOWS
 namespace std {
 	template <>
 	struct hash<augs::path_type> {
@@ -80,3 +81,4 @@ namespace std {
 		}
 	};
 }
+#endif
