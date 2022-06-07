@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- "Choose a unique name for your map, be creative!
+If someone has a map with the same name,
+they would have to delete it in order to play yours."
+
 - Reading the about section from the maps
 	- for now let's just read them whole
 

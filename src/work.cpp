@@ -1469,7 +1469,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				case custom_imgui_result::RETRY:
 					if constexpr(std::is_same_v<S, client_setup>) {
-						launch_setup(launch_type::EDITOR);
+						launch_setup(launch_type::CLIENT);
 					}
 
 					break;

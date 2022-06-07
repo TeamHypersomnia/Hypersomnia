@@ -230,6 +230,9 @@ namespace sanitization {
 	}
 }
 
+#define TEST_SYMLINKS !IS_PRODUCTION_BUILD
+#define TEST_VERY_LONG_PATHS !IS_PRODUCTION_BUILD
+
 #if BUILD_UNIT_TESTS
 #include "augs/log.h"
 #include <Catch/single_include/catch2/catch.hpp>
@@ -262,7 +265,7 @@ TEST_CASE("Map sanitization test") {
 	REQUIRE(S::sanitize_map_name(parent, ".\\") == R(F::FORBIDDEN_CHARACTERS));
 	REQUIRE(S::sanitize_map_name(parent, "..") == R(F::FORBIDDEN_CHARACTERS));
 
-#if !IS_PRODUCTION_BUILD
+#if TEST_VERY_LONG_PATHS
 #if PLATFORM_UNIX
 	auto long_parent_dir = "/tmp/" + std::string(240, 'a');
 
@@ -296,6 +299,7 @@ TEST_CASE("File path sanitization test") {
 
 	(void)analyze;
 
+#if TEST_SYMLINKS
 	const auto test_symlink_fname = "test_parent_symlink";
 	const auto test_symlink_path = augs::path_type(DETAIL_DIR) / test_symlink_fname;
 	const auto test_deep_symlink_dir = augs::path_type(DETAIL_DIR) / augs::path_type("test") / augs::path_type("test");
@@ -315,6 +319,8 @@ TEST_CASE("File path sanitization test") {
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "test_parent_symlink/cyberaqua.jpg") == R(F::GOES_BEYOND_PARENT_FOLDER));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "test/test/test_parent_symlink/cyberaqua.jpg") == R(F::GOES_BEYOND_PARENT_FOLDER));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "test/test/test_parent_symlink/cyberaqua.exe") == R(F::FORBIDDEN_EXTENSION));
+#endif
+
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "test/test/cyberaqua.png") == R(augs::path_type("test/test/cyberaqua.png")));
 
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "test_no_symlink/cyberaqua.jpg") == R(augs::path_type("test_no_symlink/cyberaqua.jpg")));
@@ -382,7 +388,7 @@ TEST_CASE("File path sanitization test") {
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "a/b/c/d/e/f/g/abcabc.") == R(F::PART_EMPTY));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "a/b/c/d/e/f/g/exe.") == R(F::PART_EMPTY));
 
-#if !IS_PRODUCTION_BUILD
+#if TEST_VERY_LONG_PATHS
 #if PLATFORM_UNIX
 	auto long_parent_dir = "/tmp/" + std::string(239, 'a');
 
