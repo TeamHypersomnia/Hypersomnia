@@ -457,6 +457,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
 
+	"src/augs/string/path_sanitization.cpp"
 	"src/augs/misc/imgui/simple_popup.cpp"
 	"src/application/config_lua_table.cpp"
 	"src/view/audiovisual_state/systems/interpolation_system.cpp"

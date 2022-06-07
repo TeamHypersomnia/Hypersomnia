@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Reading the about section from the maps
+	- for now let's just read them whole
+
+- Creating new project
+
+- co jak po drodze jest symlink? my tam robimy przeciez tylko weakly canonical
+	- chyba ze weakly rozwiazuje symlinki
+
 - editor_setup -> editor_setup
 Nie nazywajmy tego arena editor tylko użyjmy najbardziej oczywistej nazwy
 

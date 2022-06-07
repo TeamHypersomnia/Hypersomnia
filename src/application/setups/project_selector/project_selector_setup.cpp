@@ -159,7 +159,7 @@ project_selector_setup::~project_selector_setup() {
 }
 
 void project_selector_setup::customize_for_viewing(config_lua_table& config) const {
-	config.window.name = "Arena editor - project selector";
+	config.window.name = "Hypersomnia Editor - Project Selector";
 }
 
 void shift_cursor(const vec2 offset) {
@@ -222,7 +222,7 @@ bool projects_list_tab_state::perform_list(
 	ImGui::Columns(num_columns);
 
 	if (num_columns > 1) {
-		ImGui::SetColumnWidth(0, avail.x * 0.7f);
+		ImGui::SetColumnWidth(0, avail.x * 0.8f);
 	}
 
 	do_column("Name");
@@ -398,7 +398,7 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 		}
 	};
 
-	centered_text("Arena Builder 2.0 - Project Manager");
+	centered_text("Hypersomnia Editor - Project Selector");
 
 	const auto button_size_mult = 3.0f;
 	const auto button_padding_mult = 0.5f;
