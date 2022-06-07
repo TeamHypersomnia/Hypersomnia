@@ -14,7 +14,8 @@ namespace sanitization {
 		NO_EXTENSION,
 		FORBIDDEN_EXTENSION,
 		TOO_LONG,
-		GOES_BEYOND_PARENT_FOLDER
+		GOES_BEYOND_PARENT_FOLDER,
+		TOTAL_PATH_IS_TOO_LONG
 	};
 
 	std::string describe(forbidden_path_type);
@@ -39,7 +40,12 @@ namespace sanitization {
 		bool is_whitelisted_extension(const std::string& ext);
 		bool only_alphanumeric_characters(const std::string& untrusted);
 
-		bool is_subpath_safe(
+		bool is_subpath_within_parent(
+			const augs::path_type& parent_dir,
+			const std::string& untrusted_subpath
+		);
+
+		bool is_absolute_valid_length(
 			const augs::path_type& parent_dir,
 			const std::string& untrusted_subpath
 		);

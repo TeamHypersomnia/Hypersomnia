@@ -17,9 +17,11 @@ namespace sanitization {
 			case forbidden_path_type::FORBIDDEN_EXTENSION:
 				return "Filename must have an allowed extension.";
 			case forbidden_path_type::TOO_LONG:
-				return "File path cannnot be too long.";
+				return "File path is too long.";
 			case forbidden_path_type::GOES_BEYOND_PARENT_FOLDER:
 				return "File path goes beyond the parent folder.";
+			case forbidden_path_type::TOTAL_PATH_IS_TOO_LONG:
+				return "Absolute resolved file path is too long.";
 			default:
 				return "Unknown forbidden path type.";
 		}
@@ -31,7 +33,21 @@ namespace sanitization {
 			return std::string::npos == untrusted.find_first_not_of(portable_alphanumeric_set);
 		}
 
-		bool is_subpath_safe(
+		bool is_absolute_valid_length(
+			const augs::path_type& parent_dir,
+			const std::string& untrusted_subpath
+		) {
+			const std::filesystem::path parent_resolved = std::filesystem::canonical(parent_dir);
+			const std::filesystem::path requested_file_path = std::filesystem::weakly_canonical(parent_resolved / untrusted_subpath);
+
+			if (requested_file_path.string().length() > max_total_file_path_length_v) {
+				return false;
+			}
+
+			return true;
+		}
+
+		bool is_subpath_within_parent(
 			const augs::path_type& parent_dir,
 			const std::string& untrusted_subpath
 		) {
@@ -173,8 +189,12 @@ namespace sanitization {
 				return sanitization_result;
 			}
 			else {
-				if (!detail::is_subpath_safe(project_dir, sanitization_result)) {
+				if (!detail::is_subpath_within_parent(project_dir, sanitization_result)) {
 					return forbidden_path_type::GOES_BEYOND_PARENT_FOLDER;
+				}
+
+				if (!detail::is_absolute_valid_length(project_dir, sanitization_result)) {
+					return forbidden_path_type::TOTAL_PATH_IS_TOO_LONG;
 				}
 
 				return sanitization_result;
@@ -198,8 +218,12 @@ namespace sanitization {
 			return forbidden_path_type::FORBIDDEN_CHARACTERS;
 		}
 
-		if (!detail::is_subpath_safe(maps_directory, untrusted_map_name)) {
+		if (!detail::is_subpath_within_parent(maps_directory, untrusted_map_name)) {
 			return forbidden_path_type::GOES_BEYOND_PARENT_FOLDER;
+		}
+
+		if (!detail::is_absolute_valid_length(maps_directory, untrusted_map_name)) {
+			return forbidden_path_type::TOTAL_PATH_IS_TOO_LONG;
 		}
 
 		return augs::path_type(untrusted_map_name);
@@ -237,6 +261,17 @@ TEST_CASE("Map sanitization test") {
 	REQUIRE(S::sanitize_map_name(parent, "..\\") == R(F::FORBIDDEN_CHARACTERS));
 	REQUIRE(S::sanitize_map_name(parent, ".\\") == R(F::FORBIDDEN_CHARACTERS));
 	REQUIRE(S::sanitize_map_name(parent, "..") == R(F::FORBIDDEN_CHARACTERS));
+
+#if !IS_PRODUCTION_BUILD
+#if PLATFORM_UNIX
+	auto long_parent_dir = "/tmp/" + std::string(240, 'a');
+
+	augs::create_directories(long_parent_dir);
+
+	REQUIRE(S::sanitize_map_name(long_parent_dir, "aqua") == R(augs::path_type("aqua")));
+	REQUIRE(S::sanitize_map_name(long_parent_dir, "aqua2") == R(F::TOTAL_PATH_IS_TOO_LONG));
+#endif
+#endif
 }
 
 TEST_CASE("File path sanitization test") {
@@ -347,6 +382,19 @@ TEST_CASE("File path sanitization test") {
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "a/b/c/d/e/f/g/abcabc.") == R(F::PART_EMPTY));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "a/b/c/d/e/f/g/exe.") == R(F::PART_EMPTY));
 
+#if !IS_PRODUCTION_BUILD
+#if PLATFORM_UNIX
+	auto long_parent_dir = "/tmp/" + std::string(239, 'a');
+
+	augs::create_directories(long_parent_dir);
+
+	analyze(S::sanitize_downloaded_file_path(long_parent_dir, "a.png"));
+
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "a.png") == R(augs::path_type("a.png")));
+	REQUIRE(S::sanitize_downloaded_file_path(long_parent_dir, "a.png") == R(augs::path_type("a.png")));
+	REQUIRE(S::sanitize_downloaded_file_path(long_parent_dir, "a2.png") == R(F::TOTAL_PATH_IS_TOO_LONG));
+#endif
+#endif
 }
 
 #endif
