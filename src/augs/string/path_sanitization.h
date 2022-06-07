@@ -42,12 +42,12 @@ namespace sanitization {
 
 		bool is_subpath_within_parent(
 			const augs::path_type& parent_dir,
-			const std::string& untrusted_subpath
+			const augs::path_type& untrusted_subpath
 		);
 
 		bool is_absolute_valid_length(
 			const augs::path_type& parent_dir,
-			const std::string& untrusted_subpath
+			const augs::path_type& untrusted_subpath
 		);
 
 		bool all_path_elements_nonempty(const std::vector<std::string>& parts);

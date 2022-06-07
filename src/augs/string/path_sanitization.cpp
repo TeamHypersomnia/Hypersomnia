@@ -35,7 +35,7 @@ namespace sanitization {
 
 		bool is_absolute_valid_length(
 			const augs::path_type& parent_dir,
-			const std::string& untrusted_subpath
+			const augs::path_type& untrusted_subpath
 		) {
 			const std::filesystem::path parent_resolved = std::filesystem::canonical(parent_dir);
 			const std::filesystem::path requested_file_path = std::filesystem::weakly_canonical(parent_resolved / untrusted_subpath);
@@ -49,7 +49,7 @@ namespace sanitization {
 
 		bool is_subpath_within_parent(
 			const augs::path_type& parent_dir,
-			const std::string& untrusted_subpath
+			const augs::path_type& untrusted_subpath
 		) {
 			const std::filesystem::path parent_resolved = std::filesystem::canonical(parent_dir);
 			const std::filesystem::path requested_file_path = std::filesystem::weakly_canonical(parent_resolved / untrusted_subpath);
