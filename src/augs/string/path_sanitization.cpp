@@ -209,6 +209,7 @@ namespace sanitization {
 #if BUILD_UNIT_TESTS
 #include "augs/log.h"
 #include <Catch/single_include/catch2/catch.hpp>
+#include "augs/filesystem/directory.h"
 
 TEST_CASE("Map sanitization test") {
 	namespace S = sanitization;
@@ -260,7 +261,29 @@ TEST_CASE("File path sanitization test") {
 
 	(void)analyze;
 
-	analyze(S::sanitize_downloaded_file_path(parent, with_zero));
+	const auto test_symlink_fname = "test_parent_symlink";
+	const auto test_symlink_path = augs::path_type(DETAIL_DIR) / test_symlink_fname;
+	const auto test_deep_symlink_dir = augs::path_type(DETAIL_DIR) / augs::path_type("test") / augs::path_type("test");
+	const auto test_deep_symlink_path = test_deep_symlink_dir / test_symlink_fname;
+
+	try {
+		augs::create_directories(test_deep_symlink_dir);
+		std::filesystem::create_directory_symlink("..", test_symlink_path);
+		std::filesystem::create_directory_symlink(augs::path_type("..") / augs::path_type("..") / augs::path_type(".."), test_deep_symlink_path);
+	}
+	catch (const std::filesystem::filesystem_error&) {
+
+	}
+
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "test_parent_symlink.png") == R(augs::path_type("test_parent_symlink.png")));
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "test_parent_symlink") == R(F::NO_EXTENSION));
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "test_parent_symlink/cyberaqua.jpg") == R(F::GOES_BEYOND_PARENT_FOLDER));
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "test/test/test_parent_symlink/cyberaqua.jpg") == R(F::GOES_BEYOND_PARENT_FOLDER));
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "test/test/test_parent_symlink/cyberaqua.exe") == R(F::FORBIDDEN_EXTENSION));
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "test/test/cyberaqua.png") == R(augs::path_type("test/test/cyberaqua.png")));
+
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "test_no_symlink/cyberaqua.jpg") == R(augs::path_type("test_no_symlink/cyberaqua.jpg")));
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "test/test/test_no_symlink/cyberaqua.jpg") == R(augs::path_type("test/test/test_no_symlink/cyberaqua.jpg")));
 
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "") == R(F::EMPTY));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "/cyberaqua.jpg") == R(F::PART_EMPTY));
