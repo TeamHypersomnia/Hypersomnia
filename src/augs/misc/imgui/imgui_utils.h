@@ -56,6 +56,10 @@ namespace augs {
 
 		void neutralize_mouse();
 
+		inline void shift_cursor(const vec2 offset) {
+			ImGui::SetCursorPos(ImVec2(vec2(ImGui::GetCursorPos()) + offset));
+		}
+
 		void render();
 	
 		bool is_hovered_with_hand_cursor();

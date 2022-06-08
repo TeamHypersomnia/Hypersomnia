@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Let's leave it at "arena" nomenclature
+	- Will even easier to find in code
+
+- Open selected/Create from selected
+	- Name your clone/Name your new arena
+
 - "Choose a unique name for your map, be creative!
 If someone has a map with the same name,
 they would have to delete it in order to play yours."

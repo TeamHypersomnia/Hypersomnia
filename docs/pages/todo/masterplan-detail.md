@@ -632,6 +632,9 @@ To nie jest sublime text! To ma byc standard do ktorego wszyscy sa przyzwyczajen
 
 ## Interacting with the built game world representation
 
+- When still moving, only partial rebuild of only the interacted entity
+	- When finally placed, rebuild the whole world
+
 - It's only a matter of mapping the hovered game-world object to the source in-memory only recipe object
 - We can always remember what game-world object was created for a given map object
 	- and this way straightforwardly have a bidirectional mapping

@@ -25,28 +25,32 @@
 struct config_lua_table;
 struct draw_setup_gui_input;
 
-namespace sol {
-	class state;
-}
-
 class project_selector_setup : public default_setup_settings {
-	all_viewables_defs viewables;
-
 	project_selector_gui gui;
+
+	bool rebuild_miniatures = false;
+	ad_hoc_entry_id miniature_index_counter = 0;
+
+	void scan_for_all_arenas();
 
 	void load_gui_state();
 	void save_gui_state();
 
-	bool rebuild_miniatures = false;
-	void scan_for_all_arenas();
-
-	ad_hoc_entry_id miniature_index_counter = 0;
-
 public:
-	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
-
 	project_selector_setup();
 	~project_selector_setup();
+
+	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
+	void customize_for_viewing(config_lua_table&) const;
+
+	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
+	augs::path_type get_selected_project_path() const;
+
+	/*********************************************************/
+	/*************** DEFAULT SETUP BOILERPLATE ***************/
+	/*********************************************************/
+
+	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 
 	auto get_audiovisual_speed() const {
 		return 1.0;
@@ -72,12 +76,11 @@ public:
 		return get_viewed_cosmos()[get_viewed_character_id()];
 	}
 
-	const auto& get_viewable_defs() const {
-		return viewables;
-	}
+	all_viewables_defs zero_viewables;
 
-	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
-	void customize_for_viewing(config_lua_table&) const;
+	const auto& get_viewable_defs() const {
+		return zero_viewables;
+	}
 
 	void apply(const config_lua_table&) {
 		return;
@@ -124,8 +127,12 @@ public:
 	void ensure_handler() {}
 	bool requires_cursor() const { return false; }
 
+private:
+	entropy_accumulator zero_entropy;
+public:
+
 	const entropy_accumulator& get_entropy_accumulator() const {
-		return entropy_accumulator::zero;
+		return zero_entropy;
 	}
 
 	template <class F>
@@ -139,14 +146,10 @@ public:
 		return std::nullopt;
 	}
 
-	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
-
 	const arena_player_metas* find_player_metas() const {
 		return nullptr;
 	}
 
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
-
-	augs::path_type get_selected_project_path() const;
 };

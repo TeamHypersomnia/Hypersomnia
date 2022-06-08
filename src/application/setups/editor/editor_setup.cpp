@@ -12,14 +12,14 @@
 #include "augs/log.h"
 
 editor_setup::editor_setup() {
-	augs::create_directories(editor_PROJECTS_DIR);
+	augs::create_directories(EDITOR_PROJECTS_DIR);
 	LOG("Loading the last opened editor project.");
 
 	load_gui_state();
 }
 
 editor_setup::editor_setup(const augs::path_type& project_path) {
-	augs::create_directories(editor_PROJECTS_DIR);
+	augs::create_directories(EDITOR_PROJECTS_DIR);
 	LOG("Loading editor project at: %x", project_path);
 
 	load_gui_state();
@@ -34,8 +34,6 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 }
 
 void editor_setup::load_gui_state() {
-	// TODO: Read/write as yaml
-
 	try {
 		augs::load_from_bytes(gui, get_editor_gui_state_path());
 	}

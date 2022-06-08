@@ -285,5 +285,18 @@ namespace augs {
 			return opt;
 		}
 
+		inline auto scoped_selectable_colors(const rgba normal, const rgba hovered, const rgba active) {
+			return std::make_tuple(
+				scoped_style_color(ImGuiCol_Header, normal),
+				scoped_style_color(ImGuiCol_HeaderHovered, hovered),
+				scoped_style_color(ImGuiCol_HeaderActive, active)
+			);
+		}
+
+		inline auto scoped_preserve_cursor() {
+			const auto before_pos = ImGui::GetCursorPos();
+
+			return scope_guard([before_pos]() { ImGui::SetCursorPos(before_pos); });
+		};
 	}
 }

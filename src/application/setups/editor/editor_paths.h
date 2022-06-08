@@ -5,12 +5,12 @@
 
 #include "application/arena/arena_paths.h"
 
-#define editor_PROJECTS_DIR augs::path_type(USER_FILES_DIR) / "projects"
+#define EDITOR_PROJECTS_DIR augs::path_type(USER_FILES_DIR) / "projects"
 
 inline auto get_project_selector_gui_state_path() {
-	return editor_PROJECTS_DIR / "project_selector.lua";
+	return EDITOR_PROJECTS_DIR / "project_selector.lua";
 }
 
 inline auto get_editor_gui_state_path() {
-	return editor_PROJECTS_DIR / "editor_gui_state.bin";
+	return EDITOR_PROJECTS_DIR / "editor_gui_state.bin";
 }

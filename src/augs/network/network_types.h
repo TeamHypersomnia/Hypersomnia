@@ -19,6 +19,7 @@ constexpr std::size_t min_nickname_length_v = 3;
 constexpr std::size_t max_nickname_length_v = 30;
 constexpr std::size_t max_server_name_length_v = 80;
 
+constexpr std::size_t arena_public_key_length_v = 80;
 constexpr std::size_t max_arena_name_length_v = 30;
 constexpr std::size_t max_arena_file_path_length_v = 70;
 constexpr std::size_t max_total_file_path_length_v = 250;

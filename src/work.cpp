@@ -147,7 +147,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			DEMOS_DIR,
 
 			DOWNLOADED_ARENAS_DIR,
-			editor_PROJECTS_DIR
+			EDITOR_PROJECTS_DIR
 		};
 
 		{

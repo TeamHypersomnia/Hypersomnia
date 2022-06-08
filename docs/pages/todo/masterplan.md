@@ -15,6 +15,21 @@ summary: We need to set our priorities straight.
 	- Potem mozna stopniowo ulepszac wydajność tam gdzie jest potrzeba
 	- Więc PoC nie musi byc turboresponsywny na kazdym kroku
 
+# Interface
+
+- Tam gdzie inne edytory mają Scene hierarchy my będziemy mieli po prostu Layers!
+	- To będzie ten główny panel z lewej i dzięki temu będzie zawzse miał swoje miesjce na ekranie
+	- On ważny jest przecież
+
+- Można na start zrobić samą taką listę prostą jak w godocie zamiast filesystem docka z miniaturkami
+	- Niekoniecznie nawet ludziom to się może podobać
+	- A na start takie prostsze
+	- **I mniej miejsca zajmuje na ekranie!** Dzięki temu mamy zwolnioną całą wertykalną przestrzeń która przewaznie i tak jest ograniczona już
+	- I tak chcemy ten wertykalny zrobić
+		- Choćby do samych folderów więc od razu można wrzucić pozycje z plikami (najwyżej do przekonfigurowania to będzie)
+
+
+
 # Format danych
 
 - I/O SCENY CAŁKOWICIE DO JSONA.
@@ -261,6 +276,7 @@ Przy wczytywaniu projektu próbujemy:
 	- 2) DL: muzyka na ładowanie (lol)
 	- 3) DL: (secure) same ścieżki które serwer sczytał z resource_hashes.bin 
 		- sanityzujemy je na kliencie, jak wykryjemy jakiś przekręt to od razu disconnect
+		- hashujemy też na kliencie więc nie ma sensu wysyłać hashy/timestampów
 	- 4) DL: project.json
 	- 5) DL: project.signature
 	- 6) DL: wszystkie pliki
@@ -300,6 +316,8 @@ Dopiero jak odbierzemy to wtedy server od razu wysyła initial solvable state ak
 			- także opt-in a nie opt-out
 
 ## Path Sanitization
+
+- Ważne! Najpierw tworzyć wszystkie foldery, wtedy nie da rady zrobić symlinków nawet jakby ktoś chciał
 
 Uwaga: warto sanityzowac też za każdym razem nazwę mapy gdybyśmy ściągneli jakąś z neta
 - Najlepiej nie otwierać wcale mapy która ma za długą nazwę albo jakieś niealfanumeryczne_ znaki bo to ewidentnie nie stworzone w edytorze

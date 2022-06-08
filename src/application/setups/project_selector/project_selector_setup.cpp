@@ -18,25 +18,13 @@
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/log.h"
 
-const entropy_accumulator entropy_accumulator::zero;
-
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 250;
-
-static auto push_selectable_colors(const rgba normal, const rgba hovered, const rgba active) {
-	using namespace augs::imgui;
-
-	return std::make_tuple(
-		scoped_style_color(ImGuiCol_Header, normal),
-		scoped_style_color(ImGuiCol_HeaderHovered, hovered),
-		scoped_style_color(ImGuiCol_HeaderActive, active)
-	);
-}
 
 static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 	switch (tab_type) {
 		case project_tab_type::MY_PROJECTS:
-			return editor_PROJECTS_DIR;
+			return EDITOR_PROJECTS_DIR;
 
 		case project_tab_type::OFFICIAL_ARENAS:
 			return OFFICIAL_ARENAS_DIR;
@@ -49,6 +37,16 @@ static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 	}
 }
 
+project_selector_setup::project_selector_setup() {
+	augs::create_directories(EDITOR_PROJECTS_DIR);
+
+	load_gui_state();
+	scan_for_all_arenas();
+}
+
+project_selector_setup::~project_selector_setup() {
+	save_gui_state();
+}
 
 augs::path_type project_list_entry::get_miniature_path() const {
 	return arena_paths(arena_path).miniature_file_path;
@@ -69,7 +67,10 @@ std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_imag
 				const auto blank_path = "content/gfx/necessary/blank_transparent.png";
 				const auto miniature_path = entry.get_miniature_path();
 
-				new_subjects.push_back({ entry.miniature_index, augs::exists(miniature_path) ? miniature_path : blank_path });
+				new_subjects.push_back({ 
+					entry.miniature_index, 
+					augs::exists(miniature_path) ? miniature_path : blank_path 
+				});
 			}
 		}
 
@@ -147,30 +148,9 @@ void project_selector_setup::scan_for_all_arenas() {
 	rebuild_miniatures = true;
 }
 
-project_selector_setup::project_selector_setup() {
-	augs::create_directories(editor_PROJECTS_DIR);
-
-	load_gui_state();
-	scan_for_all_arenas();
-}
-
-project_selector_setup::~project_selector_setup() {
-	save_gui_state();
-}
-
 void project_selector_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Hypersomnia Editor - Project Selector";
 }
-
-void shift_cursor(const vec2 offset) {
-	ImGui::SetCursorPos(ImVec2(vec2(ImGui::GetCursorPos()) + offset));
-}
-
-auto scoped_preserve_cursor() {
-	const auto before_pos = ImGui::GetCursorPos();
-
-	return augs::scope_guard([before_pos]() { ImGui::SetCursorPos(before_pos); });
-};
 
 bool projects_list_tab_state::perform_list(
 	const ad_hoc_in_atlas_map& ad_hoc_in_atlas,
@@ -247,7 +227,7 @@ bool projects_list_tab_state::perform_list(
 		const auto local_pos = ImGui::GetCursorPos();
 
 		{
-			auto darkened_selectables = push_selectable_colors(
+			auto darkened_selectables = scoped_selectable_colors(
 				rgba(255, 255, 255, 20),
 				rgba(255, 255, 255, 30),
 				rgba(255, 255, 255, 60)
@@ -325,7 +305,7 @@ static auto selectable_with_icon(
 	bool result = false;
 
 	{
-		auto colored_selectable = push_selectable_colors(
+		auto colored_selectable = scoped_selectable_colors(
 			bg_cols[0],
 			bg_cols[1],
 			bg_cols[2]
@@ -537,8 +517,8 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 
 			const auto label = 
 				is_template ?
-				"CLONE TEMPLATE" :
-				"OPEN"
+				"CREATE FROM SELECTED" :
+				"OPEN SELECTED"
 			;
 
 			const auto icon = 
