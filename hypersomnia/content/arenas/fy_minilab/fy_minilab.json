@@ -1,0 +1,21 @@
+{
+	"meta": {
+		"name": "fy_minilab"
+	},
+
+	"about": {
+		"credits": [
+			{
+				"role": "Mapping",
+				"person": "Pythagoras of Samos"
+			},
+			{
+				"role": "Graphics",
+				"person": "Spicmir"
+			}
+		],
+
+		"short_description": "A timeless 2017 classic and the first map ever created.",
+		"full_description": "Remember: true gentlemen don't pick up the rocket launcher."
+	}
+}

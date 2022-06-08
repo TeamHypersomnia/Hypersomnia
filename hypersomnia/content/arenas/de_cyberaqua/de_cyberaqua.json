@@ -1,0 +1,21 @@
+{
+	"meta": {
+		"name": "de_cyberaqua"
+	},
+
+	"about": {
+		"credits": [
+			{
+				"role": "Mapping",
+				"person": "Pythagoras of Samos"
+			},
+			{
+				"role": "Graphics",
+				"person": "Spicmir"
+			}
+		],
+
+		"short_description": "An experimental underwater biotech laboratory is under attack by a bombing squad.\nDon't let them lay hands on any expensive equipment.",
+		"full_description": "Protect the fish!"
+	}
+}

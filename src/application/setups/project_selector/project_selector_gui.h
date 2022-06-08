@@ -14,7 +14,7 @@ struct project_list_entry {
 	double timestamp;
 	augs::path_type arena_path;
 	ad_hoc_entry_id miniature_index = 0;
-	editor_project_about meta;
+	editor_project_about about;
 
 	augs::path_type get_miniature_path() const;
 	std::string get_arena_name() const;

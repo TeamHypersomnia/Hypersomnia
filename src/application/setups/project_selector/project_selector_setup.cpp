@@ -1,3 +1,4 @@
+#include "augs/log.h"
 #include "game/cosmos/logic_step.h"
 #include "game/organization/all_messages_includes.h"
 
@@ -16,7 +17,10 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/time_utils.h"
 #include "augs/misc/imgui/imgui_game_image.h"
-#include "augs/log.h"
+#include "application/arena/arena_paths.h"
+#include "application/setups/editor/project/editor_project_paths.h"
+#include "application/setups/editor/project/editor_project_readwrite.h"
+#include "augs/readwrite/json_readwrite_errors.h"
 
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 250;
@@ -49,7 +53,7 @@ project_selector_setup::~project_selector_setup() {
 }
 
 augs::path_type project_list_entry::get_miniature_path() const {
-	return arena_paths(arena_path).miniature_file_path;
+	return editor_project_paths(arena_path).miniature;
 }
 
 std::string project_list_entry::get_arena_name() const {
@@ -80,34 +84,10 @@ std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_imag
 	return std::nullopt;
 }
 
-static auto default_meta(const augs::path_type& p) {
-	editor_project_about out;
+static editor_project_about read_about_from(const augs::path_type& arena_folder_path) {
+	const auto paths = editor_project_paths(arena_folder_path);
 
-	if (p.filename() == "de_labs2") {
-		out.credits.push_back({"Mapping & graphics", "lia"});
-		out.credits.push_back({"Music", "Marcel Windys"});
-
-		out.short_description = "Resistance has been tipped about sensitive information\nsitting in the depths of an abandoned rocket silo.";
-		out.full_description = "This first map ever to be created by the community will test your CQB to the utmost limit.\nApart from a highly tactical gameplay, this map features a very creepy atmosphere -\nexpect uneasing ambience and lots of inexplicable sounds.";
-	}
-
-	if (p.filename() == "fy_minilab") {
-		out.credits.push_back({"Mapping", "Patryk B. Czachurski"});
-		out.credits.push_back({"Graphics", "Spicmir"});
-
-		out.short_description = "A timeless 2017 classic and the first map ever created.";
-		out.full_description = "Remember: true gentlemen don't pick up the rocket launcher.";
-	}
-
-	if (p.filename() == "de_cyberaqua") {
-		out.credits.push_back({"Mapping", "Patryk B. Czachurski"});
-		out.credits.push_back({"Graphics", "Spicmir"});
-
-		out.short_description = "An experimental underwater biotech laboratory is under attack by a bombing squad.\nDon't let them lay hands on any expensive equipment.";
-		out.full_description = "Protect the fish!";
-	}
-
-	return out;
+	return editor_project_readwrite::read_only_project_about(paths.project_json);
 }
 
 void project_selector_setup::scan_for_all_arenas() {
@@ -115,7 +95,7 @@ void project_selector_setup::scan_for_all_arenas() {
 		const auto source_directory = get_arenas_directory(type);
 
 		auto register_arena = [&](const auto& arena_folder_path) {
-			const auto paths = arena_paths(arena_folder_path);
+			const auto paths = editor_project_paths(arena_folder_path);
 
 			auto new_entry = project_list_entry();
 			new_entry.arena_path = arena_folder_path;
@@ -124,7 +104,17 @@ void project_selector_setup::scan_for_all_arenas() {
 
 			new_entry.timestamp = augs::date_time().secs_since_epoch();
 			new_entry.miniature_index = miniature_index_counter++;
-			new_entry.meta = default_meta(arena_folder_path);
+			try {
+				new_entry.about = ::read_about_from(arena_folder_path);
+			}
+			catch (const augs::json_deserialization_error& err) {
+				editor_project_about err_abouts;
+				err_abouts.short_description = "Couldn't parse " + paths.project_json.string();
+				err_abouts.full_description = err.what();
+
+				new_entry.about = err_abouts;
+			}
+
 			(void)paths;
 
 			auto& view = gui.projects_view;
@@ -134,7 +124,7 @@ void project_selector_setup::scan_for_all_arenas() {
 		};
 
 		try {
-			augs::for_each_in_directory(source_directory, register_arena, [](auto&&...) { return callback_result::CONTINUE; });
+			augs::for_each_directory_in_directory(source_directory, register_arena);
 		}
 		catch (const augs::filesystem_error& err) {
 			//LOG("No folder: %x", source_directory);
@@ -268,7 +258,7 @@ bool projects_list_tab_state::perform_list(
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
 
-		text_disabled(entry.meta.short_description);
+		text_disabled(entry.about.short_description);
 
 		ImGui::SetCursorPos(after_pos);
 
@@ -448,8 +438,8 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 
 			if (selected_entry != nullptr) {
 				auto& entry = *selected_entry;
-				auto& meta = entry.meta;
-				(void)meta;
+				auto& about = entry.about;
+				(void)about;
 
 				const auto image_padding = vec2(5, 5);
 				const auto image_internal_padding = vec2i(15, 15);
@@ -482,13 +472,13 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 
 					float max_w = 0;
 
-					for (const auto& r : meta.credits) {
+					for (const auto& r : about.credits) {
 						max_w = std::max(max_w, ImGui::CalcTextSize(r.role.c_str()).x);
 					}
 
 					ImGui::SetColumnWidth(0, max_w + text_h);
 
-					for (const auto& r : meta.credits) {
+					for (const auto& r : about.credits) {
 						text_disabled(std::string(r.role) + ": ");
 						ImGui::NextColumn();
 
@@ -502,7 +492,7 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 
 					ImGui::PushTextWrapPos();
 
-					text_color(meta.full_description, rgba(210, 210, 210, 255));
+					text_color(about.full_description, rgba(210, 210, 210, 255));
 
 					ImGui::PopTextWrapPos();
 				}

@@ -457,6 +457,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
 
+	"src/application/setups/editor/project/editor_project_readwrite.cpp"
+	"src/application/setups/editor/project/editor_project_paths.cpp"
 	"src/augs/string/path_sanitization.cpp"
 	"src/augs/misc/imgui/simple_popup.cpp"
 	"src/application/config_lua_table.cpp"

@@ -1,0 +1,21 @@
+{
+	"meta": {
+		"name": "de_labs2"
+	},
+
+	"about": {
+		"credits": [
+			{
+				"role": "Mapping & graphics",
+				"person": "lia"
+			},
+			{
+				"role": "Music",
+				"person": "Marcel Windys"
+			}
+		],
+
+		"short_description": "Resistance has been tipped about sensitive information\nsitting in the depths of an abandoned rocket silo.",
+		"full_description": "This first map ever to be created by the community will test your CQB to the utmost limit.\nApart from a highly tactical gameplay, this map features a very creepy atmosphere -\nexpect uneasing ambience and lots of inexplicable sounds."
+	}
+}

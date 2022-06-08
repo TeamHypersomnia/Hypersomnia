@@ -21,6 +21,7 @@
 #include "view/viewables/ad_hoc_in_atlas_map.h"
 #include "application/setups/editor/project/editor_project_about.h"
 #include "application/setups/project_selector/project_selector_gui.h"
+#include "application/setups/editor/project/editor_project_about.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;

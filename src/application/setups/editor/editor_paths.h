@@ -3,8 +3,6 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 
-#include "application/arena/arena_paths.h"
-
 #define EDITOR_PROJECTS_DIR augs::path_type(USER_FILES_DIR) / "projects"
 
 inline auto get_project_selector_gui_state_path() {

@@ -8,6 +8,7 @@
 #include "augs/templates/type_map.h"
 #include "augs/templates/logically_empty.h"
 #include "augs/readwrite/custom_lua_representations.h"
+#include "augs/readwrite/custom_json_representations.h"
 
 #include "augs/readwrite/memory_stream.h"
 
@@ -363,6 +364,8 @@ struct tests_of_traits {
 	static_assert(augs::has_custom_to_lua_value_v<augs::path_type>);
 	static_assert(augs::has_custom_to_lua_value_v<rgba>);
 	static_assert(augs::has_custom_to_lua_value_v<ImVec4>);
+	static_assert(!augs::has_custom_to_lua_value_v<int>);
+	static_assert(!augs::has_custom_to_lua_value_v<std::map<int, int>>);
 
 	static_assert(aligned_num_of_bytes_v<0, 4> == 0, "Trait is wrong");
 	static_assert(aligned_num_of_bytes_v<1, 4> == 4, "Trait is wrong");

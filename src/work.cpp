@@ -102,6 +102,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "application/setups/client/demo_paths.h"
 #include "application/nat/stun_server_provider.h"
+#include "application/arena/arena_paths.h"
 
 #include "application/main/self_updater.h"
 #include "work_result.h"

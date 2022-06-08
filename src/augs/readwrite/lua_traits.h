@@ -1,6 +1,5 @@
 #pragma once
 #include <type_traits>
-#include <sol/sol.hpp>
 #include "augs/misc/is_constant_size_string.h"
 
 #define LUA_TRAITS_INCLUDED 1
@@ -17,7 +16,7 @@ namespace augs {
 				std::declval<const T&>()
 			),
 			from_lua_value(
-				std::declval<sol::object&>(),
+				std::declval<int&>(),
 				std::declval<T&>()
 			),
 			void()

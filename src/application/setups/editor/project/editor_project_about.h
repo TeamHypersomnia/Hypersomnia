@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/constant_size_string.h"
+#include "augs/misc/constant_size_vector.h"
 
 struct editor_project_role_info {
 	// GEN INTROSPECTOR struct editor_project_role_info

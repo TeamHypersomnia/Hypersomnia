@@ -3,8 +3,12 @@
 #include "augs/network/network_types.h"
 #include "hypersomnia_version.h"
 
+/*
+	Note: the official arenas do not specify either the game version or the autor's public key.
+*/
+
 struct editor_project_meta {
-	// GEN INTROSPECTOR struct editor_project_about
+	// GEN INTROSPECTOR struct editor_project_meta
 	augs::constant_size_string<20> game_version;
 	augs::constant_size_string<max_arena_name_length_v> name;
 	augs::constant_size_string<arena_public_key_length_v> author_public_key;

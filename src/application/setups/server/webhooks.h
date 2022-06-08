@@ -1,4 +1,6 @@
 #pragma once
+#define RAPIDJSON_HAS_STDSTRING 1
+
 #include "3rdparty/cpp-httplib/httplib.h"
 #include "augs/string/parse_url.h"
 
@@ -20,7 +22,7 @@ namespace discord_webhooks {
 	inline std::string find_attachment_url(const std::string& response) {
 		rapidjson::Document d;
 
-		if (d.Parse(response.c_str()).HasParseError()) {
+		if (d.Parse(response).HasParseError()) {
 			LOG("Couldn't parse JSON response.");
 		}
 		else {
@@ -113,7 +115,7 @@ namespace discord_webhooks {
 
 			writer.StartObject();
 			writer.Key("username");
-			writer.String(hook_username.c_str());
+			writer.String(hook_username);
 			writer.Key("embeds");
 			writer.StartArray();
 			{
@@ -128,13 +130,13 @@ namespace discord_webhooks {
 					writer.EndObject();
 
 					writer.Key("title");
-					writer.String(new_server_name.c_str());
+					writer.String(new_server_name);
 
 					writer.Key("color");
 					writer.Uint(embed_color);
 
 					writer.Key("description");
-					writer.String(full_description.c_str());
+					writer.String(full_description);
 				}
 				writer.EndObject();
 			}
@@ -203,25 +205,25 @@ namespace discord_webhooks {
 
 			writer.StartObject();
 			writer.Key("username");
-			writer.String(hook_username.c_str());
+			writer.String(hook_username);
 			writer.Key("embeds");
 			writer.StartArray();
 			{
 				writer.StartObject();
 				{
 					writer.Key("title");
-					writer.String(result_notice.c_str());
+					writer.String(result_notice);
 
 					writer.Key("image");
 					writer.StartObject();
 					{
 						writer.Key("url");
-						writer.String(chosen_picture.c_str());
+						writer.String(chosen_picture);
 					}
 					writer.EndObject();
 
 					writer.Key("description");
-					writer.String(detail_notice.c_str());
+					writer.String(detail_notice);
 				}
 				writer.EndObject();
 			}
@@ -383,7 +385,7 @@ namespace discord_webhooks {
 
 			writer.StartObject();
 			writer.Key("username");
-			writer.String(hook_username.c_str());
+			writer.String(hook_username);
 			writer.Key("embeds");
 			writer.StartArray();
 			{
@@ -394,7 +396,7 @@ namespace discord_webhooks {
 						writer.StartObject();
 						{
 							writer.Key("url");
-							writer.String(mvp_avatar_link.c_str());
+							writer.String(mvp_avatar_link);
 						}
 						writer.EndObject();
 					}
@@ -404,19 +406,19 @@ namespace discord_webhooks {
 						writer.StartObject();
 						{
 							writer.Key("url");
-							writer.String(duel_victory_pic_link.c_str());
+							writer.String(duel_victory_pic_link);
 						}
 						writer.EndObject();
 					}
 
 					writer.Key("title");
-					writer.String(summary_notice.c_str());
+					writer.String(summary_notice);
 
 					writer.Key("color");
 					writer.Uint(embed_color);
 
 					writer.Key("description");
-					writer.String(total_description.c_str());
+					writer.String(total_description);
 				}
 				writer.EndObject();
 			}
@@ -454,7 +456,7 @@ namespace discord_webhooks {
 
 			writer.StartObject();
 			writer.Key("username");
-			writer.String(hook_username.c_str());
+			writer.String(hook_username);
 			writer.Key("embeds");
 			writer.StartArray();
 			{
@@ -464,12 +466,12 @@ namespace discord_webhooks {
 					writer.StartObject();
 					{
 						writer.Key("url");
-						writer.String(duel_picture_url.c_str());
+						writer.String(duel_picture_url);
 					}
 					writer.EndObject();
 
 					writer.Key("description");
-					writer.String(duel_notice.c_str());
+					writer.String(duel_notice);
 				}
 				writer.EndObject();
 			}
@@ -532,7 +534,7 @@ namespace discord_webhooks {
 
 			writer.StartObject();
 			writer.Key("username");
-			writer.String(hook_username.c_str());
+			writer.String(hook_username);
 			writer.Key("embeds");
 			writer.StartArray();
 			{
@@ -542,17 +544,17 @@ namespace discord_webhooks {
 					writer.Uint(embed_color);
 
 					writer.Key("title");
-					writer.String(connected_notice.c_str());
+					writer.String(connected_notice);
 
 					writer.Key("description");
-					writer.String(now_playing_notice.c_str());
+					writer.String(now_playing_notice);
 
 					if (!footer_content.empty()) {
 						writer.Key("footer");
 						writer.StartObject();
 						{
 							writer.Key("text");
-							writer.String(footer_content.c_str());
+							writer.String(footer_content);
 						}
 						writer.EndObject();
 					}
