@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Later also do some unit tests for json readwrite
+
 - Let's leave it at "arena" nomenclature
 	- Will even easier to find in code
 

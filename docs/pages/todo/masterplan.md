@@ -46,6 +46,45 @@ summary: We need to set our priorities straight.
 [Save] [Discard] [Cancel]
 - Edytor panuje tylko nad jednym plikiem. Jeden save zapisuje wszystkie zmiany do sceny i wszystkich prefabów itp.
 
+
+## Pseudo-ids
+
+- No jednak uważam że mega manualnie będziemy to robić tylko wiadomo do ostatecznych obiektów już read_json
+	- jakieś idy nieidy i wg tego będziemy też zmieniali typ
+
+- Musimy jakoś identyfikować prefaby w środku samego project.json
+	- Na razie możemy to robić normalnie inkrementalnymi idami
+	- Ale żeby było przyszłościowo, zrobimy to na stringu zamiast na incie
+		- Bo potem być może byśmy chcieli używać pseudoidentyfikatorów od filenamu żeby było human readable
+- Pamiętaj że to jest problem wyizolowany dla serializacji, równie dobrze moglibyśmy tam walić ścieżki pełne
+- W środku w pamięci i tak będziemy trzymali albo pointer albo pool id
+
+- Tylko jak to serializujemy? Czy trzymamy np. prywatny std::string id który jest wyłapywany przez serializacje, a pointer nie?
+	- I potem wywołujemy resolva na wszystkich pointerach?
+
+- Subresource idy też możemy tu mieć podobnie jak w godocie
+	- Dla jakichś prefabów spawnpointów
+
+- Nie jestem w ogóle pewien czy my chcemy trzymać ten id w tym samym strukcie co dane instancji
+	- Raczej nie
+- Czy chcemy architekturalnie zrobić faktycznie też że png jest prefabem czy to ma być tylko iluzja dla użytkownika?
+	- A tak naprawdę bedziemy mieli różne typy instancji tylko pole z idem?
+- To może być coś rodzaju
+"instance_of": "22"
+"properties:" {
+}
+
+- Żeby mniejsza indentacja była i mniej noisa to jednak najlepiej tak
+
+
+- Id będziemy nadawać tylko obiektom które są gdzieś referowane
+- Typ będzie inferowany już z definicji tego ida
+
+Myślę że jakieś metadane może oddzielnie? Czy nie?
+Pasowałoby wtedy jakoś to czytać manualnie
+	Tak będzie chyba najlepiej
+	Wywoływać po prostu read_json na wszystkich takich
+
 # Organizacja plików projektu
 
 ## Konwencja nazw folderów i plików
@@ -166,6 +205,20 @@ Zauważmy że najpierw jest writeoutowany resource_hashes.bin a potem dopiero sy
 
 ### resource_hashes.bin
 
+- Jednak razem z jsonem?
+	- To jednak robi sens że triggerujemy potrzebę zapisania gdy zmienią się zasoby
+		- Dlatego że wtedy wszystko podpisujemy jeszcze raz
+	- Co z integralnością historii wtedy jak wszystko jest razem?
+		- Teoretycznie nic nie powinno sie popierdzielić i powinno się dać dalej undować jeśli:
+			- W całej reszcie pliku identyfikujemy zasoby po ścieżkach a nie hashach
+				- Tylko wtedy co jak przesuniemy zasoby?
+				- Ogólnie w takim razie w undoredo musimy trzymać jakieś identyfikatory typu nawet pointer do prefaba/id prefaba
+				- i tak musimy jakoś identyfikować te prefaby
+					- Hm to chyba właśnie po ścieżkach
+					- Właśnie i to jest pytanie
+					- Repeating paths for each and every object seems redundant but maybe it's for the best?
+						- We force those to be short anyway
+		
 - Struktura
 	- std::map<augs::path_type, entry>
 		- Będzie przy okazji zapisane od razu posortowane, teoretycznie możnaby to wektorem potem wczytać
@@ -255,7 +308,19 @@ Przy wczytywaniu projektu próbujemy:
 			- Stąd wczytujemy i sanityzujemy nazwe mapy
 				- alfanumeryczna_ i <= 30 znakow (pełna nazwa mapy może być dłuższa)
 					- Pełna nazwa może być dowolna, tutaj nie jest wysyłana
-		- version (np. timestamp zapisania) <= 32 bytes
+		- version - wersja gry <= 32 bytes
+		- last_changed_timestamp <= 32 bytes
+			- czy zamiast tego po prostu kompletny hash przed podpisaniem?
+			- tak bedzie bardziej stateless
+			- okej tylko z drugiej strony chcielibyśmy wiedzieć czy jeśli jest różny to jest nowszy czy starszy
+			- więc jednak timestamp będzie lepszy
+			- tylko... co jak się zmieni sam obrazek np.?
+				- to i tak trzeba podpisać jeszcze raz
+				- to może lepiej timestamp + sygnature?
+				- no właśnie tylko corner: skąd wiesz czy wersja jest nowsza czy starsza jeśli zmieni się sam hash jakiegoś obrazka?
+					- jeśli nie nastąpiło zapisanie to timestamp zostanie ten sam
+					- to by sporo przemawiało za trzymaniem hashy w jsonie
+			- i swoja droga tutaj od razu odrzucimy formy ataku typu "nowa cyberaqua" bo jak mamy podpis tego public keya na ta nazwe mapy z takim hashem to nic sie wiecej nie sciagnie
 		- public key = <= 100 bytes
 		- to już nam mówi wszystko czy jest aktualna, nowa, stara, albo czy duplikat z taka sama nazwa
 		- also nawet jeśli to wyślemy masterserverowi to klientowi też chcemy bo miedzy tym co jest na ms a na serwerze mogła się zmienić mapa
@@ -272,7 +337,7 @@ Przy wczytywaniu projektu próbujemy:
 			- Dlatego ze dla inkrementalnego update potrzebujemy kopii obecnych plików 
 		- Ale nie jest to potrzebne. Przy aktualizacji kopiujemy jeden po jednym tyko rzeczy ze starego które wykryliśmy że są potrzebne
 		- W ten sposób nie musimy wywoływać funkcji która usuwa pliki potencjalnie na wadliwym inpucie
-		- Usuwamy tylko poprzedni folder .new przed rozpoczęciem aktualizajci - a to jest  b. dobrze zsanityzowane
+		- Usuwamy tylko poprzedni folder .new przed rozpoczęciem aktualizacji - a to jest  b. dobrze zsanityzowane
 	- 2) DL: muzyka na ładowanie (lol)
 	- 3) DL: (secure) same ścieżki które serwer sczytał z resource_hashes.bin 
 		- sanityzujemy je na kliencie, jak wykryjemy jakiś przekręt to od razu disconnect

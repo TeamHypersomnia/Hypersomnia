@@ -1,0 +1,215 @@
+/*
+	Podstawowe pytanie.
+	Czy definiujemy resource razem w środku?
+	Za: 
+	- Internal resource nie ma sensu rozdzielac i je bedziemy definiowac od razu.
+	- Od razu widzisz wlasciwosci danej sciezki
+
+	Przeciw:
+	- Niby spoko byloby miec wykaz wszystkich sciezek skondensowany, ale czy na pewno? To raczej nie ma znaczenia
+
+	internal resource bedziemy zapisywac jako <internal_resource>
+	zeby wiedziec do ktorego sie odnosic i nie kolidowalo nam z plikami
+
+	Jakis tab pewnie "Files" i "Special"
+	i w Special taki wirtualny filesystem ze swiatlami np.
+
+	I teraz jeszcze jak robimy zeby po zmianie pnga nam sie nie rozwalala historia
+		ale tez ogolnie zeby zachowywala sie integralnosc stanu?
+
+	M. in. czy powinnismy zachowac rozmiar obrazkow i dlugosci dzwiekow?
+
+	Tak naprawde to nie rozwali nam sie historia nawet jak pozmieniaja sie w/h
+	bo to dopiero bedzie mialo efekt realny po translacji na swiat gry
+
+	Historia to przecież dosłownie tylko create/destroy/mod property
+		to sie nie zmieni w zależności od contentu 
+		nawet jak plik wywalimy, to jeśli jest używany to możemy tu trzymać wpis dopóki nie znajdziemy przekierowania
+
+	Czy w ogóle potrzebujemy robić jakieś internal resources?
+		- Byc moze jako templatki dla np. swiatel.
+		- To nie ma znaczenia ze kazde swiatlo fizycznie w swiecie ma w instancji dane o atenuacji - albo ich nie ma. 
+			- To po prostu dla wygody uzytkowania.
+		- Special internal resource juz moze byc tylko jednym typem
+			- nie da sie wybrac tak jak dla sprita czy chce byc obstaclem czy dekoracja statyczna
+				- choc to powinno byc implicit z parametrow chyba tez
+
+	Co z instancjonowanymi grupami? Albo w ogóle grupami?
+	Co z intancjonowaniem rzeczy typu całe akwarium?
+		To po prostu chyba <aquarium>
+		Te rzeczy będą w tabie Special pod officialem, normalnie też w folderach, 
+		normalnie może być duża lista specjalnych obiektów.
+		tak jak normalne Files masz official/project, to tutaj będzie taka długa oficjalna lista specialów
+
+		One mogą mieć argumenty potem nawet identyfikatory spritów
+		ok... tylko coś typu aquarium może mieć kilka warstw też więc nie wypada wrzucać jej do jednej
+			musi mieć jako property instancji, domyślnie wybierze jakieś pierwszy obstacle layer, pierwszy GROUND layer itp. ale to do wybrania jest
+
+	Teoretycznie takie rzeczy jak spawny albo lighty nie muszą mieć render layerów
+	Ale można i tak celem organizacji im przydzielać takie
+
+	Jak upuszczasz specialsa na scenę to tworzy się domyślnie np. Lights layer 1 jeśli nie ma jeszcze layera tego typu 
+
+	GRUPY
+	Dla grup bedzie chyba fajnie identyfikowac obiekty
+	Ale to nadal bym identyfikowal tylko ad-hoc zeby nie zasmiecac jsona niepotrzebnymi idami
+*/
+
+"external_resources": {
+	"gfx/abc.png": {
+		"content_hash": "aEdhJHk83dLkfJGH8932FDS",
+		"class_id": "test_abc",
+		"width": 342,
+		"height": 100
+	},
+
+	"scripts/crate_mover.lua": {
+		"content_hash": "r8932jfdsxXJKHdsFkHJjhJ",
+		"class_id": "crate_mover"
+	},
+
+	"gfx/magic_crate.png": {
+		"type": "sprite",
+		"script": "crate_mover",
+
+		"script_arguments": {
+			// Wszystkie argumenty do script arguments beda stringami,
+			// dokladnie tak jak bedziemy je podawac do interpretera lua,
+			// i taka generalizacja bedzie wygodniejsza
+			"radius": "10"
+		}
+	}
+},
+
+"internal_resources": {
+	"<strong_light>": {
+
+	}
+},
+
+"types": [
+	"21": {
+		"type": "sprite",
+		"shape": [
+			[0,0]
+			[20,0]
+			[20,20]
+			[20,0]
+		]
+	}
+],
+
+/* 
+	A jak panie zamierzasz stan skryptów przez sieć przesyłać?
+	One muszą być bezstanowe! Tylko logiczne
+	Ewentualnie mieć jakąś małą binarną wydzieloną pamięć w obiekcie
+
+	Array! Kolejnosc layerow w danym typie tez ma znaczenie!
+	Domyślnie layery są nazywane po ich typie + indeksie,
+	np.
+
+	Foreground layer 1,
+	Foreground layer 2
+
+	Tutaj jest na odwrot kolejnosc bo tak jest intuicyjnie dla tworcy,
+	czyli u góry te co na wierzchu, w przeciwienstwie do tego jak w kodzie
+	bo to wyznacza realna kolejnosc operacji renderowania.
+*/
+
+"layers": [
+	{
+		"name": "Foreground layer 1",
+		"type": "FOREGROUND"
+	},
+
+	{
+		"name": "Foreground layer 2",
+		"type": "FOREGROUND"
+	},
+
+	{
+		"name": "Smieci na podlodze",
+		"type": "GROUND"
+	},
+
+	{
+		"name": "Podloga lab",
+		"type": "GROUND"
+	},
+
+	{
+		"name": "Podloga spawn",
+		"type": "GROUND"
+	},
+
+	{
+		"name": "Grunt",
+		"type": "GROUND"
+	}
+],
+
+/* 
+	Sekwencja bo rendering order w srodku layera ma znaczenie.
+	I jak to sortujemy? Też po layerach?
+	Jeśli nie to musielibyśmy trzymać sorting id w środku.
+
+	Nie wiem czy jest sens też się aż tak przejmować tym żeby się nie zmieniały zbytnio pliki po każdym zapisaniu.
+*/
+
+"objects": [
+	{
+		"type": "lab_podloga",
+		"pos": [23, 45.02],
+		"layer": "Podloga lab"
+	},
+	{
+		"type": "lab_podloga",
+		"pos": [23, 45.02],
+		"layer": "Podloga lab"
+	},
+	{
+		"type": "abc",
+		"name": "tadam",
+		"pos": [23, 45.02],
+		"layer": "Foreground layer 1"
+	},
+
+	{
+		"type": "magic_crate",
+		"name": "ruszajaca skrzynka 1",
+
+		"script_arguments": {
+			"radius": "20",
+			"chat_message": "\"tadam\""
+		},
+
+		"pos": [23, 45.02],
+		"layer": "Solid obstacles 1"
+
+	},
+
+	{
+		"type": "<light>",
+		"pos": [23, 45.02],
+		"layer": "Light layer 1",
+		"attenuation": {
+			"constant": 1,
+			"linear": 1,
+			"quadratic": 1
+		}
+	},
+
+	{
+		"type": "<aquarium>",
+		"name": "CT spawn aquarium",
+		"pos": [23, 45.02],
+		"layer": "Spawnpoint layer 1"
+	},
+
+	{
+		"type": "<spawnpoint>",
+		"team": "Atlantis",
+		"pos": [23, 45.02],
+		"layer": "Spawnpoints"
+	}
+]
