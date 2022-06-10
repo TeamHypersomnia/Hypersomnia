@@ -1,4 +1,5 @@
 #pragma once
+#include <compare>
 #include "augs/templates/type_in_list_id.h"
 #include "augs/misc/pool/pooled_object_id.h"
 #include "application/setups/editor/nodes/all_editor_node_types.h"
