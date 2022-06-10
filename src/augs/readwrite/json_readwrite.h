@@ -1,7 +1,5 @@
 #pragma once
-#ifndef RAPIDJSON_HAS_STDSTRING
 #define RAPIDJSON_HAS_STDSTRING 1
-#endif
 
 #include "augs/filesystem/path.h"
 #include "augs/filesystem/file.h"
@@ -21,7 +19,7 @@
 
 namespace augs {
 	template <class F, class T>
-	void general_read_json_value(F& from, T& out) {
+	void general_read_json_value(const F& from, T& out) {
 		if constexpr(has_custom_to_json_value_v<T>) {
 			from_json_value(from, out);
 		}
@@ -64,7 +62,7 @@ namespace augs {
 	}
 
 	template <class F, class T>
-	void read_json(F& from, T& out) {
+	void read_json(const F& from, T& out) {
 		if constexpr(representable_as_json_value_v<T>) {
 			general_read_json_value(from, out);
 		}
@@ -129,8 +127,25 @@ namespace augs {
 		}
 	}
 
-	template <class T>
-	void from_json_string(const std::string& json, T& out) {
+	template <class T, class F>
+	T from_json(const F& from) {
+		T out;
+		read_json(from, out);
+		return out;
+	}
+
+	template <class T, class F>
+	T from_json_subobject(const F& from, const std::string& subobject_name) {
+		T out;
+
+		if (from.IsObject() && from.HasMember(subobject_name.c_str()) && from[subobject_name.c_str()].IsObject()) {
+			read_json(from[subobject_name], out);
+		}
+
+		return out;
+	}
+
+	inline rapidjson::Document json_document_from(const std::string& json) {
 		rapidjson::Document document;
 
 		if (document.Parse(json.c_str()).HasParseError()) {
@@ -141,7 +156,16 @@ namespace augs {
 			);
 		}
 
-		read_json(document, out);
+		return document;
+	}
+
+	inline rapidjson::Document json_document_from(const augs::path_type& path) {
+		return json_document_from(file_to_string(path));
+	}
+
+	template <class T>
+	void from_json_string(const std::string& json, T& out) {
+		read_json(json_document_from(json), out);
 	}
 
 	template <class T>

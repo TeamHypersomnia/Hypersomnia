@@ -17,6 +17,12 @@
 	Na razie dla ez security i tak mozemy zrobic samo proste porownanie intami po kolei czy jest nowsza zamiast calego parsowania
 	(nie wiadomo jak bardzo bezpieczny jest ten parse, date mozna i tak tez latwo sparsowac z tego i wlasciwie tylko to byloby wazne do jakiegos pokazywania)
 		Takze luz nawet ten parse nie jest jakis super potrzebny
+
+	ew. zawsze po sanityzacji mozemy zrobic parse bo wiemy ze tu same numerki maja byc
+		tylko czy istringstream sczyta z leading zeros? to i tak musimy wiedziec do tego napalowego porownywania
+		ŻADEN SSCANF, aktualnie LEKSYKOGRAFICZNY tu zrobi robote!
+			ten sam format przecież, i zawsze UTC, pierwszy tiebreaker rozstrzyga
+			operator< na stringach tu zrobi robote
 */
 "meta": {
 	"name": "example",
@@ -59,7 +65,9 @@
 	Teoretycznie takie rzeczy jak spawny albo lighty nie muszą mieć render layerów
 	Ale można i tak celem organizacji im przydzielać takie
 
-	Jak upuszczasz specialsa na scenę to tworzy się domyślnie np. Lights layer 1 jeśli nie ma jeszcze layera tego typu 
+	~~Jak upuszczasz specialsa na scenę to tworzy się domyślnie np. Lights layer 1 jeśli nie ma jeszcze layera tego typu~~
+		Aktualnie nie, bo layery nie beda mialy typow.
+		A na start damy jakas jedna.
 
 	GRUPY
 	Grupy jesli potrzebujemy to robimy tak samo jak layery! No problem.
@@ -163,37 +171,43 @@
 	Tutaj jest na odwrot kolejnosc bo tak jest intuicyjnie dla tworcy,
 	czyli u góry te co na wierzchu, w przeciwienstwie do tego jak w kodzie
 	bo to wyznacza realna kolejnosc operacji renderowania.
+
+	Teraz jak rozkminiliśmy że te layery to tylko takie abstrakcyjne kontenery,
+	one nie musza miec nawet typów żadnych.
+
+	Ale beda miały właściwości typu czy są widoczne, więc trzeba je zrobić w oddzielnej tablicy.
+	(bo teoretycznie by mozna bylo je wydedukowac jak grupy z samego tego jakie sa "layer": "moja warstwa" w objectach)
 */
 
 "layers": [
 	{
-		"name": "Foreground layer 1",
-		"type": "FOREGROUND"
+		"name": "New layer 1",
+		"visible": false
 	},
 
 	{
-		"name": "Foreground layer 2",
-		"type": "FOREGROUND"
+		"name": "New layer 2",
+		"visible": true
 	},
 
 	{
 		"name": "Smieci na podlodze",
-		"type": "GROUND"
+		"visible": true
 	},
 
 	{
 		"name": "Podloga lab",
-		"type": "GROUND"
+		"visible": true
 	},
 
 	{
 		"name": "Podloga spawn",
-		"type": "GROUND"
+		"visible": true
 	},
 
 	{
 		"name": "Grunt",
-		"type": "GROUND"
+		"visible": true
 	}
 ],
 
@@ -209,6 +223,8 @@
 	A gdyby tak layery definiowały partial order?
 	Czyli layery po prostu nie sa fizyczne/niefizyczne itp
 	Eureka!
+	No i nie potrzebujemy wcale tabów w hierarchii osobnych na audiowizualne i specjalne.
+	To wszystko jest razem wzięte.
 
 	To jest przeciez tylko literalnie dla wygody autora nie zeby definiowac czy cos jest fizyczne czy nie
 		Ok, tylko co jak sprite jest wrzucony miedzy dwoma obstaclami?
@@ -226,11 +242,13 @@
 */
 
 "prefabs": {
-	"[double_doors]": {
-		[
-
-		]
-	}
+	"[double_doors]": [
+		{
+			"type": "drzwi",
+			"name": "drzwi_left",
+			"pos": [0, 0]
+		}
+	]
 },
 
 /* 
