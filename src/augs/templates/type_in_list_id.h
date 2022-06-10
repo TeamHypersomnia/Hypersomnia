@@ -92,17 +92,7 @@ public:
 		return index;
 	}
 
-	bool operator==(const type_in_list_id b) const {
-		return index == b.index;
-	}
-
-	bool operator!=(const type_in_list_id b) const{
-		return !operator==(b);
-	}
-
-	bool operator<(const type_in_list_id b) const {
-		return index < b.index;
-	}
+	auto operator<=>(const type_in_list_id& b) const = default;
 
 	template <class F>
 	decltype(auto) dispatch(F&& callback) const {

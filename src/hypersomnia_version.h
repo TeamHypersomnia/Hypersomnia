@@ -7,6 +7,13 @@
 	The layout of this structure should stay the same for long time to come.
 */
 
+namespace augs {
+	template <unsigned const_count>
+	class constant_size_string;
+}
+
+using game_version_identifier = augs::constant_size_string<20>;
+
 struct hypersomnia_version {
 	hypersomnia_version();
 	// GEN INTROSPECTOR struct hypersomnia_version

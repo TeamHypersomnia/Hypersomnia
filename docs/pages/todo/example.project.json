@@ -259,7 +259,7 @@
 	Nie wiem czy jest sens też się aż tak przejmować tym żeby się nie zmieniały zbytnio pliki po każdym zapisaniu.
 */
 
-"objects": [
+"nodes": [
 	{
 		"type": "lab_podloga",
 		"pos": [23, 45.02],

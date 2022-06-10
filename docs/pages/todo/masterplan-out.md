@@ -6,6 +6,16 @@ permalink: masterplan
 summary: What we've already determined won't work.
 ---
 
+- Co signuje autor?
+	- Tylko dwie rzeczy
+		- project.json
+		- Tekstowa lista par <ścieżka:hash> wszystkich zasobów w gfx/sfx/scripts 
+			- posortowana LEKSYKOGRAFICZNIE, nie naturalnie, po ścieżce
+				- tak bardziej deterministycznie
+			- Skąd wzięta?
+				- Z punktu widzenia edytora - zawsze będzie w pamięci ostatnio wypisany resource_hashes.bin
+					- Oczywiście integrity check poleci przed podpisaniem 
+
 - Coraz bardziej zaczynam sie sklaniac ku opcji ze normalne codzienne edytowanie to do bina jednego leci i tyle
 	- Pros:
 		- Less complexity z tym sprawdzaniem czy ktos nie wywalil/nie edytowal mi jakiegos jsona itp

@@ -49,4 +49,20 @@ namespace augs {
 
 	template <class T>
 	static constexpr bool key_representable_as_string_v = key_representable_as_string<T>::value;
+
+
+	template <class T, class = void>
+	struct json_ignore : std::false_type {};
+
+	template <class T>
+	struct json_ignore<
+		T, 
+		decltype(
+			T::json_ignore,
+			void()
+		)
+	> : std::bool_constant<T::json_ignore> {};
+
+	template <class T>
+	constexpr bool json_ignore_v = json_ignore<remove_cref<T>>::value;
 }

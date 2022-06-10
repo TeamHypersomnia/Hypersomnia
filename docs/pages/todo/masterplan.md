@@ -15,21 +15,6 @@ summary: We need to set our priorities straight.
 	- Potem mozna stopniowo ulepszac wydajność tam gdzie jest potrzeba
 	- Więc PoC nie musi byc turboresponsywny na kazdym kroku
 
-# Interface
-
-- Tam gdzie inne edytory mają Scene hierarchy my będziemy mieli po prostu Layers!
-	- To będzie ten główny panel z lewej i dzięki temu będzie zawzse miał swoje miesjce na ekranie
-	- On ważny jest przecież
-
-- Można na start zrobić samą taką listę prostą jak w godocie zamiast filesystem docka z miniaturkami
-	- Niekoniecznie nawet ludziom to się może podobać
-	- A na start takie prostsze
-	- **I mniej miejsca zajmuje na ekranie!** Dzięki temu mamy zwolnioną całą wertykalną przestrzeń która przewaznie i tak jest ograniczona już
-	- I tak chcemy ten wertykalny zrobić
-		- Choćby do samych folderów więc od razu można wrzucić pozycje z plikami (najwyżej do przekonfigurowania to będzie)
-
-
-
 # Format danych
 
 - I/O SCENY CAŁKOWICIE DO JSONA.
@@ -38,14 +23,57 @@ summary: We need to set our priorities straight.
 	- Tiled tez ma taki workflow że przy zapisywaniu z automatu reeksportuje do ostatnio exportowanej lokacji
 - Jedyne co będzie binarne to skompresowane wersje jsonów, w folderach .cache, dla przesyłania przez sieć.
 - Nie bawimy się w binarki bezpośrednie na razie, nie ta skala. A bardziej oczywiste jest zachowywanie kompatybilności.
+## Projekt w pamięci
 
-# UI zapisywania i odzyskiwania, ogólnie persystencji
+### Layery
 
-- Promptujemy o zapisanie przy wyjsciu (inaczej ludzi bedzie zaskakiwalo)
-	- Save before closing?
-[Save] [Discard] [Cancel]
-- Edytor panuje tylko nad jednym plikiem. Jeden save zapisuje wszystkie zmiany do sceny i wszystkich prefabów itp.
+- Jak przetrzymujemy info o layerach?
+	- Tak jeszcze żeby rozsądnie było przy reorderowaniu ich?
 
+- Pointery do elementów?
+- Jeśli chcemy trzymać binarki dla szybkiego i trywialnego wczytywania, być może lepiej będzie mieć poole i idy zamiast pointerów
+- W przypadku starego edytora to była krótka piła bo wszystko poidowane było
+- Na pewno nie chcemy zmieniać tego jak to jest serializowane do jsona
+	- w sensie definicje nie lecą do layerów
+
+- A binarnie 'być może' ma sens trzymać wektory identyfikatorów w każdym layerze
+
+- To w ogóle będą będą generyczne obiekty więc na pewno nie będzie ich kolejności determinowała jedna tablica
+- Jakbyś trzymał je w osobnych heterogenicznych tablicach to nie zakodujesz kolejności między dwoma różnymi
+	- A to jest coś co intuicyjnie autor może sobie chcieć przekładać
+- Dlatego ostatecznie każda warstwa musi mieć wektor generycznych idów
+Ja myslę że tu lajtowo można przywalić taką tuplę poolów
+I co i potem jaka kolejność serializacji np do jsona?
+	- For each layer for each id?
+	- potem na każdym idzie robisz elegancko dispatcha
+Nic innego nie wymyślimy chyba, no po prostu musisz mieć identyfikatory jeśli chcesz kodować kolejność obiektów o różnym typie
+- Czyli mimo że to jest nazwane "cache" to to są kesze jakby w **stosunku do jsona** a nie do binarnej reprezentacji
+	- Cała reprezentacja binarna razem z poolami to można interpretować że do jest cache w stosunku do jsona
+- Tylko że tego nie nazywałbym cache do końca bo jednak to *definiuje* order który będzie zapisany
+
+Można zrobić że przy r/w jest pomijany obiekt cache
+Można zrobić is base of, żeby nie stringowo to robić tylko w czasie kompilacji
+json_ignored
+Przywal konstexpr boola po prostu zeby klasy nie robic niepotrzebnie
+
+Ok czyli byśmy w warstwach mieli obiekt cache żeby nie leciał do jsona
+
+Obiekt może trzymać nazwe layera do którego sie znajduje to binarnie od razu wykorzystamy i bedziemy mieli fajny lookup
+A bedzie od razu latwiejszy do serializacji do jsona
+
+Czyli normalnie robimy templatki pooli jak dla kosmosu
+Bo to jest tak naprawdę taka portable wersja kosmosu, mini opisowa
+
+Damn tylko żebyśmy nie musieli handli calych robić znowu
+Ale tu nie bedzie tyle interakcji chyba
+Bedziemy dispatchowali na miejscu
+editor_project on_node bedzie mial jakis i jazda
+	- będziemy go passować wszędzie
+
+I teraz można keszować sorting order dla każdego obiektu po każdej zamianie kolejności
+Dzięki temu potem instantiatyzacja świata jest szybsza bo można po każdym typie na każdym poolu instantiatyzować
+zamiast lecieć i dispatchować wszystko po kolei layerami
+choć i to i to robi dispatch raz
 
 ## Pseudo-ids
 
@@ -85,7 +113,35 @@ Pasowałoby wtedy jakoś to czytać manualnie
 	Tak będzie chyba najlepiej
 	Wywoływać po prostu read_json na wszystkich takich
 
+# Interface
+
+- Tam gdzie inne edytory mają Scene hierarchy my będziemy mieli po prostu Layers!
+	- To będzie ten główny panel z lewej i dzięki temu będzie zawzse miał swoje miesjce na ekranie
+	- On ważny jest przecież
+
+- Można na start zrobić samą taką listę prostą jak w godocie zamiast filesystem docka z miniaturkami
+	- Niekoniecznie nawet ludziom to się może podobać
+	- A na start takie prostsze
+	- **I mniej miejsca zajmuje na ekranie!** Dzięki temu mamy zwolnioną całą wertykalną przestrzeń która przewaznie i tak jest ograniczona już
+	- I tak chcemy ten wertykalny zrobić
+		- Choćby do samych folderów więc od razu można wrzucić pozycje z plikami (najwyżej do przekonfigurowania to będzie)
+	- Do hierarchii z layerami będzie dokładnie to samo potrzebne
+
+## UI zapisywania i odzyskiwania, ogólnie persystencji
+
+- Promptujemy o zapisanie przy wyjsciu (inaczej ludzi bedzie zaskakiwalo)
+	- Save before closing?
+[Save] [Discard] [Cancel]
+- Edytor panuje tylko nad jednym plikiem. Jeden save zapisuje wszystkie zmiany do sceny i wszystkich prefabów itp.
+
+
 # Organizacja plików projektu
+
+## Zapisywanie
+
+- Możemy od razu writeoutować zawsze te hashe które trzymamy w pamięci, dla prędkości 99% czasu
+	- A potem dopiero sprawdzać czy się coś nie zmieniło podczas działania apki
+		- praktycznie niemożliwe bo by musiał jakiś proces w tle zmienić żeby nie wyłapało podczas aktywacji
 
 ## Konwencja nazw folderów i plików
 
@@ -100,13 +156,12 @@ Tylko alfanumeryczne z _
 - .cache (\_)
 	- project.json.lz4
 	- project.json.lz4.stamp
-	- resource_hashes.bin
 - gfx (^)
 - sfx (^)
 - scripts (^)
 - project.json
 	- bez project.about.json osobno; to info będzie w środku na samym samym początku
-	- i tak musimy mieć osobno prefabs = {} i objects = {} więc about = {} nie wprowadzi nam dodatkowej indentacji
+	- i tak musimy mieć osobno prefabs = {} i nodes = {} więc about = {} nie wprowadzi nam dodatkowej indentacji
 - project.old.json
 - project.tmp.json (\*)
 - project.autosave.json (\*)
@@ -146,14 +201,8 @@ Note: tu już dla prostoty nie zapisujemy historii.
 ### project.signature - signing & verification
 
 - Co signuje autor?
-	- Tylko dwie rzeczy
-		- project.json
-		- Tekstowa lista par <ścieżka:hash> wszystkich zasobów w gfx/sfx/scripts 
-			- posortowana LEKSYKOGRAFICZNIE, nie naturalnie, po ścieżce
-				- tak bardziej deterministycznie
-			- Skąd wzięta?
-				- Z punktu widzenia edytora - zawsze będzie w pamięci ostatnio wypisany resource_hashes.bin
-					- Oczywiście integrity check poleci przed podpisaniem 
+	- Tylko project.json
+		- Są już hashe
 
 #### Proces signowania przez edytor
 
@@ -432,6 +481,7 @@ Ostatecznie:
 
 # Serializacja
 
+- Hybryda monolityczno-generyczna. See example.project.json
 - Na razie najlepiej dwie monolityczne funkcje ręcznie napisane do serializacji też żeby było jasne jak co idzie i z jaką nazwą
 
 # Filesystem dock

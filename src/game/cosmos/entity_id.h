@@ -32,13 +32,7 @@ struct unversioned_entity_id {
 		type_id.unset();
 	}
 
-	bool operator==(const unversioned_entity_id b) const {
-		return type_id == b.type_id && raw == b.raw;
-	}
-
-	bool operator!=(const unversioned_entity_id b) const {
-		return !operator==(b);
-	}
+	bool operator==(const unversioned_entity_id& b) const = default;
 
 	auto hash() const {
 		return augs::hash_multiple(raw, type_id);
@@ -71,13 +65,7 @@ struct entity_id {
 		return entity_id();
 	}
 
-	bool operator==(const entity_id b) const {
-		return type_id == b.type_id && raw == b.raw;
-	}
-
-	bool operator!=(const entity_id b) const {
-		return !operator==(b);
-	}
+	bool operator==(const entity_id& b) const = default;
 
 	void unset() {
 		raw.unset();
@@ -150,10 +138,6 @@ struct typed_entity_id {
 
 	bool is_set() const {
 		return raw.is_set();
-	}
-
-	bool operator<(const typed_entity_id<E>& b) const {
-		return raw < b.raw;
 	}
 
 	auto hash() const {
