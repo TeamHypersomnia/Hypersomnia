@@ -22,6 +22,7 @@ constexpr std::size_t max_server_name_length_v = 80;
 constexpr std::size_t arena_public_key_length_v = 80;
 constexpr std::size_t max_arena_name_length_v = 30;
 constexpr std::size_t max_arena_file_path_length_v = 70;
+constexpr std::size_t max_version_timestamp_length_v = 70;
 constexpr std::size_t max_total_file_path_length_v = 250;
 
 constexpr std::size_t max_ruleset_name_length_v = 30;

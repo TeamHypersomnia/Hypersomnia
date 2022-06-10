@@ -4,6 +4,7 @@
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"
+#include "3rdparty/date.h"
 
 #if PLATFORM_WINDOWS
 #include <Windows.h>
@@ -56,20 +57,44 @@ augs::date_time::date_time(
 }
 #endif
 
-std::string augs::date_time::get_stamp() const {
-    std::tm local_time = *std::localtime(&t);
+std::string augs::date_time::format_time_point(const std::chrono::system_clock::time_point& tp) {
+	std::ostringstream o;
+	const auto ttp = std::chrono::time_point_cast<std::chrono::microseconds>(tp);
 
-	return	
-		"[" 
-		+ leading_zero(local_time.tm_mday) + "." 
-		+ leading_zero(local_time.tm_mon + 1) + "." 
-		+ leading_zero(local_time.tm_year + 1900) + "_" 
-		+ leading_zero(local_time.tm_hour) + "." 
-		+ leading_zero(local_time.tm_min) + "." 
-		+ leading_zero(local_time.tm_sec)
-		+ "]"
-	;
+	{
+		using namespace date;
+		o << format("%F %T", ttp);
+	}
+	return o.str();
 }
+
+std::string augs::date_time::get_utc_timestamp() {
+	return format_time_point(std::chrono::system_clock::now());
+}
+
+/* 
+	This sometimes parses wrongly by a microsecond. 
+	We've also decided that for improved security,
+	we'll just parse the ints by hand (by typesafe_sscanf) as we know the format upfront,
+	so we don't really need to use a complex parsing procedure for now.
+*/
+
+#if 0
+std::optional<std::chrono::system_clock::time_point> augs::date_time::from_utc_timestamp(const std::string& str) {
+	std::istringstream in(str);
+	date::sys_time<std::chrono::microseconds> tp;
+
+	{
+		in >> date::parse("%F %T", tp);
+	}
+
+	if (in.fail() || in.bad()) {
+		return std::nullopt;
+	}
+
+	return tp;
+}
+#endif
 
 std::string augs::date_time::get_readable_for_file() const {
 	std::tm local_time = *std::localtime(&t);

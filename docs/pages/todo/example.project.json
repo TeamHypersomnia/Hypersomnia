@@ -1,38 +1,49 @@
+/* 
+	Kompresować/podpisywać jsona bez whitespaców?
+*/
+
+/* 
+	Last changed nie musi byc filesystemowy - jest generowany przez nas w aplikacji.
+	To jest data ostatniej faktycznej zmiany.
+	To moze byc np. augs::secs_since_epoch
+
+	Ten version timestamp przecież można formatować w czytelnym formacie, czemu nie
+		dajmy po prostu UTC zeby tez nie zdradzalo timezona czyjegos i elo
+		dobrze to dziala nawet z date.h
+
+		Lokalne czasy bylyby difficult to get right
+		musielibysmy sie pierdzielic z tm.h/tm.cpp
+
+	Na razie dla ez security i tak mozemy zrobic samo proste porownanie intami po kolei czy jest nowsza zamiast calego parsowania
+	(nie wiadomo jak bardzo bezpieczny jest ten parse, date mozna i tak tez latwo sparsowac z tego i wlasciwie tylko to byloby wazne do jakiegos pokazywania)
+		Takze luz nawet ten parse nie jest jakis super potrzebny
+*/
+"meta": {
+	"name": "example",
+	"version_timestamp": "2022-06-10 01:55:25.384753 UTC"
+},
+
 /*
-	Podstawowe pytanie.
-	Czy definiujemy resource razem w środku?
+	Resource definiujemy razem w środku, od razu ze sciezka.
+
 	Za: 
 	- Internal resource nie ma sensu rozdzielac i je bedziemy definiowac od razu.
 	- Od razu widzisz wlasciwosci danej sciezki
 
 	Przeciw:
-	- Niby spoko byloby miec wykaz wszystkich sciezek skondensowany, ale czy na pewno? To raczej nie ma znaczenia
-
-	internal resource bedziemy zapisywac jako <internal_resource>
-	zeby wiedziec do ktorego sie odnosic i nie kolidowalo nam z plikami
-
-	Jakis tab pewnie "Files" i "Special"
-	i w Special taki wirtualny filesystem ze swiatlami np.
+	- Nieistotne - niby spoko byloby miec wykaz wszystkich sciezek skondensowany
 
 	I teraz jeszcze jak robimy zeby po zmianie pnga nam sie nie rozwalala historia
 		ale tez ogolnie zeby zachowywala sie integralnosc stanu?
 
 	M. in. czy powinnismy zachowac rozmiar obrazkow i dlugosci dzwiekow?
 
-	Tak naprawde to nie rozwali nam sie historia nawet jak pozmieniaja sie w/h
+	Tak naprawde to nie rozwali nam sie historia nawet jak pozmieniaja sie width/height
 	bo to dopiero bedzie mialo efekt realny po translacji na swiat gry
-
-	Historia to przecież dosłownie tylko create/destroy/mod property
-		to sie nie zmieni w zależności od contentu 
-		nawet jak plik wywalimy, to jeśli jest używany to możemy tu trzymać wpis dopóki nie znajdziemy przekierowania
-
-	Czy w ogóle potrzebujemy robić jakieś internal resources?
-		- Byc moze jako templatki dla np. swiatel.
-		- To nie ma znaczenia ze kazde swiatlo fizycznie w swiecie ma w instancji dane o atenuacji - albo ich nie ma. 
-			- To po prostu dla wygody uzytkowania.
-		- Special internal resource juz moze byc tylko jednym typem
-			- nie da sie wybrac tak jak dla sprita czy chce byc obstaclem czy dekoracja statyczna
-				- choc to powinno byc implicit z parametrow chyba tez
+		Historia to przecież dosłownie tylko create/destroy/mod property
+			to sie nie zmieni w zależności od contentu 
+			nawet jak plik wywalimy, to jeśli jest używany to możemy tu trzymać wpis dopóki nie znajdziemy przekierowania
+		Także nie storowałbym raczej w środku width/height/duration
 
 	Co z instancjonowanymi grupami? Albo w ogóle grupami?
 	Co z intancjonowaniem rzeczy typu całe akwarium?
@@ -51,25 +62,44 @@
 	Jak upuszczasz specialsa na scenę to tworzy się domyślnie np. Lights layer 1 jeśli nie ma jeszcze layera tego typu 
 
 	GRUPY
-	Dla grup bedzie chyba fajnie identyfikowac obiekty
-	Ale to nadal bym identyfikowal tylko ad-hoc zeby nie zasmiecac jsona niepotrzebnymi idami
+	Grupy jesli potrzebujemy to robimy tak samo jak layery! No problem.
+	Nie identyfikujemy entitow tylko dla grup. W srodku po prostu piszemy do czego przynaleza.
+
+	Jak już se prześlesz jsona to też od razu leksykograficznie możesz wydedukować ścieżki kolejnych plików
+
+	Tutaj leksykograficznie (nie naturalnie)
+
+	Po rozszerzeniu rozpoznajemy co to jest
+
+	Tu przy serializacji jeszcze tym bardziej bedzie trzeba manualnie jesli chcemy nie powtarzac defaultow
+		Reader jest ok taki jaki jest.
+			- On po prostu pomija pola ktorych nie ma
+		Ale zdaje sie ze writer bedzie musial przyjmowac obiekt zrodlowy
+			- Nie wystarczy wlasnie defaultowy w rozumieniu C++
+			- Tylko w przypadku overridow chyba musi byc
+		Juz mamy cos takiego w lua - tym dokladnie jest user config
+			- Tylko ze dla lua mamy skrypt w lua ktory robi diffa a tutaj chyba trzeba natywnie
+			- Wiadomo ze kontenery czy cos takiego to nie robimy delt skomplikowanych tylko od nowa piszemy
 */
 
 "external_resources": {
 	"gfx/abc.png": {
-		"content_hash": "aEdhJHk83dLkfJGH8932FDS",
-		"class_id": "test_abc",
-		"width": 342,
-		"height": 100
+		"type_id": "abc",
+		"content_hash": "aEdhJHk83dLkfJGH8932FDS"
+	},
+
+	"sfx/background_ambience.ogg": {
+		"type_id": "background_ambience",
+		"content_hash": "fklj389sDLjGFLDkjh894FL"
 	},
 
 	"scripts/crate_mover.lua": {
-		"content_hash": "r8932jfdsxXJKHdsFkHJjhJ",
-		"class_id": "crate_mover"
+		"type_id": "crate_mover",
+		"content_hash": "r8932jfdsxXJKHdsFkHJjhJ"
 	},
 
 	"gfx/magic_crate.png": {
-		"type": "sprite",
+		"type_id": "sprite",
 		"script": "crate_mover",
 
 		"script_arguments": {
@@ -81,23 +111,42 @@
 	}
 },
 
+
+/*
+	internal resource bedziemy zapisywac jako <internal_resource>
+	zeby wiedziec do ktorego sie odnosic i nie kolidowalo nam z plikami
+
+	Czy w ogóle potrzebujemy robić jakieś internal resources?
+		- Byc moze jako templatki dla np. swiatel.
+		- To nie ma znaczenia ze kazde swiatlo fizycznie w swiecie ma w instancji dane o atenuacji - albo ich nie ma. 
+			- To po prostu dla wygody uzytkowania.
+		- Special internal resource juz moze byc tylko jednym typem
+			- nie da sie wybrac tak jak dla sprita czy chce byc obstaclem czy dekoracja statyczna
+				- choc to powinno byc implicit z parametrow chyba tez
+				
+	Tu w ogóle key jest jednoczesnie idem.
+	To chyba zwięźlej będzie od razu tego uzyć jako keya
+
+	potem jakis tab pewnie  "Special" obok "Files" 
+	i w Special taki wirtualny filesystem ze swiatlami np.
+
+	W specialsach też mogą znalezc sie typy broni do wrzucania na mape, czemu nie
+*/
+
 "internal_resources": {
 	"<strong_light>": {
+		"attenuation": {
+			"constant": 1,
+			"linear": 1,
+			"quadratic": 1
+		}
+	},
 
+	"<cv_47>": {
+		"mag_sprite": "abc",
+		"mag_capacity": 30
 	}
 },
-
-"types": [
-	"21": {
-		"type": "sprite",
-		"shape": [
-			[0,0]
-			[20,0]
-			[20,20]
-			[20,0]
-		]
-	}
-],
 
 /* 
 	A jak panie zamierzasz stan skryptów przez sieć przesyłać?
@@ -148,6 +197,42 @@
 	}
 ],
 
+/*
+	Jak potem bedziemy rozkminiali prefaby to bym nie przekombinowywal ich tez
+	Prefab to po prostu skupisko kilku obiektow, one moga byc po nazwie
+
+	Prefaby moga byc nazywane "[]",
+	co tez znowu pozwoli nam potem przy parsowaniu rozpoznac ze chodzi o prefab
+
+	Tylko tu znowu pytanie jak one z layerami beda dzialac
+
+	A gdyby tak layery definiowały partial order?
+	Czyli layery po prostu nie sa fizyczne/niefizyczne itp
+	Eureka!
+
+	To jest przeciez tylko literalnie dla wygody autora nie zeby definiowac czy cos jest fizyczne czy nie
+		Ok, tylko co jak sprite jest wrzucony miedzy dwoma obstaclami?
+		Nie jestes tez w stanie powiedziec ze "ok jesli bedzie nad wszystkimi obstaclami to wtedy z automatu foreground"
+		bo zobacz co sie stanie jak dwa prefaby powiedzmy akwariow bedziesz mial jeden nad drugim, jest intertwined
+
+		Będziemy musieli po prostu per-sprite chyba jakoś zaznaczać czy to jest fore czy back (jesli dekoracja)
+			- To i tak jest rozsądniejsze niż edycja własności layera
+		
+		Nazwiemy to Render group: [FOREGROUND|BACKGROUND] 
+			- ewenutalnie jeszcze PHYSICAL gdyby ktos chcial niefizyczna derokacje na layeru fizycznym
+			- ale to by bylo bez sensu bo to by glitchowało chyba troche rzeczy
+
+	Jak w ogóle drag&dropujesz nową rzecz na scenę to można dodać ja z automatu do layera w którym znajduje sie hoverowany w momencie upuszczenia myszy entity
+*/
+
+"prefabs": {
+	"[double_doors]": {
+		[
+
+		]
+	}
+},
+
 /* 
 	Sekwencja bo rendering order w srodku layera ma znaczenie.
 	I jak to sortujemy? Też po layerach?
@@ -160,12 +245,14 @@
 	{
 		"type": "lab_podloga",
 		"pos": [23, 45.02],
-		"layer": "Podloga lab"
+		"layer": "Podloga lab",
+		"group": "kilkapodlog"
 	},
 	{
 		"type": "lab_podloga",
 		"pos": [23, 45.02],
-		"layer": "Podloga lab"
+		"layer": "Podloga lab",
+		"group": "kilkapodlog"
 	},
 	{
 		"type": "abc",
@@ -193,9 +280,7 @@
 		"pos": [23, 45.02],
 		"layer": "Light layer 1",
 		"attenuation": {
-			"constant": 1,
-			"linear": 1,
-			"quadratic": 1
+			"constant": 2
 		}
 	},
 
@@ -211,5 +296,10 @@
 		"team": "Atlantis",
 		"pos": [23, 45.02],
 		"layer": "Spawnpoints"
+	}
+
+	{
+		"type": "[double_doors]",
+		"pos": [35, 543]
 	}
 ]

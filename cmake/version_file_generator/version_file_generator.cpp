@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
 
 	const auto output_file_contents = typesafe_sprintf(
 		input_file_contents,
-		"[disabled]",//augs::date_time().get_stamp(),
+		"[disabled]",//augs::date_time().get_timestamp(),
 		argc,
 		debug_argv_content,
 		git_commit_number,
