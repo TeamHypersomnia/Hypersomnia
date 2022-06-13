@@ -10,6 +10,24 @@ std::optional<T> GetIf(F& from, const std::string& label) {
 	return std::nullopt;
 }
 
+template <class F>
+auto FindArray(F& from, const std::string& label) -> std::optional<decltype(std::declval<F>()[std::declval<std::string>()].GetArray())> {
+	if (from.HasMember(label) && from[label].IsArray()) {
+		return from[label].GetArray();
+	}
+
+	return std::nullopt;
+}
+
+template <class F>
+auto FindObject(F& from, const std::string& label) -> std::optional<decltype(std::declval<F>()[std::declval<std::string>()].GetObject())> {
+	if (from.HasMember(label) && from[label].IsObject()) {
+		return from[label].GetObject();
+	}
+
+	return std::nullopt;
+}
+
 namespace editor_project_readwrite {
 	editor_project read_project_json(const augs::path_type& json_path) {
 		const auto document = augs::json_document_from(json_path);
@@ -24,14 +42,53 @@ namespace editor_project_readwrite {
 
 		{
 			const auto name_to_layer = loaded.make_name_to_layer_map();
+			const auto maybe_nodes = FindArray(document, "nodes");
+			const auto maybe_prefabs = FindObject(document, "prefabs");
 
-			if (document.HasMember("nodes") && document["nodes"].IsArray()) {
-				for (auto& node : document["nodes"].GetArray()) {
+			if (maybe_prefabs != std::nullopt) {
+
+			}
+
+			if (maybe_nodes != std::nullopt) {
+				for (auto& node : *maybe_nodes) {
 					if (!node.IsObject()) {
 						continue;
 					}
 
-					/* First we determine the type of this object */
+					auto maybe_type = GetIf<std::string>(node, "type");
+
+					if (maybe_type == std::nullopt) {
+						continue;
+					}
+
+					auto& type = maybe_type.value();
+
+					bool is_official = false;
+					(void)is_official;
+
+					if (type.front() == '@') {
+						type.erase(type.begin());
+
+						is_official = true;
+					}
+
+					const bool is_prefab   = type.front() == '[' && type.back() == ']';
+					const bool is_internal = type.front() == '<' && type.back() == '>';
+
+					if (is_prefab) {
+
+					}
+					else if (is_internal) {
+
+					}
+					else {
+
+					}
+
+					/* 
+						First we determine the type of this object
+					*/
+
 					const auto new_id = editor_node_id();
 
 					auto name = GetIf<std::string>(node, "name");
@@ -42,7 +99,7 @@ namespace editor_project_readwrite {
 					}
 
 					if (name != std::nullopt) {
-						loaded.nodes.node_names[new_id] = *name;
+						loaded.nodes.names[new_id] = *name;
 					}
 				}
 			}

@@ -137,6 +137,10 @@ struct typed_entity_id {
 		return !operator==(b);
 	}
 
+	bool operator<(const typed_entity_id<E>& b) const {
+		return raw < b.raw;
+	}
+
 	bool is_set() const {
 		return raw.is_set();
 	}

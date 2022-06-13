@@ -3,8 +3,10 @@
 #include "application/setups/editor/project/editor_project_meta.h"
 #include "application/setups/editor/project/editor_project_about.h"
 #include "application/setups/editor/project/editor_layer.h"
-#include "application/setups/editor/project/editor_node_pools.h"
 #include "application/setups/editor/project/editor_history.h"
+
+#include "application/setups/editor/nodes/editor_node_pools.h"
+#include "application/setups/editor/resources/editor_resource_pools.h"
 
 /*
 	Note that meta is always the first - 
@@ -18,6 +20,8 @@ struct editor_project {
 	editor_project_about about;
 
 	editor_node_pools nodes;
+	editor_resource_pools resources;
+
 	std::vector<editor_layer> layers;
 	// END GEN INTROSPECTOR
 

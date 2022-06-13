@@ -18,7 +18,7 @@
 #include "view/mode_gui/arena/arena_player_meta.h"
 
 #include "application/setups/editor/gui/editor_inspector_gui.h"
-#include "application/setups/editor/gui/editor_hierarchy_gui.h"
+#include "application/setups/editor/gui/editor_layers_gui.h"
 #include "application/setups/editor/gui/editor_project_files_gui.h"
 
 struct config_lua_table;
@@ -31,7 +31,7 @@ namespace sol {
 struct editor_gui {
 	// GEN INTROSPECTOR struct editor_gui
 	editor_inspector_gui inspector = std::string("Inspector");
-	editor_hierarchy_gui hierarchy = std::string("Hierarchy");
+	editor_layers_gui layers = std::string("Layers");
 	editor_project_files_gui project_files = std::string("Project files");
 	// END GEN INTROSPECTOR
 };
@@ -58,6 +58,10 @@ public:
 	editor_setup(const augs::path_type& project_path);
 	
 	~editor_setup();
+
+	/*********************************************************/
+	/*************** DEFAULT SETUP BOILERPLATE ***************/
+	/*********************************************************/
 
 	auto get_audiovisual_speed() const {
 		return 1.0;

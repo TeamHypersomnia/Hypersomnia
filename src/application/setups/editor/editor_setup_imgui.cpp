@@ -43,7 +43,7 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 				}
 			};
 
-			do_window_entry(gui.hierarchy, "R");
+			do_window_entry(gui.layers, "R");
 			do_window_entry(gui.project_files, "P");
 			do_window_entry(gui.inspector, "I");
 		}
@@ -77,7 +77,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 		auto open_default_windows = [&]() {
 			gui.inspector.open();
-			gui.hierarchy.open();
+			gui.layers.open();
 			gui.project_files.open();
 		};
 
@@ -93,7 +93,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
 
 			ImGui::DockBuilderDockWindow(gui.project_files.get_title().c_str(), dock_id_bottom);
-			ImGui::DockBuilderDockWindow(gui.hierarchy.get_title().c_str(), dock_id_left);
+			ImGui::DockBuilderDockWindow(gui.layers.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
 			ImGui::DockBuilderFinish(dockspace_id);
 		};
@@ -115,7 +115,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	perform_main_menu_bar(in);
 
 	gui.inspector.perform({});
-	gui.hierarchy.perform({});
+	gui.layers.perform({});
 	gui.project_files.perform({});
 
 	ImGui::End();

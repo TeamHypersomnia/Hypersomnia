@@ -6,6 +6,72 @@ permalink: masterplan
 summary: We need to set our priorities straight.
 ---
 
+- Research if godot/unity/ue have *separate* notions of "enabled" *and/or* "visible" node (or layer) or if it's only for visibility
+
+struct pool_tuple
+- One for resources and one for instances
+
+# Resources and Nodes (instances)
+
+- Do we need e.g. editor_sprite and editor_sprite_instance separately?
+	- I think all nodes are by default understood as instances
+	- And the "flavors" here are just resources
+	- So we wouldn't have editor_prefab_id or editor_sprite_id, but just editor_resource_id
+		- dynamically dispatched
+
+- Also it's okay to have node ids in prefab resouces
+	- Because not all nodes have to be explicitly on scene in layers
+	- So prefabs in prefab resources would be prefab nodes too
+
+- We're naming it editor_sprite_node and editor_sprite_resource
+
+- editor_light_resource?
+	- We could make using editor_light_resource = editor_light_node
+	- Still, some things might be invariant like the resource id in a sprite
+		- That won't even be stored in the node anyway
+			- Really though? I think we should store at least the generic resource id
+			- For others it might be a typed resource id
+	- I think for simplciity, we'll have typed resource ids within each node type
+		- I don't think an editor_node_sprite can have any different resource than sprite
+	- So, do we manually specify in the nodes what is able to be overwritten?
+		- One is for sure: the node will have properties that the resource doesnt have
+			- pos, res id, etc
+		- At the same time, the node won't have all resource properties per-instance
+			- E.g. it would be stupid to give a different sprite id to a wandering pixels instance
+				- (a wandering pixels resource will have an id of the sprite resource)
+				- let's keep it named wandering_pixels because it's the most common usecase
+		
+- Question is, do we want instances to be able to override everything in the resource?
+	- Pro editors do it of course
+	- I think it was one of our pain points too
+	- But how does a struct remember what to override?
+		- Won't we have to basically introspect to get the new type?
+			- We'll have to introspect or manually do it regardless if we specify it manually or just e.g. inherit
+	- And the node does need a position so it's not necessarily the same struct
+	- To not std::optionalize the node, we could say that each prop has e.g. a numerical invalid default like -infinity
+		- Remember though that if it's something like 0 or -1 then it will default to the resource's value
+			- Not a problem, we'll just keep good ranges and even if it happens it's not so bad
+
+- resources will have ids to other resources, this will be 
+	- but nodes will always have only one resource id (even prefab nodes and actual parts of prefabs)
+
+- Note a prefab can be scripted or just a hierarchy of nodes
+- Let's create a separate scripted_prefab which we'll firstly use for aquarium
+
+- Ultimately, let's avoid implementing override behavior for now.
+	- 1) for the sake of simplicity
+	- 2) This won't break any state so we can easily introduce it later
+	- 3) If you feel like you need an override somewhere, then your structure might need improvement
+		- E.g. for light we can have just scale_light_strength instead of a whole new set of attenuations
+		- There's also no problem to even have differently named "default_color" and "colorize"
+	- This ultimately means we're doing things manually too, no inheritance/introspection
+
+# Rethinking if we want state duality
+
+Ultimately, we definitely want duality. See masterplan-detail.
+- For now we can rebuild literally whole cosmos every time we make any change at all, we'll see later
+- Nawet takie durnoty jak transform
+
 # General guidelines
 
 - Optymalizować na to co będziemy robić 99% czasu a nie na 1% corner casów
@@ -23,6 +89,7 @@ summary: We need to set our priorities straight.
 	- Tiled tez ma taki workflow że przy zapisywaniu z automatu reeksportuje do ostatnio exportowanej lokacji
 - Jedyne co będzie binarne to skompresowane wersje jsonów, w folderach .cache, dla przesyłania przez sieć.
 - Nie bawimy się w binarki bezpośrednie na razie, nie ta skala. A bardziej oczywiste jest zachowywanie kompatybilności.
+
 ## Projekt w pamięci
 
 ### Layery

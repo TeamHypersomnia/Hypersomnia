@@ -6,6 +6,147 @@ permalink: masterplan
 summary: Detailed explanations for the decisions made in masterplan.md
 ---
 
+# Rethinking if we want state duality
+
+- Dual state
+	- Pros:
+		- Since you reconstruct the cosmos entirely, you know that whatever goes into json is what let the cosmos be produced this way
+		- Easily change cosmos ABI for the sake of performance
+		- Don't have to introduce some init script logic inside the cosmos and entities, which would be completely irrelevant to gameplay
+		- We have a good specification of which component data is needed by the author 
+			- as opposed to the component logic state that's irrelevant to the author (e.g. whether gun trigger is pressed)
+	- Cons:
+		- Repetition of pool allocation logic
+			- But we'd anyway have to do it with prefab logic
+
+- In the end, the dual state gives us the most flexibility.
+	- We would have to introduce editor-specific concepts and structs to cosmos
+		- Which means adding features completely irrelevant to gameplay (how is the init script and aquarium hierarchy relevant?)
+	- And if we didn't introduce them within cosmos, we'd have to somehow allocate them on our own
+		- Which anyway means implementing a dual state, but then if it's so, why not go all the way?
+
+We can always reuse structures between components and nodes to avoid repetition.
+We can do this with light for example.
+
+## Details
+
+We find that we end up duplicating lots of the functionality that flavors and entities are already giving us.
+But couldn't we actually use this in place?
+Then we will have way less code with all the 
+
+- THE EDITOR-SPECIFIC NODE FORMAT <-> NATIVE GAME FORMAT WOULD ONLY BE RESOLVED DURING JSON I/O!
+I think we wanted state duality so badly to ensure maximum backwards compatibility
+	- But look, backwards compatibility is 
+
+- You're either way reimplementing something like flavors/entities
+	- And copy-on-write flavors can be done on the fly just the same way
+
+I think this game is too easy to warrant double state
+
+## Translating editor concepts into game-world concepts
+
+and we'd operate directly on the cosmos, setting the sorting layer orders directly on the rendered components
+	- Note that for sorting layers, you'd anyway have to re-update all the rendering components to properly display the change
+
+We haven't written much code for this yet so nothing is lost
+- The notion of prefabs doesn't exist, but it's literally just a group of entities
+	- It's a virtual notion that could very well only exist 
+- Same with hierarchies, this only changes how entities behave when moved by the editor user
+
+- Sprite flavor could have custom shape already (that's also one less redirection during physics)
+	Things like that should be easy to do, it's just that they'll break our existing maps
+
+- We have built-in names etc
+
+But without duality how do you manage stuff like complicated aquarium with some initial parameters?
+So basically prefabs with init?
+
+Problem is that here you'd want to use entity_id in place of editor_node_id,
+but in fact an instantiated aquarium would be multiple entity_ids
+- Unless you'd represent it by the root!
+	- Then it could pretty well sit in the layer vector
+
+I think there's no point in separating all viewables defs and flavors
+	- What's the point if you're anyway accessing them from the logic?
+	- It should all be a flavor
+
+- Still, how do you even handle converting between say static_decoration and plain_sprited_body
+	- when all that changes is a single tick in the ui? (e.g. "physical")
+	- and how do you even preserve those changes to save them properly to json later?
+		- that's the real question, because with dual state you could just have a monolithic editor_sprite
+		- but in the game world you want to have separate binary schemes for this
+
+So we generally think that components do not separate the two kinds of data:
+- that which is altered in runtime by the game to advance logic
+- that which is only initially customized by the author (like overridden geometry)
+But nobody tells us that we'd have to touch this data anywhere, say in json serialization.
+
+The conversions with retaining data remain a problem though.
+Note that conversions also change the entity_id 
+	- But wait! Why wouldn't the sprite invariant hold all the data required to make an entity either physical or not?
+		- alright but what about the strictly physical properties like fixtures?
+		- wouldn't be kinda dumb to store everything?
+However, would you even write those physical values to the json file after unticking the "is physical" on a sprite?
+	- this would create lots of bloat
+- But this is sort of an edge case.
+	- Consider that it's not always possible to just convert an object type "for a test" without breaking stuff.
+		- A good example is a fish animation that's later given as input to the aquarium prefab.
+			- Well, it's true that in dual state and monolithic editor_sprite you could losslessly revert the change that made it back from an organism type to static decoration type
+	- One solution could be a monolithic entity flavour, and if you're worried about its size, recall that a monolithic editor_sprite would be equally big (and the game would anyway need to load all of these for ordinary gameplay)
+		- **But ask yourself this**:
+			- is it worth it making monoliths AND writing unnecessary data to json just to accomodate data preservation if we want to go back from physical to non-physical?
+			- isn't it absolutely enough if we just facilitate it by undo and not by re-ticking?
+			- Let's just warn properly before changing type of something with data loss, and undo will stil be possible
+			- To make it seem serious, I would even make it **a dropdown on top of the inspector**
+				- this will determine most of the visible properties
+			- So kind of actually choosing what type of entity this is
+			- it looks like we'll have more common with the old editor than we initially thought
+
+Also some cosmos cache could keep track of entity children for hierarchies
+	- and we support incremental reinference out of the box
+
+- A great pro of single state is also you have out of the box history commands for altering flavors or unallocating entities from pools
+- Faktem jest ze wtedy serializacja nam sie troche robi niepewna
+	- Bo jak my sobie porobimy juz 
+	- Ale to mozemy po prostu domyslnie serializowac wszystkie fieldy calych flavorow tylko pomijamy pola z domyslnymi wartosciami calkowicie
+	- a w ogole cos jak fixtures to moze byc w materiale
+- no i wlasnie trzeba rozkminic jeszcze jak edytujemy logical assety czyli rzeczy ktorych nie przeciagasz na scene
+- Trzecia zakladka?
+	- Mozna nawet sama zakladke nazwac "Materials"
+	- i po prostu "Physical material" i "Recoil material" ewentualnie
+	- Ale nazwa zakladki "Materials" po to zeby od razu wskazywalo na cos co uzywasz 99% czasu
+
+- Wypełnianie oficjalnymi flavorami potem
+	- Można trzymać w środku ten cosmos bez kompletnie żadnych oficjalnych flavorow
+	- I potem dynamicznie wypełniać tym contentem z test_scenes, ALE TYLKO DO PLAYTESTINGU! I na podstawie jakichś flag
+
+- Co jak wrzucimy na scene jakas defaultowa bron a potem sie zmienia jej parametry?
+	- Po updacie i tak następuje reread z jsona
+	- A do jsona piszemy tylko sama nazwe oficjalnej broni, to sie raczej nie zmieni
+
+- Wypełniajmy cosmos oficjalnym contentem przy czytaniu jsona
+	- Inaczej jak będziesz pokazywał w ogóle podgląd takich rzeczy jak akwarium/postawione bronie, nawet durne światła?
+	- Nie spieprzy się przecież bo po updacie wszystko jeszcze raz czytamy
+	- Trzeba będzie tylko powiązania dobrze pamiętać
+		- Ale i tak byś musiał to robić
+
+- Ok rozkminmy porzadnie jak managujemy prefaby oficjalne typu akwarium z zachowywaniem kompatybilnosci
+	- W layerze musi być jakis entity id który oznacza jego roota
+		- Tak samo z brońmi, bronie mają magazynki itd
+	- Jakis kesz musimy mieć ktory trzyma mape prefab entity id to all entities
+	- Wtedy też jak ruszasz czymś to trzeba ruszać wszystkimi
+	- Zobacz że nie piszemy na pałe wszystkich istniejacych entity idow do jsona
+	- piszemy tylko te ktore znalezlismy w warstwach i wiemy ze sa rootami pozostałych dodatków
+		- tylko jak mamy rozpoznac po samym entity id ze to prefab
+		- moze jakis prefab data? albo mapa mapujaca enttiy id na jakas mete czym to jest?
+		- czym to sie w sumie w praktyce rozni od managowania tych dualnych struktur i trzymaniu z nimi jakiegos scachowanego entity ida zeby szybko tym manipulowac na interaktywnym podgladzie? Tym ze nie alokujesz samodzielnie ich?
+
+- Z tym akwarium to ci sie rozbija tylko o to że to ma jakiś init script
+	- Bo nie mamy w ogóle koncepcji kodowania jakiegoś init scriptu w tych entitach w cosmosie
+	- W przeciwnym wypadku ten "prefab" bylby jak kazdy inny z hierarchia i cala ta hierarchia koniec koncow poszlaby do jsona
+- Z drugiej strony nie masz tez w cosmosie kodowania instantatyzacji prefabow
+	- a w edytorze chcemy miec, bo beda przeciez oddzielnie definicje prefabow i ich instantacje
+
 ## Autosave
 
 - .cache generalnie powinien byc safe do wyjebania wiec moze autosave trzymajmy obok i ignorujmy?
@@ -642,7 +783,7 @@ To nie jest sublime text! To ma byc standard do ktorego wszyscy sa przyzwyczajen
 - we process highlights and clicks on the world entity and e.g. show the corresponding map object in inspector
 	- "Show meta" button in inspector when an instance is selected
 		- this shows the prefab in the filesystem panel
-		- not sure about the naming but I thing "meta" is alright, let's not imply straight away that it's yaml I guess?
+		- not sure about the naming but I think "meta" is alright, let's not imply straight away that it's yaml I guess?
 
 ## Layers
 

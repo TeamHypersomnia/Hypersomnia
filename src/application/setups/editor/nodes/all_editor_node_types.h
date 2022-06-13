@@ -2,12 +2,12 @@
 #include "augs/templates/type_list.h"
 #include "augs/templates/type_mod_templates.h"
 
-#include "application/setups/editor/nodes/editor_light.h"
-#include "application/setups/editor/nodes/editor_sprite.h"
-#include "application/setups/editor/nodes/editor_prefab_instance.h"
+#include "application/setups/editor/nodes/editor_light_node.h"
+#include "application/setups/editor/nodes/editor_sprite_node.h"
+#include "application/setups/editor/nodes/editor_prefab_node.h"
 
 using all_editor_node_types = type_list<
-	editor_light,
-	editor_sprite,
-	editor_prefab_instance
+	editor_light_node,
+	editor_sprite_node,
+	editor_prefab_node
 >;

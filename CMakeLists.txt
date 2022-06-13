@@ -728,7 +728,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/editor_setup_imgui.cpp"
 	"src/application/setups/editor/gui/editor_inspector_gui.cpp"
 	"src/application/setups/editor/gui/editor_project_files_gui.cpp"
-	"src/application/setups/editor/gui/editor_hierarchy_gui.cpp"
+	"src/application/setups/editor/gui/editor_layers_gui.cpp"
 	"src/application/setups/project_selector/project_selector_setup.cpp"
 	"src/view/hud_messages/hud_messages_gui.cpp"
 )

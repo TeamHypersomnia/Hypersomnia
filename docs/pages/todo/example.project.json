@@ -88,26 +88,52 @@
 		Juz mamy cos takiego w lua - tym dokladnie jest user config
 			- Tylko ze dla lua mamy skrypt w lua ktory robi diffa a tutaj chyba trzeba natywnie
 			- Wiadomo ze kontenery czy cos takiego to nie robimy delt skomplikowanych tylko od nowa piszemy
+	
+	Co z animacjami?
+		- Wirtualizujemy to, tj. wszystkie propty takie same jak dla spritów
+			- Nawet nie rozpakowywujemy tego na png
+			- Dlugosci klatek czytamy z gifa!
+			- Shape tak samo mozemy miec
+			- tylko je aplikujemy do wszystkich klatek, zreszta po prostu sprite component tak samo bedzie w animacjach
+		- Tylko kiedy w ogóle następuje rozpakowywanie tych gifów?
+			- Musimy temu jakoś support chyba w viewablach zrobić
+			- Bo na razie po prostu dawaliśmy ścieżki viewablom i się nie przejmowaliśmy
+		- Ale dla autora to w dosłownie ogóle nie będzie miało znaczenia czy to sprite czy animacja
+			- Jedyna różnica to to że coś się rusza na ekranie
+		- Atlas packer czyta natywnie z pngow wiec albo
+			- dajemy packerowi sciezki typu fish.gif@1, fish.gif@2
+			- albo rozpakowujemy do pngow do keszy
+				- bardziej stateless i mniej complex z takimi sciezkami chyba
 */
 
 "external_resources": {
 	"gfx/abc.png": {
-		"type_id": "abc",
+		"id": "abc",
 		"content_hash": "aEdhJHk83dLkfJGH8932FDS"
 	},
 
+	"gfx/fish.gif": {
+		"id": "fish",
+		"content_hash": "gmBOD9342podJ8QlaSDLKf8",
+
+		"script_arguments": {
+			// Wszystko tak samo jak w normalnym png, tylko wewnętrznie sobie to wrzucamy
+			"radius": "15"
+		}
+	},
+
 	"sfx/background_ambience.ogg": {
-		"type_id": "background_ambience",
+		"id": "background_ambience",
 		"content_hash": "fklj389sDLjGFLDkjh894FL"
 	},
 
 	"scripts/crate_mover.lua": {
-		"type_id": "crate_mover",
+		"id": "crate_mover",
 		"content_hash": "r8932jfdsxXJKHdsFkHJjhJ"
 	},
 
 	"gfx/magic_crate.png": {
-		"type_id": "sprite",
+		"id": "sprite",
 		"script": "crate_mover",
 
 		"script_arguments": {
@@ -139,10 +165,53 @@
 	i w Special taki wirtualny filesystem ze swiatlami np.
 
 	W specialsach też mogą znalezc sie typy broni do wrzucania na mape, czemu nie
+
+	Musimy zaznaczać typ danego internal resourca bo tego już nie jesteśmy w stanie wykryć z rozszerzenia tak jak zasobów.
+	Myślałem czy np. nie lepiej lights = { } i tu w srodku wszystkie światła
+		- Ale jak mamy wszystkie to przynajmniej parser od razu wykrywa czy nie ma konfliktu nazw
+
+	Dobrze byłoby oznaczać w nazwie typu resourca że coś jest oficjalne
+		- Żeby uniknąć konfliktu nazw z naszymi resourcami
+			- żeby nie musieć nawet sprawdzać tego
+
+	tak samo prefaby
+	no i jak te idy nadajemy? Bo jak to nie bedzie w filesystemie, to znaczy ze bedzie w tym wirtualnym
+		- mozemy sprawdzac czy jest unikalna nazwa
+		- i tez wymagac alphanumeric_ dla kompatybilnosci jakbysmy chcieli to pisac do plikow
+
+	Since the official resources might get very large,
+	we might want to keep the resource properties within separate jsons just like we do now with lua files
+	and read them trivially on demand
+	
+	Otherwise we'd always have to parse the entire json with all resources (not necessarily load all files)
+		- Will it really be that big of a deal?
+			- Besides won't we have it encoded in binary?
+	
+	I think ultimately all binary properties of resources we'll have in binary
+		W swoim czasie przekonwertujemy te pliki lua na po prostu instrukcje cpp
+			- jakis tool do tego zeby sie to szybko robilo
+	
+	Bo chcielibysmy ostatecznie zeby wszystkie resourcy oficjalne, prefaby typu awkaria, obrazki z proptami itp
+		- to zeby to wszystko bylo juz w formie resourcow editora zeby normalnie sie to dodawalo podczas edytowania
+			- bo to by bylo durne jakbysmy to wszytko resolvowali podczas generowania cosmosu
+			- a tak to jest nawet prostsza specyfikacja danych dla nas
+
+	Dlatego od razu też zróbmy żeby nie wypełniać generowanego cosmosu wszystkimi oficjalnymi flavorami
+	a tylko tymi które explicitly dodaliśmy z edytora
+		- potem nawet zrobi sie ticki typu
+			- Advanced->"Use official weapons"
+			- Advanced->"Use official characters"
+		- jak ktos odznaczy to okienko bedzie warnowało
+
+	
+	No i teraz jeszcze czy internal resource potrzebuja oddzielnie klas instance i resource?
+		- Czy np nie lepiej uznac ze 
 */
 
 "internal_resources": {
 	"<strong_light>": {
+		"class": "LIGHT",
+
 		"attenuation": {
 			"constant": 1,
 			"linear": 1,
@@ -151,6 +220,8 @@
 	},
 
 	"<cv_47>": {
+		"class": "WEAPON",
+
 		"mag_sprite": "abc",
 		"mag_capacity": 30
 	}
@@ -294,7 +365,7 @@
 	},
 
 	{
-		"type": "<light>",
+		"type": "@<light>",
 		"pos": [23, 45.02],
 		"layer": "Light layer 1",
 		"attenuation": {
@@ -303,14 +374,21 @@
 	},
 
 	{
-		"type": "<aquarium>",
+		"type": "@crate",
+		"name": "mid crate",
+		"pos": [23, 45.02],
+		"layer": "Mid layer"
+	},
+
+	{
+		"type": "@[aquarium]",
 		"name": "CT spawn aquarium",
 		"pos": [23, 45.02],
 		"layer": "Spawnpoint layer 1"
 	},
 
 	{
-		"type": "<spawnpoint>",
+		"type": "@<spawnpoint>",
 		"team": "Atlantis",
 		"pos": [23, 45.02],
 		"layer": "Spawnpoints"

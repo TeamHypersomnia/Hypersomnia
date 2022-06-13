@@ -51,19 +51,6 @@ constexpr bool is_unpathed_asset = is_one_of_v<
 	assets::plain_animation_id
 >;
 
-/* 
-	Pathed assets are always viewables.
-	It would be insane if the logic code had access to actual filesystem paths.
-*/
-
-template <class T>
-constexpr bool is_viewable_asset_v = is_pathed_asset<T> || is_one_of_v<
-	T,
-	assets::particle_effect_id
->;
-
-template <class T>
-constexpr bool is_logical_asset_v = is_unpathed_asset<T> && !is_viewable_asset_v<T>;
 
 template <class T, class = void>
 struct has_image_id : std::false_type {};
