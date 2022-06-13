@@ -3,6 +3,7 @@
 #include "application/arena/intercosm_paths.h"
 
 struct editor_project_paths {
+	std::string arena_name;
 	augs::path_type folder_path;
 
 	augs::path_type project_json;

@@ -6,7 +6,7 @@ namespace augs {
 	path_type find_first(const free_path_type type, const path_type& path_template, F&& allow_candidate = true_returner()) {
 		for (std::size_t candidate = 0;; ++candidate) {
 			const auto candidate_path = candidate ? 
-				typesafe_sprintf(path_template.string(), typesafe_sprintf("-%x", candidate))
+				typesafe_sprintf(path_template.string(), candidate)
 				: typesafe_sprintf(path_template.string(), "")
 			;
 

@@ -202,7 +202,7 @@ namespace sanitization {
 		}, result);
 	}
 
-	result_or_error sanitize_map_name(
+	result_or_error sanitize_map_path(
 		const augs::path_type& maps_directory,
 		const std::string& untrusted_map_name
 	) {
@@ -226,7 +226,7 @@ namespace sanitization {
 			return forbidden_path_type::TOTAL_PATH_IS_TOO_LONG;
 		}
 
-		return augs::path_type(untrusted_map_name);
+		return maps_directory / untrusted_map_name;
 	}
 }
 
@@ -249,21 +249,21 @@ TEST_CASE("Map sanitization test") {
 
 	const augs::path_type parent = DETAIL_DIR;
 
-	REQUIRE(S::sanitize_map_name(parent, "") == R(F::EMPTY));
-	REQUIRE(S::sanitize_map_name(parent, "cyberaqua") == R(augs::path_type("cyberaqua")));
-	REQUIRE(S::sanitize_map_name(parent, "/cyberaqua") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, with_zero) == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, "cyberaqua/") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, "/cyberaqua/cyberaqua/cyberaqua/cyberaqua/cyberaqua/cyberaqua") == R(F::TOO_LONG));
-	REQUIRE(S::sanitize_map_name(parent, "kjlgfkjlkdfj893jdlksjdlfkj8934jfdskljfklgdfhlkj4jklfkjhyberaqua") == R(F::TOO_LONG));
-	REQUIRE(S::sanitize_map_name(parent, "cyber aqua") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, "cyberakła") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, ".") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, "../") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, "....//") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, "..\\") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, ".\\") == R(F::FORBIDDEN_CHARACTERS));
-	REQUIRE(S::sanitize_map_name(parent, "..") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, "") == R(F::EMPTY));
+	REQUIRE(S::sanitize_map_path(parent, "cyberaqua") == R(parent / augs::path_type("cyberaqua")));
+	REQUIRE(S::sanitize_map_path(parent, "/cyberaqua") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, with_zero) == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, "cyberaqua/") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, "/cyberaqua/cyberaqua/cyberaqua/cyberaqua/cyberaqua/cyberaqua") == R(F::TOO_LONG));
+	REQUIRE(S::sanitize_map_path(parent, "kjlgfkjlkdfj893jdlksjdlfkj8934jfdskljfklgdfhlkj4jklfkjhyberaqua") == R(F::TOO_LONG));
+	REQUIRE(S::sanitize_map_path(parent, "cyber aqua") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, "cyberakła") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, ".") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, "../") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, "....//") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, "..\\") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, ".\\") == R(F::FORBIDDEN_CHARACTERS));
+	REQUIRE(S::sanitize_map_path(parent, "..") == R(F::FORBIDDEN_CHARACTERS));
 
 #if TEST_VERY_LONG_PATHS
 #if PLATFORM_UNIX
@@ -271,8 +271,8 @@ TEST_CASE("Map sanitization test") {
 
 	augs::create_directories(long_parent_dir);
 
-	REQUIRE(S::sanitize_map_name(long_parent_dir, "aqua") == R(augs::path_type("aqua")));
-	REQUIRE(S::sanitize_map_name(long_parent_dir, "aqua2") == R(F::TOTAL_PATH_IS_TOO_LONG));
+	REQUIRE(S::sanitize_map_path(long_parent_dir, "aqua") == R(long_parent_dir / augs::path_type("aqua")));
+	REQUIRE(S::sanitize_map_path(long_parent_dir, "aqua2") == R(F::TOTAL_PATH_IS_TOO_LONG));
 #endif
 #endif
 }

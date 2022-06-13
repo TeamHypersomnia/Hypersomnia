@@ -1475,7 +1475,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 					break;
 
-				case custom_imgui_result::OPEN_PROJECT:
+				case custom_imgui_result::OPEN_SELECTED_PROJECT:
 					if constexpr(std::is_same_v<S, project_selector_setup>) {
 						launch_editor(setup.get_selected_project_path());
 					}

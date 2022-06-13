@@ -18,13 +18,13 @@ namespace sanitization {
 		TOTAL_PATH_IS_TOO_LONG
 	};
 
+	constexpr auto portable_alphanumeric_set = "_abcdefghijklmnopqrstuvwxyz0123456789";
+
 	std::string describe(forbidden_path_type);
 
 	using result_or_error = std::variant<forbidden_path_type, augs::path_type>;
 
 	namespace detail {
-		constexpr auto portable_alphanumeric_set = "_abcdefghijklmnopqrstuvwxyz0123456789";
-
 		inline bool is_whitelisted_extension(const std::string& ext) {
 			return
 				ext == "png"  ||
@@ -62,7 +62,7 @@ namespace sanitization {
 		const std::string& untrusted_file_path
 	);
 
-	result_or_error sanitize_map_name(
+	result_or_error sanitize_map_path(
 		const augs::path_type& maps_directory,
 		const std::string& untrusted_map_name
 	);

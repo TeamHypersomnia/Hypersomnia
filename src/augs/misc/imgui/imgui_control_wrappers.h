@@ -89,6 +89,20 @@ namespace augs {
 			return false;
 		}
 
+		template <unsigned buffer_size, class... Args>
+		bool input_multiline_text(const std::string& label, constant_size_string<buffer_size>& value, const unsigned num_lines, Args&&... args) {
+			std::array<char, buffer_size> buf;
+
+			std::copy(value.data(), value.data() + value.size() + 1, buf.data());
+
+			if (ImGui::InputTextMultiline(label.c_str(), buf.data(), buffer_size, ImVec2(0.f, ImGui::GetTextLineHeight() * num_lines), std::forward<Args>(args)...)) {
+				value = std::string(buf.data());
+				return true;
+			}
+
+			return false;
+		}
+
 		inline bool checkbox(const std::string& label, bool& into) {
 			return ImGui::Checkbox(label.c_str(), &into);
 		}

@@ -22,6 +22,8 @@
 #include "application/setups/editor/project/editor_project_about.h"
 #include "application/setups/project_selector/project_selector_gui.h"
 #include "application/setups/editor/project/editor_project_about.h"
+#include "application/setups/editor/project/editor_project_meta.h"
+#include "application/setups/editor/project/editor_project_about.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -37,6 +39,8 @@ class project_selector_setup : public default_setup_settings {
 	void load_gui_state();
 	void save_gui_state();
 
+	bool create_new_project_files();
+
 public:
 	project_selector_setup();
 	~project_selector_setup();
@@ -46,6 +50,9 @@ public:
 
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
 	augs::path_type get_selected_project_path() const;
+
+	std::optional<project_tab_type> is_project_name_taken(const arena_identifier&) const;
+	arena_identifier find_free_new_project_name() const;
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

@@ -12,7 +12,7 @@ enum class custom_imgui_result {
 	NONE,
 	GO_TO_MAIN_MENU,
 	RETRY,
-	OPEN_PROJECT
+	OPEN_SELECTED_PROJECT
 };
 
 enum class setup_escape_result {

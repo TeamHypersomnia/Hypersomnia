@@ -20,7 +20,10 @@
 #include "application/arena/arena_paths.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
+#include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/readwrite/json_readwrite_errors.h"
+#include "augs/string/path_sanitization.h"
+#include "augs/filesystem/find_path.h"
 
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 250;
@@ -56,8 +59,8 @@ augs::path_type project_list_entry::get_miniature_path() const {
 	return editor_project_paths(arena_path).miniature;
 }
 
-std::string project_list_entry::get_arena_name() const {
-	return arena_path.filename().string();
+arena_identifier project_list_entry::get_arena_name() const {
+	return arena_name;
 }
 
 std::optional<ad_hoc_atlas_subjects> project_selector_setup::get_new_ad_hoc_images() {
@@ -90,6 +93,19 @@ static editor_project_about read_about_from(const augs::path_type& arena_folder_
 	return editor_project_readwrite::read_only_project_about(paths.project_json);
 }
 
+std::optional<project_tab_type> project_selector_setup::is_project_name_taken(const arena_identifier& arena_name) const {
+	using P = project_tab_type;
+	for (auto i = P::MY_PROJECTS; i < P::COUNT; i = P(int(i) + 1)) {
+		for (auto& e : gui.projects_view.tabs[i].entries) {
+			if (arena_name == e.arena_name) {
+				return i;
+			}
+		}
+	}
+
+	return std::nullopt;
+}
+
 void project_selector_setup::scan_for_all_arenas() {
 	auto scan_for = [&](const project_tab_type type) {
 		const auto source_directory = get_arenas_directory(type);
@@ -97,19 +113,36 @@ void project_selector_setup::scan_for_all_arenas() {
 		auto register_arena = [&](const auto& arena_folder_path) {
 			const auto paths = editor_project_paths(arena_folder_path);
 
+			const auto sanitized = sanitization::sanitize_map_path(source_directory, paths.arena_name);
+			const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
+
+			if (!sanitized_path || *sanitized_path != arena_folder_path) {
+				LOG("%x is not a correct arena path! See if the arena name isn't too long or if it contains forbidden characters.", arena_folder_path);
+
+				return callback_result::CONTINUE;
+			}
+
 			auto new_entry = project_list_entry();
-			new_entry.arena_path = arena_folder_path;
+			new_entry.arena_name = paths.arena_name;
+			new_entry.arena_path = *sanitized_path;
 
 			// TODO: give it a proper timestamp
 
 			new_entry.timestamp = augs::date_time().secs_since_epoch();
 			new_entry.miniature_index = miniature_index_counter++;
 			try {
-				new_entry.about = ::read_about_from(arena_folder_path);
+				new_entry.about = ::read_about_from(*sanitized_path);
+			}
+			catch (const augs::file_open_error& err) {
+				editor_project_about err_abouts;
+				err_abouts.short_description = "Missing file: " + paths.project_json.filename().string();
+				err_abouts.full_description = err.what();
+
+				new_entry.about = err_abouts;
 			}
 			catch (const augs::json_deserialization_error& err) {
 				editor_project_about err_abouts;
-				err_abouts.short_description = "Couldn't parse " + paths.project_json.string();
+				err_abouts.short_description = "Parsing error: " + paths.project_json.filename().string();
 				err_abouts.full_description = err.what();
 
 				new_entry.about = err_abouts;
@@ -341,8 +374,9 @@ project_list_entry* projects_list_tab_state::find_selected() {
 	return nullptr;
 }
 
-custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input in) {
+project_list_view_result projects_list_view::perform(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
+	auto result = project_list_view_result::NONE;
 
 	auto left_buttons_column_size = ImGui::CalcTextSize("Community arenas  ");
 	auto root = scoped_child("Selector main", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
@@ -387,7 +421,7 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 	);
 
 	if (create_pressed) {
-		current_tab = project_tab_type::MY_PROJECTS;
+		result = project_list_view_result::OPEN_CREATE_DIALOG;
 	}
 
 	{
@@ -466,7 +500,7 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 
 					auto scope = scoped_child("descview", ImVec2(0, 0), true);
 
-					text(entry.get_arena_name() + "\n\n");
+					text(std::string(entry.get_arena_name()) + "\n\n");
 
 					ImGui::Columns(2);
 
@@ -532,16 +566,16 @@ custom_imgui_result projects_list_view::perform(const perform_custom_imgui_input
 
 			if (bottom_button_pressed) {
 				if (is_template) {
-
+					result = project_list_view_result::OPEN_CREATE_DIALOG;
 				}
 				else {
-					return custom_imgui_result::OPEN_PROJECT;
+					result = project_list_view_result::OPEN_SELECTED_PROJECT;
 				}
 			}
 		}
 	}
 
-	return custom_imgui_result::NONE;
+	return result;
 }
 
 augs::path_type projects_list_view::get_selected_project_path() const {
@@ -550,6 +584,123 @@ augs::path_type projects_list_view::get_selected_project_path() const {
 
 augs::path_type project_selector_setup::get_selected_project_path() const {
 	return gui.projects_view.get_selected_project_path();
+}
+
+void projects_list_view::select_project(const project_tab_type tab, const augs::path_type& path) {
+	current_tab = tab;
+	tabs[tab].selected_arena_path = path;
+}
+
+bool create_new_project_gui::perform(const project_selector_setup&) {
+	using namespace augs::imgui;
+
+	centered_size_mult = vec2(0.6f, 0.6f);
+
+	const auto flags = 
+		ImGuiWindowFlags_NoResize | 
+		ImGuiWindowFlags_NoMove | 
+		ImGuiWindowFlags_NoCollapse | 
+		ImGuiWindowFlags_NoSavedSettings
+	;
+
+	auto create_window = make_scoped_window(flags);
+	//std::optional<sanitization::forbidden_path_type> maybe_error;
+
+	if (!create_window) {
+		return false;
+	}
+
+	{
+		auto child = scoped_child("create view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
+
+		text_color("New arena name", green);
+
+		input_text("##Map name", name);
+
+		text("Be creative!\nIf an arena with the same name exists on somebody's server,\npeople will have to delete it in order to play your arena.");
+
+		const auto map_name_hint = typesafe_sprintf(
+			"The arena name must be at most %x characters.\nIt can only contain the following characters:\n%x",
+			max_arena_name_length_v,
+			sanitization::portable_alphanumeric_set
+		);
+
+		text_disabled(map_name_hint);
+
+		text("");
+
+		ImGui::Separator();
+
+		text_color("Short description", green);
+		input_multiline_text("##Short description", short_description, 3);
+		text("Describe your arena in two sentences.");
+
+		auto sanitization_result = sanitization::sanitize_map_path(EDITOR_PROJECTS_DIR, std::string(name));
+		const auto err = std::get_if<sanitization::forbidden_path_type>(&sanitization_result);
+
+		if (err) {
+			text_color(typesafe_sprintf("\nCannot create an arena with this name.\n%x", sanitization::describe(*err)), red);
+		}
+	}
+
+	auto sanitization_result = sanitization::sanitize_map_path(EDITOR_PROJECTS_DIR, std::string(name));
+	auto sanitized_path = std::get_if<augs::path_type>(&sanitization_result);
+
+	const bool is_disabled = sanitized_path == nullptr || *sanitized_path != (EDITOR_PROJECTS_DIR / std::string(name));
+
+	{
+		auto child = scoped_child("create cancel");
+
+		ImGui::Separator();
+
+		{
+
+			auto scope = maybe_disabled_cols({}, is_disabled);
+
+			if (ImGui::Button("Create")) {
+				return true;
+			}
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel")) {
+			close();
+		}
+	}
+
+	return false;
+}
+
+bool project_selector_setup::create_new_project_files() {
+	const auto& user_input = gui.create_dialog;
+	const auto& chosen_name = user_input.name;
+	const auto sanitized = sanitization::sanitize_map_path(EDITOR_PROJECTS_DIR, std::string(chosen_name));
+	const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
+
+	if (sanitized_path) {
+		augs::create_directory(*sanitized_path);
+		scan_for_all_arenas();
+		gui.projects_view.select_project(project_tab_type::MY_PROJECTS, *sanitized_path);
+
+		const auto paths = editor_project_paths(*sanitized_path);
+
+
+
+		return true;
+	}
+
+	return false;
+}
+
+arena_identifier project_selector_setup::find_free_new_project_name() const {
+	/* 
+		In theory this could return an already existing string due to length limitation,
+		but that would take millions of tests and would hang the program most probably.
+	*/
+
+	const auto path_template = (EDITOR_PROJECTS_DIR / "my_new_arena%x");
+	return arena_identifier(augs::first_free_path(path_template).filename());
 }
 
 custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
@@ -567,7 +718,29 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 
 	auto scope = scoped_window("Project selector main", nullptr, window_flags);
 
-	return gui.projects_view.perform(in);
+	{
+		if (gui.create_dialog.perform(*this)) {
+			if (create_new_project_files()) {
+				return custom_imgui_result::OPEN_SELECTED_PROJECT;
+			}
+		}
+	}
+
+	const auto result = gui.projects_view.perform(in);
+
+	switch (result) {
+		case project_list_view_result::NONE:
+			return custom_imgui_result::NONE;
+
+		case project_list_view_result::OPEN_CREATE_DIALOG:
+			gui.create_dialog.name = find_free_new_project_name();
+			gui.create_dialog.short_description = "Resistance invades Metropolis.\nProtect the civilians.";
+			gui.create_dialog.open();
+			return custom_imgui_result::NONE;
+
+		case project_list_view_result::OPEN_SELECTED_PROJECT:
+			return custom_imgui_result::OPEN_SELECTED_PROJECT;
+	}
 }
 
 void project_selector_setup::load_gui_state() {

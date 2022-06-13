@@ -2,6 +2,8 @@
 #include "augs/misc/constant_size_string.h"
 #include "augs/misc/constant_size_vector.h"
 
+using arena_short_description_type = augs::constant_size_string<200>;
+
 struct editor_project_role_info {
 	// GEN INTROSPECTOR struct editor_project_role_info
 	augs::constant_size_string<40> role = "Role";

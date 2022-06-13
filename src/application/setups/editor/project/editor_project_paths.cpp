@@ -1,7 +1,7 @@
 #include "application/setups/editor/project/editor_project_paths.h"
 
 editor_project_paths::editor_project_paths(const augs::path_type& target_folder) : folder_path(target_folder) {
-	const auto arena_name = target_folder.filename().string();
+	arena_name = target_folder.filename().string();
 
 	auto in_folder = [&](const auto& rest) {
 		return target_folder / rest;
