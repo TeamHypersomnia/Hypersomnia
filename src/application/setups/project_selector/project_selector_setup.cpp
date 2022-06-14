@@ -113,7 +113,7 @@ void project_selector_setup::scan_for_all_arenas() {
 		auto register_arena = [&](const auto& arena_folder_path) {
 			const auto paths = editor_project_paths(arena_folder_path);
 
-			const auto sanitized = sanitization::sanitize_map_path(source_directory, paths.arena_name);
+			const auto sanitized = sanitization::sanitize_arena_path(source_directory, paths.arena_name);
 			const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
 
 			if (!sanitized_path || *sanitized_path != arena_folder_path) {
@@ -635,15 +635,15 @@ bool create_new_project_gui::perform(const project_selector_setup&) {
 		input_multiline_text("##Short description", short_description, 3);
 		text("Describe your arena in two sentences.");
 
-		auto sanitization_result = sanitization::sanitize_map_path(EDITOR_PROJECTS_DIR, std::string(name));
+		auto sanitization_result = sanitization::sanitize_arena_path(EDITOR_PROJECTS_DIR, std::string(name));
 		const auto err = std::get_if<sanitization::forbidden_path_type>(&sanitization_result);
 
 		if (err) {
-			text_color(typesafe_sprintf("\nCannot create an arena with this name.\n%x", sanitization::describe(*err)), red);
+			text_color(typesafe_sprintf("\nCannot create an arena with this name.\n%x", sanitization::describe_for_arena(*err)), red);
 		}
 	}
 
-	auto sanitization_result = sanitization::sanitize_map_path(EDITOR_PROJECTS_DIR, std::string(name));
+	auto sanitization_result = sanitization::sanitize_arena_path(EDITOR_PROJECTS_DIR, std::string(name));
 	auto sanitized_path = std::get_if<augs::path_type>(&sanitization_result);
 
 	const bool is_disabled = sanitized_path == nullptr || *sanitized_path != (EDITOR_PROJECTS_DIR / std::string(name));
@@ -675,17 +675,26 @@ bool create_new_project_gui::perform(const project_selector_setup&) {
 bool project_selector_setup::create_new_project_files() {
 	const auto& user_input = gui.create_dialog;
 	const auto& chosen_name = user_input.name;
-	const auto sanitized = sanitization::sanitize_map_path(EDITOR_PROJECTS_DIR, std::string(chosen_name));
+	const auto sanitized = sanitization::sanitize_arena_path(EDITOR_PROJECTS_DIR, std::string(chosen_name));
 	const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
 
 	if (sanitized_path) {
+		const auto sanitized_name = sanitized_path->filename().string();
+
 		augs::create_directory(*sanitized_path);
 		scan_for_all_arenas();
 		gui.projects_view.select_project(project_tab_type::MY_PROJECTS, *sanitized_path);
 
 		const auto paths = editor_project_paths(*sanitized_path);
 
+		editor_project default_project;
+		default_project.meta.game_version = hypersomnia_version().get_version_string();
+		default_project.meta.name = sanitized_name;
+		default_project.meta.version_timestamp = augs::date_time::get_utc_timestamp();
 
+		default_project.about.short_description = user_input.short_description;
+		
+		editor_project_readwrite::write_project_json(paths.project_json, default_project);
 
 		return true;
 	}
@@ -700,7 +709,7 @@ arena_identifier project_selector_setup::find_free_new_project_name() const {
 	*/
 
 	const auto path_template = (EDITOR_PROJECTS_DIR / "my_new_arena%x");
-	return arena_identifier(augs::first_free_path(path_template).filename());
+	return arena_identifier(augs::first_free_path(path_template).filename().string());
 }
 
 custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
@@ -720,6 +729,8 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 
 	{
 		if (gui.create_dialog.perform(*this)) {
+			gui.create_dialog.close();
+
 			if (create_new_project_files()) {
 				return custom_imgui_result::OPEN_SELECTED_PROJECT;
 			}

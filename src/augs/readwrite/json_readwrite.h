@@ -7,6 +7,7 @@
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
+#include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/error/en.h"
 
@@ -178,6 +179,106 @@ namespace augs {
 	template <class T>
 	T from_json_file(const path_type& path) {
 		return from_json_string<T>(file_to_string(path));
+	}
+
+	template <class F, class T>
+	void general_write_json_value(F& to, const T& from) {
+		if constexpr(has_custom_to_json_value_v<T>) {
+			to_json_value(to, from);
+		}
+		else if constexpr(is_constant_size_string_v<T>) {
+			to.String(std::string(from));
+		}
+		else if constexpr(std::is_same_v<T, std::string>) {
+			to.String(from);
+		}
+		else if constexpr(std::is_same_v<T, float>) {
+			to.Float(from);
+		}
+		else if constexpr(std::is_same_v<T, double>) {
+			to.Double(from);
+		}
+		else if constexpr(std::is_same_v<T, int>) {
+			to.Int(from);
+		}
+		else if constexpr(std::is_same_v<T, unsigned>) {
+			to.Uint(from);
+		}
+		else if constexpr(std::is_same_v<T, bool>) {
+			to.Bool(from);
+		}
+		else if constexpr(std::is_enum_v<T>) {
+			static_assert(has_enum_to_string_v<T>, "This enum does not provide a an enum_to_string overload.");
+
+			to.String(enum_to_string(from));
+		}
+		else {
+			static_assert(always_false_v<T>, "Non-exhaustive general_read_json_value");
+		}
+	}
+
+	template <class F, class T>
+	void write_json(F& to, const T& from) {
+		if constexpr(representable_as_json_value_v<T>) {
+			general_write_json_value(to, from);
+		}
+		else if constexpr(is_container_v<T>) {
+			using Container = T;
+
+			if constexpr(is_associative_v<Container>) {
+				static_assert(key_representable_as_string_v<Container>);
+
+				to.StartObject();
+
+				for (const auto& it : from) {
+					to.Key(it.first);
+					write_json(to, it.second);
+				}
+
+				to.EndObject();
+			}
+			else {
+				to.StartArray();
+
+				for (const auto& it : from) {
+					write_json(to, it);
+				}
+
+				to.EndArray();
+			}
+		}
+		else {
+			to.StartObject();
+
+			introspect(
+				[&to](const auto& label, const auto& field) {
+					using Field = remove_cref<decltype(field)>;
+
+					if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
+						to.Key(label);
+						write_json(to, field);
+					}
+				},
+				from
+			);
+
+			to.EndObject();
+		}
+	}
+
+	template <class T>
+	std::string to_json_string(const T& from) {
+		rapidjson::StringBuffer s;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+
+		write_json(s, from);
+
+		return s.GetString();
+	}
+
+	template <class T>
+	void save_as_json(const T& from, const path_type& path) {
+		return save_as_text(path, to_json_string(from));
 	}
 }
 

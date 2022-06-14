@@ -21,6 +21,7 @@ namespace sanitization {
 	constexpr auto portable_alphanumeric_set = "_abcdefghijklmnopqrstuvwxyz0123456789";
 
 	std::string describe(forbidden_path_type);
+	std::string describe_for_arena(forbidden_path_type);
 
 	using result_or_error = std::variant<forbidden_path_type, augs::path_type>;
 
@@ -62,7 +63,7 @@ namespace sanitization {
 		const std::string& untrusted_file_path
 	);
 
-	result_or_error sanitize_map_path(
+	result_or_error sanitize_arena_path(
 		const augs::path_type& maps_directory,
 		const std::string& untrusted_map_name
 	);
