@@ -36,9 +36,6 @@ class project_selector_setup : public default_setup_settings {
 
 	void scan_for_all_arenas();
 
-	void load_gui_state();
-	void save_gui_state();
-
 	bool create_new_project_files();
 
 public:

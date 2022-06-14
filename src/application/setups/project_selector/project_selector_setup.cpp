@@ -47,12 +47,11 @@ static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 project_selector_setup::project_selector_setup() {
 	augs::create_directories(EDITOR_PROJECTS_DIR);
 
-	load_gui_state();
 	scan_for_all_arenas();
 }
 
 project_selector_setup::~project_selector_setup() {
-	save_gui_state();
+
 }
 
 augs::path_type project_list_entry::get_miniature_path() const {
@@ -591,7 +590,7 @@ void projects_list_view::select_project(const project_tab_type tab, const augs::
 	tabs[tab].selected_arena_path = path;
 }
 
-bool create_new_project_gui::perform(const project_selector_setup&) {
+bool create_new_project_gui::perform(const project_selector_setup& setup) {
 	using namespace augs::imgui;
 
 	centered_size_mult = vec2(0.6f, 0.6f);
@@ -638,15 +637,47 @@ bool create_new_project_gui::perform(const project_selector_setup&) {
 		auto sanitization_result = sanitization::sanitize_arena_path(EDITOR_PROJECTS_DIR, std::string(name));
 		const auto err = std::get_if<sanitization::forbidden_path_type>(&sanitization_result);
 
-		if (err) {
+		const auto taken_reason = setup.is_project_name_taken(std::string(name));
+
+		auto describe_reason_taken = [](const project_tab_type reason) {
+			switch (reason) {
+				case project_tab_type::MY_PROJECTS:
+					return "Project with this name already exists.";
+				case project_tab_type::OFFICIAL_ARENAS:
+					return "An official arena with this name already exists.";
+				case project_tab_type::COMMUNITY_ARENAS:
+					return "Warning: a community arena with the same name detected.";
+				case project_tab_type::COUNT:
+				default:
+					return "Unknown error.";
+			}
+		};
+
+		if (taken_reason != std::nullopt) {
+			const auto reason_str = describe_reason_taken(*taken_reason);
+
+			if (taken_reason == project_tab_type::COMMUNITY_ARENAS) {
+				text_color(reason_str, yellow);
+			}
+			else {
+				text_color(reason_str, red);
+			}
+		}
+		else if (err) {
 			text_color(typesafe_sprintf("\nCannot create an arena with this name.\n%x", sanitization::describe_for_arena(*err)), red);
 		}
 	}
 
 	auto sanitization_result = sanitization::sanitize_arena_path(EDITOR_PROJECTS_DIR, std::string(name));
 	auto sanitized_path = std::get_if<augs::path_type>(&sanitization_result);
+	
+	const auto taken_reason = setup.is_project_name_taken(std::string(name));
 
-	const bool is_disabled = sanitized_path == nullptr || *sanitized_path != (EDITOR_PROJECTS_DIR / std::string(name));
+	const bool is_disabled = 
+		(taken_reason != std::nullopt && taken_reason != project_tab_type::COMMUNITY_ARENAS)
+		|| sanitized_path == nullptr 
+		|| *sanitized_path != (EDITOR_PROJECTS_DIR / std::string(name))
+	;
 
 	{
 		auto child = scoped_child("create cancel");
@@ -752,19 +783,4 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 		case project_list_view_result::OPEN_SELECTED_PROJECT:
 			return custom_imgui_result::OPEN_SELECTED_PROJECT;
 	}
-}
-
-void project_selector_setup::load_gui_state() {
-	// TODO: Read/write as lua
-
-	try {
-		augs::load_from_bytes(gui, get_project_selector_gui_state_path());
-	}
-	catch (const augs::file_open_error&) {
-		// We don't care if it does not exist
-	}
-}
-
-void project_selector_setup::save_gui_state() {
-	augs::save_as_bytes(gui, get_project_selector_gui_state_path());
 }
