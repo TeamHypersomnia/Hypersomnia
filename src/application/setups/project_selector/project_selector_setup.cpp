@@ -653,6 +653,8 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 			}
 		};
 
+		text("\n");
+
 		if (taken_reason != std::nullopt) {
 			const auto reason_str = describe_reason_taken(*taken_reason);
 
@@ -664,7 +666,7 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 			}
 		}
 		else if (err) {
-			text_color(typesafe_sprintf("\nCannot create an arena with this name.\n%x", sanitization::describe_for_arena(*err)), red);
+			text_color(typesafe_sprintf("Cannot create an arena with this name.\n%x", sanitization::describe_for_arena(*err)), red);
 		}
 	}
 

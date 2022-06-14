@@ -476,9 +476,9 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	using namespace augs::imgui;
 
-	centered_size_mult = vec2(0.75f, 0.6f);
+	centered_size_mult = vec2(0.8f, 0.7f);
 
-	auto imgui_window = make_scoped_window();
+	auto imgui_window = make_scoped_window(ImGuiWindowFlags_NoSavedSettings);
 
 	if (!imgui_window) {
 		return false;

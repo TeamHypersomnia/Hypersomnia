@@ -22,7 +22,7 @@ struct editor_project {
 	editor_node_pools nodes;
 	editor_resource_pools resources;
 
-	std::vector<editor_layer> layers;
+	editor_layers layers;
 	// END GEN INTROSPECTOR
 
 	/* 
@@ -30,6 +30,4 @@ struct editor_project {
 	*/
 
 	editor_history history;
-
-	std::unordered_map<std::string, editor_layer*> make_name_to_layer_map();
 };

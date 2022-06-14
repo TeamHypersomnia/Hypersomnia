@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_map>
 #include "application/setups/editor/nodes/editor_node_id.h"
 
 struct editor_layer_hierarchy {
@@ -17,4 +18,20 @@ struct editor_layer {
 
 	editor_layer_hierarchy hierarchy;
 	// END GEN INTROSPECTOR
+};
+
+struct editor_layers {
+	static constexpr bool json_ignore = true;
+
+	std::vector<editor_layer> all;
+
+	auto make_name_to_layer_map() {
+		std::unordered_map<std::string, editor_layer*> out;
+
+		for (auto& layer : all) {
+			out[layer.name] = std::addressof(layer);
+		}
+
+		return out;
+	}
 };

@@ -55,7 +55,7 @@ namespace editor_project_readwrite {
 		*/
 
 		{
-			const auto name_to_layer = loaded.make_name_to_layer_map();
+			const auto name_to_layer = loaded.layers.make_name_to_layer_map();
 			const auto maybe_nodes = FindArray(document, "nodes");
 			const auto maybe_prefabs = FindObject(document, "prefabs");
 
