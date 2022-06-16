@@ -75,12 +75,6 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	{
 		const auto dockspace_id = ImGui::GetID("MyDockSpace");
 
-		auto open_default_windows = [&]() {
-			gui.inspector.open();
-			gui.layers.open();
-			gui.project_files.open();
-		};
-
 		auto make_default_layout = [&]() {
 			ImGui::DockBuilderRemoveNode(dockspace_id); // Clear out existing layout
 			ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace); // Add empty node
@@ -89,17 +83,16 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ImGuiID dock_main_id = dockspace_id; // This variable will track the document node, however we are not using it here as we aren't docking anything into it.
 
 			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.20f, NULL, &dock_main_id);
-			ImGuiID dock_id_bottom = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.20f, NULL, &dock_main_id);
 			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
+			ImGuiID dock_id_bottomleft = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.40f, NULL, &dock_id_left);
 
-			ImGui::DockBuilderDockWindow(gui.project_files.get_title().c_str(), dock_id_bottom);
+			ImGui::DockBuilderDockWindow(gui.project_files.get_title().c_str(), dock_id_bottomleft);
 			ImGui::DockBuilderDockWindow(gui.layers.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
 			ImGui::DockBuilderFinish(dockspace_id);
 		};
 
 		if (ImGui::DockBuilderGetNode(dockspace_id) == NULL) {
-			open_default_windows();
 			make_default_layout();
 		}
 
@@ -114,7 +107,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	perform_main_menu_bar(in);
 
-	gui.inspector.perform({});
+	gui.inspector.perform({ project });
 	gui.layers.perform({});
 	gui.project_files.perform({});
 

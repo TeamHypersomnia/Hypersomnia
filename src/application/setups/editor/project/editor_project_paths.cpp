@@ -16,6 +16,6 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	signature = in_folder(arena_name + ".signature");
 
 	compressed_json = in_cache(arena_name + ".lz4");
-	resource_hashes_path = in_cache("resource_hashes.bin");
+	resource_hashes = in_cache("resource_hashes.bin");
 	fast_load_bin = in_cache("fast_load.bin");
 }

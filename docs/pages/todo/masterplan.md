@@ -6,6 +6,19 @@ permalink: masterplan
 summary: We need to set our priorities straight.
 ---
 
+- Inspector variant
+	- resource or node id mostly
+		- because a file is a resource
+	- Note that it's easier if any existing file is already represented editor_resource_id
+		- otherwise we'd have to do some strange distinciton between a file that's not *yet* put on the scene
+	- So yeah, I think it's best to always take all files into consideration, rescan and make resource objects for every single one of them
+
+- Remember that if we'd only keep the used resource data in json..
+	- the existing properties would possibly get deleted if there are temporarily no instances of it on the scene
+	- It's best if we purge this data only with a "Clean unused resources"
+- Also keep a resource_hashes.bin for all hashes even if we save the hashes in json
+	- Because this will store hashing timestamps + all hashes as opposed to hashes of only used files in json
+
 - Research if godot/unity/ue have *separate* notions of "enabled" *and/or* "visible" node (or layer) or if it's only for visibility
 
 struct pool_tuple

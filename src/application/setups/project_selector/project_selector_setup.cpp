@@ -307,57 +307,6 @@ bool projects_list_tab_state::perform_list(
 	return false;
 }
 
-static auto selectable_with_icon(
-	const augs::atlas_entry& icon,
-	const std::string& label,
-	const float size_mult,
-	const float padding_mult,
-	const rgba label_color,
-	const std::array<rgba, 3> bg_cols
-) {
-	using namespace augs::imgui;
-
-	const auto text_h = ImGui::GetTextLineHeight();
-	const auto button_size = ImVec2(0, text_h * size_mult);
-
-	shift_cursor(vec2(0, text_h * padding_mult));
-
-	const auto before_pos = ImGui::GetCursorPos();
-
-	bool result = false;
-
-	{
-		auto colored_selectable = scoped_selectable_colors(
-			bg_cols[0],
-			bg_cols[1],
-			bg_cols[2]
-		);
-
-		auto id = scoped_id(label.c_str());
-
-		result = ImGui::Selectable("###Button", true, ImGuiSelectableFlags_None, button_size);
-	}
-
-	{
-		auto scope = scoped_preserve_cursor();
-
-		ImGui::SetCursorPos(before_pos);
-
-		const auto icon_size = icon.get_original_size();
-		const auto icon_padding = vec2(icon_size);/// 1.5f;
-
-		const auto image_offset = vec2(icon_padding.x, button_size.y / 2 - icon_size.y / 2);
-		game_image(icon, icon_size, label_color, image_offset);
-
-		const auto text_pos = vec2(before_pos) + image_offset + vec2(icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
-		ImGui::SetCursorPos(ImVec2(text_pos));
-		text_color(label, label_color);
-	}
-
-	shift_cursor(vec2(0, text_h * padding_mult));
-
-	return result;
-}
 
 project_list_entry* projects_list_tab_state::find_selected() {
 	if (selected_arena_path.empty()) {
@@ -565,7 +514,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 
 			if (bottom_button_pressed) {
 				if (is_template) {
-					result = project_list_view_result::OPEN_CREATE_DIALOG;
+					result = project_list_view_result::OPEN_CREATE_FROM_SELECTED_DIALOG;
 				}
 				else {
 					result = project_list_view_result::OPEN_SELECTED_PROJECT;
@@ -588,6 +537,10 @@ augs::path_type project_selector_setup::get_selected_project_path() const {
 void projects_list_view::select_project(const project_tab_type tab, const augs::path_type& path) {
 	current_tab = tab;
 	tabs[tab].selected_arena_path = path;
+}
+
+project_list_entry* projects_list_view::find_selected() {
+	return tabs[current_tab].find_selected();
 }
 
 bool create_new_project_gui::perform(const project_selector_setup& setup) {
@@ -774,6 +727,15 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 
 	switch (result) {
 		case project_list_view_result::NONE:
+			return custom_imgui_result::NONE;
+
+		case project_list_view_result::OPEN_CREATE_FROM_SELECTED_DIALOG:
+			if (auto selected = gui.projects_view.find_selected()) {
+				gui.create_dialog.name = std::string(selected->arena_name) + "_remake";
+				gui.create_dialog.short_description = selected->about.short_description;
+				gui.create_dialog.open();
+			}
+
 			return custom_imgui_result::NONE;
 
 		case project_list_view_result::OPEN_CREATE_DIALOG:

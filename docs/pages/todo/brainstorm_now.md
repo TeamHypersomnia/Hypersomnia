@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Haszy chyba na razie nie potrzebujemy, tylko do podpisywania
+
 - Later also do some unit tests for json readwrite
 
 - Let's leave it at "arena" nomenclature

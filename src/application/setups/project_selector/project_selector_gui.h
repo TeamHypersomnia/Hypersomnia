@@ -47,6 +47,7 @@ struct projects_list_result {
 
 enum class project_list_view_result {
 	OPEN_CREATE_DIALOG,
+	OPEN_CREATE_FROM_SELECTED_DIALOG,
 	OPEN_SELECTED_PROJECT,
 
 	NONE
@@ -61,6 +62,8 @@ struct projects_list_view {
 	project_list_view_result perform(perform_custom_imgui_input);
 	augs::path_type get_selected_project_path() const;
 	void select_project(project_tab_type, const augs::path_type&);
+
+	project_list_entry* find_selected();
 };
 
 class project_selector_setup;

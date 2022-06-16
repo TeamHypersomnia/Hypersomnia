@@ -6,6 +6,7 @@
 struct cmd_line_params {
 	augs::path_type exe_path;
 	augs::path_type debugger_target;
+	augs::path_type editor_target;
 	augs::path_type consistency_report;
 	bool unit_tests_only = false;
 	bool help_only = false;
@@ -81,6 +82,9 @@ struct cmd_line_params {
 			else if (a == "--verify") {
 				verified_archive = argv[i++];
 			}
+			else if (a == "--edit") {
+				editor_target = argv[i++];
+			}
 			else if (a == "--signature") {
 				verified_signature = argv[i++];
 			}
@@ -92,7 +96,7 @@ struct cmd_line_params {
 				}
 			}
 			else {
-				debugger_target = a;
+
 			}
 		}
 	}

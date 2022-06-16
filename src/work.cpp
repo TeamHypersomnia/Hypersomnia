@@ -1098,9 +1098,10 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case launch_type::EDITOR:
-				launch_editor();
-
-				break;
+				if (!params.editor_target.empty()) {
+					launch_editor(params.editor_target);
+					break;
+				}
 
 			case launch_type::EDITOR_PROJECT_SELECTOR:
 				setup_launcher([&]() {

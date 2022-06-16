@@ -13,7 +13,7 @@ struct editor_project_paths {
 
 	/* cache */
 	augs::path_type compressed_json;
-	augs::path_type resource_hashes_path;
+	augs::path_type resource_hashes;
 
 	augs::path_type fast_load_bin;
 

@@ -7,41 +7,75 @@
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/editor_paths.h"
 
+#include "augs/filesystem/directory.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/byte_file.h"
 #include "augs/log.h"
 
-editor_setup::editor_setup() {
-	augs::create_directories(EDITOR_PROJECTS_DIR);
-	LOG("Loading the last opened editor project.");
-
-	load_gui_state();
-}
-
-editor_setup::editor_setup(const augs::path_type& project_path) {
+editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	augs::create_directories(EDITOR_PROJECTS_DIR);
 	LOG("Loading editor project at: %x", project_path);
 
 	load_gui_state();
+	open_default_windows();
 }
 
 editor_setup::~editor_setup() {
 	save_gui_state();
 }
 
+void editor_setup::open_default_windows() {
+	gui.inspector.open();
+	gui.layers.open();
+	gui.project_files.open();
+}
+
+bool editor_setup::handle_input_before_imgui(
+	handle_input_before_imgui_input in
+) {
+	using namespace augs::event;
+
+	if (in.e.msg == message::activate) {
+		on_window_activate();
+	}
+
+	if (in.e.msg == message::deactivate) {
+		force_autosave_now();
+	}
+
+	return false;
+}
+
+bool editor_setup::handle_input_before_game(
+	handle_input_before_game_input
+) {
+	return false;
+}
+
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
-	config.window.name = "Arena editor";
+	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", project.meta.name);
+}
+
+void editor_setup::on_window_activate() {
+	rebuild_filesystem();
+}
+
+void editor_setup::rebuild_filesystem() {
+	files.root.build_from(paths.folder_path);
+}
+
+void editor_setup::force_autosave_now() {
+
 }
 
 void editor_setup::load_gui_state() {
-	try {
-		augs::load_from_bytes(gui, get_editor_gui_state_path());
-	}
-	catch (const augs::file_open_error&) {
-		// We don't care if it does not exist
-	}
+	/*
+		To be decided what to do about it.
+		Generally ImGui will save the important layouts on its own.
+		The identifiers (e.g. currently inspected object id) might become out of date after reloading from json.
+	*/
 }
 
 void editor_setup::save_gui_state() {
-	augs::save_as_bytes(gui, get_editor_gui_state_path());
+
 }

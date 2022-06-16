@@ -17,9 +17,13 @@
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 
+#include "application/setups/editor/project/editor_project.h"
+
 #include "application/setups/editor/gui/editor_inspector_gui.h"
 #include "application/setups/editor/gui/editor_layers_gui.h"
 #include "application/setups/editor/gui/editor_project_files_gui.h"
+#include "application/setups/editor/editor_filesystem.h"
+#include "application/setups/editor/project/editor_project_paths.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -46,18 +50,39 @@ class editor_setup : public default_setup_settings {
 	entity_id viewed_character_id;
 	mode_player_id local_player_id;
 
+	editor_project project;
 	editor_gui gui;
+	editor_filesystem files;
+
+	const editor_project_paths paths;
+
+	void on_window_activate();
+	void rebuild_filesystem();
+
+	void force_autosave_now();
 
 	void load_gui_state();
 	void save_gui_state();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
+	static constexpr bool handles_window_input = true;
 
-	editor_setup();
 	editor_setup(const augs::path_type& project_path);
 	
 	~editor_setup();
+
+	void open_default_windows();
+
+	bool handle_input_before_imgui(
+		handle_input_before_imgui_input
+	);
+
+	bool handle_input_before_game(
+		handle_input_before_game_input
+	);
+
+	void customize_for_viewing(config_lua_table&) const;
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
@@ -93,8 +118,6 @@ public:
 
 	void perform_main_menu_bar(perform_custom_imgui_input);
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
-
-	void customize_for_viewing(config_lua_table&) const;
 
 	void apply(const config_lua_table&) {
 		return;
