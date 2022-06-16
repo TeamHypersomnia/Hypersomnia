@@ -69,7 +69,7 @@ std::string augs::date_time::format_time_point(const std::chrono::system_clock::
 }
 
 std::string augs::date_time::get_utc_timestamp() {
-	return format_time_point(std::chrono::system_clock::now());
+	return format_time_point(std::chrono::system_clock::now()) + " UTC";
 }
 
 /* 

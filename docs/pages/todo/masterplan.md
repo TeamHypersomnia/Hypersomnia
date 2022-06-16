@@ -6,6 +6,13 @@ permalink: masterplan
 summary: We need to set our priorities straight.
 ---
 
+- Filesystem ui: Mozna zrobic dropdowna zamiast przelacznika
+	- Chociaz taby chyba lepsze bo klikasz raz
+
+- Easy approach to prefab UI: to allow an entire layer to be packed into a prefab
+	- And also a prefab to be unpacked automatically into a top-level layer
+	- Simple, could be in context menu or a separate button
+
 - Inspector variant
 	- resource or node id mostly
 		- because a file is a resource

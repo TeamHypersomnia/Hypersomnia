@@ -175,7 +175,7 @@ void project_selector_setup::customize_for_viewing(config_lua_table& config) con
 }
 
 bool projects_list_tab_state::perform_list(
-	const ad_hoc_in_atlas_map& ad_hoc_in_atlas,
+	const ad_hoc_in_atlas_map& ad_hoc_atlas,
 	std::optional<std::string> timestamp_column_name
 ) {
 	using namespace augs::imgui;
@@ -267,12 +267,12 @@ bool projects_list_tab_state::perform_list(
 		ImGui::SameLine();
 
 		const auto image_padding = vec2(0, 0);
-		const auto miniature_entry = mapped_or_nullptr(ad_hoc_in_atlas, entry.miniature_index);
+		const auto miniature_entry = mapped_or_nullptr(ad_hoc_atlas, entry.miniature_index);
 		const auto target_miniature_size = vec2::square(miniature_size_v);
 
 		if (miniature_entry != nullptr) {
 			const auto miniature_size = miniature_entry->get_original_size();
-			const auto resized_miniature_size = vec2i(vec2(miniature_size) * (static_cast<float>(miniature_size_v) / miniature_size.bigger_side()));
+			const auto resized_miniature_size = vec2i::scaled_to_max_size(miniature_size, miniature_size_v);
 
 			const auto offset = (target_miniature_size - resized_miniature_size) / 2;
 			game_image(*miniature_entry, resized_miniature_size, white, offset + image_padding, augs::imgui_atlas_type::AD_HOC);
@@ -333,7 +333,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 
 	auto perform_arena_list = [&]() {
 		auto& tab = tabs[current_tab];
-		auto& ad_hoc = in.ad_hoc_in_atlas;
+		auto& ad_hoc = in.ad_hoc_atlas;
 
 		switch (current_tab) {
 			case project_tab_type::MY_PROJECTS:
@@ -425,7 +425,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 
 				const auto image_padding = vec2(5, 5);
 				const auto image_internal_padding = vec2i(15, 15);
-				const auto preview_entry = mapped_or_nullptr(in.ad_hoc_in_atlas, entry.miniature_index);
+				const auto preview_entry = mapped_or_nullptr(in.ad_hoc_atlas, entry.miniature_index);
 				const auto target_preview_size = vec2::square(preview_size_v);
 
 				if (preview_entry != nullptr) {

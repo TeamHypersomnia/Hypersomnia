@@ -40,7 +40,7 @@ struct basic_vec2 {
 	type y = static_cast<type>(0);
 	// END GEN INTROSPECTOR
 
-	static basic_vec2 zero;
+	static const basic_vec2 zero;
 
 	using real = real32;
 
@@ -96,6 +96,11 @@ struct basic_vec2 {
 
 	static auto square(const type side) {
 		return basic_vec2<type>(side, side);
+	}
+
+	template <class V>
+	static auto scaled_to_max_size(const V& original_size, const type max_size) {
+		return basic_vec2(basic_vec2<real>(original_size) * (static_cast<real>(max_size) / original_size.bigger_side()));
 	}
 
 	static auto from_degrees(const real degrees) {
@@ -685,7 +690,7 @@ template <class S, class type, class = std::enable_if_t<std::is_arithmetic_v<S>>
 template <class S, class type, class = std::enable_if_t<std::is_arithmetic_v<S>>> inline basic_vec2<type> operator/(const S d, const basic_vec2<type> t) { return { t.x / d, t.y / d }; }
 
 template <class type>
-basic_vec2<type> basic_vec2<type>::zero = { static_cast<type>(0), static_cast<type>(0) };
+const basic_vec2<type> basic_vec2<type>::zero = { static_cast<type>(0), static_cast<type>(0) };
 
 namespace std {
 	template <class T>

@@ -34,7 +34,7 @@ struct projects_list_tab_state {
 	project_list_entries entries;
 
 	bool perform_list(
-		const ad_hoc_in_atlas_map& ad_hoc_in_atlas,
+		const ad_hoc_in_atlas_map& ad_hoc_atlas,
 		std::optional<std::string> timestamp_column_name
 	);
 

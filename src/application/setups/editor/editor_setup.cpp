@@ -18,6 +18,8 @@ editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_
 
 	load_gui_state();
 	open_default_windows();
+
+	on_window_activate();
 }
 
 editor_setup::~editor_setup() {
@@ -27,7 +29,7 @@ editor_setup::~editor_setup() {
 void editor_setup::open_default_windows() {
 	gui.inspector.open();
 	gui.layers.open();
-	gui.project_files.open();
+	gui.filesystem.open();
 }
 
 bool editor_setup::handle_input_before_imgui(
@@ -61,7 +63,7 @@ void editor_setup::on_window_activate() {
 }
 
 void editor_setup::rebuild_filesystem() {
-	files.root.build_from(paths.folder_path);
+	files.rebuild_from(paths.folder_path);
 }
 
 void editor_setup::force_autosave_now() {

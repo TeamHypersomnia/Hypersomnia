@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- let's implement the last opened project path for speed of iteration
 - Haszy chyba na razie nie potrzebujemy, tylko do podpisywania
 
 - Later also do some unit tests for json readwrite

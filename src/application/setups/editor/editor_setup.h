@@ -21,7 +21,7 @@
 
 #include "application/setups/editor/gui/editor_inspector_gui.h"
 #include "application/setups/editor/gui/editor_layers_gui.h"
-#include "application/setups/editor/gui/editor_project_files_gui.h"
+#include "application/setups/editor/gui/editor_filesystem_gui.h"
 #include "application/setups/editor/editor_filesystem.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 
@@ -36,7 +36,7 @@ struct editor_gui {
 	// GEN INTROSPECTOR struct editor_gui
 	editor_inspector_gui inspector = std::string("Inspector");
 	editor_layers_gui layers = std::string("Layers");
-	editor_project_files_gui project_files = std::string("Project files");
+	editor_filesystem_gui filesystem = std::string("Resources");
 	// END GEN INTROSPECTOR
 };
 
@@ -52,6 +52,8 @@ class editor_setup : public default_setup_settings {
 
 	editor_project project;
 	editor_gui gui;
+
+	editor_history history;
 	editor_filesystem files;
 
 	const editor_project_paths paths;

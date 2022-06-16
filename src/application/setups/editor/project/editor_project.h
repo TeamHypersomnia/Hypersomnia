@@ -24,10 +24,4 @@ struct editor_project {
 
 	editor_layers layers;
 	// END GEN INTROSPECTOR
-
-	/* 
-		Deliberately outside the scope of introspection 
-	*/
-
-	editor_history history;
 };

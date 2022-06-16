@@ -103,7 +103,7 @@ struct perform_custom_imgui_input {
 	sol::state& lua;
 	augs::window& window;
 	const images_in_atlas_map& game_atlas;
-	const ad_hoc_in_atlas_map& ad_hoc_in_atlas;
+	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
 	const config_lua_table& config;
 

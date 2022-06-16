@@ -44,7 +44,7 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			};
 
 			do_window_entry(gui.layers, "R");
-			do_window_entry(gui.project_files, "P");
+			do_window_entry(gui.filesystem, "P");
 			do_window_entry(gui.inspector, "I");
 		}
 	}
@@ -86,7 +86,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
 			ImGuiID dock_id_bottomleft = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.40f, NULL, &dock_id_left);
 
-			ImGui::DockBuilderDockWindow(gui.project_files.get_title().c_str(), dock_id_bottomleft);
+			ImGui::DockBuilderDockWindow(gui.filesystem.get_title().c_str(), dock_id_bottomleft);
 			ImGui::DockBuilderDockWindow(gui.layers.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
 			ImGui::DockBuilderFinish(dockspace_id);
@@ -109,7 +109,11 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	gui.inspector.perform({ project });
 	gui.layers.perform({});
-	gui.project_files.perform({});
+	gui.filesystem.perform({ 
+		files.root,
+		in.ad_hoc_atlas,
+		in.necessary_images
+	});
 
 	ImGui::End();
 
