@@ -20,11 +20,12 @@ using editor_filesystem_ui_state =
 ;
 
 struct editor_filesystem_node {
-	ad_hoc_entry_id file_thumbnail_id = 0;
+	ad_hoc_entry_id file_thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
 	bool is_open = false;
 
 	std::string name;
 
+	bool as_folder = false;
 	std::vector<editor_filesystem_node> files;
 	std::vector<editor_filesystem_node> subfolders;
 
@@ -62,7 +63,7 @@ struct editor_filesystem_node {
 	}
 
 	bool is_folder() const {
-		return subfolders.size() > 0 || files.size() > 0;
+		return as_folder;
 	}
 
 	void toggle_open() {
@@ -140,6 +141,7 @@ struct editor_filesystem_node {
 			new_node.name = path.filename().string();
 
 			if (folder) {
+				new_node.as_folder = true;
 				subfolders.emplace_back(std::move(new_node));
 			}
 			else {

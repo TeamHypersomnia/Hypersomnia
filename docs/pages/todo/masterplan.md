@@ -6,6 +6,7 @@ permalink: masterplan
 summary: We need to set our priorities straight.
 ---
 
+- wydziel chociaz do hpp ten edi filesystem jak nie do cpp
 - Filesystem ui: Mozna zrobic dropdowna zamiast przelacznika
 	- Chociaz taby chyba lepsze bo klikasz raz
 
