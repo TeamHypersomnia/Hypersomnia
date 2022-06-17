@@ -17,6 +17,7 @@
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 
+#include "view/viewables/ad_hoc_atlas_subject.h"
 #include "application/setups/editor/project/editor_project.h"
 
 #include "application/setups/editor/gui/editor_inspector_gui.h"
@@ -58,6 +59,9 @@ class editor_setup : public default_setup_settings {
 
 	const editor_project_paths paths;
 
+	bool rebuild_ad_hoc_atlas = true;
+	ad_hoc_atlas_subjects last_ad_hoc_subjects;
+
 	void on_window_activate();
 	void rebuild_filesystem();
 
@@ -85,6 +89,7 @@ public:
 	);
 
 	void customize_for_viewing(config_lua_table&) const;
+	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
@@ -196,10 +201,6 @@ public:
 	}
 
 	std::nullopt_t get_new_player_metas() {
-		return std::nullopt;
-	}
-
-	std::nullopt_t get_new_ad_hoc_images() {
 		return std::nullopt;
 	}
 

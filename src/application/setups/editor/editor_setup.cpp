@@ -58,12 +58,34 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", project.meta.name);
 }
 
+std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
+	if (rebuild_ad_hoc_atlas) {
+		rebuild_ad_hoc_atlas = false;
+
+		ad_hoc_atlas_subjects new_subjects;
+		LOG("fill_thumbnail_entries");
+		files.fill_thumbnail_entries(paths.project_folder, new_subjects);
+
+		if (new_subjects == last_ad_hoc_subjects) {
+			return std::nullopt;
+		}
+
+		LOG("NEW AD HOC %x", new_subjects.size());
+		last_ad_hoc_subjects = new_subjects;
+		return new_subjects;
+	}
+
+	return std::nullopt;
+}
+
 void editor_setup::on_window_activate() {
 	rebuild_filesystem();
 }
 
 void editor_setup::rebuild_filesystem() {
-	files.rebuild_from(paths.folder_path);
+	files.rebuild_from(paths.project_folder);
+	LOG("rebuild");
+	rebuild_ad_hoc_atlas = true;
 }
 
 void editor_setup::force_autosave_now() {

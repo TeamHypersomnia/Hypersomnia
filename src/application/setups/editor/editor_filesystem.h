@@ -2,6 +2,10 @@
 #include <map>
 #include "augs/filesystem/directory.h"
 #include "augs/templates/reversion_wrapper.h"
+#include "view/viewables/ad_hoc_in_atlas_map.h"
+#include "view/viewables/ad_hoc_atlas_subject.h"
+#include "view/asset_funcs.h"
+#include "augs/log.h"
 
 namespace augs {
 	bool natural_order(const std::string& a, const std::string& b);
@@ -16,7 +20,7 @@ using editor_filesystem_ui_state =
 ;
 
 struct editor_filesystem_node {
-	int file_thumbnail_id = 0;
+	ad_hoc_entry_id file_thumbnail_id = 0;
 	bool is_open = false;
 
 	std::string name;
@@ -26,6 +30,17 @@ struct editor_filesystem_node {
 
 	int level = 0;
 	editor_filesystem_node* parent = nullptr;
+
+	template <class F>
+	void for_each_file_recursive(F&& callback) {
+		for (auto& subfolder : subfolders) {
+			subfolder.for_each_file_recursive(std::forward<F>(callback));
+		}
+
+		for (auto& file : files) {
+			callback(file);
+		}
+	}
 
 	template <class F>
 	void in_ui_order(F&& callback) {
@@ -177,5 +192,19 @@ struct editor_filesystem {
 
 		apply_ui_state(saved_state);
 	}
+
+	void fill_thumbnail_entries(const augs::path_type& project_folder, ad_hoc_atlas_subjects& out_subjects) {
+		ad_hoc_entry_id id_counter = 1;
+
+		root.for_each_file_recursive([&](auto& node) {
+			const auto path = project_folder / node.get_path();
+
+			if (assets::is_supported_extension<assets::image_id>(path.extension().string())) {
+				node.file_thumbnail_id = id_counter++;
+				out_subjects.push_back({ node.file_thumbnail_id, path });
+			}
+		});
+	}
+
 };
 

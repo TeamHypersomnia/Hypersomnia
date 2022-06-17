@@ -4,7 +4,7 @@
 
 struct editor_project_paths {
 	std::string arena_name;
-	augs::path_type folder_path;
+	augs::path_type project_folder;
 
 	augs::path_type project_json;
 	augs::path_type miniature;

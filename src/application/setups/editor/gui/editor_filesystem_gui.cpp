@@ -41,7 +41,13 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FOLDER];
 		}
 		else {
-			icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CREATE];
+			if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, node.file_thumbnail_id)) {
+				icon = *ad_hoc;
+				atlas_type = augs::imgui_atlas_type::AD_HOC;
+			}
+			else {
+				icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CREATE];
+			}
 		}
 
 		const auto& label = node.name;
@@ -83,13 +89,15 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 			const float content_x_offset = max_icon_size * node.level;
 
-			ImGui::SetCursorPos(ImVec2(vec2(before_pos) + vec2(content_x_offset, 0)));
+			const auto icon_size = vec2::square(max_icon_size);
+			const auto scaled_icon_size = vec2::scaled_to_max_size(icon.get_original_size(), max_icon_size);
+			const auto diff = (icon_size - scaled_icon_size) / 2;
 
-			const auto icon_size = vec2i::scaled_to_max_size(icon.get_original_size(), max_icon_size);
+			ImGui::SetCursorPos(ImVec2(vec2(before_pos) + vec2(content_x_offset, 0) + diff));
 
 			const auto icon_padding = vec2(icon_size) / 1.5f;
 
-			game_image(icon, icon_size, white, vec2::zero, atlas_type);
+			game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
 
 			const auto image_offset = vec2(0, button_size.y / 2 - icon_size.y / 2);
 			const auto text_pos = vec2(before_pos) + image_offset + vec2(content_x_offset + icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
