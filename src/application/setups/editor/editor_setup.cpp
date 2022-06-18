@@ -98,5 +98,5 @@ void editor_setup::load_gui_state() {
 }
 
 void editor_setup::save_gui_state() {
-
+	augs::save_as_text(get_editor_last_project_path(), paths.project_folder.string());
 }

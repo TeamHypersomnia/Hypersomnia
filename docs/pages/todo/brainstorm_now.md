@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix that customize_for_viewing please!
+
 - let's implement the last opened project path for speed of iteration
 - Haszy chyba na razie nie potrzebujemy, tylko do podpisywania
 

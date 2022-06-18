@@ -1100,7 +1100,15 @@ work_result work(const int argc, const char* const * const argv) try {
 			case launch_type::EDITOR:
 				if (!params.editor_target.empty()) {
 					launch_editor(params.editor_target);
-					break;
+				}
+				else {
+					try {
+						launch_editor(augs::path_type(augs::file_to_string(get_editor_last_project_path())));
+						break;
+					}
+					catch (...) {
+
+					}
 				}
 
 			case launch_type::EDITOR_PROJECT_SELECTOR:

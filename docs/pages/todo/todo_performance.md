@@ -5,7 +5,11 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
-- Editor slowed down when looking at a grid far away from the center
+- maybe dont load editor icons for actual gameplay?
+	- but for now leave it at that, easier to playtest too
+
+
+- Legacy editor slowed down when looking at a grid far away from the center
 
 - Profile interpolation rewrite
 
