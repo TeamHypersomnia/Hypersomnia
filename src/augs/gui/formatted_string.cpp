@@ -48,9 +48,11 @@ namespace augs {
 
 				std::unique_lock<std::mutex> lock(log_mutex);
 
-				auto& entries = program_log::get_current().all_entries;
+				const auto& current = program_log::get_current();
+				auto& entries = current.all_entries;
 
-				lines_remaining = std::min(lines_remaining, entries.size());
+				const auto init_logs_n = current.get_init_logs_count_nomutex();
+				lines_remaining = std::min(lines_remaining, entries.size() - init_logs_n);
 
 				for (auto it = entries.end() - lines_remaining; it != entries.end(); ++it) {
 					const auto str = (*it).text + "\n";

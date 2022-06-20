@@ -109,6 +109,22 @@ void program_log::push_entry(const log_entry& new_entry) {
 	}
 }
 
+void program_log::mark_last_init_log() {
+	std::unique_lock<std::mutex> lock(log_mutex);
+
+	init_logs_count = all_entries.size();
+}
+
+std::size_t program_log::get_init_logs_count() const {
+	std::unique_lock<std::mutex> lock(log_mutex);
+
+	return init_logs_count;
+}
+
+std::size_t program_log::get_init_logs_count_nomutex() const {
+	return init_logs_count;
+}
+
 std::string program_log::get_complete() const {
 	std::unique_lock<std::mutex> lock(log_mutex);
 

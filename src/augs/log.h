@@ -26,6 +26,11 @@ public:
 	program_log(const unsigned max_all_entries);
 
 	std::vector<log_entry> all_entries;
+	std::size_t init_logs_count = 0;
+
+	void mark_last_init_log();
+	std::size_t get_init_logs_count() const;
+	std::size_t get_init_logs_count_nomutex() const;
 
 	std::string get_complete() const;
 };

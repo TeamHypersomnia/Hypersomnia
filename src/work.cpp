@@ -3297,6 +3297,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			if (!until_first_swap_measured) {
 				LOG("Time until first swap: %x ms", until_first_swap.extract<std::chrono::milliseconds>());
 				until_first_swap_measured = true;
+
+				program_log::get_current().mark_last_init_log();
 			}
 		};
 

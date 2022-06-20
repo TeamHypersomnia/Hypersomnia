@@ -96,10 +96,12 @@ void draw_debug_details(
 	const auto cosm_line_width = 400;
 
 	{
+		const auto max_lines = 30;
+
 		print(
 			output, 
 			vec2i(screen_size.x - log_line_width, 0),
-			augs::gui::text::format_recent_program_log(gui_font).mult_alpha(150.f / 255),
+			augs::gui::text::format_recent_program_log(gui_font, max_lines).mult_alpha(150.f / 255),
 			log_line_width
 		);
 	}
