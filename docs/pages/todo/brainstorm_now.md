@@ -6,7 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix that customize_for_viewing please!
+- Dragging stuff into the scene
+	- Docking breaks it because we basically have an imgui window sitting there
+		- and it fetches all inputs probably
+		- we have to make it somehow "no inputs"
+		- or make a corner case for whether imgui input should be fetched
+		- in any case we should be able to 
+	- I wouldn't worry for now about background becoming invisible with particular dock configurations, it's a corner case
+		- solved: ImGuiDockNodeFlags_NoDockingInCentralNode
+	- Btw it's better with an empty central node because
+		- Handles inputs properly out of the box
+		- Won't unnecessarily occupy space with the single tab 
+- However if we properly made the scene another window, we would right away solve problems as:
+	- showing the "unsaved" mark next to the tab name
+		- jakby sie uparl mozna nawet przy Project dac albo nazywac Project nazwa projektu
+	- right away implementing mouse navigation with offset
+	- I still think that could be done later
 
 - let's implement the last opened project path for speed of iteration
 - Haszy chyba na razie nie potrzebujemy, tylko do podpisywania

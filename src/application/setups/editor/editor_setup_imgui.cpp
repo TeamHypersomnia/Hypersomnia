@@ -27,7 +27,7 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	};
 
 	if (auto main_menu = scoped_menu_bar()) {
-		if (auto menu = scoped_menu("Project")) {
+		if (auto menu = scoped_menu(project.meta.name.c_str())) {
 
 		}
 
@@ -56,6 +56,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	window_flags |= ImGuiWindowFlags_NoBackground;
 
 	{
 		const auto viewport = ImGui::GetMainViewport();
@@ -100,6 +101,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ImGuiDockNodeFlags_NoWindowMenuButton
 			| ImGuiDockNodeFlags_NoCloseButton
 			| ImGuiDockNodeFlags_PassthruCentralNode
+			| ImGuiDockNodeFlags_NoDockingInCentralNode
 		;
 
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
@@ -108,7 +110,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	perform_main_menu_bar(in);
 
 	gui.inspector.perform({ project });
-	gui.layers.perform({});
+	gui.layers.perform({ gui.filesystem.dragged_resource });
 	gui.filesystem.perform({ 
 		files.root,
 		in.ad_hoc_atlas,

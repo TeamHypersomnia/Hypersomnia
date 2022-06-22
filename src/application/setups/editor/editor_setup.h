@@ -42,14 +42,7 @@ struct editor_gui {
 };
 
 class editor_setup : public default_setup_settings {
-	test_mode mode;
-	test_mode_ruleset ruleset;
-
 	intercosm scene;
-	entropy_accumulator total_collected;
-	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	entity_id viewed_character_id;
-	mode_player_id local_player_id;
 
 	editor_project project;
 	editor_gui gui;
@@ -104,11 +97,11 @@ public:
 	}
 
 	auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
+		return 1.0;
 	}
 
 	auto get_viewed_character_id() const {
-		return viewed_character_id;
+		return entity_id();
 	}
 
 	auto get_controlled_character_id() const {
@@ -143,30 +136,12 @@ public:
 		const setup_advance_input& in,
 		const C& callbacks
 	) {
-		timer.advance(in.frame_delta);
-
-		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
-
-		while (steps--) {
-			const auto total = total_collected.extract(
-				get_viewed_character(), 
-				local_player_id, 
-				in.make_accumulator_input()
-			);
-
-			mode.advance(
-				{ ruleset, scene.world },
-				total,
-				callbacks,
-				solve_settings()
-			);
-		}
+		(void)in;
+		(void)callbacks;
 	}
 
 	template <class T>
-	void control(const T& t) {
-		total_collected.control(t);
-	}
+	void control(const T&) {}
 
 	void accept_game_gui_events(const game_gui_entropy_type&) {}
 
@@ -187,14 +162,16 @@ public:
 	void ensure_handler() {}
 	bool requires_cursor() const { return false; }
 
+private:
+	entropy_accumulator zero_entropy;
+public:
+
 	const entropy_accumulator& get_entropy_accumulator() const {
-		return total_collected;
+		return zero_entropy;
 	}
 
 	template <class F>
-	void on_mode_with_input(F&& callback) const {
-		callback(mode, test_mode::const_input { ruleset, scene.world });
-	}
+	void on_mode_with_input(F&&) const {}
 
 	auto get_game_gui_subject_id() const {
 		return get_viewed_character_id();

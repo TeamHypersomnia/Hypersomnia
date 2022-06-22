@@ -18,6 +18,12 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 	using base::base;
 	using introspect_base = base;
 
+	const editor_filesystem_node* dragged_resource = nullptr;
+
 	void perform(editor_project_files_input);
+
+	void clear_pointers() {
+		dragged_resource = nullptr;
+	}
 };
 

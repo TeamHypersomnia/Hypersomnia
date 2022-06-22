@@ -6,6 +6,7 @@
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/editor_paths.h"
+#include "application/setups/editor/project/editor_project_readwrite.h"
 
 #include "augs/filesystem/directory.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -13,8 +14,8 @@
 #include "augs/log.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
-	augs::create_directories(EDITOR_PROJECTS_DIR);
 	LOG("Loading editor project at: %x", project_path);
+	project = editor_project_readwrite::read_project_json(paths.project_json);
 
 	load_gui_state();
 	open_default_windows();
@@ -82,6 +83,7 @@ void editor_setup::on_window_activate() {
 
 void editor_setup::rebuild_filesystem() {
 	files.rebuild_from(paths.project_folder);
+	gui.filesystem.clear_pointers();
 	rebuild_ad_hoc_atlas = true;
 }
 

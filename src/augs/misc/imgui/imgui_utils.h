@@ -63,6 +63,7 @@ namespace augs {
 		void render();
 	
 		bool is_hovered_with_hand_cursor();
+		bool mouse_over_any_window();
 
 		template <class id_type>
 		id_type get_cursor() {
@@ -81,43 +82,7 @@ namespace augs {
 			return id_type::GUI_CURSOR;
 		}
 
-		inline auto filter_inputs(augs::local_entropy local) {
-			const bool filter_mouse = ImGui::GetIO().WantCaptureMouse;
-			const bool filter_keyboard = ImGui::GetIO().WantTextInput;
-
-			using namespace augs::event;
-			using namespace keys;
-
-			erase_if(local, [filter_mouse, filter_keyboard](const change ch) {
-				if (filter_mouse && ch.msg == message::mousemotion) {
-					return true;
-				}
-
-				if (filter_mouse && ch.msg == message::wheel) {
-					return true;
-				}
-				
-				/* We always let release events propagate */
-
-				if (ch.was_any_key_pressed()) {
-					if (filter_mouse && ch.uses_mouse()) {
-						return true;
-					}
-
-					if (filter_keyboard && ch.uses_keyboard()) {
-						if (ch.is_shortcut_key()) {
-							return false;
-						}
-
-						return true;
-					}
-				}
-
-				return false;
-			});
-
-			return local;
-		}
+		augs::local_entropy filter_inputs(augs::local_entropy local);
 
 		void center_next_window(ImGuiCond);
 		void center_next_window(vec2 size_multiplier, ImGuiCond);

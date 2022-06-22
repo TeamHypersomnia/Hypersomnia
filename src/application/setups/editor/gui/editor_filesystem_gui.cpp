@@ -14,6 +14,24 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	
 	auto window = make_scoped_window();
 
+	if (dragged_resource != nullptr) {
+		const bool payload_still_exists = [&]() {
+			const auto payload = ImGui::GetDragDropPayload();
+			return payload && payload->IsDataType("editor_filesystem_gui");
+
+		}();
+
+		if (!payload_still_exists) {
+			const bool mouse_over_scene = !mouse_over_any_window();
+
+			if (mouse_over_scene) {
+				LOG("Dropped %x on scene", dragged_resource->name);
+
+				dragged_resource = nullptr;
+			}
+		}
+	}
+
 	if (!window) {
 		return;
 	}
@@ -79,7 +97,16 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 			auto id = scoped_id(label.c_str());
 
-			result = ImGui::Selectable("###Button", true, ImGuiSelectableFlags_None, button_size);
+			result = ImGui::Selectable("###Button", false, ImGuiSelectableFlags_None, button_size);
+
+			if (ImGui::BeginDragDropSource())
+			{
+				dragged_resource = std::addressof(node);
+
+				ImGui::SetDragDropPayload("editor_filesystem_gui", nullptr, 0);
+				text(label);
+				ImGui::EndDragDropSource();
+			}
 		}
 
 		const auto after_pos = ImGui::GetCursorPos();

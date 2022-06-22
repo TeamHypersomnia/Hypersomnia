@@ -238,6 +238,10 @@ namespace augs {
 			return false;// IsAnyItemHovered() && GetCurrentContext()->HoveredIdHandCursor;
 		}
 
+		bool mouse_over_any_window() {
+			return ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+		}
+
 		void center_next_window(ImGuiCond cond) {
 			const auto screen_size = vec2(GetIO().DisplaySize);
 			SetNextWindowPos(ImVec2{ screen_size / 2 }, cond, ImVec2(0.5f, 0.5f));
@@ -259,6 +263,44 @@ namespace augs {
 		void set_next_window_rect(const xywh r, const ImGuiCond cond) {
 			SetNextWindowPos(ImVec2(r.get_position()), cond);
 			SetNextWindowSize(ImVec2(r.get_size()), cond);
+		}
+
+		augs::local_entropy filter_inputs(augs::local_entropy local) {
+			const bool filter_mouse = ImGui::GetIO().WantCaptureMouse;
+			const bool filter_keyboard = ImGui::GetIO().WantTextInput;
+
+			using namespace augs::event;
+			using namespace keys;
+
+			erase_if(local, [filter_mouse, filter_keyboard](const change ch) {
+				if (filter_mouse && ch.msg == message::mousemotion) {
+					return true;
+				}
+
+				if (filter_mouse && ch.msg == message::wheel) {
+					return true;
+				}
+				
+				/* We always let release events propagate */
+
+				if (ch.was_any_key_pressed()) {
+					if (filter_mouse && ch.uses_mouse()) {
+						return true;
+					}
+
+					if (filter_keyboard && ch.uses_keyboard()) {
+						if (ch.is_shortcut_key()) {
+							return false;
+						}
+
+						return true;
+					}
+				}
+
+				return false;
+			});
+
+			return local;
 		}
 	}
 }
