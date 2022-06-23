@@ -10,4 +10,5 @@ namespace assets {
 
 	template <class T>
 	bool is_supported_extension(const std::string& ext);
+	bool is_asset_extension(const std::string& ext);
 }

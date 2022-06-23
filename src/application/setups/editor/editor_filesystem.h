@@ -22,6 +22,7 @@ using editor_filesystem_ui_state =
 struct editor_filesystem_node {
 	ad_hoc_entry_id file_thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
 	bool is_open = false;
+	bool is_resource = false;
 
 	std::string name;
 
@@ -139,12 +140,14 @@ struct editor_filesystem_node {
 		auto add_entry = [this](const auto& path, const bool folder) {
 			editor_filesystem_node new_node;
 			new_node.name = path.filename().string();
+			const auto extension = path.extension().string();
 
 			if (folder) {
 				new_node.as_folder = true;
 				subfolders.emplace_back(std::move(new_node));
 			}
 			else {
+				new_node.is_resource = assets::is_asset_extension(extension);
 				files.emplace_back(std::move(new_node));
 			}
 

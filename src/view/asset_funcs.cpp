@@ -40,6 +40,10 @@ namespace assets {
 			static_assert(always_false_v<T>, "Unsupported id type.");
 		}
 	}
+
+	bool is_asset_extension(const std::string& ext) {
+		return is_supported_extension<assets::image_id>(ext) || is_supported_extension<assets::sound_id>(ext);
+	}
 }
 
 template std::string get_content_suffix<assets::image_id>();

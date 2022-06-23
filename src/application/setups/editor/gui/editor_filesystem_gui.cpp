@@ -99,13 +99,15 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 			result = ImGui::Selectable("###Button", false, ImGuiSelectableFlags_None, button_size);
 
-			if (ImGui::BeginDragDropSource())
-			{
-				dragged_resource = std::addressof(node);
+			if (node.is_resource) {
+				if (ImGui::BeginDragDropSource())
+				{
+					dragged_resource = std::addressof(node);
 
-				ImGui::SetDragDropPayload("editor_filesystem_gui", nullptr, 0);
-				text(label);
-				ImGui::EndDragDropSource();
+					ImGui::SetDragDropPayload("editor_filesystem_gui", nullptr, 0);
+					text(label);
+					ImGui::EndDragDropSource();
+				}
 			}
 		}
 
