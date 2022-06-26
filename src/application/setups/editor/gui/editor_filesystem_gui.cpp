@@ -6,6 +6,7 @@
 #include "application/setups/editor/editor_filesystem.h"
 
 #include "application/setups/editor/gui/editor_filesystem_gui.h"
+#include "application/setups/editor/editor_setup.hpp"
 
 void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	using namespace augs::imgui;
@@ -99,7 +100,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 			result = ImGui::Selectable("###Button", false, ImGuiSelectableFlags_None, button_size);
 
-			if (node.is_resource) {
+			if (node.is_resource()) {
 				if (ImGui::BeginDragDropSource())
 				{
 					dragged_resource = std::addressof(node);

@@ -1,32 +1,16 @@
 #pragma once
-#include "augs/audio/distance_model.h"
 #include "augs/misc/constant_size_vector.h"
 #include "view/view_container_sizes.h"
 #include "augs/pad_bytes.h"
 #include "game/assets/ids/asset_ids.h"
 #include "augs/templates/hash_templates.h"
-#include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/transform_component.h"
 #include "game/detail/transform_copying.h"
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/step_declaration.h"
 #include "game/enums/faction_type.h"
 #include "game/detail/view_input/predictability_info.h"
-
-struct sound_effect_modifier {
-	// GEN INTROSPECTOR struct sound_effect_modifier
-	real32 gain = 1.f;
-	real32 pitch = 1.f;
-	real32 max_distance = -1.f;
-	real32 reference_distance = -1.f;
-	real32 doppler_factor = 1.f;
-	char repetitions = 1;
-	bool fade_on_exit = true;
-	bool disable_velocity = false;
-	bool always_direct_listener = false;
-	augs::distance_model distance_model = augs::distance_model::NONE;
-	// END GEN INTROSPECTOR
-};
+#include "game/detail/view_input/sound_effect_modifier.h"
 
 struct collision_sound_source {
 	entity_id subject;

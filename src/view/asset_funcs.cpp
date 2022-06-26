@@ -41,8 +41,16 @@ namespace assets {
 		}
 	}
 
+	bool is_image_extension(const std::string& ext) {
+		return is_supported_extension<assets::image_id>(ext);
+	}
+
+	bool is_sound_extension(const std::string& ext) {
+		return is_supported_extension<assets::sound_id>(ext);
+	}
+
 	bool is_asset_extension(const std::string& ext) {
-		return is_supported_extension<assets::image_id>(ext) || is_supported_extension<assets::sound_id>(ext);
+		return is_image_extension(ext) || is_sound_extension(ext);
 	}
 }
 

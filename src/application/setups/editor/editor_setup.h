@@ -26,12 +26,23 @@
 #include "application/setups/editor/editor_filesystem.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 
+#include "augs/misc/imgui/simple_popup.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
 namespace sol {
 	class state;
 }
+
+struct editor_paths_changed_report {
+	std::vector<std::pair<augs::path_type, augs::path_type>> redirects;
+	std::vector<augs::path_type> missing;
+
+	bool any() const {
+		return redirects.size() > 0 || missing.size() > 0;
+	}
+};
 
 struct editor_gui {
 	// GEN INTROSPECTOR struct editor_gui
@@ -44,8 +55,12 @@ struct editor_gui {
 class editor_setup : public default_setup_settings {
 	intercosm scene;
 
+	editor_resource_pools official_resources;
+
 	editor_project project;
 	editor_gui gui;
+
+	std::optional<simple_popup> ok_only_popup;
 
 	editor_history history;
 	editor_filesystem files;
@@ -57,6 +72,7 @@ class editor_setup : public default_setup_settings {
 
 	void on_window_activate();
 	void rebuild_filesystem();
+	editor_paths_changed_report rebuild_pathed_resources();
 
 	void force_autosave_now();
 
@@ -83,6 +99,12 @@ public:
 
 	void customize_for_viewing(config_lua_table&) const;
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
+
+	template <class F>
+	decltype(auto) on_resource_if(const editor_resource_id& id, F&& callback);
+
+	template <class F>
+	decltype(auto) on_resource_if(const editor_resource_id& id, F&& callback) const;
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

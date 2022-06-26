@@ -119,5 +119,11 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	ImGui::End();
 
+	if (ok_only_popup) {
+		if (ok_only_popup->perform()) {
+			ok_only_popup = std::nullopt;
+		}
+	}
+
 	return custom_imgui_result::NONE;
 }

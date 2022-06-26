@@ -6,6 +6,7 @@
 cmake_minimum_required(VERSION 3.2)
 
 project(Hypersomnia)
+enable_language(C ASM)
 
 # Sanity logs.
 message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
@@ -457,6 +458,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
 
+	"src/augs/misc/secure_hash.cpp"
 	"src/application/setups/editor/project/editor_project.cpp"
 	"src/application/setups/editor/project/editor_project_readwrite.cpp"
 	"src/application/setups/editor/project/editor_project_paths.cpp"
@@ -1001,6 +1003,7 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable.io"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode.io"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/rapidjson/include"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/blake"
 	# Only for v3
 	# "${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/src"
 )
@@ -1371,6 +1374,36 @@ endif()
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/streflop")
 
+set(BLAKE3_PATH "${PROJECT_SOURCE_DIR}/src/3rdparty/blake3")
+
+IF (MSVC)
+set(BLAKE3_SRC
+    ${BLAKE3_PATH}/blake3.c
+    ${BLAKE3_PATH}/blake3_portable.c
+    ${BLAKE3_PATH}/blake3_dispatch.c
+    ${BLAKE3_PATH}/blake3_sse41_x86-64_windows_gnu.S
+    ${BLAKE3_PATH}/blake3_sse2_x86-64_windows_gnu.S
+)
+ELSEIF(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64)
+set(BLAKE3_SRC
+    ${BLAKE3_PATH}/blake3.c
+    ${BLAKE3_PATH}/blake3_portable.c
+    ${BLAKE3_PATH}/blake3_dispatch.c
+    ${BLAKE3_PATH}/blake3_avx2_x86-64_unix.S
+    ${BLAKE3_PATH}/blake3_avx512_x86-64_unix.S
+    ${BLAKE3_PATH}/blake3_sse41_x86-64_unix.S
+    ${BLAKE3_PATH}/blake3_sse2_x86-64_unix.S
+)
+ELSE()
+set(BLAKE3_SRC
+    ${BLAKE3_PATH}/blake3.c
+    ${BLAKE3_PATH}/blake3_portable.c
+    ${BLAKE3_PATH}/blake3_dispatch.c
+)
+ENDIF()
+
+add_library(blake3 STATIC ${BLAKE3_SRC})
+
 # We build the remaining libraries.
 
 if(BUILD_NETWORKING)
@@ -1501,7 +1534,7 @@ endif()
 
 # We define libraries upon which Hypersomnia depends.
 
-set(HYPERSOMNIA_LIBS lua streflop)
+set(HYPERSOMNIA_LIBS lua streflop blake3)
 
 if(BUILD_OPENGL)
 	find_package(OpenGL REQUIRED)

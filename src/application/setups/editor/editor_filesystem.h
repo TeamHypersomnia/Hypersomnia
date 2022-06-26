@@ -6,6 +6,9 @@
 #include "view/viewables/ad_hoc_atlas_subject.h"
 #include "view/asset_funcs.h"
 #include "augs/log.h"
+#include "augs/filesystem/file.h"
+
+#include "application/setups/editor/resources/editor_resource_id.h"
 
 namespace augs {
 	bool natural_order(const std::string& a, const std::string& b);
@@ -19,18 +22,29 @@ using editor_filesystem_ui_state =
 	std::map<augs::path_type, editor_filesystem_node_ui_state>
 ;
 
+enum class editor_filesystem_node_type : uint8_t {
+	OTHER_FILE,
+	FOLDER,
+
+	IMAGE,
+	SOUND
+};
+
 struct editor_filesystem_node {
 	ad_hoc_entry_id file_thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
-	bool is_open = false;
-	bool is_resource = false;
+	editor_resource_id associated_resource;
 
+	editor_filesystem_node_type type = editor_filesystem_node_type::OTHER_FILE;
+
+	bool is_open = false;
 	std::string name;
 
-	bool as_folder = false;
 	std::vector<editor_filesystem_node> files;
 	std::vector<editor_filesystem_node> subfolders;
 
 	int level = 0;
+	augs::file_time_type last_write_time; 
+
 	editor_filesystem_node* parent = nullptr;
 
 	template <class F>
@@ -64,7 +78,22 @@ struct editor_filesystem_node {
 	}
 
 	bool is_folder() const {
-		return as_folder;
+		return type == editor_filesystem_node_type::FOLDER;
+	}
+
+	bool is_image() const {
+		return type == editor_filesystem_node_type::IMAGE;
+	}
+
+	bool is_sound() const {
+		return type == editor_filesystem_node_type::SOUND;
+	}
+
+	bool is_resource() const {
+		return 
+			type == editor_filesystem_node_type::IMAGE
+			|| type == editor_filesystem_node_type::SOUND
+		;
 	}
 
 	void toggle_open() {
@@ -143,12 +172,27 @@ struct editor_filesystem_node {
 			const auto extension = path.extension().string();
 
 			if (folder) {
-				new_node.as_folder = true;
+				new_node.type = editor_filesystem_node_type::FOLDER;
 				subfolders.emplace_back(std::move(new_node));
 			}
 			else {
-				new_node.is_resource = assets::is_asset_extension(extension);
-				files.emplace_back(std::move(new_node));
+				new_node.type = editor_filesystem_node_type::OTHER_FILE;
+
+				if (assets::is_image_extension(extension)) {
+					new_node.type = editor_filesystem_node_type::IMAGE;
+				}
+
+				if (assets::is_sound_extension(extension)) {
+					new_node.type = editor_filesystem_node_type::SOUND;
+				}
+
+				try {
+					new_node.last_write_time = augs::last_write_time(path);
+					files.emplace_back(std::move(new_node));
+				}
+				catch (...) {
+
+				}
 			}
 
 			return callback_result::CONTINUE;

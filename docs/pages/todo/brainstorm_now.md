@@ -6,6 +6,95 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Let's go the easiest route right now and just write all resource hashes and timestamps to json
+
+- Summary
+	- Separate pools, official outside editor_project, inside editor_setup
+	- Id has a bool whether it's official, a general dereferencer
+	- map of path_to_resource is calculated only on the rare occasion that it's needed
+	- Do we hold content_hash and path inside structs themselves?
+		- It's I guess more convenient
+		- because we want to serialize them this way certainly
+		- If that's not a problem we can hold a path inside the object, not as a key
+		- I think paths as keys look cleaner, there's also one line less
+			- it clearly shows it's meant to be unique
+			- especially since internal resources will too have names as keys
+	- EASIEST: json_ignore_fields. Runtime. We won't get a compile error because a string is serializable
+		- screw performance hit, it won't do anything
+	- probably augs::json_ignore with an explicit operator
+	- can't we just inherit the relevant fields into the full resource? And then cast, I don't know
+	- setting path to default so that it's ommitted sucks because it involves copying
+		- would be better to just make a runtime if
+			- why not then? this is by far the cleanest solution
+
+- Alright so we need to somewhow ignore the "path" in resources
+	- Nothing else really
+	- e.g. for pseudoids we can just manually read_json from that object into a separate variable
+		- and construct an unordered map on the side for just the duration of the json reading function
+	- well then, just a struct augs::json_ignore or path_holder?
+		- makes code uglier so i'd avoid it
+	- we thought about constexpr == const chars but it probably wont work
+
+- Alright so we also don't need to hold the pseudo-id "id" but we need to write it
+	- We can write it easily separately
+	- the problem is if we need to hold something and not write it, so the path
+
+- Separate pools also makes rescanning for filesystem changes easier because we're not looking up irrelevant data
+	- Yeah, so we certainly want separate
+
+- std::unordered_map<augs::path_type, editor_resource_id> path_to_resource;
+	- This is really only relevant upon:
+		- i/o
+		- remapping when rebuilding filesystem
+		- so do we really need to keep it? We have to also keep it up to date when allocating etc...
+		- I don't think so
+
+
+- Notice that the only moment that it matters whether a resource is official or not is json serialization
+	- Because it determines whether we serialize it to external_resoruces or not
+	- So it's not a problem if during serialization we do some recalculations to determine if something's official or not
+	- We need to allocate the needed official resources somewhere anyway
+	
+	- Why not just go the easiest route and have a separate pool of official resources outside of the editor_project struct?
+		- Always allocate all official resources
+			- note this still should not impact our performance
+				- only images used on the scene will be loaded to memory
+					- later we'll optimize so only thumbs are loaded for the filesystem view or something
+				- the created resource structs will be useful for indexing in the filesystem
+		- the only nuisance is that we'll need a general dereference that takes into account both pools
+
+- Instead of the whole fukcery with pools why not just identify every resource with a string?
+	- pro: just std::unordered_maps
+		- although once we have apis this doesn't change a lot
+	- pro: solves the problem with identifying official ones
+		- since we have the @
+	- pro: 
+	- con: have to use pseudo ids right away
+	- con: have to recalculate every time we dereference instead of centralizing this
+	- con: performance vs integer-based ids?
+		- but when does it matter?
+		- The only complexity that matters is json loading complexity for now
+		- And for that we'll have to dereference those ids by strings anyway
+		- Performance shouldn't matter all that lot
+		- And it's about runtime data layout so this can always be improved later
+
+
+- Alright, what about differentiating custom ids and official ids in binary?
+	- For a unified api, we could allocate the used official resources in the pool
+		- But hey, we have our own id structs, so we can easily pass a boolean there
+		- This saves us a lot of pool manipulation operations
+		- This simplifies data layouts too because we don't have to hold that "is official" data in resources themselves
+	- So that an id refers to either official or not
+	- But we have to determine which ones are used
+		- Upon writeout, how do we detect that a resource is official and thus does not need to be saved?
+
+	- In the cosmos, it does not matter whether a resource is official or not
+
+- Co do resourcow 
+	- i tak musisz hash walnac wiec nie ma po co sprawdzac czy jest default przy pisaniu
+	- rescan
+		- usuwamy te co nie sa 
+
 - Dragging stuff into the scene
 	- Docking breaks it because we basically have an imgui window sitting there
 		- and it fetches all inputs probably

@@ -253,7 +253,6 @@ namespace augs {
 			introspect(
 				[&to](const auto& label, const auto& field) {
 					using Field = remove_cref<decltype(field)>;
-
 					if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
 						to.Key(label);
 						write_json(to, field);

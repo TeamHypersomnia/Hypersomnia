@@ -1,6 +1,7 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
+#include <filesystem>
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/misc/time_utils.h"
@@ -57,7 +58,7 @@ augs::date_time::date_time(
 }
 #endif
 
-std::string augs::date_time::format_time_point(const std::chrono::system_clock::time_point& tp) {
+std::string augs::date_time::format_time_point_utc(const std::chrono::system_clock::time_point& tp) {
 	std::ostringstream o;
 	const auto ttp = std::chrono::time_point_cast<std::chrono::microseconds>(tp);
 
@@ -65,11 +66,11 @@ std::string augs::date_time::format_time_point(const std::chrono::system_clock::
 		using namespace date;
 		o << format("%F %T", ttp);
 	}
-	return o.str();
+	return o.str() + " UTC";
 }
 
 std::string augs::date_time::get_utc_timestamp() {
-	return format_time_point(std::chrono::system_clock::now()) + " UTC";
+	return format_time_point_utc(std::chrono::system_clock::now());
 }
 
 /* 
