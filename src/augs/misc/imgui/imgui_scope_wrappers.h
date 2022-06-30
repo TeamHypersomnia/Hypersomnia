@@ -285,11 +285,11 @@ namespace augs {
 			return opt;
 		}
 
-		inline auto scoped_selectable_colors(const rgba normal, const rgba hovered, const rgba active) {
+		inline auto scoped_selectable_colors(const std::array<rgba, 3>& colors) {
 			return std::make_tuple(
-				scoped_style_color(ImGuiCol_Header, normal),
-				scoped_style_color(ImGuiCol_HeaderHovered, hovered),
-				scoped_style_color(ImGuiCol_HeaderActive, active)
+				scoped_style_color(ImGuiCol_Header, colors[0]),
+				scoped_style_color(ImGuiCol_HeaderHovered, colors[1]),
+				scoped_style_color(ImGuiCol_HeaderActive, colors[2])
 			);
 		}
 

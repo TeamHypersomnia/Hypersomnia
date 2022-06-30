@@ -26,12 +26,7 @@ namespace augs {
 			bool result = false;
 
 			{
-				auto colored_selectable = scoped_selectable_colors(
-					bg_cols[0],
-					bg_cols[1],
-					bg_cols[2]
-				);
-
+				auto colored_selectable = scoped_selectable_colors(bg_cols);
 				auto id = scoped_id(label.c_str());
 
 				result = ImGui::Selectable("###Button", true, ImGuiSelectableFlags_None, button_size);

@@ -76,7 +76,7 @@ void debugger_history_gui::perform(const debugger_command_input in) {
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, header_hover_color);
 		}
 
-		if (!playtesting && history.is_revision_saved(command_index)) {
+		if (!playtesting && history.is_saved_revision(command_index)) {
 			++colors;
 
 			auto saved_color = rgba(0, 200, 0, 255);

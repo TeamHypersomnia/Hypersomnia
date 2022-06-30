@@ -87,5 +87,7 @@ namespace augs {
 		void center_next_window(ImGuiCond);
 		void center_next_window(vec2 size_multiplier, ImGuiCond);
 		void set_next_window_rect(xywh, ImGuiCond = ImGuiCond_FirstUseEver);
+
+		void filter_with_hint(ImGuiTextFilter& filter, const char* id, const char* hint);
 	}
 }

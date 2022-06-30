@@ -116,7 +116,7 @@
 		"id": "fish",
 		"content_hash": "gmBOD9342podJ8QlaSDLKf8",
 
-		"default_color": [255, 255, 255, 255],
+		"color": [255, 255, 255, 255],
 
 		"script_arguments": {
 			// Wszystko tak samo jak w normalnym png, tylko wewnętrznie sobie to wrzucamy

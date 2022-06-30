@@ -19,6 +19,12 @@
 #include "application/setups/editor/resources/editor_sprite_resource.h"
 #include "application/setups/editor/resources/editor_sound_resource.h"
 
+#include "application/setups/editor/editor_setup.hpp"
+
+#include "application/setups/editor/commands/edit_node_command.hpp"
+#include "application/setups/editor/commands/edit_resource_command.hpp"
+#include "augs/templates/history.hpp"
+
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	LOG("Loading editor project at: %x", project_path);
 	project = editor_project_readwrite::read_project_json(paths.project_json);
@@ -37,6 +43,7 @@ void editor_setup::open_default_windows() {
 	gui.inspector.open();
 	gui.layers.open();
 	gui.filesystem.open();
+	gui.history.open();
 }
 
 bool editor_setup::handle_input_before_imgui(
@@ -56,8 +63,40 @@ bool editor_setup::handle_input_before_imgui(
 }
 
 bool editor_setup::handle_input_before_game(
-	handle_input_before_game_input
+	handle_input_before_game_input in
 ) {
+	using namespace augs::event;
+	using namespace augs::event::keys;
+
+	const auto& state = in.common_input_state;
+	const auto& e = in.e;
+
+	const bool has_ctrl{ state[key::LCTRL] };
+	const bool has_shift{ state[key::LSHIFT] };
+
+	if (e.was_any_key_pressed()) {
+		const auto k = e.data.key.key;
+
+		if (has_ctrl) {
+			if (has_shift) {
+				switch (k) {
+					case key::Z: redo(); return true;
+					default: break;
+				}
+			}
+
+			switch (k) {
+				case key::Z: undo(); return true;
+				//case key::C: copy(); return true;
+				//case key::X: cut(); return true;
+				//case key::V: paste(); return true;
+
+				//case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
+				default: break;
+			}
+		}
+	}
+
 	return false;
 }
 
@@ -139,13 +178,17 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		Otherwise we could end up with duplicate resources.
 	*/
 
+	auto resolve = [&](const augs::path_type& path_in_project) {
+		return paths.project_folder / path_in_project;
+	};
+
 	auto handle_pool = [&]<typename P>(P& pool, const editor_filesystem_node_type type) {
-		using R = editor_pathed_resource;
+		using resource_type = typename P::value_type;
 
-		std::unordered_map<std::string,     R*> resource_by_hash;
-		std::unordered_map<augs::path_type, R*> resource_by_path;
+		std::unordered_map<std::string,     resource_type*> resource_by_hash;
+		std::unordered_map<augs::path_type, resource_type*> resource_by_path;
 
-		auto find_resource = [&](auto& in, const auto& by) -> R* {
+		auto find = [&](auto& in, const auto& by) -> resource_type* {
 			if (auto found = mapped_or_nullptr(in, by)) {
 				return *found;
 			}
@@ -156,8 +199,8 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		for (auto& entry : pool) {
 			auto& r = entry.external_file;
 
-			resource_by_hash[r.content_hash] = std::addressof(r);
-			resource_by_path[r.path]         = std::addressof(r);
+			resource_by_hash[r.content_hash]    = std::addressof(entry);
+			resource_by_path[r.path_in_project] = std::addressof(entry);
 		}
 
 		auto add_if_new = [&](editor_filesystem_node& file) {
@@ -165,11 +208,14 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 				return;
 			}
 
-			const auto path = file.get_path();
-			const auto full_path = paths.project_folder / path;
+			const auto path_in_project = file.get_path_in_project();
+			const auto full_path = resolve(path_in_project);
 
-			if (auto found_resource = find_resource(resource_by_path, path)) {
-				found_resource->maybe_rehash(full_path, file.last_write_time);
+			if (auto found_resource = find(resource_by_path, path_in_project)) {
+				found_resource->external_file.maybe_rehash(full_path, file.last_write_time);
+
+				const auto existing_id = pool.get_id_of(*found_resource);
+				file.associated_resource.set<resource_type>(existing_id, false);
 			}
 			else {
 				std::string new_resource_hash;
@@ -186,25 +232,26 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 					return;
 				}
 
-				auto moved_resource = find_resource(resource_by_hash, new_resource_hash);
+				auto moved_resource = find(resource_by_hash, new_resource_hash);
 
-				if (moved_resource && !augs::exists(moved_resource->path)) {
-					const auto& new_path = path;
+				if (moved_resource && !augs::exists(resolve(moved_resource->external_file.path_in_project))) {
+					const auto& new_path = path_in_project;
+					auto& moved = moved_resource->external_file;
 
-					changes.redirects.emplace_back(moved_resource->path, new_path);
+					changes.redirects.emplace_back(moved.path_in_project, new_path);
 
-					moved_resource->path = new_path;
-					moved_resource->set_hash_stamp(file.last_write_time);
+					moved.path_in_project = new_path;
+					moved.set_hash_stamp(file.last_write_time);
+
+					const auto moved_id = pool.get_id_of(*moved_resource);
+
+					file.associated_resource.set<resource_type>(moved_id, false);
 				}
 				else {
-					auto it = pool.allocate(editor_pathed_resource(path, new_resource_hash, file.last_write_time));
-					auto new_id = editor_resource_id();
+					const auto it = pool.allocate(editor_pathed_resource(path_in_project, new_resource_hash, file.last_write_time));
+					const auto new_id = it.key;
 
-					new_id.is_official = false;
-					new_id.raw = it.key;
-					new_id.type_id = editor_resource_type_id::template of<typename P::value_type>();
-
-					file.associated_resource = new_id;
+					file.associated_resource.set<resource_type>(new_id, false);
 				}
 			}
 		};
@@ -214,13 +261,13 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		for (auto& entry : pool) {
 			auto& r = entry.external_file;
 
-			if (!augs::exists(r.path)) {
+			if (!augs::exists(resolve(r.path_in_project))) {
 				/* 
 					If it's still missing after redirect, 
 					then it is indeed missing.
 				*/
 
-				changes.missing.emplace_back(r.path);
+				changes.missing.emplace_back(r.path_in_project);
 			}
 		}
 	};
@@ -245,6 +292,40 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 
 void editor_setup::force_autosave_now() {
 
+}
+
+editor_history::index_type editor_setup::get_last_command_index() const {
+	return history.get_last_revision();
+}
+
+bool editor_setup::exists(const editor_resource_id& id) const {
+	return on_resource(id, [&](auto&&...) { return true; }) == std::optional<bool>(true);
+}
+
+void editor_setup::inspect(inspected_variant new_inspected) {
+	gui.inspector.inspect(new_inspected);
+}
+
+bool editor_setup::is_inspected(inspected_variant inspected) const {
+	return gui.inspector.currently_inspected == inspected;
+}
+
+editor_command_input editor_setup::make_command_input() {
+	return { *this };
+}
+
+void editor_setup::seek_to_revision(editor_history::index_type revision_index) {
+	history.seek_to_revision(revision_index, make_command_input());
+}
+
+void editor_setup::undo() {
+	gui.history.scroll_to_current_once = true;
+	history.undo(make_command_input());
+}
+
+void editor_setup::redo() {
+	gui.history.scroll_to_current_once = true;
+	history.redo(make_command_input());
 }
 
 void editor_setup::load_gui_state() {
@@ -275,12 +356,16 @@ void editor_pathed_resource::maybe_rehash(const augs::path_type& full_path, cons
 	}
 }
 
+std::string editor_pathed_resource::get_display_name() const {
+	return path_in_project.filename().replace_extension("").string();
+}
+
 editor_pathed_resource::editor_pathed_resource(
-	const augs::path_type& path, 
+	const augs::path_type& path_in_project, 
 	const std::string& content_hash,
 	const augs::file_time_type& stamp
 ) : 
-	path(path),
+	path_in_project(path_in_project),
 	content_hash(content_hash)
 {
 	set_hash_stamp(stamp);

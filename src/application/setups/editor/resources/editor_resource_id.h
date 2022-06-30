@@ -18,13 +18,20 @@ struct editor_resource_id {
 
 	bool operator==(const editor_resource_id&) const = default;
 
+	template <class T>
+	void set(const editor_resource_pool_id new_raw, const bool new_is_offical) {
+		raw = new_raw;
+		type_id.template set<T>();
+		is_official = new_is_offical;
+	}
+
 	void unset() {
 		raw.unset();
 		type_id.unset();
 		is_official = false;
 	}
 
-	explicit operator editor_specific_pool_resource_id() const {
+	editor_specific_pool_resource_id to_specific_pool() const {
 		return { raw, type_id };
 	}
 

@@ -38,12 +38,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	}
 
 	thread_local ImGuiTextFilter filter;
-	{
-		ImGui::SetNextItemWidth(-0.0001f);
-		bool value_changed = ImGui::InputTextWithHint("##FilesFilter", "Search project files...", filter.InputBuf, IM_ARRAYSIZE(filter.InputBuf));
-		if (value_changed)
-		filter.Build();
-	}
+	filter_with_hint(filter, "##FilesFilter", "Search project files...");
 
 	int id_counter = 0;
 
@@ -69,12 +64,20 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			}
 		}
 
+		const bool is_inspected = in.setup.is_inspected(node.associated_resource);
+
 		const auto& label = node.name;
 		const auto label_color = white;
 		const auto bg_cols = std::array<rgba, 3> {
 			rgba(0, 0, 0, 0),
 			rgba(15, 40, 70, 255),
 			rgba(35, 60, 90, 255)
+		};
+
+		const auto inspected_cols = std::array<rgba, 3> {
+			rgba(35-10, 60-10, 90-10, 255),
+			rgba(35, 60, 90, 255),
+			rgba(35+10, 60+10, 90+10, 255)
 		};
 
 		const float size_mult = 1.1f;
@@ -90,15 +93,10 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		bool result = false;
 
 		{
-			auto colored_selectable = scoped_selectable_colors(
-				bg_cols[0],
-				bg_cols[1],
-				bg_cols[2]
-			);
-
+			auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
 			auto id = scoped_id(label.c_str());
 
-			result = ImGui::Selectable("###Button", false, ImGuiSelectableFlags_None, button_size);
+			result = ImGui::Selectable("###Button", is_inspected, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size);
 
 			if (node.is_resource()) {
 				if (ImGui::BeginDragDropSource())
@@ -140,7 +138,14 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		//shift_cursor(vec2(0, text_h * padding_mult));
 
 		if (result) {
-			node.toggle_open();
+			if (node.is_folder()) {
+				node.toggle_open();
+			}
+			else {
+				if (in.setup.exists(node.associated_resource)) {
+					in.setup.inspect(node.associated_resource);
+				}
+			}
 		}
 	};
 

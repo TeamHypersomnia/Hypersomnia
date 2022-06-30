@@ -3,12 +3,20 @@
 
 #include "game/detail/view_input/sound_effect_modifier.h"
 
+struct editor_sound_resource_editable : sound_effect_modifier {
+	using base = sound_effect_modifier;
+	using introspect_base = base;
+};
+
 struct editor_sound_resource {
 	// GEN INTROSPECTOR struct editor_sound_resource
 	editor_pathed_resource external_file;
-
-	sound_effect_modifier modifier;
+	editor_sound_resource_editable editable;
 	// END GEN INTROSPECTOR
 
 	editor_sound_resource(const editor_pathed_resource& f) : external_file(f) {}
+
+	decltype(auto) get_display_name() const {
+		return external_file.get_display_name();
+	}
 };

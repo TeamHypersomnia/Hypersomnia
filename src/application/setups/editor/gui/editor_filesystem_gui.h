@@ -8,6 +8,7 @@ class editor_setup;
 struct editor_filesystem_node;
 
 struct editor_project_files_input {
+	editor_setup& setup;
 	editor_filesystem_node& files_root;
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;

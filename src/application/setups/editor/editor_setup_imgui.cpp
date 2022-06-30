@@ -46,6 +46,7 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			do_window_entry(gui.layers, "R");
 			do_window_entry(gui.filesystem, "P");
 			do_window_entry(gui.inspector, "I");
+			do_window_entry(gui.history, "H");
 		}
 	}
 }
@@ -84,12 +85,16 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ImGuiID dock_main_id = dockspace_id; // This variable will track the document node, however we are not using it here as we aren't docking anything into it.
 
 			ImGuiID dock_id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.20f, NULL, &dock_main_id);
-			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
-			ImGuiID dock_id_bottomleft = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.40f, NULL, &dock_id_left);
+			ImGuiID dock_id_bottom_right = ImGui::DockBuilderSplitNode(dock_id_right, ImGuiDir_Down, 0.30f, NULL, &dock_id_right);
 
-			ImGui::DockBuilderDockWindow(gui.filesystem.get_title().c_str(), dock_id_bottomleft);
+			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
+			ImGuiID dock_id_bottom_left = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.40f, NULL, &dock_id_left);
+
+			ImGui::DockBuilderDockWindow(gui.filesystem.get_title().c_str(), dock_id_bottom_left);
 			ImGui::DockBuilderDockWindow(gui.layers.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
+			ImGui::DockBuilderDockWindow(gui.history.get_title().c_str(), dock_id_bottom_right);
+
 			ImGui::DockBuilderFinish(dockspace_id);
 		};
 
@@ -109,13 +114,15 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	perform_main_menu_bar(in);
 
-	gui.inspector.perform({ project });
+	gui.inspector.perform({ *this });
 	gui.layers.perform({ gui.filesystem.dragged_resource });
 	gui.filesystem.perform({ 
+		*this,
 		files.root,
 		in.ad_hoc_atlas,
 		in.necessary_images
 	});
+	gui.history.perform({ *this, history });
 
 	ImGui::End();
 

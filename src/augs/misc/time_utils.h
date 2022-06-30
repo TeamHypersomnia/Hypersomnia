@@ -24,9 +24,11 @@ namespace augs {
 
 		uint64_t seconds_ago() const;
 		std::string how_long_ago() const;
+		std::string how_long_ago_brief() const;
 		std::string how_long_ago_tell_seconds() const;
 
 		static std::string format_how_long_ago(bool tell_seconds, const uint64_t secs);
+		static std::string format_how_long_ago_brief(bool tell_seconds, const uint64_t secs);
 		static double secs_since_epoch();
 
 		static std::string format_time_point_utc(const std::chrono::system_clock::time_point& tp);

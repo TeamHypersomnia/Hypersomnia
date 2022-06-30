@@ -111,6 +111,10 @@ std::string augs::date_time::how_long_ago() const {
 	return format_how_long_ago(false, seconds_ago());
 }
 
+std::string augs::date_time::how_long_ago_brief() const {
+	return format_how_long_ago_brief(false, seconds_ago());
+}
+
 std::string augs::date_time::how_long_ago_tell_seconds() const {
 	return format_how_long_ago(true, seconds_ago());
 }
@@ -133,7 +137,7 @@ std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const 
 			return typesafe_sprintf("%x seconds ago", secs);
 		}
 
-		return "A while ago";
+		return "Just now";
 	}
 	else if (mins == 1) {
 		return typesafe_sprintf("A minute ago", mins);
@@ -152,4 +156,26 @@ std::string augs::date_time::format_how_long_ago(const bool tell_seconds, const 
 	}
 
 	return typesafe_sprintf("%x days ago", days);
+}
+
+std::string augs::date_time::format_how_long_ago_brief(const bool tell_seconds, const uint64_t secs) {
+	const auto mins = secs / 60;
+	const auto hrs = mins / 60;
+	const auto days = hrs / 24;
+
+	if (mins < 1) {
+		if (tell_seconds) {
+			return typesafe_sprintf("%xs", secs);
+		}
+
+		return "now";
+	}
+	else if (mins < 60) {
+		return typesafe_sprintf("%xm", mins);
+	}
+	else if (hrs < 24) {
+		return typesafe_sprintf("%xh", hrs);
+	}
+
+	return typesafe_sprintf("%xd", days);
 }

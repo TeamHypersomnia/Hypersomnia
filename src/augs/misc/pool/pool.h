@@ -368,6 +368,10 @@ namespace augs {
 			return id;
 		}
 
+		auto get_id_of(const value_type& object) const {
+			return get_nth_id(index_in(objects, object));
+		}
+
 		auto find_nth_id(const size_type i) const {
 			key_type id;
 

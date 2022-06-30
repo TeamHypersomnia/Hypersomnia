@@ -3,7 +3,6 @@
 #include "application/setups/editor/project/editor_project_meta.h"
 #include "application/setups/editor/project/editor_project_about.h"
 #include "application/setups/editor/project/editor_layer.h"
-#include "application/setups/editor/project/editor_history.h"
 
 #include "application/setups/editor/nodes/editor_node_pools.h"
 #include "application/setups/editor/resources/editor_resource_pools.h"

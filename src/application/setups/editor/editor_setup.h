@@ -23,13 +23,23 @@
 #include "application/setups/editor/gui/editor_inspector_gui.h"
 #include "application/setups/editor/gui/editor_layers_gui.h"
 #include "application/setups/editor/gui/editor_filesystem_gui.h"
+#include "application/setups/editor/gui/editor_history_gui.h"
+
 #include "application/setups/editor/editor_filesystem.h"
+#include "application/setups/editor/editor_history.h"
+
 #include "application/setups/editor/project/editor_project_paths.h"
 
 #include "augs/misc/imgui/simple_popup.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
+
+template <class E>
+struct editor_typed_resource_id;
+
+template <class E>
+struct editor_typed_node_id;
 
 namespace sol {
 	class state;
@@ -49,6 +59,7 @@ struct editor_gui {
 	editor_inspector_gui inspector = std::string("Inspector");
 	editor_layers_gui layers = std::string("Layers");
 	editor_filesystem_gui filesystem = std::string("Resources");
+	editor_history_gui history = std::string("History");
 	// END GEN INTROSPECTOR
 };
 
@@ -79,6 +90,12 @@ class editor_setup : public default_setup_settings {
 	void load_gui_state();
 	void save_gui_state();
 
+	template <class S, class F>
+	static decltype(auto) on_resource_impl(S& self, const editor_resource_id& id, F&& callback);
+
+	template <class S, class T>
+	static decltype(auto) find_resource_impl(S& self, const editor_typed_resource_id<T>& id);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -100,11 +117,49 @@ public:
 	void customize_for_viewing(config_lua_table&) const;
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
 
-	template <class F>
-	decltype(auto) on_resource_if(const editor_resource_id& id, F&& callback);
+	template <class T>
+	decltype(auto) find_node(const editor_typed_node_id<T>& id);
+
+	template <class T>
+	decltype(auto) find_node(const editor_typed_node_id<T>& id) const;
+
+	template <class T>
+	decltype(auto) find_resource(const editor_typed_resource_id<T>& id);
+
+	template <class T>
+	decltype(auto) find_resource(const editor_typed_resource_id<T>& id) const;
 
 	template <class F>
-	decltype(auto) on_resource_if(const editor_resource_id& id, F&& callback) const;
+	decltype(auto) on_node(const editor_node_id& id, F&& callback);
+
+	template <class F>
+	decltype(auto) on_node(const editor_node_id& id, F&& callback) const;
+
+	template <class F>
+	decltype(auto) on_resource(const editor_resource_id& id, F&& callback);
+
+	template <class F>
+	decltype(auto) on_resource(const editor_resource_id& id, F&& callback) const;
+
+	bool exists(const editor_resource_id&) const;
+
+	void seek_to_revision(editor_history::index_type);
+
+	template <class T>
+	decltype(auto) post_new_command(T&&);
+
+	template <class T>
+	decltype(auto) rewrite_last_command(T&&);
+
+	void inspect(inspected_variant);
+	bool is_inspected(inspected_variant) const;
+
+	editor_history::index_type get_last_command_index() const;
+
+	editor_command_input make_command_input(); 
+
+	void undo();
+	void redo();
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

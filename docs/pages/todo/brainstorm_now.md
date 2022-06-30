@@ -6,6 +6,40 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+# Scavenging from the legacy editor
+
+- rewrite_last_change
+	- In order to keep command api simple, we might want to have a concept of a "preview command"
+		- instead of adding separate functions for "rewrite last change"
+		- so until the command is actually finalized, just undo it and redo with new parameters
+	- Do we need a separate preview command?
+		- We can just keep a pointer to the last modified and not even dereference it, just check
+			- Index is a better guarantee due to reallocation
+
+- has_parent in history command - I think not, let's just have singular commands and properly have separate classes for multi-commands
+	- it would make for a very confusing ui
+- Alright but we'll still need to reuse commands
+	- e.g. in a delete layers command, we'd want to use delete nodes too
+- No probs, we can just keep a command inside a command
+	- and then call redo/undo on the children manually
+
+- As for history, for now we could just save snapshots instead of addresses?
+	- although that shouldn't really be too complex
+		- well, it becomes complex with various containers
+	- We can optimize it later
+	- The only problem is that we have other meta that we don't want to be editable
+
+# Everything else
+
+- Screw resource_hashes.bin for now and let's always rehash on launch
+	- We won't be writing the timestamps to json because we decided we'd put it into the cached resource_hashes.bin just for this purpose
+		- But it only really becomes necessary at scale
+			- Can't be too long anyway because it will happen whenever we download a new map
+		- We can easily add it later
+- Since stamps will be empty (default) they will get recalculated after first call to on window activate - which is called right after loading the json file
+	- To be sure we can just not read the content hashes from json (since we'll be doing i/o on resources manually)
+
 - Let's go the easiest route right now and just write all resource hashes and timestamps to json
 
 - Summary

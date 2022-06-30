@@ -7,13 +7,13 @@ struct editor_pathed_resource {
 	static constexpr bool json_ignore = true;
 
 	// GEN INTROSPECTOR struct editor_pathed_resource
-	augs::path_type path;
+	augs::path_type path_in_project;
 	std::string content_hash;
 	augs::file_time_type stamp_when_hashed;
 	// END GEN INTROSPECTOR
 
 	editor_pathed_resource(
-		const augs::path_type& path, 
+		const augs::path_type& path_in_project, 
 		const std::string& content_hash,
 		const augs::file_time_type& stamp_when_hashed
 	);
@@ -21,4 +21,6 @@ struct editor_pathed_resource {
 	void set_hash_stamp(const augs::file_time_type& stamp_when_hashed);
 
 	void maybe_rehash(const augs::path_type& full_path, const augs::file_time_type& fresh_stamp);
+
+	std::string get_display_name() const;
 };

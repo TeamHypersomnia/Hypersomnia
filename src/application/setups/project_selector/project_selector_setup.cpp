@@ -249,11 +249,11 @@ bool projects_list_tab_state::perform_list(
 		const auto local_pos = ImGui::GetCursorPos();
 
 		{
-			auto darkened_selectables = scoped_selectable_colors(
+			auto darkened_selectables = scoped_selectable_colors({
 				rgba(255, 255, 255, 20),
 				rgba(255, 255, 255, 30),
 				rgba(255, 255, 255, 60)
-			);
+			});
 
 			if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
 				selected_arena_path = path;

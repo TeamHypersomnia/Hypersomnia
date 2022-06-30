@@ -320,6 +320,17 @@ namespace augs {
 			return result;
 		}
 
+		inline bool color_picker(
+			const std::string& label,
+			rgba& into,
+			const ImGuiColorEditFlags flags = 0
+		) {
+			ImVec4 input = into;
+			const bool result = { ImGui::ColorPicker4(label.c_str(), reinterpret_cast<float*>(&input), flags) };
+			into = input;
+			return result;
+		}
+
 		template <class... Args>
 		void text(const std::string& format, Args&&... args) {
 			if constexpr(sizeof...(Args) == 0) {

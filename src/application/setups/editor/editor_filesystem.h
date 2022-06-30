@@ -136,7 +136,7 @@ struct editor_filesystem_node {
 		is_open = state.was_open;
 	}
 
-	auto get_path() const {
+	auto get_path_in_project() const {
 		std::vector<std::string> parents;
 		parents.reserve(level);
 
@@ -220,7 +220,7 @@ struct editor_filesystem {
 		auto node_to_state = editor_filesystem_ui_state();
 
 		root.in_ui_order([&](const auto& node) {
-			node_to_state[node.get_path()] = node.get_ui_state();
+			node_to_state[node.get_path_in_project()] = node.get_ui_state();
 		});
 
 		return node_to_state;
@@ -228,7 +228,7 @@ struct editor_filesystem {
 
 	void apply_ui_state(const editor_filesystem_ui_state& node_to_state) {
 		root.in_ui_order([&](auto& node) {
-			if (auto state = mapped_or_nullptr(node_to_state, node.get_path())) {
+			if (auto state = mapped_or_nullptr(node_to_state, node.get_path_in_project())) {
 				node.apply_ui_state(*state);
 			}
 		});
@@ -246,7 +246,7 @@ struct editor_filesystem {
 		ad_hoc_entry_id id_counter = 1;
 
 		root.for_each_file_recursive([&](auto& node) {
-			const auto path = project_folder / node.get_path();
+			const auto path = project_folder / node.get_path_in_project();
 
 			if (assets::is_supported_extension<assets::image_id>(path.extension().string())) {
 				node.file_thumbnail_id = id_counter++;

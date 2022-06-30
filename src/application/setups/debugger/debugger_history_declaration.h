@@ -4,7 +4,7 @@
 
 namespace augs {
 	template <class...>
-	class history_with_marks;
+	class history_with_saved_revision;
 };
 
 struct fill_with_test_scene_command;
@@ -51,7 +51,7 @@ struct change_asset_property_command;
 template <class>
 struct duplicate_asset_command;
 
-using debugger_history_base = augs::history_with_marks<
+using debugger_history_base = augs::history_with_saved_revision<
 	fill_with_test_scene_command,
 
 	move_entities_command,

@@ -89,6 +89,16 @@ public:
 		});
 	};
 
+	template <std::size_t N>
+	auto& get_nth() {
+		return std::get<N>(all);
+	}
+
+	template <std::size_t N>
+	const auto& get_nth() const {
+		return std::get<N>(all);
+	}
+
 	template <class T>
 	auto& get() {
 		return std::get<T>(all);

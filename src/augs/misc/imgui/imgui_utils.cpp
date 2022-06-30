@@ -302,5 +302,13 @@ namespace augs {
 
 			return local;
 		}
+
+		void filter_with_hint(ImGuiTextFilter& filter, const char* id, const char* hint) {
+			ImGui::SetNextItemWidth(-0.0001f);
+
+			if (ImGui::InputTextWithHint(id, hint, filter.InputBuf, IM_ARRAYSIZE(filter.InputBuf))) {
+				filter.Build();
+			}
+		}
 	}
 }

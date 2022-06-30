@@ -42,7 +42,7 @@ struct B_command {
 	}
 };
 
-using history_type = augs::history_with_marks<A_command, B_command>;
+using history_type = augs::history_with_saved_revision<A_command, B_command>;
 
 #define test_mark_as_current() \
 REQUIRE(hist.at_unsaved_revision()); \

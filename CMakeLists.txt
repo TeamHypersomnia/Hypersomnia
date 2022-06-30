@@ -462,6 +462,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/project/editor_project.cpp"
 	"src/application/setups/editor/project/editor_project_readwrite.cpp"
 	"src/application/setups/editor/project/editor_project_paths.cpp"
+	"src/application/setups/editor/gui/editor_history_gui.cpp"
 	"src/augs/string/path_sanitization.cpp"
 	"src/augs/misc/imgui/simple_popup.cpp"
 	"src/application/config_lua_table.cpp"
