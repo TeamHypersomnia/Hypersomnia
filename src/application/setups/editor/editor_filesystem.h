@@ -37,6 +37,8 @@ struct editor_filesystem_node {
 	editor_filesystem_node_type type = editor_filesystem_node_type::OTHER_FILE;
 
 	bool is_open = false;
+	bool passed_filter = false;
+
 	std::string name;
 
 	std::vector<editor_filesystem_node> files;
@@ -59,12 +61,46 @@ struct editor_filesystem_node {
 	}
 
 	template <class F>
-	void in_ui_order(F&& callback) {
+	void for_each_parent(F&& callback) {
+		auto it = parent;
+
+		while (it) {
+			callback(*it);
+			it = it->parent;
+		}
+	}
+
+	template <class F>
+	void for_each_parent(F&& callback) const {
+		auto it = parent;
+
+		while (it) {
+			callback(*it);
+			it = it->parent;
+		}
+	}
+
+	template <class F>
+	void for_each_entry_recursive(F&& callback) {
+		in_ui_order(std::forward<F>(callback), true);
+	}
+
+	void reset_filter_flags() {
+		for_each_entry_recursive([](auto& entry) { entry.passed_filter = false; });
+	}
+
+	void mark_passed_filter() {
+		passed_filter = true;
+		for_each_parent([](auto& parent){ parent.passed_filter = true; });
+	}
+
+	template <class F>
+	void in_ui_order(F&& callback, bool with_closed_folders = false) {
 		for (auto& subfolder : subfolders) {
 			callback(subfolder);
 
-			if (subfolder.is_open) {
-				subfolder.in_ui_order(std::forward<F>(callback));
+			if (with_closed_folders || subfolder.is_open) {
+				subfolder.in_ui_order(std::forward<F>(callback), with_closed_folders);
 			}
 		}
 
@@ -140,12 +176,7 @@ struct editor_filesystem_node {
 		std::vector<std::string> parents;
 		parents.reserve(level);
 
-		auto it = parent;
-
-		while (it) {
-			parents.push_back(it->name);
-			it = it->parent;
-		}
+		for_each_parent([&parents](auto& parent) { parents.push_back(parent.name); });
 
 		auto total_path = augs::path_type();
 

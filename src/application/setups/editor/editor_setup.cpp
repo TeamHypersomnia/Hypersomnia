@@ -92,6 +92,7 @@ bool editor_setup::handle_input_before_game(
 				//case key::V: paste(); return true;
 
 				//case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
+				case key::F: gui.filesystem.open(); return true;
 				default: break;
 			}
 		}

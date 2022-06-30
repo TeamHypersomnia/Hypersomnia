@@ -37,14 +37,38 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		return;
 	}
 
+	acquire_keyboard_once();
+
 	thread_local ImGuiTextFilter filter;
 	filter_with_hint(filter, "##FilesFilter", "Search project files...");
 
 	int id_counter = 0;
 
+	if (filter.IsActive()) {
+		in.files_root.reset_filter_flags();
+
+		auto& f = filter;
+
+		in.files_root.for_each_entry_recursive(
+			[&f](auto& entry) {
+				const auto path_in_project = entry.get_path_in_project();
+
+				if (f.PassFilter(path_in_project.string().c_str())) {
+					entry.mark_passed_filter();
+				}
+			}
+		);
+	}
+
 	auto node_callback = [&](editor_filesystem_node& node) {
 		using namespace augs::imgui;
 		augs::atlas_entry icon;
+
+		if (filter.IsActive()) {
+			if (!node.passed_filter) {
+				return;
+			}
+		}
 
 		auto id_scope = scoped_id(id_counter++);
 
@@ -139,7 +163,9 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 		if (result) {
 			if (node.is_folder()) {
-				node.toggle_open();
+				if (!filter.IsActive()) {
+					node.toggle_open();
+				}
 			}
 			else {
 				if (in.setup.exists(node.associated_resource)) {
@@ -149,5 +175,6 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		}
 	};
 
-	in.files_root.in_ui_order(node_callback);
+	const bool with_closed_folders = filter.IsActive();
+	in.files_root.in_ui_order(node_callback, with_closed_folders);
 }

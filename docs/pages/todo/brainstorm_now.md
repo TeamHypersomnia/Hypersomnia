@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- next
+	- poprawic kolor tego modala co pokazuje przeniesione pliki (simple popup)
+	- better descriptions (Set Color to 3,34,32,255 (generator))
+	- simple resource I/O
+	- layers gui
+		- tiled ma dokladnie to co wymyslilismy wiec git a zrobimy nawet lepsze
+	- only then some simple cosmos conversions
+	
 
 # Scavenging from the legacy editor
 

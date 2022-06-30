@@ -37,16 +37,16 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 
 		if (auto menu = scoped_menu("Window")) {
 			auto do_window_entry = [&](auto& win, const auto shortcut) {
-				const auto s = std::string("ALT+") + shortcut;
+				const auto s = std::string(shortcut);
 				if (item_if_tabs(win.get_title().c_str(), s.c_str())) {
 					win.open();
 				}
 			};
 
-			do_window_entry(gui.layers, "R");
-			do_window_entry(gui.filesystem, "P");
-			do_window_entry(gui.inspector, "I");
-			do_window_entry(gui.history, "H");
+			do_window_entry(gui.layers, "ALT+L");
+			do_window_entry(gui.filesystem, "CTRL+F");
+			do_window_entry(gui.inspector, "ALT+I");
+			do_window_entry(gui.history, "ALT+H");
 		}
 	}
 }
