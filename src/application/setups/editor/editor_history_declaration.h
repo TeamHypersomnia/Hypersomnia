@@ -1,7 +1,7 @@
 #pragma once
 #include "game/assets/ids/asset_ids.h"
-#include "application/setups/editor/resources/all_editor_resource_types.h"
-#include "application/setups/editor/nodes/all_editor_node_types.h"
+#include "application/setups/editor/resources/all_editor_resource_types_declaration.h"
+#include "application/setups/editor/nodes/all_editor_node_types_declaration.h"
 
 template <class T>
 struct edit_resource_command;

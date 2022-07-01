@@ -4,7 +4,7 @@
 #include "augs/misc/secure_hash.h"
 #include "3rdparty/blake3/blake3.h"
 
-static std::string GetHexRepresentation(const unsigned char *Bytes, size_t Length) {
+std::string get_hex_representation(const unsigned char *Bytes, const size_t Length) {
 	std::ostringstream os;
 	os.fill('0');
 	os<<std::hex;
@@ -24,6 +24,6 @@ namespace augs {
 		uint8_t output[BLAKE3_OUT_LEN];
 		blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
 
-		return GetHexRepresentation(output, BLAKE3_OUT_LEN);
+		return get_hex_representation(output, BLAKE3_OUT_LEN);
 	}
 }

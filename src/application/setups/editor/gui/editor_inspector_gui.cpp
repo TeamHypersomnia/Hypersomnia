@@ -1,6 +1,7 @@
 #include "augs/templates/history.hpp"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/string/string_templates.h"
 
 #include "application/setups/editor/commands/edit_resource_command.hpp"
 #include "application/setups/editor/commands/edit_node_command.hpp"
@@ -41,69 +42,86 @@ void editor_tweaked_widget_tracker::update(const std::size_t current_command_ind
 	last_tweaked = current_session;
 }
 
-bool perform_editable_gui(editor_sprite_node_editable& e) {
-	using namespace augs::imgui;
-	bool changed = false;
+std::string get_hex_representation(const unsigned char*, size_t length);
 
-	auto detect_change = [&](auto expression_result) {
-		if (expression_result) {
-			changed = true;
-		}
-	};
-
-	detect_change(checkbox("Flip horizontally", e.flip_horizontally));
-	detect_change(checkbox("Flip vertically", e.flip_vertically));
-
-	return changed;
+std::string as_hex(const rgba& col) {
+	return to_uppercase(get_hex_representation(std::addressof(col.r), 4));
 }
 
-bool perform_editable_gui(editor_sound_node_editable&) {
+template <class T>
+void edit_property(
+	std::string& result,
+	const std::string& label,
+	T& property
+) {
 	using namespace augs::imgui;
-	bool changed = false;
 
-	auto detect_change = [&](auto expression_result) {
-		if (expression_result) {
-			changed = true;
+	if constexpr(std::is_same_v<T, rgba>) {
+		if (label.size() > 0 && label[0] == '#') {
+			if (color_picker(label, property)) {
+				result = typesafe_sprintf("Set Color to %x in %x", as_hex(property));
+			}
 		}
-	};
-
-	(void)detect_change;
-	return changed;
+		else {
+			if (color_edit(label, property)) {
+				result = typesafe_sprintf("Set %x to %x in %x", label, as_hex(property));
+			}
+		}
+	}
+	else if constexpr(std::is_same_v<T, bool>) {
+		if (checkbox(label, property)) {
+			if (property) {
+				result = typesafe_sprintf("Enable %x in %x", label);
+			}
+			else {
+				result = typesafe_sprintf("Disable %x in %x", label);
+			}
+		}
+	}
 }
 
-bool perform_editable_gui(editor_sprite_resource_editable& e) {
+std::string perform_editable_gui(editor_sprite_node_editable& e) {
 	using namespace augs::imgui;
 
-	bool changed = false;
+	std::string result;
 
-	auto detect_change = [&](auto expression_result) {
-		if (expression_result) {
-			changed = true;
-		}
-	};
+	edit_property(result, "Flip horizontally", e.flip_horizontally);
+	edit_property(result, "Flip vertically", e.flip_vertically);
 
-	text("Default sprite color");
-
-	detect_change(color_picker("##Defaultcolor", e.color));
-
-	return changed;
+	return result;
 }
 
-bool perform_editable_gui(editor_sound_resource_editable&) {
+std::string perform_editable_gui(editor_sound_node_editable&) {
 	using namespace augs::imgui;
-	bool changed = false;
+	std::string result;
 
-	auto detect_change = [&](auto expression_result) {
-		if (expression_result) {
-			changed = true;
-		}
-	};
+	return result;
+}
 
-	(void)detect_change;
-	return changed;
+std::string perform_editable_gui(editor_sprite_resource_editable& e) {
+	using namespace augs::imgui;
+
+	std::string result;
+
+	edit_property(result, "##Defaultcolor", e.color);
+
+	ImGui::Separator();
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_sound_resource_editable&) {
+	using namespace augs::imgui;
+	std::string result;
+
+	return result;
 }
 
 void editor_inspector_gui::inspect(inspected_variant inspected) {
+	if (currently_inspected == inspected) {
+		return;
+	}
+
 	currently_inspected = std::move(inspected);
 	tweaked_widget.reset();
 }
@@ -112,7 +130,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	using namespace augs::imgui;
 
 	(void)in;
-	
+
 	auto window = make_scoped_window();
 
 	if (!window) {
@@ -138,16 +156,32 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			std::is_same_v<R, editor_sprite_resource> 
 			|| std::is_same_v<R, editor_sound_resource>
 		) {
+			const auto name = resource.external_file.path_in_project.filename().string();
+
+			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
+				text_color("Sprite: ", yellow);
+			}
+			if constexpr(std::is_same_v<R, editor_sound_resource>) {
+				text_color("Sound: ", yellow);
+			}
+
+			ImGui::SameLine();
+			text(name);
+
+			//game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
+
+			ImGui::Separator();
+
 			auto id = scoped_id(resource.external_file.path_in_project.string());
 
 			auto edited_copy = resource.editable;
-			const bool changed = perform_editable_gui(edited_copy);
+			const auto changed = perform_editable_gui(edited_copy);
 
-			if (changed) {
+			if (!changed.empty()) {
 				edit_resource_command<R> cmd;
 				cmd.resource_id = resource_id;
 				cmd.after = edited_copy;
-				cmd.built_description = "Edit " + resource.get_display_name();
+				cmd.built_description = typesafe_sprintf(changed, resource.get_display_name());
 
 				post_new_or_rewrite(std::move(cmd)); 
 			}
@@ -164,13 +198,13 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			auto id = scoped_id(node.get_display_name());
 
 			auto edited_copy = node.editable;
-			const bool changed = perform_editable_gui(edited_copy);
+			const auto changed = perform_editable_gui(edited_copy);
 
-			if (changed) {
+			if (!changed.empty()) {
 				edit_node_command<N> cmd;
 				cmd.node_id = node_id;
 				cmd.after = edited_copy;
-				cmd.built_description = "Edit " + node.get_display_name();
+				cmd.built_description = typesafe_sprintf(changed, node.get_display_name());
 
 				post_new_or_rewrite(std::move(cmd)); 
 			}

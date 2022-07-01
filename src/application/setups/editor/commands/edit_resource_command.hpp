@@ -8,6 +8,8 @@ void edit_resource_command<T>::undo(editor_command_input in) {
 	if (auto resource = in.setup.find_resource(resource_id)) {
 		after = resource->editable;
 		resource->editable = before;
+
+		in.setup.inspect(editor_resource_id(resource_id));
 	}
 }
 
@@ -16,5 +18,7 @@ void edit_resource_command<T>::redo(editor_command_input in) {
 	if (auto resource = in.setup.find_resource(resource_id)) {
 		before = resource->editable;
 		resource->editable = after;
+
+		in.setup.inspect(editor_resource_id(resource_id));
 	}
 }

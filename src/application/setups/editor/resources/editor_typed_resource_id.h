@@ -1,8 +1,6 @@
 #pragma once
 #include "augs/misc/pool/pooled_object_id.h"
-
-using editor_resource_pool_size_type = unsigned short;
-using editor_resource_pool_id = augs::pooled_object_id<editor_resource_pool_size_type>;
+#include "application/setups/editor/resources/editor_resource_id.h"
 
 template <class E>
 struct editor_specific_pool_typed_resource_id {
@@ -14,6 +12,10 @@ struct editor_typed_resource_id {
 	using target_type = E;
 	editor_resource_pool_id raw;
 	bool is_official = false;
+
+	explicit operator editor_resource_id() const {
+		return { raw, editor_resource_type_id::of<E>(), is_official };
+	}
 
 	editor_specific_pool_typed_resource_id<E> to_specific_pool() const {
 		return { raw };

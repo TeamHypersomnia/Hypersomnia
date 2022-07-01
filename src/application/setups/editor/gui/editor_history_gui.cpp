@@ -109,11 +109,13 @@ void editor_history_gui::perform(const editor_history_gui_input in) {
 	const auto& commands = history.get_commands();
 
 	for (std::size_t i = 0; i < commands.size(); ++i) {
+		const auto n = commands.size() - i - 1;
+
 		std::visit(
 			[&](const auto& typed_command) {
-				do_history_node(commands.size() - i - 1, typed_command);
+				do_history_node(n, typed_command);
 			},
-			commands[i]
+			commands[n]
 		);
 	}
 
