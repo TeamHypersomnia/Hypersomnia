@@ -190,7 +190,6 @@ namespace augs {
 
 			ImDrawList* cmd_list = nullptr;
 			std::size_t cmd_i = 0;
-			const ImDrawIdx* idx_buffer_offset = 0;
 			int fb_height = -1;
 
 			for (std::size_t i = 0; i < n; ++i) {
@@ -250,7 +249,6 @@ namespace augs {
 
 						lists_to_delete.emplace_back(cmd_list);
 						cmd_i = 0;
-						idx_buffer_offset = nullptr;
 					}
 					else if constexpr(same<C, make_screenshot>) {
 						const auto& bounds = typed_cmd.bounds;
@@ -284,9 +282,14 @@ namespace augs {
 								);
 
 								set_scissor_bounds(bounds);
-								GL_CHECK(glDrawElements(GL_TRIANGLES, (GLsizei)cc.ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset));
 
-								idx_buffer_offset += cc.ElemCount;
+								GL_CHECK(glDrawElements(
+									GL_TRIANGLES, 
+									(GLsizei)cc.ElemCount, 
+									sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, 
+									(void*)(intptr_t)(cc.IdxOffset * sizeof(ImDrawIdx))
+								));
+
 								break;
 							}
 

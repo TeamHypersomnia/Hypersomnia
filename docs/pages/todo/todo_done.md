@@ -4634,3 +4634,7 @@ Advantages:
 		
 - libcrypto.dll is missing on Windows if there's no OpenSSH installed
 - Zamienić editor_setup -> inspector_setup
+
+
+- better descriptions (Set Color to 3,34,32,255 (generator))
+- poprawic kolor tego modala co pokazuje przeniesione pliki (simple popup)

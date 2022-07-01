@@ -144,11 +144,13 @@ void editor_setup::rebuild_filesystem() {
 		const int missing = changes.missing.size();
 
 		if (missing > 0) {
-			summary += typesafe_sprintf("%x files are missing!\n", missing);
+			auto f = missing == 1 ? "file is" : "files are";
+			summary += typesafe_sprintf("%x %x missing!\n", missing, f);
 		}
 
 		if (redirs > 0) {
-			summary += typesafe_sprintf("%x files have been automatically redirected.\n", redirs);
+			auto f = redirs == 1 ? "file has" : "files have";
+			summary += typesafe_sprintf("%x %x been automatically redirected.\n", redirs, f);
 		}
 
 		std::string details;
