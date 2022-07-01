@@ -33,5 +33,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_light_resource>,
 	edit_node_command<editor_sprite_node>,
 	edit_node_command<editor_sound_node>,
-	edit_node_command<editor_light_node>
+	edit_node_command<editor_light_node>,
+
+	create_layer_command
 >;

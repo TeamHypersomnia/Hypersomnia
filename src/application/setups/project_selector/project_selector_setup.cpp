@@ -24,6 +24,7 @@
 #include "augs/readwrite/json_readwrite_errors.h"
 #include "augs/string/path_sanitization.h"
 #include "augs/filesystem/find_path.h"
+#include "augs/misc/pool/pool_allocate.h"
 
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 250;
@@ -356,7 +357,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 	const auto button_padding_mult = 0.5f;
 
 	const bool create_pressed = selectable_with_icon(
-		in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CREATE],
+		in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FILE],
 		"CREATE NEW ARENA",
 		button_size_mult,
 		button_padding_mult,
@@ -677,6 +678,13 @@ bool project_selector_setup::create_new_project_files() {
 		default_project.meta.game_version = hypersomnia_version().get_version_string();
 		default_project.meta.name = sanitized_name;
 		default_project.meta.version_timestamp = augs::date_time::get_utc_timestamp();
+
+		{
+			editor_layer default_layer;
+			default_layer.name = "Default layer";
+
+			default_project.layers.order.push_back(default_project.layers.pool.allocate(default_layer).key);
+		}
 
 		default_project.about.short_description = user_input.short_description;
 		

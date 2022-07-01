@@ -11,6 +11,7 @@
 An online shooter with ridiculously fast dynamics.  
 Challenge your friend to an intense duel, or gather two clans to hold a spectacular skirmish.  
 
+Written in modern C++, without a game engine!
 Forever free and open-source :heart: 
 
 **Download binaries for:**

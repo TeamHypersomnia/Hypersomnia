@@ -6,9 +6,9 @@ template <class T>
 struct edit_resource_command {
 	using editable_type = decltype(T::editable);
 
-	editor_typed_resource_id<T> resource_id;
-
 	editor_command_meta meta;
+
+	editor_typed_resource_id<T> resource_id;
 
 	editable_type before;
 	editable_type after;

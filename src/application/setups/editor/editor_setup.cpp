@@ -19,10 +19,12 @@
 #include "application/setups/editor/resources/editor_sprite_resource.h"
 #include "application/setups/editor/resources/editor_sound_resource.h"
 
-#include "application/setups/editor/editor_setup.hpp"
-
+#include "application/setups/editor/commands/create_layer_command.hpp"
 #include "application/setups/editor/commands/edit_node_command.hpp"
 #include "application/setups/editor/commands/edit_resource_command.hpp"
+
+#include "application/setups/editor/editor_setup.hpp"
+
 #include "augs/templates/history.hpp"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
@@ -93,6 +95,9 @@ bool editor_setup::handle_input_before_game(
 
 				//case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
 				case key::F: gui.filesystem.open(); return true;
+				case key::L: gui.layers.open(); return true;
+				case key::H: gui.history.open(); return true;
+				case key::I: gui.inspector.open(); return true;
 				default: break;
 			}
 		}
@@ -313,6 +318,10 @@ bool editor_setup::is_inspected(inspected_variant inspected) const {
 	return gui.inspector.currently_inspected == inspected;
 }
 
+inspected_variant editor_setup::get_inspected() const {
+	return gui.inspector.currently_inspected;
+}
+
 editor_command_input editor_setup::make_command_input() {
 	return { *this };
 }
@@ -376,4 +385,44 @@ editor_pathed_resource::editor_pathed_resource(
 
 void editor_pathed_resource::set_hash_stamp(const augs::file_time_type& stamp) {
 	stamp_when_hashed = stamp;
+}
+
+editor_layer* editor_setup::find_layer(const editor_layer_id& id) {
+	return project.layers.pool.find(id);
+}
+
+editor_layer* editor_setup::find_layer(const std::string& name) {
+	for (auto& layer : project.layers.pool) {
+		if (layer.name == name) {
+			return std::addressof(layer);
+		}
+	}
+
+	return nullptr;
+}
+
+template <class F>
+std::string first_free_string(const std::string& pattern, const std::string& index_pattern, F&& is_free) {
+	for (std::size_t i = 0;; ++i) {
+		const auto index_str = typesafe_sprintf(index_pattern, i);
+		const auto candidate = i ? typesafe_sprintf(pattern, index_str) : typesafe_sprintf(pattern, "");
+
+		if (is_free(candidate)) {
+			return candidate;
+		}
+	}
+}
+
+void editor_setup::create_new_layer(const std::string& name_pattern) {
+	const auto first_free_name = first_free_string(
+		name_pattern, 
+		" %x", 
+		[this](const auto& candidate){ return nullptr == find_layer(candidate); }
+	);
+
+	create_layer_command cmd;
+	cmd.chosen_name = first_free_name;
+	cmd.built_description = "Create " + first_free_name;
+
+	post_new_command(cmd);
 }

@@ -8,6 +8,7 @@
 
 #include "application/setups/editor/commands/edit_resource_command.h"
 #include "application/setups/editor/commands/edit_node_command.h"
+#include "application/setups/editor/commands/create_layer_command.h"
 
 #include "application/setups/editor/editor_history_declaration.h"
 

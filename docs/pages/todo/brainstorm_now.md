@@ -6,6 +6,44 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- One-click could select it, double-click toggle collapse?
+
+- Eye would indeed be better on the left, to not mix it with the object icons
+
+- There are many possible actions upon the layer:
+	- Rename
+	- Collapse
+	- Navigate to the center
+	- Select all
+
+- One-clicking a node certainly opens an inspector on it
+- Double clicking could either navigate to it on scene or initiate rename
+
+- Renaming should be quickly accessible to encourage it
+
+- Multiple selection
+	- Generally we'll need it for easy moves of nodes between layers e.g.
+	
+
+
+- Note we MUST use "undo_last_allocate" instead of "free" for nodes
+	- Because freeing and then allocating on redo might possibly invalidate references earlier in history
+	- Similarly for create/delete prefabs!
+- Similarly, if we are to clean unused resources we must also invalidate history
+	- Or we can make the clean a proper command! Then not necessarily.
+	- But wait, what if we clean, then alt-tab with new resources, and then hit undo?
+	- Then the undo_free will fail
+	- So invalidate history that is
+	- Makes sense because that's the only way to ever delete resource data from a project
+
+
+- If no object hovered while placing an object
+	- If we remember the last layer to which we inserted or interacted with at all
+		- Insert to that layer
+	- Otherwise create new layer and set it as the last one we interacted with
+
+- We want to be able to select layers to duplicate them potentially
+
 - next
 	- layers gui
 		- tiled ma dokladnie to co wymyslilismy wiec git a zrobimy nawet lepsze

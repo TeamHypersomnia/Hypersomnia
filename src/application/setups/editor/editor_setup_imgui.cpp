@@ -43,10 +43,10 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 				}
 			};
 
-			do_window_entry(gui.layers, "ALT+L");
+			do_window_entry(gui.layers, "CTRL+L");
 			do_window_entry(gui.filesystem, "CTRL+F");
-			do_window_entry(gui.inspector, "ALT+I");
-			do_window_entry(gui.history, "ALT+H");
+			do_window_entry(gui.inspector, "CTRL+I");
+			do_window_entry(gui.history, "CTRL+H");
 		}
 	}
 }
@@ -115,7 +115,14 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	perform_main_menu_bar(in);
 
 	gui.inspector.perform({ *this });
-	gui.layers.perform({ gui.filesystem.dragged_resource });
+	gui.layers.perform({ 
+		*this, 
+		project.layers,
+		gui.filesystem.dragged_resource,
+		in.ad_hoc_atlas,
+		in.necessary_images
+	});
+
 	gui.filesystem.perform({ 
 		*this,
 		files.root,

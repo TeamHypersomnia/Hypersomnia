@@ -1,18 +1,14 @@
 #pragma once
 #include "application/setups/editor/commands/editor_command_meta.h"
 #include "application/setups/editor/nodes/editor_typed_node_id.h"
+#include "application/setups/editor/project/editor_layers.h"
 
-template <class T>
-struct edit_node_command {
-	using editable_type = decltype(T::editable);
+#include "application/setups/editor/commands/allocating_command.h"
 
-	editor_command_meta meta;
+struct create_layer_command : allocating_command<editor_layer_id> {
+	using base = allocating_command<editor_layer_id>;
 
-	editor_typed_node_id<T> node_id;
-
-	editable_type before;
-	editable_type after;
-
+	std::string chosen_name;
 	std::string built_description;
 
 	void undo(editor_command_input in);

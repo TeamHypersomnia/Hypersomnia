@@ -96,6 +96,8 @@ class editor_setup : public default_setup_settings {
 	template <class S, class T>
 	static decltype(auto) find_resource_impl(S& self, const editor_typed_resource_id<T>& id);
 
+	friend create_layer_command;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -116,6 +118,10 @@ public:
 
 	void customize_for_viewing(config_lua_table&) const;
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
+
+	editor_layer* find_layer(const editor_layer_id& id);
+	editor_layer* find_layer(const std::string& name);
+	void create_new_layer(const std::string& name_pattern = "New layer%x");
 
 	template <class T>
 	decltype(auto) find_node(const editor_typed_node_id<T>& id);
@@ -153,6 +159,7 @@ public:
 
 	void inspect(inspected_variant);
 	bool is_inspected(inspected_variant) const;
+	inspected_variant get_inspected() const;
 
 	editor_history::index_type get_last_command_index() const;
 

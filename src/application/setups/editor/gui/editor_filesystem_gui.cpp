@@ -84,7 +84,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				atlas_type = augs::imgui_atlas_type::AD_HOC;
 			}
 			else {
-				icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CREATE];
+				icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FILE];
 			}
 		}
 
@@ -134,8 +134,6 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			}
 		}
 
-		const auto after_pos = ImGui::GetCursorPos();
-
 		{
 			auto scope = scoped_preserve_cursor();
 
@@ -156,8 +154,6 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			ImGui::SetCursorPos(ImVec2(text_pos));
 			text_color(label, label_color);
 		}
-
-		ImGui::SetCursorPos(after_pos);
 
 		//shift_cursor(vec2(0, text_h * padding_mult));
 
