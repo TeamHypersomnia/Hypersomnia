@@ -2,10 +2,12 @@
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "application/setups/editor/resources/editor_resource_id.h"
+#include "application/setups/editor/project/editor_layers.h"
 
 using inspected_variant = std::variant<
 	editor_node_id,
-	editor_resource_id
+	editor_resource_id,
+	editor_layer_id
 >;
 
 class editor_setup;

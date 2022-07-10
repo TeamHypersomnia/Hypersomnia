@@ -39,6 +39,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		rgba(35, 60, 90, 255)
 	};
 
+	const auto inspected_cols = std::array<rgba, 3> {
+		rgba(35-10, 60-10, 90-10, 255),
+		rgba(35, 60, 90, 255),
+		rgba(35+10, 60+10, 90+10, 255)
+	};
+
 	auto icon_button = [&](
 		const auto label, 
 		const auto icon_id, 
@@ -54,7 +60,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		auto id = scoped_id(label);
 
 		if (!enabled) {
-			tint = rgba(255, 255, 255, 50);
+			tint = rgba(255, 255, 255, 80);
 		}
 
 		const auto icon = in.necessary_images[icon_id];
@@ -113,12 +119,20 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	acquire_keyboard_once();
 	filter_with_hint(filter, "##HierarchyFilter", "Search objects and layers...");
 
+	//const auto& style = ImGui::GetStyle();
+	const auto disabled_color = rgba(255, 255, 255, 110);
+
 	{
 		//auto child = scoped_child("hierarchy view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 
 		auto& layers = in.layers;
 
 		int id_counter = 0;
+
+		const auto avail = ImGui::GetContentRegionAvail().x;
+
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, avail - max_icon_size);
 
 		for (const auto layer_id : layers.order) {
 			auto* maybe_layer = in.setup.find_layer(layer_id);
@@ -128,6 +142,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			}
 
 			auto& layer = *maybe_layer;
+			const bool was_disabled = !layer.visible;
 
 			auto id_scope = scoped_id(id_counter++);
 			const auto label = layer.name;
@@ -148,28 +163,44 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				: assets::necessary_image_id::EDITOR_ICON_HIDDEN
 			;
 
-			const auto label_color = layer.visible ? white : rgba(255, 255, 255, 180);
-
-			text_color(layer.name, label_color);
+			const auto node_label = typesafe_sprintf("%x###HierarchyButton", layer.name);
 
 			icon = in.necessary_images[visibility_icon];
 
-			const float size_mult = 1.1f;
-			const auto text_h = ImGui::GetTextLineHeight();
-			const auto button_size = ImVec2(0, text_h * size_mult);
-
-			const auto before_pos = ImGui::GetCursorPos();
-
-			bool result = false;
-
 			{
-				auto colored_selectable = scoped_selectable_colors(bg_cols);
-				auto id = scoped_id(label.c_str());
+				const bool is_inspected = in.setup.is_inspected(layer_id);
 
-				result = ImGui::Selectable("###HierarchyButton", false, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size);
+				auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
 
-				if (result) {
-					layer.gui_open = !layer.gui_open;
+				auto flags = 
+					ImGuiTreeNodeFlags_OpenOnDoubleClick
+					| ImGuiTreeNodeFlags_OpenOnArrow
+					| ImGuiTreeNodeFlags_SpanAvailWidth
+				;
+
+				if (is_inspected) {
+					flags |= ImGuiTreeNodeFlags_Selected;
+				}
+
+				if (was_disabled) {
+					ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
+				}
+
+				if (const auto node = scoped_tree_node_ex(node_label.c_str(), flags)) {
+
+				}
+
+				if (was_disabled) {
+					ImGui::PopStyleColor();
+				}
+
+
+				if (ImGui::IsItemClicked()) {
+					in.setup.inspect(layer_id);
+
+					if (ImGui::IsMouseDoubleClicked(0)) {
+						//layer.gui_open = !layer.gui_open;
+					}
 				}
 
 				if (ImGui::BeginDragDropSource()) {
@@ -178,33 +209,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					ImGui::EndDragDropSource();
 				}
 			}
-
-			const auto after_pos = ImGui::GetCursorPos();
-
-			const int node_level = 0;
-
-			{
-				auto scope = scoped_preserve_cursor();
-
-				const float content_x_offset = max_icon_size * node_level;
-
-				const auto icon_size = vec2::square(max_icon_size);
-				const auto scaled_icon_size = vec2::scaled_to_max_size(icon.get_original_size(), max_icon_size);
-				const auto diff = (icon_size - scaled_icon_size) / 2;
-
-				ImGui::SetCursorPos(ImVec2(vec2(before_pos) + vec2(content_x_offset, 0) + diff));
-
-				const auto icon_padding = vec2(icon_size) / 1.5f;
-
-				game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
-
-				const auto image_offset = vec2(0, button_size.y / 2 - icon_size.y / 2);
-				const auto text_pos = vec2(before_pos) + image_offset + vec2(content_x_offset + icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
-				ImGui::SetCursorPos(ImVec2(text_pos));
-				text_color(label, label_color);
-			}
-
-			ImGui::SetCursorPos(after_pos);
 
 			if (ImGui::BeginDragDropTarget())
 			{
@@ -215,6 +219,20 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				ImGui::EndDragDropTarget();
 			}
+
+			ImGui::NextColumn();
+
+			{
+				const auto scaled_icon_size = vec2::scaled_to_max_size(icon.get_original_size(), max_icon_size);
+				const auto cols = was_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
+
+				if (game_image_button("###Visibility", icon, scaled_icon_size, cols, atlas_type)) {
+					layer.visible = !layer.visible;
+				}
+			}
+
+			ImGui::NextColumn();
+
 		}
 	}
 }

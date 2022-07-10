@@ -2,8 +2,8 @@
 #include "augs/misc/enum/enum_array.h"
 #include "game/enums/faction_type.h"
 
-struct colors_nha {
-	// GEN INTROSPECTOR struct colors_nha
+struct button_colors_nha {
+	// GEN INTROSPECTOR struct button_colors_nha
 	rgba normal;
 	rgba hovered;
 	rgba active;
@@ -17,8 +17,8 @@ struct faction_color_settings {
 	rgba current_player_dead_text;
 	rgba player_dead_text;
 
-	colors_nha background;
-	colors_nha background_current;
+	button_colors_nha background;
+	button_colors_nha background_current;
 
 	rgba background_dark;
 	// END GEN INTROSPECTOR
