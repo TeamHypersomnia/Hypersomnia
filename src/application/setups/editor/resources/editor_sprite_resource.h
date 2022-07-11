@@ -12,7 +12,10 @@ struct editor_sprite_resource_editable {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_sprite_node;
 struct editor_sprite_resource {
+	using node_type = editor_sprite_node;
+
 	editor_pathed_resource external_file;
 	editor_sprite_resource_editable editable;
 	ad_hoc_entry_id thumbnail_id = static_cast<ad_hoc_entry_id>(-1);

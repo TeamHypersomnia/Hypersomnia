@@ -10,6 +10,6 @@ struct editor_light_resource;
 using all_editor_resource_types = type_list<
 	editor_sprite_resource,
 	editor_sound_resource,
-	editor_prefab_resource,
+	//editor_prefab_resource,
 	editor_light_resource
 >;

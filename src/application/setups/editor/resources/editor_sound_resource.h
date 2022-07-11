@@ -8,7 +8,10 @@ struct editor_sound_resource_editable : sound_effect_modifier {
 	using introspect_base = base;
 };
 
+struct editor_sound_node;
 struct editor_sound_resource {
+	using node_type = editor_sound_node;
+
 	// GEN INTROSPECTOR struct editor_sound_resource
 	editor_pathed_resource external_file;
 	editor_sound_resource_editable editable;

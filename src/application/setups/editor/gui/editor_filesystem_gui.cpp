@@ -18,7 +18,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	if (dragged_resource != nullptr) {
 		const bool payload_still_exists = [&]() {
 			const auto payload = ImGui::GetDragDropPayload();
-			return payload && payload->IsDataType("editor_filesystem_gui");
+			return payload && payload->IsDataType("dragged_resource");
 
 		}();
 
@@ -27,9 +27,9 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 			if (mouse_over_scene) {
 				LOG("Dropped %x on scene", dragged_resource->name);
-
-				dragged_resource = nullptr;
 			}
+
+			dragged_resource = nullptr;
 		}
 	}
 
@@ -127,7 +127,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				{
 					dragged_resource = std::addressof(node);
 
-					ImGui::SetDragDropPayload("editor_filesystem_gui", nullptr, 0);
+					ImGui::SetDragDropPayload("dragged_resource", nullptr, 0);
 					text(label);
 					ImGui::EndDragDropSource();
 				}

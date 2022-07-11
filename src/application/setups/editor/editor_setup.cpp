@@ -2,6 +2,7 @@
 #include "game/organization/all_messages_includes.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/misc/secure_hash.h"
+#include "augs/string/first_free.h"
 
 #include "view/viewables/viewables_loading_type.h"
 
@@ -416,20 +417,38 @@ editor_layer* editor_setup::find_layer(const std::string& name) {
 	return nullptr;
 }
 
-template <class F>
-std::string first_free_string(const std::string& pattern, const std::string& index_pattern, F&& is_free) {
-	for (std::size_t i = 0;; ++i) {
-		const auto index_str = typesafe_sprintf(index_pattern, i);
-		const auto candidate = i ? typesafe_sprintf(pattern, index_str) : typesafe_sprintf(pattern, "");
+std::unordered_map<std::string, editor_node_id> editor_setup::make_name_to_node_map() const {
+	std::unordered_map<std::string, editor_node_id> result;
 
-		if (is_free(candidate)) {
-			return candidate;
+	project.nodes.for_each(
+		[&](const auto& node_pool) {
+			auto register_node = [&]<typename T>(const auto id, const T& object) {
+				result[object.get_display_name()] = editor_typed_node_id<T> { id }.operator editor_node_id();
+			};
+
+			node_pool.for_each_id_and_object(register_node);
 		}
-	}
+	);
+
+	return result;
+}
+
+std::string editor_setup::get_free_node_name_for(const std::string& new_name) const {
+	const auto name_map = make_name_to_node_map();
+
+	auto is_node_name_free = [&](const auto& name) {
+		return !found_in(name_map, name);
+	};
+
+	return augs::first_free_string(
+		new_name + "%x",
+		" %x",
+		is_node_name_free
+	);
 }
 
 void editor_setup::create_new_layer(const std::string& name_pattern) {
-	const auto first_free_name = first_free_string(
+	const auto first_free_name = augs::first_free_string(
 		name_pattern, 
 		" %x", 
 		[this](const auto& candidate){ return nullptr == find_layer(candidate); }

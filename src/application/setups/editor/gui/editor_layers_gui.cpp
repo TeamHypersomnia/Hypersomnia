@@ -20,6 +20,24 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	
 	auto window = make_scoped_window();
 
+	if (dragged_node.is_set()) {
+		const bool payload_still_exists = [&]() {
+			const auto payload = ImGui::GetDragDropPayload();
+			return payload && payload->IsDataType("dragged_node");
+
+		}();
+
+		if (!payload_still_exists) {
+			const bool mouse_over_scene = !mouse_over_any_window();
+
+			if (mouse_over_scene) {
+
+			}
+
+			dragged_node.unset();
+		}
+	}
+
 	if (!window) {
 		return;
 	}
@@ -28,9 +46,13 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	const auto now_inspected = in.setup.get_inspected();
 	const auto inspected_node = std::get_if<editor_node_id>(std::addressof(now_inspected));
+	const auto inspected_layer = std::get_if<editor_layer_id>(std::addressof(now_inspected));
 	(void)inspected_node;
 
-	const bool node_or_layer_inspected = false;//inspected_node != nullptr;
+	const bool node_or_layer_inspected = 
+		in.setup.get_inspected() != inspected_variant() 
+		&& (inspected_node != nullptr || inspected_layer != nullptr)
+	;
 
 	thread_local ImGuiTextFilter filter;
 
@@ -137,7 +159,11 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		return { in.necessary_images[assets::necessary_image_id::DEFUSING_INDICATOR], augs::imgui_atlas_type::GAME };
 	};
 
-	auto handle_node_and_id = [&]<typename T>(const T& node, const editor_node_id node_id, editor_layer& layer) {
+	int node_id_counter = 0;
+
+	auto handle_node_and_id = [&]<typename T>(T& node, const editor_node_id node_id, editor_layer& layer) {
+		auto id_scope = scoped_id(node_id_counter++);
+
 		const auto icon_result = get_node_icon(node);
 		const auto icon = icon_result.first;
 		const auto atlas_type = icon_result.second;
@@ -150,6 +176,10 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		const int node_level = 1;
 
 		const bool node_disabled = !node.visible || !layer.visible;
+
+		if (node_disabled) {
+			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
+		}
 
 		{
 			const auto before_pos = ImGui::GetCursorPos();
@@ -167,7 +197,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				if (ImGui::BeginDragDropSource()) {
 					dragged_node = node_id;
 
-					ImGui::SetDragDropPayload("editor_layer_child", nullptr, 0);
+					ImGui::SetDragDropPayload("dragged_node", nullptr, 0);
 					text(label);
 					ImGui::EndDragDropSource();
 				}
@@ -186,7 +216,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				const auto icon_padding = vec2(icon_size) / 1.5f;
 
-				game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
+				const auto image_color = node_disabled ? disabled_color : white;
+				game_image(icon, scaled_icon_size, image_color, vec2::zero, atlas_type);
 
 				const auto image_offset = vec2(0, button_size.y / 2 - icon_size.y / 2);
 				const auto text_pos = vec2(before_pos) + image_offset + vec2(content_x_offset + icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
@@ -205,12 +236,16 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const auto scaled_icon_size = vec2::scaled_to_max_size(visibility_icon.get_original_size(), max_icon_size);
 				const auto cols = node_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
 
-				if (game_image_button("###Visibility", visibility_icon, scaled_icon_size, cols, atlas_type)) {
-					layer.visible = !layer.visible;
+				if (game_image_button("###NodeVisibility", visibility_icon, scaled_icon_size, cols, augs::imgui_atlas_type::GAME)) {
+					node.visible = !node.visible;
 				}
 			}
 
 			ImGui::NextColumn();
+		}
+
+		if (node_disabled) {
+			ImGui::PopStyleColor();
 		}
 	};
 
@@ -247,7 +282,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 			}
 
-			auto atlas_type = augs::imgui_atlas_type::GAME;
+			bool tree_node_open = false;
 
 			const auto node_label = typesafe_sprintf("%x###HierarchyButton", layer.name);
 
@@ -260,6 +295,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					ImGuiTreeNodeFlags_OpenOnDoubleClick
 					| ImGuiTreeNodeFlags_OpenOnArrow
 					| ImGuiTreeNodeFlags_SpanAvailWidth
+					| ImGuiTreeNodeFlags_DefaultOpen
 				;
 
 				if (is_inspected) {
@@ -270,19 +306,11 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
 				}
 
-				if (const auto node = scoped_tree_node_ex(node_label.c_str(), flags)) {
-					for (const auto& node_id : layer.hierarchy.nodes) {
-						in.setup.on_node(node_id, [&](auto& typed_node, const auto typed_node_id) {
-							(void)typed_node_id;
-							handle_node_and_id(typed_node, node_id, layer);
-						});
-					}
-				}
+				tree_node_open = bool(scoped_tree_node_ex(node_label.c_str(), flags));
 
 				if (was_disabled) {
 					ImGui::PopStyleColor();
 				}
-
 
 				if (ImGui::IsItemClicked()) {
 					in.setup.inspect(layer_id);
@@ -293,17 +321,50 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 
 				if (ImGui::BeginDragDropSource()) {
-					ImGui::SetDragDropPayload("editor_layer", nullptr, 0);
+					ImGui::SetDragDropPayload("dragged_layer", nullptr, 0);
 					text(label);
 					ImGui::EndDragDropSource();
 				}
+
 			}
 
-			if (ImGui::BeginDragDropTarget())
-			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("editor_layer"))
-				{
+			if (ImGui::BeginDragDropTarget()) {
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_layer")) {
 					LOG("Dropped %x on layer", "layer");
+				}
+
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
+					if (in.dragged_resource != nullptr) {
+						auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
+							const auto resource_name = typed_resource.get_display_name();
+							const auto new_name = in.setup.get_free_node_name_for(resource_name);
+
+							using node_type = typename T::node_type;
+
+							node_type new_node;
+							new_node.resource_id = resource_id;
+							new_node.unique_name = new_name;
+
+							create_node_command<node_type> command;
+
+							command.created_node = std::move(new_node);
+							command.layer_id = layer_id;
+							command.index_in_layer = 0;
+
+							in.setup.post_new_command(command);
+						};
+
+						in.setup.on_resource(
+							in.dragged_resource->associated_resource,
+							instantiate
+						);
+
+						in.dragged_resource = nullptr;
+					}
+				}
+
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
+					LOG("Dropped %x on layer", "node");
 				}
 
 				ImGui::EndDragDropTarget();
@@ -320,13 +381,21 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const auto scaled_icon_size = vec2::scaled_to_max_size(visibility_icon.get_original_size(), max_icon_size);
 				const auto cols = was_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
 
-				if (game_image_button("###Visibility", visibility_icon, scaled_icon_size, cols, atlas_type)) {
+				if (game_image_button("###Visibility", visibility_icon, scaled_icon_size, cols, augs::imgui_atlas_type::GAME)) {
 					layer.visible = !layer.visible;
 				}
 			}
 
 			ImGui::NextColumn();
 
+			if (tree_node_open) {
+				for (const auto& node_id : layer.hierarchy.nodes) {
+					in.setup.on_node(node_id, [&](auto& typed_node, const auto typed_node_id) {
+						(void)typed_node_id;
+						handle_node_and_id(typed_node, node_id, layer);
+					});
+				}
+			}
 		}
 	}
 }

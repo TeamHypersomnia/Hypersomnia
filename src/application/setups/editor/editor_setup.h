@@ -150,6 +150,9 @@ public:
 	template <class F>
 	decltype(auto) on_resource(const editor_resource_id& id, F&& callback) const;
 
+	std::unordered_map<std::string, editor_node_id> make_name_to_node_map() const;
+	std::string get_free_node_name_for(const std::string& new_name) const;
+
 	bool exists(const editor_resource_id&) const;
 
 	void seek_to_revision(editor_history::index_type);

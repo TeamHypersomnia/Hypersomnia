@@ -1,7 +1,10 @@
 #pragma once
 #include "application/setups/editor/nodes/editor_node_id.h"
 
+struct editor_prefab_node;
 struct editor_prefab_resource {
+	using node_type = editor_prefab_node;
+
 	// GEN INTROSPECTOR struct editor_prefab_resource
 	std::vector<editor_node_id> subnodes;
 	// END GEN INTROSPECTOR
