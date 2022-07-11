@@ -98,6 +98,9 @@ class editor_setup : public default_setup_settings {
 
 	friend create_layer_command;
 
+	template <class T>
+	friend struct create_node_command;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

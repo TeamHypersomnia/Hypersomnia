@@ -9,6 +9,12 @@ struct edit_resource_command;
 template <class T>
 struct edit_node_command;
 
+template <class T>
+struct create_node_command;
+
+template <class T>
+struct delete_node_command;
+
 namespace augs {
 	template <class...>
 	class history_with_saved_revision;
@@ -17,8 +23,6 @@ namespace augs {
 struct paste_nodes_command;
 struct delete_nodes_command;
 struct duplicate_nodes_command;
-
-struct instantiate_resource_command;
 
 struct create_layer_command;
 
@@ -31,9 +35,14 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_sprite_resource>,
 	edit_resource_command<editor_sound_resource>,
 	edit_resource_command<editor_light_resource>,
+
 	edit_node_command<editor_sprite_node>,
 	edit_node_command<editor_sound_node>,
 	edit_node_command<editor_light_node>,
 
-	create_layer_command
+	create_layer_command,
+
+	create_node_command<editor_sprite_node>,
+	create_node_command<editor_sound_node>,
+	create_node_command<editor_light_node>
 >;
