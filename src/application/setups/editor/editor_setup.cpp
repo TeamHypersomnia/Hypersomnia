@@ -460,3 +460,15 @@ void editor_setup::create_new_layer(const std::string& name_pattern) {
 
 	post_new_command(cmd);
 }
+
+template struct edit_resource_command<editor_sprite_resource>;
+template struct edit_resource_command<editor_sound_resource>;
+template struct edit_resource_command<editor_light_resource>;
+
+template struct edit_node_command<editor_sprite_node>;
+template struct edit_node_command<editor_sound_node>;
+template struct edit_node_command<editor_light_node>;
+
+template struct create_node_command<editor_sprite_node>;
+template struct create_node_command<editor_sound_node>;
+template struct create_node_command<editor_light_node>;

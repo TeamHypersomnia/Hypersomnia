@@ -1,10 +1,8 @@
 #include "augs/templates/history.hpp"
+#include "application/setups/editor/editor_setup.hpp"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/string/string_templates.h"
-
-#include "application/setups/editor/commands/edit_resource_command.hpp"
-#include "application/setups/editor/commands/edit_node_command.hpp"
 
 #include "application/setups/editor/resources/editor_sound_resource.h"
 #include "application/setups/editor/resources/editor_sprite_resource.h"
