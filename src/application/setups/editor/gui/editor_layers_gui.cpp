@@ -347,6 +347,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 							create_node_command<node_type> command;
 
+							command.built_description = typesafe_sprintf("Created %x", new_name);
 							command.created_node = std::move(new_node);
 							command.layer_id = layer_id;
 							command.index_in_layer = 0;

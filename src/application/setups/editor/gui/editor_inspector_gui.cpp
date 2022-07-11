@@ -141,7 +141,20 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		return in.setup.get_last_command_index();
 	};
 
+	auto is_command_discrete = [&](const auto& description) {
+		return	
+			begins_with(description, "Disable")
+			|| begins_with(description, "Enable")
+		;
+	};
+
 	auto post_new_or_rewrite = [&]<typename T>(T&& cmd) {
+		if (is_command_discrete(cmd.describe())) {
+			in.setup.post_new_command(std::forward<T>(cmd));
+			tweaked_widget.reset();
+			return;
+		}
+
 		if (tweaked_widget.changed(get_command_index())) {
 			in.setup.post_new_command(std::forward<T>(cmd));
 			tweaked_widget.update(get_command_index());

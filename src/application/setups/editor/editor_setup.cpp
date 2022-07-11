@@ -442,7 +442,7 @@ std::string editor_setup::get_free_node_name_for(const std::string& new_name) co
 
 	return augs::first_free_string(
 		new_name + "%x",
-		" %x",
+		" (%x)",
 		is_node_name_free
 	);
 }
