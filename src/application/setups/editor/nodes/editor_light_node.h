@@ -13,6 +13,7 @@ struct editor_light_node_editable {
 struct editor_light_node {
 	editor_typed_resource_id<editor_light_resource> resource_id;
 	editor_light_node_editable editable;
+	bool visible = true;
 
 	std::string unique_name;
 	const auto& get_display_name() const {

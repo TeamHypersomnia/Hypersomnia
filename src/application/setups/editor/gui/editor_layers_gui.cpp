@@ -6,6 +6,7 @@
 
 #include "application/setups/editor/editor_filesystem.h"
 
+#include "application/setups/editor/editor_setup.hpp"
 #include "application/setups/editor/project/editor_layers.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "application/setups/editor/gui/editor_layers_gui.h"
@@ -122,6 +123,97 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	//const auto& style = ImGui::GetStyle();
 	const auto disabled_color = rgba(255, 255, 255, 110);
 
+	auto get_node_icon = [&]<typename T>(const T& node) -> std::pair<augs::atlas_entry, augs::imgui_atlas_type> {
+		if constexpr(std::is_same_v<T, editor_sprite_node>) {
+			const auto* maybe_resource = in.setup.find_resource(node.resource_id);
+
+			if (maybe_resource != nullptr) {
+				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, maybe_resource->thumbnail_id)) {
+					return { *ad_hoc, augs::imgui_atlas_type::AD_HOC };
+				}
+			}
+		}
+
+		return { in.necessary_images[assets::necessary_image_id::DEFUSING_INDICATOR], augs::imgui_atlas_type::GAME };
+	};
+
+	auto handle_node_and_id = [&]<typename T>(const T& node, const editor_node_id node_id, editor_layer& layer) {
+		const auto icon_result = get_node_icon(node);
+		const auto icon = icon_result.first;
+		const auto atlas_type = icon_result.second;
+
+		const auto label = node.get_display_name();
+
+		const float size_mult = 1.1f;
+		const auto text_h = ImGui::GetTextLineHeight();
+		const auto button_size = ImVec2(0, text_h * size_mult);
+		const int node_level = 1;
+
+		const bool node_disabled = !node.visible || !layer.visible;
+
+		{
+			const auto before_pos = ImGui::GetCursorPos();
+
+			{
+				const bool is_inspected = in.setup.is_inspected(node_id);
+
+				auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
+				auto id = scoped_id(label.c_str());
+
+				if (ImGui::Selectable("###NodeButton", is_inspected, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size)) {
+					in.setup.inspect(node_id);
+				}
+
+				if (ImGui::BeginDragDropSource()) {
+					dragged_node = node_id;
+
+					ImGui::SetDragDropPayload("editor_layer_child", nullptr, 0);
+					text(label);
+					ImGui::EndDragDropSource();
+				}
+			}
+
+			{
+				auto scope = scoped_preserve_cursor();
+
+				const float content_x_offset = max_icon_size * node_level;
+
+				const auto icon_size = vec2::square(max_icon_size);
+				const auto scaled_icon_size = vec2::scaled_to_max_size(icon.get_original_size(), max_icon_size);
+				const auto diff = (icon_size - scaled_icon_size) / 2;
+
+				ImGui::SetCursorPos(ImVec2(vec2(before_pos) + vec2(content_x_offset, 0) + diff));
+
+				const auto icon_padding = vec2(icon_size) / 1.5f;
+
+				game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
+
+				const auto image_offset = vec2(0, button_size.y / 2 - icon_size.y / 2);
+				const auto text_pos = vec2(before_pos) + image_offset + vec2(content_x_offset + icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
+				ImGui::SetCursorPos(ImVec2(text_pos));
+				text(label);
+			}
+
+			ImGui::NextColumn();
+
+			{
+				const auto visibility_icon = in.necessary_images[node.visible
+					? assets::necessary_image_id::EDITOR_ICON_VISIBLE
+					: assets::necessary_image_id::EDITOR_ICON_HIDDEN
+				];
+
+				const auto scaled_icon_size = vec2::scaled_to_max_size(visibility_icon.get_original_size(), max_icon_size);
+				const auto cols = node_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
+
+				if (game_image_button("###Visibility", visibility_icon, scaled_icon_size, cols, atlas_type)) {
+					layer.visible = !layer.visible;
+				}
+			}
+
+			ImGui::NextColumn();
+		}
+	};
+
 	{
 		//auto child = scoped_child("hierarchy view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 
@@ -148,7 +240,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			const auto label = layer.name;
 
 			using namespace augs::imgui;
-			augs::atlas_entry icon;
 
 			if (filter.IsActive()) {
 				if (!layer.passed_filter) {
@@ -158,14 +249,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 			auto atlas_type = augs::imgui_atlas_type::GAME;
 
-			const auto visibility_icon = layer.visible
-				? assets::necessary_image_id::EDITOR_ICON_VISIBLE
-				: assets::necessary_image_id::EDITOR_ICON_HIDDEN
-			;
-
 			const auto node_label = typesafe_sprintf("%x###HierarchyButton", layer.name);
-
-			icon = in.necessary_images[visibility_icon];
 
 			{
 				const bool is_inspected = in.setup.is_inspected(layer_id);
@@ -187,7 +271,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 
 				if (const auto node = scoped_tree_node_ex(node_label.c_str(), flags)) {
-
+					for (const auto& node_id : layer.hierarchy.nodes) {
+						in.setup.on_node(node_id, [&](auto& typed_node, const auto typed_node_id) {
+							(void)typed_node_id;
+							handle_node_and_id(typed_node, node_id, layer);
+						});
+					}
 				}
 
 				if (was_disabled) {
@@ -223,10 +312,15 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			ImGui::NextColumn();
 
 			{
-				const auto scaled_icon_size = vec2::scaled_to_max_size(icon.get_original_size(), max_icon_size);
+				const auto visibility_icon = in.necessary_images[layer.visible
+					? assets::necessary_image_id::EDITOR_ICON_VISIBLE
+					: assets::necessary_image_id::EDITOR_ICON_HIDDEN
+				];
+
+				const auto scaled_icon_size = vec2::scaled_to_max_size(visibility_icon.get_original_size(), max_icon_size);
 				const auto cols = was_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
 
-				if (game_image_button("###Visibility", icon, scaled_icon_size, cols, atlas_type)) {
+				if (game_image_button("###Visibility", visibility_icon, scaled_icon_size, cols, atlas_type)) {
 					layer.visible = !layer.visible;
 				}
 			}

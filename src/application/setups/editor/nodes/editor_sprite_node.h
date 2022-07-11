@@ -17,6 +17,7 @@ struct editor_sprite_node_editable {
 struct editor_sprite_node {
 	editor_typed_resource_id<editor_sprite_resource> resource_id;
 	editor_sprite_node_editable editable;
+	bool visible = true;
 
 	std::string unique_name;
 	const auto& get_display_name() const {

@@ -13,6 +13,7 @@ struct editor_sound_node_editable {
 struct editor_sound_node {
 	editor_typed_resource_id<editor_sound_resource> resource_id;
 	editor_sound_node_editable editable;
+	bool visible = true;
 
 	std::string unique_name;
 	const auto& get_display_name() const {

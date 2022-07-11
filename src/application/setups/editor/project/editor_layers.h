@@ -5,8 +5,6 @@
 #include "augs/misc/pool/pool.h"
 
 struct editor_layer_hierarchy {
-	static constexpr bool json_ignore = true;
-
 	// GEN INTROSPECTOR struct editor_layer_hierarchy
 	std::vector<editor_node_id> nodes;
 	// END GEN INTROSPECTOR

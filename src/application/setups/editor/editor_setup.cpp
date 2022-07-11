@@ -116,6 +116,20 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 
 		ad_hoc_atlas_subjects new_subjects;
 		files.fill_thumbnail_entries(paths.project_folder, new_subjects);
+		files.root.for_each_file_recursive(
+			[&](const auto& file_node) {
+				on_resource(
+					file_node.associated_resource,
+					[&]<typename T>(T& typed_resource, const auto resource_id) {
+						(void)resource_id;
+
+						if constexpr(std::is_same_v<T, editor_sprite_resource>) {
+							typed_resource.thumbnail_id = file_node.file_thumbnail_id;
+						}
+					}
+				);
+			}
+		);
 
 		if (new_subjects == last_ad_hoc_subjects) {
 			return std::nullopt;
