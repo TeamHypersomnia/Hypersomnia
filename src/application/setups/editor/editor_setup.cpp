@@ -327,15 +327,19 @@ bool editor_setup::exists(const editor_resource_id& id) const {
 }
 
 void editor_setup::inspect(inspected_variant new_inspected) {
-	gui.inspector.inspect(new_inspected);
+	gui.inspector.inspect(new_inspected, wants_multiple_selection());
+}
+
+void editor_setup::inspect_only(inspected_variant new_inspected) {
+	gui.inspector.inspect(new_inspected, false);
 }
 
 bool editor_setup::is_inspected(inspected_variant inspected) const {
-	return gui.inspector.currently_inspected == inspected;
+	return found_in(gui.inspector.all_inspected, inspected);
 }
 
-inspected_variant editor_setup::get_inspected() const {
-	return gui.inspector.currently_inspected;
+std::vector<inspected_variant> editor_setup::get_all_inspected() const {
+	return gui.inspector.all_inspected;
 }
 
 editor_command_input editor_setup::make_command_input() {
@@ -459,6 +463,10 @@ void editor_setup::create_new_layer(const std::string& name_pattern) {
 	cmd.built_description = "Create " + first_free_name;
 
 	post_new_command(cmd);
+}
+
+bool editor_setup::wants_multiple_selection() const {
+	return ImGui::GetIO().KeyCtrl;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

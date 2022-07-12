@@ -9,7 +9,7 @@ void edit_node_command<T>::undo(editor_command_input in) {
 		after = node->editable;
 		node->editable = before;
 
-		in.setup.inspect(editor_node_id(node_id));
+		in.setup.inspect_only(editor_node_id(node_id));
 	}
 }
 
@@ -19,6 +19,6 @@ void edit_node_command<T>::redo(editor_command_input in) {
 		before = node->editable;
 		node->editable = after;
 
-		in.setup.inspect(editor_node_id(node_id));
+		in.setup.inspect_only(editor_node_id(node_id));
 	}
 }

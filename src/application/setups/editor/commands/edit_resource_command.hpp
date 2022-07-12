@@ -9,7 +9,7 @@ void edit_resource_command<T>::undo(editor_command_input in) {
 		after = resource->editable;
 		resource->editable = before;
 
-		in.setup.inspect(editor_resource_id(resource_id));
+		in.setup.inspect_only(editor_resource_id(resource_id));
 	}
 }
 
@@ -19,6 +19,6 @@ void edit_resource_command<T>::redo(editor_command_input in) {
 		before = resource->editable;
 		resource->editable = after;
 
-		in.setup.inspect(editor_resource_id(resource_id));
+		in.setup.inspect_only(editor_resource_id(resource_id));
 	}
 }

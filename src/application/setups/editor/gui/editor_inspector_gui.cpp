@@ -115,13 +115,30 @@ std::string perform_editable_gui(editor_sound_resource_editable&) {
 	return result;
 }
 
-void editor_inspector_gui::inspect(inspected_variant inspected) {
-	if (currently_inspected == inspected) {
-		return;
-	}
-
-	currently_inspected = std::move(inspected);
+void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants_multiple) {
 	tweaked_widget.reset();
+
+	auto different_found = [&]<typename T>(const T&) {
+		return inspects_any_different_than<T>();
+	};
+
+	const bool different_type_found = std::visit(different_found, inspected);
+
+	if (wants_multiple) {
+		if (different_type_found) {
+			return;
+		}
+
+		if (found_in(all_inspected, inspected)) {
+			erase_element(all_inspected, inspected);
+		}
+		else {
+			all_inspected.push_back(inspected);
+		}
+	}
+	else {
+		all_inspected = { inspected };
+	}
 }
 
 void editor_inspector_gui::perform(const editor_inspector_input in) {
@@ -134,6 +151,41 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	if (!window) {
 		return;
 	}
+
+	auto get_object_name = [&]<typename T>(const T& inspected_id) {
+		std::string found_name;
+
+		auto name_getter = [&found_name](const auto& object, const auto) {
+			found_name = object.get_display_name();
+		};
+
+		if constexpr(std::is_same_v<T, editor_node_id>) {
+			in.setup.on_node(inspected_id, name_getter);
+		}
+		else if constexpr(std::is_same_v<T, editor_resource_id>) {
+			in.setup.on_resource(inspected_id, name_getter);
+		}
+		else {
+			static_assert("Non-exhaustive handler");
+		}
+
+		(void)inspected_id;
+		return found_name;
+	};
+
+	auto get_object_type_name = [&]<typename T>(const T&) {
+		if constexpr(std::is_same_v<T, editor_node_id>) {
+			return "nodes";
+		}
+		else if constexpr(std::is_same_v<T, editor_resource_id>) {
+			return "resources";
+		}
+		else {
+			static_assert("Non-exhaustive handler");
+		}
+
+		return "objects";
+	};
 
 	auto get_command_index = [&]() {
 		return in.setup.get_last_command_index();
@@ -224,7 +276,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		(void)node;
 	};
 
-	auto handler = [&]<typename T>(const T& inspected_id) {
+	auto edit_properties = [&]<typename T>(const T& inspected_id) {
 		if constexpr(std::is_same_v<T, editor_node_id>) {
 			in.setup.on_node(inspected_id, node_handler);
 		}
@@ -238,5 +290,23 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		(void)inspected_id;
 	};
 
-	std::visit(handler, currently_inspected);
+	if (all_inspected.size() == 0) {
+
+	}
+	else if (all_inspected.size() == 1) {
+		std::visit(edit_properties, all_inspected[0]);
+	}
+	else {
+		text_color(typesafe_sprintf("Selected %x %x:", all_inspected.size(), std::visit(get_object_type_name, all_inspected[0])), yellow);
+
+		ImGui::Separator();
+
+		for (const auto& a : all_inspected) {
+			const auto name = std::visit(get_object_name, a);
+
+			if (name.size() > 0) {
+				text(name);
+			}
+		}
+	}
 }

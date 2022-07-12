@@ -39,9 +39,31 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	editor_tweaked_widget_tracker tweaked_widget;
 
-	inspected_variant currently_inspected;
+	template <class T>
+	bool inspects_any() const {
+		for (const auto& inspected : all_inspected) {
+			if (std::get_if<T>(std::addressof(inspected)) != nullptr) {
+				return true;
+			}
+		}
 
-	void inspect(inspected_variant);
+		return false;
+	}
+
+	template <class T>
+	bool inspects_any_different_than() const {
+		for (const auto& inspected : all_inspected) {
+			if (std::get_if<T>(std::addressof(inspected)) == nullptr) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	std::vector<inspected_variant> all_inspected;
+
+	void inspect(inspected_variant, bool wants_multiple);
 	void perform(editor_inspector_input);
 };
 

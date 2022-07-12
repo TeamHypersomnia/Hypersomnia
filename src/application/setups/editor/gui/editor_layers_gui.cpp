@@ -44,14 +44,9 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	const auto max_icon_size = ImGui::GetTextLineHeight();
 
-	const auto now_inspected = in.setup.get_inspected();
-	const auto inspected_node = std::get_if<editor_node_id>(std::addressof(now_inspected));
-	const auto inspected_layer = std::get_if<editor_layer_id>(std::addressof(now_inspected));
-	(void)inspected_node;
-
 	const bool node_or_layer_inspected = 
-		in.setup.get_inspected() != inspected_variant() 
-		&& (inspected_node != nullptr || inspected_layer != nullptr)
+		in.setup.inspects_any<editor_node_id>()
+		|| in.setup.inspects_any<editor_layer_id>()
 	;
 
 	thread_local ImGuiTextFilter filter;

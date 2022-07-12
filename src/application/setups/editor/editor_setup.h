@@ -156,6 +156,7 @@ public:
 	bool exists(const editor_resource_id&) const;
 
 	void seek_to_revision(editor_history::index_type);
+	bool wants_multiple_selection() const;
 
 	template <class T>
 	decltype(auto) post_new_command(T&&);
@@ -164,8 +165,15 @@ public:
 	decltype(auto) rewrite_last_command(T&&);
 
 	void inspect(inspected_variant);
+	void inspect_only(inspected_variant);
+
+	template <class T>
+	bool inspects_any() const {
+		return gui.inspector.template inspects_any<T>();
+	}
+
 	bool is_inspected(inspected_variant) const;
-	inspected_variant get_inspected() const;
+	std::vector<inspected_variant> get_all_inspected() const;
 
 	editor_history::index_type get_last_command_index() const;
 
