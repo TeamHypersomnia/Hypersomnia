@@ -161,7 +161,44 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	int node_id_counter = 0;
 
-	auto handle_node_and_id = [&]<typename T>(T& node, const editor_node_id node_id, editor_layer& layer) {
+	auto create_dragged_resource_in = [&](const auto layer_id, const auto index) {
+		if (in.dragged_resource != nullptr) {
+			auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
+				const auto resource_name = typed_resource.get_display_name();
+				const auto new_name = in.setup.get_free_node_name_for(resource_name);
+
+				using node_type = typename T::node_type;
+
+				node_type new_node;
+				new_node.resource_id = resource_id;
+				new_node.unique_name = new_name;
+
+				create_node_command<node_type> command;
+
+				command.built_description = typesafe_sprintf("Created %x", new_name);
+				command.created_node = std::move(new_node);
+				command.layer_id = layer_id;
+				command.index_in_layer = index;
+
+				in.setup.post_new_command(command);
+			};
+
+			in.setup.on_resource(
+				in.dragged_resource->associated_resource,
+				instantiate
+			);
+
+			in.dragged_resource = nullptr;
+		}
+	};
+
+	auto handle_node_and_id = [&]<typename T>(
+		const std::size_t node_index, 
+		T& node, 
+		const editor_node_id node_id, 
+		editor_layer& layer, 
+		editor_layer_id layer_id
+	) {
 		auto id_scope = scoped_id(node_id_counter++);
 
 		const auto icon_result = get_node_icon(node);
@@ -200,6 +237,14 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					ImGui::SetDragDropPayload("dragged_node", nullptr, 0);
 					text(label);
 					ImGui::EndDragDropSource();
+				}
+
+				if (ImGui::BeginDragDropTarget()) {
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
+						create_dragged_resource_in(layer_id, node_index);
+					}
+
+					ImGui::EndDragDropTarget();
 				}
 			}
 
@@ -334,34 +379,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
-					if (in.dragged_resource != nullptr) {
-						auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
-							const auto resource_name = typed_resource.get_display_name();
-							const auto new_name = in.setup.get_free_node_name_for(resource_name);
-
-							using node_type = typename T::node_type;
-
-							node_type new_node;
-							new_node.resource_id = resource_id;
-							new_node.unique_name = new_name;
-
-							create_node_command<node_type> command;
-
-							command.built_description = typesafe_sprintf("Created %x", new_name);
-							command.created_node = std::move(new_node);
-							command.layer_id = layer_id;
-							command.index_in_layer = 0;
-
-							in.setup.post_new_command(command);
-						};
-
-						in.setup.on_resource(
-							in.dragged_resource->associated_resource,
-							instantiate
-						);
-
-						in.dragged_resource = nullptr;
-					}
+					create_dragged_resource_in(layer_id, 0);
 				}
 
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
@@ -390,10 +408,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			ImGui::NextColumn();
 
 			if (tree_node_open) {
-				for (const auto& node_id : layer.hierarchy.nodes) {
+				for (std::size_t i = 0; i < layer.hierarchy.nodes.size(); ++i) {
+					const auto node_id = layer.hierarchy.nodes[i];
+
 					in.setup.on_node(node_id, [&](auto& typed_node, const auto typed_node_id) {
 						(void)typed_node_id;
-						handle_node_and_id(typed_node, node_id, layer);
+						handle_node_and_id(i, typed_node, node_id, layer, layer_id);
 					});
 				}
 			}
