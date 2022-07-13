@@ -24,6 +24,7 @@
 #include "application/setups/editor/commands/edit_node_command.hpp"
 #include "application/setups/editor/commands/edit_resource_command.hpp"
 #include "application/setups/editor/commands/create_node_command.hpp"
+#include "application/setups/editor/commands/reorder_nodes_command.hpp"
 
 #include "application/setups/editor/editor_setup.hpp"
 
@@ -411,6 +412,10 @@ editor_layer* editor_setup::find_layer(const editor_layer_id& id) {
 	return project.layers.pool.find(id);
 }
 
+const editor_layer* editor_setup::find_layer(const editor_layer_id& id) const {
+	return project.layers.pool.find(id);
+}
+
 editor_layer* editor_setup::find_layer(const std::string& name) {
 	for (auto& layer : project.layers.pool) {
 		if (layer.name == name) {
@@ -467,6 +472,43 @@ void editor_setup::create_new_layer(const std::string& name_pattern) {
 
 bool editor_setup::wants_multiple_selection() const {
 	return ImGui::GetIO().KeyCtrl;
+}
+
+editor_layer_id editor_setup::find_parent_layer(const editor_node_id node_id) const {
+	for (const auto layer_id : project.layers.order) {
+		if (const auto layer = find_layer(layer_id)) {
+			if (found_in(layer->hierarchy.nodes, node_id)) {
+				return layer_id;
+			}
+		}
+	}
+
+	return editor_layer_id();
+}
+
+std::string editor_setup::get_name(inspected_variant v) const {
+	auto get_object_name = [&]<typename T>(const T& inspected_id) {
+		std::string found_name;
+
+		auto name_getter = [&found_name](const auto& object, const auto) {
+			found_name = object.get_display_name();
+		};
+
+		if constexpr(std::is_same_v<T, editor_node_id>) {
+			on_node(inspected_id, name_getter);
+		}
+		else if constexpr(std::is_same_v<T, editor_resource_id>) {
+			on_resource(inspected_id, name_getter);
+		}
+		else {
+			static_assert("Non-exhaustive handler");
+		}
+
+		(void)inspected_id;
+		return found_name;
+	};
+
+	return std::visit(get_object_name, v);
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

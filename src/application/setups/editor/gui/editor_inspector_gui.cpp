@@ -152,27 +152,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		return;
 	}
 
-	auto get_object_name = [&]<typename T>(const T& inspected_id) {
-		std::string found_name;
-
-		auto name_getter = [&found_name](const auto& object, const auto) {
-			found_name = object.get_display_name();
-		};
-
-		if constexpr(std::is_same_v<T, editor_node_id>) {
-			in.setup.on_node(inspected_id, name_getter);
-		}
-		else if constexpr(std::is_same_v<T, editor_resource_id>) {
-			in.setup.on_resource(inspected_id, name_getter);
-		}
-		else {
-			static_assert("Non-exhaustive handler");
-		}
-
-		(void)inspected_id;
-		return found_name;
-	};
-
 	auto get_object_type_name = [&]<typename T>(const T&) {
 		if constexpr(std::is_same_v<T, editor_node_id>) {
 			return "nodes";
@@ -302,7 +281,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		ImGui::Separator();
 
 		for (const auto& a : all_inspected) {
-			const auto name = std::visit(get_object_name, a);
+			const auto name = in.setup.get_name(a);
 
 			if (name.size() > 0) {
 				text(name);

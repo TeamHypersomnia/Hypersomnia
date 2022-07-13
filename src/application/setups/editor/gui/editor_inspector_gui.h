@@ -61,6 +61,19 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 		return false;
 	}
 
+	template <class T>
+	auto get_all_inspected() const {
+		std::vector<T> result;
+
+		for (const auto& inspected : all_inspected) {
+			if (const auto typed = std::get_if<T>(std::addressof(inspected))) {
+				result.push_back(*typed);
+			}
+		}
+
+		return result;
+	}
+
 	std::vector<inspected_variant> all_inspected;
 
 	void inspect(inspected_variant, bool wants_multiple);
