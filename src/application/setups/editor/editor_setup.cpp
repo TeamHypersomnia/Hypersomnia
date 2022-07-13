@@ -57,6 +57,10 @@ bool editor_setup::handle_input_before_imgui(
 ) {
 	using namespace augs::event;
 
+	if (in.e.msg == message::ldoubleclick) {
+		double_click_happened = true;
+	}
+
 	if (in.e.msg == message::activate) {
 		on_window_activate();
 	}

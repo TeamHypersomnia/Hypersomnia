@@ -18,6 +18,9 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	(void)in;
 	
+	const bool has_double_click = in.setup.double_click_happened;
+	in.setup.double_click_happened = false;
+
 	auto window = make_scoped_window();
 
 	if (dragged_node.is_set()) {
@@ -443,10 +446,11 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				if (tree_node_pressed) {
 					in.setup.inspect(layer_id);
-					if (ImGui::IsMouseDoubleClicked(0)) {
-						layer.is_open = !layer.is_open;
-					}
 				}
+
+				const bool selectable_double_clicked = ImGui::IsItemHovered() && has_double_click;
+				bool was_arrow_clicked = false;
+				bool was_arrow_hovered = false;
 
 				{
 					ImGui::SetCursorPos(before_pos);
@@ -461,12 +465,19 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 						if (ImGui::ArrowButtonEx("###IsOpen", dir, { max_icon_size, max_icon_size })) {
 							layer.is_open = !layer.is_open;
+							was_arrow_clicked = true;
 						}
+
+						was_arrow_hovered = ImGui::IsItemHovered();
 					}
 
 					ImGui::SameLine();
 
 					text(layer.unique_name);
+				}
+
+				if (selectable_double_clicked && !was_arrow_hovered && !was_arrow_clicked) {
+					layer.is_open = !layer.is_open;
 				}
 
 				if (was_disabled) {

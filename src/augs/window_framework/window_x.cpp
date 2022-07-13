@@ -509,13 +509,13 @@ namespace augs {
 					case 1:
 					   	if (press->time - last_ldown_time_ms <= 500) {
 							ch.msg = message::ldoubleclick;
+							last_ldown_time_ms = 0;
 						}
 						else {
 							ch.msg = message::keydown;
 							ch.data.key.key = key::LMOUSE;
+							last_ldown_time_ms = press->time;
 						}
-
-						last_ldown_time_ms = press->time;
 
 						return ch;
 
