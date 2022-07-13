@@ -47,5 +47,6 @@ using editor_history_base = augs::history_with_saved_revision<
 	create_node_command<editor_sound_node>,
 	create_node_command<editor_light_node>,
 
-	reorder_nodes_command
+	reorder_nodes_command,
+	reorder_layers_command
 >;

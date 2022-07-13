@@ -21,6 +21,7 @@ struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {
 	using introspect_base = base;
 
 	editor_node_id dragged_node;
+	editor_layer_id dragged_layer;
 
 	void perform(editor_layers_input);
 };

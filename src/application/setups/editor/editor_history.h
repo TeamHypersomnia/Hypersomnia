@@ -12,6 +12,7 @@
 #include "application/setups/editor/commands/create_node_command.h"
 
 #include "application/setups/editor/commands/reorder_nodes_command.h"
+#include "application/setups/editor/commands/reorder_layers_command.h"
 
 #include "application/setups/editor/editor_history_declaration.h"
 

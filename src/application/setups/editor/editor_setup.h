@@ -101,6 +101,8 @@ class editor_setup : public default_setup_settings {
 	template <class T>
 	friend struct create_node_command;
 
+	friend reorder_layers_command;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

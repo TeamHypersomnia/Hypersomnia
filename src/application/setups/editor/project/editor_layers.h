@@ -14,7 +14,7 @@ struct editor_layer {
 	// GEN INTROSPECTOR struct editor_layer
 	std::string unique_name;
 	bool visible = true;
-	bool gui_open = true;
+	bool is_open = true;
 
 	editor_layer_hierarchy hierarchy;
 	// END GEN INTROSPECTOR

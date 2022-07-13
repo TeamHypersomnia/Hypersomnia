@@ -38,6 +38,18 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		}
 	}
 
+	if (dragged_layer.is_set()) {
+		const bool payload_still_exists = [&]() {
+			const auto payload = ImGui::GetDragDropPayload();
+			return payload && payload->IsDataType("dragged_layer");
+
+		}();
+
+		if (!payload_still_exists) {
+			dragged_layer.unset();
+		}
+	}
+
 	if (!window) {
 		return;
 	}
@@ -157,59 +169,79 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	int node_id_counter = 0;
 
 	auto create_dragged_resource_in = [&](const auto layer_id, const auto index) {
-		if (in.dragged_resource != nullptr) {
-			auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
-				const auto resource_name = typed_resource.get_display_name();
-				const auto new_name = in.setup.get_free_node_name_for(resource_name);
-
-				using node_type = typename T::node_type;
-
-				node_type new_node;
-				new_node.resource_id = resource_id;
-				new_node.unique_name = new_name;
-
-				create_node_command<node_type> command;
-
-				command.built_description = typesafe_sprintf("Created %x", new_name);
-				command.created_node = std::move(new_node);
-				command.layer_id = layer_id;
-				command.index_in_layer = index;
-
-				in.setup.post_new_command(command);
-			};
-
-			in.setup.on_resource(
-				in.dragged_resource->associated_resource,
-				instantiate
-			);
-
-			in.dragged_resource = nullptr;
+		if (in.dragged_resource == nullptr) {
+			return;
 		}
+
+		auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
+			const auto resource_name = typed_resource.get_display_name();
+			const auto new_name = in.setup.get_free_node_name_for(resource_name);
+
+			using node_type = typename T::node_type;
+
+			node_type new_node;
+			new_node.resource_id = resource_id;
+			new_node.unique_name = new_name;
+
+			create_node_command<node_type> command;
+
+			command.built_description = typesafe_sprintf("Created %x", new_name);
+			command.created_node = std::move(new_node);
+			command.layer_id = layer_id;
+			command.index_in_layer = index;
+
+			in.setup.post_new_command(command);
+		};
+
+		in.setup.on_resource(
+			in.dragged_resource->associated_resource,
+			instantiate
+		);
+
+		in.dragged_resource = nullptr;
 	};
 
 	auto accept_dragged_nodes = [&](
 		editor_layer_id target_layer_id, 
 		const std::size_t target_index
 	) {
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
-			const auto all_inspected = in.setup.get_all_inspected<editor_node_id>();
+		const auto all_inspected = in.setup.get_all_inspected<editor_node_id>();
 
-			reorder_nodes_command command;
+		reorder_nodes_command command;
 
-			command.target_layer_id = target_layer_id;
-			command.target_index = target_index;
+		command.target_layer_id = target_layer_id;
+		command.target_index = target_index;
 
-			if (in.setup.is_inspected(dragged_node) && all_inspected.size() > 1) {
-				command.nodes_to_move = all_inspected;
-				command.built_description = typesafe_sprintf("Reordered %x nodes", all_inspected.size());
-			}
-			else {
-				command.nodes_to_move = { dragged_node };
-				command.built_description = typesafe_sprintf("Reordered %x", in.setup.get_name(dragged_node));
-			}
-
-			in.setup.post_new_command(command);
+		if (in.setup.is_inspected(dragged_node) && all_inspected.size() > 1) {
+			command.nodes_to_move = all_inspected;
+			command.built_description = typesafe_sprintf("Reordered %x nodes", all_inspected.size());
 		}
+		else {
+			command.nodes_to_move = { dragged_node };
+			command.built_description = typesafe_sprintf("Reordered %x", in.setup.get_name(dragged_node));
+		}
+
+		in.setup.post_new_command(command);
+	};
+
+	auto accept_dragged_layers = [&](
+		const std::size_t target_index
+	) {
+		const auto all_inspected = in.setup.get_all_inspected<editor_layer_id>();
+
+		reorder_layers_command command;
+		command.target_index = target_index;
+
+		if (in.setup.is_inspected(dragged_layer) && all_inspected.size() > 1) {
+			command.layers_to_move = all_inspected;
+			command.built_description = typesafe_sprintf("Reordered %x layers", all_inspected.size());
+		}
+		else {
+			command.layers_to_move = { dragged_layer };
+			command.built_description = typesafe_sprintf("Reordered %x", in.setup.get_name(dragged_layer));
+		}
+
+		in.setup.post_new_command(command);
 	};
 
 	auto handle_node_and_id = [&]<typename T>(
@@ -264,7 +296,9 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 						create_dragged_resource_in(layer_id, node_index);
 					}
 
-					accept_dragged_nodes(layer_id, node_index);
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
+						accept_dragged_nodes(layer_id, node_index);
+					}
 
 					ImGui::EndDragDropTarget();
 				}
@@ -328,7 +362,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, avail - max_icon_size);
 
-		for (const auto layer_id : layers.order) {
+		for (const auto& layer_id : layers.order) {
 			auto* maybe_layer = in.setup.find_layer(layer_id);
 
 			if (maybe_layer == nullptr) {
@@ -349,64 +383,79 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 			}
 
-			bool tree_node_open = false;
-
-			const auto node_label = typesafe_sprintf("%x###HierarchyButton", layer.unique_name);
-
 			{
 				const bool is_inspected = in.setup.is_inspected(layer_id);
 
 				auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
 
-				auto flags = 
-					ImGuiTreeNodeFlags_OpenOnDoubleClick
-					| ImGuiTreeNodeFlags_OpenOnArrow
-					| ImGuiTreeNodeFlags_SpanAvailWidth
-					| ImGuiTreeNodeFlags_DefaultOpen
-				;
-
-				if (is_inspected) {
-					flags |= ImGuiTreeNodeFlags_Selected;
-				}
-
 				if (was_disabled) {
 					ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
 				}
 
-				tree_node_open = bool(scoped_tree_node_ex(node_label.c_str(), flags));
+				const auto before_pos = ImGui::GetCursorPos();
 
-				if (was_disabled) {
-					ImGui::PopStyleColor();
-				}
+				const auto flags = 
+					ImGuiSelectableFlags_AllowDoubleClick | 
+					ImGuiSelectableFlags_AllowItemOverlap
+				;
 
-				if (ImGui::IsItemClicked()) {
-					in.setup.inspect(layer_id);
-
-					if (ImGui::IsMouseDoubleClicked(0)) {
-						//layer.gui_open = !layer.gui_open;
-					}
-				}
+				const bool tree_node_pressed = ImGui::Selectable("###HierarchyButton", is_inspected, flags);
 
 				if (ImGui::BeginDragDropSource()) {
+					dragged_layer = layer_id;
+
 					ImGui::SetDragDropPayload("dragged_layer", nullptr, 0);
 					text(label);
 					ImGui::EndDragDropSource();
 				}
 
-			}
+				if (ImGui::BeginDragDropTarget()) {
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
+						create_dragged_resource_in(layer_id, 0);
+					}
 
-			if (ImGui::BeginDragDropTarget()) {
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_layer")) {
-					LOG("Dropped %x on layer", "layer");
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_layer")) {
+						accept_dragged_layers(index_in(layers.order, layer_id));
+					}
+
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
+						accept_dragged_nodes(layer_id, 0);
+					}
+
+					ImGui::EndDragDropTarget();
 				}
 
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
-					create_dragged_resource_in(layer_id, 0);
+				if (tree_node_pressed) {
+					in.setup.inspect(layer_id);
+					if (ImGui::IsMouseDoubleClicked(0)) {
+						layer.is_open = !layer.is_open;
+					}
 				}
 
-				accept_dragged_nodes(layer_id, 0);
+				{
+					ImGui::SetCursorPos(before_pos);
 
-				ImGui::EndDragDropTarget();
+					const auto dir = layer.is_open ? ImGuiDir_Down : ImGuiDir_Right;
+
+					const bool layer_is_empty = layer.hierarchy.nodes.empty();
+
+					{
+						auto col = scoped_style_color(ImGuiCol_Button, rgba(0, 0, 0, 0));
+						auto col2 = cond_scoped_style_color(layer_is_empty, ImGuiCol_Text, rgba(255, 255, 255, 60));
+
+						if (ImGui::ArrowButtonEx("###IsOpen", dir, { max_icon_size, max_icon_size })) {
+							layer.is_open = !layer.is_open;
+						}
+					}
+
+					ImGui::SameLine();
+
+					text(layer.unique_name);
+				}
+
+				if (was_disabled) {
+					ImGui::PopStyleColor();
+				}
 			}
 
 			ImGui::NextColumn();
@@ -427,7 +476,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 			ImGui::NextColumn();
 
-			if (tree_node_open) {
+			if (layer.is_open) {
 				for (std::size_t i = 0; i < layer.hierarchy.nodes.size(); ++i) {
 					const auto node_id = layer.hierarchy.nodes[i];
 

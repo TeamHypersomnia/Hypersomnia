@@ -38,9 +38,7 @@ void reorder_nodes_command::redo(editor_command_input in) {
 	auto target_layer = in.setup.find_layer(target_layer_id);
 	ensure(target_layer != nullptr);
 
-	for (const auto node_id : reverse(original_move_order)) {
-		auto& nodes = target_layer->hierarchy.nodes;
-
-		nodes.insert(nodes.begin() + target_index, node_id);
-	}
+	auto& nodes = target_layer->hierarchy.nodes;
+	const auto begin_index = std::clamp(target_index, std::size_t(0), nodes.size());
+	nodes.insert(nodes.begin() + begin_index, original_move_order.begin(), original_move_order.end());
 }
