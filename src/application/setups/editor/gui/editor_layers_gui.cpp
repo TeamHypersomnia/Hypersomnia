@@ -338,7 +338,20 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const auto cols = node_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
 
 				if (game_image_button("###NodeVisibility", visibility_icon, scaled_icon_size, cols, augs::imgui_atlas_type::GAME)) {
-					node.visible = !node.visible;
+					const bool next_value = !node.visible;
+
+					if (in.setup.is_inspected(node_id)) {
+						const auto all_inspected = in.setup.get_all_inspected<editor_node_id>();
+
+						for (const auto& node_id : all_inspected) {
+							in.setup.on_node(
+								node_id, 
+								[&](auto& node, const auto) { node.visible = next_value; }
+							);
+						}
+					}
+
+					node.visible = next_value;
 				}
 			}
 
@@ -412,6 +425,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				if (ImGui::BeginDragDropTarget()) {
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
 						create_dragged_resource_in(layer_id, 0);
+						layer.is_open = true;
 					}
 
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_layer")) {
@@ -420,6 +434,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
 						accept_dragged_nodes(layer_id, 0);
+						layer.is_open = true;
 					}
 
 					ImGui::EndDragDropTarget();
@@ -470,7 +485,19 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const auto cols = was_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
 
 				if (game_image_button("###Visibility", visibility_icon, scaled_icon_size, cols, augs::imgui_atlas_type::GAME)) {
-					layer.visible = !layer.visible;
+					const bool next_value = !layer.visible;
+
+					if (in.setup.is_inspected(layer_id)) {
+						const auto all_inspected = in.setup.get_all_inspected<editor_layer_id>();
+
+						for (const auto& layer_id : all_inspected) {
+							if (auto layer = in.setup.find_layer(layer_id)) {
+								layer->visible = next_value;
+							}
+						}
+					}
+
+					layer.visible = next_value;
 				}
 			}
 

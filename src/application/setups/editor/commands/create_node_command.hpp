@@ -32,4 +32,7 @@ void create_node_command<T>::redo(editor_command_input in) {
 
 	auto& nodes = layer->hierarchy.nodes;
 	nodes.insert(nodes.begin() + index_in_layer, node_id);
+
+	in.setup.inspect_only(node_id);
+	layer->is_open = true;
 }
