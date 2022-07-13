@@ -8,7 +8,6 @@
 struct reorder_nodes_command {
 	editor_command_meta meta;
 
-	editor_layer_id source_layer_id;
 	editor_layer_id target_layer_id;
 
 	std::size_t target_index = 0;
@@ -24,6 +23,5 @@ struct reorder_nodes_command {
 	}
 
 private:
-	std::vector<editor_node_id> original_order_in_source;
-	std::vector<editor_node_id> original_order_in_target;
+	std::unordered_map<editor_layer_id, std::vector<editor_node_id>> original_orders;
 };

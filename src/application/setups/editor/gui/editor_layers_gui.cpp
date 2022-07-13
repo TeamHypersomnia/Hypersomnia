@@ -187,6 +187,31 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		}
 	};
 
+	auto accept_dragged_nodes = [&](
+		editor_layer_id target_layer_id, 
+		const std::size_t target_index
+	) {
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
+			const auto all_inspected = in.setup.get_all_inspected<editor_node_id>();
+
+			reorder_nodes_command command;
+
+			command.target_layer_id = target_layer_id;
+			command.target_index = target_index;
+
+			if (in.setup.is_inspected(dragged_node) && all_inspected.size() > 1) {
+				command.nodes_to_move = all_inspected;
+				command.built_description = typesafe_sprintf("Reordered %x nodes", all_inspected.size());
+			}
+			else {
+				command.nodes_to_move = { dragged_node };
+				command.built_description = typesafe_sprintf("Reordered %x", in.setup.get_name(dragged_node));
+			}
+
+			in.setup.post_new_command(command);
+		}
+	};
+
 	auto handle_node_and_id = [&]<typename T>(
 		const std::size_t node_index, 
 		T& node, 
@@ -238,6 +263,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
 						create_dragged_resource_in(layer_id, node_index);
 					}
+
+					accept_dragged_nodes(layer_id, node_index);
 
 					ImGui::EndDragDropTarget();
 				}
@@ -377,28 +404,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					create_dragged_resource_in(layer_id, 0);
 				}
 
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
-					const auto all_inspected = in.setup.get_all_inspected<editor_node_id>();
-
-					reorder_nodes_command command;
-
-					command.source_layer_id = in.setup.find_parent_layer(dragged_node);
-					command.target_layer_id = layer_id;
-					command.target_index = 0;
-
-					if (in.setup.is_inspected(dragged_node) && all_inspected.size() > 1) {
-						command.nodes_to_move = all_inspected;
-						command.built_description = typesafe_sprintf("Reordered %x nodes", all_inspected.size());
-					}
-					else {
-						command.nodes_to_move = { dragged_node };
-						command.built_description = typesafe_sprintf("Reordered %x", in.setup.get_name(dragged_node));
-					}
-
-					ensure(command.source_layer_id.is_set());
-
-					in.setup.post_new_command(command);
-				}
+				accept_dragged_nodes(layer_id, 0);
 
 				ImGui::EndDragDropTarget();
 			}

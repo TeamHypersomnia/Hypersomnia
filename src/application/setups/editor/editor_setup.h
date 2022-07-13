@@ -124,6 +124,10 @@ public:
 
 	editor_layer_id find_parent_layer(editor_node_id id) const;
 
+	const std::vector<editor_layer_id>& get_layers() const {
+		return project.layers.order;
+	}
+
 	editor_layer* find_layer(const editor_layer_id& id);
 	const editor_layer* find_layer(const editor_layer_id& id) const;
 
