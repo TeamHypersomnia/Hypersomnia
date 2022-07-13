@@ -120,7 +120,8 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
 			auto id = scoped_id(label.c_str());
 
-			result = ImGui::Selectable("###Button", is_inspected, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size);
+			ImGui::Selectable("###Button", is_inspected, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size);
+			result = ImGui::IsItemClicked();
 
 			if (node.is_resource()) {
 				if (ImGui::BeginDragDropSource())

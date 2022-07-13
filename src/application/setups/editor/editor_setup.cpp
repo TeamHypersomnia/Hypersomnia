@@ -418,7 +418,7 @@ const editor_layer* editor_setup::find_layer(const editor_layer_id& id) const {
 
 editor_layer* editor_setup::find_layer(const std::string& name) {
 	for (auto& layer : project.layers.pool) {
-		if (layer.name == name) {
+		if (layer.unique_name == name) {
 			return std::addressof(layer);
 		}
 	}
@@ -500,8 +500,10 @@ std::string editor_setup::get_name(inspected_variant v) const {
 		else if constexpr(std::is_same_v<T, editor_resource_id>) {
 			on_resource(inspected_id, name_getter);
 		}
-		else {
-			static_assert("Non-exhaustive handler");
+		else if constexpr(std::is_same_v<T, editor_layer_id>) {
+			if (const auto layer = find_layer(inspected_id)) {
+				found_name = layer->get_display_name();
+			}
 		}
 
 		(void)inspected_id;

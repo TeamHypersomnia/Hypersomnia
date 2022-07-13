@@ -116,8 +116,6 @@ std::string perform_editable_gui(editor_sound_resource_editable&) {
 }
 
 void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants_multiple) {
-	tweaked_widget.reset();
-
 	auto different_found = [&]<typename T>(const T&) {
 		return inspects_any_different_than<T>();
 	};
@@ -137,7 +135,20 @@ void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants
 		}
 	}
 	else {
-		all_inspected = { inspected };
+		const bool not_the_same = all_inspected != decltype(all_inspected) { inspected };
+
+		if (not_the_same) {
+			all_inspected = { inspected };
+
+			/*
+				Commands will invoke "inspect" on undo/redo,
+				even when executing them for the first time - directly by user interaction.
+
+				This is why we need to prevent the tweaked widget from being reset if the inspected object does not change,
+				because otherwise continuous commands wouldn't work.
+			*/
+			tweaked_widget.reset();
+		}
 	}
 }
 
@@ -159,8 +170,11 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		else if constexpr(std::is_same_v<T, editor_resource_id>) {
 			return "resources";
 		}
+		else if constexpr(std::is_same_v<T, editor_layer_id>) {
+			return "layers";
+		}
 		else {
-			static_assert("Non-exhaustive handler");
+			static_assert(always_false_v<T>, "Non-exhaustive handler");
 		}
 
 		return "objects";
@@ -262,8 +276,11 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		else if constexpr(std::is_same_v<T, editor_resource_id>) {
 			in.setup.on_resource(inspected_id, resource_handler);
 		}
+		else if constexpr(std::is_same_v<T, editor_layer_id>) {
+
+		}
 		else {
-			static_assert("Non-exhaustive handler");
+			static_assert(always_false_v<T>, "Non-exhaustive handler");
 		}
 
 		(void)inspected_id;

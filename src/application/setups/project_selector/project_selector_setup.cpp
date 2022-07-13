@@ -681,7 +681,7 @@ bool project_selector_setup::create_new_project_files() {
 
 		{
 			editor_layer default_layer;
-			default_layer.name = "Default layer";
+			default_layer.unique_name = "Default layer";
 
 			default_project.layers.order.push_back(default_project.layers.pool.allocate(default_layer).key);
 		}

@@ -339,7 +339,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			const bool was_disabled = !layer.visible;
 
 			auto id_scope = scoped_id(id_counter++);
-			const auto label = layer.name;
+			const auto label = layer.unique_name;
 
 			using namespace augs::imgui;
 
@@ -351,7 +351,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 			bool tree_node_open = false;
 
-			const auto node_label = typesafe_sprintf("%x###HierarchyButton", layer.name);
+			const auto node_label = typesafe_sprintf("%x###HierarchyButton", layer.unique_name);
 
 			{
 				const bool is_inspected = in.setup.is_inspected(layer_id);

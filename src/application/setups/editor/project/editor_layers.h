@@ -12,12 +12,16 @@ struct editor_layer_hierarchy {
 
 struct editor_layer {
 	// GEN INTROSPECTOR struct editor_layer
-	std::string name;
+	std::string unique_name;
 	bool visible = true;
 	bool gui_open = true;
 
 	editor_layer_hierarchy hierarchy;
 	// END GEN INTROSPECTOR
+
+	const auto& get_display_name() const {
+		return unique_name;
+	}
 
 	bool passed_filter = false;
 };
@@ -35,7 +39,7 @@ struct editor_layers {
 		std::unordered_map<std::string, editor_layer*> out;
 
 		for (auto& layer : pool) {
-			out[layer.name] = std::addressof(layer);
+			out[layer.unique_name] = std::addressof(layer);
 		}
 
 		return out;

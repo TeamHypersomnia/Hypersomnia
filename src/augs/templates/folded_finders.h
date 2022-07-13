@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include "augs/templates/always_false.h"
 
 template <class...>
 struct type_list;
@@ -40,7 +41,7 @@ struct index_in_list;
 
 template <std::size_t i, class Candidate, template <class...> class List>
 struct index_in_list<i, Candidate, List<>> {
-	static_assert("Type was not found via index_in_list.");
+	static_assert(always_false_v<Candidate>, "Type was not found via index_in_list.");
 };
 
 template <std::size_t i, class Candidate, template <class...> class List, class T, class... Types>
