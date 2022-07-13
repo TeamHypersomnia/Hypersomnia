@@ -407,9 +407,10 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				const auto before_pos = ImGui::GetCursorPos();
 
-				const auto flags = 
-					ImGuiSelectableFlags_AllowDoubleClick | 
-					ImGuiSelectableFlags_AllowItemOverlap
+				auto flags = 
+					layer.empty() ?
+					ImGuiSelectableFlags_AllowDoubleClick :
+					ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap
 				;
 
 				const bool tree_node_pressed = ImGui::Selectable("###HierarchyButton", is_inspected, flags);
@@ -450,7 +451,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				{
 					ImGui::SetCursorPos(before_pos);
 
-					const auto dir = layer.is_open ? ImGuiDir_Down : ImGuiDir_Right;
+					const auto dir = (layer.is_open || layer.empty()) ? ImGuiDir_Down : ImGuiDir_Right;
 
 					const bool layer_is_empty = layer.hierarchy.nodes.empty();
 

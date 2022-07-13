@@ -13,5 +13,7 @@ void create_layer_command::redo(editor_command_input in) {
 	auto& new_layer = base::redo(layers.pool);
 	new_layer.unique_name = chosen_name;
 
-	layers.order.insert(layers.order.begin(), base::get_allocated_id());
+	const auto new_id = base::get_allocated_id();
+	layers.order.insert(layers.order.begin(), new_id);
+	in.setup.inspect_only(new_id);
 }

@@ -23,6 +23,10 @@ struct editor_layer {
 		return unique_name;
 	}
 
+	bool empty() const {
+		return hierarchy.nodes.empty();
+	}
+
 	bool passed_filter = false;
 };
 

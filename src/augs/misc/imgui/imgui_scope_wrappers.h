@@ -300,6 +300,14 @@ namespace augs {
 			);
 		}
 
+		inline auto scoped_button_colors(const std::array<rgba, 3>& colors) {
+			return std::make_tuple(
+				scoped_style_color(ImGuiCol_Button, colors[0]),
+				scoped_style_color(ImGuiCol_ButtonHovered, colors[1]),
+				scoped_style_color(ImGuiCol_ButtonActive, colors[2])
+			);
+		}
+
 		inline auto scoped_preserve_cursor() {
 			const auto before_pos = ImGui::GetCursorPos();
 
