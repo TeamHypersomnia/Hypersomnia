@@ -138,7 +138,9 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	setup_float_flags();
 
+#if IS_PRODUCTION_BUILD
 	const bool log_directory_existed = augs::exists(LOG_FILES_DIR);
+#endif
 
 	{
 		const auto all_created_directories = std::vector<augs::path_type> {
@@ -361,14 +363,13 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto perform_last_exit_incorrect = [&]() {
 		if (last_exit_incorrect_popup != std::nullopt) {
-#if IS_PRODUCTION_BUILD
 			if (last_exit_incorrect_popup->perform()) {
 				last_exit_incorrect_popup = std::nullopt;
 			}
-#endif
 		}
 	};
 
+#if IS_PRODUCTION_BUILD
 	if (log_directory_existed) {
 		if (const auto last_failure_log = find_last_incorrect_exit()) {
 			change_with_save([](config_lua_table& cfg) {
@@ -407,6 +408,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			last_exit_incorrect_popup = simple_popup { "Warning", full_content, "" };
 		}
 	}
+#endif
 
 	augs::remove_file(get_crashed_controllably_path());
 	augs::remove_file(get_exit_success_path());
