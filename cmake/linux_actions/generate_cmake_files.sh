@@ -1,5 +1,5 @@
-c_compiler=clang-13
-cxx_compiler=clang++-13
+c_compiler=clang-14
+cxx_compiler=clang++-14
 other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=0 -DBUILD_DEBUGGER_SETUP=0 -DBUILD_IN_CONSOLE_MODE=0"
 
 ${c_compiler} -v && ${cxx_compiler} -v && cmake --version
