@@ -89,6 +89,7 @@ class editor_setup : public default_setup_settings {
 
 	void load_gui_state();
 	void save_gui_state();
+	void save_last_project_location();
 
 	template <class S, class F>
 	static decltype(auto) on_resource_impl(S& self, const editor_resource_id& id, F&& callback);
@@ -202,6 +203,8 @@ public:
 
 	void rebuild_scene();
 
+	augs::path_type resolve(const augs::path_type& path_in_project) const;
+
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
 	/*********************************************************/
@@ -267,9 +270,7 @@ public:
 		return std::nullopt;
 	}
 
-	augs::path_type get_unofficial_content_dir() const {
-		return {};
-	}
+	augs::path_type get_unofficial_content_dir() const;
 
 	auto get_render_layer_filter() const {
 		return render_layer_filter::disabled();

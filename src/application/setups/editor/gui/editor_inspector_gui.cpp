@@ -76,6 +76,16 @@ void edit_property(
 			}
 		}
 	}
+	else if constexpr(std::is_arithmetic_v<T>) {
+		if (drag(label, property)) { 
+			result = typesafe_sprintf("Set %x to %x in %x", label, property);
+		}
+	}
+	else if constexpr(is_one_of_v<T, vec2, vec2i>) {
+		if (drag_vec2(label, property)) { 
+			result = typesafe_sprintf("Set %x to %x in %x", label, property);
+		}
+	}
 }
 
 std::string perform_editable_gui(editor_sprite_node_editable& e) {
@@ -102,6 +112,7 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e) {
 	std::string result;
 
 	edit_property(result, "##Defaultcolor", e.color);
+	edit_property(result, "Size", e.size);
 
 	ImGui::Separator();
 

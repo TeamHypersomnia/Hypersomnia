@@ -68,7 +68,7 @@ public:
 						);
 					}
 
-					const auto in_project_path = project_path / P::get_content_suffix();
+					const auto in_project_path = project_path;
 
 					if (augs::exists(in_project_path)) {
 						augs::for_each_in_directory_recursive(

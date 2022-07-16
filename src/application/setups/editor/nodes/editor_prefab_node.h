@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
+#include "augs/math/transform.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
 struct editor_prefab_resource;
@@ -12,6 +13,10 @@ struct editor_prefab_node {
 	vec2 pos;
 	real32 rotation = 0.0f;
 	// END GEN INTROSPECTOR
+
+	auto get_transform() const {
+		return transformr(pos, rotation);
+	}
 
 	std::string unique_name;
 	const auto& get_display_name() const {

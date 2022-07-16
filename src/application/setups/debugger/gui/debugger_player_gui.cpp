@@ -183,6 +183,20 @@ void debugger_player_gui::perform(const debugger_command_input cmd_in) {
 		update_official_content(cmd_in, settings);
 	}
 
+	if (ImGui::Button("Redirect to /gfx")) {
+		for (auto& img : folder.commanded->work.viewables.image_definitions) {
+			if (!img.source_image.is_official) {
+				img.source_image.path = augs::path_type("gfx") / img.source_image.path;
+			}
+		}
+
+		for (auto& snd : folder.commanded->work.viewables.sounds) {
+			if (!snd.source_sound.is_official) {
+				snd.source_sound.path = augs::path_type("sfx") / snd.source_sound.path;
+			}
+		}
+	}
+
 	text_disabled(typesafe_sprintf("Current cosmos clock: %x", folder.commanded->work.world.get_clock().now.step));
 
 	if (ImGui::Button("Force reset cosmos clock")) {

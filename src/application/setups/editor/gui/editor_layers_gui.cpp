@@ -355,6 +355,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 
 					node.visible = next_value;
+					in.setup.rebuild_scene();
 				}
 			}
 
@@ -510,6 +511,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 
 					layer.visible = next_value;
+					in.setup.rebuild_scene();
 				}
 			}
 

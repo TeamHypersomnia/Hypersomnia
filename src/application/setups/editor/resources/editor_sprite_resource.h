@@ -27,8 +27,6 @@ struct editor_sprite_resource {
 	ad_hoc_entry_id thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
 
 	/* Only for quick mapping */
-
-	mutable assets::image_id scene_image_id;
 	mutable entity_flavour_id scene_flavour_id;
 
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}

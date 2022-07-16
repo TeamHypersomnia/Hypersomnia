@@ -68,7 +68,7 @@ struct maybe_official_path {
 			return get_in_official() / path;
 		}
 
-		return project_dir / get_content_suffix() / path;
+		return project_dir / path;
 	}
 };
 

@@ -41,6 +41,7 @@ editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_
 	open_default_windows();
 
 	on_window_activate();
+	save_last_project_location();
 }
 
 editor_setup::~editor_setup() {
@@ -154,6 +155,7 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 
 void editor_setup::on_window_activate() {
 	rebuild_filesystem();
+	rebuild_scene();
 }
 
 void editor_setup::rebuild_filesystem() {
@@ -200,6 +202,10 @@ void editor_setup::rebuild_filesystem() {
 	}
 }
 
+augs::path_type editor_setup::resolve(const augs::path_type& path_in_project) const {
+	return paths.project_folder / path_in_project;
+}
+
 editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	editor_paths_changed_report changes;
 
@@ -209,10 +215,6 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 
 		Otherwise we could end up with duplicate resources.
 	*/
-
-	auto resolve = [&](const augs::path_type& path_in_project) {
-		return paths.project_folder / path_in_project;
-	};
 
 	auto handle_pool = [&]<typename P>(P& pool, const editor_filesystem_node_type type) {
 		using resource_type = typename P::value_type;
@@ -385,6 +387,10 @@ void editor_setup::load_gui_state() {
 }
 
 void editor_setup::save_gui_state() {
+	save_last_project_location();
+}
+
+void editor_setup::save_last_project_location() {
 	augs::save_as_text(get_editor_last_project_path(), paths.project_folder.string());
 }
 
@@ -549,6 +555,15 @@ void editor_setup::rebuild_scene() {
 					const auto [new_image_id, new_definition] = definitions.allocate();
 
 					{
+						/* 
+							Note that this is later resolved with get_unofficial_content_dir.
+							get_unofficial_content_dir could really be depreciated,
+							it existed because an intercosm always had relative paths since it was saved.
+							Now we won't need it because an intercosm will always exist in memory only.
+							Even if we cache things in some .cache folder per-project,
+							I think we'd be better off just caching binary representation of the project data instead of intercosms.
+						*/
+
 						new_definition.source_image.path = resource.external_file.path_in_project;
 						new_definition.source_image.is_official = is_official;
 
@@ -572,8 +587,6 @@ void editor_setup::rebuild_scene() {
 					}
 
 					/* Cache for quick and easy mapping */
-
-					resource.scene_image_id = new_image_id;
 					resource.scene_flavour_id = new_flavour_id;
 				};
 
@@ -620,12 +633,14 @@ void editor_setup::rebuild_scene() {
 				return;
 			}
 
-			auto entity_pre_constructor = [&]<typename H>(const H&, auto& agg) {
+			auto entity_pre_constructor = [&]<typename H>(const H& handle, auto& agg) {
 				// using entity_type = typename H::used_entity_type;
 
 				if (auto sorting_order = agg.template find<components::sorting_order>()) {
 					sorting_order->order = total_order;
 				}
+
+				handle.set_logic_transform(typed_node.get_transform());
 			};
 
 			auto entity_post_constructor = [&](auto&&...) {
@@ -650,6 +665,10 @@ void editor_setup::rebuild_scene() {
 			on_node(node_id, node_handler);
 		}
 	}
+}
+
+augs::path_type editor_setup::get_unofficial_content_dir() const {
+	return paths.project_folder;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;
