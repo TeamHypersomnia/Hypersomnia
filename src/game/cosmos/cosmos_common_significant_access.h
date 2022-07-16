@@ -36,5 +36,7 @@ class cosmos_common_significant_access {
 	template <class id_type>
 	friend struct duplicate_asset_command;
 
+	friend class editor_setup;
+
 	cosmos_common_significant_access() {}
 };

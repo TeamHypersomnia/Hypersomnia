@@ -6,6 +6,31 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- First let's convert the project to cosmos so we can see what's happening
+	- Co z oficjalnymi?
+		- Okej, ostatecznie nie bedziemy mieli funkcji ktora tworzy oficjalne bezposrednio w intercosmie
+			- Tylko jedynie wypelnia ten resource pool bezposrednio w reprezentacji ktora potrzebujesz
+	
+
+# Creating the viewed cosmos from the project state
+
+- When drag and dropping on scene, we could either
+	- Preview the pasted entity live by refreshing the cosmos constantly
+		- This is cleaner and is better UX
+		- But less performant?
+		- And how do we determine the layer?
+		- This could be a continuous create node command that only changes the position and target layer/index
+			- just like widgets are continuous
+			- It's only first posted however once the mouse is over the scene
+				- and would have to be deleted if we go back
+				- we'll later worry about recovering the inspector state
+			- it wil properly show the target layer position too
+				- we'll need to scroll to it though
+	- Or just show a ghost that approximates the position
+
+
+# Stuff
+
 - One-click could select it, double-click toggle collapse?
 
 - Eye would indeed be better on the left, to not mix it with the object icons

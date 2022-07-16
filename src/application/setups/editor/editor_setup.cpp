@@ -31,6 +31,8 @@
 
 #include "augs/templates/history.hpp"
 
+#include "game/cosmos/create_entity.hpp"
+
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	LOG("Loading editor project at: %x", project_path);
 	project = editor_project_readwrite::read_project_json(paths.project_json);
@@ -58,7 +60,7 @@ bool editor_setup::handle_input_before_imgui(
 	using namespace augs::event;
 
 	if (in.e.msg == message::ldoubleclick) {
-		double_click_happened = true;
+		handle_doubleclick_in_layers_gui = true;
 	}
 
 	if (in.e.msg == message::activate) {
@@ -278,8 +280,16 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 					file.associated_resource.set<resource_type>(moved_id, false);
 				}
 				else {
-					const auto it = pool.allocate(editor_pathed_resource(path_in_project, new_resource_hash, file.last_write_time));
-					const auto new_id = it.key;
+					const auto [new_id, new_resource] = pool.allocate(editor_pathed_resource(path_in_project, new_resource_hash, file.last_write_time));
+
+					if constexpr(std::is_same_v<editor_sprite_resource, resource_type>) {
+						try {
+							new_resource.editable.size = augs::image::get_size(full_path);
+						}
+						catch (...) {
+							new_resource.editable.size.set(32, 32);
+						}
+					}
 
 					file.associated_resource.set<resource_type>(new_id, false);
 				}
@@ -516,6 +526,130 @@ std::string editor_setup::get_name(inspected_variant v) const {
 	};
 
 	return std::visit(get_object_name, v);
+}
+
+void editor_setup::rebuild_scene() {
+	scene.clear();
+
+	const auto mutable_access = cosmos_common_significant_access();
+
+	/* Create resources */
+
+	auto resource_pool_handler = [&]<typename P>(const P& pool, const bool is_official) {
+		using resource_type = typename P::value_type;
+
+		auto& viewables = scene.viewables;
+
+		for (const auto& resource : pool) {
+			if constexpr(std::is_same_v<editor_sprite_resource, resource_type>) {
+				auto create_in = [&]<typename entity_type>(entity_type) {
+					auto& flavour_pool = scene.world.get_flavours<static_decoration>(mutable_access);
+					auto& definitions = viewables.image_definitions;
+					
+					const auto [new_image_id, new_definition] = definitions.allocate();
+
+					{
+						new_definition.source_image.path = resource.external_file.path_in_project;
+						new_definition.source_image.is_official = is_official;
+
+						auto& meta = new_definition.meta;
+						(void)meta;
+					}
+
+					const auto [new_raw_flavour_id, new_flavour] = flavour_pool.allocate();
+					const auto new_flavour_id = typed_entity_flavour_id<entity_type>(new_raw_flavour_id);
+
+					const auto& editable = resource.editable;
+
+					{
+						auto& render = new_flavour.template get<invariants::render>();
+						render.layer = render_layer::GROUND;
+					}
+
+					{
+						auto& sprite = new_flavour.template get<invariants::sprite>();
+						sprite.set(new_image_id, editable.size, editable.color);
+					}
+
+					/* Cache for quick and easy mapping */
+
+					resource.scene_image_id = new_image_id;
+					resource.scene_flavour_id = new_flavour_id;
+				};
+
+				// for now the only supported one
+				create_in(static_decoration());
+			}
+			else if constexpr(std::is_same_v<editor_sound_resource, resource_type>) {
+
+			}
+			else if constexpr(std::is_same_v<editor_light_resource, resource_type>) {
+
+			}
+			else {
+				//static_assert(always_false_v<P>, "Non-exhaustive if constexpr");
+			}
+		}
+	};
+
+	project.resources .for_each([&](const auto& pool) { resource_pool_handler(pool, false); } );
+	official_resources.for_each([&](const auto& pool) { resource_pool_handler(pool, true); } );
+
+	/* Create nodes */
+
+	auto total_order = sorting_order_type(0);
+
+	for (const auto layer_id : reverse(project.layers.order)) {
+		auto layer = find_layer(layer_id);
+		ensure(layer != nullptr);
+
+		if (!layer->visible) {
+			continue;
+		}
+
+		auto node_handler = [&]<typename node_type>(node_type& typed_node, const auto id) {
+			(void)id;
+
+			if (!typed_node.visible) {
+				return;
+			}
+
+			const auto resource = find_resource(typed_node.resource_id);
+
+			if (resource == nullptr) {
+				return;
+			}
+
+			auto entity_pre_constructor = [&]<typename H>(const H&, auto& agg) {
+				// using entity_type = typename H::used_entity_type;
+
+				if (auto sorting_order = agg.template find<components::sorting_order>()) {
+					sorting_order->order = total_order;
+				}
+			};
+
+			auto entity_post_constructor = [&](auto&&...) {
+
+			};
+
+			if constexpr(std::is_same_v<editor_sprite_node, node_type>) {
+
+				cosmic::create_entity(
+					scene.world,
+					resource->scene_flavour_id,
+					entity_pre_constructor,
+					entity_post_constructor
+				);
+			}
+			else {
+				//static_assert(always_false_v<P>, "Non-exhaustive if constexpr");
+			}
+		};
+
+		for (const auto node_id : reverse(layer->hierarchy.nodes)) {
+			on_node(node_id, node_handler);
+		}
+	}
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

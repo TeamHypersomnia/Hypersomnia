@@ -9,7 +9,6 @@
 
 #include "view/viewables/image_meta.h"
 
-#include "view/asset_location_context.h"
 #include "view/viewables/regeneration/neon_maps.h"
 #include "view/maybe_official_path_types.h"
 #include "view/viewables/asset_definition_view.h"

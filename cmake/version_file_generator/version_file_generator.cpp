@@ -9,7 +9,6 @@ using namespace std::chrono;
 #include "augs/window_framework/exec.h"
 #include "augs/filesystem/file.h"
 #include "augs/string/typesafe_sprintf.h"
-#include "augs/misc/time_utils.h"
 #include "augs/string/string_templates.h"
 
 int main(int argc, char** argv) {

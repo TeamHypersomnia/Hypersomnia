@@ -198,7 +198,9 @@ public:
 	void undo();
 	void redo();
 
-	bool double_click_happened = false;
+	bool handle_doubleclick_in_layers_gui = false;
+
+	void rebuild_scene();
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

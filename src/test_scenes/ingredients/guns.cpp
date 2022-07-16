@@ -1,4 +1,3 @@
-#include "test_scenes/create_test_scene_entity.h"
 #include "game/cosmos/cosmos.h"
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"

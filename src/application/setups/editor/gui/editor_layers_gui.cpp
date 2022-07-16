@@ -18,8 +18,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	(void)in;
 	
-	const bool has_double_click = in.setup.double_click_happened;
-	in.setup.double_click_happened = false;
+	const bool has_double_click = in.setup.handle_doubleclick_in_layers_gui;
+	in.setup.handle_doubleclick_in_layers_gui = false;
 
 	auto window = make_scoped_window();
 

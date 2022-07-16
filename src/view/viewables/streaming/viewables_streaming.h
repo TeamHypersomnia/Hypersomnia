@@ -8,7 +8,6 @@
 #include "augs/graphics/renderer.h"
 #include "view/viewables/streaming/viewables_streaming_profiler.h"
 #include "view/viewables/all_viewables_defs.h"
-#include "view/viewables/image_cache.h"
 #include "view/viewables/loaded_sounds_map.h"
 
 #include "view/viewables/atlas_distributions.h"

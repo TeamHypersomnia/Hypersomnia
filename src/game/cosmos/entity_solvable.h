@@ -52,6 +52,24 @@ struct entity_solvable : entity_solvable_meta {
 		return std::get<C>(component_state);
 	}
 
+	template <class C>
+	C* find() {
+		if constexpr(has<C>()) {
+			return std::addressof(std::get<C>(component_state));
+		}
+
+		return nullptr;
+	}
+
+	template <class C>
+	const C* find() const {
+		if constexpr(has<C>()) {
+			return std::addressof(std::get<C>(component_state));
+		}
+
+		return nullptr;
+	}
+
 	template <class F>
 	void for_each(F&& callback) {
 		for_each_through_std_get(component_state, std::forward<F>(callback));

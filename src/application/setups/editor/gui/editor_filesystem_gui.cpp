@@ -22,13 +22,14 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 		}();
 
+		if (const bool mouse_over_scene = !mouse_over_any_window()) {
+			LOG("Dropped %x on scene", dragged_resource->name);
+		}
+		else {
+
+		}
+
 		if (!payload_still_exists) {
-			const bool mouse_over_scene = !mouse_over_any_window();
-
-			if (mouse_over_scene) {
-				LOG("Dropped %x on scene", dragged_resource->name);
-			}
-
 			dragged_resource = nullptr;
 		}
 	}

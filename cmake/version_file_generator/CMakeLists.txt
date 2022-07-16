@@ -50,7 +50,7 @@ if(MSVC)
 		"${CMAKE_CXX_FLAGS} /Ob2 /Oi /O2 /permissive- /std:c++latest"
 	)
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++1z")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 endif()
 
 if (CLANG AND NOT MSVC)
@@ -80,7 +80,6 @@ endif()
 
 add_executable(version_file_generator 
 	"version_file_generator.cpp"
-	"../../src/augs/misc/time_utils.cpp"
 )
 
 if (MSVC)
