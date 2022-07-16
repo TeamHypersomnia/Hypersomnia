@@ -33,14 +33,23 @@ augs::date_time::date_time(
 {
 }
 
-#if 1
 #if defined(__clang__) && defined(PLATFORM_UNIX) 
+#if PLATFORM_MACOS
+// To be removed once macos updates to AppleClang 14
+augs::date_time::date_time(
+	const augs::file_time_type& tp
+) : 
+	date_time(augs::file_time_type::clock::to_time_t(tp)) 
+{
+}
+#else
 augs::date_time::date_time(
 	const augs::file_time_type& tp
 ) : 
 	date_time(std::chrono::time_point_cast<std::chrono::system_clock::duration>(std::chrono::file_clock::to_sys(tp))) 
-{
+	{
 }
+#endif
 #else
 
 static time_t filetime_to_timet(FILETIME const& ft) {
@@ -57,7 +66,6 @@ augs::date_time::date_time(
 	std::memcpy(&ft, &input_filetime, sizeof(FILETIME));
 	t = filetime_to_timet(ft);
 }
-#endif
 #endif
 
 std::string augs::date_time::format_time_point_utc(const std::chrono::system_clock::time_point& tp) {
