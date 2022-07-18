@@ -32,7 +32,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			if (mouse_over_scene) {
 				auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
 					if (previewed_created_node.is_set()) {
-						in.setup.undo();
+						in.setup.undo_quiet();
 					}
 					else {
 						// LOG("Start dropping resource on scene");
@@ -68,7 +68,8 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			else {
 				if (previewed_created_node.is_set()) {
 					// LOG("Interrupting drag.");
-					in.setup.undo();
+					in.setup.undo_quiet();
+					in.setup.rebuild_scene();
 					previewed_created_node.unset();
 				}
 			}
@@ -218,4 +219,12 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	const bool with_closed_folders = filter.IsActive();
 	in.files_root.in_ui_order(node_callback, with_closed_folders);
+}
+
+void editor_filesystem_gui::clear_drag_drop() {
+	ImGui::ClearDragDrop();
+	augs::imgui::release_mouse_buttons();
+
+	previewed_created_node.unset();
+	clear_pointers();
 }

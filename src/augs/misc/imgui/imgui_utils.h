@@ -55,6 +55,7 @@ namespace augs {
 		);
 
 		void neutralize_mouse();
+		void release_mouse_buttons();
 
 		inline void shift_cursor(const vec2 offset) {
 			ImGui::SetCursorPos(ImVec2(vec2(ImGui::GetCursorPos()) + offset));

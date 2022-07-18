@@ -28,5 +28,7 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 	void clear_pointers() {
 		dragged_resource = nullptr;
 	}
+
+	void clear_drag_drop();
 };
 

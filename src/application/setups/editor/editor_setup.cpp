@@ -395,19 +395,29 @@ editor_command_input editor_setup::make_command_input() {
 
 void editor_setup::seek_to_revision(editor_history::index_type revision_index) {
 	history.seek_to_revision(revision_index, make_command_input());
+
+	gui.filesystem.clear_drag_drop();
+	rebuild_scene();
+}
+
+void editor_setup::undo_quiet() {
+	history.undo(make_command_input());
 }
 
 void editor_setup::undo() {
 	gui.history.scroll_to_current_once = true;
-	history.undo(make_command_input());
+	undo_quiet();
 
-	gui.filesystem.previewed_created_node.unset();
-	gui.filesystem.clear_pointers();
+	gui.filesystem.clear_drag_drop();
+	rebuild_scene();
 }
 
 void editor_setup::redo() {
 	gui.history.scroll_to_current_once = true;
 	history.redo(make_command_input());
+
+	gui.filesystem.clear_drag_drop();
+	rebuild_scene();
 }
 
 void editor_setup::load_gui_state() {

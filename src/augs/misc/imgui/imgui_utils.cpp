@@ -166,14 +166,20 @@ namespace augs {
 			Render();
 		}
 
+		void release_mouse_buttons() {
+			auto& io = GetIO();
+
+			for (auto& m : io.MouseDown) {
+				m = false;
+			}
+		}
+
 		void neutralize_mouse() {
 			auto& io = GetIO();
 
 			io.MousePos = { -1, -1 };
 
-			for (auto& m : io.MouseDown) {
-				m = false;
-			}
+			release_mouse_buttons();
 		}
 		
 		image create_atlas_image(const font_loading_input& in) {

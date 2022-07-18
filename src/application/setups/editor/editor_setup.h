@@ -200,6 +200,8 @@ public:
 	editor_command_input make_command_input(); 
 
 	void undo();
+	void undo_quiet();
+
 	void redo();
 
 	bool handle_doubleclick_in_layers_gui = false;
