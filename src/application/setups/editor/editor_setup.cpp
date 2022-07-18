@@ -114,6 +114,18 @@ bool editor_setup::handle_input_before_game(
 				default: break;
 			}
 		}
+
+		auto clamp_units = [&]() { view.grid.clamp_units(8, settings.grid.render.get_maximum_unit()); };
+
+		if (!has_shift && !has_ctrl) {
+			switch (k) {
+				case key::G: view.toggle_grid(); return true;
+				case key::S: view.toggle_snapping(); return true;
+				case key::OPEN_SQUARE_BRACKET: view.grid.increase_grid_size(); clamp_units(); return true;
+				case key::CLOSE_SQUARE_BRACKET: view.grid.decrease_grid_size(); clamp_units(); return true;
+				default: break;
+			}
+		}
 	}
 
 	const auto world_cursor_pos = get_world_cursor_pos();
@@ -746,6 +758,10 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			editor_cfg.grid.render
 		);
 	}
+}
+
+void editor_setup::apply(const config_lua_table& cfg) {
+	settings = cfg.editor;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

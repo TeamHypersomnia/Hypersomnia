@@ -32,6 +32,7 @@
 
 #include "application/setups/editor/editor_view.h"
 #include "augs/misc/imgui/simple_popup.h"
+#include "application/setups/editor/editor_settings.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -79,6 +80,7 @@ class editor_setup : public default_setup_settings {
 	editor_filesystem files;
 
 	const editor_project_paths paths;
+	editor_settings settings;
 
 	bool rebuild_ad_hoc_atlas = true;
 	ad_hoc_atlas_subjects last_ad_hoc_subjects;
@@ -250,9 +252,7 @@ public:
 	void perform_main_menu_bar(perform_custom_imgui_input);
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 
-	void apply(const config_lua_table&) {
-		return;
-	}
+	void apply(const config_lua_table&);
 
 	auto escape() {
 		return setup_escape_result::IGNORE;

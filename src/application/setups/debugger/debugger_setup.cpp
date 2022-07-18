@@ -272,8 +272,6 @@ void debugger_setup::apply(const config_lua_table& cfg) {
 	if (cfg.debugger.save_entropies_to_live_file) {
 		settings.player.snapshot_interval_in_steps = 0;
 	}
-
-	return;
 }
 
 std::size_t debugger_setup::find_folder_by_path(const augs::path_type& current_path) const {
