@@ -4,9 +4,7 @@
 
 struct debugger_view;
 
-struct editor_camera_settings {
-	float panning_speed = 1.0f;
-};
+struct editor_camera_settings;
 
 namespace editor_detail {
 	bool handle_camera_input(

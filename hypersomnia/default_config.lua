@@ -299,6 +299,65 @@ treat_as_music_sounds_longer_than_secs = 5,
 		y = 84
 	}
   },
+  editor = {
+    grid = {
+      render = {
+        alpha_multiplier = 0.5,
+        hide_grids_smaller_than = 16,
+        line_colors = {
+          "255 0 0 255",
+          "255 0 255 255",
+          "255 165 0 255",
+          "255 255 0 100",
+          "0 255 0 100",
+          "0 255 255 100",
+          "255 255 255 100",
+          "177 177 177 100",
+          "75 74 74 100",
+          "54 54 54 100"
+        },
+        maximum_power_of_two = 12
+      }
+    },
+
+    autosave = {
+      enabled = true,
+      once_every_min = 1
+    },
+
+    go_to = {
+      dialog_width = 400,
+      num_lines = 15,
+    },
+
+    camera = {
+      panning_speed = 1
+    },
+
+    entity_selector = {
+      hovered_color = "255 255 255 20",
+      selected_color = "65 131 196 80",
+      held_color = "65 131 196 120",
+      hovered_color = "255 255 255 80",
+      hovered_dashed_line_color = "255 255 255 140"
+    },
+
+    matched_entity_color = "0 255 0 80",
+
+    rectangular_selection_color = "65 131 196 60",
+    rectangular_selection_border_color = "65 131 196 120",
+
+    action_notification = {
+      bg_color = "0 0 0 180",
+      bg_border_color = "255 255 255 15",
+
+      max_width = 300,
+      show_for_ms = 3000,
+      text_padding = { x = 10, y = 10 },
+      offset = { x = 80, y = 80 },
+    }
+  },
+
   debugger = {
 	player = {
 		snapshot_interval_in_steps = 800
@@ -351,19 +410,15 @@ treat_as_music_sounds_longer_than_secs = 5,
     rectangular_selection_color = "65 131 196 60",
     rectangular_selection_border_color = "65 131 196 120",
 
-	action_indicator = {
-		bg_color = "0 0 0 180",
-		bg_border_color = "255 255 255 15",
+    action_notification = {
+	    bg_color = "0 0 0 180",
+	    bg_border_color = "255 255 255 15",
 
-		max_width = 300,
-		show_for_ms = 3000,
-		text_padding = { x = 10, y = 10 },
-		offset = { x = 80, y = 80 },
-	},
-
-    different_values_frame_bg = "115 73 0 255",
-    different_values_frame_hovered_bg = "158 122 0 255",
-    different_values_frame_active_bg = "168 158 0 255"
+	    max_width = 300,
+	    show_for_ms = 3000,
+	    text_padding = { x = 10, y = 10 },
+	    offset = { x = 80, y = 80 },
+    }
   },
   input = {
 	character = {

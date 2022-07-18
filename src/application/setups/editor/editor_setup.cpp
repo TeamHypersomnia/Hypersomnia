@@ -33,6 +33,7 @@
 
 #include "game/cosmos/create_entity.hpp"
 #include "application/setups/editor/editor_camera.h"
+#include "application/setups/draw_setup_gui_input.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	LOG("Loading editor project at: %x", project_path);
@@ -724,6 +725,27 @@ augs::path_type editor_setup::get_unofficial_content_dir() const {
 
 camera_eye editor_setup::get_camera_eye() const {
 	return view.panned_camera;
+}
+
+void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) { 
+	auto cone = in.cone;
+
+	auto& eye = cone.eye;
+	eye.transform.pos.discard_fract();
+
+	auto triangles = in.get_drawer();
+	const auto screen_size = in.screen_size;
+
+	auto& editor_cfg = in.config.editor;
+
+	if (view.show_grid) {
+		triangles.grid(
+			screen_size,
+			view.grid.unit_pixels,
+			eye,
+			editor_cfg.grid.render
+		);
+	}
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

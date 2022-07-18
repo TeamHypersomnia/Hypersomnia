@@ -1860,7 +1860,7 @@ void debugger_setup::draw_marks_gui(const draw_setup_gui_input& in) {
 			const auto bbox = get_text_bbox(marks_text);
 
 			const auto ss = in.screen_size;
-			const auto& cfg = settings.action_indicator;
+			const auto& cfg = settings.action_notification;
 
 			const auto text_padding = cfg.text_padding;
 
@@ -2008,7 +2008,7 @@ void debugger_setup::draw_recent_message(const draw_setup_gui_input& in) {
 		}
 
 		if (message_text.size() > 0) {
-			const auto& cfg = settings.action_indicator;
+			const auto& cfg = settings.action_notification;
 
 			if (considered_stamp.seconds_ago() <= cfg.show_for_ms / 1000) {
 				/* TODO: (LOW) Improve granularity to milliseconds */

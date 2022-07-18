@@ -1,5 +1,6 @@
 #include "application/setups/editor/editor_camera.h"
 #include "application/setups/editor/editor_view.h"
+#include "application/setups/editor/editor_settings.h"
 
 namespace editor_detail {
 	bool handle_camera_input(

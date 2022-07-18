@@ -1317,7 +1317,7 @@ void settings_gui_state::perform(
 					}
 
 					if (auto node = scoped_tree_node("Action indicator")) {
-						auto& scope_cfg = config.debugger.action_indicator;
+						auto& scope_cfg = config.debugger.action_notification;
 
 						revertable_color_edit(SCOPE_CFG_NVP(bg_color));
 						revertable_color_edit(SCOPE_CFG_NVP(bg_border_color));
