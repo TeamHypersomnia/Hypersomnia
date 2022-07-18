@@ -20,6 +20,7 @@
 #include "application/arena/arena_paths.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
+#include "application/setups/editor/project/editor_project.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "augs/readwrite/json_readwrite_errors.h"
 #include "augs/string/path_sanitization.h"

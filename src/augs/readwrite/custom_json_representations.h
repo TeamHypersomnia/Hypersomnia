@@ -30,8 +30,8 @@ namespace augs {
 	template <class T>
 	inline void to_json_value(T& out, const vec2& from) {
 		out.StartArray();
-		out.Float(from.x);
-		out.Float(from.y);
+		out.Double(from.x);
+		out.Double(from.y);
 		out.EndArray();
 	}
 

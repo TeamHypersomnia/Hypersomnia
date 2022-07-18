@@ -12,6 +12,7 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	};
 
 	project_json = in_folder(arena_name + ".json");
+	editor_view = in_folder("editor_view.json");
 	miniature = in_folder(arena_name + ".miniature.png");
 	signature = in_folder(arena_name + ".signature");
 

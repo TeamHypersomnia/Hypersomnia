@@ -1,3 +1,5 @@
+#include "application/setups/editor/editor_view.h"
+#include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
 #include "augs/readwrite/json_readwrite.h"
 
@@ -29,6 +31,14 @@ auto FindObject(F& from, const std::string& label) -> std::optional<decltype(std
 }
 
 namespace editor_project_readwrite {
+	void write_editor_view(const augs::path_type& json_path, const editor_view& view) {
+		augs::save_as_json(view, json_path);
+	}
+
+	editor_view read_editor_view(const augs::path_type& json_path) {
+		return augs::from_json_file<editor_view>(json_path);
+	}
+
 	void write_project_json(const augs::path_type& json_path, const editor_project& project) {
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);

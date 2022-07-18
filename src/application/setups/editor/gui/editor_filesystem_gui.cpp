@@ -22,16 +22,60 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 		}();
 
-		if (const bool mouse_over_scene = !mouse_over_any_window()) {
-			LOG("Dropped %x on scene", dragged_resource->name);
-		}
-		else {
-
-		}
+		const bool mouse_over_scene = !mouse_over_any_window();
 
 		if (!payload_still_exists) {
 			dragged_resource = nullptr;
+			previewed_created_node.unset();
 		}
+		else {
+			if (mouse_over_scene) {
+				auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
+					if (previewed_created_node.is_set()) {
+						in.setup.undo();
+					}
+					else {
+						// LOG("Start dropping resource on scene");
+					}
+
+					const auto resource_name = typed_resource.get_display_name();
+					const auto new_name = in.setup.get_free_node_name_for(resource_name);
+
+					using node_type = typename T::node_type;
+
+					node_type new_node;
+					new_node.resource_id = resource_id;
+					new_node.unique_name = new_name;
+					new_node.editable.pos = in.setup.get_world_cursor_pos();
+
+					create_node_command<node_type> command;
+
+					command.built_description = typesafe_sprintf("Created %x", new_name);
+					command.created_node = std::move(new_node);
+
+					command.create_layer = create_layer_command();
+					command.create_layer->chosen_name = in.setup.get_free_layer_name();
+
+					const auto& executed = in.setup.post_new_command(std::move(command));
+					previewed_created_node = executed.get_node_id();
+				};
+
+				in.setup.on_resource(
+					dragged_resource->associated_resource,
+					instantiate
+				);
+			}
+			else {
+				if (previewed_created_node.is_set()) {
+					// LOG("Interrupting drag.");
+					in.setup.undo();
+					previewed_created_node.unset();
+				}
+			}
+		}
+	}
+	else {
+		previewed_created_node.unset();
 	}
 
 	if (!window) {

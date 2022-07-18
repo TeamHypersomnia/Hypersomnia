@@ -193,7 +193,7 @@ namespace augs {
 			to.String(from);
 		}
 		else if constexpr(std::is_same_v<T, float>) {
-			to.Float(from);
+			to.Double(from);
 		}
 		else if constexpr(std::is_same_v<T, double>) {
 			to.Double(from);
@@ -270,7 +270,7 @@ namespace augs {
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 
-		write_json(s, from);
+		write_json(writer, from);
 
 		return s.GetString();
 	}

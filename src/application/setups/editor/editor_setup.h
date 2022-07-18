@@ -30,6 +30,7 @@
 
 #include "application/setups/editor/project/editor_project_paths.h"
 
+#include "application/setups/editor/editor_view.h"
 #include "augs/misc/imgui/simple_popup.h"
 
 struct config_lua_table;
@@ -70,6 +71,7 @@ class editor_setup : public default_setup_settings {
 
 	editor_project project;
 	editor_gui gui;
+	editor_view view;
 
 	std::optional<simple_popup> ok_only_popup;
 
@@ -136,6 +138,7 @@ public:
 
 	editor_layer* find_layer(const std::string& name);
 	void create_new_layer(const std::string& name_pattern = "New layer%x");
+	std::string get_free_layer_name(const std::string& name_pattern = "New layer%x");
 
 	template <class T>
 	decltype(auto) find_node(const editor_typed_node_id<T>& id);
@@ -205,6 +208,11 @@ public:
 
 	augs::path_type resolve(const augs::path_type& path_in_project) const;
 
+	camera_eye get_camera_eye() const;
+
+	vec2 get_world_cursor_pos() const;
+	vec2 get_world_cursor_pos(const camera_eye eye) const;
+
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
 	/*********************************************************/
@@ -267,7 +275,7 @@ public:
 	void accept_game_gui_events(const game_gui_entropy_type&) {}
 
 	std::optional<camera_eye> find_current_camera_eye() const {
-		return std::nullopt;
+		return get_camera_eye();
 	}
 
 	augs::path_type get_unofficial_content_dir() const;

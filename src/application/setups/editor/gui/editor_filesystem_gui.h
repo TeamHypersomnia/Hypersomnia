@@ -2,6 +2,7 @@
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "view/necessary_resources.h"
 #include "view/viewables/ad_hoc_in_atlas_map.h"
+#include "application/setups/editor/nodes/editor_node_id.h"
 
 class editor_setup;
 
@@ -20,6 +21,7 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 	using introspect_base = base;
 
 	const editor_filesystem_node* dragged_resource = nullptr;
+	editor_node_id previewed_created_node;
 
 	void perform(editor_project_files_input);
 

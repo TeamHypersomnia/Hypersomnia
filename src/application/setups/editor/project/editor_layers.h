@@ -10,9 +10,17 @@ struct editor_layer_hierarchy {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_layer_editable {
+	// GEN INTROSPECTOR struct editor_layer_editable
+	bool select_together = false;
+	// END GEN INTROSPECTOR
+};
+
 struct editor_layer {
 	// GEN INTROSPECTOR struct editor_layer
 	std::string unique_name;
+	editor_layer_editable editable;
+
 	bool visible = true;
 	bool is_open = true;
 

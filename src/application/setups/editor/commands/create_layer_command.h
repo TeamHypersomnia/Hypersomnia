@@ -9,12 +9,11 @@ struct create_layer_command : allocating_command<editor_layer_id> {
 	using base = allocating_command<editor_layer_id>;
 
 	std::string chosen_name;
-	std::string built_description;
 
 	void undo(editor_command_input in);
 	void redo(editor_command_input in);
 
-	const auto& describe() const {
-		return built_description;
+	auto describe() const {
+		return std::string("Create ") + chosen_name;
 	}
 };

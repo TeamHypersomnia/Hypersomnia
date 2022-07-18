@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Ctrl+Z should properly interrupt the drag&drop to scene
+	- Redo won't be do any harm as it will be the newest command anyway
+
 - First let's convert the project to cosmos so we can see what's happening
 	- Co z oficjalnymi?
 		- Okej, ostatecznie nie bedziemy mieli funkcji ktora tworzy oficjalne bezposrednio w intercosmie

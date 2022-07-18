@@ -32,6 +32,7 @@
 #include "augs/templates/history.hpp"
 
 #include "game/cosmos/create_entity.hpp"
+#include "application/setups/editor/editor_camera.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	LOG("Loading editor project at: %x", project_path);
@@ -114,7 +115,35 @@ bool editor_setup::handle_input_before_game(
 		}
 	}
 
+	const auto world_cursor_pos = get_world_cursor_pos();
+	const auto current_eye = get_camera_eye();
+
+	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+	const auto current_cone = camera_cone(current_eye, screen_size);
+
+	if (editor_detail::handle_camera_input(
+		{},
+		current_cone,
+		state,
+		e,
+		world_cursor_pos,
+		view.panned_camera
+	)) {
+		return true;
+	}
+
 	return false;
+}
+
+vec2 editor_setup::get_world_cursor_pos() const {
+	return get_world_cursor_pos(get_camera_eye());
+}
+
+vec2 editor_setup::get_world_cursor_pos(const camera_eye eye) const {
+	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
+	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+
+	return camera_cone(eye, screen_size).to_world_space(mouse_pos);
 }
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
@@ -333,7 +362,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 }
 
 void editor_setup::force_autosave_now() {
-
+	save_gui_state();
 }
 
 editor_history::index_type editor_setup::get_last_command_index() const {
@@ -371,6 +400,9 @@ void editor_setup::seek_to_revision(editor_history::index_type revision_index) {
 void editor_setup::undo() {
 	gui.history.scroll_to_current_once = true;
 	history.undo(make_command_input());
+
+	gui.filesystem.previewed_created_node.unset();
+	gui.filesystem.clear_pointers();
 }
 
 void editor_setup::redo() {
@@ -384,9 +416,16 @@ void editor_setup::load_gui_state() {
 		Generally ImGui will save the important layouts on its own.
 		The identifiers (e.g. currently inspected object id) might become out of date after reloading from json.
 	*/
+	try {
+		view = editor_project_readwrite::read_editor_view(paths.editor_view);
+	}
+	catch (...) { 
+		view = {};
+	}
 }
 
 void editor_setup::save_gui_state() {
+	editor_project_readwrite::write_editor_view(paths.editor_view, view);
 	save_last_project_location();
 }
 
@@ -477,16 +516,18 @@ std::string editor_setup::get_free_node_name_for(const std::string& new_name) co
 	);
 }
 
-void editor_setup::create_new_layer(const std::string& name_pattern) {
-	const auto first_free_name = augs::first_free_string(
+std::string editor_setup::get_free_layer_name(const std::string& name_pattern) {
+	return augs::first_free_string(
 		name_pattern, 
 		" %x", 
 		[this](const auto& candidate){ return nullptr == find_layer(candidate); }
 	);
+}
 
+
+void editor_setup::create_new_layer(const std::string& name_pattern) {
 	create_layer_command cmd;
-	cmd.chosen_name = first_free_name;
-	cmd.built_description = "Create " + first_free_name;
+	cmd.chosen_name = get_free_layer_name(name_pattern);
 
 	post_new_command(cmd);
 }
@@ -669,6 +710,10 @@ void editor_setup::rebuild_scene() {
 
 augs::path_type editor_setup::get_unofficial_content_dir() const {
 	return paths.project_folder;
+}
+
+camera_eye editor_setup::get_camera_eye() const {
+	return view.panned_camera;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;
