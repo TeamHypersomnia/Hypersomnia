@@ -64,7 +64,7 @@ void populate_test_scene_viewables(
 void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_common_significant& common) {
 	populate_test_scene_flavours({ caches, common.logical_assets.plain_animations, common.flavours });
 
-	common.ambient_light_color = { 53, 97, 102, 255 }; // Brighten it up a little
+	common.light.ambient_color = rgba(53, 97, 102, 255); // Brighten it up a little
 
 	{
 		auto& defs = common.default_sound_properties;

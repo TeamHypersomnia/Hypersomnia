@@ -43,4 +43,14 @@ struct all_logical_assets {
 	auto find(const T& id) const {
 		return mapped_or_nullptr(get_logicals_pool<T>(*this), id);
 	}
+
+	void clear() {
+		plain_animations.clear();
+		recoils.clear();
+		physical_materials.clear();
+
+		for (auto& s : image_offsets) {
+			s = {};
+		}
+	}
 };

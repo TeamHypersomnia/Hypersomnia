@@ -602,6 +602,8 @@ void editor_setup::rebuild_scene() {
 	scene.clear();
 
 	const auto mutable_access = cosmos_common_significant_access();
+	auto& common = scene.world.get_common_significant(mutable_access);
+	(void)common;
 
 	/* Create resources */
 

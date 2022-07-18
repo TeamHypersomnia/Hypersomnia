@@ -35,6 +35,12 @@ struct default_sound_properties_info {
 	// END GEN INTROSPECTOR
 };
 
+struct cosmos_light_settings {
+	// GEN INTROSPECTOR struct cosmos_light_settings
+	rgba ambient_color = rgba(53, 97, 102, 255);
+	// END GEN INTROSPECTOR
+};
+
 struct cosmos_common_significant {
 	// GEN INTROSPECTOR struct cosmos_common_significant
 	all_logical_assets logical_assets;
@@ -50,7 +56,7 @@ struct cosmos_common_significant {
 	spell_tuple spells;
 	perk_tuple perks;
 
-	rgba ambient_light_color = { 25, 51, 51, 255 };
+	cosmos_light_settings light;
 
 	default_sound_properties_info default_sound_properties;
 	// END GEN INTROSPECTOR

@@ -316,7 +316,7 @@ namespace augs {
 		) {
 			ImVec4 input = into;
 			const bool result = { ImGui::ColorEdit4(label.c_str(), reinterpret_cast<float*>(&input), flags) };
-			into = input;
+			into = rgba(input);
 			return result;
 		}
 
@@ -327,7 +327,7 @@ namespace augs {
 		) {
 			ImVec4 input = into;
 			const bool result = { ImGui::ColorPicker4(label.c_str(), reinterpret_cast<float*>(&input), flags) };
-			into = input;
+			into = rgba(input);
 			return result;
 		}
 
@@ -355,6 +355,10 @@ namespace augs {
 		inline void text_color(const std::string& t, const rgba& r) {
 			auto scope = scoped_text_color(r);
 			text(t);
+		}
+
+		inline void text_color(const std::string& t, const ImVec4& r) {
+			return text_color(t, rgba(r));
 		}
 
 		template <class... T>

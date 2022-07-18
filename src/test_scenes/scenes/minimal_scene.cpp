@@ -109,7 +109,7 @@ namespace test_scenes {
 			}
 		}
 
-		if (0)
+		if (1)
 		{
 			const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
 			const auto total_floor_size = floor_size * 10;

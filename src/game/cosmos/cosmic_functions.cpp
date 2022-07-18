@@ -75,19 +75,7 @@ void cosmic::clear(cosmos& cosm) {
 			[&](auto, auto& field) {
 				using T = remove_cref<decltype(field)>;
 
-				if constexpr (std::is_same_v<T, all_logical_assets>) {
-					augs::introspect(
-						[&](auto, auto& sub_field) {
-							sub_field.clear();
-						},
-						field
-					);
-
-					for (auto& s : field.image_offsets) {
-						s = {};
-					}
-				}
-				else if constexpr (std::is_same_v<T, all_entity_flavours>) {
+				if constexpr (std::is_same_v<T, all_logical_assets> || std::is_same_v<T, all_entity_flavours>) {
 					field.clear();
 				}
 				else {

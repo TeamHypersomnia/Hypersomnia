@@ -724,7 +724,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			const auto& style = ImGui::GetStyle();
 
-			rgba final_color = is_current ? style.Colors[ImGuiCol_Text] : style.Colors[ImGuiCol_TextDisabled];
+			auto final_color = rgba(is_current ? style.Colors[ImGuiCol_Text] : style.Colors[ImGuiCol_TextDisabled]);
 
 			if (col != std::nullopt) {
 				final_color = *col;

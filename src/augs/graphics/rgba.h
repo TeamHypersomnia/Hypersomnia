@@ -46,8 +46,8 @@ struct rgba {
 	// END GEN INTROSPECTOR
 
 	rgba() {} /* Non-initializing constructor for performance */
-	rgba(const vec4&);
-	rgba(const ImVec4&);
+	explicit rgba(const vec4&);
+	explicit rgba(const ImVec4&);
 
 	explicit rgba(uint32_t);
 

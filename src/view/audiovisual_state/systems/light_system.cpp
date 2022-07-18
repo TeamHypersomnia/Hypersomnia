@@ -298,7 +298,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	in.light_fbo.set_as_current(renderer);
 	in.write_fow_to_stencil();
 
-	renderer.set_clear_color(cosm.get_common_significant().ambient_light_color);
+	renderer.set_clear_color(cosm.get_common_significant().light.ambient_color);
 	renderer.clear_current_fbo();
 	renderer.set_clear_color({ 0, 0, 0, 0 });
 

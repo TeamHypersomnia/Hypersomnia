@@ -451,7 +451,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		set_shader_with_matrix(shader);
 
-		const auto& ambient_color = cosm.get_common_significant().ambient_light_color;
+		const auto& ambient_color = cosm.get_common_significant().light.ambient_color;
 		set_uniform(shader, U::global_color, ambient_color);
 
 		if (settings.occlude_neons_under_sentiences) {
