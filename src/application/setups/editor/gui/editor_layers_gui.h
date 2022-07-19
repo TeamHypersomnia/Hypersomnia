@@ -20,6 +20,8 @@ struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {
 	using base::base;
 	using introspect_base = base;
 
+	std::optional<editor_node_id> scroll_once_to;
+
 	editor_node_id dragged_node;
 	editor_layer_id dragged_layer;
 

@@ -67,6 +67,8 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 					const auto& executed = in.setup.post_new_command(std::move(command));
 					previewed_created_node = executed.get_node_id();
+
+					in.setup.scroll_once_to(previewed_created_node);
 				};
 
 				in.setup.on_resource(

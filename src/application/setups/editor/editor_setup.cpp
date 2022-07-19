@@ -647,6 +647,10 @@ editor_node_id editor_setup::get_hovered_node() const {
 	return to_node_id(get_hovered_entity());
 }
 
+void editor_setup::scroll_once_to(editor_node_id id) {
+	gui.layers.scroll_once_to = id;
+}
+
 editor_node_id editor_setup::to_node_id(entity_id id) const {
 	if (!id.is_set()) {
 		return {};

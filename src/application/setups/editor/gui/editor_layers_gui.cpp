@@ -286,6 +286,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					in.setup.inspect(node_id);
 				}
 
+				if (scroll_once_to == node_id) {
+					scroll_once_to = std::nullopt;
+
+					ImGui::SetScrollHereY(0.5f);
+				}
+
 				if (ImGui::BeginDragDropSource()) {
 					dragged_node = node_id;
 

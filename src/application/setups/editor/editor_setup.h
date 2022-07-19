@@ -172,6 +172,7 @@ public:
 	entity_id get_hovered_entity() const;
 	editor_node_id get_hovered_node() const;
 
+	void scroll_once_to(editor_node_id);
 	std::unordered_map<std::string, editor_node_id> make_name_to_node_map() const;
 	std::string get_free_node_name_for(const std::string& new_name) const;
 
