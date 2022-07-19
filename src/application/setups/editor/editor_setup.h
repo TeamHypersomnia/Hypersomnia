@@ -67,6 +67,7 @@ struct editor_gui {
 
 class editor_setup : public default_setup_settings {
 	intercosm scene;
+	per_entity_type_array<std::vector<editor_node_id>> scene_entity_to_node;
 
 	editor_resource_pools official_resources;
 
@@ -129,7 +130,7 @@ public:
 	void customize_for_viewing(config_lua_table&) const;
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
 
-	editor_layer_id find_parent_layer(editor_node_id id) const;
+	std::optional<std::pair<editor_layer_id, std::size_t>> find_parent_layer(editor_node_id id) const;
 
 	const std::vector<editor_layer_id>& get_layers() const {
 		return project.layers.order;
@@ -165,6 +166,11 @@ public:
 
 	template <class F>
 	decltype(auto) on_resource(const editor_resource_id& id, F&& callback) const;
+
+	editor_node_id to_node_id(entity_id) const;
+
+	entity_id get_hovered_entity() const;
+	editor_node_id get_hovered_node() const;
 
 	std::unordered_map<std::string, editor_node_id> make_name_to_node_map() const;
 	std::string get_free_node_name_for(const std::string& new_name) const;

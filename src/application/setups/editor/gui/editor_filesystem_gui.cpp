@@ -33,6 +33,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
 					if (previewed_created_node.is_set()) {
 						in.setup.undo_quiet();
+						in.setup.rebuild_scene();
 					}
 					else {
 						// LOG("Start dropping resource on scene");
@@ -53,8 +54,16 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					command.built_description = typesafe_sprintf("Created %x", new_name);
 					command.created_node = std::move(new_node);
 
-					command.create_layer = create_layer_command();
-					command.create_layer->chosen_name = in.setup.get_free_layer_name();
+					const auto hovered_node = in.setup.get_hovered_node();
+
+					if (const auto parent_layer = in.setup.find_parent_layer(hovered_node)) {
+						command.layer_id = parent_layer->first;
+						command.index_in_layer = parent_layer->second;
+					}
+					else {
+						command.create_layer = create_layer_command();
+						command.create_layer->chosen_name = in.setup.get_free_layer_name();
+					}
 
 					const auto& executed = in.setup.post_new_command(std::move(command));
 					previewed_created_node = executed.get_node_id();
@@ -112,6 +121,14 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 		if (filter.IsActive()) {
 			if (!node.passed_filter) {
+				return;
+			}
+		}
+
+		if (node.parent == std::addressof(in.files_root)) {
+			/* Ignore some editor-specific files in the project folder */
+
+			if (node.name == "editor_view.json") {
 				return;
 			}
 		}

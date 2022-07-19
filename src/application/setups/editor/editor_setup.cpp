@@ -35,6 +35,9 @@
 #include "application/setups/editor/editor_camera.h"
 #include "application/setups/draw_setup_gui_input.h"
 
+#include "game/detail/visible_entities.h"
+#include "game/detail/get_hovered_world_entity.h"
+
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	LOG("Loading editor project at: %x", project_path);
 	project = editor_project_readwrite::read_project_json(paths.project_json);
@@ -559,16 +562,24 @@ bool editor_setup::wants_multiple_selection() const {
 	return ImGui::GetIO().KeyCtrl;
 }
 
-editor_layer_id editor_setup::find_parent_layer(const editor_node_id node_id) const {
+std::optional<std::pair<editor_layer_id, std::size_t>> editor_setup::find_parent_layer(const editor_node_id node_id) const {
+	if (!node_id.is_set()) {
+		return std::nullopt;
+	}
+
 	for (const auto layer_id : project.layers.order) {
 		if (const auto layer = find_layer(layer_id)) {
-			if (found_in(layer->hierarchy.nodes, node_id)) {
-				return layer_id;
+			const auto& nodes = layer->hierarchy.nodes;
+
+			for (std::size_t i = 0; i < nodes.size(); ++i) {
+				if (nodes[i] == node_id) {
+					return std::pair<editor_layer_id, std::size_t> { layer_id, i };
+				}
 			}
 		}
 	}
 
-	return editor_layer_id();
+	return std::nullopt;
 }
 
 std::string editor_setup::get_name(inspected_variant v) const {
@@ -598,8 +609,65 @@ std::string editor_setup::get_name(inspected_variant v) const {
 	return std::visit(get_object_name, v);
 }
 
+entity_id editor_setup::get_hovered_entity() const {
+	// TODO: move to editor_entity_selector
+
+	auto& vis = thread_local_visible_entities();
+	const auto world_cursor_pos = get_world_cursor_pos();
+	auto& cosm = scene.world;
+	const auto layer_order = get_default_layer_order();
+
+	vis.reacquire_all({
+		cosm,
+		camera_cone(camera_eye(world_cursor_pos, 1.f), vec2i::square(1)),
+		accuracy_type::EXACT,
+		{},
+		tree_of_npo_filter::all()
+	});
+
+	vis.sort(cosm);
+
+	thread_local std::vector<entity_id> ids;
+	ids.clear();
+
+	vis.for_all_ids_ordered([&](const auto id) {
+		ids.emplace_back(id);
+	}, layer_order);
+
+	// remove_non_hovering_icons_from(ids, world_cursor_pos);
+
+	if (ids.size() > 0) {
+		return ids.back();
+	}
+
+	return {};
+}
+
+editor_node_id editor_setup::get_hovered_node() const {
+	return to_node_id(get_hovered_entity());
+}
+
+editor_node_id editor_setup::to_node_id(entity_id id) const {
+	if (!id.is_set()) {
+		return {};
+	}
+
+	const auto& mapping = scene_entity_to_node[id.type_id.get_index()];
+	const auto node_index = id.raw.indirection_index;
+
+	if (node_index < mapping.size()) {
+		return mapping[node_index];
+	}
+
+	return {};
+}
+
 void editor_setup::rebuild_scene() {
 	scene.clear();
+
+	for (auto& s : scene_entity_to_node) {
+		s.clear();
+	}
 
 	const auto mutable_access = cosmos_common_significant_access();
 	auto& common = scene.world.get_common_significant(mutable_access);
@@ -686,9 +754,7 @@ void editor_setup::rebuild_scene() {
 			continue;
 		}
 
-		auto node_handler = [&]<typename node_type>(node_type& typed_node, const auto id) {
-			(void)id;
-
+		auto node_handler = [&]<typename node_type>(const node_type& typed_node, const auto node_id) {
 			if (!typed_node.visible) {
 				return;
 			}
@@ -714,13 +780,21 @@ void editor_setup::rebuild_scene() {
 			};
 
 			if constexpr(std::is_same_v<editor_sprite_node, node_type>) {
-
-				cosmic::create_entity(
+				const auto new_id = cosmic::create_entity(
 					scene.world,
 					resource->scene_flavour_id,
 					entity_pre_constructor,
 					entity_post_constructor
-				);
+				).get_id();
+
+				const auto mapping_index = new_id.type_id.get_index();
+				auto& mapping = scene_entity_to_node[mapping_index];
+
+				ensure_eq(mapping.size(), std::size_t(new_id.raw.indirection_index));
+				ensure_eq(decltype(new_id.raw.version)(1), new_id.raw.version);
+
+				mapping.emplace_back(node_id.operator editor_node_id());
+				typed_node.scene_entity_id = new_id;
 			}
 			else {
 				//static_assert(always_false_v<P>, "Non-exhaustive if constexpr");
