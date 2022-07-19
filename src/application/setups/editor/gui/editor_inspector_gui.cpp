@@ -239,7 +239,8 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 			ImGui::Separator();
 
-			auto id = scoped_id(resource.external_file.path_in_project.string());
+			const auto path_string = resource.external_file.path_in_project.string();
+			auto id = scoped_id(path_string.c_str());
 
 			auto edited_copy = resource.editable;
 			const auto changed = perform_editable_gui(edited_copy);
@@ -262,7 +263,8 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			std::is_same_v<N, editor_sprite_node> 
 			|| std::is_same_v<N, editor_sound_node>
 		) {
-			auto id = scoped_id(node.get_display_name());
+			const auto node_name = node.get_display_name();
+			auto id = scoped_id(node_name.c_str());
 
 			auto edited_copy = node.editable;
 			const auto changed = perform_editable_gui(edited_copy);

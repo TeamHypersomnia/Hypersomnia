@@ -6,6 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- Sprite: nazwa noda (bez .png)
+	- Show resource
+- Albo pokazujemy od razu propty, ale tez show resource sie przyda
+
+- W miarę wcześnie bym zrobił jakas prosta wersje tych multiple selections
+	- Czemu? Zeby potem nie musiec przepisywac od nowa wszystkich perform_editable_gui
+	- ja mysle ze w komendzie po prostu wektor idow + calosciowych obiektow zamieniaczy
+		- a tam gdzie perform_editable_gui po prostu:
+			- najpierw sprawdzasz common value i nadajesz kolor
+			- potem jesli edited, to robisz fora po wszystkich edytowanych i ten property ustawiasz
+			- mozliwe ze tu jakies makro wejdzie bo tego pola nie przyjmiesz jako argument funkcji
+				- tym bardziej jesli to jakas tablica bedzie
+				- tylko z tablica raczej bym nie robil makr jakichs tylko moze lambde na operacje?
+
+
 - Ctrl+Z should properly interrupt the drag&drop to scene
 	- Redo won't be do any harm as it will be the newest command anyway
 

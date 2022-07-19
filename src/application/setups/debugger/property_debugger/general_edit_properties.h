@@ -282,7 +282,7 @@ void detail_general_edit_properties(
 				const bool nodify = false;
 
 				auto ind = augs::imgui::scoped_indent();
-				auto id = augs::imgui::scoped_id(formatted_label);
+				auto id = augs::imgui::scoped_id(formatted_label.c_str());
 
 #if HIDE_DISABLED_MAYBES
 				if (value_enabled) {
@@ -481,7 +481,7 @@ void detail_general_edit_properties(
 
 				if (nodify_introspected) {
 					if constexpr(inline_with_members_v<T>) {
-						auto id = augs::imgui::scoped_id(formatted_label);
+						auto id = augs::imgui::scoped_id(formatted_label.c_str());
 
 						augs::imgui::text(formatted_label);
 						augs::imgui::next_columns(1);

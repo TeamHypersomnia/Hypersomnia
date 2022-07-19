@@ -220,8 +220,16 @@ namespace augs {
 			return scope_guard([]() { ImGui::PopID(); });
 		}
 
-		inline auto scoped_id(const std::string& v) {
-			ImGui::PushID(v.c_str());
+		/*
+			Note we cannot accept a const std::string&,
+			because we have no guarantee that it wasn't created from a temporary.
+			This would cause the subsequent ImGui calls to read pushed ID from an already freed memory.
+
+			It already caused a bug once where buttons didn't react to clicks, but somehow only for Windows.
+		*/
+
+		inline auto scoped_id(const char* v) {
+			ImGui::PushID(v);
 
 			return scope_guard([]() { ImGui::PopID(); });
 		}
