@@ -15,23 +15,7 @@
 #include "view/load_meta_lua.h"
 
 #include "augs/log_direct.h"
-
-inline auto find_with_existent_extension(const augs::path_type& path_wo_extension) {
-	const std::array<const char*, 5> exts = {
-		".png", ".jpg", ".jpeg", ".tga", ".bmp"
-	};
-
-	for (const auto e : exts) {
-		auto candidate = path_wo_extension;
-		candidate += e;
-
-		if (augs::exists(candidate)) {
-			return candidate;
-		}
-	}
-
-	return augs::path_type();
-}
+#include "augs/filesystem/find_path.h"
 
 struct test_image_does_not_exist {
 
@@ -50,9 +34,9 @@ void load_test_scene_images(
 		definition.set_source_path({ at_stem.string(), true });
 
 		const auto resolved_no_ext = definition.get_source_path().resolve({});
-		const auto with_existent_ext = find_with_existent_extension(resolved_no_ext);
+		const auto with_existent_ext = augs::first_existing_extension(resolved_no_ext, augs::IMAGE_EXTENSIONS, "");
 
-		if (with_existent_ext.empty()) {
+		if (with_existent_ext.extension().empty()) {
 			throw test_image_does_not_exist{};
 		}
 

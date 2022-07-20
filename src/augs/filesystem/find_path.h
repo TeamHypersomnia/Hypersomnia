@@ -1,7 +1,35 @@
 #pragma once
 #include "augs/string/typesafe_sprintf.h"
+#include "augs/filesystem/file.h"
 
 namespace augs {
+	constexpr std::array<const char*, 5> IMAGE_EXTENSIONS = {
+		".png", ".jpg", ".jpeg", ".tga", ".bmp"
+	};
+
+	constexpr std::array<const char*, 5> SOUND_EXTENSIONS = {
+		".wav", ".ogg"
+	};
+
+	inline auto first_existing_extension(
+		const augs::path_type& path_wo_extension, 
+		std::array<const char*, 5> exts,
+		augs::path_type default_ext
+	) {
+		for (const auto e : exts) {
+			auto candidate = path_wo_extension;
+			candidate += e;
+
+			if (augs::exists(candidate)) {
+				return candidate;
+			}
+		}
+
+		auto result = path_wo_extension;
+		result += default_ext;
+		return result;
+	}
+
 	template <class F = true_returner>
 	path_type find_first(const free_path_type type, const path_type& path_template, F&& allow_candidate = true_returner()) {
 		for (std::size_t candidate = 0;; ++candidate) {

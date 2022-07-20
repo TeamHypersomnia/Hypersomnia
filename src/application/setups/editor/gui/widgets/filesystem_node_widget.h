@@ -76,7 +76,6 @@ namespace editor_widgets {
 		);
 
 		if (result) {
-			LOG_NVPS(node.is_open);
 			if (node.is_folder()) {
 				if (!filter_active) {
 					node.toggle_open();

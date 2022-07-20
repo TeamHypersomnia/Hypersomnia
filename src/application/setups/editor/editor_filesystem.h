@@ -263,6 +263,23 @@ struct editor_filesystem_node {
 		sort_all();
 		set_parents(level);
 	}
+
+	ad_hoc_entry_id fill_thumbnail_entries(
+		const augs::path_type& project_folder,
+		ad_hoc_atlas_subjects& out_subjects,
+		ad_hoc_entry_id id_counter = 1
+	) {
+		for_each_file_recursive([&](auto& node) {
+			const auto path = project_folder / node.get_path_in_project();
+
+			if (assets::is_supported_extension<assets::image_id>(path.extension().string())) {
+				node.file_thumbnail_id = id_counter++;
+				out_subjects.push_back({ node.file_thumbnail_id, path });
+			}
+		});
+
+		return id_counter;
+	}
 };
 
 struct editor_filesystem {
@@ -293,19 +310,5 @@ struct editor_filesystem {
 
 		apply_ui_state(saved_state);
 	}
-
-	void fill_thumbnail_entries(const augs::path_type& project_folder, ad_hoc_atlas_subjects& out_subjects) {
-		ad_hoc_entry_id id_counter = 1;
-
-		root.for_each_file_recursive([&](auto& node) {
-			const auto path = project_folder / node.get_path_in_project();
-
-			if (assets::is_supported_extension<assets::image_id>(path.extension().string())) {
-				node.file_thumbnail_id = id_counter++;
-				out_subjects.push_back({ node.file_thumbnail_id, path });
-			}
-		});
-	}
-
 };
 
