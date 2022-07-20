@@ -30,7 +30,6 @@ public:
 		const std::string& disallowed_paths_displayed_name = ""
 	) {
 		using namespace augs::imgui;
-		using P = maybe_official_path<I>;
 
 		const auto displayed_str = current_source.path.empty() ? std::string("(Invalid)") : current_source.get_prettified_full();
 
@@ -58,7 +57,7 @@ public:
 				};
 
 				{
-					const auto in_official_path = P::get_in_official();
+					const auto in_official_path = OFFICIAL_CONTENT_PATH;
 
 					if (augs::exists(in_official_path)) {
 						augs::for_each_in_directory_recursive(

@@ -1,14 +1,13 @@
 #pragma once
 #include "augs/filesystem/path.h"
 
+#define OFFICIAL_CONTENT_PATH augs::path_type(OFFICIAL_CONTENT_DIR)
+
 std::string format_field_name(std::string s);
 
 namespace augs {
 	bool natural_order(const std::string& a, const std::string& b);
 }
-
-template <class T>
-std::string get_content_suffix();
 
 template <class T>
 struct maybe_official_path {
@@ -55,17 +54,9 @@ struct maybe_official_path {
 		return augs::get_prettified_filename(path);
 	}
 
-	static std::string get_content_suffix() {
-		return ::get_content_suffix<T>();
-	}
-
-	static augs::path_type get_in_official() {
-		return augs::path_type(OFFICIAL_CONTENT_DIR) / get_content_suffix();
-	}
-
 	auto resolve(const augs::path_type& project_dir) const {
 		if (is_official || project_dir.empty()) {
-			return get_in_official() / path;
+			return OFFICIAL_CONTENT_PATH / path;
 		}
 
 		return project_dir / path;

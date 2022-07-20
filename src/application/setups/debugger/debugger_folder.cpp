@@ -58,8 +58,8 @@ void debugger_folder::save_folder(const augs::path_type& to, const augs::path_ty
 
 	/* For convenience, create subdirectories for content */
 
-	augs::create_directory(to / maybe_official_path<assets::image_id>::get_content_suffix());
-	augs::create_directory(to / maybe_official_path<assets::sound_id>::get_content_suffix());
+	augs::create_directory(to / "gfx");
+	augs::create_directory(to / "sfx");
 	augs::create_directory(paths.default_export_path);
 
 	commanded->work.save_as_bytes(paths.arena.int_paths);

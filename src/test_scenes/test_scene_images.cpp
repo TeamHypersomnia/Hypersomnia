@@ -29,18 +29,20 @@ void load_test_scene_images(
 
 	all_definitions.reserve(enum_count(test_id_type()));
 
-	auto register_image = [&](const augs::path_type& at_stem) -> decltype(auto) {
+	auto register_image = [&](augs::path_type at_stem) -> decltype(auto) {
+		at_stem = augs::path_type("gfx") / at_stem;
+
 		image_definition definition;
 		definition.set_source_path({ at_stem.string(), true });
 
 		const auto resolved_no_ext = definition.get_source_path().resolve({});
-		const auto with_existent_ext = augs::first_existing_extension(resolved_no_ext, augs::IMAGE_EXTENSIONS, "");
+		const auto with_existent_ext = augs::first_existing_extension(resolved_no_ext, augs::IMAGE_EXTENSIONS);
 
-		if (with_existent_ext.extension().empty()) {
+		if (with_existent_ext.empty()) {
 			throw test_image_does_not_exist{};
 		}
 
-		auto final_path = at_stem ;
+		auto final_path = at_stem;
 		final_path += with_existent_ext.extension();
 
 		definition.set_source_path({ final_path.string(), true });

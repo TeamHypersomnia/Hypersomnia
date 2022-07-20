@@ -15,6 +15,8 @@
 
 #include "game/enums/battle_event.h"
 #include "game/enums/faction_type.h"
+#include "augs/filesystem/find_path.h"
+#include "augs/log.h"
 
 void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 	using test_id_type = test_scene_sound_id;
@@ -28,28 +30,21 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 			return;
 		}
 
-		const auto stem = to_lowercase(augs::enum_to_string(enum_id));
+		const auto stem = augs::path_type("sfx") / to_lowercase(augs::enum_to_string(enum_id));
 		using path = augs::path_type;
 
 		sound_definition definition;
 
 
 		auto try_with = [&](const auto& tried_stem) {
-			maybe_official_sound_path m;
-			m.is_official = true;
+			const auto with_existent_ext = augs::first_existing_extension(OFFICIAL_CONTENT_PATH / path(tried_stem), augs::SOUND_EXTENSIONS);
 
-			m.path = path(tried_stem) += ".ogg";
-
-			if (augs::exists(m.resolve({}))) {
+			if (!with_existent_ext.empty()) {
+				maybe_official_sound_path m;
+				m.is_official = true;
+				m.path = path(tried_stem);
+				m.path += with_existent_ext.extension();
 				definition.set_source_path(m);
-				return;
-			}
-
-			m.path = path(tried_stem) += ".wav";
-
-			if (augs::exists(m.resolve({}))) {
-				definition.set_source_path(m);
-				return;
 			}
 		};
 
@@ -63,18 +58,10 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 			ensure_eq_id(new_allocation.key, id);
 		}
 		else {
-			auto get_in_official = [](const auto& p) {
-				maybe_official_sound_path m;
-				m.is_official = true;
-				m.path = p;
-
-				return m.resolve({});
-			};
-
 			throw test_scene_asset_loading_error(
 				"Failed to load %x: sound file was not found at %x.", 
 				stem, 
-				get_in_official(stem)
+				OFFICIAL_CONTENT_PATH / stem
 			);
 		}
 	});

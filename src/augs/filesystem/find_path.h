@@ -7,14 +7,15 @@ namespace augs {
 		".png", ".jpg", ".jpeg", ".tga", ".bmp"
 	};
 
-	constexpr std::array<const char*, 5> SOUND_EXTENSIONS = {
+	constexpr std::array<const char*, 2> SOUND_EXTENSIONS = {
 		".wav", ".ogg"
 	};
 
-	inline auto first_existing_extension(
+	template <class T>
+	auto first_existing_extension(
 		const augs::path_type& path_wo_extension, 
-		std::array<const char*, 5> exts,
-		augs::path_type default_ext
+		const T& exts,
+		const std::string& default_ext = ""
 	) {
 		for (const auto e : exts) {
 			auto candidate = path_wo_extension;
@@ -23,6 +24,10 @@ namespace augs {
 			if (augs::exists(candidate)) {
 				return candidate;
 			}
+		}
+
+		if (default_ext.empty()) {
+			return augs::path_type();
 		}
 
 		auto result = path_wo_extension;

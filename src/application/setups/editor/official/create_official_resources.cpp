@@ -24,40 +24,36 @@ auto& create_official(E id, editor_resource_pools& pools) {
 	const auto lowercase_stem = to_lowercase(augs::enum_to_string(id));
 
 	if constexpr(is_pathed_resource_v<R>) {
-		augs::path_type content_folder;
-		std::string default_ext;
+		auto create_pathed_resource = [&](
+			augs::path_type content_folder,
+			auto default_ext,
+			auto exts
+		) -> decltype(auto) {
+			const auto parent_folder = augs::path_type(OFFICIAL_CONTENT_DIR);
+			const auto full_path_no_ext = parent_folder / content_folder / lowercase_stem;
+			const auto found_extension = augs::first_existing_extension(full_path_no_ext, exts, default_ext).extension();
 
-		auto exts = augs::IMAGE_EXTENSIONS;
+			/* Due to how maybe_official_path is handled, we have to remove the first element */
+			auto trimmed_path = content_folder / lowercase_stem;
+			trimmed_path += found_extension;
+
+			const auto hash = "";
+			const auto stamp = augs::file_time_type();
+
+			auto& new_object = pool.allocate(editor_pathed_resource(trimmed_path, hash, stamp)).object;
+
+			return new_object;
+		};
 
 		if constexpr(std::is_base_of_v<R, editor_sprite_resource>) {
-			content_folder = "gfx";
-			default_ext = ".png";
-
+			return create_pathed_resource("gfx", ".png", augs::IMAGE_EXTENSIONS);
 		}
 		else if constexpr(std::is_base_of_v<R, editor_sound_resource>) {
-			content_folder = "sfx";
-			default_ext = ".wav";
-
-			exts = augs::SOUND_EXTENSIONS;
+			return create_pathed_resource("sfx", ".wav", augs::SOUND_EXTENSIONS);
 		}
 		else {
 			static_assert(always_false_v<R>);
 		}
-
-		const auto parent_folder = augs::path_type(OFFICIAL_CONTENT_DIR);
-		const auto full_path_no_ext = parent_folder / content_folder / lowercase_stem;
-		const auto found_extension = augs::first_existing_extension(full_path_no_ext, exts, default_ext).extension();
-
-		/* Due to how maybe_official_path is handled, we have to remove the first element */
-		auto trimmed_path = content_folder / lowercase_stem;
-		trimmed_path += found_extension;
-
-		const auto hash = "";
-		const auto stamp = augs::file_time_type();
-
-		auto& new_object = pool.allocate(editor_pathed_resource(trimmed_path, hash, stamp)).object;
-
-		return new_object;
 	}
 	else {
 		auto& new_object = pool.allocate().object;

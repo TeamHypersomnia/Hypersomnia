@@ -1,9 +1,6 @@
 #pragma once
 #include "game/assets/ids/asset_ids.h"
 
-template <class T>
-std::string get_content_suffix();
-
 namespace assets {
 	template <class T>
 	std::string get_label();
