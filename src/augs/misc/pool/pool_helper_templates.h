@@ -17,9 +17,11 @@ struct multipool_dispatchers {
 			using I = typename P::value_type;
 			using R = decltype(callback(*found, TypedId<I> { id.raw }));
 
+			const auto typed_id = TypedId<I>::from_generic(id);
+
 			if constexpr(std::is_same_v<void, R>) {
 				if (found) {
-					callback(*found, TypedId<I> { id.raw });
+					callback(*found, typed_id);
 					return true;
 				}
 
@@ -27,7 +29,7 @@ struct multipool_dispatchers {
 			}
 			else {
 				if (found) {
-					return std::optional<R>(callback(*found, TypedId<I> { id.raw }));
+					return std::optional<R>(callback(*found, typed_id));
 				}
 
 				return std::optional<R>();

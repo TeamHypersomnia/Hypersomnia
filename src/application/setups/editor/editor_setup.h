@@ -88,7 +88,6 @@ class editor_setup : public default_setup_settings {
 	ad_hoc_atlas_subjects last_ad_hoc_subjects;
 
 	void create_official();
-	void create_official_filesystem();
 
 	void on_window_activate();
 	void rebuild_filesystem();

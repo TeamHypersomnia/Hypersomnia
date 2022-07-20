@@ -13,6 +13,10 @@ struct editor_typed_resource_id {
 	editor_resource_pool_id raw;
 	bool is_official = false;
 
+	static editor_typed_resource_id<E> from_generic(const editor_resource_id& id) {
+		return { id.raw, id.is_official };
+	}
+
 	explicit operator editor_resource_id() const {
 		return { raw, editor_resource_type_id::of<E>(), is_official };
 	}

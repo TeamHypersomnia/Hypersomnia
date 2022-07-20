@@ -28,7 +28,7 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 
 	for_each_id_and_object(definitions,
 		[&](const auto id, const auto& object) {
-			out.try_emplace(id, image_definition_view({}, object));
+			out.try_emplace(id, image_cache(image_definition_view({}, object)));
 		}
 	);
 

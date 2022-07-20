@@ -36,6 +36,10 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 	void perform(editor_project_files_input);
 	void clear_drag_drop();
 
+	bool showing_official() const {
+		return current_tab == editor_resources_tab_type::OFFICIAL;
+	}
+
 private:
 	editor_filesystem_node special_root;
 

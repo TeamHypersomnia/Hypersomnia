@@ -125,7 +125,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	gui.filesystem.perform({ 
 		*this,
-		files.root,
+		gui.filesystem.showing_official() ? official_files_root : files.root,
 		in.ad_hoc_atlas,
 		in.necessary_images
 	});

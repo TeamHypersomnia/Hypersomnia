@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Dragging from layres gui will duplicate
+	- This will also play nicely with prefabization
+	- A layer will have an option to prefabize
+		- It then changes all layer objects into an instance of a prefab
+		- And creates a new prefab in special resources
+		- But that instance can too be duplicated right away by dragging it
+		- "Prefabize visible" which only takes the visible ones
+
+- I'm thinking a weapon should be a special resource, not a sprite
+
 - Okay, how do we squash all the:
 	- Non-file resources
 	- Official resources
@@ -51,8 +61,14 @@ summary: That which we are brainstorming at the moment.
 - For Lights, Prefabs selectables etc just make a single Plus sign to create new
 	- Dropdown menu appears
 
+- Or a separate window for Specials?
+	- Pros:
+		- Doesn't clutter since we don't use it much
+	- Cons:
+		- Can't easily search for everything which sucks
+- The only real con of an integrated specials view is that it's unintuitive having + sign above resources when we can't really add any new
 
-
+- Alright let's keep it in one window for implementation simplicity if not anything else
 
 - Introduce iconed entities (nodes) before implementing selections?
 	- So that we may keep most of the logic

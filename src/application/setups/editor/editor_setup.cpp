@@ -56,17 +56,9 @@ editor_setup::~editor_setup() {
 	save_gui_state();
 }
 
-void editor_setup::create_official_filesystem() {
-	official_files_root.clear();
-
-	//auto handle_pool = 
-
-	official_files_root.adding_children_finished();
-}
-
 void editor_setup::create_official() {
 	::create_official_resources(official_resources);
-	create_official_filesystem();
+	::create_official_filesystem_from(official_resources, official_files_root);
 }
 
 void editor_setup::open_default_windows() {

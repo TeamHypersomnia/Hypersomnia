@@ -10,7 +10,7 @@ struct image_definition_view;
 struct image_cache {
 	image_cache() = default;
 
-	image_cache(
+	explicit image_cache(
 		const image_definition_view&
 	);
 

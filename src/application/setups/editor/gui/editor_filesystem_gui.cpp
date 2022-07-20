@@ -178,9 +178,8 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	ImGui::Separator();
 
 	const bool special_resource_inspected = false;
-	const bool is_official = current_tab == editor_resources_tab_type::OFFICIAL;
 
-	if (icon_button("##NewResource", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], "New special resource", !is_official)) {
+	if (icon_button("##NewResource", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], "New special resource", !showing_official())) {
 
 	}
 
@@ -201,7 +200,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 		const auto remove_tint = rgba(220, 80, 80, 255);
 
-		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], "Remove selection", !is_official && special_resource_inspected, remove_tint, remove_bgs)) {
+		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], "Remove selection", !showing_official() && special_resource_inspected, remove_tint, remove_bgs)) {
 
 		}
 	}
@@ -247,8 +246,7 @@ void editor_filesystem_gui::setup_special_filesystem() {
 void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_files_input in) {
 	auto i = 0;
 
-	const bool is_official = current_tab == editor_resources_tab_type::OFFICIAL;
-	const auto& resources = is_official ? in.setup.get_official_resources() : in.setup.get_project().resources;
+	const auto& resources = showing_official() ? in.setup.get_official_resources() : in.setup.get_project().resources;
 
 	auto& lights_folder = special_root.subfolders[i++];
 	auto& particles_folder = special_root.subfolders[i++];
@@ -267,7 +265,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 		auto resource_handler = [&](const auto raw_id, const resource_type& typed_resource) {
 			editor_resource_id resource_id;
 
-			resource_id.is_official = is_official;
+			resource_id.is_official = showing_official();
 			resource_id.raw = raw_id;
 			resource_id.type_id.set<resource_type>();
 

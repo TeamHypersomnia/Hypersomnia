@@ -7,6 +7,10 @@ struct editor_typed_node_id {
 	using target_type = E;
 	editor_node_pool_id raw;
 
+	static editor_typed_node_id<E> from_generic(const editor_node_id& id) {
+		return { id.raw };
+	}
+
 	explicit operator editor_node_id() const {
 		return { raw, editor_node_type_id::of<E>() };
 	}
