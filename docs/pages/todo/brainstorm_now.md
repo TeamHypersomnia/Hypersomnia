@@ -6,6 +6,57 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Okay, how do we squash all the:
+	- Non-file resources
+	- Official resources
+	- Into this single window?
+- It would, in the end, probably be the easiest to just have separate files per all resources
+	- Although we have to anyway enable creating new folders for this easily from the editor
+		- If we do, then there's no point in keeping these folders physically?
+			- maybe there is to not have another layer of separation
+			- We'll just have separate official and non-official
+			- Plus you can group the prefabs and all related data together in the filesystem
+	- Like in unreal, we could have a separate container called "Specials"
+		- we'd then have four
+
+- Actual json files for lights/prefabs/particles:
+	- Pros of 
+		- Easy to group together
+		- Easy to edit/version externally
+			- Well, it's versioned in project json as text anyway
+	- Cons
+		- Atomic save becomes harder
+			- Harder to know whether a project state is valid
+			- This won't be so uncommon since people would be able to move stuff in the filesystem
+		- Have to hash these again
+
+- I think for now we'll just go with a linear list of special objects
+	- Future compatibility considerations?
+		- Paths can be easily added as an additional parameter later
+	
+- In UE literally:
+	- de_cyberaqua
+		- gfx
+		- de_cyberaqua.json
+	- Official content
+- Well, we can use separators anyway to not create another level indentation
+	- Have two ticks actually to freely choose whether to show either 
+- Alright but question remains how do we fit specials in there?
+
+- Alright
+	- A tab under the filter:
+		- [Project][Official]
+	- Filter, if active, searches both
+
+- For Lights, Prefabs selectables etc just make a single Plus sign to create new
+	- Dropdown menu appears
+
+
+
+
+- Introduce iconed entities (nodes) before implementing selections?
+	- So that we may keep most of the logic
+	- In that case we have to implement "Special" resources beforehand
 
 - Sprite: nazwa noda (bez .png)
 	- Show resource

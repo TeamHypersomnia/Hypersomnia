@@ -32,6 +32,8 @@ enum class editor_filesystem_node_type : uint8_t {
 
 struct editor_filesystem_node {
 	ad_hoc_entry_id file_thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
+	std::optional<augs::atlas_entry> game_atlas_icon;
+
 	editor_resource_id associated_resource;
 
 	editor_filesystem_node_type type = editor_filesystem_node_type::OTHER_FILE;

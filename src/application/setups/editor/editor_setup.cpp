@@ -69,7 +69,7 @@ bool editor_setup::handle_input_before_imgui(
 		handle_doubleclick_in_layers_gui = true;
 	}
 
-	if (in.e.msg == message::activate) {
+	if (in.e.msg == message::activate || in.e.msg == message::click_activate) {
 		on_window_activate();
 	}
 
@@ -675,6 +675,7 @@ void editor_setup::rebuild_scene() {
 
 	const auto mutable_access = cosmos_common_significant_access();
 	auto& common = scene.world.get_common_significant(mutable_access);
+	common.light.ambient_color = rgba(180, 180, 180, 255);
 	(void)common;
 
 	/* Create resources */
@@ -774,6 +775,14 @@ void editor_setup::rebuild_scene() {
 
 				if (auto sorting_order = agg.template find<components::sorting_order>()) {
 					sorting_order->order = total_order;
+				}
+
+				if (auto sprite = agg.template find<components::sprite>()) {
+					const auto alpha_mult = layer->editable.alpha_mult;
+
+					if (alpha_mult != 1.0f) {
+						sprite->colorize.mult_alpha(alpha_mult);
+					}
 				}
 
 				handle.set_logic_transform(typed_node.get_transform());

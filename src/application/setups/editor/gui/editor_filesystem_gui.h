@@ -6,6 +6,11 @@
 
 class editor_setup;
 
+enum class editor_resources_tab_type {
+	PROJECT,
+	OFFICIAL
+};
+
 struct editor_filesystem_node;
 
 struct editor_project_files_input {
@@ -19,6 +24,8 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 	using base = standard_window_mixin<editor_filesystem_gui>;
 	using base::base;
 	using introspect_base = base;
+
+	editor_resources_tab_type current_tab = editor_resources_tab_type::PROJECT;
 
 	const editor_filesystem_node* dragged_resource = nullptr;
 	editor_node_id previewed_created_node;

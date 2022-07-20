@@ -143,6 +143,8 @@ public:
 	void create_new_layer(const std::string& name_pattern = "New layer%x");
 	std::string get_free_layer_name(const std::string& name_pattern = "New layer%x");
 
+	const editor_project& get_project() const { return project; }
+
 	template <class T>
 	decltype(auto) find_node(const editor_typed_node_id<T>& id);
 
