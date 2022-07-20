@@ -37,8 +37,11 @@
 
 #include "game/detail/visible_entities.h"
 #include "game/detail/get_hovered_world_entity.h"
+#include "application/setups/editor/official/create_official_resources.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
+	create_official();
+
 	LOG("Loading editor project at: %x", project_path);
 	project = editor_project_readwrite::read_project_json(paths.project_json);
 
@@ -51,6 +54,10 @@ editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_
 
 editor_setup::~editor_setup() {
 	save_gui_state();
+}
+
+void editor_setup::create_official() {
+	::create_official_resources(official_resources);
 }
 
 void editor_setup::open_default_windows() {

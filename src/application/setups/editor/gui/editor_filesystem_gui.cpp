@@ -9,6 +9,7 @@
 #include "application/setups/editor/editor_setup.hpp"
 #include "application/setups/editor/gui/widgets/inspectable_with_icon.h"
 #include "application/setups/editor/gui/widgets/icon_button.h"
+#include "application/setups/editor/gui/widgets/filesystem_node_widget.h"
 
 void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	using namespace augs::imgui;
@@ -151,80 +152,16 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	}
 
 	auto node_callback = [&](editor_filesystem_node& node) {
-		using namespace augs::imgui;
-		augs::atlas_entry icon;
-
-		if (filter.IsActive()) {
-			if (!node.passed_filter) {
-				return;
-			}
-		}
-
-		if (node.parent == std::addressof(in.files_root)) {
-			/* Ignore some editor-specific files in the project folder */
-
-			if (node.name == "editor_view.json") {
-				return;
-			}
-		}
-
 		auto id_scope = scoped_id(id_counter++);
 
-		auto atlas_type = augs::imgui_atlas_type::GAME;
-
-		if (node.is_folder()) {
-			icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FOLDER];
-		}
-		else {
-			if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, node.file_thumbnail_id)) {
-				icon = *ad_hoc;
-				atlas_type = augs::imgui_atlas_type::AD_HOC;
-			}
-			else {
-				icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FILE];
-			}
-		}
-
-		const bool is_inspected = in.setup.is_inspected(node.associated_resource);
-
-		const auto& label = node.name;
-		const auto label_color = white;
-
-		auto after_selectable_callback = [&]() {
-			if (node.is_resource()) {
-				if (ImGui::BeginDragDropSource())
-				{
-					dragged_resource = std::addressof(node);
-
-					ImGui::SetDragDropPayload("dragged_resource", nullptr, 0);
-					text(label);
-					ImGui::EndDragDropSource();
-				}
-			}
-		};
-
-		const bool result = inspectable_with_icon(
-			icon,
-			atlas_type,
-			label,
-			label_color,
-			node.level,
-			is_inspected,
-			after_selectable_callback
+		filesystem_node_widget(
+			in.setup,
+			node,
+			in.necessary_images,
+			in.ad_hoc_atlas,
+			filter.IsActive(),
+			dragged_resource
 		);
-
-		if (result) {
-			if (node.is_folder()) {
-				if (!filter.IsActive()) {
-					node.toggle_open();
-				}
-			}
-			else {
-				if (in.setup.exists(node.associated_resource)) {
-					in.setup.inspect(node.associated_resource);
-				}
-			}
-		}
 	};
 
 	const bool with_closed_folders = filter.IsActive();
@@ -235,9 +172,9 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	ImGui::Separator();
 
 	const bool special_resource_inspected = false;
-	const bool in_official = current_tab == editor_resources_tab_type::OFFICIAL;
+	const bool is_official = current_tab == editor_resources_tab_type::OFFICIAL;
 
-	if (icon_button("##NewResource", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], "New special resource", !in_official)) {
+	if (icon_button("##NewResource", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], "New special resource", !is_official)) {
 
 	}
 
@@ -258,7 +195,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 		const auto remove_tint = rgba(220, 80, 80, 255);
 
-		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], "Remove selection", !in_official && special_resource_inspected, remove_tint, remove_bgs)) {
+		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], "Remove selection", !is_official && special_resource_inspected, remove_tint, remove_bgs)) {
 
 		}
 	}
@@ -271,7 +208,9 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		return typesafe_sprintf("(%x)", num_resources);
 	};
 
-	const auto num_lights = after_text(in.setup.get_project().resources.get_pool_for<editor_light_resource>().size());
+	const auto& special_resources_source = is_official ? in.setup.get_official_resources() : in.setup.get_project().resources;
+
+	const auto num_lights = after_text(special_resources_source.get_pool_for<editor_light_resource>().size());
 	const auto num_particles = after_text(0);
 	const auto num_wandering_pixels = after_text(0);
 	const auto num_prefabs = after_text(0);

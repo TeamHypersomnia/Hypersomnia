@@ -458,6 +458,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
 
+	"src/application/setups/editor/official/create_official_resources.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
 	"src/augs/misc/secure_hash.cpp"
 	"src/application/setups/editor/project/editor_project.cpp"

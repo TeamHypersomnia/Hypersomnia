@@ -86,6 +86,8 @@ class editor_setup : public default_setup_settings {
 	bool rebuild_ad_hoc_atlas = true;
 	ad_hoc_atlas_subjects last_ad_hoc_subjects;
 
+	void create_official();
+
 	void on_window_activate();
 	void rebuild_filesystem();
 	editor_paths_changed_report rebuild_pathed_resources();
@@ -143,7 +145,8 @@ public:
 	void create_new_layer(const std::string& name_pattern = "New layer%x");
 	std::string get_free_layer_name(const std::string& name_pattern = "New layer%x");
 
-	const editor_project& get_project() const { return project; }
+	const auto& get_project() const { return project; }
+	const auto& get_official_resources() const { return official_resources; }
 
 	template <class T>
 	decltype(auto) find_node(const editor_typed_node_id<T>& id);

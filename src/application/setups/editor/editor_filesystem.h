@@ -27,7 +27,9 @@ enum class editor_filesystem_node_type : uint8_t {
 	FOLDER,
 
 	IMAGE,
-	SOUND
+	SOUND,
+
+	OTHER_RESOURCE
 };
 
 struct editor_filesystem_node {
@@ -131,6 +133,7 @@ struct editor_filesystem_node {
 		return 
 			type == editor_filesystem_node_type::IMAGE
 			|| type == editor_filesystem_node_type::SOUND
+			|| type == editor_filesystem_node_type::OTHER_RESOURCE
 		;
 	}
 
@@ -164,6 +167,14 @@ struct editor_filesystem_node {
 		parent = nullptr;
 		files.clear();
 		subfolders.clear();
+	}
+
+	bool is_root() const {
+		return parent == nullptr;
+	}
+
+	bool is_child_of_root() const {
+		return parent && parent->is_root();
 	}
 
 	auto get_ui_state() const {
