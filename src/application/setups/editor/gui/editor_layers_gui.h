@@ -10,7 +10,7 @@ struct editor_layers;
 struct editor_layers_input {
 	editor_setup& setup;
 	editor_layers& layers;
-	const editor_filesystem_node*& dragged_resource;
+	editor_resource_id& dragged_resource;
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
 };

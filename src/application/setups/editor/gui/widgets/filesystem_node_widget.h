@@ -8,7 +8,7 @@ namespace editor_widgets {
 		const necessary_images_in_atlas_map& necessary_images,
 		const ad_hoc_in_atlas_map& ad_hoc_atlas,
 		const bool filter_active,
-		const editor_filesystem_node*& dragged_resource
+		editor_resource_id& dragged_resource
 	) {
 		using namespace augs::imgui;
 		augs::atlas_entry icon;
@@ -55,7 +55,7 @@ namespace editor_widgets {
 		auto after_selectable_callback = [&]() {
 			if (node.is_resource()) {
 				if (ImGui::BeginDragDropSource()) {
-					dragged_resource = std::addressof(node);
+					dragged_resource = node.associated_resource;
 
 					ImGui::SetDragDropPayload("dragged_resource", nullptr, 0);
 					text(label);
@@ -71,10 +71,12 @@ namespace editor_widgets {
 			label_color,
 			node.level,
 			is_inspected,
-			after_selectable_callback
+			after_selectable_callback,
+			node.after_text
 		);
 
 		if (result) {
+			LOG_NVPS(node.is_open);
 			if (node.is_folder()) {
 				if (!filter_active) {
 					node.toggle_open();

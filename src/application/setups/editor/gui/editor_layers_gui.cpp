@@ -131,7 +131,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	int node_id_counter = 0;
 
 	auto create_dragged_resource_in = [&](const auto layer_id, const auto index) {
-		if (in.dragged_resource == nullptr) {
+		if (!in.dragged_resource.is_set()) {
 			return;
 		}
 
@@ -156,11 +156,11 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		};
 
 		in.setup.on_resource(
-			in.dragged_resource->associated_resource,
+			in.dragged_resource,
 			instantiate
 		);
 
-		in.dragged_resource = nullptr;
+		in.dragged_resource.unset();
 	};
 
 	auto accept_dragged_nodes = [&](

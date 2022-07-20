@@ -212,7 +212,7 @@ void editor_setup::on_window_activate() {
 
 void editor_setup::rebuild_filesystem() {
 	files.rebuild_from(paths.project_folder);
-	gui.filesystem.clear_pointers();
+	gui.filesystem.clear_drag_drop();
 	rebuild_ad_hoc_atlas = true;
 
 	const auto changes = rebuild_pathed_resources();

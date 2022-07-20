@@ -11,6 +11,10 @@
 #include "application/setups/editor/gui/widgets/icon_button.h"
 #include "application/setups/editor/gui/widgets/filesystem_node_widget.h"
 
+editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
+	setup_special_filesystem();
+}
+
 void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	using namespace augs::imgui;
 	using namespace editor_widgets;
@@ -19,7 +23,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	
 	auto window = make_scoped_window();
 
-	if (dragged_resource != nullptr) {
+	if (dragged_resource.is_set()) {
 		const bool payload_still_exists = [&]() {
 			const auto payload = ImGui::GetDragDropPayload();
 			return payload && payload->IsDataType("dragged_resource");
@@ -29,7 +33,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		const bool mouse_over_scene = !mouse_over_any_window();
 
 		if (!payload_still_exists) {
-			dragged_resource = nullptr;
+			dragged_resource.unset();
 			previewed_created_node.unset();
 		}
 		else {
@@ -76,7 +80,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				};
 
 				in.setup.on_resource(
-					dragged_resource->associated_resource,
+					dragged_resource,
 					instantiate
 				);
 			}
@@ -100,6 +104,8 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	acquire_keyboard_once();
 
+	rebuild_special_filesystem(in);
+
 	thread_local ImGuiTextFilter filter;
 	filter_with_hint(filter, "##FilesFilter", "Search resources...");
 
@@ -107,18 +113,20 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	if (filter.IsActive()) {
 		in.files_root.reset_filter_flags();
+		special_root.reset_filter_flags();
 
 		auto& f = filter;
 
-		in.files_root.for_each_entry_recursive(
-			[&f](auto& entry) {
-				const auto path_in_project = entry.get_path_in_project();
+		auto filter_callback = [&f](auto& entry) {
+			const auto path_in_project = entry.get_path_in_project();
 
-				if (f.PassFilter(path_in_project.string().c_str())) {
-					entry.mark_passed_filter();
-				}
+			if (f.PassFilter(path_in_project.string().c_str())) {
+				entry.mark_passed_filter();
 			}
-		);
+		};
+
+		in.files_root.for_each_entry_recursive(filter_callback);
+		special_root.for_each_entry_recursive(filter_callback);
 	}
 
 	{
@@ -167,8 +175,6 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	const bool with_closed_folders = filter.IsActive();
 	in.files_root.in_ui_order(node_callback, with_closed_folders);
 
-	auto atlas_type = augs::imgui_atlas_type::GAME;
-
 	ImGui::Separator();
 
 	const bool special_resource_inspected = false;
@@ -203,22 +209,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	ImGui::SameLine();
 
 	text_disabled("(Special resources)");
-
-	auto after_text = [](const int num_resources) {
-		return typesafe_sprintf("(%x)", num_resources);
-	};
-
-	const auto& special_resources_source = is_official ? in.setup.get_official_resources() : in.setup.get_project().resources;
-
-	const auto num_lights = after_text(special_resources_source.get_pool_for<editor_light_resource>().size());
-	const auto num_particles = after_text(0);
-	const auto num_wandering_pixels = after_text(0);
-	const auto num_prefabs = after_text(0);
-
-	inspectable_with_icon(in.necessary_images[assets::necessary_image_id::EDITOR_ICON_LIGHT], atlas_type, "Lights", white, 0, false, [](){}, num_lights);
-	inspectable_with_icon(in.necessary_images[assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE], atlas_type, "Particles", white, 0, false, [](){}, num_particles);
-	inspectable_with_icon(in.necessary_images[assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS], atlas_type, "Wandering pixels", white, 0, false, [](){}, num_wandering_pixels);
-	inspectable_with_icon(in.necessary_images[assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A], atlas_type, "Prefabs", white, 0, false, [](){}, num_prefabs);
+	special_root.in_ui_order(node_callback, with_closed_folders);
 }
 
 void editor_filesystem_gui::clear_drag_drop() {
@@ -226,5 +217,77 @@ void editor_filesystem_gui::clear_drag_drop() {
 	augs::imgui::release_mouse_buttons();
 
 	previewed_created_node.unset();
-	clear_pointers();
+	dragged_resource.unset();
+}
+
+void editor_filesystem_gui::setup_special_filesystem() {
+	special_root.clear();
+	special_root.subfolders.resize(4);
+	special_root.should_sort = false;
+
+	auto i = 0;
+
+	auto& lights_folder = special_root.subfolders[i++];
+	auto& particles_folder = special_root.subfolders[i++];
+	auto& wandering_pixels_folder = special_root.subfolders[i++];
+	auto& prefabs_folder = special_root.subfolders[i++];
+
+	lights_folder.name = "Lights";
+	particles_folder.name = "Particles";
+	wandering_pixels_folder.name = "Wandering pixels";
+	prefabs_folder.name = "Prefabs";
+
+	for (auto& s : special_root.subfolders) {
+		s.type = editor_filesystem_node_type::FOLDER;
+	}
+
+	special_root.adding_children_finished();
+}
+
+void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_files_input in) {
+	auto i = 0;
+
+	const bool is_official = current_tab == editor_resources_tab_type::OFFICIAL;
+	const auto& resources = is_official ? in.setup.get_official_resources() : in.setup.get_project().resources;
+
+	auto& lights_folder = special_root.subfolders[i++];
+	auto& particles_folder = special_root.subfolders[i++];
+	auto& wandering_pixels_folder = special_root.subfolders[i++];
+	auto& prefabs_folder = special_root.subfolders[i++];
+
+	auto handle = [&]<typename P>(editor_filesystem_node& parent, P& pool, const auto icon_id) {
+		using resource_type = typename P::value_type;
+
+		parent.game_atlas_icon = in.necessary_images[icon_id];
+		parent.after_text = typesafe_sprintf("(%x)", pool.size());
+
+		parent.files.resize(pool.size());
+		std::size_t i = 0;
+
+		auto resource_handler = [&](const auto raw_id, const resource_type& typed_resource) {
+			editor_resource_id resource_id;
+
+			resource_id.is_official = is_official;
+			resource_id.raw = raw_id;
+			resource_id.type_id.set<resource_type>();
+
+			auto& new_node = parent.files[i++];
+			new_node.name = typed_resource.unique_name;
+			new_node.associated_resource = resource_id;
+			new_node.type = editor_filesystem_node_type::OTHER_RESOURCE;
+			new_node.game_atlas_icon = parent.game_atlas_icon;
+		};
+
+		pool.for_each_id_and_object(resource_handler);
+		parent.adding_children_finished();
+	};
+
+	// TODO: redirect to proper pools!
+	handle(particles_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE);
+	handle(wandering_pixels_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS);
+	handle(prefabs_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
+
+	handle(lights_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_LIGHT);
+
+	special_root.set_parents(0);
 }

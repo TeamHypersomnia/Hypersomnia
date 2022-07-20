@@ -42,8 +42,10 @@ struct editor_filesystem_node {
 
 	bool is_open = false;
 	bool passed_filter = false;
+	bool should_sort = true;
 
 	std::string name;
+	std::string after_text;
 
 	std::vector<editor_filesystem_node> files;
 	std::vector<editor_filesystem_node> subfolders;
@@ -142,8 +144,10 @@ struct editor_filesystem_node {
 	}
 
 	void sort_all() {
-		sort_range(files);
-		sort_range(subfolders);
+		if (should_sort) {
+			sort_range(files);
+			sort_range(subfolders);
+		}
 
 		for (auto& subfolder : subfolders) {
 			subfolder.sort_all();
@@ -252,8 +256,12 @@ struct editor_filesystem_node {
 			subfolder.build_from(folder_path / subfolder.name);
 		}
 
+		adding_children_finished();
+	}
+
+	void adding_children_finished() {
 		sort_all();
-		set_parents(0);
+		set_parents(level);
 	}
 };
 
