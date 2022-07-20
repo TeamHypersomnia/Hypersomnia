@@ -12,9 +12,11 @@
 #include "application/setups/editor/gui/editor_layers_gui.h"
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/editor_setup.h"
+#include "application/setups/editor/gui/widgets/icon_button.h"
 
 void editor_layers_gui::perform(const editor_layers_input in) {
 	using namespace augs::imgui;
+	using namespace editor_widgets;
 
 	(void)in;
 	
@@ -78,56 +80,13 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		rgba(35+10, 60+10, 90+10, 255)
 	};
 
-	auto icon_button = [&](
-		const auto label, 
-		const auto icon_id, 
-		const std::string& tooltip,
-		const bool enabled,
-		rgba tint = white, 
-		std::array<rgba, 3> icon_bg_cols = {
-			rgba(0, 0, 0, 0),
-			rgba(35, 60, 90, 255),
-			rgba(35+10, 60+10, 90+10, 255)
-		}
-	) {
-		auto id = scoped_id(label);
-
-		if (!enabled) {
-			tint = rgba(255, 255, 255, 80);
-		}
-
-		const auto icon = in.necessary_images[icon_id];
-		const auto scaled_icon_size = vec2::scaled_to_max_size(icon.get_original_size(), max_icon_size);
-
-		bool result = false;
-
-		{
-			auto preserved = scoped_preserve_cursor();
-
-			auto colored_selectable = scoped_selectable_colors(icon_bg_cols);
-
-			{
-				auto scope = maybe_disabled_cols({}, !enabled);
-				result = ImGui::Selectable("##ButtonBg", false, ImGuiSelectableFlags_None, ImVec2(scaled_icon_size));
-			}
-
-			if (ImGui::IsItemHovered()) {
-				auto scope = scoped_tooltip();
-				text_color(tooltip, tint);
-			}
-		}
-
-		game_image(icon, scaled_icon_size, tint);
-		return result;
-	};
-
-	if (icon_button("##NewLayer", assets::necessary_image_id::EDITOR_ICON_ADD, "New layer", true)) {
+	if (icon_button("##NewLayer", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], "New layer", true)) {
 		in.setup.create_new_layer();
 	}
 
 	ImGui::SameLine();
 
-	if (icon_button("##Duplicate", assets::necessary_image_id::EDITOR_ICON_CLONE, "Duplicate selection", node_or_layer_inspected)) {
+	if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], "Duplicate selection", node_or_layer_inspected)) {
 
 	}
 
@@ -142,7 +101,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 		const auto remove_tint = rgba(220, 80, 80, 255);
 
-		if (icon_button("##Remove", assets::necessary_image_id::EDITOR_ICON_REMOVE, "Remove selection", node_or_layer_inspected, remove_tint, remove_bgs)) {
+		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], "Remove selection", node_or_layer_inspected, remove_tint, remove_bgs)) {
 
 		}
 	}
