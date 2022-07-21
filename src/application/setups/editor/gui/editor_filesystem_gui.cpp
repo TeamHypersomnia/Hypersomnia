@@ -159,14 +159,15 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		tab_button("Official", editor_resources_tab_type::OFFICIAL);
 	}
 
+	auto child = scoped_child(showing_official() ? "nodes official view" : "nodes project view");
+
 	auto node_callback = [&](editor_filesystem_node& node) {
 		auto id_scope = scoped_id(id_counter++);
 
 		filesystem_node_widget(
 			in.setup,
 			node,
-			in.necessary_images,
-			in.ad_hoc_atlas,
+			editor_icon_info_in(in),
 			filter.IsActive(),
 			dragged_resource
 		);

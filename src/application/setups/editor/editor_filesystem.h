@@ -211,6 +211,18 @@ struct editor_filesystem_node {
 		return total_path;
 	}
 
+	void set_file_type_by(const std::string& extension) {
+		type = editor_filesystem_node_type::OTHER_FILE;
+
+		if (assets::is_image_extension(extension)) {
+			type = editor_filesystem_node_type::IMAGE;
+		}
+
+		if (assets::is_sound_extension(extension)) {
+			type = editor_filesystem_node_type::SOUND;
+		}
+	}
+
 	void build_from(const augs::path_type& folder_path) {
 		clear();
 
@@ -224,15 +236,7 @@ struct editor_filesystem_node {
 				subfolders.emplace_back(std::move(new_node));
 			}
 			else {
-				new_node.type = editor_filesystem_node_type::OTHER_FILE;
-
-				if (assets::is_image_extension(extension)) {
-					new_node.type = editor_filesystem_node_type::IMAGE;
-				}
-
-				if (assets::is_sound_extension(extension)) {
-					new_node.type = editor_filesystem_node_type::SOUND;
-				}
+				new_node.set_file_type_by(extension);
 
 				try {
 					new_node.last_write_time = augs::last_write_time(path);

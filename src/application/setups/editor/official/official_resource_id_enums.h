@@ -13,6 +13,9 @@ enum class official_sounds {
 	// GEN INTROSPECTOR enum class official_sounds
 	LOUDY_FAN,
 
+	AQUARIUM_AMBIENCE_LEFT,
+	AQUARIUM_AMBIENCE_RIGHT,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

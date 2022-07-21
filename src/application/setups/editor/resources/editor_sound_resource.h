@@ -17,6 +17,9 @@ struct editor_sound_resource {
 	editor_sound_resource_editable editable;
 	// END GEN INTROSPECTOR
 
+	/* Only for quick mapping */
+	mutable entity_flavour_id scene_flavour_id;
+
 	editor_sound_resource(const editor_pathed_resource& f) : external_file(f) {}
 
 	decltype(auto) get_display_name() const {

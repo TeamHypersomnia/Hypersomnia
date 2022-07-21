@@ -33,6 +33,7 @@
 #include "application/setups/editor/editor_view.h"
 #include "augs/misc/imgui/simple_popup.h"
 #include "application/setups/editor/editor_settings.h"
+#include "augs/graphics/imgui_payload.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -64,6 +65,9 @@ struct editor_gui {
 	editor_history_gui history = std::string("History");
 	// END GEN INTROSPECTOR
 };
+
+struct editor_icon_info;
+struct editor_icon_info_in;
 
 class editor_setup : public default_setup_settings {
 	intercosm scene;
@@ -229,6 +233,12 @@ public:
 
 	vec2 get_world_cursor_pos() const;
 	vec2 get_world_cursor_pos(const camera_eye eye) const;
+
+	template <class T>
+	editor_icon_info get_icon_for(
+		const T& object, 
+		editor_icon_info_in
+	) const;
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

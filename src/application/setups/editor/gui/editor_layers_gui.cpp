@@ -13,6 +13,7 @@
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/gui/widgets/icon_button.h"
+#include "application/setups/editor/editor_get_icon_for.h"
 
 void editor_layers_gui::perform(const editor_layers_input in) {
 	using namespace augs::imgui;
@@ -114,20 +115,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	//const auto& style = ImGui::GetStyle();
 	const auto disabled_color = rgba(255, 255, 255, 110);
 
-	auto get_node_icon = [&]<typename T>(const T& node) -> std::pair<augs::atlas_entry, augs::imgui_atlas_type> {
-		if constexpr(std::is_same_v<T, editor_sprite_node>) {
-			const auto* maybe_resource = in.setup.find_resource(node.resource_id);
-
-			if (maybe_resource != nullptr) {
-				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, maybe_resource->thumbnail_id)) {
-					return { *ad_hoc, augs::imgui_atlas_type::AD_HOC };
-				}
-			}
-		}
-
-		return { in.necessary_images[assets::necessary_image_id::DEFUSING_INDICATOR], augs::imgui_atlas_type::GAME };
-	};
-
 	int node_id_counter = 0;
 
 	auto create_dragged_resource_in = [&](const auto layer_id, const auto index) {
@@ -215,9 +202,9 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	) {
 		auto id_scope = scoped_id(node_id_counter++);
 
-		const auto icon_result = get_node_icon(node);
-		const auto icon = icon_result.first;
-		const auto atlas_type = icon_result.second;
+		const auto icon_result = in.setup.get_icon_for(node, in);
+		const auto icon = icon_result.icon;
+		const auto atlas_type = icon_result.atlas;
 
 		const auto label = node.get_display_name();
 

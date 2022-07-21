@@ -38,6 +38,9 @@
 #include "game/detail/visible_entities.h"
 #include "game/detail/get_hovered_world_entity.h"
 #include "application/setups/editor/official/create_official_resources.h"
+#include "augs/gui/text/printer.h"
+#include "view/rendering_scripts/draw_area_indicator.h"
+#include "application/setups/debugger/gui/for_each_iconed_entity.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	create_official();
@@ -374,7 +377,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	auto& sound_pool  = project.resources.pools.template get_for<editor_sound_resource>();
 
 	handle_pool(sprite_pool, editor_filesystem_node_type::IMAGE);
-	handle_pool(sound_pool, editor_filesystem_node_type::SOUND);
+	handle_pool(sound_pool,  editor_filesystem_node_type::SOUND);
 
 	/*
 		Corner cases:
@@ -698,8 +701,8 @@ void editor_setup::rebuild_scene() {
 
 		for (const auto& resource : pool) {
 			if constexpr(std::is_same_v<editor_sprite_resource, resource_type>) {
-				auto create_in = [&]<typename entity_type>(entity_type) {
-					auto& flavour_pool = scene.world.get_flavours<static_decoration>(mutable_access);
+				auto create_as = [&]<typename entity_type>(entity_type) {
+					auto& flavour_pool = scene.world.get_flavours<entity_type>(mutable_access);
 					auto& definitions = viewables.image_definitions;
 					
 					const auto [new_image_id, new_definition] = definitions.allocate();
@@ -741,10 +744,39 @@ void editor_setup::rebuild_scene() {
 				};
 
 				// for now the only supported one
-				create_in(static_decoration());
+				create_as(static_decoration());
 			}
 			else if constexpr(std::is_same_v<editor_sound_resource, resource_type>) {
+				auto create_as = [&]<typename entity_type>(entity_type) {
+					auto& flavour_pool = scene.world.get_flavours<entity_type>(mutable_access);
+					auto& definitions = viewables.sounds;
+					
+					const auto [new_sound_id, new_definition] = definitions.allocate();
 
+					{
+						new_definition.source_sound.path = resource.external_file.path_in_project;
+						new_definition.source_sound.is_official = is_official;
+
+						auto& meta = new_definition.meta;
+						(void)meta;
+					}
+
+					const auto [new_raw_flavour_id, new_flavour] = flavour_pool.allocate();
+					const auto new_flavour_id = typed_entity_flavour_id<entity_type>(new_raw_flavour_id);
+
+					const auto& editable = resource.editable;
+
+					{
+						auto& sound = new_flavour.template get<invariants::continuous_sound>();
+						sound.effect.id = new_sound_id;
+						sound.effect.modifier = static_cast<sound_effect_modifier>(editable);
+					}
+
+					/* Cache for quick and easy mapping */
+					resource.scene_flavour_id = new_flavour_id;
+				};
+
+				create_as(sound_decoration());
 			}
 			else if constexpr(std::is_same_v<editor_light_resource, resource_type>) {
 
@@ -803,7 +835,10 @@ void editor_setup::rebuild_scene() {
 
 			};
 
-			if constexpr(std::is_same_v<editor_sprite_node, node_type>) {
+			if constexpr(
+				std::is_same_v<editor_sprite_node, node_type> ||
+				std::is_same_v<editor_sound_node, node_type>
+			) {
 				const auto new_id = cosmic::create_entity(
 					scene.world,
 					resource->scene_flavour_id,
@@ -845,7 +880,12 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	auto& eye = cone.eye;
 	eye.transform.pos.discard_fract();
 
+	auto on_screen = [&](const auto p) {
+		return cone.to_screen_space(p);
+	};
+
 	auto triangles = in.get_drawer();
+	auto lines = in.get_line_drawer();
 	const auto screen_size = in.screen_size;
 
 	auto& editor_cfg = in.config.editor;
@@ -858,6 +898,79 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			editor_cfg.grid.render
 		);
 	}
+
+	::for_each_iconed_entity(
+		scene.world, 
+		in.all_visible,
+		in.config.faction_view,
+
+		[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
+			const auto screen_space = transformr(vec2i(on_screen(world_transform.pos)), world_transform.rotation);
+
+			const auto is_invalid = image_id == assets::necessary_image_id::INVALID;
+			const auto image_size = is_invalid ? vec2u::square(32) : in.necessary_images[image_id].get_original_size();
+
+			const auto blank_tex = triangles.default_texture;
+			(void)blank_tex;
+
+#if 0
+			if (auto active_color = find_highlight_color_of(typed_handle.get_id())) {
+				active_color->a = static_cast<rgba_channel>(std::min(1.8 * active_color->a, 255.0));
+
+				augs::detail_sprite(
+					triangles.output_buffer,
+					blank_tex,
+					image_size + vec2i(10, 10),
+					screen_space.pos,
+					screen_space.rotation,
+					*active_color
+				);
+
+				active_color->a = static_cast<rgba_channel>(std::min(2.2 * active_color->a, 255.0));
+
+				lines.border(
+					image_size,
+					screen_space.pos,
+					screen_space.rotation,
+					*active_color,
+					border_input { 1, 0 }
+				);
+			}
+#endif
+
+			if (is_invalid) {
+				using namespace augs::gui::text;
+
+				const auto& callout_name = typed_handle.get_name();
+
+				print_stroked(
+					triangles,
+					on_screen(typed_handle.get_logic_transform().pos),
+					formatted_string { callout_name, { in.gui_fonts.gui, white } },
+					{ augs::ralign::CX, augs::ralign::CY }
+				);
+			}
+			else {
+				augs::detail_sprite(
+					triangles.output_buffer,
+					in.necessary_images.at(image_id),
+					screen_space.pos,
+					screen_space.rotation,
+					color
+				);
+
+				lines.border(
+					image_size,
+					screen_space.pos,
+					screen_space.rotation,
+					color,
+					border_input { 1, 2 }
+				);
+			}
+
+			::draw_area_indicator(typed_handle, lines, screen_space, eye.zoom, drawn_indicator_type::EDITOR, color);
+		}	
+	);
 }
 
 void editor_setup::apply(const config_lua_table& cfg) {

@@ -1,12 +1,12 @@
 #pragma once
 #include "application/setups/editor/gui/editor_filesystem_gui.h"
+#include "application/setups/editor/editor_get_icon_for.h"
 
 namespace editor_widgets {
 	inline void filesystem_node_widget(
 		editor_setup& setup,
 		editor_filesystem_node& node,
-		const necessary_images_in_atlas_map& necessary_images,
-		const ad_hoc_in_atlas_map& ad_hoc_atlas,
+		const editor_icon_info_in& icon_in,
 		const bool filter_active,
 		editor_resource_id& dragged_resource
 	) {
@@ -34,16 +34,15 @@ namespace editor_widgets {
 		}
 		else {
 			if (node.is_folder()) {
-				icon = necessary_images[assets::necessary_image_id::EDITOR_ICON_FOLDER];
+				icon = icon_in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FOLDER];
+			}
+			else if (node.is_resource()) {
+				auto result = setup.get_icon_for(node.associated_resource, icon_in);
+				icon = result.icon;
+				atlas_type = result.atlas;
 			}
 			else {
-				if (auto ad_hoc = mapped_or_nullptr(ad_hoc_atlas, node.file_thumbnail_id)) {
-					icon = *ad_hoc;
-					atlas_type = augs::imgui_atlas_type::AD_HOC;
-				}
-				else {
-					icon = necessary_images[assets::necessary_image_id::EDITOR_ICON_FILE];
-				}
+				icon = icon_in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FILE];
 			}
 		}
 

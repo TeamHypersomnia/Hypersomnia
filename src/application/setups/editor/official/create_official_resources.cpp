@@ -97,10 +97,23 @@ void create_sprites(editor_resource_pools& pools) {
 	}
 }
 
+void create_sounds(editor_resource_pools& pools) {
+	{
+		auto& loudy_fan = create_official(official_sounds::LOUDY_FAN, pools).editable;
+
+		loudy_fan.distance_model = augs::distance_model::LINEAR_DISTANCE_CLAMPED;
+		loudy_fan.reference_distance = 20.0f;
+		loudy_fan.max_distance = 400.0f;
+		loudy_fan.doppler_factor = 1.0f;
+		loudy_fan.gain = 0.5f;
+	}
+}
+
 void create_official_resources(editor_resource_pools& pools) {
 	create_lights(pools);
 
 	create_sprites(pools);
+	create_sounds(pools);
 }
 
 void create_official_filesystem_from(
@@ -126,10 +139,12 @@ void create_official_filesystem_from(
 			resource_id.raw = raw_id;
 			resource_id.type_id.set<resource_type>();
 
+			const auto& path = typed_resource.external_file.path_in_project;
+
 			auto& new_node = folder.files[i++];
 			new_node.associated_resource = resource_id;
-			new_node.name = typed_resource.external_file.path_in_project.filename();
-			new_node.type = editor_filesystem_node_type::OTHER_RESOURCE;
+			new_node.name = path.filename();
+			new_node.set_file_type_by(path.extension().string());
 		};
 
 		pool.for_each_id_and_object(resource_handler);
