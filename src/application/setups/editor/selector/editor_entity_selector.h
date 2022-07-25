@@ -10,17 +10,17 @@
 #include "view/necessary_image_id.h"
 #include "view/necessary_resources.h"
 
-#include "application/setups/debugger/debugger_selection_groups.h"
-#include "application/setups/debugger/debugger_settings.h"
-#include "application/setups/debugger/debugger_view.h"
+#include "application/setups/editor/editor_settings.h"
+#include "application/setups/editor/selector/editor_rect_select_type.h"
 
-struct grouped_selector_op_input {
+using current_selections_type = std::unordered_set<entity_id>;
+
+struct entity_selector_input {
 	const current_selections_type& saved_selections;
-	const debugger_selection_groups& groups;
 	bool ignore_groups;
 };
 
-class debugger_entity_selector {
+class editor_entity_selector {
 	entity_id hovered;
 	entity_id held;
 	vec2 last_ldown_position;
@@ -49,7 +49,7 @@ public:
 
 	current_selections_type do_left_release(
 		bool has_ctrl,
-		grouped_selector_op_input
+		entity_selector_input
 	);
 
 	auto get_held() const {
@@ -69,7 +69,7 @@ public:
 		const necessary_images_in_atlas_map& sizes_for_icons,
 
 		const cosmos& cosm,
-		const debugger_rect_select_type rect_select_mode,
+		const editor_rect_select_type rect_select_mode,
 		vec2 world_cursor_pos,
 		camera_eye eye,
 		bool left_button_pressed,
@@ -78,7 +78,7 @@ public:
 
 	void select_all(
 		const cosmos& cosm,
-		debugger_rect_select_type rect_select_mode,
+		editor_rect_select_type rect_select_mode,
 		bool has_ctrl,
 		std::unordered_set<entity_id>& current_selections,
 		const maybe_layer_filter& filter
@@ -86,13 +86,13 @@ public:
 
 	std::optional<ltrb> find_selection_aabb(
 		const cosmos& cosm,
-		grouped_selector_op_input in
+		entity_selector_input in
 	) const;
 
 	std::optional<rgba> find_highlight_color_of(
-		const debugger_entity_selector_settings& settings,
+		const editor_entity_selector_settings& settings,
 		entity_id id, 
-		grouped_selector_op_input in
+		entity_selector_input in
 	) const;
 
 	template <class F>
@@ -104,8 +104,8 @@ public:
 	template <class F>
 	void for_each_highlight(
 		F&& callback,
-		const debugger_entity_selector_settings& settings,
+		const editor_entity_selector_settings& settings,
 		const cosmos& cosm,
-		const grouped_selector_op_input in
+		const entity_selector_input in
 	) const;
 };

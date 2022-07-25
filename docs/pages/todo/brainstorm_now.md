@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Don't worry about atlases being too large with there being too many official assets
+	- It's enough that we generate miniatures in memory for the ad_hoc atlas, this should be trivial
+	- And we'll implement the occurence detection anyway so that only needed textures are getting into viewables
+		- The only problem with that is that when we drop a new object onto a scene, the atlas will regenerate
+		- But that's really a small price to pay
+
+
+- Can we truly assume that there is one entity per node and vice versa?
+	- What about prefabs?
+	- Well, this is pretty much only about whether we want to rewrite the entity selector to use nodes
+	- But I think this would only complicate stuff
+	- We can translate it to inspected node ids with do_left_release
+		- just like selected_ids is assigned
+
 - Dragging from layres gui will duplicate
 	- This will also play nicely with prefabization
 	- A layer will have an option to prefabize

@@ -1,6 +1,9 @@
 #pragma once
 #define RAPIDJSON_HAS_STDSTRING 1
 
+#include "augs/string/string_to_enum.h"
+#include "augs/log.h"
+
 #include "augs/filesystem/path.h"
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/json_readwrite_errors.h"

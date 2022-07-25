@@ -172,7 +172,7 @@ render_layer_filter get_layer_filter_for_miniature() {
 	return result;
 }
 
-#include "application/setups/debugger/gui/find_aabb_of.h"
+#include "view/rendering_scripts/find_aabb_of.h"
 #include "application/setups/debugger/debugger_paths.h"
 #include "game/cosmos/for_each_entity.h"
 
@@ -180,7 +180,7 @@ void debugger_coordinates_gui::perform(
 	debugger_setup& setup,
 	const vec2i screen_size,
 	const vec2i mouse_pos,
-   	const std::unordered_set<entity_id>& all_selected
+	const std::unordered_set<entity_id>& all_selected
 ) {
 	using namespace augs::imgui;
 

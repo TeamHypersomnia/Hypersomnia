@@ -8,7 +8,7 @@
 #include "application/setups/debugger/gui/debugger_entity_selector.h"
 
 #include "application/setups/debugger/commands/duplicate_entities_command.h"
-#include "application/setups/debugger/gui/find_aabb_of.h"
+#include "view/rendering_scripts/find_aabb_of.h"
 #include "application/setups/debugger/detail/debugger_transform_utils.h"
 #include "application/setups/debugger/commands/debugger_command_sanitizer.h"
 #include "application/setups/debugger/debugger_selection_groups.hpp"

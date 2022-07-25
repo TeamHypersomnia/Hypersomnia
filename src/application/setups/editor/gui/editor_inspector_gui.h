@@ -62,14 +62,24 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 	}
 
 	template <class T>
+	bool inspects_only() const {
+		return !inspects_any_different_than<T>();
+	}
+
+	template <class T, class F>
+	void for_each_inspected(F&& callback) const {
+		for (const auto& inspected : all_inspected) {
+			if (const auto typed = std::get_if<T>(std::addressof(inspected))) {
+				callback(*typed);
+			}
+		}
+	}
+
+	template <class T>
 	auto get_all_inspected() const {
 		std::vector<T> result;
 
-		for (const auto& inspected : all_inspected) {
-			if (const auto typed = std::get_if<T>(std::addressof(inspected))) {
-				result.push_back(*typed);
-			}
-		}
+		for_each_inspected<T>([&](const T& typed) { result.push_back(typed); });
 
 		return result;
 	}

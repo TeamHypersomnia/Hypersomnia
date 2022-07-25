@@ -28,6 +28,8 @@
 #include "application/setups/editor/editor_filesystem.h"
 #include "application/setups/editor/editor_history.h"
 
+#include "application/setups/editor/selector/editor_entity_selector.h"
+
 #include "application/setups/editor/project/editor_project_paths.h"
 
 #include "application/setups/editor/editor_view.h"
@@ -79,6 +81,9 @@ class editor_setup : public default_setup_settings {
 	editor_gui gui;
 	editor_view view;
 
+	editor_entity_selector selector;
+	mutable current_selections_type cached_selected_entities;
+
 	std::optional<simple_popup> ok_only_popup;
 
 	editor_history history;
@@ -119,6 +124,7 @@ class editor_setup : public default_setup_settings {
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
+	static constexpr bool has_additional_highlights = true;
 
 	editor_setup(const augs::path_type& project_path);
 	
@@ -177,6 +183,17 @@ public:
 	template <class F>
 	decltype(auto) on_resource(const editor_resource_id& id, F&& callback) const;
 
+	template <class F>
+	void for_each_dashed_line(F&&) const;
+
+	template <class F>
+	void for_each_inspected_entity(F&& callback) const;
+
+	std::unordered_set<entity_id> get_all_inspected_entities() const;
+
+	template <class F>
+	void for_each_highlight(F&& callback) const;
+
 	editor_node_id to_node_id(entity_id) const;
 
 	entity_id get_hovered_entity() const;
@@ -196,6 +213,8 @@ public:
 
 	template <class T>
 	decltype(auto) rewrite_last_command(T&&);
+
+	void inspect(const current_selections_type&);
 
 	void inspect(inspected_variant);
 	void inspect_only(inspected_variant);
@@ -217,6 +236,13 @@ public:
 	editor_history::index_type get_last_command_index() const;
 
 	editor_command_input make_command_input(); 
+	entity_selector_input make_selector_input() const;
+
+	std::optional<ltrb> find_selection_aabb() const;
+	std::optional<ltrb> find_screen_space_rect_selection(
+		const vec2i screen_size,
+		const vec2i mouse_pos
+	) const;
 
 	void undo();
 	void undo_quiet();
@@ -239,6 +265,9 @@ public:
 		const T& object, 
 		editor_icon_info_in
 	) const;
+
+	void unhover();
+	void clear_id_caches();
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

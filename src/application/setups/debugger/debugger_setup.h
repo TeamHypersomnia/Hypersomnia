@@ -341,9 +341,6 @@ public:
 	std::unordered_set<entity_id> get_all_selected_entities() const;
 
 	template <class F>
-	void for_each_line(F) const {}
-
-	template <class F>
 	void for_each_dashed_line(F&&) const;
 
 	template <class F>

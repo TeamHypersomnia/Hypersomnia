@@ -1,4 +1,4 @@
-#include "application/setups/debugger/gui/debugger_entity_selector.h"
+#include "application/setups/editor/selector/editor_entity_selector.h"
 #include "game/detail/render_layer_filter.h"
 
 #include "view/rendering_scripts/find_aabb_of.h"
@@ -9,17 +9,17 @@
 #include "augs/math/math.h"
 
 #include "game/cosmos/entity_handle.h"
-#include "application/setups/debugger/gui/debugger_entity_selector.hpp"
+#include "application/setups/editor/selector/editor_entity_selector.hpp"
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/get_hovered_world_entity.h"
 #include "game/detail/visible_entities.hpp"
 
-void debugger_entity_selector::reset_held_params() {
+void editor_entity_selector::reset_held_params() {
 	flavour_of_held = {};
 	layer_of_held = render_layer::INVALID;
 }
 
-void debugger_entity_selector::clear_dead_entities(const cosmos& cosm) {
+void editor_entity_selector::clear_dead_entities(const cosmos& cosm) {
 	cosm.erase_dead(in_rectangular_selection);
 	cosm.clear_dead(hovered);
 
@@ -29,7 +29,7 @@ void debugger_entity_selector::clear_dead_entities(const cosmos& cosm) {
 	}
 }
 
-void debugger_entity_selector::clear_dead_entity(const entity_id id) {
+void editor_entity_selector::clear_dead_entity(const entity_id id) {
 	erase_element(in_rectangular_selection, id);
 
 	if (hovered == id) {
@@ -42,14 +42,14 @@ void debugger_entity_selector::clear_dead_entity(const entity_id id) {
 	}
 }
 
-void debugger_entity_selector::clear() {
+void editor_entity_selector::clear() {
 	rectangular_drag_origin = std::nullopt;
 	in_rectangular_selection.clear();
 	hovered.unset();
 	held.unset();
 };
 
-std::optional<ltrb> debugger_entity_selector::find_screen_space_rect_selection(
+std::optional<ltrb> editor_entity_selector::find_screen_space_rect_selection(
 	const camera_cone& cone,
 	const vec2i mouse_pos
 ) const {
@@ -63,7 +63,7 @@ std::optional<ltrb> debugger_entity_selector::find_screen_space_rect_selection(
 	return std::nullopt;
 }
 
-void debugger_entity_selector::do_left_press(
+void editor_entity_selector::do_left_press(
 	const cosmos& cosm,
 	bool has_ctrl,
 	const vec2i world_cursor_pos,
@@ -86,7 +86,7 @@ void debugger_entity_selector::do_left_press(
 	}
 }
 
-void debugger_entity_selector::finish_rectangular(current_selections_type& into) {
+void editor_entity_selector::finish_rectangular(current_selections_type& into) {
 	current_selections_type new_selections;
 
 	for_each_selected_entity(
@@ -102,52 +102,40 @@ void debugger_entity_selector::finish_rectangular(current_selections_type& into)
 	in_rectangular_selection.clear();
 }
 
-current_selections_type debugger_entity_selector::do_left_release(
+current_selections_type editor_entity_selector::do_left_release(
 	const bool has_ctrl,
-	const grouped_selector_op_input in
+	const entity_selector_input in
 ) {
-	auto selections = in.saved_selections;
+	auto saved_selections = in.saved_selections;
 
 	if (const auto clicked = held; clicked.is_set()) {
-		selection_group_entries clicked_subjects;
-
-		if (in.ignore_groups) {
-			clicked_subjects = { clicked };
-		}
-		else {
-			auto find_belonging_group = [&](auto, const auto& group, auto) {
-				clicked_subjects = group.entries;	
-			};
-
-			if (!in.groups.on_group_entry_of(held, find_belonging_group)) {
-				clicked_subjects = { clicked };
-			}
-		}
+		/* Might become something different depending on group logic */
+		const auto clicked_subjects = current_selections_type { clicked };
 
 		if (has_ctrl) {
 			for (const auto& c : clicked_subjects) {
-				if (found_in(selections, c)) {
-					selections.erase(c);
+				if (found_in(saved_selections, c)) {
+					saved_selections.erase(c);
 				}
 				else {
-					selections.emplace(c);
+					saved_selections.emplace(c);
 				}
 			}
 		}
 		else {
-			assign_begin_end(selections, clicked_subjects);
+			assign_begin_end(saved_selections, clicked_subjects);
 		}
 	}
 
 	held = {};
 
-	finish_rectangular(selections);
-	return selections;
+	finish_rectangular(saved_selections);
+	return saved_selections;
 }
 
-void debugger_entity_selector::select_all(
+void editor_entity_selector::select_all(
 	const cosmos& cosm,
-	const debugger_rect_select_type rect_select_mode,
+	const editor_rect_select_type rect_select_mode,
 	const bool has_ctrl,
 	std::unordered_set<entity_id>& current_selections,
 	const maybe_layer_filter& filter
@@ -173,12 +161,12 @@ void debugger_entity_selector::select_all(
 			current_selections.emplace(id);
 		};
 
-		if (rect_select_mode == debugger_rect_select_type::SAME_FLAVOUR) {
+		if (rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
 			if (compared_flavour.is_set() && entity_flavour_id(handle.get_flavour_id()) == compared_flavour) {
 				add_to_selection();
 			}
 		}
-		else if (rect_select_mode == debugger_rect_select_type::SAME_LAYER) {
+		else if (rect_select_mode == editor_rect_select_type::SAME_LAYER) {
 			if (compared_layer != render_layer::INVALID && ::calc_render_layer(handle) == compared_layer) {
 				add_to_selection();
 			}
@@ -189,15 +177,15 @@ void debugger_entity_selector::select_all(
 	});
 }
 
-void debugger_entity_selector::unhover() {
+void editor_entity_selector::unhover() {
 	hovered = {};
 }
 
-void debugger_entity_selector::do_mousemotion(
+void editor_entity_selector::do_mousemotion(
 	const necessary_images_in_atlas_map& sizes_for_icons,
 
 	const cosmos& cosm,
-	const debugger_rect_select_type rect_select_mode,
+	const editor_rect_select_type rect_select_mode,
 	const vec2 world_cursor_pos,
 	const camera_eye eye,
 	const bool left_button_pressed,
@@ -287,7 +275,7 @@ void debugger_entity_selector::do_mousemotion(
 			reset_held_params();
 		}
 		
-		if (rect_select_mode == debugger_rect_select_type::SAME_FLAVOUR) {
+		if (rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
 			erase_if(in_rectangular_selection, [&](const entity_id id) {
 				const auto handle = cosm[id];
 				const auto candidate_flavour = entity_flavour_id(handle.get_flavour_id());
@@ -299,7 +287,7 @@ void debugger_entity_selector::do_mousemotion(
 				return flavour_of_held != candidate_flavour;
 			});
 		}
-		else if (rect_select_mode == debugger_rect_select_type::SAME_LAYER) {
+		else if (rect_select_mode == editor_rect_select_type::SAME_LAYER) {
 			erase_if(in_rectangular_selection, [&](const entity_id id) {
 				const auto handle = cosm[id];
 				const auto candidate_layer = ::calc_render_layer(handle);
@@ -338,9 +326,9 @@ void debugger_entity_selector::do_mousemotion(
 	}
 }
 
-std::optional<ltrb> debugger_entity_selector::find_selection_aabb(
+std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 	const cosmos& cosm,
-	const grouped_selector_op_input in
+	const entity_selector_input in
 ) const {
 	const auto result = ::find_aabb_of(
 		cosm,
@@ -352,10 +340,6 @@ std::optional<ltrb> debugger_entity_selector::find_selection_aabb(
 
 			if (held.is_set() && cosm[held]) {
 				combiner(held);
-
-				if (!in.ignore_groups) {
-					in.groups.for_each_sibling(held, combiner);
-				}
 			}
 		}
 	);
@@ -363,29 +347,15 @@ std::optional<ltrb> debugger_entity_selector::find_selection_aabb(
 	return result;
 }
 
-std::optional<rgba> debugger_entity_selector::find_highlight_color_of(
-	const debugger_entity_selector_settings& settings,
+std::optional<rgba> editor_entity_selector::find_highlight_color_of(
+	const editor_entity_selector_settings& settings,
 	const entity_id id, 
-	const grouped_selector_op_input in
+	const entity_selector_input in
 ) const {
-	auto held_or_hovered = [in, id](const entity_id checked, const rgba result_col) -> std::optional<rgba> {
+	auto held_or_hovered = [id](const entity_id checked, const rgba result_col) -> std::optional<rgba> {
 		if (checked.is_set()) {
 			if (checked == id) {
 				return result_col;
-			}
-
-			if (!in.ignore_groups) {
-				bool found = false;
-
-				in.groups.on_group_entry_of(checked, [id, &found](auto, const auto& group, auto) {	
-					if (found_in(group.entries, id)) {
-						found = true;
-					}
-				});
-
-				if (found) {
-					return result_col;
-				}
 			}
 		}
 

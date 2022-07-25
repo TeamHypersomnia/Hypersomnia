@@ -6,7 +6,7 @@
 #include "application/setups/debugger/debugger_command_input.h"
 #include "application/setups/debugger/commands/move_entities_command.h"
 #include "application/setups/debugger/gui/debugger_entity_selector.h"
-#include "application/setups/debugger/gui/find_aabb_of.h"
+#include "view/rendering_scripts/find_aabb_of.h"
 #include "application/setups/debugger/detail/debugger_transform_utils.h"
 #include "application/setups/debugger/commands/debugger_command_sanitizer.h"
 #include "game/inferred_caches/organism_cache.hpp"

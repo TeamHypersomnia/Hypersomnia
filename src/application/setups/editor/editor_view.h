@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/math/camera_cone.h"
 #include "augs/math/snapping_grid.h"
+#include "application/setups/editor/selector/editor_rect_select_type.h"
 
 struct editor_view {
 	// GEN INTROSPECTOR struct editor_view
@@ -9,6 +10,8 @@ struct editor_view {
 	bool snapping_enabled = true;
 	bool ignore_groups = false;
 	camera_eye panned_camera;
+
+	editor_rect_select_type rect_select_mode = editor_rect_select_type::EVERYTHING;
 	// END GEN INTROSPECTOR
 
 	void toggle_grid() {

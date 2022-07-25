@@ -5,6 +5,13 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Re-check codec security before deploying a version with direct arena transfers
+	- Consider allowing only several simple formats
+		- jpg, png, gif, ogg
+			- why even use wavs?
+	- Esp. something like gifs? For which we'll need a separate version
+	- How reputable is lodepng too?
+
 - Test if nicknames can't be exploited somehow
 	- Either by maximum/minimum length, duplicate names logic, special characters etc.
 

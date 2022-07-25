@@ -1,7 +1,7 @@
 #pragma once
 #include "application/setups/debugger/debugger_setup.h"
 #include "application/setups/debugger/detail/make_command_from_selections.h"
-#include "application/setups/debugger/gui/for_each_iconed_entity.h"
+#include "view/rendering_scripts/for_each_iconed_entity.h"
 #include "game/detail/visible_entities.h"
 #include "augs/drawing/general_border.h"
 

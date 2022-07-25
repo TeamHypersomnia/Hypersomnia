@@ -40,7 +40,9 @@
 #include "application/setups/editor/official/create_official_resources.h"
 #include "augs/gui/text/printer.h"
 #include "view/rendering_scripts/draw_area_indicator.h"
-#include "application/setups/debugger/gui/for_each_iconed_entity.h"
+#include "view/rendering_scripts/for_each_iconed_entity.h"
+#include "augs/drawing/general_border.h"
+#include "augs/templates/wrap_templates.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	create_official();
@@ -148,6 +150,8 @@ bool editor_setup::handle_input_before_game(
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 	const auto current_cone = camera_cone(current_eye, screen_size);
 
+	auto& cosm = scene.world;
+
 	if (editor_detail::handle_camera_input(
 		{},
 		current_cone,
@@ -157,6 +161,41 @@ bool editor_setup::handle_input_before_game(
 		view.panned_camera
 	)) {
 		return true;
+	}
+
+	if (e.msg == message::mousemotion) {
+		selector.do_mousemotion(
+			in.sizes_for_icons,
+			cosm,
+			view.rect_select_mode,
+			world_cursor_pos,
+			current_eye,
+			state[key::LMOUSE],
+			render_layer_filter::all()
+		);
+
+		return true;
+	}
+
+
+	if (e.was_pressed(key::LMOUSE)) {
+		auto selections = get_all_inspected_entities();
+		selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
+
+		if (selections != get_all_inspected_entities()) {
+			inspect(selections);
+		}
+
+		return true;
+	}
+
+	else if (e.was_released(key::LMOUSE)) {
+		auto selections = get_all_inspected_entities();
+		selections = selector.do_left_release(has_ctrl, make_selector_input());
+
+		if (selections != get_all_inspected_entities()) {
+			inspect(selections);
+		}
 	}
 
 	return false;
@@ -401,6 +440,14 @@ editor_history::index_type editor_setup::get_last_command_index() const {
 
 bool editor_setup::exists(const editor_resource_id& id) const {
 	return on_resource(id, [&](auto&&...) { return true; }) == std::optional<bool>(true);
+}
+
+void editor_setup::inspect(const current_selections_type& selections) {
+	gui.inspector.all_inspected.clear();
+
+	for (const auto entity : selections) {
+		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
+	}
 }
 
 void editor_setup::inspect(inspected_variant new_inspected) {
@@ -874,6 +921,115 @@ camera_eye editor_setup::get_camera_eye() const {
 	return view.panned_camera;
 }
 
+template <class F>
+void editor_setup::for_each_inspected_entity(F&& callback) const {
+	gui.inspector.for_each_inspected<editor_node_id>(
+		[&](const editor_node_id& node_id) {
+			on_node(
+				node_id,
+				[&](const auto& typed_node, const auto id) {
+					(void)id;
+					callback(typed_node.scene_entity_id);
+				}
+			);
+		}
+	);
+}
+
+std::unordered_set<entity_id> editor_setup::get_all_inspected_entities() const {
+	auto result = std::unordered_set<entity_id>();
+
+	for_each_inspected_entity(
+		[&](const auto id) {
+			result.emplace(id);
+		}
+	);
+
+	return result;
+}
+
+template <class F>
+void editor_setup::for_each_dashed_line(F&& callback) const {
+	const auto& world = scene.world;
+
+	if (const auto handle = world[selector.get_hovered()]) {
+		if (const auto tr = handle.find_logic_transform()) {
+			/* Draw dashed lines around the selected entity */
+			const auto ps = augs::make_rect_points(tr->pos, handle.get_logical_size(), tr->rotation);
+
+			for (std::size_t i = 0; i < ps.size(); ++i) {
+				const auto& v = ps[i];
+				const auto& nv = wrap_next(ps, i);
+
+				callback(v, nv, settings.entity_selector.hovered_dashed_line_color, 0);
+			}
+		}
+	}
+
+	auto dashed_line_handler = [&](const entity_id id) {
+		const auto handle = world[id];
+
+		handle.dispatch_on_having_all<components::light>([&](const auto typed_handle) {
+			const auto center = typed_handle.get_logic_transform().pos;
+
+			const auto& light = typed_handle.template get<components::light>();
+
+			const auto light_color = light.color;
+
+			auto draw_reach_indicator = [&](const auto reach, const auto col) {
+				callback(center, center + reach / 2, col);
+
+				augs::general_border_from_to(
+					ltrb(xywh::center_and_size(center, reach)),
+					0,
+					[&](const vec2 from, const vec2 to) {
+						callback(from, to, col);
+					}
+				);
+			};
+
+			draw_reach_indicator(light.calc_reach_trimmed(), light_color);
+			draw_reach_indicator(light.calc_wall_reach_trimmed(), rgba(light_color).mult_alpha(0.7f));
+		});
+
+#if 0
+		if (is_mover_active()) {
+			handle.dispatch_on_having_all<components::overridden_geo>([&](const auto& typed_handle) {
+				const auto s = typed_handle.get_logical_size();
+				const auto tr = typed_handle.get_logic_transform();
+
+				const auto& history = folder().history;
+				const auto& last = history.last_command();
+
+				if (const auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
+					const auto active = cmd->get_active_edges();
+					const auto edges = ltrb::center_and_size(tr.pos, s).make_edges();
+
+					auto draw_edge = [&](auto e) {
+						callback(e[0].rotate(tr), e[1].rotate(tr), red, global_time_seconds * 8, true);
+					};
+
+					if (active.top) {
+						draw_edge(edges[0]);
+					}
+					if (active.right) {
+						draw_edge(edges[1]);
+					}
+					if (active.bottom) {
+						draw_edge(edges[2]);
+					}
+					if (active.left) {
+						draw_edge(edges[3]);
+					}
+				}
+			});
+		}
+#endif
+	};
+
+	for_each_inspected_entity(dashed_line_handler);
+}
+
 void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) { 
 	auto cone = in.cone;
 
@@ -971,10 +1127,81 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			::draw_area_indicator(typed_handle, lines, screen_space, eye.zoom, drawn_indicator_type::EDITOR, color);
 		}	
 	);
+
+	if (const auto selection_aabb = find_selection_aabb()) {
+		auto col = white;
+
+#if 0
+		if (is_mover_active()) {
+			col.a = 120;
+		}
+#endif
+
+		triangles.border(
+			cone.to_screen_space(*selection_aabb),
+			col,
+			border_input { 1, -1 }
+		);
+	}
+
+	for_each_dashed_line(
+		[&](vec2 from, vec2 to, const rgba color, const double secs = 0.0, bool fatten = false) {
+			const auto a = on_screen(from);
+			const auto b = on_screen(to);
+
+			lines.dashed_line(a, b, color, 5.f, 5.f, secs);
+
+			if (fatten) {
+				const auto ba = b - a;
+				const auto perp = ba.perpendicular_cw().normalize();
+				lines.dashed_line(a + perp, b + perp, color, 5.f, 5.f, secs);
+				lines.dashed_line(a + perp * 2, b + perp * 2, color, 5.f, 5.f, secs);
+			}
+		}	
+	);
+
+	if (const auto r = find_screen_space_rect_selection(screen_size, in.mouse_pos)) {
+		triangles.aabb_with_border(
+			*r,
+			editor_cfg.rectangular_selection_color,
+			editor_cfg.rectangular_selection_border_color
+		);
+	}
 }
 
 void editor_setup::apply(const config_lua_table& cfg) {
 	settings = cfg.editor;
+}
+
+void editor_setup::unhover() {
+	selector.unhover();
+}
+
+void editor_setup::clear_id_caches() {
+	// Should we call it every time a node that alters entity existence is called?
+	selector.clear();
+
+	// Note that calling in.setup.clear_node_id_caches(); 
+	// during create_node_command could break hover detection in selector.
+	// Let's maybe always check for selected entities existence everywhere.
+	// (anyways it's a massive corner case that someone would ctrl+z/y during a rectangular selection.)
+	// Even without rect selection it could show some unrelated entity hovered for a split second, though.
+}
+
+entity_selector_input editor_setup::make_selector_input() const {
+	cached_selected_entities = get_all_inspected_entities();
+	return { cached_selected_entities, true };
+}
+
+std::optional<ltrb> editor_setup::find_selection_aabb() const {
+	return selector.find_selection_aabb(scene.world, make_selector_input());
+}
+
+std::optional<ltrb> editor_setup::find_screen_space_rect_selection(
+	const vec2i screen_size,
+	const vec2i mouse_pos
+) const {
+	return selector.find_screen_space_rect_selection(camera_cone(get_camera_eye(), screen_size), mouse_pos);
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

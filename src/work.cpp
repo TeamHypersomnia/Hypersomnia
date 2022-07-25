@@ -104,6 +104,8 @@
 #include "application/nat/stun_server_provider.h"
 #include "application/arena/arena_paths.h"
 
+#include "application/setups/editor/editor_setup_for_each_highlight.hpp"
+
 #include "application/main/self_updater.h"
 #include "work_result.h"
 
@@ -2208,6 +2210,10 @@ work_result work(const int argc, const char* const * const argv) try {
 			setup.unhover();
 		});
 #endif
+
+		on_specific_setup([](editor_setup& setup) {
+			setup.unhover();
+		});
 	};
 
 	static auto advance_game_gui = [&](const auto context, const auto frame_delta) {
