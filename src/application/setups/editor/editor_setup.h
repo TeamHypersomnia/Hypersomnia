@@ -198,6 +198,9 @@ public:
 	void finish_rectangular_selection();
 	void select_all_entities(bool has_ctrl);
 
+	void center_view_at_selection();
+	void center_view_at(editor_node_id);
+
 	template <class F>
 	void for_each_highlight(F&& callback) const;
 

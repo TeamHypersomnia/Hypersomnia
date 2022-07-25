@@ -98,6 +98,7 @@ namespace augs {
 		
 		int xi_opcode = -1;
 		uint32_t wm_delete_window_atom = static_cast<uint32_t>(-1);
+		vec2i delta_since_click;
 #else
 #error "Unsupported platform!"
 #endif

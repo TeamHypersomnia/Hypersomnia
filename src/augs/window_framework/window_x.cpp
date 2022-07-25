@@ -405,6 +405,7 @@ namespace augs {
 	template <class F, class G, class H>
 	std::optional<event::change> handle_event(
 		const xcb_generic_event_t* event,
+		vec2i& delta_since_click,
 		xcb_timestamp_t& last_ldown_time_ms,
 		F mousemotion_handler,
 		G keysym_getter,
@@ -507,11 +508,12 @@ namespace augs {
 				
 				switch (press->detail) {
 					case 1:
-					   	if (press->time - last_ldown_time_ms <= 500) {
+						if (press->time - last_ldown_time_ms <= 500 && std::abs(delta_since_click.x) <= 4 && std::abs(delta_since_click.y) <= 4) {
 							ch.msg = message::ldoubleclick;
 							last_ldown_time_ms = 0;
 						}
 						else {
+							delta_since_click.set(0, 0);
 							ch.msg = message::keydown;
 							ch.data.key.key = key::LMOUSE;
 							last_ldown_time_ms = press->time;
@@ -712,6 +714,7 @@ namespace augs {
 
 			if (const auto ch = handle_event(
 				event.get(), 
+				delta_since_click,
 				last_ldown_time_ms,
 				mousemotion_handler,
 				keysym_getter,
@@ -768,6 +771,12 @@ namespace augs {
 		}
 
 		output = std::move(clean_entropy);
+
+		for (auto& o : output) {
+			if (o.msg == event::message::mousemotion) {
+				delta_since_click += o.data.mouse.rel;
+			}
+		}
 	}
 
 

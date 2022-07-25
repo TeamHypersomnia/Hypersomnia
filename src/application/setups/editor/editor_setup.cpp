@@ -137,6 +137,7 @@ bool editor_setup::handle_input_before_game(
 
 		if (!has_shift && !has_ctrl) {
 			switch (k) {
+				case key::F: center_view_at_selection(); return true;
 				case key::G: view.toggle_grid(); return true;
 				case key::S: view.toggle_snapping(); return true;
 				case key::OPEN_SQUARE_BRACKET: view.grid.increase_grid_size(); clamp_units(); return true;
@@ -1272,6 +1273,23 @@ void editor_setup::select_all_entities(const bool has_ctrl) {
 	);
 
 	inspect_from_selector_state();
+}
+
+void editor_setup::center_view_at_selection() {
+	if (const auto aabb = find_selection_aabb()) {
+		view.center_at(aabb->get_center());
+	}
+}
+
+void editor_setup::center_view_at(const editor_node_id node_id) {
+	on_node(
+		node_id,
+		[&](const auto& node, const auto id) {
+			(void)id;
+
+			view.center_at(node.editable.pos);
+		}
+	);
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

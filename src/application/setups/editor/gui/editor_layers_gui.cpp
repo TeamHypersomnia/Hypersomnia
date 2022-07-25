@@ -232,6 +232,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					in.setup.inspect(node_id);
 				}
 
+				const bool selectable_double_clicked = ImGui::IsItemHovered() && has_double_click;
+
+				if (selectable_double_clicked) {
+					in.setup.center_view_at(node_id);
+				}
+
 				if (scroll_once_to == node_id) {
 					scroll_once_to = std::nullopt;
 
