@@ -4,6 +4,7 @@
 #include "view/viewables/ad_hoc_in_atlas_map.h"
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "application/setups/editor/editor_filesystem.h"
+#include "game/cosmos/entity_id.h"
 
 class editor_setup;
 
@@ -32,6 +33,8 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 
 	editor_resource_id dragged_resource;
 	editor_node_id previewed_created_node;
+
+	entity_id entity_to_highlight;
 
 	void perform(editor_project_files_input);
 	void clear_drag_drop();

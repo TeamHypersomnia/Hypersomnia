@@ -42,6 +42,7 @@
 #include "view/rendering_scripts/draw_area_indicator.h"
 #include "view/rendering_scripts/for_each_iconed_entity.h"
 #include "augs/drawing/general_border.h"
+#include "augs/drawing/drawing.hpp"
 #include "augs/templates/wrap_templates.h"
 #include "application/setups/editor/selector/editor_entity_selector.hpp"
 
@@ -527,10 +528,16 @@ editor_command_input editor_setup::make_command_input() {
 }
 
 void editor_setup::seek_to_revision(editor_history::index_type revision_index) {
+	const auto prev_inspected = get_all_inspected();
+
 	history.seek_to_revision(revision_index, make_command_input());
 
 	gui.filesystem.clear_drag_drop();
 	rebuild_scene();
+
+	if (prev_inspected != get_all_inspected()) {
+		inspected_to_entity_selector_state();
+	}
 }
 
 void editor_setup::undo_quiet() {
@@ -538,19 +545,31 @@ void editor_setup::undo_quiet() {
 }
 
 void editor_setup::undo() {
+	const auto prev_inspected = get_all_inspected();
+
 	gui.history.scroll_to_current_once = true;
 	undo_quiet();
 
 	gui.filesystem.clear_drag_drop();
 	rebuild_scene();
+
+	if (prev_inspected != get_all_inspected()) {
+		inspected_to_entity_selector_state();
+	}
 }
 
 void editor_setup::redo() {
+	const auto prev_inspected = get_all_inspected();
+
 	gui.history.scroll_to_current_once = true;
 	history.redo(make_command_input());
 
 	gui.filesystem.clear_drag_drop();
 	rebuild_scene();
+
+	if (prev_inspected != get_all_inspected()) {
+		inspected_to_entity_selector_state();
+	}
 }
 
 void editor_setup::load_gui_state() {
@@ -726,42 +745,18 @@ std::string editor_setup::get_name(inspected_variant v) const {
 	return std::visit(get_object_name, v);
 }
 
-entity_id editor_setup::get_hovered_entity() const {
-	// TODO: move to editor_entity_selector
-
-	auto& vis = thread_local_visible_entities();
-	const auto world_cursor_pos = get_world_cursor_pos();
-	auto& cosm = scene.world;
-	const auto layer_order = get_default_layer_order();
-
-	vis.reacquire_all({
-		cosm,
-		camera_cone(camera_eye(world_cursor_pos, 1.f), vec2i::square(1)),
-		accuracy_type::EXACT,
-		{},
-		tree_of_npo_filter::all()
-	});
-
-	vis.sort(cosm);
-
-	thread_local std::vector<entity_id> ids;
-	ids.clear();
-
-	vis.for_all_ids_ordered([&](const auto id) {
-		ids.emplace_back(id);
-	}, layer_order);
-
-	// remove_non_hovering_icons_from(ids, world_cursor_pos);
-
-	if (ids.size() > 0) {
-		return ids.back();
-	}
-
-	return {};
+entity_id editor_setup::get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons) const {
+	return editor_entity_selector::calc_hovered_entity(
+		scene.world,
+		sizes_for_icons,
+		get_camera_eye().zoom,
+		get_world_cursor_pos(),
+		render_layer_filter::all()
+	);
 }
 
-editor_node_id editor_setup::get_hovered_node() const {
-	return to_node_id(get_hovered_entity());
+editor_node_id editor_setup::get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons) const {
+	return to_node_id(get_hovered_entity(sizes_for_icons));
 }
 
 void editor_setup::scroll_once_to(editor_node_id id) {
@@ -1008,19 +1003,26 @@ template <class F>
 void editor_setup::for_each_dashed_line(F&& callback) const {
 	const auto& world = scene.world;
 
-	if (const auto handle = world[selector.get_hovered()]) {
-		if (const auto tr = handle.find_logic_transform()) {
-			/* Draw dashed lines around the selected entity */
-			const auto ps = augs::make_rect_points(tr->pos, handle.get_logical_size(), tr->rotation);
+	auto draw_dashes_around = [&](const entity_id hovered_id) {
+		if (const auto handle = world[hovered_id]) {
+			if (const auto tr = handle.find_logic_transform()) {
+				/* Draw dashed lines around the selected entity */
+				const auto ps = augs::make_rect_points(tr->pos, handle.get_logical_size(), tr->rotation);
 
-			for (std::size_t i = 0; i < ps.size(); ++i) {
-				const auto& v = ps[i];
-				const auto& nv = wrap_next(ps, i);
+				for (std::size_t i = 0; i < ps.size(); ++i) {
+					const auto& v = ps[i];
+					const auto& nv = wrap_next(ps, i);
 
-				callback(v, nv, settings.entity_selector.hovered_dashed_line_color, 0);
+					callback(v, nv, settings.entity_selector.hovered_dashed_line_color, 0);
+				}
 			}
 		}
-	}
+	};
+
+	draw_dashes_around(selector.get_hovered());
+
+	draw_dashes_around(gui.filesystem.entity_to_highlight);
+	draw_dashes_around(gui.layers.entity_to_highlight);
 
 	auto dashed_line_handler = [&](const entity_id id) {
 		const auto handle = world[id];
@@ -1290,6 +1292,21 @@ void editor_setup::center_view_at(const editor_node_id node_id) {
 			view.center_at(node.editable.pos);
 		}
 	);
+}
+
+entity_id editor_setup::get_scene_entity_id(const editor_node_id node_id) const {
+	if (const auto result = on_node(
+		node_id,
+		[&](const auto& node, const auto id) {
+			(void)id;
+
+			return node.scene_entity_id;
+		}
+	)) {
+		return *result;
+	}
+
+	return {};
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

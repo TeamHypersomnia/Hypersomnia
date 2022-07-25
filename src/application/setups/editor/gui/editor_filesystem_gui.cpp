@@ -21,6 +21,8 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	(void)in;
 	
+	entity_to_highlight.unset();
+
 	auto window = make_scoped_window();
 
 	if (dragged_resource.is_set()) {
@@ -62,7 +64,8 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					command.built_description = typesafe_sprintf("Created %x", new_name);
 					command.created_node = std::move(new_node);
 
-					const auto hovered_node = in.setup.get_hovered_node();
+					const auto hovered_node = in.setup.get_hovered_node(in.necessary_images);
+					entity_to_highlight = in.setup.get_scene_entity_id(hovered_node);
 
 					if (const auto parent_layer = in.setup.find_parent_layer(hovered_node)) {
 						command.layer_id = parent_layer->first;

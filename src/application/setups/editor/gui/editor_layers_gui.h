@@ -2,6 +2,7 @@
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "view/necessary_resources.h"
 #include "view/viewables/ad_hoc_in_atlas_map.h"
+#include "game/cosmos/entity_id.h"
 
 struct editor_filesystem_node;
 class editor_setup;
@@ -24,6 +25,8 @@ struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {
 
 	editor_node_id dragged_node;
 	editor_layer_id dragged_layer;
+
+	entity_id entity_to_highlight;
 
 	void perform(editor_layers_input);
 };

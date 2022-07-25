@@ -60,10 +60,22 @@ public:
 		return hovered;
 	}
 
+	void set_hovered(const entity_id id) {
+		hovered = id;
+	}
+
 	std::optional<ltrb> find_screen_space_rect_selection(
 		const camera_cone&,
 		vec2i mouse_pos
 	) const;
+
+	static entity_id calc_hovered_entity(
+		const cosmos& cosm,
+		const necessary_images_in_atlas_map& sizes_for_icons,
+		float zoom,
+		vec2 world_cursor_pos,
+		const maybe_layer_filter& filter
+	);
 
 	void do_mousemotion(
 		const necessary_images_in_atlas_map& sizes_for_icons,

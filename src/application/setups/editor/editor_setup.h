@@ -206,8 +206,9 @@ public:
 
 	editor_node_id to_node_id(entity_id) const;
 
-	entity_id get_hovered_entity() const;
-	editor_node_id get_hovered_node() const;
+	entity_id get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons) const;
+	editor_node_id get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons) const;
+	entity_id get_scene_entity_id(editor_node_id) const;
 
 	void scroll_once_to(editor_node_id);
 	std::unordered_map<std::string, editor_node_id> make_name_to_node_map() const;

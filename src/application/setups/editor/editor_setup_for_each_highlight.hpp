@@ -12,6 +12,15 @@ void editor_setup::for_each_highlight(F&& callback) const {
 		make_selector_input()
 	);
 
+	auto additional_hover_highlight = [&](const auto id) {
+		if (world[id]) {
+			callback(id, settings.entity_selector.hovered_color);
+		}
+	};
+	
+	additional_hover_highlight(gui.filesystem.entity_to_highlight);
+	additional_hover_highlight(gui.layers.entity_to_highlight);
+
 #if 0
 	// use this later to implement layer hovered detection
 

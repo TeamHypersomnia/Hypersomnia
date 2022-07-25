@@ -21,6 +21,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	(void)in;
 	
+	entity_to_highlight.unset();
+
 	const bool has_double_click = in.setup.handle_doubleclick_in_layers_gui;
 	in.setup.handle_doubleclick_in_layers_gui = false;
 
@@ -236,6 +238,10 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				if (selectable_double_clicked) {
 					in.setup.center_view_at(node_id);
+				}
+
+				if (ImGui::IsItemHovered()) {
+					entity_to_highlight = in.setup.get_scene_entity_id(node_id);
 				}
 
 				if (scroll_once_to == node_id) {
