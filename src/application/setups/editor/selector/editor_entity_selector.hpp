@@ -10,7 +10,9 @@ void editor_entity_selector::for_each_highlight(
 ) const {
 	for_each_selected_entity(
 		[&](const auto e) {
-			callback(e, settings.selected_color);
+			if (cosm[e]) {
+				callback(e, settings.selected_color);
+			}
 		},
 		in.saved_selections
 	);

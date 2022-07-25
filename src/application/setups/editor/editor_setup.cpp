@@ -43,6 +43,7 @@
 #include "view/rendering_scripts/for_each_iconed_entity.h"
 #include "augs/drawing/general_border.h"
 #include "augs/templates/wrap_templates.h"
+#include "application/setups/editor/selector/editor_entity_selector.hpp"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	create_official();
@@ -163,6 +164,16 @@ bool editor_setup::handle_input_before_game(
 		return true;
 	}
 
+	get_all_selected_by_selector(cached_selected_comparison);
+
+	auto check_changed = [&]() {
+		get_all_selected_by_selector(cached_selected_comparison_after);
+
+		if (cached_selected_comparison_after != cached_selected_comparison) {
+			inspect(cached_selected_comparison_after);
+		}
+	};
+
 	if (e.msg == message::mousemotion) {
 		selector.do_mousemotion(
 			in.sizes_for_icons,
@@ -174,31 +185,51 @@ bool editor_setup::handle_input_before_game(
 			render_layer_filter::all()
 		);
 
+		check_changed();
+
 		return true;
 	}
 
+	auto& selections = cached_selected_entities;
 
 	if (e.was_pressed(key::LMOUSE)) {
-		auto selections = get_all_inspected_entities();
 		selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
-
-		if (selections != get_all_inspected_entities()) {
-			inspect(selections);
-		}
+		check_changed();
 
 		return true;
 	}
 
 	else if (e.was_released(key::LMOUSE)) {
-		auto selections = get_all_inspected_entities();
 		selections = selector.do_left_release(has_ctrl, make_selector_input());
-
-		if (selections != get_all_inspected_entities()) {
-			inspect(selections);
-		}
+		check_changed();
 	}
 
 	return false;
+}
+
+void editor_setup::inspect_from_selector_state() {
+	get_all_selected_by_selector(cached_selected_comparison);
+
+	inspect(cached_selected_comparison);
+}
+
+void editor_setup::get_all_selected_by_selector(std::vector<entity_id>& into) const {
+	into.clear();
+
+	selector.for_each_selected_entity(
+		[&](const entity_id id) {
+			into.emplace_back(id);
+		},
+		cached_selected_entities
+	);
+
+	const auto held = selector.get_held();
+
+	if (scene.world[held]) {
+		if (!found_in(into, held)) {
+			into.emplace_back(held);
+		}
+	}
 }
 
 vec2 editor_setup::get_world_cursor_pos() const {
@@ -450,12 +481,35 @@ void editor_setup::inspect(const current_selections_type& selections) {
 	}
 }
 
+void editor_setup::inspect(const std::vector<entity_id>& selections) {
+	gui.inspector.all_inspected.clear();
+
+	for (const auto entity : selections) {
+		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
+	}
+}
+
+void editor_setup::inspected_to_entity_selector_state() {
+	cached_selected_entities.clear();
+	selector.clear();
+
+	for_each_inspected_entity(
+		[&](const entity_id id) {
+			cached_selected_entities.emplace(id);
+		}
+	);
+}
+
 void editor_setup::inspect(inspected_variant new_inspected) {
 	gui.inspector.inspect(new_inspected, wants_multiple_selection());
+
+	inspected_to_entity_selector_state();
 }
 
 void editor_setup::inspect_only(inspected_variant new_inspected) {
 	gui.inspector.inspect(new_inspected, false);
+
+	inspected_to_entity_selector_state();
 }
 
 bool editor_setup::is_inspected(inspected_variant inspected) const {
@@ -1189,7 +1243,6 @@ void editor_setup::clear_id_caches() {
 }
 
 entity_selector_input editor_setup::make_selector_input() const {
-	cached_selected_entities = get_all_inspected_entities();
 	return { cached_selected_entities, true };
 }
 
@@ -1202,6 +1255,10 @@ std::optional<ltrb> editor_setup::find_screen_space_rect_selection(
 	const vec2i mouse_pos
 ) const {
 	return selector.find_screen_space_rect_selection(camera_cone(get_camera_eye(), screen_size), mouse_pos);
+}
+
+void editor_setup::finish_rectangular_selection() {
+	selector.finish_rectangular(cached_selected_entities);
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

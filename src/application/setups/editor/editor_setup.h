@@ -82,7 +82,9 @@ class editor_setup : public default_setup_settings {
 	editor_view view;
 
 	editor_entity_selector selector;
-	mutable current_selections_type cached_selected_entities;
+	current_selections_type cached_selected_entities;
+	std::vector<entity_id> cached_selected_comparison;
+	std::vector<entity_id> cached_selected_comparison_after;
 
 	std::optional<simple_popup> ok_only_popup;
 
@@ -190,6 +192,10 @@ public:
 	void for_each_inspected_entity(F&& callback) const;
 
 	std::unordered_set<entity_id> get_all_inspected_entities() const;
+	void get_all_selected_by_selector(std::vector<entity_id>& into) const;
+	void inspect_from_selector_state();
+
+	void finish_rectangular_selection();
 
 	template <class F>
 	void for_each_highlight(F&& callback) const;
@@ -215,9 +221,11 @@ public:
 	decltype(auto) rewrite_last_command(T&&);
 
 	void inspect(const current_selections_type&);
+	void inspect(const std::vector<entity_id>&);
 
 	void inspect(inspected_variant);
 	void inspect_only(inspected_variant);
+	void inspected_to_entity_selector_state();
 
 	template <class T>
 	bool inspects_any() const {
