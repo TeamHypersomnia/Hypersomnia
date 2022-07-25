@@ -118,6 +118,7 @@ bool editor_setup::handle_input_before_game(
 			}
 
 			switch (k) {
+				case key::A: select_all_entities(has_ctrl); return true;
 				case key::Z: undo(); return true;
 				//case key::C: copy(); return true;
 				//case key::X: cut(); return true;
@@ -1259,6 +1260,18 @@ std::optional<ltrb> editor_setup::find_screen_space_rect_selection(
 
 void editor_setup::finish_rectangular_selection() {
 	selector.finish_rectangular(cached_selected_entities);
+}
+
+void editor_setup::select_all_entities(const bool has_ctrl) {
+	selector.select_all(
+		scene.world,
+		view.rect_select_mode,
+		has_ctrl,
+		cached_selected_entities,
+		render_layer_filter::all()
+	);
+
+	inspect_from_selector_state();
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

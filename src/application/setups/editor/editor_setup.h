@@ -196,6 +196,7 @@ public:
 	void inspect_from_selector_state();
 
 	void finish_rectangular_selection();
+	void select_all_entities(bool has_ctrl);
 
 	template <class F>
 	void for_each_highlight(F&& callback) const;
