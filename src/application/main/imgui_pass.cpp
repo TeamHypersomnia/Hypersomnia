@@ -10,7 +10,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
 void perform_imgui_pass(
-	augs::local_entropy& window_inputs,
+	const augs::local_entropy& window_inputs,
 	const vec2i screen_size,
 	const augs::delta delta,
 	const config_lua_table& canon_config,
@@ -108,6 +108,4 @@ void perform_imgui_pass(
 	custom_imgui_logic();
 
 	augs::imgui::render();
-
-	window_inputs = augs::imgui::filter_inputs(window_inputs);
 }

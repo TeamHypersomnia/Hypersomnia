@@ -81,6 +81,12 @@ bool editor_setup::handle_input_before_imgui(
 ) {
 	using namespace augs::event;
 
+	if (in.e.was_pressed(keys::key::LMOUSE)) {
+		if (mover.do_left_press(make_mover_input())) {
+			return true;	
+		}
+	}
+
 	if (in.e.msg == message::ldoubleclick) {
 		handle_doubleclick_in_layers_gui = true;
 	}
@@ -208,12 +214,6 @@ bool editor_setup::handle_input_before_game(
 			inspect(cached_selected_comparison_after);
 		}
 	};
-
-	if (e.was_pressed(key::LMOUSE)) {
-		if (mover.do_left_press(make_mover_input())) {
-			return true;	
-		}
-	}
 
 	if (e.msg == message::mousemotion) {
 		if (mover.do_mousemotion(make_mover_input(), world_cursor_pos)) {

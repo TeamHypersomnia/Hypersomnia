@@ -1501,6 +1501,14 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto do_imgui_pass = [](const auto frame_num, auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {
+		bool freeze_imgui_inputs = false;
+
+		on_specific_setup([&](editor_setup& editor) {
+			if (editor.is_mover_active()) {
+				freeze_imgui_inputs = true;
+			}
+		});
+
 		perform_imgui_pass(
 			new_window_entropy,
 			logic_get_screen_size(),
@@ -1597,6 +1605,12 @@ work_result work(const int argc, const char* const * const argv) try {
 			in_direct_gameplay,
 			float_tests_succeeded
 		);
+
+		if (freeze_imgui_inputs) {
+			ImGui::GetIO().WantCaptureMouse = false;
+		}
+
+		new_window_entropy = augs::imgui::filter_inputs(new_window_entropy);
 	};
 
 	static auto decide_on_cursor_clipping = [](const bool in_direct_gameplay, const auto& cfg) {

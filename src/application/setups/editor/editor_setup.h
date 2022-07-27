@@ -396,4 +396,8 @@ public:
 
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
+
+	bool is_mover_active() const {
+		return mover.is_active(history);
+	}
 };

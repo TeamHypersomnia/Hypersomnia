@@ -51,7 +51,7 @@ namespace augs {
 		);
 
 		void pass_inputs(
-			local_entropy& window_inputs
+			const local_entropy& window_inputs
 		);
 
 		void neutralize_mouse();

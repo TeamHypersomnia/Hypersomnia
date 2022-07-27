@@ -109,7 +109,7 @@ namespace augs {
 			io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
 		}
 
-		void pass_inputs(local_entropy& window_inputs) {
+		void pass_inputs(const local_entropy& window_inputs) {
 			using namespace event;
 			using namespace event::keys;
 

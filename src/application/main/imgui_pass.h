@@ -15,7 +15,7 @@ namespace augs {
 }
 
 void perform_imgui_pass(
-	augs::local_entropy& window_inputs,
+	const augs::local_entropy& window_inputs,
 	const vec2i screen_size,
 	const augs::delta delta,
 	const config_lua_table& canon_config,
