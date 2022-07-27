@@ -1,14 +1,6 @@
 #pragma once
 #include "particle_types.h"
-
-template <class T, class = void>
-struct has_rotation : std::false_type {};
-
-template <class T>
-struct has_rotation<T, decltype(std::declval<T&>().rotation, void())> : std::true_type {};
-
-template <class T>
-constexpr bool has_rotation_v = has_rotation<T>::value;
+#include "augs/templates/traits/has_rotation.h"
 
 template <class T>
 FORCE_INLINE void generic_integrate_particle(T& p, const float dt) {

@@ -9,6 +9,10 @@ class move_entities_command;
 class flip_entities_command;
 class resize_entities_command;
 
+class move_nodes_command;
+class flip_nodes_command;
+class resize_nodes_command;
+
 struct debugger_property_accessors;
 
 template <class derived_handle_type>
@@ -26,6 +30,10 @@ class cosmos_solvable_access {
 	friend move_entities_command;
 	friend flip_entities_command;
 	friend resize_entities_command;
+
+	friend move_nodes_command;
+	friend flip_nodes_command;
+	friend resize_nodes_command;
 
 	friend debugger_property_accessors;
 

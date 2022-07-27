@@ -29,6 +29,7 @@
 #include "application/setups/editor/editor_history.h"
 
 #include "application/setups/editor/selector/editor_entity_selector.h"
+#include "application/setups/editor/mover/editor_node_mover.h"
 
 #include "application/setups/editor/project/editor_project_paths.h"
 
@@ -82,6 +83,8 @@ class editor_setup : public default_setup_settings {
 	editor_view view;
 
 	editor_entity_selector selector;
+	editor_node_mover mover;
+
 	current_selections_type cached_selected_entities;
 	std::vector<entity_id> cached_selected_comparison;
 	std::vector<entity_id> cached_selected_comparison_after;
@@ -122,6 +125,15 @@ class editor_setup : public default_setup_settings {
 	friend struct create_node_command;
 
 	friend reorder_layers_command;
+
+	friend move_nodes_command;
+	friend resize_nodes_command;
+
+	friend editor_node_mover;
+
+	cosmos& get_cosmos() {
+		return scene.world;
+	}
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -225,6 +237,9 @@ public:
 	template <class T>
 	decltype(auto) rewrite_last_command(T&&);
 
+	template <class T, class... Args>
+	auto make_command_from_selections(Args&&...) const;
+
 	void inspect(const current_selections_type&);
 	void inspect(const std::vector<entity_id>&);
 
@@ -250,6 +265,7 @@ public:
 
 	editor_command_input make_command_input(); 
 	entity_selector_input make_selector_input() const;
+	node_mover_input make_mover_input();
 
 	std::optional<ltrb> find_selection_aabb() const;
 	std::optional<ltrb> find_screen_space_rect_selection(
@@ -281,6 +297,7 @@ public:
 
 	void unhover();
 	void clear_id_caches();
+	bool confirm_modal_popup();
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
@@ -319,9 +336,7 @@ public:
 
 	void apply(const config_lua_table&);
 
-	auto escape() {
-		return setup_escape_result::IGNORE;
-	}
+	setup_escape_result escape();
 
 	auto get_inv_tickrate() const {
 		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();

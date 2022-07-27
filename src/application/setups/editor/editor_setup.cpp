@@ -45,6 +45,7 @@
 #include "augs/drawing/drawing.hpp"
 #include "augs/templates/wrap_templates.h"
 #include "application/setups/editor/selector/editor_entity_selector.hpp"
+#include "application/setups/editor/editor_setup_for_each_inspected_entity.hpp"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	create_official();
@@ -95,6 +96,15 @@ bool editor_setup::handle_input_before_imgui(
 	return false;
 }
 
+bool editor_setup::confirm_modal_popup() {
+	if (ok_only_popup) {
+		ok_only_popup = std::nullopt;
+		return true;
+	}
+
+	return false;
+}
+
 bool editor_setup::handle_input_before_game(
 	handle_input_before_game_input in
 ) {
@@ -109,6 +119,16 @@ bool editor_setup::handle_input_before_game(
 
 	if (e.was_any_key_pressed()) {
 		const auto k = e.data.key.key;
+
+		if (!has_ctrl && k == key::ENTER) {
+			if (confirm_modal_popup()) {
+				return true;
+			}
+
+			if (mover.escape()) {
+				return true;
+			}
+		}	
 
 		if (has_ctrl) {
 			if (has_shift) {
@@ -125,7 +145,8 @@ bool editor_setup::handle_input_before_game(
 				//case key::X: cut(); return true;
 				//case key::V: paste(); return true;
 
-				//case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
+				case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
+				//case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
 				case key::F: gui.filesystem.open(); return true;
 				case key::L: gui.layers.open(); return true;
 				case key::H: gui.history.open(); return true;
@@ -136,8 +157,19 @@ bool editor_setup::handle_input_before_game(
 
 		auto clamp_units = [&]() { view.grid.clamp_units(8, settings.grid.render.get_maximum_unit()); };
 
+		if (has_shift && !has_ctrl) {
+			switch (k) {
+				case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
+				default: break;
+			}
+		}
+
 		if (!has_shift && !has_ctrl) {
 			switch (k) {
+				case key::T: mover.start_moving_selection(make_mover_input()); return true;
+				//case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
+				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
+				case key::W: mover.reset_rotation(make_mover_input()); return true;
 				case key::F: center_view_at_selection(); return true;
 				case key::G: view.toggle_grid(); return true;
 				case key::S: view.toggle_snapping(); return true;
@@ -177,7 +209,17 @@ bool editor_setup::handle_input_before_game(
 		}
 	};
 
+	if (e.was_pressed(key::LMOUSE)) {
+		if (mover.do_left_press(make_mover_input())) {
+			return true;	
+		}
+	}
+
 	if (e.msg == message::mousemotion) {
+		if (mover.do_mousemotion(make_mover_input(), world_cursor_pos)) {
+			return true;
+		}
+
 		selector.do_mousemotion(
 			in.sizes_for_icons,
 			cosm,
@@ -527,16 +569,13 @@ editor_command_input editor_setup::make_command_input() {
 	return { *this };
 }
 
-void editor_setup::seek_to_revision(editor_history::index_type revision_index) {
-	const auto prev_inspected = get_all_inspected();
+void editor_setup::seek_to_revision(const editor_history::index_type n) {
+	while (history.get_current_revision() < n) {
+		redo();
+	}
 
-	history.seek_to_revision(revision_index, make_command_input());
-
-	gui.filesystem.clear_drag_drop();
-	rebuild_scene();
-
-	if (prev_inspected != get_all_inspected()) {
-		inspected_to_entity_selector_state();
+	while (history.get_current_revision() > n) {
+		undo();
 	}
 }
 
@@ -972,21 +1011,6 @@ camera_eye editor_setup::get_camera_eye() const {
 	return view.panned_camera;
 }
 
-template <class F>
-void editor_setup::for_each_inspected_entity(F&& callback) const {
-	gui.inspector.for_each_inspected<editor_node_id>(
-		[&](const editor_node_id& node_id) {
-			on_node(
-				node_id,
-				[&](const auto& typed_node, const auto id) {
-					(void)id;
-					callback(typed_node.scene_entity_id);
-				}
-			);
-		}
-	);
-}
-
 std::unordered_set<entity_id> editor_setup::get_all_inspected_entities() const {
 	auto result = std::unordered_set<entity_id>();
 
@@ -1307,6 +1331,23 @@ entity_id editor_setup::get_scene_entity_id(const editor_node_id node_id) const 
 	}
 
 	return {};
+}
+
+node_mover_input editor_setup::make_mover_input() {
+	return { *this };
+}
+
+setup_escape_result editor_setup::escape() {
+	if (ok_only_popup) {
+		ok_only_popup = std::nullopt;
+		return setup_escape_result::JUST_FETCH;
+	}
+	else if (mover.escape()) {
+		undo();
+		return setup_escape_result::JUST_FETCH;
+	}
+
+	return setup_escape_result::LAUNCH_INGAME_MENU;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

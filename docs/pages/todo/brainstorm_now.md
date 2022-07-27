@@ -6,6 +6,53 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Shift+T could move with layer detection just like when putting on scene
+
+- Damn it, we badly need to have those child commands
+	- They wouldn't be visible, it would just be history detail
+	- separate post_child_command
+	- although that kind of complicates rewrite_last_command? so either stick with normal command or just embed those commands
+
+- It seems to me that it's not the worst pattern - all transforming logic working on the generated scene, as opposed to abstract node entries.
+	- This is because node transforming logic works on *apparent state*.
+	- E.g. for selector, with special stuff for prefabs you can't be sure how something is going to be generated on-scene
+		- so you'd anyway be working on entities there and reading back
+
+- Now for a fun question: can commands really contain entity ids?
+	- Since they're not saved anyway...
+	- This would spare us the initial entity->node translation
+		- which would need to be translated back anyway
+	- I guess entity id creation is deterministic
+	- A million dollar question: how do we revert it? It would seem dirty to save just the state of entities and then read-back on undo to the nodes
+		- Because there's no guarantee we'll go to the original state on revert
+		- Wouldn't that work anyway? There's no magic involved
+
+- Remember that porting those moving/transforming things will be the hardest.
+	- The hardest work will be done by then
+		- next hardest is pretty much just state i/o
+		- then duplicating/deleting etc
+
+- Now about the moving and transforming...
+	- It would be extremely complex to port it to the node structures
+	- Problem is it works on individual entities
+		- What about prefabs?
+		- Prefabs will possibly have a completely different resizing/transforming logic
+
+- Hang on. If move_entities_command accepts a single delta, can't we use it to simulate moving all of the entities (prefab included, just making sure that it's selected in its entirety)?
+	- Resize is harder
+
+- After all we could use the legacy commands to let the user "choose" so to speak
+
+- reference_point is just mouse position in the resize command
+- Translating back from resize command should be relatively easy
+	- It's clearly only touching sizes in overridden_geo + the independent transforms
+
+- Let's not worry about prefabs for now
+
+
+- Looks like the sound icon selection is broken in the original editor too
+	- Light icons work so let's first test that
+
 - Don't worry about atlases being too large with there being too many official assets
 	- It's enough that we generate miniatures in memory for the ad_hoc atlas, this should be trivial
 	- And we'll implement the occurence detection anyway so that only needed textures are getting into viewables

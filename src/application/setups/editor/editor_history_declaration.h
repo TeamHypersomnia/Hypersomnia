@@ -32,6 +32,8 @@ struct reorder_layers_command;
 struct delete_layers_command;
 struct create_multiple_nodes;
 
+class move_nodes_command;
+
 using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_sprite_resource>,
 	edit_resource_command<editor_sound_resource>,
@@ -48,5 +50,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	create_node_command<editor_light_node>,
 
 	reorder_nodes_command,
-	reorder_layers_command
+	reorder_layers_command,
+
+	move_nodes_command
 >;

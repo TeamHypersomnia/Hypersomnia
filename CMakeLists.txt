@@ -458,6 +458,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
 
+	"src/application/setups/editor/mover/editor_node_mover.cpp"
+	"src/application/setups/editor/commands/node_transform_commands.cpp"
 	"src/application/setups/editor/selector/editor_entity_selector.cpp"
 	"src/application/setups/editor/official/create_official_resources.cpp"
 	"src/application/setups/editor/editor_camera.cpp"

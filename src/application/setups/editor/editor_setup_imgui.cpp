@@ -8,6 +8,7 @@
 
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "3rdparty/imgui/imgui_internal.h"
 
 void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
@@ -137,6 +138,15 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		if (ok_only_popup->perform()) {
 			ok_only_popup = std::nullopt;
 		}
+	}
+
+	using namespace augs::imgui;
+
+	if (const auto rot = mover.current_mover_rot_delta(make_mover_input())) {
+		text_tooltip("%x*", *rot);
+	}
+	else if (const auto pos = mover.current_mover_pos_delta(make_mover_input())) {
+		text_tooltip("x: %x\ny: %x", pos->x, pos->y);
 	}
 
 	return custom_imgui_result::NONE;

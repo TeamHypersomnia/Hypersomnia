@@ -240,16 +240,20 @@ void editor_entity_selector::do_mousemotion(
 ) {
 	hovered = {};
 
-	{
+	if (!left_button_pressed) {
+		last_ldown_position = std::nullopt;
+	}
+
+	if (last_ldown_position != std::nullopt) {
 		const bool drag_just_left_dead_area = [&]() {
 			const auto drag_dead_area = 3.f;
-			const auto drag_offset = world_cursor_pos - last_ldown_position;
+			const auto drag_offset = world_cursor_pos - *last_ldown_position;
 
 			return !drag_offset.is_epsilon(drag_dead_area);
 		}();
 
-		if (left_button_pressed && drag_just_left_dead_area) {
-			rectangular_drag_origin = last_ldown_position;
+		if (drag_just_left_dead_area) {
+			rectangular_drag_origin = *last_ldown_position;
 			held = {};
 		}
 	}

@@ -23,7 +23,7 @@ struct entity_selector_input {
 class editor_entity_selector {
 	entity_id hovered;
 	entity_id held;
-	vec2 last_ldown_position;
+	std::optional<vec2> last_ldown_position;
 	current_selections_type in_rectangular_selection;
 	std::optional<vec2> rectangular_drag_origin;
 

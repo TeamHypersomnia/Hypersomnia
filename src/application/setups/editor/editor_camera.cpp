@@ -1,6 +1,7 @@
 #include "application/setups/editor/editor_camera.h"
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/editor_settings.h"
+#include "augs/templates/reversion_wrapper.h"
 
 namespace editor_detail {
 	bool handle_camera_input(
@@ -13,9 +14,6 @@ namespace editor_detail {
 	) {
 		using namespace augs::event;
 		using namespace augs::event::keys;
-
-		const auto screen_size = cone.screen_size;
-		const auto world_screen_center = cone.to_world_space(screen_size/2);
 
 		const bool has_shift{ common_input_state[key::LSHIFT] };
 		const bool has_alt{ common_input_state[key::LALT] };
@@ -92,7 +90,41 @@ namespace editor_detail {
 			const auto k = e.data.key.key;
 
 			const auto key_pan_amount = 50.f;
-			const auto key_zoom_amount = 1.f;
+
+			const float zoom_levels[] = {
+				0.05f,
+				0.1f,
+				0.25f,
+				0.5f,
+				0.75f,
+				1.f,
+				1.5f,
+				2.0f,
+				3.0f,
+				4.0f,
+				8.0f,
+				16.0f
+			};
+
+			auto get_next_zoom_level = [&](const float current) {
+				for (const auto zoom : zoom_levels) {
+					if (zoom > current) {
+						return zoom;
+					}
+				}
+
+				return 16.0f;
+			};
+
+			auto get_prev_zoom_level = [&](const float current) {
+				for (const auto zoom : reverse(zoom_levels)) {
+					if (zoom < current) {
+						return zoom;
+					}
+				}
+
+				return 0.05f;
+			};
 
 			switch (k) {
 				case key::UP: pan_scene(vec2(0, key_pan_amount)); return true;
@@ -100,8 +132,16 @@ namespace editor_detail {
 				case key::RIGHT: pan_scene(vec2(-key_pan_amount, 0)); return true;
 				case key::LEFT: pan_scene(vec2(key_pan_amount, 0)); return true;
 
-				case key::MINUS: zoom_scene(-key_zoom_amount, world_screen_center); return true;
-				case key::EQUAL: zoom_scene(key_zoom_amount, world_screen_center); return true;
+				case key::MINUS: panned_camera.zoom = get_prev_zoom_level(panned_camera.zoom); return true;
+				case key::EQUAL: 
+					if (has_shift) {
+						panned_camera.zoom = get_next_zoom_level(panned_camera.zoom);
+					}
+					else {
+						panned_camera.zoom = 1.0f;
+					}
+
+					return true;
 
 				case key::HOME: panned_camera = {}; return true;
 				default: break;
