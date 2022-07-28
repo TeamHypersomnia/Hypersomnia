@@ -1,4 +1,5 @@
 #include "game/cosmos/logic_step.h"
+#include "application/setups/debugger/property_debugger/widgets/asset_sane_default_provider.h"
 #include "game/organization/all_messages_includes.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/misc/secure_hash.h"
@@ -46,6 +47,7 @@
 #include "augs/templates/wrap_templates.h"
 #include "application/setups/editor/selector/editor_entity_selector.hpp"
 #include "application/setups/editor/editor_setup_for_each_inspected_entity.hpp"
+#include "augs/templates/traits/has_size.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	create_official();
@@ -152,7 +154,7 @@ bool editor_setup::handle_input_before_game(
 				//case key::V: paste(); return true;
 
 				case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
-				//case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
+				case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
 				case key::F: gui.filesystem.open(); return true;
 				case key::L: gui.layers.open(); return true;
 				case key::H: gui.history.open(); return true;
@@ -173,7 +175,7 @@ bool editor_setup::handle_input_before_game(
 		if (!has_shift && !has_ctrl) {
 			switch (k) {
 				case key::T: mover.start_moving_selection(make_mover_input()); return true;
-				//case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
+				case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
 				case key::W: mover.reset_rotation(make_mover_input()); return true;
 				case key::F: center_view_at_selection(); return true;
@@ -235,7 +237,7 @@ bool editor_setup::handle_input_before_game(
 		return true;
 	}
 
-	auto& selections = cached_selected_entities;
+	auto& selections = entity_selector_state;
 
 	if (e.was_pressed(key::LMOUSE)) {
 		selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
@@ -265,7 +267,7 @@ void editor_setup::get_all_selected_by_selector(std::vector<entity_id>& into) co
 		[&](const entity_id id) {
 			into.emplace_back(id);
 		},
-		cached_selected_entities
+		entity_selector_state
 	);
 
 	const auto held = selector.get_held();
@@ -535,12 +537,12 @@ void editor_setup::inspect(const std::vector<entity_id>& selections) {
 }
 
 void editor_setup::inspected_to_entity_selector_state() {
-	cached_selected_entities.clear();
+	entity_selector_state.clear();
 	selector.clear();
 
 	for_each_inspected_entity(
 		[&](const entity_id id) {
-			cached_selected_entities.emplace(id);
+			entity_selector_state.emplace(id);
 		}
 	);
 }
@@ -950,7 +952,7 @@ void editor_setup::rebuild_scene() {
 				return;
 			}
 
-			auto entity_pre_constructor = [&]<typename H>(const H& handle, auto& agg) {
+			auto setup_entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
 				// using entity_type = typename H::used_entity_type;
 
 				if (auto sorting_order = agg.template find<components::sorting_order>()) {
@@ -962,6 +964,14 @@ void editor_setup::rebuild_scene() {
 
 					if (alpha_mult != 1.0f) {
 						sprite->colorize.mult_alpha(alpha_mult);
+					}
+				}
+
+				if (auto geo = agg.template find<components::overridden_geo>()) {
+					if constexpr(has_size_v<decltype(typed_node.editable)>) {
+						if (bool(typed_node.editable.size)) {
+							geo->size.emplace(typed_node.editable.size.value());
+						}
 					}
 				}
 
@@ -979,7 +989,7 @@ void editor_setup::rebuild_scene() {
 				const auto new_id = cosmic::create_entity(
 					scene.world,
 					resource->scene_flavour_id,
-					entity_pre_constructor,
+					setup_entity_from_node,
 					entity_post_constructor
 				).get_id();
 
@@ -1074,16 +1084,14 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 			draw_reach_indicator(light.calc_wall_reach_trimmed(), rgba(light_color).mult_alpha(0.7f));
 		});
 
-#if 0
 		if (is_mover_active()) {
 			handle.dispatch_on_having_all<components::overridden_geo>([&](const auto& typed_handle) {
 				const auto s = typed_handle.get_logical_size();
 				const auto tr = typed_handle.get_logic_transform();
 
-				const auto& history = folder().history;
 				const auto& last = history.last_command();
 
-				if (const auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
+				if (const auto* const cmd = std::get_if<resize_nodes_command>(std::addressof(last))) {
 					const auto active = cmd->get_active_edges();
 					const auto edges = ltrb::center_and_size(tr.pos, s).make_edges();
 
@@ -1106,7 +1114,6 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 				}
 			});
 		}
-#endif
 	};
 
 	for_each_inspected_entity(dashed_line_handler);
@@ -1151,7 +1158,6 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			const auto blank_tex = triangles.default_texture;
 			(void)blank_tex;
 
-#if 0
 			if (auto active_color = find_highlight_color_of(typed_handle.get_id())) {
 				active_color->a = static_cast<rgba_channel>(std::min(1.8 * active_color->a, 255.0));
 
@@ -1174,7 +1180,6 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 					border_input { 1, 0 }
 				);
 			}
-#endif
 
 			if (is_invalid) {
 				using namespace augs::gui::text;
@@ -1213,11 +1218,9 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	if (const auto selection_aabb = find_selection_aabb()) {
 		auto col = white;
 
-#if 0
 		if (is_mover_active()) {
 			col.a = 120;
 		}
-#endif
 
 		triangles.border(
 			cone.to_screen_space(*selection_aabb),
@@ -1271,7 +1274,7 @@ void editor_setup::clear_id_caches() {
 }
 
 entity_selector_input editor_setup::make_selector_input() const {
-	return { cached_selected_entities, true };
+	return { entity_selector_state, true };
 }
 
 std::optional<ltrb> editor_setup::find_selection_aabb() const {
@@ -1286,7 +1289,7 @@ std::optional<ltrb> editor_setup::find_screen_space_rect_selection(
 }
 
 void editor_setup::finish_rectangular_selection() {
-	selector.finish_rectangular(cached_selected_entities);
+	selector.finish_rectangular(entity_selector_state);
 }
 
 void editor_setup::select_all_entities(const bool has_ctrl) {
@@ -1294,7 +1297,7 @@ void editor_setup::select_all_entities(const bool has_ctrl) {
 		scene.world,
 		view.rect_select_mode,
 		has_ctrl,
-		cached_selected_entities,
+		entity_selector_state,
 		render_layer_filter::all()
 	);
 
@@ -1348,6 +1351,12 @@ setup_escape_result editor_setup::escape() {
 	}
 
 	return setup_escape_result::LAUNCH_INGAME_MENU;
+}
+
+std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) const {
+	return selector.find_highlight_color_of(
+		settings.entity_selector, id, make_selector_input()
+	);
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

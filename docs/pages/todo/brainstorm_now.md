@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Properly implement snapping when instantiating an entity
+
+- Once we come to prefabs, it should be easy to rewrite these transform commands to operate on nodes
+	- We only really need a way to access sizes and positions (as shown by the data that's backed up for undo)
+
 - Shift+T could move with layer detection just like when putting on scene
 
 - Damn it, we badly need to have those child commands

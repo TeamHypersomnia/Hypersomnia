@@ -23,14 +23,11 @@ node_mover_op editor_node_mover::get_current_op(const editor_history& h) const {
 
 	const auto& last = h.last_command();
 
-#if 0
 	if (const auto* const cmd = std::get_if<resize_nodes_command>(std::addressof(last))) {
 		(void)cmd;
 		return node_mover_op::RESIZING;
 	}
-	else 
-#endif
-	if (const auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
+	else if (const auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
 		if (cmd->rotation_center != std::nullopt) {
 			return node_mover_op::ROTATING;
 		}
@@ -92,7 +89,6 @@ resize_target_point get_resize_target_point(node_mover_input in, const editor_vi
 	return { new_target_point, snapped_target_point, used_grid };
 }
 
-#if 0
 void editor_node_mover::start_resizing_selection(
 	const node_mover_input in,
    	const bool both_axes_simultaneously
@@ -121,7 +117,6 @@ void editor_node_mover::start_resizing_selection(
 		s.post_new_command(std::move(command));
 	}
 }
-#endif
 
 void editor_node_mover::transform_selection(
 	const node_mover_input in,
@@ -175,7 +170,6 @@ static auto make_reinvoker(editor_node_mover& m, const input_type in) {
 	);
 }
 
-#if 0
 void editor_node_mover::flip_selection(const input_type in, const flip_flags flip) {
 	auto& s = in.setup;
 
@@ -196,7 +190,6 @@ void editor_node_mover::flip_selection(const input_type in, const flip_flags fli
 		s.post_new_command(std::move(command));
 	}
 }
-#endif
 
 void editor_node_mover::reset_rotation(const input_type in) {
 	auto& s = in.setup;
@@ -273,14 +266,11 @@ bool editor_node_mover::do_mousemotion(const input_type in, vec2 world_cursor_po
 		auto& cosm = s.scene.world;
 		const auto& v = s.view;
 
-#if 0
 		if (auto* const cmd = std::get_if<resize_nodes_command>(std::addressof(last))) {
 			const auto new_target_point = get_resize_target_point(in, s.view, world_cursor_pos.discard_fract());
 			cmd->rewrite_change(new_target_point, s.make_command_input());
 		}
-		else 
-#endif
-		if (auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
+		else if (auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
 			const auto new_cursor_pos = world_cursor_pos.discard_fract();
 
 			if (cmd->rotation_center) {

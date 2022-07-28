@@ -18,11 +18,70 @@
 #include "game/cosmos/entity_handle.h"
 #include "augs/templates/traits/has_rotation.h"
 #include "application/setups/editor/editor_setup_for_each_inspected_entity.hpp"
+#include "augs/templates/traits/has_size.h"
 
 using active_resized_edges = resize_nodes_command::active_edges;
 using delta_type = move_nodes_command::delta_type;
 using moved_entities_type = move_nodes_command::moved_entities_type;
 using resized_entities_type = resize_nodes_command::resized_entities_type;
+
+template <class T>
+static void reselect(T& entities, editor_setup& setup, current_selections_type& selections) {
+	selections.clear();
+
+	entities.for_each([&](const auto id) {
+		selections.emplace(id);
+	});
+
+	setup.inspect_from_selector_state();
+}
+
+static void read_back_to_nodes(editor_setup& setup) {
+	auto& cosm = setup.get_viewed_cosmos();
+
+	setup.for_each_inspected_entity(
+		[&](const entity_id id) {
+			const auto handle = cosm[id];
+
+			if (handle.dead()) {
+				return;
+			}
+
+			const auto transform = handle.dispatch([](const auto& typed) { return typed.find_independent_transform(); });
+			const auto size = handle.dispatch([](const auto& typed) -> std::optional<vec2i> { 
+				if (const auto geo = typed.get().template find<components::overridden_geo>()) {
+					if (geo->size.is_enabled) {
+						return geo->size.value;
+					}
+				}
+
+				return std::nullopt;
+			});
+
+			if (transform == std::nullopt) {
+				return;
+			}
+
+			setup.on_node(
+				setup.to_node_id(id),
+				[transform, size](auto& node, const auto node_id) {
+					(void)node_id;
+
+					node.editable.pos = transform->pos;
+
+					if constexpr(has_rotation_v<decltype(node.editable)>) {
+						node.editable.rotation = transform->rotation;
+					}
+
+					if constexpr(has_size_v<decltype(node.editable)>) {
+						node.editable.size = size;
+					}
+				}
+			);
+		}
+	);
+}
+
 
 static void save_transforms(
 	cosmos& cosm,
@@ -203,13 +262,13 @@ void resize_entities(
 	const cosmos_solvable_access key,
 	cosmos& cosm,
 	const resized_entities_type& subjects,
-	const resize_target_point& resize_target_point,
+	const resize_target_point& target_point,
 	const active_resized_edges& edges,
 	const bool both_axes_simultaneously
 ) {
 	const auto si = cosm.get_si();
 
-	const auto& world_resize_target_point = resize_target_point.snapped;
+	const auto& world_resize_target_point = target_point.snapped;
 
 	subjects.for_each(
 		[&](const auto& i) {
@@ -226,8 +285,8 @@ void resize_entities(
 					}
 				}
 
-				if (resize_target_point.used_grid != std::nullopt) {
-					const auto unit = resize_target_point.used_grid->unit_pixels;
+				if (target_point.used_grid != std::nullopt) {
+					const auto unit = target_point.used_grid->unit_pixels;
 
 					if (result != std::nullopt) {
 						result->x = std::max(result->x, unit);
@@ -479,19 +538,12 @@ void move_nodes_command::rewrite_change(
 	move_entities(cosm);
 
 	reinfer_moved(cosm);
-	read_back_to_nodes(in);
+	::read_back_to_nodes(in.setup);
 	in.setup.rebuild_scene();
 }
 
 void move_nodes_command::reselect_moved_entities(const editor_command_input in) {
-	auto& selections = in.setup.cached_selected_entities;
-	selections.clear();
-
-	moved_entities.for_each([&](const auto id) {
-		selections.emplace(id);
-	});
-
-	in.setup.inspect_from_selector_state();
+	reselect(moved_entities, in.setup, in.setup.entity_selector_state);
 }
 
 void move_nodes_command::redo(const editor_command_input in) {
@@ -511,7 +563,7 @@ void move_nodes_command::redo(const editor_command_input in) {
 	//cosmic::reinfer_all_entities(cosm);
 
 	reselect_moved_entities(in);
-	read_back_to_nodes(in);
+	::read_back_to_nodes(in.setup);
 }
 
 void move_nodes_command::undo(const editor_command_input in) {
@@ -528,54 +580,22 @@ void move_nodes_command::undo(const editor_command_input in) {
 	//cosmic::reinfer_all_entities(cosm);
 
 	reselect_moved_entities(in);
-	read_back_to_nodes(in);
-}
-
-void move_nodes_command::read_back_to_nodes(const editor_command_input in) {
-	in.setup.for_each_inspected_entity(
-		[&](const entity_id id) {
-			const auto handle = in.setup.scene.world[id];
-
-			if (handle.dead()) {
-				return;
-			}
-
-			const auto transform = handle.dispatch([](const auto& typed) { return typed.find_independent_transform(); });
-
-			if (transform == std::nullopt) {
-				return;
-			}
-
-			in.setup.on_node(
-				in.setup.to_node_id(id),
-				[transform](auto& node, const auto node_id) {
-					(void)node_id;
-
-					node.editable.pos = transform->pos;
-
-					if constexpr(has_rotation_v<decltype(node.editable)>) {
-						node.editable.rotation = transform->rotation;
-					}
-				}
-			);
-		}
-	);
+	::read_back_to_nodes(in.setup);
 }
 
 void move_nodes_command::clear_undo_state() {
 	values_before_change.clear();
 }
 
-#if 0
-active_resized_edges::active_resized_edges(const transformr tr, const vec2 rect_size, vec2 resize_target_point, const bool both_axes) {
-	resize_target_point.rotate(-tr.rotation, tr.pos);
+resize_nodes_command::active_edges::active_edges(const transformr tr, const vec2 rect_size, vec2 target_point, const bool both_axes) {
+	target_point.rotate(-tr.rotation, tr.pos);
 
 	const auto edges = ltrb::center_and_size(tr.pos, rect_size).make_edges(); 
 
-	auto segment_closer = [&resize_target_point](const auto& a, const auto& b) {
+	auto segment_closer = [&target_point](const auto& a, const auto& b) {
 		return 
-			resize_target_point.sq_distance_from(a)
-		   	< resize_target_point.sq_distance_from(b)
+			target_point.sq_distance_from(a)
+		   	< target_point.sq_distance_from(b)
 		;
 	};
 
@@ -639,13 +659,13 @@ void resize_nodes_command::resize_entities(cosmos& cosm) {
 				const auto typed_handle = cosm[i];
 
 				if (const auto tr = typed_handle.find_logic_transform()) {
-					edges = active_resized_edges(*tr, typed_handle.get_logical_size(), resize_target_point.actual, both_axes_simultaneously);
+					edges = active_resized_edges(*tr, typed_handle.get_logical_size(), target_point.actual, both_axes_simultaneously);
 				}
 			}
 		);
 	}
 
-	::resize_entities({}, cosm, resized_entities, resize_target_point, edges, both_axes_simultaneously);
+	::resize_entities({}, cosm, resized_entities, target_point, edges, both_axes_simultaneously);
 }
 
 void resize_nodes_command::rewrite_change(
@@ -658,10 +678,12 @@ void resize_nodes_command::rewrite_change(
 	unresize_entities(cosm);
 
 	/* ...and only now move by the new delta, exactly as if we were moving the entities for the first time. */
-	resize_target_point = new_resize_target_point;
+	target_point = new_resize_target_point;
 	resize_entities(cosm);
 
 	reinfer_resized(cosm);
+
+	::read_back_to_nodes(in.setup);
 }
 
 void resize_nodes_command::redo(const editor_command_input in) {
@@ -675,9 +697,10 @@ void resize_nodes_command::redo(const editor_command_input in) {
 
 	resize_entities(cosm);
 
-	cosmic::reinfer_all_entities(cosm);
+	//cosmic::reinfer_all_entities(cosm);
 
-	in.folder.commanded->view_ids.select(resized_entities);
+	reselect_resized_entities(in);
+	::read_back_to_nodes(in.setup);
 }
 
 void resize_nodes_command::undo(const editor_command_input in) {
@@ -688,13 +711,18 @@ void resize_nodes_command::undo(const editor_command_input in) {
 	unresize_entities(cosm);
 	clear_undo_state();
 
-	cosmic::reinfer_all_entities(cosm);
+	//cosmic::reinfer_all_entities(cosm);
 
-	in.folder.commanded->view_ids.select(resized_entities);
+	reselect_resized_entities(in);
+	::read_back_to_nodes(in.setup);
 }
 
 void resize_nodes_command::clear_undo_state() {
 	values_before_change.clear();
+}
+
+void resize_nodes_command::reselect_resized_entities(const editor_command_input in) {
+	reselect(resized_entities, in.setup, in.setup.entity_selector_state);
 }
 
 std::string flip_nodes_command::describe() const {
@@ -792,14 +820,10 @@ void flip_nodes_command::redo(const editor_command_input in) {
 	::save_transforms(cosm, flipped_entities, before_change_data);
 	flip_entities(cosm);
 
-	cosmic::reinfer_all_entities(cosm);
+	//cosmic::reinfer_all_entities(cosm);
 
-	auto& selections = in.folder.commanded->view_ids.selected_entities;
-	selections.clear();
-
-	flipped_entities.for_each([&](const auto id) {
-		selections.emplace(id);
-	});
+	reselect_flipped_entities(in);
+	::read_back_to_nodes(in.setup);
 }
 
 void flip_nodes_command::unmove_entities(cosmos& cosm) {
@@ -823,8 +847,12 @@ void flip_nodes_command::undo(const editor_command_input in) {
 
 	clear_undo_state();
 
-	cosmic::reinfer_all_entities(cosm);
+	//cosmic::reinfer_all_entities(cosm);
 
-	in.folder.commanded->view_ids.select(flipped_entities);
+	reselect_flipped_entities(in);
+	::read_back_to_nodes(in.setup);
 }
-#endif
+
+void flip_nodes_command::reselect_flipped_entities(const editor_command_input in) {
+	reselect(flipped_entities, in.setup, in.setup.entity_selector_state);
+}

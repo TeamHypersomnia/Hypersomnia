@@ -33,6 +33,8 @@ struct delete_layers_command;
 struct create_multiple_nodes;
 
 class move_nodes_command;
+class resize_nodes_command;
+class flip_nodes_command;
 
 using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_sprite_resource>,
@@ -52,5 +54,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	reorder_nodes_command,
 	reorder_layers_command,
 
-	move_nodes_command
+	move_nodes_command,
+	resize_nodes_command,
+	flip_nodes_command
 >;

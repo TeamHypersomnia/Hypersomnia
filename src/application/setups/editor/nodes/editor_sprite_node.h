@@ -10,6 +10,7 @@ struct editor_sprite_node_editable {
 	// GEN INTROSPECTOR struct editor_sprite_node_editable
 	vec2 pos;
 	real32 rotation = 0.0f;
+	std::optional<vec2i> size;
 
 	bool flip_horizontally = false;
 	bool flip_vertically = false;

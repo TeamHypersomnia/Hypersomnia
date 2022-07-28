@@ -37,6 +37,7 @@
 #include "augs/misc/imgui/simple_popup.h"
 #include "application/setups/editor/editor_settings.h"
 #include "augs/graphics/imgui_payload.h"
+#include "application/setups/editor/commands/node_transform_commands.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -85,7 +86,7 @@ class editor_setup : public default_setup_settings {
 	editor_entity_selector selector;
 	editor_node_mover mover;
 
-	current_selections_type cached_selected_entities;
+	current_selections_type entity_selector_state;
 	std::vector<entity_id> cached_selected_comparison;
 	std::vector<entity_id> cached_selected_comparison_after;
 
@@ -100,6 +101,8 @@ class editor_setup : public default_setup_settings {
 
 	bool rebuild_ad_hoc_atlas = true;
 	ad_hoc_atlas_subjects last_ad_hoc_subjects;
+
+	double global_time_seconds = 0.0;
 
 	void create_official();
 
@@ -128,6 +131,7 @@ class editor_setup : public default_setup_settings {
 
 	friend move_nodes_command;
 	friend resize_nodes_command;
+	friend flip_nodes_command;
 
 	friend editor_node_mover;
 
@@ -267,6 +271,7 @@ public:
 	entity_selector_input make_selector_input() const;
 	node_mover_input make_mover_input();
 
+	std::optional<rgba> find_highlight_color_of(const entity_id id) const;
 	std::optional<ltrb> find_selection_aabb() const;
 	std::optional<ltrb> find_screen_space_rect_selection(
 		const vec2i screen_size,
@@ -347,6 +352,8 @@ public:
 		const setup_advance_input& in,
 		const C& callbacks
 	) {
+		global_time_seconds += in.frame_delta.in_seconds();
+
 		(void)in;
 		(void)callbacks;
 	}

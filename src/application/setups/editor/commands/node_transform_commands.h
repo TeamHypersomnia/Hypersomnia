@@ -75,11 +75,8 @@ public:
 
 	void clear_undo_state();
 	void reselect_moved_entities(const editor_command_input in);
-
-	void read_back_to_nodes(const editor_command_input in);
 };
 
-#if 1
 class flip_nodes_command {
 	friend augs::introspection_access;
 
@@ -114,6 +111,8 @@ public:
 	void undo(const editor_command_input in);
 
 	void clear_undo_state();
+
+	void reselect_flipped_entities(const editor_command_input in);
 };
 
 struct resize_target_point {
@@ -141,7 +140,7 @@ public:
 		bool left = false;
 
 		active_edges() = default;
-		active_edges(transformr, vec2 rect_size, vec2 reference_point, bool both_axes);
+		active_edges(transformr, vec2 rect_size, vec2 target_point, bool both_axes);
 
 		bool operator==(const active_edges b) const {
 			return left == b.left && top == b.top && right == b.right && bottom == b.bottom;
@@ -156,7 +155,7 @@ private:
 	active_edges edges;
 public:
 
-	point_type reference_point;
+	point_type target_point;
 	bool both_axes_simultaneously = false;
 
 	std::string built_description;
@@ -174,7 +173,7 @@ public:
 	}
 
 	void rewrite_change(
-		const point_type& new_reference_point,
+		const point_type& new_target_point,
 		const editor_command_input in
 	);
 	
@@ -186,5 +185,5 @@ public:
 	}
 
 	void clear_undo_state();
+	void reselect_resized_entities(const editor_command_input in);
 };
-#endif

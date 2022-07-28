@@ -361,7 +361,7 @@ std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 	const cosmos& cosm,
 	const entity_selector_input in
 ) const {
-	const auto result = ::find_aabb_of(
+	return ::find_aabb_of(
 		cosm,
 		[&](auto combiner) {
 			for_each_selected_entity(
@@ -374,8 +374,6 @@ std::optional<ltrb> editor_entity_selector::find_selection_aabb(
 			}
 		}
 	);
-
-	return result;
 }
 
 std::optional<rgba> editor_entity_selector::find_highlight_color_of(

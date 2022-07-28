@@ -28,12 +28,12 @@ class cosmos_solvable_access {
 
 	/* Some classes for editor must be privileged */
 	friend move_entities_command;
-	friend flip_entities_command;
 	friend resize_entities_command;
+	friend flip_entities_command;
 
 	friend move_nodes_command;
-	friend flip_nodes_command;
 	friend resize_nodes_command;
+	friend flip_nodes_command;
 
 	friend debugger_property_accessors;
 
