@@ -143,7 +143,7 @@ void create_official_filesystem_from(
 
 			auto& new_node = folder.files[i++];
 			new_node.associated_resource = resource_id;
-			new_node.name = path.filename();
+			new_node.name = path.filename().string();
 			new_node.set_file_type_by(path.extension().string());
 		};
 

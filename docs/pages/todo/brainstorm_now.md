@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix glitch wherein the other edges are snapped even though resizing another
+
+- Implement flip too
+	- read_back_from_nodes
+
 - Properly implement snapping when instantiating an entity
 
 - Once we come to prefabs, it should be easy to rewrite these transform commands to operate on nodes
