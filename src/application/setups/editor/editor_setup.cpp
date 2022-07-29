@@ -574,12 +574,20 @@ editor_command_input editor_setup::make_command_input() {
 }
 
 void editor_setup::seek_to_revision(const editor_history::index_type n) {
-	while (history.get_current_revision() < n) {
-		redo();
+	if (history.get_current_revision() < n) {
+		while (history.get_current_revision() < n) {
+			redo();
+		}
+
+		return;
 	}
 
-	while (history.get_current_revision() > n) {
-		undo();
+	if (history.get_current_revision() > n) {
+		while (history.get_current_revision() > n) {
+			undo();
+		}
+
+		return;
 	}
 }
 
@@ -587,32 +595,66 @@ void editor_setup::undo_quiet() {
 	history.undo(make_command_input());
 }
 
-void editor_setup::undo() {
-	const auto prev_inspected = get_all_inspected();
-
-	gui.history.scroll_to_current_once = true;
-	undo_quiet();
-
-	gui.filesystem.clear_drag_drop();
-	rebuild_scene();
-
-	if (prev_inspected != get_all_inspected()) {
-		inspected_to_entity_selector_state();
+bool editor_setup::is_next_command_child() const {
+	if (!history.has_next_command()) {
+		return false;
 	}
+
+	auto get_is_child = [](auto& command) { 
+		return command.meta.is_child;
+	};
+
+	return std::visit(get_is_child, history.next_command());
+}
+
+bool editor_setup::is_last_command_child() const {
+	if (!history.has_last_command()) {
+		return false;
+	}
+
+	auto get_is_child = [](auto& command) { 
+		return command.meta.is_child;
+	};
+
+	return std::visit(get_is_child, history.last_command());
+}
+
+void editor_setup::undo() {
+	bool repeat = false;
+
+	do {
+		repeat = is_last_command_child();
+
+		const auto prev_inspected = get_all_inspected();
+
+		gui.history.scroll_to_current_once = true;
+		history.undo(make_command_input());
+		LOG("UNDO");
+
+		gui.filesystem.clear_drag_drop();
+		rebuild_scene();
+
+		if (prev_inspected != get_all_inspected()) {
+			inspected_to_entity_selector_state();
+		}
+	} while(repeat);
 }
 
 void editor_setup::redo() {
-	const auto prev_inspected = get_all_inspected();
+	do {
+		const auto prev_inspected = get_all_inspected();
 
-	gui.history.scroll_to_current_once = true;
-	history.redo(make_command_input());
+		gui.history.scroll_to_current_once = true;
+		history.redo(make_command_input());
+		LOG("REDO");
 
-	gui.filesystem.clear_drag_drop();
-	rebuild_scene();
+		gui.filesystem.clear_drag_drop();
+		rebuild_scene();
 
-	if (prev_inspected != get_all_inspected()) {
-		inspected_to_entity_selector_state();
-	}
+		if (prev_inspected != get_all_inspected()) {
+			inspected_to_entity_selector_state();
+		}
+	} while(is_next_command_child());
 }
 
 void editor_setup::load_gui_state() {
@@ -1393,6 +1435,14 @@ void editor_setup::show_absolute_mover_pos_once() {
 	if (auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
 		cmd->show_absolute_mover_pos_in_ui = true;
 	}
+}
+
+void editor_setup::make_last_command_a_child() {
+	auto set_is_child = [](auto& command) { 
+		command.meta.is_child = true; 
+	};
+
+	std::visit(set_is_child, history.last_command());
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

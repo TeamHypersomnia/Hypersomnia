@@ -108,11 +108,25 @@ void editor_history_gui::perform(const editor_history_gui_input in) {
 
 	const auto& commands = history.get_commands();
 
+	bool ignore_until_parent = false;
+
 	for (std::size_t i = 0; i < commands.size(); ++i) {
 		const auto n = commands.size() - i - 1;
 
 		std::visit(
 			[&](const auto& typed_command) {
+				if (ignore_until_parent) {
+					if (!typed_command.meta.is_child) {
+						ignore_until_parent = false;
+					}
+
+					return;
+				}
+
+				if (typed_command.meta.is_child) {
+					ignore_until_parent = true;
+				}
+
 				do_history_node(n, typed_command);
 			},
 			commands[n]

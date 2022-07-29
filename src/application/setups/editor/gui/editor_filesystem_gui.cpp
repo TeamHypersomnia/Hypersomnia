@@ -76,6 +76,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					const auto& executed = in.setup.post_new_command(std::move(command));
 
 					in.setup.start_moving_selection();
+					in.setup.make_last_command_a_child();
 					in.setup.show_absolute_mover_pos_once();
 
 					previewed_created_node = executed.get_node_id();

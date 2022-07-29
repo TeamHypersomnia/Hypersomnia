@@ -514,9 +514,12 @@ std::string move_nodes_command::describe() const {
 		return typesafe_sprintf("Rotated by %x*: %x", static_cast<int>(move_by.rotation), built_description);
 	}
 
-	const auto by_to = show_absolute_mover_pos_in_ui ? "to" : "by";
+	if (meta.is_child) {
+		/* Will only ever be a child to node creation */
+		return typesafe_sprintf("Created %x", built_description);
+	}
 
-	return typesafe_sprintf("Moved %x %x: %x", by_to, move_by.pos, built_description);
+	return typesafe_sprintf("Moved by %x: %x", move_by.pos, built_description);
 }
 
 void move_nodes_command::push_entry(const const_entity_handle handle) {

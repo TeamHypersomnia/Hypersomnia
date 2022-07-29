@@ -3,6 +3,7 @@
 
 struct editor_command_meta {
 	augs::date_time timestamp;
+	bool is_child = false;
 };
 
 class editor_setup;

@@ -315,6 +315,11 @@ public:
 	void finish_moving_selection();
 	void show_absolute_mover_pos_once();
 
+	void make_last_command_a_child();
+
+	bool is_next_command_child() const;
+	bool is_last_command_child() const;
+
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
 	/*********************************************************/
