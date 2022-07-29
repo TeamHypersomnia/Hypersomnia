@@ -48,6 +48,7 @@
 #include "application/setups/editor/selector/editor_entity_selector.hpp"
 #include "application/setups/editor/editor_setup_for_each_inspected_entity.hpp"
 #include "augs/templates/traits/has_size.h"
+#include "augs/templates/traits/has_flip.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	create_official();
@@ -1029,11 +1030,19 @@ void editor_setup::rebuild_scene() {
 					}
 				}
 
+				using Node = decltype(typed_node.editable);
+				auto& node = typed_node.editable;
+
 				if (auto geo = agg.template find<components::overridden_geo>()) {
-					if constexpr(has_size_v<decltype(typed_node.editable)>) {
-						if (bool(typed_node.editable.size)) {
-							geo->size.emplace(typed_node.editable.size.value());
+					if constexpr(has_size_v<Node>) {
+						if (bool(node.size)) {
+							geo->size.emplace(node.size.value());
 						}
+					}
+
+					if constexpr(has_flip_v<Node>) {
+						geo->flip.horizontally = node.flip_horizontally;
+						geo->flip.vertically = node.flip_vertically;
 					}
 				}
 
