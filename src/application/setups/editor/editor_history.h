@@ -15,6 +15,7 @@
 #include "application/setups/editor/commands/reorder_layers_command.h"
 
 #include "application/setups/editor/commands/node_transform_commands.h"
+#include "application/setups/editor/commands/delete_nodes_command.h"
 
 #include "application/setups/editor/editor_history_declaration.h"
 

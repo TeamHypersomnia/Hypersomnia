@@ -56,5 +56,7 @@ using editor_history_base = augs::history_with_saved_revision<
 
 	move_nodes_command,
 	resize_nodes_command,
-	flip_nodes_command
+	flip_nodes_command,
+
+	delete_nodes_command
 >;

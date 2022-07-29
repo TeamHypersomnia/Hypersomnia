@@ -49,6 +49,7 @@
 #include "application/setups/editor/editor_setup_for_each_inspected_entity.hpp"
 #include "augs/templates/traits/has_size.h"
 #include "augs/templates/traits/has_flip.h"
+#include "application/setups/editor/detail/make_command_from_selections.h"
 
 editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
 	create_official();
@@ -177,6 +178,9 @@ bool editor_setup::handle_input_before_game(
 
 		if (!has_shift && !has_ctrl) {
 			switch (k) {
+				case key::D: cut_selection(); return true;
+				case key::DEL: delete_selection(); return true;
+
 				case key::T: start_moving_selection(); return true;
 				case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
@@ -548,6 +552,14 @@ void editor_setup::inspected_to_entity_selector_state() {
 			entity_selector_state.emplace(id);
 		}
 	);
+}
+
+void editor_setup::inspect_add(inspected_variant new_inspected, const bool update_selector) {
+	gui.inspector.inspect(new_inspected, true);
+
+	if (update_selector) {
+		inspected_to_entity_selector_state();
+	}
 }
 
 void editor_setup::inspect(inspected_variant new_inspected) {
@@ -1452,6 +1464,19 @@ void editor_setup::make_last_command_a_child() {
 	};
 
 	std::visit(set_is_child, history.last_command());
+}
+
+void editor_setup::cut_selection() {
+	/* TODO: some clipboard mechanic? */
+	delete_selection();
+}
+
+void editor_setup::delete_selection() {
+	auto command = make_command_from_selected_nodes<delete_nodes_command>("Deleted ");
+
+	if (!command.empty()) {
+		post_new_command(std::move(command));
+	}
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

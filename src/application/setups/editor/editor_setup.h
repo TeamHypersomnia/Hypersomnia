@@ -133,6 +133,8 @@ class editor_setup : public default_setup_settings {
 	friend resize_nodes_command;
 	friend flip_nodes_command;
 
+	friend delete_nodes_command;
+
 	friend editor_node_mover;
 
 	cosmos& get_cosmos() {
@@ -242,12 +244,16 @@ public:
 	decltype(auto) rewrite_last_command(T&&);
 
 	template <class T, class... Args>
-	auto make_command_from_selections(Args&&...) const;
+	auto make_command_from_selected_entities(Args&&...) const;
+
+	template <class T, class... Args>
+	auto make_command_from_selected_nodes(Args&&...) const;
 
 	void inspect(const current_selections_type&);
 	void inspect(const std::vector<entity_id>&);
 
 	void inspect(inspected_variant);
+	void inspect_add(inspected_variant, bool update_selector = true);
 	void inspect_only(inspected_variant);
 	void inspected_to_entity_selector_state();
 
@@ -319,6 +325,9 @@ public:
 
 	bool is_next_command_child() const;
 	bool is_last_command_child() const;
+
+	void cut_selection();
+	void delete_selection();
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

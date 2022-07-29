@@ -1,11 +1,10 @@
 #pragma once
 #include "game/detail/describers.h"
 
-template <class T, class F, class C, class P>
+template <class T, class F, class P>
 T make_command_from_selections(
 	const editor_setup& setup,
 	F for_each_selected,
-	C& cosm,
    	const std::string& preffix,
    	P inclusion_predicate
 ) {
@@ -14,12 +13,10 @@ T make_command_from_selections(
 	std::string last_name;
 
 	for_each_selected(
-		[&](const auto e) {
-			const auto handle = cosm[e];
-
-			if (inclusion_predicate(handle)) {
-				command.push_entry(handle);
-				last_name = setup.get_name(handle.get_id());
+		[&](const auto& selected) {
+			if (inclusion_predicate(selected)) {
+				command.push_entry(selected);
+				last_name = setup.get_name(selected);
 			}
 		}
 	);
@@ -37,24 +34,39 @@ T make_command_from_selections(
 	return command;
 }
 
-template <class T, class C, class F>
+template <class T, class F>
 T make_command_from_selections(
 	const editor_setup& setup,
 	F for_each_selected,
-	C& cosm,
 	const std::string& preffix
 ) {
-	return make_command_from_selections<T>(setup, for_each_selected, cosm, preffix, [](const auto&) { return true; });
+	return make_command_from_selections<T>(setup, for_each_selected, preffix, [](const auto&) { return true; });
 }
 
 template <class T, class... Args>
-auto editor_setup::make_command_from_selections(Args&&... args) const {
+auto editor_setup::make_command_from_selected_entities(Args&&... args) const {
 	return ::make_command_from_selections<T>(
 		*this,
 		[&](auto callback) {
-			for_each_inspected_entity(callback);	
+			for_each_inspected_entity(
+				[&](const auto id) {
+					if (const auto handle = scene.world[id]) {
+						callback(handle);
+					}
+				}
+			);	
 		},
-		scene.world,
+		std::forward<Args>(args)...
+	);
+}
+
+template <class T, class... Args>
+auto editor_setup::make_command_from_selected_nodes(Args&&... args) const {
+	return ::make_command_from_selections<T>(
+		*this,
+		[&](auto callback) {
+			gui.inspector.for_each_inspected<editor_node_id>(callback);
+		},
 		std::forward<Args>(args)...
 	);
 }

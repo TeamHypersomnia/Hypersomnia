@@ -56,7 +56,7 @@ void editor_node_mover::start_transforming_selection(
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selections<move_nodes_command>(
+	auto command = s.make_command_from_selected_entities<move_nodes_command>(
 		"",
 		[](const auto typed_handle) {
 			return typed_handle.has_independent_transform();
@@ -97,7 +97,7 @@ void editor_node_mover::start_resizing_selection(
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selections<resize_nodes_command>(
+	auto command = s.make_command_from_selected_entities<resize_nodes_command>(
 		"",
 		[](const auto typed_handle) {
 			return typed_handle.template has<components::overridden_geo>() && typed_handle.has_independent_transform();
@@ -127,7 +127,7 @@ void editor_node_mover::transform_selection(
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selections<move_nodes_command>(
+	auto command = s.make_command_from_selected_entities<move_nodes_command>(
 		"",
 		[](const auto typed_handle) {
 			return typed_handle.has_independent_transform();
@@ -177,7 +177,7 @@ void editor_node_mover::flip_selection(const input_type in, const flip_flags fli
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selections<flip_nodes_command>(
+	auto command = s.make_command_from_selected_entities<flip_nodes_command>(
 		"",
 		[](const auto typed_handle) {
 			return typed_handle.has_independent_transform();
@@ -198,7 +198,7 @@ void editor_node_mover::reset_rotation(const input_type in) {
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selections<move_nodes_command>(
+	auto command = s.make_command_from_selected_entities<move_nodes_command>(
 		"",
 		[](const auto typed_handle) {
 			return typed_handle.has_independent_transform();
