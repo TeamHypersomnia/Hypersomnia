@@ -241,7 +241,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 
 				if (ImGui::IsItemHovered()) {
-					entity_to_highlight = in.setup.get_scene_entity_id(node_id);
+					entity_to_highlight = in.setup.to_entity_id(node_id);
 				}
 
 				if (scroll_once_to == node_id) {

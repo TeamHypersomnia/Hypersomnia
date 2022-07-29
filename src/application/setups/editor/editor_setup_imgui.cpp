@@ -142,11 +142,29 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	using namespace augs::imgui;
 
-	if (const auto rot = mover.current_mover_rot_delta(make_mover_input())) {
-		text_tooltip("%x*", *rot);
-	}
-	else if (const auto pos = mover.current_mover_pos_delta(make_mover_input())) {
-		text_tooltip("x: %x\ny: %x", pos->x, pos->y);
+	{
+		auto in = make_mover_input();
+
+		if (const auto rot = mover.current_mover_rot_delta(in)) {
+			text_tooltip("%x*", *rot);
+		}
+		else if (const auto pos = mover.current_mover_pos_delta(in)) {
+			auto final_pos = *pos;
+
+			auto xs = "x";
+			auto ys = "y";
+
+			if (mover.show_absolute_mover_pos(in)) {
+				final_pos += gui.filesystem.world_position_started_dragging;
+				final_pos.discard_fract();
+			}
+			else {
+				xs = "delta x";
+				ys = "delta y";
+			}
+
+			text_tooltip("%x: %x\n%x: %x", xs, final_pos.x, ys, final_pos.y);
+		}
 	}
 
 	return custom_imgui_result::NONE;

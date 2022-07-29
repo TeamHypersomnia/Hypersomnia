@@ -154,8 +154,8 @@ void editor_node_mover::start_rotating_selection(const input_type in) {
 }
 
 static auto make_reinvoker(editor_node_mover& m, const input_type in) {
-	const bool pos = m.current_mover_pos_delta(in) != nullptr;
-	const bool rot = m.current_mover_rot_delta(in) != nullptr;
+	const bool pos = m.current_mover_pos_delta(in) != std::nullopt;
+	const bool rot = m.current_mover_rot_delta(in) != std::nullopt;
 
 	return augs::scope_guard(
 		[pos, rot, in, &m]() {
@@ -225,7 +225,7 @@ void editor_node_mover::rotate_selection_once_by(const input_type in, const int 
 	}
 }
 
-vec2* editor_node_mover::current_mover_pos_delta(const input_type in) const {
+std::optional<vec2> editor_node_mover::current_mover_pos_delta(const input_type in) const {
 	auto& s = in.setup;
 
 	if (active) {
@@ -234,27 +234,42 @@ vec2* editor_node_mover::current_mover_pos_delta(const input_type in) const {
 
 		if (auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
 			if (!cmd->rotation_center) {
-				return std::addressof(cmd->move_by.pos);
+				return cmd->move_by.pos;
 			}
 		}
 	}
 
-	return nullptr;
+	return std::nullopt;
 }
 
-float* editor_node_mover::current_mover_rot_delta(const input_type in) const {
+bool editor_node_mover::show_absolute_mover_pos(node_mover_input in) const {
+	auto& s = in.setup;
+
+	if (active) {
+		auto& history = s.history;
+		auto& last = history.last_command();
+
+		if (auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
+			return cmd->show_absolute_mover_pos_in_ui;
+		}
+	}
+
+	return false;
+}
+
+std::optional<float> editor_node_mover::current_mover_rot_delta(const input_type in) const {
 	if (active) {
 		auto& history = in.setup.history;
 		auto& last = history.last_command();
 
 		if (auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
 			if (cmd->rotation_center) {
-				return std::addressof(cmd->move_by.rotation);
+				return cmd->move_by.rotation;
 			}
 		}
 	}
 
-	return nullptr;
+	return std::nullopt;
 }
 
 bool editor_node_mover::do_mousemotion(const input_type in, vec2 world_cursor_pos) {

@@ -35,20 +35,16 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		const bool mouse_over_scene = !mouse_over_any_window();
 
 		if (!payload_still_exists) {
+			if (previewed_created_node.is_set()) {
+				in.setup.finish_moving_selection();
+			}
+
 			dragged_resource.unset();
 			previewed_created_node.unset();
 		}
 		else {
 			if (mouse_over_scene) {
 				auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
-					if (previewed_created_node.is_set()) {
-						in.setup.undo_quiet();
-						in.setup.rebuild_scene();
-					}
-					else {
-						// LOG("Start dropping resource on scene");
-					}
-
 					const auto resource_name = typed_resource.get_display_name();
 					const auto new_name = in.setup.get_free_node_name_for(resource_name);
 
@@ -58,6 +54,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					new_node.resource_id = resource_id;
 					new_node.unique_name = new_name;
 					new_node.editable.pos = in.setup.get_world_cursor_pos();
+					world_position_started_dragging = new_node.editable.pos;
 
 					create_node_command<node_type> command;
 
@@ -65,7 +62,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					command.created_node = std::move(new_node);
 
 					const auto hovered_node = in.setup.get_hovered_node(in.necessary_images);
-					entity_to_highlight = in.setup.get_scene_entity_id(hovered_node);
+					entity_to_highlight = in.setup.to_entity_id(hovered_node);
 
 					if (const auto parent_layer = in.setup.find_parent_layer(hovered_node)) {
 						command.layer_id = parent_layer->first;
@@ -77,20 +74,29 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					}
 
 					const auto& executed = in.setup.post_new_command(std::move(command));
+
+					in.setup.start_moving_selection();
+					in.setup.show_absolute_mover_pos_once();
+
 					previewed_created_node = executed.get_node_id();
 
 					in.setup.scroll_once_to(previewed_created_node);
 				};
 
-				in.setup.on_resource(
-					dragged_resource,
-					instantiate
-				);
+				if (!previewed_created_node.is_set()) {
+					in.setup.on_resource(
+						dragged_resource,
+						instantiate
+					);
+				}
 			}
 			else {
 				if (previewed_created_node.is_set()) {
 					// LOG("Interrupting drag.");
+					in.setup.finish_moving_selection();
 					in.setup.undo_quiet();
+					in.setup.undo_quiet();
+
 					in.setup.rebuild_scene();
 					previewed_created_node.unset();
 				}

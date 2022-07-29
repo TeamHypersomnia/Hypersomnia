@@ -50,8 +50,9 @@ public:
 
 	void start_resizing_selection(node_mover_input in, bool both_axes_simultaneously);
 
-	vec2* current_mover_pos_delta(node_mover_input in) const;
-	float* current_mover_rot_delta(node_mover_input in) const;
+	std::optional<vec2> current_mover_pos_delta(node_mover_input in) const;
+	std::optional<float> current_mover_rot_delta(node_mover_input in) const;
+	bool show_absolute_mover_pos(node_mover_input in) const;
 
 	bool do_mousemotion(node_mover_input in, vec2 world_cursor_pos);
 	bool do_left_press(node_mover_input in);

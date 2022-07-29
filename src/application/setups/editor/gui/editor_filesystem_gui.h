@@ -33,6 +33,7 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 
 	editor_resource_id dragged_resource;
 	editor_node_id previewed_created_node;
+	vec2 world_position_started_dragging;
 
 	entity_id entity_to_highlight;
 

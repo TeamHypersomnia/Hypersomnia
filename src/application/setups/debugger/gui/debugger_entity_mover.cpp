@@ -157,8 +157,8 @@ void debugger_entity_mover::start_rotating_selection(const input_type in) {
 }
 
 static auto make_reinvoker(debugger_entity_mover& m, const input_type in) {
-	const bool pos = m.current_mover_pos_delta(in) != nullptr;
-	const bool rot = m.current_mover_rot_delta(in) != nullptr;
+	const bool pos = m.current_mover_pos_delta(in) != std::nullopt;
+	const bool rot = m.current_mover_rot_delta(in) != std::nullopt;
 
 	return augs::scope_guard(
 		[pos, rot, in, &m]() {
@@ -232,7 +232,7 @@ void debugger_entity_mover::rotate_selection_once_by(const input_type in, const 
 	}
 }
 
-vec2* debugger_entity_mover::current_mover_pos_delta(const input_type in) const {
+std::optional<vec2> debugger_entity_mover::current_mover_pos_delta(const input_type in) const {
 	auto& s = in.setup;
 
 	if (s.anything_opened() && active) {
@@ -241,27 +241,27 @@ vec2* debugger_entity_mover::current_mover_pos_delta(const input_type in) const 
 
 		if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
 			if (!cmd->rotation_center) {
-				return std::addressof(cmd->move_by.pos);
+				return cmd->move_by.pos;
 			}
 		}
 	}
 
-	return nullptr;
+	return std::nullopt;
 }
 
-float* debugger_entity_mover::current_mover_rot_delta(const input_type in) const {
+std::optional<float> debugger_entity_mover::current_mover_rot_delta(const input_type in) const {
 	if (in.setup.anything_opened() && active) {
 		auto& history = in.setup.folder().history;
 		auto& last = history.last_command();
 
 		if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
 			if (cmd->rotation_center) {
-				return std::addressof(cmd->move_by.rotation);
+				return cmd->move_by.rotation;
 			}
 		}
 	}
 
-	return nullptr;
+	return std::nullopt;
 }
 
 bool debugger_entity_mover::do_mousemotion(const input_type in, vec2 world_cursor_pos) {

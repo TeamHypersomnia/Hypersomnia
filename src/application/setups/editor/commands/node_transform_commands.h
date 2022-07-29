@@ -47,6 +47,7 @@ public:
 	special_entity_mover_op special = special_entity_mover_op::NONE;
 	delta_type move_by;
 	std::optional<vec2> rotation_center;
+	bool show_absolute_mover_pos_in_ui = false;
 
 	std::string built_description;
 

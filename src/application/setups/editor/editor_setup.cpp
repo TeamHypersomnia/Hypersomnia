@@ -176,7 +176,7 @@ bool editor_setup::handle_input_before_game(
 
 		if (!has_shift && !has_ctrl) {
 			switch (k) {
-				case key::T: mover.start_moving_selection(make_mover_input()); return true;
+				case key::T: start_moving_selection(); return true;
 				case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
 				case key::W: mover.reset_rotation(make_mover_input()); return true;
@@ -761,6 +761,24 @@ std::optional<std::pair<editor_layer_id, std::size_t>> editor_setup::find_parent
 	return std::nullopt;
 }
 
+std::string editor_setup::get_name(const entity_id id) const {
+	return get_name(to_node_id(id));
+}
+
+std::size_t editor_setup::get_node_count() const {
+	auto n = std::size_t(0);
+
+	for (const auto layer_id : project.layers.order) {
+		if (const auto layer = find_layer(layer_id)) {
+			const auto& nodes = layer->hierarchy.nodes;
+
+			n += nodes.size();
+		}
+	}
+
+	return n;
+}
+
 std::string editor_setup::get_name(inspected_variant v) const {
 	auto get_object_name = [&]<typename T>(const T& inspected_id) {
 		std::string found_name;
@@ -1323,7 +1341,7 @@ void editor_setup::center_view_at(const editor_node_id node_id) {
 	);
 }
 
-entity_id editor_setup::get_scene_entity_id(const editor_node_id node_id) const {
+entity_id editor_setup::to_entity_id(const editor_node_id node_id) const {
 	if (const auto result = on_node(
 		node_id,
 		[&](const auto& node, const auto id) {
@@ -1359,6 +1377,22 @@ std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) co
 	return selector.find_highlight_color_of(
 		settings.entity_selector, id, make_selector_input()
 	);
+}
+
+void editor_setup::start_moving_selection() {
+	mover.start_moving_selection(make_mover_input());
+}
+
+void editor_setup::finish_moving_selection() {
+	mover.escape();
+}
+
+void editor_setup::show_absolute_mover_pos_once() {
+	auto& last = history.last_command();
+
+	if (auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
+		cmd->show_absolute_mover_pos_in_ui = true;
+	}
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

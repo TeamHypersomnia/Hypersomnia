@@ -224,7 +224,7 @@ public:
 
 	entity_id get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons) const;
 	editor_node_id get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons) const;
-	entity_id get_scene_entity_id(editor_node_id) const;
+	entity_id to_entity_id(editor_node_id) const;
 
 	void scroll_once_to(editor_node_id);
 	std::unordered_map<std::string, editor_node_id> make_name_to_node_map() const;
@@ -265,6 +265,9 @@ public:
 	}
 
 	std::string get_name(inspected_variant) const;
+	std::string get_name(entity_id) const;
+	std::size_t get_node_count() const;
+
 	editor_history::index_type get_last_command_index() const;
 
 	editor_command_input make_command_input(); 
@@ -303,6 +306,14 @@ public:
 	void unhover();
 	void clear_id_caches();
 	bool confirm_modal_popup();
+
+	const auto& get_view() const {
+		return view;
+	}
+
+	void start_moving_selection();
+	void finish_moving_selection();
+	void show_absolute_mover_pos_once();
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
