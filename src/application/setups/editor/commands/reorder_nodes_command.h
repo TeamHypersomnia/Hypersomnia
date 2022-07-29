@@ -4,10 +4,12 @@
 #include "application/setups/editor/project/editor_layers.h"
 
 #include "application/setups/editor/commands/allocating_command.h"
+#include "application/setups/editor/commands/create_layer_command.h"
 
 struct reorder_nodes_command {
 	editor_command_meta meta;
 
+	std::optional<create_layer_command> create_layer;
 	editor_layer_id target_layer_id;
 
 	std::size_t target_index = 0;

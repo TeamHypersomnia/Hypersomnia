@@ -24,7 +24,6 @@ struct editor_layer {
 
 	bool visible = true;
 	bool is_open = true;
-	bool dispose_when_empty = false;
 
 	editor_layer_hierarchy hierarchy;
 	// END GEN INTROSPECTOR
