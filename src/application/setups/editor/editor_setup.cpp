@@ -861,18 +861,18 @@ std::string editor_setup::get_name(inspected_variant v) const {
 	return std::visit(get_object_name, v);
 }
 
-entity_id editor_setup::get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons) const {
+entity_id editor_setup::get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons, const std::optional<vec2> at) const {
 	return editor_entity_selector::calc_hovered_entity(
 		scene.world,
 		sizes_for_icons,
 		get_camera_eye().zoom,
-		get_world_cursor_pos(),
+		at ? *at : get_world_cursor_pos(),
 		render_layer_filter::all()
 	);
 }
 
-editor_node_id editor_setup::get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons) const {
-	return to_node_id(get_hovered_entity(sizes_for_icons));
+editor_node_id editor_setup::get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons, const std::optional<vec2> at) const {
+	return to_node_id(get_hovered_entity(sizes_for_icons, at));
 }
 
 void editor_setup::scroll_once_to(editor_node_id id) {
@@ -1012,12 +1012,10 @@ void editor_setup::rebuild_scene() {
 		auto layer = find_layer(layer_id);
 		ensure(layer != nullptr);
 
-		if (!layer->visible) {
-			continue;
-		}
-
 		auto node_handler = [&]<typename node_type>(const node_type& typed_node, const auto node_id) {
-			if (!typed_node.visible) {
+			typed_node.scene_entity_id.unset();
+
+			if (!typed_node.visible || !layer->visible) {
 				return;
 			}
 
@@ -1094,6 +1092,13 @@ void editor_setup::rebuild_scene() {
 			on_node(node_id, node_handler);
 		}
 	}
+
+	/* 
+		We need to do this because ids stored in selection state
+		might point to other entities after toggling visibility.
+	*/
+
+	inspected_to_entity_selector_state();
 }
 
 augs::path_type editor_setup::get_unofficial_content_dir() const {
@@ -1143,6 +1148,10 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 
 	auto dashed_line_handler = [&](const entity_id id) {
 		const auto handle = world[id];
+
+		if (handle.dead()) {
+			return;
+		}
 
 		handle.dispatch_on_having_all<components::light>([&](const auto typed_handle) {
 			const auto center = typed_handle.get_logic_transform().pos;

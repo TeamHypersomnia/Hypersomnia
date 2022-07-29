@@ -8,6 +8,12 @@
 
 using input_type = node_mover_input;
 
+static auto is_movable() {
+	return [](const auto typed_handle) {
+		return typed_handle.has_independent_transform();
+	};
+}
+
 bool editor_node_mover::is_active(const editor_history& h) const {
 	return get_current_op(h) != node_mover_op::NONE;
 }
@@ -56,12 +62,7 @@ void editor_node_mover::start_transforming_selection(
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selected_entities<move_nodes_command>(
-		"",
-		[](const auto typed_handle) {
-			return typed_handle.has_independent_transform();
-		}	
-	);
+	auto command = s.make_command_from_selected_entities<move_nodes_command>("", is_movable());
 
 	if (!command.empty()) {
 		active = true;
@@ -127,12 +128,7 @@ void editor_node_mover::transform_selection(
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selected_entities<move_nodes_command>(
-		"",
-		[](const auto typed_handle) {
-			return typed_handle.has_independent_transform();
-		}	
-	);
+	auto command = s.make_command_from_selected_entities<move_nodes_command>("", is_movable());
 
 	if (!command.empty()) {
 		command.rotation_center = rotation_center;
@@ -177,12 +173,7 @@ void editor_node_mover::flip_selection(const input_type in, const flip_flags fli
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selected_entities<flip_nodes_command>(
-		"",
-		[](const auto typed_handle) {
-			return typed_handle.has_independent_transform();
-		}	
-	);
+	auto command = s.make_command_from_selected_entities<flip_nodes_command>("", is_movable());
 
 	if (!command.empty()) {
 		command.flip = flip;
@@ -198,12 +189,7 @@ void editor_node_mover::reset_rotation(const input_type in) {
 
 	s.finish_rectangular_selection();
 
-	auto command = s.make_command_from_selected_entities<move_nodes_command>(
-		"",
-		[](const auto typed_handle) {
-			return typed_handle.has_independent_transform();
-		}	
-	);
+	auto command = s.make_command_from_selected_entities<move_nodes_command>("", is_movable());
 
 	if (!command.empty()) {
 		command.special = special_entity_mover_op::RESET_ROTATION;
@@ -303,14 +289,14 @@ bool editor_node_mover::do_mousemotion(const input_type in, vec2 world_cursor_po
 						r = v.grid.get_snapped(r);
 					}
 
-					cmd->unmove_entities(cosm);
+					cmd->unmove_entities(s.make_command_input());
 					cmd->rewrite_change(new_delta, s.make_command_input());
 				}
 			}
 			else {
 				auto new_delta = new_cursor_pos - initial_world_cursor_pos;
 
-				cmd->unmove_entities(cosm);
+				cmd->unmove_entities(s.make_command_input());
 
 				if (v.snapping_enabled) {
 					cmd->reinfer_moved(cosm);
@@ -338,7 +324,7 @@ bool editor_node_mover::do_mousemotion(const input_type in, vec2 world_cursor_po
 bool editor_node_mover::do_left_press(const input_type in) {
 	if (active) {
 		active = false;
-		cosmic::reinfer_all_entities(in.setup.scene.world);
+		in.setup.rebuild_scene();
 		return true;
 	}
 

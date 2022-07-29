@@ -56,6 +56,10 @@ void debugger_setup::for_each_dashed_line(F&& callback) const {
 			[&](const entity_id id) {
 				const auto handle = world[id];
 
+				if (handle.dead()) {
+					return;
+				}
+
 				handle.dispatch_on_having_all<components::light>([&](const auto typed_handle) {
 					const auto center = typed_handle.get_logic_transform().pos;
 

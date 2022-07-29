@@ -9,6 +9,7 @@ struct create_layer_command : allocating_command<editor_layer_id> {
 	using base = allocating_command<editor_layer_id>;
 
 	std::string chosen_name;
+	bool quiet = false;
 
 	void undo(editor_command_input in);
 	void redo(editor_command_input in);

@@ -224,8 +224,8 @@ public:
 
 	editor_node_id to_node_id(entity_id) const;
 
-	entity_id get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons) const;
-	editor_node_id get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons) const;
+	entity_id get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons, std::optional<vec2> at = std::nullopt) const;
+	editor_node_id get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons, std::optional<vec2> at = std::nullopt) const;
 	entity_id to_entity_id(editor_node_id) const;
 
 	void scroll_once_to(editor_node_id);

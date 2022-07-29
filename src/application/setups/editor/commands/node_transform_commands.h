@@ -54,6 +54,7 @@ public:
 	std::string describe() const;
 
 	void push_entry(const_entity_handle);
+	void clear_entries();
 
 	auto size() const {
 		return moved_entities.size();
@@ -68,7 +69,7 @@ public:
 		const editor_command_input in
 	);
 	
-	void unmove_entities(cosmos& cosm);
+	void unmove_entities(const editor_command_input in);
 	void reinfer_moved(cosmos& cosm);
 
 	void redo(const editor_command_input in);

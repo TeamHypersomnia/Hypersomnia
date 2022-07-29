@@ -531,7 +531,12 @@ void move_nodes_command::push_entry(const const_entity_handle handle) {
 	});
 }
 
-void move_nodes_command::unmove_entities(cosmos& cosm) {
+void move_nodes_command::clear_entries() {
+	moved_entities.clear();
+}
+
+void move_nodes_command::unmove_entities(const editor_command_input in) {
+	auto& cosm = in.setup.get_cosmos();
 	auto before_change_data = augs::cref_memory_stream(values_before_change);
 
 	::unmove_entities({}, cosm, moved_entities, before_change_data);
@@ -589,9 +594,7 @@ void move_nodes_command::redo(const editor_command_input in) {
 }
 
 void move_nodes_command::undo(const editor_command_input in) {
-	auto& cosm = in.setup.get_cosmos();
-
-	unmove_entities(cosm);
+	unmove_entities(in);
 	clear_undo_state();
 
 	/*
