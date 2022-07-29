@@ -19,6 +19,7 @@
 #include "augs/templates/traits/has_rotation.h"
 #include "application/setups/editor/editor_setup_for_each_inspected_entity.hpp"
 #include "augs/templates/traits/has_size.h"
+#include "augs/templates/traits/has_flip.h"
 
 using active_resized_edges = resize_nodes_command::active_edges;
 using delta_type = move_nodes_command::delta_type;
@@ -48,6 +49,7 @@ static void read_back_to_nodes(editor_setup& setup) {
 			}
 
 			const auto transform = handle.dispatch([](const auto& typed) { return typed.find_independent_transform(); });
+
 			const auto size = handle.dispatch([](const auto& typed) -> std::optional<vec2i> { 
 				if (const auto geo = typed.get().template find<components::overridden_geo>()) {
 					if (geo->size.is_enabled) {
@@ -58,23 +60,38 @@ static void read_back_to_nodes(editor_setup& setup) {
 				return std::nullopt;
 			});
 
+			const auto flip = handle.dispatch([](const auto& typed) -> flip_flags { 
+				if (const auto geo = typed.get().template find<components::overridden_geo>()) {
+					return geo->flip;
+				}
+
+				return flip_flags();
+			});
+
 			if (transform == std::nullopt) {
 				return;
 			}
 
 			setup.on_node(
 				setup.to_node_id(id),
-				[transform, size](auto& node, const auto node_id) {
+				[transform, size, flip](auto& node, const auto node_id) {
 					(void)node_id;
 
 					node.editable.pos = transform->pos;
 
-					if constexpr(has_rotation_v<decltype(node.editable)>) {
+					using E = decltype(node.editable);
+
+					if constexpr(has_rotation_v<E>) {
 						node.editable.rotation = transform->rotation;
 					}
 
-					if constexpr(has_size_v<decltype(node.editable)>) {
+					if constexpr(has_size_v<E>) {
 						node.editable.size = size;
+					}
+
+					if constexpr(has_flip_v<E>) {
+						node.editable.flip_horizontally = flip.horizontally;
+						node.editable.flip_vertically = flip.vertically;
 					}
 				}
 			);

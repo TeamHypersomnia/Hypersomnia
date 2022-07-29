@@ -17,6 +17,7 @@ namespace editor_detail {
 
 		const bool has_shift{ common_input_state[key::LSHIFT] };
 		const bool has_alt{ common_input_state[key::LALT] };
+		const bool has_ctrl{ common_input_state[key::LCTRL] };
 
 		const auto pan_mult = [&](){
 			float result = 1.f;
@@ -52,20 +53,26 @@ namespace editor_detail {
 			camera.transform.pos -= pan_mult * amount / camera.zoom;
 		};
 
-		auto zoom_scene = [&panned_camera, &cone, zoom_mult](const auto zoom_amount, const auto zoom_point) {
+		auto set_zoom_with_pos_adjustment = [&panned_camera](const auto new_zoom, const auto zoom_point) {
+			auto& camera = panned_camera;
+			const auto old_zoom = camera.zoom;
+
+			camera.zoom = new_zoom;	
+			camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
+			camera.transform.pos.discard_fract();
+		};
+
+		auto zoom_scene = [set_zoom_with_pos_adjustment, &panned_camera, &cone, zoom_mult](const auto zoom_amount, const auto zoom_point) {
 			auto& camera = panned_camera;
 			(void)cone;
 
 			const auto min_zoom = 0.01f;
 			const auto max_zoom = 10.f;
 
-			const auto old_zoom = camera.zoom;
-			const auto zoom_offset = 0.09f * old_zoom * zoom_amount * zoom_mult;
-			const auto new_zoom = std::clamp(old_zoom + zoom_offset, min_zoom, max_zoom);
+			const auto zoom_offset = 0.09f * camera.zoom * zoom_amount * zoom_mult;
+			const auto new_zoom = std::clamp(camera.zoom + zoom_offset, min_zoom, max_zoom);
 
-			camera.zoom = new_zoom;	
-			camera.transform.pos += (1 - 1 / (new_zoom/old_zoom))*(zoom_point - camera.transform.pos);
-			camera.transform.pos.discard_fract();
+			set_zoom_with_pos_adjustment(new_zoom, zoom_point);
 		};
 
 		if (e.msg == message::wheel) {
@@ -133,6 +140,12 @@ namespace editor_detail {
 				case key::LEFT: pan_scene(vec2(key_pan_amount, 0)); return true;
 
 				case key::MINUS: panned_camera.zoom = get_prev_zoom_level(panned_camera.zoom); return true;
+				case key::Z: 
+					if (!has_shift && !has_ctrl) {
+						panned_camera.zoom = 1.0f;
+						return true;
+					}
+
 				case key::EQUAL: 
 					if (has_shift) {
 						panned_camera.zoom = get_next_zoom_level(panned_camera.zoom);

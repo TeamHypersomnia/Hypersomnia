@@ -168,6 +168,8 @@ bool editor_setup::handle_input_before_game(
 		if (has_shift && !has_ctrl) {
 			switch (k) {
 				case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
+				case key::H: mover.flip_selection(make_mover_input(), flip_flags::make_horizontally()); return true;
+				case key::V: mover.flip_selection(make_mover_input(), flip_flags::make_vertically()); return true;
 				default: break;
 			}
 		}
