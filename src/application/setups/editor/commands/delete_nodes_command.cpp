@@ -30,13 +30,12 @@ void delete_nodes_command::redo(const editor_command_input in) {
 
 			ensure(found_layer != std::nullopt);
 
-			const auto [layer_id, index] = *found_layer;
-			const auto layer = in.setup.find_layer(layer_id);
+			const auto layer = in.setup.find_layer(found_layer->layer_id);
 
 			ensure(layer != nullptr);
 
 			auto& nodes = layer->hierarchy.nodes;
-			nodes.erase(nodes.begin() + index);
+			nodes.erase(nodes.begin() + found_layer->index_in_layer);
 		}
 
 		auto& pool = in.setup.project.nodes.get_pool_for<N>();

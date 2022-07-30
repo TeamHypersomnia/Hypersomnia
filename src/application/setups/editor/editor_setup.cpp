@@ -533,6 +533,8 @@ void editor_setup::inspect(const current_selections_type& selections) {
 	for (const auto entity : selections) {
 		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
 	}
+
+	sort_inspected();
 }
 
 void editor_setup::inspect(const std::vector<entity_id>& selections) {
@@ -541,6 +543,8 @@ void editor_setup::inspect(const std::vector<entity_id>& selections) {
 	for (const auto entity : selections) {
 		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
 	}
+
+	sort_inspected();
 }
 
 void editor_setup::inspected_to_entity_selector_state() {
@@ -560,18 +564,40 @@ void editor_setup::inspect_add(inspected_variant new_inspected, const bool updat
 	if (update_selector) {
 		inspected_to_entity_selector_state();
 	}
+
+	sort_inspected();
 }
 
 void editor_setup::inspect(inspected_variant new_inspected) {
 	gui.inspector.inspect(new_inspected, wants_multiple_selection());
 
 	inspected_to_entity_selector_state();
+	sort_inspected();
+}
+
+void editor_setup::sort_inspected() {
+	if (gui.inspector.inspects_only<editor_node_id>()) {
+		try {
+			auto pred = [&](const inspected_variant& a, const inspected_variant& b) {
+				const auto node_a = std::get<editor_node_id>(a);
+				const auto node_b = std::get<editor_node_id>(b);
+
+				return find_parent_layer(node_a) < find_parent_layer(node_b);
+			};
+
+			gui.inspector.sort(pred);
+		}
+		catch (...) {
+
+		}
+	}
 }
 
 void editor_setup::inspect_only(inspected_variant new_inspected) {
 	gui.inspector.inspect(new_inspected, false);
 
 	inspected_to_entity_selector_state();
+	sort_inspected();
 }
 
 bool editor_setup::is_inspected(inspected_variant inspected) const {
@@ -580,6 +606,14 @@ bool editor_setup::is_inspected(inspected_variant inspected) const {
 
 std::vector<inspected_variant> editor_setup::get_all_inspected() const {
 	return gui.inspector.all_inspected;
+}
+
+editor_node_id editor_setup::get_topmost_inspected_node() const {
+	if (const auto id = gui.inspector.get_first_inspected<editor_node_id>()) {
+		return *id;
+	}
+
+	return {};
 }
 
 editor_command_input editor_setup::make_command_input() {
@@ -796,18 +830,24 @@ bool editor_setup::wants_multiple_selection() const {
 	return ImGui::GetIO().KeyCtrl;
 }
 
-std::optional<std::pair<editor_layer_id, std::size_t>> editor_setup::find_parent_layer(const editor_node_id node_id) const {
+std::optional<editor_setup::parent_layer_info> editor_setup::find_parent_layer(const editor_node_id node_id) const {
 	if (!node_id.is_set()) {
 		return std::nullopt;
 	}
 
-	for (const auto layer_id : project.layers.order) {
+	parent_layer_info info;
+
+	const auto& layers = project.layers.order;
+
+	for (std::size_t l = 0; l < layers.size(); ++l) {
+		const auto layer_id = layers[l];
+
 		if (const auto layer = find_layer(layer_id)) {
 			const auto& nodes = layer->hierarchy.nodes;
 
 			for (std::size_t i = 0; i < nodes.size(); ++i) {
 				if (nodes[i] == node_id) {
-					return std::pair<editor_layer_id, std::size_t> { layer_id, i };
+					return parent_layer_info { layer_id, l, i };
 				}
 			}
 		}

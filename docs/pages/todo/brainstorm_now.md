@@ -6,17 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Select all nodes in the given layer if pressed the layer while some node was selected
+
 - Fix glitch wherein the other edges are snapped even though resizing another
-
-- Implement flip too
-	- read_back_from_nodes
-
-- Properly implement snapping when instantiating an entity
 
 - Once we come to prefabs, it should be easy to rewrite these transform commands to operate on nodes
 	- We only really need a way to access sizes and positions (as shown by the data that's backed up for undo)
 
 - Shift+T could move with layer detection just like when putting on scene
+	- Point is, how do we quickly move one entity over another with just on-scene operations?
+		- I think ctrl+x + ctrl+v. So this is for later. Ctrl+v will always paste nodes above the topmost selected node
 
 - Damn it, we badly need to have those child commands
 	- They wouldn't be visible, it would just be history detail

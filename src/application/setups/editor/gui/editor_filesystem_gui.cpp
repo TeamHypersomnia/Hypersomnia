@@ -61,12 +61,12 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					command.built_description = typesafe_sprintf("Created %x", new_name);
 					command.created_node = std::move(new_node);
 
-					const auto hovered_node = in.setup.get_hovered_node(in.necessary_images);
-					entity_to_highlight = in.setup.to_entity_id(hovered_node);
+					const auto place_over_node = in.setup.get_topmost_inspected_node();
+					entity_to_highlight = in.setup.to_entity_id(place_over_node);
 
-					if (const auto parent_layer = in.setup.find_parent_layer(hovered_node)) {
-						command.layer_id = parent_layer->first;
-						command.index_in_layer = parent_layer->second;
+					if (const auto parent_layer = in.setup.find_parent_layer(place_over_node)) {
+						command.layer_id = parent_layer->layer_id;
+						command.index_in_layer = parent_layer->index_in_layer;
 					}
 					else {
 						command.create_layer = create_layer_command();

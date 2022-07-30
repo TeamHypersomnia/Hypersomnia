@@ -4638,3 +4638,26 @@ Advantages:
 
 - better descriptions (Set Color to 3,34,32,255 (generator))
 - poprawic kolor tego modala co pokazuje przeniesione pliki (simple popup)
+- Fixing layer detection under the new node creation scheme 
+	- NO! Different strategy: just place over the last selected entity
+		- Because otherwise we'll spam new layers when populating an empty space
+			- even in later stage of level creation we might want to disable viewing some entities with the eye icon
+			- in this case it makes no sense to use these invisible entities for detection
+			- and we still might want to place on the same layer
+			- at the very least it should choose the layer of the last selected
+				- i.e. people might want it to be placed on top of the layer instead of over the last selected entity
+
+	- We want the move command to be able to detect the new layer anyway
+		- but should it be tasked with creating a new layer?
+			- yes if we drop on an empty space, why not?
+		- however in this case the create_node_command won't create a layer
+			- or it will but it won't add the id to the orders
+		- point is that move command will have to move *from some* layer to the new
+	- reorder nodes could have a create layer as a child
+	- and the move entities command could have the reorder nodes as a child
+
+- Implement flip too
+	- read_back_from_nodes
+
+- Properly implement snapping when instantiating an entity
+

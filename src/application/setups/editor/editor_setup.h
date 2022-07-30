@@ -163,7 +163,23 @@ public:
 	void customize_for_viewing(config_lua_table&) const;
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
 
-	std::optional<std::pair<editor_layer_id, std::size_t>> find_parent_layer(editor_node_id id) const;
+	struct parent_layer_info {
+		editor_layer_id layer_id;
+		std::size_t layer_index;
+		std::size_t index_in_layer;
+
+		auto tie() const {
+			return std::tie(layer_index, index_in_layer);
+		}
+
+		bool operator<(const parent_layer_info& b) const {
+			return tie() < b.tie();
+		}
+	};
+
+	std::optional<parent_layer_info> find_parent_layer(editor_node_id id) const;
+
+	void sort_inspected();
 
 	const std::vector<editor_layer_id>& get_layers() const {
 		return project.layers.order;
@@ -269,6 +285,8 @@ public:
 	decltype(auto) get_all_inspected() const {
 		return gui.inspector.template get_all_inspected<T>();
 	}
+
+	editor_node_id get_topmost_inspected_node() const;
 
 	std::string get_name(inspected_variant) const;
 	std::string get_name(entity_id) const;
