@@ -6,6 +6,7 @@ T make_command_from_selections(
 	const editor_setup& setup,
 	F for_each_selected,
    	const std::string& preffix,
+	const std::string& suffix,
    	P inclusion_predicate
 ) {
 	T command;
@@ -25,10 +26,10 @@ T make_command_from_selections(
 		command.built_description = preffix + last_name;
 	}
 	else if (command.size() == setup.get_node_count()) {
-		command.built_description = preffix + "all nodes";
+		command.built_description = preffix + "all " + suffix;
 	}
 	else {
-		command.built_description = preffix + typesafe_sprintf("%x nodes", command.size());
+		command.built_description = preffix + typesafe_sprintf("%x %x", command.size(), suffix);
 	}
 
 	return command;
@@ -38,13 +39,14 @@ template <class T, class F>
 T make_command_from_selections(
 	const editor_setup& setup,
 	F for_each_selected,
-	const std::string& preffix
+	const std::string& preffix,
+	const std::string& suffix
 ) {
-	return make_command_from_selections<T>(setup, for_each_selected, preffix, [](const auto&) { return true; });
+	return make_command_from_selections<T>(setup, for_each_selected, preffix, suffix, [](const auto&) { return true; });
 }
 
 template <class T, class... Args>
-auto editor_setup::make_command_from_selected_entities(Args&&... args) const {
+auto editor_setup::make_command_from_selected_entities(const std::string& preffix, Args&&... args) const {
 	return ::make_command_from_selections<T>(
 		*this,
 		[&](auto callback) {
@@ -56,17 +58,34 @@ auto editor_setup::make_command_from_selected_entities(Args&&... args) const {
 				}
 			);	
 		},
+		preffix,
+		"nodes",
 		std::forward<Args>(args)...
 	);
 }
 
 template <class T, class... Args>
-auto editor_setup::make_command_from_selected_nodes(Args&&... args) const {
+auto editor_setup::make_command_from_selected_nodes(const std::string& preffix, Args&&... args) const {
 	return ::make_command_from_selections<T>(
 		*this,
 		[&](auto callback) {
 			gui.inspector.for_each_inspected<editor_node_id>(callback);
 		},
+		preffix,
+		"nodes",
+		std::forward<Args>(args)...
+	);
+}
+
+template <class T, class... Args>
+auto editor_setup::make_command_from_selected_layers(const std::string& preffix, Args&&... args) const {
+	return ::make_command_from_selections<T>(
+		*this,
+		[&](auto callback) {
+			gui.inspector.for_each_inspected<editor_layer_id>(callback);
+		},
+		preffix,
+		"layers",
 		std::forward<Args>(args)...
 	);
 }

@@ -166,6 +166,7 @@ public:
 
 	struct parent_layer_info {
 		editor_layer_id layer_id;
+		const editor_layer* layer_ptr = nullptr;
 		std::size_t layer_index;
 		std::size_t index_in_layer;
 
@@ -276,10 +277,13 @@ public:
 	decltype(auto) rewrite_last_command(T&&);
 
 	template <class T, class... Args>
-	auto make_command_from_selected_entities(Args&&...) const;
+	auto make_command_from_selected_entities(const std::string& preffix, Args&&...) const;
 
 	template <class T, class... Args>
-	auto make_command_from_selected_nodes(Args&&...) const;
+	auto make_command_from_selected_nodes(const std::string& preffix, Args&&...) const;
+
+	template <class T, class... Args>
+	auto make_command_from_selected_layers(const std::string& preffix, Args&&...) const;
 
 	void clear_inspector();
 
@@ -293,7 +297,9 @@ public:
 	void inspect(const std::vector<entity_id>&);
 
 	void inspect(inspected_variant);
-	void inspect_add(inspected_variant, bool update_selector = true);
+	void inspect_add_quiet(inspected_variant);
+	void after_quietly_adding_inspected();
+
 	void inspect_only(inspected_variant);
 	void inspected_to_entity_selector_state();
 
@@ -375,19 +381,10 @@ public:
 	void cut_selection();
 	void delete_selection();
 
-	auto only_visible_nodes() {
+	bool is_node_visible(const editor_node_id) const;
+	auto only_visible_nodes() const {
 		return [this](const auto id) {
-			bool visible = false;
-
-			on_node(id, [&visible](const auto& typed_node, const auto node_id) {
-				(void)node_id;
-
-				if (typed_node.visible) {
-					visible = true;
-				}
-			});
-
-			return visible;
+			return is_node_visible(id);
 		};
 	}
 

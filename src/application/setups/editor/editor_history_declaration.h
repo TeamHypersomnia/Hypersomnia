@@ -36,6 +36,9 @@ class move_nodes_command;
 class resize_nodes_command;
 class flip_nodes_command;
 
+struct toggle_nodes_visibility_command;
+struct toggle_layers_visibility_command;
+
 using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_sprite_resource>,
 	edit_resource_command<editor_sound_resource>,
@@ -59,5 +62,8 @@ using editor_history_base = augs::history_with_saved_revision<
 	flip_nodes_command,
 
 	delete_nodes_command,
-	duplicate_nodes_command
+	duplicate_nodes_command,
+
+	toggle_nodes_visibility_command,
+	toggle_layers_visibility_command
 >;

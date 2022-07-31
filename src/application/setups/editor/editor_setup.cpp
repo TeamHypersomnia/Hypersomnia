@@ -568,13 +568,12 @@ void editor_setup::inspected_to_entity_selector_state() {
 	);
 }
 
-void editor_setup::inspect_add(inspected_variant new_inspected, const bool update_selector) {
+void editor_setup::inspect_add_quiet(inspected_variant new_inspected) {
 	gui.inspector.inspect(new_inspected, true);
+}
 
-	if (update_selector) {
-		inspected_to_entity_selector_state();
-	}
-
+void editor_setup::after_quietly_adding_inspected() {
+	inspected_to_entity_selector_state();
 	sort_inspected();
 }
 
@@ -855,7 +854,7 @@ std::optional<editor_setup::parent_layer_info> editor_setup::find_parent_layer(c
 
 			for (std::size_t i = 0; i < nodes.size(); ++i) {
 				if (nodes[i] == node_id) {
-					return parent_layer_info { layer_id, l, i };
+					return parent_layer_info { layer_id, layer, l, i };
 				}
 			}
 		}
@@ -1591,6 +1590,31 @@ void editor_setup::mirror_selection(const vec2i direction) {
 
 void editor_setup::duplicate_selection() {
 	mirror_selection(vec2i(0, 0));
+}
+
+bool editor_setup::is_node_visible(const editor_node_id id) const {
+	if (const auto found_layer = find_parent_layer(id)) {
+		if (found_layer->layer_ptr) {
+			if (!found_layer->layer_ptr->visible) {
+				return false;
+			}
+		}
+	}
+	else {
+		return false;
+	}
+
+	bool visible = false;
+
+	on_node(id, [&visible](const auto& typed_node, const auto node_id) {
+		(void)node_id;
+
+		if (typed_node.visible) {
+			visible = true;
+		}
+	});
+
+	return visible;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

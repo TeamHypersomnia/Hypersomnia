@@ -458,6 +458,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 	${HYPERSOMNIA_DEBUGGER_SETUP_CPPS}
 
+	"src/application/setups/editor/commands/toggle_visibility_commands.cpp"
 	"src/application/setups/editor/commands/duplicate_nodes_command.cpp"
 	"src/application/setups/editor/commands/delete_nodes_command.cpp"
 	"src/application/setups/editor/mover/editor_node_mover.cpp"

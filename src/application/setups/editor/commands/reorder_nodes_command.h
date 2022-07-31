@@ -3,7 +3,6 @@
 #include "application/setups/editor/nodes/editor_typed_node_id.h"
 #include "application/setups/editor/project/editor_layers.h"
 
-#include "application/setups/editor/commands/allocating_command.h"
 #include "application/setups/editor/commands/create_layer_command.h"
 
 struct reorder_nodes_command {

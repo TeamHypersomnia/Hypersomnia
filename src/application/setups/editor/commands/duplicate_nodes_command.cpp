@@ -118,7 +118,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 			const auto duplicated_id_generic = e.duplicated_id.operator editor_node_id();
 
 			in.setup.register_node_in_layer(duplicated_id_generic, source_id_generic);
-			in.setup.inspect_add(duplicated_id_generic, false);
+			in.setup.inspect_add_quiet(duplicated_id_generic);
 		});
 	};
 
@@ -207,6 +207,8 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 		*/
 		duplicate([](auto&&...) {});
 	}
+
+	in.setup.after_quietly_adding_inspected();
 }
 
 void duplicate_nodes_command::undo(const editor_command_input in) {
@@ -223,7 +225,7 @@ void duplicate_nodes_command::undo(const editor_command_input in) {
 		auto& pool = in.setup.project.nodes.get_pool_for<N>();
 		pool.undo_last_allocate(entry.duplicated_id.raw);
 
-		in.setup.inspect_add(source_id, false);
+		in.setup.inspect_add_quiet(source_id);
 	});
 
 	{
@@ -240,8 +242,7 @@ void duplicate_nodes_command::undo(const editor_command_input in) {
 		*/
 	}
 
-	in.setup.inspected_to_entity_selector_state();
-	in.setup.sort_inspected();
+	in.setup.after_quietly_adding_inspected();
 
 	clear_undo_state();
 }

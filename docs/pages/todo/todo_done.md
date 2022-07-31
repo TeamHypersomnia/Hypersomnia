@@ -4661,3 +4661,14 @@ Advantages:
 
 - Properly implement snapping when instantiating an entity
 
+- Also undoing operations on entities is dangerous if they were made invisible
+	- That's why undoing creation of an invisible entity crashes
+	- We should probably make it a command
+- Either we make the invisibility visual only or make it a command
+- Ultimately it shouldn't matter because in the end commands should operate on node state only and not worry about entities
+	- We might force the node to be visible
+	- However won't that affect entity ids determinism?
+		- It will, even move nodes command has entity ids stored moved_entities_type moved_entities
+- Let's commandize toggling visibility after all.
+	- This is the easiest fix for now and it will come in handy later anyway.
+

@@ -61,10 +61,9 @@ void delete_nodes_command::undo(const editor_command_input in) {
 		ensure(undone_id == entry.node_id.raw);
 
 		const auto undone_generic_id = entry.node_id.operator editor_node_id();
-		in.setup.inspect_add(undone_generic_id, false);
+		in.setup.inspect_add_quiet(undone_generic_id);
 	});
 
 	in.setup.project.layers.pool = layers_backup;
-	in.setup.inspected_to_entity_selector_state();
-	in.setup.sort_inspected();
+	in.setup.after_quietly_adding_inspected();
 }
