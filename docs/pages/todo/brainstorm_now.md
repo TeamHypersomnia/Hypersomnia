@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Enable tile excess size by default
+	- That is because 99% of the time we're going to be resizing floors or things that don't stretch
+	- And this way we'll also encourage preparing sprites in the target size
+
+
 - Select all nodes in the given layer if pressed the layer while some node was selected
 
 - Fix glitch wherein the other edges are snapped even though resizing another

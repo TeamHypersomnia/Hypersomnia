@@ -352,8 +352,19 @@ void resize_entities(
 
 							if (size_unit != std::nullopt) {
 								vec2i s = new_size;
-								s /= size_unit.value();
-								s *= size_unit.value();
+
+								if (edges.horizontal()) {
+									s.x /= size_unit.value().x;
+									s.x = std::max(s.x, 1);
+									s.x *= size_unit.value().x;
+								}
+
+								if (edges.vertical()) {
+									s.y /= size_unit.value().y;
+									s.y = std::max(s.y, 1);
+									s.y *= size_unit.value().y;
+								}
+
 								overridden_geo.size.emplace(s);
 							}
 							else {

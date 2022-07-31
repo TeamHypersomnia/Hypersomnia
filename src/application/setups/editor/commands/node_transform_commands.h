@@ -141,6 +141,14 @@ public:
 		bool bottom = false;
 		bool left = false;
 
+		bool horizontal() const {
+			return left || right;
+		}
+
+		bool vertical() const {
+			return top || bottom;
+		}
+
 		active_edges() = default;
 		active_edges(transformr, vec2 rect_size, vec2 target_point, bool both_axes);
 
