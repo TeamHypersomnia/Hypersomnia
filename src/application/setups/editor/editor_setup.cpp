@@ -1541,8 +1541,8 @@ std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) co
 	);
 }
 
-void editor_setup::start_moving_selection() {
-	mover.start_moving_selection(make_mover_input());
+bool editor_setup::start_moving_selection() {
+	return mover.start_moving_selection(make_mover_input());
 }
 
 void editor_setup::finish_moving_selection() {
@@ -1611,9 +1611,8 @@ void editor_setup::unregister_node_from_layer(const editor_node_id node_id, cons
 }
 
 void editor_setup::mirror_selection(const vec2i direction) {
-	finish_rectangular_selection();
-
 	const bool only_duplicating = direction.is_zero();
+	gui.filesystem.clear_drag_drop();
 
 	auto command = make_command_from_selected_nodes<duplicate_nodes_command>(
 		only_duplicating ? "Duplicated " : "Mirrored ",
@@ -1625,8 +1624,9 @@ void editor_setup::mirror_selection(const vec2i direction) {
 		post_new_command(std::move(command));
 
 		if (only_duplicating) {
-			mover.start_moving_selection(make_mover_input());
-			make_last_command_a_child();
+			if (start_moving_selection()) {
+				make_last_command_a_child();
+			}
 		}
 	}
 }

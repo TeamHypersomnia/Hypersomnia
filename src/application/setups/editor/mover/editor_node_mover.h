@@ -30,7 +30,7 @@ class editor_node_mover {
 		std::optional<transformr> one_shot_delta
 	);
 
-	void start_transforming_selection(
+	bool start_transforming_selection(
 		node_mover_input in,
 		std::optional<vec2> rotation_center
 	);
@@ -40,7 +40,7 @@ public:
 	bool is_active(const editor_history&) const;
 	node_mover_op get_current_op(const editor_history&) const;
 
-	void start_moving_selection(node_mover_input in);
+	bool start_moving_selection(node_mover_input in);
 	void start_rotating_selection(node_mover_input in);
 	void rotate_selection_once_by(node_mover_input in, int degrees);
 

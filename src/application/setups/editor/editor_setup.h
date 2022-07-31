@@ -369,7 +369,7 @@ public:
 		return view;
 	}
 
-	void start_moving_selection();
+	bool start_moving_selection();
 	void finish_moving_selection();
 	void show_absolute_mover_pos_once();
 

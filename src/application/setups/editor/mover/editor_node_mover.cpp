@@ -54,7 +54,7 @@ bool editor_node_mover::escape() {
 	return false;
 }
 
-void editor_node_mover::start_transforming_selection(
+bool editor_node_mover::start_transforming_selection(
 	const input_type in,
 	const std::optional<vec2> rotation_center
 ) {
@@ -71,7 +71,11 @@ void editor_node_mover::start_transforming_selection(
 		s.post_new_command(std::move(command));
 
 		initial_world_cursor_pos = s.get_world_cursor_pos().discard_fract();
+
+		return true;
 	}
+
+	return false;
 }
 
 resize_target_point get_resize_target_point(node_mover_input in, const editor_view& view, std::optional<vec2> world_cursor_pos = std::nullopt) {
@@ -139,8 +143,8 @@ void editor_node_mover::transform_selection(
 }
 
 
-void editor_node_mover::start_moving_selection(const input_type in) {
-	start_transforming_selection(in, std::nullopt);
+bool editor_node_mover::start_moving_selection(const input_type in) {
+	return start_transforming_selection(in, std::nullopt);
 }
 
 void editor_node_mover::start_rotating_selection(const input_type in) {

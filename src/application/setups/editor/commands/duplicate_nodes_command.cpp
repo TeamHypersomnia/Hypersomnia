@@ -104,20 +104,23 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 
 			auto& pool = in.setup.project.nodes.get_pool_for<N>();
 
-			const auto& old_node = pool.get(e.source_id.raw);
-			const auto old_name = old_node.unique_name;
-			const auto new_name = in.setup.get_free_node_name_for(old_name + new_group_suffix);
+			auto old_node = pool.get(e.source_id.raw);
+			const auto new_name = in.setup.get_free_node_name_for(old_node.unique_name + new_group_suffix);
 
-			const auto [duplicated_id, duplicated_node] = pool.allocate(old_node);
+			const auto [duplicated_id, duplicated_node] = pool.allocate(std::move(old_node));
 			e.duplicated_id.set(duplicated_id);
 			duplicated_node.unique_name = new_name;
+			duplicated_node.scene_entity_id.unset();
 
 			new_transform_setter(duplicated_node);
 
 			const auto source_id_generic = e.source_id.operator editor_node_id();
 			const auto duplicated_id_generic = e.duplicated_id.operator editor_node_id();
 
-			in.setup.register_node_in_layer(duplicated_id_generic, source_id_generic);
+			const bool registered_in_layer = in.setup.register_node_in_layer(duplicated_id_generic, source_id_generic);
+			ensure(registered_in_layer);
+			(void)registered_in_layer;
+
 			in.setup.inspect_add_quiet(duplicated_id_generic);
 		});
 	};
