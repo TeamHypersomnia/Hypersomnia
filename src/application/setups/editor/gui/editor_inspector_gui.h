@@ -79,7 +79,7 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	template <class T, class F>
 	void for_each_inspected(F&& callback) const {
-		for (const auto& inspected : all_inspected) {
+		for (const auto inspected : all_inspected) {
 			if (const auto typed = std::get_if<T>(std::addressof(inspected))) {
 				callback(*typed);
 			}
@@ -104,5 +104,9 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	void inspect(inspected_variant, bool wants_multiple);
 	void perform(editor_inspector_input);
+
+	void clear() {
+		all_inspected.clear();
+	}
 };
 

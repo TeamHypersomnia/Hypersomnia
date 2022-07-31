@@ -64,6 +64,10 @@ public:
 		return type_in_list_id(get_index_of<T>());
 	}
 
+	friend std::ostream& operator<<(std::ostream& out, const type_in_list_id<List> x) {
+		return out << x.index;
+	}
+
 	bool is_set() const {
 		return index < max_index_v;
 	}

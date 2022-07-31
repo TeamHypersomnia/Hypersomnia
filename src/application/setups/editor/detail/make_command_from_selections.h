@@ -13,7 +13,7 @@ T make_command_from_selections(
 	std::string last_name;
 
 	for_each_selected(
-		[&](const auto& selected) {
+		[&](const auto selected) {
 			if (inclusion_predicate(selected)) {
 				command.push_entry(selected);
 				last_name = setup.get_name(selected);

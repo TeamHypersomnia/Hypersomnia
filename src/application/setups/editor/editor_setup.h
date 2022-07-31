@@ -222,6 +222,11 @@ public:
 	template <class F>
 	void for_each_dashed_line(F&&) const;
 
+	template <class T, class F>
+	void for_each_inspected(F&& callback) const {
+		gui.inspector.for_each_inspected<T>(std::forward<F>(callback));
+	}
+
 	template <class F>
 	void for_each_inspected_entity(F&& callback) const;
 
@@ -264,6 +269,8 @@ public:
 
 	template <class T, class... Args>
 	auto make_command_from_selected_nodes(Args&&...) const;
+
+	void clear_inspector();
 
 	void inspect(const current_selections_type&);
 	void inspect(const std::vector<entity_id>&);

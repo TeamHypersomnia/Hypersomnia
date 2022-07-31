@@ -527,8 +527,12 @@ bool editor_setup::exists(const editor_resource_id& id) const {
 	return on_resource(id, [&](auto&&...) { return true; }) == std::optional<bool>(true);
 }
 
+void editor_setup::clear_inspector() {
+	gui.inspector.clear();
+}
+
 void editor_setup::inspect(const current_selections_type& selections) {
-	gui.inspector.all_inspected.clear();
+	clear_inspector();
 
 	for (const auto entity : selections) {
 		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
@@ -538,7 +542,7 @@ void editor_setup::inspect(const current_selections_type& selections) {
 }
 
 void editor_setup::inspect(const std::vector<entity_id>& selections) {
-	gui.inspector.all_inspected.clear();
+	clear_inspector();
 
 	for (const auto entity : selections) {
 		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
@@ -676,7 +680,6 @@ void editor_setup::undo() {
 
 		gui.history.scroll_to_current_once = true;
 		history.undo(make_command_input());
-		LOG("UNDO");
 
 		gui.filesystem.clear_drag_drop();
 		rebuild_scene();
@@ -693,7 +696,6 @@ void editor_setup::redo() {
 
 		gui.history.scroll_to_current_once = true;
 		history.redo(make_command_input());
-		LOG("REDO");
 
 		gui.filesystem.clear_drag_drop();
 		rebuild_scene();

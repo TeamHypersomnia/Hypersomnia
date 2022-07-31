@@ -18,7 +18,7 @@ bool delete_nodes_command::empty() const {
 }
 
 void delete_nodes_command::redo(const editor_command_input in) {
-	in.setup.inspect_only({});
+	in.setup.clear_inspector();
 	layers_backup = in.setup.project.layers.pool;
 
 	deleted_nodes.for_each([&]<typename T>(T& entry) {
@@ -45,6 +45,8 @@ void delete_nodes_command::redo(const editor_command_input in) {
 }
 
 void delete_nodes_command::undo(const editor_command_input in) {
+	in.setup.clear_inspector();
+
 	/* 
 		NOTE: Pools should be independent, but to be theoretically pure,
 		we should implement reverse_for_each_through_std_get inside for_each_reverse.
@@ -58,9 +60,11 @@ void delete_nodes_command::undo(const editor_command_input in) {
 		const auto [undone_id, object] = pool.undo_free(entry.undo_delete_input, std::move(entry.node_content));
 		ensure(undone_id == entry.node_id.raw);
 
-		in.setup.inspect_add(editor_node_id(entry.node_id), false);
+		const auto undone_generic_id = entry.node_id.operator editor_node_id();
+		in.setup.inspect_add(undone_generic_id, false);
 	});
 
 	in.setup.project.layers.pool = layers_backup;
 	in.setup.inspected_to_entity_selector_state();
+	in.setup.sort_inspected();
 }
