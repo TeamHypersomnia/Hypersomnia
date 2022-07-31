@@ -155,6 +155,11 @@ bool editor_setup::handle_input_before_game(
 				//case key::X: cut(); return true;
 				//case key::V: paste(); return true;
 
+				case key::LEFT: mirror_selection(vec2i(-1, 0)); return true;
+				case key::RIGHT: mirror_selection(vec2i(1, 0)); return true;
+				case key::UP: mirror_selection(vec2i(0, -1)); return true;
+				case key::DOWN: mirror_selection(vec2i(0, 1)); return true;
+
 				case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
 				case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
 				case key::F: gui.filesystem.open(); return true;
@@ -178,6 +183,7 @@ bool editor_setup::handle_input_before_game(
 
 		if (!has_shift && !has_ctrl) {
 			switch (k) {
+				case key::C: duplicate_selection(); return true;
 				case key::D: cut_selection(); return true;
 				case key::DEL: delete_selection(); return true;
 
@@ -1528,6 +1534,63 @@ void editor_setup::delete_selection() {
 	if (!command.empty()) {
 		post_new_command(std::move(command));
 	}
+}
+
+bool editor_setup::register_node_in_layer(const editor_node_id node, const editor_node_id over_node) {
+	if (const auto parent = find_parent_layer(over_node)) {
+		return register_node_in_layer(node, parent->layer_id, parent->index_in_layer);
+	}
+
+	return false;
+}
+
+bool editor_setup::register_node_in_layer(const editor_node_id node_id, const editor_layer_id layer_id, const std::size_t index_in_layer) {
+	if (auto* const layer = find_layer(layer_id)) {
+		auto& nodes = layer->hierarchy.nodes;
+		nodes.insert(nodes.begin() + index_in_layer, node_id);
+
+		layer->is_open = true;
+		return true;
+	}
+
+	return false;
+}
+
+void editor_setup::unregister_node_from_layer(const editor_node_id node_id) {
+	if (const auto parent = find_parent_layer(node_id)) {
+		unregister_node_from_layer(node_id, parent->layer_id);
+	}
+}
+
+void editor_setup::unregister_node_from_layer(const editor_node_id node_id, const editor_layer_id layer_id) {
+	if (auto* const layer = find_layer(layer_id)) {
+		erase_element(layer->hierarchy.nodes, node_id);
+	}
+}
+
+void editor_setup::mirror_selection(const vec2i direction) {
+	finish_rectangular_selection();
+
+	const bool only_duplicating = direction.is_zero();
+
+	auto command = make_command_from_selected_nodes<duplicate_nodes_command>(
+		only_duplicating ? "Duplicated " : "Mirrored ",
+		only_visible_nodes()
+	);
+
+	if (!command.empty()) {
+		command.mirror_direction = direction;
+		post_new_command(std::move(command));
+
+		if (only_duplicating) {
+			mover.start_moving_selection(make_mover_input());
+			make_last_command_a_child();
+		}
+	}
+}
+
+void editor_setup::duplicate_selection() {
+	mirror_selection(vec2i(0, 0));
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

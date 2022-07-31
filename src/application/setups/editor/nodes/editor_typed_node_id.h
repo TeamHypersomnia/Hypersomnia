@@ -7,6 +7,10 @@ struct editor_typed_node_id {
 	using target_type = E;
 	editor_node_pool_id raw;
 
+	void set(const editor_node_pool_id& new_raw) {
+		raw = new_raw;
+	}
+
 	static editor_typed_node_id<E> from_generic(const editor_node_id& id) {
 		return { id.raw };
 	}

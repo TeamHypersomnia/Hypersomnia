@@ -6,6 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Watch out for pixel imperfections. List of possible fixes:
+	- We've deleted aabb calculation from the mirror entities command.
+
+- Also undoing operations on entities is dangerous if they were made invisible
+	- That's why undoing creation of an invisible entity crashes
+	- We should probably make it a command
+
+- Watch out for invisible entities when performing mass-commands (or even simple commands)
+	- Because scene entity ids don't exist for them
+		- Note that make command from selected entities by definition only iterates through existing entities
+		- And for each existing node is used for delete command
+			- However it's also used for duplicate
+	- So either disallow selecting them with active entities (?) or just don't do anything for them
+
+- Drag & drop to a + sign moves nodes to a new layer
+
 - Enable tile excess size by default
 	- That is because 99% of the time we're going to be resizing floors or things that don't stretch
 	- And this way we'll also encourage preparing sprites in the target size

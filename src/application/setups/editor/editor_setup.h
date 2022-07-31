@@ -134,6 +134,7 @@ class editor_setup : public default_setup_settings {
 	friend flip_nodes_command;
 
 	friend delete_nodes_command;
+	friend duplicate_nodes_command;
 
 	friend editor_node_mover;
 
@@ -247,6 +248,16 @@ public:
 
 	entity_id get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons, std::optional<vec2> at = std::nullopt) const;
 	editor_node_id get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons, std::optional<vec2> at = std::nullopt) const;
+
+	template <class T>
+	entity_id to_entity_id(const editor_typed_node_id<T> id) const {
+		if (const auto node = find_node(id)) {
+			return node->scene_entity_id;
+		}
+
+		return {};
+	}
+
 	entity_id to_entity_id(editor_node_id) const;
 
 	void scroll_once_to(editor_node_id);
@@ -271,6 +282,12 @@ public:
 	auto make_command_from_selected_nodes(Args&&...) const;
 
 	void clear_inspector();
+
+	bool register_node_in_layer(editor_node_id node, editor_node_id over_node);
+	bool register_node_in_layer(editor_node_id node, editor_layer_id layer, std::size_t index);
+
+	void unregister_node_from_layer(editor_node_id);
+	void unregister_node_from_layer(editor_node_id, editor_layer_id);
 
 	void inspect(const current_selections_type&);
 	void inspect(const std::vector<entity_id>&);
@@ -307,6 +324,10 @@ public:
 
 	std::optional<rgba> find_highlight_color_of(const entity_id id) const;
 	std::optional<ltrb> find_selection_aabb() const;
+
+	template <class F>
+	std::optional<ltrb> find_aabb_of_typed_nodes(F&& for_each_typed_node) const;
+
 	std::optional<ltrb> find_screen_space_rect_selection(
 		const vec2i screen_size,
 		const vec2i mouse_pos
@@ -353,6 +374,25 @@ public:
 
 	void cut_selection();
 	void delete_selection();
+
+	auto only_visible_nodes() {
+		return [this](const auto id) {
+			bool visible = false;
+
+			on_node(id, [&visible](const auto& typed_node, const auto node_id) {
+				(void)node_id;
+
+				if (typed_node.visible) {
+					visible = true;
+				}
+			});
+
+			return visible;
+		};
+	}
+
+	void mirror_selection(vec2i direction);
+	void duplicate_selection();
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

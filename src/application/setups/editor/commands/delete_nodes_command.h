@@ -2,21 +2,17 @@
 #include <vector>
 #include <string>
 
-#include "augs/templates/type_mod_templates.h"
-
 #include "augs/misc/pool/pool_structs.h"
 
 #include "application/setups/editor/commands/editor_command_meta.h"
 #include "application/setups/editor/nodes/editor_typed_node_id.h"
 #include "application/setups/editor/project/editor_layers.h"
 #include "application/setups/editor/nodes/all_editor_node_types.h"
+#include "application/setups/editor/nodes/per_node_type.h"
 
 namespace augs {
 	struct introspection_access;
 }
-
-template <template <class> class Mod>
-using per_node_type_container = per_type_container<all_editor_node_types, Mod>;
 
 using editor_node_pool_size_type = unsigned short;
 using node_undo_free_input = augs::pool_undo_free_input<editor_node_pool_size_type>;
@@ -34,14 +30,12 @@ struct delete_nodes_command {
 	template <class T>
 	using make_data_vector = std::vector<deleted_entry<T>>;
 
-	// GEN INTROSPECTOR struct delete_nodes_command
 	editor_command_meta meta;
 private:
 	per_node_type_container<make_data_vector> deleted_nodes;
 	editor_layer_pool layers_backup;
 public:
 	std::string built_description;
-	// END GEN INTROSPECTOR
 
 	void push_entry(editor_node_id);
 

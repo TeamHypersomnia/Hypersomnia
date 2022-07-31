@@ -4,11 +4,7 @@
 
 template <class T>
 inline void create_node_command<T>::undo(editor_command_input in) {
-	if (auto* const layer = in.setup.find_layer(layer_id)) {
-		const auto node_id = get_node_id();
-
-		erase_element(layer->hierarchy.nodes, node_id);
-	}
+	in.setup.unregister_node_from_layer(get_node_id(), layer_id);
 
 	{
 		auto& node_pool = in.setup.project.nodes.template get_pool_for<T>();
@@ -34,14 +30,10 @@ inline void create_node_command<T>::redo(editor_command_input in) {
 		base::redo(node_pool, created_node);
 	}
 
-	if (auto* const layer = in.setup.find_layer(layer_id)) {
-		const auto node_id = get_node_id();
+	const auto node_id = get_node_id();
 
-		auto& nodes = layer->hierarchy.nodes;
-		nodes.insert(nodes.begin() + index_in_layer, node_id);
-
+	if (in.setup.register_node_in_layer(node_id, layer_id, index_in_layer)) {
 		in.setup.inspect_only(node_id);
-		layer->is_open = true;
 	}
 }
 
