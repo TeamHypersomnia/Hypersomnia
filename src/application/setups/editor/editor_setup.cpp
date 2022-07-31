@@ -225,6 +225,9 @@ bool editor_setup::handle_input_before_game(
 	auto check_changed = [&]() {
 		get_all_selected_by_selector(cached_selected_comparison_after);
 
+		sort_range(cached_selected_comparison);
+		sort_range(cached_selected_comparison_after);
+
 		if (cached_selected_comparison_after != cached_selected_comparison) {
 			inspect(cached_selected_comparison_after);
 		}
