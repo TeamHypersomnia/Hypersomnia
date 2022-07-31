@@ -333,16 +333,18 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	};
 
 	{
-		//auto child = scoped_child("hierarchy view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
+		//auto ss = scoped_style_var(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		auto child = scoped_child("hierarchy view");
 
 		auto& layers = in.layers;
 
 		int id_counter = 0;
 
 		const auto avail = ImGui::GetContentRegionAvail().x;
+		const auto spacing = ImGui::GetStyle().ItemSpacing;
 
 		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, avail - max_icon_size);
+		ImGui::SetColumnWidth(0, avail - max_icon_size - spacing.x);
 
 		for (const auto& layer_id : layers.order) {
 			auto* maybe_layer = in.setup.find_layer(layer_id);
