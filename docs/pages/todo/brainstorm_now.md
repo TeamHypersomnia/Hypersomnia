@@ -6,22 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Note that ctrl+a should select all entities as well as the invisible ones
-	- And the transforming commands will re-inspect only the relevant ones (due to their redo implementation)
-		- So we don't have to purge the non-selected entities beforehand from the inspector state
-
-- Fix: Allow selecting invisible nodes along the visible ones
-
 - Watch out for pixel imperfections. List of possible fixes:
 	- We've deleted aabb calculation from the mirror entities command.
 
-
-- Watch out for invisible entities when performing mass-commands (or even simple commands)
-	- Because scene entity ids don't exist for them
-		- Note that make command from selected entities by definition only iterates through existing entities
-		- And for each existing node is used for delete command
-			- However it's also used for duplicate
-	- So either disallow selecting them with active entities (?) or just don't do anything for them
+- Clickling on layer should select all entities in the layer if we're multiple selecting and an entity is already selected
 
 - Drag & drop to a + sign moves nodes to a new layer
 

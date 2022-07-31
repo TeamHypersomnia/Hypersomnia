@@ -4672,3 +4672,9 @@ Advantages:
 - Let's commandize toggling visibility after all.
 	- This is the easiest fix for now and it will come in handy later anyway.
 
+- Note that ctrl+a should select all entities as well as the invisible ones
+	- And the transforming commands will re-inspect only the relevant ones (due to their redo implementation)
+		- So we don't have to purge the non-selected entities beforehand from the inspector state
+
+- Fix: Allow selecting invisible nodes along the visible ones
+

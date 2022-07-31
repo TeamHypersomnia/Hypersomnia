@@ -149,7 +149,7 @@ bool editor_setup::handle_input_before_game(
 			}
 
 			switch (k) {
-				case key::A: select_all_entities(has_ctrl); return true;
+				case key::A: select_all_entities(); return true;
 				case key::Z: undo(); return true;
 				//case key::C: copy(); return true;
 				//case key::X: cut(); return true;
@@ -1434,16 +1434,56 @@ void editor_setup::finish_rectangular_selection() {
 	selector.finish_rectangular(entity_selector_state);
 }
 
-void editor_setup::select_all_entities(const bool has_ctrl) {
-	selector.select_all(
-		scene.world,
-		view.rect_select_mode,
-		has_ctrl,
-		entity_selector_state,
-		render_layer_filter::all()
-	);
+void editor_setup::select_all_entities() {
+	if (gui.inspector.inspects_any_different_than<editor_node_id>()) {
+		clear_inspector();
+	}
 
-	inspect_from_selector_state();
+	bool inspected_any_visible = false;
+
+	std::unordered_set<editor_node_id> nodes;
+
+	auto remember_as_inspected = [&](const editor_node_id& node_id) {
+		nodes.emplace(node_id);
+	};
+
+	for_each_inspected<editor_node_id>(remember_as_inspected);
+
+	auto inspected = [&](const auto next_node) {
+		return found_in(nodes, next_node);
+	};
+
+	for (const auto layer_id : reverse(project.layers.order)) {
+		auto layer = find_layer(layer_id);
+		ensure(layer != nullptr);
+
+		for (const auto node_id : reverse(layer->hierarchy.nodes)) {
+			if (is_node_visible(node_id) && !inspected(node_id)) {
+				inspected_any_visible = true;
+
+				inspect_add_quiet(node_id);
+				remember_as_inspected(node_id);
+			}
+		}
+	}
+
+	if (!inspected_any_visible) {
+		for (const auto layer_id : reverse(project.layers.order)) {
+			auto layer = find_layer(layer_id);
+			ensure(layer != nullptr);
+
+			for (const auto node_id : reverse(layer->hierarchy.nodes)) {
+				if (!is_node_visible(node_id) && !inspected(node_id)) {
+					inspected_any_visible = true;
+
+					inspect_add_quiet(node_id);
+					remember_as_inspected(node_id);
+				}
+			}
+		}
+	}
+
+	after_quietly_adding_inspected();
 }
 
 void editor_setup::center_view_at_selection() {

@@ -237,7 +237,7 @@ public:
 	void inspect_from_selector_state();
 
 	void finish_rectangular_selection();
-	void select_all_entities(bool has_ctrl);
+	void select_all_entities();
 
 	void center_view_at_selection();
 	void center_view_at(editor_node_id);
