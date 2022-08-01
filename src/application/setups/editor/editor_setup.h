@@ -388,8 +388,8 @@ public:
 		};
 	}
 
-	void mirror_selection(vec2i direction);
-	void duplicate_selection();
+	void mirror_selection(vec2i direction, bool move_if_only_duplicate = true);
+	void duplicate_selection(bool start_moving = true);
 
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/

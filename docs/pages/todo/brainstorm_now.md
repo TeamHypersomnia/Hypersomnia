@@ -6,12 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Tile resizing! Remember
+
+- We were worried that invisible nodes not being moved with the visible ones could be unintuitive when mass-moving nodes
+	- We could check how it's done in other editors too
+	- However it should be expected to work like this
+	- Note that even if selecting on-scene for mass transforming, you will never be able to catch the invisible ones in selection
+	- We'll worry about it later when someone asks
+
+- Drag & drop to a + sign moves nodes to a new layer
+	- However the new layer should probably be created just above the parent of topmost selected node
+
+- Properly implement the buttons in layers gui as we already have the required commands implemented
+	- We should show the hotkeys there in the tooltip
+		- for the drag&drop too
+		
+- Duplicate layers command too
+
 - Watch out for pixel imperfections. List of possible fixes:
 	- We've deleted aabb calculation from the mirror entities command.
 
-- Clickling on layer should select all entities in the layer if we're multiple selecting and an entity is already selected
-
-- Drag & drop to a + sign moves nodes to a new layer
+- Clicking on layer should select all entities in the layer if we're multiple selecting and an entity is already selected
 
 - Enable tile excess size by default
 	- That is because 99% of the time we're going to be resizing floors or things that don't stretch

@@ -1610,7 +1610,7 @@ void editor_setup::unregister_node_from_layer(const editor_node_id node_id, cons
 	}
 }
 
-void editor_setup::mirror_selection(const vec2i direction) {
+void editor_setup::mirror_selection(const vec2i direction, const bool move_if_only_duplicate) {
 	const bool only_duplicating = direction.is_zero();
 	gui.filesystem.clear_drag_drop();
 
@@ -1623,7 +1623,7 @@ void editor_setup::mirror_selection(const vec2i direction) {
 		command.mirror_direction = direction;
 		post_new_command(std::move(command));
 
-		if (only_duplicating) {
+		if (move_if_only_duplicate && only_duplicating) {
 			if (start_moving_selection()) {
 				make_last_command_a_child();
 			}
@@ -1631,8 +1631,8 @@ void editor_setup::mirror_selection(const vec2i direction) {
 	}
 }
 
-void editor_setup::duplicate_selection() {
-	mirror_selection(vec2i(0, 0));
+void editor_setup::duplicate_selection(bool start_moving) {
+	mirror_selection(vec2i(0, 0), start_moving);
 }
 
 bool editor_setup::is_node_visible(const editor_node_id id) const {

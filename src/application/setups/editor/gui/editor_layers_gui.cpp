@@ -91,7 +91,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	ImGui::SameLine();
 
 	if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], "Duplicate selection", node_or_layer_inspected)) {
-
+		const bool move_selection = false;
+		in.setup.duplicate_selection(move_selection);
 	}
 
 	ImGui::SameLine();
@@ -106,7 +107,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		const auto remove_tint = rgba(220, 80, 80, 255);
 
 		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], "Remove selection", node_or_layer_inspected, remove_tint, remove_bgs)) {
-
+			in.setup.delete_selection();
 		}
 	}
 	
@@ -333,7 +334,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	};
 
 	{
-		//auto ss = scoped_style_var(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 		auto child = scoped_child("hierarchy view");
 
 		auto& layers = in.layers;
