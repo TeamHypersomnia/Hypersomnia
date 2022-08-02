@@ -1660,6 +1660,11 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 		// In case the commands in progress modify the inspector,
 		// just to be sure, save the inspection result beforehand.
 		const auto all_source_layers = get_all_inspected<editor_layer_id>();
+		const auto dupli_or_mirr = std::string(only_duplicating ? "Duplicated " : "Mirrored ");
+		const auto final_description = all_source_layers.size() == 1 
+			? dupli_or_mirr + get_name(all_source_layers[0])
+			: typesafe_sprintf("%x%x layers", dupli_or_mirr, all_source_layers.size())
+		;
 
 		for (const auto layer_id : all_source_layers) {
 			if (const auto source_layer = find_layer(layer_id)) {
@@ -1724,6 +1729,16 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 				if (start_moving_selection()) {
 					make_last_command_a_child();
 				}
+			}
+		}
+
+		if (history.has_last_command()) {
+			if (auto cmd = std::get_if<move_nodes_command>(&history.last_command())) {
+				cmd->built_description = final_description;
+			}
+
+			if (auto cmd = std::get_if<inspect_command>(&history.last_command())) {
+				cmd->built_description = final_description;
 			}
 		}
 	}
