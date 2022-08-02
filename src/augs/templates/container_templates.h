@@ -135,6 +135,11 @@ auto find_in(Container& v, const K& key) {
 	return std::find(v.begin(), v.end(), key);
 }
 
+template<class Container, class K>
+auto find_index_in(Container& v, const K& key) {
+	return find_in(v, key) - v.begin();
+}
+
 template<class Container, class C>
 auto find_in_if(Container& v, C callback) {
 	return std::find_if(v.begin(), v.end(), callback);

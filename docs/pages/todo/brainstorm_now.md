@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- If nodes won't ever reference other nodes (only resources), prefabs could just be nodes with a vector of node variants
+	- Since these sub-nodes are not meant to be identifiable
+	- to_entity_id should also always return the prefab node instead of individual entities
+	- *Unfortunately*, nodes will reference other nodes, e.g. a fish node might want to reference an origin node
+
+- In duplicate entities command, an optional target layer 
+	- for moving to a new layer
+	- The only case where we want new layer per-node is when we want to duplicate multiple layers
+	- I think this might be a different command and we won't reuse duplicate layers command for moving into new layer command
+		- We could reuse it if we composed layer duplication from multiple commands
+			- We iterate per-selected layer, create new layer and setup the optional target layer for duplicate nodes command
+		- Efficient enough since we wont have millions of layers duplicated
+
 - Tile resizing! Remember
 
 - We were worried that invisible nodes not being moved with the visible ones could be unintuitive when mass-moving nodes

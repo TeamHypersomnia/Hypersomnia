@@ -34,6 +34,8 @@ private:
 public:
 	std::string built_description;
 	vec2i mirror_direction;
+	std::optional<editor_layer_id> target_new_layer;
+	bool omit_inspector = false;
 
 	void push_entry(editor_node_id);
 
@@ -46,6 +48,7 @@ public:
 
 	bool empty() const;
 	std::string describe() const;
+	std::vector<editor_node_id> get_all_duplicated() const;
 
 	void clear_undo_state();
 };

@@ -49,7 +49,7 @@ inline void reorder_nodes_command::redo(editor_command_input in) {
 	}
 
 	if (create_layer != std::nullopt) {
-		create_layer->quiet = true;
+		create_layer->omit_inspector = true;
 		create_layer->redo(in);
 
 		target_layer_id = create_layer->get_allocated_id();

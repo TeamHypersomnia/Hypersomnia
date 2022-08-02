@@ -169,17 +169,10 @@ public:
 		const editor_layer* layer_ptr = nullptr;
 		std::size_t layer_index;
 		std::size_t index_in_layer;
-
-		auto tie() const {
-			return std::tie(layer_index, index_in_layer);
-		}
-
-		bool operator<(const parent_layer_info& b) const {
-			return tie() < b.tie();
-		}
 	};
 
 	std::optional<parent_layer_info> find_parent_layer(editor_node_id id) const;
+	std::size_t find_layer_index(editor_layer_id id) const;
 
 	void sort_inspected();
 
@@ -191,8 +184,8 @@ public:
 	const editor_layer* find_layer(const editor_layer_id& id) const;
 
 	editor_layer* find_layer(const std::string& name);
-	void create_new_layer(const std::string& name_pattern = "New layer%x");
-	std::string get_free_layer_name(const std::string& name_pattern = "New layer%x");
+	void create_new_layer(const std::string& name_pattern = "New layer");
+	std::string get_free_layer_name(const std::string& name_pattern = "New layer");
 
 	const auto& get_project() const { return project; }
 	const auto& get_official_resources() const { return official_resources; }
@@ -301,6 +294,7 @@ public:
 	void after_quietly_adding_inspected();
 
 	void inspect_only(inspected_variant);
+	void inspect_only(const std::vector<inspected_variant>&);
 	void inspected_to_entity_selector_state();
 
 	template <class T>

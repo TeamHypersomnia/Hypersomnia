@@ -95,11 +95,6 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 		return result;
 	}
 
-	template <class T>
-	void sort(T&& predicate) {
-		std::sort(all_inspected.begin(), all_inspected.end(), std::forward<T>(predicate));
-	}
-
 	std::vector<inspected_variant> all_inspected;
 
 	void inspect(inspected_variant, bool wants_multiple);
@@ -107,6 +102,35 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	void clear() {
 		all_inspected.clear();
+	}
+
+private:
+	friend editor_setup;
+
+	using order = std::pair<std::size_t, std::size_t>;
+	using ordered_inspected = std::vector<std::pair<order, inspected_variant>>;
+
+	ordered_inspected cached_orders;
+
+	auto& prepare_for_sorting() {
+		cached_orders.clear();
+
+		const auto n = all_inspected.size();
+		cached_orders.resize(n);
+
+		for (std::size_t i = 0; i < n; ++i) {
+			cached_orders[i] = { { 0, 0 }, all_inspected[i] };
+		}
+
+		return cached_orders;
+	}
+
+	void set_from(const ordered_inspected& ordered) {
+		all_inspected.clear();
+
+		for (auto& o : ordered) {
+			all_inspected.emplace_back(o.second);
+		}
 	}
 };
 

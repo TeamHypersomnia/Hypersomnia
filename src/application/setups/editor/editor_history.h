@@ -19,6 +19,8 @@
 #include "application/setups/editor/commands/duplicate_nodes_command.h"
 #include "application/setups/editor/commands/toggle_visibility_commands.h"
 
+#include "application/setups/editor/commands/inspect_command.h"
+
 #include "application/setups/editor/editor_history_declaration.h"
 
 struct editor_history : public editor_history_base {

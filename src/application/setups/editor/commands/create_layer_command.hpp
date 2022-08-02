@@ -11,12 +11,12 @@ void create_layer_command::undo(editor_command_input in) {
 void create_layer_command::redo(editor_command_input in) {
 	auto& layers = in.setup.project.layers;
 	auto& new_layer = base::redo(layers.pool);
-	new_layer.unique_name = chosen_name;
+	new_layer = created_layer;
 
 	const auto new_id = base::get_allocated_id();
-	layers.order.insert(layers.order.begin(), new_id);
+	layers.order.insert(layers.order.begin() + at_index, new_id);
 
-	if (!quiet) {
+	if (!omit_inspector) {
 		in.setup.inspect_only(new_id);
 	}
 }

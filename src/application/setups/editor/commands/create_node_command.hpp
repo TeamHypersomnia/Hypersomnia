@@ -19,7 +19,7 @@ inline void create_node_command<T>::undo(editor_command_input in) {
 template <class T>
 inline void create_node_command<T>::redo(editor_command_input in) {
 	if (create_layer != std::nullopt) {
-		create_layer->quiet = true;
+		create_layer->omit_inspector = true;
 		create_layer->redo(in);
 
 		layer_id = create_layer->get_allocated_id();

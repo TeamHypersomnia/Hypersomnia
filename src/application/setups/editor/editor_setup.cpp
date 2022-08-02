@@ -560,6 +560,13 @@ void editor_setup::inspect(const std::vector<entity_id>& selections) {
 	sort_inspected();
 }
 
+void editor_setup::inspect_only(const std::vector<inspected_variant>& new_inspected) {
+	gui.inspector.all_inspected = new_inspected;
+
+	inspected_to_entity_selector_state();
+	sort_inspected();
+}
+
 void editor_setup::inspected_to_entity_selector_state() {
 	entity_selector_state.clear();
 	selector.clear();
@@ -588,21 +595,30 @@ void editor_setup::inspect(inspected_variant new_inspected) {
 }
 
 void editor_setup::sort_inspected() {
+	auto& orders = gui.inspector.prepare_for_sorting();
+
+	std::size_t i = 0;
+
 	if (gui.inspector.inspects_only<editor_node_id>()) {
-		try {
-			auto pred = [&](const inspected_variant& a, const inspected_variant& b) {
-				const auto node_a = std::get<editor_node_id>(a);
-				const auto node_b = std::get<editor_node_id>(b);
-
-				return find_parent_layer(node_a) < find_parent_layer(node_b);
-			};
-
-			gui.inspector.sort(pred);
-		}
-		catch (...) {
-
-		}
+		gui.inspector.for_each_inspected<editor_node_id>(
+			[&](const editor_node_id node_id) {
+				if (const auto parent = find_parent_layer(node_id)) {
+					orders[i++].first = { parent->layer_index, parent->index_in_layer }; 
+				}
+			}
+		);
 	}
+	else if (gui.inspector.inspects_only<editor_layer_id>()) {
+		gui.inspector.for_each_inspected<editor_layer_id>(
+			[&](const editor_layer_id layer_id) {
+				orders[i++].first = { find_layer_index(layer_id), 0 }; 
+			}
+		);
+	}
+
+	sort_range(orders, [](const auto& a, const auto& b) { return a.first < b.first; } );
+
+	gui.inspector.set_from(orders);
 }
 
 void editor_setup::inspect_only(inspected_variant new_inspected) {
@@ -684,7 +700,7 @@ void editor_setup::undo() {
 	do {
 		repeat = is_last_command_child();
 
-		const auto prev_inspected = get_all_inspected();
+		const auto prev_inspected = get_all_inspected<editor_node_id>();
 
 		gui.history.scroll_to_current_once = true;
 		history.undo(make_command_input());
@@ -692,7 +708,7 @@ void editor_setup::undo() {
 		gui.filesystem.clear_drag_drop();
 		rebuild_scene();
 
-		if (prev_inspected != get_all_inspected()) {
+		if (prev_inspected != get_all_inspected<editor_node_id>()) {
 			inspected_to_entity_selector_state();
 		}
 	} while(repeat);
@@ -700,7 +716,7 @@ void editor_setup::undo() {
 
 void editor_setup::redo() {
 	do {
-		const auto prev_inspected = get_all_inspected();
+		const auto prev_inspected = get_all_inspected<editor_node_id>();
 
 		gui.history.scroll_to_current_once = true;
 		history.redo(make_command_input());
@@ -708,7 +724,7 @@ void editor_setup::redo() {
 		gui.filesystem.clear_drag_drop();
 		rebuild_scene();
 
-		if (prev_inspected != get_all_inspected()) {
+		if (prev_inspected != get_all_inspected<editor_node_id>()) {
 			inspected_to_entity_selector_state();
 		}
 	} while(is_next_command_child());
@@ -814,7 +830,7 @@ std::string editor_setup::get_free_node_name_for(const std::string& new_name) co
 	};
 
 	return augs::first_free_string(
-		new_name + "%x",
+		new_name,
 		" (%x)",
 		is_node_name_free
 	);
@@ -831,13 +847,17 @@ std::string editor_setup::get_free_layer_name(const std::string& name_pattern) {
 
 void editor_setup::create_new_layer(const std::string& name_pattern) {
 	create_layer_command cmd;
-	cmd.chosen_name = get_free_layer_name(name_pattern);
+	cmd.created_layer.unique_name = get_free_layer_name(name_pattern);
 
 	post_new_command(cmd);
 }
 
 bool editor_setup::wants_multiple_selection() const {
 	return ImGui::GetIO().KeyCtrl;
+}
+
+std::size_t editor_setup::find_layer_index(const editor_layer_id id) const {
+	return ::find_index_in(project.layers.order, id);
 }
 
 std::optional<editor_setup::parent_layer_info> editor_setup::find_parent_layer(const editor_node_id node_id) const {
@@ -1589,7 +1609,13 @@ bool editor_setup::register_node_in_layer(const editor_node_id node, const edito
 bool editor_setup::register_node_in_layer(const editor_node_id node_id, const editor_layer_id layer_id, const std::size_t index_in_layer) {
 	if (auto* const layer = find_layer(layer_id)) {
 		auto& nodes = layer->hierarchy.nodes;
-		nodes.insert(nodes.begin() + index_in_layer, node_id);
+
+		if (index_in_layer == static_cast<std::size_t>(-1)) {
+			nodes.emplace_back(node_id);
+		}
+		else {
+			nodes.insert(nodes.begin() + index_in_layer, node_id);
+		}
 
 		layer->is_open = true;
 		return true;
@@ -1610,22 +1636,111 @@ void editor_setup::unregister_node_from_layer(const editor_node_id node_id, cons
 	}
 }
 
+void inspect_command::undo(const editor_command_input in) {
+	in.setup.inspect_only(inspected_before);
+}
+
+void inspect_command::redo(const editor_command_input in) {
+	in.setup.inspect_only(to_inspect);
+}
+
 void editor_setup::mirror_selection(const vec2i direction, const bool move_if_only_duplicate) {
 	const bool only_duplicating = direction.is_zero();
 	gui.filesystem.clear_drag_drop();
 
-	auto command = make_command_from_selected_nodes<duplicate_nodes_command>(
-		only_duplicating ? "Duplicated " : "Mirrored ",
-		only_visible_nodes()
-	);
+	if (gui.inspector.inspects_only<editor_layer_id>()) {
+		bool first = true;
+		bool any_nonempty = false;
 
-	if (!command.empty()) {
-		command.mirror_direction = direction;
-		post_new_command(std::move(command));
+		const auto before_inspected = get_all_inspected<editor_layer_id>();
 
-		if (move_if_only_duplicate && only_duplicating) {
-			if (start_moving_selection()) {
-				make_last_command_a_child();
+		std::vector<inspected_variant> all_new_nodes;
+		std::vector<inspected_variant> all_new_layers;
+
+		// In case the commands in progress modify the inspector,
+		// just to be sure, save the inspection result beforehand.
+		const auto all_source_layers = get_all_inspected<editor_layer_id>();
+
+		for (const auto layer_id : all_source_layers) {
+			if (const auto source_layer = find_layer(layer_id)) {
+				duplicate_nodes_command duplicate;
+				duplicate.mirror_direction = direction;
+				duplicate.omit_inspector = true;
+
+				for (const auto source_node : source_layer->hierarchy.nodes) {
+					duplicate.push_entry(source_node);
+				}
+
+				create_layer_command new_layer;
+				new_layer.created_layer = *source_layer;
+				new_layer.created_layer.hierarchy.nodes.clear();
+				new_layer.created_layer.unique_name = get_free_layer_name(source_layer->unique_name + "-dup");
+				new_layer.at_index = find_layer_index(layer_id);
+				new_layer.omit_inspector = true;
+
+				{
+					const auto& executed = post_new_command(std::move(new_layer));
+					const auto new_layer_id = executed.get_created_id();
+
+					if (!first) {
+						make_last_command_a_child();
+					}
+
+					duplicate.target_new_layer = new_layer_id;
+
+					all_new_layers.emplace_back(new_layer_id);
+				}
+
+				if (!duplicate.empty()) {
+					any_nonempty = true;
+
+					const auto& executed = post_new_command(std::move(duplicate));
+					concatenate(all_new_nodes, executed.get_all_duplicated());
+					make_last_command_a_child();
+				}
+
+				first = false;
+			}
+		}
+
+		{
+			inspect_command inspect;
+
+			if (!all_new_nodes.empty()) {
+				inspect.to_inspect = std::move(all_new_nodes);
+			}
+			else {
+				inspect.to_inspect = std::move(all_new_layers);
+			}
+
+			assign_begin_end(inspect.inspected_before, before_inspected);
+
+			post_new_command(std::move(inspect));
+			make_last_command_a_child();
+		}
+
+		if (any_nonempty) {
+			if (move_if_only_duplicate && only_duplicating) {
+				if (start_moving_selection()) {
+					make_last_command_a_child();
+				}
+			}
+		}
+	}
+	else if (gui.inspector.inspects_only<editor_node_id>()) {
+		auto command = make_command_from_selected_nodes<duplicate_nodes_command>(
+			only_duplicating ? "Duplicated " : "Mirrored ",
+			only_visible_nodes()
+		);
+
+		if (!command.empty()) {
+			command.mirror_direction = direction;
+			post_new_command(std::move(command));
+
+			if (move_if_only_duplicate && only_duplicating) {
+				if (start_moving_selection()) {
+					make_last_command_a_child();
+				}
 			}
 		}
 	}

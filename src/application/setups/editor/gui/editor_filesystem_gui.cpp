@@ -70,7 +70,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					}
 					else {
 						command.create_layer = create_layer_command();
-						command.create_layer->chosen_name = in.setup.get_free_layer_name();
+						command.create_layer->created_layer.unique_name = in.setup.get_free_layer_name();
 					}
 
 					const auto& executed = in.setup.post_new_command(std::move(command));

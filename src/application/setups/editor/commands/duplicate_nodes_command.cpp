@@ -71,10 +71,23 @@ bool duplicate_nodes_command::empty() const {
 	return size() == 0;
 }
 
+std::vector<editor_node_id> duplicate_nodes_command::get_all_duplicated() const { 
+	std::vector<editor_node_id> result;
+
+	duplicated_nodes.for_each([&]<typename T>(T& e) {
+		const auto duplicated_id_generic = e.duplicated_id.operator editor_node_id();
+		result.push_back(duplicated_id_generic);
+	});
+
+	return result;
+}
+
 void duplicate_nodes_command::redo(const editor_command_input in) {
 	clear_undo_state();
 
-	in.setup.clear_inspector();
+	if (!omit_inspector) {
+		in.setup.clear_inspector();
+	}
 
 	const bool does_mirroring = mirror_direction.is_nonzero();
 
@@ -117,11 +130,21 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 			const auto source_id_generic = e.source_id.operator editor_node_id();
 			const auto duplicated_id_generic = e.duplicated_id.operator editor_node_id();
 
-			const bool registered_in_layer = in.setup.register_node_in_layer(duplicated_id_generic, source_id_generic);
+			auto register_in_layer = [&]() {
+				if (target_new_layer != std::nullopt) {
+					return in.setup.register_node_in_layer(duplicated_id_generic, *target_new_layer, static_cast<std::size_t>(-1));
+				}
+
+				return in.setup.register_node_in_layer(duplicated_id_generic, source_id_generic);
+			};
+
+			const bool registered_in_layer = register_in_layer();
 			ensure(registered_in_layer);
 			(void)registered_in_layer;
 
-			in.setup.inspect_add_quiet(duplicated_id_generic);
+			if (!omit_inspector) {
+				in.setup.inspect_add_quiet(duplicated_id_generic);
+			}
 		});
 	};
 
@@ -211,11 +234,15 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 		duplicate([](auto&&...) {});
 	}
 
-	in.setup.after_quietly_adding_inspected();
+	if (!omit_inspector) {
+		in.setup.after_quietly_adding_inspected();
+	}
 }
 
 void duplicate_nodes_command::undo(const editor_command_input in) {
-	in.setup.clear_inspector();
+	if (!omit_inspector) {
+		in.setup.clear_inspector();
+	}
 
 	duplicated_nodes.for_each_reverse([&]<typename T>(T& entry) {
 		using N = typename T::node_type;
@@ -228,7 +255,9 @@ void duplicate_nodes_command::undo(const editor_command_input in) {
 		auto& pool = in.setup.project.nodes.get_pool_for<N>();
 		pool.undo_last_allocate(entry.duplicated_id.raw);
 
-		in.setup.inspect_add_quiet(source_id);
+		if (!omit_inspector) {
+			in.setup.inspect_add_quiet(source_id);
+		}
 	});
 
 	{
@@ -245,7 +274,9 @@ void duplicate_nodes_command::undo(const editor_command_input in) {
 		*/
 	}
 
-	in.setup.after_quietly_adding_inspected();
+	if (!omit_inspector) {
+		in.setup.after_quietly_adding_inspected();
+	}
 
 	clear_undo_state();
 }
