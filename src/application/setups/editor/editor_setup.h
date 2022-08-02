@@ -292,6 +292,13 @@ public:
 
 	void inspect(inspected_variant);
 	void inspect_add_quiet(inspected_variant);
+
+	template <class F>
+	void inspect_erase_if(F&& callback) { 
+		erase_if(gui.inspector.all_inspected, callback);
+		after_quietly_adding_inspected();
+	}
+
 	void after_quietly_adding_inspected();
 
 	void inspect_only(inspected_variant);

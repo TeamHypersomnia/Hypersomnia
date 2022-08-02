@@ -24,7 +24,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	
 	entity_to_highlight.unset();
 
-	const bool has_double_click = in.setup.handle_doubleclick_in_layers_gui;
+	const bool has_double_click = !in.setup.wants_multiple_selection() && in.setup.handle_doubleclick_in_layers_gui;
 	in.setup.handle_doubleclick_in_layers_gui = false;
 
 	auto window = make_scoped_window();
@@ -424,7 +424,21 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			}
 
 			{
-				const bool is_inspected = in.setup.is_inspected(layer_id);
+				const bool all_children_inspected = [&]() {
+					if (layer.hierarchy.nodes.empty()) {
+						return false;
+					}
+
+					for (const auto child_node_id : layer.hierarchy.nodes) {
+						if (!in.setup.is_inspected(child_node_id)) {
+							return false;
+						}
+					}
+
+					return true;
+				}();
+
+				const bool is_inspected = all_children_inspected || in.setup.is_inspected(layer_id);
 
 				auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
 
@@ -469,7 +483,31 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 
 				if (tree_node_pressed) {
-					in.setup.inspect(layer_id);
+					if (in.setup.wants_multiple_selection() && in.setup.inspects_any<editor_node_id>()) {
+						if (all_children_inspected) {
+							auto node_in_this_layer = [&](const inspected_variant iv) {
+								if (const auto id = std::get_if<editor_node_id>(std::addressof(iv))) {
+									return found_in(layer.hierarchy.nodes, *id);
+								}
+
+								return false;
+							};
+
+							in.setup.inspect_erase_if(node_in_this_layer);
+						}
+						else {
+							for (const auto child_node_id : layer.hierarchy.nodes) {
+								if (!in.setup.is_inspected(child_node_id)) {
+									in.setup.inspect_add_quiet(child_node_id);
+								}
+							}
+
+							in.setup.after_quietly_adding_inspected();
+						}
+					}
+					else {
+						in.setup.inspect(layer_id);
+					}
 				}
 
 				const bool selectable_double_clicked = ImGui::IsItemHovered() && has_double_click;
