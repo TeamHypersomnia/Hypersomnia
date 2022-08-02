@@ -84,6 +84,18 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		rgba(35+10, 60+10, 90+10, 255)
 	};
 
+	const auto hovered_cols = std::array<rgba, 3> {
+		rgba(15, 40, 70, 255),
+		rgba(15, 40, 70, 255),
+		rgba(15, 40, 70, 255)
+	};
+
+	const auto hovered_inspected_cols = std::array<rgba, 3> {
+		rgba(35+10, 60+10, 90+10, 255),
+		rgba(35+10, 60+10, 90+10, 255),
+		rgba(35+10, 60+10, 90+10, 255)
+	};
+
 	auto new_layer_drag_drop_callback = [&]() {
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
@@ -253,12 +265,30 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			const auto before_pos = ImGui::GetCursorPos();
 
 			{
+				const bool is_hovered_on_scene = node_id == in.setup.get_hovered_node();
 				const bool is_inspected = in.setup.is_inspected(node_id);
 
-				auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
+				const auto final_cols = [&]() {
+					if (is_hovered_on_scene) {
+						if (is_inspected) {
+							return hovered_inspected_cols;
+						}
+
+						return hovered_cols;
+					}
+					else {
+						if (is_inspected) {
+							return inspected_cols;
+						}
+
+						return bg_cols;
+					}
+				}();
+
+				auto colored_selectable = scoped_selectable_colors(final_cols);
 				auto id = scoped_id(label.c_str());
 
-				if (ImGui::Selectable("###NodeButton", is_inspected, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size)) {
+				if (ImGui::Selectable("###NodeButton", is_inspected || is_hovered_on_scene, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size)) {
 					in.setup.inspect(node_id);
 				}
 

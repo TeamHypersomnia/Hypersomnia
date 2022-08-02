@@ -242,6 +242,7 @@ public:
 
 	entity_id get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons, std::optional<vec2> at = std::nullopt) const;
 	editor_node_id get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons, std::optional<vec2> at = std::nullopt) const;
+	editor_node_id get_hovered_node() const;
 
 	template <class T>
 	entity_id to_entity_id(const editor_typed_node_id<T> id) const {

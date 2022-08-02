@@ -167,5 +167,9 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		}
 	}
 
+	if (const auto node_id = get_hovered_node(); node_id.is_set()) {
+		text_tooltip(get_name(node_id));
+	}
+
 	return custom_imgui_result::NONE;
 }

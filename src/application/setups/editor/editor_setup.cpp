@@ -259,6 +259,10 @@ bool editor_setup::handle_input_before_game(
 		selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
 		check_changed();
 
+		if (const auto node_id = to_node_id(selector.get_held()); node_id.is_set()) {
+			scroll_once_to(node_id);
+		}
+
 		return true;
 	}
 
@@ -939,6 +943,10 @@ entity_id editor_setup::get_hovered_entity(const necessary_images_in_atlas_map& 
 		at ? *at : get_world_cursor_pos(),
 		render_layer_filter::all()
 	);
+}
+
+editor_node_id editor_setup::get_hovered_node() const{ 
+	return to_node_id(selector.get_hovered());
 }
 
 editor_node_id editor_setup::get_hovered_node(const necessary_images_in_atlas_map& sizes_for_icons, const std::optional<vec2> at) const {
