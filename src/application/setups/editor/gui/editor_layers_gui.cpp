@@ -84,13 +84,39 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		rgba(35+10, 60+10, 90+10, 255)
 	};
 
-	if (icon_button("##NewLayer", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], "New layer", true)) {
+	auto new_layer_drag_drop_callback = [&]() {
+		if (ImGui::BeginDragDropTarget()) {
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
+				const auto all_inspected = in.setup.get_all_inspected<editor_node_id>();
+
+				reorder_nodes_command command;
+
+				command.create_layer = create_layer_command();
+				command.create_layer->created_layer.unique_name = in.setup.get_free_layer_name();
+
+				if (in.setup.is_inspected(dragged_node) && all_inspected.size() > 1) {
+					command.nodes_to_move = all_inspected;
+					command.built_description = typesafe_sprintf("Moved %x nodes to a new layer", all_inspected.size());
+				}
+				else {
+					command.nodes_to_move = { dragged_node };
+					command.built_description = typesafe_sprintf("Moved %x to a new layer", in.setup.get_name(dragged_node));
+				}
+
+				in.setup.post_new_command(command);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+	};
+
+	if (icon_button("##NewLayer", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], new_layer_drag_drop_callback, "New layer", true)) {
 		in.setup.create_new_layer();
 	}
 
 	ImGui::SameLine();
 
-	if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], "Duplicate selection", node_or_layer_inspected)) {
+	if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Duplicate selection", node_or_layer_inspected)) {
 		const bool move_selection = false;
 		in.setup.duplicate_selection(move_selection);
 	}
@@ -106,7 +132,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 		const auto remove_tint = rgba(220, 80, 80, 255);
 
-		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], "Remove selection", node_or_layer_inspected, remove_tint, remove_bgs)) {
+		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], [](){}, "Remove selection", node_or_layer_inspected, remove_tint, remove_bgs)) {
 			in.setup.delete_selection();
 		}
 	}

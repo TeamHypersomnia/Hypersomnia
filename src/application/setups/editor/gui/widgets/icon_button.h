@@ -2,9 +2,11 @@
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 
 namespace editor_widgets {
+	template <class F>
 	inline bool icon_button(
 		const std::string& id_label, 
 		const augs::atlas_entry& icon, 
+		F&& after_item_callback,
 		const std::string& tooltip,
 		const bool enabled,
 		rgba tint = white, 
@@ -33,6 +35,7 @@ namespace editor_widgets {
 			{
 				auto scope = maybe_disabled_cols({}, !enabled);
 				result = ImGui::Selectable(id_label.c_str(), false, ImGuiSelectableFlags_None, ImVec2(scaled_icon_size));
+				after_item_callback();
 			}
 
 			if (ImGui::IsItemHovered()) {
