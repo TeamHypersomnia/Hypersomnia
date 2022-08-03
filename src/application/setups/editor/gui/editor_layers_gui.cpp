@@ -99,23 +99,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	auto new_layer_drag_drop_callback = [&]() {
 		if (ImGui::BeginDragDropTarget()) {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
-				const auto all_inspected = in.setup.get_all_inspected<editor_node_id>();
-
-				reorder_nodes_command command;
-
-				command.create_layer = create_layer_command();
-				command.create_layer->created_layer.unique_name = in.setup.get_free_layer_name();
-
-				if (in.setup.is_inspected(dragged_node) && all_inspected.size() > 1) {
-					command.nodes_to_move = all_inspected;
-					command.built_description = typesafe_sprintf("Moved %x nodes to a new layer", all_inspected.size());
-				}
-				else {
-					command.nodes_to_move = { dragged_node };
-					command.built_description = typesafe_sprintf("Moved %x to a new layer", in.setup.get_name(dragged_node));
-				}
-
-				in.setup.post_new_command(command);
+				in.setup.move_dragged_to_new_layer(dragged_node);
 			}
 
 			ImGui::EndDragDropTarget();

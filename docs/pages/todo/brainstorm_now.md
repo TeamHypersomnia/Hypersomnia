@@ -6,8 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Add a hotkey for the moving to new layer
-	- We won't forget the possible actions since all of them will have key shortcuts
+- We won't forget the possible actions since all of them will have key shortcuts
 	- But we need to describe them in tooltips over the toolbars and buttons anyway
 
 - If nodes won't ever reference other nodes (only resources), prefabs could just be nodes with a vector of node variants
@@ -15,34 +14,18 @@ summary: That which we are brainstorming at the moment.
 	- to_entity_id should also always return the prefab node instead of individual entities
 	- *Unfortunately*, nodes will reference other nodes, e.g. a fish node might want to reference an origin node
 
-- Tile resizing! Remember
-
 - We were worried that invisible nodes not being moved with the visible ones could be unintuitive when mass-moving nodes
 	- We could check how it's done in other editors too
 	- However it should be expected to work like this
 	- Note that even if selecting on-scene for mass transforming, you will never be able to catch the invisible ones in selection
 	- We'll worry about it later when someone asks
 
-- Drag & drop to a + sign moves nodes to a new layer
-	- However the new layer should probably be created just above the parent of topmost selected node
-
 - Properly implement the buttons in layers gui as we already have the required commands implemented
 	- We should show the hotkeys there in the tooltip
 		- for the drag&drop too
 		
-- Duplicate layers command too
-
 - Watch out for pixel imperfections. List of possible fixes:
 	- We've deleted aabb calculation from the mirror entities command.
-
-- Clicking on layer should select all entities in the layer if we're multiple selecting and an entity is already selected
-
-- Enable tile excess size by default
-	- That is because 99% of the time we're going to be resizing floors or things that don't stretch
-	- And this way we'll also encourage preparing sprites in the target size
-
-
-- Select all nodes in the given layer if pressed the layer while some node was selected
 
 - Fix glitch wherein the other edges are snapped even though resizing another
 
@@ -52,11 +35,6 @@ summary: That which we are brainstorming at the moment.
 - Shift+T could move with layer detection just like when putting on scene
 	- Point is, how do we quickly move one entity over another with just on-scene operations?
 		- I think ctrl+x + ctrl+v. So this is for later. Ctrl+v will always paste nodes above the topmost selected node
-
-- Damn it, we badly need to have those child commands
-	- They wouldn't be visible, it would just be history detail
-	- separate post_child_command
-	- although that kind of complicates rewrite_last_command? so either stick with normal command or just embed those commands
 
 - It seems to me that it's not the worst pattern - all transforming logic working on the generated scene, as opposed to abstract node entries.
 	- This is because node transforming logic works on *apparent state*.

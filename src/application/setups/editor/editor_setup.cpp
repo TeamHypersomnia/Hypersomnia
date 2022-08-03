@@ -183,6 +183,8 @@ bool editor_setup::handle_input_before_game(
 
 		if (!has_shift && !has_ctrl) {
 			switch (k) {
+				case key::N: move_inspected_to_new_layer(); return true;
+
 				case key::C: duplicate_selection(); return true;
 				case key::D: cut_selection(); return true;
 				case key::DEL: delete_selection(); return true;
@@ -1651,6 +1653,60 @@ void inspect_command::undo(const editor_command_input in) {
 
 void inspect_command::redo(const editor_command_input in) {
 	in.setup.inspect_only(to_inspect);
+}
+
+void editor_setup::move_inspected_to_new_layer() {
+	const auto all_inspected = get_all_inspected<editor_node_id>();
+
+	if (all_inspected.empty()) {
+		create_new_layer();
+		return;
+	}
+
+	reorder_nodes_command command;
+
+	command.create_layer = create_layer_command();
+	command.create_layer->created_layer.unique_name = get_free_layer_name();
+	command.nodes_to_move = all_inspected;
+	{
+		const auto parent_of_topmost = find_parent_layer(all_inspected[0]);
+		ensure(parent_of_topmost != std::nullopt);
+		command.create_layer->at_index = parent_of_topmost->layer_index;
+	}
+
+	if (all_inspected.size() > 1) {
+		command.built_description = typesafe_sprintf("Moved %x nodes to a new layer", all_inspected.size());
+	}
+	else {
+		command.built_description = typesafe_sprintf("Moved %x to a new layer", get_name(all_inspected[0]));
+	}
+
+	post_new_command(std::move(command));
+}
+
+void editor_setup::move_dragged_to_new_layer(const editor_node_id dragged_node) {
+	const auto all_inspected = get_all_inspected<editor_node_id>();
+
+	reorder_nodes_command command;
+
+	command.create_layer = create_layer_command();
+	command.create_layer->created_layer.unique_name = get_free_layer_name();
+	{
+		const auto parent_of_topmost = find_parent_layer(all_inspected[0]);
+		ensure(parent_of_topmost != std::nullopt);
+		command.create_layer->at_index = parent_of_topmost->layer_index;
+	}
+
+	if (is_inspected(dragged_node) && all_inspected.size() > 1) {
+		command.nodes_to_move = all_inspected;
+		command.built_description = typesafe_sprintf("Moved %x nodes to a new layer", all_inspected.size());
+	}
+	else {
+		command.nodes_to_move = { dragged_node };
+		command.built_description = typesafe_sprintf("Moved %x to a new layer", get_name(dragged_node));
+	}
+
+	post_new_command(std::move(command));
 }
 
 void editor_setup::mirror_selection(const vec2i direction, const bool move_if_only_duplicate) {

@@ -4685,3 +4685,24 @@ Advantages:
 		- We could reuse it if we composed layer duplication from multiple commands
 			- We iterate per-selected layer, create new layer and setup the optional target layer for duplicate nodes command
 		- Efficient enough since we wont have millions of layers duplicated
+- Tile resizing! Remember
+
+- Drag & drop to a + sign moves nodes to a new layer
+	- However the new layer should probably be created just above the parent of topmost selected node
+
+- Add a hotkey for the moving to new layer
+
+- Duplicate layers command too
+
+- Clicking on layer should select all entities in the layer if we're multiple selecting and an entity is already selected
+
+- Enable tile excess size by default
+	- That is because 99% of the time we're going to be resizing floors or things that don't stretch
+	- And this way we'll also encourage preparing sprites in the target size
+- Select all nodes in the given layer if pressed the layer while some node was selected
+
+- Damn it, we badly need to have those child commands
+	- They wouldn't be visible, it would just be history detail
+	- separate post_child_command
+	- although that kind of complicates rewrite_last_command? so either stick with normal command or just embed those commands
+

@@ -396,6 +396,9 @@ public:
 	void mirror_selection(vec2i direction, bool move_if_only_duplicate = true);
 	void duplicate_selection(bool start_moving = true);
 
+	void move_dragged_to_new_layer(editor_node_id dragged_node);
+	void move_inspected_to_new_layer();
+
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
 	/*********************************************************/
