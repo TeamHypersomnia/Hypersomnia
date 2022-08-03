@@ -10,7 +10,8 @@ namespace editor_widgets {
 		const int indent_level,
 		const bool is_inspected,
 		F&& after_selectable_callback,
-		const std::string& after_text = ""
+		const std::string& after_text = "",
+		const uint8_t bg_alpha = 255
 	) {
 		using namespace augs::imgui;
 
@@ -18,14 +19,14 @@ namespace editor_widgets {
 
 		const auto bg_cols = std::array<rgba, 3> {
 			rgba(0, 0, 0, 0),
-			rgba(15, 40, 70, 255),
-			rgba(35, 60, 90, 255)
+			rgba(15, 40, 70, bg_alpha),
+			rgba(35, 60, 90, bg_alpha)
 		};
 
 		const auto inspected_cols = std::array<rgba, 3> {
-			rgba(35-10, 60-10, 90-10, 255),
-			rgba(35, 60, 90, 255),
-			rgba(35+10, 60+10, 90+10, 255)
+			rgba(35-10, 60-10, 90-10, bg_alpha),
+			rgba(35, 60, 90, bg_alpha),
+			rgba(35+10, 60+10, 90+10, bg_alpha)
 		};
 
 		const float size_mult = 1.1f;

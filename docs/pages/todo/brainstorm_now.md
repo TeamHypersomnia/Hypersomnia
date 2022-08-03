@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Somehow highlight the resources when they are inspected as nodes?
+
 - We won't forget the possible actions since all of them will have key shortcuts
 	- But we need to describe them in tooltips over the toolbars and buttons anyway
 

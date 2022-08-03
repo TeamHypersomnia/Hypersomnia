@@ -47,6 +47,21 @@ namespace editor_widgets {
 		}
 
 		const bool is_inspected = setup.is_inspected(node.associated_resource);
+		const bool inspects_via_node = [&]() {
+			bool found_node = false;
+
+			setup.for_each_inspected<editor_node_id>([&](const editor_node_id& id){
+				setup.on_node(id, [&](const auto& typed_node, const auto id) {
+					(void)id;
+
+					if (node.associated_resource == typed_node.resource_id.operator editor_resource_id()) {
+						found_node = true;
+					}
+				});
+			});
+
+			return found_node;
+		}();
 
 		const auto& label = node.name;
 		const auto label_color = white;
@@ -63,15 +78,22 @@ namespace editor_widgets {
 			}
 		};
 
+		auto bg_alpha = 255;
+
+		if (!is_inspected && inspects_via_node) {
+			bg_alpha = 120;
+		}
+
 		const bool result = inspectable_with_icon(
 			icon,
 			atlas_type,
 			label,
 			label_color,
 			node.level,
-			is_inspected,
+			is_inspected || inspects_via_node,
 			after_selectable_callback,
-			node.after_text
+			node.after_text,
+			bg_alpha
 		);
 
 		if (result) {
