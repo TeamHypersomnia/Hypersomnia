@@ -4,6 +4,7 @@
 #include "application/setups/editor/resources/editor_resource_id.h"
 #include "application/setups/editor/project/editor_layers.h"
 #include "application/setups/editor/gui/inspected_variant.h"
+#include "augs/filesystem/path_declaration.h"
 
 enum class inspected_node_tab_type {
 	NODE,
@@ -112,6 +113,7 @@ private:
 	using ordered_inspected = std::vector<std::pair<order, inspected_variant>>;
 
 	ordered_inspected cached_orders;
+	augs::path_type reveal_in_explorer_once;
 
 	auto& prepare_for_sorting() {
 		cached_orders.clear();

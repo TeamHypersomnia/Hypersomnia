@@ -7,8 +7,20 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/cosmos/entity_flavour_id.h"
 
+enum class editor_sprite_domain {
+	// GEN INTROSPECTOR enum class editor_sprite_domain
+	BACKGROUND,
+	PHYSICAL,
+	FOREGROUND,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct editor_sprite_resource_editable {
 	// GEN INTROSPECTOR struct editor_sprite_resource_editable
+	editor_sprite_domain category = editor_sprite_domain::BACKGROUND;
+
 	rgba color = white;
 	vec2i size = vec2i::zero;
 	bool stretch_when_resized = false;

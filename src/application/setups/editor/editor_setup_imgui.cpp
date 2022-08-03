@@ -9,6 +9,7 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/window_framework/window.h"
 #include "3rdparty/imgui/imgui_internal.h"
 
 void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
@@ -116,6 +117,17 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	perform_main_menu_bar(in);
 
 	gui.inspector.perform({ *this });
+
+	{
+		auto& reveal_path = gui.inspector.reveal_in_explorer_once;
+
+		if (!reveal_path.empty()) {
+			in.window.reveal_in_explorer(reveal_path);
+
+			reveal_path.clear();
+		}
+	}
+
 	gui.layers.perform({ 
 		*this, 
 		project.layers,

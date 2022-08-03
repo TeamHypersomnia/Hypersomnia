@@ -2,6 +2,7 @@
 #include "application/setups/editor/editor_setup.hpp"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/imgui/imgui_enum_combo.h"
 #include "augs/string/string_templates.h"
 
 #include "application/setups/editor/resources/editor_sound_resource.h"
@@ -82,6 +83,11 @@ void edit_property(
 			result = typesafe_sprintf("Set %x to %x in %x", label, property);
 		}
 	}
+	else if constexpr(std::is_enum_v<T>) {
+		if (enum_combo(label, property)) { 
+			result = typesafe_sprintf("Set %x to %x in %x", label, property);
+		}
+	}
 	else if constexpr(is_one_of_v<T, vec2, vec2i>) {
 		if (drag_vec2(label, property)) { 
 			result = typesafe_sprintf("Set %x to %x in %x", label, property);
@@ -111,6 +117,10 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e) {
 	using namespace augs::imgui;
 
 	std::string result;
+
+	edit_property(result, "Domain", e.category);
+
+	ImGui::Separator();
 
 	edit_property(result, "##Defaultcolor", e.color);
 	edit_property(result, "Size", e.size);
@@ -225,7 +235,22 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			std::is_same_v<R, editor_sprite_resource> 
 			|| std::is_same_v<R, editor_sound_resource>
 		) {
+			auto reveal_in_explorer_button = [this](const auto& path) {
+				auto cursor = scoped_preserve_cursor();
+
+				if (ImGui::Selectable("##RevealButton")) {
+					reveal_in_explorer_once = path;
+				}
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Reveal in explorer");
+				}
+			};
+
 			const auto name = resource.external_file.path_in_project.filename().string();
+			const auto full_path = in.setup.resolve(resource.external_file.path_in_project);
+
+			reveal_in_explorer_button(full_path);
 
 			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
 				text_color("Sprite: ", yellow);
