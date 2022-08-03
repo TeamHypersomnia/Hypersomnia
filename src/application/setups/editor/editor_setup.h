@@ -255,7 +255,8 @@ public:
 
 	entity_id to_entity_id(editor_node_id) const;
 
-	void scroll_once_to(editor_node_id);
+	void scroll_once_to(inspected_variant);
+
 	std::unordered_map<std::string, editor_node_id> make_name_to_node_map() const;
 	std::string get_free_node_name_for(const std::string& new_name) const;
 
@@ -303,6 +304,7 @@ public:
 
 	void inspect_only(inspected_variant);
 	void inspect_only(const std::vector<inspected_variant>&);
+	void inspect_only(const std::vector<editor_node_id>&);
 	void inspected_to_entity_selector_state();
 
 	template <class T>

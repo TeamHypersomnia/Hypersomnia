@@ -566,6 +566,17 @@ void editor_setup::inspect(const std::vector<entity_id>& selections) {
 	sort_inspected();
 }
 
+void editor_setup::inspect_only(const std::vector<editor_node_id>& selections) {
+	clear_inspector();
+
+	for (const auto node : selections) {
+		gui.inspector.all_inspected.emplace_back(node);
+	}
+
+	inspected_to_entity_selector_state();
+	sort_inspected();
+}
+
 void editor_setup::inspect_only(const std::vector<inspected_variant>& new_inspected) {
 	gui.inspector.all_inspected = new_inspected;
 
@@ -955,7 +966,7 @@ editor_node_id editor_setup::get_hovered_node(const necessary_images_in_atlas_ma
 	return to_node_id(get_hovered_entity(sizes_for_icons, at));
 }
 
-void editor_setup::scroll_once_to(editor_node_id id) {
+void editor_setup::scroll_once_to(inspected_variant id) {
 	gui.layers.scroll_once_to = id;
 }
 

@@ -53,6 +53,11 @@ inline void reorder_nodes_command::redo(editor_command_input in) {
 		create_layer->redo(in);
 
 		target_layer_id = create_layer->get_allocated_id();
+
+		in.setup.scroll_once_to(target_layer_id);
+	}
+	else {
+		in.setup.scroll_once_to(nodes_to_move[0]);
 	}
 
 	auto target_layer = in.setup.find_layer(target_layer_id);
@@ -61,4 +66,6 @@ inline void reorder_nodes_command::redo(editor_command_input in) {
 	auto& nodes = target_layer->hierarchy.nodes;
 	const auto begin_index = std::clamp(target_index, std::size_t(0), nodes.size());
 	nodes.insert(nodes.begin() + begin_index, original_move_order.begin(), original_move_order.end());
+
+	in.setup.inspect_only(nodes_to_move);
 }

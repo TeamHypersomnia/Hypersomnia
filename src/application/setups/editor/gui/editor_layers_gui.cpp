@@ -286,7 +286,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					entity_to_highlight = in.setup.to_entity_id(node_id);
 				}
 
-				if (scroll_once_to == node_id) {
+				if (scroll_once_to == inspected_variant(node_id)) {
 					scroll_once_to = std::nullopt;
 
 					ImGui::SetScrollHereY(0.5f);
@@ -439,6 +439,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				;
 
 				const bool tree_node_pressed = ImGui::Selectable("###HierarchyButton", is_inspected, flags);
+
+				if (scroll_once_to == inspected_variant(layer_id)) {
+					scroll_once_to = std::nullopt;
+
+					ImGui::SetScrollHereY(0.5f);
+				}
 
 				if (ImGui::BeginDragDropSource()) {
 					dragged_layer = layer_id;

@@ -18,5 +18,6 @@ void create_layer_command::redo(editor_command_input in) {
 
 	if (!omit_inspector) {
 		in.setup.inspect_only(new_id);
+		in.setup.scroll_once_to(new_id);
 	}
 }
