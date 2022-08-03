@@ -113,6 +113,7 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e) {
 
 	edit_property(result, "##Defaultcolor", e.color);
 	edit_property(result, "Size", e.size);
+	edit_property(result, "Stretch when resized", e.stretch_when_resized);
 
 	ImGui::Separator();
 

@@ -17,27 +17,23 @@ struct editor_command_input;
 struct duplicate_nodes_command {
 	friend augs::introspection_access;
 
-	template <class E>
 	struct duplicated_entry {
-		using node_type = E;
-
-		editor_typed_node_id<E> source_id;
-		editor_typed_node_id<E> duplicated_id;
+		editor_node_id source_id;
+		editor_node_id duplicated_id;
 	};
-
-	template <class T>
-	using make_data_vector = std::vector<duplicated_entry<T>>;
 
 	editor_command_meta meta;
 private:
-	per_node_type_container<make_data_vector> duplicated_nodes;
+	std::vector<duplicated_entry> duplicated_nodes;
 public:
 	std::string built_description;
 	vec2i mirror_direction;
 	std::optional<editor_layer_id> target_new_layer;
+	std::optional<std::pair<editor_layer_id, std::size_t>> target_unified_location;
 	bool omit_inspector = false;
 
 	void push_entry(editor_node_id);
+	void reverse_order();
 
 	void redo(editor_command_input);
 	void undo(editor_command_input);

@@ -336,6 +336,9 @@ public:
 	template <class F>
 	std::optional<ltrb> find_aabb_of_typed_nodes(F&& for_each_typed_node) const;
 
+	template <class F>
+	std::optional<ltrb> find_aabb_of_nodes(F&& for_each_node) const;
+
 	std::optional<ltrb> find_screen_space_rect_selection(
 		const vec2i screen_size,
 		const vec2i mouse_pos

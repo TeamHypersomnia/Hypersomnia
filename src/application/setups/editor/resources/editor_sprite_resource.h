@@ -11,7 +11,7 @@ struct editor_sprite_resource_editable {
 	// GEN INTROSPECTOR struct editor_sprite_resource_editable
 	rgba color = white;
 	vec2i size = vec2i::zero;
-	bool tile_excess_size = false;
+	bool stretch_when_resized = false;
 	// END GEN INTROSPECTOR
 };
 

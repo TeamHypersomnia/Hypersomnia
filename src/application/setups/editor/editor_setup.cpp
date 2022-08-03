@@ -1029,6 +1029,7 @@ void editor_setup::rebuild_scene() {
 					{
 						auto& sprite = new_flavour.template get<invariants::sprite>();
 						sprite.set(new_image_id, editable.size, editable.color);
+						sprite.tile_excess_size = !editable.stretch_when_resized;
 					}
 
 					/* Cache for quick and easy mapping */
@@ -1755,6 +1756,28 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 			only_duplicating ? "Duplicated " : "Mirrored ",
 			only_visible_nodes()
 		);
+
+		std::optional<std::pair<editor_layer_id, std::size_t>> found_parent;
+		bool found_different = false;
+
+		for_each_inspected<editor_node_id>(
+			[&](const editor_node_id node_id) {
+				if (const auto this_parent = find_parent_layer(node_id)) {
+					if (found_parent == std::nullopt) {
+						found_parent = { this_parent->layer_id, this_parent->index_in_layer };
+					}
+
+					if (this_parent->layer_id != found_parent->first) {
+						found_different = true;
+					}
+				}
+			}
+		);
+
+		if (found_parent && !found_different) {
+			command.target_unified_location = *found_parent;
+			command.reverse_order();
+		}
 
 		if (!command.empty()) {
 			command.mirror_direction = direction;

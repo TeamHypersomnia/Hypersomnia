@@ -37,6 +37,31 @@ std::optional<ltrb> editor_setup::find_aabb_of_typed_nodes(F&& for_each_typed_no
 	return std::nullopt;
 }
 
+template <class F>
+std::optional<ltrb> editor_setup::find_aabb_of_nodes(F&& for_each_node) const {
+	ltrb total;
+
+	for_each_node(
+		[&](const auto id) {
+			on_node(id, [this, &total](const auto& typed_node, const auto typed_id) {
+				(void)typed_id;
+
+				if (const auto handle = scene.world[typed_node.scene_entity_id]) {
+					if (const auto aabb = find_aabb_of_entity(handle)) {
+						total.contain(*aabb);
+					}
+				}
+			});
+		}
+	);
+
+	if (total.good()) {
+		return total;
+	}
+
+	return std::nullopt;
+}
+
 template <class N>
 transformr get_node_transform(const N& node) {
 	auto rotation = 0.0f;
@@ -62,9 +87,7 @@ std::string duplicate_nodes_command::describe() const {
 }
 
 void duplicate_nodes_command::push_entry(const editor_node_id id) {
-	id.type_id.dispatch([&]<typename E>(const E) {
-		duplicated_nodes.get_for<E>().push_back({ editor_typed_node_id<E>::from_generic(id), {} });
-	});
+	duplicated_nodes.push_back({ id, {} });
 }
 
 bool duplicate_nodes_command::empty() const {
@@ -74,10 +97,9 @@ bool duplicate_nodes_command::empty() const {
 std::vector<editor_node_id> duplicate_nodes_command::get_all_duplicated() const { 
 	std::vector<editor_node_id> result;
 
-	duplicated_nodes.for_each([&]<typename T>(T& e) {
-		const auto duplicated_id_generic = e.duplicated_id.operator editor_node_id();
-		result.push_back(duplicated_id_generic);
-	});
+	for (const auto e : duplicated_nodes) {
+		result.push_back(e.duplicated_id);
+	}
 
 	return result;
 }
@@ -112,27 +134,33 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 	}();
 
 	auto duplicate = [&](auto&& new_transform_setter) {
-		duplicated_nodes.for_each([&]<typename T>(T& e) {
-			using N = typename T::node_type;
+		for (auto& e : duplicated_nodes) {
+			e.source_id.type_id.dispatch([&]<typename T>(const T) {
+				auto& pool = in.setup.project.nodes.get_pool_for<T>();
+				auto old_node = pool.get(e.source_id.raw);
+				const auto new_name = in.setup.get_free_node_name_for(old_node.unique_name + new_group_suffix);
+				const auto [duplicated_id, duplicated_node] = pool.allocate(std::move(old_node));
 
-			auto& pool = in.setup.project.nodes.get_pool_for<N>();
+				editor_typed_node_id<T> new_id;
+				new_id.set(duplicated_id);
+				e.duplicated_id = new_id.operator editor_node_id();
 
-			auto old_node = pool.get(e.source_id.raw);
-			const auto new_name = in.setup.get_free_node_name_for(old_node.unique_name + new_group_suffix);
+				duplicated_node.unique_name = new_name;
+				duplicated_node.scene_entity_id.unset();
 
-			const auto [duplicated_id, duplicated_node] = pool.allocate(std::move(old_node));
-			e.duplicated_id.set(duplicated_id);
-			duplicated_node.unique_name = new_name;
-			duplicated_node.scene_entity_id.unset();
+				new_transform_setter(duplicated_node);
+			});
 
-			new_transform_setter(duplicated_node);
-
-			const auto source_id_generic = e.source_id.operator editor_node_id();
-			const auto duplicated_id_generic = e.duplicated_id.operator editor_node_id();
+			const auto source_id_generic = e.source_id;
+			const auto duplicated_id_generic = e.duplicated_id;
 
 			auto register_in_layer = [&]() {
 				if (target_new_layer != std::nullopt) {
 					return in.setup.register_node_in_layer(duplicated_id_generic, *target_new_layer, static_cast<std::size_t>(-1));
+				}
+
+				if (target_unified_location) {
+					return in.setup.register_node_in_layer(duplicated_id_generic, target_unified_location->first, target_unified_location->second);
 				}
 
 				return in.setup.register_node_in_layer(duplicated_id_generic, source_id_generic);
@@ -145,7 +173,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 			if (!omit_inspector) {
 				in.setup.inspect_add_quiet(duplicated_id_generic);
 			}
-		});
+		};
 	};
 
 	if (does_mirroring) {
@@ -180,12 +208,12 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 		};
 
 		auto for_each_source_node_id = [this](auto callback){ 
-			duplicated_nodes.for_each([&](auto& e) {
+			for (const auto& e : duplicated_nodes) {
 				callback(e.source_id);
-			});
+			}
 		};
 
-		if (const auto source_aabb = in.setup.find_aabb_of_typed_nodes(for_each_source_node_id)) {
+		if (const auto source_aabb = in.setup.find_aabb_of_nodes(for_each_source_node_id)) {
 			const auto mir_dir = mirror_direction;
 
 			auto calc_mirror_offset = [source_aabb, mir_dir](const transformr& source) {
@@ -239,26 +267,30 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 	}
 }
 
+void duplicate_nodes_command::reverse_order() {
+	reverse_range(duplicated_nodes);
+}
+
 void duplicate_nodes_command::undo(const editor_command_input in) {
 	if (!omit_inspector) {
 		in.setup.clear_inspector();
 	}
 
-	duplicated_nodes.for_each_reverse([&]<typename T>(T& entry) {
-		using N = typename T::node_type;
-
-		const auto source_id = entry.source_id.operator editor_node_id();
-		const auto duplicated_id = entry.duplicated_id.operator editor_node_id();
+	for (auto& entry : reverse(duplicated_nodes)) {
+		const auto source_id = entry.source_id;
+		const auto duplicated_id = entry.duplicated_id;
 
 		in.setup.unregister_node_from_layer(duplicated_id);
 
-		auto& pool = in.setup.project.nodes.get_pool_for<N>();
-		pool.undo_last_allocate(entry.duplicated_id.raw);
+		duplicated_id.type_id.dispatch([&]<typename T>(const T) {
+			auto& pool = in.setup.project.nodes.get_pool_for<T>();
+			pool.undo_last_allocate(duplicated_id.raw);
+		});
 
 		if (!omit_inspector) {
 			in.setup.inspect_add_quiet(source_id);
 		}
-	});
+	}
 
 	{
 		/* 

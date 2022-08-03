@@ -4678,3 +4678,10 @@ Advantages:
 
 - Fix: Allow selecting invisible nodes along the visible ones
 
+- In duplicate entities command, an optional target layer 
+	- for moving to a new layer
+	- The only case where we want new layer per-node is when we want to duplicate multiple layers
+	- I think this might be a different command and we won't reuse duplicate layers command for moving into new layer command
+		- We could reuse it if we composed layer duplication from multiple commands
+			- We iterate per-selected layer, create new layer and setup the optional target layer for duplicate nodes command
+		- Efficient enough since we wont have millions of layers duplicated
