@@ -15,6 +15,7 @@
 #include "application/setups/editor/nodes/editor_prefab_node.h"
 
 #include "application/setups/editor/gui/editor_inspector_gui.h"
+#include "application/setups/editor/detail/simple_two_tabs.h"
 
 void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
@@ -219,7 +220,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		}
 	};
 
-	auto resource_handler = [&]<typename R>(R& resource, const auto& resource_id) {
+	auto resource_handler = [&]<typename R>(R& resource, const auto& resource_id, std::optional<std::vector<inspected_variant>> override_inspector = std::nullopt) {
 		if constexpr(
 			std::is_same_v<R, editor_sprite_resource> 
 			|| std::is_same_v<R, editor_sound_resource>
@@ -251,6 +252,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				cmd.resource_id = resource_id;
 				cmd.after = edited_copy;
 				cmd.built_description = typesafe_sprintf(changed, resource.get_display_name());
+				cmd.override_inspector_state = std::move(override_inspector);
 
 				post_new_or_rewrite(std::move(cmd)); 
 			}
@@ -266,6 +268,16 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		) {
 			const auto node_name = node.get_display_name();
 			auto id = scoped_id(node_name.c_str());
+
+			if constexpr(std::is_same_v<N, editor_sprite_node>) {
+				text_color("Sprite: ", yellow);
+			}
+			if constexpr(std::is_same_v<N, editor_sound_node>) {
+				text_color("Sound: ", yellow);
+			}
+
+			ImGui::SameLine();
+			text(node_name);
 
 			auto edited_copy = node.editable;
 			const auto changed = perform_editable_gui(edited_copy);
@@ -285,7 +297,28 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 	auto edit_properties = [&]<typename T>(const T& inspected_id) {
 		if constexpr(std::is_same_v<T, editor_node_id>) {
-			in.setup.on_node(inspected_id, node_handler);
+			simple_two_tabs(
+				node_current_tab,
+				inspected_node_tab_type::NODE,
+				inspected_node_tab_type::RESOURCE,
+				"Node",
+				"Resource"
+			);
+
+			ImGui::Separator();
+
+			if (node_current_tab == inspected_node_tab_type::NODE) {
+				in.setup.on_node(inspected_id, node_handler);
+			}
+			else {
+				in.setup.on_node(inspected_id, [&](const auto& typed_node, const auto id) {
+					(void)id;
+
+					if (const auto resource = in.setup.find_resource(typed_node.resource_id)) {
+						resource_handler(*resource, typed_node.resource_id, in.setup.get_all_inspected());
+					}
+				});
+			}
 		}
 		else if constexpr(std::is_same_v<T, editor_resource_id>) {
 			in.setup.on_resource(inspected_id, resource_handler);

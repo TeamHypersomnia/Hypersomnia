@@ -10,6 +10,7 @@
 #include "application/setups/editor/gui/widgets/inspectable_with_icon.h"
 #include "application/setups/editor/gui/widgets/icon_button.h"
 #include "application/setups/editor/gui/widgets/filesystem_node_widget.h"
+#include "application/setups/editor/detail/simple_two_tabs.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem();
@@ -139,35 +140,13 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		special_root.for_each_entry_recursive(filter_callback);
 	}
 
-	{
-		const auto bg_cols = std::array<rgba, 3> {
-			rgba(0, 0, 0, 0),
-			rgba(15, 40, 70, 255),
-			rgba(35, 60, 90, 255)
-		};
-
-		const auto selected_cols = std::array<rgba, 3> {
-			rgba(35-10, 60-10, 90-10, 255),
-			rgba(35, 60, 90, 255),
-			rgba(35+10, 60+10, 90+10, 255)
-		};
-
-		const auto avail = ImGui::GetContentRegionAvail();
-		auto spacing = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-
-		auto tab_button = [&](const auto label, const auto type) {
-			const bool selected = current_tab == type;
-			auto cols = scoped_button_colors(selected ? selected_cols : bg_cols);
-
-			if (ImGui::Button(label, ImVec2(avail.x / 2, 0))) {
-				current_tab = type;
-			}
-		};
-
-		tab_button("Project", editor_resources_tab_type::PROJECT);
-		ImGui::SameLine();
-		tab_button("Official", editor_resources_tab_type::OFFICIAL);
-	}
+	simple_two_tabs(
+		current_tab,
+		editor_resources_tab_type::PROJECT,
+		editor_resources_tab_type::OFFICIAL,
+		"Project",
+		"Official"
+	);
 
 	auto child = scoped_child(showing_official() ? "nodes official view" : "nodes project view");
 

@@ -3,12 +3,12 @@
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "application/setups/editor/resources/editor_resource_id.h"
 #include "application/setups/editor/project/editor_layers.h"
+#include "application/setups/editor/gui/inspected_variant.h"
 
-using inspected_variant = std::variant<
-	editor_node_id,
-	editor_resource_id,
-	editor_layer_id
->;
+enum class inspected_node_tab_type {
+	NODE,
+	RESOURCE
+};
 
 class editor_setup;
 
@@ -37,6 +37,7 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 	using base::base;
 	using introspect_base = base;
 
+	inspected_node_tab_type node_current_tab = inspected_node_tab_type::NODE;
 	editor_tweaked_widget_tracker tweaked_widget;
 
 	template <class T>

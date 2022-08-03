@@ -9,7 +9,12 @@ void edit_resource_command<T>::undo(editor_command_input in) {
 		after = resource->editable;
 		resource->editable = before;
 
-		in.setup.inspect_only(editor_resource_id(resource_id));
+		if (override_inspector_state != std::nullopt) {
+			in.setup.inspect_only(*override_inspector_state);
+		}
+		else {
+			in.setup.inspect_only(editor_resource_id(resource_id));
+		}
 	}
 }
 
@@ -19,6 +24,11 @@ void edit_resource_command<T>::redo(editor_command_input in) {
 		before = resource->editable;
 		resource->editable = after;
 
-		in.setup.inspect_only(editor_resource_id(resource_id));
+		if (override_inspector_state != std::nullopt) {
+			in.setup.inspect_only(*override_inspector_state);
+		}
+		else {
+			in.setup.inspect_only(editor_resource_id(resource_id));
+		}
 	}
 }

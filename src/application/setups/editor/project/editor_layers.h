@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "augs/misc/pool/pool.h"
+#include "application/setups/editor/project/editor_layer_id.h"
 
 struct editor_layer_hierarchy {
 	// GEN INTROSPECTOR struct editor_layer_hierarchy
@@ -39,7 +40,6 @@ struct editor_layer {
 	bool passed_filter = false;
 };
 
-using editor_layer_id = augs::pooled_object_id<unsigned short, editor_layer>;
 using editor_layer_pool = augs::pool<editor_layer, make_vector, unsigned short, type_list<>, editor_layer>;
 
 struct editor_layers {
