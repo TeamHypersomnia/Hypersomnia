@@ -400,7 +400,7 @@ void editor_setup::rebuild_filesystem() {
 	}
 }
 
-augs::path_type editor_setup::resolve(const augs::path_type& path_in_project) const {
+augs::path_type editor_setup::resolve_project_path(const augs::path_type& path_in_project) const {
 	return paths.project_folder / path_in_project;
 }
 
@@ -441,7 +441,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 			}
 
 			const auto path_in_project = file.get_path_in_project();
-			const auto full_path = resolve(path_in_project);
+			const auto full_path = resolve_project_path(path_in_project);
 
 			if (auto found_resource = find(resource_by_path, path_in_project)) {
 				found_resource->external_file.maybe_rehash(full_path, file.last_write_time);
@@ -466,7 +466,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 
 				auto moved_resource = find(resource_by_hash, new_resource_hash);
 
-				if (moved_resource && !augs::exists(resolve(moved_resource->external_file.path_in_project))) {
+				if (moved_resource && !augs::exists(resolve_project_path(moved_resource->external_file.path_in_project))) {
 					const auto& new_path = path_in_project;
 					auto& moved = moved_resource->external_file;
 
@@ -501,7 +501,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		for (auto& entry : pool) {
 			auto& r = entry.external_file;
 
-			if (!augs::exists(resolve(r.path_in_project))) {
+			if (!augs::exists(resolve_project_path(r.path_in_project))) {
 				/* 
 					If it's still missing after redirect, 
 					then it is indeed missing.
@@ -823,6 +823,16 @@ editor_layer* editor_setup::find_layer(const std::string& name) {
 	return nullptr;
 }
 
+const editor_layer* editor_setup::find_layer(const std::string& name) const {
+	for (const auto& layer : project.layers.pool) {
+		if (layer.unique_name == name) {
+			return std::addressof(layer);
+		}
+	}
+
+	return nullptr;
+}
+
 std::unordered_map<std::string, editor_node_id> editor_setup::make_name_to_node_map() const {
 	std::unordered_map<std::string, editor_node_id> result;
 
@@ -840,6 +850,10 @@ std::unordered_map<std::string, editor_node_id> editor_setup::make_name_to_node_
 }
 
 std::string editor_setup::get_free_node_name_for(const std::string& new_name) const {
+	if (new_name.empty()) {
+		return get_free_node_name_for("Unnamed node");
+	}
+
 	const auto name_map = make_name_to_node_map();
 
 	auto is_node_name_free = [&](const auto& name) {
@@ -853,7 +867,7 @@ std::string editor_setup::get_free_node_name_for(const std::string& new_name) co
 	);
 }
 
-std::string editor_setup::get_free_layer_name(const std::string& name_pattern) {
+std::string editor_setup::get_free_layer_name_for(const std::string& name_pattern) const {
 	return augs::first_free_string(
 		name_pattern, 
 		" %x", 
@@ -861,10 +875,14 @@ std::string editor_setup::get_free_layer_name(const std::string& name_pattern) {
 	);
 }
 
+std::string editor_setup::get_free_layer_name() const {
+	return get_free_layer_name_for("New layer");
+}
+
 
 void editor_setup::create_new_layer(const std::string& name_pattern) {
 	create_layer_command cmd;
-	cmd.created_layer.unique_name = get_free_layer_name(name_pattern);
+	cmd.created_layer.unique_name = get_free_layer_name_for(name_pattern);
 
 	post_new_command(cmd);
 }
@@ -1798,7 +1816,7 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 				create_layer_command new_layer;
 				new_layer.created_layer = *source_layer;
 				new_layer.created_layer.hierarchy.nodes.clear();
-				new_layer.created_layer.unique_name = get_free_layer_name(source_layer->unique_name + "-dup");
+				new_layer.created_layer.unique_name = get_free_layer_name_for(source_layer->unique_name + "-dup");
 				new_layer.at_index = find_layer_index(layer_id);
 				new_layer.omit_inspector = true;
 

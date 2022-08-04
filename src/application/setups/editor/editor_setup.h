@@ -185,8 +185,11 @@ public:
 	const editor_layer* find_layer(const editor_layer_id& id) const;
 
 	editor_layer* find_layer(const std::string& name);
+	const editor_layer* find_layer(const std::string& name) const;
 	void create_new_layer(const std::string& name_pattern = "New layer");
-	std::string get_free_layer_name(const std::string& name_pattern = "New layer");
+
+	std::string get_free_layer_name() const;
+	std::string get_free_layer_name_for(const std::string& name_pattern) const;
 
 	const auto& get_project() const { return project; }
 	const auto& get_official_resources() const { return official_resources; }
@@ -356,7 +359,7 @@ public:
 
 	void rebuild_scene();
 
-	augs::path_type resolve(const augs::path_type& path_in_project) const;
+	augs::path_type resolve_project_path(const augs::path_type& path_in_project) const;
 
 	camera_eye get_camera_eye() const;
 
@@ -376,6 +379,8 @@ public:
 	const auto& get_view() const {
 		return view;
 	}
+
+	void start_renaming_selection();
 
 	bool start_moving_selection();
 	void finish_moving_selection();

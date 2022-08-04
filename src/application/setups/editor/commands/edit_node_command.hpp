@@ -22,3 +22,31 @@ void edit_node_command<T>::redo(editor_command_input in) {
 		in.setup.inspect_only(editor_node_id(node_id));
 	}
 }
+
+void rename_node_command::undo(editor_command_input in) {
+	in.setup.on_node(
+		node_id,
+		[&](auto& node, const auto id) {
+			(void)id;
+
+			after = node.unique_name;
+			node.unique_name = before;
+
+			in.setup.inspect_only(node_id);
+		}
+	);
+}
+
+void rename_node_command::redo(editor_command_input in) {
+	in.setup.on_node(
+		node_id,
+		[&](auto& node, const auto id) {
+			(void)id;
+
+			before = node.unique_name;
+			node.unique_name = after;
+
+			in.setup.inspect_only(node_id);
+		}
+	);
+}

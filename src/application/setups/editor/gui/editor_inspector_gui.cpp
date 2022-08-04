@@ -250,7 +250,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		}
 	};
 
-	auto resource_handler = [&]<typename R>(R& resource, const auto& resource_id, std::optional<std::vector<inspected_variant>> override_inspector = std::nullopt) {
+	auto resource_handler = [&]<typename R>(const R& resource, const auto& resource_id, std::optional<std::vector<inspected_variant>> override_inspector = std::nullopt) {
 		if constexpr(
 			std::is_same_v<R, editor_sprite_resource> 
 			|| std::is_same_v<R, editor_sound_resource>
@@ -268,7 +268,13 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			};
 
 			const auto name = resource.external_file.path_in_project.filename().string();
-			const auto full_path = in.setup.resolve(resource.external_file.path_in_project);
+			const auto& path_in_project = resource.external_file.path_in_project;
+
+			const auto full_path = 
+				resource_id.is_official 
+				? OFFICIAL_CONTENT_PATH / path_in_project
+				: in.setup.resolve_project_path(path_in_project)
+			;
 
 			reveal_in_explorer_button(full_path);
 
@@ -327,23 +333,39 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		(void)resource;
 	};
 
-	auto node_handler = [&]<typename N>(N& node, const auto& node_id) {
+	auto node_handler = [&]<typename N>(const N& node, const auto& node_id) {
+		auto id = scoped_id(node.unique_name.c_str());
+
+		if constexpr(std::is_same_v<N, editor_sprite_node>) {
+			text_color("Sprite: ", yellow);
+		}
+		if constexpr(std::is_same_v<N, editor_sound_node>) {
+			text_color("Sound: ", yellow);
+		}
+
+		{
+			ImGui::SameLine();
+
+			auto edited_node_name = node.unique_name;
+
+			if (input_text<100>("##NameInput", edited_node_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
+				if (edited_node_name != node.unique_name && !edited_node_name.empty()) {
+					rename_node_command cmd;
+
+					cmd.node_id = node_id.operator editor_node_id();
+					cmd.after = in.setup.get_free_node_name_for(edited_node_name);
+					cmd.built_description = typesafe_sprintf("Renamed node to %x", cmd.after);
+
+					post_new_or_rewrite(std::move(cmd)); 
+				}
+			}
+		}
 		if constexpr(
 			std::is_same_v<N, editor_sprite_node> 
 			|| std::is_same_v<N, editor_sound_node>
 		) {
-			const auto node_name = node.get_display_name();
-			auto id = scoped_id(node_name.c_str());
 
-			if constexpr(std::is_same_v<N, editor_sprite_node>) {
-				text_color("Sprite: ", yellow);
-			}
-			if constexpr(std::is_same_v<N, editor_sound_node>) {
-				text_color("Sound: ", yellow);
-			}
-
-			ImGui::SameLine();
-			text(node_name);
+			ImGui::Separator();
 
 			auto edited_copy = node.editable;
 			const auto changed = perform_editable_gui(edited_copy);
