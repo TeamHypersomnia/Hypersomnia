@@ -183,6 +183,8 @@ bool editor_setup::handle_input_before_game(
 
 		if (!has_shift && !has_ctrl) {
 			switch (k) {
+				case key::F2: start_renaming_selection(); return true;
+
 				case key::N: move_inspected_to_new_layer(); return true;
 
 				case key::C: duplicate_selection(); return true;
@@ -831,6 +833,10 @@ const editor_layer* editor_setup::find_layer(const std::string& name) const {
 	}
 
 	return nullptr;
+}
+
+void editor_setup::start_renaming_selection() {
+	gui.layers.request_rename = true;
 }
 
 std::unordered_map<std::string, editor_node_id> editor_setup::make_name_to_node_map() const {

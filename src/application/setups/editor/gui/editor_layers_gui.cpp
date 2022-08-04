@@ -23,8 +23,10 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	
 	entity_to_highlight.unset();
 
+	bool rename_requested = request_rename;
 	const bool has_double_click = !in.setup.wants_multiple_selection() && in.setup.handle_doubleclick_in_layers_gui;
 	in.setup.handle_doubleclick_in_layers_gui = false;
+	request_rename = false;
 
 	auto window = make_scoped_window();
 
@@ -247,9 +249,10 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		{
 			const auto before_pos = ImGui::GetCursorPos();
 
+			const bool is_inspected = in.setup.is_inspected(node_id);
+
 			{
 				const bool is_hovered_on_scene = node_id == in.setup.get_hovered_node();
-				const bool is_inspected = in.setup.is_inspected(node_id);
 
 				const auto final_cols = [&]() {
 					if (is_hovered_on_scene) {
@@ -331,7 +334,41 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const auto image_offset = vec2(0, button_size.y / 2 - icon_size.y / 2);
 				const auto text_pos = vec2(before_pos) + image_offset + vec2(content_x_offset + icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
 				ImGui::SetCursorPos(ImVec2(text_pos));
-				text(label);
+
+				bool just_set = false;
+
+				if (rename_requested && is_inspected) {
+					rename_requested = false;
+
+					currently_renamed_node = node_id;
+					ImGui::SetKeyboardFocusHere();
+					just_set = true;
+				}
+
+				if (currently_renamed_node == node_id) {
+					auto edited_node_name = node.unique_name;
+
+					if (input_text<100>("##InlineNameInput", edited_node_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
+						currently_renamed_node = {};
+
+						if (edited_node_name != node.unique_name && !edited_node_name.empty()) {
+							rename_node_command cmd;
+
+							cmd.node_id = node_id;
+							cmd.after = in.setup.get_free_node_name_for(edited_node_name);
+							cmd.built_description = typesafe_sprintf("Renamed node to %x", cmd.after);
+
+							in.setup.post_new_command(std::move(cmd)); 
+						}
+					}
+
+					if (!just_set && !ImGui::IsItemActive()) {
+						currently_renamed_node = {};
+					}
+				}
+				else {
+					text(label);
+				}
 			}
 
 			ImGui::NextColumn();

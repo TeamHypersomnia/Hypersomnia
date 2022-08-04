@@ -356,7 +356,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					cmd.after = in.setup.get_free_node_name_for(edited_node_name);
 					cmd.built_description = typesafe_sprintf("Renamed node to %x", cmd.after);
 
-					post_new_or_rewrite(std::move(cmd)); 
+					in.setup.post_new_command(std::move(cmd)); 
 				}
 			}
 		}

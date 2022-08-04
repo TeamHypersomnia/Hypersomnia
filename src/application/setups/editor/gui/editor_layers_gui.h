@@ -27,6 +27,9 @@ struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {
 	editor_layer_id dragged_layer;
 
 	entity_id entity_to_highlight;
+	bool request_rename = false;
+
+	editor_node_id currently_renamed_node;
 
 	void perform(editor_layers_input);
 };
