@@ -116,7 +116,10 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	perform_main_menu_bar(in);
 
-	gui.inspector.perform({ *this });
+	gui.inspector.perform({ 
+		*this,
+		in.ad_hoc_atlas
+	});
 
 	{
 		auto& reveal_path = gui.inspector.reveal_in_explorer_once;

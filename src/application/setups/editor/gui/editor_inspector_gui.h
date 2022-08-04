@@ -4,6 +4,7 @@
 #include "application/setups/editor/resources/editor_resource_id.h"
 #include "application/setups/editor/project/editor_layers.h"
 #include "application/setups/editor/gui/inspected_variant.h"
+#include "view/viewables/ad_hoc_in_atlas_map.h"
 #include "augs/filesystem/path_declaration.h"
 
 enum class inspected_node_tab_type {
@@ -15,6 +16,7 @@ class editor_setup;
 
 struct editor_inspector_input {
 	editor_setup& setup;
+	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 };
 
 class editor_tweaked_widget_tracker {

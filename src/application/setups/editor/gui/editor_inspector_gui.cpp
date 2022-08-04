@@ -113,7 +113,7 @@ std::string perform_editable_gui(editor_sound_node_editable&) {
 	return result;
 }
 
-std::string perform_editable_gui(editor_sprite_resource_editable& e) {
+std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::optional<vec2i> original_size) {
 	using namespace augs::imgui;
 
 	std::string result;
@@ -124,6 +124,18 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e) {
 
 	edit_property(result, "##Defaultcolor", e.color);
 	edit_property(result, "Size", e.size);
+
+	if (original_size != std::nullopt) {
+		if (original_size != e.size) {
+			ImGui::SameLine();
+
+			if (ImGui::Button("Reset")) {
+				e.size = *original_size;
+				return "Reset %x size to original";
+			}
+		}
+	}
+
 	edit_property(result, "Stretch when resized", e.stretch_when_resized);
 
 	ImGui::Separator();
@@ -270,7 +282,21 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			auto id = scoped_id(path_string.c_str());
 
 			auto edited_copy = resource.editable;
-			const auto changed = perform_editable_gui(edited_copy);
+			auto changed = std::string();
+
+			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
+				auto original_size = std::optional<vec2i>();
+
+				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, resource.thumbnail_id)) {
+					original_size = ad_hoc->get_original_size();
+				}
+
+				changed = perform_editable_gui(edited_copy, original_size);
+
+			}
+			if constexpr(std::is_same_v<R, editor_sound_resource>) {
+				changed = perform_editable_gui(edited_copy);
+			}
 
 			if (!changed.empty()) {
 				edit_resource_command<R> cmd;
