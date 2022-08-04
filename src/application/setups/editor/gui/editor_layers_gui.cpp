@@ -251,6 +251,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 			const bool is_inspected = in.setup.is_inspected(node_id);
 
+			bool rename_this_node = false;
+
 			{
 				const bool is_hovered_on_scene = node_id == in.setup.get_hovered_node();
 
@@ -276,6 +278,16 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				if (ImGui::Selectable("###NodeButton", is_inspected || is_hovered_on_scene, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size)) {
 					in.setup.inspect(node_id);
+				}
+
+				if (ImGui::BeginPopupContextItem()) {
+					in.setup.inspect_only(node_id);
+
+					if (ImGui::Selectable("Rename (F2)")) {
+						rename_this_node = true;
+					}
+
+					ImGui::EndPopup();
 				}
 
 				const bool selectable_double_clicked = ImGui::IsItemHovered() && has_double_click;
@@ -337,8 +349,9 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				bool just_set = false;
 
-				if (rename_requested && is_inspected) {
+				if (rename_this_node || (rename_requested && is_inspected)) {
 					rename_requested = false;
+					rename_this_node = false;
 
 					currently_renamed_object = node_id;
 					ImGui::SetKeyboardFocusHere();
@@ -443,6 +456,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 			}
 
+			bool rename_this_layer = false;
+
 			{
 				const bool all_children_inspected = [&]() {
 					if (layer.hierarchy.nodes.empty()) {
@@ -474,7 +489,17 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap
 				;
 
-				const bool tree_node_pressed = ImGui::Selectable("###HierarchyButton", is_inspected, flags);
+				const bool tree_node_pressed = ImGui::Selectable("###LayerButton", is_inspected, flags);
+
+				if (ImGui::BeginPopupContextItem()) {
+					in.setup.inspect_only(layer_id);
+
+					if (ImGui::Selectable("Rename (F2)")) {
+						rename_this_layer = true;
+					}
+
+					ImGui::EndPopup();
+				}
 
 				if (scroll_once_to == inspected_variant(layer_id)) {
 					scroll_once_to = std::nullopt;
@@ -563,8 +588,9 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 					bool just_set = false;
 
-					if (rename_requested && is_inspected) {
+					if (rename_this_layer || (rename_requested && is_inspected)) {
 						rename_requested = false;
+						rename_this_layer = false;
 
 						currently_renamed_object = layer_id;
 						ImGui::SetKeyboardFocusHere();

@@ -4714,3 +4714,5 @@ Advantages:
 		- for the drag&drop too
 - Fix glitch wherein the other edges are snapped even though resizing another
 
+- Renaming stuff
+

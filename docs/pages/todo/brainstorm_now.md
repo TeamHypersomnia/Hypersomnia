@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Renaming stuff
-
 - Alright let's now try creating various entity types like lights and sounds
 	- And fix those icons
 
