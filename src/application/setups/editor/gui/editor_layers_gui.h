@@ -29,7 +29,7 @@ struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {
 	entity_id entity_to_highlight;
 	bool request_rename = false;
 
-	editor_node_id currently_renamed_node;
+	std::optional<inspected_variant> currently_renamed_object;
 
 	void perform(editor_layers_input);
 };

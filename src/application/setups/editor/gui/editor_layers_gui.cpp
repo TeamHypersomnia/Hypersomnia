@@ -340,16 +340,16 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				if (rename_requested && is_inspected) {
 					rename_requested = false;
 
-					currently_renamed_node = node_id;
+					currently_renamed_object = node_id;
 					ImGui::SetKeyboardFocusHere();
 					just_set = true;
 				}
 
-				if (currently_renamed_node == node_id) {
+				if (currently_renamed_object == inspected_variant(node_id)) {
 					auto edited_node_name = node.unique_name;
 
 					if (input_text<100>("##InlineNameInput", edited_node_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
-						currently_renamed_node = {};
+						currently_renamed_object = std::nullopt;
 
 						if (edited_node_name != node.unique_name && !edited_node_name.empty()) {
 							rename_node_command cmd;
@@ -363,7 +363,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 
 					if (!just_set && !ImGui::IsItemActive()) {
-						currently_renamed_node = {};
+						currently_renamed_object = std::nullopt;
 					}
 				}
 				else {
@@ -561,7 +561,40 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 					ImGui::SameLine();
 
-					text(layer.unique_name);
+					bool just_set = false;
+
+					if (rename_requested && is_inspected) {
+						rename_requested = false;
+
+						currently_renamed_object = layer_id;
+						ImGui::SetKeyboardFocusHere();
+						just_set = true;
+					}
+
+					if (currently_renamed_object == inspected_variant(layer_id)) {
+						auto edited_layer_name = layer.unique_name;
+
+						if (input_text<100>("##InlineNameInput", edited_layer_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
+							currently_renamed_object = std::nullopt;
+
+							if (edited_layer_name != layer.unique_name && !edited_layer_name.empty()) {
+								rename_layer_command cmd;
+
+								cmd.layer_id = layer_id;
+								cmd.after = in.setup.get_free_layer_name_for(edited_layer_name);
+								cmd.built_description = typesafe_sprintf("Renamed layer to %x", cmd.after);
+
+								in.setup.post_new_command(std::move(cmd)); 
+							}
+						}
+
+						if (!just_set && !ImGui::IsItemActive()) {
+							currently_renamed_object = std::nullopt;
+						}
+					}
+					else {
+						text(label);
+					}
 				}
 
 				if (selectable_double_clicked && !was_arrow_hovered && !was_arrow_clicked) {

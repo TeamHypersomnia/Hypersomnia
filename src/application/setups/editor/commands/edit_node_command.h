@@ -40,3 +40,21 @@ struct rename_node_command {
 		return built_description;
 	}
 };
+
+struct rename_layer_command {
+	editor_command_meta meta;
+
+	editor_layer_id layer_id;
+
+	std::string before;
+	std::string after;
+
+	std::string built_description;
+
+	void undo(editor_command_input in);
+	void redo(editor_command_input in);
+
+	const auto& describe() const {
+		return built_description;
+	}
+};

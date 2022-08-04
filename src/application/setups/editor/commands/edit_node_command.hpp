@@ -50,3 +50,21 @@ void rename_node_command::redo(editor_command_input in) {
 		}
 	);
 }
+
+void rename_layer_command::undo(editor_command_input in) {
+	if (const auto layer = in.setup.find_layer(layer_id)) {
+		after = layer->unique_name;
+		layer->unique_name = before;
+
+		in.setup.inspect_only(layer_id);
+	}
+}
+
+void rename_layer_command::redo(editor_command_input in) {
+	if (const auto layer = in.setup.find_layer(layer_id)) {
+		before = layer->unique_name;
+		layer->unique_name = after;
+
+		in.setup.inspect_only(layer_id);
+	}
+}

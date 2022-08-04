@@ -383,6 +383,28 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		(void)node;
 	};
 
+	auto layer_handler = [&](editor_layer& layer, const editor_layer_id layer_id) {
+		text_color("Layer: ", yellow);
+
+		{
+			ImGui::SameLine();
+
+			auto edited_layer_name = layer.unique_name;
+
+			if (input_text<100>("##NameInput", edited_layer_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
+				if (edited_layer_name != layer.unique_name && !edited_layer_name.empty()) {
+					rename_layer_command cmd;
+
+					cmd.layer_id = layer_id;
+					cmd.after = in.setup.get_free_layer_name_for(edited_layer_name);
+					cmd.built_description = typesafe_sprintf("Renamed layer to %x", cmd.after);
+
+					in.setup.post_new_command(std::move(cmd)); 
+				}
+			}
+		}
+	};
+
 	auto edit_properties = [&]<typename T>(const T& inspected_id) {
 		if constexpr(std::is_same_v<T, editor_node_id>) {
 			simple_two_tabs(
@@ -412,6 +434,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			in.setup.on_resource(inspected_id, resource_handler);
 		}
 		else if constexpr(std::is_same_v<T, editor_layer_id>) {
+			if (auto layer = in.setup.find_layer(inspected_id)) {
+				layer_handler(*layer, inspected_id);
+			}
 
 		}
 		else {
