@@ -23,10 +23,20 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	
 	entity_to_highlight.unset();
 
+	auto release_enter = augs::scope_guard([this]() {
+		if (request_confirm_rename) {
+			ImGui::GetIO().KeysDown[int(augs::event::keys::key::ENTER)] = false;
+		}
+	});
+
 	bool rename_requested = request_rename;
 	const bool has_double_click = !in.setup.wants_multiple_selection() && in.setup.handle_doubleclick_in_layers_gui;
 	in.setup.handle_doubleclick_in_layers_gui = false;
 	request_rename = false;
+
+	bool inspect_next_item = false;
+	bool inspect_next_layer = false;
+	std::optional<inspected_variant> previous_item;
 
 	auto window = make_scoped_window();
 
@@ -225,7 +235,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		T& node, 
 		const editor_node_id node_id, 
 		editor_layer& layer, 
-		editor_layer_id layer_id
+		const editor_layer_id layer_id
 	) {
 		auto id_scope = scoped_id(node_id_counter++);
 
@@ -249,7 +259,42 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		{
 			const auto before_pos = ImGui::GetCursorPos();
 
-			const bool is_inspected = in.setup.is_inspected(node_id);
+			if (inspect_next_item) {
+				inspect_next_item = false;
+				in.setup.inspect_only(node_id);
+				ImGui::SetScrollHereY(0.5f);
+			}
+
+			bool is_inspected = in.setup.is_inspected(node_id);
+
+			if (is_inspected) {
+				if (!pressed_arrow.is_zero()) {
+					if (pressed_arrow.y == -1 && previous_item != std::nullopt) {
+						in.setup.inspect_only(*previous_item);
+						in.setup.scroll_once_to(*previous_item);
+						previous_item = std::nullopt;
+						is_inspected = false;
+					}
+
+					if (pressed_arrow.y == 1) {
+						inspect_next_item = true;
+					}
+
+					if (pressed_arrow.x == -1) {
+						//layer.is_open = false;
+						in.setup.inspect_only(layer_id);
+						in.setup.scroll_once_to(layer_id);
+					}
+
+					if (pressed_arrow.x == 1) {
+						inspect_next_layer = true;
+					}
+
+					pressed_arrow.set(0, 0);
+				}
+			}
+
+			previous_item = node_id;
 
 			bool rename_this_node = false;
 
@@ -435,7 +480,11 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		ImGui::Columns(2);
 		ImGui::SetColumnWidth(0, avail - max_icon_size - spacing.x);
 
+		std::optional<editor_layer_id> previous_layer;
+
 		for (const auto& layer_id : layers.order) {
+			auto save_prev = augs::scope_guard([&]() { previous_layer = layer_id; });
+
 			auto* maybe_layer = in.setup.find_layer(layer_id);
 
 			if (maybe_layer == nullptr) {
@@ -473,9 +522,56 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					return true;
 				}();
 
-				const bool is_inspected = all_children_inspected || in.setup.is_inspected(layer_id);
+				if (inspect_next_item || inspect_next_layer) {
+					inspect_next_item = false;
+					inspect_next_layer = false;
+					in.setup.inspect_only(layer_id);
+					ImGui::SetScrollHereY(0.5f);
+				}
 
-				auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
+				const bool is_inspected = in.setup.is_inspected(layer_id);
+
+				if (is_inspected) {
+					if (!pressed_arrow.is_zero()) {
+						if (pressed_arrow.y == -1 && previous_item != std::nullopt) {
+							in.setup.inspect_only(*previous_item);
+							in.setup.scroll_once_to(*previous_item);
+						}
+
+						if (pressed_arrow.y == 1) {
+							inspect_next_item = true;
+						}
+
+						if (pressed_arrow.x == 1) {
+							if (layer.is_open || layer.empty()) {
+								inspect_next_layer = true;
+							}
+							else {
+								layer.is_open = true;
+							}
+						}
+
+						if (pressed_arrow.x == -1) {
+							if (!layer.is_open || layer.empty()) {
+								if (previous_layer != std::nullopt) {
+									in.setup.inspect_only(*previous_layer);
+									in.setup.scroll_once_to(*previous_layer);
+								}
+							}
+							else {
+								layer.is_open = false;
+							}
+						}
+
+						pressed_arrow.set(0, 0);
+					}
+				}
+
+				const bool is_visually_inspected = is_inspected || all_children_inspected;
+
+				previous_item = layer_id;
+
+				auto colored_selectable = scoped_selectable_colors(is_visually_inspected ? inspected_cols : bg_cols);
 
 				if (was_disabled) {
 					ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
@@ -489,7 +585,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap
 				;
 
-				const bool tree_node_pressed = ImGui::Selectable("###LayerButton", is_inspected, flags);
+				const bool tree_node_pressed = ImGui::Selectable("###LayerButton", is_visually_inspected, flags);
 
 				if (ImGui::BeginPopupContextItem()) {
 					in.setup.inspect_only(layer_id);

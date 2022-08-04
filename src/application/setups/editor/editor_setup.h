@@ -407,6 +407,10 @@ public:
 	void move_dragged_to_new_layer(editor_node_id dragged_node);
 	void move_inspected_to_new_layer();
 
+	const auto& get_history() const {
+		return history;
+	}
+
 	/*********************************************************/
 	/*************** DEFAULT SETUP BOILERPLATE ***************/
 	/*********************************************************/

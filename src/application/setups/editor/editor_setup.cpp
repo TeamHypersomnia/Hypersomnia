@@ -91,6 +91,42 @@ bool editor_setup::handle_input_before_imgui(
 		}
 	}
 
+	if (in.e.was_any_key_pressed()) {
+		using namespace augs::event::keys;
+
+		const auto k = in.e.data.key.key;
+
+		const bool has_shift{ in.common_input_state[key::LSHIFT] };
+
+		if (gui.layers.is_focused()) {
+			if (k == key::UP || (k == key::TAB && has_shift)) {
+				gui.layers.pressed_arrow = vec2i(0, -1);
+				ImGui::GetIO().KeysDown[int(key::ENTER)] = true;
+				gui.layers.request_confirm_rename = true;
+
+				return true;
+			}
+			else if (k == key::DOWN || k == key::TAB) {
+				gui.layers.pressed_arrow = vec2i(0, 1);
+				ImGui::GetIO().KeysDown[int(key::ENTER)] = true;
+				gui.layers.request_confirm_rename = true;
+
+				return true;
+			}
+		}
+
+		if (!ImGui::GetIO().WantCaptureKeyboard) {
+			switch (k) {
+				case key::LEFT: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(-1, 0); return true; } else break;
+				case key::RIGHT: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(1, 0); return true; } else break;
+				case key::UP: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(0, -1); return true; } else break;
+				case key::DOWN: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(0, 1); return true; } else break;
+
+				default: break;
+			}
+		}
+	}
+
 	if (in.e.msg == message::ldoubleclick) {
 		handle_doubleclick_in_layers_gui = true;
 	}
@@ -200,6 +236,7 @@ bool editor_setup::handle_input_before_game(
 				case key::S: view.toggle_snapping(); return true;
 				case key::OPEN_SQUARE_BRACKET: view.grid.increase_grid_size(); clamp_units(); return true;
 				case key::CLOSE_SQUARE_BRACKET: view.grid.decrease_grid_size(); clamp_units(); return true;
+
 				default: break;
 			}
 		}

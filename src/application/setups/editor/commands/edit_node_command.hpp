@@ -46,7 +46,9 @@ void rename_node_command::redo(editor_command_input in) {
 			before = node.unique_name;
 			node.unique_name = after;
 
-			in.setup.inspect_only(node_id);
+			if (!in.setup.get_history().executed_new()) {
+				in.setup.inspect_only(node_id);
+			}
 		}
 	);
 }
@@ -65,6 +67,14 @@ void rename_layer_command::redo(editor_command_input in) {
 		before = layer->unique_name;
 		layer->unique_name = after;
 
-		in.setup.inspect_only(layer_id);
+		/* 
+			If we inspect on first execution,
+			pressing up arrow while renaming doesn't result in the inspector focus going up
+			since the inspected element is overridden here to the renamed element again.
+		*/
+
+		if (!in.setup.get_history().executed_new()) {
+			in.setup.inspect_only(layer_id);
+		}
 	}
 }

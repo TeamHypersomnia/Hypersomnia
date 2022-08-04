@@ -53,6 +53,10 @@ namespace augs {
 			return last_op;
 		}
 
+		bool executed_new() const {
+			return get_last_op().type == history_op_type::EXECUTE_NEW;
+		}
+
 		template <class T, class... RedoArgs>
 		const T& execute_new(T&& command, RedoArgs&&... redo_args);
 
