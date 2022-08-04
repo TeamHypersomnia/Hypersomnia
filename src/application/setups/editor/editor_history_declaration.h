@@ -25,6 +25,7 @@ struct delete_nodes_command;
 struct duplicate_nodes_command;
 
 struct create_layer_command;
+struct delete_layers_command;
 
 struct reorder_nodes_command;
 struct reorder_layers_command;
@@ -51,6 +52,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_node_command<editor_light_node>,
 
 	create_layer_command,
+	delete_layers_command,
 
 	create_node_command<editor_sprite_node>,
 	create_node_command<editor_sound_node>,

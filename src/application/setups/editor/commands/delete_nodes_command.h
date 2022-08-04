@@ -36,6 +36,7 @@ private:
 	editor_layer_pool layers_backup;
 public:
 	std::string built_description;
+	bool omit_inspector = false;
 
 	void push_entry(editor_node_id);
 

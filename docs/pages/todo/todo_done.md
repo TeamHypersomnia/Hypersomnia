@@ -4706,3 +4706,5 @@ Advantages:
 	- separate post_child_command
 	- although that kind of complicates rewrite_last_command? so either stick with normal command or just embed those commands
 
+- Somehow highlight the resources when they are inspected as nodes?
+

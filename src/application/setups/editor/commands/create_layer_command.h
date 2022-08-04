@@ -23,3 +23,38 @@ struct create_layer_command : allocating_command<editor_layer_id> {
 		return base::get_allocated_id();
 	}
 };
+
+using editor_layer_pool_size_type = unsigned short;
+using layer_undo_free_input = augs::pool_undo_free_input<editor_layer_pool_size_type, editor_layer>;
+
+struct delete_layers_command {
+	struct entry {
+		editor_layer_id layer_id;
+		editor_layer layer_content;
+		layer_undo_free_input undo_delete_input;
+	};
+
+	editor_command_meta meta;
+
+	std::vector<entry> entries;
+	std::vector<editor_layer_id> order_backup;
+
+	void undo(editor_command_input in);
+	void redo(editor_command_input in);
+
+	void push_entry(editor_layer_id);
+
+	std::string built_description;
+
+	auto size() const {
+		return entries.size();
+	}
+
+	bool empty() const {
+		return entries.empty();
+	}
+
+	const auto& describe() const {
+		return built_description;
+	}
+};

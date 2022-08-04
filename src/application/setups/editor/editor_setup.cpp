@@ -1627,10 +1627,35 @@ void editor_setup::cut_selection() {
 }
 
 void editor_setup::delete_selection() {
-	auto command = make_command_from_selected_nodes<delete_nodes_command>("Deleted ");
+	if (gui.inspector.inspects_any<editor_node_id>()) {
+		auto command = make_command_from_selected_nodes<delete_nodes_command>("Deleted ");
 
-	if (!command.empty()) {
-		post_new_command(std::move(command));
+		if (!command.empty()) {
+			post_new_command(std::move(command));
+		}
+	}
+	else if (gui.inspector.inspects_any<editor_layer_id>()) {
+		auto layer_command = make_command_from_selected_layers<delete_layers_command>("Deleted ");
+
+		delete_nodes_command nodes_command;
+		nodes_command.omit_inspector = true;
+
+		for (auto& entry : layer_command.entries) {
+			if (const auto layer = find_layer(entry.layer_id)) {
+				for (const auto node_id : layer->hierarchy.nodes) {
+					nodes_command.push_entry(node_id);
+				}
+			}
+		}
+
+		if (!nodes_command.empty()) {
+			post_new_command(std::move(nodes_command));
+			post_new_command(std::move(layer_command));
+			make_last_command_a_child();
+		}
+		else if (!layer_command.empty()) {
+			post_new_command(std::move(layer_command));
+		}
 	}
 }
 

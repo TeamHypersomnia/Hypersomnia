@@ -6,21 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Somehow highlight the resources when they are inspected as nodes?
-
 - We won't forget the possible actions since all of them will have key shortcuts
 	- But we need to describe them in tooltips over the toolbars and buttons anyway
-
-- If nodes won't ever reference other nodes (only resources), prefabs could just be nodes with a vector of node variants
-	- Since these sub-nodes are not meant to be identifiable
-	- to_entity_id should also always return the prefab node instead of individual entities
-	- *Unfortunately*, nodes will reference other nodes, e.g. a fish node might want to reference an origin node
-
-- We were worried that invisible nodes not being moved with the visible ones could be unintuitive when mass-moving nodes
-	- We could check how it's done in other editors too
-	- However it should be expected to work like this
-	- Note that even if selecting on-scene for mass transforming, you will never be able to catch the invisible ones in selection
-	- We'll worry about it later when someone asks
 
 - Properly implement the buttons in layers gui as we already have the required commands implemented
 	- We should show the hotkeys there in the tooltip

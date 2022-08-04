@@ -5,6 +5,17 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- We were worried that invisible nodes not being moved with the visible ones could be unintuitive when mass-moving nodes
+	- We could check how it's done in other editors too
+	- However it should be expected to work like this
+	- Note that even if selecting on-scene for mass transforming, you will never be able to catch the invisible ones in selection
+	- We'll worry about it later when someone asks
+
+- If nodes won't ever reference other nodes (only resources), prefabs could just be nodes with a vector of node variants
+	- Since these sub-nodes are not meant to be identifiable
+	- to_entity_id should also always return the prefab node instead of individual entities
+	- *Unfortunately*, nodes will reference other nodes, e.g. a fish node might want to reference an origin node
+
 - Fix akimbo mid-chambering: switch to the other weapon when we drop the current during mid-akimbo
 	- Implementation: If the currently mid-chambered doesn't match AND IT'S ALREADY GONE from inventory, switch to the second 
 	- It's okay if it's also due to the manual drop

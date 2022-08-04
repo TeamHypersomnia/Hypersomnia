@@ -21,6 +21,8 @@ inline void reorder_nodes_command::undo(editor_command_input in) {
 	}
 
 	original_orders.clear();
+
+	in.setup.inspect_only(nodes_to_move);
 }
 
 inline void reorder_nodes_command::redo(editor_command_input in) {

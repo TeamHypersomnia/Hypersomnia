@@ -123,6 +123,7 @@ class editor_setup : public default_setup_settings {
 	static decltype(auto) find_resource_impl(S& self, const editor_typed_resource_id<T>& id);
 
 	friend create_layer_command;
+	friend delete_layers_command;
 
 	template <class T>
 	friend struct create_node_command;

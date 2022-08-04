@@ -14,6 +14,8 @@ inline void create_node_command<T>::undo(editor_command_input in) {
 	if (create_layer != std::nullopt) {
 		create_layer->undo(in);
 	}
+
+	in.setup.clear_inspector();
 }
 
 template <class T>

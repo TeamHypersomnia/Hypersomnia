@@ -18,7 +18,10 @@ bool delete_nodes_command::empty() const {
 }
 
 void delete_nodes_command::redo(const editor_command_input in) {
-	in.setup.clear_inspector();
+	if (!omit_inspector) {
+		in.setup.clear_inspector();
+	}
+
 	layers_backup = in.setup.project.layers.pool;
 
 	deleted_nodes.for_each([&]<typename T>(T& entry) {
@@ -39,13 +42,23 @@ void delete_nodes_command::redo(const editor_command_input in) {
 		}
 
 		auto& pool = in.setup.project.nodes.get_pool_for<N>();
-		entry.node_content = pool.at(entry.node_id.raw);
-		entry.undo_delete_input = *pool.free(entry.node_id.raw);
+
+		const auto found_node = pool.find(entry.node_id.raw);
+
+		ensure(found_node != nullptr);
+
+		entry.node_content = *found_node;
+
+		auto delete_input = pool.free(entry.node_id.raw);
+		ensure(delete_input != std::nullopt);
+		entry.undo_delete_input = *delete_input;
 	});
 }
 
 void delete_nodes_command::undo(const editor_command_input in) {
-	in.setup.clear_inspector();
+	if (!omit_inspector) {
+		in.setup.clear_inspector();
+	}
 
 	/* 
 		NOTE: Pools should be independent, but to be theoretically pure,
@@ -61,9 +74,15 @@ void delete_nodes_command::undo(const editor_command_input in) {
 		ensure(undone_id == entry.node_id.raw);
 
 		const auto undone_generic_id = entry.node_id.operator editor_node_id();
-		in.setup.inspect_add_quiet(undone_generic_id);
+
+		if (!omit_inspector) {
+			in.setup.inspect_add_quiet(undone_generic_id);
+		}
 	});
 
 	in.setup.project.layers.pool = layers_backup;
-	in.setup.after_quietly_adding_inspected();
+
+	if (!omit_inspector) {
+		in.setup.after_quietly_adding_inspected();
+	}
 }
