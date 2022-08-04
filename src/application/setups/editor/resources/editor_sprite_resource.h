@@ -19,11 +19,12 @@ enum class editor_sprite_domain {
 
 struct editor_sprite_resource_editable {
 	// GEN INTROSPECTOR struct editor_sprite_resource_editable
-	editor_sprite_domain category = editor_sprite_domain::BACKGROUND;
+	editor_sprite_domain domain = editor_sprite_domain::BACKGROUND;
 
 	rgba color = white;
 	vec2i size = vec2i::zero;
 	bool stretch_when_resized = false;
+	bool foreground_glow = false;
 	// END GEN INTROSPECTOR
 };
 

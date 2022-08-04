@@ -6,24 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Renaming stuff
+
+- Alright let's now try creating various entity types like lights and sounds
+	- And fix those icons
+
+- Another special resource: materials
+	- But only physical, we won't create a separate material for grounds as it's just a single sound
+
 - We won't forget the possible actions since all of them will have key shortcuts
 	- But we need to describe them in tooltips over the toolbars and buttons anyway
-
-- Properly implement the buttons in layers gui as we already have the required commands implemented
-	- We should show the hotkeys there in the tooltip
-		- for the drag&drop too
 		
 - Watch out for pixel imperfections. List of possible fixes:
 	- We've deleted aabb calculation from the mirror entities command.
 
-- Fix glitch wherein the other edges are snapped even though resizing another
-
 - Once we come to prefabs, it should be easy to rewrite these transform commands to operate on nodes
 	- We only really need a way to access sizes and positions (as shown by the data that's backed up for undo)
-
-- Shift+T could move with layer detection just like when putting on scene
-	- Point is, how do we quickly move one entity over another with just on-scene operations?
-		- I think ctrl+x + ctrl+v. So this is for later. Ctrl+v will always paste nodes above the topmost selected node
 
 - It seems to me that it's not the worst pattern - all transforming logic working on the generated scene, as opposed to abstract node entries.
 	- This is because node transforming logic works on *apparent state*.

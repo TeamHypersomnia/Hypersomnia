@@ -5,6 +5,10 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Shift+T could move with layer detection just like when putting on scene
+	- Point is, how do we quickly move one entity over another with just on-scene operations?
+		- I think ctrl+x + ctrl+v. So this is for later. Ctrl+v will always paste nodes above the topmost selected node
+
 - We were worried that invisible nodes not being moved with the visible ones could be unintuitive when mass-moving nodes
 	- We could check how it's done in other editors too
 	- However it should be expected to work like this

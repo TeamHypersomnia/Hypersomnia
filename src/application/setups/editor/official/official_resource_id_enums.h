@@ -5,6 +5,9 @@ enum class official_sprites {
 	ROAD,
 	FLOOR,
 
+	AWAKENING,
+	WELCOME_TO_METROPOLIS,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

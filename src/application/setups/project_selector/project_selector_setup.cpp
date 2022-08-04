@@ -21,7 +21,7 @@
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
 #include "application/setups/editor/project/editor_project.h"
-#include "application/setups/debugger/detail/maybe_different_colors.h"
+#include "application/setups/editor/detail/maybe_different_colors.h"
 #include "augs/readwrite/json_readwrite_errors.h"
 #include "augs/string/path_sanitization.h"
 #include "augs/filesystem/find_path.h"
@@ -643,7 +643,7 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 
 		{
 
-			auto scope = maybe_disabled_cols({}, is_disabled);
+			auto scope = maybe_disabled_cols(is_disabled);
 
 			if (ImGui::Button("Create")) {
 				return true;

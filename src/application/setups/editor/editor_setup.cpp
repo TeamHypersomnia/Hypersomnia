@@ -1038,10 +1038,14 @@ void editor_setup::rebuild_scene() {
 						auto& render = new_flavour.template get<invariants::render>();
 
 						render.layer = [&]() {
-							switch (editable.category) {
+							switch (editable.domain) {
 								case editor_sprite_domain::BACKGROUND:
 									return render_layer::GROUND;
 								case editor_sprite_domain::FOREGROUND:
+									if (editable.foreground_glow) {
+										return render_layer::FOREGROUND_GLOWS;
+									}
+
 									return render_layer::FOREGROUND;
 								case editor_sprite_domain::PHYSICAL:
 									return render_layer::SOLID_OBSTACLES;

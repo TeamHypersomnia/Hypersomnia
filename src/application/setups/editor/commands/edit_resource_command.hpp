@@ -5,6 +5,11 @@
 
 template <class T>
 void edit_resource_command<T>::undo(editor_command_input in) {
+	if (resource_id.is_official) {
+		built_description = "Error: trying to edit official resource.";
+		return;
+	}
+
 	if (auto resource = in.setup.find_resource(resource_id)) {
 		after = resource->editable;
 		resource->editable = before;
@@ -20,6 +25,11 @@ void edit_resource_command<T>::undo(editor_command_input in) {
 
 template <class T>
 void edit_resource_command<T>::redo(editor_command_input in) {
+	if (resource_id.is_official) {
+		built_description = "Error: trying to edit official resource.";
+		return;
+	}
+
 	if (auto resource = in.setup.find_resource(resource_id)) {
 		before = resource->editable;
 		resource->editable = after;

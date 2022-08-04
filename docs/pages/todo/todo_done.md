@@ -4708,3 +4708,9 @@ Advantages:
 
 - Somehow highlight the resources when they are inspected as nodes?
 
+
+- Properly implement the buttons in layers gui as we already have the required commands implemented
+	- We should show the hotkeys there in the tooltip
+		- for the drag&drop too
+- Fix glitch wherein the other edges are snapped even though resizing another
+

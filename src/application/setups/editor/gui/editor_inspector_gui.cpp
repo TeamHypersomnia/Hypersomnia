@@ -18,6 +18,8 @@
 #include "application/setups/editor/gui/editor_inspector_gui.h"
 #include "application/setups/editor/detail/simple_two_tabs.h"
 
+#include "application/setups/editor/detail/maybe_different_colors.h"
+
 void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
 }
@@ -118,15 +120,17 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::
 
 	std::string result;
 
-	edit_property(result, "Domain", e.category);
+	edit_property(result, "Domain", e.domain);
 
 	ImGui::Separator();
+
+	const auto current_size = e.size;
 
 	edit_property(result, "##Defaultcolor", e.color);
 	edit_property(result, "Size", e.size);
 
 	if (original_size != std::nullopt) {
-		if (original_size != e.size) {
+		if (original_size != current_size) {
 			ImGui::SameLine();
 
 			if (ImGui::Button("Reset")) {
@@ -137,6 +141,10 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::
 	}
 
 	edit_property(result, "Stretch when resized", e.stretch_when_resized);
+
+	if (e.domain == editor_sprite_domain::FOREGROUND) {
+		edit_property(result, "Foreground glow", e.foreground_glow);
+	}
 
 	ImGui::Separator();
 
@@ -291,14 +299,21 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					original_size = ad_hoc->get_original_size();
 				}
 
+				/* 
+					It's probably better to leave the widgets themselves active
+					in case someone wants to copy the values.
+				*/
+
+				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
 				changed = perform_editable_gui(edited_copy, original_size);
 
 			}
 			if constexpr(std::is_same_v<R, editor_sound_resource>) {
+				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
 				changed = perform_editable_gui(edited_copy);
 			}
 
-			if (!changed.empty()) {
+			if (!changed.empty() && !resource_id.is_official) {
 				edit_resource_command<R> cmd;
 				cmd.resource_id = resource_id;
 				cmd.after = edited_copy;

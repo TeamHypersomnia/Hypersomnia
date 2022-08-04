@@ -95,6 +95,18 @@ void create_sprites(editor_resource_pools& pools) {
 		auto& road = create_official(official_sprites::ROAD, pools);
 		(void)road;
 	}
+
+	{
+		auto& welcome_to_metropolis = create_official(official_sprites::WELCOME_TO_METROPOLIS, pools).editable;
+		welcome_to_metropolis.domain = editor_sprite_domain::FOREGROUND;
+		welcome_to_metropolis.foreground_glow = true;
+	}
+
+	{
+		auto& awakening = create_official(official_sprites::AWAKENING, pools).editable;
+		awakening.domain = editor_sprite_domain::FOREGROUND;
+		awakening.foreground_glow = true;
+	}
 }
 
 void create_sounds(editor_resource_pools& pools) {

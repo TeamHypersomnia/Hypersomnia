@@ -8,7 +8,6 @@
 
 #include "application/setups/editor/editor_setup.hpp"
 #include "application/setups/editor/project/editor_layers.h"
-#include "application/setups/debugger/detail/maybe_different_colors.h"
 #include "application/setups/editor/gui/editor_layers_gui.h"
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/editor_setup.h"
