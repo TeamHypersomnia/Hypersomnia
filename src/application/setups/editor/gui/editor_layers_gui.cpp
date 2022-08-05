@@ -14,6 +14,7 @@
 #include "application/setups/editor/gui/widgets/icon_button.h"
 #include "application/setups/editor/editor_get_icon_for.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
+#include "application/setups/editor/resources/can_be_instantiated.h"
 
 void editor_layers_gui::perform(const editor_layers_input in) {
 	using namespace augs::imgui;
@@ -154,7 +155,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	int node_id_counter = 0;
 
-	auto create_dragged_resource_in = [&](const auto layer_id, const auto index) {
+	auto create_dragged_resource_in = [&](const auto layer_id, const auto index, const vec2 pos) {
 		if (!in.dragged_resource.is_set()) {
 			return;
 		}
@@ -168,6 +169,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			node_type new_node;
 			new_node.resource_id = resource_id;
 			new_node.unique_name = new_name;
+			new_node.editable.pos = pos;
 
 			create_node_command<node_type> command;
 
@@ -181,7 +183,11 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 		in.setup.on_resource(
 			in.dragged_resource,
-			instantiate
+			[&]<typename T>(const T& typed_resource, const auto resource_id) {
+				if constexpr(can_be_instantiated_v<T>) {
+					instantiate(typed_resource, resource_id);
+				}
+			}
 		);
 
 		in.dragged_resource.unset();
@@ -361,7 +367,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				if (ImGui::BeginDragDropTarget()) {
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
-						create_dragged_resource_in(layer_id, node_index);
+						create_dragged_resource_in(layer_id, node_index, node.get_transform().pos);
 					}
 
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_node")) {
@@ -613,7 +619,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				if (ImGui::BeginDragDropTarget()) {
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
-						create_dragged_resource_in(layer_id, 0);
+						create_dragged_resource_in(layer_id, 0, vec2::zero);
 						layer.is_open = true;
 					}
 

@@ -52,6 +52,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_node_command<editor_sprite_node>,
 	edit_node_command<editor_sound_node>,
 	edit_node_command<editor_light_node>,
+	edit_node_command<editor_particles_node>,
 
 	rename_node_command,
 
@@ -62,6 +63,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	create_node_command<editor_sprite_node>,
 	create_node_command<editor_sound_node>,
 	create_node_command<editor_light_node>,
+	create_node_command<editor_particles_node>,
 
 	reorder_nodes_command,
 	reorder_layers_command,

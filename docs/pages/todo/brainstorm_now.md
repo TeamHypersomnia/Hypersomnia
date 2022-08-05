@@ -6,6 +6,34 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- All physical materials will be official for now so we don't have to worry about serializing the collision matrix
+	- We'll determine later if we want to have a global collision matrix or just per-material entries because it won't be editable for now
+- Same with particles, we'll just use the officials everywhere and not worry about serialization
+	- So that will just be a copy-paste mostly
+
+- For serializing stuff like ids we should pass a lambda to write_json that has all the required references to properly map the id to a proper name
+	- For now let's have the default modifiers embedded in resources themselves and let's see how far it will take us
+		- Should work for entities at least since we have no component with modifier, how much really a single sound effect would be reused among flavors?
+			- Well maybe apart from stuff like footsteps
+			- okay but still different sprites for each of these and thus separate fields with modifiers possible
+	- Let's really not store std string directly there
+
+- Technically, it's the nodes/entities that should have modifiers, not resources/flavours
+	- We need to fix the particle decoration implementation
+	- but we need to preserve bincompat for now
+- Similarly sound_effect_modifier is more like the default properties like the particles' emissions, a modifier would just be gain or sth
+
+
+- I think none of the special resources will be editable for now
+- We don't have to write serialization for anything that we provide as official
+	- It's enough that referencing it is implemented
+	- So we can have physical materials natively for now
+
+- Materials
+	- Can't we for now have a set of defaults without it being editable?
+		- This could be officials
+
+
 - Screw that mouse confirmation for now, encourage enter usage (lol)
 
 - Alright let's now try creating various entity types like lights and sounds

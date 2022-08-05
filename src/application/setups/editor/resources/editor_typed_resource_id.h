@@ -13,6 +13,10 @@ struct editor_typed_resource_id {
 	editor_resource_pool_id raw;
 	bool is_official = false;
 
+	static editor_typed_resource_id<E> from_raw(const editor_resource_pool_id& raw, const bool is_official) {
+		return { raw, is_official };
+	}
+
 	static editor_typed_resource_id<E> from_generic(const editor_resource_id& id) {
 		return { id.raw, id.is_official };
 	}
@@ -35,4 +39,17 @@ struct editor_typed_resource_id {
 	bool is_set() const {
 		return raw.is_set();
 	}
+
+	auto hash() const {
+		return augs::hash_multiple(raw, is_official);
+	}
 };
+
+namespace std {
+	template <class E>
+	struct hash<editor_typed_resource_id<E>> {
+		std::size_t operator()(const editor_typed_resource_id<E> v) const {
+			return v.hash();
+		}
+	};
+}

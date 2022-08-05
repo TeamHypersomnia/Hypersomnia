@@ -1,6 +1,5 @@
 #pragma once
 #include "application/setups/editor/resources/editor_pathed_resource.h"
-
 #include "game/detail/view_input/sound_effect_modifier.h"
 
 struct editor_sound_resource_editable : sound_effect_modifier {
@@ -12,10 +11,8 @@ struct editor_sound_node;
 struct editor_sound_resource {
 	using node_type = editor_sound_node;
 
-	// GEN INTROSPECTOR struct editor_sound_resource
 	editor_pathed_resource external_file;
 	editor_sound_resource_editable editable;
-	// END GEN INTROSPECTOR
 
 	/* Only for quick mapping */
 	mutable std::variant<

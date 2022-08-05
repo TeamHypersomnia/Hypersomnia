@@ -9,23 +9,30 @@
 #include "application/setups/editor/editor_filesystem.h"
 #include "augs/image/image.h"
 
+#include "application/setups/editor/detail/official_id_to_pool_id.h"
+
 #define OFFICIAL_CONTENT_PATH augs::path_type(OFFICIAL_CONTENT_DIR)
 
 template <class T>
 constexpr bool is_pathed_resource_v = is_one_of_v<T, editor_sprite_resource, editor_sound_resource>;
 
-using to_resource_type_t = type_map<
-	type_pair<official_sprites, editor_sprite_resource>,
-	type_pair<official_sounds, editor_sound_resource>,
-	type_pair<official_lights, editor_light_resource>
->;
+template <class R>
+auto& get_resource(const editor_typed_resource_id<R> typed_id, editor_resource_pools& pools) {
+	auto& pool = pools.template get_pool_for<R>();
+	return pool.get(typed_id.raw).editable;
+}
 
 template <class E>
-auto& create_official(E id, editor_resource_pools& pools) {
+auto& get_resource(const E official_id, editor_resource_pools& pools) {
+	return get_resource(to_resource_id(official_id), pools);
+}
+
+template <class E>
+auto& create_official(const E official_id, editor_resource_pools& pools) {
 	using R = to_resource_type_t::at<E>;
 	auto& pool = pools.template get_pool_for<R>();
 
-	const auto lowercase_stem = to_lowercase(augs::enum_to_string(id));
+	const auto lowercase_stem = to_lowercase(augs::enum_to_string(official_id));
 
 	if constexpr(is_pathed_resource_v<R>) {
 		auto create_pathed_resource = [&](
@@ -43,7 +50,11 @@ auto& create_official(E id, editor_resource_pools& pools) {
 			const auto hash = "";
 			const auto stamp = augs::file_time_type();
 
-			auto& new_object = pool.allocate(editor_pathed_resource(trimmed_path, hash, stamp)).object;
+			const auto [new_id, new_object] = pool.allocate(editor_pathed_resource(trimmed_path, hash, stamp));
+			const auto recreated_pool_id = to_resource_id(official_id);
+
+			/* Resources must be created in order! */
+			ensure(recreated_pool_id.raw == new_id);
 
 			return new_object;
 		};
@@ -70,59 +81,26 @@ auto& create_official(E id, editor_resource_pools& pools) {
 		}
 	}
 	else {
-		auto& new_object = pool.allocate().object;
+		const auto [new_id, new_object] = pool.allocate();
+		const auto recreated_pool_id = to_resource_id(official_id);
+
+		/* Resources must be created in order! */
+		ensure(recreated_pool_id.raw == new_id);
+
 		new_object.unique_name = lowercase_stem;
 
 		return new_object;
 	}
 }
 
-void create_lights(editor_resource_pools& pools) {
-	{
-		auto& strong_lamp = create_official(official_lights::STRONG_LAMP, pools);
-		(void)strong_lamp;
-	}
-
-	{
-		auto& aquarium_lamp = create_official(official_lights::AQUARIUM_LAMP, pools).editable;
-		aquarium_lamp.attenuation.constant = 75;
-		aquarium_lamp.attenuation.quadratic = 631;
-	}
-}
-
-void create_sprites(editor_resource_pools& pools) {
-	{
-		auto& road = create_official(official_sprites::ROAD, pools);
-		(void)road;
-	}
-
-	{
-		auto& welcome_to_metropolis = create_official(official_sprites::WELCOME_TO_METROPOLIS, pools).editable;
-		welcome_to_metropolis.domain = editor_sprite_domain::FOREGROUND;
-		welcome_to_metropolis.foreground_glow = true;
-	}
-
-	{
-		auto& awakening = create_official(official_sprites::AWAKENING, pools).editable;
-		awakening.domain = editor_sprite_domain::FOREGROUND;
-		awakening.foreground_glow = true;
-	}
-}
-
-void create_sounds(editor_resource_pools& pools) {
-	{
-		auto& loudy_fan = create_official(official_sounds::LOUDY_FAN, pools).editable;
-
-		loudy_fan.distance_model = augs::distance_model::LINEAR_DISTANCE_CLAMPED;
-		loudy_fan.reference_distance = 20.0f;
-		loudy_fan.max_distance = 400.0f;
-		loudy_fan.doppler_factor = 1.0f;
-		loudy_fan.gain = 0.5f;
-	}
-}
+#include "application/setups/editor/official/create_official_sprites.h"
+#include "application/setups/editor/official/create_official_materials.h"
+#include "application/setups/editor/official/create_official_lights.h"
+#include "application/setups/editor/official/create_official_sounds.h"
 
 void create_official_resources(editor_resource_pools& pools) {
 	create_lights(pools);
+	create_materials(pools);
 
 	create_sprites(pools);
 	create_sounds(pools);

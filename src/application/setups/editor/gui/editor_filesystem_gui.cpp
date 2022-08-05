@@ -11,6 +11,7 @@
 #include "application/setups/editor/gui/widgets/icon_button.h"
 #include "application/setups/editor/gui/widgets/filesystem_node_widget.h"
 #include "application/setups/editor/detail/simple_two_tabs.h"
+#include "application/setups/editor/resources/can_be_instantiated.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem();
@@ -88,7 +89,11 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				if (!previewed_created_node.is_set()) {
 					in.setup.on_resource(
 						dragged_resource,
-						instantiate
+						[&]<typename T>(const T& typed_resource, const auto resource_id) {
+							if constexpr(can_be_instantiated_v<T>) {
+								instantiate(typed_resource, resource_id);
+							}
+						}
 					);
 				}
 			}
