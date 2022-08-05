@@ -619,7 +619,18 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				if (ImGui::BeginDragDropTarget()) {
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("dragged_resource")) {
-						create_dragged_resource_in(layer_id, 0, vec2::zero);
+						auto average = vec2::zero;
+						int count = 0;
+
+						for (const auto& child_node_id : layer.hierarchy.nodes) {
+							in.setup.on_node(child_node_id, [&](const auto& n, auto) { average += n.get_transform().pos; ++count; });
+						}
+
+						if (count != 0) {
+							average /= count;
+						}
+
+						create_dragged_resource_in(layer_id, 0, average);
 						layer.is_open = true;
 					}
 
