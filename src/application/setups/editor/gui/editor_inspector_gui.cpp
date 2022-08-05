@@ -51,7 +51,7 @@ std::string as_hex(const rgba& col) {
 }
 
 template <class T>
-void edit_property(
+bool edit_property(
 	std::string& result,
 	const std::string& label,
 	T& property
@@ -62,11 +62,13 @@ void edit_property(
 		if (label.size() > 0 && label[0] == '#') {
 			if (color_picker(label, property)) {
 				result = typesafe_sprintf("Set Color to %x in %x", as_hex(property));
+				return true;
 			}
 		}
 		else {
 			if (color_edit(label, property)) {
 				result = typesafe_sprintf("Set %x to %x in %x", label, as_hex(property));
+				return true;
 			}
 		}
 	}
@@ -74,36 +76,69 @@ void edit_property(
 		if (checkbox(label, property)) {
 			if (property) {
 				result = typesafe_sprintf("Enable %x in %x", label);
+				return true;
 			}
 			else {
 				result = typesafe_sprintf("Disable %x in %x", label);
+				return true;
 			}
 		}
 	}
 	else if constexpr(std::is_arithmetic_v<T>) {
 		if (drag(label, property)) { 
 			result = typesafe_sprintf("Set %x to %x in %x", label, property);
+			return true;
 		}
 	}
 	else if constexpr(std::is_enum_v<T>) {
 		if (enum_combo(label, property)) { 
 			result = typesafe_sprintf("Set %x to %x in %x", label, property);
+			return true;
 		}
 	}
 	else if constexpr(is_one_of_v<T, vec2, vec2i>) {
 		if (drag_vec2(label, property)) { 
 			result = typesafe_sprintf("Set %x to %x in %x", label, property);
+			return true;
 		}
 	}
+
+	return false;
 }
 
-std::string perform_editable_gui(editor_sprite_node_editable& e) {
+std::string perform_editable_gui(editor_sprite_node_editable& e, const vec2i default_size) {
 	using namespace augs::imgui;
 
 	std::string result;
 
+	edit_property(result, "Position", e.pos);
+	edit_property(result, "Rotation", e.rotation);
+
 	edit_property(result, "Flip horizontally", e.flip_horizontally);
+	ImGui::SameLine();
 	edit_property(result, "Flip vertically", e.flip_vertically);
+
+	edit_property(result, "Colorize", e.colorize);
+
+	bool size_enabled = e.size != std::nullopt;
+
+	if (checkbox("Resize", size_enabled)) {
+		if (size_enabled) {
+			e.size = default_size;
+			result = "Override size in %x";
+		}
+		else {
+			e.size = std::nullopt;
+			result = "Reset size to default in %x";
+		}
+	}
+
+	if (e.size != std::nullopt) {
+		ImGui::SameLine();
+		if (edit_property(result, "##Overridden size", *e.size)) {
+			result = "Resized %x";
+		}
+	}
 
 	return result;
 }
@@ -360,24 +395,24 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				}
 			}
 		}
-		if constexpr(
-			std::is_same_v<N, editor_sprite_node> 
-			|| std::is_same_v<N, editor_sound_node>
-		) {
+		ImGui::Separator();
+		auto edited_copy = node.editable;
+		auto changed = std::string();
 
-			ImGui::Separator();
+		if constexpr(std::is_same_v<N, editor_sprite_node>) {
+			const auto resource = in.setup.find_resource(node.resource_id);
+			ensure(resource != nullptr);
 
-			auto edited_copy = node.editable;
-			const auto changed = perform_editable_gui(edited_copy);
+			changed = perform_editable_gui(edited_copy, resource->editable.size);
+		}
 
-			if (!changed.empty()) {
-				edit_node_command<N> cmd;
-				cmd.node_id = node_id;
-				cmd.after = edited_copy;
-				cmd.built_description = typesafe_sprintf(changed, node.get_display_name());
+		if (!changed.empty()) {
+			edit_node_command<N> cmd;
+			cmd.node_id = node_id;
+			cmd.after = edited_copy;
+			cmd.built_description = typesafe_sprintf(changed, node.get_display_name());
 
-				post_new_or_rewrite(std::move(cmd)); 
-			}
+			post_new_or_rewrite(std::move(cmd)); 
 		}
 
 		(void)node;

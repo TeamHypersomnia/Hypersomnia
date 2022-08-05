@@ -18,7 +18,9 @@ struct editor_sound_resource {
 	// END GEN INTROSPECTOR
 
 	/* Only for quick mapping */
-	mutable entity_flavour_id scene_flavour_id;
+	mutable std::variant<
+		typed_entity_flavour_id<sound_decoration>
+	> scene_flavour_id;
 
 	editor_sound_resource(const editor_pathed_resource& f) : external_file(f) {}
 

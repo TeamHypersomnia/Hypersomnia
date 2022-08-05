@@ -148,6 +148,10 @@ struct typed_entity_id {
 	auto hash() const {
 		return augs::hash_multiple(raw);
 	}
+
+	auto get_type_id() const {
+		return entity_type_id::of<E>();
+	}
 }; 
 
 template <class T>

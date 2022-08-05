@@ -40,7 +40,10 @@ struct editor_sprite_resource {
 	ad_hoc_entry_id thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
 
 	/* Only for quick mapping */
-	mutable entity_flavour_id scene_flavour_id;
+	mutable std::variant<
+		typed_entity_flavour_id<static_decoration>,
+		typed_entity_flavour_id<plain_sprited_body>
+	> scene_flavour_id;
 
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 

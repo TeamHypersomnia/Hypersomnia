@@ -6,8 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Screw that mouse confirmation for now, encourage enter usage (lol)
+
 - Alright let's now try creating various entity types like lights and sounds
-	- And fix those icons
+	- And fix that icon hover logic
 
 - Another special resource: materials
 	- But only physical, we won't create a separate material for grounds as it's just a single sound

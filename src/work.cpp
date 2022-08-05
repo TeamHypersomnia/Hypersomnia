@@ -2423,7 +2423,9 @@ work_result work(const int argc, const char* const * const argv) try {
 				*/
 
 				write_buffer.should_pause_cursor = in_direct_gameplay;
-				
+
+				const bool was_any_imgui_popup_opened = ImGui::IsPopupOpen(0u, ImGuiPopupFlags_AnyPopupId);
+
 				do_imgui_pass(get_current_frame_num(), new_window_entropy, frame_delta, in_direct_gameplay);
 
 				const auto viewing_config = get_setup_customized_config();
@@ -2472,7 +2474,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					/* Now is the time to actually track the input state. */
 					common_input_state.apply(e);
 
-					if (e.was_pressed(key::ESC)) {
+					if (!was_any_imgui_popup_opened && e.was_pressed(key::ESC)) {
 						if (has_current_setup()) {
 							if (ingame_menu.show) {
 								ingame_menu.show = false;

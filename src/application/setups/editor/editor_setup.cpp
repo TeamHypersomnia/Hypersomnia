@@ -1046,6 +1046,50 @@ editor_node_id editor_setup::to_node_id(entity_id id) const {
 	return {};
 }
 
+template <class N, class R, class H, class A>
+void setup_entity_from_node(
+	const sorting_order_type total_order,
+	const editor_layer& layer,
+	const N& node, 
+	const R& resource,
+	H& handle, 
+	A& agg
+) {
+	using Editable = decltype(node.editable);
+	auto& editable = node.editable;
+
+	if (auto sorting_order = agg.template find<components::sorting_order>()) {
+		sorting_order->order = total_order;
+	}
+
+	if constexpr(std::is_same_v<N, editor_sprite_node>) {
+		auto& sprite = agg.template get<components::sprite>();
+		sprite.colorize = editable.colorize;
+
+		const auto alpha_mult = layer.editable.alpha_mult;
+
+		if (alpha_mult != 1.0f) {
+			sprite.colorize.mult_alpha(alpha_mult);
+		}
+	}
+
+	if (auto geo = agg.template find<components::overridden_geo>()) {
+		if constexpr(has_size_v<Editable>) {
+			if (bool(editable.size)) {
+				geo->size.emplace(editable.size.value());
+			}
+		}
+
+		if constexpr(has_flip_v<Editable>) {
+			geo->flip.horizontally = editable.flip_horizontally;
+			geo->flip.vertically = editable.flip_vertically;
+		}
+	}
+
+	handle.set_logic_transform(node.get_transform());
+	(void)resource;
+}
+
 void editor_setup::rebuild_scene() {
 	scene.clear();
 
@@ -1196,63 +1240,40 @@ void editor_setup::rebuild_scene() {
 				return;
 			}
 
-			auto setup_entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
-				// using entity_type = typename H::used_entity_type;
-
-				if (auto sorting_order = agg.template find<components::sorting_order>()) {
-					sorting_order->order = total_order;
-				}
-
-				if (auto sprite = agg.template find<components::sprite>()) {
-					const auto alpha_mult = layer->editable.alpha_mult;
-
-					if (alpha_mult != 1.0f) {
-						sprite->colorize.mult_alpha(alpha_mult);
-					}
-				}
-
-				using Node = decltype(typed_node.editable);
-				auto& node = typed_node.editable;
-
-				if (auto geo = agg.template find<components::overridden_geo>()) {
-					if constexpr(has_size_v<Node>) {
-						if (bool(node.size)) {
-							geo->size.emplace(node.size.value());
-						}
-					}
-
-					if constexpr(has_flip_v<Node>) {
-						geo->flip.horizontally = node.flip_horizontally;
-						geo->flip.vertically = node.flip_vertically;
-					}
-				}
-
-				handle.set_logic_transform(typed_node.get_transform());
-			};
-
-			auto entity_post_constructor = [&](auto&&...) {
-
-			};
-
 			if constexpr(
 				std::is_same_v<editor_sprite_node, node_type> ||
 				std::is_same_v<editor_sound_node, node_type>
 			) {
-				const auto new_id = cosmic::create_entity(
-					scene.world,
-					resource->scene_flavour_id,
-					setup_entity_from_node,
-					entity_post_constructor
-				).get_id();
+				auto entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
+					::setup_entity_from_node(
+						total_order, 
+						*layer,
+						typed_node, 
+						resource,
+						handle, 
+						agg
+					);
+				};
 
-				const auto mapping_index = new_id.type_id.get_index();
-				auto& mapping = scene_entity_to_node[mapping_index];
+				std::visit(
+					[&](const auto& typed_flavour_id) {
+						const auto new_id = cosmic::specific_create_entity(
+							scene.world,
+							typed_flavour_id,
+							entity_from_node
+						).get_id();
 
-				ensure_eq(mapping.size(), std::size_t(new_id.raw.indirection_index));
-				ensure_eq(decltype(new_id.raw.version)(1), new_id.raw.version);
+						const auto mapping_index = new_id.get_type_id().get_index();
+						auto& mapping = scene_entity_to_node[mapping_index];
 
-				mapping.emplace_back(node_id.operator editor_node_id());
-				typed_node.scene_entity_id = new_id;
+						ensure_eq(mapping.size(), std::size_t(new_id.raw.indirection_index));
+						ensure_eq(decltype(new_id.raw.version)(1), new_id.raw.version);
+
+						mapping.emplace_back(node_id.operator editor_node_id());
+						typed_node.scene_entity_id = new_id;
+					},
+					resource->scene_flavour_id
+				);
 			}
 			else {
 				//static_assert(always_false_v<P>, "Non-exhaustive if constexpr");
