@@ -118,13 +118,13 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		}
 	};
 
-	if (icon_button("##NewLayer", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], new_layer_drag_drop_callback, "New layer", true)) {
+	if (icon_button("##NewLayer", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], new_layer_drag_drop_callback, "New layer (N)", true)) {
 		in.setup.create_new_layer();
 	}
 
 	ImGui::SameLine();
 
-	if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Duplicate selection", node_or_layer_inspected)) {
+	if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Duplicate selection (C)", node_or_layer_inspected)) {
 		const bool move_selection = false;
 		in.setup.duplicate_selection(move_selection);
 	}
@@ -140,7 +140,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 		const auto remove_tint = rgba(220, 80, 80, 255);
 
-		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], [](){}, "Remove selection", node_or_layer_inspected, remove_tint, remove_bgs)) {
+		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], [](){}, "Remove selection (D)", node_or_layer_inspected, remove_tint, remove_bgs)) {
 			in.setup.delete_selection();
 		}
 	}

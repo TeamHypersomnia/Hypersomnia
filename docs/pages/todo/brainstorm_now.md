@@ -6,6 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Resources reference resolution: creation order by type is important 
+	- E.g. first we need to create all the materials to pass them to physical sprites
+		- But we first need to create sounds/particles to pass them to materials
+			- what if a particle effect needs a sprite again?
+	- Well then, we should first only create all the resources to establish identities
+	
+
+- Handle throw_through later, we'll make it just see-through for the moment
+	- we'll have a separate filter for that probably
+
+- I would say ultimately physical material is for damage sound/particle effects
+	- Although maybe let's leave that ricochet there after all
+
+- What we'd really want to avoid is to having to specify collision sounds twice because we want different restitution/density on say another wooden body
+	- max_ricochet_angle is likely something we'd like to unify, though
+
 - All physical materials will be official for now so we don't have to worry about serializing the collision matrix
 	- We'll determine later if we want to have a global collision matrix or just per-material entries because it won't be editable for now
 - Same with particles, we'll just use the officials everywhere and not worry about serialization

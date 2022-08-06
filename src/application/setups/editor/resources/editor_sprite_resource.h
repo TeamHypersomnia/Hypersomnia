@@ -6,6 +6,7 @@
 #include "augs/drawing/sprite.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "application/setups/editor/resources/editor_typed_resource_id.h"
 
 enum class editor_sprite_domain {
 	// GEN INTROSPECTOR enum class editor_sprite_domain
@@ -17,14 +18,30 @@ enum class editor_sprite_domain {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_material_resource;
+
 struct editor_sprite_resource_editable {
 	// GEN INTROSPECTOR struct editor_sprite_resource_editable
 	editor_sprite_domain domain = editor_sprite_domain::BACKGROUND;
 
 	rgba color = white;
+	rgba neon_color = white;
+
 	vec2i size = vec2i::zero;
 	bool stretch_when_resized = false;
+
 	bool foreground_glow = false;
+
+	bool is_static = false;
+	bool is_see_through = false;
+	real32 density = 0.7f;
+	real32 friction = 0.0f;
+	real32 restitution = 0.2f;
+
+	real32 linear_damping = 6.5f;
+	real32 angular_damping = 6.5f;
+
+	editor_typed_resource_id<editor_material_resource> material;
 	// END GEN INTROSPECTOR
 };
 

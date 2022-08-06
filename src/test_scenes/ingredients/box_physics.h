@@ -104,9 +104,6 @@ namespace test_flavours {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
-		body_def.damping.linear = 6.5f;
-		body_def.damping.angular = 6.5f;
-
 		body_def.body_type = rigid_body_type::ALWAYS_STATIC;
 
 		fixtures_def.filter = filters[predefined_filter_type::WALL];

@@ -1,3 +1,4 @@
+#include "augs/templates/enum_introspect.h"
 #include "augs/templates/history.hpp"
 #include "application/setups/editor/editor_setup.hpp"
 #include "augs/misc/imgui/imgui_utils.h"
@@ -179,6 +180,23 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::
 
 	if (e.domain == editor_sprite_domain::FOREGROUND) {
 		edit_property(result, "Foreground glow", e.foreground_glow);
+	}
+
+	if (e.domain == editor_sprite_domain::PHYSICAL) {
+		ImGui::Separator();
+		text_color("Physics", yellow);
+		ImGui::Separator();
+
+		edit_property(result, "Is static", e.is_static);
+		edit_property(result, "Is see-through", e.is_static);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If enabled, lets the light through.\nEnemies will be visible behind this object.\nUse it on walls of glass.");
+		}
+
+		edit_property(result, "Density", e.density);
+		edit_property(result, "Friction", e.friction);
+		edit_property(result, "Restitution", e.restitution);
 	}
 
 	ImGui::Separator();

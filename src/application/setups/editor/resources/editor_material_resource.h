@@ -32,7 +32,9 @@ struct editor_material_resource_editable {
 
 	editor_sound_effect standard_damage_sound;
 	editor_particle_effect standard_damage_particles;
+
 	real32 unit_effect_damage = 30.f;
+	real32 max_ricochet_angle = 20.0f;
 	// END GEN INTROSPECTOR
 };
 

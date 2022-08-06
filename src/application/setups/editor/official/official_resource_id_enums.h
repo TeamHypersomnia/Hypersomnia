@@ -12,6 +12,8 @@ enum class official_sprites {
 	AWAKENING,
 	WELCOME_TO_METROPOLIS,
 
+	AQUARIUM_GLASS,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

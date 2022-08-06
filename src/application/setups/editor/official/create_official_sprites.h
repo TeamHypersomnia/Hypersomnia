@@ -23,4 +23,19 @@ void create_sprites(editor_resource_pools& pools) {
 		welcome_to_metropolis.domain = editor_sprite_domain::FOREGROUND;
 		welcome_to_metropolis.foreground_glow = true;
 	}
+
+	const auto glass_alpha = 60;
+	const auto glass_neon_alpha = 130;
+
+	{
+		auto& aquarium_glass = create_sprite(official_sprites::AQUARIUM_GLASS);
+
+		aquarium_glass.domain = editor_sprite_domain::PHYSICAL;
+		aquarium_glass.is_static = true;
+		aquarium_glass.is_see_through = true;
+		aquarium_glass.restitution = 0.4;
+
+		aquarium_glass.color.a = glass_alpha;
+		aquarium_glass.neon_color.a = glass_neon_alpha;
+	}
 }
