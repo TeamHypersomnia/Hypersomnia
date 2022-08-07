@@ -69,4 +69,8 @@ struct editor_sprite_resource {
 	decltype(auto) get_display_name() const {
 		return external_file.get_display_name();
 	}
+
+	static const char* get_type_name() {
+		return "Sprite";
+	}
 };

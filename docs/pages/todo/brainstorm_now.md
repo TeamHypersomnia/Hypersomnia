@@ -6,6 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Yeah I'm thinking let's first do those complex topics 
+	- that will let us finally strap everything into place
+
+- For particles we might just templatize the particle effect by the image id and animation id
+	- We don't even have to explicitly instantiate particle types as the defs are included in hpp
+
+- I think we'll first implement animations because we'll need them for the particles
+
+- Let's implement those gifs because it's constantly on my mind
+	- And it will be somewhat fun
+
 - Handle throw_through later, we'll make it just see-through for the moment
 	- we'll have a separate filter for that probably
 

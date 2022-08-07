@@ -31,4 +31,8 @@ struct editor_sound_node {
 	const auto& get_display_name() const {
 		return unique_name;
 	}
+
+	static const char* get_type_name() {
+		return "Sound";
+	}
 };

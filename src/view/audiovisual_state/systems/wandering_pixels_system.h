@@ -14,7 +14,6 @@
 class visible_entities;
 
 class interpolation_system;
-struct particles_emission;
 struct randomization;
 
 class wandering_pixels_system {

@@ -1,5 +1,5 @@
 #pragma once
-#include "application/setups/editor/resources/can_be_instantiated.h"
+#include "application/setups/editor/resources/resource_traits.h"
 #include "game/enums/filters.h"
 
 template <class N, class R, class H, class A>
@@ -173,6 +173,8 @@ void setup_scene_object_from_resource(
 	}
 	else if constexpr(std::is_same_v<editor_particles_resource, R>) {
 		if constexpr(std::is_same_v<R, particle_effect>) {
+			// TODO: we'll have to call introspective assign here
+
 			scene.emissions = editable.emissions;
 			scene.name = resource.get_display_name();
 		}

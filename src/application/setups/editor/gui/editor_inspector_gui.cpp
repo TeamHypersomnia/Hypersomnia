@@ -20,6 +20,7 @@
 #include "application/setups/editor/detail/simple_two_tabs.h"
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
+#include "application/setups/editor/resources/resource_traits.h"
 
 void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
@@ -144,9 +145,30 @@ std::string perform_editable_gui(editor_sprite_node_editable& e, const vec2i def
 	return result;
 }
 
-std::string perform_editable_gui(editor_sound_node_editable&) {
+std::string perform_editable_gui(editor_sound_node_editable& e) {
 	using namespace augs::imgui;
 	std::string result;
+
+	edit_property(result, "Position", e.pos);
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_light_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Position", e.pos);
+	edit_property(result, "Scale intensity", e.scale_intensity);
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_particles_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Position", e.pos);
 
 	return result;
 }
@@ -211,6 +233,30 @@ std::string perform_editable_gui(editor_sound_resource_editable&) {
 	return result;
 }
 
+std::string perform_editable_gui(editor_light_resource_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "##Defaultcolor", e.color);
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_particles_resource_editable&) {
+	using namespace augs::imgui;
+	std::string result;
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_material_resource_editable&) {
+	using namespace augs::imgui;
+	std::string result;
+
+	return result;
+}
+
+
 void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants_multiple) {
 	auto different_found = [&]<typename T>(const T&) {
 		return inspects_any_different_than<T>();
@@ -259,7 +305,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		return;
 	}
 
-	auto get_object_type_name = [&]<typename T>(const T&) {
+	auto get_object_category_name = [&]<typename T>(const T&) {
 		if constexpr(std::is_same_v<T, editor_node_id>) {
 			return "nodes";
 		}
@@ -303,11 +349,17 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		}
 	};
 
-	auto resource_handler = [&]<typename R>(const R& resource, const auto& resource_id, std::optional<std::vector<inspected_variant>> override_inspector = std::nullopt) {
-		if constexpr(
-			std::is_same_v<R, editor_sprite_resource> 
-			|| std::is_same_v<R, editor_sound_resource>
-		) {
+	auto resource_handler = [&]<typename R>(
+		const R& resource, 
+		const auto& resource_id, 
+		std::optional<std::vector<inspected_variant>> override_inspector_state = std::nullopt
+	) {
+		auto name = resource.get_display_name();
+
+		if constexpr(is_pathed_resource_v<R>) {
+			/* Preserve extension when displaying name */
+			name = resource.external_file.path_in_project.filename().string();
+			
 			auto reveal_in_explorer_button = [this](const auto& path) {
 				auto cursor = scoped_preserve_cursor();
 
@@ -320,7 +372,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				}
 			};
 
-			const auto name = resource.external_file.path_in_project.filename().string();
 			const auto& path_in_project = resource.external_file.path_in_project;
 
 			const auto full_path = 
@@ -330,71 +381,58 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			;
 
 			reveal_in_explorer_button(full_path);
-
-			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
-				text_color("Sprite: ", yellow);
-			}
-			if constexpr(std::is_same_v<R, editor_sound_resource>) {
-				text_color("Sound: ", yellow);
-			}
-
-			ImGui::SameLine();
-			text(name);
-
-			//game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
-
-			ImGui::Separator();
-
-			const auto path_string = resource.external_file.path_in_project.string();
-			auto id = scoped_id(path_string.c_str());
-
-			auto edited_copy = resource.editable;
-			auto changed = std::string();
-
-			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
-				auto original_size = std::optional<vec2i>();
-
-				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, resource.thumbnail_id)) {
-					original_size = ad_hoc->get_original_size();
-				}
-
-				/* 
-					It's probably better to leave the widgets themselves active
-					in case someone wants to copy the values.
-				*/
-
-				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
-				changed = perform_editable_gui(edited_copy, original_size);
-
-			}
-			if constexpr(std::is_same_v<R, editor_sound_resource>) {
-				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
-				changed = perform_editable_gui(edited_copy);
-			}
-
-			if (!changed.empty() && !resource_id.is_official) {
-				edit_resource_command<R> cmd;
-				cmd.resource_id = resource_id;
-				cmd.after = edited_copy;
-				cmd.built_description = typesafe_sprintf(changed, resource.get_display_name());
-				cmd.override_inspector_state = std::move(override_inspector);
-
-				post_new_or_rewrite(std::move(cmd)); 
-			}
 		}
 
-		(void)resource;
+		text_color(std::string(resource.get_type_name()) + ": ", yellow);
+
+		ImGui::SameLine();
+		text(name);
+
+		//game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
+
+		ImGui::Separator();
+
+		auto id = scoped_id(name.c_str());
+
+		auto edited_copy = resource.editable;
+		auto changed = std::string();
+
+		if constexpr(std::is_same_v<R, editor_sprite_resource>) {
+			auto original_size = std::optional<vec2i>();
+
+			if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, resource.thumbnail_id)) {
+				original_size = ad_hoc->get_original_size();
+			}
+
+			/* 
+				It's probably better to leave the widgets themselves active
+				in case someone wants to copy the values.
+			*/
+
+			auto disabled = maybe_disabled_only_cols(resource_id.is_official);
+			changed = perform_editable_gui(edited_copy, original_size);
+
+		}
+		else {
+			auto disabled = maybe_disabled_only_cols(resource_id.is_official);
+			changed = perform_editable_gui(edited_copy);
+		}
+
+		if (!changed.empty() && !resource_id.is_official) {
+			edit_resource_command<R> cmd;
+			cmd.resource_id = resource_id;
+			cmd.after = edited_copy;
+			cmd.built_description = typesafe_sprintf(changed, resource.get_display_name());
+			cmd.override_inspector_state = std::move(override_inspector_state);
+
+			post_new_or_rewrite(std::move(cmd)); 
+		}
 	};
 
 	auto node_handler = [&]<typename N>(const N& node, const auto& node_id) {
 		auto id = scoped_id(node.unique_name.c_str());
 
-		if constexpr(std::is_same_v<N, editor_sprite_node>) {
-			text_color("Sprite: ", yellow);
-		}
-		if constexpr(std::is_same_v<N, editor_sound_node>) {
-			text_color("Sound: ", yellow);
-		}
+		text_color(std::string(node.get_type_name()) + ": ", yellow);
 
 		{
 			ImGui::SameLine();
@@ -422,6 +460,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			ensure(resource != nullptr);
 
 			changed = perform_editable_gui(edited_copy, resource->editable.size);
+		}
+		else {
+			changed = perform_editable_gui(edited_copy);
 		}
 
 		if (!changed.empty()) {
@@ -506,7 +547,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		std::visit(edit_properties, all_inspected[0]);
 	}
 	else {
-		text_color(typesafe_sprintf("Selected %x %x:", all_inspected.size(), std::visit(get_object_type_name, all_inspected[0])), yellow);
+		text_color(typesafe_sprintf("Selected %x %x:", all_inspected.size(), std::visit(get_object_category_name, all_inspected[0])), yellow);
 
 		ImGui::Separator();
 

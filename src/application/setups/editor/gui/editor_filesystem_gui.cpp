@@ -11,7 +11,7 @@
 #include "application/setups/editor/gui/widgets/icon_button.h"
 #include "application/setups/editor/gui/widgets/filesystem_node_widget.h"
 #include "application/setups/editor/detail/simple_two_tabs.h"
-#include "application/setups/editor/resources/can_be_instantiated.h"
+#include "application/setups/editor/resources/resource_traits.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem();
@@ -248,6 +248,9 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 	auto& wandering_pixels_folder = special_root.subfolders[i++];
 	auto& prefabs_folder = special_root.subfolders[i++];
 
+	(void)prefabs_folder;
+	(void)wandering_pixels_folder;
+
 	auto handle = [&]<typename P>(editor_filesystem_node& parent, P& pool, const auto icon_id) {
 		using resource_type = typename P::value_type;
 
@@ -276,9 +279,9 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 	};
 
 	// TODO: redirect to proper pools!
-	handle(particles_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE);
-	handle(wandering_pixels_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS);
-	handle(prefabs_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
+	handle(particles_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE);
+	//handle(wandering_pixels_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS);
+	//handle(prefabs_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
 
 	handle(lights_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_LIGHT);
 

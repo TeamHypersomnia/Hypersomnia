@@ -14,6 +14,13 @@ enum class official_sprites {
 
 	AQUARIUM_GLASS,
 
+	SMOKE_1,
+	SMOKE_2,
+	SMOKE_3,
+	SMOKE_4,
+	SMOKE_5,
+	SMOKE_6,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

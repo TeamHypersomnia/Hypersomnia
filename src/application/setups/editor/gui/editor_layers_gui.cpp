@@ -14,7 +14,7 @@
 #include "application/setups/editor/gui/widgets/icon_button.h"
 #include "application/setups/editor/editor_get_icon_for.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
-#include "application/setups/editor/resources/can_be_instantiated.h"
+#include "application/setups/editor/resources/resource_traits.h"
 
 void editor_layers_gui::perform(const editor_layers_input in) {
 	using namespace augs::imgui;

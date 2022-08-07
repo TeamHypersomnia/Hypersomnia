@@ -38,4 +38,11 @@ void create_sprites(editor_resource_pools& pools) {
 		aquarium_glass.color.a = glass_alpha;
 		aquarium_glass.neon_color.a = glass_neon_alpha;
 	}
+
+	create_sprite(official_sprites::SMOKE_1);
+	create_sprite(official_sprites::SMOKE_2);
+	create_sprite(official_sprites::SMOKE_3);
+	create_sprite(official_sprites::SMOKE_4);
+	create_sprite(official_sprites::SMOKE_5);
+	create_sprite(official_sprites::SMOKE_6);
 }

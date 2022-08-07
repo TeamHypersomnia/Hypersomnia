@@ -1,9 +1,9 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "game/assets/ids/asset_ids.h"
-#include "view/viewables/particle_effect.h"
 #include "game/detail/view_input/particle_effect_modifier.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "view/viewables/particle_effect.h"
 
 struct editor_particles_resource_editable : particle_effect_modifier {
 	using base = particle_effect_modifier;
@@ -30,5 +30,9 @@ struct editor_particles_resource {
 	std::string unique_name;
 	const auto& get_display_name() const {
 		return unique_name;
+	}
+
+	static const char* get_type_name() {
+		return "Particles";
 	}
 };

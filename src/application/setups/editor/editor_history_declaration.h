@@ -48,6 +48,8 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_sprite_resource>,
 	edit_resource_command<editor_sound_resource>,
 	edit_resource_command<editor_light_resource>,
+	edit_resource_command<editor_particles_resource>,
+	edit_resource_command<editor_material_resource>,
 
 	edit_node_command<editor_sprite_node>,
 	edit_node_command<editor_sound_node>,

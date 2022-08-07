@@ -97,10 +97,12 @@ auto& create_official(const E official_id, editor_resource_pools& pools) {
 #include "application/setups/editor/official/create_official_materials.h"
 #include "application/setups/editor/official/create_official_lights.h"
 #include "application/setups/editor/official/create_official_sounds.h"
+#include "application/setups/editor/official/create_official_particles.h"
 
 void create_official_resources(editor_resource_pools& pools) {
 	create_lights(pools);
 	create_materials(pools);
+	create_particles(pools);
 
 	create_sprites(pools);
 	create_sounds(pools);
