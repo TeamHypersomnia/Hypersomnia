@@ -62,6 +62,8 @@ struct editor_sprite_resource {
 		typed_entity_flavour_id<plain_sprited_body>
 	> scene_flavour_id;
 
+	mutable assets::image_id scene_asset_id;
+
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 
 	decltype(auto) get_display_name() const {

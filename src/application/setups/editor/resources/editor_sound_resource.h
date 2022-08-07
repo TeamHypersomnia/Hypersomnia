@@ -19,6 +19,8 @@ struct editor_sound_resource {
 		typed_entity_flavour_id<sound_decoration>
 	> scene_flavour_id;
 
+	mutable assets::sound_id scene_asset_id;
+
 	editor_sound_resource(const editor_pathed_resource& f) : external_file(f) {}
 
 	decltype(auto) get_display_name() const {

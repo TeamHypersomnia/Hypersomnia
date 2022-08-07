@@ -6,13 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Resources reference resolution: creation order by type is important 
-	- E.g. first we need to create all the materials to pass them to physical sprites
-		- But we first need to create sounds/particles to pass them to materials
-			- what if a particle effect needs a sprite again?
-	- Well then, we should first only create all the resources to establish identities
-	
-
 - Handle throw_through later, we'll make it just see-through for the moment
 	- we'll have a separate filter for that probably
 

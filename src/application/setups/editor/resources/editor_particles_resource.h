@@ -25,6 +25,8 @@ struct editor_particles_resource {
 		typed_entity_flavour_id<particles_decoration>
 	> scene_flavour_id;
 
+	mutable assets::particle_effect_id scene_asset_id;
+
 	std::string unique_name;
 	const auto& get_display_name() const {
 		return unique_name;

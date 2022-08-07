@@ -45,16 +45,35 @@ void setup_entity_from_node(
 	handle.set_logic_transform(node.get_transform());
 	(void)resource;
 }
-
 template <class R>
-void create_flavour_from_resource(
+void allocate_flavours_and_assets(
 	const R& resource,
 	const bool is_official,
 	all_viewables_defs& viewables,
 	cosmos_common_significant& common
 ) {
-	if constexpr(std::is_same_v<editor_sprite_resource, R>) {
-		const auto& editable = resource.editable;
+	const auto& editable = resource.editable;
+
+	if constexpr(std::is_same_v<editor_material_resource, R>) {
+		auto& definitions = common.logical_assets.physical_materials;
+		resource.scene_asset_id = definitions.allocate().key;
+	}
+	else if constexpr(std::is_same_v<editor_light_resource, R>) {
+		using entity_type = static_light;
+
+		auto& flavour_pool = common.flavours.get_for<entity_type>();
+		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
+	}
+	else if constexpr(std::is_same_v<editor_particles_resource, R>) {
+		auto& definitions = viewables.particle_effects;
+		resource.scene_asset_id = definitions.allocate().key;
+
+		using entity_type = particles_decoration;
+
+		auto& flavour_pool = common.flavours.get_for<entity_type>();
+		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
+	}
+	else if constexpr(std::is_same_v<editor_sprite_resource, R>) {
 		const auto domain = editable.domain;
 
 		auto create_as = [&]<typename entity_type>(entity_type) {
@@ -80,62 +99,11 @@ void create_flavour_from_resource(
 				(void)meta;
 			}
 
-			const auto [new_raw_flavour_id, new_flavour] = flavour_pool.allocate();
+			const auto new_raw_flavour_id = flavour_pool.allocate().key;
 			const auto new_flavour_id = typed_entity_flavour_id<entity_type>(new_raw_flavour_id);
 
-			{
-				auto& render = new_flavour.template get<invariants::render>();
-
-				render.layer = [&]() {
-					switch (domain) {
-						case editor_sprite_domain::BACKGROUND:
-							return render_layer::GROUND;
-						case editor_sprite_domain::FOREGROUND:
-							if (editable.foreground_glow) {
-								return render_layer::FOREGROUND_GLOWS;
-							}
-
-							return render_layer::FOREGROUND;
-						case editor_sprite_domain::PHYSICAL:
-							return render_layer::SOLID_OBSTACLES;
-
-						default:
-							return render_layer::GROUND;
-
-					}
-				}();
-			}
-
-			{
-				auto& sprite = new_flavour.template get<invariants::sprite>();
-				sprite.set(new_image_id, editable.size, editable.color);
-				sprite.tile_excess_size = !editable.stretch_when_resized;
-			}
-
-			if (auto rigid_body = new_flavour.template find<invariants::rigid_body>()) {
-				rigid_body->damping.linear = editable.linear_damping;
-				rigid_body->damping.angular = editable.angular_damping;
-
-				if (editable.is_static) {
-					rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
-				}
-			}
-
-			if (auto fixtures = new_flavour.template find<invariants::fixtures>()) {
-				fixtures->density = editable.density;
-				fixtures->friction = editable.friction;
-				fixtures->restitution = editable.restitution;
-
-				if (editable.is_see_through) {
-					fixtures->filter = filters[predefined_filter_type::GLASS_OBSTACLE];
-				}
-				else {
-					fixtures->filter = filters[predefined_filter_type::WALL];
-				}
-			}
-
-			/* Cache for quick and easy mapping */
 			resource.scene_flavour_id = new_flavour_id;
+			resource.scene_asset_id = new_image_id;
 		};
 
 		if (domain == editor_sprite_domain::PHYSICAL) {
@@ -149,7 +117,7 @@ void create_flavour_from_resource(
 		auto create_as = [&]<typename entity_type>(entity_type) {
 			auto& flavour_pool = common.flavours.get_for<entity_type>();
 			auto& definitions = viewables.sounds;
-			
+
 			const auto [new_sound_id, new_definition] = definitions.allocate();
 
 			{
@@ -160,28 +128,125 @@ void create_flavour_from_resource(
 				(void)meta;
 			}
 
-			const auto [new_raw_flavour_id, new_flavour] = flavour_pool.allocate();
+			const auto new_raw_flavour_id = flavour_pool.allocate();
 			const auto new_flavour_id = typed_entity_flavour_id<entity_type>(new_raw_flavour_id);
 
-			const auto& editable = resource.editable;
-
-			{
-				auto& sound = new_flavour.template get<invariants::continuous_sound>();
-				sound.effect.id = new_sound_id;
-				sound.effect.modifier = static_cast<sound_effect_modifier>(editable);
-			}
-
-			/* Cache for quick and easy mapping */
 			resource.scene_flavour_id = new_flavour_id;
+			resource.scene_asset_id = new_sound_id;
 		};
 
 		create_as(sound_decoration());
 	}
-	else if constexpr(std::is_same_v<editor_light_resource, R>) {
+	else {
+		static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
+	}
+}
 
+template <class A, class R, class S>
+void setup_scene_object_from_resource(
+	A get_asset_id_of,
+	const R& resource,
+	S& scene
+) {
+	const auto& editable = resource.editable;
+
+	auto to_game_effect = [&]<typename T>(const T& in) {
+		if constexpr(std::is_same_v<T, editor_sound_effect>) {
+			sound_effect_input out;
+			out.modifier = static_cast<sound_effect_modifier>(in);
+			out.id = get_asset_id_of(in.resource_id);
+
+			return out;
+		}
+		else if constexpr(std::is_same_v<T, editor_particle_effect>) {
+			particle_effect_input out;
+			out.modifier = static_cast<particle_effect_modifier>(in);
+			out.id = get_asset_id_of(in.resource_id);
+
+			return out;
+		}
+	};
+
+	if constexpr(std::is_same_v<editor_material_resource, R>) {
+		scene.unit_effect_damage = editable.unit_effect_damage;
+		scene.standard_damage_sound = to_game_effect(editable.standard_damage_sound);
+	}
+	else if constexpr(std::is_same_v<editor_particles_resource, R>) {
+		if constexpr(std::is_same_v<R, particle_effect>) {
+			scene.emissions = editable.emissions;
+			scene.name = resource.get_display_name();
+		}
+		else {
+			auto& particles = scene.template get<invariants::continuous_particles>();
+			particles.effect.id = resource.scene_asset_id;
+			particles.effect.modifier = static_cast<particle_effect_modifier>(editable);
+		}
+	}
+	else if constexpr(std::is_same_v<editor_sprite_resource, R>) {
+		const auto domain = editable.domain;
+
+		{
+			auto& render = scene.template get<invariants::render>();
+
+			render.layer = [&]() {
+				switch (domain) {
+					case editor_sprite_domain::BACKGROUND:
+						return render_layer::GROUND;
+					case editor_sprite_domain::FOREGROUND:
+						if (editable.foreground_glow) {
+							return render_layer::FOREGROUND_GLOWS;
+						}
+
+						return render_layer::FOREGROUND;
+					case editor_sprite_domain::PHYSICAL:
+						return render_layer::SOLID_OBSTACLES;
+
+					default:
+						return render_layer::GROUND;
+
+				}
+			}();
+		}
+
+		{
+			auto& sprite = scene.template get<invariants::sprite>();
+			sprite.set(resource.scene_asset_id, editable.size, editable.color);
+			sprite.tile_excess_size = !editable.stretch_when_resized;
+		}
+
+		if (auto rigid_body = scene.template find<invariants::rigid_body>()) {
+			rigid_body->damping.linear = editable.linear_damping;
+			rigid_body->damping.angular = editable.angular_damping;
+
+			if (editable.is_static) {
+				rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
+			}
+		}
+
+		if (auto fixtures = scene.template find<invariants::fixtures>()) {
+			fixtures->density = editable.density;
+			fixtures->friction = editable.friction;
+			fixtures->restitution = editable.restitution;
+
+			if (editable.is_see_through) {
+				fixtures->filter = filters[predefined_filter_type::GLASS_OBSTACLE];
+			}
+			else {
+				fixtures->filter = filters[predefined_filter_type::WALL];
+			}
+		}
+	}
+	else if constexpr(std::is_same_v<editor_sound_resource, R>) {
+		auto& sound = scene.template get<invariants::continuous_sound>();
+		sound.effect.id = resource.scene_asset_id;
+		sound.effect.modifier = static_cast<sound_effect_modifier>(editable);
+	}
+	else if constexpr(std::is_same_v<editor_light_resource, R>) {
+		auto& light = scene.template get<components::light>();
+		light = editable;
 	}
 	else {
-		//static_assert(always_false_v<P>, "Non-exhaustive if constexpr");
+		static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
 	}
 }
 
@@ -196,11 +261,14 @@ void editor_setup::rebuild_scene() {
 	auto& common = scene.world.get_common_significant(mutable_access);
 	common.light.ambient_color = rgba(180, 180, 180, 255);
 
-	/* Create resources */
+	/* 
+		Establish identities. 
+		First we have to create all flavour and asset ids so that we can properly setup references later.
+	*/
 
-	auto resource_pool_handler = [&]<typename P>(const P& pool, const bool is_official) {
+	auto allocate_flavours_and_assets = [&]<typename P>(const P& pool, const bool is_official) {
 		for (const auto& resource : pool) {
-			::create_flavour_from_resource(
+			::allocate_flavours_and_assets(
 				resource,
 				is_official,
 				scene.viewables,
@@ -209,8 +277,53 @@ void editor_setup::rebuild_scene() {
 		}
 	};
 
-	project.resources .for_each([&](const auto& pool) { resource_pool_handler(pool, false); } );
-	official_resources.for_each([&](const auto& pool) { resource_pool_handler(pool, true); } );
+	official_resources.for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
+	project.resources .for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, false); } );
+
+	/* Create resources */
+
+	auto setup_flavours_and_assets = [&]<typename P>(const P& pool) {
+		auto get_asset_id_of = [&]<typename R>(const editor_typed_resource_id<R>& resource_id) {
+			using asset_type = decltype(R::scene_asset_id);
+
+			if (const auto resource = find_resource(resource_id)) {
+				return resource->scene_asset_id;
+			}
+
+			return asset_type();
+		};
+
+		using R = typename P::value_type;
+
+		for (const R& resource : pool) {
+			auto setup_scene_object = [&](auto& scene_object) {
+				::setup_scene_object_from_resource(
+					get_asset_id_of,
+					resource,
+					scene_object
+				);
+			};
+
+			if constexpr(std::is_same_v<R, editor_material_resource>) {
+				auto& material = common.logical_assets.physical_materials.get(resource.scene_asset_id);
+				setup_scene_object(material);
+			}
+			else {
+				std::visit(
+					[&]<typename E>(const typed_entity_flavour_id<E>& typed_flavour_id) {
+						auto& flavour_pool = common.flavours.get_for<E>();
+						auto& flavour = flavour_pool.get(typed_flavour_id.raw);
+
+						setup_scene_object(flavour);
+					},
+					resource.scene_flavour_id
+				);
+			}
+		}
+	};
+
+	official_resources.for_each(setup_flavours_and_assets);
+	project.resources .for_each(setup_flavours_and_assets);
 
 	/* Create nodes */
 

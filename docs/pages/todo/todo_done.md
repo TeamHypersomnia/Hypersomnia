@@ -4716,3 +4716,30 @@ Advantages:
 
 - Renaming stuff
 
+- Resources reference resolution: creation order by type is important 
+	- You see that's the problem with png-equals-flavour architecture because normally there are references only to image ids that will always be independent
+		- But the thing is we should still only need ids from these referenced resources so it should be safe to just referencelessly create all required ids
+		- So we'll explicitly only use get_asset_id_of
+		- this also nicely separates the logic of choosing the type from populating it
+			- this will be just a single visit
+
+	- Wait.. it's not just ids we might want to reference
+		- Look. A physical material has a sound effect input (id + modifier)
+			- editor sound effect input has an reource id + modifier
+				- however that resource could also have its own modifier defined so to properly multiply them, we'd need to first properly create the resource
+				- well.. even if we don't multiply, we'd still need to access its id so it must be created to that extent
+	- Anyways I'm thinking let's not multiply, if reused, the sound effects will appear in completely different contexts
+	- Instead of first creating identities, we might first create all non-identity properties and only then resolve identities
+		- Though this will be uglier
+
+	- First, sound effects are independent so can be created first
+		- Particle effects are problematic as they depend on sprites and sprites can depend on particle effects
+		
+
+	- E.g. first we need to create all the materials to pass them to physical sprites
+		- But we first need to create sounds/particles to pass them to materials
+			- what if a particle effect needs a sprite again?
+	- Well then, we should first only create all the resources to establish identities
+	- Sprites and sounds have also to allocate the asset ids
+	
+

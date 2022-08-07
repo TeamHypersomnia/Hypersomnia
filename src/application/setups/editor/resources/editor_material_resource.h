@@ -40,7 +40,7 @@ struct editor_material_resource_editable {
 
 struct editor_material_resource {
 	editor_material_resource_editable editable;
-	mutable assets::physical_material_id scene_material_id;
+	mutable assets::physical_material_id scene_asset_id;
 
 	std::string unique_name;
 	const auto& get_display_name() const {
