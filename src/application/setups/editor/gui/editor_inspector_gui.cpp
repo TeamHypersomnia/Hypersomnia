@@ -28,7 +28,7 @@ void editor_tweaked_widget_tracker::reset() {
 
 void editor_tweaked_widget_tracker::poll_change(const std::size_t current_command_index) {
 	if (last_tweaked) {
-		const auto possible_session = tweak_session { ImGui::GetActiveID(), current_command_index };
+		const auto possible_session = tweak_session { ImGui::GetCurrentContext()->LastActiveId, current_command_index };
 
 		if (last_tweaked.value() != possible_session) {
 			last_tweaked.reset();
@@ -37,12 +37,12 @@ void editor_tweaked_widget_tracker::poll_change(const std::size_t current_comman
 }
 
 bool editor_tweaked_widget_tracker::changed(const std::size_t current_command_index) const {
-	const auto current_session = tweak_session { ImGui::GetActiveID(), current_command_index };
+	const auto current_session = tweak_session { ImGui::GetCurrentContext()->LastActiveId, current_command_index };
 	return last_tweaked != current_session;
 }
 
 void editor_tweaked_widget_tracker::update(const std::size_t current_command_index) {
-	const auto current_session = tweak_session { ImGui::GetActiveID(), current_command_index };
+	const auto current_session = tweak_session { ImGui::GetCurrentContext()->LastActiveId, current_command_index };
 	last_tweaked = current_session;
 }
 
@@ -94,7 +94,7 @@ bool edit_property(
 	}
 	else if constexpr(std::is_enum_v<T>) {
 		if (enum_combo(label, property)) { 
-			result = typesafe_sprintf("Set %x to %x in %x", label, property);
+			result = typesafe_sprintf("Switch %x to %x in %x", label, property);
 			return true;
 		}
 	}
@@ -332,20 +332,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		return in.setup.get_last_command_index();
 	};
 
-	auto is_command_discrete = [&](const auto& description) {
-		return	
-			begins_with(description, "Disable")
-			|| begins_with(description, "Enable")
-		;
-	};
-
 	auto post_new_or_rewrite = [&]<typename T>(T&& cmd) {
-		if (is_command_discrete(cmd.describe())) {
-			in.setup.post_new_command(std::forward<T>(cmd));
-			tweaked_widget.reset();
-			return;
-		}
-
 		if (tweaked_widget.changed(get_command_index())) {
 			in.setup.post_new_command(std::forward<T>(cmd));
 			tweaked_widget.update(get_command_index());
