@@ -8,7 +8,8 @@
 struct editor_light_node_editable {
 	// GEN INTROSPECTOR struct editor_light_node_editable
 	vec2 pos;
-	real32 scale_intensity = 0.0f;
+	rgba colorize = white;
+	real32 scale_intensity = 1.0f;
 	// END GEN INTROSPECTOR
 };
 

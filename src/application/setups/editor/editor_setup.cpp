@@ -97,17 +97,22 @@ bool editor_setup::handle_input_before_imgui(
 
 		const auto k = in.e.data.key.key;
 
-		const bool has_shift{ in.common_input_state[key::LSHIFT] };
+		const auto& state = in.common_input_state;
+
+		const bool has_alt{ state[key::LALT] };
+		const bool has_ctrl{ state[key::LCTRL] };
+		const bool has_shift{ state[key::LSHIFT] };
+		const bool no_modifiers = !has_alt && !has_ctrl && !has_shift;
 
 		if (gui.layers.is_focused()) {
-			if (k == key::UP || (k == key::TAB && has_shift)) {
+			if ((k == key::UP && no_modifiers) || (k == key::TAB && has_shift)) {
 				gui.layers.pressed_arrow = vec2i(0, -1);
 				ImGui::GetIO().KeysDown[int(key::ENTER)] = true;
 				gui.layers.request_confirm_rename = true;
 
 				return true;
 			}
-			else if (k == key::DOWN || k == key::TAB) {
+			else if ((k == key::DOWN && no_modifiers) || k == key::TAB) {
 				gui.layers.pressed_arrow = vec2i(0, 1);
 				ImGui::GetIO().KeysDown[int(key::ENTER)] = true;
 				gui.layers.request_confirm_rename = true;
@@ -116,7 +121,7 @@ bool editor_setup::handle_input_before_imgui(
 			}
 		}
 
-		if (!ImGui::GetIO().WantCaptureKeyboard) {
+		if (no_modifiers && !ImGui::GetIO().WantCaptureKeyboard) {
 			switch (k) {
 				case key::LEFT: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(-1, 0); return true; } else break;
 				case key::RIGHT: if (gui.layers.is_focused()) { gui.layers.pressed_arrow = vec2i(1, 0); return true; } else break;
@@ -642,6 +647,8 @@ void editor_setup::inspect_add_quiet(inspected_variant new_inspected) {
 void editor_setup::after_quietly_adding_inspected() {
 	inspected_to_entity_selector_state();
 	sort_inspected();
+
+	gui.inspector.tweaked_widget.reset();
 }
 
 void editor_setup::inspect(inspected_variant new_inspected) {

@@ -106,6 +106,7 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	void clear() {
 		all_inspected.clear();
+		tweaked_widget.reset();
 	}
 
 private:

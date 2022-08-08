@@ -29,6 +29,11 @@ void setup_entity_from_node(
 		}
 	}
 
+	if constexpr(std::is_same_v<N, editor_light_node>) {
+		auto& light = agg.template get<components::light>();
+		light.color *= editable.colorize;
+	}
+
 	if (auto geo = agg.template find<components::overridden_geo>()) {
 		if constexpr(has_size_v<Editable>) {
 			if (bool(editable.size)) {
@@ -261,7 +266,7 @@ void editor_setup::rebuild_scene() {
 
 	const auto mutable_access = cosmos_common_significant_access();
 	auto& common = scene.world.get_common_significant(mutable_access);
-	common.light.ambient_color = rgba(180, 180, 180, 255);
+	//common.light.ambient_color = rgba(180, 180, 180, 255);
 
 	/* 
 		Establish identities. 
@@ -348,44 +353,36 @@ void editor_setup::rebuild_scene() {
 				return;
 			}
 
-			if constexpr(
-				std::is_same_v<editor_sprite_node, node_type> ||
-				std::is_same_v<editor_sound_node, node_type>
-			) {
-				auto entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
-					::setup_entity_from_node(
-						total_order, 
-						*layer,
-						typed_node, 
-						resource,
-						handle, 
-						agg
-					);
-				};
-
-				std::visit(
-					[&](const auto& typed_flavour_id) {
-						const auto new_id = cosmic::specific_create_entity(
-							scene.world,
-							typed_flavour_id,
-							entity_from_node
-						).get_id();
-
-						const auto mapping_index = new_id.get_type_id().get_index();
-						auto& mapping = scene_entity_to_node[mapping_index];
-
-						ensure_eq(mapping.size(), std::size_t(new_id.raw.indirection_index));
-						ensure_eq(decltype(new_id.raw.version)(1), new_id.raw.version);
-
-						mapping.emplace_back(node_id.operator editor_node_id());
-						typed_node.scene_entity_id = new_id;
-					},
-					resource->scene_flavour_id
+			auto entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
+				::setup_entity_from_node(
+					total_order, 
+					*layer,
+					typed_node, 
+					resource,
+					handle, 
+					agg
 				);
-			}
-			else {
-				//static_assert(always_false_v<P>, "Non-exhaustive if constexpr");
-			}
+			};
+
+			std::visit(
+				[&](const auto& typed_flavour_id) {
+					const auto new_id = cosmic::specific_create_entity(
+						scene.world,
+						typed_flavour_id,
+						entity_from_node
+					).get_id();
+
+					const auto mapping_index = new_id.get_type_id().get_index();
+					auto& mapping = scene_entity_to_node[mapping_index];
+
+					ensure_eq(mapping.size(), std::size_t(new_id.raw.indirection_index));
+					ensure_eq(decltype(new_id.raw.version)(1), new_id.raw.version);
+
+					mapping.emplace_back(node_id.operator editor_node_id());
+					typed_node.scene_entity_id = new_id;
+				},
+				resource->scene_flavour_id
+			);
 		};
 
 		for (const auto node_id : reverse(layer->hierarchy.nodes)) {

@@ -4743,3 +4743,6 @@ Advantages:
 	- Sprites and sounds have also to allocate the asset ids
 	
 
+- fix ctrl + arrows, layers gui shouldn't capture these hotkeys, only if there is no modifier
+- fix ids in inspector had some fuckups with changing domain like it wasn't registered for some crates)
+	- also is_static/is_see_through

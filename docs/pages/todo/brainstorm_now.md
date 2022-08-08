@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Could show a full preview when hovering specifically the icons in filesystem
+
+- shift + select in layers selects all
+- that multiple selection might come in handy after all to e.g. set to physical multiple crates at once
+	- and to drop multiple objects to scene from resources if they are related like those floors
+- properly cast light on wall-like objects, perhaps some filter/render layer?
+
 - Yeah I'm thinking let's first do those complex topics 
 	- that will let us finally strap everything into place
 

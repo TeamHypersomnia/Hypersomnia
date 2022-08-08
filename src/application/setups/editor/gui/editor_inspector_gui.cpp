@@ -159,6 +159,7 @@ std::string perform_editable_gui(editor_light_node_editable& e) {
 	std::string result;
 
 	edit_property(result, "Position", e.pos);
+	edit_property(result, "Colorize", e.colorize);
 	edit_property(result, "Scale intensity", e.scale_intensity);
 
 	return result;
@@ -180,11 +181,12 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::
 
 	edit_property(result, "Domain", e.domain);
 
-	ImGui::Separator();
+	//ImGui::Separator();
 
 	const auto current_size = e.size;
 
-	edit_property(result, "##Defaultcolor", e.color);
+	edit_property(result, "Color", e.color);
+	//ImGui::Separator();
 	edit_property(result, "Size", e.size);
 
 	if (original_size != std::nullopt) {
@@ -209,8 +211,12 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::
 		text_color("Physics", yellow);
 		ImGui::Separator();
 
+		{
+			auto scope = augs::imgui::scoped_tree_node_ex("Edit collider shape");
+		}
+
 		edit_property(result, "Is static", e.is_static);
-		edit_property(result, "Is see-through", e.is_static);
+		edit_property(result, "Is see-through", e.is_see_through);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, lets the light through.\nEnemies will be visible behind this object.\nUse it on walls of glass.");
