@@ -48,8 +48,6 @@ bool server_list_entry::is_set() const {
 	return heartbeat.server_name.size() > 0;
 }
 
-browse_servers_gui_state::~browse_servers_gui_state() = default;
-
 struct browse_servers_gui_internal {
 	std::future<std::optional<httplib::Result>> future_response;
 	netcode_socket_t socket;
@@ -61,6 +59,7 @@ struct browse_servers_gui_internal {
 	}
 };
 
+browse_servers_gui_state::~browse_servers_gui_state() = default;
 
 browse_servers_gui_state::browse_servers_gui_state(const std::string& title) 
 	: base(title), data(std::make_unique<browse_servers_gui_internal>()) 
