@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Coloring the light icons would be pretty useful
+
+- Alright let's now try creating various entity types like lights and sounds
+- I think we'll first implement animations because we'll need them for the particles
+
+- Yeah I'm thinking let's first do those complex topics 
+	- that will let us finally strap everything into place
+
 - Could show a full preview when hovering specifically the icons in filesystem
 
 - shift + select in layers selects all
@@ -13,13 +21,8 @@ summary: That which we are brainstorming at the moment.
 	- and to drop multiple objects to scene from resources if they are related like those floors
 - properly cast light on wall-like objects, perhaps some filter/render layer?
 
-- Yeah I'm thinking let's first do those complex topics 
-	- that will let us finally strap everything into place
-
 - For particles we might just templatize the particle effect by the image id and animation id
 	- We don't even have to explicitly instantiate particle types as the defs are included in hpp
-
-- I think we'll first implement animations because we'll need them for the particles
 
 - Let's implement those gifs because it's constantly on my mind
 	- And it will be somewhat fun
@@ -62,9 +65,6 @@ summary: That which we are brainstorming at the moment.
 
 
 - Screw that mouse confirmation for now, encourage enter usage (lol)
-
-- Alright let's now try creating various entity types like lights and sounds
-	- And fix that icon hover logic
 
 - Another special resource: materials
 	- But only physical, we won't create a separate material for grounds as it's just a single sound

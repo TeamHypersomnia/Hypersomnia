@@ -1018,7 +1018,7 @@ std::string editor_setup::get_name(inspected_variant v) const {
 }
 
 entity_id editor_setup::get_hovered_entity(const necessary_images_in_atlas_map& sizes_for_icons, const std::optional<vec2> at) const {
-	return editor_entity_selector::calc_hovered_entity(
+	return selector.calc_hovered_entity(
 		scene.world,
 		sizes_for_icons,
 		get_camera_eye().zoom,

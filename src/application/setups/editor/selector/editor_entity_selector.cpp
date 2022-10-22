@@ -181,24 +181,40 @@ void editor_entity_selector::unhover() {
 	hovered = {};
 }
 
-template <class C, class T>
-void remove_non_hovering_icons_from(
+template <class T>
+static void get_non_hovering_icons_from(
 	const cosmos& cosm,
 	const necessary_images_in_atlas_map& sizes_for_icons,
 	const float zoom,
-	C& container,
+	const std::unordered_set<entity_id>& in_container,
+	std::vector<entity_id>& out_non_hovering,
 	T world_range
 ) {
 	auto& vis = thread_local_visible_entities();
+	vis.set_from(cosm, in_container);
 
+	return get_non_hovering_icons_from(cosm, sizes_for_icons, zoom, vis, out_non_hovering, world_range);
+}
+
+template <class T>
+static void get_non_hovering_icons_from(
+	const cosmos& cosm,
+	const necessary_images_in_atlas_map& sizes_for_icons,
+	const float zoom,
+	visible_entities& in_container,
+	std::vector<entity_id>& out_non_hovering,
+	T world_range
+) {
 	auto get_icon_aabb = [&](const auto icon_id, const transformr where) {
 		const auto size = icon_id == assets::necessary_image_id::INVALID ? vec2::square(32.f) : vec2(sizes_for_icons.at(icon_id).get_original_size());
 		return xywh::center_and_size(where.pos, size / zoom);
 	};
 
+	out_non_hovering.clear();
+
 	::for_each_iconed_entity(
 		cosm, 
-		vis,
+		in_container,
 		faction_view_settings(),
 		[&](const auto handle, 
 			const auto tex_id,
@@ -209,7 +225,7 @@ void remove_non_hovering_icons_from(
 
 			if constexpr(std::is_same_v<W, ltrb>) {
 				if (!get_icon_aabb(tex_id, where).hover(world_range)) {
-					erase_element(container, handle.get_id());
+					out_non_hovering.emplace_back(handle.get_id());
 				}
 			}
 			else if constexpr(std::is_same_v<W, vec2>) {
@@ -217,7 +233,7 @@ void remove_non_hovering_icons_from(
 				const auto size = vec2(sizes_for_icons.at(tex_id).get_original_size()) / zoom;
 
 				if (!::point_in_rect(where.pos, where.rotation, size, world_range)) {
-					erase_element(container, handle.get_id());
+					out_non_hovering.emplace_back(handle.get_id());
 				}
 			}
 			else {
@@ -258,7 +274,8 @@ void editor_entity_selector::do_mousemotion(
 		}
 	}
 
-	auto& vis = thread_local_visible_entities();
+	auto& vis = cache_visible;
+	vis.clear();
 
 	if (rectangular_drag_origin.has_value()) {
 		in_rectangular_selection.clear();
@@ -271,7 +288,7 @@ void editor_entity_selector::do_mousemotion(
 			camera_cone(camera_eye(world_range.get_center(), 1.f), world_range.get_size()),
 			accuracy_type::PROXIMATE,
 			filter,
-			tree_of_npo_filter::all()
+			tree_of_npo_filter::all_and_force_add_all_icons()
 		};
 
 		vis.reacquire_all(query);
@@ -281,7 +298,8 @@ void editor_entity_selector::do_mousemotion(
 			emplace_element(in_rectangular_selection, id);
 		}, layer_order);
 
-		remove_non_hovering_icons_from(cosm, sizes_for_icons, eye.zoom, in_rectangular_selection, world_range);
+		get_non_hovering_icons_from(cosm, sizes_for_icons, eye.zoom, in_rectangular_selection, cache_non_hovering, world_range);
+		erase_elements(in_rectangular_selection, cache_non_hovering);
 
 		if (in_rectangular_selection.empty()) {
 			reset_held_params();
@@ -327,16 +345,17 @@ entity_id editor_entity_selector::calc_hovered_entity(
 	const float zoom,
 	vec2 world_cursor_pos,
 	const maybe_layer_filter& filter
-) {
+) const {
 	const auto layer_order = get_default_layer_order();
-	auto& vis = thread_local_visible_entities();
+	auto& vis = cache_visible;
+	vis.clear();
 
 	vis.reacquire_all({
 		cosm,
 		camera_cone(camera_eye(world_cursor_pos, 1.f), vec2i::square(1)),
 		accuracy_type::EXACT,
 		filter,
-		tree_of_npo_filter::all()
+		tree_of_npo_filter::all_and_force_add_all_icons()
 	});
 
 	vis.sort(cosm);
@@ -348,7 +367,9 @@ entity_id editor_entity_selector::calc_hovered_entity(
 		ids.emplace_back(id);
 	}, layer_order);
 
-	remove_non_hovering_icons_from(cosm, sizes_for_icons, zoom, ids, world_cursor_pos);
+	get_non_hovering_icons_from(cosm, sizes_for_icons, zoom, vis, cache_non_hovering, world_cursor_pos);
+
+	erase_elements(ids, cache_non_hovering);
 
 	if (ids.size() > 0) {
 		return ids.back();

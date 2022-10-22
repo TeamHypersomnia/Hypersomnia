@@ -52,6 +52,11 @@ void erase_if(Container& v, F f) {
 }
 
 template <class Container, class T>
+auto erase_elements(Container& v, const T& l) {
+	erase_if(v, [&l](const auto& candidate){ return found_in(l, candidate); });
+}
+
+template <class Container, class T>
 auto erase_element(Container& v, const T& l) {
 	static_assert(!std::is_same_v<decltype(v.begin()), T>, "erase_element serves to erase keys or values, not iterators!");
 

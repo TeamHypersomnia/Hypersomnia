@@ -62,6 +62,31 @@ public:
 	};	
 
 	template <class F>
+	void for_all_of_type(
+		F callback,
+		const tree_of_npo_type type
+	) const {
+		const auto& tree = trees[type];
+
+		struct render_listener {
+			const b2DynamicTree* const tree;
+			F callback;
+
+			bool QueryCallback(const int32 node_id) const {
+				tree_of_npo_node node;
+				node.bytes = tree->GetUserData(node_id);
+				
+				callback(node.payload);
+				return true;
+			}
+		};
+
+		const auto aabb_listener = render_listener{ &tree.nodes, callback };
+
+		tree.nodes.QueryAll(&aabb_listener);
+	}
+
+	template <class F>
 	void for_each_in_camera(
 		F callback,
 		const camera_cone cone,

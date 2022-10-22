@@ -91,6 +91,9 @@ public:
 	template <typename T>
 	void Query(T* callback, const b2AABB& aabb) const;
 
+	template <typename T>
+	void QueryAll(T* callback) const;
+
 	/// Ray-cast against the proxies in the tree. This relies on the callback
 	/// to perform a exact ray-cast in the case were the proxy contains a shape.
 	/// The callback also performs the any collision filtering. This has performance
@@ -170,6 +173,37 @@ inline const b2AABB& b2DynamicTree::GetFatAABB(int32 proxyId) const
 {
 	b2Assert(0 <= proxyId && proxyId < m_nodeCapacity);
 	return m_nodes[proxyId].aabb;
+}
+
+template <typename T>
+inline void b2DynamicTree::QueryAll(T* callback) const {
+	b2GrowableStack<int32, 256> stack;
+	stack.Push(m_root);
+
+	while (stack.GetCount() > 0)
+	{
+		int32 nodeId = stack.Pop();
+		if (nodeId == b2_nullNode)
+		{
+			continue;
+		}
+
+		const b2TreeNode* node = m_nodes + nodeId;
+
+		if (node->IsLeaf())
+		{
+			bool proceed = callback->QueryCallback(nodeId);
+			if (proceed == false)
+			{
+				return;
+			}
+		}
+		else
+		{
+			stack.Push(node->child1);
+			stack.Push(node->child2);
+		}
+	}
 }
 
 template <typename T>

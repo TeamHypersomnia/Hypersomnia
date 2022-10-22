@@ -75,6 +75,13 @@ public:
 	void acquire_physical(const visible_entities_query);
 	void acquire_non_physical(const visible_entities_query);
 	
+	template <class T>
+	void set_from(const cosmos& cosm, const T& ids) {
+		for (const auto& id : ids) {
+			register_visible(cosm, id);
+		}
+	}
+
 	void sort(const cosmos& cosm);
 	void clear();
 

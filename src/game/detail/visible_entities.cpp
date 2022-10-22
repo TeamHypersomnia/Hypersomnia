@@ -21,7 +21,15 @@
 #include "game/detail/calc_sorting_order.h"
 #include "augs/templates/enum_introspect.h"
 
-static constexpr auto EXACT = accuracy_type::EXACT;
+static bool is_icon_type(const tree_of_npo_type type) {
+	switch (type) {
+		case tree_of_npo_type::RENDERABLES:
+		case tree_of_npo_type::ORGANISMS:
+			return false;
+		default:
+			return true;
+	}
+}
 
 std::size_t visible_entities::count_all() const {
 	return ::accumulate_sizes(per_layer);
@@ -102,7 +110,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 		}
 	};
 
-	if (input.accuracy == EXACT) {
+	if (input.accuracy == accuracy_type::EXACT) {
 		const auto camera_aabb = camera.get_visible_world_rect_aabb();
 		
 		physics.for_each_intersection_with_polygon(
@@ -168,48 +176,68 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 				return;
 			}
 
-			if (input.accuracy == EXACT) {
-				const bool visible = cosm[id].dispatch([&](const auto typed_handle) {
-					const auto aabb = typed_handle.find_aabb();
+			if (input.accuracy == accuracy_type::PROXIMATE) {
+				register_visible(cosm, id);
+				return;
+			}
 
-					if (aabb == std::nullopt) {
-						return false;
-					}
+			ensure(input.accuracy == accuracy_type::EXACT)
 
-					if (!camera_aabb.hover(*aabb)) {
-						return false;
-					}
+			const bool visible = cosm[id].dispatch([&](const auto typed_handle) {
+				const auto aabb = typed_handle.find_aabb();
 
-					if (camera.screen_size == vec2i::square(1)) {
-						/* This is an infinitely small point. */
-						if (const auto transform = typed_handle.find_logic_transform()) {
-							const auto size = typed_handle.get_logical_size();
+				if (aabb == std::nullopt) {
+					return false;
+				}
 
-							if (!point_in_rect(
-								transform->pos,
-								transform->rotation,
-								size,
-								camera.eye.transform.pos
-							)) {
-								return false;
-							}
-						}
-						else {
+				if (!camera_aabb.hover(*aabb)) {
+					return false;
+				}
+
+				if (camera.screen_size == vec2i::square(1)) {
+					/* This is an infinitely small point. */
+					if (const auto transform = typed_handle.find_logic_transform()) {
+						const auto size = typed_handle.get_logical_size();
+
+						if (!point_in_rect(
+							transform->pos,
+							transform->rotation,
+							size,
+							camera.eye.transform.pos
+						)) {
 							return false;
 						}
 					}
-
-					return true;
-				});
-
-				if (visible) {
-					register_visible(cosm, id);
+					else {
+						return false;
+					}
 				}
-			}
-			else {
+
+				return true;
+			});
+
+			if (visible) {
 				register_visible(cosm, id);
 			}
 		};
+
+		const bool add_all_iconed = 
+			is_icon_type(type) && input.types.force_add_all_icons
+		;
+
+		if (add_all_iconed) {
+			tree_of_npo.for_all_of_type(
+				[&](const auto& unversioned_id) {
+					const auto id = cosm.get_versioned(unversioned_id);
+					//if (::passes_filter(input.filter, cosm, id)) {
+						register_visible(cosm, id);
+						//}
+				},
+				type
+			);
+
+			return;
+		}
 
 		if (type == tree_of_npo_type::ORGANISMS) {
 			organisms.for_each_cell_of_all_grids(

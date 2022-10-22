@@ -30,6 +30,9 @@ class editor_entity_selector {
 	entity_flavour_id flavour_of_held;
 	render_layer layer_of_held = render_layer::INVALID;
 
+	mutable visible_entities cache_visible;
+	mutable std::vector<entity_id> cache_non_hovering;
+
 	void reset_held_params();
 
 public:
@@ -69,13 +72,13 @@ public:
 		vec2i mouse_pos
 	) const;
 
-	static entity_id calc_hovered_entity(
+	entity_id calc_hovered_entity(
 		const cosmos& cosm,
 		const necessary_images_in_atlas_map& sizes_for_icons,
 		float zoom,
 		vec2 world_cursor_pos,
 		const maybe_layer_filter& filter
-	);
+	) const;
 
 	void do_mousemotion(
 		const necessary_images_in_atlas_map& sizes_for_icons,
