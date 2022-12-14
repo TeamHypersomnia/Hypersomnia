@@ -781,7 +781,7 @@ treat_as_music_sounds_longer_than_secs = 5,
   private_server = {
     master_rcon_password = "",
     rcon_password = "",
-    webhook_url = ""
+    discord_webhook_url = ""
   },
 
   dedicated_server = {

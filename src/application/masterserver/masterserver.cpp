@@ -261,12 +261,12 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
 		const auto ip_str = ::ToString(from);
 
-		auto webhook_url = parsed_url(cfg.private_server.webhook_url);
+		auto discord_webhook_url = parsed_url(cfg.private_server.discord_webhook_url);
 
 		push_webhook_job(
-			[ip_str, data, webhook_url]() -> std::string {
+			[ip_str, data, discord_webhook_url]() -> std::string {
 				const auto ca_path = CA_CERT_PATH;
-				http_client_type http_client(webhook_url.host);
+				http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
 				http_client.set_ca_cert_path(ca_path.c_str());
@@ -291,7 +291,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					nat_type_to_string(data.nat.type)
 				);
 
-				http_client.Post(webhook_url.location.c_str(), items);
+				http_client.Post(discord_webhook_url.location.c_str(), items);
 
 				return "";
 			}

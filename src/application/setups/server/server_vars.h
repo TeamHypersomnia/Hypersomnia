@@ -82,6 +82,6 @@ struct private_server_vars {
 	std::string master_rcon_password = "";
 	std::string rcon_password = "";
 
-	std::string webhook_url = "";
+	std::string discord_webhook_url = "";
 	// END GEN INTROSPECTOR
 };

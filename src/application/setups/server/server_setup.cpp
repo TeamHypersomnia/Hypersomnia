@@ -127,7 +127,7 @@ std::string server_setup::get_next_duel_pic_link() {
 void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupted_message& interrupt_info) {
 	finalize_webhook_jobs();
 
-	auto webhook_url = parsed_url(private_vars.webhook_url);
+	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
 	auto server_name = get_server_name();
 
 	LOG("pushing duel interrupted webhook.");
@@ -136,9 +136,9 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 	auto reconsidered = vars.webhooks.reconsidered_pic_link;
 
 	push_webhook_job(
-		[webhook_url, server_name, fled, reconsidered, interrupt_info]() -> std::string {
+		[discord_webhook_url, server_name, fled, reconsidered, interrupt_info]() -> std::string {
 			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(webhook_url.host);
+			http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
 			http_client.set_ca_cert_path(ca_path.c_str());
@@ -155,7 +155,7 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 				interrupt_info
 			);
 
-			http_client.Post(webhook_url.location.c_str(), items);
+			http_client.Post(discord_webhook_url.location.c_str(), items);
 
 			return "";
 		}
@@ -165,7 +165,7 @@ void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupte
 void server_setup::push_match_summary_webhook(const messages::match_summary_message& summary) {
 	finalize_webhook_jobs();
 
-	auto webhook_url = parsed_url(private_vars.webhook_url);
+	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
 	auto server_name = get_server_name();
 
 	const auto mvp_state = find_client_state(summary.mvp_player_id);
@@ -182,9 +182,9 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 	LOG("pushing match summary webhook.");
 
 	push_webhook_job(
-		[webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary]() -> std::string {
+		[discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary]() -> std::string {
 			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(webhook_url.host);
+			http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
 			http_client.set_ca_cert_path(ca_path.c_str());
@@ -202,7 +202,7 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 				summary
 			);
 
-			http_client.Post(webhook_url.location.c_str(), items);
+			http_client.Post(discord_webhook_url.location.c_str(), items);
 
 			return "";
 		}
@@ -210,15 +210,15 @@ void server_setup::push_match_summary_webhook(const messages::match_summary_mess
 }
 
 void server_setup::push_duel_of_honor_webhook(const std::string& first, const std::string& second) {
-	auto webhook_url = parsed_url(private_vars.webhook_url);
+	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
 	auto server_name = get_server_name();
 
 	LOG("pushing duel webhook with %x versus %x", first, second);
 
 	push_webhook_job(
-		[first, second, webhook_url, server_name, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
+		[first, second, discord_webhook_url, server_name, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
 			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(webhook_url.host);
+			http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
 			http_client.set_ca_cert_path(ca_path.c_str());
@@ -235,7 +235,7 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 				duel_pic_link
 			);
 
-			http_client.Post(webhook_url.location.c_str(), items);
+			http_client.Post(discord_webhook_url.location.c_str(), items);
 
 			return "";
 		}
@@ -255,7 +255,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 
 	state->pushed_connected_webhook = true;
 
-	auto webhook_url = parsed_url(private_vars.webhook_url);
+	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
 	auto server_name = get_server_name();
 	auto avatar = state->meta.avatar.image_bytes;
 	auto connected_player_nickname = state->get_nickname();
@@ -263,9 +263,9 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 	auto current_arena_name = get_current_arena_name();
 
 	push_webhook_job(
-		[webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
+		[discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
 			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(webhook_url.host);
+			http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
 			http_client.set_ca_cert_path(ca_path.c_str());
@@ -283,7 +283,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 				current_arena_name
 			);
 
-			auto response = http_client.Post(webhook_url.location.c_str(), items);
+			auto response = http_client.Post(discord_webhook_url.location.c_str(), items);
 
 			LOG("PUSH RESPONSE:");
 
