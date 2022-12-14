@@ -88,9 +88,6 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 						case game_intent_type::DASH:
 							movement->flags.dashing = it.was_pressed();
 							break;
-						case game_intent_type::PICK_UP_ITEMS:
-							movement->flags.picking = it.was_pressed();
-							break;
 
 						default: break;
 					}
@@ -279,10 +276,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			};
 
 			const bool is_walking = !movement.was_sprint_effective && [&]() {
-				if (movement.flags.picking) {
-					return true;
-				}
-
 				return movement.flags.walking;
 			}();
 

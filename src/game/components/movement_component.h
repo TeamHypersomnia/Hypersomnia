@@ -66,7 +66,7 @@ struct movement_flags {
 	bool backward = false;
 
 	bool walking = false;
-	bool picking = false;
+	pad_bytes<1> pad;
 	bool sprinting = false;
 	bool dashing = false;
 	// END GEN INTROSPECTOR

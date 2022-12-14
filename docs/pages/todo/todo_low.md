@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Coloring the light icons would be pretty useful
+
 - later rcon messages and server vars generally could be sent via blocks
 	- but this works well enough with low packet loss
 

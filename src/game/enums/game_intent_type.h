@@ -31,7 +31,6 @@ enum class game_intent_type {
 	DASH,
 	SPRINT,
 	WALK_SILENTLY,
-	PICK_UP_ITEMS,
 
 	INTERACT,
 	RELOAD,

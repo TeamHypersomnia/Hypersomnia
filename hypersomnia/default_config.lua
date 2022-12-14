@@ -96,7 +96,7 @@ return {
     LeftMouseButton = "SHOOT",
     RightMouseButton = "SHOOT_SECONDARY",
 
-    LeftControl = "PICK_UP_ITEMS",
+    LeftControl = "WALK_SILENTLY",
     G = "DROP",
 
     MiddleMouseButton = "THROW_FORCE_GRENADE",
