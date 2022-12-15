@@ -296,6 +296,35 @@ void perform_masterserver(const config_lua_table& cfg) try {
 				return "";
 			}
 		);
+
+		auto telegram_webhook_url = parsed_url(cfg.private_server.telegram_webhook_url);
+		auto telegram_channel_id = cfg.private_server.telegram_channel_id;
+
+		push_webhook_job(
+			[ip_str, data, telegram_webhook_url, telegram_channel_id]() -> std::string {
+				const auto ca_path = CA_CERT_PATH;
+				http_client_type http_client(telegram_webhook_url.host);
+
+#if BUILD_OPENSSL
+				http_client.set_ca_cert_path(ca_path.c_str());
+				http_client.enable_server_certificate_verification(true);
+#endif
+				http_client.set_follow_location(true);
+				http_client.set_read_timeout(5);
+				http_client.set_write_timeout(5);
+
+				auto items = telegram_webhooks::form_new_community_server(
+					telegram_channel_id,
+					data.server_name,
+					ip_str
+				);
+
+				const auto location = telegram_webhook_url.location + "/sendMessage";
+				http_client.Post(location.c_str(), items);
+
+				return "";
+			}
+		);
 	};
 
 	while (true) {

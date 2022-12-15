@@ -243,22 +243,23 @@ void server_setup::push_duel_of_honor_webhook(const std::string& first, const st
 }
 
 void server_setup::push_connected_webhook(const mode_player_id id) {
-	auto state = find_client_state(id);
+	auto client_state = find_client_state(id);
 
-	if (state == nullptr) {
+	if (client_state == nullptr) {
 		return;
 	}
 
-	if (state->pushed_connected_webhook) {
+	if (client_state->pushed_connected_webhook) {
 		return;
 	}
 
-	state->pushed_connected_webhook = true;
+	client_state->pushed_connected_webhook = true;
 
 	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
+
 	auto server_name = get_server_name();
-	auto avatar = state->meta.avatar.image_bytes;
-	auto connected_player_nickname = state->get_nickname();
+	auto avatar = client_state->meta.avatar.image_bytes;
+	auto connected_player_nickname = client_state->get_nickname();
 	auto all_nicknames = get_all_nicknames();
 	auto current_arena_name = get_current_arena_name();
 
@@ -299,6 +300,43 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 			return "";
 		}, 
 		id
+	);
+
+	auto telegram_webhook_url = parsed_url(private_vars.telegram_webhook_url);
+	auto telegram_channel_id = private_vars.telegram_channel_id;
+
+	push_webhook_job(
+		[telegram_webhook_url, telegram_channel_id, connected_player_nickname]() -> std::string {
+			const auto ca_path = CA_CERT_PATH;
+			http_client_type http_client(telegram_webhook_url.host);
+
+#if BUILD_OPENSSL
+			http_client.set_ca_cert_path(ca_path.c_str());
+			http_client.enable_server_certificate_verification(true);
+#endif
+			http_client.set_follow_location(true);
+			http_client.set_read_timeout(5);
+			http_client.set_write_timeout(5);
+
+			auto items = telegram_webhooks::form_player_connected(
+				telegram_channel_id,
+				connected_player_nickname
+			);
+
+			const auto location = telegram_webhook_url.location + "/sendMessage";
+			auto response = http_client.Post(location.c_str(), items);
+
+			LOG("TG PUSH RESPONSE:" + response->body);
+
+			if (response) {
+				LOG_NVPS(response->body);
+			}
+			else {
+				LOG("Response was null");
+			}
+
+			return "";
+		}
 	);
 }
 

@@ -18,6 +18,58 @@ inline std::string bytes_to_string(const std::vector<std::byte>& bytes) {
 	return result;
 }
 
+namespace telegram_webhooks {
+	inline std::string escaped_nick(const std::string& n) {
+		std::string result;
+
+		for (auto c : n) {
+			switch(c) {
+				case '*':
+				case '_':
+				case '~':
+				case '>':
+				case '`':
+					result += '\\';
+					break;
+				default:
+					break;
+
+			}
+
+			result += c;
+		}
+
+		return result;
+	}
+
+	inline httplib::MultipartFormDataItems form_player_connected(
+		const std::string& channel_id,
+		const std::string& connected_player
+	) {
+		const auto connected_notice = typesafe_sprintf("*%x* connected.", escaped_nick(connected_player));
+
+		return {
+			{ "chat_id", channel_id, "", "" },
+			{ "parse_mode", "Markdown", "", "" },
+			{ "text", connected_notice, "", "" }
+		};
+	}
+
+	inline httplib::MultipartFormDataItems form_new_community_server(
+		const std::string& channel_id,
+		const std::string& new_server_name,
+		const std::string& new_server_ip
+	) {
+		std::string full_description = "*" + escaped_nick(new_server_name) + "*" + " hosted at " + "*" + new_server_ip + "*";
+
+		return {
+			{ "chat_id", channel_id, "", "" },
+			{ "parse_mode", "Markdown", "", "" },
+			{ "text", full_description, "", "" }
+		};
+	}
+}
+
 namespace discord_webhooks {
 	inline std::string find_attachment_url(const std::string& response) {
 		rapidjson::Document d;

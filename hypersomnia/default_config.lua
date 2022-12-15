@@ -781,7 +781,9 @@ treat_as_music_sounds_longer_than_secs = 5,
   private_server = {
     master_rcon_password = "",
     rcon_password = "",
-    discord_webhook_url = ""
+    discord_webhook_url = "",
+    telegram_webhook_url = "",
+    telegram_channel_id = "@hypersomnia_monitor"
   },
 
   dedicated_server = {

@@ -83,5 +83,7 @@ struct private_server_vars {
 	std::string rcon_password = "";
 
 	std::string discord_webhook_url = "";
+	std::string telegram_webhook_url = "";
+	std::string telegram_channel_id = "@hypersomnia_monitor";
 	// END GEN INTROSPECTOR
 };
