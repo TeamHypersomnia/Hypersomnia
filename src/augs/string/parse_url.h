@@ -8,6 +8,10 @@ struct parsed_url {
 	std::string query;
 
 	parsed_url(const std::string& url_s) {
+		if (url_s.empty()) {
+			return;
+		}
+
 		using namespace std;
 
 		const string prot_end("://");
@@ -30,6 +34,10 @@ struct parsed_url {
 		if( query_i != url_s.end() )
 		++query_i;
 		query.assign(query_i, url_s.end());
+	}
+
+	bool valid() const {
+		return !protocol.empty() && !host.empty();
 	}
 };
 

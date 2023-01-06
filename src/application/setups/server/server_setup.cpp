@@ -127,119 +127,122 @@ std::string server_setup::get_next_duel_pic_link() {
 void server_setup::push_duel_interrupted_webhook(const messages::duel_interrupted_message& interrupt_info) {
 	finalize_webhook_jobs();
 
-	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
-	auto server_name = get_server_name();
+	if (auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url); discord_webhook_url.valid()) {
+		auto server_name = get_server_name();
 
-	LOG("pushing duel interrupted webhook.");
+		LOG("pushing duel interrupted webhook.");
 
-	auto fled = vars.webhooks.fled_pic_link;
-	auto reconsidered = vars.webhooks.reconsidered_pic_link;
+		auto fled = vars.webhooks.fled_pic_link;
+		auto reconsidered = vars.webhooks.reconsidered_pic_link;
 
-	push_webhook_job(
-		[discord_webhook_url, server_name, fled, reconsidered, interrupt_info]() -> std::string {
-			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(discord_webhook_url.host);
+		push_webhook_job(
+			[discord_webhook_url, server_name, fled, reconsidered, interrupt_info]() -> std::string {
+				const auto ca_path = CA_CERT_PATH;
+				http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
-			http_client.set_ca_cert_path(ca_path.c_str());
-			http_client.enable_server_certificate_verification(true);
+				http_client.set_ca_cert_path(ca_path.c_str());
+				http_client.enable_server_certificate_verification(true);
 #endif
-			http_client.set_follow_location(true);
-			http_client.set_read_timeout(5);
-			http_client.set_write_timeout(5);
+				http_client.set_follow_location(true);
+				http_client.set_read_timeout(5);
+				http_client.set_write_timeout(5);
 
-			auto items = discord_webhooks::form_duel_interrupted(
-				server_name,
-				fled,
-				reconsidered,
-				interrupt_info
-			);
+				auto items = discord_webhooks::form_duel_interrupted(
+					server_name,
+					fled,
+					reconsidered,
+					interrupt_info
+				);
 
-			http_client.Post(discord_webhook_url.location.c_str(), items);
+				http_client.Post(discord_webhook_url.location.c_str(), items);
 
-			return "";
-		}
-	);
+				return "";
+			}
+		);
+	}
 }
 
 void server_setup::push_match_summary_webhook(const messages::match_summary_message& summary) {
 	finalize_webhook_jobs();
 
-	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
-	auto server_name = get_server_name();
+	if (auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url); discord_webhook_url.valid()) {
+		auto server_name = get_server_name();
 
-	const auto mvp_state = find_client_state(summary.mvp_player_id);
+		const auto mvp_state = find_client_state(summary.mvp_player_id);
 
-	if (mvp_state == nullptr) {
-		return;
-	}
+		if (mvp_state == nullptr) {
+			return;
+		}
 
-	auto mvp_nickname = mvp_state->get_nickname();
-	auto mvp_player_avatar_url = mvp_state->uploaded_avatar_url;
-	const auto this_duel_index = (duel_pic_counter - 1) % vars.webhooks.num_duel_pics;
-	auto duel_victory_pic_link = typesafe_sprintf(vars.webhooks.duel_victory_pic_link_pattern, this_duel_index);
+		auto mvp_nickname = mvp_state->get_nickname();
+		auto mvp_player_avatar_url = mvp_state->uploaded_avatar_url;
+		const auto this_duel_index = (duel_pic_counter - 1) % vars.webhooks.num_duel_pics;
+		auto duel_victory_pic_link = typesafe_sprintf(vars.webhooks.duel_victory_pic_link_pattern, this_duel_index);
 
-	LOG("pushing match summary webhook.");
+		LOG("pushing match summary webhook.");
 
-	push_webhook_job(
-		[discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary]() -> std::string {
-			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(discord_webhook_url.host);
+		push_webhook_job(
+			[discord_webhook_url, server_name, mvp_nickname, mvp_player_avatar_url, duel_victory_pic_link, summary]() -> std::string {
+				const auto ca_path = CA_CERT_PATH;
+				http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
-			http_client.set_ca_cert_path(ca_path.c_str());
-			http_client.enable_server_certificate_verification(true);
+				http_client.set_ca_cert_path(ca_path.c_str());
+				http_client.enable_server_certificate_verification(true);
 #endif
-			http_client.set_follow_location(true);
-			http_client.set_read_timeout(5);
-			http_client.set_write_timeout(5);
+				http_client.set_follow_location(true);
+				http_client.set_read_timeout(5);
+				http_client.set_write_timeout(5);
 
-			auto items = discord_webhooks::form_match_summary(
-				server_name,
-				mvp_nickname,
-				mvp_player_avatar_url,
-				duel_victory_pic_link,
-				summary
-			);
+				auto items = discord_webhooks::form_match_summary(
+					server_name,
+					mvp_nickname,
+					mvp_player_avatar_url,
+					duel_victory_pic_link,
+					summary
+				);
 
-			http_client.Post(discord_webhook_url.location.c_str(), items);
+				http_client.Post(discord_webhook_url.location.c_str(), items);
 
-			return "";
-		}
-	);
+				return "";
+			}
+		);
+	}
 }
 
 void server_setup::push_duel_of_honor_webhook(const std::string& first, const std::string& second) {
-	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
-	auto server_name = get_server_name();
+	if (auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url); discord_webhook_url.valid()) {
+		auto server_name = get_server_name();
 
-	LOG("pushing duel webhook with %x versus %x", first, second);
+		LOG("pushing duel webhook with %x versus %x", first, second);
 
-	push_webhook_job(
-		[first, second, discord_webhook_url, server_name, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
-			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(discord_webhook_url.host);
+		push_webhook_job(
+			[first, second, discord_webhook_url, server_name, duel_pic_link = get_next_duel_pic_link()]() -> std::string {
+				const auto ca_path = CA_CERT_PATH;
+				http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
-			http_client.set_ca_cert_path(ca_path.c_str());
-			http_client.enable_server_certificate_verification(true);
+				http_client.set_ca_cert_path(ca_path.c_str());
+				http_client.enable_server_certificate_verification(true);
 #endif
-			http_client.set_follow_location(true);
-			http_client.set_read_timeout(5);
-			http_client.set_write_timeout(5);
+				http_client.set_follow_location(true);
+				http_client.set_read_timeout(5);
+				http_client.set_write_timeout(5);
 
-			auto items = discord_webhooks::form_duel_of_honor(
-				server_name,
-				first,
-				second,
-				duel_pic_link
-			);
+				auto items = discord_webhooks::form_duel_of_honor(
+					server_name,
+					first,
+					second,
+					duel_pic_link
+				);
 
-			http_client.Post(discord_webhook_url.location.c_str(), items);
+				http_client.Post(discord_webhook_url.location.c_str(), items);
 
-			return "";
-		}
-	);
+				return "";
+			}
+		);
+	}
 }
 
 void server_setup::push_connected_webhook(const mode_player_id id) {
@@ -255,89 +258,91 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 
 	client_state->pushed_connected_webhook = true;
 
-	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
-
-	auto server_name = get_server_name();
-	auto avatar = client_state->meta.avatar.image_bytes;
 	auto connected_player_nickname = client_state->get_nickname();
-	auto all_nicknames = get_all_nicknames();
-	auto current_arena_name = get_current_arena_name();
 
-	push_webhook_job(
-		[discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
-			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(discord_webhook_url.host);
+	if (auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url); discord_webhook_url.valid()) {
+		auto server_name = get_server_name();
+		auto avatar = client_state->meta.avatar.image_bytes;
+		auto all_nicknames = get_all_nicknames();
+		auto current_arena_name = get_current_arena_name();
 
-#if BUILD_OPENSSL
-			http_client.set_ca_cert_path(ca_path.c_str());
-			http_client.enable_server_certificate_verification(true);
-#endif
-			http_client.set_follow_location(true);
-			http_client.set_read_timeout(5);
-			http_client.set_write_timeout(5);
-
-			auto items = discord_webhooks::form_player_connected(
-				avatar,
-				server_name,
-				connected_player_nickname,
-				all_nicknames,
-				current_arena_name
-			);
-
-			auto response = http_client.Post(discord_webhook_url.location.c_str(), items);
-
-			LOG("PUSH RESPONSE:");
-
-			if (response) {
-				LOG_NVPS(response->body);
-
-				return discord_webhooks::find_attachment_url(response->body);
-			}
-			else {
-				LOG("Response was null");
-			}
-
-			return "";
-		}, 
-		id
-	);
-
-	auto telegram_webhook_url = parsed_url(private_vars.telegram_webhook_url);
-	auto telegram_channel_id = private_vars.telegram_channel_id;
-
-	push_webhook_job(
-		[telegram_webhook_url, telegram_channel_id, connected_player_nickname]() -> std::string {
-			const auto ca_path = CA_CERT_PATH;
-			http_client_type http_client(telegram_webhook_url.host);
+		push_webhook_job(
+			[discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
+				const auto ca_path = CA_CERT_PATH;
+				http_client_type http_client(discord_webhook_url.host);
 
 #if BUILD_OPENSSL
-			http_client.set_ca_cert_path(ca_path.c_str());
-			http_client.enable_server_certificate_verification(true);
+				http_client.set_ca_cert_path(ca_path.c_str());
+				http_client.enable_server_certificate_verification(true);
 #endif
-			http_client.set_follow_location(true);
-			http_client.set_read_timeout(5);
-			http_client.set_write_timeout(5);
+				http_client.set_follow_location(true);
+				http_client.set_read_timeout(5);
+				http_client.set_write_timeout(5);
 
-			auto items = telegram_webhooks::form_player_connected(
-				telegram_channel_id,
-				connected_player_nickname
-			);
+				auto items = discord_webhooks::form_player_connected(
+					avatar,
+					server_name,
+					connected_player_nickname,
+					all_nicknames,
+					current_arena_name
+				);
 
-			const auto location = telegram_webhook_url.location + "/sendMessage";
-			auto response = http_client.Post(location.c_str(), items);
+				auto response = http_client.Post(discord_webhook_url.location.c_str(), items);
 
-			LOG("TG PUSH RESPONSE:" + response->body);
+				LOG("PUSH RESPONSE:");
 
-			if (response) {
-				LOG_NVPS(response->body);
+				if (response) {
+					LOG_NVPS(response->body);
+
+					return discord_webhooks::find_attachment_url(response->body);
+				}
+				else {
+					LOG("Response was null");
+				}
+
+				return "";
+			}, 
+			id
+		);
+	}
+
+	if (auto telegram_webhook_url = parsed_url(private_vars.telegram_webhook_url); telegram_webhook_url.valid()) {
+		auto telegram_channel_id = private_vars.telegram_channel_id;
+
+		push_webhook_job(
+			[telegram_webhook_url, telegram_channel_id, connected_player_nickname]() -> std::string {
+				const auto ca_path = CA_CERT_PATH;
+				http_client_type http_client(telegram_webhook_url.host);
+
+#if BUILD_OPENSSL
+				http_client.set_ca_cert_path(ca_path.c_str());
+				http_client.enable_server_certificate_verification(true);
+#endif
+				http_client.set_follow_location(true);
+				http_client.set_read_timeout(5);
+				http_client.set_write_timeout(5);
+
+				auto items = telegram_webhooks::form_player_connected(
+					telegram_channel_id,
+					connected_player_nickname
+				);
+
+				const auto location = telegram_webhook_url.location + "/sendMessage";
+				auto response = http_client.Post(location.c_str(), items);
+
+				LOG("TG PUSH RESPONSE:" + response->body);
+
+				if (response) {
+					LOG_NVPS(response->body);
+				}
+				else {
+					LOG("Response was null");
+				}
+
+				return "";
 			}
-			else {
-				LOG("Response was null");
-			}
-
-			return "";
-		}
-	);
+		);
+	}
 }
 
 void server_setup::finalize_webhook_jobs() {
