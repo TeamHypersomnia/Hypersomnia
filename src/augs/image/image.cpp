@@ -639,6 +639,12 @@ namespace augs {
 			*this = std::move(new_image);
 		}
 	}
+
+	image::gif_data image::gif_to_frames(const path_type& file_path) {
+		image::gif_data result;
+
+		return result;
+	}
 }
 
 

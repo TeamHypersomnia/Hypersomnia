@@ -73,6 +73,15 @@ namespace augs {
 			STB
 		};
 
+		struct frame {
+			std::vector<std::byte> serialized_frame;
+			float duration_milliseconds = 0.0f;
+		};
+
+		using gif_data = std::vector<frame>;
+
+		static gif_data gif_to_frames(const path_type& file_path);
+
 		static image white_pixel();
 
 		static vec2u get_size(const path_type& file_path);

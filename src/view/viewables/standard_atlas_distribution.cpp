@@ -6,6 +6,7 @@
 #include "augs/templates/thread_pool.h"
 #include "augs/templates/introspect.h"
 #include "view/viewables/regeneration/atlas_progress_structs.h"
+#include "augs/log.h"
 
 void regenerate_and_gather_subjects(
 	const subjects_gathering_input in,
@@ -194,29 +195,58 @@ general_atlas_output create_general_atlas(
 
 ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 	thread_local atlas_input_subjects atlas_subjects;
-	thread_local std::vector<ad_hoc_entry_id> identificators;
 	thread_local baked_atlas baked;
 
-	identificators.clear();
 	atlas_subjects.clear();
 	baked.clear();
 
-	const auto num_subjects = static_cast<int>(in.subjects.size());
+	std::unordered_map<augs::path_type, ad_hoc_entry_id> input_path_to_id;
+	std::unordered_map<augs::path_type, augs::image::gif_data> gif_datas;
 
-	atlas_subjects.loaded_images.resize(num_subjects);
-	identificators.resize(num_subjects);
-
-	for (int i = 0; i < num_subjects; ++i) {
-		const auto& entry = in.subjects[i];
+	for (const auto& entry : in.subjects) {
+		if (entry.image_path.extension() == ".gif") {
+			continue;
+		}
 
 		try {
-			augs::file_to_bytes(entry.image_path, atlas_subjects.loaded_images[i]);
+			std::vector<std::byte> bytes;
+			augs::file_to_bytes(entry.image_path, bytes);
+			atlas_subjects.loaded_images.emplace_back(std::move(bytes));
+
+			input_path_to_id[entry.image_path] = entry.id;
+
+			atlas_subjects.images.push_back(entry.image_path);
 		}
 		catch (...) {
 
 		}
+	}
 
-		identificators[i] = entry.id;
+	const auto virtual_gif_ext_template = ".gif.+%x.png";
+
+	for (const auto& entry : in.subjects) {
+		if (entry.image_path.extension() != ".gif") {
+			continue;
+		}
+
+		try {
+			auto frames = augs::image::gif_to_frames(entry.image_path);
+
+			for (std::size_t i = 0; i < frames.size(); ++i) {
+				auto& frame = frames[i];
+
+				auto frame_virtual_path = entry.image_path;
+				frame_virtual_path.replace_extension(typesafe_sprintf(virtual_gif_ext_template, i));
+
+				atlas_subjects.loaded_images.emplace_back(std::move(frame.serialized_frame));
+			}
+
+			input_path_to_id[entry.image_path] = entry.id;
+			gif_datas[entry.image_path] = std::move(frames);
+		}
+		catch (...) {
+
+		}
 	}
 
 	atlas_profiler performance;
@@ -238,13 +268,26 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 	ad_hoc_atlas_output out;
 	out.atlas_size = baked.atlas_image_size;
 
-	ensure_eq(identificators.size(), baked.loaded_images.size());
+	for (auto& it : input_path_to_id) {
+		const auto& baked_path = it.first;
+		const auto entry_id = it.second;
 
-	for (int i = 0; i < static_cast<int>(identificators.size()); ++i) {
-		const auto& id = identificators[i];
-		const auto& baked_image = baked.loaded_images[i];
+		if (const auto gif_data = mapped_or_nullptr(gif_datas, baked_path)) {
+			for (std::size_t i = 0; i < gif_data->size(); ++i) {
+				auto queried_path = baked_path;
+				queried_path.replace_extension(typesafe_sprintf(virtual_gif_ext_template, i));
 
-		out.atlas_entries[id] = baked_image;
+				if (const auto baked_image = mapped_or_nullptr(baked.images, queried_path)) {
+					out.atlas_entries.add_frame(entry_id, *baked_image, gif_data->at(i).duration_milliseconds);
+				}
+			}
+
+			continue;
+		}
+
+		const auto& baked_image = baked.images.at(baked_path);
+
+		out.atlas_entries.add_frame(entry_id, baked_image, 0.0f);
 	}
 
 	return out;
