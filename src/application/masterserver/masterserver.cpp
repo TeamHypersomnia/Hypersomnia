@@ -97,6 +97,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	LOG("Creating %x masterserver sockets for UDP commands.", num_sockets);
 
+	augs::timer since_launch;
+
 	for (int i = 0; i < num_sockets; ++i) {
 		const auto new_port = settings.first_udp_command_port + i;
 
@@ -260,6 +262,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
 		const auto ip_str = ::ToString(from);
+
+		if (since_launch.get<std::chrono::seconds>() < settings.suppress_community_server_webhooks_after_launch_for_secs) {
+			return;
+		}
 
 		if (auto discord_webhook_url = parsed_url(cfg.private_server.discord_webhook_url); discord_webhook_url.valid()) {
 			push_webhook_job(

@@ -5,6 +5,7 @@ struct masterserver_settings {
 	// GEN INTROSPECTOR struct masterserver_settings
 	std::string ip = "127.0.0.1";
 	unsigned server_entry_timeout_secs = 60;
+	unsigned suppress_community_server_webhooks_after_launch_for_secs = 20;
 
 	port_type first_udp_command_port = 8430;
 	int num_udp_command_ports = 5;
