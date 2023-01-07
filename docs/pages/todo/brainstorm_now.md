@@ -6,9 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- On masterserver, disable notifications for 5 secs after restarting server so all community servers won't trigger a notification
-
+- Autoupdate would be handy for dedicated server admins too
+	- It comes *before* simulating the dedicated server in main so should happen automatically even
 - dedicated server should default to allow_nat_traversal = false I believe
+	- We left it like this because is if someone's setting up a dedicated server they're usually educated enough to set this flag themselves, but it's just a pain in the ass
+	- Normally behind routers people will just select the integrated server option IMO, there's no advantage to hosting a dedicated server from the game menu
 - .password files should be reloaded every launch not just update
 
 - For quick gratification We could first add decoder and load first gif frame like a png

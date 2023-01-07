@@ -172,6 +172,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static const auto canon_config_path = augs::path_type("default_config.lua");
 	static const auto local_config_path = augs::path_type(USER_FILES_DIR "/config.lua");
+	static const auto force_config_path = augs::path_type(USER_FILES_DIR "/config.force.lua");
 
 	LOG("Creating lua state.");
 	static auto lua = augs::create_lua_state();
@@ -225,6 +226,10 @@ work_result work(const int argc, const char* const * const argv) try {
 		if (augs::exists(local_config_path)) {
 			auto result = canon_config;
 			result.load_patch(lua, local_config_path);
+
+			if (augs::exists(force_config_path)) {
+				result.load_patch(lua, force_config_path);
+			}
 
 			return result;
 		}

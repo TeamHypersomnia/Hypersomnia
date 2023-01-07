@@ -5,6 +5,11 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- The only problem with how we do canon/local config is that some local settings might disappear
+	- If we manually set allow nat = false and then we launch a dedicated server, that setting might disappear
+		- Is that really that much of a bad thing though?
+	- Won't happen with a force config
+
 - Shift+T could move with layer detection just like when putting on scene
 	- Point is, how do we quickly move one entity over another with just on-scene operations?
 		- I think ctrl+x + ctrl+v. So this is for later. Ctrl+v will always paste nodes above the topmost selected node

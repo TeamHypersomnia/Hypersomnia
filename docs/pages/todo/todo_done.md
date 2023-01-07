@@ -4748,3 +4748,5 @@ Advantages:
 	- also is_static/is_see_through
 
 - And fix that icon hover logic!!
+- On masterserver, disable notifications for 5 secs after restarting server so all community servers won't trigger a notification
+
