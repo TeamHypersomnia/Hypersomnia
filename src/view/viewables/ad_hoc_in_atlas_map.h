@@ -24,13 +24,7 @@ struct ad_hoc_in_atlas_map {
 
 	const augs::atlas_entry* find(const ad_hoc_entry_id& id) const {
 		if (const auto anim = mapped_or_nullptr(entries, id)) {
-			if (anim->frames.size() == 1) {
-				return std::addressof(anim->frames.at(0).entry);
-			}
-
-			if (const auto frame = calc_current_frame(*anim, animation_time)) {
-				return std::addressof(frame->entry);
-			}
+			return std::addressof(calc_current_frame_looped(*anim, animation_time * 1000).entry);
 		}
 
 		return nullptr;

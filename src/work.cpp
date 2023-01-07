@@ -1455,6 +1455,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		return result;
 	};
 
+	static augs::timer ad_hoc_animation_timer;
+
 	static auto perform_setup_custom_imgui = [&]() {
 		/*
 			The debugger setup might want to use IMGUI to create views of entities or resources,
@@ -1464,6 +1466,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		*/
 
 		visit_current_setup([&](auto& setup) {
+			streaming.ad_hoc.in_atlas.animation_time = ad_hoc_animation_timer.get<std::chrono::seconds>();
+
 			const auto result = setup.perform_custom_imgui({ 
 				lua,
 				window,

@@ -202,6 +202,7 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 
 	std::unordered_map<augs::path_type, ad_hoc_entry_id> input_path_to_id;
 	std::unordered_map<augs::path_type, augs::image::gif_data> gif_datas;
+	std::unordered_map<augs::path_type, std::size_t> starting_loading_image;
 
 	for (const auto& entry : in.subjects) {
 		if (entry.image_path.extension() == ".gif") {
@@ -209,20 +210,13 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 		}
 
 		try {
-			std::vector<std::byte> bytes;
-			augs::file_to_bytes(entry.image_path, bytes);
-			atlas_subjects.loaded_images.emplace_back(std::move(bytes));
-
-			input_path_to_id[entry.image_path] = entry.id;
-
 			atlas_subjects.images.push_back(entry.image_path);
+			input_path_to_id[entry.image_path] = entry.id;
 		}
 		catch (...) {
 
 		}
 	}
-
-	const auto virtual_gif_ext_template = ".gif.+%x.png";
 
 	for (const auto& entry : in.subjects) {
 		if (entry.image_path.extension() != ".gif") {
@@ -231,12 +225,10 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 
 		try {
 			auto frames = augs::image::gif_to_frames(entry.image_path);
+			starting_loading_image[entry.image_path] = atlas_subjects.loaded_images.size();
 
 			for (std::size_t i = 0; i < frames.size(); ++i) {
 				auto& frame = frames[i];
-
-				auto frame_virtual_path = entry.image_path;
-				frame_virtual_path.replace_extension(typesafe_sprintf(virtual_gif_ext_template, i));
 
 				atlas_subjects.loaded_images.emplace_back(std::move(frame.serialized_frame));
 			}
@@ -273,13 +265,13 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 		const auto entry_id = it.second;
 
 		if (const auto gif_data = mapped_or_nullptr(gif_datas, baked_path)) {
-			for (std::size_t i = 0; i < gif_data->size(); ++i) {
-				auto queried_path = baked_path;
-				queried_path.replace_extension(typesafe_sprintf(virtual_gif_ext_template, i));
+			const auto start_i = starting_loading_image[baked_path];
 
-				if (const auto baked_image = mapped_or_nullptr(baked.images, queried_path)) {
-					out.atlas_entries.add_frame(entry_id, *baked_image, gif_data->at(i).duration_milliseconds);
-				}
+			for (std::size_t i = 0; i < gif_data->size(); ++i) {
+				const auto baked_image = baked.loaded_images[start_i + i];
+				const auto ms = gif_data->at(i).duration_milliseconds;
+
+				out.atlas_entries.add_frame(entry_id, baked_image, ms);
 			}
 
 			continue;

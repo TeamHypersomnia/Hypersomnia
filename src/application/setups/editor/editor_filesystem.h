@@ -218,6 +218,10 @@ struct editor_filesystem_node {
 			type = editor_filesystem_node_type::IMAGE;
 		}
 
+		if (extension == ".gif") {
+			type = editor_filesystem_node_type::IMAGE;
+		}
+
 		if (assets::is_sound_extension(extension)) {
 			type = editor_filesystem_node_type::SOUND;
 		}

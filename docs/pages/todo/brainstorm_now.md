@@ -6,7 +6,40 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Coloring the light icons would be pretty useful
+- On masterserver, disable notifications for 5 secs after restarting server so all community servers won't trigger a notification
+
+- dedicated server should default to allow_nat_traversal = false I believe
+- .password files should be reloaded every launch not just update
+
+- For quick gratification We could first add decoder and load first gif frame like a png
+	- We'll also see how it looks on atlas generation side
+	- For ad hoc generation we don't need to modify cosmos-related structs
+		- we can already display it on the list
+		- remember? it's always in this order, first UI then backend because UI helps debug backend
+
+- Animations
+	- Used only in a) animation component or b) particles defs
+		- animating decorations/organisms (animation component)
+	- How do we plug them into object-per-sprite system?
+	- why can't we just create animations for viewables as usual?
+		- we probably can and will
+	- We only wanted to templatize the particle types because we need a separate means of keeping them in the editor state
+		- could be introspectively assigned
+	- Okay so we just need a means of translating some editor animation resources to proper cosmos resources
+		- Contrary to classic editors we won't make animation a vector of sprite resources
+		- It will instead keep a single animation resource with properties for a single sprite to be applied to all frames
+	- What about pathed assets?
+		- Do we want to keep separate forms of animation, i.e. separate pngs and gifs?
+		- I think just one will be enough
+		- It's good if we force small number of colors anyway
+	- With gifs, adhoc atlas will be problematic
+		- It takes a path
+	- How do we create the rest of resources like officials?
+- So problems to solve
+	- For adhoc there can be a separate system that just keeps track of the animation and feeds proper changed coordinates
+		- Without virtualization on the atlas generation level
+	- We won't recreate the atlas every time, we'll just pass different coordinates
+		
 
 - Alright let's now try creating various entity types like lights and sounds
 - I think we'll first implement animations because we'll need them for the particles

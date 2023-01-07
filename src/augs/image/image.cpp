@@ -155,6 +155,10 @@ auto& thread_local_file_buffer() {
 	return loaded_bytes;
 }
 
+std::array<uint32_t, 3> get_bin_file_magic_numbers() {
+	return { 8142, 1337, 33333333 };
+}
+
 namespace augs {
 	static void throw_if_zero_size(const path_type& path, const vec2u size) {
 		if (!size.x || !size.y) {
@@ -264,6 +268,20 @@ namespace augs {
 	}
 
 	vec2u image::get_size(const std::vector<std::byte>& bytes) {
+		{
+			auto in = augs::cref_memory_stream(bytes);
+
+			auto magic_numbers = decltype(get_bin_file_magic_numbers())();
+			augs::read_bytes(in, magic_numbers);
+
+			if (magic_numbers == get_bin_file_magic_numbers()) {
+				auto size = vec2u::zero;
+				augs::read_bytes(in, size);
+
+				return size;
+			}
+		}
+
 		int x;
 		int y;
 		int comp;
@@ -347,6 +365,11 @@ namespace augs {
 		auto in = with_exceptions<std::ifstream>();
 		in.open(path, std::ios::in | std::ios::binary);
 
+		auto magic_numbers = decltype(get_bin_file_magic_numbers())();
+
+		augs::read_bytes(in, magic_numbers);
+		ensure(magic_numbers == get_bin_file_magic_numbers());
+
 		augs::read_bytes(in, size);
 		augs::read_bytes(in, v);
 
@@ -374,19 +397,36 @@ namespace augs {
 			augs::read_bytes(in, v);
 		}
 		else {
-			int width;
-			int height;
-			int comp;
+			/* Detect extension */
 
-			const auto result = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(from.data()), static_cast<int>(from.size()), &width, &height, &comp, 4);
+			auto load_general = [this, &reported_path, &from]() {
+				int width;
+				int height;
+				int comp;
 
-			if (result == nullptr) {
-				throw image_loading_error(
-					"Failed to load image %x (earlier loaded into memory):\nstbi returned NULL", reported_path
-				);
+				const auto result = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(from.data()), static_cast<int>(from.size()), &width, &height, &comp, 4);
+
+				if (result == nullptr) {
+					throw image_loading_error(
+						"Failed to load image %x (earlier loaded into memory):\nstbi returned NULL", reported_path
+					);
+				}
+
+				load_stbi_buffer(result, width, height);
+			};
+
+			auto in = augs::cref_memory_stream(from);
+
+			std::array<uint32_t, 3> magic_numbers {};
+			augs::read_bytes(in, magic_numbers);
+
+			if (magic_numbers == get_bin_file_magic_numbers()) {
+				augs::read_bytes(in, size);
+				augs::read_bytes(in, v);
 			}
-
-			load_stbi_buffer(result, width, height);
+			else {
+				load_general();
+			}
 		}
 	}
 
@@ -596,6 +636,7 @@ namespace augs {
 		augs::create_directories_for(path);
 
 		std::ofstream out(path, std::ios::out | std::ios::binary);
+		augs::write_bytes(out, get_bin_file_magic_numbers());
 		augs::write_bytes(out, size);
 		augs::write_bytes(out, v);
 	}
@@ -640,10 +681,88 @@ namespace augs {
 		}
 	}
 
-	image::gif_data image::gif_to_frames(const path_type& file_path) {
-		image::gif_data result;
+	unsigned char *stbi_xload(stbi__context *s, int *x, int *y, int *frames, int **delays)
+	{
+		int comp;
+		unsigned char *result = 0;
+
+		if (stbi__gif_test(s))
+			return reinterpret_cast<unsigned char*>(stbi__load_gif_main(s, delays, x, y, frames, &comp, 4));
+
+		stbi__result_info ri;
+		result = reinterpret_cast<unsigned char*>(stbi__load_main(s, x, y, &comp, 4, &ri, 8));
+		*frames = !!result;
+
+		if (ri.bits_per_channel != 8) {
+			STBI_ASSERT(ri.bits_per_channel == 16);
+			result = stbi__convert_16_to_8((stbi__uint16 *)result, *x, *y, 4);
+			ri.bits_per_channel = 8;
+		}
 
 		return result;
+	}
+
+	unsigned char *stbi_xload_mem(unsigned char *buffer, int len, int *x, int *y, int *frames, int **delays)
+	{
+		stbi__context s;
+		stbi__start_mem(&s, buffer, len);
+		return stbi_xload(&s, x, y, frames, delays);
+	}
+
+	image::gif_data image::gif_to_frames(const path_type& path) {
+		image::gif_data output_frames;
+
+		auto& loaded_bytes = thread_local_file_buffer();
+
+		try {
+			augs::file_to_bytes(path, loaded_bytes);
+
+			int frames_n = 0;
+			int x = 0;
+			int y = 0;
+			int* delays = nullptr;
+
+			const auto packed_gif_frames = stbi_xload_mem(
+				reinterpret_cast<unsigned char*>(loaded_bytes.data()),
+				loaded_bytes.size(), 
+				&x,
+				&y,
+				&frames_n,
+				&delays
+			);
+
+			if (packed_gif_frames) {
+				const auto single_image_bytes = x * y * 4;
+
+				for (int i = 0; i < frames_n; ++i) {
+					output_frames.emplace_back();
+					auto& new_frame = output_frames.back();
+
+					new_frame.duration_milliseconds = delays[i];
+
+					auto ar = augs::ref_memory_stream(new_frame.serialized_frame);
+
+					augs::write_bytes(ar, get_bin_file_magic_numbers());
+					augs::write_bytes(ar, vec2u(x, y));
+					augs::write_bytes(ar, uint32_t(x * y));
+
+					ar.write(reinterpret_cast<const std::byte*>(packed_gif_frames + i * single_image_bytes), single_image_bytes);
+				}
+			}
+
+			if (delays) {
+				stbi_image_free(reinterpret_cast<void*>(delays));
+			}
+
+			if (packed_gif_frames) {
+				stbi_image_free(reinterpret_cast<void*>(packed_gif_frames));
+			}
+		}
+		catch (...) {
+
+		}
+
+		return output_frames;
 	}
 }
 
