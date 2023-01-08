@@ -80,9 +80,17 @@ static void report_explosive(const auto enum_id, H handle) {
 	entry.notes = handle.template get<invariants::text_details>().description;
 
 	entry.price = item.standard_price;
-	entry.kill_award = explosive.adversarial.knockout_award;
 
 	entry.fuse_delay = fuse.fuse_delay_ms / 1000;
+
+	if (explosive.explosion.type == adverse_element_type::FORCE) {
+		entry.kill_award = explosive.adversarial.knockout_award;
+		entry.base_damage = explosive.explosion.damage.base;
+	}
+	else {
+		entry.kill_award = -1;
+		entry.base_damage = -1;
+	}
 
 	entry.weight = 100 * handle.template get<components::rigid_body>().get_mass();
 
@@ -266,7 +274,7 @@ static void report_all_spells(cosmos& cosm) {
 			entry.mana_required = spell.common.personal_electricity_required;
 			entry.kill_award = spell.common.adversarial.knockout_award;
 			entry.id = id;
-			entry.pic_filename = id + ".png";
+			entry.pic_filename = "spell_" + id + "_icon.png";
 			entry.display_name = spell.appearance.name;
 			entry.notes = spell.appearance.description;
 			entry.incantation = spell.appearance.incantation;
