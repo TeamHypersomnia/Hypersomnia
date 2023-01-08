@@ -1495,7 +1495,7 @@ namespace test_flavours {
 			missile.damage.impact_impulse = 450.f;
 			missile.damage.impulse_multiplier_against_sentience = 1.f;
 			missile.ricochet_born_cooldown_ms = 17.f;
-			missile.pe_damage_ratio = 0.15f;
+			missile.pe_damage_ratio = 0.4;
 			missile.max_lifetime_ms = 1000.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
@@ -1514,7 +1514,7 @@ namespace test_flavours {
 				amp = meta;
 
 				amp.get<invariants::text_details>().name = "Amplifier arm missile";
-				amp.get<invariants::missile>().damage.base = 32;
+				amp.get<invariants::missile>().damage.base = 10;
 				amp.get<invariants::missile>().max_lifetime_ms = 950.f;
 			}
 
@@ -3639,7 +3639,7 @@ namespace test_flavours {
 			gun_def.recoil_multiplier = 4.f;
 			gun_def.kickback_towards_wielder = kickback_mult * 500.f;
 
-			gun_def.minimum_heat_to_shoot = 0.31f;
+			gun_def.minimum_heat_to_shoot = 0.21f;
 
 			gun_def.heavy_heat_start_sound.id = to_sound_id(test_scene_sound_id::ELON_HRL_LEVER);
 			gun_def.light_heat_start_sound.id = to_sound_id(test_scene_sound_id::ELON_HRL_LEVER);
@@ -3658,7 +3658,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELON_HRL, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 2.5f);
+			set_density_mult(meta, 1.9f);
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 0.f, 0.f, false, "1.0");
 
 			auto& slots = meta.get<invariants::container>().slots;
@@ -3674,12 +3674,12 @@ namespace test_flavours {
 				auto& mag = slots[slot_function::GUN_CHAMBER_MAGAZINE];
 				mag = slots[slot_function::GUN_CHAMBER];
 				mag.never_reachable_for_mounting = false;
-				mag.mounting_duration_ms = 3500.f;
+				mag.mounting_duration_ms = 2900.f;
 				mag.start_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_LOAD);
 				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_LOAD);
 			}
 
-			set_chambering_duration_ms(meta, 1000.f);
+			set_chambering_duration_ms(meta, 600.f);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 7000;
@@ -4053,12 +4053,12 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {1450.f, 1450.f};
+			gun_def.muzzle_velocity = {1800.f, 1800.f};
 			gun_def.shot_cooldown_ms = 500.f;
 			gun_def.headshot_multiplier = 2.0f;
 			gun_def.head_radius_multiplier = 0.2f;
 
-			gun_def.damage_multiplier = 1.f;
+			gun_def.damage_multiplier = 3.2f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::AMPLIFIER_ARM_MISSILE);

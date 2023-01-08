@@ -27,6 +27,7 @@ void load_test_scene_sentience_properties(
 		d.common.cooldown_ms = 5000;
 		d.common.personal_electricity_required = 36;
 		d.common.associated_color = green_spell_color;
+		d.common.adversarial.knockout_award = -1;
 		d.perk_duration_seconds = 15;
 
 		d.appearance.incantation = "treximo";
@@ -51,6 +52,7 @@ void load_test_scene_sentience_properties(
 		d.common.cooldown_ms = 5000;
 		d.common.personal_electricity_required = 40;
 		d.common.associated_color = green;
+		d.common.adversarial.knockout_award = -1;
 
 		d.appearance.incantation = "efforia";
 
@@ -76,6 +78,7 @@ void load_test_scene_sentience_properties(
 		d.common.cooldown_ms = 2000;
 		d.common.personal_electricity_required = 27;
 		d.common.associated_color = yellow;
+		d.common.adversarial.knockout_award = -1;
 
 		d.appearance.incantation = "armonia";
 

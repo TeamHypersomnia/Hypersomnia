@@ -121,7 +121,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::INTERFERENCE_GRENADE);
 
 			meta.get<invariants::text_details>().description =
-				"Victim is kicked far away and has its stamina drained."
+				"Kicks enemies far away. Also drains stamina."
 			;
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::INTERFERENCE_GRENADE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -257,7 +257,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::PED_GRENADE);
 
 			meta.get<invariants::text_details>().description =
-				"Drains Personal Electricity and destroys magic armor."
+				"Drains Personal Electricity and destroys armor."
 			;
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PED_GRENADE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
