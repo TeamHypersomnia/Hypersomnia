@@ -292,7 +292,7 @@ namespace test_flavours {
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_RICOCHET);
 
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_DESTRUCTION);
-			missile.damage.base = 112.f;
+			missile.damage.base = 10.f;
 			missile.max_lifetime_ms = 1000.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_FLIGHT);
@@ -3634,7 +3634,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 2500.f};
-			gun_def.damage_multiplier = 1.f;
+			gun_def.damage_multiplier = 11.2f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 0;
 			gun_def.recoil_multiplier = 4.f;
 			gun_def.kickback_towards_wielder = kickback_mult * 500.f;

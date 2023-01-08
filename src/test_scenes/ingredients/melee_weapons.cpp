@@ -24,7 +24,10 @@ namespace test_flavours {
 			const auto price,
 			const auto specific_to,
 			const auto weight_mult,
-			const auto color
+			const auto color,
+			const float dmg_mult = 1.f,
+			const money_type award = 1350,
+			const float swings_mult = 1.0f
 		) -> auto& {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
@@ -54,7 +57,7 @@ namespace test_flavours {
 
 			{
 				invariants::melee melee;
-				melee.adversarial.knockout_award = static_cast<money_type>(1350);
+				melee.adversarial.knockout_award = static_cast<money_type>(award);
 
 				{
 					auto& t = melee.throw_def;
@@ -64,7 +67,7 @@ namespace test_flavours {
 
 					auto& d = t.damage;
 					d.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-					d.base = int(88.f * weight_mult);
+					d.base = int(88.f * weight_mult * dmg_mult);
 					auto& eff = d.effects;
 
 					eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SENTIENCE_IMPACT);
@@ -91,7 +94,7 @@ namespace test_flavours {
 					a.obstacle_hit_linear_inertia_ms = 140.f;
 					a.wielder_impulse = 387.f * weight_mult;
 					a.wielder_inert_for_ms = 200.f * weight_mult;
-					a.cooldown_ms = 200.f * weight_mult;
+					a.cooldown_ms = 200.f * weight_mult * swings_mult;
 					a.cp_required = static_cast<int>(3.f * weight_mult);
 
 					a.obstacle_hit_recoil = 40.f;
@@ -108,7 +111,7 @@ namespace test_flavours {
 						clash.impulse = 450.f * weight_mult;
 					}
 
-					a.damage.base = int(27.f * weight_mult);
+					a.damage.base = int(27.f * weight_mult * dmg_mult);
 					a.damage.shake.mult *= 0.9f;
 					a.damage.impact_impulse = 20.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
@@ -133,7 +136,7 @@ namespace test_flavours {
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_SECONDARY_SMOKE);
 					a.wielder_impulse = 717.f;
 					a.wielder_inert_for_ms = 300.f * weight_mult;
-					a.cooldown_ms = 500.f * weight_mult;
+					a.cooldown_ms = 500.f * weight_mult * swings_mult;
 					a.obstacle_hit_linear_inertia_ms = 100.f;
 					a.cp_required = static_cast<int>(6.f * weight_mult);
 					a.obstacle_hit_recoil_mult = 1.2f * weight_mult;
@@ -154,7 +157,7 @@ namespace test_flavours {
 						clash.impulse = 750.f * weight_mult;
 					}
 
-					a.damage.base = int(50.f * weight_mult);
+					a.damage.base = int(50.f * weight_mult * dmg_mult);
 					a.damage.impact_impulse = 40.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 1700.f;
@@ -181,8 +184,11 @@ namespace test_flavours {
 				test_scene_image_id::FURY_THROWER,
 				static_cast<money_type>(1000),
 				faction_type::RESISTANCE,
-				1.1f,
-				white
+				1.f,
+				white,
+				1.125f,
+				3500,
+				1.15f
 			);
 
 			invariants::continuous_particles particles_def;
@@ -198,10 +204,12 @@ namespace test_flavours {
 		make_knife(
 			test_melee_weapons::ELECTRIC_RAPIER,
 			test_scene_image_id::ELECTRIC_RAPIER,
-			static_cast<money_type>(700),
+			static_cast<money_type>(1300),
 			faction_type::SPECTATOR,
-			1.f,
-			white
+			0.65f,
+			white,
+			1.8f,
+			static_cast<money_type>(1000)
 		);
 
 		make_knife(
@@ -229,7 +237,9 @@ namespace test_flavours {
 				static_cast<money_type>(500),
 				faction_type::SPECTATOR,
 				0.7f,
-				white
+				white,
+				1.0f,
+				static_cast<money_type>(3000)
 			);
 
 			for (auto& a : meta.get<invariants::melee>().actions) {
@@ -246,7 +256,9 @@ namespace test_flavours {
 				static_cast<money_type>(1000),
 				faction_type::SPECTATOR,
 				1.1f,
-				white
+				white,
+				1.0f,
+				3500
 			);
 			
 			invariants::continuous_particles particles_def;

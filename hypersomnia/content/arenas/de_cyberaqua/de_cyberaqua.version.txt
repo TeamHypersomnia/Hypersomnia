@@ -1,5 +1,5 @@
-Hypersomnia version 1.1.7733
-Revision no.: 7733 (dirty)
-Build date: Sat Jul 16 23:05:49 2022
+Hypersomnia version 1.1.7819
+Revision no.: 7819 (dirty)
+Build date: Sat Jan 7 20:00:43 2023
 Commit message:
-FIx sound(..)modifier compaibi(...)
+config.force.lua: settings to (...)
