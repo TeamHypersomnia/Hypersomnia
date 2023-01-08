@@ -1,8 +1,34 @@
 #pragma once
 #include "game/enums/gun_action_type.h"
 
-struct json_weapon_entry {
-	// GEN INTROSPECTOR struct json_weapon_entry
+struct json_melee_entry {
+	// GEN INTROSPECTOR struct json_melee_entry
+	std::string id;
+	std::string display_name;
+
+	float fast_swings_per_second = 0;
+	float strong_swings_per_second = 0;
+
+	float fast_damage = 0;
+	float strong_damage = 0;
+
+	float fast_hs_damage = 0;
+	float strong_hs_damage = 0;
+
+	float fast_stamina_required = 0;
+	float strong_stamina_required = 0;
+
+	float throw_damage = 0;
+	float throw_hs_damage = 0;
+
+	float price = 0;
+	float kill_award = 0;
+	float weight = 0;
+	// END GEN INTROSPECTOR
+};
+
+struct json_gun_entry {
+	// GEN INTROSPECTOR struct json_gun_entry
 	std::string id;
 	std::string display_name;
 
@@ -29,12 +55,5 @@ struct json_weapon_entry {
 	float magazine_x = 0;
 	float magazine_y = 0;
 	float magazine_rotation = 0;
-	// END GEN INTROSPECTOR
-};
-
-
-struct weapons_database {
-	// GEN INTROSPECTOR struct weapons_database
-	std::unordered_map<std::string, json_weapon_entry> entries;
 	// END GEN INTROSPECTOR
 };

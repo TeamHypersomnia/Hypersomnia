@@ -47,11 +47,57 @@
 #include "augs/readwrite/json_readwrite.h"
 #include "game/detail/flavour_presentation.h"
 
-std::unordered_map<std::string, json_weapon_entry> reported_weapons;
+std::unordered_map<std::string, json_gun_entry> reported_guns;
+std::unordered_map<std::string, json_melee_entry> reported_melees;
+
+template <class H>
+static void report_melee(const auto enum_id, H handle) {
+	auto& cosm = handle.get_cosmos();
+	(void)cosm;
+
+	auto& item = handle.template get<invariants::item>();
+	auto& melee = handle.template get<invariants::melee>();
+
+	json_melee_entry entry;
+
+
+	entry.id = to_lowercase(augs::enum_to_string(enum_id));
+	entry.display_name = handle.get_name();
+
+	auto& fast = melee.actions[weapon_action_type::PRIMARY];
+	auto& strong = melee.actions[weapon_action_type::SECONDARY];
+
+	entry.fast_swings_per_second = 1000.0f / fast.cooldown_ms;
+	entry.strong_swings_per_second = 1000.0f / strong.cooldown_ms;
+
+	entry.fast_damage = fast.damage.base;
+	entry.strong_damage = strong.damage.base;
+
+	entry.fast_hs_damage = entry.fast_damage * fast.headshot_multiplier;
+	entry.strong_hs_damage = entry.strong_damage * strong.headshot_multiplier;
+
+	entry.fast_stamina_required = fast.cp_required;
+	entry.strong_stamina_required = strong.cp_required;
+
+	entry.throw_damage = melee.throw_def.damage.base;
+	entry.throw_hs_damage = entry.throw_damage * melee.throw_def.headshot_multiplier;
+
+	entry.price = item.standard_price;
+	entry.kill_award = melee.adversarial.knockout_award;
+
+	entry.weight = 100 * handle.template get<components::rigid_body>().get_mass();
+
+	reported_melees[entry.id] = entry;
+}
 
 template <class H>
 static void report_weapon(const auto enum_id, H handle) {
 	if (handle.dead()) return;
+
+	if (handle.template has<components::melee>()) {
+		report_melee(enum_id, handle);
+	}
+
 	if (!handle.template has<components::gun>() || !handle.template has<components::item>()) {
 		return;
 	}
@@ -60,9 +106,8 @@ static void report_weapon(const auto enum_id, H handle) {
 	auto& gun = handle.template get<invariants::gun>();
 	auto& item = handle.template get<invariants::item>();
 
-	json_weapon_entry entry;
+	json_gun_entry entry;
 	entry.id = to_lowercase(augs::enum_to_string(enum_id));
-	//str_ops(handle.get_name()).multi_replace_all({ " " }, "_").to_lowercase().multi_replace_all({ "ć" }, "c").subject;
 	entry.display_name = handle.get_name();
 
 	entry.min_bullet_speed = gun.muzzle_velocity.first;
@@ -141,11 +186,12 @@ static void report_weapon(const auto enum_id, H handle) {
 		}
 	);
 
-	reported_weapons[entry.id] = entry;
+	reported_guns[entry.id] = entry;
 };
 
 static void save_all_reported_weapons() {
-	augs::save_as_json(reported_weapons, LOG_FILES_DIR "/all_weapons.json");
+	augs::save_as_json(reported_guns, LOG_FILES_DIR "/all_guns.json");
+	augs::save_as_json(reported_melees, LOG_FILES_DIR "/all_melees.json");
 }
 
 namespace test_scenes {
