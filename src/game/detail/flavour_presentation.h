@@ -1,5 +1,7 @@
 #pragma once
 #include "game/modes/detail/flavour_getters.h"
+#include "view/viewables/images_in_atlas_map.h"
+#include "game/detail/inventory/direct_attachment_offset.h"
 
 template <class L>
 transformr presentational_direct_attachment_offset(
@@ -59,7 +61,8 @@ template <class F>
 void presentational_with_attachments(
 	F&& callback,
 	const cosmos& cosm,
-	const item_flavour_id& flavour
+	const item_flavour_id& flavour,
+	const bool skip_root_container = false
 ) {
 	const auto container_image = image_of(cosm, flavour);
 
@@ -89,7 +92,7 @@ void presentational_with_attachments(
 
 		const auto presentational_offset = ::presentational_direct_attachment_offset(cosm.get_logical_assets(), container_image, attachment_image, type);
 
-		callback(attachment_image, presentational_offset);
+		callback(attachment_image, presentational_offset, only_under);
 	};
 
 	const auto presented_gun_attachments = std::array<slot_function, 5> {
@@ -101,7 +104,9 @@ void presentational_with_attachments(
 		do_callback_for(s, true);
 	}
 
-	callback(container_image, transformr());
+	if (!skip_root_container) {
+		callback(container_image, transformr(), false);
+	}
 
 	for (const auto& s : presented_gun_attachments) {
 		do_callback_for(s, false);
@@ -122,7 +127,8 @@ ltrb aabb_of_game_image_with_attachments(
 
 	auto contain = [&](
 		const auto& attachment_image,
-		const auto& attachment_offset
+		const auto& attachment_offset,
+		bool
 	) {
 		const auto& entry = get_entry(attachment_image);
 		const auto& rotated_aabb = augs::calc_sprite_aabb(attachment_offset, entry.get_original_size());

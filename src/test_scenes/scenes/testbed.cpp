@@ -39,6 +39,115 @@
 #include "game/modes/bomb_defusal.h"
 #include "game/detail/inventory/generate_equipment.h"
 
+#include "game/cosmos/for_each_entity.h"
+#include "augs/string/string_templates.h"
+#include "test_scenes/ingredients/all_weapons_report.h"
+#include "game/modes/detail/item_purchase_logic.hpp"
+
+#include "augs/readwrite/json_readwrite.h"
+#include "game/detail/flavour_presentation.h"
+
+std::unordered_map<std::string, json_weapon_entry> reported_weapons;
+
+template <class H>
+static void report_weapon(const auto enum_id, H handle) {
+	if (handle.dead()) return;
+	if (!handle.template has<components::gun>() || !handle.template has<components::item>()) {
+		return;
+	}
+
+	auto& cosm = handle.get_cosmos();
+	auto& gun = handle.template get<invariants::gun>();
+	auto& item = handle.template get<invariants::item>();
+
+	json_weapon_entry entry;
+	entry.id = to_lowercase(augs::enum_to_string(enum_id));
+	//str_ops(handle.get_name()).multi_replace_all({ " " }, "_").to_lowercase().multi_replace_all({ "ć" }, "c").subject;
+	entry.display_name = handle.get_name();
+
+	entry.min_bullet_speed = gun.muzzle_velocity.first;
+	entry.max_bullet_speed = gun.muzzle_velocity.second;
+
+
+	if (auto slot = handle[slot_function::GUN_CHAMBER]) {
+		entry.chambering_time = slot.get().mounting_duration_ms;
+	}
+
+	if (auto slot = handle[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+		entry.reload_time = slot.get().mounting_duration_ms;
+	}
+
+	if (auto slot = handle[slot_function::GUN_CHAMBER_MAGAZINE]) {
+		entry.reload_time = slot.get().mounting_duration_ms;
+	}
+
+	auto practical_shot_cooldown = gun.shot_cooldown_ms;
+
+	if (gun.num_last_bullets_to_trigger_low_ammo_cue == 0) {
+		practical_shot_cooldown += entry.chambering_time + entry.reload_time;
+	}
+	else if (gun.action_mode == gun_action_type::BOLT_ACTION) {
+		practical_shot_cooldown += entry.chambering_time;
+	}
+
+	entry.shots_per_second = 1000.0f / practical_shot_cooldown;
+	entry.damage = gun.damage_multiplier * 10.0f;
+	entry.headshot_damage = entry.damage * gun.headshot_multiplier;
+	entry.price = item.standard_price;
+	entry.kill_award = gun.adversarial.knockout_award;
+
+	entry.weight = 100 * handle.template get<components::rigid_body>().get_mass();
+
+	entry.reload_time /= 1000;
+	entry.chambering_time /= 1000;
+
+	if (entry.reload_time > 0.0f && entry.chambering_time > 0.0f) {
+		entry.slow_reload_time = entry.reload_time + entry.chambering_time;
+	}
+
+	const auto charge_flavour = calc_default_charge_flavour(handle);
+
+	if (charge_flavour.is_set()) {
+		entry.pellets_per_shot = cosm.on_flavour(charge_flavour, [&](const auto flav) {
+			if constexpr(flav.template has<invariants::cartridge>()) {
+				return flav.template get<invariants::cartridge>().num_rounds_spawned;
+			}
+
+			return 0;
+		});
+	}
+
+	entry.action_type = gun.action_mode;
+
+	handle.dispatch(
+		[&](const auto typed_handle) {
+			if constexpr(typed_handle.template has<invariants::item>()) {
+				::presentational_with_attachments(
+					[&](const auto& img, const auto transform, bool under) {
+						entry.has_magazine = true;
+						entry.draw_magazine_under = under;
+
+						entry.magazine_id = to_lowercase(augs::enum_to_string((test_scene_image_id)img.indirection_index));
+						entry.magazine_x = transform.pos.x;
+						entry.magazine_y = transform.pos.y;
+						entry.magazine_rotation = transform.rotation;
+
+					},
+					cosm,
+					typed_handle.get_flavour_id(),
+					true
+				);
+			}
+		}
+	);
+
+	reported_weapons[entry.id] = entry;
+};
+
+static void save_all_reported_weapons() {
+	augs::save_as_json(reported_weapons, LOG_FILES_DIR "/all_weapons.json");
+}
+
 namespace test_scenes {
 	void testbed::setup(test_mode_ruleset& rs) {
 		rs.name = "Standard test ruleset";
@@ -330,7 +439,8 @@ namespace test_scenes {
 				r.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			}
 
-			r.generate_for(character, step);
+			auto result = r.generate_for(character, step);
+			report_weapon(w, world[result]);
 		};
 
 		auto give_charge = [&](const auto& where, const auto w, const int pieces) {
@@ -910,5 +1020,7 @@ namespace test_scenes {
 			test_scene_node { world, test_dynamic_decorations::CONSOLE_LIGHT }
 		).ro()
 		.next(test_sound_decorations::HUMMING_DISABLED);
+
+		save_all_reported_weapons();
 	}
 }

@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- linux bug: neon silhouettes can be seen behind player, probably something to do with drivers
+	- It's a problem with gl_FragCoord: probably stencil on another fbo is somehow flipped
+	- To reverse the problem, one can put the following in fog_of_war.fsh: layout(origin_upper_left) in vec4 gl_FragCoord; 
+		- although only with higher glsl version
+	- didn't happen before, very probable it's a driver bug
+
 - Autoupdate would be handy for dedicated server admins too
 	- It comes *before* simulating the dedicated server in main so should happen automatically even
 - dedicated server should default to allow_nat_traversal = false I believe

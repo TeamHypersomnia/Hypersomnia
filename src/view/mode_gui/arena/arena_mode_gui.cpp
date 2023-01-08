@@ -37,7 +37,8 @@ void draw_weapon_flavour_with_attachments(
 
 	auto draw = [&](
 		const auto& attachment_image,
-		const auto& attachment_offset
+		const auto& attachment_offset,
+		bool
 	) {
 		const auto& entry = images_in_atlas.find_or(attachment_image).diffuse;
 		const auto final_pos = lt_pos + lt_offset + attachment_offset.pos;

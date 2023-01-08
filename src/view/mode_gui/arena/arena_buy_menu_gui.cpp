@@ -43,7 +43,8 @@ void game_image_with_attachments(
 
 	auto draw = [&](
 		const auto& attachment_image,
-		const auto& attachment_offset
+		const auto& attachment_offset,
+		bool
 	) {
 		const auto& entry = get_entry(attachment_image);
 		const auto size = entry.get_original_size();
