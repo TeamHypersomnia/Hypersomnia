@@ -1,10 +1,27 @@
 #pragma once
 #include "game/enums/gun_action_type.h"
 
+struct json_spell_entry {
+	// GEN INTROSPECTOR struct json_spell_entry
+	std::string id;
+	std::string display_name;
+	std::string pic_filename;
+	std::string notes;
+	std::string incantation;
+	rgba associated_color = white;
+
+	float cooldown = 0;
+	float mana_required = 0;
+	float price = 0;
+	float kill_award = 0;
+	// END GEN INTROSPECTOR
+};
+
 struct json_explosive_entry {
 	// GEN INTROSPECTOR struct json_explosive_entry
 	std::string id;
 	std::string display_name;
+	std::string pic_filename;
 	std::string notes;
 
 	float fuse_delay = 0;
@@ -20,6 +37,7 @@ struct json_melee_entry {
 	// GEN INTROSPECTOR struct json_melee_entry
 	std::string id;
 	std::string display_name;
+	std::string pic_filename;
 
 	float fast_swings_per_second = 0;
 	float strong_swings_per_second = 0;
@@ -42,10 +60,11 @@ struct json_melee_entry {
 	// END GEN INTROSPECTOR
 };
 
-struct json_gun_entry {
-	// GEN INTROSPECTOR struct json_gun_entry
+struct json_firearm_entry {
+	// GEN INTROSPECTOR struct json_firearm_entry
 	std::string id;
 	std::string display_name;
+	std::string pic_filename;
 
 	int pellets_per_shot = 1;
 	float damage = 0;

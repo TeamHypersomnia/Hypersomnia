@@ -64,7 +64,7 @@ namespace test_flavours {
 
 					auto& d = t.damage;
 					d.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-					d.base = 88.f * weight_mult;
+					d.base = int(88.f * weight_mult);
 					auto& eff = d.effects;
 
 					eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SENTIENCE_IMPACT);
@@ -108,7 +108,7 @@ namespace test_flavours {
 						clash.impulse = 450.f * weight_mult;
 					}
 
-					a.damage.base = 27.f * weight_mult;
+					a.damage.base = int(27.f * weight_mult);
 					a.damage.shake.mult *= 0.9f;
 					a.damage.impact_impulse = 20.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
@@ -154,7 +154,7 @@ namespace test_flavours {
 						clash.impulse = 750.f * weight_mult;
 					}
 
-					a.damage.base = 50.f * weight_mult;
+					a.damage.base = int(50.f * weight_mult);
 					a.damage.impact_impulse = 40.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 1700.f;

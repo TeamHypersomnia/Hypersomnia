@@ -842,9 +842,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				for_each_through_std_get(
 					spells,
-					[&](const auto& typed_spell) {
-						using S = remove_cref<decltype(typed_spell)>;
-
+					[&]<typename S>(const S&) {
 						if (!factions_compatible(subject, spell_id::of<S>())) {
 							return;
 						}

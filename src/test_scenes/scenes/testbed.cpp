@@ -47,9 +47,12 @@
 #include "augs/readwrite/json_readwrite.h"
 #include "game/detail/flavour_presentation.h"
 
-std::unordered_map<std::string, json_gun_entry> reported_guns;
+static bool reported = false;
+
+std::unordered_map<std::string, json_firearm_entry> reported_firearms;
 std::unordered_map<std::string, json_melee_entry> reported_melees;
 std::unordered_map<std::string, json_explosive_entry> reported_explosives;
+std::unordered_map<std::string, json_spell_entry> reported_spells;
 
 template <class H>
 static void report_explosive(const auto enum_id, H handle) {
@@ -63,6 +66,16 @@ static void report_explosive(const auto enum_id, H handle) {
 	json_explosive_entry entry;
 
 	entry.id = to_lowercase(augs::enum_to_string(enum_id));
+	entry.pic_filename = entry.id;
+
+	if (handle.template has<invariants::animation>()) {
+		if (handle.template get<invariants::animation>().id.is_set()) {
+			entry.pic_filename += "_1";
+		}
+	}
+
+	entry.pic_filename += ".png";
+
 	entry.display_name = handle.get_name();
 	entry.notes = handle.template get<invariants::text_details>().description;
 
@@ -88,6 +101,16 @@ static void report_melee(const auto enum_id, H handle) {
 
 
 	entry.id = to_lowercase(augs::enum_to_string(enum_id));
+	entry.pic_filename = entry.id;
+
+	if (handle.template has<invariants::animation>()) {
+		if (handle.template get<invariants::animation>().id.is_set()) {
+			entry.pic_filename += "_1";
+		}
+	}
+
+	entry.pic_filename += ".png";
+
 	entry.display_name = handle.get_name();
 
 	auto& fast = melee.actions[weapon_action_type::PRIMARY];
@@ -136,8 +159,18 @@ static void report_weapon(const auto enum_id, H handle) {
 	auto& gun = handle.template get<invariants::gun>();
 	auto& item = handle.template get<invariants::item>();
 
-	json_gun_entry entry;
+	json_firearm_entry entry;
 	entry.id = to_lowercase(augs::enum_to_string(enum_id));
+	entry.pic_filename = entry.id;
+
+	if (handle.template has<invariants::animation>()) {
+		if (handle.template get<invariants::animation>().id.is_set()) {
+			entry.pic_filename += "_1";
+		}
+	}
+
+	entry.pic_filename += ".png";
+
 	entry.display_name = handle.get_name();
 
 	entry.min_bullet_speed = gun.muzzle_velocity.first;
@@ -216,13 +249,45 @@ static void report_weapon(const auto enum_id, H handle) {
 		}
 	);
 
-	reported_guns[entry.id] = entry;
+	reported_firearms[entry.id] = entry;
 };
 
+static void report_all_spells(cosmos& cosm) {
+	auto& spells = cosm.get_common_significant().spells;
+
+	for_each_through_std_get(
+		spells,
+		[&]<typename S>(const S& spell) {
+			const auto id = str_ops(spell.appearance.name).to_lowercase().replace_all(" ", "_").subject;
+
+			json_spell_entry entry;
+			entry.associated_color = spell.common.associated_color;
+			entry.cooldown = spell.common.cooldown_ms / 1000;
+			entry.mana_required = spell.common.personal_electricity_required;
+			entry.kill_award = spell.common.adversarial.knockout_award;
+			entry.id = id;
+			entry.pic_filename = id + ".png";
+			entry.display_name = spell.appearance.name;
+			entry.notes = spell.appearance.description;
+			entry.incantation = spell.appearance.incantation;
+			entry.price = spell.common.standard_price;
+
+			reported_spells[id] = entry;
+		}
+	);
+}
+
 static void save_all_reported_weapons() {
-	augs::save_as_json(reported_guns, LOG_FILES_DIR "/all_guns.json");
+	if (reported) {
+		return;
+	}
+
+	reported = true;
+
+	augs::save_as_json(reported_firearms, LOG_FILES_DIR "/all_firearms.json");
 	augs::save_as_json(reported_melees, LOG_FILES_DIR "/all_melees.json");
 	augs::save_as_json(reported_explosives, LOG_FILES_DIR "/all_explosives.json");
+	augs::save_as_json(reported_spells, LOG_FILES_DIR "/all_spells.json");
 }
 
 namespace test_scenes {
@@ -415,6 +480,7 @@ namespace test_scenes {
 
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {
 		auto& world = step.get_cosmos();
+		report_all_spells(world);
 		
 		auto create = [&](auto&&... args) {
 			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);

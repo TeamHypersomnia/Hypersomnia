@@ -34,7 +34,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.name = "Haste";
 		d.appearance.name_color = green;
 		d.appearance.description = typesafe_sprintf(
-			"[color=vsdarkgray]Increases movement speed for %x seconds.[/color]", 
+			"Increases movement speed for %x seconds.", 
 			d.perk_duration_seconds
 		);
 
@@ -57,7 +57,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.name = "Exaltation";
 		d.appearance.name_color = green;
 		d.appearance.description = typesafe_sprintf(
-			"[color=vsdarkgray]Stabilizes functions of the physical body.[/color]"
+			"Restores moderate amount of health."
 		);
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_EXALTATION_ICON);
@@ -82,7 +82,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.name = "Echoes of the higher realms";
 		d.appearance.name_color = yellow;
 		d.appearance.description = typesafe_sprintf(
-			"[color=vsdarkgray]Restores resonance of mind with the body.[/color]"
+			"Restores full stamina."
 		);
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ECHOES_OF_THE_HIGHER_REALMS_ICON);
@@ -107,7 +107,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.name = "Fury of the Aeons";
 		d.appearance.name_color = cyan;
 		d.appearance.description = typesafe_sprintf(
-			"[color=vsdarkgray]Causes instant damage around the caster.[/color]"
+			"Causes instant damage around the caster."
 		);
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_FURY_OF_THE_AEONS_ICON);
@@ -149,7 +149,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.name = "Electric Triad";
 		d.appearance.name_color = cyan;
 		d.appearance.description = typesafe_sprintf(
-			"[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]"
+			"Spawns three missiles chasing hostile entities."
 		);
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ELECTRIC_TRIAD_ICON);
@@ -172,7 +172,7 @@ void load_test_scene_sentience_properties(
 		d.appearance.name = "Ultimate Wrath of the Aeons";
 		d.appearance.name_color = cyan;
 		d.appearance.description = typesafe_sprintf(
-			"[color=vsdarkgray]Causes massive damage around the caster.\nRequires delay to initiate.[/color]"
+			"Causes massive damage around the caster after a delay."
 		);
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ULTIMATE_WRATH_OF_THE_AEONS_ICON);
