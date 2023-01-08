@@ -49,6 +49,32 @@
 
 std::unordered_map<std::string, json_gun_entry> reported_guns;
 std::unordered_map<std::string, json_melee_entry> reported_melees;
+std::unordered_map<std::string, json_explosive_entry> reported_explosives;
+
+template <class H>
+static void report_explosive(const auto enum_id, H handle) {
+	auto& cosm = handle.get_cosmos();
+	(void)cosm;
+
+	auto& item = handle.template get<invariants::item>();
+	auto& explosive = handle.template get<invariants::explosive>();
+	auto& fuse = handle.template get<invariants::hand_fuse>();
+
+	json_explosive_entry entry;
+
+	entry.id = to_lowercase(augs::enum_to_string(enum_id));
+	entry.display_name = handle.get_name();
+	entry.notes = handle.template get<invariants::text_details>().description;
+
+	entry.price = item.standard_price;
+	entry.kill_award = explosive.adversarial.knockout_award;
+
+	entry.fuse_delay = fuse.fuse_delay_ms / 1000;
+
+	entry.weight = 100 * handle.template get<components::rigid_body>().get_mass();
+
+	reported_explosives[entry.id] = entry;
+}
 
 template <class H>
 static void report_melee(const auto enum_id, H handle) {
@@ -96,6 +122,10 @@ static void report_weapon(const auto enum_id, H handle) {
 
 	if (handle.template has<components::melee>()) {
 		report_melee(enum_id, handle);
+	}
+
+	if (handle.template has<invariants::explosive>()) {
+		report_explosive(enum_id, handle);
 	}
 
 	if (!handle.template has<components::gun>() || !handle.template has<components::item>()) {
@@ -192,6 +222,7 @@ static void report_weapon(const auto enum_id, H handle) {
 static void save_all_reported_weapons() {
 	augs::save_as_json(reported_guns, LOG_FILES_DIR "/all_guns.json");
 	augs::save_as_json(reported_melees, LOG_FILES_DIR "/all_melees.json");
+	augs::save_as_json(reported_explosives, LOG_FILES_DIR "/all_explosives.json");
 }
 
 namespace test_scenes {
@@ -727,6 +758,13 @@ namespace test_scenes {
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_melee_weapons::ASSAULT_RATTLE);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_melee_weapons::MINI_KNIFE);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::DEAGLE);
+
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_hand_explosives::BOMB);
+
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), force_type);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), ped_type);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), interference_type);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), flash_type);
 			}
 		}
 

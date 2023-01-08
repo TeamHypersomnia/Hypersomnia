@@ -1,6 +1,21 @@
 #pragma once
 #include "game/enums/gun_action_type.h"
 
+struct json_explosive_entry {
+	// GEN INTROSPECTOR struct json_explosive_entry
+	std::string id;
+	std::string display_name;
+	std::string notes;
+
+	float fuse_delay = 0;
+	float base_damage = 0;
+
+	float price = 0;
+	float kill_award = 0;
+	float weight = 0;
+	// END GEN INTROSPECTOR
+};
+
 struct json_melee_entry {
 	// GEN INTROSPECTOR struct json_melee_entry
 	std::string id;

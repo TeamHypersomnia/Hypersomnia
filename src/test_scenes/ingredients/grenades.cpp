@@ -32,7 +32,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::FORCE_GRENADE);
 
 			meta.get<invariants::text_details>().description =
-				"Throwable explosive with a one second delay.\nDeals damage to [color=red]Health[/color]."
+				"Deals damage to Health."
 			;
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::FORCE_GRENADE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -121,7 +121,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::INTERFERENCE_GRENADE);
 
 			meta.get<invariants::text_details>().description =
-				"Throwable explosive with a one second delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
+				"Victim is kicked far away and has its stamina drained."
 			;
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::INTERFERENCE_GRENADE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -145,6 +145,7 @@ namespace test_flavours {
 			}
 
 			invariants::explosive explosive; 
+			explosive.adversarial.knockout_award = 0;
 
 			auto& in = explosive.explosion;
 			auto& dmg = in.damage;
@@ -204,7 +205,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::FLASHBANG);
 
 			meta.get<invariants::text_details>().description =
-				"Throwable explosive with a one second delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
+				"Blinds and deafens the enemy for a short while."
 			;
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::FLASHBANG, white);
 			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
@@ -229,6 +230,7 @@ namespace test_flavours {
 			}
 
 			invariants::explosive explosive; 
+			explosive.adversarial.knockout_award = 0;
 
 			auto& in = explosive.explosion;
 			auto& dmg = in.damage;
@@ -255,7 +257,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::PED_GRENADE);
 
 			meta.get<invariants::text_details>().description =
-				"Throwable explosive with a one second delay.\nDrains [color=cyan]Personal Electricity[/color].\nIf the subject has [color=turquoise]Electric Shield[/color] enabled,\nthe effect is doubled."
+				"Drains Personal Electricity and destroys magic armor."
 			;
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PED_GRENADE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -280,6 +282,7 @@ namespace test_flavours {
 			}
 
 			invariants::explosive explosive; 
+			explosive.adversarial.knockout_award = 0;
 
 			auto& in = explosive.explosion;
 			auto& dmg = in.damage;
