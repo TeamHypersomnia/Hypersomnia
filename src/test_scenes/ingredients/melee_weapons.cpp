@@ -187,7 +187,7 @@ namespace test_flavours {
 				1.f,
 				white,
 				1.125f,
-				3500,
+				4000,
 				1.15f
 			);
 
@@ -258,7 +258,7 @@ namespace test_flavours {
 				1.1f,
 				white,
 				1.0f,
-				3500
+				4000
 			);
 			
 			invariants::continuous_particles particles_def;
