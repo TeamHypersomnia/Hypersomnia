@@ -71,14 +71,14 @@ You can reconfigure all bindings by going to Settings->Controls tab.
 - WSAD: move around
 - Shift - sprint, it drains stamina.
 - Space - dash, it drains quite a lot of stamina.
-- Left control - move quietly and pick up items. You have to hold the left control, and your character needs to touch the item you want to pick, simultaneously.
+- Left control - move quietly.
 - T - open the shop. Usually, the shop is off during warmup.
 - O - change team. You should just pick Auto-assign to preserve balance.
 - G - drop the most recently wielded item.
 - H - hide the most recently wielded item. Can fail if you have no space in your inventory!
-- E - defuse the bomb. If you move when defusing, the timer is reset, so stay still. You can shoot, though. Just remember to keep the trigger in the bomb's range, they have to touch.
+- E - Pick up items/defuse the bomb. If you move when defusing, the timer is reset, so stay still. You can shoot, though. Just remember to keep the trigger in the bomb's range, they have to touch.
 - C - pull out the bomb (as a terrorist)
-- Wheel Down - quickly throw a knife (or another melee weapon you happen to have).
+- Wheel Down - quickly throw a knife (or another melee weapon you happen to have). Note you can throw a knife during any activity, even when reloading or planting a bomb.
 - Wheel Up - quickly throw two knives (or other melee weapons you happen to have).
 - Middle mouse button - quickly throw a Force grenade.
 - Mouse4 - quickly throw a Flashbang.
