@@ -50,6 +50,7 @@ void setup_entity_from_node(
 	handle.set_logic_transform(node.get_transform());
 	(void)resource;
 }
+
 template <class R>
 void allocate_flavours_and_assets(
 	const R& resource,

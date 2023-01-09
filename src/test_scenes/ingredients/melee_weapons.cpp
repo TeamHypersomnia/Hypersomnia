@@ -187,7 +187,7 @@ namespace test_flavours {
 				1.f,
 				white,
 				1.125f,
-				4000,
+				4500,
 				1.15f
 			);
 
@@ -204,12 +204,12 @@ namespace test_flavours {
 		make_knife(
 			test_melee_weapons::ELECTRIC_RAPIER,
 			test_scene_image_id::ELECTRIC_RAPIER,
-			static_cast<money_type>(1300),
+			static_cast<money_type>(1100),
 			faction_type::SPECTATOR,
 			0.65f,
 			white,
 			1.8f,
-			static_cast<money_type>(1000)
+			static_cast<money_type>(800)
 		);
 
 		make_knife(
@@ -218,7 +218,9 @@ namespace test_flavours {
 			static_cast<money_type>(700),
 			faction_type::METROPOLIS,
 			1.f,
-			cyan
+			cyan,
+			1.f,
+			static_cast<money_type>(2000)
 		);
 
 		make_knife(
@@ -227,7 +229,9 @@ namespace test_flavours {
 			static_cast<money_type>(700),
 			faction_type::RESISTANCE,
 			1.f,
-			yellow
+			yellow,
+			1.f,
+			static_cast<money_type>(2000)
 		);
 
 		{
@@ -239,7 +243,7 @@ namespace test_flavours {
 				0.7f,
 				white,
 				1.0f,
-				static_cast<money_type>(3000)
+				static_cast<money_type>(5000)
 			);
 
 			for (auto& a : meta.get<invariants::melee>().actions) {
@@ -258,7 +262,7 @@ namespace test_flavours {
 				1.1f,
 				white,
 				1.0f,
-				4000
+				4500
 			);
 			
 			invariants::continuous_particles particles_def;
