@@ -223,19 +223,17 @@ work_result work(const int argc, const char* const * const argv) try {
 	}();
 
 	static auto config = []() {
+		auto result = canon_config;
+
 		if (augs::exists(local_config_path)) {
-			auto result = canon_config;
 			result.load_patch(lua, local_config_path);
-
-			if (augs::exists(force_config_path)) {
-				result.load_patch(lua, force_config_path);
-			}
-
-			return result;
 		}
-		else {
-			return canon_config;
+
+		if (augs::exists(force_config_path)) {
+			result.load_patch(lua, force_config_path);
 		}
+
+		return result;
 	}();
 
 	if (config.log_to_live_file) {
