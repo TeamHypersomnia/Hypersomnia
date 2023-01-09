@@ -317,10 +317,16 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		LOG("Checking for updates");
 
+		const bool should_update_headless = 
+			params.type == app_type::DEDICATED_SERVER
+			|| params.type == app_type::MASTERSERVER
+		;
+
 		last_update_result = check_and_apply_updates(
 			imgui_atlas_image,
 			config.http_client,
-			config.window
+			config.window,
+			should_update_headless
 		);
 
 		LOG_NVPS(last_update_result.type);
@@ -343,6 +349,9 @@ work_result work(const int argc, const char* const * const argv) try {
 				last_update_result.type = update_result::FIRST_LAUNCH_AFTER_UPGRADE;
 			}
 		}
+	}
+	else {
+		LOG("Skipping update check due to update_on_launch = false.");
 	}
 
 	static augs::timer until_first_swap;

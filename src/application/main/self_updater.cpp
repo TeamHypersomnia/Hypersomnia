@@ -63,7 +63,8 @@ namespace fs = std::filesystem;
 self_update_result check_and_apply_updates(
 	const augs::image& imgui_atlas_image,
 	const http_client_settings& http_settings,
-	augs::window_settings window_settings
+	augs::window_settings window_settings,
+	const bool headless
 ) {
 	using namespace augs::imgui;
 
@@ -181,39 +182,44 @@ self_update_result check_and_apply_updates(
 
 	augs::renderer renderer;
 
-	try {
-		window.emplace(window_settings);
-		const auto disp = window->get_display();
-
-		window_settings.position = vec2i { disp.w / 2 - window_size.x / 2, disp.h / 2 - window_size.y / 2 };
-		window->apply(window_settings);
-
-		renderer_backend.emplace();
-		imgui_atlas.emplace(imgui_atlas_image);
-
-		LOG("Initializing the standard shader.");
-
-		try {
-			const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", CANON_SHADER_FOLDER, "standard");
-			const auto canon_fsh_path = typesafe_sprintf("%x/%x.fsh", CANON_SHADER_FOLDER, "standard");
-
-			standard.emplace(
-				canon_vsh_path,
-				canon_fsh_path
-			);
-		}
-		catch (const augs::graphics::shader_error& err) {
-			(void)err;
-		}
-
-		if (standard != std::nullopt) {
-			standard->set_as_current(renderer);
-			standard->set_projection(renderer, augs::orthographic_projection(vec2(window_size)));
-		}
+	if (headless) {
+		LOG("Forced updating in headless mode (server application).");
 	}
-	catch (const augs::window_error& err) {
-		LOG("Failed to open the window:\n%x", err.what());
-		LOG("Updating in headless mode.");
+	else {
+		try {
+			window.emplace(window_settings);
+			const auto disp = window->get_display();
+
+			window_settings.position = vec2i { disp.w / 2 - window_size.x / 2, disp.h / 2 - window_size.y / 2 };
+			window->apply(window_settings);
+
+			renderer_backend.emplace();
+			imgui_atlas.emplace(imgui_atlas_image);
+
+			LOG("Initializing the standard shader.");
+
+			try {
+				const auto canon_vsh_path = typesafe_sprintf("%x/%x.vsh", CANON_SHADER_FOLDER, "standard");
+				const auto canon_fsh_path = typesafe_sprintf("%x/%x.fsh", CANON_SHADER_FOLDER, "standard");
+
+				standard.emplace(
+					canon_vsh_path,
+					canon_fsh_path
+				);
+			}
+			catch (const augs::graphics::shader_error& err) {
+				(void)err;
+			}
+
+			if (standard != std::nullopt) {
+				standard->set_as_current(renderer);
+				standard->set_projection(renderer, augs::orthographic_projection(vec2(window_size)));
+			}
+		}
+		catch (const augs::window_error& err) {
+			LOG("Failed to open the window:\n%x", err.what());
+			LOG("Updating in headless mode.");
+		}
 	}
 
 	renderer_backend_result rendering_result;
