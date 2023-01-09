@@ -122,6 +122,10 @@ void perform_rcon_gui(
 						LOG("Requesting the server to shut down");
 					}
 
+					if (do_command_button("Restart & update server", RS::RESTART)) {
+						LOG("Requesting the server to restart");
+					}
+
 					do_command_button("Download logs", RS::DOWNLOAD_LOGS); 
 				}
 				else {

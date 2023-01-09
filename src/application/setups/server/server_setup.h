@@ -112,6 +112,7 @@ class server_setup :
 
 	net_time_t server_time = 0.0;
 	bool schedule_shutdown = false;
+	bool request_restart_after_shutdown = false;
 
 	bool rebuild_player_meta_viewables = false;
 	arena_player_metas last_player_metas;
@@ -120,6 +121,7 @@ class server_setup :
 	std::string failure_reason;
 
 	server_nat_traversal nat_traversal;
+	bool suppress_community_server_webhook_this_run = false;
 
 	struct webhook_job {
 		mode_player_id player_id;
@@ -224,10 +226,15 @@ public:
 		const private_server_vars&,
 		std::optional<augs::dedicated_server_input>,
 
-		const server_nat_traversal_input& nat_traversal_input
+		const server_nat_traversal_input& nat_traversal_input,
+		bool suppress_community_server_webhook_this_run
 	);
 
 	~server_setup();
+
+	bool server_restart_requested() const {
+		return request_restart_after_shutdown;
+	}
 
 	static mode_player_id to_mode_player_id(const client_id_type&);
 	std::optional<session_id_type> find_session_id(const client_id_type&);

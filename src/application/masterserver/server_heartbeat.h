@@ -2,6 +2,7 @@
 #include "game/modes/all_mode_includes.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "application/nat/nat_detection_session.h"
+#include "hypersomnia_version.h"
 
 bool operator==(const netcode_address_t& a, const netcode_address_t& b);
 bool operator!=(const netcode_address_t& a, const netcode_address_t& b);
@@ -23,6 +24,7 @@ struct server_heartbeat {
 	std::optional<netcode_address_t> internal_network_address;
 	nat_detection_result nat;
 	bool suppress_new_community_server_webhook = false;
+	game_version_identifier server_version = "Unknown";
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_heartbeat&) const = default;

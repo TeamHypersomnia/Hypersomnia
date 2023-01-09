@@ -306,7 +306,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	static auto last_update_result = self_update_result();
 	
-	if (config.http_client.update_on_launch) {
+	if (config.http_client.update_on_launch && !params.suppress_autoupdate) {
 		/* 
 			TODO: SKIP UPDATING IF THERE ARE UNSAVED CHANGES IN EDITOR PROJECTS! 
 			This could potentially erase someone's work because of breaking changes to editor files' binary structure!
@@ -351,7 +351,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	}
 	else {
-		LOG("Skipping update check due to update_on_launch = false.");
+		if (params.suppress_autoupdate) {
+			LOG("Skipping update check due to --no-update flag.");
+		}
+		else {
+			LOG("Skipping update check due to update_on_launch = false.");
+		}
 	}
 
 	static augs::timer until_first_swap;
@@ -657,7 +662,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.private_server,
 			config.dedicated_server,
 
-			make_server_nat_traversal_input()
+			make_server_nat_traversal_input(),
+			params.suppress_server_webhook
 		);
 
 		auto& server = std::get<server_setup>(*current_setup);
@@ -684,6 +690,10 @@ work_result work(const int argc, const char* const * const argv) try {
 			server.sleep_until_next_tick();
 		}
 #endif
+
+		if (server.server_restart_requested()) {
+			return work_result::RELAUNCH_DEDICATED_SERVER;
+		}
 
 		return work_result::SUCCESS;
 	}
@@ -1104,7 +1114,8 @@ work_result work(const int argc, const char* const * const argv) try {
 						config.private_server,
 						std::nullopt,
 
-						make_server_nat_traversal_input()
+						make_server_nat_traversal_input(),
+						params.suppress_server_webhook
 					);
 				});
 #endif

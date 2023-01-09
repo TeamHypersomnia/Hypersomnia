@@ -961,6 +961,8 @@ void server_details_gui_state::perform(const server_list_entry& entry) {
 	if (heartbeat.nat.type != nat_type::PUBLIC_INTERNET) {
 		input_text("Port delta", delta, ImGuiInputTextFlags_ReadOnly);
 	}
+
+	input_text("Server version", heartbeat.server_version, ImGuiInputTextFlags_ReadOnly);
 }
 
 void browse_servers_gui_state::reping_all_servers() {

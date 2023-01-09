@@ -5,6 +5,7 @@
 namespace rcon_commands {
 	enum class special : unsigned char {
 		SHUTDOWN,
+		RESTART,
 		DOWNLOAD_LOGS,
 
 		COUNT

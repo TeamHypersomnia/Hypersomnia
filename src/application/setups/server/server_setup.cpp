@@ -404,7 +404,8 @@ server_setup::server_setup(
 	const client_vars& integrated_client_vars,
 	const private_server_vars& private_initial_vars,
 	const std::optional<augs::dedicated_server_input> dedicated,
-	const server_nat_traversal_input& nat_traversal_input
+	const server_nat_traversal_input& nat_traversal_input,
+	bool suppress_community_server_webhook_this_run
 ) : 
 	integrated_client_vars(integrated_client_vars),
 	lua(lua),
@@ -423,7 +424,8 @@ server_setup::server_setup(
 		)
 	),
 	server_time(yojimbo_time()),
-	nat_traversal(nat_traversal_input, resolved_server_list_addr)
+	nat_traversal(nat_traversal_input, resolved_server_list_addr),
+	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
 {
 	const bool force = true;
 
@@ -546,7 +548,11 @@ void server_setup::send_heartbeat_to_server_list() {
 		}
 	);
 
-	heartbeat.suppress_new_community_server_webhook = vars.suppress_new_community_server_webhook;
+	heartbeat.suppress_new_community_server_webhook = 
+		suppress_community_server_webhook_this_run ||
+		vars.suppress_new_community_server_webhook
+	;
+
 	heartbeat.max_online = get_max_players();
 	heartbeat.internal_network_address = internal_address;
 
@@ -558,6 +564,8 @@ void server_setup::send_heartbeat_to_server_list() {
 			heartbeat.max_fighting = mode.get_max_num_active_players(input);
 		}
 	);
+
+	heartbeat.server_version = hypersomnia_version().get_version_string();
 
 	heartbeat.validate();
 	heartbeat_buffer.clear();
@@ -1315,6 +1323,20 @@ message_handler_result server_setup::handle_rcon_payload(
 			case special::SHUTDOWN: {
 				LOG("Shutting down due to rcon's request.");
 				schedule_shutdown = true;
+
+				server_broadcasted_chat message;
+				message.target = chat_target_type::SERVER_SHUTTING_DOWN;
+				message.recipient_shall_kindly_leave = true;
+
+				broadcast(message);
+
+				return continue_v;
+			}
+
+			case special::RESTART: {
+				LOG("Restarting the server due to rcon's request.");
+				schedule_shutdown = true;
+				request_restart_after_shutdown = true;
 
 				server_broadcasted_chat message;
 				message.target = chat_target_type::SERVER_SHUTTING_DOWN;
