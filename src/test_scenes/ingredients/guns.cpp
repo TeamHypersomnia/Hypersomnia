@@ -2754,7 +2754,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("1.5");
+			charge_deposit_def.space_available = to_space_units("2.0");
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::LEWSII_CHARGE);
 			charge_deposit_def.mounting_duration_ms = 300.f;
 
@@ -3290,7 +3290,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 4.0f;
 			gun_def.gunshot_adds_heat = 0.2f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.4f;
-			gun_def.recoil_multiplier = 1.05f;
+			gun_def.recoil_multiplier = 0.8f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(150);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
@@ -3302,11 +3302,11 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.75f);
+			set_density_mult(meta, 1.25f);
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f, 0.f, false, "0.01", true);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
-			meta.get<invariants::item>().standard_price = 5000;
+			meta.get<invariants::item>().standard_price = 5100;
 			set_chambering_duration_ms(meta, 700.f);
 
 			only_allow_mag(meta, test_container_items::LEWSII_MAGAZINE);
