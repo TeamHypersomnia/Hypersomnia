@@ -315,6 +315,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		using update_result = self_update_result_type;
 
+		LOG("Checking for updates");
+
 		last_update_result = check_and_apply_updates(
 			imgui_atlas_image,
 			config.http_client,

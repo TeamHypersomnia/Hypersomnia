@@ -10,9 +10,17 @@
 #include "augs/string/string_templates.h"
 #include "augs/log_path_getters.h"
 
+#if PLATFORM_UNIX
+#define OUTPUT_TO_STDOUT 1
+#elif BUILD_IN_CONSOLE_MODE
+#define OUTPUT_TO_STDOUT 1
+#else
+#define OUTPUT_TO_STDOUT 0
+#endif
+
 #define ENABLE_LOG 1
 
-#if BUILD_IN_CONSOLE_MODE
+#if OUTPUT_TO_STDOUT
 #include <iostream>
 #endif
 
@@ -143,7 +151,7 @@ void LOG_DIRECT(const std::string& f) {
 
 	program_log::get_current().push_entry({ f });
 
-#if BUILD_IN_CONSOLE_MODE
+#if OUTPUT_TO_STDOUT
 	std::cout << f << std::endl;
 #endif
 
