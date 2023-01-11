@@ -4,6 +4,7 @@ namespace editor_widgets {
 	template <class F>
 	bool inspectable_with_icon(
 		const augs::atlas_entry& icon,
+		const rgba icon_color,
 		const augs::imgui_atlas_type atlas_type,
 		const std::string& label,
 		const rgba label_color,
@@ -62,7 +63,7 @@ namespace editor_widgets {
 
 			const auto icon_padding = vec2(icon_size) / 1.5f;
 
-			game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
+			game_image(icon, scaled_icon_size, icon_color, vec2::zero, atlas_type);
 
 			const auto image_offset = vec2(0, button_size.y / 2 - icon_size.y / 2);
 			const auto text_pos = vec2(before_pos) + image_offset + vec2(content_x_offset + icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);

@@ -29,6 +29,8 @@ namespace editor_widgets {
 
 		auto atlas_type = augs::imgui_atlas_type::GAME;
 
+		auto icon_color = white;
+
 		if (node.game_atlas_icon != std::nullopt) {
 			icon = *node.game_atlas_icon;
 		}
@@ -39,6 +41,7 @@ namespace editor_widgets {
 			else if (node.is_resource()) {
 				auto result = setup.get_icon_for(node.associated_resource, icon_in);
 				icon = result.icon;
+				icon_color = setup.get_icon_color_for(node.associated_resource);
 				atlas_type = result.atlas;
 			}
 			else {
@@ -86,6 +89,7 @@ namespace editor_widgets {
 
 		const bool result = inspectable_with_icon(
 			icon,
+			icon_color,
 			atlas_type,
 			label,
 			label_color,

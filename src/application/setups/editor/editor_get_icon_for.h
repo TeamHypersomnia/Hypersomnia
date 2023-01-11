@@ -23,6 +23,53 @@ template <class T>
 constexpr bool is_node_type_v = has_resource_id<T>::value;
 
 template <class T>
+rgba editor_setup::get_icon_color_for(
+	const T& object
+) const {
+	if constexpr(is_node_type_v<T>) {
+		auto node_color = white;
+
+		if constexpr(std::is_same_v<T, editor_sprite_node>) {
+			node_color = object.editable.colorize;
+		}
+		else if constexpr(std::is_same_v<T, editor_light_node>) {
+			node_color = object.editable.colorize;
+		}
+		else if constexpr(std::is_same_v<T, editor_particles_node>) {
+			node_color = object.editable.colorize;
+		}
+
+		const auto* maybe_resource = find_resource(object.resource_id);
+
+		if (maybe_resource != nullptr) {
+			return node_color * get_icon_color_for(*maybe_resource);
+		}
+
+		return node_color;
+	}
+	else if constexpr(std::is_same_v<T, editor_resource_id>) {
+		auto icon_getter = [&](const auto& typed_resource, const auto) { 
+			return get_icon_color_for(typed_resource);
+		};
+
+		if (const auto result = on_resource(object, icon_getter)) {
+			return *result;
+		}
+	}
+	else if constexpr(std::is_same_v<T, editor_sprite_resource>) {
+		return object.editable.color;
+	}
+	else if constexpr(std::is_same_v<T, editor_light_resource>) {
+		return object.editable.color;
+	}
+	else if constexpr(std::is_same_v<T, editor_particles_resource>) {
+		return object.editable.colorize;
+	}
+
+	return white;
+}
+
+template <class T>
 editor_icon_info editor_setup::get_icon_for(
 	const T& object, 
 	const editor_icon_info_in in

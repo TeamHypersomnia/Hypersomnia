@@ -375,6 +375,11 @@ public:
 	vec2 get_world_cursor_pos(const camera_eye eye) const;
 
 	template <class T>
+	rgba get_icon_color_for(
+		const T& object
+	) const;
+	
+	template <class T>
 	editor_icon_info get_icon_for(
 		const T& object, 
 		editor_icon_info_in

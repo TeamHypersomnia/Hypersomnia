@@ -247,6 +247,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 		const auto icon_result = in.setup.get_icon_for(node, in);
 		const auto icon = icon_result.icon;
+		const auto icon_color = in.setup.get_icon_color_for(node);
 		const auto atlas_type = icon_result.atlas;
 
 		const auto label = node.get_display_name();
@@ -392,7 +393,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const auto icon_padding = vec2(icon_size) / 1.5f;
 
 				const auto image_color = node_disabled ? disabled_color : white;
-				game_image(icon, scaled_icon_size, image_color, vec2::zero, atlas_type);
+				game_image(icon, scaled_icon_size, icon_color * image_color, vec2::zero, atlas_type);
 
 				const auto image_offset = vec2(0, button_size.y / 2 - icon_size.y / 2);
 				const auto text_pos = vec2(before_pos) + image_offset + vec2(content_x_offset + icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
