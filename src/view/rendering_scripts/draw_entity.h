@@ -110,6 +110,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				if (sprite_comp.colorize != white) {
 					result.colorize *= sprite_comp.colorize;
 				}
+
+				result.disable_special_effects = sprite_comp.disable_special_effects;
 			}
 
 			return result;

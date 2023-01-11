@@ -200,15 +200,6 @@ namespace test_flavours {
 			test_scene_plain_animation_id::DRAGON_FISH,
 			test_ground_order::BOTTOM_FISH,
 			160,
-			200
-		);
-
-		fish_flavour(
-			test_dynamic_decorations::RAINBOW_DRAGON_FISH,
-			test_scene_image_id::DRAGON_FISH_1,
-			test_scene_plain_animation_id::DRAGON_FISH,
-			test_ground_order::BOTTOM_FISH,
-			160,
 			200,
 			augs::sprite_special_effect::COLOR_WAVE
 		);

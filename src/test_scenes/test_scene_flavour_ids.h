@@ -255,7 +255,6 @@ enum class test_dynamic_decorations {
 	CYANVIOLET_FISH,
 	JELLYFISH,
 	DRAGON_FISH,
-	RAINBOW_DRAGON_FISH,
 	WATER_SURFACE,
 
 	FLOWER_PINK,

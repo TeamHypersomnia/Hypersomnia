@@ -10,6 +10,8 @@ summary: Just a hidden scratchpad.
 	- It crashed before successfully sending the message to Telegram but after successfully sending the Discord one
 	- Actually rather peculiar, if both lived enough for the discord message to be properly sent, there's no reason telegram one wouldn't eventually arrive, must've been problem elsewhere 
 		- I've also seen kartezjan for a bit so it must've sent me some data
+	- Maybe httplib is not actually thread safe
+		- Just in case I'd update it and merge the two webhook handlers into a single lambda
 
 
 

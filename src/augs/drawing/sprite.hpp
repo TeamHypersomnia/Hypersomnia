@@ -99,7 +99,7 @@ namespace augs {
 			in.flip 
 		);
 
-		if (spr.effect == sprite_special_effect::COLOR_WAVE) {
+		if (!in.disable_special_effects && spr.effect == sprite_special_effect::COLOR_WAVE) {
 			auto left_col = rgba(hsv{ std::fmod(in.global_time_seconds * spr.effect_speed_multiplier / 2.f, 1.f), 1.0, 1.0 });
 			auto right_col = rgba(hsv{ std::fmod(in.global_time_seconds * spr.effect_speed_multiplier / 2.f / 2.f + 0.3f, 1.f), 1.0, 1.0 });
 

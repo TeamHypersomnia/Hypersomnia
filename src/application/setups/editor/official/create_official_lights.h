@@ -7,12 +7,14 @@ void create_lights(const intercosm& scene, editor_resource_pools& pools) {
 		using test_id_type = test_static_lights;
 
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
-			const auto light = scene.world.get_flavour(to_entity_flavour_id(enum_id)).template get<components::light>();
+			const auto flavour_id = to_entity_flavour_id(enum_id);
+			const auto light = scene.world.get_flavour(flavour_id).template get<components::light>();
 
 			auto res = editor_light_resource();
 			res.editable = light;
 			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
 			res.official_tag = enum_id;
+			res.scene_flavour_id = flavour_id;
 
 			pool.allocate(res);
 		});

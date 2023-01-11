@@ -11,11 +11,13 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 		using test_id_type = test_scene_physical_material_id;
 
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
-			// const auto material = materials.get(to_physical_material_id(enum_id));
+			const auto material_id = to_physical_material_id(enum_id);
+			// const auto material = materials.get(material_id);
 
 			auto res = editor_material_resource();
 			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
 			res.official_tag = enum_id;
+			res.scene_asset_id = material_id;
 
 			pool.allocate(res);
 		});

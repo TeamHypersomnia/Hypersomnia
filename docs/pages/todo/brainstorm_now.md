@@ -6,14 +6,38 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- A simple tooltip when someone tries to drag&drop e.g. a physical to a scene
+	- Physical materials cannot be instantiated as nodes.
+
+- Also the rainbow fish thing will now be handled with separate files
+	- We can easily optimize it later by detecting duplicate entries in the atlas (by hashing for example)
+	- We could also have a naming convention for copying files but that would be overkill
+
+- Technically aquarium could be templatized without fish parameters
+	- We can later just drag& drop from the organism section
+	- An organism area will be a special resource too
+
+
+- Something like aquarium could still be parametrized by entities though
+	- It will first need to be created and put on scene
+		- Since a resource cannot contain references to an entity
+
+- We can make fishes into gifs to test how they work
+
+- For differentiating between stuff like dragon rainbow fish and rainbow fish we'll use a flag "disable special effects" per-sprite
+	- Okay but it's still problematic because they can't be used as separate flavors/resources
+	- So can't be passed as separate arguments to an aquarium for example.
+	- As it stands we can't even list them properly as resources
+	- At some point in time we might have virtualized resources
+	- For now we'll just have to use a single flavor
+
+- Colorize icons/resources by their colorize parameters
+
 - Let's do the same for weapons so that we have a nice listing of them
 
 - We need to properly decide which official resources to list
 	- However what we've done will already help us a lot in that we won't have to port particles itp
 
-- For differentiating between stuff like dragon rainbow fish and rainbow fish we'll use a flag "disable special effects" per-sprite
-	- Okay but it's still problematic because they can't be used as separate flavors/resources
-	- So can't be passed as separate arguments to an aquarium for example.
 
 - In case we want more standalone particles we'll just add them
 	- As for singular effects.. technically these are separate resources

@@ -18,6 +18,7 @@ struct basic_drawing_input_base {
 	basic_transform<T> renderable_transform;
 	rgba colorize = white;
 	bool use_neon_map = false;
+	bool disable_special_effects = false;
 };
 
 using drawing_input_base = basic_drawing_input_base<real32>;

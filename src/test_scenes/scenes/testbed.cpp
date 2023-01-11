@@ -1096,15 +1096,15 @@ namespace test_scenes {
 			const auto cyanvioletfish = test_dynamic_decorations::CYANVIOLET_FISH;
 			const auto jellyfish = test_dynamic_decorations::JELLYFISH;
 			const auto dragon_fish = test_dynamic_decorations::DRAGON_FISH;
-			const auto rainbow_dragon_fish = test_dynamic_decorations::RAINBOW_DRAGON_FISH;
 
 			const auto origin_entity = create(test_box_markers::ORGANISM_AREA, aquarium_origin).set_logical_size(aquarium_size * 2);
 
-			auto create_fish = [&, origin_entity](auto t, auto where) {
+			auto create_fish = [&, origin_entity](auto t, auto where, bool disable_eff = false) {
 				const auto decor = create(t, where);
 				decor.template get<components::movement_path>().origin = origin_entity.get_id();
 				const auto secs = real32(decor.template get<components::animation>().state.frame_num) * 12.23f;
 				decor.template get<components::sprite>().effect_offset_secs = secs;
+				decor.template get<components::sprite>().disable_special_effects = disable_eff;
 				return decor;
 			};
 
@@ -1146,15 +1146,15 @@ namespace test_scenes {
 			create_fish(jellyfish, aquarium_tr - vec2(80, 70));
 			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 80), -180));
 
-			create_fish(dragon_fish, aquarium_tr - vec2(100, 30));
-			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 40), -180));
-			create_fish(dragon_fish, aquarium_tr - vec2(100, 50));
-			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 60), -180));
+			create_fish(dragon_fish, aquarium_tr - vec2(100, 30), true);
+			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 40), -180), true);
+			create_fish(dragon_fish, aquarium_tr - vec2(100, 50), true);
+			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 60), -180), true);
 
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(100, 30));
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 40));
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(100, 50));
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60));
+			create_fish(dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(100, 30));
+			create_fish(dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 40));
+			create_fish(dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(100, 50));
+			create_fish(dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60));
 		};
 
 		const auto orig1 = vec2(380, -1524);

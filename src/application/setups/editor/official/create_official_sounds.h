@@ -9,7 +9,8 @@ void create_sounds(const intercosm& scene, editor_resource_pools& pools) {
 		using test_id_type = test_sound_decorations;
 
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
-			const auto sound_id = scene.world.get_flavour(to_entity_flavour_id(enum_id)).template get<invariants::continuous_sound>().effect.id;
+			const auto flavour_id = to_entity_flavour_id(enum_id);
+			const auto sound_id = scene.world.get_flavour(flavour_id).template get<invariants::continuous_sound>().effect.id;
 
 			if (sound_id == to_sound_id(test_scene_sound_id::BLANK)) {
 				return;
@@ -19,6 +20,8 @@ void create_sounds(const intercosm& scene, editor_resource_pools& pools) {
 			
 			auto res = editor_sound_resource(editor_pathed_resource(path, "", {}));
 			res.official_tag = enum_id;
+			res.scene_flavour_id = flavour_id;
+			res.scene_asset_id = sound_id;
 			pool.allocate(res);
 		});
 	}

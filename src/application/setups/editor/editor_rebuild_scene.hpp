@@ -288,7 +288,9 @@ void editor_setup::rebuild_scene() {
 			}
 		};
 
+#if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 		official_resources.for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
+#endif
 		project.resources .for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, false); } );
 	}
 
@@ -334,7 +336,10 @@ void editor_setup::rebuild_scene() {
 		}
 	};
 
+
+#if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 	official_resources.for_each(setup_flavours_and_assets);
+#endif
 	project.resources .for_each(setup_flavours_and_assets);
 
 	/* Create nodes */

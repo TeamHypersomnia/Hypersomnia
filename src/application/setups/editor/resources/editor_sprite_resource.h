@@ -58,12 +58,16 @@ struct editor_sprite_resource {
 
 	ad_hoc_entry_id thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
 
-	std::optional<std::variant<test_static_decorations, test_dynamic_decorations>> official_tag;
+	std::optional<std::variant<
+		test_static_decorations,
+		test_dynamic_decorations
+	>> official_tag;
 
 	/* Only for quick mapping */
 	mutable std::variant<
 		typed_entity_flavour_id<static_decoration>,
-		typed_entity_flavour_id<plain_sprited_body>
+		typed_entity_flavour_id<plain_sprited_body>,
+		typed_entity_flavour_id<dynamic_decoration>
 	> scene_flavour_id;
 
 	mutable assets::image_id scene_asset_id;
