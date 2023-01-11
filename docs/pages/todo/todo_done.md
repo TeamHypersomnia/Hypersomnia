@@ -4763,3 +4763,6 @@ Advantages:
 		- we can already display it on the list
 		- remember? it's always in this order, first UI then backend because UI helps debug backend
 
+- Let's implement those gifs because it's constantly on my mind
+	- And it will be somewhat fun
+

@@ -215,11 +215,16 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::
 			auto scope = augs::imgui::scoped_tree_node_ex("Edit collider shape");
 		}
 
-		edit_property(result, "Is static", e.is_static);
 		edit_property(result, "Is see-through", e.is_see_through);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, lets the light through.\nEnemies will be visible behind this object.\nUse it on walls of glass.");
+		}
+
+		edit_property(result, "Is body static", e.is_static);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If enabled, will be permanently set in place.\nWon't move no matter what.\nUse it on layout-defining walls and objects.");
 		}
 
 		edit_property(result, "Density", e.density);
@@ -387,38 +392,43 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 		auto id = scoped_id(name.c_str());
 
-		auto edited_copy = resource.editable;
-		auto changed = std::string();
-
-		if constexpr(std::is_same_v<R, editor_sprite_resource>) {
-			auto original_size = std::optional<vec2i>();
-
-			if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, resource.thumbnail_id)) {
-				original_size = ad_hoc->get_original_size();
-			}
-
-			/* 
-				It's probably better to leave the widgets themselves active
-				in case someone wants to copy the values.
-			*/
-
-			auto disabled = maybe_disabled_only_cols(resource_id.is_official);
-			changed = perform_editable_gui(edited_copy, original_size);
-
+		if (resource_id.is_official) {
+			text_color("Official resources cannot be edited.", yellow);
 		}
 		else {
-			auto disabled = maybe_disabled_only_cols(resource_id.is_official);
-			changed = perform_editable_gui(edited_copy);
-		}
+			auto edited_copy = resource.editable;
+			auto changed = std::string();
 
-		if (!changed.empty() && !resource_id.is_official) {
-			edit_resource_command<R> cmd;
-			cmd.resource_id = resource_id;
-			cmd.after = edited_copy;
-			cmd.built_description = typesafe_sprintf(changed, resource.get_display_name());
-			cmd.override_inspector_state = std::move(override_inspector_state);
+			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
+				auto original_size = std::optional<vec2i>();
 
-			post_new_or_rewrite(std::move(cmd)); 
+				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, resource.thumbnail_id)) {
+					original_size = ad_hoc->get_original_size();
+				}
+
+				/* 
+					It's probably better to leave the widgets themselves active
+					in case someone wants to copy the values.
+				*/
+
+				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
+				changed = perform_editable_gui(edited_copy, original_size);
+
+			}
+			else {
+				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
+				changed = perform_editable_gui(edited_copy);
+			}
+
+			if (!changed.empty() && !resource_id.is_official) {
+				edit_resource_command<R> cmd;
+				cmd.resource_id = resource_id;
+				cmd.after = edited_copy;
+				cmd.built_description = typesafe_sprintf(changed, resource.get_display_name());
+				cmd.override_inspector_state = std::move(override_inspector_state);
+
+				post_new_or_rewrite(std::move(cmd)); 
+			}
 		}
 	};
 

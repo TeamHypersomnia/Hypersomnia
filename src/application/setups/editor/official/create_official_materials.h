@@ -1,6 +1,26 @@
 #pragma once
+#include "test_scenes/test_scene_physical_materials.h"
 
-void create_materials(editor_resource_pools& pools) {
+void create_materials(const intercosm& scene, editor_resource_pools& pools) {
+	// auto& materials = scene.world.get_common_significant().logical_assets.physical_materials;
+	(void)scene;
+
+	auto& pool = pools.template get_pool_for<editor_material_resource>();
+
+	{
+		using test_id_type = test_scene_physical_material_id;
+
+		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
+			// const auto material = materials.get(to_physical_material_id(enum_id));
+
+			auto res = editor_material_resource();
+			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
+			res.official_tag = enum_id;
+
+			pool.allocate(res);
+		});
+	}
+#if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 	auto create_material = [&](const official_materials id) -> auto& {
 		return create_official(id, pools).editable;
 	};
@@ -51,4 +71,5 @@ void create_materials(editor_resource_pools& pools) {
 	};
 
 	set_pair(official_materials::GLASS, official_materials::GLASS, official_sounds::COLLISION_GLASS);
+#endif
 }

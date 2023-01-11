@@ -56,6 +56,41 @@ void intercosm::clear() {
 #endif
 }
 
+void intercosm::populate_official_content(
+	sol::state& lua, 
+	const unsigned tickrate,
+	bomb_defusal_ruleset& bomb_defusal
+) {
+	clear();
+
+#if !STATICALLY_ALLOCATE_ENTITIES
+	cosmic::reserve_storage_for_entities(world, 3000u);
+#endif
+
+	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
+
+	world.change_common_significant([&](cosmos_common_significant& common){
+		auto& logicals = common.logical_assets;
+
+		populate_test_scene_logical_assets(viewables.image_definitions, logicals);
+		populate_test_scene_viewables(caches, logicals.plain_animations, viewables);
+		viewables.update_relevant(logicals);
+		::populate_test_scene_common(caches, common);
+
+		return changer_callback_result::REFRESH;
+	});
+
+	cosmic::change_solvable_significant(world, [&](auto& s){
+		s.clk.now.step = 0;
+		s.clk.dt = augs::delta::steps_per_second(tickrate);
+		return changer_callback_result::DONT_REFRESH;
+	});
+
+	auto populator = test_scenes::testbed();
+	populator.setup(bomb_defusal);
+	bomb_defusal.speeds.tickrate = tickrate;
+}
+
 void intercosm::make_test_scene(
 	sol::state& lua, 
 	const test_scene_settings settings,

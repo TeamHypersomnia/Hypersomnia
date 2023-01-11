@@ -6,35 +6,138 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- linux bug: neon silhouettes can be seen behind player, probably something to do with drivers
-	- It's a problem with gl_FragCoord: probably stencil on another fbo is somehow flipped
-	- To reverse the problem, one can put the following in fog_of_war.fsh: layout(origin_upper_left) in vec4 gl_FragCoord; 
-		- although only with higher glsl version
-	- didn't happen before, very probable it's a driver bug
+- Let's do the same for weapons so that we have a nice listing of them
+
+- We need to properly decide which official resources to list
+	- However what we've done will already help us a lot in that we won't have to port particles itp
+
+- For differentiating between stuff like dragon rainbow fish and rainbow fish we'll use a flag "disable special effects" per-sprite
+	- Okay but it's still problematic because they can't be used as separate flavors/resources
+	- So can't be passed as separate arguments to an aquarium for example.
+
+- In case we want more standalone particles we'll just add them
+	- As for singular effects.. technically these are separate resources
+		- Thing is something like a muzzle shot effect or any burst is different from environmental which should be normally viewable through official resources
+	- We shouldn't worry about it for now, we won't be creating a particle editor for a while still
+	- Does the same problem happen elsewhere?
+		- Also, materials
+		- So we could just have separate categories, sound effects and particle bursts apart from "decorations"
+			- decorations pretty much imply they're static
+	- Sounds would technically be similar, there are bursts and ambiences
+	- However someone creating an environment in the editor won't bother with "bursts" and "sound effects", they will only deal with these environmentals
+		- Well unless they're making an interactive object somehow
+
+
+- Okay so the first challenge will be to list all these official resources somehow in the resources view
+	- We can keep the old generation logic
+	- We should just create a manual list of resources to list
+		- We don't want like muzzle sounds or magazine pics because they won't be used
+		- Even though they could technically be used in creating new special resources later
+	- We could virtualize the folders
+	- Some foldering would only be needed insofar as special graphics are concerned, we can leave it for later
+
+- As for whether we should have a special Domain for weapons/special objects..
+	- We'll worry about it when we get to this stage
+	- Because we'll only allow creating weapons/particles/phys materials later
+	- We could even decide to make it a separate special folder
+		- so that normal graphics don't have additional domains to choose from
+
+- By default all official resources will be created. What do we do with the redundant textures that inevitably get included?
+	- We need to prune them once on cosmos generation stage
+	- I see even de_labs2 includes road sprites which technically sucks
+		- but not a problem for now since it's worked like that for a while
+	- Yeah at some point we'll need to run a dependency graph and remove viewables that aren't referenced
+		- But we'd need to do this anyway even if we didn't create all official resources at abi level
+
+
+		- Reusing official content creation on ABI-level
+			- Pros
+				- Editor ready sooner
+				- Finer control for now and won't screw up creation process
+			- Cons
+				- Missing out on easier creation process for official resources
+					- Though one could argue that doing it at abi stage is more... immediate? (Won't have to create translation logic for a new feature we want to test)
+				- Won't be able to reference it/properly visualize it from the editor as a resource?
+					- WILL be able to reference it actually
+					- and will be able to easily create an ad-hoc icon logic
+					- This is the only means of visualization we need
+				- Won't be able to view properties
+					- It's not important
+				- Also won't be able to create a custom resource basing on it
+					- Unimportant too, will encourage creativity
+			- Note that even if official gun creation happens in abi...
+				- ...we can still have custom gun resource creation logic without being forced to use it to create the official resources
+
+
+		- Can we do it though?
+			- Problematically, guns/particles/materials etc will refer to official resources which will be reference-able from the editor
+				- Can't we just visualize and somehow associate them? Given their properties won't be editable and don't even have to be viewable
+			- E.g. we wouldn't be able to do it with sprites because we wouldn't even be able to list them
+			- We already have a separate 
+- We could technically hold enum tags in editor's sprite resource struct
+	- If it's set we know it's also official
+	- However we'll already know it because official resources are in a separate struct
+
+- Do we have another domain for special objects like aquariums and guns?
+	- They mix objects from various domains
+
+- It would be good to implement something like aquarium early to finally clear all that confusion
+	- As well as weapons
+
+- As for officials we also need special objects with parametrization
+	- Like aquarium with parametrized sizes
+	- This doesn't have to be visualized in the editor except on the cosmos stage
+	- It can just be tagged somehow
+	- Aquarium will be parametrized and won't have to reference any specific image ids
+	- Only specific non-special official resources might reference other official resources
+	- What about lights? Do we just have a tag for them too?
+		- I don't think lights are referenced elsewhere though in officials so they can be viewable/editable
+
+- Major problem: reconciling official content with created content
+	- Can we use the existing functions for populating the cosmos with official resources?
+		- And then e.g. filling it with the custom content from the map?
+
+	- I think none of the special resources will be editable for now
+		- We don't have to write serialization for anything that we provide as official
+			- It's enough that referencing it is implemented
+			- So we can have physical materials natively for now
+			- All physical materials will be official for now so we don't have to worry about serializing the collision matrix
+				- We'll determine later if we want to have a global collision matrix or just per-material entries because it won't be editable for now
+			- Same with particles, we'll just use the officials everywhere and not worry about serialization
+			- So that will just be a copy-paste mostly
+
+	- For serializing stuff like ids we should pass a lambda to write_json that has all the required references to properly map the id to a proper name
+		- For now let's have the default modifiers embedded in resources themselves and let's see how far it will take us
+			- Should work for entities at least since we have no component with modifier, how much really a single sound effect would be reused among flavors?
+				- Well maybe apart from stuff like footsteps
+				- okay but still different sprites for each of these and thus separate fields with modifiers possible
+		- Let's really not store std string directly there
+
 
 - Animations
+	- Okay so we just need a means of translating some editor animation resources to proper cosmos resources
+		- Contrary to classic editors we won't make animation a vector of sprite resources
+		- It will instead keep a single animation resource with properties for a single sprite to be applied to all frames
+	- How do we plug them into object-per-sprite system?
+		- Can't we just make it a sprite?
+	- Technically for editing guns or walking animations we'd need to skin/edit state of every frame 
+		- But for environment objects we should just make it abstract
 	- Used only in a) animation component or b) particles defs
 		- animating decorations/organisms (animation component)
-	- How do we plug them into object-per-sprite system?
 	- why can't we just create animations for viewables as usual?
 		- we probably can and will
 	- We only wanted to templatize the particle types because we need a separate means of keeping them in the editor state
 		- could be introspectively assigned
-	- Okay so we just need a means of translating some editor animation resources to proper cosmos resources
-		- Contrary to classic editors we won't make animation a vector of sprite resources
-		- It will instead keep a single animation resource with properties for a single sprite to be applied to all frames
 	- What about pathed assets?
 		- Do we want to keep separate forms of animation, i.e. separate pngs and gifs?
 		- I think just one will be enough
 		- It's good if we force small number of colors anyway
-	- With gifs, adhoc atlas will be problematic
-		- It takes a path
 	- How do we create the rest of resources like officials?
 - So problems to solve
 	- For adhoc there can be a separate system that just keeps track of the animation and feeds proper changed coordinates
 		- Without virtualization on the atlas generation level
 	- We won't recreate the atlas every time, we'll just pass different coordinates
-		
+	- Okay so this is done
 
 - Alright let's now try creating various entity types like lights and sounds
 - I think we'll first implement animations because we'll need them for the particles
@@ -52,9 +155,6 @@ summary: That which we are brainstorming at the moment.
 - For particles we might just templatize the particle effect by the image id and animation id
 	- We don't even have to explicitly instantiate particle types as the defs are included in hpp
 
-- Let's implement those gifs because it's constantly on my mind
-	- And it will be somewhat fun
-
 - Handle throw_through later, we'll make it just see-through for the moment
 	- we'll have a separate filter for that probably
 
@@ -64,17 +164,11 @@ summary: That which we are brainstorming at the moment.
 - What we'd really want to avoid is to having to specify collision sounds twice because we want different restitution/density on say another wooden body
 	- max_ricochet_angle is likely something we'd like to unify, though
 
-- All physical materials will be official for now so we don't have to worry about serializing the collision matrix
-	- We'll determine later if we want to have a global collision matrix or just per-material entries because it won't be editable for now
-- Same with particles, we'll just use the officials everywhere and not worry about serialization
-	- So that will just be a copy-paste mostly
 
-- For serializing stuff like ids we should pass a lambda to write_json that has all the required references to properly map the id to a proper name
-	- For now let's have the default modifiers embedded in resources themselves and let's see how far it will take us
-		- Should work for entities at least since we have no component with modifier, how much really a single sound effect would be reused among flavors?
-			- Well maybe apart from stuff like footsteps
-			- okay but still different sprites for each of these and thus separate fields with modifiers possible
-	- Let's really not store std string directly there
+
+- Materials
+	- Can't we for now have a set of defaults without it being editable?
+		- This could be officials
 
 - Technically, it's the nodes/entities that should have modifiers, not resources/flavours
 	- We need to fix the particle decoration implementation
@@ -82,14 +176,6 @@ summary: That which we are brainstorming at the moment.
 - Similarly sound_effect_modifier is more like the default properties like the particles' emissions, a modifier would just be gain or sth
 
 
-- I think none of the special resources will be editable for now
-- We don't have to write serialization for anything that we provide as official
-	- It's enough that referencing it is implemented
-	- So we can have physical materials natively for now
-
-- Materials
-	- Can't we for now have a set of defaults without it being editable?
-		- This could be officials
 
 
 - Screw that mouse confirmation for now, encourage enter usage (lol)

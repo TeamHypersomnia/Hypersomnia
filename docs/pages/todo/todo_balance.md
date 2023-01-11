@@ -6,6 +6,9 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
+- Later we'll balance the rattle/spear by increasing the throw distance
+	- This will break the ABI though
+
 - Also it's critical to lengthen the hand for pistol
 
 - USP

@@ -5,7 +5,26 @@ auto float_range(const A a, const B b) {
 	return augs::bound<float>(static_cast<float>(a), static_cast<float>(b));
 }
 
-void create_particles(editor_resource_pools& pools) {
+void create_particles(const intercosm& scene, editor_resource_pools& pools) {
+	auto& pool = pools.template get_pool_for<editor_particles_resource>();
+	(void)scene;
+
+	{
+		using test_id_type = test_particles_decorations;
+
+		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
+			//const auto effect = scene.world.get_flavour(to_entity_flavour_id(enum_id)).template get<invariants::continuous_particles>().effect.modifier;
+
+			auto res = editor_particles_resource();
+			//static_cast<particle_effect_modifier&>(res.editable) = effect;
+			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
+			res.official_tag = enum_id;
+
+			pool.allocate(res);
+		});
+	}
+
+#if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 	auto create_particles = [&](const official_particles id) -> auto& {
 		return create_official(id, pools).editable;
 	};
@@ -41,4 +60,5 @@ void create_particles(editor_resource_pools& pools) {
 		}
 	}
 
+#endif
 }

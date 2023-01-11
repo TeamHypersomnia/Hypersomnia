@@ -9,7 +9,8 @@
 #include "application/setups/editor/editor_filesystem.h"
 #include "augs/image/image.h"
 
-#include "application/setups/editor/detail/official_id_to_pool_id.h"
+#if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
+#include "application/setups/editor/official/official_id_to_pool_id.h"
 
 #define OFFICIAL_CONTENT_PATH augs::path_type(OFFICIAL_CONTENT_DIR)
 
@@ -92,20 +93,26 @@ auto& create_official(const E official_id, editor_resource_pools& pools) {
 		return new_object;
 	}
 }
+#endif
 
+#include "application/intercosm.h"
 #include "application/setups/editor/official/create_official_sprites.h"
 #include "application/setups/editor/official/create_official_materials.h"
 #include "application/setups/editor/official/create_official_lights.h"
 #include "application/setups/editor/official/create_official_sounds.h"
 #include "application/setups/editor/official/create_official_particles.h"
 
-void create_official_resources(editor_resource_pools& pools) {
-	create_lights(pools);
-	create_materials(pools);
-	create_particles(pools);
+void create_official_resources(
+	const intercosm& initial_intercosm,
+	editor_resource_pools& pools
+) {
+	create_lights(initial_intercosm, pools);
+	create_materials(initial_intercosm, pools);
+	create_particles(initial_intercosm, pools);
 
-	create_sprites(pools);
-	create_sounds(pools);
+	create_sounds(initial_intercosm, pools);
+
+	create_sprites(initial_intercosm, pools);
 }
 
 void create_official_filesystem_from(

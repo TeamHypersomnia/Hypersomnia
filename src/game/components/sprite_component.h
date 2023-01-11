@@ -9,7 +9,8 @@ namespace components {
 	struct sprite {
 		// GEN INTROSPECTOR struct components::sprite
 		bool disable_neon_map = false;
-		pad_bytes<3> pad;
+		bool disable_special_effects = false;
+		pad_bytes<2> pad;
 		real32 effect_offset_secs = 0.f;
 		rgba colorize = white;
 		rgba colorize_neon = white;

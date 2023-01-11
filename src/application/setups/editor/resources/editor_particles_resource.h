@@ -4,6 +4,7 @@
 #include "game/detail/view_input/particle_effect_modifier.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "view/viewables/particle_effect.h"
+#include "test_scenes/test_scene_flavour_ids.h"
 
 struct editor_particles_resource_editable : particle_effect_modifier {
 	using base = particle_effect_modifier;
@@ -20,6 +21,8 @@ struct editor_particles_resource {
 	using node_type = editor_particles_node;
 
 	editor_particles_resource_editable editable;
+
+	std::optional<test_particles_decorations> official_tag;
 
 	mutable std::variant<
 		typed_entity_flavour_id<particles_decoration>

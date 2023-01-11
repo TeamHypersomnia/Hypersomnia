@@ -4,6 +4,7 @@
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/resources/editor_particle_effect.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
+#include "test_scenes/test_scene_physical_materials.h"
 
 struct editor_material_resource;
 
@@ -40,6 +41,8 @@ struct editor_material_resource_editable {
 
 struct editor_material_resource {
 	editor_material_resource_editable editable;
+
+	std::optional<test_scene_physical_material_id> official_tag;
 	mutable assets::physical_material_id scene_asset_id;
 
 	std::string unique_name;

@@ -52,7 +52,11 @@
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/setups/editor/editor_rebuild_scene.hpp"
 
-editor_setup::editor_setup(const augs::path_type& project_path) : paths(project_path) {
+editor_setup::editor_setup(
+	sol::state& lua,
+	const augs::path_type& project_path
+) : paths(project_path) {
+	initial_scene.populate_official_content(lua, 60, default_bomb_ruleset);
 	create_official();
 
 	LOG("Loading editor project at: %x", project_path);
@@ -70,7 +74,7 @@ editor_setup::~editor_setup() {
 }
 
 void editor_setup::create_official() {
-	::create_official_resources(official_resources);
+	::create_official_resources(initial_scene, official_resources);
 	::create_official_filesystem_from(official_resources, official_files_root);
 }
 
@@ -382,8 +386,8 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 			);
 		};
 
-		files.root.for_each_file_recursive(cache_thumbnail_id_in_resource);
 		official_files_root.for_each_file_recursive(cache_thumbnail_id_in_resource);
+		files.root.for_each_file_recursive(cache_thumbnail_id_in_resource);
 
 		if (new_subjects == last_ad_hoc_subjects) {
 			return std::nullopt;

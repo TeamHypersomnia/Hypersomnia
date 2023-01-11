@@ -5,6 +5,14 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Server crash from 11.01.2023 at 01:24
+	- Kartezjan then najsilniejszy programista C++
+	- It crashed before successfully sending the message to Telegram but after successfully sending the Discord one
+	- Actually rather peculiar, if both lived enough for the discord message to be properly sent, there's no reason telegram one wouldn't eventually arrive, must've been problem elsewhere 
+		- I've also seen kartezjan for a bit so it must've sent me some data
+
+
+
 - NAT traversal does not always work with our symmetric port-sensitive
 	- Working connections:
 		- filemon -> Billan

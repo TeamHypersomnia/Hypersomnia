@@ -37,6 +37,12 @@ struct intercosm {
 		bomb_defusal_ruleset* = nullptr
 	);
 
+	void populate_official_content(
+		sol::state&, 
+		unsigned tickrate,
+		bomb_defusal_ruleset&
+	);
+
 	void load_from_bytes(const intercosm_paths&);
 	void save_as_bytes(const intercosm_paths&) const;
 

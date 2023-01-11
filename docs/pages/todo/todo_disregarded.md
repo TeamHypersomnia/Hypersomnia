@@ -5,6 +5,12 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- linux bug: neon silhouettes can be seen behind player, probably something to do with drivers
+	- It's a problem with gl_FragCoord: probably stencil on another fbo is somehow flipped
+	- To reverse the problem, one can put the following in fog_of_war.fsh: layout(origin_upper_left) in vec4 gl_FragCoord; 
+		- although only with higher glsl version
+	- didn't happen before, very probable it's a driver bug
+
 - The only problem with how we do canon/local config is that some local settings might disappear
 	- If we manually set allow nat = false and then we launch a dedicated server, that setting might disappear
 		- Is that really that much of a bad thing though?

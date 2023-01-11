@@ -39,6 +39,8 @@
 #include "augs/graphics/imgui_payload.h"
 #include "application/setups/editor/commands/node_transform_commands.h"
 
+#include "game/modes/bomb_defusal.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -74,6 +76,9 @@ struct editor_icon_info;
 struct editor_icon_info_in;
 
 class editor_setup : public default_setup_settings {
+	bomb_defusal_ruleset default_bomb_ruleset;
+	intercosm initial_scene;
+
 	intercosm scene;
 	per_entity_type_array<std::vector<editor_node_id>> scene_entity_to_node;
 
@@ -148,7 +153,10 @@ public:
 	static constexpr bool handles_window_input = true;
 	static constexpr bool has_additional_highlights = true;
 
-	editor_setup(const augs::path_type& project_path);
+	editor_setup(
+		sol::state& lua,
+		const augs::path_type& project_path
+	);
 	
 	~editor_setup();
 

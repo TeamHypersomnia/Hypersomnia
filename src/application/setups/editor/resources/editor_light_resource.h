@@ -2,6 +2,7 @@
 #include "augs/math/vec2.h"
 #include "game/components/light_component.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "test_scenes/test_scene_flavour_ids.h"
 
 using editor_light_resource_editable = components::light;
 
@@ -11,6 +12,7 @@ struct editor_light_resource {
 
 	editor_light_resource_editable editable;
 
+	std::optional<test_static_lights> official_tag;
 	mutable std::variant<
 		typed_entity_flavour_id<static_light>
 	> scene_flavour_id;

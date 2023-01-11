@@ -14,6 +14,8 @@ struct editor_sound_resource {
 	editor_pathed_resource external_file;
 	editor_sound_resource_editable editable;
 
+	std::optional<std::variant<test_sound_decorations>> official_tag;
+
 	/* Only for quick mapping */
 	mutable std::variant<
 		typed_entity_flavour_id<sound_decoration>

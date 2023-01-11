@@ -1,6 +1,39 @@
 #pragma once
+#include "test_scenes/test_scene_flavour_ids.h"
+#include "test_scenes/test_scene_flavours.h"
 
-void create_sprites(editor_resource_pools& pools) {
+void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
+	auto& images = scene.viewables.image_definitions;
+
+	auto& pool = pools.template get_pool_for<editor_sprite_resource>();
+
+	{
+		using test_id_type = test_static_decorations;
+
+		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
+			const auto image_id = scene.world.get_flavour(to_entity_flavour_id(enum_id)).template get<invariants::sprite>().image_id;
+			const auto path = images[image_id].source_image.path;
+			
+			auto res = editor_sprite_resource(editor_pathed_resource(path, "", {}));
+			res.official_tag = enum_id;
+			pool.allocate(res);
+		});
+	}
+
+	{
+		using test_id_type = test_dynamic_decorations;
+
+		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
+			const auto image_id = scene.world.get_flavour(to_entity_flavour_id(enum_id)).template get<invariants::sprite>().image_id;
+			const auto path = images[image_id].source_image.path;
+			
+			auto res = editor_sprite_resource(editor_pathed_resource(path, "", {}));
+			res.official_tag = enum_id;
+			pool.allocate(res);
+		});
+	}
+
+#if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 	auto create_sprite = [&](const official_sprites id) -> auto& {
 		return create_official(id, pools).editable;
 	};
@@ -45,4 +78,5 @@ void create_sprites(editor_resource_pools& pools) {
 	create_sprite(official_sprites::SMOKE_4);
 	create_sprite(official_sprites::SMOKE_5);
 	create_sprite(official_sprites::SMOKE_6);
+#endif
 }

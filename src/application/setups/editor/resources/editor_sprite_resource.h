@@ -8,6 +8,8 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
+#include "test_scenes/test_scene_flavour_ids.h"
+
 enum class editor_sprite_domain {
 	// GEN INTROSPECTOR enum class editor_sprite_domain
 	BACKGROUND,
@@ -55,6 +57,8 @@ struct editor_sprite_resource {
 	/* Cache */
 
 	ad_hoc_entry_id thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
+
+	std::optional<std::variant<test_static_decorations, test_dynamic_decorations>> official_tag;
 
 	/* Only for quick mapping */
 	mutable std::variant<

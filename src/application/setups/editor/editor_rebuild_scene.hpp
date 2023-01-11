@@ -52,7 +52,7 @@ void setup_entity_from_node(
 }
 
 template <class R>
-void allocate_flavours_and_assets(
+void allocate_flavours_and_assets_for_resource(
 	const R& resource,
 	const bool is_official,
 	all_viewables_defs& viewables,
@@ -92,8 +92,10 @@ void allocate_flavours_and_assets(
 				/* 
 					Note that this is later resolved with get_unofficial_content_dir.
 					get_unofficial_content_dir could really be depreciated,
-					it existed because an intercosm always had relative paths since it was saved.
-					Now we won't need it because an intercosm will always exist in memory only.
+						it existed because an intercosm always had relative paths since it was saved.
+						Now we won't need it because an intercosm will always exist in memory only.
+						So we could store absolute paths in the intercosmos.
+
 					Even if we cache things in some .cache folder per-project,
 					I think we'd be better off just caching binary representation of the project data instead of intercosms.
 				*/
@@ -259,7 +261,7 @@ void setup_scene_object_from_resource(
 }
 
 void editor_setup::rebuild_scene() {
-	scene.clear();
+	scene = initial_scene;
 
 	for (auto& s : scene_entity_to_node) {
 		s.clear();
@@ -274,19 +276,21 @@ void editor_setup::rebuild_scene() {
 		First we have to create all flavour and asset ids so that we can properly setup references later.
 	*/
 
-	auto allocate_flavours_and_assets = [&]<typename P>(const P& pool, const bool is_official) {
-		for (const auto& resource : pool) {
-			::allocate_flavours_and_assets(
-				resource,
-				is_official,
-				scene.viewables,
-				common
-			);
-		}
-	};
+	{
+		auto allocate_flavours_and_assets = [&]<typename P>(const P& pool, const bool is_official) {
+			for (const auto& resource : pool) {
+				::allocate_flavours_and_assets_for_resource(
+					resource,
+					is_official,
+					scene.viewables,
+					common
+				);
+			}
+		};
 
-	official_resources.for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
-	project.resources .for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, false); } );
+		official_resources.for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
+		project.resources .for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, false); } );
+	}
 
 	/* Create resources */
 
