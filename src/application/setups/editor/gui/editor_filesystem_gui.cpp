@@ -271,7 +271,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 			new_node.name = typed_resource.unique_name;
 			new_node.associated_resource = resource_id;
 			new_node.type = editor_filesystem_node_type::OTHER_RESOURCE;
-			new_node.game_atlas_icon = parent.game_atlas_icon;
+			//new_node.game_atlas_icon = parent.game_atlas_icon;
 		};
 
 		pool.for_each_id_and_object(resource_handler);

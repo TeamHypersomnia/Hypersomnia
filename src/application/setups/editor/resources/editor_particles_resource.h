@@ -5,12 +5,14 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "view/viewables/particle_effect.h"
 #include "test_scenes/test_scene_flavour_ids.h"
+#include "game/components/continuous_particles.h"
 
 struct editor_particles_resource_editable : particle_effect_modifier {
 	using base = particle_effect_modifier;
 	using introspect_base = base;
 
 	// GEN INTROSPECTOR struct editor_particles_resource_editable
+	augs::maybe<stream_wandering> wandering;
 	emission_vector emissions;
 	// END GEN INTROSPECTOR
 };

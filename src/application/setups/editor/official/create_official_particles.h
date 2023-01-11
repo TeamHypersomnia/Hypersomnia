@@ -14,13 +14,16 @@ void create_particles(const intercosm& scene, editor_resource_pools& pools) {
 
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
 			const auto flavour_id = to_entity_flavour_id(enum_id);
-			//const auto effect = scene.world.get_flavour().template get<invariants::continuous_particles>().effect.modifier;
+			const auto& cp = scene.world.get_flavour(flavour_id).template get<invariants::continuous_particles>();
+			//const auto effect = .effect.modifier;
 
 			auto res = editor_particles_resource();
 			//static_cast<particle_effect_modifier&>(res.editable) = effect;
 			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
 			res.official_tag = enum_id;
 			res.scene_flavour_id = flavour_id;
+			res.editable.wandering = cp.wandering;
+			res.editable.colorize = cp.effect.modifier.colorize;
 
 			pool.allocate(res);
 		});

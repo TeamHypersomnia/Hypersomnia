@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- For now we can leave the audiovisual speed on 1 because it doesn't break anything and looks cool
+	- We could even simulate a passing global time since I think that's what the rainbows are based on
+
+- Don't list physical materials for now in the filesystem
+	- It will only make sense once we can view them or create new ones
+	- for now it's enough they'll be choosable from some list
+
 - A simple tooltip when someone tries to drag&drop e.g. a physical to a scene
 	- Physical materials cannot be instantiated as nodes.
 

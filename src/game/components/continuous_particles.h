@@ -3,6 +3,7 @@
 #include "augs/templates/maybe.h"
 #include "augs/misc/bound.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 struct stream_wandering {
 	// GEN INTROSPECTOR struct stream_wandering

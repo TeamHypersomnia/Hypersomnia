@@ -107,6 +107,10 @@ editor_icon_info editor_setup::get_icon_for(
 		return { in.necessary_images[assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON], augs::imgui_atlas_type::GAME };
 	}
 	else if constexpr(std::is_same_v<T, editor_particles_resource>) {
+		if (object.editable.wandering.is_enabled) {
+			return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_SMOKE_EFFECT], augs::imgui_atlas_type::GAME };
+		}
+
 		return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE], augs::imgui_atlas_type::GAME };
 	}
 
