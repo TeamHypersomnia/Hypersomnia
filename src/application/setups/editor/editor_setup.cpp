@@ -1778,6 +1778,10 @@ bool editor_setup::is_node_visible(const editor_node_id id) const {
 	return visible;
 }
 
+double editor_setup::get_interpolation_ratio() const {
+	return global_time_seconds / get_inv_tickrate();
+}
+
 template struct edit_resource_command<editor_sprite_resource>;
 template struct edit_resource_command<editor_sound_resource>;
 template struct edit_resource_command<editor_light_resource>;

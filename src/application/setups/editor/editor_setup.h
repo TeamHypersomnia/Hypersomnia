@@ -436,9 +436,7 @@ public:
 		return scene.world;
 	}
 
-	auto get_interpolation_ratio() const {
-		return 1.0;
-	}
+	double get_interpolation_ratio() const;
 
 	auto get_viewed_character_id() const {
 		return entity_id();
