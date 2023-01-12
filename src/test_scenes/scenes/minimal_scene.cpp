@@ -2,6 +2,8 @@
 
 #include "augs/templates/algorithm_templates.h"
 
+#include "game/cosmos/entity_handle.h"
+#include "game/detail/inventory/generate_equipment.h"
 #include "game/enums/faction_type.h"
 
 #include "test_scenes/test_scene_flavours.h"
