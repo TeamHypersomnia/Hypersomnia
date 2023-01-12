@@ -460,9 +460,11 @@ void editor_setup::rebuild_scene() {
 		might point to other entities after toggling visibility.
 	*/
 
-	auto step_input = logic_step_input { scene.world, {}, solve_settings() };
+	auto entropy = cosmic_entropy();
+	auto step_input = logic_step_input { scene.world, entropy, solve_settings() };
+	auto solver = standard_solver();
 
-	standard_solver()(
+	solver(
 		step_input,
 		solver_callbacks(
 			[&](const logic_step step) { populate(step); }

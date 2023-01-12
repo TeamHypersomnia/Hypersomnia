@@ -123,7 +123,8 @@ void intercosm::make_test_scene(
 			bomb_defusal->speeds.tickrate = settings.scene_tickrate;
 		}
 
-		populator.populate_with_entities(caches, { world, {}, solve_settings() });
+		auto entropy = cosmic_entropy();
+		populator.populate_with_entities(caches, { world, entropy, solve_settings() });
 
 		cosmic::change_solvable_significant(world, [&settings](auto& s){
 			/* Populating with test scene will advance it so revert the step number back to 0 */
