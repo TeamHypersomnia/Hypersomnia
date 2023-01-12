@@ -295,6 +295,14 @@ void editor_entity_selector::do_mousemotion(
 		vis.sort(cosm);
 
 		vis.for_all_ids_ordered([&](const auto id) {
+			auto slot = cosm[id].get_current_slot();
+			const bool is_attachment = slot.alive();
+
+			if (is_attachment) {
+				emplace_element(in_rectangular_selection, slot.get_root_container());
+				return;
+			}
+
 			emplace_element(in_rectangular_selection, id);
 		}, layer_order);
 
@@ -364,6 +372,14 @@ entity_id editor_entity_selector::calc_hovered_entity(
 	ids.clear();
 
 	vis.for_all_ids_ordered([&](const auto id) {
+		auto slot = cosm[id].get_current_slot();
+		const bool is_attachment = slot.alive();
+
+		if (is_attachment) {
+			ids.emplace_back(slot.get_root_container());
+			return;
+		}
+
 		ids.emplace_back(id);
 	}, layer_order);
 
