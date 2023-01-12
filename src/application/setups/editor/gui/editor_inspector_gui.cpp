@@ -154,6 +154,27 @@ std::string perform_editable_gui(editor_sound_node_editable& e) {
 	return result;
 }
 
+std::string perform_editable_gui(editor_firearm_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Position", e.pos);
+	edit_property(result, "Rotation", e.rotation);
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_ammunition_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Position", e.pos);
+	edit_property(result, "Rotation", e.rotation);
+
+	return result;
+}
+
+
 std::string perform_editable_gui(editor_light_node_editable& e) {
 	using namespace augs::imgui;
 	std::string result;
@@ -267,6 +288,19 @@ std::string perform_editable_gui(editor_material_resource_editable&) {
 	return result;
 }
 
+std::string perform_editable_gui(editor_firearm_resource_editable&) {
+	using namespace augs::imgui;
+	std::string result;
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_ammunition_resource_editable&) {
+	using namespace augs::imgui;
+	std::string result;
+
+	return result;
+}
 
 void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants_multiple) {
 	auto different_found = [&]<typename T>(const T&) {

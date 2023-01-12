@@ -8,11 +8,17 @@ struct editor_sound_node;
 struct editor_prefab_node;
 struct editor_particles_node;
 
+struct editor_firearm_node;
+struct editor_ammunition_node;
+
 using all_editor_node_types = type_list<
 	editor_sprite_node,
 	editor_sound_node,
 	editor_light_node,
-	editor_particles_node
+	editor_particles_node,
+
+	editor_firearm_node,
+	editor_ammunition_node
 
 	//editor_prefab_node,
 >;

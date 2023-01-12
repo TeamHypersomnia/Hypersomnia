@@ -216,7 +216,7 @@ void editor_filesystem_gui::clear_drag_drop() {
 
 void editor_filesystem_gui::setup_special_filesystem() {
 	special_root.clear();
-	special_root.subfolders.resize(4);
+	special_root.subfolders.resize(8);
 	special_root.should_sort = false;
 
 	auto i = 0;
@@ -226,10 +226,20 @@ void editor_filesystem_gui::setup_special_filesystem() {
 	auto& wandering_pixels_folder = special_root.subfolders[i++];
 	auto& prefabs_folder = special_root.subfolders[i++];
 
+	auto& firearms_folder = special_root.subfolders[i++];
+	auto& ammunition_folder = special_root.subfolders[i++];
+	auto& explosives_folder = special_root.subfolders[i++];
+	auto& melee_weapons_folder = special_root.subfolders[i++];
+
 	lights_folder.name = "Lights";
 	particles_folder.name = "Particles";
 	wandering_pixels_folder.name = "Wandering pixels";
 	prefabs_folder.name = "Prefabs";
+
+	firearms_folder.name = "Firearms";
+	ammunition_folder.name = "Ammunition";
+	explosives_folder.name = "Explosives";
+	melee_weapons_folder.name = "Melee weapons";
 
 	for (auto& s : special_root.subfolders) {
 		s.type = editor_filesystem_node_type::FOLDER;
@@ -247,6 +257,11 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 	auto& particles_folder = special_root.subfolders[i++];
 	auto& wandering_pixels_folder = special_root.subfolders[i++];
 	auto& prefabs_folder = special_root.subfolders[i++];
+
+	auto& firearms_folder = special_root.subfolders[i++];
+	auto& ammunition_folder = special_root.subfolders[i++];
+	auto& explosives_folder = special_root.subfolders[i++];
+	auto& melee_weapons_folder = special_root.subfolders[i++];
 
 	(void)prefabs_folder;
 	(void)wandering_pixels_folder;
@@ -284,6 +299,11 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 	//handle(prefabs_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
 
 	handle(lights_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_LIGHT);
+
+	handle(firearms_folder, resources.get_pool_for<editor_firearm_resource>(), assets::necessary_image_id::CHAMBER_SLOT_ICON);
+	handle(ammunition_folder, resources.get_pool_for<editor_ammunition_resource>(), assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
+	handle(explosives_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::BOMB_INDICATOR);
+	handle(melee_weapons_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::SHOULDER_SLOT_ICON);
 
 	special_root.set_parents(0);
 }

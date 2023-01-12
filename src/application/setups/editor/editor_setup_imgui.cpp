@@ -136,14 +136,17 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		project.layers,
 		gui.filesystem.dragged_resource,
 		in.ad_hoc_atlas,
-		in.necessary_images
+		in.necessary_images,
+		in.game_atlas
 	});
 
 	gui.filesystem.perform({ 
 		*this,
 		gui.filesystem.showing_official() ? official_files_root : files.root,
+
 		in.ad_hoc_atlas,
-		in.necessary_images
+		in.necessary_images,
+		in.game_atlas
 	});
 	gui.history.perform({ *this, history });
 

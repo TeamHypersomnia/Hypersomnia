@@ -7,6 +7,7 @@
 #include "game/cosmos/entity_id.h"
 
 class editor_setup;
+class images_in_atlas_map;
 
 enum class editor_resources_tab_type {
 	PROJECT,
@@ -18,8 +19,10 @@ struct editor_filesystem_node;
 struct editor_project_files_input {
 	editor_setup& setup;
 	editor_filesystem_node& files_root;
+
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
+	const images_in_atlas_map& game_images;
 };
 
 struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {

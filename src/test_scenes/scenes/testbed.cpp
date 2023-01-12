@@ -803,6 +803,16 @@ namespace test_scenes {
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::AO44);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::PRO90);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::CALICO);
+
+				{
+					requested_equipment r;
+					r.non_standard_mag = to_entity_flavour_id(test_container_items::CALICO_MAGAZINE);
+					r.num_given_ammo_pieces = 1;
+					auto tr = transformr(vec2(-800 - k * 150, y_off + off_i++ * 200));
+
+					r.generate_for(tr, step);
+				}
+
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::WARX_FQ12);
 
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::COVERT);

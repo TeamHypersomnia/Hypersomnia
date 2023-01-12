@@ -1,0 +1,36 @@
+#pragma once
+#include "augs/math/vec2.h"
+#include "game/cosmos/entity_flavour_id.h"
+#include "test_scenes/test_scene_flavour_ids.h"
+
+struct editor_ammunition_resource_editable {
+	// GEN INTROSPECTOR struct editor_ammunition_resource_editable
+	bool dummy = false;
+	// END GEN INTROSPECTOR
+};
+
+struct editor_ammunition_node;
+struct editor_ammunition_resource {
+	using node_type = editor_ammunition_node;
+
+	editor_ammunition_resource_editable editable;
+
+	std::optional<std::variant<
+		test_shootable_charges,
+		test_container_items
+	>> official_tag;
+
+	mutable std::variant<
+		typed_entity_flavour_id<container_item>,
+		typed_entity_flavour_id<shootable_charge>
+	> scene_flavour_id;
+
+	std::string unique_name;
+	const auto& get_display_name() const {
+		return unique_name;
+	}
+
+	static const char* get_type_name() {
+		return "ammunition";
+	}
+};

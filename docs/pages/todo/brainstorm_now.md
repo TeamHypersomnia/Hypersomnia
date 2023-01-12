@@ -6,15 +6,67 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We should make the gun attachments unselectable
+	- If it has no scene entity to node mapping for example
+
+- Crash after e.g. spawning ao44 and then ao44 magazine
+	- Because of the earlier mag in ao44 we have a mismatch in scene/node mappings
+
+- Layers with all-default values should be deleted once the last element is removed
+
+- Simple toolbar with all possible operations with immediate tooltips
+	- Maybe disable rotations/resizing on special resources
+
+- Once special sprite effects/continous effects are live people will rarely use playtesting, obviously we sill need to do it
+
+- Asset-based Icons for special resources
+	- Do we take it from the game atlas?
+		- Technically when we prune the atlas it might be missing
+	- For project-based resources, there will always be a resource with the sprite from which we can read 
+	- For officials we could refer to the initial scene
+		- Problematically this won't necessarily be in the game atlas
+			- Especially if it gets pruned
+			- I wouldn't prune officials though because technically they can always be requested by some scripts
+	- Taking them from the atlas will work and I'd avoid pruning the special resource related assets
+
+- Listing weapons - they need some special creating logic
+	- Similarly, magazine listings
+	- We'll basically have separate categories for:
+		- Firearms
+		- Ammunition
+		- Melee weapons
+		- Explosives
+	- In particular those will not appear in gfx
+		- If so, how do we go about creating them in custom maps?
+			- It's not a worry for now technically
+		- Initially, they WILL be mixed with other environmental objects and you cannot do anything about it
+		- Nothing wrong with that
+			- Yes we can hide those in officials because the resources are already madew
+			- But there's no way to hide them in the Project tab
+			- Will be your responsibility technically to just categorize it properly and make sure you don't just drag and drop the graphic instead of the entire weapon
+				- Will be easy to notice though as there won't be a magazine
+		- How else will you define sprite properties like neons etc for them as sprite resources?
+			- You will have to set their domain to physical to edit their physical properties though
+		- The icon for the special resource will display just the weapon but could even display the entire thing with attachments later
+		- The weapon creator will just accept several parameters and create the weapon straight away with the magazine resources too
+		- Problem: recreating the weapon from the creator might leave us with abandoned magazines
+			- A problem for later since officials wont change
+			- Still, that creator will mostly be for asset specification
+			- Later only small parameters will change not the whole concept with assets involved
+
+
+		
+
+- We can make fishes into gifs to test the GIF animation pipeline
+
 - For now we can leave the audiovisual speed on 1 because it doesn't break anything and looks cool
 	- We could even simulate a passing global time since I think that's what the rainbows are based on
 
 - Don't list physical materials for now in the filesystem
 	- It will only make sense once we can view them or create new ones
 	- for now it's enough they'll be choosable from some list
-
-- A simple tooltip when someone tries to drag&drop e.g. a physical to a scene
-	- Physical materials cannot be instantiated as nodes.
+	- Once we do list, a simple tooltip when someone tries to drag&drop e.g. a physical to a scene
+		- Physical materials cannot be instantiated as nodes.
 
 - Also the rainbow fish thing will now be handled with separate files
 	- We can easily optimize it later by detecting duplicate entries in the atlas (by hashing for example)
@@ -24,12 +76,9 @@ summary: That which we are brainstorming at the moment.
 	- We can later just drag& drop from the organism section
 	- An organism area will be a special resource too
 
-
 - Something like aquarium could still be parametrized by entities though
 	- It will first need to be created and put on scene
 		- Since a resource cannot contain references to an entity
-
-- We can make fishes into gifs to test how they work
 
 - For differentiating between stuff like dragon rainbow fish and rainbow fish we'll use a flag "disable special effects" per-sprite
 	- Okay but it's still problematic because they can't be used as separate flavors/resources
@@ -44,7 +93,6 @@ summary: That which we are brainstorming at the moment.
 
 - We need to properly decide which official resources to list
 	- However what we've done will already help us a lot in that we won't have to port particles itp
-
 
 - In case we want more standalone particles we'll just add them
 	- As for singular effects.. technically these are separate resources

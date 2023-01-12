@@ -1,6 +1,9 @@
 #pragma once
 #include "application/setups/editor/resources/resource_traits.h"
 #include "game/enums/filters.h"
+#include "game/detail/inventory/requested_equipment.h"
+#include "game/detail/inventory/generate_equipment.h"
+#include "game/cosmos/solvers/standard_solver.h"
 
 template <class N, class R, class H, class A>
 void setup_entity_from_node(
@@ -28,8 +31,7 @@ void setup_entity_from_node(
 			sprite.colorize.mult_alpha(alpha_mult);
 		}
 	}
-
-	if constexpr(std::is_same_v<N, editor_light_node>) {
+	else if constexpr(std::is_same_v<N, editor_light_node>) {
 		auto& light = agg.template get<components::light>();
 		light.color *= editable.colorize;
 	}
@@ -78,6 +80,12 @@ void allocate_flavours_and_assets_for_resource(
 
 		auto& flavour_pool = common.flavours.get_for<entity_type>();
 		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
+	}
+	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
+		ensure(false && "not implemented");
+	}
+	else if constexpr(std::is_same_v<editor_ammunition_resource, R>) {
+		ensure(false && "not implemented");
 	}
 	else if constexpr(std::is_same_v<editor_sprite_resource, R>) {
 		const auto domain = editable.domain;
@@ -191,6 +199,12 @@ void setup_scene_object_from_resource(
 			particles.effect.id = resource.scene_asset_id;
 			particles.effect.modifier = static_cast<particle_effect_modifier>(editable);
 		}
+	}
+	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
+		ensure(false && "not implemented");
+	}
+	else if constexpr(std::is_same_v<editor_ammunition_resource, R>) {
+		ensure(false && "not implemented");
 	}
 	else if constexpr(std::is_same_v<editor_sprite_resource, R>) {
 		const auto domain = editable.domain;
@@ -346,64 +360,114 @@ void editor_setup::rebuild_scene() {
 
 	auto total_order = sorting_order_type(0);
 
-	for (const auto layer_id : reverse(project.layers.order)) {
-		auto layer = find_layer(layer_id);
-		ensure(layer != nullptr);
+	auto populate = [&](const logic_step step) {
+		for (const auto layer_id : reverse(project.layers.order)) {
+			auto layer = find_layer(layer_id);
+			ensure(layer != nullptr);
 
-		auto node_handler = [&]<typename node_type>(const node_type& typed_node, const auto node_id) {
-			typed_node.scene_entity_id.unset();
+			auto node_handler = [&]<typename node_type>(const node_type& typed_node, const auto node_id) {
+				typed_node.scene_entity_id.unset();
 
-			if (!typed_node.visible || !layer->visible) {
-				return;
-			}
+				if (!typed_node.visible || !layer->visible) {
+					return;
+				}
 
-			const auto resource = find_resource(typed_node.resource_id);
+				const auto resource = find_resource(typed_node.resource_id);
 
-			if (resource == nullptr) {
-				return;
-			}
+				if (resource == nullptr) {
+					return;
+				}
 
-			auto entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
-				::setup_entity_from_node(
-					total_order, 
-					*layer,
-					typed_node, 
-					resource,
-					handle, 
-					agg
-				);
-			};
-
-			std::visit(
-				[&](const auto& typed_flavour_id) {
-					const auto new_id = cosmic::specific_create_entity(
-						scene.world,
-						typed_flavour_id,
-						entity_from_node
-					).get_id();
-
-					const auto mapping_index = new_id.get_type_id().get_index();
+				auto setup_node_entity_mapping = [&](const auto new_entity_id) {
+					const auto mapping_index = new_entity_id.get_type_id().get_index();
 					auto& mapping = scene_entity_to_node[mapping_index];
 
-					ensure_eq(mapping.size(), std::size_t(new_id.raw.indirection_index));
-					ensure_eq(decltype(new_id.raw.version)(1), new_id.raw.version);
+					ensure_eq(decltype(new_entity_id.raw.version)(1), new_entity_id.raw.version);
 
-					mapping.emplace_back(node_id.operator editor_node_id());
-					typed_node.scene_entity_id = new_id;
-				},
-				resource->scene_flavour_id
-			);
-		};
+					while (mapping.size() <= std::size_t(new_entity_id.raw.indirection_index)) {
+						mapping.emplace_back();
+					}
 
-		for (const auto node_id : reverse(layer->hierarchy.nodes)) {
-			on_node(node_id, node_handler);
+					mapping.back() = node_id.operator editor_node_id();
+					typed_node.scene_entity_id = new_entity_id;
+				};
+
+				if constexpr(std::is_same_v<node_type, editor_firearm_node>) {
+					std::visit(
+						[&](const auto& typed) {
+							requested_equipment r;
+							r.weapon = typed;
+							r.num_given_ammo_pieces = 1;
+
+							auto new_id = r.generate_for(typed_node.get_transform(), step);
+							ensure(scene.world[new_id].alive());
+							setup_node_entity_mapping(new_id);
+						},
+
+						resource->scene_flavour_id
+					);
+				}
+				else if constexpr(std::is_same_v<node_type, editor_ammunition_node>) {
+					std::visit(
+						[&](const auto& typed) {
+							requested_equipment r;
+							r.non_standard_mag = typed;
+							r.num_given_ammo_pieces = 1;
+
+							auto new_id = r.generate_for(typed_node.get_transform(), step);
+							ensure(scene.world[new_id].alive());
+							setup_node_entity_mapping(new_id);
+						},
+
+						resource->scene_flavour_id
+					);
+				}
+				else {
+					auto entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
+						::setup_entity_from_node(
+							total_order, 
+							*layer,
+							typed_node, 
+							resource,
+							handle, 
+							agg
+						);
+					};
+
+					std::visit(
+						[&](const auto& typed_flavour_id) {
+							const auto new_id = cosmic::specific_create_entity(
+								scene.world,
+								typed_flavour_id,
+								entity_from_node
+							).get_id();
+
+							setup_node_entity_mapping(new_id);
+						},
+						resource->scene_flavour_id
+					);
+				}
+			};
+
+			for (const auto node_id : reverse(layer->hierarchy.nodes)) {
+				on_node(node_id, node_handler);
+			}
 		}
-	}
+	};
 
 	/* 
 		We need to do this because ids stored in selection state
 		might point to other entities after toggling visibility.
 	*/
+
+	auto step_input = logic_step_input { scene.world, {}, solve_settings() };
+
+	standard_solver()(
+		step_input,
+		solver_callbacks(
+			[&](const logic_step step) { populate(step); }
+		)
+	);
 
 	inspected_to_entity_selector_state();
 }

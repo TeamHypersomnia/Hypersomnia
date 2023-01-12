@@ -101,6 +101,7 @@ auto& create_official(const E official_id, editor_resource_pools& pools) {
 #include "application/setups/editor/official/create_official_lights.h"
 #include "application/setups/editor/official/create_official_sounds.h"
 #include "application/setups/editor/official/create_official_particles.h"
+#include "application/setups/editor/official/create_official_weapons.h"
 
 void create_official_resources(
 	const intercosm& initial_intercosm,
@@ -113,6 +114,8 @@ void create_official_resources(
 	create_sounds(initial_intercosm, pools);
 
 	create_sprites(initial_intercosm, pools);
+
+	create_weapons(initial_intercosm, pools);
 }
 
 void create_official_filesystem_from(

@@ -12,8 +12,10 @@ struct editor_layers_input {
 	editor_setup& setup;
 	editor_layers& layers;
 	editor_resource_id& dragged_resource;
+
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
+	const images_in_atlas_map& game_images;
 };
 
 struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {

@@ -62,6 +62,10 @@ struct entity_id {
 		const child_entity_id& id
 	);
 
+	auto get_type_id() const {
+		return type_id;
+	}
+
 	static auto dead() {
 		return entity_id();
 	}

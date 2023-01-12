@@ -7,6 +7,16 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/modes/detail/owner_meta_logic.h"
+#include "game/cosmos/just_create_entity_functional.h"
+
+template <class E>
+entity_id requested_equipment::generate_for(
+	const E& character, 
+	cosmos& cosm,
+	int max_effects_played
+) const {
+	return generate_for_impl(character, cosm, [](auto){}, max_effects_played);
+}
 
 template <class E>
 entity_id requested_equipment::generate_for(
@@ -14,13 +24,27 @@ entity_id requested_equipment::generate_for(
 	const logic_step step,
 	int max_effects_played
 ) const {
+	return generate_for_impl(character, step.get_cosmos(), [&](auto callback){ callback(step); }, max_effects_played);
+}
+
+
+template <class E, class F>
+entity_id requested_equipment::generate_for_impl(
+	const E& character, 
+	cosmos& cosm,
+	F&& on_step,
+	int max_effects_played
+) const {
 	static constexpr bool to_the_ground = std::is_same_v<E, transformr>;
 
 	const auto& eq = *this;
-	auto& cosm = step.get_cosmos();
 
 	auto make_owned_item = [&](const auto& flavour) {
-		const auto new_entity = just_create_entity(cosm, flavour);
+		const auto new_entity = just_create_entity(cosm, flavour, [&](const entity_handle h){ 
+			if constexpr(to_the_ground) {
+				h.set_logic_transform(character);
+			}
+		}, [](entity_handle){});
 
 		if constexpr (!to_the_ground) {
 			::set_original_owner(new_entity, character);
@@ -29,7 +53,7 @@ entity_id requested_equipment::generate_for(
 		return new_entity;
 	};
 
-	auto transfer = [&step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) {
+	auto transfer = [&cosm, &on_step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) {
 		if (to.dead()) {
 			return;
 		}
@@ -47,7 +71,12 @@ entity_id requested_equipment::generate_for(
 		request.params.play_transfer_sounds = max_effects_played > 0 && play_effects;
 		request.params.play_transfer_particles = max_effects_played > 0 && play_effects;
 
-		perform_transfer(request, step);
+		const auto result = perform_transfer_no_step(request, cosm);
+
+		on_step([&result](auto&& step) {
+			result.notify(step);
+			result.play_effects(step);
+		});
 
 		if (play_effects) {
 			--max_effects_played;
@@ -92,14 +121,6 @@ entity_id requested_equipment::generate_for(
 		}
 	};
 
-	auto pickup = [&](const auto& what) {
-		if (what.dead()) {
-			return;
-		}
-
-		transfer(what, get_pickup_slot_for(what));
-	};
-
 	const auto character_transform = [&](auto&&...) {
 		if constexpr (to_the_ground) {
 			return character;
@@ -108,6 +129,19 @@ entity_id requested_equipment::generate_for(
 			return character.get_logic_transform();	
 		}
 	}();
+
+	auto pickup = [&](const auto& what) {
+		if (what.dead()) {
+			return;
+		}
+
+		if constexpr (to_the_ground) {
+			what.set_logic_transform(character_transform);
+		}
+		else {
+			transfer(what, get_pickup_slot_for(what));
+		}
+	};
 
 	auto make_ammo_piece = [&](const auto& flavour) {
 		if (flavour.is_set()) {
@@ -142,9 +176,15 @@ entity_id requested_equipment::generate_for(
 	auto ammo_pieces_to_generate_left = eq.num_given_ammo_pieces;
 
 	auto generate_spares = [&](const item_flavour_id& f) {
+		entity_id piece;
+
 		while (ammo_pieces_to_generate_left-- > 0) {
-			pickup(make_ammo_piece(f));
+			auto next = make_ammo_piece(f);
+			piece = next.get_id();
+			pickup(next);
 		}
+
+		return piece;
 	};
 
 	entity_id result_weapon;
@@ -237,7 +277,7 @@ entity_id requested_equipment::generate_for(
 	}
 	else {
 		if (const auto& f = eq.non_standard_mag; f.is_set()) {
-			generate_spares(f);
+			result_weapon =	generate_spares(f);
 		}
 	}
 
