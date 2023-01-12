@@ -42,6 +42,8 @@ class flip_nodes_command;
 struct toggle_nodes_visibility_command;
 struct toggle_layers_visibility_command;
 
+struct edit_layer_command;
+
 struct inspect_command;
 
 using editor_history_base = augs::history_with_saved_revision<
@@ -88,6 +90,8 @@ using editor_history_base = augs::history_with_saved_revision<
 
 	toggle_nodes_visibility_command,
 	toggle_layers_visibility_command,
+
+	edit_layer_command,
 
 	inspect_command
 >;

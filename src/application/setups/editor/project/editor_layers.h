@@ -14,6 +14,7 @@ struct editor_layer_hierarchy {
 struct editor_layer_editable {
 	// GEN INTROSPECTOR struct editor_layer_editable
 	bool select_together = false;
+	bool selectable_on_scene = true;
 	float alpha_mult = 1.0f;
 	// END GEN INTROSPECTOR
 };

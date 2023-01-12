@@ -195,6 +195,15 @@ std::string perform_editable_gui(editor_particles_node_editable& e) {
 	return result;
 }
 
+std::string perform_editable_gui(editor_layer_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Selectable on scene", e.selectable_on_scene);
+
+	return result;
+}
+
 std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::optional<vec2i> original_size) {
 	using namespace augs::imgui;
 
@@ -520,17 +529,35 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		{
 			ImGui::SameLine();
 
-			auto edited_layer_name = layer.unique_name;
+			{
+				auto edited_layer_name = layer.unique_name;
 
-			if (input_text<100>("##NameInput", edited_layer_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
-				if (edited_layer_name != layer.unique_name && !edited_layer_name.empty()) {
-					rename_layer_command cmd;
+				if (input_text<100>("##NameInput", edited_layer_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
+					if (edited_layer_name != layer.unique_name && !edited_layer_name.empty()) {
+						rename_layer_command cmd;
 
+						cmd.layer_id = layer_id;
+						cmd.after = in.setup.get_free_layer_name_for(edited_layer_name);
+						cmd.built_description = typesafe_sprintf("Renamed layer to %x", cmd.after);
+
+						in.setup.post_new_command(std::move(cmd)); 
+					}
+				}
+			}
+
+			{
+				auto edited_copy = layer.editable;
+				auto changed = std::string();
+
+				changed = perform_editable_gui(edited_copy);
+
+				if (!changed.empty()) {
+					edit_layer_command cmd;
 					cmd.layer_id = layer_id;
-					cmd.after = in.setup.get_free_layer_name_for(edited_layer_name);
-					cmd.built_description = typesafe_sprintf("Renamed layer to %x", cmd.after);
+					cmd.after = edited_copy;
+					cmd.built_description = typesafe_sprintf(changed, layer.get_display_name());
 
-					in.setup.post_new_command(std::move(cmd)); 
+					post_new_or_rewrite(std::move(cmd)); 
 				}
 			}
 		}

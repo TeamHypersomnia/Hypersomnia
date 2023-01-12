@@ -133,6 +133,7 @@ current_selections_type editor_entity_selector::do_left_release(
 	return saved_selections;
 }
 
+#if 0
 void editor_entity_selector::select_all(
 	const cosmos& cosm,
 	const editor_rect_select_type rect_select_mode,
@@ -176,6 +177,7 @@ void editor_entity_selector::select_all(
 		}
 	});
 }
+#endif
 
 void editor_entity_selector::unhover() {
 	hovered = {};
@@ -277,6 +279,10 @@ void editor_entity_selector::do_mousemotion(
 	auto& vis = cache_visible;
 	vis.clear();
 
+	auto is_selectable = [](auto handle) {
+		return handle.when_born().step == 1;
+	};
+
 	if (rectangular_drag_origin.has_value()) {
 		in_rectangular_selection.clear();
 
@@ -294,16 +300,22 @@ void editor_entity_selector::do_mousemotion(
 		vis.reacquire_all(query);
 		vis.sort(cosm);
 
+		auto add = [&](const auto selected_handle) {
+			if (is_selectable(selected_handle)) {
+				emplace_element(in_rectangular_selection, selected_handle.get_id());
+			}
+		};
+
 		vis.for_all_ids_ordered([&](const auto id) {
 			auto slot = cosm[id].get_current_slot();
 			const bool is_attachment = slot.alive();
 
 			if (is_attachment) {
-				emplace_element(in_rectangular_selection, slot.get_root_container());
-				return;
+				add(slot.get_root_container());
 			}
-
-			emplace_element(in_rectangular_selection, id);
+			else {
+				add(cosm[id]);
+			}
 		}, layer_order);
 
 		get_non_hovering_icons_from(cosm, sizes_for_icons, eye.zoom, in_rectangular_selection, cache_non_hovering, world_range);
@@ -371,16 +383,27 @@ entity_id editor_entity_selector::calc_hovered_entity(
 	thread_local std::vector<entity_id> ids;
 	ids.clear();
 
+	auto is_selectable = [](auto handle) {
+		return handle.when_born().step == 1;
+	};
+
+	auto add = [&](const auto selected_handle) {
+		if (is_selectable(selected_handle)) {
+			ids.emplace_back(selected_handle.get_id());
+		}
+	};
+
 	vis.for_all_ids_ordered([&](const auto id) {
-		auto slot = cosm[id].get_current_slot();
+		auto handle = cosm[id];
+		auto slot = handle.get_current_slot();
 		const bool is_attachment = slot.alive();
 
 		if (is_attachment) {
-			ids.emplace_back(slot.get_root_container());
-			return;
+			add(slot.get_root_container());
 		}
-
-		ids.emplace_back(id);
+		else {
+			add(handle);
+		}
 	}, layer_order);
 
 	get_non_hovering_icons_from(cosm, sizes_for_icons, zoom, vis, cache_non_hovering, world_cursor_pos);

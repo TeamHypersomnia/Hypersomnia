@@ -91,6 +91,7 @@ public:
 		const maybe_layer_filter& filter
 	);
 
+#if 0
 	void select_all(
 		const cosmos& cosm,
 		editor_rect_select_type rect_select_mode,
@@ -98,6 +99,7 @@ public:
 		std::unordered_set<entity_id>& current_selections,
 		const maybe_layer_filter& filter
 	);
+#endif
 
 	std::optional<ltrb> find_selection_aabb(
 		const cosmos& cosm,

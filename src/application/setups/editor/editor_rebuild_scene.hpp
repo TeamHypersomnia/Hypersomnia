@@ -20,6 +20,12 @@ void setup_entity_from_node(
 	if (auto sorting_order = agg.template find<components::sorting_order>()) {
 		sorting_order->order = total_order;
 	}
+	
+	ensure(agg.when_born.step == 1);
+
+	if (!layer.editable.selectable_on_scene) {
+		agg.when_born.step = 2;
+	}
 
 	if constexpr(std::is_same_v<N, editor_sprite_node>) {
 		auto& sprite = agg.template get<components::sprite>();

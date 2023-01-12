@@ -23,6 +23,7 @@
 
 #include "application/setups/editor/commands/create_layer_command.hpp"
 #include "application/setups/editor/commands/edit_node_command.hpp"
+#include "application/setups/editor/commands/edit_layer_command.hpp"
 #include "application/setups/editor/commands/edit_resource_command.hpp"
 #include "application/setups/editor/commands/create_node_command.hpp"
 #include "application/setups/editor/commands/reorder_nodes_command.hpp"

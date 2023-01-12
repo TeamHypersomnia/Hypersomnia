@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Double ctrl a should select all layers
+
 - We should make the gun attachments unselectable
 	- If it has no scene entity to node mapping for example
 
