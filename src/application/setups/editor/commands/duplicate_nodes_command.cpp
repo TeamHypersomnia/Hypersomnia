@@ -104,6 +104,25 @@ std::vector<editor_node_id> duplicate_nodes_command::get_all_duplicated() const 
 	return result;
 }
 
+static auto peel_duplicate_suffix(std::string s) {
+	const auto orig = s;
+
+	if (s.size() > 0 && s.back() == ')') {
+		s.pop_back();
+
+		s = cut_trailing_number(s);
+
+		if (ends_with(s, " (")) {
+			s.pop_back();
+			s.pop_back();
+
+			return s;
+		}
+	}
+
+	return orig;
+}
+
 void duplicate_nodes_command::redo(const editor_command_input in) {
 	clear_undo_state();
 
@@ -115,7 +134,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 
 	const auto new_group_suffix = [this](){
 		if (mirror_direction.is_zero()) {
-			return "-dup";
+			return "";
 		}	
 		if (mirror_direction == vec2i(1, 0)) {
 			return "-mr";
@@ -138,7 +157,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 			e.source_id.type_id.dispatch([&]<typename T>(const T) {
 				auto& pool = in.setup.project.nodes.get_pool_for<T>();
 				auto old_node = pool.get(e.source_id.raw);
-				const auto new_name = in.setup.get_free_node_name_for(old_node.unique_name + new_group_suffix);
+				const auto new_name = in.setup.get_free_node_name_for(peel_duplicate_suffix(old_node.unique_name + new_group_suffix));
 				const auto [duplicated_id, duplicated_node] = pool.allocate(std::move(old_node));
 
 				editor_typed_node_id<T> new_id;

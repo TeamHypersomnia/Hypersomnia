@@ -4773,3 +4773,5 @@ Advantages:
 	- Because of the earlier mag in ao44 we have a mismatch in scene/node mappings
 
 - Double ctrl a should select all layers
+- Replace -dup-dup etc with -dup1 dup2 etc
+

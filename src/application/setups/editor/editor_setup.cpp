@@ -1625,6 +1625,10 @@ void editor_setup::move_dragged_to_new_layer(const editor_node_id dragged_node) 
 	post_new_command(std::move(command));
 }
 
+static auto peel_duplicate_suffix(std::string s) {
+	return cut_trailing_number_and_spaces(s);
+}
+
 void editor_setup::mirror_selection(const vec2i direction, const bool move_if_only_duplicate) {
 	const bool only_duplicating = direction.is_zero();
 	gui.filesystem.clear_drag_drop();
@@ -1660,7 +1664,7 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 				create_layer_command new_layer;
 				new_layer.created_layer = *source_layer;
 				new_layer.created_layer.hierarchy.nodes.clear();
-				new_layer.created_layer.unique_name = get_free_layer_name_for(source_layer->unique_name + "-dup");
+				new_layer.created_layer.unique_name = get_free_layer_name_for(peel_duplicate_suffix(source_layer->unique_name));
 				new_layer.at_index = find_layer_index(layer_id);
 				new_layer.omit_inspector = true;
 

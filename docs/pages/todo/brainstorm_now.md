@@ -40,8 +40,6 @@ summary: That which we are brainstorming at the moment.
 	
 
 	
-- Replace -dup-dup etc with -dup1 dup2 etc
-
 - Layers with all-default values should be deleted once the last element is removed
 
 - Simple toolbar with all possible operations with immediate tooltips
