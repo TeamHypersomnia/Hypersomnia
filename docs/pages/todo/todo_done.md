@@ -4766,3 +4766,10 @@ Advantages:
 - Let's implement those gifs because it's constantly on my mind
 	- And it will be somewhat fun
 
+- We should make the gun attachments unselectable
+	- If it has no scene entity to node mapping for example
+
+- Crash after e.g. spawning ao44 and then ao44 magazine
+	- Because of the earlier mag in ao44 we have a mismatch in scene/node mappings
+
+- Double ctrl a should select all layers

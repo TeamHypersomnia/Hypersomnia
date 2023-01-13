@@ -6,13 +6,41 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Double ctrl a should select all layers
+- Aquarium creation logic is important because otherwise we won't be able to faithfully reproduce de_cyberaqua and fy_minilab
 
-- We should make the gun attachments unselectable
-	- If it has no scene entity to node mapping for example
+- Finally test that gif->on-scene animation pipeline
+	- And maybe mass-gifize some png sequences like fish
+		- Even just for the sake of nicer view for official resources
 
-- Crash after e.g. spawning ao44 and then ao44 magazine
-	- Because of the earlier mag in ao44 we have a mismatch in scene/node mappings
+- Static collider entities
+	- static_collider
+	- just a physical material
+	- will arguably never need some specific interaction logic as this could simply be in a separate non-physical entity
+	- it's not meant to be much of a dynamic thing either
+	- Resizing/Rotating will just reposition vertices
+		- Or will it? Maybe let's just apply these parameters like with normal sprites
+			- Although size is non-applicable but we can still have scale
+		- If we ensure standard objects *cannot* be selected along static colliders, we can run some custom resizing logic
+	- Resizing/zooming might complicate our snapping logic
+		- That will only affect how we calculate the offset though, it will always be just a translation
+		- But still we'll probably want to preserve that information about how a shape was initially
+
+- A radiobox-like tabs for "Object layers"/"Collision layers"
+	- This is the final boss
+	- A simple on-scene vertex editor will be VERY handy and it won't really be that complicated
+	- It will let us avoid implementing the whole "detect neighboring static walls" and just let the mapper map it out themselves precisely
+	- Allows for some cool skinning options
+	- This could even be a tab in layers view?
+	- Although theoretically nothing stops us from having these static walls as nodes like all others 
+		- Still it might come in handy to be able to instanty switch between these two modes
+		- It will just make these collider entities visible or not though
+		- And at most change some default mouse behavior
+	- A full-blown on-scene geometry mode will also be essential to have soldat-like irregular maps
+		- Lack of this is what made de labs so squary
+	
+
+	
+- Replace -dup-dup etc with -dup1 dup2 etc
 
 - Layers with all-default values should be deleted once the last element is removed
 

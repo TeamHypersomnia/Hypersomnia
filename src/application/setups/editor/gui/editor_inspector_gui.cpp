@@ -201,6 +201,10 @@ std::string perform_editable_gui(editor_layer_editable& e) {
 
 	edit_property(result, "Selectable on scene", e.selectable_on_scene);
 
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Useful for e.g. ground/floor layers.\nYou might want to see the background objects without them being hoverable.\nThis way you can comfortably mass-select only some foreground objects.");
+	}
+
 	return result;
 }
 

@@ -1343,6 +1343,20 @@ void editor_setup::finish_rectangular_selection() {
 }
 
 void editor_setup::select_all_entities() {
+	if (gui.inspector.inspects_only<editor_node_id>()) {
+		if (gui.inspector.all_inspected.size() == get_node_count()) {
+			clear_inspector();
+
+			for (const auto layer_id : project.layers.order) {
+				inspect_add_quiet(layer_id);
+			}
+
+			after_quietly_adding_inspected();
+
+			return;
+		}
+	}
+
 	if (gui.inspector.inspects_any_different_than<editor_node_id>()) {
 		clear_inspector();
 	}
