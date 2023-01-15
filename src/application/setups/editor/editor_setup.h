@@ -181,6 +181,8 @@ public:
 	};
 
 	std::optional<parent_layer_info> find_parent_layer(editor_node_id id) const;
+	std::optional<parent_layer_info> convert_to_parent_layer_info(editor_layer_id id) const;
+
 	std::size_t find_layer_index(editor_layer_id id) const;
 
 	void sort_inspected();
@@ -525,4 +527,6 @@ public:
 	bool is_mover_active() const {
 		return mover.is_active(history);
 	}
+
+	std::optional<editor_setup::parent_layer_info> find_best_layer_for_new_node() const;
 };

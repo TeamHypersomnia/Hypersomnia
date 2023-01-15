@@ -611,6 +611,10 @@ void editor_setup::inspect(const current_selections_type& selections) {
 		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
 	}
 
+	if (gui.inspector.all_inspected.size() > 0) {
+		gui.inspector.mark_if_layer_or_node(gui.inspector.all_inspected.back());
+	}
+
 	sort_inspected();
 }
 
@@ -619,6 +623,10 @@ void editor_setup::inspect(const std::vector<entity_id>& selections) {
 
 	for (const auto entity : selections) {
 		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
+	}
+
+	if (gui.inspector.all_inspected.size() > 0) {
+		gui.inspector.mark_if_layer_or_node(gui.inspector.all_inspected.back());
 	}
 
 	sort_inspected();
@@ -1807,6 +1815,39 @@ bool editor_setup::is_node_visible(const editor_node_id id) const {
 
 double editor_setup::get_interpolation_ratio() const {
 	return global_time_seconds / get_inv_tickrate();
+}
+
+std::optional<editor_setup::parent_layer_info> editor_setup::find_best_layer_for_new_node() const {
+	return std::visit(
+		[&]<typename T>(const T& inspected_id) -> std::optional<editor_setup::parent_layer_info> {
+			if constexpr(std::is_same_v<T, editor_layer_id>) {
+				return convert_to_parent_layer_info(inspected_id);
+			}
+			else if constexpr(std::is_same_v<T, editor_node_id>) {
+				return find_parent_layer(inspected_id);
+			}
+			else {
+				return std::nullopt;
+			}
+		},
+		gui.inspector.get_last_inspected_layer_or_node()
+	);
+}
+
+std::optional<editor_setup::parent_layer_info> editor_setup::convert_to_parent_layer_info(const editor_layer_id layer_id) const {
+	parent_layer_info info;
+
+	const auto& layers = project.layers.order;
+
+	for (std::size_t l = 0; l < layers.size(); ++l) {
+		if (layer_id == layers[l]) {
+			if (const auto layer = find_layer(layer_id)) {
+				return parent_layer_info { layer_id, layer, l, 0 };
+			}
+		}
+	}
+
+	return std::nullopt;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

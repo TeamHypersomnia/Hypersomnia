@@ -127,6 +127,7 @@ void allocate_flavours_and_assets_for_resource(
 					}
 
 					new_definition.source_image.path = augs::path_type(GENERATED_FILES_DIR) / resource.external_file.path_in_project;
+					new_definition.source_image.path += typesafe_sprintf("%x.png");
 					new_definition.source_image.is_official = is_official;
 					new_definition.meta.extra_loadables.generate_neon_map = resource.editable.neon_map;
 

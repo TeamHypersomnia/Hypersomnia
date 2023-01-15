@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Remember last selected when spawn new object, this will be a better behavior on unselected
+	- Actually we should just track last layer interacted with
+		- Ultimately last interacted with is last inspected
+	- Just save it whenever we unselect stuff and when there's nothing selected we read from it, trivial
+
 - GIF unpacking
 	- viewables: paths to cached directories based on gif path
 	- Atlas generator realizes the path is from a generated dir and is part of a gif (we'll just peel off .png and the number)

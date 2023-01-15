@@ -16,6 +16,25 @@ void regenerate_and_gather_subjects(
 		return image_definition_view(in.unofficial_project_dir, def);
 	};
 
+	/* Unpack GIFs into PNGs */
+
+	for (const auto& d : in.image_definitions) {
+		auto path = d.get_source_path().path;
+		if (path.extension() == ".png") {
+			if (path.replace_extension("").replace_extension("").extension() == ".gif") {
+				LOG("FOUND UNPACKED GIF REQUEST!");
+
+			}
+
+			/* auto trimmed = path.replace_extension("").string(); */
+			/* trimmed = cut_trailing_number(trimmed); */
+
+			/* if (ends_with(trimmed, ".gif")) { */
+
+			/* } */
+		}
+	}
+
 	{
 		output.clear();
 

@@ -107,6 +107,25 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	std::vector<inspected_variant> all_inspected;
 
+private:
+	inspected_variant last_inspected_layer_or_node;
+public:
+
+	const auto& get_last_inspected_layer_or_node() const {
+		return last_inspected_layer_or_node;
+	}
+
+	void mark_if_layer_or_node(const inspected_variant& v) {
+		std::visit(
+			[this]<typename T>(const T& typed) {
+				if constexpr(std::is_same_v<T, editor_node_id> || std::is_same_v<T, editor_layer_id>) {
+					last_inspected_layer_or_node = typed;
+				}
+			},
+			v
+		);
+	}
+
 	void inspect(inspected_variant, bool wants_multiple);
 	void perform(editor_inspector_input);
 

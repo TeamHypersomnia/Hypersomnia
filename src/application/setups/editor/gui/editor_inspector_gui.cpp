@@ -22,6 +22,7 @@
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/resources/resource_traits.h"
 
+
 void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
 }
@@ -407,6 +408,7 @@ void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants
 		}
 		else {
 			all_inspected.push_back(inspected);
+			mark_if_layer_or_node(inspected);
 		}
 	}
 	else {
@@ -414,6 +416,7 @@ void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants
 
 		if (not_the_same) {
 			all_inspected = { inspected };
+			mark_if_layer_or_node(inspected);
 
 			/*
 				Commands will invoke "inspect" on undo/redo,

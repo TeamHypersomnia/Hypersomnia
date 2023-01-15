@@ -66,7 +66,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					const auto place_over_node = in.setup.get_topmost_inspected_node();
 					entity_to_highlight = in.setup.to_entity_id(place_over_node);
 
-					if (const auto parent_layer = in.setup.find_parent_layer(place_over_node)) {
+					if (const auto parent_layer = in.setup.find_best_layer_for_new_node()) {
 						command.layer_id = parent_layer->layer_id;
 						command.index_in_layer = parent_layer->index_in_layer;
 					}
