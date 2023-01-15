@@ -245,7 +245,14 @@ std::string perform_editable_gui(
 	}
 
 	{
-		edit_property(result, "##NeonMap", e.neon_map.is_enabled);
+		if (edit_property(result, "##NeonMap", e.neon_map.is_enabled)) {
+			if (e.neon_map.is_enabled) {
+				result = "Enabled neon map in %x";
+			}
+			else {
+				result = "Disabled neon map in %x";
+			}
+		}
 
 		ImGui::SameLine();
 
@@ -262,9 +269,9 @@ std::string perform_editable_gui(
 			edit_property(result, "Colorize neon", e.neon_color);
 
 			edit_property(result, "Standard deviation", v.standard_deviation);
-			edit_property(result, "Radius", v.radius);
+			edit_property(result, "Radius", v.radius.x);
+			v.radius.y = v.radius.x;
 			edit_property(result, "Amplification", v.amplification);
-			edit_property(result, "Alpha multiplier", v.alpha_multiplier);
 
 			auto ic = 0;
 			auto removed_i = -1;
@@ -447,7 +454,13 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	};
 
 	auto post_new_or_rewrite = [&]<typename T>(T&& cmd) {
-		if (tweaked_widget.changed(get_command_index())) {
+		bool force_new = false;
+
+		if (begins_with(cmd.describe(), "Added") || begins_with(cmd.describe(), "Picked") || begins_with(cmd.describe(), "Removed")) {
+			force_new = true;
+		}
+
+		if (force_new || tweaked_widget.changed(get_command_index())) {
 			in.setup.post_new_command(std::forward<T>(cmd));
 			tweaked_widget.update(get_command_index());
 		}

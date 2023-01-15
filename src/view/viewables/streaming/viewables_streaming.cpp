@@ -440,7 +440,7 @@ void viewables_streaming::display_loading_progress() const {
 		loading_message += "\n";
 
 		center_next_window(ImGuiCond_Always);
-		auto loading_window = scoped_window("Loading in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+		auto loading_window = scoped_window("Loading in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoFocusOnAppearing);
 
 		text_color("The game is regenerating resources. Please be patient.\n", yellow);
 		ImGui::Separator();
