@@ -268,15 +268,10 @@ std::string perform_editable_gui(
 
 			edit_property(result, "Colorize neon", e.neon_color);
 
-			edit_property(result, "Standard deviation", v.standard_deviation);
-			edit_property(result, "Radius", v.radius.x);
-			v.radius.y = v.radius.x;
-			edit_property(result, "Amplification", v.amplification);
-
 			auto ic = 0;
 			auto removed_i = -1;
 
-			text("Pick neon light sources on the image:");
+			text("Click on the image to add neon light sources.");
 
 			{
 				if (picker.handle_prologue("##LightColorPicker", v.light_colors)) {
@@ -302,9 +297,20 @@ std::string perform_editable_gui(
 				result = typesafe_sprintf("Removed Light %x in %x", removed_i);
 			}
 
+#if 0
 			if (ImGui::Button("+##AddNewLightColor")) {
 				v.light_colors.emplace_back(white);
 				result = "Added new light color in %x";
+			}
+
+			text("Add new light source");
+#endif
+
+			if (auto scope = augs::imgui::scoped_tree_node_ex("Advanced neon map parameters")) {
+				edit_property(result, "Standard deviation", v.standard_deviation);
+				edit_property(result, "Radius", v.radius.x);
+				v.radius.y = v.radius.x;
+				edit_property(result, "Amplification", v.amplification);
 			}
 		}
 	}
