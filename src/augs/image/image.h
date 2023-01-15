@@ -81,6 +81,7 @@ namespace augs {
 		using gif_data = std::vector<frame>;
 
 		static gif_data gif_to_frames(const path_type& file_path);
+		static std::vector<int> read_gif_frame_meta(const path_type& file_path);
 
 		static image white_pixel();
 

@@ -325,6 +325,18 @@ namespace augs {
 		else if (extension == ".bin") {
 			from_binary_file(path);
 		}
+#if 0
+		else if (extension == ".gif") {
+			auto f = gif_to_frames(path);
+
+			if (f.size() > 0) {
+				from_bytes(f[0].serialized_frame, "dummy.gif");
+			}
+			else {
+				throw image_loading_error("Failed to load image %x:\nNo frames in gif!", path);
+			}
+		}
+#endif
 		else {
 			int width;
 			int height;
@@ -356,7 +368,7 @@ namespace augs {
 		}
 		catch (const augs::file_open_error& err) {
 			throw image_loading_error(
-				"Failed to open the avatar file:\n%x\nEnsure that the file exists and the path is correct.\n\nDetails:\n%x", path, err.what()
+				"Failed to open:\n%x\nEnsure that the file exists and the path is correct.\n\nDetails:\n%x", path, err.what()
 			);
 		}
 	}
@@ -757,6 +769,52 @@ namespace augs {
 			if (packed_gif_frames) {
 				stbi_image_free(reinterpret_cast<void*>(packed_gif_frames));
 			}
+		}
+		catch (...) {
+
+		}
+
+		return output_frames;
+	}
+
+	// TODO: Optimize, read just the header
+	std::vector<int> image::read_gif_frame_meta(const path_type& path) {
+		std::vector<int> output_frames;
+
+		auto& loaded_bytes = thread_local_file_buffer();
+
+		try {
+			augs::file_to_bytes(path, loaded_bytes);
+
+			int frames_n = 0;
+			int x = 0;
+			int y = 0;
+			int* delays = nullptr;
+
+			const auto packed_gif_frames = stbi_xload_mem(
+				reinterpret_cast<unsigned char*>(loaded_bytes.data()),
+				loaded_bytes.size(), 
+				&x,
+				&y,
+				&frames_n,
+				&delays
+			);
+
+			output_frames.resize(frames_n);
+
+			for (int i = 0; i < frames_n; ++i) {
+				output_frames[i] = delays[i];
+			}
+
+			if (delays) {
+				stbi_image_free(reinterpret_cast<void*>(delays));
+			}
+
+			if (packed_gif_frames) {
+				stbi_image_free(reinterpret_cast<void*>(packed_gif_frames));
+			}
+
+			return output_frames;
 		}
 		catch (...) {
 

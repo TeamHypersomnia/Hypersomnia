@@ -535,9 +535,17 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 					if constexpr(std::is_same_v<editor_sprite_resource, resource_type>) {
 						try {
 							new_resource.editable.size = augs::image::get_size(full_path);
+
+							if (full_path.extension() == ".gif") {
+								new_resource.animation_frames = augs::image::read_gif_frame_meta(full_path);
+							}
+							else {
+								new_resource.animation_frames.clear();
+							}
 						}
 						catch (...) {
 							new_resource.editable.size.set(32, 32);
+							new_resource.animation_frames.clear();
 						}
 					}
 

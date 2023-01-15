@@ -118,7 +118,8 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	gui.inspector.perform({ 
 		*this,
-		in.ad_hoc_atlas
+		in.ad_hoc_atlas,
+		in.game_atlas
 	});
 
 	{

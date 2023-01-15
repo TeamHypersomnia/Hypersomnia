@@ -6,6 +6,14 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Atlas
+	- FIRST into neon maps and diffuse 
+	- Literally even neons have separate drawcalls for foreground, dropped items and 
+	- Then trivially separate into items/background stuffs/foreground stuffs
+		- Since we know these will always be drawcalled separately
+		- We control rendering, it's not like unity so we should really be good to go
+	- And boom you have tripled the amount of textures we can contain
+
 - Equip z prawej w jak w ceesie najlepiej
 	- equip load pasek bardzo widoczny nad wszystkimi slotami
 

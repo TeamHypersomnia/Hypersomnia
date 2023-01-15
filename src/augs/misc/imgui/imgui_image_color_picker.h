@@ -2,6 +2,7 @@
 #include "augs/misc/imgui/imgui_drawers.h"
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/texture_atlas/atlas_entry.h"
+#include "augs/misc/imgui/imgui_control_wrappers.h"
 
 namespace augs {
 	namespace imgui {

@@ -3,6 +3,10 @@
 #include "application/setups/debugger/detail/debugger_image_preview.h"
 #include "application/setups/debugger/property_debugger/tweaker_type.h"
 
+#include "view/viewables/images_in_atlas_map.h"
+#include "view/viewables/image_definition.h"
+
+#include "augs/misc/imgui/imgui_image_color_picker.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_drawers.h"
 
@@ -48,7 +52,10 @@ struct image_color_picker_widget {
 		bool result = false;
 
 		auto perform_widget = [&]() {
-			const auto zoom = 4;
+			const int avail_x = ImGui::GetContentRegionAvail().x;
+			const int image_width = current_preview.image.get_size().x;
+			const int zoom = image_width == 0 ? 1 : std::max(1, avail_x / image_width);
+
 			const auto& entry = game_atlas.find_or(id).diffuse;
 
 			if (const auto picked = image_color_picker(zoom, entry, current_preview.image)) {
@@ -65,9 +72,7 @@ struct image_color_picker_widget {
 			}
 		}
 		else {
-			if (auto combo = scoped_combo(("###AddMultiple" + identity_label).c_str(), "Add multiple...", ImGuiComboFlags_HeightLargest)) {
-				perform_widget();
-			}
+			perform_widget();
 		}
 
 		return result;

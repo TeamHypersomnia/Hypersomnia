@@ -74,11 +74,11 @@ namespace augs {
 		void save_debug_logic_step_lines_for_interpolation(const debug_lines&);
 
 		void draw_call_imgui(
-			const graphics::texture& imgui_atlas,
-			const graphics::texture* game_world_atlas,
-			const graphics::texture* avatar_atlas,
-			const graphics::texture* avatar_preview_atlas,
-			const graphics::texture* ad_hoc_texture
+			graphics::texture& imgui_atlas,
+			graphics::texture* game_world_atlas,
+			graphics::texture* avatar_atlas,
+			graphics::texture* avatar_preview_atlas,
+			graphics::texture* ad_hoc_texture
 		);
 
 		void draw_debug_lines(

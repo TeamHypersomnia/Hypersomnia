@@ -6,6 +6,7 @@
 #include "augs/drawing/sprite.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "view/viewables/regeneration/neon_maps.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
 #include "test_scenes/test_scene_flavour_ids.h"
@@ -25,6 +26,7 @@ struct editor_material_resource;
 struct editor_sprite_resource_editable {
 	// GEN INTROSPECTOR struct editor_sprite_resource_editable
 	editor_sprite_domain domain = editor_sprite_domain::BACKGROUND;
+	augs::maybe<neon_map_input> neon_map;
 
 	rgba color = white;
 	rgba neon_color = white;
@@ -51,6 +53,8 @@ struct editor_sprite_node;
 struct editor_sprite_resource {
 	using node_type = editor_sprite_node;
 
+	std::vector<int> animation_frames;
+
 	editor_pathed_resource external_file;
 	editor_sprite_resource_editable editable;
 
@@ -71,6 +75,7 @@ struct editor_sprite_resource {
 	> scene_flavour_id;
 
 	mutable assets::image_id scene_asset_id;
+	mutable assets::plain_animation_id scene_animation_id;
 
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 

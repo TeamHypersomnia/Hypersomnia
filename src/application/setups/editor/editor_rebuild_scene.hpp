@@ -95,14 +95,50 @@ void allocate_flavours_and_assets_for_resource(
 	}
 	else if constexpr(std::is_same_v<editor_sprite_resource, R>) {
 		const auto domain = editable.domain;
+		const int n_frames = resource.animation_frames.size();
 
 		auto create_as = [&]<typename entity_type>(entity_type) {
 			auto& flavour_pool = common.flavours.get_for<entity_type>();
-			auto& definitions = viewables.image_definitions;
+			auto& image_definitions = viewables.image_definitions;
+			auto& animations = common.logical_assets.plain_animations;
 			
-			const auto [new_image_id, new_definition] = definitions.allocate();
-
 			{
+				const auto new_raw_flavour_id = flavour_pool.allocate().key;
+				const auto new_flavour_id = typed_entity_flavour_id<entity_type>(new_raw_flavour_id);
+
+				resource.scene_flavour_id = new_flavour_id;
+			}
+
+			if (n_frames > 1) {
+				const auto [new_animation_id, new_animation] = animations.allocate();
+				new_animation.frames.resize(n_frames);
+
+				{
+					resource.scene_animation_id = new_animation_id;
+				}
+
+				for (int i = 0; i < n_frames; ++i) {
+					const auto [new_image_id, new_definition] = image_definitions.allocate();
+					new_animation.frames[i].image_id = new_image_id;
+					new_animation.frames[i].duration_milliseconds = resource.animation_frames[i];
+
+					if (!resource.scene_asset_id.is_set()) {
+						resource.scene_asset_id = new_image_id;
+					}
+
+					new_definition.source_image.path = augs::path_type(GENERATED_FILES_DIR) / resource.external_file.path_in_project;
+					new_definition.source_image.is_official = is_official;
+					new_definition.meta.extra_loadables.generate_neon_map = resource.editable.neon_map;
+
+					auto& meta = new_definition.meta;
+					(void)meta;
+				}
+			}
+			else {
+				const auto [new_image_id, new_definition] = image_definitions.allocate();
+				resource.scene_asset_id = new_image_id;
+				resource.scene_animation_id = {};
+
 				/* 
 					Note that this is later resolved with get_unofficial_content_dir.
 					get_unofficial_content_dir could really be depreciated,
@@ -110,29 +146,31 @@ void allocate_flavours_and_assets_for_resource(
 						Now we won't need it because an intercosm will always exist in memory only.
 						So we could store absolute paths in the intercosmos.
 
+						However for backwards compatibility with old maps we're using get_unofficial_content_dir for now.
+
 					Even if we cache things in some .cache folder per-project,
 					I think we'd be better off just caching binary representation of the project data instead of intercosms.
 				*/
 
 				new_definition.source_image.path = resource.external_file.path_in_project;
 				new_definition.source_image.is_official = is_official;
+				new_definition.meta.extra_loadables.generate_neon_map = resource.editable.neon_map;
 
 				auto& meta = new_definition.meta;
 				(void)meta;
 			}
-
-			const auto new_raw_flavour_id = flavour_pool.allocate().key;
-			const auto new_flavour_id = typed_entity_flavour_id<entity_type>(new_raw_flavour_id);
-
-			resource.scene_flavour_id = new_flavour_id;
-			resource.scene_asset_id = new_image_id;
 		};
 
 		if (domain == editor_sprite_domain::PHYSICAL) {
 			create_as(plain_sprited_body());
 		}
 		else {
-			create_as(static_decoration());
+			if (n_frames > 1) {
+				create_as(dynamic_decoration());
+			}
+			else {
+				create_as(static_decoration());
+			}
 		}
 	}
 	else if constexpr(std::is_same_v<editor_sound_resource, R>) {
@@ -242,6 +280,11 @@ void setup_scene_object_from_resource(
 			auto& sprite = scene.template get<invariants::sprite>();
 			sprite.set(resource.scene_asset_id, editable.size, editable.color);
 			sprite.tile_excess_size = !editable.stretch_when_resized;
+			sprite.neon_color = editable.neon_color;
+		}
+
+		if (auto animation = scene.template find<invariants::animation>()) {
+			animation->id = resource.scene_animation_id; 
 		}
 
 		if (auto rigid_body = scene.template find<invariants::rigid_body>()) {

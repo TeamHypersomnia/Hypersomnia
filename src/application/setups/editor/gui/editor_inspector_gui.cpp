@@ -98,7 +98,7 @@ bool edit_property(
 			return true;
 		}
 	}
-	else if constexpr(is_one_of_v<T, vec2, vec2i>) {
+	else if constexpr(is_one_of_v<T, vec2, vec2i, vec2u>) {
 		if (drag_vec2(label, property)) { 
 			result = typesafe_sprintf("Set %x to %x in %x", label, property);
 			return true;
@@ -208,7 +208,11 @@ std::string perform_editable_gui(editor_layer_editable& e) {
 	return result;
 }
 
-std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::optional<vec2i> original_size) {
+std::string perform_editable_gui(
+	editor_sprite_resource_editable& e,
+	const std::optional<vec2i> original_size,
+	const image_color_picker_widget& picker
+) {
 	using namespace augs::imgui;
 
 	std::string result;
@@ -238,6 +242,64 @@ std::string perform_editable_gui(editor_sprite_resource_editable& e, const std::
 
 	if (e.domain == editor_sprite_domain::FOREGROUND) {
 		edit_property(result, "Foreground glow", e.foreground_glow);
+	}
+
+	{
+		edit_property(result, "##NeonMap", e.neon_map.is_enabled);
+
+		ImGui::SameLine();
+
+		auto disabled = maybe_disabled_only_cols(!e.neon_map.is_enabled);
+
+		auto scope = augs::imgui::scoped_tree_node_ex("Neon map");
+
+		if (scope) {
+
+			auto actually_disabled = maybe_disabled_cols(!e.neon_map.is_enabled);
+
+			auto& v = e.neon_map.value;
+
+			edit_property(result, "Colorize neon", e.neon_color);
+
+			edit_property(result, "Standard deviation", v.standard_deviation);
+			edit_property(result, "Radius", v.radius);
+			edit_property(result, "Amplification", v.amplification);
+			edit_property(result, "Alpha multiplier", v.alpha_multiplier);
+
+			auto ic = 0;
+			auto removed_i = -1;
+
+			text("Pick neon light sources on the image:");
+
+			{
+				if (picker.handle_prologue("##LightColorPicker", v.light_colors)) {
+					result = "Picked new light color in %x";
+				}
+			}
+
+			for (auto& col : v.light_colors) {
+				auto id_col = typesafe_sprintf("Light %x", ++ic);
+				auto id_but = typesafe_sprintf("-##Light%x", ic);
+
+				if (ImGui::Button(id_but.c_str())) {
+					removed_i = ic;
+				}
+
+				ImGui::SameLine();
+
+				edit_property(result, id_col, col);
+			}
+
+			if (removed_i != -1) {
+				v.light_colors.erase(v.light_colors.begin() + removed_i - 1);
+				result = typesafe_sprintf("Removed Light %x in %x", removed_i);
+			}
+
+			if (ImGui::Button("+##AddNewLightColor")) {
+				v.light_colors.emplace_back(white);
+				result = "Added new light color in %x";
+			}
+		}
 	}
 
 	if (e.domain == editor_sprite_domain::PHYSICAL) {
@@ -459,7 +521,19 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				*/
 
 				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
-				changed = perform_editable_gui(edited_copy, original_size);
+
+				const auto project_dir = in.setup.get_unofficial_content_dir();
+
+				const auto picker = image_color_picker_widget {
+					resource.scene_asset_id,
+					in.game_atlas,
+					in.setup.get_viewable_defs().image_definitions,
+					neon_map_picker_preview,
+					project_dir,
+					false
+				};
+
+				changed = perform_editable_gui(edited_copy, original_size, picker);
 
 			}
 			else {

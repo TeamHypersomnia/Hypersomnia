@@ -7,6 +7,9 @@
 #include "view/viewables/ad_hoc_in_atlas_map.h"
 #include "augs/filesystem/path_declaration.h"
 
+#include "application/setups/debugger/property_debugger/widgets/image_color_picker_widget.h"
+#include "view/viewables/images_in_atlas_map.h"
+
 enum class inspected_node_tab_type {
 	NODE,
 	RESOURCE
@@ -17,6 +20,7 @@ class editor_setup;
 struct editor_inspector_input {
 	editor_setup& setup;
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
+	const images_in_atlas_map& game_atlas;
 };
 
 class editor_tweaked_widget_tracker {
@@ -42,6 +46,8 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	inspected_node_tab_type node_current_tab = inspected_node_tab_type::NODE;
 	editor_tweaked_widget_tracker tweaked_widget;
+
+	debugger_image_preview neon_map_picker_preview;
 
 	template <class T>
 	bool inspects_any() const {

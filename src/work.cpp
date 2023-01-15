@@ -763,7 +763,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	);
 
 	LOG("Creating the ImGui atlas.");
-	static const auto imgui_atlas = augs::graphics::texture(imgui_atlas_image);
+	static auto imgui_atlas = augs::graphics::texture(imgui_atlas_image);
 
 	static const auto configurables = configuration_subscribers {
 		window,

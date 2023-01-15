@@ -121,11 +121,11 @@ namespace augs {
 	}
 
 	void renderer::draw_call_imgui(
-		const graphics::texture& imgui_atlas,
-		const graphics::texture* game_world_atlas,
-		const graphics::texture* avatar_atlas,
-		const graphics::texture* avatar_preview_atlas,
-		const graphics::texture* ad_hoc_atlas
+		graphics::texture& imgui_atlas,
+		graphics::texture* game_world_atlas,
+		graphics::texture* avatar_atlas,
+		graphics::texture* avatar_preview_atlas,
+		graphics::texture* ad_hoc_atlas
 	) {
 		const auto* const draw_data = ImGui::GetDrawData();
 
@@ -161,6 +161,16 @@ namespace augs {
 						if (atlas_type == type) {
 							if (atlas != nullptr) {
 								atlas->set_as_current(*this);
+
+								if (type == augs::imgui_atlas_type::GAME) {
+									/* 
+										Mostly to properly view image-based widgets in editor.
+										This is properly reset in illuminated rendering procedure to a user-preferred filtering value.
+									*/
+
+									atlas->set_filtering(*this, augs::filtering_type::NEAREST_NEIGHBOR);
+								}
+
 								rebind = true;
 							}
 						}
