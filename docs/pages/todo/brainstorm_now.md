@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Randomization like on assault rattle should be at rendering time instead of animation time
+
 - We were worried that once we move to gif-format for officials, we won't be able to skin e.g. new stances as usual
 	- But there won't be official maps to read from anyway
 	- So we'll have to prepare an intercosm for skinning like this

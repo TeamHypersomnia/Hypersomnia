@@ -51,3 +51,22 @@ void animation_system::advance_stateful_animations(const logic_step step) const 
 		}
 	);
 }
+
+void animation_system::dry_advance_stateful_animations(cosmos& cosm) const {
+	const auto delta = cosm.get_fixed_delta();
+	const auto& logicals = cosm.get_logical_assets();
+
+	cosm.for_each_having<components::animation>(
+		[&](const auto& t) {
+			auto& animation = t.template get<components::animation>();
+			const auto& animation_def = t.template get<invariants::animation>();
+
+			if (const auto displayed_animation = logicals.find(animation_def.id)) {
+				animation.state.advance_looped(
+					delta.in_milliseconds() * animation.speed_factor,
+					displayed_animation->frames
+				);
+			}
+		}
+	);
+}

@@ -41,6 +41,8 @@
 
 #include "game/modes/bomb_defusal.h"
 
+#include "game/stateless_systems/animation_system.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -80,6 +82,8 @@ class editor_setup : public default_setup_settings {
 	intercosm initial_scene;
 
 	intercosm scene;
+	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
+
 	per_entity_type_array<std::vector<editor_node_id>> scene_entity_to_node;
 
 	editor_resource_pools official_resources;
@@ -473,6 +477,14 @@ public:
 		const C& callbacks
 	) {
 		global_time_seconds += in.frame_delta.in_seconds();
+
+		timer.advance(in.frame_delta);
+
+		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
+
+		while (steps--) {
+			animation_system().dry_advance_stateful_animations(scene.world);
+		}
 
 		(void)in;
 		(void)callbacks;
