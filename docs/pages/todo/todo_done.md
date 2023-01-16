@@ -4789,3 +4789,6 @@ Advantages:
 		- This regeneration will happen only once even though we'll have multiple requests to this gif from all frames
 		- Also for this to work we need the generated paths we give to viewables to be exact with just cache/ added
 
+- Dynamic decorations appear over other sprites
+	- Well this is just a bug, no technological/architectural reason for this to happen
+

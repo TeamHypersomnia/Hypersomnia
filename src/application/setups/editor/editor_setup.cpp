@@ -221,6 +221,7 @@ bool editor_setup::handle_input_before_game(
 
 		if (has_shift && !has_ctrl) {
 			switch (k) {
+				case key::N: move_inspected_to_new_layer(); return true;
 				case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
 				case key::H: mover.flip_selection(make_mover_input(), flip_flags::make_horizontally()); return true;
 				case key::V: mover.flip_selection(make_mover_input(), flip_flags::make_vertically()); return true;
@@ -232,7 +233,7 @@ bool editor_setup::handle_input_before_game(
 			switch (k) {
 				case key::F2: start_renaming_selection(); return true;
 
-				case key::N: move_inspected_to_new_layer(); return true;
+				case key::N: create_new_layer(); return true;
 
 				case key::C: duplicate_selection(); return true;
 				case key::D: cut_selection(); return true;
@@ -955,6 +956,10 @@ std::string editor_setup::get_free_layer_name() const {
 void editor_setup::create_new_layer(const std::string& name_pattern) {
 	create_layer_command cmd;
 	cmd.created_layer.unique_name = get_free_layer_name_for(name_pattern);
+
+	if (const auto best_above = find_best_layer_for_new_node()) {
+		cmd.at_index = best_above->layer_index;
+	}
 
 	post_new_command(cmd);
 }

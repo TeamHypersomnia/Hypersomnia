@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Dynamic decorations appear over other sprites
-	- Well this is just a bug, no technological/architectural reason for this to happen
-
 - Entity types to add later once we won't break abi
 	- Plain sprited bodies but with arbitrary polygons per-entity, obviously
 	- Dynamic decorations but non-organism like, we should have a specific entity for an organism
