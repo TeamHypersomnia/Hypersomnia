@@ -59,12 +59,13 @@ void setup_entity_from_node(
 	(void)resource;
 }
 
-template <class R>
+template <class R, class F>
 void allocate_flavours_and_assets_for_resource(
 	const R& resource,
 	const bool is_official,
 	all_viewables_defs& viewables,
-	cosmos_common_significant& common
+	cosmos_common_significant& common,
+	F resolve_path
 ) {
 	const auto& editable = resource.editable;
 
@@ -126,9 +127,15 @@ void allocate_flavours_and_assets_for_resource(
 						resource.scene_asset_id = new_image_id;
 					}
 
-					new_definition.source_image.path = augs::path_type(GENERATED_FILES_DIR) / resource.external_file.path_in_project;
-					new_definition.source_image.path += typesafe_sprintf("%x.png");
-					new_definition.source_image.is_official = is_official;
+					/*
+						TODO: deprecate get_unofficial_content_dir when old maps are gone!!!!
+						This way we won't have to specify RESOLVED flag here.
+					*/
+
+					new_definition.source_image.path = augs::path_type(GENERATED_FILES_DIR) / resolve_path(resource.external_file.path_in_project);
+					new_definition.source_image.path += typesafe_sprintf(".%x.png", i);
+					new_definition.source_image.is_official = maybe_official_image_path::RESOLVED;
+
 					new_definition.meta.extra_loadables.generate_neon_map = resource.editable.neon_map;
 
 					auto& meta = new_definition.meta;
@@ -347,7 +354,8 @@ void editor_setup::rebuild_scene() {
 					resource,
 					is_official,
 					scene.viewables,
-					common
+					common,
+					[this](const auto& path) { return resolve_project_path(path); }
 				);
 			}
 		};

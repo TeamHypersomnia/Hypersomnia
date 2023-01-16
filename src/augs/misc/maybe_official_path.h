@@ -13,9 +13,15 @@ template <class T>
 struct maybe_official_path {
 	using id_type = T;
 
+	enum : uint8_t {
+		CUSTOM = 0,
+		OFFICIAL = 1,
+		RESOLVED = 2
+	};
+
 	// GEN INTROSPECTOR struct maybe_official_path class T
 	augs::path_type path;
-	bool is_official = false;
+	uint8_t is_official = 0;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const maybe_official_path& b) const {
@@ -55,6 +61,10 @@ struct maybe_official_path {
 	}
 
 	auto resolve(const augs::path_type& project_dir) const {
+		if (is_official == RESOLVED) {
+			return path;
+		}
+
 		if (is_official || project_dir.empty()) {
 			return OFFICIAL_CONTENT_PATH / path;
 		}

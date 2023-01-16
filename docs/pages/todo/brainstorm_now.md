@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We were worried that once we move to gif-format for officials, we won't be able to skin e.g. new stances as usual
+	- But there won't be official maps to read from anyway
+	- So we'll have to prepare an intercosm for skinning like this
+	- And then we can just pass the generated png file paths as always
+	- In any case we'll probably port it somehow or even use another tool (?)
+
 - Remember last selected when spawn new object, this will be a better behavior on unselected
 	- Actually we should just track last layer interacted with
 		- Ultimately last interacted with is last inspected

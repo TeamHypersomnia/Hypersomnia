@@ -1,3 +1,5 @@
+#include <unordered_set>
+
 #include "view/viewables/atlas_distributions.h"
 #include "view/viewables/image_in_atlas.h"
 
@@ -8,31 +10,118 @@
 #include "view/viewables/regeneration/atlas_progress_structs.h"
 #include "augs/log.h"
 
+#include "augs/filesystem/file.h"
+#include "augs/readwrite/byte_file.h"
+#include "augs/readwrite/to_bytes.h"
+#include "augs/filesystem/directory.h"
+
+static bool should_regenerate(
+	const augs::path_type& source,
+	const augs::path_type& stamp
+) {
+	try {
+		const auto new_stamp_bytes = augs::to_bytes(augs::last_write_time(source));
+		const auto existent_stamp_bytes = augs::file_to_bytes(stamp);
+		const bool are_stamps_identical = (new_stamp_bytes == existent_stamp_bytes);
+
+		if (!are_stamps_identical) {
+			return true;
+		}
+	}
+	catch (...) {
+		return true;
+	}
+
+	return false;
+}
+
 void regenerate_and_gather_subjects(
 	const subjects_gathering_input in,
 	atlas_input_subjects& output
 ) {
+	const auto num_workers = std::size_t(in.settings.neon_regeneration_threads - 1);
+
+	static augs::thread_pool workers = 0;
+	workers.resize(num_workers);
+
 	auto make_view = [&in](const auto& def) {
 		return image_definition_view(in.unofficial_project_dir, def);
 	};
 
 	/* Unpack GIFs into PNGs */
 
+	//make_view
+
+	std::unordered_set<augs::path_type> gifs_to_regenerate;
+
 	for (const auto& d : in.image_definitions) {
-		auto path = d.get_source_path().path;
+		const auto def = make_view(d);
+		auto path = def.get_source_image_path();
+
 		if (path.extension() == ".png") {
 			if (path.replace_extension("").replace_extension("").extension() == ".gif") {
-				LOG("FOUND UNPACKED GIF REQUEST!");
+				auto stamp_path = path;
+				stamp_path += ".stamp";
 
+				auto cache_preffix = std::string(GENERATED_FILES_DIR);
+				auto original_gif_path = path.string();
+
+				/* Remove first folder */
+
+				if (begins_with(original_gif_path, cache_preffix)) {
+					cut_preffix(original_gif_path, cache_preffix);
+
+					if (original_gif_path.size() > 0) {
+						/* Remove separator */
+						original_gif_path.erase(original_gif_path.begin());
+
+						if (!found_in(gifs_to_regenerate, original_gif_path)) {
+							if (should_regenerate(original_gif_path, stamp_path)) {
+								gifs_to_regenerate.emplace(original_gif_path);
+							}
+						}
+					}
+				}
 			}
-
-			/* auto trimmed = path.replace_extension("").string(); */
-			/* trimmed = cut_trailing_number(trimmed); */
-
-			/* if (ends_with(trimmed, ".gif")) { */
-
-			/* } */
 		}
+	}
+
+	if (!gifs_to_regenerate.empty()) {
+		for (const auto& gif : gifs_to_regenerate) {
+			auto new_job = [&gif]() {
+				const auto frames = augs::image::gif_to_frames(gif);
+
+				LOG("Regenerate gif: %x (%x frames)", gif, frames.size());
+
+				for (std::size_t i = 0; i < frames.size(); ++i) {
+					const auto& frame = frames[i];
+
+					LOG("Reading frame %x, %x bytes", i, frame.serialized_frame.size());
+
+					augs::image img; 
+					img.from_bytes(frame.serialized_frame, "dummy.bin");
+
+					auto generated_png_path = augs::path_type(GENERATED_FILES_DIR) / gif;
+					generated_png_path += typesafe_sprintf(".%x.png", i);
+					LOG("Generated_png_path: %x. Creating directories.", generated_png_path);
+
+					augs::create_directories_for(generated_png_path);
+					LOG("Saving as png: %x", generated_png_path);
+					img.save_as_png(generated_png_path);
+				};
+
+				auto stamp_path = augs::path_type(GENERATED_FILES_DIR) / gif;
+				stamp_path += ".stamp";
+
+				augs::save_as_bytes(augs::last_write_time(gif), stamp_path);
+			};
+
+			workers.enqueue(new_job);
+		}
+
+		workers.submit();
+		workers.help_until_no_tasks();
+		workers.wait_for_all_tasks_to_complete();
 	}
 
 	{
@@ -83,11 +172,6 @@ void regenerate_and_gather_subjects(
 		};
 
 		{
-			const auto num_workers = std::size_t(in.settings.neon_regeneration_threads - 1);
-
-			static augs::thread_pool workers = 0;
-			workers.resize(num_workers);
-
 			for (const auto& d : in.image_definitions) {
 				workers.enqueue([&d, worker]() { worker(d); });
 			}

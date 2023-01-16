@@ -405,8 +405,18 @@ namespace augs {
 		else if (extension == ".bin") {
 			auto in = augs::cref_memory_stream(from);
 
-			augs::read_bytes(in, size);
-			augs::read_bytes(in, v);
+			auto magic_numbers = decltype(get_bin_file_magic_numbers())();
+			augs::read_bytes(in, magic_numbers);
+
+			if (magic_numbers == get_bin_file_magic_numbers()) {
+				augs::read_bytes(in, size);
+				augs::read_bytes(in, v);
+			}
+			else {
+				throw image_loading_error(
+					"Failed to load image %x:\n.bin file magic number is incorrect", reported_path
+				);
+			}
 		}
 		else {
 			/* Detect extension */
@@ -429,7 +439,7 @@ namespace augs {
 
 			auto in = augs::cref_memory_stream(from);
 
-			std::array<uint32_t, 3> magic_numbers {};
+			auto magic_numbers = decltype(get_bin_file_magic_numbers())();
 			augs::read_bytes(in, magic_numbers);
 
 			if (magic_numbers == get_bin_file_magic_numbers()) {
