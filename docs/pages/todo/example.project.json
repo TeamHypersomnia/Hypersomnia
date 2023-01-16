@@ -337,13 +337,6 @@
 		"type": "lab_podloga",
 		"pos": [23, 45.02],
 		"layer": "Podloga lab",
-		"group": "kilkapodlog"
-	},
-	{
-		"type": "lab_podloga",
-		"pos": [23, 45.02],
-		"layer": "Podloga lab",
-		"group": "kilkapodlog"
 	},
 	{
 		"type": "abc",
@@ -352,6 +345,12 @@
 		"layer": "Foreground layer 1"
 	},
 
+	{
+		"type": "lab_podloga",
+		"pos": [23, 45.02],
+		"layer": "Podloga lab",
+		"group": "kilkapodlog"
+	},
 	{
 		"type": "magic_crate",
 		"name": "ruszajaca skrzynka 1",

@@ -21,6 +21,7 @@
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/resources/resource_traits.h"
+#include "augs/templates/introspection_utils/introspective_equal.h"
 
 
 void editor_tweaked_widget_tracker::reset() {
@@ -485,6 +486,15 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	) {
 		auto name = resource.get_display_name();
 
+		bool request_defaults = false;
+
+		if (!resource_id.is_official) {
+			const auto region_avail = ImGui::GetContentRegionAvail().x;
+
+			ImGui::Columns(2);
+			ImGui::SetColumnWidth(0, region_avail - ImGui::CalcTextSize("Reset").x - ImGui::GetStyle().FramePadding.x);
+		}
+
 		if constexpr(is_pathed_resource_v<R>) {
 			/* Preserve extension when displaying name */
 			name = resource.external_file.path_in_project.filename().string();
@@ -517,6 +527,50 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		ImGui::SameLine();
 		text(name);
 
+		auto hypothetical_default = decltype(resource.editable)();
+
+		if (!resource_id.is_official) {
+			ImGui::NextColumn();
+
+			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
+				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, resource.thumbnail_id)) {
+					hypothetical_default.size = ad_hoc->get_original_size();
+				}
+			}
+
+			{
+				const auto reset_bgs = std::array<rgba, 3> {
+					rgba(0, 0, 0, 0),
+					rgba(80, 20, 20, 255),
+					rgba(150, 40, 40, 255)
+				};
+
+				const bool already_default = augs::introspective_equal(hypothetical_default, resource.editable);
+
+				{
+					auto cols = scoped_button_colors(reset_bgs);
+					auto disabled = maybe_disabled_cols(already_default);
+
+					if (ImGui::Button("Reset") && !already_default) {
+						request_defaults = true;
+					}
+				}
+
+				if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+					if (already_default) {
+						auto scope = scoped_tooltip();
+						text_color("There's nothing to reset now.", green); text("The resource has default properties.");
+					}
+					else {
+						auto scope = scoped_tooltip();
+						text_color("Restore defaults to all properties below.", orange); text("Can safely be undone.");
+					}
+				}
+			}
+
+			ImGui::Columns(1);
+		}
+
 		//game_image(icon, scaled_icon_size, white, vec2::zero, atlas_type);
 
 		ImGui::Separator();
@@ -531,12 +585,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			auto changed = std::string();
 
 			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
-				auto original_size = std::optional<vec2i>();
-
-				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, resource.thumbnail_id)) {
-					original_size = ad_hoc->get_original_size();
-				}
-
 				/* 
 					It's probably better to leave the widgets themselves active
 					in case someone wants to copy the values.
@@ -555,12 +603,17 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					false
 				};
 
-				changed = perform_editable_gui(edited_copy, original_size, picker);
+				changed = perform_editable_gui(edited_copy, hypothetical_default.size, picker);
 
 			}
 			else {
 				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
 				changed = perform_editable_gui(edited_copy);
+			}
+
+			if (request_defaults) {
+				edited_copy = hypothetical_default;
+				changed = "Restored defaults to %x";
 			}
 
 			if (!changed.empty() && !resource_id.is_official) {

@@ -26,6 +26,8 @@ inline auto maybe_disabled_cols(
 		cond_scoped_item_flag(are_disabled, ImGuiItemFlags_Disabled, true),
 		cond_scoped_style_color(are_disabled, ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)),
 		cond_scoped_style_color(are_disabled, ImGuiCol_Button, disabled_col),
+		cond_scoped_style_color(are_disabled, ImGuiCol_ButtonHovered, disabled_col),
+		cond_scoped_style_color(are_disabled, ImGuiCol_ButtonActive, disabled_col),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBg, disabled_col),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgHovered, disabled_col),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgActive, disabled_col)
@@ -41,6 +43,8 @@ inline auto maybe_disabled_only_cols(
 	return std::make_tuple(
 		cond_scoped_style_color(are_disabled, ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled)),
 		cond_scoped_style_color(are_disabled, ImGuiCol_Button, disabled_col),
+		cond_scoped_style_color(are_disabled, ImGuiCol_ButtonHovered, disabled_col),
+		cond_scoped_style_color(are_disabled, ImGuiCol_ButtonActive, disabled_col),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBg, disabled_col),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgHovered, disabled_col),
 		cond_scoped_style_color(are_disabled, ImGuiCol_FrameBgActive, disabled_col)

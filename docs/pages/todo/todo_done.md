@@ -4775,3 +4775,17 @@ Advantages:
 - Double ctrl a should select all layers
 - Replace -dup-dup etc with -dup1 dup2 etc
 
+- Remember last selected when spawn new object, this will be a better behavior on unselected
+	- Actually we should just track last layer interacted with
+		- Ultimately last interacted with is last inspected
+	- Just save it whenever we unselect stuff and when there's nothing selected we read from it, trivial
+
+- GIF unpacking
+	- viewables: paths to cached directories based on gif path
+	- Atlas generator realizes the path is from a generated dir and is part of a gif (we'll just peel off .png and the number)
+		- Gif stamp is checked
+		- Stamp not found or out of date -> regenerate
+		- Direct png file path does not exist -> regenerate
+		- This regeneration will happen only once even though we'll have multiple requests to this gif from all frames
+		- Also for this to work we need the generated paths we give to viewables to be exact with just cache/ added
+

@@ -15,6 +15,7 @@ struct light_value_variation {
 	// END GEN INTROSPECTOR
 
 	void update_value(randomization&, atten_t& val, const float dt_seconds) const;
+	friend bool operator==(const light_value_variation&, const light_value_variation&) = default;
 };
 
 struct attenuation_variations {

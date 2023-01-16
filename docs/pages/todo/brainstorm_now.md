@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Dynamic decorations appear over other sprites
+	- Well this is just a bug, no technological/architectural reason for this to happen
+
+- Entity types to add later once we won't break abi
+	- Plain sprited bodies but with arbitrary polygons per-entity, obviously
+	- Dynamic decorations but non-organism like, we should have a specific entity for an organism
+		- Pointless for them to be processed just like static animations
+
+- Button to reset resource properties to default
+	- Since it's not like with nodes that you can just recreate them
+
+- Gral gif is colorized yellow when neons are enabled, probably due to wrong light calculations
+	- We sh ould probably check on windows first
 - Randomization like on assault rattle should be at rendering time instead of animation time
 
 - We were worried that once we move to gif-format for officials, we won't be able to skin e.g. new stances as usual
@@ -13,20 +26,6 @@ summary: That which we are brainstorming at the moment.
 	- So we'll have to prepare an intercosm for skinning like this
 	- And then we can just pass the generated png file paths as always
 	- In any case we'll probably port it somehow or even use another tool (?)
-
-- Remember last selected when spawn new object, this will be a better behavior on unselected
-	- Actually we should just track last layer interacted with
-		- Ultimately last interacted with is last inspected
-	- Just save it whenever we unselect stuff and when there's nothing selected we read from it, trivial
-
-- GIF unpacking
-	- viewables: paths to cached directories based on gif path
-	- Atlas generator realizes the path is from a generated dir and is part of a gif (we'll just peel off .png and the number)
-		- Gif stamp is checked
-		- Stamp not found or out of date -> regenerate
-		- Direct png file path does not exist -> regenerate
-		- This regeneration will happen only once even though we'll have multiple requests to this gif from all frames
-		- Also for this to work we need the generated paths we give to viewables to be exact with just cache/ added
 
 - Btw first thing we should do for atlas optimization is have a separate neon map atlas
 
