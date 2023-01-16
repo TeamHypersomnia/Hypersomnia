@@ -483,7 +483,7 @@ void editor_setup::rebuild_scene() {
 				else {
 					auto entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
 						::setup_entity_from_node(
-							total_order, 
+							total_order++, 
 							*layer,
 							typed_node, 
 							resource,
