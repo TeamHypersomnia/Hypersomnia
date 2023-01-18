@@ -2,7 +2,7 @@
 #include "game/inferred_caches/tree_of_npo_cache.h"
 #include "game/detail/calc_render_layer.h"
 #include "game/cosmos/find_cache.h"
-#include "game/inferred_caches/is_organism.h"
+#include "game/inferred_caches/is_grid_organism.h"
 
 template <class E>
 auto* find_tree_of_npo_cache(const E& handle) {
@@ -36,7 +36,7 @@ std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 
 		result.aabb = *aabb;
 
-		if (::is_organism(handle)) {
+		if (::is_grid_organism(handle)) {
 			/* Handled by the grids in organism cache */
 			return std::nullopt;
 		}

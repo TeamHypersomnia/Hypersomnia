@@ -4798,3 +4798,5 @@ Advantages:
 - Path virtualization in viewables is non-breaking feature, just an additional option
 	- So won't break existing maps
 
+- Fix official dynamic organisms like fish not rendering
+

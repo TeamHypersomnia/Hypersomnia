@@ -1,7 +1,7 @@
 #pragma once
 #include "game/enums/marker_type.h"
 #include "game/cosmos/for_each_entity.h"
-#include "game/inferred_caches/is_organism.h"
+#include "game/inferred_caches/is_grid_organism.h"
 
 constexpr real32 movement_path_neighbor_query_radius_v = 50.f;
 constexpr int grid_cell_size_v = static_cast<int>(movement_path_neighbor_query_radius_v * 2);
@@ -11,7 +11,7 @@ using cell_type = organism_cache::cell_type;
 
 template <class E>
 bool organism_cache::assign_to_grid(const E& organism) {
-	if (!::is_organism(organism)) {
+	if (!::is_grid_organism(organism)) {
 		return false;
 	}
 	

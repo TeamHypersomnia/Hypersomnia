@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Also add insects and garden sprites to officials, will be handy to have all biomes
+	- Maybe it will motivate is to implement culling
+		- which will only break the official firearm rendering for now
+
+- By the way let's thoroughly check which officials we want to list
+	- We might also want to change some names for accuracy so that it's future-proof
+		- Will break maps but only if we wanted to press "Update official content" (in player window) on them
+
+
 - Maybe we should leave officials as they are
 	- This is literally just for the nice animated icons in editor
 	- And we'd have to correctly put the durations in there
