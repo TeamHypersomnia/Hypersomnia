@@ -311,6 +311,7 @@ public:
 
 	void inspect(inspected_variant);
 	void inspect_add_quiet(inspected_variant);
+	void quiet_set_last_inspected(inspected_variant);
 
 	template <class F>
 	void inspect_erase_if(F&& callback) { 
@@ -544,5 +545,9 @@ public:
 
 	const auto& get_initial_scene() const {
 		return initial_scene;
+	}
+
+	const auto& get_last_inspected_layer_or_node() const {
+		return gui.inspector.get_last_inspected_layer_or_node();
 	}
 };

@@ -648,30 +648,73 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 
 				if (tree_node_pressed) {
-					if (in.setup.wants_multiple_selection() && in.setup.inspects_any<editor_node_id>()) {
-						if (all_children_inspected) {
-							auto node_in_this_layer = [&](const inspected_variant iv) {
-								if (const auto id = std::get_if<editor_node_id>(std::addressof(iv))) {
-									return found_in(layer.hierarchy.nodes, *id);
+					if (in.setup.wants_multiple_selection()) {
+						if (in.setup.inspects_any<editor_node_id>()) {
+							if (all_children_inspected) {
+								auto node_in_this_layer = [&](const inspected_variant iv) {
+									if (const auto id = std::get_if<editor_node_id>(std::addressof(iv))) {
+										return found_in(layer.hierarchy.nodes, *id);
+									}
+
+									return false;
+								};
+
+								in.setup.inspect_erase_if(node_in_this_layer);
+							}
+							else {
+								for (const auto child_node_id : layer.hierarchy.nodes) {
+									if (!in.setup.is_inspected(child_node_id)) {
+										in.setup.inspect_add_quiet(child_node_id);
+									}
 								}
 
-								return false;
-							};
-
-							in.setup.inspect_erase_if(node_in_this_layer);
+								in.setup.after_quietly_adding_inspected();
+							}
 						}
 						else {
-							for (const auto child_node_id : layer.hierarchy.nodes) {
-								if (!in.setup.is_inspected(child_node_id)) {
-									in.setup.inspect_add_quiet(child_node_id);
-								}
-							}
-
-							in.setup.after_quietly_adding_inspected();
+							in.setup.inspect(layer_id);
 						}
 					}
 					else {
-						in.setup.inspect(layer_id);
+						if (ImGui::GetIO().KeyShift) {
+							auto last_inspected = in.setup.get_last_inspected_layer_or_node();
+							auto last_layer = std::get_if<editor_layer_id>(&last_inspected);
+							auto last_node = std::get_if<editor_node_id>(&last_inspected);
+
+							if (in.setup.inspects_any<editor_layer_id>() && last_layer && *last_layer != layer_id) {
+								auto& ordered = in.setup.get_layers();
+
+								int state = 0;
+
+								in.setup.clear_inspector();
+
+								for (const editor_layer_id id : ordered) {
+									if (id == layer_id || id == *last_layer) {
+										++state;
+									}
+
+									if (state) {
+										in.setup.inspect_add_quiet(id);
+									}
+
+									if (state == 2) {
+										break;
+									}
+								}
+
+								in.setup.after_quietly_adding_inspected();
+								in.setup.quiet_set_last_inspected(*last_layer);
+							}
+							else if (in.setup.inspects_any<editor_node_id>() && last_node) {
+								in.setup.inspect(layer_id);
+							}
+							else {
+								in.setup.inspect(layer_id);
+							}
+						}
+						else {
+							in.setup.inspect(layer_id);
+						}
 					}
 				}
 

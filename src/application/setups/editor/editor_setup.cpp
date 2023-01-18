@@ -1880,6 +1880,10 @@ std::optional<editor_setup::parent_layer_info> editor_setup::convert_to_parent_l
 	return std::nullopt;
 }
 
+void editor_setup::quiet_set_last_inspected(const inspected_variant inspected) {
+	gui.inspector.last_inspected_layer_or_node = inspected;
+}
+
 template struct edit_resource_command<editor_sprite_resource>;
 template struct edit_resource_command<editor_sound_resource>;
 template struct edit_resource_command<editor_light_resource>;
