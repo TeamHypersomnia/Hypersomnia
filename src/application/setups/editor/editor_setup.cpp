@@ -81,6 +81,9 @@ void editor_setup::create_official() {
 		official_resources,
 		official_files_root
 	);
+
+	gui.filesystem.rebuild_official_special_filesystem(*this);
+	gui.filesystem.rebuild_special_filesystem(*this);
 }
 
 void editor_setup::open_default_windows() {
@@ -371,13 +374,23 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", project.meta.name);
 }
 
+template <class T, class = void>
+struct has_thumbnail_id : std::false_type {};
+
+template <class T>
+struct has_thumbnail_id<T, decltype(std::declval<T&>().thumbnail_id, void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_thumbnail_id_v = has_thumbnail_id<T>::value;
+
 std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 	if (rebuild_ad_hoc_atlas) {
 		rebuild_ad_hoc_atlas = false;
 
 		ad_hoc_atlas_subjects new_subjects;
-		const auto next_id = files.root.fill_thumbnail_entries(paths.project_folder, new_subjects);
-		official_files_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), new_subjects, next_id);
+		auto next_id = files.root.fill_thumbnail_entries(paths.project_folder, new_subjects);
+		next_id = official_files_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), new_subjects, next_id);
+		next_id = gui.filesystem.official_special_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), new_subjects, next_id);
 
 		auto cache_thumbnail_id_in_resource = [&](const auto& file_node) {
 			on_resource(
@@ -385,13 +398,14 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 				[&]<typename T>(T& typed_resource, const auto resource_id) {
 					(void)resource_id;
 
-					if constexpr(std::is_same_v<T, editor_sprite_resource>) {
+					if constexpr(has_thumbnail_id_v<T>) {
 						typed_resource.thumbnail_id = file_node.file_thumbnail_id;
 					}
 				}
 			);
 		};
 
+		gui.filesystem.official_special_root.for_each_file_recursive(cache_thumbnail_id_in_resource);
 		official_files_root.for_each_file_recursive(cache_thumbnail_id_in_resource);
 		files.root.for_each_file_recursive(cache_thumbnail_id_in_resource);
 

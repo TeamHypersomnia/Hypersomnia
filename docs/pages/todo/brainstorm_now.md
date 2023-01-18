@@ -10,6 +10,10 @@ summary: That which we are brainstorming at the moment.
 	- We might also want to change some names for accuracy so that it's future-proof
 		- Will break maps but only if we wanted to press "Update official content" (in player window) on them
 
+- We can finally implement game atlas culling now that we don't use it in rendering
+	- Remember ad hoc won't need culling because we'll just use tiny tiny icons
+	- Only the inspector gui will need using ad hoc
+
 - Also add insects and garden sprites to officials, will be handy to have all biomes
 	- Maybe it will motivate is to implement culling
 		- which will only break the official firearm rendering for now

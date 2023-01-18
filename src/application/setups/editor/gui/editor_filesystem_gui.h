@@ -22,7 +22,6 @@ struct editor_project_files_input {
 
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
-	const images_in_atlas_map& game_images;
 };
 
 struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
@@ -47,10 +46,19 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 		return current_tab == editor_resources_tab_type::OFFICIAL;
 	}
 
-private:
-	editor_filesystem_node special_root;
+	auto& get_viewed_special_root() {
+		return showing_official() ? official_special_root : project_special_root;
+	}
 
-	void setup_special_filesystem();
-	void rebuild_special_filesystem(editor_project_files_input);
+	void rebuild_official_special_filesystem(editor_setup&);
+	void rebuild_special_filesystem(editor_setup&);
+
+private:
+	friend editor_setup;
+	editor_filesystem_node project_special_root;
+	editor_filesystem_node official_special_root;
+
+	void setup_special_filesystem(editor_filesystem_node& root);
+	void rebuild_special_filesystem(editor_filesystem_node& root, bool official, editor_setup&);
 };
 

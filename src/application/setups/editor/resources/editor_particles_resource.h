@@ -24,7 +24,7 @@ struct editor_particles_resource {
 
 	editor_particles_resource_editable editable;
 
-	std::optional<test_particles_decorations> official_tag;
+	std::optional<std::variant<test_particles_decorations>> official_tag;
 
 	mutable std::variant<
 		typed_entity_flavour_id<particles_decoration>

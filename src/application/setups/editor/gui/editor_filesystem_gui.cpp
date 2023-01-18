@@ -12,9 +12,11 @@
 #include "application/setups/editor/gui/widgets/filesystem_node_widget.h"
 #include "application/setups/editor/detail/simple_two_tabs.h"
 #include "application/setups/editor/resources/resource_traits.h"
+#include "test_scenes/test_scene_flavours.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
-	setup_special_filesystem();
+	setup_special_filesystem(project_special_root);
+	setup_special_filesystem(official_special_root);
 }
 
 void editor_filesystem_gui::perform(const editor_project_files_input in) {
@@ -120,7 +122,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	acquire_keyboard_once();
 
-	rebuild_special_filesystem(in);
+	//rebuild_special_filesystem(in);
 
 	thread_local ImGuiTextFilter filter;
 	filter_with_hint(filter, "##FilesFilter", "Search resources...");
@@ -129,7 +131,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	if (filter.IsActive()) {
 		in.files_root.reset_filter_flags();
-		special_root.reset_filter_flags();
+		get_viewed_special_root().reset_filter_flags();
 
 		auto& f = filter;
 
@@ -142,7 +144,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		};
 
 		in.files_root.for_each_entry_recursive(filter_callback);
-		special_root.for_each_entry_recursive(filter_callback);
+		get_viewed_special_root().for_each_entry_recursive(filter_callback);
 	}
 
 	simple_two_tabs(
@@ -203,7 +205,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	ImGui::SameLine();
 
 	text_disabled("(Special resources)");
-	special_root.in_ui_order(node_callback, with_closed_folders);
+	get_viewed_special_root().in_ui_order(node_callback, with_closed_folders);
 }
 
 void editor_filesystem_gui::clear_drag_drop() {
@@ -214,22 +216,22 @@ void editor_filesystem_gui::clear_drag_drop() {
 	dragged_resource.unset();
 }
 
-void editor_filesystem_gui::setup_special_filesystem() {
-	special_root.clear();
-	special_root.subfolders.resize(8);
-	special_root.should_sort = false;
+void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& root) {
+	root.clear();
+	root.subfolders.resize(8);
+	root.should_sort = false;
 
 	auto i = 0;
 
-	auto& lights_folder = special_root.subfolders[i++];
-	auto& particles_folder = special_root.subfolders[i++];
-	auto& wandering_pixels_folder = special_root.subfolders[i++];
-	auto& prefabs_folder = special_root.subfolders[i++];
+	auto& lights_folder = root.subfolders[i++];
+	auto& particles_folder = root.subfolders[i++];
+	auto& wandering_pixels_folder = root.subfolders[i++];
+	auto& prefabs_folder = root.subfolders[i++];
 
-	auto& firearms_folder = special_root.subfolders[i++];
-	auto& ammunition_folder = special_root.subfolders[i++];
-	auto& explosives_folder = special_root.subfolders[i++];
-	auto& melee_weapons_folder = special_root.subfolders[i++];
+	auto& firearms_folder = root.subfolders[i++];
+	auto& ammunition_folder = root.subfolders[i++];
+	auto& explosives_folder = root.subfolders[i++];
+	auto& melee_weapons_folder = root.subfolders[i++];
 
 	lights_folder.name = "Lights";
 	particles_folder.name = "Particles";
@@ -241,27 +243,35 @@ void editor_filesystem_gui::setup_special_filesystem() {
 	explosives_folder.name = "Explosives";
 	melee_weapons_folder.name = "Melee weapons";
 
-	for (auto& s : special_root.subfolders) {
+	for (auto& s : root.subfolders) {
 		s.type = editor_filesystem_node_type::FOLDER;
 	}
 
-	special_root.adding_children_finished();
+	root.adding_children_finished();
 }
 
-void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_files_input in) {
+void editor_filesystem_gui::rebuild_special_filesystem(editor_setup& setup) {
+	rebuild_special_filesystem(project_special_root, false, setup);
+}
+
+void editor_filesystem_gui::rebuild_official_special_filesystem(editor_setup& setup) {
+	rebuild_special_filesystem(official_special_root, true, setup);
+}
+
+void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& root, bool official, editor_setup& setup) {
 	auto i = 0;
 
-	const auto& resources = showing_official() ? in.setup.get_official_resources() : in.setup.get_project().resources;
+	const auto& resources = official ? setup.get_official_resources() : setup.get_project().resources;
 
-	auto& lights_folder = special_root.subfolders[i++];
-	auto& particles_folder = special_root.subfolders[i++];
-	auto& wandering_pixels_folder = special_root.subfolders[i++];
-	auto& prefabs_folder = special_root.subfolders[i++];
+	auto& lights_folder = root.subfolders[i++];
+	auto& particles_folder = root.subfolders[i++];
+	auto& wandering_pixels_folder = root.subfolders[i++];
+	auto& prefabs_folder = root.subfolders[i++];
 
-	auto& firearms_folder = special_root.subfolders[i++];
-	auto& ammunition_folder = special_root.subfolders[i++];
-	auto& explosives_folder = special_root.subfolders[i++];
-	auto& melee_weapons_folder = special_root.subfolders[i++];
+	auto& firearms_folder = root.subfolders[i++];
+	auto& ammunition_folder = root.subfolders[i++];
+	auto& explosives_folder = root.subfolders[i++];
+	auto& melee_weapons_folder = root.subfolders[i++];
 
 	(void)prefabs_folder;
 	(void)wandering_pixels_folder;
@@ -269,7 +279,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 	auto handle = [&]<typename P>(editor_filesystem_node& parent, P& pool, const auto icon_id) {
 		using resource_type = typename P::value_type;
 
-		parent.game_atlas_icon = in.necessary_images[icon_id];
+		parent.necessary_atlas_icon = icon_id;
 		parent.after_text = typesafe_sprintf("(%x)", pool.size());
 
 		parent.files.resize(pool.size());
@@ -278,15 +288,67 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 		auto resource_handler = [&](const auto raw_id, const resource_type& typed_resource) {
 			editor_resource_id resource_id;
 
-			resource_id.is_official = showing_official();
+			resource_id.is_official = official;
 			resource_id.raw = raw_id;
 			resource_id.type_id.set<resource_type>();
 
 			auto& new_node = parent.files[i++];
-			new_node.name = typed_resource.unique_name;
 			new_node.associated_resource = resource_id;
 			new_node.type = editor_filesystem_node_type::OTHER_RESOURCE;
-			//new_node.game_atlas_icon = parent.game_atlas_icon;
+
+			const auto& initial_intercosm = setup.get_initial_scene();
+
+			std::visit(
+				[&](const auto& tag) {
+					const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
+					auto name = flavour.get_name();
+
+					const auto id = str_ops(name).to_lowercase().replace_all(" ", "_").subject;
+					new_node.name = id;
+
+					if (auto sprite = flavour.template find<invariants::sprite>()) {
+						new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
+					}
+
+					if (auto animation = flavour.template find<invariants::animation>()) {
+						if (animation->id.is_set()) {
+							auto path_s = new_node.custom_thumbnail_path.string();
+							ensure(ends_with(path_s, "_1.png"));
+
+							path_s.erase(path_s.end() - std::strlen("_1.png"), path_s.end());
+							path_s += "_*.png";
+
+							new_node.custom_thumbnail_path = path_s;
+							// LOG_NVPS(new_node.custom_thumbnail_path);
+						}
+					}
+
+					if (auto gun = flavour.template find<invariants::gun>()) {
+						if (gun->shoot_animation.is_set()) {
+							//const auto image_id = initial_intercosm.world.get_logical_assets().plain_animations[gun->shoot_animation].frames[0].image_id;
+							//auto path_s = initial_intercosm.viewables.image_definitions[image_id].get_source_path().resolve({}).string();
+							//LOG_NVPS(path_s);
+
+							auto path_s = new_node.custom_thumbnail_path;
+							path_s.replace_extension("");
+							path_s += "_shot_*.png";
+
+							/* auto path_basic = path_s.string(); */
+							/* cut_trailing_number(path_basic); */
+
+							/* if (path_basic.back() == '_') { */
+							/* 	path_basic.pop_back(); */
+							/* } */
+
+							/* path_basic += "_shot_*.png"; */
+
+							new_node.custom_thumbnail_path = path_s;
+							// LOG_NVPS(new_node.custom_thumbnail_path);
+						}
+					}
+				},
+				*typed_resource.official_tag
+			);
 		};
 
 		pool.for_each_id_and_object(resource_handler);
@@ -305,5 +367,5 @@ void editor_filesystem_gui::rebuild_special_filesystem(const editor_project_file
 	handle(explosives_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::BOMB_INDICATOR);
 	handle(melee_weapons_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::SHOULDER_SLOT_ICON);
 
-	special_root.set_parents(0);
+	root.set_parents(0);
 }

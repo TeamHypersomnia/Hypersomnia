@@ -31,8 +31,8 @@ namespace editor_widgets {
 
 		auto icon_color = white;
 
-		if (node.game_atlas_icon != std::nullopt) {
-			icon = *node.game_atlas_icon;
+		if (node.necessary_atlas_icon != std::nullopt) {
+			icon = icon_in.necessary_images[*node.necessary_atlas_icon];
 		}
 		else {
 			if (node.is_folder()) {

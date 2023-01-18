@@ -12,7 +12,7 @@ struct editor_light_resource {
 
 	editor_light_resource_editable editable;
 
-	std::optional<test_static_lights> official_tag;
+	std::optional<std::variant<test_static_lights>> official_tag;
 	mutable std::variant<
 		typed_entity_flavour_id<static_light>
 	> scene_flavour_id;

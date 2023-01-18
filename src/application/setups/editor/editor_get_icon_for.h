@@ -9,10 +9,9 @@ struct editor_icon_info {
 struct editor_icon_info_in {
 	const necessary_images_in_atlas_map& necessary_images;
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
-	const images_in_atlas_map& game_images;
 
 	template <class T>
-	editor_icon_info_in(const T& in) : necessary_images(in.necessary_images), ad_hoc_atlas(in.ad_hoc_atlas), game_images(in.game_images) {};
+	editor_icon_info_in(const T& in) : necessary_images(in.necessary_images), ad_hoc_atlas(in.ad_hoc_atlas) {};
 };
 
 template <class T, class = void>
@@ -101,7 +100,7 @@ editor_icon_info editor_setup::get_icon_for(
 			return *result;
 		}
 	}
-	else if constexpr(std::is_same_v<T, editor_sprite_resource>) {
+	else if constexpr(std::is_same_v<T, editor_sprite_resource> || std::is_same_v<T, editor_ammunition_resource> || std::is_same_v<T, editor_firearm_resource>) {
 		if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, object.thumbnail_id)) {
 			return { *ad_hoc, augs::imgui_atlas_type::AD_HOC };
 		}
@@ -110,18 +109,6 @@ editor_icon_info editor_setup::get_icon_for(
 	}
 	else if constexpr(std::is_same_v<T, editor_light_resource>) {
 		return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_LIGHT], augs::imgui_atlas_type::GAME };
-	}
-	else if constexpr(std::is_same_v<T, editor_ammunition_resource> || std::is_same_v<T, editor_firearm_resource>) {
-		return std::visit(
-			[&](const auto& typed) -> editor_icon_info {
-				const auto& id = scene.world.get_flavour(typed).template get<invariants::sprite>().image_id;
-				//LOG_NVPS(object.unique_name, id, in.game_images.at(id).diffuse.atlas_space);
-
-				return { in.game_images.at(id).diffuse, augs::imgui_atlas_type::GAME };
-			},
-
-			object.scene_flavour_id
-		);
 	}
 	else if constexpr(std::is_same_v<T, editor_sound_resource>) {
 		return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_SOUND], augs::imgui_atlas_type::GAME };

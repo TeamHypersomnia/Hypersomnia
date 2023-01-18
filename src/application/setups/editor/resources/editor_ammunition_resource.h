@@ -3,6 +3,8 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "test_scenes/test_scene_flavour_ids.h"
 
+using ad_hoc_entry_id = uint32_t;
+
 struct editor_ammunition_resource_editable {
 	// GEN INTROSPECTOR struct editor_ammunition_resource_editable
 	bool dummy = false;
@@ -19,6 +21,8 @@ struct editor_ammunition_resource {
 		test_shootable_charges,
 		test_container_items
 	>> official_tag;
+
+	ad_hoc_entry_id thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
 
 	mutable std::variant<
 		typed_entity_flavour_id<container_item>,
