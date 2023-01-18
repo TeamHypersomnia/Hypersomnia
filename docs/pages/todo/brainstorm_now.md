@@ -6,26 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Also add insects and garden sprites to officials, will be handy to have all biomes
-	- Maybe it will motivate is to implement culling
-		- which will only break the official firearm rendering for now
-
 - By the way let's thoroughly check which officials we want to list
 	- We might also want to change some names for accuracy so that it's future-proof
 		- Will break maps but only if we wanted to press "Update official content" (in player window) on them
 
-
-- Maybe we should leave officials as they are
-	- This is literally just for the nice animated icons in editor
-	- And we'd have to correctly put the durations in there
-	- Plus it introduces overhead of re-reading the gif files
-	- I'm thinking we should just have a special-purpose logic for visualizing animations in editor
-		- We can put correct durations for animations in there
-
-- Alright, official animations
-	- We need to do them pretty much just for proper visualization
-	- Right now official resources have defaults next to the files
-		- We probably won't do this for custom projects since we wanted all properties to be found in the map file
+- Also add insects and garden sprites to officials, will be handy to have all biomes
+	- Maybe it will motivate is to implement culling
+		- which will only break the official firearm rendering for now
+		- And might break animation rendering if we use the game atlas
 
 - We were worried that once we move to gif-format for officials, we won't be able to skin e.g. new stances as usual
 	- But there won't be official maps to read from anyway

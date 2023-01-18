@@ -159,6 +159,18 @@ void create_official_filesystem_from(
 					if (auto sprite = flavour.template find<invariants::sprite>()) {
 						new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
 					}
+
+					if (auto animation = flavour.template find<invariants::animation>()) {
+						if (animation->id.is_set()) {
+							auto path_s = new_node.custom_thumbnail_path.string();
+							ensure(ends_with(path_s, "_1.png"));
+
+							path_s.erase(path_s.end() - std::strlen("_1.png"), path_s.end());
+							path_s += "_*.png";
+
+							new_node.custom_thumbnail_path = path_s;
+						}
+					}
 				},
 				*typed_resource.official_tag
 			);

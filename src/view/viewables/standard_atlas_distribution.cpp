@@ -305,16 +305,55 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 
 	std::unordered_map<augs::path_type, ad_hoc_entry_id> input_path_to_id;
 	std::unordered_map<augs::path_type, augs::image::gif_data> gif_datas;
+	std::unordered_map<augs::path_type, augs::image::gif_data> png_seq_datas;
 	std::unordered_map<augs::path_type, std::size_t> starting_loading_image;
 
 	for (const auto& entry : in.subjects) {
-		if (entry.image_path.extension() == ".gif") {
+		if (entry.image_path.extension() == ".gif" || ends_with(entry.image_path.string(), "_*.png")) {
 			continue;
 		}
 
 		try {
 			atlas_subjects.images.push_back(entry.image_path);
 			input_path_to_id[entry.image_path] = entry.id;
+		}
+		catch (...) {
+
+		}
+	}
+
+	for (const auto& entry : in.subjects) {
+		if (!ends_with(entry.image_path.string(), "_*.png")) {
+			continue;
+		}
+
+		auto frames = augs::image::gif_data();
+		auto basic_path = entry.image_path.string();
+		basic_path.erase(basic_path.end() - std::strlen("_*.png"), basic_path.end());
+
+		try {
+			for (std::size_t i = 1; ; ++i) {
+				auto next_path = basic_path;
+				next_path += typesafe_sprintf("_%x.png", i);
+
+				if (augs::exists(next_path)) {
+					atlas_subjects.images.push_back(next_path);
+
+					/*
+						The fact that it won't be accurate is not a problem.
+						PNG sequences will only be used for official resources.
+					*/
+
+					constexpr int default_duration_milliseconds = 40;
+					frames.push_back({ {}, default_duration_milliseconds });
+				}
+				else {
+					break;
+				}
+			}
+
+			input_path_to_id[entry.image_path] = entry.id;
+			png_seq_datas[entry.image_path] = std::move(frames);
 		}
 		catch (...) {
 
@@ -373,6 +412,22 @@ ad_hoc_atlas_output create_ad_hoc_atlas(ad_hoc_atlas_input in) {
 			for (std::size_t i = 0; i < gif_data->size(); ++i) {
 				const auto baked_image = baked.loaded_images[start_i + i];
 				const auto ms = gif_data->at(i).duration_milliseconds;
+
+				out.atlas_entries.add_frame(entry_id, baked_image, ms);
+			}
+
+			continue;
+		}
+
+		if (const auto png_seq_data = mapped_or_nullptr(png_seq_datas, baked_path)) {
+			auto basic_path = baked_path.string();
+			basic_path.erase(basic_path.end() - std::strlen("_*.png"), basic_path.end());
+			basic_path += "_%x.png";
+
+			for (std::size_t i = 0; i < png_seq_data->size(); ++i) {
+				const auto frame_path = typesafe_sprintf(basic_path, i + 1);
+				const auto baked_image = baked.images[frame_path];
+				const auto ms = png_seq_data->at(i).duration_milliseconds;
 
 				out.atlas_entries.add_frame(entry_id, baked_image, ms);
 			}

@@ -4800,3 +4800,17 @@ Advantages:
 
 - Fix official dynamic organisms like fish not rendering
 
+
+- Maybe we should leave officials as they are
+	- This is literally just for the nice animated icons in editor
+	- And we'd have to correctly put the durations in there
+	- Plus it introduces overhead of re-reading the gif files
+	- I'm thinking we should just have a special-purpose logic for visualizing animations in editor
+		- We can put correct durations for animations in there
+
+- Alright, official animations
+	- We need to do them pretty much just for proper visualization
+	- Right now official resources have defaults next to the files
+		- We probably won't do this for custom projects since we wanted all properties to be found in the map file
+
+- Also we determined to just put a default duration of 40 ms for visualization, accuracy is not a problem here
