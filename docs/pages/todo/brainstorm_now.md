@@ -6,23 +6,33 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Entity types to add later once we won't break abi
-	- Plain sprited bodies but with arbitrary polygons per-entity, obviously
-	- Dynamic decorations but non-organism like, we should have a specific entity for an organism
-		- Pointless for them to be processed just like static animations
+- Maybe we should leave officials as they are
+	- This is literally just for the nice animated icons in editor
+	- And we'd have to correctly put the durations in there
+	- Plus it introduces overhead of re-reading the gif files
+	- I'm thinking we should just have a special-purpose logic for visualizing animations in editor
+		- We can put correct durations for animations in there
 
-- Button to reset resource properties to default
-	- Since it's not like with nodes that you can just recreate them
-
-- Gral gif is colorized yellow when neons are enabled, probably due to wrong light calculations
-	- We sh ould probably check on windows first
-- Randomization like on assault rattle should be at rendering time instead of animation time
+- Alright, official animations
+	- We need to do them pretty much just for proper visualization
+	- Right now official resources have defaults next to the files
+		- We probably won't do this for custom projects since we wanted all properties to be found in the map file
 
 - We were worried that once we move to gif-format for officials, we won't be able to skin e.g. new stances as usual
 	- But there won't be official maps to read from anyway
 	- So we'll have to prepare an intercosm for skinning like this
 	- And then we can just pass the generated png file paths as always
 	- In any case we'll probably port it somehow or even use another tool (?)
+
+- Entity types to add later once we won't break abi
+	- Plain sprited bodies but with arbitrary polygons per-entity, obviously
+	- Dynamic decorations but non-organism like, we should have a specific entity for an organism
+		- Pointless for them to be processed just like static animations
+
+- Gral gif is colorized yellow when neons are enabled, probably due to wrong light calculations
+	- We should probably check on windows first
+
+- Randomization like on assault rattle should be at rendering time instead of animation time
 
 - Btw first thing we should do for atlas optimization is have a separate neon map atlas
 
@@ -72,9 +82,6 @@ summary: That which we are brainstorming at the moment.
 	- So we'll probably need to know the number of frames either way
 	- We can read the number of frames as metadata and store in filesystem resource next to thumb id
 		- Later we can even use ad hoc atlas to display it to edit some per-frame properties
-
-- Path virtualization in viewables is non-breaking feature, just an additional option
-	- So won't break existing maps
 
 - We really shouldn't worry about the old editor for now, we can wait this much
 	- Only important that we don't break the abi for reading current binary maps into the game if e.g. we need to push a quick unrelated bugfix

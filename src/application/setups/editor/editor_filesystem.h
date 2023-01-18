@@ -53,6 +53,9 @@ struct editor_filesystem_node {
 	int level = 0;
 	augs::file_time_type last_write_time; 
 
+	/* Used for official resources */
+	augs::path_type custom_thumbnail_path;
+
 	editor_filesystem_node* parent = nullptr;
 
 	template <class F>
@@ -277,8 +280,12 @@ struct editor_filesystem_node {
 		ad_hoc_atlas_subjects& out_subjects,
 		ad_hoc_entry_id id_counter = 1
 	) {
-		for_each_file_recursive([&](auto& node) {
-			const auto path = project_folder / node.get_path_in_project();
+		for_each_file_recursive([&id_counter, &out_subjects, &project_folder](auto& node) {
+			auto path = project_folder / node.get_path_in_project();
+
+			if (!node.custom_thumbnail_path.empty()) {
+				path = node.custom_thumbnail_path;
+			}
 
 			if (assets::is_supported_extension<assets::image_id>(path.extension().string())) {
 				node.file_thumbnail_id = id_counter++;

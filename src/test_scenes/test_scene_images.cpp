@@ -29,6 +29,28 @@ void load_test_scene_images(
 
 	all_definitions.reserve(enum_count(test_id_type()));
 
+	auto setup_with_path = [&all_definitions, &lua](const augs::path_type& final_path) {
+		image_definition new_def;
+		new_def.set_source_path({ final_path.string(), true });
+
+		try {
+			load_meta_lua_if_exists(
+				lua, 
+				new_def.meta, 
+				image_definition_view({}, new_def).get_source_image_path()
+			);
+		}
+		catch (const augs::lua_deserialization_error& err) {
+			throw test_scene_asset_loading_error(
+				"Failed to load additional properties for %x:\nNot a valid lua table.\n%x",
+				final_path,
+				err.what()
+			);
+		}
+
+		return all_definitions.allocate(std::move(new_def));
+	};
+
 	auto register_image = [&](augs::path_type at_stem) -> decltype(auto) {
 		at_stem = augs::path_type("gfx") / at_stem;
 
@@ -45,24 +67,7 @@ void load_test_scene_images(
 		auto final_path = at_stem;
 		final_path += with_existent_ext.extension();
 
-		definition.set_source_path({ final_path.string(), true });
-
-		try {
-			load_meta_lua_if_exists(
-				lua, 
-				definition.meta, 
-				image_definition_view({}, definition).get_source_image_path()
-			);
-		}
-		catch (const augs::lua_deserialization_error& err) {
-			throw test_scene_asset_loading_error(
-				"Failed to load additional properties for %x:\nNot a valid lua table.\n%x",
-				at_stem,
-				err.what()
-			);
-		}
-
-		return all_definitions.allocate(std::move(definition));
+		return setup_with_path(final_path);
 	};
 
 	augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {

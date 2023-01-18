@@ -76,7 +76,11 @@ editor_setup::~editor_setup() {
 
 void editor_setup::create_official() {
 	::create_official_resources(initial_scene, official_resources);
-	::create_official_filesystem_from(official_resources, official_files_root);
+	::create_official_filesystem_from(
+		initial_scene,
+		official_resources,
+		official_files_root
+	);
 }
 
 void editor_setup::open_default_windows() {

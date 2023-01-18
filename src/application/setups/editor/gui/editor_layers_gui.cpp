@@ -118,7 +118,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		}
 	};
 
-	if (icon_button("##NewLayer", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], new_layer_drag_drop_callback, "New layer (N)", true)) {
+	if (icon_button("##NewLayer", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], new_layer_drag_drop_callback, "New layer (N)\nMove selection to new layer (Shift+N)\nYou can drag & drop nodes on this button.", true)) {
 		in.setup.create_new_layer();
 	}
 

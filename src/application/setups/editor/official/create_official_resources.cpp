@@ -119,6 +119,7 @@ void create_official_resources(
 }
 
 void create_official_filesystem_from(
+	const intercosm& initial_intercosm,
 	editor_resource_pools& resources,
 	editor_filesystem_node& official_files_root
 ) {
@@ -145,8 +146,22 @@ void create_official_filesystem_from(
 
 			auto& new_node = folder.files[i++];
 			new_node.associated_resource = resource_id;
-			new_node.name = path.filename().string();
 			new_node.set_file_type_by(path.extension().string());
+
+			std::visit(
+				[&](const auto& tag) {
+					const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
+					auto name = flavour.get_name();
+
+					const auto id = str_ops(name).to_lowercase().replace_all(" ", "_").subject;
+					new_node.name = id;
+
+					if (auto sprite = flavour.template find<invariants::sprite>()) {
+						new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
+					}
+				},
+				*typed_resource.official_tag
+			);
 		};
 
 		pool.for_each_id_and_object(resource_handler);

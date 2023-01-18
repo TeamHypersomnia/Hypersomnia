@@ -541,4 +541,8 @@ public:
 	}
 
 	std::optional<editor_setup::parent_layer_info> find_best_layer_for_new_node() const;
+
+	const auto& get_initial_scene() const {
+		return initial_scene;
+	}
 };

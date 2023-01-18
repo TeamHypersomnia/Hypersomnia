@@ -22,6 +22,7 @@
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
+#include "test_scenes/test_scene_flavours.h"
 
 
 void editor_tweaked_widget_tracker::reset() {
@@ -658,7 +659,21 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			const auto resource = in.setup.find_resource(node.resource_id);
 			ensure(resource != nullptr);
 
-			changed = perform_editable_gui(edited_copy, resource->editable.size);
+			auto original_size = resource->editable.size;
+			
+			if (resource->official_tag) {
+				std::visit(
+					[&](const auto& tag) {
+						const auto& flavour = in.setup.get_initial_scene().world.get_flavour(to_entity_flavour_id(tag));
+						if (const auto sprite = flavour.template find<invariants::sprite>()) {
+							original_size = sprite->get_size();
+						}
+					},
+					*resource->official_tag
+				);
+			}
+
+			changed = perform_editable_gui(edited_copy, original_size);
 		}
 		else {
 			changed = perform_editable_gui(edited_copy);

@@ -4792,3 +4792,9 @@ Advantages:
 - Dynamic decorations appear over other sprites
 	- Well this is just a bug, no technological/architectural reason for this to happen
 
+- Button to reset resource properties to default
+	- Since it's not like with nodes that you can just recreate them
+
+- Path virtualization in viewables is non-breaking feature, just an additional option
+	- So won't break existing maps
+

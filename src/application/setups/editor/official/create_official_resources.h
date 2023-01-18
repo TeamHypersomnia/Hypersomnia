@@ -6,4 +6,4 @@ struct editor_filesystem_node;
 struct intercosm;
 
 void create_official_resources(const intercosm&, editor_resource_pools& pools);
-void create_official_filesystem_from(editor_resource_pools& pools, editor_filesystem_node& official_files_root);
+void create_official_filesystem_from(const intercosm&, editor_resource_pools& pools, editor_filesystem_node& official_files_root);
