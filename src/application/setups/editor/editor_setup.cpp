@@ -293,6 +293,13 @@ bool editor_setup::handle_input_before_game(
 		}
 	};
 
+	if (e.msg == message::ldoubleclick) {
+		if (auto node = get_hovered_node(); node.is_set()) {
+			center_view_at_selection();
+			view.panned_camera.zoom = 1.f;
+		}
+	}
+
 	if (e.msg == message::mousemotion) {
 		if (mover.do_mousemotion(make_mover_input(), world_cursor_pos)) {
 			return true;
