@@ -749,7 +749,41 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 								in.setup.quiet_set_last_inspected(*last_layer);
 							}
 							else if (in.setup.inspects_any<editor_node_id>() && last_node) {
-								in.setup.inspect(layer_id);
+								auto& ordered = in.setup.get_layers();
+
+								int state = 0;
+
+								in.setup.clear_inspector();
+
+								for (const editor_layer_id lid : ordered) {
+									if (lid == layer_id) {
+										++state;
+									}
+
+									if (state == 2) {
+										break;
+									}
+
+									auto layer = in.setup.find_layer(lid);
+									ensure(layer != nullptr);
+
+									for (const editor_node_id nid : layer->hierarchy.nodes) {
+										if (nid == *last_node) {
+											++state;
+										}
+
+										if (state) {
+											in.setup.inspect_add_quiet(nid);
+										}
+
+										if (state == 2) {
+											break;
+										}
+									}
+								}
+
+								in.setup.after_quietly_adding_inspected();
+								in.setup.quiet_set_last_inspected(*last_node);
 							}
 							else {
 								in.setup.inspect(layer_id);
