@@ -94,6 +94,12 @@ void allocate_flavours_and_assets_for_resource(
 	else if constexpr(std::is_same_v<editor_ammunition_resource, R>) {
 		ensure(false && "not implemented");
 	}
+	else if constexpr(std::is_same_v<editor_melee_resource, R>) {
+		ensure(false && "not implemented");
+	}
+	else if constexpr(std::is_same_v<editor_explosive_resource, R>) {
+		ensure(false && "not implemented");
+	}
 	else if constexpr(std::is_same_v<editor_sprite_resource, R>) {
 		const auto domain = editable.domain;
 		const int n_frames = resource.animation_frames.size();
@@ -256,6 +262,12 @@ void setup_scene_object_from_resource(
 		ensure(false && "not implemented");
 	}
 	else if constexpr(std::is_same_v<editor_ammunition_resource, R>) {
+		ensure(false && "not implemented");
+	}
+	else if constexpr(std::is_same_v<editor_melee_resource, R>) {
+		ensure(false && "not implemented");
+	}
+	else if constexpr(std::is_same_v<editor_explosive_resource, R>) {
 		ensure(false && "not implemented");
 	}
 	else if constexpr(std::is_same_v<editor_sprite_resource, R>) {
@@ -456,6 +468,20 @@ void editor_setup::rebuild_scene() {
 							requested_equipment r;
 							r.weapon = typed;
 							r.num_given_ammo_pieces = 1;
+
+							auto new_id = r.generate_for(typed_node.get_transform(), step);
+							ensure(scene.world[new_id].alive());
+							setup_node_entity_mapping(new_id);
+						},
+
+						resource->scene_flavour_id
+					);
+				}
+				if constexpr(std::is_same_v<node_type, editor_melee_node> || std::is_same_v<node_type, editor_explosive_node>) {
+					std::visit(
+						[&](const auto& typed) {
+							requested_equipment r;
+							r.weapon = typed;
 
 							auto new_id = r.generate_for(typed_node.get_transform(), step);
 							ensure(scene.world[new_id].alive());

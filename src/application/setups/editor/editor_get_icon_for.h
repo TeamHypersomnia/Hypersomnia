@@ -1,5 +1,6 @@
 #pragma once
 #include "view/viewables/images_in_atlas_map.h"
+#include "application/setups/editor/has_thumbnail_id.h"
 
 struct editor_icon_info {
 	augs::atlas_entry icon;
@@ -66,14 +67,21 @@ rgba editor_setup::get_icon_color_for(
 	else if constexpr(std::is_same_v<T, editor_particles_resource>) {
 		return object.editable.colorize;
 	}
-	else if constexpr(std::is_same_v<T, editor_ammunition_resource> || std::is_same_v<T, editor_firearm_resource>) {
-		return std::visit(
-			[&](const auto& typed) -> rgba {
-				return scene.world.get_flavour(typed).template get<invariants::sprite>().color;
+	else if constexpr(std::is_same_v<T, editor_material_resource>) {
+		return white;
+	}
+	else {
+		const auto sprite = std::visit(
+			[&](const auto& typed) {
+				return scene.world.get_flavour(typed).template find<invariants::sprite>();
 			},
 
 			object.scene_flavour_id
 		);
+
+		if (sprite) {
+			return sprite->color;
+		}
 	}
 
 	return white;
@@ -100,7 +108,7 @@ editor_icon_info editor_setup::get_icon_for(
 			return *result;
 		}
 	}
-	else if constexpr(std::is_same_v<T, editor_sprite_resource> || std::is_same_v<T, editor_ammunition_resource> || std::is_same_v<T, editor_firearm_resource>) {
+	else if constexpr(has_thumbnail_id_v<T>) {
 		if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, object.thumbnail_id)) {
 			return { *ad_hoc, augs::imgui_atlas_type::AD_HOC };
 		}

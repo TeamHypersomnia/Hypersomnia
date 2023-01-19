@@ -230,8 +230,8 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 
 	auto& firearms_folder = root.subfolders[i++];
 	auto& ammunition_folder = root.subfolders[i++];
-	auto& explosives_folder = root.subfolders[i++];
 	auto& melee_weapons_folder = root.subfolders[i++];
+	auto& explosives_folder = root.subfolders[i++];
 
 	lights_folder.name = "Lights";
 	particles_folder.name = "Particles";
@@ -240,8 +240,8 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 
 	firearms_folder.name = "Firearms";
 	ammunition_folder.name = "Ammunition";
-	explosives_folder.name = "Explosives";
 	melee_weapons_folder.name = "Melee weapons";
+	explosives_folder.name = "Explosives";
 
 	for (auto& s : root.subfolders) {
 		s.type = editor_filesystem_node_type::FOLDER;
@@ -270,8 +270,8 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 	auto& firearms_folder = root.subfolders[i++];
 	auto& ammunition_folder = root.subfolders[i++];
-	auto& explosives_folder = root.subfolders[i++];
 	auto& melee_weapons_folder = root.subfolders[i++];
+	auto& explosives_folder = root.subfolders[i++];
 
 	(void)prefabs_folder;
 	(void)wandering_pixels_folder;
@@ -364,8 +364,8 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 	handle(firearms_folder, resources.get_pool_for<editor_firearm_resource>(), assets::necessary_image_id::CHAMBER_SLOT_ICON);
 	handle(ammunition_folder, resources.get_pool_for<editor_ammunition_resource>(), assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
-	handle(explosives_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::BOMB_INDICATOR);
-	handle(melee_weapons_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::SHOULDER_SLOT_ICON);
+	handle(melee_weapons_folder, resources.get_pool_for<editor_melee_resource>(), assets::necessary_image_id::SHOULDER_SLOT_ICON);
+	handle(explosives_folder, resources.get_pool_for<editor_explosive_resource>(), assets::necessary_image_id::BOMB_INDICATOR);
 
 	root.set_parents(0);
 }

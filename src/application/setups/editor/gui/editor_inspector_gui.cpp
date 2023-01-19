@@ -177,6 +177,25 @@ std::string perform_editable_gui(editor_ammunition_node_editable& e) {
 	return result;
 }
 
+std::string perform_editable_gui(editor_melee_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Position", e.pos);
+	edit_property(result, "Rotation", e.rotation);
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_explosive_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Position", e.pos);
+	edit_property(result, "Rotation", e.rotation);
+
+	return result;
+}
 
 std::string perform_editable_gui(editor_light_node_editable& e) {
 	using namespace augs::imgui;
@@ -387,6 +406,20 @@ std::string perform_editable_gui(editor_firearm_resource_editable&) {
 }
 
 std::string perform_editable_gui(editor_ammunition_resource_editable&) {
+	using namespace augs::imgui;
+	std::string result;
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_melee_resource_editable&) {
+	using namespace augs::imgui;
+	std::string result;
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_explosive_resource_editable&) {
 	using namespace augs::imgui;
 	std::string result;
 

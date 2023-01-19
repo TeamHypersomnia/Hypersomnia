@@ -10,6 +10,8 @@ struct editor_particles_node;
 
 struct editor_firearm_node;
 struct editor_ammunition_node;
+struct editor_melee_node;
+struct editor_explosive_node;
 
 using all_editor_node_types = type_list<
 	editor_sprite_node,
@@ -18,7 +20,9 @@ using all_editor_node_types = type_list<
 	editor_particles_node,
 
 	editor_firearm_node,
-	editor_ammunition_node
+	editor_ammunition_node,
+	editor_melee_node,
+	editor_explosive_node
 
 	//editor_prefab_node,
 >;

@@ -52,6 +52,7 @@
 #include "augs/templates/traits/has_flip.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/setups/editor/editor_rebuild_scene.hpp"
+#include "application/setups/editor/has_thumbnail_id.h"
 
 editor_setup::editor_setup(
 	sol::state& lua,
@@ -380,15 +381,6 @@ vec2 editor_setup::get_world_cursor_pos(const camera_eye eye) const {
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", project.meta.name);
 }
-
-template <class T, class = void>
-struct has_thumbnail_id : std::false_type {};
-
-template <class T>
-struct has_thumbnail_id<T, decltype(std::declval<T&>().thumbnail_id, void())> : std::true_type {};
-
-template <class T>
-constexpr bool has_thumbnail_id_v = has_thumbnail_id<T>::value;
 
 std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 	if (rebuild_ad_hoc_atlas) {
@@ -1892,6 +1884,8 @@ template struct edit_resource_command<editor_particles_resource>;
 
 template struct edit_resource_command<editor_firearm_resource>;
 template struct edit_resource_command<editor_ammunition_resource>;
+template struct edit_resource_command<editor_melee_resource>;
+template struct edit_resource_command<editor_explosive_resource>;
 
 template struct edit_node_command<editor_sprite_node>;
 template struct edit_node_command<editor_sound_node>;
@@ -1900,6 +1894,8 @@ template struct edit_node_command<editor_particles_node>;
 
 template struct edit_node_command<editor_firearm_node>;
 template struct edit_node_command<editor_ammunition_node>;
+template struct edit_node_command<editor_melee_node>;
+template struct edit_node_command<editor_explosive_node>;
 
 template struct create_node_command<editor_sprite_node>;
 template struct create_node_command<editor_sound_node>;
@@ -1908,3 +1904,5 @@ template struct create_node_command<editor_particles_node>;
 
 template struct create_node_command<editor_firearm_node>;
 template struct create_node_command<editor_ammunition_node>;
+template struct create_node_command<editor_melee_node>;
+template struct create_node_command<editor_explosive_node>;

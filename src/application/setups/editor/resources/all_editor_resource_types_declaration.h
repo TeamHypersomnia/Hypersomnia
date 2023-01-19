@@ -10,6 +10,8 @@ struct editor_particles_resource;
 
 struct editor_firearm_resource;
 struct editor_ammunition_resource;
+struct editor_melee_resource;
+struct editor_explosive_resource;
 
 struct editor_material_resource;
 
@@ -22,6 +24,8 @@ using all_editor_resource_types = type_list<
 
 	editor_firearm_resource,
 	editor_ammunition_resource,
+	editor_melee_resource,
+	editor_explosive_resource,
 
 	editor_material_resource
 >;
