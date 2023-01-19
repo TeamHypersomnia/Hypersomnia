@@ -690,7 +690,7 @@ namespace test_scenes {
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = light_cyan;
-						w.particles_count = 150;
+						w.num_particles = 150;
 
 						const auto reach = xywh(light_pos.x- 350, light_pos.y-350, 500, 500);
 						e.set_logical_size(reach.get_size());
@@ -727,7 +727,6 @@ namespace test_scenes {
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = cyan;
-						w.particles_count = 50;
 						e.set_logical_size(left_reach.get_size());
 						e.set_logic_transform(left_reach.get_center());
 					});
@@ -739,7 +738,6 @@ namespace test_scenes {
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = orange;
-						w.particles_count = 50;
 						e.set_logical_size(right_reach.get_size());
 						e.set_logic_transform(right_reach.get_center());
 					});
@@ -1064,8 +1062,8 @@ namespace test_scenes {
 				auto& w = e.template get<components::wandering_pixels>();
 
 				w.colorize = cyan;
-				w.particles_count = 40;
-				w.keep_particles_within_bounds = true;
+				w.num_particles = 40;
+				w.force_particles_within_bounds = true;
 				e.set_logical_size(vec2(750, 750));
 				e.set_logic_transform(aquarium_origin);
 			});

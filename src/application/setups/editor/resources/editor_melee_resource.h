@@ -29,6 +29,6 @@ struct editor_melee_resource {
 	}
 
 	static const char* get_type_name() {
-		return "melee";
+		return "Melee";
 	}
 };

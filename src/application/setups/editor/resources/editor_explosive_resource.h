@@ -29,6 +29,6 @@ struct editor_explosive_resource {
 	}
 
 	static const char* get_type_name() {
-		return "explosive";
+		return "Explosive";
 	}
 };

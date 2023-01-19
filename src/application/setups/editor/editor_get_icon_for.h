@@ -40,6 +40,9 @@ rgba editor_setup::get_icon_color_for(
 		else if constexpr(std::is_same_v<T, editor_particles_node>) {
 			node_color = object.editable.colorize;
 		}
+		else if constexpr(std::is_same_v<T, editor_wandering_pixels_node>) {
+			node_color = object.editable.colorize;
+		}
 
 		const auto* maybe_resource = find_resource(object.resource_id);
 
@@ -130,6 +133,9 @@ editor_icon_info editor_setup::get_icon_for(
 		}
 
 		return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE], augs::imgui_atlas_type::GAME };
+	}
+	else if constexpr(std::is_same_v<T, editor_wandering_pixels_resource>) {
+		return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS], augs::imgui_atlas_type::GAME };
 	}
 
 	return { in.necessary_images[assets::necessary_image_id::DEFUSING_INDICATOR], augs::imgui_atlas_type::GAME };

@@ -6,10 +6,10 @@ auto float_range(const A a, const B b) {
 }
 
 void create_particles(const intercosm& scene, editor_resource_pools& pools) {
-	auto& pool = pools.template get_pool_for<editor_particles_resource>();
 	(void)scene;
 
 	{
+		auto& pool = pools.template get_pool_for<editor_particles_resource>();
 		using test_id_type = test_particles_decorations;
 
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
@@ -24,6 +24,25 @@ void create_particles(const intercosm& scene, editor_resource_pools& pools) {
 			res.scene_flavour_id = flavour_id;
 			res.editable.wandering = cp.wandering;
 			res.editable.colorize = cp.effect.modifier.colorize;
+
+			pool.allocate(res);
+		});
+	}
+
+	{
+		auto& pool = pools.template get_pool_for<editor_wandering_pixels_resource>();
+		using test_id_type = test_wandering_pixels_decorations;
+
+		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
+			const auto flavour_id = to_entity_flavour_id(enum_id);
+			//const auto& wp =       scene.world.get_flavour(flavour_id).template get<invariants::wandering_pixels>();
+			const auto& def_comp = scene.world.get_flavour(flavour_id).template get<components::wandering_pixels>();
+
+			auto res = editor_wandering_pixels_resource();
+			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
+			res.official_tag = enum_id;
+			res.scene_flavour_id = flavour_id;
+			res.editable.node_defaults = def_comp;
 
 			pool.allocate(res);
 		});

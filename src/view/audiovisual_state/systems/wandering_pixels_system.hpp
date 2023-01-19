@@ -44,16 +44,9 @@ void wandering_pixels_system::advance_for(
 	}
 
 	const auto total_animation_duration = ::calc_total_duration(anim->frames);
-
-	if (cache.recorded_particle_count != wandering.particles_count) {
-		cache.particles.resize(wandering.particles_count);
-		cache.recorded_particle_count = wandering.particles_count;
-	}
-
 	const auto current_reach = xywh(*it.find_aabb());
 
-	if (cache.recorded_reach != current_reach) {
-		/* refresh_cache */ 
+	auto reset_positions = [&]() {
 		for (auto& p : cache.particles) {
 			p.pos.set(
 				current_reach.x + used_rng.randval(0u, static_cast<unsigned>(current_reach.w)), 
@@ -62,7 +55,17 @@ void wandering_pixels_system::advance_for(
 
 			p.current_lifetime_ms = used_rng.randval(0.f, total_animation_duration);
 		}
+	};
 
+	if (cache.recorded_particle_count != wandering.num_particles) {
+		cache.particles.resize(wandering.num_particles);
+		cache.recorded_particle_count = wandering.num_particles;
+		reset_positions();
+	}
+
+	if (cache.recorded_reach != current_reach) {
+		/* refresh_cache */ 
+		reset_positions();
 		cache.recorded_reach = current_reach;
 	}
 
@@ -148,7 +151,7 @@ void wandering_pixels_system::advance_for(
 
 		//p.pos.x += cos(global_time_seconds) * 20 * dt_secs * 1.2;
 
-		if (wandering.keep_particles_within_bounds) {
+		if (wandering.force_particles_within_bounds) {
 			const auto velocity = p.pos - prev_pos;
 
 			p.pos += augs::steer_to_avoid_edges(

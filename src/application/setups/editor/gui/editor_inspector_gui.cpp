@@ -187,6 +187,34 @@ std::string perform_editable_gui(editor_melee_node_editable& e) {
 	return result;
 }
 
+std::string perform_editable_gui(components::wandering_pixels& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Colorize", e.colorize);
+	edit_property(result, "Num particles", e.num_particles);
+	edit_property(result, "Force particles within bounds", e.force_particles_within_bounds);
+	edit_property(result, "Illuminate", e.illuminate);
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_wandering_pixels_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	edit_property(result, "Position", e.pos);
+	edit_property(result, "Rotation", e.rotation);
+
+	ImGui::Separator();
+
+	if (const auto new_res = perform_editable_gui(static_cast<components::wandering_pixels&>(e)); !new_res.empty()) {
+		result = new_res;
+	}
+
+	return result;
+}
+
 std::string perform_editable_gui(editor_explosive_node_editable& e) {
 	using namespace augs::imgui;
 	std::string result;
@@ -415,6 +443,19 @@ std::string perform_editable_gui(editor_ammunition_resource_editable&) {
 std::string perform_editable_gui(editor_melee_resource_editable&) {
 	using namespace augs::imgui;
 	std::string result;
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_wandering_pixels_resource_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	if (auto scope = augs::imgui::scoped_tree_node_ex("Node defaults")) {
+		if (const auto new_res = perform_editable_gui(e.node_defaults); !new_res.empty()) {
+			result = new_res;
+		}
+	}
 
 	return result;
 }

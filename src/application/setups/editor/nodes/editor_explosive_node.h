@@ -30,6 +30,6 @@ struct editor_explosive_node {
 	}
 
 	static const char* get_type_name() {
-		return "explosive";
+		return "Explosive";
 	}
 };

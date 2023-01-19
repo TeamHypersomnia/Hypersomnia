@@ -41,6 +41,10 @@ void setup_entity_from_node(
 		auto& light = agg.template get<components::light>();
 		light.color *= editable.colorize;
 	}
+	else if constexpr(std::is_same_v<N, editor_wandering_pixels_node>) {
+		auto& wandering_pixels = agg.template get<components::wandering_pixels>();
+		wandering_pixels = static_cast<const components::wandering_pixels&>(editable);
+	}
 
 	if (auto geo = agg.template find<components::overridden_geo>()) {
 		if constexpr(has_size_v<Editable>) {
@@ -87,6 +91,9 @@ void allocate_flavours_and_assets_for_resource(
 
 		auto& flavour_pool = common.flavours.get_for<entity_type>();
 		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
+	}
+	else if constexpr(std::is_same_v<editor_wandering_pixels_resource, R>) {
+		ensure(false && "not implemented");
 	}
 	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
 		ensure(false && "not implemented");
@@ -257,6 +264,9 @@ void setup_scene_object_from_resource(
 			particles.effect.id = resource.scene_asset_id;
 			particles.effect.modifier = static_cast<particle_effect_modifier>(editable);
 		}
+	}
+	else if constexpr(std::is_same_v<editor_wandering_pixels_resource, R>) {
+		ensure(false && "not implemented");
 	}
 	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
 		ensure(false && "not implemented");

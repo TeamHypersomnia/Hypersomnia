@@ -1881,6 +1881,7 @@ template struct edit_resource_command<editor_sound_resource>;
 template struct edit_resource_command<editor_light_resource>;
 template struct edit_resource_command<editor_material_resource>;
 template struct edit_resource_command<editor_particles_resource>;
+template struct edit_resource_command<editor_wandering_pixels_resource>;
 
 template struct edit_resource_command<editor_firearm_resource>;
 template struct edit_resource_command<editor_ammunition_resource>;
@@ -1891,6 +1892,7 @@ template struct edit_node_command<editor_sprite_node>;
 template struct edit_node_command<editor_sound_node>;
 template struct edit_node_command<editor_light_node>;
 template struct edit_node_command<editor_particles_node>;
+template struct edit_node_command<editor_wandering_pixels_node>;
 
 template struct edit_node_command<editor_firearm_node>;
 template struct edit_node_command<editor_ammunition_node>;
@@ -1901,6 +1903,7 @@ template struct create_node_command<editor_sprite_node>;
 template struct create_node_command<editor_sound_node>;
 template struct create_node_command<editor_light_node>;
 template struct create_node_command<editor_particles_node>;
+template struct create_node_command<editor_wandering_pixels_node>;
 
 template struct create_node_command<editor_firearm_node>;
 template struct create_node_command<editor_ammunition_node>;

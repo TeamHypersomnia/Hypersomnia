@@ -51,6 +51,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_sound_resource>,
 	edit_resource_command<editor_light_resource>,
 	edit_resource_command<editor_particles_resource>,
+	edit_resource_command<editor_wandering_pixels_resource>,
 	edit_resource_command<editor_material_resource>,
 
 	edit_resource_command<editor_firearm_resource>,
@@ -62,6 +63,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_node_command<editor_sound_node>,
 	edit_node_command<editor_light_node>,
 	edit_node_command<editor_particles_node>,
+	edit_node_command<editor_wandering_pixels_node>,
 
 	edit_node_command<editor_firearm_node>,
 	edit_node_command<editor_ammunition_node>,
@@ -78,6 +80,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	create_node_command<editor_sound_node>,
 	create_node_command<editor_light_node>,
 	create_node_command<editor_particles_node>,
+	create_node_command<editor_wandering_pixels_node>,
 
 	create_node_command<editor_firearm_node>,
 	create_node_command<editor_ammunition_node>,

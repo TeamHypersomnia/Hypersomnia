@@ -35,6 +35,6 @@ struct editor_ammunition_resource {
 	}
 
 	static const char* get_type_name() {
-		return "ammunition";
+		return "Ammunition";
 	}
 };

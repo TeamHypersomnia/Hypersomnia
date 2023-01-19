@@ -56,7 +56,12 @@ namespace test_flavours {
 
 			components::wandering_pixels initial_wandering;
 			initial_wandering.illuminate = true;
+			initial_wandering.num_particles = 50;
 			meta.set(initial_wandering);
+
+			components::overridden_geo s;
+			s.size.emplace(vec2(750, 750));
+			meta.set(s);
 		}
 
 		{
@@ -73,9 +78,9 @@ namespace test_flavours {
 
 			{
 				components::wandering_pixels wandering;
-				wandering.keep_particles_within_bounds = true;
+				wandering.force_particles_within_bounds = true;
 				wandering.colorize = { 234, 228, 201, 255 };
-				wandering.particles_count = 15;
+				wandering.num_particles = 15;
 				wandering.illuminate = true;
 				meta.set(wandering);
 
@@ -99,9 +104,9 @@ namespace test_flavours {
 
 			{
 				components::wandering_pixels wandering;
-				wandering.keep_particles_within_bounds = true;
+				wandering.force_particles_within_bounds = true;
 				wandering.colorize = { 234, 228, 201, 255 };
-				wandering.particles_count = 500;
+				wandering.num_particles = 500;
 				meta.set(wandering);
 
 				components::overridden_geo s;

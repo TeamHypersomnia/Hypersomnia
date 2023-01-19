@@ -15,6 +15,7 @@
 #include "application/setups/editor/editor_get_icon_for.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/setups/editor/resources/resource_traits.h"
+#include "application/setups/editor/nodes/editor_node_defaults.h"
 
 void editor_layers_gui::perform(const editor_layers_input in) {
 	using namespace augs::imgui;
@@ -176,6 +177,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			new_node.resource_id = resource_id;
 			new_node.unique_name = new_name;
 			new_node.editable.pos = pos;
+
+			::setup_node_defaults(new_node, typed_resource);
 
 			create_node_command<node_type> command;
 

@@ -188,7 +188,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 				int total = 0;
 
 				all_visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&total](const auto& e) {
-					total += e.template get<components::wandering_pixels>().particles_count;
+					total += e.template get<components::wandering_pixels>().num_particles;
 				});
 
 				return total;
@@ -207,7 +207,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, typed_wandering_pixels, game_images);
 						};
 
-						const auto current_count = typed_wandering_pixels.template get<components::wandering_pixels>().particles_count;;
+						const auto current_count = typed_wandering_pixels.template get<components::wandering_pixels>().num_particles;;
 						current_index += current_count;
 
 						input.pool.enqueue(job);
@@ -221,7 +221,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 				int total = 0;
 
 				all_visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&total](const auto& e) {
-					total += e.template get<components::wandering_pixels>().particles_count;
+					total += e.template get<components::wandering_pixels>().num_particles;
 				});
 
 				return total;
@@ -240,7 +240,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, typed_wandering_pixels, game_images);
 						};
 
-						const auto current_count = typed_wandering_pixels.template get<components::wandering_pixels>().particles_count;;
+						const auto current_count = typed_wandering_pixels.template get<components::wandering_pixels>().num_particles;;
 						current_index += current_count;
 
 						input.pool.enqueue(job);

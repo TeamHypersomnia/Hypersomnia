@@ -13,6 +13,7 @@
 #include "application/setups/editor/detail/simple_two_tabs.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "application/setups/editor/nodes/editor_node_defaults.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem(project_special_root);
@@ -58,6 +59,9 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					new_node.resource_id = resource_id;
 					new_node.unique_name = new_name;
 					new_node.editable.pos = in.setup.get_world_cursor_pos();
+
+					::setup_node_defaults(new_node, typed_resource);
+
 					world_position_started_dragging = new_node.editable.pos;
 
 					create_node_command<node_type> command;
@@ -357,7 +361,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 	// TODO: redirect to proper pools!
 	handle(particles_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE);
-	//handle(wandering_pixels_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS);
+	handle(wandering_pixels_folder, resources.get_pool_for<editor_wandering_pixels_resource>(), assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS);
 	//handle(prefabs_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
 
 	handle(lights_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_LIGHT);

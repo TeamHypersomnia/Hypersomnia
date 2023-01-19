@@ -30,6 +30,6 @@ struct editor_melee_node {
 	}
 
 	static const char* get_type_name() {
-		return "melee";
+		return "Melee";
 	}
 };
