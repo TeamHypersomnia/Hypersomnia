@@ -205,7 +205,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	ImGui::SameLine();
 
 	text_disabled("(Special resources)");
-	get_viewed_special_root().in_ui_order(node_callback, with_closed_folders);
+	get_viewed_special_root().in_ui_order(node_callback, with_closed_folders, true);
 }
 
 void editor_filesystem_gui::clear_drag_drop() {

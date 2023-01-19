@@ -104,8 +104,18 @@ struct editor_filesystem_node {
 	}
 
 	template <class F>
-	void in_ui_order(F&& callback, bool with_closed_folders = false) {
+	void in_ui_order(
+		F&& callback,
+		const bool with_closed_folders = false,
+		const bool skip_empty_folders = false
+	) {
 		for (auto& subfolder : subfolders) {
+			if (skip_empty_folders) {
+				if (subfolder.subfolders.empty() && subfolder.files.empty()) {
+					continue;
+				}
+			}
+
 			callback(subfolder);
 
 			if (with_closed_folders || subfolder.is_open) {
