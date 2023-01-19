@@ -24,6 +24,12 @@ namespace editor_widgets {
 			rgba(35, 60, 90, bg_alpha)
 		};
 
+		const auto dragged_cols = std::array<rgba, 3> {
+			rgba(70, 70, 70, bg_alpha),
+			rgba(0, 0, 0, bg_alpha),
+			rgba(0, 0, 0, bg_alpha)
+		};
+
 		const auto inspected_cols = std::array<rgba, 3> {
 			rgba(35-10, 60-10, 90-10, bg_alpha),
 			rgba(35, 60, 90, bg_alpha),
@@ -43,10 +49,18 @@ namespace editor_widgets {
 		bool result = false;
 
 		{
-			auto colored_selectable = scoped_selectable_colors(is_inspected ? inspected_cols : bg_cols);
 			auto id = scoped_id(label.c_str());
 
-			result = ImGui::Selectable("###Button", is_inspected, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size);
+			auto payload = ImGui::GetDragDropPayload();
+
+			ImGuiWindow* window = ImGui::GetCurrentWindow();
+			ImGuiID sid = window->GetID("###Button");
+
+			const bool is_dragged = window && payload && payload->SourceId == sid;
+
+			auto colored_selectable = scoped_selectable_colors(is_dragged ? dragged_cols : (is_inspected ? inspected_cols : bg_cols));
+
+			result = ImGui::Selectable("###Button", is_inspected || is_dragged, 0, button_size);
 			after_selectable_callback();
 		}
 

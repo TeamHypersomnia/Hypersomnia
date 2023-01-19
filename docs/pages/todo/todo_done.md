@@ -4814,3 +4814,5 @@ Advantages:
 		- We probably won't do this for custom projects since we wanted all properties to be found in the map file
 
 - Also we determined to just put a default duration of 40 ms for visualization, accuracy is not a problem here
+- We could try ubuntu-20.04 or wait for github actions to roll out 22.05
+

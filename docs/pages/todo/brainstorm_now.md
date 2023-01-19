@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- We could try ubuntu-20.04 or wait for github actions to roll out 22.05
-
 - Once we're remotely close to MVP - EVEN WITHOUT A GEOMETRY EDITOR YET!
 	- We should start rebuilding fy_minilab pretty soon
 		- This way we reason what is really needed at this point
@@ -22,8 +20,6 @@ summary: That which we are brainstorming at the moment.
 		- So they'd be values after pressing Reset in resource view
 		- It would make it extremely easy to port resources from one map to another
 	
-
-
 - By the way let's thoroughly check which officials we want to list
 	- We might also want to change some names for accuracy so that it's future-proof
 		- Will break maps but only if we wanted to press "Update official content" (in player window) on them

@@ -96,6 +96,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		rgba(35+10, 60+10, 90+10, 255)
 	};
 
+	const auto dragged_cols = std::array<rgba, 3> {
+		rgba(70, 70, 70, 255),
+		rgba(0, 0, 0, 255),
+		rgba(0, 0, 0, 255)
+	};
+
 	const auto hovered_cols = std::array<rgba, 3> {
 		rgba(15, 40, 70, 255),
 		rgba(15, 40, 70, 255),
@@ -306,9 +312,21 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			bool rename_this_node = false;
 
 			{
+				auto id = scoped_id(label.c_str());
+
 				const bool is_hovered_on_scene = node_id == in.setup.get_hovered_node();
+				auto payload = ImGui::GetDragDropPayload();
+
+				ImGuiWindow* window = ImGui::GetCurrentWindow();
+				ImGuiID sid = window->GetID("###NodeButton");
+
+				const bool is_dragged = window && payload && payload->SourceId == sid;
 
 				const auto final_cols = [&]() {
+					if (is_dragged) {
+						return dragged_cols;
+					}
+
 					if (is_hovered_on_scene) {
 						if (is_inspected) {
 							return hovered_inspected_cols;
@@ -326,9 +344,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}();
 
 				auto colored_selectable = scoped_selectable_colors(final_cols);
-				auto id = scoped_id(label.c_str());
 
-				if (ImGui::Selectable("###NodeButton", is_inspected || is_hovered_on_scene, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size)) {
+				if (ImGui::Selectable("###NodeButton", is_inspected || is_hovered_on_scene || is_dragged, 0, button_size)) {
 					if (ImGui::GetIO().KeyShift && !in.setup.wants_multiple_selection()) {
 						auto last_inspected = in.setup.get_last_inspected_layer_or_node();
 						auto last_node = std::get_if<editor_node_id>(&last_inspected);
@@ -621,7 +638,14 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				previous_item = layer_id;
 
-				auto colored_selectable = scoped_selectable_colors(is_visually_inspected ? inspected_cols : bg_cols);
+				auto payload = ImGui::GetDragDropPayload();
+
+				ImGuiWindow* window = ImGui::GetCurrentWindow();
+				ImGuiID sid = window->GetID("###LayerButton");
+
+				const bool is_dragged = window && payload && payload->SourceId == sid;
+
+				auto colored_selectable = scoped_selectable_colors(is_dragged ? dragged_cols : (is_visually_inspected ? inspected_cols : bg_cols));
 
 				if (was_disabled) {
 					ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
@@ -635,7 +659,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowItemOverlap
 				;
 
-				const bool tree_node_pressed = ImGui::Selectable("###LayerButton", is_visually_inspected, flags);
+				const bool tree_node_pressed = ImGui::Selectable("###LayerButton", is_dragged || is_visually_inspected, flags);
 
 				if (ImGui::BeginPopupContextItem()) {
 					in.setup.inspect_only(layer_id);

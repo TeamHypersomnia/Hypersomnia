@@ -665,6 +665,7 @@ void b2DynamicTree::Validate() const
 	ValidateMetrics(m_root);
 
 	int32 freeCount = 0;
+	(void)freeCount;
 	int32 freeIndex = m_freeList;
 	while (freeIndex != b2_nullNode)
 	{
