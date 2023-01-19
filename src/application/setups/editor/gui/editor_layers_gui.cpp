@@ -329,7 +329,50 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				auto id = scoped_id(label.c_str());
 
 				if (ImGui::Selectable("###NodeButton", is_inspected || is_hovered_on_scene, ImGuiSelectableFlags_DrawHoveredWhenHeld, button_size)) {
-					in.setup.inspect(node_id);
+					if (ImGui::GetIO().KeyShift && !in.setup.wants_multiple_selection()) {
+						auto last_inspected = in.setup.get_last_inspected_layer_or_node();
+						auto last_node = std::get_if<editor_node_id>(&last_inspected);
+
+						if (in.setup.inspects_any<editor_node_id>() && last_node && *last_node != node_id) {
+							auto& ordered = in.setup.get_layers();
+
+							int state = 0;
+
+							in.setup.clear_inspector();
+
+							for (const editor_layer_id lid : ordered) {
+								auto layer = in.setup.find_layer(lid);
+								ensure(layer != nullptr);
+
+								for (const editor_node_id nid : layer->hierarchy.nodes) {
+									if (nid == node_id || nid == *last_node) {
+										++state;
+									}
+
+									if (state) {
+										in.setup.inspect_add_quiet(nid);
+									}
+
+									if (state == 2) {
+										break;
+									}
+								}
+
+								if (state == 2) {
+									break;
+								}
+							}
+
+							in.setup.after_quietly_adding_inspected();
+							in.setup.quiet_set_last_inspected(*last_node);
+						}
+						else {
+							in.setup.inspect(node_id);
+						}
+					}
+					else {
+						in.setup.inspect(node_id);
+					}
 				}
 
 				if (ImGui::BeginPopupContextItem()) {

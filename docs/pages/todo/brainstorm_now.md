@@ -6,6 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Once we're remotely close to MVP - EVEN WITHOUT A GEOMETRY EDITOR YET!
+	- We should start rebuilding fy_minilab pretty soon
+		- This way we reason what is really needed at this point
+		- Per-sprite geometry editor will obviously be necessary too but we'll port it
+	- We'll need a way to mass export image parameters like neon maps
+	- We could make it way easier: just export neon maps as pngs, we don't care about rest of the parameters
+		- Except shapes... but we could reapply them, shouldn't be that many
+	- We might want already export to json from the old editor
+		- We'll import in json in the new editor
+	- It's a cool idea - next to a png file there'd be a file.png.json file
+		- These would ONLY be defaults
+		- So they'd be values after pressing Reset in resource view
+		- It would make it extremely easy to port resources from one map to another
+	
+
+
 - By the way let's thoroughly check which officials we want to list
 	- We might also want to change some names for accuracy so that it's future-proof
 		- Will break maps but only if we wanted to press "Update official content" (in player window) on them
