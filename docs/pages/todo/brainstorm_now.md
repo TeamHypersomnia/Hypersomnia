@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We could try ubuntu-20.04 or wait for github actions to roll out 22.05
+
 - Once we're remotely close to MVP - EVEN WITHOUT A GEOMETRY EDITOR YET!
 	- We should start rebuilding fy_minilab pretty soon
 		- This way we reason what is really needed at this point

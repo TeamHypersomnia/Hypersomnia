@@ -29,7 +29,7 @@ jobs:
         fetch-depth: 0
 
     - name: Install packages
-      run: sudo apt-get install cmake ninja-build libxcb-keysyms1 libxcb-keysyms1-dev libxi6 libxi-dev alsa-oss osspd-alsa osspd libasound2 libasound2-dev p7zip p7zip-full libgl1-mesa-glx libxcb-glx0-dev libx11-xcb-dev
+      run: sudo apt-get install cmake ninja-build libxcb-keysyms1 libxcb-keysyms1-dev libxi6 libxi-dev alsa-oss osspd-alsa osspd libasound2 libasound2-dev p7zip p7zip-full libgl1 libxcb-glx0-dev libx11-xcb-dev
 
     - name: Install LLVM
       run: . cmake/linux_actions/install_llvm.sh
