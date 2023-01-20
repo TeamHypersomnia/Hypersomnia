@@ -71,8 +71,13 @@ auto on_shape_representation(
 ) {
 	if constexpr(A::template has<invariants::box_marker>()) {
 		const auto& b = shapized_entity.get_logical_size(); 
+		const auto si = shapized_entity.get_cosmos().get_si();
+
 		b2PolygonShape shape;
-		shape.SetAsBox(b.x / 2, b.y / 2);
+		const auto hx = si.get_meters(b.x / 2);
+		const auto hy = si.get_meters(b.y / 2);
+
+		shape.SetAsBox(hx, hy);
 		return callback(shape);
 	}
 
@@ -88,6 +93,7 @@ auto entity_overlaps_entity(
 
 	if (shapized_entity.template has<invariants::fixtures>()) {
 		/* TODO */
+		ensure(false && "not implemented");
 	}
 	else {
 		return on_shape_representation(shapized_entity, [&](const auto& shape) -> std::optional<b2TestOverlapOutput> {

@@ -157,6 +157,7 @@ std::optional<const_entity_handle> debugger_go_to_entity_gui::perform(
 				const auto query = current_input_text;
 	
 				unsigned hits = 0;
+				(void)hits;
 					
 				cosm.for_each_entity([&](const auto& handle) {
 					const auto name = handle.get_name();

@@ -2,13 +2,6 @@
 #include "game/enums/marker_type.h"
 #include "game/enums/faction_type.h"
 
-struct generator_marker {
-	// GEN INTROSPECTOR struct generator_marker
-	item_flavour_id generated_eq;
-	int charges = 1;
-	// END GEN INTROSPECTOR
-};
-
 namespace invariants {
 	struct point_marker {
 		static constexpr bool reinfer_when_tweaking = true;
@@ -33,7 +26,7 @@ namespace components {
 
 		// GEN INTROSPECTOR struct components::marker
 		faction_type associated_faction = faction_type::METROPOLIS;
-		generator_marker generator;
+		pad_bytes<sizeof(item_flavour_id) + sizeof(int)> dummy_compat;
 		// END GEN INTROSPECTOR
 	};
 }
