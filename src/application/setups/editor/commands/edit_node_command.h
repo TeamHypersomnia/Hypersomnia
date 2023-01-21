@@ -26,15 +26,29 @@ struct edit_node_command {
 struct rename_node_command {
 	editor_command_meta meta;
 
-	editor_node_id node_id;
+	struct entry {
+		editor_node_id node_id;
+		std::string before;
+	};
 
-	std::string before;
+	std::vector<entry> entries;
+
+	void push_entry(editor_node_id);
+
 	std::string after;
 
 	std::string built_description;
 
 	void undo(editor_command_input in);
 	void redo(editor_command_input in);
+
+	auto size() const {
+		return entries.size();
+	}
+
+	auto empty() const {
+		return entries.empty();
+	}
 
 	const auto& describe() const {
 		return built_description;

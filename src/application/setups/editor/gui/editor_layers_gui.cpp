@@ -486,13 +486,16 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 						currently_renamed_object = std::nullopt;
 
 						if (edited_node_name != node.unique_name && !edited_node_name.empty()) {
-							rename_node_command cmd;
+							auto cmd = in.setup.make_command_from_selected_nodes<rename_node_command>("Renamed ");
+							cmd.after = edited_node_name;
 
-							cmd.node_id = node_id;
-							cmd.after = in.setup.get_free_node_name_for(edited_node_name);
-							cmd.built_description = typesafe_sprintf("Renamed node to %x", cmd.after);
+							if (cmd.size() == 1) {
+								cmd.built_description = typesafe_sprintf("Renamed node to %x", cmd.after);
+							}
 
-							in.setup.post_new_command(std::move(cmd)); 
+							if (!cmd.empty()) {
+								in.setup.post_new_command(std::move(cmd)); 
+							}
 						}
 					}
 

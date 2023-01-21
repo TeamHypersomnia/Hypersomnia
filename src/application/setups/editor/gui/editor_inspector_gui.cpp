@@ -815,11 +815,16 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 			if (input_text<100>("##NameInput", edited_node_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
 				if (edited_node_name != node.unique_name && !edited_node_name.empty()) {
-					rename_node_command cmd;
+					auto cmd = in.setup.make_command_from_selected_nodes<rename_node_command>("Renamed ");
+					cmd.after = edited_node_name;
 
-					cmd.node_id = node_id.operator editor_node_id();
-					cmd.after = in.setup.get_free_node_name_for(edited_node_name);
-					cmd.built_description = typesafe_sprintf("Renamed node to %x", cmd.after);
+					if (cmd.size() == 1) {
+						cmd.built_description = typesafe_sprintf("Renamed node to %x", cmd.after);
+					}
+
+					if (!cmd.empty()) {
+						in.setup.post_new_command(std::move(cmd)); 
+					}
 
 					in.setup.post_new_command(std::move(cmd)); 
 				}
