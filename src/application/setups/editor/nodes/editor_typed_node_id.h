@@ -15,8 +15,12 @@ struct editor_typed_node_id {
 		return { id.raw };
 	}
 
+	auto get_type_id() const {
+		return editor_node_type_id::of<E>();
+	}
+
 	explicit operator editor_node_id() const {
-		return { raw, editor_node_type_id::of<E>() };
+		return { raw, get_type_id() };
 	}
 
 	bool operator==(const editor_typed_node_id<E>&) const = default;

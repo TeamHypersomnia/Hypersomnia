@@ -327,11 +327,33 @@ std::string perform_editable_gui(editor_particles_node_editable& e) {
 	return result;
 }
 
-std::string perform_editable_gui(editor_layer_editable& e) {
+#define MULTIPROPERTY(label, MEMBER) \
+{\
+	bool values_different = false;\
+\
+	for (auto& ee : es) {\
+		if (!(ee.after.MEMBER == insp.MEMBER)) {\
+			values_different = true;\
+		}\
+	}\
+\
+	auto cols = maybe_different_value_cols({}, values_different);\
+\
+	if (edit_property(result, label, insp.MEMBER)) {\
+		for (auto& ee : es) {\
+			ee.after.MEMBER = insp.MEMBER;\
+		}\
+	}\
+}
+
+std::string perform_editable_gui(
+	editor_layer_editable& insp,
+	decltype(edit_layer_command::entries)& es
+) {
 	using namespace augs::imgui;
 	std::string result;
 
-	edit_property(result, "Selectable on scene", e.selectable_on_scene);
+	MULTIPROPERTY("Selectable on scene", selectable_on_scene);
 
 	if (ImGui::IsItemHovered()) {
 		text_tooltip("Useful for e.g. ground/floor layers.\nYou might want to see the background objects without them being hoverable.\nThis way you can comfortably mass-select only some foreground objects.");
@@ -584,7 +606,7 @@ void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants
 		}
 		else {
 			all_inspected.push_back(inspected);
-			mark_if_layer_or_node(inspected);
+			mark_last_inspected(inspected);
 		}
 	}
 	else {
@@ -592,7 +614,7 @@ void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants
 
 		if (not_the_same) {
 			all_inspected = { inspected };
-			mark_if_layer_or_node(inspected);
+			mark_last_inspected(inspected);
 
 			/*
 				Commands will invoke "inspect" on undo/redo,
@@ -825,8 +847,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					if (!cmd.empty()) {
 						in.setup.post_new_command(std::move(cmd)); 
 					}
-
-					in.setup.post_new_command(std::move(cmd)); 
 				}
 			}
 		}
@@ -909,13 +929,21 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				auto edited_copy = layer.editable;
 				auto changed = std::string();
 
-				changed = perform_editable_gui(edited_copy);
+				auto cmd = in.setup.make_command_from_selected_layers<edit_layer_command>("Edited ");
 
-				if (!changed.empty()) {
-					edit_layer_command cmd;
-					cmd.layer_id = layer_id;
-					cmd.after = edited_copy;
-					cmd.built_description = typesafe_sprintf(changed, layer.get_display_name());
+				for (auto& e : cmd.entries) {
+					const auto layer = in.setup.find_layer(e.layer_id);
+					ensure(layer != nullptr);
+					e.after = layer->editable;
+				}
+
+				(void)layer_id;
+				changed = perform_editable_gui(edited_copy, cmd.entries);
+
+				if (!changed.empty() && !cmd.empty()) {
+					if (cmd.size() == 1) {
+						cmd.built_description = typesafe_sprintf(changed, layer.get_display_name());
+					}
 
 					post_new_or_rewrite(std::move(cmd)); 
 				}
@@ -971,15 +999,61 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		std::visit(edit_properties, all_inspected[0]);
 	}
 	else {
-		text_color(typesafe_sprintf("Selected %x %x:", all_inspected.size(), std::visit(get_object_category_name, all_inspected[0])), yellow);
+		auto can_multi_edit = [&]<typename T>(const T& typed_inspected) -> bool { 
+			if constexpr(std::is_same_v<T, editor_layer_id>) {
+				return inspects_only<T>();
+			}
+			else if constexpr(std::is_same_v<T, editor_node_id>) {
+				const auto same_type = in.setup.on_node(
+					typed_inspected,
+					[&]<typename E>(const E&, editor_typed_node_id<E> typed) {
+						for (auto& e : all_inspected) {
+							if (std::get<editor_node_id>(e).type_id != typed.get_type_id()) {
+								return false;
+							}
+						}
 
-		ImGui::Separator();
+						return true;
+					}
+				);
 
-		for (const auto& a : all_inspected) {
-			const auto name = in.setup.get_name(a);
+				return same_type.has_value() && same_type.value();
+			}
+			else if constexpr(std::is_same_v<T, editor_resource_id>) {
+				const auto same_type = in.setup.on_resource(
+					typed_inspected,
+					[&]<typename E>(const E&, editor_typed_resource_id<E> typed) {
+						for (auto& e : all_inspected) {
+							if (std::get<editor_resource_id>(e).type_id != typed.get_type_id()) {
+								return false;
+							}
+						}
 
-			if (name.size() > 0) {
-				text(name);
+						return true;
+					}
+				);
+
+				return same_type.has_value() && same_type.value();
+			}
+			else {
+				static_assert(always_false_v<T>, "Non-exhaustive");
+			}
+		};
+
+		if (std::visit(can_multi_edit, all_inspected[0])) {
+			std::visit(edit_properties, last_inspected_any);
+		}
+		else {
+			text_color(typesafe_sprintf("Selected %x %x:", all_inspected.size(), std::visit(get_object_category_name, all_inspected[0])), yellow);
+
+			ImGui::Separator();
+
+			for (const auto& a : all_inspected) {
+				const auto name = in.setup.get_name(a);
+
+				if (name.size() > 0) {
+					text(name);
+				}
 			}
 		}
 	}

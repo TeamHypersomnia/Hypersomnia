@@ -21,8 +21,12 @@ struct editor_typed_resource_id {
 		return { id.raw, id.is_official };
 	}
 
+	auto get_type_id() const {
+		return editor_resource_type_id::of<E>();
+	}
+
 	explicit operator editor_resource_id() const {
-		return { raw, editor_resource_type_id::of<E>(), is_official };
+		return { raw, get_type_id(), is_official };
 	}
 
 	editor_specific_pool_typed_resource_id<E> to_specific_pool() const {

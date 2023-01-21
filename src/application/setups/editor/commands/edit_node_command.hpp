@@ -28,11 +28,7 @@ void rename_node_command::push_entry(const editor_node_id id) {
 }
 
 void rename_node_command::undo(editor_command_input in) {
-	const bool do_inspector = !in.setup.get_history().executed_new();
-
-	if (do_inspector) {
-		in.setup.clear_inspector();
-	}
+	in.setup.clear_inspector();
 
 	for (auto& entry : entries) {
 		in.setup.on_node(
@@ -41,14 +37,12 @@ void rename_node_command::undo(editor_command_input in) {
 				(void)id;
 
 				node.unique_name = entry.before;
-				in.setup.inspect_only(entry.node_id);
+				in.setup.inspect_add_quiet(entry.node_id);
 			}
 		);
 	}
 
-	if (do_inspector) {
-		in.setup.after_quietly_adding_inspected();
-	}
+	in.setup.after_quietly_adding_inspected();
 }
 
 void rename_node_command::redo(editor_command_input in) {
@@ -68,7 +62,7 @@ void rename_node_command::redo(editor_command_input in) {
 				node.unique_name = in.setup.get_free_node_name_for(after);
 
 				if (do_inspector) {
-					in.setup.inspect_only(entry.node_id);
+					in.setup.inspect_add_quiet(entry.node_id);
 				}
 			}
 		);

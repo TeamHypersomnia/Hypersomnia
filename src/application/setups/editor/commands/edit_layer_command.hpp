@@ -4,20 +4,43 @@
 #include "application/setups/editor/commands/edit_layer_command.h"
 #include "application/setups/editor/commands/editor_command_meta.h"
 
-void edit_layer_command::undo(editor_command_input in) {
-	if (auto layer = in.setup.find_layer(layer_id)) {
-		after = layer->editable;
-		layer->editable = before;
+void edit_layer_command::push_entry(const editor_layer_id id) {
+	entries.push_back({ id, {}, {} });
+}
 
-		in.setup.inspect_only(layer_id);
+void edit_layer_command::undo(editor_command_input in) {
+	in.setup.clear_inspector();
+
+	for (auto& entry : entries) {
+		if (auto layer = in.setup.find_layer(entry.layer_id)) {
+			layer->editable = entry.before;
+
+			in.setup.inspect_add_quiet(entry.layer_id);
+		}
 	}
+
+	in.setup.after_quietly_adding_inspected();
 }
 
 void edit_layer_command::redo(editor_command_input in) {
-	if (auto layer = in.setup.find_layer(layer_id)) {
-		before = layer->editable;
-		layer->editable = after;
+	const bool do_inspector = !in.setup.get_history().executed_new();
 
-		in.setup.inspect_only(layer_id);
+	if (do_inspector) {
+		in.setup.clear_inspector();
+	}
+
+	for (auto& entry : entries) {
+		if (auto layer = in.setup.find_layer(entry.layer_id)) {
+			entry.before = layer->editable;
+			layer->editable = entry.after;
+
+			if (do_inspector) {
+				in.setup.inspect_add_quiet(entry.layer_id);
+			}
+		}
+	}
+
+	if (do_inspector) {
+		in.setup.after_quietly_adding_inspected();
 	}
 }

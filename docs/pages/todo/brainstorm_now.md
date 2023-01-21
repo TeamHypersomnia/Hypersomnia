@@ -8,6 +8,10 @@ summary: That which we are brainstorming at the moment.
 
 - Multiple edits - concat commands or have commands specify multiple entries
 	- command concat sounds nice on paper because it avoids repetition but rewrite last command gets fucked a bit, might complicate things
+	- Let's go with multiple entries
+	- What about command descriptions?
+		- We already have these in edit properties
+		- We can take advantage of these and just add "in %x nodes"
 
 - Maybe multiple editing would be easy under our new system
 	- The inspector would just need to know which props are shared but even that wouldn't be necessary in the first iteration

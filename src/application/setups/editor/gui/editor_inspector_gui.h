@@ -73,7 +73,13 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 	template <class T>
 	bool inspects_only() const {
-		return !inspects_any_different_than<T>();
+		for (const auto& inspected : all_inspected) {
+			if (std::get_if<T>(std::addressof(inspected)) == nullptr) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	template <class T>
@@ -109,13 +115,14 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 
 private:
 	inspected_variant last_inspected_layer_or_node;
+	inspected_variant last_inspected_any;
 public:
 
 	const auto& get_last_inspected_layer_or_node() const {
 		return last_inspected_layer_or_node;
 	}
 
-	void mark_if_layer_or_node(const inspected_variant& v) {
+	void mark_last_inspected(const inspected_variant& v) {
 		std::visit(
 			[this]<typename T>(const T& typed) {
 				if constexpr(std::is_same_v<T, editor_node_id> || std::is_same_v<T, editor_layer_id>) {
@@ -124,6 +131,8 @@ public:
 			},
 			v
 		);
+
+		last_inspected_any = v;
 	}
 
 	void inspect(inspected_variant, bool wants_multiple);

@@ -631,7 +631,7 @@ void editor_setup::inspect(const current_selections_type& selections) {
 	}
 
 	if (gui.inspector.all_inspected.size() > 0) {
-		gui.inspector.mark_if_layer_or_node(gui.inspector.all_inspected.back());
+		gui.inspector.mark_last_inspected(gui.inspector.all_inspected.back());
 	}
 
 	sort_inspected();
@@ -645,7 +645,7 @@ void editor_setup::inspect(const std::vector<entity_id>& selections) {
 	}
 
 	if (gui.inspector.all_inspected.size() > 0) {
-		gui.inspector.mark_if_layer_or_node(gui.inspector.all_inspected.back());
+		gui.inspector.mark_last_inspected(gui.inspector.all_inspected.back());
 	}
 
 	sort_inspected();
