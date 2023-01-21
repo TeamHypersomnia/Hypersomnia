@@ -6,7 +6,100 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- I'd have atlantis/metropolis spawn as defaults, this will avoid some renames
+	- Wait
+		- Consider this:
+			- Someone creates a nice spawn and wants to mirror it
+			- Now they want to change the faction
+			- They'd either:
+				- need to change the resource of the node which is counterintuitive
+				- Or change the associated faction in the node and let a metropolis node be associated with a resource called resistance spawn etc
+					- ridiculous
+		- So let's just leave it at that
+		- Mass renames will fix ergonomics and like I said it won't even be used that much
+	- Let's be real, this won't be used very much since we'll h
+	- it'll only look nice in the official collection
+
+- Right-click should keep the selection
+	- For mass rename for example, this should be easy to do
+
+- Entity types to add later once we won't break abi
+	- CALLOUT WITH ITS NAME IN THE COMPONENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	- Plain sprited bodies but with arbitrary polygons per-entity, obviously
+	- Dynamic decorations but non-organism like, we should have a specific entity for an organism
+		- Pointless for them to be processed just like static animations
+
+- Separate resource types for area/point markers?
+	- Point markers can have rotation too! e.g. spawns
+	- We should absolutely support rotation
+	- The only reason against so far is more code bloat but that's irrelevant
+	- Look, it will never make sense to change an area marker to a point marker and vice versa
+	- And the transformation logic will be cleaner
+
+- Alright final verdict - let's have A/B/C and assigned team as parameters
+	- Pros
+		- Less clutter in special filesystem view
+		- Less clutter in enums
+		- Implied optionality in the choice of letters instead of forcing someone to choose
+		- Assoicated faction - NEUTRAL could also serve the purpose of neutral FFA spawns
+		- Letters will also be reused for domination points etc
+
+
+- We should also assign the organism automatically to the bound so it's intuitive
+
+- Decide whether we have separate entries for teams or just "Buyzone" and "Team spawn"
+	- Separate entries encourage making the critical choice straight away
+	- On the contrary it makes it harder to later just change team of the spawnpoint
+		- Although this would be extremely unlikely and maybe it's even better
+		- Later even team spawns might have some characteristics?
+			- E.g. preferred bomber spawn
+			- So it would make sense to make team inherent property of the marker rather than just parameter
+	- Well technically we have assigned_faction in the cosoms
+
+- There's no metadata attached to markers except for their type
+	- We even had weapon generators attached to the componend (maybe used for fy minilab? not sure)
+		- Checked through removing and recompiling, it is indeed unused
+	- So they can easily be strictly official and just have dropdown type
+	- We wouldn't even need separate categories in filesystem technically
+		- though it will be nice to browse
+		- we'll have to create a flavour for each possible enum but it's okay
+		- what about changing their type as nodes later? Do we allow it?
+			- Perhaps
+			- Yes, I think changing is no different than deleting in that regard
+			- And we anyway allow changing way more important things like background->physical and back
+
+- How do we classify area markers?
+	- Do we just have a area markers and point markers special objects in officials?
+		- I think these will be strictly official too
+
+- Actually map could have in its settings two checkboxes:
+	- Include all invisible layers
+	- Include all invisible nodes
+	- This way we could edit some specific fragments in peace but have them always finally be included
+	- I believe this should be off by default as it will only become useful as the map grows really
+
+- Also we have all required special objects for aquarium
+	- Well.. except for the organism bound marker
+
+- Now that we're dabbling with special items..
+	- Let's spawn all necessary things for a bomsite
+	- The map should technically support as many gamemodes as possible
+		- Once we have many gamemodes we'll let the map creator select which game modes to initially support (they have to choose at least one, create button will be disabled if there's none)
+		- We'll have separate layers for objects pertaining to these gamemodes
+		- gamemode_common 
+			- buyzones
+			- team spawns
+		- gamemode_defusal
+			- bombsite a
+			- bombsite b also to let someone know intuitively there can be more than 1
+			- bombsite c too since we already have an icon lol
+		- gamemode_ffa
+			- neutral spawns
+
+- Also let's similarly have colorizeable particle streams with the initial color in node_defaults
+
 - Consider renaming all "colorize" to "color" in the editor
+	- Once we're doing serialization tho
 
 - Once we're remotely close to MVP - EVEN WITHOUT A GEOMETRY EDITOR YET!
 	- We should start rebuilding fy_minilab pretty soon
@@ -40,11 +133,6 @@ summary: That which we are brainstorming at the moment.
 	- So we'll have to prepare an intercosm for skinning like this
 	- And then we can just pass the generated png file paths as always
 	- In any case we'll probably port it somehow or even use another tool (?)
-
-- Entity types to add later once we won't break abi
-	- Plain sprited bodies but with arbitrary polygons per-entity, obviously
-	- Dynamic decorations but non-organism like, we should have a specific entity for an organism
-		- Pointless for them to be processed just like static animations
 
 - Gral gif is colorized yellow when neons are enabled, probably due to wrong light calculations
 	- We should probably check on windows first

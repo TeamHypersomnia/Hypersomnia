@@ -1141,7 +1141,7 @@ we consider whole type overrides too complex architeciturally:
 			- Shape
 			- Circle
 		- marker_meta
-			- associated_faction
+			- faction
 		- invariants::point_marker
 			- point_marker_purpose enum
 				- spawnpoint

@@ -247,7 +247,7 @@ namespace test_flavours {
 			marker.type = point_marker_type::TEAM_SPAWN;
 
 			components::marker marker_meta;
-			marker_meta.associated_faction = faction_type::METROPOLIS;
+			marker_meta.faction = faction_type::METROPOLIS;
 
 			meta.set(marker);
 			meta.set(marker_meta);
@@ -256,10 +256,10 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_box_markers::BOMBSITE_A);
 			invariants::box_marker marker;
-			marker.type = area_marker_type::BOMBSITE_A;
+			marker.type = area_marker_type::BOMBSITE;
 
 			components::marker marker_meta;
-			marker_meta.associated_faction = faction_type::RESISTANCE;
+			marker_meta.faction = faction_type::RESISTANCE;
 
 			meta.set(marker);
 			meta.set(marker_meta);
@@ -268,10 +268,10 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_box_markers::BOMBSITE_B);
 			invariants::box_marker marker;
-			marker.type = area_marker_type::BOMBSITE_B;
+			marker.type = area_marker_type::BOMBSITE_DUMMY_B;
 
 			components::marker marker_meta;
-			marker_meta.associated_faction = faction_type::RESISTANCE;
+			marker_meta.faction = faction_type::RESISTANCE;
 
 			meta.set(marker);
 			meta.set(marker_meta);

@@ -8,50 +8,65 @@ struct marker_icon {
 	I id = I::INVALID;
 	rgba col = white;
 
-	template <class F>
-	marker_icon(const invariants::box_marker& p, const components::marker& meta, F get_faction_color) {
+	marker_icon() = default;
+
+	template <class M, class Meta, class F>
+	static auto from_area(const M& p, const Meta& meta, F get_faction_color) {
+		auto result = marker_icon();
 		const auto type = p.type;
 
-		if (type == area_marker_type::BOMBSITE_A) {
-			id = I::EDITOR_ICON_BOMBSITE_A;
-			col = get_faction_color(meta.associated_faction);
+		if (type == area_marker_type::BOMBSITE) {
+			result.id = I::EDITOR_ICON_BOMBSITE_A;
+			result.col = get_faction_color(meta.faction);
 		}
-		else if (type == area_marker_type::BOMBSITE_B) {
-			id = I::EDITOR_ICON_BOMBSITE_B;
-			col = get_faction_color(meta.associated_faction);
+		else if (type == area_marker_type::BOMBSITE_DUMMY_B) {
+			result.id = I::EDITOR_ICON_BOMBSITE_B;
+			result.col = get_faction_color(meta.faction);
 		}
-		else if (type == area_marker_type::BOMBSITE_C) {
-			id = I::EDITOR_ICON_BOMBSITE_C;
-			col = get_faction_color(meta.associated_faction);
+		else if (type == area_marker_type::BOMBSITE_DUMMY_C) {
+			result.id = I::EDITOR_ICON_BOMBSITE_C;
+			result.col = get_faction_color(meta.faction);
 		}
 		else if (type == area_marker_type::BUY_AREA) {
-			id = I::EDITOR_ICON_BUY_AREA;
-			col = get_faction_color(meta.associated_faction);
+			result.id = I::EDITOR_ICON_BUY_AREA;
+			result.col = get_faction_color(meta.faction);
 		}
 		else if (type == area_marker_type::ORGANISM_AREA) {
-			id = I::EDITOR_ICON_ORGANISM_AREA;
-			col = green;
+			result.id = I::EDITOR_ICON_ORGANISM_AREA;
+			result.col = green;
 		}
 		else if (type == area_marker_type::CALLOUT) {
-			id = I::INVALID;
-			col = white;
+			result.id = I::GUI_CURSOR_TEXT_INPUT;
+			result.col = white;
 		}
+
+		return result;
+	}
+
+	template <class M, class Meta, class F>
+	static auto from_point(const M& p, const Meta& meta, F get_faction_color) {
+		auto result = marker_icon();
+
+		if (p.type == point_marker_type::TEAM_SPAWN) {
+			result.id = I::EDITOR_ICON_SPAWN;
+			result.col = get_faction_color(meta.faction);
+		}
+		else if (p.type == point_marker_type::FFA_SPAWN) {
+			result.id = I::EDITOR_ICON_SPAWN;
+			result.col = white;
+		}
+
+		return result;
+	}
+
+	template <class F>
+	marker_icon(const invariants::box_marker& p, const components::marker& meta, F get_faction_color) {
+		*this = from_area(p, meta, get_faction_color);
 	}
 
 	template <class F>
 	marker_icon(const invariants::point_marker& p, const components::marker& meta, F get_faction_color) {
-		if (p.type == point_marker_type::TEAM_SPAWN) {
-			id = I::EDITOR_ICON_SPAWN;
-			col = get_faction_color(meta.associated_faction);
-		}
-		else if (p.type == point_marker_type::FFA_SPAWN) {
-			id = I::EDITOR_ICON_SPAWN;
-			col = gray;
-		}
-		else if (p.type == point_marker_type::EQUIPMENT_GENERATOR) {
-			id = I::DETACHABLE_MAGAZINE_SLOT_ICON;
-			col = white;
-		}
+		*this = from_point(p, meta, get_faction_color);
 	}
 };
 

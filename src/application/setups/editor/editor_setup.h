@@ -42,6 +42,7 @@
 #include "game/modes/bomb_defusal.h"
 
 #include "game/stateless_systems/animation_system.h"
+#include "view/faction_view_settings.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -107,6 +108,7 @@ class editor_setup : public default_setup_settings {
 
 	const editor_project_paths paths;
 	editor_settings settings;
+	faction_view_settings faction_view;
 
 	bool rebuild_ad_hoc_atlas = true;
 	ad_hoc_atlas_subjects last_ad_hoc_subjects;

@@ -5,6 +5,7 @@
 #include "application/setups/editor/nodes/editor_prefab_node.h"
 #include "application/setups/editor/nodes/editor_particles_node.h"
 #include "application/setups/editor/nodes/editor_wandering_pixels_node.h"
+#include "application/setups/editor/nodes/editor_marker_node.h"
 
 #include "application/setups/editor/nodes/editor_firearm_node.h"
 #include "application/setups/editor/nodes/editor_ammunition_node.h"

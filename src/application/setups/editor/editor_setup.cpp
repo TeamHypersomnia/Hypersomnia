@@ -1272,7 +1272,11 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			if (is_invalid) {
 				using namespace augs::gui::text;
 
+#if 0
 				const auto& callout_name = typed_handle.get_name();
+#endif
+				// TODO: Add an entity type with a callout as component instead of reading this from node name!!!
+				const auto& callout_name = get_name(typed_handle.get_id());
 
 				print_stroked(
 					triangles,
@@ -1344,6 +1348,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 
 void editor_setup::apply(const config_lua_table& cfg) {
 	settings = cfg.editor;
+	faction_view = cfg.faction_view;
 }
 
 void editor_setup::unhover() {
@@ -1882,6 +1887,8 @@ template struct edit_resource_command<editor_light_resource>;
 template struct edit_resource_command<editor_material_resource>;
 template struct edit_resource_command<editor_particles_resource>;
 template struct edit_resource_command<editor_wandering_pixels_resource>;
+template struct edit_resource_command<editor_point_marker_resource>;
+template struct edit_resource_command<editor_area_marker_resource>;
 
 template struct edit_resource_command<editor_firearm_resource>;
 template struct edit_resource_command<editor_ammunition_resource>;
@@ -1893,6 +1900,8 @@ template struct edit_node_command<editor_sound_node>;
 template struct edit_node_command<editor_light_node>;
 template struct edit_node_command<editor_particles_node>;
 template struct edit_node_command<editor_wandering_pixels_node>;
+template struct edit_node_command<editor_point_marker_node>;
+template struct edit_node_command<editor_area_marker_node>;
 
 template struct edit_node_command<editor_firearm_node>;
 template struct edit_node_command<editor_ammunition_node>;
@@ -1904,6 +1913,8 @@ template struct create_node_command<editor_sound_node>;
 template struct create_node_command<editor_light_node>;
 template struct create_node_command<editor_particles_node>;
 template struct create_node_command<editor_wandering_pixels_node>;
+template struct create_node_command<editor_point_marker_node>;
+template struct create_node_command<editor_area_marker_node>;
 
 template struct create_node_command<editor_firearm_node>;
 template struct create_node_command<editor_ammunition_node>;

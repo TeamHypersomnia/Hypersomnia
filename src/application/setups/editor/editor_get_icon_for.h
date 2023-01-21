@@ -1,6 +1,7 @@
 #pragma once
 #include "view/viewables/images_in_atlas_map.h"
 #include "application/setups/editor/has_thumbnail_id.h"
+#include "view/rendering_scripts/for_each_iconed_entity.h"
 
 struct editor_icon_info {
 	augs::atlas_entry icon;
@@ -42,6 +43,26 @@ rgba editor_setup::get_icon_color_for(
 		}
 		else if constexpr(std::is_same_v<T, editor_wandering_pixels_node>) {
 			node_color = object.editable.colorize;
+		}
+		else if constexpr(is_one_of_v<T, editor_point_marker_node, editor_area_marker_node>) {
+			const auto* maybe_resource = find_resource(object.resource_id);
+
+			if (maybe_resource != nullptr) {
+				marker_icon icon;
+
+				auto get_faction_color = [&](const auto faction) {
+					return faction_view.colors[faction].standard;
+				};
+
+				if constexpr(std::is_same_v<T, editor_point_marker_node>) {
+					icon = marker_icon::from_point(maybe_resource->editable, object.editable, get_faction_color);
+				}
+				else if constexpr(std::is_same_v<T, editor_area_marker_node>) {
+					icon = marker_icon::from_area(maybe_resource->editable, object.editable, get_faction_color);
+				}
+
+				return icon.col;
+			}
 		}
 
 		const auto* maybe_resource = find_resource(object.resource_id);
@@ -95,7 +116,27 @@ editor_icon_info editor_setup::get_icon_for(
 	const T& object, 
 	const editor_icon_info_in in
 ) const {
-	if constexpr(is_node_type_v<T>) {
+	if constexpr(is_one_of_v<T, editor_point_marker_node, editor_area_marker_node>) {
+		const auto* maybe_resource = find_resource(object.resource_id);
+
+		if (maybe_resource != nullptr) {
+			marker_icon icon;
+
+			auto get_faction_color = [&](const auto faction) {
+				return faction_view.colors[faction].standard;
+			};
+
+			if constexpr(std::is_same_v<T, editor_point_marker_node>) {
+				icon = marker_icon::from_point(maybe_resource->editable, object.editable, get_faction_color);
+			}
+			else if constexpr(std::is_same_v<T, editor_area_marker_node>) {
+				icon = marker_icon::from_area(maybe_resource->editable, object.editable, get_faction_color);
+			}
+
+			return { in.necessary_images[icon.id], augs::imgui_atlas_type::GAME };
+		}
+	}
+	else if constexpr(is_node_type_v<T>) {
 		const auto* maybe_resource = find_resource(object.resource_id);
 
 		if (maybe_resource != nullptr) {
@@ -126,6 +167,18 @@ editor_icon_info editor_setup::get_icon_for(
 	}
 	else if constexpr(std::is_same_v<T, editor_material_resource>) {
 		return { in.necessary_images[assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON], augs::imgui_atlas_type::GAME };
+	}
+	else if constexpr(is_one_of_v<T, editor_point_marker_resource, editor_area_marker_resource>) {
+		marker_icon icon;
+
+		if constexpr(std::is_same_v<T, editor_point_marker_resource>) {
+			icon = marker_icon::from_point(object.editable, decltype(editor_point_marker_node::editable)(), [](auto&&...) { return white; });
+		}
+		else if constexpr(std::is_same_v<T, editor_area_marker_resource>) {
+			icon = marker_icon::from_area(object.editable, decltype(editor_area_marker_node::editable)(), [](auto&&...) { return white; });
+		}
+
+		return { in.necessary_images[icon.id], augs::imgui_atlas_type::GAME };
 	}
 	else if constexpr(std::is_same_v<T, editor_particles_resource>) {
 		if (object.editable.wandering.is_enabled) {

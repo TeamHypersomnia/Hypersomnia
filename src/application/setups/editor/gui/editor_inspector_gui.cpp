@@ -96,9 +96,22 @@ bool edit_property(
 		}
 	}
 	else if constexpr(std::is_enum_v<T>) {
-		if (enum_combo(label, property)) { 
-			result = typesafe_sprintf("Switch %x to %x in %x", label, property);
-			return true;
+		if constexpr(std::is_same_v<T, faction_type>) {
+			if (enum_combo_constrained<
+				faction_type, 
+				faction_type::RESISTANCE,
+				faction_type::METROPOLIS,
+				faction_type::ATLANTIS
+			>(label, property)) { 
+				result = typesafe_sprintf("Switch %x to %x in %x", label, property);
+				return true;
+			}
+		}
+		else {
+			if (enum_combo(label, property)) { 
+				result = typesafe_sprintf("Switch %x to %x in %x", label, property);
+				return true;
+			}
 		}
 	}
 	else if constexpr(is_one_of_v<T, vec2, vec2i, vec2u>) {
@@ -210,6 +223,74 @@ std::string perform_editable_gui(editor_wandering_pixels_node_editable& e) {
 
 	if (const auto new_res = perform_editable_gui(static_cast<components::wandering_pixels&>(e)); !new_res.empty()) {
 		result = new_res;
+	}
+
+	return result;
+}
+
+static bool has_letter(const point_marker_type type) {
+	switch (type) {
+		default:
+			return false;
+	}
+}
+
+static bool has_team(const point_marker_type type) {
+	switch (type) {
+		case point_marker_type::TEAM_SPAWN:
+			return true;
+		default:
+			return false;
+	}
+}
+
+static bool has_letter(const area_marker_type type) {
+	switch (type) {
+		case area_marker_type::BOMBSITE:
+			return true;
+		default:
+			return false;
+	}
+}
+
+static bool has_team(const area_marker_type type) {
+	switch (type) {
+		case area_marker_type::BUY_AREA:
+			return true;
+		default:
+			return false;
+	}
+}
+
+std::string perform_editable_gui(const editor_point_marker_resource& resource, editor_point_marker_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	const auto type = resource.editable.type;
+
+	if (has_team(type)) {
+		edit_property(result, "Faction", e.faction);
+	}
+
+	if (has_letter(type)) {
+		edit_property(result, "Letter", e.letter);
+	}
+
+	return result;
+}
+
+std::string perform_editable_gui(const editor_area_marker_resource& resource, editor_area_marker_node_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	const auto type = resource.editable.type;
+
+	if (has_team(type)) {
+		edit_property(result, "Faction", e.faction);
+	}
+
+	if (has_letter(type)) {
+		edit_property(result, "Letter", e.letter);
 	}
 
 	return result;
@@ -456,6 +537,24 @@ std::string perform_editable_gui(editor_wandering_pixels_resource_editable& e) {
 			result = new_res;
 		}
 	}
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_point_marker_resource_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	(void)e;
+
+	return result;
+}
+
+std::string perform_editable_gui(editor_area_marker_resource_editable& e) {
+	using namespace augs::imgui;
+	std::string result;
+
+	(void)e;
 
 	return result;
 }
@@ -750,7 +849,15 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			changed = perform_editable_gui(edited_copy, original_size);
 		}
 		else {
-			changed = perform_editable_gui(edited_copy);
+			if constexpr(is_one_of_v<N, editor_point_marker_node, editor_area_marker_node>) {
+				const auto resource = in.setup.find_resource(node.resource_id);
+				ensure(resource != nullptr);
+
+				changed = perform_editable_gui(*resource, edited_copy);
+			}
+			else {
+				changed = perform_editable_gui(edited_copy);
+			}
 		}
 
 		if (!changed.empty()) {

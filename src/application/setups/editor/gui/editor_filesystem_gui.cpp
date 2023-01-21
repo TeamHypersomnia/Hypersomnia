@@ -14,6 +14,7 @@
 #include "application/setups/editor/resources/resource_traits.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "application/setups/editor/nodes/editor_node_defaults.h"
+#include "view/rendering_scripts/for_each_iconed_entity.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem(project_special_root);
@@ -222,7 +223,7 @@ void editor_filesystem_gui::clear_drag_drop() {
 
 void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& root) {
 	root.clear();
-	root.subfolders.resize(8);
+	root.subfolders.resize(10);
 	root.should_sort = false;
 
 	auto i = 0;
@@ -237,6 +238,9 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	auto& melee_weapons_folder = root.subfolders[i++];
 	auto& explosives_folder = root.subfolders[i++];
 
+	auto& point_markers_folder = root.subfolders[i++];
+	auto& area_markers_folder = root.subfolders[i++];
+
 	lights_folder.name = "Lights";
 	particles_folder.name = "Particles";
 	wandering_pixels_folder.name = "Wandering pixels";
@@ -246,6 +250,9 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	ammunition_folder.name = "Ammunition";
 	melee_weapons_folder.name = "Melee weapons";
 	explosives_folder.name = "Explosives";
+
+	point_markers_folder.name = "Point markers";
+	area_markers_folder.name = "Area markers";
 
 	for (auto& s : root.subfolders) {
 		s.type = editor_filesystem_node_type::FOLDER;
@@ -277,6 +284,9 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	auto& melee_weapons_folder = root.subfolders[i++];
 	auto& explosives_folder = root.subfolders[i++];
 
+	auto& point_markers_folder = root.subfolders[i++];
+	auto& area_markers_folder = root.subfolders[i++];
+
 	(void)prefabs_folder;
 	(void)wandering_pixels_folder;
 
@@ -302,57 +312,62 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 			const auto& initial_intercosm = setup.get_initial_scene();
 
-			std::visit(
-				[&](const auto& tag) {
-					const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
-					auto name = flavour.get_name();
+			if constexpr(is_one_of_v<resource_type, editor_point_marker_resource, editor_area_marker_resource>) {
+				new_node.name = typed_resource.get_display_name();
+			}
+			else {
+				std::visit(
+					[&](const auto& tag) {
+						const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
+						auto name = flavour.get_name();
 
-					const auto id = str_ops(name).to_lowercase().replace_all(" ", "_").subject;
-					new_node.name = id;
+						const auto id = str_ops(name).to_lowercase().replace_all(" ", "_").subject;
+						new_node.name = id;
 
-					if (auto sprite = flavour.template find<invariants::sprite>()) {
-						new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
-					}
-
-					if (auto animation = flavour.template find<invariants::animation>()) {
-						if (animation->id.is_set()) {
-							auto path_s = new_node.custom_thumbnail_path.string();
-							ensure(ends_with(path_s, "_1.png"));
-
-							path_s.erase(path_s.end() - std::strlen("_1.png"), path_s.end());
-							path_s += "_*.png";
-
-							new_node.custom_thumbnail_path = path_s;
-							// LOG_NVPS(new_node.custom_thumbnail_path);
+						if (auto sprite = flavour.template find<invariants::sprite>()) {
+							new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
 						}
-					}
 
-					if (auto gun = flavour.template find<invariants::gun>()) {
-						if (gun->shoot_animation.is_set()) {
-							//const auto image_id = initial_intercosm.world.get_logical_assets().plain_animations[gun->shoot_animation].frames[0].image_id;
-							//auto path_s = initial_intercosm.viewables.image_definitions[image_id].get_source_path().resolve({}).string();
-							//LOG_NVPS(path_s);
+						if (auto animation = flavour.template find<invariants::animation>()) {
+							if (animation->id.is_set()) {
+								auto path_s = new_node.custom_thumbnail_path.string();
+								ensure(ends_with(path_s, "_1.png"));
 
-							auto path_s = new_node.custom_thumbnail_path;
-							path_s.replace_extension("");
-							path_s += "_shot_*.png";
+								path_s.erase(path_s.end() - std::strlen("_1.png"), path_s.end());
+								path_s += "_*.png";
 
-							/* auto path_basic = path_s.string(); */
-							/* cut_trailing_number(path_basic); */
-
-							/* if (path_basic.back() == '_') { */
-							/* 	path_basic.pop_back(); */
-							/* } */
-
-							/* path_basic += "_shot_*.png"; */
-
-							new_node.custom_thumbnail_path = path_s;
-							// LOG_NVPS(new_node.custom_thumbnail_path);
+								new_node.custom_thumbnail_path = path_s;
+								// LOG_NVPS(new_node.custom_thumbnail_path);
+							}
 						}
-					}
-				},
-				*typed_resource.official_tag
-			);
+
+						if (auto gun = flavour.template find<invariants::gun>()) {
+							if (gun->shoot_animation.is_set()) {
+								//const auto image_id = initial_intercosm.world.get_logical_assets().plain_animations[gun->shoot_animation].frames[0].image_id;
+								//auto path_s = initial_intercosm.viewables.image_definitions[image_id].get_source_path().resolve({}).string();
+								//LOG_NVPS(path_s);
+
+								auto path_s = new_node.custom_thumbnail_path;
+								path_s.replace_extension("");
+								path_s += "_shot_*.png";
+
+								/* auto path_basic = path_s.string(); */
+								/* cut_trailing_number(path_basic); */
+
+								/* if (path_basic.back() == '_') { */
+								/* 	path_basic.pop_back(); */
+								/* } */
+
+								/* path_basic += "_shot_*.png"; */
+
+								new_node.custom_thumbnail_path = path_s;
+								// LOG_NVPS(new_node.custom_thumbnail_path);
+							}
+						}
+					},
+					*typed_resource.official_tag
+				);
+			}
 		};
 
 		pool.for_each_id_and_object(resource_handler);
@@ -370,6 +385,9 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	handle(ammunition_folder, resources.get_pool_for<editor_ammunition_resource>(), assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
 	handle(melee_weapons_folder, resources.get_pool_for<editor_melee_resource>(), assets::necessary_image_id::SHOULDER_SLOT_ICON);
 	handle(explosives_folder, resources.get_pool_for<editor_explosive_resource>(), assets::necessary_image_id::BOMB_INDICATOR);
+
+	handle(point_markers_folder, resources.get_pool_for<editor_point_marker_resource>(), assets::necessary_image_id::DANGER_INDICATOR);
+	handle(area_markers_folder, resources.get_pool_for<editor_area_marker_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
 
 	root.set_parents(0);
 }

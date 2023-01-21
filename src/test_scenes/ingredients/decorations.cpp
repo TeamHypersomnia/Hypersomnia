@@ -124,7 +124,7 @@ namespace test_flavours {
 			marker.type = area_marker_type::ORGANISM_AREA;
 
 			components::marker marker_meta;
-			marker_meta.associated_faction = faction_type::SPECTATOR;
+			marker_meta.faction = faction_type::SPECTATOR;
 
 			meta.set(marker);
 			meta.set(marker_meta);

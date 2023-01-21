@@ -45,6 +45,11 @@ void setup_entity_from_node(
 		auto& wandering_pixels = agg.template get<components::wandering_pixels>();
 		wandering_pixels = static_cast<const components::wandering_pixels&>(editable);
 	}
+	else if constexpr(is_one_of_v<N, editor_point_marker_node, editor_area_marker_node>) {
+		auto& marker = agg.template get<components::marker>();
+		marker.faction = editable.faction;
+		// TODO: add letter to the fields once we can freely modify cosmos ABI
+	}
 
 	if (auto geo = agg.template find<components::overridden_geo>()) {
 		if constexpr(has_size_v<Editable>) {
@@ -94,6 +99,18 @@ void allocate_flavours_and_assets_for_resource(
 	}
 	else if constexpr(std::is_same_v<editor_wandering_pixels_resource, R>) {
 		ensure(false && "not implemented");
+	}
+	else if constexpr(std::is_same_v<editor_point_marker_resource, R>) {
+		using entity_type = point_marker;
+
+		auto& flavour_pool = common.flavours.get_for<point_marker>();
+		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
+	}
+	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
+		using entity_type = box_marker;
+
+		auto& flavour_pool = common.flavours.get_for<box_marker>();
+		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
 	}
 	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
 		ensure(false && "not implemented");
@@ -268,6 +285,14 @@ void setup_scene_object_from_resource(
 	else if constexpr(std::is_same_v<editor_wandering_pixels_resource, R>) {
 		ensure(false && "not implemented");
 	}
+	else if constexpr(std::is_same_v<editor_point_marker_resource, R>) {
+		auto& marker = scene.template get<invariants::point_marker>();
+		marker.type = resource.editable.type;
+	}
+	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
+		auto& marker = scene.template get<invariants::box_marker>();
+		marker.type = resource.editable.type;
+	}
 	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
 		ensure(false && "not implemented");
 	}
@@ -364,6 +389,11 @@ void editor_setup::rebuild_scene() {
 	auto& common = scene.world.get_common_significant(mutable_access);
 	//common.light.ambient_color = rgba(180, 180, 180, 255);
 
+	auto for_each_manually_specified_official_resource_pool = [&](auto lbd) {
+		lbd(official_resources.get_pool_for<editor_point_marker_resource>());
+		lbd(official_resources.get_pool_for<editor_area_marker_resource>());
+	};
+
 	/* 
 		Establish identities. 
 		First we have to create all flavour and asset ids so that we can properly setup references later.
@@ -384,6 +414,8 @@ void editor_setup::rebuild_scene() {
 
 #if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 		official_resources.for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
+#else
+		for_each_manually_specified_official_resource_pool([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
 #endif
 		project.resources .for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, false); } );
 	}
@@ -433,6 +465,8 @@ void editor_setup::rebuild_scene() {
 
 #if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 	official_resources.for_each(setup_flavours_and_assets);
+#else
+	for_each_manually_specified_official_resource_pool(setup_flavours_and_assets);
 #endif
 	project.resources .for_each(setup_flavours_and_assets);
 

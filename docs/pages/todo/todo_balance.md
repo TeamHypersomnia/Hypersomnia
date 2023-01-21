@@ -6,6 +6,12 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
+- A hpsr hidden in inventory could stop emitting particles
+	- It's already very hard to play it so we should do at least that
+
+- Once we add scopes we could consider adding a visible laser?
+	- So that someone could have a chance to react to being shot from an off-screen distance
+
 - Later we'll balance the rattle/spear by increasing the throw distance
 	- This will break the ABI though
 

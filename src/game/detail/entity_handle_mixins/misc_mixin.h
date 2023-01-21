@@ -184,7 +184,7 @@ public:
 		const auto self = *static_cast<const E*>(this);
 
 		if (const auto marker = self.template find<components::marker>()) {
-			marker->associated_faction = f;
+			marker->faction = f;
 		}
 	}
 
@@ -200,7 +200,7 @@ public:
 		}
 
 		if (const auto marker = self.template find<components::marker>()) {
-			return marker->associated_faction;
+			return marker->faction;
 		}
 
 		return faction_type::SPECTATOR;

@@ -15,7 +15,7 @@ namespace invariants {
 		static constexpr bool reinfer_when_tweaking = true;
 
 		// GEN INTROSPECTOR struct invariants::box_marker
-		area_marker_type type = area_marker_type::BOMBSITE_A;
+		area_marker_type type = area_marker_type::BOMBSITE;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -25,7 +25,7 @@ namespace components {
 		static constexpr bool reinfer_when_tweaking = true;
 
 		// GEN INTROSPECTOR struct components::marker
-		faction_type associated_faction = faction_type::METROPOLIS;
+		faction_type faction = faction_type::METROPOLIS;
 		pad_bytes<sizeof(item_flavour_id) + sizeof(int)> dummy_compat;
 		// END GEN INTROSPECTOR
 	};
