@@ -44,15 +44,29 @@ struct rename_node_command {
 struct rename_layer_command {
 	editor_command_meta meta;
 
-	editor_layer_id layer_id;
+	struct entry {
+		editor_layer_id layer_id;
+		std::string before;
+	};
 
-	std::string before;
+	std::vector<entry> entries;
+
+	void push_entry(editor_layer_id);
+
 	std::string after;
 
 	std::string built_description;
 
 	void undo(editor_command_input in);
 	void redo(editor_command_input in);
+
+	auto size() const {
+		return entries.size();
+	}
+
+	auto empty() const {
+		return entries.empty();
+	}
 
 	const auto& describe() const {
 		return built_description;

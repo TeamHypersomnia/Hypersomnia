@@ -17,6 +17,8 @@
 #include "application/setups/editor/resources/resource_traits.h"
 #include "application/setups/editor/nodes/editor_node_defaults.h"
 
+#include "application/setups/editor/detail/make_command_from_selections.h"
+
 void editor_layers_gui::perform(const editor_layers_input in) {
 	using namespace augs::imgui;
 	using namespace editor_widgets;
@@ -465,6 +467,10 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				bool just_set = false;
 
 				if (rename_this_node || (rename_requested && is_inspected)) {
+					if (!is_inspected) {
+						in.setup.inspect(node_id);
+					}
+
 					rename_requested = false;
 					rename_this_node = false;
 
@@ -850,6 +856,10 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					bool just_set = false;
 
 					if (rename_this_layer || (rename_requested && is_inspected)) {
+						if (!is_inspected) {
+							in.setup.inspect(layer_id);
+						}
+
 						rename_requested = false;
 						rename_this_layer = false;
 
@@ -865,13 +875,16 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 							currently_renamed_object = std::nullopt;
 
 							if (edited_layer_name != layer.unique_name && !edited_layer_name.empty()) {
-								rename_layer_command cmd;
+								auto cmd = in.setup.make_command_from_selected_layers<rename_layer_command>("Renamed ");
+								cmd.after = edited_layer_name;
 
-								cmd.layer_id = layer_id;
-								cmd.after = in.setup.get_free_layer_name_for(edited_layer_name);
-								cmd.built_description = typesafe_sprintf("Renamed layer to %x", cmd.after);
+								if (cmd.size() == 1) {
+									cmd.built_description = typesafe_sprintf("Renamed layer to %x", cmd.after);
+								}
 
-								in.setup.post_new_command(std::move(cmd)); 
+								if (!cmd.empty()) {
+									in.setup.post_new_command(std::move(cmd)); 
+								}
 							}
 						}
 

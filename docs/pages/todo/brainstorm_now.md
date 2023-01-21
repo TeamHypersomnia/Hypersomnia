@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Multiple edits - concat commands or have commands specify multiple entries
+	- command concat sounds nice on paper because it avoids repetition but rewrite last command gets fucked a bit, might complicate things
+
+- Maybe multiple editing would be easy under our new system
+	- The inspector would just need to know which props are shared but even that wouldn't be necessary in the first iteration
+	- We could begin with layers
+	- uh, we'd still need to pass the vector of things to apply the change to all
+	- so I guess first step would be accept vector of references instead of just one object
+		- and some macro to turn each edit_property into a loop
+
 - We should also assign the organism automatically to the bound so it's intuitive
 
 - I'd have atlantis/metropolis spawn as defaults, this will avoid some renames

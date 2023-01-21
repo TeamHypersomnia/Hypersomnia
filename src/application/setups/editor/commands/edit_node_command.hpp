@@ -53,28 +53,49 @@ void rename_node_command::redo(editor_command_input in) {
 	);
 }
 
-void rename_layer_command::undo(editor_command_input in) {
-	if (const auto layer = in.setup.find_layer(layer_id)) {
-		after = layer->unique_name;
-		layer->unique_name = before;
+void rename_layer_command::push_entry(const editor_layer_id id) {
+	entries.push_back({ id, {} });
+}
 
-		in.setup.inspect_only(layer_id);
+void rename_layer_command::undo(editor_command_input in) {
+	in.setup.clear_inspector();
+
+	for (auto& entry : entries) {
+		if (const auto layer = in.setup.find_layer(entry.layer_id)) {
+			layer->unique_name = entry.before;
+
+			in.setup.inspect_add_quiet(entry.layer_id);
+		}
 	}
+
+	in.setup.after_quietly_adding_inspected();
 }
 
 void rename_layer_command::redo(editor_command_input in) {
-	if (const auto layer = in.setup.find_layer(layer_id)) {
-		before = layer->unique_name;
-		layer->unique_name = after;
+	const bool do_inspector = !in.setup.get_history().executed_new();
 
-		/* 
-			If we inspect on first execution,
-			pressing up arrow while renaming doesn't result in the inspector focus going up
-			since the inspected element is overridden here to the renamed element again.
-		*/
+	if (do_inspector) {
+		in.setup.clear_inspector();
+	}
 
-		if (!in.setup.get_history().executed_new()) {
-			in.setup.inspect_only(layer_id);
+	for (auto& entry : entries) {
+		if (const auto layer = in.setup.find_layer(entry.layer_id)) {
+			entry.before = layer->unique_name;
+			layer->unique_name = in.setup.get_free_layer_name_for(after);
+
+			/* 
+				If we inspect on first execution,
+				pressing up arrow while renaming doesn't result in the inspector focus going up
+				since the inspected element is overridden here to the renamed element again.
+			*/
+
+			if (do_inspector) {
+				in.setup.inspect_add_quiet(entry.layer_id);
+			}
 		}
+	}
+
+	if (do_inspector) {
+		in.setup.after_quietly_adding_inspected();
 	}
 }

@@ -22,6 +22,7 @@
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
+#include "application/setups/editor/detail/make_command_from_selections.h"
 #include "test_scenes/test_scene_flavours.h"
 
 
@@ -883,11 +884,16 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 				if (input_text<100>("##NameInput", edited_layer_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
 					if (edited_layer_name != layer.unique_name && !edited_layer_name.empty()) {
-						rename_layer_command cmd;
+						auto cmd = in.setup.make_command_from_selected_layers<rename_layer_command>("Renamed ");
+						cmd.after = edited_layer_name;
 
-						cmd.layer_id = layer_id;
-						cmd.after = in.setup.get_free_layer_name_for(edited_layer_name);
-						cmd.built_description = typesafe_sprintf("Renamed layer to %x", cmd.after);
+						if (cmd.size() == 1) {
+							cmd.built_description = typesafe_sprintf("Renamed layer to %x", cmd.after);
+						}
+
+						if (!cmd.empty()) {
+							in.setup.post_new_command(std::move(cmd)); 
+						}
 
 						in.setup.post_new_command(std::move(cmd)); 
 					}
