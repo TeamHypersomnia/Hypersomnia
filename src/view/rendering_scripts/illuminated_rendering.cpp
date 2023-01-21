@@ -372,7 +372,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
 				const auto where = typed_handle.get_logic_transform();
 				const auto& marker_alpha = markers.value;
-				::draw_area_indicator(typed_handle, get_line_drawer(), where, marker_alpha, drawn_indicator_type::INGAME);
+				::draw_area_indicator(typed_handle, get_line_drawer(), where, marker_alpha, drawn_indicator_type::INGAME, 1.0f);
 			});
 		});
 	};

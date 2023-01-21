@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We should also assign the organism automatically to the bound so it's intuitive
+
 - I'd have atlantis/metropolis spawn as defaults, this will avoid some renames
 	- Wait
 		- Consider this:
@@ -44,8 +46,6 @@ summary: That which we are brainstorming at the moment.
 		- Assoicated faction - NEUTRAL could also serve the purpose of neutral FFA spawns
 		- Letters will also be reused for domination points etc
 
-
-- We should also assign the organism automatically to the bound so it's intuitive
 
 - Decide whether we have separate entries for teams or just "Buyzone" and "Team spawn"
 	- Separate entries encourage making the critical choice straight away

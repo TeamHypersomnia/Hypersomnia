@@ -396,7 +396,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 
 				if (ImGui::BeginPopupContextItem()) {
-					in.setup.inspect_only(node_id);
+					//in.setup.inspect_only(node_id);
 
 					if (ImGui::Selectable("Rename (F2)")) {
 						rename_this_node = true;
@@ -665,7 +665,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const bool tree_node_pressed = ImGui::Selectable("###LayerButton", is_dragged || is_visually_inspected, flags);
 
 				if (ImGui::BeginPopupContextItem()) {
-					in.setup.inspect_only(layer_id);
+					//in.setup.inspect_only(layer_id);
 
 					if (ImGui::Selectable("Rename (F2)")) {
 						rename_this_layer = true;

@@ -521,7 +521,7 @@ void editor_setup::rebuild_scene() {
 						resource->scene_flavour_id
 					);
 				}
-				if constexpr(std::is_same_v<node_type, editor_melee_node> || std::is_same_v<node_type, editor_explosive_node>) {
+				else if constexpr(is_one_of_v<node_type, editor_melee_node, editor_explosive_node>) {
 					std::visit(
 						[&](const auto& typed) {
 							requested_equipment r;

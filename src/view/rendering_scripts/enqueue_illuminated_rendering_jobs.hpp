@@ -262,7 +262,7 @@ void enqueue_illuminated_rendering_jobs(
 						const auto where = typed_handle.get_logic_transform();
 						const auto& callout_alpha = callouts.value;
 
-						::draw_area_indicator(typed_handle, line_drawer, where, callout_alpha, drawn_indicator_type::INGAME);
+						::draw_area_indicator(typed_handle, line_drawer, where, callout_alpha, drawn_indicator_type::INGAME, 1.0f);
 
 						using namespace augs::gui::text;
 

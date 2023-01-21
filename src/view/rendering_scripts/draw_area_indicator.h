@@ -15,6 +15,7 @@ void draw_area_indicator(
 	const transformr where,
 	const float alpha,
 	const drawn_indicator_type type,
+	const float zoom,
 	std::optional<rgba> color = std::nullopt
 ) {
 	if (const auto marker = typed_handle.template find<invariants::box_marker>()) {
@@ -44,7 +45,7 @@ void draw_area_indicator(
 		color->mult_alpha(alpha);
 
 		drawer.border_dashed(
-			size,
+			size * zoom,
 			where.pos,
 			where.rotation,
 			*color,

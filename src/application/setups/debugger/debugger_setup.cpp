@@ -1647,7 +1647,7 @@ void debugger_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 				);
 			}
 
-			::draw_area_indicator(typed_handle, lines, screen_space, eye.zoom, drawn_indicator_type::EDITOR, color);
+			::draw_area_indicator(typed_handle, lines, screen_space, 1.0f, drawn_indicator_type::EDITOR, eye.zoom, color);
 		}	
 	);
 
