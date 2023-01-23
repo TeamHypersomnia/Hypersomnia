@@ -6,35 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- macos build fail: vsprintf in yojimbo
-	- low prio tho but would be nice to have a green light
-
-- Also think how do we handle resource editing when multiple nodes are selected and we switch to resource tab
-	- Should be fairly easy to properly implement this, just gather the resource targets from the currently inspected nodes, the rest as usual
+- counts in Node and Resource tabs
+	- Will be helpful esp in Resource, also feedback that we're editing multiple
+- shift+select resources
 
 - Why does the performance drop dramatically in debug after spawning just a few firearms?
 	- Doesn't happen with normal entities too
 	- Maybe check with physical objects too?
 
-- Area markers and point markers should have their own tonpo (tree of non-physical object)
-	- for now the bruteforce will work
-
 - flips/resizes not applied to animated stuff
 	- uhh wtf they actually have no overridden geo
-
-- Multiple edits - concat commands or have commands specify multiple entries
-	- command concat sounds nice on paper because it avoids repetition but rewrite last command gets fucked a bit, might complicate things
-	- Let's go with multiple entries
-	- What about command descriptions?
-		- We already have these in edit properties
-		- We can take advantage of these and just add "in %x nodes"
-
-- Maybe multiple editing would be easy under our new system
-	- The inspector would just need to know which props are shared but even that wouldn't be necessary in the first iteration
-	- We could begin with layers
-	- uh, we'd still need to pass the vector of things to apply the change to all
-	- so I guess first step would be accept vector of references instead of just one object
-		- and some macro to turn each edit_property into a loop
 
 - We should also assign the organism automatically to the bound so it's intuitive
 

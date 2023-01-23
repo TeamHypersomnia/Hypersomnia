@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/misc/pool/pooled_object_id.h"
 #include "application/setups/editor/nodes/editor_node_id.h"
+#include "augs/ensure.h"
 
 template <class E>
 struct editor_typed_node_id {
@@ -11,12 +12,13 @@ struct editor_typed_node_id {
 		raw = new_raw;
 	}
 
-	static editor_typed_node_id<E> from_generic(const editor_node_id& id) {
-		return { id.raw };
+	static auto get_type_id() {
+		return editor_node_type_id::of<E>();
 	}
 
-	auto get_type_id() const {
-		return editor_node_type_id::of<E>();
+	static editor_typed_node_id<E> from_generic(const editor_node_id& id) {
+		ensure(get_type_id() == id.type_id);
+		return { id.raw };
 	}
 
 	explicit operator editor_node_id() const {

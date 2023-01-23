@@ -5,6 +5,8 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Area markers and point markers should have their own tonpo (tree of non-physical object)
+	- for now the bruteforce will work
 - search for TODO: hits in editor sources later because some important temporary fixes were applied that are not necessarily optimal
 	- e.g. bugfix to point/area marker icons being unhoverable when zoomed out. This is a temporary measure
  

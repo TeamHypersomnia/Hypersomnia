@@ -363,45 +363,59 @@ EDIT_FUNCTION(editor_layer_editable& insp, T& es) {
 	return result;
 }
 
-std::string perform_editable_gui(
-	editor_sprite_resource_editable& e,
-	const std::optional<vec2i> original_size,
+EDIT_FUNCTION(
+	editor_sprite_resource_editable& insp,
+	T& es,
+	const std::vector<editor_sprite_resource_editable>& defaults,
 	const image_color_picker_widget& picker
 ) {
 	using namespace augs::imgui;
 
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Domain", e.domain);
+	MULTIPROPERTY("Domain", domain);
 
 	//ImGui::Separator();
 
-	const auto current_size = e.size;
-
-	edit_property(result, "Color", e.color);
+	MULTIPROPERTY("Color", color);
 	//ImGui::Separator();
-	edit_property(result, "Size", e.size);
+	MULTIPROPERTY("Size", size);
 
-	if (original_size != std::nullopt) {
+	bool perform_size_reset = false;
+
+	for (std::size_t i = 0; i < defaults.size(); ++i) {
+		const auto original_size = defaults[i].size;
+		const auto current_size = es[i].after.size;
+
 		if (original_size != current_size) {
-			ImGui::SameLine();
-
-			if (ImGui::Button("Reset")) {
-				e.size = *original_size;
-				return "Reset %x size to original";
-			}
+			perform_size_reset = true;
 		}
 	}
 
-	edit_property(result, "Stretch when resized", e.stretch_when_resized);
+	if (perform_size_reset) {
+		ImGui::SameLine();
 
-	if (e.domain == editor_sprite_domain::FOREGROUND) {
-		edit_property(result, "Foreground glow", e.foreground_glow);
+		if (ImGui::Button("Reset")) {
+			for (std::size_t i = 0; i < defaults.size(); ++i) {
+				es[i].after.size = defaults[i].size;
+			}
+
+			return "Reset %x size to original";
+		}
+	}
+
+	MULTIPROPERTY("Stretch when resized", stretch_when_resized);
+
+	if (insp.domain == editor_sprite_domain::FOREGROUND) {
+		MULTIPROPERTY("Foreground glow", foreground_glow);
 	}
 
 	{
-		if (edit_property(result, "##NeonMap", e.neon_map.is_enabled)) {
-			if (e.neon_map.is_enabled) {
+		MULTIPROPERTY("##NeonMap", neon_map.is_enabled);
+
+		if (last_result) {
+			if (insp.neon_map.is_enabled) {
 				result = "Enabled neon map in %x";
 			}
 			else {
@@ -411,46 +425,77 @@ std::string perform_editable_gui(
 
 		ImGui::SameLine();
 
-		auto disabled = maybe_disabled_only_cols(!e.neon_map.is_enabled);
+		auto disabled = maybe_disabled_only_cols(!insp.neon_map.is_enabled);
 
 		auto scope = augs::imgui::scoped_tree_node_ex("Neon map");
 
 		if (scope) {
+			auto actually_disabled = maybe_disabled_cols(!insp.neon_map.is_enabled);
 
-			auto actually_disabled = maybe_disabled_cols(!e.neon_map.is_enabled);
+			MULTIPROPERTY("Colorize neon", neon_color);
 
-			auto& v = e.neon_map.value;
-
-			edit_property(result, "Colorize neon", e.neon_color);
-
-			auto ic = 0;
-			auto removed_i = -1;
+			std::optional<std::size_t> removed_i;
 
 			text("Click on the image to add neon light sources.");
 
+			auto& v = insp.neon_map.value;
+
 			{
-				if (picker.handle_prologue("##LightColorPicker", v.light_colors)) {
-					result = "Picked new light color in %x";
+				bool colors_different = false;
+
+				for (auto& e : es) {
+					if (!(v.light_colors == e.after.neon_map.value.light_colors)) {
+						colors_different = true;
+					}
+				}
+
+				{
+					if (picker.handle_prologue("##LightColorPicker", v.light_colors)) {
+						result = "Picked new light color in %x";
+
+						for (auto& e : es) {
+							e.after.neon_map.value.light_colors.push_back(v.light_colors.back());
+						}
+					}
+				}
+
+				auto cols = maybe_different_value_cols({}, colors_different);
+
+				for (auto& col : v.light_colors) {
+					const auto idx = index_in(v.light_colors, col);
+					auto id_col = typesafe_sprintf("Light %x", idx + 1);
+					auto id_but = typesafe_sprintf("-##Light%x", idx);
+
+					if (ImGui::Button(id_but.c_str())) {
+						removed_i = idx;
+					}
+
+					ImGui::SameLine();
+
+					if (edit_property(result, id_col, col)) {
+						for (auto& e : es) {
+							auto& lc = e.after.neon_map.value.light_colors;
+
+							if (idx < lc.size()) {
+								lc[idx] = col;
+							}
+						}
+					}
+				}
+
+				if (removed_i) {
+					for (auto& e : es) {
+						auto& lc = e.after.neon_map.value.light_colors;
+
+						if (*removed_i < lc.size()) {
+							lc.erase(lc.begin() + *removed_i);
+						}
+					}
+
+					result = typesafe_sprintf("Removed Light %x in %x", *removed_i);
 				}
 			}
 
-			for (auto& col : v.light_colors) {
-				auto id_col = typesafe_sprintf("Light %x", ++ic);
-				auto id_but = typesafe_sprintf("-##Light%x", ic);
-
-				if (ImGui::Button(id_but.c_str())) {
-					removed_i = ic;
-				}
-
-				ImGui::SameLine();
-
-				edit_property(result, id_col, col);
-			}
-
-			if (removed_i != -1) {
-				v.light_colors.erase(v.light_colors.begin() + removed_i - 1);
-				result = typesafe_sprintf("Removed Light %x in %x", removed_i);
-			}
 
 #if 0
 			if (ImGui::Button("+##AddNewLightColor")) {
@@ -462,15 +507,19 @@ std::string perform_editable_gui(
 #endif
 
 			if (auto scope = augs::imgui::scoped_tree_node_ex("Advanced neon map parameters")) {
-				edit_property(result, "Standard deviation", v.standard_deviation);
-				edit_property(result, "Radius", v.radius.x);
-				v.radius.y = v.radius.x;
-				edit_property(result, "Amplification", v.amplification);
+				MULTIPROPERTY("Standard deviation", neon_map.value.standard_deviation);
+				MULTIPROPERTY("Radius", neon_map.value.radius.x);
+
+				for (auto& e : es) {
+					e.after.neon_map.value.radius.y = e.after.neon_map.value.radius.x;
+				}
+
+				MULTIPROPERTY("Amplification", neon_map.value.amplification);
 			}
 		}
 	}
 
-	if (e.domain == editor_sprite_domain::PHYSICAL) {
+	if (insp.domain == editor_sprite_domain::PHYSICAL) {
 		ImGui::Separator();
 		text_color("Physics", yellow);
 		ImGui::Separator();
@@ -479,21 +528,21 @@ std::string perform_editable_gui(
 			auto scope = augs::imgui::scoped_tree_node_ex("Edit collider shape");
 		}
 
-		edit_property(result, "Is see-through", e.is_see_through);
+		MULTIPROPERTY("Is see-through", is_see_through);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, lets the light through.\nEnemies will be visible behind this object.\nUse it on walls of glass.");
 		}
 
-		edit_property(result, "Is body static", e.is_static);
+		MULTIPROPERTY("Is body static", is_static);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, will be permanently set in place.\nWon't move no matter what.\nUse it on layout-defining walls and objects.");
 		}
 
-		edit_property(result, "Density", e.density);
-		edit_property(result, "Friction", e.friction);
-		edit_property(result, "Restitution", e.restitution);
+		MULTIPROPERTY("Density", density);
+		MULTIPROPERTY("Friction", friction);
+		MULTIPROPERTY("Restitution", restitution);
 	}
 
 	ImGui::Separator();
@@ -501,63 +550,84 @@ std::string perform_editable_gui(
 	return result;
 }
 
-std::string perform_editable_gui(editor_sound_resource_editable&) {
+EDIT_FUNCTION(editor_sound_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_light_resource_editable& e) {
+EDIT_FUNCTION(editor_light_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "##Defaultcolor", e.color);
+	MULTIPROPERTY("##Defaultcolor", color);
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_particles_resource_editable&) {
+EDIT_FUNCTION(editor_particles_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_material_resource_editable&) {
+EDIT_FUNCTION(editor_material_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_firearm_resource_editable&) {
+EDIT_FUNCTION(editor_firearm_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_ammunition_resource_editable&) {
+EDIT_FUNCTION(editor_ammunition_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_melee_resource_editable&) {
+EDIT_FUNCTION(editor_melee_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_wandering_pixels_resource_editable& e) {
+EDIT_FUNCTION(editor_wandering_pixels_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
 
 	if (auto scope = augs::imgui::scoped_tree_node_ex("Node defaults")) {
-		(void)e;
 		// TODO: let this be edited
 		/* if (const auto new_res = perform_editable_gui(e.node_defaults); !new_res.empty()) { */
 		/* 	result = new_res; */
@@ -567,27 +637,32 @@ std::string perform_editable_gui(editor_wandering_pixels_resource_editable& e) {
 	return result;
 }
 
-std::string perform_editable_gui(editor_point_marker_resource_editable& e) {
+EDIT_FUNCTION(editor_point_marker_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	(void)e;
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_area_marker_resource_editable& e) {
+EDIT_FUNCTION(editor_area_marker_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	(void)e;
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_explosive_resource_editable&) {
+EDIT_FUNCTION(editor_explosive_resource_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
@@ -609,7 +684,7 @@ void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants
 		}
 		else {
 			all_inspected.push_back(inspected);
-			mark_last_inspected(inspected);
+			mark_last_inspected(inspected, false);
 		}
 	}
 	else {
@@ -727,16 +802,29 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		ImGui::SameLine();
 		text(name);
 
-		auto hypothetical_default = decltype(resource.editable)();
+		const bool include_resources_from_selected_nodes = (node_current_tab == inspected_node_tab_type::RESOURCE);
+
+		auto cmd = in.setup.make_command_from_selected_typed_resources<edit_resource_command<R>, R>("Edited ", include_resources_from_selected_nodes);
+
+		std::vector<decltype(resource.editable)> hypothetical_defaults;
+		hypothetical_defaults.reserve(cmd.entries.size());
+
+		for (auto& e : cmd.entries) {
+			const auto entry_resource = in.setup.find_resource(e.resource_id);
+			ensure(entry_resource != nullptr);
+			e.after = entry_resource->editable;
+
+			hypothetical_defaults.push_back({});
+
+			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
+				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, entry_resource->thumbnail_id)) {
+					hypothetical_defaults.back().size = ad_hoc->get_original_size();
+				}
+			}
+		}
 
 		if (!resource_id.is_official) {
 			ImGui::NextColumn();
-
-			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
-				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, resource.thumbnail_id)) {
-					hypothetical_default.size = ad_hoc->get_original_size();
-				}
-			}
 
 			{
 				const auto reset_bgs = std::array<rgba, 3> {
@@ -745,7 +833,14 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					rgba(150, 40, 40, 255)
 				};
 
-				const bool already_default = augs::introspective_equal(hypothetical_default, resource.editable);
+				bool already_default = true;
+
+				for (std::size_t i = 0; i < cmd.entries.size(); ++i) {
+					if (!augs::introspective_equal(hypothetical_defaults[i], cmd.entries[i].after)) {
+						already_default = false;
+						break;
+					}
+				}
 
 				{
 					auto cols = scoped_button_colors(reset_bgs);
@@ -759,11 +854,23 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
 					if (already_default) {
 						auto scope = scoped_tooltip();
-						text_color("There's nothing to reset now.", green); text("The resource has default properties.");
+						text_color("There's nothing to reset now.", green); 
+						if (cmd.entries.size() == 1) {
+							text("The resource has default properties.");
+						}
+						else {
+							text("All selected resources have default properties.");
+						}
 					}
 					else {
 						auto scope = scoped_tooltip();
-						text_color("Restore defaults to all properties below.", orange); text("Can safely be undone.");
+
+						if (cmd.entries.size() == 1) {
+							text_color("Restore defaults to all properties below.", orange); text("Can safely be undone.");
+						}
+						else {
+							text_color("Some of the selected resources can be reset to default.\nClick to restore defaults to them all.", orange); text("Can safely be undone.");
+						}
 					}
 				}
 			}
@@ -803,24 +910,27 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					false
 				};
 
-				changed = perform_editable_gui(edited_copy, hypothetical_default.size, picker);
+				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, picker);
 
 			}
 			else {
 				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
-				changed = perform_editable_gui(edited_copy);
+				changed = perform_editable_gui(edited_copy, cmd.entries);
 			}
 
 			if (request_defaults) {
-				edited_copy = hypothetical_default;
+				for (std::size_t i = 0; i < cmd.entries.size(); ++i) {
+					cmd.entries[i].after = hypothetical_defaults[i];
+				}
+
 				changed = "Restored defaults to %x";
 			}
 
-			if (!changed.empty() && !resource_id.is_official) {
-				edit_resource_command<R> cmd;
-				cmd.resource_id = resource_id;
-				cmd.after = edited_copy;
-				cmd.built_description = typesafe_sprintf(changed, resource.get_display_name());
+			if (!changed.empty() && !cmd.empty() && !resource_id.is_official) {
+				if (cmd.size() == 1) {
+					cmd.built_description = typesafe_sprintf(changed, resource.get_display_name());
+				}
+
 				cmd.override_inspector_state = std::move(override_inspector_state);
 
 				post_new_or_rewrite(std::move(cmd)); 
@@ -860,9 +970,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		auto cmd = in.setup.make_command_from_selected_typed_nodes<edit_node_command<N>, N>("Edited ");
 
 		for (auto& e : cmd.entries) {
-			const auto node = in.setup.find_node(e.node_id);
-			ensure(node != nullptr);
-			e.after = node->editable;
+			const auto entry_node = in.setup.find_node(e.node_id);
+			ensure(entry_node != nullptr);
+			e.after = entry_node->editable;
 		}
 
 		(void)node_id;

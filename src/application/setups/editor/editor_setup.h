@@ -300,6 +300,9 @@ public:
 	template <class T, class Node, class... Args>
 	auto make_command_from_selected_typed_nodes(const std::string& preffix, Args&&...) const;
 
+	template <class T, class Resource, class... Args>
+	auto make_command_from_selected_typed_resources(const std::string& preffix, bool include_resources_from_selected_nodes, Args&&...) const;
+
 	template <class T, class... Args>
 	auto make_command_from_selected_layers(const std::string& preffix, Args&&...) const;
 
@@ -353,6 +356,15 @@ public:
 	std::string get_name(editor_typed_node_id<N> id) const {
 		if (const auto node = find_node(id)) {
 			return node->get_display_name();
+		}
+
+		return "";
+	}
+
+	template <class N>
+	std::string get_name(editor_typed_resource_id<N> id) const {
+		if (const auto resource = find_resource(id)) {
+			return resource->get_display_name();
 		}
 
 		return "";
@@ -565,4 +577,6 @@ public:
 	const auto& get_last_inspected_layer_or_node() const {
 		return gui.inspector.get_last_inspected_layer_or_node();
 	}
+
+	void set_inspector_tab(inspected_node_tab_type);
 };

@@ -25,9 +25,14 @@ T make_command_from_selections(
 	if (command.size() == 1) {
 		command.built_description = preffix + last_name;
 	}
+#if 0
+	// TODO: pass the proper ALL count but this will be a pain in the ass and hard to interpret anyway
+	// low prio tbh
+
 	else if (command.size() == setup.get_node_count()) {
 		command.built_description = preffix + "all " + suffix;
 	}
+#endif
 	else {
 		command.built_description = preffix + typesafe_sprintf("%x %x", command.size(), suffix);
 	}
@@ -90,6 +95,49 @@ auto editor_setup::make_command_from_selected_typed_nodes(const std::string& pre
 		},
 		preffix,
 		"nodes",
+		std::forward<Args>(args)...
+	);
+}
+
+template <class T, class Resource, class... Args>
+auto editor_setup::make_command_from_selected_typed_resources(const std::string& preffix, const bool include_resources_from_selected_nodes, Args&&... args) const {
+	return ::make_command_from_selections<T>(
+		*this,
+		[&](auto callback) {
+			if (include_resources_from_selected_nodes) {
+				thread_local std::unordered_set<editor_typed_resource_id<Resource>> seen;
+				seen.clear();
+
+				gui.inspector.for_each_inspected<editor_node_id>(
+					[&](const editor_node_id& inspected_id) {
+						on_node(inspected_id, [&](const auto& typed_node, const auto id) {
+							(void)id;
+
+							if (const auto resource = find_resource(typed_node.resource_id)) {
+								if (!typed_node.resource_id.is_official) {
+									const auto id = editor_typed_resource_id<Resource>::from_generic(editor_resource_id(typed_node.resource_id));
+
+									if (!found_in(seen, id)) {
+										seen.emplace(id);
+										callback(id);
+									}
+								}
+							}
+						});
+					}
+				);
+			}
+
+			gui.inspector.for_each_inspected<editor_resource_id>(
+				[&](const editor_resource_id& resource_id) {
+					if (!resource_id.is_official) {
+						callback(editor_typed_resource_id<Resource>::from_generic(resource_id));
+					}
+				}
+			);
+		},
+		preffix,
+		"resources",
 		std::forward<Args>(args)...
 	);
 }

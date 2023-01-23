@@ -4831,3 +4831,23 @@ Advantages:
 - If size is smaller than original we could default to stretch
 	- Otherwise sprites disappear which is confusing
 
+- macos build fail: vsprintf in yojimbo
+	- low prio tho but would be nice to have a green light
+
+
+- Also think how do we handle resource editing when multiple nodes are selected and we switch to resource tab
+	- Should be fairly easy to properly implement this, just gather the resource targets from the currently inspected nodes, the rest as usual
+- Multiple edits - concat commands or have commands specify multiple entries
+	- command concat sounds nice on paper because it avoids repetition but rewrite last command gets fucked a bit, might complicate things
+	- Let's go with multiple entries
+	- What about command descriptions?
+		- We already have these in edit properties
+		- We can take advantage of these and just add "in %x nodes"
+
+- Maybe multiple editing would be easy under our new system
+	- The inspector would just need to know which props are shared but even that wouldn't be necessary in the first iteration
+	- We could begin with layers
+	- uh, we'd still need to pass the vector of things to apply the change to all
+	- so I guess first step would be accept vector of references instead of just one object
+		- and some macro to turn each edit_property into a loop
+

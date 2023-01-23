@@ -27,6 +27,7 @@ void edit_node_command<T>::undo(editor_command_input in) {
 	}
 
 	if (do_inspector) {
+		in.setup.set_inspector_tab(inspected_node_tab_type::NODE);
 		in.setup.after_quietly_adding_inspected();
 	}
 }
@@ -51,6 +52,7 @@ void edit_node_command<T>::redo(editor_command_input in) {
 	}
 
 	if (do_inspector) {
+		in.setup.set_inspector_tab(inspected_node_tab_type::NODE);
 		in.setup.after_quietly_adding_inspected();
 	}
 }

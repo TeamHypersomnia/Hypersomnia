@@ -9,10 +9,24 @@ struct edit_resource_command {
 
 	editor_command_meta meta;
 
-	editor_typed_resource_id<T> resource_id;
+	struct entry {
+		editor_typed_resource_id<T> resource_id;
 
-	editable_type before;
-	editable_type after;
+		editable_type before;
+		editable_type after;
+	};
+
+	void push_entry(editor_typed_resource_id<T>);
+
+	std::vector<entry> entries;
+
+	auto size() const {
+		return entries.size();
+	}
+
+	auto empty() const {
+		return entries.empty();
+	}
 
 	std::string built_description;
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/misc/pool/pooled_object_id.h"
 #include "application/setups/editor/resources/editor_resource_id.h"
+#include "augs/ensure.h"
 
 template <class E>
 struct editor_specific_pool_typed_resource_id {
@@ -17,12 +18,13 @@ struct editor_typed_resource_id {
 		return { raw, is_official };
 	}
 
-	static editor_typed_resource_id<E> from_generic(const editor_resource_id& id) {
-		return { id.raw, id.is_official };
+	static auto get_type_id() {
+		return editor_resource_type_id::of<E>();
 	}
 
-	auto get_type_id() const {
-		return editor_resource_type_id::of<E>();
+	static editor_typed_resource_id<E> from_generic(const editor_resource_id& id) {
+		ensure(get_type_id() == id.type_id);
+		return { id.raw, id.is_official };
 	}
 
 	explicit operator editor_resource_id() const {

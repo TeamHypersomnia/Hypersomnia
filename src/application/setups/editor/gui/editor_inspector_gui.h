@@ -123,7 +123,7 @@ public:
 		return last_inspected_layer_or_node;
 	}
 
-	void mark_last_inspected(const inspected_variant& v) {
+	void mark_last_inspected(const inspected_variant& v, bool reset_tab_to_node = true) {
 		std::visit(
 			[this]<typename T>(const T& typed) {
 				if constexpr(std::is_same_v<T, editor_node_id> || std::is_same_v<T, editor_layer_id>) {
@@ -134,6 +134,19 @@ public:
 		);
 
 		last_inspected_any = v;
+
+		if (reset_tab_to_node) {
+			/*
+				The tabs might look similar so it's best to default to NODE
+				any time something is explicitly inspected.
+
+				This is to avoid the user mistakenly editing resource when they have clicked on a node.
+				We don't do this with multiple selection logic (controlled with reset_tab_to_node)
+				because it would feel strange if the tab changed on its own while adding more nodes to the selection.
+			*/
+
+			node_current_tab = inspected_node_tab_type::NODE;
+		}
 	}
 
 	void inspect(inspected_variant, bool wants_multiple);

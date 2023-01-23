@@ -628,7 +628,7 @@ void editor_setup::inspect(const current_selections_type& selections) {
 
 	for (const auto entity : selections) {
 		if (!found_in(gui.inspector.all_inspected, inspected_variant(to_node_id(entity)))) {
-			gui.inspector.mark_last_inspected(to_node_id(entity));
+			gui.inspector.mark_last_inspected(to_node_id(entity), selections.size() == 1);
 			found_next_marked = true;
 			break;
 		}
@@ -644,7 +644,7 @@ void editor_setup::inspect(const current_selections_type& selections) {
 
 	if (!found_next_marked) {
 		if (gui.inspector.all_inspected.size() > 0) {
-			gui.inspector.mark_last_inspected(gui.inspector.all_inspected.front());
+			gui.inspector.mark_last_inspected(gui.inspector.all_inspected.front(), false);
 		}
 	}
 }
@@ -654,7 +654,7 @@ void editor_setup::inspect(const std::vector<entity_id>& selections) {
 
 	for (const auto entity : selections) {
 		if (!found_in(gui.inspector.all_inspected, inspected_variant(to_node_id(entity)))) {
-			gui.inspector.mark_last_inspected(to_node_id(entity));
+			gui.inspector.mark_last_inspected(to_node_id(entity), selections.size() == 1);
 			found_next_marked = true;
 			break;
 		}
@@ -670,7 +670,7 @@ void editor_setup::inspect(const std::vector<entity_id>& selections) {
 
 	if (!found_next_marked) {
 		if (gui.inspector.all_inspected.size() > 0) {
-			gui.inspector.mark_last_inspected(gui.inspector.all_inspected.front());
+			gui.inspector.mark_last_inspected(gui.inspector.all_inspected.front(), false);
 		}
 	}
 }
@@ -1904,6 +1904,10 @@ std::optional<editor_setup::parent_layer_info> editor_setup::convert_to_parent_l
 
 void editor_setup::quiet_set_last_inspected(const inspected_variant inspected) {
 	gui.inspector.last_inspected_layer_or_node = inspected;
+}
+
+void editor_setup::set_inspector_tab(const inspected_node_tab_type type) {
+	gui.inspector.node_current_tab = type;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;
