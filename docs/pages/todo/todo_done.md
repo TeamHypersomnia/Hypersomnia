@@ -4828,3 +4828,6 @@ Advantages:
  
 - Spawnpoint icons don't hover properly when zoomed out
 
+- If size is smaller than original we could default to stretch
+	- Otherwise sprites disappear which is confusing
+

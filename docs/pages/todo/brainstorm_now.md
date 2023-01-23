@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- macos build fail: vsprintf in yojimbo
+	- low prio tho but would be nice to have a green light
+
 - Also think how do we handle resource editing when multiple nodes are selected and we switch to resource tab
 	- Should be fairly easy to properly implement this, just gather the resource targets from the currently inspected nodes, the rest as usual
 
@@ -15,9 +18,6 @@ summary: That which we are brainstorming at the moment.
 
 - Area markers and point markers should have their own tonpo (tree of non-physical object)
 	- for now the bruteforce will work
-
-- If size is smaller than original we could default to stretch
-	- Otherwise sprites disappear which is confusing
 
 - flips/resizes not applied to animated stuff
 	- uhh wtf they actually have no overridden geo
