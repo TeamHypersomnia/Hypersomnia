@@ -170,6 +170,26 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 	const auto& tree_of_npo = cosm.get_solvable_inferred().tree_of_npo;
 	const auto& organisms = cosm.get_solvable_inferred().organisms;
 	
+	if (input.types.force_add_all_icons) {
+		// TODO: markers should have their own tonpo!!!
+		// At some point this might start lagging in editor
+
+		cosm.for_each_having<invariants::point_marker>(
+			[&](const auto typed_handle) {
+				register_visible(cosm, typed_handle);
+			}
+		);
+
+		cosm.for_each_having<invariants::box_marker>(
+			[&](const auto typed_handle) {
+				if (typed_handle.template get<invariants::box_marker>().type != area_marker_type::CALLOUT) {
+					// callouts already do have their own tonpo
+					register_visible(cosm, typed_handle);
+				}
+			}
+		);
+	}
+
 	auto acquire_from = [&](const tree_of_npo_type type) {
 		auto add_visible = [&](const auto& id) {
 			if (!::passes_filter(input.filter, cosm, id)) {

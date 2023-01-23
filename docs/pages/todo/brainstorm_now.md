@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Spawnpoint icons don't hover properly when zoomed out
-
 - Also think how do we handle resource editing when multiple nodes are selected and we switch to resource tab
 	- Should be fairly easy to properly implement this, just gather the resource targets from the currently inspected nodes, the rest as usual
 

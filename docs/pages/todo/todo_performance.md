@@ -5,6 +5,9 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- search for TODO: hits in editor sources later because some important temporary fixes were applied that are not necessarily optimal
+	- e.g. bugfix to point/area marker icons being unhoverable when zoomed out. This is a temporary measure
+ 
 - maybe dont load editor icons for actual gameplay?
 	- but for now leave it at that, easier to playtest too
 

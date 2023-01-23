@@ -4826,3 +4826,5 @@ Advantages:
 - use last_inspected_any?
 	- the current inspected under multiselection does not always correspond to the last inspected
  
+- Spawnpoint icons don't hover properly when zoomed out
+

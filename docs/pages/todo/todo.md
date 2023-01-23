@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Review the TODO: comments especially inside editor sources once we're close to MVP
+
 - Atlas
 	- FIRST into neon maps and diffuse 
 	- Literally even neons have separate drawcalls for foreground, dropped items and 
