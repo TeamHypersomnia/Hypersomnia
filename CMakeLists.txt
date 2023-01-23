@@ -456,8 +456,6 @@ if(BUILD_NETWORKING)
 		"src/application/network/network_adapters.cpp"
 		"src/augs/network/network_types.cpp"
 	)
-
-	file_flag("src/augs/network/network_types.cpp" "-Wno-error=deprecated-declarations")
 endif()
 
 set(HYPERSOMNIA_CODEBASE_CPPS
@@ -861,9 +859,6 @@ if(BUILD_NETWORKING)
 	# "src/3rdparty/yojimbo/yojimbo.h"
 	# "src/3rdparty/yojimbo/netcode.io/netcode.h"
 	# "src/3rdparty/yojimbo/reliable.io/reliable.h" 
-	file_flag("src/3rdparty/yojimbo/yojimbo.cpp" "-Wno-error=deprecated-declarations")
-	file_flag("src/3rdparty/yojimbo/netcode.io/netcode.c" "-Wno-error=deprecated-declarations")
-	file_flag("src/3rdparty/yojimbo/reliable.io/reliable.c" "-Wno-error=deprecated-declarations")
 endif()
 
 # Project resource files, e.g. an icon.
@@ -1071,6 +1066,10 @@ if(CLANG)
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 
 	file_flag("src/augs/image/image.cpp" "-Wno-error")
+	file_flag("src/augs/network/network_types.cpp" "-Wno-error=deprecated-declarations")
+	file_flag("src/3rdparty/yojimbo/yojimbo.cpp" "-Wno-error=deprecated-declarations")
+	file_flag("src/3rdparty/yojimbo/netcode.io/netcode.c" "-Wno-error=deprecated-declarations")
+	file_flag("src/3rdparty/yojimbo/reliable.io/reliable.c" "-Wno-error=deprecated-declarations")
 endif()
 
 if(GCC)
