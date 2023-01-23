@@ -140,6 +140,16 @@ public:
 	void perform(editor_inspector_input);
 
 	void clear() {
+		/*
+			last_inspected_layer_or_node needs to be preserved after clears 
+			for find_best_layer_for_new_node to behave intuitively.
+
+			last_inspected_any needs to be reset though because it's used to determine
+			which object is inspected under multiple selection.
+			however we can't reset it here because inspector is sometimes cleared and then repopulated again with new entries.
+				last_inspected_any is therefore only reset right before handling inspector gui logic. This also accounts for manual deselection.
+		*/
+
 		all_inspected.clear();
 		tweaked_widget.reset();
 	}

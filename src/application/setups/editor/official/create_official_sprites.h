@@ -21,6 +21,7 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 			res.scene_flavour_id = flavour_id;
 			res.scene_asset_id = image_id;
 			res.editable.color = sprite.color;
+			res.editable.size = sprite.size;
 			pool.allocate(res);
 		});
 	}
@@ -39,6 +40,7 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 			res.scene_flavour_id = flavour_id;
 			res.scene_asset_id = image_id;
 			res.editable.color = sprite.color;
+			res.editable.size = sprite.size;
 			pool.allocate(res);
 		});
 	}

@@ -24,7 +24,7 @@ struct editor_area_marker_node_editable {
 
 	vec2 pos;
 	real32 rotation = 0.0f;
-	augs::maybe<vec2i> size;
+	vec2i size = { 256, 256 };
 	// END GEN INTROSPECTOR
 };
 

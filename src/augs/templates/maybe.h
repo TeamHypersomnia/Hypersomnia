@@ -32,6 +32,10 @@ namespace augs {
 			is_enabled = true;
 		}
 
+		void reset() {
+			is_enabled = false;
+		}
+
 		explicit operator bool() const {
 			return is_enabled;
 		}

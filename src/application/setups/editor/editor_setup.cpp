@@ -624,31 +624,55 @@ void editor_setup::clear_inspector() {
 }
 
 void editor_setup::inspect(const current_selections_type& selections) {
+	bool found_next_marked = false;
+
+	for (const auto entity : selections) {
+		if (!found_in(gui.inspector.all_inspected, inspected_variant(to_node_id(entity)))) {
+			gui.inspector.mark_last_inspected(to_node_id(entity));
+			found_next_marked = true;
+			break;
+		}
+	}
+
 	clear_inspector();
 
 	for (const auto entity : selections) {
 		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
 	}
 
-	if (gui.inspector.all_inspected.size() > 0) {
-		gui.inspector.mark_last_inspected(gui.inspector.all_inspected.back());
-	}
-
 	sort_inspected();
+
+	if (!found_next_marked) {
+		if (gui.inspector.all_inspected.size() > 0) {
+			gui.inspector.mark_last_inspected(gui.inspector.all_inspected.front());
+		}
+	}
 }
 
 void editor_setup::inspect(const std::vector<entity_id>& selections) {
+	bool found_next_marked = false;
+
+	for (const auto entity : selections) {
+		if (!found_in(gui.inspector.all_inspected, inspected_variant(to_node_id(entity)))) {
+			gui.inspector.mark_last_inspected(to_node_id(entity));
+			found_next_marked = true;
+			break;
+		}
+	}
+
 	clear_inspector();
 
 	for (const auto entity : selections) {
 		gui.inspector.all_inspected.emplace_back(to_node_id(entity));
 	}
 
-	if (gui.inspector.all_inspected.size() > 0) {
-		gui.inspector.mark_last_inspected(gui.inspector.all_inspected.back());
-	}
-
 	sort_inspected();
+
+	if (!found_next_marked) {
+		if (gui.inspector.all_inspected.size() > 0) {
+			gui.inspector.mark_last_inspected(gui.inspector.all_inspected.front());
+		}
+	}
 }
 
 void editor_setup::inspect_only(const std::vector<editor_node_id>& selections) {

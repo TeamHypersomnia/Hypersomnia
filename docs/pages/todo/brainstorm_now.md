@@ -7,14 +7,19 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Spawnpoint icons don't hover properly when zoomed out
-- If size is smaller than original we could default to stretch
 
-- Things wrong now
-	- officials get 0 size when we tick resize
-		- that default is probably written during file resolution? and we simulate that
-	- rewrite last change doesnt work, spams cmds - fixed with skip_inspector
-	- also toggling flags also spams cmds - fixed with skip_inspector
-	- mass-editing uninspects nodes straight away - fixed with skip_inspector
+- Also think how do we handle resource editing when multiple nodes are selected and we switch to resource tab
+	- Should be fairly easy to properly implement this, just gather the resource targets from the currently inspected nodes, the rest as usual
+
+- Why does the performance drop dramatically in debug after spawning just a few firearms?
+	- Doesn't happen with normal entities too
+	- Maybe check with physical objects too?
+
+- Area markers and point markers should have their own tonpo (tree of non-physical object)
+	- for now the bruteforce will work
+
+- If size is smaller than original we could default to stretch
+	- Otherwise sprites disappear which is confusing
 
 - flips/resizes not applied to animated stuff
 	- uhh wtf they actually have no overridden geo

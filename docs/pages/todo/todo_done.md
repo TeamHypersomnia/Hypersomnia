@@ -4816,3 +4816,13 @@ Advantages:
 - Also we determined to just put a default duration of 40 ms for visualization, accuracy is not a problem here
 - We could try ubuntu-20.04 or wait for github actions to roll out 22.05
 
+
+- Things wrong now
+	- officials get 0 size when we tick resize
+		- that default is probably written during file resolution? and we simulate that
+	- rewrite last change doesnt work, spams cmds - fixed with skip_inspector
+	- also toggling flags also spams cmds - fixed with skip_inspector
+	- mass-editing uninspects nodes straight away - fixed with skip_inspector
+- use last_inspected_any?
+	- the current inspected under multiselection does not always correspond to the last inspected
+ 

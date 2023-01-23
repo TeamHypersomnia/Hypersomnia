@@ -9,6 +9,7 @@ using ad_hoc_entry_id = uint32_t;
 struct editor_wandering_pixels_resource_editable {
 	// GEN INTROSPECTOR struct editor_wandering_pixels_resource_editable
 	components::wandering_pixels node_defaults;
+	vec2i default_size;
 	// END GEN INTROSPECTOR
 };
 

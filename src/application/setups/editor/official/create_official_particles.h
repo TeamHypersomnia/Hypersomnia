@@ -36,13 +36,16 @@ void create_particles(const intercosm& scene, editor_resource_pools& pools) {
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
 			const auto flavour_id = to_entity_flavour_id(enum_id);
 			//const auto& wp =       scene.world.get_flavour(flavour_id).template get<invariants::wandering_pixels>();
-			const auto& def_comp = scene.world.get_flavour(flavour_id).template get<components::wandering_pixels>();
+			auto& flavour = scene.world.get_flavour(flavour_id);
+			const auto& def_comp = flavour.template get<components::wandering_pixels>();
+			const auto& og = flavour.template get<components::overridden_geo>();
 
 			auto res = editor_wandering_pixels_resource();
 			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
 			res.official_tag = enum_id;
 			res.scene_flavour_id = flavour_id;
 			res.editable.node_defaults = def_comp;
+			res.editable.default_size = og.size.value;
 
 			pool.allocate(res);
 		});

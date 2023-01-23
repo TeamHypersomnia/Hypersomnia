@@ -227,6 +227,7 @@ EDIT_FUNCTION(editor_wandering_pixels_node_editable& insp, T& es) {
 
 	MULTIPROPERTY("Position", pos);
 	MULTIPROPERTY("Rotation", rotation);
+	MULTIPROPERTY("Size", size);
 
 	ImGui::Separator();
 
@@ -277,6 +278,9 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 	bool last_result = false;
 	std::string result;
 
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
+
 	const auto type = resource.editable.type;
 
 	if (has_team(type)) {
@@ -295,6 +299,10 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 	bool last_result = false;
 	std::string result;
 
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
+	MULTIPROPERTY("Size", size);
+	 
 	const auto type = resource.editable.type;
 
 	if (has_team(type)) {
@@ -1044,7 +1052,11 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			}
 		};
 
-		if (std::visit(can_multi_edit, all_inspected[0])) {
+		if (!found_in(all_inspected, last_inspected_any)) {
+			last_inspected_any = all_inspected.front();
+		}
+
+		if (std::visit(can_multi_edit, last_inspected_any)) {
 			std::visit(edit_properties, last_inspected_any);
 		}
 		else {

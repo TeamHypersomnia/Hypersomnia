@@ -12,7 +12,7 @@ struct editor_wandering_pixels_node_editable : components::wandering_pixels {
 	// GEN INTROSPECTOR struct editor_wandering_pixels_node_editable
 	vec2 pos;
 	real32 rotation = 0.0f;
-	augs::maybe<vec2i> size;
+	vec2i size;
 	// END GEN INTROSPECTOR
 };
 
