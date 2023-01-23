@@ -297,6 +297,9 @@ public:
 	template <class T, class... Args>
 	auto make_command_from_selected_nodes(const std::string& preffix, Args&&...) const;
 
+	template <class T, class Node, class... Args>
+	auto make_command_from_selected_typed_nodes(const std::string& preffix, Args&&...) const;
+
 	template <class T, class... Args>
 	auto make_command_from_selected_layers(const std::string& preffix, Args&&...) const;
 
@@ -345,11 +348,21 @@ public:
 
 	std::string get_name(inspected_variant) const;
 	std::string get_name(entity_id) const;
+
+	template <class N>
+	std::string get_name(editor_typed_node_id<N> id) const {
+		if (const auto node = find_node(id)) {
+			return node->get_display_name();
+		}
+
+		return "";
+	}
+
 	std::size_t get_node_count() const;
 
 	editor_history::index_type get_last_command_index() const;
 
-	editor_command_input make_command_input(); 
+	editor_command_input make_command_input(bool skip_inspector = false); 
 	entity_selector_input make_selector_input() const;
 	node_mover_input make_mover_input();
 

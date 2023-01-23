@@ -86,7 +86,13 @@ static void read_back_to_nodes(editor_setup& setup) {
 					}
 
 					if constexpr(has_size_v<E>) {
-						node.editable.size = size;
+						if (size == std::nullopt) {
+							node.editable.size.is_enabled = false;
+						}
+						else {
+							node.editable.size.value = *size;
+							node.editable.size.is_enabled = true;
+						}
 					}
 
 					if constexpr(has_flip_v<E>) {

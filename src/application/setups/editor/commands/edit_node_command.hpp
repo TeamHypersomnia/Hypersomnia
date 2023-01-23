@@ -4,22 +4,54 @@
 #include "application/setups/editor/commands/editor_command_meta.h"
 
 template <class T>
-void edit_node_command<T>::undo(editor_command_input in) {
-	if (auto node = in.setup.find_node(node_id)) {
-		after = node->editable;
-		node->editable = before;
+void edit_node_command<T>::push_entry(const editor_typed_node_id<T> id) {
+	entries.push_back({ id, {}, {} });
+}
 
-		in.setup.inspect_only(editor_node_id(node_id));
+template <class T>
+void edit_node_command<T>::undo(editor_command_input in) {
+	const bool do_inspector = !in.skip_inspector;
+
+	if (do_inspector) {
+		in.setup.clear_inspector();
+	}
+
+	for (auto& entry : entries) {
+		if (auto node = in.setup.find_node(entry.node_id)) {
+			node->editable = entry.before;
+
+			if (do_inspector) {
+				in.setup.inspect_add_quiet(editor_node_id(entry.node_id));
+			}
+		}
+	}
+
+	if (do_inspector) {
+		in.setup.after_quietly_adding_inspected();
 	}
 }
 
 template <class T>
 void edit_node_command<T>::redo(editor_command_input in) {
-	if (auto node = in.setup.find_node(node_id)) {
-		before = node->editable;
-		node->editable = after;
+	const bool do_inspector = !in.skip_inspector;
 
-		in.setup.inspect_only(editor_node_id(node_id));
+	if (do_inspector) {
+		in.setup.clear_inspector();
+	}
+
+	for (auto& entry : entries) {
+		if (auto node = in.setup.find_node(entry.node_id)) {
+			entry.before = node->editable;
+			node->editable = entry.after;
+
+			if (do_inspector) {
+				in.setup.inspect_only(editor_node_id(entry.node_id));
+			}
+		}
+	}
+
+	if (do_inspector) {
+		in.setup.after_quietly_adding_inspected();
 	}
 }
 
@@ -28,7 +60,11 @@ void rename_node_command::push_entry(const editor_node_id id) {
 }
 
 void rename_node_command::undo(editor_command_input in) {
-	in.setup.clear_inspector();
+	const bool do_inspector = !in.skip_inspector;
+
+	if (do_inspector) {
+		in.setup.clear_inspector();
+	}
 
 	for (auto& entry : entries) {
 		in.setup.on_node(
@@ -37,16 +73,21 @@ void rename_node_command::undo(editor_command_input in) {
 				(void)id;
 
 				node.unique_name = entry.before;
-				in.setup.inspect_add_quiet(entry.node_id);
+
+				if (do_inspector) {
+					in.setup.inspect_add_quiet(entry.node_id);
+				}
 			}
 		);
 	}
 
-	in.setup.after_quietly_adding_inspected();
+	if (do_inspector) {
+		in.setup.after_quietly_adding_inspected();
+	}
 }
 
 void rename_node_command::redo(editor_command_input in) {
-	const bool do_inspector = !in.setup.get_history().executed_new();
+	const bool do_inspector = !in.skip_inspector;
 
 	if (do_inspector) {
 		in.setup.clear_inspector();
@@ -78,21 +119,29 @@ void rename_layer_command::push_entry(const editor_layer_id id) {
 }
 
 void rename_layer_command::undo(editor_command_input in) {
-	in.setup.clear_inspector();
+	const bool do_inspector = !in.skip_inspector;
+
+	if (do_inspector) {
+		in.setup.clear_inspector();
+	}
 
 	for (auto& entry : entries) {
 		if (const auto layer = in.setup.find_layer(entry.layer_id)) {
 			layer->unique_name = entry.before;
 
-			in.setup.inspect_add_quiet(entry.layer_id);
+			if (do_inspector) {
+				in.setup.inspect_add_quiet(entry.layer_id);
+			}
 		}
 	}
 
-	in.setup.after_quietly_adding_inspected();
+	if (do_inspector) {
+		in.setup.after_quietly_adding_inspected();
+	}
 }
 
 void rename_layer_command::redo(editor_command_input in) {
-	const bool do_inspector = !in.setup.get_history().executed_new();
+	const bool do_inspector = !in.skip_inspector;
 
 	if (do_inspector) {
 		in.setup.clear_inspector();

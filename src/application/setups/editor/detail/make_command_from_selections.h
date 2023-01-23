@@ -77,6 +77,23 @@ auto editor_setup::make_command_from_selected_nodes(const std::string& preffix, 
 	);
 }
 
+template <class T, class Node, class... Args>
+auto editor_setup::make_command_from_selected_typed_nodes(const std::string& preffix, Args&&... args) const {
+	return ::make_command_from_selections<T>(
+		*this,
+		[&](auto callback) {
+			gui.inspector.for_each_inspected<editor_node_id>(
+				[&](const editor_node_id& node_id) {
+					callback(editor_typed_node_id<Node>::from_generic(node_id));
+				}
+			);
+		},
+		preffix,
+		"nodes",
+		std::forward<Args>(args)...
+	);
+}
+
 template <class T, class... Args>
 auto editor_setup::make_command_from_selected_layers(const std::string& preffix, Args&&... args) const {
 	return ::make_command_from_selections<T>(

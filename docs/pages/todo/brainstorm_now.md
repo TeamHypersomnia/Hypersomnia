@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Spawnpoint icons don't hover properly when zoomed out
+- If size is smaller than original we could default to stretch
+
+- Things wrong now
+	- officials get 0 size when we tick resize
+		- that default is probably written during file resolution? and we simulate that
+	- rewrite last change doesnt work, spams cmds - fixed with skip_inspector
+	- also toggling flags also spams cmds - fixed with skip_inspector
+	- mass-editing uninspects nodes straight away - fixed with skip_inspector
+
+- flips/resizes not applied to animated stuff
+	- uhh wtf they actually have no overridden geo
+
 - Multiple edits - concat commands or have commands specify multiple entries
 	- command concat sounds nice on paper because it avoids repetition but rewrite last command gets fucked a bit, might complicate things
 	- Let's go with multiple entries

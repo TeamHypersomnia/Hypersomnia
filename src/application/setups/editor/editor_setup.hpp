@@ -21,15 +21,15 @@ decltype(auto) editor_setup::post_new_command(T&& command) {
 	});
 
 	gui.history.scroll_to_latest_once = true;
-	return history.execute_new(std::forward<T>(command), make_command_input());
+	return history.execute_new(std::forward<T>(command), make_command_input(true));
 }
 
 template <class T>
 decltype(auto) editor_setup::rewrite_last_command(T&& command) {
 	auto rebuild_after = augs::scope_guard([this]() { rebuild_scene(); });
 
-	history.undo(make_command_input());
-	return history.execute_new(std::forward<T>(command), make_command_input());
+	history.undo(make_command_input(true));
+	return history.execute_new(std::forward<T>(command), make_command_input(true));
 }
 
 template <class S, class F>

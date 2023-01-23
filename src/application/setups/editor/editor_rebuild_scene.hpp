@@ -53,9 +53,7 @@ void setup_entity_from_node(
 
 	if (auto geo = agg.template find<components::overridden_geo>()) {
 		if constexpr(has_size_v<Editable>) {
-			if (bool(editable.size)) {
-				geo->size.emplace(editable.size.value());
-			}
+			geo->size = editable.size;
 		}
 
 		if constexpr(has_flip_v<Editable>) {

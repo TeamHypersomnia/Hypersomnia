@@ -10,5 +10,6 @@ class editor_setup;
 
 struct editor_command_input {
 	editor_setup& setup;
+	bool skip_inspector;
 };
 

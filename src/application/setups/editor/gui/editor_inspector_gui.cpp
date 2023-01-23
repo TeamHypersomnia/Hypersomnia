@@ -25,6 +25,29 @@
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "test_scenes/test_scene_flavours.h"
 
+#define MULTIPROPERTY(label, MEMBER) \
+{\
+	bool values_different = false;\
+\
+	for (auto& ee : es) {\
+		if (!(ee.after.MEMBER == insp.MEMBER)) {\
+			values_different = true;\
+		}\
+	}\
+\
+	auto cols = maybe_different_value_cols({}, values_different);\
+\
+	last_result = edit_property(result, label, insp.MEMBER);\
+\
+	if (last_result) {\
+		for (auto& ee : es) {\
+			ee.after.MEMBER = insp.MEMBER;\
+		}\
+	}\
+}
+
+#define EDIT_FUNCTION template <class T> std::string perform_editable_gui
+
 
 void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
@@ -125,36 +148,28 @@ bool edit_property(
 	return false;
 }
 
-std::string perform_editable_gui(editor_sprite_node_editable& e, const vec2i default_size) {
+EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es) {
 	using namespace augs::imgui;
 
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Position", e.pos);
-	edit_property(result, "Rotation", e.rotation);
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
 
-	edit_property(result, "Flip horizontally", e.flip_horizontally);
+	MULTIPROPERTY("Flip horizontally", flip_horizontally);
 	ImGui::SameLine();
-	edit_property(result, "Flip vertically", e.flip_vertically);
+	MULTIPROPERTY("Flip vertically", flip_vertically);
 
-	edit_property(result, "Colorize", e.colorize);
+	MULTIPROPERTY("Colorize", colorize);
 
-	bool size_enabled = e.size != std::nullopt;
+	MULTIPROPERTY("Resize", size.is_enabled);
 
-	if (checkbox("Resize", size_enabled)) {
-		if (size_enabled) {
-			e.size = default_size;
-			result = "Override size in %x";
-		}
-		else {
-			e.size = std::nullopt;
-			result = "Reset size to default in %x";
-		}
-	}
-
-	if (e.size != std::nullopt) {
+	if (insp.size.is_enabled) {
 		ImGui::SameLine();
-		if (edit_property(result, "##Overridden size", *e.size)) {
+		MULTIPROPERTY("##Overridden size", size.value);
+
+		if (last_result) {
 			result = "Resized %x";
 		}
 	}
@@ -162,69 +177,63 @@ std::string perform_editable_gui(editor_sprite_node_editable& e, const vec2i def
 	return result;
 }
 
-std::string perform_editable_gui(editor_sound_node_editable& e) {
+EDIT_FUNCTION(editor_sound_node_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Position", e.pos);
+	MULTIPROPERTY("Position", pos);
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_firearm_node_editable& e) {
+EDIT_FUNCTION(editor_firearm_node_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Position", e.pos);
-	edit_property(result, "Rotation", e.rotation);
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_ammunition_node_editable& e) {
+EDIT_FUNCTION(editor_ammunition_node_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Position", e.pos);
-	edit_property(result, "Rotation", e.rotation);
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_melee_node_editable& e) {
+EDIT_FUNCTION(editor_melee_node_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Position", e.pos);
-	edit_property(result, "Rotation", e.rotation);
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
 }
 
-std::string perform_editable_gui(components::wandering_pixels& e) {
+EDIT_FUNCTION(editor_wandering_pixels_node_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Colorize", e.colorize);
-	edit_property(result, "Num particles", e.num_particles);
-	edit_property(result, "Force particles within bounds", e.force_particles_within_bounds);
-	edit_property(result, "Illuminate", e.illuminate);
-
-	return result;
-}
-
-std::string perform_editable_gui(editor_wandering_pixels_node_editable& e) {
-	using namespace augs::imgui;
-	std::string result;
-
-	edit_property(result, "Position", e.pos);
-	edit_property(result, "Rotation", e.rotation);
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
 
 	ImGui::Separator();
 
-	if (const auto new_res = perform_editable_gui(static_cast<components::wandering_pixels&>(e)); !new_res.empty()) {
-		result = new_res;
-	}
+	MULTIPROPERTY("Colorize", colorize);
+	MULTIPROPERTY("Num particles", num_particles);
+	MULTIPROPERTY("Force particles within bounds", force_particles_within_bounds);
+	MULTIPROPERTY("Illuminate", illuminate);
 
 	return result;
 }
@@ -263,94 +272,78 @@ static bool has_team(const area_marker_type type) {
 	}
 }
 
-std::string perform_editable_gui(const editor_point_marker_resource& resource, editor_point_marker_node_editable& e) {
+EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point_marker_resource& resource) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
 	const auto type = resource.editable.type;
 
 	if (has_team(type)) {
-		edit_property(result, "Faction", e.faction);
+		MULTIPROPERTY("Faction", faction);
 	}
 
 	if (has_letter(type)) {
-		edit_property(result, "Letter", e.letter);
+		MULTIPROPERTY("Letter", letter);
 	}
 
 	return result;
 }
 
-std::string perform_editable_gui(const editor_area_marker_resource& resource, editor_area_marker_node_editable& e) {
+EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_marker_resource& resource) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
 	const auto type = resource.editable.type;
 
 	if (has_team(type)) {
-		edit_property(result, "Faction", e.faction);
+		MULTIPROPERTY("Faction", faction);
 	}
 
 	if (has_letter(type)) {
-		edit_property(result, "Letter", e.letter);
+		MULTIPROPERTY("Letter", letter);
 	}
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_explosive_node_editable& e) {
+EDIT_FUNCTION(editor_explosive_node_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Position", e.pos);
-	edit_property(result, "Rotation", e.rotation);
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_light_node_editable& e) {
+EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Position", e.pos);
-	edit_property(result, "Colorize", e.colorize);
-	edit_property(result, "Scale intensity", e.scale_intensity);
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Colorize", colorize);
+	MULTIPROPERTY("Scale intensity", scale_intensity);
 
 	return result;
 }
 
-std::string perform_editable_gui(editor_particles_node_editable& e) {
+EDIT_FUNCTION(editor_particles_node_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
-	edit_property(result, "Position", e.pos);
+	MULTIPROPERTY("Position", pos);
 
 	return result;
 }
 
-#define MULTIPROPERTY(label, MEMBER) \
-{\
-	bool values_different = false;\
-\
-	for (auto& ee : es) {\
-		if (!(ee.after.MEMBER == insp.MEMBER)) {\
-			values_different = true;\
-		}\
-	}\
-\
-	auto cols = maybe_different_value_cols({}, values_different);\
-\
-	if (edit_property(result, label, insp.MEMBER)) {\
-		for (auto& ee : es) {\
-			ee.after.MEMBER = insp.MEMBER;\
-		}\
-	}\
-}
-
-std::string perform_editable_gui(
-	editor_layer_editable& insp,
-	decltype(edit_layer_command::entries)& es
-) {
+EDIT_FUNCTION(editor_layer_editable& insp, T& es) {
 	using namespace augs::imgui;
+	bool last_result = false;
 	std::string result;
 
 	MULTIPROPERTY("Selectable on scene", selectable_on_scene);
@@ -556,9 +549,11 @@ std::string perform_editable_gui(editor_wandering_pixels_resource_editable& e) {
 	std::string result;
 
 	if (auto scope = augs::imgui::scoped_tree_node_ex("Node defaults")) {
-		if (const auto new_res = perform_editable_gui(e.node_defaults); !new_res.empty()) {
-			result = new_res;
-		}
+		(void)e;
+		// TODO: let this be edited
+		/* if (const auto new_res = perform_editable_gui(e.node_defaults); !new_res.empty()) { */
+		/* 	result = new_res; */
+		/* } */
 	}
 
 	return result;
@@ -854,6 +849,16 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		auto edited_copy = node.editable;
 		auto changed = std::string();
 
+		auto cmd = in.setup.make_command_from_selected_typed_nodes<edit_node_command<N>, N>("Edited ");
+
+		for (auto& e : cmd.entries) {
+			const auto node = in.setup.find_node(e.node_id);
+			ensure(node != nullptr);
+			e.after = node->editable;
+		}
+
+		(void)node_id;
+
 		if constexpr(std::is_same_v<N, editor_sprite_node>) {
 			const auto resource = in.setup.find_resource(node.resource_id);
 			ensure(resource != nullptr);
@@ -872,25 +877,24 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				);
 			}
 
-			changed = perform_editable_gui(edited_copy, original_size);
+			changed = perform_editable_gui(edited_copy, cmd.entries);
 		}
 		else {
 			if constexpr(is_one_of_v<N, editor_point_marker_node, editor_area_marker_node>) {
 				const auto resource = in.setup.find_resource(node.resource_id);
 				ensure(resource != nullptr);
 
-				changed = perform_editable_gui(*resource, edited_copy);
+				changed = perform_editable_gui(edited_copy, cmd.entries, *resource);
 			}
 			else {
-				changed = perform_editable_gui(edited_copy);
+				changed = perform_editable_gui(edited_copy, cmd.entries);
 			}
 		}
 
-		if (!changed.empty()) {
-			edit_node_command<N> cmd;
-			cmd.node_id = node_id;
-			cmd.after = edited_copy;
-			cmd.built_description = typesafe_sprintf(changed, node.get_display_name());
+		if (!changed.empty() && !cmd.empty()) {
+			if (cmd.size() == 1) {
+				cmd.built_description = typesafe_sprintf(changed, node.get_display_name());
+			}
 
 			post_new_or_rewrite(std::move(cmd)); 
 		}

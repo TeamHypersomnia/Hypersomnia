@@ -9,21 +9,29 @@ void edit_layer_command::push_entry(const editor_layer_id id) {
 }
 
 void edit_layer_command::undo(editor_command_input in) {
-	in.setup.clear_inspector();
+	const bool do_inspector = !in.skip_inspector;
+
+	if (do_inspector) {
+		in.setup.clear_inspector();
+	}
 
 	for (auto& entry : entries) {
 		if (auto layer = in.setup.find_layer(entry.layer_id)) {
 			layer->editable = entry.before;
 
-			in.setup.inspect_add_quiet(entry.layer_id);
+			if (do_inspector) {
+				in.setup.inspect_add_quiet(entry.layer_id);
+			}
 		}
 	}
 
-	in.setup.after_quietly_adding_inspected();
+	if (do_inspector) {
+		in.setup.after_quietly_adding_inspected();
+	}
 }
 
 void edit_layer_command::redo(editor_command_input in) {
-	const bool do_inspector = !in.setup.get_history().executed_new();
+	const bool do_inspector = !in.skip_inspector;
 
 	if (do_inspector) {
 		in.setup.clear_inspector();
