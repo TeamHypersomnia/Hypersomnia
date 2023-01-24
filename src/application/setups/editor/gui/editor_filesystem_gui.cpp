@@ -164,6 +164,8 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	const bool with_closed_folders = filter.IsActive();
 
+	editor_filesystem_node* currently_viewed_root = &in.files_root;
+
 	auto node_callback = [&](editor_filesystem_node& node) {
 		auto id_scope = scoped_id(id_counter++);
 
@@ -225,7 +227,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 								}
 							};
 
-							in.files_root.in_ui_order(shift_click_callback, with_closed_folders);
+							currently_viewed_root->in_ui_order(shift_click_callback, with_closed_folders);
 
 							in.setup.after_quietly_adding_inspected();
 							in.setup.quiet_set_last_inspected_any(*last_resource);
@@ -274,7 +276,9 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	ImGui::SameLine();
 
 	text_disabled("(Special resources)");
-	get_viewed_special_root().in_ui_order(node_callback, with_closed_folders, true);
+
+	currently_viewed_root = &get_viewed_special_root();
+	currently_viewed_root->in_ui_order(node_callback, with_closed_folders, true);
 }
 
 void editor_filesystem_gui::clear_drag_drop() {
