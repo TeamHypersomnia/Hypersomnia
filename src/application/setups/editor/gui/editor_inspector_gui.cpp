@@ -797,7 +797,16 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			reveal_in_explorer_button(full_path);
 		}
 
-		text_color(std::string(resource.get_type_name()) + ": ", yellow);
+		auto label = std::string(resource.get_type_name());
+
+		if (override_inspector_state == std::nullopt) {
+			const auto cnt = all_inspected.size();
+			if (cnt > 1) {
+				label += typesafe_sprintf(" (%x sel.)", cnt);
+			}
+		}
+
+		text_color(label + ": ", yellow);
 
 		ImGui::SameLine();
 		text(name);
@@ -805,6 +814,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		const bool include_resources_from_selected_nodes = (node_current_tab == inspected_node_tab_type::RESOURCE);
 
 		auto cmd = in.setup.make_command_from_selected_typed_resources<edit_resource_command<R>, R>("Edited ", include_resources_from_selected_nodes);
+		num_last_resources_last_time = cmd.entries.size();
 
 		std::vector<decltype(resource.editable)> hypothetical_defaults;
 		hypothetical_defaults.reserve(cmd.entries.size());
@@ -1021,7 +1031,16 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	};
 
 	auto layer_handler = [&](editor_layer& layer, const editor_layer_id layer_id) {
-		text_color("Layer: ", yellow);
+		const auto insp_count = all_inspected.size();
+		auto label = std::string("Layer");
+
+		if (insp_count > 1) {
+			label += typesafe_sprintf("s (%x sel.)", insp_count);
+		}
+
+		label += ":";
+
+		text_color(label, yellow);
 
 		{
 			ImGui::SameLine();
@@ -1075,12 +1094,24 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 	auto edit_properties = [&]<typename T>(const T& inspected_id) {
 		if constexpr(std::is_same_v<T, editor_node_id>) {
+			const auto insp_count = all_inspected.size();
+			const auto node_label = insp_count == 1 ? std::string("Node") : typesafe_sprintf("Nodes (%x)", insp_count);
+
+			const auto resource_label = [this]() -> std::string {
+				if (node_current_tab == inspected_node_tab_type::NODE) {
+					return "Resource";
+				}
+
+				const auto cnt = num_last_resources_last_time;
+				return cnt == 1 ? std::string("Resource") : typesafe_sprintf("Resources (%x)", cnt);
+			}();
+
 			simple_two_tabs(
 				node_current_tab,
 				inspected_node_tab_type::NODE,
 				inspected_node_tab_type::RESOURCE,
-				"Node",
-				"Resource"
+				node_label,
+				resource_label
 			);
 
 			ImGui::Separator();

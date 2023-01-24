@@ -5,6 +5,13 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Why does the performance drop dramatically in debug after spawning just a few firearms?
+	- Doesn't happen with normal entities too
+	- Maybe check with physical objects too?
+	- Possibly because of physical reinference, it slows a bit with other physical objects
+		- I think contacts might be getting resolved at that stage too
+			- Maybe this is because weapons with attachments suffer all the more
+
 - Area markers and point markers should have their own tonpo (tree of non-physical object)
 	- for now the bruteforce will work
 - search for TODO: hits in editor sources later because some important temporary fixes were applied that are not necessarily optimal

@@ -49,6 +49,7 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 	editor_tweaked_widget_tracker tweaked_widget;
 
 	debugger_image_preview neon_map_picker_preview;
+	std::size_t num_last_resources_last_time = 0;
 
 	template <class T>
 	bool inspects_any() const {

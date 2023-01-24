@@ -4851,3 +4851,10 @@ Advantages:
 	- so I guess first step would be accept vector of references instead of just one object
 		- and some macro to turn each edit_property into a loop
 
+- counts in Node and Resource tabs
+	- Will be helpful esp in Resource, also feedback that we're editing multiple
+- shift+select resources
+
+- Right-click should keep the selection
+	- For mass rename for example, this should be easy to do
+

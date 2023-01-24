@@ -8,14 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 - Maybe ask during Q&A if we should indeed reset the tab or not
 
-- counts in Node and Resource tabs
-	- Will be helpful esp in Resource, also feedback that we're editing multiple
-- shift+select resources
-
-- Why does the performance drop dramatically in debug after spawning just a few firearms?
-	- Doesn't happen with normal entities too
-	- Maybe check with physical objects too?
-
 - flips/resizes not applied to animated stuff
 	- uhh wtf they actually have no overridden geo
 
@@ -34,9 +26,6 @@ summary: That which we are brainstorming at the moment.
 		- Mass renames will fix ergonomics and like I said it won't even be used that much
 	- Let's be real, this won't be used very much since we'll h
 	- it'll only look nice in the official collection
-
-- Right-click should keep the selection
-	- For mass rename for example, this should be easy to do
 
 - Entity types to add later once we won't break abi
 	- CALLOUT WITH ITS NAME IN THE COMPONENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

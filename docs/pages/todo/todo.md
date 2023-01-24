@@ -6,6 +6,11 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Reset properties to default under Right-click 
+	- Could be easy but arguably not needed right now
+	- Most of node properties won't have the concept of default
+	- Resources, maybe, still they have the reset button so one can always check and undo
+
 - Review the TODO: comments especially inside editor sources once we're close to MVP
 
 - Atlas
