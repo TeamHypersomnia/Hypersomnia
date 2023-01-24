@@ -766,6 +766,13 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 file_flag("src/3rdparty/imgui/imgui.cpp" "-Wno-error")
 file_flag("src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp" "-Wno-error")
 
+if(APPLE)
+	file_flag("src/augs/network/network_types.cpp" "-Wno-error")
+	file_flag("src/3rdparty/yojimbo/yojimbo.cpp" "-Wno-error")
+	file_flag("src/3rdparty/yojimbo/netcode.io/netcode.c" "-Wno-error")
+	file_flag("src/3rdparty/yojimbo/reliable.io/reliable.c" "-Wno-error")
+endif()
+
 # These headers will be input to the Introspector-generator.
 
 file(GLOB_RECURSE HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES

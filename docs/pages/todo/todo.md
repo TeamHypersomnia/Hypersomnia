@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- We could attach the whole aquarium to the organism area marker and use the marker to transform/resize it
+
 - Reset properties to default under Right-click 
 	- Could be easy but arguably not needed right now
 	- Most of node properties won't have the concept of default
