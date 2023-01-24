@@ -46,7 +46,7 @@ namespace editor_widgets {
 
 		const auto before_pos = ImGui::GetCursorPos();
 
-		bool result = false;
+		bool pressed = false;
 
 		{
 			auto id = scoped_id(label.c_str());
@@ -60,7 +60,7 @@ namespace editor_widgets {
 
 			auto colored_selectable = scoped_selectable_colors(is_dragged ? dragged_cols : (is_inspected ? inspected_cols : bg_cols));
 
-			result = ImGui::Selectable("###Button", is_inspected || is_dragged, 0, button_size);
+			pressed = ImGui::Selectable("###Button", is_inspected || is_dragged, 0, button_size);
 			after_selectable_callback();
 		}
 
@@ -90,6 +90,6 @@ namespace editor_widgets {
 			}
 		}
 
-		return result;
+		return pressed;
 	}
 }

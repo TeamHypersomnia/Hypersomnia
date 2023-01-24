@@ -386,7 +386,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 							}
 
 							in.setup.after_quietly_adding_inspected();
-							in.setup.quiet_set_last_inspected(*last_node);
+							in.setup.quiet_set_last_inspected_layer_or_node(*last_node);
 						}
 						else {
 							in.setup.inspect(node_id);
@@ -782,7 +782,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 								}
 
 								in.setup.after_quietly_adding_inspected();
-								in.setup.quiet_set_last_inspected(*last_layer);
+								in.setup.quiet_set_last_inspected_layer_or_node(*last_layer);
 							}
 							else if (in.setup.inspects_any<editor_node_id>() && last_node) {
 								auto& ordered = in.setup.get_layers();
@@ -819,7 +819,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 								}
 
 								in.setup.after_quietly_adding_inspected();
-								in.setup.quiet_set_last_inspected(*last_node);
+								in.setup.quiet_set_last_inspected_layer_or_node(*last_node);
 							}
 							else {
 								in.setup.inspect(layer_id);

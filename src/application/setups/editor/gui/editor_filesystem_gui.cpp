@@ -162,19 +162,83 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	auto child = scoped_child(showing_official() ? "nodes official view" : "nodes project view");
 
+	const bool with_closed_folders = filter.IsActive();
+
 	auto node_callback = [&](editor_filesystem_node& node) {
 		auto id_scope = scoped_id(id_counter++);
 
-		filesystem_node_widget(
+		const bool filter_active = filter.IsActive();
+
+		if (filter_active) {
+			if (!node.passed_filter) {
+				return;
+			}
+		}
+
+		if (node.is_child_of_root()) {
+			/* Ignore some editor-specific files in the project folder */
+
+			if (node.name == "editor_view.json") {
+				return;
+			}
+		}
+
+		const bool pressed = filesystem_node_widget(
 			in.setup,
 			node,
 			editor_icon_info_in(in),
-			filter.IsActive(),
 			dragged_resource
 		);
+
+		if (pressed) {
+			if (node.is_folder()) {
+				if (!filter_active) {
+					node.toggle_open();
+				}
+			}
+			else {
+				if (in.setup.exists(node.associated_resource)) {
+					if (ImGui::GetIO().KeyShift && !in.setup.wants_multiple_selection()) {
+						auto last_inspected = in.setup.get_last_inspected_any();
+						auto last_resource = std::get_if<editor_resource_id>(&last_inspected);
+
+						const auto shift_clicked_resource_id = node.associated_resource;
+
+						if (in.setup.inspects_any<editor_resource_id>() && last_resource && *last_resource != shift_clicked_resource_id) {
+							int state = 0;
+
+							in.setup.clear_inspector();
+
+							auto shift_click_callback = [&state, &last_resource, &shift_clicked_resource_id, &in](editor_filesystem_node& it_node) {
+								if (state == 2) {
+									return;
+								}
+
+								const editor_resource_id id = it_node.associated_resource;
+
+								if (id == shift_clicked_resource_id || id == *last_resource) {
+									++state;
+								}
+
+								if (state && id.is_set()) {
+									in.setup.inspect_add_quiet(id);
+								}
+							};
+
+							in.files_root.in_ui_order(shift_click_callback, with_closed_folders);
+
+							in.setup.after_quietly_adding_inspected();
+							in.setup.quiet_set_last_inspected_any(*last_resource);
+						}
+					}
+					else {
+						in.setup.inspect(node.associated_resource);
+					}
+				}
+			}
+		}
 	};
 
-	const bool with_closed_folders = filter.IsActive();
 	in.files_root.in_ui_order(node_callback, with_closed_folders);
 
 	ImGui::Separator();

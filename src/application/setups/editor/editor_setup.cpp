@@ -1902,8 +1902,12 @@ std::optional<editor_setup::parent_layer_info> editor_setup::convert_to_parent_l
 	return std::nullopt;
 }
 
-void editor_setup::quiet_set_last_inspected(const inspected_variant inspected) {
+void editor_setup::quiet_set_last_inspected_layer_or_node(const inspected_variant inspected) {
 	gui.inspector.last_inspected_layer_or_node = inspected;
+}
+
+void editor_setup::quiet_set_last_inspected_any(const inspected_variant inspected) {
+	gui.inspector.last_inspected_any = inspected;
 }
 
 void editor_setup::set_inspector_tab(const inspected_node_tab_type type) {

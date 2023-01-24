@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Maybe ask during Q&A if we should indeed reset the tab or not
+
 - counts in Node and Resource tabs
 	- Will be helpful esp in Resource, also feedback that we're editing multiple
 - shift+select resources

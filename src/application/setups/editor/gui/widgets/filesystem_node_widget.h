@@ -3,29 +3,14 @@
 #include "application/setups/editor/editor_get_icon_for.h"
 
 namespace editor_widgets {
-	inline void filesystem_node_widget(
+	inline bool filesystem_node_widget(
 		editor_setup& setup,
 		editor_filesystem_node& node,
 		const editor_icon_info_in& icon_in,
-		const bool filter_active,
 		editor_resource_id& dragged_resource
 	) {
 		using namespace augs::imgui;
 		augs::atlas_entry icon;
-
-		if (filter_active) {
-			if (!node.passed_filter) {
-				return;
-			}
-		}
-
-		if (node.is_child_of_root()) {
-			/* Ignore some editor-specific files in the project folder */
-
-			if (node.name == "editor_view.json") {
-				return;
-			}
-		}
 
 		auto atlas_type = augs::imgui_atlas_type::GAME;
 
@@ -87,7 +72,7 @@ namespace editor_widgets {
 			bg_alpha = 120;
 		}
 
-		const bool result = inspectable_with_icon(
+		return inspectable_with_icon(
 			icon,
 			icon_color,
 			atlas_type,
@@ -99,18 +84,5 @@ namespace editor_widgets {
 			node.after_text,
 			bg_alpha
 		);
-
-		if (result) {
-			if (node.is_folder()) {
-				if (!filter_active) {
-					node.toggle_open();
-				}
-			}
-			else {
-				if (setup.exists(node.associated_resource)) {
-					setup.inspect(node.associated_resource);
-				}
-			}
-		}
 	};
 }

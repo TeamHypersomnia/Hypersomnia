@@ -123,6 +123,10 @@ public:
 		return last_inspected_layer_or_node;
 	}
 
+	const auto& get_last_inspected_any() const {
+		return last_inspected_any;
+	}
+
 	void mark_last_inspected(const inspected_variant& v, bool reset_tab_to_node = true) {
 		std::visit(
 			[this]<typename T>(const T& typed) {
@@ -145,6 +149,7 @@ public:
 				because it would feel strange if the tab changed on its own while adding more nodes to the selection.
 			*/
 
+			// TODO: Maybe ask during Q&A if we should indeed reset the tab or not
 			node_current_tab = inspected_node_tab_type::NODE;
 		}
 	}

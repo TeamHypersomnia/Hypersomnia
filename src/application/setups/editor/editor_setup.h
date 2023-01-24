@@ -319,7 +319,8 @@ public:
 
 	void inspect(inspected_variant);
 	void inspect_add_quiet(inspected_variant);
-	void quiet_set_last_inspected(inspected_variant);
+	void quiet_set_last_inspected_layer_or_node(inspected_variant);
+	void quiet_set_last_inspected_any(inspected_variant);
 
 	template <class F>
 	void inspect_erase_if(F&& callback) { 
@@ -576,6 +577,10 @@ public:
 
 	const auto& get_last_inspected_layer_or_node() const {
 		return gui.inspector.get_last_inspected_layer_or_node();
+	}
+
+	const auto& get_last_inspected_any() const {
+		return gui.inspector.get_last_inspected_any();
 	}
 
 	void set_inspector_tab(inspected_node_tab_type);
