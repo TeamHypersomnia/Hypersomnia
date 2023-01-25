@@ -82,20 +82,14 @@ entity_handle cosmic::create_entity(
 		[&](auto e) {
 			using E = decltype(e);
 
-			try {
-				const auto typed_handle = specific_create_entity(
-					cosm, 
-					typed_entity_flavour_id<E>(flavour_id.raw), 
-					std::forward<Pre>(pre_construction)
-				);
+			const auto typed_handle = specific_create_entity(
+				cosm, 
+				typed_entity_flavour_id<E>(flavour_id.raw), 
+				std::forward<Pre>(pre_construction)
+			);
 
-				post_construction(typed_handle);
-				return entity_handle(typed_handle);
-			}
-			catch (const entity_creation_error& err) {
-				(void)err;
-				return cosm[entity_id()];
-			}
+			post_construction(typed_handle);
+			return entity_handle(typed_handle);
 		}
 	);
 }

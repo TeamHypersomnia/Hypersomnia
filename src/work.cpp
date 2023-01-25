@@ -3483,3 +3483,7 @@ catch (const netcode_socket_raii_error& err) {
 	LOG("Failed to create a socket for server browser:\n%x", err.what());
 	return work_result::FAILURE;
 }
+catch (const entity_creation_error& err) {
+	LOG("Failed to create entity:\n%x", err.what());
+	return work_result::FAILURE;
+}
