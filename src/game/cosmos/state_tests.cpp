@@ -193,6 +193,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 	padding_checker(augs::pool_indirector<unsigned>());
 	padding_checker(augs::pool_slot<unsigned>());
 	
+#if 0
 #if !STATICALLY_ALLOCATE_ENTITIES
 	/* TODO: Fix this actually */
 	/* Too much space would be wasted and stack overflows would occur. */
@@ -219,6 +220,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 		}),
 		common
 	);
+#endif
 #endif
 }
 #endif

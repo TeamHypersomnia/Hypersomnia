@@ -9,7 +9,6 @@
 #include "game/components/wandering_pixels_component.h"
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
-#include "view/audiovisual_state/systems/linear_cache_map.h"
 
 class visible_entities;
 
@@ -39,7 +38,7 @@ public:
 
 	double global_time_seconds = 0.0;
 
-	linear_cache_map<cache, entity_types_having_all_of<components::wandering_pixels>> per_entity_cache;
+	audiovisual_cache_map<cache> per_entity_cache;
 
 	void clear() {
 		per_entity_cache.clear();

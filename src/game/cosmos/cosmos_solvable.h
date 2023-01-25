@@ -4,11 +4,7 @@
 
 #include "augs/misc/timing/delta.h"
 
-#if STATICALLY_ALLOCATE_ENTITIES
 #include "game/organization/all_component_includes.h"
-#else
-#include "game/organization/all_components_declaration.h"
-#endif
 
 #include "game/cosmos/cosmos_solvable_inferred.h"
 #include "game/cosmos/cosmos_solvable_significant.h"

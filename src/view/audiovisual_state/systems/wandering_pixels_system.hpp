@@ -5,18 +5,12 @@
 
 template <class E>
 wandering_pixels_system::cache& wandering_pixels_system::get_cache(const E& id) {
-	return per_entity_cache.all.template get_for<entity_type_of<E>>().value[id.raw.indirection_index];
+	return per_entity_cache[id.to_unversioned()];
 }
 
 template <class E>
 const wandering_pixels_system::cache* wandering_pixels_system::find_cache(const E& id) const {
-	auto& ch = per_entity_cache.all.template get_for<entity_type_of<E>>().value[id.raw.indirection_index];
-
-	if (ch.is_set()) {
-		return std::addressof(ch);
-	}
-
-	return nullptr;
+	return mapped_or_nullptr(per_entity_cache, id.to_unversioned());
 }
 
 template <class E>

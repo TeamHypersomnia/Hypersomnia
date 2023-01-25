@@ -4,7 +4,7 @@
 #include "augs/misc/pool/pooled_object_id.h"
 #include "application/setups/editor/nodes/all_editor_node_types_declaration.h"
 
-using editor_node_pool_size_type = unsigned short;
+using editor_node_pool_size_type = unsigned;
 using editor_node_type_id = type_in_list_id<all_editor_node_types>;
 using editor_node_pool_id = augs::pooled_object_id<editor_node_pool_size_type>;
 

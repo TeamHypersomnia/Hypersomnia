@@ -14,7 +14,7 @@ namespace augs {
 	struct introspection_access;
 }
 
-using editor_node_pool_size_type = unsigned short;
+using editor_node_pool_size_type = unsigned;
 using node_undo_free_input = augs::pool_undo_free_input<editor_node_pool_size_type>;
 
 struct delete_nodes_command {

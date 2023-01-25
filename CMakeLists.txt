@@ -215,7 +215,7 @@ endif()
 #	- Can't tweak maximum number of entities at runtime
 #	- Even empty game worlds occupy as much space as those filled to the maximum
 
-set(STATICALLY_ALLOCATE_ENTITIES "1" CACHE STRING "Statically allocate entities in the cosmos")
+set(STATICALLY_ALLOCATE_ENTITIES OFF CACHE STRING "Statically allocate entities in the cosmos")
 
 # If this variable is nonzero, the cosmos common will use a statically allocated number
 # of entity flavours, drastically improving access performance. Might be very useful for a sever application.
@@ -226,7 +226,7 @@ set(STATICALLY_ALLOCATE_ENTITIES "1" CACHE STRING "Statically allocate entities 
 #	- Can't tweak maximum number of entity flavours at runtime
 #	- Even empty game worlds occupy as much space as those filled to the maximum
 
-set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS "1" CACHE STRING "Statically allocate entity flavours in the cosmos common")
+set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS OFF CACHE STRING "Statically allocate entity flavours in the cosmos common")
 
 ## Internal build flags for programmers' use. 
 ## Don't set them manually without a good reason.
@@ -1517,8 +1517,14 @@ endif()
 
 # We configure additional user options for building the game.
 
-add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES=${STATICALLY_ALLOCATE_ENTITIES})
-add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS=${STATICALLY_ALLOCATE_ENTITY_FLAVOURS})
+if (STATICALLY_ALLOCATE_ENTITIES)
+	add_definitions(-DSTATICALLY_ALLOCATE_ENTITIES=1)
+endif()
+
+if (STATICALLY_ALLOCATE_ENTITY_FLAVOURS)
+	add_definitions(-DSTATICALLY_ALLOCATE_ENTITY_FLAVOURS=1)
+endif()
+
 add_definitions(-DBUILD_IN_CONSOLE_MODE=${BUILD_IN_CONSOLE_MODE})
 
 add_definitions(-DDETAIL_DIR="${HYPERSOMNIA_DETAIL_DIR}")

@@ -7,6 +7,11 @@
 #include "game/cosmos/cosmos.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/misc/trivially_copyable_tuple.h"
+#include "augs/templates/logically_empty.h"
+#include "game/cosmos/entity_id_declaration.h"
+
+#include "game/components/transform_component.h"
+#include "game/components/rigid_body_component.h"
 
 #if !STATICALLY_ALLOCATE_ENTITIES
 
@@ -43,7 +48,7 @@ TEST_CASE("GetByDynamicId") {
 		return 20.0;	
 	}));
 
-	REQUIRE(20.0 == get_by_dynamic_id(t, type_in_list_id<all_entity_types>(), [](auto){
+	REQUIRE(20.0 == get_by_dynamic_id(t, type_in_list_id<all_entity_types>(0), [](auto){
 		return 20.0;	
 	}));
 
@@ -109,10 +114,9 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 	}
 
 	{
-		using aggr = augs::trivially_copyable_tuple<
-			cosmic_object_pool_id<components::transform>,
-			cosmic_object_pool_id<components::rigid_body>, 
-		>;
+		using T1 = components::transform;
+		using T2 = components::rigid_body;
+		using aggr = augs::trivially_copyable_tuple<T1, T2>;
 
 		std::vector<aggr> pool;
 		REQUIRE(pool.size() == 0);
@@ -120,45 +124,6 @@ TEST_CASE("Ca TriviallyCopyableTuple") {
 		REQUIRE(pool.size() == 1);
 		pool.push_back(aggr());
 		REQUIRE(pool.size() == 2);
-	}
-
-	{
-
-		using aggr2 = decltype(cosmic_entity::component_ids);
-
-		std::vector<aggr2> pool;
-		REQUIRE(pool.size() == 0);
-		pool.emplace_back();
-		REQUIRE(pool.size() == 1);
-		pool.push_back(aggr2());
-		REQUIRE(pool.size() == 2);
-		pool.push_back(aggr2());
-		REQUIRE(pool.size() == 3);
-
-		const augs::trivially_copyable_tuple<int, double, float> aaa;
-		std::get<0>(aaa);
-		std::get<1>(aaa);
-		std::get<2>(aaa);
-		//std::get<float&>(aaa);
-		std::get<int>(aaa);
-		std::get<float>(aaa);
-
-		sizeof(aggr2);
-		for_each_through_std_get(aggr2(), [](auto...) {});
-		//std::get<components::sentience>(aaa);
-		//std::get<3>(aaa); // error
-	}
-
-	{
-		entity_pool_type pool(2);
-		REQUIRE(pool.size() == 0);
-		pool.allocate();
-		REQUIRE(pool.size() == 1);
-		pool.allocate();
-		REQUIRE(pool.size() == 2);
-	}
-
-	{
 	}
 }
 #endif

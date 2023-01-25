@@ -3286,6 +3286,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			{
 				auto scope = measure_scope(game_thread_performance.total);
 
+#if IS_PRODUCTION_BUILD
 				try {
 					prepare_next_game_frame();
 				}
@@ -3304,6 +3305,9 @@ work_result work(const int argc, const char* const * const argv) try {
 					game_thread_result = work_result::FAILURE;
 					request_quit();
 				}
+#else
+				prepare_next_game_frame();
+#endif
 			}
 
 			auto scope = measure_scope(game_thread_performance.main_wait);

@@ -134,6 +134,7 @@ struct tests_of_traits {
 
 	/* One-shot asserts. */
 
+	static_assert(!statically_allocate_entities, "Let's keep it that way for now");
 	static_assert(same<int, argument_t<decltype(&ftrait::test), 0>>);
 	static_assert(same<int, argument_t<decltype(&ftrait::ctest), 0>>);
 

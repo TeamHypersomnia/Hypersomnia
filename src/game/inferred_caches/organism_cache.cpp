@@ -71,6 +71,6 @@ void organism_cache::infer_cache_for(const const_entity_handle& e) {
 	});
 }
 
-void organism_cache::reserve_caches_for_entities(const std::size_t n) {
-	grids.reserve(n);
+void organism_cache::reserve_caches_for_entities(const std::size_t) {
+
 }

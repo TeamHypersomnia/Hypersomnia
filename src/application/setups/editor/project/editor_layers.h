@@ -41,7 +41,8 @@ struct editor_layer {
 	bool passed_filter = false;
 };
 
-using editor_layer_pool = augs::pool<editor_layer, make_vector, unsigned short, type_list<>, editor_layer>;
+using editor_layer_pool_size_type = unsigned;
+using editor_layer_pool = augs::pool<editor_layer, make_vector, editor_layer_pool_size_type, type_list<>, editor_layer>;
 
 struct editor_layers {
 	static constexpr bool json_ignore = true;

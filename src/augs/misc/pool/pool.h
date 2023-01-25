@@ -276,9 +276,13 @@ namespace augs {
 			return static_cast<size_type>(slots.size());
 		}
 
+		auto get_container_max_size() const {
+			return objects.max_size();
+		}
+
 		auto max_size() const {
-			const auto size_type_limit = static_cast<size_type>(std::numeric_limits<size_type>::max() - 1);
-			const auto container_limit = static_cast<size_type>(objects.max_size());
+			const auto size_type_limit = std::size_t(std::numeric_limits<size_type>::max() - 1);
+			const auto container_limit = std::size_t(get_container_max_size());
 
 			return std::min(size_type_limit, container_limit);
 		}

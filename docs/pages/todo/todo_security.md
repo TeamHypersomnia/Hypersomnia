@@ -5,6 +5,8 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- After disabling static allocations, we still have the theroetical limit of 65k entities, this could be breached but not anytime soon
+
 - Lol these limits will eventually have to be lifted
 	- Imagine a person with $20k, they can buy 40 mini knives
 	- 40 of them is enough to clog the server, alright that's still quite a lot

@@ -24,7 +24,7 @@ struct create_layer_command : allocating_command<editor_layer_id> {
 	}
 };
 
-using editor_layer_pool_size_type = unsigned short;
+using editor_layer_pool_size_type = unsigned;
 using layer_undo_free_input = augs::pool_undo_free_input<editor_layer_pool_size_type, editor_layer>;
 
 struct delete_layers_command {

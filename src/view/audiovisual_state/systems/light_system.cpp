@@ -32,8 +32,8 @@
 #define LINEAR_MULT 10000
 #define QUADRATIC_MULT 10000000
 
-void light_system::reserve_caches_for_entities(const std::size_t n) {
-	per_entity_cache.reserve(n);
+void light_system::reserve_caches_for_entities(const std::size_t) {
+
 }
 
 void light_system::clear() {

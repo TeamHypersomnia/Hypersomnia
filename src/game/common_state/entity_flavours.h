@@ -126,7 +126,7 @@ template <class E>
 using entity_flavours_container = 
 	augs::pool<
 		entity_flavour<E>, 
-		make_vector
+		make_vector,
 		unsigned short,
 		type_list<>,
 		raw_flavour_id_key
