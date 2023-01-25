@@ -15,7 +15,7 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
 	static_assert(!std::is_const_v<C>, "Can't create entity in a const cosmos.");
 
 	if (nullptr == cosm.find_flavour(flavour_id)) {
-		throw entity_creation_error { entity_creation_error_type::DEAD_FLAVOUR };
+		throw entity_creation_error(entity_creation_error_type::DEAD_FLAVOUR);
 	}
 
 	const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>({ flavour_id.raw });
@@ -132,7 +132,7 @@ auto cosmos_solvable::allocate_new_entity(const entity_creation_input in) {
 	auto& pool = significant.get_pool<E>();
 
 	if (pool.full()) {
-		throw entity_creation_error { entity_creation_error_type::POOL_FULL };
+		throw entity_creation_error(entity_creation_error_type::POOL_FULL);
 	}
 
 	const auto result = pool.allocate(in.flavour_id, get_timestamp());

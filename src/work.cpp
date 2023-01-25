@@ -2277,6 +2277,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	static cached_visibility_data cached_visibility;
 	static debug_details_summaries debug_summaries;
 
+	static auto game_thread_result = work_result::SUCCESS;
+
 	static auto game_thread_worker = []() {
 		auto prepare_next_game_frame = [&]() {
 			auto frame = measure_scope(game_thread_performance.total);
@@ -3283,7 +3285,25 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			{
 				auto scope = measure_scope(game_thread_performance.total);
-				prepare_next_game_frame();
+
+				try {
+					prepare_next_game_frame();
+				}
+				catch (const std::runtime_error& err) {
+					LOG("Runtime error: %x", err.what());
+					game_thread_result = work_result::FAILURE;
+					request_quit();
+				}
+				catch (const entity_creation_error& err) {
+					LOG("Failed to create entity: %x", err.what());
+					game_thread_result = work_result::FAILURE;
+					request_quit();
+				}
+				catch (...) {
+					LOG("Unknown error.");
+					game_thread_result = work_result::FAILURE;
+					request_quit();
+				}
 			}
 
 			auto scope = measure_scope(game_thread_performance.main_wait);
@@ -3442,7 +3462,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 	}
 
-	return work_result::SUCCESS;
+	return game_thread_result;
 }
 catch (const config_read_error& err) {
 	LOG("Failed to read the initial config for the game!\n%x", err.what());
@@ -3481,9 +3501,5 @@ catch (const augs::unit_test_session_error& err) {
 }
 catch (const netcode_socket_raii_error& err) {
 	LOG("Failed to create a socket for server browser:\n%x", err.what());
-	return work_result::FAILURE;
-}
-catch (const entity_creation_error& err) {
-	LOG("Failed to create entity:\n%x", err.what());
 	return work_result::FAILURE;
 }

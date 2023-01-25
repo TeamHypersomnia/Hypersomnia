@@ -286,10 +286,10 @@ public:
 	bool wants_multiple_selection() const;
 
 	template <class T>
-	decltype(auto) post_new_command(T&&);
+	const T& post_new_command(T&&);
 
 	template <class T>
-	decltype(auto) rewrite_last_command(T&&);
+	const T& rewrite_last_command(T&&);
 
 	template <class T, class... Args>
 	auto make_command_from_selected_entities(const std::string& preffix, Args&&...) const;

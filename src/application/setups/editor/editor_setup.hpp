@@ -3,33 +3,35 @@
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
 template <class T>
-decltype(auto) editor_setup::post_new_command(T&& command) {
-	auto rebuild_after = augs::scope_guard([this]() { 
-		rebuild_scene(); 
-	
-		if constexpr(std::is_base_of_v<allocating_command<editor_node_pool_id>, T>) {
-			/*
-				This is already called by inspect_only (which is called during redo of the command),
-				however the inspect_only is called before the scene is rebuilt,
-				causing the result selector state to contain invalid entity_ids.
-
-				This is why we have to manually call it after the command completes.
-			*/
-
-			inspected_to_entity_selector_state();
-		}
-	});
-
+const T& editor_setup::post_new_command(T&& command) {
 	gui.history.scroll_to_latest_once = true;
-	return history.execute_new(std::forward<T>(command), make_command_input(true));
+	const T& result = history.execute_new(std::forward<T>(command), make_command_input(true));
+
+	rebuild_scene();
+
+	if constexpr(std::is_base_of_v<allocating_command<editor_node_pool_id>, T>) {
+		/*
+			This is already called by inspect_only (which is called during redo of the command),
+			however the inspect_only is called before the scene is rebuilt,
+			causing the result selector state to contain invalid entity_ids.
+
+			This is why we have to manually call it after the command completes.
+		*/
+
+		inspected_to_entity_selector_state();
+	}
+
+	return result;
 }
 
 template <class T>
-decltype(auto) editor_setup::rewrite_last_command(T&& command) {
-	auto rebuild_after = augs::scope_guard([this]() { rebuild_scene(); });
-
+const T& editor_setup::rewrite_last_command(T&& command) {
 	history.undo(make_command_input(true));
-	return history.execute_new(std::forward<T>(command), make_command_input(true));
+	const T& result = history.execute_new(std::forward<T>(command), make_command_input(true));
+
+	rebuild_scene(); 
+
+	return result;
 }
 
 template <class S, class F>

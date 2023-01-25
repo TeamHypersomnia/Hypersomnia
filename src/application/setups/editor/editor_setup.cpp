@@ -73,6 +73,7 @@ editor_setup::editor_setup(
 
 editor_setup::~editor_setup() {
 	save_gui_state();
+	LOG("DTOR finished: ~editor_setup");
 }
 
 void editor_setup::create_official() {
