@@ -59,7 +59,7 @@ struct controlled_character {
 
 struct plain_sprited_body {
 	static constexpr std::size_t statically_allocated_entities = 3000;
-	static constexpr std::size_t statically_allocated_flavours = 300;
+	static constexpr std::size_t statically_allocated_flavours = 1000;
 
 	using invariant_list = type_list<
 		invariants::rigid_body,
@@ -188,7 +188,7 @@ struct shootable_charge {
 
 struct static_decoration {
 	static constexpr std::size_t statically_allocated_entities = 20000;
-	static constexpr std::size_t statically_allocated_flavours = 300;
+	static constexpr std::size_t statically_allocated_flavours = 2000;
 
 	using invariant_list = type_list<
 		invariants::sprite,
@@ -210,7 +210,7 @@ struct static_decoration {
 
 struct dynamic_decoration {
 	static constexpr std::size_t statically_allocated_entities = 2000;
-	static constexpr std::size_t statically_allocated_flavours = 300;
+	static constexpr std::size_t statically_allocated_flavours = 1000;
 
 	using invariant_list = type_list<
 		invariants::sprite,

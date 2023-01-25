@@ -5,6 +5,18 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Static allocation limits: we need to have a message about there not being enough space in the cosmos
+	- This should prevent playtesting at all and should happen while we edit already
+		- Actually should prevent the creation of any new node
+	- This is mostly problematic for entity types later created in the game dynamically
+		- Like weapons
+		- So we should probably better limit firearms way before they hit the allocation limit
+	- We should totally use the static allocation though to properly manage the posibility of too many entities
+		- this will pay off in the future
+	- Let's test this tomorrow
+- We should have a thorough audit of what happens when entity limits are exceeded
+	- Flavours not so much as it is somewhat more controlled
+
 - Re-check codec security before deploying a version with direct arena transfers
 	- Consider allowing only several simple formats
 		- jpg, png, gif, ogg
