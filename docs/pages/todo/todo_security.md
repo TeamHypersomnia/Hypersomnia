@@ -5,6 +5,17 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Lol these limits will eventually have to be lifted
+	- Imagine a person with $20k, they can buy 40 mini knives
+	- 40 of them is enough to clog the server, alright that's still quite a lot
+
+- Isn't static allocation bullshit anyway?
+	- We shouldn't worry about it for now, we can set the limits sufficiently high for now
+	- Technically it speeds up flavor dereferencing when we're iterating over all entities
+		- But the fastest would be a pointer anyway
+			- And we really should use pointers here because flavors are constant unlike entities
+			- When we rewrite the solvables we won't have to rewrite the flavor pointers anyway 
+
 - Static allocation limits: we need to have a message about there not being enough space in the cosmos
 	- This should prevent playtesting at all and should happen while we edit already
 		- Actually should prevent the creation of any new node

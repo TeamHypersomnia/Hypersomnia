@@ -5,6 +5,8 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Cosmos should really hold a reference to flavors instead of a copy so that we can have e.g. two cosmoi without copying the same data and so that the second correctly points to the first one
+
 - Why does the performance drop dramatically in debug after spawning just a few firearms?
 	- Doesn't happen with normal entities too
 	- Maybe check with physical objects too?
