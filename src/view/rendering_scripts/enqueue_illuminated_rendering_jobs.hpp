@@ -316,7 +316,7 @@ void enqueue_illuminated_rendering_jobs(
 				>();
 
 				h3.draw<
-					special_render_function::WALL_ILLUMINATION
+					special_render_function::ILLUMINATE_AS_WALL
 				>();
 			};
 
@@ -345,7 +345,7 @@ void enqueue_illuminated_rendering_jobs(
 				>();
 
 				h2.draw<
-					special_render_function::OCCLUDE_GROUND_NEONS
+					special_render_function::COVER_GROUND_NEONS
 				>();
 			};
 

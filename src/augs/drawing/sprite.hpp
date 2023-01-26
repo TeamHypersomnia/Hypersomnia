@@ -132,10 +132,6 @@ namespace augs {
 		const sprite_size_type considered_size,
 		rgba target_color
 	) {
-		if (spr.effect == sprite_special_effect::CONTINUOUS_ROTATION) {
-			target_rotation += std::fmod(in.global_time_seconds * spr.effect_speed_multiplier * 360.f, 360.f);
-		}
-
 		detail_draw(
 			spr,
 			in,
@@ -157,7 +153,13 @@ namespace augs {
 		);
 
 		const auto pos = in.renderable_transform.pos;
-		const auto final_rotation = in.renderable_transform.rotation; //+ rotation_offset;
+
+		auto final_rotation = in.renderable_transform.rotation; //+ rotation_offset;
+
+		if (spr.effect == sprite_special_effect::CONTINUOUS_ROTATION) {
+			final_rotation += std::fmod(in.global_time_seconds * spr.effect_speed_multiplier * 360.f, 360.f);
+		}
+
 		const auto drawn_size = spr.get_size();
 
 		const auto& entry = manager.at(spr.image_id);

@@ -5,6 +5,9 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Still we need to test with 65k entities once we optimize editor and performance doesn't suck ass
+	- But we can only do this after having the proper editor to not fuck up the old maps
+
 - After disabling static allocations, we still have the theroetical limit of 65k entities, this could be breached but not anytime soon
 
 - Lol these limits will eventually have to be lifted

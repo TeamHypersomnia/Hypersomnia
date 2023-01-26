@@ -4858,3 +4858,9 @@ Advantages:
 - Right-click should keep the selection
 	- For mass rename for example, this should be easy to do
 
+- We should lift the static allocation limits so we don't have to worry about it for the forseeable future
+	- signi entity ids are rarely used, mostly for inventory
+	- We iterate over entities directly
+	- and we'll eventually use pointers for flavors anyway
+
+- Screw static allocation for now, we should only have a safety module so that people don't lose their work accidentally

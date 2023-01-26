@@ -306,6 +306,15 @@ void setup_scene_object_from_resource(
 	else if constexpr(std::is_same_v<editor_sprite_resource, R>) {
 		const auto domain = editable.domain;
 
+		auto on_domain_specific = [&](auto callback) {
+			if (domain == editor_sprite_domain::PHYSICAL) {
+				callback(editable.as_physical);
+			}
+			else {
+				callback(editable.as_nonphysical);
+			}
+		};
+
 		{
 			auto& render = scene.template get<invariants::render>();
 
@@ -327,6 +336,11 @@ void setup_scene_object_from_resource(
 
 				}
 			}();
+
+			on_domain_specific([&](auto& specific) {
+				render.special_functions.set(special_render_function::ILLUMINATE_AS_WALL, specific.illuminate_as_wall);
+				render.special_functions.set(special_render_function::COVER_GROUND_NEONS, specific.cover_ground_neons);
+			});
 		}
 
 		{
@@ -334,27 +348,41 @@ void setup_scene_object_from_resource(
 			sprite.set(resource.scene_asset_id, editable.size, editable.color);
 			sprite.tile_excess_size = !editable.stretch_when_resized;
 			sprite.neon_color = editable.neon_color;
+
+			if (editable.color_wave_speed.is_enabled) {
+				sprite.effect = augs::sprite_special_effect::COLOR_WAVE;
+				sprite.effect_speed_multiplier = editable.color_wave_speed.value;
+			}
+
+			// TODO: currently one overrides the other, make it a boolset!
+
+			if (editable.rotate_continuously_degrees_per_sec.is_enabled) {
+				sprite.effect = augs::sprite_special_effect::CONTINUOUS_ROTATION;
+				sprite.effect_speed_multiplier = editable.rotate_continuously_degrees_per_sec.value / 360.0f;
+			}
 		}
 
 		if (auto animation = scene.template find<invariants::animation>()) {
 			animation->id = resource.scene_animation_id; 
 		}
 
-		if (auto rigid_body = scene.template find<invariants::rigid_body>()) {
-			rigid_body->damping.linear = editable.linear_damping;
-			rigid_body->damping.angular = editable.angular_damping;
+		auto& physical = editable.as_physical;
 
-			if (editable.is_static) {
+		if (auto rigid_body = scene.template find<invariants::rigid_body>()) {
+			rigid_body->damping.linear = physical.linear_damping;
+			rigid_body->damping.angular = physical.angular_damping;
+
+			if (physical.is_static) {
 				rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
 			}
 		}
 
 		if (auto fixtures = scene.template find<invariants::fixtures>()) {
-			fixtures->density = editable.density;
-			fixtures->friction = editable.friction;
-			fixtures->restitution = editable.restitution;
+			fixtures->density = physical.density;
+			fixtures->friction = physical.friction;
+			fixtures->restitution = physical.bounciness;
 
-			if (editable.is_see_through) {
+			if (physical.is_see_through) {
 				fixtures->filter = filters[predefined_filter_type::GLASS_OBSTACLE];
 			}
 			else {

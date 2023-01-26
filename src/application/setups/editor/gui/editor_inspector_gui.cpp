@@ -519,7 +519,26 @@ EDIT_FUNCTION(
 		}
 	}
 
+	MULTIPROPERTY("Color wave", color_wave_speed.is_enabled);
+	{
+		if (insp.color_wave_speed.is_enabled) {
+			auto indent = scoped_indent();
+			MULTIPROPERTY("Speed", color_wave_speed.value);
+		}
+	}
+
+	MULTIPROPERTY("Rotate continuously", rotate_continuously_degrees_per_sec.is_enabled);
+	{
+		if (insp.rotate_continuously_degrees_per_sec.is_enabled) {
+			auto indent = scoped_indent();
+			MULTIPROPERTY("Degrees per sec", rotate_continuously_degrees_per_sec.value);
+		}
+	}
+
 	if (insp.domain == editor_sprite_domain::PHYSICAL) {
+		MULTIPROPERTY("Cover ground neons", as_physical.cover_ground_neons);
+		MULTIPROPERTY("Illuminate as wall", as_physical.illuminate_as_wall);
+
 		ImGui::Separator();
 		text_color("Physics", yellow);
 		ImGui::Separator();
@@ -528,21 +547,31 @@ EDIT_FUNCTION(
 			auto scope = augs::imgui::scoped_tree_node_ex("Edit collider shape");
 		}
 
-		MULTIPROPERTY("Is see-through", is_see_through);
+		MULTIPROPERTY("Density", as_physical.density);
+		MULTIPROPERTY("Friction", as_physical.friction);
+		MULTIPROPERTY("Bounciness", as_physical.bounciness);
 
-		if (ImGui::IsItemHovered()) {
-			text_tooltip("If enabled, lets the light through.\nEnemies will be visible behind this object.\nUse it on walls of glass.");
-		}
-
-		MULTIPROPERTY("Is body static", is_static);
+		MULTIPROPERTY("Is body static", as_physical.is_static);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, will be permanently set in place.\nWon't move no matter what.\nUse it on layout-defining walls and objects.");
 		}
 
-		MULTIPROPERTY("Density", density);
-		MULTIPROPERTY("Friction", friction);
-		MULTIPROPERTY("Restitution", restitution);
+		if (!insp.as_physical.is_static) {
+			MULTIPROPERTY("Linear damping", as_physical.linear_damping);
+			MULTIPROPERTY("Angular damping", as_physical.angular_damping);
+		}
+
+		MULTIPROPERTY("Is see-through", as_physical.is_see_through);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If enabled, lets the light through.\nEnemies will be visible behind this object.\nUse it on walls of glass.");
+		}
+	}
+	else {
+		MULTIPROPERTY("Cover ground neons", as_nonphysical.cover_ground_neons);
+		MULTIPROPERTY("Illuminate as wall", as_nonphysical.illuminate_as_wall);
+
 	}
 
 	ImGui::Separator();

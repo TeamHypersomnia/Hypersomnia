@@ -6,6 +6,180 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- Let's keep the unvariantized structs as_physical and as_nonphysical and let them both go to json
+	- Pro: we might later decide to let nodes override domains after all
+		- Then we'll be ready for it
+		- With componentized render invariant it will take only 2 flavors instead of 3
+	- Pro: it sounds like a nice idiom to be able to modify this sprite's behavior in all domains
+		- The selected domain is just the default
+	- Con: not really any
+		- There might be repetition in fields that have different defaults
+		- But there would still be if we e.g. created a new sprite resource type (meh)
+		- And the only alternative would be std::optional shenanigans
+			- This wouldn't even let us have both behaviors saved if they differ
+
+
+- Now that I think of it, from the point of view of JSON api, it will look nice to have physics = {}
+	- We might not want to variantize it in case we want to go back to physics domain
+	- So we want to serialize it all
+- Or we might want to have a separate sprite resource type at all
+
+- Note that an occassional static wall intersecting another static wall won't break lighting, the raycasts will just miss it
+	- It's only important that we have a proper vertex at the corner
+
+- For now let's just add all insects to officials so we don't have to make gui for editing organisms
+	- We'll reproduce the entire garden in officials along with flowers etc
+
+- Alright let's variantize the sprite resource editable and have a handler for it in serialization routine
+
+- I think these two flags are very specific that they'll have different defaults across domains
+	- However it would still be nice to variantize domain-related properties and then still serialize it nicely
+
+- What I'd really love is focusing on having the simplest JSON api here
+	- so no separate physics_wall_illumination but just wall_illumination = false/true
+		- as well as omitting it if we have the domain default (true for physical and false for decoration)
+	- on the implementation side - std::optional<bool> could be the on/off/default idiom
+		- Pretty easy to implement in serializator
+		- Nullopt could be rendered differently depending on the selected domain
+		- Could be rendered with a combo enum
+		- However for the user it would be most intuitive if it was still a checkbox
+- Okay, we'll need custom serializators anyway because we'll have to serialize the ids
+- Since we'll have a custom serializer we could make sprite editable a variant
+
+- Json readwrite and ignoring defaults
+	- With reads it is really simple, if we read e.g. a physical resource we can set the default before reading directly into it
+	- The best default provider would be just the default type
+	- We might have a per-type default provider passed to write_json
+
+- Special render functions - we might have a different defaults for physical and non-physical sprite
+	- Set defaults when switching domains?
+		- Switching domains is a major operation so I think it would be okay
+		- We might have different "hypothetical defaults" too
+			- Well a hypothetical default will always be a sprite so no
+
+- The whole idea of overrides is stupid af it'll just complicate our editor arch
+	- We'll just have to copy the file and be done with it, atlas will be easily able to recognize it
+	- Also we should really have the option to unpack the aquarium into nodes.
+		- So that we can do a thing similar to fy minilab
+		- If you want non-physical aquarium walls you'll just do it yourself, that's just a template
+		- Will autoselect the unpacked nodes
+
+- Uhh can't we force just separate resources?
+	- The domain overrides complicate the shit out of creation pipeline
+	- We could later have virtual resources
+
+- How do we spec the organisms?
+	- We thought of a separate domain
+	- But that sucks because an organism can be either background or foreground as well (think insects vs underwater aquarium)
+	- So we'll just have a tick like with neon map: Organism behavior (advanced)
+
+- Note that even if we wanted to make this aquarium manually
+	- we'd still need those lab walls with overridden domain
+
+- I'd think of a nicer way to serialize augs::maybe<> in json
+	- Either have enabled = true/false inside the struct (in practice these structs are guaranteed to have no member like that because otherwise what would be the point of maybe<>)
+	- or at least name it disabled__organism vs organism instead of enabled_organism
+		- actually "organism__DISABLED": because we sure as hell won't have capitalized members and it's visible clearly
+
+- We've touched on separate topics here
+	- Automatized placement/special prefabs specification - this is solved, we'll have enums and structs per each usecase
+	- Domain overrides for nodes
+		- we were worried about too many flavours which led us to think about static allocation limits
+			- But maybe we shouldn't worry about it for now? We'll have to increase the limit anyway, I think flavors will be smaller
+		- Ultimately we could make the render invariant a component so we can have just a single flavor (?)
+			- Still would be a waste to make the physics cache dereference it
+		- Okay then we should necessarily just lazy-allocate the flavors we need for overrides
+		- Only thing left is how we think of organisms here because the physical domains won't specify moving organisms
+			- Although insect sprites will always be foreground so I don't get the problem
+			- It's just whether we want to make it a separate domain, maybe yes? Organism could be both bg and fg
+	
+- Aquarium - We only really need to think how we'd do it manually and support it in the editor
+	- The rest is only about automatized placement, we shouldn't worry about these two simultaneously
+
+- Is our model still incomplete?
+	- If we allow specifying custom resources in the aquarium node,
+		- we will need to implement the non-physical override for the officials as well
+	- Also think where creating organisms fits into this all
+		- Are they just in the foreground domain? (esp. the insects must be foreground)
+	- We shouldn't worry about duplicate flavours
+		- at least the image defs won't be reused
+
+
+- A node should have an option to make it non-physical
+	- So it can be spawned just as a decoration because sometimes the thin walls might be used standalone physically, or separately over the layout defining colliders
+	- Some physical nodes might also be overlaid transparently (?)
+		if we determine we want our own physics for an aquarium for example
+	- Alright so the aquarium surely should have the option to not create the physical aspect
+		- 1) because it might be somewhere off-screen and it'd be a waste of resources
+		- 2) because it might be used in a layout-defining context and it might conflict with the walls
+	- In legacy editor, we have instances of the same image being used in both physical and non-physical context'
+		- Notably lab_wall
+
+- Note that domain could be overridable on a per-node basis
+	- This is because physical domain involves strictly more properties than both foreground/background (which are the same)
+	- So we could enable this option for nodes of physical resources
+
+- Okay but what are the remaining problems with this prefablike special objects design?
+	- If it's area marker, it will not correspond directly to aquarium's physical bounds
+		- Not big of a deal but still, especially if aquarium is meant to be layout-defining
+		- On the other hand if we make the organism area the actual physical bound it will be confusing that it's larger than the actual bound for fish
+			- However most likely it will not be noticeable
+			- We'll just have to hide rendering of the true organism bound marker which would be ugly
+	- Okay I don't think we have the choice, we just have to accept physical bounds will be larger and go with the first, simplest solution
+		- Someone might want to specify different wall sizes anyway so for layout defining aquaria they will have to figure it out on their own 
+		
+	
+	- Other is where do we spec the default resource setup for the aquarium walls glasses etc.
+		- The defaults will obviously be official
+		- and I think we could technically set them in editor_node_defaults, but maybe we could store and preset them somehow somewhere (?)
+
+- Couldn't we implement "special resources" in terms of "node templates"?
+	- The previous "special resources" design was really just a response to ours not having implemented enough node/resource types
+		- With all organism entities, particles and organism areas in place, we could make aquarium just an instantiable node group
+			- We can still call it prefabs for what it's worth
+		- it's just it will spawn an entire layer
+	- No no no, we lose all the parametrability we wanted to achieve
+		- the deal was that we wanted it to be instantly resizable for example
+	- We wouldn't be able to have a simple json type = 'aquarium' with just size and be done with it
+
+- Prefab-like Special objects (finally) 
+	- Notice how special objects are intuitively the same as area markers
+		- If a prefab is just a point without any other sprite, it can be implemented in terms of a point
+		- Otherwise we will always want to be able to resize it, if it has any decoration of any sort
+			- or just to signify range or whatever
+		- Plus an icon over a prefab will come in handy as additional feedback that this object is indeed configurable
+			- the entities could still map to the prefab node many-to-one (just like mags map to the containers, although that's a different mechanism implemented in visible_entities afaik)
+			- 
+	- Of course for now we only care about official ones implemented by us in C++
+		- So for now only aquarium
+	- And here we could attach the whole aquarium to the organism area marker and use the marker to transform/resize it
+		- So sometimes the markers will actually be functional and won't only indicate the range/size
+	- The only "con" to reusing area markers for special prefabs is that we'll have to manually differentiate between them in special filesystem
+		- otherwise they'll show up under Area markers with all others which wouldn't be too great as normally these markers are non-physical
+	- Implementation details (state)
+		- Actually we can make it even simpler: an enum
+			- What would you hold in the variant anyway?
+			- The entire spec will be in the node, linearly
+			- The spec couldn't be in the resource because by definition it will be official
+				- We could reimplement it later anyway if we wanted to e.g. "fork" resources, but that would be stupid tbh
+				- The spec in nodes will be easy enough for it to be enough to just make it once and then copypaste
+					- Literally Invisible nodes could be the "library" of our custom resources to spawn
+			- Okay but instead of linearly keeping vars like aquarium_res1, aquarium_res2 let's just have structs for each usecase
+				- it will still technically be "linear", easily multiproperty-able etc.
+		- In short: we're doing a variant
+			- Note this variant will NEVER be serialized even in LATER STAGES of the project, because this is by definition a built-in!
+				- With customs it will be scripting so implementing it as a variant wouldn't make sense anyway!
+		- Details
+			- Note that for now it won't even matter if we make it a variants (and thus complicated to serialize)..
+				- ..because it will be sitting in a resource
+				- and we won't serialize official resources
+				- as well as allow creation of project-based ones, btw by definition you won't be able to create a project-based special builtin resource
+				- so serializing those variants is a non-issue pretty much
+					- yeah absolutely
+			- Nodes will only serialize the generic unique resource id, which is the name
+			- And area nodes will just have all properties linearly without variantization, for ease of serialization
+
 - Maybe ask during Q&A if we should indeed reset the tab or not
 
 - flips/resizes not applied to animated stuff

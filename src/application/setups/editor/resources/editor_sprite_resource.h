@@ -23,6 +23,31 @@ enum class editor_sprite_domain {
 
 struct editor_material_resource;
 
+struct editor_sprite_resource_nonphysical {
+	// GEN INTROSPECTOR struct editor_sprite_resource_nonphysical
+	bool cover_ground_neons = false;
+	bool illuminate_as_wall = false;
+	// END GEN INTROSPECTOR
+};
+
+struct editor_sprite_resource_physical {
+	// GEN INTROSPECTOR struct editor_sprite_resource_physical
+	bool is_static = false;
+	bool is_see_through = false;
+	real32 density = 0.7f;
+	real32 friction = 0.0f;
+	real32 bounciness = 0.2f;
+
+	real32 linear_damping = 6.5f;
+	real32 angular_damping = 6.5f;
+
+	editor_typed_resource_id<editor_material_resource> material;
+
+	bool cover_ground_neons = true;
+	bool illuminate_as_wall = true;
+	// END GEN INTROSPECTOR
+};
+
 struct editor_sprite_resource_editable {
 	// GEN INTROSPECTOR struct editor_sprite_resource_editable
 	editor_sprite_domain domain = editor_sprite_domain::BACKGROUND;
@@ -35,17 +60,11 @@ struct editor_sprite_resource_editable {
 	bool stretch_when_resized = false;
 
 	bool foreground_glow = false;
+	augs::maybe<float> color_wave_speed = augs::maybe<float>(1.0f, false);
+	augs::maybe<float> rotate_continuously_degrees_per_sec = augs::maybe<float>(360.0f, false);
 
-	bool is_static = false;
-	bool is_see_through = false;
-	real32 density = 0.7f;
-	real32 friction = 0.0f;
-	real32 restitution = 0.2f;
-
-	real32 linear_damping = 6.5f;
-	real32 angular_damping = 6.5f;
-
-	editor_typed_resource_id<editor_material_resource> material;
+	editor_sprite_resource_physical as_physical;
+	editor_sprite_resource_nonphysical as_nonphysical;
 	// END GEN INTROSPECTOR
 };
 
@@ -64,6 +83,7 @@ struct editor_sprite_resource {
 
 	std::optional<std::variant<
 		test_static_decorations,
+		test_plain_sprited_bodies,
 		test_dynamic_decorations
 	>> official_tag;
 

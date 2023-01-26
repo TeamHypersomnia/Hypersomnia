@@ -138,6 +138,18 @@
 		"id": "sprite",
 		"script": "crate_mover",
 
+		"domain": "PHYSICAL",
+
+		"as_physical": {
+			"density": 3,
+			"friction": 21.0
+		},
+
+		"as_nonphysical": {
+			"wall_illumination": true,
+			"occlude_ground_neons": true
+		},
+
 		"script_arguments": {
 			// Wszystkie argumenty do script arguments beda stringami,
 			// dokladnie tak jak bedziemy je podawac do interpretera lua,

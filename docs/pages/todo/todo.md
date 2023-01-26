@@ -6,6 +6,20 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+## Editor final MVP once we can ditch old maps
+
+- Let's make sprite's special effect a boolset
+	- and not just have one effect speed multiplier
+	- for now one will just implicitly override another
+
+- Move render invariant to component, instead of allocating flavors for each override
+	- WE STILL NEED AN OVERRIDE FOR physical->non physical.
+	- Entire render component could fit into two bytes
+	- Will even be faster to calculate render layer because won't have to refer to flavor
+	- When we componentize render, we can still have editable defaults in the resource
+
+## Others
+
 - Future idea: bullet penetration
 	- Restores balance to pistols
 		- All pistols except for deagle and revolver would be non-penetrating
