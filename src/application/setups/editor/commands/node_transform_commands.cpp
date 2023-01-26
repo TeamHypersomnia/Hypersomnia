@@ -725,6 +725,7 @@ void resize_nodes_command::rewrite_change(
 	reinfer_resized(cosm);
 
 	::read_back_to_nodes(in.setup);
+	in.setup.rebuild_scene();
 }
 
 void resize_nodes_command::redo(const editor_command_input in) {
