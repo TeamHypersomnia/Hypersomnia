@@ -382,6 +382,8 @@ vec2 editor_setup::get_world_cursor_pos(const camera_eye eye) const {
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", project.meta.name);
 	config.drawing.draw_area_markers.is_enabled = false;
+	config.drawing.draw_aabb_highlighter = false;
+	config.interpolation.enabled = false;
 }
 
 std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {

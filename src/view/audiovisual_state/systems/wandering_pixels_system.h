@@ -45,10 +45,7 @@ public:
 	}
 
 	template <class E>
-	cache& get_cache(const E& id);
-
-	template <class E>
-	const cache* find_cache(const E& id) const;
+	const cache* find_cache(E id) const;
 
 	template <class E>
 	void advance_for(

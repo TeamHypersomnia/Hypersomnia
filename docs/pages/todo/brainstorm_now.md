@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Also organize garden, fish, insects etc in officials
+	- even despite the preffixes like aquarium_, garden_ etc
+	- name fish_color
+	- fish_dragon
+	- fish_rainbow_dragon
 
 - Let's keep the unvariantized structs as_physical and as_nonphysical and let them both go to json
 	- Pro: we might later decide to let nodes override domains after all
@@ -143,47 +148,8 @@ summary: That which we are brainstorming at the moment.
 		- the deal was that we wanted it to be instantly resizable for example
 	- We wouldn't be able to have a simple json type = 'aquarium' with just size and be done with it
 
-- Prefab-like Special objects (finally) 
-	- Notice how special objects are intuitively the same as area markers
-		- If a prefab is just a point without any other sprite, it can be implemented in terms of a point
-		- Otherwise we will always want to be able to resize it, if it has any decoration of any sort
-			- or just to signify range or whatever
-		- Plus an icon over a prefab will come in handy as additional feedback that this object is indeed configurable
-			- the entities could still map to the prefab node many-to-one (just like mags map to the containers, although that's a different mechanism implemented in visible_entities afaik)
-			- 
-	- Of course for now we only care about official ones implemented by us in C++
-		- So for now only aquarium
-	- And here we could attach the whole aquarium to the organism area marker and use the marker to transform/resize it
-		- So sometimes the markers will actually be functional and won't only indicate the range/size
-	- The only "con" to reusing area markers for special prefabs is that we'll have to manually differentiate between them in special filesystem
-		- otherwise they'll show up under Area markers with all others which wouldn't be too great as normally these markers are non-physical
-	- Implementation details (state)
-		- Actually we can make it even simpler: an enum
-			- What would you hold in the variant anyway?
-			- The entire spec will be in the node, linearly
-			- The spec couldn't be in the resource because by definition it will be official
-				- We could reimplement it later anyway if we wanted to e.g. "fork" resources, but that would be stupid tbh
-				- The spec in nodes will be easy enough for it to be enough to just make it once and then copypaste
-					- Literally Invisible nodes could be the "library" of our custom resources to spawn
-			- Okay but instead of linearly keeping vars like aquarium_res1, aquarium_res2 let's just have structs for each usecase
-				- it will still technically be "linear", easily multiproperty-able etc.
-		- In short: we're doing a variant
-			- Note this variant will NEVER be serialized even in LATER STAGES of the project, because this is by definition a built-in!
-				- With customs it will be scripting so implementing it as a variant wouldn't make sense anyway!
-		- Details
-			- Note that for now it won't even matter if we make it a variants (and thus complicated to serialize)..
-				- ..because it will be sitting in a resource
-				- and we won't serialize official resources
-				- as well as allow creation of project-based ones, btw by definition you won't be able to create a project-based special builtin resource
-				- so serializing those variants is a non-issue pretty much
-					- yeah absolutely
-			- Nodes will only serialize the generic unique resource id, which is the name
-			- And area nodes will just have all properties linearly without variantization, for ease of serialization
 
 - Maybe ask during Q&A if we should indeed reset the tab or not
-
-- flips/resizes not applied to animated stuff
-	- uhh wtf they actually have no overridden geo
 
 - We should also assign the organism automatically to the bound so it's intuitive
 

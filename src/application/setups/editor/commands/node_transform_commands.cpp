@@ -582,7 +582,6 @@ void move_nodes_command::rewrite_change(
 
 	reinfer_moved(cosm);
 	::read_back_to_nodes(in.setup);
-	in.setup.rebuild_scene();
 }
 
 void move_nodes_command::reselect_moved_entities(const editor_command_input in) {
@@ -597,13 +596,6 @@ void move_nodes_command::redo(const editor_command_input in) {
 
 	::save_transforms(cosm, moved_entities, before_change_data);
 	move_entities(cosm);
-
-	/*
-		We are rebuilding the scene after every command anyway.
-		No need to reinfer.
-	*/
-
-	//cosmic::reinfer_all_entities(cosm);
 
 	reselect_moved_entities(in);
 	::read_back_to_nodes(in.setup);
@@ -725,7 +717,6 @@ void resize_nodes_command::rewrite_change(
 	reinfer_resized(cosm);
 
 	::read_back_to_nodes(in.setup);
-	in.setup.rebuild_scene();
 }
 
 void resize_nodes_command::redo(const editor_command_input in) {

@@ -4,13 +4,9 @@
 #include "augs/math/steering.h"
 
 template <class E>
-wandering_pixels_system::cache& wandering_pixels_system::get_cache(const E& id) {
-	return per_entity_cache[id.to_unversioned()];
-}
-
-template <class E>
-const wandering_pixels_system::cache* wandering_pixels_system::find_cache(const E& id) const {
-	return mapped_or_nullptr(per_entity_cache, id.to_unversioned());
+const wandering_pixels_system::cache* wandering_pixels_system::find_cache(const E id) const {
+	const auto unversioned = id.to_unversioned();
+	return mapped_or_nullptr(per_entity_cache, unversioned);
 }
 
 template <class E>
@@ -23,7 +19,9 @@ void wandering_pixels_system::advance_for(
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
 
-	auto& cache = get_cache(it.get_id());
+	const auto id = it.get_id();
+	const auto unversioned = id.to_unversioned();
+	auto& cache = per_entity_cache[unversioned];
 	auto& used_rng = rng;
 
 	const auto& wandering = it.template get<components::wandering_pixels>();

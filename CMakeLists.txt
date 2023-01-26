@@ -1052,9 +1052,15 @@ if(CLANG)
 	# -Wall and -Wextra cover everything already
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
+	set(DISABLED_WARNINGS "-Wno-error=unused-command-line-argument -Wno-error=missing-braces")
+
+	if (APPLE)
+		set(DISABLED_WARNINGS "${DISABLED_WARNINGS} -Wno-error=deprecated-declarations")
+	endif()
+
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS 
-		"${HYPERSOMNIA_CXX_FLAGS} ${CHOSEN_WARNINGS}  -fcolor-diagnostics -Wno-error=unused-command-line-argument -Wno-error=deprecated-declarations -Wno-error=missing-braces"
+		"${HYPERSOMNIA_CXX_FLAGS} ${CHOSEN_WARNINGS}  -fcolor-diagnostics ${DISABLED_WARNINGS}"
 	)
 
 	if(NOT MSVC)

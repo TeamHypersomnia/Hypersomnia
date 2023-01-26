@@ -2142,6 +2142,10 @@ work_result work(const int argc, const char* const * const argv) try {
 				}
 #endif
 
+				if constexpr(std::is_same_v<S, editor_setup>) {
+					pending_new_state_sample = true;
+				}
+
 				setup.advance(
 					{ 
 						frame_delta, 
