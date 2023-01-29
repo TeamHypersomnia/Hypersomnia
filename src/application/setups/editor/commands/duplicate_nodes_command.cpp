@@ -211,6 +211,17 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 					auto mirrored_transform = transformr(mirror_offset + source_transform.pos, new_rotation);
 					fix_pixel_imperfections(mirrored_transform);
 
+					/*
+						We need to account for nodes that do not have fields for flipping,
+						like spawnpoints for example.
+					*/
+
+					if constexpr(!has_flip_v<decltype(e)>) {
+						if (hori) {
+							mirrored_transform.rotation += 180;
+						}
+					}
+
 					set_node_transform(e, mirrored_transform);
 				}
 

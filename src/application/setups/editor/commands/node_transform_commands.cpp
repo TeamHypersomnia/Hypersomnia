@@ -807,8 +807,14 @@ void flip_nodes_command::flip_entities(cosmos& cosm) {
 
 						auto mirrored_transform = transformr(mirror_offset + source_transform.pos, new_rotation);
 						fix_pixel_imperfections(mirrored_transform);
+
+						if (!typed_handle.do_flip(flip)) {
+							if (flip.horizontally) {
+								mirrored_transform.rotation += 180;
+							}
+						}
+
 						typed_handle.set_logic_transform(mirrored_transform);
-						typed_handle.do_flip(flip);
 					}
 				}
 			);

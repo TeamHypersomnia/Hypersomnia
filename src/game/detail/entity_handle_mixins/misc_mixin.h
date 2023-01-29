@@ -42,12 +42,15 @@ public:
 		do_flip(flip_flags { false, true });
 	}
 
-	void do_flip(const flip_flags f) const {
+	bool do_flip(const flip_flags f) const {
 		const auto self = *static_cast<const E*>(this);
 
 		if (const auto overridden = self.template find<components::overridden_geo>()) {
 			overridden.do_flip(f);
+			return true;
 		}
+
+		return false;
 	}
 
 	auto* find_crosshair() const {

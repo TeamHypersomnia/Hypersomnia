@@ -4864,3 +4864,4 @@ Advantages:
 	- and we'll eventually use pointers for flavors anyway
 
 - Screw static allocation for now, we should only have a safety module so that people don't lose their work accidentally
+- Fix spawn rotations when cloning (lack of flips? translate flips to rotations maybe if no flips in constexpr)
