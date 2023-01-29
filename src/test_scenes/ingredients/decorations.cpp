@@ -289,7 +289,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_sprite(
-				test_dynamic_decorations::WATER_SURFACE,
+				test_dynamic_decorations::WATER_CAUSTICS,
 				test_scene_image_id::WATER_SURFACE_1,
 				test_ground_order::WATER_SURFACES
 			);

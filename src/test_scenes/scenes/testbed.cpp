@@ -996,13 +996,13 @@ namespace test_scenes {
 
 				for (int i = 0; i < N; ++i) {
 					const auto target = caustics[i] + aquarium_tr;
-					auto ent = create(test_dynamic_decorations::WATER_SURFACE, target);
+					auto ent = create(test_dynamic_decorations::WATER_CAUSTICS, target);
 					ent.get<components::animation>().state.frame_num = caustics_offsets[i];
 				}
 
 				for (int i = 0; i < DN; ++i) {
 					const auto target = dim_caustics[i] + aquarium_tr;
-					auto ent = create(test_dynamic_decorations::WATER_SURFACE, target);
+					auto ent = create(test_dynamic_decorations::WATER_CAUSTICS, target);
 					ent.get<components::animation>().state.frame_num = dim_caustics_offsets[i];
 					ent.get<components::sprite>().colorize.a = 79;
 				}
