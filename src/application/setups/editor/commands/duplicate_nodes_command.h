@@ -31,6 +31,7 @@ public:
 	std::optional<editor_layer_id> target_new_layer;
 	std::optional<std::pair<editor_layer_id, std::size_t>> target_unified_location;
 	bool omit_inspector = false;
+	std::optional<ltrb> custom_aabb;
 
 	void push_entry(editor_node_id);
 	void reverse_order();

@@ -4,63 +4,13 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 
 #include "application/setups/editor/commands/duplicate_nodes_command.h"
-#include "view/rendering_scripts/find_aabb_of.h"
 #include "application/setups/editor/detail/editor_transform_utils.h"
 
 #include "augs/misc/pool/pool_allocate.h"
 
 #include "augs/templates/traits/has_rotation.h"
 #include "augs/templates/traits/has_flip.h"
-
-template <class F>
-std::optional<ltrb> editor_setup::find_aabb_of_typed_nodes(F&& for_each_typed_node) const {
-	ltrb total;
-
-	for_each_typed_node(
-		[&](const auto id) {
-			if (const auto node = find_node(id)) {
-				// TODO: In case of prefabs, this should consider *all* entity ids, not just the scene_entity_id.
-
-				if (const auto handle = scene.world[node->scene_entity_id]) {
-					if (const auto aabb = find_aabb_of_entity(handle)) {
-						total.contain(*aabb);
-					}
-				}
-			}
-		}
-	);
-
-	if (total.good()) {
-		return total;
-	}
-
-	return std::nullopt;
-}
-
-template <class F>
-std::optional<ltrb> editor_setup::find_aabb_of_nodes(F&& for_each_node) const {
-	ltrb total;
-
-	for_each_node(
-		[&](const auto id) {
-			on_node(id, [this, &total](const auto& typed_node, const auto typed_id) {
-				(void)typed_id;
-
-				if (const auto handle = scene.world[typed_node.scene_entity_id]) {
-					if (const auto aabb = find_aabb_of_entity(handle)) {
-						total.contain(*aabb);
-					}
-				}
-			});
-		}
-	);
-
-	if (total.good()) {
-		return total;
-	}
-
-	return std::nullopt;
-}
+#include "application/setups/editor/editor_setup_find_aabb_of_nodes.hpp"
 
 template <class N>
 transformr get_node_transform(const N& node) {
@@ -243,7 +193,15 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 			}
 		};
 
-		if (const auto source_aabb = in.setup.find_aabb_of_nodes(for_each_source_node_id)) {
+		const auto source_aabb = [&]() {
+			if (custom_aabb) {
+				return custom_aabb;
+			}
+
+			return in.setup.find_aabb_of_nodes(for_each_source_node_id);
+		}();
+
+		if (source_aabb) {
 			const auto mir_dir = mirror_direction;
 
 			auto calc_mirror_offset = [source_aabb, mir_dir](const transformr& source) {

@@ -48,6 +48,7 @@
 #include "augs/templates/wrap_templates.h"
 #include "application/setups/editor/selector/editor_entity_selector.hpp"
 #include "application/setups/editor/editor_setup_for_each_inspected_entity.hpp"
+#include "application/setups/editor/editor_setup_find_aabb_of_nodes.hpp"
 #include "augs/templates/traits/has_size.h"
 #include "augs/templates/traits/has_flip.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
@@ -1722,11 +1723,24 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 			: typesafe_sprintf("%x%x layers", dupli_or_mirr, all_source_layers.size())
 		;
 
+		auto for_each_source_node_id = [&](auto callback) { 
+			for (const auto layer_id : all_source_layers) {
+				if (const auto source_layer = find_layer(layer_id)) {
+					for (const auto source_node : source_layer->hierarchy.nodes) {
+						callback(source_node);
+					}
+				}
+			}
+		};
+
+		const auto custom_aabb = find_aabb_of_nodes(for_each_source_node_id);
+
 		for (const auto layer_id : all_source_layers) {
 			if (const auto source_layer = find_layer(layer_id)) {
 				duplicate_nodes_command duplicate;
 				duplicate.mirror_direction = direction;
 				duplicate.omit_inspector = true;
+				duplicate.custom_aabb = custom_aabb;
 
 				for (const auto source_node : source_layer->hierarchy.nodes) {
 					duplicate.push_entry(source_node);
