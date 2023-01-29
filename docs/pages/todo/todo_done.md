@@ -4865,3 +4865,13 @@ Advantages:
 
 - Screw static allocation for now, we should only have a safety module so that people don't lose their work accidentally
 - Fix spawn rotations when cloning (lack of flips? translate flips to rotations maybe if no flips in constexpr)
+
+- Mirroring layers should take the entire aabb into account
+- how the fucking fuck do we setup names for official resources
+	- and why can't we never remember it
+	- create_official_filesystem_from
+
+- fix water surface being named blank
+	- problematic though, maybe we could give it an overridden unique name?
+		- We could play like this with official resources
+		- They'll be unique because they won't have an extension

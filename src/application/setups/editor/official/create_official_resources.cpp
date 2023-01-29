@@ -156,8 +156,7 @@ void create_official_filesystem_from(
 					const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
 					auto name = flavour.get_name();
 
-					const auto id = str_ops(name).to_lowercase().replace_all(" ", "_").subject;
-					new_node.name = id;
+					new_node.name = typed_resource.overridden_official_name;
 
 					if (auto sprite = flavour.template find<invariants::sprite>()) {
 						new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});

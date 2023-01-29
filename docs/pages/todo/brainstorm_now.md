@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Mirroring layers should take the entire aabb into account
 
 - Also organize garden, fish, insects etc in officials
 	- even despite the preffixes like aquarium_, garden_ etc

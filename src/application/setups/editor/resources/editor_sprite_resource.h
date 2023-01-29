@@ -87,6 +87,8 @@ struct editor_sprite_resource {
 		test_dynamic_decorations
 	>> official_tag;
 
+	std::string overridden_official_name;
+
 	/* Only for quick mapping */
 	mutable std::variant<
 		typed_entity_flavour_id<static_decoration>,
@@ -100,6 +102,10 @@ struct editor_sprite_resource {
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 
 	decltype(auto) get_display_name() const {
+		if (!overridden_official_name.empty()) {
+			return overridden_official_name;
+		}
+
 		return external_file.get_display_name();
 	}
 
