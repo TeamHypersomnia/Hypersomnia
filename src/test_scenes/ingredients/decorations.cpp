@@ -210,6 +210,16 @@ namespace test_flavours {
 			render_layer::FOREGROUND
 		);
 
+		{
+			auto& meta = flavour_with_sprite(
+				test_static_decorations::LAB_WALL_FOREGROUND,
+				test_scene_image_id::LAB_WALL,
+				render_layer::FOREGROUND
+			);
+
+			meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS, true);
+		}
+
 		flavour_with_sprite(
 			test_static_decorations::AQUARIUM_BOTTOM_LAMP_BODY,
 			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_BODY,

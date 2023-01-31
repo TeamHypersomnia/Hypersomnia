@@ -287,7 +287,7 @@ struct editor_filesystem_node {
 
 	ad_hoc_entry_id fill_thumbnail_entries(
 		const augs::path_type& project_folder,
-		ad_hoc_atlas_subjects& out_subjects,
+		std::unordered_map<augs::path_type, ad_hoc_entry_id>& out_subjects,
 		ad_hoc_entry_id id_counter = 1
 	) {
 		for_each_file_recursive([&id_counter, &out_subjects, &project_folder](auto& node) {
@@ -298,8 +298,13 @@ struct editor_filesystem_node {
 			}
 
 			if (assets::is_supported_extension<assets::image_id>(path.extension().string())) {
-				node.file_thumbnail_id = id_counter++;
-				out_subjects.push_back({ node.file_thumbnail_id, path });
+				if (const auto found_id = mapped_or_nullptr(out_subjects, path)) {
+					node.file_thumbnail_id = *found_id;
+				}
+				else {
+					node.file_thumbnail_id = id_counter++;
+					out_subjects[path] = node.file_thumbnail_id;
+				}
 			}
 		});
 

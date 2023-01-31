@@ -538,3 +538,19 @@ summary: Just a hidden scratchpad.
 - After death, perhaps the camera should follow the head instead of the dead body
 	- Especially since the body may explode
 	- And there will be dynamics for the head
+
+- Alright let's variantize the sprite resource editable and have a handler for it in serialization routine
+
+- I think these two flags are very specific that they'll have different defaults across domains
+	- However it would still be nice to variantize domain-related properties and then still serialize it nicely
+
+- What I'd really love is focusing on having the simplest JSON api here
+	- so no separate physics_wall_illumination but just wall_illumination = false/true
+		- as well as omitting it if we have the domain default (true for physical and false for decoration)
+	- on the implementation side - std::optional<bool> could be the on/off/default idiom
+		- Pretty easy to implement in serializator
+		- Nullopt could be rendered differently depending on the selected domain
+		- Could be rendered with a combo enum
+		- However for the user it would be most intuitive if it was still a checkbox
+- Okay, we'll need custom serializators anyway because we'll have to serialize the ids
+- Since we'll have a custom serializer we could make sprite editable a variant

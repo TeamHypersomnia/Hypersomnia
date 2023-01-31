@@ -391,10 +391,17 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 	if (rebuild_ad_hoc_atlas) {
 		rebuild_ad_hoc_atlas = false;
 
+		std::unordered_map<augs::path_type, ad_hoc_entry_id> subject_ids;
+		auto next_id = files.root.fill_thumbnail_entries(paths.project_folder, subject_ids);
+		next_id = official_files_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), subject_ids, next_id);
+		next_id = gui.filesystem.official_special_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), subject_ids, next_id);
+
 		ad_hoc_atlas_subjects new_subjects;
-		auto next_id = files.root.fill_thumbnail_entries(paths.project_folder, new_subjects);
-		next_id = official_files_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), new_subjects, next_id);
-		next_id = gui.filesystem.official_special_root.fill_thumbnail_entries(augs::path_type(OFFICIAL_CONTENT_DIR), new_subjects, next_id);
+		new_subjects.reserve(subject_ids.size());
+
+		for (auto& s : subject_ids) {
+			new_subjects.push_back({ s.second, s.first });
+		}
 
 		auto cache_thumbnail_id_in_resource = [&](const auto& file_node) {
 			on_resource(

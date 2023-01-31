@@ -38,6 +38,7 @@ enum class test_static_decorations {
 	AQUARIUM_SAND_CORNER,
 
 	WATER_COLOR_OVERLAY,
+	LAB_WALL_FOREGROUND,
 	LAB_WALL_A2,
 
 	COUNT

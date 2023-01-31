@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Cover ground neons per-entity?
+	- Only foregrounds will need it on a second thought
+	- Consider making anything foreground cover the ground neons by default, but I don't know how we'll do it
+
+- Official asset organization
+	- I believe we could encode them in enums
+	- We must think of how we identify them in json also
+		- Perhaps even in folders they will have unique filenames, which would be best
 
 - Also organize garden, fish, insects etc in officials
 	- even despite the preffixes like aquarium_, garden_ etc
@@ -37,28 +45,12 @@ summary: That which we are brainstorming at the moment.
 - For now let's just add all insects to officials so we don't have to make gui for editing organisms
 	- We'll reproduce the entire garden in officials along with flowers etc
 
-- Alright let's variantize the sprite resource editable and have a handler for it in serialization routine
-
-- I think these two flags are very specific that they'll have different defaults across domains
-	- However it would still be nice to variantize domain-related properties and then still serialize it nicely
-
-- What I'd really love is focusing on having the simplest JSON api here
-	- so no separate physics_wall_illumination but just wall_illumination = false/true
-		- as well as omitting it if we have the domain default (true for physical and false for decoration)
-	- on the implementation side - std::optional<bool> could be the on/off/default idiom
-		- Pretty easy to implement in serializator
-		- Nullopt could be rendered differently depending on the selected domain
-		- Could be rendered with a combo enum
-		- However for the user it would be most intuitive if it was still a checkbox
-- Okay, we'll need custom serializators anyway because we'll have to serialize the ids
-- Since we'll have a custom serializer we could make sprite editable a variant
-
 - Json readwrite and ignoring defaults
 	- With reads it is really simple, if we read e.g. a physical resource we can set the default before reading directly into it
 	- The best default provider would be just the default type
 	- We might have a per-type default provider passed to write_json
 
-- Special render functions - we might have a different defaults for physical and non-physical sprite
+- Special render functions - we might have different defaults for physical and non-physical sprite
 	- Set defaults when switching domains?
 		- Switching domains is a major operation so I think it would be okay
 		- We might have different "hypothetical defaults" too
