@@ -195,7 +195,8 @@ TEST_CASE("Byte readwrite FixedContainers") {
 		REQUIRE(std::string(abab) == "hja");
 
 		abab = "ohyeah";
-		REQUIRE(std::string(abab) == "ohye");
+		// Check trimming
+		REQUIRE(std::string(abab) == "ohyea");
 		readwrite_test_cycle(abab);
 	}
 

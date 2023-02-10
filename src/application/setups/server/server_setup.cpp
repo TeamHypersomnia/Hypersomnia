@@ -84,6 +84,10 @@ void server_heartbeat::validate() {
 }
 
 bool server_heartbeat::is_valid() const {
+	if (!is_nickname_valid_characters(server_name)) {
+		return false;
+	}
+
 	return max_online >= 2 && !server_name.empty() && !current_arena.empty();
 }
 

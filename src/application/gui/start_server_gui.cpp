@@ -233,7 +233,7 @@ as well as to test your skills in a laggy environment.
 		ImGui::Separator();
 
 		{
-			auto scope = maybe_disabled_cols({}, is_disabled);
+			auto scope = maybe_disabled_cols({}, !is_nickname_valid_characters(into_vars.server_name) || is_disabled);
 
 			if (ImGui::Button("Launch!")) {
 				result = true;
