@@ -41,6 +41,24 @@ inline bool nickname_len_in_range(const std::size_t len) {
 	return len >= min_nickname_length_v && len <= max_chat_message_length_v;
 }
 
+inline bool is_wrong_whitespace(const char c) {
+	return std::isspace(static_cast<unsigned char>(c)) && c != ' ';
+}
+
+inline bool is_nickname_valid_characters(const std::string& nickname) {
+	if (std::count(nickname.begin(), nickname.end(), ' ') == static_cast<long>(nickname.length())) {
+		return false;
+	}
+
+	for (const auto& c : nickname) {
+		if (is_wrong_whitespace(c)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 using net_time_t = double;
 using client_id_type = int;
 using channel_id_type = int;

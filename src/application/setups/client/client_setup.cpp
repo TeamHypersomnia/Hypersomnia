@@ -258,6 +258,14 @@ client_setup::client_setup(
 
 			set_disconnect_reason(reason);
 		}
+		else if (!is_nickname_valid_characters(vars.nickname)) {
+			const auto reason = typesafe_sprintf(
+				"The nickname '%x' has invalid characters.", 
+				vars.nickname
+			);
+
+			set_disconnect_reason(reason);
+		}
 		else {
 			augs::network::enable_detailed_logs(true);
 

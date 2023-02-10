@@ -1406,6 +1406,16 @@ message_handler_result server_setup::handle_client_message(
 
 		auto& new_nick = payload.chosen_nickname;
 
+		if (!is_nickname_valid_characters(new_nick)) {
+			const auto reason = typesafe_sprintf(
+				"Your nickname has invalid characters.\nPlease choose a different one.",
+				new_nick
+			);
+
+			kick(client_id, reason);
+			return abort_v;
+		}
+
 		if (!nickname_len_in_range(new_nick.length())) {
 			new_nick = "Player";
 		}
