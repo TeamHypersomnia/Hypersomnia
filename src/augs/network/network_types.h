@@ -37,6 +37,8 @@ using server_name_type = augs::constant_size_string<max_server_name_length_v>;
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using address_string_type = augs::constant_size_string<max_address_string_length_v>;
 
+using client_nickname_type = augs::constant_size_string<max_nickname_length_v>;
+
 inline bool nickname_len_in_range(const std::size_t len) {
 	return len >= min_nickname_length_v && len <= max_nickname_length_v;
 }
@@ -45,12 +47,16 @@ inline bool is_wrong_whitespace(const char c) {
 	return std::isspace(static_cast<unsigned char>(c)) && c != ' ';
 }
 
-inline bool is_nickname_valid_characters(const std::string& nickname) {
+inline bool is_nickname_valid_characters(const client_nickname_type& nickname) {
 	if (std::count(nickname.begin(), nickname.end(), ' ') == static_cast<long>(nickname.length())) {
 		return false;
 	}
 
 	for (const auto& c : nickname) {
+		if (c == '\0') {
+			return false;
+		}
+
 		if (is_wrong_whitespace(c)) {
 			return false;
 		}
