@@ -38,7 +38,7 @@ using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using address_string_type = augs::constant_size_string<max_address_string_length_v>;
 
 inline bool nickname_len_in_range(const std::size_t len) {
-	return len >= min_nickname_length_v && len <= max_chat_message_length_v;
+	return len >= min_nickname_length_v && len <= max_nickname_length_v;
 }
 
 inline bool is_wrong_whitespace(const char c) {

@@ -5,31 +5,17 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Test if nicknames can't be exploited somehow
+	- Either by maximum/minimum length, duplicate names logic, special characters etc.
+	- Filter nicknames for all unicode whitespaces as well
+		- Though the game won't even display them properly so probably no point
+		- Maybe also do a parameter for printer to disallow newlines
+
 - Still we need to test with 65k entities once we optimize editor and performance doesn't suck ass
 	- But we can only do this after having the proper editor to not fuck up the old maps
 
 - After disabling static allocations, we still have the theroetical limit of 65k entities, this could be breached but not anytime soon
 
-- Lol these limits will eventually have to be lifted
-	- Imagine a person with $20k, they can buy 40 mini knives
-	- 40 of them is enough to clog the server, alright that's still quite a lot
-
-- Isn't static allocation bullshit anyway?
-	- We shouldn't worry about it for now, we can set the limits sufficiently high for now
-	- Technically it speeds up flavor dereferencing when we're iterating over all entities
-		- But the fastest would be a pointer anyway
-			- And we really should use pointers here because flavors are constant unlike entities
-			- When we rewrite the solvables we won't have to rewrite the flavor pointers anyway 
-
-- Static allocation limits: we need to have a message about there not being enough space in the cosmos
-	- This should prevent playtesting at all and should happen while we edit already
-		- Actually should prevent the creation of any new node
-	- This is mostly problematic for entity types later created in the game dynamically
-		- Like weapons
-		- So we should probably better limit firearms way before they hit the allocation limit
-	- We should totally use the static allocation though to properly manage the posibility of too many entities
-		- this will pay off in the future
-	- Let's test this tomorrow
 - We should have a thorough audit of what happens when entity limits are exceeded
 	- Flavours not so much as it is somewhat more controlled
 
@@ -39,9 +25,6 @@ summary: Just a hidden scratchpad.
 			- why even use wavs?
 	- Esp. something like gifs? For which we'll need a separate version
 	- How reputable is lodepng too?
-
-- Test if nicknames can't be exploited somehow
-	- Either by maximum/minimum length, duplicate names logic, special characters etc.
 
 - Validation of downloaded arenas
 	- Enforce small miniature size when loading it in the project selector
@@ -75,3 +58,27 @@ summary: Just a hidden scratchpad.
 
 - Money persistence: for now someone can re-join warmup indefinitely and spawn arbitrary number of items from the shop,
 overloading the server
+
+## Done 
+
+- Static allocation limits for entities and flavors
+	- Lol these limits will eventually have to be lifted
+		- Imagine a person with $20k, they can buy 40 mini knives
+		- 40 of them is enough to clog the server, alright that's still quite a lot
+
+	- Isn't static allocation bullshit anyway?
+		- We shouldn't worry about it for now, we can set the limits sufficiently high for now
+		- Technically it speeds up flavor dereferencing when we're iterating over all entities
+			- But the fastest would be a pointer anyway
+				- And we really should use pointers here because flavors are constant unlike entities
+				- When we rewrite the solvables we won't have to rewrite the flavor pointers anyway 
+
+	- Static allocation limits: we need to have a message about there not being enough space in the cosmos
+		- This should prevent playtesting at all and should happen while we edit already
+			- Actually should prevent the creation of any new node
+		- This is mostly problematic for entity types later created in the game dynamically
+			- Like weapons
+			- So we should probably better limit firearms way before they hit the allocation limit
+		- We should totally use the static allocation though to properly manage the posibility of too many entities
+			- this will pay off in the future
+		- Let's test this tomorrow
