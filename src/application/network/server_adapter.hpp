@@ -42,6 +42,8 @@ void server_adapter::advance(const net_time_t server_time, H&& handler) {
                     server.ReleaseMessage(i, message);
 
 					if (result == message_handler_result::ABORT_AND_DISCONNECT) {
+						LOG("client %x: message_handler_result::ABORT_AND_DISCONNECT", i);
+
 						j = connection_config.numChannels;
 						handler.disconnect_and_unset(i);
 						break;

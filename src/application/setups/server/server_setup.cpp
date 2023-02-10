@@ -260,87 +260,85 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 
 	auto connected_player_nickname = client_state->get_nickname();
 
-	if (auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url); discord_webhook_url.valid()) {
+	auto discord_webhook_url = parsed_url(private_vars.discord_webhook_url);
+	auto telegram_webhook_url = parsed_url(private_vars.telegram_webhook_url);
+
+	if (discord_webhook_url.valid() || telegram_webhook_url.valid()) {
 		auto server_name = get_server_name();
 		auto avatar = client_state->meta.avatar.image_bytes;
 		auto all_nicknames = get_all_nicknames();
 		auto current_arena_name = get_current_arena_name();
+		auto priv_vars = private_vars;
 
 		push_webhook_job(
-			[discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
-				const auto ca_path = CA_CERT_PATH;
-				http_client_type http_client(discord_webhook_url.host);
+			[priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
+				if (telegram_webhook_url.valid()) {
+					auto telegram_channel_id = priv_vars.telegram_channel_id;
+
+					const auto ca_path = CA_CERT_PATH;
+					http_client_type http_client(telegram_webhook_url.host);
 
 #if BUILD_OPENSSL
-				http_client.set_ca_cert_path(ca_path.c_str());
-				http_client.enable_server_certificate_verification(true);
+					http_client.set_ca_cert_path(ca_path.c_str());
+					http_client.enable_server_certificate_verification(true);
 #endif
-				http_client.set_follow_location(true);
-				http_client.set_read_timeout(5);
-				http_client.set_write_timeout(5);
+					http_client.set_follow_location(true);
+					http_client.set_read_timeout(5);
+					http_client.set_write_timeout(5);
 
-				auto items = discord_webhooks::form_player_connected(
-					avatar,
-					server_name,
-					connected_player_nickname,
-					all_nicknames,
-					current_arena_name
-				);
+					auto items = telegram_webhooks::form_player_connected(
+						telegram_channel_id,
+						connected_player_nickname
+					);
 
-				auto response = http_client.Post(discord_webhook_url.location.c_str(), items);
+					const auto location = telegram_webhook_url.location + "/sendMessage";
+					auto response = http_client.Post(location.c_str(), items);
 
-				LOG("PUSH RESPONSE:");
-
-				if (response) {
-					LOG_NVPS(response->body);
-
-					return discord_webhooks::find_attachment_url(response->body);
+					if (response) {
+						LOG("Received TG response.");
+					}
+					else {
+						LOG("Response from TG was null");
+					}
 				}
-				else {
-					LOG("Response was null");
+
+				if (discord_webhook_url.valid()) {
+					const auto ca_path = CA_CERT_PATH;
+					http_client_type http_client(discord_webhook_url.host);
+
+#if BUILD_OPENSSL
+					http_client.set_ca_cert_path(ca_path.c_str());
+					http_client.enable_server_certificate_verification(true);
+#endif
+					http_client.set_follow_location(true);
+					http_client.set_read_timeout(5);
+					http_client.set_write_timeout(5);
+
+					auto items = discord_webhooks::form_player_connected(
+						avatar,
+						server_name,
+						connected_player_nickname,
+						all_nicknames,
+						current_arena_name
+					);
+
+					auto response = http_client.Post(discord_webhook_url.location.c_str(), items);
+
+					LOG("PUSH RESPONSE:");
+
+					if (response) {
+						LOG_NVPS(response->body);
+
+						return discord_webhooks::find_attachment_url(response->body);
+					}
+					else {
+						LOG("Response was null");
+					}
 				}
 
 				return "";
 			}, 
 			id
-		);
-	}
-
-	if (auto telegram_webhook_url = parsed_url(private_vars.telegram_webhook_url); telegram_webhook_url.valid()) {
-		auto telegram_channel_id = private_vars.telegram_channel_id;
-
-		push_webhook_job(
-			[telegram_webhook_url, telegram_channel_id, connected_player_nickname]() -> std::string {
-				const auto ca_path = CA_CERT_PATH;
-				http_client_type http_client(telegram_webhook_url.host);
-
-#if BUILD_OPENSSL
-				http_client.set_ca_cert_path(ca_path.c_str());
-				http_client.enable_server_certificate_verification(true);
-#endif
-				http_client.set_follow_location(true);
-				http_client.set_read_timeout(5);
-				http_client.set_write_timeout(5);
-
-				auto items = telegram_webhooks::form_player_connected(
-					telegram_channel_id,
-					connected_player_nickname
-				);
-
-				const auto location = telegram_webhook_url.location + "/sendMessage";
-				auto response = http_client.Post(location.c_str(), items);
-
-				LOG("TG PUSH RESPONSE:" + response->body);
-
-				if (response) {
-					LOG_NVPS(response->body);
-				}
-				else {
-					LOG("Response was null");
-				}
-
-				return "";
-			}
 		);
 	}
 }
@@ -1086,6 +1084,7 @@ void server_setup::advance_clients_state() {
 					const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
 
 					if (server_time - *c.when_kicked > linger_secs) {
+						LOG("Disconnecting kicked client %x.", client_id);
 						disconnect_and_unset(client_id);
 					}
 				}
@@ -1264,6 +1263,7 @@ void server_setup::advance_clients_state() {
 						}
 					}
 					else {
+						LOG("Couldn't add client to the game mode. Disconnecting.");
 						disconnect_and_unset(client_id);
 						return;
 					}
@@ -1406,7 +1406,7 @@ message_handler_result server_setup::handle_client_message(
 
 		auto& new_nick = payload.chosen_nickname;
 
-		if (new_nick.empty()) {
+		if (!nickname_len_in_range(new_nick.empty())) {
 			new_nick = "Player";
 		}
 
@@ -1432,7 +1432,7 @@ message_handler_result server_setup::handle_client_message(
 				}
 			}
 
-			if (new_nick.empty() || find_client_state(new_nick) != nullptr) {
+			if (!nickname_len_in_range(new_nick.length()) || find_client_state(new_nick) != nullptr) {
 				const auto reason = typesafe_sprintf(
 					"Nickname: '%x' was already taken.\nPlease choose a different one.",
 					new_nick
