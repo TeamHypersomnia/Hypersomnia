@@ -4875,3 +4875,20 @@ Advantages:
 	- problematic though, maybe we could give it an overridden unique name?
 		- We could play like this with official resources
 		- They'll be unique because they won't have an extension
+- Official asset organization
+	- To have folder organization specification in one place, we can make a const virtual enum asset listing like
+		- fish = { test_complex_decor::DRAGONFISH, JELLYFISH } etc
+		- without the silly string etc, this will be nice and typsafe
+	- Note the folder organization is only a matter of viewing this nicely in editor, this doesn't have to be reflected in the folder structure
+	- Also note this helps us ensure that filenames are unique if they are physically all in the same folder
+
+	- I believe we could encode them in enums
+	- We must think of how we identify them in json also
+		- Perhaps even in folders they will have unique filenames, which would be best
+
+- Also organize garden, fish, insects etc in officials
+	- even despite the preffixes like aquarium_, garden_ etc
+	- name fish_color
+	- fish_dragon
+	- fish_rainbow_dragon
+

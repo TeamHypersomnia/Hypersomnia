@@ -78,7 +78,7 @@ namespace test_flavours {
 
 		static_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodies::BRICK_WALL,
+				test_plain_sprited_bodies::HARD_WOODEN_WALL,
 				test_scene_image_id::BRICK_WALL,
 				test_obstacle_order::OPAQUE
 			),

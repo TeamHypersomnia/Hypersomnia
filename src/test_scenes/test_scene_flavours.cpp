@@ -176,7 +176,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_tiled_sprite(
-				test_static_decorations::FLOOR,
+				test_static_decorations::CYAN_FLOOR,
 				test_scene_image_id::FLOOR,
 				test_ground_order::FLOOR_AND_ROAD
 			);
@@ -221,7 +221,7 @@ namespace test_flavours {
 		);
 
 		flavour_with_sprite(
-			test_static_decorations::METROPOLIS,
+			test_static_decorations::WELCOME_TO_METROPOLIS,
 			test_scene_image_id::METROPOLIS,
 			render_layer::FOREGROUND_GLOWS
 		);

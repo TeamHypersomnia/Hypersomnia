@@ -126,6 +126,95 @@ void create_official_filesystem_from(
 	editor_resource_pools& resources,
 	editor_filesystem_node& official_files_root
 ) {
+	using gfx_entry_type = decltype(editor_sprite_resource::official_tag);
+
+	struct subfolder {
+		std::string name;
+		std::vector<gfx_entry_type> entries;
+	};
+
+	const std::vector<subfolder> gfx_subfolders = {
+		{ 
+			"aquarium", 
+			{ 
+				test_static_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT,
+				test_static_decorations::AQUARIUM_BOTTOM_LAMP_BODY,
+
+				test_static_decorations::AQUARIUM_HALOGEN_1_LIGHT,
+				test_static_decorations::AQUARIUM_HALOGEN_1_BODY,
+
+				test_static_decorations::AQUARIUM_SAND_1,
+				test_static_decorations::AQUARIUM_SAND_2,
+
+				test_static_decorations::DUNE_BIG,
+				test_static_decorations::DUNE_SMALL,
+
+				test_static_decorations::AQUARIUM_SAND_EDGE,
+				test_static_decorations::AQUARIUM_SAND_CORNER,
+
+				test_static_decorations::WATER_COLOR_OVERLAY,
+				test_dynamic_decorations::WATER_CAUSTICS,
+
+				test_dynamic_decorations::FLOWER_PINK,
+				test_dynamic_decorations::FLOWER_CYAN,
+				test_dynamic_decorations::PINK_CORAL,
+
+				test_plain_sprited_bodies::AQUARIUM_GLASS,
+				test_plain_sprited_bodies::AQUARIUM_GLASS_START
+			} 
+		},
+		{ 
+			"fish", 
+			{ 
+				test_dynamic_decorations::YELLOW_FISH,
+				test_dynamic_decorations::DARKBLUE_FISH,
+				test_dynamic_decorations::CYANVIOLET_FISH,
+				test_dynamic_decorations::JELLYFISH,
+				test_dynamic_decorations::DRAGON_FISH
+			} 
+		},
+
+		{ 
+			"floors", 
+			{ 
+				test_static_decorations::CYAN_FLOOR,
+				test_static_decorations::WATER_ROOM_FLOOR
+			}
+		},
+
+		{ 
+			"walls", 
+			{ 
+				test_static_decorations::SOIL,
+				test_static_decorations::ROAD_DIRT,
+				test_static_decorations::ROAD,
+
+				test_static_decorations::LAB_WALL_FOREGROUND,
+				test_static_decorations::LAB_WALL_A2_FOREGROUND,
+
+				test_plain_sprited_bodies::HARD_WOODEN_WALL,
+				test_plain_sprited_bodies::LAB_WALL,
+				test_plain_sprited_bodies::LAB_WALL_SMOOTH_END,
+				test_plain_sprited_bodies::LAB_WALL_CORNER_CUT,
+				test_plain_sprited_bodies::LAB_WALL_CORNER_SQUARE
+			} 
+		},
+
+		{ 
+			"captions", 
+			{ 
+
+				test_static_decorations::HAVE_A_PLEASANT,
+				test_static_decorations::AWAKENING,
+				test_static_decorations::WELCOME_TO_METROPOLIS,
+				test_static_decorations::SNACKBAR_CAPTION
+			}
+		}
+	};
+
+	//std::unordered_set<gfx_entry_type> gfx_already_in_subfolder;
+	std::unordered_map<gfx_entry_type, editor_filesystem_node*> gfx_to_subfolder;
+
 	official_files_root.clear();
 
 	auto handle_pool = [&]<typename P>(const P& pool, const auto content_folder_name) {
@@ -135,8 +224,23 @@ void create_official_filesystem_from(
 		folder.name = content_folder_name;
 		folder.type = editor_filesystem_node_type::FOLDER;
 
-		folder.files.resize(pool.size());
-		std::size_t i = 0;
+		if constexpr(std::is_same_v<resource_type, editor_sprite_resource>) {
+			std::size_t i = 0;
+			folder.subfolders.resize(gfx_subfolders.size());
+
+			for (auto& sub : gfx_subfolders) {
+				auto& subfolder_node = folder.subfolders[i++];
+				subfolder_node.name = sub.name;
+				subfolder_node.type = editor_filesystem_node_type::FOLDER;
+
+				for (auto& entry : sub.entries) {
+					gfx_to_subfolder[entry] = std::addressof(subfolder_node);
+				}
+			}
+		}
+
+		folder.files.reserve(pool.size());
+		folder.files.clear();
 
 		auto resource_handler = [&](const auto raw_id, const resource_type& typed_resource) {
 			editor_resource_id resource_id;
@@ -147,7 +251,7 @@ void create_official_filesystem_from(
 
 			const auto& path = typed_resource.external_file.path_in_project;
 
-			auto& new_node = folder.files[i++];
+			auto new_node = editor_filesystem_node();
 			new_node.associated_resource = resource_id;
 			new_node.set_file_type_by(path.extension().string());
 
@@ -171,6 +275,15 @@ void create_official_filesystem_from(
 							path_s += "_*.png";
 
 							new_node.custom_thumbnail_path = path_s;
+						}
+					}
+
+					if constexpr(std::is_same_v<resource_type, editor_sprite_resource>) {
+						if (const auto sub = mapped_or_nullptr(gfx_to_subfolder, tag)) {
+							(*sub)->files.emplace_back(std::move(new_node));
+						}
+						else {
+							folder.files.emplace_back(std::move(new_node));
 						}
 					}
 				},

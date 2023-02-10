@@ -125,7 +125,7 @@ namespace test_scenes {
 				);
 			};
 
-			floor_align(test_static_decorations::FLOOR).set_size(total_floor_size);
+			floor_align(test_static_decorations::CYAN_FLOOR).set_size(total_floor_size);
 		}
 
 		cosmic::reinfer_all_entities(world);

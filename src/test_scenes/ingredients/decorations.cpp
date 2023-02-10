@@ -205,7 +205,7 @@ namespace test_flavours {
 		);
 
 		flavour_with_sprite(
-			test_static_decorations::LAB_WALL_A2,
+			test_static_decorations::LAB_WALL_A2_FOREGROUND,
 			test_scene_image_id::LAB_WALL_A2,
 			render_layer::FOREGROUND
 		);

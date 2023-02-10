@@ -753,7 +753,7 @@ namespace test_scenes {
 				create(test_sound_decorations::HUMMING_DISABLED, transformr(vec2(1504, -86)));
 
 				create(test_static_decorations::AWAKENING, transformr(vec2(-42, 8)));
-				create(test_static_decorations::METROPOLIS, transformr(vec2(1106, 3)));
+				create(test_static_decorations::WELCOME_TO_METROPOLIS, transformr(vec2(1106, 3)));
 
 
 				//const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
@@ -771,7 +771,7 @@ namespace test_scenes {
 				floor_align(test_static_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
 				floor_align(test_box_markers::ROOM).set_size(total_floor_size);
 
-				floor_align(test_plain_sprited_bodies::BRICK_WALL)
+				floor_align(test_plain_sprited_bodies::HARD_WOODEN_WALL)
 					.ro().ti().stretch_b().again()
 					.ro().bi().nr().extend_r(2).again()
 					.ro().bo().extend_l(2).extend_b(1).again()
@@ -905,7 +905,7 @@ namespace test_scenes {
 					.ro().bo()
 					.again(test_sound_decorations::LOUDY_FAN)
 					.to()
-					.again(test_static_decorations::LAB_WALL_A2).flip_v()
+					.again(test_static_decorations::LAB_WALL_A2_FOREGROUND).flip_v()
 					.to()
 				;
 

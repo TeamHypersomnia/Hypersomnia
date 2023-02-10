@@ -11,14 +11,15 @@ enum class test_static_lights {
 
 enum class test_static_decorations {
 	// GEN INTROSPECTOR enum class test_static_decorations
-	HAVE_A_PLEASANT,
 	SOIL,
 	ROAD_DIRT,
 	ROAD,
-	FLOOR,
+	CYAN_FLOOR,
 	WATER_ROOM_FLOOR,
+
+	HAVE_A_PLEASANT,
 	AWAKENING,
-	METROPOLIS,
+	WELCOME_TO_METROPOLIS,
 
 	SNACKBAR_CAPTION,
 
@@ -39,7 +40,7 @@ enum class test_static_decorations {
 
 	WATER_COLOR_OVERLAY,
 	LAB_WALL_FOREGROUND,
-	LAB_WALL_A2,
+	LAB_WALL_A2_FOREGROUND,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -57,7 +58,7 @@ enum class test_controlled_characters {
 enum class test_plain_sprited_bodies {
 	// GEN INTROSPECTOR enum class test_plain_sprited_bodies
 	CRATE,
-	BRICK_WALL,
+	HARD_WOODEN_WALL,
 	AQUARIUM_GLASS,
 
 	AQUARIUM_GLASS_START,

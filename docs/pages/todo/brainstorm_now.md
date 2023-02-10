@@ -10,17 +10,6 @@ summary: That which we are brainstorming at the moment.
 	- Only foregrounds will need it on a second thought
 	- Consider making anything foreground cover the ground neons by default, but I don't know how we'll do it
 
-- Official asset organization
-	- I believe we could encode them in enums
-	- We must think of how we identify them in json also
-		- Perhaps even in folders they will have unique filenames, which would be best
-
-- Also organize garden, fish, insects etc in officials
-	- even despite the preffixes like aquarium_, garden_ etc
-	- name fish_color
-	- fish_dragon
-	- fish_rainbow_dragon
-
 - Let's keep the unvariantized structs as_physical and as_nonphysical and let them both go to json
 	- Pro: we might later decide to let nodes override domains after all
 		- Then we'll be ready for it
@@ -32,7 +21,6 @@ summary: That which we are brainstorming at the moment.
 		- But there would still be if we e.g. created a new sprite resource type (meh)
 		- And the only alternative would be std::optional shenanigans
 			- This wouldn't even let us have both behaviors saved if they differ
-
 
 - Now that I think of it, from the point of view of JSON api, it will look nice to have physics = {}
 	- We might not want to variantize it in case we want to go back to physics domain
