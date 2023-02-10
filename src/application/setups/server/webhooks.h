@@ -21,26 +21,19 @@ inline std::string bytes_to_string(const std::vector<std::byte>& bytes) {
 namespace telegram_webhooks {
 	inline std::string escaped_nick(const std::string& n) {
 		std::string result;
+		/*
+			Telegram sucks at sanitization so we have to whitelist
+		*/
+
+		const auto tg_nickname_whitelist = std::string("_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
 
 		for (auto c : n) {
-			if (c == '`') {
-				continue;
+			if (tg_nickname_whitelist.find(c) == std::string::npos) {
+				result += '?';
 			}
-
-			switch(c) {
-				case '*':
-				case '_':
-				case '~':
-				case '>':
-				case '`':
-					result += '\\';
-					break;
-				default:
-					break;
-
+			else {
+				result += c;
 			}
-
-			result += c;
 		}
 
 		return result;
@@ -123,6 +116,11 @@ namespace discord_webhooks {
 		std::string result;
 
 		for (auto c : n) {
+			if (c == '\n' || c == '\t' || c == '\r') {
+				result += '?';
+				continue;
+			}
+
 			switch(c) {
 				case '\\':
 				case '*':
