@@ -23,6 +23,10 @@ namespace telegram_webhooks {
 		std::string result;
 
 		for (auto c : n) {
+			if (c == '`') {
+				continue;
+			}
+
 			switch(c) {
 				case '*':
 				case '_':
@@ -46,7 +50,7 @@ namespace telegram_webhooks {
 		const std::string& channel_id,
 		const std::string& connected_player
 	) {
-		const auto connected_notice = typesafe_sprintf("*%x* connected.", escaped_nick(connected_player));
+		const auto connected_notice = typesafe_sprintf("`%x` connected.", escaped_nick(connected_player));
 
 		return {
 			{ "chat_id", channel_id, "", "" },
