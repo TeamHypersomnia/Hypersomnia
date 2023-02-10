@@ -1406,7 +1406,7 @@ message_handler_result server_setup::handle_client_message(
 
 		auto& new_nick = payload.chosen_nickname;
 
-		if (!nickname_len_in_range(new_nick.empty())) {
+		if (!nickname_len_in_range(new_nick.length())) {
 			new_nick = "Player";
 		}
 
