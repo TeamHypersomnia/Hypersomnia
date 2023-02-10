@@ -4,6 +4,21 @@
 #include "augs/math/steering.h"
 
 template <class E>
+void wandering_pixels_system::allocate_cache_for(E id) {
+	const auto unversioned = id.to_unversioned();
+	
+	if (!found_in(per_entity_cache, unversioned)) {
+		per_entity_cache[unversioned] = {};
+	}
+}
+	
+template <class E>
+wandering_pixels_system::cache* wandering_pixels_system::find_cache(const E id) {
+	const auto unversioned = id.to_unversioned();
+	return mapped_or_nullptr(per_entity_cache, unversioned);
+}
+
+template <class E>
 const wandering_pixels_system::cache* wandering_pixels_system::find_cache(const E id) const {
 	const auto unversioned = id.to_unversioned();
 	return mapped_or_nullptr(per_entity_cache, unversioned);
@@ -11,7 +26,7 @@ const wandering_pixels_system::cache* wandering_pixels_system::find_cache(const 
 
 template <class E>
 void wandering_pixels_system::advance_for(
-	const E& it, 
+	const E it, 
 	const augs::delta dt
 ) {
 	thread_local randomization rng;
@@ -19,9 +34,14 @@ void wandering_pixels_system::advance_for(
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
 
-	const auto id = it.get_id();
-	const auto unversioned = id.to_unversioned();
-	auto& cache = per_entity_cache[unversioned];
+	auto maybe_cache = find_cache(it.get_id());
+
+	if (maybe_cache == nullptr) {
+		return;
+	}
+
+	auto& cache = *maybe_cache;
+
 	auto& used_rng = rng;
 
 	const auto& wandering = it.template get<components::wandering_pixels>();

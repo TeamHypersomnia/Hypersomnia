@@ -45,15 +45,20 @@ public:
 	}
 
 	template <class E>
+	void allocate_cache_for(E id);
+	
+	template <class E>
 	const cache* find_cache(E id) const;
 
 	template <class E>
+	cache* find_cache(E id);
+
+	template <class E>
 	void advance_for(
-		const E& subject,
+		const E subject,
 		const augs::delta dt
 	);
 
-	void reserve_caches_for_entities(const std::size_t n) {
-		per_entity_cache.reserve(n);
+	void reserve_caches_for_entities(const std::size_t) {
 	}
 };

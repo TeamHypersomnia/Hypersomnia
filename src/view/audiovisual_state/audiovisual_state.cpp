@@ -181,6 +181,22 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	};
 
 	auto launch_wandering_pixels_jobs = [&]() {
+		/* 
+			This fixes a crash where advance_for would use unordered_map's operator[]
+			to access per-entity caches, however we were posting advance_for in separate thread jobs
+			leading to a data race.
+
+			We must first reserve caches so that the workers can only use read-only functions on the map.
+		*/
+
+		all_visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS, render_layer::DIM_WANDERING_PIXELS>(cosm, [&wandering_pixels](const auto& e) {
+			e.template dispatch_on_having_all<invariants::wandering_pixels>(
+				[&](const auto typed_wandering_pixels) {
+					wandering_pixels.allocate_cache_for(typed_wandering_pixels.get_id());
+				}
+			);
+		});
+
 		auto& dedicated = input.dedicated;
 
 		{
@@ -201,10 +217,14 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 			all_visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto& e) {
 				e.template dispatch_on_having_all<invariants::wandering_pixels>(
-					[&](const auto& typed_wandering_pixels) {
-						auto job = [&triangles, current_index, &wandering_pixels, &game_images, typed_wandering_pixels, dt]() {
-							wandering_pixels.advance_for(typed_wandering_pixels, dt);
-							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, typed_wandering_pixels, game_images);
+					[&](const auto typed_wandering_pixels) {
+						const auto wandering_id = typed_wandering_pixels.get_id();
+
+						auto job = [&cosm, &triangles, current_index, &wandering_pixels, &game_images, wandering_id, dt]() {
+							auto handle = cosm[wandering_id];
+
+							wandering_pixels.advance_for(handle, dt);
+							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, handle, game_images);
 						};
 
 						const auto current_count = typed_wandering_pixels.template get<components::wandering_pixels>().num_particles;;
@@ -234,10 +254,14 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 			all_visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto& e) {
 				e.template dispatch_on_having_all<invariants::wandering_pixels>(
-					[&](const auto& typed_wandering_pixels) {
-						auto job = [&triangles, current_index, &wandering_pixels, &game_images, typed_wandering_pixels, dt]() {
-							wandering_pixels.advance_for(typed_wandering_pixels, dt);
-							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, typed_wandering_pixels, game_images);
+					[&](const auto typed_wandering_pixels) {
+						const auto wandering_id = typed_wandering_pixels.get_id();
+
+						auto job = [&cosm, &triangles, current_index, &wandering_pixels, &game_images, wandering_id, dt]() {
+							auto handle = cosm[wandering_id];
+
+							wandering_pixels.advance_for(handle, dt);
+							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, handle, game_images);
 						};
 
 						const auto current_count = typed_wandering_pixels.template get<components::wandering_pixels>().num_particles;;

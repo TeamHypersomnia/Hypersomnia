@@ -5,16 +5,6 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
-- Server crash from 11.01.2023 at 01:24
-	- Kartezjan then najsilniejszy programista C++
-	- It crashed before successfully sending the message to Telegram but after successfully sending the Discord one
-	- Actually rather peculiar, if both lived enough for the discord message to be properly sent, there's no reason telegram one wouldn't eventually arrive, must've been problem elsewhere 
-		- I've also seen kartezjan for a bit so it must've sent me some data
-	- Maybe httplib is not actually thread safe
-		- Just in case I'd update it and merge the two webhook handlers into a single lambda
-
-
-
 - NAT traversal does not always work with our symmetric port-sensitive
 	- Working connections:
 		- filemon -> Billan
@@ -48,3 +38,17 @@ summary: Just a hidden scratchpad.
 	In that case, if the owner body of an item chamber is badly determined, it might make sense that it crashes
 	- ensure that the posted subject in contact listener is alive, but that is most likely the case since we get physical components from them anyway
 		- but ensures won't hurt
+
+# Done
+
+- Wandering pixels crash
+	- Fixed by eliminating Data race, see the comments in audiovisual_state.cpp
+
+- Server crash from 11.01.2023 at 01:24 - fixed with *11b30d931246caa7e0cce04d7e83756eb33acd53*
+	- Kartezjan then najsilniejszy programista C++
+	- It crashed before successfully sending the message to Telegram but after successfully sending the Discord one
+	- Actually rather peculiar, if both lived enough for the discord message to be properly sent, there's no reason telegram one wouldn't eventually arrive, must've been problem elsewhere 
+		- I've also seen kartezjan for a bit so it must've sent me some data
+	- Maybe httplib is not actually thread safe
+		- Just in case I'd update it and merge the two webhook handlers into a single lambda
+
