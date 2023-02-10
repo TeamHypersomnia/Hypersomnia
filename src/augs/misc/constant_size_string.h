@@ -5,7 +5,7 @@
 namespace augs {
 	template <unsigned const_count>
 	class constant_size_string {
-		using array_type = std::array<char, const_count>;
+		using array_type = std::array<char, const_count + 1>;
 
 		unsigned len = 0;
 		array_type arr = {};
@@ -14,7 +14,7 @@ namespace augs {
 		constant_size_string() = default;
 
 		constant_size_string(const std::string& ss) {
-			len = std::min(std::size_t(const_count - 1), ss.size());
+			len = std::min(std::size_t(const_count), ss.size());
 
 			std::memcpy(arr.data(), ss.data(), len);
 			arr[len] = 0;
