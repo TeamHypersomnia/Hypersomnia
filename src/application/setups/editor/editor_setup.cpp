@@ -308,7 +308,7 @@ bool editor_setup::handle_input_before_game(
 	if (e.msg == message::ldoubleclick) {
 		if (auto node = get_hovered_node(); node.is_set()) {
 			center_view_at_selection();
-			view.panned_camera.zoom = 1.f;
+			reset_zoom();
 		}
 	}
 
@@ -1148,6 +1148,10 @@ augs::path_type editor_setup::get_unofficial_content_dir() const {
 
 camera_eye editor_setup::get_camera_eye() const {
 	return view.panned_camera;
+}
+
+void editor_setup::set_zoom(const float zoom) {
+	view.panned_camera.zoom = zoom;
 }
 
 std::unordered_set<entity_id> editor_setup::get_all_inspected_entities() const {
@@ -2007,6 +2011,19 @@ bool editor_setup::is_snapping_enabled() const {
 
 node_mover_op editor_setup::get_current_node_transforming_op() const {
 	return mover.get_current_op(history);
+}
+
+void editor_setup::reset_zoom() {
+	view.panned_camera.zoom = 1.f;
+}
+
+bool editor_setup::is_view_centered_at_selection() const {
+	if (const auto aabb = find_selection_aabb()) {
+		auto pos = aabb->get_center();
+		return view.panned_camera.transform.pos == pos.discard_fract();
+	}
+
+	return true;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

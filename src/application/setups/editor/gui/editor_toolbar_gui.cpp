@@ -51,7 +51,7 @@ void DockingToolbar(const char* name, ImGuiAxis* p_toolbar_axis, bool& is_docked
     ImGui::SetNextWindowClass(&window_class);
 
     // 3. Begin into the window
-    ImGui::Begin(name, NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin(name, NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
     // 4. Overwrite node size
     ImGuiDockNode* node = ImGui::GetWindowDockNode();
@@ -107,7 +107,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 		return;
 	}
 
-	const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+	//const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 
 	const auto WinPadding = ImGui::GetStyle().WindowPadding;
 	const auto icon_size = 32.0f;
@@ -120,7 +120,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 				return ImVec2(WinPadding.x * 2.0f, WinPadding.y);
 			}
 			else {
-				return ImVec2(WinPadding.x, WinPadding.y * 2.0f);
+				return ImVec2(WinPadding.x * 2.2f, WinPadding.y * 2.0f);
 			}
 		}
 
@@ -269,6 +269,55 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		if (do_icon(snap_icon, snap_desc)) {
 			in.setup.toggle_snapping();
+		}
+
+		category_separator();
+
+		const auto zoom = in.setup.get_camera_eye().zoom;
+		const bool nonzero_zoom = zoom != 1.0f;
+
+		const auto current_zoom = typesafe_sprintf("\nCurrent zoom: %2f%", zoom * 100.0f);
+		const bool is_centered = in.setup.is_view_centered_at_selection();
+
+		if (do_icon(ID::EDITOR_TOOL_CENTER_VIEW, "Focus view at selection (F)\n(or double-click a node on scene)", !is_centered)) {
+			in.setup.center_view_at_selection();
+		}
+
+		if (do_icon(ID::EDITOR_TOOL_RESET_ZOOM, "Reset zoom (Z or =)\n(-, + or mouse scroll to change zoom)" + current_zoom, nonzero_zoom)) {
+			in.setup.reset_zoom();
+		}
+
+		float zi = (zoom * 100);
+
+		ImGui::SetNextItemWidth(ImGui::CalcTextSize("9999% ").x);
+
+		auto fmt = "%.0f%%";
+
+		{
+			auto current_padding = ImGui::GetStyle().FramePadding;
+
+			if (toolbar_axis == ImGuiAxis_Y) {
+
+				if (is_docked) {
+					if (zi >= 100) {
+						current_padding.x = 0.0f;
+					}
+				}
+
+				auto pos = ImGui::GetCursorPos();
+				pos.x -= ImGui::GetStyle().WindowPadding.x/2;
+				ImGui::SetCursorPos(pos);
+			}
+
+			const auto scoped_style = scoped_style_var(ImGuiStyleVar_FramePadding, current_padding);
+
+			if (ImGui::InputFloat("##ZoomInput", &zi, 0.0f, 0.0f, fmt)) {
+				in.setup.set_zoom(std::clamp(float(zi) / 100, 0.01f, 10.0f));
+			}
+		}
+
+		if (toolbar_axis == ImGuiAxis_X) {
+			ImGui::SameLine();
 		}
 
 		category_separator();

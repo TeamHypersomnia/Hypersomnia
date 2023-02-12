@@ -259,6 +259,8 @@ public:
 
 	void center_view_at_selection();
 	void center_view_at(editor_node_id);
+	void reset_zoom();
+	bool is_view_centered_at_selection() const;
 
 	template <class F>
 	void for_each_highlight(F&& callback) const;
@@ -445,6 +447,7 @@ public:
 	void flip_selection_horizontally();
 	void flip_selection_vertically();
 	void reset_rotation_of_selected_nodes();
+	void set_zoom(float);
 
 	void toggle_grid();
 	void toggle_snapping();
