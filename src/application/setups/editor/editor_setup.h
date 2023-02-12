@@ -454,6 +454,8 @@ public:
 	void sparser_grid();
 	void denser_grid();
 
+	node_mover_op get_current_node_transforming_op() const;
+
 	int get_current_grid_size() const;
 
 	void make_last_command_a_child();

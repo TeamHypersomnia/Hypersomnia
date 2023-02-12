@@ -108,6 +108,16 @@ bool editor_setup::handle_input_before_imgui(
 		}
 	}
 
+#if 0
+	/* We can't use RMB to cancel operations because we're using RMB to move around the screen */
+	if (in.e.was_pressed(keys::key::RMOUSE)) {
+		if (mover.is_active(history)) {
+			escape();
+			return true;
+		}
+	}
+#endif
+
 	if (in.e.was_any_key_pressed()) {
 		using namespace augs::event::keys;
 
@@ -1993,6 +2003,10 @@ bool editor_setup::is_grid_enabled() const {
 
 bool editor_setup::is_snapping_enabled() const {
 	return view.snapping_enabled;
+}
+
+node_mover_op editor_setup::get_current_node_transforming_op() const {
+	return mover.get_current_op(history);
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

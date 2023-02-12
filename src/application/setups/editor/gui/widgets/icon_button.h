@@ -37,7 +37,7 @@ namespace editor_widgets {
 
 			{
 				auto scope = maybe_disabled_cols(!enabled);
-				result = ImGui::Selectable(id_label.c_str(), false, ImGuiSelectableFlags_None, ImVec2(scaled_icon_size));
+				result = ImGui::Selectable(id_label.c_str(), icon_bg_cols[0] != rgba(0, 0, 0, 0), ImGuiSelectableFlags_None, ImVec2(scaled_icon_size));
 				after_item_callback();
 			}
 

@@ -151,21 +151,26 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 		return in.necessary_images.at(id);
 	};
 
-	auto do_icon = [this, &current_icon_id, img, icon_size](auto img_id, auto tooltip, bool active = true, rgba tint = white) {
+	auto do_icon = [this, &current_icon_id, img, icon_size](auto img_id, auto tooltip, bool enabled = true, bool currently_active = false, rgba tint = white) {
 		auto scope = scoped_id(current_icon_id++);
 
-		const std::array<rgba, 3> icon_bg_cols = {
+		std::array<rgba, 3> icon_bg_cols = {
 			rgba(0, 0, 0, 0),
 			rgba(35, 60, 90, 255),
 			rgba(35+10, 60+10, 90+10, 255)
 		};
+
+		if (currently_active) {
+			icon_bg_cols[0] = icon_bg_cols[1];
+			tint *= green;
+		}
 
 		auto result = icon_button(
 			"##Transform",
 			img(img_id),
 			[](){},
 			tooltip,
-			active,
+			enabled,
 			tint,
 			icon_bg_cols,
 			icon_size
@@ -201,14 +206,24 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		//auto no_space = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
 
-		if (do_icon(ID::EDITOR_TOOL_MOVE, "Move selection (T)", any_node_selected)) {
-			in.setup.start_moving_selection();
+		const auto op = in.setup.get_current_node_transforming_op();
 
-			in.window.set_cursor_pos(in.window.get_screen_size() / 2);
+		if (do_icon(ID::EDITOR_TOOL_MOVE, "Move selection (T)", any_node_selected, op == node_mover_op::TRANSLATING)) {
+			const auto screen_center = in.window.get_screen_size() / 2;
+			ImGui::GetIO().MousePos = ImVec2(screen_center);
+			in.window.set_cursor_pos(screen_center);
+
+			in.setup.start_moving_selection();
 		}
 
-		if (do_icon(ID::EDITOR_TOOL_ROTATE_ARBITRARY, "Rotate selection (R)", any_node_selected)) {
+		if (do_icon(ID::EDITOR_TOOL_ROTATE_ARBITRARY, "Rotate selection (R)", any_node_selected, op == node_mover_op::ROTATING)) {
 			in.setup.start_rotating_selection();
+		}
+
+		const auto resize_desc = "Resize selection\n(move cursor close to selection edge and press E)\n(Ctrl+E to pick two edges simultaneously)";
+
+		if (do_icon(ID::EDITOR_TOOL_RESIZE, resize_desc, any_node_selected, op == node_mover_op::RESIZING)) {
+
 		}
 
 		if (do_icon(ID::EDITOR_TOOL_ROTATE_CCW, "Rotate selection by -90 degrees (Shift+R)", any_node_selected)) {
@@ -219,11 +234,6 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 			in.setup.rotate_selection_once_by(90);
 		}
 
-		const auto resize_desc = "Resize selection\n(E with cursor close to the edge)\n(Ctrl+E to resize two edges simultaneously)";
-
-		if (do_icon(ID::EDITOR_TOOL_RESIZE, resize_desc, any_node_selected)) {
-
-		}
 
 		if (do_icon(ID::EDITOR_TOOL_FLIP_HORIZONTALLY, "Flip selection horizontally (Shift+H)", any_node_selected)) {
 			in.setup.flip_selection_horizontally();
