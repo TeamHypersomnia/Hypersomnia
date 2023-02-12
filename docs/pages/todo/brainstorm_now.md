@@ -6,6 +6,38 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- I don't think it will be bad if we just make it a plain click-to-open combo popup with icons attached
+	- even aseprite works on click
+	- Yeah really it's only a tutorial because you really should memorize those hotkeys and they will be easy to remember
+
+- Let's have a toolbar first so we can enter playtesting from there
+	- View->Toolbar for disabling
+		- Pro mappers will disable it because everything can be controlled with shortcuts
+		- And the * mark will communicate unsaved changes
+	- Let's make it a window actually
+		- Will be easier because we'd have to adjust the dockable space
+		- Will save space too
+		- Being able to move it is a plus
+		- Should be easy to make the buttons adapt to the sizes
+			- Playtest button doesn't need to have a text attached really if it makes it harder to adapt the buttons
+	- toolbar expandable buttons
+		- must work like combobox or it might go offscreen
+
+- Playtesting
+	- Alright let's do this, it will be rewarding anyway
+	- Separate setup?
+		- Hosting a server will require saving the changes first because we'll actually switch to server_setup
+		- Normal playtesting can easily do it in-editor as it will use just the test_mode so won't even need to save changes
+	- Server: To notify or not to notify
+		- Maybe notify by default and only hide notifications for passworded servers?
+		- For now it would be good to always see if someone's making a server so let's notify by default
+			- Won't really be accidentally 'spammable' as you'll have to save the changes first and maybe fix warnings/meet the conditions for game mode etc
+		
+
+
+- Simple toolbar with all possible operations with immediate tooltips
+	- Maybe disable rotations/resizing on special resources
+
 - Cover ground neons per-entity?
 	- Only foregrounds will need it on a second thought
 	- Consider making anything foreground cover the ground neons by default, but I don't know how we'll do it
@@ -378,8 +410,6 @@ summary: That which we are brainstorming at the moment.
 	
 - Layers with all-default values should be deleted once the last element is removed
 
-- Simple toolbar with all possible operations with immediate tooltips
-	- Maybe disable rotations/resizing on special resources
 
 - Once special sprite effects/continous effects are live people will rarely use playtesting, obviously we sill need to do it
 

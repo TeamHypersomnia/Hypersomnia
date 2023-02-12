@@ -94,6 +94,7 @@ void editor_setup::open_default_windows() {
 	gui.layers.open();
 	gui.filesystem.open();
 	gui.history.open();
+	gui.toolbar.open();
 }
 
 bool editor_setup::handle_input_before_imgui(
@@ -217,8 +218,8 @@ bool editor_setup::handle_input_before_game(
 				case key::UP: mirror_selection(vec2i(0, -1)); return true;
 				case key::DOWN: mirror_selection(vec2i(0, 1)); return true;
 
-				case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
-				case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
+				case key::R: rotate_selection_once_by(90); return true;
+				case key::E: start_resizing_selection(true); return true;
 				case key::F: gui.filesystem.open(); return true;
 				case key::L: gui.layers.open(); return true;
 				case key::H: gui.history.open(); return true;
@@ -227,14 +228,12 @@ bool editor_setup::handle_input_before_game(
 			}
 		}
 
-		auto clamp_units = [&]() { view.grid.clamp_units(8, settings.grid.render.get_maximum_unit()); };
-
 		if (has_shift && !has_ctrl) {
 			switch (k) {
 				case key::N: move_inspected_to_new_layer(); return true;
-				case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
-				case key::H: mover.flip_selection(make_mover_input(), flip_flags::make_horizontally()); return true;
-				case key::V: mover.flip_selection(make_mover_input(), flip_flags::make_vertically()); return true;
+				case key::R: rotate_selection_once_by(-90); return true;
+				case key::H: flip_selection_horizontally(); return true;
+				case key::V: flip_selection_vertically(); return true;
 				default: break;
 			}
 		}
@@ -250,14 +249,14 @@ bool editor_setup::handle_input_before_game(
 				case key::DEL: delete_selection(); return true;
 
 				case key::T: start_moving_selection(); return true;
-				case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
-				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
-				case key::W: mover.reset_rotation(make_mover_input()); return true;
+				case key::E: start_resizing_selection(false); return true;
+				case key::R: start_rotating_selection(); return true;
+				case key::W: reset_rotation_of_selected_nodes(); return true;
 				case key::F: center_view_at_selection(); return true;
-				case key::G: view.toggle_grid(); return true;
-				case key::S: view.toggle_snapping(); return true;
-				case key::OPEN_SQUARE_BRACKET: view.grid.increase_grid_size(); clamp_units(); return true;
-				case key::CLOSE_SQUARE_BRACKET: view.grid.decrease_grid_size(); clamp_units(); return true;
+				case key::G: toggle_grid(); return true;
+				case key::S: toggle_snapping(); return true;
+				case key::OPEN_SQUARE_BRACKET: sparser_grid(); return true;
+				case key::CLOSE_SQUARE_BRACKET: denser_grid(); return true;
 
 				default: break;
 			}
@@ -1936,6 +1935,64 @@ void editor_setup::quiet_set_last_inspected_any(const inspected_variant inspecte
 
 void editor_setup::set_inspector_tab(const inspected_node_tab_type type) {
 	gui.inspector.node_current_tab = type;
+}
+
+void editor_setup::start_rotating_selection() {
+	mover.start_rotating_selection(make_mover_input()); 
+}
+
+void editor_setup::start_resizing_selection(const bool two_edges) {
+	mover.start_resizing_selection(make_mover_input(), two_edges); 
+}
+
+void editor_setup::rotate_selection_once_by(const int degrees) {
+	mover.rotate_selection_once_by(make_mover_input(), degrees);
+}
+
+void editor_setup::flip_selection_horizontally() {
+	mover.flip_selection(make_mover_input(), flip_flags::make_horizontally());
+}
+
+void editor_setup::flip_selection_vertically() {
+	mover.flip_selection(make_mover_input(), flip_flags::make_vertically());
+}
+
+void editor_setup::reset_rotation_of_selected_nodes() {
+	mover.reset_rotation(make_mover_input());
+}
+
+void editor_setup::toggle_grid() {
+	view.toggle_grid();
+}
+
+void editor_setup::toggle_snapping() {
+	view.toggle_snapping();
+}
+
+void editor_setup::clamp_units() {
+	view.grid.clamp_units(8, settings.grid.render.get_maximum_unit());
+}
+
+void editor_setup::sparser_grid() {
+	view.grid.increase_grid_size();
+	clamp_units();
+}
+
+void editor_setup::denser_grid() {
+	view.grid.decrease_grid_size();
+	clamp_units();
+}
+
+int editor_setup::get_current_grid_size() const {
+	return view.grid.unit_pixels;
+}
+
+bool editor_setup::is_grid_enabled() const {
+	return view.show_grid;
+}
+
+bool editor_setup::is_snapping_enabled() const {
+	return view.snapping_enabled;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

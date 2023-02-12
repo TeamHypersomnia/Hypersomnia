@@ -14,6 +14,7 @@
 
 # Playtesting character
 
+- Can setup starting eq
 - Well we can have a special entity type like "playtest character" for playtests too on some small scenes with prefab rooms for example
 
 # Game mode

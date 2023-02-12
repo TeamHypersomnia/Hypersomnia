@@ -25,6 +25,8 @@
 #include "application/setups/editor/gui/editor_filesystem_gui.h"
 #include "application/setups/editor/gui/editor_history_gui.h"
 
+#include "application/setups/editor/gui/editor_toolbar_gui.h"
+
 #include "application/setups/editor/editor_filesystem.h"
 #include "application/setups/editor/editor_history.h"
 
@@ -72,6 +74,7 @@ struct editor_gui {
 	editor_layers_gui layers = std::string("Layers");
 	editor_filesystem_gui filesystem = std::string("Resources");
 	editor_history_gui history = std::string("History");
+	editor_toolbar_gui toolbar = std::string("Toolbar");
 	// END GEN INTROSPECTOR
 };
 
@@ -153,6 +156,8 @@ class editor_setup : public default_setup_settings {
 	cosmos& get_cosmos() {
 		return scene.world;
 	}
+
+	void clamp_units();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -433,6 +438,23 @@ public:
 	bool start_moving_selection();
 	void finish_moving_selection();
 	void show_absolute_mover_pos_once();
+
+	void start_rotating_selection();
+	void start_resizing_selection(bool two_edges);
+	void rotate_selection_once_by(int degrees);
+	void flip_selection_horizontally();
+	void flip_selection_vertically();
+	void reset_rotation_of_selected_nodes();
+
+	void toggle_grid();
+	void toggle_snapping();
+	bool is_grid_enabled() const;
+	bool is_snapping_enabled() const;
+
+	void sparser_grid();
+	void denser_grid();
+
+	int get_current_grid_size() const;
 
 	void make_last_command_a_child();
 

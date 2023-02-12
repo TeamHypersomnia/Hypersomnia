@@ -14,7 +14,8 @@ namespace editor_widgets {
 			rgba(0, 0, 0, 0),
 			rgba(35, 60, 90, 255),
 			rgba(35+10, 60+10, 90+10, 255)
-		}
+		},
+		std::optional<float> override_max_icon_size = std::nullopt
 	) {
 		using namespace augs::imgui;
 
@@ -22,10 +23,12 @@ namespace editor_widgets {
 			tint = rgba(255, 255, 255, 80);
 		}
 
-		const auto max_icon_size = ImGui::GetTextLineHeight();
+		const auto max_icon_size = override_max_icon_size ? *override_max_icon_size : ImGui::GetTextLineHeight();
 		const auto scaled_icon_size = vec2::scaled_to_max_size(icon.get_original_size(), max_icon_size);
 
 		bool result = false;
+
+		ImVec2 final_pos; 
 
 		{
 			auto preserved = scoped_preserve_cursor();
@@ -38,13 +41,18 @@ namespace editor_widgets {
 				after_item_callback();
 			}
 
-			if (ImGui::IsItemHovered()) {
+			if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
 				auto scope = scoped_tooltip();
 				text_color(tooltip, tint);
 			}
+
+			final_pos = ImGui::GetCursorPos();
 		}
 
 		game_image(icon, scaled_icon_size, tint);
+
+		ImGui::SetCursorPos(final_pos);
+
 		return result;
 	};
 }

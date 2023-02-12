@@ -49,7 +49,9 @@ inline bool is_wrong_whitespace(const char c) {
 
 template <class T>
 inline bool is_nickname_valid_characters(const T& nickname) {
-	if (std::count(nickname.begin(), nickname.end(), ' ') == static_cast<long>(nickname.length())) {
+	const bool only_spaces = std::count(nickname.begin(), nickname.end(), ' ') == static_cast<long>(nickname.length());
+
+	if (only_spaces) {
 		return false;
 	}
 

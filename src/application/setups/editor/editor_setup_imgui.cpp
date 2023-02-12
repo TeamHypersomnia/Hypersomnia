@@ -50,6 +50,12 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			do_window_entry(gui.inspector, "CTRL+I");
 			do_window_entry(gui.history, "CTRL+H");
 		}
+
+		if (auto menu = scoped_menu("View")) {
+			if (ImGui::MenuItem("Toolbar", "CTRL+T", gui.toolbar.show, true)) {
+				gui.toolbar.toggle();
+			}
+		}
 	}
 }
 
@@ -92,10 +98,14 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.20f, NULL, &dock_main_id);
 			ImGuiID dock_id_bottom_left = ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Down, 0.40f, NULL, &dock_id_left);
 
+			ImGuiID dock_id_top = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.20f, NULL, &dock_main_id);
+
 			ImGui::DockBuilderDockWindow(gui.filesystem.get_title().c_str(), dock_id_bottom_left);
 			ImGui::DockBuilderDockWindow(gui.layers.get_title().c_str(), dock_id_left);
 			ImGui::DockBuilderDockWindow(gui.inspector.get_title().c_str(), dock_id_right);
 			ImGui::DockBuilderDockWindow(gui.history.get_title().c_str(), dock_id_bottom_right);
+
+			ImGui::DockBuilderDockWindow(gui.toolbar.get_title().c_str(), dock_id_top);
 
 			ImGui::DockBuilderFinish(dockspace_id);
 		};
@@ -149,6 +159,12 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	});
 
 	gui.history.perform({ *this, history });
+
+	gui.toolbar.perform({
+		*this,
+		in.window,
+		in.necessary_images
+	});
 
 	ImGui::End();
 

@@ -25,6 +25,10 @@ struct standard_window_mixin {
 		show = false;
 	}
 
+	void toggle() {
+		show = !show;
+	}
+
 	template <class... Args>
 	auto make_scoped_window(Args&&... args) {
 		if (show) {
