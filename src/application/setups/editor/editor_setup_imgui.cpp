@@ -180,7 +180,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		auto in = make_mover_input();
 
 		if (const auto rot = mover.current_mover_rot_delta(in)) {
-			text_tooltip("%x*\n(ESC to cancel)", *rot);
+			text_tooltip("%x*\n(ESC or MMB to cancel)", *rot);
 		}
 		else if (const auto pos = mover.current_mover_pos_delta(in)) {
 			auto final_pos = *pos;
@@ -197,10 +197,10 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 				ys = "delta y";
 			}
 
-			text_tooltip("%x: %x\n%x: %x\n(ESC to cancel)", xs, final_pos.x, ys, final_pos.y);
+			text_tooltip("%x: %x\n%x: %x\n(ESC or MMB to cancel)", xs, final_pos.x, ys, final_pos.y);
 		}
 		else if (get_current_node_transforming_op() == node_mover_op::RESIZING) {
-			text_tooltip("(ESC to cancel)");
+			text_tooltip("(ESC or MMB to cancel)");
 		}
 	}
 

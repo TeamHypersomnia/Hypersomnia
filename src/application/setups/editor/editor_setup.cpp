@@ -108,15 +108,17 @@ bool editor_setup::handle_input_before_imgui(
 		}
 	}
 
-#if 0
-	/* We can't use RMB to cancel operations because we're using RMB to move around the screen */
-	if (in.e.was_pressed(keys::key::RMOUSE)) {
+	/* 
+		We can't use RMB to cancel operations because we're using RMB to move around the screen.
+		Only MMB is left.
+	*/
+
+	if (in.e.was_pressed(keys::key::MMOUSE)) {
 		if (mover.is_active(history)) {
 			escape();
 			return true;
 		}
 	}
-#endif
 
 	if (in.e.was_any_key_pressed()) {
 		using namespace augs::event::keys;
@@ -230,6 +232,7 @@ bool editor_setup::handle_input_before_game(
 
 				case key::R: rotate_selection_once_by(90); return true;
 				case key::E: start_resizing_selection(true); return true;
+				case key::T: gui.toolbar.toggle(); return true;
 				case key::F: gui.filesystem.open(); return true;
 				case key::L: gui.layers.open(); return true;
 				case key::H: gui.history.open(); return true;

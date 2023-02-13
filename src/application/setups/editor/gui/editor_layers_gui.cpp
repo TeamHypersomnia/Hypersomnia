@@ -133,7 +133,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	ImGui::SameLine();
 
-	if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Duplicate selection (C)", node_or_layer_inspected)) {
+	if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Clone selection (C)", node_or_layer_inspected)) {
 		const bool move_selection = false;
 		in.setup.duplicate_selection(move_selection);
 	}
