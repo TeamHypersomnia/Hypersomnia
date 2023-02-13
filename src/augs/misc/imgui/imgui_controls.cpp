@@ -12,14 +12,16 @@ namespace augs {
 			const augs::atlas_entry& icon,
 			const std::string& label,
 			const float size_mult,
-			const float padding_mult,
+			const vec2 padding_mult,
 			const rgba label_color,
-			const std::array<rgba, 3> bg_cols
+			const std::array<rgba, 3> bg_cols,
+			const float icon_rotation,
+			const bool pad_from_left
 		) {
 			const auto text_h = ImGui::GetTextLineHeight();
 			const auto button_size = ImVec2(0, text_h * size_mult);
 
-			shift_cursor(vec2(0, text_h * padding_mult));
+			shift_cursor(vec2(0, text_h * padding_mult.y));
 
 			const auto before_pos = ImGui::GetCursorPos();
 
@@ -38,17 +40,17 @@ namespace augs {
 				ImGui::SetCursorPos(before_pos);
 
 				const auto icon_size = icon.get_original_size();
-				const auto icon_padding = vec2(icon_size);/// 1.5f;
+				const auto icon_padding = vec2(icon_size) * padding_mult;/// 1.5f;
 
-				const auto image_offset = vec2(icon_padding.x, button_size.y / 2 - icon_size.y / 2);
-				game_image(icon, icon_size, label_color, image_offset);
+				const auto image_offset = vec2(pad_from_left ? icon_padding.x : 0, button_size.y / 2 - icon_size.y / 2);
+				game_image(icon, icon_size, label_color, image_offset, imgui_atlas_type::GAME, icon_rotation);
 
 				const auto text_pos = vec2(before_pos) + image_offset + vec2(icon_size.x + icon_padding.x, icon_size.y / 2 - text_h / 2);
 				ImGui::SetCursorPos(ImVec2(text_pos));
 				text_color(label, label_color);
 			}
 
-			shift_cursor(vec2(0, text_h * padding_mult));
+			shift_cursor(vec2(0, text_h * padding_mult.y));
 
 			return result;
 		}

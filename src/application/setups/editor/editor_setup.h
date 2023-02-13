@@ -347,6 +347,11 @@ public:
 		return gui.inspector.template inspects_any<T>();
 	}
 
+	template <class T>
+	bool inspects_only() const {
+		return gui.inspector.template inspects_only<T>();
+	}
+
 	bool is_inspected(inspected_variant) const;
 	std::vector<inspected_variant> get_all_inspected() const;
 

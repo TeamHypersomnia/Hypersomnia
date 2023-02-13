@@ -8,10 +8,12 @@ namespace augs {
 		bool selectable_with_icon(
 			const augs::atlas_entry& icon,
 			const std::string& label,
-			const float size_mult,
-			const float padding_mult,
-			const rgba label_color,
-			const std::array<rgba, 3> bg_cols
+			float size_mult,
+			vec2 padding_mult,
+			rgba label_color,
+			std::array<rgba, 3> bg_cols,
+			float rotation = 0.0f,
+			bool pad_from_left = true
 		);
 	}
 }

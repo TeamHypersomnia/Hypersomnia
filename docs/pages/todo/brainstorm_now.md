@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Mirroring works differently than flipping for animated sprites, but that's probably because we don't have flip property in dynamic decorations
+
 - I don't think it will be bad if we just make it a plain click-to-open combo popup with icons attached
 	- even aseprite works on click
 	- Yeah really it's only a tutorial because you really should memorize those hotkeys and they will be easy to remember

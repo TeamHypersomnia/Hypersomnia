@@ -361,7 +361,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 		in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FILE],
 		"CREATE NEW ARENA",
 		button_size_mult,
-		button_padding_mult,
+		vec2(1.0f, button_padding_mult),
 		rgba(100, 255, 100, 255),
 		{
 			rgba(10, 50, 10, 255),
@@ -505,7 +505,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 				in.necessary_images[icon],
 				label,
 				button_size_mult,
-				button_padding_mult,
+				vec2(1.0f, button_padding_mult),
 				rgba(120, 220, 255, 255),
 				{
 					rgba(15, 40, 70, 255),

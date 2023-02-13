@@ -151,17 +151,19 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 		return in.necessary_images.at(id);
 	};
 
-	auto do_icon = [this, &current_icon_id, img, icon_size](auto img_id, auto tooltip, bool enabled = true, bool currently_active = false, rgba tint = white) {
+	const std::array<rgba, 3> icon_bg_cols = {
+		rgba(0, 0, 0, 0),
+		rgba(35, 60, 90, 255),
+		rgba(35+10, 60+10, 90+10, 255)
+	};
+
+	auto do_icon = [this, icon_bg_cols, &current_icon_id, img, icon_size](auto img_id, auto tooltip, bool enabled = true, bool currently_active = false, rgba tint = white) {
 		auto scope = scoped_id(current_icon_id++);
 
-		std::array<rgba, 3> icon_bg_cols = {
-			rgba(0, 0, 0, 0),
-			rgba(35, 60, 90, 255),
-			rgba(35+10, 60+10, 90+10, 255)
-		};
+		auto cols = icon_bg_cols;
 
 		if (currently_active) {
-			icon_bg_cols[0] = icon_bg_cols[1];
+			cols[0] = cols[1];
 			tint *= green;
 		}
 
@@ -172,7 +174,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 			tooltip,
 			enabled,
 			tint,
-			icon_bg_cols,
+			cols,
 			icon_size
 		);
 
@@ -223,7 +225,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 			in.setup.start_rotating_selection();
 		}
 
-		const auto resize_desc = "Resize selection\n(move cursor close to selection edge and press E)\n(Ctrl+E to pick two edges simultaneously)";
+		const auto resize_desc = "Resize selection\n(place cursor near the chosen edge and press E)\n(Ctrl+E to pick two edges simultaneously)";
 
 		if (do_icon(ID::EDITOR_TOOL_RESIZE, resize_desc, any_node_selected, op == node_mover_op::RESIZING)) {
 
@@ -248,13 +250,55 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		category_separator();
 
-		if (do_icon(ID::EDITOR_ICON_CLONE, "Clone selection (C)", any_node_selected)) {
-			warp_cursor();
+		if (do_icon(ID::EDITOR_ICON_CLONE, "Clone selection (C)", node_or_layer_inspected)) {
+			if (in.setup.inspects_only<editor_layer_id>()) {
+				const bool inspecting_any_layers_with_nodes = [&]() {
+					const auto all_source_layers = in.setup.get_all_inspected<editor_layer_id>();
+
+					for (const auto layer_id : all_source_layers) {
+						if (const auto source_layer = in.setup.find_layer(layer_id)) {
+							if (source_layer->hierarchy.nodes.size() > 0) {
+								return true;
+							}
+						}
+					}
+
+					return false;
+				}();
+
+				if (inspecting_any_layers_with_nodes) {
+					warp_cursor();
+				}
+			}
+			else {
+				warp_cursor();
+			}
+
 			in.setup.duplicate_selection();
 		}
 
-		if (do_icon(ID::EDITOR_TOOL_MIRROR, "Clone selection with mirroring (Ctrl+Arrow)", any_node_selected)) {
+		const bool mirroring_active = ImGui::IsPopupOpen("Mirror Options");
 
+		if (do_icon(ID::EDITOR_TOOL_MIRROR, "Clone selection with mirroring (Ctrl+Arrow)", node_or_layer_inspected, mirroring_active)) {
+			ImGui::OpenPopup("Mirror Options");
+		}
+
+		if (ImGui::BeginPopup("Mirror Options")) {
+			auto padding = vec2(0.5f, 0.0f);
+			const bool pad_from_left = false;
+
+			auto do_mirror_opt = [&](const auto label, const auto dir, const auto arrow_icon_angle) {
+				if (selectable_with_icon(img(ID::EDITOR_TOOL_PLAIN_ARROW), label, 2.0f, padding, white, icon_bg_cols, arrow_icon_angle, pad_from_left)) {
+					in.setup.mirror_selection(dir);
+				}
+			};
+
+			do_mirror_opt("Mirror up (Ctrl+Up)", vec2i(0, -1), -90);
+			do_mirror_opt("Mirror left (Ctrl+Left)", vec2i(-1, 0), -180);
+			do_mirror_opt("Mirror right (Ctrl+Right)", vec2i(1, 0), 0);
+			do_mirror_opt("Mirror down (Ctrl+Down)", vec2i(0, 1), 90);
+
+			ImGui::EndPopup();
 		}
 
 		category_separator();
