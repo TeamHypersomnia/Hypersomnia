@@ -227,8 +227,41 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		const auto resize_desc = "Resize selection\n(place cursor near the chosen edge and press E)\n(Ctrl+E to pick two edges simultaneously)";
 
-		if (do_icon(ID::EDITOR_TOOL_RESIZE, resize_desc, any_node_selected, op == node_mover_op::RESIZING)) {
+		const bool resizing_active = ImGui::IsPopupOpen("Resize Options");
 
+		if (do_icon(ID::EDITOR_TOOL_RESIZE, resize_desc, any_node_selected, op == node_mover_op::RESIZING || resizing_active)) {
+			ImGui::OpenPopup("Resize Options");
+		}
+
+		if (ImGui::BeginPopup("Resize Options")) {
+			auto padding = vec2(0.5f, 0.0f);
+			const bool pad_from_left = false;
+
+			using ae = resize_nodes_command::active_edges;
+			auto do_resize_opt = [&](
+				const auto label,
+				const bool two,
+				const auto edges,
+				const auto edge_icon_angle
+			) {
+				if (selectable_with_icon(img(two ? ID::EDITOR_TOOL_RESIZE_TWO_EDGES : ID::EDITOR_TOOL_RESIZE_EDGE), label, 2.0f, padding, white, icon_bg_cols, edge_icon_angle, pad_from_left)) {
+					in.setup.start_resizing_selection(two, edges);
+				}
+			};
+
+			do_resize_opt("Drag top edge", false, ae(true, false, false, false), -90);
+			do_resize_opt("Drag left edge", false, ae(false, true, false, false), -180);
+			do_resize_opt("Drag right edge", false, ae(false, false, true, false), 0);
+			do_resize_opt("Drag bottom edge", false, ae(false, false, false, true), 90);
+
+			ImGui::Separator();
+
+			do_resize_opt("Drag top-left edges", true, ae(true, true, false, false), -90);
+			do_resize_opt("Drag top-right edges", true, ae(true, false, true, false), 0);
+			do_resize_opt("Drag bottom-right edges", true, ae(false, false, true, true), 90);
+			do_resize_opt("Drag bottom-left edges", true, ae(false, true, false, true), 180);
+
+			ImGui::EndPopup();
 		}
 
 		if (do_icon(ID::EDITOR_TOOL_ROTATE_CCW, "Rotate selection by -90 degrees (Shift+R)", any_node_selected)) {

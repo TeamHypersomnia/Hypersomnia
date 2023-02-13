@@ -137,9 +137,9 @@ public:
 
 	struct active_edges {
 		bool top = false;
+		bool left = false;
 		bool right = false;
 		bool bottom = false;
-		bool left = false;
 
 		bool horizontal() const {
 			return left || right;
@@ -149,7 +149,13 @@ public:
 			return top || bottom;
 		}
 
+		bool is_set() const {
+			return top || right || bottom || left;
+		}
+
 		active_edges() = default;
+		active_edges(bool top, bool left, bool right, bool bottom) : top(top), left(left), right(right), bottom(bottom) {}
+
 		active_edges(transformr, vec2 rect_size, vec2 target_point, bool both_axes);
 
 		bool operator==(const active_edges b) const {
@@ -162,8 +168,9 @@ public:
 private:
 	resized_entities_type resized_entities;
 	std::vector<std::byte> values_before_change;
-	active_edges edges;
 public:
+
+	active_edges edges;
 
 	point_type target_point;
 	bool both_axes_simultaneously = false;

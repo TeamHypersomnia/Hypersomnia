@@ -96,7 +96,8 @@ resize_target_point get_resize_target_point(node_mover_input in, const editor_vi
 
 void editor_node_mover::start_resizing_selection(
 	const node_mover_input in,
-   	const bool both_axes_simultaneously
+   	const bool both_axes_simultaneously,
+	const resize_nodes_command::active_edges custom_edges
 ) {
 	auto& s = in.setup;
 
@@ -108,6 +109,8 @@ void editor_node_mover::start_resizing_selection(
 			return typed_handle.template has<components::overridden_geo>() && typed_handle.has_independent_transform();
 		}	
 	);
+
+	command.edges = custom_edges;
 
 	if (!command.empty()) {
 		active = true;

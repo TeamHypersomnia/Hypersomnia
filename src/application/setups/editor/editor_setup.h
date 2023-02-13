@@ -447,7 +447,7 @@ public:
 	void show_absolute_mover_pos_once();
 
 	void start_rotating_selection();
-	void start_resizing_selection(bool two_edges);
+	void start_resizing_selection(bool two_edges, resize_nodes_command::active_edges custom_edges = {});
 	void rotate_selection_once_by(int degrees);
 	void flip_selection_horizontally();
 	void flip_selection_vertically();

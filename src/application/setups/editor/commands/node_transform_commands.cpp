@@ -653,7 +653,19 @@ resize_nodes_command::active_edges::active_edges(const transformr tr, const vec2
 	}
 	else {
 		const auto idx = std::addressof(minimum_of(edges, segment_closer)) - std::addressof(edges[0]);
-		*(std::addressof(top) + idx) = true;
+
+		if (idx == 0) {
+			top = true;
+		}
+		if (idx == 1) {
+			right = true;
+		}
+		if (idx == 2) {
+			bottom = true;
+		}
+		if (idx == 3) {
+			left = true;
+		}
 	}
 }
 
@@ -686,7 +698,7 @@ void resize_nodes_command::reinfer_resized(cosmos& cosm) {
 }
 
 void resize_nodes_command::resize_entities(cosmos& cosm) {
-	if (edges == active_resized_edges()) {
+	if (!edges.is_set()) {
 		resized_entities.for_each(
 			[&](const auto& i) {
 				const auto typed_handle = cosm[i];

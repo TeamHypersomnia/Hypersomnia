@@ -1958,8 +1958,8 @@ void editor_setup::start_rotating_selection() {
 	mover.start_rotating_selection(make_mover_input()); 
 }
 
-void editor_setup::start_resizing_selection(const bool two_edges) {
-	mover.start_resizing_selection(make_mover_input(), two_edges); 
+void editor_setup::start_resizing_selection(const bool two_edges, resize_nodes_command::active_edges custom_edges) {
+	mover.start_resizing_selection(make_mover_input(), two_edges, custom_edges); 
 }
 
 void editor_setup::rotate_selection_once_by(const int degrees) {

@@ -48,7 +48,7 @@ public:
 	void flip_selection(node_mover_input in, flip_flags flip);
 	void align_individually(node_mover_input in);
 
-	void start_resizing_selection(node_mover_input in, bool both_axes_simultaneously);
+	void start_resizing_selection(node_mover_input in, bool both_axes_simultaneously, resize_nodes_command::active_edges custom_edges = {});
 
 	std::optional<vec2> current_mover_pos_delta(node_mover_input in) const;
 	std::optional<float> current_mover_rot_delta(node_mover_input in) const;

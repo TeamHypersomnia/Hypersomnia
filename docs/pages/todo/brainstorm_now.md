@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- When resizing, might be a good idea to determine edges based on aabb of selected entities
+
 - Mirroring works differently than flipping for animated sprites, but that's probably because we don't have flip property in dynamic decorations
 
 - I don't think it will be bad if we just make it a plain click-to-open combo popup with icons attached
