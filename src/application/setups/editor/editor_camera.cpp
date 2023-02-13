@@ -139,12 +139,21 @@ namespace editor_detail {
 				case key::RIGHT: pan_scene(vec2(-key_pan_amount, 0)); return true;
 				case key::LEFT: pan_scene(vec2(key_pan_amount, 0)); return true;
 
-				case key::MINUS: panned_camera.zoom = get_prev_zoom_level(panned_camera.zoom); return true;
+				case key::MINUS: 
+				case key::SUBTRACT: 
+					panned_camera.zoom = get_prev_zoom_level(panned_camera.zoom); 
+					return true;
+
 				case key::Z: 
 					if (!has_shift && !has_ctrl) {
 						panned_camera.zoom = 1.0f;
 						return true;
 					}
+
+				case key::PLUS: 
+				case key::ADD: 
+						panned_camera.zoom = get_next_zoom_level(panned_camera.zoom);
+						return true;
 
 				case key::EQUAL: 
 					if (has_shift) {

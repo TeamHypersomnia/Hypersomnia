@@ -208,11 +208,14 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		const auto op = in.setup.get_current_node_transforming_op();
 
-		if (do_icon(ID::EDITOR_TOOL_MOVE, "Move selection (T)", any_node_selected, op == node_mover_op::TRANSLATING)) {
+		auto warp_cursor = [&]() {
 			const auto screen_center = in.window.get_screen_size() / 2;
 			ImGui::GetIO().MousePos = ImVec2(screen_center);
 			in.window.set_cursor_pos(screen_center);
+		};
 
+		if (do_icon(ID::EDITOR_TOOL_MOVE, "Move selection (T)", any_node_selected, op == node_mover_op::TRANSLATING)) {
+			warp_cursor();
 			in.setup.start_moving_selection();
 		}
 
@@ -241,6 +244,17 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		if (do_icon(ID::EDITOR_TOOL_FLIP_VERTICALLY, "Flip selection vertically (Shift+V)", any_node_selected)) {
 			in.setup.flip_selection_vertically();
+		}
+
+		category_separator();
+
+		if (do_icon(ID::EDITOR_ICON_CLONE, "Clone selection (C)", any_node_selected)) {
+			warp_cursor();
+			in.setup.duplicate_selection();
+		}
+
+		if (do_icon(ID::EDITOR_TOOL_MIRROR, "Clone selection with mirroring (Ctrl+Arrow)", any_node_selected)) {
+
 		}
 
 		category_separator();
@@ -279,7 +293,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 		const auto current_zoom = typesafe_sprintf("\nCurrent zoom: %2f%", zoom * 100.0f);
 		const bool is_centered = in.setup.is_view_centered_at_selection();
 
-		if (do_icon(ID::EDITOR_TOOL_CENTER_VIEW, "Focus view at selection (F)\n(or double-click a node on scene)", !is_centered)) {
+		if (do_icon(ID::EDITOR_TOOL_CENTER_VIEW, "Focus view on selection (F)\n(or double-click a node on scene)", !is_centered)) {
 			in.setup.center_view_at_selection();
 		}
 

@@ -786,7 +786,7 @@ void settings_gui_state::perform(
 
 							const auto label = [&]() -> std::string {
 								if (captured) {
-									return "Press a key, ESC to clear, Enter to abort...";
+									return "Press a key, ESC to abort, Enter to clear...";
 								}
 
 								return key ? key_to_string_shortened(*key) : "(Unassigned)";
@@ -831,8 +831,8 @@ void settings_gui_state::perform(
 						if (capturing_this_action && captured_successfully) {
 							const auto new_key = *hijacking.captured;
 
-							if (new_key != augs::event::keys::key::ENTER) {
-								const bool should_clear = new_key == augs::event::keys::key::ESC;
+							if (new_key != augs::event::keys::key::ESC) {
+								const bool should_clear = new_key == augs::event::keys::key::ENTER;
 								const auto found = find_already_assigned_action(new_key);
 
 								auto make_popup = [&]() {
