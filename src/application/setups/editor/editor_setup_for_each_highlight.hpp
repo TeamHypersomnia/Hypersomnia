@@ -3,6 +3,10 @@
 
 template <class F>
 void editor_setup::for_each_highlight(F&& callback) const {
+	if (is_playtesting()) {
+		return;
+	}
+
 	const auto& world = scene.world;
 
 	selector.for_each_highlight(

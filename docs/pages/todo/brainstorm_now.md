@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Perhaps honor only visible playtest spawns
+	- also ignore the team spawns
+	- technically it already does since we're teleporting
+
 - When resizing, might be a good idea to determine edges based on aabb of selected entities
 
 - Mirroring works differently than flipping for animated sprites, but that's probably because we don't have flip property in dynamic decorations

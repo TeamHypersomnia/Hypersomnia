@@ -25,7 +25,6 @@
 
 namespace test_scenes {
 	void minimal_scene::setup(test_mode_ruleset& rs) {
-		rs.spawned_faction = faction_type::METROPOLIS;
 		rs.name = "Minimal test ruleset";
 	}
 
@@ -134,7 +133,7 @@ namespace test_scenes {
 
 		//give_weapon(transformr(), test_shootable_weapons::BILMER2000);
 
-		create(test_point_markers::BOMB_DEFUSAL_SPAWN, transformr()).set_associated_faction(faction_type::METROPOLIS);
+		create(test_point_markers::TEST_TEAM_SPAWN, transformr()).set_associated_faction(faction_type::METROPOLIS);
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}

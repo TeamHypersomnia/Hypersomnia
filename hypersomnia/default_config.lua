@@ -335,9 +335,9 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
 
     entity_selector = {
-      selected_color = "65 131 196 80",
-      held_color = "65 131 196 120",
-      hovered_color = "255 255 255 30",
+      selected_color = "65 131 196 20",
+      held_color = "65 131 196 40",
+      hovered_color = "255 255 255 0",
       hovered_dashed_line_color = "255 255 255 140"
     },
 

@@ -75,6 +75,8 @@ struct editor_gui {
 	editor_filesystem_gui filesystem = std::string("Resources");
 	editor_history_gui history = std::string("History");
 	editor_toolbar_gui toolbar = std::string("Toolbar");
+
+	bool playtest_immersive = true;
 	// END GEN INTROSPECTOR
 };
 
@@ -82,11 +84,17 @@ struct editor_icon_info;
 struct editor_icon_info_in;
 
 class editor_setup : public default_setup_settings {
+	test_mode mode;
+	test_mode_ruleset default_test_ruleset;
 	bomb_defusal_ruleset default_bomb_ruleset;
 	intercosm initial_scene;
 
 	intercosm scene;
+
+	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
+	entity_id viewed_character_id;
+	mode_player_id local_player_id;
 
 	per_entity_type_array<std::vector<editor_node_id>> scene_entity_to_node;
 
@@ -504,10 +512,7 @@ public:
 	}
 
 	double get_interpolation_ratio() const;
-
-	auto get_viewed_character_id() const {
-		return entity_id();
-	}
+	entity_id get_viewed_character_id() const;
 
 	auto get_controlled_character_id() const {
 		return get_viewed_character_id();
@@ -544,21 +549,32 @@ public:
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
 		while (steps--) {
-			animation_system().dry_advance_stateful_animations(scene.world);
+			if (is_playtesting()) {
+				const auto total = total_collected.extract(
+					get_viewed_character(), 
+					local_player_id, 
+					in.make_accumulator_input()
+				);
+
+				mode.advance(
+					{ default_test_ruleset, scene.world },
+					total,
+					callbacks,
+					solve_settings()
+				);
+			}
+			else {
+				animation_system().dry_advance_stateful_animations(scene.world);
+			}
 		}
 
 		(void)in;
 		(void)callbacks;
 	}
 
-	template <class T>
-	void control(const T&) {}
+	void accept_game_gui_events(const game_gui_entropy_type&);
 
-	void accept_game_gui_events(const game_gui_entropy_type&) {}
-
-	std::optional<camera_eye> find_current_camera_eye() const {
-		return get_camera_eye();
-	}
+	std::optional<camera_eye> find_current_camera_eye() const;
 
 	augs::path_type get_unofficial_content_dir() const;
 
@@ -575,7 +591,16 @@ private:
 	entropy_accumulator zero_entropy;
 public:
 
+	template <class T>
+	void control(const T& t) {
+		total_collected.control(t);
+	}
+
 	const entropy_accumulator& get_entropy_accumulator() const {
+		if (is_playtesting()) {
+			return total_collected;
+		}
+
 		return zero_entropy;
 	}
 
@@ -616,4 +641,8 @@ public:
 	}
 
 	void set_inspector_tab(inspected_node_tab_type);
+
+	void start_playtesting();
+	bool is_playtesting() const;
+	void stop_playtesting();
 };

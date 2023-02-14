@@ -51,7 +51,7 @@ struct marker_icon {
 			result.id = I::EDITOR_ICON_SPAWN;
 			result.col = get_faction_color(meta.faction);
 		}
-		else if (p.type == point_marker_type::FFA_SPAWN) {
+		else if (p.type == point_marker_type::FFA_SPAWN || p.type == point_marker_type::PLAYTESTING_SPAWN) {
 			result.id = I::EDITOR_ICON_SPAWN;
 			result.col = white;
 		}

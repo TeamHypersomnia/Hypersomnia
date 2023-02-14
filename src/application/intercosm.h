@@ -40,7 +40,8 @@ struct intercosm {
 	void populate_official_content(
 		sol::state&, 
 		unsigned tickrate,
-		bomb_defusal_ruleset&
+		bomb_defusal_ruleset&,
+		test_mode_ruleset&
 	);
 
 	void load_from_bytes(const intercosm_paths&);

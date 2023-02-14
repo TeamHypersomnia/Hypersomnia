@@ -301,7 +301,6 @@ static void save_all_reported_weapons() {
 namespace test_scenes {
 	void testbed::setup(test_mode_ruleset& rs) {
 		rs.name = "Standard test ruleset";
-		rs.spawned_faction = faction_type::METROPOLIS;
 
 		rs.factions[faction_type::RESISTANCE].initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.factions[faction_type::RESISTANCE].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
@@ -529,7 +528,7 @@ namespace test_scenes {
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::BOMB_DEFUSAL_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
+				create(test_point_markers::TEST_TEAM_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
 			}
 		}
 
@@ -542,7 +541,7 @@ namespace test_scenes {
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::BOMB_DEFUSAL_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
+				create(test_point_markers::TEST_TEAM_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
 			}
 		}
 
@@ -769,7 +768,7 @@ namespace test_scenes {
 				};
 
 				floor_align(test_static_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
-				floor_align(test_box_markers::ROOM).set_size(total_floor_size);
+				floor_align(test_box_markers::CALLOUT_ROOM).set_size(total_floor_size);
 
 				floor_align(test_plain_sprited_bodies::HARD_WOODEN_WALL)
 					.ro().ti().stretch_b().again()
@@ -1171,8 +1170,8 @@ namespace test_scenes {
 		create(test_box_markers::BUY_AREA, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
 		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
 
-		create(test_box_markers::CT_SPAWN, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
-		create(test_box_markers::T_SPAWN, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
+		create(test_box_markers::CALLOUT_CT_SPAWN, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_box_markers::CALLOUT_T_SPAWN, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
 
 		create(test_box_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));
 

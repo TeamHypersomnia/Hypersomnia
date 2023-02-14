@@ -38,8 +38,6 @@ struct test_mode_ruleset {
 
 	real32 respawn_after_ms = 3000;
 	per_actual_faction<test_mode_faction_rules> factions;
-	faction_type spawned_faction = faction_type::METROPOLIS;
-	int spawned_chars = 1;
 	test_mode_view_rules view;
 	// END GEN INTROSPECTOR
 };

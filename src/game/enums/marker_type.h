@@ -13,7 +13,8 @@ enum class marker_letter_type {
 enum class point_marker_type {
 	// GEN INTROSPECTOR enum class point_marker_type
 	TEAM_SPAWN,
-	FFA_SPAWN
+	FFA_SPAWN,
+	PLAYTESTING_SPAWN
 	// END GEN INTROSPECTOR
 };
 

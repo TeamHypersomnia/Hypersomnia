@@ -54,12 +54,19 @@
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/setups/editor/editor_rebuild_scene.hpp"
 #include "application/setups/editor/has_thumbnail_id.h"
+#include "game/detail/snap_interpolation_to_logical.h"
 
 editor_setup::editor_setup(
 	sol::state& lua,
 	const augs::path_type& project_path
 ) : paths(project_path) {
-	initial_scene.populate_official_content(lua, 60, default_bomb_ruleset);
+	initial_scene.populate_official_content(
+		lua,
+		60,
+		default_bomb_ruleset,
+		default_test_ruleset
+	);
+
 	create_official();
 
 	LOG("Loading editor project at: %x", project_path);
@@ -101,6 +108,10 @@ bool editor_setup::handle_input_before_imgui(
 	handle_input_before_imgui_input in
 ) {
 	using namespace augs::event;
+
+	if (is_playtesting()) {
+		return false;
+	}
 
 	if (in.e.was_pressed(keys::key::LMOUSE)) {
 		if (mover.do_left_press(make_mover_input())) {
@@ -191,6 +202,10 @@ bool editor_setup::handle_input_before_game(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
+	if (is_playtesting()) {
+		return false;
+	}
+
 	const auto& state = in.common_input_state;
 	const auto& e = in.e;
 
@@ -266,6 +281,7 @@ bool editor_setup::handle_input_before_game(
 				case key::R: start_rotating_selection(); return true;
 				case key::W: reset_rotation_of_selected_nodes(); return true;
 				case key::F: center_view_at_selection(); return true;
+				case key::SPACE: start_playtesting(); return true;
 				case key::G: toggle_grid(); return true;
 				case key::S: toggle_snapping(); return true;
 				case key::OPEN_SQUARE_BRACKET: sparser_grid(); return true;
@@ -1260,6 +1276,10 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 }
 
 void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) { 
+	if (is_playtesting()) {
+		return;
+	}
+
 	auto cone = in.cone;
 
 	auto& eye = cone.eye;
@@ -1540,6 +1560,11 @@ node_mover_input editor_setup::make_mover_input() {
 }
 
 setup_escape_result editor_setup::escape() {
+	if (is_playtesting()) {
+		stop_playtesting();
+		return setup_escape_result::JUST_FETCH;
+	}
+
 	if (ok_only_popup) {
 		ok_only_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
@@ -1906,7 +1931,15 @@ bool editor_setup::is_node_visible(const editor_node_id id) const {
 }
 
 double editor_setup::get_interpolation_ratio() const {
+	if (is_playtesting()) {
+		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
+	}
+
 	return global_time_seconds / get_inv_tickrate();
+}
+
+entity_id editor_setup::get_viewed_character_id() const {
+	return viewed_character_id;
 }
 
 std::optional<editor_setup::parent_layer_info> editor_setup::find_best_layer_for_new_node() const {
@@ -2027,6 +2060,53 @@ bool editor_setup::is_view_centered_at_selection() const {
 	}
 
 	return true;
+}
+
+void editor_setup::start_playtesting() {
+	if (is_playtesting()) {
+		return;
+	}
+
+	mode = test_mode();
+	auto& cosm = scene.world;
+	local_player_id = mode.add_player({ default_test_ruleset, cosm }, faction_type::METROPOLIS);
+
+	const auto new_character = cosm[mode.lookup(local_player_id)];
+
+	const auto spawn_transform = get_camera_eye().transform;
+
+	const auto mouse_dir = (get_world_cursor_pos() - spawn_transform.pos).normalize();
+	new_character.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
+		typed_handle.set_logic_transform(spawn_transform);
+		::snap_interpolated_to(typed_handle, spawn_transform);
+
+		if (const auto crosshair = typed_handle.find_crosshair()) {
+			crosshair->base_offset = mouse_dir * 100;
+		}
+	});
+
+	viewed_character_id = new_character.get_id();
+}
+
+void editor_setup::stop_playtesting() {
+	viewed_character_id.unset();
+	rebuild_scene();
+}
+
+bool editor_setup::is_playtesting() const {
+	return viewed_character_id.is_set();
+}
+
+void editor_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
+	control(events);
+}
+
+std::optional<camera_eye> editor_setup::find_current_camera_eye() const {
+	if (is_playtesting() && gui.playtest_immersive) {
+		return std::nullopt;
+	}
+
+	return get_camera_eye();
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

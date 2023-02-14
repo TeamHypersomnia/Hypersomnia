@@ -221,7 +221,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 			in.setup.start_moving_selection();
 		}
 
-		if (do_icon(ID::EDITOR_TOOL_ROTATE_ARBITRARY, "Rotate selection (R)", any_node_selected, op == node_mover_op::ROTATING)) {
+		if (do_icon(ID::EDITOR_TOOL_ROTATE_ARBITRARY, "Rotate selection (R)\n(W to reset rotations to 0)", any_node_selected, op == node_mover_op::ROTATING)) {
 			in.setup.start_rotating_selection();
 		}
 
@@ -413,12 +413,12 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		category_separator();
 
-		if (do_icon(ID::EDITOR_TOOL_PLAYTEST, "Playtest (P)")) {
-			//in.setup.start_rotating_selection();
+		if (do_icon(ID::EDITOR_TOOL_PLAYTEST, "Playtest (Space)")) {
+			in.setup.start_playtesting();
 		}
 
 		if (do_icon(ID::EDITOR_TOOL_HOST_SERVER, "Host a server (Ctrl+P)")) {
-			//in.setup.start_rotating_selection();
+
 		}
 	};
 

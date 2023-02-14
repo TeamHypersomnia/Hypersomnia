@@ -327,8 +327,7 @@ enum class test_particles_decorations {
 
 enum class test_point_markers {
 	// GEN INTROSPECTOR enum class test_point_markers
-	FFA_SPAWN,
-	BOMB_DEFUSAL_SPAWN,
+	TEST_TEAM_SPAWN,
 	COUNT
 	// END GEN INTROSPECTOR
 };
@@ -341,9 +340,9 @@ enum class test_box_markers {
 
 	ORGANISM_AREA,
 
-	T_SPAWN,
-	CT_SPAWN,
-	ROOM,
+	CALLOUT_T_SPAWN,
+	CALLOUT_CT_SPAWN,
+	CALLOUT_ROOM,
 
 	COUNT
 	// END GEN INTROSPECTOR

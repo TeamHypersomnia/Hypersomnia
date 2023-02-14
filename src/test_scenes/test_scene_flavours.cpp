@@ -235,14 +235,7 @@ namespace test_flavours {
 		);
 
 		{
-			auto& meta = get_test_flavour(flavours, test_point_markers::FFA_SPAWN);
-			invariants::point_marker marker;
-			marker.type = point_marker_type::FFA_SPAWN;
-			meta.set(marker);
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_point_markers::BOMB_DEFUSAL_SPAWN);
+			auto& meta = get_test_flavour(flavours, test_point_markers::TEST_TEAM_SPAWN);
 			invariants::point_marker marker;
 			marker.type = point_marker_type::TEAM_SPAWN;
 
@@ -286,7 +279,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::T_SPAWN);
+			auto& meta = get_test_flavour(flavours, test_box_markers::CALLOUT_T_SPAWN);
 
 			invariants::box_marker marker;
 			marker.type = area_marker_type::CALLOUT;
@@ -295,7 +288,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::CT_SPAWN);
+			auto& meta = get_test_flavour(flavours, test_box_markers::CALLOUT_CT_SPAWN);
 
 			invariants::box_marker marker;
 			marker.type = area_marker_type::CALLOUT;
@@ -304,7 +297,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::ROOM);
+			auto& meta = get_test_flavour(flavours, test_box_markers::CALLOUT_ROOM);
 
 			invariants::box_marker marker;
 			marker.type = area_marker_type::CALLOUT;

@@ -63,7 +63,7 @@ void test_mode::teleport_to_next_spawn(const input_type in, const entity_id id) 
 		if (const auto spawn = ::find_faction_spawn(in.cosm, faction, current_spawn_index)) {
 			const auto spawn_transform = spawn.get_logic_transform();
 			typed_handle.set_logic_transform(spawn_transform);
-			snap_interpolated_to(typed_handle, spawn_transform);
+			::snap_interpolated_to(typed_handle, spawn_transform);
 
 			if (const auto crosshair = typed_handle.find_crosshair()) {
 				crosshair->base_offset = spawn_transform.get_direction() * 200;
@@ -109,14 +109,6 @@ void test_mode::remove_player(input_type in, const mode_player_id id) {
 void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {
 	(void)entropy;
 	auto& cosm = in.cosm;
-
-	if (players.empty()) {
-		auto n = in.rules.spawned_chars;
-
-		while (n--) {
-			add_player(in, in.rules.spawned_faction);
-		}
-	}
 
 	const auto& clk = cosm.get_clock();
 

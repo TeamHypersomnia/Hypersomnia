@@ -15,6 +15,10 @@
 void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
 
+	if (is_playtesting() && gui.playtest_immersive) {
+		return;
+	}
+
 	(void)in;
 
 	auto window_border_size = scoped_style_var(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -61,6 +65,10 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 
 custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	(void)in;
+
+	if (is_playtesting() && gui.playtest_immersive) {
+		return custom_imgui_result::NONE;
+	}
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 	window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;

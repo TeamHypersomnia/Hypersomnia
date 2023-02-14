@@ -59,7 +59,8 @@ void intercosm::clear() {
 void intercosm::populate_official_content(
 	sol::state& lua, 
 	const unsigned tickrate,
-	bomb_defusal_ruleset& bomb_defusal
+	bomb_defusal_ruleset& bomb_defusal,
+	test_mode_ruleset& test_ruleset
 ) {
 	clear();
 
@@ -88,6 +89,7 @@ void intercosm::populate_official_content(
 
 	auto populator = test_scenes::testbed();
 	populator.setup(bomb_defusal);
+	populator.setup(test_ruleset);
 	bomb_defusal.speeds.tickrate = tickrate;
 }
 
