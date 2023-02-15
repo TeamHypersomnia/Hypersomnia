@@ -53,7 +53,10 @@ namespace augs {
 
 		template <std::size_t buffer_size, class S, class... Args>
 		bool input_text(std::array<char, buffer_size>& buf, const std::string& label, S& value, Args&&... args) {
-			std::copy(value.data(), value.data() + value.size() + 1, buf.data());
+			static_assert(buffer_size > 1, "Array length must be at least 2 to hold the null character");
+
+			const auto considered_n = std::min(buffer_size - 1, value.size());
+			std::copy(value.data(), value.data() + considered_n + 1, buf.data());
 
 			if (ImGui::InputText(label.c_str(), buf.data(), buffer_size, std::forward<Args>(args)...)) {
 				value = std::string(buf.data());

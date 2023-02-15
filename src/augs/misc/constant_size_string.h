@@ -63,11 +63,11 @@ namespace augs {
 		}
 
 		auto size() const {
-			return len;
+			return std::size_t(len);
 		}
 
 		auto length() const {
-			return len;
+			return std::size_t(len);
 		}
 
 		bool empty() const {
