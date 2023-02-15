@@ -32,3 +32,14 @@ summary: Balancing issues to be solved.
 - balance kek9 against sn69?
 	- Maybe a little more damage, to the point that it just takes one less hit with armor but takes same amount of hits without armor
 
+## Done
+
+- Buff AWP (HPSR)
+	- Nobody plays it in competitive environments right now
+	- Remove the particles giving off the location, that makes it literally pointless
+		- Let's leave it only for the launcher
+	- Make it a bit lighter
+	- Dmg: 198
+	- Price can stay the same
+	- We need people to fear the awp
+

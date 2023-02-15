@@ -6,6 +6,75 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Also add File->Reveal project in explorer
+	- Ctrl+E
+
+- "Include if visible" will NOT solve the problem of e.g. hiding metal obstacles when we don't want them to be visible but still including them in the game
+	- Better solution: layer alpha
+		- We can make an "opacity" slider and a separate control for "tint" (either rgb or rgba)
+			- point is there will just be "color" field per layer
+			- and the opacity slider will edit that color's alpha component
+				 - will have to somehow smartly translate 0-255 to opacity 0-1 in the slider
+			- but people will be more familiar with layer "opacity" rather than choosing it as a color
+				- plus it will be faster to just slide an alpha instead of entering a numerical value or opening picker
+
+
+- If we have just a single entity selected, check for available operations
+	- Or entities of the same type
+		- e.g. disable resizing on weapons and complex objects
+	- Disable resizing on point markers as well
+		- actually leave flipping for spawns and other stuff that has rotation
+
+- Might be an overkill to add additional button, just add a context menu to reveal any entry in the filesystem
+	- Might be also over the Project tab itself so that the folder can be revealed
+		- although I would reveal the json file automatically then so that we're already in the folder
+
+- A plus sign to add images directly from the game
+	- Maybe not important now that we'll have reveal in explorer
+
+	- So that we don't have to navigate to the map folder
+	- although then it'd be good to add a "New folder" button
+	- actually we should just have "reveal in explorer" under Project tab or somewhere and be done with it
+
+
+- Ctrl + Scroll could move nodes up/down
+	- We could save it in Edit menu (Move Up in Layers) so we don't forget
+
+- Settings->Editor should edit Editor settings not Debugger
+
+- Server playtesting
+	- Once we hit clapperboard once, "Play" could automatically refresh the server
+	- Let the other player still play once we go back to editing mode
+	- Other players can always spawn by default where the host spawns
+		- will collide if some two connect at the same time but doesn't matter
+	- Then their positions can be preserved when they refresh the map
+		- That preservation can be done server side easily because server_setup will just receive a signal to refresh it 
+			- and will readd all players to the test mode
+	- can show an ip address to copy next to the clapperboard
+		- or even copy it automatically on pressing ctrl+p when it's first hosted
+		- the clapperboard might actually just be to host the server and play will enter the game
+			- when ip shows it will be a nice feedback that the server was hosted
+
+
+
+- we could as well have a separate window for things like project-wide playtest settings 
+	- even though it will technically be a project setting
+	- but won't hurt to have some specific settings separately from inspector i guess
+	- Project->Playtesting
+		- yeah maybe it'd be good to have a menu for various project settings to indicate they're indeed project-wide
+	- there's no mass edit involved here
+
+- Playtesting settings: how do we save them?
+	- A separate window?
+	- Maybe it should be a project-wide setting? With all the default mouse angles etc, default factions and weapons
+		- Yeah probably just save it in json
+	- Immersive mode can just be a flag ofc
+	- We can have a menu entry for this why not
+	- default guns/faction could be customized too
+	- default spawn node setting will override the spawning at view-center 
+		- it will be a project setting
+		- 
+
 - Perhaps honor only visible playtest spawns
 	- also ignore the team spawns
 	- technically it already does since we're teleporting
