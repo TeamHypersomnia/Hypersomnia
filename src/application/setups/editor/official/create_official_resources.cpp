@@ -178,17 +178,18 @@ void create_official_filesystem_from(
 			"floors", 
 			{ 
 				test_static_decorations::CYAN_FLOOR,
-				test_static_decorations::WATER_ROOM_FLOOR
+				test_static_decorations::WATER_ROOM_FLOOR,
+
+				test_static_decorations::SOIL,
+				test_static_decorations::ROAD_DIRT,
+				test_static_decorations::ROAD
+
 			}
 		},
 
 		{ 
 			"walls", 
 			{ 
-				test_static_decorations::SOIL,
-				test_static_decorations::ROAD_DIRT,
-				test_static_decorations::ROAD,
-
 				test_static_decorations::LAB_WALL_FOREGROUND,
 				test_static_decorations::LAB_WALL_A2_FOREGROUND,
 

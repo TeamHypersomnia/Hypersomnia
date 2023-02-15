@@ -593,7 +593,9 @@ public:
 
 	template <class T>
 	void control(const T& t) {
-		total_collected.control(t);
+		if (is_playtesting()) {
+			total_collected.control(t);
+		}
 	}
 
 	const entropy_accumulator& get_entropy_accumulator() const {
