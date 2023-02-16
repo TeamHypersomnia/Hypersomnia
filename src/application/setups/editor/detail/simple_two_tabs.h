@@ -2,13 +2,14 @@
 
 namespace augs {
 	namespace imgui {
-		template <class E>
+		template <class E, class F>
 		void simple_two_tabs(
 			E& current_tab, 
 			const E a,
 			const E b,
 			const std::string& a_str,
-			const std::string& b_str
+			const std::string& b_str,
+			F after_first
 		) {
 			const auto bg_cols = std::array<rgba, 3> {
 				rgba(0, 0, 0, 0),
@@ -35,6 +36,7 @@ namespace augs {
 			};
 
 			tab_button(a_str, a);
+			after_first();
 			ImGui::SameLine();
 			tab_button(b_str, b);
 		}

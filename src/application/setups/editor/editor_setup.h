@@ -422,6 +422,10 @@ public:
 
 	void rebuild_scene();
 
+	const auto& get_paths() const {
+		return paths;
+	}
+
 	augs::path_type resolve_project_path(const augs::path_type& path_in_project) const;
 
 	camera_eye get_camera_eye() const;

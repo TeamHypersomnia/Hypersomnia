@@ -15,6 +15,7 @@
 #include "test_scenes/test_scene_flavours.h"
 #include "application/setups/editor/nodes/editor_node_defaults.h"
 #include "view/rendering_scripts/for_each_iconed_entity.h"
+#include "augs/window_framework/window.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem(project_special_root);
@@ -157,7 +158,16 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		editor_resources_tab_type::PROJECT,
 		editor_resources_tab_type::OFFICIAL,
 		"Project",
-		"Official"
+		"Official",
+		[&]() {
+			if (ImGui::BeginPopupContextItem()) {
+				if (ImGui::Selectable("Reveal in explorer")) {
+					in.window.reveal_in_explorer(in.setup.get_paths().project_json);
+				}
+
+				ImGui::EndPopup();
+			}
+		}
 	);
 
 	auto child = scoped_child(showing_official() ? "nodes official view" : "nodes project view");
@@ -189,7 +199,16 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			in.setup,
 			node,
 			editor_icon_info_in(in),
-			dragged_resource
+			dragged_resource,
+			[&]() {
+				if (ImGui::BeginPopupContextItem()) {
+					if (ImGui::Selectable("Reveal in explorer")) {
+						in.window.reveal_in_explorer(in.setup.resolve_project_path(node.get_path_in_project()));
+					}
+
+					ImGui::EndPopup();
+				}
+			}
 		);
 
 		if (pressed) {

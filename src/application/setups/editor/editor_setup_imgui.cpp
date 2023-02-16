@@ -34,7 +34,9 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 
 	if (auto main_menu = scoped_menu_bar()) {
 		if (auto menu = scoped_menu(project.meta.name.c_str())) {
-
+			if (ImGui::MenuItem("Reveal in explorer", "CTRL+SHIFT+E")) {
+				in.window.reveal_in_explorer(paths.project_json);
+			}
 		}
 
 		if (auto menu = scoped_menu("Edit")) {
@@ -160,6 +162,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	gui.filesystem.perform({ 
 		*this,
+		in.window,
 		gui.filesystem.showing_official() ? official_files_root : files.root,
 
 		in.ad_hoc_atlas,

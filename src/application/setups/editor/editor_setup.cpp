@@ -55,6 +55,7 @@
 #include "application/setups/editor/editor_rebuild_scene.hpp"
 #include "application/setups/editor/has_thumbnail_id.h"
 #include "game/detail/snap_interpolation_to_logical.h"
+#include "augs/window_framework/window.h"
 
 editor_setup::editor_setup(
 	sol::state& lua,
@@ -228,6 +229,7 @@ bool editor_setup::handle_input_before_game(
 		if (has_ctrl) {
 			if (has_shift) {
 				switch (k) {
+					case key::E: in.window.reveal_in_explorer(paths.project_json); return true;
 					case key::Z: redo(); return true;
 					default: break;
 				}

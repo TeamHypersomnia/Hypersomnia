@@ -16,8 +16,13 @@ enum class editor_resources_tab_type {
 
 struct editor_filesystem_node;
 
+namespace augs {
+	class window;
+}
+
 struct editor_project_files_input {
 	editor_setup& setup;
+	augs::window& window;
 	editor_filesystem_node& files_root;
 
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;

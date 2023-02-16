@@ -3,11 +3,13 @@
 #include "application/setups/editor/editor_get_icon_for.h"
 
 namespace editor_widgets {
+	template <class F>
 	inline bool filesystem_node_widget(
 		editor_setup& setup,
 		editor_filesystem_node& node,
 		const editor_icon_info_in& icon_in,
-		editor_resource_id& dragged_resource
+		editor_resource_id& dragged_resource,
+		F after_selectable
 	) {
 		using namespace augs::imgui;
 		augs::atlas_entry icon;
@@ -64,6 +66,8 @@ namespace editor_widgets {
 					ImGui::EndDragDropSource();
 				}
 			}
+
+			after_selectable();
 		};
 
 		auto bg_alpha = 255;

@@ -7,7 +7,8 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Also add File->Reveal project in explorer
-	- Ctrl+E
+	- Ctrl+Shift+E
+		- Ctrl+E is already taken by resizer
 
 - "Include if visible" will NOT solve the problem of e.g. hiding metal obstacles when we don't want them to be visible but still including them in the game
 	- Better solution: layer alpha

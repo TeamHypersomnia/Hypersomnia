@@ -1140,7 +1140,8 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				inspected_node_tab_type::NODE,
 				inspected_node_tab_type::RESOURCE,
 				node_label,
-				resource_label
+				resource_label,
+				[](){}
 			);
 
 			ImGui::Separator();
