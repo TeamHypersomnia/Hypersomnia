@@ -278,12 +278,11 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const bool sound_every_step = sound_freq == sound_processing_frequency::EVERY_SIMULATION_STEP;
 
 	auto update_sound_properties = [audio_renderer, sound_every_step, scaled_state_dt, viewed_character, dt, input, &sounds, &interp, input_camera]() {
-		if (viewed_character.dead()) {
-			return;
-		}
-
 		auto ear = input_camera;
-		ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
+
+		if (viewed_character) {
+			ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
+		}
 		
 		sounds.update_sound_properties(
 			{
@@ -297,7 +296,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 				input_camera.cone,
 				sound_every_step ? *scaled_state_dt : dt,
 				input.speed_multiplier,
-				input.inv_tickrate
+				input.inv_tickrate,
+				input.interpolation_ratio
 			}
 		);
 	};
@@ -471,6 +471,7 @@ void audiovisual_state::standard_post_solve(
 					input.camera.cone,
 					augs::delta::zero,
 					1.0,
+					0.0,
 					0.0
 				}
 			);

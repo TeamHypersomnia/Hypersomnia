@@ -287,6 +287,9 @@ void create_official_filesystem_from(
 							folder.files.emplace_back(std::move(new_node));
 						}
 					}
+					else {
+						folder.files.emplace_back(std::move(new_node));
+					}
 				},
 				*typed_resource.official_tag
 			);

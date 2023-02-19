@@ -2104,6 +2104,9 @@ void editor_setup::start_playtesting() {
 void editor_setup::stop_playtesting() {
 	viewed_character_id.unset();
 	rebuild_scene();
+
+	/* Would interrupt the sounds which would be unpleasant to the ear */
+	//scene.world.request_resample();
 }
 
 bool editor_setup::is_playtesting() const {

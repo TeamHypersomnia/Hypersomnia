@@ -1994,6 +1994,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			frame_delta,
 			speed_multiplier,
 			inv_tickrate,
+			get_interpolation_ratio(),
 
 			get_character_camera(),
 			get_queried_cone(viewing_config),

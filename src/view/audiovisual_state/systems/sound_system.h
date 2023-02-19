@@ -63,7 +63,9 @@ class sound_system {
 		const augs::delta dt;
 		const double speed_multiplier;
 		const double inv_tickrate;
+		const double interpolation_ratio;
 
+		const cosmos& get_cosmos() const;
 		const_entity_handle get_listener() const;
 		std::optional<transformr> find_transform(const absolute_or_local&) const;
 
@@ -166,7 +168,7 @@ class sound_system {
 
 	void update_listener(
 		const augs::audio_renderer& renderer,
-		const const_entity_handle subject,
+		const character_camera& listener,
 		const interpolation_system& sys,
 		const sound_system_settings& settings,
 		const vec2 world_screen_center

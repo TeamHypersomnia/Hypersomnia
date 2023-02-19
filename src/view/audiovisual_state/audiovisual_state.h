@@ -55,6 +55,7 @@ struct audiovisual_advance_input {
 	const augs::delta frame_delta;
 	const double speed_multiplier;
 	const double inv_tickrate;
+	const double interpolation_ratio;
 
 	const character_camera& camera;
 	const camera_cone queried_cone;

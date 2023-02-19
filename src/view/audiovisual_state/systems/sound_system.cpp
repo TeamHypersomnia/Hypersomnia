@@ -38,6 +38,10 @@ const_entity_handle sound_system::update_properties_input::get_listener() const 
 	return ear.viewed_character;
 }
 
+const cosmos& sound_system::update_properties_input::get_cosmos() const {
+	return ear.viewed_character.get_cosmos();
+}
+
 bool sound_system::update_properties_input::under_short_sound_limit() const {
 	return static_cast<int>(owner.short_sounds.size()) < settings.max_short_sounds;
 }
@@ -97,37 +101,37 @@ void sound_system::clear_sources_playing(const assets::sound_id id) {
 
 void sound_system::update_listener(
 	const augs::audio_renderer& renderer,
-	const const_entity_handle listener,
+	const character_camera& listener,
 	const interpolation_system& sys,
 	const sound_system_settings& settings,
 	const vec2 world_screen_center
 ) {
 	augs::update_listener_properties cmd;
 
-	const auto character_transform = listener.get_viewing_transform(sys);
+	const auto listener_handle = listener.viewed_character;
+
+	const auto listener_transform = listener_handle ? listener_handle.get_viewing_transform(sys) : listener.cone.eye.transform;
 
 	{
-		const auto character_pos = character_transform.pos;
-
 		const auto listener_pos = 
 			settings.listener_reference == listener_position_reference::SCREEN_CENTER ?
 			world_screen_center :
-			character_pos
+			listener_transform.pos
 		;
 
 		cmd.position = listener_pos;
 	}
 
-	cmd.velocity = listener.get_effective_velocity();
+	cmd.velocity = listener_handle ? listener_handle.get_effective_velocity() : vec2(0, 0);
 
 	vec2 orientation = vec2(0, -1.f);
 
 	if (settings.set_listener_orientation_to_character_orientation) {
 		orientation = vec2(1, 0);
-		orientation.rotate(character_transform.rotation);
+		orientation.rotate(listener_transform.rotation);
 	}
 
-	cmd.si = listener.get_cosmos().get_si();
+	cmd.si = listener_handle.get_cosmos().get_si();
 	cmd.orientation = orientation;
 	
 	renderer.push_command(cmd);
@@ -207,20 +211,27 @@ bool sound_system::generic_sound_cache::rebind_buffer(const update_properties_in
 bool sound_system::generic_sound_cache::should_play(const update_properties_input in) const {
 	const auto listening_character = in.get_listener();
 
-	if (listening_character.dead()) {
-		return false;
-	}
+	if (listening_character) {
+		if (original.start.silent_trace_like) {
+			if (original.start.direct_listener == listening_character) {
+				return false;
+			}
+		}
 
-	if (original.start.silent_trace_like) {
-		if (original.start.direct_listener == listening_character) {
+		const auto faction = listening_character.get_official_faction();
+		const auto target_faction = original.start.listener_faction;
+
+		return target_faction == faction_type::SPECTATOR || faction == target_faction;
+	}
+	else {
+		const auto target_faction = original.start.listener_faction;
+
+		if (target_faction != faction_type::SPECTATOR) {
 			return false;
 		}
+
+		return true;
 	}
-
-	const auto faction = listening_character.get_official_faction();
-	const auto target_faction = original.start.listener_faction;
-
-	return target_faction == faction_type::SPECTATOR || faction == target_faction;
 }
 
 void sound_system::generic_sound_cache::eat_followup() {
@@ -241,20 +252,16 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		elapsed_secs += dt_this_frame;
 	}
 
-	if (listening_character.dead()) {
-		return;
-	}
-
-	const auto faction = listening_character.get_official_faction();
+	const auto faction = (listening_character ? listening_character.get_official_faction() : faction_type::SPECTATOR);
 	const auto target_faction = original.start.listener_faction;
 
 	const bool is_direct_listener = 
 		original.input.modifier.always_direct_listener 
-		|| listening_character == original.start.direct_listener
+		|| (listening_character.alive() && listening_character == original.start.direct_listener)
 		|| (target_faction != faction_type::SPECTATOR && faction == target_faction)
 	;
 
-	const auto& cosm = listening_character.get_cosmos();
+	const auto& cosm = in.get_cosmos();
 	const auto maybe_transform = in.find_transform(positioning);
 	
 	if (maybe_transform == std::nullopt)
@@ -363,10 +370,15 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	if (is_linear) {
 
 	}
-	else if (is_nonlinear && !is_direct_listener && listening_character) {
+	else if (is_nonlinear && !is_direct_listener) {
 		/* Let's just do our custom gain calculation */
+		const auto interped_listener_pos = 
+			listening_character ? 
+			listening_character.get_viewing_transform(in.interp).pos :
+			in.ear.cone.eye.transform.pos
+		;
 
-		const auto dist = (current_transform.pos - listening_character.get_viewing_transform(in.interp).pos).length();
+		const auto dist = (current_transform.pos - interped_listener_pos).length();
 
 		if (dist > ref_dist) {
 			custom_dist_gain_mult *= 1 - std::clamp(dist - ref_dist, 0.f, max_dist) / max_dist;
@@ -617,13 +629,12 @@ void sound_system::advance_flash(const const_entity_handle listener, const augs:
 
 void sound_system::update_sound_properties(const update_properties_input in) {
 	const auto& renderer = in.renderer;
-	const auto listening_character = in.get_listener();
 
 	const auto screen_center = in.camera.get_world_screen_center();
 
 	update_listener(
 		in.renderer,
-		listening_character, 
+		in.ear, 
 		in.interp, 
 		in.settings,
 		screen_center
@@ -641,10 +652,10 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		}
 	}
 
-	const auto& cosm = listening_character.get_cosmos();
+	const auto& cosm = in.get_cosmos();
 
 	{
-		advance_flash(listening_character, in.dt);
+		advance_flash(in.ear.viewed_character, in.dt);
 
 		const auto& last_mult = last_registered_flash_mult;
 
@@ -815,14 +826,18 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			const auto secs = buf.computed_length_in_seconds;
 
 			if (secs > in.settings.sync_sounds_longer_than_secs) {
+				const auto& cosm = subject.get_cosmos();
+
 				const auto when_born = subject.when_born().step;
-				const auto now_step = subject.get_cosmos().get_timestamp().step;
+				const auto now_step = cosm.get_timestamp().step;
 
 				if (now_step < when_born) {
 					return;
 				}
 
-				const auto total_lived_secs = (now_step - when_born) * in.inv_tickrate * in.speed_multiplier;
+				const auto total_secs_passed = cosm.get_total_seconds_passed(in.interpolation_ratio);
+				const auto born_at_secs = when_born * in.inv_tickrate;
+				const auto total_lived_secs = std::max(0.0, (total_secs_passed - born_at_secs) * in.speed_multiplier);
 				const auto total_lived_cycles = total_lived_secs / secs;
 
 				const auto expected_secs = [&]() {
