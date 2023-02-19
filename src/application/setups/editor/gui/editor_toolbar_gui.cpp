@@ -137,13 +137,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 	int current_icon_id = 0;
 
-	const bool any_node_selected = [&]() {
-		if (in.setup.inspects_any<editor_node_id>()) {
-			return true;
-		}
-
-		return false;
-	}();
+	const bool any_node_selected = in.setup.inspects_any<editor_node_id>();
 
 	using ID = assets::necessary_image_id;
 
@@ -211,9 +205,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 		const auto op = in.setup.get_current_node_transforming_op();
 
 		auto warp_cursor = [&]() {
-			const auto screen_center = in.window.get_screen_size() / 2;
-			ImGui::GetIO().MousePos = ImVec2(screen_center);
-			in.window.set_cursor_pos(screen_center);
+			in.setup.warp_cursor_to_center(in.window);
 		};
 
 		if (do_icon(ID::EDITOR_TOOL_MOVE, "Move selection (T)", any_node_selected, op == node_mover_op::TRANSLATING)) {
@@ -229,7 +221,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		const bool resizing_active = ImGui::IsPopupOpen("Resize Options");
 
-		if (do_icon(ID::EDITOR_TOOL_RESIZE, resize_desc, any_node_selected, op == node_mover_op::RESIZING || resizing_active)) {
+		if (do_icon(ID::EDITOR_TOOL_RESIZE, resize_desc, in.setup.can_resize_selected_nodes(), op == node_mover_op::RESIZING || resizing_active)) {
 			ImGui::OpenPopup("Resize Options");
 		}
 
@@ -284,26 +276,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 		category_separator();
 
 		if (do_icon(ID::EDITOR_ICON_CLONE, "Clone selection (C)", node_or_layer_inspected)) {
-			if (in.setup.inspects_only<editor_layer_id>()) {
-				const bool inspecting_any_layers_with_nodes = [&]() {
-					const auto all_source_layers = in.setup.get_all_inspected<editor_layer_id>();
-
-					for (const auto layer_id : all_source_layers) {
-						if (const auto source_layer = in.setup.find_layer(layer_id)) {
-							if (source_layer->hierarchy.nodes.size() > 0) {
-								return true;
-							}
-						}
-					}
-
-					return false;
-				}();
-
-				if (inspecting_any_layers_with_nodes) {
-					warp_cursor();
-				}
-			}
-			else {
+			if (in.setup.should_warp_cursor_before_duplicating()) {
 				warp_cursor();
 			}
 

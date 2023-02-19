@@ -51,6 +51,123 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			if (item_if(can_redo(), "Redo", "CTRL+SHIFT+Z")) {
 				redo();
 			}
+
+			ImGui::Separator();
+
+			const bool any_node_selected = inspects_any<editor_node_id>();
+
+			if (item_if(any_node_selected, "Move", "T")) {
+				warp_cursor_to_center(in.window);
+				start_moving_selection();
+			}
+
+			if (item_if(any_node_selected, "Rotate", "R")) {
+				start_rotating_selection();
+			}
+
+			const bool can_resize = can_resize_selected_nodes();
+
+			if (ImGui::BeginMenu("Resize (E)", can_resize)) {
+				auto do_resize_opt = [&](
+					const auto label,
+					const bool two,
+					const auto edges,
+					const auto edge_icon_angle
+				) {
+					(void)edge_icon_angle;
+
+					if (ImGui::MenuItem(label)) {
+						start_resizing_selection(two, edges);
+					}
+				};
+
+				using ae = resize_nodes_command::active_edges;
+
+				do_resize_opt("Drag top edge", false, ae(true, false, false, false), -90);
+				do_resize_opt("Drag left edge", false, ae(false, true, false, false), -180);
+				do_resize_opt("Drag right edge", false, ae(false, false, true, false), 0);
+				do_resize_opt("Drag bottom edge", false, ae(false, false, false, true), 90);
+
+				ImGui::Separator();
+
+				do_resize_opt("Drag top-left edges", true, ae(true, true, false, false), -90);
+				do_resize_opt("Drag top-right edges", true, ae(true, false, true, false), 0);
+				do_resize_opt("Drag bottom-right edges", true, ae(false, false, true, true), 90);
+				do_resize_opt("Drag bottom-left edges", true, ae(false, true, false, true), 180);
+
+				ImGui::EndMenu();
+			}
+
+			if (item_if(any_node_selected, "Rotate 90* CCW", "SHIFT+R")) {
+				rotate_selection_once_by(-90);
+			}
+
+			if (item_if(any_node_selected, "Rotate 90* CW", "CTRL+R")) {
+				rotate_selection_once_by(90);
+			}
+
+			if (item_if(any_node_selected, "Reset rotation", "W")) {
+				reset_rotation_of_selected_nodes();
+			}
+
+			if (item_if(any_node_selected, "Flip horizontally", "SHIFT+H")) {
+				flip_selection_horizontally();
+			}
+
+			if (item_if(any_node_selected, "Flip vertically", "SHIFT+V")) {
+				flip_selection_vertically();
+			}
+
+			ImGui::Separator();
+
+			const bool node_or_layer_inspected = 
+				inspects_any<editor_node_id>()
+				|| inspects_any<editor_layer_id>()
+			;
+
+			if (item_if(node_or_layer_inspected, "Clone", "C")) {
+				if (should_warp_cursor_before_duplicating()) {
+					warp_cursor_to_center(in.window);
+				}
+
+				duplicate_selection();
+			}
+
+			const bool can_mirror = node_or_layer_inspected;
+
+			if (ImGui::BeginMenu("Mirror", can_mirror)) {
+				auto do_mirror_opt = [&](const auto label, const auto shortcut, const auto dir, const auto arrow_icon_angle) {
+					(void)arrow_icon_angle;
+
+					if (ImGui::MenuItem(label, shortcut)) {
+						mirror_selection(dir);
+					}
+				};
+
+				do_mirror_opt("Up ", "CTRL+UP", vec2i(0, -1), -90);
+				do_mirror_opt("Left", "CTRL+LEFT", vec2i(-1, 0), -180);
+				do_mirror_opt("Right", "CTRL+RIGHT", vec2i(1, 0), 0);
+				do_mirror_opt("Down", "CTRL+DOWN", vec2i(0, 1), 90);
+
+				ImGui::EndMenu();
+			}
+
+			{
+				const auto remove_bgs = std::array<rgba, 3> {
+					rgba(0, 0, 0, 0),
+					rgba(80, 20, 20, 255),
+					rgba(150, 40, 40, 255)
+				};
+
+				const auto remove_tint = rgba(220, 80, 80, 255);
+
+				auto colored_selectable = scoped_selectable_colors(remove_bgs);
+				auto colored_col = scoped_text_color(remove_tint);
+
+				if (item_if(node_or_layer_inspected, "Delete", "D")) {
+					delete_selection();
+				}
+			}
 		}
 
 		if (auto menu = scoped_menu("Window")) {

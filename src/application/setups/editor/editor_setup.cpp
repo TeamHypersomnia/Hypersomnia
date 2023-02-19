@@ -2138,6 +2138,59 @@ bool editor_setup::can_transform_nodes() const {
 	return true;
 }
 
+void editor_setup::warp_cursor_to_center(augs::window& window) {
+	const auto screen_center = window.get_screen_size() / 2;
+	ImGui::GetIO().MousePos = ImVec2(screen_center);
+	window.set_cursor_pos(screen_center);
+}
+
+bool editor_setup::can_resize_selected_nodes() const {
+	bool any_can = false;
+	bool all_can = true;
+
+	for_each_inspected<editor_node_id>(
+		[&](const editor_node_id node_id) {
+			const auto id = to_entity_id(node_id);
+			const auto handle = scene.world[id];
+
+			const bool can = handle && handle.can_resize();
+
+			if (can) {
+				any_can = true;
+			}
+
+			if (!can) {
+				all_can = false;
+			}
+		}
+	);
+
+	return any_can;
+	//return any_can && all_can;
+}
+
+bool editor_setup::should_warp_cursor_before_duplicating() const {
+	if (inspects_only<editor_layer_id>()) {
+		const bool inspecting_any_layers_with_nodes = [&]() {
+			const auto all_source_layers = get_all_inspected<editor_layer_id>();
+
+			for (const auto layer_id : all_source_layers) {
+				if (const auto source_layer = find_layer(layer_id)) {
+					if (source_layer->hierarchy.nodes.size() > 0) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}();
+
+		return inspecting_any_layers_with_nodes;
+	}
+
+	return true;
+}
+
 template struct edit_resource_command<editor_sprite_resource>;
 template struct edit_resource_command<editor_sound_resource>;
 template struct edit_resource_command<editor_light_resource>;

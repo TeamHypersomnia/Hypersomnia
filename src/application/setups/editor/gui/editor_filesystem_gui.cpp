@@ -288,7 +288,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 			const auto remove_tint = rgba(220, 80, 80, 255);
 
-			if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], [](){}, "Remove selection", !showing_official() && special_resource_inspected, remove_tint, remove_bgs)) {
+			if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], [](){}, "Delete selection", !showing_official() && special_resource_inspected, remove_tint, remove_bgs)) {
 
 			}
 		}

@@ -105,9 +105,7 @@ void editor_node_mover::start_resizing_selection(
 
 	auto command = s.make_command_from_selected_entities<resize_nodes_command>(
 		"",
-		[](const auto typed_handle) {
-			return typed_handle.template has<components::overridden_geo>() && typed_handle.has_independent_transform();
-		}	
+		[](const auto& h) { return h.can_resize(); }
 	);
 
 	command.edges = custom_edges;

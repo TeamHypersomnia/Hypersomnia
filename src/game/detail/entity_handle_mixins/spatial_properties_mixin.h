@@ -17,6 +17,7 @@ template <class entity_handle_type>
 class spatial_properties_mixin {
 public:
 	bool has_independent_transform() const;
+	bool can_resize() const;
 	void set_logic_transform(const transformr t) const;
 
 	template <class F, class... K>
@@ -385,6 +386,13 @@ std::optional<transformr> spatial_properties_mixin<E>::find_independent_transfor
 	);
 
 	return result;
+}
+
+
+template <class E>
+bool spatial_properties_mixin<E>::can_resize() const {
+	const auto& handle = *static_cast<const E*>(this);
+	return handle.has_independent_transform() && handle.template has<components::overridden_geo>();
 }
 
 template <class E>

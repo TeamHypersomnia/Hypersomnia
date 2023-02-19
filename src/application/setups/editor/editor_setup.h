@@ -657,4 +657,8 @@ public:
 
 	bool can_resize_nodes() const;
 	bool can_transform_nodes() const;
+
+	void warp_cursor_to_center(augs::window&);
+	bool can_resize_selected_nodes() const;
+	bool should_warp_cursor_before_duplicating() const;
 };

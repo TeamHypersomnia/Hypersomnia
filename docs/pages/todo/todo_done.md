@@ -4892,3 +4892,7 @@ Advantages:
 	- fish_dragon
 	- fish_rainbow_dragon
 
+
+- Also add File->Reveal project in explorer
+	- Ctrl+Shift+E
+		- Ctrl+E is already taken by resizer
