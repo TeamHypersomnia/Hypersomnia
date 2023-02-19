@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- The physical shape editor simply specifies the default shape
+	- This shape overrides what would be shown with the standard in-world geometry editor
+
 - If we have just a single entity selected, check for available operations
 	- Or entities of the same type
 		- e.g. disable resizing on weapons and complex objects

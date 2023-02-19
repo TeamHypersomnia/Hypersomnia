@@ -39,11 +39,11 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			}
 		}
 
-		if (auto menu = scoped_menu("Edit")) {
-			auto item_if = [](const bool condition, const char* label, const char* shortcut = nullptr) {
-				return ImGui::MenuItem(label, shortcut, nullptr, condition);
-			};
+		auto item_if = [](const bool condition, const char* label, const char* shortcut = nullptr) {
+			return ImGui::MenuItem(label, shortcut, nullptr, condition);
+		};
 
+		if (auto menu = scoped_menu("Edit")) {
 			if (item_if(can_undo(), "Undo", "CTRL+Z")) {
 				undo();
 			}
@@ -187,6 +187,42 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 		if (auto menu = scoped_menu("View")) {
 			if (ImGui::MenuItem("Toolbar", "CTRL+T", gui.toolbar.show, true)) {
 				gui.toolbar.toggle();
+			}
+
+			const bool grid_enabled = is_grid_enabled();
+			const bool snapping_enabled = is_snapping_enabled();
+
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Grid", "G", grid_enabled, true)) {
+				toggle_grid();
+			}
+
+			if (ImGui::MenuItem("Sparser grid", "[")) {
+				sparser_grid();
+			}
+
+			if (ImGui::MenuItem("Denser grid", "]")) {
+				denser_grid();
+			}
+
+			if (ImGui::MenuItem("Snap to grid", "S", snapping_enabled, true)) {
+				toggle_snapping();
+			}
+
+			ImGui::Separator();
+
+			const bool is_centered = is_view_centered_at_selection();
+
+			if (item_if(!is_centered, "Focus", "F")) {
+				center_view_at_selection();
+			}
+
+			const auto zoom = get_camera_eye().zoom;
+			const bool nonzero_zoom = zoom != 1.0f;
+
+			if (item_if(nonzero_zoom, "Reset zoom", "Z or =")) {
+				reset_zoom();
 			}
 		}
 	}
