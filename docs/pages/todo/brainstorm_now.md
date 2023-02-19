@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+
+- Remember we can have
+	
+
 - The physical shape editor simply specifies the default shape
 	- This shape overrides what would be shown with the standard in-world geometry editor
 
@@ -14,27 +19,6 @@ summary: That which we are brainstorming at the moment.
 		- e.g. disable resizing on weapons and complex objects
 	- Disable resizing on point markers as well
 		- actually leave flipping for spawns and other stuff that has rotation
-
-- "Include if visible" will NOT solve the problem of e.g. hiding metal obstacles when we don't want them to be visible but still including them in the game
-	- Better solution: layer alpha
-		- We can make an "opacity" slider and a separate control for "tint" (either rgb or rgba)
-			- point is there will just be "color" field per layer
-			- and the opacity slider will edit that color's alpha component
-				 - will have to somehow smartly translate 0-255 to opacity 0-1 in the slider
-			- but people will be more familiar with layer "opacity" rather than choosing it as a color
-				- plus it will be faster to just slide an alpha instead of entering a numerical value or opening picker
-
-- Might be an overkill to add additional button, just add a context menu to reveal any entry in the filesystem
-	- Might be also over the Project tab itself so that the folder can be revealed
-		- although I would reveal the json file automatically then so that we're already in the folder
-
-- A plus sign to add images directly from the game
-	- Maybe not important now that we'll have reveal in explorer
-
-	- So that we don't have to navigate to the map folder
-	- although then it'd be good to add a "New folder" button
-	- actually we should just have "reveal in explorer" under Project tab or somewhere and be done with it
-
 
 - Ctrl + Scroll could move nodes up/down
 	- We could save it in Edit menu (Move Up in Layers) so we don't forget
@@ -53,7 +37,6 @@ summary: That which we are brainstorming at the moment.
 		- or even copy it automatically on pressing ctrl+p when it's first hosted
 		- the clapperboard might actually just be to host the server and play will enter the game
 			- when ip shows it will be a nice feedback that the server was hosted
-
 
 
 - we could as well have a separate window for things like project-wide playtest settings 
@@ -117,6 +100,9 @@ summary: That which we are brainstorming at the moment.
 - Cover ground neons per-entity?
 	- Only foregrounds will need it on a second thought
 	- Consider making anything foreground cover the ground neons by default, but I don't know how we'll do it
+	- When something needs to cover ground neons per-entity it's usually static
+		- So we can do the job with a static neon occluder
+			- Although that's PITA when we want to move the entity so maybe let's have per-entity switch after all
 
 - Let's keep the unvariantized structs as_physical and as_nonphysical and let them both go to json
 	- Pro: we might later decide to let nodes override domains after all

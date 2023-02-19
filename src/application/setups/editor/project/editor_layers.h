@@ -4,6 +4,7 @@
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "augs/misc/pool/pool.h"
 #include "application/setups/editor/project/editor_layer_id.h"
+#include "augs/graphics/rgba.h"
 
 struct editor_layer_hierarchy {
 	// GEN INTROSPECTOR struct editor_layer_hierarchy
@@ -15,7 +16,8 @@ struct editor_layer_editable {
 	// GEN INTROSPECTOR struct editor_layer_editable
 	bool select_together = false;
 	bool selectable_on_scene = true;
-	float alpha_mult = 1.0f;
+	float opacity = 1.0f;
+	rgba tint = white;
 	// END GEN INTROSPECTOR
 };
 

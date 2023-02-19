@@ -114,6 +114,17 @@ bool edit_property(
 		}
 	}
 	else if constexpr(std::is_arithmetic_v<T>) {
+		if constexpr(std::is_same_v<float, T>) {
+			if (label == "Opacity") {
+				if (slider(label, property, 0.0f, 1.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+		}
+
 		if (drag(label, property)) { 
 			result = typesafe_sprintf("Set %x to %x in %x", label, property);
 			return true;
@@ -355,6 +366,8 @@ EDIT_FUNCTION(editor_layer_editable& insp, T& es) {
 	std::string result;
 
 	MULTIPROPERTY("Selectable on scene", selectable_on_scene);
+	MULTIPROPERTY("Opacity", opacity);
+	MULTIPROPERTY("Tint", tint);
 
 	if (ImGui::IsItemHovered()) {
 		text_tooltip("Useful for e.g. ground/floor layers.\nYou might want to see the background objects without them being hoverable.\nThis way you can comfortably mass-select only some foreground objects.");

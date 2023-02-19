@@ -4896,3 +4896,17 @@ Advantages:
 - Also add File->Reveal project in explorer
 	- Ctrl+Shift+E
 		- Ctrl+E is already taken by resizer
+- Might be an overkill to add additional button, just add a context menu to reveal any entry in the filesystem
+	- Might be also over the Project tab itself so that the folder can be revealed
+		- although I would reveal the json file automatically then so that we're already in the folder
+
+- "Include if visible" will NOT solve the problem of e.g. hiding metal obstacles when we don't want them to be visible but still including them in the game
+	- Better solution: layer alpha
+		- We can make an "opacity" slider and a separate control for "tint" (either rgb or rgba)
+			- point is there will just be "color" field per layer
+			- and the opacity slider will edit that color's alpha component
+				 - will have to somehow smartly translate 0-255 to opacity 0-1 in the slider
+			- but people will be more familiar with layer "opacity" rather than choosing it as a color
+				- plus it will be faster to just slide an alpha instead of entering a numerical value or opening picker
+
+

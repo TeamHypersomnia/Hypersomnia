@@ -30,11 +30,12 @@ void setup_entity_from_node(
 	if constexpr(std::is_same_v<N, editor_sprite_node>) {
 		auto& sprite = agg.template get<components::sprite>();
 		sprite.colorize = editable.colorize;
+		sprite.colorize *= layer.editable.tint;
 
-		const auto alpha_mult = layer.editable.alpha_mult;
+		const auto opacity = layer.editable.opacity;
 
-		if (alpha_mult != 1.0f) {
-			sprite.colorize.mult_alpha(alpha_mult);
+		if (opacity != 1.0f) {
+			sprite.colorize.mult_alpha(opacity);
 		}
 	}
 	else if constexpr(std::is_same_v<N, editor_light_node>) {

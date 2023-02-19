@@ -4,12 +4,12 @@ hide_sidebar: true
 permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
+- A plus sign to add images directly from the game
+	- Maybe not important now that we'll have reveal in explorer
 
-- linux bug: neon silhouettes can be seen behind player, probably something to do with drivers
-	- It's a problem with gl_FragCoord: probably stencil on another fbo is somehow flipped
-	- To reverse the problem, one can put the following in fog_of_war.fsh: layout(origin_upper_left) in vec4 gl_FragCoord; 
-		- although only with higher glsl version
-	- didn't happen before, very probable it's a driver bug
+	- So that we don't have to navigate to the map folder
+	- although then it'd be good to add a "New folder" button
+	- actually we should just have "reveal in explorer" under Project tab or somewhere and be done with it
 
 - The only problem with how we do canon/local config is that some local settings might disappear
 	- If we manually set allow nat = false and then we launch a dedicated server, that setting might disappear
