@@ -651,4 +651,10 @@ public:
 	void start_playtesting();
 	bool is_playtesting() const;
 	void stop_playtesting();
+
+	bool can_undo() const;
+	bool can_redo() const;
+
+	bool can_resize_nodes() const;
+	bool can_transform_nodes() const;
 };

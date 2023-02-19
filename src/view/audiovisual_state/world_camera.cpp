@@ -82,10 +82,12 @@ void world_camera::tick(
 		//else
 
 		const vec2 target_pos = target_cone.transform.pos + camera_crosshair_offset;
+		const auto target_rotation = target_cone.transform.rotation;
+
 		const vec2 smoothed_part = camera_crosshair_offset;
 
 		last_interpolant.pos = augs::interp(vec2d(last_interpolant.pos), vec2d(smoothed_part), averaging_constant);
-		last_interpolant.rotation = augs::interp(last_interpolant.rotation, target_cone.transform.rotation, averaging_constant);
+		last_interpolant.rotation = augs::interp(last_interpolant.rotation, target_rotation, averaging_constant);
 
 																	   //if ((smoothed_camera_eye.pos - last_interpolant.pos).length() > 5)
 		const vec2 calculated_smoothed_pos = static_cast<vec2>(target_pos - smoothed_part) + last_interpolant.pos;
@@ -105,6 +107,13 @@ void world_camera::tick(
 
 		current_eye.transform.pos = calculated_smoothed_pos;
 		current_eye.transform.rotation = static_cast<float>(calculated_smoothed_rotation);
+
+		if (dont_smooth_once) {
+			current_eye.transform.pos = target_pos;
+			current_eye.transform.rotation = target_rotation;
+
+			last_interpolant.pos = camera_crosshair_offset;
+		}
 	}
 
 	if (entity_to_chase.alive()) {
@@ -119,6 +128,10 @@ void world_camera::tick(
 			if (player_pos != player_position_at_previous_step) {
 				player_position_previously_seen = player_position_at_previous_step;
 				player_position_at_previous_step = player_pos;
+			}
+
+			if (dont_smooth_once) {
+				player_position_previously_seen = player_position_at_previous_step = player_pos;
 			}
 
 			target_value = (player_pos - player_position_previously_seen) * cosm.get_fixed_delta().in_milliseconds();
@@ -145,6 +158,10 @@ void world_camera::tick(
 
 		additional_position_smoothing.target_value = target_value * (-1);
 		additional_position_smoothing.tick(dt, settings.additional_position_smoothing);
+
+		if (dont_smooth_once) {
+			additional_position_smoothing.snap_value_to_target();
+		}
 	}
 
 	if (enable_smoothing) {

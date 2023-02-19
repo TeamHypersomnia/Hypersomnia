@@ -2085,14 +2085,18 @@ void editor_setup::start_playtesting() {
 	const auto spawn_transform = get_camera_eye().transform;
 
 	const auto mouse_dir = (get_world_cursor_pos() - spawn_transform.pos).normalize();
+	(void)mouse_dir;
+
 	new_character.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 		typed_handle.set_logic_transform(spawn_transform);
 		::snap_interpolated_to(typed_handle, spawn_transform);
 
 		if (const auto crosshair = typed_handle.find_crosshair()) {
-			crosshair->base_offset = mouse_dir * 100;
+			crosshair->base_offset = vec2::zero;
 		}
 	});
+
+	cosm.request_resample();
 
 	viewed_character_id = new_character.get_id();
 }
@@ -2116,6 +2120,22 @@ std::optional<camera_eye> editor_setup::find_current_camera_eye() const {
 	}
 
 	return get_camera_eye();
+}
+
+bool editor_setup::can_undo() const {
+	return !history.is_revision_oldest();
+}
+
+bool editor_setup::can_redo() const {
+	return !history.empty() && !history.is_revision_newest();
+}
+
+bool editor_setup::can_resize_nodes() const {
+	return true;
+}
+
+bool editor_setup::can_transform_nodes() const {
+	return true;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

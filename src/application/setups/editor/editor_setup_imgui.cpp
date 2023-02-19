@@ -40,7 +40,17 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 		}
 
 		if (auto menu = scoped_menu("Edit")) {
+			auto item_if = [](const bool condition, const char* label, const char* shortcut = nullptr) {
+				return ImGui::MenuItem(label, shortcut, nullptr, condition);
+			};
 
+			if (item_if(can_undo(), "Undo", "CTRL+Z")) {
+				undo();
+			}
+
+			if (item_if(can_redo(), "Redo", "CTRL+SHIFT+Z")) {
+				redo();
+			}
 		}
 
 		if (auto menu = scoped_menu("Window")) {

@@ -8,7 +8,7 @@ vec2 calc_crosshair_displacement(const E& self, bool consider_recoil_position) {
 		auto considered_base_offset = crosshair->base_offset;
 		const auto& recoil = crosshair->recoil;
 
-		const bool snap_epsilon_base_offset = true;
+		const bool snap_epsilon_base_offset = false;
 
 		if (snap_epsilon_base_offset && considered_base_offset.is_epsilon(4)) {
 			considered_base_offset.set(4, 0);

@@ -309,10 +309,10 @@ namespace test_scenes {
 		rs.factions[faction_type::RESISTANCE].initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 
 		rs.factions[faction_type::METROPOLIS].initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		rs.factions[faction_type::METROPOLIS].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
+		rs.factions[faction_type::METROPOLIS].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
 		rs.factions[faction_type::METROPOLIS].initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
 		rs.factions[faction_type::METROPOLIS].initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
-		rs.factions[faction_type::METROPOLIS].initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
+		rs.factions[faction_type::METROPOLIS].initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::ASSAULT_RATTLE);
 #if 0
 		rs.initial_eq.over_back_wearable = to_entity_flavour_id(test_hand_explosives::BOMB);
 #endif

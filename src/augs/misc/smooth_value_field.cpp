@@ -16,6 +16,5 @@ namespace augs {
 		}
 
 		value = calculated_smoothed_value;
-		discrete_value = value;
 	}
 }

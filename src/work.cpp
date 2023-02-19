@@ -1959,7 +1959,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				cosm.mark_as_resampled();
 
 #if !IS_PRODUCTION_BUILD
-				LOG("Now sampled cosmos has changed.");
+				LOG("RESAMPLE due to a switched cosmos");
 #endif
 			};
 
@@ -1968,6 +1968,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				if (requested_resample || last_sampled_cosmos != now_sampled_cosmos) {
 					resample();
+					gameplay_camera.dont_smooth_once = true;
 				}
 			};
 
