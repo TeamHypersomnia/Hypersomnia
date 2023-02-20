@@ -295,7 +295,7 @@ double debugger_folder::get_inv_tickrate() const {
 		);
 	}
 
-	return 1 / 128.0;
+	return 1 / 60.0;
 }
 
 double debugger_folder::get_audiovisual_speed() const {

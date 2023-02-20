@@ -1,4 +1,5 @@
 #pragma once
+#include "application/arena/choose_arena.h"
 
 using initial_payload = initial_arena_state_payload<false>;
 

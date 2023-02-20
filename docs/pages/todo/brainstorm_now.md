@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- warmup not played when switching maps sometimes and still spectating (in release)
+- fraction_of_step_until_next_step -> next_step_progress_fraction
 
 
 - Remember we can have

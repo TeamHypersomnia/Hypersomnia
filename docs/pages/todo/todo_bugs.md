@@ -5,6 +5,17 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- wrong interpolation values in client setup
+	- But somehow only for fy_minilab
+		- It was probably generated with 128 so the solvable might still have 128 written into it
+		- but only predicted cosmos sometimes shows 128, referential always has 60
+			- how is it possible if the only source of state for predicted is the referential?
+				- maybe referential is somehow updated later? And predicted is only rewritten on mismatch afaik
+				- yeah first both are read from disk, only then is initial state applied
+					- after reading from disk both should have 128
+					- then upon receiving initial, is predicted properly set to 60?
+
+
 - linux bug: neon silhouettes can be seen behind player, probably something to do with drivers
 	- It's a problem with gl_FragCoord: probably stencil on another fbo is somehow flipped
 	- To reverse the problem, one can put the following in fog_of_war.fsh: layout(origin_upper_left) in vec4 gl_FragCoord; 

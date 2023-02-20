@@ -158,7 +158,7 @@ public:
 		bomb_defusal_ruleset bomb_ruleset;
 
 		test_scene_settings settings;
-		settings.scene_tickrate = 128;
+		settings.scene_tickrate = 60;
 
 		{
 			test_mode_ruleset dummy;

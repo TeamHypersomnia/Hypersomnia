@@ -49,7 +49,7 @@
 
 struct config_lua_table;
 
-constexpr double default_inv_tickrate = 1 / 128.0;
+constexpr double default_inv_tickrate = 1 / 60.0;
 
 class client_adapter;
 
@@ -565,7 +565,19 @@ public:
 			return demo_player.timer.fraction_of_step_until_next_step(dt_secs);
 		}
 
-		return std::min(1.0, (get_current_time() - client_time) / dt_secs);
+		/* 
+			0 = step is exactly a delta away (current = client_time - dt_secs)
+			1 = step should happen now       (current = client_time)
+
+			Will never be less than 0 because client_time is only ever incremented by dt_secs 
+				conditional upon that it is LESS than current_time
+
+			if current = client_time then
+			ratio = (client_time - (client_time - dt_secs)) / dt_secs = 1
+		*/
+
+		const auto at_0 = client_time - dt_secs;
+		return (get_current_time() - at_0) / dt_secs;
 	}
 
 	const_entity_handle get_viewed_character() const {

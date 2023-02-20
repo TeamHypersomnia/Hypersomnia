@@ -15,8 +15,6 @@
 
 #include "augs/readwrite/memory_stream.h"
 
-#include "application/arena/choose_arena.h"
-
 #include "augs/filesystem/file.h"
 
 #include "augs/gui/text/printer.h"
