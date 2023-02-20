@@ -70,6 +70,7 @@ message_handler_result client_setup::handle_server_payload(
 
 			/* Prepare the predicted cosmos. */
 			predicted_cosmos = scene.world;
+			predicted_mode = current_mode;
 		}
 
 		sv_solvable_vars = new_vars;
