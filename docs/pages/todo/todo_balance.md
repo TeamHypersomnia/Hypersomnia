@@ -43,3 +43,9 @@ summary: Balancing issues to be solved.
 	- Price can stay the same
 	- We need people to fear the awp
 
+
+- Zamiec/pro90 need a buff because they're never used
+	- less recoil probably to both
+	- more muzzle velocity for zamiec
+		- nah, let's keep them CQB
+	- more ammo for cyberspray
