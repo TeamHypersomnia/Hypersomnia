@@ -3008,7 +3008,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4000.f, 4100.f};
+			gun_def.muzzle_velocity = {4100.f, 4200.f};
 			gun_def.shot_cooldown_ms = 61.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3062,7 +3062,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ZAMIEC_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4400.f, 4400.f};
+			gun_def.muzzle_velocity = {4550.f, 4550.f};
 			gun_def.shot_cooldown_ms = 75.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3118,7 +3118,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4050.f, 4700.f};
+			gun_def.muzzle_velocity = {4150.f, 4800.f};
 			gun_def.shot_cooldown_ms = 40.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3290,7 +3290,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 4.0f;
 			gun_def.gunshot_adds_heat = 0.2f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.4f;
-			gun_def.recoil_multiplier = 0.8f;
+			gun_def.recoil_multiplier = 0.5f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(150);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);

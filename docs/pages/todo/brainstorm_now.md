@@ -6,7 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- warmup not played when switching maps sometimes and still spectating (in release)
+- stronger highlight for icons? hover/activated is almost invisible
+- silly idea but until we have a geometry editor we could have default colliders in various shapes
+	- e.g. triangle_wood_collider
+	- sucks that we can't set material per entity but screw it, we can list all properly, there won't be many of these
+		- won't hurt to support it longterm as it will be basically blank texture
+	- then we can resize/rotate it as we will which I think already works with physical shapes (e.g. crates can be resized)
+- toggle sound
 - fraction_of_step_until_next_step -> next_step_progress_fraction
 
 
