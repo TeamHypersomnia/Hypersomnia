@@ -16,6 +16,7 @@
 #include "game/inferred_caches/tree_of_npo_cache.hpp"
 #include "game/inferred_caches/organism_cache.hpp"
 #include "game/inferred_caches/organism_cache_query.hpp"
+#include "game/detail/get_hovered_world_entity.h"
 
 void movement_path_system::advance_paths(const logic_step step) const {
 	if (!step.get_settings().simulate_decorative_organisms) {
@@ -55,6 +56,32 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto origin = cosm[movement_path.origin];
 
 				if (origin.dead()) {
+					movement_path.origin = ::get_hovered_world_entity(
+						cosm,
+						transform.pos,
+						[&](const auto area_id) {
+							if (const auto area_entity = cosm[area_id]) {
+								if (const auto area = area_entity.template find<invariants::box_marker>()) {
+									if (area->type == area_marker_type::ORGANISM_AREA) {
+										return true;
+									}
+								}
+							}
+
+							return false;
+						},
+						render_layer_filter::whitelist(render_layer::AREA_MARKERS),
+						accuracy_type::EXACT,
+						{ { tree_of_npo_type::RENDERABLES } }
+					);
+
+					// LOG("New origin for %x: %x", subject, cosm[movement_path.origin]);
+
+					/*
+						Return so that we notice a frozen organism 
+						if for some reason origin gets reset every frame.
+					*/
+
 					return;
 				}
 

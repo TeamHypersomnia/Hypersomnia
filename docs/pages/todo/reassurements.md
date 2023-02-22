@@ -5,6 +5,9 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- Note that an occassional static wall intersecting another static wall won't break lighting, the raycasts will just miss it
+	- It's only important that we have a proper vertex at the corner
+
 - For now don't worry about maximum texture size, it's enough until DM
 	- In production, we will always reserve max used ever on startup
 		- we'll reserve the maximum (which will probably be half the maximum texture GPU size)

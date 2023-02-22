@@ -6,6 +6,23 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Entity types to add later once we won't break abi
+	- CALLOUT WITH ITS NAME IN THE COMPONENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	- Plain sprited bodies but with arbitrary polygons per-entity, obviously
+	- Dynamic decorations but non-organism like, we should have a specific entity for an organism
+		- Pointless for them to be processed just like static animations
+
+- Filters window
+	- Visible
+		- (Checkboxes) Backgrounds Physical Foregrounds
+	- Selectable
+		- (Checkboxes) Backgrounds Physical Foregrounds
+
+- When resizing, might be a good idea to determine edges based on total aabb of selected entities
+
+- honor playtesting spawns
+- stronger highlight for icons? hover/activated is almost invisible
+
 - Grenades could/should have very low restitution against player bodies
 - Laser should switch to the knife/grenade being thrown when it is done with a gun in another hand
 	- Actually just disable the second laser then because there are both now

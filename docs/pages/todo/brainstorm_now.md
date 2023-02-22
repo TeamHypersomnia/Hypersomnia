@@ -6,7 +6,28 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- stronger highlight for icons? hover/activated is almost invisible
+- Aquarium - We only really need to think how we'd do it manually and support it in the editor
+	- The rest is only about automatized placement, we shouldn't worry about these two simultaneously
+
+- Is our model still incomplete?
+	- If we allow specifying custom resources in the aquarium node,
+		- we will need to implement the non-physical override for the officials as well
+	- Also think where creating organisms fits into this all
+		- Are they just in the foreground domain? (esp. the insects must be foreground)
+	- We shouldn't worry about duplicate flavours
+		- at least the image defs won't be reused
+		
+- Cover ground neons per-entity?
+	- Only foregrounds will need it on a second thought
+	- Consider making anything foreground cover the ground neons by default, but I don't know how we'll do it
+	- When something needs to cover ground neons per-entity it's usually static
+		- So we can do the job with a static neon occluder
+			- Although that's PITA when we want to move the entity so maybe let's have per-entity switch after all
+
+- For now let's just add all insects to officials so we don't have to make gui for editing organisms
+	- We'll reproduce the entire garden in officials along with flowers etc
+
+
 - silly idea but until we have a geometry editor we could have default colliders in various shapes
 	- e.g. triangle_wood_collider
 	- sucks that we can't set material per entity but screw it, we can list all properly, there won't be many of these
@@ -15,12 +36,6 @@ summary: That which we are brainstorming at the moment.
 
 - The physical shape editor simply specifies the default shape
 	- This shape overrides what would be shown with the standard in-world geometry editor
-
-- If we have just a single entity selected, check for available operations
-	- Or entities of the same type
-		- e.g. disable resizing on weapons and complex objects
-	- Disable resizing on point markers as well
-		- actually leave flipping for spawns and other stuff that has rotation
 
 - Ctrl + Scroll could move nodes up/down
 	- We could save it in Edit menu (Move Up in Layers) so we don't forget
@@ -38,7 +53,6 @@ summary: That which we are brainstorming at the moment.
 		- the clapperboard might actually just be to host the server and play will enter the game
 			- when ip shows it will be a nice feedback that the server was hosted
 
-
 - we could as well have a separate window for things like project-wide playtest settings 
 	- even though it will technically be a project setting
 	- but won't hurt to have some specific settings separately from inspector i guess
@@ -55,32 +69,8 @@ summary: That which we are brainstorming at the moment.
 	- default guns/faction could be customized too
 	- default spawn node setting will override the spawning at view-center 
 		- it will be a project setting
-		- 
-
-- Perhaps honor only visible playtest spawns
-	- also ignore the team spawns
-	- technically it already does since we're teleporting
-
-- When resizing, might be a good idea to determine edges based on aabb of selected entities
 
 - Mirroring works differently than flipping for animated sprites, but that's probably because we don't have flip property in dynamic decorations
-
-- I don't think it will be bad if we just make it a plain click-to-open combo popup with icons attached
-	- even aseprite works on click
-	- Yeah really it's only a tutorial because you really should memorize those hotkeys and they will be easy to remember
-
-- Let's have a toolbar first so we can enter playtesting from there
-	- View->Toolbar for disabling
-		- Pro mappers will disable it because everything can be controlled with shortcuts
-		- And the * mark will communicate unsaved changes
-	- Let's make it a window actually
-		- Will be easier because we'd have to adjust the dockable space
-		- Will save space too
-		- Being able to move it is a plus
-		- Should be easy to make the buttons adapt to the sizes
-			- Playtest button doesn't need to have a text attached really if it makes it harder to adapt the buttons
-	- toolbar expandable buttons
-		- must work like combobox or it might go offscreen
 
 - Playtesting
 	- Alright let's do this, it will be rewarding anyway
@@ -91,52 +81,11 @@ summary: That which we are brainstorming at the moment.
 		- Maybe notify by default and only hide notifications for passworded servers?
 		- For now it would be good to always see if someone's making a server so let's notify by default
 			- Won't really be accidentally 'spammable' as you'll have to save the changes first and maybe fix warnings/meet the conditions for game mode etc
-		
-
-
-- Simple toolbar with all possible operations with immediate tooltips
-	- Maybe disable rotations/resizing on special resources
-
-- Cover ground neons per-entity?
-	- Only foregrounds will need it on a second thought
-	- Consider making anything foreground cover the ground neons by default, but I don't know how we'll do it
-	- When something needs to cover ground neons per-entity it's usually static
-		- So we can do the job with a static neon occluder
-			- Although that's PITA when we want to move the entity so maybe let's have per-entity switch after all
-
-- Let's keep the unvariantized structs as_physical and as_nonphysical and let them both go to json
-	- Pro: we might later decide to let nodes override domains after all
-		- Then we'll be ready for it
-		- With componentized render invariant it will take only 2 flavors instead of 3
-	- Pro: it sounds like a nice idiom to be able to modify this sprite's behavior in all domains
-		- The selected domain is just the default
-	- Con: not really any
-		- There might be repetition in fields that have different defaults
-		- But there would still be if we e.g. created a new sprite resource type (meh)
-		- And the only alternative would be std::optional shenanigans
-			- This wouldn't even let us have both behaviors saved if they differ
-
-- Now that I think of it, from the point of view of JSON api, it will look nice to have physics = {}
-	- We might not want to variantize it in case we want to go back to physics domain
-	- So we want to serialize it all
-- Or we might want to have a separate sprite resource type at all
-
-- Note that an occassional static wall intersecting another static wall won't break lighting, the raycasts will just miss it
-	- It's only important that we have a proper vertex at the corner
-
-- For now let's just add all insects to officials so we don't have to make gui for editing organisms
-	- We'll reproduce the entire garden in officials along with flowers etc
 
 - Json readwrite and ignoring defaults
 	- With reads it is really simple, if we read e.g. a physical resource we can set the default before reading directly into it
 	- The best default provider would be just the default type
 	- We might have a per-type default provider passed to write_json
-
-- Special render functions - we might have different defaults for physical and non-physical sprite
-	- Set defaults when switching domains?
-		- Switching domains is a major operation so I think it would be okay
-		- We might have different "hypothetical defaults" too
-			- Well a hypothetical default will always be a sprite so no
 
 - The whole idea of overrides is stupid af it'll just complicate our editor arch
 	- We'll just have to copy the file and be done with it, atlas will be easily able to recognize it
@@ -148,11 +97,6 @@ summary: That which we are brainstorming at the moment.
 - Uhh can't we force just separate resources?
 	- The domain overrides complicate the shit out of creation pipeline
 	- We could later have virtual resources
-
-- How do we spec the organisms?
-	- We thought of a separate domain
-	- But that sucks because an organism can be either background or foreground as well (think insects vs underwater aquarium)
-	- So we'll just have a tick like with neon map: Organism behavior (advanced)
 
 - Note that even if we wanted to make this aquarium manually
 	- we'd still need those lab walls with overridden domain
@@ -173,17 +117,6 @@ summary: That which we are brainstorming at the moment.
 		- Only thing left is how we think of organisms here because the physical domains won't specify moving organisms
 			- Although insect sprites will always be foreground so I don't get the problem
 			- It's just whether we want to make it a separate domain, maybe yes? Organism could be both bg and fg
-	
-- Aquarium - We only really need to think how we'd do it manually and support it in the editor
-	- The rest is only about automatized placement, we shouldn't worry about these two simultaneously
-
-- Is our model still incomplete?
-	- If we allow specifying custom resources in the aquarium node,
-		- we will need to implement the non-physical override for the officials as well
-	- Also think where creating organisms fits into this all
-		- Are they just in the foreground domain? (esp. the insects must be foreground)
-	- We shouldn't worry about duplicate flavours
-		- at least the image defs won't be reused
 
 
 - A node should have an option to make it non-physical
@@ -225,69 +158,6 @@ summary: That which we are brainstorming at the moment.
 
 
 - Maybe ask during Q&A if we should indeed reset the tab or not
-
-- We should also assign the organism automatically to the bound so it's intuitive
-
-- I'd have atlantis/metropolis spawn as defaults, this will avoid some renames
-	- Wait
-		- Consider this:
-			- Someone creates a nice spawn and wants to mirror it
-			- Now they want to change the faction
-			- They'd either:
-				- need to change the resource of the node which is counterintuitive
-				- Or change the associated faction in the node and let a metropolis node be associated with a resource called resistance spawn etc
-					- ridiculous
-		- So let's just leave it at that
-		- Mass renames will fix ergonomics and like I said it won't even be used that much
-	- Let's be real, this won't be used very much since we'll h
-	- it'll only look nice in the official collection
-
-- Entity types to add later once we won't break abi
-	- CALLOUT WITH ITS NAME IN THE COMPONENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	- Plain sprited bodies but with arbitrary polygons per-entity, obviously
-	- Dynamic decorations but non-organism like, we should have a specific entity for an organism
-		- Pointless for them to be processed just like static animations
-
-- Separate resource types for area/point markers?
-	- Point markers can have rotation too! e.g. spawns
-	- We should absolutely support rotation
-	- The only reason against so far is more code bloat but that's irrelevant
-	- Look, it will never make sense to change an area marker to a point marker and vice versa
-	- And the transformation logic will be cleaner
-
-- Alright final verdict - let's have A/B/C and assigned team as parameters
-	- Pros
-		- Less clutter in special filesystem view
-		- Less clutter in enums
-		- Implied optionality in the choice of letters instead of forcing someone to choose
-		- Assoicated faction - NEUTRAL could also serve the purpose of neutral FFA spawns
-		- Letters will also be reused for domination points etc
-
-
-- Decide whether we have separate entries for teams or just "Buyzone" and "Team spawn"
-	- Separate entries encourage making the critical choice straight away
-	- On the contrary it makes it harder to later just change team of the spawnpoint
-		- Although this would be extremely unlikely and maybe it's even better
-		- Later even team spawns might have some characteristics?
-			- E.g. preferred bomber spawn
-			- So it would make sense to make team inherent property of the marker rather than just parameter
-	- Well technically we have assigned_faction in the cosoms
-
-- There's no metadata attached to markers except for their type
-	- We even had weapon generators attached to the componend (maybe used for fy minilab? not sure)
-		- Checked through removing and recompiling, it is indeed unused
-	- So they can easily be strictly official and just have dropdown type
-	- We wouldn't even need separate categories in filesystem technically
-		- though it will be nice to browse
-		- we'll have to create a flavour for each possible enum but it's okay
-		- what about changing their type as nodes later? Do we allow it?
-			- Perhaps
-			- Yes, I think changing is no different than deleting in that regard
-			- And we anyway allow changing way more important things like background->physical and back
-
-- How do we classify area markers?
-	- Do we just have a area markers and point markers special objects in officials?
-		- I think these will be strictly official too
 
 - Actually map could have in its settings two checkboxes:
 	- Include all invisible layers

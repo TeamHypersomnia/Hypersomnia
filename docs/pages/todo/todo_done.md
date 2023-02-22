@@ -4914,3 +4914,118 @@ Advantages:
 - toggle sound
 
 - Settings->Editor should edit Editor settings not Debugger
+- If we have just a single entity selected, check for available operations
+	- Or entities of the same type
+		- e.g. disable resizing on weapons and complex objects
+	- Disable resizing on point markers as well
+		- actually leave flipping for spawns and other stuff that has rotation
+
+- I don't think it will be bad if we just make it a plain click-to-open combo popup with icons attached
+	- even aseprite works on click
+	- Yeah really it's only a tutorial because you really should memorize those hotkeys and they will be easy to remember
+
+- Let's have a toolbar first so we can enter playtesting from there
+	- View->Toolbar for disabling
+		- Pro mappers will disable it because everything can be controlled with shortcuts
+		- And the * mark will communicate unsaved changes
+	- Let's make it a window actually
+		- Will be easier because we'd have to adjust the dockable space
+		- Will save space too
+		- Being able to move it is a plus
+		- Should be easy to make the buttons adapt to the sizes
+			- Playtest button doesn't need to have a text attached really if it makes it harder to adapt the buttons
+	- toolbar expandable buttons
+		- must work like combobox or it might go offscreen
+
+- Simple toolbar with all possible operations with immediate tooltips
+	- Maybe disable rotations/resizing on special resources
+
+- Let's keep the unvariantized structs as_physical and as_nonphysical and let them both go to json
+	- Pro: we might later decide to let nodes override domains after all
+		- Then we'll be ready for it
+		- With componentized render invariant it will take only 2 flavors instead of 3
+	- Pro: it sounds like a nice idiom to be able to modify this sprite's behavior in all domains
+		- The selected domain is just the default
+	- Con: not really any
+		- There might be repetition in fields that have different defaults
+		- But there would still be if we e.g. created a new sprite resource type (meh)
+		- And the only alternative would be std::optional shenanigans
+			- This wouldn't even let us have both behaviors saved if they differ
+- Now that I think of it, from the point of view of JSON api, it will look nice to have physics = {}
+	- We might not want to variantize it in case we want to go back to physics domain
+	- So we want to serialize it all
+- Or we might want to have a separate sprite resource type at all
+
+
+- Special render functions - we might have different defaults for physical and non-physical sprite
+	- Set defaults when switching domains?
+		- Switching domains is a major operation so I think it would be okay
+		- We might have different "hypothetical defaults" too
+			- Well a hypothetical default will always be a sprite so no
+
+- How do we spec the organisms?
+	- We thought of a separate domain
+	- But that sucks because an organism can be either background or foreground as well (think insects vs underwater aquarium)
+	- So we'll just have a tick like with neon map: Organism behavior (advanced)
+
+- Perhaps honor only visible playtest spawns
+	- also ignore the team spawns
+	- technically it already does since we're teleporting
+	- for now we spawn at the center
+
+- I'd have atlantis/metropolis spawn as defaults, this will avoid some renames
+	- Wait
+		- Consider this:
+			- Someone creates a nice spawn and wants to mirror it
+			- Now they want to change the faction
+			- They'd either:
+				- need to change the resource of the node which is counterintuitive
+				- Or change the associated faction in the node and let a metropolis node be associated with a resource called resistance spawn etc
+					- ridiculous
+		- So let's just leave it at that
+		- Mass renames will fix ergonomics and like I said it won't even be used that much
+	- Let's be real, this won't be used very much since we'll h
+	- it'll only look nice in the official collection
+
+- Separate resource types for area/point markers?
+	- Point markers can have rotation too! e.g. spawns
+	- We should absolutely support rotation
+	- The only reason against so far is more code bloat but that's irrelevant
+	- Look, it will never make sense to change an area marker to a point marker and vice versa
+	- And the transformation logic will be cleaner
+
+- Alright final verdict - let's have A/B/C and assigned team as parameters
+	- Pros
+		- Less clutter in special filesystem view
+		- Less clutter in enums
+		- Implied optionality in the choice of letters instead of forcing someone to choose
+		- Assoicated faction - NEUTRAL could also serve the purpose of neutral FFA spawns
+		- Letters will also be reused for domination points etc
+
+
+- Decide whether we have separate entries for teams or just "Buyzone" and "Team spawn"
+	- Separate entries encourage making the critical choice straight away
+	- On the contrary it makes it harder to later just change team of the spawnpoint
+		- Although this would be extremely unlikely and maybe it's even better
+		- Later even team spawns might have some characteristics?
+			- E.g. preferred bomber spawn
+			- So it would make sense to make team inherent property of the marker rather than just parameter
+	- Well technically we have assigned_faction in the cosoms
+- There's no metadata attached to markers except for their type
+	- We even had weapon generators attached to the componend (maybe used for fy minilab? not sure)
+		- Checked through removing and recompiling, it is indeed unused
+	- So they can easily be strictly official and just have dropdown type
+	- We wouldn't even need separate categories in filesystem technically
+		- though it will be nice to browse
+		- we'll have to create a flavour for each possible enum but it's okay
+		- what about changing their type as nodes later? Do we allow it?
+			- Perhaps
+			- Yes, I think changing is no different than deleting in that regard
+			- And we anyway allow changing way more important things like background->physical and back
+
+- How do we classify area markers?
+	- Do we just have a area markers and point markers special objects in officials?
+		- I think these will be strictly official too
+
+- We should also assign the organism automatically to the bound so it's intuitive
+

@@ -615,6 +615,12 @@ void editor_setup::rebuild_scene() {
 		might point to other entities after toggling visibility.
 	*/
 
+	/*
+		Some node-generating funcitons need a logic_step.
+		Therefore we have no choice but to fully step the cosmos with a standard solver
+		so that we have a logic_step to be passed.
+	*/
+
 	auto entropy = cosmic_entropy();
 	auto step_input = logic_step_input { scene.world, entropy, solve_settings() };
 	auto solver = standard_solver();

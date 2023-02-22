@@ -34,16 +34,18 @@ entity_id get_hovered_world_entity(
 	const cosmos& cosm,
 	const vec2 world_cursor_position,
 	F&& is_hoverable,
-	const augs::maybe<render_layer_filter>& filter
+	const augs::maybe<render_layer_filter>& filter,
+	accuracy_type accuracy = accuracy_type::EXACT,
+	tree_of_npo_filter tree_filter = tree_of_npo_filter::all_drawables()
 ) {
 	auto& entities = thread_local_visible_entities();
 
 	entities.reacquire_all({
 		cosm,
 		camera_cone(camera_eye(world_cursor_position, 1.f), vec2i::square(1)),
-		accuracy_type::EXACT,
+		accuracy,
 		filter,
-		tree_of_npo_filter::all_drawables()
+		tree_filter
 	});
 
 	entities.sort(cosm);
