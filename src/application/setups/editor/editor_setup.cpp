@@ -274,6 +274,8 @@ bool editor_setup::handle_input_before_game(
 
 				case key::N: create_new_layer(); return true;
 
+				case key::U: gui.request_toggle_sounds_preview = true; return true;
+
 				case key::C: duplicate_selection(); return true;
 				case key::D: cut_selection(); return true;
 				case key::DEL: delete_selection(); return true;
@@ -412,6 +414,7 @@ vec2 editor_setup::get_world_cursor_pos(const camera_eye eye) const {
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", project.meta.name);
+
 	if (is_playtesting()) {
 
 	}
@@ -419,6 +422,8 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.drawing.draw_area_markers.is_enabled = false;
 		config.drawing.draw_aabb_highlighter = false;
 		config.interpolation.enabled = false;
+		
+		config.sound.allow_sounds_without_character_listener = gui.sounds_preview;
 	}
 }
 
@@ -2192,6 +2197,10 @@ bool editor_setup::should_warp_cursor_before_duplicating() const {
 	}
 
 	return true;
+}
+
+void editor_setup::toggle_sounds_preview() {
+	gui.sounds_preview = !gui.sounds_preview;
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

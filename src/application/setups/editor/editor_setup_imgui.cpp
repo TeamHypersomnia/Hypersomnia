@@ -189,6 +189,10 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 				gui.toolbar.toggle();
 			}
 
+			if (ImGui::MenuItem("Sounds preview", "U", gui.sounds_preview, true)) {
+				toggle_sounds_preview();
+			}
+
 			const bool grid_enabled = is_grid_enabled();
 			const bool snapping_enabled = is_snapping_enabled();
 
@@ -230,6 +234,12 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 
 custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	(void)in;
+
+	if (gui.request_toggle_sounds_preview) {
+		gui.request_toggle_sounds_preview = false;
+
+		toggle_sounds_preview();
+	}
 
 	if (is_playtesting() && gui.playtest_immersive) {
 		return custom_imgui_result::NONE;

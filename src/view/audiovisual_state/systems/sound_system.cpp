@@ -224,6 +224,10 @@ bool sound_system::generic_sound_cache::should_play(const update_properties_inpu
 		return target_faction == faction_type::SPECTATOR || faction == target_faction;
 	}
 	else {
+		if (!in.settings.allow_sounds_without_character_listener) {
+			return false;
+		}
+
 		const auto target_faction = original.start.listener_faction;
 
 		if (target_faction != faction_type::SPECTATOR) {
@@ -796,6 +800,11 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			fade_or_stop(cache);
 			return true;
 		}
+		
+		if (!cache.should_play(in)) {
+			fade_or_stop(cache);
+			return true;
+		}
 
 		const bool result = update_facade(cache);
 
@@ -881,6 +890,11 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		}
 
 		if (recorded.name != handle.get_name()) {
+			fade_or_stop(cache);
+			return true;
+		}
+
+		if (!cache.should_play(in)) {
 			fade_or_stop(cache);
 			return true;
 		}

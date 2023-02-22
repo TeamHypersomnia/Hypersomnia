@@ -77,6 +77,9 @@ struct editor_gui {
 	editor_toolbar_gui toolbar = std::string("Toolbar");
 
 	bool playtest_immersive = true;
+	bool sounds_preview = true;
+
+	bool request_toggle_sounds_preview = false;
 	// END GEN INTROSPECTOR
 };
 
@@ -665,4 +668,6 @@ public:
 	void warp_cursor_to_center(augs::window&);
 	bool can_resize_selected_nodes() const;
 	bool should_warp_cursor_before_duplicating() const;
+
+	void toggle_sounds_preview();
 };
