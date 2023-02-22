@@ -7,9 +7,11 @@ struct editor_command_meta {
 };
 
 class editor_setup;
+struct editor_settings;
 
 struct editor_command_input {
 	editor_setup& setup;
+	editor_settings& settings;
 	bool skip_inspector;
 };
 

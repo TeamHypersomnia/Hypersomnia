@@ -4912,3 +4912,5 @@ Advantages:
 
 - fraction_of_step_until_next_step -> next_step_progress_fraction
 - toggle sound
+
+- Settings->Editor should edit Editor settings not Debugger

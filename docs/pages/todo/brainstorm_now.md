@@ -25,8 +25,6 @@ summary: That which we are brainstorming at the moment.
 - Ctrl + Scroll could move nodes up/down
 	- We could save it in Edit menu (Move Up in Layers) so we don't forget
 
-- Settings->Editor should edit Editor settings not Debugger
-
 - Server playtesting
 	- Once we hit clapperboard once, "Play" could automatically refresh the server
 	- Let the other player still play once we go back to editing mode

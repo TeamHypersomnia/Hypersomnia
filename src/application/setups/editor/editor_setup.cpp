@@ -824,7 +824,7 @@ editor_node_id editor_setup::get_topmost_inspected_node() const {
 }
 
 editor_command_input editor_setup::make_command_input(const bool skip_inspector) {
-	return { *this, skip_inspector };
+	return { *this, settings, skip_inspector };
 }
 
 void editor_setup::seek_to_revision(const editor_history::index_type n) {
