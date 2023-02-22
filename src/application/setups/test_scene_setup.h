@@ -52,7 +52,7 @@ public:
 	}
 
 	auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
+		return timer.next_step_progress_fraction(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
 	}
 
 	auto get_viewed_character_id() const {

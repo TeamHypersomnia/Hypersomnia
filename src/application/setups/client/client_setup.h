@@ -562,7 +562,7 @@ public:
 		const auto dt_secs = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
 
 		if (is_replaying()) {
-			return demo_player.timer.fraction_of_step_until_next_step(dt_secs);
+			return demo_player.timer.next_step_progress_fraction(dt_secs);
 		}
 
 		/* 

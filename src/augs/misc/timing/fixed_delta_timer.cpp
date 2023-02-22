@@ -59,7 +59,7 @@ namespace augs {
 		return result;
 	}
 
-	double fixed_delta_timer::fraction_of_step_until_next_step(const double dt_secs) const {
+	double fixed_delta_timer::next_step_progress_fraction(const double dt_secs) const {
 		if (dt_secs <= AUGS_EPSILON<double>) {
 			return 0.f;
 		}

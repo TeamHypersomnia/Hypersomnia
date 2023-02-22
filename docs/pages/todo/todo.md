@@ -6,6 +6,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Grenades could/should have very low restitution against player bodies
+- Laser should switch to the knife/grenade being thrown when it is done with a gun in another hand
+	- Actually just disable the second laser then because there are both now
+
 ## Editor final MVP once we can ditch old maps
 
 - Let's make sprite's special effect a boolset

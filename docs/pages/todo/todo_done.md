@@ -4910,3 +4910,5 @@ Advantages:
 				- plus it will be faster to just slide an alpha instead of entering a numerical value or opening picker
 
 
+- fraction_of_step_until_next_step -> next_step_progress_fraction
+- toggle sound

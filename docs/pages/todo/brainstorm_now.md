@@ -12,12 +12,6 @@ summary: That which we are brainstorming at the moment.
 	- sucks that we can't set material per entity but screw it, we can list all properly, there won't be many of these
 		- won't hurt to support it longterm as it will be basically blank texture
 	- then we can resize/rotate it as we will which I think already works with physical shapes (e.g. crates can be resized)
-- toggle sound
-- fraction_of_step_until_next_step -> next_step_progress_fraction
-
-
-- Remember we can have
-	
 
 - The physical shape editor simply specifies the default shape
 	- This shape overrides what would be shown with the standard in-world geometry editor

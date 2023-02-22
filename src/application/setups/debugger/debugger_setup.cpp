@@ -71,7 +71,7 @@ const cosmos& debugger_setup::get_viewed_cosmos() const {
 }
 
 double debugger_setup::get_interpolation_ratio() const {
-	return anything_opened() ? player().get_timer().fraction_of_step_until_next_step(folder().get_inv_tickrate()) : 1.0;
+	return anything_opened() ? player().get_timer().next_step_progress_fraction(folder().get_inv_tickrate()) : 1.0;
 }
 
 entity_id debugger_setup::get_viewed_character_id() const {
