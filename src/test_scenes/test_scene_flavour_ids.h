@@ -260,6 +260,10 @@ enum class test_dynamic_decorations {
 	DRAGON_FISH,
 	WATER_CAUSTICS,
 
+	BUTTERFLY,
+	CICADA,
+	MOTA,
+
 	FLOWER_PINK,
 	FLOWER_CYAN,
 

@@ -166,7 +166,7 @@ void wandering_pixels_system::advance_for(
 		if (wandering.force_particles_within_bounds) {
 			const auto velocity = p.pos - prev_pos;
 
-			p.pos += augs::steer_to_avoid_edges(
+			auto steer_result = augs::steer_to_avoid_edges(
 				velocity,
 				p.pos,
 				current_reach.get_vertices(),
@@ -174,6 +174,8 @@ void wandering_pixels_system::advance_for(
 				30.f,
 				1.f
 			);
+
+			p.pos += steer_result.seek_vector;
 		}
 	}
 }

@@ -67,6 +67,25 @@ void setup_entity_from_node(
 	(void)resource;
 }
 
+template <class N, class R, class H>
+void setup_entity_from_node_post_construct(
+	const N& node, 
+	const R& resource,
+	H& handle
+) {
+	(void)resource;
+
+	if constexpr(std::is_same_v<N, editor_sprite_node>) {
+		if (auto anim = handle.template find<components::animation>()) {
+			if (!node.editable.randomize_starting_animation_frame) {
+				anim->state.frame_num = 0;
+			}
+
+			anim->speed_factor *= node.editable.animation_speed_factor;
+		}
+	}
+}
+
 template <class R, class F>
 void allocate_flavours_and_assets_for_resource(
 	const R& resource,
@@ -589,15 +608,25 @@ void editor_setup::rebuild_scene() {
 						);
 					};
 
+					auto entity_from_node_post_construct = [&]<typename H>(const H& handle) {
+						::setup_entity_from_node_post_construct(
+							typed_node, 
+							resource,
+							handle
+						);
+					};
+
 					std::visit(
 						[&](const auto& typed_flavour_id) {
-							const auto new_id = cosmic::specific_create_entity(
+							const auto new_handle = cosmic::specific_create_entity(
 								scene.world,
 								typed_flavour_id,
 								entity_from_node
-							).get_id();
+							);
 
-							setup_node_entity_mapping(new_id);
+							entity_from_node_post_construct(new_handle);
+
+							setup_node_entity_mapping(new_handle.get_id());
 						},
 						resource->scene_flavour_id
 					);

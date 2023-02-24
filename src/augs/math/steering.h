@@ -117,6 +117,11 @@ namespace augs {
 		return vec2(avoidance).set_length(avoidance_force * std::max(0.f, 1.f - (danger_dist / comfort_zone)));
 	}
 
+	struct steer_to_avoid_result {
+		vec2 seek_vector;
+		bool hit_edge = false;
+	};
+
 	template <class V, class C>
 	inline auto steer_to_avoid_edges(
 		const vec2 velocity,
@@ -151,17 +156,22 @@ namespace augs {
 
 		auto dir_mult = std::max(0.f, 1.f - dist_to_closest / max_dist_to_avoid) * force_multiplier;
 
+		steer_to_avoid_result result;
+
 		if (pos_outside) {
 			/* Protect from going outside */
 			dir_mult = 1.f;
+			result.hit_edge = true;
 		}
 
-		return augs::seek(
+		result.seek_vector = augs::seek(
 			velocity,
 			position,
 			center,
 			velocity.length()
 		) * dir_mult;
+
+		return result;
 	}
 
 }

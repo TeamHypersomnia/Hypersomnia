@@ -46,6 +46,7 @@
 
 #include "augs/readwrite/json_readwrite.h"
 #include "game/detail/flavour_presentation.h"
+#include "game/inferred_caches/organism_cache.hpp"
 
 static bool reported = false;
 
@@ -1185,6 +1186,33 @@ namespace test_scenes {
 			test_scene_node { world, test_dynamic_decorations::CONSOLE_LIGHT }
 		).ro()
 		.next(test_sound_decorations::HUMMING_DISABLED);
+
+		{
+			auto insects_origin = transformr({ 500, 213 }, 0);
+			auto insects_size = vec2(2000, 1000);
+
+			auto insects_area = create(test_box_markers::ORGANISM_AREA, insects_origin).set_logical_size(insects_size);
+
+			auto create_insect = [&](auto t, auto off, auto rot) {
+				const auto decor = create(t, transformr(insects_origin.pos + off, rot));
+				const auto secs = real32(decor.template get<components::animation>().state.frame_num) * 12.23f;
+
+				decor.template get<components::movement_path>().origin = insects_area.get_id();
+				decor.template get<components::sprite>().effect_offset_secs = secs;
+				return decor;
+			};
+
+			auto rr = world.get_rng_for({});
+
+			for (int bbb = 0; bbb < 4; ++bbb) {
+				auto hx = insects_size.x / 2;
+				auto hy = insects_size.y / 2;
+
+				create_insect(test_dynamic_decorations::BUTTERFLY, vec2(rr.randval(-hx, hx), rr.randval(-hy, hy)), rr.randval(-180, 180));
+				create_insect(test_dynamic_decorations::CICADA, vec2(rr.randval(-hx, hx), rr.randval(-hy, hy)), rr.randval(-180, 180));
+				create_insect(test_dynamic_decorations::MOTA, vec2(rr.randval(-hx, hx), rr.randval(-hy, hy)), rr.randval(-180, 180));
+			}
+		}
 
 		save_all_reported_weapons();
 	}

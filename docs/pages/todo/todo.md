@@ -6,6 +6,16 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Make throwing headshots more consistent by considering e.g. the center of the rattle, the velocity of the rattle and head center
+	- Actually not the center of the rattle
+		- Whenever a bullet/thrown item is spawned, register current trajectory
+			- Except for homing missiles, not sure how headshots should be handled here, the old way could work
+				- Actually it could work - if it's homing (so changed trajectory) never register the headshot, only on direct hit
+	- All headshot/ricochet detection will benefit from it because there's no measure that is more accurate
+		- Except for ricochets on the homing missiles, we should calculate it by the current velocity etc
+			- Even though realistically once it starts to "home" there won't be any ricochets remaining
+
+	- On ricochet, we'll just have to update the trajectory
 - Entity types to add later once we won't break abi
 	- CALLOUT WITH ITS NAME IN THE COMPONENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	- Plain sprited bodies but with arbitrary polygons per-entity, obviously

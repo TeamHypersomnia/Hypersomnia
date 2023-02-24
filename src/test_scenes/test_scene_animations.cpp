@@ -769,6 +769,24 @@ void load_test_scene_animations(
 			50.0f
 		);
 
+		make_plain(
+			test_id_type::BUTTERFLY,
+			test_scene_image_id::BUTTERFLY_1,
+			30.0f
+		);
+
+		make_plain(
+			test_id_type::CICADA,
+			test_scene_image_id::CICADA_1,
+			30.0f
+		);
+
+		make_plain(
+			test_id_type::MOTA,
+			test_scene_image_id::MOTA_1,
+			30.0f
+		);
+
 		{
 			auto& anim = make_plain(
 				test_id_type::FLOWER_PINK,

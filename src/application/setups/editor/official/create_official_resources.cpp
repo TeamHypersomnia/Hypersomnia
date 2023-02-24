@@ -175,6 +175,15 @@ void create_official_filesystem_from(
 		},
 
 		{ 
+			"insects", 
+			{ 
+				test_dynamic_decorations::BUTTERFLY,
+				test_dynamic_decorations::CICADA,
+				test_dynamic_decorations::MOTA
+			} 
+		},
+
+		{ 
 			"floors", 
 			{ 
 				test_static_decorations::CYAN_FLOOR,

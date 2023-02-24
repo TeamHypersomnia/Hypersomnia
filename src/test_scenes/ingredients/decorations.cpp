@@ -78,7 +78,7 @@ namespace test_flavours {
 			const int base_speed = 80,
 			const int sine_speed_boost = 100,
 			const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
-		) {
+		) -> auto& {
 			auto& meta = flavour_with_sprite(
 				flavour_id,
 				sprite_id,
@@ -116,7 +116,64 @@ namespace test_flavours {
 
 				meta.set(movement_path_def);
 			}
+
+			return meta;
 		};
+
+		auto insect_flavour = [&](
+			const auto flavour_id,
+			const auto sprite_id,
+			const auto animation_id,
+			const auto insect_sparkles,
+			const auto sine_wandering_amplitude,
+			const auto sine_wandering_period
+		) {
+			auto& meta = fish_flavour(
+				flavour_id,
+				sprite_id,
+				animation_id,
+				render_layer::FOREGROUND
+			);
+
+			auto& movement_path_def = meta.template get<invariants::movement_path>();
+			auto& wandering = movement_path_def.organism_wandering;
+			auto& def = wandering.value;
+
+			def.bubble_effect.id = to_particle_effect_id(insect_sparkles);
+			def.bubble_effect.modifier.colorize = white;
+
+			def.sine_wandering_amplitude = sine_wandering_amplitude;
+			def.sine_wandering_period = sine_wandering_period;
+
+			def.susceptible_to.set(scare_source::MELEE);
+		};
+
+		insect_flavour(
+			test_dynamic_decorations::BUTTERFLY,
+			test_scene_image_id::BUTTERFLY_1,
+			test_scene_plain_animation_id::BUTTERFLY,
+			test_scene_particle_effect_id::CYAN_BLUE_INSECT_SPARKLES,
+			2,
+			10
+		);
+
+		insect_flavour(
+			test_dynamic_decorations::CICADA,
+			test_scene_image_id::CICADA_1,
+			test_scene_plain_animation_id::CICADA,
+			test_scene_particle_effect_id::VIOLET_GREEN_INSECT_SPARKLES,
+			7,
+			3
+		);
+
+		insect_flavour(
+			test_dynamic_decorations::MOTA,
+			test_scene_image_id::MOTA_1,
+			test_scene_plain_animation_id::MOTA,
+			test_scene_particle_effect_id::GREEN_RED_INSECT_SPARKLES,
+			5,
+			1
+		);
 
 		{
 			auto& meta = get_test_flavour(in.flavours, test_box_markers::ORGANISM_AREA);

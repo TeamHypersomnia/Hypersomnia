@@ -495,6 +495,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				/* For common aftermath */
 				real32 total_recoil = 0.f;
+				int total_rounds_spawned = 0;
 				bool was_reloading = false;
 				bool decrease_heat_in_aftermath = true;
 
@@ -808,6 +809,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 #if !ENABLE_RECOIL
 													LOG("ROUND CREATED");
 #endif
+													++total_rounds_spawned;
 													auto& sender = round_entity.template get<components::sender>();
 													sender.set(gun_entity);
 
@@ -965,8 +967,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				if (total_recoil != 0.f) {
 	#if ENABLE_RECOIL
-					startle_nearby_organisms(cosm, muzzle_transform.pos, total_recoil * 300.f, 60.f, startle_type::IMMEDIATE);
-					startle_nearby_organisms(cosm, muzzle_transform.pos, total_recoil * 300.f, 60.f, startle_type::LIGHTER);
+					const auto radius = std::max(1, total_rounds_spawned / 2) * gun_def.damage_multiplier * 100.f;
+
+					startle_nearby_organisms(cosm, muzzle_transform.pos, radius, 60.f, startle_type::IMMEDIATE);
+					startle_nearby_organisms(cosm, muzzle_transform.pos, radius, 60.f, startle_type::LIGHTER);
 
 					auto total_kickback = total_recoil;
 

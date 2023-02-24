@@ -264,10 +264,11 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						}
 					}
 
-					return vec2::zero;
+					return augs::steer_to_avoid_result { vec2::zero, false };
 				});
 
-				velocity += bound_avoidance;
+				auto bound_avoidance_vector = bound_avoidance.seek_vector;
+				velocity += bound_avoidance_vector;
 
 				for (auto& startle : movement_path.startle) {
 					/* 
@@ -275,8 +276,12 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						to avoid a glitch where fish is conflicted about where to go.
 					*/
 
-					if (startle + bound_avoidance * 6 < startle) {
-						startle += bound_avoidance * 6;
+					if (startle +  bound_avoidance_vector * 6 < startle) {
+						startle += bound_avoidance_vector * 6;
+					}
+
+					if (bound_avoidance.hit_edge) {
+						startle = step_rng.randval(0, 1) == 0 ? startle.perpendicular_cw() : startle.perpendicular_ccw();
 					}
 				}
 

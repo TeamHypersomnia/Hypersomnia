@@ -72,6 +72,10 @@ enum class test_scene_plain_animation_id {
 	JELLYFISH,
 	DRAGON_FISH,
 
+	BUTTERFLY,
+	CICADA,
+	MOTA,
+
 	FLOWER_PINK,
 	FLOWER_CYAN,
 

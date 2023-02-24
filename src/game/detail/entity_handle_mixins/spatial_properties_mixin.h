@@ -215,6 +215,9 @@ public:
 
 		if (const auto overridden_geo = handle.template find<components::overridden_geo>()) {
 			overridden_geo.set(new_size);
+
+			handle.infer_transform();
+
 			return handle;
 		}
 

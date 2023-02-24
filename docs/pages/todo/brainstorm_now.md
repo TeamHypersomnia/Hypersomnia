@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Light scale intensity doesn't work
+	- Could influence range not just alpha so we have more strong but natural lights
+- Choose filters
+- Can't we make bodies static per-entity?
+
+- Filters window
+	- Visible
+		- (Checkboxes) Backgrounds Physical Foregrounds
+	- Selectable
+		- (Checkboxes) Backgrounds Physical Foregrounds
+	- Let's just add an eye to the toolbar
+		- Later optionally "Filtering" to View
+
+- Init organisms with random starting offsets
 - Aquarium - We only really need to think how we'd do it manually and support it in the editor
 	- The rest is only about automatized placement, we shouldn't worry about these two simultaneously
 
@@ -26,7 +40,6 @@ summary: That which we are brainstorming at the moment.
 
 - For now let's just add all insects to officials so we don't have to make gui for editing organisms
 	- We'll reproduce the entire garden in officials along with flowers etc
-
 
 - silly idea but until we have a geometry editor we could have default colliders in various shapes
 	- e.g. triangle_wood_collider

@@ -123,6 +123,15 @@ bool edit_property(
 
 				return false;
 			}
+
+			if (label == "Animation speed factor") {
+				if (slider(label, property, 0.0f, 10.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
 		}
 
 		if (drag(label, property)) { 
@@ -184,6 +193,11 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es) {
 			result = "Resized %x";
 		}
 	}
+
+	ImGui::Separator();
+
+	MULTIPROPERTY("Animation speed factor", animation_speed_factor);
+	MULTIPROPERTY("Randomize starting animation frame", randomize_starting_animation_frame);
 
 	return result;
 }

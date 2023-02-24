@@ -22,6 +22,7 @@
 #include "game/modes/bomb_defusal.h"
 #include "augs/math/cascade_aligner.h"
 #include "game/modes/test_mode.h"
+#include "game/inferred_caches/organism_cache.hpp"
 
 namespace test_scenes {
 	void minimal_scene::setup(test_mode_ruleset& rs) {

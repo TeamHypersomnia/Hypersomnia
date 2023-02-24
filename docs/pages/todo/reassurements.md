@@ -5,6 +5,10 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- BTW property-per-resource is GOOD
+	- Because it encourages people to create DIFFERENT sprites for DIFFERENT behaviors
+	- So that the player ALWAYS knows what to expect when they see an object
+
 - Note that an occassional static wall intersecting another static wall won't break lighting, the raycasts will just miss it
 	- It's only important that we have a proper vertex at the corner
 
