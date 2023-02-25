@@ -34,6 +34,8 @@ struct editor_sprite_resource_physical {
 	// GEN INTROSPECTOR struct editor_sprite_resource_physical
 	bool is_static = false;
 	bool is_see_through = false;
+	bool is_throw_through = false;
+
 	real32 density = 0.7f;
 	real32 friction = 0.0f;
 	real32 bounciness = 0.2f;

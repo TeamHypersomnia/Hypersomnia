@@ -408,6 +408,10 @@ void setup_scene_object_from_resource(
 			else {
 				fixtures->filter = filters[predefined_filter_type::WALL];
 			}
+
+			if (physical.is_throw_through) {
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::FLYING));
+			}
 		}
 	}
 	else if constexpr(std::is_same_v<editor_sound_resource, R>) {

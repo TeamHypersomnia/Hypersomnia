@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Choose physical filters
+	- Btw I think we should just have ticks like is throw-through instead of special filters too choose
+
 - Light customization
 	- We need to make it easy to create nice soft lights
 	- Light scale intensity doesn't work
@@ -17,9 +20,32 @@ summary: That which we are brainstorming at the moment.
 			- Although this might cause junk bugs so let's just base it on attenuation
 		- Consider always using EXACT too
 			- Does this change whether we want to allow to edit trim reach for walls?
+	- I think letting someone edit trim points for wall illumination would result in ugly glitches
+		- Shouldn't we have the same wall and normal attenuations by default?
+			- a checkbox maybe for custom wall attenuations but that would be silly
+	- Attenuation
+		- Alright, we might leave the 3 values but at least we should make them percentage-based
+			- three 0-100% sliders?
+				- no because pulling one will only be able to take from one other value
+			- we should likely use an imgui custom range slider
+				- https://github.com/ocornut/imgui/issues/76
+			- THE WAY IT WORKED BEFORE - mathematically speaking..
+				- Is that it SCALED the other two attenuation values.
+				- So we can have three sliders that are always 0-100%
+					- and dragging one adjusts percentages of BOTH others such that the relative ratio between THOSE OTHER TWO is conserved 
+					- and 100% after summing all 3 is preserved
+					- for this we'll need to remember the initial ratio while the widget is being dragged
+						- so there will be more state for the active widget
+				- Yeah let's do it like this
+					- best UI/UX honestly
+				
+
+		- Yeah and we'll serialize it as 3 values
+			- We can later add a 0-50% mode but the recalculations will only be handled by the editor
+		- A "RANGE" parameter!
+			- Apart from attenuation percentages we could have a "range" parameter that calculates internally what multiplier we should give the attenuation vars
 
 
-- Choose filters
 - Can't we make bodies static per-entity?
 
 - Filters window

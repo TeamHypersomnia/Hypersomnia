@@ -594,6 +594,12 @@ EDIT_FUNCTION(
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, lets the light through.\nEnemies will be visible behind this object.\nUse it on walls of glass.");
 		}
+
+		MULTIPROPERTY("Is throw-through", as_physical.is_throw_through);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If enabled, grenades and knives will freely fly over this object.\nBullets and characters will still collide.");
+		}
 	}
 	else {
 		MULTIPROPERTY("Cover ground neons", as_nonphysical.cover_ground_neons);
