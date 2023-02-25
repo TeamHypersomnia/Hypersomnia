@@ -6,8 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Light scale intensity doesn't work
-	- Could influence range not just alpha so we have more strong but natural lights
+- Light customization
+	- We need to make it easy to create nice soft lights
+	- Light scale intensity doesn't work
+		- Could influence range not just alpha so we have more strong but natural lights
+	- Trim reach does not make sense on walls because it's pretty much not implemented
+		- It only affects whether aabb will be visible and thus whether wall illumination will be chosen for drawing at all
+			- but that's just silly optimization about which nobody will think
+		- I believe we should always draw wall illumination only as far as normal reach
+			- Although this might cause junk bugs so let's just base it on attenuation
+		- Consider always using EXACT too
+			- Does this change whether we want to allow to edit trim reach for walls?
+
+
 - Choose filters
 - Can't we make bodies static per-entity?
 
