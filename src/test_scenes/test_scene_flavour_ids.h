@@ -2,8 +2,7 @@
 
 enum class test_static_lights {
 	// GEN INTROSPECTOR enum class test_static_lights
-	STRONG_LAMP,
-	AQUARIUM_LAMP,
+	POINT_LIGHT,
 
 	COUNT
 	// END GEN INTROSPECTOR

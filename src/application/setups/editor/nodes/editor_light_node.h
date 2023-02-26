@@ -5,11 +5,18 @@
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/resources/editor_light_resource.h"
 
+#include "application/setups/editor/nodes/editor_light_falloff.h"
+
 struct editor_light_node_editable {
 	// GEN INTROSPECTOR struct editor_light_node_editable
 	vec2 pos;
 	rgba colorize = white;
-	real32 scale_intensity = 1.0f;
+
+	editor_light_falloff falloff;
+	augs::maybe<editor_light_falloff> wall_falloff;
+
+	float positional_vibration = 1.0f;
+	float intensity_vibration = 1.0f;
 	// END GEN INTROSPECTOR
 };
 

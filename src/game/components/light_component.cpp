@@ -1,19 +1,16 @@
 #include "augs/misc/randomization.h"
 #include "game/components/light_component.h"
-
-#define CONST_MULT 100
-#define LINEAR_MULT 10000
-#define QUADRATIC_MULT 10000000
+#include "view/audiovisual_state/systems/legacy_light_mults.h"
 
 namespace components {
 	light::light() {
-		attenuation.constant = 0.4f * CONST_MULT;
-		attenuation.linear = 0.000005f * LINEAR_MULT;
-		attenuation.quadratic = 0.000055f * QUADRATIC_MULT;
+		wall_attenuation.constant = attenuation.constant = 0.4f * CONST_MULT;
+		wall_attenuation.linear = attenuation.linear = 0.000005f * LINEAR_MULT;
+		wall_attenuation.quadratic = attenuation.quadratic = 0.000055f * QUADRATIC_MULT;
 
-		wall_attenuation.constant = 0.4f * CONST_MULT;
-		wall_attenuation.linear = 0.000017f * LINEAR_MULT;
-		wall_attenuation.quadratic = 0.000037f* QUADRATIC_MULT;
+		//wall_attenuation.constant *= 2.5;
+		wall_attenuation.linear *= 2;
+		wall_attenuation.quadratic *= 2;
 
 		{
 			variation.is_enabled = true;
@@ -47,7 +44,7 @@ namespace components {
 		auto props = attenuation;
 
 		if (variation.is_enabled) {
-			props.add_max(variation.value);
+			//props.add_max(variation.value);
 		}
 
 		return props.calc_reach_trimmed();
@@ -57,7 +54,7 @@ namespace components {
 		auto props = wall_attenuation;
 
 		if (wall_variation.is_enabled) {
-			props.add_max(wall_variation.value);
+			//props.add_max(wall_variation.value);
 		}
 
 		return props.calc_reach_trimmed();
@@ -111,12 +108,6 @@ vec2 attenuation_properties::calc_reach_trimmed() const {
 	}
 
 	return result;
-}
-
-void attenuation_properties::add_max(const attenuation_variations& v) {
-	constant += v.constant.magnitude / 2;
-	linear += v.linear.magnitude / 2;
-	quadratic += v.quadratic.magnitude / 2;
 }
 
 void light_value_variation::update_value(randomization& rng, atten_t& val, const float dt_seconds) const {

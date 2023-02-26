@@ -33,8 +33,6 @@ class editor_tweaked_widget_tracker {
 	std::optional<tweak_session> last_tweaked;
 
 public:
-	auto get_last_tweaked() const { return last_tweaked; }
-	void poll_change(std::size_t current_command_index);
 	bool changed(std::size_t current_command_index) const;
 	void update(std::size_t current_command_index);
 	void reset();

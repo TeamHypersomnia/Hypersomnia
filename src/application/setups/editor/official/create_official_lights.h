@@ -22,14 +22,8 @@ void create_lights(const intercosm& scene, editor_resource_pools& pools) {
 
 #if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 	{
-		auto& strong_lamp = create_official(official_lights::STRONG_LAMP, pools);
-		(void)strong_lamp;
-	}
-
-	{
-		auto& aquarium_lamp = create_official(official_lights::AQUARIUM_LAMP, pools).editable;
-		aquarium_lamp.attenuation.constant = 75;
-		aquarium_lamp.attenuation.quadratic = 631;
+		auto& point_lamp = create_official(official_lights::POINT_LAMP, pools);
+		(void)point_lamp;
 	}
 #endif
 }

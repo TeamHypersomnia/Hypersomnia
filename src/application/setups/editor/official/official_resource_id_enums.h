@@ -41,8 +41,7 @@ enum class official_sounds {
 
 enum class official_lights {
 	// GEN INTROSPECTOR enum class official_lights
-	STRONG_LAMP,
-	AQUARIUM_LAMP,
+	POINT_LIGHT,
 
 	COUNT
 	// END GEN INTROSPECTOR

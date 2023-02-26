@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We might need to rework the lights to use two radiuses
+	- But once we're able to recreate cyberaqua etc
+	- Yeah I think a total rework for the light system will be necessary
+- There's no point making workarounds now because we'll replace it with two 50%/100% falloff parameters
+	- and this will solve pretty much everything
+- We'll just tell people to place lights without changing defaults
+	- Except for radius because it can stay like this
+	- We might add half_radius too
+		- More intuitive than 50%_falloff and anyways we cant put % in the prop name
+- Yeah for now let's just disable editing of attenuations altogether
+	- Maybe we'll even end up with just this model
+	- The rest works nicely, it's only important that we can edit radius
+		- and cutoff alpha for rudimentary "intensity" scaling
+
 - Choose physical filters
 	- Btw I think we should just have ticks like is throw-through instead of special filters too choose
 

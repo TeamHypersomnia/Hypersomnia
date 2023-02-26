@@ -27,10 +27,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "augs/graphics/shader.hpp"
-
-#define CONST_MULT 100
-#define LINEAR_MULT 10000
-#define QUADRATIC_MULT 10000000
+#include "view/audiovisual_state/systems/legacy_light_mults.h"
 
 void light_system::reserve_caches_for_entities(const std::size_t) {
 
@@ -177,9 +174,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 					const auto& a = light.attenuation;
 
 					const auto attenuations = vec3 {
-						(variation_vals[0] + a.constant) / CONST_MULT,
-						(variation_vals[1] + a.linear) / LINEAR_MULT,
-						(variation_vals[2] + a.quadratic) / QUADRATIC_MULT
+						(std::abs(variation_vals[0]) + a.constant) / CONST_MULT,
+						(std::abs(variation_vals[1]) + a.linear) / LINEAR_MULT,
+						(std::abs(variation_vals[2]) + a.quadratic) / QUADRATIC_MULT
 					};
 
 					set_uniform(light_shader, light_uniform.attenuation, attenuations);
@@ -246,9 +243,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 				const auto& a = light.wall_attenuation;
 
 				const auto attenuations = vec3 {
-					(variation_vals[3] + a.constant) / CONST_MULT,
-					(variation_vals[4] + a.linear) / LINEAR_MULT,
-					(variation_vals[5] + a.quadratic) / QUADRATIC_MULT
+					(std::abs(variation_vals[3]) + a.constant) / CONST_MULT,
+					(std::abs(variation_vals[4]) + a.linear) / LINEAR_MULT,
+					(std::abs(variation_vals[5]) + a.quadratic) / QUADRATIC_MULT
 				};
 
 				set_uniform(wall_light_shader, wall_light_uniform.attenuation, attenuations);

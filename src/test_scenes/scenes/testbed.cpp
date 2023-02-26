@@ -680,7 +680,7 @@ namespace test_scenes {
 				const auto light_cyan = c.x < 0 ? orange : rgba(30, 255, 255, 255);
 
 				{
-					const auto l = create(test_static_lights::STRONG_LAMP, transformr(light_pos));
+					const auto l = create(test_static_lights::POINT_LIGHT, transformr(light_pos));
 					auto& light = l.get<components::light>();
 					light.color = light_cyan;
 				}
@@ -702,17 +702,17 @@ namespace test_scenes {
 
 		{
 			{
-				const auto l = create(test_static_lights::STRONG_LAMP, transformr(vec2(-44, 270)));
+				const auto l = create(test_static_lights::POINT_LIGHT, transformr(vec2(-44, 270)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 			}
 			{
-				const auto l = create(test_static_lights::STRONG_LAMP, transformr(vec2(1098, 220)));
+				const auto l = create(test_static_lights::POINT_LIGHT, transformr(vec2(1098, 220)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
 			}
 			{
-				const auto l = create(test_static_lights::STRONG_LAMP, transformr(vec2(223, -47)));
+				const auto l = create(test_static_lights::POINT_LIGHT, transformr(vec2(223, -47)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 			}
@@ -952,10 +952,13 @@ namespace test_scenes {
 				};
 
 				for (int i = 0; i < 3; ++i) {
-					const auto l = create(test_static_lights::AQUARIUM_LAMP);
+					const auto l = create(test_static_lights::POINT_LIGHT);
+
 					l.set_logic_transform(aquarium_tr + transformr(lights[i]));
 					auto& light = l.get<components::light>();
 					light.color = light_cols[i];
+					light.attenuation.constant = 75;
+					light.attenuation.quadratic = 631;
 				}
 			}
 

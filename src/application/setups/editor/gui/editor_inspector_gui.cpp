@@ -53,16 +53,6 @@ void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
 }
 
-void editor_tweaked_widget_tracker::poll_change(const std::size_t current_command_index) {
-	if (last_tweaked) {
-		const auto possible_session = tweak_session { ImGui::GetCurrentContext()->LastActiveId, current_command_index };
-
-		if (last_tweaked.value() != possible_session) {
-			last_tweaked.reset();
-		}
-	}
-}
-
 bool editor_tweaked_widget_tracker::changed(const std::size_t current_command_index) const {
 	const auto current_session = tweak_session { ImGui::GetCurrentContext()->LastActiveId, current_command_index };
 	return last_tweaked != current_session;
@@ -113,9 +103,15 @@ bool edit_property(
 			}
 		}
 	}
+	else if constexpr(std::is_same_v<rgba_channel, T>) {
+		if (slider(label, property, rgba_channel(0), rgba_channel(255))) { 
+			result = typesafe_sprintf("Set %x to %x in %x", label, property);
+			return true;
+		}
+	}
 	else if constexpr(std::is_arithmetic_v<T>) {
 		if constexpr(std::is_same_v<float, T>) {
-			if (label == "Opacity") {
+			if (label == "Opacity" || label == "Constant" || label == "Linear" || label == "Quadratic") {
 				if (slider(label, property, 0.0f, 1.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -124,8 +120,17 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Animation speed factor") {
-				if (slider(label, property, 0.0f, 10.0f)) { 
+			if (label == "Radius") {
+				if (slider(label, property, 0.0f, 2000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Animation speed factor" || label == "Positional vibration" || label == "Intensity vibration") {
+				if (slider(label, property, 0.0f, 5.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
@@ -357,9 +362,154 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
+	thread_local editor_tweaked_widget_tracker tracker;
+	thread_local editor_light_falloff operated_falloff;
+
+	(void)tracker;
+
 	MULTIPROPERTY("Position", pos);
 	MULTIPROPERTY("Colorize", colorize);
-	MULTIPROPERTY("Scale intensity", scale_intensity);
+	MULTIPROPERTY("Positional vibration", positional_vibration);
+	MULTIPROPERTY("Intensity vibration", intensity_vibration);
+
+	ImGui::Separator();
+	text("Falloff");
+
+	auto prev_foff = insp.falloff;
+	auto prev_woff = insp.wall_falloff;
+
+	auto rebalance_coeffs = [&](
+		auto& changed, 
+		auto& first, 
+		auto& second,
+		const auto& first_orig, 
+		const auto& second_orig,
+		bool is_wall
+	) {
+		//LOG_NVPS(first_orig, second_orig);
+		if (last_result) {
+			if (tracker.changed(0)) {
+				LOG("CHANGED!!!");
+				changed = std::clamp(changed, 0.0f, 1.0f);
+				operated_falloff = is_wall ? prev_woff.value : prev_foff;
+				tracker.update(0);
+			}
+
+			const auto total_orig = first_orig + second_orig;
+
+			const auto first_shares = first_orig == second_orig ? 0.5f : first_orig / total_orig;
+			const auto second_shares = first_orig == second_orig ? 0.5f : second_orig / total_orig;
+
+			const auto new_total = 1 - changed;
+
+			first = first_shares * new_total;
+			second = second_shares * new_total;
+
+			for (auto& e : es) {
+				if (is_wall) {
+					e.after.wall_falloff = insp.wall_falloff;
+				}
+				else {
+					e.after.falloff = insp.falloff;
+				}
+			}
+		}
+	};
+
+	MULTIPROPERTY("Constant", falloff.constant);
+	rebalance_coeffs(
+		insp.falloff.constant,
+
+		insp.falloff.linear,
+		insp.falloff.quadratic,
+		operated_falloff.linear,
+		operated_falloff.quadratic,
+		false
+	);
+
+	MULTIPROPERTY("Linear", falloff.linear);
+	rebalance_coeffs(
+		insp.falloff.linear,
+
+		insp.falloff.constant,
+		insp.falloff.quadratic,
+		operated_falloff.constant,
+		operated_falloff.quadratic,
+		false
+	);
+
+	MULTIPROPERTY("Quadratic", falloff.quadratic);
+	rebalance_coeffs(
+		insp.falloff.quadratic,
+
+		insp.falloff.constant,
+		insp.falloff.linear,
+		operated_falloff.constant,
+		operated_falloff.linear,
+		false
+	);
+
+	MULTIPROPERTY("Radius", falloff.radius);
+	MULTIPROPERTY("Cutoff alpha", falloff.cutoff_alpha);
+
+	MULTIPROPERTY("Separate falloff for walls", wall_falloff.is_enabled);
+
+	if (last_result) {
+		if (insp.wall_falloff.is_enabled) {
+			result = "Enabled separate wall falloff in %x";
+		}
+		else {
+			result = "Disabled separate wall falloff %x";
+		}
+	}
+
+	{
+		auto scope = scoped_id("WALLFALLOFS");
+
+		auto disabled = maybe_disabled_only_cols(!insp.wall_falloff.is_enabled);
+
+		if (insp.wall_falloff.is_enabled) {
+			auto& edited_foff = insp.wall_falloff.value;
+
+			auto ind = scoped_indent();
+
+			MULTIPROPERTY("Constant", wall_falloff.value.constant);
+			rebalance_coeffs(
+				edited_foff.constant,
+
+				edited_foff.linear,
+				edited_foff.quadratic,
+				operated_falloff.linear,
+				operated_falloff.quadratic,
+				true
+			);
+
+			MULTIPROPERTY("Linear", wall_falloff.value.linear);
+			rebalance_coeffs(
+				edited_foff.linear,
+
+				edited_foff.constant,
+				edited_foff.quadratic,
+				operated_falloff.constant,
+				operated_falloff.quadratic,
+				true
+			);
+
+			MULTIPROPERTY("Quadratic", wall_falloff.value.quadratic);
+			rebalance_coeffs(
+				edited_foff.quadratic,
+
+				edited_foff.constant,
+				edited_foff.linear,
+				operated_falloff.constant,
+				operated_falloff.linear,
+				true
+			);
+
+			MULTIPROPERTY("Radius", wall_falloff.value.radius);
+			MULTIPROPERTY("Cutoff alpha", wall_falloff.value.cutoff_alpha);
+		}
+	}
 
 	return result;
 }

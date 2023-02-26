@@ -1,0 +1,4 @@
+#pragma once
+#define CONST_MULT 100
+#define LINEAR_MULT 10000
+#define QUADRATIC_MULT 10000000

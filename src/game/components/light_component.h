@@ -16,6 +16,13 @@ struct light_value_variation {
 
 	void update_value(randomization&, atten_t& val, const float dt_seconds) const;
 	friend bool operator==(const light_value_variation&, const light_value_variation&) = default;
+
+	auto& operator*=(const atten_t& mult) {
+		magnitude *= mult;
+		change_speed *= mult;
+
+		return *this;
+	}
 };
 
 struct attenuation_variations {
@@ -24,6 +31,14 @@ struct attenuation_variations {
 	light_value_variation linear;
 	light_value_variation quadratic;
 	// END GEN INTROSPECTOR
+
+	auto& operator*=(const atten_t& mult) {
+		constant *= mult;
+		linear *= mult;
+		quadratic *= mult;
+
+		return *this;
+	}
 };
 
 struct attenuation_properties {
@@ -40,14 +55,12 @@ struct attenuation_properties {
 
 	real32 calc_reach() const;
 	vec2 calc_reach_trimmed() const;
-
-	void add_max(const attenuation_variations&);
 };
 
 namespace invariants {
 	struct light {
 		// GEN INTROSPECTOR struct invariants::light
-		int reserved_for_future_use = 0;
+		int is_new_light_attenuation = 0;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -4,6 +4,7 @@
 #include "game/detail/inventory/requested_equipment.h"
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/cosmos/solvers/standard_solver.h"
+#include "view/audiovisual_state/systems/legacy_light_mults.h"
 
 template <class N, class R, class H, class A>
 void setup_entity_from_node(
@@ -39,8 +40,52 @@ void setup_entity_from_node(
 		}
 	}
 	else if constexpr(std::is_same_v<N, editor_light_node>) {
+		auto set_attn_from_falloff = [&](auto& attn, const auto& foff) {
+			const auto mult = foff.calc_attenuation_mult_for_requested_radius();
+
+			attn.constant = foff.constant * mult * CONST_MULT;
+			attn.linear = foff.linear * mult * LINEAR_MULT;
+			attn.quadratic = foff.quadratic * mult * QUADRATIC_MULT;
+
+			attn.trim_alpha = foff.cutoff_alpha;
+			// LOG_NVPS(foff.radius, attn.calc_reach(), attn.calc_reach_trimmed());
+		};
+
 		auto& light = agg.template get<components::light>();
 		light.color *= editable.colorize;
+
+		set_attn_from_falloff(light.attenuation, node.editable.falloff);
+
+		{
+			auto& wall_foff = node.editable.wall_falloff;
+
+			if (wall_foff.is_enabled) {
+				set_attn_from_falloff(light.wall_attenuation, wall_foff.value);
+			}
+			else {
+				light.wall_attenuation = light.attenuation;
+			}
+		}
+
+		light.wall_variation = light.variation;
+
+		{
+			const float positional_vibration = node.editable.positional_vibration;
+			const float intensity_vibration = node.editable.intensity_vibration;
+
+			light.variation.is_enabled = intensity_vibration > 0.0f;
+			light.wall_variation.is_enabled = intensity_vibration > 0.0f;
+
+			light.position_variations.is_enabled = positional_vibration > 0.0f;
+
+			for (auto& pv : light.position_variations.value) {
+				pv *= positional_vibration;
+			}
+
+			light.variation.value *= intensity_vibration;
+			light.wall_variation.value *= intensity_vibration;
+		}
+
 	}
 	else if constexpr(std::is_same_v<N, editor_wandering_pixels_node>) {
 		auto& wandering_pixels = agg.template get<components::wandering_pixels>();
@@ -422,6 +467,8 @@ void setup_scene_object_from_resource(
 	else if constexpr(std::is_same_v<editor_light_resource, R>) {
 		auto& light = scene.template get<components::light>();
 		light = editable;
+
+		//scene.template get<invariants::light>().is_new_light_attenuation = 1;
 	}
 	else {
 		static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
@@ -666,4 +713,31 @@ void editor_setup::rebuild_scene() {
 	);
 
 	inspected_to_entity_selector_state();
+}
+
+inline real32 editor_light_falloff::calc_attenuation_mult_for_requested_radius() const {
+	/*
+		Taking component defaults is kinda stupid but we have to bear with it until we can remove legacy maps
+		Ultimately vibration might scale with the values itself
+		Or we'll just have hardcoded percentage like 10% and it will scale that
+
+		Update:
+		Let's actually not consider vibration in light range calculations
+		vibration is meant to be minor
+		also it should vibrate to the smaller side (so more attenuation)
+
+		(void)vibration;
+	*/
+
+	const auto atten_at_edge = 
+		constant +
+		linear * radius +
+		quadratic * radius * radius
+	;
+
+	if (atten_at_edge == 0.0f) {
+		return 1.0f;
+	}
+
+	return 255.f / (atten_at_edge * float(std::max(rgba_channel(1), cutoff_alpha)));
 }
