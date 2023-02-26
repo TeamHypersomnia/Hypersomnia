@@ -205,6 +205,8 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es) {
 
 	MULTIPROPERTY("Animation speed factor", animation_speed_factor);
 	MULTIPROPERTY("Randomize starting animation frame", randomize_starting_animation_frame);
+	MULTIPROPERTY("Randomize color wave offset", randomize_color_wave_offset);
+
 
 	return result;
 }

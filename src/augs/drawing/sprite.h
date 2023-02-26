@@ -108,6 +108,10 @@ namespace augs {
 		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 
+		bool has_color_wave() const {
+			return effect == sprite_special_effect::COLOR_WAVE;
+		}
+
 		bool operator==(const sprite<id_type>&) const = default;
 
 		size_type get_size() const {

@@ -126,6 +126,16 @@ void setup_entity_from_node_post_construct(
 				anim->state.frame_num = 0;
 			}
 
+			if (node.editable.randomize_color_wave_offset) {
+				if (auto spr_inv = handle.template find<invariants::sprite>()) {
+					if (auto spr = handle.template find<components::sprite>()) {
+						if (spr_inv->has_color_wave()) {
+							spr->effect_offset_secs = handle.get_cosmos().get_rng_for(handle.get_id()).randval(0.0f, 20.0f);
+						}
+					}
+				}
+			}	
+
 			anim->speed_factor *= node.editable.animation_speed_factor;
 		}
 	}
