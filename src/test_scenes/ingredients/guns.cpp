@@ -3863,7 +3863,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CALICO_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4250.f, 4250.f};
+			gun_def.muzzle_velocity = {4150.f, 4150.f};
 			gun_def.shot_cooldown_ms = 110.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3889,7 +3889,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CALICO, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.1f);
+			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 700;
@@ -3954,7 +3954,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.modifier.max_distance = 400.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4400.f, 4400.f};
+			gun_def.muzzle_velocity = {4600.f, 4600.f};
 			gun_def.shot_cooldown_ms = 150.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
