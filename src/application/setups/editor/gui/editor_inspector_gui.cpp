@@ -362,11 +362,6 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	thread_local editor_tweaked_widget_tracker tracker;
-	thread_local editor_light_falloff operated_falloff;
-
-	(void)tracker;
-
 	MULTIPROPERTY("Position", pos);
 	MULTIPROPERTY("Colorize", colorize);
 	MULTIPROPERTY("Positional vibration", positional_vibration);
@@ -374,6 +369,10 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 
 	ImGui::Separator();
 	text("Falloff");
+
+#if EDIT_ATTENUATIONS
+	thread_local editor_tweaked_widget_tracker tracker;
+	thread_local editor_light_falloff operated_falloff;
 
 	auto prev_foff = insp.falloff;
 	auto prev_woff = insp.wall_falloff;
@@ -448,6 +447,7 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 		operated_falloff.linear,
 		false
 	);
+#endif
 
 	MULTIPROPERTY("Radius", falloff.radius);
 	MULTIPROPERTY("Cutoff alpha", falloff.cutoff_alpha);
@@ -469,9 +469,10 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 		auto disabled = maybe_disabled_only_cols(!insp.wall_falloff.is_enabled);
 
 		if (insp.wall_falloff.is_enabled) {
-			auto& edited_foff = insp.wall_falloff.value;
-
 			auto ind = scoped_indent();
+
+#if EDIT_ATTENUATIONS
+			auto& edited_foff = insp.wall_falloff.value;
 
 			MULTIPROPERTY("Constant", wall_falloff.value.constant);
 			rebalance_coeffs(
@@ -505,6 +506,7 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 				operated_falloff.linear,
 				true
 			);
+#endif
 
 			MULTIPROPERTY("Radius", wall_falloff.value.radius);
 			MULTIPROPERTY("Cutoff alpha", wall_falloff.value.cutoff_alpha);
