@@ -1217,6 +1217,15 @@ namespace test_scenes {
 			}
 		}
 
+		{
+			const auto l = create(test_static_lights::POINT_LIGHT);
+
+			l.set_logic_transform(transformr(vec2(200, 1200)));
+			auto& ll = l.template get<components::light>();
+
+			ll.attenuation.trim_alpha = 20;
+		}
+
 		save_all_reported_weapons();
 	}
 }

@@ -91,6 +91,8 @@ struct light_uniforms {
 
 	U pos = U::light_pos;
 	U distance_mult = U::distance_mult;
+	U max_distance = U::max_distance;
+	U cutoff_distance = U::cutoff_distance;
 	U attenuation = U::light_attenuation;
 	U multiply_color = U::multiply_color;
 
@@ -186,6 +188,21 @@ void light_system::render_all_lights(const light_system_input in) const {
 					light_shader, 
 					light_uniform.multiply_color,
 					white.rgb()
+				);
+
+				const auto max_distance = light.attenuation.calc_reach();
+				const auto cutoff_distance = std::max(0.0f, max_distance - 3*float(light.attenuation.trim_alpha));
+
+				set_uniform(
+					light_shader, 
+					light_uniform.max_distance,
+					max_distance
+				);
+
+				set_uniform(
+					light_shader, 
+					light_uniform.cutoff_distance,
+					cutoff_distance
 				);
 
 				renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_VISIBILITY, i);

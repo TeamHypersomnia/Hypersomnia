@@ -25,7 +25,7 @@ namespace telegram_webhooks {
 			Telegram sucks at sanitization so we have to whitelist
 		*/
 
-		const auto tg_nickname_whitelist = std::string("_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
+		const auto tg_nickname_whitelist = std::string("_'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
 
 		for (auto c : n) {
 			if (tg_nickname_whitelist.find(c) == std::string::npos) {

@@ -4,6 +4,10 @@ hide_sidebar: true
 permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
+
+- Can't we make bodies static per-entity?
+	- see reassurements.md: property-per-resource is a GOOD thing
+
 - A plus sign to add images directly from the game
 	- Maybe not important now that we'll have reveal in explorer
 

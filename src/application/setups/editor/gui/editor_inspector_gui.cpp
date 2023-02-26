@@ -25,6 +25,8 @@
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "test_scenes/test_scene_flavours.h"
 
+#define EDIT_ATTENUATIONS 0
+
 #define MULTIPROPERTY(label, MEMBER) \
 {\
 	bool values_different = false;\

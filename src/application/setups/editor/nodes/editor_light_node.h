@@ -10,13 +10,13 @@
 struct editor_light_node_editable {
 	// GEN INTROSPECTOR struct editor_light_node_editable
 	vec2 pos;
-	rgba colorize = white;
+	rgba colorize = rgba(255, 255, 255, 160);
 
 	editor_light_falloff falloff;
 	augs::maybe<editor_light_falloff> wall_falloff;
 
-	float positional_vibration = 1.0f;
-	float intensity_vibration = 1.0f;
+	float positional_vibration = 0.5f;
+	float intensity_vibration = 0.1f;
 	// END GEN INTROSPECTOR
 };
 

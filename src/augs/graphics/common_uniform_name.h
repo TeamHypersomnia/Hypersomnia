@@ -9,6 +9,8 @@ namespace augs {
 		eye_frag_pos,
 		light_pos,
 		distance_mult,
+		max_distance,
+		cutoff_distance,
 		light_attenuation,
 		multiply_color,
 		texture_center,
