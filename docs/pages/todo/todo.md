@@ -6,6 +6,11 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Enter while filtering with ImGuiTextFilter could always select the target
+	- E.g. go to node on scene
+	- But leave this for later as it might be too automatic of a behavior
+		- We never even used this filtering field before, people will just click on scene mostly
+
 - We might need to rework the lights to use two radiuses
 	- But once we're able to recreate cyberaqua etc
 	- Yeah I think a total rework for the light system will be necessary

@@ -387,7 +387,27 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 								auto layer = in.setup.find_layer(lid);
 								ensure(layer != nullptr);
 
+								if (filter.IsActive() && !layer->passed_filter) {
+									continue;
+								}
+
 								for (const editor_node_id nid : layer->hierarchy.nodes) {
+									bool passed = true;
+
+									in.setup.on_node(
+										nid,
+										[&](const auto& typed_node, const auto) {
+											if (filter.IsActive() && !typed_node.passed_filter) {
+												passed = false;
+											}
+										}
+									);
+
+									if (!passed) {
+										continue;
+									}
+
+
 									if (nid == node_id || nid == *last_node) {
 										++state;
 									}
@@ -789,6 +809,13 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 								in.setup.clear_inspector();
 
 								for (const editor_layer_id id : ordered) {
+									auto layer = in.setup.find_layer(id);
+									ensure(layer != nullptr);
+
+									if (filter.IsActive() && !layer->passed_filter) {
+										continue;
+									}
+
 									if (id == layer_id || id == *last_layer) {
 										++state;
 									}
