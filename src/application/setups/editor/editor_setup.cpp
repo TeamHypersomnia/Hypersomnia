@@ -1156,6 +1156,14 @@ editor_node_id editor_setup::get_hovered_node(const necessary_images_in_atlas_ma
 
 void editor_setup::scroll_once_to(inspected_variant id) {
 	gui.layers.scroll_once_to = id;
+
+	if (auto node = std::get_if<editor_node_id>(std::addressof(id))) {
+		if (auto parent = find_parent_layer(*node)) {
+			if (auto layer = find_layer(parent->layer_id)) {
+				layer->is_open = true;
+			}
+		}
+	}
 }
 
 editor_node_id editor_setup::to_node_id(entity_id id) const {
