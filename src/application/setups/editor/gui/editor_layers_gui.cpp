@@ -157,7 +157,28 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	ImGui::SameLine();
 
 	acquire_keyboard_once();
-	filter_with_hint(filter, "##HierarchyFilter", "Search objects and layers...");
+	filter_with_hint(filter, "##HierarchyFilter", "Filter layers/nodes... (CTRL+L)");
+
+	if (filter.IsActive()) {
+		for (auto& l : in.layers.pool) {
+			const auto layer_name = l.get_display_name();
+			l.passed_filter = filter.PassFilter(layer_name.c_str());
+
+			for (auto& n : l.hierarchy.nodes) {
+				in.setup.on_node(
+					n,
+					[&](const auto& typed_node, const auto) {
+						const auto node_name = typed_node.get_display_name();
+						typed_node.passed_filter = filter.PassFilter(node_name.c_str());
+
+						if (typed_node.passed_filter) {
+							l.passed_filter = true;
+						}
+					}
+				);
+			}
+		}
+	}
 
 	//const auto& style = ImGui::GetStyle();
 	const auto disabled_color = rgba(255, 255, 255, 110);
@@ -580,7 +601,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 			if (filter.IsActive()) {
 				if (!layer.passed_filter) {
-					return;
+					continue;
 				}
 			}
 
@@ -838,7 +859,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				{
 					ImGui::SetCursorPos(before_pos);
 
-					const auto dir = (layer.is_open || layer.empty()) ? ImGuiDir_Down : ImGuiDir_Right;
+					const auto dir = (filter.IsActive() || layer.is_open || layer.empty()) ? ImGuiDir_Down : ImGuiDir_Right;
 
 					const bool layer_is_empty = layer.hierarchy.nodes.empty();
 
@@ -941,12 +962,19 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 			ImGui::NextColumn();
 
-			if (layer.is_open) {
+			if (layer.is_open || filter.IsActive()) {
 				for (std::size_t i = 0; i < layer.hierarchy.nodes.size(); ++i) {
 					const auto node_id = layer.hierarchy.nodes[i];
 
 					in.setup.on_node(node_id, [&](auto& typed_node, const auto typed_node_id) {
 						(void)typed_node_id;
+
+						if (filter.IsActive()) {
+							if (!typed_node.passed_filter) {
+								return;
+							}
+						}
+
 						handle_node_and_id(i, typed_node, node_id, layer, layer_id);
 					});
 				}

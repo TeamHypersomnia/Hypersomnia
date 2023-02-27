@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
-#include "game/cosmos/entity_id.h"
+#include "application/setups/editor/nodes/editor_node_base.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
 struct editor_prefab_resource;

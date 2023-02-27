@@ -15,8 +15,8 @@ namespace test_flavours {
 			const auto material,
 			const float restitution = 0.f,
 			const float max_ricochet_angle = 10.f
-		) {
-			meta.template get<invariants::sprite>().tile_excess_size = true;
+		) -> auto& {
+			meta.template get<invariants::sprite>().tile_excess_size = false;
 
 			test_flavours::add_standard_static_body(meta);
 
@@ -29,12 +29,14 @@ namespace test_flavours {
 
 			meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL);
 			meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS);
+
+			return meta;
 		};
 
 		const auto glass_alpha = 60;
 		const auto glass_neon_alpha = 130;
 
-		auto static_glass_obstacle = [&](auto& meta) {
+		auto static_glass_obstacle = [&](auto& meta) -> auto& {
 			static_obstacle(
 				meta,
 				test_scene_physical_material_id::GLASS,
@@ -49,6 +51,8 @@ namespace test_flavours {
 			meta.template get<invariants::sprite>().neon_color.a = glass_neon_alpha;
 			meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL, false);
 			meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS, false);
+
+			return meta;
 		};
 
 		auto dynamic_obstacle = [&](
@@ -83,7 +87,7 @@ namespace test_flavours {
 				test_obstacle_order::OPAQUE
 			),
 			test_scene_physical_material_id::WOOD
-		);
+		).template get<invariants::sprite>().tile_excess_size = true;
 
 		static_obstacle(
 			flavour_with_sprite(

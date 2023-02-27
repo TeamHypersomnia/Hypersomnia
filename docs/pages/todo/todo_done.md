@@ -5071,3 +5071,4 @@ Advantages:
 - For now let's just add all insects to officials so we don't have to make gui for editing organisms
 	- We'll reproduce the entire garden in officials along with flowers etc
 
+- Init organisms with random starting offsets

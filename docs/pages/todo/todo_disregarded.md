@@ -558,3 +558,6 @@ summary: Just a hidden scratchpad.
 		- However for the user it would be most intuitive if it was still a checkbox
 - Okay, we'll need custom serializators anyway because we'll have to serialize the ids
 - Since we'll have a custom serializer we could make sprite editable a variant
+
+- Let's leave the double-click-to-navigate-to-center as is
+	- We will anyway use it on small objects only and then it would be confusing as hell

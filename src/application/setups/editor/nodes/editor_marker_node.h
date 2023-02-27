@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
-#include "game/cosmos/entity_id.h"
+#include "application/setups/editor/nodes/editor_node_base.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/resources/editor_marker_resource.h"
 #include "game/enums/marker_type.h"
@@ -28,21 +28,12 @@ struct editor_area_marker_node_editable {
 	// END GEN INTROSPECTOR
 };
 
-struct editor_point_marker_node {
-	editor_typed_resource_id<editor_point_marker_resource> resource_id;
-	editor_point_marker_node_editable editable;
-
-	bool visible = true;
-
-	mutable entity_id scene_entity_id;
-
+struct editor_point_marker_node : editor_node_base<
+	editor_point_marker_resource,
+	editor_point_marker_node_editable
+> {
 	auto get_transform() const {
 		return transformr(editable.pos, editable.rotation);
-	}
-
-	std::string unique_name;
-	const auto& get_display_name() const {
-		return unique_name;
 	}
 
 	static const char* get_type_name() {
@@ -50,21 +41,12 @@ struct editor_point_marker_node {
 	}
 };
 
-struct editor_area_marker_node {
-	editor_typed_resource_id<editor_area_marker_resource> resource_id;
-	editor_area_marker_node_editable editable;
-
-	bool visible = true;
-
-	mutable entity_id scene_entity_id;
-
+struct editor_area_marker_node : editor_node_base<
+	editor_area_marker_resource,
+	editor_area_marker_node_editable
+> {
 	auto get_transform() const {
 		return transformr(editable.pos, editable.rotation);
-	}
-
-	std::string unique_name;
-	const auto& get_display_name() const {
-		return unique_name;
 	}
 
 	static const char* get_type_name() {

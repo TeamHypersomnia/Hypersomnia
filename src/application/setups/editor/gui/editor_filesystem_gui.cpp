@@ -131,7 +131,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	//rebuild_special_filesystem(in);
 
 	thread_local ImGuiTextFilter filter;
-	filter_with_hint(filter, "##FilesFilter", "Search resources...");
+	filter_with_hint(filter, "##FilesFilter", "Search resources... (CTRL+F)");
 
 	int id_counter = 0;
 

@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- First sort out physicals and handle the aquarium spawning at the very end
+	- Apparently resizing physical bodies doesn't honor the custom physical collider.
+		- Only if it's a box
+
+- Finishing touches
+	- Implement filtering in Layer window
+		- the UI is there but it's not implemented
+		- what about /?
+			- thought that it could activate the search window like ctrl+f but in layer window
+			- why not? It's just that only pressing / will automatically make it go to entity
+	- We gotta wrap it up
+	- Resizing animations
+
 - We can ship editor as soon as we reproduce fy_minilab
 	- So people can play in the meantime
 		- and I can start redoing other maps
@@ -18,7 +31,6 @@ summary: That which we are brainstorming at the moment.
 	- Let's just add an eye to the toolbar
 		- Later optionally "Filtering" to View
 
-- Init organisms with random starting offsets
 - Aquarium - We only really need to think how we'd do it manually and support it in the editor
 	- The rest is only about automatized placement, we shouldn't worry about these two simultaneously
 
