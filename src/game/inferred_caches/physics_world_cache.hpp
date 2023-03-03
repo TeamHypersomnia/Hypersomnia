@@ -238,6 +238,29 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 	specific_infer_rigid_body_from_scratch(handle);
 }
 
+inline vec2 calc_requested_scale(const vec2 sprite_size, vec2 overri_size) {
+	overri_size.x = std::max(1.f, overri_size.x);
+	overri_size.y = std::max(1.f, overri_size.y);
+
+	auto scale = vec2();
+
+	if (sprite_size.x == 0) {
+		scale.x = 1;
+	}
+	else {
+		scale.x = overri_size.x / sprite_size.x;
+	}
+
+	if (sprite_size.y == 0) {
+		scale.y = 1;
+	}
+	else {
+		scale.y = overri_size.y / sprite_size.y;
+	}
+
+	return scale;
+}
+
 template <class E>
 void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle, const colliders_connection& connection) {
 	auto& cosm = handle.get_cosmos();
@@ -331,6 +354,18 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 		unsigned ci = 0;
 
+		auto scale = std::optional<vec2>();
+
+		if (const auto geo = handle.template find<components::overridden_geo>()) {
+			auto& s = geo.get();
+
+			if (s.is_enabled) {
+				if (const auto sprite = handle.template find<invariants::sprite>()) {
+					scale = ::calc_requested_scale(sprite->get_size(), s.value);
+				}
+			}
+		}
+
 		auto add_convex = [&](const auto& convex) {
 			augs::constant_size_vector<b2Vec2, POLY_VERTEX_COUNT> b2verts(
 				convex.begin(), 
@@ -343,6 +378,11 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 			for (auto& v : b2verts) {
 				v = si.get_meters(v);
+
+				if (scale) {
+					v.x *= scale->x;
+					v.y *= scale->y;
+				}
 			}
 
 			b2PolygonShape ps;
