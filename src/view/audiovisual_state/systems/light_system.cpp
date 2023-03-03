@@ -274,6 +274,21 @@ void light_system::render_all_lights(const light_system_input in) const {
 				light.color.rgb()
 			);
 
+			const auto max_distance = light.wall_attenuation.calc_reach();
+			const auto cutoff_distance = std::max(0.0f, max_distance - 3*float(light.wall_attenuation.trim_alpha));
+
+			set_uniform(
+				wall_light_shader, 
+				wall_light_uniform.max_distance,
+				max_distance
+			);
+
+			set_uniform(
+				wall_light_shader, 
+				wall_light_uniform.cutoff_distance,
+				cutoff_distance
+			);
+
 			renderer.call_triangles(D::WALL_ILLUMINATIONS);
 		}
 	};

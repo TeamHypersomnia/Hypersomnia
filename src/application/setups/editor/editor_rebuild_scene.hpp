@@ -63,7 +63,10 @@ void setup_entity_from_node(
 				set_attn_from_falloff(light.wall_attenuation, wall_foff.value);
 			}
 			else {
-				light.wall_attenuation = light.attenuation;
+				auto auto_wall_falloff = node.editable.falloff;
+				auto_wall_falloff.radius /= 1.5f; 
+
+				set_attn_from_falloff(light.wall_attenuation, auto_wall_falloff);
 			}
 		}
 
