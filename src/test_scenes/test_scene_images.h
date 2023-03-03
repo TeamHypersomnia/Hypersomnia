@@ -329,6 +329,8 @@ enum class test_scene_image_id {
 
 	HEADSHOT_ICON,
 
+	TRIANGLE_COLLIDER,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -134,6 +134,22 @@ void create_official_filesystem_from(
 	};
 
 	const std::vector<subfolder> gfx_subfolders = {
+		{
+			"colliders",
+			{
+
+				test_plain_sprited_bodies::BOX_COLLIDER_WOOD,
+				test_plain_sprited_bodies::BOX_COLLIDER_METAL,
+				test_plain_sprited_bodies::BOX_COLLIDER_GLASS,
+				test_plain_sprited_bodies::BOX_COLLIDER_VENT,
+
+				test_plain_sprited_bodies::TRIANGLE_COLLIDER_WOOD,
+				test_plain_sprited_bodies::TRIANGLE_COLLIDER_METAL,
+				test_plain_sprited_bodies::TRIANGLE_COLLIDER_GLASS,
+				test_plain_sprited_bodies::TRIANGLE_COLLIDER_VENT
+			}
+		},
+
 		{ 
 			"aquarium", 
 			{ 

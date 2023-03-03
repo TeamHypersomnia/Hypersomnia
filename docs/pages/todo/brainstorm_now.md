@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- What do we make official?
+	- Vent sprites certainly because we already have an official vent physical material
+	- Maybe some complex-shaped stuff
+		- The steel crate
+	- Entire garden biome
+
 - First sort out physicals and handle the aquarium spawning at the very end
 	- Apparently resizing physical bodies doesn't honor the custom physical collider.
 		- Only if it's a box

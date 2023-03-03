@@ -36,6 +36,18 @@ namespace test_flavours {
 		const auto glass_alpha = 60;
 		const auto glass_neon_alpha = 130;
 
+		auto make_glass_properties = [&](auto& meta) {
+			auto& fixtures_def = meta.template get<invariants::fixtures>();
+			fixtures_def.filter = filters[predefined_filter_type::GLASS_OBSTACLE];
+
+			meta.template get<invariants::sprite>().color.a = glass_alpha;
+			meta.template get<invariants::sprite>().neon_color.a = glass_neon_alpha;
+			meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL, false);
+			meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS, false);
+
+			meta.template get<components::sorting_order>().order = static_cast<sorting_order_type>(test_obstacle_order::GLASS);
+		};
+
 		auto static_glass_obstacle = [&](auto& meta) -> auto& {
 			static_obstacle(
 				meta,
@@ -44,13 +56,7 @@ namespace test_flavours {
 				40.f
 			);
 
-			auto& fixtures_def = meta.template get<invariants::fixtures>();
-			fixtures_def.filter = filters[predefined_filter_type::GLASS_OBSTACLE];
-
-			meta.template get<invariants::sprite>().color.a = glass_alpha;
-			meta.template get<invariants::sprite>().neon_color.a = glass_neon_alpha;
-			meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL, false);
-			meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS, false);
+			make_glass_properties(meta);
 
 			return meta;
 		};
@@ -160,5 +166,103 @@ namespace test_flavours {
 				test_obstacle_order::GLASS
 			)
 		);
+
+		{
+
+			const auto default_size = vec2i(128, 128);
+
+			auto create_default_collider = [&](
+				const auto id,
+				const auto triangle_id,
+				const auto material,
+				const auto color,
+				const auto restitution,
+				const auto max_ricochet_angle,
+				const bool glass = false
+			) {
+				{
+					auto& meta = flavour_with_sprite(
+						id,
+						test_scene_image_id::BLANK,
+						test_obstacle_order::OPAQUE,
+						color
+					);
+
+					static_obstacle(
+						meta,
+						material,
+						restitution,
+						max_ricochet_angle
+					);
+
+					meta.template get<invariants::sprite>().size = default_size;
+
+					if (glass) {
+						make_glass_properties(meta);
+						meta.template get<invariants::sprite>().color.a = 200;
+					}
+				}
+
+				{
+					auto& meta = flavour_with_sprite(
+						triangle_id,
+						test_scene_image_id::TRIANGLE_COLLIDER,
+						test_obstacle_order::OPAQUE,
+						color
+					);
+
+					static_obstacle(
+						meta,
+						material,
+						restitution,
+						max_ricochet_angle
+					);
+
+					meta.template get<invariants::sprite>().size = default_size;
+
+					if (glass) {
+						make_glass_properties(meta);
+						meta.template get<invariants::sprite>().color.a = 200;
+					}
+				}
+			};
+
+			create_default_collider(
+				test_plain_sprited_bodies::BOX_COLLIDER_WOOD,
+				test_plain_sprited_bodies::TRIANGLE_COLLIDER_WOOD,
+				test_scene_physical_material_id::WOOD,
+				rgba(255, 150, 50, 255),
+				0.0f,
+				10.0f
+			);
+
+			create_default_collider(
+				test_plain_sprited_bodies::BOX_COLLIDER_METAL,
+				test_plain_sprited_bodies::TRIANGLE_COLLIDER_METAL,
+				test_scene_physical_material_id::METAL,
+				rgba(200, 200, 255, 255),
+				0.2f,
+				20.0f
+			);
+
+			create_default_collider(
+				test_plain_sprited_bodies::BOX_COLLIDER_VENT,
+				test_plain_sprited_bodies::TRIANGLE_COLLIDER_VENT,
+				test_scene_physical_material_id::VENT,
+				rgba(200, 200, 200, 255),
+				0.2f,
+				20.0f
+			);
+
+			create_default_collider(
+				test_plain_sprited_bodies::BOX_COLLIDER_GLASS,
+				test_plain_sprited_bodies::TRIANGLE_COLLIDER_GLASS,
+				test_scene_physical_material_id::GLASS,
+				rgba(200, 255, 255, 255),
+				0.5f,
+				40.0f,
+				true
+			);
+		}
 	}
 }
