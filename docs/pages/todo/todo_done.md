@@ -5072,3 +5072,8 @@ Advantages:
 	- We'll reproduce the entire garden in officials along with flowers etc
 
 - Init organisms with random starting offsets
+	- Implement filtering in Layer window
+		- the UI is there but it's not implemented
+		- what about /?
+			- thought that it could activate the search window like ctrl+f but in layer window
+			- why not? It's just that only pressing / will automatically make it go to entity

@@ -11,11 +11,6 @@ summary: That which we are brainstorming at the moment.
 		- Only if it's a box
 
 - Finishing touches
-	- Implement filtering in Layer window
-		- the UI is there but it's not implemented
-		- what about /?
-			- thought that it could activate the search window like ctrl+f but in layer window
-			- why not? It's just that only pressing / will automatically make it go to entity
 	- We gotta wrap it up
 	- Resizing animations
 

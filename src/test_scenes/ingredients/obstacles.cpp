@@ -96,7 +96,7 @@ namespace test_flavours {
 				test_obstacle_order::OPAQUE
 			),
 
-			test_scene_physical_material_id::AIR_DUCT,
+			test_scene_physical_material_id::VENT,
 			0.2f,
 			20.f
 		);

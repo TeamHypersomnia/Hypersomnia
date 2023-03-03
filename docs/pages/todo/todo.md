@@ -6,6 +6,23 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Merging static colliders
+	- Purpose
+		- Performance: Less overhead for visibility system
+			- Although lights filter duplicate vertices, there would still be less raycasts if bodies were merged
+		- Physics precision: a wall-touching character will always hit the edges between two bodies, pretty annoying
+			- Weren't much of a problem until now so it won't be important until next MVP I guess
+
+	- Instead of a full-blown geometry editor, let's auto-detect static colliders with identical materials that touch each other
+		- When should it be done?
+			- We thought of post-inference in the cosmos but you have no guarantee that some constituent entities won't be reinferred on their own for some reason (e.g. there could be some script)
+			- Therefore it should be done on Editor->Cosmos conversion stage
+				- There we have more civilised ways of determining whether two nodes can be truly merged
+	- and then let the user compose complex shapes with just the primitives they come up with
+		- That way we don't force precise geometry editing on the mapper
+		- and this is even easier on the mapper
+
+
 - Enter while filtering with ImGuiTextFilter could always select the target
 	- E.g. go to node on scene
 	- But leave this for later as it might be too automatic of a behavior
@@ -57,6 +74,9 @@ summary: Just a hidden scratchpad.
 	- Actually just disable the second laser then because there are both now
 
 ## Editor final MVP once we can ditch old maps
+
+- AIR_DUCT -> VENT in official resources
+	- We can't do it now because it's gonna break maps
 
 - Let's make sprite's special effect a boolset
 	- and not just have one effect speed multiplier
