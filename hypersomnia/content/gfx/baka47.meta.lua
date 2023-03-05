@@ -117,7 +117,7 @@ return {
         3,
         4
       },
-      original_poly = {
+      source_polygon = {
         {
           x = -58,
           y = -5

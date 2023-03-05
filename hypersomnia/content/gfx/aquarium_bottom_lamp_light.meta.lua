@@ -102,7 +102,7 @@ return {
     },
     non_standard_shape = {
       convex_partition = {},
-      original_poly = {}
+      source_polygon = {}
     },
     torso = {
       back = {

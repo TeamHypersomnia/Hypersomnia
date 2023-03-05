@@ -281,12 +281,12 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 					if (const auto& shape = offsets.non_standard_shape; !shape.empty()) {
 						total_verts.clear();
 
-						for (auto h : shape.original_poly) {
+						for (auto h : shape.source_polygon) {
 							h.mult(from);
 							total_verts.emplace_back(h);
 						}
 
-						for (auto h : shape.original_poly) {
+						for (auto h : shape.source_polygon) {
 							h.mult(to);
 							total_verts.emplace_back(h);
 						}

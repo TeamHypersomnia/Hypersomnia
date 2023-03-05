@@ -15,34 +15,34 @@ struct basic_convex_partitioned_shape {
 	using transform = basic_transform<T>;
 	using index_type = uint8_t;
 
-	using original_poly_type = augs::constant_size_vector<vec2, vertex_count>;
+	using source_polygon_type = augs::constant_size_vector<vec2, vertex_count>;
 	using convex_partition_type = augs::constant_size_vector<index_type, partition_index_count>;
 
 	// GEN INTROSPECTOR struct basic_convex_partitioned_shape class T std::size_t vertex_count std::size_t partition_index_count
-	original_poly_type original_poly = {};
+	source_polygon_type source_polygon = {};
 	convex_partition_type convex_partition = {};
 	// END GEN INTROSPECTOR
 
 	void offset_vertices(const transformr transform) {
-		for (auto& v : original_poly) {
+		for (auto& v : source_polygon) {
 			v.rotate(transform.rotation);
 			v += transform.pos;
 		}
 	}
 
 	void scale(const vec2 mult) {
-		for (auto& v : original_poly) {
+		for (auto& v : source_polygon) {
 			v *= mult;
 		}
 	}
 
 	void clear() {
-		original_poly.clear();
+		source_polygon.clear();
 		convex_partition.clear();
 	}
 
 	bool empty() const {
-		return original_poly.empty();
+		return source_polygon.empty();
 	}
 
 	bool take_vertices_one_after_another() const {

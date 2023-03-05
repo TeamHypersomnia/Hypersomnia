@@ -101,7 +101,7 @@ return {
     },
     non_standard_shape = {
       convex_partition = {},
-      original_poly = {
+      source_polygon = {
         {
           x = -12,
           y = -4

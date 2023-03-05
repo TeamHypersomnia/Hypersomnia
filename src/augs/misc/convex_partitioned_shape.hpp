@@ -8,13 +8,13 @@ template <
 template <class F>
 void basic_convex_partitioned_shape<T, V, P>::for_each_convex(F&& callback) const {
 	if (take_vertices_one_after_another()) {
-		callback(original_poly);
+		callback(source_polygon);
 		return;
 	}
 
 	using C = basic_convex_partitioned_shape<T, V, P>;
 
-	typename C::original_poly_type convex;
+	typename C::source_polygon_type convex;
 
 	const auto& partition = convex_partition;
 
@@ -28,8 +28,8 @@ void basic_convex_partitioned_shape<T, V, P>::for_each_convex(F&& callback) cons
 			continue;
 		}
 
-		if (partition[i] < original_poly.size()) {
-			convex.push_back(original_poly[partition[i]]);
+		if (partition[i] < source_polygon.size()) {
+			convex.push_back(source_polygon[partition[i]]);
 		}
 	}
 }

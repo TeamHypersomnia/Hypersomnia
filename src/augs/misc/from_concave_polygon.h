@@ -14,7 +14,7 @@ namespace augs {
 	void refresh_convex_partitioning(
 		basic_convex_partitioned_shape<T, vertex_count, index_count>& poly
 	) {
-		const auto& verts = poly.original_poly;
+		const auto& verts = poly.source_polygon;
 
 		auto& pc = poly.convex_partition;
 		pc.clear();
@@ -128,7 +128,6 @@ namespace augs {
 
 		for (std::size_t i = 0; i < polygon.size(); ++i) {
 			vertices.push_back(polygon[i]);
-			//original_polygon.push_back(polygon[i].pos);
 		}
 
 		for (std::size_t i = 0; i < polygon.size(); ++i) {

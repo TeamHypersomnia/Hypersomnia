@@ -341,13 +341,13 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		shape.offset_vertices(connection.shape_offset);
 
 		if (flips.horizontally) {
-			for (auto& v : shape.original_poly) {
+			for (auto& v : shape.source_polygon) {
 				v.neg_x();
 			}
 		}
 
 		if (flips.vertically) {
-			for (auto& v : shape.original_poly) {
+			for (auto& v : shape.source_polygon) {
 				v.neg_y();
 			}
 		}

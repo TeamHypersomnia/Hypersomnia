@@ -100,7 +100,7 @@ return {
         0,
         1
       },
-      original_poly = {
+      source_polygon = {
         {
           x = -15,
           y = -2

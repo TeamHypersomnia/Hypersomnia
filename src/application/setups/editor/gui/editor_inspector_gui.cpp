@@ -731,7 +731,7 @@ EDIT_FUNCTION(
 
 		{
 			if (auto tweak_type = shape_picker.handle("Custom collider shape", insp.as_physical.custom_shape)) {
-				augs::fix_polygon_winding(insp.as_physical.custom_shape.original_poly);
+				augs::fix_polygon_winding(insp.as_physical.custom_shape.source_polygon);
 				augs::refresh_convex_partitioning(insp.as_physical.custom_shape);
 
 				for (auto& e : es) {

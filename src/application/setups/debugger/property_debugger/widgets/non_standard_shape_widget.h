@@ -71,7 +71,7 @@ struct non_standard_shape_widget {
 				if (object.empty()) {
 					T box;
 
-					auto& v = box.original_poly;
+					auto& v = box.source_polygon;
 
 					v.resize(4);
 					v[0].set(-hs.x, -hs.y);
@@ -85,7 +85,7 @@ struct non_standard_shape_widget {
 				return object;
 			}();
 			
-			auto& considered_poly = considered.original_poly;
+			auto& considered_poly = considered.source_polygon;
 
 			const auto n = considered_poly.size();
 
@@ -229,7 +229,7 @@ struct non_standard_shape_widget {
 		auto perform_standard_widget = [&]() {
 			ImGui::Separator();
 
-			if (object.original_poly.size() > 0) {
+			if (object.source_polygon.size() > 0) {
 				text("Vertices:");
 			}
 			else {
@@ -239,8 +239,8 @@ struct non_standard_shape_widget {
 			/* Perform the standard widget for manual tweaking */
 			auto iw = scoped_item_width(-1);
 
-			for (auto& v : object.original_poly) {
-				auto id = scoped_id(index_in(object.original_poly, v));
+			for (auto& v : object.source_polygon) {
+				auto id = scoped_id(index_in(object.source_polygon, v));
 
 				if (drag_vec2("##" + identity_label, v)) {
 					result = tweaker_type::CONTINUOUS;

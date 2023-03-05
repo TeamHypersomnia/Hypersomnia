@@ -99,7 +99,7 @@ return {
         5,
         6
       },
-      original_poly = {
+      source_polygon = {
         {
           x = -24,
           y = 7
