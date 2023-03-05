@@ -75,6 +75,8 @@ summary: Just a hidden scratchpad.
 
 ## Editor final MVP once we can ditch old maps
 
+- Resizing animations
+
 - Watch out for MAX_IMAGES_IN_INTERCOSM
 	- Let's not allocate this statically
 

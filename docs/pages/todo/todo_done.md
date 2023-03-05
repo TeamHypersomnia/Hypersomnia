@@ -5077,3 +5077,9 @@ Advantages:
 		- what about /?
 			- thought that it could activate the search window like ctrl+f but in layer window
 			- why not? It's just that only pressing / will automatically make it go to entity
+- Let's keep convex partitions in the map jsons
+	- Just check the indices in convex_partition for safety
+
+- Shape editor
+	- port it from old editor
+

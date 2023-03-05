@@ -5,6 +5,7 @@
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/cosmos/solvers/standard_solver.h"
 #include "view/audiovisual_state/systems/legacy_light_mults.h"
+#include "game/cosmos/change_common_significant.hpp"
 
 template <class N, class R, class H, class A>
 void setup_entity_from_node(
@@ -243,6 +244,7 @@ void allocate_flavours_and_assets_for_resource(
 					new_definition.source_image.is_official = maybe_official_image_path::RESOLVED;
 
 					new_definition.meta.extra_loadables.generate_neon_map = resource.editable.neon_map;
+					new_definition.meta.offsets.non_standard_shape = resource.editable.as_physical.custom_shape;
 
 					auto& meta = new_definition.meta;
 					(void)meta;
@@ -269,7 +271,9 @@ void allocate_flavours_and_assets_for_resource(
 				new_definition.source_image.path = resource.external_file.path_in_project;
 				new_definition.source_image.is_official = is_official;
 				new_definition.meta.extra_loadables.generate_neon_map = resource.editable.neon_map;
+				new_definition.meta.offsets.non_standard_shape = resource.editable.as_physical.custom_shape;
 
+				LOG_NVPS(new_definition.source_image.path.string(), resource.editable.as_physical.custom_shape.empty());
 				auto& meta = new_definition.meta;
 				(void)meta;
 			}
@@ -579,6 +583,17 @@ void editor_setup::rebuild_scene() {
 	for_each_manually_specified_official_resource_pool(setup_flavours_and_assets);
 #endif
 	project.resources .for_each(setup_flavours_and_assets);
+
+	/* 
+		We do this instead of calling post_load_state_correction 
+		which would reinfer all entities unnecessarily.
+	*/
+
+	scene.world.change_common_significant([&](cosmos_common_significant& common) {
+		scene.viewables.update_relevant(common.logical_assets);
+
+		return changer_callback_result::DONT_REFRESH;
+	});
 
 	/* Create nodes */
 

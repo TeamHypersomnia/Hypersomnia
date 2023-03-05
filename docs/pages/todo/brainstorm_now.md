@@ -6,12 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Let's keep convex partitions in the map jsons
-	- Just check the indices in convex_partition for safety
-
-- Shape editor
-	- port it from old editor
-
 - What do we make official?
 	- Vent sprites certainly because we already have an official vent physical material
 	- Maybe some complex-shaped stuff
@@ -22,9 +16,7 @@ summary: That which we are brainstorming at the moment.
 	- Apparently resizing physical bodies doesn't honor the custom physical collider.
 		- Only if it's a box
 
-- Finishing touches
-	- We gotta wrap it up
-	- Resizing animations
+- We gotta wrap it up
 
 - We can ship editor as soon as we reproduce fy_minilab
 	- So people can play in the meantime
