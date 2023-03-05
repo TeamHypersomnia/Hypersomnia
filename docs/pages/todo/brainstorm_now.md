@@ -6,6 +6,28 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Consider adding "+1 times" to resize calculation
+	- Also automatically "not tile" *during resizing* if it's less than original
+
+- "File is missing" needs to disappear if the deleted resource wasn't used anywhere
+
+- Aquarium - We only really need to think how we'd do it manually and support it in the editor
+	- The rest is only about automatized placement, we shouldn't worry about these two simultaneously
+
+- Is our model still incomplete?
+	- If we allow specifying custom resources in the aquarium node,
+		- we will need to implement the non-physical override for the officials as well
+	- Also think where creating organisms fits into this all
+		- Are they just in the foreground domain? (esp. the insects must be foreground)
+	- We shouldn't worry about duplicate flavours
+		- at least the image defs won't be reused
+		
+- Map caching/compilation
+	- This can be an easy bin file in cache
+	- Or even an adjacent file
+	- The bin file can hold a stamp inside with both the game's version and last_write_time
+	- so we don't even need a folder for that, but it might be nice
+
 - What do we make official?
 	- Vent sprites certainly because we already have an official vent physical material
 	- Maybe some complex-shaped stuff
@@ -30,17 +52,6 @@ summary: That which we are brainstorming at the moment.
 	- Let's just add an eye to the toolbar
 		- Later optionally "Filtering" to View
 
-- Aquarium - We only really need to think how we'd do it manually and support it in the editor
-	- The rest is only about automatized placement, we shouldn't worry about these two simultaneously
-
-- Is our model still incomplete?
-	- If we allow specifying custom resources in the aquarium node,
-		- we will need to implement the non-physical override for the officials as well
-	- Also think where creating organisms fits into this all
-		- Are they just in the foreground domain? (esp. the insects must be foreground)
-	- We shouldn't worry about duplicate flavours
-		- at least the image defs won't be reused
-		
 - Cover ground neons per-entity?
 	- Only foregrounds will need it on a second thought
 	- Consider making anything foreground cover the ground neons by default, but I don't know how we'll do it

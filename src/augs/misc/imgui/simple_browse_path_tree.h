@@ -38,11 +38,12 @@ void simple_browse_path_tree(
 	using namespace augs::imgui;
 
 	thread_local ImGuiTextFilter filter;
-	filter.Draw();
 
 	if (acquire_keyboard) {
 		ImGui::SetKeyboardFocusHere();
 	}
+
+	filter.Draw();
 
 	auto files_view = scoped_child("Files view", ImVec2(0, 20 * ImGui::GetTextLineHeightWithSpacing()));
 

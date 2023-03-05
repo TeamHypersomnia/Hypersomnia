@@ -63,13 +63,13 @@ public:
 		auto id = scoped_id("Unpathed asset selection");
 
 		if (auto combo = track.standard_combo_facade(identity_label.c_str(), displayed_str.c_str())) {
-			filter.Draw();
-
 			const bool acquire_keyboard = track.pop_acquire_keyboard();
 
 			if (acquire_keyboard) {
 				ImGui::SetKeyboardFocusHere();
 			}
+
+			filter.Draw();
 
 			if (detail_select_none(asset_id)) {
 				return std::make_optional(tweaker_type::DISCRETE);

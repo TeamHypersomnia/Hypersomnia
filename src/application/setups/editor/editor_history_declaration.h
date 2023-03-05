@@ -34,6 +34,7 @@ struct reorder_layers_command;
 struct delete_layers_command;
 struct create_multiple_nodes;
 struct rename_node_command;
+struct change_resource_command;
 
 class move_nodes_command;
 class resize_nodes_command;
@@ -75,6 +76,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_node_command<editor_explosive_node>,
 
 	rename_node_command,
+	change_resource_command,
 
 	create_layer_command,
 	delete_layers_command,

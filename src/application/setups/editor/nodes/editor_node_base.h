@@ -4,6 +4,8 @@
 
 template <class R, class E>
 struct editor_node_base {
+	using resource_type = R;
+
 	editor_typed_resource_id<R> resource_id;
 	E editable;
 

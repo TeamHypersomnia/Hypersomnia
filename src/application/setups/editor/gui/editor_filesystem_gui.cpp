@@ -17,6 +17,8 @@
 #include "view/rendering_scripts/for_each_iconed_entity.h"
 #include "augs/window_framework/window.h"
 
+#include "application/setups/editor/detail/make_command_from_selections.h"
+
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem(project_special_root);
 	setup_special_filesystem(official_special_root);
@@ -202,8 +204,46 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			dragged_resource,
 			[&]() {
 				if (ImGui::BeginPopupContextItem()) {
-					if (ImGui::Selectable("Reveal in explorer")) {
-						in.window.reveal_in_explorer(in.setup.resolve_project_path(node.get_path_in_project()));
+					const bool can_reveal = node.associated_resource.is_set() && !node.associated_resource.is_official;
+
+					{
+						auto disabled = maybe_disabled_cols(!can_reveal);
+
+						if (ImGui::Selectable("Reveal in explorer")) {
+							if (can_reveal) {
+								in.window.reveal_in_explorer(in.setup.resolve_project_path(node.get_path_in_project()));
+							}
+						}
+					}
+
+					if (!node.is_folder() && node.associated_resource.is_set()) {
+						ImGui::Separator();
+
+						bool can_assign = in.setup.inspects_any<editor_node_id>();
+
+						in.setup.for_each_inspected<editor_node_id>([&](const editor_node_id id) { 
+							in.setup.on_node(id, [&](const auto& typed_node, const auto) {
+								if (typed_node.resource_id.get_type_id() != node.associated_resource.type_id) {
+									can_assign = false;
+								}
+							});
+						});
+
+						{
+							auto disabled = maybe_disabled_cols(!can_assign);
+
+							if (ImGui::Selectable("Assign to inspected nodes")) {
+								if (can_assign) {
+									auto cmd = in.setup.make_command_from_selected_nodes<change_resource_command>("Changed resource of ");
+									cmd.after = node.associated_resource;
+									cmd.built_description = typesafe_sprintf("Changed resource to %x", node.name);
+
+									if (!cmd.empty()) {
+										in.setup.post_new_command(std::move(cmd)); 
+									}
+								}
+							}
+						}
 					}
 
 					ImGui::EndPopup();

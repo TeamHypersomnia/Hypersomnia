@@ -52,6 +52,19 @@ decltype(auto) editor_setup::find_resource_impl(S& self, const editor_typed_reso
 	return self.project.resources.find_typed(id);
 }
 
+template <class R, class F>
+void editor_setup::for_each_resource(F&& callback, bool official) const {
+	const auto& pools = official ? official_resources : project.resources;
+
+	pools.template get_pool_for<R>().for_each_id_and_object(
+		[&](const auto& raw_id, const auto& object) {
+			const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, official);
+
+			callback(typed_id, object);
+		}
+	);
+}
+
 template <class T>
 decltype(auto) editor_setup::find_node(const editor_typed_node_id<T>& id) {
 	return project.nodes.find_typed(id);

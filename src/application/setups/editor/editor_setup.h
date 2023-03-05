@@ -250,6 +250,9 @@ public:
 	template <class F>
 	decltype(auto) on_resource(const editor_resource_id& id, F&& callback) const;
 
+	template <class R, class F>
+	void for_each_resource(F&& callback, bool official) const;
+
 	template <class F>
 	void for_each_dashed_line(F&&) const;
 

@@ -273,7 +273,6 @@ void allocate_flavours_and_assets_for_resource(
 				new_definition.meta.extra_loadables.generate_neon_map = resource.editable.neon_map;
 				new_definition.meta.offsets.non_standard_shape = resource.editable.as_physical.custom_shape;
 
-				LOG_NVPS(new_definition.source_image.path.string(), resource.editable.as_physical.custom_shape.empty());
 				auto& meta = new_definition.meta;
 				(void)meta;
 			}

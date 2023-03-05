@@ -26,6 +26,7 @@
 #include "test_scenes/test_scene_flavours.h"
 #include "application/setups/debugger/property_debugger/widgets/non_standard_shape_widget.h"
 #include "augs/misc/from_concave_polygon.h"
+#include "application/setups/editor/gui/widgets/resource_chooser.h"
 
 #define EDIT_ATTENUATIONS 0
 
@@ -1193,46 +1194,80 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	auto node_handler = [&]<typename N>(const N& node, const auto& node_id) {
 		auto id = scoped_id(node.unique_name.c_str());
 
-		text_color(std::string(node.get_type_name()) + ": ", yellow);
+		const auto resource = in.setup.find_resource(node.resource_id);
+		ensure(resource != nullptr);
 
-		{
-			ImGui::SameLine();
-
-			auto edited_node_name = node.unique_name;
-
-			if (input_text<100>("##NameInput", edited_node_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
-				if (edited_node_name != node.unique_name && !edited_node_name.empty()) {
-					auto cmd = in.setup.make_command_from_selected_nodes<rename_node_command>("Renamed ");
-					cmd.after = edited_node_name;
-
-					if (cmd.size() == 1) {
-						cmd.built_description = typesafe_sprintf("Renamed node to %x", cmd.after);
-					}
-
-					if (!cmd.empty()) {
-						in.setup.post_new_command(std::move(cmd)); 
-					}
-				}
-			}
+		if (resource == nullptr) {
+			return;
 		}
-		ImGui::Separator();
+
 		auto edited_copy = node.editable;
 		auto changed = std::string();
 
 		auto cmd = in.setup.make_command_from_selected_typed_nodes<edit_node_command<N>, N>("Edited ");
 
+		bool same_resource = true;
+
 		for (auto& e : cmd.entries) {
 			const auto entry_node = in.setup.find_node(e.node_id);
 			ensure(entry_node != nullptr);
 			e.after = entry_node->editable;
+
+			if (entry_node->resource_id != node.resource_id) {
+				same_resource = false;
+			}
 		}
 
+		text_color(std::string(node.get_type_name()) + ": ", yellow);
+		ImGui::SameLine();
+
+		{
+			const auto displayed_resource_name = resource->get_display_name();
+
+			using R = typename N::resource_type;
+			thread_local resource_chooser<R> chooser;
+
+			auto cols = maybe_different_value_cols({}, !same_resource);
+
+			chooser.perform(
+				"##ResourceSelector",
+				displayed_resource_name,
+				in.setup,
+				[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
+					auto cmd = in.setup.make_command_from_selected_nodes<change_resource_command>("Changed resource of ");
+					cmd.after = chosen_id.operator editor_resource_id();
+					cmd.built_description = typesafe_sprintf("Changed resource to %x", chosen_name);
+
+					if (!cmd.empty()) {
+						in.setup.post_new_command(std::move(cmd)); 
+					}
+				}
+			);
+		}
+
+		{
+			auto edited_node_name = node.unique_name;
+
+			if (input_text<100>("Name: ", edited_node_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
+				if (edited_node_name != node.unique_name && !edited_node_name.empty()) {
+					auto name_cmd = in.setup.make_command_from_selected_nodes<rename_node_command>("Renamed ");
+					name_cmd.after = edited_node_name;
+
+					if (name_cmd.size() == 1) {
+						name_cmd.built_description = typesafe_sprintf("Renamed node to %x", name_cmd.after);
+					}
+
+					if (!name_cmd.empty()) {
+						in.setup.post_new_command(std::move(name_cmd)); 
+					}
+				}
+			}
+		}
+
+		ImGui::Separator();
 		(void)node_id;
 
 		if constexpr(std::is_same_v<N, editor_sprite_node>) {
-			const auto resource = in.setup.find_resource(node.resource_id);
-			ensure(resource != nullptr);
-
 			auto original_size = resource->editable.size;
 			
 			if (resource->official_tag) {

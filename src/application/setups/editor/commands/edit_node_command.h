@@ -37,6 +37,40 @@ struct edit_node_command {
 	}
 };
 
+struct change_resource_command {
+	editor_command_meta meta;
+
+	struct entry {
+		editor_node_id node_id;
+
+		std::string before_name;
+		editor_resource_id before_resource;
+	};
+
+	std::vector<entry> entries;
+
+	void push_entry(editor_node_id);
+
+	editor_resource_id after;
+
+	std::string built_description;
+
+	void undo(editor_command_input in);
+	void redo(editor_command_input in);
+
+	auto size() const {
+		return entries.size();
+	}
+
+	auto empty() const {
+		return entries.empty();
+	}
+
+	const auto& describe() const {
+		return built_description;
+	}
+};
+
 struct rename_node_command {
 	editor_command_meta meta;
 
