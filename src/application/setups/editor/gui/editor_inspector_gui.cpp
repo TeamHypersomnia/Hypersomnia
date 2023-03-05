@@ -1248,7 +1248,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		{
 			auto edited_node_name = node.unique_name;
 
-			if (input_text<100>("Name: ", edited_node_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
+			if (input_text<100>("Name", edited_node_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
 				if (edited_node_name != node.unique_name && !edited_node_name.empty()) {
 					auto name_cmd = in.setup.make_command_from_selected_nodes<rename_node_command>("Renamed ");
 					name_cmd.after = edited_node_name;

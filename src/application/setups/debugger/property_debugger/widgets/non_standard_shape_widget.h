@@ -93,7 +93,7 @@ struct non_standard_shape_widget {
 
 			const auto mpos = [&]() {
 				const auto pos = ImGui::GetCursorScreenPos();
-				const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
+				const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x + float(zoom)/2, io.MousePos.y - pos.y + float(zoom)/2) / zoom);
 				return vec2(image_space_new - reference_point);
 			}();
 
@@ -242,7 +242,9 @@ struct non_standard_shape_widget {
 			for (auto& v : object.source_polygon) {
 				auto id = scoped_id(index_in(object.source_polygon, v));
 
-				if (drag_vec2("##" + identity_label, v)) {
+				auto vi = vec2i(v);
+				if (drag_vec2("##" + identity_label, vi)) {
+					v = vi;
 					result = tweaker_type::CONTINUOUS;
 				}
 			}

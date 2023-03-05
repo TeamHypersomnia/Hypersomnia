@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- deal with name collisions of custom sprites vs official sprites
+	- looks like we can't identify by name
+
 - Consider adding "+1 times" to resize calculation
 	- Also automatically "not tile" *during resizing* if it's less than original
 
