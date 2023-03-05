@@ -75,6 +75,14 @@ summary: Just a hidden scratchpad.
 
 ## Editor final MVP once we can ditch old maps
 
+- Watch out for MAX_IMAGES_IN_INTERCOSM
+	- Let's not allocate this statically
+
+
+- Check what happens when we overflow the texture size
+	- with some giant gif for example
+	- we can later implement the optimizations like separating atlases
+
 - AIR_DUCT -> VENT in official resources
 	- We can't do it now because it's gonna break maps
 

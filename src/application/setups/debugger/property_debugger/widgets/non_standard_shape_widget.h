@@ -45,22 +45,25 @@ struct non_standard_shape_widget {
 			const auto& entry = game_atlas.find_or(id);
 
 			const auto is = vec2i(entry.get_original_size());
-			const auto zoom = 4;
+
+			const int avail_x = ImGui::GetContentRegionAvail().x;
+			const int image_width = is.x;
+			const int zoom = image_width == 0 ? 1 : std::max(1, avail_x / image_width);
 
 			const auto viewing_size = (is * zoom).operator ImVec2();
 
-			text("Image size: %x, zoom: %x", is, zoom);
+			text("Image size: %x, zoom: %x\nHold CTRL to add vertices.\nHold Shift to delete vertices.\nHold Alt to show the convex partition.", is, zoom);
 
 			invisible_button_reset_cursor("###VertexSelector", viewing_size);
 			game_image(entry.diffuse, viewing_size);
 
-			const auto segment_alpha = 180;
+			const auto segment_alpha = float(180)/255;
 
 			const auto hs = vec2(is) * 0.5f;
 			const auto& reference_point = hs;
 
 			auto segment = [&](const auto a, const auto b, rgba col) {
-				col.a = segment_alpha;
+				col.mult_alpha(segment_alpha);
 				draw_segment((reference_point + a) * zoom, (reference_point + b) * zoom, col, 2.f);
 			};
 
@@ -129,10 +132,10 @@ struct non_standard_shape_widget {
 
 			const bool hovered = ImGui::IsItemHovered();
 
-			const bool is_adding_mode = n < considered_poly.max_size() && io.KeyShift;
-			const bool is_removing_mode = n > 3 && io.KeyAlt;
+			const bool is_adding_mode = n < considered_poly.max_size() && io.KeyCtrl;
+			const bool is_removing_mode = n > 3 && io.KeyShift;
 			const bool is_normal_mode = !is_removing_mode && !is_adding_mode;
-			const bool is_show_partition_mode = is_normal_mode && io.KeyCtrl;
+			const bool is_show_partition_mode = is_normal_mode && io.KeyAlt;
 
 			if (is_show_partition_mode) {
 				considered.for_each_convex([&](const auto& convex) {
@@ -147,6 +150,20 @@ struct non_standard_shape_widget {
 				});
 			}
 			else {
+				if (!considered.take_vertices_one_after_another()) {
+					auto col = orange;
+					col.a = 50;
+
+					considered.for_each_convex([&](const auto& convex) {
+						for (std::size_t i = 0; i < convex.size(); ++i) {
+							const auto& va = convex[i];
+							const auto& vb = wrap_next(convex, i);
+
+							segment(va, vb, col);
+						}
+					});
+				}
+
 				for (std::size_t i = 0; i < considered_poly.size(); ++i) {
 					auto a = considered_poly[i];
 					auto b = wrap_next(considered_poly, i);
@@ -210,20 +227,29 @@ struct non_standard_shape_widget {
 		};
 
 		auto perform_standard_widget = [&]() {
+			ImGui::Separator();
+
+			if (object.original_poly.size() > 0) {
+				text("Vertices:");
+			}
+			else {
+				text("The shape has default vertices.");
+			}
+
 			/* Perform the standard widget for manual tweaking */
 			auto iw = scoped_item_width(-1);
 
 			for (auto& v : object.original_poly) {
 				auto id = scoped_id(index_in(object.original_poly, v));
 
-				if (drag_vec2(identity_label, v)) {
+				if (drag_vec2("##" + identity_label, v)) {
 					result = tweaker_type::CONTINUOUS;
 				}
 			}
 		};
 
 		if (nodeize) {
-			const auto node_label = "" + identity_label;
+			const auto node_label = identity_label;
 
 			auto node = scoped_tree_node(node_label.c_str());
 

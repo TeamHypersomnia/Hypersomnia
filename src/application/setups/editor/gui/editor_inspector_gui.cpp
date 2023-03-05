@@ -24,6 +24,8 @@
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "application/setups/debugger/property_debugger/widgets/non_standard_shape_widget.h"
+#include "augs/misc/from_concave_polygon.h"
 
 #define EDIT_ATTENUATIONS 0
 
@@ -550,7 +552,8 @@ EDIT_FUNCTION(
 	editor_sprite_resource_editable& insp,
 	T& es,
 	const std::vector<editor_sprite_resource_editable>& defaults,
-	const image_color_picker_widget& picker
+	const image_color_picker_widget& picker,
+	const non_standard_shape_widget& shape_picker
 ) {
 	using namespace augs::imgui;
 
@@ -727,7 +730,23 @@ EDIT_FUNCTION(
 		ImGui::Separator();
 
 		{
-			auto scope = augs::imgui::scoped_tree_node_ex("Edit collider shape");
+			if (auto tweak_type = shape_picker.handle("Custom collider shape", insp.as_physical.custom_shape)) {
+				augs::fix_polygon_winding(insp.as_physical.custom_shape.original_poly);
+				augs::refresh_convex_partitioning(insp.as_physical.custom_shape);
+
+				for (auto& e : es) {
+					e.after.as_physical.custom_shape = insp.as_physical.custom_shape;
+				}
+
+				if (tweak_type == tweaker_type::CONTINUOUS) {
+					result = "Edited shape vertices in %x";
+				}
+				else {
+					result = "Altered physical shape of %x";
+				}
+			}
+
+			ImGui::Separator();
 		}
 
 		MULTIPROPERTY("Density", as_physical.density);
@@ -959,7 +978,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	auto post_new_or_rewrite = [&]<typename T>(T&& cmd) {
 		bool force_new = false;
 
-		if (begins_with(cmd.describe(), "Added") || begins_with(cmd.describe(), "Picked") || begins_with(cmd.describe(), "Removed")) {
+		if (begins_with(cmd.describe(), "Added") || begins_with(cmd.describe(), "Picked") || begins_with(cmd.describe(), "Removed") || begins_with(cmd.describe(), "Altered")) {
 			force_new = true;
 		}
 
@@ -1138,8 +1157,13 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					false
 				};
 
-				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, picker);
+				const auto shape_picker = non_standard_shape_widget {
+					resource.scene_asset_id,
+					in.game_atlas,
+					true
+				};
 
+				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, picker, shape_picker);
 			}
 			else {
 				auto disabled = maybe_disabled_only_cols(resource_id.is_official);

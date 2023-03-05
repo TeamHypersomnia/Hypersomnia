@@ -13,10 +13,10 @@ struct basic_convex_partitioned_shape {
 	using this_type = basic_convex_partitioned_shape<T, vertex_count, partition_index_count>;
 	using vec2 = basic_vec2<T>;
 	using transform = basic_transform<T>;
-	using index_type = unsigned char;
+	using index_type = uint8_t;
 
 	using original_poly_type = augs::constant_size_vector<vec2, vertex_count>;
-	using convex_partition_type = augs::constant_size_vector<unsigned char, partition_index_count>;
+	using convex_partition_type = augs::constant_size_vector<index_type, partition_index_count>;
 
 	// GEN INTROSPECTOR struct basic_convex_partitioned_shape class T std::size_t vertex_count std::size_t partition_index_count
 	original_poly_type original_poly = {};

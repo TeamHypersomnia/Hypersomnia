@@ -28,6 +28,8 @@ void basic_convex_partitioned_shape<T, V, P>::for_each_convex(F&& callback) cons
 			continue;
 		}
 
-		convex.push_back(original_poly[partition[i]]);
+		if (partition[i] < original_poly.size()) {
+			convex.push_back(original_poly[partition[i]]);
+		}
 	}
 }

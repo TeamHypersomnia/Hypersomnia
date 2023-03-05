@@ -10,6 +10,8 @@
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
 #include "test_scenes/test_scene_flavour_ids.h"
+#include "augs/misc/convex_partitioned_shape.h"
+#include "game/assets/image_offsets.h"
 
 enum class editor_sprite_domain {
 	// GEN INTROSPECTOR enum class editor_sprite_domain
@@ -47,6 +49,8 @@ struct editor_sprite_resource_physical {
 
 	bool cover_ground_neons = true;
 	bool illuminate_as_wall = true;
+
+	image_shape_type custom_shape;
 	// END GEN INTROSPECTOR
 };
 

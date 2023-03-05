@@ -82,15 +82,8 @@ namespace augs {
 		}
 	}
 
-	template <std::size_t vertex_count, std::size_t index_count>
-	void from_concave_polygon(
-		polygon<vertex_count, index_count>& poly,
-	   	std::vector<vertex> polygon
-	) {
-		if (polygon.empty()) {
-			return;
-		}
-
+	template <class P>
+	void fix_polygon_winding(P& polygon) {
 		std::size_t i1;
 		std::size_t	i2;
 
@@ -104,12 +97,22 @@ namespace augs {
 				i2 = 0;
 			}
 
-			area += vs[i1].pos.cross(vs[i2].pos);
+			area += vs[i1].cross(vs[i2]);
 		}
 
 		/* ensure proper winding */
-		if (area > 0) {
+		if (area < 0) {
 			std::reverse(polygon.begin(), polygon.end());
+		}
+	}
+
+	template <std::size_t vertex_count, std::size_t index_count>
+	void from_concave_polygon(
+		polygon<vertex_count, index_count>& poly,
+	   	std::vector<vertex> polygon
+	) {
+		if (polygon.empty()) {
+			return;
 		}
 
 		TPPLPoly inpoly;

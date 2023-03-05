@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Let's keep convex partitions in the map jsons
+	- Just check the indices in convex_partition for safety
+
+- Shape editor
+	- port it from old editor
+
 - What do we make official?
 	- Vent sprites certainly because we already have an official vent physical material
 	- Maybe some complex-shaped stuff

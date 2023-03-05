@@ -126,6 +126,7 @@ namespace augs {
 					verts.push_back(twelve_o_clock);
 				}
 
+				std::reverse(verts.begin(), verts.end());
 				augs::constant_size_vector<augs::vertex, 7> concave;
 
 				for (const auto& v : verts) {
