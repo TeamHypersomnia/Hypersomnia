@@ -6,8 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Let's NOT keep cache files inside map folders.
+	- Would add security overhead: someone could upload a map with a malicious cache binary
+	- Instead let's keep it in game's own cache folder
+		- like: cache/arenas/official/de_cyberaqua/compiled.bin etc
+	- also way cleaner, less clutter in the map folders and less stuff to blacklist later for transmission etc.
+	
+- dev_floor_128, 256, 64, 32 etc
+
 - deal with name collisions of custom sprites vs official sprites
 	- looks like we can't identify by name
+		- won't this be solved just by fixing the resources chooser?
+	- Look, unique names are ONLY required during serialization but official resources will be marked with [] anyway
+		- Otherwise it's merely a matter of displaying them
 
 - Consider adding "+1 times" to resize calculation
 	- Also automatically "not tile" *during resizing* if it's less than original

@@ -1232,6 +1232,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			chooser.perform(
 				"##ResourceSelector",
 				displayed_resource_name,
+				node.resource_id,
 				in.setup,
 				[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
 					auto cmd = in.setup.make_command_from_selected_nodes<change_resource_command>("Changed resource of ");

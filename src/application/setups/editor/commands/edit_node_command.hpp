@@ -97,6 +97,7 @@ void change_resource_command::redo(editor_command_input in) {
 				ensure(new_resource != nullptr);
 
 				if (should_rename && new_resource) {
+					node.unique_name = "";
 					node.unique_name = in.setup.get_free_node_name_for(new_resource->get_display_name());
 				}
 
@@ -181,6 +182,7 @@ void rename_node_command::redo(editor_command_input in) {
 				(void)id;
 
 				entry.before = node.unique_name;
+				node.unique_name = "";
 				node.unique_name = in.setup.get_free_node_name_for(after);
 
 				if (do_inspector) {
@@ -231,6 +233,7 @@ void rename_layer_command::redo(editor_command_input in) {
 	for (auto& entry : entries) {
 		if (const auto layer = in.setup.find_layer(entry.layer_id)) {
 			entry.before = layer->unique_name;
+			layer->unique_name = "";
 			layer->unique_name = in.setup.get_free_layer_name_for(after);
 
 			/* 

@@ -16,10 +16,11 @@ class resource_chooser : keyboard_acquiring_popup {
 	using I = std::string;
 
 	using base = keyboard_acquiring_popup;
+	using id_type = editor_typed_resource_id<R>;
 
 	struct sorted_entry {
 		std::string name;
-		editor_typed_resource_id<R> target_id;
+		id_type target_id;
 		
 		bool operator<(const sorted_entry& b) const {
 			return name < b.name;
@@ -34,6 +35,7 @@ public:
 	bool perform(
 		const std::string& label, 
 		const std::string& current_source,
+		const id_type current_source_id,
 		const editor_setup& setup,
 		F on_choice
 	) {
@@ -65,14 +67,18 @@ public:
 
 			auto resources_view = scoped_child("Resources view", ImVec2(0, 20 * ImGui::GetTextLineHeightWithSpacing()));
 
+			uint32_t idx = 0;
+
 			for (auto& entry : sorted_resources) {
+				auto idx_id = scoped_id(idx++);
+
 				const auto& entry_name = entry.name;
 
 				if (!filter.PassFilter(entry_name.c_str())) {
 					continue;
 				}
 
-				const bool is_current = entry_name == current_source;
+				const bool is_current = entry.target_id == current_source_id;
 
 				if (is_current && acquire_keyboard) {
 					ImGui::SetScrollHereY();
