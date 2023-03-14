@@ -1,6 +1,8 @@
 #pragma once
 
 void create_lights(const intercosm& scene, editor_resource_pools& pools) {
+	(void)scene;
+
 	auto& pool = pools.template get_pool_for<editor_light_resource>();
 
 	{
@@ -8,10 +10,8 @@ void create_lights(const intercosm& scene, editor_resource_pools& pools) {
 
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
 			const auto flavour_id = to_entity_flavour_id(enum_id);
-			const auto light = scene.world.get_flavour(flavour_id).template get<components::light>();
 
 			auto res = editor_light_resource();
-			res.editable = light;
 			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
 			res.official_tag = enum_id;
 			res.scene_flavour_id = flavour_id;

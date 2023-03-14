@@ -561,3 +561,5 @@ summary: Just a hidden scratchpad.
 
 - Let's leave the double-click-to-navigate-to-center as is
 	- We will anyway use it on small objects only and then it would be confusing as hell
+- wth is wsad_player getting rebuilt when we only modify prefab node editable?
+	- ok probs due to introspectors

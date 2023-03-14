@@ -45,6 +45,10 @@ public:
 	bool do_flip(const flip_flags f) const {
 		const auto self = *static_cast<const E*>(this);
 
+		if (self.template find<components::marker>()) {
+			return false;
+		}
+
 		if (const auto overridden = self.template find<components::overridden_geo>()) {
 			overridden.do_flip(f);
 			return true;

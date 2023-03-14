@@ -46,6 +46,8 @@
 #include "game/stateless_systems/animation_system.h"
 #include "view/faction_view_settings.h"
 
+#include "application/setups/editor/editor_official_resource_map.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -102,6 +104,7 @@ class editor_setup : public default_setup_settings {
 	per_entity_type_array<std::vector<editor_node_id>> scene_entity_to_node;
 
 	editor_resource_pools official_resources;
+	editor_official_resource_map official_resource_map;
 
 	editor_project project;
 	editor_gui gui;
@@ -129,7 +132,10 @@ class editor_setup : public default_setup_settings {
 
 	double global_time_seconds = 0.0;
 
+	per_type_container<all_editor_node_types, make_vector> temp_prefab_node_pools;
+
 	void create_official();
+	void create_official_prefabs();
 
 	void on_window_activate();
 	void rebuild_filesystem();
@@ -673,4 +679,7 @@ public:
 	bool should_warp_cursor_before_duplicating() const;
 
 	void toggle_sounds_preview();
+
+	template <class F>
+	void rebuild_prefab_nodes(editor_typed_node_id<editor_prefab_node>, F on_created_child);
 };

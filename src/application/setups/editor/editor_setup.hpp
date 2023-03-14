@@ -71,7 +71,7 @@ decltype(auto) editor_setup::find_node(const editor_typed_node_id<T>& id) {
 }
 
 template <class T>
-decltype(auto) editor_setup::find_node(const editor_typed_node_id<T>& id) const{
+decltype(auto) editor_setup::find_node(const editor_typed_node_id<T>& id) const {
 	return project.nodes.find_typed(id);
 }
 

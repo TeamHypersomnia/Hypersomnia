@@ -31,7 +31,8 @@ struct marker_icon {
 			result.id = I::EDITOR_ICON_BUY_AREA;
 			result.col = get_faction_color(meta.faction);
 		}
-		else if (type == area_marker_type::ORGANISM_AREA) {
+		/* Prefab - temporarily */
+		else if (type == area_marker_type::ORGANISM_AREA || type == area_marker_type::PREFAB) {
 			result.id = I::EDITOR_ICON_ORGANISM_AREA;
 			result.col = green;
 		}

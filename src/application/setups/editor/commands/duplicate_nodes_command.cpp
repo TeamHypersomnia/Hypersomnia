@@ -116,6 +116,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 
 				duplicated_node.unique_name = new_name;
 				duplicated_node.scene_entity_id.unset();
+				duplicated_node.clear_duplicated_fields();
 
 				new_transform_setter(duplicated_node);
 			});
@@ -153,7 +154,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 
 	if (does_mirroring) {
 		auto duplicate_with_flip = [&](auto calc_mirror_offset, const bool hori, const bool vert) {
-			duplicate([&](auto& duplicated_node) {
+			duplicate([&]<typename N>(N& duplicated_node) {
 				auto& e = duplicated_node.editable;
 				const auto source_transform = get_node_transform(e);
 
@@ -170,11 +171,21 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 					/*
 						We need to account for nodes that do not have fields for flipping,
 						like spawnpoints for example.
+
+						Areas and points get special treatment when calculating flipped rotations,
+						because they do not support flip flags.
 					*/
 
-					if constexpr(!has_flip_v<decltype(e)>) {
-						if (hori) {
+					if constexpr(is_one_of_v<N, editor_prefab_node, editor_area_marker_node>) {
+						if (vert) {
 							mirrored_transform.rotation += 180;
+						}
+					}
+					else {
+						if constexpr(!has_flip_v<decltype(e)>) {
+							if (hori) {
+								mirrored_transform.rotation += 180;
+							}
 						}
 					}
 

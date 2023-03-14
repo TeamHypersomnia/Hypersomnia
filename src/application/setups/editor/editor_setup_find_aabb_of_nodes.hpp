@@ -35,8 +35,11 @@ std::optional<ltrb> editor_setup::find_aabb_of_nodes(F&& for_each_node) const {
 			on_node(id, [this, &total](const auto& typed_node, const auto typed_id) {
 				(void)typed_id;
 
+				LOG_NVPS(typed_node.get_display_name());
 				if (const auto handle = scene.world[typed_node.scene_entity_id]) {
+					LOG_NVPS(handle);
 					if (const auto aabb = find_aabb_of_entity(handle)) {
+						LOG_NVPS(*aabb);
 						total.contain(*aabb);
 					}
 				}
@@ -44,6 +47,7 @@ std::optional<ltrb> editor_setup::find_aabb_of_nodes(F&& for_each_node) const {
 		}
 	);
 
+	LOG_NVPS(total);
 	if (total.good()) {
 		return total;
 	}

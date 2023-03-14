@@ -6,6 +6,12 @@
 #include "game/cosmos/solvers/standard_solver.h"
 #include "view/audiovisual_state/systems/legacy_light_mults.h"
 #include "game/cosmos/change_common_significant.hpp"
+#include "application/setups/editor/editor_rebuild_prefab.hpp"
+
+template <class T>
+void make_unselectable(T& agg) {
+	agg.when_born.step = 2;
+}
 
 template <class N, class R, class H, class A>
 void setup_entity_from_node(
@@ -26,7 +32,7 @@ void setup_entity_from_node(
 	ensure(agg.when_born.step == 1);
 
 	if (!layer.editable.selectable_on_scene) {
-		agg.when_born.step = 2;
+		::make_unselectable(agg);
 	}
 
 	if constexpr(std::is_same_v<N, editor_sprite_node>) {
@@ -127,7 +133,14 @@ void setup_entity_from_node_post_construct(
 	if constexpr(std::is_same_v<N, editor_sprite_node>) {
 		if (auto anim = handle.template find<components::animation>()) {
 			if (!node.editable.randomize_starting_animation_frame) {
-				anim->state.frame_num = 0;
+				auto& override_start = node.editable.starting_animation_frame;
+
+				if (override_start.is_enabled) {
+					anim->state.frame_num = override_start.value;
+				}
+				else {
+					anim->state.frame_num = 0;
+				}
 			}
 
 			if (node.editable.randomize_color_wave_offset) {
@@ -184,6 +197,12 @@ void allocate_flavours_and_assets_for_resource(
 		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
 	}
 	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
+		using entity_type = box_marker;
+
+		auto& flavour_pool = common.flavours.get_for<box_marker>();
+		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
+	}
+	else if constexpr(std::is_same_v<editor_prefab_resource, R>) {
 		using entity_type = box_marker;
 
 		auto& flavour_pool = common.flavours.get_for<box_marker>();
@@ -372,6 +391,10 @@ void setup_scene_object_from_resource(
 		auto& marker = scene.template get<invariants::box_marker>();
 		marker.type = resource.editable.type;
 	}
+	else if constexpr(std::is_same_v<editor_prefab_resource, R>) {
+		auto& marker = scene.template get<invariants::box_marker>();
+		marker.type = area_marker_type::PREFAB;
+	}
 	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
 		ensure(false && "not implemented");
 	}
@@ -481,10 +504,15 @@ void setup_scene_object_from_resource(
 		sound.effect.modifier = static_cast<sound_effect_modifier>(editable);
 	}
 	else if constexpr(std::is_same_v<editor_light_resource, R>) {
-		auto& light = scene.template get<components::light>();
-		light = editable;
+		/*
+			We could theoretically setup defaults for the node here,
+			but on the other hand this could be handled by setup_node_defaults
 
-		//scene.template get<invariants::light>().is_new_light_attenuation = 1;
+			auto& light = scene.template get<components::light>();
+			light = editable;
+
+			//scene.template get<invariants::light>().is_new_light_attenuation = 1;
+		*/
 	}
 	else {
 		static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
@@ -505,6 +533,7 @@ void editor_setup::rebuild_scene() {
 	auto for_each_manually_specified_official_resource_pool = [&](auto lbd) {
 		lbd(official_resources.get_pool_for<editor_point_marker_resource>());
 		lbd(official_resources.get_pool_for<editor_area_marker_resource>());
+		lbd(official_resources.get_pool_for<editor_prefab_resource>());
 	};
 
 	/* 
@@ -603,7 +632,11 @@ void editor_setup::rebuild_scene() {
 			auto layer = find_layer(layer_id);
 			ensure(layer != nullptr);
 
-			auto node_handler = [&]<typename node_type>(const node_type& typed_node, const auto node_id) {
+			auto node_handler = [&]<typename node_type, typename id_type>(
+				const node_type& typed_node,
+				const editor_typed_node_id<id_type> node_id,
+				const bool is_prefab_child
+			) {
 				typed_node.scene_entity_id.unset();
 
 				if (!typed_node.visible || !layer->visible) {
@@ -680,16 +713,20 @@ void editor_setup::rebuild_scene() {
 							total_order++, 
 							*layer,
 							typed_node, 
-							resource,
+							*resource,
 							handle, 
 							agg
 						);
+
+						if (is_prefab_child) {
+							::make_unselectable(agg);
+						}
 					};
 
 					auto entity_from_node_post_construct = [&]<typename H>(const H& handle) {
 						::setup_entity_from_node_post_construct(
 							typed_node, 
-							resource,
+							*resource,
 							handle
 						);
 					};
@@ -712,7 +749,18 @@ void editor_setup::rebuild_scene() {
 			};
 
 			for (const auto node_id : reverse(layer->hierarchy.nodes)) {
-				on_node(node_id, node_handler);
+				on_node(node_id, [&]<typename node_type>(const node_type& typed_node, const auto node_id) {
+					node_handler(typed_node, node_id, false);
+
+					if constexpr(std::is_same_v<node_type, editor_prefab_node>) {
+						rebuild_prefab_nodes(
+							node_id,
+							[&](const auto& child_node) {
+								node_handler(child_node, node_id, true);
+							}
+						);
+					}
+				});
 			}
 		}
 	};

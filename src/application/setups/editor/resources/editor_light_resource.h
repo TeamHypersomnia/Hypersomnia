@@ -4,7 +4,11 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "test_scenes/test_scene_flavour_ids.h"
 
-using editor_light_resource_editable = components::light;
+struct editor_light_resource_editable {
+	// GEN INTROSPECTOR struct editor_light_resource_editable
+	bool dummy = false;
+	// END GEN INTROSPECTOR
+};
 
 struct editor_light_node;
 struct editor_light_resource {

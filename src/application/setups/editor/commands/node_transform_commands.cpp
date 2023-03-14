@@ -40,6 +40,8 @@ static void reselect(T& entities, editor_setup& setup, current_selections_type& 
 static void read_back_to_nodes(editor_setup& setup) {
 	auto& cosm = setup.get_viewed_cosmos();
 
+	bool rebuild_scene = false;
+
 	setup.for_each_inspected_entity(
 		[&](const entity_id id) {
 			const auto handle = cosm[id];
@@ -72,36 +74,46 @@ static void read_back_to_nodes(editor_setup& setup) {
 				return;
 			}
 
+			auto read_back_to = [transform, size, flip]<typename N>(N& node, auto) {
+				node.editable.pos = transform->pos;
+
+				using E = decltype(node.editable);
+
+				if constexpr(has_rotation_v<E>) {
+					node.editable.rotation = transform->rotation;
+				}
+
+				if constexpr(has_size_v<E>) {
+					if (size == std::nullopt) {
+						node.editable.size.reset();
+					}
+					else {
+						node.editable.size = *size;
+					}
+				}
+
+				if constexpr(has_flip_v<E>) {
+					node.editable.flip_horizontally = flip.horizontally;
+					node.editable.flip_vertically = flip.vertically;
+				}
+			};
+
 			setup.on_node(
 				setup.to_node_id(id),
-				[transform, size, flip](auto& node, const auto node_id) {
-					(void)node_id;
+				[&]<typename N>(N& node, const auto node_id) {
+					read_back_to(node, node_id);
 
-					node.editable.pos = transform->pos;
-
-					using E = decltype(node.editable);
-
-					if constexpr(has_rotation_v<E>) {
-						node.editable.rotation = transform->rotation;
-					}
-
-					if constexpr(has_size_v<E>) {
-						if (size == std::nullopt) {
-							node.editable.size.reset();
-						}
-						else {
-							node.editable.size = *size;
-						}
-					}
-
-					if constexpr(has_flip_v<E>) {
-						node.editable.flip_horizontally = flip.horizontally;
-						node.editable.flip_vertically = flip.vertically;
+					if constexpr(std::is_same_v<N, editor_prefab_node>) {
+						rebuild_scene = true;
 					}
 				}
 			);
 		}
 	);
+
+	if (rebuild_scene) {
+		setup.rebuild_scene();
+	}
 }
 
 
@@ -820,9 +832,24 @@ void flip_nodes_command::flip_entities(cosmos& cosm) {
 						auto mirrored_transform = transformr(mirror_offset + source_transform.pos, new_rotation);
 						fix_pixel_imperfections(mirrored_transform);
 
-						if (!typed_handle.do_flip(flip)) {
-							if (flip.horizontally) {
+						/* 
+							Areas and points get special treatment when calculating flipped rotations,
+							because they do not support flip flags.
+						*/
+
+						const bool is_area = typed_handle.template find<invariants::box_marker>();
+
+						if (is_area) {
+							if (flip.vertically) {
 								mirrored_transform.rotation += 180;
+							}
+						}
+						else {
+							/* It's a point */
+							if (!typed_handle.do_flip(flip)) {
+								if (flip.horizontally) {
+									mirrored_transform.rotation += 180;
+								}
 							}
 						}
 

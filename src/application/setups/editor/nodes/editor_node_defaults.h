@@ -10,4 +10,7 @@ void setup_node_defaults(N& new_node, const R& resource) {
 		new_node.editable.size.value = resource.editable.size;
 		new_node.editable.size.is_enabled = false;
 	}
+	else if constexpr(std::is_same_v<R, editor_prefab_resource>) {
+		new_node.editable = resource.editable.default_node_properties;
+	}
 }

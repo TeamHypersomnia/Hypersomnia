@@ -26,4 +26,5 @@ struct create_node_command : allocating_command<editor_node_pool_id> {
 	}
 
 	editor_node_id get_node_id() const;
+	editor_typed_node_id<T> get_typed_node_id() const;
 };

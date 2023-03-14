@@ -1,6 +1,7 @@
 #pragma once
 #include "application/setups/editor/commands/create_node_command.h"
 #include "augs/misc/pool/pool_allocate.h"
+#include "application/setups/editor/editor_rebuild_prefab.hpp"
 
 template <class T>
 inline void create_node_command<T>::undo(editor_command_input in) {
@@ -40,6 +41,11 @@ inline void create_node_command<T>::redo(editor_command_input in) {
 }
 
 template <class T>
+inline editor_typed_node_id<T> create_node_command<T>::get_typed_node_id() const {
+	return { base::get_allocated_id() };
+}
+
+template <class T>
 inline editor_node_id create_node_command<T>::get_node_id() const {
-	return editor_typed_node_id<T> { base::get_allocated_id() }.operator editor_node_id();
+	return get_typed_node_id().operator editor_node_id();
 }

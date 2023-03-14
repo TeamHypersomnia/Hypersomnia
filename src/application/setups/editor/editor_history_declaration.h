@@ -62,6 +62,8 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_melee_resource>,
 	edit_resource_command<editor_explosive_resource>,
 
+	edit_resource_command<editor_prefab_resource>,
+
 	edit_node_command<editor_sprite_node>,
 	edit_node_command<editor_sound_node>,
 	edit_node_command<editor_light_node>,
@@ -74,6 +76,8 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_node_command<editor_ammunition_node>,
 	edit_node_command<editor_melee_node>,
 	edit_node_command<editor_explosive_node>,
+
+	edit_node_command<editor_prefab_node>,
 
 	rename_node_command,
 	change_resource_command,
@@ -94,6 +98,8 @@ using editor_history_base = augs::history_with_saved_revision<
 	create_node_command<editor_ammunition_node>,
 	create_node_command<editor_melee_node>,
 	create_node_command<editor_explosive_node>,
+
+	create_node_command<editor_prefab_node>,
 
 	reorder_nodes_command,
 	reorder_layers_command,

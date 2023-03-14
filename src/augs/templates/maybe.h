@@ -36,6 +36,16 @@ namespace augs {
 			is_enabled = false;
 		}
 
+		auto& operator=(const T& t) {
+			emplace(t);
+			return *this;
+		}
+
+		auto& operator=(T&& t) {
+			emplace(std::move(t));
+			return *this;
+		}
+
 		explicit operator bool() const {
 			return is_enabled;
 		}

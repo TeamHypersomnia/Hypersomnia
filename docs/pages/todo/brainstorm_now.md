@@ -6,11 +6,117 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Let's NOT keep cache files inside map folders.
-	- Would add security overhead: someone could upload a map with a malicious cache binary
-	- Instead let's keep it in game's own cache folder
-		- like: cache/arenas/official/de_cyberaqua/compiled.bin etc
-	- also way cleaner, less clutter in the map folders and less stuff to blacklist later for transmission etc.
+- Another reason why most official maps should only use official resources is..
+	- ..textures and sounds won't have to be reloaded!
+
+- Nodeize first then debug the wandering pixels
+- For now let's have the fish as aquarium prefab icon
+	- we'll later customize it?
+
+- Problem: editing prefab triggers rebuild of the child nodes which makes history commands non-deterministic
+	- That is because nodes are freed and reallocated, but undo does not replay it backwards
+	- similarly all existential commands like duplicating/creating would have to take this into account
+		- you'd have to basically save the entire project state in history if one of the edited nodes is a prefab
+	- The cleanest solution will be to ditch child nodes
+		- Simply have a callback for rebuilding the nodes directly inside scene creation
+	- Now we need to ditch the anchor node
+		- So implement prefab as an actual marker, copy implementation from markers
+			- Then hide all markers for un-nodeized prefabs (would anyway be counter-intuitive if there were icons but couldn't be selected)
+	- Both rebuild_prefab_nodes and destroy_prefab_nodes won't exist (at least named as such)
+
+	- Will this solution be free of corner cases though?
+		- Setting up references between the nodes might be a pain
+			- We could use name-based lookups? but that would be a pain
+				- and setup unique node names only after actually creating them all (during nodeization)
+			- Nah I don't think we'l l switch to name lookups just because of prefabs
+		- Since we care to keep names unique, we could use name-based identities in commands
+			- Then we don't have to deterministically undelete
+			- but properties would need to use names as well
+				- Well, this will would make it easier to serialize but it kinda sucks to have it non-typed in logic
+	
+	- Verdict: I think for now let's go with a callback and don't worry about assigning ids
+		- We don't need it yet and we won't need it for a while
+			- and it has nothing to do with state so we don't have to decide now
+		- note we don't have to store these in "variants" or "pools"
+	- Inter-node Association is a complex topic 
+		- dependencies will have to anyway be resolved yet again after creating all entities
+			- so might as well do it with prefabs customarily later
+
+
+- Rename some aquarium sprites in accordance with the field names in as_aquarium in prefab node editable
+	- except maybe for water_overlay
+
+- fix Clear button in resource chooser
+
+- Note that to selectively rebuild entities for prefab nodes..
+	- ..you'd have to selectively modify scene_entity_to_node which would break it
+		- we'd need a proper unordered map for it which will give a slight performance hit
+		- so for now let's just skip the hassle and rebuild the entire scene
+	- but hey, it's not a problem just with the prefab.
+		- even rewrite_last_command calls rebuild scene! which makes sense because editing nodes has to be reflected on the scene immediately
+			- so tweaking will be expensive as well
+	- for now let's screw it and just rebuild it all on any modification to prefab
+
+- Icon previews can be shown *before* the combo box 
+	- so that we don't have to alter combo box logic
+
+- When do we rebuild the prefab?
+	- Remember to delete child nodes when deleting the prefab!!!!
+		- And when undoing duplication..
+		- and when undoing create.. lol
+		- Btw we thought of just having a lambda for_each_child_node instead of actually allocating them but this won't work
+			- because we need an actual node for the anchor and the logic here would be the same
+	- Preemptively on create
+	- On duplication too (we had a crash because we didn't)!!!!
+	- Preemptively on edit
+	- Any time any transform is read-back to the anchor prefab node in read_back_to_nodes
+		- Should happen in the same frame
+		- We can trivially check for being an anchor node since all nodes have prefab parent member
+	- With this, every case should be covered
+	- Problematically, we have to selectively reinstantiate entities for the nodes once we rebuild them
+		- Instead of rebuilding the whole scene, although we might rebuild it entirely for a start
+
+- Also we shouldn't make the component nodes selectable at all
+
+- Note we don't rebuild the prefab during scene rebuild
+	- The scene might actually completely ignore the prefab node
+		- except for iterating through its children
+
+- We need to setup node defaults before serializing nodes
+	- E.g. default as_aquarium would have empty ids set
+	- And this would force the serializer to write the default settings even though we didn't modify them
+	- We will need to provide a defaults_provider after all
+	- This situation with defaults in prefabs doesn't change anything
+		- Note we can have e.g. just size and pos modified in the editable
+		- but the serializator will detect that the editable has changed so it will redundantly write e.g. rotation as well
+	- Verdict: we'll somehow need to delta per-field (multi-introspection), and not just per type!
+		- We'll have to adapt the json serializer
+		- It will have to accept an entire second object for serialization - the default
+		- Call ::setup_node_defaults on that object
+
+
+- When instantiating prefabs, we need to create *nodes*, not entities
+	- Because we want to be able to unpack ("nodeize") them
+
+- Special resources
+	- I think we can just have a variant
+	- And an enum instead of a typed resource id
+	- Why? we will anyway supervise serialization of resources
+		- So we can as well supervise serialization of specials and have arbitrary design on the binary side of things
+	- Actually let's have a dummy resource id
+		- Removing it would subvert our architecture and add lots of if/elses
+		- Plus we might want editor_resource_id to potentially refer to a prefab actually
+
+- Geometry editing could be available only on the stock collider nodes, will also have arbitrary_collider resource
+	- We could be able to merge them too
+	- If people use these stock colliders extensively, does it break our future plans of arbitrary geometry editing?
+		- Not really.
+			- We can have a "merge" function available only for stock colliders
+			- This will change their type to e.g. arbitrary_collider_wood or arbitrary_collider_metal
+				- Even if there are conflicting materials in the original collider nodes, this isn't really important as you can still change it
+				- Vertices can then be changed arbitrarily
+					- Editor could even hold original collider info until at least one vertex is modified
+					- Also the stock box/triangle collider nodes could be transformed into arbitrary collider the moment their vertices are modified as well
 	
 - dev_floor_128, 256, 64, 32 etc
 
@@ -19,11 +125,15 @@ summary: That which we are brainstorming at the moment.
 		- won't this be solved just by fixing the resources chooser?
 	- Look, unique names are ONLY required during serialization but official resources will be marked with [] anyway
 		- Otherwise it's merely a matter of displaying them
+	- obviously layers need unique names for serialization but that we're already handling well
 
 - Consider adding "+1 times" to resize calculation
 	- Also automatically "not tile" *during resizing* if it's less than original
 
 - "File is missing" needs to disappear if the deleted resource wasn't used anywhere
+	- Do we detect if it's unused?
+	- Maybe just remember if the message was shown for this resource
+	- Perhaps we'll know more once we get to serialization
 
 - Aquarium - We only really need to think how we'd do it manually and support it in the editor
 	- The rest is only about automatized placement, we shouldn't worry about these two simultaneously
@@ -37,6 +147,11 @@ summary: That which we are brainstorming at the moment.
 		- at least the image defs won't be reused
 		
 - Map caching/compilation
+	- *Let's NOT keep cache files inside map folders.*
+		- Would add security overhead: someone could upload a map with a malicious cache binary
+		- Instead let's keep it in game's own cache folder
+			- like: cache/arenas/official/de_cyberaqua/compiled.bin etc
+		- also way cleaner, less clutter in the map folders and less stuff to blacklist later for transmission etc.
 	- This can be an easy bin file in cache
 	- Or even an adjacent file
 	- The bin file can hold a stamp inside with both the game's version and last_write_time

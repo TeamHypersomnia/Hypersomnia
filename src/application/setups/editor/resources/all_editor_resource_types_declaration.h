@@ -4,7 +4,6 @@
 
 struct editor_sprite_resource;
 struct editor_sound_resource;
-struct editor_prefab_resource;
 struct editor_light_resource;
 struct editor_particles_resource;
 struct editor_wandering_pixels_resource;
@@ -18,10 +17,11 @@ struct editor_explosive_resource;
 
 struct editor_material_resource;
 
+struct editor_prefab_resource;
+
 using all_editor_resource_types = type_list<
 	editor_sprite_resource,
 	editor_sound_resource,
-	//editor_prefab_resource,
 	editor_light_resource,
 	editor_particles_resource,
 	editor_wandering_pixels_resource,
@@ -33,5 +33,7 @@ using all_editor_resource_types = type_list<
 	editor_melee_resource,
 	editor_explosive_resource,
 
-	editor_material_resource
+	editor_material_resource,
+
+	editor_prefab_resource
 >;

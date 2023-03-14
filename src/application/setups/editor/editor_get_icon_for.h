@@ -86,12 +86,15 @@ rgba editor_setup::get_icon_color_for(
 		return object.editable.color;
 	}
 	else if constexpr(std::is_same_v<T, editor_light_resource>) {
-		return object.editable.color;
+		return white;
 	}
 	else if constexpr(std::is_same_v<T, editor_particles_resource>) {
 		return object.editable.colorize;
 	}
 	else if constexpr(std::is_same_v<T, editor_material_resource>) {
+		return white;
+	}
+	else if constexpr(std::is_same_v<T, editor_prefab_resource>) {
 		return white;
 	}
 	else {
@@ -167,6 +170,9 @@ editor_icon_info editor_setup::get_icon_for(
 	}
 	else if constexpr(std::is_same_v<T, editor_material_resource>) {
 		return { in.necessary_images[assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON], augs::imgui_atlas_type::GAME };
+	}
+	else if constexpr(is_one_of_v<T, editor_prefab_resource>) {
+		return { in.necessary_images[assets::necessary_image_id::SPELL_BORDER], augs::imgui_atlas_type::GAME };
 	}
 	else if constexpr(is_one_of_v<T, editor_point_marker_resource, editor_area_marker_resource>) {
 		marker_icon icon;

@@ -226,6 +226,8 @@ namespace augs {
 			This would cause the subsequent ImGui calls to read pushed ID from an already freed memory.
 
 			It already caused a bug once where buttons didn't react to clicks, but somehow only for Windows.
+
+			In case c_str() is manually passed to this function, the std::string's lifetime will usually exceed the scope of the scoped_id call.
 		*/
 
 		inline auto scoped_id(const char* v) {

@@ -15,6 +15,7 @@ struct editor_sprite_node_editable {
 
 	bool flip_horizontally = false;
 	bool flip_vertically = false;
+	augs::maybe<uint32_t> starting_animation_frame;
 	bool randomize_starting_animation_frame = false;
 	bool randomize_color_wave_offset = false;
 

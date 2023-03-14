@@ -60,11 +60,11 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					using node_type = typename T::node_type;
 
 					node_type new_node;
+					::setup_node_defaults(new_node, typed_resource);
+
 					new_node.resource_id = resource_id;
 					new_node.unique_name = new_name;
 					new_node.editable.pos = in.setup.get_world_cursor_pos();
-
-					::setup_node_defaults(new_node, typed_resource);
 
 					world_position_started_dragging = new_node.editable.pos;
 
@@ -360,7 +360,6 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	auto& lights_folder = root.subfolders[i++];
 	auto& particles_folder = root.subfolders[i++];
 	auto& wandering_pixels_folder = root.subfolders[i++];
-	auto& prefabs_folder = root.subfolders[i++];
 
 	auto& firearms_folder = root.subfolders[i++];
 	auto& ammunition_folder = root.subfolders[i++];
@@ -370,10 +369,11 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	auto& point_markers_folder = root.subfolders[i++];
 	auto& area_markers_folder = root.subfolders[i++];
 
+	auto& prefabs_folder = root.subfolders[i++];
+
 	lights_folder.name = "Lights";
 	particles_folder.name = "Particles";
 	wandering_pixels_folder.name = "Wandering pixels";
-	prefabs_folder.name = "Prefabs";
 
 	firearms_folder.name = "Firearms";
 	ammunition_folder.name = "Ammunition";
@@ -382,6 +382,8 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 
 	point_markers_folder.name = "Point markers";
 	area_markers_folder.name = "Area markers";
+
+	prefabs_folder.name = "Prefabs";
 
 	for (auto& s : root.subfolders) {
 		s.type = editor_filesystem_node_type::FOLDER;
@@ -406,7 +408,6 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	auto& lights_folder = root.subfolders[i++];
 	auto& particles_folder = root.subfolders[i++];
 	auto& wandering_pixels_folder = root.subfolders[i++];
-	auto& prefabs_folder = root.subfolders[i++];
 
 	auto& firearms_folder = root.subfolders[i++];
 	auto& ammunition_folder = root.subfolders[i++];
@@ -416,8 +417,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	auto& point_markers_folder = root.subfolders[i++];
 	auto& area_markers_folder = root.subfolders[i++];
 
-	(void)prefabs_folder;
-	(void)wandering_pixels_folder;
+	auto& prefabs_folder = root.subfolders[i++];
 
 	auto handle = [&]<typename P>(editor_filesystem_node& parent, P& pool, const auto icon_id) {
 		using resource_type = typename P::value_type;
@@ -441,7 +441,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 			const auto& initial_intercosm = setup.get_initial_scene();
 
-			if constexpr(is_one_of_v<resource_type, editor_point_marker_resource, editor_area_marker_resource>) {
+			if constexpr(is_one_of_v<resource_type, editor_prefab_resource, editor_point_marker_resource, editor_area_marker_resource>) {
 				new_node.name = typed_resource.get_display_name();
 			}
 			else {
@@ -506,7 +506,6 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	// TODO: redirect to proper pools!
 	handle(particles_folder, resources.get_pool_for<editor_particles_resource>(), assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE);
 	handle(wandering_pixels_folder, resources.get_pool_for<editor_wandering_pixels_resource>(), assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS);
-	//handle(prefabs_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
 
 	handle(lights_folder, resources.get_pool_for<editor_light_resource>(), assets::necessary_image_id::EDITOR_ICON_LIGHT);
 
@@ -517,6 +516,8 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 	handle(point_markers_folder, resources.get_pool_for<editor_point_marker_resource>(), assets::necessary_image_id::DANGER_INDICATOR);
 	handle(area_markers_folder, resources.get_pool_for<editor_area_marker_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
+
+	handle(prefabs_folder, resources.get_pool_for<editor_prefab_resource>(), assets::necessary_image_id::SPELL_BORDER);
 
 	root.set_parents(0);
 }

@@ -40,6 +40,7 @@
 #include "game/detail/visible_entities.h"
 #include "game/detail/get_hovered_world_entity.h"
 #include "application/setups/editor/official/create_official_resources.h"
+#include "application/setups/editor/official/create_official_prefabs.h"
 #include "augs/gui/text/printer.h"
 #include "view/rendering_scripts/draw_area_indicator.h"
 #include "view/rendering_scripts/for_each_iconed_entity.h"
@@ -92,6 +93,27 @@ void editor_setup::create_official() {
 		official_resources,
 		official_files_root
 	);
+
+	auto map_officials = [&](const auto id, auto& obj) {
+		ensure(obj.official_tag.has_value());
+
+		if (obj.official_tag) {
+			official_resource_map[*obj.official_tag] = id;
+		}
+	};
+
+	auto map_officials_area = [&](const auto id, auto& obj) {
+		official_resource_map[obj.editable.type] = id;
+	};
+
+	for_each_resource<editor_sprite_resource>(map_officials, true);
+	for_each_resource<editor_sound_resource>(map_officials, true);
+	for_each_resource<editor_light_resource>(map_officials, true);
+	for_each_resource<editor_particles_resource>(map_officials, true);
+	for_each_resource<editor_wandering_pixels_resource>(map_officials, true);
+	for_each_resource<editor_area_marker_resource>(map_officials_area, true);
+
+	create_official_prefabs();
 
 	gui.filesystem.rebuild_official_special_filesystem(*this);
 	gui.filesystem.rebuild_special_filesystem(*this);
@@ -1332,6 +1354,30 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 		[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
 			const auto screen_space = transformr(vec2i(on_screen(world_transform.pos)), world_transform.rotation);
 
+			{
+				bool is_prefab_child = false;
+
+				auto parent_node = to_node_id(typed_handle.get_id());
+
+				on_node(
+					parent_node,
+					[&]<typename N>(const N& node, const auto) {
+						if constexpr(std::is_same_v<N, editor_prefab_node>) {
+							/* 
+								Prefab's scene_entity_id points to the anchor, i.e. itself. 
+								Therefore it's an unselectable child if entity points to the prefab node but prefab points to something else.
+							*/
+
+							is_prefab_child = node.scene_entity_id != typed_handle.get_id();
+						}
+					}
+				);
+
+				if (is_prefab_child) {
+					return;
+				}
+			}
+
 			const auto is_invalid = image_id == assets::necessary_image_id::INVALID;
 			const auto image_size = is_invalid ? vec2u::square(32) : in.necessary_images[image_id].get_original_size();
 
@@ -2225,6 +2271,8 @@ template struct edit_resource_command<editor_ammunition_resource>;
 template struct edit_resource_command<editor_melee_resource>;
 template struct edit_resource_command<editor_explosive_resource>;
 
+template struct edit_resource_command<editor_prefab_resource>;
+
 template struct edit_node_command<editor_sprite_node>;
 template struct edit_node_command<editor_sound_node>;
 template struct edit_node_command<editor_light_node>;
@@ -2238,6 +2286,8 @@ template struct edit_node_command<editor_ammunition_node>;
 template struct edit_node_command<editor_melee_node>;
 template struct edit_node_command<editor_explosive_node>;
 
+template struct edit_node_command<editor_prefab_node>;
+
 template struct create_node_command<editor_sprite_node>;
 template struct create_node_command<editor_sound_node>;
 template struct create_node_command<editor_light_node>;
@@ -2250,3 +2300,5 @@ template struct create_node_command<editor_firearm_node>;
 template struct create_node_command<editor_ammunition_node>;
 template struct create_node_command<editor_melee_node>;
 template struct create_node_command<editor_explosive_node>;
+
+template struct create_node_command<editor_prefab_node>;

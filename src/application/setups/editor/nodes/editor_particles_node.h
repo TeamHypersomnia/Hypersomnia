@@ -11,6 +11,7 @@ struct editor_particles_node_editable : particle_effect_modifier {
 
 	// GEN INTROSPECTOR struct editor_particles_node_editable
 	vec2 pos;
+	real32 rotation = 0.0f;
 	// END GEN INTROSPECTOR
 };
 
@@ -19,7 +20,7 @@ struct editor_particles_node : editor_node_base<
 	editor_particles_node_editable
 > {
 	auto get_transform() const {
-		return transformr(editable.pos, 0.0f);
+		return transformr(editable.pos, editable.rotation);
 	}
 
 	static const char* get_type_name() {

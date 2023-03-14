@@ -125,13 +125,19 @@ void duplicate_entities_command::redo(const debugger_command_input in) {
 
 						auto mirrored_transform = transformr(mirror_offset + source_transform.pos, new_rotation);
 						fix_pixel_imperfections(mirrored_transform);
+
+						flip_flags flip;
+						flip.horizontally = hori;
+						flip.vertically = vert;
+
+						if (!typed_handle.do_flip(flip)) {
+							if (flip.horizontally) {
+								mirrored_transform.rotation += 180;
+							}
+						}
+
 						typed_handle.set_logic_transform(mirrored_transform);
 					}
-
-					flip_flags f;
-					f.horizontally = hori;
-					f.vertically = vert;
-					typed_handle.do_flip(f);
 				}
 			});
 		};

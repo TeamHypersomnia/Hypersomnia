@@ -28,6 +28,80 @@
 #include "augs/misc/from_concave_polygon.h"
 #include "application/setups/editor/gui/widgets/resource_chooser.h"
 
+template <class T>
+struct is_editor_typed_resource_id : std::false_type {};
+
+template <class T>
+struct is_editor_typed_resource_id<editor_typed_resource_id<T>> : std::true_type {};
+
+template <class T>
+static constexpr bool is_editor_typed_resource_id_v = is_editor_typed_resource_id<T>::value;
+
+struct default_widget_handler {
+	template <class... Args>
+	default_widget_handler(Args&&...) {}
+
+	template <class T>
+	static constexpr bool handles = always_false_v<T>;
+
+	template <class T>
+	bool handle(std::string&, const std::string&, const T&) {
+		static_assert(handles<T>);
+		return false;
+	}
+};
+
+struct id_widget_handler {
+	editor_setup& setup;
+
+	template <class T>
+	static constexpr bool handles = is_editor_typed_resource_id_v<T>;
+
+	template <class T>
+	bool handle(
+		std::string& result,
+		const std::string& label,
+		T& property
+	) {
+		static_assert(handles<T>);
+
+		auto resource = setup.find_resource(property);
+
+		const auto displayed_resource_name = resource ? resource->get_display_name() : "(None)";
+
+		using R = typename T::target_type;
+		thread_local resource_chooser<R> chooser;
+
+		bool modified = false;
+
+		chooser.perform(
+			label,
+			displayed_resource_name,
+			property,
+			setup,
+			[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
+				result = typesafe_sprintf("Changed resource to %x", chosen_name);
+				modified = true;
+				property = chosen_id;
+			}
+		);
+
+		if (property.is_set()) {
+			ImGui::SameLine();
+
+			auto scope = augs::imgui::scoped_id(label.c_str());
+
+			if (ImGui::Button("Clear")) {
+				result = typesafe_sprintf("Cleared %x", label);
+				property = {};
+				modified = true;
+			}
+		}
+
+		return modified;
+	}
+};
+
 #define EDIT_ATTENUATIONS 0
 
 #define MULTIPROPERTY(label, MEMBER) \
@@ -42,7 +116,7 @@
 \
 	auto cols = maybe_different_value_cols({}, values_different);\
 \
-	last_result = edit_property(result, label, insp.MEMBER);\
+	last_result = edit_property(result, label, special_handler, insp.MEMBER);\
 \
 	if (last_result) {\
 		for (auto& ee : es) {\
@@ -74,15 +148,21 @@ std::string as_hex(const rgba& col) {
 	return to_uppercase(get_hex_representation(std::addressof(col.r), 4));
 }
 
-template <class T>
+template <class T, class H>
 bool edit_property(
 	std::string& result,
 	const std::string& label,
+	H special_handler,
 	T& property
 ) {
 	using namespace augs::imgui;
 
-	if constexpr(std::is_same_v<T, rgba>) {
+	if constexpr(H::template handles<T>) {
+		if (special_handler.handle(result, label, property)) {
+			return true;
+		}
+	}
+	else if constexpr(std::is_same_v<T, rgba>) {
 		if (label.size() > 0 && label[0] == '#') {
 			if (color_picker(label, property)) {
 				result = typesafe_sprintf("Set Color to %x in %x", as_hex(property));
@@ -179,6 +259,7 @@ bool edit_property(
 }
 
 EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 
 	bool last_result = false;
@@ -207,7 +288,16 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es) {
 	ImGui::Separator();
 
 	MULTIPROPERTY("Animation speed factor", animation_speed_factor);
+	MULTIPROPERTY("Override starting animation frame", starting_animation_frame.is_enabled);
+
+	if (insp.starting_animation_frame.is_enabled) {
+		auto indent = scoped_indent();
+
+		MULTIPROPERTY("##Overridden frame", starting_animation_frame.value);
+	}
+
 	MULTIPROPERTY("Randomize starting animation frame", randomize_starting_animation_frame);
+
 	MULTIPROPERTY("Randomize color wave offset", randomize_color_wave_offset);
 
 
@@ -215,6 +305,7 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_sound_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -225,6 +316,7 @@ EDIT_FUNCTION(editor_sound_node_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_firearm_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -236,6 +328,7 @@ EDIT_FUNCTION(editor_firearm_node_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_ammunition_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -247,6 +340,7 @@ EDIT_FUNCTION(editor_ammunition_node_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_melee_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -258,6 +352,7 @@ EDIT_FUNCTION(editor_melee_node_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_wandering_pixels_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -311,6 +406,7 @@ static bool has_team(const area_marker_type type) {
 }
 
 EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point_marker_resource& resource) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -332,6 +428,7 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 }
 
 EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_marker_resource& resource) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -354,6 +451,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 }
 
 EDIT_FUNCTION(editor_explosive_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -364,7 +462,59 @@ EDIT_FUNCTION(editor_explosive_node_editable& insp, T& es) {
 	return result;
 }
 
+EDIT_FUNCTION(editor_prefab_node_editable& insp, T& es, const editor_prefab_resource& resource, const id_widget_handler& special_handler) {
+	using namespace augs::imgui;
+	bool last_result = false;
+	std::string result;
+
+	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
+	MULTIPROPERTY("Size", size);
+
+	auto edit_as_aquarium = [&]() {
+		MULTIPROPERTY("Caustics", as_aquarium.caustics);
+		MULTIPROPERTY("Water overlay", as_aquarium.water_overlay);
+
+		MULTIPROPERTY("Sand 1", as_aquarium.sand_1);
+		MULTIPROPERTY("Sand 2", as_aquarium.sand_2);
+
+		MULTIPROPERTY("Wall", as_aquarium.wall);
+		MULTIPROPERTY("Wall top corners", as_aquarium.wall_top_corners);
+		MULTIPROPERTY("Wall bottom corners", as_aquarium.wall_bottom_corners);
+
+		MULTIPROPERTY("Left ambience", as_aquarium.ambience_left);
+		MULTIPROPERTY("Right ambience", as_aquarium.ambience_right);
+
+		MULTIPROPERTY("Glass start offset", as_aquarium.glass_start_offset);
+		MULTIPROPERTY("Wall lamp offset", as_aquarium.wall_lamp_offset);
+
+		MULTIPROPERTY("Wandering pixels 1", as_aquarium.wandering_pixels_1);
+		MULTIPROPERTY("Wandering pixels 2", as_aquarium.wandering_pixels_2);
+
+		MULTIPROPERTY("Fish random seed", as_aquarium.fish_seed);
+		MULTIPROPERTY("Caustics count", as_aquarium.caustics_count);
+		MULTIPROPERTY("Caustics random seed", as_aquarium.caustics_seed);
+
+		MULTIPROPERTY("Dim caustics count", as_aquarium.dim_caustics_count);
+		MULTIPROPERTY("Dim caustics random seed", as_aquarium.dim_caustics_seed);
+	};
+
+	using P = editor_builtin_prefab_type;
+
+	switch (resource.editable.type) {
+		case P::AQUARIUM:
+			edit_as_aquarium();
+			break;
+
+		default:
+			break;
+	}
+
+	return result;
+}
+
 EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -524,16 +674,19 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_particles_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
 
 	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
 }
 
 EDIT_FUNCTION(editor_layer_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -556,6 +709,7 @@ EDIT_FUNCTION(
 	const image_color_picker_widget& picker,
 	const non_standard_shape_widget& shape_picker
 ) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 
 	bool last_result = false;
@@ -659,7 +813,7 @@ EDIT_FUNCTION(
 
 					ImGui::SameLine();
 
-					if (edit_property(result, id_col, col)) {
+					if (edit_property(result, id_col, special_handler, col)) {
 						for (auto& e : es) {
 							auto& lc = e.after.neon_map.value.light_colors;
 
@@ -789,6 +943,18 @@ EDIT_FUNCTION(
 }
 
 EDIT_FUNCTION(editor_sound_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
+	using namespace augs::imgui;
+	bool last_result = false;
+	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
+
+	return result;
+}
+
+EDIT_FUNCTION(editor_prefab_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -799,16 +965,18 @@ EDIT_FUNCTION(editor_sound_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_light_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("##Defaultcolor", color);
+	(void)insp; (void)es; (void)last_result;
 
 	return result;
 }
 
 EDIT_FUNCTION(editor_particles_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -819,6 +987,7 @@ EDIT_FUNCTION(editor_particles_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_material_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -829,6 +998,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_firearm_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -839,6 +1009,7 @@ EDIT_FUNCTION(editor_firearm_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_ammunition_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -849,6 +1020,7 @@ EDIT_FUNCTION(editor_ammunition_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_melee_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -859,6 +1031,7 @@ EDIT_FUNCTION(editor_melee_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_wandering_pixels_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -876,6 +1049,7 @@ EDIT_FUNCTION(editor_wandering_pixels_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_point_marker_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -886,6 +1060,7 @@ EDIT_FUNCTION(editor_point_marker_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_area_marker_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -896,6 +1071,7 @@ EDIT_FUNCTION(editor_area_marker_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_explosive_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -1284,6 +1460,13 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			}
 
 			changed = perform_editable_gui(edited_copy, cmd.entries);
+		}
+		else if constexpr(std::is_same_v<N, editor_prefab_node>) {
+			auto id_handler = id_widget_handler { in.setup };
+			const auto resource = in.setup.find_resource(node.resource_id);
+			ensure(resource != nullptr);
+
+			changed = perform_editable_gui(edited_copy, cmd.entries, *resource, id_handler);
 		}
 		else {
 			if constexpr(is_one_of_v<N, editor_point_marker_node, editor_area_marker_node>) {
