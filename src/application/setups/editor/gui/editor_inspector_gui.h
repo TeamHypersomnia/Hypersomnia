@@ -9,6 +9,7 @@
 
 #include "application/setups/debugger/property_debugger/widgets/image_color_picker_widget.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "view/necessary_resources.h"
 
 enum class inspected_node_tab_type {
 	NODE,
@@ -19,6 +20,7 @@ class editor_setup;
 
 struct editor_inspector_input {
 	editor_setup& setup;
+	const necessary_images_in_atlas_map& necessary_images;
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const images_in_atlas_map& game_atlas;
 };

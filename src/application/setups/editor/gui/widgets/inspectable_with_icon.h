@@ -8,7 +8,7 @@ namespace editor_widgets {
 		const augs::imgui_atlas_type atlas_type,
 		const std::string& label,
 		const rgba label_color,
-		const int indent_level,
+		const float indent_level,
 		const bool is_inspected,
 		F&& after_selectable_callback,
 		const std::string& after_text = "",

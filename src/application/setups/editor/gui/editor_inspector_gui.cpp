@@ -53,6 +53,7 @@ struct default_widget_handler {
 
 struct id_widget_handler {
 	editor_setup& setup;
+	const editor_icon_info_in icon_in;
 
 	template <class T>
 	static constexpr bool handles = is_editor_typed_resource_id_v<T>;
@@ -79,6 +80,7 @@ struct id_widget_handler {
 			displayed_resource_name,
 			property,
 			setup,
+			icon_in,
 			[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
 				result = typesafe_sprintf("Changed resource to %x", chosen_name);
 				modified = true;
@@ -221,6 +223,16 @@ bool edit_property(
 				}
 
 				return false;
+			}
+		}
+		else if constexpr(std::is_same_v<uint32_t, T>) {
+			if (label.find("Fish") != std::string::npos || label.find("austics") != std::string::npos) {
+				if (label.find("count") != std::string::npos) {
+					if (slider(label, property, 0u, 50u)) { 
+						result = typesafe_sprintf("Set %x to %x in %x", label, property);
+						return true;
+					}
+				}
 			}
 		}
 
@@ -500,16 +512,16 @@ EDIT_FUNCTION(editor_prefab_node_editable& insp, T& es, const editor_prefab_reso
 		MULTIPROPERTY("Coral", as_aquarium.coral);
 
 		MULTIPROPERTY("Fish 1", as_aquarium.fish_1);
-		MULTIPROPERTY("Fish 1 count", as_aquarium.fish_1_count);
 		MULTIPROPERTY("Fish 2", as_aquarium.fish_2);
-		MULTIPROPERTY("Fish 2 count", as_aquarium.fish_2_count);
 		MULTIPROPERTY("Fish 3", as_aquarium.fish_3);
-		MULTIPROPERTY("Fish 3 count", as_aquarium.fish_3_count);
 		MULTIPROPERTY("Fish 4", as_aquarium.fish_4);
-		MULTIPROPERTY("Fish 4 count", as_aquarium.fish_4_count);
 		MULTIPROPERTY("Fish 5", as_aquarium.fish_5);
-		MULTIPROPERTY("Fish 5 count", as_aquarium.fish_5_count);
 		MULTIPROPERTY("Fish 6", as_aquarium.fish_6);
+		MULTIPROPERTY("Fish 1 count", as_aquarium.fish_1_count);
+		MULTIPROPERTY("Fish 2 count", as_aquarium.fish_2_count);
+		MULTIPROPERTY("Fish 3 count", as_aquarium.fish_3_count);
+		MULTIPROPERTY("Fish 4 count", as_aquarium.fish_4_count);
+		MULTIPROPERTY("Fish 5 count", as_aquarium.fish_5_count);
 		MULTIPROPERTY("Fish 6 count", as_aquarium.fish_6_count);
 
 		MULTIPROPERTY("Fish random seed", as_aquarium.fish_seed);
@@ -1446,6 +1458,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				displayed_resource_name,
 				node.resource_id,
 				in.setup,
+				editor_icon_info_in(in),
 				[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
 					auto cmd = in.setup.make_command_from_selected_nodes<change_resource_command>("Changed resource of ");
 					cmd.after = chosen_id.operator editor_resource_id();
@@ -1498,7 +1511,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			changed = perform_editable_gui(edited_copy, cmd.entries);
 		}
 		else if constexpr(std::is_same_v<N, editor_prefab_node>) {
-			auto id_handler = id_widget_handler { in.setup };
+			auto id_handler = id_widget_handler { in.setup, editor_icon_info_in(in) };
 			const auto resource = in.setup.find_resource(node.resource_id);
 			ensure(resource != nullptr);
 

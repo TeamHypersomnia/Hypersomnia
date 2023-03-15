@@ -350,10 +350,16 @@ void editor_setup::rebuild_prefab_nodes(
 			}
 		}
 
-		auto spawn_multiple_of = [&](auto& rng, auto flavour, int count, auto cb, vec2 bnd_x = vec2(0.0f, 1.0f), vec2 bnd_y = vec2(0.0f, 1.0f)) {
+		auto spawn_multiple_of = [&](auto& rng, auto flavour, uint32_t count, auto cb, vec2 bnd_x = vec2(0.0f, 1.0f), vec2 bnd_y = vec2(0.0f, 1.0f)) {
 			auto sz = get_resource_size(flavour);
 
-			while (count--) {
+			/* 
+				Security measure as someone could forge a map that requests infinite amounts
+			*/
+
+			count = std::min(count, 50u);
+
+			for (uint32_t i = 0; i < count; ++i) {
 				auto rand_x = rng.randval(bnd_x.x, bnd_x.y);
 				auto rand_y = rng.randval(bnd_y.x, bnd_y.y);
 

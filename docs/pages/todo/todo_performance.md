@@ -5,6 +5,12 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Rebuild scene quickly becomes the bottleneck even in release
+	- Let's profile it
+
+- OpenAL begins to miss sound effects when there is a lot of ambient sounds in the background
+	- even if they are completely far away!
+
 - In debug mode, You could trigger a drastic performance hit in physics
 	-  By simply switching weapon from nothing to zamiec for example
 	- Only works if there are two neighboring static bodies instead of a single continuous one, and something is put inside the notch between them

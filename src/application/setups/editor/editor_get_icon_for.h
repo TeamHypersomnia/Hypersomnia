@@ -81,6 +81,9 @@ rgba editor_setup::get_icon_color_for(
 		if (const auto result = on_resource(object, icon_getter)) {
 			return *result;
 		}
+		else {
+			return rgba(0, 0, 0, 0);
+		}
 	}
 	else if constexpr(std::is_same_v<T, editor_sprite_resource>) {
 		return object.editable.color;
@@ -197,6 +200,6 @@ editor_icon_info editor_setup::get_icon_for(
 		return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS], augs::imgui_atlas_type::GAME };
 	}
 
-	return { in.necessary_images[assets::necessary_image_id::DEFUSING_INDICATOR], augs::imgui_atlas_type::GAME };
+	return { {}, augs::imgui_atlas_type::GAME };
 }
 

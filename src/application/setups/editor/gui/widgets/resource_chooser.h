@@ -10,6 +10,8 @@
 #include "application/setups/debugger/property_debugger/widgets/keyboard_acquiring_popup.h"
 #include "view/asset_funcs.h"
 #include "augs/log.h"
+#include "application/setups/editor/gui/widgets/inspectable_with_icon.h"
+#include "application/setups/editor/editor_get_icon_for.h"
 
 template <class R>
 class resource_chooser : keyboard_acquiring_popup {
@@ -37,11 +39,34 @@ public:
 		const std::string& current_source,
 		const id_type current_source_id,
 		const editor_setup& setup,
+		const editor_icon_info_in icon_in,
 		F on_choice
 	) {
 		using namespace augs::imgui;
 
 		const auto displayed_str = current_source.empty() ? std::string("(Invalid)") : current_source;
+
+		{
+			const auto before_pos = ImGui::GetCursorPos();
+			auto icon_result = setup.get_icon_for(current_source_id.operator editor_resource_id(), icon_in);
+
+			const auto icon = icon_result.icon;
+			const auto icon_color = setup.get_icon_color_for(current_source_id.operator editor_resource_id());
+			const auto atlas_type = icon_result.atlas;
+
+			const float indent_level = 0.f;
+			const auto max_icon_size = ImGui::GetTextLineHeight();
+			const float content_x_offset = max_icon_size * indent_level;
+			const auto icon_size = vec2::square(max_icon_size);
+			const auto scaled_icon_size = vec2::scaled_to_max_size(icon.get_original_size(), max_icon_size);
+
+			const auto diff = (icon_size - scaled_icon_size) / 2;
+
+			ImGui::SetCursorPos(ImVec2(vec2(before_pos) + vec2(content_x_offset + diff.x, 0)));
+
+			game_image_button("##choosericon", icon, scaled_icon_size, colors_nha{ icon_color, icon_color, icon_color }, atlas_type);
+			ImGui::SameLine();
+		}
 
 		if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 			if (base::check_opened_first_time()) {
@@ -84,7 +109,24 @@ public:
 					ImGui::SetScrollHereY();
 				}
 
-				if (ImGui::Selectable(entry_name.c_str(), is_current)) {
+				auto icon_result = setup.get_icon_for(entry.target_id.operator editor_resource_id(), icon_in);
+
+				const auto icon = icon_result.icon;
+				const auto icon_color = setup.get_icon_color_for(entry.target_id.operator editor_resource_id());
+				const auto atlas_type = icon_result.atlas;
+
+				auto result = editor_widgets::inspectable_with_icon(
+					icon,
+					icon_color,
+					atlas_type,
+					entry_name,
+					white,
+					0.5f,
+					is_current,
+					[](auto&&...) {}
+				);
+
+				if (result) {
 					ImGui::CloseCurrentPopup();
 
 					on_choice(entry.target_id, entry.name);
