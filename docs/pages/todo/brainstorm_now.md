@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We could delegate scene rebuild to a separate thread to avoid freezes
+
 - Another reason why most official maps should only use official resources is..
 	- ..textures and sounds won't have to be reloaded!
 

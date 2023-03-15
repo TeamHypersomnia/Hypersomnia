@@ -472,26 +472,62 @@ EDIT_FUNCTION(editor_prefab_node_editable& insp, T& es, const editor_prefab_reso
 	MULTIPROPERTY("Size", size);
 
 	auto edit_as_aquarium = [&]() {
-		MULTIPROPERTY("Caustics", as_aquarium.caustics);
-		MULTIPROPERTY("Water overlay", as_aquarium.water_overlay);
-
 		MULTIPROPERTY("Sand 1", as_aquarium.sand_1);
 		MULTIPROPERTY("Sand 2", as_aquarium.sand_2);
+		MULTIPROPERTY("Sand edge", as_aquarium.sand_edge);
+
+		MULTIPROPERTY("Dune small", as_aquarium.dune_small);
+		MULTIPROPERTY("Dune big", as_aquarium.dune_big);
 
 		MULTIPROPERTY("Wall", as_aquarium.wall);
 		MULTIPROPERTY("Wall top corners", as_aquarium.wall_top_corners);
 		MULTIPROPERTY("Wall bottom corners", as_aquarium.wall_bottom_corners);
+		MULTIPROPERTY("Wall smooth end", as_aquarium.wall_smooth_end);
 
-		MULTIPROPERTY("Left ambience", as_aquarium.ambience_left);
-		MULTIPROPERTY("Right ambience", as_aquarium.ambience_right);
+		MULTIPROPERTY("Wall top foreground", as_aquarium.wall_top_foreground);
 
-		MULTIPROPERTY("Glass start offset", as_aquarium.glass_start_offset);
-		MULTIPROPERTY("Wall lamp offset", as_aquarium.wall_lamp_offset);
+		MULTIPROPERTY("Glass", as_aquarium.glass);
+		MULTIPROPERTY("Glass start", as_aquarium.glass_start);
+
+		MULTIPROPERTY("Sand lamp body", as_aquarium.sand_lamp_body);
+		MULTIPROPERTY("Sand lamp light", as_aquarium.sand_lamp_light);
+
+		MULTIPROPERTY("Wall lamp body", as_aquarium.wall_lamp_body);
+		MULTIPROPERTY("Wall lamp light", as_aquarium.wall_lamp_light);
+
+		MULTIPROPERTY("Flower 1", as_aquarium.flower_1);
+		MULTIPROPERTY("Flower 2", as_aquarium.flower_2);
+		MULTIPROPERTY("Coral", as_aquarium.coral);
+
+		MULTIPROPERTY("Fish 1", as_aquarium.fish_1);
+		MULTIPROPERTY("Fish 1 count", as_aquarium.fish_1_count);
+		MULTIPROPERTY("Fish 2", as_aquarium.fish_2);
+		MULTIPROPERTY("Fish 2 count", as_aquarium.fish_2_count);
+		MULTIPROPERTY("Fish 3", as_aquarium.fish_3);
+		MULTIPROPERTY("Fish 3 count", as_aquarium.fish_3_count);
+		MULTIPROPERTY("Fish 4", as_aquarium.fish_4);
+		MULTIPROPERTY("Fish 4 count", as_aquarium.fish_4_count);
+		MULTIPROPERTY("Fish 5", as_aquarium.fish_5);
+		MULTIPROPERTY("Fish 5 count", as_aquarium.fish_5_count);
+		MULTIPROPERTY("Fish 6", as_aquarium.fish_6);
+		MULTIPROPERTY("Fish 6 count", as_aquarium.fish_6_count);
+
+		MULTIPROPERTY("Fish random seed", as_aquarium.fish_seed);
+
+		MULTIPROPERTY("Bubbles", as_aquarium.bubbles);
+		MULTIPROPERTY("Flower bubbles", as_aquarium.flower_bubbles);
 
 		MULTIPROPERTY("Wandering pixels 1", as_aquarium.wandering_pixels_1);
 		MULTIPROPERTY("Wandering pixels 2", as_aquarium.wandering_pixels_2);
 
-		MULTIPROPERTY("Fish random seed", as_aquarium.fish_seed);
+		MULTIPROPERTY("Ambience left", as_aquarium.ambience_left);
+		MULTIPROPERTY("Ambience right", as_aquarium.ambience_right);
+
+		MULTIPROPERTY("Water overlay", as_aquarium.water_overlay);
+		MULTIPROPERTY("Interior collider", as_aquarium.collider_interior);
+
+		MULTIPROPERTY("Caustics", as_aquarium.caustics);
+
 		MULTIPROPERTY("Caustics count", as_aquarium.caustics_count);
 		MULTIPROPERTY("Caustics random seed", as_aquarium.caustics_seed);
 

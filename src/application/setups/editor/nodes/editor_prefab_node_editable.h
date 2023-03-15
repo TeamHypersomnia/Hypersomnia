@@ -39,15 +39,6 @@ struct aquarium_prefab_node {
 	editor_typed_resource_id<editor_sprite_resource> fish_5;
 	editor_typed_resource_id<editor_sprite_resource> fish_6;
 
-	int fish_seed = 1337;
-
-	int fish_1_count = 12;
-	int fish_2_count = 8;
-	int fish_3_count = 6;
-	int fish_4_count = 6;
-	int fish_5_count = 4;
-	int fish_6_count = 4;
-
 	editor_typed_resource_id<editor_particles_resource> bubbles;
 	editor_typed_resource_id<editor_particles_resource> flower_bubbles;
 
@@ -57,16 +48,27 @@ struct aquarium_prefab_node {
 	editor_typed_resource_id<editor_sound_resource> ambience_left;
 	editor_typed_resource_id<editor_sound_resource> ambience_right;
 
+	editor_typed_resource_id<editor_sprite_resource> water_overlay;
+	editor_typed_resource_id<editor_sprite_resource> collider_interior;
+
+	editor_typed_resource_id<editor_sprite_resource> caustics;
+
 	int glass_start_offset = 10;
 	int wall_lamp_offset = 50;
 
-	editor_typed_resource_id<editor_sprite_resource> water_overlay;
+	uint32_t fish_seed = 1337;
 
-	editor_typed_resource_id<editor_sprite_resource> caustics;
+	uint32_t fish_1_count = 12;
+	uint32_t fish_2_count = 8;
+	uint32_t fish_3_count = 6;
+	uint32_t fish_4_count = 6;
+	uint32_t fish_5_count = 4;
+	uint32_t fish_6_count = 4;
+
 	uint32_t caustics_seed = 8933;
-	uint32_t dim_caustics_seed = 8204;
-
 	uint32_t caustics_count = 9;
+
+	uint32_t dim_caustics_seed = 8204;
 	uint32_t dim_caustics_count = 4;
 	// END GEN INTROSPECTOR
 };

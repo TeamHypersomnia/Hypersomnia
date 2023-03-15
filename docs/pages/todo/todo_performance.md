@@ -5,6 +5,17 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- In debug mode, You could trigger a drastic performance hit in physics
+	-  By simply switching weapon from nothing to zamiec for example
+	- Only works if there are two neighboring static bodies instead of a single continuous one, and something is put inside the notch between them
+		- happened with shells too
+	- for now let's disable the interior collider, better to just teleport inside the aquarium rather than hit the 
+		- we could also have an invisible, soundless player-only collider
+- This will eventually be fixed by having an additional fov-aligned player-only collider for static bodies that stretches to infinity
+- We could anyway diagnose what's causing the performance hit in physics because it's a security concern
+	- not so much security but someone could still do some griefing
+	- esp since it can also happen to shells, so this might still apply after we do the fov feature
+
 - Cosmos should really hold a reference to flavors instead of a copy so that we can have e.g. two cosmoi without copying the same data and so that the second correctly points to the first one
 
 - Why does the performance drop dramatically in debug after spawning just a few firearms?

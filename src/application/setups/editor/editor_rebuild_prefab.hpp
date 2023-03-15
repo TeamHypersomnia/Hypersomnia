@@ -27,7 +27,7 @@ void editor_setup::rebuild_prefab_nodes(
 
 	using P = editor_builtin_prefab_type;
 
-	std::string name_preffix = "";
+	const auto name_preffix = prefab_node->get_display_name() + " ";
 
 	auto get_resource_size = [&]<typename R>(R& rid) {
 		const auto resource = find_resource(rid);
@@ -161,8 +161,6 @@ void editor_setup::rebuild_prefab_nodes(
 	};
 
 	auto build_aquarium = [&]() {
-		name_preffix = "aquarium ";
-
 		const auto& o = official_resource_map;
 		const auto& e = prefab_node->editable;
 		const auto& a = e.as_aquarium;
@@ -223,6 +221,10 @@ void editor_setup::rebuild_prefab_nodes(
 		create_child(a.bubbles, { vec2(0, -h2 + 15), 90 });
 
 		create_child(a.water_overlay, transformr(), e.size);
+
+		if (auto node = create_child(a.collider_interior, transformr(), e.size)) {
+			node->editable.colorize.a = 0;
+		}
 
 		create_child(a.ambience_left, vec2(-w2, h2));
 		create_child(a.ambience_right, vec2(w2, h2));
