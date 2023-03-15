@@ -20,7 +20,7 @@ void draw_area_indicator(
 ) {
 	if (const auto marker = typed_handle.template find<invariants::box_marker>()) {
 		if (type == drawn_indicator_type::INGAME) {
-			if (marker->type == area_marker_type::ORGANISM_AREA) {
+			if (marker->type == area_marker_type::ORGANISM_AREA || marker->type == area_marker_type::PREFAB) {
 				return;
 			}
 		}

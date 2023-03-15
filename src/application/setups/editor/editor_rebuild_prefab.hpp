@@ -186,6 +186,9 @@ void editor_setup::rebuild_prefab_nodes(
 		create_child(a.sand_2, hsand_size * vec2(1, -1), sand_size);
 		create_child(a.sand_2, hsand_size * vec2(-1, 1), sand_size);
 
+		align({1, -1},  create_child(a.sand_edge, vec2(-w2, h2), vec2(w2, 0)));
+		align({-1, -1}, create_child(a.sand_edge, vec2(w2, h2),   vec2(w2, 0)));
+
 		//auto dune_sz = get_resource_size(a.dune_big);
 
 		create_child(a.dune_big, vec2(-w2 / 4.5, 0));
@@ -307,10 +310,10 @@ void editor_setup::rebuild_prefab_nodes(
 			//const auto coral_sz = get_resource_size(a.coral);
 
 			std::tuple<vec2, vec2, float> flowers_1[5] = {
-				{ vec2(-1, 1), vec2::zero, 0 },
 				{ vec2(-0.5, -0.3), vec2::zero, 90 },
 				{ vec2(-0.5, -0.3), vec2(0, flower_1_sz.x), 90 },
 				{ vec2(-0.7, -0.5), vec2::zero, 0 },
+				{ vec2(-0.7, -0.5), vec2(flower_1_sz.x, -flower_1_sz.y), 0 },
 				{ vec2(-0.3, -0.7), vec2::zero, 0 }
 			};
 
