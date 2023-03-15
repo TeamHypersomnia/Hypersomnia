@@ -1,7 +1,6 @@
 #pragma once
 #include "application/setups/editor/commands/create_node_command.h"
 #include "augs/misc/pool/pool_allocate.h"
-#include "application/setups/editor/editor_rebuild_prefab.hpp"
 
 template <class T>
 inline void create_node_command<T>::undo(editor_command_input in) {
@@ -16,7 +15,9 @@ inline void create_node_command<T>::undo(editor_command_input in) {
 		create_layer->undo(in);
 	}
 
-	in.setup.clear_inspector();
+	if (!omit_inspector) {
+		in.setup.clear_inspector();
+	}
 }
 
 template <class T>
@@ -34,8 +35,9 @@ inline void create_node_command<T>::redo(editor_command_input in) {
 	}
 
 	const auto node_id = get_node_id();
+	const bool registered = in.setup.register_node_in_layer(node_id, layer_id, index_in_layer);
 
-	if (in.setup.register_node_in_layer(node_id, layer_id, index_in_layer)) {
+	if (registered && !omit_inspector) {
 		in.setup.inspect_only(node_id);
 	}
 }

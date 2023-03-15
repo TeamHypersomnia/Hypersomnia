@@ -27,6 +27,8 @@ struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {
 	editor_node_id dragged_node;
 	editor_layer_id dragged_layer;
 
+	editor_typed_node_id<editor_prefab_node> nodeize_request;
+
 	entity_id entity_to_highlight;
 	bool request_rename = false;
 	bool request_confirm_rename = false;

@@ -47,6 +47,8 @@ struct edit_layer_command;
 
 struct inspect_command;
 
+struct nodeize_prefab_command;
+
 using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_sprite_resource>,
 	edit_resource_command<editor_sound_resource>,
@@ -116,5 +118,6 @@ using editor_history_base = augs::history_with_saved_revision<
 
 	edit_layer_command,
 
-	inspect_command
+	inspect_command,
+	nodeize_prefab_command
 >;

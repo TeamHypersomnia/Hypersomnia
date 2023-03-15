@@ -16,39 +16,64 @@ struct editor_official_resource_map {
 	Map<test_particles_decorations, editor_particles_resource> particles_decorations;
 	Map<test_wandering_pixels_decorations, editor_wandering_pixels_resource> wandering_pixels;
 
-	template <class T>
-	auto& dereference_enum(const T& typed) {
+	template <class S, class T>
+	static auto& get_container(S& self, const T&) {
 		if constexpr(std::is_same_v<T, test_static_decorations>) {
-			return static_decorations[typed];
+			return self.static_decorations;
 		}
 		else if constexpr(std::is_same_v<T, test_plain_sprited_bodies>) {
-			return plain_sprited_bodies[typed];
+			return self.plain_sprited_bodies;
 		}
 		else if constexpr(std::is_same_v<T, test_dynamic_decorations>) {
-			return dynamic_decorations[typed];
+			return self.dynamic_decorations;
 		}
 		else if constexpr(std::is_same_v<T, test_sound_decorations>) {
-			return sound_decorations[typed];
+			return self.sound_decorations;
 		}
 		else if constexpr(std::is_same_v<T, test_particles_decorations>) {
-			return particles_decorations[typed];
+			return self.particles_decorations;
 		}
 		else if constexpr(std::is_same_v<T, area_marker_type>) {
-			return box_markers[typed];
+			return self.box_markers;
 		}
 		else if constexpr(std::is_same_v<T, test_static_lights>) {
-			return lights[typed];
+			return self.lights;
 		}
 		else if constexpr(std::is_same_v<T, test_wandering_pixels_decorations>) {
-			return wandering_pixels[typed];
+			return self.wandering_pixels;
 		}
 		else {
 			static_assert(always_false_v<T>, "Non-exhaustive if constexpr");
 		}
 	}
 
+	template <class T>
+	const auto& dereference_enum(const T& typed) const {
+		return get_container(*this, typed).at(typed);
+	}
+
+	template <class T>
+	auto& dereference_enum(const T& typed) {
+		return get_container(*this, typed)[typed];
+	}
+
 	template <class V>
 	auto& operator[](const V& var) {
+		if constexpr(is_variant_v<V>) {
+			return std::visit(
+				[this]<typename T>(const T& typed) -> auto& {
+					return this->dereference_enum(typed);
+				},
+				var
+			);
+		}
+		else {
+			return dereference_enum(var);
+		}
+	}
+
+	template <class V>
+	const auto& operator[](const V& var) const {
 		if constexpr(is_variant_v<V>) {
 			return std::visit(
 				[this]<typename T>(const T& typed) -> auto& {

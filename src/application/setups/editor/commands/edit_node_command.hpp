@@ -46,7 +46,7 @@ void edit_node_command<T>::redo(editor_command_input in) {
 			node->editable = entry.after;
 
 			if (do_inspector) {
-				in.setup.inspect_only(editor_node_id(entry.node_id));
+				in.setup.inspect_add_quiet(editor_node_id(entry.node_id));
 			}
 		}
 	}

@@ -5083,3 +5083,18 @@ Advantages:
 - Shape editor
 	- port it from old editor
 
+- Fix reentrancy - rebuild_prefab_nodes calls itself 
+	- maybe create a multi-create command with a vector of node variants
+		- this will also fix prefab being rebuilt for each node
+	- what about a multi-command command?
+	- although we actually need to execute the create commands to acquire node ids for the inspect command
+
+- We need to stop rebuilding the entire scene with every child command in nodeize(
+	- That might make nodeize extremely slow, although wouldn't normally be an issue for now
+
+- Nodeize first then debug the wandering pixels
+- For now let's have the fish as aquarium prefab icon
+	- we'll later customize it?
+
+- check inspect_add_quiet in edit node cmd, its wrong
+

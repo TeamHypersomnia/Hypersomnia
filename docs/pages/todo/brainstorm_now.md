@@ -9,10 +9,6 @@ summary: That which we are brainstorming at the moment.
 - Another reason why most official maps should only use official resources is..
 	- ..textures and sounds won't have to be reloaded!
 
-- Nodeize first then debug the wandering pixels
-- For now let's have the fish as aquarium prefab icon
-	- we'll later customize it?
-
 - Problem: editing prefab triggers rebuild of the child nodes which makes history commands non-deterministic
 	- That is because nodes are freed and reallocated, but undo does not replay it backwards
 	- similarly all existential commands like duplicating/creating would have to take this into account

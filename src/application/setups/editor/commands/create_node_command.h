@@ -17,6 +17,7 @@ struct create_node_command : allocating_command<editor_node_pool_id> {
 	std::size_t index_in_layer = 0;
 
 	std::string built_description;
+	bool omit_inspector = false;
 
 	void undo(editor_command_input in);
 	void redo(editor_command_input in);

@@ -3,11 +3,18 @@
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 
 template <class T>
+constexpr bool skip_scene_rebuild_v = is_one_of_v<T,
+	inspect_command
+>;
+
+template <class T>
 const T& editor_setup::post_new_command(T&& command) {
 	gui.history.scroll_to_latest_once = true;
 	const T& result = history.execute_new(std::forward<T>(command), make_command_input(true));
 
-	rebuild_scene();
+	if constexpr(!skip_scene_rebuild_v<T>) {
+		rebuild_scene();
+	}
 
 	if constexpr(std::is_base_of_v<allocating_command<editor_node_pool_id>, T>) {
 		/*

@@ -25,6 +25,11 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 	(void)in;
 	
+	if (nodeize_request.is_set()) {
+		in.setup.nodeize(nodeize_request);
+		nodeize_request.unset();
+	}
+
 	entity_to_highlight.unset();
 
 	auto release_enter = augs::scope_guard([this]() {
@@ -271,11 +276,13 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	auto handle_node_and_id = [&]<typename T>(
 		const std::size_t node_index, 
 		T& node, 
-		const editor_node_id node_id, 
+		const editor_typed_node_id<T> typed_node_id, 
 		editor_layer& layer, 
 		const editor_layer_id layer_id
 	) {
 		auto id_scope = scoped_id(node_id_counter++);
+
+		const auto node_id = typed_node_id.operator editor_node_id();
 
 		const auto icon_result = in.setup.get_icon_for(node, in);
 		const auto icon = icon_result.icon;
@@ -443,6 +450,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 					if (ImGui::Selectable("Rename (F2)")) {
 						rename_this_node = true;
+					}
+
+					if constexpr(std::is_same_v<T, editor_prefab_node>) {
+						if (ImGui::Selectable("Nodeize")) {
+							nodeize_request = typed_node_id;
+						}
 					}
 
 					ImGui::EndPopup();
@@ -994,15 +1007,13 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					const auto node_id = layer.hierarchy.nodes[i];
 
 					in.setup.on_node(node_id, [&](auto& typed_node, const auto typed_node_id) {
-						(void)typed_node_id;
-
 						if (filter.IsActive()) {
 							if (!typed_node.passed_filter) {
 								return;
 							}
 						}
 
-						handle_node_and_id(i, typed_node, node_id, layer, layer_id);
+						handle_node_and_id(i, typed_node, typed_node_id, layer, layer_id);
 					});
 				}
 			}

@@ -21,6 +21,7 @@
 #include "application/setups/editor/commands/edit_layer_command.h"
 
 #include "application/setups/editor/commands/inspect_command.h"
+#include "application/setups/editor/commands/nodeize_prefab_command.h"
 
 #include "application/setups/editor/editor_history_declaration.h"
 

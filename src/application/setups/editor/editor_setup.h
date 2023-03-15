@@ -681,5 +681,7 @@ public:
 	void toggle_sounds_preview();
 
 	template <class F>
-	void rebuild_prefab_nodes(editor_typed_node_id<editor_prefab_node>, F on_created_child);
+	void rebuild_prefab_nodes(editor_typed_node_id<editor_prefab_node>, F on_created_child, bool call_reverse = false);
+
+	void nodeize(editor_typed_node_id<editor_prefab_node>);
 };

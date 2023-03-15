@@ -3,11 +3,13 @@
 #include "augs/templates/traits/has_rotation.h"
 #include "augs/templates/traits/has_size.h"
 #include "augs/misc/randomization.h"
+#include "application/setups/editor/nodes/editor_node_defaults.h"
 
 template <class F>
 void editor_setup::rebuild_prefab_nodes(
 	const editor_typed_node_id<editor_prefab_node> prefab_node_id,
-	F on_created_child
+	F on_created_child,
+	const bool call_reverse
 ) {
 	auto prefab_node = find_node(prefab_node_id);
 
@@ -125,6 +127,8 @@ void editor_setup::rebuild_prefab_nodes(
 		pool.emplace_back();
 		auto& new_node = pool.back();
 
+		::setup_node_defaults(new_node, *resource);
+
 		new_node.unique_name = get_free_node_name_for(name_preffix + (custom_name.empty() ? resource_name : custom_name));
 		new_node.resource_id = resource_id;
 
@@ -159,9 +163,9 @@ void editor_setup::rebuild_prefab_nodes(
 	auto build_aquarium = [&]() {
 		name_preffix = "aquarium ";
 
-		auto& o = official_resource_map;
-		auto& e = prefab_node->editable;
-		auto& a = e.as_aquarium;
+		const auto& o = official_resource_map;
+		const auto& e = prefab_node->editable;
+		const auto& a = e.as_aquarium;
 
 		const auto w = e.size.x;
 		const auto h = e.size.y;
@@ -418,17 +422,22 @@ void editor_setup::rebuild_prefab_nodes(
 		default: break;
 	}
 
-	temp_prefab_node_pools.template for_each(
-		[&]<typename N>(N& child_node) {
-			const auto final_transform = prefab_node->get_transform() * child_node.get_transform();
+	auto callback = [&]<typename N>(N& child_node) {
+		const auto final_transform = prefab_node->get_transform() * child_node.get_transform();
 
-			child_node.editable.pos = final_transform.pos;
+		child_node.editable.pos = final_transform.pos;
 
-			if constexpr(has_rotation_v<decltype(child_node.editable)>) {
-				child_node.editable.rotation = final_transform.rotation;
-			}
-
-			on_created_child(child_node);
+		if constexpr(has_rotation_v<decltype(child_node.editable)>) {
+			child_node.editable.rotation = final_transform.rotation;
 		}
-	);
+
+		on_created_child(child_node);
+	};
+
+	if (call_reverse) {
+		temp_prefab_node_pools.for_each_reverse(callback);
+	}
+	else {
+		temp_prefab_node_pools.for_each(callback);
+	}
 }

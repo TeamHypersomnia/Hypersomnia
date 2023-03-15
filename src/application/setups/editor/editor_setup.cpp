@@ -896,39 +896,78 @@ bool editor_setup::is_last_command_child() const {
 }
 
 void editor_setup::undo() {
-	bool repeat = false;
-
-	do {
-		repeat = is_last_command_child();
+	while (can_undo()) {
+		const bool repeat = is_last_command_child();
 
 		const auto prev_inspected = get_all_inspected<editor_node_id>();
 
 		gui.history.scroll_to_current_once = true;
+
+		bool should_rebuild = true;
+
+		auto check_rebuild = [&]<typename T>(const T&) {
+			if constexpr(skip_scene_rebuild_v<T>) {
+				should_rebuild = false;
+			}
+		};
+
+		std::visit(check_rebuild, history.last_command());
 		history.undo(make_command_input());
 
 		gui.filesystem.clear_drag_drop();
-		rebuild_scene();
+
+		if (should_rebuild) {
+			rebuild_scene();
+		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
 			inspected_to_entity_selector_state();
 		}
-	} while(repeat);
+
+		if (!repeat) {
+			break;
+		}
+	}
 }
 
 void editor_setup::redo() {
-	do {
+	while (can_redo()) {
 		const auto prev_inspected = get_all_inspected<editor_node_id>();
 
 		gui.history.scroll_to_current_once = true;
+
+		bool should_rebuild = true;
+
+		auto check_rebuild = [&]<typename T>(const T&) {
+			if constexpr(skip_scene_rebuild_v<T>) {
+				should_rebuild = false;
+			}
+		};
+
+		std::visit(check_rebuild, history.next_command());
+
 		history.redo(make_command_input());
 
 		gui.filesystem.clear_drag_drop();
-		rebuild_scene();
+
+		/*
+			Ok... apparently we need to call these for all intermediate commands
+			because our node mover is still kinda legacy
+			and operates on entities instead of nodes
+		*/
+
+		if (should_rebuild) {
+			rebuild_scene();
+		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
 			inspected_to_entity_selector_state();
 		}
-	} while(is_next_command_child());
+		
+		if (!is_next_command_child()) {
+			break;
+		}
+	}
 }
 
 void editor_setup::load_gui_state() {
@@ -2255,6 +2294,80 @@ bool editor_setup::should_warp_cursor_before_duplicating() const {
 
 void editor_setup::toggle_sounds_preview() {
 	gui.sounds_preview = !gui.sounds_preview;
+}
+
+void nodeize_prefab_command::redo(editor_command_input in) {
+	create_cmds.clear();
+
+	const bool do_inspector = true;
+
+	if (do_inspector) {
+		in.setup.clear_inspector();
+	}
+
+	const auto parent_layer = in.setup.find_parent_layer(prefab_id.operator editor_node_id());
+
+	if (parent_layer == std::nullopt) {
+		return;
+	}
+
+	auto rebuilder = [&]<typename T>(const T& created_child) {
+		create_node_command<T> cmd;
+
+		cmd.created_node = created_child;
+		cmd.layer_id = parent_layer->layer_id;
+		cmd.index_in_layer = parent_layer->index_in_layer;
+		cmd.omit_inspector = true;
+
+		cmd.redo(in);
+
+		if (do_inspector) {
+			in.setup.inspect_add_quiet(cmd.get_node_id());
+		}
+
+		create_cmds.emplace_back(std::move(cmd));
+	};
+
+	in.setup.rebuild_prefab_nodes(prefab_id, rebuilder);
+
+	delete_nodes_command cmd;
+	cmd.push_entry(prefab_id.operator editor_node_id());
+	cmd.omit_inspector = true;
+
+	del_prefab_cmd = std::move(cmd);
+	del_prefab_cmd.redo(in);
+
+	if (do_inspector) {
+		in.setup.after_quietly_adding_inspected();
+	}
+}
+
+void nodeize_prefab_command::undo(editor_command_input in) {
+	const bool do_inspector = true;
+
+	del_prefab_cmd.undo(in);
+
+	for (auto& c : reverse(create_cmds)) {
+		std::visit([&](auto& typed_cmd) { typed_cmd.undo(in); }, c);
+	}
+
+	if (do_inspector) {
+		in.setup.inspect_only(prefab_id.operator editor_node_id());
+	}
+}
+
+void editor_setup::nodeize(const editor_typed_node_id<editor_prefab_node> prefab_id) {
+	const auto prefab = find_node(prefab_id);
+
+	if (prefab == nullptr) {
+		return;
+	}
+
+	nodeize_prefab_command cmd;
+	cmd.prefab_id = prefab_id;
+	cmd.built_description = typesafe_sprintf("Nodeized %x", prefab->get_display_name());
+
+	post_new_command(std::move(cmd));
 }
 
 template struct edit_resource_command<editor_sprite_resource>;
