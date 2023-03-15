@@ -232,6 +232,8 @@ bool edit_property(
 						result = typesafe_sprintf("Set %x to %x in %x", label, property);
 						return true;
 					}
+
+					return false;
 				}
 			}
 		}

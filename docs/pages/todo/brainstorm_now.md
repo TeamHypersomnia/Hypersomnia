@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Maybe hide animation-related fields in sprite node if it's not an animation
 - We could delegate scene rebuild to a separate thread to avoid freezes
 
 - Another reason why most official maps should only use official resources is..

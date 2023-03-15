@@ -381,15 +381,20 @@ void editor_setup::rebuild_prefab_nodes(
 		};
 
 		{
-			auto rng = randomization(a.fish_seed);
+			auto r1 = randomization(a.fish_seed);
+			auto r2 = randomization(a.fish_seed + 1);
+			auto r3 = randomization(a.fish_seed + 2);
+			auto r4 = randomization(a.fish_seed + 3);
+			auto r5 = randomization(a.fish_seed + 4);
+			auto r6 = randomization(a.fish_seed + 5);
 
 			auto cb = [](auto...){};
-			spawn_multiple_of(rng, a.fish_1, a.fish_1_count, cb);
-			spawn_multiple_of(rng, a.fish_2, a.fish_2_count, cb);
-			spawn_multiple_of(rng, a.fish_3, a.fish_3_count, cb);
-			spawn_multiple_of(rng, a.fish_4, a.fish_4_count, cb);
-			spawn_multiple_of(rng, a.fish_5, a.fish_5_count, cb);
-			spawn_multiple_of(rng, a.fish_6, a.fish_6_count, cb);
+			spawn_multiple_of(r1, a.fish_1, a.fish_1_count, cb);
+			spawn_multiple_of(r2, a.fish_2, a.fish_2_count, cb);
+			spawn_multiple_of(r3, a.fish_3, a.fish_3_count, cb);
+			spawn_multiple_of(r4, a.fish_4, a.fish_4_count, cb);
+			spawn_multiple_of(r5, a.fish_5, a.fish_5_count, cb);
+			spawn_multiple_of(r6, a.fish_6, a.fish_6_count, cb);
 		}
 
 		{

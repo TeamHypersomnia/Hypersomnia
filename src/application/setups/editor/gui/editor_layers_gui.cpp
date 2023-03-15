@@ -453,7 +453,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 
 					if constexpr(std::is_same_v<T, editor_prefab_node>) {
-						if (ImGui::Selectable("Nodeize")) {
+						if (ImGui::Selectable("Unpack prefab")) {
 							nodeize_request = typed_node_id;
 						}
 					}
