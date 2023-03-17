@@ -168,6 +168,8 @@ class editor_setup : public default_setup_settings {
 	friend delete_nodes_command;
 	friend duplicate_nodes_command;
 
+	friend edit_project_settings_command;
+
 	friend editor_node_mover;
 
 	cosmos& get_cosmos() {
@@ -360,6 +362,7 @@ public:
 	void inspect_only(inspected_variant);
 	void inspect_only(const std::vector<inspected_variant>&);
 	void inspect_only(const std::vector<editor_node_id>&);
+	void inspect_project_settings(bool scroll = true);
 	void inspected_to_entity_selector_state();
 
 	template <class T>
@@ -663,6 +666,7 @@ public:
 	}
 
 	void set_inspector_tab(inspected_node_tab_type);
+	void set_inspector_tab(inspected_project_tab_type);
 
 	void start_playtesting();
 	bool is_playtesting() const;
@@ -683,5 +687,5 @@ public:
 	template <class F>
 	void rebuild_prefab_nodes(editor_typed_node_id<editor_prefab_node>, F on_created_child, bool call_reverse = false);
 
-	void nodeize(editor_typed_node_id<editor_prefab_node>);
+	void unpack_prefab(editor_typed_node_id<editor_prefab_node>);
 };

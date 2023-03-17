@@ -23,6 +23,7 @@
 
 #include "application/setups/editor/commands/create_layer_command.hpp"
 #include "application/setups/editor/commands/edit_node_command.hpp"
+#include "application/setups/editor/commands/edit_project_settings_command.hpp"
 #include "application/setups/editor/commands/edit_layer_command.hpp"
 #include "application/setups/editor/commands/edit_resource_command.hpp"
 #include "application/setups/editor/commands/create_node_command.hpp"
@@ -276,6 +277,7 @@ bool editor_setup::handle_input_before_game(
 				case key::L: gui.layers.open(); return true;
 				case key::H: gui.history.open(); return true;
 				case key::I: gui.inspector.open(); return true;
+				case key::U: inspect_project_settings(); return true;
 				default: break;
 			}
 		}
@@ -766,6 +768,14 @@ void editor_setup::inspect_only(const std::vector<inspected_variant>& new_inspec
 	sort_inspected();
 }
 
+void editor_setup::inspect_project_settings(const bool scroll) {
+	inspect_only(inspected_special::PROJECT_SETTINGS);
+
+	if (scroll) {
+		scroll_once_to(inspected_special::PROJECT_SETTINGS);
+	}
+}
+
 void editor_setup::inspected_to_entity_selector_state() {
 	entity_selector_state.clear();
 	selector.clear();
@@ -1217,6 +1227,7 @@ editor_node_id editor_setup::get_hovered_node(const necessary_images_in_atlas_ma
 
 void editor_setup::scroll_once_to(inspected_variant id) {
 	gui.layers.scroll_once_to = id;
+	gui.filesystem.scroll_once_to = id;
 
 	if (auto node = std::get_if<editor_node_id>(std::addressof(id))) {
 		if (auto parent = find_parent_layer(*node)) {
@@ -2092,6 +2103,10 @@ void editor_setup::set_inspector_tab(const inspected_node_tab_type type) {
 	gui.inspector.node_current_tab = type;
 }
 
+void editor_setup::set_inspector_tab(const inspected_project_tab_type type) {
+	gui.inspector.project_current_tab = type;
+}
+
 void editor_setup::start_rotating_selection() {
 	mover.start_rotating_selection(make_mover_input()); 
 }
@@ -2296,7 +2311,7 @@ void editor_setup::toggle_sounds_preview() {
 	gui.sounds_preview = !gui.sounds_preview;
 }
 
-void nodeize_prefab_command::redo(editor_command_input in) {
+void unpack_prefab_command::redo(editor_command_input in) {
 	create_cmds.clear();
 
 	const bool do_inspector = true;
@@ -2342,7 +2357,7 @@ void nodeize_prefab_command::redo(editor_command_input in) {
 	}
 }
 
-void nodeize_prefab_command::undo(editor_command_input in) {
+void unpack_prefab_command::undo(editor_command_input in) {
 	const bool do_inspector = true;
 
 	del_prefab_cmd.undo(in);
@@ -2356,16 +2371,16 @@ void nodeize_prefab_command::undo(editor_command_input in) {
 	}
 }
 
-void editor_setup::nodeize(const editor_typed_node_id<editor_prefab_node> prefab_id) {
+void editor_setup::unpack_prefab(const editor_typed_node_id<editor_prefab_node> prefab_id) {
 	const auto prefab = find_node(prefab_id);
 
 	if (prefab == nullptr) {
 		return;
 	}
 
-	nodeize_prefab_command cmd;
+	unpack_prefab_command cmd;
 	cmd.prefab_id = prefab_id;
-	cmd.built_description = typesafe_sprintf("Nodeized %x", prefab->get_display_name());
+	cmd.built_description = typesafe_sprintf("Unpacked prefab: %x", prefab->get_display_name());
 
 	post_new_command(std::move(cmd));
 }

@@ -26,7 +26,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 	(void)in;
 	
 	if (nodeize_request.is_set()) {
-		in.setup.nodeize(nodeize_request);
+		in.setup.unpack_prefab(nodeize_request);
 		nodeize_request.unset();
 	}
 

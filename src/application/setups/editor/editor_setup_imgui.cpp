@@ -168,6 +168,12 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 					delete_selection();
 				}
 			}
+
+			ImGui::Separator();
+
+			if (item_if(true, "Project settings", "CTRL+U")) {
+				inspect_project_settings();
+			}
 		}
 
 		if (auto menu = scoped_menu("Window")) {
@@ -337,8 +343,8 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	gui.filesystem.perform({ 
 		*this,
 		in.window,
-		gui.filesystem.showing_official() ? official_files_root : files.root,
-
+		files.root,
+		official_files_root,
 		in.ad_hoc_atlas,
 		in.necessary_images
 	});

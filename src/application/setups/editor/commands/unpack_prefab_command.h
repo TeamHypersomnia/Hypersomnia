@@ -4,7 +4,7 @@
 #include "application/setups/editor/commands/create_node_variant.h"
 #include "application/setups/editor/commands/delete_nodes_command.h"
 
-struct nodeize_prefab_command {
+struct unpack_prefab_command {
 	editor_command_meta meta;
 
 	std::vector<create_node_variant> create_cmds;

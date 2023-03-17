@@ -5098,3 +5098,14 @@ Advantages:
 
 - check inspect_add_quiet in edit node cmd, its wrong
 
+- unpack_prefab_command -> unpack_prefab_command
+- Common properties
+	- Do we view them in inspector or a separate window?
+	- The only downside to a separate window really is that we need to reserve some screen space for it 
+- Inspector would be intuitive insofar as screen space is concerned and also..
+	- ..we can click the json file like it is a resource
+	- The Edit->project settings would just inspect that automatically
+- I don't think we'll need to co-edit something along with the settings
+	- Plus it's a nice pattern that inspector leads to undoable commands, with a separate window it might not be that obvious
+
+- Maybe hide animation-related fields in sprite node if it's not an animation

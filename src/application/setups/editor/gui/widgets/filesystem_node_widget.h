@@ -9,6 +9,7 @@ namespace editor_widgets {
 		editor_filesystem_node& node,
 		const editor_icon_info_in& icon_in,
 		editor_resource_id& dragged_resource,
+		const std::optional<bool> override_is_inspected,
 		F after_selectable
 	) {
 		using namespace augs::imgui;
@@ -36,7 +37,7 @@ namespace editor_widgets {
 			}
 		}
 
-		const bool is_inspected = setup.is_inspected(node.associated_resource);
+		const bool is_inspected = override_is_inspected.has_value() ? override_is_inspected.value() : setup.is_inspected(node.associated_resource);
 		const bool inspects_via_node = [&]() {
 			bool found_node = false;
 

@@ -6,7 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Maybe hide animation-related fields in sprite node if it's not an animation
+- We could attach lights to physical objects
+	- Even automatically when they are spawned over a dynamic object
+		- so that we don't have to resolve references etc
+	- This will work with static bodies too because then they just won't move
+	- Yeah, we should do this totally
+	- light object could also die with its host
+
 - We could delegate scene rebuild to a separate thread to avoid freezes
 
 - Another reason why most official maps should only use official resources is..

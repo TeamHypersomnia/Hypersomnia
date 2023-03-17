@@ -9,6 +9,7 @@
 
 #include "application/setups/debugger/property_debugger/widgets/image_color_picker_widget.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "application/setups/editor/gui/inspected_project_tab_type.h"
 #include "view/necessary_resources.h"
 
 enum class inspected_node_tab_type {
@@ -46,6 +47,8 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 	using introspect_base = base;
 
 	inspected_node_tab_type node_current_tab = inspected_node_tab_type::NODE;
+	inspected_project_tab_type project_current_tab = inspected_project_tab_type::ARENA_PROPERTIES;
+
 	editor_tweaked_widget_tracker tweaked_widget;
 
 	debugger_image_preview neon_map_picker_preview;

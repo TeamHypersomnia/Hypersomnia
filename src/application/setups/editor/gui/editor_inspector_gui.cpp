@@ -106,6 +106,9 @@ struct id_widget_handler {
 
 #define EDIT_ATTENUATIONS 0
 
+#define PROPERTY(label, MEMBER) \
+edit_property(result, label, special_handler, insp.MEMBER);
+
 #define MULTIPROPERTY(label, MEMBER) \
 {\
 	bool values_different = false;\
@@ -128,7 +131,7 @@ struct id_widget_handler {
 }
 
 #define EDIT_FUNCTION template <class T> std::string perform_editable_gui
-
+#define SINGLE_EDIT_FUNCTION std::string perform_editable_gui_single
 
 void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
@@ -268,11 +271,17 @@ bool edit_property(
 			return true;
 		}
 	}
+	else if constexpr(is_constant_size_string_v<T>) {
+		if (input_text(label, property, ImGuiInputTextFlags_EnterReturnsTrue)) { 
+			result = typesafe_sprintf("Edited %x in %x", label);
+			return true;
+		}
+	}
 
 	return false;
 }
 
-EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es) {
+EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& resource) {
 	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 
@@ -299,21 +308,29 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es) {
 		}
 	}
 
-	ImGui::Separator();
-
-	MULTIPROPERTY("Animation speed factor", animation_speed_factor);
-	MULTIPROPERTY("Override starting animation frame", starting_animation_frame.is_enabled);
-
-	if (insp.starting_animation_frame.is_enabled) {
-		auto indent = scoped_indent();
-
-		MULTIPROPERTY("##Overridden frame", starting_animation_frame.value);
+	if (resource.editable.color_wave_speed.is_enabled) {
+		MULTIPROPERTY("Randomize color wave offset", randomize_color_wave_offset);
 	}
 
-	MULTIPROPERTY("Randomize starting animation frame", randomize_starting_animation_frame);
+	const bool is_animation = !resource.animation_frames.empty();
 
-	MULTIPROPERTY("Randomize color wave offset", randomize_color_wave_offset);
+	if (is_animation) {
+		ImGui::Separator();
 
+		text_color("Animation", yellow);
+
+		MULTIPROPERTY("Animation speed factor", animation_speed_factor);
+		MULTIPROPERTY("Override starting animation frame", starting_animation_frame.is_enabled);
+
+		if (insp.starting_animation_frame.is_enabled) {
+			auto indent = scoped_indent();
+
+			MULTIPROPERTY("##Overridden frame", starting_animation_frame.value);
+		}
+
+		MULTIPROPERTY("Randomize starting animation frame", randomize_starting_animation_frame);
+
+	}
 
 	return result;
 }
@@ -595,7 +612,6 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 		//LOG_NVPS(first_orig, second_orig);
 		if (last_result) {
 			if (tracker.changed(0)) {
-				LOG("CHANGED!!!");
 				changed = std::clamp(changed, 0.0f, 1.0f);
 				operated_falloff = is_wall ? prev_woff.value : prev_foff;
 				tracker.update(0);
@@ -1131,6 +1147,39 @@ EDIT_FUNCTION(editor_explosive_resource_editable& insp, T& es) {
 	return result;
 }
 
+SINGLE_EDIT_FUNCTION(editor_project_about& insp) {
+	auto special_handler = default_widget_handler();
+	using namespace augs::imgui;
+	std::string result;
+
+	PROPERTY("Full name", full_name);
+
+	ImGui::Separator();
+
+	if (input_multiline_text("Short description", insp.short_description, 3)) {
+		result = "Edited Short description in %x";
+	}
+
+	ImGui::Separator();
+
+	if (input_multiline_text("Full description", insp.full_description, 10)) {
+		result = "Edited Full description in %x";
+	}
+
+	return result;
+}
+
+SINGLE_EDIT_FUNCTION(editor_arena_properties& insp) {
+	auto special_handler = default_widget_handler();
+	using namespace augs::imgui;
+	std::string result;
+
+	PROPERTY("Ambient light color", ambient_light_color);
+
+	return result;
+}
+
+
 void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants_multiple) {
 	auto different_found = [&]<typename T>(const T&) {
 		return inspects_any_different_than<T>();
@@ -1191,6 +1240,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		else if constexpr(std::is_same_v<T, editor_layer_id>) {
 			return "layers";
 		}
+		else if constexpr(std::is_same_v<T, inspected_special>) {
+			return "objects";
+		}
 		else {
 			static_assert(always_false_v<T>, "Non-exhaustive handler");
 		}
@@ -1218,6 +1270,18 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		}
 	};
 
+	auto reveal_in_explorer_button = [this](const auto& path) {
+		auto cursor = scoped_preserve_cursor();
+
+		if (ImGui::Selectable("##RevealButton")) {
+			reveal_in_explorer_once = path;
+		}
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("Reveal in explorer");
+		}
+	};
+
 	auto resource_handler = [&]<typename R>(
 		const R& resource, 
 		const auto& resource_id, 
@@ -1238,18 +1302,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			/* Preserve extension when displaying name */
 			name = resource.external_file.path_in_project.filename().string();
 			
-			auto reveal_in_explorer_button = [this](const auto& path) {
-				auto cursor = scoped_preserve_cursor();
-
-				if (ImGui::Selectable("##RevealButton")) {
-					reveal_in_explorer_once = path;
-				}
-
-				if (ImGui::IsItemHovered()) {
-					text_tooltip("Reveal in explorer");
-				}
-			};
-
 			const auto& path_in_project = resource.external_file.path_in_project;
 
 			const auto full_path = 
@@ -1510,7 +1562,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				);
 			}
 
-			changed = perform_editable_gui(edited_copy, cmd.entries);
+			changed = perform_editable_gui(edited_copy, cmd.entries, *resource);
 		}
 		else if constexpr(std::is_same_v<N, editor_prefab_node>) {
 			auto id_handler = id_widget_handler { in.setup, editor_icon_info_in(in) };
@@ -1542,7 +1594,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		(void)node;
 	};
 
-	auto layer_handler = [&](editor_layer& layer, const editor_layer_id layer_id) {
+	auto layer_handler = [&](const editor_layer& layer, const editor_layer_id layer_id) {
 		const auto insp_count = all_inspected.size();
 		auto label = std::string("Layer");
 
@@ -1580,8 +1632,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 			{
 				auto edited_copy = layer.editable;
-				auto changed = std::string();
-
 				auto cmd = in.setup.make_command_from_selected_layers<edit_layer_command>("Edited ");
 
 				for (auto& e : cmd.entries) {
@@ -1591,7 +1641,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				}
 
 				(void)layer_id;
-				changed = perform_editable_gui(edited_copy, cmd.entries);
+				const auto changed = perform_editable_gui(edited_copy, cmd.entries);
 
 				if (!changed.empty() && !cmd.empty()) {
 					if (cmd.size() == 1) {
@@ -1601,6 +1651,51 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					post_new_or_rewrite(std::move(cmd)); 
 				}
 			}
+		}
+	};
+
+	auto project_settings_handler = [&]() {
+		const auto& project = in.setup.get_project();
+
+		reveal_in_explorer_button(in.setup.get_paths().project_json);
+
+		text_color("Project settings: ", yellow);
+
+		ImGui::SameLine();
+
+		text(typesafe_sprintf("%x", project.meta.name));
+
+		ImGui::Separator();
+
+		simple_two_tabs(
+			project_current_tab,
+			inspected_project_tab_type::ARENA_PROPERTIES,
+			inspected_project_tab_type::ABOUT,
+			"Arena properties",
+			"About",
+			[](){}
+		);
+
+		ImGui::Separator();
+
+		auto changed = std::string();
+
+		edit_project_settings_command cmd;
+		cmd.after = project.settings;
+		auto& edited_copy = cmd.after;
+
+		if (project_current_tab == inspected_project_tab_type::ARENA_PROPERTIES) {
+			changed = perform_editable_gui_single(edited_copy.arena_properties);
+			cmd.tab = inspected_project_tab_type::ARENA_PROPERTIES;
+		}
+		else if (project_current_tab == inspected_project_tab_type::ABOUT) {
+			changed = perform_editable_gui_single(edited_copy.about);
+			cmd.tab = inspected_project_tab_type::ABOUT;
+		}
+
+		if (!changed.empty()) {
+			cmd.built_description = typesafe_sprintf(changed, "Project settings");
+			post_new_or_rewrite(std::move(cmd));
 		}
 	};
 
@@ -1651,6 +1746,16 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			}
 
 		}
+		else if constexpr(std::is_same_v<T, inspected_special>) {
+
+			switch (inspected_id) {
+				case inspected_special::PROJECT_SETTINGS:
+					project_settings_handler();
+					break;
+				default:
+					break;
+			}
+		}
 		else {
 			static_assert(always_false_v<T>, "Non-exhaustive handler");
 		}
@@ -1700,6 +1805,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				);
 
 				return same_type.has_value() && same_type.value();
+			}
+			else if constexpr(std::is_same_v<T, inspected_special>) {
+				return false;
 			}
 			else {
 				static_assert(always_false_v<T>, "Non-exhaustive");

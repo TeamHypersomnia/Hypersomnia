@@ -45,9 +45,10 @@ struct toggle_layers_visibility_command;
 
 struct edit_layer_command;
 
-struct inspect_command;
+struct edit_project_settings_command;
 
-struct nodeize_prefab_command;
+struct inspect_command;
+struct unpack_prefab_command;
 
 using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_sprite_resource>,
@@ -117,7 +118,8 @@ using editor_history_base = augs::history_with_saved_revision<
 	toggle_layers_visibility_command,
 
 	edit_layer_command,
+	edit_project_settings_command,
 
 	inspect_command,
-	nodeize_prefab_command
+	unpack_prefab_command
 >;

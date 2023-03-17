@@ -29,7 +29,16 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	using namespace editor_widgets;
 
 	(void)in;
-	
+
+	const auto scroll_once = scroll_once_to;
+	scroll_once_to = std::nullopt;
+
+	if (scroll_once == inspected_variant(inspected_special::PROJECT_SETTINGS)) {
+		current_tab = editor_resources_tab_type::PROJECT;
+	}
+
+	auto& files_root = showing_official() ? in.official_files_root : in.project_files_root;
+
 	entity_to_highlight.unset();
 
 	auto window = make_scoped_window();
@@ -138,7 +147,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	int id_counter = 0;
 
 	if (filter.IsActive()) {
-		in.files_root.reset_filter_flags();
+		files_root.reset_filter_flags();
 		get_viewed_special_root().reset_filter_flags();
 
 		auto& f = filter;
@@ -151,9 +160,13 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			}
 		};
 
-		in.files_root.for_each_entry_recursive(filter_callback);
+		files_root.for_each_entry_recursive(filter_callback);
 		get_viewed_special_root().for_each_entry_recursive(filter_callback);
 	}
+
+	auto reveal_project_json_file = [&]() {
+		in.window.reveal_in_explorer(in.setup.get_paths().project_json);
+	};
 
 	simple_two_tabs(
 		current_tab,
@@ -164,7 +177,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		[&]() {
 			if (ImGui::BeginPopupContextItem()) {
 				if (ImGui::Selectable("Reveal in explorer")) {
-					in.window.reveal_in_explorer(in.setup.get_paths().project_json);
+					reveal_project_json_file();
 				}
 
 				ImGui::EndPopup();
@@ -176,7 +189,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 	const bool with_closed_folders = filter.IsActive();
 
-	editor_filesystem_node* currently_viewed_root = &in.files_root;
+	editor_filesystem_node* currently_viewed_root = &files_root;
 
 	auto node_callback = [&](editor_filesystem_node& node) {
 		auto id_scope = scoped_id(id_counter++);
@@ -189,7 +202,11 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			}
 		}
 
+		bool is_project_json_file = false;
+
 		if (node.is_child_of_root()) {
+			is_project_json_file = node.name == in.setup.get_paths().project_json.filename().string();
+
 			/* Ignore some editor-specific files in the project folder */
 
 			if (node.name == "editor_view.json") {
@@ -197,21 +214,37 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			}
 		}
 
+		std::optional<bool> override_is_inspected;
+
+		if (is_project_json_file) {
+			override_is_inspected = in.setup.is_inspected(inspected_special::PROJECT_SETTINGS);
+		}
+
 		const bool pressed = filesystem_node_widget(
 			in.setup,
 			node,
 			editor_icon_info_in(in),
 			dragged_resource,
+			override_is_inspected,
 			[&]() {
+				if (is_project_json_file && scroll_once == inspected_variant(inspected_special::PROJECT_SETTINGS)) {
+					ImGui::SetScrollHereY(0.5f);
+				}
+
 				if (ImGui::BeginPopupContextItem()) {
-					const bool can_reveal = node.associated_resource.is_set() && !node.associated_resource.is_official;
+					const bool can_reveal = is_project_json_file || (node.associated_resource.is_set() && !node.associated_resource.is_official);
 
 					{
 						auto disabled = maybe_disabled_cols(!can_reveal);
 
 						if (ImGui::Selectable("Reveal in explorer")) {
 							if (can_reveal) {
-								in.window.reveal_in_explorer(in.setup.resolve_project_path(node.get_path_in_project()));
+								if (is_project_json_file) {
+									reveal_project_json_file();
+								}
+								else {
+									in.window.reveal_in_explorer(in.setup.resolve_project_path(node.get_path_in_project()));
+								}
 							}
 						}
 					}
@@ -252,7 +285,10 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		);
 
 		if (pressed) {
-			if (node.is_folder()) {
+			if (is_project_json_file) {
+				in.setup.inspect_project_settings(false);
+			}
+			else if (node.is_folder()) {
 				if (!filter_active) {
 					node.toggle_open();
 				}
@@ -300,7 +336,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		}
 	};
 
-	in.files_root.in_ui_order(node_callback, with_closed_folders);
+	files_root.in_ui_order(node_callback, with_closed_folders);
 
 	ImGui::Separator();
 

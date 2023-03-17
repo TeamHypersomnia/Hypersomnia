@@ -57,7 +57,8 @@ namespace editor_project_readwrite {
 		const auto document = augs::json_document_from(json_path);
 
 		editor_project loaded;
-		augs::read_json(document, loaded);
+		loaded.meta = read_only_project_meta(json_path);
+		loaded.settings.about = read_only_project_about(json_path);
 
 		/*
 			Layer hierarchies and nodes are ignored when reading.

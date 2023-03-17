@@ -5,6 +5,7 @@
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "application/setups/editor/editor_filesystem.h"
 #include "game/cosmos/entity_id.h"
+#include "application/setups/editor/gui/inspected_variant.h"
 
 class editor_setup;
 class images_in_atlas_map;
@@ -23,7 +24,8 @@ namespace augs {
 struct editor_project_files_input {
 	editor_setup& setup;
 	augs::window& window;
-	editor_filesystem_node& files_root;
+	editor_filesystem_node& project_files_root;
+	editor_filesystem_node& official_files_root;
 
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
@@ -36,6 +38,7 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 
 	editor_filesystem_gui(const std::string& name);
 
+	std::optional<inspected_variant> scroll_once_to;
 	editor_resources_tab_type current_tab = editor_resources_tab_type::PROJECT;
 
 	editor_resource_id dragged_resource;
