@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Modes
+	- Maybe think this through before we do serialization
+	- Could be project-specific special resources
+	- As for showing only changed properties, this is a problem specific not just to nodes and we'll have to tackle it anyway
+
 - We could attach lights to physical objects
 	- Even automatically when they are spawned over a dynamic object
 		- so that we don't have to resolve references etc

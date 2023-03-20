@@ -95,6 +95,25 @@ namespace test_flavours {
 			test_scene_physical_material_id::WOOD
 		).template get<invariants::sprite>().tile_excess_size = true;
 
+		{
+			auto make_dev_wall = [&](const auto fid, const auto iid) {
+				static_obstacle(
+					flavour_with_sprite(
+						fid,
+						iid,
+						test_obstacle_order::OPAQUE,
+						orange
+					),
+					test_scene_physical_material_id::METAL
+				).template get<invariants::sprite>().tile_excess_size = true;
+			};
+
+			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_32, test_scene_image_id::DEV_FLOOR_32);
+			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_64, test_scene_image_id::DEV_FLOOR_64);
+			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_128, test_scene_image_id::DEV_FLOOR_128);
+			make_dev_wall(test_plain_sprited_bodies::DEV_WALL_256, test_scene_image_id::DEV_FLOOR_256);
+		}
+
 		static_obstacle(
 			flavour_with_sprite(
 				test_plain_sprited_bodies::SNACKBAR,

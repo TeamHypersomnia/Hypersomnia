@@ -194,6 +194,30 @@ namespace test_flavours {
 			}
 		}
 
+		flavour_with_tiled_sprite(
+			test_static_decorations::DEV_FLOOR_32,
+			test_scene_image_id::DEV_FLOOR_32,
+			test_ground_order::FLOOR_AND_ROAD
+		);
+
+		flavour_with_tiled_sprite(
+			test_static_decorations::DEV_FLOOR_64,
+			test_scene_image_id::DEV_FLOOR_64,
+			test_ground_order::FLOOR_AND_ROAD
+		);
+
+		flavour_with_tiled_sprite(
+			test_static_decorations::DEV_FLOOR_128,
+			test_scene_image_id::DEV_FLOOR_128,
+			test_ground_order::FLOOR_AND_ROAD
+		);
+
+		flavour_with_tiled_sprite(
+			test_static_decorations::DEV_FLOOR_256,
+			test_scene_image_id::DEV_FLOOR_256,
+			test_ground_order::FLOOR_AND_ROAD
+		);
+
 		flavour_with_sprite(
 			test_static_decorations::HAVE_A_PLEASANT,
 			test_scene_image_id::HAVE_A_PLEASANT,

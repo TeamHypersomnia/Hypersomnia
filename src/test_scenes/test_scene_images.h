@@ -331,6 +331,11 @@ enum class test_scene_image_id {
 
 	TRIANGLE_COLLIDER,
 
+	DEV_FLOOR_32,
+	DEV_FLOOR_64,
+	DEV_FLOOR_128,
+	DEV_FLOOR_256,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

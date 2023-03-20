@@ -5109,3 +5109,5 @@ Advantages:
 	- Plus it's a nice pattern that inspector leads to undoable commands, with a separate window it might not be that obvious
 
 - Maybe hide animation-related fields in sprite node if it's not an animation
+- Why is lighting wrong with no lights and ambient lighting = 100%?
+
