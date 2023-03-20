@@ -1169,7 +1169,7 @@ SINGLE_EDIT_FUNCTION(editor_project_about& insp) {
 	return result;
 }
 
-SINGLE_EDIT_FUNCTION(editor_arena_properties& insp) {
+SINGLE_EDIT_FUNCTION(editor_arena_settings& insp) {
 	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	std::string result;
@@ -1669,33 +1669,42 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 		simple_two_tabs(
 			project_current_tab,
-			inspected_project_tab_type::ARENA_PROPERTIES,
+			inspected_project_tab_type::ARENA,
 			inspected_project_tab_type::ABOUT,
-			"Arena properties",
+			"Arena",
 			"About",
 			[](){}
 		);
 
 		ImGui::Separator();
 
-		auto changed = std::string();
+		if (project_current_tab == inspected_project_tab_type::ARENA) {
+			edit_project_settings_command cmd;
 
-		edit_project_settings_command cmd;
-		cmd.after = project.settings;
-		auto& edited_copy = cmd.after;
+			auto edited_copy = project.settings;
+			const auto changed = perform_editable_gui_single(edited_copy);
 
-		if (project_current_tab == inspected_project_tab_type::ARENA_PROPERTIES) {
-			changed = perform_editable_gui_single(edited_copy.arena_properties);
-			cmd.tab = inspected_project_tab_type::ARENA_PROPERTIES;
+			if (!changed.empty()) {
+				cmd.after = edited_copy;
+				cmd.built_description = typesafe_sprintf(changed, "Arena");
+				post_new_or_rewrite(std::move(cmd));
+			}
+
+			cmd.tab = inspected_project_tab_type::ARENA;
 		}
 		else if (project_current_tab == inspected_project_tab_type::ABOUT) {
-			changed = perform_editable_gui_single(edited_copy.about);
-			cmd.tab = inspected_project_tab_type::ABOUT;
-		}
+			edit_project_settings_command cmd;
 
-		if (!changed.empty()) {
-			cmd.built_description = typesafe_sprintf(changed, "Project settings");
-			post_new_or_rewrite(std::move(cmd));
+			auto edited_copy = project.about;
+			const auto changed = perform_editable_gui_single(edited_copy);
+
+			if (!changed.empty()) {
+				cmd.after = edited_copy;
+				cmd.built_description = typesafe_sprintf(changed, "About");
+				post_new_or_rewrite(std::move(cmd));
+			}
+
+			cmd.tab = inspected_project_tab_type::ABOUT;
 		}
 	};
 

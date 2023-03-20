@@ -388,7 +388,7 @@ void editor_filesystem_gui::clear_drag_drop() {
 
 void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& root) {
 	root.clear();
-	root.subfolders.resize(10);
+	root.subfolders.resize(11);
 	root.should_sort = false;
 
 	auto i = 0;
@@ -406,6 +406,7 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	auto& area_markers_folder = root.subfolders[i++];
 
 	auto& prefabs_folder = root.subfolders[i++];
+	auto& game_modes_folder = root.subfolders[i++];
 
 	lights_folder.name = "Lights";
 	particles_folder.name = "Particles";
@@ -420,6 +421,7 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	area_markers_folder.name = "Area markers";
 
 	prefabs_folder.name = "Prefabs";
+	game_modes_folder.name = "Game modes";
 
 	for (auto& s : root.subfolders) {
 		s.type = editor_filesystem_node_type::FOLDER;

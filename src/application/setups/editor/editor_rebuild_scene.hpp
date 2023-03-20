@@ -528,7 +528,7 @@ void editor_setup::rebuild_scene() {
 
 	const auto mutable_access = cosmos_common_significant_access();
 	auto& common = scene.world.get_common_significant(mutable_access);
-	common.light.ambient_color = project.settings.arena_properties.ambient_light_color;
+	common.light.ambient_color = project.settings.ambient_light_color;
 
 	auto for_each_manually_specified_official_resource_pool = [&](auto lbd) {
 		lbd(official_resources.get_pool_for<editor_point_marker_resource>());

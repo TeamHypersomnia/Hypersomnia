@@ -186,7 +186,8 @@ void create_official_filesystem_from(
 				test_dynamic_decorations::DARKBLUE_FISH,
 				test_dynamic_decorations::CYANVIOLET_FISH,
 				test_dynamic_decorations::JELLYFISH,
-				test_dynamic_decorations::DRAGON_FISH
+				test_dynamic_decorations::DRAGON_FISH,
+				test_dynamic_decorations::RAINBOW_DRAGON_FISH
 			} 
 		},
 

@@ -6,8 +6,8 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
-- A hpsr hidden in inventory could stop emitting particles
-	- It's already very hard to play it so we should do at least that
+- Pistols could just have a slower rate of fire and they'll be perfectly balanced
+	- Otherwise they're just superior smgs honestly
 
 - Once we add scopes we could consider adding a visible laser?
 	- So that someone could have a chance to react to being shot from an off-screen distance
@@ -33,6 +33,9 @@ summary: Balancing issues to be solved.
 	- Maybe a little more damage, to the point that it just takes one less hit with armor but takes same amount of hits without armor
 
 ## Done
+
+- A hpsr hidden in inventory could stop emitting particles
+	- It's already very hard to play it so we should do at least that
 
 - Buff AWP (HPSR)
 	- Nobody plays it in competitive environments right now

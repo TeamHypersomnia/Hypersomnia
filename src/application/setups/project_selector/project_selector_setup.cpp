@@ -687,7 +687,7 @@ bool project_selector_setup::create_new_project_files() {
 			default_project.layers.order.push_back(default_project.layers.pool.allocate(default_layer).key);
 		}
 
-		default_project.settings.about.short_description = user_input.short_description;
+		default_project.about.short_description = user_input.short_description;
 		
 		editor_project_readwrite::write_project_json(paths.project_json, default_project);
 

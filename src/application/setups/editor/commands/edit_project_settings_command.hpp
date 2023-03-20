@@ -4,7 +4,10 @@
 void edit_project_settings_command::undo(editor_command_input in) {
 	const bool do_inspector = !in.skip_inspector;
 
-	in.setup.project.settings = before;
+	std::visit([&]<typename T>(T& typed_before) {
+		auto& current = in.setup.project.template get<T>();
+		current = typed_before;
+	}, before);
 
 	if (do_inspector) {
 		in.setup.inspect_project_settings();
@@ -15,8 +18,12 @@ void edit_project_settings_command::undo(editor_command_input in) {
 void edit_project_settings_command::redo(editor_command_input in) {
 	const bool do_inspector = !in.skip_inspector;
 
-	before = in.setup.project.settings;
-	in.setup.project.settings = after;
+	std::visit([&]<typename T>(T& typed_after) {
+		auto& current = in.setup.project.template get<T>();
+
+		before = current;
+		current = typed_after;
+	}, after);
 
 	if (do_inspector) {
 		in.setup.inspect_project_settings();

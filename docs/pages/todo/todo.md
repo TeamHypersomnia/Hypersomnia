@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Melee clash should: a) happen more often; b) and cancel damage
+
 - Merging static colliders
 	- Purpose
 		- Performance: Less overhead for visibility system

@@ -5111,3 +5111,15 @@ Advantages:
 - Maybe hide animation-related fields in sprite node if it's not an animation
 - Why is lighting wrong with no lights and ambient lighting = 100%?
 
+- Project settings: final nomenclature
+	- arena_properties is too specific: it would be nice if we really had a lot of these
+		- but we'll literally only have ambient light color for these cosmos_common settings
+	- One is certain: we'll serialize it side by side like meta = {}, about = {}, settings = {}
+		- About are not really settings, but it makes sense to edit them under Project settings already
+	- Binary layout isn't that important, we can have settings for everything although would be nice to have about separately
+		- Yeah but it will be nice to reproduce it 1:1 to avoid confusion in the future
+		- Yes, let's have a variant in the command
+	- There will always be some inconsistency in the naming here
+		- We're choosing one that there's About under "Project settings" whereas in json and in binary it is separate
+			- However maybe it makes sense becuase it's "Project" settings not just arena settings, and the json settings are specifically arena settings
+

@@ -58,7 +58,7 @@ namespace editor_project_readwrite {
 
 		editor_project loaded;
 		loaded.meta = read_only_project_meta(json_path);
-		loaded.settings.about = read_only_project_about(json_path);
+		loaded.about = read_only_project_about(json_path);
 
 		/*
 			Layer hierarchies and nodes are ignored when reading.

@@ -1,7 +1,8 @@
 #pragma once
 #include "augs/misc/constant_size_string.h"
 #include "application/setups/editor/project/editor_project_meta.h"
-#include "application/setups/editor/project/editor_project_settings.h"
+#include "application/setups/editor/project/editor_project_about.h"
+#include "application/setups/editor/project/editor_arena_settings.h"
 #include "application/setups/editor/project/editor_layers.h"
 
 #include "application/setups/editor/nodes/editor_node_pools.h"
@@ -16,11 +17,23 @@
 struct editor_project {
 	// GEN INTROSPECTOR struct editor_project
 	editor_project_meta meta;
-	editor_project_settings settings;
+	editor_project_about about;
+
+	editor_arena_settings settings;
 
 	editor_node_pools nodes;
 	editor_resource_pools resources;
 
 	editor_layers layers;
 	// END GEN INTROSPECTOR
+
+	template <typename T>
+	auto& get() {
+		if constexpr(std::is_same_v<editor_project_about, T>) {
+			return about;
+		}
+		else if constexpr(std::is_same_v<editor_arena_settings, T>) {
+			return settings;
+		}
+	}
 };

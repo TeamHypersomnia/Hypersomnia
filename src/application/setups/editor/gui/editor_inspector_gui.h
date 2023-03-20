@@ -47,7 +47,7 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 	using introspect_base = base;
 
 	inspected_node_tab_type node_current_tab = inspected_node_tab_type::NODE;
-	inspected_project_tab_type project_current_tab = inspected_project_tab_type::ARENA_PROPERTIES;
+	inspected_project_tab_type project_current_tab = inspected_project_tab_type::ARENA;
 
 	editor_tweaked_widget_tracker tweaked_widget;
 
