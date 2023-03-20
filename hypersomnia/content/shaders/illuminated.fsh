@@ -28,6 +28,11 @@ void main()
 		) / 255.0;
 	light.rgb *= intensity;
 
-	vec4 pixel = theColor * texture(basic_texture, theTexcoord) * light;
+	vec4 texComponent = texture(basic_texture, theTexcoord);
+	vec4 pixel = theColor * texComponent * light;
+	pixel.r = min(texComponent.r, pixel.r);
+	pixel.g = min(texComponent.g, pixel.g);
+	pixel.b = min(texComponent.b, pixel.b);
+
 	outputColor = pixel;
 }

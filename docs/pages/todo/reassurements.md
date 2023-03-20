@@ -5,6 +5,10 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- This light model is good because
+	- Texture allows you to CAP the max light exposure to ensure color fidelity
+	- Whereas the color parameter lets you change how much it actually absorbs light
+
 - BTW property-per-resource is GOOD
 	- Because it encourages people to create DIFFERENT sprites for DIFFERENT behaviors
 	- So that the player ALWAYS knows what to expect when they see an object
