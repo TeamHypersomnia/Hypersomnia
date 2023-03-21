@@ -442,19 +442,15 @@ namespace test_scenes {
 			add_streak(13, "Holy Shit!", test_scene_sound_id::ANNOUNCE_HOLYSHIT);
 		}
 
-		for (auto& t : rs.view.win_themes.items) {
-			t = to_sound_id(test_scene_sound_id::BLANK);
-		}
-
 		{
-			auto& mt = rs.view.win_sounds[faction_type::METROPOLIS];
+			auto& mt = rs.view.win_sounds.metropolis;
 
 			mt[faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
 			mt[faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
 		}
 
 		{
-			auto& re = rs.view.win_sounds[faction_type::RESISTANCE];
+			auto& re = rs.view.win_sounds.resistance;
 			re = rs.view.win_sounds[faction_type::METROPOLIS];
 		}
 

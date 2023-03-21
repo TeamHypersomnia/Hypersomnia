@@ -59,7 +59,7 @@ struct editor_filesystem_gui : standard_window_mixin<editor_filesystem_gui> {
 	}
 
 	void rebuild_official_special_filesystem(editor_setup&);
-	void rebuild_special_filesystem(editor_setup&);
+	void rebuild_project_special_filesystem(editor_setup&);
 
 private:
 	friend editor_setup;

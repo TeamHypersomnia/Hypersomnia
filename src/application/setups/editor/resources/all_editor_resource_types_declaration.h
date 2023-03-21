@@ -18,6 +18,7 @@ struct editor_explosive_resource;
 struct editor_material_resource;
 
 struct editor_prefab_resource;
+struct editor_game_mode_resource;
 
 using all_editor_resource_types = type_list<
 	editor_sprite_resource,
@@ -35,5 +36,6 @@ using all_editor_resource_types = type_list<
 
 	editor_material_resource,
 
-	editor_prefab_resource
+	editor_prefab_resource,
+	editor_game_mode_resource
 >;

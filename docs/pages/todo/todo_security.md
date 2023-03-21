@@ -5,6 +5,9 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Any security risk in allowing any names for entities on the map?
+	- Not sure, they would have to somehow be reported to outside servers but aren't really (except nicknames which are sanitized)
+
 - Test if nicknames can't be exploited somehow
 	- Either by maximum/minimum length, duplicate names logic, special characters etc.
 	- Filter nicknames for all unicode whitespaces as well

@@ -380,7 +380,16 @@ work_result work(const int argc, const char* const * const argv) try {
 		last_saved_config.save_patch(lua, canon_config, local_config_path);
 	};
 
+	static auto failed_to_load_arena_popup = std::optional<simple_popup>();
 	static auto last_exit_incorrect_popup = std::optional<simple_popup>();
+
+	static auto perform_failed_to_load_arena_popup = [&]() {
+		if (failed_to_load_arena_popup != std::nullopt) {
+			if (failed_to_load_arena_popup->perform()) {
+				failed_to_load_arena_popup = std::nullopt;
+			}
+		}
+	};
 
 	static auto perform_last_exit_incorrect = [&]() {
 		if (last_exit_incorrect_popup != std::nullopt) {
@@ -1520,7 +1529,19 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				case custom_imgui_result::OPEN_SELECTED_PROJECT:
 					if constexpr(std::is_same_v<S, project_selector_setup>) {
-						launch_editor(setup.get_selected_project_path());
+						auto backup = setup;
+
+						const auto path = setup.get_selected_project_path();
+
+						try {
+							launch_editor(path);
+						}
+						catch (const std::runtime_error& err) {
+							const auto full_content = typesafe_sprintf("Failed to load: %x\nReason:\n\n%x", path, err.what());
+							failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
+
+							current_setup = std::move(backup);
+						}
 					}
 
 					break;
@@ -1595,6 +1616,8 @@ work_result work(const int argc, const char* const * const argv) try {
 					perform_start_client(frame_num);
 					perform_start_server();
 				}
+
+				perform_failed_to_load_arena_popup();
 
 				streaming.display_loading_progress();
 

@@ -16,6 +16,9 @@ struct editor_official_resource_map {
 	Map<test_particles_decorations, editor_particles_resource> particles_decorations;
 	Map<test_wandering_pixels_decorations, editor_wandering_pixels_resource> wandering_pixels;
 
+	Map<test_shootable_weapons, editor_firearm_resource> firearms;
+	Map<test_melee_weapons, editor_melee_resource> melees;
+
 	template <class S, class T>
 	static auto& get_container(S& self, const T&) {
 		if constexpr(std::is_same_v<T, test_static_decorations>) {
@@ -41,6 +44,12 @@ struct editor_official_resource_map {
 		}
 		else if constexpr(std::is_same_v<T, test_wandering_pixels_decorations>) {
 			return self.wandering_pixels;
+		}
+		else if constexpr(std::is_same_v<T, test_shootable_weapons>) {
+			return self.firearms;
+		}
+		else if constexpr(std::is_same_v<T, test_melee_weapons>) {
+			return self.melees;
 		}
 		else {
 			static_assert(always_false_v<T>, "Non-exhaustive if constexpr");

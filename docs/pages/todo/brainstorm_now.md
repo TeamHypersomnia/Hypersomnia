@@ -6,6 +6,52 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Treat space as _ when filtering
+	- At least where filtered stuff is path like
+		- But will be applicable pretty much everywhere honestly
+
+- Generating defaults
+	- We won't do it in project selector, we'll have to create some default nodes 
+		- these might be dependent on resource values etc
+		- would be silly to do it from there
+
+- Do we want editor_project to be writable/operable standalone?
+	- Editor setup is needed for:
+		- Accessing resources mostly (whether they're official or project-specific)
+	- For it to be independent:
+		- Resource ids would have to have official tags instead of bool is_official
+			- effectively becoming a variant
+			- this would certainly save us some repetition in some places
+	- editor_project::on_resource can just call it on enum and then we can constexpr if it's an enum
+		- the serializator won't need to know the exact values of resources, unless..
+		- wait a bit, what if node default values depend on values of resources, official as well?
+			- uh, they do actually, so we need these values after all
+	- I think we'll just pass the official resources to the serializator instead of the entire setup
+
+- In json, Write modes separately above resources
+	- So that they are visible at the very top
+	- Easier for parsers to show what game modes are available
+	- Type of gamemodes will be inferred from either the custom name or its parent
+	- I think for now let's just force the single mode with treating mode names as type names
+
+- Defining sounds
+	- We might want to specify gains, pitches etc
+	- It might simply be indented in the editor and the parameters show only if any sound is selected
+	- json Semantics?
+		- "footstep_sound": { "id": "standard_footstep", "gain": 0.5, "pitch": 0.9 }
+	- will be exactly the same for themes, just the inspector will differentiate widgets based on name (we'll hide distance models for themes etc")
+
+- Some common mode properties would come in handy
+	- E.g. for warmup
+		- Starting messages too
+		- Fog of war too...
+	- We don't have to list all these properties right now but we can certainly think about it in advance
+	- I think warmup theme can be global as well and default to the official arabesque
+- editor_playtesting_settings
+	- skip_warmup
+	- skip_freeze_time
+	- unlimited_money
+
 - Modes
 	- Maybe think this through before we do serialization
 	- Could be project-specific special resources
@@ -16,9 +62,17 @@ summary: That which we are brainstorming at the moment.
 			- Note that we don't even have to include these editor-specific variables into actual rulesets
 				- Because they will be rebuilt like everything else!
 			- These editor overrides should be at the very top, later separated by ImGui::Separator
+				- Actually put these overrides in arena settings!!!!!!!!! Not in specific modes
+					- We want this always available
+					- Maybe even a separate tab, testing
+				- Could be called testing settings
 		- Similarly with playtest mode, just another set of variables for spawning if it's in server
 			- or maybe playtest spawn can specify a flag server_test_only = false
 		- This way we'll just have two rulesets most of the time (one for playtesting + one map specific) which is good
+- Do we want mode/mission duality like in CS:GO?
+	- The only reason would be if we'd realistically want one thing to be playable either as a complete rounds with economy etc.
+	- I say no
+	- I think they only need it for construction mode because it can be combined with e.g. ctf or tdm 
 
 - Duality of defaults
 	- Names
@@ -36,7 +90,6 @@ summary: That which we are brainstorming at the moment.
 - We can do resetting to defaults later
 	- Let's highlight changed properties in green and allow reset under right click
 	- We'll easily just pass vector of hypothetical defaults
-
 
 - We could attach lights to physical objects
 	- Even automatically when they are spawned over a dynamic object

@@ -5,6 +5,10 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- I don't think we should allow "steppable" but "silent" grounds, this will confuse people
+	- Actually we can choose a sound and let it have gain = 0
+	- So we have a semantic for this indeed
+
 - Can't we make bodies static per-entity?
 	- see reassurements.md: property-per-resource is a GOOD thing
 

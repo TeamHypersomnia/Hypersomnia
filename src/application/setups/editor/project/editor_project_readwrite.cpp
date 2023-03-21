@@ -1,6 +1,7 @@
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
+#include "augs/misc/pool/pool_allocate.h"
 #include "augs/readwrite/json_readwrite.h"
 
 template <class T, class F>
@@ -43,7 +44,14 @@ namespace editor_project_readwrite {
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 
-		augs::write_json(writer, project);
+		(void)project;
+
+		/*
+			We'll have to pass proper id handlers here.
+			Global settings may specify some resources.
+		*/
+
+		//augs::write_json(writer, project);
 
 		/*
 			Layer hierarchies and nodes are ignored when writing.
@@ -59,6 +67,40 @@ namespace editor_project_readwrite {
 		editor_project loaded;
 		loaded.meta = read_only_project_meta(json_path);
 		loaded.about = read_only_project_about(json_path);
+
+		{
+			if (const auto maybe_modes = FindObject(document, "game_modes")) {
+				auto& modes = loaded.get_game_modes();
+
+				for (auto& mode : *maybe_modes) {
+					if (!mode.value.IsObject()) {
+						continue;
+					}
+
+					const auto name = std::string(mode.name.GetString());
+
+					editor_game_mode_resource new_game_mode;
+					//::setup_resource_defaults(new_game_mode);
+
+					auto read_into = [&](auto& typed) {
+						(void)typed;
+					};
+
+					if (name == "playtesting") {
+						new_game_mode.type.set<editor_playtesting_mode>();
+						read_into(new_game_mode.editable.playtesting);
+					}
+					else if (name == "bomb_defusal") {
+						new_game_mode.type.set<editor_bomb_defusal_mode>();
+						read_into(new_game_mode.editable.bomb_defusal);
+					}
+
+					new_game_mode.unique_name = name;
+
+					modes.allocate(std::move(new_game_mode));
+				}
+			}
+		}
 
 		/*
 			Layer hierarchies and nodes are ignored when reading.

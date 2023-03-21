@@ -673,7 +673,7 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 #endif
 
 	MULTIPROPERTY("Radius", falloff.radius);
-	MULTIPROPERTY("Cutoff alpha", falloff.cutoff_alpha);
+	MULTIPROPERTY("Strength", falloff.strength);
 
 	MULTIPROPERTY("Separate falloff for walls", wall_falloff.is_enabled);
 
@@ -732,7 +732,7 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 #endif
 
 			MULTIPROPERTY("Radius", wall_falloff.value.radius);
-			MULTIPROPERTY("Cutoff alpha", wall_falloff.value.cutoff_alpha);
+			MULTIPROPERTY("Strength", wall_falloff.value.strength);
 		}
 	}
 
@@ -1166,6 +1166,24 @@ SINGLE_EDIT_FUNCTION(editor_project_about& insp) {
 		result = "Edited Full description in %x";
 	}
 
+	ImGui::Separator();
+
+	if (input_multiline_text("Welcome message", insp.full_description, 6)) {
+		result = "Edited Welcome message in %x";
+	}
+
+	return result;
+}
+
+SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp) {
+	auto special_handler = default_widget_handler();
+	using namespace augs::imgui;
+	std::string result;
+
+	PROPERTY("Skip warmup", skip_warmup);
+	PROPERTY("Skip freeze time", skip_freeze_time);
+	PROPERTY("Unlimited money", unlimited_money);
+
 	return result;
 }
 
@@ -1179,6 +1197,36 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp) {
 	return result;
 }
 
+
+EDIT_FUNCTION(
+	editor_game_mode_resource_editable& insp,
+	T& es,
+	const std::vector<editor_game_mode_resource_editable>& defaults,
+	const editor_game_mode_resource::type_type type,
+	const id_widget_handler& special_handler
+) {
+	using namespace augs::imgui;
+	std::string result;
+	bool last_result = false;
+
+	auto edit = [&]<typename I>(const I&) {
+		if constexpr(std::is_same_v<I, editor_playtesting_mode>) {
+			MULTIPROPERTY("AA", playtesting.equipment.atlantis.extra_ammo_pieces);
+		}
+		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
+			MULTIPROPERTY("Warmup secs", bomb_defusal.warmup_secs);
+			MULTIPROPERTY("Freeze secs", bomb_defusal.freeze_secs);
+		}
+		else {
+			static_assert(always_false_v<I>, "Non-exhaustive if constexpr");
+		}
+	};
+
+	type.dispatch(edit);
+	(void)defaults;
+
+	return result;
+}
 
 void editor_inspector_gui::inspect(const inspected_variant inspected, bool wants_multiple) {
 	auto different_found = [&]<typename T>(const T&) {
@@ -1335,6 +1383,8 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		std::vector<decltype(resource.editable)> hypothetical_defaults;
 		hypothetical_defaults.reserve(cmd.entries.size());
 
+		const auto& official_map = in.setup.get_official_resource_map();
+
 		for (auto& e : cmd.entries) {
 			const auto entry_resource = in.setup.find_resource(e.resource_id);
 			ensure(entry_resource != nullptr);
@@ -1346,6 +1396,10 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, entry_resource->thumbnail_id)) {
 					hypothetical_defaults.back().size = ad_hoc->get_original_size();
 				}
+			}
+			else if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
+				auto& def = hypothetical_defaults.back();
+				def.playtesting.equipment.metropolis.firearm = official_map[test_shootable_weapons::ZAMIEC];
 			}
 		}
 
@@ -1443,6 +1497,11 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				};
 
 				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, picker, shape_picker);
+			}
+			else if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
+				auto id_handler = id_widget_handler { in.setup, editor_icon_info_in(in) };
+
+				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, resource.type, id_handler);
 			}
 			else {
 				auto disabled = maybe_disabled_only_cols(resource_id.is_official);
@@ -1667,19 +1726,19 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 		ImGui::Separator();
 
-		simple_two_tabs(
+		simple_tabs(
 			project_current_tab,
-			inspected_project_tab_type::ARENA,
-			inspected_project_tab_type::ABOUT,
-			"Arena",
-			"About",
-			[](){}
+
+			std::make_pair("Arena", inspected_project_tab_type::ARENA),
+			std::make_pair("Playtesting", inspected_project_tab_type::PLAYTESTING),
+			std::make_pair("About", inspected_project_tab_type::ABOUT)
 		);
 
 		ImGui::Separator();
 
 		if (project_current_tab == inspected_project_tab_type::ARENA) {
 			edit_project_settings_command cmd;
+			cmd.tab = inspected_project_tab_type::ARENA;
 
 			auto edited_copy = project.settings;
 			const auto changed = perform_editable_gui_single(edited_copy);
@@ -1689,11 +1748,10 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				cmd.built_description = typesafe_sprintf(changed, "Arena");
 				post_new_or_rewrite(std::move(cmd));
 			}
-
-			cmd.tab = inspected_project_tab_type::ARENA;
 		}
 		else if (project_current_tab == inspected_project_tab_type::ABOUT) {
 			edit_project_settings_command cmd;
+			cmd.tab = inspected_project_tab_type::ABOUT;
 
 			auto edited_copy = project.about;
 			const auto changed = perform_editable_gui_single(edited_copy);
@@ -1703,8 +1761,19 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				cmd.built_description = typesafe_sprintf(changed, "About");
 				post_new_or_rewrite(std::move(cmd));
 			}
+		}
+		else if (project_current_tab == inspected_project_tab_type::PLAYTESTING) {
+			edit_project_settings_command cmd;
+			cmd.tab = inspected_project_tab_type::PLAYTESTING;
 
-			cmd.tab = inspected_project_tab_type::ABOUT;
+			auto edited_copy = project.playtesting;
+			const auto changed = perform_editable_gui_single(edited_copy);
+
+			if (!changed.empty()) {
+				cmd.after = edited_copy;
+				cmd.built_description = typesafe_sprintf(changed, "Playtesting");
+				post_new_or_rewrite(std::move(cmd));
+			}
 		}
 	};
 

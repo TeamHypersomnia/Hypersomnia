@@ -100,6 +100,9 @@ rgba editor_setup::get_icon_color_for(
 	else if constexpr(std::is_same_v<T, editor_prefab_resource>) {
 		return white;
 	}
+	else if constexpr(std::is_same_v<T, editor_game_mode_resource>) {
+		return white;
+	}
 	else {
 		const auto sprite = std::visit(
 			[&](const auto& typed) {
@@ -176,6 +179,17 @@ editor_icon_info editor_setup::get_icon_for(
 	}
 	else if constexpr(is_one_of_v<T, editor_prefab_resource>) {
 		return { in.necessary_images[assets::necessary_image_id::SPELL_BORDER], augs::imgui_atlas_type::GAME };
+	}
+	else if constexpr(is_one_of_v<T, editor_game_mode_resource>) {
+		if (object.type.template is<editor_bomb_defusal_mode>()) {
+			return { in.necessary_images[assets::necessary_image_id::BOMB_INDICATOR], augs::imgui_atlas_type::GAME };
+		}
+
+		if (object.type.template is<editor_playtesting_mode>()) {
+			return { in.necessary_images[assets::necessary_image_id::EDITOR_TOOL_PLAYTEST], augs::imgui_atlas_type::GAME };
+		}
+
+		return { in.necessary_images[assets::necessary_image_id::EDITOR_TOOL_HOST_SERVER], augs::imgui_atlas_type::GAME };
 	}
 	else if constexpr(is_one_of_v<T, editor_point_marker_resource, editor_area_marker_resource>) {
 		marker_icon icon;

@@ -104,7 +104,9 @@ namespace test_flavours {
 						test_obstacle_order::OPAQUE,
 						orange
 					),
-					test_scene_physical_material_id::METAL
+					test_scene_physical_material_id::METAL,
+					0.2f,
+					20.f
 				).template get<invariants::sprite>().tile_excess_size = true;
 			};
 

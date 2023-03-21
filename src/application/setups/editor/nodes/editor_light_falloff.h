@@ -7,8 +7,7 @@ struct editor_light_falloff {
 	real32 quadratic = 0.0f;
 
 	real32 radius = 600.0f;
-
-	rgba_channel cutoff_alpha = 30;
+	rgba_channel strength = 30;
 	// END GEN INTROSPECTOR
 
 	real32 calc_attenuation_mult_for_requested_radius() const;

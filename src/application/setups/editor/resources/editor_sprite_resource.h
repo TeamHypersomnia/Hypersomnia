@@ -12,6 +12,7 @@
 #include "test_scenes/test_scene_flavour_ids.h"
 #include "augs/misc/convex_partitioned_shape.h"
 #include "game/assets/image_offsets.h"
+#include "application/setups/editor/resources/editor_sound_effect.h"
 
 enum class editor_sprite_domain {
 	// GEN INTROSPECTOR enum class editor_sprite_domain
@@ -29,6 +30,9 @@ struct editor_sprite_resource_nonphysical {
 	// GEN INTROSPECTOR struct editor_sprite_resource_nonphysical
 	bool cover_ground_neons = false;
 	bool illuminate_as_wall = false;
+
+	editor_sound_effect footstep_sound;
+	float footstep_speed_mult = 1.0f;
 	// END GEN INTROSPECTOR
 };
 

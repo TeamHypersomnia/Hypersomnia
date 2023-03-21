@@ -688,4 +688,8 @@ public:
 	void rebuild_prefab_nodes(editor_typed_node_id<editor_prefab_node>, F on_created_child, bool call_reverse = false);
 
 	void unpack_prefab(editor_typed_node_id<editor_prefab_node>);
+
+	const auto& get_official_resource_map() const {
+		return official_resource_map;
+	}
 };

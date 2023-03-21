@@ -20,5 +20,7 @@ struct editor_project_about {
 	augs::constant_size_string<40> full_name;
 	augs::constant_size_string<200> short_description;
 	augs::constant_size_string<1000> full_description;
+
+	augs::constant_size_string<500> welcome_message = "Warm up your hands!";
 	// END GEN INTROSPECTOR
 };

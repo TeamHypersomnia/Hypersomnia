@@ -232,7 +232,18 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				}
 
 				if (ImGui::BeginPopupContextItem()) {
-					const bool can_reveal = is_project_json_file || (node.associated_resource.is_set() && !node.associated_resource.is_official);
+					bool is_pathed = false;
+					
+					if (node.associated_resource.is_set()) {
+						in.setup.on_resource(
+							node.associated_resource,
+							[&]<typename R>(auto&, const editor_typed_resource_id<R>) {
+								is_pathed = is_pathed_resource_v<R>;
+							}
+						);
+					}
+
+					const bool can_reveal = is_pathed || is_project_json_file;
 
 					{
 						auto disabled = maybe_disabled_cols(!can_reveal);
@@ -430,7 +441,7 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	root.adding_children_finished();
 }
 
-void editor_filesystem_gui::rebuild_special_filesystem(editor_setup& setup) {
+void editor_filesystem_gui::rebuild_project_special_filesystem(editor_setup& setup) {
 	rebuild_special_filesystem(project_special_root, false, setup);
 }
 
@@ -456,6 +467,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	auto& area_markers_folder = root.subfolders[i++];
 
 	auto& prefabs_folder = root.subfolders[i++];
+	auto& game_modes_folder = root.subfolders[i++];
 
 	auto handle = [&]<typename P>(editor_filesystem_node& parent, P& pool, const auto icon_id) {
 		using resource_type = typename P::value_type;
@@ -479,17 +491,15 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 			const auto& initial_intercosm = setup.get_initial_scene();
 
-			if constexpr(is_one_of_v<resource_type, editor_prefab_resource, editor_point_marker_resource, editor_area_marker_resource>) {
+			if constexpr(is_one_of_v<resource_type, editor_prefab_resource, editor_game_mode_resource, editor_point_marker_resource, editor_area_marker_resource>) {
 				new_node.name = typed_resource.get_display_name();
 			}
 			else {
 				std::visit(
 					[&](const auto& tag) {
-						const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
-						auto name = flavour.get_name();
+						new_node.name = to_lowercase(augs::enum_to_string(tag));
 
-						const auto id = str_ops(name).to_lowercase().replace_all(" ", "_").subject;
-						new_node.name = id;
+						const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
 
 						if (auto sprite = flavour.template find<invariants::sprite>()) {
 							new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
@@ -556,6 +566,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	handle(area_markers_folder, resources.get_pool_for<editor_area_marker_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
 
 	handle(prefabs_folder, resources.get_pool_for<editor_prefab_resource>(), assets::necessary_image_id::SPELL_BORDER);
+	handle(game_modes_folder, resources.get_pool_for<editor_game_mode_resource>(), assets::necessary_image_id::EDITOR_TOOL_HOST_SERVER);
 
 	root.set_parents(0);
 }

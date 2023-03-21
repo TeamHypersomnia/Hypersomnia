@@ -7,6 +7,13 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 
 	auto& pool = pools.template get_pool_for<editor_sprite_resource>();
 
+	/*
+		Whereas official resources are non-editable,
+		it is useful to read the actual colors/sizes assigned on the scene back to the official resource objects.
+		- Colors will influence how icons are rendered
+		- Sizes will determine the default node size values
+	*/
+
 	{
 		using test_id_type = test_static_decorations;
 

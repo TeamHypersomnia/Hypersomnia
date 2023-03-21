@@ -5,6 +5,8 @@
 #include "application/setups/editor/project/editor_arena_settings.h"
 #include "application/setups/editor/project/editor_layers.h"
 
+#include "application/setups/editor/project/editor_playtesting_settings.h"
+
 #include "application/setups/editor/nodes/editor_node_pools.h"
 #include "application/setups/editor/resources/editor_resource_pools.h"
 
@@ -20,6 +22,7 @@ struct editor_project {
 	editor_project_about about;
 
 	editor_arena_settings settings;
+	editor_playtesting_settings playtesting;
 
 	editor_node_pools nodes;
 	editor_resource_pools resources;
@@ -35,5 +38,19 @@ struct editor_project {
 		else if constexpr(std::is_same_v<editor_arena_settings, T>) {
 			return settings;
 		}
+		else if constexpr(std::is_same_v<editor_playtesting_settings, T>) {
+			return playtesting;
+		}
+		else {
+			static_assert(always_false_v<T>, "Non-exhaustive if constexpr");
+		}
+	}
+
+	auto& get_game_modes() {
+		return resources.get_pool_for<editor_game_mode_resource>();
+	}
+
+	const auto& get_game_modes() const {
+		return resources.get_pool_for<editor_game_mode_resource>();
 	}
 };

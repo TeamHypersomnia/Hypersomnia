@@ -27,6 +27,8 @@
 #include "augs/filesystem/find_path.h"
 #include "augs/misc/pool/pool_allocate.h"
 
+#include "augs/readwrite/json_readwrite.h"
+
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 250;
 
@@ -109,6 +111,9 @@ std::optional<project_tab_type> project_selector_setup::is_project_name_taken(co
 
 void project_selector_setup::scan_for_all_arenas() {
 	auto scan_for = [&](const project_tab_type type) {
+		auto& view = gui.projects_view;
+		view.tabs[type].entries.clear();
+
 		const auto source_directory = get_arenas_directory(type);
 
 		auto register_arena = [&](const auto& arena_folder_path) {
@@ -667,29 +672,69 @@ bool project_selector_setup::create_new_project_files() {
 	const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
 
 	if (sanitized_path) {
-		const auto sanitized_name = sanitized_path->filename().string();
-
 		augs::create_directory(*sanitized_path);
 		scan_for_all_arenas();
 		gui.projects_view.select_project(project_tab_type::MY_PROJECTS, *sanitized_path);
 
 		const auto paths = editor_project_paths(*sanitized_path);
 
-		editor_project default_project;
-		default_project.meta.game_version = hypersomnia_version().get_version_string();
-		default_project.meta.name = sanitized_name;
-		default_project.meta.version_timestamp = augs::date_time::get_utc_timestamp();
+		const auto sanitized_name = sanitized_path->filename().string();
+		const auto version = hypersomnia_version().get_version_string();
+		const auto timestamp = augs::date_time::get_utc_timestamp();
+
+		rapidjson::StringBuffer s;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 
 		{
-			editor_layer default_layer;
-			default_layer.unique_name = "Default layer";
+			writer.StartObject();
 
-			default_project.layers.order.push_back(default_project.layers.pool.allocate(default_layer).key);
+			writer.Key("meta");
+
+			{
+				writer.StartObject();
+				writer.Key("game_version");
+				writer.String(version.c_str());
+				writer.Key("name");
+				writer.String(sanitized_name.c_str());
+				writer.Key("version_timestamp");
+				writer.String(timestamp.c_str());
+				writer.EndObject();
+			}
+
+			writer.Key("about");
+
+			{
+				writer.StartObject();
+				writer.Key("short_description");
+				writer.String(user_input.short_description.c_str());
+				writer.EndObject();
+			}
+
+			writer.Key("game_modes");
+
+			{
+				writer.StartObject();
+				writer.Key("playtesting");
+
+				{
+					writer.StartObject();
+					writer.EndObject();
+				}
+
+				writer.Key("bomb_defusal");
+
+				{
+					writer.StartObject();
+					writer.EndObject();
+				}
+
+				writer.EndObject();
+			}
+
+			writer.EndObject();
 		}
-
-		default_project.about.short_description = user_input.short_description;
 		
-		editor_project_readwrite::write_project_json(paths.project_json, default_project);
+		augs::save_as_text(paths.project_json, s.GetString());
 
 		return true;
 	}

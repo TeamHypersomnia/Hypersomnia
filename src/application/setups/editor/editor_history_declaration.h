@@ -66,6 +66,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_resource_command<editor_explosive_resource>,
 
 	edit_resource_command<editor_prefab_resource>,
+	edit_resource_command<editor_game_mode_resource>,
 
 	edit_node_command<editor_sprite_node>,
 	edit_node_command<editor_sound_node>,

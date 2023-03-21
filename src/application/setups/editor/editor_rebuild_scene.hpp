@@ -54,7 +54,7 @@ void setup_entity_from_node(
 			attn.linear = foff.linear * mult * LINEAR_MULT;
 			attn.quadratic = foff.quadratic * mult * QUADRATIC_MULT;
 
-			attn.trim_alpha = foff.cutoff_alpha;
+			attn.trim_alpha = foff.strength;
 			// LOG_NVPS(foff.radius, attn.calc_reach(), attn.calc_reach_trimmed());
 		};
 
@@ -207,6 +207,9 @@ void allocate_flavours_and_assets_for_resource(
 
 		auto& flavour_pool = common.flavours.get_for<box_marker>();
 		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
+	}
+	else if constexpr(std::is_same_v<editor_game_mode_resource, R>) {
+		/* Nothing to do for game modes */
 	}
 	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
 		ensure(false && "not implemented");
@@ -394,6 +397,9 @@ void setup_scene_object_from_resource(
 	else if constexpr(std::is_same_v<editor_prefab_resource, R>) {
 		auto& marker = scene.template get<invariants::box_marker>();
 		marker.type = area_marker_type::PREFAB;
+	}
+	else if constexpr(std::is_same_v<editor_game_mode_resource, R>) {
+		/* Nothing to do for game modes */
 	}
 	else if constexpr(std::is_same_v<editor_firearm_resource, R>) {
 		ensure(false && "not implemented");
@@ -586,7 +592,10 @@ void editor_setup::rebuild_scene() {
 				);
 			};
 
-			if constexpr(std::is_same_v<R, editor_material_resource>) {
+			if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
+
+			}
+			else if constexpr(std::is_same_v<R, editor_material_resource>) {
 				auto& material = common.logical_assets.physical_materials.get(resource.scene_asset_id);
 				setup_scene_object(material);
 			}
@@ -814,5 +823,10 @@ inline real32 editor_light_falloff::calc_attenuation_mult_for_requested_radius()
 		return 1.0f;
 	}
 
+	/*
+		Strength is just another name for cutoff alpha.
+	*/
+
+	const auto cutoff_alpha = strength;
 	return 255.f / (atten_at_edge * float(std::max(rgba_channel(1), cutoff_alpha)));
 }

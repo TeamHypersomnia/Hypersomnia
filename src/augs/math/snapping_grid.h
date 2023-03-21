@@ -13,7 +13,7 @@ struct snapping_grid {
 	}
 
 	// GEN INTROSPECTOR struct snapping_grid
-	int unit_pixels = 16;
+	int unit_pixels = 32;
 	int unit_degrees = 15;
 	// END GEN INTROSPECTOR
 

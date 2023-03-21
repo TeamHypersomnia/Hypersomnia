@@ -14,5 +14,6 @@
 #include "application/setups/editor/resources/editor_material_resource.h"
 
 #include "application/setups/editor/resources/editor_prefab_resource.h"
+#include "application/setups/editor/resources/editor_game_mode_resource.h"
 
 #include "application/setups/editor/resources/all_editor_resource_types_declaration.h"

@@ -75,6 +75,8 @@ editor_setup::editor_setup(
 	LOG("Loading editor project at: %x", project_path);
 	project = editor_project_readwrite::read_project_json(paths.project_json);
 
+	gui.filesystem.rebuild_project_special_filesystem(*this);
+
 	load_gui_state();
 	open_default_windows();
 
@@ -112,12 +114,15 @@ void editor_setup::create_official() {
 	for_each_resource<editor_light_resource>(map_officials, true);
 	for_each_resource<editor_particles_resource>(map_officials, true);
 	for_each_resource<editor_wandering_pixels_resource>(map_officials, true);
+
+	for_each_resource<editor_firearm_resource>(map_officials, true);
+	for_each_resource<editor_melee_resource>(map_officials, true);
+
 	for_each_resource<editor_area_marker_resource>(map_officials_area, true);
 
 	create_official_prefabs();
 
 	gui.filesystem.rebuild_official_special_filesystem(*this);
-	gui.filesystem.rebuild_special_filesystem(*this);
 }
 
 void editor_setup::open_default_windows() {
@@ -2400,6 +2405,7 @@ template struct edit_resource_command<editor_melee_resource>;
 template struct edit_resource_command<editor_explosive_resource>;
 
 template struct edit_resource_command<editor_prefab_resource>;
+template struct edit_resource_command<editor_game_mode_resource>;
 
 template struct edit_node_command<editor_sprite_node>;
 template struct edit_node_command<editor_sound_node>;
