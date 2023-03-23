@@ -6,14 +6,30 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Type vs id nomenclature
+	- E.g. we want nodes to say what "type" (resource) they are but footstep custom sound to have "id"
+		- it just sounds intuitive
+	- I'd say wherever we have a typed_editor_resource_id we use id and a generic one, editor_resource_id, is necessarily a "type"
+		- since it actually encodes type information as well
+
+- Modes considerations
+	- Replacing freeze_secs etc with freeze_time
+		- More intuitive for cs-natives
+		- Time is connotated with both the unit and the event
+	- Remember to set defaults in serialization (isn't done yet)
+	- Regardless if we'll later have mode-agnostic parameters for easy setting from CLI like mp_freezetime
+		- It absolutely makes sense that we might want to override them from modes
+		- They don't even have to match all possibilities, they can but they don't have to, we can arbitrarily enable the most obvious ones from the GUI
+		- At this stage it's only important that we name them correctly
+	- Some properties WILL be mode-specific. And it won't make sense to specify them in the general variables.
+		- Like starting equipment for playtesting - non-transferrable to anywhere else really
+
+- footstep editing, per-faction equipment editing
+	- we'll have some specific macro utils probably
+
 - Treat space as _ when filtering
 	- At least where filtered stuff is path like
 		- But will be applicable pretty much everywhere honestly
-
-- Generating defaults
-	- We won't do it in project selector, we'll have to create some default nodes 
-		- these might be dependent on resource values etc
-		- would be silly to do it from there
 
 - Do we want editor_project to be writable/operable standalone?
 	- Editor setup is needed for:

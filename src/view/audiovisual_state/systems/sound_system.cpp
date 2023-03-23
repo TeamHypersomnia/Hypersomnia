@@ -326,24 +326,24 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		when_set_velocity = cosm.get_timestamp();
 	}
 
-	auto max_dist = m.max_distance;
-	auto ref_dist = m.reference_distance;
+	auto max_distance = m.max_distance;
+	auto ref_distance = m.reference_distance;
 	auto dist_model = m.distance_model;
 
 	if (dist_model == augs::distance_model::NONE) {
 		dist_model = defaults.distance_model;
 	}
 
-	if (max_dist < 0.f) {
-		max_dist = defaults.max_distance;
+	if (max_distance < 0.f) {
+		max_distance = defaults.max_distance;
 	}
 
-	if (ref_dist < 0.f) {
-		ref_dist = defaults.reference_distance;
+	if (ref_distance < 0.f) {
+		ref_distance = defaults.reference_distance;
 	}
 
-	if (max_dist == 0.f) {
-		max_dist = 1.f;
+	if (max_distance == 0.f) {
+		max_distance = 1.f;
 	}
 
 	const bool is_linear = 
@@ -384,8 +384,8 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 		const auto dist = (current_transform.pos - interped_listener_pos).length();
 
-		if (dist > ref_dist) {
-			custom_dist_gain_mult *= 1 - std::clamp(dist - ref_dist, 0.f, max_dist) / max_dist;
+		if (dist > ref_distance) {
+			custom_dist_gain_mult *= 1 - std::clamp(dist - ref_distance, 0.f, max_distance) / max_distance;
 		}
 
 		custom_dist_gain_mult *= custom_dist_gain_mult;
@@ -401,8 +401,8 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	cmd.gain = std::clamp((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * mult_via_settings * custom_dist_gain_mult, 0.f, 1.f);
 	cmd.pitch = m.pitch * in.speed_multiplier;
 	cmd.doppler_factor = std::max(0.f, m.doppler_factor);
-	cmd.reference_distance = ref_dist;
-	cmd.max_distance = max_dist;
+	cmd.reference_distance = ref_distance;
+	cmd.max_distance = max_distance;
 	cmd.looping = m.repetitions == -1;
 	cmd.model = dist_model;
 	cmd.is_direct_listener = is_direct_listener;

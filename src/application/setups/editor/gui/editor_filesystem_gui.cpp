@@ -13,7 +13,7 @@
 #include "application/setups/editor/detail/simple_two_tabs.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "test_scenes/test_scene_flavours.h"
-#include "application/setups/editor/nodes/editor_node_defaults.h"
+#include "application/setups/editor/defaults/editor_node_defaults.h"
 #include "view/rendering_scripts/for_each_iconed_entity.h"
 #include "augs/window_framework/window.h"
 
@@ -499,48 +499,38 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 					[&](const auto& tag) {
 						new_node.name = to_lowercase(augs::enum_to_string(tag));
 
-						const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
+						const auto custom_thumbnail_path = [&]() {
+							const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
 
-						if (auto sprite = flavour.template find<invariants::sprite>()) {
-							new_node.custom_thumbnail_path = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
-						}
+							auto result = new_node.custom_thumbnail_path;
 
-						if (auto animation = flavour.template find<invariants::animation>()) {
-							if (animation->id.is_set()) {
-								auto path_s = new_node.custom_thumbnail_path.string();
-								ensure(ends_with(path_s, "_1.png"));
-
-								path_s.erase(path_s.end() - std::strlen("_1.png"), path_s.end());
-								path_s += "_*.png";
-
-								new_node.custom_thumbnail_path = path_s;
-								// LOG_NVPS(new_node.custom_thumbnail_path);
+							if (auto sprite = flavour.template find<invariants::sprite>()) {
+								result = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
 							}
-						}
 
-						if (auto gun = flavour.template find<invariants::gun>()) {
-							if (gun->shoot_animation.is_set()) {
-								//const auto image_id = initial_intercosm.world.get_logical_assets().plain_animations[gun->shoot_animation].frames[0].image_id;
-								//auto path_s = initial_intercosm.viewables.image_definitions[image_id].get_source_path().resolve({}).string();
-								//LOG_NVPS(path_s);
-
-								auto path_s = new_node.custom_thumbnail_path;
-								path_s.replace_extension("");
-								path_s += "_shot_*.png";
-
-								/* auto path_basic = path_s.string(); */
-								/* cut_trailing_number(path_basic); */
-
-								/* if (path_basic.back() == '_') { */
-								/* 	path_basic.pop_back(); */
-								/* } */
-
-								/* path_basic += "_shot_*.png"; */
-
-								new_node.custom_thumbnail_path = path_s;
-								// LOG_NVPS(new_node.custom_thumbnail_path);
+							if (auto animation = flavour.template find<invariants::animation>()) {
+								if (animation->id.is_set()) {
+									auto path_s = result.string();
+									ensure(ends_with(path_s, "_1.png"));
+									path_s.erase(path_s.end() - std::strlen("_1.png"), path_s.end());
+									path_s += "_*.png";
+									result = path_s;
+								}
 							}
-						}
+
+							if (auto gun = flavour.template find<invariants::gun>()) {
+								if (gun->shoot_animation.is_set()) {
+									auto path_s = result;
+									path_s.replace_extension("");
+									path_s += "_shot_*.png";
+									result = path_s;
+								}
+							}
+
+							return result;
+						}();
+
+						new_node.custom_thumbnail_path = custom_thumbnail_path;
 					},
 					*typed_resource.official_tag
 				);

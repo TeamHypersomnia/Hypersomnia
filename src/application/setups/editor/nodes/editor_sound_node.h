@@ -3,12 +3,12 @@
 #include "augs/math/transform.h"
 #include "application/setups/editor/nodes/editor_node_base.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
-#include "game/detail/view_input/sound_effect_modifier.h"
+#include "application/setups/editor/resources/editor_sound_effect.h"
 
 struct editor_sound_resource;
 
-struct editor_sound_node_editable : sound_effect_modifier {
-	using base = sound_effect_modifier;
+struct editor_sound_node_editable : editor_sound_property_effect_modifier {
+	using base = editor_sound_effect_modifier;
 	using introspect_base = base;
 
 	// GEN INTROSPECTOR struct editor_sound_node_editable

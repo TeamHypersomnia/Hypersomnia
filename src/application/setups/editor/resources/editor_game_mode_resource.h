@@ -13,19 +13,20 @@ struct editor_requested_equipment {
 	editor_typed_resource_id<editor_melee_resource> melee;
 	editor_typed_resource_id<editor_explosive_resource> explosive;
 
-	bool give_backpack = false;
+	bool backpack = false;
 	uint32_t extra_ammo_pieces = 2;
 	// END GEN INTROSPECTOR
 
 	bool is_set() const {
-		return give_backpack || firearm.is_set() || melee.is_set() || explosive.is_set();
+		return backpack || firearm.is_set() || melee.is_set() || explosive.is_set();
 	}
 };
 
 struct editor_bomb_defusal_mode {
 	// GEN INTROSPECTOR struct editor_bomb_defusal_mode
-	uint32_t warmup_secs = 45;
-	uint32_t freeze_secs = 10;
+	uint32_t warmup_time = 45;
+	uint32_t freeze_time = 10;
+	uint32_t buy_time = 30;
 
 	per_actual_faction<editor_requested_equipment> warmup_equipment;
 	// END GEN INTROSPECTOR
@@ -34,6 +35,7 @@ struct editor_bomb_defusal_mode {
 struct editor_playtesting_mode {
 	// GEN INTROSPECTOR struct editor_playtesting_mode
 	per_actual_faction<editor_requested_equipment> equipment;
+	uint32_t respawn_time_ms = 1000;
 	// END GEN INTROSPECTOR
 };
 

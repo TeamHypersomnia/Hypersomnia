@@ -731,6 +731,15 @@ bool project_selector_setup::create_new_project_files() {
 				writer.EndObject();
 			}
 
+			writer.Key("playtesting");
+
+			{
+				writer.StartObject();
+				writer.Key("mode");
+				writer.String("playtesting");
+				writer.EndObject();
+			}
+
 			writer.EndObject();
 		}
 		

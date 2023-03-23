@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Show a tooltip with some basic info when hovering resources in filesystem view like the initial size e.g. 32x64
+	- length for sounds etc
+
 - Melee clash should: a) happen more often; b) and cancel damage
 
 - Merging static colliders
@@ -76,6 +79,8 @@ summary: Just a hidden scratchpad.
 	- Actually just disable the second laser then because there are both now
 
 ## Editor final MVP once we can ditch old maps
+
+- Sounds should have per-entity sound effect modifiers (we implement it in editor already)
 
 - Resizing animations
 

@@ -15,7 +15,7 @@
 #include "application/setups/editor/editor_get_icon_for.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/setups/editor/resources/resource_traits.h"
-#include "application/setups/editor/nodes/editor_node_defaults.h"
+#include "application/setups/editor/defaults/editor_node_defaults.h"
 
 #include "application/setups/editor/detail/make_command_from_selections.h"
 

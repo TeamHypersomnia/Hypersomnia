@@ -40,7 +40,9 @@ public:
 		const id_type current_source_id,
 		const editor_setup& setup,
 		const editor_icon_info_in icon_in,
-		F on_choice
+		const bool allow_none,
+		F on_choice,
+		const std::string none_label = "(None)"
 	) {
 		using namespace augs::imgui;
 
@@ -62,10 +64,15 @@ public:
 
 			const auto diff = (icon_size - scaled_icon_size) / 2;
 
-			ImGui::SetCursorPos(ImVec2(vec2(before_pos) + vec2(content_x_offset + diff.x, 0)));
+			const auto icon_padding = vec2(icon_size) / 2.5f;
 
-			game_image_button("##choosericon", icon, scaled_icon_size, colors_nha{ icon_color, icon_color, icon_color }, atlas_type);
-			ImGui::SameLine();
+			auto icon_cur_pos = ImVec2(vec2(before_pos) + vec2(content_x_offset, 0) + diff);
+			auto target_cur_pos = ImVec2(vec2(before_pos) + vec2(content_x_offset, 0) + vec2(max_icon_size + icon_padding.x, 0));
+
+			// ugly but I don't have time to do this nicely
+			ImGui::SetCursorPos(icon_cur_pos);
+			game_image(icon, scaled_icon_size, icon_color, vec2::zero, atlas_type);
+			ImGui::SetCursorPos(target_cur_pos);
 		}
 
 		if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
@@ -80,6 +87,10 @@ public:
 				setup.template for_each_resource<R>(adder_lbd, true);
 
 				sort_range(sorted_resources);
+
+				if (allow_none) {
+					sorted_resources.insert(sorted_resources.begin(), sorted_entry { none_label, {} });
+				}
 			}
 
 			const bool acquire_keyboard = base::pop_acquire_keyboard();

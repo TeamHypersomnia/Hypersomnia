@@ -455,7 +455,6 @@ namespace test_scenes {
 		}
 
 		rs.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
-		rs.view.warmup_theme = to_entity_flavour_id(test_sound_decorations::GENERIC_WARMUP_THEME);
 		rs.view.bomb_soon_explodes_theme = to_entity_flavour_id(test_sound_decorations::GENERIC_BOMB_SOON_EXPLODES_THEME);
 		rs.view.secs_until_detonation_to_start_theme = 11;
 

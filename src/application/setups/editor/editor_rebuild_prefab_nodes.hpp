@@ -3,7 +3,7 @@
 #include "augs/templates/traits/has_rotation.h"
 #include "augs/templates/traits/has_size.h"
 #include "augs/misc/randomization.h"
-#include "application/setups/editor/nodes/editor_node_defaults.h"
+#include "application/setups/editor/defaults/editor_node_defaults.h"
 
 template <class F>
 void editor_setup::rebuild_prefab_nodes(

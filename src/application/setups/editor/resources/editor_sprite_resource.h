@@ -26,13 +26,19 @@ enum class editor_sprite_domain {
 
 struct editor_material_resource;
 
+struct editor_custom_footstep {
+	// GEN INTROSPECTOR struct editor_custom_footstep
+	editor_sound_effect sound;
+	float walking_speed = 1.0f;
+	// END GEN INTROSPECTOR
+};
+
 struct editor_sprite_resource_nonphysical {
 	// GEN INTROSPECTOR struct editor_sprite_resource_nonphysical
 	bool cover_ground_neons = false;
 	bool illuminate_as_wall = false;
 
-	editor_sound_effect footstep_sound;
-	float footstep_speed_mult = 1.0f;
+	augs::maybe<editor_custom_footstep> custom_footstep;
 	// END GEN INTROSPECTOR
 };
 

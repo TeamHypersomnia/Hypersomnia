@@ -5123,3 +5123,10 @@ Advantages:
 		- We're choosing one that there's About under "Project settings" whereas in json and in binary it is separate
 			- However maybe it makes sense becuase it's "Project" settings not just arena settings, and the json settings are specifically arena settings
 
+- Generating defaults
+	- We won't do it in project selector, we'll have to create some default nodes 
+		- these might be dependent on resource values etc
+		- would be silly to do it from there
+
+
+- Sound 'properties' should also multiply by its resource modifier

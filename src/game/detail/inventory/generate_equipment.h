@@ -173,7 +173,8 @@ entity_id requested_equipment::generate_for_impl(
 		return cosm[entity_id()];
 	};
 
-	auto ammo_pieces_to_generate_left = eq.num_given_ammo_pieces;
+	/* Min for security */
+	auto ammo_pieces_to_generate_left = std::min(10, eq.num_given_ammo_pieces);
 
 	auto generate_spares = [&](const item_flavour_id& f) {
 		entity_id piece;

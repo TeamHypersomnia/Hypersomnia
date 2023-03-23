@@ -388,7 +388,8 @@ namespace test_flavours {
 			const auto ref_distance,
 			const auto max_distance,
 			const real32 doppler = 1.f,
-			const real32 gain = 1.f
+			const real32 gain = 1.f,
+			const real32 pitch = 1.f
 		) {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
@@ -399,8 +400,29 @@ namespace test_flavours {
 			sound_def.effect.modifier.max_distance = max_distance;
 			sound_def.effect.modifier.doppler_factor = doppler;
 			sound_def.effect.modifier.gain = gain;
+			sound_def.effect.modifier.pitch = pitch;
 			meta.set(sound_def);
 		};
+
+		flavour_with_sound(
+			test_sound_decorations::FOOTSTEP_DIRT,
+			test_scene_sound_id::FOOTSTEP_DIRT,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1,
+			0.35f,
+			1.0f
+		);
+
+		flavour_with_sound(
+			test_sound_decorations::FOOTSTEP_FLOOR,
+			test_scene_sound_id::FOOTSTEP_FLOOR,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1,
+			0.9f,
+			0.6f
+		);
 
 		flavour_with_sound(
 			test_sound_decorations::AQUARIUM_AMBIENCE_LEFT,
@@ -440,11 +462,13 @@ namespace test_flavours {
 		);
 
 		{
-			auto& meta = get_test_flavour(flavours, test_sound_decorations::GENERIC_WARMUP_THEME);
+			auto& meta = get_test_flavour(flavours, test_sound_decorations::ARABESQUE);
 
 			invariants::continuous_sound sound_def;
-			sound_def.effect.id = to_sound_id(test_scene_sound_id::BLANK);
-			sound_def.effect.modifier.always_direct_listener = true;
+			sound_def.effect.id = to_sound_id(test_scene_sound_id::ARABESQUE);
+			sound_def.effect.modifier.doppler_factor = 0;
+			sound_def.effect.modifier.repetitions = -1;
+
 
 			meta.set(sound_def);
 		}

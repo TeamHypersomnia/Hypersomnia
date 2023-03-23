@@ -1,3 +1,4 @@
+#pragma once
 #include <unordered_map>
 #include "test_scenes/test_scene_flavour_ids.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"

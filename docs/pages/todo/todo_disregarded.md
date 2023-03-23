@@ -567,3 +567,6 @@ summary: Just a hidden scratchpad.
 	- We will anyway use it on small objects only and then it would be confusing as hell
 - wth is wsad_player getting rebuilt when we only modify prefab node editable?
 	- ok probs due to introspectors
+
+- Damn, footsteps make sprite resources dependent on sprites
+	- although all resources are created by the time we rebuild scene so it's a non-issue

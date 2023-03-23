@@ -1,9 +1,9 @@
 #pragma once
 #include "application/setups/editor/resources/editor_pathed_resource.h"
-#include "game/detail/view_input/sound_effect_modifier.h"
+#include "application/setups/editor/resources/editor_sound_effect.h"
 
-struct editor_sound_resource_editable : sound_effect_modifier {
-	using base = sound_effect_modifier;
+struct editor_sound_resource_editable : editor_sound_effect_modifier {
+	using base = editor_sound_effect_modifier;
 	using introspect_base = base;
 };
 

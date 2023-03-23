@@ -1,6 +1,11 @@
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
+
+#include "application/setups/editor/editor_official_resource_map.h"
+#include "application/setups/editor/defaults/editor_game_mode_defaults.h"
+#include "application/setups/editor/defaults/editor_project_defaults.h"
+
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/readwrite/json_readwrite.h"
 
@@ -61,10 +66,21 @@ namespace editor_project_readwrite {
 		augs::save_as_text(json_path, s.GetString());
 	}
 
-	editor_project read_project_json(const augs::path_type& json_path) {
+	editor_project read_project_json(
+		const augs::path_type& json_path,
+		const editor_resource_pools& officials,
+		const editor_official_resource_map& officials_map
+	) {
+		(void)officials;
+
 		const auto document = augs::json_document_from(json_path);
 
 		editor_project loaded;
+		::setup_project_defaults(loaded.settings, officials_map);
+
+		/* This won't set the playtesting mode yet but maybe it might other properties in the future */
+		::setup_project_defaults(loaded.playtesting, loaded.get_game_modes(), officials_map);
+
 		loaded.meta = read_only_project_meta(json_path);
 		loaded.about = read_only_project_about(json_path);
 
@@ -80,7 +96,7 @@ namespace editor_project_readwrite {
 					const auto name = std::string(mode.name.GetString());
 
 					editor_game_mode_resource new_game_mode;
-					//::setup_resource_defaults(new_game_mode);
+					::setup_game_mode_defaults(new_game_mode.editable, officials_map);
 
 					auto read_into = [&](auto& typed) {
 						(void)typed;
@@ -99,6 +115,24 @@ namespace editor_project_readwrite {
 
 					modes.allocate(std::move(new_game_mode));
 				}
+			}
+		}
+
+		{
+			/*
+				Fallback
+			*/
+
+			auto& modes = loaded.get_game_modes();
+
+			if (modes.empty()) {
+				editor_game_mode_resource new_game_mode;
+				::setup_game_mode_defaults(new_game_mode.editable, officials_map);
+
+				new_game_mode.type.set<editor_playtesting_mode>();
+				new_game_mode.unique_name = "playtesting";
+
+				modes.allocate(std::move(new_game_mode));
 			}
 		}
 
@@ -172,6 +206,9 @@ namespace editor_project_readwrite {
 			}
 		}
 
+		if (!loaded.playtesting.mode.is_set()) {
+			::setup_default_playtesting_mode(loaded.playtesting, loaded.get_game_modes());
+		}
 
 		return loaded;
 	}

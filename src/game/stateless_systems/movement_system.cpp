@@ -417,6 +417,11 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 
 				auto& sound = chosen_effect.sound;
+
+				if (!sound.id.is_set()) {
+					sound = standard_effect.sound;
+				}
+
 				const auto gain_mult = speed_mult / 2;
 				const auto pitch_mult = std::min(1.7f, 1 + gain_mult);
 
@@ -443,6 +448,11 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				{
 					auto& particles = chosen_effect.particles;
+
+					if (!particles.id.is_set()) {
+						particles = standard_effect.particles;
+					}
+
 					particles.modifier.scale_amounts *= scale;
 					particles.modifier.scale_lifetimes *= scale;
 

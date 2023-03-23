@@ -59,6 +59,8 @@
 #include "game/detail/snap_interpolation_to_logical.h"
 #include "augs/window_framework/window.h"
 
+#include "application/setups/editor/defaults/editor_resource_defaults.h"
+
 editor_setup::editor_setup(
 	sol::state& lua,
 	const augs::path_type& project_path
@@ -73,7 +75,12 @@ editor_setup::editor_setup(
 	create_official();
 
 	LOG("Loading editor project at: %x", project_path);
-	project = editor_project_readwrite::read_project_json(paths.project_json);
+
+	project = editor_project_readwrite::read_project_json(
+		paths.project_json,
+		official_resources,
+		official_resource_map
+	);
 
 	gui.filesystem.rebuild_project_special_filesystem(*this);
 
@@ -647,6 +654,8 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 							new_resource.animation_frames.clear();
 						}
 					}
+
+					::setup_resource_defaults(new_resource, official_resource_map);
 
 					file.associated_resource.set<resource_type>(new_id, false);
 				}

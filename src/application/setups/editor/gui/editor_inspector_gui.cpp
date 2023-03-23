@@ -28,6 +28,11 @@
 #include "augs/misc/from_concave_polygon.h"
 #include "application/setups/editor/gui/widgets/resource_chooser.h"
 
+#include "application/setups/editor/defaults/editor_game_mode_defaults.h"
+#include "application/setups/editor/defaults/editor_resource_defaults.h"
+#include "application/setups/editor/defaults/editor_node_defaults.h"
+#include "application/setups/editor/defaults/editor_project_defaults.h"
+
 template <class T>
 struct is_editor_typed_resource_id : std::false_type {};
 
@@ -54,9 +59,18 @@ struct default_widget_handler {
 struct id_widget_handler {
 	editor_setup& setup;
 	const editor_icon_info_in icon_in;
+	bool allow_none = true;
 
 	template <class T>
 	static constexpr bool handles = is_editor_typed_resource_id_v<T>;
+
+	auto get_none_label(const std::string& label) const {
+		if (label == "Footstep sound") {
+			return "(Default)";
+		}
+
+		return "(None)";
+	}
 
 	template <class T>
 	bool handle(
@@ -68,7 +82,8 @@ struct id_widget_handler {
 
 		auto resource = setup.find_resource(property);
 
-		const auto displayed_resource_name = resource ? resource->get_display_name() : "(None)";
+		const auto none_label = std::string(get_none_label(label));
+		const auto displayed_resource_name = resource ? resource->get_display_name() : none_label;
 
 		using R = typename T::target_type;
 		thread_local resource_chooser<R> chooser;
@@ -81,22 +96,26 @@ struct id_widget_handler {
 			property,
 			setup,
 			icon_in,
+			allow_none,
 			[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
 				result = typesafe_sprintf("Changed resource to %x", chosen_name);
 				modified = true;
 				property = chosen_id;
-			}
+			},
+			none_label
 		);
 
-		if (property.is_set()) {
-			ImGui::SameLine();
+		if (allow_none) {
+			if (property.is_set()) {
+				ImGui::SameLine();
 
-			auto scope = augs::imgui::scoped_id(label.c_str());
+				auto scope = augs::imgui::scoped_id(label.c_str());
 
-			if (ImGui::Button("Clear")) {
-				result = typesafe_sprintf("Cleared %x", label);
-				property = {};
-				modified = true;
+				if (ImGui::Button("Clear")) {
+					result = typesafe_sprintf("Cleared %x", label);
+					property = {};
+					modified = true;
+				}
 			}
 		}
 
@@ -132,6 +151,52 @@ edit_property(result, label, special_handler, insp.MEMBER);
 
 #define EDIT_FUNCTION template <class T> std::string perform_editable_gui
 #define SINGLE_EDIT_FUNCTION std::string perform_editable_gui_single
+
+#define EQUIPMENT_PROPERTIES(field) \
+	MULTIPROPERTY("Firearm", field.firearm);\
+	MULTIPROPERTY("Melee", field.melee);\
+	MULTIPROPERTY("Explosive", field.explosive);\
+\
+	MULTIPROPERTY("Backpack", field.backpack);\
+	MULTIPROPERTY("Extra ammo pieces", field.extra_ammo_pieces);
+
+#define EQUIPMENT_PROPERTY(label, field) \
+if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
+	EQUIPMENT_PROPERTIES(field);\
+}
+
+#define FACTION_EQUIPMENT_PROPERTY(label, field) \
+if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
+	ImGui::Separator();\
+	text_color("Metropolis", yellow);\
+	{ auto scope = scoped_id("##Metropolis"); EQUIPMENT_PROPERTIES(field.metropolis); }\
+	text_color("Resistance", yellow);\
+	{ auto scope = scoped_id("##Resistance"); EQUIPMENT_PROPERTIES(field.resistance); }\
+	ImGui::Separator();\
+	/*\
+		We'll only show the two relevant factions always, unless we have a three-way-conflict\
+		text_color("Atlantis", yellow);\
+		EQUIPMENT_PROPERTIES(field.atlantis);\
+	*/\
+}
+
+#define THEME_PROPERTY(label, field) \
+	PROPERTY(label, field.id);\
+	if (insp.field.id.is_set()) {\
+		auto indent = scoped_indent();\
+\
+		PROPERTY("Gain", field.gain);\
+		PROPERTY("Pitch", field.pitch);\
+	}\
+
+#define SOUND_EFFECT_LEAN_MULTIPROPERTY(label, field) \
+	MULTIPROPERTY(label, field.id);\
+	if (insp.field.id.is_set()) {\
+		auto indent = scoped_indent();\
+\
+		MULTIPROPERTY("Gain", field.gain);\
+		MULTIPROPERTY("Pitch", field.pitch);\
+	}
 
 void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
@@ -227,6 +292,24 @@ bool edit_property(
 
 				return false;
 			}
+
+			if (label == "Walking speed") {
+				if (slider(label, property, 0.0f, 2.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Gain" || label == "Pitch") {
+				if (slider(label, property, 0.0f, 10.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
 		}
 		else if constexpr(std::is_same_v<uint32_t, T>) {
 			if (label.find("Fish") != std::string::npos || label.find("austics") != std::string::npos) {
@@ -239,6 +322,15 @@ bool edit_property(
 					return false;
 				}
 			}
+
+			if (label.find("Extra ammo pieces") != std::string::npos) {
+				if (slider(label, property, 0u, 10u)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
 		}
 
 		if (drag(label, property)) { 
@@ -250,9 +342,8 @@ bool edit_property(
 		if constexpr(std::is_same_v<T, faction_type>) {
 			if (enum_combo_constrained<
 				faction_type, 
-				faction_type::RESISTANCE,
 				faction_type::METROPOLIS,
-				faction_type::ATLANTIS
+				faction_type::RESISTANCE
 			>(label, property)) { 
 				result = typesafe_sprintf("Switch %x to %x in %x", label, property);
 				return true;
@@ -279,6 +370,56 @@ bool edit_property(
 	}
 
 	return false;
+}
+
+static bool reset_button(
+	const bool already_default,
+	const bool multiple
+) {
+	using namespace augs::imgui;
+
+	bool request_defaults = false;
+
+	const auto reset_bgs = std::array<rgba, 3> {
+		rgba(0, 0, 0, 0),
+		rgba(80, 20, 20, 255),
+		rgba(150, 40, 40, 255)
+	};
+
+	{
+		auto cols = scoped_button_colors(reset_bgs);
+		auto disabled = maybe_disabled_cols(already_default);
+
+		if (ImGui::Button("Reset") && !already_default) {
+			request_defaults = true;
+		}
+	}
+
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+		if (already_default) {
+			auto scope = scoped_tooltip();
+			text_color("There's nothing to reset now.", green); 
+
+			if (multiple) {
+				text("All selected resources have default properties.");
+			}
+			else {
+				text("All properties below are default.");
+			}
+		}
+		else {
+			auto scope = scoped_tooltip();
+
+			if (multiple) {
+				text_color("Some of the selected resources can be reset to default.\nClick to restore defaults to them all.", orange); text("Can safely be undone.");
+			}
+			else {
+				text_color("Restore defaults to all properties below.", orange); text("Can safely be undone.");
+			}
+		}
+	}
+
+	return request_defaults;
 }
 
 EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& resource) {
@@ -342,6 +483,11 @@ EDIT_FUNCTION(editor_sound_node_editable& insp, T& es) {
 	std::string result;
 
 	MULTIPROPERTY("Position", pos);
+
+	/* 
+		TODO: Sounds should have per-entity sound effect modifiers.
+		Once it's done, edit gain and pitch here.
+	*/
 
 	return result;
 }
@@ -773,9 +919,9 @@ EDIT_FUNCTION(
 	T& es,
 	const std::vector<editor_sprite_resource_editable>& defaults,
 	const image_color_picker_widget& picker,
-	const non_standard_shape_widget& shape_picker
+	const non_standard_shape_widget& shape_picker,
+	const id_widget_handler& special_handler
 ) {
-	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 
 	bool last_result = false;
@@ -1001,6 +1147,16 @@ EDIT_FUNCTION(
 		MULTIPROPERTY("Cover ground neons", as_nonphysical.cover_ground_neons);
 		MULTIPROPERTY("Illuminate as wall", as_nonphysical.illuminate_as_wall);
 
+		ImGui::Separator();
+
+		MULTIPROPERTY("Custom footstep", as_nonphysical.custom_footstep.is_enabled);
+
+		if (insp.as_nonphysical.custom_footstep.is_enabled) {
+			auto indent = scoped_indent();
+
+			MULTIPROPERTY("Walking speed", as_nonphysical.custom_footstep.value.walking_speed);
+			SOUND_EFFECT_LEAN_MULTIPROPERTY("Footstep sound", as_nonphysical.custom_footstep.value.sound);
+		}
 	}
 
 	ImGui::Separator();
@@ -1014,7 +1170,54 @@ EDIT_FUNCTION(editor_sound_resource_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	(void)insp; (void)es; (void)last_result;
+	MULTIPROPERTY("Gain", gain);
+	MULTIPROPERTY("Pitch", pitch);
+	MULTIPROPERTY("Spatialize", spatialize);
+
+	if (insp.spatialize) {
+		const auto tooltip_content = "If left unticked, will be dependent on the context.\nE.g. if the sound is used as a footstep,\ndefault heard distance will be way different than\nif it's a gunshot sound or a shell collision sound.";
+
+		auto do_tooltip = [&]() {
+			if (ImGui::IsItemHovered()) {
+				text_tooltip(tooltip_content);
+			}
+		};
+
+		MULTIPROPERTY("Custom distance model", distance_model.is_enabled);
+		do_tooltip();
+
+		if (insp.distance_model.is_enabled) {
+			MULTIPROPERTY("##DistanceModel", distance_model.value);
+
+			if (last_result) {
+				result = "Changed distance model in %x";
+			}
+		}
+
+		MULTIPROPERTY("Custom max distance", max_distance.is_enabled);
+		do_tooltip();
+
+		if (insp.max_distance.is_enabled) {
+			MULTIPROPERTY("##MaxDistance", max_distance.value);
+
+			if (last_result) {
+				result = "Changed max distance in %x";
+			}
+		}
+
+		MULTIPROPERTY("Custom reference distance", reference_distance.is_enabled);
+		do_tooltip();
+
+		if (insp.reference_distance.is_enabled) {
+			MULTIPROPERTY("##ReferenceDistance", reference_distance.value);
+
+			if (last_result) {
+				result = "Changed reference distance in %x";
+			}
+		}
+
+		MULTIPROPERTY("Doppler intensity", doppler_intensity);
+	}
 
 	return result;
 }
@@ -1175,10 +1378,19 @@ SINGLE_EDIT_FUNCTION(editor_project_about& insp) {
 	return result;
 }
 
-SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp) {
-	auto special_handler = default_widget_handler();
+SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting_settings defaults, id_widget_handler special_handler) {
 	using namespace augs::imgui;
 	std::string result;
+
+	(void)defaults;
+
+	special_handler.allow_none = false;
+
+	PROPERTY("Mode to test", mode);
+
+	special_handler.allow_none = true;
+
+	PROPERTY("Starting faction", starting_faction);
 
 	PROPERTY("Skip warmup", skip_warmup);
 	PROPERTY("Skip freeze time", skip_freeze_time);
@@ -1187,16 +1399,17 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp) {
 	return result;
 }
 
-SINGLE_EDIT_FUNCTION(editor_arena_settings& insp) {
-	auto special_handler = default_widget_handler();
+SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings defaults, const id_widget_handler& special_handler) {
 	using namespace augs::imgui;
 	std::string result;
 
+	(void)defaults;
+
 	PROPERTY("Ambient light color", ambient_light_color);
+	THEME_PROPERTY("Warmup theme", warmup_theme);
 
 	return result;
 }
-
 
 EDIT_FUNCTION(
 	editor_game_mode_resource_editable& insp,
@@ -1211,11 +1424,14 @@ EDIT_FUNCTION(
 
 	auto edit = [&]<typename I>(const I&) {
 		if constexpr(std::is_same_v<I, editor_playtesting_mode>) {
-			MULTIPROPERTY("AA", playtesting.equipment.atlantis.extra_ammo_pieces);
+			FACTION_EQUIPMENT_PROPERTY("Equipment", playtesting.equipment);
 		}
 		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
-			MULTIPROPERTY("Warmup secs", bomb_defusal.warmup_secs);
-			MULTIPROPERTY("Freeze secs", bomb_defusal.freeze_secs);
+			MULTIPROPERTY("Warmup time", bomb_defusal.warmup_time);
+			MULTIPROPERTY("Freeze time", bomb_defusal.freeze_time);
+			MULTIPROPERTY("Buy time", bomb_defusal.buy_time);
+
+			FACTION_EQUIPMENT_PROPERTY("Warmup equipment", bomb_defusal.warmup_equipment);
 		}
 		else {
 			static_assert(always_false_v<I>, "Non-exhaustive if constexpr");
@@ -1277,6 +1493,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 	if (!window) {
 		return;
 	}
+
+	auto id_handler = id_widget_handler{ in.setup, editor_icon_info_in(in), true };
+	const auto& official_map = in.setup.get_official_resource_map();
 
 	auto get_object_category_name = [&]<typename T>(const T&) {
 		if constexpr(std::is_same_v<T, editor_node_id>) {
@@ -1383,23 +1602,25 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 		std::vector<decltype(resource.editable)> hypothetical_defaults;
 		hypothetical_defaults.reserve(cmd.entries.size());
 
-		const auto& official_map = in.setup.get_official_resource_map();
-
 		for (auto& e : cmd.entries) {
 			const auto entry_resource = in.setup.find_resource(e.resource_id);
 			ensure(entry_resource != nullptr);
 			e.after = entry_resource->editable;
 
 			hypothetical_defaults.push_back({});
+			auto& new_default = hypothetical_defaults.back();
 
 			if constexpr(std::is_same_v<R, editor_sprite_resource>) {
 				if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, entry_resource->thumbnail_id)) {
-					hypothetical_defaults.back().size = ad_hoc->get_original_size();
+					new_default.size = ad_hoc->get_original_size();
 				}
 			}
-			else if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
-				auto& def = hypothetical_defaults.back();
-				def.playtesting.equipment.metropolis.firearm = official_map[test_shootable_weapons::ZAMIEC];
+
+			if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
+				::setup_game_mode_defaults(new_default, official_map);
+			}
+			else {
+				::setup_resource_defaults(new_default, official_map);
 			}
 		}
 
@@ -1407,13 +1628,8 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			ImGui::NextColumn();
 
 			{
-				const auto reset_bgs = std::array<rgba, 3> {
-					rgba(0, 0, 0, 0),
-					rgba(80, 20, 20, 255),
-					rgba(150, 40, 40, 255)
-				};
-
 				bool already_default = true;
+				const bool multiple = cmd.entries.size() > 1;
 
 				for (std::size_t i = 0; i < cmd.entries.size(); ++i) {
 					if (!augs::introspective_equal(hypothetical_defaults[i], cmd.entries[i].after)) {
@@ -1422,36 +1638,8 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					}
 				}
 
-				{
-					auto cols = scoped_button_colors(reset_bgs);
-					auto disabled = maybe_disabled_cols(already_default);
-
-					if (ImGui::Button("Reset") && !already_default) {
-						request_defaults = true;
-					}
-				}
-
-				if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-					if (already_default) {
-						auto scope = scoped_tooltip();
-						text_color("There's nothing to reset now.", green); 
-						if (cmd.entries.size() == 1) {
-							text("The resource has default properties.");
-						}
-						else {
-							text("All selected resources have default properties.");
-						}
-					}
-					else {
-						auto scope = scoped_tooltip();
-
-						if (cmd.entries.size() == 1) {
-							text_color("Restore defaults to all properties below.", orange); text("Can safely be undone.");
-						}
-						else {
-							text_color("Some of the selected resources can be reset to default.\nClick to restore defaults to them all.", orange); text("Can safely be undone.");
-						}
-					}
+				if (reset_button(already_default, multiple)) {
+					request_defaults = true;
 				}
 			}
 
@@ -1496,11 +1684,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 					true
 				};
 
-				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, picker, shape_picker);
+				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, picker, shape_picker, id_handler);
 			}
 			else if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
-				auto id_handler = id_widget_handler { in.setup, editor_icon_info_in(in) };
-
 				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, resource.type, id_handler);
 			}
 			else {
@@ -1566,12 +1752,15 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 			auto cols = maybe_different_value_cols({}, !same_resource);
 
+			const bool allow_none = false;
+
 			chooser.perform(
 				"##ResourceSelector",
 				displayed_resource_name,
 				node.resource_id,
 				in.setup,
 				editor_icon_info_in(in),
+				allow_none,
 				[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
 					auto cmd = in.setup.make_command_from_selected_nodes<change_resource_command>("Changed resource of ");
 					cmd.after = chosen_id.operator editor_resource_id();
@@ -1624,7 +1813,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			changed = perform_editable_gui(edited_copy, cmd.entries, *resource);
 		}
 		else if constexpr(std::is_same_v<N, editor_prefab_node>) {
-			auto id_handler = id_widget_handler { in.setup, editor_icon_info_in(in) };
 			const auto resource = in.setup.find_resource(node.resource_id);
 			ensure(resource != nullptr);
 
@@ -1736,14 +1924,34 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 		ImGui::Separator();
 
+		auto do_reset_button_for_project_settings = [&](auto cmd, const auto& defaults, auto& edited_copy, const auto label) {
+			const bool already_default = augs::introspective_equal(defaults, edited_copy);
+
+			if (reset_button(already_default, false)) {
+				cmd.after = defaults;
+				cmd.built_description = typesafe_sprintf("Reset %x settings to default", label);
+
+				post_new_or_rewrite(std::move(cmd));
+
+				return true;
+			}
+
+			return false;
+		};
+
 		if (project_current_tab == inspected_project_tab_type::ARENA) {
 			edit_project_settings_command cmd;
 			cmd.tab = inspected_project_tab_type::ARENA;
 
 			auto edited_copy = project.settings;
-			const auto changed = perform_editable_gui_single(edited_copy);
 
-			if (!changed.empty()) {
+			editor_arena_settings defaults;
+			::setup_project_defaults(defaults, official_map);
+
+			const bool posted = do_reset_button_for_project_settings(cmd, defaults, edited_copy, "Arena");
+			const auto changed = perform_editable_gui_single(edited_copy, std::as_const(defaults), id_handler);
+
+			if (!changed.empty() && !posted) {
 				cmd.after = edited_copy;
 				cmd.built_description = typesafe_sprintf(changed, "Arena");
 				post_new_or_rewrite(std::move(cmd));
@@ -1767,9 +1975,14 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			cmd.tab = inspected_project_tab_type::PLAYTESTING;
 
 			auto edited_copy = project.playtesting;
-			const auto changed = perform_editable_gui_single(edited_copy);
 
-			if (!changed.empty()) {
+			editor_playtesting_settings defaults;
+			::setup_project_defaults(defaults, project.get_game_modes(), official_map);
+
+			const bool posted = do_reset_button_for_project_settings(cmd, defaults, edited_copy, "Playtesting");
+			const auto changed = perform_editable_gui_single(edited_copy, defaults, id_handler);
+
+			if (!changed.empty() && !posted) {
 				cmd.after = edited_copy;
 				cmd.built_description = typesafe_sprintf(changed, "Playtesting");
 				post_new_or_rewrite(std::move(cmd));

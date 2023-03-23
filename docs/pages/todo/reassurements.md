@@ -5,6 +5,11 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- We can leave _1 _2 _3_ etc for sounds
+	- Contrary to animations, these variations are done on augs audio library level
+	- Someone might want to reuse the other numbers for something else (or just listen to them separately) so nothing to worry about here
+	- the first one automatically uses a variation
+
 - This light model is good because
 	- Texture allows you to CAP the max light exposure to ensure color fidelity
 	- Whereas the color parameter lets you change how much it actually absorbs light
