@@ -471,7 +471,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/official/create_official_resources.cpp"
 	"src/application/setups/editor/editor_camera.cpp"
 	"src/augs/misc/secure_hash.cpp"
-	"src/application/setups/editor/project/editor_project.cpp"
 	"src/application/setups/editor/project/editor_project_readwrite.cpp"
 	"src/application/setups/editor/project/editor_project_paths.cpp"
 	"src/application/setups/editor/gui/editor_history_gui.cpp"

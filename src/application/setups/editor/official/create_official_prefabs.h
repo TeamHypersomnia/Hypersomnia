@@ -25,6 +25,9 @@ void editor_setup::create_official_prefabs() {
 
 					auto& a = defs.as_aquarium;
 
+					a.point_light = m[test_static_lights::POINT_LIGHT];
+					a.organism_area = m[area_marker_type::ORGANISM_AREA];
+
 					a.sand_1 = m[test_static_decorations::AQUARIUM_SAND_1];
 					a.sand_2 = m[test_static_decorations::AQUARIUM_SAND_2];
 					a.sand_edge = m[test_static_decorations::AQUARIUM_SAND_EDGE];

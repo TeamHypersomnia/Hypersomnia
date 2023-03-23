@@ -5,6 +5,9 @@ struct editor_sprite_resource;
 struct aquarium_prefab_node {
 	// GEN INTROSPECTOR struct aquarium_prefab_node
 
+	editor_typed_resource_id<editor_light_resource> point_light;
+	editor_typed_resource_id<editor_area_marker_resource> organism_area;
+
 	editor_typed_resource_id<editor_sprite_resource> sand_1;
 	editor_typed_resource_id<editor_sprite_resource> sand_2;
 	editor_typed_resource_id<editor_sprite_resource> sand_edge;

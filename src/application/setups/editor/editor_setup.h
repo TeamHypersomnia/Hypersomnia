@@ -47,6 +47,8 @@
 #include "view/faction_view_settings.h"
 
 #include "application/setups/editor/editor_official_resource_map.h"
+#include "application/arena/mode_and_rules.h"
+#include "application/predefined_rulesets.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -88,13 +90,24 @@ struct editor_gui {
 struct editor_icon_info;
 struct editor_icon_info_in;
 
+template <bool C, class ModeVariantType>
+class basic_arena_handle;
+
+template <bool C>
+using editor_arena_handle = basic_arena_handle<C, mode_and_rules>;
+
 class editor_setup : public default_setup_settings {
 	test_mode mode;
 	test_mode_ruleset default_test_ruleset;
 	bomb_defusal_ruleset default_bomb_ruleset;
-	intercosm initial_scene;
+	intercosm built_official_content;
 
 	intercosm scene;
+
+	/* Arena handle essentials */
+	predefined_rulesets rulesets;
+	mode_and_rules current_mode;
+	cosmos_solvable_significant clean_round_state;
 
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
@@ -132,9 +145,7 @@ class editor_setup : public default_setup_settings {
 
 	double global_time_seconds = 0.0;
 
-	per_type_container<all_editor_node_types, make_vector> temp_prefab_node_pools;
-
-	void create_official();
+	void create_official_resources();
 	void create_official_prefabs();
 
 	void on_window_activate();
@@ -146,12 +157,6 @@ class editor_setup : public default_setup_settings {
 	void load_gui_state();
 	void save_gui_state();
 	void save_last_project_location();
-
-	template <class S, class F>
-	static decltype(auto) on_resource_impl(S& self, const editor_resource_id& id, F&& callback);
-
-	template <class S, class T>
-	static decltype(auto) find_resource_impl(S& self, const editor_typed_resource_id<T>& id);
 
 	friend create_layer_command;
 	friend delete_layers_command;
@@ -177,6 +182,17 @@ class editor_setup : public default_setup_settings {
 	}
 
 	void clamp_units();
+
+	template <class H, class S>
+	static decltype(auto) get_arena_handle_impl(S& self) {
+		return H {
+			self.current_mode,
+			self.scene,
+			self.scene.world,
+			self.rulesets,
+			self.clean_round_state
+		};
+	}
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -235,28 +251,28 @@ public:
 	const auto& get_official_resources() const { return official_resources; }
 
 	template <class T>
-	decltype(auto) find_node(const editor_typed_node_id<T>& id);
-
-	template <class T>
-	decltype(auto) find_node(const editor_typed_node_id<T>& id) const;
-
-	template <class T>
 	decltype(auto) find_resource(const editor_typed_resource_id<T>& id);
 
 	template <class T>
 	decltype(auto) find_resource(const editor_typed_resource_id<T>& id) const;
 
 	template <class F>
-	decltype(auto) on_node(const editor_node_id& id, F&& callback);
-
-	template <class F>
-	decltype(auto) on_node(const editor_node_id& id, F&& callback) const;
-
-	template <class F>
 	decltype(auto) on_resource(const editor_resource_id& id, F&& callback);
 
 	template <class F>
 	decltype(auto) on_resource(const editor_resource_id& id, F&& callback) const;
+
+	template <class T>
+	decltype(auto) find_node(const editor_typed_node_id<T>& id);
+
+	template <class T>
+	decltype(auto) find_node(const editor_typed_node_id<T>& id) const;
+
+	template <class F>
+	decltype(auto) on_node(const editor_node_id& id, F&& callback);
+
+	template <class F>
+	decltype(auto) on_node(const editor_node_id& id, F&& callback) const;
 
 	template <class R, class F>
 	void for_each_resource(F&& callback, bool official) const;
@@ -653,8 +669,8 @@ public:
 
 	std::optional<editor_setup::parent_layer_info> find_best_layer_for_new_node() const;
 
-	const auto& get_initial_scene() const {
-		return initial_scene;
+	const auto& get_built_official_content() const {
+		return built_official_content;
 	}
 
 	const auto& get_last_inspected_layer_or_node() const {
@@ -685,11 +701,14 @@ public:
 	void toggle_sounds_preview();
 
 	template <class F>
-	void rebuild_prefab_nodes(editor_typed_node_id<editor_prefab_node>, F on_created_child, bool call_reverse = false);
+	void rebuild_prefab_nodes(editor_typed_node_id<editor_prefab_node>, F&& on_created_child, bool call_reverse = false);
 
 	void unpack_prefab(editor_typed_node_id<editor_prefab_node>);
 
 	const auto& get_official_resource_map() const {
 		return official_resource_map;
 	}
+
+	editor_arena_handle<false> get_arena_handle();
+	editor_arena_handle<true> get_arena_handle() const;
 };

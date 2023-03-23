@@ -30,6 +30,9 @@ inline void create_node_command<T>::redo(editor_command_input in) {
 	}
 
 	{
+		created_node.unique_name = in.setup.get_free_node_name_for(created_node.unique_name);
+		built_description = "Created " + created_node.unique_name;
+
 		auto& node_pool = in.setup.project.nodes.template get_pool_for<T>();
 		base::redo(node_pool, created_node);
 	}

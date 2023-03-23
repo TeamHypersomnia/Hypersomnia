@@ -1,6 +1,7 @@
 #pragma once
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
+#include "application/setups/editor/project/editor_project.hpp"
 
 template <class T>
 constexpr bool skip_scene_rebuild_v = is_one_of_v<T,
@@ -41,24 +42,6 @@ const T& editor_setup::rewrite_last_command(T&& command) {
 	return result;
 }
 
-template <class S, class F>
-decltype(auto) editor_setup::on_resource_impl(S& self, const editor_resource_id& id, F&& callback) {
-	if (id.is_official) {
-		return self.official_resources.dispatch_on(id, std::forward<F>(callback));
-	}
-
-	return self.project.resources.dispatch_on(id, std::forward<F>(callback));
-}
-
-template <class S, class T>
-decltype(auto) editor_setup::find_resource_impl(S& self, const editor_typed_resource_id<T>& id) {
-	if (id.is_official) {
-		return self.official_resources.find_typed(id);
-	}
-
-	return self.project.resources.find_typed(id);
-}
-
 template <class R, class F>
 void editor_setup::for_each_resource(F&& callback, bool official) const {
 	const auto& pools = official ? official_resources : project.resources;
@@ -74,40 +57,40 @@ void editor_setup::for_each_resource(F&& callback, bool official) const {
 
 template <class T>
 decltype(auto) editor_setup::find_node(const editor_typed_node_id<T>& id) {
-	return project.nodes.find_typed(id);
+	return project.find_node(id);
 }
 
 template <class T>
 decltype(auto) editor_setup::find_node(const editor_typed_node_id<T>& id) const {
-	return project.nodes.find_typed(id);
+	return project.find_node(id);
 }
 
 template <class T>
 decltype(auto) editor_setup::find_resource(const editor_typed_resource_id<T>& id) {
-	return find_resource_impl(*this, id);
+	return project.find_resource(official_resources, id);
 }
 
 template <class T>
 decltype(auto) editor_setup::find_resource(const editor_typed_resource_id<T>& id) const {
-	return find_resource_impl(*this, id);
+	return project.find_resource(official_resources, id);
 }
 
 template <class F>
 decltype(auto) editor_setup::on_resource(const editor_resource_id& id, F&& callback) {
-	return on_resource_impl(*this, id, std::forward<F>(callback));
+	return project.on_resource(official_resources, id, std::forward<F>(callback));
 }
 
 template <class F>
 decltype(auto) editor_setup::on_resource(const editor_resource_id& id, F&& callback) const {
-	return on_resource_impl(*this, id, std::forward<F>(callback));
+	return project.on_resource(official_resources, id, std::forward<F>(callback));
 }
 
 template <class F>
 decltype(auto) editor_setup::on_node(const editor_node_id& id, F&& callback) {
-	return project.nodes.dispatch_on(id, std::forward<F>(callback));
+	return project.on_node(id, std::forward<F>(callback));
 }
 
 template <class F>
 decltype(auto) editor_setup::on_node(const editor_node_id& id, F&& callback) const {
-	return project.nodes.dispatch_on(id, std::forward<F>(callback));
+	return project.on_node(id, std::forward<F>(callback));
 }

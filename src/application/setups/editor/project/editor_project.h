@@ -10,6 +10,15 @@
 #include "application/setups/editor/nodes/editor_node_pools.h"
 #include "application/setups/editor/resources/editor_resource_pools.h"
 
+template <class E>
+struct editor_typed_node_id;
+
+template <class E>
+struct editor_typed_resource_id;
+
+struct editor_node_id;
+struct editor_resource_id;
+
 /*
 	Note that meta is always the first - 
 	so, to identify the game version string of a cached project binary file (and thus determine if the rest is safe to read),
@@ -53,4 +62,43 @@ struct editor_project {
 	const auto& get_game_modes() const {
 		return resources.get_pool_for<editor_game_mode_resource>();
 	}
+
+	using O = editor_resource_pools;
+
+	template <class T>
+	decltype(auto) find_resource(O& officials, const editor_typed_resource_id<T>& id);
+
+	template <class T>
+	decltype(auto) find_resource(const O& officials, const editor_typed_resource_id<T>& id) const;
+
+	template <class F>
+	decltype(auto) on_resource(O& officials, const editor_resource_id& id, F&& callback);
+
+	template <class F>
+	decltype(auto) on_resource(const O& officials, const editor_resource_id& id, F&& callback) const;
+
+	template <class T>
+	decltype(auto) find_node(const editor_typed_node_id<T>& id);
+
+	template <class T>
+	decltype(auto) find_node(const editor_typed_node_id<T>& id) const;
+
+	template <class F>
+	decltype(auto) on_node(const editor_node_id& id, F&& callback);
+
+	template <class F>
+	decltype(auto) on_node(const editor_node_id& id, F&& callback) const;
+
+	auto make_find_resource_lambda(const O& officials) const;
+	auto make_on_resource_lambda(const O& officials) const;
+
+	editor_layer* find_layer(const editor_layer_id& id);
+	const editor_layer* find_layer(const editor_layer_id& id) const;
+   
+private:
+	template <class S, class Officials, class F>
+	static decltype(auto) on_resource_impl(S& self, Officials&, const editor_resource_id& id, F&& callback);
+
+	template <class S, class Officials, class T>
+	static decltype(auto) find_resource_impl(S& self, Officials&, const editor_typed_resource_id<T>& id);
 };

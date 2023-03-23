@@ -197,7 +197,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 		auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
 			const auto resource_name = typed_resource.get_display_name();
-			const auto new_name = in.setup.get_free_node_name_for(resource_name);
 
 			using node_type = typename T::node_type;
 
@@ -205,12 +204,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			::setup_node_defaults(new_node, typed_resource);
 
 			new_node.resource_id = resource_id;
-			new_node.unique_name = new_name;
+			new_node.unique_name = resource_name;
 			new_node.editable.pos = pos;
 
 			create_node_command<node_type> command;
 
-			command.built_description = typesafe_sprintf("Created %x", new_name);
+			command.built_description = typesafe_sprintf("Created %x", new_node.unique_name);
 			command.created_node = std::move(new_node);
 			command.layer_id = layer_id;
 			command.index_in_layer = index;

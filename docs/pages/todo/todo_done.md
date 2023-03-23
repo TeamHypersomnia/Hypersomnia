@@ -5130,3 +5130,11 @@ Advantages:
 
 
 - Sound 'properties' should also multiply by its resource modifier
+- Area vs Box marker nomenclature
+	- Doesn't really matter from JSON perspective for now
+		- That's because the only markers are official and we won't specify their type names
+	- Maybe area because we're not naming them "plant box" or "buy box" but rather plant area/zone etc.
+		- and if we really do have different shapes then it'd be silly to have another resource for it I believe
+
+- initial_signi -> clean_round_signi
+

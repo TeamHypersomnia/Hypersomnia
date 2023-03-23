@@ -64,7 +64,6 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			if (mouse_over_scene) {
 				auto instantiate = [&]<typename T>(const T& typed_resource, const auto resource_id) {
 					const auto resource_name = typed_resource.get_display_name();
-					const auto new_name = in.setup.get_free_node_name_for(resource_name);
 
 					using node_type = typename T::node_type;
 
@@ -72,14 +71,14 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					::setup_node_defaults(new_node, typed_resource);
 
 					new_node.resource_id = resource_id;
-					new_node.unique_name = new_name;
+					new_node.unique_name = resource_name;
 					new_node.editable.pos = in.setup.get_world_cursor_pos();
 
 					world_position_started_dragging = new_node.editable.pos;
 
 					create_node_command<node_type> command;
 
-					command.built_description = typesafe_sprintf("Created %x", new_name);
+					command.built_description = typesafe_sprintf("Created %x", new_node.unique_name);
 					command.created_node = std::move(new_node);
 
 					const auto place_over_node = in.setup.get_topmost_inspected_node();
@@ -489,7 +488,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 			new_node.associated_resource = resource_id;
 			new_node.type = editor_filesystem_node_type::OTHER_RESOURCE;
 
-			const auto& initial_intercosm = setup.get_initial_scene();
+			const auto& built_officials = setup.get_built_official_content();
 
 			if constexpr(is_one_of_v<resource_type, editor_prefab_resource, editor_game_mode_resource, editor_point_marker_resource, editor_area_marker_resource>) {
 				new_node.name = typed_resource.get_display_name();
@@ -500,12 +499,12 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 						new_node.name = to_lowercase(augs::enum_to_string(tag));
 
 						const auto custom_thumbnail_path = [&]() {
-							const auto& flavour = initial_intercosm.world.get_flavour(to_entity_flavour_id(tag));
+							const auto& flavour = built_officials.world.get_flavour(to_entity_flavour_id(tag));
 
 							auto result = new_node.custom_thumbnail_path;
 
 							if (auto sprite = flavour.template find<invariants::sprite>()) {
-								result = initial_intercosm.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
+								result = built_officials.viewables.image_definitions[sprite->image_id].get_source_path().resolve({});
 							}
 
 							if (auto animation = flavour.template find<invariants::animation>()) {

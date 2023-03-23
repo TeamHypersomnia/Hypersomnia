@@ -1,6 +1,7 @@
 #pragma once
 #include "game/modes/all_mode_includes.h"
 #include "augs/templates/folded_finders.h"
+#include "game/modes/ruleset_id.h"
 
 template <class VariantType>
 struct basic_mode_and_rules {

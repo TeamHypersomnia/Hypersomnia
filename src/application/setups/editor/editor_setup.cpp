@@ -60,19 +60,20 @@
 #include "augs/window_framework/window.h"
 
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
+#include "application/arena/arena_handle.h"
 
 editor_setup::editor_setup(
 	sol::state& lua,
 	const augs::path_type& project_path
 ) : paths(project_path) {
-	initial_scene.populate_official_content(
+	built_official_content.populate_official_content(
 		lua,
 		60,
 		default_bomb_ruleset,
 		default_test_ruleset
 	);
 
-	create_official();
+	create_official_resources();
 
 	LOG("Loading editor project at: %x", project_path);
 
@@ -96,10 +97,10 @@ editor_setup::~editor_setup() {
 	LOG("DTOR finished: ~editor_setup");
 }
 
-void editor_setup::create_official() {
-	::create_official_resources(initial_scene, official_resources);
+void editor_setup::create_official_resources() {
+	::create_official_resources(built_official_content, official_resources);
 	::create_official_filesystem_from(
-		initial_scene,
+		built_official_content,
 		official_resources,
 		official_files_root
 	);
@@ -1053,11 +1054,11 @@ void editor_pathed_resource::set_hash_stamp(const augs::file_time_type& stamp) {
 }
 
 editor_layer* editor_setup::find_layer(const editor_layer_id& id) {
-	return project.layers.pool.find(id);
+	return project.find_layer(id);
 }
 
 const editor_layer* editor_setup::find_layer(const editor_layer_id& id) const {
-	return project.layers.pool.find(id);
+	return project.find_layer(id);
 }
 
 editor_layer* editor_setup::find_layer(const std::string& name) {
@@ -2201,6 +2202,8 @@ void editor_setup::start_playtesting() {
 		return;
 	}
 
+	clean_round_state = scene.world.get_solvable().significant;
+
 	total_collected.clear();
 
 	mode = test_mode();
@@ -2397,6 +2400,14 @@ void editor_setup::unpack_prefab(const editor_typed_node_id<editor_prefab_node> 
 	cmd.built_description = typesafe_sprintf("Unpacked prefab: %x", prefab->get_display_name());
 
 	post_new_command(std::move(cmd));
+}
+
+editor_arena_handle<false> editor_setup::get_arena_handle() {
+	return get_arena_handle_impl<editor_arena_handle<false>>(*this);
+}
+
+editor_arena_handle<true> editor_setup::get_arena_handle() const {
+	return get_arena_handle_impl<editor_arena_handle<true>>(*this);
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

@@ -1811,7 +1811,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			if (resource->official_tag) {
 				std::visit(
 					[&](const auto& tag) {
-						const auto& flavour = in.setup.get_initial_scene().world.get_flavour(to_entity_flavour_id(tag));
+						const auto& flavour = in.setup.get_built_official_content().world.get_flavour(to_entity_flavour_id(tag));
 						if (const auto sprite = flavour.template find<invariants::sprite>()) {
 							original_size = sprite->get_size();
 						}

@@ -5,21 +5,17 @@
 #include "augs/misc/randomization.h"
 #include "application/setups/editor/defaults/editor_node_defaults.h"
 
-template <class F>
-void editor_setup::rebuild_prefab_nodes(
-	const editor_typed_node_id<editor_prefab_node> prefab_node_id,
+template <class FR, class F>
+void rebuild_prefab_nodes(
+	const editor_prefab_node& prefab_node,
+	FR find_resource,
 	F on_created_child,
-	const bool call_reverse
+	const bool call_reverse = false
 ) {
-	auto prefab_node = find_node(prefab_node_id);
-
-	if (prefab_node == nullptr) {
-		return;
-	}
-
+	thread_local per_type_container<all_editor_node_types, make_vector> temp_prefab_node_pools;
 	temp_prefab_node_pools.clear();
 
-	auto prefab_resource = find_resource(prefab_node->resource_id);
+	auto prefab_resource = find_resource(prefab_node.resource_id);
 
 	if (prefab_resource == nullptr) {
 		return;
@@ -27,7 +23,7 @@ void editor_setup::rebuild_prefab_nodes(
 
 	using P = editor_builtin_prefab_type;
 
-	const auto name_preffix = prefab_node->get_display_name() + " ";
+	const auto name_preffix = prefab_node.get_display_name() + " ";
 
 	auto get_resource_size = [&]<typename R>(R& rid) {
 		const auto resource = find_resource(rid);
@@ -123,13 +119,13 @@ void editor_setup::rebuild_prefab_nodes(
 
 		const auto resource_name = resource->get_display_name();
 
-		auto& pool = temp_prefab_node_pools.template get_for<N>();
+		auto& pool = temp_prefab_node_pools.get_for<N>();
 		pool.emplace_back();
 		auto& new_node = pool.back();
 
 		::setup_node_defaults(new_node, *resource);
 
-		new_node.unique_name = get_free_node_name_for(name_preffix + (custom_name.empty() ? resource_name : custom_name));
+		new_node.unique_name = name_preffix + (custom_name.empty() ? resource_name : custom_name);
 		new_node.resource_id = resource_id;
 
 		new_node.editable.pos = offset.pos;
@@ -161,8 +157,7 @@ void editor_setup::rebuild_prefab_nodes(
 	};
 
 	auto build_aquarium = [&]() {
-		const auto& o = official_resource_map;
-		const auto& e = prefab_node->editable;
+		const auto& e = prefab_node.editable;
 		const auto& a = e.as_aquarium;
 
 		const auto w = e.size.x;
@@ -170,9 +165,9 @@ void editor_setup::rebuild_prefab_nodes(
 		const auto w2 = w / 2;
 		const auto h2 = h / 2;
 
-		const auto POINT_LIGHT = o[test_static_lights::POINT_LIGHT];
+		const auto POINT_LIGHT = a.point_light;
 
-		create_child(o[area_marker_type::ORGANISM_AREA], transformr(), e.size);
+		create_child(a.organism_area, transformr(), e.size);
 
 		create_child(a.wandering_pixels_1, transformr(), e.size);
 		create_child(a.wandering_pixels_2, transformr(), e.size);
@@ -439,7 +434,7 @@ void editor_setup::rebuild_prefab_nodes(
 	}
 
 	auto callback = [&]<typename N>(N& child_node) {
-		const auto final_transform = prefab_node->get_transform() * child_node.get_transform();
+		const auto final_transform = prefab_node.get_transform() * child_node.get_transform();
 
 		child_node.editable.pos = final_transform.pos;
 
@@ -456,4 +451,28 @@ void editor_setup::rebuild_prefab_nodes(
 	else {
 		temp_prefab_node_pools.for_each(callback);
 	}
+}
+
+template <class F>
+void editor_setup::rebuild_prefab_nodes(
+	const editor_typed_node_id<editor_prefab_node> prefab_node_id,
+	F&& on_created_child,
+	const bool call_reverse
+) {
+	const auto prefab_node = find_node(prefab_node_id);
+
+	if (prefab_node == nullptr) {
+		return;
+	}
+
+	auto find_res_lbd = [&](auto&&... args) -> decltype(auto) { 
+		return find_resource(std::forward<decltype(args)>(args)... ); 
+	};
+
+	::rebuild_prefab_nodes(
+		*prefab_node,
+		find_res_lbd,
+		std::forward<F>(on_created_child),
+		call_reverse
+	);
 }
