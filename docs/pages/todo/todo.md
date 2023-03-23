@@ -78,7 +78,20 @@ summary: Just a hidden scratchpad.
 - Laser should switch to the knife/grenade being thrown when it is done with a gun in another hand
 	- Actually just disable the second laser then because there are both now
 
-## Editor final MVP once we can ditch old maps
+## Editor final MVP (post MVP) once we can ditch old maps
+
+- Renames for weapons!!! We should really decide once and for all about some names so that they're future-proof
+	- Best to avoid two-word names except in rare cases
+	- We can use some polish names because they'll be sounding interesting to foreign players
+	- elon_hrl -> rocket_launcher (we though
+		- Good PR because it's then obvious to anyone new to the game
+		- Warx fq12 -> warx (there's no other single-word intuitive name for an automatic shotgun)
+		- datum_gun -> datum
+		- ao44 -> revolver
+		- hpsr -> awka
+		- lewsII -> lews (there's no I anyway)
+		- amplifier_arm -> amplifier
+	
 
 - Sounds should have per-entity sound effect modifiers (we implement it in editor already)
 

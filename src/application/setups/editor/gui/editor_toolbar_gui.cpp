@@ -390,7 +390,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 			in.setup.start_playtesting();
 		}
 
-		if (do_icon(ID::EDITOR_TOOL_HOST_SERVER, "Host a server (Ctrl+P)")) {
+		if (do_icon(ID::EDITOR_TOOL_HOST_SERVER, "Playtest online (Ctrl+P)")) {
 
 		}
 	};

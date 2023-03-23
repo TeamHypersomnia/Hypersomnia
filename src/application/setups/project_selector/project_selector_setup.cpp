@@ -731,6 +731,15 @@ bool project_selector_setup::create_new_project_files() {
 				writer.EndObject();
 			}
 
+			writer.Key("settings");
+
+			{
+				writer.StartObject();
+				writer.Key("default_server_mode");
+				writer.String("bomb_defusal");
+				writer.EndObject();
+			}
+
 			writer.Key("playtesting");
 
 			{

@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Now let's do rebuilding the modes and applying these to test mode
+	- The test mode should really hold a variant of all modes I believe
+	- or the complete arena handle, we'll see how it works
+
 - Type vs id nomenclature
 	- E.g. we want nodes to say what "type" (resource) they are but footstep custom sound to have "id"
 		- it just sounds intuitive
@@ -93,7 +97,7 @@ summary: That which we are brainstorming at the moment.
 - Duality of defaults
 	- Names
 		- editor_testing_mode
-		- server_default_mode
+		- default_server_mode
 	- Both editable from the arena properties I'd say
 		- We'll easily adapt the resource chooser
 	- One of them will be visible in the toolbar

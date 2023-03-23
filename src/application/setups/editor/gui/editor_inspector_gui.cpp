@@ -1399,11 +1399,21 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 	return result;
 }
 
-SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings defaults, const id_widget_handler& special_handler) {
+SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings defaults, id_widget_handler special_handler) {
 	using namespace augs::imgui;
 	std::string result;
 
 	(void)defaults;
+
+	special_handler.allow_none = false;
+
+	PROPERTY("Default server mode", default_server_mode);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("When an actual server loads your arena,\nthis game mode will be chosen first.\n\nTo change the mode you're testing in the editor,\ngo to Playtesting tab.");
+	}
+
+	special_handler.allow_none = true;
 
 	PROPERTY("Ambient light color", ambient_light_color);
 	THEME_PROPERTY("Warmup theme", warmup_theme);
@@ -1924,7 +1934,8 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 		ImGui::Separator();
 
-		auto do_reset_button_for_project_settings = [&](auto cmd, const auto& defaults, auto& edited_copy, const auto label) {
+		auto do_reset_button_for_project_settings = [&](auto cmd, auto& defaults, auto& edited_copy, const auto label) {
+			::setup_project_defaults(defaults, project.get_game_modes(), official_map);
 			const bool already_default = augs::introspective_equal(defaults, edited_copy);
 
 			if (reset_button(already_default, false)) {
@@ -1946,8 +1957,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			auto edited_copy = project.settings;
 
 			editor_arena_settings defaults;
-			::setup_project_defaults(defaults, official_map);
-
 			const bool posted = do_reset_button_for_project_settings(cmd, defaults, edited_copy, "Arena");
 			const auto changed = perform_editable_gui_single(edited_copy, std::as_const(defaults), id_handler);
 
@@ -1977,8 +1986,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			auto edited_copy = project.playtesting;
 
 			editor_playtesting_settings defaults;
-			::setup_project_defaults(defaults, project.get_game_modes(), official_map);
-
 			const bool posted = do_reset_button_for_project_settings(cmd, defaults, edited_copy, "Playtesting");
 			const auto changed = perform_editable_gui_single(edited_copy, defaults, id_handler);
 

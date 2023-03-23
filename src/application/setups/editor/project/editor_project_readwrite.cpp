@@ -76,9 +76,13 @@ namespace editor_project_readwrite {
 		const auto document = augs::json_document_from(json_path);
 
 		editor_project loaded;
-		::setup_project_defaults(loaded.settings, officials_map);
+		::setup_project_defaults(loaded.settings, loaded.get_game_modes(), officials_map);
 
-		/* This won't set the playtesting mode yet but maybe it might other properties in the future */
+		/* 
+			This doesn't set the playtesting mode (done later below) 
+			but maybe there will be other important properties in the future
+		*/
+
 		::setup_project_defaults(loaded.playtesting, loaded.get_game_modes(), officials_map);
 
 		loaded.meta = read_only_project_meta(json_path);
@@ -118,11 +122,7 @@ namespace editor_project_readwrite {
 			}
 		}
 
-		{
-			/*
-				Fallback
-			*/
-
+		auto create_fallback_playtesting_mode_if_none = [&]() {
 			auto& modes = loaded.get_game_modes();
 
 			if (modes.empty()) {
@@ -134,7 +134,9 @@ namespace editor_project_readwrite {
 
 				modes.allocate(std::move(new_game_mode));
 			}
-		}
+		};
+
+		create_fallback_playtesting_mode_if_none();
 
 		/*
 			Layer hierarchies and nodes are ignored when reading.
@@ -208,6 +210,10 @@ namespace editor_project_readwrite {
 
 		if (!loaded.playtesting.mode.is_set()) {
 			::setup_default_playtesting_mode(loaded.playtesting, loaded.get_game_modes());
+		}
+
+		if (!loaded.settings.default_server_mode.is_set()) {
+			::setup_default_server_mode(loaded.settings, loaded.get_game_modes());
 		}
 
 		return loaded;
