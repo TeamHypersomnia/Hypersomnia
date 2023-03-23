@@ -233,18 +233,18 @@ struct debugger_property_accessors;
 class bomb_defusal {
 public:
 	using ruleset_type = bomb_defusal_ruleset;
-	static constexpr bool needs_initial_signi = true;
+	static constexpr bool needs_clean_round_state = true;
 	static constexpr bool round_based = true;
 
 	template <bool C>
 	struct basic_input {
 		const ruleset_type& rules;
-		const cosmos_solvable_significant& initial_signi;
+		const cosmos_solvable_significant& clean_round_state;
 		maybe_const_ref_t<C, cosmos> cosm;
 
 		template <bool is_const = C, class = std::enable_if_t<!is_const>>
 		operator basic_input<!is_const>() const {
-			return { rules, initial_signi, cosm };
+			return { rules, clean_round_state, cosm };
 		}
 	};
 

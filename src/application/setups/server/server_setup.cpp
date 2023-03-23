@@ -968,7 +968,7 @@ void server_setup::choose_arena(const std::string& name) {
 		lua,
 		arena,
 		solvable_vars,
-		initial_signi
+		clean_round_state
 	);
 
 	arena_gui.reset();
@@ -1209,10 +1209,10 @@ void server_setup::advance_clients_state() {
 
 				buffers,
 
-				initial_signi,
+				clean_round_state,
 				scene.world.get_common_significant().flavours,
 
-				initial_arena_state_payload<true> {
+				full_arena_snapshot_payload<true> {
 					scene.world.get_solvable().significant,
 					current_mode,
 					sent_client_id,
@@ -1263,7 +1263,7 @@ void server_setup::advance_clients_state() {
 						if (c.state == S::WELCOME_ARRIVED) {
 							send_state_for_the_first_time();
 
-							c.state = S::RECEIVING_INITIAL_STATE;
+							c.state = S::RECEIVING_INITIAL_SNAPSHOT;
 						}
 					}
 					else {
@@ -1290,7 +1290,7 @@ void server_setup::advance_clients_state() {
 		}
 
 #if 0
-		else if (c.state == S::RECEIVING_INITIAL_STATE_CORRECTION) {
+		else if (c.state == S::RECEIVING_INITIAL_SNAPSHOT_CORRECTION) {
 			if (!server->has_messages_to_send(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS)) {
 				c.set_in_game(server_time);
 			}
@@ -1512,7 +1512,7 @@ message_handler_result server_setup::handle_client_message(
 		}
 	}
 	else if constexpr (std::is_same_v<T, total_mode_player_entropy>) {
-		if (c.state == S::RECEIVING_INITIAL_STATE) {
+		if (c.state == S::RECEIVING_INITIAL_SNAPSHOT) {
 			c.set_in_game(server_time);
 		}
 
@@ -1567,10 +1567,10 @@ message_handler_result server_setup::handle_client_message(
 
 						buffers,
 
-						initial_signi,
+						clean_round_state,
 						scene.world.get_common_significant().flavours,
 
-						initial_arena_state_payload<true> {
+						full_arena_snapshot_payload<true> {
 							scene.world.get_solvable().significant,
 							current_mode,
 							client_id,
@@ -1714,7 +1714,7 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 
 	auto process_client = [&](const auto client_id, auto& c) {
 		const bool its_time_already = 
-			c.state >= client_state_type::RECEIVING_INITIAL_STATE
+			c.state >= client_state_type::RECEIVING_INITIAL_SNAPSHOT
 		;
 
 		if (!its_time_already) {

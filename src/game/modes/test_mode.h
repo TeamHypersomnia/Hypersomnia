@@ -53,7 +53,7 @@ struct test_mode_player {
 class test_mode {
 public:
 	using ruleset_type = test_mode_ruleset;
-	static constexpr bool needs_initial_signi = false;
+	static constexpr bool needs_clean_round_state = false;
 	static constexpr bool round_based = false;
 
 	template <bool C>

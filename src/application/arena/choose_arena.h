@@ -6,7 +6,7 @@ inline void choose_arena(
 	sol::state& lua,
 	online_arena_handle<false> handle,
 	const server_solvable_vars& vars,
-	cosmos_solvable_significant& initial_signi
+	cosmos_solvable_significant& clean_round_state
 ) {
 	const auto& name = vars.current_arena;
 	const auto emigrated_session = handle.on_mode([](const auto& typed_mode) { return typed_mode.emigrate(); });
@@ -16,7 +16,7 @@ inline void choose_arena(
 
 		handle.make_default(
 			lua, 
-			initial_signi
+			clean_round_state
 		);
 	}
 	else {
@@ -25,7 +25,7 @@ inline void choose_arena(
 
 		handle.load_from(
 			paths,
-			initial_signi
+			clean_round_state
 		);
 	}
 

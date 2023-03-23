@@ -2511,7 +2511,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Client FSM
 	- PENDING_WELCOME 
-	- RECEIVING_INITIAL_STATE
+	- RECEIVING_INITIAL_SNAPSHOT
 		- after receiving initial state, we might want to send inputs that happened as a block as well
 	- IN_GAME
 	- Last time of valid activity

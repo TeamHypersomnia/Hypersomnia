@@ -5,6 +5,22 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Smoke grenades
+	- Obstructing visibility
+		- Actually very simple: after visibility polygon is already generated:
+			- for every smoke circle, render a simple black polygon 
+			- the polygon is similar to trapezoid: shorter side begins in the circle, larger side ends off-screen
+		- No raycasts needed at all - this will be render-bound which is good
+	- We could easily make ones that expand to fill the space like in CS 2
+		- We can incrementally spawn squares that expand and scan around
+		- Actually a BFS
+			- terminates recursion after the first static obstacle is detected, but still considers the colliding square node
+	- Interaction will be harder
+		- Actually very simple
+		- The squares don't have to interact with anything but bullets and explosions
+		- They don't have to move at all
+		- Whenever they are out of their current position, however, they seek back
+
 - Letting servers adjust the speed of the game
 	- bomb mode doesn't do timing, it just advances whenever asked, but it has to effecctively use the delta information
 		- which is obtained by ls / tickrate

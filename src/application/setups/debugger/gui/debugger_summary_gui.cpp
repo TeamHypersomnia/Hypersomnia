@@ -58,9 +58,9 @@ void debugger_summary_gui::perform(debugger_setup& setup) {
 				compressed_buf.clear();
 
 				{
-					const auto& initial_signi = setup.is_gameplay_on() ? setup.get_arena_handle().initial_signi : solvable;
+					const auto& clean_round_state = setup.is_gameplay_on() ? setup.get_arena_handle().clean_round_state : solvable;
 
-					auto s = net_solvable_stream_ref(cosm.get_common_significant().flavours, initial_signi, solvable, input_buf);
+					auto s = net_solvable_stream_ref(cosm.get_common_significant().flavours, clean_round_state, solvable, input_buf);
 					augs::write_bytes(s, solvable);
 				}
 

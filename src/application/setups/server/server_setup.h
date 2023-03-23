@@ -63,7 +63,7 @@ class server_setup :
 
 	/* This is loaded from the arena folder */
 	intercosm scene;
-	cosmos_solvable_significant initial_signi;
+	cosmos_solvable_significant clean_round_state;
 
 	predefined_rulesets rulesets;
 
@@ -158,7 +158,7 @@ private:
 			self.scene,
 			self.scene.world,
 			self.rulesets,
-			self.initial_signi
+			self.clean_round_state
 		};
 	}
 

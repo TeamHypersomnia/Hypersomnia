@@ -8,7 +8,7 @@
 #include "application/network/net_solvable_stream.h"
 
 template <bool C>
-struct initial_arena_state_payload {
+struct full_arena_snapshot_payload {
 	maybe_const_ref_t<C, cosmos_solvable_significant> signi;
 	maybe_const_ref_t<C, online_mode_and_rules> mode;
 	maybe_const_ref_t<C, uint32_t> client_id;
@@ -132,10 +132,10 @@ namespace net_messages {
 		return true;
 	}
 
-	inline bool initial_arena_state::read_payload(
+	inline bool full_arena_snapshot::read_payload(
 		augs::serialization_buffers& buffers,
-		const cosmos_solvable_significant& initial_signi,
-		const initial_arena_state_payload<false> in
+		const cosmos_solvable_significant& clean_round_state,
+		const full_arena_snapshot_payload<false> in
 	) {
 		const auto data = reinterpret_cast<const std::byte*>(GetBlockData());
 		const auto size = static_cast<std::size_t>(GetBlockSize());
@@ -181,7 +181,7 @@ namespace net_messages {
 			return false;
 		}
 
-		auto s = net_solvable_stream_cref(initial_signi, uncompressed_buf);
+		auto s = net_solvable_stream_cref(clean_round_state, uncompressed_buf);
 
 		augs::read_bytes(s, in.signi);
 		augs::read_bytes(s, in.mode);
@@ -194,12 +194,12 @@ namespace net_messages {
 	}
 
 	template <class F>
-	inline bool initial_arena_state::write_payload(
+	inline bool full_arena_snapshot::write_payload(
 		F block_allocator,
 		augs::serialization_buffers& buffers,
-		const cosmos_solvable_significant& initial_signi,
+		const cosmos_solvable_significant& clean_round_state,
 		const all_entity_flavours& all_flavours,
-		const initial_arena_state_payload<true> in
+		const full_arena_snapshot_payload<true> in
 	) {
 		auto write_all_to = [&in](auto& s) {
 			augs::write_bytes(s, in.signi);
@@ -220,7 +220,7 @@ namespace net_messages {
 			NSR_LOG("Reserved size: %x", s.size());
 
 			{
-				auto s = buffers.make_serialization_stream<net_solvable_stream_ref>(all_flavours, initial_signi, in.signi);
+				auto s = buffers.make_serialization_stream<net_solvable_stream_ref>(all_flavours, clean_round_state, in.signi);
 				write_all_to(s);
 			}
 

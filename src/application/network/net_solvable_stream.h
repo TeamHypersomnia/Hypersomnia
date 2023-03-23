@@ -21,19 +21,19 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 
 	const all_entity_flavours& flavours;
 	const cosmos_solvable_significant& initial_signi;
-	const cosmos_solvable_significant& serialized_signi;
+	const cosmos_solvable_significant& current_signi;
 
 	template <class... Args>
 	net_solvable_stream_ref(
 		const all_entity_flavours& flavours,
 		const cosmos_solvable_significant& initial_signi,
-		const cosmos_solvable_significant& serialized_signi,
+		const cosmos_solvable_significant& current_signi,
 		Args&&... args
 	) : 
 		base(std::forward<Args>(args)...),
 		flavours(flavours),
 		initial_signi(initial_signi),
-		serialized_signi(serialized_signi)
+		current_signi(current_signi)
 	{}
 
 	template <class T, class = std::enable_if_t<never_changes_in_game<T>>>
@@ -46,15 +46,15 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 		using E = entity_type_of<typename V::value_type>;
 
 		const auto& body_flavours = flavours.template get_for<E>();
-		const auto& serialized_pool = serialized_signi.entity_pools.get_for<E>();
-		const auto& original_pool = initial_signi.entity_pools.get_for<E>();
+		const auto& initial_pool = initial_signi.entity_pools.get_for<E>();
+		const auto& current_pool = current_signi.entity_pools.get_for<E>();
 
 		augs::write_bytes(*this, storage.size());
 
 		for (const auto& s : storage) {
 			const bool is_always_static = pred(body_flavours[s.flavour_id]);
 			const auto this_idx = index_in(storage, s);
-			const auto this_id = serialized_pool.find_nth_id(this_idx);
+			const auto this_id = current_pool.find_nth_id(this_idx);
 
 			const auto static_byte = [&]() -> char {
 				if (is_always_static) {
@@ -63,7 +63,7 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 
 				static_assert(std::is_trivially_copyable_v<remove_cref<decltype(s)>>);
 
-				if (const auto correspondent_initial = original_pool.find(this_id)) {
+				if (const auto correspondent_initial = initial_pool.find(this_id)) {
 					if (!std::memcmp(std::addressof(s), correspondent_initial, sizeof(*correspondent_initial))) {
 						return 2;
 					}

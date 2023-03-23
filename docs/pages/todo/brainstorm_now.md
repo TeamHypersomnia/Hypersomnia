@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- initial_signi -> clean_round_signi
+
 - Now let's do rebuilding the modes and applying these to test mode
 	- The test mode should really hold a variant of all modes I believe
 	- or the complete arena handle, we'll see how it works

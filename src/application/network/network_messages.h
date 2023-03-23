@@ -150,7 +150,7 @@ struct only_block_message : public yojimbo::BlockMessage {
 };
 
 template <bool C>
-struct initial_arena_state_payload;
+struct full_arena_snapshot_payload;
 
 namespace net_messages {
 	struct client_welcome : net_message_with_payload<requested_client_settings> {
@@ -223,20 +223,20 @@ namespace net_messages {
 		static constexpr bool client_to_server = false;
 	};
 
-	struct initial_arena_state : only_block_message {
+	struct full_arena_snapshot : only_block_message {
 		bool read_payload(
 			augs::serialization_buffers&,
-			const cosmos_solvable_significant& initial_signi,
-			initial_arena_state_payload<false>
+			const cosmos_solvable_significant& clean_round_state,
+			full_arena_snapshot_payload<false>
 		);
 
 		template <class F>
 		bool write_payload(
 			F block_allocator,
 			augs::serialization_buffers&,
-			const cosmos_solvable_significant& initial_signi,
+			const cosmos_solvable_significant& clean_round_state,
 			const all_entity_flavours& all_flavours,
-			initial_arena_state_payload<true>
+			full_arena_snapshot_payload<true>
 		);
 	};
 
@@ -262,7 +262,7 @@ namespace net_messages {
 		public_settings_update*, 
 		new_server_vars*,
 		new_server_solvable_vars*,
-		initial_arena_state*,
+		full_arena_snapshot*,
 		//initial_steps_correction*,
 #if CONTEXTS_SEPARATE
 		prestep_client_context*,

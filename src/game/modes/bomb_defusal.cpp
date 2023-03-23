@@ -918,11 +918,11 @@ void bomb_defusal::setup_round(
 
 	round_speeds = in.rules.speeds;
 
-	cosm.set(in.initial_signi);
+	cosm.set(in.clean_round_state);
 
 	/* 
 		If there are any entries in message queues, 
-		they become invalid when we assign the initial_signi.
+		they become invalid when we assign the clean_round_state.
 	*/
 
 	step.transient.flush_everything();

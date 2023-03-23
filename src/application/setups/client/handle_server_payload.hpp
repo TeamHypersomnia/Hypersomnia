@@ -1,7 +1,7 @@
 #pragma once
 #include "application/arena/choose_arena.h"
 
-using initial_payload = initial_arena_state_payload<false>;
+using initial_snapshot_payload = full_arena_snapshot_payload<false>;
 
 void snap_interpolated_to_logical(cosmos&);
 
@@ -27,7 +27,7 @@ message_handler_result client_setup::handle_server_payload(
 
 		if (are_initial_vars) {
 			LOG("Received initial vars from the server");
-			state = client_state_type::RECEIVING_INITIAL_STATE;
+			state = client_state_type::RECEIVING_INITIAL_SNAPSHOT;
 		}
 		else {
 			LOG("Received corrected vars from the server");
@@ -47,7 +47,7 @@ message_handler_result client_setup::handle_server_payload(
 					lua,
 					referential_arena,
 					new_vars,
-					initial_signi
+					clean_round_state
 				);
 
 				arena_gui.reset();
@@ -157,8 +157,8 @@ message_handler_result client_setup::handle_server_payload(
 			return abort_v;
 		}	
 	}
-	else if constexpr (std::is_same_v<T, initial_payload>) {
-		if (!now_resyncing && state != client_state_type::RECEIVING_INITIAL_STATE) {
+	else if constexpr (std::is_same_v<T, initial_snapshot_payload>) {
+		if (!now_resyncing && state != client_state_type::RECEIVING_INITIAL_SNAPSHOT) {
 			LOG("The server has sent initial state early (state: %x). Disconnecting.", state);
 			log_malicious_server();
 			return abort_v;
@@ -176,9 +176,9 @@ message_handler_result client_setup::handle_server_payload(
 				read_payload(
 					buffers,
 
-					initial_signi,
+					clean_round_state,
 
-					initial_payload {
+					initial_snapshot_payload {
 						signi,
 						current_mode,
 						read_client_id,

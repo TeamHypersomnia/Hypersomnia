@@ -29,8 +29,8 @@ class basic_arena_handle {
 
 				ensure(vars != nullptr);
 
-				if constexpr(M::needs_initial_signi) {
-					const auto in = I { *vars, self.initial_signi, self.advanced_cosm };
+				if constexpr(M::needs_clean_round_state) {
+					const auto in = I { *vars, self.clean_round_state, self.advanced_cosm };
 
 					return callback(typed_mode, in);
 				}
@@ -64,7 +64,7 @@ public:
 	maybe_const_ref_t<C, intercosm> scene;
 	maybe_const_ref_t<C, cosmos> advanced_cosm;
 	maybe_const_ref_t<C, predefined_rulesets> rulesets;
-	const cosmos_solvable_significant& initial_signi;
+	const cosmos_solvable_significant& clean_round_state;
 
 	template <class T>
 	void transfer_all_solvables(T& from) {
@@ -135,7 +135,7 @@ public:
 
 	void load_from(
 		const arena_paths& paths,
-		cosmos_solvable_significant& target_initial_signi
+		cosmos_solvable_significant& target_clean_round_state
 	) const {
 		load_arena_from(
 			paths,
@@ -143,13 +143,13 @@ public:
 			rulesets
 		);
 
-		target_initial_signi = advanced_cosm.get_solvable().significant;
+		target_clean_round_state = advanced_cosm.get_solvable().significant;
 	}
 
 	template <class S>
 	void make_default(
 		S& lua,
-		cosmos_solvable_significant& target_initial_signi
+		cosmos_solvable_significant& target_clean_round_state
 	) const {
 		scene.clear();
 
@@ -188,7 +188,7 @@ public:
 		rulesets.meta.server_default = id;
 		rulesets.meta.playtest_default = id;
 
-		target_initial_signi = advanced_cosm.get_solvable().significant;
+		target_clean_round_state = advanced_cosm.get_solvable().significant;
 	}
 
 	template <class... Args>
