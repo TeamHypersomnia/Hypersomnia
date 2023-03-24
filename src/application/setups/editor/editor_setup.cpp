@@ -510,7 +510,7 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 
 void editor_setup::on_window_activate() {
 	rebuild_filesystem();
-	rebuild_scene();
+	rebuild_arena();
 }
 
 void editor_setup::rebuild_filesystem() {
@@ -942,7 +942,7 @@ void editor_setup::undo() {
 		gui.filesystem.clear_drag_drop();
 
 		if (should_rebuild) {
-			rebuild_scene();
+			rebuild_arena();
 		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
@@ -982,7 +982,7 @@ void editor_setup::redo() {
 		*/
 
 		if (should_rebuild) {
-			rebuild_scene();
+			rebuild_arena();
 		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
@@ -2233,7 +2233,7 @@ void editor_setup::start_playtesting() {
 
 void editor_setup::stop_playtesting() {
 	viewed_character_id.unset();
-	rebuild_scene();
+	rebuild_arena();
 
 	/* Would interrupt the sounds which would be unpleasant to the ear */
 	//scene.world.request_resample();

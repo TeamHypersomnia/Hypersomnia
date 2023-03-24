@@ -13,6 +13,7 @@ summary: Just a hidden scratchpad.
 		- No raycasts needed at all - this will be render-bound which is good
 	- We could easily make ones that expand to fill the space like in CS 2
 		- We can incrementally spawn squares that expand and scan around
+			- These could even be sensors
 		- Actually a BFS
 			- terminates recursion after the first static obstacle is detected, but still considers the colliding square node
 	- Interaction will be harder

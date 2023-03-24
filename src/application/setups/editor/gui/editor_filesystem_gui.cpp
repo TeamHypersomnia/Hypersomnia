@@ -122,7 +122,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					in.setup.undo_quiet();
 					in.setup.undo_quiet();
 
-					in.setup.rebuild_scene();
+					in.setup.rebuild_arena();
 					previewed_created_node.unset();
 				}
 			}

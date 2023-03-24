@@ -451,7 +451,7 @@ public:
 
 	bool handle_doubleclick_in_layers_gui = false;
 
-	void rebuild_scene();
+	void rebuild_arena();
 
 	const auto& get_paths() const {
 		return paths;

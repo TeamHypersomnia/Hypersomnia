@@ -10,7 +10,7 @@
 #include "application/arena/arena_handle.h"
 #include "application/arena/build_arena_from_editor_project.hpp"
 
-void editor_setup::rebuild_scene() {
+void editor_setup::rebuild_arena() {
 	::build_arena_from_editor_project(
 		get_arena_handle(),
 		project,

@@ -329,7 +329,7 @@ bool editor_node_mover::do_mousemotion(const input_type in, vec2 world_cursor_po
 bool editor_node_mover::do_left_press(const input_type in) {
 	if (active) {
 		active = false;
-		in.setup.rebuild_scene();
+		in.setup.rebuild_arena();
 		return true;
 	}
 

@@ -14,7 +14,7 @@ const T& editor_setup::post_new_command(T&& command) {
 	const T& result = history.execute_new(std::forward<T>(command), make_command_input(true));
 
 	if constexpr(!skip_scene_rebuild_v<T>) {
-		rebuild_scene();
+		rebuild_arena();
 	}
 
 	if constexpr(std::is_base_of_v<allocating_command<editor_node_pool_id>, T>) {
@@ -37,7 +37,7 @@ const T& editor_setup::rewrite_last_command(T&& command) {
 	history.undo(make_command_input(true));
 	const T& result = history.execute_new(std::forward<T>(command), make_command_input(true));
 
-	rebuild_scene(); 
+	rebuild_arena(); 
 
 	return result;
 }

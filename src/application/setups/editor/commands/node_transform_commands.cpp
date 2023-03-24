@@ -40,7 +40,7 @@ static void reselect(T& entities, editor_setup& setup, current_selections_type& 
 static void read_back_to_nodes(editor_setup& setup) {
 	auto& cosm = setup.get_viewed_cosmos();
 
-	bool rebuild_scene = false;
+	bool rebuild_arena = false;
 
 	setup.for_each_inspected_entity(
 		[&](const entity_id id) {
@@ -104,15 +104,15 @@ static void read_back_to_nodes(editor_setup& setup) {
 					read_back_to(node, node_id);
 
 					if constexpr(std::is_same_v<N, editor_prefab_node>) {
-						rebuild_scene = true;
+						rebuild_arena = true;
 					}
 				}
 			);
 		}
 	);
 
-	if (rebuild_scene) {
-		setup.rebuild_scene();
+	if (rebuild_arena) {
+		setup.rebuild_arena();
 	}
 }
 
