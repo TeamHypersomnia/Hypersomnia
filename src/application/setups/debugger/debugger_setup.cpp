@@ -79,7 +79,7 @@ entity_id debugger_setup::get_viewed_character_id() const {
 		const auto& f = folder();
 
 		if (is_gameplay_on()) {
-			return arena_base::get_viewed_character_id();
+			return arena_gui_base::get_viewed_character_id();
 		}
 
 		return f.get_controlled_character_id();
@@ -734,7 +734,7 @@ custom_imgui_result debugger_setup::perform_custom_imgui(const perform_custom_im
 		}
 
 		if (is_gameplay_on()) {
-			arena_base::perform_custom_imgui(in);
+			arena_gui_base::perform_custom_imgui(in);
 		}
 	}
 
@@ -1249,7 +1249,7 @@ bool debugger_setup::handle_input_before_game(
 	}
 
 	if (is_gameplay_on()) {
-		if (arena_base::handle_input_before_game(in)) {
+		if (arena_gui_base::handle_input_before_game(in)) {
 			return true;
 		}
 	}
@@ -2044,7 +2044,7 @@ void debugger_setup::draw_recent_message(const draw_setup_gui_input& in) {
 
 void debugger_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
 	if (is_gameplay_on()) {
-		arena_base::draw_custom_gui(in);
+		arena_gui_base::draw_custom_gui(in);
 	}
 }
 
@@ -2159,7 +2159,7 @@ debugger_arena_handle<true> debugger_setup::get_arena_handle() const {
 
 bool debugger_setup::requires_cursor() const {
 	if (is_gameplay_on()) {
-		return arena_base::requires_cursor();
+		return arena_gui_base::requires_cursor();
 	}
 
 	return true;

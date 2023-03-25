@@ -239,7 +239,7 @@ bool editor_setup::handle_input_before_game(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
-	if (arena_base::handle_input_before_game(in)) {
+	if (arena_gui_base::handle_input_before_game(in)) {
 		return true;
 	}
 
@@ -1387,7 +1387,7 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 }
 
 void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) { 
-	arena_base::draw_custom_gui(in);
+	arena_gui_base::draw_custom_gui(in);
 
 	if (is_playtesting()) {
 		return;

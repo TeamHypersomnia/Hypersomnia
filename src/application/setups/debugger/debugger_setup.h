@@ -77,8 +77,8 @@ class images_in_atlas_map;
 struct intercosm;
 
 class debugger_setup : public arena_gui_mixin<debugger_setup> {
-	using arena_base = arena_gui_mixin<debugger_setup>;
-	friend arena_base;
+	using arena_gui_base = arena_gui_mixin<debugger_setup>;
+	friend arena_gui_base;
 
 	friend augs::introspection_access;
 

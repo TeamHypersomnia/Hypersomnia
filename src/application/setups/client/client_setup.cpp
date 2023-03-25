@@ -716,7 +716,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	if (is_gameplay_on) {
 		augs::network::enable_detailed_logs(false);
 
-		arena_base::perform_custom_imgui(in);
+		arena_gui_base::perform_custom_imgui(in);
 	}
 	else {
 		center_next_window(vec2::square(0.7f), ImGuiCond_FirstUseEver);
@@ -928,7 +928,7 @@ augs::path_type client_setup::get_unofficial_content_dir() const {
 bool client_setup::handle_input_before_game(
 	const handle_input_before_game_input in
 ) {
-	if (arena_base::handle_input_before_game(in)) {
+	if (arena_gui_base::handle_input_before_game(in)) {
 		return true;
 	}
 
@@ -985,7 +985,7 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		get_current_time()
 	);
 
-	arena_base::draw_custom_gui(in);
+	arena_gui_base::draw_custom_gui(in);
 }
 
 std::optional<arena_player_metas> client_setup::get_new_player_metas() {
@@ -1113,7 +1113,7 @@ void client_setup::handle_new_session(const add_player_input& in) {
 }
 
 bool client_setup::requires_cursor() const {
-	return arena_base::requires_cursor() || client_gui.requires_cursor() || demo_player.gui.requires_cursor();
+	return arena_gui_base::requires_cursor() || client_gui.requires_cursor() || demo_player.gui.requires_cursor();
 }
 
 void client_setup::ensure_handler() {

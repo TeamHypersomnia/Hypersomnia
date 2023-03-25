@@ -1896,7 +1896,7 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 		}
 	}
 
-	return arena_base::perform_custom_imgui(in);
+	return arena_gui_base::perform_custom_imgui(in);
 }
 
 setup_escape_result server_setup::escape() {
@@ -1908,7 +1908,7 @@ setup_escape_result server_setup::escape() {
 		return setup_escape_result::JUST_FETCH;
 	}
 
-	return arena_base::escape();
+	return arena_gui_base::escape();
 }
 
 bool server_setup::is_gameplay_on() const {
@@ -2239,7 +2239,7 @@ bool server_setup::handle_input_before_game(
 ) {
 	ensure(is_integrated());
 
-	if (arena_base::handle_input_before_game(in)) {
+	if (arena_gui_base::handle_input_before_game(in)) {
 		return true;
 	}
 
@@ -2263,7 +2263,7 @@ void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		get_current_time()
 	);
 
-	arena_base::draw_custom_gui(in);
+	arena_gui_base::draw_custom_gui(in);
 }
 
 bool server_setup::is_integrated() const {
@@ -2306,7 +2306,7 @@ void server_setup::log_performance() {
 }
 
 bool server_setup::requires_cursor() const {
-	return arena_base::requires_cursor() || integrated_client_gui.requires_cursor();
+	return arena_gui_base::requires_cursor() || integrated_client_gui.requires_cursor();
 }
 
 bool server_setup::player_added_to_mode(const mode_player_id mode_id) const {

@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- arena_base -> arena_gui_base
+- arena_gui_base -> arena_gui_base
 
 - Perhaps we should think of separating the rebuilders now
 	- Rebuild can be a function of arena handle

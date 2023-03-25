@@ -241,7 +241,7 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	(void)in;
 
-	arena_base::perform_custom_imgui(in);
+	arena_gui_base::perform_custom_imgui(in);
 
 	if (gui.request_toggle_sounds_preview) {
 		gui.request_toggle_sounds_preview = false;

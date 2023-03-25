@@ -59,8 +59,8 @@ class client_setup :
 	public default_setup_settings,
 	public arena_gui_mixin<client_setup>
 {
-	using arena_base = arena_gui_mixin<client_setup>;
-	friend arena_base;
+	using arena_gui_base = arena_gui_mixin<client_setup>;
+	friend arena_gui_base;
 	friend client_adapter;
 
 	/* This is loaded from the arena folder */

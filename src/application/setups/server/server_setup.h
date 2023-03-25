@@ -59,7 +59,7 @@ class server_setup :
 	public default_setup_settings,
 	public arena_gui_mixin<server_setup> /* For the admin player */
 {
-	using arena_base = arena_gui_mixin<server_setup>;
+	using arena_gui_base = arena_gui_mixin<server_setup>;
 
 	/* This is loaded from the arena folder */
 	intercosm scene;

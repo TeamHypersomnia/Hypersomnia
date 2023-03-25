@@ -101,7 +101,7 @@ template <bool C>
 using editor_arena_handle = basic_arena_handle<C, mode_and_rules>;
 
 class editor_setup : public default_setup_settings, public arena_gui_mixin<editor_setup> {
-	using arena_base = arena_gui_mixin<editor_setup>;
+	using arena_gui_base = arena_gui_mixin<editor_setup>;
 
 	test_mode_ruleset default_test_ruleset;
 	bomb_defusal_ruleset default_bomb_ruleset;
