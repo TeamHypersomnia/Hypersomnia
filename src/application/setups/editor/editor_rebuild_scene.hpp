@@ -17,9 +17,11 @@ void editor_setup::rebuild_arena() {
 		[&](const auto& path) { return resolve_project_path(path); },
 		official_resources,
 		built_official_content,
+		{ default_test_ruleset, default_bomb_ruleset },
 		std::addressof(scene_entity_to_node),
 		nullptr,
-		cosmos_common_significant_access()
+		cosmos_common_significant_access(),
+		true
 	);
 
 	inspected_to_entity_selector_state();

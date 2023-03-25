@@ -1,7 +1,7 @@
 #pragma once
 #include "game/modes/all_mode_includes.h"
 
-using raw_ruleset_id = unsigned;
+using raw_ruleset_id = uint32_t;
 
 struct ruleset_id {
 	// GEN INTROSPECTOR struct ruleset_id

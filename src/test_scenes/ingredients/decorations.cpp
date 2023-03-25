@@ -468,6 +468,7 @@ namespace test_flavours {
 			sound_def.effect.id = to_sound_id(test_scene_sound_id::ARABESQUE);
 			sound_def.effect.modifier.doppler_factor = 0;
 			sound_def.effect.modifier.repetitions = -1;
+			sound_def.effect.modifier.always_direct_listener = true;
 
 
 			meta.set(sound_def);

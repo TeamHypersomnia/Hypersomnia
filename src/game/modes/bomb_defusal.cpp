@@ -159,6 +159,10 @@ bomb_defusal::participating_factions bomb_defusal::calc_participating_factions(c
 		}
 	});
 
+	if (!output.valid()) {
+		output = participating_factions::fallback();
+	}
+
 	return output;
 }
 
@@ -700,8 +704,8 @@ void bomb_defusal::release_triggers_of_weapons_of_players(const input_type in) {
 }
 
 void bomb_defusal::spawn_bomb_near_players(const input_type in) {
-	vec2 avg_pos;
-	vec2 avg_dir;
+	auto avg_pos = vec2::zero;
+	auto avg_dir = vec2::zero;
 
 	std::size_t n = 0;
 
@@ -717,8 +721,10 @@ void bomb_defusal::spawn_bomb_near_players(const input_type in) {
 		++n;
 	});
 
-	avg_pos /= n;
-	avg_dir /= n;
+	if (n != 0) {
+		avg_pos /= n;
+		avg_dir /= n;
+	}
 
 	const auto new_bomb_entity = spawn_bomb(in);
 

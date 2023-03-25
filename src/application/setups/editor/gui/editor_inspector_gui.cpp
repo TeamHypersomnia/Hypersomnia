@@ -156,8 +156,13 @@ edit_property(result, label, special_handler, insp.MEMBER);
 	MULTIPROPERTY("Firearm", field.firearm);\
 	MULTIPROPERTY("Melee", field.melee);\
 	MULTIPROPERTY("Explosive", field.explosive);\
+	if (insp.field.explosive.is_set()) {\
+		auto ind = scoped_indent();\
+		MULTIPROPERTY("Count", field.num_explosives)\
+	}\
 \
 	MULTIPROPERTY("Backpack", field.backpack);\
+	MULTIPROPERTY("Electric armor", field.electric_armor);\
 	MULTIPROPERTY("Extra ammo pieces", field.extra_ammo_pieces);
 
 #define EQUIPMENT_PROPERTY(label, field) \
@@ -182,7 +187,8 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 
 #define THEME_PROPERTY(label, field) \
 	PROPERTY(label, field.id);\
-	if (insp.field.id.is_set()) {\
+	/* TODO: warmup_theme needs to be a sound_effect input for these to have any effect at all! */\
+	if (false && insp.field.id.is_set()) {\
 		auto indent = scoped_indent();\
 \
 		PROPERTY("Gain", field.gain);\
@@ -1090,7 +1096,7 @@ EDIT_FUNCTION(
 
 	if (insp.domain == editor_sprite_domain::PHYSICAL) {
 		MULTIPROPERTY("Cover ground neons", as_physical.cover_ground_neons);
-		MULTIPROPERTY("Illuminate as wall", as_physical.illuminate_as_wall);
+		MULTIPROPERTY("Illuminate like wall", as_physical.illuminate_like_wall);
 
 		ImGui::Separator();
 		text_color("Physics", yellow);
@@ -1145,7 +1151,7 @@ EDIT_FUNCTION(
 	}
 	else {
 		MULTIPROPERTY("Cover ground neons", as_nonphysical.cover_ground_neons);
-		MULTIPROPERTY("Illuminate as wall", as_nonphysical.illuminate_as_wall);
+		MULTIPROPERTY("Illuminate like wall", as_nonphysical.illuminate_like_wall);
 
 		ImGui::Separator();
 

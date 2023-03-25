@@ -304,7 +304,7 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 
 		rs.factions[faction_type::RESISTANCE].initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		rs.factions[faction_type::RESISTANCE].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
+		rs.factions[faction_type::RESISTANCE].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
 		rs.factions[faction_type::RESISTANCE].initial_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
 		rs.factions[faction_type::RESISTANCE].initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 		rs.factions[faction_type::RESISTANCE].initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);

@@ -6,6 +6,9 @@
 #include "application/setups/editor/editor_rebuild_resource.hpp"
 #include "application/setups/editor/editor_rebuild_game_mode.hpp"
 
+#include "game/detail/inventory/requested_equipment.h"
+#include "test_scenes/test_scene_flavours.h"
+
 using scene_entity_to_node_map = per_entity_type_array<std::vector<editor_node_id>>;
 
 template <class A, class Resolve>
@@ -15,9 +18,11 @@ void build_arena_from_editor_project(
 	Resolve&& resolve_project_path,
 	const editor_resource_pools& official_resources,
 	const intercosm& built_official_content,
+	const default_rulesets_tuple& built_default_modes,
 	scene_entity_to_node_map* scene_entity_to_node,
 	cosmos_solvable_significant* target_clean_round_state,
-	cosmos_common_significant_access mutable_access
+	cosmos_common_significant_access mutable_access,
+	const bool for_playtesting = false
 ) {
 	auto find_resource = project.make_find_resource_lambda(official_resources);
 
@@ -29,6 +34,55 @@ void build_arena_from_editor_project(
 			s.clear();
 		}
 	}
+
+	auto rebuild_game_modes = [&]() {
+		const auto& pool = project.resources.get_pool_for<editor_game_mode_resource>();
+
+		auto& rulesets = arena_handle.rulesets;
+
+		rulesets = {};
+
+		auto id_counter = raw_ruleset_id(0);
+
+		using R = editor_game_mode_resource;
+
+		pool.for_each_id_and_object(
+			[&](const auto& raw_id, const R& game_mode) {
+				const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, false);
+
+				const bool pass_playtesting_overrides = for_playtesting;
+				const editor_playtesting_settings* overrides = nullptr;
+
+				if (pass_playtesting_overrides) {
+					overrides = std::addressof(project.playtesting);
+				}
+
+				const auto rules_id = ::setup_ruleset_from_editor_mode(
+					game_mode,
+					find_resource,
+					built_default_modes,
+					id_counter,
+					rulesets,
+					project.settings,
+					overrides
+				);
+
+				if (typed_id == project.settings.default_server_mode) {
+					rulesets.meta.server_default = rules_id;
+				}
+
+				if (typed_id == project.playtesting.mode) {
+					rulesets.meta.playtest_default = rules_id;
+				}
+
+				++id_counter;
+			}
+		);
+
+		arena_handle.current_mode.choose(rulesets.meta.playtest_default);
+	};
+
+	rebuild_game_modes();
 
 	cosmos_common_significant& common = scene.world.get_common_significant(mutable_access);
 	common.light.ambient_color = project.settings.ambient_light_color;

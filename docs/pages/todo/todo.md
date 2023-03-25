@@ -80,6 +80,19 @@ summary: Just a hidden scratchpad.
 
 ## Editor final MVP (post MVP) once we can ditch old maps
 
+- wtf, warmup_theme shouldn't be a flavour id but a sound effect input
+	- It actually needs to be a flavor because it's synchronized through the network so it needs to be an entity
+		- it can't be a sound effect
+	- However later we'll just allow sound decorations to be entities, pointless to have invariants here (?)
+		- Remember it's sent through the network in that case, although it's just a few bytes
+	- We'll need to entitize at least gain and pitch to be able to honor these modifiers in sound node and theme properties
+		- Well, fortunately we'll easily be able to do this
+
+- search for TODO in editor generally
+
+- Markers should have letters per-entity just like factions
+	- we can only set them per-invariant right now, there are bombsite_dummy_b etc, this is bad obv
+
 - Renames for weapons!!! We should really decide once and for all about some names so that they're future-proof
 	- Best to avoid two-word names except in rare cases
 	- We can use some polish names because they'll be sounding interesting to foreign players

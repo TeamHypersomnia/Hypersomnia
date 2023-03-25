@@ -50,6 +50,10 @@
 #include "application/arena/mode_and_rules.h"
 #include "application/predefined_rulesets.h"
 
+#include "application/arena/arena_handle.h"
+#include "view/mode_gui/arena/arena_gui_mixin.h"
+#include "application/setups/client/client_vars.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -96,8 +100,9 @@ class basic_arena_handle;
 template <bool C>
 using editor_arena_handle = basic_arena_handle<C, mode_and_rules>;
 
-class editor_setup : public default_setup_settings {
-	test_mode mode;
+class editor_setup : public default_setup_settings, public arena_gui_mixin<editor_setup> {
+	using arena_base = arena_gui_mixin<editor_setup>;
+
 	test_mode_ruleset default_test_ruleset;
 	bomb_defusal_ruleset default_bomb_ruleset;
 	intercosm built_official_content;
@@ -111,8 +116,9 @@ class editor_setup : public default_setup_settings {
 
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	entity_id viewed_character_id;
 	mode_player_id local_player_id;
+
+	bool playtesting = false;
 
 	per_entity_type_array<std::vector<editor_node_id>> scene_entity_to_node;
 
@@ -138,6 +144,7 @@ class editor_setup : public default_setup_settings {
 
 	const editor_project_paths paths;
 	editor_settings settings;
+	client_vars simulated_client;
 	faction_view_settings faction_view;
 
 	bool rebuild_ad_hoc_atlas = true;
@@ -547,7 +554,6 @@ public:
 	}
 
 	double get_interpolation_ratio() const;
-	entity_id get_viewed_character_id() const;
 
 	auto get_controlled_character_id() const {
 		return get_viewed_character_id();
@@ -591,11 +597,15 @@ public:
 					in.make_accumulator_input()
 				);
 
-				mode.advance(
-					{ default_test_ruleset, scene.world },
-					total,
-					callbacks,
-					solve_settings()
+				get_arena_handle().on_mode_with_input(
+					[&](auto& mode, const auto& input) {
+						mode.advance(
+							input,
+							total,
+							callbacks,
+							solve_settings()
+						);
+					}
 				);
 			}
 			else {
@@ -624,7 +634,6 @@ public:
 	void draw_custom_gui(const draw_setup_gui_input&);
 
 	void ensure_handler() {}
-	bool requires_cursor() const { return false; }
 
 private:
 	entropy_accumulator zero_entropy;
@@ -647,10 +656,6 @@ public:
 
 	template <class F>
 	void on_mode_with_input(F&&) const {}
-
-	auto get_game_gui_subject_id() const {
-		return get_viewed_character_id();
-	}
 
 	std::nullopt_t get_new_player_metas() {
 		return std::nullopt;
@@ -686,6 +691,14 @@ public:
 
 	void start_playtesting();
 	bool is_playtesting() const;
+
+	/* Arena interface */
+	bool is_gameplay_on() const { return is_playtesting(); }
+
+	auto get_local_player_id() const {
+		return local_player_id;
+	}
+
 	void stop_playtesting();
 
 	bool can_undo() const;

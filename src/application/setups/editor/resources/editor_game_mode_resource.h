@@ -14,7 +14,10 @@ struct editor_requested_equipment {
 	editor_typed_resource_id<editor_explosive_resource> explosive;
 
 	bool backpack = false;
+	bool electric_armor = false;
 	uint32_t extra_ammo_pieces = 2;
+
+	uint32_t num_explosives = 1;
 	// END GEN INTROSPECTOR
 
 	bool is_set() const {

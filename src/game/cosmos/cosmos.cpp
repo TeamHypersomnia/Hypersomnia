@@ -151,7 +151,10 @@ void cosmos::set_fixed_delta(const augs::delta& dt) {
 	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi){ 
 		using S = decltype(current_signi.clk.now.step);
 
-		ensure_eq(static_cast<S>(0), current_signi.clk.now.step);
+		/* Arenas from editor need to perform a single step after generation */
+		const bool is_first_step = current_signi.clk.now.step <= static_cast<S>(1);
+		ensure(is_first_step);
+
 		current_signi.clk.dt = dt;
 		return changer_callback_result::DONT_REFRESH; 
 	});

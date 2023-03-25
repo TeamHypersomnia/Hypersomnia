@@ -255,6 +255,14 @@ public:
 		faction_type bombing = faction_type::SPECTATOR;
 		faction_type defusing = faction_type::SPECTATOR;
 
+		bool valid() const {
+			return bombing != faction_type::SPECTATOR && defusing != faction_type::SPECTATOR;
+		}
+
+		static auto fallback() {
+			return participating_factions { faction_type::RESISTANCE, faction_type::METROPOLIS };
+		}
+
 		template <class F>
 		void for_each(F callback) const {
 			callback(bombing);
@@ -438,6 +446,7 @@ private:
 
 	friend augs::introspection_access;
 	friend debugger_property_accessors;
+	friend class editor_setup;
 
 	void on_faction_changed_for(const_input, faction_type previous_faction, const mode_player_id&);
 	void assign_free_color_to_best_uncolored(const_input in, faction_type previous_faction, rgba free_color);

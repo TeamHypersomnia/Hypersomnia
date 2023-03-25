@@ -239,6 +239,10 @@ bool editor_setup::handle_input_before_game(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
+	if (arena_base::handle_input_before_game(in)) {
+		return true;
+	}
+
 	if (is_playtesting()) {
 		return false;
 	}
@@ -1383,6 +1387,8 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 }
 
 void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) { 
+	arena_base::draw_custom_gui(in);
+
 	if (is_playtesting()) {
 		return;
 	}
@@ -1552,6 +1558,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 void editor_setup::apply(const config_lua_table& cfg) {
 	settings = cfg.editor;
 	faction_view = cfg.faction_view;
+	simulated_client = cfg.client;
 }
 
 void editor_setup::unhover() {
@@ -2069,10 +2076,6 @@ double editor_setup::get_interpolation_ratio() const {
 	return global_time_seconds / get_inv_tickrate();
 }
 
-entity_id editor_setup::get_viewed_character_id() const {
-	return viewed_character_id;
-}
-
 std::optional<editor_setup::parent_layer_info> editor_setup::find_best_layer_for_new_node() const {
 	return std::visit(
 		[&]<typename T>(const T& inspected_id) -> std::optional<editor_setup::parent_layer_info> {
@@ -2202,37 +2205,47 @@ void editor_setup::start_playtesting() {
 		return;
 	}
 
+	arena_gui.choose_team.show = false;
+
+	playtesting = true;
+
 	clean_round_state = scene.world.get_solvable().significant;
 
 	total_collected.clear();
 
-	mode = test_mode();
 	auto& cosm = scene.world;
-	local_player_id = mode.add_player({ default_test_ruleset, cosm }, faction_type::METROPOLIS);
 
-	const auto new_character = cosm[mode.lookup(local_player_id)];
+	get_arena_handle().on_mode_with_input([&]<typename M>(M& mode, const auto& input) {
+		if constexpr(std::is_same_v<M, test_mode>) {
+			local_player_id = mode.add_player(input, project.playtesting.starting_faction);
 
-	const auto spawn_transform = get_camera_eye().transform;
+			const auto new_character = cosm[mode.lookup(local_player_id)];
 
-	const auto mouse_dir = (get_world_cursor_pos() - spawn_transform.pos).normalize();
-	(void)mouse_dir;
+			const auto spawn_transform = get_camera_eye().transform;
 
-	new_character.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
-		typed_handle.set_logic_transform(spawn_transform);
-		::snap_interpolated_to(typed_handle, spawn_transform);
+			const auto mouse_dir = (get_world_cursor_pos() - spawn_transform.pos).normalize();
+			(void)mouse_dir;
 
-		if (const auto crosshair = typed_handle.find_crosshair()) {
-			crosshair->base_offset = vec2::zero;
+			new_character.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
+				typed_handle.set_logic_transform(spawn_transform);
+				::snap_interpolated_to(typed_handle, spawn_transform);
+
+				if (const auto crosshair = typed_handle.find_crosshair()) {
+					crosshair->base_offset = vec2::zero;
+				}
+			});
+		}
+		else {
+			local_player_id = mode.add_player(input, simulated_client.nickname);
+			mode.choose_faction(input, local_player_id, project.playtesting.starting_faction);
 		}
 	});
 
 	cosm.request_resample();
-
-	viewed_character_id = new_character.get_id();
 }
 
 void editor_setup::stop_playtesting() {
-	viewed_character_id.unset();
+	playtesting = false;
 	rebuild_arena();
 
 	/* Would interrupt the sounds which would be unpleasant to the ear */
@@ -2240,7 +2253,7 @@ void editor_setup::stop_playtesting() {
 }
 
 bool editor_setup::is_playtesting() const {
-	return viewed_character_id.is_set();
+	return playtesting;
 }
 
 void editor_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
