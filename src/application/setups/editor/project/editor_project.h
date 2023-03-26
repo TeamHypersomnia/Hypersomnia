@@ -97,8 +97,8 @@ struct editor_project {
    
 private:
 	template <class S, class Officials, class F>
-	static decltype(auto) on_resource_impl(S& self, Officials&, const editor_resource_id& id, F&& callback);
+	static decltype(auto) on_resource_impl(S& self, Officials& officials, const editor_resource_id& id, F&& callback);
 
 	template <class S, class Officials, class T>
-	static decltype(auto) find_resource_impl(S& self, Officials&, const editor_typed_resource_id<T>& id);
+	static decltype(auto) find_resource_impl(S& self, Officials& officials, const editor_typed_resource_id<T>& id);
 };

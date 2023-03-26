@@ -1,8 +1,8 @@
 #pragma once
 #include "application/setups/editor/project/editor_project.h"
 
-template <class S, class O, class F>
-decltype(auto) editor_project::on_resource_impl(S& self, O& officials, const editor_resource_id& id, F&& callback) {
+template <class S, class Officials, class F>
+decltype(auto) editor_project::on_resource_impl(S& self, Officials& officials, const editor_resource_id& id, F&& callback) {
 	if (id.is_official) {
 		return officials.dispatch_on(id, std::forward<F>(callback));
 	}
@@ -10,8 +10,8 @@ decltype(auto) editor_project::on_resource_impl(S& self, O& officials, const edi
 	return self.resources.dispatch_on(id, std::forward<F>(callback));
 }
 
-template <class S, class O, class T>
-decltype(auto) editor_project::find_resource_impl(S& self, O& officials, const editor_typed_resource_id<T>& id) {
+template <class S, class Officials, class T>
+decltype(auto) editor_project::find_resource_impl(S& self, Officials& officials, const editor_typed_resource_id<T>& id) {
 	if (id.is_official) {
 		return officials.find_typed(id);
 	}
