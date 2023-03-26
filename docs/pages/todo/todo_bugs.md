@@ -78,3 +78,6 @@ summary: Just a hidden scratchpad.
 	- Maybe httplib is not actually thread safe
 		- Just in case I'd update it and merge the two webhook handlers into a single lambda
 
+- Enabling HRTF in debug mode crashes the game but there's no core or segfault or anything
+	- it just quits
+	- Fixed by updating OpenAL

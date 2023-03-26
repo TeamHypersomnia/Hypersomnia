@@ -10,7 +10,7 @@
 struct editor_light_node_editable {
 	// GEN INTROSPECTOR struct editor_light_node_editable
 	vec2 pos;
-	rgba colorize = rgba(255, 255, 255, 160);
+	rgba colorize = white;
 
 	editor_light_falloff falloff;
 	augs::maybe<editor_light_falloff> wall_falloff;

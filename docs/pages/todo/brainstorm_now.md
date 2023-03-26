@@ -6,7 +6,53 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- arena_gui_base -> arena_gui_base
+- add chosen playtesting mode to toolbar
+	- vertical can have only icon and arrow
+	- Before or after Playtest button?
+		- id say put the combo BEFORE both playtest button and clapboard
+		- that's in accordance with VS layout
+
+- preliminary JSON serialization considerations
+	- Layers can have node names:
+
+"layers": [
+	{
+		"name": "New layer 1",
+		"visible": true,
+		"nodes": [
+			"aquarium",
+			"aquarium (1)",
+			"cyan_floor"
+		]
+	}
+]
+	- And nodes can be right below it with complete definitions:
+"nodes": [
+	{
+		"name": "aquarium",
+		"type": "[aquarium]",
+		"pos": [ 23.0, 41.0 ]
+	},
+	{
+		"name": "aquarium (1)",
+		"type": "[aquarium]",
+		"pos": [ 3.0, 410.0 ]
+	},
+	{
+		"name": "cyan_floor",
+		"type": "cyan_floor"
+		"pos": [ 33.0, 410.0 ]
+	}
+]
+- When considering what order to serialize nodes in, we want:
+	- Most important: infrequent changes in the version control
+		- E.g. don't move the entire node in the file when we just reorder it in hierarchy
+	- Pretty much nothing else
+	- Alphabetical order isn't that important
+- Therefore, it's best to serialize nodes in chronological order.
+	- Why?
+		- By far the least changing metric which will make it version-control friendly
+		- Bonus points for being able to approximately visualize how the map was laid out step by step
 
 - Perhaps we should think of separating the rebuilders now
 	- Rebuild can be a function of arena handle
