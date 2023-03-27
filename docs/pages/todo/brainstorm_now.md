@@ -6,12 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- add chosen playtesting mode to toolbar
-	- vertical can have only icon and arrow
-	- Before or after Playtest button?
-		- id say put the combo BEFORE both playtest button and clapboard
-		- that's in accordance with VS layout
-
 - preliminary JSON serialization considerations
 	- Layers can have node names:
 

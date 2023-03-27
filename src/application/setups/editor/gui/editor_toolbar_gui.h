@@ -11,6 +11,7 @@ namespace augs {
 struct editor_toolbar_input {
 	editor_setup& setup;
 	augs::window& window;
+	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
 };
 

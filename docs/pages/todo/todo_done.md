@@ -5140,3 +5140,10 @@ Advantages:
 
 - arena_gui_base -> arena_gui_base
 
+- add chosen playtesting mode to toolbar
+	- vertical can have only icon and arrow
+	- Before or after Playtest button?
+		- id say put the combo BEFORE both playtest button and clapboard
+		- that's in accordance with VS layout
+	- Well, looks better AFTER the buttons in the end
+

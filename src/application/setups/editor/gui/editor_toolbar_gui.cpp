@@ -8,6 +8,7 @@
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/gui/widgets/icon_button.h"
+#include "application/setups/editor/gui/id_widget_handler.h"
 
 #include "3rdparty/imgui/imgui_internal.h"
 #include "augs/window_framework/window.h"
@@ -390,9 +391,51 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 			in.setup.start_playtesting();
 		}
 
-		if (do_icon(ID::EDITOR_TOOL_HOST_SERVER, "Playtest online (Ctrl+P)")) {
+		if (do_icon(ID::EDITOR_TOOL_HOST_SERVER, "Playtest online (Ctrl+P)\n\nThis playtesting session will be visible in the server browser.\nYour friends will be able to join!")) {
 
 		}
+
+		{
+			auto id_handler = id_widget_handler { in.setup, editor_icon_info_in(in), false };
+
+			auto mode = in.setup.get_project().playtesting.mode;
+
+			std::string result;
+
+			if (const auto res = in.setup.find_resource(mode)) {
+				const auto name = res->get_display_name() + "  ";
+
+				if (toolbar_axis == ImGuiAxis_Y) {
+					auto pos = ImGui::GetCursorPos();
+					pos.x -= ImGui::GetStyle().WindowPadding.x/2;
+					ImGui::SetCursorPos(pos);
+				}
+
+				ImGui::SetNextItemWidth(ImGui::CalcTextSize(name.c_str()).x + ImGui::GetFrameHeight());
+
+				if (id_handler.handle(result, "##ModeChooserWidget", mode, false)) {
+					auto new_playtesting = in.setup.get_project().playtesting;
+					new_playtesting.mode = mode;
+
+					edit_project_settings_command cmd;
+					cmd.do_inspector_at_all = false;
+					cmd.after = std::move(new_playtesting);
+					cmd.built_description = typesafe_sprintf("Set tested mode to %x", in.setup.get_name(in.setup.get_project().playtesting.mode));
+
+					in.setup.post_new_command(std::move(cmd));
+				}
+
+				
+				if (ImGui::IsItemHovered()) {
+					text_tooltip("Mode to launch after pressing 'Playtest' buttons.\nApplies to both offline and online playtesting.\n\nTo choose the default mode launched by an actual server,\ngo to project settings (CTRL+U).");
+
+				}
+				if (toolbar_axis == ImGuiAxis_X) {
+					ImGui::SameLine();
+				}
+			}
+		}
+
 	};
 
 	DockingToolbar(get_title().c_str(), &toolbar_axis, is_docked, icons_callback);

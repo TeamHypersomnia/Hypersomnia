@@ -19,6 +19,7 @@ struct edit_project_settings_command {
 	editable_type before;
 	editable_type after;
 	inspected_project_tab_type tab = inspected_project_tab_type::ARENA;
+	bool do_inspector_at_all = true;
 
 	std::string built_description;
 

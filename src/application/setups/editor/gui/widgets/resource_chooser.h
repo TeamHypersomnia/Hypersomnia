@@ -42,13 +42,14 @@ public:
 		const editor_icon_info_in icon_in,
 		const bool allow_none,
 		F on_choice,
-		const std::string none_label = "(None)"
+		const std::string none_label = "(None)",
+		const bool show_icon = true
 	) {
 		using namespace augs::imgui;
 
 		const auto displayed_str = current_source.empty() ? std::string("(Invalid)") : current_source;
 
-		{
+		if (show_icon) {
 			const auto before_pos = ImGui::GetCursorPos();
 			auto icon_result = setup.get_icon_for(current_source_id.operator editor_resource_id(), icon_in);
 

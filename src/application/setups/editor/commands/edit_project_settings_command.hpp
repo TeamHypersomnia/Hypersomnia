@@ -2,7 +2,7 @@
 #include "application/setups/editor/commands/edit_project_settings_command.h"
 
 void edit_project_settings_command::undo(editor_command_input in) {
-	const bool do_inspector = !in.skip_inspector;
+	const bool do_inspector = do_inspector_at_all && !in.skip_inspector;
 
 	std::visit([&]<typename T>(T& typed_before) {
 		auto& current = in.setup.project.template get<T>();
@@ -16,7 +16,7 @@ void edit_project_settings_command::undo(editor_command_input in) {
 }
 
 void edit_project_settings_command::redo(editor_command_input in) {
-	const bool do_inspector = !in.skip_inspector;
+	const bool do_inspector = do_inspector_at_all && !in.skip_inspector;
 
 	std::visit([&]<typename T>(T& typed_after) {
 		auto& current = in.setup.project.template get<T>();
