@@ -37,6 +37,7 @@ struct editor_sprite_resource_nonphysical {
 	// GEN INTROSPECTOR struct editor_sprite_resource_nonphysical
 	bool cover_ground_neons = false;
 	bool illuminate_like_wall = false;
+	bool full_illumination = false;
 
 	augs::maybe<editor_custom_footstep> custom_footstep;
 	// END GEN INTROSPECTOR
@@ -75,7 +76,6 @@ struct editor_sprite_resource_editable {
 	vec2i size = vec2i::zero;
 	bool stretch_when_resized = false;
 
-	bool foreground_glow = false;
 	augs::maybe<float> color_wave_speed = augs::maybe<float>(1.0f, false);
 	augs::maybe<float> rotate_continuously_degrees_per_sec = augs::maybe<float>(360.0f, false);
 

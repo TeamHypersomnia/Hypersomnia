@@ -315,7 +315,7 @@ void setup_scene_object_from_resource(
 					case editor_sprite_domain::BACKGROUND:
 						return render_layer::GROUND;
 					case editor_sprite_domain::FOREGROUND:
-						if (editable.foreground_glow) {
+						if (editable.as_nonphysical.full_illumination) {
 							return render_layer::FOREGROUND_GLOWS;
 						}
 

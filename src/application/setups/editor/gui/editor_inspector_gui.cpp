@@ -966,10 +966,6 @@ EDIT_FUNCTION(
 
 	MULTIPROPERTY("Stretch when resized", stretch_when_resized);
 
-	if (insp.domain == editor_sprite_domain::FOREGROUND) {
-		MULTIPROPERTY("Foreground glow", foreground_glow);
-	}
-
 	{
 		MULTIPROPERTY("##NeonMap", neon_map.is_enabled);
 
@@ -1152,6 +1148,10 @@ EDIT_FUNCTION(
 	else {
 		MULTIPROPERTY("Cover ground neons", as_nonphysical.cover_ground_neons);
 		MULTIPROPERTY("Illuminate like wall", as_nonphysical.illuminate_like_wall);
+
+		if (insp.domain == editor_sprite_domain::FOREGROUND) {
+			MULTIPROPERTY("Full illumination", as_nonphysical.full_illumination);
+		}
 
 		ImGui::Separator();
 

@@ -89,13 +89,13 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 	{
 		auto& awakening = create_sprite(official_sprites::AWAKENING);
 		awakening.domain = editor_sprite_domain::FOREGROUND;
-		awakening.foreground_glow = true;
+		awakening.full_illumination = true;
 	}
 
 	{
 		auto& welcome_to_metropolis = create_sprite(official_sprites::WELCOME_TO_METROPOLIS);
 		welcome_to_metropolis.domain = editor_sprite_domain::FOREGROUND;
-		welcome_to_metropolis.foreground_glow = true;
+		welcome_to_metropolis.full_illumination = true;
 	}
 
 	const auto glass_alpha = 60;
