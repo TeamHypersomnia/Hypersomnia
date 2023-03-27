@@ -35,7 +35,7 @@ struct editor_custom_footstep {
 
 struct editor_sprite_resource_nonphysical {
 	// GEN INTROSPECTOR struct editor_sprite_resource_nonphysical
-	bool cover_ground_neons = false;
+	bool cover_background_neons = false;
 	bool illuminate_like_wall = false;
 	bool full_illumination = false;
 
@@ -58,7 +58,7 @@ struct editor_sprite_resource_physical {
 
 	editor_typed_resource_id<editor_material_resource> material;
 
-	bool cover_ground_neons = true;
+	bool cover_background_neons = true;
 	bool illuminate_like_wall = true;
 
 	image_shape_type custom_shape;

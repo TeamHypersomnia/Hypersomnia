@@ -1091,7 +1091,7 @@ EDIT_FUNCTION(
 	}
 
 	if (insp.domain == editor_sprite_domain::PHYSICAL) {
-		MULTIPROPERTY("Cover ground neons", as_physical.cover_ground_neons);
+		MULTIPROPERTY("Cover background neons", as_physical.cover_background_neons);
 		MULTIPROPERTY("Illuminate like wall", as_physical.illuminate_like_wall);
 
 		ImGui::Separator();
@@ -1146,8 +1146,12 @@ EDIT_FUNCTION(
 		}
 	}
 	else {
-		MULTIPROPERTY("Cover ground neons", as_nonphysical.cover_ground_neons);
-		MULTIPROPERTY("Illuminate like wall", as_nonphysical.illuminate_like_wall);
+		MULTIPROPERTY("Cover background neons", as_nonphysical.cover_background_neons);
+		{
+			const bool full_illumination_already = insp.domain == editor_sprite_domain::FOREGROUND && insp.as_nonphysical.full_illumination;
+			auto disabled = maybe_disabled_only_cols(full_illumination_already);
+			MULTIPROPERTY("Illuminate like wall", as_nonphysical.illuminate_like_wall);
+		}
 
 		if (insp.domain == editor_sprite_domain::FOREGROUND) {
 			MULTIPROPERTY("Full illumination", as_nonphysical.full_illumination);

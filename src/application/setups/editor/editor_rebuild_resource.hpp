@@ -331,7 +331,7 @@ void setup_scene_object_from_resource(
 
 			on_domain_specific([&](auto& specific) {
 				render.special_functions.set(special_render_function::ILLUMINATE_AS_WALL, specific.illuminate_like_wall);
-				render.special_functions.set(special_render_function::COVER_GROUND_NEONS, specific.cover_ground_neons);
+				render.special_functions.set(special_render_function::COVER_GROUND_NEONS, specific.cover_background_neons);
 			});
 		}
 
