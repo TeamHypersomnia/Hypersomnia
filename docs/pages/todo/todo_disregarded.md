@@ -5,6 +5,26 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- As for resetting maybes, when they're disabled it doesn't matter 
+	- When they're enabled only then we can show the colored properties for whatever has changed
+
+- WE'RE JUST USING AUGS::MAYBE WITH A FLAG!!! And leaving current design as is
+	- We don't want to write off values to json to not unnecessarily clutter it
+	- So the off values will be reloaded anyway with game restart
+- old considerations:
+	- I think after all we should use an std::optional for the sprite node size
+		- It's a complex case of override of a default which can change during runtime
+		- Though it sucks then for multi-editing when we enable resize?
+			- But in that case we'd want to set it to the same custom size anyway
+		- The only reason we want augs::maybe because it'd be comfortable fast-switching to check how it looks like?
+			- when ctrl+z would suffice really
+	- I'm not sure if the current augs::maybe design is wrong, perhaps we should skip writing it to json is all
+		- Otherwise we anyway should have a reset button in place
+		- what corner case does exactly solve it to write 0 if size is default?
+			- Well, if the resource size changes while its off it will catch on
+				- but it won't anyway if we have tweaked it
+		- uh, let's maybe leave it at that, it will be reset anyway once we reload the game (since we don't want to serialize default maybes anyway)
+
 - I don't think we should allow "steppable" but "silent" grounds, this will confuse people
 	- Actually we can choose a sound and let it have gain = 0
 	- So we have a semantic for this indeed

@@ -5,6 +5,12 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Optimizing post-culling so Ad hoc atlas only holds resized down images (except the one previewed in some color/shape picker)
+	- ad_hoc_in_atlas_map can have get_unscaled_size instead of tarnishing the augs::atlas_entry
+		- But wait, what would we really use this method for?
+		- Just for resetting in sprite resource inspector? Really? That'd be overengineering
+
+
 - Rebuild scene quickly becomes the bottleneck even in release
 	- Let's profile it
 

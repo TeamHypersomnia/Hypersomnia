@@ -6,9 +6,11 @@
 namespace augs {
 	struct introspection_access;
 
-	template <class T>
+	template <class T, bool SerializeDisabled = true>
 	struct maybe {
-		// GEN INTROSPECTOR struct augs::maybe class T
+		static constexpr bool serialize_disabled = SerializeDisabled;
+
+		// GEN INTROSPECTOR struct augs::maybe class T bool S
 		T value;
 		bool is_enabled = false;
 		pad_bytes<3> pad;
@@ -50,7 +52,11 @@ namespace augs {
 			return is_enabled;
 		}
 
-		friend bool operator==(const maybe<T>&, const maybe<T>&) = default;
+		operator maybe<T, !SerializeDisabled>() const {
+			return { value, is_enabled };
+		}
+
+		friend bool operator==(const maybe<T, SerializeDisabled>&, const maybe<T, SerializeDisabled>&) = default;
 	};
 }
 

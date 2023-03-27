@@ -10,7 +10,7 @@ struct editor_sprite_node_editable {
 	// GEN INTROSPECTOR struct editor_sprite_node_editable
 	vec2 pos;
 	real32 rotation = 0.0f;
-	augs::maybe<vec2i> size;
+	augs::maybe<vec2i, false> size;
 	rgba colorize = white;
 
 	bool flip_horizontally = false;

@@ -300,18 +300,28 @@ namespace augs {
 							}
 						}
 						else if constexpr(is_maybe_v<T>) {
-							if (sol::object enabled_field = input_table[std::string("enabled_") + label];
-								enabled_field.valid()
-							) {
-								read_lua(enabled_field, field.value);
-								field.is_enabled = true;
-							}
+							if constexpr(T::serialize_disabled) {
+								if (sol::object enabled_field = input_table[std::string("enabled_") + label];
+									enabled_field.valid()
+								) {
+									read_lua(enabled_field, field.value);
+									field.is_enabled = true;
+								}
 
-							if (sol::object disabled_field = input_table[std::string("disabled_") + label];
-								disabled_field.valid()
-							) {
-								read_lua(disabled_field, field.value);
-								field.is_enabled = false;
+								if (sol::object disabled_field = input_table[std::string("disabled_") + label];
+									disabled_field.valid()
+								) {
+									read_lua(disabled_field, field.value);
+									field.is_enabled = false;
+								}
+							}
+							else {
+								if (sol::object disabled_field = input_table[label];
+									disabled_field.valid()
+								) {
+									read_lua(disabled_field, field.value);
+									field.is_enabled = false;
+								}
 							}
 						}
 						else if constexpr(!is_padding_field_v<T>) {
@@ -500,11 +510,18 @@ namespace augs {
 						}
 					}
 					else if constexpr(is_maybe_v<T>) {
-						if (field) {
-							write_table_or_field(output_table, field.value, std::string("enabled_") + label);
+						if constexpr(T::serialize_disabled) {
+							if (field) {
+								write_table_or_field(output_table, field.value, std::string("enabled_") + label);
+							}
+							else {
+								write_table_or_field(output_table, field.value, std::string("disabled_") + label);
+							}
 						}
 						else {
-							write_table_or_field(output_table, field.value, std::string("disabled_") + label);
+							if (field) {
+								write_table_or_field(output_table, field.value, label);
+							}
 						}
 					}
 					else if constexpr(!is_padding_field_v<T>) {

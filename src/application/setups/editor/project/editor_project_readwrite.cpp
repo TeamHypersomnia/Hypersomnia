@@ -85,8 +85,13 @@ namespace editor_project_readwrite {
 
 		::setup_project_defaults(loaded.playtesting, loaded.get_game_modes(), officials_map);
 
-		loaded.meta = read_only_project_meta(json_path);
-		loaded.about = read_only_project_about(json_path);
+		/*
+			Will leave out non-trivial fields like layers, nodes and resources.
+			(see: static constexpr bool json_ignore = true)
+			Only stuff like about, meta, settings etc. get loaded in this call.
+		*/
+
+		//augs::read_json(document, loaded);
 
 		{
 			if (const auto maybe_modes = FindObject(document, "game_modes")) {

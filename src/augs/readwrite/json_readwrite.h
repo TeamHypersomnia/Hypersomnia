@@ -20,6 +20,7 @@
 #include "augs/readwrite/custom_json_representations.h"
 #include "augs/readwrite/json_traits.h"
 #include "augs/pad_bytes.h"
+#include "augs/templates/traits/is_maybe.h"
 
 namespace augs {
 	template <class F, class T>
@@ -120,8 +121,24 @@ namespace augs {
 						using Field = remove_cref<decltype(field)>;
 
 						if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
-							if (from.HasMember(label)) {
-								read_json(from[label], field);
+							if constexpr(is_maybe_v<Field>) {
+								if (from.HasMember(label)) {
+									read_json(from[label], field.value);
+									field.is_enabled = true;
+								}
+								else {
+									const auto OFF_label = std::string("OFF_") + label;
+
+									if (from.HasMember(OFF_label)) {
+										read_json(from[OFF_label], field.value);
+										field.is_enabled = false;
+									}
+								}
+							}
+							else {
+								if (from.HasMember(label)) {
+									read_json(from[label], field);
+								}
 							}
 						}
 					},
@@ -257,8 +274,22 @@ namespace augs {
 				[&to](const auto& label, const auto& field) {
 					using Field = remove_cref<decltype(field)>;
 					if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
-						to.Key(label);
-						write_json(to, field);
+						if constexpr(is_maybe_v<Field>) {
+							if (field.is_enabled) {
+								to.Key(label);
+								write_json(to, field.value);
+							}
+							else {
+								if constexpr(Field::serialize_disabled) {
+									to.Key(std::string("OFF_") + label);
+									write_json(to, field.value);
+								}
+							}
+						}
+						else {
+							to.Key(label);
+							write_json(to, field);
+						}
 					}
 				},
 				from
