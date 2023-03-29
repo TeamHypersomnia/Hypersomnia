@@ -576,14 +576,14 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					const auto next_value = !node.active;
 
 					if (in.setup.is_inspected(node_id)) {
-						auto command = in.setup.make_command_from_selected_nodes<toggle_nodes_active_command>(next_value ? "Shown " : "Hidden ");
+						auto command = in.setup.make_command_from_selected_nodes<toggle_nodes_active_command>(next_value ? "Enabled " : "Disabled ");
 						command.next_value = next_value;
 						in.setup.post_new_command(std::move(command));
 					}
 					else {
 						auto command = toggle_nodes_active_command(); 
 						command.push_entry(node_id);
-						command.built_description = (next_value ? "Shown " : "Hidden ") + node.get_display_name();
+						command.built_description = (next_value ? "Enabled " : "Disabled ") + node.get_display_name();
 						command.next_value = next_value;
 						command.update_inspector = false;
 						in.setup.post_new_command(std::move(command));
@@ -984,7 +984,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					const auto next_value = !layer.is_active();
 
 					if (in.setup.is_inspected(layer_id)) {
-						auto command = in.setup.make_command_from_selected_layers<toggle_layers_active_command>(next_value ? "Shown " : "Hidden ");
+						auto command = in.setup.make_command_from_selected_layers<toggle_layers_active_command>(next_value ? "Enabled " : "Disabled ");
 						command.next_value = next_value;
 						in.setup.post_new_command(std::move(command));
 					}
