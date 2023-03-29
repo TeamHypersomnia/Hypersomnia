@@ -592,7 +592,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		for (auto& entry : pool) {
 			auto& r = entry.external_file;
 
-			resource_by_hash[r.content_hash]    = std::addressof(entry);
+			resource_by_hash[r.file_hash]    	= std::addressof(entry);
 			resource_by_path[r.path_in_project] = std::addressof(entry);
 		}
 
@@ -1025,16 +1025,16 @@ void editor_setup::save_last_project_location() {
 void editor_pathed_resource::maybe_rehash(const augs::path_type& full_path, const augs::file_time_type& fresh_stamp) {
 	const auto fresh_stamp_utc = fresh_stamp;
 
-	if (stamp_when_hashed == fresh_stamp_utc && content_hash.size() > 0) {
+	if (stamp_when_hashed == fresh_stamp_utc && file_hash.size() > 0) {
 		return;
 	}
 
 	try {
-		content_hash = augs::secure_hash(augs::file_to_bytes(full_path));
+		file_hash = augs::secure_hash(augs::file_to_bytes(full_path));
 		stamp_when_hashed = fresh_stamp_utc;
 	}
 	catch (...) {
-		content_hash = "";
+		file_hash = "";
 	}
 }
 
@@ -1044,11 +1044,11 @@ std::string editor_pathed_resource::get_display_name() const {
 
 editor_pathed_resource::editor_pathed_resource(
 	const augs::path_type& path_in_project, 
-	const std::string& content_hash,
+	const std::string& file_hash,
 	const augs::file_time_type& stamp
 ) : 
 	path_in_project(path_in_project),
-	content_hash(content_hash)
+	file_hash(file_hash)
 {
 	set_hash_stamp(stamp);
 }

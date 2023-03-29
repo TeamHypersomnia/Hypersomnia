@@ -111,7 +111,28 @@ namespace editor_project_readwrite {
 			}
 		};
 
-		augs::on_each_object_in_object<recurse_to_find_ids>(project, handle);
+		auto traverse_object = [&](auto& object) {
+			augs::on_each_object_in_object<recurse_to_find_ids>(object, handle);
+		};
+
+		traverse_object(project);
+
+		project.resources.pools.for_each(
+			[&](auto& resource) {
+				traverse_object(resource.editable);
+			}
+		);
+
+		project.nodes.pools.for_each(
+			[&](auto& node) {
+				callback(node.resource_id);
+				traverse_object(node.editable);
+			}
+		);
+
+		for (auto& layer : project.layers.pool) {
+			traverse_object(layer.editable);
+		}
 	}
 
 	editor_project read_project_json(
@@ -133,8 +154,6 @@ namespace editor_project_readwrite {
 			resource_map.get_for<O>()[allocated.unique_name] = typed_id;
 		};
 
-		const auto document = augs::json_document_from(json_path);
-
 		editor_project loaded;
 
 		auto initialize_project_structs = [&]() {
@@ -147,6 +166,8 @@ namespace editor_project_readwrite {
 
 			::setup_project_defaults(loaded.playtesting, loaded.get_game_modes(), officials_map);
 		};
+
+		const auto document = augs::json_document_from(json_path);
 
 		auto read_project_structs = [&]() {
 
@@ -196,6 +217,10 @@ namespace editor_project_readwrite {
 			}
 		};
 
+		auto read_resources = [&]() {
+
+		};
+
 		auto create_fallback_playtesting_mode_if_none = [&]() {
 			auto& modes = loaded.get_game_modes();
 
@@ -223,6 +248,7 @@ namespace editor_project_readwrite {
 		read_project_structs();
 
 		read_modes();
+		read_resources();
 		create_fallback_playtesting_mode_if_none();
 
 		unstringify_resource_ids();

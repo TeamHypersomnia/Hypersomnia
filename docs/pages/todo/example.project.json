@@ -109,12 +109,13 @@
 "external_resources": {
 	"gfx/abc.png": {
 		"id": "abc",
-		"content_hash": "aEdhJHk83dLkfJGH8932FDS"
+		"file_hash": "aEdhJHk83dLkfJGH8932FDS"
 	},
 
-	"gfx/fish.gif": {
+	{
+		"path": "gfx/fish.gif",
 		"id": "fish",
-		"content_hash": "gmBOD9342podJ8QlaSDLKf8",
+		"file_hash": "gmBOD9342podJ8QlaSDLKf8",
 
 		"color": [255, 255, 255, 255],
 
@@ -126,12 +127,12 @@
 
 	"sfx/background_ambience.ogg": {
 		"id": "background_ambience",
-		"content_hash": "fklj389sDLjGFLDkjh894FL"
+		"file_hash": "fklj389sDLjGFLDkjh894FL"
 	},
 
 	"scripts/crate_mover.lua": {
 		"id": "crate_mover",
-		"content_hash": "r8932jfdsxXJKHdsFkHJjhJ"
+		"file_hash": "r8932jfdsxXJKHdsFkHJjhJ"
 	},
 
 	"gfx/magic_crate.png": {

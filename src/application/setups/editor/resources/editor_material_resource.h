@@ -23,10 +23,10 @@ struct editor_collision_sound_def {
 };
 
 struct editor_material_resource_editable {
-	using collision_sound_matrix_type = std::unordered_map<
+	using collision_sound_matrix_type = std::vector<augs::simple_pair<
 		editor_typed_resource_id<editor_material_resource>, 
 		editor_collision_sound_def
-	>;
+	>>;
 
 	// GEN INTROSPECTOR struct editor_material_resource_editable
 	collision_sound_matrix_type collision_sound_matrix;

@@ -1169,7 +1169,7 @@ summary: That which we are brainstorming at the moment.
 	- Separate pools, official outside editor_project, inside editor_setup
 	- Id has a bool whether it's official, a general dereferencer
 	- map of path_to_resource is calculated only on the rare occasion that it's needed
-	- Do we hold content_hash and path inside structs themselves?
+	- Do we hold file_hash and path inside structs themselves?
 		- It's I guess more convenient
 		- because we want to serialize them this way certainly
 		- If that's not a problem we can hold a path inside the object, not as a key

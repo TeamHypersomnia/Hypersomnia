@@ -8,13 +8,13 @@ struct editor_pathed_resource {
 
 	// GEN INTROSPECTOR struct editor_pathed_resource
 	augs::path_type path_in_project;
-	std::string content_hash;
+	std::string file_hash;
 	augs::file_time_type stamp_when_hashed;
 	// END GEN INTROSPECTOR
 
 	editor_pathed_resource(
 		const augs::path_type& path_in_project, 
-		const std::string& content_hash,
+		const std::string& file_hash,
 		const augs::file_time_type& stamp_when_hashed
 	);
 
