@@ -112,6 +112,13 @@
 	My i tak bedziemy sobie robić mape z identyfikatorów
 
 	Reader po prostu niech odrzuca duplikaty
+		Nawet jakbysmy zostawili to czy cos by nam to rozwalilo?
+		Po prostu bylyby dwa resourcy pointujace do tego samego pliku, nawet bym powiedzial ficzer
+		Tylko ze edytor se przebuduje filesystem po swojemu i tak
+	Pamietajmy ze jakakolwiek unikalnosc ma znaczenie tylko przy serializacji
+	Runtime sie posluguje idami binarnymi do wszelkiej identyfikacji
+	możemy to sanityzować na wszelki wypadek
+	rapidjson uzywa std::multimap wiec tbh lepiej zebysmy my mieli kontrole nad tym jak to mapujemy a to sie ladowalo do prostej sekwencji zawsze
 */
 
 "external_resources": [

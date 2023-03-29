@@ -9,6 +9,7 @@
 #include "augs/filesystem/file.h"
 
 #include "application/setups/editor/resources/editor_resource_id.h"
+#include "application/setups/editor/editor_filesystem_node_type.h"
 
 namespace augs {
 	bool natural_order(const std::string& a, const std::string& b);
@@ -21,16 +22,6 @@ struct editor_filesystem_node_ui_state {
 using editor_filesystem_ui_state = 
 	std::map<augs::path_type, editor_filesystem_node_ui_state>
 ;
-
-enum class editor_filesystem_node_type : uint8_t {
-	OTHER_FILE,
-	FOLDER,
-
-	IMAGE,
-	SOUND,
-
-	OTHER_RESOURCE
-};
 
 struct editor_filesystem_node {
 	ad_hoc_entry_id file_thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
@@ -225,19 +216,7 @@ struct editor_filesystem_node {
 	}
 
 	void set_file_type_by(const std::string& extension) {
-		type = editor_filesystem_node_type::OTHER_FILE;
-
-		if (assets::is_image_extension(extension)) {
-			type = editor_filesystem_node_type::IMAGE;
-		}
-
-		if (extension == ".gif") {
-			type = editor_filesystem_node_type::IMAGE;
-		}
-
-		if (assets::is_sound_extension(extension)) {
-			type = editor_filesystem_node_type::SOUND;
-		}
+		type = ::get_filesystem_node_type_by_extension(extension);
 	}
 
 	void build_from(const augs::path_type& folder_path) {

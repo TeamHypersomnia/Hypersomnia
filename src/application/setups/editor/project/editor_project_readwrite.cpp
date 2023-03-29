@@ -1,3 +1,5 @@
+#include <unordered_set>
+#include "augs/string/path_sanitization.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/detail/is_editor_typed_resource.h"
 
@@ -27,6 +29,9 @@ namespace augs {
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/templates/introspection_utils/on_each_object_in_object.h"
 #include "application/setups/editor/create_name_to_id_map.hpp"
+
+#include "application/setups/editor/editor_filesystem_node_type.h"
+#include "application/setups/editor/defaults/editor_resource_defaults.h"
 
 #if 0
 template <class R>
@@ -145,7 +150,8 @@ namespace editor_project_readwrite {
 	editor_project read_project_json(
 		const augs::path_type& json_path,
 		const editor_resource_pools& officials,
-		const editor_official_resource_map& officials_map
+		const editor_official_resource_map& officials_map,
+		const bool strict
 	) {
 		(void)officials;
 
@@ -158,7 +164,7 @@ namespace editor_project_readwrite {
 			using Id = editor_typed_resource_id<O>;
 
 			const auto typed_id = Id::from_raw(allocation_result.key, false);
-			resource_map[allocated.unique_name] = typed_id.operator editor_resource_id();
+			resource_map.try_emplace(allocated.unique_name, typed_id.operator editor_resource_id());
 		};
 
 		editor_project loaded;
@@ -174,6 +180,7 @@ namespace editor_project_readwrite {
 			::setup_project_defaults(loaded.playtesting, loaded.get_game_modes(), officials_map);
 		};
 
+		const auto project_dir = json_path.parent_path();
 		const auto document = augs::json_document_from(json_path);
 
 		auto read_project_structs = [&]() {
@@ -225,17 +232,139 @@ namespace editor_project_readwrite {
 		};
 
 		auto read_external_resources = [&]() {
+			std::unordered_set<augs::path_type> existing;
+
 			if (const auto maybe_externals = FindArray(document, "external_resources")) {
 				for (auto& resource : *maybe_externals) {
 					if (!resource.IsObject()) {
 						continue;
 					}
 
-					if (!resource.HasMember("id")) {
+					if (!resource.HasMember("path") || !resource["path"].IsString()) {
+						if (strict) {
+							throw augs::json_deserialization_error("Missing \"path\" property for an external resource!");
+						}
+
 						continue;
 					}
+
+					if (!resource.HasMember("id") || !resource["id"].IsString()) {
+						if (strict) {
+							throw augs::json_deserialization_error("Missing \"id\" property for %x!", resource["path"].GetString());
+						}
+
+						continue;
+					}
+
+					if (!resource.HasMember("file_hash") || !resource["file_hash"].IsString()) {
+						if (strict) {
+							throw augs::json_deserialization_error("Missing \"file_hash\" property for %x!", resource["path"].GetString());
+						}
+
+						continue;
+					}
+
+					const auto id = resource["id"].GetString();
+					const auto file_hash = resource["file_hash"].GetString();
+
+					auto load_resource = [&](const augs::path_type& path) {
+						if (found_in(existing, path)) {
+							if (strict) {
+								throw augs::json_deserialization_error("Duplicate entries for %x!", path);
+							}
+
+							return;
+						}
+
+						existing.emplace(path);
+
+						/*
+							Determine type based on the extension.
+						*/
+
+						auto read_as = [&]<typename R>(R typed_resource) {
+							::setup_resource_defaults(typed_resource, officials_map);
+							augs::read_json(resource, typed_resource.editable);
+
+							auto& pool = loaded.resources.get_pool_for<R>();
+							const auto [key, object] = pool.allocate(std::move(typed_resource));
+							const auto typed_id = editor_typed_resource_id<R>::from_raw(key, false);
+
+							const auto result = resource_map.try_emplace(id, typed_id.operator editor_resource_id());
+
+							if (strict) {
+								if (!result.second) {
+									throw augs::json_deserialization_error("Duplicate resource id %x: ", id);
+								}
+							}
+						};
+
+						const auto extension = path.extension();
+						const auto type = ::get_filesystem_node_type_by_extension(extension);
+
+						using Type = editor_filesystem_node_type;
+
+						const auto pathed = editor_pathed_resource(
+							/*
+								In case of the editor,
+								these two props are read basically only so that the editor can later 
+								associate the paths/hashes to existing files - 
+								since the editor on its own iterates the entire project folder in search of paths.
+							*/
+
+							path,
+							file_hash,
+							{}
+						);
+
+						switch (type) {
+							case Type::IMAGE:
+								read_as(editor_sprite_resource(pathed));
+								break;
+							case Type::SOUND:
+								read_as(editor_sound_resource(pathed));
+								break;
+
+							default: 
+								if (strict) {
+									throw augs::json_deserialization_error("Failed to load %x: unknown extension!", path);
+								}
+
+								return;
+						}
+					};
+
+					const auto untrusted_path = resource["path"].GetString();
+
+					std::visit(
+						[&]<typename R>(const R& result) {
+							if constexpr(std::is_same_v<R, sanitization::forbidden_path_type>) {
+								const auto err = typesafe_sprintf(
+									"Failed to load %x:\n%x",
+									untrusted_path,
+									sanitization::describe(result)
+								);
+
+								if (strict) {
+									throw augs::json_deserialization_error(err);
+								}
+							}
+							else if constexpr(std::is_same_v<R, augs::path_type>) {
+								load_resource(result);
+							}
+							else {
+								static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
+							}
+						},
+
+						sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path)
+					);
 				}
 			}
+		};
+
+		auto read_resources = [&]() {
+
 		};
 
 		auto create_fallback_playtesting_mode_if_none = [&]() {
@@ -266,6 +395,7 @@ namespace editor_project_readwrite {
 
 		read_modes();
 		read_external_resources();
+		read_resources();
 		create_fallback_playtesting_mode_if_none();
 
 		unstringify_resource_ids();

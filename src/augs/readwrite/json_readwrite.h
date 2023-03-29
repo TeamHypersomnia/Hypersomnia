@@ -28,14 +28,34 @@ namespace augs {
 		if constexpr(has_custom_to_json_value_v<T>) {
 			from_json_value(from, out);
 		}
-		else if constexpr(is_constant_size_string_v<T>) {
+		else if constexpr(is_constant_size_string_v<T> || std::is_same_v<T, std::string>) {
 			if (from.IsString()) {
 				out = from.GetString();
 			}
 		}
-		else if constexpr(std::is_same_v<T, std::string> || std::is_arithmetic_v<T>) {
+		else if constexpr(std::is_same_v<T, uint8_t> || std::is_same_v<T, unsigned char>) {
+			if (from.IsUint()) {
+				out = static_cast<T>(from.GetUint());
+			}
+			else if (from.IsUint64()) {
+				out = static_cast<T>(from.GetUint64());
+			}
+		}
+		else if constexpr(std::is_arithmetic_v<T>) {
 			if (from.template Is<T>()) {
 				out = from.template Get<T>();
+			}
+			else {
+				/* 
+					Allow e.g. int -> float conversion for writers that round full numbers to int 
+					(will be useful for manually crafted jsons too).
+
+					This will also convert floats to ints if decimals are mistakenly added to what is meant to be an integer.
+				*/
+
+				if (from.IsNumber()) {
+					out = static_cast<T>(from.GetDouble());
+				}
 			}
 		}
 		else if constexpr(std::is_enum_v<T>) {
@@ -221,7 +241,10 @@ namespace augs {
 		else if constexpr(std::is_same_v<T, int>) {
 			to.Int(from);
 		}
-		else if constexpr(std::is_same_v<T, unsigned>) {
+		else if constexpr(std::is_same_v<T, uint64_t>) {
+			to.Uint64(from);
+		}
+		else if constexpr(std::is_unsigned_v<T>) {
 			to.Uint(from);
 		}
 		else if constexpr(std::is_same_v<T, bool>) {
@@ -233,7 +256,7 @@ namespace augs {
 			to.String(enum_to_string(from));
 		}
 		else {
-			static_assert(always_false_v<T>, "Non-exhaustive general_read_json_value");
+			static_assert(always_false_v<T>, "Non-exhaustive general_write_json_value");
 		}
 	}
 

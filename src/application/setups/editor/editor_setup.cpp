@@ -78,10 +78,13 @@ editor_setup::editor_setup(
 
 	LOG("Loading editor project at: %x", project_path);
 
+	constexpr bool strict = true;
+
 	project = editor_project_readwrite::read_project_json(
 		paths.project_json,
 		official_resources,
-		official_resource_map
+		official_resource_map,
+		strict
 	);
 
 	gui.filesystem.rebuild_project_special_filesystem(*this);

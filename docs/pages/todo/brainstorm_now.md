@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Deprecate multipooldispatchers, it's silly
+- not sure if we need to set the stamp hash when reading
+	- This is basically just for the editor to be able to redirect missing resources
+	- Game won't use it even if the resource is missing
+	- i don't think so, they're probably reread only after the entire redirecting work
+
 - id vs name
 	- in case of resources - at least pathed ones - certainly id because it might even be different than display name
 	- I'd honestly be consistent as these indeed work as identifiers
