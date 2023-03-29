@@ -14,8 +14,10 @@ struct editor_typed_resource_id {
 	editor_resource_pool_id raw;
 	bool is_official = false;
 
+	mutable std::string _serialized_resource_name = "";
+
 	static editor_typed_resource_id<E> from_raw(const editor_resource_pool_id& raw, const bool is_official) {
-		return { raw, is_official };
+		return { raw, is_official, {} };
 	}
 
 	static auto get_type_id() {

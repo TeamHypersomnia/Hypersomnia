@@ -6,27 +6,30 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- So yeah, the cardinal question is do we serialize the metadata for resources that are necessary to preserve logical integrity of the map?
-	- Like sprite sizes, number of frames and sound lengths
-	- Important because even physical shapes might depend on it
-	- I'm thinking we should
-- The problem with augs::maybe remains that if the resource changes its size it will by default write a wrong OFF value
-- Let's leave it at that, we're overthinking, this isn't even critical
-	- Only important is the json state
-- I'm thinking yes, let's serialize these sizes
-	- Will let anyone skin the map without having the resources
-	- Will let visualize the map early without full textures yet
-		- Will come in handy in future verisons maybe
+- Resolution of strings->ids and viceversa should be easy
+	- That's literally just a single introspection call to our entire project + single introspection call per every node and resource
+		- Nothing more
+	- We could even make if constexprs for containers if we were scrupulous
+		- it's not like a comparative introspect where we need two 
+
 
 - Check if windows doubly-activates window too
 
 - JSON serialization
+	- We'll need a context object anyway
+		- Unless we put strings into ids ourselves
+		- Technically we could
+		- And we'll anyway need a routine to manually resolve all dependencies once string ids are read
 	- Reading
 		- Dependency resolution
 			- We first have to read all resources
 			- That is because before we read a node, we setup its defaults
 			- And also it would be good to resolve resource names right away when reading these nodes so that we don't have to do a secondary lookup
 				- We'll can read resources first anyway regardless of if we do this
+	- Writing
+		- Skipping defaults
+			- It only concerns writing and not reading, right?
+				- Reading just checks if the variable exists anyway	
 
 - What happens when a resource image changes size?
 	- We should actually reload it in the editor to be state-correct

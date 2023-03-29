@@ -2,44 +2,10 @@
 #include "augs/log.h"
 #include "test_scenes/test_scene_settings.h"
 #include "game/cosmos/change_common_significant.hpp"
-#include "augs/templates/introspection_utils/on_dynamic_content.h"
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "application/setups/debugger/detail/find_asset_id.h"
-
-template <class T, class F>
-void on_each_object_in_object(T& object, F&& callback) {
-	augs::introspect(
-		[&callback](const auto&, auto& member) {
-			using Field = remove_cref<decltype(member)>;
-
-			if constexpr(augs::has_dynamic_content_v<Field>) {
-				callback(member);
-
-				augs::on_dynamic_content(
-					[&](auto& dyn, auto...) {
-						callback(dyn);
-
-						using D = remove_cref<decltype(dyn)>;
-
-						if constexpr(!is_introspective_leaf_v<D>) {
-							on_each_object_in_object(dyn, std::forward<F>(callback));
-						}
-					},
-					member
-				);
-			}
-			else {
-				callback(member);
-
-				if constexpr(!is_introspective_leaf_v<Field>) {
-					on_each_object_in_object(member, std::forward<F>(callback));
-				}
-			}
-		},
-		object
-	);
-}
+#include "augs/templates/introspection_utils/on_each_object_in_object.h"
 
 template <class T>
 struct flavour_remap_entry {
@@ -176,7 +142,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 	};
 
 	auto remap_ids_in = [&](auto& new_object, const bool is_official) {
-		::on_each_object_in_object(new_object, [&](auto& field) { remap_ids(field, is_official); });
+		augs::on_each_object_in_object(new_object, [&](auto& field) { remap_ids(field, is_official); });
 	};
 
 	auto add_pathed_assets = [&](auto& custom, const auto& official, const std::string& type_name) {

@@ -5,6 +5,19 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- BELOW IS A NON-QUESTION: We have sizes in sprite resources, so we serialize them!!!
+	- So yeah, the cardinal question is do we serialize the metadata for resources that are necessary to preserve logical integrity of the map?
+		- Like sprite sizes, number of frames and sound lengths
+		- Important because even physical shapes might depend on it
+		- I'm thinking we should
+	- The problem with augs::maybe remains that if the resource changes its size it will by default write a wrong OFF value
+	- Let's leave it at that, we're overthinking, this isn't even critical
+		- Only important is the json state
+	- I'm thinking yes, let's serialize these sizes
+		- Will let anyone skin the map without having the resources
+		- Will let visualize the map early without full textures yet
+			- Will come in handy in future verisons maybe
+
 - As for resetting maybes, when they're disabled it doesn't matter 
 	- When they're enabled only then we can show the colored properties for whatever has changed
 

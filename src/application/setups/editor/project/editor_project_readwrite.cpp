@@ -1,3 +1,20 @@
+#include "application/setups/editor/resources/editor_typed_resource_id.h"
+#include "application/setups/editor/detail/is_editor_typed_resource.h"
+
+namespace augs {
+	template <class T, class R>
+	void to_json_value(T& out, const editor_typed_resource_id<R>& from) {
+		out.String(from._serialized_resource_name);
+	}
+
+	template <class T, class R>
+	void from_json_value(T& from, editor_typed_resource_id<R>& out) {
+		if (from.IsString()) {
+			out._serialized_resource_name = from.GetString();
+		}
+	}
+}
+
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
@@ -8,6 +25,19 @@
 
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "augs/templates/introspection_utils/on_each_object_in_object.h"
+
+template <class T>
+using make_string_to_id_map = std::unordered_map<std::string, editor_typed_resource_id<T>>;
+
+using resource_name_to_id = per_type_container<all_editor_resource_types, make_string_to_id_map>;
+
+template <class R>
+void unpack_string_id(resource_name_to_id& ids, editor_typed_resource_id<R>& id) {
+	if (auto found = mapped_or_nullptr(ids.get_for<R>(), id._serialized_resource_name)) {
+		id = *found;
+	}
+}
 
 template <class T, class F>
 std::optional<T> GetIf(F& from, const std::string& label) {
@@ -66,6 +96,24 @@ namespace editor_project_readwrite {
 		augs::save_as_text(json_path, s.GetString());
 	}
 
+	template <class T>
+	struct recurse_to_find_ids {
+		static constexpr bool value = !augs::json_ignore_v<T> && !augs::has_custom_to_json_value_v<T>;
+	};
+
+	template <class P, class F>
+	void on_each_resource_id_in_project(P& project, F callback) {
+		auto handle = [&](auto& object) {
+			using Field = remove_cref<decltype(object)>;
+
+			if constexpr(is_editor_typed_resource_id_v<Field>) {
+				callback(object);
+			}
+		};
+
+		augs::on_each_object_in_object<recurse_to_find_ids>(project, handle);
+	}
+
 	editor_project read_project_json(
 		const augs::path_type& json_path,
 		const editor_resource_pools& officials,
@@ -73,27 +121,47 @@ namespace editor_project_readwrite {
 	) {
 		(void)officials;
 
+		resource_name_to_id resource_map;
+
+		auto register_new_resource = [&](auto& allocation_result) {
+			auto& allocated = allocation_result.object;
+
+			using O = remove_cref<decltype(allocated)>;
+			using Id = editor_typed_resource_id<O>;
+
+			const auto typed_id = Id::from_raw(allocation_result.key, false);
+			resource_map.get_for<O>()[allocated.unique_name] = typed_id;
+		};
+
 		const auto document = augs::json_document_from(json_path);
 
 		editor_project loaded;
-		::setup_project_defaults(loaded.settings, loaded.get_game_modes(), officials_map);
 
-		/* 
-			This doesn't set the playtesting mode (done later below) 
-			but maybe there will be other important properties in the future
-		*/
+		auto initialize_project_structs = [&]() {
+			::setup_project_defaults(loaded.settings, loaded.get_game_modes(), officials_map);
 
-		::setup_project_defaults(loaded.playtesting, loaded.get_game_modes(), officials_map);
+			/* 
+				This doesn't set the playtesting mode (done later below) 
+				but maybe there will be other important properties in the future
+			*/
 
-		/*
-			Will leave out non-trivial fields like layers, nodes and resources.
-			(see: static constexpr bool json_ignore = true)
-			Only stuff like about, meta, settings etc. get loaded in this call.
-		*/
+			::setup_project_defaults(loaded.playtesting, loaded.get_game_modes(), officials_map);
+		};
 
-		//augs::read_json(document, loaded);
+		auto read_project_structs = [&]() {
 
-		{
+			/*
+				Will leave out non-trivial fields like layers, nodes and resources.
+				(see: static constexpr bool json_ignore = true)
+				Only stuff like about, meta, settings etc. get loaded in this call.
+			*/
+
+			static_assert(augs::has_custom_to_json_value_v<decltype(editor_playtesting_settings::mode)>);
+
+			augs::read_json(document, loaded);
+		};
+
+		auto read_modes = [&]() {
 			if (const auto maybe_modes = FindObject(document, "game_modes")) {
 				auto& modes = loaded.get_game_modes();
 
@@ -122,10 +190,11 @@ namespace editor_project_readwrite {
 
 					new_game_mode.unique_name = name;
 
-					modes.allocate(std::move(new_game_mode));
+					const auto result = modes.allocate(std::move(new_game_mode));
+					register_new_resource(result);
 				}
 			}
-		}
+		};
 
 		auto create_fallback_playtesting_mode_if_none = [&]() {
 			auto& modes = loaded.get_game_modes();
@@ -137,15 +206,32 @@ namespace editor_project_readwrite {
 				new_game_mode.type.set<editor_playtesting_mode>();
 				new_game_mode.unique_name = "playtesting";
 
-				modes.allocate(std::move(new_game_mode));
+				const auto result = modes.allocate(std::move(new_game_mode));
+				register_new_resource(result);
 			}
 		};
 
+		auto unstringify_resource_ids = [&]() {
+			auto resolve = [&](auto& typed_id) {
+				::unpack_string_id(resource_map, typed_id);
+			};
+
+			on_each_resource_id_in_project(loaded, resolve);
+		};
+
+		initialize_project_structs();
+		read_project_structs();
+
+		read_modes();
 		create_fallback_playtesting_mode_if_none();
 
+		unstringify_resource_ids();
+
+
 		/*
-			Layer hierarchies and nodes are ignored when reading.
-			We have to load them manually.
+			After resources and project settings are fully setup,
+			we have to load layer hierarchies and nodes - manually.
+			(They have the constexpr json_ignore flag set so they weren't loaded through augs::read_json).
 		*/
 
 		{

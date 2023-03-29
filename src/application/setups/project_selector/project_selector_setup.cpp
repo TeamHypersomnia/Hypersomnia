@@ -731,6 +731,8 @@ bool project_selector_setup::create_new_project_files() {
 				writer.EndObject();
 			}
 
+			/* These aren't necessary because we're properly finding sensible defaults in the serializer */
+#if 0
 			writer.Key("settings");
 
 			{
@@ -748,6 +750,7 @@ bool project_selector_setup::create_new_project_files() {
 				writer.String("playtesting");
 				writer.EndObject();
 			}
+#endif
 
 			writer.EndObject();
 		}

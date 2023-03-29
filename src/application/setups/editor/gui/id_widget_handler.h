@@ -1,14 +1,6 @@
 #pragma once
 #include "application/setups/editor/gui/widgets/resource_chooser.h"
-
-template <class T>
-struct is_editor_typed_resource_id : std::false_type {};
-
-template <class T>
-struct is_editor_typed_resource_id<editor_typed_resource_id<T>> : std::true_type {};
-
-template <class T>
-static constexpr bool is_editor_typed_resource_id_v = is_editor_typed_resource_id<T>::value;
+#include "application/setups/editor/detail/is_editor_typed_resource.h"
 
 struct id_widget_handler {
 	editor_setup& setup;
