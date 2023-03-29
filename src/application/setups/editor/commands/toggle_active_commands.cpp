@@ -1,15 +1,15 @@
-#include "application/setups/editor/commands/toggle_visibility_commands.h"
+#include "application/setups/editor/commands/toggle_active_commands.h"
 #include "application/setups/editor/editor_setup.hpp"
 
-void toggle_nodes_visibility_command::push_entry(const editor_node_id id) {
+void toggle_nodes_active_command::push_entry(const editor_node_id id) {
 	entries.push_back({ id, false });
 }
 
-bool toggle_nodes_visibility_command::empty() const {
+bool toggle_nodes_active_command::empty() const {
 	return entries.size() == 0;
 }
 
-void toggle_nodes_visibility_command::redo(const editor_command_input in) {
+void toggle_nodes_active_command::redo(const editor_command_input in) {
 	if (update_inspector) {
 		in.setup.clear_inspector();
 	}
@@ -20,8 +20,8 @@ void toggle_nodes_visibility_command::redo(const editor_command_input in) {
 			[&](auto& typed_node, const auto& node_id) {
 				(void)node_id;
 
-				e.was_visible = typed_node.visible;
-				typed_node.visible = next_value;
+				e.was_active = typed_node.active;
+				typed_node.active = next_value;
 
 				if (update_inspector) {
 					in.setup.inspect_add_quiet(e.id);
@@ -35,7 +35,7 @@ void toggle_nodes_visibility_command::redo(const editor_command_input in) {
 	}
 }
 
-void toggle_nodes_visibility_command::undo(const editor_command_input in) {
+void toggle_nodes_active_command::undo(const editor_command_input in) {
 	if (update_inspector) {
 		in.setup.clear_inspector();
 	}
@@ -46,7 +46,7 @@ void toggle_nodes_visibility_command::undo(const editor_command_input in) {
 			[&](auto& typed_node, const auto& node_id) {
 				(void)node_id;
 
-				typed_node.visible = e.was_visible;
+				typed_node.active = e.was_active;
 
 				if (update_inspector) {
 					in.setup.inspect_add_quiet(e.id);
@@ -62,23 +62,23 @@ void toggle_nodes_visibility_command::undo(const editor_command_input in) {
 
 
 
-void toggle_layers_visibility_command::push_entry(const editor_layer_id id) {
+void toggle_layers_active_command::push_entry(const editor_layer_id id) {
 	entries.push_back({ id, false });
 }
 
-bool toggle_layers_visibility_command::empty() const {
+bool toggle_layers_active_command::empty() const {
 	return entries.size() == 0;
 }
 
-void toggle_layers_visibility_command::redo(const editor_command_input in) {
+void toggle_layers_active_command::redo(const editor_command_input in) {
 	if (update_inspector) {
 		in.setup.clear_inspector();
 	}
 
 	for (auto& e : entries) {
 		if (auto layer = in.setup.find_layer(e.id)) {
-			e.was_visible = layer->visible;
-			layer->visible = next_value;
+			e.was_active = layer->editable.active;
+			layer->editable.active = next_value;
 
 			if (update_inspector) {
 				in.setup.inspect_add_quiet(e.id);
@@ -91,14 +91,14 @@ void toggle_layers_visibility_command::redo(const editor_command_input in) {
 	}
 }
 
-void toggle_layers_visibility_command::undo(const editor_command_input in) {
+void toggle_layers_active_command::undo(const editor_command_input in) {
 	if (update_inspector) {
 		in.setup.clear_inspector();
 	}
 
 	for (auto& e : entries) {
 		if (auto layer = in.setup.find_layer(e.id)) {
-			layer->visible = e.was_visible;
+			layer->editable.active = e.was_active;
 
 			if (update_inspector) {
 				in.setup.inspect_add_quiet(e.id);

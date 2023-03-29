@@ -295,7 +295,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		const auto button_size = ImVec2(0, text_h * size_mult);
 		const int node_level = 1;
 
-		const bool node_disabled = !node.visible || !layer.visible;
+		const bool node_disabled = !node.active || !layer.is_active();
 
 		if (node_disabled) {
 			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
@@ -564,7 +564,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			ImGui::NextColumn();
 
 			{
-				const auto visibility_icon = in.necessary_images[node.visible
+				const auto visibility_icon = in.necessary_images[node.active
 					? assets::necessary_image_id::EDITOR_ICON_VISIBLE
 					: assets::necessary_image_id::EDITOR_ICON_HIDDEN
 				];
@@ -573,15 +573,15 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const auto cols = node_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
 
 				if (game_image_button("###NodeVisibility", visibility_icon, scaled_icon_size, cols, augs::imgui_atlas_type::GAME)) {
-					const auto next_value = !node.visible;
+					const auto next_value = !node.active;
 
 					if (in.setup.is_inspected(node_id)) {
-						auto command = in.setup.make_command_from_selected_nodes<toggle_nodes_visibility_command>(next_value ? "Shown " : "Hidden ");
+						auto command = in.setup.make_command_from_selected_nodes<toggle_nodes_active_command>(next_value ? "Shown " : "Hidden ");
 						command.next_value = next_value;
 						in.setup.post_new_command(std::move(command));
 					}
 					else {
-						auto command = toggle_nodes_visibility_command(); 
+						auto command = toggle_nodes_active_command(); 
 						command.push_entry(node_id);
 						command.built_description = (next_value ? "Shown " : "Hidden ") + node.get_display_name();
 						command.next_value = next_value;
@@ -624,7 +624,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			}
 
 			auto& layer = *maybe_layer;
-			const bool was_disabled = !layer.visible;
+			const bool was_disabled = !layer.is_active();
 
 			auto id_scope = scoped_id(id_counter++);
 			const auto label = layer.unique_name;
@@ -972,7 +972,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			ImGui::NextColumn();
 
 			{
-				const auto visibility_icon = in.necessary_images[layer.visible
+				const auto visibility_icon = in.necessary_images[layer.is_active()
 					? assets::necessary_image_id::EDITOR_ICON_VISIBLE
 					: assets::necessary_image_id::EDITOR_ICON_HIDDEN
 				];
@@ -981,17 +981,17 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const auto cols = was_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
 
 				if (game_image_button("###Visibility", visibility_icon, scaled_icon_size, cols, augs::imgui_atlas_type::GAME)) {
-					const auto next_value = !layer.visible;
+					const auto next_value = !layer.is_active();
 
 					if (in.setup.is_inspected(layer_id)) {
-						auto command = in.setup.make_command_from_selected_layers<toggle_layers_visibility_command>(next_value ? "Shown " : "Hidden ");
+						auto command = in.setup.make_command_from_selected_layers<toggle_layers_active_command>(next_value ? "Shown " : "Hidden ");
 						command.next_value = next_value;
 						in.setup.post_new_command(std::move(command));
 					}
 					else {
-						auto command = toggle_layers_visibility_command(); 
+						auto command = toggle_layers_active_command(); 
 						command.push_entry(layer_id);
-						command.built_description = (next_value ? "Shown " : "Hidden ") + layer.get_display_name();
+						command.built_description = (next_value ? "Enabled " : "Disabled ") + layer.get_display_name();
 						command.next_value = next_value;
 						command.update_inspector = false;
 						in.setup.post_new_command(std::move(command));

@@ -200,7 +200,7 @@ void build_arena_from_editor_project(
 			) {
 				typed_node.scene_entity_id.unset();
 
-				if (!typed_node.visible || !layer->visible) {
+				if (!typed_node.active || !layer->is_active()) {
 					return;
 				}
 

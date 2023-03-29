@@ -14,10 +14,11 @@ struct editor_layer_hierarchy {
 
 struct editor_layer_editable {
 	// GEN INTROSPECTOR struct editor_layer_editable
-	bool select_together = false;
-	bool selectable_on_scene = true;
+	bool active = true;
 	float opacity = 1.0f;
 	rgba tint = white;
+
+	bool selectable_on_scene = true;
 	// END GEN INTROSPECTOR
 };
 
@@ -26,7 +27,6 @@ struct editor_layer {
 	std::string unique_name;
 	editor_layer_editable editable;
 
-	bool visible = true;
 	bool is_open = true;
 
 	editor_layer_hierarchy hierarchy;
@@ -34,6 +34,10 @@ struct editor_layer {
 
 	const auto& get_display_name() const {
 		return unique_name;
+	}
+
+	bool is_active() const {
+		return editable.active;
 	}
 
 	bool empty() const {

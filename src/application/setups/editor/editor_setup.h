@@ -524,10 +524,10 @@ public:
 	void cut_selection();
 	void delete_selection();
 
-	bool is_node_visible(const editor_node_id) const;
-	auto only_visible_nodes() const {
+	bool is_node_active(const editor_node_id) const;
+	auto only_active_nodes() const {
 		return [this](const auto id) {
-			return is_node_visible(id);
+			return is_node_active(id);
 		};
 	}
 

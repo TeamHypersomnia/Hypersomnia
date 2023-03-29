@@ -17,7 +17,7 @@
 #include "application/setups/editor/commands/node_transform_commands.h"
 #include "application/setups/editor/commands/delete_nodes_command.h"
 #include "application/setups/editor/commands/duplicate_nodes_command.h"
-#include "application/setups/editor/commands/toggle_visibility_commands.h"
+#include "application/setups/editor/commands/toggle_active_commands.h"
 #include "application/setups/editor/commands/edit_layer_command.h"
 
 #include "application/setups/editor/commands/inspect_command.h"

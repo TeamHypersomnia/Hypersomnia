@@ -13,7 +13,7 @@ struct editor_node_base {
 	editor_typed_resource_id<R> resource_id;
 	E editable;
 
-	bool visible = true;
+	bool active = true;
 
 	mutable entity_id scene_entity_id;
 	mutable bool passed_filter = false;

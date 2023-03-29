@@ -5147,3 +5147,6 @@ Advantages:
 		- that's in accordance with VS layout
 	- Well, looks better AFTER the buttons in the end
 
+- visible -> active
+	- this is future-proof because we might want to use "visible" for nodes that are still included in the scene, but invisible in the editor
+

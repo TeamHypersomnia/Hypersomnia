@@ -40,8 +40,8 @@ class move_nodes_command;
 class resize_nodes_command;
 class flip_nodes_command;
 
-struct toggle_nodes_visibility_command;
-struct toggle_layers_visibility_command;
+struct toggle_nodes_active_command;
+struct toggle_layers_active_command;
 
 struct edit_layer_command;
 
@@ -115,8 +115,8 @@ using editor_history_base = augs::history_with_saved_revision<
 	delete_nodes_command,
 	duplicate_nodes_command,
 
-	toggle_nodes_visibility_command,
-	toggle_layers_visibility_command,
+	toggle_nodes_active_command,
+	toggle_layers_active_command,
 
 	edit_layer_command,
 	edit_project_settings_command,

@@ -1618,7 +1618,7 @@ void editor_setup::select_all_entities() {
 		clear_inspector();
 	}
 
-	bool inspected_any_visible = false;
+	bool inspected_any_active = false;
 
 	std::unordered_set<editor_node_id> nodes;
 
@@ -1637,8 +1637,8 @@ void editor_setup::select_all_entities() {
 		ensure(layer != nullptr);
 
 		for (const auto node_id : reverse(layer->hierarchy.nodes)) {
-			if (is_node_visible(node_id) && !inspected(node_id)) {
-				inspected_any_visible = true;
+			if (is_node_active(node_id) && !inspected(node_id)) {
+				inspected_any_active = true;
 
 				inspect_add_quiet(node_id);
 				remember_as_inspected(node_id);
@@ -1646,14 +1646,14 @@ void editor_setup::select_all_entities() {
 		}
 	}
 
-	if (!inspected_any_visible) {
+	if (!inspected_any_active) {
 		for (const auto layer_id : reverse(project.layers.order)) {
 			auto layer = find_layer(layer_id);
 			ensure(layer != nullptr);
 
 			for (const auto node_id : reverse(layer->hierarchy.nodes)) {
-				if (!is_node_visible(node_id) && !inspected(node_id)) {
-					inspected_any_visible = true;
+				if (!is_node_active(node_id) && !inspected(node_id)) {
+					inspected_any_active = true;
 
 					inspect_add_quiet(node_id);
 					remember_as_inspected(node_id);
@@ -2005,7 +2005,7 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 	else if (gui.inspector.inspects_only<editor_node_id>()) {
 		auto command = make_command_from_selected_nodes<duplicate_nodes_command>(
 			only_duplicating ? "Duplicated " : "Mirrored ",
-			only_visible_nodes()
+			only_active_nodes()
 		);
 
 		std::optional<std::pair<editor_layer_id, std::size_t>> found_parent;
@@ -2047,10 +2047,10 @@ void editor_setup::duplicate_selection(bool start_moving) {
 	mirror_selection(vec2i(0, 0), start_moving);
 }
 
-bool editor_setup::is_node_visible(const editor_node_id id) const {
+bool editor_setup::is_node_active(const editor_node_id id) const {
 	if (const auto found_layer = find_parent_layer(id)) {
 		if (found_layer->layer_ptr) {
-			if (!found_layer->layer_ptr->visible) {
+			if (!found_layer->layer_ptr->is_active()) {
 				return false;
 			}
 		}
@@ -2059,17 +2059,17 @@ bool editor_setup::is_node_visible(const editor_node_id id) const {
 		return false;
 	}
 
-	bool visible = false;
+	bool active = false;
 
-	on_node(id, [&visible](const auto& typed_node, const auto node_id) {
+	on_node(id, [&active](const auto& typed_node, const auto node_id) {
 		(void)node_id;
 
-		if (typed_node.visible) {
-			visible = true;
+		if (typed_node.active) {
+			active = true;
 		}
 	});
 
-	return visible;
+	return active;
 }
 
 double editor_setup::get_interpolation_ratio() const {

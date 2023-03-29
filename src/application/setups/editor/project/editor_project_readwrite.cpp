@@ -197,173 +197,188 @@ namespace editor_project_readwrite {
 		};
 
 		auto read_modes = [&]() {
-			if (const auto maybe_modes = FindObject(document, "game_modes")) {
-				auto& modes = loaded.get_game_modes();
+			const auto maybe_modes = FindObject(document, "game_modes");
 
-				for (auto& mode : *maybe_modes) {
-					if (!mode.value.IsObject()) {
-						continue;
-					}
+			if (!maybe_modes) {
+				return;
+			}
 
-					const auto key = std::string(mode.name.GetString());
+			auto& modes = loaded.get_game_modes();
 
-					editor_game_mode_resource new_game_mode;
-					::setup_game_mode_defaults(new_game_mode.editable, officials_map);
-
-					auto read_into = [&](auto& specific_game_mode) {
-						augs::read_json(mode.value, specific_game_mode);
-					};
-
-					if (key == "playtesting") {
-						new_game_mode.type.set<editor_playtesting_mode>();
-						read_into(new_game_mode.editable.playtesting);
-					}
-					else if (key == "bomb_defusal") {
-						new_game_mode.type.set<editor_bomb_defusal_mode>();
-						read_into(new_game_mode.editable.bomb_defusal);
-					}
-
-					new_game_mode.unique_name = key;
-
-					const auto result = modes.allocate(std::move(new_game_mode));
-					register_new_resource(result);
+			for (auto& mode : *maybe_modes) {
+				if (!mode.value.IsObject()) {
+					continue;
 				}
+
+				const auto key = std::string(mode.name.GetString());
+
+				editor_game_mode_resource new_game_mode;
+				::setup_game_mode_defaults(new_game_mode.editable, officials_map);
+
+				auto read_into = [&](auto& specific_game_mode) {
+					augs::read_json(mode.value, specific_game_mode);
+				};
+
+				if (key == "playtesting") {
+					new_game_mode.type.set<editor_playtesting_mode>();
+					read_into(new_game_mode.editable.playtesting);
+				}
+				else if (key == "bomb_defusal") {
+					new_game_mode.type.set<editor_bomb_defusal_mode>();
+					read_into(new_game_mode.editable.bomb_defusal);
+				}
+
+				new_game_mode.unique_name = key;
+
+				const auto result = modes.allocate(std::move(new_game_mode));
+				register_new_resource(result);
 			}
 		};
 
 		auto read_external_resources = [&]() {
 			std::unordered_set<augs::path_type> existing;
 
-			if (const auto maybe_externals = FindArray(document, "external_resources")) {
-				for (auto& resource : *maybe_externals) {
-					if (!resource.IsObject()) {
-						continue;
+			const auto maybe_externals = FindArray(document, "external_resources");
+
+			if (!maybe_externals) {
+				return;
+			}
+
+			for (auto& resource : *maybe_externals) {
+				if (!resource.IsObject()) {
+					continue;
+				}
+
+				if (!resource.HasMember("path") || !resource["path"].IsString()) {
+					if (strict) {
+						throw augs::json_deserialization_error("Missing \"path\" property for an external resource!");
 					}
 
-					if (!resource.HasMember("path") || !resource["path"].IsString()) {
+					continue;
+				}
+
+				if (!resource.HasMember("id") || !resource["id"].IsString()) {
+					if (strict) {
+						throw augs::json_deserialization_error("Missing \"id\" property for %x!", resource["path"].GetString());
+					}
+
+					continue;
+				}
+
+				if (!resource.HasMember("file_hash") || !resource["file_hash"].IsString()) {
+					if (strict) {
+						throw augs::json_deserialization_error("Missing \"file_hash\" property for %x!", resource["path"].GetString());
+					}
+
+					continue;
+				}
+
+				const auto id = resource["id"].GetString();
+				const auto file_hash = resource["file_hash"].GetString();
+
+				auto load_resource = [&](const augs::path_type& path) {
+					if (found_in(existing, path)) {
 						if (strict) {
-							throw augs::json_deserialization_error("Missing \"path\" property for an external resource!");
+							throw augs::json_deserialization_error("Duplicate entries for %x!", path);
 						}
 
-						continue;
+						return;
 					}
 
-					if (!resource.HasMember("id") || !resource["id"].IsString()) {
+					existing.emplace(path);
+
+					/*
+						Determine type based on the extension.
+					*/
+
+					auto read_as = [&]<typename R>(R typed_resource) {
+						::setup_resource_defaults(typed_resource, officials_map);
+						augs::read_json(resource, typed_resource.editable);
+
+						auto& pool = loaded.resources.get_pool_for<R>();
+						const auto [key, object] = pool.allocate(std::move(typed_resource));
+						const auto typed_id = editor_typed_resource_id<R>::from_raw(key, false);
+
+						const auto result = resource_map.try_emplace(id, typed_id.operator editor_resource_id());
+
 						if (strict) {
-							throw augs::json_deserialization_error("Missing \"id\" property for %x!", resource["path"].GetString());
-						}
-
-						continue;
-					}
-
-					if (!resource.HasMember("file_hash") || !resource["file_hash"].IsString()) {
-						if (strict) {
-							throw augs::json_deserialization_error("Missing \"file_hash\" property for %x!", resource["path"].GetString());
-						}
-
-						continue;
-					}
-
-					const auto id = resource["id"].GetString();
-					const auto file_hash = resource["file_hash"].GetString();
-
-					auto load_resource = [&](const augs::path_type& path) {
-						if (found_in(existing, path)) {
-							if (strict) {
-								throw augs::json_deserialization_error("Duplicate entries for %x!", path);
+							if (!result.second) {
+								throw augs::json_deserialization_error("Duplicate resource id %x: ", id);
 							}
-
-							return;
-						}
-
-						existing.emplace(path);
-
-						/*
-							Determine type based on the extension.
-						*/
-
-						auto read_as = [&]<typename R>(R typed_resource) {
-							::setup_resource_defaults(typed_resource, officials_map);
-							augs::read_json(resource, typed_resource.editable);
-
-							auto& pool = loaded.resources.get_pool_for<R>();
-							const auto [key, object] = pool.allocate(std::move(typed_resource));
-							const auto typed_id = editor_typed_resource_id<R>::from_raw(key, false);
-
-							const auto result = resource_map.try_emplace(id, typed_id.operator editor_resource_id());
-
-							if (strict) {
-								if (!result.second) {
-									throw augs::json_deserialization_error("Duplicate resource id %x: ", id);
-								}
-							}
-						};
-
-						const auto extension = path.extension();
-						const auto type = ::get_filesystem_node_type_by_extension(extension);
-
-						using Type = editor_filesystem_node_type;
-
-						const auto pathed = editor_pathed_resource(
-							/*
-								In case of the editor,
-								these two props are read basically only so that the editor can later 
-								associate the paths/hashes to existing files - 
-								since the editor on its own iterates the entire project folder in search of paths.
-							*/
-
-							path,
-							file_hash,
-							{}
-						);
-
-						switch (type) {
-							case Type::IMAGE:
-								read_as(editor_sprite_resource(pathed));
-								break;
-							case Type::SOUND:
-								read_as(editor_sound_resource(pathed));
-								break;
-
-							default: 
-								if (strict) {
-									throw augs::json_deserialization_error("Failed to load %x: unknown extension!", path);
-								}
-
-								return;
 						}
 					};
 
-					const auto untrusted_path = resource["path"].GetString();
+					const auto extension = path.extension();
+					const auto type = ::get_filesystem_node_type_by_extension(extension);
 
-					std::visit(
-						[&]<typename R>(const R& result) {
-							if constexpr(std::is_same_v<R, sanitization::forbidden_path_type>) {
-								const auto err = typesafe_sprintf(
-									"Failed to load %x:\n%x",
-									untrusted_path,
-									sanitization::describe(result)
-								);
+					using Type = editor_filesystem_node_type;
 
-								if (strict) {
-									throw augs::json_deserialization_error(err);
-								}
-							}
-							else if constexpr(std::is_same_v<R, augs::path_type>) {
-								load_resource(result);
-							}
-							else {
-								static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
-							}
-						},
+					const auto pathed = editor_pathed_resource(
+						/*
+							In case of the editor,
+							these two props are read basically only so that the editor can later 
+							associate the paths/hashes to existing files - 
+							since the editor on its own iterates the entire project folder in search of paths.
+						*/
 
-						sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path)
+						path,
+						file_hash,
+						{}
 					);
-				}
+
+					switch (type) {
+						case Type::IMAGE:
+							read_as(editor_sprite_resource(pathed));
+							break;
+						case Type::SOUND:
+							read_as(editor_sound_resource(pathed));
+							break;
+
+						default: 
+							if (strict) {
+								throw augs::json_deserialization_error("Failed to load %x: unknown extension!", path);
+							}
+
+							return;
+					}
+				};
+
+				const auto untrusted_path = resource["path"].GetString();
+
+				std::visit(
+					[&]<typename R>(const R& result) {
+						if constexpr(std::is_same_v<R, sanitization::forbidden_path_type>) {
+							const auto err = typesafe_sprintf(
+								"Failed to load %x:\n%x",
+								untrusted_path,
+								sanitization::describe(result)
+							);
+
+							if (strict) {
+								throw augs::json_deserialization_error(err);
+							}
+						}
+						else if constexpr(std::is_same_v<R, augs::path_type>) {
+							load_resource(result);
+						}
+						else {
+							static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
+						}
+					},
+
+					sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path)
+				);
 			}
 		};
 
-		auto read_resources = [&]() {
+		auto read_internal_resources = [&]() {
+			/* 
+				For now we won't have any.
+				All of them are official.
+			*/
+		};
+
+		auto read_layers = [&]() {
 
 		};
 
@@ -394,9 +409,12 @@ namespace editor_project_readwrite {
 		read_project_structs();
 
 		read_modes();
-		read_external_resources();
-		read_resources();
 		create_fallback_playtesting_mode_if_none();
+
+		read_external_resources();
+		read_internal_resources();
+
+		read_layers();
 
 		unstringify_resource_ids();
 

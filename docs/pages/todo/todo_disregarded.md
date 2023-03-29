@@ -5,6 +5,14 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Internal/special resource names colliding with file names might be a pain the ass
+	- E.g. suppose there's no collision
+		- Someone renames a sprite whose pseudo-id becomes now equivalent to some special resource's name 
+		- Again this is only a problem during serialization - not during game
+			- And during serialization we can just add "_" until the name becomes free
+	- And it's not even a problem for now because we don't have special resources yet save for modes
+	- We don't even have to decide on name
+
 - BELOW IS A NON-QUESTION: We have sizes in sprite resources, so we serialize them!!!
 	- So yeah, the cardinal question is do we serialize the metadata for resources that are necessary to preserve logical integrity of the map?
 		- Like sprite sizes, number of frames and sound lengths

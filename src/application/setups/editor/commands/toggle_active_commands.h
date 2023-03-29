@@ -3,13 +3,13 @@
 #include "application/setups/editor/nodes/editor_node_id.h"
 #include "application/setups/editor/project/editor_layers.h"
 
-struct toggle_nodes_visibility_command {
+struct toggle_nodes_active_command {
 	editor_command_meta meta;
 
 private:
 	struct entry {
 		editor_node_id id;
-		bool was_visible = false;
+		bool was_active = false;
 	};
 
 	std::vector<entry> entries;
@@ -35,13 +35,13 @@ public:
 	}
 };
 
-struct toggle_layers_visibility_command {
+struct toggle_layers_active_command {
 	editor_command_meta meta;
 
 private:
 	struct entry {
 		editor_layer_id id;
-		bool was_visible = false;
+		bool was_active = false;
 	};
 
 	std::vector<entry> entries;
