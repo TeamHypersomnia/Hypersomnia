@@ -106,8 +106,17 @@
 				- bardziej stateless i mniej complex z takimi sciezkami chyba
 */
 
-"external_resources": {
-	"gfx/abc.png": {
+/*
+	Może się wydawać kuszące żeby robić ścieżki jako klucze
+	ale lepiej żeby deserializator wczytywał to do tablicy zamiast niepotrzebnie robił sobie w środku mapę
+	My i tak bedziemy sobie robić mape z identyfikatorów
+
+	Reader po prostu niech odrzuca duplikaty
+*/
+
+"external_resources": [
+	{
+		"path": "gfx/abc.png",
 		"id": "abc",
 		"file_hash": "aEdhJHk83dLkfJGH8932FDS"
 	},
@@ -158,7 +167,7 @@
 			"radius": "10"
 		}
 	}
-},
+],
 
 
 /*

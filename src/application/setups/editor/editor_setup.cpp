@@ -59,6 +59,7 @@
 #include "game/detail/snap_interpolation_to_logical.h"
 #include "augs/window_framework/window.h"
 
+#include "application/setups/editor/editor_official_resource_map.hpp"
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
 #include "application/arena/arena_handle.h"
 

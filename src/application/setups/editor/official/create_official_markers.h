@@ -23,17 +23,15 @@ void create_markers(const intercosm&, editor_resource_pools& pools) {
 		auto& pool = pools.template get_pool_for<editor_area_marker_resource>();
 
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
-			if (enum_id == area_marker_type::PREFAB) {
+			if (enum_id == area_marker_type::PREFAB 
+				|| enum_id == area_marker_type::BOMBSITE_DUMMY_B
+				|| enum_id == area_marker_type::BOMBSITE_DUMMY_C
+			) {
 				return;
 			}
 
 			auto res = editor_area_marker_resource();
 			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
-
-			if (res.unique_name.find("dummy") != std::string::npos) {
-				return;
-			}
-
 			res.editable.type = enum_id;
 
 			pool.allocate(res);

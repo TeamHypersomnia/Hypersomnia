@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- id vs name
+	- in case of resources - at least pathed ones - certainly id because it might even be different than display name
+	- I'd honestly be consistent as these indeed work as identifiers
+- Also nothing happens if two resources have the same display name in-game
+	- we'll have to use a pseudo id that considers an extension
+- Mapping official resources
+	- Can we guarantee that all resources
+		- Does it matter at serialization stage?
+		- These are only display names, but it would be nice if they matched ids
+
+- Uh, we'll actually need to map to editor_resource_id
+	- And all resource ids will have to be unique (so can't have a weapon named "playtesting")
+	- That is because we're resolving the type of the node by just its resource name
+
 - Resolution of strings->ids and viceversa should be easy
 	- That's literally just a single introspection call to our entire project + single introspection call per every node and resource
 		- Nothing more

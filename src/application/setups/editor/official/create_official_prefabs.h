@@ -1,6 +1,7 @@
 #pragma once
 #include "test_scenes/test_scene_flavour_ids.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "application/setups/editor/editor_official_resource_map.hpp"
 
 void editor_setup::create_official_prefabs() {
 	using id_type = editor_builtin_prefab_type;

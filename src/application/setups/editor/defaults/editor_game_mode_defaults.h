@@ -1,5 +1,5 @@
 #pragma once
-#include "application/setups/editor/editor_official_resource_map.h"
+#include "application/setups/editor/editor_official_resource_map.hpp"
 
 inline void setup_game_mode_defaults(
 	editor_game_mode_resource_editable& e,

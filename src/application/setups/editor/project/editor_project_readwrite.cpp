@@ -19,25 +19,32 @@ namespace augs {
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/project/editor_project_readwrite.h"
 
-#include "application/setups/editor/editor_official_resource_map.h"
+#include "application/setups/editor/editor_official_resource_map.hpp"
 #include "application/setups/editor/defaults/editor_game_mode_defaults.h"
 #include "application/setups/editor/defaults/editor_project_defaults.h"
 
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/templates/introspection_utils/on_each_object_in_object.h"
+#include "application/setups/editor/create_name_to_id_map.hpp"
 
-template <class T>
-using make_string_to_id_map = std::unordered_map<std::string, editor_typed_resource_id<T>>;
-
-using resource_name_to_id = per_type_container<all_editor_resource_types, make_string_to_id_map>;
-
+#if 0
 template <class R>
 void unpack_string_id(resource_name_to_id& ids, editor_typed_resource_id<R>& id) {
 	if (auto found = mapped_or_nullptr(ids.get_for<R>(), id._serialized_resource_name)) {
 		id = *found;
 	}
 }
+#else
+template <class R>
+void unpack_string_id(resource_name_to_id& ids, editor_typed_resource_id<R>& id) {
+	if (auto found = mapped_or_nullptr(ids, id._serialized_resource_name)) {
+		if ((*found).type_id.template is<R>()) {
+			id = editor_typed_resource_id<R>::from_generic(*found);
+		}
+	}
+}
+#endif
 
 template <class T, class F>
 std::optional<T> GetIf(F& from, const std::string& label) {
@@ -142,7 +149,7 @@ namespace editor_project_readwrite {
 	) {
 		(void)officials;
 
-		resource_name_to_id resource_map;
+		auto resource_map = officials_map.create_name_to_id_map();
 
 		auto register_new_resource = [&](auto& allocation_result) {
 			auto& allocated = allocation_result.object;
@@ -151,7 +158,7 @@ namespace editor_project_readwrite {
 			using Id = editor_typed_resource_id<O>;
 
 			const auto typed_id = Id::from_raw(allocation_result.key, false);
-			resource_map.get_for<O>()[allocated.unique_name] = typed_id;
+			resource_map[allocated.unique_name] = typed_id.operator editor_resource_id();
 		};
 
 		editor_project loaded;
@@ -191,25 +198,25 @@ namespace editor_project_readwrite {
 						continue;
 					}
 
-					const auto name = std::string(mode.name.GetString());
+					const auto key = std::string(mode.name.GetString());
 
 					editor_game_mode_resource new_game_mode;
 					::setup_game_mode_defaults(new_game_mode.editable, officials_map);
 
-					auto read_into = [&](auto& typed) {
-						(void)typed;
+					auto read_into = [&](auto& specific_game_mode) {
+						augs::read_json(mode.value, specific_game_mode);
 					};
 
-					if (name == "playtesting") {
+					if (key == "playtesting") {
 						new_game_mode.type.set<editor_playtesting_mode>();
 						read_into(new_game_mode.editable.playtesting);
 					}
-					else if (name == "bomb_defusal") {
+					else if (key == "bomb_defusal") {
 						new_game_mode.type.set<editor_bomb_defusal_mode>();
 						read_into(new_game_mode.editable.bomb_defusal);
 					}
 
-					new_game_mode.unique_name = name;
+					new_game_mode.unique_name = key;
 
 					const auto result = modes.allocate(std::move(new_game_mode));
 					register_new_resource(result);
@@ -217,8 +224,18 @@ namespace editor_project_readwrite {
 			}
 		};
 
-		auto read_resources = [&]() {
+		auto read_external_resources = [&]() {
+			if (const auto maybe_externals = FindArray(document, "external_resources")) {
+				for (auto& resource : *maybe_externals) {
+					if (!resource.IsObject()) {
+						continue;
+					}
 
+					if (!resource.HasMember("id")) {
+						continue;
+					}
+				}
+			}
 		};
 
 		auto create_fallback_playtesting_mode_if_none = [&]() {
@@ -248,7 +265,7 @@ namespace editor_project_readwrite {
 		read_project_structs();
 
 		read_modes();
-		read_resources();
+		read_external_resources();
 		create_fallback_playtesting_mode_if_none();
 
 		unstringify_resource_ids();
