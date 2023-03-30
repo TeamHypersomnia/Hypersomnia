@@ -833,13 +833,20 @@ EDIT_FUNCTION(editor_layer_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Selectable on scene", selectable_on_scene);
-	MULTIPROPERTY("Opacity", opacity);
-	MULTIPROPERTY("Tint", tint);
+	MULTIPROPERTY("Active", active);
 
 	if (ImGui::IsItemHovered()) {
-		text_tooltip("Useful for e.g. ground/floor layers.\nYou might want to see the background objects without them being hoverable.\nThis way you can comfortably mass-select only some foreground objects.");
+		text_tooltip("If you untick this, nodes will not be included in the scene.\nYou won't be able to see them or interact with them.");
 	}
+
+	MULTIPROPERTY("Selectable on scene", selectable_on_scene);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("If you untick this, you'll still see the nodes on scene\nbut they will not react to the mouse cursor.\n\nThis way you can comfortably work on nodes only from layers of interest:\ne.g. disable foregrounds while you're trying to work on objects beneath.");
+	}
+
+	MULTIPROPERTY("Opacity", opacity);
+	MULTIPROPERTY("Tint", tint);
 
 	return result;
 }

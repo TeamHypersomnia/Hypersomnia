@@ -378,8 +378,71 @@ namespace editor_project_readwrite {
 			*/
 		};
 
-		auto read_layers = [&]() {
+		std::unordered_map<std::string, editor_node_id> node_map;
 
+		auto read_nodes = [&]() {
+
+		};
+
+		auto read_layers = [&]() {
+			const auto maybe_layers = FindArray(document, "layers");
+
+			if (!maybe_layers) {
+				return;
+			}
+
+			for (auto& json_layer : *maybe_layers) {
+				const auto id = GetIf<std::string>(json_layer, "id");
+
+				if (id == std::nullopt) {
+					if (strict) {
+						throw augs::json_deserialization_error("Missing \"id\" property for layer!");
+					}
+
+					continue;
+				}
+
+				editor_layer layer;
+				layer.unique_name = *id;
+
+				augs::read_json(json_layer, layer.editable);
+
+				auto read_layer_nodes = [&]() {
+					if (const auto maybe_nodes = FindArray(json_layer, "nodes")) {
+						for (auto& layer_node : *maybe_nodes) {
+							if (layer_node.IsString()) {
+								const auto node_id = layer_node.GetString();
+								
+								if (const auto found_node = mapped_or_nullptr(node_map, node_id)) {
+									layer.hierarchy.nodes.push_back(*found_node);
+								}
+								else {
+									if (strict) {
+										throw augs::json_deserialization_error(
+											"Error reading layer \"%x\": node \"%x\" not found!", 
+											layer.unique_name,
+											node_id
+										);
+									}
+								}
+							}
+							else {
+								if (strict) {
+									throw augs::json_deserialization_error(
+										"Error reading layer \"%x\": Node identifier must be a string!", 
+										layer.unique_name
+									);
+								}
+							}
+						}
+					}
+				};
+
+				read_layer_nodes();
+
+				const editor_layer_id layer_id = loaded.layers.pool.allocate(std::move(layer));
+				loaded.layers.order.push_back(layer_id);
+			}
 		};
 
 		auto create_fallback_playtesting_mode_if_none = [&]() {
@@ -414,6 +477,7 @@ namespace editor_project_readwrite {
 		read_external_resources();
 		read_internal_resources();
 
+		read_nodes();
 		read_layers();
 
 		unstringify_resource_ids();
