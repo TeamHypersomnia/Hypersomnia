@@ -22,3 +22,7 @@ inline editor_filesystem_node_type get_filesystem_node_type_by_extension(const s
 
 	return editor_filesystem_node_type::OTHER_FILE;
 }
+
+inline editor_filesystem_node_type get_filesystem_node_type_by_extension(const augs::path_type& extension) {
+	return get_filesystem_node_type_by_extension(extension.string());
+}
