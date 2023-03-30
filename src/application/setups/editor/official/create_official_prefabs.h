@@ -12,6 +12,7 @@ void editor_setup::create_official_prefabs() {
 		auto res = editor_prefab_resource();
 		res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
 		res.editable.type = enum_id;
+		res.official_tag = enum_id;
 
 		using T = editor_builtin_prefab_type;
 

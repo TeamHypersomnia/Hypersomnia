@@ -133,6 +133,7 @@ void editor_setup::create_official_resources() {
 	for_each_resource<editor_area_marker_resource>(map_officials_area, true);
 
 	create_official_prefabs();
+	for_each_resource<editor_prefab_resource>(map_officials, true);
 
 	gui.filesystem.rebuild_official_special_filesystem(*this);
 }

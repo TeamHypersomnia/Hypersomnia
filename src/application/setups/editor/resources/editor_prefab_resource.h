@@ -22,6 +22,7 @@ struct editor_prefab_resource {
 
 	editor_prefab_resource_editable editable;
 
+	std::optional<editor_builtin_prefab_type> official_tag;
 	mutable std::variant<typed_entity_flavour_id<box_marker>> scene_flavour_id;
 
 	std::string unique_name;

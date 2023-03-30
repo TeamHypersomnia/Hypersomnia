@@ -20,6 +20,8 @@ struct editor_official_resource_map {
 
 	Map<test_shootable_weapons, editor_firearm_resource> firearms;
 	Map<test_melee_weapons, editor_melee_resource> melees;
+
+	Map<editor_builtin_prefab_type, editor_prefab_resource> prefabs;
 	// END GEN INTROSPECTOR
 
 	auto create_name_to_id_map() const;

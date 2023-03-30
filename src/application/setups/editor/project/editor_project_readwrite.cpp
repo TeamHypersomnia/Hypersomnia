@@ -160,14 +160,21 @@ namespace editor_project_readwrite {
 
 		auto resource_map = officials_map.create_name_to_id_map();
 
-		auto register_new_resource = [&](auto& allocation_result) {
+		auto register_new_resource = [&](const auto name_id, auto& allocation_result) {
 			auto& allocated = allocation_result.object;
 
 			using O = remove_cref<decltype(allocated)>;
 			using Id = editor_typed_resource_id<O>;
 
 			const auto typed_id = Id::from_raw(allocation_result.key, false);
-			resource_map.try_emplace(allocated.unique_name, typed_id.operator editor_resource_id());
+
+			const auto result = resource_map.try_emplace(name_id, typed_id.operator editor_resource_id());
+
+			if (strict) {
+				if (!result.second) {
+					throw augs::json_deserialization_error("Duplicate resource: \"%x\"", name_id);
+				}
+			}
 		};
 
 		editor_project loaded;
@@ -234,7 +241,7 @@ namespace editor_project_readwrite {
 				new_game_mode.unique_name = key;
 
 				const auto result = modes.allocate(std::move(new_game_mode));
-				register_new_resource(result);
+				register_new_resource(key, result);
 			}
 		};
 
@@ -299,16 +306,8 @@ namespace editor_project_readwrite {
 						augs::read_json(resource, typed_resource.editable);
 
 						auto& pool = loaded.resources.pools.get_for<R>();
-						const auto [key, object] = pool.allocate(std::move(typed_resource));
-						const auto typed_id = editor_typed_resource_id<R>::from_raw(key, false);
-
-						const auto result = resource_map.try_emplace(id, typed_id.operator editor_resource_id());
-
-						if (strict) {
-							if (!result.second) {
-								throw augs::json_deserialization_error("Duplicate resource id %x: ", id);
-							}
-						}
+						const auto result = pool.allocate(std::move(typed_resource));
+						register_new_resource(id, result);
 					};
 
 					const auto extension = path.extension();
@@ -573,11 +572,12 @@ namespace editor_project_readwrite {
 				editor_game_mode_resource new_game_mode;
 				::setup_game_mode_defaults(new_game_mode.editable, officials_map);
 
+				const auto key = "playtesting";
 				new_game_mode.type.set<editor_playtesting_mode>();
-				new_game_mode.unique_name = "playtesting";
+				new_game_mode.unique_name = key;
 
 				const auto result = modes.allocate(std::move(new_game_mode));
-				register_new_resource(result);
+				register_new_resource(key, result);
 			}
 		};
 
