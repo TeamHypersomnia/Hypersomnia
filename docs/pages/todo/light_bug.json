@@ -1,0 +1,45 @@
+{
+    "meta": {
+        "game_version": "1.1.7967",
+        "name": "my_new_arena",
+        "version_timestamp": "2023-03-29 00:21:59.661792 UTC"
+    },
+
+    "about": {
+        "short_description": "Light bug, wtf? On such a simple setup? We'll really need to switch to the optimal algorithm without raycasts."
+    },
+
+    "layers": [
+        {
+            "id": "warstwa",
+            "nodes": [
+                "light",
+                "wall",
+                "floor"
+            ]
+        }
+    ],
+
+    "nodes": [
+        {
+            "id": "floor",
+            "type": "[dev_floor_128]",
+            "pos": [192, 128],
+            "size": [640, 512]
+        },
+        {
+            "id": "light",
+            "type": "[point_light]",
+            "colorize": [255, 165, 0, 255],
+            "pos": [100, 100],
+            "positional_vibration": 0,
+            "intensity_vibration": 0
+        },
+        {
+            "id": "wall",
+            "type": "[dev_wall_128]",
+            "pos": [-192, 128],
+            "size": [128, 512]
+        }
+    ]
+}

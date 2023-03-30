@@ -37,7 +37,7 @@ namespace augs {
 
 	template <class I>
 	void from_json_value(I& from, vec2& out) {
-		if (from.IsArray() && from.Size() == 2 && from[0].IsFloat() && from[1].IsFloat()) {
+		if (from.IsArray() && from.Size() == 2 && from[0].IsNumber() && from[1].IsNumber()) {
 			out.set(from[0].GetFloat(), from[1].GetFloat());
 		}
 	}
@@ -52,7 +52,7 @@ namespace augs {
 
 	template <class I>
 	void from_json_value(I& from, vec2d& out) {
-		if (from.IsArray() && from.Size() == 2 && from[0].IsDouble() && from[1].IsDouble()) {
+		if (from.IsArray() && from.Size() == 2 && from[0].IsNumber() && from[1].IsNumber()) {
 			out.set(from[0].GetDouble(), from[1].GetDouble());
 		}
 	}
@@ -67,8 +67,15 @@ namespace augs {
 
 	template <class I>
 	void from_json_value(I& from, vec2i& out) {
-		if (from.IsArray() && from.Size() == 2 && from[0].IsInt() && from[1].IsInt()) {
-			out.set(from[0].GetInt(), from[1].GetInt());
+		if (from.IsArray() && from.Size() == 2) {
+			if (from[0].IsInt() && from[1].IsInt()) {
+				out.set(from[0].GetInt(), from[1].GetInt());
+			}
+			else {
+				if (from[0].IsNumber() && from[1].IsNumber()) {
+					out.set(static_cast<int>(from[0].GetDouble()), static_cast<int>(from[1].GetDouble()));
+				}
+			}
 		}
 	}
 
@@ -83,7 +90,14 @@ namespace augs {
 	template <class I>
 	void from_json_value(I& from, vec2u& out) {
 		if (from.IsArray() && from.Size() == 2 && from[0].IsUint() && from[1].IsUint()) {
-			out.set(from[0].GetUint(), from[1].GetUint());
+			if (from[0].IsUint() && from[1].IsUint()) {
+				out.set(from[0].GetUint(), from[1].GetUint());
+			}
+			else {
+				if (from[0].IsNumber() && from[1].IsNumber()) {
+					out.set(static_cast<unsigned>(from[0].GetDouble()), static_cast<unsigned>(from[1].GetDouble()));
+				}
+			}
 		}
 	}
 }

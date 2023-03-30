@@ -47,7 +47,7 @@ inline void create_node_command<T>::redo(editor_command_input in) {
 
 template <class T>
 inline editor_typed_node_id<T> create_node_command<T>::get_typed_node_id() const {
-	return { base::get_allocated_id() };
+	return editor_typed_node_id<T>::from_raw(base::get_allocated_id());
 }
 
 template <class T>

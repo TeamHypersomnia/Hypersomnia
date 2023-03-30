@@ -2,6 +2,7 @@
 #include "augs/string/path_sanitization.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/detail/is_editor_typed_resource.h"
+#include "application/setups/editor/resources/resource_traits.h"
 
 namespace augs {
 	template <class T, class R>
@@ -19,6 +20,7 @@ namespace augs {
 
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/project/editor_project.h"
+#include "application/setups/editor/project/editor_project.hpp"
 #include "application/setups/editor/project/editor_project_readwrite.h"
 
 #include "application/setups/editor/editor_official_resource_map.hpp"
@@ -32,6 +34,7 @@ namespace augs {
 
 #include "application/setups/editor/editor_filesystem_node_type.h"
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
+#include "application/setups/editor/defaults/editor_node_defaults.h"
 
 #if 0
 template <class R>
@@ -295,7 +298,7 @@ namespace editor_project_readwrite {
 						::setup_resource_defaults(typed_resource, officials_map);
 						augs::read_json(resource, typed_resource.editable);
 
-						auto& pool = loaded.resources.get_pool_for<R>();
+						auto& pool = loaded.resources.pools.get_for<R>();
 						const auto [key, object] = pool.allocate(std::move(typed_resource));
 						const auto typed_id = editor_typed_resource_id<R>::from_raw(key, false);
 
@@ -378,13 +381,106 @@ namespace editor_project_readwrite {
 			*/
 		};
 
-		std::unordered_map<std::string, editor_node_id> node_map;
+		struct node_meta {
+			editor_node_id id = editor_node_id();
+			bool assigned_to_layer = false;
+		};
+
+		std::unordered_map<std::string, node_meta> node_map;
 
 		auto read_nodes = [&]() {
+			const auto maybe_nodes = FindArray(document, "nodes");
 
+			if (maybe_nodes != std::nullopt) {
+				for (auto& json_node : *maybe_nodes) {
+					if (!json_node.IsObject()) {
+						continue;
+					}
+
+					const auto maybe_id = GetIf<std::string>(json_node, "id");
+
+					if (maybe_id == std::nullopt || *maybe_id == "") {
+						if (strict) {
+							throw augs::json_deserialization_error("Missing \"id\" property for node!");
+						}
+
+						continue;
+					}
+
+					const auto& id = *maybe_id;
+
+					const auto maybe_type = GetIf<std::string>(json_node, "type");
+
+					if (maybe_type == std::nullopt) {
+						if (strict) {
+							throw augs::json_deserialization_error("Missing \"type\" property for node \"%x\"!", id);
+						}
+
+						continue;
+					}
+
+					const auto& type = *maybe_type;
+					const auto resource_id = mapped_or_nullptr(resource_map, type);
+
+					if (resource_id == nullptr) {
+						if (strict) {
+							throw augs::json_deserialization_error("Invalid \"type\" property for node \"%x\".\nResource not found!", id);
+						}
+
+						continue;
+					}
+
+					auto create_node_from_resource = [&]<typename R>(const R& typed_resource, const auto typed_resource_id) {
+						if constexpr(!can_be_instantiated_v<R>) {
+							if (strict) {
+								throw augs::json_deserialization_error(
+									"Invalid \"type\" property for node \"%x\".\n\"%x\" cannot be instantiated!", id, type
+								);
+							}
+
+							return;
+						}
+						else {
+							using node_type = typename R::node_type;
+
+							const auto map_result = node_map.try_emplace(id, node_meta());
+
+							if (const bool is_unique = map_result.second) {
+								auto& pool = loaded.nodes.pools.get_for<node_type>();
+
+								const auto [new_raw_id, new_node] = pool.allocate();
+
+								new_node.resource_id = typed_resource_id;
+								new_node.unique_name = id;
+
+								::setup_node_defaults(new_node, typed_resource);
+								augs::read_json(json_node, new_node.editable);
+
+								const auto new_typed_id = editor_typed_node_id<node_type>::from_raw(new_raw_id);
+								(*map_result.first).second.id = new_typed_id.operator editor_node_id();
+							}
+							else {
+								if (strict) {
+									throw augs::json_deserialization_error(
+										"Duplicate nodes: \"%x\"!", id
+									);
+								}
+							}
+						}
+					};
+
+					loaded.on_resource(
+						officials,
+						*resource_id,
+						create_node_from_resource
+					);
+				}
+			}
 		};
 
 		auto read_layers = [&]() {
+			auto nodes_registered = std::size_t(0);
+
 			const auto maybe_layers = FindArray(document, "layers");
 
 			if (!maybe_layers) {
@@ -414,7 +510,23 @@ namespace editor_project_readwrite {
 								const auto node_id = layer_node.GetString();
 								
 								if (const auto found_node = mapped_or_nullptr(node_map, node_id)) {
-									layer.hierarchy.nodes.push_back(*found_node);
+									if (found_node->assigned_to_layer) {
+										if (strict) {
+											throw augs::json_deserialization_error(
+												"Error reading layer \"%x\":\nnode \"%x\" is already assigned to another layer!", 
+												layer.unique_name,
+												node_id
+											);
+										}
+
+										continue;
+									}
+									else {
+										found_node->assigned_to_layer = true;
+										layer.hierarchy.nodes.push_back(found_node->id);
+
+										++nodes_registered;
+									}
 								}
 								else {
 									if (strict) {
@@ -442,6 +554,15 @@ namespace editor_project_readwrite {
 
 				const editor_layer_id layer_id = loaded.layers.pool.allocate(std::move(layer));
 				loaded.layers.order.push_back(layer_id);
+			}
+
+			if (strict) {
+				if (nodes_registered < node_map.size()) {
+					throw augs::json_deserialization_error(
+						"Error reading layers:\n%x nodes weren't assigned to any layer!", 
+						node_map.size() - nodes_registered
+					);
+				}
 			}
 		};
 
@@ -482,76 +603,7 @@ namespace editor_project_readwrite {
 
 		unstringify_resource_ids();
 
-
-		/*
-			After resources and project settings are fully setup,
-			we have to load layer hierarchies and nodes - manually.
-			(They have the constexpr json_ignore flag set so they weren't loaded through augs::read_json).
-		*/
-
 		{
-			const auto name_to_layer = loaded.layers.make_name_to_layer_map();
-			const auto maybe_nodes = FindArray(document, "nodes");
-			const auto maybe_prefabs = FindObject(document, "prefabs");
-
-			if (maybe_prefabs != std::nullopt) {
-
-			}
-
-			if (maybe_nodes != std::nullopt) {
-				for (auto& node : *maybe_nodes) {
-					if (!node.IsObject()) {
-						continue;
-					}
-
-					auto maybe_type = GetIf<std::string>(node, "type");
-
-					if (maybe_type == std::nullopt) {
-						continue;
-					}
-
-					auto& type = maybe_type.value();
-
-					bool is_official = false;
-					(void)is_official;
-
-					if (type.front() == '@') {
-						type.erase(type.begin());
-
-						is_official = true;
-					}
-
-					const bool is_prefab   = type.front() == '[' && type.back() == ']';
-					const bool is_internal = type.front() == '<' && type.back() == '>';
-
-					if (is_prefab) {
-
-					}
-					else if (is_internal) {
-
-					}
-					else {
-
-					}
-
-					/* 
-						First we determine the type of this object
-					*/
-
-					const auto new_id = editor_node_id();
-
-					auto name = GetIf<std::string>(node, "name");
-					auto layer = GetIf<std::string>(node, "layer");
-
-					if (layer == std::nullopt) {
-						continue;
-					}
-
-					if (name != std::nullopt) {
-						loaded.nodes.names[new_id] = *name;
-					}
-				}
-			}
 		}
 
 		if (!loaded.playtesting.mode.is_set()) {

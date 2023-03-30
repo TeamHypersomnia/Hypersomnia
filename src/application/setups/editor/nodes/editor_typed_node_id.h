@@ -16,6 +16,10 @@ struct editor_typed_node_id {
 		return editor_node_type_id::of<E>();
 	}
 
+	static editor_typed_node_id<E> from_raw(const editor_node_pool_id& raw) {
+		return { raw };
+	}
+
 	static editor_typed_node_id<E> from_generic(const editor_node_id& id) {
 		ensure(get_type_id() == id.type_id);
 		return { id.raw };
