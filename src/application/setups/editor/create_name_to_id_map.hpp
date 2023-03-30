@@ -21,7 +21,7 @@ auto editor_official_resource_map::create_name_to_id_map() const {
 
 	auto map_names = [&](const auto&, auto& m) {
 		for (const auto& entry : m) {
-			const auto name = std::string("[") + to_lowercase(augs::enum_to_string(entry.first)) + "]";
+			const auto name = to_lowercase(augs::enum_to_string(entry.first));
 			name_to_id.try_emplace(name, entry.second.operator editor_resource_id());
 		}
 	};

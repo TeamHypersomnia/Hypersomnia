@@ -23,13 +23,13 @@
     "nodes": [
         {
             "id": "floor",
-            "type": "[dev_floor_128]",
+            "type": "dev_floor_128",
             "pos": [192, 128],
             "size": [640, 512]
         },
         {
             "id": "light",
-            "type": "[point_light]",
+            "type": "point_light",
             "colorize": [255, 165, 0, 255],
             "pos": [100, 100],
             "positional_vibration": 0,
@@ -37,7 +37,7 @@
         },
         {
             "id": "wall",
-            "type": "[dev_wall_128]",
+            "type": "dev_wall_128",
             "pos": [-192, 128],
             "size": [128, 512]
         }

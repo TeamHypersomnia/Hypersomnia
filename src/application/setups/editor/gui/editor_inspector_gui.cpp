@@ -1375,12 +1375,18 @@ EDIT_FUNCTION(
 
 	auto edit = [&]<typename I>(const I&) {
 		if constexpr(std::is_same_v<I, editor_playtesting_mode>) {
+			MULTIPROPERTY("Respawn time (ms)", playtesting.respawn_time_ms);
+
+			ImGui::Separator();
+
 			FACTION_EQUIPMENT_PROPERTY("Equipment", playtesting.equipment);
 		}
 		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
 			MULTIPROPERTY("Warmup time", bomb_defusal.warmup_time);
 			MULTIPROPERTY("Freeze time", bomb_defusal.freeze_time);
 			MULTIPROPERTY("Buy time", bomb_defusal.buy_time);
+
+			ImGui::Separator();
 
 			FACTION_EQUIPMENT_PROPERTY("Warmup equipment", bomb_defusal.warmup_equipment);
 		}

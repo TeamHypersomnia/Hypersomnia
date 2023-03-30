@@ -6,6 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Final decision: do we denote official resources with []?
+	- Con: might seem redundant as most maps will be using official resources mostly
+		- And if we denote something, it should be the less frequent case
+	- Pros:
+		- The only ones are when human-reading these files
+		- E.g. if we want to know how many times an official crate is used, we look for "[crate]"
+			- but some nodes might still be named "[crate]", although that's not probable
+			- Well we can just look for "type": "crate" which solves the problem
+	- I think after all let's ditch them
+
+- Fix that aquarium bounds too
+
 - Deprecate multipooldispatchers, it's silly
 - not sure if we need to set the stamp hash when reading
 	- This is basically just for the editor to be able to redirect missing resources
