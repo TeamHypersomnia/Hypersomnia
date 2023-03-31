@@ -46,4 +46,6 @@ struct editor_theme {
 	real32 gain = 1.0f;
 	real32 pitch = 1.0f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_theme&) const = default;
 };

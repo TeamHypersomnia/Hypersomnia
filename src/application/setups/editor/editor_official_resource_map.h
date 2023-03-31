@@ -26,6 +26,9 @@ struct editor_official_resource_map {
 
 	auto create_name_to_id_map() const;
 
+	template <class S>
+	auto create_id_to_name_map(S& taken_names) const;
+
 	template <class S, class T>
 	static auto& get_container(S& self, const T&);
 

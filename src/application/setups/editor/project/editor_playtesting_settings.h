@@ -16,4 +16,6 @@ struct editor_playtesting_settings {
 	bool skip_freeze_time = true;
 	bool unlimited_money = true;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_playtesting_settings&) const = default;
 };

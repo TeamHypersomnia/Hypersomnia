@@ -336,5 +336,76 @@ namespace augs {
 	void save_as_json(const T& from, const path_type& path) {
 		return save_as_text(path, to_json_string(from));
 	}
+
+	template <class F, class T>
+	void write_json_diff(F& to, const T& from, const T& reference_object) {
+		if constexpr(representable_as_json_value_v<T>) {
+			general_write_json_value(to, from);
+		}
+		else if constexpr(is_container_v<T>) {
+			using Container = T;
+
+			if constexpr(is_associative_v<Container>) {
+				static_assert(key_representable_as_string_v<Container>);
+
+				to.StartObject();
+
+				const auto defaults = typename Container::mapped_type();
+
+				for (const auto& it : from) {
+					to.Key(it.first);
+					write_json_diff(to, it.second, defaults);
+				}
+
+				to.EndObject();
+			}
+			else {
+				to.StartArray();
+
+				const auto defaults = typename Container::value_type();
+
+				for (const auto& it : from) {
+					write_json_diff(to, it, defaults);
+				}
+
+				to.EndArray();
+			}
+		}
+		else {
+			to.StartObject();
+
+			introspect(
+				[&to](const auto& label, const auto& field, const auto& reference_field) {
+					using Field = remove_cref<decltype(field)>;
+					if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
+						if constexpr(is_maybe_v<Field>) {
+							if (field.is_enabled) {
+								to.Key(label);
+								write_json_diff(to, field.value);
+							}
+							else {
+								if constexpr(Field::serialize_disabled) {
+									to.Key(std::string("OFF_") + label);
+									write_json_diff(to, field.value);
+								}
+							}
+						}
+						else {
+							if (field == reference_field) {
+								return;
+							}
+
+							to.Key(label);
+							write_json_diff(to, field, reference_field);
+						}
+					}
+				},
+				from,
+				reference_object
+			);
+
+			to.EndObject();
+		}
+	}
 }
 

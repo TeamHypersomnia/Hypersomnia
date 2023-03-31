@@ -115,6 +115,8 @@ struct editor_sprite_resource {
 	mutable assets::image_id scene_asset_id;
 	mutable assets::plain_animation_id scene_animation_id;
 
+	mutable uint32_t reference_count = 0u;
+
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 
 	decltype(auto) get_display_name() const {

@@ -23,6 +23,8 @@ struct editor_requested_equipment {
 	bool is_set() const {
 		return backpack || firearm.is_set() || melee.is_set() || explosive.is_set();
 	}
+
+	bool operator==(const editor_requested_equipment&) const = default;
 };
 
 struct editor_bomb_defusal_mode {

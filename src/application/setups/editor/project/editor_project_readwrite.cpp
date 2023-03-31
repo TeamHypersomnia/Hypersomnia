@@ -2,6 +2,7 @@
 #include "augs/string/path_sanitization.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/detail/is_editor_typed_resource.h"
+#include "application/setups/editor/detail/has_reference_count.h"
 #include "application/setups/editor/resources/resource_traits.h"
 
 namespace augs {
@@ -35,6 +36,7 @@ namespace augs {
 #include "application/setups/editor/editor_filesystem_node_type.h"
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
 #include "application/setups/editor/defaults/editor_node_defaults.h"
+#include "application/setups/editor/project/on_each_resource_id_in_project.hpp"
 
 #if 0
 template <class R>
@@ -51,6 +53,8 @@ void unpack_string_id(resource_name_to_id& ids, editor_typed_resource_id<R>& id)
 			id = editor_typed_resource_id<R>::from_generic(*found);
 		}
 	}
+
+	id._serialized_resource_name.clear();
 }
 #endif
 
@@ -81,6 +85,36 @@ auto FindObject(F& from, const std::string& label) -> std::optional<decltype(std
 	return std::nullopt;
 }
 
+void editor_project::recount_references(const O& officials, const bool recount_officials) const {
+	if (recount_officials) {
+		officials.pools.for_each_container(
+			[&]<typename P>(const P& pool) {
+				using resource_type = typename P::mapped_type;
+
+				if constexpr(has_reference_count_v<resource_type>) {
+					for (auto& resource : pool) {
+						resource.reference_count = 0;
+					}
+				}
+			}
+		);
+	}
+
+	auto count_refs = [&]<typename R>(const editor_typed_resource_id<R>& id) {
+		if constexpr(has_reference_count_v<R>) {
+			if (id.is_official && !recount_officials) {
+				return;
+			}
+
+			if (const auto resource = find_resource(officials, id)) {
+				resource->reference_count += 1;
+			}
+		}
+	};
+
+	on_each_resource_id_in_project(*this, count_refs);
+}
+
 namespace editor_project_readwrite {
 	void write_editor_view(const augs::path_type& json_path, const editor_view& view) {
 		augs::save_as_json(view, json_path);
@@ -90,18 +124,148 @@ namespace editor_project_readwrite {
 		return augs::from_json_file<editor_view>(json_path);
 	}
 
-	void write_project_json(const augs::path_type& json_path, const editor_project& project) {
+	void write_project_json(
+		const augs::path_type& json_path,
+		const editor_project& project,
+		const editor_resource_pools& officials,
+		const editor_official_resource_map& officials_map
+	) {
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 
-		(void)project;
+		editor_project project_defaults;
 
-		/*
-			We'll have to pass proper id handlers here.
-			Global settings may specify some resources.
-		*/
+		std::unordered_set<std::string> taken_pseudoids;
+		auto id_to_pseudoid = officials_map.create_id_to_name_map(taken_pseudoids);
 
-		//augs::write_json(writer, project);
+		auto clean_stringified_resource_ids = [](auto& subject) {
+			auto clean = [&](auto& id) {
+				id._serialized_resource_name.clear();
+			};
+
+			::on_each_resource_id_in_project(subject, clean);
+		};
+
+		auto stringify_resource_ids = [&id_to_pseudoid](auto& subject) {
+			auto resolve = [&](auto& typed_id) {
+				if (const auto name = mapped_or_nullptr(id_to_pseudoid, typed_id.operator editor_resource_id())) {
+					typed_id._serialized_resource_name = *name;
+				}
+				else {
+					typed_id._serialized_resource_name = "";
+				}
+			};
+
+			::on_each_resource_id_in_project(subject, resolve);
+		};
+
+		auto setup_project_defaults = [&]() {
+			/*
+				We do this so we don't redundantly write default values. 
+				The written editor project will then be compared against this one.
+			*/
+
+			auto& defaults = project_defaults;
+
+			auto initialize_project_structs = [&]() {
+				::setup_project_defaults(defaults.settings, defaults.get_game_modes(), officials_map);
+				::setup_project_defaults(defaults.playtesting, defaults.get_game_modes(), officials_map);
+			};
+
+			initialize_project_structs();
+			defaults.playtesting.mode._serialized_resource_name = "playtesting";
+		};
+
+		auto write_project_structs = [&]() {
+			augs::write_json_diff(writer, project, project_defaults);
+		};
+
+		auto write_modes = [&]() {
+			const auto& modes = project.get_game_modes();
+
+			if (modes.empty()) {
+				return;
+			}
+
+			writer.Key("modes");
+			writer.StartObject();
+
+			auto defaults = editor_game_mode_resource();
+			::setup_game_mode_defaults(defaults.editable, officials_map);
+
+			for (const auto& mode : modes) {
+				writer.Key(mode.unique_name);
+
+				auto write = [&]<typename I>(const I&) {
+					if constexpr(std::is_same_v<I, editor_playtesting_mode>) {
+						augs::write_json_diff(writer, mode.editable.playtesting, defaults.editable.playtesting);
+					}
+					else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
+						augs::write_json_diff(writer, mode.editable.bomb_defusal, defaults.editable.bomb_defusal);
+					}
+					else {
+						static_assert(always_false_v<I>, "Non-exhaustive if constexpr!");
+					}
+				};
+
+				mode.type.dispatch(write);
+			}
+
+			writer.EndObject();
+		};
+
+		auto write_layers = [&]() {
+			const auto& layers = project.layers.order;
+
+			if (layers.empty()) {
+				return;
+			}
+
+			writer.Key("layers");
+			writer.StartArray();
+
+			auto defaults = editor_layer();
+
+			for (const auto& layer_id : layers) {
+				if (const auto layer = project.find_layer(layer_id)) {
+					writer.StartObject();
+					augs::write_json_diff(writer, layer->editable, defaults.editable);
+
+					if (!layer->hierarchy.nodes.empty()) {
+						writer.Key("nodes");
+
+						writer.StartArray();
+
+						for (auto& node_id : layer->hierarchy.nodes) {
+							project.on_node(node_id, [&](const auto& typed_node, const auto) {
+								writer.String(typed_node.unique_name);
+							});
+						}
+
+						writer.EndArray();
+					}
+
+					writer.EndObject();
+				}
+			}
+
+			writer.EndArray();
+		};
+
+		auto write_external_resources = [&]() {
+			const bool recount_officials = false;
+			project.recount_references(officials, recount_officials);
+		};
+
+		setup_project_defaults();
+
+		stringify_resource_ids(project_defaults);
+		stringify_resource_ids(project);
+
+		write_project_structs();
+		write_modes();
+		write_layers();
+		write_external_resources();
 
 		/*
 			Layer hierarchies and nodes are ignored when writing.
@@ -109,45 +273,9 @@ namespace editor_project_readwrite {
 		*/
 
 		augs::save_as_text(json_path, s.GetString());
-	}
 
-	template <class T>
-	struct recurse_to_find_ids {
-		static constexpr bool value = !augs::json_ignore_v<T> && !augs::has_custom_to_json_value_v<T>;
-	};
-
-	template <class P, class F>
-	void on_each_resource_id_in_project(P& project, F callback) {
-		auto handle = [&](auto& object) {
-			using Field = remove_cref<decltype(object)>;
-
-			if constexpr(is_editor_typed_resource_id_v<Field>) {
-				callback(object);
-			}
-		};
-
-		auto traverse_object = [&](auto& object) {
-			augs::on_each_object_in_object<recurse_to_find_ids>(object, handle);
-		};
-
-		traverse_object(project);
-
-		project.resources.pools.for_each(
-			[&](auto& resource) {
-				traverse_object(resource.editable);
-			}
-		);
-
-		project.nodes.pools.for_each(
-			[&](auto& node) {
-				callback(node.resource_id);
-				traverse_object(node.editable);
-			}
-		);
-
-		for (auto& layer : project.layers.pool) {
-			traverse_object(layer.editable);
-		}
+		clean_stringified_resource_ids(project);
+		(void)officials;
 	}
 
 	editor_project read_project_json(
@@ -586,7 +714,7 @@ namespace editor_project_readwrite {
 				::unpack_string_id(resource_map, typed_id);
 			};
 
-			on_each_resource_id_in_project(loaded, resolve);
+			::on_each_resource_id_in_project(loaded, resolve);
 		};
 
 		initialize_project_structs();

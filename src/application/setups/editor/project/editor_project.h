@@ -94,6 +94,8 @@ struct editor_project {
 
 	editor_layer* find_layer(const editor_layer_id& id);
 	const editor_layer* find_layer(const editor_layer_id& id) const;
+
+	void recount_references(const O& officials, bool recount_officials) const;
    
 private:
 	template <class S, class Officials, class F>

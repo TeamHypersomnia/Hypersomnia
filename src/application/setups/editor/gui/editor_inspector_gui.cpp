@@ -751,14 +751,14 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	MULTIPROPERTY("Radius", falloff.radius);
 	MULTIPROPERTY("Strength", falloff.strength);
 
-	MULTIPROPERTY("Separate falloff for walls", wall_falloff.is_enabled);
+	MULTIPROPERTY("Custom falloff for walls", wall_falloff.is_enabled);
 
 	if (last_result) {
 		if (insp.wall_falloff.is_enabled) {
-			result = "Enabled separate wall falloff in %x";
+			result = "Enabled Custom wall falloff in %x";
 		}
 		else {
-			result = "Disabled separate wall falloff %x";
+			result = "Disabled Custom wall falloff %x";
 		}
 	}
 

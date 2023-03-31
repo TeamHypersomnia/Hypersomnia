@@ -14,4 +14,6 @@ struct editor_project_meta {
 	augs::constant_size_string<arena_public_key_length_v> author_public_key;
 	augs::constant_size_string<max_version_timestamp_length_v> version_timestamp;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_project_meta&) const = default;
 };

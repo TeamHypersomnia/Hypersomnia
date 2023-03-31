@@ -52,4 +52,6 @@ struct per_actual_faction {
 				return atlantis;
 		}
 	}
+
+	bool operator==(const per_actual_faction<T>&) const = default;
 };

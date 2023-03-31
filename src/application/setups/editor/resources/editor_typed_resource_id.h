@@ -37,7 +37,15 @@ struct editor_typed_resource_id {
 		return { raw };
 	}
 
-	bool operator==(const editor_typed_resource_id<E>&) const = default;
+	bool operator==(const editor_typed_resource_id<E>& b) const {
+		const bool serialization_context = !_serialized_resource_name.empty() || !b._serialized_resource_name.empty();
+
+		if (serialization_context) {
+			return _serialized_resource_name == b._serialized_resource_name;
+		}
+
+		return raw == b.raw && is_official == b.is_official;
+	}
 
 	void unset() {
 		raw.unset();

@@ -6,6 +6,96 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix that aquarium bounds too
+
+- Turbo-simple Online Playtesting Ctrl+P implementation
+	- Can literally create a server_setup making an editor_setup backup like when project selector loads an arena 
+		- (this is so that the same map ends up selected in project selector if the load goes wrong for some reason)
+	- Client knows it's connecting to an editor playtesting session
+	- This also replaces the flow where you're "Constantly online" which may be uncomfortable to some
+		- You're only online for the duration of the playtest
+	- We might begin with this also before moving on to a proper implementation which will be way better
+		- We at least want the editing guy to be able to chat with the people he disconnected with otherwise they'll lose interest quickly when they're in the offline mode, perhaps it could still work while they're on a voicechat etc
+		- and it will be cool to show connected people's positions in the editor
+
+- O(N) algorithm for detecting used/unused resources
+	- Instead of calling on_each_resource_id_in_project for each existing resource which would be quadratic
+	- Just call on_each_resource_id_in_project once
+		- And hold a std::unordered_map<editor_resource_id, uint32_t> references;
+		- We could literally hold this as mutable in the resources instead of creating a map
+	- So when do we recalculate?
+		- Surely on write because we want to know which external resources to serialize
+			- It'd be pointless to serialize all unused resources with default properties
+	- Note we only do this with pathed resources.
+		- We will want to serialize the internal resources anyway because even their names constitute data
+	- Then when the game loads this json it will only allocate the needed resources as images. Voila!
+		- Note however we'll serialize based on two criteria: whether the image's both unused AND unmodified.
+		- We might want to save the number of references so that the game doesn't load unused resources despite them being modified for later use!
+	
+	
+
+- If no layers found, put nodes in a default one in the order of appearance
+
+- fog_of_war: false
+  fog_of_war: {
+		angle = 1800
+		size = [1920, 1080]
+  }
+
+- colorize -> color maybe?
+- Do that chronological thing for nodes
+
+- Serializing maybes.
+	- Things would be way easier if we assumed that no maybes will be true by default
+		- Then we just have the intuitive OFF_ and we don't have to handle DEFAULT_
+	- It would honestly be really stupid semantically if we allowed enabled maybes
+	- Then also we don't have to worry about serialize_disabled flag
+		- because being disabled will never be 'different' state so no data will be lost
+	- The reason why it makes no sense for a maybe to start with true, at least in the editor context, is
+		- because disabling it then would mean 'overriding' it to another value
+		- this is semantically the same as having an implicit value D that is taken when maybe is disabled, and then switching to default F when it is enabled
+			- with maybe "enabled" by default, that D is maybe::value and F becomes the implicit value
+		- so what about a switch like draw fov? Enabled by default and it specifies angle. An actual game mode var.
+			- Nicest way would be to have an augs::maybe for it actually
+			- then to disable it we just write "fog_of_war": false
+				- This is not an override technically, so we should have separate vars for it like 
+				- "fog_of_war": true/false
+					- In any case we should prefer this instead of OFF_fog_of_war 
+				- "fog_of_war_angle": 180
+				- etc
+				- although here we're confusing serialized mode data with actual config vars which will be designed to look nice
+					- though if mapper can override them per-mode it would be nice if these at least resembled it
+
+	static_assert(!std::is_same_v<bool, typename Field::value_type>);
+	We don't have to specialize for bools.
+
+	We can always just pass null type to signify the default
+
+	Maybes are tricky.
+	If the value is the same but is_enabled differs,
+	then we should write something like:
+
+	"maybe_field": {}
+
+	or:
+
+	"OFF_maybe_field": {}
+
+	To only signify whether it's enabled
+
+	If is_enabled is the same but value differs, 
+	then we *need* to write it as if the entire structure differed.
+	We're redundantly passing the information on whether it's enabled, though
+	In that case we should do:
+
+	"DEFAULT_maybe_field": { "different_field": 2 }
+
+	Well, if you elect to not write disabled maybes at all,
+	then what if one is by default enabled?
+	We could also do
+
+	"maybe_field": false
+
 - Final decision: do we denote official resources with []?
 	- Con: might seem redundant as most maps will be using official resources mostly
 		- And if we denote something, it should be the less frequent case
@@ -15,8 +105,6 @@ summary: That which we are brainstorming at the moment.
 			- but some nodes might still be named "[crate]", although that's not probable
 			- Well we can just look for "type": "crate" which solves the problem
 	- I think after all let's ditch them
-
-- Fix that aquarium bounds too
 
 - Deprecate multipooldispatchers, it's silly
 - not sure if we need to set the stamp hash when reading

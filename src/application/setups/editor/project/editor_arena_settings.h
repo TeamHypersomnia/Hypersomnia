@@ -8,4 +8,6 @@ struct editor_arena_settings {
 	rgba ambient_light_color = rgba(53, 97, 102, 255);
 	editor_theme warmup_theme;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_arena_settings&) const = default;
 };

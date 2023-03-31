@@ -9,6 +9,8 @@ struct editor_project_role_info {
 	augs::constant_size_string<40> role = "Role";
 	augs::constant_size_string<40> person = "Person";
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_project_role_info&) const = default;
 };
 
 /* Less than 2 kB */
@@ -23,4 +25,6 @@ struct editor_project_about {
 
 	augs::constant_size_string<500> welcome_message = "Warm up your hands!";
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_project_about&) const = default;
 };

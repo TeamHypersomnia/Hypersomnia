@@ -20,6 +20,8 @@ struct editor_layer_editable {
 
 	bool selectable_on_scene = true;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_layer_editable&) const = default;
 };
 
 struct editor_layer {
