@@ -11,6 +11,8 @@ struct editor_sound_property_effect_modifier {
 	real32 gain = 1.0f;
 	real32 pitch = 1.0f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_sound_property_effect_modifier&) const = default;
 };
 
 struct editor_sound_effect_modifier {
@@ -25,6 +27,8 @@ struct editor_sound_effect_modifier {
 
 	bool loop = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_sound_effect_modifier&) const = default;
 };
 
 struct editor_sound_effect : editor_sound_property_effect_modifier {
@@ -38,6 +42,8 @@ struct editor_sound_effect : editor_sound_property_effect_modifier {
 	bool is_set() const {
 		return id.is_set();
 	}
+
+	bool operator==(const editor_sound_effect&) const = default;
 };
 
 struct editor_theme {

@@ -25,6 +25,8 @@ struct editor_resource_id;
 	you will always have to just read the firstmost bytes into game_version_identifier.
 */
 
+struct editor_official_resource_map;
+
 struct editor_project {
 	// GEN INTROSPECTOR struct editor_project
 	editor_project_meta meta;
@@ -95,7 +97,8 @@ struct editor_project {
 	editor_layer* find_layer(const editor_layer_id& id);
 	const editor_layer* find_layer(const editor_layer_id& id) const;
 
-	void recount_references(const O& officials, bool recount_officials) const;
+	bool recount_references(const O& officials, bool recount_officials) const;
+	bool mark_changed_resources(const editor_official_resource_map& officials_map) const;
    
 private:
 	template <class S, class Officials, class F>

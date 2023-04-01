@@ -109,7 +109,10 @@ namespace augs {
 
 					for (auto& it : from.GetObject()) {
 						if (out.size() >= max_size) {
-							break;
+							throw json_deserialization_error(
+								"Too many elements in a container!%x\nMax size: %x", 
+								max_size
+							);
 						}
 
 						typename Container::key_type key;
@@ -126,12 +129,17 @@ namespace augs {
 			else {
 				if (from.IsArray()) {
 					const auto max_size = out.max_size();
+					const auto& from_array = from.GetArray();
 
-					for (auto& it : from.GetArray()) {
-						if (out.size() >= max_size) {
-							break;
-						}
+					if (out.size() + from_array.Size() > max_size) {
+						throw json_deserialization_error(
+							"Too many elements in a container!\nElements passed: %x\nMax size: %x", 
+							from_array.Size(),
+							max_size
+						);
+					}
 
+					for (auto& it : from_array) {
 						typename Container::value_type val;
 
 						read_json(it, val);
@@ -393,12 +401,12 @@ namespace augs {
 						if constexpr(is_maybe_v<Field>) {
 							if (field.is_enabled) {
 								to.Key(label);
-								write_json_diff(to, field.value);
+								write_json_diff(to, field.value, reference_field.value);
 							}
 							else {
 								if constexpr(Field::serialize_disabled) {
 									to.Key(std::string("OFF_") + label);
-									write_json_diff(to, field.value);
+									write_json_diff(to, field.value, reference_field.value);
 								}
 							}
 						}

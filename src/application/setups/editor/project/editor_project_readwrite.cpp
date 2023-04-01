@@ -119,20 +119,25 @@ auto FindObject(F& from, const std::string& label) -> std::optional<decltype(std
 	return std::nullopt;
 }
 
-void editor_project::recount_references(const O& officials, const bool recount_officials) const {
-	if (recount_officials) {
-		officials.pools.for_each_container(
-			[&]<typename P>(const P& pool) {
-				using resource_type = typename P::mapped_type;
+bool editor_project::recount_references(const O& officials, const bool recount_officials) const {
+	bool any_project_resources_referenced = false;
 
-				if constexpr(has_reference_count_v<resource_type>) {
-					for (auto& resource : pool) {
-						resource.reference_count = 0;
-					}
-				}
+	auto clear_refs = [&]<typename P>(const P& pool) {
+		using resource_type = typename P::mapped_type;
+
+		if constexpr(has_reference_count_v<resource_type>) {
+			for (auto& resource : pool) {
+				resource.reference_count = 0;
+				resource.changes_detected = false;
 			}
-		);
+		}
+	};
+
+	if (recount_officials) {
+		officials.pools.for_each_container(clear_refs);
 	}
+
+	resources.pools.for_each_container(clear_refs);
 
 	auto count_refs = [&]<typename R>(const editor_typed_resource_id<R>& id) {
 		if constexpr(has_reference_count_v<R>) {
@@ -141,12 +146,92 @@ void editor_project::recount_references(const O& officials, const bool recount_o
 			}
 
 			if (const auto resource = find_resource(officials, id)) {
+				if (!id.is_official) {
+					any_project_resources_referenced = true;
+				}
+
 				resource->reference_count += 1;
 			}
 		}
 	};
 
 	on_each_resource_id_in_project(*this, count_refs);
+
+	return any_project_resources_referenced;
+}
+
+bool editor_project::mark_changed_resources(const editor_official_resource_map& officials_map) const {
+	bool any_project_resources_changed = false;
+
+	auto mark_changed = [&]<typename P>(const P& pool) {
+		using resource_type = typename P::mapped_type;
+
+		if constexpr(has_reference_count_v<resource_type>) {
+			auto defaults = decltype(resource_type::editable)();
+			::setup_resource_defaults(defaults, officials_map);
+
+			/*
+				This will skip writing unused resources for which only size has changed.
+				When an image changes its size on disk while editor still works,
+				the old size could wrongly be interpreted as one that is different from the new default.
+			*/
+
+			static constexpr bool is_sprite = std::is_same_v<resource_type, editor_sprite_resource>;
+
+			if constexpr(is_sprite) {
+				defaults.size = vec2i::zero;
+			}
+
+			for (auto& resource : pool) {
+				auto compared = resource.editable;
+
+				if constexpr(is_sprite) {
+					compared.size = vec2i::zero;
+				}
+
+				const bool changed = !(compared == defaults);
+				resource.changes_detected = changed;
+
+				if (changed) {
+					any_project_resources_changed = true;
+				}
+			}
+		}
+	};
+
+	resources.pools.for_each_container(mark_changed);
+
+	return any_project_resources_changed;
+}
+
+template <class T, class P, class Cmp, class F>
+void in_order_of(T& container, P get_property, Cmp comparator, F order_callback) {
+	using property_type = decltype(get_property(*container.begin()));
+
+	struct sorted_entry {
+		property_type criterion;
+		uint32_t index = 0;
+	};
+
+	thread_local std::vector<sorted_entry> sorted;
+	sorted.resize(container.size());
+
+	{
+		auto it = container.begin();
+
+		for (uint32_t i = 0; i < container.size(); ++i) {
+			sorted[i].criterion = get_property(*it);
+			sorted[i].index = i;
+
+			++it;
+		}
+	}
+
+	std::sort(sorted.begin(), sorted.end(), [&](const auto& a, const auto& b) { return comparator(a.criterion, b.criterion); });
+
+	for (const auto& entry : sorted) {
+		order_callback(*(container.begin() + entry.index));
+	}
 }
 
 namespace editor_project_readwrite {
@@ -288,7 +373,70 @@ namespace editor_project_readwrite {
 
 		auto write_external_resources = [&]() {
 			const bool recount_officials = false;
-			project.recount_references(officials, recount_officials);
+
+			const bool any_references = project.recount_references(officials, recount_officials);
+			const bool any_changes = project.mark_changed_resources(officials_map);
+
+			const bool any_external_resources_to_write = any_references || any_changes;
+
+			if (!any_external_resources_to_write) {
+				return;
+			}
+
+			writer.Key("external_resources");
+			writer.StartArray();
+
+			auto sort_and_write = [&]<typename P>(const P& pool) {
+				using R = typename P::mapped_type;
+
+				auto defaults = decltype(R::editable)();
+				::setup_resource_defaults(defaults, officials_map);
+
+				if constexpr(is_pathed_resource_v<R>) {
+					auto write = [&](const auto& typed_resource) {
+						const bool should_write = 
+							typed_resource.reference_count > 0 ||
+							typed_resource.changes_detected
+						;
+
+						if (!should_write) {
+							return;
+						}
+
+						const auto& editable = typed_resource.editable;
+						const auto& file = typed_resource.external_file;
+
+						const auto id = file.path_in_project.filename().string();
+
+						writer.StartObject();
+						writer.Key("path");
+						writer.String(file.path_in_project);
+						writer.Key("file_hash");
+						writer.String(file.file_hash);
+						writer.Key("id");
+						writer.String(id);
+
+						augs::write_json_diff(writer, editable, defaults);
+
+						writer.EndObject();
+					};
+
+					::in_order_of(
+						pool,
+						[&](const auto& typed_resource) {
+							return typed_resource.external_file.path_in_project.string();
+						},
+						[&](const auto& a, const auto& b) {
+							return augs::natural_order(a, b);
+						},
+						write
+					);
+				}
+			};
+
+			project.resources.pools.for_each_container(sort_and_write);
+
+			writer.EndArray();
 		};
 
 		setup_project_defaults();
@@ -464,7 +612,7 @@ namespace editor_project_readwrite {
 					*/
 
 					auto read_as = [&]<typename R>(R typed_resource) {
-						::setup_resource_defaults(typed_resource, officials_map);
+						::setup_resource_defaults(typed_resource.editable, officials_map);
 						augs::read_json(resource, typed_resource.editable);
 
 						auto& pool = loaded.resources.pools.get_for<R>();
@@ -638,7 +786,7 @@ namespace editor_project_readwrite {
 								new_node.resource_id = typed_resource_id;
 								new_node.unique_name = id;
 
-								::setup_node_defaults(new_node, typed_resource);
+								::setup_node_defaults(new_node.editable, typed_resource);
 								augs::read_json(json_node, new_node.editable);
 
 								if constexpr(std::is_same_v<node_type, editor_prefab_node>) {

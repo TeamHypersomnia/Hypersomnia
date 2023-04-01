@@ -26,6 +26,7 @@ struct editor_sound_resource {
 	mutable assets::sound_id scene_asset_id;
 
 	mutable uint32_t reference_count = 0u;
+	mutable bool changes_detected = false;
 
 	editor_sound_resource(const editor_pathed_resource& f) : external_file(f) {}
 

@@ -51,4 +51,6 @@ struct basic_convex_partitioned_shape {
 
 	template <class F>
 	void for_each_convex(F&& callback) const;
+
+	bool operator==(const basic_convex_partitioned_shape<T, vertex_count, partition_index_count>&) const = default;
 };

@@ -669,7 +669,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 						}
 					}
 
-					::setup_resource_defaults(new_resource, official_resource_map);
+					::setup_resource_defaults(new_resource.editable, official_resource_map);
 
 					file.associated_resource.set<resource_type>(new_id, false);
 				}

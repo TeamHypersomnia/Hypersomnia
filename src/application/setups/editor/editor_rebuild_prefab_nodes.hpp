@@ -125,7 +125,7 @@ void rebuild_prefab_nodes(
 		pool.emplace_back();
 		auto& new_node = pool.back();
 
-		::setup_node_defaults(new_node, *resource);
+		::setup_node_defaults(new_node.editable, *resource);
 
 		new_node.unique_name = name_preffix + (custom_name.empty() ? resource_name : custom_name);
 		new_node.resource_id = resource_id;

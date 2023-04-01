@@ -31,6 +31,8 @@ struct editor_custom_footstep {
 	editor_sound_effect sound;
 	float walking_speed = 1.0f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_custom_footstep&) const = default;
 };
 
 struct editor_sprite_resource_nonphysical {
@@ -41,6 +43,8 @@ struct editor_sprite_resource_nonphysical {
 
 	augs::maybe<editor_custom_footstep> custom_footstep;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_sprite_resource_nonphysical&) const = default;
 };
 
 struct editor_sprite_resource_physical {
@@ -63,6 +67,8 @@ struct editor_sprite_resource_physical {
 
 	image_shape_type custom_shape;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_sprite_resource_physical&) const = default;
 };
 
 struct editor_sprite_resource_editable {
@@ -82,6 +88,8 @@ struct editor_sprite_resource_editable {
 	editor_sprite_resource_physical as_physical;
 	editor_sprite_resource_nonphysical as_nonphysical;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_sprite_resource_editable&) const = default;
 };
 
 struct editor_sprite_node;
@@ -116,6 +124,7 @@ struct editor_sprite_resource {
 	mutable assets::plain_animation_id scene_animation_id;
 
 	mutable uint32_t reference_count = 0u;
+	mutable bool changes_detected = false;
 
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 

@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- When considering which external resources to write, let's skip unused resources with only size defined
+	- That's because size only starts to matter when we instantiate some
+
 - area_marker/box_marker naming consistency
 	- though it's not significant in json state
 

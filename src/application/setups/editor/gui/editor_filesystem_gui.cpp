@@ -68,7 +68,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					using node_type = typename T::node_type;
 
 					node_type new_node;
-					::setup_node_defaults(new_node, typed_resource);
+					::setup_node_defaults(new_node.editable, typed_resource);
 
 					new_node.resource_id = resource_id;
 					new_node.unique_name = resource_name;
