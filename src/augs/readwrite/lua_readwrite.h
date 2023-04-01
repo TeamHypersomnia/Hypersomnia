@@ -233,7 +233,13 @@ namespace augs {
 				else {
 					int counter = 1;
 
+					const auto max_size = into.max_size();
+
 					while (true) {
+						if (into.size() >= max_size) {
+							break;
+						}
+
 						sol::object maybe_element = input_table[counter];
 
 						if (maybe_element.valid()) {

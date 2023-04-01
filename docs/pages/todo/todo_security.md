@@ -5,6 +5,10 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Re-check const size containers if max sizes are respected when serializing json or other formats
+	- esp. around convex shape partitions 
+		- check for corner cases here still, the indexing is a bit complex here
+
 - Any security risk in allowing any names for entities on the map?
 	- Not sure, they would have to somehow be reported to outside servers but aren't really (except nicknames which are sanitized)
 

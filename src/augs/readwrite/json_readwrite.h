@@ -105,7 +105,13 @@ namespace augs {
 				static_assert(key_representable_as_string_v<Container>);
 
 				if (from.IsObject()) {
+					const auto max_size = out.max_size();
+
 					for (auto& it : from.GetObject()) {
+						if (out.size() >= max_size) {
+							break;
+						}
+
 						typename Container::key_type key;
 						typename Container::mapped_type mapped;
 
@@ -119,7 +125,13 @@ namespace augs {
 			}
 			else {
 				if (from.IsArray()) {
+					const auto max_size = out.max_size();
+
 					for (auto& it : from.GetArray()) {
+						if (out.size() >= max_size) {
+							break;
+						}
+
 						typename Container::value_type val;
 
 						read_json(it, val);
