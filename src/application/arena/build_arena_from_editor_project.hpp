@@ -22,7 +22,8 @@ void build_arena_from_editor_project(
 	scene_entity_to_node_map* scene_entity_to_node,
 	cosmos_solvable_significant* target_clean_round_state,
 	cosmos_common_significant_access mutable_access,
-	const bool for_playtesting = false
+	const bool for_playtesting,
+	const bool editor_preview
 ) {
 	auto find_resource = project.make_find_resource_lambda(official_resources);
 
@@ -200,8 +201,12 @@ void build_arena_from_editor_project(
 			) {
 				typed_node.scene_entity_id.unset();
 
-				if (!typed_node.active || !layer->is_active()) {
-					return;
+				const bool force_active = !editor_preview && project.settings.include_disabled_nodes;
+
+				if (!force_active) {
+					if (!typed_node.active || !layer->is_active()) {
+						return;
+					}
 				}
 
 				const auto resource = find_resource(typed_node.resource_id);

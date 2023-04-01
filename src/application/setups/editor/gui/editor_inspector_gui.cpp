@@ -836,13 +836,13 @@ EDIT_FUNCTION(editor_layer_editable& insp, T& es) {
 	MULTIPROPERTY("Active", active);
 
 	if (ImGui::IsItemHovered()) {
-		text_tooltip("If you untick this, nodes will not be included in the scene.\nYou won't be able to see them or interact with them.");
+		text_tooltip("If you untick this, nodes will not be added to the scene.\nYou won't be able to see them or interact with them.");
 	}
 
 	MULTIPROPERTY("Selectable on scene", selectable_on_scene);
 
 	if (ImGui::IsItemHovered()) {
-		text_tooltip("If you untick this, you'll still see the nodes on scene\nbut they will not react to the mouse cursor.\n\nThis way you can comfortably work on nodes only from layers of interest:\ne.g. disable foregrounds while you're trying to work on objects beneath.");
+		text_tooltip("If you untick this, nodes will stop reacting to the mouse cursor.\nYou'll still see the nodes on the scene.\n\nThis way you can comfortably work on nodes only from layers of interest:\ne.g. disable - but still see - foregrounds while you tweak the objects beneath.");
 	}
 
 	MULTIPROPERTY("Opacity", opacity);
@@ -1355,6 +1355,11 @@ SINGLE_EDIT_FUNCTION(editor_arena_settings& insp, const editor_arena_settings de
 	}
 
 	special_handler.allow_none = true;
+	PROPERTY("Include disabled nodes", include_disabled_nodes);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("If ticked, all nodes disabled with the \"eye\" icon\nwill still appear in-game (both when playtesting and live).\n\nThey will remain hidden when editing.");
+	}
 
 	PROPERTY("Ambient light color", ambient_light_color);
 	THEME_PROPERTY("Warmup theme", warmup_theme);

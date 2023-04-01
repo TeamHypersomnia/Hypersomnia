@@ -2214,6 +2214,10 @@ void editor_setup::start_playtesting() {
 		return;
 	}
 
+	if (project.settings.include_disabled_nodes) {
+		rebuild_arena(false);
+	}
+
 	arena_gui.choose_team.show = false;
 
 	playtesting = true;

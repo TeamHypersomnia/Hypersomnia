@@ -10,7 +10,9 @@
 #include "application/arena/arena_handle.h"
 #include "application/arena/build_arena_from_editor_project.hpp"
 
-void editor_setup::rebuild_arena() {
+void editor_setup::rebuild_arena(const bool editor_preview) {
+	const bool for_playtesting = true;
+
 	::build_arena_from_editor_project(
 		get_arena_handle(),
 		project,
@@ -21,7 +23,8 @@ void editor_setup::rebuild_arena() {
 		std::addressof(scene_entity_to_node),
 		nullptr,
 		cosmos_common_significant_access(),
-		true
+		for_playtesting,
+		editor_preview
 	);
 
 	inspected_to_entity_selector_state();
