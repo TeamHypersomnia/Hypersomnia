@@ -3,6 +3,8 @@
 struct editor_sprite_resource;
 
 struct aquarium_prefab_node {
+	static constexpr bool json_ignore = true;
+
 	// GEN INTROSPECTOR struct aquarium_prefab_node
 
 	editor_typed_resource_id<editor_light_resource> point_light;

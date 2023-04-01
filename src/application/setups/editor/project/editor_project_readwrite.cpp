@@ -8,13 +8,26 @@
 namespace augs {
 	template <class T, class R>
 	void to_json_value(T& out, const editor_typed_resource_id<R>& from) {
-		out.String(from._serialized_resource_name);
+		if (from.is_set()) {
+			out.String(from._serialized_resource_name);
+		}
+		else {
+			out.Null();
+		}
 	}
 
 	template <class T, class R>
 	void from_json_value(T& from, editor_typed_resource_id<R>& out) {
 		if (from.IsString()) {
 			out._serialized_resource_name = from.GetString();
+
+			if (out._serialized_resource_name.empty()) {
+				out = {};
+			}
+		}
+
+		if (from.IsNull() || (from.IsBool() && !from.GetBool())) {
+			out = {};
 		}
 	}
 }
@@ -47,10 +60,31 @@ void unpack_string_id(resource_name_to_id& ids, editor_typed_resource_id<R>& id)
 }
 #else
 template <class R>
-void unpack_string_id(resource_name_to_id& ids, editor_typed_resource_id<R>& id) {
+void unpack_string_id(resource_name_to_id& ids, editor_typed_resource_id<R>& id, const bool strict) {
+	if (id._serialized_resource_name.empty()) {
+		return;
+	}
+
 	if (auto found = mapped_or_nullptr(ids, id._serialized_resource_name)) {
 		if ((*found).type_id.template is<R>()) {
 			id = editor_typed_resource_id<R>::from_generic(*found);
+		}
+		else {
+			if (strict) {
+				throw augs::json_deserialization_error(
+					"Invalid resource property:\n\"%x\" is not a %x!",
+					id._serialized_resource_name,
+					R::get_type_name()
+				);
+			}
+		}
+	}
+	else {
+		if (strict) {
+			throw augs::json_deserialization_error(
+				"Invalid resource property: \"%x\"\nResource not found!",
+				id._serialized_resource_name
+			);
 		}
 	}
 
@@ -583,6 +617,21 @@ namespace editor_project_readwrite {
 								::setup_node_defaults(new_node, typed_resource);
 								augs::read_json(json_node, new_node.editable);
 
+								if constexpr(std::is_same_v<node_type, editor_prefab_node>) {
+									using E = editor_builtin_prefab_type;
+
+									const auto prefab_type = typed_resource.editable.type;
+
+									switch (prefab_type) {
+										case E::AQUARIUM:
+											augs::read_json(json_node, new_node.editable.as_aquarium);
+											break;
+
+										default:
+											break;
+									}
+								}
+
 								const auto new_typed_id = editor_typed_node_id<node_type>::from_raw(new_raw_id);
 								(*map_result.first).second.id = new_typed_id.operator editor_node_id();
 							}
@@ -711,7 +760,7 @@ namespace editor_project_readwrite {
 
 		auto unstringify_resource_ids = [&]() {
 			auto resolve = [&](auto& typed_id) {
-				::unpack_string_id(resource_map, typed_id);
+				::unpack_string_id(resource_map, typed_id, strict);
 			};
 
 			::on_each_resource_id_in_project(loaded, resolve);
@@ -730,9 +779,6 @@ namespace editor_project_readwrite {
 		read_layers();
 
 		unstringify_resource_ids();
-
-		{
-		}
 
 		if (!loaded.playtesting.mode.is_set()) {
 			::setup_default_playtesting_mode(loaded.playtesting, loaded.get_game_modes());

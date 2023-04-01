@@ -2,7 +2,9 @@
 
 template <class T>
 struct recurse_to_find_ids {
-	static constexpr bool value = !augs::json_ignore_v<T> && !augs::has_custom_to_json_value_v<T>;
+	static constexpr bool value = 
+		!is_one_of_v<T, editor_node_pools, editor_resource_pools, editor_layers>
+		&& !augs::has_custom_to_json_value_v<T>;
 };
 
 template <class P, class F>

@@ -459,10 +459,10 @@ void rebuild_prefab_nodes(
 	}
 
 	auto callback = [&]<typename N>(N& child_node) {
-		auto tr = prefab_node.get_transform();
-		tr.pos += center_offset;
+		auto ch_tr = child_node.get_transform();
+		ch_tr.pos += center_offset;
 
-		const auto final_transform = tr * child_node.get_transform();
+		const auto final_transform = prefab_node.get_transform() * ch_tr;
 
 		child_node.editable.pos = final_transform.pos;
 
