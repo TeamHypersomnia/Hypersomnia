@@ -549,6 +549,30 @@ namespace editor_project_readwrite {
 
 		std::unordered_map<std::string, node_meta> node_map;
 
+		const bool create_fallback_node_order = [&]() {
+			auto layers = FindArray(document, "layers");
+
+			if (!layers) {
+				return true;
+			}
+
+			if (layers->Size() > 1) {
+				return false;
+			}
+
+			for (auto& layer : *layers) {
+				const auto maybe_nodes = FindArray(layer, "nodes");
+
+				if (maybe_nodes) {
+					return false;
+				}
+			}
+
+			return true;
+		}();
+			
+		std::vector<editor_node_id> fallback_node_order;
+
 		auto read_nodes = [&]() {
 			const auto maybe_nodes = FindArray(document, "nodes");
 
@@ -633,7 +657,12 @@ namespace editor_project_readwrite {
 								}
 
 								const auto new_typed_id = editor_typed_node_id<node_type>::from_raw(new_raw_id);
-								(*map_result.first).second.id = new_typed_id.operator editor_node_id();
+								const auto new_id = new_typed_id.operator editor_node_id();
+								(*map_result.first).second.id = new_id;
+
+								if (create_fallback_node_order) {
+									fallback_node_order.push_back(new_id);
+								}
 							}
 							else {
 								if (strict) {
@@ -660,6 +689,15 @@ namespace editor_project_readwrite {
 			const auto maybe_layers = FindArray(document, "layers");
 
 			if (!maybe_layers) {
+				editor_layer layer;
+				layer.unique_name = "New layer";
+				layer.hierarchy.nodes = std::move(fallback_node_order);
+
+				nodes_registered = layer.hierarchy.nodes.size();
+
+				const editor_layer_id layer_id = loaded.layers.pool.allocate(std::move(layer));
+				loaded.layers.order.push_back(layer_id);
+
 				return;
 			}
 
@@ -726,7 +764,13 @@ namespace editor_project_readwrite {
 					}
 				};
 
-				read_layer_nodes();
+				if (create_fallback_node_order) {
+					layer.hierarchy.nodes = std::move(fallback_node_order);
+					nodes_registered = layer.hierarchy.nodes.size();
+				}
+				else {
+					read_layer_nodes();
+				}
 
 				const editor_layer_id layer_id = loaded.layers.pool.allocate(std::move(layer));
 				loaded.layers.order.push_back(layer_id);
