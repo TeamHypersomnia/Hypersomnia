@@ -5,6 +5,11 @@ void make_unselectable(T& agg) {
 	agg.when_born.step = 2;
 }
 
+template <class T>
+void make_unselectable_handle(T handle) {
+	::make_unselectable(handle.get({}));
+}
+
 template <class N, class R, class H, class A>
 void setup_entity_from_node(
 	const sorting_order_type total_order,

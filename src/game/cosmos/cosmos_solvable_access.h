@@ -50,5 +50,8 @@ class cosmos_solvable_access {
 	template <class T, class H>
 	friend auto& get_corresponding(const H& handle);
 
+	template <class T>
+	friend void make_unselectable_handle(T);
+
 	cosmos_solvable_access() {}
 };

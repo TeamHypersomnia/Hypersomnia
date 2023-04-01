@@ -215,6 +215,16 @@ void build_arena_from_editor_project(
 					return;
 				}
 
+				auto apply_layer_modifiers_on_special_entity = [&](const auto new_entity_id) {
+					if (!layer->editable.selectable_on_scene) {
+						if (const auto handle = scene.world[new_entity_id]) {
+							handle.dispatch([&](const auto typed_handle) {
+								::make_unselectable_handle(typed_handle);
+							});
+						}
+					}
+				};
+
 				auto setup_node_entity_mapping = [&](const auto new_entity_id) {
 					if (scene_entity_to_node == nullptr) {
 						return;
@@ -243,6 +253,7 @@ void build_arena_from_editor_project(
 							auto new_id = r.generate_for(typed_node.get_transform(), step);
 							ensure(scene.world[new_id].alive());
 							setup_node_entity_mapping(new_id);
+							apply_layer_modifiers_on_special_entity(new_id);
 						},
 
 						resource->scene_flavour_id
@@ -257,6 +268,7 @@ void build_arena_from_editor_project(
 							auto new_id = r.generate_for(typed_node.get_transform(), step);
 							ensure(scene.world[new_id].alive());
 							setup_node_entity_mapping(new_id);
+							apply_layer_modifiers_on_special_entity(new_id);
 						},
 
 						resource->scene_flavour_id
@@ -272,6 +284,7 @@ void build_arena_from_editor_project(
 							auto new_id = r.generate_for(typed_node.get_transform(), step);
 							ensure(scene.world[new_id].alive());
 							setup_node_entity_mapping(new_id);
+							apply_layer_modifiers_on_special_entity(new_id);
 						},
 
 						resource->scene_flavour_id
