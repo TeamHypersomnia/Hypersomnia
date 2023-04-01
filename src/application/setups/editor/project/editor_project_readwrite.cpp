@@ -585,7 +585,7 @@ namespace editor_project_readwrite {
 
 					if (resource_id == nullptr) {
 						if (strict) {
-							throw augs::json_deserialization_error("Invalid \"type\" property for node \"%x\".\nResource not found!", id);
+							throw augs::json_deserialization_error("Invalid \"type\" property for node \"%x\".\nResource \"%x\" not found!", id, type);
 						}
 
 						continue;

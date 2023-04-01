@@ -19,6 +19,9 @@ auto& editor_official_resource_map::get_container(S& self, const T&) {
 	else if constexpr(std::is_same_v<T, test_particles_decorations>) {
 		return self.particles_decorations;
 	}
+	else if constexpr(std::is_same_v<T, point_marker_type>) {
+		return self.point_markers;
+	}
 	else if constexpr(std::is_same_v<T, area_marker_type>) {
 		return self.box_markers;
 	}
@@ -31,8 +34,20 @@ auto& editor_official_resource_map::get_container(S& self, const T&) {
 	else if constexpr(std::is_same_v<T, test_shootable_weapons>) {
 		return self.firearms;
 	}
+	else if constexpr(std::is_same_v<T, test_container_items>) {
+		return self.magazines;
+	}
+	else if constexpr(std::is_same_v<T, test_shootable_charges>) {
+		return self.shootable_charges;
+	}
 	else if constexpr(std::is_same_v<T, test_melee_weapons>) {
 		return self.melees;
+	}
+	else if constexpr(std::is_same_v<T, test_hand_explosives>) {
+		return self.explosives;
+	}
+	else if constexpr(std::is_same_v<T, test_scene_physical_material_id>) {
+		return self.materials;
 	}
 	else if constexpr(std::is_same_v<T, editor_builtin_prefab_type>) {
 		return self.prefabs;

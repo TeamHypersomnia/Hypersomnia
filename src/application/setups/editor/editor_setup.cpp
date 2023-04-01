@@ -109,7 +109,7 @@ void editor_setup::create_official_resources() {
 		official_files_root
 	);
 
-	auto map_officials = [&](const auto id, auto& obj) {
+	auto map_with_tag = [&](const auto id, auto& obj) {
 		ensure(obj.official_tag.has_value());
 
 		if (obj.official_tag) {
@@ -117,23 +117,27 @@ void editor_setup::create_official_resources() {
 		}
 	};
 
-	auto map_officials_area = [&](const auto id, auto& obj) {
+	auto map_with_type = [&](const auto id, auto& obj) {
 		official_resource_map[obj.editable.type] = id;
 	};
 
-	for_each_resource<editor_sprite_resource>(map_officials, true);
-	for_each_resource<editor_sound_resource>(map_officials, true);
-	for_each_resource<editor_light_resource>(map_officials, true);
-	for_each_resource<editor_particles_resource>(map_officials, true);
-	for_each_resource<editor_wandering_pixels_resource>(map_officials, true);
+	official_resources.pools.for_each_container(
+		[&]<typename P>(const P&) {
+			using R = typename P::mapped_type;
 
-	for_each_resource<editor_firearm_resource>(map_officials, true);
-	for_each_resource<editor_melee_resource>(map_officials, true);
-
-	for_each_resource<editor_area_marker_resource>(map_officials_area, true);
+			if constexpr(!is_one_of_v<R, editor_prefab_resource, editor_game_mode_resource>) {
+				if constexpr(is_one_of_v<R, editor_area_marker_resource, editor_point_marker_resource>) {
+					for_each_resource<R>(map_with_type, true);
+				}
+				else {
+					for_each_resource<R>(map_with_tag, true);
+				}
+			}
+		}
+	);
 
 	create_official_prefabs();
-	for_each_resource<editor_prefab_resource>(map_officials, true);
+	for_each_resource<editor_prefab_resource>(map_with_type, true);
 
 	gui.filesystem.rebuild_official_special_filesystem(*this);
 }

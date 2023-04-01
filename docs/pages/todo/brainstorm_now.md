@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- area_marker/box_marker naming consistency
+	- though it's not significant in json state
+
 - Turbo-simple Online Playtesting Ctrl+P implementation
 	- Can literally create a server_setup making an editor_setup backup like when project selector loads an arena 
 		- (this is so that the same map ends up selected in project selector if the load goes wrong for some reason)
