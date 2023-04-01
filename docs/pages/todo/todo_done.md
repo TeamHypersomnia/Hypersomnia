@@ -5150,3 +5150,5 @@ Advantages:
 - visible -> active
 	- this is future-proof because we might want to use "visible" for nodes that are still included in the scene, but invisible in the editor
 
+- Fix that aquarium bounds too
+

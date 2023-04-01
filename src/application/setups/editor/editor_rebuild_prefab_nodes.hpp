@@ -97,6 +97,8 @@ void rebuild_prefab_nodes(
 		return node;
 	};
 
+	vec2 center_offset = vec2::zero;
+
 	auto create_child = [&](
 		auto resource_id,
 		transformr offset = transformr(),
@@ -157,8 +159,31 @@ void rebuild_prefab_nodes(
 	};
 
 	auto build_aquarium = [&]() {
-		const auto& e = prefab_node.editable;
+		auto e = prefab_node.editable;
 		const auto& a = e.as_aquarium;
+
+		{
+			const auto wall = get_resource_size(a.wall);
+			const auto w_top = get_resource_size(a.wall_top_foreground);
+			const auto top_c = get_resource_size(a.wall_top_corners);
+			const auto bot_c = get_resource_size(a.wall_bottom_corners);
+			const auto glass = get_resource_size(a.glass);
+			const auto w_s = get_resource_size(a.wall_smooth_end);
+			const auto g_s = get_resource_size(a.glass_start);
+
+			const auto max_on_left = std::max({ wall.y, bot_c.x, top_c.x });
+			const auto max_on_right = std::max({ wall.y, bot_c.x, top_c.x });
+			const auto max_on_top = std::max({ wall.y, w_top.y, top_c.y });
+			const auto max_on_bottom = std::max({ bot_c.y, glass.y, w_s.y, g_s.y });
+
+			e.size.x -= max_on_left;
+			e.size.x -= max_on_right;
+
+			e.size.y -= max_on_top;
+			e.size.y -= max_on_bottom;
+
+			center_offset.y = (float(max_on_top) - max_on_bottom) / 2;
+		}
 
 		const auto w = e.size.x;
 		const auto h = e.size.y;
@@ -434,7 +459,10 @@ void rebuild_prefab_nodes(
 	}
 
 	auto callback = [&]<typename N>(N& child_node) {
-		const auto final_transform = prefab_node.get_transform() * child_node.get_transform();
+		auto tr = prefab_node.get_transform();
+		tr.pos += center_offset;
+
+		const auto final_transform = tr * child_node.get_transform();
 
 		child_node.editable.pos = final_transform.pos;
 
