@@ -31,6 +31,8 @@ inline void create_node_command<T>::redo(editor_command_input in) {
 
 	{
 		created_node.unique_name = in.setup.get_free_node_name_for(created_node.unique_name);
+		created_node.chronological_order = in.setup.project.nodes.next_chronological_order++;
+
 		built_description = "Created " + created_node.unique_name;
 
 		auto& node_pool = in.setup.project.nodes.template get_pool_for<T>();

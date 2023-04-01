@@ -40,6 +40,14 @@ class per_type_container {
 	}
 
 	template <class S, class F>
+	static void for_each_container_reverse_impl(S& self, F callback) {
+		for_each_through_std_get(
+			self.all,
+			callback
+		);
+	}
+
+	template <class S, class F>
 	static void for_each_impl(S& self, F callback) {
 		for_each_through_std_get(
 			self.all,
@@ -127,6 +135,16 @@ public:
 	template <class F>
 	decltype(auto) for_each_container(F&& callback) const {
 		return for_each_container_impl(*this, std::forward<F>(callback));
+	}
+
+	template <class F>
+	decltype(auto) for_each_container_reverse(F&& callback) {
+		return for_each_container_reverse_impl(*this, std::forward<F>(callback));
+	}
+
+	template <class F>
+	decltype(auto) for_each_container_reverse(F&& callback) const {
+		return for_each_container_reverse_impl(*this, std::forward<F>(callback));
 	}
 
 	template <class F>

@@ -11,5 +11,7 @@ struct editor_light_falloff {
 	// END GEN INTROSPECTOR
 
 	real32 calc_attenuation_mult_for_requested_radius() const;
+
+	bool operator==(const editor_light_falloff&) const = default;
 };
 

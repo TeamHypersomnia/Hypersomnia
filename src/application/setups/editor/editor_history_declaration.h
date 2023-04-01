@@ -20,7 +20,6 @@ namespace augs {
 	class history_with_saved_revision;
 };
 
-struct paste_nodes_command;
 struct delete_nodes_command;
 struct duplicate_nodes_command;
 

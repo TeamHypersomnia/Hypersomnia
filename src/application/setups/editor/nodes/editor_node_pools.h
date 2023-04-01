@@ -15,4 +15,5 @@ struct editor_node_pools : multipool_dispatchers<editor_node_pools, editor_node_
 	static constexpr bool json_ignore = true;
 
 	all_editor_node_pools pools;
+	uint32_t next_chronological_order = 0;
 };

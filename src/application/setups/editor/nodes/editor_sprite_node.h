@@ -8,7 +8,7 @@ struct editor_sprite_resource;
 
 struct editor_sprite_node_editable {
 	// GEN INTROSPECTOR struct editor_sprite_node_editable
-	vec2 pos;
+	vec2 pos = vec2::zero;
 	real32 rotation = 0.0f;
 	augs::maybe<vec2i, false> size;
 	rgba colorize = white;

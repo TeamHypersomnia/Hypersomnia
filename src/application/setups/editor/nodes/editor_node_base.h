@@ -18,6 +18,8 @@ struct editor_node_base {
 	mutable entity_id scene_entity_id;
 	mutable bool passed_filter = false;
 
+	uint32_t chronological_order = 0;
+
 	std::string unique_name;
 
 	void clear_duplicated_fields() {

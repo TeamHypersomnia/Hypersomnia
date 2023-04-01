@@ -115,6 +115,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 				e.duplicated_id = new_id.operator editor_node_id();
 
 				duplicated_node.unique_name = new_name;
+				duplicated_node.chronological_order = in.setup.project.nodes.next_chronological_order++;
 				duplicated_node.scene_entity_id.unset();
 				duplicated_node.clear_duplicated_fields();
 

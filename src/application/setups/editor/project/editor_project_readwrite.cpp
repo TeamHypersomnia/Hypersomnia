@@ -204,16 +204,9 @@ bool editor_project::mark_changed_resources(const editor_official_resource_map& 
 	return any_project_resources_changed;
 }
 
-template <class T, class P, class Cmp, class F>
-void in_order_of(T& container, P get_property, Cmp comparator, F order_callback) {
-	using property_type = decltype(get_property(*container.begin()));
-
-	struct sorted_entry {
-		property_type criterion;
-		uint32_t index = 0;
-	};
-
-	thread_local std::vector<sorted_entry> sorted;
+template <class T, class P, class Cmp, class F, class S>
+void in_order_of(T& container, P get_property, Cmp comparator, F order_callback, S& sorted_cache) {
+	auto& sorted = sorted_cache;
 	sorted.resize(container.size());
 
 	{
@@ -232,6 +225,25 @@ void in_order_of(T& container, P get_property, Cmp comparator, F order_callback)
 	for (const auto& entry : sorted) {
 		order_callback(*(container.begin() + entry.index));
 	}
+}
+template <class T, class P, class Cmp, class F>
+void in_order_of(T&& container, P get_property, Cmp&& comparator, F&& order_callback) {
+	using property_type = decltype(get_property(*container.begin()));
+
+	struct sorted_entry {
+		property_type criterion;
+		uint32_t index = 0;
+	};
+
+	thread_local std::vector<sorted_entry> sorted;
+
+	::in_order_of(
+		std::forward<T>(container), 
+		get_property, 
+		std::forward<Cmp>(comparator), 
+		std::forward<F>(order_callback), 
+		sorted
+	);
 }
 
 namespace editor_project_readwrite {
@@ -406,7 +418,7 @@ namespace editor_project_readwrite {
 						const auto& editable = typed_resource.editable;
 						const auto& file = typed_resource.external_file;
 
-						const auto id = file.path_in_project.filename().string();
+						const auto pseudo_id = file.path_in_project.filename().string();
 
 						writer.StartObject();
 						writer.Key("path");
@@ -414,7 +426,7 @@ namespace editor_project_readwrite {
 						writer.Key("file_hash");
 						writer.String(file.file_hash);
 						writer.Key("id");
-						writer.String(id);
+						writer.String(pseudo_id);
 
 						augs::write_json_diff(writer, editable, defaults);
 
@@ -439,6 +451,78 @@ namespace editor_project_readwrite {
 			writer.EndArray();
 		};
 
+		auto write_nodes = [&]() {
+			{
+				bool any_nodes = false;
+
+				project.nodes.pools.for_each_container([&](const auto& pool) {
+					if (!pool.empty()) {
+						any_nodes = true;
+					}
+				});
+
+				if (!any_nodes) {
+					return;
+				}
+			}
+
+			writer.Key("nodes");
+			writer.StartArray();
+
+			/*
+				Reuse vector of sorted entries across node types,
+				as the sorted entry is exactly the same type across node types.
+			*/
+
+			struct sorted_entry {
+				uint32_t chronological_order = 0;
+				uint32_t index = 0;
+			};
+
+			thread_local std::vector<sorted_entry> sorted;
+
+			/*
+				We iterate in reverse so that sprites will be serialized last.
+				(most new nodes will then be appended to the end of file) 
+			*/
+			project.nodes.pools.for_each_container_reverse([&]<typename P>(const P& pool) {
+				using node_type = typename P::mapped_type;
+				auto defaults = node_type();
+
+				auto write = [&](const node_type& typed_node) {
+
+					if (const auto resource = project.find_resource(officials, typed_node.resource_id)) {
+						writer.StartObject();
+
+						const auto pseudo_id = resource->get_display_name();
+
+						writer.Key("id");
+						writer.String(typed_node.unique_name);
+
+						writer.Key("type");
+						writer.String(pseudo_id);
+
+						::setup_node_defaults(defaults.editable, *resource);
+						augs::write_json_diff(writer, typed_node.editable, defaults.editable);
+
+						writer.EndObject();
+					}
+				};
+
+				::in_order_of(
+					pool,
+					[&](const auto& typed_node) {
+						return typed_node.chronological_order;
+					},
+					std::less<uint32_t>(),
+					write
+				);
+			});
+
+
+			writer.EndArray();
+		};
+
 		setup_project_defaults();
 
 		stringify_resource_ids(project_defaults);
@@ -446,8 +530,10 @@ namespace editor_project_readwrite {
 
 		write_project_structs();
 		write_modes();
-		write_layers();
 		write_external_resources();
+
+		write_layers();
+		write_nodes();
 
 		/*
 			Layer hierarchies and nodes are ignored when writing.
@@ -785,6 +871,8 @@ namespace editor_project_readwrite {
 
 								new_node.resource_id = typed_resource_id;
 								new_node.unique_name = id;
+
+								new_node.chronological_order = loaded.nodes.next_chronological_order++;
 
 								::setup_node_defaults(new_node.editable, typed_resource);
 								augs::read_json(json_node, new_node.editable);
