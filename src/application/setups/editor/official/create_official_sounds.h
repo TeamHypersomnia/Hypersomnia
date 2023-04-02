@@ -23,7 +23,7 @@ void create_sounds(const intercosm& scene, editor_resource_pools& pools) {
 			res.official_tag = enum_id;
 			res.scene_flavour_id = flavour_id;
 			res.scene_asset_id = sound_id;
-			res.overridden_official_name = to_lowercase(augs::enum_to_string(enum_id));
+			res.cached_official_name = to_lowercase(augs::enum_to_string(enum_id));
 
 			/* Might come in handy */
 

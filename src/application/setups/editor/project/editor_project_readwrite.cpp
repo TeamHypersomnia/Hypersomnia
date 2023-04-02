@@ -267,7 +267,43 @@ namespace editor_project_readwrite {
 		editor_project project_defaults;
 
 		std::unordered_set<std::string> taken_pseudoids;
-		auto id_to_pseudoid = officials_map.create_id_to_name_map(taken_pseudoids);
+
+		auto resolve_pseudoids_of_project_resources = [&]() {
+			/*
+				Given that we now know that external resources, internal resources and official resources
+				can only ever collide within each respective group,
+				(because we're preffixing them)
+				we can only check externals against externals.
+			*/
+
+		};
+
+		auto get_pseudoid = [&]<typename R>(const editor_typed_resource_id<R>& resource_id, const R* resource = nullptr) {
+			if (resource == nullptr) {
+				resource = project.find_resource(officials, resource_id);
+			}
+
+			if (resource) {
+				if constexpr(is_pathed_resource_v<R>) {
+					if (resource_id.is_official) {
+						return resource->cached_official_name;
+					}
+					else {
+						return resource->pseudoid;
+					}
+				}
+				else {
+					if (resource_id.is_official) {
+						return resource->unique_name;
+					}
+					else {
+						return "!" + resource->unique_name;
+					}
+				}
+			}
+
+			return std::string("");
+		};
 
 		auto clean_stringified_resource_ids = [](auto& subject) {
 			auto clean = [&](auto& id) {
@@ -277,14 +313,9 @@ namespace editor_project_readwrite {
 			::on_each_resource_id_in_project(subject, clean);
 		};
 
-		auto stringify_resource_ids = [&id_to_pseudoid](auto& subject) {
+		auto stringify_resource_ids = [&get_pseudoid](auto& subject) {
 			auto resolve = [&](auto& typed_id) {
-				if (const auto name = mapped_or_nullptr(id_to_pseudoid, typed_id.operator editor_resource_id())) {
-					typed_id._serialized_resource_name = *name;
-				}
-				else {
-					typed_id._serialized_resource_name = "";
-				}
+				typed_id._serialized_resource_name = get_pseudoid(typed_id);
 			};
 
 			::on_each_resource_id_in_project(subject, resolve);
@@ -418,15 +449,13 @@ namespace editor_project_readwrite {
 						const auto& editable = typed_resource.editable;
 						const auto& file = typed_resource.external_file;
 
-						const auto pseudo_id = file.path_in_project.filename().string();
-
 						writer.StartObject();
 						writer.Key("path");
 						writer.String(file.path_in_project);
 						writer.Key("file_hash");
 						writer.String(file.file_hash);
 						writer.Key("id");
-						writer.String(pseudo_id);
+						writer.String(typed_resource.pseudoid);
 
 						augs::write_json_diff(writer, editable, defaults);
 
@@ -490,17 +519,16 @@ namespace editor_project_readwrite {
 				auto defaults = node_type();
 
 				auto write = [&](const node_type& typed_node) {
-
 					if (const auto resource = project.find_resource(officials, typed_node.resource_id)) {
 						writer.StartObject();
 
-						const auto pseudo_id = resource->get_display_name();
+						const auto pseudoid = get_pseudoid(typed_node.resource_id, resource);
 
 						writer.Key("id");
 						writer.String(typed_node.unique_name);
 
 						writer.Key("type");
-						writer.String(pseudo_id);
+						writer.String(pseudoid);
 
 						::setup_node_defaults(defaults.editable, *resource);
 						augs::write_json_diff(writer, typed_node.editable, defaults.editable);
@@ -524,6 +552,8 @@ namespace editor_project_readwrite {
 		};
 
 		setup_project_defaults();
+
+		resolve_pseudoids_of_project_resources();
 
 		stringify_resource_ids(project_defaults);
 		stringify_resource_ids(project);

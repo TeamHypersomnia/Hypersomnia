@@ -29,7 +29,7 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 			res.scene_asset_id = image_id;
 			res.editable.color = sprite.color;
 			res.editable.size = sprite.size;
-			res.overridden_official_name = to_lowercase(augs::enum_to_string(enum_id));
+			res.cached_official_name = to_lowercase(augs::enum_to_string(enum_id));
 			pool.allocate(res);
 		});
 	}
@@ -49,7 +49,7 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 			res.scene_asset_id = image_id;
 			res.editable.color = sprite.color;
 			res.editable.size = sprite.size;
-			res.overridden_official_name = to_lowercase(augs::enum_to_string(enum_id));
+			res.cached_official_name = to_lowercase(augs::enum_to_string(enum_id));
 			pool.allocate(res);
 		});
 	}
@@ -69,7 +69,7 @@ void create_sprites(const intercosm& scene, editor_resource_pools& pools) {
 			res.scene_asset_id = image_id;
 			res.editable.color = sprite.color;
 			res.editable.size = sprite.size;
-			res.overridden_official_name = to_lowercase(augs::enum_to_string(enum_id));
+			res.cached_official_name = to_lowercase(augs::enum_to_string(enum_id));
 			pool.allocate(res);
 		});
 	}
