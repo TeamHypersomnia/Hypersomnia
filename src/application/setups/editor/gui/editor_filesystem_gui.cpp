@@ -18,6 +18,7 @@
 #include "augs/window_framework/window.h"
 
 #include "application/setups/editor/detail/make_command_from_selections.h"
+#include "augs/string/path_sanitization.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem(project_special_root);
@@ -334,6 +335,37 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			}
 		}
 	};
+
+	if (!showing_official() && in.setup.get_project_pathed_resource_count() == 0) {
+		const auto bg_cols = std::array<rgba, 3> {
+			rgba(0, 0, 0, 0),
+			rgba(15, 40, 70, 255),
+			rgba(35, 60, 90, 255)
+		};
+
+		auto colored_selectable = scoped_selectable_colors(bg_cols);
+
+		{
+			//auto scoped_text = scoped_text_color(rgba(255, 255, 255, 80));
+
+			if (ImGui::Selectable("Just paste files to the project folder.\nThey'll appear here.\nSupported extensions:\n.png, .jpg, .gif, .ogg, .wav.\n ")) {
+				in.window.reveal_in_explorer(in.setup.get_paths().project_json);
+			}
+		}
+
+		if (ImGui::IsItemHovered()) {
+			auto scope = scoped_tooltip();
+
+			text(std::string("(Click to open the project folder)\n\nTip: once you paste custom sprites and sounds,\nyou can freely move or rename them on HDD."));
+			text_color("The editor detects moved/renamed files.", green);
+			text("Changed files will also be hot-reloaded.\n\n");
+
+			text_color(std::string("Filenames/folders must only contain these characters:\n\n") + std::string(sanitization::portable_alphanumeric_set), orange);
+			text(std::string("\nOtherwise they will be ignored!\nOnly one dot is allowed - for file extensions."));
+		}
+
+		ImGui::Separator();
+	}
 
 	files_root.in_ui_order(node_callback, with_closed_folders);
 

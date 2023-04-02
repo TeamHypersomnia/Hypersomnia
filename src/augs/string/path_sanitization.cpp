@@ -391,7 +391,7 @@ TEST_CASE("File path sanitization test") {
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "a/b/c/d.abc") == R(F::FORBIDDEN_EXTENSION));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "abc.abc") == R(F::FORBIDDEN_EXTENSION));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "abc.com") == R(F::FORBIDDEN_EXTENSION));
-	REQUIRE(S::sanitize_downloaded_file_path(parent, "abc.lua") == R(augs::path_type("abc.lua")));
+	REQUIRE(S::sanitize_downloaded_file_path(parent, "abc.lua") == R(F::FORBIDDEN_EXTENSION));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "a/b/c/d/e/f/g/cos.ogg") == R(augs::path_type("a/b/c/d/e/f/g/cos.ogg")));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "a\\b\\c\\d\\e\\f\\g\\cos.ogg") == R(F::FORBIDDEN_CHARACTERS));
 	REQUIRE(S::sanitize_downloaded_file_path(parent, "a\\b\\c\\d\\e\\f\\g\\cos.test.ogg") == R(F::DOTS_OUTSIDE_EXTENSION));

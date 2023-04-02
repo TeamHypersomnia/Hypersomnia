@@ -49,6 +49,10 @@ struct editor_filesystem_node {
 
 	editor_filesystem_node* parent = nullptr;
 
+	bool just_one_file() const {
+		return files.size() == 1 && subfolders.empty();
+	}
+
 	template <class F>
 	void for_each_file_recursive(F&& callback) {
 		for (auto& subfolder : subfolders) {

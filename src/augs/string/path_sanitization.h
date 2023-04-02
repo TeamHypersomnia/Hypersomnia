@@ -33,8 +33,7 @@ namespace sanitization {
 				ext == "jpg"  ||
 				ext == "jpeg" ||
 				ext == "wav"  ||
-				ext == "ogg"  ||
-				ext == "lua"
+				ext == "ogg"
 			;
 		}
 

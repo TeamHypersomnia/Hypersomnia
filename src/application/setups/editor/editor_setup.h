@@ -430,6 +430,7 @@ public:
 	}
 
 	std::size_t get_node_count() const;
+	std::size_t get_project_pathed_resource_count() const;
 
 	editor_history::index_type get_last_command_index() const;
 

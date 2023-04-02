@@ -1290,6 +1290,22 @@ std::string editor_setup::get_name(const entity_id id) const {
 	return get_name(to_node_id(id));
 }
 
+std::size_t editor_setup::get_project_pathed_resource_count() const {
+	auto n = std::size_t(0);
+
+	project.resources.pools.for_each_container(
+		[&]<typename P>(const P& pool) {
+			using R = typename P::mapped_type;
+
+			if constexpr(is_pathed_resource_v<R>) {
+				n += pool.size();
+			}
+		}
+	);
+
+	return n;
+}
+
 std::size_t editor_setup::get_node_count() const {
 	auto n = std::size_t(0);
 
