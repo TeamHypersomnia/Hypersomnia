@@ -320,13 +320,13 @@ summary: That which we are brainstorming at the moment.
 
 - Duality of defaults
     - Names
-        - editor_testing_mode
+        - editor_quick_test_mode
         - default_server_mode
     - Both editable from the arena properties I'd say
         - We'll easily adapt the resource chooser
     - One of them will be visible in the toolbar
     - Alright
-        - I think editor_testing_mode should be used for both local playtesting and online playtesting
+        - I think editor_quick_test_mode should be used for both local playtesting and online playtesting
             - by the way let's use this terminology and don't use 'server playtesting' in particular because then it will really be confusing
         - Reason being is that once we start up the server with the clapborad, we'll automatically connect back to it by pressing space
             - so there won't really be any space for "i'll locally test it before syncing it to the connected guys" kind of flow

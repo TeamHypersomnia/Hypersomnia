@@ -121,8 +121,8 @@ ruleset_id setup_ruleset_from_editor_mode(
 	};
 
 	auto build = [&]<typename I>(const I&) {
-		if constexpr(std::is_same_v<I, editor_playtesting_mode>) {
-			auto& vars = game_mode.editable.playtesting;
+		if constexpr(std::is_same_v<I, editor_quick_test_mode>) {
+			auto& vars = game_mode.editable.quick_test;
 
 			using T = test_mode;
 

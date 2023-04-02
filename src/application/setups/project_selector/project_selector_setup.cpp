@@ -714,7 +714,7 @@ bool project_selector_setup::create_new_project_files() {
 
 			{
 				writer.StartObject();
-				writer.Key("playtesting");
+				writer.Key("quick_test");
 
 				{
 					writer.StartObject();
@@ -742,12 +742,12 @@ bool project_selector_setup::create_new_project_files() {
 				writer.EndObject();
 			}
 
-			writer.Key("playtesting");
+			writer.Key("quick_test");
 
 			{
 				writer.StartObject();
 				writer.Key("mode");
-				writer.String("playtesting");
+				writer.String("quick_test");
 				writer.EndObject();
 			}
 #endif

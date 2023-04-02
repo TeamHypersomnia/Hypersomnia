@@ -375,7 +375,7 @@ namespace editor_project_readwrite {
 			};
 
 			initialize_project_structs();
-			defaults.playtesting.mode._serialized_resource_name = "playtesting";
+			defaults.playtesting.mode._serialized_resource_name = "quick_test";
 		};
 
 		auto write_project_structs = [&]() {
@@ -399,8 +399,8 @@ namespace editor_project_readwrite {
 				writer.Key(mode.unique_name);
 
 				auto write = [&]<typename I>(const I&) {
-					if constexpr(std::is_same_v<I, editor_playtesting_mode>) {
-						augs::write_json_diff(writer, mode.editable.playtesting, defaults.editable.playtesting);
+					if constexpr(std::is_same_v<I, editor_quick_test_mode>) {
+						augs::write_json_diff(writer, mode.editable.quick_test, defaults.editable.quick_test);
 					}
 					else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
 						augs::write_json_diff(writer, mode.editable.bomb_defusal, defaults.editable.bomb_defusal);
@@ -696,13 +696,20 @@ namespace editor_project_readwrite {
 					augs::read_json(mode.value, specific_game_mode);
 				};
 
-				if (key == "playtesting") {
-					new_game_mode.type.set<editor_playtesting_mode>();
-					read_into(new_game_mode.editable.playtesting);
+				if (key == "quick_test") {
+					new_game_mode.type.set<editor_quick_test_mode>();
+					read_into(new_game_mode.editable.quick_test);
 				}
 				else if (key == "bomb_defusal") {
 					new_game_mode.type.set<editor_bomb_defusal_mode>();
 					read_into(new_game_mode.editable.bomb_defusal);
+				}
+				else {
+					if (strict) {
+						throw augs::json_deserialization_error("Unknown game mode: \"%x\"", key);
+					}
+
+					continue;
 				}
 
 				new_game_mode.unique_name = key;
@@ -1093,15 +1100,15 @@ namespace editor_project_readwrite {
 			}
 		};
 
-		auto create_fallback_playtesting_mode_if_none = [&]() {
+		auto create_fallback_quick_test_mode_if_none = [&]() {
 			auto& modes = loaded.get_game_modes();
 
 			if (modes.empty()) {
 				editor_game_mode_resource new_game_mode;
 				::setup_game_mode_defaults(new_game_mode.editable, officials_map);
 
-				const auto key = "playtesting";
-				new_game_mode.type.set<editor_playtesting_mode>();
+				const auto key = "quick_test";
+				new_game_mode.type.set<editor_quick_test_mode>();
 				new_game_mode.unique_name = key;
 
 				const auto result = modes.allocate(std::move(new_game_mode));
@@ -1121,7 +1128,7 @@ namespace editor_project_readwrite {
 		read_project_structs();
 
 		read_modes();
-		create_fallback_playtesting_mode_if_none();
+		create_fallback_quick_test_mode_if_none();
 
 		read_external_resources();
 		read_internal_resources();
@@ -1132,7 +1139,7 @@ namespace editor_project_readwrite {
 		unstringify_resource_ids();
 
 		if (!loaded.playtesting.mode.is_set()) {
-			::setup_default_playtesting_mode(loaded.playtesting, loaded.get_game_modes());
+			::setup_default_quick_test_mode(loaded.playtesting, loaded.get_game_modes());
 		}
 
 		if (!loaded.settings.default_server_mode.is_set()) {

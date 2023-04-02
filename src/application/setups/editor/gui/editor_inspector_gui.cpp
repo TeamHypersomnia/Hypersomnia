@@ -1379,12 +1379,12 @@ EDIT_FUNCTION(
 	bool last_result = false;
 
 	auto edit = [&]<typename I>(const I&) {
-		if constexpr(std::is_same_v<I, editor_playtesting_mode>) {
-			MULTIPROPERTY("Respawn time (ms)", playtesting.respawn_time_ms);
+		if constexpr(std::is_same_v<I, editor_quick_test_mode>) {
+			MULTIPROPERTY("Respawn time (ms)", quick_test.respawn_time_ms);
 
 			ImGui::Separator();
 
-			FACTION_EQUIPMENT_PROPERTY("Equipment", playtesting.equipment);
+			FACTION_EQUIPMENT_PROPERTY("Equipment", quick_test.equipment);
 		}
 		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
 			MULTIPROPERTY("Warmup time", bomb_defusal.warmup_time);

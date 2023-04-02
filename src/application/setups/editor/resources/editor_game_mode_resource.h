@@ -37,8 +37,8 @@ struct editor_bomb_defusal_mode {
 	// END GEN INTROSPECTOR
 };
 
-struct editor_playtesting_mode {
-	// GEN INTROSPECTOR struct editor_playtesting_mode
+struct editor_quick_test_mode {
+	// GEN INTROSPECTOR struct editor_quick_test_mode
 	per_actual_faction<editor_requested_equipment> equipment;
 	uint32_t respawn_time_ms = 1000;
 	// END GEN INTROSPECTOR
@@ -46,7 +46,7 @@ struct editor_playtesting_mode {
 
 struct editor_game_mode_resource_editable {
 	// GEN INTROSPECTOR struct editor_game_mode_resource_editable
-	editor_playtesting_mode playtesting;
+	editor_quick_test_mode quick_test;
 	editor_bomb_defusal_mode bomb_defusal;
 	// END GEN INTROSPECTOR
 };
@@ -54,7 +54,7 @@ struct editor_game_mode_resource_editable {
 struct editor_game_mode_resource {
 	using editable_type = editor_game_mode_resource_editable;
 	using type_type = type_in_list_id<type_list<
-		editor_playtesting_mode,
+		editor_quick_test_mode,
 		editor_bomb_defusal_mode
 	>>;
 
