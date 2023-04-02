@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- folders should be revealable in explorer
-
 - ensure paths are serialized with forward slashes regardless of platform
     - Otherwise maps will save differently and it won't be vcs-friendly
 

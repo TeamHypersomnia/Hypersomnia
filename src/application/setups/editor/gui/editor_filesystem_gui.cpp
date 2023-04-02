@@ -231,20 +231,9 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				}
 
 				if (ImGui::BeginPopupContextItem()) {
-					bool is_pathed = false;
-					
-					if (node.associated_resource.is_set()) {
-						in.setup.on_resource(
-							node.associated_resource,
-							[&]<typename R>(auto&, const editor_typed_resource_id<R>) {
-								is_pathed = is_pathed_resource_v<R>;
-							}
-						);
-					}
-
-					const bool can_reveal = is_pathed || is_project_json_file;
-
 					{
+						const bool can_reveal = currently_viewed_root == &in.project_files_root;
+
 						auto disabled = maybe_disabled_cols(!can_reveal);
 
 						if (ImGui::Selectable("Reveal in explorer")) {

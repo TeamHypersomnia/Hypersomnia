@@ -5159,3 +5159,5 @@ Advantages:
     - Important to get it right because people might duplicate files on disk to create different resources with the same picture
         - Which is not a bad thing, works as intended
 
+- folders should be revealable in explorer
+
