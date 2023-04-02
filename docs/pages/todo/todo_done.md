@@ -5152,3 +5152,10 @@ Advantages:
 
 - Fix that aquarium bounds too
 
+- A corner case to consider - what if there are two files having the same hash but different names, and...
+    - Only one is moved/renamed?
+    - Both are moved/renamed?
+    - At the very least we shouldn't map from a hash to path but from a hash to vector of paths
+    - Important to get it right because people might duplicate files on disk to create different resources with the same picture
+        - Which is not a bad thing, works as intended
+

@@ -6,6 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- folders should be revealable in explorer
+
+- ensure paths are serialized with forward slashes regardless of platform
+    - Otherwise maps will save differently and it won't be vcs-friendly
+
+- Pseudoid collision resolution
+    - In what order?
+        - A case: gfx/aquarium/fish.gif, gfx/garden/fish.png
+        - We either:
+            - Differentiate both: so pseudoids here will become @fish.gif and @fish.png
+            - or differentiate only one of the duplicate, so e.g. @fish and @fish.png
+    - We could trivially replace all duplicate entries with full paths
+        - Notice that resolving two duplicates might lead to another duplicate
+            - e.g. if there's garden_fish.png then if there are garden/fish.png and aquarium/fish.png, there's another collision for when the latter two are already resolved
+
 - We HAVE to differentiate official/project resources to avoid confusion.
     - E.g. what if someone adds their own "gfx/metal_crate" and then we add an official resource named metal_crate?
         - While it could still be handled by the reader, this would be very confusing

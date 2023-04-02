@@ -584,28 +584,32 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		Otherwise we could end up with duplicate resources.
 	*/
 
+	auto missing_on_disk = [&](const auto& resource) {
+		return !augs::exists(resolve_project_path(resource.external_file.path_in_project));
+	};
+
 	auto handle_pool = [&]<typename P>(P& pool, const editor_filesystem_node_type type) {
 		using resource_type = typename P::value_type;
+		using id_type = editor_typed_resource_id<resource_type>;
 
-		std::unordered_map<std::string,     resource_type*> resource_by_hash;
-		std::unordered_map<augs::path_type, resource_type*> resource_by_path;
+		std::unordered_map<std::string,     std::vector<id_type>> resources_by_hash;
+		std::unordered_map<augs::path_type, id_type> resource_by_path;
 
-		auto find = [&](auto& in, const auto& by) -> resource_type* {
-			if (auto found = mapped_or_nullptr(in, by)) {
-				return *found;
-			}
+		auto map_all_resources = [&](const auto id, const auto& entry) {
+			const auto& r = entry.external_file;
 
-			return nullptr;
+			entry.missing_on_disk = std::nullopt;
+
+			resources_by_hash[r.file_hash].push_back(id);
+			resource_by_path[r.path_in_project]    = id;
 		};
 
-		for (auto& entry : pool) {
-			auto& r = entry.external_file;
-
-			resource_by_hash[r.file_hash]    	= std::addressof(entry);
-			resource_by_path[r.path_in_project] = std::addressof(entry);
+		{
+			const bool official = false;
+			for_each_resource<resource_type>(map_all_resources, official);
 		}
 
-		auto add_if_new = [&](editor_filesystem_node& file) {
+		auto add_if_new_or_redirect = [&](editor_filesystem_node& file) {
 			if (file.type != type) {
 				return;
 			}
@@ -613,13 +617,20 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 			const auto path_in_project = file.get_path_in_project();
 			const auto full_path = resolve_project_path(path_in_project);
 
-			if (auto found_resource = find(resource_by_path, path_in_project)) {
-				found_resource->external_file.maybe_rehash(full_path, file.last_write_time);
+			auto match_path_to_existing_resource = [&]() {
+				if (const auto found_resource_id = mapped_or_nullptr(resource_by_path, path_in_project)) {
+					if (const auto found_resource = find_resource(*found_resource_id)) {
+						found_resource->external_file.maybe_rehash(full_path, file.last_write_time);
+						file.associated_resource = found_resource_id->operator editor_resource_id();
 
-				const auto existing_id = pool.get_id_of(*found_resource);
-				file.associated_resource.set<resource_type>(existing_id, false);
-			}
-			else {
+						return true;
+					}
+				}
+
+				return false;
+			};
+
+			auto redirect_by_hash_or_register_new = [&]() {
 				std::string new_resource_hash;
 
 				try {
@@ -634,22 +645,101 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 					return;
 				}
 
-				auto moved_resource = find(resource_by_hash, new_resource_hash);
+				auto redirect_by_hash = [&]() {
+					/*
+						Note that if we match with an existing resource to be redirected,
+						if it's the same hash it will *very likely* have the same extension.
+						So we should look by stems only.
+					*/
 
-				if (moved_resource && !augs::exists(resolve_project_path(moved_resource->external_file.path_in_project))) {
-					const auto& new_path = path_in_project;
-					auto& moved = moved_resource->external_file;
+					const auto searched_stem = full_path.stem();
 
-					changes.redirects.emplace_back(moved.path_in_project, new_path);
+					auto get_stem = [&](const auto& of) {
+						return of.external_file.path_in_project.stem();
+					};
 
-					moved.path_in_project = new_path;
-					moved.set_hash_stamp(file.last_write_time);
+					if (const auto maybe_moved_resources = mapped_or_nullptr(resources_by_hash, new_resource_hash)) {
+						auto most_resembling_resource_idx = [&]() -> std::optional<std::size_t> {
+							const auto& moved_resources = *maybe_moved_resources;
 
-					const auto moved_id = pool.get_id_of(*moved_resource);
+							if (moved_resources.empty()) {
+								return std::nullopt;
+							}
 
-					file.associated_resource.set<resource_type>(moved_id, false);
-				}
-				else {
+							/*
+								Determine which ones are missing - once.
+							*/
+
+							for (auto& match_candidate : moved_resources) {
+								auto& candidate = *find_resource(match_candidate);
+
+								if (candidate.missing_on_disk == std::nullopt) {
+									candidate.missing_on_disk = missing_on_disk(candidate);
+								}
+							}
+
+							/*
+								First see if there is any missing one with a matching stem.
+							*/
+
+							for (std::size_t i = 0; i < moved_resources.size(); ++i) {
+								const auto& candidate = *find_resource(moved_resources[i]);
+
+								if (candidate.missing_on_disk.value() && searched_stem == get_stem(candidate)) {
+									return i;
+								}
+							}
+
+							/*
+								If none found, it must have been renamed in addition to being moved, 
+								so take whichever comes.
+							*/
+
+							for (std::size_t i = 0; i < moved_resources.size(); ++i) {
+								const auto& candidate = *find_resource(moved_resources[i]);
+
+								if (candidate.missing_on_disk.value()) {
+									return i;
+								}
+							}
+
+							/* 
+								None of the resources with the given hash are missing.
+								Register a new resource.
+							*/
+
+							return std::nullopt;
+						}();
+
+						if (most_resembling_resource_idx == std::nullopt) {
+							return false;
+						}
+
+						auto& moved_resources = *maybe_moved_resources;
+						auto& moved_resource = *find_resource(moved_resources[*most_resembling_resource_idx]);
+
+						const auto& new_path = path_in_project;
+						auto& moved = moved_resource.external_file;
+
+						changes.redirects.emplace_back(moved.path_in_project, new_path);
+
+						moved.path_in_project = new_path;
+						moved.set_hash_stamp(file.last_write_time);
+
+						const auto moved_id = pool.get_id_of(moved_resource);
+
+						file.associated_resource.set<resource_type>(moved_id, false);
+
+						std::swap(moved_resources.back(), moved_resources[*most_resembling_resource_idx]);
+						moved_resources.pop_back();
+
+						return true;
+					}
+
+					return false;
+				};
+
+				auto register_new_resource = [&]() {
 					const auto [new_id, new_resource] = pool.allocate(editor_pathed_resource(path_in_project, new_resource_hash, file.last_write_time));
 
 					if constexpr(std::is_same_v<editor_sprite_resource, resource_type>) {
@@ -672,22 +762,28 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 					::setup_resource_defaults(new_resource.editable, official_resource_map);
 
 					file.associated_resource.set<resource_type>(new_id, false);
+				};
+
+				if (!redirect_by_hash()) {
+					register_new_resource();
 				}
+			};
+
+			if (!match_path_to_existing_resource()) {
+				redirect_by_hash_or_register_new();
 			}
 		};
 
-		files.root.for_each_file_recursive(add_if_new);
+		files.root.for_each_file_recursive(add_if_new_or_redirect);
 
 		for (auto& entry : pool) {
-			auto& r = entry.external_file;
-
-			if (!augs::exists(resolve_project_path(r.path_in_project))) {
+			if (missing_on_disk(entry)) {
 				/* 
-					If it's still missing after redirect, 
+					If it's still missing after all redirecting, 
 					then it is indeed missing.
 				*/
 
-				changes.missing.emplace_back(r.path_in_project);
+				changes.missing.emplace_back(entry.external_file.path_in_project);
 			}
 		}
 	};

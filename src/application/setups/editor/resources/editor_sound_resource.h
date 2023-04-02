@@ -28,6 +28,7 @@ struct editor_sound_resource {
 	mutable uint32_t reference_count = 0u;
 	mutable bool changes_detected = false;
 	mutable std::string pseudoid;
+	mutable std::optional<bool> missing_on_disk;
 
 	editor_sound_resource(const editor_pathed_resource& f) : external_file(f) {}
 

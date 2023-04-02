@@ -272,7 +272,7 @@ namespace editor_project_readwrite {
 			/*
 				Given that we now know that external resources, internal resources and official resources
 				can only ever collide within each respective group,
-				(because we're preffixing them)
+				(because we're preffixing them with @ and !)
 				we can only check externals against externals.
 			*/
 

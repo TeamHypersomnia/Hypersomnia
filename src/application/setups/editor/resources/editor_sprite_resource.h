@@ -126,6 +126,7 @@ struct editor_sprite_resource {
 	mutable uint32_t reference_count = 0u;
 	mutable bool changes_detected = false;
 	mutable std::string pseudoid;
+	mutable std::optional<bool> missing_on_disk;
 
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 
