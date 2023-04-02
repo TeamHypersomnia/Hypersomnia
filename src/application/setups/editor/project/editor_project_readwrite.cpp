@@ -266,7 +266,7 @@ namespace editor_project_readwrite {
 
 		editor_project project_defaults;
 
-		std::unordered_set<std::string> taken_pseudoids;
+		auto taken_pseudoids = resource_name_to_id();
 
 		auto resolve_pseudoids_of_project_resources = [&]() {
 			/*
@@ -276,6 +276,46 @@ namespace editor_project_readwrite {
 				we can only check externals against externals.
 			*/
 
+			auto resolve_pseudoids = [&]<typename P>(const P& pool) {
+				using R = typename P::mapped_type;
+
+				if constexpr(is_pathed_resource_v<R>) {
+					pool.for_each_id_and_object(
+						[&](const auto raw_id, const auto& typed_resource) {
+							const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, false);
+							const auto& path_in_project = typed_resource.external_file.path_in_project;
+							const auto short_pseudoid = "@" + path_in_project.stem().string();
+
+							const auto result = taken_pseudoids.try_emplace(short_pseudoid, typed_id.operator editor_resource_id());
+
+							if (const bool duplicate = !result.second) {
+								auto make_certainly_unique_pseudoid = [&]<typename O>(const O& of) {
+									/* Have to if constexpr again because we're dispatching on the generic editor_resource_id */
+									if constexpr(is_pathed_resource_v<O>) {
+										/* Guaranteed to be unique */
+										of.resolved_pseudoid = "@" + of.external_file.path_in_project.string();
+									}
+								};
+
+								make_certainly_unique_pseudoid(typed_resource);
+
+								project.on_resource(
+									officials,
+									(*result.first).second,
+									[make_certainly_unique_pseudoid](const auto& typed_duplicate, const auto) {
+										make_certainly_unique_pseudoid(typed_duplicate);
+									}
+								);
+							}
+							else {
+								typed_resource.resolved_pseudoid = short_pseudoid;
+							}
+						}
+					);
+				}
+			};
+
+			project.resources.pools.for_each_container(resolve_pseudoids);
 		};
 
 		auto get_pseudoid = [&]<typename R>(const editor_typed_resource_id<R>& resource_id, const R* resource = nullptr) {
@@ -289,7 +329,7 @@ namespace editor_project_readwrite {
 						return resource->cached_official_name;
 					}
 					else {
-						return resource->pseudoid;
+						return resource->resolved_pseudoid;
 					}
 				}
 				else {
@@ -451,11 +491,11 @@ namespace editor_project_readwrite {
 
 						writer.StartObject();
 						writer.Key("path");
-						writer.String(file.path_in_project);
+						augs::general_write_json_value(writer, file.path_in_project);
 						writer.Key("file_hash");
 						writer.String(file.file_hash);
 						writer.Key("id");
-						writer.String(typed_resource.pseudoid);
+						writer.String(typed_resource.resolved_pseudoid);
 
 						augs::write_json_diff(writer, editable, defaults);
 
@@ -522,7 +562,8 @@ namespace editor_project_readwrite {
 					if (const auto resource = project.find_resource(officials, typed_node.resource_id)) {
 						writer.StartObject();
 
-						const auto pseudoid = get_pseudoid(typed_node.resource_id, resource);
+						/* Already stringified with a call to stringify_resource_ids */
+						const auto pseudoid = typed_node.resource_id._serialized_resource_name;
 
 						writer.Key("id");
 						writer.String(typed_node.unique_name);
@@ -771,7 +812,7 @@ namespace editor_project_readwrite {
 					}
 				};
 
-				const auto untrusted_path = resource["path"].GetString();
+				const auto untrusted_path = augs::general_read_json_value<augs::path_type>(resource["path"]);
 
 				std::visit(
 					[&]<typename R>(const R& result) {

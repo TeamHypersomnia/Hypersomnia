@@ -28,6 +28,15 @@ namespace augs {
 		if constexpr(has_custom_to_json_value_v<T>) {
 			from_json_value(from, out);
 		}
+		else if constexpr(is_constant_size_string_v<T> || std::is_same_v<T, std::string> || std::is_same_v<T, augs::path_type>) {
+			if (from.IsString()) {
+				out = from.GetString();
+
+				if constexpr(std::is_same_v<T, path_type>) {
+					out.make_preferred();
+				}
+			}
+		}
 		else if constexpr(is_constant_size_string_v<T> || std::is_same_v<T, std::string>) {
 			if (from.IsString()) {
 				out = from.GetString();
@@ -84,6 +93,13 @@ namespace augs {
 		else {
 			static_assert(always_false_v<T>, "Non-exhaustive general_read_json_value");
 		}
+	}
+
+	template <class T, class F>
+	T general_read_json_value(const F& from) {
+		T out;
+		general_read_json_value(from, out);
+		return out;
 	}
 
 	template <class F, class T>
@@ -251,6 +267,11 @@ namespace augs {
 		}
 		else if constexpr(std::is_same_v<T, std::string>) {
 			to.String(from);
+		}
+		else if constexpr(std::is_same_v<T, path_type>) {
+			auto path = from.string();
+			std::replace(path.begin(), path.end(), '\\', '/');
+			to.String(path);
 		}
 		else if constexpr(std::is_same_v<T, float>) {
 			to.Double(from);

@@ -1144,7 +1144,7 @@ void editor_pathed_resource::maybe_rehash(const augs::path_type& full_path, cons
 }
 
 std::string editor_pathed_resource::get_display_name() const {
-	return path_in_project.filename().replace_extension("").string();
+	return path_in_project.stem().string();
 }
 
 editor_pathed_resource::editor_pathed_resource(
