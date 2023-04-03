@@ -378,7 +378,7 @@ namespace augs {
 	}
 
 	template <class F, class T>
-	void write_json_diff(F& to, const T& from, const T& reference_object) {
+	void write_json_diff(F& to, const T& from, const T& reference_object, const bool write_object_delimiters = false) {
 		if constexpr(representable_as_json_value_v<T>) {
 			general_write_json_value(to, from);
 		}
@@ -388,45 +388,59 @@ namespace augs {
 			if constexpr(is_associative_v<Container>) {
 				static_assert(key_representable_as_string_v<Container>);
 
-				to.StartObject();
+				if (write_object_delimiters) {
+					to.StartObject();
+				}
 
 				const auto defaults = typename Container::mapped_type();
 
 				for (const auto& it : from) {
 					to.Key(it.first);
-					write_json_diff(to, it.second, defaults);
+					write_json_diff(to, it.second, defaults, true);
 				}
 
-				to.EndObject();
+				if (write_object_delimiters) {
+					to.EndObject();
+				}
 			}
 			else {
-				to.StartArray();
+				if (write_object_delimiters) {
+					to.StartArray();
+				}
 
 				const auto defaults = typename Container::value_type();
 
 				for (const auto& it : from) {
-					write_json_diff(to, it, defaults);
+					write_json_diff(to, it, defaults, true);
 				}
 
-				to.EndArray();
+				if (write_object_delimiters) {
+					to.EndArray();
+				}
 			}
 		}
 		else {
-			to.StartObject();
+			if (write_object_delimiters) {
+				to.StartObject();
+			}
 
 			introspect(
 				[&to](const auto& label, const auto& field, const auto& reference_field) {
 					using Field = remove_cref<decltype(field)>;
 					if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
 						if constexpr(is_maybe_v<Field>) {
+							if (field == reference_field) {
+								return;
+							}
+
 							if (field.is_enabled) {
 								to.Key(label);
-								write_json_diff(to, field.value, reference_field.value);
+								write_json_diff(to, field.value, reference_field.value, true);
 							}
 							else {
 								if constexpr(Field::serialize_disabled) {
 									to.Key(std::string("OFF_") + label);
-									write_json_diff(to, field.value, reference_field.value);
+									write_json_diff(to, field.value, reference_field.value, true);
 								}
 							}
 						}
@@ -436,7 +450,7 @@ namespace augs {
 							}
 
 							to.Key(label);
-							write_json_diff(to, field, reference_field);
+							write_json_diff(to, field, reference_field, true);
 						}
 					}
 				},
@@ -444,7 +458,9 @@ namespace augs {
 				reference_object
 			);
 
-			to.EndObject();
+			if (write_object_delimiters) {
+				to.EndObject();
+			}
 		}
 	}
 }

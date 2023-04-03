@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Note we'll have to clear the history if we want to forget resources
+    - Let's also think of corner cases with autosave
+        - autosave could have:
+            - less resources than in saved
+            - more resources than in saved
+
 - Honor playtest spawns but maybe as respawn points only and spawn where the camera is?
     - think later
 

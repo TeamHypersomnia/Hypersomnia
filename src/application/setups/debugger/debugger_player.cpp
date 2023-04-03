@@ -105,7 +105,7 @@ void debugger_player::finish_testing(const debugger_command_input in, const fini
 	dirty = false;
 
 	/* Forces autosave in the case that we returned to a saved revision */
-	f.history.set_modified_flag();
+	f.history.set_dirty_flag();
 
 	if (mode == finish_testing_type::DISCARD_CHANGES) {
 

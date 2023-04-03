@@ -16,8 +16,8 @@ template <class T>
 struct delete_node_command;
 
 namespace augs {
-	template <class...>
-	class history_with_saved_revision;
+	template <class Derived, class... CommandTypes>
+	class history;
 };
 
 struct delete_nodes_command;
@@ -49,7 +49,12 @@ struct edit_project_settings_command;
 struct inspect_command;
 struct unpack_prefab_command;
 
-using editor_history_base = augs::history_with_saved_revision<
+struct replace_whole_project_command;
+
+struct editor_history;
+
+using editor_history_base = augs::history<
+	editor_history,
 	edit_resource_command<editor_sprite_resource>,
 	edit_resource_command<editor_sound_resource>,
 	edit_resource_command<editor_light_resource>,
@@ -121,5 +126,7 @@ using editor_history_base = augs::history_with_saved_revision<
 	edit_project_settings_command,
 
 	inspect_command,
-	unpack_prefab_command
+	unpack_prefab_command,
+
+	replace_whole_project_command
 >;

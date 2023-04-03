@@ -45,7 +45,7 @@ namespace augs {
 
 		void derived_set_modified_flag() {
 			auto& self = *static_cast<Derived*>(this);
-			self.set_modified_flag();
+			self.set_dirty_flag();
 		}
 
 	public:
@@ -151,7 +151,7 @@ namespace augs {
 
 		// GEN INTROSPECTOR class augs::history_with_saved_revision class... CommandTypes
 		std::optional<index_type> saved_at_revision;
-		bool modified_since_save = false;
+		bool dirty_flag = false;
 		// END GEN INTROSPECTOR
 
 		void invalidate_revisions_from(const index_type index) {
@@ -166,12 +166,12 @@ namespace augs {
 	public:
 		using base::get_current_revision;
 
-		void set_modified_flag() {
-			modified_since_save = true;
+		void set_dirty_flag() {
+			dirty_flag = true;
 		}
 
 		void mark_as_just_saved() {
-			modified_since_save = false;
+			dirty_flag = false;
 			saved_at_revision = get_current_revision();
 		}
 
@@ -184,19 +184,19 @@ namespace augs {
 		}
 
 		bool at_saved_revision() const {
-			return empty() || is_saved_revision(get_current_revision());
+			return is_saved_revision(get_current_revision()) || empty();
 		}
 
 		bool at_unsaved_revision() const {
 			return !at_saved_revision();
 		}
 
-		bool was_modified() const {
-			return modified_since_save;
+		bool is_dirty() const {
+			return dirty_flag;
 		}
 
 		bool empty() const {
-			return base::empty() && !was_modified();
+			return base::empty() && !dirty_flag;
 		}
 	};
 }

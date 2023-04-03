@@ -33,7 +33,13 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	};
 
 	if (auto main_menu = scoped_menu_bar()) {
-		if (auto menu = scoped_menu(project.meta.name.c_str())) {
+		const auto file_button_label = get_arena_name_with_star();
+
+		if (auto menu = scoped_menu(file_button_label.c_str())) {
+			if (ImGui::MenuItem("Save", "CTRL+S")) {
+				save();
+			}
+
 			if (ImGui::MenuItem("Reveal in explorer", "CTRL+SHIFT+E")) {
 				in.window.reveal_in_explorer(paths.project_json);
 			}

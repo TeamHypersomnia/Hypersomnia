@@ -59,6 +59,8 @@
 #include "game/detail/snap_interpolation_to_logical.h"
 #include "augs/window_framework/window.h"
 
+#include "application/setups/editor/commands/replace_whole_project_command.hpp"
+
 #include "application/setups/editor/editor_official_resource_map.hpp"
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
 #include "application/arena/arena_handle.h"
@@ -87,6 +89,30 @@ editor_setup::editor_setup(
 		strict
 	);
 
+	history.mark_as_just_saved();
+
+	try {
+		auto autosaved_project = std::make_unique<editor_project>(editor_project_readwrite::read_project_json(
+			paths.autosave_json,
+			official_resources,
+			official_resource_map,
+			strict
+		));
+
+		replace_whole_project_command cmd;
+		cmd.after = std::move(autosaved_project);
+		cmd.before = std::make_unique<editor_project>(project);
+		cmd.built_description = std::string("Loaded autosave from ") + paths.autosave_json.filename().string();
+
+		post_new_command(std::move(cmd));
+		history.mark_as_autosaved();
+
+		dirty_after_loading_autosave = true;
+	}
+	catch (...) {
+		LOG("No autosave file was found.");
+	}
+
 	gui.filesystem.rebuild_project_special_filesystem(*this);
 
 	load_gui_state();
@@ -97,7 +123,17 @@ editor_setup::editor_setup(
 }
 
 editor_setup::~editor_setup() {
-	save_gui_state();
+	autosave_now_if_neeeded();
+
+	/*
+		Remove autosave only if we're at saved revision.
+		With one exception: when we've just loaded autosave and the user hasn't yet saved any revision to decide which one they want.
+	*/
+
+	if (history.at_saved_revision() && !dirty_after_loading_autosave) {
+		remove_autosave_file();
+	}
+
 	LOG("DTOR finished: ~editor_setup");
 }
 
@@ -227,7 +263,7 @@ bool editor_setup::handle_input_before_imgui(
 	}
 
 	if (in.e.msg == message::deactivate) {
-		force_autosave_now();
+		autosave_now_if_neeeded();
 	}
 
 	return false;
@@ -291,6 +327,7 @@ bool editor_setup::handle_input_before_game(
 			switch (k) {
 				case key::A: select_all_entities(); return true;
 				case key::Z: undo(); return true;
+				case key::S: save(); return true;
 				//case key::C: copy(); return true;
 				//case key::X: cut(); return true;
 				//case key::V: paste(); return true;
@@ -467,7 +504,7 @@ vec2 editor_setup::get_world_cursor_pos(const camera_eye eye) const {
 }
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
-	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", project.meta.name);
+	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", get_arena_name_with_star());
 
 	if (is_playtesting()) {
 
@@ -834,7 +871,55 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	return changes;
 }
 
-void editor_setup::force_autosave_now() {
+void editor_setup::remove_autosave_file() {
+	augs::remove_file(paths.autosave_json);
+}
+
+void editor_setup::save() {
+	history.mark_as_just_saved();
+	dirty_after_loading_autosave = false;
+
+	save_project_file_as(paths.project_json);
+	remove_autosave_file();
+}
+
+void editor_setup::save_project_file_as(const augs::path_type& path) {
+	LOG("Saving project file as: %x", path);
+
+	editor_project_readwrite::write_project_json(
+		path,
+		project,
+		official_resources,
+		official_resource_map
+	);
+}
+
+bool editor_setup::has_unsaved_changes() const {
+	if (dirty_after_loading_autosave) {
+		return true;
+	}
+
+	return !history.at_saved_revision();
+}
+
+std::string editor_setup::get_arena_name_with_star() const {
+	if (has_unsaved_changes()) {
+		return std::string(project.meta.name) + "*";
+	}
+
+	return std::string(project.meta.name);
+}
+
+bool editor_setup::autosave_needed() const {
+	return history.at_unsaved_revision() && !history.at_autosaved_revision();
+}
+
+void editor_setup::autosave_now_if_neeeded() {
+	if (autosave_needed()) {
+		save_project_file_as(paths.autosave_json);
+		history.mark_as_autosaved();
+	}
+
 	save_gui_state();
 }
 

@@ -155,6 +155,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	double global_time_seconds = 0.0;
 
+	bool dirty_after_loading_autosave = false;
+
 	void create_official_resources();
 	void create_official_prefabs();
 
@@ -162,7 +164,13 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	void rebuild_filesystem();
 	editor_paths_changed_report rebuild_pathed_resources();
 
-	void force_autosave_now();
+	void remove_autosave_file();
+	void autosave_now_if_neeeded();
+	bool autosave_needed() const;
+	void save();
+	void save_project_file_as(const augs::path_type& path);
+	bool has_unsaved_changes() const;
+	std::string get_arena_name_with_star() const;
 
 	void load_gui_state();
 	void save_gui_state();
@@ -186,6 +194,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	friend edit_project_settings_command;
 
 	friend editor_node_mover;
+
+	friend replace_whole_project_command;
 
 	cosmos& get_cosmos() {
 		return scene.world;
@@ -728,4 +738,8 @@ public:
 
 	editor_arena_handle<false> get_arena_handle();
 	editor_arena_handle<true> get_arena_handle() const;
+
+	bool is_dirty_after_loading_autosave() const {
+		return dirty_after_loading_autosave;
+	}
 };

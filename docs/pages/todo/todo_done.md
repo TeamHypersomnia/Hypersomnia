@@ -1811,7 +1811,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Some strange bug when seeking while recording
 
-- was_modified exists so that the history is saved when some new commands were added later on but we returned to the current revision
+- is_dirty exists so that the history is saved when some new commands were added later on but we returned to the current revision
 	- we would always set modified flags during record or replay because the line gets really blurry here
 	- autosave when:
 		- playtesting & playtesting dirty flag set

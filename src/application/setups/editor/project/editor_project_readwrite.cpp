@@ -90,6 +90,28 @@ void unpack_string_id(resource_name_to_id& ids, editor_typed_resource_id<R>& id,
 
 	id._serialized_resource_name.clear();
 }
+
+using modes_map = std::unordered_map<std::string, editor_typed_resource_id<editor_game_mode_resource>>;
+
+void unpack_string_id(const modes_map& modes, editor_typed_resource_id<editor_game_mode_resource>& id, const bool strict) {
+	if (id._serialized_resource_name.empty()) {
+		return;
+	}
+
+	if (auto found = mapped_or_nullptr(modes, id._serialized_resource_name)) {
+		id = *found;
+	}
+	else {
+		if (strict) {
+			throw augs::json_deserialization_error(
+				"Invalid mode property: \"%x\"\nMode not found!",
+				id._serialized_resource_name
+			);
+		}
+	}
+
+	id._serialized_resource_name.clear();
+}
 #endif
 
 template <class T, class F>
@@ -263,6 +285,7 @@ namespace editor_project_readwrite {
 	) {
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+		//writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
 
 		editor_project project_defaults;
 
@@ -337,7 +360,12 @@ namespace editor_project_readwrite {
 						return resource->unique_name;
 					}
 					else {
-						return "!" + resource->unique_name;
+						if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
+							return resource->unique_name;
+						}
+						else {
+							return "!" + resource->unique_name;
+						}
 					}
 				}
 			}
@@ -353,12 +381,12 @@ namespace editor_project_readwrite {
 			::on_each_resource_id_in_project(subject, clean);
 		};
 
-		auto stringify_resource_ids = [&get_pseudoid](auto& subject) {
-			auto resolve = [&](auto& typed_id) {
-				typed_id._serialized_resource_name = get_pseudoid(typed_id);
-			};
+		auto stringify_id = [&get_pseudoid](auto& typed_id) {
+			typed_id._serialized_resource_name = get_pseudoid(typed_id);
+		};
 
-			::on_each_resource_id_in_project(subject, resolve);
+		auto stringify_resource_ids = [&stringify_id](auto& subject) {
+			::on_each_resource_id_in_project(subject, stringify_id);
 		};
 
 		auto setup_project_defaults = [&]() {
@@ -389,21 +417,22 @@ namespace editor_project_readwrite {
 				return;
 			}
 
-			writer.Key("modes");
+			writer.Key("game_modes");
 			writer.StartObject();
 
 			auto defaults = editor_game_mode_resource();
 			::setup_game_mode_defaults(defaults.editable, officials_map);
+			::on_each_resource_id_in_object(defaults.editable, stringify_id);
 
-			for (const auto& mode : modes) {
+			auto write = [&](const auto& mode) {
 				writer.Key(mode.unique_name);
 
 				auto write = [&]<typename I>(const I&) {
 					if constexpr(std::is_same_v<I, editor_quick_test_mode>) {
-						augs::write_json_diff(writer, mode.editable.quick_test, defaults.editable.quick_test);
+						augs::write_json_diff(writer, mode.editable.quick_test, defaults.editable.quick_test, true);
 					}
 					else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
-						augs::write_json_diff(writer, mode.editable.bomb_defusal, defaults.editable.bomb_defusal);
+						augs::write_json_diff(writer, mode.editable.bomb_defusal, defaults.editable.bomb_defusal, true);
 					}
 					else {
 						static_assert(always_false_v<I>, "Non-exhaustive if constexpr!");
@@ -411,7 +440,18 @@ namespace editor_project_readwrite {
 				};
 
 				mode.type.dispatch(write);
-			}
+			};
+
+			::in_order_of(
+				modes,
+				[&](const auto& mode) {
+					return mode.unique_name;
+				},
+				[&](const auto& a, const auto& b) {
+					return augs::natural_order(a, b);
+				},
+				write
+			);
 
 			writer.EndObject();
 		};
@@ -431,6 +471,10 @@ namespace editor_project_readwrite {
 			for (const auto& layer_id : layers) {
 				if (const auto layer = project.find_layer(layer_id)) {
 					writer.StartObject();
+
+					writer.Key("id");
+					writer.String(layer->unique_name);
+
 					augs::write_json_diff(writer, layer->editable, defaults.editable);
 
 					if (!layer->hierarchy.nodes.empty()) {
@@ -599,12 +643,16 @@ namespace editor_project_readwrite {
 		stringify_resource_ids(project_defaults);
 		stringify_resource_ids(project);
 
+		writer.StartObject();
+
 		write_project_structs();
 		write_modes();
 		write_external_resources();
 
 		write_layers();
 		write_nodes();
+
+		writer.EndObject();
 
 		/*
 			Layer hierarchies and nodes are ignored when writing.
@@ -614,7 +662,6 @@ namespace editor_project_readwrite {
 		augs::save_as_text(json_path, s.GetString());
 
 		clean_stringified_resource_ids(project);
-		(void)officials;
 	}
 
 	editor_project read_project_json(
@@ -623,9 +670,8 @@ namespace editor_project_readwrite {
 		const editor_official_resource_map& officials_map,
 		const bool strict
 	) {
-		(void)officials;
-
 		auto resource_map = officials_map.create_name_to_id_map();
+		auto mode_map = modes_map();
 
 		auto register_new_resource = [&](const auto name_id, auto& allocation_result) {
 			auto& allocated = allocation_result.object;
@@ -635,11 +681,22 @@ namespace editor_project_readwrite {
 
 			const auto typed_id = Id::from_raw(allocation_result.key, false);
 
-			const auto result = resource_map.try_emplace(name_id, typed_id.operator editor_resource_id());
+			if constexpr(std::is_same_v<O, editor_game_mode_resource>) {
+				const auto result = mode_map.try_emplace(name_id, typed_id);
 
-			if (strict) {
-				if (!result.second) {
-					throw augs::json_deserialization_error("Duplicate resource: \"%x\"", name_id);
+				if (strict) {
+					if (!result.second) {
+						throw augs::json_deserialization_error("Duplicate mode: \"%x\"", name_id);
+					}
+				}
+			}
+			else {
+				const auto result = resource_map.try_emplace(name_id, typed_id.operator editor_resource_id());
+
+				if (strict) {
+					if (!result.second) {
+						throw augs::json_deserialization_error("Duplicate resource: \"%x\"", name_id);
+					}
 				}
 			}
 		};
@@ -1003,6 +1060,10 @@ namespace editor_project_readwrite {
 			const auto maybe_layers = FindArray(document, "layers");
 
 			if (!maybe_layers) {
+				if (fallback_node_order.empty()) {
+					return;
+				}
+
 				editor_layer layer;
 				layer.unique_name = "New layer";
 				layer.hierarchy.nodes = std::move(fallback_node_order);
@@ -1116,12 +1177,17 @@ namespace editor_project_readwrite {
 			}
 		};
 
-		auto unstringify_resource_ids = [&]() {
-			auto resolve = [&](auto& typed_id) {
+		auto unstringify_id = [&]<typename R>(editor_typed_resource_id<R>& typed_id) {
+			if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
+				::unpack_string_id(mode_map, typed_id, strict);
+			}
+			else {
 				::unpack_string_id(resource_map, typed_id, strict);
-			};
+			}
+		};
 
-			::on_each_resource_id_in_project(loaded, resolve);
+		auto unstringify_resource_ids = [&]() {
+			::on_each_resource_id_in_project(loaded, unstringify_id);
 		};
 
 		initialize_project_structs();

@@ -1141,18 +1141,23 @@ work_result work(const int argc, const char* const * const argv) try {
 					launch_editor(params.editor_target);
 				}
 				else {
-					const auto loaded_path = augs::path_type(augs::file_to_string(get_editor_last_project_path()));
-
 					try {
-						launch_editor(loaded_path);
-						break;
-					}
-					catch (const std::runtime_error& err) {
-						const auto full_content = typesafe_sprintf("Failed to load: %x\nReason:\n\n%x", loaded_path, err.what());
-						failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
+						const auto loaded_path = augs::path_type(augs::file_to_string(get_editor_last_project_path()));
+
+						try {
+							launch_editor(loaded_path);
+							break;
+						}
+						catch (const std::runtime_error& err) {
+							const auto full_content = typesafe_sprintf("Failed to load: %x\nReason:\n\n%x", loaded_path, err.what());
+							failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
+						}
+						catch (...) {
+
+						}
 					}
 					catch (...) {
-
+						LOG("No %x detected. Launching the project selector.", get_editor_last_project_path());
 					}
 				}
 

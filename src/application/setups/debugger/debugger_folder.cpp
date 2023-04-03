@@ -224,7 +224,7 @@ bool debugger_folder::should_autosave() const {
 	}
 #endif
 
-	return player.dirty || history.at_unsaved_revision() || history.was_modified();
+	return player.dirty || history.at_unsaved_revision() || history.is_dirty();
 }
 
 void debugger_folder::autosave_if_needed() const {

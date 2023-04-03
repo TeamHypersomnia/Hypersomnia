@@ -12,6 +12,7 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	};
 
 	project_json = in_folder(arena_name + ".json");
+	autosave_json = in_folder("autosave.json");
 	editor_view = in_folder("editor_view.json");
 	miniature = in_folder("miniature.png");
 	signature = in_folder("signature");
@@ -24,6 +25,7 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 bool editor_project_paths::is_project_specific_file(const augs::path_type& path) const {
 	return 
 		path == project_json
+		|| path == autosave_json
 		|| path == editor_view
 		|| path == miniature
 		|| path == signature
