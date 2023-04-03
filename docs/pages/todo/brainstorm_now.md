@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Honor playtest spawns but maybe as respawn points only and spawn where the camera is?
+    - think later
+
+- Alright, now comes the saving
+    - let's highlight saved revision in green
+    - when unsaved, show * next to area name
+        - and in the window title
+
 - Prepare comprehensive official resource collection before shipping
 
 - Test sanitization on windows too

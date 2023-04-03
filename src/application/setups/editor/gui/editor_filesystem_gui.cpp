@@ -366,8 +366,9 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			auto scope = scoped_tooltip();
 
 			text(std::string("(Click to open the project folder)\n\nTip: after adding custom sprites and sounds,\nyou can freely move or rename them on HDD."));
-			text_color("The editor detects moved/renamed files.", green);
-			text("Changed files will also be hot-reloaded.\n\n");
+			text_color("The editor detects moved/renamed files!", green);
+			text("You may also edit files externally while the editor is open.");
+			text_color("They will be hot-reloaded!\n\n", green);
 
 			text_color(std::string("Filenames/folders must only contain these characters:\n\n") + std::string(sanitization::portable_alphanumeric_set), orange);
 			text(std::string("\nOtherwise they will be ignored!\nOnly one dot is allowed - for file extensions."));

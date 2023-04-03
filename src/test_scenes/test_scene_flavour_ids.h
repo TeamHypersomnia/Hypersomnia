@@ -41,6 +41,8 @@ enum class test_static_decorations {
 	LAB_WALL_FOREGROUND,
 	LAB_WALL_A2_FOREGROUND,
 
+	ROTATING_FAN,
+
 	DEV_FLOOR_32,
 	DEV_FLOOR_64,
 	DEV_FLOOR_128,
@@ -271,7 +273,6 @@ enum class test_container_items {
 
 enum class test_dynamic_decorations {
 	// GEN INTROSPECTOR enum class test_dynamic_decorations
-	ROTATING_FAN,
 	YELLOW_FISH,
 	DARKBLUE_FISH,
 	CYANVIOLET_FISH,

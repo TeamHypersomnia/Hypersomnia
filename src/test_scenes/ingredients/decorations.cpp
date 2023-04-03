@@ -14,15 +14,15 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_sprite(
-				test_dynamic_decorations::ROTATING_FAN,
+				test_static_decorations::ROTATING_FAN,
 				test_scene_image_id::FAN,
 				test_ground_order::ON_FLOOR
 			);
 
 			{
-				invariants::movement_path movement_path_def;
-				movement_path_def.continuous_rotation_speed = 720.f;
-				meta.set(movement_path_def);
+				auto& sprite = meta.template get<invariants::sprite>();
+				sprite.effect = augs::sprite_special_effect::CONTINUOUS_ROTATION;
+				sprite.effect_speed_multiplier = 2.0f;
 			}
 
 			{

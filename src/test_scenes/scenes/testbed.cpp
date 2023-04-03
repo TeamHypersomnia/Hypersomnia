@@ -857,7 +857,7 @@ namespace test_scenes {
 
 		create(sample_backpack, vec2(200, -750));
 		create(brown_backpack, vec2(280, -750));
-		create(test_dynamic_decorations::ROTATING_FAN, vec2(380, -750));
+		create(test_static_decorations::ROTATING_FAN, vec2(380, -750));
 
 		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 		const auto whole_aquarium_size = aquarium_size * 2;
