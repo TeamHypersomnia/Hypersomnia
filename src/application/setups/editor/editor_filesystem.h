@@ -10,6 +10,8 @@
 
 #include "application/setups/editor/resources/editor_resource_id.h"
 #include "application/setups/editor/editor_filesystem_node_type.h"
+#include "augs/string/path_sanitization.h"
+#include "augs/string/to_forward_slashes.h"
 
 namespace augs {
 	bool natural_order(const std::string& a, const std::string& b);
@@ -23,6 +25,8 @@ using editor_filesystem_ui_state =
 	std::map<augs::path_type, editor_filesystem_node_ui_state>
 ;
 
+using editor_forbidden_paths_result = std::vector<std::pair<augs::path_type, sanitization::forbidden_path_type>>;
+
 struct editor_filesystem_node {
 	ad_hoc_entry_id file_thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
 	std::optional<assets::necessary_image_id> necessary_atlas_icon;
@@ -34,6 +38,7 @@ struct editor_filesystem_node {
 	bool is_open = false;
 	bool passed_filter = false;
 	bool should_sort = true;
+	bool sanitization_skipped = false;
 
 	std::string name;
 	std::string after_text;
@@ -223,27 +228,58 @@ struct editor_filesystem_node {
 		type = ::get_filesystem_node_type_by_extension(extension);
 	}
 
-	void build_from(const augs::path_type& folder_path) {
+	template <class F>
+	void build_from(
+		const augs::path_type& folder_path,
+		const augs::path_type& project_folder,
+		F skip_sanitization,
+		editor_forbidden_paths_result& out_ignored_paths
+	) {
 		clear();
 
-		auto add_entry = [this](const auto& path, const bool folder) {
-			editor_filesystem_node new_node;
-			new_node.name = path.filename().string();
-			const auto extension = path.extension().string();
-
+		auto add_entry = [this, skip_sanitization, &project_folder, &out_ignored_paths](const auto& untrusted_path, const bool folder) {
 			if (folder) {
+				editor_filesystem_node new_node;
+				new_node.name = untrusted_path.filename().string();
 				new_node.type = editor_filesystem_node_type::FOLDER;
 				subfolders.emplace_back(std::move(new_node));
 			}
 			else {
-				new_node.set_file_type_by(extension);
+				auto add_file = [&](const auto& filename, const bool sanitization_skipped) {
+					const auto extension = filename.extension().string();
 
-				try {
-					new_node.last_write_time = augs::last_write_time(path);
-					files.emplace_back(std::move(new_node));
+					editor_filesystem_node new_node;
+					new_node.name = filename.string();
+					new_node.set_file_type_by(extension);
+					new_node.sanitization_skipped = sanitization_skipped;
+
+					try {
+						new_node.last_write_time = augs::last_write_time(untrusted_path);
+						files.emplace_back(std::move(new_node));
+					}
+					catch (...) {
+
+					}
+				};
+
+				if (skip_sanitization(untrusted_path)) {
+					add_file(untrusted_path.filename(), true);
 				}
-				catch (...) {
+				else {
+					const auto relative_in_project = std::filesystem::relative(untrusted_path, project_folder);
 
+					std::visit(
+						[&]<typename S>(const S& sanitization_result) {
+							if constexpr(std::is_same_v<S, augs::path_type>) {
+								add_file(sanitization_result.filename(), false);
+							}
+							else {
+								out_ignored_paths.push_back({ relative_in_project, sanitization_result });
+							}
+						},
+
+						sanitization::sanitize_downloaded_file_path(project_folder, ::to_forward_slashes(relative_in_project.string()))
+					);
 				}
 			}
 
@@ -257,7 +293,12 @@ struct editor_filesystem_node {
 		);
 
 		for (auto& subfolder : subfolders) {
-			subfolder.build_from(folder_path / subfolder.name);
+			subfolder.build_from(
+				folder_path / subfolder.name,
+				project_folder, 
+				skip_sanitization, 
+				out_ignored_paths
+			);
 		}
 
 		adding_children_finished();
@@ -316,10 +357,15 @@ struct editor_filesystem {
 		});
 	}
 
-	void rebuild_from(const augs::path_type& folder_path) {
+	template <class F>
+	void rebuild_from(
+		const augs::path_type& project_folder,
+		F skip_sanitization,
+		editor_forbidden_paths_result& out_ignored_paths
+	) {
 		auto saved_state = make_ui_state();
 
-		root.build_from(folder_path);
+		root.build_from(project_folder, project_folder, skip_sanitization, out_ignored_paths);
 
 		apply_ui_state(saved_state);
 	}

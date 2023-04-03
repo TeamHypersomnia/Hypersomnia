@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Test sanitization on windows too
+
 - ensure paths are serialized with forward slashes regardless of platform
     - Otherwise maps will save differently and it won't be vcs-friendly
 

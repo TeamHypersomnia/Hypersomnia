@@ -5,17 +5,17 @@ namespace sanitization {
 	std::string describe(const forbidden_path_type f) {
 		switch (f) {
 			case forbidden_path_type::DOTS_OUTSIDE_EXTENSION:
-				return "File path cannot have dots except one for the extension.";
+				return "Only one dot is allowed for the file extension.";
 			case forbidden_path_type::EMPTY:
-				return "File path cannot be empty.";
+				return "File path is empty.";
 			case forbidden_path_type::PART_EMPTY:
-				return "File path cannot have zero-length elements.";
+				return "File path has empty elements.";
 			case forbidden_path_type::FORBIDDEN_CHARACTERS:
-				return "File and folder names can only contain lowercase alphanumeric characters and underscores (\"_\").";
+				return "Forbidden characters. Only lowercase letters, numbers and underscores (\"_\") are allowed.";
 			case forbidden_path_type::NO_EXTENSION:
-				return "Filename must have an extension.";
+				return "Filename has no extension.";
 			case forbidden_path_type::FORBIDDEN_EXTENSION:
-				return "Filename must have an allowed extension.";
+				return "Forbidden extension.";
 			case forbidden_path_type::TOO_LONG:
 				return "File path is too long.";
 			case forbidden_path_type::GOES_BEYOND_PARENT_FOLDER:

@@ -238,6 +238,10 @@ bool editor_setup::confirm_modal_popup() {
 		ok_only_popup = std::nullopt;
 		return true;
 	}
+	else if (ok_only_popup_2) {
+		ok_only_popup_2 = std::nullopt;
+		return true;
+	}
 
 	return false;
 }
@@ -527,7 +531,13 @@ void editor_setup::on_window_activate() {
 }
 
 void editor_setup::rebuild_filesystem() {
-	files.rebuild_from(paths.project_folder);
+	last_ignored_paths.clear();
+
+	auto should_skip_sanitization = [&](auto path) {
+		return paths.is_project_specific_file(path.make_preferred());
+	};
+
+	files.rebuild_from(paths.project_folder, should_skip_sanitization, last_ignored_paths);
 	gui.filesystem.clear_drag_drop();
 	rebuild_ad_hoc_atlas = true;
 
@@ -566,7 +576,25 @@ void editor_setup::rebuild_filesystem() {
 		changes_popup.message = summary;
 		changes_popup.details = details;
 
-		ok_only_popup = changes_popup;
+		ok_only_popup_2 = changes_popup;
+	}
+
+	if (last_ignored_paths.size() > 0) {
+		simple_popup ignored_popup;
+
+		std::string summary;
+		std::string details;
+		summary = typesafe_sprintf("%x files have invalid filenames.\nThey will be ignored until you name them correctly.\n\nIf they were in the project before,\nthey will now be reported as missing.", last_ignored_paths.size());
+
+		for (auto& r : last_ignored_paths) {
+			details += typesafe_sprintf("%x:\n%x\n", r.first.string(), sanitization::describe(r.second));
+		}
+
+		ignored_popup.title = "Invalid filenames detected!";
+		ignored_popup.message = summary;
+		ignored_popup.details = details;
+
+		ok_only_popup = ignored_popup;
 	}
 }
 
@@ -1826,6 +1854,10 @@ setup_escape_result editor_setup::escape() {
 
 	if (ok_only_popup) {
 		ok_only_popup = std::nullopt;
+		return setup_escape_result::JUST_FETCH;
+	}
+	else if (ok_only_popup_2) {
+		ok_only_popup_2 = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
 	}
 	else if (mover.escape()) {

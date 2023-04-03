@@ -20,4 +20,6 @@ struct editor_project_paths {
 	augs::path_type fast_load_bin;
 
 	editor_project_paths(const augs::path_type& target_folder);
+
+	bool is_project_specific_file(const augs::path_type&) const;
 };

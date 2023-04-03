@@ -202,15 +202,24 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			}
 		}
 
-		bool is_project_json_file = false;
+		const bool viewing_project_files = currently_viewed_root == &in.project_files_root;
 
-		if (node.is_child_of_root()) {
-			is_project_json_file = node.name == in.setup.get_paths().project_json.filename().string();
+		const bool is_project_json_file = 
+			viewing_project_files && 
+			node.is_child_of_root() &&
+			node.name == in.setup.get_paths().project_json.filename().string()
+		;
 
+		if (viewing_project_files) {
 			/* Ignore some editor-specific files in the project folder */
+			if (!is_project_json_file) {
+				if (node.is_child_of_root() && node.name == ".cache") {
+					return;
+				}
 
-			if (node.name == "editor_view.json") {
-				return;
+				if (node.sanitization_skipped) {
+					return;
+				}
 			}
 		}
 
@@ -233,7 +242,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 				if (ImGui::BeginPopupContextItem()) {
 					{
-						const bool can_reveal = currently_viewed_root == &in.project_files_root;
+						const bool can_reveal = viewing_project_files;
 
 						auto disabled = maybe_disabled_cols(!can_reveal);
 
@@ -356,7 +365,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		if (ImGui::IsItemHovered()) {
 			auto scope = scoped_tooltip();
 
-			text(std::string("(Click to open the project folder)\n\nTip: once you paste custom sprites and sounds,\nyou can freely move or rename them on HDD."));
+			text(std::string("(Click to open the project folder)\n\nTip: after adding custom sprites and sounds,\nyou can freely move or rename them on HDD."));
 			text_color("The editor detects moved/renamed files.", green);
 			text("Changed files will also be hot-reloaded.\n\n");
 

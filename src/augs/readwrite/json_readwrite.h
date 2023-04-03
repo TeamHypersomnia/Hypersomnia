@@ -21,6 +21,7 @@
 #include "augs/readwrite/json_traits.h"
 #include "augs/pad_bytes.h"
 #include "augs/templates/traits/is_maybe.h"
+#include "augs/string/to_forward_slashes.h"
 
 namespace augs {
 	template <class F, class T>
@@ -269,9 +270,7 @@ namespace augs {
 			to.String(from);
 		}
 		else if constexpr(std::is_same_v<T, path_type>) {
-			auto path = from.string();
-			std::replace(path.begin(), path.end(), '\\', '/');
-			to.String(path);
+			to.String(::to_forward_slashes(from.string()));
 		}
 		else if constexpr(std::is_same_v<T, float>) {
 			to.Double(from);

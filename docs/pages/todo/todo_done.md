@@ -5161,3 +5161,5 @@ Advantages:
 
 - folders should be revealable in explorer
 
+- If we sanitize in-editor we must also remember windows will put \ there which will trigger sanitization error
+

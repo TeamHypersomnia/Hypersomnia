@@ -367,6 +367,11 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			ok_only_popup = std::nullopt;
 		}
 	}
+	else if (ok_only_popup_2) {
+		if (ok_only_popup_2->perform()) {
+			ok_only_popup_2 = std::nullopt;
+		}
+	}
 
 	using namespace augs::imgui;
 
