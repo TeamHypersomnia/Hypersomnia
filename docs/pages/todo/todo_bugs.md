@@ -11,6 +11,14 @@ summary: Just a hidden scratchpad.
 		- although only with higher glsl version
 	- didn't happen before, very probable it's a driver bug
 
+- Fixing wallbangs and wall teleportation
+    - A short raycast sensor in front of the player
+        - Detect all convex shapes of walls in front of him
+        - Just take all vertices of all detected convexes
+        - And create a single trapezoid body
+    - Don't do raycast
+        - simply query the  right before the physics step (after applying the crosshair's direction to player rotation)
+
 - There was a crash due to dead entity in driver setup finding a component
 	- possible cause is that the gun system destroys item in chamber, but technically they should not trigger END_CONTACT
 	as they are devoid of... hey, actually that might be because we still see those entities even if they are in backpack. 

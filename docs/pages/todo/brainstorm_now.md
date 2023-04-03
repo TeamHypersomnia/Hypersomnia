@@ -6,32 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Prepare comprehensive official resource collection before shipping
+
 - Test sanitization on windows too
-
-- ensure paths are serialized with forward slashes regardless of platform
-    - Otherwise maps will save differently and it won't be vcs-friendly
-
-- Pseudoid collision resolution
-    - In what order?
-        - A case: gfx/aquarium/fish.gif, gfx/garden/fish.png
-        - We either:
-            - Differentiate both: so pseudoids here will become @fish.gif and @fish.png
-            - or differentiate only one of the duplicate, so e.g. @fish and @fish.png
-    - We could trivially replace all duplicate entries with full paths
-        - Notice that resolving two duplicates might lead to another duplicate
-            - e.g. if there's garden_fish.png then if there are garden/fish.png and aquarium/fish.png, there's another collision for when the latter two are already resolved
-
-- We HAVE to differentiate official/project resources to avoid confusion.
-    - E.g. what if someone adds their own "gfx/metal_crate" and then we add an official resource named metal_crate?
-        - While it could still be handled by the reader, this would be very confusing
-        - Final verdict:
-            - use "@resource" for project-specific external resources
-            - use "!resource" for project-specific internal resources
-                - not a problem for now but we'll later maybe force names without spaces
-            - use just "resource" for official resources
-
-- When considering which external resources to write, let's skip unused resources with only size defined
-    - That's because size only starts to matter when we instantiate some
 
 - area_marker/box_marker naming consistency
     - though it's not significant in json state
@@ -60,10 +37,6 @@ summary: That which we are brainstorming at the moment.
         - Note however we'll serialize based on two criteria: whether the image's both unused AND unmodified.
         - We might want to save the number of references so that the game doesn't load unused resources despite them being modified for later use!
     
-    
-
-- If no layers found, put nodes in a default one in the order of appearance
-
 - fog_of_war: false
   fog_of_war: {
         angle = 1800
@@ -71,7 +44,6 @@ summary: That which we are brainstorming at the moment.
   }
 
 - colorize -> color maybe?
-- Do that chronological thing for nodes
 
 - Serializing maybes.
     - Things would be way easier if we assumed that no maybes will be true by default
@@ -124,44 +96,17 @@ summary: That which we are brainstorming at the moment.
 
     "maybe_field": false
 
-- Final decision: do we denote official resources with []?
-    - Con: might seem redundant as most maps will be using official resources mostly
-        - And if we denote something, it should be the less frequent case
-    - Pros:
-        - The only ones are when human-reading these files
-        - E.g. if we want to know how many times an official crate is used, we look for "[crate]"
-            - but some nodes might still be named "[crate]", although that's not probable
-            - Well we can just look for "type": "crate" which solves the problem
-    - I think after all let's ditch them
-
-- Deprecate multipooldispatchers, it's silly
 - not sure if we need to set the stamp hash when reading
     - This is basically just for the editor to be able to redirect missing resources
     - Game won't use it even if the resource is missing
     - i don't think so, they're probably reread only after the entire redirecting work
 
-- id vs name
-    - in case of resources - at least pathed ones - certainly id because it might even be different than display name
-    - I'd honestly be consistent as these indeed work as identifiers
 - Also nothing happens if two resources have the same display name in-game
     - we'll have to use a pseudo id that considers an extension
 - Mapping official resources
     - Can we guarantee that all resources
         - Does it matter at serialization stage?
         - These are only display names, but it would be nice if they matched ids
-
-- Uh, we'll actually need to map to editor_resource_id
-    - And all resource ids will have to be unique (so can't have a weapon named "playtesting")
-    - That is because we're resolving the type of the node by just its resource name
-
-- Resolution of strings->ids and viceversa should be easy
-    - That's literally just a single introspection call to our entire project + single introspection call per every node and resource
-        - Nothing more
-    - We could even make if constexprs for containers if we were scrupulous
-        - it's not like a comparative introspect where we need two 
-
-
-- Check if windows doubly-activates window too
 
 - JSON serialization
     - We'll need a context object anyway
@@ -186,62 +131,6 @@ summary: That which we are brainstorming at the moment.
             - Maybe we should?
     - If size is default, do we write it to json?
 
-- preliminary JSON serialization considerations
-    - Layers can have node names:
-
-"layers": [
-    {
-        "name": "New layer 1",
-        "visible": true,
-        "nodes": [
-            "aquarium",
-            "aquarium (1)",
-            "cyan_floor"
-        ]
-    }
-]
-    - And nodes can be right below it with complete definitions:
-"nodes": [
-    {
-        "name": "aquarium",
-        "type": "[aquarium]",
-        "pos": [ 23.0, 41.0 ]
-    },
-    {
-        "name": "aquarium (1)",
-        "type": "[aquarium]",
-        "pos": [ 3.0, 410.0 ]
-    },
-    {
-        "name": "cyan_floor",
-        "type": "cyan_floor"
-        "pos": [ 33.0, 410.0 ]
-    }
-]
-- When considering what order to serialize nodes in, we want:
-    - Most important: infrequent changes in the version control
-        - E.g. don't move the entire node in the file when we just reorder it in hierarchy
-    - Pretty much nothing else
-    - Alphabetical order isn't that important
-- Therefore, it's best to serialize nodes in chronological order.
-    - Why?
-        - By far the least changing metric which will make it version-control friendly
-        - Bonus points for being able to approximately visualize how the map was laid out step by step
-
-- Perhaps we should think of separating the rebuilders now
-    - Rebuild can be a function of arena handle
-        - it has references to everything we need
-
-- Now let's do rebuilding the modes and applying these to test mode
-    - The test mode should really hold a variant of all modes I believe
-    - or the complete arena handle, we'll see how it works
-
-- Type vs id nomenclature
-    - E.g. we want nodes to say what "type" (resource) they are but footstep custom sound to have "id"
-        - it just sounds intuitive
-    - I'd say wherever we have a typed_editor_resource_id we use id and a generic one, editor_resource_id, is necessarily a "type"
-        - since it actually encodes type information as well
-
 - Modes considerations
     - Replacing freeze_secs etc with freeze_time
         - More intuitive for cs-natives
@@ -254,49 +143,9 @@ summary: That which we are brainstorming at the moment.
     - Some properties WILL be mode-specific. And it won't make sense to specify them in the general variables.
         - Like starting equipment for playtesting - non-transferrable to anywhere else really
 
-- footstep editing, per-faction equipment editing
-    - we'll have some specific macro utils probably
-
 - Treat space as _ when filtering
     - At least where filtered stuff is path like
         - But will be applicable pretty much everywhere honestly
-
-- Do we want editor_project to be writable/operable standalone?
-    - Editor setup is needed for:
-        - Accessing resources mostly (whether they're official or project-specific)
-    - For it to be independent:
-        - Resource ids would have to have official tags instead of bool is_official
-            - effectively becoming a variant
-            - this would certainly save us some repetition in some places
-    - editor_project::on_resource can just call it on enum and then we can constexpr if it's an enum
-        - the serializator won't need to know the exact values of resources, unless..
-        - wait a bit, what if node default values depend on values of resources, official as well?
-            - uh, they do actually, so we need these values after all
-    - I think we'll just pass the official resources to the serializator instead of the entire setup
-
-- In json, Write modes separately above resources
-    - So that they are visible at the very top
-    - Easier for parsers to show what game modes are available
-    - Type of gamemodes will be inferred from either the custom name or its parent
-    - I think for now let's just force the single mode with treating mode names as type names
-
-- Defining sounds
-    - We might want to specify gains, pitches etc
-    - It might simply be indented in the editor and the parameters show only if any sound is selected
-    - json Semantics?
-        - "footstep_sound": { "id": "standard_footstep", "gain": 0.5, "pitch": 0.9 }
-    - will be exactly the same for themes, just the inspector will differentiate widgets based on name (we'll hide distance models for themes etc")
-
-- Some common mode properties would come in handy
-    - E.g. for warmup
-        - Starting messages too
-        - Fog of war too...
-    - We don't have to list all these properties right now but we can certainly think about it in advance
-    - I think warmup theme can be global as well and default to the official arabesque
-- editor_playtesting_settings
-    - skip_warmup
-    - skip_freeze_time
-    - unlimited_money
 
 - Modes
     - Maybe think this through before we do serialization
@@ -1622,36 +1471,6 @@ Nie nazywajmy tego arena editor tylko użyjmy najbardziej oczywistej nazwy
 
 - Area marker variation (?)
 
-- All obstacles should be on a well-defined layer
-    - like in jj2
-    - Well what about detached heads?
-- The point is what the user can see
-    - Ground and Foreground will not be physical
-- What about mixing physical and non-physical tiles on the same tile layer?
-
-- I think we need to let go of the concept that "render_layer" will directly correspond to the stuff in "Separators"
-
-- Do we really want to expose "wall lighting" option to ground layer even when it will make little sense?
-    - Perhaps make it only appear for the wall layers and all wall flavours will have it on by default
-
-- Notice that we will have to make likewise "separators" for callout markers, lights and whatnot
-    - So shouldn't they be render layers too?
-    - We could call it a special layer
-    - All special layers will be a heterogenous tuple of arrays of possible id type vectors
-    - I'd divide it into tabs
-        - Foreground
-        - Background
-        - Special
-    - Though it would be enough to just have a single sub-layer of lights and of markers
-        - instead of whole separators
-
-- Maybe instead of "glass obstacles" and "solid obstacles" have just solid obstacles and a bool whether we want to apply additional wall light
-    - similarly with foreground?
-    - but the glows would anyways be rendered on top so it'd be counterintuitive
-        - similarly with neon erasers
-        - we can have though instead of SOLID_OBSTACLES_OCCLUDING_NEONS just a single solid obstacle layer and just a flag if to occlude floor neons
-            - since it will anyways be shown always above the ground layer 
-
 - Sentience -> Character please
 
 - Fix version numbering on MacOS
@@ -1661,13 +1480,6 @@ Nie nazywajmy tego arena editor tylko użyjmy najbardziej oczywistej nazwy
 
 - Fix those mag refills please
 
-- Fixing wallbangs and wall teleportation
-    - A short raycast sensor in front of the player
-        - Detect all convex shapes of walls in front of him
-        - Just take all vertices of all detected convexes
-        - And create a single trapezoid body
-    - Don't do raycast
-        - simply query the  right before the physics step (after applying the crosshair's direction to player rotation)
 
 - Leaderboards shown in the main menu
 - "Host a server" button right in the arena editor

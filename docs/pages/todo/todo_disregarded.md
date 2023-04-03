@@ -5,6 +5,10 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Deprecate multipooldispatchers, it's silly
+	- it's actually useful because it has typed id dispatch functions etc
+- Check if windows doubly-activates window too
+
 - Internal/special resource names colliding with file names might be a pain the ass
 	- E.g. suppose there's no collision
 		- Someone renames a sprite whose pseudo-id becomes now equivalent to some special resource's name 
