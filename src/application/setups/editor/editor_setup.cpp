@@ -106,6 +106,7 @@ editor_setup::editor_setup(
 
 		post_new_command(std::move(cmd));
 		history.mark_as_autosaved();
+		autosave_timer.reset();
 
 		dirty_after_loading_autosave = true;
 	}
@@ -123,7 +124,7 @@ editor_setup::editor_setup(
 }
 
 editor_setup::~editor_setup() {
-	autosave_now_if_neeeded();
+	autosave_now_if_needed();
 
 	/*
 		Remove autosave only if we're at saved revision.
@@ -263,9 +264,10 @@ bool editor_setup::handle_input_before_imgui(
 	}
 
 	if (in.e.msg == message::deactivate) {
-		autosave_now_if_neeeded();
+		if (settings.autosave.on_lost_focus) {
+			autosave_now_if_needed();
+		}
 	}
-
 	return false;
 }
 
@@ -877,6 +879,8 @@ void editor_setup::remove_autosave_file() {
 
 void editor_setup::save() {
 	history.mark_as_just_saved();
+	autosave_timer.reset();
+
 	dirty_after_loading_autosave = false;
 
 	save_project_file_as(paths.project_json);
@@ -914,10 +918,11 @@ bool editor_setup::autosave_needed() const {
 	return history.at_unsaved_revision() && !history.at_autosaved_revision();
 }
 
-void editor_setup::autosave_now_if_neeeded() {
+void editor_setup::autosave_now_if_needed() {
 	if (autosave_needed()) {
 		save_project_file_as(paths.autosave_json);
 		history.mark_as_autosaved();
+		autosave_timer.reset();
 	}
 
 	save_gui_state();

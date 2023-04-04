@@ -249,6 +249,26 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	arena_gui_base::perform_custom_imgui(in);
 
+	auto update_autosave = [this]() {
+		if (last_autosave_settings.interval_changed(settings.autosave)) {
+			autosave_timer.reset();
+		}
+
+		last_autosave_settings = settings.autosave;
+
+		if (settings.autosave.periodically) {
+			if (!autosave_needed()) {
+				autosave_timer.reset();
+			}
+
+			if (settings.autosave.once_every_min <= autosave_timer.get<std::chrono::minutes>()) {
+				autosave_now_if_needed();
+			}
+		}
+	};
+
+	update_autosave();
+
 	if (gui.request_toggle_sounds_preview) {
 		gui.request_toggle_sounds_preview = false;
 

@@ -322,12 +322,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     autosave = {
       enabled = true,
-      once_every_min = 1
-    },
-
-    go_to = {
-      dialog_width = 400,
-      num_lines = 15,
+      once_every_min = 2
     },
 
     camera = {

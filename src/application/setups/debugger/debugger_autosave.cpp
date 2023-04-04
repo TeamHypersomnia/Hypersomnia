@@ -93,7 +93,7 @@ void debugger_autosave::advance(
 	const debugger_significant& signi,
 	const debugger_autosave_settings& settings
 ) {
-	if (last_settings != settings) {
+	if (last_settings.interval_changed(settings)) {
 		autosave_timer = {};
 	}
 

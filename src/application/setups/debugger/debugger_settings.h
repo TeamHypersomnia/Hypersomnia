@@ -14,7 +14,7 @@ struct debugger_autosave_settings {
 	double once_every_min = 1.0;
 	// END GEN INTROSPECTOR
 
-	bool operator!=(const debugger_autosave_settings b) const {
+	bool interval_changed(const debugger_autosave_settings b) const {
 		return once_every_min != b.once_every_min || enabled != b.enabled;
 	}
 };

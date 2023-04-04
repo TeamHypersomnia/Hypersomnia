@@ -103,6 +103,8 @@ using editor_arena_handle = basic_arena_handle<C, mode_and_rules>;
 class editor_setup : public default_setup_settings, public arena_gui_mixin<editor_setup> {
 	using arena_gui_base = arena_gui_mixin<editor_setup>;
 
+	augs::timer autosave_timer;
+
 	test_mode_ruleset default_test_ruleset;
 	bomb_defusal_ruleset default_bomb_ruleset;
 	intercosm built_official_content;
@@ -147,6 +149,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	const editor_project_paths paths;
 	editor_settings settings;
+	editor_autosave_settings last_autosave_settings;
+
 	client_vars simulated_client;
 	faction_view_settings faction_view;
 
@@ -165,7 +169,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	editor_paths_changed_report rebuild_pathed_resources();
 
 	void remove_autosave_file();
-	void autosave_now_if_neeeded();
+	void autosave_now_if_needed();
 	bool autosave_needed() const;
 	void save();
 	void save_project_file_as(const augs::path_type& path);

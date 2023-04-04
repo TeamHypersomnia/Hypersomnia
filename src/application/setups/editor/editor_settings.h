@@ -4,17 +4,16 @@
 
 #include "augs/drawing/grid_render_settings.h"
 
-#include "augs/templates/snapshotted_player_settings.h"
-
 struct editor_autosave_settings {
 	// GEN INTROSPECTOR struct editor_autosave_settings
-	bool enabled = true;
 	bool on_lost_focus = true;
+
+	bool periodically = true;
 	double once_every_min = 1.0;
 	// END GEN INTROSPECTOR
 
-	bool operator!=(const editor_autosave_settings b) const {
-		return once_every_min != b.once_every_min || enabled != b.enabled;
+	bool interval_changed(const editor_autosave_settings b) const {
+		return once_every_min != b.once_every_min || periodically != b.periodically;
 	}
 };
 
@@ -61,18 +60,11 @@ struct editor_action_notification_settings {
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
-	bool keep_source_entities_selected_on_mirroring = false;
-	
-#if TODO
-	unsigned remember_last_n_commands = 200;
-#endif
+	bool keep_source_nodes_selected_on_mirroring = false;
 
 	editor_grid_settings grid;
-	augs::snapshotted_player_settings player;
-	bool save_entropies_to_live_file = false;
 
 	editor_camera_settings camera;
-	editor_go_to_settings go_to;
 	editor_entity_selector_settings entity_selector;
 
 	rgba matched_entity_color = { 0, 255, 0, 80 };

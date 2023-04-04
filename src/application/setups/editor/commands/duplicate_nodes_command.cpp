@@ -145,7 +145,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 				in.setup.inspect_add_quiet(duplicated_id_generic);
 			}
 
-			if (in.settings.keep_source_entities_selected_on_mirroring) {
+			if (in.settings.keep_source_nodes_selected_on_mirroring) {
 				if (does_mirroring) {
 					in.setup.inspect_add_quiet(source_id_generic);
 				}

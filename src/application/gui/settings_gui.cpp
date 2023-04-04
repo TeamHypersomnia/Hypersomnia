@@ -1224,17 +1224,18 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::EDITOR: {
-				if (auto node = scoped_tree_node("General")) {
-					revertable_checkbox("Enable autosave", config.editor.autosave.enabled);
-	
-					if (config.editor.autosave.enabled) {
+				if (auto node = scoped_tree_node("Autosave")) {
+					revertable_checkbox("Autosave when window loses focus", config.editor.autosave.on_lost_focus);
+					revertable_checkbox("Autosave periodically", config.editor.autosave.periodically);
+
+					if (config.editor.autosave.periodically) {
 						auto scope = scoped_indent();
 						text("Autosave once per");
 						ImGui::SameLine();
 						revertable_drag("minutes", config.editor.autosave.once_every_min, 0.002, 0.05, 2000.0);
-
-						revertable_checkbox("Autosave when window loses focus", config.editor.autosave.on_lost_focus);
 					}
+
+					text_disabled("(Note that when you exit the editor with unsaved changes,\nyour work will ALWAYS be autosaved)");
 					
 #if TODO
 					text("Remember last");
@@ -1279,14 +1280,16 @@ void settings_gui_state::perform(
 						revertable_drag("Panning speed", config.editor.camera.panning_speed, 0.001f, -10.f, 10.f);
 					}
 
+#if 0
 					if (auto node = scoped_tree_node("\"Go to\" dialogs")) {
 						revertable_slider("Width", config.editor.go_to.dialog_width, 30u, static_cast<unsigned>(screen_size.x));
 						revertable_slider("Number of lines to show", config.editor.go_to.num_lines, 1u, 300u);
 					}
+#endif
 
 					if (auto node = scoped_tree_node("Entity selections")) {
 						auto& scope_cfg = config.editor;
-						revertable_checkbox(SCOPE_CFG_NVP(keep_source_entities_selected_on_mirroring));
+						revertable_checkbox(SCOPE_CFG_NVP(keep_source_nodes_selected_on_mirroring));
 					}
 				}
 
@@ -1346,6 +1349,7 @@ void settings_gui_state::perform(
 #endif
 				}
 
+#if 0
 				if (auto node = scoped_tree_node("Player")) {
 					auto& scope_cfg = config.editor.player;
 
@@ -1357,6 +1361,7 @@ void settings_gui_state::perform(
 
 					revertable_checkbox(SCOPE_CFG_NVP(save_entropies_to_live_file));
 				}
+#endif
 
 				break;
 			}
