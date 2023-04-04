@@ -899,7 +899,7 @@ namespace editor_project_readwrite {
 						}
 					},
 
-					sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path)
+					sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path.string())
 				);
 			}
 		};
