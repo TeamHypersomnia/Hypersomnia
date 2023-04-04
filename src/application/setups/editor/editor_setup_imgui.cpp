@@ -373,6 +373,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		in.window,
 		files.root,
 		official_files_root,
+		history,
 		in.ad_hoc_atlas,
 		in.necessary_images
 	});

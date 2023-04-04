@@ -420,7 +420,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 					edit_project_settings_command cmd;
 					cmd.do_inspector_at_all = false;
 					cmd.after = std::move(new_playtesting);
-					cmd.built_description = typesafe_sprintf("Set tested mode to %x", in.setup.get_name(in.setup.get_project().playtesting.mode));
+					cmd.built_description = typesafe_sprintf("Set playtested mode to %x", in.setup.get_name(in.setup.get_project().playtesting.mode));
 
 					in.setup.post_new_command(std::move(cmd));
 				}

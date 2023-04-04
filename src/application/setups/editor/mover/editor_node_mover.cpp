@@ -63,6 +63,7 @@ bool editor_node_mover::start_transforming_selection(
 	s.finish_rectangular_selection();
 
 	auto command = s.make_command_from_selected_entities<move_nodes_command>("", is_movable());
+	command.built_description = "";
 
 	if (!command.empty()) {
 		active = true;

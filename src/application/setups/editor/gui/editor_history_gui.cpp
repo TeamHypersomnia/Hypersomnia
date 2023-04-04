@@ -111,6 +111,10 @@ void editor_history_gui::perform(const editor_history_gui_input in) {
 	bool ignore_until_parent = false;
 
 	for (std::size_t i = 0; i < commands.size(); ++i) {
+		/*
+			We iterate commands in reverse,
+			to show the most recent ones on top.
+		*/
 		const auto n = commands.size() - i - 1;
 
 		std::visit(
@@ -138,7 +142,7 @@ void editor_history_gui::perform(const editor_history_gui_input in) {
 			editor_command_meta meta;
 
 			auto describe() const {
-				return std::string("Open saved changes");
+				return std::string("Opened project file");
 			}
 		};
 

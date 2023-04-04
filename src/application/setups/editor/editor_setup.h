@@ -53,6 +53,7 @@
 #include "application/arena/arena_handle.h"
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/setups/client/client_vars.h"
+#include "application/setups/editor/gui/editor_recent_message.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -150,6 +151,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	const editor_project_paths paths;
 	editor_settings settings;
 	editor_autosave_settings last_autosave_settings;
+
+	editor_recent_message recent_message;
 
 	client_vars simulated_client;
 	faction_view_settings faction_view;
@@ -650,6 +653,8 @@ public:
 	}
 
 	void draw_custom_gui(const draw_setup_gui_input&);
+	void draw_custom_gui_over_imgui(const draw_setup_gui_input&);
+	void draw_recent_message(const draw_setup_gui_input&);
 
 	void ensure_handler() {}
 

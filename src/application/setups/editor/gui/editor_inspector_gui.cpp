@@ -179,11 +179,11 @@ bool edit_property(
 	else if constexpr(std::is_same_v<T, bool>) {
 		if (checkbox(label, property)) {
 			if (property) {
-				result = typesafe_sprintf("Enable %x in %x", label);
+				result = typesafe_sprintf("Enabled %x in %x", label);
 				return true;
 			}
 			else {
-				result = typesafe_sprintf("Disable %x in %x", label);
+				result = typesafe_sprintf("Disabled %x in %x", label);
 				return true;
 			}
 		}
@@ -275,13 +275,13 @@ bool edit_property(
 				faction_type::METROPOLIS,
 				faction_type::RESISTANCE
 			>(label, property)) { 
-				result = typesafe_sprintf("Switch %x to %x in %x", label, property);
+				result = typesafe_sprintf("Switched %x to %x in %x", label, property);
 				return true;
 			}
 		}
 		else {
 			if (enum_combo(label, property)) { 
-				result = typesafe_sprintf("Switch %x to %x in %x", label, property);
+				result = typesafe_sprintf("Switched %x to %x in %x", label, property);
 				return true;
 			}
 		}

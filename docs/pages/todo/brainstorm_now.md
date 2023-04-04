@@ -6,10 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Commandizing would be good because then an accidental import could be undone
+    - But if resources are unused (no changes and no references), we shouldn't spawn a "missing" popup
+    - For this we need to run recount references once after rebuilding the filesystem
+        
+
+- Should we commandize resource existence?
+    - Why not?
+    - Apart from autosave, this will also let us handle forgetting resources normally
+    - The only problem being that an import/redirect will overwrite revisions from the future
+
 - Note we'll have to clear the history if we want to forget resources
     - Let's also think of corner cases with autosave
         - autosave could have:
             - less resources than in saved
+                - Once we rebuild though, there will be the same amount of resources
+                - Consider this.    
+                    - An autosave has less resources, this is being kept in the project struct in "after" field
+                    - Now resources are reloaded as the game window is activated and there is more resources
+                    - Some of the new resources are instantiated and new commands on top of autosave load are created
+                    - "Undo" is performed back to autosave command
+                    - The redo will work on nonexisting resources.
             - more resources than in saved
 
 - Honor playtest spawns but maybe as respawn points only and spawn where the camera is?

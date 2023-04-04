@@ -109,6 +109,9 @@ editor_setup::editor_setup(
 		autosave_timer.reset();
 
 		dirty_after_loading_autosave = true;
+
+		recent_message.set("Loaded an autosave file.\nTo go back to last saved changes instead,\npress Undo (CTRL+Z).");
+		recent_message.show_for_at_least_ms = 10000;
 	}
 	catch (...) {
 		LOG("No autosave file was found.");
@@ -884,6 +887,9 @@ void editor_setup::save() {
 	dirty_after_loading_autosave = false;
 
 	save_project_file_as(paths.project_json);
+
+	recent_message.set("Saved the project to %x", paths.project_json.filename().string());
+
 	remove_autosave_file();
 }
 
@@ -920,6 +926,8 @@ bool editor_setup::autosave_needed() const {
 
 void editor_setup::autosave_now_if_needed() {
 	if (autosave_needed()) {
+		recent_message.set("Autosaved current changes to: %x", paths.autosave_json.filename().string());
+
 		save_project_file_as(paths.autosave_json);
 		history.mark_as_autosaved();
 		autosave_timer.reset();
@@ -1794,6 +1802,195 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	}
 }
 
+void editor_setup::draw_custom_gui_over_imgui(const draw_setup_gui_input& in) {
+	draw_recent_message(in);
+}
+
+void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
+	const auto& cfg = settings.action_notification;
+
+	if (!cfg.enabled) {
+		return;
+	}
+
+	const auto& h = history;
+
+	using namespace augs::gui::text;
+	using O = augs::history_op_type;
+
+	const auto& fnt = in.gui_fonts.gui;
+
+	auto colored = [&](const auto& s, const rgba col = white) {
+		const auto st = style(fnt, col);
+		return formatted_string(s, st);
+	};
+
+	auto make_colorized = [&](auto dest) {
+		formatted_string result;
+
+		auto try_preffix = [&](const auto& preffix, const auto col) {
+			if (begins_with(dest, preffix)) {
+				cut_preffix(dest, preffix);
+				result = colored(preffix, col) + colored(dest);
+				return true;
+			}
+
+			return false;
+		};
+
+		if (try_preffix("Deleted", red)
+			|| try_preffix("Erased", red)
+			|| try_preffix("Removed", red)
+			|| try_preffix("Cannot", red)
+			|| try_preffix("Discarded", orange)
+			|| try_preffix("Reapplied", pink)
+			|| try_preffix("Successfully", green)
+			|| try_preffix("Filled", green)
+			|| try_preffix("Exported", green)
+			|| try_preffix("Written", green)
+			|| try_preffix("Saved the project", green)
+			|| try_preffix("Loaded an autosave file.", green)
+			|| try_preffix("Saved", green)
+			|| try_preffix("Loaded", green)
+			|| try_preffix("Opened", green)
+			|| try_preffix("Altered", yellow)
+			|| try_preffix("Grouped", yellow)
+			|| try_preffix("Ungrouped", orange)
+			|| try_preffix("Set", green)
+			|| try_preffix("Unset", green)
+			|| try_preffix("Switched", green)
+			|| try_preffix("Edited", green)
+			|| try_preffix("Enabled", green)
+			|| try_preffix("Disabled", gray)
+			|| try_preffix("Selected", yellow)
+			|| try_preffix("Moved", green)
+			|| try_preffix("Rotated", green)
+			|| try_preffix("Resized", green)
+			|| try_preffix("Renamed", green)
+			|| try_preffix("Changed", green)
+			|| try_preffix("Created", green)
+			|| try_preffix("Autosaved", green)
+			|| try_preffix("Started", green)				
+			|| try_preffix("Started tracking", green)				
+			|| try_preffix("Duplicated", cyan)
+			|| try_preffix("Mirrored", cyan)
+		) {
+			return result;
+		}
+
+		return colored(dest);
+	};
+
+	augs::date_time considered_stamp;
+	formatted_string message_text;
+	auto considered_limit = cfg.show_for_ms;
+
+	if (const auto op = h.get_last_op(); op.stamp > recent_message.stamp) {
+		considered_stamp = op.stamp;
+
+		auto get_description = [&](const auto& from_command) -> decltype(auto) {
+			return std::visit(
+				[&](const auto& typed_command) -> decltype(auto) {
+					const auto description = typed_command.describe();
+
+					if (op.type == O::EXECUTE_NEW) {
+						if (begins_with(description, "Moved")
+							|| begins_with(description, "Rotated")
+							|| begins_with(description, "Resized")
+						) {
+							return colored("");
+						}
+					}
+
+					return make_colorized(description);
+
+				},
+				from_command
+			);
+		};
+
+		const auto description = [&]() {
+			if (op.type == O::UNDO) {
+				if (h.has_next_command()) {
+					const auto preffix = colored("Undo ", orange);
+					const auto& cmd = h.next_command();
+
+					return preffix + get_description(cmd);
+				}
+			}
+			else if (op.type == O::REDO) {
+				if (h.has_last_command()) {
+					const auto preffix = colored("Redo ", gray);
+					const auto& cmd = h.last_command();
+
+					return preffix + get_description(cmd);
+				}
+			}
+			else if (op.type == O::EXECUTE_NEW) {
+				if (h.has_last_command()) {
+					const auto& cmd = h.last_command();
+
+					return get_description(cmd);
+				}
+
+			}
+
+			return colored("Unknown op type");
+		}();
+
+		if (description.size() > 0) {
+			message_text = colored(typesafe_sprintf("#%x: ", 1 + h.get_current_revision())) + description;
+		}
+	}
+	else {
+		message_text = make_colorized(recent_message.content);
+		considered_stamp = recent_message.stamp;
+		considered_limit = std::max(recent_message.show_for_at_least_ms, considered_limit);
+	}
+
+	if (message_text.size() > 0) {
+		const auto passed = considered_stamp.seconds_ago();
+		const auto limit = considered_limit  / 1000;
+
+		if (passed <= limit) {
+			/* TODO: (LOW) Improve granularity to milliseconds */
+
+			const auto ss = in.screen_size;
+			auto rb_space = cfg.offset;
+
+			if (is_playtesting()) {
+				rb_space.y = std::max(rb_space.y, 180);
+			}
+
+			const auto text_padding = cfg.text_padding;
+			const auto wrapping = cfg.max_width;
+
+			const auto bbox = get_text_bbox(message_text, wrapping, false);
+			//const auto line_h = static_cast<int>(fnt.metrics.get_height());
+			//bbox.y = std::max(bbox.y, line_h * 2);
+
+			const auto& out = in.get_drawer();
+
+			const auto bbox_padded = bbox + text_padding * 2;
+			const auto rect_pos = vec2i(ss.x/2, ss.y) - vec2i(0, rb_space.y) - vec2i(bbox_padded.x / 2, bbox_padded.y);
+			const auto text_pos = rect_pos + text_padding;
+			const auto rect_size = bbox + text_padding * 2;
+			const auto rect = xywh(rect_pos, rect_size);
+
+			out.aabb_with_border(rect, cfg.bg_color, cfg.bg_border_color);
+
+			print_stroked(
+				out,
+				text_pos,
+				message_text,
+				augs::ralign_flags {},
+				black,
+				wrapping
+			);
+		}
+	}
+}
+
 void editor_setup::apply(const config_lua_table& cfg) {
 	settings = cfg.editor;
 	faction_view = cfg.faction_view;
@@ -2247,6 +2444,8 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 			only_active_nodes()
 		);
 
+		auto description = command.built_description;
+
 		std::optional<std::pair<editor_layer_id, std::size_t>> found_parent;
 		bool found_different = false;
 
@@ -2276,6 +2475,12 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 			if (move_if_only_duplicate && only_duplicating) {
 				if (start_moving_selection()) {
 					make_last_command_a_child();
+
+					if (history.has_last_command()) {
+						if (auto cmd = std::get_if<move_nodes_command>(&history.last_command())) {
+							cmd->built_description = description;
+						}
+					}
 				}
 			}
 		}
@@ -2452,6 +2657,8 @@ void editor_setup::start_playtesting() {
 		rebuild_arena(false);
 	}
 
+	recent_message.set("Playtesting offline. Press ESC to quit.");
+
 	arena_gui.choose_team.show = false;
 
 	playtesting = true;
@@ -2494,6 +2701,8 @@ void editor_setup::start_playtesting() {
 void editor_setup::stop_playtesting() {
 	playtesting = false;
 	rebuild_arena();
+
+	recent_message.set("Ended playtesting session.");
 
 	/* Would interrupt the sounds which would be unpleasant to the ear */
 	//scene.world.request_resample();

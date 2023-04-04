@@ -1254,6 +1254,23 @@ void settings_gui_state::perform(
 #endif
 				}	
 				
+				if (auto node = scoped_tree_node("Action notifications")) {
+					auto& scope_cfg = config.editor.action_notification;
+
+					revertable_checkbox(SCOPE_CFG_NVP(enabled));
+
+					if (scope_cfg.enabled) {
+						revertable_slider(SCOPE_CFG_NVP(show_for_ms), 0u, 20000u);
+						revertable_drag(SCOPE_CFG_NVP(offset.y));
+
+						revertable_color_edit(SCOPE_CFG_NVP(bg_color));
+						revertable_color_edit(SCOPE_CFG_NVP(bg_border_color));
+
+						revertable_slider(SCOPE_CFG_NVP(max_width), 10u, 1000u);
+						revertable_drag_vec2(SCOPE_CFG_NVP(text_padding));
+					}
+				}
+
 				if (auto node = scoped_tree_node("Interface")) {
 					if (auto node = scoped_tree_node("Grid")) {
 						auto& scope_cfg = config.editor.grid.render;
@@ -1325,20 +1342,6 @@ void settings_gui_state::perform(
 #endif
 					}
 
-					if (auto node = scoped_tree_node("Action indicator")) {
-						auto& scope_cfg = config.editor.action_notification;
-
-						revertable_color_edit(SCOPE_CFG_NVP(bg_color));
-						revertable_color_edit(SCOPE_CFG_NVP(bg_border_color));
-
-						revertable_slider(SCOPE_CFG_NVP(max_width), 10u, 1000u);
-						revertable_slider(SCOPE_CFG_NVP(show_for_ms), 0u, 20000u);
-
-						revertable_slider(SCOPE_CFG_NVP(show_for_ms), 0u, 20000u);
-
-						revertable_drag_vec2(SCOPE_CFG_NVP(text_padding));
-						revertable_drag_vec2(SCOPE_CFG_NVP(offset));
-					}
 
 #if 0
 					auto& scope_cfg = config.editor;

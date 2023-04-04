@@ -342,13 +342,15 @@ treat_as_music_sounds_longer_than_secs = 5,
     rectangular_selection_border_color = "65 131 196 120",
 
     action_notification = {
-      bg_color = "0 0 0 180",
+      enabled = true,
+
+      bg_color = "0 0 0 200",
       bg_border_color = "255 255 255 15",
 
-      max_width = 300,
+      max_width = 1000,
       show_for_ms = 3000,
       text_padding = { x = 10, y = 10 },
-      offset = { x = 80, y = 80 },
+      offset = { y = 80 },
     }
   },
 

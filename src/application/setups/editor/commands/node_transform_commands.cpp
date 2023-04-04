@@ -543,8 +543,7 @@ std::string move_nodes_command::describe() const {
 	}
 
 	if (meta.is_child) {
-		/* Will only ever be a child to node creation */
-		return typesafe_sprintf("Created %x", built_description);
+		return typesafe_sprintf(built_description);
 	}
 
 	return typesafe_sprintf("Moved by %x: %x", move_by.pos, built_description);

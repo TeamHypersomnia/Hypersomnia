@@ -47,6 +47,8 @@ struct editor_grid_settings {
 
 struct editor_action_notification_settings {
 	// GEN INTROSPECTOR struct editor_action_notification_settings
+	bool enabled = true;
+
 	rgba bg_color = { 0, 0, 0, 180 };
 	rgba bg_border_color = { 255, 255, 255, 15 };
 

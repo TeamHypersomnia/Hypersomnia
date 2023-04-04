@@ -80,6 +80,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					create_node_command<node_type> command;
 
 					command.built_description = typesafe_sprintf("Created %x", new_node.unique_name);
+					auto description = command.built_description;
 					command.created_node = std::move(new_node);
 
 					const auto place_over_node = in.setup.get_topmost_inspected_node();
@@ -98,6 +99,15 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 					in.setup.start_moving_selection();
 					in.setup.make_last_command_a_child();
+					
+					auto& history = in.history;
+
+					if (history.has_last_command()) {
+						if (auto cmd = std::get_if<move_nodes_command>(&history.last_command())) {
+							cmd->built_description = description;
+						}
+					}
+
 					in.setup.show_absolute_mover_pos_once();
 
 					previewed_created_node = executed.get_node_id();

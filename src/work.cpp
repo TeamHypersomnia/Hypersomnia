@@ -2835,34 +2835,42 @@ work_result work(const int argc, const char* const * const argv) try {
 				game_gui.world.draw(create_viewing_game_gui_context(chosen_renderer, viewing_config));
 			};
 
+			auto make_draw_setup_gui_input = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
+				return draw_setup_gui_input {
+					all_visible,
+					get_camera_cone(),
+					get_blank_texture(),
+					new_viewing_config,
+					streaming.necessary_images_in_atlas,
+					std::addressof(streaming.general_atlas),
+					std::addressof(streaming.avatars.texture),
+					streaming.images_in_atlas,
+					streaming.avatars.in_atlas,
+					chosen_renderer,
+					common_input_state.mouse.pos,
+					screen_size,
+					streaming.get_loaded_gui_fonts(),
+					necessary_sounds,
+					visit_current_setup([&](auto& setup) { return setup.find_player_metas(); }),
+					game_gui_mode_flag,
+					is_replaying_demo()
+				};
+			};
+
+			auto draw_setup_custom_gui_over_imgui = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
+				visit_current_setup([&]<typename S>(S& setup) {
+					if constexpr(std::is_same_v<editor_setup, remove_cref<S>>) {
+						setup.draw_custom_gui_over_imgui(make_draw_setup_gui_input(chosen_renderer, new_viewing_config));
+						chosen_renderer.call_and_clear_triangles();
+					}
+				});
+			};
+
 			auto draw_mode_and_setup_custom_gui = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
 				auto scope = measure_scope(game_thread_performance.draw_setup_custom_gui);
 
-				const auto player_metas = visit_current_setup([&](auto& setup) {
-					return setup.find_player_metas();
-				});
-
 				visit_current_setup([&](auto& setup) {
-					setup.draw_custom_gui({
-						all_visible,
-						get_camera_cone(),
-						get_blank_texture(),
-						new_viewing_config,
-						streaming.necessary_images_in_atlas,
-						std::addressof(streaming.general_atlas),
-						std::addressof(streaming.avatars.texture),
-						streaming.images_in_atlas,
-						streaming.avatars.in_atlas,
-						chosen_renderer,
-						common_input_state.mouse.pos,
-						screen_size,
-						streaming.get_loaded_gui_fonts(),
-						necessary_sounds,
-						player_metas,
-						game_gui_mode_flag,
-						is_replaying_demo()
-					});
-
+					setup.draw_custom_gui(make_draw_setup_gui_input(chosen_renderer, new_viewing_config));
 					chosen_renderer.call_and_clear_lines();
 				});
 
@@ -3247,6 +3255,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				/* #6 */
 				draw_call_imgui(chosen_renderer);
 
+				draw_setup_custom_gui_over_imgui(chosen_renderer, new_viewing_config);
 			};
 
 			auto place_final_drawcalls_synchronously = [&]() {
