@@ -1312,7 +1312,7 @@ SINGLE_EDIT_FUNCTION(editor_project_about& insp) {
 
 	ImGui::Separator();
 
-	if (input_multiline_text("Welcome message", insp.full_description, 6)) {
+	if (input_multiline_text("Welcome message", insp.welcome_message, 6)) {
 		result = "Edited Welcome message in %x";
 	}
 
