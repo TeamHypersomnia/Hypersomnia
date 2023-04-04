@@ -163,6 +163,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	double global_time_seconds = 0.0;
 
 	bool dirty_after_loading_autosave = false;
+	bool dirty_after_redirecting_paths = false;
 
 	void create_official_resources();
 	void create_official_prefabs();
@@ -172,6 +173,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	editor_paths_changed_report rebuild_pathed_resources();
 
 	void remove_autosave_file();
+	void force_autosave();
 	void autosave_now_if_needed();
 	bool autosave_needed() const;
 	void save();
@@ -748,7 +750,5 @@ public:
 	editor_arena_handle<false> get_arena_handle();
 	editor_arena_handle<true> get_arena_handle() const;
 
-	bool is_dirty_after_loading_autosave() const {
-		return dirty_after_loading_autosave;
-	}
+	bool is_dirty() const;
 };

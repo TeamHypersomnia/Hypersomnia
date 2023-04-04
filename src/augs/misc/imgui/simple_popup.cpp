@@ -47,6 +47,10 @@ int simple_popup::perform(const std::vector<button>& buttons) {
 	if (auto popup = scoped_modal_popup(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 		text(message);
 
+		if (!warning_notice.empty()) {
+			text_color(warning_notice, yellow);
+		}
+
 		{
 			if (details.size() > 0) {
 				auto& f = details_expanded;

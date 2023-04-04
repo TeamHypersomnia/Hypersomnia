@@ -132,9 +132,10 @@ editor_setup::~editor_setup() {
 	/*
 		Remove autosave only if we're at saved revision.
 		With one exception: when we've just loaded autosave and the user hasn't yet saved any revision to decide which one they want.
+			Also if we haven't saved after auto-redirecting pathed resources.
 	*/
 
-	if (history.at_saved_revision() && !dirty_after_loading_autosave) {
+	if (!has_unsaved_changes()) {
 		remove_autosave_file();
 	}
 
@@ -618,6 +619,12 @@ void editor_setup::rebuild_filesystem() {
 		changes_popup.message = summary;
 		changes_popup.details = details;
 
+		if (changes.redirects.size() > 0) {
+			changes_popup.warning_notice = "Please save the project to remember the redirected paths.";
+			dirty_after_redirecting_paths = true;
+			force_autosave();
+		}
+
 		ok_only_popup_2 = changes_popup;
 	}
 
@@ -647,6 +654,9 @@ augs::path_type editor_setup::resolve_project_path(const augs::path_type& path_i
 editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	editor_paths_changed_report changes;
 
+	auto& rebuilt_project = project;
+	rebuilt_project.rescan_pathed_resources_to_track(official_resources, official_resource_map);
+
 	/*
 		Before allocating a resource, we want to first check if one exists with this content hash,
 		and with own path no longer existing. Only then do we redirect.
@@ -662,6 +672,15 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		using resource_type = typename P::value_type;
 		using id_type = editor_typed_resource_id<resource_type>;
 
+		/*
+			Note we don't update this map when we redirect
+			(by changing paths in resource properties, essentially rendering resource_by_path map incorrect).
+			That is because paths are guaranteed to be unique.
+				i.e. once we redirect to a editor_filesystem_node&, we wont meet one with the same path again.
+
+			Hashes don't change during this process.
+		*/
+
 		std::unordered_map<std::string,     std::vector<id_type>> resources_by_hash;
 		std::unordered_map<augs::path_type, id_type> resource_by_path;
 
@@ -674,10 +693,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 			resource_by_path[r.path_in_project]    = id;
 		};
 
-		{
-			const bool official = false;
-			for_each_resource<resource_type>(map_all_resources, official);
-		}
+		rebuilt_project.for_each_resource<resource_type>(map_all_resources);
 
 		auto add_if_new_or_redirect = [&](editor_filesystem_node& file) {
 			if (file.type != type) {
@@ -858,8 +874,8 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		}
 	};
 
-	auto& sprite_pool = project.resources.pools.template get_for<editor_sprite_resource>();
-	auto& sound_pool  = project.resources.pools.template get_for<editor_sound_resource>();
+	auto& sprite_pool = rebuilt_project.resources.pools.template get_for<editor_sprite_resource>();
+	auto& sound_pool  = rebuilt_project.resources.pools.template get_for<editor_sound_resource>();
 
 	handle_pool(sprite_pool, editor_filesystem_node_type::IMAGE);
 	handle_pool(sound_pool,  editor_filesystem_node_type::SOUND);
@@ -885,6 +901,7 @@ void editor_setup::save() {
 	autosave_timer.reset();
 
 	dirty_after_loading_autosave = false;
+	dirty_after_redirecting_paths = false;
 
 	save_project_file_as(paths.project_json);
 
@@ -904,12 +921,12 @@ void editor_setup::save_project_file_as(const augs::path_type& path) {
 	);
 }
 
-bool editor_setup::has_unsaved_changes() const {
-	if (dirty_after_loading_autosave) {
-		return true;
-	}
+bool editor_setup::is_dirty() const {
+	return dirty_after_loading_autosave || dirty_after_redirecting_paths;
+}
 
-	return !history.at_saved_revision();
+bool editor_setup::has_unsaved_changes() const {
+	return is_dirty() || !history.at_saved_revision();
 }
 
 std::string editor_setup::get_arena_name_with_star() const {
@@ -921,16 +938,25 @@ std::string editor_setup::get_arena_name_with_star() const {
 }
 
 bool editor_setup::autosave_needed() const {
-	return history.at_unsaved_revision() && !history.at_autosaved_revision();
+	/*
+		The reason we don't need to check for if it's dirty is because
+		once it becomes dirty for whatever reason, we force autosave.
+	*/
+
+	return !history.at_saved_revision() && !history.at_autosaved_revision();
+}
+
+void editor_setup::force_autosave() {
+	save_project_file_as(paths.autosave_json);
+
+	recent_message.set("Autosaved current changes to: %x", paths.autosave_json.filename().string());
+	history.mark_as_autosaved();
+	autosave_timer.reset();
 }
 
 void editor_setup::autosave_now_if_needed() {
 	if (autosave_needed()) {
-		recent_message.set("Autosaved current changes to: %x", paths.autosave_json.filename().string());
-
-		save_project_file_as(paths.autosave_json);
-		history.mark_as_autosaved();
-		autosave_timer.reset();
+		force_autosave();
 	}
 
 	save_gui_state();

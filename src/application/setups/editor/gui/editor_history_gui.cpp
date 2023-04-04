@@ -76,7 +76,7 @@ void editor_history_gui::perform(const editor_history_gui_input in) {
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, header_hover_color);
 		}
 
-		if (history.is_saved_revision(command_index) && !in.setup.is_dirty_after_loading_autosave()) {
+		if (history.is_saved_revision(command_index) && !in.setup.is_dirty()) {
 			++colors;
 
 			auto saved_color = rgba(0, 200, 0, 255);

@@ -78,3 +78,20 @@ inline editor_layer* editor_project::find_layer(const editor_layer_id& id) {
 inline const editor_layer* editor_project::find_layer(const editor_layer_id& id) const {
 	return layers.pool.find(id);
 }
+template <class R, class F>
+void editor_project::for_each_resource(F&& callback) const {
+	resources.template get_pool_for<R>().for_each_id_and_object(
+		[&](const auto& raw_id, const auto& object) {
+			const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, false);
+
+			callback(typed_id, object);
+		}
+	);
+}
+
+inline bool editor_project::rescan_pathed_resources_to_track(const O& officials, const editor_official_resource_map& officials_map) const {
+	const bool any_references = recount_references(officials, false);
+	const bool any_changes = mark_changed_resources(officials_map);
+
+	return any_references || any_changes;
+}

@@ -499,14 +499,9 @@ namespace editor_project_readwrite {
 		};
 
 		auto write_external_resources = [&]() {
-			const bool recount_officials = false;
+			const bool any_to_track = project.rescan_pathed_resources_to_track(officials, officials_map);
 
-			const bool any_references = project.recount_references(officials, recount_officials);
-			const bool any_changes = project.mark_changed_resources(officials_map);
-
-			const bool any_external_resources_to_write = any_references || any_changes;
-
-			if (!any_external_resources_to_write) {
+			if (!any_to_track) {
 				return;
 			}
 
@@ -521,10 +516,7 @@ namespace editor_project_readwrite {
 
 				if constexpr(is_pathed_resource_v<R>) {
 					auto write = [&](const auto& typed_resource) {
-						const bool should_write = 
-							typed_resource.reference_count > 0 ||
-							typed_resource.changes_detected
-						;
+						const bool should_write = typed_resource.should_be_tracked();
 
 						if (!should_write) {
 							return;

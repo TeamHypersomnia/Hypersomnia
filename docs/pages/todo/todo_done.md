@@ -5342,3 +5342,8 @@ Advantages:
         - we can have though instead of SOLID_OBSTACLES_OCCLUDING_NEONS just a single solid obstacle layer and just a flag if to occlude floor neons
             - since it will anyways be shown always above the ground layer 
 
+- Alright, now comes the saving
+    - let's highlight saved revision in green
+    - when unsaved, show * next to area name
+        - and in the window title
+

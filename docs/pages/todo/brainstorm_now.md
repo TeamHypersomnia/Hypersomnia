@@ -6,10 +6,76 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Note that even if the file is unused in the current revision, it might still be used in the saved revision
+    - So a redirect should make it dirty even though no references are found in the current revision
+- Similarly, resources might "become" missing after undoing or redoing even though they are not missing now...
+
+- Since now this is only a problem with autosave..
+    - *We can keep the state in autosave command up to date as well!*
+    - Simply call rebuild_pathed_resources for the autosave command as well!!!
+        - For both before and after
+    - Also, only redirecting used resources should trigger a "dirty" flag
+        - We can also prompt "Please save the project to remember this change"
+            - Autosave could technically save the redirects if it's not saved
+                - it should really
+                - then even without ctrl+s we won't be prompted with a redirect popup on relaunch
+    - Can we then dumbly assign on undo/redo for autosave command?
+        - How do we ensure that both the saved revision and autosave revision have the same existential set?
+            - unfortunately we cannot
+            - both may have e.g. resources that simply do not exist, and different sets of these
+            - so they'll need to allocate different sets of resources
+
+- Note we don't really need to delete a resource in order to "forget" it.
+    - In practice, just not showing a popup about a missing resource when we know it is irrelevant to json state is enough.
+        - We don't have to delete it.
+        - This ensures resource ids are NEVER invalidated.
+        - This way we're sure past commands are valid
+        - So we don't really have to "invalidate entire history" when we want to forget a resource.
+
+
+- We could import (start tracking) resources ONLY once they are first used.
+    - And automatically forget them if they are edited back to normal.
+    - This would regenerate the atlas a lot however unless we created it from the entire filesystem
+
+- Problematically, if there's more resources when loading the autosave,
+
+- "File is missing" popup needs to disappear if the deleted resource wasn't used anywhere or modified
+    - For this we need to run recount references once after rebuilding the filesystem
+
+- btw in a playtesting session in quick_test mode, all clients should join the opposing team
+    - for balance of course! The mapper knows literally everything about the map
+
+- Autosaves and resource persistence
+    - Pros of commandizing resource existence:
+        - Everything's clear in history
+        - When forgetting a resource, don't have to invalidate the entire history.
+        - Autosave problem is solved. If there are more resources than there is in autosave when loading, an import command will placed on top.
+            - This prevents invalidation of future commands when switching back to autosave revision
+        - Also it's intuitive when auto-redirecting because we need to save the changes
+            - The project file actually changes so why shouldn't we commandize it?
+            - Otherwise when you're on a saved revision it's not really saved (we could make it dirty or not highlighted in green but meh)
+    - Cons:
+        - "Imported" command with unused resources will show up literally every time we open a file with autosave, in case a map has many unused sprites
+            - Easy: we can reubild after autosave and modify the Load Autosave command to include these new unused resources!
+                - Same with the Open project command!
+                    - So that we don't show the message with imported resources literally every time we open even a saved project
+            - Redirect is important so we should show it up as a command
+                - Actually we can do all the redirects too. And include these in the command.
+
+            - We can SKIP rebuild for the first time
+                - Ahh that sucks because the unused resources won't show up in the explorer right away
+            - Because we only serialize used resources
+            - Then the tip to "ctrl+z" won't even apply because you'd have to do it twice
+        - Can fuck up future revisions in history unexpectedly because this would happen automatically
+            - We just need to issue a warning if the revision isn't newest
+        - Literally the only use case is a) the autosave b) to not have to invalidate whole history
+        - Bloats command history
+            - What does it even mean that we can undo import/redirect?
+            - We'd have to hide the undone imports from the explorer
+            - in case of redirects, we'd have to show them as missing or what?
+
 - Commandizing would be good because then an accidental import could be undone
     - But if resources are unused (no changes and no references), we shouldn't spawn a "missing" popup
-    - For this we need to run recount references once after rebuilding the filesystem
-        
 
 - Should we commandize resource existence?
     - Why not?
@@ -31,11 +97,6 @@ summary: That which we are brainstorming at the moment.
 
 - Honor playtest spawns but maybe as respawn points only and spawn where the camera is?
     - think later
-
-- Alright, now comes the saving
-    - let's highlight saved revision in green
-    - when unsaved, show * next to area name
-        - and in the window title
 
 - Prepare comprehensive official resource collection before shipping
 
@@ -345,11 +406,6 @@ summary: That which we are brainstorming at the moment.
 
 - Consider adding "+1 times" to resize calculation
     - Also automatically "not tile" *during resizing* if it's less than original
-
-- "File is missing" needs to disappear if the deleted resource wasn't used anywhere
-    - Do we detect if it's unused?
-    - Maybe just remember if the message was shown for this resource
-    - Perhaps we'll know more once we get to serialization
 
 - Aquarium - We only really need to think how we'd do it manually and support it in the editor
     - The rest is only about automatized placement, we shouldn't worry about these two simultaneously

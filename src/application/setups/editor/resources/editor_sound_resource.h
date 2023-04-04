@@ -27,6 +27,11 @@ struct editor_sound_resource {
 
 	mutable uint32_t reference_count = 0u;
 	mutable bool changes_detected = false;
+
+	bool should_be_tracked() const {
+		return reference_count > 0 || changes_detected;
+	}
+
 	mutable std::string resolved_pseudoid;
 	mutable std::optional<bool> missing_on_disk;
 

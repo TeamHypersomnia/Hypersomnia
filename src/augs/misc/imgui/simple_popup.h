@@ -9,6 +9,8 @@ struct simple_popup {
 	std::string message;
 	std::string details;
 
+	std::string warning_notice = "";
+
 	struct button {
 		std::string label;
 		rgba col = rgba::zero;
