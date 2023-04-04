@@ -64,6 +64,7 @@
 #include "application/setups/editor/editor_official_resource_map.hpp"
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
 #include "application/arena/arena_handle.h"
+#include "augs/readwrite/json_readwrite_errors.h"
 
 editor_setup::editor_setup(
 	sol::state& lua,
@@ -82,12 +83,17 @@ editor_setup::editor_setup(
 
 	constexpr bool strict = true;
 
-	project = editor_project_readwrite::read_project_json(
-		paths.project_json,
-		official_resources,
-		official_resource_map,
-		strict
-	);
+	try {
+		project = editor_project_readwrite::read_project_json(
+			paths.project_json,
+			official_resources,
+			official_resource_map,
+			strict
+		);
+	}
+	catch (const augs::json_deserialization_error& err) {
+		throw augs::json_deserialization_error("(%x):\n%x", paths.project_json.filename().string(), err.what());
+	}
 
 	history.mark_as_just_saved();
 
@@ -112,6 +118,9 @@ editor_setup::editor_setup(
 
 		recent_message.set("Loaded an autosave file.\nTo go back to last saved changes instead,\npress Undo (CTRL+Z).");
 		recent_message.show_for_at_least_ms = 10000;
+	}
+	catch (const augs::json_deserialization_error& err) {
+		throw augs::json_deserialization_error("(%x):\n%x", paths.autosave_json.filename().string(), err.what());
 	}
 	catch (...) {
 		LOG("No autosave file was found.");

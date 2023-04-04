@@ -228,6 +228,17 @@ void create_official_filesystem_from(
 		},
 
 		{ 
+			"garden", 
+			{ 
+				test_static_decorations::FERN,
+				test_static_decorations::FLOWERBED_CYAN,
+				test_static_decorations::FLOWERBED_ROSES,
+				test_static_decorations::FLOWERPOT_ORANGE,
+				test_static_decorations::ROBOWORKER
+			} 
+		},
+
+		{ 
 			"captions", 
 			{ 
 

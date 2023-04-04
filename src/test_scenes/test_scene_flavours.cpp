@@ -25,6 +25,25 @@ namespace test_flavours {
 		auto& flavours = in.flavours;
 		auto flavour_with_sprite = in.flavour_with_sprite_maker();
 
+		auto set_floor_footstep = [&](auto& meta) -> auto& {
+			{
+				invariants::ground ground_def;
+
+				footstep_effect_input effect;
+				effect.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_FLOOR);
+				effect.sound.modifier.gain = 1;
+				effect.sound.modifier.pitch = 1;
+				effect.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+				ground_def.footstep_effect.emplace(effect);
+				ground_def.movement_speed_mult = 1;
+
+				meta.set(ground_def);
+			}
+
+			return meta;
+		};
+
 		auto flavour_with_tiled_sprite = [&](auto&&... args) -> auto& {
 			auto& meta = flavour_with_sprite(std::forward<decltype(args)>(args)...);
 			meta.template get<invariants::sprite>().tile_excess_size = true;
@@ -173,8 +192,8 @@ namespace test_flavours {
 
 			footstep_effect_input dirt;
 			dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_FLOOR);
-			dirt.sound.modifier.gain = .6f;
-			dirt.sound.modifier.pitch = .9f;
+			dirt.sound.modifier.gain = 1.f;
+			dirt.sound.modifier.pitch = 0.8f;
 			dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
 
 			ground_def.footstep_effect.emplace(dirt);
@@ -190,33 +209,34 @@ namespace test_flavours {
 
 				meta.get<invariants::sprite>().color = { 132, 132, 132, 255 };
 				meta.get<invariants::sprite>().neon_color = { 255, 255, 255, 106 };
-				meta.set(ground_def);
+
+				set_floor_footstep(meta);
 			}
 		}
 
-		flavour_with_tiled_sprite(
+		set_floor_footstep(flavour_with_tiled_sprite(
 			test_static_decorations::DEV_FLOOR_32,
 			test_scene_image_id::DEV_FLOOR_32,
 			test_ground_order::FLOOR_AND_ROAD
-		);
+		));
 
-		flavour_with_tiled_sprite(
+		set_floor_footstep(flavour_with_tiled_sprite(
 			test_static_decorations::DEV_FLOOR_64,
 			test_scene_image_id::DEV_FLOOR_64,
 			test_ground_order::FLOOR_AND_ROAD
-		);
+		));
 
-		flavour_with_tiled_sprite(
+		set_floor_footstep(flavour_with_tiled_sprite(
 			test_static_decorations::DEV_FLOOR_128,
 			test_scene_image_id::DEV_FLOOR_128,
 			test_ground_order::FLOOR_AND_ROAD
-		);
+		));
 
-		flavour_with_tiled_sprite(
+		set_floor_footstep(flavour_with_tiled_sprite(
 			test_static_decorations::DEV_FLOOR_256,
 			test_scene_image_id::DEV_FLOOR_256,
 			test_ground_order::FLOOR_AND_ROAD
-		);
+		));
 
 		flavour_with_sprite(
 			test_static_decorations::HAVE_A_PLEASANT,

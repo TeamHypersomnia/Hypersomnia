@@ -12,6 +12,45 @@ namespace test_flavours {
 		const auto aquarium_size = caches.at(to_image_id(test_scene_image_id::AQUARIUM_SAND_1)).get_original_size();
 		const auto sand_color = rgba(129, 129, 129, 255);
 
+		auto set_dirt_footstep = [&](auto& meta) -> auto& {
+			{
+				invariants::ground ground_def;
+
+				footstep_effect_input dirt;
+				dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_DIRT);
+				dirt.sound.modifier.gain = .6f;
+				dirt.sound.modifier.pitch = .9f;
+				dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+				ground_def.footstep_effect.emplace(dirt);
+				ground_def.movement_speed_mult = 0.5f;
+
+				meta.set(ground_def);
+			}
+
+			return meta;
+		};
+
+		auto set_floor_footstep = [&](auto& meta) -> auto& {
+			{
+				invariants::ground ground_def;
+
+				footstep_effect_input effect;
+				effect.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_FLOOR);
+				effect.sound.modifier.gain = 1;
+				effect.sound.modifier.pitch = 1;
+				effect.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+				ground_def.footstep_effect.emplace(effect);
+				ground_def.movement_speed_mult = 1;
+
+				meta.set(ground_def);
+			}
+
+			return meta;
+		};
+
+
 		{
 			auto& meta = flavour_with_sprite(
 				test_static_decorations::ROTATING_FAN,
@@ -275,6 +314,36 @@ namespace test_flavours {
 			test_scene_image_id::LAB_WALL_A2,
 			render_layer::FOREGROUND
 		);
+
+		flavour_with_sprite(
+			test_static_decorations::FERN,
+			test_scene_image_id::FERN,
+			render_layer::FOREGROUND
+		);
+
+		set_dirt_footstep(flavour_with_sprite(
+			test_static_decorations::FLOWERBED_CYAN,
+			test_scene_image_id::FLOWERBED_CYAN,
+			test_ground_order::ON_FLOOR
+		));
+
+		set_dirt_footstep(flavour_with_sprite(
+			test_static_decorations::FLOWERBED_ROSES,
+			test_scene_image_id::FLOWERBED_ROSES,
+			test_ground_order::ON_FLOOR
+		));
+
+		set_dirt_footstep(flavour_with_sprite(
+			test_static_decorations::FLOWERPOT_ORANGE,
+			test_scene_image_id::FLOWERPOT_ORANGE,
+			test_ground_order::ON_FLOOR
+		));
+
+		set_floor_footstep(flavour_with_sprite(
+			test_static_decorations::ROBOWORKER,
+			test_scene_image_id::ROBOWORKER,
+			test_ground_order::ON_ON_FLOOR
+		));
 
 		{
 			auto& meta = flavour_with_sprite(

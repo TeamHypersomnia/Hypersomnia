@@ -64,7 +64,9 @@ namespace augs {
 					callback(e);
 				};
 
-				(perform(all_enums), ...);
+				for (const auto _enum : { all_enums... }) {
+					perform(_enum);
+				}
 			}
 		);
 	}
