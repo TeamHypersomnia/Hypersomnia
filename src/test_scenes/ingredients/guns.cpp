@@ -3258,7 +3258,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_shootable_weapons::LEWSII);
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::LEWS);
 
 			meta.get<invariants::text_details>().description =
 				"Standard issue sample rifle."
@@ -3314,7 +3314,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_shootable_weapons::DATUM_GUN);
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::DATUM);
 
 			meta.get<invariants::text_details>().description =
 				"Standard issue sample rifle."
@@ -3450,7 +3450,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_shootable_weapons::HPSR);
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AWKA);
 
 			invariants::gun gun_def;
 
@@ -3743,7 +3743,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_shootable_weapons::WARX_FQ12);
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::WARX);
 
 			invariants::gun gun_def;
 

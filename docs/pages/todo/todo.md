@@ -106,6 +106,7 @@ summary: Just a hidden scratchpad.
 		- Warx fq12 -> warx (there's no other single-word intuitive name for an automatic shotgun)
 		- datum_gun -> datum
 		- ao44 -> revolver
+			- actually let's leave it at ao44 because we'll use "Revolver" for something stronger
 		- hpsr -> awka
 		- lewsII -> lews (there's no I anyway)
 		- amplifier_arm -> amplifier

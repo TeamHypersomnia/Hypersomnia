@@ -806,10 +806,10 @@ namespace test_scenes {
 					r.generate_for(tr, step);
 				}
 
-				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::WARX_FQ12);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::WARX);
 
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::COVERT);
-				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::HPSR);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::AWKA);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::HUNTER);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::BULLDUP2000);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::CYBERSPRAY);
@@ -846,14 +846,14 @@ namespace test_scenes {
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);
-		give_weapon(transformr(vec2(280, -750)), test_shootable_weapons::DATUM_GUN);
+		give_weapon(transformr(vec2(280, -750)), test_shootable_weapons::DATUM);
 
 		give_weapon(transformr(vec2(280, -150)), test_shootable_weapons::BAKA47);
 		give_weapon(transformr(vec2(280, -250)), test_shootable_weapons::BILMER2000);
 		give_weapon(transformr(vec2(450, -250)), test_shootable_weapons::SZTURM);
 
-		give_weapon(transformr(vec2(300, -100)), test_shootable_weapons::LEWSII);
-		give_weapon(transformr(vec2(400, -100)), test_shootable_weapons::LEWSII);
+		give_weapon(transformr(vec2(300, -100)), test_shootable_weapons::LEWS);
+		give_weapon(transformr(vec2(400, -100)), test_shootable_weapons::LEWS);
 
 		create(sample_backpack, vec2(200, -750));
 		create(brown_backpack, vec2(280, -750));
