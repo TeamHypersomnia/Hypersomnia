@@ -674,8 +674,17 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	*/
 
 	auto missing_on_disk = [&](const auto& resource) {
-		return !augs::exists(resolve_project_path(resource.external_file.path_in_project));
+		return !resource.found_on_disk;
 	};
+
+	auto existing_paths = std::unordered_set<std::string>();
+
+	auto register_resources_found_on_disk = [&](editor_filesystem_node& file) {
+		const auto path_in_project = file.get_path_in_project().string();
+		existing_paths.emplace(path_in_project);
+	};
+
+	files.root.for_each_file_recursive(register_resources_found_on_disk);
 
 	auto handle_pool = [&]<typename P>(P& pool, const editor_filesystem_node_type type) {
 		using resource_type = typename P::value_type;
@@ -696,13 +705,11 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		auto map_all_resources = [&](const auto id, const auto& entry) {
 			const auto& r = entry.external_file;
 
-			entry.missing_on_disk = std::nullopt;
+			entry.found_on_disk = found_in(existing_paths, r.path_in_project.string());
 
 			resources_by_hash[r.file_hash].push_back(id);
 			resource_by_path[r.path_in_project]    = id;
 		};
-
-		rebuilt_project.for_each_resource<resource_type>(map_all_resources);
 
 		auto add_if_new_or_redirect = [&](editor_filesystem_node& file) {
 			if (file.type != type) {
@@ -762,25 +769,13 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 							}
 
 							/*
-								Determine which ones are missing - once.
-							*/
-
-							for (auto& match_candidate : moved_resources) {
-								auto& candidate = *find_resource(match_candidate);
-
-								if (candidate.missing_on_disk == std::nullopt) {
-									candidate.missing_on_disk = missing_on_disk(candidate);
-								}
-							}
-
-							/*
 								First see if there is any missing one with a matching stem.
 							*/
 
 							for (std::size_t i = 0; i < moved_resources.size(); ++i) {
 								const auto& candidate = *find_resource(moved_resources[i]);
 
-								if (candidate.missing_on_disk.value() && searched_stem == get_stem(candidate)) {
+								if (missing_on_disk(candidate) && searched_stem == get_stem(candidate)) {
 									return i;
 								}
 							}
@@ -793,7 +788,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 							for (std::size_t i = 0; i < moved_resources.size(); ++i) {
 								const auto& candidate = *find_resource(moved_resources[i]);
 
-								if (candidate.missing_on_disk.value()) {
+								if (missing_on_disk(candidate)) {
 									return i;
 								}
 							}
@@ -828,6 +823,8 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 						std::swap(moved_resources.back(), moved_resources[*most_resembling_resource_idx]);
 						moved_resources.pop_back();
 
+						moved_resource.found_on_disk = true;
+
 						return true;
 					}
 
@@ -857,6 +854,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 					::setup_resource_defaults(new_resource.editable, official_resource_map);
 
 					file.associated_resource.set<resource_type>(new_id, false);
+					new_resource.found_on_disk = true;
 				};
 
 				if (!redirect_by_hash()) {
@@ -869,6 +867,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 			}
 		};
 
+		rebuilt_project.for_each_resource<resource_type>(map_all_resources);
 		files.root.for_each_file_recursive(add_if_new_or_redirect);
 
 		for (auto& entry : pool) {

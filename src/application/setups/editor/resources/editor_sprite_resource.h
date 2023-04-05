@@ -131,7 +131,7 @@ struct editor_sprite_resource {
 	}
 
 	mutable std::string resolved_pseudoid;
-	mutable std::optional<bool> missing_on_disk;
+	mutable bool found_on_disk = false;
 
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 
