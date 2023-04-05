@@ -23,7 +23,7 @@ enum class area_marker_type {
 	BOMBSITE,
 	BOMBSITE_DUMMY_B,
 	BOMBSITE_DUMMY_C,
-	BUY_AREA,
+	BUY_ZONE,
 
 	ORGANISM_AREA,
 

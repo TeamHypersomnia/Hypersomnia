@@ -2,6 +2,7 @@
 #include <string>
 #include "augs/math/vec2.h"
 #include "augs/graphics/rgba.h"
+#include "rapidjson/prettywriter.h"
 
 #if JSON_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
@@ -10,12 +11,14 @@
 namespace augs {
 	template <class T>
 	inline void to_json_value(T& out, const rgba& from) {
+		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);
 		out.StartArray();
 		out.Uint(from.r);
 		out.Uint(from.g);
 		out.Uint(from.b);
 		out.Uint(from.a);
 		out.EndArray();
+		out.SetFormatOptions(rapidjson::kFormatDefault);
 	}
 
 	template <class T>
@@ -29,10 +32,12 @@ namespace augs {
 
 	template <class T>
 	inline void to_json_value(T& out, const vec2& from) {
+		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);
 		out.StartArray();
 		out.Double(from.x);
 		out.Double(from.y);
 		out.EndArray();
+		out.SetFormatOptions(rapidjson::kFormatDefault);
 	}
 
 	template <class I>
@@ -44,10 +49,12 @@ namespace augs {
 
 	template <class T>
 	inline void to_json_value(T& out, const vec2d& from) {
+		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);
 		out.StartArray();
 		out.Double(from.x);
 		out.Double(from.y);
 		out.EndArray();
+		out.SetFormatOptions(rapidjson::kFormatDefault);
 	}
 
 	template <class I>
@@ -59,10 +66,12 @@ namespace augs {
 
 	template <class T>
 	inline void to_json_value(T& out, const vec2i& from) {
+		out.SetFormatOptions(rapidjson::kFormatSingleLineArray);
 		out.StartArray();
 		out.Int(from.x);
 		out.Int(from.y);
 		out.EndArray();
+		out.SetFormatOptions(rapidjson::kFormatDefault);
 	}
 
 	template <class I>

@@ -34,7 +34,7 @@ void setup_entity_from_node(
 
 	if constexpr(std::is_same_v<N, editor_sprite_node>) {
 		auto& sprite = agg.template get<components::sprite>();
-		sprite.colorize = editable.colorize;
+		sprite.colorize = editable.color;
 		sprite.colorize *= layer.editable.tint;
 
 		const auto opacity = layer.editable.opacity;
@@ -56,7 +56,7 @@ void setup_entity_from_node(
 		};
 
 		auto& light = agg.template get<components::light>();
-		light.color *= editable.colorize;
+		light.color *= editable.color;
 
 		set_attn_from_falloff(light.attenuation, node.editable.falloff);
 

@@ -27,7 +27,7 @@ struct marker_icon {
 			result.id = I::EDITOR_ICON_BOMBSITE_C;
 			result.col = get_faction_color(meta.faction);
 		}
-		else if (type == area_marker_type::BUY_AREA) {
+		else if (type == area_marker_type::BUY_ZONE) {
 			result.id = I::EDITOR_ICON_BUY_AREA;
 			result.col = get_faction_color(meta.faction);
 		}
@@ -128,7 +128,7 @@ void for_each_iconed_entity(
 			handle,
 			assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
 			handle.get_logic_transform(),
-			handle.template get<components::wandering_pixels>().colorize
+			handle.template get<components::wandering_pixels>().color
 		);
 	});
 

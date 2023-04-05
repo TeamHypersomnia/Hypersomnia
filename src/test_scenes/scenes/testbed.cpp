@@ -684,7 +684,7 @@ namespace test_scenes {
 					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e, auto&&...){
 						auto& w = e.template get<components::wandering_pixels>();
 
-						w.colorize = light_cyan;
+						w.color = light_cyan;
 						w.num_particles = 150;
 
 						const auto reach = xywh(light_pos.x- 350, light_pos.y-350, 500, 500);
@@ -721,7 +721,7 @@ namespace test_scenes {
 
 						auto& w = e.template get<components::wandering_pixels>();
 
-						w.colorize = cyan;
+						w.color = cyan;
 						e.set_logical_size(left_reach.get_size());
 						e.set_logic_transform(left_reach.get_center());
 					});
@@ -732,7 +732,7 @@ namespace test_scenes {
 
 						auto& w = e.template get<components::wandering_pixels>();
 
-						w.colorize = orange;
+						w.color = orange;
 						e.set_logical_size(right_reach.get_size());
 						e.set_logic_transform(right_reach.get_center());
 					});
@@ -745,7 +745,7 @@ namespace test_scenes {
 
 				create(test_plain_sprited_bodies::SNACKBAR, transformr(vec2(1504, -96)));
 				create(test_static_decorations::SNACKBAR_CAPTION, transformr(vec2(1504, -86)));
-				create(test_sound_decorations::HUMMING_DISABLED, transformr(vec2(1504, -86)));
+				create(test_sound_decorations::POWERLINE_NOISE, transformr(vec2(1504, -86)));
 
 				create(test_static_decorations::AWAKENING, transformr(vec2(-42, 8)));
 				create(test_static_decorations::WELCOME_TO_METROPOLIS, transformr(vec2(1106, 3)));
@@ -821,7 +821,7 @@ namespace test_scenes {
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_melee_weapons::POSEIDON);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_melee_weapons::YELLOW_DAGGER);
 
-				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::ELON_HRL);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::ELON);
 				give_charge(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_charges::SKULL_ROCKET, 5);
 
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::BLUNAZ);
@@ -1059,7 +1059,7 @@ namespace test_scenes {
 			create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e, auto&&...){
 				auto& w = e.template get<components::wandering_pixels>();
 
-				w.colorize = cyan;
+				w.color = cyan;
 				w.num_particles = 40;
 				w.force_particles_within_bounds = true;
 				e.set_logical_size(vec2(750, 750));
@@ -1182,9 +1182,9 @@ namespace test_scenes {
 		make_cascade_aligner(
 			orig1 + aquarium_size / 2, 
 			whole_aquarium_size + vec2i::square(2 * lab_wall_size.y),
-			test_scene_node { world, test_dynamic_decorations::CONSOLE_LIGHT }
+			test_scene_node { world, test_dynamic_decorations::CYBER_PANEL }
 		).ro()
-		.next(test_sound_decorations::HUMMING_DISABLED);
+		.next(test_sound_decorations::POWERLINE_NOISE);
 
 		{
 			auto insects_origin = transformr({ 500, 213 }, 0);

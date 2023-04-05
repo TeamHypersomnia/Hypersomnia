@@ -117,7 +117,7 @@ enum class test_shootable_weapons {
 	PRO90,
 	AMPLIFIER_ARM,
 	DATUM_GUN,
-	ELON_HRL,
+	ELON,
 	BLUNAZ,
 	GRADOBICIE,
 	BULWARK,
@@ -294,7 +294,7 @@ enum class test_dynamic_decorations {
 	FLOWER_PINK,
 	FLOWER_CYAN,
 
-	CONSOLE_LIGHT,
+	CYBER_PANEL,
 
 	PINK_CORAL,
 
@@ -336,7 +336,7 @@ enum class test_sound_decorations {
 	AQUARIUM_AMBIENCE_LEFT,
 	AQUARIUM_AMBIENCE_RIGHT,
 
-	HUMMING_DISABLED,
+	POWERLINE_NOISE,
 	LOUDY_FAN,
 
 	ARABESQUE,

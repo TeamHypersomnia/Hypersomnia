@@ -5347,3 +5347,5 @@ Advantages:
     - when unsaved, show * next to area name
         - and in the window title
 
+- Be strict when loading autosave!
+

@@ -40,7 +40,7 @@ void draw_wandering_pixels_as_sprites(
 					manager.at(image_id),
 					p.pos,
 					0,
-					wandering.colorize
+					wandering.color
 				);
 			}
 		}

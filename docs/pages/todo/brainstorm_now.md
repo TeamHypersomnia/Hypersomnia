@@ -6,6 +6,127 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add how many nodes were deleted in the description
+- I'd hide the arrow to communicate a layer is empty
+
+- quick_test-exclusive property: Respawn at team spawns
+    - Disable by default
+
+- Fix Rotated By: description
+    - Moved by too
+
+- Fix maybe how point markers are highlighted because the white aabb edge is completely invisible
+
+- we'll overhaul this anyway but we had an autosave during playtest
+    - but we did place spawns. Well, it's to be expected tbh
+    - Not a bug
+
+- Honor playtest spawns but maybe as respawn points only and spawn where the camera is?
+    - For quick_test, it is okay if all client players appear in the same place as host
+    - the host can anyway predict where their "enemy" is and it's a nice way of meeting in the same place
+    - It is also okay if the players respawn right where they died to keep the "fight" going
+    - with this, there's very little usecase for creating your own quick_test_spawns, but if you want, there's nothing holding you back
+        - position in layers will determine the first order of respawns likely
+        - by default they can only be used to *respawn* instead of spawn
+            - playtesting settings could have a tick to spawn at quick_test_spawn instead of camera center
+    - for now we could disable them
+        - nah maybe let's leave it but just rename it
+
+
+- Let's start again
+    - First consider the smallest working model
+        - No autosaves, just one session
+            - Resource existence is only additive in time - we don't delete them from the pool, ever
+            - Redirects don't need commands, we can notify about all redirects as well 
+                - We HAVE to notify about redirect, because we HAVE to mark it as dirty. The user needs an explanation.
+                    - We have to mark is as dirty because saving at now saved revision would result in a different json file - therefore no truly saved revision exists.
+                - We might autosave at this point, and we mark as dirty. Also we prompt the user to save soon.
+            - At this point all is well.
+            - Problems begin when we want to delete a resource.
+                - Missing resources are in a way simpler than redirects because no state is changed. We just notify of the fact.
+                - Note we don't really need to delete a resource in order to "forget" it.
+                    - In practice, just not showing a popup about a missing resource when we know it is irrelevant to json state is enough.
+                        - We don't have to delete it.
+                        - This ensures resource ids are NEVER invalidated.
+                        - This way we're sure past/future revisions are valid
+                        - So we don't really have to "invalidate entire history" when we want to forget a resource.
+                
+                - Implementation detail: We'll need to rescan reference counts after every command.
+                    - This is so that we know if we have to report resource as missing.
+                - Technically, execute_new cannot introduce a dependency on an unbacked/forgotten resource (making it missing).
+                    - because it will not show in the filesystem gui.
+                    - undo/redo can.
+                    - if performance is an issue, we can ONLY do this if there is at least ONE unbacked/missing resource.
+                        - although if there's even a single unbacked one (with already removed references) we'll have to rescan always
+                            - We could stop rescanning all commands after the first one that removes all references to it.
+                            - for now we'll just rescan always and optimize in the future
+
+    - Then with autosaves
+        - For when we can still switch between autosaved and last saved..
+            - ..Just rebuild filesystem gui once to show factual file state
+                - and pass it as argument to rebuild pathed resources in both before and after
+                - we could also rebuild it after each undo/redo
+        - Now after any command is posted, the other is invalidated
+            - If last saved was selected then autosave obviously would be anyway
+                - but can still be retrieved because we won't autosave unless redirects dirtied state
+                    - we could disable autosaving too at this point
+                    - it probably makes no sense at all to autosave at any point while we're still at these two revisions
+        - After that, resources pool will never be directly assigned to.
+            - So we don't have to worry about ids being invalidated in other commands.
+            - From now on the only ops on resources will be additive existentially.
+
+
+- We could also disable undoing autosave command once any other command is posted
+    - Note this doesn't take away any option
+        - If you quit now without saving, you'll still be greeted with autosave + last saved
+        - And you don't have to worry about the
+    - This with not deleting forgotten resources might be the simplest option
+
+- Also think a bit if all this additional complexity is a better investment than several bandaids
+
+- "Import 6 resources? 
+This will discard your redo history."
+
+- New nomenclature proposition
+    - rescan_filesystem_entries
+    - reassociate_resources_with_filesystem
+        - this doesn't necessarily trigger commands?
+
+- rebuild_pathed_resources can just return a vector of results so that we can decide if we want to use it as a command or just to modify the resources in the replace whole project command
+    - We need this anyway to first prompt the user before posting a command
+    - Unimported ones will be grayed out and say "This resource must first be imported".
+- Also we don't even need to rebuild the editor_filesystem_gui when we undo/redo etc, because we assume that real file existence only changes when we alt tab
+    - We need to reset their ids though? Or depend on determinism that the created ones will be there again 
+    - Although watch out because rebuild will clear all ids there too on alt-tab
+        - I think we'll just end up associating them by path later
+
+- Just to avoid a command triggering right after we load, just like we said earlier, import right into the replace_whole_project_command right after reading from json
+    - 
+- Why not just always show real hdd filesystem in the gui,
+    - but for undone imports just show them inactive (detected by dead resource id)
+    - and for undone redirects just report the old ones as missing without triggering a missing popup already
+
+- To properly undo a redirect, however, we'd have to rebuild the filesystem gui from the former state, not from what's acutally on hdd
+    - Can't we just report as missing?
+
+- I'm starting to be for commandization
+    - Even if we like unshow them in the filesystem that's not really much of a problem
+    - Btw then we can only show nodes for which we have a live associated resource
+    - And simply ask before importing/redirecting if future revisions exist
+
+- We need to rethink this from the ground up
+
+- Or we just disable imports/redirects until either autosave or saved revision is chosen?
+
+- Another corner case.. if we rebuild after we undo, it will overwrite our autosave with the saved revision
+
+- Btw currently whole filesystem ui gets destroyed because we don't rebuild resources after redoing/undoing autosave
+    - Even with commandization it would kinda suck to "unshow" the resources in the filesystem
+
+- So why not just commandize?
+    - Undoing redirect should be intuitive, the resources just show up in missing
+        - and we don't have to prompt idiotically
+
 - Note that even if the file is unused in the current revision, it might still be used in the saved revision
     - So a redirect should make it dirty even though no references are found in the current revision
 - Similarly, resources might "become" missing after undoing or redoing even though they are not missing now...
@@ -25,12 +146,6 @@ summary: That which we are brainstorming at the moment.
             - both may have e.g. resources that simply do not exist, and different sets of these
             - so they'll need to allocate different sets of resources
 
-- Note we don't really need to delete a resource in order to "forget" it.
-    - In practice, just not showing a popup about a missing resource when we know it is irrelevant to json state is enough.
-        - We don't have to delete it.
-        - This ensures resource ids are NEVER invalidated.
-        - This way we're sure past commands are valid
-        - So we don't really have to "invalidate entire history" when we want to forget a resource.
 
 
 - We could import (start tracking) resources ONLY once they are first used.
@@ -55,6 +170,7 @@ summary: That which we are brainstorming at the moment.
             - The project file actually changes so why shouldn't we commandize it?
             - Otherwise when you're on a saved revision it's not really saved (we could make it dirty or not highlighted in green but meh)
     - Cons:
+        - "Undoing imports" means we have to literally hide existing hdd entries from the filesystem gui
         - "Imported" command with unused resources will show up literally every time we open a file with autosave, in case a map has many unused sprites
             - Easy: we can reubild after autosave and modify the Load Autosave command to include these new unused resources!
                 - Same with the Open project command!
@@ -94,9 +210,6 @@ summary: That which we are brainstorming at the moment.
                     - "Undo" is performed back to autosave command
                     - The redo will work on nonexisting resources.
             - more resources than in saved
-
-- Honor playtest spawns but maybe as respawn points only and spawn where the camera is?
-    - think later
 
 - Prepare comprehensive official resource collection before shipping
 

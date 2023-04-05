@@ -5,6 +5,12 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Watch out especially where servers pass arena name in their masterserver heartbeat
+	- That "filename" could potentially lead to moving/removing a system folder if not sanitized!
+		- Because we might request replacing an arena if we detect an existing one with the same name
+	- Easy to sanitize though (literally just alphanumerics and underscore), we'd have to really screw up for this to be exploited 
+		- But watch out
+
 - Re-check const size containers if max sizes are respected when serializing json or other formats
 	- esp. around convex shape partitions 
 		- check for corner cases here still, the indexing is a bit complex here

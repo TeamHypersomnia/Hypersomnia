@@ -6,7 +6,7 @@
 namespace components {
 	struct wandering_pixels {
 		// GEN INTROSPECTOR struct components::wandering_pixels
-		rgba colorize = white;
+		rgba color = white;
 		unsigned num_particles = 0u;
 		bool force_particles_within_bounds = false;
 		bool illuminate = false;

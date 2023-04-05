@@ -904,7 +904,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 					{
 						auto col = scoped_style_color(ImGuiCol_Button, rgba(0, 0, 0, 0));
-						auto col2 = cond_scoped_style_color(layer_is_empty, ImGuiCol_Text, rgba(255, 255, 255, 60));
+						auto col2 = cond_scoped_style_color(layer_is_empty, ImGuiCol_Text, rgba(255, 255, 255, 0));
 
 						if (ImGui::ArrowButtonEx("###IsOpen", dir, { max_icon_size, max_icon_size })) {
 							layer.is_open = !layer.is_open;

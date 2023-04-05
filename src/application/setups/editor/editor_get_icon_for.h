@@ -33,16 +33,16 @@ rgba editor_setup::get_icon_color_for(
 		auto node_color = white;
 
 		if constexpr(std::is_same_v<T, editor_sprite_node>) {
-			node_color = object.editable.colorize;
+			node_color = object.editable.color;
 		}
 		else if constexpr(std::is_same_v<T, editor_light_node>) {
-			node_color = object.editable.colorize;
+			node_color = object.editable.color;
 		}
 		else if constexpr(std::is_same_v<T, editor_particles_node>) {
 			node_color = object.editable.colorize;
 		}
 		else if constexpr(std::is_same_v<T, editor_wandering_pixels_node>) {
-			node_color = object.editable.colorize;
+			node_color = object.editable.color;
 		}
 		else if constexpr(is_one_of_v<T, editor_point_marker_node, editor_area_marker_node>) {
 			const auto* maybe_resource = find_resource(object.resource_id);

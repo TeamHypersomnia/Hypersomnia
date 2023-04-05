@@ -80,6 +80,11 @@ summary: Just a hidden scratchpad.
 
 ## Editor final MVP (post MVP) once we can ditch old maps
 
+- Ensure all official floors have *some* footsteps set
+
+- Full illumination maybe per entity too for foregrounds
+    - Otherwise we'd need two types of ferns because cyberaqua has a full illumination one
+
 - wtf, warmup_theme shouldn't be a flavour id but a sound effect input
 	- It actually needs to be a flavor because it's synchronized through the network so it needs to be an entity
 		- it can't be a sound effect

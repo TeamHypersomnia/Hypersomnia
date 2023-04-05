@@ -86,7 +86,7 @@ namespace test_flavours {
 			{
 				components::wandering_pixels wandering;
 				wandering.force_particles_within_bounds = true;
-				wandering.colorize = { 234, 228, 201, 255 };
+				wandering.color = { 234, 228, 201, 255 };
 				wandering.num_particles = 15;
 				wandering.illuminate = true;
 				meta.set(wandering);
@@ -112,7 +112,7 @@ namespace test_flavours {
 			{
 				components::wandering_pixels wandering;
 				wandering.force_particles_within_bounds = true;
-				wandering.colorize = { 234, 228, 201, 255 };
+				wandering.color = { 234, 228, 201, 255 };
 				wandering.num_particles = 500;
 				meta.set(wandering);
 
@@ -306,7 +306,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_box_markers::BUY_AREA);
 
 			invariants::box_marker marker;
-			marker.type = area_marker_type::BUY_AREA;
+			marker.type = area_marker_type::BUY_ZONE;
 			meta.set(marker);
 		}
 

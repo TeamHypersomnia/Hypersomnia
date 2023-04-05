@@ -128,6 +128,11 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 		MULTIPROPERTY("Pitch", field.pitch);\
 	}
 
+
+#define MULTIPROPERTY_POSITION(field) \
+	MULTIPROPERTY("Position X", pos.x); \
+	MULTIPROPERTY("Position Y", pos.y);
+
 void editor_tweaked_widget_tracker::reset() {
 	last_tweaked.reset();
 }
@@ -359,14 +364,14 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& 
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 
 	MULTIPROPERTY("Flip horizontally", flip_horizontally);
 	ImGui::SameLine();
 	MULTIPROPERTY("Flip vertically", flip_vertically);
 
-	MULTIPROPERTY("Colorize", colorize);
+	MULTIPROPERTY("Color", color);
 
 	MULTIPROPERTY("Resize", size.is_enabled);
 
@@ -412,7 +417,7 @@ EDIT_FUNCTION(editor_sound_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 
 	/* 
 		TODO: Sounds should have per-entity sound effect modifiers.
@@ -428,7 +433,7 @@ EDIT_FUNCTION(editor_firearm_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
@@ -440,7 +445,7 @@ EDIT_FUNCTION(editor_ammunition_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
@@ -452,7 +457,7 @@ EDIT_FUNCTION(editor_melee_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
@@ -464,13 +469,13 @@ EDIT_FUNCTION(editor_wandering_pixels_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 	MULTIPROPERTY("Size", size);
 
 	ImGui::Separator();
 
-	MULTIPROPERTY("Colorize", colorize);
+	MULTIPROPERTY("Color", color);
 	MULTIPROPERTY("Num particles", num_particles);
 	MULTIPROPERTY("Force particles within bounds", force_particles_within_bounds);
 	MULTIPROPERTY("Illuminate", illuminate);
@@ -505,7 +510,7 @@ static bool has_letter(const area_marker_type type) {
 
 static bool has_team(const area_marker_type type) {
 	switch (type) {
-		case area_marker_type::BUY_AREA:
+		case area_marker_type::BUY_ZONE:
 			return true;
 		default:
 			return false;
@@ -518,7 +523,7 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 
 	const auto type = resource.editable.type;
@@ -540,7 +545,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 	MULTIPROPERTY("Size", size);
 	 
@@ -563,7 +568,7 @@ EDIT_FUNCTION(editor_explosive_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
@@ -574,7 +579,7 @@ EDIT_FUNCTION(editor_prefab_node_editable& insp, T& es, const editor_prefab_reso
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 	MULTIPROPERTY("Size", size);
 
@@ -640,6 +645,23 @@ EDIT_FUNCTION(editor_prefab_node_editable& insp, T& es, const editor_prefab_reso
 
 		MULTIPROPERTY("Dim caustics count", as_aquarium.dim_caustics_count);
 		MULTIPROPERTY("Dim caustics random seed", as_aquarium.dim_caustics_seed);
+
+		ImGui::Separator();
+		text_color("Colors", yellow);
+
+		text_disabled("(Set alpha to 0 to disable the lamp completely.)");
+
+		MULTIPROPERTY("Left bottom lamp color", as_aquarium.left_bottom_lamp_color);
+		MULTIPROPERTY("Right top lamp color", as_aquarium.right_top_lamp_color);
+		MULTIPROPERTY("Top light color", as_aquarium.top_lamp_color);
+		MULTIPROPERTY("Sand lamp color", as_aquarium.sand_lamp_color);
+
+		ImGui::Separator();
+		text_color("Positioning", yellow);
+
+		MULTIPROPERTY("Flip glass vertically", as_aquarium.flip_glass_vertically);
+		MULTIPROPERTY("Glass start offset", as_aquarium.glass_start_offset);
+		MULTIPROPERTY("Wall lamp offset", as_aquarium.wall_lamp_offset);
 	};
 
 	using P = editor_builtin_prefab_type;
@@ -662,8 +684,8 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
-	MULTIPROPERTY("Colorize", colorize);
+	MULTIPROPERTY_POSITION(pos);
+	MULTIPROPERTY("Color", color);
 	MULTIPROPERTY("Positional vibration", positional_vibration);
 	MULTIPROPERTY("Intensity vibration", intensity_vibration);
 
@@ -821,7 +843,7 @@ EDIT_FUNCTION(editor_particles_node_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	MULTIPROPERTY("Position", pos);
+	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 
 	return result;
@@ -918,7 +940,7 @@ EDIT_FUNCTION(
 		if (scope) {
 			auto actually_disabled = maybe_disabled_cols(!insp.neon_map.is_enabled);
 
-			MULTIPROPERTY("Colorize neon", neon_color);
+			MULTIPROPERTY("Color neon", neon_color);
 
 			std::optional<std::size_t> removed_i;
 

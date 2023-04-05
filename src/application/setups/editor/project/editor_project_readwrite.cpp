@@ -475,6 +475,11 @@ namespace editor_project_readwrite {
 					writer.Key("id");
 					writer.String(layer->unique_name);
 
+					if (layer->is_open != defaults.is_open) {
+						writer.Key("is_open_in_editor");
+						writer.Bool(layer->is_open);
+					}
+
 					augs::write_json_diff(writer, layer->editable, defaults.editable);
 
 					if (!layer->hierarchy.nodes.empty()) {
@@ -513,6 +518,7 @@ namespace editor_project_readwrite {
 
 				auto defaults = decltype(R::editable)();
 				::setup_resource_defaults(defaults, officials_map);
+				::on_each_resource_id_in_object(defaults, stringify_id);
 
 				if constexpr(is_pathed_resource_v<R>) {
 					auto write = [&](const auto& typed_resource) {
@@ -609,6 +615,22 @@ namespace editor_project_readwrite {
 
 						::setup_node_defaults(defaults.editable, *resource);
 						augs::write_json_diff(writer, typed_node.editable, defaults.editable);
+						::on_each_resource_id_in_object(defaults.editable, stringify_id);
+
+						if constexpr(std::is_same_v<node_type, editor_prefab_node>) {
+							using E = editor_builtin_prefab_type;
+
+							const auto prefab_type = resource->editable.type;
+
+							switch (prefab_type) {
+								case E::AQUARIUM:
+									augs::write_json_diff(writer, typed_node.editable.as_aquarium, defaults.editable.as_aquarium);
+									break;
+
+								default:
+									break;
+							}
+						}
 
 						writer.EndObject();
 					}
@@ -1081,6 +1103,10 @@ namespace editor_project_readwrite {
 
 				editor_layer layer;
 				layer.unique_name = *id;
+
+				if (const auto is_open = GetIf<bool>(json_layer, "is_open_in_editor")) {
+					layer.is_open = *is_open;
+				}
 
 				augs::read_json(json_layer, layer.editable);
 

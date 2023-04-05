@@ -2168,6 +2168,10 @@ node_mover_input editor_setup::make_mover_input() {
 }
 
 setup_escape_result editor_setup::escape() {
+	if (arena_gui.escape()) {
+		return setup_escape_result::JUST_FETCH;
+	}
+
 	if (is_playtesting()) {
 		stop_playtesting();
 		return setup_escape_result::JUST_FETCH;

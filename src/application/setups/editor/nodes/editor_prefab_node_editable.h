@@ -58,6 +58,7 @@ struct aquarium_prefab_node {
 
 	editor_typed_resource_id<editor_sprite_resource> caustics;
 
+	bool flip_glass_vertically = false;
 	int glass_start_offset = 10;
 	int wall_lamp_offset = 50;
 
@@ -75,6 +76,11 @@ struct aquarium_prefab_node {
 
 	uint32_t dim_caustics_seed = 8204;
 	uint32_t dim_caustics_count = 4;
+
+	rgba left_bottom_lamp_color = rgba(96, 255, 255, 255);
+	rgba right_top_lamp_color = rgba(103, 255, 69, 255);
+	rgba top_lamp_color = rgba(0, 179, 255, 0);
+	rgba sand_lamp_color = rgba(0, 99, 126, 255);
 	// END GEN INTROSPECTOR
 };
 

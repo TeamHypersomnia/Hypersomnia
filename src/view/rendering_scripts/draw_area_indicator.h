@@ -34,7 +34,7 @@ void draw_area_indicator(
 				if (::is_bombsite(t)) {
 					return red;
 				}
-				else if (t == area_marker_type::BUY_AREA) {
+				else if (t == area_marker_type::BUY_ZONE) {
 					return rgba(200, 200, 0, 255);
 				}
 

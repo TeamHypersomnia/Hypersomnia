@@ -253,7 +253,7 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_animation(
-				test_dynamic_decorations::CONSOLE_LIGHT,
+				test_dynamic_decorations::CYBER_PANEL,
 				test_scene_image_id::CONSOLE_LIGHT_1,
 				test_scene_plain_animation_id::CONSOLE_LIGHT,
 				test_ground_order::ON_ON_FLOOR
@@ -512,7 +512,7 @@ namespace test_flavours {
 		);
 
 		flavour_with_sound(
-			test_sound_decorations::HUMMING_DISABLED,
+			test_sound_decorations::POWERLINE_NOISE,
 			test_scene_sound_id::HUMMING_DISABLED,
 			augs::distance_model::LINEAR_DISTANCE_CLAMPED,
 			50.f,

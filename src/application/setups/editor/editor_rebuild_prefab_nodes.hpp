@@ -49,7 +49,7 @@ void rebuild_prefab_nodes(
 	};
 
 	auto set_color = [&]<typename N>(const rgba col, N* const node) -> N* {
-		node->editable.colorize = col; 
+		node->editable.color = col; 
 
 		return node;
 	};
@@ -225,28 +225,34 @@ void rebuild_prefab_nodes(
 		align({1, -1}, create_child(a.wall_top_corners, { vec2(w2, -h2), 180 }));
 		align({1, 1}, create_child(a.wall_bottom_corners, { vec2(w2, h2), 270 }));
 
-		align({1, 1}, 					 create_child(a.wall_smooth_end, vec2(-w2, h2)));
-		flip(true, false, align({-1, 1}, create_child(a.wall_smooth_end, vec2( w2, h2))));
+		const auto f_vert = a.flip_glass_vertically;
+
+		flip(false, f_vert, align({1, 1}, 					 create_child(a.wall_smooth_end, vec2(-w2, h2))));
+		flip(true, f_vert, align({-1, 1}, create_child(a.wall_smooth_end, vec2( w2, h2))));
 
 		{
 			auto wse_sz = get_resource_size(a.wall_smooth_end);
 			auto gs_sz = get_resource_size(a.glass_start);
 			auto gs_off = a.glass_start_offset;
 
-			align(					{1, 1},  create_child(a.glass_start, vec2(-w2 - gs_off, h2) + vec2(wse_sz.x, 0)));
-			flip(true, false, align({-1, 1}, create_child(a.glass_start, vec2(w2  + gs_off,  h2) - vec2(wse_sz.x, 0))));
+			flip(false, f_vert, align(					{1, 1},  create_child(a.glass_start, vec2(-w2 - gs_off, h2) + vec2(wse_sz.x, 0))));
+			flip(true, f_vert, align({-1, 1}, create_child(a.glass_start, vec2(w2  + gs_off,  h2) - vec2(wse_sz.x, 0))));
 
-			align({0, 1}, create_child(a.glass, vec2(0, h2), vec2(w - wse_sz.x * 2 - gs_sz.x * 2 + gs_off * 2, 0)));
+			flip(false, f_vert, align({0, 1}, create_child(a.glass, vec2(0, h2), vec2(w - wse_sz.x * 2 - gs_sz.x * 2 + gs_off * 2, 0))));
 		}
 
 		align({0, -1}, create_child(a.wall_top_foreground, { vec2(0, -h2), 180 }));
+
+		if (a.top_lamp_color.a != 0) {
+			set_color(a.top_lamp_color, create_child(POINT_LIGHT, vec2(0, -h2 + 30)));
+		}
 
 		create_child(a.bubbles, { vec2(0, -h2 + 15), 90 });
 
 		create_child(a.water_overlay, transformr(), e.size);
 
 		if (auto node = create_child(a.collider_interior, transformr(), e.size)) {
-			node->editable.colorize.a = 0;
+			node->editable.color.a = 0;
 		}
 
 		create_child(a.ambience_left, vec2(-w2, h2));
@@ -256,8 +262,8 @@ void rebuild_prefab_nodes(
 			constexpr int N = 2;
 
 			rgba wall_lamp_light_cols[N] = {
-				rgba(96, 255, 255, 255),
-				rgba(103, 255, 69, 255)
+				a.left_bottom_lamp_color,
+				a.right_top_lamp_color
 			};
 
 			rgba wall_lamp_bodies_cols[N] = {
@@ -276,6 +282,10 @@ void rebuild_prefab_nodes(
 			};
 
 			for (int hi = 0; hi < N; ++hi) {
+				if (wall_lamp_light_cols[hi].a == 0) {
+					continue;
+				}
+
 				if (auto lamp = create_child(a.wall_lamp_body, lamp_offsets[hi].second)) {
 					align(lamp_offsets[hi].first, lamp);
 
@@ -289,11 +299,11 @@ void rebuild_prefab_nodes(
 			}
 		}
 
-		{
+		if (a.sand_lamp_color.a != 0) {
 			constexpr int N = 1;
 
 			rgba sand_light_cols[N] = {
-				rgba(0, 99, 126, 255)
+				a.sand_lamp_color
 			};
 
 			rgba sand_lamp_light_cols[N] = {
@@ -447,7 +457,7 @@ void rebuild_prefab_nodes(
 			spawn_multiple_of(rng, a.caustics, a.dim_caustics_count, [&](auto* node) {
 				if (node) {
 					node->editable.starting_animation_frame.emplace(rng.randval(0, 100));
-					node->editable.colorize.a = 79;
+					node->editable.color.a = 79;
 				}
 			}, vec2(0.5, 1.0), vec2(0.5, 1.0));
 		}

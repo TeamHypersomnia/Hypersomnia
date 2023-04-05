@@ -3617,7 +3617,9 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_shootable_weapons::ELON_HRL);
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::ELON);
+
+			meta.template get<invariants::text_details>().name = "Rocket Launcher ELON";
 
 			invariants::gun gun_def;
 

@@ -330,9 +330,9 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
 
     entity_selector = {
-      selected_color = "65 131 196 20",
-      held_color = "65 131 196 40",
       hovered_color = "255 255 255 0",
+      selected_color = "65 131 196 3",
+      held_color = "65 131 196 6",
       hovered_dashed_line_color = "255 255 255 140"
     },
 
@@ -393,11 +393,10 @@ treat_as_music_sounds_longer_than_secs = 5,
       panning_speed = 1
     },
     entity_selector = {
-      hovered_color = "255 255 255 20",
-      selected_color = "65 131 196 80",
-      held_color = "65 131 196 120",
-	  hovered_color = "255 255 255 80",
-	  hovered_dashed_line_color = "255 255 255 140"
+      hovered_color = "255 255 255 0",
+      selected_color = "65 131 196 3",
+      held_color = "65 131 196 6",
+      hovered_dashed_line_color = "255 255 255 140"
     },
 	tutorial_text_color = "220 220 220 255",
     controlled_entity_color = "255 255 0 120",

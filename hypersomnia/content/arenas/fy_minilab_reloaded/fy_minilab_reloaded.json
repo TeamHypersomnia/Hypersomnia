@@ -1,0 +1,1628 @@
+{
+    "meta": {
+        "game_version": "1.1.7967",
+        "name": "fy_minilab_reloaded",
+        "version_timestamp": "2023-04-05 14:39:20.396351 UTC"
+    },
+    "about": {
+        "short_description": "A timeless 2017 classic."
+    },
+    "settings": {
+        "default_server_mode": "bomb_defusal"
+    },
+    "playtesting": {
+        "mode": "quick_test"
+    },
+    "game_modes": {
+        "bomb_defusal": {},
+        "quick_test": {
+            "equipment": {
+                "metropolis": {
+                    "firearm": "baka47",
+                    "melee": null,
+                    "backpack": 0
+                }
+            }
+        }
+    },
+    "layers": [
+        {
+            "id": "markers",
+            "is_open_in_editor": false,
+            "active": 0,
+            "nodes": [
+                "ct_spawn (32)-ml",
+                "bombsite (2)",
+                "bombsite (1)",
+                "bombsite",
+                "ct_spawn (31)-ml",
+                "ct_spawn (30)-ml",
+                "ct_spawn (29)-ml",
+                "ct_spawn (28)-ml",
+                "ct_spawn (27)-ml",
+                "ct_spawn (26)-ml",
+                "ct_spawn (25)-ml",
+                "ct_spawn (24)-ml",
+                "ct_spawn (23)-ml",
+                "ct_spawn (22)-ml",
+                "ct_spawn (21)-ml",
+                "ct_spawn (20)-ml",
+                "ct_spawn (19)-ml",
+                "ct_spawn (18)-ml",
+                "ct_spawn (17)-ml",
+                "ct_spawn (16)-ml",
+                "ct_spawn (15)-ml",
+                "ct_spawn (14)-ml",
+                "ct_spawn (13)-ml",
+                "ct_spawn (12)-ml",
+                "ct_spawn (11)-ml",
+                "ct_spawn (9)-ml",
+                "ct_spawn (8)-ml",
+                "ct_spawn (7)-ml",
+                "ct_spawn (6)-ml",
+                "ct_spawn (5)-ml",
+                "ct_spawn (3)-ml",
+                "ct_spawn (2)-ml",
+                "ct_spawn (1)-ml",
+                "ct_spawn-ml",
+                "ct_spawn (10)-ml",
+                "ct_spawn (4)-ml",
+                "ct_spawn (32)",
+                "ct_spawn (31)",
+                "ct_spawn (30)",
+                "ct_spawn (29)",
+                "ct_spawn (28)",
+                "ct_spawn (27)",
+                "ct_spawn (26)",
+                "ct_spawn (25)",
+                "ct_spawn (24)",
+                "ct_spawn (23)",
+                "ct_spawn (22)",
+                "ct_spawn (21)",
+                "ct_spawn (20)",
+                "ct_spawn (19)",
+                "ct_spawn (18)",
+                "ct_spawn (17)",
+                "ct_spawn (16)",
+                "ct_spawn (15)",
+                "ct_spawn (14)",
+                "ct_spawn (13)",
+                "ct_spawn (12)",
+                "ct_spawn (11)",
+                "ct_spawn (9)",
+                "ct_spawn (8)",
+                "ct_spawn (7)",
+                "ct_spawn (6)",
+                "ct_spawn (5)",
+                "ct_spawn (3)",
+                "ct_spawn (2)",
+                "ct_spawn (1)",
+                "ct_spawn",
+                "ct_spawn (10)",
+                "ct_spawn (4)",
+                "ct_buy_zone",
+                "tt_buy_zone"
+            ]
+        },
+        {
+            "id": "aquarium_top",
+            "is_open_in_editor": false,
+            "nodes": [
+                "aquarium",
+                "water_room_floor (1)"
+            ]
+        },
+        {
+            "id": "aquarium_bottom",
+            "is_open_in_editor": false,
+            "nodes": [
+                "point_light (10)",
+                "point_light (9)",
+                "point_light",
+                "point_light (8)",
+                "point_light (7)",
+                "aquarium_halogen_1_light-md (1)",
+                "aquarium_halogen_1_body-md (1)",
+                "aquarium (1)",
+                "water_room_floor (2)"
+            ]
+        },
+        {
+            "id": "garden",
+            "is_open_in_editor": false,
+            "nodes": [
+                "paprotka",
+                "paprotka (1)",
+                "paprotka (2)",
+                "paprotka (3)",
+                "doniczka (1)",
+                "doniczka (2)",
+                "doniczka",
+                "doniczka (3)",
+                "wandering_pixels (5)",
+                "wandering_pixels (4)",
+                "wandering_pixels (3)",
+                "wandering_pixels (2)",
+                "wandering_pixels (7)",
+                "wandering_pixels (9)",
+                "wandering_pixels (6)",
+                "wandering_pixels (1)",
+                "wandering_pixels",
+                "wandering_smoke (2)",
+                "crate (4)",
+                "crate (3)",
+                "paprotka (4)",
+                "doniczka (4)",
+                "flowerbed_cyan-mr-mr",
+                "flowerbed_cyan-mr",
+                "flowerbed_cyan",
+                "aquarium_halogen_1_light-md",
+                "aquarium_halogen_1_body-md",
+                "aquarium_halogen_1_light",
+                "aquarium_halogen_1_body",
+                "crate (10)",
+                "crate (9)",
+                "crate (11)",
+                "crate (6)",
+                "roboworker",
+                "wandering_pixels (11)",
+                "aquarium_halogen_1_body-md (4)",
+                "aquarium_halogen_1_body (3)",
+                "wandering_pixels (10)",
+                "aquarium_halogen_1_light-md (3)",
+                "aquarium_halogen_1_body-md (3)",
+                "aquarium_halogen_1_light (2)",
+                "aquarium_halogen_1_body (2)",
+                "point_light (11)",
+                "wandering_pixels (8)",
+                "aquarium_halogen_1_light-md (2)",
+                "aquarium_halogen_1_body-md (2)",
+                "aquarium_halogen_1_light (1)",
+                "aquarium_halogen_1_body (1)",
+                "point_light (3)"
+            ]
+        },
+        {
+            "id": "interior",
+            "is_open_in_editor": false,
+            "nodes": [
+                "skull_rocket (1)",
+                "skull_rocket",
+                "point_light (2)",
+                "point_light (6)",
+                "point_light (5)",
+                "point_light (4)",
+                "point_light (1)",
+                "cyber_panel-mu",
+                "cyber_panel",
+                "elon",
+                "snackbar",
+                "hard_wooden_wall (7)",
+                "hard_wooden_wall (8)",
+                "hard_wooden_wall (6)",
+                "hard_wooden_wall (5)",
+                "hard_wooden_wall (4)",
+                "hard_wooden_wall (3)",
+                "hard_wooden_wall (2)",
+                "crate (1)",
+                "crate (2)",
+                "flowerbed_roses (1)",
+                "flowerbed_roses",
+                "crate",
+                "hard_wooden_wall (11)",
+                "hard_wooden_wall (10)",
+                "hard_wooden_wall (15)",
+                "hard_wooden_wall (13)",
+                "hard_wooden_wall (16)",
+                "hard_wooden_wall (14)",
+                "hard_wooden_wall (12)",
+                "hard_wooden_wall (9)",
+                "hard_wooden_wall (1)",
+                "hard_wooden_wall (17)",
+                "hard_wooden_wall",
+                "road_dirt",
+                "lab_wall (8)",
+                "lab_wall (7)",
+                "lab_wall (4)",
+                "lab_wall (1)",
+                "lab_wall (3)",
+                "lab_wall (2)",
+                "lab_wall_corner_cut (3)",
+                "lab_wall_corner_cut (2)",
+                "round_corner-mu",
+                "round_corner (1)-mu",
+                "round_corner (2)-mu",
+                "round_corner",
+                "round_corner (1)",
+                "round_corner (2)",
+                "lab_wall_corner_cut (1)",
+                "lab_wall_corner_cut",
+                "lab_wall (5)",
+                "lab_wall",
+                "powerline_noise (1)-mu",
+                "powerline_noise (1)",
+                "powerline_noise",
+                "water_room_floor"
+            ]
+        },
+        {
+            "id": "exterior_left",
+            "is_open_in_editor": false,
+            "nodes": [
+                "crate (15)",
+                "crate (18)",
+                "crate (17)",
+                "crate (19)",
+                "crate (16)",
+                "crate (14)",
+                "crate (13)",
+                "crate (12)",
+                "crate (8)",
+                "crate (7)",
+                "lab_wall (6)",
+                "road",
+                "wandering_smoke (1)",
+                "wandering_smoke"
+            ]
+        },
+        {
+            "id": "ground",
+            "is_open_in_editor": false,
+            "nodes": [
+                "soil"
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "id": "water_room_floor",
+            "type": "water_room_floor",
+            "pos": [64.0, -64.0],
+            "size": [3584, 1536]
+        },
+        {
+            "id": "hard_wooden_wall",
+            "type": "hard_wooden_wall",
+            "pos": [-768.0, 512.0]
+        },
+        {
+            "id": "hard_wooden_wall (1)",
+            "type": "hard_wooden_wall",
+            "pos": [-512.0, 256.0],
+            "size": [256, 128]
+        },
+        {
+            "id": "hard_wooden_wall (2)",
+            "type": "hard_wooden_wall",
+            "pos": [-1024.0, 0.0],
+            "rotation": 90.0,
+            "size": [384, 128]
+        },
+        {
+            "id": "hard_wooden_wall (3)",
+            "type": "hard_wooden_wall",
+            "pos": [-704.0, -384.0],
+            "rotation": 90.0,
+            "size": [256, 128]
+        },
+        {
+            "id": "hard_wooden_wall (4)",
+            "type": "hard_wooden_wall",
+            "pos": [-768.0, -768.0],
+            "rotation": -180.0,
+            "size": [384, 128]
+        },
+        {
+            "id": "hard_wooden_wall (5)",
+            "type": "hard_wooden_wall",
+            "pos": [64.00003814697266, -576.0],
+            "rotation": -180.0,
+            "size": [256, 256]
+        },
+        {
+            "id": "hard_wooden_wall (6)",
+            "type": "hard_wooden_wall",
+            "pos": [384.00006103515625, -128.00001525878906],
+            "rotation": -180.0,
+            "size": [128, 128]
+        },
+        {
+            "id": "hard_wooden_wall (7)",
+            "type": "hard_wooden_wall",
+            "pos": [1024.0001220703125, -384.0000915527344],
+            "rotation": -180.0,
+            "size": [384, 128]
+        },
+        {
+            "id": "hard_wooden_wall (8)",
+            "type": "hard_wooden_wall",
+            "pos": [1152.0, -512.0],
+            "rotation": -180.0,
+            "size": [128, 128]
+        },
+        {
+            "id": "hard_wooden_wall (9)",
+            "type": "hard_wooden_wall",
+            "pos": [256.0, 448.00006103515625],
+            "rotation": 90.0,
+            "size": [256, 128]
+        },
+        {
+            "id": "hard_wooden_wall (10)",
+            "type": "hard_wooden_wall",
+            "pos": [768.0, 256.00006103515625],
+            "rotation": 90.0,
+            "size": [128, 128]
+        },
+        {
+            "id": "hard_wooden_wall (11)",
+            "type": "hard_wooden_wall",
+            "pos": [895.9998779296875, 384.0],
+            "rotation": -180.0,
+            "size": [384, 128]
+        },
+        {
+            "id": "crate",
+            "type": "crate",
+            "pos": [608.0, -384.0]
+        },
+        {
+            "id": "crate (1)",
+            "type": "crate",
+            "pos": [896.0, -64.0],
+            "size": [128, 192]
+        },
+        {
+            "id": "crate (2)",
+            "type": "crate",
+            "pos": [-64.0, 112.0],
+            "size": [128, 160]
+        },
+        {
+            "id": "soil",
+            "type": "soil",
+            "pos": [64.0, 448.0],
+            "size": [10240, 6144]
+        },
+        {
+            "id": "road",
+            "type": "road",
+            "pos": [-3260.0, -64.0],
+            "rotation": 90.0,
+            "size": [512, 3072],
+            "flip_horizontally": 1,
+            "flip_vertically": 1
+        },
+        {
+            "id": "road_dirt",
+            "type": "road_dirt",
+            "pos": [-1712.0, -64.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "lab_wall",
+            "type": "lab_wall",
+            "pos": [-1744.0, 448.0],
+            "rotation": 90.0,
+            "size": [512, 32]
+        },
+        {
+            "id": "lab_wall (1)",
+            "type": "lab_wall",
+            "pos": [-768.0, 720.0],
+            "size": [1920, 32]
+        },
+        {
+            "id": "lab_wall (2)",
+            "type": "lab_wall",
+            "pos": [1871.9998779296875, 448.0],
+            "rotation": -90.0,
+            "size": [512, 32]
+        },
+        {
+            "id": "lab_wall (3)",
+            "type": "lab_wall",
+            "pos": [1871.9998779296875, -576.0],
+            "rotation": -90.0,
+            "size": [512, 32]
+        },
+        {
+            "id": "lab_wall (4)",
+            "type": "lab_wall",
+            "pos": [-768.0, -847.9998779296875],
+            "rotation": -180.0,
+            "size": [1920, 32]
+        },
+        {
+            "id": "lab_wall (5)",
+            "type": "lab_wall",
+            "pos": [-1744.0, -576.0],
+            "rotation": 90.0,
+            "size": [512, 32]
+        },
+        {
+            "id": "lab_wall_corner_cut",
+            "type": "lab_wall_corner_cut",
+            "pos": [-1744.0, -847.9999389648438],
+            "rotation": 90.0
+        },
+        {
+            "id": "lab_wall_corner_cut (1)",
+            "type": "lab_wall_corner_cut",
+            "pos": [-1744.0, 720.0]
+        },
+        {
+            "id": "lab_wall_corner_cut (2)",
+            "type": "lab_wall_corner_cut",
+            "pos": [1871.9998779296875, 720.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "lab_wall_corner_cut (3)",
+            "type": "lab_wall_corner_cut",
+            "pos": [1871.9998779296875, -847.9999389648438],
+            "rotation": -180.0
+        },
+        {
+            "id": "round_corner (2)",
+            "type": "lab_wall_corner_cut",
+            "pos": [1872.0001220703125, -304.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "round_corner (1)",
+            "type": "lab_wall_corner_cut",
+            "pos": [1840.0, -304.0],
+            "rotation": 90.0,
+            "flip_horizontally": 1
+        },
+        {
+            "id": "round_corner",
+            "type": "lab_wall_corner_cut",
+            "pos": [1840.0, -336.0],
+            "rotation": -90.0,
+            "flip_horizontally": 1,
+            "flip_vertically": 1
+        },
+        {
+            "id": "round_corner (2)-mu",
+            "type": "lab_wall_corner_cut",
+            "pos": [1872.0001220703125, 176.0],
+            "rotation": 90.0,
+            "flip_vertically": 1
+        },
+        {
+            "id": "round_corner (1)-mu",
+            "type": "lab_wall_corner_cut",
+            "pos": [1840.0, 176.0],
+            "rotation": -90.0,
+            "flip_horizontally": 1,
+            "flip_vertically": 1
+        },
+        {
+            "id": "round_corner-mu",
+            "type": "lab_wall_corner_cut",
+            "pos": [1840.0, 208.0],
+            "rotation": 90.0,
+            "flip_horizontally": 1
+        },
+        {
+            "id": "snackbar",
+            "type": "snackbar",
+            "pos": [384.0, -32.0]
+        },
+        {
+            "id": "cyber_panel",
+            "type": "cyber_panel",
+            "pos": [1612.0, 676.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "roboworker",
+            "type": "roboworker",
+            "pos": [2304.0, -64.0]
+        },
+        {
+            "id": "flowerbed_cyan",
+            "type": "flowerbed_cyan",
+            "pos": [2055.0, -320.0]
+        },
+        {
+            "id": "flowerbed_cyan-mr",
+            "type": "flowerbed_cyan",
+            "pos": [2327.0, -320.0],
+            "flip_horizontally": 1
+        },
+        {
+            "id": "flowerbed_cyan-mr-mr",
+            "type": "flowerbed_cyan",
+            "pos": [2599.0, -320.0]
+        },
+        {
+            "id": "crate (3)",
+            "type": "crate",
+            "pos": [2048.0, -512.0]
+        },
+        {
+            "id": "crate (4)",
+            "type": "crate",
+            "pos": [2496.0, -768.0],
+            "size": [256, 128]
+        },
+        {
+            "id": "hard_wooden_wall (12)",
+            "type": "hard_wooden_wall",
+            "pos": [2815.99951171875, -63.99985122680664],
+            "rotation": 90.0,
+            "size": [3072, 128]
+        },
+        {
+            "id": "hard_wooden_wall (13)",
+            "type": "hard_wooden_wall",
+            "pos": [-0.000244140625, -1535.9998779296875],
+            "rotation": -180.0,
+            "size": [5504, 128]
+        },
+        {
+            "id": "hard_wooden_wall (14)",
+            "type": "hard_wooden_wall",
+            "pos": [-2688.0, 896.0001220703125],
+            "rotation": 90.0,
+            "size": [1152, 128]
+        },
+        {
+            "id": "hard_wooden_wall (15)",
+            "type": "hard_wooden_wall",
+            "pos": [64.0, 1408.0],
+            "rotation": -180.0,
+            "size": [5376, 128]
+        },
+        {
+            "id": "crate (6)",
+            "type": "crate",
+            "pos": [2240.0, 256.0]
+        },
+        {
+            "id": "flowerbed_roses",
+            "type": "flowerbed_roses",
+            "pos": [1952.0, 448.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "flowerbed_roses (1)",
+            "type": "flowerbed_roses",
+            "pos": [2688.0, 448.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "hard_wooden_wall (16)",
+            "type": "hard_wooden_wall",
+            "pos": [-2688.0, -959.9998779296875],
+            "rotation": 90.0,
+            "size": [1024, 128]
+        },
+        {
+            "id": "lab_wall (6)",
+            "type": "lab_wall",
+            "pos": [-2720.0, -64.0],
+            "rotation": -90.0,
+            "size": [768, 64]
+        },
+        {
+            "id": "crate (7)",
+            "type": "crate",
+            "pos": [-1920.0001220703125, 0.0]
+        },
+        {
+            "id": "crate (8)",
+            "type": "crate",
+            "pos": [-2192.0, -208.0]
+        },
+        {
+            "id": "aquarium_halogen_1_body",
+            "type": "aquarium_halogen_1_body",
+            "pos": [2338.0, 433.0],
+            "color": [0, 180, 59, 255]
+        },
+        {
+            "id": "aquarium_halogen_1_light",
+            "type": "aquarium_halogen_1_light",
+            "pos": [2338.0, 433.0],
+            "color": [103, 255, 69, 255]
+        },
+        {
+            "id": "aquarium_halogen_1_body-md",
+            "type": "aquarium_halogen_1_body",
+            "pos": [2338.0, 467.0],
+            "color": [0, 180, 59, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "aquarium_halogen_1_light-md",
+            "type": "aquarium_halogen_1_light",
+            "pos": [2338.0, 467.0],
+            "color": [103, 255, 69, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "paprotka (3)",
+            "type": "fern",
+            "pos": [2066.0, 652.0]
+        },
+        {
+            "id": "doniczka (4)",
+            "type": "flowerpot_orange",
+            "pos": [2061.0, 649.0]
+        },
+        {
+            "id": "doniczka (3)",
+            "type": "flowerpot_orange",
+            "pos": [2197.0, 649.0],
+            "flip_horizontally": 1
+        },
+        {
+            "id": "paprotka (2)",
+            "type": "fern",
+            "pos": [2193.0, 652.0],
+            "flip_horizontally": 1
+        },
+        {
+            "id": "doniczka",
+            "type": "flowerpot_orange",
+            "pos": [2567.0, 649.0]
+        },
+        {
+            "id": "paprotka",
+            "type": "fern",
+            "pos": [2571.0, 652.0]
+        },
+        {
+            "id": "crate (9)",
+            "type": "crate",
+            "pos": [1344.0, 976.0],
+            "size": [128, 287]
+        },
+        {
+            "id": "crate (10)",
+            "type": "crate",
+            "pos": [1956.48291015625, 925.37060546875],
+            "rotation": 75.0,
+            "size": [128, 287]
+        },
+        {
+            "id": "crate (11)",
+            "type": "crate",
+            "pos": [2336.0, 912.0]
+        },
+        {
+            "id": "crate (12)",
+            "type": "crate",
+            "pos": [-1507.4329833984375, 1151.2501220703125],
+            "rotation": -60.000003814697266,
+            "size": [128, 287]
+        },
+        {
+            "id": "crate (13)",
+            "type": "crate",
+            "pos": [-1053.0, 1057.0],
+            "rotation": -60.000003814697266,
+            "size": [128, 287]
+        },
+        {
+            "id": "crate (14)",
+            "type": "crate",
+            "pos": [-508.0, 1215.0],
+            "rotation": -60.000003814697266,
+            "size": [128, 287]
+        },
+        {
+            "id": "crate (15)",
+            "type": "crate",
+            "pos": [-387.0, 927.0],
+            "rotation": 60.000003814697266,
+            "size": [128, 287],
+            "flip_horizontally": 1
+        },
+        {
+            "id": "crate (16)",
+            "type": "crate",
+            "pos": [-123.0, -1155.0],
+            "rotation": -105.00000762939453,
+            "size": [128, 287]
+        },
+        {
+            "id": "crate (17)",
+            "type": "crate",
+            "pos": [-640.0, -1180.0],
+            "rotation": -210.00001525878906,
+            "size": [128, 287]
+        },
+        {
+            "id": "crate (18)",
+            "type": "crate",
+            "pos": [-1311.0, -1124.0],
+            "rotation": -210.00001525878906,
+            "size": [128, 287]
+        },
+        {
+            "id": "cyber_panel-mu",
+            "type": "cyber_panel",
+            "pos": [1707.0, -803.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "lab_wall (7)",
+            "type": "lab_wall",
+            "pos": [1407.999755859375, -847.9999389648438],
+            "rotation": -180.0,
+            "size": [896, 32]
+        },
+        {
+            "id": "water_room_floor (1)",
+            "type": "water_room_floor",
+            "pos": [576.0, -864.0],
+            "size": [832, 64]
+        },
+        {
+            "id": "lab_wall (8)",
+            "type": "lab_wall",
+            "pos": [1407.999755859375, 720.0],
+            "rotation": -360.0,
+            "size": [896, 32]
+        },
+        {
+            "id": "water_room_floor (2)",
+            "type": "water_room_floor",
+            "pos": [576.0, 736.0],
+            "size": [768, 64]
+        },
+        {
+            "id": "aquarium_halogen_1_body-md (1)",
+            "type": "aquarium_halogen_1_body",
+            "pos": [209.0, 829.0],
+            "rotation": -90.0,
+            "color": [0, 180, 59, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "aquarium_halogen_1_light-md (1)",
+            "type": "aquarium_halogen_1_light",
+            "pos": [209.0, 829.0],
+            "rotation": -90.0,
+            "color": [103, 255, 69, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "hard_wooden_wall (17)",
+            "type": "hard_wooden_wall",
+            "pos": [-384.0, -128.0]
+        },
+        {
+            "id": "doniczka (2)",
+            "type": "flowerpot_orange",
+            "pos": [2315.0, 649.0]
+        },
+        {
+            "id": "paprotka (4)",
+            "type": "fern",
+            "pos": [2319.0, 652.0]
+        },
+        {
+            "id": "doniczka (1)",
+            "type": "flowerpot_orange",
+            "pos": [2449.0, 649.0],
+            "flip_horizontally": 1
+        },
+        {
+            "id": "paprotka (1)",
+            "type": "fern",
+            "pos": [2445.0, 652.0],
+            "flip_horizontally": 1
+        },
+        {
+            "id": "crate (19)",
+            "type": "crate",
+            "pos": [1636.0, -1123.0],
+            "rotation": -105.00000762939453,
+            "size": [128, 287]
+        },
+        {
+            "id": "aquarium_halogen_1_body (1)",
+            "type": "aquarium_halogen_1_body",
+            "pos": [2684.0, -1428.0],
+            "color": [119, 86, 0, 255]
+        },
+        {
+            "id": "aquarium_halogen_1_light (1)",
+            "type": "aquarium_halogen_1_light",
+            "pos": [2684.0, -1428.0],
+            "color": [255, 183, 0, 255]
+        },
+        {
+            "id": "aquarium_halogen_1_body-md (2)",
+            "type": "aquarium_halogen_1_body",
+            "pos": [2684.0, -1394.0],
+            "color": [119, 86, 0, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "aquarium_halogen_1_light-md (2)",
+            "type": "aquarium_halogen_1_light",
+            "pos": [2684.0, -1394.0],
+            "color": [255, 183, 0, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "aquarium_halogen_1_body (2)",
+            "type": "aquarium_halogen_1_body",
+            "pos": [-2564.0, -1428.0],
+            "color": [119, 86, 0, 255]
+        },
+        {
+            "id": "aquarium_halogen_1_light (2)",
+            "type": "aquarium_halogen_1_light",
+            "pos": [-2564.0, -1428.0],
+            "color": [255, 183, 0, 255]
+        },
+        {
+            "id": "aquarium_halogen_1_body-md (3)",
+            "type": "aquarium_halogen_1_body",
+            "pos": [-2564.0, -1394.0],
+            "color": [119, 86, 0, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "aquarium_halogen_1_light-md (3)",
+            "type": "aquarium_halogen_1_light",
+            "pos": [-2564.0, -1394.0],
+            "color": [255, 183, 0, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "aquarium_halogen_1_body (3)",
+            "type": "aquarium_halogen_1_body",
+            "pos": [-2500.0, 1196.0],
+            "color": [119, 86, 0, 255]
+        },
+        {
+            "id": "aquarium_halogen_1_body-md (4)",
+            "type": "aquarium_halogen_1_body",
+            "pos": [-2500.0, 1230.0],
+            "color": [119, 86, 0, 255],
+            "flip_vertically": 1
+        },
+        {
+            "id": "powerline_noise",
+            "type": "powerline_noise",
+            "pos": [384.0, -22.0]
+        },
+        {
+            "id": "powerline_noise (1)",
+            "type": "powerline_noise",
+            "pos": [1631.0, 675.0]
+        },
+        {
+            "id": "powerline_noise (1)-mu",
+            "type": "powerline_noise",
+            "pos": [1727.0, -801.0]
+        },
+        {
+            "id": "point_light (1)",
+            "type": "point_light",
+            "pos": [1537.0999755859375, -801.0],
+            "color": [73, 192, 255, 255],
+            "falloff": {
+                "radius": 943.0390014648438,
+                "strength": 15
+            },
+            "wall_falloff": {}
+        },
+        {
+            "id": "point_light (2)",
+            "type": "point_light",
+            "pos": [2339.0, 450.0],
+            "color": [0, 180, 59, 255],
+            "falloff": {
+                "radius": 770.885986328125,
+                "strength": 41
+            }
+        },
+        {
+            "id": "point_light (3)",
+            "type": "point_light",
+            "pos": [2687.0, -1409.0],
+            "color": [255, 183, 0, 255],
+            "falloff": {
+                "radius": 1020.0800170898438
+            }
+        },
+        {
+            "id": "point_light (4)",
+            "type": "point_light",
+            "pos": [1537.0999755859375, 673.0],
+            "color": [73, 192, 255, 255],
+            "falloff": {
+                "radius": 943.0390014648438,
+                "strength": 15
+            },
+            "wall_falloff": {}
+        },
+        {
+            "id": "point_light (5)",
+            "type": "point_light",
+            "pos": [-1279.0, -801.0],
+            "color": [255, 225, 73, 250],
+            "falloff": {
+                "radius": 1246.8349609375,
+                "strength": 9
+            },
+            "wall_falloff": {}
+        },
+        {
+            "id": "point_light (6)",
+            "type": "point_light",
+            "pos": [-1329.0, 657.0],
+            "color": [255, 225, 73, 250],
+            "falloff": {
+                "radius": 1246.8349609375,
+                "strength": 9
+            },
+            "wall_falloff": {}
+        },
+        {
+            "id": "point_light",
+            "type": "point_light",
+            "pos": [259.0, 825.0],
+            "color": [19, 255, 23, 122],
+            "falloff": {
+                "radius": 985.6729736328125,
+                "strength": 9
+            }
+        },
+        {
+            "id": "point_light (7)",
+            "type": "point_light",
+            "pos": [575.0, 735.0],
+            "color": [0, 255, 59, 25],
+            "falloff": {
+                "radius": 601.718994140625,
+                "strength": 7
+            }
+        },
+        {
+            "id": "point_light (8)",
+            "type": "point_light",
+            "pos": [538.0, -848.0],
+            "color": [0, 179, 255, 20],
+            "falloff": {
+                "radius": 727.7940063476563,
+                "strength": 17
+            }
+        },
+        {
+            "id": "point_light (9)",
+            "type": "point_light",
+            "pos": [577.0, 1185.0],
+            "color": [19, 255, 23, 255],
+            "falloff": {
+                "radius": 0.0,
+                "strength": 0
+            },
+            "wall_falloff": {}
+        },
+        {
+            "id": "point_light (10)",
+            "type": "point_light",
+            "pos": [575.0, -1313.0],
+            "color": [0, 255, 255, 255],
+            "falloff": {
+                "radius": 0.0,
+                "strength": 0
+            },
+            "wall_falloff": {}
+        },
+        {
+            "id": "point_light (11)",
+            "type": "point_light",
+            "pos": [-2561.0, -1409.0],
+            "color": [255, 183, 0, 255],
+            "falloff": {
+                "radius": 1020.0800170898438
+            }
+        },
+        {
+            "id": "wandering_smoke",
+            "type": "wandering_smoke",
+            "pos": [-2126.5, 671.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "wandering_smoke (1)",
+            "type": "wandering_smoke",
+            "pos": [-2208.0, -976.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "wandering_smoke (2)",
+            "type": "wandering_smoke",
+            "pos": [2048.0, -144.0]
+        },
+        {
+            "id": "wandering_pixels",
+            "type": "wandering_pixels",
+            "color": [0, 255, 232, 255],
+            "illuminate": 0,
+            "pos": [2334.0, -320.0],
+            "size": [1000, 192]
+        },
+        {
+            "id": "wandering_pixels (1)",
+            "type": "wandering_pixels",
+            "color": [0, 255, 12, 255],
+            "num_particles": 150,
+            "illuminate": 0,
+            "pos": [2328.0, 640.0],
+            "size": [656, 159]
+        },
+        {
+            "id": "wandering_pixels (2)",
+            "type": "wandering_pixels",
+            "color": [0, 255, 12, 255],
+            "illuminate": 0,
+            "pos": [1999.0, 454.0],
+            "size": [194, 557]
+        },
+        {
+            "id": "wandering_pixels (3)",
+            "type": "wandering_pixels",
+            "color": [0, 255, 12, 255],
+            "illuminate": 0,
+            "pos": [2653.0, 467.0],
+            "size": [194, 557]
+        },
+        {
+            "id": "wandering_pixels (4)",
+            "type": "wandering_pixels",
+            "color": [255, 0, 12, 255],
+            "illuminate": 0,
+            "pos": [2655.0, 422.0],
+            "size": [194, 557]
+        },
+        {
+            "id": "wandering_pixels (5)",
+            "type": "wandering_pixels",
+            "color": [255, 0, 12, 255],
+            "illuminate": 0,
+            "pos": [1999.0, 438.0],
+            "size": [194, 557]
+        },
+        {
+            "id": "wandering_pixels (6)",
+            "type": "wandering_pixels",
+            "color": [0, 255, 232, 255],
+            "illuminate": 0,
+            "pos": [1620.0, 1044.0],
+            "size": [1000, 600]
+        },
+        {
+            "id": "wandering_pixels (7)",
+            "type": "wandering_pixels",
+            "color": [255, 165, 0, 255],
+            "illuminate": 0,
+            "pos": [-1268.0, 972.0],
+            "size": [1000, 600]
+        },
+        {
+            "id": "wandering_pixels (8)",
+            "type": "wandering_pixels",
+            "color": [255, 165, 0, 255],
+            "illuminate": 0,
+            "pos": [2672.0, -1392.0],
+            "size": [544, 416]
+        },
+        {
+            "id": "wandering_pixels (9)",
+            "type": "wandering_pixels",
+            "color": [0, 255, 232, 255],
+            "illuminate": 0,
+            "pos": [1556.0, -1204.0],
+            "size": [1000, 600]
+        },
+        {
+            "id": "wandering_pixels (10)",
+            "type": "wandering_pixels",
+            "color": [255, 165, 0, 255],
+            "illuminate": 0,
+            "pos": [-2544.0, -1392.0],
+            "size": [544, 416]
+        },
+        {
+            "id": "wandering_pixels (11)",
+            "type": "wandering_pixels",
+            "color": [255, 165, 0, 255],
+            "illuminate": 0,
+            "pos": [-2432.0, 1136.0],
+            "size": [384, 416]
+        },
+        {
+            "id": "skull_rocket",
+            "type": "skull_rocket",
+            "pos": [-176.0, -210.0]
+        },
+        {
+            "id": "skull_rocket (1)",
+            "type": "skull_rocket",
+            "pos": [112.0, 130.0]
+        },
+        {
+            "id": "elon",
+            "type": "elon",
+            "pos": [-45.0, -80.0]
+        },
+        {
+            "id": "aquarium",
+            "type": "aquarium",
+            "pos": [576.0, -1056.0],
+            "size": [832, 448],
+            "wall_bottom_corners": null,
+            "flower_1": null,
+            "flower_2": "flower_pink",
+            "fish_2": null,
+            "fish_3": null,
+            "fish_6": null,
+            "flip_glass_vertically": 1,
+            "left_bottom_lamp_color": [0, 132, 190, 255],
+            "right_top_lamp_color": [103, 255, 69, 0],
+            "top_lamp_color": [0, 179, 255, 255],
+            "sand_lamp_color": [0, 99, 126, 0]
+        },
+        {
+            "id": "aquarium (1)",
+            "type": "aquarium",
+            "pos": [576.0, 928.0],
+            "rotation": -180.0,
+            "size": [832, 448],
+            "wall_bottom_corners": null,
+            "flower_1": "flower_cyan",
+            "flower_2": null,
+            "coral": "flower_cyan",
+            "fish_1": null,
+            "fish_3": null,
+            "fish_4": null,
+            "fish_5": null,
+            "flip_glass_vertically": 1,
+            "wall_lamp_offset": 631,
+            "left_bottom_lamp_color": [0, 70, 255, 0],
+            "right_top_lamp_color": [55, 255, 0, 255],
+            "top_lamp_color": [0, 0, 0, 0],
+            "sand_lamp_color": [0, 255, 0, 0]
+        },
+        {
+            "id": "ct_spawn (4)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, -705.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (10)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, -579.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, -449.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (1)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, -323.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (2)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, -193.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (3)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, -67.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (5)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, 63.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (6)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, 189.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (7)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, 319.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (8)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, 447.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (9)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1537.0, 575.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (11)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, -705.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (12)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, -579.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (13)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, -449.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (14)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, -323.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (15)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, -193.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (16)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, -67.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (17)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, 63.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (18)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, 189.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (19)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, 319.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (20)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, 447.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (21)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1729.0, 575.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (22)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, -705.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (23)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, -579.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (24)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, -449.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (25)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, -323.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (26)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, -193.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (27)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, -67.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (28)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, 63.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (29)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, 189.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (30)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, 319.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (31)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, 447.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (32)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1345.0, 575.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "ct_spawn (4)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, -705.0]
+        },
+        {
+            "id": "ct_spawn (10)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, -579.0]
+        },
+        {
+            "id": "ct_spawn-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, -449.0]
+        },
+        {
+            "id": "ct_spawn (1)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, -323.0]
+        },
+        {
+            "id": "ct_spawn (2)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, -193.0]
+        },
+        {
+            "id": "ct_spawn (3)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, -67.0]
+        },
+        {
+            "id": "ct_spawn (5)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, 63.0]
+        },
+        {
+            "id": "ct_spawn (6)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, 189.0]
+        },
+        {
+            "id": "ct_spawn (7)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, 319.0]
+        },
+        {
+            "id": "ct_spawn (8)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, 447.0]
+        },
+        {
+            "id": "ct_spawn (9)-ml",
+            "type": "team_spawn",
+            "pos": [-1409.0, 575.0]
+        },
+        {
+            "id": "ct_spawn (11)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, -705.0]
+        },
+        {
+            "id": "ct_spawn (12)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, -579.0]
+        },
+        {
+            "id": "ct_spawn (13)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, -449.0]
+        },
+        {
+            "id": "ct_spawn (14)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, -323.0]
+        },
+        {
+            "id": "ct_spawn (15)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, -193.0]
+        },
+        {
+            "id": "ct_spawn (16)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, -67.0]
+        },
+        {
+            "id": "ct_spawn (17)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, 63.0]
+        },
+        {
+            "id": "ct_spawn (18)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, 189.0]
+        },
+        {
+            "id": "ct_spawn (19)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, 319.0]
+        },
+        {
+            "id": "ct_spawn (20)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, 447.0]
+        },
+        {
+            "id": "ct_spawn (21)-ml",
+            "type": "team_spawn",
+            "pos": [-1601.0, 575.0]
+        },
+        {
+            "id": "ct_spawn (22)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, -705.0]
+        },
+        {
+            "id": "ct_spawn (23)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, -579.0]
+        },
+        {
+            "id": "ct_spawn (24)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, -449.0]
+        },
+        {
+            "id": "ct_spawn (25)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, -323.0]
+        },
+        {
+            "id": "ct_spawn (26)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, -193.0]
+        },
+        {
+            "id": "ct_spawn (27)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, -67.0]
+        },
+        {
+            "id": "ct_spawn (28)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, 63.0]
+        },
+        {
+            "id": "ct_spawn (29)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, 189.0]
+        },
+        {
+            "id": "ct_spawn (30)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, 319.0]
+        },
+        {
+            "id": "ct_spawn (31)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, 447.0]
+        },
+        {
+            "id": "ct_spawn (32)-ml",
+            "type": "team_spawn",
+            "pos": [-1217.0, 575.0]
+        },
+        {
+            "id": "tt_buy_zone",
+            "type": "buy_zone",
+            "pos": [-1408.0, -64.0],
+            "size": [512, 1408]
+        },
+        {
+            "id": "ct_buy_zone",
+            "type": "buy_zone",
+            "faction": "METROPOLIS",
+            "pos": [1536.0, -64.0],
+            "size": [512, 1408]
+        },
+        {
+            "id": "bombsite",
+            "type": "bombsite",
+            "pos": [616.0, 576.0],
+            "size": [592, 256]
+        },
+        {
+            "id": "bombsite (1)",
+            "type": "bombsite",
+            "pos": [584.0, -704.0],
+            "size": [688, 256]
+        },
+        {
+            "id": "bombsite (2)",
+            "type": "bombsite",
+            "pos": [2328.0, -64.0],
+            "size": [688, 256]
+        }
+    ]
+}

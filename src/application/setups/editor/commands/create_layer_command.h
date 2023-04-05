@@ -16,7 +16,7 @@ struct create_layer_command : allocating_command<editor_layer_id> {
 	void redo(editor_command_input in);
 
 	auto describe() const {
-		return std::string("Create ") + created_layer.unique_name;
+		return std::string("Created ") + created_layer.unique_name;
 	}
 
 	auto get_created_id() const {
