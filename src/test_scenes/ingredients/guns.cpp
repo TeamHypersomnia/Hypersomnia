@@ -3641,7 +3641,7 @@ namespace test_flavours {
 			gun_def.recoil_multiplier = 4.f;
 			gun_def.kickback_towards_wielder = kickback_mult * 500.f;
 
-			gun_def.minimum_heat_to_shoot = 0.21f;
+			gun_def.minimum_heat_to_shoot = 0.18f;
 
 			gun_def.heavy_heat_start_sound.id = to_sound_id(test_scene_sound_id::ELON_HRL_LEVER);
 			gun_def.light_heat_start_sound.id = to_sound_id(test_scene_sound_id::ELON_HRL_LEVER);

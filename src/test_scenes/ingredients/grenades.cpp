@@ -588,8 +588,8 @@ namespace test_flavours {
 				{
 					auto& c = explosive.cascade[0];
 					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::SKULL_ROCKET_CASCADE);
-					c.num_spawned = 2;
-					c.num_explosions = { 2, 0 };
+					c.num_spawned = 3;
+					c.num_explosions = { 3, 0 };
 					c.initial_speed = { 1300.f, 0.2f };
 				}
 
@@ -597,7 +597,7 @@ namespace test_flavours {
 					auto& c = explosive.cascade[1];
 					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::SKULL_ROCKET_CASCADE_SMALLER);
 					c.num_spawned = 3;
-					c.num_explosions = { 2, 0 };
+					c.num_explosions = { 3, 0 };
 					c.initial_speed = { 1200.f, 0.6f };
 					c.spawn_angle_variation = 0.5f;
 				}
