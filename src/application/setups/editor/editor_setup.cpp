@@ -1878,6 +1878,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			|| try_preffix("Cannot", red)
 			|| try_preffix("Discarded", orange)
 			|| try_preffix("Reapplied", pink)
+			|| try_preffix("Showing", green)
 			|| try_preffix("Successfully", green)
 			|| try_preffix("Filled", green)
 			|| try_preffix("Exported", green)
@@ -1891,11 +1892,13 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			|| try_preffix("Grouped", yellow)
 			|| try_preffix("Ungrouped", orange)
 			|| try_preffix("Set", green)
+			|| try_preffix("Reset", green)
 			|| try_preffix("Unset", green)
 			|| try_preffix("Switched", green)
 			|| try_preffix("Edited", green)
 			|| try_preffix("Enabled", green)
 			|| try_preffix("Disabled", gray)
+			|| try_preffix("Hiding", gray)
 			|| try_preffix("Selected", yellow)
 			|| try_preffix("Moved", green)
 			|| try_preffix("Rotated", green)
@@ -2637,10 +2640,24 @@ void editor_setup::reset_rotation_of_selected_nodes() {
 
 void editor_setup::toggle_grid() {
 	view.toggle_grid();
+
+	if (view.show_grid) {
+		recent_message.set("Showing grid (%x px)", get_current_grid_size());
+	}
+	else {
+		recent_message.set("Hiding grid (%x px)", get_current_grid_size());
+	}
 }
 
 void editor_setup::toggle_snapping() {
 	view.toggle_snapping();
+
+	if (view.snapping_enabled) {
+		recent_message.set("Enabled grid snapping (%x px)", get_current_grid_size());
+	}
+	else {
+		recent_message.set("Disabled grid snapping (%x px)", get_current_grid_size());
+	}
 }
 
 void editor_setup::clamp_units() {
@@ -2650,11 +2667,15 @@ void editor_setup::clamp_units() {
 void editor_setup::sparser_grid() {
 	view.grid.increase_grid_size();
 	clamp_units();
+
+	recent_message.set("Set grid size to %x px", get_current_grid_size());
 }
 
 void editor_setup::denser_grid() {
 	view.grid.decrease_grid_size();
 	clamp_units();
+
+	recent_message.set("Set grid size to %x px", get_current_grid_size());
 }
 
 int editor_setup::get_current_grid_size() const {

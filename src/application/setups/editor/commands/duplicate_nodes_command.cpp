@@ -87,16 +87,16 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 			return "";
 		}	
 		if (mirror_direction == vec2i(1, 0)) {
-			return "-mr";
+			return "-right";
 		}
 		if (mirror_direction == vec2i(-1, 0)) {
-			return "-ml";
+			return "-left";
 		}
 		if (mirror_direction == vec2i(0, -1)) {
-			return "-mu";
+			return "-up";
 		}
 		if (mirror_direction == vec2i(0, 1)) {
-			return "-md";
+			return "-down";
 		}
 
 		return "-INVALID";

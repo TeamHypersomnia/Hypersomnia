@@ -538,6 +538,10 @@ void resize_entities(
 }
 
 std::string move_nodes_command::describe() const {
+	if (special == special_entity_mover_op::RESET_ROTATION) {
+		return typesafe_sprintf("Reset rotation: %x", built_description);
+	}
+
 	if (rotation_center) {
 		return typesafe_sprintf("Rotated by %x*: %x", static_cast<int>(move_by.rotation), built_description);
 	}
