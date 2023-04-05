@@ -5349,3 +5349,6 @@ Advantages:
 
 - Be strict when loading autosave!
 
+- Fix Rotated By: description
+    - Moved by too
+

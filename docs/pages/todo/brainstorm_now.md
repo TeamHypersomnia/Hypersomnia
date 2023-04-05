@@ -6,33 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Add how many nodes were deleted in the description
-- I'd hide the arrow to communicate a layer is empty
-
-- quick_test-exclusive property: Respawn at team spawns
-    - Disable by default
-
-- Fix Rotated By: description
-    - Moved by too
-
-- Fix maybe how point markers are highlighted because the white aabb edge is completely invisible
-
-- we'll overhaul this anyway but we had an autosave during playtest
-    - but we did place spawns. Well, it's to be expected tbh
-    - Not a bug
-
-- Honor playtest spawns but maybe as respawn points only and spawn where the camera is?
-    - For quick_test, it is okay if all client players appear in the same place as host
-    - the host can anyway predict where their "enemy" is and it's a nice way of meeting in the same place
-    - It is also okay if the players respawn right where they died to keep the "fight" going
-    - with this, there's very little usecase for creating your own quick_test_spawns, but if you want, there's nothing holding you back
-        - position in layers will determine the first order of respawns likely
-        - by default they can only be used to *respawn* instead of spawn
-            - playtesting settings could have a tick to spawn at quick_test_spawn instead of camera center
-    - for now we could disable them
-        - nah maybe let's leave it but just rename it
-
-
 - Let's start again
     - First consider the smallest working model
         - No autosaves, just one session
@@ -81,6 +54,31 @@ summary: That which we are brainstorming at the moment.
         - If you quit now without saving, you'll still be greeted with autosave + last saved
         - And you don't have to worry about the
     - This with not deleting forgotten resources might be the simplest option
+
+- Add how many nodes were deleted in the description
+- I'd hide the arrow to communicate a layer is empty
+
+- quick_test-exclusive property: Respawn at team spawns
+    - Disable by default
+
+- Fix maybe how point markers are highlighted because the white aabb edge is completely invisible
+
+- we'll overhaul this anyway but we had an autosave during playtest
+    - but we did place spawns. Well, it's to be expected tbh
+    - Not a bug
+
+- Honor playtest spawns but maybe as respawn points only and spawn where the camera is?
+    - For quick_test, it is okay if all client players appear in the same place as host
+    - the host can anyway predict where their "enemy" is and it's a nice way of meeting in the same place
+    - It is also okay if the players respawn right where they died to keep the "fight" going
+    - with this, there's very little usecase for creating your own quick_test_spawns, but if you want, there's nothing holding you back
+        - position in layers will determine the first order of respawns likely
+        - by default they can only be used to *respawn* instead of spawn
+            - playtesting settings could have a tick to spawn at quick_test_spawn instead of camera center
+    - for now we could disable them
+        - nah maybe let's leave it but just rename it
+
+
 
 - Also think a bit if all this additional complexity is a better investment than several bandaids
 

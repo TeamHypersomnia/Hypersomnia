@@ -1703,7 +1703,10 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 		in.all_visible,
 		in.config.faction_view,
 
-		[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
+		[&](const auto typed_handle, const auto image_id, const transformr world_transform, rgba color) {
+			/* It's better if we see all icons clearly */
+			color.a = 255;
+
 			const auto screen_space = transformr(vec2i(on_screen(world_transform.pos)), world_transform.rotation);
 
 			{
