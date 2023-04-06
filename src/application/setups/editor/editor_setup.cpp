@@ -114,6 +114,11 @@ editor_setup::editor_setup(
 		history.mark_as_autosaved();
 		autosave_timer.reset();
 
+		/*
+			We need this so that the autosave file isn't removed 
+			when the user exits the editor on a saved revision without explicitly saving it.
+		*/
+
 		dirty_after_loading_autosave = true;
 
 		recent_message.set("Loaded an autosave file.\nTo go back to last saved changes instead,\npress Undo (CTRL+Z).");
@@ -205,6 +210,16 @@ bool editor_setup::handle_input_before_imgui(
 ) {
 	using namespace augs::event;
 
+	if (in.e.msg == message::activate || in.e.msg == message::click_activate) {
+		on_window_activate();
+	}
+
+	if (in.e.msg == message::deactivate) {
+		if (settings.autosave.on_lost_focus) {
+			autosave_now_if_needed();
+		}
+	}
+
 	if (is_playtesting()) {
 		return false;
 	}
@@ -272,15 +287,6 @@ bool editor_setup::handle_input_before_imgui(
 		handle_doubleclick_in_layers_gui = true;
 	}
 
-	if (in.e.msg == message::activate || in.e.msg == message::click_activate) {
-		on_window_activate();
-	}
-
-	if (in.e.msg == message::deactivate) {
-		if (settings.autosave.on_lost_focus) {
-			autosave_now_if_needed();
-		}
-	}
 	return false;
 }
 
@@ -890,6 +896,16 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	*/
 
 	rescan_missing_resources(std::addressof(changes.missing));
+
+	const auto num_missing = rebuilt_project.num_potentially_missing_resources;
+
+	if (num_missing > 0) {
+		LOG("%x resources are *potentially* missing, so they'll be rescanned after every command.", rebuilt_project.num_potentially_missing_resources);
+	}
+	else {
+		LOG("All resources ever seen during this session are still on disk.");
+	}
+
 
 	return changes;
 }
