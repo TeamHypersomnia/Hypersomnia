@@ -6,6 +6,35 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Can'we just save the project state before assigning the saved revision?
+    - This will make it absolutely deterministic
+
+- Alright, EASIEST SOLUTION:
+    - Load pristine projects as they are, don't rebuild their resources
+    - 
+    - We won't even need to parametrize rebuilders by project
+
+
+- Why the heck would we even rebuild these revisions?
+    - The whole point is they won't be used if anything is posted beyond these two
+
+- Uhh, maybe_rehash is a source of indeterminism here
+    - We should rebuild just once and reapply changes to both revisions
+
+- Note that rebuild_pathed_resources_for reassociates resources with the filesystem gui.
+    - So even though the physical filesystem does not change, we have to rerun rebuild_pathed_resources_for
+    - As for missing resources, note that rebuild_pathed_resources_for was always called on a pristine filesystem gui node
+        - So right after recreating it from filesystem
+        - Therefore if no resource matched that filesystem node, the associated resource id is just empty
+        - We might need to rerun an association function
+
+- When we launch with an autosave, do we show the report of redirects/missings for the autosave or for the saved state?
+    - I say autosave
+        - That is because it's meant to be the newer one
+- Then we need to do the redirects for both project states saved incrementally
+
+- Also remember to rebuild_project_special_filesystem
+
 - Watch out to *not* automatically autosave when we auto-redirect post-project load
     - (since we do after successful redirects normally)
     - Shouldn't happen because we'll always be at autosave post-load

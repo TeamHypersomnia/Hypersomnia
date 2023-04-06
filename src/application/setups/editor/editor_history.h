@@ -45,12 +45,12 @@ struct editor_history : public editor_history_base {
 
 	void set_dirty_flag() {}
 
-	void mark_as_just_saved() {
+	void mark_revision_as_saved() {
 		saved_at_revision = get_current_revision();
 		last_autosaved_revision = std::nullopt;
 	}
 
-	void mark_as_autosaved() {
+	void mark_revision_as_autosaved() {
 		last_autosaved_revision = get_current_revision();
 	}
 

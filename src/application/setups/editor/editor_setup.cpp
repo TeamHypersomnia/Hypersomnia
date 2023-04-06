@@ -95,7 +95,9 @@ editor_setup::editor_setup(
 		throw augs::json_deserialization_error("(%x):\n%x", paths.project_json.filename().string(), err.what());
 	}
 
-	history.mark_as_just_saved();
+	history.mark_revision_as_saved();
+
+	rescan_physical_filesystem();
 
 	try {
 		auto autosaved_project = std::make_unique<editor_project>(editor_project_readwrite::read_project_json(
@@ -111,7 +113,7 @@ editor_setup::editor_setup(
 		cmd.built_description = std::string("Loaded autosave from ") + paths.autosave_json.filename().string();
 
 		post_new_command(std::move(cmd));
-		history.mark_as_autosaved();
+		history.mark_revision_as_autosaved();
 		autosave_timer.reset();
 
 		/*
@@ -129,14 +131,18 @@ editor_setup::editor_setup(
 	}
 	catch (...) {
 		LOG("No autosave file was found.");
-	}
 
-	gui.filesystem.rebuild_project_special_filesystem(*this);
+		/*
+			This is otherwise already called by assign_project in replace_whole_project_command.
+			If we don't load autosave, we need to manually call this for the current project.
+		*/
+
+		on_project_assigned();
+	}
 
 	load_gui_state();
 	open_default_windows();
 
-	rebuild_filesystem();
 	rebuild_arena();
 	save_last_project_location();
 }
@@ -588,11 +594,11 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 }
 
 void editor_setup::on_window_activate() {
-	rebuild_filesystem();
+	on_filesystem_change();
 	rebuild_arena();
 }
 
-void editor_setup::rebuild_filesystem() {
+void editor_setup::rescan_physical_filesystem() {
 	last_ignored_paths.clear();
 
 	auto should_skip_sanitization = [&](auto path) {
@@ -602,50 +608,6 @@ void editor_setup::rebuild_filesystem() {
 	files.rebuild_from(paths.project_folder, should_skip_sanitization, last_ignored_paths);
 	gui.filesystem.clear_drag_drop();
 	rebuild_ad_hoc_atlas = true;
-
-	const auto changes = rebuild_pathed_resources();
-
-	if (changes.any()) {
-		simple_popup changes_popup;
-
-		changes_popup.title = "Detected changes in filesystem";
-		std::string summary;
-
-		const int redirs = changes.redirects.size();
-		const int missing = changes.missing.size();
-
-		if (missing > 0) {
-			auto f = missing == 1 ? "file is" : "files are";
-			summary += typesafe_sprintf("%x %x missing!\n", missing, f);
-		}
-
-		if (redirs > 0) {
-			auto f = redirs == 1 ? "file has" : "files have";
-			summary += typesafe_sprintf("%x %x been automatically redirected.\n", redirs, f);
-		}
-
-		std::string details;
-
-		for (auto& c : changes.missing) {
-			details += typesafe_sprintf("Missing: %x\n", c.string());
-		}
-
-		for (auto& r : changes.redirects) {
-			details += typesafe_sprintf("Redirected: %x -> %x\n", r.first.string(), r.second.string());
-		}
-
-		changes_popup.title = "Detected changes in filesystem";
-		changes_popup.message = summary;
-		changes_popup.details = details;
-
-		if (changes.redirects.size() > 0) {
-			changes_popup.warning_notice = "Please save the project to remember the redirected paths.";
-			dirty_after_redirecting_paths = true;
-			force_autosave();
-		}
-
-		ok_only_popup_2 = changes_popup;
-	}
 
 	if (last_ignored_paths.size() > 0) {
 		simple_popup ignored_popup;
@@ -666,6 +628,67 @@ void editor_setup::rebuild_filesystem() {
 	}
 }
 
+void editor_setup::report_changed_paths(const editor_paths_changed_report& changes) {
+	if (!changes.any()) {
+		return;
+	}
+
+	simple_popup changes_popup;
+
+	changes_popup.title = "Detected changes in filesystem";
+	std::string summary;
+
+	const int redirs = changes.redirects.size();
+	const int missing = changes.missing.size();
+
+	if (missing > 0) {
+		auto f = missing == 1 ? "file is" : "files are";
+		summary += typesafe_sprintf("%x %x missing!\n", missing, f);
+	}
+
+	if (redirs > 0) {
+		auto f = redirs == 1 ? "file has" : "files have";
+		summary += typesafe_sprintf("%x %x been automatically redirected.\n", redirs, f);
+	}
+
+	std::string details;
+
+	for (auto& c : changes.missing) {
+		details += typesafe_sprintf("Missing: %x\n", c.string());
+	}
+
+	for (auto& r : changes.redirects) {
+		details += typesafe_sprintf("Redirected: %x -> %x\n", r.first.string(), r.second.string());
+	}
+
+	changes_popup.title = "Detected changes in filesystem";
+	changes_popup.message = summary;
+	changes_popup.details = details;
+
+	if (changes.redirects.size() > 0) {
+		changes_popup.warning_notice = "Please save the project to remember the redirected paths.";
+		dirty_after_redirecting_paths = true;
+		force_autosave();
+	}
+
+	ok_only_popup_2 = changes_popup;
+}
+
+void editor_setup::on_filesystem_change() {
+	rescan_physical_filesystem();
+	report_changed_paths(rebuild_pathed_resources());	
+}
+
+void editor_setup::on_project_assigned() {
+	report_changed_paths(rebuild_pathed_resources());
+	gui.filesystem.rebuild_project_special_filesystem(*this);
+}
+
+void editor_setup::assign_project(const editor_project& new_project) {
+	project = new_project;
+	on_project_assigned();
+}
+
 augs::path_type editor_setup::resolve_project_path(const augs::path_type& path_in_project) const {
 	return paths.project_folder / path_in_project;
 }
@@ -680,9 +703,10 @@ augs::path_type editor_setup::resolve_project_path(const augs::path_type& path_i
 */
 
 editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
-	editor_paths_changed_report changes;
-
 	auto& rebuilt_project = project;
+
+	editor_paths_changed_report changes;
+	rebuild_ad_hoc_atlas = true;
 
 	/*
 		Before allocating a resource, we want to first check if one exists with this content hash,
@@ -878,6 +902,10 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 				}
 			};
 
+			/* In case it's missing */
+
+			file.associated_resource = {};
+
 			if (!match_path_to_existing_resource()) {
 				redirect_by_hash_or_register_new();
 			}
@@ -915,7 +943,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	}
 
 	/*
-		We'll need to know if we any resources we actually reference are now missing.
+		We'll need to know if any resources we actually reference are now missing.
 	*/
 
 	rescan_missing_resources(std::addressof(changes.missing));
@@ -925,7 +953,6 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 
 void editor_setup::rescan_missing_resources(std::vector<augs::path_type>* const out_report) { 
 	auto& rebuilt_project = project;
-
 	rebuilt_project.last_missing_resources.clear();
 
 	if (rebuilt_project.last_unbacked_resources.empty()) {
@@ -985,7 +1012,7 @@ void editor_setup::remove_autosave_file() {
 }
 
 void editor_setup::save() {
-	history.mark_as_just_saved();
+	history.mark_revision_as_saved();
 	autosave_timer.reset();
 
 	dirty_after_loading_autosave = false;
@@ -1042,7 +1069,7 @@ void editor_setup::force_autosave() {
 	save_project_file_as(paths.autosave_json);
 
 	recent_message.set("Autosaved current changes to: %x", paths.autosave_json.filename().string());
-	history.mark_as_autosaved();
+	history.mark_revision_as_autosaved();
 	autosave_timer.reset();
 }
 

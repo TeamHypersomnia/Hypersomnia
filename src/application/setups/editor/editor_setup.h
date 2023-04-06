@@ -169,8 +169,11 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	void create_official_prefabs();
 
 	void on_window_activate();
-	void rebuild_filesystem();
+	void on_filesystem_change();
+
+	void rescan_physical_filesystem();
 	editor_paths_changed_report rebuild_pathed_resources();
+	void report_changed_paths(const editor_paths_changed_report&);
 
 	void rescan_missing_resources(std::vector<augs::path_type>* out_report = nullptr);
 
@@ -206,8 +209,6 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	friend edit_project_settings_command;
 
 	friend editor_node_mover;
-
-	friend replace_whole_project_command;
 
 	cosmos& get_cosmos() {
 		return scene.world;
@@ -754,4 +755,7 @@ public:
 	editor_arena_handle<true> get_arena_handle() const;
 
 	bool is_dirty() const;
+
+	void assign_project(const editor_project&);
+	void on_project_assigned();
 };
