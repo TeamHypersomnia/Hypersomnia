@@ -671,10 +671,18 @@ void editor_setup::on_window_activate() {
 
 	const auto result = rebuild_pathed_resources();
 
+	if (is_playtesting()) {
+		if (result.any()) {
+			stop_playtesting();
+		}
+	}
+
 	report_changed_paths(result);	
 	autosave_if_redirected(result, during_activate, undoing_to_first_revision);
 
-	rebuild_arena();
+	if (!is_playtesting()) {
+		rebuild_arena();
+	}
 }
 
 void editor_setup::rescan_physical_filesystem() {

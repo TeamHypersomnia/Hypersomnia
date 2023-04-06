@@ -80,6 +80,8 @@ summary: Just a hidden scratchpad.
 
 ## Editor final MVP (post MVP) once we can ditch old maps
 
+- remove fy_minilab_reloaded-only clause from project selector where it's scanning for official areas
+
 - Ensure all official floors have *some* footsteps set
 
 - Full illumination maybe per entity too for foregrounds
