@@ -74,9 +74,6 @@ summary: That which we are brainstorming at the moment.
         - And you don't have to worry about the
     - This with not deleting forgotten resources might be the simplest option
 
-- Add how many nodes were deleted in the description
-- I'd hide the arrow to communicate a layer is empty
-
 - quick_test-exclusive property: Respawn at team spawns
     - Disable by default
 

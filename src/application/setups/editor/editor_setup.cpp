@@ -2360,11 +2360,16 @@ void editor_setup::delete_selection() {
 		}
 
 		if (!nodes_command.empty()) {
+			layer_command.built_description += typesafe_sprintf(" (with %x nodes)", nodes_command.size());
+			nodes_command.built_description = layer_command.built_description;
+
 			post_new_command(std::move(nodes_command));
 			post_new_command(std::move(layer_command));
 			make_last_command_a_child();
 		}
 		else if (!layer_command.empty()) {
+			layer_command.built_description += " (empty)";
+
 			post_new_command(std::move(layer_command));
 		}
 	}

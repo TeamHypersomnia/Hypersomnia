@@ -5359,3 +5359,6 @@ Advantages:
     - But a separate vector of resources with found_on_disk = false
     - Because we're only checking for changed resource counts
 
+- Add how many nodes were deleted in the description
+- I'd hide the arrow to communicate a layer is empty
+

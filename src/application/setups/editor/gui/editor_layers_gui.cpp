@@ -957,6 +957,11 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 					else {
 						text(label);
+
+						if (const bool layer_is_empty = layer.hierarchy.nodes.empty()) {
+							ImGui::SameLine();
+							text_disabled("(empty)");
+						}
 					}
 				}
 
