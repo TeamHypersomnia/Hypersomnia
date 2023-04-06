@@ -41,6 +41,9 @@ struct editor_project {
 	editor_layers layers;
 	// END GEN INTROSPECTOR
 
+	std::vector<editor_resource_id> last_missing_resources;
+	uint32_t num_potentially_missing_resources = 0;
+
 	template <typename T>
 	auto& get() {
 		if constexpr(std::is_same_v<editor_project_about, T>) {

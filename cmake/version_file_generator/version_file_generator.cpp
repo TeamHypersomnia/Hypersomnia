@@ -77,7 +77,8 @@ int main(int argc, char** argv) {
 		git_commit_number,
 		git_commit_message,
 		git_commit_date,
-		git_commit_hash
+		git_commit_hash,
+		git_working_tree_changes_lines
 	);
 
 	augs::save_as_text_if_different(

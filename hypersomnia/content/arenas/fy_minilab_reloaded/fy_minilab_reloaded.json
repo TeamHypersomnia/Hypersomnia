@@ -28,45 +28,44 @@
     "layers": [
         {
             "id": "markers",
-            "is_open_in_editor": false,
             "active": false,
             "nodes": [
                 "ct_spawn (32)-ml",
                 "bombsite (2)",
                 "bombsite (1)",
                 "bombsite",
-                "ct_spawn (31)-ml",
-                "ct_spawn (30)-ml",
-                "ct_spawn (29)-ml",
-                "ct_spawn (28)-ml",
-                "ct_spawn (27)-ml",
-                "ct_spawn (26)-ml",
-                "ct_spawn (25)-ml",
-                "ct_spawn (24)-ml",
-                "ct_spawn (23)-ml",
-                "ct_spawn (22)-ml",
-                "ct_spawn (21)-ml",
-                "ct_spawn (20)-ml",
-                "ct_spawn (19)-ml",
-                "ct_spawn (18)-ml",
-                "ct_spawn (17)-ml",
-                "ct_spawn (16)-ml",
-                "ct_spawn (15)-ml",
-                "ct_spawn (14)-ml",
-                "ct_spawn (13)-ml",
-                "ct_spawn (12)-ml",
-                "ct_spawn (11)-ml",
-                "ct_spawn (9)-ml",
-                "ct_spawn (8)-ml",
-                "ct_spawn (7)-ml",
-                "ct_spawn (6)-ml",
-                "ct_spawn (5)-ml",
-                "ct_spawn (3)-ml",
-                "ct_spawn (2)-ml",
-                "ct_spawn (1)-ml",
-                "ct_spawn-ml",
-                "ct_spawn (10)-ml",
-                "ct_spawn (4)-ml",
+                "t_spawn",
+                "t_spawn (1)",
+                "t_spawn (2)",
+                "t_spawn (3)",
+                "t_spawn (4)",
+                "t_spawn (5)",
+                "t_spawn (6)",
+                "t_spawn (7)",
+                "t_spawn (8)",
+                "t_spawn (9)",
+                "t_spawn (10)",
+                "t_spawn (11)",
+                "t_spawn (12)",
+                "t_spawn (13)",
+                "t_spawn (14)",
+                "t_spawn (15)",
+                "t_spawn (16)",
+                "t_spawn (17)",
+                "t_spawn (18)",
+                "t_spawn (19)",
+                "t_spawn (20)",
+                "t_spawn (21)",
+                "t_spawn (22)",
+                "t_spawn (23)",
+                "t_spawn (24)",
+                "t_spawn (25)",
+                "t_spawn (26)",
+                "t_spawn (27)",
+                "t_spawn (28)",
+                "t_spawn (29)",
+                "t_spawn (30)",
+                "t_spawn (31)",
                 "ct_spawn (32)",
                 "ct_spawn (31)",
                 "ct_spawn (30)",
@@ -1429,162 +1428,162 @@
             "rotation": -180.0
         },
         {
-            "id": "ct_spawn (4)-ml",
+            "id": "t_spawn (31)",
             "type": "team_spawn",
             "pos": [-1409.0, -705.0]
         },
         {
-            "id": "ct_spawn (10)-ml",
+            "id": "t_spawn (30)",
             "type": "team_spawn",
             "pos": [-1409.0, -579.0]
         },
         {
-            "id": "ct_spawn-ml",
+            "id": "t_spawn (29)",
             "type": "team_spawn",
             "pos": [-1409.0, -449.0]
         },
         {
-            "id": "ct_spawn (1)-ml",
+            "id": "t_spawn (28)",
             "type": "team_spawn",
             "pos": [-1409.0, -323.0]
         },
         {
-            "id": "ct_spawn (2)-ml",
+            "id": "t_spawn (27)",
             "type": "team_spawn",
             "pos": [-1409.0, -193.0]
         },
         {
-            "id": "ct_spawn (3)-ml",
+            "id": "t_spawn (26)",
             "type": "team_spawn",
             "pos": [-1409.0, -67.0]
         },
         {
-            "id": "ct_spawn (5)-ml",
+            "id": "t_spawn (25)",
             "type": "team_spawn",
             "pos": [-1409.0, 63.0]
         },
         {
-            "id": "ct_spawn (6)-ml",
+            "id": "t_spawn (24)",
             "type": "team_spawn",
             "pos": [-1409.0, 189.0]
         },
         {
-            "id": "ct_spawn (7)-ml",
+            "id": "t_spawn (23)",
             "type": "team_spawn",
             "pos": [-1409.0, 319.0]
         },
         {
-            "id": "ct_spawn (8)-ml",
+            "id": "t_spawn (22)",
             "type": "team_spawn",
             "pos": [-1409.0, 447.0]
         },
         {
-            "id": "ct_spawn (9)-ml",
+            "id": "t_spawn (21)",
             "type": "team_spawn",
             "pos": [-1409.0, 575.0]
         },
         {
-            "id": "ct_spawn (11)-ml",
+            "id": "t_spawn (20)",
             "type": "team_spawn",
             "pos": [-1601.0, -705.0]
         },
         {
-            "id": "ct_spawn (12)-ml",
+            "id": "t_spawn (19)",
             "type": "team_spawn",
             "pos": [-1601.0, -579.0]
         },
         {
-            "id": "ct_spawn (13)-ml",
+            "id": "t_spawn (18)",
             "type": "team_spawn",
             "pos": [-1601.0, -449.0]
         },
         {
-            "id": "ct_spawn (14)-ml",
+            "id": "t_spawn (17)",
             "type": "team_spawn",
             "pos": [-1601.0, -323.0]
         },
         {
-            "id": "ct_spawn (15)-ml",
+            "id": "t_spawn (16)",
             "type": "team_spawn",
             "pos": [-1601.0, -193.0]
         },
         {
-            "id": "ct_spawn (16)-ml",
+            "id": "t_spawn (15)",
             "type": "team_spawn",
             "pos": [-1601.0, -67.0]
         },
         {
-            "id": "ct_spawn (17)-ml",
+            "id": "t_spawn (14)",
             "type": "team_spawn",
             "pos": [-1601.0, 63.0]
         },
         {
-            "id": "ct_spawn (18)-ml",
+            "id": "t_spawn (13)",
             "type": "team_spawn",
             "pos": [-1601.0, 189.0]
         },
         {
-            "id": "ct_spawn (19)-ml",
+            "id": "t_spawn (12)",
             "type": "team_spawn",
             "pos": [-1601.0, 319.0]
         },
         {
-            "id": "ct_spawn (20)-ml",
+            "id": "t_spawn (11)",
             "type": "team_spawn",
             "pos": [-1601.0, 447.0]
         },
         {
-            "id": "ct_spawn (21)-ml",
+            "id": "t_spawn (10)",
             "type": "team_spawn",
             "pos": [-1601.0, 575.0]
         },
         {
-            "id": "ct_spawn (22)-ml",
+            "id": "t_spawn (9)",
             "type": "team_spawn",
             "pos": [-1217.0, -705.0]
         },
         {
-            "id": "ct_spawn (23)-ml",
+            "id": "t_spawn (8)",
             "type": "team_spawn",
             "pos": [-1217.0, -579.0]
         },
         {
-            "id": "ct_spawn (24)-ml",
+            "id": "t_spawn (7)",
             "type": "team_spawn",
             "pos": [-1217.0, -449.0]
         },
         {
-            "id": "ct_spawn (25)-ml",
+            "id": "t_spawn (6)",
             "type": "team_spawn",
             "pos": [-1217.0, -323.0]
         },
         {
-            "id": "ct_spawn (26)-ml",
+            "id": "t_spawn (5)",
             "type": "team_spawn",
             "pos": [-1217.0, -193.0]
         },
         {
-            "id": "ct_spawn (27)-ml",
+            "id": "t_spawn (4)",
             "type": "team_spawn",
             "pos": [-1217.0, -67.0]
         },
         {
-            "id": "ct_spawn (28)-ml",
+            "id": "t_spawn (3)",
             "type": "team_spawn",
             "pos": [-1217.0, 63.0]
         },
         {
-            "id": "ct_spawn (29)-ml",
+            "id": "t_spawn (2)",
             "type": "team_spawn",
             "pos": [-1217.0, 189.0]
         },
         {
-            "id": "ct_spawn (30)-ml",
+            "id": "t_spawn (1)",
             "type": "team_spawn",
             "pos": [-1217.0, 319.0]
         },
         {
-            "id": "ct_spawn (31)-ml",
+            "id": "t_spawn",
             "type": "team_spawn",
             "pos": [-1217.0, 447.0]
         },

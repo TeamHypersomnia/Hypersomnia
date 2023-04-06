@@ -172,6 +172,9 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	void rebuild_filesystem();
 	editor_paths_changed_report rebuild_pathed_resources();
 
+	void rescan_missing_resources(std::vector<augs::path_type>* out_report = nullptr);
+	void rescan_missing_resources_if_potentially_any();
+
 	void remove_autosave_file();
 	void force_autosave();
 	void autosave_now_if_needed();

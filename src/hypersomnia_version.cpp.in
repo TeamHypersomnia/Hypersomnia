@@ -15,7 +15,8 @@ hypersomnia_version::hypersomnia_version() :
 	commit_message("%x"),
 	commit_date("%x"),
 	commit_hash("%x"),
-	working_tree_changes({})
+	working_tree_changes({
+%x	})
 {
 }
 

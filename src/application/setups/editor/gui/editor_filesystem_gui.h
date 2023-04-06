@@ -12,7 +12,8 @@ class images_in_atlas_map;
 
 enum class editor_resources_tab_type {
 	PROJECT,
-	OFFICIAL
+	OFFICIAL,
+	MISSING
 };
 
 struct editor_filesystem_node;

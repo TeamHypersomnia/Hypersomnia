@@ -195,11 +195,152 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 		}
 	);
 
-	auto child = scoped_child(showing_official() ? "nodes official view" : "nodes project view");
+	auto do_missing_files_tab = [&]() {
+		const auto avail = ImGui::GetContentRegionAvail();
+		auto spacing = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
-	const bool with_closed_folders = filter.IsActive();
+		const auto bg_cols = std::array<rgba, 3> {
+			rgba(255, 0, 0, 15),
+			rgba(255, 0, 0, 30),
+			rgba(255, 0, 0, 60)
+		};
+
+		const auto selected_cols = std::array<rgba, 3> {
+			rgba(255, 0, 0, 80),
+			rgba(255, 0, 0, 80),
+			rgba(255, 0, 0, 80)
+		};
+
+		auto tab_button = [&](const std::string& label, const editor_resources_tab_type type) {
+			const bool selected = current_tab == type;
+			auto cols = scoped_button_colors(selected ? selected_cols : bg_cols);
+
+			if (ImGui::Button(label.c_str(), ImVec2(avail.x, 0))) {
+				current_tab = type;
+			}
+		};
+
+		const auto missing_label = typesafe_sprintf("Missing files (%x)", in.setup.get_project().last_missing_resources.size());
+		auto scoped_text = scoped_text_color(rgba(255, 30, 30, 255));
+
+		tab_button(missing_label, editor_resources_tab_type::MISSING);
+
+		return false;
+	};
+
+	{
+		const auto& project = in.setup.get_project();
+
+		if (project.last_missing_resources.empty()) {
+			if (current_tab == editor_resources_tab_type::MISSING) {
+				current_tab = editor_resources_tab_type::PROJECT;
+			}
+		}
+		else {
+			do_missing_files_tab();
+		}
+
+	}
 
 	editor_filesystem_node* currently_viewed_root = &files_root;
+	const bool with_closed_folders = filter.IsActive();
+
+	auto handle_pressed_resource_id = [&](const auto pressed_resource_id) {
+		if (!in.setup.exists(pressed_resource_id)) {
+			return;
+		}
+
+		if (ImGui::GetIO().KeyShift && !in.setup.wants_multiple_selection()) {
+			auto last_inspected = in.setup.get_last_inspected_any();
+			auto last_resource = std::get_if<editor_resource_id>(&last_inspected);
+
+			const auto shift_clicked_resource_id = pressed_resource_id;
+
+			if (in.setup.inspects_any<editor_resource_id>() && last_resource && *last_resource != shift_clicked_resource_id) {
+				int state = 0;
+
+				in.setup.clear_inspector();
+
+				auto shift_click_callback = [&state, &last_resource, &shift_clicked_resource_id, &in](editor_filesystem_node& it_node) {
+					if (state == 2) {
+						return;
+					}
+
+					const editor_resource_id id = it_node.associated_resource;
+
+					if (id == shift_clicked_resource_id || id == *last_resource) {
+						++state;
+					}
+
+					if (state && id.is_set()) {
+						in.setup.inspect_add_quiet(id);
+					}
+				};
+
+				currently_viewed_root->in_ui_order(shift_click_callback, with_closed_folders);
+
+				in.setup.after_quietly_adding_inspected();
+				in.setup.quiet_set_last_inspected_any(*last_resource);
+			}
+		}
+		else {
+			in.setup.inspect(pressed_resource_id);
+		}
+	};
+
+	if (current_tab == editor_resources_tab_type::MISSING) {
+		const auto& project = in.setup.get_project();
+
+		editor_filesystem_node missing_root;
+		currently_viewed_root = &missing_root;
+
+		for (const auto& missing : project.last_missing_resources) {
+			in.setup.on_resource(
+				missing,
+				[&]<typename R>(const R& resource, const auto id) {
+					if constexpr(is_pathed_resource_v<R>) {
+						editor_filesystem_node virtual_missing_node;
+
+						virtual_missing_node.associated_resource = id.operator editor_resource_id();
+						virtual_missing_node.name = resource.external_file.path_in_project.string();
+
+						missing_root.files.emplace_back(std::move(virtual_missing_node));
+					}
+				}
+			);
+		}
+
+		auto child = scoped_child("missing resources view");
+
+		auto node_callback = [&](const editor_filesystem_node& node) {
+			const bool filter_active = filter.IsActive();
+
+			if (filter_active) {
+				if (!node.passed_filter) {
+					return;
+				}
+			}
+
+			const bool pressed = filesystem_node_widget(
+				in.setup,
+				node,
+				editor_icon_info_in(in),
+				dragged_resource,
+				std::nullopt,
+				[&]() {}
+			);
+
+			if (pressed) {
+				handle_pressed_resource_id(node.associated_resource);
+			}
+		};
+
+		missing_root.in_ui_order(node_callback, with_closed_folders);
+
+		return;
+	}
+
+	auto child = scoped_child(showing_official() ? "official resources view" : "project resources view");
 
 	auto node_callback = [&](editor_filesystem_node& node) {
 		auto id_scope = scoped_id(id_counter++);
@@ -313,44 +454,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 				}
 			}
 			else {
-				if (in.setup.exists(node.associated_resource)) {
-					if (ImGui::GetIO().KeyShift && !in.setup.wants_multiple_selection()) {
-						auto last_inspected = in.setup.get_last_inspected_any();
-						auto last_resource = std::get_if<editor_resource_id>(&last_inspected);
-
-						const auto shift_clicked_resource_id = node.associated_resource;
-
-						if (in.setup.inspects_any<editor_resource_id>() && last_resource && *last_resource != shift_clicked_resource_id) {
-							int state = 0;
-
-							in.setup.clear_inspector();
-
-							auto shift_click_callback = [&state, &last_resource, &shift_clicked_resource_id, &in](editor_filesystem_node& it_node) {
-								if (state == 2) {
-									return;
-								}
-
-								const editor_resource_id id = it_node.associated_resource;
-
-								if (id == shift_clicked_resource_id || id == *last_resource) {
-									++state;
-								}
-
-								if (state && id.is_set()) {
-									in.setup.inspect_add_quiet(id);
-								}
-							};
-
-							currently_viewed_root->in_ui_order(shift_click_callback, with_closed_folders);
-
-							in.setup.after_quietly_adding_inspected();
-							in.setup.quiet_set_last_inspected_any(*last_resource);
-						}
-					}
-					else {
-						in.setup.inspect(node.associated_resource);
-					}
-				}
+				handle_pressed_resource_id(node.associated_resource);
 			}
 		}
 	};

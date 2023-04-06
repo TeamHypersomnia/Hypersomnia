@@ -27,8 +27,10 @@ summary: That which we are brainstorming at the moment.
                 - Implementation detail: We'll need to rescan reference counts after every command.
                     - This is so that we know if we have to report resource as missing.
                 - Technically, execute_new cannot introduce a dependency on an unbacked/forgotten resource (making it missing).
+                    - But it can FIX REFERENCES TO MISSING ONES!
+                        - so we need to rescan either way
                     - because it will not show in the filesystem gui.
-                    - undo/redo can.
+                    - undo/redo can, and also rescanning pathed resources can
                     - if performance is an issue, we can ONLY do this if there is at least ONE unbacked/missing resource.
                         - although if there's even a single unbacked one (with already removed references) we'll have to rescan always
                             - We could stop rescanning all commands after the first one that removes all references to it.

@@ -8,6 +8,28 @@ constexpr bool skip_scene_rebuild_v = is_one_of_v<T,
 	inspect_command
 >;
 
+/*
+	Renames and transformations should be safe.
+	Others, not so much, they might edit some resource property.
+*/
+
+template <class T>
+constexpr bool skip_missing_resources_check_v = is_one_of_v<T,
+	inspect_command,
+
+	rename_node_command,
+	rename_layer_command,
+
+	reorder_nodes_command,
+	reorder_layers_command,
+
+	move_nodes_command,
+	resize_nodes_command,
+	flip_nodes_command,
+	toggle_nodes_active_command,
+	toggle_layers_active_command
+>;
+
 template <class T>
 const T& editor_setup::post_new_command(T&& command) {
 	gui.history.scroll_to_latest_once = true;
@@ -15,6 +37,10 @@ const T& editor_setup::post_new_command(T&& command) {
 
 	if constexpr(!skip_scene_rebuild_v<T>) {
 		rebuild_arena();
+	}
+
+	if constexpr(!skip_missing_resources_check_v<T>) {
+		rescan_missing_resources_if_potentially_any();
 	}
 
 	if constexpr(std::is_base_of_v<allocating_command<editor_node_pool_id>, T>) {
@@ -38,6 +64,10 @@ const T& editor_setup::rewrite_last_command(T&& command) {
 	const T& result = history.execute_new(std::forward<T>(command), make_command_input(true));
 
 	rebuild_arena(); 
+
+	if constexpr(!skip_missing_resources_check_v<remove_cref<T>>) {
+		rescan_missing_resources_if_potentially_any();
+	}
 
 	return result;
 }

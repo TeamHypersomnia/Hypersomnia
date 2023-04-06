@@ -660,11 +660,19 @@ augs::path_type editor_setup::resolve_project_path(const augs::path_type& path_i
 	return paths.project_folder / path_in_project;
 }
 
+/*
+	Corner cases:
+
+	If someone moves a file AND modifies it too, it will simply be considered missing.
+	Then every time you activate the window the editor will try redirecting the deleted files.
+
+	But you should still be able to clear all references to said resource and forcefully forget it.
+*/
+
 editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	editor_paths_changed_report changes;
 
 	auto& rebuilt_project = project;
-	rebuilt_project.rescan_pathed_resources_to_track(official_resources, official_resource_map);
 
 	/*
 		Before allocating a resource, we want to first check if one exists with this content hash,
@@ -869,17 +877,6 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 
 		rebuilt_project.for_each_resource<resource_type>(map_all_resources);
 		files.root.for_each_file_recursive(add_if_new_or_redirect);
-
-		for (auto& entry : pool) {
-			if (missing_on_disk(entry)) {
-				/* 
-					If it's still missing after all redirecting, 
-					then it is indeed missing.
-				*/
-
-				changes.missing.emplace_back(entry.external_file.path_in_project);
-			}
-		}
 	};
 
 	auto& sprite_pool = rebuilt_project.resources.pools.template get_for<editor_sprite_resource>();
@@ -889,15 +886,89 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	handle_pool(sound_pool,  editor_filesystem_node_type::SOUND);
 
 	/*
-		Corner cases:
-
-		If someone deletes a resource file (e.g. .png or .ogg), it's still in memory and its parameters will be written to the json file.
-		If someone moves a file AND modifies it too, it will simply be considered missing.
-
-		Every time you activate the window the editor will try redirecting the deleted files.
+		We'll need to know if we any resources we actually reference are now missing.
 	*/
 
+	rescan_missing_resources(std::addressof(changes.missing));
+
 	return changes;
+}
+
+void editor_setup::rescan_missing_resources_if_potentially_any() { 
+	auto& rebuilt_project = project;
+
+	if (rebuilt_project.num_potentially_missing_resources > 0) {
+		rescan_missing_resources();
+	}
+}
+
+void editor_setup::rescan_missing_resources(std::vector<augs::path_type>* const out_report) { 
+	auto& rebuilt_project = project;
+
+	// LOG("RESCAN_MISSING_RESOURCES");
+
+	struct entry {
+		std::string path;
+		editor_resource_id id;
+
+		bool operator<(const entry& b) const {
+			return augs::natural_order(path, b.path);
+		}
+	};
+
+	std::vector<entry> missing;
+
+	rebuilt_project.rescan_pathed_resources_to_track(official_resources, official_resource_map);
+	rebuilt_project.num_potentially_missing_resources = 0;
+
+	auto missing_on_disk = [&](const auto& resource) {
+		return !resource.found_on_disk;
+	};
+
+	auto rescan_missing = [&](const auto id, const auto& resource) {
+		/* 
+			If it's still missing after all redirecting, 
+			then it is indeed missing.
+		*/
+
+		if (missing_on_disk(resource)) {
+			// LOG("MISSING: %x", resource.external_file.path_in_project);
+
+			/* 
+				This counter will force us to rescan for missing resources
+				every time we post a command.
+
+				This is because dangling ids to missing resources might be left somewhere in command history,
+				even though the current revision reports no "missing" resources, 
+				i.e. resources that are CURRENTLY in use by the project but have no backing file.
+			*/
+
+			++rebuilt_project.num_potentially_missing_resources;
+
+			if (resource.should_be_tracked()) {
+				missing.push_back({ resource.external_file.path_in_project.string(), id.operator editor_resource_id() });
+			}
+		}
+	};
+
+	rebuilt_project.for_each_resource<editor_sprite_resource>(rescan_missing);
+	rebuilt_project.for_each_resource<editor_sound_resource>(rescan_missing);
+
+	sort_range(missing);
+
+	if (out_report) {
+		for (auto& e : missing) {
+			out_report->push_back(e.path);
+		}
+	}
+
+	rebuilt_project.last_missing_resources.clear();
+
+	for (auto& e : missing) {
+		rebuilt_project.last_missing_resources.push_back(e.id);
+	}
+
+	// LOG_NVPS(rebuilt_project.last_missing_resources.size(), rebuilt_project.num_potentially_missing_resources);
 }
 
 void editor_setup::remove_autosave_file() {
@@ -1198,10 +1269,15 @@ void editor_setup::undo() {
 		gui.history.scroll_to_current_once = true;
 
 		bool should_rebuild = true;
+		bool should_rescan_missing = true;
 
 		auto check_rebuild = [&]<typename T>(const T&) {
 			if constexpr(skip_scene_rebuild_v<T>) {
 				should_rebuild = false;
+			}
+
+			if constexpr(skip_missing_resources_check_v<T>) {
+				should_rescan_missing = false;
 			}
 		};
 
@@ -1212,6 +1288,10 @@ void editor_setup::undo() {
 
 		if (should_rebuild) {
 			rebuild_arena();
+		}
+
+		if (should_rescan_missing) {
+			rescan_missing_resources_if_potentially_any();
 		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
@@ -1231,10 +1311,15 @@ void editor_setup::redo() {
 		gui.history.scroll_to_current_once = true;
 
 		bool should_rebuild = true;
+		bool should_rescan_missing = true;
 
 		auto check_rebuild = [&]<typename T>(const T&) {
 			if constexpr(skip_scene_rebuild_v<T>) {
 				should_rebuild = false;
+			}
+
+			if constexpr(skip_missing_resources_check_v<T>) {
+				should_rescan_missing = false;
 			}
 		};
 
@@ -1252,6 +1337,10 @@ void editor_setup::redo() {
 
 		if (should_rebuild) {
 			rebuild_arena();
+		}
+
+		if (should_rescan_missing) {
+			rescan_missing_resources_if_potentially_any();
 		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
@@ -1895,6 +1984,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			|| try_preffix("Grouped", yellow)
 			|| try_preffix("Ungrouped", orange)
 			|| try_preffix("Set", green)
+			|| try_preffix("Restored defaults", green)
 			|| try_preffix("Reset", green)
 			|| try_preffix("Unset", green)
 			|| try_preffix("Switched", green)

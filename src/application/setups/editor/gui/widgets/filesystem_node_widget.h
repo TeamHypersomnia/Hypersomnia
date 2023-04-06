@@ -6,7 +6,7 @@ namespace editor_widgets {
 	template <class F>
 	inline bool filesystem_node_widget(
 		editor_setup& setup,
-		editor_filesystem_node& node,
+		const editor_filesystem_node& node,
 		const editor_icon_info_in& icon_in,
 		editor_resource_id& dragged_resource,
 		const std::optional<bool> override_is_inspected,
