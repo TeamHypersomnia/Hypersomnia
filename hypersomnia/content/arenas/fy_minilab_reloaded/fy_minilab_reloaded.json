@@ -20,7 +20,7 @@
                 "metropolis": {
                     "firearm": "baka47",
                     "melee": null,
-                    "backpack": 0
+                    "backpack": false
                 }
             }
         }
@@ -29,7 +29,7 @@
         {
             "id": "markers",
             "is_open_in_editor": false,
-            "active": 0,
+            "active": false,
             "nodes": [
                 "ct_spawn (32)-ml",
                 "bombsite (2)",
@@ -390,8 +390,8 @@
             "pos": [-3260.0, -64.0],
             "rotation": 90.0,
             "size": [512, 3072],
-            "flip_horizontally": 1,
-            "flip_vertically": 1
+            "flip_horizontally": true,
+            "flip_vertically": true
         },
         {
             "id": "road_dirt",
@@ -474,37 +474,37 @@
             "type": "lab_wall_corner_cut",
             "pos": [1840.0, -304.0],
             "rotation": 90.0,
-            "flip_horizontally": 1
+            "flip_horizontally": true
         },
         {
             "id": "round_corner",
             "type": "lab_wall_corner_cut",
             "pos": [1840.0, -336.0],
             "rotation": -90.0,
-            "flip_horizontally": 1,
-            "flip_vertically": 1
+            "flip_horizontally": true,
+            "flip_vertically": true
         },
         {
             "id": "round_corner (2)-mu",
             "type": "lab_wall_corner_cut",
             "pos": [1872.0001220703125, 176.0],
             "rotation": 90.0,
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "round_corner (1)-mu",
             "type": "lab_wall_corner_cut",
             "pos": [1840.0, 176.0],
             "rotation": -90.0,
-            "flip_horizontally": 1,
-            "flip_vertically": 1
+            "flip_horizontally": true,
+            "flip_vertically": true
         },
         {
             "id": "round_corner-mu",
             "type": "lab_wall_corner_cut",
             "pos": [1840.0, 208.0],
             "rotation": 90.0,
-            "flip_horizontally": 1
+            "flip_horizontally": true
         },
         {
             "id": "snackbar",
@@ -531,7 +531,7 @@
             "id": "flowerbed_cyan-mr",
             "type": "flowerbed_cyan",
             "pos": [2327.0, -320.0],
-            "flip_horizontally": 1
+            "flip_horizontally": true
         },
         {
             "id": "flowerbed_cyan-mr-mr",
@@ -635,14 +635,14 @@
             "type": "aquarium_halogen_1_body",
             "pos": [2338.0, 467.0],
             "color": [0, 180, 59, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "aquarium_halogen_1_light-md",
             "type": "aquarium_halogen_1_light",
             "pos": [2338.0, 467.0],
             "color": [103, 255, 69, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "paprotka (3)",
@@ -658,13 +658,13 @@
             "id": "doniczka (3)",
             "type": "flowerpot_orange",
             "pos": [2197.0, 649.0],
-            "flip_horizontally": 1
+            "flip_horizontally": true
         },
         {
             "id": "paprotka (2)",
             "type": "fern",
             "pos": [2193.0, 652.0],
-            "flip_horizontally": 1
+            "flip_horizontally": true
         },
         {
             "id": "doniczka",
@@ -721,7 +721,7 @@
             "pos": [-387.0, 927.0],
             "rotation": 60.000003814697266,
             "size": [128, 287],
-            "flip_horizontally": 1
+            "flip_horizontally": true
         },
         {
             "id": "crate (16)",
@@ -782,7 +782,7 @@
             "pos": [209.0, 829.0],
             "rotation": -90.0,
             "color": [0, 180, 59, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "aquarium_halogen_1_light-md (1)",
@@ -790,7 +790,7 @@
             "pos": [209.0, 829.0],
             "rotation": -90.0,
             "color": [103, 255, 69, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "hard_wooden_wall (17)",
@@ -811,13 +811,13 @@
             "id": "doniczka (1)",
             "type": "flowerpot_orange",
             "pos": [2449.0, 649.0],
-            "flip_horizontally": 1
+            "flip_horizontally": true
         },
         {
             "id": "paprotka (1)",
             "type": "fern",
             "pos": [2445.0, 652.0],
-            "flip_horizontally": 1
+            "flip_horizontally": true
         },
         {
             "id": "crate (19)",
@@ -843,14 +843,14 @@
             "type": "aquarium_halogen_1_body",
             "pos": [2684.0, -1394.0],
             "color": [119, 86, 0, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "aquarium_halogen_1_light-md (2)",
             "type": "aquarium_halogen_1_light",
             "pos": [2684.0, -1394.0],
             "color": [255, 183, 0, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "aquarium_halogen_1_body (2)",
@@ -869,14 +869,14 @@
             "type": "aquarium_halogen_1_body",
             "pos": [-2564.0, -1394.0],
             "color": [119, 86, 0, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "aquarium_halogen_1_light-md (3)",
             "type": "aquarium_halogen_1_light",
             "pos": [-2564.0, -1394.0],
             "color": [255, 183, 0, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "aquarium_halogen_1_body (3)",
@@ -889,7 +889,7 @@
             "type": "aquarium_halogen_1_body",
             "pos": [-2500.0, 1230.0],
             "color": [119, 86, 0, 255],
-            "flip_vertically": 1
+            "flip_vertically": true
         },
         {
             "id": "powerline_noise",
@@ -1051,7 +1051,7 @@
             "id": "wandering_pixels",
             "type": "wandering_pixels",
             "color": [0, 255, 232, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [2334.0, -320.0],
             "size": [1000, 192]
         },
@@ -1060,7 +1060,7 @@
             "type": "wandering_pixels",
             "color": [0, 255, 12, 255],
             "num_particles": 150,
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [2328.0, 640.0],
             "size": [656, 159]
         },
@@ -1068,7 +1068,7 @@
             "id": "wandering_pixels (2)",
             "type": "wandering_pixels",
             "color": [0, 255, 12, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [1999.0, 454.0],
             "size": [194, 557]
         },
@@ -1076,7 +1076,7 @@
             "id": "wandering_pixels (3)",
             "type": "wandering_pixels",
             "color": [0, 255, 12, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [2653.0, 467.0],
             "size": [194, 557]
         },
@@ -1084,7 +1084,7 @@
             "id": "wandering_pixels (4)",
             "type": "wandering_pixels",
             "color": [255, 0, 12, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [2655.0, 422.0],
             "size": [194, 557]
         },
@@ -1092,7 +1092,7 @@
             "id": "wandering_pixels (5)",
             "type": "wandering_pixels",
             "color": [255, 0, 12, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [1999.0, 438.0],
             "size": [194, 557]
         },
@@ -1100,7 +1100,7 @@
             "id": "wandering_pixels (6)",
             "type": "wandering_pixels",
             "color": [0, 255, 232, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [1620.0, 1044.0],
             "size": [1000, 600]
         },
@@ -1108,7 +1108,7 @@
             "id": "wandering_pixels (7)",
             "type": "wandering_pixels",
             "color": [255, 165, 0, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [-1268.0, 972.0],
             "size": [1000, 600]
         },
@@ -1116,7 +1116,7 @@
             "id": "wandering_pixels (8)",
             "type": "wandering_pixels",
             "color": [255, 165, 0, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [2672.0, -1392.0],
             "size": [544, 416]
         },
@@ -1124,7 +1124,7 @@
             "id": "wandering_pixels (9)",
             "type": "wandering_pixels",
             "color": [0, 255, 232, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [1556.0, -1204.0],
             "size": [1000, 600]
         },
@@ -1132,7 +1132,7 @@
             "id": "wandering_pixels (10)",
             "type": "wandering_pixels",
             "color": [255, 165, 0, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [-2544.0, -1392.0],
             "size": [544, 416]
         },
@@ -1140,7 +1140,7 @@
             "id": "wandering_pixels (11)",
             "type": "wandering_pixels",
             "color": [255, 165, 0, 255],
-            "illuminate": 0,
+            "illuminate": false,
             "pos": [-2432.0, 1136.0],
             "size": [384, 416]
         },
@@ -1170,7 +1170,7 @@
             "fish_2": null,
             "fish_3": null,
             "fish_6": null,
-            "flip_glass_vertically": 1,
+            "flip_glass_vertically": true,
             "left_bottom_lamp_color": [0, 132, 190, 255],
             "right_top_lamp_color": [103, 255, 69, 0],
             "top_lamp_color": [0, 179, 255, 255],
@@ -1190,7 +1190,7 @@
             "fish_3": null,
             "fish_4": null,
             "fish_5": null,
-            "flip_glass_vertically": 1,
+            "flip_glass_vertically": true,
             "wall_lamp_offset": 631,
             "left_bottom_lamp_color": [0, 70, 255, 0],
             "right_top_lamp_color": [55, 255, 0, 255],

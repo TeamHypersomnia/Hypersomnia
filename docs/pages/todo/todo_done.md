@@ -5352,3 +5352,5 @@ Advantages:
 - Fix Rotated By: description
     - Moved by too
 
+- flip_horizontally is written as int? wtf?
+

@@ -43,6 +43,14 @@ namespace augs {
 				out = from.GetString();
 			}
 		}
+		else if constexpr(std::is_same_v<T, bool>) {
+			if (from.IsBool()) {
+				out = from.GetBool();
+			}
+			else if (from.IsUint()) {
+				out = static_cast<bool>(from.GetUint());
+			}
+		}
 		else if constexpr(std::is_same_v<T, uint8_t> || std::is_same_v<T, unsigned char>) {
 			if (from.IsUint()) {
 				out = static_cast<T>(from.GetUint());
@@ -269,6 +277,9 @@ namespace augs {
 		else if constexpr(std::is_same_v<T, std::string>) {
 			to.String(from);
 		}
+		else if constexpr(std::is_same_v<T, bool>) {
+			to.Bool(from);
+		}
 		else if constexpr(std::is_same_v<T, path_type>) {
 			to.String(::to_forward_slashes(from.string()));
 		}
@@ -286,9 +297,6 @@ namespace augs {
 		}
 		else if constexpr(std::is_unsigned_v<T>) {
 			to.Uint(from);
-		}
-		else if constexpr(std::is_same_v<T, bool>) {
-			to.Bool(from);
 		}
 		else if constexpr(std::is_enum_v<T>) {
 			static_assert(has_enum_to_string_v<T>, "This enum does not provide a an enum_to_string overload.");
