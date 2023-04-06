@@ -169,11 +169,15 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	void create_official_prefabs();
 
 	void on_window_activate();
-	void on_filesystem_change();
 
 	void rescan_physical_filesystem();
 	editor_paths_changed_report rebuild_pathed_resources();
 	void report_changed_paths(const editor_paths_changed_report&);
+	void autosave_if_redirected(
+		const editor_paths_changed_report&,
+		const bool during_activate,
+		const bool undoing_to_first_revision
+	);
 
 	void rescan_missing_resources(std::vector<augs::path_type>* out_report = nullptr);
 
@@ -756,6 +760,6 @@ public:
 
 	bool is_dirty() const;
 
-	void assign_project(const editor_project&);
-	void on_project_assigned();
+	void assign_project(const editor_project&, const bool undoing_to_first_revision);
+	void on_project_assigned(const bool undoing_to_first_revision);
 };

@@ -15,9 +15,11 @@ void replace_whole_project_command::undo(editor_command_input in) {
 		*after = in.setup.get_project();
 	}
 
-	in.setup.assign_project(*before);
+	const bool undoing_to_first_revision = true;
+	in.setup.assign_project(*before, undoing_to_first_revision);
 }
 
 void replace_whole_project_command::redo(editor_command_input in) {
-	in.setup.assign_project(*after);
+	const bool undoing_to_first_revision = false;
+	in.setup.assign_project(*after, undoing_to_first_revision);
 }

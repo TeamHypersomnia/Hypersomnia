@@ -135,9 +135,12 @@ editor_setup::editor_setup(
 		/*
 			This is otherwise already called by assign_project in replace_whole_project_command.
 			If we don't load autosave, we need to manually call this for the current project.
+
+			We pass true here to suppress the autosave that comes from redirecting.
 		*/
 
-		on_project_assigned();
+		const bool undoing_to_first_revision = true;
+		on_project_assigned(undoing_to_first_revision);
 	}
 
 	load_gui_state();
@@ -593,8 +596,78 @@ std::optional<ad_hoc_atlas_subjects> editor_setup::get_new_ad_hoc_images() {
 	return std::nullopt;
 }
 
+void editor_setup::autosave_if_redirected(
+	const editor_paths_changed_report& report,
+	const bool during_activate,
+	const bool undoing_to_first_revision
+) {
+	if (report.redirects.empty()) {
+		return;
+	}
+
+	/*
+		Corner case:
+
+		We do not want to overwrite the current autosave in case we undo/redo back to the saved revision
+		and it happens to automatically redirect some resources.
+
+		However what if this is caused not by a seek to a saved revision
+		but just an alt-tab while we are already at a saved revision?
+			In that case we probably want to produce a fresh autosave.
+			The current autosave would've been removed anyway if there had been no redirect intead and the game quit.
+
+		Both of the above could happen during the "autosave dilemma"
+		(which is the situation when there is only the load autosave command)
+
+		(report_changed_paths is only called on assign_project and on_window_activate, no other case
+
+		Now what if autosave revision gets ctrl+s'd and seeking to it causes a redirect?
+			Should be autosaved all-right
+				Now what if we undo back to the - now unsaved - 0 revision and it causes a redirect?
+					well, this one naturally becomes the autosaved revision on next launch
+
+		
+		
+		THEREFORE
+		
+		The only moment we skip autosave here is when we're on the 0 revision and it's still a saved but DIRTY revision.
+		dirty_after_loading_autosave implies the 0 revision is a saved one and dirty (because no other save has yet been made). 
+
+		Note it will also be nice to preserve it when there's more commands above the autosave command, because why not?
+	*/
+
+	/*
+	   	Note history.is_revision_oldest() will mistakenly report true while it is redoing from oldest to autosave revision.
+		But if we're on this oldest revision, we need to skip the autosave during window activate as well.
+	*/
+
+	const bool due_to_activate_on_oldest = during_activate && history.is_revision_oldest();
+	const bool due_to_undo_to_oldest = undoing_to_first_revision;
+
+	const bool preserve_current_autosave = 
+		dirty_after_loading_autosave
+		&& (due_to_activate_on_oldest || due_to_undo_to_oldest);
+
+	if (preserve_current_autosave) {
+		LOG("Preserving current autosave despite redirects.\nThis is the oldest revision, and the loaded autosave has not yet been saved explicitly, so there's no point to replace that autosave.");
+	}
+	else {
+		LOG("Autosaving due to redirects.");
+		force_autosave();
+	}
+}
+
 void editor_setup::on_window_activate() {
-	on_filesystem_change();
+	rescan_physical_filesystem();
+
+	const bool during_activate = true;
+	const bool undoing_to_first_revision = false;
+
+	const auto result = rebuild_pathed_resources();
+
+	report_changed_paths(result);	
+	autosave_if_redirected(result, during_activate, undoing_to_first_revision);
+
 	rebuild_arena();
 }
 
@@ -668,25 +741,24 @@ void editor_setup::report_changed_paths(const editor_paths_changed_report& chang
 	if (changes.redirects.size() > 0) {
 		changes_popup.warning_notice = "Please save the project to remember the redirected paths.";
 		dirty_after_redirecting_paths = true;
-		force_autosave();
 	}
 
 	ok_only_popup_2 = changes_popup;
 }
 
-void editor_setup::on_filesystem_change() {
-	rescan_physical_filesystem();
-	report_changed_paths(rebuild_pathed_resources());	
-}
+void editor_setup::on_project_assigned(const bool undoing_to_first_revision) {
+	const bool during_activate = false;
+	const auto result = rebuild_pathed_resources();
 
-void editor_setup::on_project_assigned() {
-	report_changed_paths(rebuild_pathed_resources());
+	report_changed_paths(result);	
+	autosave_if_redirected(result, during_activate, undoing_to_first_revision);
+
 	gui.filesystem.rebuild_project_special_filesystem(*this);
 }
 
-void editor_setup::assign_project(const editor_project& new_project) {
+void editor_setup::assign_project(const editor_project& new_project, const bool undoing_to_first_revision) {
 	project = new_project;
-	on_project_assigned();
+	on_project_assigned(undoing_to_first_revision);
 }
 
 augs::path_type editor_setup::resolve_project_path(const augs::path_type& path_in_project) const {
@@ -1075,6 +1147,7 @@ void editor_setup::force_autosave() {
 
 void editor_setup::autosave_now_if_needed() {
 	if (autosave_needed()) {
+		LOG("Not on either autosaved or saved revision. Forcing autosave.");
 		force_autosave();
 	}
 
