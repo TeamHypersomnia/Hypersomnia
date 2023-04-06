@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Prepare comprehensive official resource collection
+
 - Can'we just save the project state before assigning the saved revision?
     - This will make it absolutely deterministic
 
@@ -29,7 +31,7 @@ summary: That which we are brainstorming at the moment.
         - We might need to rerun an association function
 
 - When we launch with an autosave, do we show the report of redirects/missings for the autosave or for the saved state?
-    - I say autosave
+    - I say for autosave revision
         - That is because it's meant to be the newer one
 - Then we need to do the redirects for both project states saved incrementally
 
@@ -253,8 +255,6 @@ This will discard your redo history."
                     - "Undo" is performed back to autosave command
                     - The redo will work on nonexisting resources.
             - more resources than in saved
-
-- Prepare comprehensive official resource collection before shipping
 
 - Test sanitization on windows too
 

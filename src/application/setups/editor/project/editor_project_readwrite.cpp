@@ -890,7 +890,7 @@ namespace editor_project_readwrite {
 					}
 				};
 
-				const auto untrusted_path = augs::general_read_json_value<augs::path_type>(resource["path"]);
+				const auto untrusted_path = resource["path"].GetString();
 
 				std::visit(
 					[&]<typename R>(const R& result) {
@@ -913,7 +913,7 @@ namespace editor_project_readwrite {
 						}
 					},
 
-					sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path.string())
+					sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path)
 				);
 			}
 		};

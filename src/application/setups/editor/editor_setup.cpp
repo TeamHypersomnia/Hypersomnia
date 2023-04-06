@@ -136,10 +136,11 @@ editor_setup::editor_setup(
 			This is otherwise already called by assign_project in replace_whole_project_command.
 			If we don't load autosave, we need to manually call this for the current project.
 
-			We pass true here to suppress the autosave that comes from redirecting.
+			Autosave will be triggered here if any redirects happen. That's not a bad thing,
+			because at this point no autosave exists.
 		*/
 
-		const bool undoing_to_first_revision = true;
+		const bool undoing_to_first_revision = false;
 		on_project_assigned(undoing_to_first_revision);
 	}
 
