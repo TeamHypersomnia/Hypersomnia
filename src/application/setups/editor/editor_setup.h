@@ -173,7 +173,6 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	editor_paths_changed_report rebuild_pathed_resources();
 
 	void rescan_missing_resources(std::vector<augs::path_type>* out_report = nullptr);
-	void rescan_missing_resources_if_potentially_any();
 
 	void remove_autosave_file();
 	void force_autosave();
@@ -182,6 +181,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	void save();
 	void save_project_file_as(const augs::path_type& path);
 	bool has_unsaved_changes() const;
+	bool everything_completely_saved() const;
 	std::string get_arena_name_with_star() const;
 
 	void load_gui_state();

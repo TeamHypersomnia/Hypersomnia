@@ -126,12 +126,16 @@ struct editor_sprite_resource {
 	mutable uint32_t reference_count = 0u;
 	mutable bool changes_detected = false;
 
+	mutable std::string resolved_pseudoid;
+	mutable bool found_on_disk = false;
+
 	bool should_be_tracked() const {
 		return reference_count > 0 || changes_detected;
 	}
 
-	mutable std::string resolved_pseudoid;
-	mutable bool found_on_disk = false;
+	bool unbacked_on_disk() const {
+		return !found_on_disk;
+	}
 
 	editor_sprite_resource(const editor_pathed_resource& f) : external_file(f) {}
 

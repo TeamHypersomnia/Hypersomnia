@@ -40,7 +40,7 @@ const T& editor_setup::post_new_command(T&& command) {
 	}
 
 	if constexpr(!skip_missing_resources_check_v<T>) {
-		rescan_missing_resources_if_potentially_any();
+		rescan_missing_resources();
 	}
 
 	if constexpr(std::is_base_of_v<allocating_command<editor_node_pool_id>, T>) {
@@ -66,7 +66,7 @@ const T& editor_setup::rewrite_last_command(T&& command) {
 	rebuild_arena(); 
 
 	if constexpr(!skip_missing_resources_check_v<remove_cref<T>>) {
-		rescan_missing_resources_if_potentially_any();
+		rescan_missing_resources();
 	}
 
 	return result;

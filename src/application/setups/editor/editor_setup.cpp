@@ -136,7 +136,8 @@ editor_setup::editor_setup(
 	load_gui_state();
 	open_default_windows();
 
-	on_window_activate();
+	rebuild_filesystem();
+	rebuild_arena();
 	save_last_project_location();
 }
 
@@ -145,11 +146,14 @@ editor_setup::~editor_setup() {
 
 	/*
 		Remove autosave only if we're at saved revision.
-		With one exception: when we've just loaded autosave and the user hasn't yet saved any revision to decide which one they want.
-			Also if we haven't saved after auto-redirecting pathed resources.
+
+		Note we're "dirty" if we've just loaded autosave and the user hasn't yet saved any revision to decide which one they want.
+		We're also "dirty" if we haven't saved after auto-redirecting pathed resources.
+
+		In these cases, autosave file will not be removed even if we're at a saved revision in history.
 	*/
 
-	if (!has_unsaved_changes()) {
+	if (everything_completely_saved()) {
 		remove_autosave_file();
 	}
 
@@ -687,10 +691,6 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		Otherwise we could end up with duplicate resources.
 	*/
 
-	auto missing_on_disk = [&](const auto& resource) {
-		return !resource.found_on_disk;
-	};
-
 	auto existing_paths = std::unordered_set<std::string>();
 
 	auto register_resources_found_on_disk = [&](editor_filesystem_node& file) {
@@ -699,6 +699,8 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	};
 
 	files.root.for_each_file_recursive(register_resources_found_on_disk);
+
+	rebuilt_project.last_unbacked_resources.clear();
 
 	auto handle_pool = [&]<typename P>(P& pool, const editor_filesystem_node_type type) {
 		using resource_type = typename P::value_type;
@@ -789,7 +791,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 							for (std::size_t i = 0; i < moved_resources.size(); ++i) {
 								const auto& candidate = *find_resource(moved_resources[i]);
 
-								if (missing_on_disk(candidate) && searched_stem == get_stem(candidate)) {
+								if (candidate.unbacked_on_disk() && searched_stem == get_stem(candidate)) {
 									return i;
 								}
 							}
@@ -802,7 +804,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 							for (std::size_t i = 0; i < moved_resources.size(); ++i) {
 								const auto& candidate = *find_resource(moved_resources[i]);
 
-								if (missing_on_disk(candidate)) {
+								if (candidate.unbacked_on_disk()) {
 									return i;
 								}
 							}
@@ -881,8 +883,20 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 			}
 		};
 
+		auto check_if_unbacked = [&](const auto id, const auto& entry) {
+			if (entry.unbacked_on_disk()) {
+				/* 
+					If the file is still missing after all redirecting, 
+					then it is indeed unbacked.
+				*/
+
+				rebuilt_project.last_unbacked_resources.push_back(id.operator editor_resource_id());
+			}
+		};
+
 		rebuilt_project.for_each_resource<resource_type>(map_all_resources);
 		files.root.for_each_file_recursive(add_if_new_or_redirect);
+		rebuilt_project.for_each_resource<resource_type>(check_if_unbacked);
 	};
 
 	auto& sprite_pool = rebuilt_project.resources.pools.template get_for<editor_sprite_resource>();
@@ -891,35 +905,33 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	handle_pool(sprite_pool, editor_filesystem_node_type::IMAGE);
 	handle_pool(sound_pool,  editor_filesystem_node_type::SOUND);
 
+	const auto num_unbacked = rebuilt_project.last_unbacked_resources.size();
+
+	if (num_unbacked > 0) {
+		LOG("%x resources are unbacked (*potentially* missing), so they'll be rescanned after every command.", num_unbacked);
+	}
+	else {
+		LOG("All resources ever seen during this session are still on disk.");
+	}
+
 	/*
 		We'll need to know if we any resources we actually reference are now missing.
 	*/
 
 	rescan_missing_resources(std::addressof(changes.missing));
 
-	const auto num_missing = rebuilt_project.num_potentially_missing_resources;
-
-	if (num_missing > 0) {
-		LOG("%x resources are *potentially* missing, so they'll be rescanned after every command.", rebuilt_project.num_potentially_missing_resources);
-	}
-	else {
-		LOG("All resources ever seen during this session are still on disk.");
-	}
-
-
 	return changes;
-}
-
-void editor_setup::rescan_missing_resources_if_potentially_any() { 
-	auto& rebuilt_project = project;
-
-	if (rebuilt_project.num_potentially_missing_resources > 0) {
-		rescan_missing_resources();
-	}
 }
 
 void editor_setup::rescan_missing_resources(std::vector<augs::path_type>* const out_report) { 
 	auto& rebuilt_project = project;
+
+	rebuilt_project.last_missing_resources.clear();
+
+	if (rebuilt_project.last_unbacked_resources.empty()) {
+		/* There will be none regardless of reference counts. */
+		return;
+	}
 
 	// LOG("RESCAN_MISSING_RESOURCES");
 
@@ -932,59 +944,40 @@ void editor_setup::rescan_missing_resources(std::vector<augs::path_type>* const 
 		}
 	};
 
-	std::vector<entry> missing;
+	std::vector<entry> missing_entries;
 
 	rebuilt_project.rescan_pathed_resources_to_track(official_resources, official_resource_map);
-	rebuilt_project.num_potentially_missing_resources = 0;
 
-	auto missing_on_disk = [&](const auto& resource) {
-		return !resource.found_on_disk;
-	};
+	auto check_missing = [&]<typename R>(const R& resource, const editor_typed_resource_id<R> id) {
+		if constexpr(is_pathed_resource_v<R>) {
+			if (resource.unbacked_on_disk() && resource.should_be_tracked()) {
+				// LOG("MISSING: %x", resource.external_file.path_in_project);
 
-	auto rescan_missing = [&](const auto id, const auto& resource) {
-		/* 
-			If it's still missing after all redirecting, 
-			then it is indeed missing.
-		*/
-
-		if (missing_on_disk(resource)) {
-			// LOG("MISSING: %x", resource.external_file.path_in_project);
-
-			/* 
-				This counter will force us to rescan for missing resources
-				every time we post a command.
-
-				This is because dangling ids to missing resources might be left somewhere in command history,
-				even though the current revision reports no "missing" resources, 
-				i.e. resources that are CURRENTLY in use by the project but have no backing file.
-			*/
-
-			++rebuilt_project.num_potentially_missing_resources;
-
-			if (resource.should_be_tracked()) {
-				missing.push_back({ resource.external_file.path_in_project.string(), id.operator editor_resource_id() });
+				missing_entries.push_back({ 
+					resource.external_file.path_in_project.string(), 
+					id.operator editor_resource_id() 
+				});
 			}
 		}
 	};
 
-	rebuilt_project.for_each_resource<editor_sprite_resource>(rescan_missing);
-	rebuilt_project.for_each_resource<editor_sound_resource>(rescan_missing);
+	for (auto& unbacked : rebuilt_project.last_unbacked_resources) {
+		on_resource(unbacked, check_missing);
+	}
 
-	sort_range(missing);
+	sort_range(missing_entries);
 
 	if (out_report) {
-		for (auto& e : missing) {
+		for (auto& e : missing_entries) {
 			out_report->push_back(e.path);
 		}
 	}
 
-	rebuilt_project.last_missing_resources.clear();
-
-	for (auto& e : missing) {
+	for (auto& e : missing_entries) {
 		rebuilt_project.last_missing_resources.push_back(e.id);
 	}
 
-	// LOG_NVPS(rebuilt_project.last_missing_resources.size(), rebuilt_project.num_potentially_missing_resources);
+	// LOG_NVPS(rebuilt_project.last_missing_resources.size(), rebuilt_project.last_unbacked_resources.size());
 }
 
 void editor_setup::remove_autosave_file() {
@@ -1020,8 +1013,12 @@ bool editor_setup::is_dirty() const {
 	return dirty_after_loading_autosave || dirty_after_redirecting_paths;
 }
 
+bool editor_setup::everything_completely_saved() const {
+	return !is_dirty() && history.at_saved_revision();
+}
+
 bool editor_setup::has_unsaved_changes() const {
-	return is_dirty() || !history.at_saved_revision();
+	return !everything_completely_saved();
 }
 
 std::string editor_setup::get_arena_name_with_star() const {
@@ -1307,7 +1304,7 @@ void editor_setup::undo() {
 		}
 
 		if (should_rescan_missing) {
-			rescan_missing_resources_if_potentially_any();
+			rescan_missing_resources();
 		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
@@ -1356,7 +1353,7 @@ void editor_setup::redo() {
 		}
 
 		if (should_rescan_missing) {
-			rescan_missing_resources_if_potentially_any();
+			rescan_missing_resources();
 		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {

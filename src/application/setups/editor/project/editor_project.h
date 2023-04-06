@@ -41,8 +41,17 @@ struct editor_project {
 	editor_layers layers;
 	// END GEN INTROSPECTOR
 
+	/*
+		Unbacked resource is one whose file on disk is missing.
+		Missing resource is an unbacked resource that is referenced by a current revision.
+
+		An unbacked resource that is not used anywhere will *not* reported as missing.
+		We need to keep track of all unbacked resources ever seen however, because redoing or undoing editor commands
+		might cause an unbacked resource to become missing (e.g. undoing a delete of the only node referencing that resource)
+	*/
+
+	std::vector<editor_resource_id> last_unbacked_resources;
 	std::vector<editor_resource_id> last_missing_resources;
-	uint32_t num_potentially_missing_resources = 0;
 
 	template <typename T>
 	auto& get() {

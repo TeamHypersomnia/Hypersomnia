@@ -5,6 +5,9 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Perhaps exit the editor to project selector setup?
+    - Not really because it introduces another step when we want to host a map for real
+
 - Deprecate multipooldispatchers, it's silly
 	- it's actually useful because it has typed id dispatch functions etc
 - Check if windows doubly-activates window too

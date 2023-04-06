@@ -6,6 +6,30 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Watch out to *not* automatically autosave when we auto-redirect post-project load
+    - (since we do after successful redirects normally)
+    - Shouldn't happen because we'll always be at autosave post-load
+    - However we might invoke rebuild_pathed_resources on replace's undo which would trigger an autosave on a "saved" instead of autosave, deleting the autosave
+        - there is force_autosave called so it's not checking for any other conditions
+
+- I say when the project loads, do not redirect. Only report missing ones.
+    - Remember auto-redirect is a special action because it changes state.
+    - *Nah, that will be counterintuitive because someone might redirect when the game's off and they'll see the game didn't redirect it right away.*
+    - We might rebuild on undo/redo of the replace command.
+
+- Then with autosaves
+    - For when we can still switch between autosaved and last saved..
+        - ..Just rebuild filesystem gui once to show factual file state
+            - and pass it as argument to rebuild pathed resources in both before and after
+            - we could also rebuild it after each undo/redo
+    - Now after any command is posted, the other is invalidated
+        - If last saved was selected then autosave obviously would be anyway
+            - but can still be retrieved because we won't autosave unless redirects dirtied state
+                - we could disable autosaving too at this point
+                - it probably makes no sense at all to autosave at any point while we're still at these two revisions
+    - After that, resources pool will never be directly assigned to.
+        - So we don't have to worry about ids being invalidated in other commands.
+        - From now on the only ops on resources will be additive existentially.
 - Let's start again
     - First consider the smallest working model
         - No autosaves, just one session
@@ -29,6 +53,10 @@ summary: That which we are brainstorming at the moment.
                 - Technically, execute_new cannot introduce a dependency on an unbacked/forgotten resource (making it missing).
                     - But it can FIX REFERENCES TO MISSING ONES!
                         - so we need to rescan either way
+                        - BUT IT"S OKAY IF WE ONLY SCAN ones with found_on_disk = false.
+                            - So not necessarily last_missing_resources vector (because it's a conjunction of both sets)
+                            - But a separate vector of resources with found_on_disk = false
+                            - Because we're only checking for changed resource counts
                     - because it will not show in the filesystem gui.
                     - undo/redo can, and also rescanning pathed resources can
                     - if performance is an issue, we can ONLY do this if there is at least ONE unbacked/missing resource.
@@ -36,19 +64,8 @@ summary: That which we are brainstorming at the moment.
                             - We could stop rescanning all commands after the first one that removes all references to it.
                             - for now we'll just rescan always and optimize in the future
 
-    - Then with autosaves
-        - For when we can still switch between autosaved and last saved..
-            - ..Just rebuild filesystem gui once to show factual file state
-                - and pass it as argument to rebuild pathed resources in both before and after
-                - we could also rebuild it after each undo/redo
-        - Now after any command is posted, the other is invalidated
-            - If last saved was selected then autosave obviously would be anyway
-                - but can still be retrieved because we won't autosave unless redirects dirtied state
-                    - we could disable autosaving too at this point
-                    - it probably makes no sense at all to autosave at any point while we're still at these two revisions
-        - After that, resources pool will never be directly assigned to.
-            - So we don't have to worry about ids being invalidated in other commands.
-            - From now on the only ops on resources will be additive existentially.
+
+- Later do an interface for showing nodes using a given resource
 
 
 - We could also disable undoing autosave command once any other command is posted

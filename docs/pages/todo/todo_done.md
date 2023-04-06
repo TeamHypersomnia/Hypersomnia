@@ -5354,3 +5354,8 @@ Advantages:
 
 - flip_horizontally is written as int? wtf?
 
+- IT''S OKAY IF WE ONLY SCAN ones with found_on_disk = false.
+    - So not necessarily last_missing_resources vector (because it's a conjunction of both sets)
+    - But a separate vector of resources with found_on_disk = false
+    - Because we're only checking for changed resource counts
+
