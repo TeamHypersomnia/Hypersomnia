@@ -36,6 +36,10 @@ namespace augs {
 		return std::filesystem::last_write_time(path);
 	}
 
+	inline decltype(auto) copy_file_or_dir(const path_type& from, const path_type& to) {
+		return std::filesystem::copy(from, to);
+	}
+
 	inline bool exists(const path_type& path) {
 		return std::filesystem::exists(path);
 	}

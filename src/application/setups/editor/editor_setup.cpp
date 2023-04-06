@@ -90,6 +90,9 @@ editor_setup::editor_setup(
 			official_resource_map,
 			strict
 		);
+
+		/* Will be overwritten to the new name upon the first save. */
+		project.meta.name = paths.arena_name;
 	}
 	catch (const augs::json_deserialization_error& err) {
 		throw augs::json_deserialization_error("(%x):\n%x", paths.project_json.filename().string(), err.what());
@@ -106,6 +109,8 @@ editor_setup::editor_setup(
 			official_resource_map,
 			strict
 		));
+
+		autosaved_project->meta.name = paths.arena_name;
 
 		replace_whole_project_command cmd;
 		cmd.after = std::move(autosaved_project);
@@ -1123,10 +1128,10 @@ bool editor_setup::has_unsaved_changes() const {
 
 std::string editor_setup::get_arena_name_with_star() const {
 	if (has_unsaved_changes()) {
-		return std::string(project.meta.name) + "*";
+		return std::string(paths.arena_name) + "*";
 	}
 
-	return std::string(project.meta.name);
+	return std::string(paths.arena_name);
 }
 
 bool editor_setup::autosave_needed() const {

@@ -31,7 +31,7 @@ struct draw_setup_gui_input;
 class project_selector_setup : public default_setup_settings {
 	project_selector_gui gui;
 
-	bool rebuild_miniatures = false;
+	bool rebuild_miniatures = true;
 	ad_hoc_entry_id miniature_index_counter = 0;
 
 	void scan_for_all_arenas();
@@ -56,6 +56,7 @@ public:
 	/*********************************************************/
 
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
+	static constexpr bool handles_window_input = true;
 
 	auto get_audiovisual_speed() const {
 		return 1.0;
@@ -157,4 +158,12 @@ public:
 
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
+
+	bool handle_input_before_imgui(
+		handle_input_before_imgui_input in
+	);
+
+	bool handle_input_before_game(
+		const handle_input_before_game_input
+	);
 };

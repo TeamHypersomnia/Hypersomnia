@@ -1,6 +1,10 @@
 #pragma once
 #include "augs/misc/imgui/standard_window_mixin.h"
 
+namespace augs {
+	class window;
+}
+
 enum class project_tab_type {
 	// GEN INTROSPECTOR enum class project_tab_type
 	MY_PROJECTS,
@@ -35,7 +39,8 @@ struct projects_list_tab_state {
 
 	bool perform_list(
 		const ad_hoc_in_atlas_map& ad_hoc_atlas,
-		std::optional<std::string> timestamp_column_name
+		std::optional<std::string> timestamp_column_name,
+		augs::window& window
 	);
 
 	project_list_entry* find_selected();
@@ -76,6 +81,8 @@ struct create_new_project_gui : standard_window_mixin<create_new_project_gui> {
 	// GEN INTROSPECTOR struct create_new_project_gui
 	arena_identifier name;
 	arena_short_description_type short_description;
+
+	augs::path_type cloning_from;
 	// END GEN INTROSPECTOR
 
 	bool perform(const project_selector_setup&);

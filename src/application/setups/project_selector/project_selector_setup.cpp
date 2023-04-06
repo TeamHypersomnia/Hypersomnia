@@ -28,6 +28,7 @@
 #include "augs/misc/pool/pool_allocate.h"
 
 #include "augs/readwrite/json_readwrite.h"
+#include "augs/window_framework/window.h"
 
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 250;
@@ -110,6 +111,8 @@ std::optional<project_tab_type> project_selector_setup::is_project_name_taken(co
 }
 
 void project_selector_setup::scan_for_all_arenas() {
+	miniature_index_counter = 0;
+
 	auto scan_for = [&](const project_tab_type type) {
 		auto& view = gui.projects_view;
 		view.tabs[type].entries.clear();
@@ -131,6 +134,14 @@ void project_selector_setup::scan_for_all_arenas() {
 			auto new_entry = project_list_entry();
 			new_entry.arena_name = paths.arena_name;
 			new_entry.arena_path = *sanitized_path;
+
+			// TODO EDITOR: remove this clause once we have more
+			if (type == project_tab_type::OFFICIAL_ARENAS) {
+				/* For now just one */
+				if (paths.arena_name != "fy_minilab_reloaded") {
+					return callback_result::CONTINUE; 
+				}
+			}
 
 			// TODO: give it a proper timestamp
 
@@ -183,7 +194,8 @@ void project_selector_setup::customize_for_viewing(config_lua_table& config) con
 
 bool projects_list_tab_state::perform_list(
 	const ad_hoc_in_atlas_map& ad_hoc_atlas,
-	std::optional<std::string> timestamp_column_name
+	std::optional<std::string> timestamp_column_name,
+	augs::window& window
 ) {
 	using namespace augs::imgui;
 
@@ -265,6 +277,14 @@ bool projects_list_tab_state::perform_list(
 			if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
 				selected_arena_path = path;
 			}
+
+			if (ImGui::BeginPopupContextItem()) {
+				if (ImGui::Selectable("Reveal in explorer")) {
+					window.reveal_in_explorer(path);
+				}
+
+				ImGui::EndPopup();
+			}
 		}
 
 		const auto after_pos = ImGui::GetCursorPos();
@@ -344,13 +364,13 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 
 		switch (current_tab) {
 			case project_tab_type::MY_PROJECTS:
-			return tab.perform_list(ad_hoc, "Last modified");
+			return tab.perform_list(ad_hoc, "Last modified", in.window);
 
 			case project_tab_type::OFFICIAL_ARENAS:
-			return tab.perform_list(ad_hoc, "Last updated");
+			return tab.perform_list(ad_hoc, "Last updated", in.window);
 
 			case project_tab_type::COMMUNITY_ARENAS:
-			return tab.perform_list(ad_hoc, "When downloaded");
+			return tab.perform_list(ad_hoc, "When downloaded", in.window);
 
 			default:
 			return false;
@@ -572,6 +592,10 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 	{
 		auto child = scoped_child("create view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 
+		if (!cloning_from.empty()) {
+			text_color(typesafe_sprintf("Cloning from %x", cloning_from), yellow);
+		}
+
 		text_color("New arena name", green);
 
 		input_text("##Map name", name);
@@ -665,99 +689,141 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 	return false;
 }
 
+bool project_selector_setup::handle_input_before_imgui(
+	handle_input_before_imgui_input in
+) {
+	using namespace augs::event;
+
+	if (in.e.msg == message::activate || in.e.msg == message::click_activate) {
+		scan_for_all_arenas();
+	}
+
+	return false;
+}
+
+bool project_selector_setup::handle_input_before_game(
+	const handle_input_before_game_input
+) {
+	return false;
+}
+
 bool project_selector_setup::create_new_project_files() {
 	const auto& user_input = gui.create_dialog;
 	const auto& chosen_name = user_input.name;
+	const auto& cloning_from = user_input.cloning_from;
 	const auto sanitized = sanitization::sanitize_arena_path(EDITOR_PROJECTS_DIR, std::string(chosen_name));
 	const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
 
 	if (sanitized_path) {
-		augs::create_directory(*sanitized_path);
-		scan_for_all_arenas();
-		gui.projects_view.select_project(project_tab_type::MY_PROJECTS, *sanitized_path);
+		if (!cloning_from.empty()) {
+			try {
+				std::filesystem::copy(cloning_from, *sanitized_path);
 
-		const auto paths = editor_project_paths(*sanitized_path);
+				const auto old_filename = editor_project_paths(cloning_from).project_json.filename();
+				const auto new_filename = editor_project_paths(*sanitized_path).project_json.filename();
 
-		const auto sanitized_name = sanitized_path->filename().string();
-		const auto version = hypersomnia_version().get_version_string();
-		const auto timestamp = augs::date_time::get_utc_timestamp();
+				const auto old_project_json_in_new_project = (*sanitized_path) / old_filename;
+				const auto new_project_json_in_new_project = (*sanitized_path) / new_filename;
 
-		rapidjson::StringBuffer s;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+				std::filesystem::rename(old_project_json_in_new_project, new_project_json_in_new_project);
 
-		{
-			writer.StartObject();
+				gui.projects_view.select_project(project_tab_type::MY_PROJECTS, *sanitized_path);
+				scan_for_all_arenas();
 
-			writer.Key("meta");
-
-			{
-				writer.StartObject();
-				writer.Key("game_version");
-				writer.String(version.c_str());
-				writer.Key("name");
-				writer.String(sanitized_name.c_str());
-				writer.Key("version_timestamp");
-				writer.String(timestamp.c_str());
-				writer.EndObject();
+				return true;
 			}
-
-			writer.Key("about");
-
-			{
-				writer.StartObject();
-				writer.Key("short_description");
-				writer.String(user_input.short_description.c_str());
-				writer.EndObject();
+			catch (...) {
+				return false;
 			}
+		}
+		else {
+			augs::create_directory(*sanitized_path);
+			scan_for_all_arenas();
+			gui.projects_view.select_project(project_tab_type::MY_PROJECTS, *sanitized_path);
 
-			writer.Key("game_modes");
+			const auto paths = editor_project_paths(*sanitized_path);
+
+			const auto sanitized_name = sanitized_path->filename().string();
+			const auto version = hypersomnia_version().get_version_string();
+			const auto timestamp = augs::date_time::get_utc_timestamp();
+
+			rapidjson::StringBuffer s;
+			rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 
 			{
 				writer.StartObject();
+
+				writer.Key("meta");
+
+				{
+					writer.StartObject();
+					writer.Key("game_version");
+					writer.String(version.c_str());
+					writer.Key("name");
+					writer.String(sanitized_name.c_str());
+					writer.Key("version_timestamp");
+					writer.String(timestamp.c_str());
+					writer.EndObject();
+				}
+
+				writer.Key("about");
+
+				{
+					writer.StartObject();
+					writer.Key("short_description");
+					writer.String(user_input.short_description.c_str());
+					writer.EndObject();
+				}
+
+				writer.Key("game_modes");
+
+				{
+					writer.StartObject();
+					writer.Key("quick_test");
+
+					{
+						writer.StartObject();
+						writer.EndObject();
+					}
+
+					writer.Key("bomb_defusal");
+
+					{
+						writer.StartObject();
+						writer.EndObject();
+					}
+
+					writer.EndObject();
+				}
+
+				/* These aren't necessary because we're properly finding sensible defaults in the serializer */
+	#if 0
+				writer.Key("settings");
+
+				{
+					writer.StartObject();
+					writer.Key("default_server_mode");
+					writer.String("bomb_defusal");
+					writer.EndObject();
+				}
+
 				writer.Key("quick_test");
 
 				{
 					writer.StartObject();
+					writer.Key("mode");
+					writer.String("quick_test");
 					writer.EndObject();
 				}
-
-				writer.Key("bomb_defusal");
-
-				{
-					writer.StartObject();
-					writer.EndObject();
-				}
+	#endif
 
 				writer.EndObject();
 			}
+			
+			augs::save_as_text(paths.project_json, s.GetString());
 
-			/* These aren't necessary because we're properly finding sensible defaults in the serializer */
-#if 0
-			writer.Key("settings");
-
-			{
-				writer.StartObject();
-				writer.Key("default_server_mode");
-				writer.String("bomb_defusal");
-				writer.EndObject();
-			}
-
-			writer.Key("quick_test");
-
-			{
-				writer.StartObject();
-				writer.Key("mode");
-				writer.String("quick_test");
-				writer.EndObject();
-			}
-#endif
-
-			writer.EndObject();
+			return true;
 		}
-		
-		augs::save_as_text(paths.project_json, s.GetString());
-
-		return true;
 	}
 
 	return false;
@@ -808,6 +874,7 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 			if (auto selected = gui.projects_view.find_selected()) {
 				gui.create_dialog.name = std::string(selected->arena_name) + "_remake";
 				gui.create_dialog.short_description = selected->about.short_description;
+				gui.create_dialog.cloning_from = selected->arena_path;
 				gui.create_dialog.open();
 			}
 
@@ -816,6 +883,7 @@ custom_imgui_result project_selector_setup::perform_custom_imgui(const perform_c
 		case project_list_view_result::OPEN_CREATE_DIALOG:
 			gui.create_dialog.name = find_free_new_project_name();
 			gui.create_dialog.short_description = "Resistance invades Metropolis.\nProtect the civilians.";
+			gui.create_dialog.cloning_from.clear();
 			gui.create_dialog.open();
 			return custom_imgui_result::NONE;
 

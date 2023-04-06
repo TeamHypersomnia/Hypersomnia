@@ -1894,7 +1894,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 		ImGui::SameLine();
 
-		text(typesafe_sprintf("%x", project.meta.name));
+		text(typesafe_sprintf("%x", in.setup.get_paths().arena_name));
 
 		ImGui::Separator();
 
