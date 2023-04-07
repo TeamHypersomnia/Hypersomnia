@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- First we need to be able to host them officially on the server at all, under the assumption that all clients have these already
+
 - Prepare comprehensive official resource collection
     - What do we make official?
         - Vent sprites certainly because we already have an official vent physical material

@@ -118,7 +118,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
-		d.common.standard_price = static_cast<money_type>(2100);
+		d.common.standard_price = static_cast<money_type>(900);
 
 		{
 			auto& in = d.explosion;
@@ -160,7 +160,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
-		d.common.standard_price = static_cast<money_type>(5000);
+		d.common.standard_price = static_cast<money_type>(4100);
 		d.missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 	}
 
@@ -187,7 +187,7 @@ void load_test_scene_sentience_properties(
 		d.charging_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_CHARGING);
 		d.charging_particles.modifier.scale_lifetimes = 1.3f;
 		d.charging_sound.id = to_sound_id(test_scene_sound_id::CAST_CHARGING);
-		d.common.standard_price = static_cast<money_type>(4800);
+		d.common.standard_price = static_cast<money_type>(2500);
 
 		{
 			standard_explosion_input in;
