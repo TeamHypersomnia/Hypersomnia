@@ -670,6 +670,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
 	vsync_mode = "OFF",
 	disabled_max_fps = 300,
+	max_fps_method = "YIELD"
   },
   faction_view = {
 	colors = {
@@ -824,7 +825,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 
   performance = {
 	max_particles_in_single_job = 2500,
-	swap_buffers_when = "AFTER_HELPING_LOGIC_THREAD",
+	swap_buffers_when = "AFTER_GL_COMMANDS",
 
     special_effects = {
 	  explosions = {

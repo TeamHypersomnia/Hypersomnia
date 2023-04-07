@@ -2507,6 +2507,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				write_buffer.new_settings = viewing_config.window;
 				write_buffer.swap_when = viewing_config.performance.swap_window_buffers_when;
 				write_buffer.max_fps = viewing_config.window.max_fps;
+				write_buffer.max_fps_method = viewing_config.window.max_fps_method;
 				decide_on_cursor_clipping(in_direct_gameplay, viewing_config);
 
 				releases.set_due_to_imgui(ImGui::GetIO());
@@ -3485,14 +3486,37 @@ work_result work(const int argc, const char* const * const argv) try {
 				buffer_swapper.swap_buffers(game_main_thread_synced_op);
 
 				const auto max_fps = get_read_buffer().max_fps;
-				const auto target_delay_ms = max_fps.value >= 0 ? 1000.0 / max_fps.value : 0.0;
 
-				const auto passed_ms = this_frame_timer.extract<std::chrono::milliseconds>();
+				if (max_fps.is_enabled && max_fps.value >= 10) {
+					const auto target_delay_ms = 1000.0 / max_fps.value;
+					const auto method = get_read_buffer().max_fps_method;
 
-				if (max_fps.is_enabled != 0 && passed_ms < target_delay_ms) {
-					const auto to_sleep_ms = target_delay_ms - passed_ms;
+					auto passed_ms = this_frame_timer.get<std::chrono::milliseconds>();
 
-					std::this_thread::sleep_for(std::chrono::duration<double>(to_sleep_ms / 1000.0));
+					while (passed_ms < target_delay_ms) {
+						switch (method) {
+							case augs::max_fps_type::SLEEP:
+							{
+								const auto to_sleep_ms = target_delay_ms - passed_ms;
+
+								std::this_thread::sleep_for(std::chrono::duration<double>(to_sleep_ms / 1000.0));
+							}
+							case augs::max_fps_type::SLEEP_ZERO:
+								yojimbo_sleep(0);
+								break;
+							case augs::max_fps_type::YIELD:
+								std::this_thread::yield();
+								break;
+							case augs::max_fps_type::BUSY:
+								break;
+							default:
+								break;
+						}
+
+						passed_ms = this_frame_timer.get<std::chrono::milliseconds>();
+					}
+
+					this_frame_timer.reset();
 				}
 			}
 		}

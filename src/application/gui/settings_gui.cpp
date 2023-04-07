@@ -447,6 +447,7 @@ void settings_gui_state::perform(
 						auto scope = scoped_indent();
 
 						revertable_slider("Max FPS", mf.value, 15, 400);
+						revertable_enum("Method", config.window.max_fps_method);
 					}
 				}
 

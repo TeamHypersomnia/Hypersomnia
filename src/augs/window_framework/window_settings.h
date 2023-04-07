@@ -13,6 +13,15 @@ namespace augs {
 		// END GEN INTROSPECTOR
 	};
 
+	enum class max_fps_type {
+		// GEN INTROSPECTOR enum class augs::max_fps_type
+		SLEEP,
+		SLEEP_ZERO,
+		YIELD,
+		BUSY
+		// END GEN INTROSPECTOR
+	};
+
 	struct window_settings {
 		// GEN INTROSPECTOR struct augs::window_settings
 		std::string name = "example";
@@ -26,6 +35,7 @@ namespace augs {
 		bool log_keystrokes = false;
 		vsync_type vsync_mode = vsync_type::OFF;
 		maybe<int> max_fps = maybe<int>::disabled(60);
+		max_fps_type max_fps_method = max_fps_type::YIELD;
 		// END GEN INTROSPECTOR
 
 		xywhi make_window_rect() const {

@@ -46,6 +46,7 @@ struct game_frame_buffer {
 	augs::window_settings new_settings;
 	swap_buffers_moment swap_when = swap_buffers_moment::AFTER_HELPING_LOGIC_THREAD;
 	augs::maybe<int> max_fps = augs::maybe<int>::disabled(60);
+	augs::max_fps_type max_fps_method = augs::max_fps_type::YIELD;
 
 	bool should_clip_cursor = false;
 	bool should_pause_cursor = false;
