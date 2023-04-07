@@ -238,6 +238,10 @@ namespace augs {
 		push_no_arg(no_arg_command::FULLSCREEN_QUAD);
 	}
 
+	void renderer::finish() {
+		push_no_arg(no_arg_command::FINISH);
+	}
+
 	void renderer::set_blending(const bool on) {
 		push_toggle(toggle_command_type::BLENDING, on);
 	}

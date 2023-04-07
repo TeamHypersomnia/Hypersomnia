@@ -5362,3 +5362,561 @@ Advantages:
 - Add how many nodes were deleted in the description
 - I'd hide the arrow to communicate a layer is empty
 
+# Autosaves, resources, redirects et al
+
+- Can'we just save the project state before assigning the saved revision?
+    - This will make it absolutely deterministic
+- Alright, EASIEST SOLUTION:
+    - Load pristine projects as they are, don't rebuild their resources
+    - 
+    - We won't even need to parametrize rebuilders by project
+
+
+- Why the heck would we even rebuild these revisions?
+    - The whole point is they won't be used if anything is posted beyond these two
+
+- Uhh, maybe_rehash is a source of indeterminism here
+    - We should rebuild just once and reapply changes to both revisions
+
+- Note that rebuild_pathed_resources_for reassociates resources with the filesystem gui.
+    - So even though the physical filesystem does not change, we have to rerun rebuild_pathed_resources_for
+    - As for missing resources, note that rebuild_pathed_resources_for was always called on a pristine filesystem gui node
+        - So right after recreating it from filesystem
+        - Therefore if no resource matched that filesystem node, the associated resource id is just empty
+        - We might need to rerun an association function
+
+- When we launch with an autosave, do we show the report of redirects/missings for the autosave or for the saved state?
+    - I say for autosave revision
+        - That is because it's meant to be the newer one
+- Then we need to do the redirects for both project states saved incrementally
+
+- Also remember to rebuild_project_special_filesystem
+
+- Watch out to *not* automatically autosave when we auto-redirect post-project load
+    - (since we do after successful redirects normally)
+    - Shouldn't happen because we'll always be at autosave post-load
+    - However we might invoke rebuild_pathed_resources on replace's undo which would trigger an autosave on a "saved" instead of autosave, deleting the autosave
+        - there is force_autosave called so it's not checking for any other conditions
+
+- I say when the project loads, do not redirect. Only report missing ones.
+    - Remember auto-redirect is a special action because it changes state.
+    - *Nah, that will be counterintuitive because someone might redirect when the game's off and they'll see the game didn't redirect it right away.*
+    - We might rebuild on undo/redo of the replace command.
+
+- Then with autosaves
+    - For when we can still switch between autosaved and last saved..
+        - ..Just rebuild filesystem gui once to show factual file state
+            - and pass it as argument to rebuild pathed resources in both before and after
+            - we could also rebuild it after each undo/redo
+    - Now after any command is posted, the other is invalidated
+        - If last saved was selected then autosave obviously would be anyway
+            - but can still be retrieved because we won't autosave unless redirects dirtied state
+                - we could disable autosaving too at this point
+                - it probably makes no sense at all to autosave at any point while we're still at these two revisions
+    - After that, resources pool will never be directly assigned to.
+        - So we don't have to worry about ids being invalidated in other commands.
+        - From now on the only ops on resources will be additive existentially.
+- Let's start again
+    - First consider the smallest working model
+        - No autosaves, just one session
+            - Resource existence is only additive in time - we don't delete them from the pool, ever
+            - Redirects don't need commands, we can notify about all redirects as well 
+                - We HAVE to notify about redirect, because we HAVE to mark it as dirty. The user needs an explanation.
+                    - We have to mark is as dirty because saving at now saved revision would result in a different json file - therefore no truly saved revision exists.
+                - We might autosave at this point, and we mark as dirty. Also we prompt the user to save soon.
+            - At this point all is well.
+            - Problems begin when we want to delete a resource.
+                - Missing resources are in a way simpler than redirects because no state is changed. We just notify of the fact.
+                - Note we don't really need to delete a resource in order to "forget" it.
+                    - In practice, just not showing a popup about a missing resource when we know it is irrelevant to json state is enough.
+                        - We don't have to delete it.
+                        - This ensures resource ids are NEVER invalidated.
+                        - This way we're sure past/future revisions are valid
+                        - So we don't really have to "invalidate entire history" when we want to forget a resource.
+                
+                - Implementation detail: We'll need to rescan reference counts after every command.
+                    - This is so that we know if we have to report resource as missing.
+                - Technically, execute_new cannot introduce a dependency on an unbacked/forgotten resource (making it missing).
+                    - But it can FIX REFERENCES TO MISSING ONES!
+                        - so we need to rescan either way
+                        - BUT IT"S OKAY IF WE ONLY SCAN ones with found_on_disk = false.
+                            - So not necessarily last_missing_resources vector (because it's a conjunction of both sets)
+                            - But a separate vector of resources with found_on_disk = false
+                            - Because we're only checking for changed resource counts
+                    - because it will not show in the filesystem gui.
+                    - undo/redo can, and also rescanning pathed resources can
+                    - if performance is an issue, we can ONLY do this if there is at least ONE unbacked/missing resource.
+                        - although if there's even a single unbacked one (with already removed references) we'll have to rescan always
+                            - We could stop rescanning all commands after the first one that removes all references to it.
+                            - for now we'll just rescan always and optimize in the future
+
+- Also think a bit if all this additional complexity is a better investment than several bandaids
+- "Import 6 resources? 
+This will discard your redo history."
+
+- we'll overhaul this anyway but we had an autosave during playtest
+    - but we did place spawns. Well, it's to be expected tbh
+    - Not a bug
+
+- New nomenclature proposition
+    - rescan_filesystem_entries
+    - reassociate_resources_with_filesystem
+        - this doesn't necessarily trigger commands?
+
+- rebuild_pathed_resources can just return a vector of results so that we can decide if we want to use it as a command or just to modify the resources in the replace whole project command
+    - We need this anyway to first prompt the user before posting a command
+    - Unimported ones will be grayed out and say "This resource must first be imported".
+- Also we don't even need to rebuild the editor_filesystem_gui when we undo/redo etc, because we assume that real file existence only changes when we alt tab
+    - We need to reset their ids though? Or depend on determinism that the created ones will be there again 
+    - Although watch out because rebuild will clear all ids there too on alt-tab
+        - I think we'll just end up associating them by path later
+
+- Just to avoid a command triggering right after we load, just like we said earlier, import right into the replace_whole_project_command right after reading from json
+    - 
+- Why not just always show real hdd filesystem in the gui,
+    - but for undone imports just show them inactive (detected by dead resource id)
+    - and for undone redirects just report the old ones as missing without triggering a missing popup already
+
+- To properly undo a redirect, however, we'd have to rebuild the filesystem gui from the former state, not from what's acutally on hdd
+    - Can't we just report as missing?
+
+- I'm starting to be for commandization
+    - Even if we like unshow them in the filesystem that's not really much of a problem
+    - Btw then we can only show nodes for which we have a live associated resource
+    - And simply ask before importing/redirecting if future revisions exist
+
+- We need to rethink this from the ground up
+
+- Or we just disable imports/redirects until either autosave or saved revision is chosen?
+
+- Another corner case.. if we rebuild after we undo, it will overwrite our autosave with the saved revision
+
+- Btw currently whole filesystem ui gets destroyed because we don't rebuild resources after redoing/undoing autosave
+    - Even with commandization it would kinda suck to "unshow" the resources in the filesystem
+
+- So why not just commandize?
+    - Undoing redirect should be intuitive, the resources just show up in missing
+        - and we don't have to prompt idiotically
+
+- Note that even if the file is unused in the current revision, it might still be used in the saved revision
+    - So a redirect should make it dirty even though no references are found in the current revision
+- Similarly, resources might "become" missing after undoing or redoing even though they are not missing now...
+
+- Since now this is only a problem with autosave..
+    - *We can keep the state in autosave command up to date as well!*
+    - Simply call rebuild_pathed_resources for the autosave command as well!!!
+        - For both before and after
+    - Also, only redirecting used resources should trigger a "dirty" flag
+        - We can also prompt "Please save the project to remember this change"
+            - Autosave could technically save the redirects if it's not saved
+                - it should really
+                - then even without ctrl+s we won't be prompted with a redirect popup on relaunch
+    - Can we then dumbly assign on undo/redo for autosave command?
+        - How do we ensure that both the saved revision and autosave revision have the same existential set?
+            - unfortunately we cannot
+            - both may have e.g. resources that simply do not exist, and different sets of these
+            - so they'll need to allocate different sets of resources
+
+
+
+- We could import (start tracking) resources ONLY once they are first used.
+    - And automatically forget them if they are edited back to normal.
+    - This would regenerate the atlas a lot however unless we created it from the entire filesystem
+
+- Problematically, if there's more resources when loading the autosave,
+
+- "File is missing" popup needs to disappear if the deleted resource wasn't used anywhere or modified
+    - For this we need to run recount references once after rebuilding the filesystem
+
+- Autosaves and resource persistence
+    - Pros of commandizing resource existence:
+        - Everything's clear in history
+        - When forgetting a resource, don't have to invalidate the entire history.
+        - Autosave problem is solved. If there are more resources than there is in autosave when loading, an import command will placed on top.
+            - This prevents invalidation of future commands when switching back to autosave revision
+        - Also it's intuitive when auto-redirecting because we need to save the changes
+            - The project file actually changes so why shouldn't we commandize it?
+            - Otherwise when you're on a saved revision it's not really saved (we could make it dirty or not highlighted in green but meh)
+    - Cons:
+        - "Undoing imports" means we have to literally hide existing hdd entries from the filesystem gui
+        - "Imported" command with unused resources will show up literally every time we open a file with autosave, in case a map has many unused sprites
+            - Easy: we can reubild after autosave and modify the Load Autosave command to include these new unused resources!
+                - Same with the Open project command!
+                    - So that we don't show the message with imported resources literally every time we open even a saved project
+            - Redirect is important so we should show it up as a command
+                - Actually we can do all the redirects too. And include these in the command.
+
+            - We can SKIP rebuild for the first time
+                - Ahh that sucks because the unused resources won't show up in the explorer right away
+            - Because we only serialize used resources
+            - Then the tip to "ctrl+z" won't even apply because you'd have to do it twice
+        - Can fuck up future revisions in history unexpectedly because this would happen automatically
+            - We just need to issue a warning if the revision isn't newest
+        - Literally the only use case is a) the autosave b) to not have to invalidate whole history
+        - Bloats command history
+            - What does it even mean that we can undo import/redirect?
+            - We'd have to hide the undone imports from the explorer
+            - in case of redirects, we'd have to show them as missing or what?
+
+- Commandizing would be good because then an accidental import could be undone
+    - But if resources are unused (no changes and no references), we shouldn't spawn a "missing" popup
+
+- Should we commandize resource existence?
+    - Why not?
+    - Apart from autosave, this will also let us handle forgetting resources normally
+    - The only problem being that an import/redirect will overwrite revisions from the future
+
+- Note we'll have to clear the history if we want to forget resources
+    - Let's also think of corner cases with autosave
+        - autosave could have:
+            - less resources than in saved
+                - Once we rebuild though, there will be the same amount of resources
+                - Consider this.    
+                    - An autosave has less resources, this is being kept in the project struct in "after" field
+                    - Now resources are reloaded as the game window is activated and there is more resources
+                    - Some of the new resources are instantiated and new commands on top of autosave load are created
+                    - "Undo" is performed back to autosave command
+                    - The redo will work on nonexisting resources.
+            - more resources than in saved
+
+# (End of Autosaves, resources, redirects et al)
+
+- We could also disable undoing autosave command once any other command is posted
+    - Note this doesn't take away any option
+        - If you quit now without saving, you'll still be greeted with autosave + last saved
+        - And you don't have to worry about the
+    - This with not deleting forgotten resources might be the simplest option
+
+- Test sanitization on windows too
+
+- O(N) algorithm for detecting used/unused resources
+    - Instead of calling on_each_resource_id_in_project for each existing resource which would be quadratic
+    - Just call on_each_resource_id_in_project once
+        - And hold a std::unordered_map<editor_resource_id, uint32_t> references;
+        - We could literally hold this as mutable in the resources instead of creating a map
+    - So when do we recalculate?
+        - Surely on write because we want to know which external resources to serialize
+            - It'd be pointless to serialize all unused resources with default properties
+    - Note we only do this with pathed resources.
+        - We will want to serialize the internal resources anyway because even their names constitute data
+    - Then when the game loads this json it will only allocate the needed resources as images. Voila!
+        - Note however we'll serialize based on two criteria: whether the image's both unused AND unmodified.
+        - We might want to save the number of references so that the game doesn't load unused resources despite them being modified for later use!
+    
+- colorize -> color maybe?
+
+- Also nothing happens if two resources have the same display name in-game
+    - we'll have to use a pseudo id that considers an extension
+- Mapping official resources
+    - Can we guarantee that all resources
+        - Does it matter at serialization stage?
+        - These are only display names, but it would be nice if they matched ids
+
+- JSON serialization
+    - We'll need a context object anyway
+        - Unless we put strings into ids ourselves
+        - Technically we could
+        - And we'll anyway need a routine to manually resolve all dependencies once string ids are read
+    - Reading
+        - Dependency resolution
+            - We first have to read all resources
+            - That is because before we read a node, we setup its defaults
+            - And also it would be good to resolve resource names right away when reading these nodes so that we don't have to do a secondary lookup
+                - We'll can read resources first anyway regardless of if we do this
+    - Writing
+        - Skipping defaults
+            - It only concerns writing and not reading, right?
+                - Reading just checks if the variable exists anyway    
+
+- What happens when a resource image changes size?
+    - We should actually reload it in the editor to be state-correct
+        - Otherwise a completely different map would load on restart which is bad
+            - Unless of course we serialized image sizes but do we want to?
+            - Maybe we should?
+    - If size is default, do we write it to json?
+
+- Duality of defaults
+    - Names
+        - editor_quick_test_mode
+        - default_server_mode
+    - Both editable from the arena properties I'd say
+        - We'll easily adapt the resource chooser
+    - One of them will be visible in the toolbar
+    - Alright
+        - I think editor_quick_test_mode should be used for both local playtesting and online playtesting
+            - by the way let's use this terminology and don't use 'server playtesting' in particular because then it will really be confusing
+        - Reason being is that once we start up the server with the clapborad, we'll automatically connect back to it by pressing space
+            - so there won't really be any space for "i'll locally test it before syncing it to the connected guys" kind of flow
+
+- Problem: editing prefab triggers rebuild of the child nodes which makes history commands non-deterministic
+    - That is because nodes are freed and reallocated, but undo does not replay it backwards
+    - similarly all existential commands like duplicating/creating would have to take this into account
+        - you'd have to basically save the entire project state in history if one of the edited nodes is a prefab
+    - The cleanest solution will be to ditch child nodes
+        - Simply have a callback for rebuilding the nodes directly inside scene creation
+    - Now we need to ditch the anchor node
+        - So implement prefab as an actual marker, copy implementation from markers
+            - Then hide all markers for un-nodeized prefabs (would anyway be counter-intuitive if there were icons but couldn't be selected)
+    - Both rebuild_prefab_nodes and destroy_prefab_nodes won't exist (at least named as such)
+
+    - Will this solution be free of corner cases though?
+        - Setting up references between the nodes might be a pain
+            - We could use name-based lookups? but that would be a pain
+                - and setup unique node names only after actually creating them all (during nodeization)
+            - Nah I don't think we'l l switch to name lookups just because of prefabs
+        - Since we care to keep names unique, we could use name-based identities in commands
+            - Then we don't have to deterministically undelete
+            - but properties would need to use names as well
+                - Well, this will would make it easier to serialize but it kinda sucks to have it non-typed in logic
+    
+    - Verdict: I think for now let's go with a callback and don't worry about assigning ids
+        - We don't need it yet and we won't need it for a while
+            - and it has nothing to do with state so we don't have to decide now
+        - note we don't have to store these in "variants" or "pools"
+    - Inter-node Association is a complex topic 
+        - dependencies will have to anyway be resolved yet again after creating all entities
+            - so might as well do it with prefabs customarily later
+
+- Icon previews can be shown *before* the combo box 
+    - so that we don't have to alter combo box logic
+
+- When do we rebuild the prefab?
+    - Remember to delete child nodes when deleting the prefab!!!!
+        - And when undoing duplication..
+        - and when undoing create.. lol
+        - Btw we thought of just having a lambda for_each_child_node instead of actually allocating them but this won't work
+            - because we need an actual node for the anchor and the logic here would be the same
+    - Preemptively on create
+    - On duplication too (we had a crash because we didn't)!!!!
+    - Preemptively on edit
+    - Any time any transform is read-back to the anchor prefab node in read_back_to_nodes
+        - Should happen in the same frame
+        - We can trivially check for being an anchor node since all nodes have prefab parent member
+    - With this, every case should be covered
+    - Problematically, we have to selectively reinstantiate entities for the nodes once we rebuild them
+        - Instead of rebuilding the whole scene, although we might rebuild it entirely for a start
+
+- Also we shouldn't make the component nodes selectable at all
+
+- Note we don't rebuild the prefab during scene rebuild
+    - The scene might actually completely ignore the prefab node
+        - except for iterating through its children
+
+- We need to setup node defaults before serializing nodes
+    - E.g. default as_aquarium would have empty ids set
+    - And this would force the serializer to write the default settings even though we didn't modify them
+    - We will need to provide a defaults_provider after all
+    - This situation with defaults in prefabs doesn't change anything
+        - Note we can have e.g. just size and pos modified in the editable
+        - but the serializator will detect that the editable has changed so it will redundantly write e.g. rotation as well
+    - Verdict: we'll somehow need to delta per-field (multi-introspection), and not just per type!
+        - We'll have to adapt the json serializer
+        - It will have to accept an entire second object for serialization - the default
+        - Call ::setup_node_defaults on that object
+
+
+- When instantiating prefabs, we need to create *nodes*, not entities
+    - Because we want to be able to unpack ("nodeize") them
+
+
+- Special resources
+    - I think we can just have a variant
+    - And an enum instead of a typed resource id
+    - Why? we will anyway supervise serialization of resources
+        - So we can as well supervise serialization of specials and have arbitrary design on the binary side of things
+    - Actually let's have a dummy resource id
+        - Removing it would subvert our architecture and add lots of if/elses
+        - Plus we might want editor_resource_id to potentially refer to a prefab actually
+- dev_floor_128, 256, 64, 32 etc
+
+- deal with name collisions of custom sprites vs official sprites
+    - looks like we can't identify by name
+        - won't this be solved just by fixing the resources chooser?
+    - Look, unique names are ONLY required during serialization but official resources will be marked with [] anyway
+        - Otherwise it's merely a matter of displaying them
+    - obviously layers need unique names for serialization but that we're already handling well
+
+- Aquarium - We only really need to think how we'd do it manually and support it in the editor
+    - The rest is only about automatized placement, we shouldn't worry about these two simultaneously
+
+- Is our model still incomplete?
+    - If we allow specifying custom resources in the aquarium node,
+        - we will need to implement the non-physical override for the officials as well
+    - Also think where creating organisms fits into this all
+        - Are they just in the foreground domain? (esp. the insects must be foreground)
+    - We shouldn't worry about duplicate flavours
+        - at least the image defs won't be reused
+        
+- silly idea but until we have a geometry editor we could have default colliders in various shapes
+    - e.g. triangle_wood_collider
+    - sucks that we can't set material per entity but screw it, we can list all properly, there won't be many of these
+        - won't hurt to support it longterm as it will be basically blank texture
+    - then we can resize/rotate it as we will which I think already works with physical shapes (e.g. crates can be resized)
+
+- The physical shape editor simply specifies the default shape
+    - This shape overrides what would be shown with the standard in-world geometry editor
+
+- we could as well have a separate window for things like project-wide playtest settings 
+    - even though it will technically be a project setting
+    - but won't hurt to have some specific settings separately from inspector i guess
+    - Project->Playtesting
+        - yeah maybe it'd be good to have a menu for various project settings to indicate they're indeed project-wide
+    - there's no mass edit involved here
+
+- Playtesting settings: how do we save them?
+    - A separate window?
+    - Maybe it should be a project-wide setting? With all the default mouse angles etc, default factions and weapons
+        - Yeah probably just save it in json
+    - Immersive mode can just be a flag ofc
+    - We can have a menu entry for this why not
+    - default guns/faction could be customized too
+    - default spawn node setting will override the spawning at view-center 
+        - it will be a project setting
+
+- Json readwrite and ignoring defaults
+    - With reads it is really simple, if we read e.g. a physical resource we can set the default before reading directly into it
+    - The best default provider would be just the default type
+    - We might have a per-type default provider passed to write_json
+
+- The whole idea of overrides is stupid af it'll just complicate our editor arch
+    - We'll just have to copy the file and be done with it, atlas will be easily able to recognize it
+    - Also we should really have the option to unpack the aquarium into nodes.
+        - So that we can do a thing similar to fy minilab
+        - If you want non-physical aquarium walls you'll just do it yourself, that's just a template
+        - Will autoselect the unpacked nodes
+
+- Uhh can't we force just separate resources?
+    - The domain overrides complicate the shit out of creation pipeline
+    - We could later have virtual resources
+
+- Note that even if we wanted to make this aquarium manually
+    - we'd still need those lab walls with overridden domain
+
+- We've touched on separate topics here
+    - Automatized placement/special prefabs specification - this is solved, we'll have enums and structs per each usecase
+    - Domain overrides for nodes
+        - we were worried about too many flavours which led us to think about static allocation limits
+            - But maybe we shouldn't worry about it for now? We'll have to increase the limit anyway, I think flavors will be smaller
+        - Ultimately we could make the render invariant a component so we can have just a single flavor (?)
+            - Still would be a waste to make the physics cache dereference it
+        - Okay then we should necessarily just lazy-allocate the flavors we need for overrides
+        - Only thing left is how we think of organisms here because the physical domains won't specify moving organisms
+            - Although insect sprites will always be foreground so I don't get the problem
+            - It's just whether we want to make it a separate domain, maybe yes? Organism could be both bg and fg
+
+
+- Listing weapons - they need some special creating logic
+    - Similarly, magazine listings
+    - We'll basically have separate categories for:
+        - Firearms
+        - Ammunition
+        - Melee weapons
+        - Explosives
+    - In particular those will not appear in gfx
+        - If so, how do we go about creating them in custom maps?
+            - It's not a worry for now technically
+        - Initially, they WILL be mixed with other environmental objects and you cannot do anything about it
+        - Nothing wrong with that
+            - Yes we can hide those in officials because the resources are already madew
+            - But there's no way to hide them in the Project tab
+            - Will be your responsibility technically to just categorize it properly and make sure you don't just drag and drop the graphic instead of the entire weapon
+                - Will be easy to notice though as there won't be a magazine
+        - How else will you define sprite properties like neons etc for them as sprite resources?
+            - You will have to set their domain to physical to edit their physical properties though
+        - The icon for the special resource will display just the weapon but could even display the entire thing with attachments later
+        - The weapon creator will just accept several parameters and create the weapon straight away with the magazine resources too
+        - Problem: recreating the weapon from the creator might leave us with abandoned magazines
+            - A problem for later since officials wont change
+            - Still, that creator will mostly be for asset specification
+            - Later only small parameters will change not the whole concept with assets involved
+
+
+        
+- We can make fishes into gifs to test the GIF animation pipeline
+
+- Also the rainbow fish thing will now be handled with separate files
+    - We can easily optimize it later by detecting duplicate entries in the atlas (by hashing for example)
+    - We could also have a naming convention for copying files but that would be overkill
+
+- Technically aquarium could be templatized without fish parameters
+    - We can later just drag& drop from the organism section
+    - An organism area will be a special resource too
+
+- Something like aquarium could still be parametrized by entities though
+    - It will first need to be created and put on scene
+        - Since a resource cannot contain references to an entity
+
+- For differentiating between stuff like dragon rainbow fish and rainbow fish we'll use a flag "disable special effects" per-sprite
+    - Okay but it's still problematic because they can't be used as separate flavors/resources
+    - So can't be passed as separate arguments to an aquarium for example.
+    - As it stands we can't even list them properly as resources
+    - At some point in time we might have virtualized resources
+    - For now we'll just have to use a single flavor
+
+- Colorize icons/resources by their colorize parameters
+
+- Let's do the same for weapons so that we have a nice listing of them
+
+- We need to properly decide which official resources to list
+    - However what we've done will already help us a lot in that we won't have to port particles itp
+
+- Okay so the first challenge will be to list all these official resources somehow in the resources view
+    - We can keep the old generation logic
+    - We should just create a manual list of resources to list
+        - We don't want like muzzle sounds or magazine pics because they won't be used
+        - Even though they could technically be used in creating new special resources later
+    - We could virtualize the folders
+    - Some foldering would only be needed insofar as special graphics are concerned, we can leave it for later
+
+- As for whether we should have a special Domain for weapons/special objects..
+    - We'll worry about it when we get to this stage
+    - Because we'll only allow creating weapons/particles/phys materials later
+    - We could even decide to make it a separate special folder
+        - so that normal graphics don't have additional domains to choose from
+
+- Do we have another domain for special objects like aquariums and guns?
+    - They mix objects from various domains
+
+- It would be good to implement something like aquarium early to finally clear all that confusion
+    - As well as weapons
+
+- As for officials we also need special objects with parametrization
+    - Like aquarium with parametrized sizes
+    - This doesn't have to be visualized in the editor except on the cosmos stage
+    - It can just be tagged somehow
+    - Aquarium will be parametrized and won't have to reference any specific image ids
+    - Only specific non-special official resources might reference other official resources
+    - What about lights? Do we just have a tag for them too?
+        - I don't think lights are referenced elsewhere though in officials so they can be viewable/editable
+
+- Major problem: reconciling official content with created content
+    - Can we use the existing functions for populating the cosmos with official resources?
+        - And then e.g. filling it with the custom content from the map?
+
+    - I think none of the special resources will be editable for now
+        - We don't have to write serialization for anything that we provide as official
+            - It's enough that referencing it is implemented
+            - So we can have physical materials natively for now
+            - All physical materials will be official for now so we don't have to worry about serializing the collision matrix
+                - We'll determine later if we want to have a global collision matrix or just per-material entries because it won't be editable for now
+            - Same with particles, we'll just use the officials everywhere and not worry about serialization
+            - So that will just be a copy-paste mostly
+
+    - For serializing stuff like ids we should pass a lambda to write_json that has all the required references to properly map the id to a proper name
+        - For now let's have the default modifiers embedded in resources themselves and let's see how far it will take us
+            - Should work for entities at least since we have no component with modifier, how much really a single sound effect would be reused among flavors?
+                - Well maybe apart from stuff like footsteps
+                - okay but still different sprites for each of these and thus separate fields with modifiers possible
+        - Let's really not store std string directly there
+
+- Alright let's now try creating various entity types like lights and sounds
+- I think we'll first implement animations because we'll need them for the particles
+
+- Yeah I'm thinking let's first do those complex topics 
+    - that will let us finally strap everything into place
+
+- shift + select in layers selects all
+- that multiple selection might come in handy after all to e.g. set to physical multiple crates at once
+    - and to drop multiple objects to scene from resources if they are related like those floors
+- properly cast light on wall-like objects, perhaps some filter/render layer?
+

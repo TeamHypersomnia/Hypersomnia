@@ -85,6 +85,8 @@ namespace augs {
 				std::size_t n,
 				const dedicated_buffers&
 			);
+
+			void finish();
 		};
 	}
 }

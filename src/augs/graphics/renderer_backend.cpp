@@ -273,6 +273,7 @@ namespace augs {
 							case N::FINISH_WRITING_STENCIL: finish_writing_stencil(); break;
 							case N::STENCIL_POSITIVE_TEST: stencil_positive_test(); break;
 							case N::STENCIL_REVERSE_TEST: stencil_reverse_test(); break;
+							case N::FINISH: finish(); break;
 
 							case N::IMGUI_CMD: {
 								ensure(fb_height > -1);
@@ -460,6 +461,10 @@ namespace augs {
 			stencil_reverse_test();
 			GL_CHECK(glStencilMask(0x00));
 			GL_CHECK(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
+		}
+
+		void renderer_backend::finish() {
+			GL_CHECK(glFinish());
 		}
 	}
 }

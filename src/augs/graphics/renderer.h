@@ -188,5 +188,7 @@ namespace augs {
 
 		void next_frame();
 		void screenshot(xywhi bounds);
+
+		void finish();
 	};
 }

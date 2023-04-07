@@ -5,6 +5,13 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Easiest destructon system ever
+	- Just have a list of remnant flavors
+	- Along with positions and rotations
+	- Destruction system is responsible literally for just spawning them when enough damage is applied
+		- This will avoid the necessity to calculate some polygonal remnants
+		- Remnants could be destructible as well and have their own user-defined physical shapes
+
 - Smoke grenades
 	- Obstructing visibility
 		- Actually very simple: after visibility polygon is already generated:
