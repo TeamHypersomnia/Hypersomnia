@@ -804,6 +804,10 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	auto existing_paths = std::unordered_set<std::string>();
 
 	auto register_resources_found_on_disk = [&](editor_filesystem_node& file) {
+		if (file.sanitization_skipped) {
+			return;
+		}
+
 		const auto path_in_project = file.get_path_in_project().string();
 		existing_paths.emplace(path_in_project);
 	};
@@ -839,6 +843,10 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 
 		auto add_if_new_or_redirect = [&](editor_filesystem_node& file) {
 			if (file.type != type) {
+				return;
+			}
+
+			if (file.sanitization_skipped) {
 				return;
 			}
 

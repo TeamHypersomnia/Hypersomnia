@@ -28,6 +28,7 @@
     "layers": [
         {
             "id": "markers",
+            "is_open_in_editor": false,
             "active": false,
             "nodes": [
                 "ct_spawn (32)-ml",
