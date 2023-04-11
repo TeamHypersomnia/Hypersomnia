@@ -1,4 +1,4 @@
 #pragma once
 #include <string>
 
-void LOG_DIRECT(const std::string& f);
+void LOG_NOFORMAT(const std::string& f);

@@ -135,7 +135,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 				augs::save_as_text(get_path_in_log_files("object1.txt"), describe_fields(*reinterpret_cast<checked_type*>(&buf1)));
 				augs::save_as_text(get_path_in_log_files("object2.txt"), describe_fields(*reinterpret_cast<checked_type*>(&buf2)));
 
-				LOG_DIRECT(log_contents);
+				LOG_NOFORMAT(log_contents);
 				FAIL(log_contents);
 			}
 
@@ -158,7 +158,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 					augs::save_as_text(get_path_in_log_files("object1.txt"), describe_fields(a));
 					augs::save_as_text(get_path_in_log_files("object2.txt"), describe_fields(b));
 
-					LOG_DIRECT(log_contents);
+					LOG_NOFORMAT(log_contents);
 					FAIL(log_contents);
 				}
 			}
@@ -167,8 +167,8 @@ TEST_CASE("StateTest2 PaddingTest") {
 			const auto breaks = determine_breaks_in_fields_continuity_by_introspection(checked_type(args...));
 
 			if (breaks.size() > 0) {
-				LOG_DIRECT(breaks);
-				LOG_DIRECT(describe_fields(checked_type(args...)));
+				LOG_NOFORMAT(breaks);
+				LOG_NOFORMAT(describe_fields(checked_type(args...)));
 
 				FAIL(typesafe_sprintf(
 					"Padding is wrong, or a variable is uninitialized in %x\nsizeof: %x\n", 

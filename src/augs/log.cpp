@@ -145,7 +145,7 @@ std::string program_log::get_complete() const {
 	return logs;
 }
 
-void LOG_DIRECT(const std::string& f) {
+void LOG_NOFORMAT(const std::string& f) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 

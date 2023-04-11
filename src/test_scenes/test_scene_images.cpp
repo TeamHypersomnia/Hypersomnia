@@ -87,7 +87,7 @@ void load_test_scene_images(
 			ensure_eq_id(id, new_allocation.key);
 		}
 		catch (const test_image_does_not_exist&) {
-			LOG_DIRECT("WARNING! Could not find an official game image: " + stem);
+			LOG_NOFORMAT("WARNING! Could not find an official game image: " + stem);
 		}
 	});
 

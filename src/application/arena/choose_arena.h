@@ -12,7 +12,7 @@ inline void choose_arena(
 	const auto emigrated_session = handle.on_mode([](const auto& typed_mode) { return typed_mode.emigrate(); });
 
 	if (name.empty()) {
-		LOG_DIRECT("Arena name empty, so making a default one.");
+		LOG_NOFORMAT("Arena name empty, so making a default one.");
 
 		handle.make_default(
 			lua, 
@@ -21,7 +21,7 @@ inline void choose_arena(
 	}
 	else {
 		const auto paths = arena_paths(name);
-		LOG_DIRECT("Solv file: " + paths.int_paths.solv_file.string());
+		LOG_NOFORMAT("Solv file: " + paths.int_paths.solv_file.string());
 
 		handle.load_from(
 			paths,

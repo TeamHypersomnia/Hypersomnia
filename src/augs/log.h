@@ -16,7 +16,7 @@ class program_log {
 	unsigned max_all_entries;
 
 	void push_entry(const log_entry&);
-	friend void LOG_DIRECT(const std::string& f);
+	friend void LOG_NOFORMAT(const std::string& f);
 
 public:
 	static auto& get_current() {
@@ -37,7 +37,7 @@ public:
 
 template <class... A>
 FORCE_NOINLINE void LOG(const std::string& f, A&&... a) {
-	LOG_DIRECT(typesafe_sprintf(f, std::forward<A>(a)...));
+	LOG_NOFORMAT(typesafe_sprintf(f, std::forward<A>(a)...));
 }
 
 #define LOG_NVPS(...) { \

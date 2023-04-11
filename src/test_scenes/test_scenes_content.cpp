@@ -21,7 +21,7 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 		load_test_scene_sounds(output_sources.sounds);
 	}
 	catch (const test_scene_asset_loading_error& err) {
-		LOG_DIRECT(err.what());
+		LOG_NOFORMAT(err.what());
 	}
 
 	loaded_image_caches_map out;
@@ -57,7 +57,7 @@ void populate_test_scene_viewables(
 		);
 	}
 	catch (const test_scene_asset_loading_error& err) {
-		LOG_DIRECT(err.what());
+		LOG_NOFORMAT(err.what());
 	}
 }
 

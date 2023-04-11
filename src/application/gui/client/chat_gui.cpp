@@ -10,7 +10,7 @@
 #include "game/messages/game_notification.h"
 #include "augs/templates/identity_templates.h"
 
-void LOG_DIRECT(const std::string& f);
+void LOG_NOFORMAT(const std::string& f);
 
 const auto standard_gray_v = rgba(200, 200, 200, 255);
 
@@ -28,7 +28,7 @@ bool chat_gui_state::add_entry_from_game_notification(
 		new_entry.message = str;
 		new_entry.overridden_message_color = col;
 
-		LOG_DIRECT(new_entry.operator std::string());
+		LOG_NOFORMAT(new_entry.operator std::string());
 		add_entry(std::move(new_entry));
 	};
 
