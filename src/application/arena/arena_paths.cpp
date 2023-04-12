@@ -19,7 +19,7 @@ arena_paths::arena_paths(
 }
 
 arena_paths::arena_paths(const std::string& arena_name) 
-	: arena_paths(augs::path_type(OFFICIAL_ARENAS_DIR) / arena_name, arena_name) 
+	: arena_paths(OFFICIAL_ARENAS_DIR / arena_name, arena_name) 
 {
 
 }

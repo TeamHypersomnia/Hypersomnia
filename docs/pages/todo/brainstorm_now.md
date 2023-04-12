@@ -6,6 +6,100 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Note test mode is unimplemented for multiplayer
+
+- Investigate a desync when switching legacy maps
+    - Does it happen in the previous commit?
+    - Also maybe it won't matter once we use new format
+
+- Also plan for sending/loading autosaves
+    - So that we don't have to explicitly save when doing another online playtest
+
+- Resolving duplicate arena names
+    - WILL happen.
+        - When you have made a map and you later want to download it
+            - We should also skip downloading if our map is identical on hdd
+    - If an official map exists, it should always override downloads/user projects
+        - A map like this should NOT exist on HDD
+        - If we didn't override someone could easily make their own version with transparent walls
+    - Therefore:
+        - Official > User > Downloads
+            - Official is first for anticheat and consistency (so de_cyberaqua always means de_cyberaqua and not some custom thing)
+            - User is first because the mapper might want to host their updated version of their own map they downloaded somewhere else
+        - Note that with this people could still make their own versions of downloaded maps with transparent walls, so maybe override it 
+            - Of course when you host, you should be able to choose any map
+            - In particular watch out to not host the downloaded version when you mean to host your updated edited version
+    - For security, order of resolution is irrelevant
+        - Client should just check map hashes if they match, every time
+            - Otherwise a script kiddie will just edit official maps directly
+            - So we should send hashes for officials as well
+            - And obviously for community maps always as well
+    - editor_project_paths must then resolve by name and hash
+        - With the nice format for current_arena variable, especially if we want to change it through config/cli..
+            - ..we won't be able to choose one duplicate name over the other specifically
+                - but are there cases we would like to do that?
+                - A mapper could host an earlier downloaded version for a test run
+                - Or host their own updated version. The duplicate needs to be resolved properly as well.
+            - We should therefore treat user/projects/arenas as a part of the downloads library!
+            - This way downloaded arenas will have a _VER1 etc suffixes
+                - However it would be dump to send "de_rats_VER1" to the clients when it is not known how it is numbered at the clients end
+                    - This applies not just to editing.
+                        - If we download multiple versions of the same map, we still have to do this to host one of them.
+            - Should we even show _VERx and such in the choosers and project selectors? Making them legit maps?
+    - We wanted to enable a flow where one person hosts their map, their friend downloads it
+        - then later they edit it and host it as well
+        - and the first guy can easily apply those changes
+        
+    - To resolve downloads/project collisions, we can preffix the name with "!" to denote the map MUST be taken from the editor files
+        - This is a one-shot variable and the ! should be stripped ASAP
+        - We can do this later. For now we can just disable hosting 
+    - Alright but this is still damn ugly
+    - Can't we just always prioritize the map in users when hosting?
+        - Why would a mapper want to host an outdated version anyway?
+        - They'll just ask someone else to host it
+        - Well there's no UI reason to disallow choosing the one from 
+    - For now let's disallow 
+        - Later we can add ! and strip this during net serialization stage
+        - current_arena variable will have to be sanitized anyway
+
+- Verdicts:
+    - Server-side and client-side arena choice are different routines
+        - Client will always look for name+hash pair and doesn't care if it finds it in official/ or downloads/ or user/projects/
+            - Note that even if someone deletes official map from the official folder
+                - and then modifies it for their own benefit, the hashes will not match
+    - Server-side duplicate name resolution when requesting x
+        - For now assume user/projects > user/downloads
+            - This will work out-of-the-box when we want to request online playtesting
+                - The only corner case is when a mapper wants to host a version of the map they've downloaded but we'll handle it later
+    - It will be mostly transparent to the user because they'll choose the map from the arena selector
+    - current_arena is literally just a *hint* for the client where to look for a map with a given hash
+        - will be sent through server solvable vars too probably
+        - server_vars (note: not SOLVABLE vars) will have a load_arena_by_path
+            - This will be the setting set by the arena selector and this will load the arena once
+                - Nothing stops us from loading a map external to the game even although that's not recommended
+            - the selector will also set the current_arena to the filename (minus say .old and other possible version modifiers)
+    - Security concerns
+        - Of course the client should disallow downloading a new map if it's official but it's only for convenience
+            - since someone can delete arenas from the official folder
+                - This will not change the fact that the newly downloaded map will have its hash checked against what the server requires
+
+- Remove dummy jsons from legacy maps and determine if it's new based on its existence
+    - we'll later remove that clause completely and only allow json maps
+
+- Transmitting maps and resources (finally)
+    - Reusing resources for new versions of maps.
+        - Will naturally happen frequently when hosting playtesting sessions from editor.
+        - We don't have to start with a full-blown content database.
+            - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
+                - Will cover 90% of the cases.
+
+
+
+- The semantics of augs::maybe isn't really one of "is it enabled" but more "is it specified"
+    - which is why it would make less sense to use it for fog of war for example
+        - because this mechanic exists at all times - we can just temporarily disable it
+        - which is why there should probably be separate flags for it
+
 - First we need to be able to host them officially on the server at all, under the assumption that all clients have these already
 
 - Prepare comprehensive official resource collection
@@ -23,6 +117,9 @@ summary: That which we are brainstorming at the moment.
 - Fix maybe how point markers are highlighted because the white aabb edge is completely invisible
 
 - Honor playtest spawns but maybe as respawn points only and spawn where the camera is?
+    - BTW WE NEED quick_test_spawn to properly spawn characters during quick_test!
+        - Not necessarily. We can have a playtest_context
+
     - For quick_test, it is okay if all client players appear in the same place as host
     - the host can anyway predict where their "enemy" is and it's a nice way of meeting in the same place
     - It is also okay if the players respawn right where they died to keep the "fight" going

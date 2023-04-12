@@ -9,29 +9,25 @@
 #include "game/detail/inventory/requested_equipment.h"
 #include "test_scenes/test_scene_flavours.h"
 
-using scene_entity_to_node_map = per_entity_type_array<std::vector<editor_node_id>>;
+#include "application/arena/build_arena_from_editor_project.h"
 
-template <class A, class Resolve>
-void build_arena_from_editor_project(
-	A arena_handle,
-	const editor_project& project,
-	Resolve&& resolve_project_path,
-	const editor_resource_pools& official_resources,
-	const intercosm& built_official_content,
-	const default_rulesets_tuple& built_default_modes,
-	scene_entity_to_node_map* scene_entity_to_node,
-	cosmos_solvable_significant* target_clean_round_state,
-	cosmos_common_significant_access mutable_access,
-	const bool for_playtesting,
-	const bool editor_preview
-) {
-	auto find_resource = project.make_find_resource_lambda(official_resources);
+template <class A>
+void build_arena_from_editor_project(A arena_handle, const build_arena_input in) {
+	const auto& project = in.project;
+	const auto& official = in.official;
+
+	const auto built_default_modes = default_rulesets_tuple { 
+		official.default_test_ruleset,
+		official.default_bomb_ruleset
+	};
+
+	auto find_resource = project.make_find_resource_lambda(official.resources);
 
 	auto& scene = arena_handle.scene;
-	scene = built_official_content;
+	scene = official.built_content;
 
-	if (scene_entity_to_node) {
-		for (auto& s : *scene_entity_to_node) {
+	if (in.scene_entity_to_node) {
+		for (auto& s : *in.scene_entity_to_node) {
 			s.clear();
 		}
 	}
@@ -51,7 +47,7 @@ void build_arena_from_editor_project(
 			[&](const auto& raw_id, const R& game_mode) {
 				const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, false);
 
-				const bool pass_playtesting_overrides = for_playtesting;
+				const bool pass_playtesting_overrides = in.for_playtesting;
 				const editor_playtesting_settings* overrides = nullptr;
 
 				if (pass_playtesting_overrides) {
@@ -85,13 +81,13 @@ void build_arena_from_editor_project(
 
 	rebuild_game_modes();
 
-	cosmos_common_significant& common = scene.world.get_common_significant(mutable_access);
+	cosmos_common_significant& common = scene.world.get_common_significant(cosmos_common_significant_access());
 	common.light.ambient_color = project.settings.ambient_light_color;
 
 	auto for_each_manually_specified_official_resource_pool = [&](auto lbd) {
-		lbd(official_resources.get_pool_for<editor_point_marker_resource>());
-		lbd(official_resources.get_pool_for<editor_area_marker_resource>());
-		lbd(official_resources.get_pool_for<editor_prefab_resource>());
+		lbd(official.resources.get_pool_for<editor_point_marker_resource>());
+		lbd(official.resources.get_pool_for<editor_area_marker_resource>());
+		lbd(official.resources.get_pool_for<editor_prefab_resource>());
 	};
 
 	/* 
@@ -107,13 +103,13 @@ void build_arena_from_editor_project(
 					is_official,
 					scene.viewables,
 					common,
-					std::forward<Resolve>(resolve_project_path)
+					[&](const auto& path) { return in.project_resources_parent_folder / path; }
 				);
 			}
 		};
 
 #if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
-		official_resources.for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
+		official.resources.for_each([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
 #else
 		for_each_manually_specified_official_resource_pool([&](const auto& pool) { allocate_flavours_and_assets(pool, true); } );
 #endif
@@ -168,7 +164,7 @@ void build_arena_from_editor_project(
 
 
 #if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
-	official_resources.for_each(setup_flavours_and_assets);
+	official.resources.for_each(setup_flavours_and_assets);
 #else
 	for_each_manually_specified_official_resource_pool(setup_flavours_and_assets);
 #endif
@@ -201,7 +197,7 @@ void build_arena_from_editor_project(
 			) {
 				typed_node.scene_entity_id.unset();
 
-				const bool force_active = !editor_preview && project.settings.include_disabled_nodes;
+				const bool force_active = !in.editor_preview && project.settings.include_disabled_nodes;
 
 				if (!force_active) {
 					if (!typed_node.active || !layer->is_active()) {
@@ -226,12 +222,12 @@ void build_arena_from_editor_project(
 				};
 
 				auto setup_node_entity_mapping = [&](const auto new_entity_id) {
-					if (scene_entity_to_node == nullptr) {
+					if (in.scene_entity_to_node == nullptr) {
 						return;
 					}
 
 					const auto mapping_index = new_entity_id.get_type_id().get_index();
-					auto& mapping = (*scene_entity_to_node)[mapping_index];
+					auto& mapping = (*in.scene_entity_to_node)[mapping_index];
 
 					ensure_eq(decltype(new_entity_id.raw.version)(1), new_entity_id.raw.version);
 
@@ -371,7 +367,7 @@ void build_arena_from_editor_project(
 		)
 	);
 
-	if (target_clean_round_state) {
-		*target_clean_round_state = scene.world.get_solvable().significant;
+	if (in.target_clean_round_state) {
+		*in.target_clean_round_state = scene.world.get_solvable().significant;
 	}
 }

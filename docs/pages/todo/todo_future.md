@@ -5,6 +5,10 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Modes should be able to specify enabled/disabled layers
+	- This way we can encode an alternative destroyed environkment for a zombie mode, in the same map! Instead of creating e.g. zm_cyberaqua
+		- Ofc this would also need an ambient light color override
+
 - Easiest destructon system ever
 	- Just have a list of remnant flavors
 	- Along with positions and rotations

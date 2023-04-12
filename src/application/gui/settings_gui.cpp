@@ -1652,8 +1652,8 @@ void perform_arena_chooser(
 	chooser.perform(
 		"Arena",
 		current_arena,
-		augs::path_type(OFFICIAL_ARENAS_DIR),
-		augs::path_type(DOWNLOADED_ARENAS_DIR),
+		OFFICIAL_ARENAS_DIR,
+		DOWNLOADED_ARENAS_DIR,
 		[&](const auto& new_choice) {
 			current_arena = new_choice.path.string();
 		}

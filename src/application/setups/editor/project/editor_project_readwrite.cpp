@@ -682,8 +682,26 @@ namespace editor_project_readwrite {
 		const augs::path_type& json_path,
 		const editor_resource_pools& officials,
 		const editor_official_resource_map& officials_map,
-		const bool strict
+		const bool strict,
+		augs::secure_hash_type* const output_arena_hash
 	) {
+		const auto project_dir = json_path.parent_path();
+
+		return read_project_json(project_dir, augs::file_to_string(json_path), officials, officials_map, strict, output_arena_hash);
+	}
+
+	editor_project read_project_json(
+		const augs::path_type& project_dir,
+		const std::string& loaded_project_json,
+		const editor_resource_pools& officials,
+		const editor_official_resource_map& officials_map,
+		const bool strict,
+		augs::secure_hash_type* const output_arena_hash
+	) {
+		const auto document = augs::json_document_from(loaded_project_json);
+
+		editor_project loaded;
+
 		auto resource_map = officials_map.create_name_to_id_map();
 		auto mode_map = modes_map();
 
@@ -715,8 +733,6 @@ namespace editor_project_readwrite {
 			}
 		};
 
-		editor_project loaded;
-
 		auto initialize_project_structs = [&]() {
 			::setup_project_defaults(loaded.settings, loaded.get_game_modes(), officials_map);
 
@@ -727,9 +743,6 @@ namespace editor_project_readwrite {
 
 			::setup_project_defaults(loaded.playtesting, loaded.get_game_modes(), officials_map);
 		};
-
-		const auto project_dir = json_path.parent_path();
-		const auto document = augs::json_document_from(json_path);
 
 		auto read_project_structs = [&]() {
 
@@ -1228,6 +1241,10 @@ namespace editor_project_readwrite {
 
 		if (!loaded.settings.default_server_mode.is_set()) {
 			::setup_default_server_mode(loaded.settings, loaded.get_game_modes());
+		}
+
+		if (output_arena_hash != nullptr) {
+			*output_arena_hash = augs::secure_hash(loaded_project_json);
 		}
 
 		return loaded;

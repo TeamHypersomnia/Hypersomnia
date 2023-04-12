@@ -29,7 +29,7 @@ static_assert(has_introspect_base_v<const entity_solvable<const controlled_chara
 static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_assets>);
 static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
 
-void load_arena_from(
+void load_intercosm_and_rulesets(
 	const arena_paths& paths,
 	intercosm& scene,
 	predefined_rulesets& rulesets

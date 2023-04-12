@@ -33,6 +33,7 @@ constexpr std::size_t max_packet_size_v = 2 * 1024; // 2 KB
 
 constexpr std::size_t max_address_string_length_v = 255;
 
+using ruleset_name_type = augs::constant_size_string<max_ruleset_name_length_v>;
 using server_name_type = augs::constant_size_string<max_server_name_length_v>;
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using address_string_type = augs::constant_size_string<max_address_string_length_v>;

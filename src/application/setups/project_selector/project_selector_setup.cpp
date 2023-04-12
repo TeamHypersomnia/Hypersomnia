@@ -135,14 +135,6 @@ void project_selector_setup::scan_for_all_arenas() {
 			new_entry.arena_name = paths.arena_name;
 			new_entry.arena_path = *sanitized_path;
 
-			// TODO EDITOR: remove this clause once we have more
-			if (type == project_tab_type::OFFICIAL_ARENAS) {
-				/* For now just one */
-				if (paths.arena_name != "fy_minilab_reloaded") {
-					return callback_result::CONTINUE; 
-				}
-			}
-
 			// TODO: give it a proper timestamp
 
 			new_entry.timestamp = augs::date_time().secs_since_epoch();
@@ -156,6 +148,11 @@ void project_selector_setup::scan_for_all_arenas() {
 				err_abouts.full_description = err.what();
 
 				new_entry.about = err_abouts;
+
+				if (type == project_tab_type::OFFICIAL_ARENAS) {
+					/* For now not having a project json file is used to determine if a map is a legacy one */
+					return callback_result::CONTINUE;
+				}
 			}
 			catch (const augs::json_deserialization_error& err) {
 				editor_project_about err_abouts;

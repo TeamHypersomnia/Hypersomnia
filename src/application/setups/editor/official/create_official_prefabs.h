@@ -3,10 +3,10 @@
 #include "test_scenes/test_scene_flavours.h"
 #include "application/setups/editor/editor_official_resource_map.hpp"
 
-void editor_setup::create_official_prefabs() {
+void packaged_official_content::create_official_prefabs() {
 	using id_type = editor_builtin_prefab_type;
 
-	auto& pool = official_resources.template get_pool_for<editor_prefab_resource>();
+	auto& pool = resources.template get_pool_for<editor_prefab_resource>();
 
 	augs::for_each_enum_except_bounds([&](const id_type enum_id) {
 		auto res = editor_prefab_resource();
@@ -18,7 +18,7 @@ void editor_setup::create_official_prefabs() {
 
 		auto& defs = res.editable.default_node_properties;
 
-		auto& m = official_resource_map;
+		auto& m = resource_map;
 
 		switch (enum_id) {
 			case T::AQUARIUM:

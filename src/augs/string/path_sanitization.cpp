@@ -1,5 +1,6 @@
 #include "augs/string/path_sanitization.h"
 #include "augs/network/network_types.h"
+#include "application/arena/arena_paths.h"
 
 namespace sanitization {
 	std::string describe(const forbidden_path_type f) {
@@ -247,6 +248,35 @@ namespace sanitization {
 
 		return maps_directory / untrusted_map_name;
 	}
+
+	bool arena_name_safe(const std::string& untrusted_map_name) {
+#if 0
+		const auto sanitized_1 = sanitization::sanitize_arena_path(DOWNLOADED_ARENAS_DIR, untrusted_map_name);
+		const auto sanitized_2 = sanitization::sanitize_arena_path(EDITOR_PROJECTS_DIR, untrusted_map_name);
+		const auto sanitized_3 = sanitization::sanitize_arena_path(OFFICIAL_ARENAS_DIR, untrusted_map_name);
+
+		return 
+			std::get_if<augs::path_type>(&sanitized_1) != nullptr &&
+			std::get_if<augs::path_type>(&sanitized_2) != nullptr &&
+			std::get_if<augs::path_type>(&sanitized_3) != nullptr
+		;
+#else
+		const auto sanitized_1 = sanitization::sanitize_arena_path(DOWNLOADED_ARENAS_DIR, untrusted_map_name);
+
+		/*
+			Dirs are as follows:
+
+			user/downloads/arenas
+			user/projects
+			content/arenas
+
+			The arena in question could be in any of these folders,
+			but it's enough to sanitize against the user/downloads/arenas folder as it's the longest path.
+		*/
+
+		return std::get_if<augs::path_type>(&sanitized_1) != nullptr;
+#endif
+	}
 }
 
 #define TEST_SYMLINKS !PLATFORM_WINDOWS && !IS_PRODUCTION_BUILD
@@ -283,6 +313,24 @@ TEST_CASE("Map sanitization test") {
 	REQUIRE(S::sanitize_arena_path(parent, "..\\") == R(F::FORBIDDEN_CHARACTERS));
 	REQUIRE(S::sanitize_arena_path(parent, ".\\") == R(F::FORBIDDEN_CHARACTERS));
 	REQUIRE(S::sanitize_arena_path(parent, "..") == R(F::FORBIDDEN_CHARACTERS));
+
+	REQUIRE(!S::arena_name_safe(""));
+	REQUIRE(S::arena_name_safe("cyberaqua"));
+	REQUIRE(S::arena_name_safe("_"));
+	REQUIRE(S::arena_name_safe("_________fy_minilab"));
+	REQUIRE(!S::arena_name_safe("/cyberaqua"));
+	REQUIRE(!S::arena_name_safe(with_zero));
+	REQUIRE(!S::arena_name_safe("cyberaqua/"));
+	REQUIRE(!S::arena_name_safe("/cyberaqua/cyberaqua/cyberaqua/cyberaqua/cyberaqua/cyberaqua"));
+	REQUIRE(!S::arena_name_safe("kjlgfkjlkdfj893jdlksjdlfkj8934jfdskljfklgdfhlkj4jklfkjhyberaqua"));
+	REQUIRE(!S::arena_name_safe("cyber aqua"));
+	REQUIRE(!S::arena_name_safe("cyberakła"));
+	REQUIRE(!S::arena_name_safe("."));
+	REQUIRE(!S::arena_name_safe("../"));
+	REQUIRE(!S::arena_name_safe("....//"));
+	REQUIRE(!S::arena_name_safe("..\\"));
+	REQUIRE(!S::arena_name_safe(".\\"));
+	REQUIRE(!S::arena_name_safe(".."));
 
 #if TEST_VERY_LONG_PATHS
 #if PLATFORM_UNIX

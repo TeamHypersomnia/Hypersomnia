@@ -88,7 +88,7 @@ void debugger_folder::load_folder(const augs::path_type& from, const augs::path_
 	const auto paths = debugger_paths(from, name);
 
 	try {
-		load_arena_from(
+		load_intercosm_and_rulesets(
 			paths.arena,
 			commanded->work,
 			commanded->rulesets

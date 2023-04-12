@@ -6,6 +6,7 @@
 #include "application/arena/arena_utils.h"
 #include "test_scenes/test_scene_settings.h"
 #include "view/game_drawing_settings.h"
+#include "application/setups/editor/project/editor_project_paths.h"
 
 struct arena_paths;
 struct game_drawing_settings;
@@ -133,19 +134,6 @@ public:
 		return std::visit(std::forward<F>(f), current_mode.state);
 	}
 
-	void load_from(
-		const arena_paths& paths,
-		cosmos_solvable_significant& target_clean_round_state
-	) const {
-		load_arena_from(
-			paths,
-			scene,
-			rulesets
-		);
-
-		target_clean_round_state = advanced_cosm.get_solvable().significant;
-	}
-
 	template <class S>
 	void make_default(
 		S& lua,
@@ -223,6 +211,22 @@ public:
 				if (!r.enable_tactical_indicators) {
 					settings.draw_tactical_indicators.is_enabled = false;
 				}
+			}
+		);
+	}
+
+	auto emigrate_mode_session() const {
+		return this->on_mode(
+			[](const auto& typed_mode) { return typed_mode.emigrate(); }
+		);
+	}
+
+
+	template <class A>
+	void migrate_mode_session(const A& session) const {
+		this->on_mode_with_input(
+			[&session](auto& typed_mode, const auto& input) {
+				typed_mode.migrate(input, session);
 			}
 		);
 	}

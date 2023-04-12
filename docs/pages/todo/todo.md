@@ -80,6 +80,11 @@ summary: Just a hidden scratchpad.
 
 ## Editor final MVP (post MVP) once we can ditch old maps
 
+- Deprecate ruleset maps.
+    - Rebuild arena when changing mode
+	- This will be necessary anyway with modes that can alter rebuild behavior (like enabling destroyed environments for zombie mode)
+    - Then pick only one mode
+
 - remove fy_minilab_reloaded-only clause from project selector where it's scanning for official areas
 
 - Ensure all official floors have *some* footsteps set

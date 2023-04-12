@@ -54,6 +54,7 @@ constexpr double default_inv_tickrate = 1 / 60.0;
 class client_adapter;
 
 struct netcode_socket_t;
+struct packaged_official_content;
 
 class client_setup : 
 	public default_setup_settings,
@@ -86,6 +87,7 @@ class client_setup :
 
 	/* The rest is client-specific */
 	sol::state& lua;
+	const packaged_official_content& official;
 
 	simulation_receiver receiver;
 
@@ -548,6 +550,7 @@ public:
 
 	client_setup(
 		sol::state& lua,
+		const packaged_official_content& official,
 		const client_start_input&,
 		const client_vars& initial_vars,
 		const nat_detection_settings& nat_detection,
@@ -641,7 +644,7 @@ public:
 					const auto vars_backup = vars;
 
 					std::destroy_at(this);
-					new (this) client_setup(l, client_in, vars_backup, nat_detection_settings(), port_type(0));
+					new (this) client_setup(l, official, client_in, vars_backup, nat_detection_settings(), port_type(0));
 				}
 
 				demo_player = std::move(player_backup);

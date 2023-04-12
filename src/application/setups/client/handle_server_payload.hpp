@@ -39,20 +39,67 @@ message_handler_result client_setup::handle_server_payload(
 
 		if (are_initial_vars || new_arena != sv_solvable_vars.current_arena) {
 			LOG("Client loads arena: %x", new_arena);
+			LOG("Required arena hash: %x", augs::to_hex_format(new_vars.required_arena_hash));
 
 			try {
 				const auto& referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
 
-				::choose_arena(
-					lua,
-					referential_arena,
-					new_vars,
-					clean_round_state
+				const auto choice_result = ::choose_arena_client(
+					{
+						lua,
+						referential_arena,
+						official,
+						new_vars.current_arena,
+						new_vars.override_default_ruleset,
+						clean_round_state,
+						new_vars.playtesting_context
+					},
+
+					new_vars.required_arena_hash
 				);
 
-				arena_gui.reset();
-				arena_gui.choose_team.show = !is_replaying() && ::is_spectator(referential_arena, get_local_player_id());
-				client_gui.rcon.show = false;
+				if (choice_result.was_arena_found()) {
+					arena_gui.reset();
+					arena_gui.choose_team.show = !is_replaying() && ::is_spectator(referential_arena, get_local_player_id());
+					client_gui.rcon.show = false;
+				}
+				else {
+					if (choice_result.official_differs) {
+						set_disconnect_reason(typesafe_sprintf(
+							"Failed to load arena: \"%x\".\n"
+							"The local arena file differs from the servers!\n"
+							"This is an official arena, so your game might be out of date.",
+							new_arena
+						));
+					}
+					else if (choice_result.invalid_arena_name) {
+						set_disconnect_reason(typesafe_sprintf(
+							"Failed to load arena: \"%x\".\n"
+							"The server sent an incorrect arena name!",
+							new_arena
+						));
+					}
+					else if (choice_result.not_found_any) {
+						/*
+							TODO: We'll initiate the download request here.
+						*/
+
+						set_disconnect_reason(typesafe_sprintf(
+							"Failed to load arena: \"%x\".\n"
+							"You do not have this arena downloaded.",
+							new_arena
+						));
+					}
+					else {
+						set_disconnect_reason(typesafe_sprintf(
+							"Failed to load arena: \"%x\".\n"
+							"Unknown error.",
+							new_arena
+						));
+					}
+
+					return abort_v;
+				}
 			}
 			catch (const augs::file_open_error& err) {
 				set_disconnect_reason(typesafe_sprintf(

@@ -42,6 +42,8 @@
 #include "application/network/resolve_address_result.h"
 #include "augs/network/netcode_utils.h"
 
+#include "application/setups/editor/packaged_official_content.h"
+
 void client_demo_player::play_demo_from(const augs::path_type& p) {
 	source_path = p;
 	auto source = augs::open_binary_input_stream(source_path);
@@ -210,12 +212,14 @@ bool client_setup::send_payload(Args&&... args) {
 
 client_setup::client_setup(
 	sol::state& lua,
+	const packaged_official_content& official,
 	const client_start_input& in,
 	const client_vars& initial_vars,
 	const nat_detection_settings& nat_detection,
 	port_type preferred_binding_port
 ) : 
 	lua(lua),
+	official(official),
 	last_addr(in.get_address_and_port()),
 	vars(initial_vars),
 	adapter(std::make_unique<client_adapter>(preferred_binding_port)),

@@ -40,6 +40,8 @@
 
 #include "game/detail/visible_entities.h"
 #include "game/detail/get_hovered_world_entity.h"
+#include "application/setups/editor/packaged_official_content.h"
+
 #include "application/setups/editor/official/create_official_resources.h"
 #include "application/setups/editor/official/create_official_prefabs.h"
 #include "augs/gui/text/printer.h"
@@ -66,18 +68,66 @@
 #include "application/arena/arena_handle.h"
 #include "augs/readwrite/json_readwrite_errors.h"
 
-editor_setup::editor_setup(
-	sol::state& lua,
-	const augs::path_type& project_path
-) : paths(project_path) {
-	built_official_content.populate_official_content(
+#include "application/arena/build_arena_from_editor_project.hpp"
+
+template <class R, class F>
+void packaged_official_content::for_each_resource(F callback) {
+	resources.template get_pool_for<R>().for_each_id_and_object(
+		[&](const auto& raw_id, const auto& object) {
+			const bool official = true;
+			const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, official);
+
+			callback(typed_id, object);
+		}
+	);
+}
+
+packaged_official_content::packaged_official_content(sol::state& lua) {
+	built_content.populate_official_content(
 		lua,
 		60,
 		default_bomb_ruleset,
 		default_test_ruleset
 	);
 
-	create_official_resources();
+	::create_official_resources(built_content, resources);
+
+	auto map_with_tag = [&](const auto id, auto& obj) {
+		ensure(obj.official_tag.has_value());
+
+		if (obj.official_tag) {
+			resource_map[*obj.official_tag] = id;
+		}
+	};
+
+	auto map_with_type = [&](const auto id, auto& obj) {
+		resource_map[obj.editable.type] = id;
+	};
+
+	resources.pools.for_each_container(
+		[&]<typename P>(const P&) {
+			using R = typename P::mapped_type;
+
+			if constexpr(!is_one_of_v<R, editor_prefab_resource, editor_game_mode_resource>) {
+				if constexpr(is_one_of_v<R, editor_area_marker_resource, editor_point_marker_resource>) {
+					for_each_resource<R>(map_with_type);
+				}
+				else {
+					for_each_resource<R>(map_with_tag);
+				}
+			}
+		}
+	);
+
+	create_official_prefabs();
+	for_each_resource<editor_prefab_resource>(map_with_type);
+}
+
+editor_setup::editor_setup(
+	const packaged_official_content& official,
+	const augs::path_type& project_path
+) : official(official), paths(project_path) {
+	create_official_filesystems();
 
 	LOG("Loading editor project at: %x", project_path);
 
@@ -86,8 +136,8 @@ editor_setup::editor_setup(
 	try {
 		project = editor_project_readwrite::read_project_json(
 			paths.project_json,
-			official_resources,
-			official_resource_map,
+			official.resources,
+			official.resource_map,
 			strict
 		);
 
@@ -105,8 +155,8 @@ editor_setup::editor_setup(
 	try {
 		auto autosaved_project = std::make_unique<editor_project>(editor_project_readwrite::read_project_json(
 			paths.autosave_json,
-			official_resources,
-			official_resource_map,
+			official.resources,
+			official.resource_map,
 			strict
 		));
 
@@ -175,43 +225,12 @@ editor_setup::~editor_setup() {
 	LOG("DTOR finished: ~editor_setup");
 }
 
-void editor_setup::create_official_resources() {
-	::create_official_resources(built_official_content, official_resources);
+void editor_setup::create_official_filesystems() {
 	::create_official_filesystem_from(
-		built_official_content,
-		official_resources,
+		official.built_content,
+		official.resources,
 		official_files_root
 	);
-
-	auto map_with_tag = [&](const auto id, auto& obj) {
-		ensure(obj.official_tag.has_value());
-
-		if (obj.official_tag) {
-			official_resource_map[*obj.official_tag] = id;
-		}
-	};
-
-	auto map_with_type = [&](const auto id, auto& obj) {
-		official_resource_map[obj.editable.type] = id;
-	};
-
-	official_resources.pools.for_each_container(
-		[&]<typename P>(const P&) {
-			using R = typename P::mapped_type;
-
-			if constexpr(!is_one_of_v<R, editor_prefab_resource, editor_game_mode_resource>) {
-				if constexpr(is_one_of_v<R, editor_area_marker_resource, editor_point_marker_resource>) {
-					for_each_resource<R>(map_with_type, true);
-				}
-				else {
-					for_each_resource<R>(map_with_tag, true);
-				}
-			}
-		}
-	);
-
-	create_official_prefabs();
-	for_each_resource<editor_prefab_resource>(map_with_type, true);
 
 	gui.filesystem.rebuild_official_special_filesystem(*this);
 }
@@ -776,7 +795,7 @@ void editor_setup::assign_project(const editor_project& new_project, const bool 
 }
 
 augs::path_type editor_setup::resolve_project_path(const augs::path_type& path_in_project) const {
-	return paths.project_folder / path_in_project;
+	return paths.resolve(path_in_project);
 }
 
 /*
@@ -870,13 +889,9 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 				std::string new_resource_hash;
 
 				try {
-					new_resource_hash = augs::secure_hash(augs::file_to_bytes(full_path));
+					new_resource_hash = augs::to_hex_format(augs::secure_hash(augs::file_to_bytes(full_path)));
 				}
 				catch (...) {
-
-				}
-
-				if (new_resource_hash.empty()) {
 					LOG("WARNING! Couldn't get a hash from %x", full_path);
 					return;
 				}
@@ -985,7 +1000,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 						}
 					}
 
-					::setup_resource_defaults(new_resource.editable, official_resource_map);
+					::setup_resource_defaults(new_resource.editable, official.resource_map);
 
 					file.associated_resource.set<resource_type>(new_id, false);
 					new_resource.found_on_disk = true;
@@ -1067,7 +1082,7 @@ void editor_setup::rescan_missing_resources(std::vector<augs::path_type>* const 
 
 	std::vector<entry> missing_entries;
 
-	rebuilt_project.rescan_pathed_resources_to_track(official_resources, official_resource_map);
+	rebuilt_project.rescan_pathed_resources_to_track(official.resources, official.resource_map);
 
 	auto check_missing = [&]<typename R>(const R& resource, const editor_typed_resource_id<R> id) {
 		if constexpr(is_pathed_resource_v<R>) {
@@ -1125,8 +1140,8 @@ void editor_setup::save_project_file_as(const augs::path_type& path) {
 	editor_project_readwrite::write_project_json(
 		path,
 		project,
-		official_resources,
-		official_resource_map
+		official.resources,
+		official.resource_map
 	);
 }
 
@@ -1519,7 +1534,7 @@ void editor_pathed_resource::maybe_rehash(const augs::path_type& full_path, cons
 	}
 
 	try {
-		file_hash = augs::secure_hash(augs::file_to_bytes(full_path));
+		file_hash = augs::to_hex_format(augs::secure_hash(augs::file_to_bytes(full_path)));
 		stamp_when_hashed = fresh_stamp_utc;
 	}
 	catch (...) {
@@ -2969,9 +2984,6 @@ void editor_setup::start_playtesting() {
 
 			const auto spawn_transform = get_camera_eye().transform;
 
-			const auto mouse_dir = (get_world_cursor_pos() - spawn_transform.pos).normalize();
-			(void)mouse_dir;
-
 			new_character.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 				typed_handle.set_logic_transform(spawn_transform);
 				::snap_interpolated_to(typed_handle, spawn_transform);
@@ -3171,6 +3183,25 @@ editor_arena_handle<true> editor_setup::get_arena_handle() const {
 	return get_arena_handle_impl<editor_arena_handle<true>>(*this);
 }
 
+const intercosm& editor_setup::get_built_official_content() const {
+	return official.built_content;
+}
+
+const editor_resource_pools& editor_setup::get_official_resources() const { return official.resources; }
+editor_resource_pools& editor_setup::get_mut_official_resources() { return official.resources; }
+
+const editor_official_resource_map& editor_setup::get_official_resource_map() const {
+	return official.resource_map;
+}
+
+const editor_resource_pools& official_get_resources(const packaged_official_content& official) {
+	return official.resources;
+}
+
+const editor_official_resource_map& official_get_resource_map(const packaged_official_content& official) {
+	return official.resource_map;
+}
+
 template struct edit_resource_command<editor_sprite_resource>;
 template struct edit_resource_command<editor_sound_resource>;
 template struct edit_resource_command<editor_light_resource>;
@@ -3217,3 +3248,7 @@ template struct create_node_command<editor_melee_node>;
 template struct create_node_command<editor_explosive_node>;
 
 template struct create_node_command<editor_prefab_node>;
+
+#include "application/network/network_common.h"
+template void build_arena_from_editor_project<online_arena_handle<false>>(online_arena_handle<false> arena_handle, build_arena_input);
+template void build_arena_from_editor_project<editor_arena_handle<false>>(editor_arena_handle<false> arena_handle, build_arena_input);

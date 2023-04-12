@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/filesystem/path.h"
+#include "augs/misc/secure_hash.h"
 
 struct editor_view;
 struct editor_project;
@@ -16,10 +17,20 @@ namespace editor_project_readwrite {
 	*/
 
 	editor_project read_project_json(
+		const augs::path_type& parent_folder,
+		const std::string& loaded_project_json,
+		const editor_resource_pools& officials,
+		const editor_official_resource_map& officials_map,
+		const bool strict,
+		augs::secure_hash_type* output_arena_hash = nullptr
+	);
+
+	editor_project read_project_json(
 		const augs::path_type& json_path,
 		const editor_resource_pools& officials,
 		const editor_official_resource_map& officials_map,
-		const bool strict
+		const bool strict,
+		augs::secure_hash_type* output_arena_hash = nullptr
 	);
 
 	void write_project_json(

@@ -15,15 +15,23 @@ std::string get_hex_representation(const unsigned char *Bytes, const size_t Leng
 }
 
 namespace augs {
-	std::string secure_hash(const std::byte* bytes, std::size_t n) {
+	hash_string_type to_hex_format(const secure_hash_type& hstr) {
+		static_assert(hash_string_type().max_size() == BLAKE3_OUT_LEN * 2);
+
+		return get_hex_representation(hstr.data(), hstr.size());
+	}
+
+	secure_hash_type secure_hash(const std::byte* bytes, std::size_t n) {
+		static_assert(secure_hash_type().size() == BLAKE3_OUT_LEN);
+
 		blake3_hasher hasher;
 		blake3_hasher_init(&hasher);
 
 		blake3_hasher_update(&hasher, bytes, n);
 
-		uint8_t output[BLAKE3_OUT_LEN];
-		blake3_hasher_finalize(&hasher, output, BLAKE3_OUT_LEN);
+		secure_hash_type output;
+		blake3_hasher_finalize(&hasher, output.data(), output.size());
 
-		return get_hex_representation(output, BLAKE3_OUT_LEN);
+		return output;
 	}
 }

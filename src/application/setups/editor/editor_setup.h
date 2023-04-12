@@ -46,7 +46,6 @@
 #include "game/stateless_systems/animation_system.h"
 #include "view/faction_view_settings.h"
 
-#include "application/setups/editor/editor_official_resource_map.h"
 #include "application/arena/mode_and_rules.h"
 #include "application/predefined_rulesets.h"
 
@@ -95,6 +94,11 @@ struct editor_gui {
 struct editor_icon_info;
 struct editor_icon_info_in;
 
+struct packaged_official_content;
+struct intercosm;
+struct editor_resource_pools;
+struct editor_official_resource_map;
+
 template <bool C, class ModeVariantType>
 class basic_arena_handle;
 
@@ -106,9 +110,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	augs::timer autosave_timer;
 
-	test_mode_ruleset default_test_ruleset;
-	bomb_defusal_ruleset default_bomb_ruleset;
-	intercosm built_official_content;
+	const packaged_official_content& official;
 
 	intercosm scene;
 
@@ -124,9 +126,6 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	bool playtesting = false;
 
 	per_entity_type_array<std::vector<editor_node_id>> scene_entity_to_node;
-
-	editor_resource_pools official_resources;
-	editor_official_resource_map official_resource_map;
 
 	editor_project project;
 	editor_gui gui;
@@ -165,8 +164,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	bool dirty_after_loading_autosave = false;
 	bool dirty_after_redirecting_paths = false;
 
-	void create_official_resources();
-	void create_official_prefabs();
+	void create_official_filesystems();
 
 	void on_window_activate();
 
@@ -237,7 +235,7 @@ public:
 	static constexpr bool has_additional_highlights = true;
 
 	editor_setup(
-		sol::state& lua,
+		const packaged_official_content& official,
 		const augs::path_type& project_path
 	);
 	
@@ -285,7 +283,6 @@ public:
 	std::string get_free_layer_name_for(const std::string& name_pattern) const;
 
 	const auto& get_project() const { return project; }
-	const auto& get_official_resources() const { return official_resources; }
 
 	template <class T>
 	decltype(auto) find_resource(const editor_typed_resource_id<T>& id);
@@ -707,10 +704,6 @@ public:
 
 	std::optional<editor_setup::parent_layer_info> find_best_layer_for_new_node() const;
 
-	const auto& get_built_official_content() const {
-		return built_official_content;
-	}
-
 	const auto& get_last_inspected_layer_or_node() const {
 		return gui.inspector.get_last_inspected_layer_or_node();
 	}
@@ -751,9 +744,14 @@ public:
 
 	void unpack_prefab(editor_typed_node_id<editor_prefab_node>);
 
-	const auto& get_official_resource_map() const {
-		return official_resource_map;
-	}
+	const intercosm& get_built_official_content() const;
+	const editor_resource_pools& get_official_resources() const;
+
+private:
+	editor_resource_pools& get_mut_official_resources();
+public:
+
+	const editor_official_resource_map& get_official_resource_map() const;
 
 	editor_arena_handle<false> get_arena_handle();
 	editor_arena_handle<true> get_arena_handle() const;

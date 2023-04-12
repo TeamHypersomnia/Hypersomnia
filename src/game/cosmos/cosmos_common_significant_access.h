@@ -1,5 +1,6 @@
 #pragma once
 
+struct build_arena_input;
 struct debugger_property_accessors;
 
 struct create_flavour_command;
@@ -37,6 +38,9 @@ class cosmos_common_significant_access {
 	friend struct duplicate_asset_command;
 
 	friend class editor_setup;
+
+	template <class A>
+	friend void build_arena_from_editor_project(A arena_handle, build_arena_input in);
 
 	cosmos_common_significant_access() {}
 };

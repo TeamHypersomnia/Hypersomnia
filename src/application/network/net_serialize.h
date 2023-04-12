@@ -7,6 +7,10 @@
 #include "game/modes/mode_commands/match_command.h"
 #include "augs/window_framework/mouse_rel_bound.h"
 
+namespace sanitization {
+	bool arena_name_safe(const std::string& untrusted_map_name);
+}
+
 namespace net_messages {
 	template <class Stream, class V>
 	bool serialize_trivial_as_bytes(Stream& s, V& v) {
@@ -153,7 +157,11 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream& s, server_solvable_vars& c) {
-		return unsafe_serialize(s, c);
+		if (!unsafe_serialize(s, c)) {
+			return false;
+		}
+
+		return sanitization::arena_name_safe(c.current_arena);
 	}
 
 	template <class Stream>

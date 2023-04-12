@@ -6,6 +6,8 @@
 #include "augs/misc/constant_size_vector.h"
 #include "application/network/address_and_port.h"
 #include "application/setups/server/server_webhook_vars.h"
+#include "augs/misc/secure_hash.h"
+#include "application/arena/arena_playtesting_context.h"
 
 using arena_pool_type = augs::constant_size_vector<arena_identifier, max_arenas_in_pool_v, true>;
 
@@ -27,7 +29,9 @@ struct server_solvable_vars {
 	arena_switching_settings arena_switching;
 
 	arena_identifier current_arena = "";
-	augs::constant_size_string<max_ruleset_name_length_v> override_default_ruleset = "";
+	augs::secure_hash_type required_arena_hash = augs::secure_hash_type();
+	ruleset_name_type override_default_ruleset = "";
+	std::optional<arena_playtesting_context> playtesting_context;
 	// END GEN INTROSPECTOR
 };
 

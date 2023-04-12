@@ -66,5 +66,7 @@ namespace sanitization {
 		const augs::path_type& maps_directory,
 		const std::string& untrusted_map_name
 	);
+
+	bool arena_name_safe(const std::string& untrusted_map_name);
 }
 

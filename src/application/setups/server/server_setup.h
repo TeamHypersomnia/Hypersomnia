@@ -42,6 +42,8 @@ struct config_lua_table;
 struct draw_setup_gui_input;
 struct public_settings_update;
 
+struct packaged_official_content;
+
 namespace net_messages {
 	struct client_welcome;
 }
@@ -77,6 +79,7 @@ class server_setup :
 
 	/* The rest is server-specific */
 	sol::state& lua;
+	const packaged_official_content& official;
 
 	augs::server_listen_input last_start;
 	std::optional<augs::dedicated_server_input> dedicated;
@@ -219,6 +222,7 @@ public:
 
 	server_setup(
 		sol::state& lua,
+		const packaged_official_content& official,
 		const augs::server_listen_input&,
 		const server_vars&,
 		const server_solvable_vars&,

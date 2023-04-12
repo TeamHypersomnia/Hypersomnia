@@ -618,3 +618,7 @@ summary: Just a hidden scratchpad.
 
 - Damn, footsteps make sprite resources dependent on sprites
 	- although all resources are created by the time we rebuild scene so it's a non-issue
+- move custom_footstep to general properties as physical ones could theoretically be stepped on as well
+    - think crate remnants for example
+    - maybe leave it as it is and specify footsteps in physical materials
+    - fuck it, leave it as it is and only add footstep in physical material if we really ever get to it

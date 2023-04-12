@@ -400,6 +400,7 @@ bool server_setup::respond_to_ping_requests(
 
 server_setup::server_setup(
 	sol::state& lua,
+	const packaged_official_content& official,
 	const augs::server_listen_input& in,
 	const server_vars& initial_vars,
 	const server_solvable_vars& initial_solvable_vars,
@@ -411,6 +412,7 @@ server_setup::server_setup(
 ) : 
 	integrated_client_vars(integrated_client_vars),
 	lua(lua),
+	official(official),
 	last_start(in),
 	dedicated(dedicated),
 	server(
@@ -898,17 +900,6 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 	}
 
 	if (any_difference) {
-		auto broadcast_new_vars = [&](const auto recipient_id, auto&) {
-			server->send_payload(
-				recipient_id,
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
-
-				solvable_vars
-			);
-		};
-
-		for_each_id_and_client(broadcast_new_vars, only_connected_v);
-
 		if (force || old_vars.current_arena != new_vars.current_arena) {
 			try {
 				choose_arena(new_vars.current_arena);
@@ -928,6 +919,17 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 				choose_arena(test_scene_arena);
 			}
 		}
+
+		auto broadcast_new_vars = [&](const auto recipient_id, auto&) {
+			server->send_payload(
+				recipient_id,
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+
+				solvable_vars
+			);
+		};
+
+		for_each_id_and_client(broadcast_new_vars, only_connected_v);
 	}
 }
 
@@ -960,16 +962,24 @@ void server_setup::apply(const config_lua_table& cfg) {
 void server_setup::choose_arena(const std::string& name) {
 	LOG("Choosing arena: %x", name);
 
-	solvable_vars.current_arena = name;
-
 	const auto& arena = get_arena_handle();
 
-	::choose_arena(
-		lua,
-		arena,
-		solvable_vars,
-		clean_round_state
-	);
+	{
+		const auto required_hash = ::choose_arena_server({
+			lua,
+			arena,
+			official,
+			name,
+			solvable_vars.override_default_ruleset,
+			clean_round_state,
+			solvable_vars.playtesting_context
+		});
+
+		solvable_vars.current_arena = name;
+		solvable_vars.required_arena_hash = required_hash;
+
+		LOG("Chosen arena hash: %x", required_hash);
+	}
 
 	arena_gui.reset();
 	arena_gui.choose_team.show = ::is_spectator(arena, get_local_player_id());

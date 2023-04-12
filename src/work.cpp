@@ -107,6 +107,7 @@
 #include "application/setups/editor/editor_setup_for_each_highlight.hpp"
 
 #include "application/main/self_updater.h"
+#include "application/setups/editor/packaged_official_content.h"
 #include "work_result.h"
 
 std::function<void()> ensure_handler;
@@ -607,6 +608,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		};
 	};
 
+	static const auto official = packaged_official_content(lua);
+
 	if (params.type == app_type::DEDICATED_SERVER) {
 		LOG("Starting the dedicated server at port: %x", chosen_server_port());
 
@@ -662,6 +665,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		emplace_current_setup(
 			std::in_place_type_t<server_setup>(),
 			lua,
+			official,
 			start,
 			config.server,
 			config.server_solvable,
@@ -1050,6 +1054,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
 				lua,
+				official,
 				config.default_client_start,
 				config.client,
 				config.nat_detection,
@@ -1066,7 +1071,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		setup_launcher([&]() {
 			emplace_current_setup(
 				std::in_place_type_t<editor_setup>(),
-				lua,
+				official,
 				std::forward<decltype(args)>(args)...
 			);
 		});
@@ -1115,6 +1120,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<server_setup>(),
 						lua,
+						official,
 						start,
 						config.server,
 						config.server_solvable,

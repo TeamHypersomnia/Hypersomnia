@@ -73,12 +73,12 @@ const T& editor_setup::rewrite_last_command(T&& command) {
 }
 
 template <class R, class F>
-void editor_setup::for_each_resource(F&& callback, bool official) const {
-	const auto& pools = official ? official_resources : project.resources;
+void editor_setup::for_each_resource(F&& callback, bool for_official) const {
+	const auto& pools = for_official ? get_official_resources() : project.resources;
 
 	pools.template get_pool_for<R>().for_each_id_and_object(
 		[&](const auto& raw_id, const auto& object) {
-			const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, official);
+			const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, for_official);
 
 			callback(typed_id, object);
 		}
@@ -97,22 +97,22 @@ decltype(auto) editor_setup::find_node(const editor_typed_node_id<T>& id) const 
 
 template <class T>
 decltype(auto) editor_setup::find_resource(const editor_typed_resource_id<T>& id) {
-	return project.find_resource(official_resources, id);
+	return project.find_resource(get_mut_official_resources(), id);
 }
 
 template <class T>
 decltype(auto) editor_setup::find_resource(const editor_typed_resource_id<T>& id) const {
-	return project.find_resource(official_resources, id);
+	return project.find_resource(get_official_resources(), id);
 }
 
 template <class F>
 decltype(auto) editor_setup::on_resource(const editor_resource_id& id, F&& callback) {
-	return project.on_resource(official_resources, id, std::forward<F>(callback));
+	return project.on_resource(get_mut_official_resources(), id, std::forward<F>(callback));
 }
 
 template <class F>
 decltype(auto) editor_setup::on_resource(const editor_resource_id& id, F&& callback) const {
-	return project.on_resource(official_resources, id, std::forward<F>(callback));
+	return project.on_resource(get_official_resources(), id, std::forward<F>(callback));
 }
 
 template <class F>

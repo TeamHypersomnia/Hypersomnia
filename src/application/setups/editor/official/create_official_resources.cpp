@@ -123,7 +123,7 @@ void create_official_resources(
 
 void create_official_filesystem_from(
 	const intercosm& initial_intercosm,
-	editor_resource_pools& resources,
+	const editor_resource_pools& resources,
 	editor_filesystem_node& official_files_root
 ) {
 	using gfx_entry_type = decltype(editor_sprite_resource::official_tag);

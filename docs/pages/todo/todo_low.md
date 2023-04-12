@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Separate the includes maybe so the entire editor project isn't included
+
 - Coloring the light icons would be pretty useful
 
 - later rcon messages and server vars generally could be sent via blocks
