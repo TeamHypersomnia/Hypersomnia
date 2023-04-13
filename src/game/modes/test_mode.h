@@ -8,6 +8,12 @@
 #include "game/modes/detail/fog_of_war_settings.h"
 #include "view/character_hud_type.h"
 
+#include "game/modes/session_id.h"
+#include "game/modes/arena_mode.h"
+#include "augs/templates/continue_or_callback_result.h"
+
+#include "application/arena/arena_playtesting_context.h"
+
 using mode_entity_id = entity_id;
 
 struct entity_id;
@@ -40,12 +46,53 @@ struct test_mode_ruleset {
 	per_actual_faction<test_mode_faction_rules> factions;
 	test_mode_view_rules view;
 	// END GEN INTROSPECTOR
+
+	bool should_hide_details_when_spectating_enemies() const {
+		return true;
+	}
+};
+
+struct test_mode_player_stats {
+	// GEN INTROSPECTOR struct test_mode_player_stats
+	money_type money = 0;
+
+	int knockouts = 0;
+	int assists = 0;
+	int deaths = 0;
+	// END GEN INTROSPECTOR
+
+	int calc_score() const { 
+		return 
+			knockouts * 2 
+			+ assists
+		;
+	}
 };
 
 struct test_mode_player {
 	// GEN INTROSPECTOR struct test_mode_player
+	player_session_data session;
 	mode_entity_id controlled_character_id;
+	test_mode_player_stats stats;
 	// END GEN INTROSPECTOR
+
+	bool operator<(const test_mode_player& b) const;
+
+	bool is_set() const {
+		return session.is_set();
+	}
+
+	const auto& get_chosen_name() const {
+		return session.chosen_name;
+	}
+
+	const auto& get_faction() const {
+		return session.faction;
+	}
+
+	const auto& get_session_id() const {
+		return session.id;
+	}
 
 	test_mode_player(const mode_entity_id controlled_character_id = mode_entity_id()) : controlled_character_id(controlled_character_id) {}
 };
@@ -53,11 +100,15 @@ struct test_mode_player {
 class test_mode {
 public:
 	using ruleset_type = test_mode_ruleset;
+	using player_type = test_mode_player;
+
 	static constexpr bool needs_clean_round_state = false;
 	static constexpr bool round_based = false;
 
 	template <bool C>
 	struct basic_input {
+		using mode_type = test_mode;
+
 		const ruleset_type& rules;
 		maybe_const_ref_t<C, cosmos> cosm;
 
@@ -76,15 +127,20 @@ private:
 
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 
+	void create_controlled_character_for(input in, mode_player_id);
+
 public:
 	// GEN INTROSPECTOR class test_mode
 	unsigned current_spawn_index = 0;
 	std::vector<mode_entity_id> pending_inits;
-	std::unordered_map<mode_player_id, test_mode_player> players;
+	std::map<mode_player_id, player_type> players;
+
+	session_id_type next_session_id = session_id_type::first();
+	std::optional<arena_playtesting_context> playtesting_context;
 	// END GEN INTROSPECTOR
 
-	mode_player_id add_player(input, const faction_type);
-	void remove_player(input, mode_player_id);
+	mode_player_id add_player(input, const entity_name_str& nickname, const faction_type);
+	void remove_player(input, logic_step, mode_player_id);
 
 	mode_entity_id lookup(const mode_player_id&) const;
 	mode_player_id lookup(const mode_entity_id&) const;
@@ -111,12 +167,61 @@ public:
 		);
 	}
 
-	template <class... Args>
-	mode_player_id get_next_to_spectate(Args&&...) const { return {}; }
+	bool add_player_custom(input, const add_player_input&);
+	void add_or_remove_players(input, const mode_entropy&, logic_step);
 
-	template <class... Args>
-	bool suitable_for_spectating(Args&&...) const { return true; }
+	arena_migrated_session emigrate() const;
+	void migrate(input, const arena_migrated_session&);
 
-	template <class... Args>
-	bool conscious_or_can_still_spectate(Args&&...) const { return true; }
+	auto get_next_session_id() const {
+		return next_session_id;
+	}
+
+	template <class S, class E>
+	static auto find_player_by_impl(S& self, const E& identifier);
+
+	player_type* find_player_by(const entity_name_str& chosen_name);
+	player_type* find(const mode_player_id&);
+	const player_type* find_player_by(const entity_name_str& chosen_name) const;
+	const player_type* find(const mode_player_id&) const;
+
+	const player_type* find(const session_id_type&) const;
+	mode_player_id lookup(const session_id_type&) const;
+
+	template <class F>
+	void for_each_player_id(F callback) const {
+		for (const auto& p : players) {
+			if (callback(p.first) == callback_result::ABORT) {
+				return;
+			}
+		}
+	}
+
+	template <class F>
+	void for_each_player_in(const faction_type faction, F&& callback) const {
+		for (auto& it : players) {
+			if (it.second.get_faction() == faction) {
+				if (::continue_or_callback_result(std::forward<F>(callback), it.first, it.second) == callback_result::ABORT) {
+					return;
+				}
+			}
+		}
+	}
+
+	std::size_t num_players_in(faction_type) const;
+
+	uint32_t get_num_players() const;
+	uint32_t get_num_active_players() const;
+
+	uint32_t get_max_num_active_players(const_input) const;
+
+	uint32_t calc_max_faction_score() const {
+		return 0;
+	}
+
+	uint32_t get_faction_score(const faction_type) const {
+		return 0;
+	}
+
+	void remove_old_lying_items(input, logic_step);
 };

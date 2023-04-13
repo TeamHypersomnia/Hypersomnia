@@ -5,6 +5,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/modes/bomb_defusal.hpp"
+#include "game/modes/test_mode.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_lua_table.h"
 #include "game/modes/mode_helpers.h"
@@ -43,13 +44,22 @@ void arena_scoreboard_gui::draw_gui(
 ) const {
 	using namespace augs::gui::text;
 
-	const bool should_show = show || typed_mode.get_state() == arena_mode_state::MATCH_SUMMARY;
+	bool force_show = false;
+	bool is_halftime = false;
+
+	if constexpr(!std::is_same_v<M, test_mode>) {
+		if (typed_mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
+			force_show = true;
+		}
+
+		is_halftime = typed_mode.is_match_summary() && typed_mode.is_halfway_round(mode_input);;
+	}
+
+	const bool should_show = show || force_show;
 
 	if (!should_show) {
 		return;
 	}
-
-	const bool is_halftime = typed_mode.is_match_summary() && typed_mode.is_halfway_round(mode_input);
 
 	const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
@@ -81,11 +91,11 @@ void arena_scoreboard_gui::draw_gui(
 	const auto window_name = "Scoreboard";
 	const auto window_name_size = calc_size(window_name);
 
-	const auto participants = typed_mode.calc_participating_factions(mode_input);
+	const int num_participating_factions = 2;
 
 	auto estimated_window_height = [&]() {
-		const auto player_cells_h = cell_h * typed_mode.get_players().size();
-		const auto headline_cells_h = cell_h * 3 * participants.size();
+		const auto player_cells_h = cell_h * typed_mode.get_num_players();
+		const auto headline_cells_h = cell_h * 3 * num_participating_factions;
 
 		const auto num_spectators = typed_mode.num_players_in(faction_type::SPECTATOR);
 
@@ -280,7 +290,7 @@ void arena_scoreboard_gui::draw_gui(
 
 		const auto& cosm = mode_input.cosm;
 
-		std::vector<std::pair<bomb_defusal_player, mode_player_id>> sorted_players;
+		std::vector<std::pair<typename M::player_type, mode_player_id>> sorted_players;
 
 		typed_mode.for_each_player_in(faction, [&](
 			const auto& id, 
@@ -293,7 +303,7 @@ void arena_scoreboard_gui::draw_gui(
 
 		const auto& bg_dark = colors.background_dark;
 
-		const auto faction_state = typed_mode.get_factions_state()[faction];
+		const auto faction_score = typed_mode.get_faction_score(faction);
 
 		auto draw_headline = [&]() {
 			const auto bg_height = cell_h * 3;
@@ -303,36 +313,38 @@ void arena_scoreboard_gui::draw_gui(
 				aabb(faction_bg_orig, bg_dark);
 			}
 
-			if (typed_mode.is_match_summary()) {
-				const auto match_result = typed_mode.calc_match_result(mode_input);
-				const bool tied = match_result.is_tie();
-				auto label = std::string(tied ? "TIED" : "WON");
+			if constexpr(!std::is_same_v<M, test_mode>) {
+				if (typed_mode.is_match_summary()) {
+					const auto match_result = typed_mode.calc_match_result(mode_input);
+					const bool tied = match_result.is_tie();
+					auto label = std::string(tied ? "TIED" : "WON");
 
-				if (is_halftime) {
-					label += " THE FIRST HALF";
-				}
-				else {
-					label += " THE MATCH";
-				}
-
-				auto text_pos = faction_bg_orig.get_center();
-
-				if (tied) {
-					text_pos -= vec2i(0, faction_bg_orig.get_size().y / 2);
-				}
-
-				auto do_draw = [&]() {
-					text_stroked(label, yellow, text_pos, { augs::ralign::CX, augs::ralign::CY });
-				};
-
-				if (tied) {
-					if (!on_top) {
-						do_draw();
+					if (is_halftime) {
+						label += " THE FIRST HALF";
 					}
-				}
-				else {
-					if (match_result.winner == faction) {
-						do_draw();
+					else {
+						label += " THE MATCH";
+					}
+
+					auto text_pos = faction_bg_orig.get_center();
+
+					if (tied) {
+						text_pos -= vec2i(0, faction_bg_orig.get_size().y / 2);
+					}
+
+					auto do_draw = [&]() {
+						text_stroked(label, yellow, text_pos, { augs::ralign::CX, augs::ralign::CY });
+					};
+
+					if (tied) {
+						if (!on_top) {
+							do_draw();
+						}
+					}
+					else {
+						if (match_result.winner == faction) {
+							do_draw();
+						}
 					}
 				}
 			}
@@ -341,33 +353,35 @@ void arena_scoreboard_gui::draw_gui(
 
 			pen.x += cell_pad.x * 2;
 
-			if (sorted_players.size() > 0) {
-				if (const auto& head_image = mode_input.rules.view.logos[faction]; head_image.is_set()) {
-					if (const auto& entry = draw_in.images_in_atlas.find_or(head_image).diffuse; entry.exists()) {
-						const auto size = entry.get_original_size();
-						auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
+			if constexpr(!std::is_same_v<M, test_mode>) {
+				if (sorted_players.size() > 0) {
+					if (const auto& head_image = mode_input.rules.view.logos[faction]; head_image.is_set()) {
+						if (const auto& entry = draw_in.images_in_atlas.find_or(head_image).diffuse; entry.exists()) {
+							const auto size = entry.get_original_size();
+							auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
 
-						head_orig.l = 0;
-						head_orig.r = size.x;
+							head_orig.l = 0;
+							head_orig.r = size.x;
 
-						/* if (!on_top) { */
-						/* 	head_orig.t = faction_bg_orig.b - size.y - cell_pad.y * 2; */
-						/* 	head_orig.b = head_orig.t + size.y; */
-						/* } */
-						/* else { */
-						/* 	head_orig.t = faction_bg_orig.t + cell_pad.y * 2; */
-						/* 	head_orig.b = head_orig.t + size.y; */
-						/* } */
+							/* if (!on_top) { */
+							/* 	head_orig.t = faction_bg_orig.b - size.y - cell_pad.y * 2; */
+							/* 	head_orig.b = head_orig.t + size.y; */
+							/* } */
+							/* else { */
+							/* 	head_orig.t = faction_bg_orig.t + cell_pad.y * 2; */
+							/* 	head_orig.b = head_orig.t + size.y; */
+							/* } */
 
-						aabb_img(entry, head_orig, rgba(white).mult_alpha(cfg.faction_logo_alpha));
+							aabb_img(entry, head_orig, rgba(white).mult_alpha(cfg.faction_logo_alpha));
 
-						pen.x += size.x + cell_pad.x * 2;
+							pen.x += size.x + cell_pad.x * 2;
+						}
 					}
 				}
 			}
 
 			const auto score_text_max_w = calc_size(fmt_large((max_score >= 10 ? "99" : "9"))).x;
-			auto score_text = typesafe_sprintf("%x", faction_state.score);
+			auto score_text = typesafe_sprintf("%x", faction_score);
 
 			if (max_score >= 10 && score_text.size() == 1) {
 				score_text = "0" + score_text;
@@ -550,47 +564,49 @@ void arena_scoreboard_gui::draw_gui(
 					}
 				);
 
-				auto show_icon = [&]() {
-					if (icon != std::nullopt) {
-						const auto icon_image = mode_input.rules.view.icons.at(*icon);
+				if constexpr(!std::is_same_v<M, test_mode>) {
+					auto show_icon = [&]() {
+						if (icon != std::nullopt) {
+							const auto icon_image = mode_input.rules.view.icons.at(*icon);
 
-						if (const auto& entry = draw_in.images_in_atlas.find_or(icon_image).diffuse; entry.exists()) {
-							const auto size = entry.get_original_size();
+							if (const auto& entry = draw_in.images_in_atlas.find_or(icon_image).diffuse; entry.exists()) {
+								const auto size = entry.get_original_size();
 
-							const auto& c = *current_column;
-							const auto& cell_orig = ltrbi(c.l, 0, c.r, cell_h);
+								const auto& c = *current_column;
+								const auto& cell_orig = ltrbi(c.l, 0, c.r, cell_h);
 
-							auto icon_orig = ltrbi(vec2i::zero, size);
-							icon_orig.place_in_center_of(cell_orig);
+								auto icon_orig = ltrbi(vec2i::zero, size);
+								icon_orig.place_in_center_of(cell_orig);
 
-							auto total_alpha = cfg.icon_alpha;
-								
-							if (!is_conscious) {
-								total_alpha *= cfg.dead_player_text_alpha_mult;
+								auto total_alpha = cfg.icon_alpha;
+									
+								if (!is_conscious) {
+									total_alpha *= cfg.dead_player_text_alpha_mult;
+								}
+
+								aabb_img(
+									entry,
+									icon_orig,
+									rgba(white).mult_alpha(total_alpha)
+								);
 							}
-
-							aabb_img(
-								entry,
-								icon_orig,
-								rgba(white).mult_alpha(total_alpha)
-							);
 						}
-					}
-				};
+					};
 
-				if (mode_input.rules.view.show_info_icons_of_opponents) {
-					show_icon();
-				}
-				else {
-					if (is_viewer_faction) {
+					if (mode_input.rules.view.show_info_icons_of_opponents) {
 						show_icon();
 					}
 					else {
-						if (
-							icon == scoreboard_icon_type::DEATH_ICON
-							|| icon == scoreboard_icon_type::UNCONSCIOUS_ICON
-						) {
+						if (is_viewer_faction) {
 							show_icon();
+						}
+						else {
+							if (
+								icon == scoreboard_icon_type::DEATH_ICON
+								|| icon == scoreboard_icon_type::UNCONSCIOUS_ICON
+							) {
+								show_icon();
+							}
 						}
 					}
 				}
@@ -617,31 +633,33 @@ void arena_scoreboard_gui::draw_gui(
 				}
 			}
 
-			if (is_viewer_faction && mode_input.rules.enable_player_colors) {
-				const auto color_indicator_image = assets::necessary_image_id::SMALL_COLOR_INDICATOR;
+			if constexpr(!std::is_same_v<M, test_mode>) {
+				if (is_viewer_faction && mode_input.rules.enable_player_colors) {
+					const auto color_indicator_image = assets::necessary_image_id::SMALL_COLOR_INDICATOR;
 
-				if (const auto& entry = in.necessary_images.at(color_indicator_image); entry.exists()) {
-					const auto size = entry.get_original_size();
+					if (const auto& entry = in.necessary_images.at(color_indicator_image); entry.exists()) {
+						const auto size = entry.get_original_size();
 
-					const auto& c = *current_column;
+						const auto& c = *current_column;
 
-					auto icon_orig = ltrbi(vec2i::zero, size);
-					icon_orig.l = (c.l + c.r) / 2 - size.x / 2;
-					icon_orig.r = icon_orig.l + size.x;
-					icon_orig.t++;
-					icon_orig.b++;
+						auto icon_orig = ltrbi(vec2i::zero, size);
+						icon_orig.l = (c.l + c.r) / 2 - size.x / 2;
+						icon_orig.r = icon_orig.l + size.x;
+						icon_orig.t++;
+						icon_orig.b++;
 
-					auto total_alpha = cfg.icon_alpha;
+						auto total_alpha = cfg.icon_alpha;
 
-					if (!is_conscious) {
-						total_alpha *= cfg.dead_player_text_alpha_mult;
+						if (!is_conscious) {
+							total_alpha *= cfg.dead_player_text_alpha_mult;
+						}
+
+						color_indicator_aabb_img(
+							entry,
+							icon_orig,
+							rgba(player_data.assigned_color).mult_alpha(total_alpha)
+						);
 					}
-
-					color_indicator_aabb_img(
-						entry,
-						icon_orig,
-						rgba(player_data.assigned_color).mult_alpha(total_alpha)
-					);
 				}
 			}
 
@@ -652,7 +670,7 @@ void arena_scoreboard_gui::draw_gui(
 
 			const auto& stats = player_data.stats;
 
-			{
+			if constexpr(!std::is_same_v<M, test_mode>) {
 				auto do_money = [&]() {
 					col_text(typesafe_sprintf("%x$", stats.money));
 				};
@@ -684,13 +702,21 @@ void arena_scoreboard_gui::draw_gui(
 		}
 	};
 
-	print_faction(participants.defusing, true);
-	print_faction(participants.bombing, false);
+	if constexpr(std::is_same_v<M, test_mode>) {
+		print_faction(faction_type::METROPOLIS, true);
+		print_faction(faction_type::RESISTANCE, false);
+	}
+	else {
+		const auto participants = typed_mode.calc_participating_factions(mode_input);
+
+		print_faction(participants.defusing, true);
+		print_faction(participants.bombing, false);
+	}
 
 	{
 		const auto faction = faction_type::SPECTATOR;
 
-		std::vector<std::pair<bomb_defusal_player, mode_player_id>> sorted_players;
+		std::vector<std::pair<typename M::player_type, mode_player_id>> sorted_players;
 
 		typed_mode.for_each_player_in(faction, [&](
 			const auto& id, 
@@ -742,4 +768,12 @@ template void arena_scoreboard_gui::draw_gui(
 
 	const bomb_defusal& mode, 
 	const typename bomb_defusal::const_input&
+) const;
+
+template void arena_scoreboard_gui::draw_gui(
+	const draw_setup_gui_input&,
+	const draw_mode_gui_input&, 
+
+	const test_mode& mode, 
+	const typename test_mode::const_input&
 ) const;

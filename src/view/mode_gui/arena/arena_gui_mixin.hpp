@@ -191,42 +191,35 @@ entity_id arena_gui_mixin<D>::get_game_gui_subject_id() const {
 
 	auto get_viewed_or_local_with = [&](const auto... args) {
 		return self.get_arena_handle(args...).on_mode_with_input([&](const auto& typed_mode, const auto& mode_input) {
-			using M = remove_cref<decltype(typed_mode)>;
+			const bool show_details_of_enemies = !mode_input.rules.should_hide_details_when_spectating_enemies();
 
-			if constexpr(M::round_based) {
-				const bool show_details_of_enemies = !mode_input.rules.hide_details_when_spectating_enemies;
-
-				if (show_details_of_enemies) {
-					return self.get_viewed_character_id();
-				}
-
-				if (!arena_gui.spectator.active) {
-					return self.get_viewed_character_id();
-				}
-
-				const auto local_player_id = self.get_local_player_id();
-				const auto local_player_data = typed_mode.find(local_player_id);
-
-				const auto viewed_player_id = arena_gui.spectator.now_spectating;
-				const auto viewed_player_data = typed_mode.find(viewed_player_id);
-
-				if (viewed_player_data == nullptr || local_player_data == nullptr) {
-					return self.get_viewed_character_id();
-				}
-
-				if (local_player_data->get_faction() == faction_type::SPECTATOR) {
-					return self.get_viewed_character_id();
-				}
-
-				if (viewed_player_data->get_faction() != local_player_data->get_faction()) {
-					return local_player_data->controlled_character_id;
-				}
-
+			if (show_details_of_enemies) {
 				return self.get_viewed_character_id();
 			}
-			else {
+
+			if (!arena_gui.spectator.active) {
 				return self.get_viewed_character_id();
 			}
+
+			const auto local_player_id = self.get_local_player_id();
+			const auto local_player_data = typed_mode.find(local_player_id);
+
+			const auto viewed_player_id = arena_gui.spectator.now_spectating;
+			const auto viewed_player_data = typed_mode.find(viewed_player_id);
+
+			if (viewed_player_data == nullptr || local_player_data == nullptr) {
+				return self.get_viewed_character_id();
+			}
+
+			if (local_player_data->get_faction() == faction_type::SPECTATOR) {
+				return self.get_viewed_character_id();
+			}
+
+			if (viewed_player_data->get_faction() != local_player_data->get_faction()) {
+				return local_player_data->controlled_character_id;
+			}
+
+			return self.get_viewed_character_id();
 		});
 	};
 

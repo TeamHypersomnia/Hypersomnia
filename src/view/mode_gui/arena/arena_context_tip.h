@@ -209,14 +209,16 @@ inline void draw_context_tip(
 			return cosm[result];
 		}();
 
-		if (bomb) {
-			const auto participants = typed_mode.calc_participating_factions(mode_input);
+		if constexpr(std::is_same_v<M, bomb_defusal>) {
+			if (bomb) {
+				const auto participants = typed_mode.calc_participating_factions(mode_input);
 
-			if (participants.defusing == current_faction) {
-				text("You've stolen the bomb! Escape!");
-				break_line();
-				text("Careful, enemies know where you go with the bomb.");
-				return total_text;
+				if (participants.defusing == current_faction) {
+					text("You've stolen the bomb! Escape!");
+					break_line();
+					text("Careful, enemies know where you go with the bomb.");
+					return total_text;
+				}
 			}
 		}
 
@@ -309,19 +311,21 @@ inline void draw_context_tip(
 			return total_text;
 		}
 
-		if (::buy_area_in_range(viewed_character)) {
-			if (!buy_menu_opened) {
-				if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
-					text("It is too late to buy items.");
-					return total_text;
+		if constexpr(!std::is_same_v<M, test_mode>) {
+			if (::buy_area_in_range(viewed_character)) {
+				if (!buy_menu_opened) {
+					if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
+						text("It is too late to buy items.");
+						return total_text;
+					}
+
+					text("Press");
+					hotkey(general_gui_intent_type::BUY_MENU);
+					text("to buy items.");
 				}
 
-				text("Press");
-				hotkey(general_gui_intent_type::BUY_MENU);
-				text("to buy items.");
+				return total_text;
 			}
-
-			return total_text;
 		}
 
 		(void)viewed_character;

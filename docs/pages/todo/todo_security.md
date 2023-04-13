@@ -5,6 +5,8 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- watch out for unsafe_serialize: we should impose limits on container sizes when stuff is serialized just with read_bytes using introspection etc
+
 - Watch out especially where servers pass arena name in their masterserver heartbeat
 	- That "filename" could potentially lead to moving/removing a system folder if not sanitized!
 		- Because we might request replacing an arena if we detect an existing one with the same name

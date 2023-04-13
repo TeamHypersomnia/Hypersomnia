@@ -15,7 +15,7 @@ test_scene_setup::test_scene_setup(
 	scene.make_test_scene(lua, settings, ruleset);
 	auto& cosm = scene.world;
 
-	local_player_id = mode.add_player({ ruleset, cosm }, faction_type::METROPOLIS);
+	local_player_id = mode.add_player({ ruleset, cosm }, "Player", faction_type::METROPOLIS);
 	viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
 #else
 	(void)lua;

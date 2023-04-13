@@ -144,6 +144,14 @@ inline augs::secure_hash_type choose_arena_server(
 
 	in.handle.migrate_mode_session(emigrated_session);
 
+	in.handle.on_mode(
+		[&]<typename T>(T& typed_mode) {
+			if constexpr(std::is_same_v<test_mode, T>) {
+				typed_mode.playtesting_context = in.playtesting_context;
+			}
+		}
+	);
+
 	return result;
 }
 
@@ -187,6 +195,14 @@ inline client_find_arena_result choose_arena_client(
 	}
 
 	in.handle.migrate_mode_session(emigrated_session);
+
+	in.handle.on_mode(
+		[&]<typename T>(T& typed_mode) {
+			if constexpr(std::is_same_v<test_mode, T>) {
+				typed_mode.playtesting_context = in.playtesting_context;
+			}
+		}
+	);
 
 	return result;
 }

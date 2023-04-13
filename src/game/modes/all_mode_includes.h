@@ -10,14 +10,14 @@
 #include "augs/templates/list_utils.h"
 
 using all_online_modes = type_list<
-	bomb_defusal
->;
-
-using rest_of_modes = type_list<
+	bomb_defusal,
 	test_mode
 >;
 
-using all_modes = concatenate_lists_t<all_online_modes, rest_of_modes>;
+using all_modes = type_list<
+	bomb_defusal,
+	test_mode
+>;
 
 using all_modes_variant = replace_list_type_t<all_modes, std::variant>;
 using all_online_modes_variant = replace_list_type_t<all_online_modes, std::variant>;

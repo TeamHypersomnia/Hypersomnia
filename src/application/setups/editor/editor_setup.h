@@ -53,6 +53,7 @@
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/setups/client/client_vars.h"
 #include "application/setups/editor/gui/editor_recent_message.h"
+#include "application/arena/arena_playtesting_context.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -760,4 +761,6 @@ public:
 
 	void assign_project(const editor_project&, const bool undoing_to_first_revision);
 	void on_project_assigned(const bool undoing_to_first_revision);
+
+	arena_playtesting_context make_playtesting_context() const;
 };

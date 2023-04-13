@@ -2104,19 +2104,17 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 }
 
 void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {
-	const auto sender_player = get_arena_handle().on_mode(
-		[&](const auto& typed_mode) {
-			return typed_mode.find(payload.author);
-		}
-	);
-
 	std::string sender_player_nickname;
 	auto sender_player_faction = faction_type::SPECTATOR;
 
-	if (sender_player != nullptr) {
-		sender_player_faction = sender_player->get_faction();
-		sender_player_nickname = sender_player->get_chosen_name();
-	}
+	get_arena_handle().on_mode(
+		[&](const auto& typed_mode) {
+			if (const auto entry = typed_mode.find(payload.author)) {
+				sender_player_faction = entry->get_faction();
+				sender_player_nickname = entry->get_chosen_name();
+			}
+		}
+	);
 
 	bool integrated_received = false;
 
@@ -2133,13 +2131,15 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		}
 
 		if (payload.target == chat_target_type::TEAM_ONLY) {
-			const auto recipient_player = get_arena_handle().on_mode(
+			const auto recipient_player_faction = get_arena_handle().on_mode(
 				[&](const auto& typed_mode) {
-					return typed_mode.find(to_mode_player_id(recipient_client_id));
+					if (const auto entry = typed_mode.find(to_mode_player_id(recipient_client_id))) {
+						return entry->get_faction();
+					}
+
+					return faction_type::SPECTATOR;
 				}
 			);
-
-			const auto recipient_player_faction = recipient_player ? recipient_player->get_faction() : faction_type::SPECTATOR;
 
 			if (sender_player_faction != recipient_player_faction) {
 				return;

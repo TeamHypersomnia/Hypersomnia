@@ -31,6 +31,7 @@
 #include "game/messages/game_notification.h"
 #include "game/messages/hud_message.h"
 #include "game/detail/sentience/sentience_logic.h"
+#include "game/modes/detail/delete_with_held_items.hpp"
 
 #define LOG_BOMB_DEFUSAL 0
 
@@ -52,14 +53,6 @@ void BMB_LOG(Args&&... args) {
 using input_type = bomb_defusal::input;
 using const_input_type = bomb_defusal::const_input;
 
-bomb_defusal_player* bomb_defusal::find(const mode_player_id& id) {
-	return mapped_or_nullptr(players, id);
-}
-
-const bomb_defusal_player* bomb_defusal::find(const mode_player_id& id) const {
-	return mapped_or_nullptr(players, id);
-}
-
 int bomb_defusal_player_stats::calc_score() const {
 	return 
 		knockouts * 2 
@@ -68,38 +61,6 @@ int bomb_defusal_player_stats::calc_score() const {
 		+ bomb_explosions * 2
 		+ bomb_defuses * 4
 	;
-}
-
-template <class H>
-static void delete_with_held_items(const input_type in, const logic_step step, const H handle) {
-	if (handle) {
-		deletion_queue q;
-		q.push_back(handle.get_id());
-
-		handle.for_each_contained_item_recursive(
-			[&](const auto& contained) {
-				const auto& b = in.rules.bomb_flavour;
-
-				if (b.is_set()) {
-					if (entity_flavour_id(b) == entity_flavour_id(contained.get_flavour_id())) {
-						/* Don't delete the bomb!!! Drop it instead. */
-
-						auto request = item_slot_transfer_request::drop(contained);
-						request.params.bypass_mounting_requirements = true;
-
-						const auto result = perform_transfer_no_step(request, step.get_cosmos());
-						result.notify_logical(step);
-
-						return;
-					}
-				}
-
-				q.push_back(entity_id(contained.get_id()));
-			}
-		);
-
-		reverse_perform_deletions(q, handle.get_cosmos());
-	}
 }
 
 bool bomb_defusal_player::operator<(const bomb_defusal_player& b) const {
@@ -471,16 +432,12 @@ mode_player_id bomb_defusal::add_player(const input_type in, const entity_name_s
 	return {};
 }
 
-bool bomb_defusal_player::is_set() const {
-	return !get_chosen_name().empty();
-}
-
 void bomb_defusal::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
 	handle_duel_desertion(in, step, id);
 
 	const auto controlled_character_id = lookup(id);
 
-	delete_with_held_items(in, step, in.cosm[controlled_character_id]);
+	::delete_with_held_items(in, step, in.cosm[controlled_character_id]);
 
 	if (const auto entry = find(id)) {
 		const auto previous_faction = entry->get_faction();
@@ -1753,7 +1710,7 @@ void bomb_defusal::migrate(const input_type in, const arena_migrated_session& se
 	ensure(players.empty());
 	ensure_eq(0u, get_current_round_number());
 
-	std::unordered_map<faction_type, faction_type> faction_mapping;
+	std::map<faction_type, faction_type> faction_mapping;
 
 	for (const auto& migrated_player : session.players) {
 		const auto f = migrated_player.data.faction;
@@ -1795,8 +1752,6 @@ void bomb_defusal::migrate(const input_type in, const arena_migrated_session& se
 }
 
 void bomb_defusal::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
-	(void)step;
-
 	const auto& g = entropy.general;
 
 	if (logically_set(g.added_player)) {
@@ -2790,18 +2745,26 @@ auto bomb_defusal::find_player_by_impl(S& self, const E& identifier) {
 		auto& player_data = it.second;
 
 		if constexpr(std::is_same_v<entity_name_str, E>) {
-			if (player_data.get_chosen_name() == identifier) {
+			if (player_data.session.chosen_name == identifier) {
 				return std::addressof(it);
 			}
 		}
 		else if constexpr(std::is_same_v<session_id_type, E>) {
-			if (player_data.get_session_id() == identifier) {
+			if (player_data.session.id == identifier) {
 				return std::addressof(it);
 			}
 		}
 	}
 
 	return R(nullptr);
+}
+
+bomb_defusal_player* bomb_defusal::find(const mode_player_id& id) {
+	return mapped_or_nullptr(players, id);
+}
+
+const bomb_defusal_player* bomb_defusal::find(const mode_player_id& id) const {
+	return mapped_or_nullptr(players, id);
 }
 
 mode_player_id bomb_defusal::lookup(const session_id_type& session_id) const {

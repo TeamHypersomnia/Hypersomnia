@@ -131,7 +131,7 @@ main_menu_setup::main_menu_setup(
 
 	if (is_intro_scene_available) {
 		intro.make_test_scene(lua, { false, 60 }, ruleset);
-		viewed_character_id = cosm[mode.lookup(mode.add_player({ ruleset, cosm }, faction_type::METROPOLIS))].get_id();
+		viewed_character_id = cosm[mode.lookup(mode.add_player({ ruleset, cosm }, "Player", faction_type::METROPOLIS))].get_id();
 	}
 
 	const bool is_recording_available = is_intro_scene_available && false;

@@ -191,6 +191,11 @@ mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 	if (buy_menu.show && choose_team.show) {
 		buy_menu.show = false;
 	}
+	
+	if constexpr(std::is_same_v<test_mode, M>) {
+		choose_team.show = false;
+		buy_menu.show = false;
+	}
 
 	if constexpr(M::round_based) {
 		if (prediction.play_unpredictable) {
@@ -284,11 +289,65 @@ void arena_gui_state::draw_mode_gui(
 		return in.get_drawer();
 	};
 
-	if constexpr(M::round_based) {
+	const auto local_player_id = mode_in.local_player_id;
+
+	auto draw_context_tip = [&]() {
+		auto general_drawer = get_drawer();
+
+		entity_id tipped_character_id;
+		auto tipped_faction = faction_type::SPECTATOR;
+
+		const auto tipped_player_id = [&]() {
+			if (in.demo_replay_mode) {
+				return spectator.active ? spectator.now_spectating : local_player_id;
+			}
+
+			return local_player_id;
+		}();
+
+		const auto player_data = typed_mode.find(tipped_player_id);
+
+		if (player_data != nullptr) {
+			tipped_faction = player_data->get_faction();
+			tipped_character_id = player_data->controlled_character_id;
+		}
+
+		const auto& cosm = mode_input.cosm;
+
+		::draw_context_tip(
+			typed_mode,
+			mode_input,
+			mode_in.config,
+			general_drawer,
+			in.screen_size,
+			in.gui_fonts.gui,
+			cosm[tipped_character_id],
+			tipped_faction,
+			choose_team.show,
+			buy_menu.show,
+			in.is_cursor_released
+		);
+	};
+
+	if constexpr(std::is_same_v<M, test_mode>) {
+		/* Only draw scoreboard so that we know who's online */
+
+		auto draw_scoreboard = [&]() {
+			scoreboard.draw_gui(in, mode_in, typed_mode, mode_input);
+		};
+
+		if (prediction.play_unpredictable) {
+			draw_scoreboard();
+		}
+
+		if (prediction.play_predictable) {
+			draw_context_tip();
+		}
+	}
+	else {
 		using namespace augs::gui::text;
 
 		const auto death_fallback_icon = mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON];
-		const auto local_player_id = mode_in.local_player_id;
 
 		const auto local_player_faction = [&]() -> std::optional<faction_type> {
 			if (const auto p = typed_mode.find(local_player_id)) {
@@ -1091,44 +1150,6 @@ void arena_gui_state::draw_mode_gui(
 			}
 		};
 
-		auto draw_context_tip = [&]() {
-			auto general_drawer = get_drawer();
-
-			entity_id tipped_character_id;
-			auto tipped_faction = faction_type::SPECTATOR;
-			
-			const auto tipped_player_id = [&]() {
-				if (in.demo_replay_mode) {
-					return spectator.active ? spectator.now_spectating : local_player_id;
-				}
-
-				return local_player_id;
-			}();
-
-			const auto player_data = typed_mode.find(tipped_player_id);
-
-			if (player_data != nullptr) {
-				tipped_faction = player_data->get_faction();
-				tipped_character_id = player_data->controlled_character_id;
-			}
-
-			const auto& cosm = mode_input.cosm;
-
-			::draw_context_tip(
-				typed_mode,
-				mode_input,
-				mode_in.config,
-				general_drawer,
-				in.screen_size,
-				in.gui_fonts.gui,
-				cosm[tipped_character_id],
-				tipped_faction,
-				choose_team.show,
-				buy_menu.show,
-				in.is_cursor_released
-			);
-		};
-
 		if (prediction.play_unpredictable) {
 			if (cfg.show_client_resyncing_notifier && resyncing_notifier) {
 				const auto warning = colored("WARNING! Resynchronizing client with the server.", orange);
@@ -1203,10 +1224,6 @@ void arena_gui_state::draw_mode_gui(
 
 			draw_context_tip();
 		}
-	}
-	else {
-		(void)typed_mode;
-		(void)in;
 	}
 }
 

@@ -2978,20 +2978,8 @@ void editor_setup::start_playtesting() {
 
 	get_arena_handle().on_mode_with_input([&]<typename M>(M& mode, const auto& input) {
 		if constexpr(std::is_same_v<M, test_mode>) {
-			local_player_id = mode.add_player(input, project.playtesting.starting_faction);
-
-			const auto new_character = cosm[mode.lookup(local_player_id)];
-
-			const auto spawn_transform = get_camera_eye().transform;
-
-			new_character.template dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
-				typed_handle.set_logic_transform(spawn_transform);
-				::snap_interpolated_to(typed_handle, spawn_transform);
-
-				if (const auto crosshair = typed_handle.find_crosshair()) {
-					crosshair->base_offset = vec2::zero;
-				}
-			});
+			mode.playtesting_context = make_playtesting_context();
+			local_player_id = mode.add_player(input, simulated_client.nickname, project.playtesting.starting_faction);
 		}
 		else {
 			local_player_id = mode.add_player(input, simulated_client.nickname);
@@ -3202,6 +3190,13 @@ const editor_official_resource_map& official_get_resource_map(const packaged_off
 	return official.resource_map;
 }
 
+arena_playtesting_context editor_setup::make_playtesting_context() const {
+	return { 
+		get_camera_eye().transform.pos,
+		project.playtesting.starting_faction
+	};
+}
+
 template struct edit_resource_command<editor_sprite_resource>;
 template struct edit_resource_command<editor_sound_resource>;
 template struct edit_resource_command<editor_light_resource>;
@@ -3251,4 +3246,3 @@ template struct create_node_command<editor_prefab_node>;
 
 #include "application/network/network_common.h"
 template void build_arena_from_editor_project<online_arena_handle<false>>(online_arena_handle<false> arena_handle, build_arena_input);
-template void build_arena_from_editor_project<editor_arena_handle<false>>(editor_arena_handle<false> arena_handle, build_arena_input);

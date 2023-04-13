@@ -114,6 +114,10 @@ struct bomb_defusal_ruleset {
 	augs::maybe<sentience_shake_settings> override_shake;
 	// END GEN INTROSPECTOR
 
+	bool should_hide_details_when_spectating_enemies() const {
+		return true;
+	}
+
 	auto get_num_rounds() const {
 		/* Make it even */
 		return std::max((max_rounds / 2) * 2, 2u);
@@ -122,9 +126,9 @@ struct bomb_defusal_ruleset {
 
 struct bomb_defusal_faction_state {
 	// GEN INTROSPECTOR struct bomb_defusal_faction_state
-	unsigned current_spawn_index = 0;
-	unsigned score = 0;
-	unsigned consecutive_losses = 0;
+	uint32_t current_spawn_index = 0;
+	uint32_t score = 0;
+	uint32_t consecutive_losses = 0;
 	std::vector<mode_entity_id> shuffled_spawns;
 	// END GEN INTROSPECTOR
 
@@ -179,7 +183,9 @@ struct bomb_defusal_player {
 
 	bool operator<(const bomb_defusal_player& b) const;
 
-	bool is_set() const;
+	bool is_set() const {
+		return session.is_set();
+	}
 
 	const auto& get_chosen_name() const {
 		return session.chosen_name;
@@ -233,11 +239,15 @@ struct debugger_property_accessors;
 class bomb_defusal {
 public:
 	using ruleset_type = bomb_defusal_ruleset;
+	using player_type = bomb_defusal_player;
+
 	static constexpr bool needs_clean_round_state = true;
 	static constexpr bool round_based = true;
 
 	template <bool C>
 	struct basic_input {
+		using mode_type = bomb_defusal;
+
 		const ruleset_type& rules;
 		const cosmos_solvable_significant& clean_round_state;
 		maybe_const_ref_t<C, cosmos> cosm;
@@ -414,9 +424,6 @@ private:
 
 	void post_award(input, mode_player_id, money_type amount);
 
-	bomb_defusal_player* find_player_by(const entity_name_str& chosen_name);
-	bomb_defusal_player* find(const mode_player_id&);
-
 	template <class C, class F>
 	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
@@ -427,7 +434,7 @@ private:
 	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
 	per_actual_faction<bomb_defusal_faction_state> factions;
-	std::map<mode_player_id, bomb_defusal_player> players;
+	std::map<mode_player_id, player_type> players;
 	bomb_defusal_round_state current_round;
 
 	bool was_first_blood = false;
@@ -483,19 +490,18 @@ public:
 
 	unsigned calc_max_faction_score() const;
 
-	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
-	std::size_t num_players_in(faction_type) const;
-
 	mode_player_id find_first_free_player() const;
 
 	arena_mode_match_result calc_match_result(const_input) const;
 
 	unsigned get_score(faction_type) const;
 
-	const bomb_defusal_player* find_player_by(const entity_name_str& chosen_name) const;
-	const bomb_defusal_player* find(const mode_player_id&) const;
+	player_type* find_player_by(const entity_name_str& chosen_name);
+	player_type* find(const mode_player_id&);
+	const player_type* find_player_by(const entity_name_str& chosen_name) const;
+	const player_type* find(const mode_player_id&) const;
 
-	const bomb_defusal_player* find(const session_id_type&) const;
+	const player_type* find(const session_id_type&) const;
 	mode_player_id lookup(const session_id_type&) const;
 
 	template <class F>
@@ -560,8 +566,8 @@ public:
 		return state == arena_mode_state::MATCH_SUMMARY;
 	}
 
-	const auto& get_factions_state() const {
-		return factions;
+	uint32_t get_faction_score(const faction_type faction) const {
+		return factions[faction].score;
 	}
 
 	mode_player_id get_next_to_spectate(
@@ -611,6 +617,9 @@ public:
 
 	arena_migrated_session emigrate() const;
 	void migrate(input, const arena_migrated_session&);
+
+	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
+	std::size_t num_players_in(faction_type) const;
 
 	uint32_t get_num_players() const;
 	uint32_t get_num_active_players() const;

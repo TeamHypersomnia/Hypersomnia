@@ -6,6 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Quick refresher of server architecture before we introduce serious changes
+    - Why did we want to have session ids? And why in the mode?
+        - Identifying by client ids 0-64 is suboptimal because the client might disconnect and someone else might connect
+        - We also want session ids be synchronized so other clients can refer to them
+            - The crux here is they can refer to/recognize them asynchronously to solvable (deterministic) stream
+            - so e.g. the avatar for a specific session id might be sent in parallel to gameplay
+    - Do we need to distinguish between mode player id and client id?
+        - I think it's a good distinction
+        - Note client setup does not need to know of "connected client ids", he just has mode player ids and their associated existential session guids
+    - Then, why not ditch mode_player_id and just always use session_id and map with it?
+        - The server would just map player_session_id to its 0-64 slot internally
+            - all player_session_id are correctly synchronized through solvable stream because they're held in the mode
+        - Pro: We can identify players with just 1 byte instead of 4 (we know it's in 0-64 range)
+    - The current arch then makes sense.
+        - Modes are convenient way to associate players to session guids through solvable stream.
+        - And we want to be able to synchronously identify players with just 1-byte ids.
+
+- It will be useful to network the test_mode because it will be the minimal mode, as a showcase of the interface required
 - Note test mode is unimplemented for multiplayer
 
 - Investigate a desync when switching legacy maps

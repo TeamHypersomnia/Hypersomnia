@@ -622,3 +622,8 @@ summary: Just a hidden scratchpad.
     - think crate remnants for example
     - maybe leave it as it is and specify footsteps in physical materials
     - fuck it, leave it as it is and only add footstep in physical material if we really ever get to it
+
+- set max_incoming_connections_v to 63 so that we can fit in the integrated client as the 64th
+    - This way we'll be able to identify clients with one less bit
+    - Well, it's actually aligned to a byte anyway when serializing so this won't have any effect on bandwidth
+

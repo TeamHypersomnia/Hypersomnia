@@ -133,20 +133,19 @@ message_handler_result client_setup::handle_server_payload(
 	else if constexpr (std::is_same_v<T, server_broadcasted_chat>) {
 		const auto author_id = payload.author;
 
-		const auto sender_player = get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-			[&](const auto& typed_mode) {
-				return typed_mode.find(author_id);
-			}
-		);
-
 		std::string sender_player_nickname;
 		auto sender_player_faction = faction_type::SPECTATOR;
 
-		if (sender_player != nullptr) {
-			sender_player_faction = sender_player->get_faction();
-			sender_player_nickname = sender_player->get_chosen_name();
-		}
-		else {
+		get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+			[&](const auto& typed_mode) {
+				if (auto entry = typed_mode.find(author_id)) {
+					sender_player_faction = entry->get_faction();
+					sender_player_nickname = entry->get_chosen_name();
+				}
+			}
+		);
+
+		if (sender_player_nickname.empty()) {
 			if (!author_id.is_set()) {
 				sender_player_nickname = "Client";
 			}

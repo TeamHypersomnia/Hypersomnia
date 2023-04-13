@@ -7,6 +7,9 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/detail/snap_interpolation_to_logical.h"
+#include "game/messages/game_notification.h"
+#include "augs/templates/logically_empty.h"
+#include "game/modes/detail/delete_with_held_items.hpp"
 
 #include "game/detail/sentience/sentience_logic.h"
 
@@ -54,7 +57,8 @@ void test_mode::teleport_to_next_spawn(const input_type in, const entity_id id) 
 		const auto faction = typed_handle.get_official_faction();
 		const auto num_spawns = get_num_faction_spawns(in.cosm, faction);
 
-		if (0 == num_spawns) {
+		/* Respawn in the same place during playtest */
+		if (0 == num_spawns || playtesting_context.has_value()) {
 			return;
 		}
 
@@ -78,40 +82,176 @@ void test_mode::teleport_to_next_spawn(const input_type in, const entity_id id) 
 	});
 }
 
-mode_player_id test_mode::add_player(input_type in, const faction_type faction) {
-	auto& cosm = in.cosm;
-
-	if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
-		const auto new_id = first_free_key(players, mode_player_id::first());
-
-		if (just_create_entity(
-			cosm, 
-			entity_flavour_id(flavour), 
-			[&](const entity_handle new_character) {
-				teleport_to_next_spawn(in, new_character);
-				pending_inits.push_back(new_character);
-
-				cosmic::set_specific_name(new_character, "Player");
-
-				players.try_emplace(new_id, new_character);
-			}
-		)) {
-			return new_id;
-		}
+mode_player_id test_mode::add_player(input_type in, const entity_name_str& name, const faction_type faction) {
+	if (const auto new_id = first_free_key(players, mode_player_id::first()); new_id.is_set()) {
+		add_player_custom(in, { new_id, name, faction });
+		return new_id;
 	}
 
 	return mode_player_id::dead();
 }
 
-void test_mode::remove_player(input_type in, const mode_player_id id) {
+void test_mode::remove_player(input_type in, const logic_step step, const mode_player_id id) {
 	const auto controlled_character_id = lookup(id);
-	cosmic::delete_entity(in.cosm[controlled_character_id]);
+
+	::delete_with_held_items(in, step, in.cosm[controlled_character_id]);
 
 	erase_element(players, id);
 }
 
+void test_mode::create_controlled_character_for(const input_type in, const mode_player_id id) {
+	auto entry = find(id);
+
+	if (entry == nullptr) {
+		return;
+	}
+
+	auto& cosm = in.cosm;
+	const auto faction = entry->get_faction();
+
+	if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
+		just_create_entity(
+			cosm, 
+			entity_flavour_id(flavour), 
+			[&](const entity_handle new_character) {
+				if (playtesting_context) {
+					const auto spawn_transform = transformr(playtesting_context->initial_spawn_pos, 0);
+
+					new_character.dispatch_on_having_all<components::sentience>(
+						[&](const auto& typed_character) {
+							typed_character.set_logic_transform(spawn_transform);
+							::snap_interpolated_to(typed_character, spawn_transform);
+
+							if (const auto crosshair = typed_character.find_crosshair()) {
+								crosshair->base_offset = vec2::zero;
+							}
+						}
+					);
+				}
+				else {
+					teleport_to_next_spawn(in, new_character);
+				}
+
+				pending_inits.push_back(new_character);
+
+				cosmic::set_specific_name(new_character, entry->get_chosen_name());
+				entry->controlled_character_id = new_character.get_id();
+			}
+		);
+	}
+}
+
+bool test_mode::add_player_custom(const input_type in, const add_player_input& add_in) {
+	auto& cosm = in.cosm;
+	(void)cosm;
+
+	auto considered_faction = add_in.faction;
+
+	if (playtesting_context) {
+		const bool is_playtest_host = players.empty();
+
+		if (is_playtest_host) {
+			considered_faction = playtesting_context->first_player_faction;
+		}
+		else {
+			considered_faction = playtesting_context->first_player_faction == faction_type::RESISTANCE ? faction_type::METROPOLIS : faction_type::RESISTANCE;
+		}
+	}
+	else {
+		// Default to metropolis
+
+		if (considered_faction != faction_type::METROPOLIS && considered_faction != faction_type::RESISTANCE) {
+			considered_faction = faction_type::METROPOLIS;
+		}
+	}
+
+	const auto& new_id = add_in.id;
+
+	auto& new_player = (*players.try_emplace(new_id).first).second;
+
+	if (new_player.is_set()) {
+		return false;
+	}
+
+	new_player.session.chosen_name = add_in.name;
+	new_player.session.id = next_session_id;
+	new_player.session.faction = considered_faction;
+	++next_session_id;
+
+	create_controlled_character_for(in, new_id);
+
+	return true;
+}
+
+void test_mode::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	const auto& g = entropy.general;
+
+	if (logically_set(g.added_player)) {
+		const auto& a = g.added_player;
+		const auto result = add_player_custom(in, a);
+		(void)result;
+
+		if (const auto entry = find(a.id)) {
+			messages::game_notification notification;
+
+			notification.subject_mode_id = a.id;
+			notification.subject_name = entry->get_chosen_name();
+			notification.payload = messages::joined_or_left::JOINED;
+
+			step.post_message(std::move(notification));
+		}
+	}
+
+	if (logically_set(g.removed_player)) {
+		if (const auto entry = find(g.removed_player)) {
+			messages::game_notification notification;
+
+			notification.subject_mode_id = g.removed_player;
+			notification.subject_name = entry->get_chosen_name();
+			notification.payload = messages::joined_or_left::LEFT;
+
+			step.post_message(std::move(notification));
+		}
+
+		remove_player(in, step, g.removed_player);
+	}
+
+	if (logically_set(g.removed_player) && logically_set(g.added_player)) {
+		ensure(g.removed_player != g.added_player.id);
+	}
+}
+
+void test_mode::remove_old_lying_items(input_type in, logic_step) {
+	const auto max_age_ms = 10000;
+
+	auto& cosm = in.cosm;
+	const auto& clk = cosm.get_clock();
+
+	deletion_queue q;
+
+	cosm.for_each_having<invariants::item>([&](const auto typed_handle) {
+		if (typed_handle.get_current_slot().alive()) {
+			return;
+		}
+
+		const auto when_born = typed_handle.when_born();
+		const auto when_dropped = typed_handle.when_last_transferred();
+
+		const bool was_created_somewhat_later = when_born.step > 10;
+
+		if (was_created_somewhat_later && when_dropped.was_set()) {
+			if (clk.is_ready(max_age_ms, when_dropped)) {
+				q.push_back(entity_id(typed_handle.get_id()));
+			}
+		}
+	});
+
+	reverse_perform_deletions(q, cosm);
+}
+
 void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {
-	(void)entropy;
+	add_or_remove_players(in, entropy, step);
+
 	auto& cosm = in.cosm;
 
 	const auto& clk = cosm.get_clock();
@@ -137,4 +277,133 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 			sentience.when_knocked_out = {};
 		}
 	});
+
+	remove_old_lying_items(in, step);
+}
+
+arena_migrated_session test_mode::emigrate() const {
+	arena_migrated_session session;
+
+	for (const auto& emigrated_player : players) {
+		arena_migrated_player_entry entry;
+		entry.mode_id = emigrated_player.first;
+		entry.data = emigrated_player.second.session;
+
+		session.players.emplace_back(std::move(entry));
+	}
+
+	session.next_session_id = next_session_id;
+	return session;
+}
+
+void test_mode::migrate(const input_type in, const arena_migrated_session& session) {
+	ensure(players.empty());
+
+	for (const auto& migrated_player : session.players) {
+		const auto mode_id = migrated_player.mode_id;
+		const auto& it = players.try_emplace(mode_id);
+		auto& new_player = (*it.first).second;
+
+		ensure(it.second);
+		ensure(!new_player.session.is_set());
+
+		new_player.session = migrated_player.data;
+		new_player.session.faction = new_player.session.faction;
+
+		create_controlled_character_for(in, mode_id);
+	}
+
+	next_session_id = session.next_session_id;
+}
+
+template <class S, class E>
+auto test_mode::find_player_by_impl(S& self, const E& identifier) {
+	using R = maybe_const_ptr_t<std::is_const_v<S>, std::pair<const mode_player_id, test_mode_player>>;
+
+	for (auto& it : self.players) {
+		auto& player_data = it.second;
+
+		if constexpr(std::is_same_v<entity_name_str, E>) {
+			if (player_data.session.chosen_name == identifier) {
+				return std::addressof(it);
+			}
+		}
+		else if constexpr(std::is_same_v<session_id_type, E>) {
+			if (player_data.session.id == identifier) {
+				return std::addressof(it);
+			}
+		}
+	}
+
+	return R(nullptr);
+}
+
+test_mode_player* test_mode::find(const mode_player_id& id) {
+	return mapped_or_nullptr(players, id);
+}
+
+const test_mode_player* test_mode::find(const mode_player_id& id) const {
+	return mapped_or_nullptr(players, id);
+}
+
+mode_player_id test_mode::lookup(const session_id_type& session_id) const {
+	if (const auto r = find_player_by_impl(*this, session_id)) {
+		return r->first;
+	}
+
+	return {};
+}
+
+const test_mode_player* test_mode::find(const session_id_type& session_id) const {
+	if (const auto r = find_player_by_impl(*this, session_id)) {
+		return std::addressof(r->second);
+	}
+
+	return nullptr;
+}
+
+test_mode_player* test_mode::find_player_by(const entity_name_str& chosen_name) {
+	if (const auto r = find_player_by_impl(*this, chosen_name)) {
+		return std::addressof(r->second);
+	}
+
+	return nullptr;
+}
+
+const test_mode_player* test_mode::find_player_by(const entity_name_str& chosen_name) const {
+	if (const auto r = find_player_by_impl(*this, chosen_name)) {
+		return std::addressof(r->second);
+	}
+
+	return nullptr;
+}
+
+std::size_t test_mode::num_players_in(const faction_type faction) const {
+	auto total = std::size_t(0);
+
+	for_each_player_in(faction, [&](auto&&...) {
+		++total;
+	});
+
+	return total;
+}
+
+uint32_t test_mode::get_num_players() const {
+	return players.size();
+}
+
+uint32_t test_mode::get_num_active_players() const {
+	return get_num_players() - num_players_in(faction_type::SPECTATOR);
+}
+
+uint32_t test_mode::get_max_num_active_players(const const_input) const {
+	const auto max_players_per_team = 32;
+	return max_players_per_team * 2;
+}
+
+bool test_mode_player::operator<(const test_mode_player& b) const {
+	const auto ao = arena_player_order { get_chosen_name(), stats.calc_score() };
+	const auto bo = arena_player_order { b.get_chosen_name(), b.stats.calc_score() };
+
+	return ao < bo;
 }

@@ -21,6 +21,10 @@ struct arena_migrated_player {
 	session_id_type id = session_id_type::dead();
 	faction_type faction = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
+
+	bool is_set() const {
+		return !chosen_name.empty();
+	}
 };
 
 struct arena_migrated_player_entry {
