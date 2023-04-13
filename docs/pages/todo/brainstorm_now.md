@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Transmitting maps and resources (finally)
+    - Reusing resources for new versions of maps.
+        - Will naturally happen frequently when hosting playtesting sessions from editor.
+        - We don't have to start with a full-blown content database.
+            - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
+                - Will cover 90% of the cases.
+
 - Quick refresher of server architecture before we introduce serious changes
     - Why did we want to have session ids? And why in the mode?
         - Identifying by client ids 0-64 is suboptimal because the client might disconnect and someone else might connect
@@ -22,18 +29,6 @@ summary: That which we are brainstorming at the moment.
     - The current arch then makes sense.
         - Modes are convenient way to associate players to session guids through solvable stream.
         - And we want to be able to synchronously identify players with just 1-byte ids.
-
-- It will be useful to network the test_mode because it will be the minimal mode, as a showcase of the interface required
-- Note test mode is unimplemented for multiplayer
-
-- Investigate a desync when switching legacy maps
-    - might be due to clean_state = in.scene.world
-        - change to advanced_cosm
-    - Does it happen in the previous commit?
-    - Also maybe it won't matter once we use new format
-
-- Also plan for sending/loading autosaves
-    - So that we don't have to explicitly save when doing another online playtest
 
 - Resolving duplicate arena names
     - WILL happen.
@@ -103,24 +98,11 @@ summary: That which we are brainstorming at the moment.
             - since someone can delete arenas from the official folder
                 - This will not change the fact that the newly downloaded map will have its hash checked against what the server requires
 
-- Remove dummy jsons from legacy maps and determine if it's new based on its existence
-    - we'll later remove that clause completely and only allow json maps
-
-- Transmitting maps and resources (finally)
-    - Reusing resources for new versions of maps.
-        - Will naturally happen frequently when hosting playtesting sessions from editor.
-        - We don't have to start with a full-blown content database.
-            - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
-                - Will cover 90% of the cases.
-
-
 
 - The semantics of augs::maybe isn't really one of "is it enabled" but more "is it specified"
     - which is why it would make less sense to use it for fog of war for example
         - because this mechanic exists at all times - we can just temporarily disable it
         - which is why there should probably be separate flags for it
-
-- First we need to be able to host them officially on the server at all, under the assumption that all clients have these already
 
 - Prepare comprehensive official resource collection
     - What do we make official?

@@ -570,6 +570,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	);
 
 	heartbeat.server_version = hypersomnia_version().get_version_string();
+	heartbeat.is_editor_playtesting_server = solvable_vars.playtesting_context != std::nullopt;
 
 	heartbeat.validate();
 	heartbeat_buffer.clear();

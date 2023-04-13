@@ -5920,3 +5920,21 @@ This will discard your redo history."
     - and to drop multiple objects to scene from resources if they are related like those floors
 - properly cast light on wall-like objects, perhaps some filter/render layer?
 
+
+- Investigate a desync when switching legacy maps
+    - might be due to clean_state = in.scene.world
+        - change to advanced_cosm
+    - Does it happen in the previous commit?
+    - Also maybe it won't matter once we use new format
+    - Mode wasn't properly migrated in choose_arena_client or server i dont recall
+- Also plan for sending/loading autosaves
+    - So that we don't have to explicitly save when doing another online playtest
+
+- Remove dummy jsons from legacy maps and determine if it's new based on its existence
+    - we'll later remove that clause completely and only allow json maps
+
+- It will be useful to network the test_mode because it will be the minimal mode, as a showcase of the interface required
+- Note test mode is unimplemented for multiplayer
+
+- First we need to be able to host them officially on the server at all, under the assumption that all clients have these already
+

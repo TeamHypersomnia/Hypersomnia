@@ -25,6 +25,7 @@ struct server_heartbeat {
 	nat_detection_result nat;
 	bool suppress_new_community_server_webhook = false;
 	game_version_identifier server_version = "Unknown";
+	bool is_editor_playtesting_server = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_heartbeat&) const = default;
