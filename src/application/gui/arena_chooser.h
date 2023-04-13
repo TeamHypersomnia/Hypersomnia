@@ -21,7 +21,7 @@ class arena_chooser : keyboard_acquiring_popup {
 		augs::path_type path;
 
 		bool operator<(const entry& b) const {
-			return augs::natural_order(path, b.path);
+			return augs::natural_order(path.string(), b.path.string());
 		}
 
 		auto get_filename() const {
