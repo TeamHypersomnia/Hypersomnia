@@ -242,6 +242,12 @@ void test_mode::remove_old_lying_items(input_type in, logic_step) {
 		if (was_created_somewhat_later && when_dropped.was_set()) {
 			if (clk.is_ready(max_age_ms, when_dropped)) {
 				q.push_back(entity_id(typed_handle.get_id()));
+
+				typed_handle.for_each_contained_item_recursive(
+					[&](const auto& contained) {
+						q.push_back(entity_id(contained.get_id()));
+					}
+				);
 			}
 		}
 	});

@@ -15,7 +15,7 @@ summary: That which we are brainstorming at the moment.
 
 - Quick refresher of server architecture before we introduce serious changes
     - Why did we want to have session ids? And why in the mode?
-        - Identifying by client ids 0-64 is suboptimal because the client might disconnect and someone else might connect
+        - Identifying by client ids 0-64 is prone to glitches because the client might disconnect and someone else might connect
         - We also want session ids be synchronized so other clients can refer to them
             - The crux here is they can refer to/recognize them asynchronously to solvable (deterministic) stream
             - so e.g. the avatar for a specific session id might be sent in parallel to gameplay

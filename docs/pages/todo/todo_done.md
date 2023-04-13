@@ -5938,3 +5938,5 @@ This will discard your redo history."
 
 - First we need to be able to host them officially on the server at all, under the assumption that all clients have these already
 
+- Deleting objects shouldn't cause interpolation glitch
+
