@@ -105,7 +105,7 @@ inline void load_arena_legacy(
 		in.handle.rulesets
 	);
 
-	in.clean_round_state = in.handle.advanced_cosm.get_solvable().significant;
+	in.clean_round_state = in.handle.scene.world.get_solvable().significant;
 }
 
 inline augs::secure_hash_type choose_arena_server(
@@ -153,6 +153,8 @@ inline client_find_arena_result choose_arena_client(
 ) {
 	const auto emigrated_session = in.handle.emigrate_mode_session();
 
+	client_find_arena_result result;
+
 	if (required_hash == augs::secure_hash_type()) {
 		// LEGACY CLAUSE: TO BE REMOVED
 		if (in.name.empty()) {
@@ -162,21 +164,19 @@ inline client_find_arena_result choose_arena_client(
 			::load_arena_legacy(in);
 		}
 
-		client_find_arena_result result;
 		result.found_arena_path = arena_paths(in.name).folder_path;
-
-		return result;
-	}
-
-	const auto result = ::client_find_arena(in.name, required_hash);
-
-	if (const auto maybe_arena_folder = result.found_arena_path) {
-		LOG_NOFORMAT("Arena with a matching hash found in: " + maybe_arena_folder->string());
-
-		::load_arena_from_string(in, *maybe_arena_folder, result.json_document);
 	}
 	else {
-		in.make_default();
+		result = ::client_find_arena(in.name, required_hash);
+
+		if (const auto maybe_arena_folder = result.found_arena_path) {
+			LOG_NOFORMAT("Arena with a matching hash found in: " + maybe_arena_folder->string());
+
+			::load_arena_from_string(in, *maybe_arena_folder, result.json_document);
+		}
+		else {
+			in.make_default();
+		}
 	}
 
 	if (in.override_default_ruleset.size() > 0) {
