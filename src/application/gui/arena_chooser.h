@@ -5,7 +5,6 @@
 #include "augs/filesystem/directory.h"
 #include "augs/misc/imgui/simple_browse_path_tree.h"
 #include "augs/misc/imgui/path_tree_structs.h"
-#include "augs/misc/maybe_official_path.h"
 #include "application/setups/debugger/property_debugger/browsed_path_entry_base.h"
 #include "application/setups/debugger/property_debugger/widgets/keyboard_acquiring_popup.h"
 #include "view/asset_funcs.h"
@@ -18,7 +17,30 @@ class arena_chooser : keyboard_acquiring_popup {
 
 	using asset_widget_path_entry = browsed_path_entry_base<I>;
 
-	std::vector<asset_widget_path_entry> all_paths;
+	struct entry {
+		augs::path_type path;
+
+		bool operator<(const entry& b) const {
+			return augs::natural_order(path, b.path);
+		}
+
+		auto get_filename() const {
+			return path.filename();
+		}
+
+		auto get_displayed_directory() const {
+			return augs::path_type(path).replace_filename("").string();
+		}
+
+		const auto& get_full_path() const {
+			return path;
+		}
+	};
+
+	std::vector<entry> official_paths;
+	std::vector<entry> downloaded_paths;
+	std::vector<entry> user_projects_paths;
+
 	path_tree_settings tree_settings;
 
 public:
@@ -26,8 +48,9 @@ public:
 	void perform(
 		const std::string& label, 
 		const std::string& current_source,
-		const augs::path_type& official_path,
-		const augs::path_type& community_path,
+		const augs::path_type& official_folder,
+		const augs::path_type& downloaded_folder,
+		const augs::path_type& user_projects_folder,
 		F on_choice
 	) {
 		using namespace augs::imgui;
@@ -36,70 +59,112 @@ public:
 
 		if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 			if (base::check_opened_first_time()) {
-				all_paths.clear();
+				auto add_paths = [&](const auto& root, auto& out_entries) {
+					out_entries.clear();
 
-				auto make_path_adder = [&](const bool official, const auto& root) {
-					return [official, this, &root](const auto& p) {
-						maybe_official_path<I> entry;
+					try {
+						augs::for_each_in_directory(
+							root,
+							[&](const auto& p) {
+								out_entries.push_back({ std::filesystem::relative(p, root) });
+								return callback_result::CONTINUE;
+							},
+							[](const auto&) { return callback_result::CONTINUE; }
+						);
+					}
+					catch (...) {
 
-						entry.path = std::filesystem::relative(p, root);
-						entry.is_official = official;
+					}
 
-						all_paths.emplace_back(std::move(entry));
-						return callback_result::CONTINUE;
-					};
+					sort_range(out_entries);
 				};
 
-				{
-					if (augs::exists(official_path)) {
-						augs::for_each_in_directory(
-							official_path,
-							make_path_adder(true, official_path),
-							[](const auto&) { return callback_result::CONTINUE; }
-						);
-					}
-
-					if (augs::exists(community_path)) {
-						augs::for_each_in_directory(
-							community_path,
-							make_path_adder(false, community_path),
-							[](const auto&) { return callback_result::CONTINUE; }
-						);
-					}
-				}
-
-				sort_range(all_paths);
+				add_paths(official_folder, official_paths);
+				add_paths(downloaded_folder, downloaded_paths);
+				add_paths(user_projects_folder, user_projects_paths);
 			}
 
 			const bool acquire_keyboard = base::pop_acquire_keyboard();
 
-			path_tree_settings settings;
-			settings.linear_view = true;
-			settings.pretty_names = false;
+			thread_local ImGuiTextFilter filter;
 
-			simple_browse_path_tree(
-				settings,
-				all_paths,
-				[&](const auto& path_entry, const auto displayed_name) {
-					const auto button_path = path_entry.get_full_path();
-					const bool is_current = button_path.path.string() == current_source;
+			if (acquire_keyboard) {
+				ImGui::SetKeyboardFocusHere();
+			}
 
-					if (is_current && acquire_keyboard) {
-						ImGui::SetScrollHereY();
+			filter.Draw();
+
+			auto files_view = scoped_child("Files view", ImVec2(0, 20 * ImGui::GetTextLineHeightWithSpacing()));
+
+			const std::array<std::string, 2> custom_column_names = { "Arena", "Type" };
+
+			const auto avail = ImGui::GetContentRegionAvail();
+
+			ImGui::Columns(2);
+
+			text_disabled(custom_column_names[0]);
+			ImGui::NextColumn();
+			text_disabled(custom_column_names[1]);
+			ImGui::NextColumn();
+
+			ImGui::SetColumnWidth(0, avail.x - ImGui::CalcTextSize("User project9999").x);
+
+			auto do_selectable = [&](const auto& path_entry) {
+				const auto button_path = path_entry.path;
+				const auto arena_name = button_path.filename().string();
+
+				/* 
+					TODO: this will behave wrongly when there is more than one area with the same name. 
+					But we don't yet have proper logic to choose a specific area when there is a duplicate,
+					i.e. we anyway for now default to official > user project > downloaded.
+				*/
+
+				const bool is_current = arena_name == current_source;
+
+				if (is_current && acquire_keyboard) {
+					ImGui::SetScrollHereY();
+				}
+
+				if (ImGui::Selectable(arena_name.c_str(), is_current, ImGuiSelectableFlags_SpanAllColumns)) {
+					ImGui::CloseCurrentPopup();
+
+					LOG("Arena selected: %x", button_path);
+					on_choice(button_path);
+				}
+			};
+
+			auto idx = 0;
+
+			auto perform_paths = [&](const auto& label, const auto& entries, const auto type_name) {
+				if (entries.empty()) {
+					return;
+				}
+
+				auto scope = scoped_id(idx++);
+
+				ImGui::Separator();
+				text_disabled(label);
+
+				ImGui::NextColumn();
+				ImGui::NextColumn();
+
+				for (const auto& entry : entries) {
+					const auto arena_name = entry.get_filename().string();
+
+					if (!filter.PassFilter(arena_name.c_str())) {
+						continue;
 					}
 
-					if (ImGui::Selectable(displayed_name.c_str(), is_current)) {
-						ImGui::CloseCurrentPopup();
+					do_selectable(entry);
+					ImGui::NextColumn();
+					text_disabled(type_name);
+					ImGui::NextColumn();
+				}
+			};
 
-						LOG("Choosing button path: %x ", button_path);
-						on_choice(button_path);
-					}
-				},
-				acquire_keyboard,
-				{},
-				"",
-				{ "Arena", "Type" }
-			);
+			perform_paths("(User projects)", user_projects_paths, "User project");
+			perform_paths("(Downloaded arenas)", downloaded_paths, "Downloaded");
+			perform_paths("(Official arenas)", official_paths, "Official");
 		}
 		else {
 			base::mark_not_opened();

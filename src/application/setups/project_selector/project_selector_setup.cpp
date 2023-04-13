@@ -41,7 +41,7 @@ static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 		case project_tab_type::OFFICIAL_ARENAS:
 			return OFFICIAL_ARENAS_DIR;
 
-		case project_tab_type::COMMUNITY_ARENAS:
+		case project_tab_type::DOWNLOADED_ARENAS:
 			return DOWNLOADED_ARENAS_DIR;
 
 		default:
@@ -180,7 +180,7 @@ void project_selector_setup::scan_for_all_arenas() {
 
 	scan_for(project_tab_type::MY_PROJECTS);
 	scan_for(project_tab_type::OFFICIAL_ARENAS);
-	scan_for(project_tab_type::COMMUNITY_ARENAS);
+	scan_for(project_tab_type::DOWNLOADED_ARENAS);
 
 	rebuild_miniatures = true;
 }
@@ -350,7 +350,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 	using namespace augs::imgui;
 	auto result = project_list_view_result::NONE;
 
-	auto left_buttons_column_size = ImGui::CalcTextSize("Community arenas  ");
+	auto left_buttons_column_size = ImGui::CalcTextSize("Downloaded arenas  ");
 	auto root = scoped_child("Selector main", ImVec2(0, 0), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	(void)left_buttons_column_size;
@@ -366,7 +366,7 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 			case project_tab_type::OFFICIAL_ARENAS:
 			return tab.perform_list(ad_hoc, "Last updated", in.window);
 
-			case project_tab_type::COMMUNITY_ARENAS:
+			case project_tab_type::DOWNLOADED_ARENAS:
 			return tab.perform_list(ad_hoc, "When downloaded", in.window);
 
 			default:
@@ -626,8 +626,8 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 					return "Project with this name already exists.";
 				case project_tab_type::OFFICIAL_ARENAS:
 					return "An official arena with this name already exists.";
-				case project_tab_type::COMMUNITY_ARENAS:
-					return "Warning: a community arena with the same name detected.";
+				case project_tab_type::DOWNLOADED_ARENAS:
+					return "Warning: a downloaded arena with the same name detected.";
 				case project_tab_type::COUNT:
 				default:
 					return "Unknown error.";
@@ -639,7 +639,7 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 		if (taken_reason != std::nullopt) {
 			const auto reason_str = describe_reason_taken(*taken_reason);
 
-			if (taken_reason == project_tab_type::COMMUNITY_ARENAS) {
+			if (taken_reason == project_tab_type::DOWNLOADED_ARENAS) {
 				text_color(reason_str, yellow);
 			}
 			else {
@@ -657,7 +657,7 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 	const auto taken_reason = setup.is_project_name_taken(std::string(name));
 
 	const bool is_disabled = 
-		(taken_reason != std::nullopt && taken_reason != project_tab_type::COMMUNITY_ARENAS)
+		(taken_reason != std::nullopt && taken_reason != project_tab_type::DOWNLOADED_ARENAS)
 		|| sanitized_path == nullptr 
 		|| *sanitized_path != (EDITOR_PROJECTS_DIR / std::string(name))
 	;

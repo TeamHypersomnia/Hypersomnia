@@ -978,7 +978,7 @@ void server_setup::choose_arena(const std::string& name) {
 		solvable_vars.current_arena = name;
 		solvable_vars.required_arena_hash = required_hash;
 
-		LOG("Chosen arena hash: %x", required_hash);
+		LOG("Chosen arena hash: %x", augs::to_hex_format(required_hash));
 	}
 
 	arena_gui.reset();

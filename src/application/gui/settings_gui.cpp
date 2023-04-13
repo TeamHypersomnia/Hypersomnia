@@ -30,6 +30,7 @@
 #include "application/gui/config_nvp.h"
 #include "application/gui/do_server_vars.h"
 #include "application/gui/pretty_tabs.h"
+#include "application/setups/editor/editor_paths.h"
 
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 	window.sync_back_into(into.window);
@@ -1654,8 +1655,9 @@ void perform_arena_chooser(
 		current_arena,
 		OFFICIAL_ARENAS_DIR,
 		DOWNLOADED_ARENAS_DIR,
-		[&](const auto& new_choice) {
-			current_arena = new_choice.path.string();
+		EDITOR_PROJECTS_DIR,
+		[&](const auto& chosen_arena_path) {
+			current_arena = chosen_arena_path.filename().string();
 		}
 	);
 }

@@ -105,7 +105,7 @@ inline void load_arena_legacy(
 		in.handle.rulesets
 	);
 
-	in.clean_round_state = in.handle.scene.world.get_solvable().significant;
+	in.clean_round_state = in.handle.advanced_cosm.get_solvable().significant;
 }
 
 inline augs::secure_hash_type choose_arena_server(

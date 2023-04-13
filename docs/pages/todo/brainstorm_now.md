@@ -9,6 +9,8 @@ summary: That which we are brainstorming at the moment.
 - Note test mode is unimplemented for multiplayer
 
 - Investigate a desync when switching legacy maps
+    - might be due to clean_state = in.scene.world
+        - change to advanced_cosm
     - Does it happen in the previous commit?
     - Also maybe it won't matter once we use new format
 
