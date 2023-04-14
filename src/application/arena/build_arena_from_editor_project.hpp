@@ -79,8 +79,6 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		arena_handle.current_mode.choose(rulesets.meta.playtest_default);
 	};
 
-	rebuild_game_modes();
-
 	cosmos_common_significant& common = scene.world.get_common_significant(cosmos_common_significant_access());
 	common.light.ambient_color = project.settings.ambient_light_color;
 
@@ -180,6 +178,13 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 		return changer_callback_result::DONT_REFRESH;
 	});
+
+	/*
+		Modes must be created after flavors because rulesets
+		have some flavour ids as properties.
+	*/
+
+	rebuild_game_modes();
 
 	/* Create nodes */
 

@@ -6,16 +6,23 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Maybe let's have override_domain after all
-
-- duplicate -> clone
-
 - Transmitting maps and resources (finally)
     - Reusing resources for new versions of maps.
         - Will naturally happen frequently when hosting playtesting sessions from editor.
         - We don't have to start with a full-blown content database.
             - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
                 - Will cover 90% of the cases.
+
+- Sound nodes should have pitch/gain
+    - Also specify Play once for sounds like on fy_snow 
+
+- Simplify hosting server ui especially once we allow hosting custom maps
+    - esp. with that max incoming connections, it's silly af
+        - just call it max_players
+
+- Maybe let's have override_domain after all
+
+- duplicate -> clone
 
 - Online playtesting (finally)
     - For showing current running session's chat
