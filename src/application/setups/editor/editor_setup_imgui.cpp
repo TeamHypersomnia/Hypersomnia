@@ -132,11 +132,11 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			;
 
 			if (item_if(node_or_layer_inspected, "Clone", "C")) {
-				if (should_warp_cursor_before_duplicating()) {
+				if (should_warp_cursor_before_cloning()) {
 					warp_cursor_to_center(in.window);
 				}
 
-				duplicate_selection();
+				clone_selection();
 			}
 
 			const bool can_mirror = node_or_layer_inspected;

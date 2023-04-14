@@ -3,7 +3,7 @@
 #include "application/setups/editor/editor_setup.hpp"
 #include "game/detail/inventory/inventory_slot_handle.h"
 
-#include "application/setups/editor/commands/duplicate_nodes_command.h"
+#include "application/setups/editor/commands/clone_nodes_command.h"
 #include "application/setups/editor/detail/editor_transform_utils.h"
 
 #include "augs/misc/pool/pool_allocate.h"
@@ -32,29 +32,29 @@ void set_node_transform(N& node, const transformr& new_transform) {
 	}
 }
 
-std::string duplicate_nodes_command::describe() const {
+std::string clone_nodes_command::describe() const {
 	return built_description;
 }
 
-void duplicate_nodes_command::push_entry(const editor_node_id id) {
-	duplicated_nodes.push_back({ id, {} });
+void clone_nodes_command::push_entry(const editor_node_id id) {
+	cloned_nodes.push_back({ id, {} });
 }
 
-bool duplicate_nodes_command::empty() const {
+bool clone_nodes_command::empty() const {
 	return size() == 0;
 }
 
-std::vector<editor_node_id> duplicate_nodes_command::get_all_duplicated() const { 
+std::vector<editor_node_id> clone_nodes_command::get_all_cloned() const { 
 	std::vector<editor_node_id> result;
 
-	for (const auto e : duplicated_nodes) {
-		result.push_back(e.duplicated_id);
+	for (const auto e : cloned_nodes) {
+		result.push_back(e.cloned_id);
 	}
 
 	return result;
 }
 
-static auto peel_duplicate_suffix(std::string s) {
+static auto peel_clone_suffix(std::string s) {
 	const auto orig = s;
 
 	if (s.size() > 0 && s.back() == ')') {
@@ -73,7 +73,7 @@ static auto peel_duplicate_suffix(std::string s) {
 	return orig;
 }
 
-void duplicate_nodes_command::redo(const editor_command_input in) {
+void clone_nodes_command::redo(const editor_command_input in) {
 	clear_undo_state();
 
 	if (!omit_inspector) {
@@ -103,38 +103,38 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 	}();
 
 	auto duplicate = [&](auto&& new_transform_setter) {
-		for (auto& e : duplicated_nodes) {
+		for (auto& e : cloned_nodes) {
 			e.source_id.type_id.dispatch([&]<typename T>(const T) {
 				auto& pool = in.setup.project.nodes.get_pool_for<T>();
 				auto old_node = pool.get(e.source_id.raw);
-				const auto new_name = in.setup.get_free_node_name_for(peel_duplicate_suffix(old_node.unique_name + new_group_suffix));
-				const auto [duplicated_id, duplicated_node] = pool.allocate(std::move(old_node));
+				const auto new_name = in.setup.get_free_node_name_for(peel_clone_suffix(old_node.unique_name + new_group_suffix));
+				const auto [cloned_id, cloned_node] = pool.allocate(std::move(old_node));
 
 				editor_typed_node_id<T> new_id;
-				new_id.set(duplicated_id);
-				e.duplicated_id = new_id.operator editor_node_id();
+				new_id.set(cloned_id);
+				e.cloned_id = new_id.operator editor_node_id();
 
-				duplicated_node.unique_name = new_name;
-				duplicated_node.chronological_order = in.setup.project.nodes.next_chronological_order++;
-				duplicated_node.scene_entity_id.unset();
-				duplicated_node.clear_duplicated_fields();
+				cloned_node.unique_name = new_name;
+				cloned_node.chronological_order = in.setup.project.nodes.next_chronological_order++;
+				cloned_node.scene_entity_id.unset();
+				cloned_node.clear_cloned_fields();
 
-				new_transform_setter(duplicated_node);
+				new_transform_setter(cloned_node);
 			});
 
 			const auto source_id_generic = e.source_id;
-			const auto duplicated_id_generic = e.duplicated_id;
+			const auto cloned_id_generic = e.cloned_id;
 
 			auto register_in_layer = [&]() {
 				if (target_new_layer != std::nullopt) {
-					return in.setup.register_node_in_layer(duplicated_id_generic, *target_new_layer, static_cast<std::size_t>(-1));
+					return in.setup.register_node_in_layer(cloned_id_generic, *target_new_layer, static_cast<std::size_t>(-1));
 				}
 
 				if (target_unified_location) {
-					return in.setup.register_node_in_layer(duplicated_id_generic, target_unified_location->first, target_unified_location->second);
+					return in.setup.register_node_in_layer(cloned_id_generic, target_unified_location->first, target_unified_location->second);
 				}
 
-				return in.setup.register_node_in_layer(duplicated_id_generic, source_id_generic);
+				return in.setup.register_node_in_layer(cloned_id_generic, source_id_generic);
 			};
 
 			const bool registered_in_layer = register_in_layer();
@@ -142,7 +142,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 			(void)registered_in_layer;
 
 			if (!omit_inspector) {
-				in.setup.inspect_add_quiet(duplicated_id_generic);
+				in.setup.inspect_add_quiet(cloned_id_generic);
 			}
 
 			if (in.settings.keep_source_nodes_selected_on_mirroring) {
@@ -154,9 +154,9 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 	};
 
 	if (does_mirroring) {
-		auto duplicate_with_flip = [&](auto calc_mirror_offset, const bool hori, const bool vert) {
-			duplicate([&]<typename N>(N& duplicated_node) {
-				auto& e = duplicated_node.editable;
+		auto clone_with_flip = [&](auto calc_mirror_offset, const bool hori, const bool vert) {
+			duplicate([&]<typename N>(N& cloned_node) {
+				auto& e = cloned_node.editable;
 				const auto source_transform = get_node_transform(e);
 
 				{
@@ -206,7 +206,7 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 		};
 
 		auto for_each_source_node_id = [this](auto callback){ 
-			for (const auto& e : duplicated_nodes) {
+			for (const auto& e : cloned_nodes) {
 				callback(e.source_id);
 			}
 		};
@@ -244,19 +244,19 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 			};
 
 			if (mirror_direction == vec2i(1, 0)) {
-				duplicate_with_flip(calc_mirror_offset, true, false);
+				clone_with_flip(calc_mirror_offset, true, false);
 			}
 
 			if (mirror_direction == vec2i(-1, 0)) {
-				duplicate_with_flip(calc_mirror_offset, true, false);
+				clone_with_flip(calc_mirror_offset, true, false);
 			}
 
 			if (mirror_direction == vec2i(0, 1)) {
-				duplicate_with_flip(calc_mirror_offset, false, true);
+				clone_with_flip(calc_mirror_offset, false, true);
 			}
 
 			if (mirror_direction == vec2i(0, -1)) {
-				duplicate_with_flip(calc_mirror_offset, false, true);
+				clone_with_flip(calc_mirror_offset, false, true);
 			}
 		}
 	}
@@ -273,24 +273,24 @@ void duplicate_nodes_command::redo(const editor_command_input in) {
 	}
 }
 
-void duplicate_nodes_command::reverse_order() {
-	reverse_range(duplicated_nodes);
+void clone_nodes_command::reverse_order() {
+	reverse_range(cloned_nodes);
 }
 
-void duplicate_nodes_command::undo(const editor_command_input in) {
+void clone_nodes_command::undo(const editor_command_input in) {
 	if (!omit_inspector) {
 		in.setup.clear_inspector();
 	}
 
-	for (auto& entry : reverse(duplicated_nodes)) {
+	for (auto& entry : reverse(cloned_nodes)) {
 		const auto source_id = entry.source_id;
-		const auto duplicated_id = entry.duplicated_id;
+		const auto cloned_id = entry.cloned_id;
 
-		in.setup.unregister_node_from_layer(duplicated_id);
+		in.setup.unregister_node_from_layer(cloned_id);
 
-		duplicated_id.type_id.dispatch([&]<typename T>(const T) {
+		cloned_id.type_id.dispatch([&]<typename T>(const T) {
 			auto& pool = in.setup.project.nodes.get_pool_for<T>();
-			pool.undo_last_allocate(duplicated_id.raw);
+			pool.undo_last_allocate(cloned_id.raw);
 		});
 
 		if (!omit_inspector) {
@@ -319,6 +319,6 @@ void duplicate_nodes_command::undo(const editor_command_input in) {
 	clear_undo_state();
 }
 
-void duplicate_nodes_command::clear_undo_state() {
+void clone_nodes_command::clear_undo_state() {
 
 }

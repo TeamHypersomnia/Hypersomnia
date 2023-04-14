@@ -951,7 +951,7 @@ void debugger_setup::mirror_selection(const vec2i direction) {
 
 		const bool only_duplicating = direction.is_zero();
 
-		auto command = make_command_from_selections<duplicate_entities_command>(only_duplicating ? "Duplicated " : "Mirrored ");
+		auto command = make_command_from_selections<duplicate_entities_command>(only_duplicating ? "Cloned " : "Mirrored ");
 
 		if (!command.empty()) {
 			command.mirror_direction = direction;
@@ -965,7 +965,7 @@ void debugger_setup::mirror_selection(const vec2i direction) {
 	}
 }
 
-void debugger_setup::duplicate_selection() {
+void debugger_setup::clone_selection() {
 	mirror_selection(vec2i(0, 0));
 }
 
@@ -1449,7 +1449,7 @@ bool debugger_setup::handle_input_before_game(
 					case key::S: view().toggle_snapping(); return true;
 					case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
 					case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;
-					case key::C: duplicate_selection(); return true;
+					case key::C: clone_selection(); return true;
 					case key::D: cut_selection(); return true;
 					case key::DEL: delete_selection(); return true;
 					case key::W: mover.reset_rotation(make_mover_input()); return true;
@@ -1930,7 +1930,7 @@ void debugger_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				|| try_preffix("Created", green)
 				|| try_preffix("Started", green)				
 				|| try_preffix("Started tracking", green)				
-				|| try_preffix("Duplicated", cyan)
+				|| try_preffix("Cloned", cyan)
 				|| try_preffix("Mirrored", cyan)
 			) {
 				return result;

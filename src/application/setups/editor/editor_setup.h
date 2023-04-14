@@ -207,7 +207,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	friend flip_nodes_command;
 
 	friend delete_nodes_command;
-	friend duplicate_nodes_command;
+	friend clone_nodes_command;
 
 	friend edit_project_settings_command;
 
@@ -560,8 +560,8 @@ public:
 		};
 	}
 
-	void mirror_selection(vec2i direction, bool move_if_only_duplicate = true);
-	void duplicate_selection(bool start_moving = true);
+	void mirror_selection(vec2i direction, bool move_if_only_clone = true);
+	void clone_selection(bool start_moving = true);
 
 	void move_dragged_to_new_layer(editor_node_id dragged_node);
 	void move_inspected_to_new_layer();
@@ -736,7 +736,7 @@ public:
 
 	void warp_cursor_to_center(augs::window&);
 	bool can_resize_selected_nodes() const;
-	bool should_warp_cursor_before_duplicating() const;
+	bool should_warp_cursor_before_cloning() const;
 
 	void toggle_sounds_preview();
 

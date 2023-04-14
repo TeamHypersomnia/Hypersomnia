@@ -277,11 +277,11 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 		category_separator();
 
 		if (do_icon(ID::EDITOR_ICON_CLONE, "Clone selection (C)", node_or_layer_inspected)) {
-			if (in.setup.should_warp_cursor_before_duplicating()) {
+			if (in.setup.should_warp_cursor_before_cloning()) {
 				warp_cursor();
 			}
 
-			in.setup.duplicate_selection();
+			in.setup.clone_selection();
 		}
 
 		const bool mirroring_active = ImGui::IsPopupOpen("Mirror Options");

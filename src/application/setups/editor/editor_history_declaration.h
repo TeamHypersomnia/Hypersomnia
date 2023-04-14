@@ -21,7 +21,7 @@ namespace augs {
 };
 
 struct delete_nodes_command;
-struct duplicate_nodes_command;
+struct clone_nodes_command;
 
 struct create_layer_command;
 struct delete_layers_command;
@@ -117,7 +117,7 @@ using editor_history_base = augs::history<
 	flip_nodes_command,
 
 	delete_nodes_command,
-	duplicate_nodes_command,
+	clone_nodes_command,
 
 	toggle_nodes_active_command,
 	toggle_layers_active_command,

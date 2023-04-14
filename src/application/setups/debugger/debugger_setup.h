@@ -178,7 +178,7 @@ class debugger_setup : public arena_gui_mixin<debugger_setup> {
 	void delete_selection();
 
 	void mirror_selection(vec2i direction);
-	void duplicate_selection();
+	void clone_selection();
 
 	void group_selection();
 	void ungroup_selection();

@@ -504,7 +504,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 		ImGui::SameLine();
 
-		if (icon_button("##Duplicate", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Clone selection", special_resource_inspected)) {
+		if (icon_button("##Clone", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Clone selection", special_resource_inspected)) {
 
 		}
 

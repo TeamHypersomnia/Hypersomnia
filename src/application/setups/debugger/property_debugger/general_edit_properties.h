@@ -502,15 +502,19 @@ void detail_general_edit_properties(
 						augs::imgui::next_columns(1 + input.extra_columns);
 					}
 					else {
-						if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
-							augs::introspect(further, altered);
+						if constexpr(!std::is_same_v<T, std::optional<arena_playtesting_context>>) {
+							if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
+								augs::introspect(further, altered);
+							}
 						}
 					}
 				}
 				else {
-					auto ind = augs::imgui::scoped_indent();
+					if constexpr(!std::is_same_v<T, std::optional<arena_playtesting_context>>) {
+						auto ind = augs::imgui::scoped_indent();
 
-					augs::introspect(further, altered);
+						augs::introspect(further, altered);
+					}
 				}
 			}
 		}

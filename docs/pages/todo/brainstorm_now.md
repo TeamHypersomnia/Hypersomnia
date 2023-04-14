@@ -6,12 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Maybe let's have override_domain after all
+
+- duplicate -> clone
+
 - Transmitting maps and resources (finally)
     - Reusing resources for new versions of maps.
         - Will naturally happen frequently when hosting playtesting sessions from editor.
         - We don't have to start with a full-blown content database.
             - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
                 - Will cover 90% of the cases.
+
+- Online playtesting (finally)
+    - For showing current running session's chat
+        - just have a ptr to server_setup* and call its perform custom imgui for arena mixin instead of editor's
+            - This will even let you use TAB and check who's connected while you edit
 
 - Quick refresher of server architecture before we introduce serious changes
     - Why did we want to have session ids? And why in the mode?

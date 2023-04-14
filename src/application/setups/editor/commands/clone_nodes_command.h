@@ -14,17 +14,17 @@ namespace augs {
 
 struct editor_command_input;
 
-struct duplicate_nodes_command {
+struct clone_nodes_command {
 	friend augs::introspection_access;
 
-	struct duplicated_entry {
+	struct cloned_entry {
 		editor_node_id source_id;
-		editor_node_id duplicated_id;
+		editor_node_id cloned_id;
 	};
 
 	editor_command_meta meta;
 private:
-	std::vector<duplicated_entry> duplicated_nodes;
+	std::vector<cloned_entry> cloned_nodes;
 public:
 	std::string built_description;
 	vec2i mirror_direction;
@@ -40,12 +40,12 @@ public:
 	void undo(editor_command_input);
 
 	auto size() const {
-		return duplicated_nodes.size();
+		return cloned_nodes.size();
 	}
 
 	bool empty() const;
 	std::string describe() const;
-	std::vector<editor_node_id> get_all_duplicated() const;
+	std::vector<editor_node_id> get_all_cloned() const;
 
 	void clear_undo_state();
 };

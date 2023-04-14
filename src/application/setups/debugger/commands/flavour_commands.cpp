@@ -60,7 +60,7 @@ void create_flavour_command::redo_and_copy(const debugger_command_input in, cons
 			new_object.template get<invariants::text_details>().name = new_name;
 
 			if (source_flavour) {
-				built_description = typesafe_sprintf("Duplicated flavour: %x", source_flavour->get_name());
+				built_description = typesafe_sprintf("Cloned flavour: %x", source_flavour->get_name());
 			}
 			else {
 				built_description = typesafe_sprintf("Created flavour: %x", new_name);

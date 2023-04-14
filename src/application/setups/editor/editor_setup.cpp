@@ -426,7 +426,7 @@ bool editor_setup::handle_input_before_game(
 
 				case key::U: gui.request_toggle_sounds_preview = true; return true;
 
-				case key::C: duplicate_selection(); return true;
+				case key::C: clone_selection(); return true;
 				case key::D: cut_selection(); return true;
 				case key::DEL: delete_selection(); return true;
 
@@ -2152,7 +2152,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			|| try_preffix("Autosaved", green)
 			|| try_preffix("Started", green)				
 			|| try_preffix("Started tracking", green)				
-			|| try_preffix("Duplicated", cyan)
+			|| try_preffix("Cloned", cyan)
 			|| try_preffix("Mirrored", cyan)
 		) {
 			return result;
@@ -2612,12 +2612,12 @@ void editor_setup::move_dragged_to_new_layer(const editor_node_id dragged_node) 
 	post_new_command(std::move(command));
 }
 
-static auto peel_duplicate_suffix(std::string s) {
+static auto peel_clone_suffix(std::string s) {
 	return cut_trailing_number_and_spaces(s);
 }
 
-void editor_setup::mirror_selection(const vec2i direction, const bool move_if_only_duplicate) {
-	const bool only_duplicating = direction.is_zero();
+void editor_setup::mirror_selection(const vec2i direction, const bool move_if_only_clone) {
+	const bool only_cloning = direction.is_zero();
 	gui.filesystem.clear_drag_drop();
 
 	if (gui.inspector.inspects_only<editor_layer_id>()) {
@@ -2632,7 +2632,7 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 		// In case the commands in progress modify the inspector,
 		// just to be sure, save the inspection result beforehand.
 		const auto all_source_layers = get_all_inspected<editor_layer_id>();
-		const auto dupli_or_mirr = std::string(only_duplicating ? "Duplicated " : "Mirrored ");
+		const auto dupli_or_mirr = std::string(only_cloning ? "Cloned " : "Mirrored ");
 		const auto final_description = all_source_layers.size() == 1 
 			? dupli_or_mirr + get_name(all_source_layers[0])
 			: typesafe_sprintf("%x%x layers", dupli_or_mirr, all_source_layers.size())
@@ -2652,19 +2652,19 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 
 		for (const auto layer_id : all_source_layers) {
 			if (const auto source_layer = find_layer(layer_id)) {
-				duplicate_nodes_command duplicate;
-				duplicate.mirror_direction = direction;
-				duplicate.omit_inspector = true;
-				duplicate.custom_aabb = custom_aabb;
+				clone_nodes_command clone;
+				clone.mirror_direction = direction;
+				clone.omit_inspector = true;
+				clone.custom_aabb = custom_aabb;
 
 				for (const auto source_node : source_layer->hierarchy.nodes) {
-					duplicate.push_entry(source_node);
+					clone.push_entry(source_node);
 				}
 
 				create_layer_command new_layer;
 				new_layer.created_layer = *source_layer;
 				new_layer.created_layer.hierarchy.nodes.clear();
-				new_layer.created_layer.unique_name = get_free_layer_name_for(peel_duplicate_suffix(source_layer->unique_name));
+				new_layer.created_layer.unique_name = get_free_layer_name_for(peel_clone_suffix(source_layer->unique_name));
 				new_layer.at_index = find_layer_index(layer_id);
 				new_layer.omit_inspector = true;
 
@@ -2676,16 +2676,16 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 						make_last_command_a_child();
 					}
 
-					duplicate.target_new_layer = new_layer_id;
+					clone.target_new_layer = new_layer_id;
 
 					all_new_layers.emplace_back(new_layer_id);
 				}
 
-				if (!duplicate.empty()) {
+				if (!clone.empty()) {
 					any_nonempty = true;
 
-					const auto& executed = post_new_command(std::move(duplicate));
-					concatenate(all_new_nodes, executed.get_all_duplicated());
+					const auto& executed = post_new_command(std::move(clone));
+					concatenate(all_new_nodes, executed.get_all_cloned());
 					make_last_command_a_child();
 				}
 
@@ -2710,7 +2710,7 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 		}
 
 		if (any_nonempty) {
-			if (move_if_only_duplicate && only_duplicating) {
+			if (move_if_only_clone && only_cloning) {
 				if (start_moving_selection()) {
 					make_last_command_a_child();
 				}
@@ -2728,8 +2728,8 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 		}
 	}
 	else if (gui.inspector.inspects_only<editor_node_id>()) {
-		auto command = make_command_from_selected_nodes<duplicate_nodes_command>(
-			only_duplicating ? "Duplicated " : "Mirrored ",
+		auto command = make_command_from_selected_nodes<clone_nodes_command>(
+			only_cloning ? "Cloned " : "Mirrored ",
 			only_active_nodes()
 		);
 
@@ -2761,7 +2761,7 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 			command.mirror_direction = direction;
 			post_new_command(std::move(command));
 
-			if (move_if_only_duplicate && only_duplicating) {
+			if (move_if_only_clone && only_cloning) {
 				if (start_moving_selection()) {
 					make_last_command_a_child();
 
@@ -2776,7 +2776,7 @@ void editor_setup::mirror_selection(const vec2i direction, const bool move_if_on
 	}
 }
 
-void editor_setup::duplicate_selection(bool start_moving) {
+void editor_setup::clone_selection(bool start_moving) {
 	mirror_selection(vec2i(0, 0), start_moving);
 }
 
@@ -3063,7 +3063,7 @@ bool editor_setup::can_resize_selected_nodes() const {
 	//return any_can && all_can;
 }
 
-bool editor_setup::should_warp_cursor_before_duplicating() const {
+bool editor_setup::should_warp_cursor_before_cloning() const {
 	if (inspects_only<editor_layer_id>()) {
 		const bool inspecting_any_layers_with_nodes = [&]() {
 			const auto all_source_layers = get_all_inspected<editor_layer_id>();

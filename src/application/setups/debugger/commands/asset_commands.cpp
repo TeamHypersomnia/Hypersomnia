@@ -100,7 +100,7 @@ void forget_asset_id_command<I>::undo(const debugger_command_input in) {
 
 template <class I>
 std::string duplicate_asset_command<I>::describe() const {
-	return typesafe_sprintf("Duplicated %x", uncapitalize_first(format_field_name(get_type_name_strip_namespace<I>())));
+	return typesafe_sprintf("Cloned %x", uncapitalize_first(format_field_name(get_type_name_strip_namespace<I>())));
 }
 
 template <class I>

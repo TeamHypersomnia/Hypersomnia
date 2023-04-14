@@ -22,7 +22,7 @@ struct editor_node_base {
 
 	std::string unique_name;
 
-	void clear_duplicated_fields() {
+	void clear_cloned_fields() {
 		scene_entity_id.unset();
 	}
 
