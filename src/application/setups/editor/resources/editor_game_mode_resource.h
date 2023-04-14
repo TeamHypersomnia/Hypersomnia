@@ -29,7 +29,7 @@ struct editor_requested_equipment {
 
 struct editor_bomb_defusal_mode {
 	// GEN INTROSPECTOR struct editor_bomb_defusal_mode
-	uint32_t warmup_time = 45;
+	uint32_t warmup_time = 81;
 	uint32_t freeze_time = 10;
 	uint32_t buy_time = 30;
 
