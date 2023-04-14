@@ -75,6 +75,7 @@ class server_setup :
 	client_vars integrated_client_vars;
 	server_vars vars;
 	server_solvable_vars solvable_vars;
+	augs::path_type current_arena_folder;
 	private_server_vars private_vars;
 
 	/* The rest is server-specific */

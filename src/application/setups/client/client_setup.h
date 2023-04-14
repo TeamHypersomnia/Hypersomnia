@@ -74,6 +74,7 @@ class client_setup :
 	online_mode_and_rules current_mode;
 	server_vars sv_vars;
 	server_solvable_vars sv_solvable_vars;
+	augs::path_type current_arena_folder;
 
 	mode_player_id client_player_id;
 

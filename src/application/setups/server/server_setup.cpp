@@ -966,7 +966,7 @@ void server_setup::choose_arena(const std::string& name) {
 	const auto& arena = get_arena_handle();
 
 	{
-		const auto required_hash = ::choose_arena_server({
+		const auto result = ::choose_arena_server({
 			lua,
 			arena,
 			official,
@@ -977,9 +977,10 @@ void server_setup::choose_arena(const std::string& name) {
 		});
 
 		solvable_vars.current_arena = name;
-		solvable_vars.required_arena_hash = required_hash;
+		solvable_vars.required_arena_hash = result.required_hash;
+		current_arena_folder = result.arena_folder_path;
 
-		LOG("Chosen arena hash: %x", augs::to_hex_format(required_hash));
+		LOG("Chosen arena hash: %x", augs::to_hex_format(result.required_hash));
 	}
 
 	arena_gui.reset();
@@ -2037,14 +2038,7 @@ server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) c
 }
 
 augs::path_type server_setup::get_unofficial_content_dir() const {
-	const auto& name = solvable_vars.current_arena;
-
-	if (name.empty()) {
-		return {};
-	}
-
-	const auto paths = arena_paths(name);
-	return paths.folder_path;
+	return current_arena_folder;
 }
 
 bool safe_equal(const decltype(requested_client_settings::rcon_password)& candidate_password, const std::string& actual_password) {

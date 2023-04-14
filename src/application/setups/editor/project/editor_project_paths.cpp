@@ -72,7 +72,7 @@ client_find_arena_result client_find_arena(
 				result.official_differs = required_hash != augs::secure_hash(result.json_document);
 
 				if (!result.official_differs) {
-					result.found_arena_path = in_official;
+					result.arena_folder_path = in_official;
 				}
 			}
 			catch (...) {
@@ -89,7 +89,7 @@ client_find_arena_result client_find_arena(
 		if (augs::exists(in_folder)) {
 			try {
 				client_find_arena_result result;
-				result.found_arena_path = in_folder;
+				result.arena_folder_path = in_folder;
 
 				const auto folder_paths = editor_project_paths(in_folder);
 

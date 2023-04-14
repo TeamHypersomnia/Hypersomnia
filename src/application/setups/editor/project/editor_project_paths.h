@@ -38,11 +38,11 @@ struct client_find_arena_result {
 	bool invalid_arena_name = false;
 	bool not_found_any = false;
 
-	std::optional<augs::path_type> found_arena_path;
+	std::optional<augs::path_type> arena_folder_path;
 	std::string json_document;
 
 	bool was_arena_found() const {
-		return found_arena_path != std::nullopt;
+		return arena_folder_path != std::nullopt;
 	}
 };
 

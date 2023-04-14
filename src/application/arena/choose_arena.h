@@ -108,18 +108,25 @@ inline void load_arena_legacy(
 	in.clean_round_state = in.handle.scene.world.get_solvable().significant;
 }
 
-inline augs::secure_hash_type choose_arena_server(
+struct server_choose_arena_result {
+	augs::secure_hash_type required_hash = augs::secure_hash_type();
+	augs::path_type arena_folder_path;
+};
+
+inline server_choose_arena_result choose_arena_server(
 	choose_arena_input in
 ) {
 	const auto emigrated_session = in.handle.emigrate_mode_session();
 
-	auto result = augs::secure_hash_type();
+	auto result = server_choose_arena_result();
 
 	if (const auto path = ::server_choose_arena_file_by(in.name); !path.empty()) {
 		if (augs::exists(path)) {
 			LOG_NOFORMAT("Loading arena from: " + path.string());
 
-			::load_arena_from_path(in, path, std::addressof(result));
+			::load_arena_from_path(in, path, std::addressof(result.required_hash));
+
+			result.arena_folder_path = path.parent_path();
 		}
 		else {
 			/* 
@@ -128,7 +135,10 @@ inline augs::secure_hash_type choose_arena_server(
 
 				Once we remove legacy maps, we'll just assume that the project file exists and catch exceptions in case it does not.
 			*/
+
 			::load_arena_legacy(in);
+
+			result.arena_folder_path = arena_paths(in.name).folder_path;
 		}
 	}
 	else {
@@ -170,14 +180,14 @@ inline client_find_arena_result choose_arena_client(
 		}
 		else {
 			::load_arena_legacy(in);
-		}
 
-		result.found_arena_path = arena_paths(in.name).folder_path;
+			result.arena_folder_path = arena_paths(in.name).folder_path;
+		}
 	}
 	else {
 		result = ::client_find_arena(in.name, required_hash);
 
-		if (const auto maybe_arena_folder = result.found_arena_path) {
+		if (const auto maybe_arena_folder = result.arena_folder_path) {
 			LOG_NOFORMAT("Arena with a matching hash found in: " + maybe_arena_folder->string());
 
 			::load_arena_from_string(in, *maybe_arena_folder, result.json_document);

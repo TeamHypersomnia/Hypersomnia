@@ -919,14 +919,7 @@ void client_setup::update_stats(network_info& stats) const {
 }
 
 augs::path_type client_setup::get_unofficial_content_dir() const {
-	const auto& name = sv_solvable_vars.current_arena;
-
-	if (name.empty()) {
-		return {};
-	}
-
-	const auto paths = arena_paths(name);
-	return paths.folder_path;
+	return current_arena_folder;
 }
 
 bool client_setup::handle_input_before_game(

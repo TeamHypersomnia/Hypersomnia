@@ -44,6 +44,8 @@ message_handler_result client_setup::handle_server_payload(
 			try {
 				const auto& referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
 
+				current_arena_folder = augs::path_type();
+
 				const auto choice_result = ::choose_arena_client(
 					{
 						lua,
@@ -58,7 +60,9 @@ message_handler_result client_setup::handle_server_payload(
 					new_vars.required_arena_hash
 				);
 
-				if (choice_result.was_arena_found()) {
+				if (choice_result.arena_folder_path != std::nullopt) {
+					current_arena_folder = *choice_result.arena_folder_path;
+
 					arena_gui.reset();
 					arena_gui.choose_team.show = !is_replaying() && ::is_spectator(referential_arena, get_local_player_id());
 					client_gui.rcon.show = false;
