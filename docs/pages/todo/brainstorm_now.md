@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- show timestamp of commands when hovering
+    - especially for autosave and open project revisions
+
+- Allow resizing by axis only
+    - just like position - separate widgets for x and y
+
 - Transmitting maps and resources (finally)
     - Reusing resources for new versions of maps.
         - Will naturally happen frequently when hosting playtesting sessions from editor.
