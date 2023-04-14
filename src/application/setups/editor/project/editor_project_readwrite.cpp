@@ -4,6 +4,7 @@
 #include "application/setups/editor/detail/is_editor_typed_resource.h"
 #include "application/setups/editor/detail/has_reference_count.h"
 #include "application/setups/editor/resources/resource_traits.h"
+#include "augs/image/image.h"
 
 namespace augs {
 	template <class T, class R>
@@ -860,6 +861,15 @@ namespace editor_project_readwrite {
 					*/
 
 					auto read_as = [&]<typename R>(R typed_resource) {
+						if constexpr(std::is_same_v<R, editor_sprite_resource>) {
+							if (path.extension() == ".gif") {
+								typed_resource.animation_frames = augs::image::read_gif_frame_meta(project_dir / path);
+							}
+							else {
+								typed_resource.animation_frames.clear();
+							}
+						}
+
 						::setup_resource_defaults(typed_resource.editable, officials_map);
 						augs::read_json(resource, typed_resource.editable);
 

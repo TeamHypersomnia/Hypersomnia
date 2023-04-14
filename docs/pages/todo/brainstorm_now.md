@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix warmup time to match the normal one
+
+- Note that to preserve determinism while resources aren't fully loaded,
+    - gif frames would need to be serialized
+    s- gif durations have no way to be reloaded right now
+    - that is because they're not a subject of streamable, but reside in state
+
 - show timestamp of commands when hovering
     - especially for autosave and open project revisions
 
