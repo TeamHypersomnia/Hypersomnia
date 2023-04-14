@@ -386,6 +386,7 @@ bool editor_setup::handle_input_before_game(
 			switch (k) {
 				case key::A: select_all_entities(); return true;
 				case key::Z: undo(); return true;
+				case key::D: cut_selection(); return true;
 				case key::S: save(); return true;
 				//case key::C: copy(); return true;
 				//case key::X: cut(); return true;
@@ -427,7 +428,6 @@ bool editor_setup::handle_input_before_game(
 				case key::U: gui.request_toggle_sounds_preview = true; return true;
 
 				case key::C: clone_selection(); return true;
-				case key::D: cut_selection(); return true;
 				case key::DEL: delete_selection(); return true;
 
 				case key::T: start_moving_selection(); return true;

@@ -154,7 +154,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 		const auto remove_tint = rgba(220, 80, 80, 255);
 
-		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], [](){}, "Delete selection (D)", node_or_layer_inspected, remove_tint, remove_bgs)) {
+		if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], [](){}, "Delete selection (Ctrl+D/DEL)", node_or_layer_inspected, remove_tint, remove_bgs)) {
 			in.setup.delete_selection();
 		}
 	}
