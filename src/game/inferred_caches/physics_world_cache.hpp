@@ -367,7 +367,11 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		}
 
 		auto add_convex = [&](const auto& convex) {
-			augs::constant_size_vector<b2Vec2, POLY_VERTEX_COUNT> b2verts(
+			if (convex.size() > b2_maxPolygonVertices) {
+				return;
+			}
+
+			augs::constant_size_vector<b2Vec2, b2_maxPolygonVertices> b2verts(
 				convex.begin(), 
 				convex.end()
 			);

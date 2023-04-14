@@ -21,10 +21,7 @@ struct rigid_body_cache {
 struct colliders_cache {
 	static constexpr bool is_cache = true;
 
-	augs::constant_size_vector<
-		augs::propagate_const<b2Fixture*>, 
-		POLY_VERTEX_COUNT
-	> constructed_fixtures;
+	std::vector<augs::propagate_const<b2Fixture*>> constructed_fixtures;
 
 	colliders_connection connection;
 
