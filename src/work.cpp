@@ -2418,7 +2418,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 						simulated_input_state.apply(e);
 
-						if (e.msg == message::activate) {
+						if (e.msg == message::activate || e.msg == message::click_activate) {
 							if (config.content_regeneration.rescan_assets_on_window_focus) {
 								streaming.request_rescan();
 							}
