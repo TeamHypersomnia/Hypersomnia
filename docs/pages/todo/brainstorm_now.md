@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- TODO: Ressurrect the code that did those 8-polygon partitions out of convexes
-
 - show timestamp of commands when hovering
     - especially for autosave and open project revisions
 

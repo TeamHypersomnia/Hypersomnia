@@ -5940,3 +5940,5 @@ This will discard your redo history."
 
 - Deleting objects shouldn't cause interpolation glitch
 
+- TODO: Ressurrect the code that did those 8-polygon partitions out of convexes
+

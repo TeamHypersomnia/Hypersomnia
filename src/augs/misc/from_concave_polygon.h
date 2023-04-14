@@ -49,36 +49,49 @@ namespace augs {
 			return output;
 		}();
 
-		if (partition_result.size() == 1) {
+		if (partition_result.size() == 1 && (*partition_result.begin()).GetNumPoints() <= b2_maxPolygonVertices) {
 			return;
 		}
 
+		using I = typename remove_cref<decltype(pc)>::value_type;
+
 		for (const auto& out_poly : partition_result) {
-			const auto n = out_poly.GetNumPoints();
-			
-			if (n > b2_maxPolygonVertices) {
-				/* TODO: Ressurrect the code that did those 8-polygon partitions out of convexes */
-				continue;
-			}
+			auto add_sequence = [&pc, &out_poly](const auto first, const auto num) {
+				auto add = [&](auto idx) {
+					const auto& out_vertex = out_poly.GetPoint(idx);
+					const auto new_id = static_cast<I>(out_vertex.id);
+					pc.push_back(new_id);
+				};
 
-			{
-				const auto how_many_more_can_fit = static_cast<int>(pc.max_size() - pc.size());
+				{
+					const auto how_many_more_can_fit = static_cast<int>(pc.max_size() - pc.size());
 
-				if (how_many_more_can_fit < n + 1) {
-					break;
+					if (how_many_more_can_fit < num + 2) {
+						return;
+					}
 				}
+
+				add(0);
+
+				for (long i = first; i < first + num; ++i) {
+					add(i);
+				}
+
+				add(0);
+			};
+
+			const auto n = out_poly.GetNumPoints();
+
+			long start = 1;
+
+			while (start + 1 < n) {
+				const auto how_many_left_to_add = n - start;
+				const auto max_at_once = long(b2_maxPolygonVertices) - 1;
+				const auto how_many_now = std::min(max_at_once, how_many_left_to_add);
+
+				add_sequence(start, how_many_now);
+				start += how_many_now - 1;
 			}
-
-			using I = typename remove_cref<decltype(pc)>::value_type;
-
-			for (long i = 0; i < out_poly.GetNumPoints(); ++i) {
-				const auto& out_vertex = out_poly.GetPoint(i);
-				const auto new_id = static_cast<I>(out_vertex.id);
-				pc.push_back(new_id);
-			}
-
-			const auto last_id = static_cast<I>(out_poly.GetPoint(0).id);
-			pc.push_back(last_id);
 		}
 	}
 
