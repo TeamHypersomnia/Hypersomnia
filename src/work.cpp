@@ -170,11 +170,13 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	LOG("Loading the config.");
 
-	const auto canon_config = [&]() {
-		auto result = config_lua_table {
+	const auto canon_config_ptr = [&]() {
+		auto result_ptr = std::make_unique<config_lua_table>(
 			lua,
 			canon_config_path
-		};
+		);
+
+		auto& result = *result_ptr;
 
 #if !IS_PRODUCTION_BUILD
 		/* Some developer-friendly options */
@@ -210,22 +212,26 @@ work_result work(const int argc, const char* const * const argv) try {
 		result.window.fullscreen = false;
 #endif
 
-		return result;
+		return result_ptr;
 	}();
 
-	auto config = [&]() {
-		auto result = canon_config;
+	auto& canon_config = *canon_config_ptr;
+
+	auto config_ptr = [&]() {
+		auto result = std::make_unique<config_lua_table>(canon_config);
 
 		if (augs::exists(local_config_path)) {
-			result.load_patch(lua, local_config_path);
+			result->load_patch(lua, local_config_path);
 		}
 
 		if (augs::exists(force_config_path)) {
-			result.load_patch(lua, force_config_path);
+			result->load_patch(lua, force_config_path);
 		}
 
 		return result;
 	}();
+
+	auto& config = *config_ptr;
 
 	if (config.log_to_live_file) {
 		augs::remove_file(get_path_in_log_files("live_debug.txt"));
@@ -291,7 +297,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	);
 
 	LOG("Creating the ImGui atlas image.");
-	const auto imgui_atlas_image = augs::imgui::create_atlas_image(config.gui_fonts.gui);
+	const auto imgui_atlas_image = std::make_unique<augs::image>(augs::imgui::create_atlas_image(config.gui_fonts.gui));
 
 	auto last_update_result = self_update_result();
 	
@@ -312,7 +318,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		;
 
 		last_update_result = check_and_apply_updates(
-			imgui_atlas_image,
+			*imgui_atlas_image,
 			config.http_client,
 			config.window,
 			should_update_headless
@@ -362,7 +368,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
-	auto last_saved_config = config;
+	auto last_saved_config_ptr = std::make_unique<config_lua_table>(config);
+	auto& last_saved_config = *last_saved_config_ptr;
 
 	auto change_with_save = [&](auto setter) {
 		setter(config);
@@ -707,6 +714,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
 
 	auto thread_pool = augs::thread_pool(config.performance.get_num_pool_workers());
+
 	augs::audio_command_buffers audio_buffers(thread_pool);
 
 	LOG("Initializing the window.");
@@ -766,7 +774,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	);
 
 	LOG("Creating the ImGui atlas.");
-	auto imgui_atlas = augs::graphics::texture(imgui_atlas_image);
+	auto imgui_atlas = augs::graphics::texture(*imgui_atlas_image);
 
 	const auto configurables = configuration_subscribers {
 		window,
@@ -818,7 +826,9 @@ work_result work(const int argc, const char* const * const argv) try {
 	*/
 
 	LOG("Initializing the streaming of viewables.");
-	viewables_streaming streaming;
+
+	auto streaming_ptr = std::make_unique<viewables_streaming>();
+	viewables_streaming& streaming = *streaming_ptr;
 
 	auto get_blank_texture = [&]() {
 		return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
@@ -833,10 +843,10 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	world_camera gameplay_camera;
 	LOG("Initializing the audiovisual state.");
-	audiovisual_state audiovisuals;
-	
+	auto audiovisuals = std::make_unique<audiovisual_state>();
+
 	auto get_audiovisuals = [&]() -> audiovisual_state& {
-		return audiovisuals;
+		return *audiovisuals;
 	};
 
 

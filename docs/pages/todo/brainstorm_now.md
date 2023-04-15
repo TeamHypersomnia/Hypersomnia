@@ -6,12 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- choose default audio device from settings
+
 - fix warmup time to match the normal one
 
-- Note that to preserve determinism while resources aren't fully loaded,
+- GIF determinism: Note that to preserve determinism while resources aren't fully loaded,
     - gif frames would need to be serialized
-    s- gif durations have no way to be reloaded right now
+        - which would prevent nicely reloading them
     - that is because they're not a subject of streamable, but reside in state
+        - gif durations have no way to be reloaded right now
+    - even though they're harmless animations, they partake in animation system
+        - and can get destroyed when the animation ends for example, which would influence state
+    - we should just assume for sanity that all map files are required for determinism, why not?
+        - some scripts would be required too, although one could argue they will only be server-side
+    - we can always add this gif serialization later if it's really required
 
 - show timestamp of commands when hovering
     - especially for autosave and open project revisions
