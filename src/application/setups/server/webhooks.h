@@ -157,7 +157,13 @@ namespace discord_webhooks {
 			const auto embed_color = 16763904;
 
 			std::string full_description;
-			full_description += "IP:    " + code_escaped_nick(new_server_ip) + "\n";
+
+			const bool show_ip = false;
+
+			if (show_ip) {
+				full_description += "IP:    " + code_escaped_nick(new_server_ip) + "\n";
+			}
+
 			full_description += "Map:   " + code_escaped_nick(arena_name) + "\n";
 			full_description += "Mode:  " + code_escaped_nick(game_mode) + "\n";
 			full_description += "Slots: " + std::to_string(num_slots) + "\n";
