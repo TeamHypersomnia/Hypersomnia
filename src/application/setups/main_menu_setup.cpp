@@ -95,10 +95,6 @@ main_menu_setup::main_menu_setup(
 
 	query_latest_news(settings.latest_news_url);
 
-	if (settings.skip_credits) {
-		gui.show = true;
-	}
-
 	const auto menu_config_patch_path = "content/menu/config.lua";
 
 	try {
@@ -136,11 +132,6 @@ main_menu_setup::main_menu_setup(
 
 	const bool is_recording_available = is_intro_scene_available && false;
 	initial_step_number = cosm.get_total_steps_passed();
-
-	for (auto& m : gui.root.buttons) {
-		m.hover_highlight_maximum_distance = 10.f;
-		m.hover_highlight_duration_ms = 300.f;
-	}
 
 #if 0
 	gui.root.buttons[main_menu_button_type::CONNECT_TO_OFFICIAL_SERVER].set_appearing_caption("Connect to official server");

@@ -5,6 +5,37 @@
 
 namespace augs {
 	namespace event {
+		std::string message_to_string(const message k) {
+			using M = message;
+
+			switch (k) {
+				case M::close: return "close";
+				case M::quit: return "quit";
+				case M::move: return "move";
+				case M::resize: return "resize";
+				case M::activate: return "activate";
+				case M::deactivate: return "deactivate";
+				case M::click_activate: return "click_activate";
+				case M::minimize: return "minimize";
+				case M::maximize: return "maximize";
+				case M::restore: return "restore";
+				case M::clipboard_change: return "clipboard_change";
+				case M::syskeydown: return "syskeydown";
+				case M::syskeyup: return "syskeyup";
+				case M::keydown: return "keydown";
+				case M::keyup: return "keyup";
+				case M::character: return "character";
+				case M::unichar: return "unichar";
+				case M::mousemotion: return "mousemotion";
+				case M::wheel: return "wheel";
+				case M::ldoubleclick: return "ldoubleclick";
+				case M::rdoubleclick: return "rdoubleclick";
+				case M::mdoubleclick: return "mdoubleclick";
+				case M::ltripleclick: return "ltripleclick";
+				default: return "unknown"; 
+			}
+		}
+
 		std::ostream& operator<<(std::ostream& out, const augs::event::change& x) {
 			if (x.was_any_key_pressed()) {
 				return out << "Pressed: " << augs::event::keys::key_to_string(x.data.key.key);

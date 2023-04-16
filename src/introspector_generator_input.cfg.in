@@ -74,6 +74,9 @@ generated-file-format:
 
 namespace augs {
 	namespace event {
+		enum class message;
+		std::string message_to_string(const message);
+		
 		namespace keys {
 			enum class key;
 			std::string key_to_string(const key);
@@ -93,6 +96,11 @@ struct ImVec4;
 		auto str = event::keys::key_to_string(k);
 		erase_if(str, [](const auto ch) { return ch == ' '; });
 		return str;
+	}
+	
+	template <class... T>
+	std::string enum_to_string(const event::message k, T...) {
+		return event::message_to_string(k);
 	}
 
 	/* Generated introspectors begin here */

@@ -14,11 +14,18 @@ using const_main_menu_context = menu_context<true, main_menu_button_type>;
 using viewing_main_menu_context = viewing_menu_context<main_menu_button_type>;
 
 struct main_menu_gui {
-	bool show = false;
+	bool show = true;
 
 	main_menu_context::tree_type tree;
 	main_menu_context::root_type root;
 	main_menu_context::rect_world_type world;
+
+	main_menu_gui() {
+		for (auto& m : root.buttons) {
+			m.hover_highlight_maximum_distance = 10.f;
+			m.hover_highlight_duration_ms = 300.f;
+		}
+	}
 
 	auto create_context(
 		const vec2i screen_size,

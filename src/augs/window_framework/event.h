@@ -44,6 +44,8 @@ namespace augs {
 
 			COUNT
 		};
+			
+		std::string message_to_string(const message);
 
 		namespace keys {
 			enum class key {

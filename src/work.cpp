@@ -794,6 +794,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	*/
 
 	std::unique_ptr<main_menu_setup> main_menu;
+	main_menu_gui main_menu_gui;
 
 	auto has_main_menu = [&]() {
 		return main_menu != nullptr;
@@ -1011,6 +1012,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	auto launch_main_menu = [&]() {
 		if (!has_main_menu()) {
+			main_menu_gui = {};
+			
 			setup_launcher([&]() {
 				emplace_main_menu(lua, config.main_menu);
 			});
@@ -1761,6 +1764,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	std::function<void()> request_quit;
 
 	auto do_main_menu_option = [&](const main_menu_button_type t) {
+		LOG("Menu option: %x", augs::enum_to_string(t));
+		
 		using T = decltype(t);
 
 		switch (t) {
@@ -1818,6 +1823,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::QUIT:
+				LOG("Quitting due to Quit pressed in main menu.");
 				request_quit();
 				break;
 
@@ -1846,6 +1852,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::QUIT:
+				LOG("Quitting due to Quit pressed in ingame menu.");
 				request_quit();
 				break;
 
@@ -2286,7 +2293,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		game_gui.world.unhover_and_undrag(create_game_gui_context());
 
 		if (has_main_menu()) {
-			main_menu->gui.world.unhover_and_undrag(create_menu_context(main_menu->gui));
+			main_menu_gui.world.unhover_and_undrag(create_menu_context(main_menu_gui));
 		}
 
 		ingame_menu.world.unhover_and_undrag(create_menu_context(ingame_menu));
@@ -2439,6 +2446,7 @@ work_result work(const int argc, const char* const * const argv) try {
 						}
 
 						if (e.is_exit_message()) {
+							LOG("Window closing due to message: %x. Shutting down.", augs::enum_to_string(e.msg));
 							request_quit();
 							return true;
 						}
@@ -2596,8 +2604,8 @@ work_result work(const int argc, const char* const * const argv) try {
 									return true;
 								}
 
-								if (main_menu->gui.show) {
-									main_menu->gui.control(create_menu_context(main_menu->gui), e, do_main_menu_option);
+								if (main_menu_gui.show) {
+									main_menu_gui.control(create_menu_context(main_menu_gui), e, do_main_menu_option);
 								}
 
 								return true;
@@ -2916,15 +2924,15 @@ work_result work(const int argc, const char* const * const argv) try {
 					return assets::necessary_image_id::INVALID;
 				}
 				else {
-					const auto context = create_menu_context(main_menu->gui);
+					const auto context = create_menu_context(main_menu_gui);
 
-					main_menu->gui.advance(context, frame_delta);
+					main_menu_gui.advance(context, frame_delta);
 
 #if MENU_ART
 					get_drawer().aabb(streaming.necessary_images_in_atlas[assets::necessary_image_id::ART_1], ltrb(0, 0, screen_size.x, screen_size.y), white);
 #endif
 
-					const auto cursor = main_menu->gui.draw({ context, get_drawer() });
+					const auto cursor = main_menu_gui.draw({ context, get_drawer() });
 
 					main_menu->draw_overlays(
 						last_update_result,

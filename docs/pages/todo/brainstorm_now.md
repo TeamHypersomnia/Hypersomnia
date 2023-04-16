@@ -6,6 +6,25 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Universal additional collision sound for bodies so we don't have to create materials for some basic uses
+
+- Good balance for sniper scopes:
+    - When zooming, place a red dot where the cursor is
+        - It's only a dot so you don't know its direction
+        - And it should also be obscured by fog of war
+    - This way when someone's camping, victim won't know the direction of the sniper
+        - but they'll have a chance of knowing there is a sniper so it will be fair!
+
+
+- Exit crashes: there are sound sources declared like:
+    - static augs::sound_source tick_sound;
+    - They might be causing AL ERRORS on exiting the game.
+    - sound buffers are thankfully just in viewables stream
+    - there's some in the main menu setup as well although probably less harmful
+        - this will stop and exit along with the game thread exiting so should be fine
+        - just these statics should be removed
+            - we can test if it's the reason on windows, with a longer tick sound
+
 - choose default audio device from settings
 
 - fix warmup time to match the normal one
