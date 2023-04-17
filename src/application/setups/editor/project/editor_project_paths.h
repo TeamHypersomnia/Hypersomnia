@@ -6,6 +6,7 @@
 struct editor_project_paths {
 	std::string arena_name;
 	augs::path_type project_folder;
+	augs::path_type cache_folder;
 
 	augs::path_type editor_view;
 

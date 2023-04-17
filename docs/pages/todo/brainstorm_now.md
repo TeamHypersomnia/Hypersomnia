@@ -27,8 +27,6 @@ summary: That which we are brainstorming at the moment.
 
 - choose default audio device from settings
 
-- fix warmup time to match the normal one
-
 - GIF determinism: Note that to preserve determinism while resources aren't fully loaded,
     - gif frames would need to be serialized
         - which would prevent nicely reloading them

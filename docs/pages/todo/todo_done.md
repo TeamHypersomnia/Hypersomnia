@@ -5942,3 +5942,5 @@ This will discard your redo history."
 
 - TODO: Ressurrect the code that did those 8-polygon partitions out of convexes
 
+
+- fix warmup time to match the normal one

@@ -126,8 +126,10 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 		return target_folder / rest;
 	};
 
+	cache_folder = in_folder(".cache");
+
 	auto in_cache = [&](const auto& rest) {
-		return in_folder(".cache") / rest;
+		return cache_folder / rest;
 	};
 
 	project_json = in_folder(arena_name + ".json");
@@ -151,5 +153,6 @@ bool editor_project_paths::is_project_specific_file(const augs::path_type& path)
 		|| path == compressed_json
 		|| path == resource_hashes
 		|| path == fast_load_bin
+		|| path == cache_folder
 	;
 }

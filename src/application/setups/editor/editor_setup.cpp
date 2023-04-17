@@ -329,12 +329,12 @@ bool editor_setup::handle_input_before_imgui(
 }
 
 bool editor_setup::confirm_modal_popup() {
-	if (ok_only_popup) {
-		ok_only_popup = std::nullopt;
+	if (invalid_filenames_popup) {
+		invalid_filenames_popup = std::nullopt;
 		return true;
 	}
-	else if (ok_only_popup_2) {
-		ok_only_popup_2 = std::nullopt;
+	else if (redirect_or_missing_popup) {
+		redirect_or_missing_popup = std::nullopt;
 		return true;
 	}
 
@@ -707,32 +707,59 @@ void editor_setup::on_window_activate() {
 }
 
 void editor_setup::rescan_physical_filesystem() {
-	last_ignored_paths.clear();
+	last_invalid_paths.clear();
 
 	auto should_skip_sanitization = [&](auto path) {
 		return paths.is_project_specific_file(path.make_preferred());
 	};
 
-	files.rebuild_from(paths.project_folder, should_skip_sanitization, last_ignored_paths);
+	files.rebuild_from(paths.project_folder, should_skip_sanitization, last_invalid_paths);
 	gui.filesystem.clear_drag_drop();
 	rebuild_ad_hoc_atlas = true;
 
-	if (last_ignored_paths.size() > 0) {
+	if (last_invalid_paths.size() > 0) {
 		simple_popup ignored_popup;
+
+		std::size_t can_be_renamed_num = 0;
+
+		for (const auto& r : last_invalid_paths) {
+			if (r.can_be_renamed()) {
+				++can_be_renamed_num;
+			}
+		}
 
 		std::string summary;
 		std::string details;
-		summary = typesafe_sprintf("%x files have invalid filenames.\nThey will be ignored until you name them correctly.\n\nIf they were in the project before,\nthey will now be reported as missing.", last_ignored_paths.size());
 
-		for (auto& r : last_ignored_paths) {
-			details += typesafe_sprintf("%x:\n%x\n", r.first.string(), sanitization::describe(r.second));
+		if (can_be_renamed_num > 0) {
+			summary = typesafe_sprintf("%x files/folders have invalid filenames.\n%x can be renamed automatically.\n\nIf you cancel, they will be ignored until you name them correctly.\nIf they were in the project before, they will be reported as missing.", last_invalid_paths.size(), can_be_renamed_num == last_invalid_paths.size() ? std::string("All") : std::to_string(can_be_renamed_num));
+		}
+		else {
+			summary = typesafe_sprintf("%x files/folders have invalid filenames.\nThey cannot be renamed automatically.\n\nThey will be ignored until you name them correctly.\nIf they were in the project before, they will be reported as missing.", last_invalid_paths.size());
+		}
+
+		for (const auto& r : last_invalid_paths) {
+			details += r.forbidden_path.string();
+
+			if (r.can_be_renamed()) {
+				details += std::string(" ->\n") + r.get_suggested_path().string();
+			}
+			else {
+				details += "\n";
+			   	details	+= sanitization::describe(r.reason);
+			}
+
+			details += "\n\n";
 		}
 
 		ignored_popup.title = "Invalid filenames detected!";
 		ignored_popup.message = summary;
 		ignored_popup.details = details;
 
-		ok_only_popup = ignored_popup;
+		invalid_filenames_popup = ignored_popup;
+	}
+	else {
+		invalid_filenames_popup = std::nullopt;
 	}
 }
 
@@ -766,7 +793,7 @@ void editor_setup::report_changed_paths(const editor_paths_changed_report& chang
 	}
 
 	for (auto& r : changes.redirects) {
-		details += typesafe_sprintf("Redirected: %x -> %x\n", r.first.string(), r.second.string());
+		details += typesafe_sprintf("\n%x ->\n%x\n", r.first.string(), r.second.string());
 	}
 
 	changes_popup.title = "Detected changes in filesystem";
@@ -778,13 +805,14 @@ void editor_setup::report_changed_paths(const editor_paths_changed_report& chang
 		dirty_after_redirecting_paths = true;
 	}
 
-	ok_only_popup_2 = changes_popup;
+	redirect_or_missing_popup = changes_popup;
 }
 
 void editor_setup::on_project_assigned(const bool undoing_to_first_revision) {
 	const bool during_activate = false;
 	const auto result = rebuild_pathed_resources();
 
+	redirect_or_missing_popup = std::nullopt;
 	report_changed_paths(result);	
 	autosave_if_redirected(result, during_activate, undoing_to_first_revision);
 
@@ -2425,12 +2453,12 @@ setup_escape_result editor_setup::escape() {
 		return setup_escape_result::JUST_FETCH;
 	}
 
-	if (ok_only_popup) {
-		ok_only_popup = std::nullopt;
+	if (invalid_filenames_popup) {
+		invalid_filenames_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
 	}
-	else if (ok_only_popup_2) {
-		ok_only_popup_2 = std::nullopt;
+	else if (redirect_or_missing_popup) {
+		redirect_or_missing_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
 	}
 	else if (mover.escape()) {

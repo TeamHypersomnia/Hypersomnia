@@ -389,14 +389,58 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	ImGui::End();
 
-	if (ok_only_popup) {
-		if (ok_only_popup->perform()) {
-			ok_only_popup = std::nullopt;
+	if (invalid_filenames_popup) {
+		std::size_t can_be_renamed_num = 0;
+
+		for (const auto& r : last_invalid_paths) {
+			if (r.can_be_renamed()) {
+				++can_be_renamed_num;
+			}
+		}
+
+		if (can_be_renamed_num == 0) {
+			if (invalid_filenames_popup->perform()) {
+				invalid_filenames_popup = std::nullopt;
+			}
+		}
+		else {
+			if (const auto result = invalid_filenames_popup->perform({
+				{ "Cancel" },
+				{ 
+					typesafe_sprintf("Rename (%x)", can_be_renamed_num), 
+					rgba(200, 40, 0, 255),
+					rgba(25, 20, 0, 255)
+				}
+			})) {
+				invalid_filenames_popup = std::nullopt;
+
+				if (const bool should_rename = result == 2) {
+					/* Iterate in reverse so we first rename the descendants. */
+					for (const auto& r : reverse(last_invalid_paths)) {
+						if (r.can_be_renamed()) {
+							const auto& wrong = resolve_project_path(r.forbidden_path);
+							const auto good = resolve_project_path(r.get_suggested_path());
+
+							try {
+								if (augs::exists(wrong) && !augs::exists(good)) {
+									std::filesystem::rename(wrong, good);
+								}
+							}
+							catch (...) {
+
+							}
+						}
+					}
+
+					redirect_or_missing_popup = std::nullopt;
+					on_window_activate();
+				}
+			}
 		}
 	}
-	else if (ok_only_popup_2) {
-		if (ok_only_popup_2->perform()) {
-			ok_only_popup_2 = std::nullopt;
+	else if (redirect_or_missing_popup) {
+		if (redirect_or_missing_popup->perform()) {
+			redirect_or_missing_popup = std::nullopt;
 		}
 	}
 

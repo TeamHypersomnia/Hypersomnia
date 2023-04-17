@@ -139,10 +139,10 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	std::vector<entity_id> cached_selected_comparison;
 	std::vector<entity_id> cached_selected_comparison_after;
 
-	std::optional<simple_popup> ok_only_popup;
-	std::optional<simple_popup> ok_only_popup_2;
+	std::optional<simple_popup> invalid_filenames_popup;
+	std::optional<simple_popup> redirect_or_missing_popup;
 
-	editor_forbidden_paths_result last_ignored_paths;
+	editor_forbidden_paths_result last_invalid_paths;
 
 	editor_history history;
 	editor_filesystem files;

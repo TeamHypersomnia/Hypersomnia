@@ -25,7 +25,43 @@ using editor_filesystem_ui_state =
 	std::map<augs::path_type, editor_filesystem_node_ui_state>
 ;
 
-using editor_forbidden_paths_result = std::vector<std::pair<augs::path_type, sanitization::forbidden_path_type>>;
+struct forbidden_path_result {
+	augs::path_type forbidden_path;
+	std::size_t len = 0;
+	sanitization::forbidden_path_type reason;
+	std::optional<std::string> suggested_filename;
+
+	bool can_be_renamed() const {
+		return suggested_filename != std::nullopt;
+	}
+
+	auto get_suggested_path() const {
+		auto good = forbidden_path;
+		good.replace_filename(*suggested_filename);
+
+		return good;
+	}
+
+	bool operator<(const forbidden_path_result& b) {
+		return len < b.len;
+	}
+
+	forbidden_path_result(
+		const augs::path_type& p,
+		const sanitization::forbidden_path_type r
+	) : forbidden_path(p), reason(r) {
+		const auto bad_filename = forbidden_path.filename().string();
+		const auto good_filename = sanitization::try_generate_sanitized_filename(bad_filename);
+
+		len = p.string().length();
+
+		if (good_filename != bad_filename) {
+			suggested_filename = good_filename;
+		}
+	}
+};
+
+using editor_forbidden_paths_result = std::vector<forbidden_path_result>;
 
 struct editor_filesystem_node {
 	ad_hoc_entry_id file_thumbnail_id = static_cast<ad_hoc_entry_id>(-1);
@@ -238,20 +274,22 @@ struct editor_filesystem_node {
 		clear();
 
 		auto add_entry = [this, skip_sanitization, &project_folder, &out_ignored_paths](const auto& untrusted_path, const bool folder) {
-			if (folder) {
-				editor_filesystem_node new_node;
-				new_node.name = untrusted_path.filename().string();
-				new_node.type = editor_filesystem_node_type::FOLDER;
-				subfolders.emplace_back(std::move(new_node));
-			}
-			else {
-				auto add_file = [&](const auto& filename, const bool sanitization_skipped) {
-					const auto extension = filename.extension().string();
+			auto add_file_or_folder = [&](auto filename, const bool sanitization_skipped) {
+				if (folder) {
+					filename.replace_extension("");
+				}
 
-					editor_filesystem_node new_node;
-					new_node.name = filename.string();
+				editor_filesystem_node new_node;
+				new_node.name = filename.string();
+				new_node.sanitization_skipped = sanitization_skipped;
+
+				if (folder) {
+					new_node.type = editor_filesystem_node_type::FOLDER;
+					subfolders.emplace_back(std::move(new_node));
+				}
+				else {
+					const auto extension = filename.extension().string();
 					new_node.set_file_type_by(extension);
-					new_node.sanitization_skipped = sanitization_skipped;
 
 					try {
 						new_node.last_write_time = augs::last_write_time(untrusted_path);
@@ -260,27 +298,34 @@ struct editor_filesystem_node {
 					catch (...) {
 
 					}
-				};
-
-				if (skip_sanitization(untrusted_path)) {
-					add_file(untrusted_path.filename(), true);
 				}
-				else {
-					const auto relative_in_project = std::filesystem::relative(untrusted_path, project_folder);
+			};
 
-					std::visit(
-						[&]<typename S>(const S& sanitization_result) {
-							if constexpr(std::is_same_v<S, augs::path_type>) {
-								add_file(sanitization_result.filename(), false);
-							}
-							else {
-								out_ignored_paths.push_back({ relative_in_project, sanitization_result });
-							}
-						},
+			const auto relative_in_project = std::filesystem::relative(untrusted_path, project_folder);
 
-						sanitization::sanitize_downloaded_file_path(project_folder, ::to_forward_slashes(relative_in_project.string()))
-					);
+			if (skip_sanitization(untrusted_path)) {
+				add_file_or_folder(untrusted_path.filename(), true);
+			}
+			else {
+				auto filename_to_sanitize = ::to_forward_slashes(relative_in_project.string());
+
+				if (folder) {
+					/* Add a dummy extension to silence the NO_EXTENSION error for folders */
+					filename_to_sanitize += ".png";
 				}
+
+				std::visit(
+					[&]<typename S>(const S& sanitization_result) {
+						if constexpr(std::is_same_v<S, augs::path_type>) {
+							add_file_or_folder(sanitization_result.filename(), false);
+						}
+						else {
+							out_ignored_paths.emplace_back(relative_in_project, sanitization_result);
+						}
+					},
+
+					sanitization::sanitize_downloaded_file_path(project_folder, filename_to_sanitize)
+				);
 			}
 
 			return callback_result::CONTINUE;

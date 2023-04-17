@@ -2,6 +2,8 @@
 #include "augs/network/network_types.h"
 #include "application/arena/arena_paths.h"
 
+#include "augs/string/string_templates.h"
+
 namespace sanitization {
 	std::string describe(const forbidden_path_type f) {
 		switch (f) {
@@ -277,6 +279,31 @@ namespace sanitization {
 		return std::get_if<augs::path_type>(&sanitized_1) != nullptr;
 #endif
 	}
+
+	std::string whitelisted_str(const std::string& untrusted, const std::string& whitelist) {
+		std::string result;
+
+		for (const auto c : untrusted) {
+			if (whitelist.find(c) != std::string::npos) {
+				result += c;
+			}
+		}
+
+		return result;
+	}
+
+	std::string try_generate_sanitized_filename(const std::string& untrusted_filename) {
+		const auto first_pass = str_ops(untrusted_filename)
+			.to_lowercase()
+			.replace_all(" ", "_").subject
+		;
+
+		auto path = augs::path_type(first_pass);
+		const auto ext_backup = path.extension().string();
+		path.replace_extension("");
+
+		return whitelisted_str(path.string(), portable_alphanumeric_set) + ext_backup;
+	}
 }
 
 #define TEST_SYMLINKS !PLATFORM_WINDOWS && !IS_PRODUCTION_BUILD
@@ -468,6 +495,31 @@ TEST_CASE("File path sanitization test") {
 	REQUIRE(S::sanitize_downloaded_file_path(long_parent_dir, "a2.png") == R(F::TOTAL_PATH_IS_TOO_LONG));
 #endif
 #endif
+}
+
+TEST_CASE("try_generate_sanitized_filename") {
+	namespace S = sanitization;
+
+	REQUIRE(S::try_generate_sanitized_filename("file.txt") == "file.txt");
+	REQUIRE(S::try_generate_sanitized_filename("file.TXT") == "file.txt");
+	REQUIRE(S::try_generate_sanitized_filename("File 123.Txt") == "file_123.txt");
+	REQUIRE(S::try_generate_sanitized_filename("TEST@#$%^&*()_file-+=!;.txt") == "test_file.txt");
+	REQUIRE(S::try_generate_sanitized_filename("A B C.txt") == "a_b_c.txt");
+	REQUIRE(S::try_generate_sanitized_filename("123.ABC") == "123.abc");
+	REQUIRE(S::try_generate_sanitized_filename("with space.txt") == "with_space.txt");
+	REQUIRE(S::try_generate_sanitized_filename("mixed_CASE123.txt") == "mixed_case123.txt");
+	REQUIRE(S::try_generate_sanitized_filename("double__space__test.txt") == "double__space__test.txt");
+	REQUIRE(S::try_generate_sanitized_filename("file.with.multiple.dots.txt") == "filewithmultipledots.txt");
+	REQUIRE(S::try_generate_sanitized_filename("   leading_spaces.txt") == "___leading_spaces.txt");
+	REQUIRE(S::try_generate_sanitized_filename("trailing_spaces   .txt") == "trailing_spaces___.txt");
+	REQUIRE(S::try_generate_sanitized_filename("!@#$%^&*()_+=-[]{}|;':\"<>,?/`~") == "_");
+	REQUIRE(S::try_generate_sanitized_filename("CAPS.TXT") == "caps.txt");
+	REQUIRE(S::try_generate_sanitized_filename("file.with.special@!#$^&chars.txt") == "filewithspecialchars.txt");
+	REQUIRE(S::try_generate_sanitized_filename("file_with(123).txt") == "file_with123.txt");
+	REQUIRE(S::try_generate_sanitized_filename("abc123_.txt") == "abc123_.txt");
+	REQUIRE(S::try_generate_sanitized_filename("one.TWO.three.FOUR") == "onetwothree.four");
+	REQUIRE(S::try_generate_sanitized_filename("UPPERlowerNUM123.txt") == "upperlowernum123.txt");
+	REQUIRE(S::try_generate_sanitized_filename("emoji😊test.txt") == "emojitest.txt");
 }
 
 #endif

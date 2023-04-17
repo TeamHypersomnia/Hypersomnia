@@ -68,5 +68,7 @@ namespace sanitization {
 	);
 
 	bool arena_name_safe(const std::string& untrusted_map_name);
+
+	std::string try_generate_sanitized_filename(const std::string& untrusted_filename);
 }
 
