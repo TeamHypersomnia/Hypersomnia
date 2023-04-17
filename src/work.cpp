@@ -1935,6 +1935,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	bool pending_new_state_sample = true;
 	auto last_sampled_cosmos = cosmos_id_type(-1);
 
+	augs::timer state_changed_timer;
+
 	auto audiovisual_step = [&](
 		const augs::audio_renderer* audio_renderer,
 		const augs::delta frame_delta,
@@ -1982,8 +1984,6 @@ work_result work(const int argc, const char* const * const argv) try {
 		const auto inv_tickrate = visit_current_setup([&](const auto& setup) {
 			return setup.get_inv_tickrate();
 		});
-
-		augs::timer state_changed_timer;
 
 		visit_current_setup([&](const auto& setup) {
 			using S = remove_cref<decltype(setup)>;

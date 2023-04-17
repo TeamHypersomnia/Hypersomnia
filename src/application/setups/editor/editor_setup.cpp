@@ -574,6 +574,8 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.interpolation.enabled = false;
 		
 		config.sound.allow_sounds_without_character_listener = gui.sounds_preview;
+
+		config.sound.processing_frequency = sound_processing_frequency::EVERY_SINGLE_FRAME;
 	}
 }
 
