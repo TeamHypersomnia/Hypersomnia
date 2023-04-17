@@ -11,6 +11,11 @@ using namespace std::chrono;
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/string/string_templates.h"
 
+#if PLATFORM_WINDOWS
+#include <windows.h>
+#include "augs/filesystem/winapi_exists.hpp"
+#endif
+
 int main(int argc, char** argv) {
 	auto start = high_resolution_clock::now();
 

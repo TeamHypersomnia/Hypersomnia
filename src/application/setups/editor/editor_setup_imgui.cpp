@@ -422,6 +422,8 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 							const auto good = resolve_project_path(r.get_suggested_path());
 
 							try {
+								LOG("Renaming %x to %x. %x %x", wrong, good, augs::exists(wrong), augs::exists(good));
+
 								if (augs::exists(wrong) && !augs::exists(good)) {
 									std::filesystem::rename(wrong, good);
 								}

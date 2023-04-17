@@ -40,9 +40,13 @@ namespace augs {
 		return std::filesystem::copy(from, to);
 	}
 
+#if PLATFORM_WINDOWS
+	bool exists(const path_type& path);
+#else
 	inline bool exists(const path_type& path) {
 		return std::filesystem::exists(path);
 	}
+#endif
 
 	inline bool is_empty(const path_type& path) {
 		return std::filesystem::is_empty(path);
