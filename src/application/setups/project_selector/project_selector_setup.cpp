@@ -97,6 +97,12 @@ static editor_project_about read_about_from(const augs::path_type& arena_folder_
 	return editor_project_readwrite::read_only_project_about(paths.project_json);
 }
 
+static editor_project_meta read_meta_from(const augs::path_type& arena_folder_path) {
+	const auto paths = editor_project_paths(arena_folder_path);
+
+	return editor_project_readwrite::read_only_project_meta(paths.project_json);
+}
+
 std::optional<project_tab_type> project_selector_setup::is_project_name_taken(const arena_identifier& arena_name) const {
 	using P = project_tab_type;
 	for (auto i = P::MY_PROJECTS; i < P::COUNT; i = P(int(i) + 1)) {
@@ -137,10 +143,10 @@ void project_selector_setup::scan_for_all_arenas() {
 
 			// TODO: give it a proper timestamp
 
-			new_entry.timestamp = augs::date_time().secs_since_epoch();
 			new_entry.miniature_index = miniature_index_counter++;
 			try {
 				new_entry.about = ::read_about_from(*sanitized_path);
+				new_entry.meta = ::read_meta_from(*sanitized_path);
 			}
 			catch (const augs::file_open_error& err) {
 				editor_project_about err_abouts;
@@ -321,8 +327,15 @@ bool projects_list_tab_state::perform_list(
 		if (num_columns > 1) {
 			ImGui::NextColumn();
 
-			const auto secs_ago = augs::date_time::secs_since_epoch() - entry.timestamp;
-			text_disabled(augs::date_time::format_how_long_ago(true, secs_ago));
+			const auto date = augs::date_time::from_utc_timestamp(entry.meta.version_timestamp);
+
+			const auto ago = typesafe_sprintf(
+				"%x\n%x", 
+				date.get_readable_day_hour(),
+				date.how_long_ago_tell_seconds()
+			);
+
+			text_disabled(ago);
 
 			ImGui::NextColumn();
 		}
@@ -364,10 +377,10 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 			return tab.perform_list(ad_hoc, "Last modified", in.window);
 
 			case project_tab_type::OFFICIAL_ARENAS:
-			return tab.perform_list(ad_hoc, "Last updated", in.window);
+			return tab.perform_list(ad_hoc, "Last modified", in.window);
 
 			case project_tab_type::DOWNLOADED_ARENAS:
-			return tab.perform_list(ad_hoc, "When downloaded", in.window);
+			return tab.perform_list(ad_hoc, "Last modified", in.window);
 
 			default:
 			return false;

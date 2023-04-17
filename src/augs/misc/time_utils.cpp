@@ -79,6 +79,38 @@ std::string augs::date_time::format_time_point_utc(const std::chrono::system_clo
 	return o.str() + " UTC";
 }
 
+#if PLATFORM_WINDOWS
+#define timegm _mkgmtime
+#endif
+
+auto convert_string_to_time_t(const std::string &utc_timestamp) {
+    std::istringstream ss(utc_timestamp);
+    std::tm tm = {};
+
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+
+    if (ss.fail()) {
+		return std::chrono::system_clock::now();
+    }
+
+    const auto seconds = std::chrono::seconds(timegm(&tm));
+
+    // Parse fractional seconds (if present)
+    if (ss.peek() == '.') {
+        int fractional_seconds;
+        ss.ignore();
+        ss >> fractional_seconds;
+
+        return std::chrono::system_clock::from_time_t(seconds.count()) + std::chrono::microseconds(fractional_seconds);
+    } 
+
+    return std::chrono::system_clock::from_time_t(seconds.count());
+}
+
+augs::date_time augs::date_time::from_utc_timestamp(const std::string& timestamp) {
+	return augs::date_time(convert_string_to_time_t(timestamp));
+}
+
 std::string augs::date_time::get_utc_timestamp() {
 	return format_time_point_utc(std::chrono::system_clock::now());
 }
@@ -110,6 +142,11 @@ std::optional<std::chrono::system_clock::time_point> augs::date_time::from_utc_t
 std::string augs::date_time::get_readable_for_file() const {
 	std::tm local_time = *std::localtime(&t);
 	return typesafe_sprintf("%x", std::put_time(&local_time, "%y.%m.%d at %H-%M-%S"));
+}
+
+std::string augs::date_time::get_readable_day_hour() const {
+	std::tm local_time = *std::localtime(&t);
+	return typesafe_sprintf("%x", std::put_time(&local_time, "%m-%d-%y %H:%M:%S"));
 }
 
 std::string augs::date_time::get_readable() const {

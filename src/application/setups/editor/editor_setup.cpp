@@ -1167,6 +1167,8 @@ void editor_setup::save() {
 void editor_setup::save_project_file_as(const augs::path_type& path) {
 	LOG("Saving project file as: %x", path);
 
+	project.meta.version_timestamp = augs::date_time::get_utc_timestamp();
+
 	editor_project_readwrite::write_project_json(
 		path,
 		project,

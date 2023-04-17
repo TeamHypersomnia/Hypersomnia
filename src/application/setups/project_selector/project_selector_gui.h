@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/imgui/standard_window_mixin.h"
+#include "application/setups/editor/project/editor_project_meta.h"
 
 namespace augs {
 	class window;
@@ -16,11 +17,11 @@ enum class project_tab_type {
 };
 
 struct project_list_entry { 
-	double timestamp;
 	augs::path_type arena_path;
 	arena_identifier arena_name;
 	ad_hoc_entry_id miniature_index = 0;
 	editor_project_about about;
+	editor_project_meta meta;
 
 	augs::path_type get_miniature_path() const;
 	arena_identifier get_arena_name() const;

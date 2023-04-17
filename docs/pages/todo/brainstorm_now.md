@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix hashing on linux
+    - Probably an issue with clrf endings
+
+- convert line endings when hashing json file
+
 - Universal additional collision sound for bodies so we don't have to create materials for some basic uses
 
 - Good balance for sniper scopes:

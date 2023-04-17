@@ -20,12 +20,15 @@ namespace augs {
 		}
 
 		std::string get_readable() const;
+		std::string get_readable_day_hour() const;
 		std::string get_readable_for_file() const;
 
 		uint64_t seconds_ago() const;
 		std::string how_long_ago() const;
 		std::string how_long_ago_brief() const;
 		std::string how_long_ago_tell_seconds() const;
+
+		static date_time from_utc_timestamp(const std::string&);
 
 		static std::string format_how_long_ago(bool tell_seconds, const uint64_t secs);
 		static std::string format_how_long_ago_brief(bool tell_seconds, const uint64_t secs);
