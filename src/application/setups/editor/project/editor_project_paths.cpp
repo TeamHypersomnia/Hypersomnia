@@ -7,11 +7,11 @@ namespace sanitization {
 }
 
 std::string editor_project_paths::load_project_json() const {
-	return augs::file_to_string(project_json);
+	return augs::file_to_string_crlf_to_lf(project_json);
 }
 
 std::string editor_project_paths::load_autosave_json() const {
-	return augs::file_to_string(autosave_json);
+	return augs::file_to_string_crlf_to_lf(autosave_json);
 }
 
 augs::path_type server_choose_arena_file_by(const std::string& name) {

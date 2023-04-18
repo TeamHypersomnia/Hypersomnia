@@ -79,6 +79,8 @@ namespace augs {
 		}
 	}
 
+	void crlf_to_lf(std::string&);
+
 	inline auto file_to_string(const path_type& path) {
 		auto t = with_exceptions<std::ifstream>();
 		t.open(path);
@@ -87,6 +89,18 @@ namespace augs {
 		buffer << t.rdbuf();
 
 		return buffer.str();
+	}
+
+	inline auto file_to_string_crlf_to_lf(const path_type& path) {
+		auto t = with_exceptions<std::ifstream>();
+		t.open(path);
+
+		std::stringstream buffer;
+		buffer << t.rdbuf();
+
+		auto out = buffer.str();
+		crlf_to_lf(out);
+		return out;
 	}
 
 	inline auto file_read_first_line(const path_type& path) {

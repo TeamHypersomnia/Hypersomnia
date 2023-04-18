@@ -15,6 +15,22 @@ std::string get_hex_representation(const unsigned char *Bytes, const size_t Leng
 }
 
 namespace augs {
+	void crlf_to_lf(std::string& input) {
+		std::size_t read_idx = 0;
+		std::size_t write_idx = 0;
+
+		while (read_idx < input.size()) {
+			if (input[read_idx] == '\r' && read_idx + 1 < input.size() && input[read_idx + 1] == '\n') {
+				input[write_idx++] = '\n';
+				read_idx += 2;  // Skip the '\r' and the '\n'
+			} else {
+				input[write_idx++] = input[read_idx++];
+			}
+		}
+
+		input.resize(write_idx);  // Truncate the string to the new size
+	}
+
 	hash_string_type to_hex_format(const secure_hash_type& hstr) {
 		static_assert(hash_string_type().max_size() == BLAKE3_OUT_LEN * 2);
 

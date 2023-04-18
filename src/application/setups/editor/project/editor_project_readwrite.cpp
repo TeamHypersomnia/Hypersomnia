@@ -688,7 +688,9 @@ namespace editor_project_readwrite {
 	) {
 		const auto project_dir = json_path.parent_path();
 
-		return read_project_json(project_dir, augs::file_to_string(json_path), officials, officials_map, strict, output_arena_hash);
+		const auto read_string = output_arena_hash != nullptr ? augs::file_to_string_crlf_to_lf : augs::file_to_string;
+
+		return read_project_json(project_dir, read_string(json_path), officials, officials_map, strict, output_arena_hash);
 	}
 
 	editor_project read_project_json(
