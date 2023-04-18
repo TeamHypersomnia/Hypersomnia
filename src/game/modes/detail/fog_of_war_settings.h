@@ -3,7 +3,7 @@
 
 struct fog_of_war_settings {
 	// GEN INTROSPECTOR struct fog_of_war_settings
-	real32 angle = 180.f;
+	real32 angle = 165.f;
 	vec2 size = vec2(1920, 1080);
 	// END GEN INTROSPECTOR
 

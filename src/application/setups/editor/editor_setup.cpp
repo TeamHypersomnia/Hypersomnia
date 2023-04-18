@@ -566,7 +566,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = typesafe_sprintf("Hypersomnia Editor - %x", get_arena_name_with_star());
 
 	if (is_playtesting()) {
-
+		get_arena_handle().adjust(config.drawing);
 	}
 	else {
 		config.drawing.draw_area_markers.is_enabled = false;

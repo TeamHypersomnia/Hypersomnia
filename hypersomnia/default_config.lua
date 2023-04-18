@@ -283,12 +283,14 @@ treat_as_music_sounds_longer_than_secs = 5,
 	enabled_draw_tactical_indicators = 1,
 	enabled_draw_danger_indicators = "255 50 50 255",
 
+    fog_of_war_appearance = {
+      overlay_color = "0 0 0 40",
+      overlay_color_on_visible = false
+    },
 	fog_of_war = {
-	  overlay_color_on_visible = true,
-	  overlay_color = "255 255 255 2",
 	  enabled = true,
-	  angle = 150
-	},
+	  angle = 165
+    },
 	enemy_hud_mode = "SMALL_HEALTH_BAR",
 	draw_hp_bar = true,
 	draw_cp_bar = true,
