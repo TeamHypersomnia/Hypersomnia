@@ -245,6 +245,10 @@ namespace augs {
 		return document;
 	}
 
+	inline rapidjson::Document json_document_from(const augs::path_type& path) {
+		return json_document_from(file_to_string(path));
+	}
+
 	template <class T>
 	void from_json_string(const std::string& json, T& out) {
 		read_json(json_document_from(json), out);

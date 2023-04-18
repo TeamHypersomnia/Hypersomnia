@@ -2177,6 +2177,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			|| try_preffix("Selected", yellow)
 			|| try_preffix("Moved", green)
 			|| try_preffix("Rotated", green)
+			|| try_preffix("Flipped", green)
 			|| try_preffix("Resized", green)
 			|| try_preffix("Renamed", green)
 			|| try_preffix("Changed", green)
