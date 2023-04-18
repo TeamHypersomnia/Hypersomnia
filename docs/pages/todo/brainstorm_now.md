@@ -12,6 +12,7 @@ summary: That which we are brainstorming at the moment.
 - convert line endings when hashing json file
 
 - Universal additional collision sound for bodies so we don't have to create materials for some basic uses
+    - e.g. for bouncer
 
 - Good balance for sniper scopes:
     - When zooming, place a red dot where the cursor is
