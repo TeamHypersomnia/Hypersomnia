@@ -80,18 +80,6 @@ LRESULT CALLBACK wndproc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam) {
 	auto& self = *window_ptr;
 	self.handle_wndproc(hwnd, umsg, wParam, lParam);
 
-	if (umsg == WM_ACTIVATE) {
-		return 0;
-	}
-
-	if (umsg == SC_MINIMIZE) {
-		return 0;
-	}
-
-	if (umsg == WM_SYSKEYDOWN || umsg == WM_SYSKEYUP) {
-		return 0;
-	}
-
 	return DefWindowProc(hwnd, umsg, wParam, lParam);
 }
 
