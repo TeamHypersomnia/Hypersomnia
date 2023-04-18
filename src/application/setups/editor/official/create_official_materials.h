@@ -19,6 +19,27 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 			res.official_tag = enum_id;
 			res.scene_asset_id = material_id;
 
+			if (enum_id == test_scene_physical_material_id::GLASS) {
+				res.editable.max_ricochet_angle = 40.0f;
+			}
+			else if (enum_id == test_scene_physical_material_id::WOOD) {
+				res.editable.max_ricochet_angle = 10.0f;
+			}
+			else if (enum_id == test_scene_physical_material_id::METAL) {
+				res.editable.max_ricochet_angle = 20.0f;
+			}
+			else if (enum_id == test_scene_physical_material_id::VENT) {
+				res.editable.max_ricochet_angle = 20.0f;
+			}
+			else {
+				/* 
+					For now only allow well-defined wall resources.
+					Skip grenade, flashbang, knife etc.
+				*/
+
+				return;
+			}
+
 			pool.allocate(res);
 		});
 	}

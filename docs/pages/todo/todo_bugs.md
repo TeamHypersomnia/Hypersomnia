@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- crash on bigilab: we should be able to 
+
 - linux bug: neon silhouettes can be seen behind player, probably something to do with drivers
 	- It's a problem with gl_FragCoord: probably stencil on another fbo is somehow flipped
 	- To reverse the problem, one can put the following in fog_of_war.fsh: layout(origin_upper_left) in vec4 gl_FragCoord; 

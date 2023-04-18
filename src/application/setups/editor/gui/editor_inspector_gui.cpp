@@ -1071,6 +1071,8 @@ EDIT_FUNCTION(
 			ImGui::Separator();
 		}
 
+		MULTIPROPERTY("Material", as_physical.material);
+
 		MULTIPROPERTY("Density", as_physical.density);
 		MULTIPROPERTY("Friction", as_physical.friction);
 		MULTIPROPERTY("Bounciness", as_physical.bounciness);

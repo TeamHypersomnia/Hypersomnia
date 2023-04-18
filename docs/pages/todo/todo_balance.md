@@ -6,6 +6,8 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
+- For bilmer and covert, shot bullet traces only briefly
+
 - Pistols could just have a slower rate of fire and they'll be perfectly balanced
 	- Otherwise they're just superior smgs honestly
 

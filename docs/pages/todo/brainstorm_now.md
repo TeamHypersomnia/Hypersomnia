@@ -6,10 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix hashing on linux
-    - Probably an issue with clrf endings
+- Transmitting maps and resources (finally)
+    - Reusing resources for new versions of maps.
+        - Will naturally happen frequently when hosting playtesting sessions from editor.
+        - We don't have to start with a full-blown content database.
+            - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
+                - Will cover 90% of the cases.
 
-- convert line endings when hashing json file
+- Note we cannot do the de_cyberaqua vs de_cyberaqua.old swap WITHOUT PROMPTING if there are only 2 versions
+    - This way a malicious server could wipe everyone's maps by constantly changing them once someone connects
+
+- Run static analyzer and thread sanitizer at least once after finishing transmission
 
 - Universal additional collision sound for bodies so we don't have to create materials for some basic uses
     - e.g. for bouncer
@@ -20,7 +27,6 @@ summary: That which we are brainstorming at the moment.
         - And it should also be obscured by fog of war
     - This way when someone's camping, victim won't know the direction of the sniper
         - but they'll have a chance of knowing there is a sniper so it will be fair!
-
 
 - Exit crashes: there are sound sources declared like:
     - static augs::sound_source tick_sound;
@@ -49,13 +55,6 @@ summary: That which we are brainstorming at the moment.
 
 - Allow resizing by axis only
     - just like position - separate widgets for x and y
-
-- Transmitting maps and resources (finally)
-    - Reusing resources for new versions of maps.
-        - Will naturally happen frequently when hosting playtesting sessions from editor.
-        - We don't have to start with a full-blown content database.
-            - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
-                - Will cover 90% of the cases.
 
 - Sound nodes should have pitch/gain
     - Also specify Play once for sounds like on fy_snow 

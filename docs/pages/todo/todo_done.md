@@ -5944,3 +5944,7 @@ This will discard your redo history."
 
 
 - fix warmup time to match the normal one
+- fix hashing on linux
+    - Probably an issue with clrf endings
+
+- convert line endings when hashing json file

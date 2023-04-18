@@ -371,6 +371,11 @@ void setup_scene_object_from_resource(
 		}
 
 		if (auto fixtures = scene.template find<invariants::fixtures>()) {
+			if (const auto material = find_resource(physical.material)) {
+				fixtures->material = material->scene_asset_id;
+				fixtures->max_ricochet_angle = material->editable.max_ricochet_angle;
+			}
+
 			fixtures->density = physical.density;
 			fixtures->friction = physical.friction;
 			fixtures->restitution = physical.bounciness;
