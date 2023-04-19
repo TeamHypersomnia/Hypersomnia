@@ -189,7 +189,7 @@ private:
 	friend server_adapter;
 
 	template <class T, class F>
-	message_handler_result handle_client_message(
+	message_handler_result handle_payload(
 		const client_id_type&, 
 		F&& read_payload
 	);

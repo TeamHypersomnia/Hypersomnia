@@ -98,7 +98,7 @@ message_handler_result server_adapter::process_message(const client_id_type& cli
 
 				using P = payload_of_t<net_message_type>;
 
-				return handler.template handle_client_message<remove_cref<P>>(client_id, std::move(read_payload_into));
+				return handler.template handle_payload<remove_cref<P>>(client_id, std::move(read_payload_into));
 			}
 		}
 	);

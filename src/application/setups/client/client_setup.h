@@ -453,7 +453,7 @@ class client_setup :
 				}
 
 				if (result.desync && !now_resyncing) {
-					pending_requests.push_back(special_client_request::RESYNC);
+					pending_requests.push_back(special_client_request::RESYNC_ARENA);
 					now_resyncing = true;
 				}
 			}
