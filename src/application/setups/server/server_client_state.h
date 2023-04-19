@@ -14,7 +14,7 @@ using client_pending_entropies = std::vector<total_client_entropy>;
 struct server_client_state {
 	using type = client_state_type;
 
-	type state = type::INITIATING_CONNECTION;
+	type state = type::NETCODE_NEGOTIATING_CONNECTION;
 	net_time_t last_valid_payload_time = -1.0;
 	net_time_t last_keyboard_activity_time = -1.0;
 	requested_client_settings settings;
@@ -71,7 +71,7 @@ struct server_client_state {
 	}
 
 	bool is_set() const {
-		return state != type::INITIATING_CONNECTION;
+		return state != type::NETCODE_NEGOTIATING_CONNECTION;
 	}
 
 	void init(const net_time_t server_time) {

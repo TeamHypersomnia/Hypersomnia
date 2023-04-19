@@ -6,12 +6,31 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
 - Transmitting maps and resources (finally)
     - Reusing resources for new versions of maps.
         - Will naturally happen frequently when hosting playtesting sessions from editor.
         - We don't have to start with a full-blown content database.
             - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
                 - Will cover 90% of the cases.
+    - Interrupted downloads
+        - Need to identify that a map downloaded halfway
+            - Say, if json exists, map downloaded completely
+            - This will play nicely with detection logic for existing maps
+        - Although it will logistically be helpful to download json first
+            - we might want to just download the json and skip resources for some reason if we want to download it from someone
+        - We should at least determine if external resource paths exist
+            - Same complexity as we need to read those same resources after all
+    - Masterserver heartbeat will have a hash/maybe even saved utc but it will only be for the purpose of filtering
+        - Downloading decision will only happen after receiving solvable vars
+        - Especially since some servers might have heartbeats every once say 1-2 minutes and it will make us download the wrong map all the more often
+            - Although we can't help downloading wrong maps sometimes because by the time we download it the host might change the map as well
+                - But we can minimize it
+    - The client must essentially be able to request any map from the server
+        - Potential security issue? We'll just sanitize the input, easy
+    - We'll still be sending solvables etc. to stay connected
+        - We just won't show the arena on client screen as long as they are requesting anything
+        - Once we're done we will have to re-request a state correction 
 
 
 - Note we cannot do the de_cyberaqua vs de_cyberaqua.old swap WITHOUT PROMPTING if there are only 2 versions

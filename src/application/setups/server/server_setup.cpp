@@ -1295,7 +1295,7 @@ void server_setup::advance_clients_state() {
 			automove_to_spectators_if_afk(client_id, c);
 		}
 
-		if (c.state > client_state_type::INITIATING_CONNECTION) {
+		if (c.state > client_state_type::NETCODE_NEGOTIATING_CONNECTION) {
 			if (c.should_kick_due_to_inactivity(vars, server_time)) {
 				kick(client_id, "No messages arrived for too long!");
 			}

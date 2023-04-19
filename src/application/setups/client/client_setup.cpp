@@ -513,7 +513,7 @@ void client_setup::advance_demo_recorder() {
 void client_setup::send_pending_commands() {
 	using C = client_state_type;
 
-	const bool init_send = state == C::INITIATING_CONNECTION;
+	const bool init_send = state == C::NETCODE_NEGOTIATING_CONNECTION;
 
 	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
 	const bool resend_requested_settings = can_already_resend_settings && current_requested_settings != requested_settings;
@@ -760,7 +760,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 			text_color(typesafe_sprintf("Connected to %x.", last_addr.address), green);
 
-			if (state == C::INITIATING_CONNECTION) {
+			if (state == C::NETCODE_NEGOTIATING_CONNECTION) {
 				text("Initializing connection...");
 			}
 			else if (state == C::PENDING_WELCOME) {
@@ -783,7 +783,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				disconnect();
 			}
 		}
-		else if (state == C::INITIATING_CONNECTION && adapter->is_connecting()) {
+		else if (state == C::NETCODE_NEGOTIATING_CONNECTION && adapter->is_connecting()) {
 			text("Connecting to %x\nTime: %2f seconds", last_addr.address, get_current_time() - when_initiated_connection);
 
 			text("\n");
@@ -795,13 +795,13 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (
-			const bool failed_after_connected = adapter->is_connecting() && state > C::INITIATING_CONNECTION; 
+			const bool failed_after_connected = adapter->is_connecting() && state > C::NETCODE_NEGOTIATING_CONNECTION; 
 			failed_after_connected || adapter->has_connection_failed()
 		) {
 			if (state == C::IN_GAME) {
 				text("Lost connection to the server.");
 			}
-			else if (state == C::INITIATING_CONNECTION) {
+			else if (state == C::NETCODE_NEGOTIATING_CONNECTION) {
 				text("Failed to establish connection with %x", last_addr.address);
 			}
 			else {

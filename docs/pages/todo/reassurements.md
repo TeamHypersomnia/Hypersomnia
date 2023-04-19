@@ -5,6 +5,9 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- I'd standardize max_ricochet_angle for materials so there aren't too many
+	- Other values, we might customize per-resource, why not
+
 - We can leave _1 _2 _3_ etc for sounds
 	- Contrary to animations, these variations are done on augs audio library level
 	- Someone might want to reuse the other numbers for something else (or just listen to them separately) so nothing to worry about here

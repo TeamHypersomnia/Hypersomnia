@@ -94,7 +94,7 @@ class client_setup :
 
 	address_and_port last_addr;
 	netcode_address_t resolved_server_address;
-	client_state_type state = client_state_type::INITIATING_CONNECTION;
+	client_state_type state = client_state_type::NETCODE_NEGOTIATING_CONNECTION;
 
 	client_vars vars;
 	requested_client_settings requested_settings;
