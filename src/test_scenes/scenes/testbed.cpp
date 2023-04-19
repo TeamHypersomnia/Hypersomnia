@@ -172,6 +172,23 @@ static void report_weapon(const auto enum_id, H handle) {
 	entry.id = to_lowercase(augs::enum_to_string(enum_id));
 	entry.pic_filename = entry.id;
 
+	/* TODO EDITOR: remove this when we deprecate maps */
+	if (entry.pic_filename == "awka") {
+		entry.pic_filename = "hpsr";
+	}
+	if (entry.pic_filename == "lews") {
+		entry.pic_filename = "lewsii";
+	}
+	if (entry.pic_filename == "elon") {
+		entry.pic_filename = "elon_hrl";
+	}
+	if (entry.pic_filename == "warx") {
+		entry.pic_filename = "warx_fq12";
+	}
+	if (entry.pic_filename == "datum") {
+		entry.pic_filename = "datum_gun";
+	}
+
 	if (handle.template has<invariants::animation>()) {
 		if (handle.template get<invariants::animation>().id.is_set()) {
 			entry.pic_filename += "_1";

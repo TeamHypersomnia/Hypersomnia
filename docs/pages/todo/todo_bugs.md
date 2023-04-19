@@ -62,6 +62,8 @@ summary: Just a hidden scratchpad.
 
 # Done
 
+- all_necessary_sounds might cause a crash on destruct too
+
 - remember to fix your system time before hosting
 	- fix that damn connect token
 

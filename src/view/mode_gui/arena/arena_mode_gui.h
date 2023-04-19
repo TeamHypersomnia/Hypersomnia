@@ -38,6 +38,8 @@ struct arena_gui_state {
 	mutable std::unique_ptr<augs::populate_with_delays_impl> populator;
 	mutable warmup_welcome_cache warmup;
 
+	mutable augs::sound_source tick_sound;
+
 	arena_gui_state();
 	~arena_gui_state();
 

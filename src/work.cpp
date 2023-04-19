@@ -449,27 +449,6 @@ work_result work(const int argc, const char* const * const argv) try {
 		freetype_library.emplace();
 	}
 
-	std::unique_ptr<setup_variant> current_setup = nullptr;
-
-	auto has_current_setup = [&]() {
-		return current_setup != nullptr;
-	};
-
-	auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
-		using Tag = decltype(tag);
-		using T = type_of_in_place_type_t<Tag>; 
-
-		if (p == nullptr) {
-			p = std::make_unique<setup_variant>(
-				tag,
-				std::forward<decltype(args)>(args)...
-			);
-		}
-		else {
-			p->emplace<T>(std::forward<decltype(args)>(args)...);
-		}
-	};
-
 	if (params.type == app_type::MASTERSERVER) {
 		auto adjusted_config = config;
 		auto& masterserver = adjusted_config.masterserver;
@@ -659,8 +638,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		start.port = bound_port;
 
 #if BUILD_NETWORKING
-		emplace_current_setup(
-			std::in_place_type_t<server_setup>(),
+		auto server_ptr = std::make_unique<server_setup>(
 			lua,
 			*official,
 			start,
@@ -674,7 +652,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			params.suppress_server_webhook
 		);
 
-		auto& server = std::get<server_setup>(*current_setup);
+		auto& server = *server_ptr;
 
 		while (server.is_running()) {
 			const auto zoom = 1.f;
@@ -855,6 +833,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		The lambdas that aid to make the main loop code more concise.
 	*/	
 
+	std::unique_ptr<setup_variant> current_setup = nullptr;
+
+	auto has_current_setup = [&]() {
+		return current_setup != nullptr;
+	};
+
 	auto visit_current_setup = [&](auto callback) -> decltype(auto) {
 		if (has_current_setup()) {
 			return std::visit(
@@ -987,6 +971,21 @@ work_result work(const int argc, const char* const * const argv) try {
 					restart_nat_detection();
 				}
 			}
+		}
+	};
+
+	auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
+		using Tag = decltype(tag);
+		using T = type_of_in_place_type_t<Tag>; 
+
+		if (p == nullptr) {
+			p = std::make_unique<setup_variant>(
+				tag,
+				std::forward<decltype(args)>(args)...
+			);
+		}
+		else {
+			p->emplace<T>(std::forward<decltype(args)>(args)...);
 		}
 	};
 

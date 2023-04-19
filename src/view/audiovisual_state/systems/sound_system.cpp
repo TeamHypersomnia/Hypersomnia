@@ -863,12 +863,21 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 
 				const auto max_divergence = in.settings.max_divergence_before_sync_secs;
 
-				augs::reseek_to_sync_if_needed cmd;
-				cmd.proxy_id = source.id;
-				cmd.expected_secs = expected_secs;
-				cmd.max_divergence = max_divergence;
-				
-				renderer.push_command(cmd);
+				if (total_lived_secs >= secs && total_lived_cycles + 1 >= m.repetitions) {
+					augs::source_no_arg_command cmd;
+					cmd.proxy_id = source.id;
+					cmd.type = augs::source_no_arg_command_type::STOP;
+
+					renderer.push_command(cmd);
+				}
+				else {
+					augs::reseek_to_sync_if_needed cmd;
+					cmd.proxy_id = source.id;
+					cmd.expected_secs = expected_secs;
+					cmd.max_divergence = max_divergence;
+
+					renderer.push_command(cmd);
+				}
 			}
 		}
 	};

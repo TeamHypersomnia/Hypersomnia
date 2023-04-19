@@ -13,6 +13,7 @@ summary: That which we are brainstorming at the moment.
             - It's enough to look up the downloaded resource hash from the map we're replacing/downloading new versions for.
                 - Will cover 90% of the cases.
 
+
 - Note we cannot do the de_cyberaqua vs de_cyberaqua.old swap WITHOUT PROMPTING if there are only 2 versions
     - This way a malicious server could wipe everyone's maps by constantly changing them once someone connects
 
