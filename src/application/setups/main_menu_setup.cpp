@@ -90,7 +90,7 @@ main_menu_setup::main_menu_setup(
 		menu_theme.emplace(settings.menu_theme_path);
 	}
 	catch (const std::runtime_error& err) {
-		LOG("Warning: could not load the main menu theme:\n%x", err.what());
+		// LOG("Warning: could not load the main menu theme:\n%x", err.what());
 	}
 
 	query_latest_news(settings.latest_news_url);
