@@ -74,7 +74,7 @@ message_handler_result client_adapter::process_message(yojimbo::Message& m, H&& 
 
 				using P = payload_of_t<net_message_type>;
 
-				return handler.template handle_server_payload<remove_cref<P>>(std::move(read_payload_into));
+				return handler.template handle_payload<remove_cref<P>>(std::move(read_payload_into));
 			}
 		}
 	);

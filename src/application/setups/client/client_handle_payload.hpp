@@ -6,7 +6,7 @@ using initial_snapshot_payload = full_arena_snapshot_payload<false>;
 void snap_interpolated_to_logical(cosmos&);
 
 template <class T, class F>
-message_handler_result client_setup::handle_server_payload(
+message_handler_result client_setup::handle_payload(
 	F&& read_payload
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;

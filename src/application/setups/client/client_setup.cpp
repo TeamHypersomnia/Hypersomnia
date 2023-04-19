@@ -36,7 +36,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "application/gui/client/demo_player_gui.hpp"
 
-#include "application/setups/client/handle_server_payload.hpp"
+#include "application/setups/client/client_handle_payload.hpp"
 #include "application/network/resolve_address.h"
 #include "augs/network/netcode_sockets.h"
 #include "application/network/resolve_address_result.h"
@@ -109,7 +109,7 @@ void client_setup::demo_replay_server_messages_from(const demo_step& step) {
 
 			using P = payload_of_t<net_message_type>;
 
-			return handle_server_payload<remove_cref<P>>(std::move(read_payload_into));
+			return handle_payload<remove_cref<P>>(std::move(read_payload_into));
 		};
 
 		try {
@@ -484,7 +484,7 @@ bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
 	return true;
 }
 
-void client_setup::handle_server_payloads() {
+void client_setup::handle_incoming_payloads() {
 	namespace N = net_messages;
 
 	if (vars.network_simulator.value.loss_percent >= 100.f) {

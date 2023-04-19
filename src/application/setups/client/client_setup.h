@@ -182,13 +182,13 @@ class client_setup :
 		}
 	}
 
-	void handle_server_payloads();
+	void handle_incoming_payloads();
 	void send_pending_commands();
 	void send_packets_if_its_time();
 	void traverse_nat_if_required();
 
 	template <class T, class F>
-	message_handler_result handle_server_payload(
+	message_handler_result handle_payload(
 		F&& read_payload
 	);
 
@@ -676,7 +676,7 @@ public:
 			advance_single_step(
 				in, 
 				callbacks, 
-				[this](){ handle_server_payloads(); }, 
+				[this](){ handle_incoming_payloads(); }, 
 				local_entropy_provider
 			);
 		}
