@@ -163,6 +163,43 @@ message_handler_result server_setup::handle_payload(
 				c.last_keyboard_activity_time = server_time;
 				break;
 
+			case special_client_request::RESYNC_ARENA_AFTER_FILES_DOWNLOADED:
+				LOG("Client is asking for a resync after download.");
+				
+				if (!c.is_downloading_files) {
+					LOG("Client notified about downloads completion twice.");
+					return abort_v;
+				}
+
+				{
+					server_broadcasted_chat message;
+					message.target = chat_target_type::FINISHED_DOWNLOADING;
+
+					if (const auto session_id = find_session_id(client_id)) {
+						message.author = *session_id;
+
+						const auto except = client_id;
+						broadcast(message, except);
+					}
+				}
+
+				c.is_downloading_files = false;
+
+				/* Prevent kick after the inactivity period */
+
+				c.last_valid_payload_time = server_time;
+				c.last_keyboard_activity_time = server_time;
+
+				/* 
+					Resync entire solvable as if the client has just connected. 
+				*/
+
+				c.reset_solvable_stream();
+				send_complete_solvable_state_to(client_id);
+				reinference_necessary = true;
+
+				break;
+
 			case special_client_request::RESYNC_ARENA:
 				if (server_time >= c.last_resync_counter_reset_at + vars.reset_resync_timer_once_every_secs) {
 					c.resyncs_counter = 0;
@@ -179,27 +216,7 @@ message_handler_result server_setup::handle_payload(
 					return abort_v;
 				}
 
-				{
-					const auto rcon_level = get_rcon_level(client_id);
-
-					server->send_payload(
-						client_id, 
-						game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
-
-						buffers,
-
-						clean_round_state,
-						scene.world.get_common_significant().flavours,
-
-						full_arena_snapshot_payload<true> {
-							scene.world.get_solvable().significant,
-							current_mode,
-							client_id,
-							rcon_level
-						}
-					);
-				}
-
+				send_full_arena_snapshot_to(client_id);
 				reinference_necessary = true;
 
 				break;
@@ -261,6 +278,68 @@ message_handler_result server_setup::handle_payload(
 			else {
 				kick(client_id, "sending an invalid avatar");
 			}
+		}
+	}
+	else if constexpr (std::is_same_v<T, ::request_arena_file_download>) {
+		if (!vars.allow_arena_file_downloads) {
+			kick(client_id, "This server disabled downloading arenas.");
+			return abort_v;
+		}
+
+		auto kick_file_not_found = [&]() {
+			kick(client_id, "Requested file was not found on the server.");
+			return abort_v;
+		};
+
+		/*
+		   	TODO: Check if the previous file transfer is complete, for security.
+			Should probably check if the channel is empty, and if it's not, just kick.
+		*/
+
+		if (const auto found_file_path = mapped_or_nullptr(arena_files_database, payload.requested_file_hash)) {
+			file_download_payload sent_file_payload;
+
+			try {
+				if (found_file_path->extension() == ".json") {
+					const auto str = augs::file_to_string_crlf_to_lf(*found_file_path);
+
+					sent_file_payload.file_bytes.assign(
+						reinterpret_cast<const std::byte*>(str.data()),
+						reinterpret_cast<const std::byte*>(str.data() + str.size())
+					);
+				}
+				else {
+					sent_file_payload.file_bytes = augs::file_to_bytes(*found_file_path);
+				}
+			}
+			catch (...) {
+				return kick_file_not_found();
+			}
+
+			if (!c.is_downloading_files) {
+				server_broadcasted_chat message;
+				message.target = chat_target_type::DOWNLOADING_FILES;
+
+				if (const auto session_id = find_session_id(client_id)) {
+					message.author = *session_id;
+
+					const auto except = client_id;
+					broadcast(message, except);
+				}
+			}
+
+			c.is_downloading_files = true;
+			c.when_last_sent_file_packet = get_current_time();
+
+			server->send_payload(
+				client_id, 
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+
+				sent_file_payload
+			);
+		}
+		else {
+			return kick_file_not_found();
 		}
 	}
 	else {

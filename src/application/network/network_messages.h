@@ -15,6 +15,7 @@
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "game/common_state/entity_flavours.h"
 #include "application/setups/server/public_settings_update.h"
+#include "application/setups/server/request_arena_file_download.h"
 #include "game/modes/session_id.h"
 #include "application/network/net_serialize.h"
 
@@ -257,6 +258,26 @@ namespace net_messages {
 		);
 	};
 
+	struct request_arena_file_download : net_message_with_payload<::request_arena_file_download> {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+	};
+
+	struct file_download : only_block_message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		bool read_payload(
+			file_download_payload&
+		);
+
+		template <class F>
+		bool write_payload(
+			F block_allocator,
+			const file_download_payload&
+		);
+	};
+
 	using all_t = type_list<
 		client_welcome*,
 		public_settings_update*, 
@@ -275,7 +296,9 @@ namespace net_messages {
 		client_requested_chat*,
 		server_broadcasted_chat*,
 		net_statistics_update*,
-		player_avatar_exchange*
+		player_avatar_exchange*,
+		request_arena_file_download*,
+		file_download*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

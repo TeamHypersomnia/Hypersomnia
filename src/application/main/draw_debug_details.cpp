@@ -43,7 +43,7 @@ void debug_details_summaries::acquire(
 		const bool in_bytes = false;
 
 		if (in_bytes) {
-			return readable_bytesize(kbits / 8 * 1000);
+			return readable_bytesize(kbits * 1000 / 8);
 		}
 
 		return readable_bitsize(kbits * 1000);

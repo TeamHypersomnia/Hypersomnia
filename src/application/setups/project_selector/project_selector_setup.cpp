@@ -105,6 +105,11 @@ static editor_project_meta read_meta_from(const augs::path_type& arena_folder_pa
 
 std::optional<project_tab_type> project_selector_setup::is_project_name_taken(const arena_identifier& arena_name) const {
 	using P = project_tab_type;
+
+	if (arena_name == arena_identifier("autosave")) {
+		return project_tab_type::OFFICIAL_ARENAS;
+	}
+
 	for (auto i = P::MY_PROJECTS; i < P::COUNT; i = P(int(i) + 1)) {
 		for (auto& e : gui.projects_view.tabs[i].entries) {
 			if (arena_name == e.arena_name) {
@@ -633,8 +638,12 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 
 		const auto taken_reason = setup.is_project_name_taken(std::string(name));
 
-		auto describe_reason_taken = [](const project_tab_type reason) {
+		auto describe_reason_taken = [this](const project_tab_type reason) {
 			switch (reason) {
+				if (name == arena_identifier("autosave")) {
+					return "Forbidden name.";
+				}
+
 				case project_tab_type::MY_PROJECTS:
 					return "Project with this name already exists.";
 				case project_tab_type::OFFICIAL_ARENAS:
@@ -670,7 +679,8 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 	const auto taken_reason = setup.is_project_name_taken(std::string(name));
 
 	const bool is_disabled = 
-		(taken_reason != std::nullopt && taken_reason != project_tab_type::DOWNLOADED_ARENAS)
+		name == arena_identifier("autosave")
+		|| (taken_reason != std::nullopt && taken_reason != project_tab_type::DOWNLOADED_ARENAS)
 		|| sanitized_path == nullptr 
 		|| *sanitized_path != (EDITOR_PROJECTS_DIR / std::string(name))
 	;

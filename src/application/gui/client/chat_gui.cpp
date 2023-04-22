@@ -172,6 +172,18 @@ chat_gui_entry chat_gui_entry::from(
 			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
 			break;
 
+		case chat_target_type::DOWNLOADING_FILES:
+			new_entry.author.clear();
+			new_entry.message = typesafe_sprintf("%x is downloading files.", author);
+			new_entry.overridden_message_color = yellow;
+			break;
+
+		case chat_target_type::FINISHED_DOWNLOADING:
+			new_entry.author.clear();
+			new_entry.message = typesafe_sprintf("%x finished downloading files.", author);
+			new_entry.overridden_message_color = green;
+			break;
+
 		case chat_target_type::BAN:
 			new_entry.author.clear();
 			new_entry.message = typesafe_sprintf("%x was banned from the server.\nReason: %x", author, message_str);

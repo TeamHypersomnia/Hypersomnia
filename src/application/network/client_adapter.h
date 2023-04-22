@@ -2,6 +2,7 @@
 #include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 #include "augs/network/network_simulator_settings.h"
+#include "application/network/game_channel_type.h"
 
 struct netcode_socket_t;
 struct resolve_address_result;
@@ -42,6 +43,7 @@ public:
 	);
 
 	void send_packets();
+	void receive_packets();
 
 	template <class... Args>
 	bool send_payload(
@@ -60,4 +62,6 @@ public:
 	network_info get_network_info() const;
 
 	const netcode_socket_t* find_underlying_socket() const;
+
+	yojimbo::BlockProgress get_block_progress(game_channel_type) const;
 };

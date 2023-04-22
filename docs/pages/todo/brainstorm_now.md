@@ -6,8 +6,174 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- impose that 10mb limit in editor too
+
+- point/area markers -> spots/zones
+
+- remember to uncomment looking in editor files once we're done
+    - and dont commit webhookd suppression 
+
+
+- percents next to nickname
+    - client will have to send them on their own every second like ping, on volatile statistics channel
+
+- fix broken chat when client downloads files, although not that important
+
+- log should call to hex format automatically
+
+- Net solvable is too large for such a simple map, check other maps
+    - The official content populator was reserving entities... 3000 for each type. Fixed.
+
+
+- Note client will be disconnected if arena contains files that do not exist
+
+- Lain ambience could be good for some maps lol
+
+- Remember about proper reinference both on the server and the client whenever complete solvable is sent
+    - The client reinfers anyway whenever a snapshot arrives
+
+- Won't chat be broken if we don't send solvables?
+    - Since displaying it depends on the mode state
+        - Not necessarily, I think chat messages are fully formatted before being sent
+
+- Could the server's first initial_state_payload be misconstrued as the post-download resynced arena?
+    - Solution: simply send files in the same channel as the solvables
+        - Bonus points: less memory wasted
+        - Another bonus points: state snapshots can use more MB
+        
+    - That would be bad
+    - The initial one could very well arrive well after the arena is downloaded
+
+- is_gameplay_on returning false should take care of arena handle usage
+    - What is being rendered while we download though?
+        - Especially if we start once we were already in the game
+    - get_viewed_character_id will return dead entity when is_gameplay_on is false
+        - so it should be fine, the old arena proabably will never be referenced in viewing code
+
+- Shouldn't we handle networked_server_step_entropy?
+    - Point is to clear local pending entropies
+    - But if we resync after finishing download we should begin with no entropies at all anyway
+        - Watch out for receiver.predicted_entropies, this might get filled
+        - Shouldn't we anyway only send entropies if we are on a valid arena? This will fix this problem
+            - Unless there are already some receiver.predicted_entropies but suddenly the map is changed and we didn't clear it
+            - Note the entire resolution of accepted entropies and clearing them is resolved under if (in_game) {
+                - in_game will be false when we download
+                - Then I believe we should clear the pending entropies when we start the download
+                    - But the server should also clear the incoming ones in its client state
+                    
+
+- Careful about avatars. See if new players are synchronized correctly while we download.
+    - Technically any new avatar should go to untimely payloads as there will not be any arena
+        - And it should properly be handled once the resync arrives with new arena state where handle_untimely_payloads will find the relevant session ids 
+
+- For resyncing, let's revert the client back to PENDING_WELCOME.
+    - Not sure anymore.
+        - This might be less predictable once connection initialization is more complex
+            - Since we force it to be repeated entirely
+        - Maybe just explicitly resync the entire solvable
+            - Since we know it's the only thing that gets paused during arena files transmission
+        - And have an explicit clause for when the client is downloading
+        - This is tempting because client's gui would react out of the box
+    - The real q is what does the client do when it knows its state is IN_GAME
+        - E.g. it sends the avatar
+        - For the initial connection, it might even be the case that we won't enter IN_GAME until after we have downloaded the arena.
+            - The solvable might arrive first before initial arena payload arrives
+                - And we set the state to in_game only once initial arena payload arrives
+            - So player's avatar wouldn't arrive until after we've downloaded the map
+                - Not a bad thing; they will be in spectators anyway and this way we even prioritize bandwidth
+        - So the q is if the game will behave correctly when we can stay in downloading state both during IN_GAME state as well as RECEIVING_INITIAL_SNAPSHOT
+            - Cannot be an earlier state since the first server_solvable_vars triggers RECEIVING_INITIAL_SNAPSHOT
+                - it will stay in that mode until we finish download
+                    - that is because IN_GAME is triggered only with the first initial arena state payload
+
+    - This way we can revert the state easily both the client and the server.
+        - Just do not resend the avatar I guess?
+    - Watch out because the client might already be added to the game, as in, registered in the mode
+        - and we always ensure we don't do it twice
+        - Shouldn't be a problem: looks like we register the player in mode as soon as the state is WELCOME_ARRIVED
+            - and we'd revert back to 
+
+- Let's keep the ability to chat btw
+- Corner case: client received solvable vars with a custom arena..
+    - ..client requests download
+    - But the server didn't receive it yet and another solvable with another arena arrives 
+        - We should just ignore all solvable vars, perhaps even with public client settings, and resync completely
+
+- Always scan the part directory
+    - Because we might have left a download halfway
+
+- What happens if the current arena changes during our download session?
+    - Note as it stands we're applying server solvables as they go
+        - We only pause the entropy streams 
+    - So I guess we should also resynchronize the server solvable vars
+        - Wouldn't it be easier to stop all solvable streams and just revert client back to WELCOME_ARRIVED state upon resync?
+            - And do not interrupt map downloads
+
+- retest hex generation locally on maps
+
+- reset keyboard afk timer when downloading complete
+
+- Note the block size itself is a notification of the file size, we should be able to read from that
+
+- Pausing solvable streams for clients
+    - Do we want to though?
+        - Some important public client settings are sent through
+    - We can easily interrupt just the entropy streams and leave server solvable vars and public settings intact
+
+- Disable naming maps "autosave"
+    - Otherwise it might fuck up maps, autosave will literally be deleted
+
+- Remember to also resend solvable vars once files download
+
+- We need to say which map's file we're interested in! 
+    - We can't just use an index and assume the server will be able to understand it
+    - This is also future proof as it will let us download all maps from a server if some allow it in the future
+- Therefore, the server needs a per-hash content database
+    - For now it can just generate it on the go from all loaded maps 
+        - The client will thus be able to download content only of arenas that have been played at least once
+    - Old maps might get wrong hashes once they are modified
+        - But then it's just a case of loading the map again on the server, it's unrealistic to think files will change there for some reason and someone will want to download them
+        - We can just say download failed. Server could find the file
+            - this will leave the map in the .part state exactly as if we had disconnected, no biggie
+
+able to request per map
+
+- Also which one do we replace if we have a map in both downloads and user projects?
+    - Default to downloads right now
+
+- Idea
+    - First always download maps to de_knysza.part
+        - Only once it's complete move it to de_knysza.new
+        - Then after playing, a dialog
+            - "Your last downloaded de_knysza differs from the local version. Do you want to apply it? (Upgrade) (Discard) (Cancel)"
+
+- Server config could specify if they allow downloading maps? But should be on by default and maybe not disablable from UI
+    - We will always send files one by one, to not have to allocate space for more messages in reliable channel.
+        - We'll ask for file hashes, server has to create and keep a map from hash to path when loading any arena
+        
+    - Purpose would be to save memory space really: The channel for file transmission wouldn't be created
 
 - Transmitting maps and resources (finally)
+    - The client's request may come WELL AFTER we have connected!
+        - Why? The server might change the map while the client is already in game!
+    - So let's even begin by designing AND testing for this case
+        - SO - What if we're already connected and the map changes to a non-existing map?
+            - This could only happen with a new server solvable vars
+
+    - The server does not really have to hold the json file in memory, although it might be useful
+        - At first we can treat it like any other file
+    - First download the json file maybe so that the client knows what to ask for
+        - We ask by hashes not paths to be secure, and also because there might be more than one file with this hash anyway
+    - So we can have two client->server commands
+        - Request map file
+        - Request map resource
+    - Hard part will be to sustain the connection client-side without crashing in absence of a valid arena perhaps?
+        - lol we could first download the json file and read it, only later paste files
+        - this is where determinism with just the json file will come in handy
+        - although no, it'd be silly to show an incomplete map
+        - what about showing the chat etc
+            - do we even send chat messages to clients not in game?
+
     - Reusing resources for new versions of maps.
         - Will naturally happen frequently when hosting playtesting sessions from editor.
         - We don't have to start with a full-blown content database.
@@ -31,6 +197,16 @@ summary: That which we are brainstorming at the moment.
     - We'll still be sending solvables etc. to stay connected
         - We just won't show the arena on client screen as long as they are requesting anything
         - Once we're done we will have to re-request a state correction 
+    - We should impose a maximum size limit per file 
+        - e.g. 16 MB
+            - Simplifies implementation because we can just send a single yojimbo block
+            - Forces people to be more mindful of the file sizes
+            - Good for security too
+        - Wrong file sizes will be ignored
+        - However we should have a separate channel so that 16 MB isn't allocated every time we connect to an existing map
+        - Remember though this is per-client.
+            - This will shoot up our memory consumption to 64 * 16
+            - I think 8 MB is enough, even free discord has that limit lol
 
 
 - Note we cannot do the de_cyberaqua vs de_cyberaqua.old swap WITHOUT PROMPTING if there are only 2 versions

@@ -284,6 +284,14 @@ namespace editor_project_readwrite {
 		const editor_resource_pools& officials,
 		const editor_official_resource_map& officials_map
 	) {
+		/* 
+			Scan before stringifying resource ids.
+			If we scanned later, mark_changed_resources could return false positives,
+			because ids are compared by stringified ids when either is set.
+		*/
+
+		const bool any_external_resources_to_track = project.rescan_pathed_resources_to_track(officials, officials_map);
+
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 		//writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
@@ -505,9 +513,7 @@ namespace editor_project_readwrite {
 		};
 
 		auto write_external_resources = [&]() {
-			const bool any_to_track = project.rescan_pathed_resources_to_track(officials, officials_map);
-
-			if (!any_to_track) {
+			if (!any_external_resources_to_track) {
 				return;
 			}
 
@@ -615,6 +621,14 @@ namespace editor_project_readwrite {
 						writer.String(pseudoid);
 
 						::setup_node_defaults(defaults.editable, *resource);
+
+						/* 
+							Force position to always be written,
+							even if it's default at [0, 0].
+						*/
+
+						defaults.editable.pos = typed_node.editable.pos + vec2(1, 1);
+
 						augs::write_json_diff(writer, typed_node.editable, defaults.editable);
 						::on_each_resource_id_in_object(defaults.editable, stringify_id);
 
@@ -1260,6 +1274,72 @@ namespace editor_project_readwrite {
 		}
 
 		return loaded;
+	}
+
+	external_resource_database read_only_external_resources(
+		const augs::path_type& project_dir,
+		const std::string& loaded_project_json
+	) {
+		external_resource_database database;
+
+		const auto document = augs::json_document_from(loaded_project_json);
+		const auto maybe_externals = FindArray(document, "external_resources");
+
+		if (!maybe_externals) {
+			return database;
+		}
+
+		std::unordered_set<augs::path_type> existing;
+
+		for (auto& resource : *maybe_externals) {
+			if (!resource.IsObject()) {
+				continue;
+			}
+
+			if (!resource.HasMember("path") || !resource["path"].IsString()) {
+				continue;
+			}
+
+			if (!resource.HasMember("file_hash") || !resource["file_hash"].IsString()) {
+				continue;
+			}
+
+			const auto file_hash = resource["file_hash"].GetString();
+			const auto untrusted_path = resource["path"].GetString();
+
+			std::visit(
+				[&]<typename R>(const R& result) {
+					if constexpr(std::is_same_v<R, sanitization::forbidden_path_type>) {
+						const auto err = typesafe_sprintf(
+							"Failed to load %x:\n%x",
+							untrusted_path,
+							sanitization::describe(result)
+						);
+
+						throw augs::json_deserialization_error(err);
+					}
+					else if constexpr(std::is_same_v<R, augs::path_type>) {
+						const auto& path = result;
+
+						if (found_in(existing, path)) {
+							throw augs::json_deserialization_error("Duplicate entries for %x!", path);
+
+							return;
+						}
+
+						existing.emplace(path);
+						database.emplace_back(path, augs::to_secure_hash_byte_format(file_hash));
+					}
+					else {
+						static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
+					}
+				},
+
+				sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path)
+			);
+		}
+
+		return database;
 	}
 
 	editor_project_about read_only_project_about(const augs::path_type& json_path) {

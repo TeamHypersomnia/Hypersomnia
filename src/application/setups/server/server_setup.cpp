@@ -39,6 +39,8 @@
 #include "3rdparty/include_httplib.h"
 #include "application/setups/server/webhooks.h"
 #include "game/messages/hud_message.h"
+#include "application/setups/editor/resources/resource_traits.h"
+#include "augs/readwrite/json_readwrite_errors.h"
 
 const auto only_connected_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
@@ -50,6 +52,112 @@ const auto connected_and_integrated_v = server_setup::for_each_flags {
 };
 
 #include "application/setups/server/server_handle_payload.hpp"
+
+server_setup::server_setup(
+	sol::state& lua,
+	const packaged_official_content& official,
+	const augs::server_listen_input& in,
+	const server_vars& initial_vars,
+	const server_solvable_vars& initial_solvable_vars,
+	const client_vars& integrated_client_vars,
+	const private_server_vars& private_initial_vars,
+	const std::optional<augs::dedicated_server_input> dedicated,
+	const server_nat_traversal_input& nat_traversal_input,
+	bool suppress_community_server_webhook_this_run
+) : 
+	integrated_client_vars(integrated_client_vars),
+	lua(lua),
+	official(official),
+	last_loaded_project(std::make_unique<editor_project>()),
+	last_start(in),
+	dedicated(dedicated),
+	server(
+		std::make_unique<server_adapter>(
+			in,
+			[this](auto&&... args) {
+				if (respond_to_ping_requests(std::forward<decltype(args)>(args)...)) {
+					return true;
+				}
+
+				return nat_traversal.handle_auxiliary_command(std::forward<decltype(args)>(args)...); 
+			}
+		)
+	),
+	server_time(yojimbo_time()),
+	nat_traversal(nat_traversal_input, resolved_server_list_addr),
+	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
+{
+	const bool force = true;
+
+	{
+		auto initial_vars_modified = initial_vars;
+		auto source_server_name = std::string(initial_vars_modified.server_name);
+		str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.nickname));
+		initial_vars_modified.server_name = source_server_name;
+
+		apply(initial_vars_modified, force);
+	}
+
+	apply(private_initial_vars, force);
+	apply(initial_solvable_vars, force);
+
+	if (private_initial_vars.master_rcon_password.empty()) {
+		LOG("WARNING! The master rcon password is empty! This means that only the localhost can access the master rcon.");
+	}
+
+	if (private_initial_vars.rcon_password.empty()) {
+		LOG("WARNING! The rcon password is empty! This means that only the localhost can access the rcon.");
+	}
+
+	if (dedicated == std::nullopt) {
+		integrated_client.init(server_time);
+		integrated_client.settings.chosen_nickname = integrated_client_vars.nickname;
+
+		if (!integrated_client_vars.avatar_image_path.empty()) {
+			auto& image_bytes = integrated_client.meta.avatar.image_bytes;
+
+			try {
+				image_bytes = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
+
+				const auto size = augs::image::get_size(image_bytes);
+
+				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+					image_bytes.clear();
+				}
+			}
+			catch (...) {
+				image_bytes.clear();
+			}
+		}
+
+		push_connected_webhook(to_mode_player_id(get_integrated_client_id()));
+
+		rebuild_player_meta_viewables = true;
+	}
+
+	const bool conditions_fulfilled = [&]() {
+		if (dedicated == std::nullopt) {
+			if (!nickname_len_in_range(integrated_client_vars.nickname.length())) {
+				failure_reason = typesafe_sprintf(
+					"The nickname should have between %x and %x bytes.", 
+					min_nickname_length_v,
+					max_nickname_length_v
+				);
+
+				return false;
+			}
+		}
+
+		return true;
+
+	}();
+
+	if (!conditions_fulfilled) {
+		shutdown();
+	}
+
+	resolve_server_list();
+}
 
 void server_setup::reset_afk_timer() {
 	integrated_client.last_keyboard_activity_time = server_time;
@@ -404,111 +512,6 @@ bool server_setup::respond_to_ping_requests(
 	}
 
 	return false;
-}
-
-server_setup::server_setup(
-	sol::state& lua,
-	const packaged_official_content& official,
-	const augs::server_listen_input& in,
-	const server_vars& initial_vars,
-	const server_solvable_vars& initial_solvable_vars,
-	const client_vars& integrated_client_vars,
-	const private_server_vars& private_initial_vars,
-	const std::optional<augs::dedicated_server_input> dedicated,
-	const server_nat_traversal_input& nat_traversal_input,
-	bool suppress_community_server_webhook_this_run
-) : 
-	integrated_client_vars(integrated_client_vars),
-	lua(lua),
-	official(official),
-	last_start(in),
-	dedicated(dedicated),
-	server(
-		std::make_unique<server_adapter>(
-			in,
-			[this](auto&&... args) {
-				if (respond_to_ping_requests(std::forward<decltype(args)>(args)...)) {
-					return true;
-				}
-
-				return nat_traversal.handle_auxiliary_command(std::forward<decltype(args)>(args)...); 
-			}
-		)
-	),
-	server_time(yojimbo_time()),
-	nat_traversal(nat_traversal_input, resolved_server_list_addr),
-	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
-{
-	const bool force = true;
-
-	{
-		auto initial_vars_modified = initial_vars;
-		auto source_server_name = std::string(initial_vars_modified.server_name);
-		str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.nickname));
-		initial_vars_modified.server_name = source_server_name;
-
-		apply(initial_vars_modified, force);
-	}
-
-	apply(private_initial_vars, force);
-	apply(initial_solvable_vars, force);
-
-	if (private_initial_vars.master_rcon_password.empty()) {
-		LOG("WARNING! The master rcon password is empty! This means that only the localhost can access the master rcon.");
-	}
-
-	if (private_initial_vars.rcon_password.empty()) {
-		LOG("WARNING! The rcon password is empty! This means that only the localhost can access the rcon.");
-	}
-
-	if (dedicated == std::nullopt) {
-		integrated_client.init(server_time);
-		integrated_client.settings.chosen_nickname = integrated_client_vars.nickname;
-
-		if (!integrated_client_vars.avatar_image_path.empty()) {
-			auto& image_bytes = integrated_client.meta.avatar.image_bytes;
-
-			try {
-				image_bytes = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
-
-				const auto size = augs::image::get_size(image_bytes);
-
-				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
-					image_bytes.clear();
-				}
-			}
-			catch (...) {
-				image_bytes.clear();
-			}
-		}
-
-		push_connected_webhook(to_mode_player_id(get_integrated_client_id()));
-
-		rebuild_player_meta_viewables = true;
-	}
-
-	const bool conditions_fulfilled = [&]() {
-		if (dedicated == std::nullopt) {
-			if (!nickname_len_in_range(integrated_client_vars.nickname.length())) {
-				failure_reason = typesafe_sprintf(
-					"The nickname should have between %x and %x bytes.", 
-					min_nickname_length_v,
-					max_nickname_length_v
-				);
-
-				return false;
-			}
-		}
-
-		return true;
-
-	}();
-
-	if (!conditions_fulfilled) {
-		shutdown();
-	}
-
-	resolve_server_list();
 }
 
 uint32_t server_setup::get_max_connections() const {
@@ -913,6 +916,12 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 			try {
 				choose_arena(new_vars.current_arena);
 			}
+			catch (const augs::json_deserialization_error& err) {
+				LOG("Failed to load \"%x\":\n%x.", new_vars.current_arena, err.what());
+
+				const auto test_scene_arena = "";
+				choose_arena(test_scene_arena);
+			}
 			catch (const augs::file_open_error& err) {
 				/* 
 					TODO!!! 
@@ -927,9 +936,17 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 				const auto test_scene_arena = "";
 				choose_arena(test_scene_arena);
 			}
+			catch (...) {
+				const auto test_scene_arena = "";
+				choose_arena(test_scene_arena);
+			}
 		}
 
-		auto broadcast_new_vars = [&](const auto recipient_id, auto&) {
+		auto broadcast_new_vars = [&](const auto recipient_id, const auto& c) {
+			if (c.should_pause_solvable_stream()) {
+				return;
+			}
+
 			server->send_payload(
 				recipient_id,
 				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
@@ -968,6 +985,25 @@ void server_setup::apply(const config_lua_table& cfg) {
 	}
 }
 
+void register_external_resources_of(
+	const editor_project& project,
+	const augs::path_type& arena_folder_path,
+	arena_files_database_type& database
+) {
+	project.resources.pools.for_each_container(
+		[&]<typename P>(const P& pool) {
+			using R = typename P::mapped_type;
+
+			if constexpr(is_pathed_resource_v<R>) {
+				for (auto& resource : pool) {
+					const auto& file = resource.external_file;
+					database[augs::to_secure_hash_byte_format(file.file_hash)] = arena_folder_path / file.path_in_project;
+				}
+			}
+		}
+	);
+}
+
 void server_setup::choose_arena(const std::string& name) {
 	LOG("Choosing arena: %x", name);
 
@@ -981,14 +1017,44 @@ void server_setup::choose_arena(const std::string& name) {
 			name,
 			solvable_vars.override_default_ruleset,
 			clean_round_state,
-			solvable_vars.playtesting_context
+			solvable_vars.playtesting_context,
+			std::addressof(*last_loaded_project)
 		});
 
 		solvable_vars.current_arena = name;
 		solvable_vars.required_arena_hash = result.required_hash;
 		current_arena_folder = result.arena_folder_path;
 
-		LOG("Chosen arena hash: %x", augs::to_hex_format(result.required_hash));
+		const auto arena_json_hash = result.required_hash;
+		LOG("Chosen arena hash: %x", augs::to_hex_format(arena_json_hash));
+
+		::register_external_resources_of(
+			*last_loaded_project,
+			current_arena_folder,
+			arena_files_database
+		);
+
+		const auto paths = editor_project_paths(current_arena_folder);
+
+		if (augs::exists(paths.autosave_json)) {
+			LOG("Arena was loaded from the autosave.");
+
+			/* 
+				Properly point to the autosave file if it was the one to be loaded.
+				Otherwise the client would receive the wrong file.
+
+				Note even though we might have loaded an autosave file,
+				The client will always download the arena file as project_name.json.
+
+				The server does not control how filenames are being set on the client
+				(except for external resources in the json file).
+		   	*/
+
+			arena_files_database[arena_json_hash] = paths.autosave_json;
+		}
+		else {
+			arena_files_database[arena_json_hash] = paths.project_json;
+		}
 	}
 
 	arena_gui.reset();
@@ -1055,6 +1121,51 @@ void server_setup::accept_entropy_of_client(
 	if (!entropy.empty()) {
 		step_collected += { mode_id, entropy };
 	}
+}
+
+void server_setup::send_full_arena_snapshot_to(const client_id_type client_id) {
+	const auto sent_client_id = static_cast<uint32_t>(client_id);
+
+	server->send_payload(
+		client_id, 
+		game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+
+		buffers,
+
+		clean_round_state,
+		scene.world.get_common_significant().flavours,
+
+		full_arena_snapshot_payload<true> {
+			scene.world.get_solvable().significant,
+			current_mode,
+			sent_client_id,
+			get_rcon_level(client_id)
+		}
+	);
+}
+
+void server_setup::send_complete_solvable_state_to(const client_id_type client_id) {
+	server->send_payload(
+		client_id, 
+		game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+
+		solvable_vars
+	);
+
+	send_full_arena_snapshot_to(client_id);
+
+	auto download_existing_public_settings  = [this, recipient_client_id = client_id](const auto client_id_of_settings, auto& cc) {
+		const auto downloaded_settings = make_public_settings_update_from(cc, client_id_of_settings);
+
+		server->send_payload(
+			recipient_client_id,
+			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+
+			downloaded_settings
+		);
+	};
+
+	for_each_id_and_client(download_existing_public_settings, connected_and_integrated_v);
 }
 
 void server_setup::advance_clients_state() {
@@ -1203,42 +1314,9 @@ void server_setup::advance_clients_state() {
 		};
 
 		auto send_state_for_the_first_time = [&]() {
-			const auto sent_client_id = static_cast<uint32_t>(client_id);
+			LOG("Sending initial payload for %x at step: %x", client_id, scene.world.get_total_steps_passed());
 
-			server->send_payload(
-				client_id, 
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
-
-				solvable_vars
-			);
-
-			const auto rcon_level = get_rcon_level(client_id);
-
-			if (rcon_level >= rcon_level_type::BASIC) {
-				server->send_payload(
-					client_id, 
-					game_channel_type::COMMUNICATIONS, 
-
-					vars
-				);
-			}
-
-			server->send_payload(
-				client_id, 
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
-
-				buffers,
-
-				clean_round_state,
-				scene.world.get_common_significant().flavours,
-
-				full_arena_snapshot_payload<true> {
-					scene.world.get_solvable().significant,
-					current_mode,
-					sent_client_id,
-					rcon_level
-				}
-			);
+			send_complete_solvable_state_to(client_id);
 
 			{
 				auto download_existing_avatar = [this, recipient_client_id = client_id](const auto client_id_of_avatar, auto& cc) {
@@ -1258,22 +1336,16 @@ void server_setup::advance_clients_state() {
 				for_each_id_and_client(download_existing_avatar, connected_and_integrated_v);
 			}
 
-			{
-				auto download_existing_public_settings  = [this, recipient_client_id = client_id](const auto client_id_of_settings, auto& cc) {
-					const auto downloaded_settings = make_public_settings_update_from(cc, client_id_of_settings);
+			const auto rcon_level = get_rcon_level(client_id);
 
-					server->send_payload(
-						recipient_client_id,
-						game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+			if (rcon_level >= rcon_level_type::BASIC) {
+				server->send_payload(
+					client_id, 
+					game_channel_type::COMMUNICATIONS, 
 
-						downloaded_settings
-					);
-				};
-
-				for_each_id_and_client(download_existing_public_settings, connected_and_integrated_v);
+					vars
+				);
 			}
-
-			LOG("Sending initial payload for %x at step: %x", client_id, scene.world.get_total_steps_passed());
 		};
 
 		if (!added_someone_already) {
@@ -1416,34 +1488,92 @@ void server_setup::handle_client_messages() {
 	return update;
 }
 
-void server_setup::send_server_step_entropies(const compact_server_step_entropy& total_input) {
-	{
-		auto process_client = [&](const auto client_id, auto& c) {
-			if (c.rebroadcast_public_settings) {
-				if (to_mode_player_id(client_id) == get_local_player_id()) {
-					when_last_sent_admin_public_settings = server_time;
-				}
+void server_setup::rebroadcast_public_settings() {
+	auto rebroadcast_if_needed = [&](const auto client_id, auto& c) {
+		if (!c.rebroadcast_public_settings) {
+			return;
+		}
 
-				c.rebroadcast_public_settings = false;
+		c.rebroadcast_public_settings = false;
 
-				const auto broadcasted_update = make_public_settings_update_from(c, client_id);
+		if (to_mode_player_id(client_id) == get_local_player_id()) {
+			when_last_sent_admin_public_settings = server_time;
+		}
 
-				auto update_for_client = [this, &broadcasted_update](const auto recipient_client_id, auto&) {
-					server->send_payload(
-						recipient_client_id, 
-						game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+		const auto broadcasted_update = make_public_settings_update_from(c, client_id);
 
-						broadcasted_update
-					);
-				};
-
-				for_each_id_and_client(update_for_client, only_connected_v);
+		auto update_for_client = [this, &broadcasted_update](const auto recipient_client_id, const auto& c) {
+			if (c.should_pause_solvable_stream()) {
+				return;
 			}
+
+			server->send_payload(
+				recipient_client_id, 
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+
+				broadcasted_update
+			);
 		};
 
-		for_each_id_and_client(process_client, connected_and_integrated_v);
-	}
+		for_each_id_and_client(update_for_client, only_connected_v);
+	};
 
+	for_each_id_and_client(rebroadcast_if_needed, connected_and_integrated_v);
+}
+
+void server_setup::broadcast_net_statistics() {
+	const auto& interval = vars.send_net_statistics_update_once_every_secs;
+
+	if (interval > 0 && server_time - when_last_sent_net_statistics > std::max(interval, 0.5f)) {
+		net_statistics_update update;
+
+		auto gather_stats = [&](const auto client_id, const auto& c) {
+			if (c.state != client_state_type::IN_GAME) {
+				return;
+			}
+
+			const auto max_ping = std::numeric_limits<uint8_t>::max();
+			const auto clamped_ping = [&]() {
+				if (to_mode_player_id(client_id) == get_local_player_id()) {
+					return 0;
+				}
+
+				const auto info = server->get_network_info(client_id);
+				const auto rounded_ping = static_cast<int>(std::round(info.rtt_ms));
+				return std::clamp(rounded_ping, 1, int(max_ping));
+			}();
+
+			last_player_metas[client_id].stats.ping = clamped_ping;
+
+			update.ping_values.push_back(static_cast<uint8_t>(clamped_ping));
+		};
+
+		auto send_stats = [&](const auto client_id, const auto& c) {
+			if (c.should_pause_solvable_stream()) {
+				/* No point sending ping values either */
+				return;
+			}
+
+			if (c.state != client_state_type::IN_GAME) {
+				return;
+			}
+
+			server->send_payload(
+				client_id,
+				game_channel_type::VOLATILE_STATISTICS,
+
+				update
+			);
+		};
+
+		for_each_id_and_client(gather_stats, connected_and_integrated_v);
+		for_each_id_and_client(send_stats, only_connected_v);
+
+		when_last_sent_net_statistics = server_time;
+	}
+}
+
+void server_setup::send_server_step_entropies(const compact_server_step_entropy& total_input) {
 	networked_server_step_entropy total;
 	total.payload = total_input;
 	total.meta.reinference_necessary = reinference_necessary;
@@ -1461,7 +1591,11 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 		return std::nullopt;
 	}();
 
-	auto process_client = [&](const auto client_id, auto& c) {
+	auto send_total_entropy = [&](const auto client_id, auto& c) {
+		if (c.should_pause_solvable_stream()) {
+			return;
+		}
+
 		const bool its_time_already = 
 			c.state >= client_state_type::RECEIVING_INITIAL_SNAPSHOT
 		;
@@ -1500,54 +1634,7 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 		);
 	};
 
-	for_each_id_and_client(process_client, only_connected_v);
-
-	{
-		const auto& interval = vars.send_net_statistics_update_once_every_secs;
-
-		if (interval > 0 && server_time - when_last_sent_net_statistics > std::max(interval, 0.5f)) {
-			net_statistics_update update;
-
-			auto gather_stats = [&](const auto client_id, const auto& c) {
-				if (c.state != client_state_type::IN_GAME) {
-					return;
-				}
-
-				const auto max_ping = std::numeric_limits<uint8_t>::max();
-				const auto clamped_ping = [&]() {
-					if (to_mode_player_id(client_id) == get_local_player_id()) {
-						return 0;
-					}
-
-					const auto info = server->get_network_info(client_id);
-					const auto rounded_ping = static_cast<int>(std::round(info.rtt_ms));
-					return std::clamp(rounded_ping, 1, int(max_ping));
-				}();
-
-				last_player_metas[client_id].stats.ping = clamped_ping;
-
-				update.ping_values.push_back(static_cast<uint8_t>(clamped_ping));
-			};
-
-			auto send_stats = [&](const auto client_id, const auto& c) {
-				if (c.state != client_state_type::IN_GAME) {
-					return;
-				}
-
-				server->send_payload(
-					client_id,
-					game_channel_type::VOLATILE_STATISTICS,
-
-					update
-				);
-			};
-
-			for_each_id_and_client(gather_stats, connected_and_integrated_v);
-			for_each_id_and_client(send_stats, only_connected_v);
-
-			when_last_sent_net_statistics = server_time;
-		}
-	}
+	for_each_id_and_client(send_total_entropy, only_connected_v);
 }
 
 void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& entropy) {
@@ -1556,6 +1643,39 @@ void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& e
 		cosmic::reinfer_solvable(get_arena_handle().get_cosmos());
 		reinference_necessary = false;
 	}
+}
+
+void server_setup::send_packets_to_clients_downloading_files() {
+	const auto target_bandwidth = 2 * 1024 * 1024; // 2 MB per second should be a fine compromise
+	const auto max_packets_at_a_time = 10; // 10k at a time can be sent, so to achieve max bandwidth, just 200 fps on a server is enough.
+
+	/* 
+		Afaik just one fragment is sent per packet, 
+		even if max packet size would allow for more.
+	*/
+
+	const auto packets_per_second = float(target_bandwidth) / block_fragment_size_v;
+	const auto packet_interval = 1.0f / packets_per_second;
+
+	const auto current_time = get_current_time();
+
+	auto send_packets = [&](const auto client_id, auto& c) {
+		if (c.is_downloading_files) {
+			int times_sent = 0;
+
+			while (c.when_last_sent_file_packet <= current_time && times_sent < max_packets_at_a_time) {
+				c.when_last_sent_file_packet += packet_interval;
+
+				server->send_packets_to(client_id);
+				server->receive_packets_from(client_id);
+				++times_sent;
+			}
+
+			c.when_last_sent_file_packet = current_time;
+		}
+	};
+
+	for_each_id_and_client(send_packets, connected_and_integrated_v);
 }
 
 void server_setup::send_packets_if_its_time() {

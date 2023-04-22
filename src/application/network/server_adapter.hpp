@@ -124,7 +124,7 @@ translated_payload_id server_adapter::translate_payload(
 
 	constexpr bool is_block_message_v = std::is_base_of_v<yojimbo::BlockMessage, net_message_type>;
 
-	if (const auto new_message = create_message<net_message_type>(client_id)) {
+	if (auto new_message = create_message<net_message_type>(client_id)) {
 		auto& m = *new_message;
 
 		if constexpr (is_block_message_v) {
@@ -133,7 +133,7 @@ translated_payload_id server_adapter::translate_payload(
 
 			auto allocate_block = [&](const std::size_t requested_size) {
 				allocated_size = requested_size;
-				allocated_block = get_specific().AllocateBlock(client_id, requested_size);
+				allocated_block = (uint8_t*)YOJIMBO_ALLOCATE(yojimbo::GetDefaultAllocator(), requested_size);;
 
 				return allocated_block;
 			};
@@ -144,11 +144,11 @@ translated_payload_id server_adapter::translate_payload(
 			);
 
 			if (translation_result && allocated_block != nullptr) {
-				get_specific().AttachBlockToMessage(client_id, new_message, allocated_block, allocated_size);
+				new_message->AttachBlock( yojimbo::GetDefaultAllocator(), allocated_block, allocated_size );
 				return new_message;
 			}
 
-			get_specific().FreeBlock(client_id, allocated_block);
+			YOJIMBO_FREE(yojimbo::GetDefaultAllocator(), new_message);
 		}
 		else {
 			const auto translation_result = m.write_payload(

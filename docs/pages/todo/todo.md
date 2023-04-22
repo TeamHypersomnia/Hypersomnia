@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- reverb area
+
 - black stroke for stamina/health circular bars because they're invisible on brighter maps
 
 - Show a tooltip with some basic info when hovering resources in filesystem view like the initial size e.g. 32x64

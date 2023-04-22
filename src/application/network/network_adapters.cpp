@@ -44,19 +44,6 @@ game_connection_config::game_connection_config() {
 	numChannels = static_cast<int>(game_channel_type::COUNT);
 	timeout = 10;
 
-#if RESYNCS_CHANNEL
-	{
-		auto& resyncs = channel[static_cast<int>(game_channel_type::RESYNCS)];
-		resyncs.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
-		resyncs.maxBlockSize = max_block_size_v;
-		resyncs.sentPacketBufferSize = 16;
-		resyncs.messageResendTime = 0.f;
-		resyncs.messageSendQueueSize = 16;
-		resyncs.messageReceiveQueueSize = 16;
-		resyncs.packetBudget = 600;
-	}
-#endif
-
 	{
 		auto& solvable_stream = channel[static_cast<int>(game_channel_type::SERVER_SOLVABLE_AND_STEPS)];
 		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
@@ -66,6 +53,8 @@ game_connection_config::game_connection_config() {
 		solvable_stream.messageResendTime = 0.f;
 		solvable_stream.messageSendQueueSize = 1024 * 8;
 		solvable_stream.messageReceiveQueueSize = 1024 * 8;
+		solvable_stream.blockFragmentSize = block_fragment_size_v;
+		solvable_stream.blockFragmentResendTime = 0.15f;
 	}
 
 	{
@@ -95,7 +84,7 @@ game_connection_config::game_connection_config() {
 		stats.type = yojimbo::CHANNEL_TYPE_UNRELIABLE_UNORDERED;
 	}
 
-	serverPerClientMemory += 1024 * 1024 * 7;
+	serverPerClientMemory = 20 * 1024 * 1024;
 	clientMemory = 1024 * 1024 * 50;
 
 	networkSimulator = true;
@@ -207,6 +196,14 @@ void server_adapter::disconnect_client(const client_id_type& id) {
 
 void server_adapter::send_packets() {
 	server.SendPackets();
+}
+
+void server_adapter::send_packets_to(const client_id_type& id) {
+	server.SendPacketsTo(id);
+}
+
+void server_adapter::receive_packets_from(const client_id_type& id) {
+	server.ReceivePacketsFrom(id);
 }
 
 client_adapter::client_adapter(const std::optional<port_type> preferred_binding_port) :
@@ -532,6 +529,10 @@ void client_adapter::send_packets() {
 	client.SendPackets();
 }
 
+void client_adapter::receive_packets() {
+	client.ReceivePackets();
+}
+
 bool client_adapter::can_send_message(const game_channel_type& channel) const {
 	return client.CanSendMessage(static_cast<channel_id_type>(channel));
 }
@@ -691,6 +692,10 @@ const netcode_socket_t* client_adapter::find_underlying_socket() const {
 	}
 
 	return nullptr;
+}
+
+yojimbo::BlockProgress client_adapter::get_block_progress(const game_channel_type channel) const {
+	return client.GetBlockProgress(static_cast<int>(channel));
 }
 
 const netcode_socket_t* server_adapter::find_underlying_socket() const {

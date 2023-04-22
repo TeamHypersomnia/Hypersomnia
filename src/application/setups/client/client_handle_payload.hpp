@@ -22,6 +22,15 @@ message_handler_result client_setup::handle_payload(
 	}
 
 	if constexpr (std::is_same_v<T, server_solvable_vars>) {
+		if (downloading.has_value()) {
+			/* 
+				Ignore.
+				We will resync everything once we're done anyway.
+			*/
+
+			return continue_v;
+		}
+
 		const bool are_initial_vars = state == client_state_type::PENDING_WELCOME;
 		const auto& new_vars = payload;
 
@@ -37,96 +46,19 @@ message_handler_result client_setup::handle_payload(
 
 		LOG_NVPS(new_arena);
 
-		if (are_initial_vars || new_arena != sv_solvable_vars.current_arena) {
-			LOG("Client loads arena: %x", new_arena);
-			LOG("Required arena hash: %x", augs::to_hex_format(new_vars.required_arena_hash));
-
-			try {
-				const auto& referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
-
-				current_arena_folder = augs::path_type();
-
-				const auto choice_result = ::choose_arena_client(
-					{
-						lua,
-						referential_arena,
-						official,
-						new_vars.current_arena,
-						new_vars.override_default_ruleset,
-						clean_round_state,
-						new_vars.playtesting_context
-					},
-
-					new_vars.required_arena_hash
-				);
-
-				if (choice_result.arena_folder_path != std::nullopt) {
-					current_arena_folder = *choice_result.arena_folder_path;
-
-					arena_gui.reset();
-					arena_gui.choose_team.show = !is_replaying() && ::is_spectator(referential_arena, get_local_player_id());
-					client_gui.rcon.show = false;
-				}
-				else {
-					if (choice_result.official_differs) {
-						set_disconnect_reason(typesafe_sprintf(
-							"Failed to load arena: \"%x\".\n"
-							"The local arena file differs from the servers!\n"
-							"This is an official arena, so your game might be out of date.",
-							new_arena
-						));
-					}
-					else if (choice_result.invalid_arena_name) {
-						set_disconnect_reason(typesafe_sprintf(
-							"Failed to load arena: \"%x\".\n"
-							"The server sent an incorrect arena name!",
-							new_arena
-						));
-					}
-					else if (choice_result.not_found_any) {
-						/*
-							TODO: We'll initiate the download request here.
-						*/
-
-						set_disconnect_reason(typesafe_sprintf(
-							"Failed to load arena: \"%x\".\n"
-							"You do not have this arena downloaded.",
-							new_arena
-						));
-					}
-					else {
-						set_disconnect_reason(typesafe_sprintf(
-							"Failed to load arena: \"%x\".\n"
-							"Unknown error.",
-							new_arena
-						));
-					}
-
-					return abort_v;
-				}
-			}
-			catch (const augs::file_open_error& err) {
-				set_disconnect_reason(typesafe_sprintf(
-					"Failed to load arena: \"%x\".\n"
-					"The arena files might be corrupt, or they might be missing.\n"
-					"Please check if \"%x\" folder resides within \"%x\" directory.\n"
-					"\nDetails: \n%x",
-					new_arena,
-					new_arena,
-					"arenas",
-					err.what()
-				));
-
-				return abort_v;
-			}
-
-			/* Prepare the predicted cosmos. */
-			predicted_cosmos = scene.world;
-			predicted_mode = current_mode;
-		}
+		const bool reload_arena = new_arena != sv_solvable_vars.current_arena;
 
 		sv_solvable_vars = new_vars;
 		client_gui.rcon.on_arrived(new_vars);
+
+		if (are_initial_vars || reload_arena) {
+			if (!try_load_arena_according_to(new_vars, true)) {
+				return abort_v;
+			}
+		}
+	}
+	else if constexpr (std::is_same_v<T, file_download_payload>) {
+		return advance_downloading_session(payload.file_bytes);
 	}
 	else if constexpr (std::is_same_v<T, server_vars>) {
 		const auto& new_vars = payload;
@@ -208,7 +140,22 @@ message_handler_result client_setup::handle_payload(
 		}	
 	}
 	else if constexpr (std::is_same_v<T, initial_snapshot_payload>) {
-		if (!now_resyncing && state != client_state_type::RECEIVING_INITIAL_SNAPSHOT) {
+		if (downloading.has_value()) {
+			/* 
+				Ignore.
+				We will resync everything once we're done anyway.
+			*/
+
+			return continue_v;
+		}
+
+		/*
+			Note that changing arenas is deterministic,
+			so if they're found both on the client and the server,
+		   	an arena change will not trigger an initial_snapshot_payload.
+		*/
+
+		if (!now_resyncing && state < client_state_type::RECEIVING_INITIAL_SNAPSHOT) {
 			LOG("The server has sent initial state early (state: %x). Disconnecting.", state);
 			log_malicious_server();
 			return abort_v;
@@ -282,6 +229,15 @@ message_handler_result client_setup::handle_payload(
 	}
 #endif
 	else if constexpr (std::is_same_v<T, networked_server_step_entropy>) {
+		if (downloading.has_value()) {
+			/* 
+				Ignore.
+				We will resync everything once we're done anyway.
+			*/
+
+			return continue_v;
+		}
+
 		if (state != client_state_type::IN_GAME) {
 			LOG("The server has sent entropy too early (state: %x). Disconnecting.", state);
 
@@ -314,6 +270,16 @@ message_handler_result client_setup::handle_payload(
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
 	else if constexpr (std::is_same_v<T, public_settings_update>) {
+		if (downloading.has_value()) {
+			/* 
+				Ignore.
+				We will resync everything once we're done anyway.
+				Wouldn't hurt to apply it but why bother, just in case.
+			*/
+
+			return continue_v;
+		}
+
 		/* 
 			We can assign it right away and it won't desync,
 			because it only affects the incoming entropies and they are unpacked on the go

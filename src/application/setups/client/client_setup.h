@@ -46,6 +46,7 @@
 #include "application/setups/client/client_demo_player.h"
 #include "application/nat/nat_detection_settings.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
+#include "application/setups/client/arena_downloading_session.h"
 
 struct config_lua_table;
 
@@ -116,6 +117,8 @@ class client_setup :
 	bool has_sent_avatar = false;
 	client_gui_state client_gui;
 
+	std::optional<arena_downloading_session> downloading;
+
 	using untimely_payload_variant = std::variant<arena_player_avatar_payload>;
 
 	struct untimely_payload {
@@ -153,6 +156,7 @@ class client_setup :
 	template <class T>
 	void set_disconnect_reason(T&& reason, bool print_only_reason = false) {
 		last_disconnect_reason = std::forward<T>(reason);
+		LOG(last_disconnect_reason);
 		print_only_disconnect_reason = print_only_reason;
 	}
 
@@ -185,6 +189,7 @@ class client_setup :
 	void handle_incoming_payloads();
 	void send_pending_commands();
 	void send_packets_if_its_time();
+	void exchange_file_packets();
 	void traverse_nat_if_required();
 
 	template <class T, class F>
@@ -453,7 +458,7 @@ class client_setup :
 				}
 
 				if (result.desync && !now_resyncing) {
-					pending_requests.push_back(special_client_request::RESYNC_ARENA);
+					special_request(special_client_request::RESYNC_ARENA);
 					now_resyncing = true;
 				}
 			}
@@ -669,16 +674,22 @@ public:
 		const auto current_time = get_current_time();
 
 		if (client_time <= current_time) {
-			auto local_entropy_provider = [&]() {
-				return get_total_local_player_entropy(in);
-			};
+			if (downloading) {
+				exchange_file_packets();
+				update_stats(in.network_stats);
+			}
+			else {
+				auto local_entropy_provider = [&]() {
+					return get_total_local_player_entropy(in);
+				};
 
-			advance_single_step(
-				in, 
-				callbacks, 
-				[this](){ handle_incoming_payloads(); }, 
-				local_entropy_provider
-			);
+				advance_single_step(
+					in, 
+					callbacks, 
+					[this](){ handle_incoming_payloads(); }, 
+					local_entropy_provider
+				);
+			}
 		}
 	}
 
@@ -765,4 +776,18 @@ public:
 
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
+
+	void request_file_download(const augs::secure_hash_type&);
+
+	bool start_downloading_arena(
+		const std::string& new_arena_name,
+		const augs::secure_hash_type& project_hash
+	);
+
+	message_handler_result advance_downloading_session(const std::vector<std::byte>& new_file);
+
+	bool finalize_arena_download();
+
+	void special_request(special_client_request);
+	bool try_load_arena_according_to(const server_solvable_vars&, bool allow_download);
 };

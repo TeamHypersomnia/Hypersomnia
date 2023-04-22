@@ -6,6 +6,7 @@
 #include "augs/templates/logically_empty.h"
 #include "application/network/net_serialize.h"
 #include "application/network/net_solvable_stream.h"
+#include "augs/string/get_type_name.h"
 
 template <bool C>
 struct full_arena_snapshot_payload {
@@ -142,7 +143,7 @@ namespace net_messages {
 
 		NSR_LOG("RECEIVING INITIAL STATE");
 
-		NSR_LOG("Compressed stream size: %x", size);
+		LOG("Compressed arena snapshot size: %x", size);
 
 		const bool size_written_properly = size >= sizeof(uint32_t);
 
@@ -152,7 +153,7 @@ namespace net_messages {
 
 		const auto uncompressed_size = *reinterpret_cast<const uint32_t*>(data);
 	
-		NSR_LOG("Uncompressed size: %x", uncompressed_size);
+		LOG("Uncompressed arena snapshot size: %x", uncompressed_size);
 
 		/*
 			TODO: validate uncompressed_size with some predefined max solvable size.
@@ -239,16 +240,44 @@ namespace net_messages {
 				const auto uncompressed_size = static_cast<uint32_t>(buffers.serialization.size());
 				augs::write_bytes(s, uncompressed_size);
 
-				NSR_LOG("Uncompressed size: %x", uncompressed_size);
+				LOG("Uncompressed arena snapshot size: %x", uncompressed_size);
 			}
 
 			augs::compress(buffers.compression_state, buffers.serialization, c);
 
-			NSR_LOG("Compressed stream size: %x", c.size());
+			LOG("Compressed arena snapshot size: %x", c.size());
 		}
 
 		auto block = block_allocator(c.size());
 		std::memcpy(block, c.data(), c.size());
+
+		return true;
+	}
+
+	inline bool file_download::read_payload(
+		file_download_payload& payload
+	) {
+		auto data = reinterpret_cast<const std::byte*>(GetBlockData());
+		auto size = static_cast<std::size_t>(GetBlockSize());
+
+		if (size > max_transferred_file_size_v) {
+			return false;
+		}
+
+		payload.file_bytes.resize(size);
+		std::memcpy(payload.file_bytes.data(), data, size);
+
+		return true;
+	}
+
+	template <class F>
+	inline bool file_download::write_payload(
+		F block_allocator,
+		const file_download_payload& payload
+	) {
+		const auto& file = payload.file_bytes;
+		auto block = block_allocator(file.size());
+		std::memcpy(block, file.data(), file.size());
 
 		return true;
 	}

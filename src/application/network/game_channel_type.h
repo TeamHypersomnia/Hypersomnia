@@ -1,7 +1,6 @@
+#pragma once
+
 enum class game_channel_type {
-#if RESYNCS_CHANNEL
-	RESYNCS,
-#endif
 	SERVER_SOLVABLE_AND_STEPS,
 	CLIENT_COMMANDS,
 	COMMUNICATIONS,

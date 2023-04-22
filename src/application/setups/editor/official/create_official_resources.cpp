@@ -8,14 +8,12 @@
 #include "augs/templates/folded_finders.h"
 #include "application/setups/editor/editor_filesystem.h"
 #include "augs/image/image.h"
+#include "application/setups/editor/resources/resource_traits.h"
 
 #if CREATE_OFFICIAL_CONTENT_ON_EDITOR_LEVEL
 #include "application/setups/editor/official/official_id_to_pool_id.h"
 
 #define OFFICIAL_CONTENT_PATH augs::path_type(OFFICIAL_CONTENT_DIR)
-
-template <class T>
-constexpr bool is_pathed_resource_v = is_one_of_v<T, editor_sprite_resource, editor_sound_resource>;
 
 template <class R>
 auto& get_resource(const editor_typed_resource_id<R> typed_id, editor_resource_pools& pools) {

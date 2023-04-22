@@ -64,10 +64,6 @@ void intercosm::populate_official_content(
 ) {
 	clear();
 
-#if !STATICALLY_ALLOCATE_ENTITIES
-	cosmic::reserve_storage_for_entities(world, 3000u);
-#endif
-
 	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
 
 	world.change_common_significant([&](cosmos_common_significant& common){
@@ -102,11 +98,6 @@ void intercosm::make_test_scene(
 	clear();
 
 #if BUILD_TEST_SCENES
-
-#if !STATICALLY_ALLOCATE_ENTITIES
-	cosmic::reserve_storage_for_entities(world, 3000u);
-#endif
-
 	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
 
 	auto reloader = [&](auto populator) {

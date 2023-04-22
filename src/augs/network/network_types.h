@@ -28,8 +28,10 @@ constexpr std::size_t max_total_file_path_length_v = 250;
 constexpr std::size_t max_ruleset_name_length_v = 30;
 constexpr std::size_t max_arenas_in_pool_v = 50;
 
-constexpr std::size_t max_block_size_v = 2 * 1024 * 1024; // 2 MB
-constexpr std::size_t max_packet_size_v = 2 * 1024; // 2 KB
+constexpr std::size_t max_transferred_file_size_v = 10 * 1024 * 1024; // 10 MB
+constexpr std::size_t max_block_size_v = max_transferred_file_size_v;
+constexpr std::size_t block_fragment_size_v = 1 * 1024;
+constexpr std::size_t max_packet_size_v = 4 * 1024;
 
 constexpr std::size_t max_address_string_length_v = 255;
 

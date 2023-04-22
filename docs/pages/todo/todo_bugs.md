@@ -5,7 +5,46 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
-- crash on bigilab: we should be able to 
+- when quick testing arena5, probably due to item deletion?
+Program terminated with signal SIGSEGV, Segmentation fault.
+#0  spatial_properties_mixin<specific_entity_handle<true, shootable_charge, ref_stored_id_provider> >::find_logic_transform() const ()
+[Current thread is 1 (Thread 0x7f6243fff6c0 (LWP 84381))]
+#0  spatial_properties_mixin<specific_entity_handle<true, shootable_charge, ref_stored_id_provider> >::find_logic_transform() const ()
+#1  _ZN6cosmic29specific_create_entity_detailI16shootable_charge6cosmosN4augs24trivially_copyable_tupleIJN10components4itemENS5_10rigid_bodyEEEEZNS_21specific_c
+lone_entityIS1_EE22specific_entity_handleILb0ET_22ref_stored_id_providerESD_EUlSB_DpOT0_E_EESD_RT0_23typed_entity_flavour_idISB_ERKT1_T2_ ()
+#2  just_clone_entity(basic_entity_handle<false>) ()
+#3  perform_transfer_impl::operator()(basic_item_slot_transfer_request<entity_id>, cosmos&) const ()
+#4  perform_transfer(basic_item_slot_transfer_request<entity_id>, basic_logic_step<false>) ()
+#5  gun_system::launch_shots_due_to_pressed_triggers(basic_logic_step<false>) ()
+#6  standard_solve(basic_logic_step<false>) ()
+#7  _ZNSt3__116__variant_detail12__visitation6__base12__dispatcherIJLm1EEE10__dispatchB6v15007IONS1_9__variant15__value_visitorIZN18basic_arena_handleILb0E20bas
+ic_mode_and_rulesINS_7variantIJ12bomb_defusal9test_modeEEEEE23on_mode_with_input_implIKSF_ZNKSF_7advanceIJRK12mode_entropyR18solver_callbacks_tIZ4workiPKPKcE4$_
+36ZZNKSM_ISR_ZZ4workiSQ_ENK4$_37clI12server_setupEEDaPKN4augs14audio_rendererENSV_5deltaERT_RK17input_pass_resultEUl16basic_logic_stepILb1EE31audiovisual_post_s
+olve_settingsE_ZZ4workiSQ_ENKST_ISU_EEDaSY_SZ_S11_S14_EUlRKS16_E_E7combineI14empty_callbackRZNSU_7advanceIS1C_EEvRK20server_advance_inputRKS10_EUlS10_S16_E0_S1E
+_EEDaOS10_OT0_OT1_ENKUlS10_S1O_E_clIS1L_S18_EEDaS10_S1O_EUlDpOT_E_S1B_E14solve_settingsEEEDcS1W_EUlS11_RKS1O_E_EEDcS11_S1P_EUlS11_E_EEJRNS0_6__baseILNS0_6_Trait
+E1EJSB_SC_EEEEEEDcS10_DpT0_ ()
+#8  _ZNSt3__116__variant_detail12__visitation6__base12__dispatcherIJLm4EEE10__dispatchB6v15007IONS1_9__variant15__value_visitorIZZ4workiPKPKcENK3$_2clIZZ4workiS
+B_ENK4$_35clEPKN4augs14audio_rendererENSF_5deltaERK17input_pass_resultEUlRT_E_EEDcSN_EUlSO_E_EEJRNS0_6__baseILNS0_6_TraitE1EJ16test_scene_setup12editor_setup22p
+roject_selector_setup12client_setup12server_setupEEEEEEDcSN_DpT0_ ()
+#9  work(int, char const* const*)::$_39::operator()() const::{lambda()#1}::operator()() const ()
+#10 void* std::__1::__thread_proxy[abi:v15007]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struc
+t> >, work(int, char const* const*)::$_39> >(void*) ()
+#11 ?? () from /usr/lib/libc.so.6
+#12 ?? () from /usr/lib/libc.so.6
+
+We have a demo file
+
+
+- demo files might be fucked up during sessions with downloaded maps
+	- they must correctly remember the full state snapshots
+
+- don't autolaunch on the replayed demo!!!!! because it might crash
+
+- on de_duel_practice, we had an openal error because of a reseek_to_sync_if_needed on a warmup theme
+	- alSourcef was called with an out of range value, but I'm not sure how it's possible since we clamp the value always to the duration
+	- However simply setting stop (stop is always valid for a source) fixes the issue for now, but I'm not sure how it happened in the first place
+
+- crash on bigilab: we should be able to reproduce it with a demo on windows
 
 - linux bug: neon silhouettes can be seen behind player, probably something to do with drivers
 	- It's a problem with gl_FragCoord: probably stencil on another fbo is somehow flipped
@@ -93,3 +132,12 @@ summary: Just a hidden scratchpad.
 - Enabling HRTF in debug mode crashes the game but there's no core or segfault or anything
 	- it just quits
 	- Fixed by updating OpenAL
+
+- Server sent entropy too early?
+    - server wasn't pausing the solvable stream for downloading clients when sending entropies
+- TLSF crashes after sending 9 files
+    - Maybe we're not freeing the blocks properly
+    - Probably an issue with tlsf, wouldn't be surprised if it was because of differing sizes for files, at least one block was remaining per each size
+        - which is why we need to use default allocator for our block messages because their sizes will be nondeterministic
+            - this will also free our per-client memory
+

@@ -81,8 +81,10 @@ std::vector<std::byte> net_message_to_bytes(net_message_type& msg) {
 		augs::detail::write_raw_bytes(ar, block_bytes, block_size);
 	}
 	else {
-		uint8_t buffer[max_packet_size_v];
-		auto stream = yojimbo::WriteStream(allocator, buffer, sizeof(buffer));
+		thread_local std::vector<uint8_t> buffer;
+		buffer.resize(max_packet_size_v);
+
+		auto stream = yojimbo::WriteStream(allocator, buffer.data(), buffer.size());
 
 		msg.Serialize(stream);
 		stream.Flush();

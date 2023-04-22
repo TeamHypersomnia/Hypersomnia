@@ -17,6 +17,9 @@ struct server_client_state {
 	type state = type::NETCODE_NEGOTIATING_CONNECTION;
 	net_time_t last_valid_payload_time = -1.0;
 	net_time_t last_keyboard_activity_time = -1.0;
+
+	net_time_t when_last_sent_file_packet = 0.0f;
+
 	requested_client_settings settings;
 	bool rebroadcast_public_settings = false;
 
@@ -31,6 +34,8 @@ struct server_client_state {
 	std::string uploaded_avatar_url;
 	bool pushed_connected_webhook = false;
 
+	bool is_downloading_files = false;
+
 	arena_player_meta meta;
 
 	server_client_state() = default;
@@ -38,7 +43,16 @@ struct server_client_state {
 		init(server_time);
 	}
 
+	void reset_solvable_stream() {
+		num_entropies_accepted = 0;
+		pending_entropies.clear();
+	}
+
 	bool should_move_to_spectators_due_to_afk(const server_vars& v, const net_time_t server_time) const {
+		if (is_downloading_files) {
+			return true;
+		}
+
 		const auto diff = server_time - last_keyboard_activity_time;
 		const auto bare_minimum_afk = 10u;
 
@@ -46,6 +60,10 @@ struct server_client_state {
 	}
 
 	bool should_kick_due_to_afk(const server_vars& v, const net_time_t server_time) const {
+		if (is_downloading_files) {
+			return false;
+		}
+
 		const auto diff = server_time - last_keyboard_activity_time;
 		const auto bare_minimum_afk = 10u;
 
@@ -53,6 +71,10 @@ struct server_client_state {
 	}
 
 	bool should_kick_due_to_inactivity(const server_vars& v, const net_time_t server_time) const {
+		if (is_downloading_files) {
+			return false;
+		}
+
 		const auto diff = server_time - last_valid_payload_time;
 
 		if (state == type::IN_GAME) {
@@ -83,6 +105,10 @@ struct server_client_state {
 
 	void unset() {
 		*this = {};
+	}
+
+	bool should_pause_solvable_stream() const {
+		return is_downloading_files; 
 	}
 
 	std::string get_nickname() const {

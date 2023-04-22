@@ -5,6 +5,13 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- TODO: Check if the previous file transfer is complete, for security.
+Should probably check if the channel is empty, and if it's not, just kick.
+
+- Think what happens when the server loads an incorrect arena or just fails to load it for whatever reason
+	- currently a default one is loaded instead
+	- shouldn't be a problem security wise but clients will desync if they happen to load the arena correctly
+
 - watch out for unsafe_serialize: we should impose limits on container sizes when stuff is serialized just with read_bytes using introspection etc
 
 - Watch out especially where servers pass arena name in their masterserver heartbeat

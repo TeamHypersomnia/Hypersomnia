@@ -116,7 +116,7 @@ struct editor_project {
 
 	template <class R, class F>
 	void for_each_resource(F&& callback) const;
-   
+
 private:
 	template <class S, class Officials, class F>
 	static decltype(auto) on_resource_impl(S& self, Officials& officials, const editor_resource_id& id, F&& callback);

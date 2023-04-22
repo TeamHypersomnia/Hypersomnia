@@ -46,6 +46,7 @@ struct server_vars {
 	bool suppress_new_community_server_webhook = false;
 
 	bool allow_nat_traversal = true;
+	bool allow_arena_file_downloads = true;
 
 	uint32_t send_heartbeat_to_server_list_once_every_secs = 10;
 	uint32_t resolve_server_list_address_once_every_secs = 60;

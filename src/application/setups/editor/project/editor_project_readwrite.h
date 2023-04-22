@@ -43,6 +43,13 @@ namespace editor_project_readwrite {
 	editor_project_about read_only_project_about(const augs::path_type& json_path);
 	editor_project_meta read_only_project_meta(const augs::path_type& json_path);
 
+	using external_resource_database = std::vector<std::pair<augs::path_type, augs::secure_hash_type>>;
+
+	external_resource_database read_only_external_resources(
+		const augs::path_type& parent_folder_for_sanitization_checks,
+		const std::string& loaded_project_json
+	);
+
 	void write_editor_view(const augs::path_type& json_path, const editor_view&);
 	editor_view read_editor_view(const augs::path_type& json_path);
 }

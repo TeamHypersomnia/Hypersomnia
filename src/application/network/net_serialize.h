@@ -6,6 +6,7 @@
 #include "augs/readwrite/to_bytes.h"
 #include "game/modes/mode_commands/match_command.h"
 #include "augs/window_framework/mouse_rel_bound.h"
+#include "application/setups/server/request_arena_file_download.h"
 
 namespace sanitization {
 	bool arena_name_safe(const std::string& untrusted_map_name);
@@ -38,6 +39,13 @@ namespace net_messages {
 	template <class Stream>
 	bool serialize(Stream& s, ::session_id_type& i) {
 		serialize_uint32(s, i.value);
+		return true;
+	}
+
+	template <class Stream, std::size_t count>
+	bool serialize_fixed_byte_array(Stream& stream, std::array<uint8_t, count>& byte_array) {
+		serialize_bytes(stream, byte_array.data(), count);
+
 		return true;
 	}
 
@@ -303,6 +311,11 @@ namespace net_messages {
 		serialize_bool(stream, payload.suppress_webhooks);
 
 		return true;
+	}
+
+	template <typename Stream>
+	bool serialize(Stream& stream, ::request_arena_file_download& payload) {
+		return serialize_fixed_byte_array(stream, payload.requested_file_hash);
 	}
 
 	template <typename Stream>

@@ -56,6 +56,9 @@ struct add_to_arena_input {
 class server_adapter;
 
 struct resolve_address_result;
+struct editor_project;
+
+using arena_files_database_type = std::unordered_map<augs::secure_hash_type, augs::path_type>;
 
 class server_setup : 
 	public default_setup_settings,
@@ -81,6 +84,9 @@ class server_setup :
 	/* The rest is server-specific */
 	sol::state& lua;
 	const packaged_official_content& official;
+
+	std::unique_ptr<editor_project> last_loaded_project;
+	arena_files_database_type arena_files_database;
 
 	augs::server_listen_input last_start;
 	std::optional<augs::dedicated_server_input> dedicated;
@@ -168,7 +174,15 @@ private:
 
 	void handle_client_messages();
 	void advance_clients_state();
+
+	void rebroadcast_public_settings();
 	void send_server_step_entropies(const compact_server_step_entropy& total);
+	void broadcast_net_statistics();
+
+	void send_full_arena_snapshot_to(const client_id_type);
+	void send_complete_solvable_state_to(const client_id_type);
+
+	void send_packets_to_clients_downloading_files();
 	void send_packets_if_its_time();
 
 	void send_heartbeat_to_server_list();
@@ -302,6 +316,8 @@ public:
 			nat_traversal.last_detected_nat = nat_detection_result();
 		}
 
+		send_packets_to_clients_downloading_files();
+
 		const auto current_time = get_current_time();
 
 		while (server_time <= current_time) {
@@ -347,7 +363,10 @@ public:
 
 			{
 				auto scope = measure_scope(profiler.send_entropies);
+
+				rebroadcast_public_settings();
 				send_server_step_entropies(step_collected);
+				broadcast_net_statistics();
 			}
 
 			{
@@ -559,4 +578,6 @@ public:
 	std::string get_current_arena_name() const;
 
 	void default_server_post_solve(const const_logic_step step);
+
+	void register_external_resources_of(const editor_project&);
 };

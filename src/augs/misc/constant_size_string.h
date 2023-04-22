@@ -99,6 +99,14 @@ namespace augs {
 			arr[len] = 0;
 		}
 
+		auto& operator[](const std::size_t n) {
+			return arr[n];
+		}
+
+		const auto& operator[](const std::size_t n) const {
+			return arr[n];
+		}
+		
 		void clear() {
 			len = 0;
 			arr[0] = 0;

@@ -100,7 +100,7 @@ bool client_adapter::send_payload(
 
 	constexpr bool is_block_message_v = std::is_base_of_v<yojimbo::BlockMessage, net_message_type>;
 
-	if (const auto new_message = create_message<net_message_type>()) {
+	if (auto new_message = create_message<net_message_type>()) {
 		auto& m = *new_message;
 
 		auto send_it = [&]() {
@@ -114,7 +114,7 @@ bool client_adapter::send_payload(
 
 			auto allocate_block = [&](const std::size_t requested_size) {
 				allocated_size = requested_size;
-				allocated_block = get_specific().AllocateBlock(requested_size);
+				allocated_block = (uint8_t*)YOJIMBO_ALLOCATE(yojimbo::GetDefaultAllocator(), requested_size);;
 
 				return allocated_block;
 			};
@@ -125,12 +125,12 @@ bool client_adapter::send_payload(
 			);
 
 			if (translation_result && allocated_block != nullptr) {
-				get_specific().AttachBlockToMessage(new_message, allocated_block, allocated_size);
+				new_message->AttachBlock( yojimbo::GetDefaultAllocator(), allocated_block, allocated_size );
 				send_it();
 				return true;
 			}
 
-			get_specific().FreeBlock(allocated_block);
+			YOJIMBO_FREE(yojimbo::GetDefaultAllocator(), new_message);
 			return false;
 		}
 		else {
