@@ -673,7 +673,7 @@ public:
 
 		const auto current_time = get_current_time();
 
-		if (client_time <= current_time) {
+		if (client_time < current_time) {
 			if (downloading) {
 				exchange_file_packets();
 				update_stats(in.network_stats);

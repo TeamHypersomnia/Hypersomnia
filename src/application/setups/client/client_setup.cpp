@@ -1148,7 +1148,7 @@ void client_setup::exchange_file_packets() {
 		++times_sent;
 	}
 
-	if (times_sent >= max_packets_at_a_time) {
+	if (client_time < current_time) {
 		client_time = current_time;
 	}
 }
