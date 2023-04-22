@@ -846,7 +846,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 
 				const auto total_secs_passed = cosm.get_total_seconds_passed(in.interpolation_ratio);
 				const auto born_at_secs = when_born * in.inv_tickrate;
-				const auto total_lived_secs = std::max(0.0, (total_secs_passed - born_at_secs) * in.speed_multiplier);
+				const auto total_lived_secs = std::max(0.0, (total_secs_passed - born_at_secs) * in.speed_multiplier * m.pitch);
 				const auto total_lived_cycles = total_lived_secs / secs;
 
 				const auto expected_secs = [&]() {
