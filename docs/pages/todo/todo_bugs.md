@@ -5,6 +5,16 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Crash due to yojimbo_assert( sentPacket );
+	- Only in debug build though
+	- This doesn't really break anything if we just comment it out and let it go
+		- this is basically because we don't send any packets on all the other channels for a while so they have m_sequence = 0, and they are suddenly greeted with a very large sequence number
+		- the question being, if it's not inserted into the sequence buffer, how the hell is it even getting acked
+			- so why does this just work?
+		LOG_NVPS(sequence,m_sentPackets->GetSequence(), m_sentPackets->GetSize());
+	- looks like the sequence number is increased by just acking the fragments, it won't help to withhold file requests
+
+
 - when quick testing arena5, probably due to item deletion?
 Program terminated with signal SIGSEGV, Segmentation fault.
 #0  spatial_properties_mixin<specific_entity_handle<true, shootable_charge, ref_stored_id_provider> >::find_logic_transform() const ()

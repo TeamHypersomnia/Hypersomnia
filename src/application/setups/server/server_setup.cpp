@@ -881,7 +881,7 @@ void server_setup::apply(const server_vars& new_vars, const bool force) {
 			if (rcon_level >= rcon_level_type::BASIC) {
 				server->send_payload(
 					recipient_id,
-					game_channel_type::COMMUNICATIONS,
+					game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
 					new_vars
 				);
@@ -1325,7 +1325,7 @@ void server_setup::advance_clients_state() {
 					if (session_id_of_avatar) {
 						server->send_payload(
 							recipient_client_id,
-							game_channel_type::COMMUNICATIONS,
+							game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
 							*session_id_of_avatar,
 							cc.meta.avatar
@@ -1341,7 +1341,7 @@ void server_setup::advance_clients_state() {
 			if (rcon_level >= rcon_level_type::BASIC) {
 				server->send_payload(
 					client_id, 
-					game_channel_type::COMMUNICATIONS, 
+					game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
 
 					vars
 				);
@@ -2004,7 +2004,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		else {
 			server->send_payload(
 				recipient_client_id,
-				game_channel_type::COMMUNICATIONS,
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
 				payload
 			);
@@ -2063,7 +2063,7 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 
 	server->send_payload(
 		kicked_id,
-		game_channel_type::COMMUNICATIONS,
+		game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
 		message
 	);

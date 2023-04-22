@@ -52,7 +52,7 @@ struct arena_downloading_session {
 	bool requested_hash_matches(const std::vector<std::byte>&) const;
 	std::optional<augs::secure_hash_type> next_hash_to_download();
 
-	std::size_t num_downloaded_files() const {
+	std::size_t get_downloaded_file_index() const {
 		if (current_resource_idx) {
 			return *current_resource_idx;
 		}

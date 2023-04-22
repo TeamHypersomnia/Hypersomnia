@@ -534,7 +534,7 @@ void client_setup::request_file_download(const augs::secure_hash_type& hash) {
 	LOG("Requesting file download: %x", augs::to_hex_format(hash));
 
 	send_payload(
-		game_channel_type::CLIENT_COMMANDS,
+		game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 		request
 	);
 
@@ -1028,7 +1028,7 @@ void client_setup::send_pending_commands() {
 
 	auto send_settings = [&]() {
 		send_payload(
-			game_channel_type::CLIENT_COMMANDS,
+			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 			std::as_const(requested_settings)
 		);
 
@@ -1059,7 +1059,7 @@ void client_setup::send_pending_commands() {
 				const auto dummy_client_id = session_id_type::dead();
 
 				send_payload(
-					game_channel_type::COMMUNICATIONS,
+					game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
 					dummy_client_id,
 					payload
@@ -1079,7 +1079,7 @@ void client_setup::send_pending_commands() {
 					const auto dummy_client_id = session_id_type::dead();
 
 					send_payload(
-						game_channel_type::COMMUNICATIONS,
+						game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
 						dummy_client_id,
 						payload
@@ -1103,7 +1103,7 @@ void client_setup::send_pending_commands() {
 
 	for (const auto& pending_request : pending_requests) {
 		send_payload(
-			game_channel_type::CLIENT_COMMANDS,
+			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 			pending_request
 		);
 	}
@@ -1183,7 +1183,7 @@ void client_setup::perform_chat_input_bar() {
 		message.message = chat.current_message;
 
 		send_payload(
-			game_channel_type::COMMUNICATIONS,
+			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 			message
 		);
 
@@ -1253,7 +1253,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			payload = new_payload;
 
 			send_payload(
-				game_channel_type::COMMUNICATIONS,
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 				payload
 			);
 		};
@@ -1347,16 +1347,16 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				const auto this_percent_complete = this_progress.blockSize == 0 ? 0.0f : float(this_progress.downloadedBytes) / this_progress.blockSize;
 
 				if (downloading->is_downloading_resources()) {
-					const auto num_downloaded = downloading->num_downloaded_files();
+					const auto downloaded_index = downloading->get_downloaded_file_index();
 					const auto num_all = downloading->num_all_downloaded_files();
 
 					/* Looks more pro without the easing per-file after all */
 
-					const auto percent_complete = (float(num_downloaded) /*+ this_percent_complete*/) / num_all;
+					const auto percent_complete = (num_all == 1) ? 1.f : ((float(downloaded_index) /*+ this_percent_complete*/) / (num_all - 1));
 
 					text(typesafe_sprintf(
 						"File: %x of %x",
-						num_downloaded,
+						downloaded_index + 1,
 						num_all
 					));
 
@@ -1501,7 +1501,7 @@ void client_setup::send_to_server(
 	total_client_entropy& new_local_entropy
 ) {
 	send_payload(
-		game_channel_type::CLIENT_COMMANDS,
+		game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 		new_local_entropy
 	);
 }

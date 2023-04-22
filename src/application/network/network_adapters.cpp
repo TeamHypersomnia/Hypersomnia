@@ -58,28 +58,6 @@ game_connection_config::game_connection_config() {
 	}
 
 	{
-		auto& client_entropies = channel[static_cast<int>(game_channel_type::CLIENT_COMMANDS)];
-		client_entropies.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
-		/* these are like, super critical. */
-		client_entropies.sentPacketBufferSize = 1024 * 2;
-		client_entropies.maxMessagesPerPacket = 32;
-		client_entropies.messageResendTime = 0.f;
-		client_entropies.messageSendQueueSize = 1024 * 8;
-		client_entropies.messageReceiveQueueSize = 1024 * 8;
-	}
-
-	{
-		auto& communications = channel[static_cast<int>(game_channel_type::COMMUNICATIONS)];
-		communications.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
-
-		communications.sentPacketBufferSize = 1024 * 2;
-		communications.messageResendTime = 0.3f;
-		communications.maxMessagesPerPacket = 16;
-		communications.messageSendQueueSize = 1024;
-		communications.messageReceiveQueueSize = 1024;
-	}
-
-	{
 		auto& stats = channel[static_cast<int>(game_channel_type::VOLATILE_STATISTICS)];
 		stats.type = yojimbo::CHANNEL_TYPE_UNRELIABLE_UNORDERED;
 	}

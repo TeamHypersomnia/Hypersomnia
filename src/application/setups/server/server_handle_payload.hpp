@@ -255,7 +255,7 @@ message_handler_result server_setup::handle_payload(
 								auto broadcast_avatar = [this, session_id_of_avatar, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
 									server->send_payload(
 										recipient_client_id,
-										game_channel_type::COMMUNICATIONS,
+										game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
 										*session_id_of_avatar,
 										client_with_updated_avatar.meta.avatar
