@@ -763,4 +763,7 @@ public:
 	void on_project_assigned(const bool undoing_to_first_revision);
 
 	arena_playtesting_context make_playtesting_context() const;
+
+	template <class... Args>
+	void set_recent_message(Args&&... args) { recent_message.set(std::forward<Args>(args)...); }
 };
