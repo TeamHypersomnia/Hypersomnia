@@ -848,9 +848,10 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				const auto born_at_secs = when_born * in.inv_tickrate;
 				const auto total_lived_secs = std::max(0.0, (total_secs_passed - born_at_secs) * in.speed_multiplier * m.pitch);
 				const auto total_lived_cycles = total_lived_secs / secs;
+				const bool looping = m.repetitions == -1;
 
 				const auto expected_secs = [&]() {
-					if (m.repetitions == -1) {
+					if (looping) {
 						return std::fmod(total_lived_secs, secs);
 					}
 
@@ -863,7 +864,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 
 				const auto max_divergence = in.settings.max_divergence_before_sync_secs;
 
-				if (total_lived_secs >= secs && total_lived_cycles + 1 >= m.repetitions) {
+				if (!looping && total_lived_secs >= secs && total_lived_cycles + 1 >= m.repetitions) {
 					augs::source_no_arg_command cmd;
 					cmd.proxy_id = source.id;
 					cmd.type = augs::source_no_arg_command_type::STOP;

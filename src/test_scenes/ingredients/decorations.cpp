@@ -450,6 +450,10 @@ namespace test_flavours {
 
 		auto& flavours = in.flavours;
 
+		auto make_loop = [&](auto& meta) {
+			meta.template get<invariants::continuous_sound>().effect.modifier.repetitions = -1;
+		};
+
 		auto flavour_with_sound = [&](
 			const auto flavour_id,
 			const auto sound_id,
@@ -459,7 +463,7 @@ namespace test_flavours {
 			const real32 doppler = 1.f,
 			const real32 gain = 1.f,
 			const real32 pitch = 1.f
-		) {
+		) -> auto& {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
 			invariants::continuous_sound sound_def;
@@ -470,7 +474,10 @@ namespace test_flavours {
 			sound_def.effect.modifier.doppler_factor = doppler;
 			sound_def.effect.modifier.gain = gain;
 			sound_def.effect.modifier.pitch = pitch;
+			sound_def.effect.modifier.repetitions = 1;
 			meta.set(sound_def);
+
+			return meta;
 		};
 
 		flavour_with_sound(
@@ -493,34 +500,34 @@ namespace test_flavours {
 			0.6f
 		);
 
-		flavour_with_sound(
+		make_loop(flavour_with_sound(
 			test_sound_decorations::AQUARIUM_AMBIENCE_LEFT,
 			test_scene_sound_id::AQUARIUM_AMBIENCE_LEFT,
 			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
 			530.f,
 			2000.f,
 			0.f
-		);
+		));
 
-		flavour_with_sound(
+		make_loop(flavour_with_sound(
 			test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT,
 			test_scene_sound_id::AQUARIUM_AMBIENCE_RIGHT,
 			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
 			530.f,
 			2000.f,
 			0.f
-		);
+		));
 
-		flavour_with_sound(
+		(flavour_with_sound(
 			test_sound_decorations::POWERLINE_NOISE,
 			test_scene_sound_id::HUMMING_DISABLED,
 			augs::distance_model::LINEAR_DISTANCE_CLAMPED,
 			50.f,
 			100.f,
 			0.f
-		);
+		));
 
-		flavour_with_sound(
+		make_loop(flavour_with_sound(
 			test_sound_decorations::LOUDY_FAN,
 			test_scene_sound_id::LOUDY_FAN,
 			augs::distance_model::LINEAR_DISTANCE_CLAMPED,
@@ -528,7 +535,7 @@ namespace test_flavours {
 			400.f,
 			1.f,
 			0.5f
-		);
+		));
 
 		{
 			auto& meta = get_test_flavour(flavours, test_sound_decorations::ARABESQUE);
