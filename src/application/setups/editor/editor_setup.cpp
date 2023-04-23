@@ -2664,6 +2664,10 @@ static auto peel_clone_suffix(std::string s) {
 }
 
 void editor_setup::mirror_selection(const vec2i direction, const bool move_if_only_clone) {
+	if (gui.inspector.empty()) {
+		return;
+	}
+
 	const bool only_cloning = direction.is_zero();
 	gui.filesystem.clear_drag_drop();
 

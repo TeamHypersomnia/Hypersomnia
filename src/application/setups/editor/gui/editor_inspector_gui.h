@@ -176,6 +176,10 @@ public:
 		tweaked_widget.reset();
 	}
 
+	bool empty() const {
+		return all_inspected.empty();
+	}
+
 private:
 	friend editor_setup;
 
