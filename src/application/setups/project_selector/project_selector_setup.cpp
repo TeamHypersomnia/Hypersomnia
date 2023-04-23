@@ -737,7 +737,7 @@ bool project_selector_setup::create_new_project_files() {
 	if (sanitized_path) {
 		if (!cloning_from.empty()) {
 			try {
-				std::filesystem::copy(cloning_from, *sanitized_path);
+				std::filesystem::copy(cloning_from, *sanitized_path, std::filesystem::copy_options::recursive);
 
 				const auto old_filename = editor_project_paths(cloning_from).project_json.filename();
 				const auto new_filename = editor_project_paths(*sanitized_path).project_json.filename();
