@@ -165,6 +165,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	bool dirty_after_loading_autosave = false;
 	bool dirty_after_redirecting_paths = false;
 
+	std::optional<custom_imgui_result> imgui_return_once;
+
 	void create_official_filesystems();
 
 	void on_window_activate();
@@ -188,7 +190,6 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	void save_project_file_as(const augs::path_type& path);
 	bool has_unsaved_changes() const;
 	bool everything_completely_saved() const;
-	std::string get_arena_name_with_star() const;
 
 	void load_gui_state();
 	void save_gui_state();
@@ -766,4 +767,10 @@ public:
 
 	template <class... Args>
 	void set_recent_message(Args&&... args) { recent_message.set(std::forward<Args>(args)...); }
+
+	std::string get_arena_name_with_star() const;
+	std::string get_arena_name() const;
+
+	void prepare_for_online_playtesting();
+	void request_online_playtesting();
 };

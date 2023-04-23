@@ -91,6 +91,14 @@ class server_setup :
 	augs::server_listen_input last_start;
 	std::optional<augs::dedicated_server_input> dedicated;
 
+	auto quit_playtesting_or(custom_imgui_result result) const {
+		if (solvable_vars.playtesting_context && result == custom_imgui_result::GO_TO_MAIN_MENU) {
+			return custom_imgui_result::QUIT_PLAYTESTING;
+		}
+
+		return result;
+	}
+
 	server_step_type current_simulation_step = 0;
 
 	augs::serialization_buffers buffers;

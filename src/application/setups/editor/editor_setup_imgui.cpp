@@ -381,11 +381,11 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	gui.history.perform({ *this, history });
 
 	gui.toolbar.perform({
-		*this,
-		in.window,
-		in.ad_hoc_atlas,
-		in.necessary_images
-	});
+			*this,
+			in.window,
+			in.ad_hoc_atlas,
+			in.necessary_images
+		});
 
 	ImGui::End();
 
@@ -478,6 +478,13 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	if (const auto node_id = get_hovered_node(); node_id.is_set()) {
 		text_tooltip(get_name(node_id));
+	}
+
+	if (imgui_return_once) {
+		const auto returned = *imgui_return_once;
+		imgui_return_once = std::nullopt;
+
+		return returned;
 	}
 
 	return custom_imgui_result::NONE;

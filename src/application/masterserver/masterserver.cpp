@@ -293,7 +293,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						data.current_arena,
 						game_mode_name,
 						data.max_online,
-						nat_type_to_string(data.nat.type)
+						nat_type_to_string(data.nat.type),
+						data.is_editor_playtesting_server
 					);
 
 					http_client.Post(discord_webhook_url.location.c_str(), items);
@@ -322,7 +323,8 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					auto items = telegram_webhooks::form_new_community_server(
 						telegram_channel_id,
 						data.server_name,
-						ip_str
+						ip_str,
+						data.is_editor_playtesting_server
 					);
 
 					const auto location = telegram_webhook_url.location + "/sendMessage";

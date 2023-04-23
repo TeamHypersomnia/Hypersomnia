@@ -55,9 +55,11 @@ namespace telegram_webhooks {
 	inline httplib::MultipartFormDataItems form_new_community_server(
 		const std::string& channel_id,
 		const std::string& new_server_name,
-		const std::string& new_server_ip
+		const std::string& new_server_ip,
+		const bool is_editor_playtesting_session
 	) {
-		std::string full_description = "*" + escaped_nick(new_server_name) + "*" + " hosted at " + "*" + new_server_ip + "*";
+		const std::string hosted_at = is_editor_playtesting_session ? " at " : " hosted at ";
+		const std::string full_description = "*" + escaped_nick(new_server_name) + "*" + hosted_at + "*" + new_server_ip + "*";
 
 		return {
 			{ "chat_id", channel_id, "", "" },
@@ -148,7 +150,8 @@ namespace discord_webhooks {
 		const std::string& arena_name,
 		const std::string& game_mode,
 		const int num_slots,
-		const std::string& nat_type
+		const std::string& nat_type,
+		const bool is_editor_playtesting_session
 	) {
 		const auto payload = [&]()
 		{
@@ -185,7 +188,13 @@ namespace discord_webhooks {
 					writer.StartObject();
 					{
 						writer.Key("name");
-						writer.String("New community server!");
+
+						if (is_editor_playtesting_session) {
+							writer.String("New editor session!");
+						}
+						else {
+							writer.String("New community server!");
+						}
 					}
 					writer.EndObject();
 

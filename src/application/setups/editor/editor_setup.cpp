@@ -341,6 +341,14 @@ bool editor_setup::confirm_modal_popup() {
 	return false;
 }
 
+void editor_setup::prepare_for_online_playtesting() {
+	autosave_now_if_needed();
+}
+
+void editor_setup::request_online_playtesting() {
+	imgui_return_once = custom_imgui_result::PLAYTEST_ONLINE;
+}
+
 bool editor_setup::handle_input_before_game(
 	handle_input_before_game_input in
 ) {
@@ -386,6 +394,7 @@ bool editor_setup::handle_input_before_game(
 			switch (k) {
 				case key::A: select_all_entities(); return true;
 				case key::Z: undo(); return true;
+				case key::P: request_online_playtesting(); return true;
 				case key::D: cut_selection(); return true;
 				case key::S: save(); return true;
 				//case key::C: copy(); return true;
@@ -1189,12 +1198,16 @@ bool editor_setup::has_unsaved_changes() const {
 	return !everything_completely_saved();
 }
 
+std::string editor_setup::get_arena_name() const {
+	return std::string(paths.arena_name);
+}
+
 std::string editor_setup::get_arena_name_with_star() const {
 	if (has_unsaved_changes()) {
-		return std::string(paths.arena_name) + "*";
+		return get_arena_name() + "*";
 	}
 
-	return std::string(paths.arena_name);
+	return get_arena_name();
 }
 
 bool editor_setup::autosave_needed() const {
@@ -2187,6 +2200,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			|| try_preffix("Started tracking", green)				
 			|| try_preffix("Cloned", cyan)
 			|| try_preffix("Mirrored", cyan)
+			|| try_preffix("NAT detection", orange)
 		) {
 			return result;
 		}

@@ -100,6 +100,7 @@ void DockingToolbar(const char* name, ImGuiAxis* p_toolbar_axis, bool& is_docked
     // Output user stored data
     *p_toolbar_axis = toolbar_axis;
 }
+
 void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 	using namespace augs::imgui;
 	using namespace editor_widgets;
@@ -393,6 +394,7 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 
 		if (do_icon(ID::EDITOR_TOOL_HOST_SERVER, "Playtest online (Ctrl+P)\n\nThis playtesting session will be visible in the server browser.\nYour friends will be able to join!")) {
 
+			in.setup.request_online_playtesting();
 		}
 
 		{

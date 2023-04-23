@@ -158,7 +158,12 @@ inline server_choose_arena_result choose_arena_server(
 		// handle.current_mode.choose(in.override_default_ruleset);
 	}
 	else {
-		in.handle.current_mode.choose(in.handle.rulesets.meta.server_default);
+		const auto launched_mode = in.is_for_playtesting() ?
+			in.handle.rulesets.meta.playtest_default :
+			in.handle.rulesets.meta.server_default
+		;
+
+		in.handle.current_mode.choose(launched_mode);
 	}
 
 	in.handle.migrate_mode_session(emigrated_session);
@@ -212,7 +217,12 @@ inline client_find_arena_result choose_arena_client(
 			// in.handle.current_mode.choose(in.override_default_ruleset);
 		}
 		else {
-			in.handle.current_mode.choose(in.handle.rulesets.meta.server_default);
+			const auto launched_mode = in.is_for_playtesting() ?
+				in.handle.rulesets.meta.playtest_default :
+				in.handle.rulesets.meta.server_default
+			;
+
+			in.handle.current_mode.choose(launched_mode);
 		}
 
 		in.handle.migrate_mode_session(emigrated_session);

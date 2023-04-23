@@ -5,6 +5,11 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Desync with hajt
+	- Try playing it on windows
+	- Happens when damage is dealt for some reason
+		- couldnt physics break at these bullet speeds?
+
 - Crash due to yojimbo_assert( sentPacket );
 	- Only in debug build though
 	- This doesn't really break anything if we just comment it out and let it go
@@ -44,9 +49,6 @@ t> >, work(int, char const* const*)::$_39> >(void*) ()
 
 We have a demo file
 
-
-- demo files might be fucked up during sessions with downloaded maps
-	- they must correctly remember the full state snapshots
 
 - don't autolaunch on the replayed demo!!!!! because it might crash
 

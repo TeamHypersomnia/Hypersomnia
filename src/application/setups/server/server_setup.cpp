@@ -1068,10 +1068,18 @@ void server_setup::choose_arena(const std::string& name) {
 		if (!player_added_to_mode(admin_id)) {
 			mode_entropy_general cmd;
 
+			const auto& playtesting_context = solvable_vars.playtesting_context;
+			auto admin_faction = faction_type::SPECTATOR;
+
+			if (playtesting_context) {
+				admin_faction = playtesting_context->first_player_faction;
+				arena_gui.choose_team.show = false;
+			}
+
 			cmd.added_player = add_player_input {
 				get_integrated_player_id(),
 				integrated_client_vars.nickname,
-				faction_type::SPECTATOR
+				admin_faction
 			};
 
 			local_collected.clear();
@@ -1723,7 +1731,7 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 		ImGui::Separator();
 
 		if (ImGui::Button("Go back")) {
-			return custom_imgui_result::GO_TO_MAIN_MENU;
+			return quit_playtesting_or(custom_imgui_result::GO_TO_MAIN_MENU);
 		}
 	}
 	else {
@@ -1765,10 +1773,14 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 		}
 	}
 
-	return arena_gui_base::perform_custom_imgui(in);
+	return quit_playtesting_or(arena_gui_base::perform_custom_imgui(in));
 }
 
 setup_escape_result server_setup::escape() {
+	if (solvable_vars.playtesting_context) {
+		return setup_escape_result::QUIT_PLAYTESTING;
+	}
+
 	if (!is_gameplay_on()) {
 		return setup_escape_result::GO_TO_MAIN_MENU;
 	}

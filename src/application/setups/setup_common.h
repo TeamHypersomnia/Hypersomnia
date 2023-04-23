@@ -12,14 +12,19 @@ enum class custom_imgui_result {
 	NONE,
 	GO_TO_MAIN_MENU,
 	RETRY,
-	OPEN_SELECTED_PROJECT
+	OPEN_SELECTED_PROJECT,
+
+	PLAYTEST_ONLINE,
+	QUIT_PLAYTESTING
 };
 
 enum class setup_escape_result {
 	IGNORE,
 	LAUNCH_INGAME_MENU,
 	GO_TO_MAIN_MENU,
-	JUST_FETCH
+	JUST_FETCH,
+
+	QUIT_PLAYTESTING
 };
 
 struct setup_advance_input {

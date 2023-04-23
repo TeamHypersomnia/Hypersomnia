@@ -834,9 +834,14 @@ work_result work(const int argc, const char* const * const argv) try {
 	*/	
 
 	std::unique_ptr<setup_variant> current_setup = nullptr;
+	std::unique_ptr<setup_variant> background_setup = nullptr;
 
 	auto has_current_setup = [&]() {
 		return current_setup != nullptr;
+	};
+
+	auto restore_background_setup = [&]() {
+		current_setup = std::move(background_setup);
 	};
 
 	auto visit_current_setup = [&](auto callback) -> decltype(auto) {
@@ -1110,7 +1115,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				const auto bound_port = get_bound_local_port();
 				auxiliary_socket.reset();
 
-				LOG("Starting server  setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
+				LOG("Starting server setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
 				auto start = config.default_server_start;
 				start.port = bound_port;
@@ -1561,6 +1566,57 @@ work_result work(const int argc, const char* const * const argv) try {
 
 					break;
 
+				case custom_imgui_result::PLAYTEST_ONLINE:
+					if constexpr(std::is_same_v<S, editor_setup>) {
+						setup.prepare_for_online_playtesting();
+
+						if (config.server.allow_nat_traversal) {
+							if (!nat_detection_complete()) {
+								setup.set_recent_message("NAT detection in progress. Please try again in a few seconds.");
+								break;
+							}
+						}
+
+						const auto bound_port = get_bound_local_port();
+						auxiliary_socket.reset();
+
+						LOG("Starting server setup for playtesting. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
+
+						auto start = config.default_server_start;
+						start.port = bound_port;
+
+						auto playtest_vars = config.server;
+						playtest_vars.server_name = "${MY_NICKNAME} is creating " + setup.get_arena_name();
+
+						auto playtest_solvable_vars = config.server_solvable;
+						playtest_solvable_vars.playtesting_context = setup.make_playtesting_context();
+						playtest_solvable_vars.current_arena = setup.get_arena_name();
+
+						background_setup = std::move(current_setup);
+
+						setup_launcher([&]() {
+							emplace_current_setup(std::in_place_type_t<server_setup>(),
+								lua,
+								*official,
+								start,
+								playtest_vars,
+								playtest_solvable_vars,
+								config.client,
+								config.private_server,
+								std::nullopt,
+
+								make_server_nat_traversal_input(),
+								params.suppress_server_webhook
+							);
+						});
+					}
+
+					break;
+
+				case custom_imgui_result::QUIT_PLAYTESTING:
+					restore_background_setup();
+					break;
+
 				default: break;
 			}
 		});
@@ -1588,7 +1644,18 @@ work_result work(const int argc, const char* const * const argv) try {
 			lua,
 			[&]() {
 				auto do_nat_detection_logic = [&]() {
-					if (has_current_setup()) {
+					bool do_nat_detection = true;
+
+					visit_current_setup([&](const auto& setup) {
+						using T = remove_cref<decltype(setup)>;
+
+						if constexpr(is_one_of_v<T, client_setup, server_setup>) {
+							/* Don't do NAT detection when it's already too late to do so */
+							do_nat_detection = false;
+						}
+					});
+
+					if (!do_nat_detection) {
 						return;
 					}
 
@@ -2566,6 +2633,7 @@ work_result work(const int argc, const char* const * const argv) try {
 									case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; return true;
 									case setup_escape_result::JUST_FETCH: return true;
 									case setup_escape_result::GO_TO_MAIN_MENU: launch_setup(launch_type::MAIN_MENU); return true;
+									case setup_escape_result::QUIT_PLAYTESTING: restore_background_setup(); return true;
 									default: return false;
 								}
 							})) {
