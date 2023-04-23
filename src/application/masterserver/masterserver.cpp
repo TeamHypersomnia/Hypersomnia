@@ -263,11 +263,17 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
 		const auto ip_str = ::ToString(from);
 
-		if (since_launch.get<std::chrono::seconds>() < settings.suppress_community_server_webhooks_after_launch_for_secs) {
+		const auto passed = since_launch.get<std::chrono::seconds>();
+		const auto mute_for_secs = settings.suppress_community_server_webhooks_after_launch_for_secs;
+
+		if (passed < mute_for_secs) {
+			MSR_LOG("Suppressing notifications for %x as masterserver has only just launched (%x/%x).", passed, mute_for_secs);
 			return;
 		}
 
 		if (auto discord_webhook_url = parsed_url(cfg.private_server.discord_webhook_url); discord_webhook_url.valid()) {
+			MSR_LOG("Posting a discord webhook job");
+
 			push_webhook_job(
 				[ip_str, data, discord_webhook_url]() -> std::string {
 					const auto ca_path = CA_CERT_PATH;
@@ -297,14 +303,23 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						data.is_editor_playtesting_server
 					);
 
+					MSR_LOG("Sending a discord notification for %x", data.server_name);
+
 					http_client.Post(discord_webhook_url.location.c_str(), items);
 
 					return "";
 				}
 			);
 		}
+		else {
+			if (cfg.private_server.discord_webhook_url.size() > 0) {
+				MSR_LOG("Discord webhook url was invalid.");
+			}
+		}
 
 		if (auto telegram_webhook_url = parsed_url(cfg.private_server.telegram_webhook_url); telegram_webhook_url.valid()) {
+			MSR_LOG("Posting a telegram webhook job");
+
 			auto telegram_channel_id = cfg.private_server.telegram_channel_id;
 
 			push_webhook_job(
@@ -328,11 +343,19 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					);
 
 					const auto location = telegram_webhook_url.location + "/sendMessage";
+
+					MSR_LOG("Sending a telegram notification for %x", data.server_name);
+
 					http_client.Post(location.c_str(), items);
 
 					return "";
 				}
 			);
+		}
+		else {
+			if (cfg.private_server.telegram_webhook_url.size() > 0) {
+				MSR_LOG("Discord webhook url was invalid.");
+			}
 		}
 	};
 
@@ -411,9 +434,15 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 							const bool heartbeats_mismatch = heartbeat_before != server_entry.last_heartbeat;
 
+							const auto ip_str = ::ToString(from);
+
 							if (is_new_server) {
 								if (!typed_request.suppress_new_community_server_webhook) {
+									MSR_LOG("New server sent a heartbeat from %x. Sending a notification.", ip_str);
 									push_new_server_webhook(from, typed_request);
+								}
+								else {
+									MSR_LOG("New server sent a heartbeat from %x. Skipping notification due to a flag.", ip_str);
 								}
 							}
 
