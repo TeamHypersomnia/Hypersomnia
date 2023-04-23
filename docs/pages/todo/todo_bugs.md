@@ -151,3 +151,7 @@ We have a demo file
         - which is why we need to use default allocator for our block messages because their sizes will be nondeterministic
             - this will also free our per-client memory
 
+- demo files might be fucked up during sessions with downloaded maps
+	- they must correctly remember the full state snapshots
+	- It was just a matter of ignoring file payloads
+

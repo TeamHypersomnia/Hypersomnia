@@ -472,14 +472,16 @@ class client_setup :
 					const auto& max_commands = vars.max_predicted_client_commands;
 					const auto num_commands = p.size();
 
-					if (num_commands > max_commands) {
-						set_disconnect_reason(typesafe_sprintf(
-							"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
-							num_commands,
-							max_commands
-						));
+					if (!is_replaying()) {
+						if (num_commands > max_commands) {
+							set_disconnect_reason(typesafe_sprintf(
+								"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
+								num_commands,
+								max_commands
+							));
 
-						disconnect();
+							disconnect();
+						}
 					}
 
 					performance.predicted_steps.measure(num_commands);

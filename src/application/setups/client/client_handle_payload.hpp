@@ -58,6 +58,10 @@ message_handler_result client_setup::handle_payload(
 		}
 	}
 	else if constexpr (std::is_same_v<T, file_download_payload>) {
+		if (is_replaying()) {
+			return continue_v;
+		}
+
 		return advance_downloading_session(payload.file_bytes);
 	}
 	else if constexpr (std::is_same_v<T, server_vars>) {
@@ -254,16 +258,18 @@ message_handler_result client_setup::handle_payload(
 		const auto& max_commands = vars.max_buffered_server_commands;
 		const auto num_commands = receiver.incoming_entropies.size();
 
-		if (num_commands > max_commands) {
-			set_disconnect_reason(typesafe_sprintf(
-				"Number of buffered server commands (%x) exceeded max_buffered_server_commands (%x).", 
-				num_commands,
-				max_commands
-			));
+		if (!is_replaying()) {
+			if (num_commands > max_commands) {
+				set_disconnect_reason(typesafe_sprintf(
+					"Number of buffered server commands (%x) exceeded max_buffered_server_commands (%x).", 
+					num_commands,
+					max_commands
+				));
 
-			LOG_NVPS(last_disconnect_reason);
+				LOG_NVPS(last_disconnect_reason);
 
-			return abort_v;
+				return abort_v;
+			}
 		}
 
 		//LOG("Received %x th entropy from the server", receiver.incoming_entropies.size());
