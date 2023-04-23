@@ -1184,7 +1184,11 @@ EDIT_FUNCTION(editor_sound_resource_editable& insp, T& es) {
 		MULTIPROPERTY("Doppler intensity", doppler_intensity);
 	}
 
-	MULTIPROPERTY("Loop", loop);
+	MULTIPROPERTY("Loop forever", loop);
+
+	if (!insp.loop) {
+		MULTIPROPERTY("Times played", play_times);
+	}
 
 	return result;
 }

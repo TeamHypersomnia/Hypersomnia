@@ -26,6 +26,7 @@ struct editor_sound_effect_modifier {
 	real32 doppler_intensity = 1.0f;
 
 	bool loop = false;
+	uint32_t play_times = 1;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_sound_effect_modifier&) const = default;

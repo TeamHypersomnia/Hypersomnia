@@ -205,6 +205,9 @@ void setup_scene_object_from_resource(
 			if (from.loop) {
 				out.repetitions = -1;
 			}
+			else {
+				out.repetitions = from.play_times;
+			}
 		};
 
 		if constexpr(std::is_same_v<T, editor_sound_effect>) {
