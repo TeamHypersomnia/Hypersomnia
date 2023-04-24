@@ -1654,7 +1654,7 @@ void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& e
 }
 
 void server_setup::send_packets_to_clients_downloading_files() {
-	const auto target_bandwidth = 2 * 1024 * 1024; // 2 MB per second should be a fine compromise
+	const auto target_bandwidth = vars.max_file_bandwidth * 1024 * 1024;
 	const auto max_packets_at_a_time = 10; // 10k at a time can be sent, so to achieve max bandwidth, just 200 fps on a server is enough.
 
 	/* 

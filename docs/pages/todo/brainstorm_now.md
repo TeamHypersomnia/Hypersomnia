@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix organism area order
+    - Only the topmost one should be considered
+
+- Expand/collapse all layers
+
+- Allow spawning c4 on the map, then it won't spawn with the TTs, they'll have to pick it up
+
 - impose that 10mb limit in editor too
 
 - point/area markers -> spots/zones

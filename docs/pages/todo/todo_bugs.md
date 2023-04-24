@@ -9,6 +9,7 @@ summary: Just a hidden scratchpad.
 	- Try playing it on windows
 	- Happens when damage is dealt for some reason
 		- couldnt physics break at these bullet speeds?
+	- Perhaps rapidjson is a source of indeterminism when loading doubles/floats
 
 - Crash due to yojimbo_assert( sentPacket );
 	- Only in debug build though

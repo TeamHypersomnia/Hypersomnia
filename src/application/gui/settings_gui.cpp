@@ -1146,6 +1146,8 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(max_predicted_client_commands), 0u, 3000u);
 				}
 
+				revertable_slider("Max file bandwidth (per second)", scope_cfg.max_file_bandwidth, 0.0f, 4.f, "%.1f MB");
+
 				ImGui::Separator();
 
 				text_color("Lag compensation", yellow);
@@ -1715,6 +1717,8 @@ void do_server_vars(
 	revertable_input_text(SCOPE_CFG_NVP(server_name));
 
 	revertable_checkbox("Allow NAT traversal", scope_cfg.allow_nat_traversal);
+
+	revertable_slider("Max file bandwidth (per second)", scope_cfg.max_file_bandwidth, 0.0f, 4.f, "%.1f MB");
 
 	if (auto node = scoped_tree_node("Time limits")) {
 		revertable_slider(SCOPE_CFG_NVP(move_to_spectators_if_afk_for_secs), 10u, 6000u);

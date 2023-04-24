@@ -1132,7 +1132,7 @@ void client_setup::traverse_nat_if_required() {
 void client_setup::exchange_file_packets() {
 	const auto current_time = get_current_time();
 
-	const auto target_bandwidth = 2 * 1024 * 1024;
+	const auto target_bandwidth = vars.max_file_bandwidth * 1024 * 1024;
 	const auto max_packets_at_a_time = 10;
 
 	const auto packets_per_second = float(target_bandwidth) / block_fragment_size_v;
