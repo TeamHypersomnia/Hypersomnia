@@ -185,6 +185,47 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		}
 	}
 
+	auto do_collapse_all_opts = [&]() {
+		ImGui::Separator();
+
+		bool all_collapsed = true;
+		bool none_collapsed = true;
+
+		if (in.layers.pool.empty()) {
+			all_collapsed = false;
+			none_collapsed = false;
+		}
+
+		for (auto& l : in.layers.pool) {
+			if (l.is_open) {
+				all_collapsed = false;
+			}
+			else {
+				none_collapsed = false;
+			}
+		}
+
+		{
+			auto disabled = maybe_disabled_cols(all_collapsed);
+
+			if (ImGui::Selectable("Collapse all layers")) {
+				for (auto& l : in.layers.pool) {
+					l.is_open = false;
+				}
+			}
+		}
+
+		{
+			auto disabled = maybe_disabled_cols(none_collapsed);
+
+			if (ImGui::Selectable("Expand all layers")) {
+				for (auto& l : in.layers.pool) {
+					l.is_open = true;
+				}
+			}
+		}
+	};
+
 	//const auto& style = ImGui::GetStyle();
 	const auto disabled_color = rgba(255, 255, 255, 110);
 
@@ -456,6 +497,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 							nodeize_request = typed_node_id;
 						}
 					}
+
+					do_collapse_all_opts();
 
 					ImGui::EndPopup();
 				}
@@ -732,6 +775,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					if (ImGui::Selectable("Rename (F2)")) {
 						rename_this_layer = true;
 					}
+
+					do_collapse_all_opts();
 
 					ImGui::EndPopup();
 				}
