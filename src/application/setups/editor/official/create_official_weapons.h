@@ -45,10 +45,6 @@ void create_weapons(const intercosm& scene, editor_resource_pools& pools) {
 		auto& pool = pools.template get_pool_for<editor_explosive_resource>();
 
 		augs::for_each_enum_except_bounds([&](const test_id_type enum_id) {
-			if (enum_id == test_hand_explosives::BOMB) {
-				return;
-			}
-
 			const auto flavour_id = to_entity_flavour_id(enum_id);
 
 			auto res = editor_explosive_resource();

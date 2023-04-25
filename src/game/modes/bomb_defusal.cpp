@@ -699,6 +699,21 @@ entity_handle bomb_defusal::spawn_bomb(const input_type in) {
 }
 
 bool bomb_defusal::give_bomb_to_random_player(const input_type in, const logic_step step) {
+	auto& cosm = in.cosm;
+
+	bool existing_bomb_found = false;
+
+	cosm.template for_each_having<invariants::hand_fuse>([&](const auto& typed_handle) {
+		if (typed_handle.get_flavour_id() == in.rules.bomb_flavour) {
+			bomb_entity = typed_handle;
+			existing_bomb_found = true;
+		}
+	});
+
+	if (existing_bomb_found) {
+		return true;
+	}
+
 	static const auto tried_slots = std::array<slot_function, 3> {
 		slot_function::OVER_BACK,
 
@@ -707,8 +722,6 @@ bool bomb_defusal::give_bomb_to_random_player(const input_type in, const logic_s
 	};
 
 	const auto p = calc_participating_factions(in);
-
-	auto& cosm = in.cosm;
 
 	const auto viable_players = [&]() {
 		std::vector<typed_entity_id<player_character_type>> result;
