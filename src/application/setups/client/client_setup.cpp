@@ -1130,12 +1130,21 @@ void client_setup::traverse_nat_if_required() {
 }
 
 void client_setup::exchange_file_packets() {
+	if (!is_connected()) {
+		return;
+	}
+
 	const auto current_time = get_current_time();
 
 	const auto target_bandwidth = vars.max_file_bandwidth * 1024 * 1024;
 	const auto max_packets_at_a_time = 10;
 
 	const auto packets_per_second = float(target_bandwidth) / block_fragment_size_v;
+
+	if (packets_per_second == 0.0f) {
+		return;
+	}
+
 	const auto packet_interval = 1.0f / packets_per_second;
 
 	int times_sent = 0;
@@ -1146,10 +1155,36 @@ void client_setup::exchange_file_packets() {
 		adapter->send_packets();
 		handle_incoming_payloads();
 		++times_sent;
+		++times_sent_packets;
 	}
+
+	send_silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo();
 
 	if (client_time < current_time) {
 		client_time = current_time;
+	}
+}
+
+void client_setup::send_silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo() {
+	if (times_sent_packets > 1000) {
+		times_sent_packets = 0;
+
+		if (downloading) {
+			const auto downloaded_index = downloading->get_downloaded_file_index();
+			const auto num_all = downloading->num_all_downloaded_files();
+
+			/* Looks more pro without the easing per-file after all */
+
+			const auto percent_complete = (num_all == 1) ? 1.f : ((float(downloaded_index) /*+ this_percent_complete*/) / (num_all - 1));
+
+			::download_progress_message silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo;
+			silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo.progress = percent_complete * 255;
+
+			send_payload(
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+				silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo
+			);
+		}
 	}
 }
 
@@ -1161,6 +1196,10 @@ void client_setup::send_packets_if_its_time() {
 	if (vars.network_simulator.value.loss_percent >= 100.f) {
 		return;
 	}
+
+	++times_sent_packets;
+
+	send_silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo();
 
 	adapter->send_packets();
 }

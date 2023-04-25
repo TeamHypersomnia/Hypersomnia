@@ -18,6 +18,7 @@
 #include "application/setups/server/request_arena_file_download.h"
 #include "game/modes/session_id.h"
 #include "application/network/net_serialize.h"
+#include "application/network/download_progress_message.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -278,6 +279,11 @@ namespace net_messages {
 		);
 	};
 
+	struct download_progress_message : net_message_with_payload<::download_progress_message> {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+	};
+
 	using all_t = type_list<
 		client_welcome*,
 		public_settings_update*, 
@@ -298,7 +304,8 @@ namespace net_messages {
 		net_statistics_update*,
 		player_avatar_exchange*,
 		request_arena_file_download*,
-		file_download*
+		file_download*,
+		download_progress_message*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

@@ -1663,27 +1663,58 @@ void server_setup::send_packets_to_clients_downloading_files() {
 	*/
 
 	const auto packets_per_second = float(target_bandwidth) / block_fragment_size_v;
-	const auto packet_interval = 1.0f / packets_per_second;
+
+	if (packets_per_second == 0.0f) {
+		return;
+	}
+
+	auto packet_interval = 1.0f / packets_per_second;
 
 	const auto current_time = get_current_time();
 
-	auto send_packets = [&](const auto client_id, auto& c) {
+	auto max_times_sent = 0;
+	int num_downloaders = 0;
+
+	for_each_id_and_client([&num_downloaders](const auto, auto& c){
+		if (c.is_downloading_files) {
+			++num_downloaders;
+		}
+	}, connected_and_integrated_v);
+
+	if (num_downloaders == 0) {
+		return;
+	}
+
+	packet_interval *= num_downloaders;
+
+	auto send_packets = [&](const auto, auto& c) {
 		if (c.is_downloading_files) {
 			int times_sent = 0;
 
 			while (c.when_last_sent_file_packet <= current_time && times_sent < max_packets_at_a_time) {
 				c.when_last_sent_file_packet += packet_interval;
 
+#if 0
 				server->send_packets_to(client_id);
 				server->receive_packets_from(client_id);
+#endif
 				++times_sent;
 			}
 
-			c.when_last_sent_file_packet = current_time;
+			max_times_sent = std::max(times_sent, max_times_sent);
+
+			if (c.when_last_sent_file_packet < current_time) {
+				c.when_last_sent_file_packet = current_time;
+			}
 		}
 	};
 
 	for_each_id_and_client(send_packets, connected_and_integrated_v);
+
+	for (int i = 0; i < max_times_sent; ++i) {
+		server->send_packets();
+		handle_client_messages();
+	}
 }
 
 void server_setup::send_packets_if_its_time() {

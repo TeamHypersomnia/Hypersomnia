@@ -10,6 +10,7 @@ summary: Just a hidden scratchpad.
 	- Happens when damage is dealt for some reason
 		- couldnt physics break at these bullet speeds?
 	- Perhaps rapidjson is a source of indeterminism when loading doubles/floats
+- The desync happened with claarity too on a very simple map so it makes me think it's an issue with how it's loaded from json
 
 - Crash due to yojimbo_assert( sentPacket );
 	- Only in debug build though

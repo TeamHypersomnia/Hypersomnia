@@ -324,8 +324,6 @@ public:
 			nat_traversal.last_detected_nat = nat_detection_result();
 		}
 
-		send_packets_to_clients_downloading_files();
-
 		const auto current_time = get_current_time();
 
 		while (server_time <= current_time) {
@@ -450,6 +448,8 @@ public:
 			update_stats(in.server_stats);
 			step_collected.clear();
 		}
+
+		send_packets_to_clients_downloading_files();
 
 		log_performance();
 	}

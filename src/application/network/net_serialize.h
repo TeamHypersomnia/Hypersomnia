@@ -7,6 +7,7 @@
 #include "game/modes/mode_commands/match_command.h"
 #include "augs/window_framework/mouse_rel_bound.h"
 #include "application/setups/server/request_arena_file_download.h"
+#include "application/network/download_progress_message.h"
 
 namespace sanitization {
 	bool arena_name_safe(const std::string& untrusted_map_name);
@@ -316,6 +317,13 @@ namespace net_messages {
 	template <typename Stream>
 	bool serialize(Stream& stream, ::request_arena_file_download& payload) {
 		return serialize_fixed_byte_array(stream, payload.requested_file_hash);
+	}
+
+	template <typename Stream>
+	bool serialize(Stream& stream, ::download_progress_message& payload) {
+		serialize_int(stream, payload.progress, 0, 255);
+
+		return true;
 	}
 
 	template <typename Stream>
