@@ -527,40 +527,32 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 		}
 
 		if (selected_entry != nullptr) {
-			const bool is_template = current_tab != project_tab_type::MY_PROJECTS;
-
-			const auto label = 
-				is_template ?
-				"CREATE FROM SELECTED" :
-				"OPEN SELECTED"
-			;
-
-			const auto icon = 
-				is_template ? 
-				assets::necessary_image_id::EDITOR_ICON_CLONE : 
-				assets::necessary_image_id::EDITOR_ICON_OPEN
-			;
-
-			const bool bottom_button_pressed = selectable_with_icon(
-				in.necessary_images[icon],
-				label,
-				button_size_mult,
-				vec2(1.0f, button_padding_mult),
-				rgba(120, 220, 255, 255),
-				{
-					rgba(15, 40, 70, 255),
-					rgba(35, 60, 90, 255),
-					rgba(55, 80, 110, 255)
+			auto do_big_button = [&](auto label, auto icon, auto result_if) {
+				if (selectable_with_icon(
+					in.necessary_images[icon],
+					label,
+					button_size_mult,
+					vec2(1.0f, button_padding_mult),
+					rgba(120, 220, 255, 255),
+					{
+						rgba(15, 40, 70, 255),
+						rgba(35, 60, 90, 255),
+						rgba(55, 80, 110, 255)
+					}
+				)) {
+					result = result_if;
 				}
-			);
+			};
 
-			if (bottom_button_pressed) {
-				if (is_template) {
-					result = project_list_view_result::OPEN_CREATE_FROM_SELECTED_DIALOG;
-				}
-				else {
-					result = project_list_view_result::OPEN_SELECTED_PROJECT;
-				}
+			if (current_tab == project_tab_type::MY_PROJECTS) {
+				ImGui::Columns(2);
+				do_big_button("OPEN SELECTED", assets::necessary_image_id::EDITOR_ICON_OPEN, project_list_view_result::OPEN_SELECTED_PROJECT);
+				ImGui::NextColumn();
+				do_big_button("CLONE FROM SELECTED", assets::necessary_image_id::EDITOR_ICON_CLONE, project_list_view_result::OPEN_CREATE_FROM_SELECTED_DIALOG);
+				ImGui::Columns(1);
+			}
+			else {
+				do_big_button("CREATE FROM SELECTED", assets::necessary_image_id::EDITOR_ICON_CLONE, project_list_view_result::OPEN_CREATE_FROM_SELECTED_DIALOG);
 			}
 		}
 	}
