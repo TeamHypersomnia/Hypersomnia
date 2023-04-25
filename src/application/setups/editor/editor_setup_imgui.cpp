@@ -389,7 +389,12 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 
 	ImGui::End();
 
-	if (invalid_filenames_popup) {
+	if (autosave_popup) {
+		if (autosave_popup->perform()) {
+			autosave_popup = std::nullopt;
+		}
+	}
+	else if (invalid_filenames_popup) {
 		std::size_t can_be_renamed_num = 0;
 
 		for (const auto& r : last_invalid_paths) {

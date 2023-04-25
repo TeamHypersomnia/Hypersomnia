@@ -162,10 +162,19 @@ editor_setup::editor_setup(
 
 		autosaved_project->meta.name = paths.arena_name;
 
+		simple_popup new_autosave_popup;
+		new_autosave_popup.title = "WARNING!";
+
 		replace_whole_project_command cmd;
 		cmd.after = std::move(autosaved_project);
 		cmd.before = std::make_unique<editor_project>(project);
 		cmd.built_description = std::string("Loaded autosave from ") + paths.autosave_json.filename().string();
+
+		new_autosave_popup.warning_notice_above = "Loaded an autosave file from " + paths.autosave_json.filename().string() + ".";
+
+		new_autosave_popup.message = "To go back to last saved changes instead,\npress Undo (CTRL+Z).\n\nIt is best practice to save your work (CTRL+S) before exiting the game.";
+
+		autosave_popup = new_autosave_popup;
 
 		post_new_command(std::move(cmd));
 		history.mark_revision_as_autosaved();
@@ -177,9 +186,8 @@ editor_setup::editor_setup(
 		*/
 
 		dirty_after_loading_autosave = true;
-
-		recent_message.set("Loaded an autosave file.\nTo go back to last saved changes instead,\npress Undo (CTRL+Z).");
-		recent_message.show_for_at_least_ms = 10000;
+		//recent_message.set("Loaded an autosave file.\nTo go back to last saved changes instead,\npress Undo (CTRL+Z).");
+		//recent_message.show_for_at_least_ms = 10000;
 	}
 	catch (const augs::json_deserialization_error& err) {
 		throw augs::json_deserialization_error("(%x):\n%x", paths.autosave_json.filename().string(), err.what());
@@ -329,7 +337,11 @@ bool editor_setup::handle_input_before_imgui(
 }
 
 bool editor_setup::confirm_modal_popup() {
-	if (invalid_filenames_popup) {
+	if (autosave_popup) {
+		autosave_popup = std::nullopt;
+		return true;
+	}
+	else if (invalid_filenames_popup) {
 		invalid_filenames_popup = std::nullopt;
 		return true;
 	}
@@ -2470,7 +2482,11 @@ setup_escape_result editor_setup::escape() {
 		return setup_escape_result::JUST_FETCH;
 	}
 
-	if (invalid_filenames_popup) {
+	if (autosave_popup) {
+		autosave_popup = std::nullopt;
+		return setup_escape_result::JUST_FETCH;
+	}
+	else if (invalid_filenames_popup) {
 		invalid_filenames_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
 	}

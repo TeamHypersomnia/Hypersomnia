@@ -45,6 +45,10 @@ int simple_popup::perform(const std::vector<button>& buttons) {
 	using namespace augs::imgui;
 
 	if (auto popup = scoped_modal_popup(title, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (!warning_notice_above.empty()) {
+			text_color(warning_notice_above, yellow);
+		}
+
 		text(message);
 
 		if (!warning_notice.empty()) {

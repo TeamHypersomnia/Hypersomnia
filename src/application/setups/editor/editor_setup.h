@@ -139,6 +139,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	std::vector<entity_id> cached_selected_comparison;
 	std::vector<entity_id> cached_selected_comparison_after;
 
+	std::optional<simple_popup> autosave_popup;
 	std::optional<simple_popup> invalid_filenames_popup;
 	std::optional<simple_popup> redirect_or_missing_popup;
 
