@@ -81,6 +81,8 @@ struct server_vars {
 	float max_file_bandwidth = 2.0f;
 
 	server_webhook_vars webhooks;
+
+	bool shutdown_after_first_match = false;
 	// END GEN INTROSPECTOR
 };
 

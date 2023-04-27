@@ -184,6 +184,11 @@ chat_gui_entry chat_gui_entry::from(
 			new_entry.overridden_message_color = green;
 			break;
 
+		case chat_target_type::SERVER_SHUTTING_DOWN:
+			new_entry.author.clear();
+			new_entry.message = "Server shutting down.";
+			break;
+
 		case chat_target_type::BAN:
 			new_entry.author.clear();
 			new_entry.message = typesafe_sprintf("%x was banned from the server.\nReason: %x", author, message_str);

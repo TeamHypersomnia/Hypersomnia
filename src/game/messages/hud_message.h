@@ -28,6 +28,15 @@ namespace messages {
 		message_variant payload;
 	};
 
+	struct team_match_start_message {
+		struct player_entry {
+			std::string nickname;
+		};
+
+		std::vector<player_entry> team_1;
+		std::vector<player_entry> team_2;
+	};
+
 	struct duel_of_honor_message {
 		std::string first_player;
 		std::string second_player;
@@ -49,11 +58,17 @@ namespace messages {
 		}
 	};
 
+	struct match_summary_ended {
+		bool is_final = false;
+	};
+
 	struct match_summary_message {
 		struct player_entry {
 			int kills = 0;
 			int assists = 0;
 			int deaths = 0;
+
+			int score = 0;
 
 			std::string nickname;
 		};

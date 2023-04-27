@@ -129,7 +129,7 @@ class server_setup :
 	std::optional<netcode_address_t> internal_address;
 
 	net_time_t server_time = 0.0;
-	bool schedule_shutdown = false;
+	bool shutdown_scheduled = false;
 	bool request_restart_after_shutdown = false;
 
 	bool rebuild_player_meta_viewables = false;
@@ -305,9 +305,7 @@ public:
 		const server_advance_input& in,
 		const C& callbacks
 	) {
-		if (schedule_shutdown) {
-			shutdown();
-			schedule_shutdown = false;
+		if (!is_running()) {
 			return;
 		}
 
@@ -327,6 +325,12 @@ public:
 		const auto current_time = get_current_time();
 
 		while (server_time <= current_time) {
+			if (shutdown_scheduled) {
+				shutdown();
+				shutdown_scheduled = false;
+				return;
+			}
+
 			auto scope = measure_scope(profiler.step);
 
 			step_collected.clear();
@@ -588,4 +592,12 @@ public:
 	void default_server_post_solve(const const_logic_step step);
 
 	void register_external_resources_of(const editor_project&);
+
+	void log_match_end_json(const messages::match_summary_message&);
+	void log_match_start_json(const messages::team_match_start_message&);
+
+	void schedule_shutdown();
+	void send_goodbye_to_masterserver();
+
+	void broadcast_shutdown_message();
 };

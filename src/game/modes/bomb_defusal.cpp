@@ -2194,6 +2194,9 @@ void bomb_defusal::end_warmup_and_go_live(const input_type in, const logic_step 
 	state = arena_mode_state::LIVE;
 	reset_players_stats(in);
 	setup_round(in, step);
+
+	post_team_match_start(in, step);
+	check_duel_of_honor(in, step);
 }
 
 bool bomb_defusal::is_first_round_in_half(const const_input_type in) const { 
@@ -2244,6 +2247,7 @@ void bomb_defusal::report_match_result(const input_type in, const logic_step ste
 		new_entry.assists = player.stats.assists;
 		new_entry.deaths = player.stats.deaths;
 		new_entry.nickname = player.get_chosen_name();
+		new_entry.score = player.stats.calc_score();
 
 		return new_entry;
 	};
@@ -2292,6 +2296,25 @@ void bomb_defusal::report_match_result(const input_type in, const logic_step ste
 	}
 
 	step.post_message(summary);
+}
+
+void bomb_defusal::post_team_match_start(const input_type in, const logic_step step) {
+	const auto p = calc_participating_factions(in);
+
+	messages::team_match_start_message start;
+
+	auto setup_team = [&](auto& into, const auto faction) {
+		for_each_player_in(faction, [&](const auto&, const auto& data) {
+			into.push_back({ data.get_chosen_name() });
+
+			return callback_result::CONTINUE;
+		});
+	};
+
+	setup_team(start.team_1, p.bombing);
+	setup_team(start.team_2, p.defusing);
+
+	step.post_message(start);
 }
 
 void bomb_defusal::check_duel_of_honor(const input_type in, const logic_step step) {
@@ -2354,7 +2377,6 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 
 			if (get_match_begins_in_seconds(in) <= 0.f) {
 				end_warmup_and_go_live(in, step);
-				check_duel_of_honor(in, step);
 			}
 		}
 	}
@@ -2384,10 +2406,16 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 		if (get_match_summary_seconds_left(in) <= 0.f) {
 			const auto p = calc_participating_factions(in);
 
+			messages::match_summary_ended summary_ended;
+
 			if (is_final_round(in)) {
 				restart_match(in, step);
+
+				summary_ended.is_final = true;
 			}
 			else {
+				summary_ended.is_final = false;
+
 				swap_assigned_factions(p);
 
 				was_first_blood = false;
@@ -2401,6 +2429,8 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 				set_players_money_to_initial(in);
 				start_next_round(in, step, round_start_type::DONT_KEEP_EQUIPMENTS);
 			}
+
+			step.post_message(summary_ended);
 		}
 	}
 }

@@ -627,6 +627,8 @@ public:
 	uint32_t get_max_num_active_players(const_input) const;
 
 	void check_duel_of_honor(input, logic_step);
+	void post_team_match_start(input, logic_step);
+
 	bool is_a_duellist(const mode_player_id&) const;
 	mode_player_id get_opponent_duellist(const mode_player_id&) const;
 	void clear_duel();

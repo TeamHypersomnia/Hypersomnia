@@ -578,7 +578,7 @@ custom_imgui_result debugger_setup::perform_custom_imgui(const perform_custom_im
 
 					ImGui::MenuItem("(Info)", NULL, false, false);
 
-					do_window_entry(summary_gui, "U");
+					do_window_entry(summary_gui, "Y");
 					do_window_entry(coordinates_gui, "O");
 
 					ImGui::Separator();
@@ -1160,7 +1160,7 @@ bool debugger_setup::handle_input_before_imgui(
 				case key::C: common_state_gui.open(); return true;
 				case key::G: selection_groups_gui.open(); return true;
 				case key::P: player_gui.show = true; return true;
-				case key::U: summary_gui.open(); return true;
+				case key::Y: summary_gui.open(); return true;
 				case key::O: coordinates_gui.open(); return true;
 				case key::L: layers_gui.open(); return true;
 				case key::I: images_gui.open(); return true;

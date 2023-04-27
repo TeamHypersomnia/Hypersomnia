@@ -371,6 +371,16 @@ namespace augs {
 	}
 
 	template <class T>
+	std::string to_json_string_nopretty(const T& from) {
+		rapidjson::StringBuffer s;
+		rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+
+		write_json(writer, from);
+
+		return s.GetString();
+	}
+
+	template <class T>
 	std::string to_json_string(const T& from) {
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);

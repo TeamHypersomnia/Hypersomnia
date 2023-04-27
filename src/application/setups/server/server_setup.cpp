@@ -42,6 +42,9 @@
 #include "application/setups/editor/resources/resource_traits.h"
 #include "augs/readwrite/json_readwrite_errors.h"
 
+#include "application/setups/server/server_json_events.h"
+#include "augs/readwrite/json_readwrite.h"
+
 const auto only_connected_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
 };
@@ -163,22 +166,23 @@ void server_setup::reset_afk_timer() {
 	integrated_client.last_keyboard_activity_time = server_time;
 }
 
-void server_setup::shutdown() {
+void server_setup::send_goodbye_to_masterserver() {
 	if (has_sent_any_heartbeats() && resolved_server_list_addr != std::nullopt) {
-		// Say goodbye
-
 		const auto destination_address = resolved_server_list_addr.value();
 
 		const auto goodbye = masterserver_request(masterserver_in::goodbye {});
 		auto goodbye_bytes = augs::to_bytes(goodbye);
 
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < 5; ++i) {
 			server->send_udp_packet(destination_address, goodbye_bytes.data(), goodbye_bytes.size());
 		}
 	}
+}
+
+void server_setup::shutdown() {
+	send_goodbye_to_masterserver();
 
 	if (server->is_running()) {
-		server->send_packets();
 		LOG("Shutting down the server.");
 		server->stop();
 	}
@@ -186,7 +190,10 @@ void server_setup::shutdown() {
 
 /* To avoid incomplete type error */
 server_setup::~server_setup() {
-	shutdown();
+	if (is_running()) {
+		broadcast_shutdown_message();
+		shutdown();
+	}
 }
 
 void server_heartbeat::validate() {
@@ -216,23 +223,83 @@ void server_setup::push_webhook_job(F&& f, mode_player_id id) {
 	pending_jobs.emplace_back(webhook_job{ id, std::move(ptr) });
 }
 
+void server_setup::log_match_start_json(const messages::team_match_start_message& msg) {
+	server_json_events::match_start start;
+
+	auto write_faction = [&](auto& to, const auto& from) {
+		for (const auto& player : from) {
+			to.players.push_back({ player.nickname });
+		}
+	};
+
+	write_faction(start.team_1, msg.team_1);
+	write_faction(start.team_2, msg.team_2);
+
+	LOG("SERVER_EVENT match_start: %x", augs::to_json_string_nopretty(start));
+}
+
+void server_setup::log_match_end_json(const messages::match_summary_message& summary) {
+	server_json_events::match_end end;
+
+	auto write_faction = [&](auto& to, const auto from_score, const auto& from) {
+		to.score = from_score;
+
+		for (const auto& player : from) {
+			to.players.push_back({
+				player.score,
+				player.nickname
+			});
+		}
+	};
+
+	write_faction(end.team_1, summary.first_team_score, summary.first_faction);
+	write_faction(end.team_2, summary.second_team_score, summary.second_faction);
+
+	LOG("SERVER_EVENT match_end: %x", augs::to_json_string_nopretty(end));
+}
+
 void server_setup::default_server_post_solve(const const_logic_step step) {
-	const auto& duels = step.get_queue<messages::duel_of_honor_message>();
+	{
+		const auto& match_starts = step.get_queue<messages::team_match_start_message>();
 
-	for (const auto& duel : duels) {
-		push_duel_of_honor_webhook(duel.first_player, duel.second_player);
+		for (const auto& start : match_starts) {
+			log_match_start_json(start);
+		}
 	}
 
-	const auto& duel_interrupts = step.get_queue<messages::duel_interrupted_message>();
+	{
+		const auto& duels = step.get_queue<messages::duel_of_honor_message>();
 
-	for (const auto& duel_interrupt : duel_interrupts) {
-		push_duel_interrupted_webhook(duel_interrupt);
+		for (const auto& duel : duels) {
+			push_duel_of_honor_webhook(duel.first_player, duel.second_player);
+		}
 	}
 
-	const auto& summaries = step.get_queue<messages::match_summary_message>();
+	{
+		const auto& duel_interrupts = step.get_queue<messages::duel_interrupted_message>();
 
-	for (const auto& summary : summaries) {
-		push_match_summary_webhook(summary);
+		for (const auto& duel_interrupt : duel_interrupts) {
+			push_duel_interrupted_webhook(duel_interrupt);
+		}
+	}
+
+	{
+		const auto& summaries = step.get_queue<messages::match_summary_message>();
+
+		for (const auto& summary : summaries) {
+			push_match_summary_webhook(summary);
+			log_match_end_json(summary);
+		}
+	}
+
+	if (vars.shutdown_after_first_match) {
+		const auto& ends = step.get_queue<messages::match_summary_ended>();
+
+		for (const auto& ended : ends) {
+			if (ended.is_final) {
+				schedule_shutdown();
+			}
+		}
 	}
 }
 
@@ -1409,6 +1476,29 @@ void server_setup::advance_clients_state() {
 	}
 }
 
+void server_setup::broadcast_shutdown_message() {
+	server_broadcasted_chat message;
+	message.target = chat_target_type::SERVER_SHUTTING_DOWN;
+	message.recipient_shall_kindly_leave = true;
+
+	broadcast(message);
+
+	handle_client_messages();
+
+	for (int i = 0; i < 10; ++i) {
+		server->send_packets();
+	}
+}
+
+void server_setup::schedule_shutdown() {
+	if (shutdown_scheduled) {
+		return;
+	}
+
+	shutdown_scheduled = true;
+	broadcast_shutdown_message();
+}
+
 template <class P>
 message_handler_result server_setup::handle_rcon_payload(
 	const P& typed_payload
@@ -1426,27 +1516,16 @@ message_handler_result server_setup::handle_rcon_payload(
 		switch (typed_payload) {
 			case special::SHUTDOWN: {
 				LOG("Shutting down due to rcon's request.");
-				schedule_shutdown = true;
-
-				server_broadcasted_chat message;
-				message.target = chat_target_type::SERVER_SHUTTING_DOWN;
-				message.recipient_shall_kindly_leave = true;
-
-				broadcast(message);
+				schedule_shutdown();
 
 				return continue_v;
 			}
 
 			case special::RESTART: {
 				LOG("Restarting the server due to rcon's request.");
-				schedule_shutdown = true;
+				schedule_shutdown();
+
 				request_restart_after_shutdown = true;
-
-				server_broadcasted_chat message;
-				message.target = chat_target_type::SERVER_SHUTTING_DOWN;
-				message.recipient_shall_kindly_leave = true;
-
-				broadcast(message);
 
 				return continue_v;
 			}

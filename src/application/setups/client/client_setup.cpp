@@ -1215,7 +1215,7 @@ void client_setup::log_malicious_server() {
 void client_setup::perform_chat_input_bar() {
 	auto& chat = client_gui.chat;
 
-	if (chat.perform_input_bar(vars.client_chat)) {
+	if (chat.perform_input_bar(vars.client_chat) && is_connected()) {
 		::client_requested_chat message;
 
 		message.target = chat.target;
