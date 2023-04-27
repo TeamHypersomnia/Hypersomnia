@@ -74,6 +74,10 @@ using use_interaction_variant = std::variant<
 
 template <class E>
 std::optional<use_interaction_variant> query_use_interaction(const E& subject) {
+	if (!subject.template has<invariants::sentience>()) {
+		return std::nullopt;
+	}
+
 	auto& cosm = subject.get_cosmos();
 	const auto max_defuse_radius = subject.template get<invariants::sentience>().interaction_hitbox_radius;
 	const auto where = subject.get_logic_transform().pos;

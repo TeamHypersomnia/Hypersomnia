@@ -1444,7 +1444,7 @@ bool debugger_setup::handle_input_before_game(
 					case key::A: view().toggle_ignore_groups(); return true;
 					case key::Z: center_view_at_selection(); return true;
 					case key::I: begin_recording(); return true;
-					case key::L: begin_replaying(); return true;
+					case key::SPACE: begin_replaying(); return true;
 					case key::G: view().toggle_grid(); return true;
 					case key::S: view().toggle_snapping(); return true;
 					case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
