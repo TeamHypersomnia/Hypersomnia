@@ -2061,7 +2061,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 	}
 
 	if (is_dedicated() || integrated_received) {
-		LOG(new_entry.operator std::string());
+		LOG("Server: %x", new_entry.operator std::string());
 	}
 }
 
