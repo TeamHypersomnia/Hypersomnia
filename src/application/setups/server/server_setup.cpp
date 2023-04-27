@@ -77,6 +77,7 @@ server_setup::server_setup(
 	server(
 		std::make_unique<server_adapter>(
 			in,
+			dedicated == std::nullopt,
 			[this](auto&&... args) {
 				if (respond_to_ping_requests(std::forward<decltype(args)>(args)...)) {
 					return true;
@@ -581,16 +582,8 @@ bool server_setup::respond_to_ping_requests(
 	return false;
 }
 
-uint32_t server_setup::get_max_connections() const {
-	return last_start.slots;
-}
-
 uint32_t server_setup::get_num_slots() const {
-	if (is_integrated()) {
-		return 1 + get_max_connections();
-	}
-
-	return get_max_connections();
+	return last_start.slots;
 }
 
 uint32_t server_setup::get_num_connected() const {

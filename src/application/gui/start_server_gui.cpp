@@ -121,10 +121,12 @@ as well as to test your skills in a laggy environment.
 
 		// auto& scope_cfg = into;
 
-		perform_arena_chooser(into_solvable_vars.current_arena);
 		input_text("Server name", into_vars.server_name);
+		perform_arena_chooser(into_solvable_vars.current_arena);
 
-		input_text<100>("Address (IPv4 or IPv6)", into.ip);
+		slider("Slots", into.slots, 2, 64);
+
+		// input_text<100>("Address (IPv4 or IPv6)", into.ip);
 		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
 
 		auto do_port = [&](const auto& label, auto& val) {
@@ -134,6 +136,11 @@ as well as to test your skills in a laggy environment.
 			val = static_cast<unsigned short>(std::clamp(chosen_port, 0, 65535));
 		};
 
+		checkbox("Allow NAT traversal", into_vars.allow_nat_traversal);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If you're behind a router, leave this on.\n\nThis technique lets clients establish a direct connection with your server -\nwithout port forwarding necessary.\n\nYou can disable this if you plan to only play over LAN.");
+		}
 
 		{
 			const bool has_custom_port = into.port != 0;
@@ -152,8 +159,6 @@ as well as to test your skills in a laggy environment.
 			previous_chosen_port = into.port;
 			do_port("##Port", into.port);
 		}
-
-		checkbox("Allow NAT traversal", into_vars.allow_nat_traversal);
 
 		const bool port_bound_successfully = into.port == currently_bound_port;
 
@@ -213,17 +218,9 @@ as well as to test your skills in a laggy environment.
 			text_color("On Linux, please use the command line to spawn a dedicated server.", red);
 		}
 		else {
-			if (instance_type == server_instance_type::INTEGRATED) {
-				slider("Max incoming connections", into.slots, 1, 64);
-				text_disabled("Tip: this number does not include the integrated, local player on the server.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch,\nyou want to set this value to 1.\n\n");
-			}
-			else {
-				slider("Max incoming connections", into.slots, 2, 64);
-			}
-
 			text_disabled("See Settings->Server for more options to tweak.\n\n");
 
-			text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
+			//text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
 		}
 	}
 

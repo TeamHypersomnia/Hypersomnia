@@ -426,7 +426,7 @@ bool start_client_gui_state::perform(
 
 		checkbox("Record demo", into_vars.demo_recording_path.is_enabled);
 
-		text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
+		//text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 	}
 
 	{
