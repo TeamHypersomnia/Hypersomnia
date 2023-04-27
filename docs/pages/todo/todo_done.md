@@ -5948,3 +5948,7 @@ This will discard your redo history."
     - Probably an issue with clrf endings
 
 - convert line endings when hashing json file
+- Expand/collapse all layers
+
+- Allow spawning c4 on the map, then it won't spawn with the TTs, they'll have to pick it up
+

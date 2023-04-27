@@ -159,7 +159,7 @@ server_adapter::server_adapter(const augs::server_listen_input& in, auxiliary_co
 	),
 	auxiliary_command_callback(auxiliary_command_callback)
 {
-    server.Start(in.max_connections);
+    server.Start(in.slots);
 	LOG("Server address is %x", ToString(server.GetAddress()));
 
 	if (auto detail = server.GetServerDetail()) {

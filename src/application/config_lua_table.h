@@ -151,13 +151,13 @@ struct config_lua_table {
 	faction_view_settings faction_view;
 	damage_indication_settings damage_indication;
 
-	server_start_input default_server_start;
+	server_start_input server_start;
 	server_vars server;
 	server_solvable_vars server_solvable;
 	private_server_vars private_server;
 	augs::dedicated_server_input dedicated_server;
 
-	client_start_input default_client_start;
+	client_start_input client_start;
 	client_vars client;
 	performance_settings performance;
 

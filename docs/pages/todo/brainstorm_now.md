@@ -6,16 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- warmup doesn't restart if it stopped and someone joins and game commences
+- warmup theme doesn't restart if it stopped and someone joins and game commences
     - Shouldn't we resample sounds when we reset round?
         - Not really, we don't want sounds to end abruptly
 
 - Fix organism area order
     - Only the topmost one should be considered
-
-- Expand/collapse all layers
-
-- Allow spawning c4 on the map, then it won't spawn with the TTs, they'll have to pick it up
 
 - impose that 10mb limit in editor too
 

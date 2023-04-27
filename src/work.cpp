@@ -185,7 +185,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		result.server.suppress_new_community_server_webhook = true;
 
 #if PLATFORM_UNIX
-		result.default_client_start.chosen_address_type = connect_address_type::CUSTOM;
+		result.client_start.chosen_address_type = connect_address_type::CUSTOM;
 		result.window.fullscreen = false;
 #endif
 #endif
@@ -230,6 +230,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		return result;
 	}();
+
+	LOG("Loaded user configs.");
 
 	auto& config = *config_ptr;
 
@@ -474,7 +476,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	}
 
 	auto chosen_server_port = [&](){
-		return config.default_server_start.port;
+		return config.server_start.port;
 	};
 
 	auto chosen_server_nat = nat_detection_result();
@@ -634,7 +636,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		LOG("Starting a dedicated server. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
-		auto start = config.default_server_start;
+		auto start = config.server_start;
 		start.port = bound_port;
 
 #if BUILD_NETWORKING
@@ -792,7 +794,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
 
 	auto find_chosen_server_info = [&]() {
-		return browse_servers_gui.find_entry(config.default_client_start);
+		return browse_servers_gui.find_entry(config.client_start);
 	};
 
 	ingame_menu_gui ingame_menu;
@@ -1058,7 +1060,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			emplace_current_setup(std::in_place_type_t<client_setup>(),
 				lua,
 				*official,
-				config.default_client_start,
+				config.client_start,
 				config.client,
 				config.nat_detection,
 				bound_port
@@ -1117,7 +1119,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				LOG("Starting server setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
-				auto start = config.default_server_start;
+				auto start = config.server_start;
 				start.port = bound_port;
 
 				setup_launcher([&]() {
@@ -1212,7 +1214,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	auto next_nat_traversal_attempt = [&]() {
 		const auto& server_nat = chosen_server_nat;
-		const auto& client_start = config.default_client_start;
+		const auto& client_start = config.client_start;
 		const auto traversed_address = to_netcode_addr(client_start.get_address_and_port());
 
 		ensure(traversed_address != std::nullopt);
@@ -1258,7 +1260,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		const auto state = nat_traversal->get_current_state();
 
 		if (state == nat_traversal_session::state::TRAVERSAL_COMPLETE) {
-			config.default_client_start.set_custom(::ToString(nat_traversal->get_opened_address()));
+			config.client_start.set_custom(::ToString(nat_traversal->get_opened_address()));
 			nat_traversal.reset();
 
 			finalize_pending_launch();
@@ -1276,7 +1278,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	auto start_client_setup = [&]() {
 		change_with_save(
 			[&](auto& cfg) {
-				cfg.default_client_start = config.default_client_start;
+				cfg.client_start = config.client_start;
 				cfg.client = config.client;
 			}
 		);
@@ -1289,7 +1291,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	auto get_browse_servers_input = [&]() {
 		return browse_servers_input {
 			config.server_list_provider,
-			config.default_client_start,
+			config.client_start,
 			config.official_arena_servers
 		};
 	};
@@ -1308,7 +1310,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			get_general_renderer(), 
 			streaming.avatar_preview_tex, 
 			window, 
-			config.default_client_start, 
+			config.client_start, 
 			config.client,
 			config.official_arena_servers
 		);
@@ -1320,7 +1322,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	auto perform_start_server = [&]() {
 		const bool launched_from_server_start_gui = start_server_gui.perform(
-			config.default_server_start, 
+			config.server_start, 
 			config.server, 
 			config.server_solvable,
 			nat_detection != std::nullopt ? std::addressof(*nat_detection) : nullptr,
@@ -1332,7 +1334,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			change_with_save(
 				[&](auto& cfg) {
-					cfg.default_server_start = config.default_server_start;
+					cfg.server_start = config.server_start;
 					cfg.client = config.client;
 					cfg.server = config.server;
 					cfg.server_solvable = config.server_solvable;
@@ -1344,7 +1346,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			}
 			else {
 				augs::spawn_detached_process(params.exe_path.string(), "--dedicated-server");
-				config.default_client_start.set_custom(typesafe_sprintf("%x:%x", config.default_server_start.ip, chosen_server_port()));
+				config.client_start.set_custom(typesafe_sprintf("%x:%x", config.server_start.ip, chosen_server_port()));
 
 				launch_setup(launch_type::CLIENT);
 			}
@@ -1616,7 +1618,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 						LOG("Starting server setup for playtesting. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
-						auto start = config.default_server_start;
+						auto start = config.server_start;
 						start.port = bound_port;
 
 						auto playtest_vars = config.server;
@@ -1887,7 +1889,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					client_start_requested = true;
 				}
 				else {
-					config.default_client_start.chosen_address_type = connect_address_type::OFFICIAL;
+					config.client_start.chosen_address_type = connect_address_type::OFFICIAL;
 				}
 
 				break;
@@ -1899,7 +1901,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					client_start_requested = true;
 				}
 
-				config.default_client_start.chosen_address_type = connect_address_type::CUSTOM;
+				config.client_start.chosen_address_type = connect_address_type::CUSTOM;
 
 				break;
 				
@@ -2337,7 +2339,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			if (!target.empty()) {
 				change_with_save([&](config_lua_table& cfg) {
-					cfg.default_client_start.set_custom(target);
+					cfg.client_start.set_custom(target);
 				});
 			}
 		}

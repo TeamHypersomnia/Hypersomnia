@@ -214,11 +214,11 @@ as well as to test your skills in a laggy environment.
 		}
 		else {
 			if (instance_type == server_instance_type::INTEGRATED) {
-				slider("Max incoming connections", into.max_connections, 1, 64);
+				slider("Max incoming connections", into.slots, 1, 64);
 				text_disabled("Tip: this number does not include the integrated, local player on the server.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch,\nyou want to set this value to 1.\n\n");
 			}
 			else {
-				slider("Max incoming connections", into.max_connections, 2, 64);
+				slider("Max incoming connections", into.slots, 2, 64);
 			}
 
 			text_disabled("See Settings->Server for more options to tweak.\n\n");

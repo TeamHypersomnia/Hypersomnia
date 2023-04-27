@@ -582,10 +582,10 @@ bool server_setup::respond_to_ping_requests(
 }
 
 uint32_t server_setup::get_max_connections() const {
-	return last_start.max_connections;
+	return last_start.slots;
 }
 
-uint32_t server_setup::get_max_players() const {
+uint32_t server_setup::get_num_slots() const {
 	if (is_integrated()) {
 		return 1 + get_max_connections();
 	}
@@ -635,7 +635,7 @@ void server_setup::send_heartbeat_to_server_list() {
 		vars.suppress_new_community_server_webhook
 	;
 
-	heartbeat.max_online = get_max_players();
+	heartbeat.max_online = get_num_slots();
 	heartbeat.internal_network_address = internal_address;
 
 	heartbeat.num_online = get_num_connected();

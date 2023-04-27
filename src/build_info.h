@@ -92,9 +92,9 @@ Options:
                                 --verify-updater Hypersomnia-for-Windows.exe --signature Hypersomnia-for-Windows.exe.sig
 
     --unit-tests-only           Perform unit tests only and quit.
-    --connect [ADDRESS]         Connect to an arena server in accordance with default_client_start inside the config file.
+    --connect [ADDRESS]         Connect to an arena server in accordance with client_start inside the config file.
                                 The ADDRESS argument is optional - if specified, it will override the connect_address field from the config file.
-    --server                    Host an arena server in accordance with default_server_start inside the config file.
+    --server                    Host an arena server in accordance with server_start inside the config file.
                                 Contrary to the --dedicated-server option, this lets you play on your own server within the same game instance.
     --dedicated-server          The same as --server, but applies some settings suitable for a dedicated server instance.
                                 For example - the game will be started without a window.

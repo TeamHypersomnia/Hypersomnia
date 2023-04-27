@@ -64,13 +64,13 @@ return {
 	"arena.hypersomnia.xyz"
   },
 
-  default_server_start = {
+  server_start = {
 	ip = "127.0.0.1",
 	port = 0,
-	max_connections = 64
+	slots = 64
   },
 
-  default_client_start = {
+  client_start = {
   	default_port = 8412,
 	custom_address = "127.0.0.1",
 
