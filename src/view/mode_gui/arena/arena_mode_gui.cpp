@@ -942,7 +942,11 @@ void arena_gui_state::draw_mode_gui(
 			auto play_tick = [&]() {
 				auto& vol = in.config.audio_volume;
 
-				tick_sound.just_play(
+				if (tick_sound == std::nullopt) {
+					tick_sound.emplace();
+				}
+
+				tick_sound->just_play(
 					alarm ? in.sounds.alarm_tick : in.sounds.round_clock_tick, 
 					vol.get_sound_effects_volume()
 				);

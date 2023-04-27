@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- maybe don't use sleep on dedicated server as it might not be precise
+
 - warmup theme doesn't restart if it stopped and someone joins and game commences
     - Shouldn't we resample sounds when we reset round?
         - Not really, we don't want sounds to end abruptly

@@ -48,7 +48,7 @@ bool start_server_gui_state::perform(
 		const auto help_1 = R"(
 Simplified server running in the game's process.
 The server will be shut down as soon as you exit the game.
-As a host, you will experience no lag whatsoever - your experience will be seamless.
+As a host, you will experience no lag whatsoever - your experience will be flawless.
 
 This option is perfect for quick matches between friends and duels of honor.
 
@@ -64,7 +64,6 @@ This option is perfect for quick matches between friends and duels of honor.
 Fully featured, separate server process designed to run 24/7.
 It will be running even after exiting the game.
 You can shut it down only through a RCON command accessible to authorized clients.
-To play, you will need to manually connect to localhost after launching the server. 
 You will experience a minimal lag (on the order of 10ms). 
 For balance, you can increase the lag via Settings->Client->Enable lag simulator.
 
