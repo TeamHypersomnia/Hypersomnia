@@ -93,6 +93,10 @@ void hotbar_button::draw(
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}
+	
+	if (!context.dependencies.settings.draw_hotbar) {
+		return;
+	}
 
 	const auto& this_tree_entry = context.get_tree_entry(this_id);
 	const auto owner_transfer_capability = context.get_subject_entity();

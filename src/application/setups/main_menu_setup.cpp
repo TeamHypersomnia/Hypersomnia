@@ -51,6 +51,7 @@ void main_menu_setup::customize_for_viewing(config_lua_table& config) const {
 	/* Treat new volume as a multiplier */
 
 	config.audio_volume.sound_effects *= previous_sfx_volume;
+	config.drawing.cinematic_mode = true;
 }
 
 void main_menu_setup::apply(const config_lua_table& config) {

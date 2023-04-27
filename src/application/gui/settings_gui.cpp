@@ -982,10 +982,16 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.drawing;
 
-					if (auto node = scoped_tree_node("In-world HUD")) {
+					if (auto node = scoped_tree_node("HUD")) {
+						revertable_checkbox("Cinematic mode", config.drawing.cinematic_mode);
+
+						revertable_checkbox(SCOPE_CFG_NVP(draw_inventory));
+						revertable_checkbox(SCOPE_CFG_NVP(draw_hotbar));
+
 						revertable_checkbox("Draw Health bar and ammo bar", config.drawing.draw_hp_bar);
 						revertable_checkbox("Draw Personal Electricity bar", config.drawing.draw_pe_bar);
 						revertable_checkbox("Draw Consciousness bar", config.drawing.draw_cp_bar);
+						revertable_checkbox("Draw character status", config.drawing.draw_character_status);
 						revertable_checkbox("Draw remaining ammo", config.drawing.draw_remaining_ammo);
 						revertable_checkbox("Draw damage indicators", config.drawing.draw_damage_indicators);
 
@@ -1035,6 +1041,7 @@ void settings_gui_state::perform(
 						}
 
 						revertable_checkbox("Draw callout indicators", config.drawing.draw_callout_indicators.is_enabled);
+						revertable_checkbox("Draw current character callout", config.drawing.print_current_character_callout);
 
 						if (config.drawing.draw_callout_indicators.is_enabled) {
 							auto indent = scoped_indent();
@@ -1047,15 +1054,8 @@ void settings_gui_state::perform(
 							auto indent = scoped_indent();
 							revertable_slider("Alpha##markers", config.drawing.draw_area_markers.value, 0.f, 1.f);
 						}
-					}
 
-					if (auto node = scoped_tree_node("Static HUD")) {
-						revertable_checkbox(SCOPE_CFG_NVP(print_current_character_callout));
-
-						{
-							revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
-						}
-
+						revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
 					}
 				}
 

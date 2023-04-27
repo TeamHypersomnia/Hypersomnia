@@ -1496,6 +1496,40 @@ work_result work(const int argc, const char* const * const argv) try {
 				config_copy.renderer.default_filtering = augs::filtering_type::LINEAR;
 			}
 
+			if (config_copy.drawing.cinematic_mode) {
+				auto& d = config_copy.drawing;
+
+				d.draw_crosshairs = false;
+				//d.draw_weapon_laser = false;
+				d.draw_aabb_highlighter = false;
+				d.draw_inventory = false;
+				d.draw_hotbar = false;
+				d.draw_area_markers.is_enabled = false;
+				d.draw_callout_indicators.is_enabled = false;
+				d.enemy_hud_mode = character_hud_type::NONE;
+				d.draw_hp_bar = false;
+				d.draw_cp_bar = false;
+				d.draw_pe_bar = false;
+				d.draw_character_status = false;
+				d.draw_remaining_ammo = false;
+
+				d.draw_offscreen_indicators = false;
+				d.draw_offscreen_callouts = false;
+				d.draw_nicknames = false;
+				d.draw_small_health_bars = false;
+				d.draw_health_numbers = false;
+				//d.draw_damage_indicators = false;
+
+				d.draw_teammate_indicators.is_enabled = false;
+				d.draw_danger_indicators.is_enabled = false;
+				d.draw_tactical_indicators.is_enabled = false;
+				d.print_current_character_callout = false;
+				d.show_danger_indicator_for_seconds = 0;
+				d.show_death_indicator_for_seconds = 0;
+				d.nickname_characters_for_offscreen_indicators = 0;
+			}
+
+
 			return config_copy;
 		});
 	};
@@ -1799,6 +1833,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			case T::TOGGLE_WEAPON_LASER: {
 				bool& f = config.drawing.draw_weapon_laser;
+				f = !f;
+				return true;
+			}
+
+			case T::TOGGLE_CINEMATIC_MODE: {
+				bool& f = config.drawing.cinematic_mode;
 				f = !f;
 				return true;
 			}
@@ -2750,6 +2790,13 @@ work_result work(const int argc, const char* const * const argv) try {
 
 							if (was_released || direct_gameplay || game_gui_effective) {
 								if (const auto it = mapped_or_nullptr(viewing_config.general_gui_controls, key)) {
+									const bool has_alt{ common_input_state[key::LALT] };
+
+									if (was_pressed && has_alt && key == augs::event::keys::key::U) {
+										handle_general_gui_intent(general_gui_intent_type::TOGGLE_CINEMATIC_MODE);
+										continue;
+									}
+
 									if (was_pressed) {
 										if (handle_general_gui_intent(*it)) {
 											continue;

@@ -33,6 +33,8 @@ enum class general_gui_intent_type {
 	TOGGLE_MOUSE_CURSOR,
 	CLEAR_DEBUG_LINES,
 
+	TOGGLE_CINEMATIC_MODE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

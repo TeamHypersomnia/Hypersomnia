@@ -115,6 +115,10 @@ void value_bar::draw(
 		return;
 	}
 
+	if (!context.dependencies.settings.draw_character_status) {
+		return;
+	}
+
 	rgba icon_col = white;
 	auto icon_tex = get_bar_icon(context, this_id);
 

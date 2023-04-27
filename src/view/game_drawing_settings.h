@@ -38,12 +38,15 @@ struct game_drawing_settings {
 	bool draw_crosshairs = true;
 	bool draw_weapon_laser = true;
 	bool draw_aabb_highlighter = true;
+	bool draw_inventory = true;
+	bool draw_hotbar = true;
 	augs::maybe<float> draw_area_markers = augs::maybe<float>(0.5f, true);
 	augs::maybe<float> draw_callout_indicators = augs::maybe<float>(0.5f, true);
 	character_hud_type enemy_hud_mode = character_hud_type::SMALL_HEALTH_BAR;
 	bool draw_hp_bar = true;
 	bool draw_cp_bar = true;
 	bool draw_pe_bar = false;
+	bool draw_character_status = true;
 	bool draw_remaining_ammo = true;
 
 	bool draw_offscreen_indicators = true;
@@ -54,6 +57,9 @@ struct game_drawing_settings {
 	bool draw_damage_indicators = false;
 
 	bool occlude_neons_under_sentiences = true;
+
+	bool cinematic_mode = false;
+
 
 	offscreen_reference_type offscreen_reference_mode = offscreen_reference_type::CHARACTER_POSITION;
 

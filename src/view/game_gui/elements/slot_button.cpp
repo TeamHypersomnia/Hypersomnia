@@ -31,6 +31,10 @@ void slot_button::draw(
 		return;
 	}
 
+	if (!context.dependencies.settings.draw_inventory) {
+		return;
+	}
+
 	const auto& cosm = context.get_cosmos();
 
 	const auto slot_handle = cosm[this_id.get_location().slot_id];

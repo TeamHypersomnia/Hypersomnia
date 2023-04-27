@@ -36,6 +36,10 @@
 using namespace augs::gui::text;
 
 void draw_sentiences_hud(const draw_sentiences_hud_input in) {
+	if (in.meters.empty()) {
+		return;
+	}
+
 	const auto& cosm = in.cosm;
 	const auto& interp = in.interpolation;
 

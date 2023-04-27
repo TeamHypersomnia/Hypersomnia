@@ -546,6 +546,10 @@ void item_button::draw(
 	const viewing_game_gui_context context, 
 	const const_this_in_item this_id
 ) {
+	if (!context.dependencies.settings.draw_inventory) {
+		return;
+	}
+
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
 		return;
 	}

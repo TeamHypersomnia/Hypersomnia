@@ -241,6 +241,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	auto draw_sentience_HUDs = [&]() {
+		if (settings.cinematic_mode) {
+			return;
+		}
+
 		set_shader_with_matrix(shaders.circular_bars);
 
 		const auto set_center_uniform = [&](const auto& tex_id) {
