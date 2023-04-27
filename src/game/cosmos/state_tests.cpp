@@ -1,4 +1,4 @@
-#if !PRODUCTION_BUILD
+#if !IS_PRODUCTION_BUILD
 #if BUILD_UNIT_TESTS
 #include "augs/log_direct.h"
 #include <Catch/single_include/catch2/catch.hpp>

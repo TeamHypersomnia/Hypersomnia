@@ -6,6 +6,11 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
+- We could bind C to silently swap weapon between hands?
+
+- We should lock in the trajectory for the thrown grenade/knife the moment we press the hotkey for it
+	- Otherwise it's unusable
+
 - For bilmer and covert, shot bullet traces only briefly
 
 - Pistols could just have a slower rate of fire and they'll be perfectly balanced
