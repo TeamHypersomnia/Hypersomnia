@@ -35,23 +35,6 @@ t> >, work(int, char const* const*)::$_39> >(void*) ()
 
 - Weapon collider is fucked when it's in the other hand
 
-- Desync with hajt
-	- Try playing it on windows
-	- Happens when damage is dealt for some reason
-		- couldnt physics break at these bullet speeds?
-	- Perhaps rapidjson is a source of indeterminism when loading doubles/floats
-- The desync happened with claarity too on a very simple map so it makes me think it's an issue with how it's loaded from json
-
-- Crash due to yojimbo_assert( sentPacket );
-	- Only in debug build though
-	- This doesn't really break anything if we just comment it out and let it go
-		- this is basically because we don't send any packets on all the other channels for a while so they have m_sequence = 0, and they are suddenly greeted with a very large sequence number
-		- the question being, if it's not inserted into the sequence buffer, how the hell is it even getting acked
-			- so why does this just work?
-		LOG_NVPS(sequence,m_sentPackets->GetSequence(), m_sentPackets->GetSize());
-	- looks like the sequence number is increased by just acking the fragments, it won't help to withhold file requests
-
-
 - when quick testing arena5, probably due to item deletion?
 Program terminated with signal SIGSEGV, Segmentation fault.
 #0  spatial_properties_mixin<specific_entity_handle<true, shootable_charge, ref_stored_id_provider> >::find_logic_transform() const ()
@@ -188,4 +171,35 @@ We have a demo file
 - demo files might be fucked up during sessions with downloaded maps
 	- they must correctly remember the full state snapshots
 	- It was just a matter of ignoring file payloads
+
+- When comparing dumped solvables - aligned storage DOES NOT CALL CONSTRUCTORS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    - this is why you get differing results when comparing binary .solv files
+    - we might zero it out for investigations
+    - we could also use const size vector to zero out once we clear fixtures etc to look for the crash
+	- although std::vector::clear would normally trigger a sigsegv too
+
+
+- Desync with hajt
+	- Try playing it on windows
+	- Happens when damage is dealt for some reason
+		- couldnt physics break at these bullet speeds?
+	- Perhaps rapidjson is a source of indeterminism when loading doubles/floats
+- The desync happened with claarity too on a very simple map so it makes me think it's an issue with how it's loaded from json
+
+- Crash due to yojimbo_assert( sentPacket );
+	- Only in debug build though
+	- This doesn't really break anything if we just comment it out and let it go
+		- this is basically because we don't send any packets on all the other channels for a while so they have m_sequence = 0, and they are suddenly greeted with a very large sequence number
+		- the question being, if it's not inserted into the sequence buffer, how the hell is it even getting acked
+			- so why does this just work?
+		LOG_NVPS(sequence,m_sentPackets->GetSequence(), m_sentPackets->GetSize());
+	- looks like the sequence number is increased by just acking the fragments, it won't help to withhold file requests
+- Found culprit:
+	auto step_input = logic_step_input { scene.world, entropy, solve_settings() };
+	- this caused fish to not simulate during first step which later led to a desync
+- Enough to change to:
+	auto settings = solve_settings();
+	auto step_input = logic_step_input { scene.world, entropy, settings };
+- silly C++ just let us literally compile UB..
+	- this would normally be catched by static analysis so we should do this
 

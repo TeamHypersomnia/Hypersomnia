@@ -362,7 +362,8 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	*/
 
 	auto entropy = cosmic_entropy();
-	auto step_input = logic_step_input { scene.world, entropy, solve_settings() };
+	auto settings = solve_settings();
+	auto step_input = logic_step_input { scene.world, entropy, settings };
 	auto solver = standard_solver();
 
 	solver(
