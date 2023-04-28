@@ -397,8 +397,6 @@ namespace augs {
 		}
 
 		void clear() {
-			const auto c = capacity();
-
 			objects.clear();
 			slots.clear();
 			indirectors.clear();
@@ -407,8 +405,6 @@ namespace augs {
 			if constexpr(has_synchronized_arrays) {
 				synchronized_arrays.clear();
 			}
-
-			reserve(c);
 		}
 
 		template <class C>
