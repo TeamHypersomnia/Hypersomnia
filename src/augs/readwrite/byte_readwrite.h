@@ -389,20 +389,16 @@ namespace augs {
 		container_size_type c;
 		read_bytes(ar, c);
 
-		if (c > storage.max_size()) {
-			throw stream_read_error(
-				"Requested storage capacity is bigger than its max_size!"
-			);
-		}
-
-		storage.reserve(c);
+		(void)storage;
 	}
 
 	template<class Archive, class Container, class container_size_type>
 	void write_capacity_bytes(Archive& ar, const Container& storage) {
-		const auto c = static_cast<container_size_type>(storage.capacity());
+		const auto c = static_cast<container_size_type>(0);
 		ensure(c <= std::numeric_limits<container_size_type>::max());
 		write_bytes(ar, c);
+
+		(void)storage;
 	}
 
 	template<class Archive, std::size_t count>
