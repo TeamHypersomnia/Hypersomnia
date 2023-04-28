@@ -1,3 +1,4 @@
+#include "augs/string/typesafe_sprintf.h"
 #include "augs/string/string_templates.h"
 
 #include "application/intercosm.h"

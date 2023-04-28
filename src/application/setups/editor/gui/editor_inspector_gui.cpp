@@ -1960,6 +1960,13 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				cmd.built_description = typesafe_sprintf(changed, "About");
 				post_new_or_rewrite(std::move(cmd));
 			}
+
+#if DEBUG_DESYNCS
+			if (ImGui::Button("Dump binary file")) {
+				in.setup.rebuild_arena(false);
+				in.setup.get_scene().save_as_bytes(intercosm_paths("/tmp", "dump"));
+			}
+#endif
 		}
 		else if (project_current_tab == inspected_project_tab_type::PLAYTESTING) {
 			edit_project_settings_command cmd;

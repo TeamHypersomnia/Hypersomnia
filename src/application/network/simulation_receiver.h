@@ -190,10 +190,12 @@ public:
 							referential_cosmos.template calculate_solvable_signi_hash<uint32_t>()
 						;
 
+						const auto step_number = referential_cosmos.get_total_steps_passed();
+
 						if (*received_hash != client_state_hash) {
 							LOG(
 								"Client desynchronized at step: %x. Hashes differ.\nExpected: %x\nActual: %x\n",
-								referential_cosmos.get_total_steps_passed(),
+								step_number,
 							   	*received_hash,
 							   	client_state_hash
 							);

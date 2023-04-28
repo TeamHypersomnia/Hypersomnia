@@ -176,10 +176,22 @@ void intercosm::load_from_lua(const intercosm_path_op op) {
 	augs::load_from_lua_table(op.lua, *this, op.path);
 }
 
+#if DEBUG_DESYNCS
+bool LOG_BYTE_SERIALIZE = false;
+#endif
+
 void intercosm::save_as_bytes(const intercosm_paths& paths) const {
 	augs::save_as_bytes(viewables, paths.viewables_file);
 	augs::save_as_bytes(world.get_common_significant(), paths.comm_file);
+#if DEBUG_DESYNCS
+	LOG_BYTE_SERIALIZE = true;
+#endif
+
 	augs::save_as_bytes(world.get_solvable().significant, paths.solv_file);
+
+#if DEBUG_DESYNCS
+	LOG_BYTE_SERIALIZE = false;
+#endif
 }
 
 void intercosm::load_from_bytes(const intercosm_paths& paths) {

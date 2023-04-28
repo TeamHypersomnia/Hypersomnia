@@ -23,6 +23,13 @@
 #include "augs/readwrite/stream_read_error.h"
 #include "augs/templates/resize_no_init.h"
 
+#if DEBUG_DESYNCS
+#include "augs/string/get_type_name.h"
+#include "augs/log.h"
+
+extern bool LOG_BYTE_SERIALIZE;
+#endif
+
 namespace augs {
 	namespace detail {	
 		template <class Archive, class Serialized>
@@ -47,6 +54,19 @@ namespace augs {
 		) {
 			verify_byte_readwrite_safety<Archive, Serialized>();
 			
+#if DEBUG_DESYNCS
+			if constexpr(std::is_same_v<Archive, std::ofstream>) {
+				if (LOG_BYTE_SERIALIZE) {
+					if constexpr(can_stream_left_v<std::ostringstream, Serialized>) {
+						LOG_NVPS(ar.tellp(), get_type_name<Serialized>(), object_count, *location);
+					}
+					else {
+						LOG_NVPS(ar.tellp(), get_type_name<Serialized>(), object_count);
+					}
+				}
+			}
+#endif
+
 			const auto byte_count = object_count * sizeof(Serialized);
 			const auto* const byte_location = reinterpret_cast<const byte_type_for_t<Archive>*>(location);
 

@@ -1239,6 +1239,10 @@ void client_setup::snap_interpolation_of_viewed() {
 	snap_for(client_arena_type::REFERENTIAL);
 }
 
+#if DEBUG_SOLVABLES
+#include "augs/readwrite/lua_file.h"
+#endif
+
 void client_setup::perform_demo_player_imgui(augs::window& window) {
 	demo_player.gui.perform(window, demo_player);
 	
@@ -1247,6 +1251,17 @@ void client_setup::perform_demo_player_imgui(augs::window& window) {
 	if (pending_snap) {
 		snap_interpolation_of_viewed();
 		pending_snap = false;
+	}
+
+	if (demo_player.gui.pending_dump) {
+		demo_player.gui.pending_dump = false;
+
+#if DEBUG_DESYNCS
+		LOG_BYTE_SERIALIZE = true;
+		augs::save_as_bytes(clean_round_state, "/tmp/crs.solv");
+		augs::save_as_lua_table(lua, clean_round_state, "/tmp/crs.lua");
+		LOG_BYTE_SERIALIZE = false;
+#endif
 	}
 }
 

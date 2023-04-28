@@ -131,4 +131,10 @@ Numpad keys control speed (0 resets to 1x)
 )";
 
 	text_disabled(hotkeys);
+
+#if DEBUG_DESYNCS
+	if (ImGui::Button("Dump state")) {
+		pending_dump = true;
+	}
+#endif
 }

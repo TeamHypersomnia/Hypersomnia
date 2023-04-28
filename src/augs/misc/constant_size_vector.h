@@ -42,6 +42,10 @@ namespace augs {
 		size_type count = 0;
 		aligned_storage_type raw[const_count];
 
+		void memset_zero() {
+			std::memset(raw, 0, sizeof(raw));
+		}
+
 		auto* nth_ptr(const size_type n) {
 			return std::launder(reinterpret_cast<T*>(raw + n));
 		}
@@ -77,7 +81,13 @@ namespace augs {
 		using reverse_iterator = std::reverse_iterator<T*>;
 		using const_reverse_iterator = std::reverse_iterator<const T*>;
 
+#if DEBUG_DESYNCS
+		constant_size_vector_base() {
+			memset_zero();
+		}
+#else
 		constant_size_vector_base() = default;
+#endif
 
 		template <class Iter>
 		constant_size_vector_base(Iter first, Iter last) {
@@ -315,6 +325,10 @@ namespace augs {
 			else {
 				count = 0;
 			}
+
+#if DEBUG_DESYNCS
+			memset_zero();
+#endif
 		}
 
 		operator std::vector<value_type>() const {

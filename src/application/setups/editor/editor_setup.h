@@ -774,4 +774,8 @@ public:
 
 	void prepare_for_online_playtesting();
 	void request_online_playtesting();
+
+	const auto& get_scene() const {
+		return scene;
+	}
 };
