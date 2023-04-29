@@ -93,7 +93,7 @@ struct nat_traversal_details_window {
 			center_next_window(vec2(0.8f, 0.7f), ImGuiCond_Always);
 		}
 
-		if (auto popup = cond_scoped_modal_popup(should_be_open, title, nullptr, flags)) {
+		if (auto popup = cond_scoped_modal_popup(should_be_open, title, nullptr, flags); popup && session != std::nullopt) {
 			{
 				auto& current_attempt = attempts[current_attempt_index];
 
