@@ -253,13 +253,12 @@ std::optional<netcode_address_t> to_netcode_addr(addrinfo* p) {
 
 std::optional<netcode_address_t> hostname_to_netcode_address_t(const std::string& hostname, bool accept_ip4, bool accept_ip6) {
 	struct addrinfo hints, *res, *p;
-	int status;
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if ((status = getaddrinfo(hostname.c_str(), NULL, &hints, &res)) != 0) {
+	if (getaddrinfo(hostname.c_str(), NULL, &hints, &res) != 0) {
 		return std::nullopt;
 	}
 

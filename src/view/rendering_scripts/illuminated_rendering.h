@@ -61,7 +61,7 @@ struct illuminated_rendering_input {
 	const augs::renderer_settings& renderer_settings;
 	const std::vector<additional_highlight>& additional_highlights;
 	const std::vector<special_indicator>& special_indicators;
-	const special_indicator_meta& indicator_meta;
+	const special_indicator_meta indicator_meta;
 	const particle_triangle_buffers& drawn_particles;
 
 	const damage_indication_settings damage_indication;

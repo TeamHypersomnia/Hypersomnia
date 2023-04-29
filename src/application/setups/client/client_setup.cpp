@@ -99,7 +99,7 @@ bool client_demo_player::control(const handle_input_before_game_input in) {
 }
 
 void client_setup::demo_replay_server_messages_from(const demo_step& step) {
-	for (auto& s : step.serialized_messages) {
+	for (std::vector<std::byte>& serialized_bytes : step.serialized_messages) {
 		auto replay_message = [this](auto& typed_msg) -> message_handler_result {
 			using net_message_type = remove_cref<decltype(typed_msg)>;
 
@@ -115,7 +115,7 @@ void client_setup::demo_replay_server_messages_from(const demo_step& step) {
 		};
 
 		try {
-			const auto result = ::replay_serialized_net_message(s, replay_message);
+			const auto result = ::replay_serialized_net_message(serialized_bytes, replay_message);
 
 			if (result == message_handler_result::ABORT_AND_DISCONNECT) {
 				disconnect();

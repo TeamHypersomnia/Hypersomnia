@@ -22,10 +22,6 @@ summary: That which we are brainstorming at the moment.
 - remember to uncomment looking in editor files once we're done
     - and dont commit webhookd suppression 
 
-
-- percents next to nickname
-    - client will have to send them on their own every second like ping, on volatile statistics channel
-
 - fix broken chat when client downloads files, although not that important
 
 - log should call to hex format automatically

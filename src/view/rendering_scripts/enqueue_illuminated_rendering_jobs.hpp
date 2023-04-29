@@ -37,7 +37,7 @@ void enqueue_illuminated_rendering_jobs(
 	(void)viewed_character_transform;
 
 	const auto& cosm = viewed_character.get_cosmos();
-	const auto& indicator_meta = in.indicator_meta;
+	const auto indicator_meta = in.indicator_meta;
 
 #if BUILD_STENCIL_BUFFER
 	const bool fog_of_war_effective = 
@@ -77,7 +77,7 @@ void enqueue_illuminated_rendering_jobs(
 		return augs::line_drawer_with_default { dedicated[d].lines, necessarys.at(assets::necessary_image_id::BLANK) };
 	};
 
-	auto sentience_hud_job = [&cosm, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, &indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
+	auto sentience_hud_job = [&cosm, cone, global_time_seconds, &settings, &necessarys, &dedicated, queried_cone, &visible, viewed_character, &interp, &gui_font, indicator_meta, fog_of_war_effective, pre_step_crosshair_displacement, &damage_indication, damage_indication_settings]() {
 		augs::constant_size_vector<requested_sentience_meter, 3> requested_meters;
 
 		std::array<assets::necessary_image_id, 3> circles = {

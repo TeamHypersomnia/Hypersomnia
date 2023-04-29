@@ -5,6 +5,10 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- The leak from ImDrawList::CloneOutput() is not important
+	- It's only once on exit and we'd be more likely to break something trying to fix that and synchronously deallocate it
+	- If we do anything with it, we should prevent it from allocating each frame in the first place
+
 - I'd standardize max_ricochet_angle for materials so there aren't too many
 	- Other values, we might customize per-resource, why not
 

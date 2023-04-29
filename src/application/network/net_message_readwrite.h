@@ -4,12 +4,15 @@ template <class T>
 constexpr bool is_block_message_v = std::is_base_of_v<only_block_message, T>;
 
 template <class F>
-decltype(auto) replay_serialized_net_message(const std::vector<std::byte>& bytes, F&& callback) {
+decltype(auto) replay_serialized_net_message(std::vector<std::byte>& demo_bytes, F&& callback) {
 	using Id = type_in_list_id<server_message_variant>;
 
-	auto ar = augs::cref_memory_stream(bytes);
+	auto ar = augs::cref_memory_stream(demo_bytes);
 
 	Id id;
+
+	static_assert(sizeof(id) % 4 == 0);
+
 	augs::read_bytes(ar, id);
 
 	if (id.get_index() >= Id::max_index_v) {
@@ -36,7 +39,7 @@ decltype(auto) replay_serialized_net_message(const std::vector<std::byte>& bytes
 
 				if constexpr(is_block_message_v<net_message_type>) {
 					const auto pos = ar.get_read_pos();
-					const auto block_size = bytes.size() - pos;
+					const auto block_size = demo_bytes.size() - pos;
 
 					if (block_size > max_block_size_v) {
 						throw augs::stream_read_error("block_size (%x) is too big!", block_size);
@@ -52,8 +55,15 @@ decltype(auto) replay_serialized_net_message(const std::vector<std::byte>& bytes
 				else {
 					const auto pos = ar.get_read_pos();
 
-					auto stream = yojimbo::ReadStream(allocator, reinterpret_cast<const uint8_t*>(bytes.data() + pos), bytes.size() - pos);
-					msg.Serialize(stream);
+					if (demo_bytes.size() % 4 != 0) {
+						demo_bytes.resize(demo_bytes.size() + 4 - (demo_bytes.size() % 4));
+					}
+
+					auto stream = yojimbo::ReadStream(allocator, reinterpret_cast<const uint8_t*>(demo_bytes.data() + pos), demo_bytes.size() - pos);
+
+					if (!msg.Serialize(stream)) {
+						throw augs::stream_read_error("error reading replayed net message from stream!");
+					}
 
 					return callback(msg);
 				}

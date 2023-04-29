@@ -105,9 +105,6 @@ struct preserialized_message_type_for {
 template <class T>
 using preserialized_message_type_for_t = typename preserialized_message_type_for<T>::type;
 
-using message_bytes_type = augs::constant_size_vector<std::byte, max_message_size_v>;
-using default_preserialized_message = preserialized_message_type_for_t<message_bytes_type>;
-
 template <class P>
 struct net_message_with_payload : yojimbo::Message {
 	P payload;

@@ -18,8 +18,13 @@ using server_message_variant = transform_types_in_list_t<
 struct demo_step {
 	// GEN INTROSPECTOR struct demo_step
 	std::optional<mode_entropy> local_entropy;
-	std::vector<std::vector<std::byte>> serialized_messages;
+	mutable std::vector<std::vector<std::byte>> serialized_messages;
 	// END GEN INTROSPECTOR
+
+	/*
+		serialized_messages needs to be mutable,
+		because we need to potentially resize it to a multiple of 4 for yojimbo::ReadStream to work properly.
+	*/
 };
 
 using client_setup_snapshot = std::vector<std::byte>;

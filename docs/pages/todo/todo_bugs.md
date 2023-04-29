@@ -203,3 +203,6 @@ We have a demo file
 - silly C++ just let us literally compile UB..
 	- this would normally be catched by static analysis so we should do this
 
+- Might also later fix the direct/indirect memory leaks reported by address sanitizer
+	- done for box2d
+

@@ -4,6 +4,9 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- percents next to nickname
+    - client will have to send them on their own every second like ping, on volatile statistics channel
+
 - Separate the includes maybe so the entire editor project isn't included
 
 - Coloring the light icons would be pretty useful

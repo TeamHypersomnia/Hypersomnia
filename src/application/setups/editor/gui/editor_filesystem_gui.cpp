@@ -95,7 +95,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 						command.create_layer->created_layer.unique_name = in.setup.get_free_layer_name();
 					}
 
-					const auto& executed = in.setup.post_new_command(std::move(command));
+					previewed_created_node = in.setup.post_new_command(std::move(command)).get_node_id();
 
 					in.setup.start_moving_selection();
 					in.setup.make_last_command_a_child();
@@ -109,9 +109,6 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					}
 
 					in.setup.show_absolute_mover_pos_once();
-
-					previewed_created_node = executed.get_node_id();
-
 					in.setup.scroll_once_to(previewed_created_node);
 				};
 

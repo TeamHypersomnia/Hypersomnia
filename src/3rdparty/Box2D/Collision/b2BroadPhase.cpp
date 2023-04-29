@@ -129,6 +129,9 @@ b2BroadPhase& b2BroadPhase::operator=(const b2BroadPhase& b) {
 
 	m_queryProxyId = b.m_queryProxyId;
 
+	b2Free(m_pairBuffer);
+	b2Free(m_moveBuffer);
+
 	m_pairBuffer = (b2Pair*)b2Alloc(m_pairCapacity * sizeof(b2Pair));
 	m_moveBuffer = (int32*)b2Alloc(m_moveCapacity * sizeof(int32));
 

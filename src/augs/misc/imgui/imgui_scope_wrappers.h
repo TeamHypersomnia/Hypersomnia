@@ -37,7 +37,7 @@ namespace augs {
 				}
 			}
 
-			return scope_guard([&post, cond]() { if (cond) { post(); } });
+			return scope_guard([post, cond]() { if (cond) { post(); } });
 		}
 
 		template <class... T>
