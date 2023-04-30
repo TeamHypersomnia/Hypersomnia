@@ -118,7 +118,7 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 
 				}
 				else {
-					if (key_requested_choice != std::nullopt) {
+					if (key_requested_choice.has_value()) {
 						return make_choice(*key_requested_choice);
 					}
 

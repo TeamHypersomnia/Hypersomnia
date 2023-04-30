@@ -640,7 +640,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		money_type equipment_value = 0;
 
 		subject.for_each_contained_item_recursive([&](const auto& typed_item) {
-			if (const auto price = typed_item.find_price(); price != std::nullopt && *price != 0) {
+			if (const auto price = typed_item.find_price(); price.has_value() && *price != 0) {
 				/* Skip bombs, personal deposits and zero-price items which are considered non-buyable */
 				if (typed_item.get_current_slot().get_type() == slot_function::PERSONAL_DEPOSIT) {
 					return;
@@ -800,7 +800,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 						return;
 					}
 
-					if (considered_stance != std::nullopt) {
+					if (considered_stance.has_value()) {
 						if (item.holding_stance != *considered_stance) {
 							const bool but_its_sniper_and_we_want_rifles = item.holding_stance == item_holding_stance::SNIPER_LIKE && considered_stance == item_holding_stance::RIFLE_LIKE;
 

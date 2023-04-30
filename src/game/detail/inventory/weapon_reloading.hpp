@@ -197,7 +197,7 @@ bool is_currently_reloading(
 	const C& cosm,
 	const W& wielded_items
 ) {
-	return ::calc_reloading_movement(cosm, wielded_items) != std::nullopt;
+	return ::calc_reloading_movement(cosm, wielded_items).has_value();
 }
 
 template <class E>

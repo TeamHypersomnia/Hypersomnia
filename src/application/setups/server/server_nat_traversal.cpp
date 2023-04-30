@@ -79,7 +79,7 @@ void server_nat_traversal::advance() {
 
 		auto& stun = traversal.stun;
 
-		if (stun != std::nullopt) {
+		if (stun.has_value()) {
 			if (stun->has_timed_out(stun_timeout_secs)) {
 				if (!traversal.has_stun_timed_out) {
 					traversal.has_stun_timed_out = true;
@@ -102,7 +102,7 @@ void server_nat_traversal::advance() {
 			const auto state = stun->get_current_state();
 
 			if (state == stun_session::state::COMPLETED) {
-				if (masterserver_address != std::nullopt) {
+				if (masterserver_address.has_value()) {
 					const auto& times = traversal.times_sent_port_info;
 
 					if (times == 0) {
@@ -230,7 +230,7 @@ bool server_nat_traversal::handle_auxiliary_command(
 					if (last_detected_nat.type == nat_type::ADDRESS_SENSITIVE) {
 						auto& stun = traversal.stun;
 
-						if (stun != std::nullopt) {
+						if (stun.has_value()) {
 							const auto state = stun->get_current_state();
 
 							if (state == stun_session::state::COMPLETED) {
@@ -340,7 +340,7 @@ bool server_nat_traversal::handle_stun_packet(const std::byte* packet_buffer, co
 	for (auto& entry : traversals) {
 		auto& stun = entry.second.stun;
 
-		if (stun != std::nullopt) {
+		if (stun.has_value()) {
 			if (stun->handle_packet(packet_buffer, packet_bytes)) {
 				return true;
 			}

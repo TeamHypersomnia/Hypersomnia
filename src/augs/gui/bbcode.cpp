@@ -414,7 +414,7 @@ namespace augs {
 								const auto overriding_entry = std::find_if(
 									tag_stack.crbegin(), entry_to_remove,
 									[&] (const auto& entry) {
-										return entry.alteration.*member != std::nullopt;
+										return (entry.alteration.*member).has_value();
 									}
 								);
 
@@ -425,7 +425,7 @@ namespace augs {
 								const auto overridden_entry = std::find_if(
 									std::next(entry_to_remove), tag_stack.crend(),
 									[&] (const auto& entry) {
-										return entry.alteration.*member != std::nullopt;
+										return (entry.alteration.*member).has_value();
 									}
 								);
 

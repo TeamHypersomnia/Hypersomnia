@@ -110,7 +110,7 @@ void debugger_setup::unhover() {
 }
 
 bool debugger_setup::is_editing_mode() const {
-	if (miniature_generator != std::nullopt) {
+	if (miniature_generator.has_value()) {
 		return false;
 	}
 
@@ -122,7 +122,7 @@ bool debugger_setup::is_gameplay_on() const {
 }
 
 std::optional<camera_eye> debugger_setup::find_current_camera_eye() const {
-	if (miniature_generator != std::nullopt) {
+	if (miniature_generator.has_value()) {
 		return miniature_generator->get_current_camera();
 	}
 
@@ -252,7 +252,7 @@ void debugger_setup::customize_for_viewing(config_lua_table& config) const {
 		config.drawing.draw_callout_indicators = {};
 	}
 
-	if (miniature_generator != std::nullopt) {
+	if (miniature_generator.has_value()) {
 		config.drawing.draw_aabb_highlighter = false;
 		config.interpolation.enabled = false;
 		config.drawing.draw_area_markers.is_enabled = false;
@@ -1557,7 +1557,7 @@ augs::path_type debugger_setup::get_unofficial_content_dir() const {
 render_layer_filter get_layer_filter_for_miniature();
 
 augs::maybe<render_layer_filter> debugger_setup::get_render_layer_filter() const {
-	if (miniature_generator != std::nullopt) {
+	if (miniature_generator.has_value()) {
 		return get_layer_filter_for_miniature();
 	}
 
@@ -2169,16 +2169,16 @@ bool debugger_setup::requires_cursor() const {
 #include "augs/graphics/renderer_backend.h"
 
 void debugger_setup::after_all_drawcalls(game_frame_buffer& write_buffer) {
-	if (miniature_generator != std::nullopt) {
+	if (miniature_generator.has_value()) {
 		miniature_generator->request_screenshot(write_buffer.renderers.all[renderer_type::GENERAL]);
 	}
 }
 
 void debugger_setup::do_game_main_thread_synced_op(renderer_backend_result& result) {
-	if (miniature_generator != std::nullopt) {
+	if (miniature_generator.has_value()) {
 		auto& ss = result.result_screenshot;
 
-		if (ss != std::nullopt) {
+		if (ss.has_value()) {
 			miniature_generator->acquire(*ss);
 		}
 	}

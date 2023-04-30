@@ -355,7 +355,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 			if (is_inspected) {
 				if (!pressed_arrow.is_zero()) {
-					if (pressed_arrow.y == -1 && previous_item != std::nullopt) {
+					if (pressed_arrow.y == -1 && previous_item.has_value()) {
 						in.setup.inspect_only(*previous_item);
 						in.setup.scroll_once_to(*previous_item);
 						previous_item = std::nullopt;
@@ -708,7 +708,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				if (is_inspected) {
 					if (!pressed_arrow.is_zero()) {
-						if (pressed_arrow.y == -1 && previous_item != std::nullopt) {
+						if (pressed_arrow.y == -1 && previous_item.has_value()) {
 							in.setup.inspect_only(*previous_item);
 							in.setup.scroll_once_to(*previous_item);
 						}
@@ -728,7 +728,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 						if (pressed_arrow.x == -1) {
 							if (!layer.is_open || layer.empty()) {
-								if (previous_layer != std::nullopt) {
+								if (previous_layer.has_value()) {
 									in.setup.inspect_only(*previous_layer);
 									in.setup.scroll_once_to(*previous_layer);
 								}

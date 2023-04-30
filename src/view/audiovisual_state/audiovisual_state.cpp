@@ -332,7 +332,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		}
 
 		if (sound_every_step) {
-			return input.new_state_delta != std::nullopt;
+			return input.new_state_delta.has_value();
 		}
 
 		return false;

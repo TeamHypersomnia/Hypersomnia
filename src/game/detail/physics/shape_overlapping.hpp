@@ -10,7 +10,7 @@ auto for_each_fixture(const E& handle, F callback) -> decltype(callback(std::dec
 		for (const auto& f : ch->constructed_fixtures) {
 			decltype(auto) result = callback(*f);
 
-			if (result != std::nullopt) {
+			if (result.has_value()) {
 				return result;
 			}
 		}
@@ -56,7 +56,7 @@ auto shape_overlaps_entity(
 			si,
 			shape_transform,
 			fixture
-		); result != std::nullopt && result->overlap) {
+		); result.has_value() && result->overlap) {
 			return result;
 		}
 
@@ -170,7 +170,7 @@ auto circular_sector_overlaps_entity(
 		&shape,
 		shape_transform,
 		handle
-	); result != std::nullopt && result->overlap) {
+	); result.has_value() && result->overlap) {
 		return result;
 	}
 

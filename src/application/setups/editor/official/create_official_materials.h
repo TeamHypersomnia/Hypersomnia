@@ -72,7 +72,7 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 
 		auto def_template = editor_collision_sound_def();
 
-		if (maybe_def_template != std::nullopt) {
+		if (maybe_def_template.has_value()) {
 			def_template = *maybe_def_template;
 		}
 		else {

@@ -19,7 +19,7 @@ namespace editor_widgets {
 
 		auto icon_color = white;
 
-		if (node.necessary_atlas_icon != std::nullopt) {
+		if (node.necessary_atlas_icon.has_value()) {
 			icon = icon_in.necessary_images[*node.necessary_atlas_icon];
 		}
 		else {

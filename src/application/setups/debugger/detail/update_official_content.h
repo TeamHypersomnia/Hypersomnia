@@ -150,7 +150,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 			const auto source_path = o.get_source_path();
 			const auto existing_custom_asset = find_asset_id_by_path(source_path, custom);
 
-			if (existing_custom_asset != std::nullopt) {
+			if (existing_custom_asset.has_value()) {
 				auto adjusted_asset = o;
 				remap_ids_in(adjusted_asset, true);
 				custom[*existing_custom_asset] = adjusted_asset;
@@ -173,7 +173,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 			const auto source_name = ::get_displayed_name(o, offi_image_defs);
 			const auto existing_custom_asset = find_asset_id_by_name(source_name, custom, cust_image_defs);
 
-			if (existing_custom_asset != std::nullopt) {
+			if (existing_custom_asset.has_value()) {
 				auto adjusted_asset = o;
 				remap_ids_in(adjusted_asset, true);
 				custom[*existing_custom_asset] = adjusted_asset;

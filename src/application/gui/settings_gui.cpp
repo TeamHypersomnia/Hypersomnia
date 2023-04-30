@@ -50,7 +50,7 @@ void configuration_subscribers::apply_main_thread(const augs::window_settings& s
 }
 
 bool settings_gui_state::should_hijack_key() const {
-	return hijacking.for_idx != std::nullopt;
+	return hijacking.for_idx.has_value();
 }
 
 void settings_gui_state::set_hijacked_key(const augs::event::keys::key k) {
@@ -170,7 +170,7 @@ stun_server_tester::stun_server_tester(const stun_server_provider& provider, por
 void stun_manager_window::perform() {
 	using namespace augs::imgui;
 
-	if (tester != std::nullopt) {
+	if (tester.has_value()) {
 		tester->advance();
 	}
 
@@ -187,7 +187,7 @@ void stun_manager_window::perform() {
 	}
 
 	if (ImGui::Button("Start analysis")) {
-		if (all_candidates != std::nullopt) {
+		if (all_candidates.has_value()) {
 			tester.reset();
 			auto rng = randomization::from_random_device();
 			tester.emplace(*all_candidates, rng.randval(1024, 60000));
@@ -198,7 +198,7 @@ void stun_manager_window::perform() {
 	std::string all_latencies;
 	std::string all_ports;
 
-	if (tester != std::nullopt) {
+	if (tester.has_value()) {
 		for (const auto& resolved : tester->resolved_servers) {
 			all_resolved_servers += std::get<1>(resolved) + "\n";
 		}
@@ -240,7 +240,7 @@ void stun_manager_window::perform() {
 
 	ImGui::NextColumn();
 
-	if (tester != std::nullopt) {
+	if (tester.has_value()) {
 		const auto processed = tester->num_duplicate_resolved_addresses + tester->num_failed_servers + tester->num_duplicate_servers + tester->resolved_servers.size();
 
 		text("Chosen source port: %x", tester->socket.socket.address.port);

@@ -39,7 +39,7 @@ struct arena_downloading_session {
 	}
 
 	bool is_downloading_resources() const {
-		return current_resource_idx != std::nullopt;
+		return current_resource_idx.has_value();
 	}
 
 	void determine_needed_resources();

@@ -161,7 +161,7 @@ public:
 				{
 					const auto received_hash = meta.state_hash;
 
-					if (received_hash != std::nullopt) {
+					if (received_hash.has_value()) {
 #if TEST_DESYNC_DETECTION
 						auto total = referential_cosmos.get_total_steps_passed();
 						bool simulate_desync = false;

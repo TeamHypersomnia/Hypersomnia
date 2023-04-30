@@ -211,7 +211,7 @@ self_update_result check_and_apply_updates(
 				(void)err;
 			}
 
-			if (standard != std::nullopt) {
+			if (standard.has_value()) {
 				standard->set_as_current(renderer);
 				standard->set_projection(renderer, augs::orthographic_projection(vec2(window_size)));
 			}
@@ -908,7 +908,7 @@ self_update_result check_and_apply_updates(
 		}
 #endif
 
-		if (window != std::nullopt) {
+		if (window.has_value()) {
 			window->collect_entropy(entropy);
 
 			for (const auto& e : entropy) {
@@ -935,8 +935,8 @@ self_update_result check_and_apply_updates(
 		advance_update_logic();
 		augs::imgui::render();
 
-		if (window != std::nullopt) {
-			ensure(imgui_atlas != std::nullopt);
+		if (window.has_value()) {
+			ensure(imgui_atlas.has_value());
 
 			if (imgui_atlas.has_value()) {
 				renderer.draw_call_imgui(
@@ -955,7 +955,7 @@ self_update_result check_and_apply_updates(
 			{
 				auto& r = renderer;
 
-				ensure(renderer_backend != std::nullopt);
+				ensure(renderer_backend.has_value());
 
 				if (renderer_backend.has_value()) {
 					renderer_backend->perform(

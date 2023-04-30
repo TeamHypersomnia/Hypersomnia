@@ -32,7 +32,7 @@ void edit_resource_command<T>::undo(editor_command_input in) {
 	}
 
 	if (do_inspector) {
-		if (override_inspector_state != std::nullopt) {
+		if (override_inspector_state.has_value()) {
 			in.setup.inspect_only(*override_inspector_state);
 			in.setup.set_inspector_tab(inspected_node_tab_type::RESOURCE);
 		}
@@ -67,7 +67,7 @@ void edit_resource_command<T>::redo(editor_command_input in) {
 	}
 
 	if (do_inspector) {
-		if (override_inspector_state != std::nullopt) {
+		if (override_inspector_state.has_value()) {
 			in.setup.inspect_only(*override_inspector_state);
 			in.setup.set_inspector_tab(inspected_node_tab_type::RESOURCE);
 		}

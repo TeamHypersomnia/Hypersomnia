@@ -99,7 +99,10 @@ TEST_CASE("Pool UndoDeletes") {
 		{
 			for (unsigned i = 0; i < keys.size(); ++i) {
 				REQUIRE(p.get(keys[i]) == static_cast<int>(i));
-				undos[i] = *p.free(keys[i]);
+
+				if (auto ff = p.free(keys[i])) {
+					undos[i] = *ff;
+				}
 			}
 
 			REQUIRE(p.empty());
@@ -118,7 +121,10 @@ TEST_CASE("Pool UndoDeletes") {
 				unsigned i = static_cast<unsigned>(idx);
 
 				REQUIRE(p.get(keys[i]) == static_cast<int>(i));
-				undos[i] = *p.free(keys[i]);
+
+				if (auto ff = p.free(keys[i])) {
+					undos[i] = *ff;
+				}
 			}
 
 			REQUIRE(p.empty());

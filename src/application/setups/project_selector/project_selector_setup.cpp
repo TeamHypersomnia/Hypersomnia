@@ -207,7 +207,7 @@ bool projects_list_tab_state::perform_list(
 ) {
 	using namespace augs::imgui;
 
-	const auto num_columns = timestamp_column_name != std::nullopt ? 2 : 1;
+	const auto num_columns = timestamp_column_name.has_value() ? 2 : 1;
 
 	int current_col = 0;
 
@@ -222,7 +222,7 @@ bool projects_list_tab_state::perform_list(
 
 		auto final_color = rgba(is_current ? style.Colors[ImGuiCol_Text] : style.Colors[ImGuiCol_TextDisabled]);
 
-		if (col != std::nullopt) {
+		if (col.has_value()) {
 			final_color = *col;
 		}
 
@@ -256,7 +256,7 @@ bool projects_list_tab_state::perform_list(
 
 	do_column("Name");
 
-	if (timestamp_column_name != std::nullopt) {
+	if (timestamp_column_name.has_value()) {
 		do_column(*timestamp_column_name);
 	}
 
@@ -650,7 +650,7 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 
 		text("\n");
 
-		if (taken_reason != std::nullopt) {
+		if (taken_reason.has_value()) {
 			const auto reason_str = describe_reason_taken(*taken_reason);
 
 			if (taken_reason == project_tab_type::DOWNLOADED_ARENAS) {
@@ -672,7 +672,7 @@ bool create_new_project_gui::perform(const project_selector_setup& setup) {
 
 	const bool is_disabled = 
 		name == arena_identifier("autosave")
-		|| (taken_reason != std::nullopt && taken_reason != project_tab_type::DOWNLOADED_ARENAS)
+		|| (taken_reason.has_value() && taken_reason != project_tab_type::DOWNLOADED_ARENAS)
 		|| sanitized_path == nullptr 
 		|| *sanitized_path != (EDITOR_PROJECTS_DIR / std::string(name))
 	;

@@ -158,7 +158,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 #if BUILD_STENCIL_BUFFER
 	const bool fog_of_war_effective = 
-		viewed_character_transform != std::nullopt 
+		viewed_character_transform.has_value() 
 		&& settings.fog_of_war.is_enabled()
 	;
 #else

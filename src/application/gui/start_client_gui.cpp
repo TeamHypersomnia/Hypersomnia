@@ -307,7 +307,7 @@ bool start_client_gui_state::perform(
 					loading_result out;
 					out.new_path = window.open_file_dialog(filters, "Choose avatar image");
 
-					if (out.new_path != std::nullopt) {
+					if (out.new_path.has_value()) {
 						try {
 							out.load_image(*out.new_path);
 						}
@@ -397,7 +397,7 @@ bool start_client_gui_state::perform(
 				error_popup->title = "Error";
 				error_popup->message = error_msg;
 			}
-			else if (result.new_path != std::nullopt) {
+			else if (result.new_path.has_value()) {
 				p = *result.new_path;
 
 				avatar_preview_tex.texImage2D(renderer, result.loaded_image);

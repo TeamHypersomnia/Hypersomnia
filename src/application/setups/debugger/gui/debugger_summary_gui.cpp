@@ -270,7 +270,7 @@ void debugger_coordinates_gui::perform(
 		}
 	}
 
-	if (miniature_generator != std::nullopt) {
+	if (miniature_generator.has_value()) {
 		if (miniature_generator->complete()) {
 			miniature_generator.reset();
 		}

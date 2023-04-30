@@ -566,7 +566,7 @@ void arena_scoreboard_gui::draw_gui(
 
 				if constexpr(!std::is_same_v<M, test_mode>) {
 					auto show_icon = [&]() {
-						if (icon != std::nullopt) {
+						if (icon.has_value()) {
 							const auto icon_image = mode_input.rules.view.icons.at(*icon);
 
 							if (const auto& entry = draw_in.images_in_atlas.find_or(icon_image).diffuse; entry.exists()) {

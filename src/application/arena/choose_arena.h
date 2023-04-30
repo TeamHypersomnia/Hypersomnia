@@ -20,7 +20,7 @@ struct choose_arena_input {
 	editor_project* keep_loaded_project;
 	
 	bool is_for_playtesting() const {
-		return playtesting_context != std::nullopt;
+		return playtesting_context.has_value();
 	}
 
 	void make_default() {

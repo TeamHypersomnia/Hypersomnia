@@ -998,7 +998,7 @@ namespace editor_project_readwrite {
 		auto read_nodes = [&]() {
 			const auto maybe_nodes = FindArray(document, "nodes");
 
-			if (maybe_nodes != std::nullopt) {
+			if (maybe_nodes.has_value()) {
 				for (auto& json_node : *maybe_nodes) {
 					if (!json_node.IsObject()) {
 						continue;

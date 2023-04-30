@@ -100,7 +100,7 @@ struct client_demo_player {
 		RewindState rewind_state,
 		const double inv_tickrate
 	) {
-		if (requested_seek != std::nullopt) {
+		if (requested_seek.has_value()) {
 			const auto target_step = *requested_seek;
 
 			if (target_step < current_step) {

@@ -384,7 +384,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	auto last_exit_incorrect_popup = std::optional<simple_popup>();
 
 	auto perform_failed_to_load_arena_popup = [&]() {
-		if (failed_to_load_arena_popup != std::nullopt) {
+		if (failed_to_load_arena_popup.has_value()) {
 			if (failed_to_load_arena_popup->perform()) {
 				failed_to_load_arena_popup = std::nullopt;
 			}
@@ -392,7 +392,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	auto perform_last_exit_incorrect = [&]() {
-		if (last_exit_incorrect_popup != std::nullopt) {
+		if (last_exit_incorrect_popup.has_value()) {
 			if (last_exit_incorrect_popup->perform()) {
 				last_exit_incorrect_popup = std::nullopt;
 			}
@@ -455,11 +455,11 @@ work_result work(const int argc, const char* const * const argv) try {
 		auto adjusted_config = config;
 		auto& masterserver = adjusted_config.masterserver;
 
-		if (params.first_udp_command_port != std::nullopt) {
+		if (params.first_udp_command_port.has_value()) {
 			masterserver.first_udp_command_port = *params.first_udp_command_port;
 		}
 
-		if (params.server_list_port != std::nullopt) {
+		if (params.server_list_port.has_value()) {
 			masterserver.server_list_port = *params.server_list_port;
 		}
 
@@ -490,7 +490,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	auto last_requested_local_port = port_type(0);
 
 	auto recreate_auxiliary_socket = [&](std::optional<port_type> temporary_port = std::nullopt) {
-		const auto preferred_port = temporary_port != std::nullopt ? *temporary_port : chosen_server_port();
+		const auto preferred_port = temporary_port.has_value() ? *temporary_port : chosen_server_port();
 		last_requested_local_port = preferred_port;
 
 		try {
@@ -523,7 +523,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			return false;
 		}
 
-		return nat_detection->query_result() != std::nullopt;
+		return nat_detection->query_result().has_value();
 	};
 
 	auto restart_nat_detection = [&]() {
@@ -566,7 +566,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		;
 
 		const bool should_be_open = 
-			pending_launch != std::nullopt 
+			pending_launch.has_value() 
 			&& !nat_detection_complete()
 		;
 
@@ -614,8 +614,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		};
 
 		if (config.server.allow_nat_traversal) {
-			if (nat_detection != std::nullopt) {
-				if (auxiliary_socket != std::nullopt) {
+			if (nat_detection.has_value()) {
+				if (auxiliary_socket.has_value()) {
 					LOG("Waiting for NAT detection to complete...");
 
 					while (!nat_detection_complete()) {
@@ -1217,12 +1217,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		const auto& client_start = config.client_start;
 		const auto traversed_address = to_netcode_addr(client_start.get_address_and_port());
 
-		ensure(traversed_address != std::nullopt);
+		ensure(traversed_address.has_value());
 		ensure(nat_detection_complete());
 
 		const auto masterserver_address = nat_detection->get_resolved_port_probing_host();
 
-		ensure(masterserver_address != std::nullopt);
+		ensure(masterserver_address.has_value());
 
 		nat_traversal_details.next_attempt();
 
@@ -1249,8 +1249,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			return;
 		}
 
-		if (nat_traversal != std::nullopt) {
-			if (auxiliary_socket != std::nullopt) {
+		if (nat_traversal.has_value()) {
+			if (auxiliary_socket.has_value()) {
 				nat_traversal->advance(auxiliary_socket->socket);
 			}
 		}
@@ -1325,7 +1325,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.server_start, 
 			config.server, 
 			config.server_solvable,
-			nat_detection != std::nullopt ? std::addressof(*nat_detection) : nullptr,
+			nat_detection.has_value() ? std::addressof(*nat_detection) : nullptr,
 			get_bound_local_port()
 		);
 
@@ -1700,12 +1700,12 @@ work_result work(const int argc, const char* const * const argv) try {
 						restart_nat_detection();
 					}
 
-					if (nat_detection != std::nullopt) {
+					if (nat_detection.has_value()) {
 						if (config.nat_detection != nat_detection->get_settings()) {
 							restart_nat_detection();
 						}
 
-						if (auxiliary_socket != std::nullopt) {
+						if (auxiliary_socket.has_value()) {
 							nat_detection->advance(auxiliary_socket->socket);
 						}
 					}
@@ -1743,7 +1743,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				do_traversal_details_popup(window);
 				do_detection_details_popup();
 
-				if (pending_launch != std::nullopt) {
+				if (pending_launch.has_value()) {
 					const auto l = pending_launch;
 
 					if (l == launch_type::SERVER) {
@@ -3326,7 +3326,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 #if BUILD_STENCIL_BUFFER
 				const bool fog_of_war_effective = 
-					viewed_character_transform != std::nullopt 
+					viewed_character_transform.has_value() 
 					&& fog_of_war.is_enabled()
 				;
 #else

@@ -115,7 +115,7 @@ void nat_detection_session::advance_resolution_of_stun_hosts() {
 
 
 void nat_detection_session::advance_resolution_of_port_probing_host() {
-	if (resolved_port_probing_host != std::nullopt) {
+	if (resolved_port_probing_host.has_value()) {
 		return;
 	}
 
@@ -152,7 +152,7 @@ bool nat_detection_session::enough_stun_hosts_resolved() const {
 }
 
 bool nat_detection_session::all_required_hosts_resolved() const {
-	return enough_stun_hosts_resolved() && resolved_port_probing_host != std::nullopt;
+	return enough_stun_hosts_resolved() && resolved_port_probing_host.has_value();
 }
 
 void nat_detection_session::send_requests() {
@@ -294,7 +294,7 @@ static nat_detection_result calculate_from(
 }
 
 void nat_detection_session::analyze_results(const port_type source_port) {
-	if (detected_nat != std::nullopt) {
+	if (detected_nat.has_value()) {
 		return;
 	}
 
@@ -423,7 +423,7 @@ void nat_detection_session::receive_packets(netcode_socket_t socket) {
 }
 
 void nat_detection_session::advance(netcode_socket_t socket) {
-	if (detected_nat != std::nullopt) {
+	if (detected_nat.has_value()) {
 		return;
 	}
 
@@ -478,7 +478,7 @@ void netcode_packet_queue::send_one(netcode_socket_t socket, log_function log_si
 
 	auto saved_ttl = std::optional<int>();
 
-	if (packet.ttl != std::nullopt) {
+	if (packet.ttl.has_value()) {
 		saved_ttl = netcode_socket_get_ttl(&socket);
 		netcode_socket_set_ttl(&socket, *packet.ttl);
 	}
@@ -487,7 +487,7 @@ void netcode_packet_queue::send_one(netcode_socket_t socket, log_function log_si
 
 	netcode_socket_send_packet(&socket, &address, bytes.data(), bytes.size());
 
-	if (saved_ttl != std::nullopt) {
+	if (saved_ttl.has_value()) {
 		netcode_socket_set_ttl(&socket, *saved_ttl);
 	}
 

@@ -44,7 +44,7 @@ void delete_layers_command::redo(editor_command_input in) {
 		entry.layer_content = *found_layer;
 
 		const auto delete_input = pool.free(entry.layer_id);
-		ensure(delete_input != std::nullopt);
+		ensure(delete_input.has_value());
 		entry.undo_delete_input = *delete_input;
 
 		erase_element(project_layers.order, entry.layer_id);

@@ -14,7 +14,7 @@ bool sentient_and_unconscious(const E& self) {
 
 template <class E>
 bool any_shield_active(const E& self) {
-	return ::find_active_pe_absorption(self) != std::nullopt;
+	return ::find_active_pe_absorption(self).has_value();
 }
 
 template <class E>

@@ -181,7 +181,7 @@ void bomb_defusal::init_spawned(
 	const auto& faction_rules = in.rules.factions[handle.get_official_faction()];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
-		if (transferred != std::nullopt && transferred->player.survived) {
+		if (transferred.has_value() && transferred->player.survived) {
 			const auto& eq = transferred->player.saved_eq;
 
 			if (const auto sentience = typed_handle.template find<components::sentience>()) {
@@ -329,7 +329,7 @@ void bomb_defusal::init_spawned(
 
 		::resurrect(typed_handle);
 
-		if (transferred != std::nullopt) {
+		if (transferred.has_value()) {
 			typed_handle.template get<components::movement>().flags = transferred->player.movement;
 
 			/* Reset the wielding to hide some mags/bullets that were in hands due to reloading */
@@ -1299,7 +1299,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 				if (any_enemy_has_more_than_one) {
 					play_faction_sound_for(in, step, battle_event::ONE_VERSUS_MANY, victim_faction, never_predictable_v);
 
-					if (victim_faction_id != std::nullopt) {
+					if (victim_faction_id.has_value()) {
 						hud_message_1_player(step, "", typesafe_sprintf(" is clutching against [color=orange]%x[/color] enemies! [color=yellow]All depends on you![/color]", total_enemies), find(*victim_faction_id), true);
 					}
 				}
@@ -1307,7 +1307,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 					/* All enemies have at most one. It's a duel/truel situation. */
 					play_sound_for(in, step, battle_event::ONE_VERSUS_ONE, never_predictable_v);
 
-					if (victim_faction_id != std::nullopt && enemy_id != std::nullopt) {
+					if (victim_faction_id.has_value() && enemy_id.has_value()) {
 						auto get_hp_col = [&](const auto hp) {
 							if (hp > 70.f) {
 								return "lightgreen";
@@ -1358,7 +1358,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 				}
 			});
 
-			if (award != std::nullopt) {
+			if (award.has_value()) {
 				post_award(in, ko.knockouter.id, *award);
 			}
 		}
@@ -2056,7 +2056,7 @@ void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& en
 
 						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(final_faction));
 
-						if (death_request != std::nullopt) {
+						if (death_request.has_value()) {
 							step.post_message(*death_request);
 						}
 					}
@@ -2224,7 +2224,9 @@ void bomb_defusal::report_match_result(const input_type in, const logic_step ste
 
 	const auto result = calc_match_result(in);
 
-	if (!result.is_tie()) {
+	const bool tied = result.is_tie();
+
+	if (!tied) {
 		if (!result.winner.has_value() || !result.loser.has_value()) {
 			LOG("Wrong match result.");
 
@@ -2232,13 +2234,8 @@ void bomb_defusal::report_match_result(const input_type in, const logic_step ste
 		}
 	}
 
-	messages::match_summary_message summary;
-
-	summary.first_team_score = result.winner_score;
-	summary.second_team_score = result.loser_score;
-
-	const auto first_team  = result.is_tie()  ? p.defusing  : *result.winner;
-	const auto second_team = result.is_tie()  ? p.bombing   : *result.loser;
+	const auto first_team  = tied ? p.defusing  : *result.winner;
+	const auto second_team = tied ? p.bombing   : *result.loser;
 
 	auto make_entry = [](const auto& player) {
 		messages::match_summary_message::player_entry new_entry;
@@ -2254,6 +2251,11 @@ void bomb_defusal::report_match_result(const input_type in, const logic_step ste
 
 	auto strongest_in_first = mode_player_id::dead();
 	auto strongest_in_second = mode_player_id::dead();
+
+	messages::match_summary_message summary;
+
+	summary.first_team_score = result.winner_score;
+	summary.second_team_score = result.loser_score;
 
 	for_each_player_best_to_worst_in(
 		first_team,

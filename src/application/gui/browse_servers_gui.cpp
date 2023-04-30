@@ -290,7 +290,7 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 			const auto& internal_address = s.heartbeat.internal_network_address;
 			const bool maybe_reachable_internally = 
-				internal_address != std::nullopt
+				internal_address.has_value()
 				&& ::is_internal(*internal_address)
 			;
 
@@ -725,7 +725,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 			auto final_color = rgba(is_current ? style.Colors[ImGuiCol_Text] : style.Colors[ImGuiCol_TextDisabled]);
 
-			if (col != std::nullopt) {
+			if (col.has_value()) {
 				final_color = *col;
 			}
 
@@ -897,7 +897,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 	
 	server_details.perform(selected_server);
 
-	if (requested_connection != std::nullopt) {
+	if (requested_connection.has_value()) {
 		in.client_start.set_custom(::ToString(*requested_connection));
 
 		return true;

@@ -25,7 +25,7 @@ class nat_detection_session {
 		request_state(const netcode_address_t& destination) : destination(destination) {}
 
 		bool completed() const {
-			return translated_address != std::nullopt;
+			return translated_address.has_value();
 		}
 	};
 

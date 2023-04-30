@@ -157,8 +157,8 @@ void debugger_entity_mover::start_rotating_selection(const input_type in) {
 }
 
 static auto make_reinvoker(debugger_entity_mover& m, const input_type in) {
-	const bool pos = m.current_mover_pos_delta(in) != std::nullopt;
-	const bool rot = m.current_mover_rot_delta(in) != std::nullopt;
+	const bool pos = m.current_mover_pos_delta(in).has_value();
+	const bool rot = m.current_mover_rot_delta(in).has_value();
 
 	return augs::scope_guard(
 		[pos, rot, in, &m]() {

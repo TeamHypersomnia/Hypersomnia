@@ -2636,7 +2636,7 @@ void editor_setup::move_inspected_to_new_layer() {
 	command.nodes_to_move = all_inspected;
 	{
 		const auto parent_of_topmost = find_parent_layer(all_inspected[0]);
-		ensure(parent_of_topmost != std::nullopt);
+		ensure(parent_of_topmost.has_value());
 		command.create_layer->at_index = parent_of_topmost->layer_index;
 	}
 
@@ -2659,7 +2659,7 @@ void editor_setup::move_dragged_to_new_layer(const editor_node_id dragged_node) 
 	command.create_layer->created_layer.unique_name = get_free_layer_name();
 	{
 		const auto parent_of_topmost = find_parent_layer(all_inspected[0]);
-		ensure(parent_of_topmost != std::nullopt);
+		ensure(parent_of_topmost.has_value());
 		command.create_layer->at_index = parent_of_topmost->layer_index;
 	}
 

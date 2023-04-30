@@ -697,7 +697,7 @@ std::optional<std::string> arena_downloading_session::rearrange_directories() {
 }
 
 bool client_setup::finalize_arena_download() {
-	ensure(downloading != std::nullopt);
+	ensure(downloading.has_value());
 
 	if (downloading) {
 		const auto error = downloading->rearrange_directories();
@@ -743,7 +743,7 @@ bool client_setup::try_load_arena_according_to(const server_solvable_vars& new_v
 			new_vars.required_arena_hash
 		);
 
-		if (choice_result.arena_folder_path != std::nullopt) {
+		if (choice_result.arena_folder_path.has_value()) {
 			current_arena_folder = *choice_result.arena_folder_path;
 
 			arena_gui.reset();
@@ -1769,7 +1769,7 @@ void client_setup::handle_new_session(const add_player_input& in) {
 	const auto new_player = in.id;
 	const auto new_session_id = find_session_id(new_player);
 
-	ensure(new_session_id != std::nullopt);
+	ensure(new_session_id.has_value());
 
 	auto& meta = player_metas[new_player.value];
 	meta.clear_session_channeled_data();

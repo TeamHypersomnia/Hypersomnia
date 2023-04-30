@@ -35,7 +35,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 
 		collision_sound_def def_template;
 
-		if (maybe_def_template != std::nullopt) {
+		if (maybe_def_template.has_value()) {
 			def_template = *maybe_def_template;
 		}
 		else {

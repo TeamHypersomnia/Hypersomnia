@@ -31,7 +31,7 @@ void delete_nodes_command::redo(const editor_command_input in) {
 			const auto node_id = editor_node_id(entry.node_id);
 			const auto found_layer = in.setup.find_parent_layer(node_id);
 
-			ensure(found_layer != std::nullopt);
+			ensure(found_layer.has_value());
 
 			const auto layer = in.setup.find_layer(found_layer->layer_id);
 
@@ -50,7 +50,7 @@ void delete_nodes_command::redo(const editor_command_input in) {
 		entry.node_content = *found_node;
 
 		auto delete_input = pool.free(entry.node_id.raw);
-		ensure(delete_input != std::nullopt);
+		ensure(delete_input.has_value());
 		entry.undo_delete_input = *delete_input;
 	});
 }

@@ -588,7 +588,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 												const auto head_transform = ::calc_head_transform(victim);
 												const auto head_radius = victim_sentience->head_hitbox_radius * current_attack_def.head_radius_multiplier;
 
-												if (head_transform != std::nullopt) {
+												if (head_transform.has_value()) {
 													const auto head_pos = head_transform->pos;
 
 													if (DEBUG_DRAWING.draw_headshot_detection) {

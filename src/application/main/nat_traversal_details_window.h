@@ -87,13 +87,13 @@ struct nat_traversal_details_window {
 
 		bool result = false;
 
-		const bool should_be_open = session != std::nullopt;
+		const bool should_be_open = session.has_value();
 
 		if (should_be_open) {
 			center_next_window(vec2(0.8f, 0.7f), ImGuiCond_Always);
 		}
 
-		if (auto popup = cond_scoped_modal_popup(should_be_open, title, nullptr, flags); popup && session != std::nullopt) {
+		if (auto popup = cond_scoped_modal_popup(should_be_open, title, nullptr, flags); popup && session.has_value()) {
 			{
 				auto& current_attempt = attempts[current_attempt_index];
 

@@ -168,7 +168,7 @@ void server_setup::reset_afk_timer() {
 }
 
 void server_setup::send_goodbye_to_masterserver() {
-	if (has_sent_any_heartbeats() && resolved_server_list_addr != std::nullopt) {
+	if (has_sent_any_heartbeats() && resolved_server_list_addr.has_value()) {
 		const auto destination_address = resolved_server_list_addr.value();
 
 		const auto goodbye = masterserver_request(masterserver_in::goodbye {});
@@ -641,7 +641,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	);
 
 	heartbeat.server_version = hypersomnia_version().get_version_string();
-	heartbeat.is_editor_playtesting_server = solvable_vars.playtesting_context != std::nullopt;
+	heartbeat.is_editor_playtesting_server = solvable_vars.playtesting_context.has_value();
 
 	heartbeat.validate();
 	heartbeat_buffer.clear();
@@ -715,7 +715,7 @@ void server_setup::resolve_internal_address_if_its_time() {
 	if (valid_and_is_ready(future_internal_address)) {
 		auto new_address = future_internal_address.get();
 
-		if (new_address != std::nullopt) {
+		if (new_address.has_value()) {
 			new_address->port = last_start.port;
 
 			if (new_address != internal_address) {
@@ -1283,7 +1283,7 @@ void server_setup::advance_clients_state() {
 			}
 
 			if (!removed_someone_already) {
-				if (c.when_kicked != std::nullopt) {
+				if (c.when_kicked.has_value()) {
 					const auto linger_secs = std::clamp(vars.max_kick_ban_linger_secs, 0.f, 15.f);
 
 					if (server_time - *c.when_kicked > linger_secs) {
@@ -1845,7 +1845,7 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 				server_broadcasted_chat message;
 
 				const auto session_id = find_session_id(get_integrated_client_id());
-				ensure(session_id != std::nullopt);
+				ensure(session_id.has_value());
 
 				message.author = *session_id;
 				message.message = std::string(chat.current_message);
@@ -2093,7 +2093,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 	);
 
 	auto send_it = [&](const auto recipient_client_id, auto&) {
-		if (except != std::nullopt && *except == recipient_client_id) {
+		if (except.has_value() && *except == recipient_client_id) {
 			return;
 		}
 
@@ -2156,7 +2156,7 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 		return;
 	}
 
-	if (c.when_kicked != std::nullopt) {
+	if (c.when_kicked.has_value()) {
 		return;
 	}
 
@@ -2248,7 +2248,7 @@ bool server_setup::is_integrated() const {
 }
 
 bool server_setup::is_dedicated() const {
-	return dedicated != std::nullopt;
+	return dedicated.has_value();
 }
 
 void server_setup::handle_new_session(const add_player_input&) {

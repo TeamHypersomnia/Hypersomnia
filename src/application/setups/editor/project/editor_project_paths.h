@@ -43,7 +43,7 @@ struct client_find_arena_result {
 	std::string json_document;
 
 	bool was_arena_found() const {
-		return arena_folder_path != std::nullopt;
+		return arena_folder_path.has_value();
 	}
 };
 

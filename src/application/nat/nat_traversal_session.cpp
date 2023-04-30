@@ -247,7 +247,7 @@ void nat_traversal_session::handle_packet(const netcode_address_t& from, uint8_t
 		return;
 	}
 
-	if (stun_in_progress != std::nullopt) {
+	if (stun_in_progress.has_value()) {
 		const auto bytes = reinterpret_cast<const std::byte*>(packet_buffer);
 
 		if (stun_in_progress->handle_packet(bytes, packet_bytes)) {
@@ -347,7 +347,7 @@ stun_session::stun_session(
 }
 
 std::optional<netcode_queued_packet> stun_session::advance(const double request_interval_secs, randomization& rng) {
-	if (stun_host != std::nullopt) {
+	if (stun_host.has_value()) {
 		return std::nullopt;
 	}
 
@@ -365,7 +365,7 @@ std::optional<netcode_queued_packet> stun_session::advance(const double request_
 		}
 	}
 
-	if (stun_host != std::nullopt) {
+	if (stun_host.has_value()) {
 		if (try_fire_interval(request_interval_secs, when_generated_last_packet)) {
 			when_sent_first_request = yojimbo_time();
 			return netcode_queued_packet { *stun_host, augs::to_bytes(source_request) };
@@ -376,12 +376,12 @@ std::optional<netcode_queued_packet> stun_session::advance(const double request_
 }
 
 stun_session::state stun_session::get_current_state() const {
-	if (external_address != std::nullopt) {
+	if (external_address.has_value()) {
 		return state::COMPLETED;
 	}
 
 	if (!future_stun_host.valid()) {
-		if (stun_host != std::nullopt) {
+		if (stun_host.has_value()) {
 			return state::SENDING_REQUEST_PACKETS;
 		}
 		else {

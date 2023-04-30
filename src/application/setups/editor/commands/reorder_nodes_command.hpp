@@ -8,7 +8,7 @@ inline void reorder_nodes_command::undo(editor_command_input in) {
 		return;
 	}
 
-	if (create_layer != std::nullopt) {
+	if (create_layer.has_value()) {
 		create_layer->undo(in);
 	}
 
@@ -50,7 +50,7 @@ inline void reorder_nodes_command::redo(editor_command_input in) {
 		erase_if(nodes, should_move);
 	}
 
-	if (create_layer != std::nullopt) {
+	if (create_layer.has_value()) {
 		create_layer->omit_inspector = true;
 		create_layer->redo(in);
 

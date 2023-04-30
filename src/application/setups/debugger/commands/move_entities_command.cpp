@@ -221,10 +221,10 @@ static void resize_entities(
 					}
 				}
 
-				if (reference_point.used_grid != std::nullopt) {
+				if (reference_point.used_grid.has_value()) {
 					const auto unit = reference_point.used_grid->unit_pixels;
 
-					if (result != std::nullopt) {
+					if (result.has_value()) {
 						result->x = std::max(result->x, unit);
 						result->y = std::max(result->y, unit);
 					}
@@ -269,7 +269,7 @@ static void resize_entities(
 						auto set_size = [&](const vec2 new_size) {
 							auto& overridden_geo = typed_handle.get(key).template get<components::overridden_geo>();
 
-							if (size_unit != std::nullopt) {
+							if (size_unit.has_value()) {
 								vec2i s = new_size;
 								s /= size_unit.value();
 								s *= size_unit.value();
@@ -324,7 +324,7 @@ static void resize_entities(
 						auto unitize_diff_x = [&](const real32 diff_x) {
 							const auto would_be_w = static_cast<int>(current_size.x + diff_x);
 
-							if (size_unit != std::nullopt) {
+							if (size_unit.has_value()) {
 								auto snapped_w = would_be_w;
 
 								snapped_w /= size_unit->x;
@@ -353,7 +353,7 @@ static void resize_entities(
 						auto unitize_diff_y = [&](const real32 diff_y) {
 							const auto would_be_h = static_cast<int>(current_size.y + diff_y);
 
-							if (size_unit != std::nullopt) {
+							if (size_unit.has_value()) {
 								auto snapped_h = would_be_h;
 
 								snapped_h /= size_unit->y;

@@ -249,7 +249,7 @@ bool basic_inventory_slot_handle<E>::is_physically_reachable_from(
 	const entity_id from_parent,
 	const optional_slot_flags& bypass_slots
 ) const {
-	const bool passes_filter = bypass_slots != std::nullopt && bypass_slots->test(get_type());
+	const bool passes_filter = bypass_slots.has_value() && bypass_slots->test(get_type());
 	const bool should_item_here_keep_physical_body = passes_filter || get().makes_physical_connection();
 	const bool reachable = should_item_here_keep_physical_body && !get().never_reachable_for_mounting;
 

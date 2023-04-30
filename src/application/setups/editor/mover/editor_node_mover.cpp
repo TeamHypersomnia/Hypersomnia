@@ -34,7 +34,7 @@ node_mover_op editor_node_mover::get_current_op(const editor_history& h) const {
 		return node_mover_op::RESIZING;
 	}
 	else if (const auto* const cmd = std::get_if<move_nodes_command>(std::addressof(last))) {
-		if (cmd->rotation_center != std::nullopt) {
+		if (cmd->rotation_center.has_value()) {
 			return node_mover_op::ROTATING;
 		}
 		else {
@@ -155,8 +155,8 @@ void editor_node_mover::start_rotating_selection(const input_type in) {
 }
 
 static auto make_reinvoker(editor_node_mover& m, const input_type in) {
-	const bool pos = m.current_mover_pos_delta(in) != std::nullopt;
-	const bool rot = m.current_mover_rot_delta(in) != std::nullopt;
+	const bool pos = m.current_mover_pos_delta(in).has_value();
+	const bool rot = m.current_mover_rot_delta(in).has_value();
 
 	return augs::scope_guard(
 		[pos, rot, in, &m]() {

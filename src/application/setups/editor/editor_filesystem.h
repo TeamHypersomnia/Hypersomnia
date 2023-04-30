@@ -32,7 +32,7 @@ struct forbidden_path_result {
 	std::optional<std::string> suggested_filename;
 
 	bool can_be_renamed() const {
-		return suggested_filename != std::nullopt;
+		return suggested_filename.has_value();
 	}
 
 	auto get_suggested_path() const {

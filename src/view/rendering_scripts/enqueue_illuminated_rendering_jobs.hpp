@@ -41,7 +41,7 @@ void enqueue_illuminated_rendering_jobs(
 
 #if BUILD_STENCIL_BUFFER
 	const bool fog_of_war_effective = 
-		viewed_character_transform != std::nullopt 
+		viewed_character_transform.has_value() 
 		&& settings.fog_of_war.is_enabled()
 	;
 #else
@@ -368,7 +368,7 @@ void enqueue_illuminated_rendering_jobs(
 
 			const auto bad_color = rgba(255, 50, 50, 255);
 
-			if (potential_interaction != std::nullopt) {
+			if (potential_interaction.has_value()) {
 				auto handle_interaction = [&](const auto& typed_interaction) {
 					using T = remove_cref<decltype(typed_interaction)>;
 

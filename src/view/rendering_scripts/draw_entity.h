@@ -362,7 +362,7 @@ FORCE_INLINE void specific_entity_drawer(
 				/* Draw items under the sentience first. */
 
 				const auto reloading_movement = ::calc_reloading_movement(typed_handle.get_cosmos(), wielded_items);
-				const bool currently_reloading = reloading_movement != std::nullopt;
+				const bool currently_reloading = reloading_movement.has_value();
 
 				auto should_draw_over_torso = [&](const auto attachment_entity) {
 					const auto slot = attachment_entity.get_current_slot();

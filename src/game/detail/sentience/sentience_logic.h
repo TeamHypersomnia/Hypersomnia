@@ -47,7 +47,7 @@ template <class E>
 void mark_caused_danger(const E& handle, const real32 radius, std::optional<transformr> other_transform = std::nullopt) {
 	if (const auto sentience = handle.template find<components::sentience>()) {
 		sentience->time_of_last_caused_danger = handle.get_cosmos().get_timestamp();
-		sentience->transform_when_danger_caused = other_transform != std::nullopt ? *other_transform : handle.get_logic_transform();
+		sentience->transform_when_danger_caused = other_transform.has_value() ? *other_transform : handle.get_logic_transform();
 		sentience->radius_of_last_caused_danger = radius;
 	}
 }

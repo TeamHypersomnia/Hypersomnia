@@ -31,7 +31,7 @@ S& pretty_print(S& os, const T& val) {
 		os << val.operator std::string();
 	}
 	else if constexpr(is_optional_v<T>) {
-		if (val != std::nullopt) {
+		if (val.has_value()) {
 			pretty_print(os, *val);
 		}
 		else {

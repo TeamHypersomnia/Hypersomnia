@@ -306,7 +306,7 @@ class client_setup :
 			return std::nullopt;
 		}();
 
-		const bool in_game = new_local_entropy != std::nullopt;
+		const bool in_game = new_local_entropy.has_value();
 
 		if (is_connected()) {
 			auto scope = measure_scope(performance.sending_messages);

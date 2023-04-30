@@ -126,7 +126,7 @@ void clone_nodes_command::redo(const editor_command_input in) {
 			const auto cloned_id_generic = e.cloned_id;
 
 			auto register_in_layer = [&]() {
-				if (target_new_layer != std::nullopt) {
+				if (target_new_layer.has_value()) {
 					return in.setup.register_node_in_layer(cloned_id_generic, *target_new_layer, static_cast<std::size_t>(-1));
 				}
 

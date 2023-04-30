@@ -142,7 +142,7 @@ void regenerate_and_gather_subjects(
 
 			auto result = def.should_regenerate_neon_map(force);
 
-			if (result != std::nullopt) {
+			if (result.has_value()) {
 				++total_to_regenerate;
 			}
 

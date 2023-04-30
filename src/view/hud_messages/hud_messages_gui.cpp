@@ -73,7 +73,7 @@ void hud_messages_gui::advance(const hud_message_settings& settings) {
 	if (messages.size() > 0) {
 		const auto& m = messages.front();
 
-		if (m.first_appeared != std::nullopt) {
+		if (m.first_appeared.has_value()) {
 			const auto passed = now - *m.first_appeared;
 
 			if (passed >= total_lifetime) {

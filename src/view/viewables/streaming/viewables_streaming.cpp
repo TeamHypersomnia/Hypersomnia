@@ -79,7 +79,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 	/* Avatar atlas pass */
 	if (avatars.work_slot_free(current_frame)) {
-		if (in.new_player_metas != std::nullopt) {
+		if (in.new_player_metas.has_value()) {
 			auto avatar_atlas_in = avatar_atlas_input {
 				std::move(*in.new_player_metas),
 				max_atlas_size,
@@ -95,7 +95,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	}
 
 	if (ad_hoc.work_slot_free(current_frame)) {
-		if (in.ad_hoc_subjects != std::nullopt) {
+		if (in.ad_hoc_subjects.has_value()) {
 			auto ad_hoc_atlas_in = ad_hoc_atlas_input {
 				std::move(*in.ad_hoc_subjects),
 				max_atlas_size,
@@ -417,7 +417,7 @@ void viewables_streaming::display_loading_progress() const {
 	const auto& progress = general_atlas_progress;
 	float progress_percent = -1.f;
 
-	if (progress != std::nullopt) {
+	if (progress.has_value()) {
 		const auto& a_neon_i = progress->current_neon_map_num;
 		const auto neon_i = a_neon_i.load();
 

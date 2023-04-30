@@ -18,7 +18,7 @@ void do_pretty_tabs(E& active_pane, F custom_name) {
 				augs::for_each_enum_except_bounds([&c_strs, custom_name](const E s) {
 					const auto custom = custom_name(s);
 
-					label_strs[s] = custom != std::nullopt ? *custom : format_enum(s);
+					label_strs[s] = custom.has_value() ? *custom : format_enum(s);
 					c_strs[s] = label_strs[s].c_str();
 				});
 

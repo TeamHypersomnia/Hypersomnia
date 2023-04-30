@@ -92,7 +92,7 @@ inline void draw_offscreen_indicator(
 
 			augs::detail_sprite(output, indicator_tex, final_indicator_location, indicator_angle, col);
 
-			if (next_tex != std::nullopt) {
+			if (next_tex.has_value()) {
 				const auto bbox_a = vec2(bbox);
 				const auto bbox_b = vec2(next_tex->get_original_size());
 
