@@ -38,6 +38,12 @@ namespace augs {
 		}
 
 		void measure(const T value) {
+			ensure(tracked.size() != 0);
+
+			if (tracked.empty()) {
+				return;
+			}
+
 			measured = true;
 			last_measurement = value;
 

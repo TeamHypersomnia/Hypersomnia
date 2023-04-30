@@ -256,7 +256,7 @@ containment_result query_containment_result(
 		const bool slot_would_have_too_many_items =
 			slot.always_allow_exactly_one_item
 			&& items.size() == 1
-			&& !can_stack_entities(cosm[target_slot.get_items_inside().at(0)], item_entity)
+			&& !can_stack_entities(cosm[items.at(0)], item_entity)
 		;
 
 		if (slot_would_have_too_many_items) {
@@ -299,6 +299,11 @@ bool can_stack_entities(
 	const const_entity_handle a,
 	const const_entity_handle b
 ) {
+	if (a.dead() || b.dead()) {
+		ensure(false && "Cannot stack dead entities!");
+		return false;
+	}
+
 	return 
 		a.get_flavour_id() == b.get_flavour_id() 
 		&& a.get<invariants::item>().stackable

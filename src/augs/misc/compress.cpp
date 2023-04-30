@@ -84,7 +84,7 @@ namespace augs {
 			reinterpret_cast<const char*>(input), 
 			reinterpret_cast<char*>(output.data()), 
 			byte_count,
-			uncompressed_size
+			static_cast<int>(uncompressed_size)
 		);
 
 		if (bytes_read < 0) {
@@ -107,7 +107,7 @@ TEST_CASE("Ca CompressionDecompression") {
 	const auto tests = {
 		"",
 		"jsdfhsdkj fhdslkjfh37824y239874y298734y9382ejhfdffgsdfgsdfgsfdgdsfglkjdfsjglskdfjglksdfjgsdfgjhksdfj ghsdjfghsdjkfghsjfkdghskdfgkfsdjghkj",
-		"jsdfhsdkj 8923749087sdewlak fidsuj 89r2 jklsdfjj 89023jfoui23jfjhglkddjgh87934ylalksja;lsdalf89kl43jvgfh7823dsakjhd78t3kjhsd78"
+		"jsdfhsdkj 8923749087sdewlak fidsuj 89r2 jklsdfjj 89023jfoui23jfjhglkddjgh87934ylalksja;lsdalf89kl43jvgfh7823dsakjhd78t3kjhsd78",
 		"	aslkd jaslkajslk87679608759086476980574069854lkglljgj0219238nmmlsdfjlkq290831ulmdskmfsn 8329iuflmdskzmaoq091!()@*!)(@*!($%*%!&(%*&(*8ghsdjfghsdjkfghsjfkdghskdfgkfsdjghkj",
 		"1234",
 		"89750983275098437508934759043",

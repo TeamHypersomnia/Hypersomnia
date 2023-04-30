@@ -92,7 +92,7 @@ namespace augs {
 				uint32_t        Subchunk2Size;  // Sampled data length
 			} wav_hdr;
 
-			wav_hdr wav_header;
+			wav_hdr wav_header = {};
 
 			if (fread(&wav_header, 1, sizeof(wav_hdr), wav_file.get()) > 0) {
 				if (wav_header.bitsPerSample == 16) {

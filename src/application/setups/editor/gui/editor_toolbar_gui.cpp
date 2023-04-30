@@ -61,13 +61,16 @@ void DockingToolbar(const char* name, ImGuiAxis* p_toolbar_axis, bool& is_docked
         // Overwrite size of the node
         ImGuiStyle& style = ImGui::GetStyle();
         const ImGuiAxis toolbar_axis_perp = (ImGuiAxis)(toolbar_axis ^ 1);
-        const float TOOLBAR_SIZE_WHEN_DOCKED = style.WindowPadding[toolbar_axis_perp] * 2.0f + icon_size[toolbar_axis_perp];
-        node->WantLockSizeOnce = true;
-        node->Size[toolbar_axis_perp] = node->SizeRef[toolbar_axis_perp] = TOOLBAR_SIZE_WHEN_DOCKED;
 
-        if (TOOLBAR_AUTO_DIRECTION_WHEN_DOCKED)
-            if (node->ParentNode && node->ParentNode->SplitAxis != ImGuiAxis_None)
-                toolbar_axis = (ImGuiAxis)(node->ParentNode->SplitAxis ^ 1);
+		if (toolbar_axis_perp == 0 || toolbar_axis_perp == 1) {
+			const float TOOLBAR_SIZE_WHEN_DOCKED = style.WindowPadding[toolbar_axis_perp] * 2.0f + icon_size[toolbar_axis_perp];
+			node->WantLockSizeOnce = true;
+			node->Size[toolbar_axis_perp] = node->SizeRef[toolbar_axis_perp] = TOOLBAR_SIZE_WHEN_DOCKED;
+
+			if (TOOLBAR_AUTO_DIRECTION_WHEN_DOCKED)
+			if (node->ParentNode && node->ParentNode->SplitAxis != ImGuiAxis_None)
+			toolbar_axis = (ImGuiAxis)(node->ParentNode->SplitAxis ^ 1);
+		}
     }
     
     // 5. Dummy populate tab bar

@@ -38,8 +38,12 @@ void play_collision_sound(
 ) {
 	const auto& cosm = step.get_cosmos();
 	const auto& logicals = cosm.get_logical_assets();
-	const auto subject_coll = sub.get<invariants::fixtures>();
-	const auto collider_coll = col.get<invariants::fixtures>();
+	const auto subject_coll = sub.find<invariants::fixtures>();
+	const auto collider_coll = col.find<invariants::fixtures>();
+
+	if (subject_coll == nullptr || collider_coll == nullptr) {
+		return;
+	}
 
 	const bool sub_missile = sub.find<invariants::missile>();
 	const bool col_missile = col.find<invariants::missile>();
@@ -54,7 +58,7 @@ void play_collision_sound(
 	) {
 		auto play_sound = [&](const auto* sound_def) {
 			if (sound_def) {
-				const auto impulse = strength * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
+				const auto impulse = strength * subject_coll->collision_sound_gain_mult * collider_coll->collision_sound_gain_mult;
 
 				const auto gain_mult = impulse * impulse * sound_def->gain_mult;
 				const auto pitch_mult = impulse * sound_def->pitch_mult;
@@ -96,8 +100,8 @@ void play_collision_sound(
 			}
 		};
 
-		const auto first_def = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_coll.material);
-		const auto second_def = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_coll.material);
+		const auto first_def = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_coll->material);
+		const auto second_def = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_coll->material);
 
 		play_sound(first_def);
 
@@ -126,7 +130,9 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 			const auto collision_sound_strength = c.normal_impulse;
 
-			::play_collision_sound(collision_sound_strength, c.point, subject, collider, step);
+			if (subject.alive() && collider.alive()) {
+				::play_collision_sound(collision_sound_strength, c.point, subject, collider, step);
+			}
 
 			// skip the next, swapped collision message
 			++i;

@@ -316,6 +316,13 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		const const_entity_handle subject_capability = subject.get_owning_transfer_capability();
 		const const_entity_handle collider_owner_body = collider.get_owner_of_colliders();
 
+		ensure(subject_owner_body.alive());
+		ensure(collider_owner_body.alive());
+
+		if (subject_owner_body.dead() || collider_owner_body.dead()) {
+			return;
+		}
+
 #if TODO_CARS
 		if (subject_fixtures.is_friction_ground()) {
 			// friction fields do not collide with their children

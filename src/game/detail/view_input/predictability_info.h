@@ -11,8 +11,8 @@ class prediction_input {
 	prediction_input() {}
 
 public:
-	bool play_predictable;
-	bool play_unpredictable;
+	bool play_predictable = false;
+	bool play_unpredictable = false;
 	entity_id predicting_subject;
 
 	static auto unpredictable_for(const entity_id whom) {

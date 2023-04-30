@@ -3031,7 +3031,7 @@ bool TabLabels(int numTabs, const char** tabLabels, int& selectedIndex, const ch
             justClosedTabIndex = i;
             if (pOptionalClosedTabIndex) *pOptionalClosedTabIndex = i;
             if (pOptionalClosedTabIndexInsideItemOrdering) *pOptionalClosedTabIndexInsideItemOrdering = j;
-            pOptionalItemOrdering[j] = -1;
+			if (pOptionalItemOrdering) pOptionalItemOrdering[j] = -1;
         }
 
     }
@@ -3472,7 +3472,7 @@ bool TabLabelsVertical(bool textIsRotatedCCW, int numTabs, const char** tabLabel
             justClosedTabIndex = i;
             if (pOptionalClosedTabIndex) *pOptionalClosedTabIndex = i;
             if (pOptionalClosedTabIndexInsideItemOrdering) *pOptionalClosedTabIndexInsideItemOrdering = j;
-            pOptionalItemOrdering[j] = -1;
+			if (pOptionalItemOrdering) pOptionalItemOrdering[j] = -1;
         }
 
     }

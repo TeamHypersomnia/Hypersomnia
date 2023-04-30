@@ -26,9 +26,9 @@ void organism_cache::for_each_cell_of_grid(const unversioned_entity_id origin, c
 }
 
 template <class F>
-void organism_cache::for_each_cell_of_all_grids(const ltrb query, F&& callback) const {
+void organism_cache::for_each_cell_of_all_grids(const ltrb query, F callback) const {
 	for (const auto& g : grids) {
-		g.second.for_each_cell(query, std::forward<F>(callback));
+		g.second.for_each_cell(query, callback);
 	}
 }
 

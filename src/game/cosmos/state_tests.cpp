@@ -37,13 +37,11 @@ TEST_CASE("StateTest0 PaddingSanityCheck1") {
 	using checked_type = ok;
 	constexpr size_t type_size = sizeof(checked_type);
 
-	std::array<char, type_size> buf1{};
-	std::array<char, type_size> buf2{};
+	std::aligned_storage_t<type_size, alignof(checked_type)> buf1{};
+	std::aligned_storage_t<type_size, alignof(checked_type)> buf2{};
 
-	for (std::size_t i = 0; i < type_size; ++i) {
-		buf1[i] = 3;
-		buf2[i] = 4;
-	}
+	std::memset(&buf1, 3, type_size);
+	std::memset(&buf2, 4, type_size);
 
 	new (&buf1) checked_type;
 	new (&buf2) checked_type;
@@ -65,13 +63,11 @@ TEST_CASE("StateTest1 PaddingSanityCheck2") {
 	typedef ok checked_type;
 	constexpr size_t type_size = sizeof(checked_type);
 
-	std::array<char, type_size> buf1{};
-	std::array<char, type_size> buf2{};
+	std::aligned_storage_t<type_size, alignof(checked_type)> buf1{};
+	std::aligned_storage_t<type_size, alignof(checked_type)> buf2{};
 
-	for (std::size_t i = 0; i < type_size; ++i) {
-		buf1[i] = 3;
-		buf2[i] = 4;
-	}
+	std::memset(&buf1, 3, type_size);
+	std::memset(&buf2, 4, type_size);
 
 	new (&buf1) checked_type;
 	new (&buf2) checked_type;
@@ -100,13 +96,11 @@ TEST_CASE("StateTest2 PaddingTest") {
 		if constexpr(!allows_nontriviality_v<checked_type>) {
 			constexpr std::size_t type_size = sizeof(checked_type);
 
-			std::array<char, type_size> buf1 {};
-			std::array<char, type_size> buf2 {};
+			std::aligned_storage_t<type_size, alignof(checked_type)> buf1{};
+			std::aligned_storage_t<type_size, alignof(checked_type)> buf2{};
 
-			for (std::size_t i = 0; i < type_size; ++i) {
-				buf1[i] = 3;
-				buf2[i] = 4;
-			}
+			std::memset(&buf1, 3, type_size);
+			std::memset(&buf2, 4, type_size);
 
 			// it looks like the placement new may zero-out the memory before allocation.
 			// we will leave this test as it is useful anyway.
@@ -118,7 +112,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 			bool same = true;
 
 			for (; iter < type_size; ++iter) {
-				if (buf1[iter] != buf2[iter]) {
+				if (reinterpret_cast<const char*>(&buf1)[iter] != reinterpret_cast<const char*>(&buf2)[iter]) {
 					same = false;
 					break;
 				}

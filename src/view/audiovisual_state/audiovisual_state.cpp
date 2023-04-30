@@ -352,6 +352,10 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 		const const_entity_handle subject_owner_body = cosm[it.subject].get_owner_of_colliders();
 		const const_entity_handle collider_owner_body = cosm[it.collider].get_owner_of_colliders();
 
+		if (collider_owner_body.dead()) {
+			continue;
+		}
+
 		auto& past_system = get<past_infection_system>();
 
 		if (past_system.is_infected(subject_owner_body) && !collider_owner_body.get_flag(entity_flag::IS_IMMUNE_TO_PAST)) {

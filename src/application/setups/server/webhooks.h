@@ -416,8 +416,8 @@ namespace discord_webhooks {
 			};
 
 			const auto longest_nick_len = std::max(
-				maximum_of(info.first_faction,  length_of).nickname.length(),
-				maximum_of(info.second_faction, length_of).nickname.length()
+				info.first_faction.empty() ? std::size_t(0) : (maximum_of(info.first_faction,  length_of).nickname.length()),
+				info.second_faction.empty() ? std::size_t(0) : (maximum_of(info.second_faction, length_of).nickname.length())
 			);
 
 			std::size_t nick_stat_padding = 8;

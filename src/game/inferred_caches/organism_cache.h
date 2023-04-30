@@ -91,7 +91,7 @@ public:
 	void for_each_cell_of_grid(const unversioned_entity_id origin, const ltrb query, F&& callback) const;
 
 	template <class F>
-	void for_each_cell_of_all_grids(const ltrb query, F&& callback) const;
+	void for_each_cell_of_all_grids(const ltrb query, F callback) const;
 
 	bool recalculate_cell_for(const unversioned_entity_id origin, const organism_id_type organism_id, vec2 old_position, vec2 new_position);
 

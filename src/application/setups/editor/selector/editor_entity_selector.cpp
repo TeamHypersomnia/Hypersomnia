@@ -328,6 +328,11 @@ void editor_entity_selector::do_mousemotion(
 		if (rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
 			erase_if(in_rectangular_selection, [&](const entity_id id) {
 				const auto handle = cosm[id];
+
+				if (handle.dead()) {
+					return true;
+				}
+
 				const auto candidate_flavour = entity_flavour_id(handle.get_flavour_id());
 
 				if (!flavour_of_held.is_set()) {
@@ -340,6 +345,11 @@ void editor_entity_selector::do_mousemotion(
 		else if (rect_select_mode == editor_rect_select_type::SAME_LAYER) {
 			erase_if(in_rectangular_selection, [&](const entity_id id) {
 				const auto handle = cosm[id];
+
+				if (handle.dead()) {
+					return true;
+				}
+
 				const auto candidate_layer = ::calc_render_layer(handle);
 
 				if (layer_of_held == render_layer::INVALID) {

@@ -17,11 +17,12 @@ namespace augs {
 
 		template <class... Args>
 		static void set_current_to(derived* const which, Args&&... args) {
-			if (which == nullptr) {
+			if (which != nullptr) {
+				which->settable_as_current_mixin::set_as_current(std::forward<Args>(args)...);
+			}
+			else {
 				set_current_to_none(std::forward<Args>(args)...);
 			}
-
-			which->settable_as_current_mixin::set_as_current(std::forward<Args>(args)...);
 		}
 
 	protected:

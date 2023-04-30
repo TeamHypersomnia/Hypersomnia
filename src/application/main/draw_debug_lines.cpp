@@ -52,7 +52,7 @@ void draw_debug_lines(
 			augs::drawer_with_default(renderer.get_triangle_buffer(), default_texture).border(
 				multiplied_cone.get_visible_world_rect_aabb(),
 				white,
-				border_input { static_cast<int>(3.f / zoom + .5f), 0 }
+				border_input { static_cast<int>(std::lround(3.f / zoom)), 0 }
 			);
 
 			renderer.call_and_clear_triangles();

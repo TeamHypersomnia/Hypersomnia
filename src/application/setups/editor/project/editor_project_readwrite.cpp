@@ -1196,16 +1196,22 @@ namespace editor_project_readwrite {
 					}
 				};
 
+				auto allocate_layer = [&]() {
+					const editor_layer_id layer_id = loaded.layers.pool.allocate(std::move(layer));
+					loaded.layers.order.push_back(layer_id);
+				};
+
 				if (create_fallback_node_order) {
 					layer.hierarchy.nodes = std::move(fallback_node_order);
 					nodes_registered = layer.hierarchy.nodes.size();
+
+					allocate_layer();
+					break;
 				}
 				else {
 					read_layer_nodes();
+					allocate_layer();
 				}
-
-				const editor_layer_id layer_id = loaded.layers.pool.allocate(std::move(layer));
-				loaded.layers.order.push_back(layer_id);
 			}
 
 			if (strict) {

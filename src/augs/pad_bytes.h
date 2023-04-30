@@ -10,7 +10,7 @@ struct pad_bytes {
 
 	pad_bytes() {
 		for (auto& p : pad) {
-			p = static_cast<std::byte>(0u);
+			p = static_cast<std::byte>(0);
 		}
 	}
 

@@ -1326,7 +1326,7 @@ SINGLE_EDIT_FUNCTION(editor_project_about& insp) {
 	using namespace augs::imgui;
 	std::string result;
 
-	PROPERTY("Full name", full_name);
+	PROPERTY("Author", author);
 
 	ImGui::Separator();
 

@@ -67,7 +67,7 @@ namespace augs {
 			e.cerr_content = dynamic_cast<std::ostringstream&>(Catch::cerr()).str();
 			e.clog_content = dynamic_cast<std::ostringstream&>(Catch::clog()).str();
 
-			throw e;
+			throw unit_test_session_error(e);
 		}
 #endif
 	}

@@ -111,6 +111,10 @@ randomization cosmos::get_nontemporal_rng_for(const entity_id id) const {
 rng_seed_type cosmos::get_nontemporal_rng_seed_for(const entity_id id) const {
 	const auto handle = operator[](id);
 
+	if (handle.dead()) {
+		return 0;
+	}
+
 	auto h = augs::hash_multiple(
 		handle.get_id().raw.indirection_index, 
 		handle.get_id().type_id.get_index(), 

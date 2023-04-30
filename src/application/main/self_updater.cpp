@@ -938,14 +938,17 @@ self_update_result check_and_apply_updates(
 		if (window != std::nullopt) {
 			ensure(imgui_atlas != std::nullopt);
 
+			if (imgui_atlas.has_value()) {
+				renderer.draw_call_imgui(
+					*imgui_atlas, 
+					nullptr, 
+					nullptr, 
+					nullptr,
+					nullptr
+				);
+			}
+
 			renderer.clear_current_fbo();
-			renderer.draw_call_imgui(
-				*imgui_atlas, 
-				nullptr, 
-				nullptr, 
-				nullptr,
-				nullptr
-			);
 
 			rendering_result.clear();
 
@@ -954,12 +957,14 @@ self_update_result check_and_apply_updates(
 
 				ensure(renderer_backend != std::nullopt);
 
-				renderer_backend->perform(
-					rendering_result,
-					r.commands.data(),
-					r.commands.size(),
-					r.dedicated
-				);
+				if (renderer_backend.has_value()) {
+					renderer_backend->perform(
+						rendering_result,
+						r.commands.data(),
+						r.commands.size(),
+						r.dedicated
+					);
+				}
 			}
 
 			for (const auto& f : rendering_result.imgui_lists_to_delete) {

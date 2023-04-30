@@ -16,7 +16,7 @@ class basic_arena_handle {
 	template <class E, class F>
 	static decltype(auto) on_mode_with_input_impl(
 		E& self,
-		F&& callback
+		F callback
 	) {
 		return self.on_mode(
 			[&](auto& typed_mode) -> decltype(auto) {
@@ -46,7 +46,7 @@ class basic_arena_handle {
 	template <class E, class F>
 	static decltype(auto) on_mode_with_rules_impl(
 		E& self,
-		F&& callback
+		F callback
 	) {
 		return self.on_mode(
 			[&](auto& typed_mode) -> decltype(auto) {

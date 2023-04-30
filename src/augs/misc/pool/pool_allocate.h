@@ -209,7 +209,14 @@ namespace augs {
 				indirectors[indirector_of_moved_element].real_index = size();
 			}
 
-			slots.emplace_back(std::move(new_slot_space));
+			/* Ensure new_slot_space and new_object_space aren't invalidated */
+
+			slots.reserve(slots.size() + 1);
+			objects.reserve(objects.size() + 1);
+
+			/* Do not move from the slot space to silence static analyzers */
+
+			slots.emplace_back(new_slot_space);
 			objects.emplace_back(std::move(new_object_space));
 
 			if constexpr(has_synchronized_arrays) {

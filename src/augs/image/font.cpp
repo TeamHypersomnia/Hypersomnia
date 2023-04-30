@@ -16,7 +16,7 @@
 #include "augs/misc/bound.h"
 
 namespace augs {
-	const baked_font baked_font::zero;
+	const baked_font baked_font::zero {};
 
 #if BUILD_FREETYPE
 	font_glyph_metadata::font_glyph_metadata(

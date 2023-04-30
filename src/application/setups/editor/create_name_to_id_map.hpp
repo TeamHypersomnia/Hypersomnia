@@ -34,7 +34,7 @@ auto editor_official_resource_map::create_id_to_name_map(S& taken_names) const {
 	return id_to_name;
 }
 
-auto editor_official_resource_map::create_name_to_id_map() const {
+inline auto editor_official_resource_map::create_name_to_id_map() const {
 	resource_name_to_id name_to_id;
 
 	auto map_names = [&](const auto&, auto& m) {
