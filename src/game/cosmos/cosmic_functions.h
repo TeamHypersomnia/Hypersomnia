@@ -5,6 +5,8 @@
 #include "game/cosmos/entity_id_declaration.h"
 #include "game/cosmos/specific_entity_handle_declaration.h"
 #include "game/common_state/entity_name_str.h"
+#include "game/cosmos/allocate_new_entity_access.h"
+#include "game/cosmos/step_declaration.h"
 
 class cosmic_delta;
 class cosmos;
@@ -33,6 +35,7 @@ class cosmic {
 
 	template <class E, class C, class I, class P>
 	static ref_typed_entity_handle<E> specific_create_entity_detail(
+		allocate_new_entity_access access,
 		C& cosm, 
 		const typed_entity_flavour_id<E> flavour_id,
 		const I& initial_components,
@@ -43,22 +46,32 @@ public:
 	static void set_specific_name(const entity_handle&, const entity_name_str&);
 	static void clear(cosmos& cosm);
 
-	template <class C, class I, class E>
-	static ref_typed_entity_handle<E> specific_paste_entity(
-		C& cosm, 
-		const typed_entity_flavour_id<E> flavour_id,
-		const I& initial_components
-	);
-
 	template <class C, class E, class P>
 	static ref_typed_entity_handle<E> specific_create_entity(
+		allocate_new_entity_access access,
 		C& cosm, 
 		const typed_entity_flavour_id<E> flavour_id,
 		P&& pre_construction
 	);
 
+	template <class... Types, class Pre, class Post>
+	static void queue_create_entity(
+		logic_step step,
+		constrained_entity_flavour_id<Types...> flavour_id,
+		Pre pre_construction,
+		Post post_construction
+	);
+
+	template <class... Types, class Pre>
+	static void queue_create_entity(
+		logic_step step,
+		constrained_entity_flavour_id<Types...> flavour_id,
+		Pre&& pre_construction
+	);
+
 	template <class C, class... Types, class Pre, class Post>
 	static entity_handle create_entity(
+		allocate_new_entity_access access,
 		C& cosm,
 		const constrained_entity_flavour_id<Types...> flavour_id,
 		Pre&& pre_construction,
@@ -77,7 +90,10 @@ public:
 	static void make_suitable_for_cloning(entity_solvable<E>& solvable);
 
 	template <class entity_type>
-	static ref_typed_entity_handle<entity_type> specific_clone_entity(ref_typed_entity_handle<entity_type> source_entity);
+	static ref_typed_entity_handle<entity_type> specific_clone_entity(
+		allocate_new_entity_access access,
+		ref_typed_entity_handle<entity_type> source_entity
+	);
 
 	static void undo_last_create_entity(const entity_handle);
 	static std::optional<cosmic_pool_undo_free_input> delete_entity(const entity_handle);
@@ -97,4 +113,7 @@ public:
 
 	static void after_solvable_copy(cosmos&, const cosmos&);
 	static void set_flavour_id_cache_enabled(bool flag, cosmos&);
+
+	template <class... Types>
+	static void might_allocate_entities_having(cosmos&, const std::size_t new_count);
 };

@@ -1,7 +1,4 @@
 #pragma once
-#include "game/detail/inventory/item_slot_transfer_request.h"
-
-class cosmos;
 #include "game/cosmos/step_declaration.h"
 
 class item_system {

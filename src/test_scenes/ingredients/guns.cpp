@@ -24,8 +24,9 @@
 
 #include "test_scenes/test_scene_animations.h"
 #include "test_scenes/ingredients/ingredients.h"
-#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+
+inventory_space_type to_space_units(const std::string& s);
 
 namespace test_flavours {
 	void populate_gun_flavours(const populate_flavours_input in) {

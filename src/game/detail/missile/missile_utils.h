@@ -10,6 +10,7 @@ void play_collision_sound(
 
 template <class R, class F>
 static void spawn_bullet_remnants(
+	allocate_new_entity_access access,
 	const logic_step step,
 	R& rng,
 	F flavours,
@@ -49,6 +50,7 @@ static void spawn_bullet_remnants(
 		}
 
 		cosmic::create_entity(
+			access,
 			cosm,
 			r_id,
 			[&, vel](const auto typed_remnant, auto&&...) {

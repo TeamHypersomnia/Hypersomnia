@@ -61,26 +61,30 @@ void detonate(const detonate_input in, const bool destroy_subject) {
 
 			const auto vel_angle = target_angle_offset + (n == 1 ? rotation : left + angle_dt * i);
 
-			cosmic::create_entity(
-				cosm,
+			components::sender sender_info;
+
+			if (const auto maybe_subject_sender = subject.find<components::sender>()) {
+				sender_info = *maybe_subject_sender;
+			}
+
+			sender_info.set_direct(subject);
+
+			const auto cascade_transform = transformr(t.pos, vel_angle);
+			const auto cascade_vel = vec2::from_degrees(vel_angle) * target_speed;
+
+			const int explosions_left = rng.randval(c_in.num_explosions);
+			const auto next_explosion_in_ms_mult = rng.randval(0.f, 1.0f); ;
+
+			cosmic::queue_create_entity(
+				step,
 				c_in.flavour_id,
-				[&](const auto typed_handle, auto&&...) {
-					auto& cascade_sender = typed_handle.template get<components::sender>();
-
-					if (const auto subject_sender = subject.find<components::sender>()) {
-						cascade_sender = *subject_sender;
-					}
-
-					cascade_sender.set_direct(subject);
-
-					{
-						const auto target_transform = transformr(t.pos, vel_angle);
-						typed_handle.set_logic_transform(target_transform);
-					}
+				[sender_info, cascade_transform, cascade_vel, explosions_left, next_explosion_in_ms_mult](const auto typed_handle, auto&&...) {
+					typed_handle.template get<components::sender>() = sender_info;
+					typed_handle.set_logic_transform(cascade_transform);
 
 					{
 						const auto& body = typed_handle.template get<components::rigid_body>();
-						body.set_velocity(vec2::from_degrees(vel_angle) * target_speed);
+						body.set_velocity(cascade_vel);
 					}
 
 					{
@@ -88,17 +92,16 @@ void detonate(const detonate_input in, const bool destroy_subject) {
 
 						auto& cascade = typed_handle.template get<components::cascade_explosion>();
 
-						cascade.explosions_left = rng.randval(c_in.num_explosions);
+						cascade.explosions_left = explosions_left;
 						
-						const auto next_explosion_in_ms = rng.randval(0.f, cascade_def.explosion_interval_ms.value);
+						const auto& clk = typed_handle.get_cosmos().get_clock();	
 
-						const auto& clk = cosm.get_clock();	
+						const auto next_explosion_in_ms = next_explosion_in_ms_mult * cascade_def.explosion_interval_ms.value;
 
 						cascade.when_next_explosion = clk.now;
 						cascade.when_next_explosion.step += next_explosion_in_ms / clk.dt.in_milliseconds();
 					}
-				},
-				[&](auto&) {}
+				}
 			);
 		}
 	}

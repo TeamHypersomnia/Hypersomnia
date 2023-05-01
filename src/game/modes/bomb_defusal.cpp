@@ -180,6 +180,8 @@ void bomb_defusal::init_spawned(
 	const auto handle = cosm[id];
 	const auto& faction_rules = in.rules.factions[handle.get_official_faction()];
 
+	auto access = allocate_new_entity_access();
+
 	handle.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 		if (transferred.has_value() && transferred->player.survived) {
 			const auto& eq = transferred->player.saved_eq;
@@ -233,9 +235,10 @@ void bomb_defusal::init_spawned(
 				}
 
 				const auto new_item = just_create_entity(
+					access,
 					cosm,
 					i.flavour,
-					[&](const entity_handle& handle) {
+					[&](const entity_handle handle) {
 						arena_mode_set_transferred_item_meta(handle, i.charges, i.owner_meta);
 					}
 				);
@@ -259,7 +262,7 @@ void bomb_defusal::init_spawned(
 						created_items.push_back(new_id);
 					}
 
-					auto fill_or_refill = [&cosm, &step, &typed_handle](const auto slot) {
+					auto fill_or_refill = [&cosm, &step, &typed_handle, access](const auto slot) {
 						if (const auto charge_inside = slot.get_item_if_any()) {
 							charge_inside.set_charges(charge_inside.num_charges_fitting_in(slot));
 						}
@@ -271,7 +274,7 @@ void bomb_defusal::init_spawned(
 							}
 
 							if (charge_flavour.is_set()) {
-								const auto charge = just_create_entity(cosm, charge_flavour);
+								const auto charge = just_create_entity(access, cosm, charge_flavour);
 								set_original_owner(charge, typed_handle);
 
 								charge.set_charges(charge.num_charges_fitting_in(slot));
@@ -324,10 +327,10 @@ void bomb_defusal::init_spawned(
 				: faction_rules.initial_eq
 			;
 
-			eq.generate_for(typed_handle, step, 1);
+			eq.generate_for(access, typed_handle, step, 1);
 		}
 
-		::resurrect(typed_handle);
+		::resurrect(step, typed_handle);
 
 		if (transferred.has_value()) {
 			typed_handle.template get<components::movement>().flags = transferred->player.movement;
@@ -693,7 +696,9 @@ void bomb_defusal::spawn_bomb_near_players(const input_type in) {
 
 
 entity_handle bomb_defusal::spawn_bomb(const input_type in) {
-	const auto new_bomb = just_create_entity(in.cosm, in.rules.bomb_flavour);
+	auto access = allocate_new_entity_access();
+
+	const auto new_bomb = just_create_entity(access, in.cosm, in.rules.bomb_flavour);
 	bomb_entity = new_bomb;
 	return new_bomb;
 }
@@ -770,6 +775,8 @@ entity_id bomb_defusal::create_character_for_player(
 	const mode_player_id id,
 	const std::optional<transfer_meta> transferred
 ) {
+	auto access = allocate_new_entity_access();
+
 	if (auto player_data = find(id)) {
 		auto& p = *player_data;
 		auto& cosm = in.cosm;
@@ -783,6 +790,7 @@ entity_id bomb_defusal::create_character_for_player(
 
 			if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
 				auto new_player = just_create_entity(
+					access,
 					cosm, 
 					entity_flavour_id(flavour), 
 					[](entity_handle) {},
@@ -873,6 +881,8 @@ void bomb_defusal::setup_round(
 	const logic_step step, 
 	const bomb_defusal::round_transferred_players& transfers
 ) {
+	auto access = allocate_new_entity_access();
+
 	clear_players_round_state(in);
 
 	auto& cosm = in.cosm;
@@ -965,7 +975,7 @@ void bomb_defusal::setup_round(
 	if (state == arena_mode_state::WARMUP) {
 		const auto theme = in.rules.view.warmup_theme;
 
-		just_create_entity(cosm, theme);
+		just_create_entity(access, cosm, theme);
 	}
 
 	step.post_message(messages::hud_message { messages::special_hud_command::CLEAR });
@@ -1814,6 +1824,8 @@ mode_player_id bomb_defusal::find_first_free_player() const {
 }
 
 void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& entropy, const logic_step step) {
+	auto access = allocate_new_entity_access();
+
 	const auto current_round = get_current_round_number();
 	auto& cosm = in.cosm;
 
@@ -1887,7 +1899,7 @@ void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& en
 										eq.weapon = f_id;
 									}
 
-									const auto result_weapon = eq.generate_for(player_handle, step);
+									const auto result_weapon = eq.generate_for(access, player_handle, step);
 
 									if (const auto w = cosm[result_weapon]; w.alive() && ::is_weapon_like(w)) {
 										auto requested_wielding = wielding_setup::bare_hands();
@@ -1929,7 +1941,7 @@ void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& en
 									requested_equipment eq;
 
 									eq.spells_to_give[s_id.get_index()] = true;
-									eq.generate_for(player_handle, step);
+									eq.generate_for(access, player_handle, step);
 
 									::play_learnt_spell_effect(player_handle, s_id, step);
 
@@ -2438,6 +2450,8 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 }
 
 void bomb_defusal::mode_post_solve(const input_type in, const mode_entropy& entropy, const const_logic_step step) {
+	auto access = allocate_new_entity_access();
+
 	(void)entropy;
 	auto& cosm = in.cosm;
 
@@ -2527,7 +2541,7 @@ void bomb_defusal::mode_post_solve(const input_type in, const mode_entropy& entr
 					if (theme.is_set()) {
 						LOG("Bomb detonation theme started.");
 
-						bomb_detonation_theme = just_create_entity(cosm, theme);
+						bomb_detonation_theme = just_create_entity(access, cosm, theme);
 					}
 				}
 			}

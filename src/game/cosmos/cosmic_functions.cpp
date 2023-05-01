@@ -3,7 +3,6 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/create_entity.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
-#include "game/detail/inventory/perform_transfer.h"
 #include "augs/templates/introspect.h"
 #include "game/cosmos/change_common_significant.hpp"
 #include "game/cosmos/delete_entity.h"
@@ -26,32 +25,35 @@ void cosmic::after_solvable_copy(cosmos& to, const cosmos& from) {
 }
 
 entity_handle just_create_entity(
+	allocate_new_entity_access access,
 	cosmos& cosm,
 	const entity_flavour_id id,
 	pre_construction_callback pre,
 	post_construction_callback post
 ) {
-	return cosmic::create_entity(cosm, id, [&pre](const auto& handle, auto& agg) { pre(handle); (void)agg; }, post);
+	return cosmic::create_entity(access, cosm, id, [&pre](const auto& handle, auto& agg) { pre(handle); (void)agg; }, post);
 }
 
 entity_handle just_create_entity(
+	allocate_new_entity_access access,
 	cosmos& cosm,
 	const entity_flavour_id id
 ) {
 	pre_construction_callback pre = [](entity_handle){};
 	post_construction_callback post = [](entity_handle){};
 
-	return just_create_entity(cosm, id, pre, post);
+	return just_create_entity(access, cosm, id, pre, post);
 }
 
 entity_handle just_create_entity(
+	allocate_new_entity_access access,
 	cosmos& cosm,
 	const entity_flavour_id id,
 	pre_construction_callback pre
 ) {
 	pre_construction_callback post = [](entity_handle){};
 
-	return just_create_entity(cosm, id, pre, post);
+	return just_create_entity(access, cosm, id, pre, post);
 }
 
 void cosmic::set_specific_name(const entity_handle& handle, const entity_name_str& name) {
@@ -160,15 +162,18 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 	reinfer_all_entities(cosm);
 }
 
-entity_handle just_clone_entity(const entity_handle source_entity) {
+entity_handle just_clone_entity(
+	allocate_new_entity_access access,
+	const entity_handle source_entity
+) {
 	auto& cosm = source_entity.get_cosmos();
 
 	if (source_entity.dead()) {
 		return entity_handle::dead_handle(cosm);
 	}
 
-	return source_entity.dispatch([](const auto typed_handle){
-		return entity_handle(cosmic::specific_clone_entity(typed_handle));
+	return source_entity.dispatch([access](const auto typed_handle){
+		return entity_handle(cosmic::specific_clone_entity(access, typed_handle));
 	});
 }
 
@@ -308,11 +313,14 @@ void reverse_perform_deletions(const deletion_queue& deletions, cosmos& cosm) {
 }
 
 template <class entity_type>
-ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(const ref_typed_entity_handle<entity_type> in_entity) {
+ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(
+	allocate_new_entity_access access,
+	const ref_typed_entity_handle<entity_type> in_entity
+) {
 	const auto source_entity = in_entity.to_const();
 	auto& cosm = in_entity.get_cosmos();
 
-	return cosmic::specific_create_entity(cosm, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
+	return cosmic::specific_create_entity(access, cosm, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
 		const auto& source_components = source_entity.get({}).component_state;
 		auto& new_solvable = new_entity.get({});
 		auto& new_components = new_solvable.component_state;
@@ -332,6 +340,6 @@ ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(const ref_typ
 	});
 }
 
-#define INSTANTIATE_SPECIFIC_CLONE(entity_type) template ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(const ref_typed_entity_handle<entity_type> in_entity);
+#define INSTANTIATE_SPECIFIC_CLONE(entity_type) template ref_typed_entity_handle<entity_type> cosmic::specific_clone_entity(allocate_new_entity_access access, const ref_typed_entity_handle<entity_type> in_entity);
 
 FOR_ALL_ENTITY_TYPES(INSTANTIATE_SPECIFIC_CLONE)

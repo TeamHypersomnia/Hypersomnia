@@ -11,6 +11,10 @@
 
 #include "augs/string/string_templates.h"
 
+void item_slot_transfer_request_params::set_specified_quantity(allocate_new_entity_access, const int quantity) {
+	specified_quantity = quantity;
+}
+
 capability_comparison match_transfer_capabilities(
 	const cosmos& cosm,
 	item_slot_transfer_request r
@@ -95,7 +99,7 @@ item_transfer_result query_transfer_result(
 
 			const auto item = transferred_item.template get<components::item>();
 
-			ensure(r.params.specified_quantity != 0);
+			ensure(r.params.get_specified_quantity() != 0);
 
 			const auto capabilities_compared = match_transfer_capabilities(transferred_item.get_cosmos(), r);
 			const auto relation = capabilities_compared.relation_type;
@@ -115,11 +119,11 @@ item_transfer_result query_transfer_result(
 			if (relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP) {
 				output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
 
-				if (r.params.specified_quantity == -1) {
+				if (r.params.get_specified_quantity() == -1) {
 					output.transferred_charges = item.get_charges();
 				}
 				else {
-					output.transferred_charges = std::min(r.params.specified_quantity, item.get_charges());
+					output.transferred_charges = std::min(r.params.get_specified_quantity(), item.get_charges());
 				}
 			}
 			else {
@@ -131,7 +135,7 @@ item_transfer_result query_transfer_result(
 					const auto containment_result = query_containment_result(
 						transferred_item, 
 						target_slot,
-						r.params.specified_quantity
+						r.params.get_specified_quantity()
 					);
 
 					output.transferred_charges = containment_result.transferred_charges;
@@ -310,7 +314,7 @@ bool can_stack_entities(
 	;
 }
 
-unsigned to_space_units(const std::string& s) {
+inventory_space_type to_space_units(const std::string& s) {
 	unsigned sum = 0;
 	unsigned mult = SPACE_ATOMS_PER_UNIT;
 

@@ -161,7 +161,13 @@ bool game_gui_system::control_gui_world(
 
 			if (change.was_pressed(augs::event::keys::key::RMOUSE)) {
 				if (world.held_rect_is_dragged) {
-					queue_transfer(root_entity, item_slot_transfer_request::drop_some(item_entity, dragged_charges));
+					auto access = allocate_new_entity_access();
+
+					item_slot_transfer_request drop_some;
+					drop_some.item = item_entity;
+					drop_some.params.set_specified_quantity(access, dragged_charges);
+
+					queue_transfer(root_entity, drop_some);
 					world.unhover_and_undrag(context);
 					return true;
 				}

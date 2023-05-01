@@ -135,4 +135,9 @@ public:
 	void perform_deletions() const {
 		deletion_system().reverse_perform_deletions(*this);
 	}
+
+	template <bool C = !is_const, class = std::enable_if_t<C>>
+	void flush_pending_allocations() const {
+		allocation_system().flush_pending_allocations(*this);
+	}
 };

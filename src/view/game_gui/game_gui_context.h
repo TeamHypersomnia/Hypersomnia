@@ -113,6 +113,10 @@ public:
 	const auto& get_image_metas() const {
 		return dependencies.image_definitions;
 	}
+
+	auto get_access_to_partial_transfers() const {
+		return allocate_new_entity_access();
+	}
 };
 
 using game_gui_context = basic_game_gui_context<false>;

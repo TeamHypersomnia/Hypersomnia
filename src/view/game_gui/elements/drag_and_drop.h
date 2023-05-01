@@ -6,7 +6,6 @@
 #include "game/detail/inventory/item_transfer_result.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "view/game_gui/elements/item_button.h"
-#include "game/detail/inventory/perform_transfer.h"
 
 struct unfinished_drag_of_item {
 	hotbar_button_in_character_gui source_hotbar_button_id;

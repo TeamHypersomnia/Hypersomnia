@@ -13,7 +13,6 @@
 #include "game/components/attitude_component.h"
 #include "game/components/container_component.h"
 #include "game/components/sender_component.h"
-#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"

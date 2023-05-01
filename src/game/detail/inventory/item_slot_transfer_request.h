@@ -9,9 +9,19 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "augs/math/physics_structs.h"
 
+class allocate_new_entity_access;
+
+namespace augs {
+	struct introspection_access;
+}
+
 struct item_slot_transfer_request_params {
+	friend augs::introspection_access;
+
 	// GEN INTROSPECTOR struct item_slot_transfer_request_params
+private:
 	int specified_quantity = -1;
+public:
 	impulse_mults additional_drop_impulse;
 	bool apply_standard_impulse = true;
 
@@ -26,6 +36,12 @@ struct item_slot_transfer_request_params {
 
 	pad_bytes<1> pad;
 	// END GEN INTROSPECTOR
+
+	void set_specified_quantity(allocate_new_entity_access, int);
+
+	int get_specified_quantity() const {
+		return specified_quantity;
+	}
 };
 
 template <class id_type>
@@ -46,14 +62,6 @@ struct basic_item_slot_transfer_request {
 		return out;
 	}
 
-	static auto standard(const id_type item, const target_slot_type target, const int specified_quantity) {
-		request_type out;
-		out.item = item;
-		out.target_slot = target;
-		out.params.specified_quantity = specified_quantity;
-		return out;
-	}
-
 	static auto drop(const id_type item) {
 		request_type out;
 		out.item = item;
@@ -64,13 +72,6 @@ struct basic_item_slot_transfer_request {
 		request_type out;
 		out.item = item;
 		out.params.additional_drop_impulse = additional_drop;
-		return out;
-	}
-
-	static auto drop_some(const id_type item, const int specified_quantity) {
-		request_type out;
-		out.item = item;
-		out.params.specified_quantity = specified_quantity;
 		return out;
 	}
 

@@ -8,28 +8,21 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/modes/detail/owner_meta_logic.h"
 #include "game/cosmos/just_create_entity_functional.h"
+#include "game/cosmos/allocate_new_entity_access.h"
 
 template <class E>
 entity_id requested_equipment::generate_for(
-	const E& character, 
-	cosmos& cosm,
-	int max_effects_played
-) const {
-	return generate_for_impl(character, cosm, [](auto){}, max_effects_played);
-}
-
-template <class E>
-entity_id requested_equipment::generate_for(
+	allocate_new_entity_access access,
 	const E& character, 
 	const logic_step step,
 	int max_effects_played
 ) const {
-	return generate_for_impl(character, step.get_cosmos(), [&](auto callback){ callback(step); }, max_effects_played);
+	return generate_for_impl(access, character, step.get_cosmos(), [&](auto callback){ callback(step); }, max_effects_played);
 }
-
 
 template <class E, class F>
 entity_id requested_equipment::generate_for_impl(
+	allocate_new_entity_access access,
 	const E& character, 
 	cosmos& cosm,
 	F&& on_step,
@@ -40,7 +33,7 @@ entity_id requested_equipment::generate_for_impl(
 	const auto& eq = *this;
 
 	auto make_owned_item = [&](const auto& flavour) {
-		const auto new_entity = just_create_entity(cosm, flavour, [&](const entity_handle h){ 
+		const auto new_entity = just_create_entity(access, cosm, flavour, [&](const entity_handle h){ 
 			if constexpr(to_the_ground) {
 				h.set_logic_transform(character);
 			}

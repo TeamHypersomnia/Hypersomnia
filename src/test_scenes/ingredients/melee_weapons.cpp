@@ -11,7 +11,7 @@
 #include "game/components/item_component.h"
 #include "game/components/melee_component.h"
 
-#include "game/detail/inventory/perform_transfer.h"
+inventory_space_type to_space_units(const std::string& s);
 
 namespace test_flavours {
 	void populate_melee_flavours(const populate_flavours_input in) {

@@ -5,13 +5,23 @@
 #include "game/cosmos/step_declaration.h"
 #include "game/detail/view_input/sound_effect_input.h"
 
+#include "game/cosmos/logic_step.h"
+
 struct damage_origin;
 
 template <class E>
-void resurrect(const E& typed_handle) {
+void resurrect(const logic_step step, const E& typed_handle) {
 	auto& sentience = typed_handle.template get<components::sentience>();
 
 	for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
+
+	auto& cosm = typed_handle.get_cosmos();
+	const auto head = cosm[sentience.detached.head];
+
+	if (head) {
+		step.queue_deletion_of(head, "Lying head of resurrected character");
+	}
+
 	sentience.detached = {};
 	sentience.when_corpse_catched_fire = {};
 

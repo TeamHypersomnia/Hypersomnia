@@ -53,6 +53,7 @@
 
 #include "game/detail/gun/gun_getters.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "game/cosmos/might_allocate_entities_having.hpp"
 
 enum class reload_advance_result {
 	DIFFERENT_VIABLE,
@@ -180,8 +181,10 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 	(void)step;
 	auto& cosm = step.get_cosmos();
 
+	auto access = allocate_new_entity_access();
+
 	auto transfer = [&](auto r) -> bool {
-		r.params.specified_quantity = 1;
+		r.params.set_specified_quantity(access, 1);
 		return ::perform_transfer(r, step).result.is_successful();
 	};
 
@@ -193,6 +196,8 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 	};
 
 	cosm.for_each_having<components::item_slot_transfers>([&](const auto& it) {
+		cosm.might_allocate_stackable_entities(5);
+
 		auto& transfers = it.template get<components::item_slot_transfers>();
 		auto& ctx = transfers.current_reloading_context;
 
@@ -472,7 +477,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 							if (n > 1) {
 								auto hide_rest_to_where_it_was = item_slot_transfer_request::standard(new_mag, old_slot);
 								auto& p = hide_rest_to_where_it_was.params;
-								p.specified_quantity = n - 1;
+								p.set_specified_quantity(access, n - 1);
 								p.play_transfer_sounds = false;
 								p.play_transfer_particles = false;
 								p.perform_recoils = false;

@@ -462,6 +462,23 @@ namespace augs {
 		decltype(auto) operator[](Args&&... args) const {
 			return get(std::forward<Args>(args)...);
 		}
+
+		void might_allocate_objects(const std::size_t count) {
+			/* 
+				Prereserve objects before potential allocations so that existing pointers
+				aren't invalidated.
+			*/
+
+			const auto required_capacity = objects.size() + count;
+
+			if (required_capacity > objects.capacity()) {
+				objects.reserve(required_capacity * 2);
+			}
+		}
+
+		bool next_allocation_preserves_pointers() const {
+			return objects.size() < objects.capacity();
+		}
 	};
 }
 

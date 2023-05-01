@@ -6,7 +6,6 @@
 #include "view/game_gui/elements/gui_grid.h"
 #include "view/game_gui/elements/character_gui.h"
 #include "game/components/item_component.h"
-#include "game/detail/inventory/perform_transfer.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
@@ -14,6 +13,7 @@
 #include "view/game_gui/game_gui_context.h"
 #include "view/game_gui/game_gui_system.h"
 #include "augs/string/format_enum.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 void drag_and_drop_callback(
 	game_gui_context context, 
@@ -99,6 +99,8 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 	const game_gui_element_location held_rect_id, 
 	const game_gui_element_location drop_target_rect_id
 ) {
+	auto access = context.get_access_to_partial_transfers();
+
 	const auto& cosm = context.get_cosmos();
 	const auto& element = context.get_character_gui();
 	const auto owning_transfer_capability = context.get_subject_entity();
@@ -166,7 +168,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 
 			auto& simulated_transfer = drop.simulated_transfer;
 			simulated_transfer.item = dragged_item_handle;
-			simulated_transfer.params.specified_quantity = element.dragged_charges == 0 ? -1 : element.dragged_charges;
+			simulated_transfer.params.set_specified_quantity(access, element.dragged_charges == 0 ? -1 : element.dragged_charges);
 
 			drop.source_hotbar_button_id = source_hotbar_button_id;
 
@@ -219,7 +221,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					const auto item_charges = dragged_item_handle.template get<components::item>().get_charges();
 
 					if (item_charges > 1) {
-						auto& requested_q = simulated_transfer.params.specified_quantity;
+						const auto requested_q = simulated_transfer.params.get_specified_quantity();
 						const auto& resulted_q = static_cast<int>(drop.result.transferred_charges);
 
 						if (requested_q == resulted_q) {
@@ -227,7 +229,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 						}
 						else {
 							charges_text = " " + std::to_string(drop.result.transferred_charges);
-							requested_q = resulted_q;
+							simulated_transfer.params.set_specified_quantity(access, resulted_q);
 						}
 					}
 

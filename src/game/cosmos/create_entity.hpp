@@ -4,9 +4,11 @@
 #include "game/cosmos/cosmic_functions.h"
 #include "game/detail/entity_handle_mixins/get_current_slot.hpp"
 #include "game/cosmos/entity_creation_error.h"
+#include "game/messages/create_entity_message.h"
 
 template <class E, class C, class I, class P>
 ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
+	allocate_new_entity_access access,
 	C& cosm, 
 	const typed_entity_flavour_id<E> flavour_id,
 	const I& initial_components,
@@ -18,7 +20,7 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
 		throw entity_creation_error(entity_creation_error_type::DEAD_FLAVOUR);
 	}
 
-	const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>({ flavour_id.raw });
+	const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>({ access, flavour_id.raw });
 	const auto handle = ref_typed_entity_handle<E> { cosm, { new_allocation.object, new_allocation.key } };
 
 	{
@@ -35,27 +37,15 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
 	return handle;
 }
 
-template <class C, class I, class E>
-ref_typed_entity_handle<E> cosmic::specific_paste_entity(
-	C& cosm, 
-	const typed_entity_flavour_id<E> flavour_id,
-	const I& initial_components
-) {
-	return specific_create_entity_detail(
-		cosm,
-		flavour_id,
-		initial_components,
-		[](auto&&...){}
-	);
-}
-
 template <class C, class E, class P>
 ref_typed_entity_handle<E> cosmic::specific_create_entity(
+	allocate_new_entity_access access,
 	C& cosm, 
 	const typed_entity_flavour_id<E> flavour_id,
 	P&& pre_construction
 ) {
 	return specific_create_entity_detail(
+		access,
 		cosm,
 		flavour_id,
 		cosm.get_flavour(flavour_id).initial_components,
@@ -63,18 +53,68 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity(
 	);
 }
 
+template <class... Types, class Pre, class Post>
+void cosmic::queue_create_entity(
+	const logic_step step,
+	const constrained_entity_flavour_id<Types...> flavour_id,
+	Pre pre_construction,
+	Post post_construction
+) {
+	if (!flavour_id.is_set()) {
+		return;
+	}
+
+	using candidate_types = typename decltype(flavour_id)::matching_types; 
+
+	conditional_get_by_dynamic_id<candidate_types>(
+		all_entity_types(),
+		flavour_id.type_id,
+		[&](auto e) {
+			using E = decltype(e);
+
+			messages::create_entity_message<E> msg;
+			msg.flavour_id = typed_entity_flavour_id<E>(flavour_id.raw);
+
+			msg.pre_construction = [pre_construction](ref_typed_entity_handle<E> typed_handle, entity_solvable<E>& agg) {
+				pre_construction(typed_handle, agg);
+			};
+
+			msg.post_construction = [post_construction](ref_typed_entity_handle<E> typed_handle, const logic_step step) {
+				post_construction(typed_handle, step);
+			};
+
+			step.post_message(msg);
+		}
+	);
+}
+
+template <class... Types, class Pre>
+void cosmic::queue_create_entity(
+	const logic_step step,
+	const constrained_entity_flavour_id<Types...> flavour_id,
+	Pre&& pre_construction
+) {
+	queue_create_entity(
+		step,
+		flavour_id,
+		std::forward<Pre>(pre_construction),
+		[](auto&&...) {}
+	);
+}
+
 template <class C, class... Types, class Pre, class Post>
 entity_handle cosmic::create_entity(
+	allocate_new_entity_access access,
 	C& cosm,
 	const constrained_entity_flavour_id<Types...> flavour_id,
 	Pre&& pre_construction,
 	Post post_construction
 ) {
-	using candidate_types = typename decltype(flavour_id)::matching_types; 
-
 	if (!flavour_id.is_set()) {
 		return cosm[entity_id()];
 	}
+
+	using candidate_types = typename decltype(flavour_id)::matching_types; 
 
 	return conditional_get_by_dynamic_id<candidate_types>(
 		all_entity_types(),
@@ -83,6 +123,7 @@ entity_handle cosmic::create_entity(
 			using E = decltype(e);
 
 			const auto typed_handle = specific_create_entity(
+				access,
 				cosm, 
 				typed_entity_flavour_id<E>(flavour_id.raw), 
 				std::forward<Pre>(pre_construction)

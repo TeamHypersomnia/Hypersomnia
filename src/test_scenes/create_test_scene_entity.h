@@ -11,21 +11,22 @@ auto transform_setter(const T& where) {
 
 template <class C, class E, class F>
 auto create_test_scene_entity(C& cosm, const E enum_flavour, F&& callback) {
-	return cosmic::specific_create_entity(cosm, to_entity_flavour_id(enum_flavour), std::forward<F>(callback));
+	auto access = allocate_new_entity_access();
+	return cosmic::specific_create_entity(access, cosm, to_entity_flavour_id(enum_flavour), std::forward<F>(callback));
 }
 
 template <class C, class E>
 auto create_test_scene_entity(C& cosm, const E enum_flavour, const vec2 pos) {
-	return cosmic::specific_create_entity(cosm, to_entity_flavour_id(enum_flavour), transform_setter(pos));
+	return create_test_scene_entity(cosm, enum_flavour, transform_setter(pos));
 }
 
 template <class C, class E>
 auto create_test_scene_entity(C& cosm, const E enum_flavour, const transformr where) {
-	return cosmic::specific_create_entity(cosm, to_entity_flavour_id(enum_flavour), transform_setter(where));
+	return create_test_scene_entity(cosm, enum_flavour, transform_setter(where));
 }
 
 template <class C, class E>
 auto create_test_scene_entity(C& cosm, const E enum_flavour) {
-	return cosmic::specific_create_entity(cosm, to_entity_flavour_id(enum_flavour), [](auto&&...) {});
+	return create_test_scene_entity(cosm, enum_flavour, [](auto&&...) {});
 }
 

@@ -26,13 +26,14 @@
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/explosive/like_explosive.h"
 #include "game/inferred_caches/relational_cache.hpp"
+#include "game/cosmos/might_allocate_entities_having.hpp"
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
 	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); result.play_effects(step); });
 }
 
 void perform_transfer_result::notify_logical(const logic_step step) const {
-	if (destructed) {
+	if (destructed.has_value()) {
 		step.queue_deletion_of(*destructed, "Post-transfer deletion");
 	}
 }
@@ -74,6 +75,13 @@ perform_transfer_result perform_transfer(
 	return result;
 }
 
+struct perform_transfer_impl {
+	perform_transfer_result operator()( 
+		const item_slot_transfer_request r, 
+		cosmos& cosm
+	) const;
+};
+
 perform_transfer_result perform_transfer_no_step(
 	const item_slot_transfer_request r, 
 	cosmos& cosm
@@ -86,9 +94,6 @@ perform_transfer_result perform_transfer_impl::operator()(
 	cosmos& cosm
 ) const {
 	const auto access = write_synchronized_component_access();
-#if TODO_ACCESS
-	const auto inferred_access = cosmos_solvable_inferred_access();
-#endif
 
 	auto deguidize = [&](const auto s) {
 		/* No-op */
@@ -290,7 +295,14 @@ perform_transfer_result perform_transfer_impl::operator()(
 			return transferred_item;
 		}
 		else {
-			const auto cloned_stack = just_clone_entity(transferred_item);
+			transferred_item.dispatch(
+				[&]<typename H>(const H&) {
+					using E = typename H::used_entity_type;
+					ensure(cosm.next_allocation_preserves_pointers<E>());
+				}
+			);
+
+			const auto cloned_stack = just_clone_entity(allocate_new_entity_access(), transferred_item);
 			get_item_of(cloned_stack).charges = result.transferred_charges;
 			get_item_of(cloned_stack).previous_slot = source_slot;
 

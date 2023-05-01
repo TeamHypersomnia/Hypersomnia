@@ -16,6 +16,7 @@ enum class missile_collision_type {
 
 template <class A, class B>
 static std::optional<missile_collision_result> collide_missile_against_surface(
+	allocate_new_entity_access access,
 	const logic_step step,
 
 	const A& typed_missile,
@@ -123,6 +124,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 			if (!surface_sentient) {
 				spawn_bullet_remnants(
+					access,
 					step,
 					rng,
 					missile_def.remnant_flavours,

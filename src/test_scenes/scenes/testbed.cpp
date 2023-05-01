@@ -28,7 +28,6 @@
 #include "game/detail/describers.h"
 
 #include "game/messages/intent_message.h"
-#include "game/detail/inventory/perform_transfer.h"
 
 #include "view/viewables/image_cache.h"
 #include "game/cosmos/logic_step.h"
@@ -502,6 +501,8 @@ namespace test_scenes {
 		auto& world = step.get_cosmos();
 		report_all_spells(world);
 		
+		auto access = allocate_new_entity_access();
+
 		auto create = [&](auto&&... args) {
 			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
 		};
@@ -602,7 +603,7 @@ namespace test_scenes {
 				r.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			}
 
-			auto result = r.generate_for(character, step);
+			auto result = r.generate_for(access, character, step);
 			report_weapon(w, world[result]);
 		};
 
@@ -616,14 +617,14 @@ namespace test_scenes {
 			requested_equipment r;
 			r.back_wearable = to_entity_flavour_id(c);
 
-			r.generate_for(character, step);
+			r.generate_for(access, character, step);
 		};
 
 		auto give_armor = [&](const auto& character) {
 			requested_equipment r;
 			r.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 
-			r.generate_for(character, step);
+			r.generate_for(access, character, step);
 		};
 
 		const auto metropolis_type = test_controlled_characters::METROPOLIS_SOLDIER;
@@ -820,7 +821,7 @@ namespace test_scenes {
 					r.num_given_ammo_pieces = 1;
 					auto tr = transformr(vec2(-800 - k * 150, y_off + off_i++ * 200));
 
-					r.generate_for(tr, step);
+					r.generate_for(access, tr, step);
 				}
 
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + off_i++ * 200)), test_shootable_weapons::WARX);
@@ -1121,11 +1122,11 @@ namespace test_scenes {
 			const auto dragon_fish = test_dynamic_decorations::DRAGON_FISH;
 			const auto rainbow_dragon_fish = test_dynamic_decorations::RAINBOW_DRAGON_FISH;
 
-			const auto origin_entity = create(test_box_markers::ORGANISM_AREA, aquarium_origin).set_logical_size(aquarium_size * 2);
+			const auto origin_entity_id = create(test_box_markers::ORGANISM_AREA, aquarium_origin).set_logical_size(aquarium_size * 2).get_id();
 
-			auto create_fish = [&, origin_entity](auto t, auto where, bool disable_eff = false) {
+			auto create_fish = [&, origin_entity_id](auto t, auto where, bool disable_eff = false) {
 				const auto decor = create(t, where);
-				decor.template get<components::movement_path>().origin = origin_entity.get_id();
+				decor.template get<components::movement_path>().origin = origin_entity_id;
 				const auto secs = real32(decor.template get<components::animation>().state.frame_num) * 12.23f;
 				decor.template get<components::sprite>().effect_offset_secs = secs;
 				decor.template get<components::sprite>().disable_special_effects = disable_eff;
@@ -1207,13 +1208,13 @@ namespace test_scenes {
 			auto insects_origin = transformr({ 500, 213 }, 0);
 			auto insects_size = vec2(2000, 1000);
 
-			auto insects_area = create(test_box_markers::ORGANISM_AREA, insects_origin).set_logical_size(insects_size);
+			auto insects_area_id = create(test_box_markers::ORGANISM_AREA, insects_origin).set_logical_size(insects_size).get_id();
 
 			auto create_insect = [&](auto t, auto off, auto rot) {
 				const auto decor = create(t, transformr(insects_origin.pos + off, rot));
 				const auto secs = real32(decor.template get<components::animation>().state.frame_num) * 12.23f;
 
-				decor.template get<components::movement_path>().origin = insects_area.get_id();
+				decor.template get<components::movement_path>().origin = insects_area_id;
 				decor.template get<components::sprite>().effect_offset_secs = secs;
 				return decor;
 			};

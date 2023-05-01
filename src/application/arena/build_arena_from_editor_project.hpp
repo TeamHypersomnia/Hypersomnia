@@ -13,6 +13,8 @@
 
 template <class A>
 void build_arena_from_editor_project(A arena_handle, const build_arena_input in) {
+	auto access = allocate_new_entity_access();
+
 	const auto& project = in.project;
 	const auto& official = in.official;
 
@@ -251,7 +253,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							r.weapon = typed;
 							r.num_given_ammo_pieces = 1;
 
-							auto new_id = r.generate_for(typed_node.get_transform(), step);
+							auto new_id = r.generate_for(access, typed_node.get_transform(), step);
 							ensure(scene.world[new_id].alive());
 							setup_node_entity_mapping(new_id);
 							apply_layer_modifiers_on_special_entity(new_id);
@@ -266,7 +268,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							requested_equipment r;
 							r.weapon = typed;
 
-							auto new_id = r.generate_for(typed_node.get_transform(), step);
+							auto new_id = r.generate_for(access, typed_node.get_transform(), step);
 							ensure(scene.world[new_id].alive());
 							setup_node_entity_mapping(new_id);
 							apply_layer_modifiers_on_special_entity(new_id);
@@ -282,7 +284,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							r.non_standard_mag = typed;
 							r.num_given_ammo_pieces = 1;
 
-							auto new_id = r.generate_for(typed_node.get_transform(), step);
+							auto new_id = r.generate_for(access, typed_node.get_transform(), step);
 							ensure(scene.world[new_id].alive());
 							setup_node_entity_mapping(new_id);
 							apply_layer_modifiers_on_special_entity(new_id);
@@ -318,6 +320,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 					std::visit(
 						[&](const auto& typed_flavour_id) {
 							const auto new_handle = cosmic::specific_create_entity(
+								access,
 								scene.world,
 								typed_flavour_id,
 								entity_from_node

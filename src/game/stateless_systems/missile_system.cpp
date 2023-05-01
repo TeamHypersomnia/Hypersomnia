@@ -8,7 +8,6 @@
 #include "game/messages/queue_deletion.h"
 #include "game/messages/damage_message.h"
 
-#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/entity_scripts.h"
 
 #include "game/components/missile_component.h"
@@ -96,6 +95,8 @@ void missile_system::ricochet_missiles(const logic_step step) {
 }
 
 void missile_system::detonate_colliding_missiles(const logic_step step) {
+	auto access = allocate_new_entity_access();
+
 	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::collision_message>();
 
@@ -129,6 +130,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			const auto info = missile_surface_info(typed_missile, surface_handle);
 
 			if (const auto result = collide_missile_against_surface(
+				access,
 				step,
 
 				typed_missile, 
@@ -294,6 +296,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					}
 
 					if (const auto result = collide_missile_against_surface(
+						access,
 						step,
 
 						typed_melee, 

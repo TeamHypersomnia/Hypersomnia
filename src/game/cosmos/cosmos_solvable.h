@@ -10,8 +10,10 @@
 #include "game/cosmos/cosmos_solvable_significant.h"
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/entity_creation_error.h"
+#include "game/cosmos/allocate_new_entity_access.h"
 
 struct entity_creation_input {
+	allocate_new_entity_access access;
 	raw_entity_flavour_id flavour_id;
 };
 

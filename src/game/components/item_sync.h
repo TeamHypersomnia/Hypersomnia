@@ -3,15 +3,6 @@
 #include "game/components/item_component.h"
 
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
-#include "game/cosmos/cosmos_solvable_inferred_access.h"
-#include "game/detail/inventory/perform_transfer_result.h"
-
-struct perform_transfer_impl {
-	perform_transfer_result operator()( 
-		const item_slot_transfer_request r, 
-		cosmos& cosm
-	) const;
-};
 
 template <class E>
 class component_synchronizer<E, components::item> : public synchronizer_base<E, components::item> {

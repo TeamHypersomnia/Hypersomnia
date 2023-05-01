@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
+#include "game/organization/all_entity_types_declaration.h"
 
 namespace augs {
 	template <class...>
@@ -35,7 +36,12 @@ namespace messages {
 	struct duel_interrupted_message;
 	struct team_match_start_message;
 	struct match_summary_ended;
+
+	template <class T>
+	struct create_entity_message;
 }
+
+#define MAKE_CREATE_ENTITY_MESSAGE(entity_type) messages::create_entity_message<entity_type>,
 
 using all_message_queues = augs::storage_for_message_queues<
 	messages::intent_message,
@@ -77,5 +83,8 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::match_summary_message,
 
 	messages::team_match_start_message,
+
+	FOR_ALL_ENTITY_TYPES(MAKE_CREATE_ENTITY_MESSAGE)
+
 	messages::match_summary_ended
 >;

@@ -48,6 +48,16 @@
 #include "game/detail/gun/gun_getters.h"
 
 #include "augs/log.h"
+#include "game/cosmos/allocate_new_entity_access.h"
+#include "game/cosmos/might_allocate_entities_having.hpp"
+
+static void correct_interpolation_for(const logic_step step, const entity_id id, const transformr muzzle_transform) {
+	messages::interpolation_correction_request request;
+	request.subject = id;
+	request.set_previous_transform_value = muzzle_transform;
+
+	step.post_message(request);
+};
 
 template <class T>
 bool gun_try_to_fire_and_reset(
@@ -107,6 +117,7 @@ static entity_id find_next_cartridge(
 
 template <class E>
 static void load_next_cartridge(
+	allocate_new_entity_access access,
 	const E& gun_entity,
 	const entity_id next_cartridge,
 	const logic_step step
@@ -116,18 +127,19 @@ static void load_next_cartridge(
 	into_chamber_transfer.item = next_cartridge;
 	into_chamber_transfer.target_slot = gun_entity[slot_function::GUN_CHAMBER];
 	into_chamber_transfer.params.bypass_mounting_requirements = true;
-	into_chamber_transfer.params.specified_quantity = 1;
+	into_chamber_transfer.params.set_specified_quantity(access, 1);
    
 	perform_transfer(into_chamber_transfer, step);
 }
 
 template <class E>
 static void find_and_load_next_cartridge(
+	allocate_new_entity_access access,
 	const E& gun_entity,
 	const logic_step step
 ) {
 	if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
-		load_next_cartridge(gun_entity, next_cartridge, step);
+		load_next_cartridge(access, gun_entity, next_cartridge, step);
 	}
 }
 
@@ -187,6 +199,7 @@ static void cooldown_gun_heat(
 
 template <class A, class B, class C, class D>
 static void spawn_shell(
+	const allocate_new_entity_access access,
 	const logic_step step,
 	const transformr gun_transform,
 	const transformr muzzle_transform,
@@ -198,7 +211,7 @@ static void spawn_shell(
 ) {
 	auto& cosm = step.get_cosmos();
 
-	cosmic::create_entity(cosm, shell_flavour, [&](const auto shell_entity, auto&&...) {
+	cosmic::create_entity(access, cosm, shell_flavour, [&](const auto shell_entity, auto&&...) {
 		auto rng = cosm.get_nontemporal_rng_for(shell_entity);
 
 		const auto shell_spawn_offset = ::calc_shell_offset(gun_entity);
@@ -242,8 +255,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	const auto& logicals = step.get_logical_assets();
 	const auto delta_ms = delta.in_milliseconds();
 
+	auto access = allocate_new_entity_access();
+
 	cosm.for_each_having<components::gun>(
 		[&](const auto& gun_entity) {
+			cosm.might_allocate_stackable_entities(5);
+
 			const auto when_transferred = gun_entity.when_last_transferred();
 
 			const auto gun_transform = gun_entity.get_logic_transform();
@@ -386,14 +403,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					response.subject = gun_entity;
 					response.capability = capability;
 					return response;
-				};
-
-				auto correct_interpolation_for = [&](const const_entity_handle round_entity){
-					messages::interpolation_correction_request request;
-					request.subject = round_entity;
-					request.set_previous_transform_value = muzzle_transform;
-
-					step.post_message(request);
 				};
 
 				auto try_to_fire_interval = [&]() -> std::optional<weapon_action_type> {
@@ -575,6 +584,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier;
 
 							cosmic::create_entity(
+								access,
 								cosm, 
 								magic_missile_flavour_id,
 								[&](const auto round_entity, auto&&...) {
@@ -610,7 +620,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 										step.post_message(response);
 									}
 
-									correct_interpolation_for(round_entity);
+									::correct_interpolation_for(step, round_entity.get_id(), muzzle_transform);
 								},
 								[&](const auto) {}
 							);
@@ -669,7 +679,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 												[&](const auto& typed_charge_flavour) {
 													if (const auto cartridge_def = typed_charge_flavour.template find<invariants::cartridge>()) {
 														if (const auto shell_flavour = cartridge_def->shell_flavour; shell_flavour.is_set()) {
-															::spawn_shell(step, gun_transform, muzzle_transform, gun_def, gun_entity, shell_flavour, owning_capability, *cartridge_def);
+															::spawn_shell(access, step, gun_transform, muzzle_transform, gun_def, gun_entity, shell_flavour, owning_capability, *cartridge_def);
 														}
 													}
 												}
@@ -681,7 +691,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								}
 
 								if (progress >= chambering_duration_ms) {
-									::load_next_cartridge(gun_entity, next_cartridge, step);
+									::load_next_cartridge(access, gun_entity, next_cartridge, step);
 									progress = 0.f;
 									gun.special_state = gun_special_state::NONE;
 								}
@@ -805,7 +815,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 											const auto& num_rounds = cartridge_def.num_rounds_spawned;
 
 											auto create_round = [&](const std::optional<real32> rotational_offset) {
-												cosmic::create_entity(cosm, round_flavour, [&](const auto round_entity, auto&&...) {
+												cosmic::create_entity(access, cosm, round_flavour, [&](const auto round_entity, auto&&...) {
 #if !ENABLE_RECOIL
 													LOG("ROUND CREATED");
 #endif
@@ -853,7 +863,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 														round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
 													}
 
-													correct_interpolation_for(round_entity);
+													::correct_interpolation_for(step, round_entity.get_id(), muzzle_transform);
 												}, [&](const auto) {});
 											};
 
@@ -879,7 +889,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 										const auto& cartridge_def = single_bullet_or_pellet_stack.get<invariants::cartridge>();
 
 										if (const auto shell_flavour = cartridge_def.shell_flavour; shell_flavour.is_set()) {
-											::spawn_shell(step, gun_transform, muzzle_transform, gun_def, gun_entity, shell_flavour, owning_capability, cartridge_def);
+											::spawn_shell(access, step, gun_transform, muzzle_transform, gun_def, gun_entity, shell_flavour, owning_capability, cartridge_def);
 										}
 									}
 
@@ -903,7 +913,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								*/
 
 								if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
-									::find_and_load_next_cartridge(gun_entity, step);
+									::find_and_load_next_cartridge(access, gun_entity, step);
 								}
 							};
 
@@ -912,7 +922,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 									/* The gun might not necessarily load the cartridges automatically */
 
 									if (gun.remaining_burst_shots > 0) {
-										::find_and_load_next_cartridge(gun_entity, step);
+										::find_and_load_next_cartridge(access, gun_entity, step);
 									}
 								}
 							};

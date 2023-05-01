@@ -28,6 +28,7 @@ struct standard_solver {
 		cosmic::increment_step(input.cosm);
 		callbacks.pre_solve(step);
 		standard_solve(step);
+		step.flush_pending_allocations();
 		callbacks.post_solve(const_logic_step(step));
 		step.perform_deletions();
 		callbacks.post_cleanup(const_logic_step(step));

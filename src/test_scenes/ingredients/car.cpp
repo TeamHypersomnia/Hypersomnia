@@ -35,9 +35,9 @@ namespace prefabs {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 
-		auto front = create_test_scene_entity(world, test_scene_flavour::TRUCK_FRONT);
-		auto interior = create_test_scene_entity(world, test_scene_flavour::TRUCK_INTERIOR);
-		auto left_wheel = create_test_scene_entity(world, test_scene_flavour::TRUCK_LEFT_WHEEL);
+		auto front_id = create_test_scene_entity(world, test_scene_flavour::TRUCK_FRONT).get_id();
+		auto interior_id = create_test_scene_entity(world, test_scene_flavour::TRUCK_INTERIOR).get_id();
+		auto left_wheel_id = create_test_scene_entity(world, test_scene_flavour::TRUCK_LEFT_WHEEL).get_id();
 
 		const auto si = world.get_si();
 

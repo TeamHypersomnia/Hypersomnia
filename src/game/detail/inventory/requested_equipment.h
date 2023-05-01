@@ -8,6 +8,8 @@ using other_equipment_vector = std::vector<augs::simple_pair<int, item_flavour_i
 
 class cosmos;
 
+class allocate_new_entity_access;
+
 struct requested_equipment {
 	// GEN INTROSPECTOR struct requested_equipment
 	item_flavour_id weapon;
@@ -29,25 +31,22 @@ struct requested_equipment {
 	learnt_spells_array_type spells_to_give = {};
 	// END GEN INTROSPECTOR
 
+	template <class E>
+	entity_id generate_for(
+		allocate_new_entity_access access,
+		const E& character, 
+		logic_step step,
+		int max_effects_played = 2
+	) const;
+
+private:
 	template <class E, class F>
 	entity_id generate_for_impl(
+		allocate_new_entity_access access,
 		const E& character, 
 		cosmos& cosm,
 		F&& on_step,
 		int max_effects_played
 	) const;
 
-	template <class E>
-	entity_id generate_for(
-		const E& character, 
-		logic_step step,
-		int max_effects_played = 2
-	) const;
-
-	template <class E>
-	entity_id generate_for(
-		const E& character, 
-		cosmos& cosm,
-		int max_effects_played = 2
-	) const;
 };

@@ -1,4 +1,3 @@
-#include "game/cosmos/just_create_entity_functional.h"
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/modes/test_mode.h"
 #include "game/modes/mode_entropy.h"
@@ -12,6 +11,7 @@
 #include "game/modes/detail/delete_with_held_items.hpp"
 
 #include "game/detail/sentience/sentience_logic.h"
+#include "game/cosmos/create_entity.hpp"
 
 using input_type = test_mode::input;
 
@@ -36,14 +36,16 @@ mode_player_id test_mode::lookup(const entity_id& controlled_character_id) const
 void test_mode::init_spawned(const input_type in, const entity_id id, const logic_step step) {
 	const auto handle = in.cosm[id];
 
+	auto access = allocate_new_entity_access();
+
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		in.rules.factions[typed_handle.get_official_faction()].initial_eq.generate_for(typed_handle, step, 1);
+		in.rules.factions[typed_handle.get_official_faction()].initial_eq.generate_for(access, typed_handle, step, 1);
 
 		if (auto crosshair = typed_handle.template find<components::crosshair>()) {
 			crosshair->recoil = {};
 		}
 
-		::resurrect(typed_handle);
+		::resurrect(step, typed_handle);
 
 		auto& sentience = typed_handle.template get<components::sentience>();
 		fill_range(sentience.learnt_spells, true);
@@ -100,6 +102,8 @@ void test_mode::remove_player(input_type in, const logic_step step, const mode_p
 }
 
 void test_mode::create_controlled_character_for(const input_type in, const mode_player_id id) {
+	auto access = allocate_new_entity_access();
+
 	auto entry = find(id);
 
 	if (entry == nullptr) {
@@ -110,23 +114,20 @@ void test_mode::create_controlled_character_for(const input_type in, const mode_
 	const auto faction = entry->get_faction();
 
 	if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
-		just_create_entity(
+		cosmic::specific_create_entity(
+			access,
 			cosm, 
-			entity_flavour_id(flavour), 
-			[&](const entity_handle new_character) {
+			flavour, 
+			[&](const auto new_character, auto&&...) {
 				if (playtesting_context) {
 					const auto spawn_transform = transformr(playtesting_context->initial_spawn_pos, 0);
 
-					new_character.dispatch_on_having_all<components::sentience>(
-						[&](const auto& typed_character) {
-							typed_character.set_logic_transform(spawn_transform);
-							::snap_interpolated_to(typed_character, spawn_transform);
+					new_character.set_logic_transform(spawn_transform);
+					::snap_interpolated_to(new_character, spawn_transform);
 
-							if (const auto crosshair = typed_character.find_crosshair()) {
-								crosshair->base_offset = vec2::zero;
-							}
-						}
-					);
+					if (const auto crosshair = new_character.find_crosshair()) {
+						crosshair->base_offset = vec2::zero;
+					}
 				}
 				else {
 					teleport_to_next_spawn(in, new_character);
@@ -252,7 +253,7 @@ void test_mode::remove_old_lying_items(input_type in, logic_step) {
 		}
 	});
 
-	reverse_perform_deletions(q, cosm);
+	::reverse_perform_deletions(q, cosm);
 }
 
 void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {

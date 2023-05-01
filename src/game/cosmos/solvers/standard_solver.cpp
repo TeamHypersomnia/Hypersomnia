@@ -162,6 +162,7 @@ void standard_solve(const logic_step step) {
 		auto scope = measure_scope(performance.explosives);
 
 		demolitions_system().detonate_fuses(step);
+		step.flush_pending_allocations();
 		demolitions_system().advance_cascade_explosions(step);
 	}
 

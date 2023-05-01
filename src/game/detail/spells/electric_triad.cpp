@@ -9,7 +9,8 @@
 #include "game/detail/spells/spell_logic_input.h"
 #include "game/detail/spells/spell_utils.h"
 #include "game/enums/filters.h"
-#include "game/cosmos/just_create_entity_functional.h"
+#include "game/cosmos/create_entity.hpp"
+#include "game/cosmos/data_living_one_step.h"
 
 bool electric_triad_instance::are_additional_conditions_for_casting_fulfilled(const const_entity_handle caster) const {
 	(void)caster;
@@ -52,11 +53,16 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		
 		const auto spread = spell_data.spread_in_absence_of_hostiles;
 
+		auto missile_velocity = spell_data.missile_velocity;
+
+		components::sender sender_info;
+		sender_info.set(caster);
+
 		{
-			just_create_entity(
-				cosm, 
+			cosmic::queue_create_entity(
+				in.step, 
 				spell_data.missile_flavour,
-				[&](const entity_handle new_energy_ball) {
+				[i, spread, missile_velocity, caster_transform, sender_info](const entity_handle new_energy_ball, auto&) {
 					auto new_energy_ball_transform = caster_transform;
 					auto& rot = new_energy_ball_transform.rotation;
 
@@ -69,9 +75,9 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 
 					new_energy_ball.set_logic_transform(new_energy_ball_transform);
 
-					new_energy_ball.template get<components::sender>().set(caster);
+					new_energy_ball.template get<components::sender>() = sender_info;
 
-					const auto energy_ball_velocity = new_energy_ball_transform.get_direction() * spell_data.missile_velocity;
+					const auto energy_ball_velocity = new_energy_ball_transform.get_direction() * missile_velocity;
 					new_energy_ball.template get<components::rigid_body>().set_velocity(energy_ball_velocity);
 				}
 			);

@@ -6,7 +6,6 @@
 #include "view/game_gui/elements/item_button.h"
 
 #include "game/detail/inventory/inventory_slot.h"
-#include "game/detail/inventory/perform_transfer.h"
 #include "view/game_gui/elements/game_gui_root.h"
 #include "view/game_gui/elements/character_gui.h"
 

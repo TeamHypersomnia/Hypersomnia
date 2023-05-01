@@ -7,8 +7,6 @@
 
 #include "augs/misc/machine_entropy.h"
 #include "augs/templates/introspection_utils/rewrite_members.h"
-
-#include "game/detail/inventory/perform_transfer.h"
 #include "game/cosmos/entropy_recording_options.h"
 
 

@@ -318,4 +318,12 @@ public:
 	void request_resample();
 	bool resample_requested() const;
 	void mark_as_resampled() const;
+
+	void might_allocate_stackable_entities(const std::size_t count);
+
+	template <class... Types>
+	void might_allocate_entities_having(const std::size_t count);
+
+	template <class E>
+	bool next_allocation_preserves_pointers() const;
 };

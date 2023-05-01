@@ -11,6 +11,7 @@
 #include "game/detail/inventory/item_mounting.hpp"
 #include "game/messages/start_sound_effect.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/might_allocate_entities_having.hpp"
 
 bool pending_item_mount::is_unmounting(const const_entity_handle& handle) const {
 	if (const auto slot = handle.get_current_slot()) {
@@ -52,7 +53,11 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 	const auto delta = step.get_delta();
 	auto& cosm = step.get_cosmos();
 
+	auto access = allocate_new_entity_access();
+
 	erase_if(pending_item_mounts, [&](auto& m) {
+		cosm.might_allocate_stackable_entities(5);
+
 		const auto& e_id = m.first;
 
 		const auto item_handle = cosm[e_id];
@@ -66,7 +71,7 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 
 		const auto target_slot = cosm[request.target];
 
-		auto& specified_charges = request.params.specified_quantity;
+		const auto specified_charges = request.params.get_specified_quantity();
 
 		if (specified_charges == 0) {
 			return true;
@@ -145,7 +150,7 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 					transfer.target_slot = target_slot;
 					transfer.params = request.params;
 					transfer.params.bypass_mounting_requirements = true;
-					transfer.params.specified_quantity = 1;
+					transfer.params.set_specified_quantity(access, 1);
 
 					const auto previous_charges = transferred_item.template get<components::item>().get_charges();
 
@@ -165,7 +170,7 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 						request.progress_ms = -1.f;
 					}
 					else {
-						--specified_charges;
+						request.params.set_specified_quantity(access, specified_charges - 1);
 						progress = 0.f;
 					}
 

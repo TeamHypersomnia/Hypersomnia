@@ -7,6 +7,7 @@ using post_construction_callback = pre_construction_callback;
 
 /* So that we don't have to include the entire cosmic_functions for this simplest task */
 entity_handle just_create_entity(
+	allocate_new_entity_access access,
 	cosmos& cosm,
 	const entity_flavour_id id,
 	pre_construction_callback pre,
@@ -14,6 +15,7 @@ entity_handle just_create_entity(
 );
 
 entity_handle just_create_entity(
+	allocate_new_entity_access access,
 	cosmos& cosm,
 	const entity_flavour_id id,
 	pre_construction_callback pre

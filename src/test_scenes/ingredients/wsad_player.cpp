@@ -20,7 +20,8 @@
 
 #include "game/enums/filters.h"
 #include "game/enums/faction_type.h"
-#include "game/detail/inventory/perform_transfer.h"
+
+inventory_space_type to_space_units(const std::string& s);
 
 namespace test_flavours {
 	void populate_character_flavours(const populate_flavours_input in) {

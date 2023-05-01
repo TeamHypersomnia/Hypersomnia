@@ -85,11 +85,13 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::will_soon_be_deleted>();
 
+	auto access = allocate_new_entity_access();
+
 	for (const auto& it : events) {
 		const auto deleted_entity = cosm[it.subject];
 
 		deleted_entity.dispatch_on_having_all<invariants::trace>([&](const auto& typed_deleted) {
-			const auto& trace = typed_deleted.template get<components::trace>();
+			const auto trace = typed_deleted.template get<components::trace>();
 
 			if (trace.is_it_a_finishing_trace) {
 				return;
@@ -112,13 +114,16 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 				/* ; */
 			}
 
+			auto src_interp = get_corresponding<components::interpolation>(typed_deleted);
+
 			if (const auto finishing_trace = cosmic::create_entity(
+				access,
 				cosm, 
 				trace_def.finishing_trace_flavour,
-				[&](const auto typed_handle, auto&&...) {
+				[transform_of_finishing](const auto typed_handle, auto&&...) {
 					typed_handle.set_logic_transform(transform_of_finishing);
 				},
-				[&](const auto typed_handle) {
+				[transform_of_finishing, trace](const auto typed_handle) {
 					{
 						auto& interp = get_corresponding<components::interpolation>(typed_handle);
 						interp.set_place_of_birth(transform_of_finishing);
@@ -132,10 +137,8 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 				}
 			)) {
 				finishing_trace.template dispatch_on_having_all<invariants::interpolation>(
-					[&](const auto& typed_finishing) {
-						auto& src_interp = get_corresponding<components::interpolation>(typed_deleted);
+					[src_interp](const auto& typed_finishing) {
 						auto& trg_interp = get_corresponding<components::interpolation>(typed_finishing);
-
 						trg_interp = src_interp;
 					}
 				);

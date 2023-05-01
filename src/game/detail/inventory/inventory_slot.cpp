@@ -2,7 +2,6 @@
 #include "game/components/item_component.h"
 #include "game/cosmos/cosmos.h"
 
-#include "perform_transfer.h"
 #include "game/cosmos/entity_handle.h"
 
 item_category_flagset inventory_slot::get_allowed_categories() const {

@@ -5,11 +5,12 @@
 #include "game/enums/item_category.h"
 #include "game/assets/all_logical_assets.h"
 
-#include "game/detail/inventory/perform_transfer.h"
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 
 #include "game/cosmos/entity_handle.h"
+
+inventory_space_type to_space_units(const std::string& s);
 
 namespace test_flavours {
 	void populate_backpack_flavours(const populate_flavours_input in) {

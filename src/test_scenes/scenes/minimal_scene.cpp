@@ -15,7 +15,6 @@
 #include "game/organization/all_messages_includes.h"
 #include "game/cosmos/logic_step.h"
 
-#include "game/detail/inventory/perform_transfer.h"
 #include "view/viewables/image_cache.h"
 
 #include "test_scenes/scenes/test_scene_node.h"
@@ -55,6 +54,8 @@ namespace test_scenes {
 	void minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {
 		auto& world = step.get_cosmos();
 
+		auto access = allocate_new_entity_access();
+
 		auto create = [&](auto&&... args) {
 			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
 		};
@@ -76,7 +77,7 @@ namespace test_scenes {
 				r.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			}
 
-			r.generate_for(character, step);
+			r.generate_for(access, character, step);
 		};
 
 		if (0)

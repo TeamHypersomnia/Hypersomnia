@@ -1,10 +1,10 @@
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/detail/inventory/perform_transfer.h"
 #include "game/stateless_systems/driver_system.h"
 #include "game/detail/inventory/drop_from_all_slots.h"
-#include "game/cosmos/just_create_entity_functional.h"
+#include "game/cosmos/create_entity.hpp"
+#include "game/cosmos/data_living_one_step.h"
 #include "game/detail/explosive/detonate.h"
 
 #include "augs/log.h"
@@ -148,37 +148,45 @@ void perform_knockout(
 		sentience.knockout_origin = origin;
 
 		if (sentience.is_dead() && origin.circumstances.headshot) {
-			auto spawn_detached_body_part = [&](const auto& flavour) {
-				just_create_entity(
-					cosm,
-					flavour,
-					[&](const auto& typed_entity) {
-						sentience.detached.head = typed_entity;
+			const auto head_transform = typed_subject.get_logic_transform();
+			const auto head_velocity = direction * sentience_def.base_detached_head_speed;
+			const auto typed_subject_id = typed_subject.get_id();
+			const auto head_effect = sentience_def.detached_head_particles;
 
-						typed_entity.set_logic_transform(typed_subject.get_logic_transform());
+			auto spawn_detached_body_part = [&](const auto& flavour) {
+				cosmic::queue_create_entity(
+					step,
+					flavour,
+					[head_transform, head_velocity, typed_subject_id](const auto& typed_entity, auto&) {
+						typed_entity.set_logic_transform(head_transform);
 
 						const auto& rigid_body = typed_entity.template get<components::rigid_body>();
 
-						rigid_body.set_velocity(direction * sentience_def.base_detached_head_speed);
+						rigid_body.set_velocity(head_velocity);
 						rigid_body.set_angular_velocity(7200.f);
-						rigid_body.get_special().during_cooldown_ignore_collision_with = typed_subject;
+						rigid_body.get_special().during_cooldown_ignore_collision_with = typed_subject_id;
+					},
 
-						const auto& effect = sentience_def.detached_head_particles;
+					[head_effect, typed_subject_id](const auto& typed_entity, const logic_step step) {
+						if (const auto typed_subject = step.get_cosmos()[typed_subject_id]) {
+							typed_subject.template get<components::sentience>().detached.head = typed_entity;
+						}
+
 						const auto predictability = 
 							step.get_settings().effect_prediction.predict_death_particles 
 							? always_predictable_v
 							: never_predictable_v
 						;
 
-						effect.start(
+						head_effect.start(
 							step,
 							particle_effect_start_input::orbit_local(typed_entity, { vec2::zero, 180 } ),
 							predictability
 						);
 
-						effect.start(
+						head_effect.start(
 							step,
-							particle_effect_start_input::orbit_local(typed_subject, { vec2::zero, 180 } ),
+							particle_effect_start_input::orbit_local(typed_subject_id, { vec2::zero, 180 } ),
 							predictability
 						);
 					}

@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- the whole bullshit with perform_transfer would be a non-issue if our inventory system was normal
+
+- rename conditional_get_by_dynamic_id -> constrained...
+- rename specific -> typed for entity handles and creation
+
+- why prod-debug doesn't see details.lua? wrong cwd?
+
 - So we'll probably make an creation_system
 
 - what's the point of postconstruct callback in just_create_entity if it accepts a generic handle?

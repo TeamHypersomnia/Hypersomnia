@@ -1,7 +1,4 @@
 #pragma once
-
-class physics_world_cache;
-class cosmos;
 #include "game/cosmos/step_declaration.h"
 
 class gun_system {
