@@ -1,4 +1,4 @@
-#include "destroy_system.h"
+#include "deletion_system.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_id.h"
 
@@ -9,7 +9,7 @@
 
 #include "game/detail/inventory/perform_transfer.h"
 
-void destroy_system::mark_queued_entities_and_their_children_for_deletion(const logic_step step) {
+void deletion_system::mark_queued_entities_and_their_children_for_deletion(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& queued = step.get_queue<messages::queue_deletion>();
 	auto& deletions = step.get_queue<messages::will_soon_be_deleted>();
@@ -17,7 +17,7 @@ void destroy_system::mark_queued_entities_and_their_children_for_deletion(const 
 	make_deletion_queue(queued, deletions, cosm);
 }
 
-void destroy_system::reverse_perform_deletions(const logic_step step) {
+void deletion_system::reverse_perform_deletions(const logic_step step) {
 	const auto& deletions = step.get_queue<messages::will_soon_be_deleted>();
 
 	::reverse_perform_deletions(deletions, step.get_cosmos());

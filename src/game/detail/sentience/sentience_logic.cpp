@@ -152,7 +152,7 @@ void perform_knockout(
 				just_create_entity(
 					cosm,
 					flavour,
-					[&](const entity_handle& typed_entity) {
+					[&](const auto& typed_entity) {
 						sentience.detached.head = typed_entity;
 
 						typed_entity.set_logic_transform(typed_subject.get_logic_transform());

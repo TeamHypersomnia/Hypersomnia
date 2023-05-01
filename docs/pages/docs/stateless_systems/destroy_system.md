@@ -2,7 +2,7 @@
 title: Destroy system 
 tags: [stateless_systems] 
 hide_sidebar: true
-permalink: destroy_system
+permalink: deletion_system
 ---
 
 hahaha

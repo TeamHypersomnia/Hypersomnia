@@ -493,7 +493,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/car_system.cpp"
 	"src/game/stateless_systems/crosshair_system.cpp"
 	"src/game/stateless_systems/missile_system.cpp"
-	"src/game/stateless_systems/destroy_system.cpp"
+	"src/game/stateless_systems/deletion_system.cpp"
 	"src/game/stateless_systems/driver_system.cpp"
 	"src/game/stateless_systems/force_joint_system.cpp"
 	"src/game/stateless_systems/gun_system.cpp"

@@ -18,7 +18,7 @@
 #include "game/stateless_systems/gun_system.h"
 #include "game/stateless_systems/crosshair_system.h"
 #include "game/stateless_systems/missile_system.h"
-#include "game/stateless_systems/destroy_system.h"
+#include "game/stateless_systems/deletion_system.h"
 #include "game/stateless_systems/particles_existence_system.h"
 #include "game/stateless_systems/behaviour_tree_system.h"
 #include "game/stateless_systems/car_system.h"
@@ -239,7 +239,7 @@ void standard_solve(const logic_step step) {
 	const auto queued_before_marking_num = step.get_queue<messages::queue_deletion>().size();
 	(void)queued_before_marking_num;
 
-	destroy_system().mark_queued_entities_and_their_children_for_deletion(step);
+	deletion_system().mark_queued_entities_and_their_children_for_deletion(step);
 
 	trace_system().spawn_finishing_traces_for_deleted_entities(step);
 

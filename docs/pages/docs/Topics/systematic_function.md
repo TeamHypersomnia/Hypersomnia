@@ -27,7 +27,7 @@ For example, a function that is concerned with detonatable entities - ``demoliti
     - For example, one that adds the children entities of deleted entities into the deletion queue.
 
         ```cpp
-        destroy_system::mark_queued_entities_and_their_children_for_deletion
+        deletion_system::mark_queued_entities_and_their_children_for_deletion
         ````
 
 - Iterates through a processing list and produces side effects.

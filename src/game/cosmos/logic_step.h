@@ -3,7 +3,7 @@
 #include "game/cosmos/cosmic_entropy.h"
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/messages/queue_deletion.h"
-#include "game/stateless_systems/destroy_system.h"
+#include "game/stateless_systems/deletion_system.h"
 #include "augs/misc/randomization_declaration.h"
 #include "game/cosmos/solvers/solve_structs.h"
 
@@ -133,6 +133,6 @@ public:
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>
 	void perform_deletions() const {
-		destroy_system().reverse_perform_deletions(*this);
+		deletion_system().reverse_perform_deletions(*this);
 	}
 };
