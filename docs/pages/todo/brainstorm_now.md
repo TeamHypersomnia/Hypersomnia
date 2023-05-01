@@ -8,8 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 - the whole bullshit with perform_transfer would be a non-issue if our inventory system was normal
 
-- rename specific -> typed for entity handles and creation
-
 - why prod-debug doesn't see details.lua? wrong cwd?
 
 - So we'll probably make an creation_system

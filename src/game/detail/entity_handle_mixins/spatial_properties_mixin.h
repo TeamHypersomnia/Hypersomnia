@@ -27,7 +27,7 @@ public:
 	) const {
 		using E = entity_handle_type;
 
-		if constexpr(E::is_specific) {
+		if constexpr(E::is_typed) {
 			const auto& handle = *static_cast<const entity_handle_type*>(this);
 			auto& components = handle.get(keys...).component_state;
 
@@ -59,7 +59,7 @@ public:
 
 		const auto& handle = *static_cast<const entity_handle_type*>(this);
 
-		if constexpr(E::is_specific) {
+		if constexpr(E::is_typed) {
 			if constexpr(E::template has<invariants::interpolation>()) {
 				return get_corresponding<components::interpolation>(handle).desired_transform;
 			}
@@ -84,7 +84,7 @@ public:
 
 		const auto& handle = *static_cast<const entity_handle_type*>(this);
 
-		if constexpr(!E::is_specific) {
+		if constexpr(!E::is_typed) {
 			return handle.dispatch([&](const auto& typed_handle) {
 				return typed_handle.find_viewing_transform(sys);
 			});
@@ -298,7 +298,7 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 
 		/* OPTIMIZATION: If the handle is already dispatched, check if it owns itself - which is the most probable occurence. */
 
-		if constexpr(E::is_specific) {
+		if constexpr(E::is_typed) {
 			if constexpr(E::template has<components::rigid_body>()) {
 				if (owner_id == handle.get_id()) {
 					if (const auto body = handle.template get<components::rigid_body>();

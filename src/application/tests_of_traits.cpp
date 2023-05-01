@@ -206,8 +206,8 @@ struct tests_of_traits {
 	static_assert(same<double, type_argument_t<std::is_trivially_copyable<double>>>);
 	static_assert(same<constrained_entity_flavour_id<invariants::missile>::matching_types, type_list<plain_missile>>);
 
-	static_assert(typed_entity_handle<controlled_character>::is_specific);
-	static_assert(!const_entity_handle::is_specific);
+	static_assert(ref_typed_entity_handle<controlled_character>::is_typed);
+	static_assert(!const_entity_handle::is_typed);
 
 	static_assert(all_are_v<std::is_trivially_copyable, type_list<int, double, float>>);
 

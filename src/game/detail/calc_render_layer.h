@@ -11,7 +11,7 @@
 
 template <class H>
 FORCE_INLINE auto calc_render_layer(const H& handle) {
-	if constexpr(H::is_specific) {
+	if constexpr(H::is_typed) {
 		if constexpr(H::template has<invariants::render>()) {
 			return handle.template get<invariants::render>().layer;
 		}

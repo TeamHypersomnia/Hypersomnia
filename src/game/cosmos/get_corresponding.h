@@ -1,5 +1,5 @@
 #pragma once
-#include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/cosmos/typed_entity_handle_declaration.h"
 
 template <class T, class H>
 auto& get_corresponding(const H& handle) {

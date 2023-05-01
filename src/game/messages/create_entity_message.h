@@ -2,7 +2,7 @@
 #include <vector>
 #include <functional>
 #include "game/cosmos/entity_handle_declaration.h"
-#include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/cosmos/typed_entity_handle_declaration.h"
 #include "game/messages/message.h"
 #include "game/cosmos/step_declaration.h"
 

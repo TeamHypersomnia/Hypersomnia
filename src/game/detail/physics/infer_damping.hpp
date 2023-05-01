@@ -2,7 +2,7 @@
 
 template <class E>
 bool calc_angled_damping_enabled(const E& handle) {
-	static_assert(E::is_specific);
+	static_assert(E::is_typed);
 
 	if (handle.template get<invariants::rigid_body>().angled_damping) {
 		if constexpr(E::template has<components::movement>()) {

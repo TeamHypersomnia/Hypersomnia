@@ -1,6 +1,6 @@
 #pragma once
 #include "view/audiovisual_state/systems/wandering_pixels_system.h"
-#include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/cosmos/typed_entity_handle_declaration.h"
 #include "augs/math/steering.h"
 
 template <class E>

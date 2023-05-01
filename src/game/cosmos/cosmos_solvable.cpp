@@ -1,7 +1,7 @@
 #include "game/cosmos/cosmos_solvable.h"
 
 #include "augs/templates/introspect.h"
-#include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/cosmos/typed_entity_handle_declaration.h"
 #include "game/cosmos/cosmos_solvable.hpp"
 #include "game/cosmos/on_entity_meta.h"
 #include "augs/templates/introspection_utils/rewrite_members.h"

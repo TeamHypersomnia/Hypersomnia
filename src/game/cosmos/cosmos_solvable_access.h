@@ -39,7 +39,7 @@ class cosmos_solvable_access {
 
 	template <class C, class E>
 	friend auto subscript_handle_getter(C& cosm, typed_entity_id<E>) 
-		-> basic_typed_entity_handle<std::is_const_v<C>, E>
+		-> id_typed_entity_handle<std::is_const_v<C>, E>
 	;
 
 	template <class C>

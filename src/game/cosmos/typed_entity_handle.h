@@ -6,7 +6,7 @@
 #include "game/cosmos/entity_pools.h"
 
 #include "game/cosmos/entity_handle_declaration.h"
-#include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/cosmos/typed_entity_handle_declaration.h"
 #include "game/cosmos/entity_solvable.h"
 #include "game/cosmos/cosmos_solvable_access.h"
 #include "game/cosmos/entity_type_traits.h"
@@ -224,20 +224,20 @@ public:
 };
 
 template <bool is_const, class entity_type, template <class> class identifier_provider>
-class specific_entity_handle :
-	public misc_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
-	public inventory_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
-	public physics_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
-	public relations_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
-	public spatial_properties_mixin<specific_entity_handle<is_const, entity_type, identifier_provider>>,
-	public identifier_provider<specific_entity_handle<is_const, entity_type, identifier_provider>>
+class typed_entity_handle :
+	public misc_mixin<typed_entity_handle<is_const, entity_type, identifier_provider>>,
+	public inventory_mixin<typed_entity_handle<is_const, entity_type, identifier_provider>>,
+	public physics_mixin<typed_entity_handle<is_const, entity_type, identifier_provider>>,
+	public relations_mixin<typed_entity_handle<is_const, entity_type, identifier_provider>>,
+	public spatial_properties_mixin<typed_entity_handle<is_const, entity_type, identifier_provider>>,
+	public identifier_provider<typed_entity_handle<is_const, entity_type, identifier_provider>>
 {
-	using this_handle_type = specific_entity_handle<is_const, entity_type, identifier_provider>;
+	using this_handle_type = typed_entity_handle<is_const, entity_type, identifier_provider>;
 	using used_identifier_provider = identifier_provider<this_handle_type>;
 
 	using misc_base = misc_mixin<this_handle_type>;
 
-	using const_handle_type = specific_entity_handle<true, entity_type, identifier_provider>;
+	using const_handle_type = typed_entity_handle<true, entity_type, identifier_provider>;
 
 	using subject_type = entity_solvable<entity_type>;
 
@@ -245,7 +245,7 @@ class specific_entity_handle :
 
 	// cosmos shall only be able to construct directly
 	friend class cosmos;
-	friend specific_entity_handle<!is_const, entity_type, identifier_provider>;
+	friend typed_entity_handle<!is_const, entity_type, identifier_provider>;
 	friend used_identifier_provider;
 
 	template <class T, class H>
@@ -255,9 +255,9 @@ class specific_entity_handle :
 	using used_identifier_provider::find_subject;
 
 public:
-	static constexpr bool is_specific = true;
+	static constexpr bool is_typed = true;
 
-	using const_type = specific_entity_handle<true, entity_type, identifier_provider>;
+	using const_type = typed_entity_handle<true, entity_type, identifier_provider>;
 	using misc_base::get_flavour;
 	using used_identifier_provider::get;
 	using used_identifier_provider::alive;
@@ -285,7 +285,7 @@ private:
 	friend class basic_entity_handle;
 
 public:
-	specific_entity_handle(
+	typed_entity_handle(
 		owner_reference owner,
 		const used_identifier_provider identifier
 	) :
@@ -361,11 +361,11 @@ public:
 		return this->get_id() != h.get_id();
 	}
 
-	bool operator==(const specific_entity_handle<!is_const, entity_type, identifier_provider>& h) const {
+	bool operator==(const typed_entity_handle<!is_const, entity_type, identifier_provider>& h) const {
 		return this->get_id() == h.get_id();
 	}
 
-	bool operator!=(const specific_entity_handle<!is_const, entity_type, identifier_provider>& h) const {
+	bool operator!=(const typed_entity_handle<!is_const, entity_type, identifier_provider>& h) const {
 		return this->get_id() != h.get_id();
 	}
 
@@ -387,13 +387,13 @@ public:
 
 
 	template <bool C = is_const, class = std::enable_if_t<!C>>
-	specific_entity_handle<true, entity_type, identifier_provider> to_const() const {
+	typed_entity_handle<true, entity_type, identifier_provider> to_const() const {
 		return { owner, static_cast<const used_identifier_provider&>(*this) };
 	}
 
 	/* Return a handle with a reference instead of a pointer */
 	template <class T = used_identifier_provider, class = std::enable_if_t<std::is_same_v<T, stored_id_provider<this_handle_type>>>>
-	specific_entity_handle<is_const, entity_type, ref_stored_id_provider> operator*() const {
+	typed_entity_handle<is_const, entity_type, ref_stored_id_provider> operator*() const {
 		ensure_alive();
 		return { owner, { *this->subject, this->stored_id } };
 	}
@@ -494,7 +494,7 @@ public:
 template <bool is_const, class entity_type, template <class> class identifier_provider>
 std::ostream& operator<<(
 	std::ostream& out,
-   	const specific_entity_handle<is_const, entity_type, identifier_provider> x
+   	const typed_entity_handle<is_const, entity_type, identifier_provider> x
 ) {
 	if (x.dead()) {
 		return out << "(dead handle)";
@@ -505,7 +505,7 @@ std::ostream& operator<<(
 
 template <class C, class E>
 auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id)
-	-> basic_typed_entity_handle<std::is_const_v<C>, E>
+	-> id_typed_entity_handle<std::is_const_v<C>, E>
 {
 	const auto ptr = cosm.get_solvable({}).dereference_entity(id);
 

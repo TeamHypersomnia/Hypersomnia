@@ -14,7 +14,7 @@
 #include "game/cosmos/cosmos_solvable_access.h"
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/entity_solvable.h"
-#include "game/cosmos/specific_entity_handle.h"
+#include "game/cosmos/typed_entity_handle.h"
 
 #include "game/organization/all_components_declaration.h"
 
@@ -40,7 +40,7 @@ class basic_entity_handle :
 	public spatial_properties_mixin<basic_entity_handle<is_const>>
 {
 	template <bool, class, template <class> class>
-	friend class specific_entity_handle;
+	friend class typed_entity_handle;
 
 	using owner_reference = maybe_const_ref_t<is_const, cosmos>;
 	using entity_ptr = maybe_const_ptr_t<is_const, void>;
@@ -96,7 +96,7 @@ class basic_entity_handle :
 	}
 
 public:
-	static constexpr bool is_specific = false;
+	static constexpr bool is_typed = false;
 
 	using const_type = basic_entity_handle<!is_const>;
 	using misc_base::get_raw_flavour_id;
@@ -158,12 +158,12 @@ public:
 	}
 
 	template <bool AA, class BB, template <class> class CC>
-	bool operator==(const specific_entity_handle<AA, BB, CC>& other_handle) const {
+	bool operator==(const typed_entity_handle<AA, BB, CC>& other_handle) const {
 		return get_id() == other_handle.get_id(); 
 	}
 
 	template <bool AA, class BB, template <class> class CC>
-	bool operator!=(const specific_entity_handle<AA, BB, CC>& other_handle) const {
+	bool operator!=(const typed_entity_handle<AA, BB, CC>& other_handle) const {
 		return get_id() != other_handle.get_id(); 
 	}
 

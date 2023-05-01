@@ -10,7 +10,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/crosshair_component.h"
 
-#include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/cosmos/typed_entity_handle_declaration.h"
 #include "game/detail/sentience_shake.h"
 #include "augs/math/physics_structs.h"
 #include "game/detail/economy/money_type.h"
@@ -132,7 +132,7 @@ public:
 	auto get_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
 
-		if constexpr(E::is_specific) {
+		if constexpr(E::is_typed) {
 			return typed_entity_flavour_id<entity_type_of<E>>(self.get_raw_flavour_id());
 		}
 		else {
@@ -146,7 +146,7 @@ public:
 	}
 
 	auto& get_flavour() const {
-		if constexpr(E::is_specific) {
+		if constexpr(E::is_typed) {
 			const auto self = *static_cast<const E*>(this);
 			auto& cosm = self.get_cosmos();
 			return cosm.template get_flavour<entity_type_of<E>>(get_flavour_id());
@@ -166,7 +166,7 @@ public:
 			return *name;
 		}
 
-		if constexpr(E::is_specific) {
+		if constexpr(E::is_typed) {
 			return get_flavour().template get<invariants::text_details>().name;
 		}
 		else {
@@ -179,7 +179,7 @@ public:
 
 		auto& cosm = self.get_cosmos();
 
-		if constexpr(E::is_specific) {
+		if constexpr(E::is_typed) {
 			return get_flavour().template get<invariants::text_details>().description;
 		}
 		else {

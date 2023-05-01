@@ -1,6 +1,6 @@
 #include "augs/enums/callback_result.h"
 
-#include "game/cosmos/specific_entity_handle.h"
+#include "game/cosmos/typed_entity_handle.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "application/intercosm.h"
 #include "application/setups/debugger/debugger_folder.h"
