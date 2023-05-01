@@ -118,7 +118,7 @@ template <class F>
 decltype(auto) constrained_entity_flavour_id<C...>::dispatch(F callback) const {
 	using M = typename constrained_entity_flavour_id<C...>::matching_types;
 
-	return type_id.conditional_dispatch<M>([&](auto e) {
+	return type_id.constrained_dispatch<M>([&](auto e) {
 		return callback(typed_entity_flavour_id<decltype(e)>(this->raw));
 	});
 }

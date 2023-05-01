@@ -113,8 +113,8 @@ struct tests_of_traits {
 			}
 		};
 
-		auto okay3 = conditional_get_by_dynamic_index<candidates>(t, std::size_t(0), tester);
-		auto okay4 = conditional_get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
+		auto okay3 = constrained_get_by_dynamic_index<candidates>(t, std::size_t(0), tester);
+		auto okay4 = constrained_get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
 
 		static_assert(same<double, decltype(okay)>);
 		static_assert(same<double, decltype(okay2)>);
@@ -122,7 +122,7 @@ struct tests_of_traits {
 		static_assert(same<double, decltype(okay4)>);
 
 		{
-			auto okay5 = conditional_find_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), nopt_tester);
+			auto okay5 = constrained_find_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), nopt_tester);
 			static_assert(same<double, decltype(okay5)>);
 		}
 

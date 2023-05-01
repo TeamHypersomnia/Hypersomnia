@@ -74,10 +74,10 @@ TEST_CASE("GetByDynamicId") {
 
 	using id_type = type_in_list_id<all_entity_types>;
 
-	REQUIRE(4 == conditional_get_by_dynamic_id<candidates>(t, id_type::of<plain_missile>(), tester));
-	REQUIRE(8949 == conditional_get_by_dynamic_id<candidates>(t, id_type::of<plain_sprited_body>(), tester));
+	REQUIRE(4 == constrained_get_by_dynamic_id<candidates>(t, id_type::of<plain_missile>(), tester));
+	REQUIRE(8949 == constrained_get_by_dynamic_id<candidates>(t, id_type::of<plain_sprited_body>(), tester));
 
-	REQUIRE(-1 == conditional_find_by_dynamic_id<candidates>(t, id_type::of<controlled_character>(), tester));
+	REQUIRE(-1 == constrained_find_by_dynamic_id<candidates>(t, id_type::of<controlled_character>(), tester));
 }
 
 TEST_CASE("Ca TriviallyCopyableTuple") {

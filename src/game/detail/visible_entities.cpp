@@ -295,7 +295,7 @@ void visible_entities::layer_register::register_visible(const entity_id id, cons
 }
 
 void visible_entities::register_visible(const cosmos& cosm, const entity_id id) {
-	cosm[id].template conditional_dispatch_ret<entities_with_render_layer>(
+	cosm[id].template constrained_dispatch_ret<entities_with_render_layer>(
 		[&](const auto& typed_handle) {
 			if constexpr(!is_nullopt_v<decltype(typed_handle)>) {
 				const auto layer = ::calc_render_layer(typed_handle);

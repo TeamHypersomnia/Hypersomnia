@@ -619,7 +619,7 @@ FORCE_INLINE void draw_entity(
 	const const_entity_handle& handle,
 	const draw_renderable_input& in
 ) {
-	handle.conditional_dispatch<entities_with_renderables>([&in](const auto typed_handle) {
+	handle.constrained_dispatch<entities_with_renderables>([&in](const auto typed_handle) {
 		specific_draw_entity(typed_handle, in);
 	});
 }
@@ -628,7 +628,7 @@ FORCE_INLINE void draw_neon_map(
 	const const_entity_handle& handle,
 	const draw_renderable_input& in
 ) {
-	handle.conditional_dispatch<entities_with_renderables>([&in](const auto typed_handle) {
+	handle.constrained_dispatch<entities_with_renderables>([&in](const auto typed_handle) {
 		specific_draw_neon_map(typed_handle, in);
 	});
 }
@@ -638,7 +638,7 @@ FORCE_INLINE void draw_color_highlight(
 	const rgba color,
 	const draw_renderable_input& in
 ) {
-	handle.conditional_dispatch<entities_with_renderables>([&in, color](const auto typed_handle) {
+	handle.constrained_dispatch<entities_with_renderables>([&in, color](const auto typed_handle) {
 		specific_draw_color_highlight(typed_handle, color, in);
 	});
 }
@@ -649,7 +649,7 @@ FORCE_INLINE void draw_border(
 	const draw_renderable_input& in,
 	B&& borders
 ) {
-	handle.conditional_dispatch<entities_with_renderables>([&in, &borders](const auto typed_handle) {
+	handle.constrained_dispatch<entities_with_renderables>([&in, &borders](const auto typed_handle) {
 		specific_draw_border(typed_handle, in, std::forward<B>(borders));
 	});
 }

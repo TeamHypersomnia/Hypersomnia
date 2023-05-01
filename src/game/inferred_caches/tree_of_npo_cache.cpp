@@ -20,7 +20,7 @@ void tree_of_npo_cache_data::clear(tree_of_npo_cache& owner) {
 }
 
 void tree_of_npo_cache::destroy_cache_of(const entity_handle& e) {
-	e.conditional_dispatch<npo_entities>([this](const auto& handle) {
+	e.constrained_dispatch<npo_entities>([this](const auto& handle) {
 		if (const auto cache = find_tree_of_npo_cache(handle)) {
 			cache->clear(*this);
 		}
@@ -41,7 +41,7 @@ static_assert(!is_npo_entity_v<plain_sprited_body>);
 static_assert(is_npo_entity_v<static_decoration>);
 
 void tree_of_npo_cache::infer_cache_for(const entity_handle& e) {
-	e.conditional_dispatch<npo_entities>([this](const auto& handle) {
+	e.constrained_dispatch<npo_entities>([this](const auto& handle) {
 		specific_infer_cache_for(handle);
 	});
 }

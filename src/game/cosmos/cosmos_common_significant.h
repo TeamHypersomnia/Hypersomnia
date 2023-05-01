@@ -70,7 +70,7 @@ private:
 	) {
 		using candidate_types = typename decltype(flavour_id)::matching_types; 
 
-		return conditional_get_by_dynamic_id<candidate_types>(
+		return constrained_get_by_dynamic_id<candidate_types>(
 			all_entity_types(),
 			flavour_id.type_id,
 			[&, flavour_id](auto t) -> decltype(auto) {

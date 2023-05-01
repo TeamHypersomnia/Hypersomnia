@@ -64,7 +64,7 @@ class basic_entity_handle :
 
 	template <class T>
 	auto* find_invariant_ptr() const {
-		return conditional_dispatch_ret<entity_types_having_all_of<T>>(
+		return constrained_dispatch_ret<entity_types_having_all_of<T>>(
 			[&](const auto& t) -> const T* { 
 				if constexpr(is_nullopt_v<decltype(t)>) {
 					return nullptr;
@@ -88,7 +88,7 @@ class basic_entity_handle :
 
 	template <class T>
 	auto* find_component_ptr() const {
-		return conditional_dispatch_ret<entity_types_having_all_of<T>>(
+		return constrained_dispatch_ret<entity_types_having_all_of<T>>(
 			[&](const auto& t) -> maybe_const_ptr_t<is_const, T> {
 				return find_or_nullptr<T>(t);
 			}
@@ -220,12 +220,12 @@ public:
 	}
 
 	template <class List, class F>
-	FORCE_INLINE decltype(auto) conditional_dispatch_ret(F&& callback) const {
+	FORCE_INLINE decltype(auto) constrained_dispatch_ret(F&& callback) const {
 #if !IS_PRODUCTION_BUILD
 		ensure(alive());
 #endif
 
-		return conditional_find_by_dynamic_id<List>(
+		return constrained_find_by_dynamic_id<List>(
 			all_entity_types(), 
 			raw_id.type_id,
 			[&](auto t) -> decltype(auto) { 
@@ -242,8 +242,8 @@ public:
 	}
 
 	template <class List, class F>
-	FORCE_INLINE void conditional_dispatch(F&& callback) const {
-		this->conditional_dispatch_ret<List>(
+	FORCE_INLINE void constrained_dispatch(F&& callback) const {
+		this->constrained_dispatch_ret<List>(
 			[&](const auto& typed_handle) {
 				if constexpr(!is_nullopt_v<decltype(typed_handle)>) {
 					callback(typed_handle);
@@ -254,7 +254,7 @@ public:
 
 	template <class... List, class F>
 	decltype(auto) dispatch_on_having_all_ret(F&& callback) const {
-		return this->conditional_dispatch_ret<entity_types_having_all_of<List...>>(
+		return this->constrained_dispatch_ret<entity_types_having_all_of<List...>>(
 			[&](const auto& typed_handle) -> decltype(auto) {
 				return callback(typed_handle);
 			}
@@ -263,7 +263,7 @@ public:
 
 	template <class... List, class F>
 	void dispatch_on_having_all(F&& callback) const {
-		this->conditional_dispatch_ret<entity_types_having_all_of<List...>>(
+		this->constrained_dispatch_ret<entity_types_having_all_of<List...>>(
 			[&](const auto& typed_handle) {
 				if constexpr(!is_nullopt_v<decltype(typed_handle)>) {
 					callback(typed_handle);
@@ -274,7 +274,7 @@ public:
 
 	template <class... List, class F>
 	void dispatch_on_having_any(F&& callback) const {
-		this->conditional_dispatch_ret<entity_types_having_any_of<List...>>(
+		this->constrained_dispatch_ret<entity_types_having_any_of<List...>>(
 			[&](const auto& typed_handle) {
 				if constexpr(!is_nullopt_v<decltype(typed_handle)>) {
 					callback(typed_handle);
@@ -301,7 +301,7 @@ public:
 
 	template <class T>
 	bool has() const {
-		return this->conditional_dispatch_ret<entity_types_having_any_of<T>>(
+		return this->constrained_dispatch_ret<entity_types_having_any_of<T>>(
 			[&](const auto& typed_handle) {
 				return !is_nullopt_v<decltype(typed_handle)>;
 			}

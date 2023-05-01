@@ -64,7 +64,7 @@ template <
 	class T,
 	class F
 >
-decltype(auto) conditional_get_by_dynamic_index(
+decltype(auto) constrained_get_by_dynamic_index(
 	T&& index_gettable_object,
 	const std::size_t dynamic_type_index,
 	F&& generic_call
@@ -103,7 +103,7 @@ decltype(auto) conditional_get_by_dynamic_index(
 			return generic_call(std::get<list_space_current>(std::forward<T>(index_gettable_object)));
 		}
 
-		return conditional_get_by_dynamic_index<OnlyCandidates, candidate_space_current + 1, nullopt_if_not_found>(
+		return constrained_get_by_dynamic_index<OnlyCandidates, candidate_space_current + 1, nullopt_if_not_found>(
 			std::forward<T>(index_gettable_object),
 			dynamic_type_index,
 			std::forward<F>(generic_call)
@@ -127,7 +127,7 @@ decltype(auto) get_by_dynamic_id(
 }
 
 template <class OnlyCandidates, class T, class F>
-decltype(auto) conditional_get_by_dynamic_id(
+decltype(auto) constrained_get_by_dynamic_id(
 	T&& index_gettable_object,
 	const type_in_list_id<remove_cref<T>> dynamic_type_index,
 	F&& generic_call
@@ -135,7 +135,7 @@ decltype(auto) conditional_get_by_dynamic_id(
 	static_assert(num_types_in_list_v<remove_cref<T>> > 0, "Can't get from an empty list.");
 	static_assert(num_types_in_list_v<OnlyCandidates> > 0, "Candidate list is empty.");
 
-	return conditional_get_by_dynamic_index<OnlyCandidates, 0>(
+	return constrained_get_by_dynamic_index<OnlyCandidates, 0>(
 		std::forward<T>(index_gettable_object), 
 		static_cast<std::size_t>(dynamic_type_index.get_index()),
 		std::forward<F>(generic_call)
@@ -158,7 +158,7 @@ decltype(auto) find_by_dynamic_id(
 }
 
 template <class OnlyCandidates, class T, class F>
-decltype(auto) conditional_find_by_dynamic_id(
+decltype(auto) constrained_find_by_dynamic_id(
 	T&& index_findable_object,
 	const type_in_list_id<remove_cref<T>> dynamic_type_index,
 	F&& generic_call
@@ -170,7 +170,7 @@ decltype(auto) conditional_find_by_dynamic_id(
 		return generic_call(std::nullopt);
 	}
 	else {
-		return conditional_get_by_dynamic_index<OnlyCandidates, 0, true>(
+		return constrained_get_by_dynamic_index<OnlyCandidates, 0, true>(
 			std::forward<T>(index_findable_object), 
 			static_cast<std::size_t>(dynamic_type_index.get_index()),
 			std::forward<F>(generic_call)

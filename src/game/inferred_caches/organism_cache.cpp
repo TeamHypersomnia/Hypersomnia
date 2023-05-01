@@ -36,7 +36,7 @@ void organism_cache::grid::reset(const ltrb new_aabb) {
 void organism_cache::destroy_cache_of(const const_entity_handle& handle) {
 	using concerned = entity_types_passing<concerned_with>;
 
-	handle.conditional_dispatch<concerned>([&](const auto& typed_handle) {
+	handle.constrained_dispatch<concerned>([&](const auto& typed_handle) {
 		using E = remove_cref<decltype(typed_handle)>;
 
 		if constexpr(E::template has<invariants::box_marker>()) {
@@ -66,7 +66,7 @@ void organism_cache::infer_all(const cosmos& cosm) {
 void organism_cache::infer_cache_for(const const_entity_handle& e) {
 	using concerned = entity_types_passing<concerned_with>;
 
-	e.conditional_dispatch<concerned>([this](const auto& typed_handle) {
+	e.constrained_dispatch<concerned>([this](const auto& typed_handle) {
 		specific_infer_cache_for(typed_handle);
 	});
 }

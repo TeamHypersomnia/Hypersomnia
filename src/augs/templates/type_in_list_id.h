@@ -24,7 +24,7 @@ decltype(auto) get_by_dynamic_id(
 );
 
 template <class OnlyCandidates, class T, class F>
-decltype(auto) conditional_get_by_dynamic_id(
+decltype(auto) constrained_get_by_dynamic_id(
 	T&& index_gettable_object,
 	const type_in_list_id<remove_cref<T>> dynamic_type_index,
 	F&& generic_call
@@ -109,8 +109,8 @@ public:
 	}
 
 	template <class OnlyCandidates, class F>
-	decltype(auto) conditional_dispatch(F&& callback) const {
-		return conditional_get_by_dynamic_id<OnlyCandidates>(
+	decltype(auto) constrained_dispatch(F&& callback) const {
+		return constrained_get_by_dynamic_id<OnlyCandidates>(
 			List(),
 			*this,
 			std::forward<F>(callback)

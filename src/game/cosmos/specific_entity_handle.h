@@ -427,7 +427,7 @@ public:
 
 	/* For compatibility with the general handle */
 	template <class List, class F>
-	void conditional_dispatch(F callback) const {
+	void constrained_dispatch(F callback) const {
 		if constexpr(num_types_in_list_v<List> > 0) {
 			if constexpr(is_one_of_list_v<entity_type, List>) {
 				callback(*this);
@@ -438,7 +438,7 @@ public:
 	}
 
 	template <class List, class F>
-	decltype(auto) conditional_dispatch_ret(F&& callback) const {
+	decltype(auto) constrained_dispatch_ret(F&& callback) const {
 		if constexpr(num_types_in_list_v<List> > 0) {
 			if constexpr(is_one_of_list_v<entity_type, List>) {
 				return callback(*this);
@@ -454,17 +454,17 @@ public:
 
 	template <class... List, class F>
 	decltype(auto) dispatch_on_having_all_ret(F&& callback) const {
-		return conditional_dispatch_ret<entity_types_having_all_of<List...>>(std::forward<F>(callback));
+		return constrained_dispatch_ret<entity_types_having_all_of<List...>>(std::forward<F>(callback));
 	}
 
 	template <class... List, class F>
 	void dispatch_on_having_all(F&& callback) const {
-		conditional_dispatch<entity_types_having_all_of<List...>>(std::forward<F>(callback));
+		constrained_dispatch<entity_types_having_all_of<List...>>(std::forward<F>(callback));
 	}
 
 	template <class... List, class F>
 	void dispatch_on_having_any(F&& callback) const {
-		conditional_dispatch<entity_types_having_any_of<List...>>(std::forward<F>(callback));
+		constrained_dispatch<entity_types_having_any_of<List...>>(std::forward<F>(callback));
 	}
 
 	template <class F>
