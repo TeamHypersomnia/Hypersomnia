@@ -1421,6 +1421,10 @@ EDIT_FUNCTION(
 			MULTIPROPERTY("Freeze time", bomb_defusal.freeze_time);
 			MULTIPROPERTY("Buy time", bomb_defusal.buy_time);
 
+			MULTIPROPERTY("Round time", bomb_defusal.round_time);
+			MULTIPROPERTY("Round end time", bomb_defusal.round_end_time);
+			MULTIPROPERTY("Rounds in match", bomb_defusal.rounds_in_match);
+
 			ImGui::Separator();
 
 			FACTION_EQUIPMENT_PROPERTY("Warmup equipment", bomb_defusal.warmup_equipment);
