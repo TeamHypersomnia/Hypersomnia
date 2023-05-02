@@ -27,7 +27,7 @@ class editor_node_mover {
 	void transform_selection(
 		node_mover_input in,
 		std::optional<vec2> rotation_center,
-		std::optional<transformr> one_shot_delta
+		transformr one_shot_delta
 	);
 
 	bool start_transforming_selection(

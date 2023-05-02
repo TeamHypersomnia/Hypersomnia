@@ -541,7 +541,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			auto& personal_electricity = s.get<personal_electricity_meter_instance>();
 
 			const auto absorption = ::find_active_pe_absorption(subject);
-			const bool is_shield_enabled = logically_set(absorption);
+			const auto is_shield_enabled = [&absorption]() { return absorption.has_value(); };
 
 			meter_value_type reported_pe_damage = 0;
 			meter_value_type reported_hp_damage = 0;
@@ -565,7 +565,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 				auto after_shield_damage = amount;
 
-				if (is_shield_enabled) {
+				if (is_shield_enabled()) {
 					const auto mult = std::max(0.01f, absorption->first.hp);
 					after_shield_damage = apply_ped(amount / mult).excessive * mult;
 					event.is_remainder_after_shield_destruction = true;
@@ -588,7 +588,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 				auto after_shield_damage = amount;
 
-				if (is_shield_enabled) {
+				if (is_shield_enabled()) {
 					const auto mult = std::max(0.01f, absorption->first.cp);
 					after_shield_damage = apply_ped(amount / mult).excessive * mult;
 				}
@@ -604,7 +604,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			}
 
 			else if (d.type == adverse_element_type::PED && personal_electricity.is_enabled()) {
-				if (is_shield_enabled) {
+				if (is_shield_enabled()) {
 					apply_ped(static_cast<meter_value_type>(amount * 2.5));
 				}
 				else {

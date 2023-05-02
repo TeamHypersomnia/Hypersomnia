@@ -185,6 +185,7 @@ option(BUILD_DEBUGGER_SETUP "Build debugger setup. Due to hardcore templates, th
 ## Thread sanitizer.
 
 option(ENABLE_THREADSANITIZER "Enable ThreadSanitizer." OFF)
+option(ENABLE_ADRRESSSANITIZER "Enable AddressSanitizer." OFF)
 
 if (ENABLE_THREADSANITIZER)
 	message("Game will build with the thread sanitizer.")
@@ -1151,7 +1152,15 @@ if(CLANG)
 	endif()
 
 	if (ENABLE_THREADSANITIZER)
+		message("Building with thread sanitizer.")
+
 		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -fsanitize=thread")
+	endif()
+
+	if (ENABLE_ADDRESSSANITIZER)
+		message("Building with address sanitizer.")
+
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -fsanitize=address")
 	endif()
 endif()
 

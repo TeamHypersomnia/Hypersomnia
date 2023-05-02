@@ -185,8 +185,8 @@ namespace augs {
 
 				if constexpr(is_associative_v<Container> && key_representable_as_lua_value_v<Container>) {
 					for (auto key_value_pair : input_table) {
-						typename Container::key_type key;
-						typename Container::mapped_type mapped;
+						typename Container::key_type key{};
+						typename Container::mapped_type mapped{};
 
 						general_from_lua_value(key_value_pair.first, key);
 						read_lua(key_value_pair.second, mapped);
@@ -244,8 +244,8 @@ namespace augs {
 
 						if (maybe_element.valid()) {
 							if constexpr(is_associative_v<Container>) {
-								typename Container::key_type key;
-								typename Container::mapped_type mapped;
+								typename Container::key_type key{};
+								typename Container::mapped_type mapped{};
 
 								ensure(maybe_element.is<sol::table>());
 								

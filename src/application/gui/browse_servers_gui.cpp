@@ -907,18 +907,14 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 }
 
 const server_list_entry* browse_servers_gui_state::find_entry(const client_start_input& in) const {
-	const auto connected_address = to_netcode_addr(in.get_address_and_port());
+	if (const auto connected_address = to_netcode_addr(in.get_address_and_port())) {
+		LOG("Finding the server entry by: %x", ::ToString(*connected_address));
+		LOG("Number of servers in the browser: %x", server_list.size());
 
-	if (connected_address == std::nullopt) {
-		return nullptr;
-	}
-
-	LOG("Finding the server entry by: %x", ::ToString(*connected_address));
-	LOG("Number of servers in the browser: %x", server_list.size());
-
-	for (auto& s : server_list) {
-		if (s.address == *connected_address) {
-			return &s;
+		for (auto& s : server_list) {
+			if (s.address == *connected_address) {
+				return &s;
+			}
 		}
 	}
 

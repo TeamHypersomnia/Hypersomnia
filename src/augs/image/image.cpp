@@ -52,25 +52,32 @@ void lodepng_free(void* ptr)
   free(ptr);
 }
 
-unsigned decode_rgba(std::vector<rgba>& out, unsigned& w, unsigned& h, const unsigned char* in,
-                size_t insize, LodePNGColorType colortype = LCT_RGBA, unsigned bitdepth = 8)
-{
+unsigned decode_rgba(
+	std::vector<rgba>& out,
+	unsigned& w,
+	unsigned& h,
+	const unsigned char* in,
+    const std::size_t insize,
+	const LodePNGColorType colortype = LCT_RGBA,
+	const unsigned bitdepth = 8
+) {
 	using namespace lodepng;
-  unsigned char* buffer;
-  unsigned error = lodepng_decode_memory(&buffer, &w, &h, in, insize, colortype, bitdepth);
-  if(buffer && !error)
-  {
-    State state;
-    state.info_raw.colortype = colortype;
-    state.info_raw.bitdepth = bitdepth;
-    size_t buffersize = lodepng_get_raw_size(w, h, &state.info_raw);
+	unsigned char* buffer;
+	unsigned error = lodepng_decode_memory(&buffer, &w, &h, in, insize, colortype, bitdepth);
 
-	const auto elems_written = buffersize / sizeof(rgba);
-	out.resize(out.size() + elems_written);
-	std::memcpy(&out[out.size() - elems_written], &buffer[0], buffersize);
-    lodepng_free(buffer);
-  }
-  return error;
+	if(buffer && !error) {
+		State state;
+		state.info_raw.colortype = colortype;
+		state.info_raw.bitdepth = bitdepth;
+		std::size_t buffersize = lodepng_get_raw_size(w, h, &state.info_raw);
+
+		const auto pixels_written = buffersize / sizeof(rgba);
+		out.resize(out.size() + pixels_written);
+		std::memcpy(&out[out.size() - pixels_written], buffer, buffersize);
+		lodepng_free(buffer);
+	}
+
+	return error;
 }
 
 unsigned decode_rgba(std::vector<rgba>& out, unsigned& w, unsigned& h, const std::vector<std::byte>& from) {

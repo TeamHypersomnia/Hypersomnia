@@ -37,7 +37,7 @@ namespace augs {
 
 	template <class F, class Instance, class... Instances>
 	void introspect(
-		F&& callback,
+		F callback,
 		Instance& t,
 		Instances&... tn
 	) {
@@ -46,7 +46,7 @@ namespace augs {
 
 		if constexpr(has_introspect_base_v<T>) {
 			introspect(
-				std::forward<F>(callback), 
+				callback, 
 				static_cast<maybe_const_ref_t<C, typename T::introspect_base>>(t),
 				tn...
 			);
@@ -54,7 +54,7 @@ namespace augs {
 		else if constexpr(has_introspect_bases_v<T>) {
 			for_each_type_in_list<typename T::introspect_bases>([&](const auto& b){
 				introspect(
-					std::forward<F>(callback), 
+					callback, 
 					static_cast<maybe_const_ref_t<C, remove_cref<decltype(b)>>>(t),
 					tn...
 				);
@@ -67,7 +67,7 @@ namespace augs {
 		);
 
 		if constexpr(has_introspect_body_v<T>) {
-			introspect_body(std::forward<F>(callback), t, tn...);
+			introspect_body(callback, t, tn...);
 		}
 		else {
 			static_assert(

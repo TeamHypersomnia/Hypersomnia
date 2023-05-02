@@ -127,7 +127,7 @@ void editor_node_mover::start_resizing_selection(
 void editor_node_mover::transform_selection(
 	const node_mover_input in,
 	const std::optional<vec2> rotation_center,
-	const std::optional<transformr> one_shot_delta
+	const transformr one_shot_delta
 ) {
 	auto& s = in.setup;
 
@@ -137,7 +137,7 @@ void editor_node_mover::transform_selection(
 
 	if (!command.empty()) {
 		command.rotation_center = rotation_center;
-		command.move_by = *one_shot_delta;
+		command.move_by = one_shot_delta;
 
 		s.post_new_command(std::move(command));
 	}

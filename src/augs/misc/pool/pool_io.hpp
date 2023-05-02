@@ -102,8 +102,8 @@ namespace augs {
 					objects.emplace_back(std::move(object));
 				}
 				
-				size_type pointing;
-				size_type version;
+				size_type pointing = 0;
+				size_type version = 0;
 
 				general_from_lua_value(meta_entry["pointing"], pointing);
 				general_from_lua_value(meta_entry["version"], version);

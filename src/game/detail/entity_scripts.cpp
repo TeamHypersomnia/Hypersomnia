@@ -108,13 +108,11 @@ attitude_type calc_attitude(const const_entity_handle targeter, const const_enti
 
 
 real32 assess_projectile_velocity_of_weapon(const const_entity_handle& weapon) {
-	if (weapon.dead()) {
-		return 0.f;
-	}
-
-	if (const auto* const gun_def = weapon.find<invariants::gun>()) {
-		// TODO: Take into consideration the missile invariant found in the chamber
-		return (gun_def->muzzle_velocity.first + gun_def->muzzle_velocity.second) / 2;
+	if (weapon.alive()) {
+		if (const auto* const gun_def = weapon.find<invariants::gun>()) {
+			// TODO: Take into consideration the missile invariant found in the chamber
+			return (gun_def->muzzle_velocity.first + gun_def->muzzle_velocity.second) / 2;
+		}
 	}
 
 	return 0.f;

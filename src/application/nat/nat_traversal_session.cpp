@@ -407,7 +407,9 @@ std::optional<netcode_address_t> stun_session::query_result() const {
 
 bool stun_session::handle_packet(const std::byte* const packet_buffer, const int num_bytes_received) {
 	if (const auto translated = read_stun_response(source_request, packet_buffer, num_bytes_received)) {
-		log_info(typesafe_sprintf("received STUN response: %x -> %x", ::ToString(*stun_host), ::ToString(*translated)));
+		if (stun_host.has_value()) {
+			log_info(typesafe_sprintf("received STUN response: %x -> %x", ::ToString(*stun_host), ::ToString(*translated)));
+		}
 
 		when_completed = yojimbo_time();
 		external_address = *translated;
@@ -425,3 +427,49 @@ const std::optional<netcode_address_t>& stun_session::get_resolved_stun_host() c
 double stun_session::get_ping_seconds() const {
 	return when_completed - when_sent_first_request;
 }
+
+std::string nat_traversal_state_to_string(const nat_traversal_session::state state) {
+	using S = nat_traversal_session::state;
+
+	switch (state) {
+		case S::INIT:
+			return "Initializing";
+		case S::TRAVERSING:
+			return "Traversing";
+		case S::SERVER_STUN_REQUIREMENT_MET:
+			return "Server STUN requirement met";
+		case S::REQUESTING_REMOTE_PORT_INFO:
+			return "Requesting remote port info";
+		case S::TRAVERSAL_COMPLETE:
+			return "Traversal complete";
+		case S::TIMED_OUT:
+			return "Traversal timed out";
+
+		default:
+			return "Unknown";
+	}
+}
+
+rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
+	using S = nat_traversal_session::state;
+
+	switch (state) {
+		case S::INIT:
+			return orange;
+		case S::SERVER_STUN_REQUIREMENT_MET:
+			return cyan;
+		case S::REQUESTING_REMOTE_PORT_INFO:
+			return yellow;
+		case S::TRAVERSING:
+			return cyan;
+		case S::TRAVERSAL_COMPLETE:
+			return green;
+		case S::TIMED_OUT:
+			return red;
+
+		default:
+			return red;
+	}
+}
+
+

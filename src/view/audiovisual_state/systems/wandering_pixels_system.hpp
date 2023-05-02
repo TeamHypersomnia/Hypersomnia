@@ -56,7 +56,11 @@ void wandering_pixels_system::advance_for(
 	}
 
 	const auto total_animation_duration = ::calc_total_duration(anim->frames);
-	const auto current_reach = xywh(*it.find_aabb());
+	auto current_reach = xywh();
+
+	if (const auto aabb = it.find_aabb()) {
+		current_reach = *aabb;
+	}
 
 	auto reset_positions = [&]() {
 		for (auto& p : cache.particles) {

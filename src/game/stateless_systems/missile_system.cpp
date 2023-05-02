@@ -116,7 +116,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			}
 		}();
 
-		if (type == std::nullopt) {
+		if (!type.has_value()) {
 			continue;
 		}
 

@@ -226,7 +226,7 @@ mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 						p->get_faction()
 					});
 
-					if (logically_set(choice)) {
+					if (choice.has_value()) {
 						result_entropy = *choice;
 					}
 

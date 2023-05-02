@@ -595,18 +595,21 @@ void AddTextVertical(ImDrawList* drawList,const ImFont* font, float font_size, c
     if (font_size == 0.0f)
         font_size = GImGui->FontSize;
 
-    IM_ASSERT(drawList && font->ContainerAtlas->TexID == drawList->_TextureIdStack.back());  // Use high-level ImGui::PushFont() or low-level ImDrawList::PushTextureId() to change font.
+	if (font && font->ContainerAtlas) {
+		IM_ASSERT(drawList && font->ContainerAtlas->TexID == drawList->_TextureIdStack.back());  // Use high-level ImGui::PushFont() or low-level ImDrawList::PushTextureId() to change font.
 
-    ImVec4 clip_rect = drawList->_ClipRectStack.back();
-    if (cpu_fine_clip_rect)
-    {
-        clip_rect.x = ImMax(clip_rect.x, cpu_fine_clip_rect->x);
-        clip_rect.y = ImMax(clip_rect.y, cpu_fine_clip_rect->y);
-        clip_rect.z = ImMin(clip_rect.z, cpu_fine_clip_rect->z);
-        clip_rect.w = ImMin(clip_rect.w, cpu_fine_clip_rect->w);
-    }
-    RenderTextVertical(font, drawList, font_size, pos, col, clip_rect, text_begin, text_end, wrap_width, cpu_fine_clip_rect != NULL,rotateCCW);
+		ImVec4 clip_rect = drawList->_ClipRectStack.back();
+		if (cpu_fine_clip_rect)
+		{
+			clip_rect.x = ImMax(clip_rect.x, cpu_fine_clip_rect->x);
+			clip_rect.y = ImMax(clip_rect.y, cpu_fine_clip_rect->y);
+			clip_rect.z = ImMin(clip_rect.z, cpu_fine_clip_rect->z);
+			clip_rect.w = ImMin(clip_rect.w, cpu_fine_clip_rect->w);
+		}
+		RenderTextVertical(font, drawList, font_size, pos, col, clip_rect, text_begin, text_end, wrap_width, cpu_fine_clip_rect != NULL,rotateCCW);
+	}
 }
+
 void AddTextVertical(ImDrawList* drawList,const ImVec2& pos, ImU32 col, const char* text_begin, const char* text_end=NULL,bool rotateCCW=false)    {
     AddTextVertical(drawList,GImGui->Font, GImGui->FontSize, pos, col, text_begin, text_end,0.0f,NULL,rotateCCW);
 }

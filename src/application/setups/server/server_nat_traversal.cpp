@@ -30,16 +30,18 @@ void server_nat_traversal::session::relay_stun_result(
 	netcode_address_t masterserver_address,
 	netcode_packet_queue& queue
 ) {
-	if (const auto result = stun->query_result()) {
-		auto result_info = masterserver_in::stun_result_info();
+	if (stun.has_value()) {
+		if (const auto result = stun->query_result()) {
+			auto result_info = masterserver_in::stun_result_info();
 
-		result_info.session_guid = session_guid;
-		result_info.client_origin = request.client_origin;
-		result_info.resolved_external_port = result->port;
+			result_info.session_guid = session_guid;
+			result_info.client_origin = request.client_origin;
+			result_info.resolved_external_port = result->port;
 
-		const auto info_bytes = augs::to_bytes(masterserver_request(result_info));
-		queue(masterserver_address, info_bytes);
-		++times_sent_port_info;
+			const auto info_bytes = augs::to_bytes(masterserver_request(result_info));
+			queue(masterserver_address, info_bytes);
+			++times_sent_port_info;
+		}
 	}
 }
 

@@ -242,7 +242,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	result_type result;
 
-	if (logically_set(requested_special)) {
+	if (requested_special.has_value()) {
 		result = *requested_special;
 		requested_special = std::nullopt;
 		return result;

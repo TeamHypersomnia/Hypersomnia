@@ -150,7 +150,7 @@ public:
 	}
 
 	bool dead() const {
-		return !alive();
+		return ptr == nullptr;
 	}
 
 	auto& get_cosmos() const {

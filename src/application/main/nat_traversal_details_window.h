@@ -3,50 +3,9 @@
 #include "augs/filesystem/file.h"
 #include "application/setups/debugger/detail/maybe_different_colors.h"
 
-std::string nat_traversal_state_to_string(const nat_traversal_session::state state) {
-	using S = nat_traversal_session::state;
-
-	switch (state) {
-		case S::INIT:
-			return "Initializing";
-		case S::TRAVERSING:
-			return "Traversing";
-		case S::SERVER_STUN_REQUIREMENT_MET:
-			return "Server STUN requirement met";
-		case S::REQUESTING_REMOTE_PORT_INFO:
-			return "Requesting remote port info";
-		case S::TRAVERSAL_COMPLETE:
-			return "Traversal complete";
-		case S::TIMED_OUT:
-			return "Traversal timed out";
-
-		default:
-			return "Unknown";
-	}
-}
-
-rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
-	using S = nat_traversal_session::state;
-
-	switch (state) {
-		case S::INIT:
-			return orange;
-		case S::SERVER_STUN_REQUIREMENT_MET:
-			return cyan;
-		case S::REQUESTING_REMOTE_PORT_INFO:
-			return yellow;
-		case S::TRAVERSING:
-			return cyan;
-		case S::TRAVERSAL_COMPLETE:
-			return green;
-		case S::TIMED_OUT:
-			return red;
-
-		default:
-			return red;
-	}
-}
-
+std::string nat_traversal_state_to_string(const nat_traversal_session::state state);
+std::string nat_type_to_string(const nat_type type);
+rgba nat_traversal_state_to_color(const nat_traversal_session::state state);
 
 struct nat_traversal_details_window {
 	bool rechoose_random_port_on_start = false;

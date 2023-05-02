@@ -136,6 +136,10 @@ work_result work(const int argc, const char* const * const argv) try {
 #endif
 
 	{
+		LOG("Started at %x", augs::date_time().get_readable());
+		LOG("Working directory: %x", augs::get_current_working_directory());
+		LOG("If the game crashes repeatedly, consider deleting the \"cache\" folder.\n");
+
 		const auto all_created_directories = std::vector<augs::path_type> {
 			LOG_FILES_DIR,
 			GENERATED_FILES_DIR,
@@ -363,10 +367,6 @@ work_result work(const int argc, const char* const * const argv) try {
 	network_profiler network_performance;
 	network_info network_stats;
 	server_network_info server_stats;
-
-	LOG("If the game crashes repeatedly, consider deleting the \"cache\" folder.\n");
-	LOG("Started at %x", augs::date_time().get_readable());
-	LOG("Working directory: %x", augs::get_current_working_directory());
 
 	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 

@@ -63,14 +63,12 @@ vec2u image_definition_view::read_source_image_size() const {
 std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_map(
 	const bool force_regenerate
 ) const {
-	if (get_def().meta.extra_loadables.should_generate_neon_map()) {
+	if (const auto generated_neon_map_path = find_generated_neon_map_path()) {
 		const auto diffuse_path = resolved_source_path;
-
-		const auto generated_neon_map_path = find_generated_neon_map_path().value();
 
 		return ::should_regenerate_neon_map(
 			diffuse_path,
-			generated_neon_map_path,
+			*generated_neon_map_path,
 			get_def().meta.extra_loadables.generate_neon_map.value,
 			force_regenerate
 		);
@@ -84,12 +82,14 @@ void image_definition_view::regenerate_neon_map(
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
-	::regenerate_neon_map(
-		diffuse_path,
-		find_generated_neon_map_path().value(),
-		get_def().meta.extra_loadables.generate_neon_map.value,
-		cached_in
-	);
+	if (const auto generated_neon_map_path = find_generated_neon_map_path()) {
+		::regenerate_neon_map(
+			diffuse_path,
+			*generated_neon_map_path,
+			get_def().meta.extra_loadables.generate_neon_map.value,
+			cached_in
+		);
+	}
 }
 
 void image_definition_view::regenerate_desaturation(
@@ -97,10 +97,10 @@ void image_definition_view::regenerate_desaturation(
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
-	if (get_def().meta.extra_loadables.should_generate_desaturation()) {
+	if (const auto desaturation_path = find_desaturation_path()) {
 		::regenerate_desaturation(
 			diffuse_path,
-			find_desaturation_path().value(),
+			*desaturation_path,
 			force_regenerate
 		);
 	}

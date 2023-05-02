@@ -1863,8 +1863,6 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 						if (!cmd.empty()) {
 							in.setup.post_new_command(std::move(cmd)); 
 						}
-
-						in.setup.post_new_command(std::move(cmd)); 
 					}
 				}
 			}
