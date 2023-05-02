@@ -128,6 +128,7 @@ std::string instantiate_flavour_command::describe() const {
 }
 
 void instantiate_flavour_command::redo(const debugger_command_input in) {
+	auto access = allocate_new_entity_access();
 	ensure(!created_id.is_set());
 
 	instantiated_id.type_id.dispatch(
@@ -150,6 +151,7 @@ void instantiate_flavour_command::redo(const debugger_command_input in) {
 
 			try {
 				const auto created_entity = cosmic::specific_create_entity(
+					access,
 					cosm,
 					flavour_id,
 					[this](const auto typed_handle, auto&&...) {

@@ -17,6 +17,9 @@ class game_gui_system;
 struct cosmos_global_solvable;
 struct perform_transfer_impl;
 
+struct duplicate_entities_command;
+struct instantiate_flavour_command;
+
 class allocate_new_entity_access {
 	/*
 		We have to be EXTREMELY careful who do we allow to create entities.
@@ -140,6 +143,13 @@ class allocate_new_entity_access {
 
 	template <bool is_const>
 	friend class basic_game_gui_context;
+
+	/*
+		Debugger setup.
+	*/
+
+	friend instantiate_flavour_command;
+	friend duplicate_entities_command;
 
 	allocate_new_entity_access() {}
 };

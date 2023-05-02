@@ -29,6 +29,8 @@ bool duplicate_entities_command::empty() const {
 }
 
 void duplicate_entities_command::redo(const debugger_command_input in) {
+	auto access = allocate_new_entity_access();
+
 	clear_undo_state();
 
 	in.purge_selections();
@@ -68,7 +70,7 @@ void duplicate_entities_command::redo(const debugger_command_input in) {
 	auto duplicate = [&](auto&& new_transform_setter) {
 		duplicated_entities.for_each([&](auto& e) {
 			try {
-				const auto duplicated = cosmic::specific_clone_entity(*cosm[e.source_id]);
+				const auto duplicated = cosmic::specific_clone_entity(access, *cosm[e.source_id]);
 
 				const bool group_found = groups.on_group_entry_of(e.source_id, [&](auto, const auto& group, auto) {
 					/* 
