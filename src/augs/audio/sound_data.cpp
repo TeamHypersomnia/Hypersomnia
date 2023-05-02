@@ -67,7 +67,11 @@ namespace augs {
 			std::memcpy(samples.data(), buffer.data(), buffer.size());
 		}
 		else if (extension == ".wav") {
+#if PLATFORM_UNIX
 			auto wav_file = fclosed_unique(fopen(path_str.c_str(), "rbe"));
+#else
+			auto wav_file = fclosed_unique(fopen(path_str.c_str(), "rb"));
+#endif
 
 			if (!wav_file) {
 				throw sound_decoding_error("Failed to decode %x: could not open the file for reading.", path);
