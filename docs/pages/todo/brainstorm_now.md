@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- RCON should show maps on the server, not the local ones
+
 - On the official server, would be best to have a separate folder for custom maps
     - because we have to reupload every time on deploy otherwise 
     - and a config switch for that

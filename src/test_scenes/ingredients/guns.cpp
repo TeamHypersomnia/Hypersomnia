@@ -2572,7 +2572,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_container_items::HPSR_MAGAZINE);
+			auto& meta = get_test_flavour(flavours, test_container_items::AWKA_MAGAZINE);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -3498,7 +3498,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 4900;
 			set_chambering_duration_ms(meta, 650.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("8");
-			only_allow_mag(meta, test_container_items::HPSR_MAGAZINE);
+			only_allow_mag(meta, test_container_items::AWKA_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().flip_when_reloading = true;
 			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 2;

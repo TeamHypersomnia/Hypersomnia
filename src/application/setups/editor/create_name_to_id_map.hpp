@@ -46,5 +46,9 @@ inline auto editor_official_resource_map::create_name_to_id_map() const {
 
 	augs::introspect(map_names, *this);
 
+	if (const auto redirect = mapped_or_nullptr(name_to_id, "awka_magazine")) {
+		name_to_id["hpsr_magazine"] = *redirect;
+	}
+
 	return name_to_id;
 }
