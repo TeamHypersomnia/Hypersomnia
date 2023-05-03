@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Investigate why is changing maps moving to spectator
+    - same thing when entering playtesting
+    - probably something with faction remapping
+    - is it connected to the vars != nullptr crash?
+
 - RCON should show maps on the server, not the local ones
 
 - On the official server, would be best to have a separate folder for custom maps
