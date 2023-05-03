@@ -161,20 +161,11 @@ void debugger_summary_gui::perform(debugger_setup& setup) {
 	}
 }
 
-render_layer_filter get_layer_filter_for_miniature() {
-	auto result = render_layer_filter::all();
-	auto& l = result.layers;
-
-	for (auto i = render_layer::INVALID; i <= render_layer::DIM_WANDERING_PIXELS; i = render_layer(int(i) + 1)) {
-		l[i] = false;
-	}
-
-	return result;
-}
-
 #include "view/rendering_scripts/find_aabb_of.h"
 #include "application/setups/debugger/debugger_paths.h"
 #include "game/cosmos/for_each_entity.h"
+
+render_layer_filter get_layer_filter_for_miniature();
 
 void debugger_coordinates_gui::perform(
 	debugger_setup& setup,

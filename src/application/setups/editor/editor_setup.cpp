@@ -69,6 +69,10 @@
 #include "augs/readwrite/json_readwrite_errors.h"
 
 #include "application/arena/build_arena_from_editor_project.hpp"
+#include "game/cosmos/for_each_entity.h"
+#include "game/detail/passes_filter.h"
+
+render_layer_filter get_layer_filter_for_miniature();
 
 template <class R, class F>
 void packaged_official_content::for_each_resource(F callback) {
@@ -597,6 +601,13 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.sound.allow_sounds_without_character_listener = gui.sounds_preview;
 
 		config.sound.processing_frequency = sound_processing_frequency::EVERY_SINGLE_FRAME;
+	}
+
+	if (miniature_generator.has_value()) {
+		config.drawing.draw_aabb_highlighter = false;
+		config.interpolation.enabled = false;
+		config.drawing.draw_area_markers.is_enabled = false;
+		config.drawing.draw_callout_indicators.is_enabled = false;
 	}
 }
 
@@ -1854,6 +1865,10 @@ augs::path_type editor_setup::get_unofficial_content_dir() const {
 }
 
 camera_eye editor_setup::get_camera_eye() const {
+	if (miniature_generator.has_value()) {
+		return miniature_generator->get_current_camera();
+	}
+
 	return view.panned_camera;
 }
 
@@ -3262,6 +3277,111 @@ arena_playtesting_context editor_setup::make_playtesting_context() const {
 		get_camera_eye().transform.pos,
 		project.playtesting.starting_faction
 	};
+}
+
+#include "application/main/game_frame_buffer.h"
+#include "augs/graphics/renderer_backend.h"
+
+void editor_setup::after_all_drawcalls(game_frame_buffer& write_buffer) {
+	if (miniature_generator.has_value()) {
+		miniature_generator->request_screenshot(write_buffer.renderers.all[renderer_type::GENERAL]);
+	}
+}
+
+void editor_setup::do_game_main_thread_synced_op(renderer_backend_result& result) {
+	if (miniature_generator.has_value()) {
+		auto& ss = result.result_screenshot;
+
+		if (ss.has_value()) {
+			miniature_generator->acquire(*ss);
+		}
+	}
+}
+
+augs::maybe<render_layer_filter> editor_setup::get_render_layer_filter() const {
+	if (miniature_generator.has_value()) {
+		return get_layer_filter_for_miniature();
+	}
+
+	return render_layer_filter::disabled();
+}
+
+render_layer_filter get_layer_filter_for_miniature() {
+	auto result = render_layer_filter();
+	auto& l = result.layers;
+
+	for (auto i = render_layer::GROUND; i <= render_layer::DIM_WANDERING_PIXELS; i = render_layer(int(i) + 1)) {
+		l[i] = true;
+	}
+
+	return result;
+}
+
+void editor_setup::request_arena_screenshot(const augs::path_type& output_path, const int max_size, const bool reveal) {
+	const auto filter = get_layer_filter_for_miniature();
+
+	const auto& cosm = get_viewed_cosmos();
+
+	auto for_each_target = [&](auto combiner) {
+		cosm.for_each_entity(
+			[&](const auto& typed_entity) {
+				if (auto sprite = typed_entity.template find<components::sprite>()) {
+					if (sprite->colorize.a == 0) {
+						return;
+					}
+				}
+
+				if (auto sprite = typed_entity.template find<invariants::sprite>()) {
+					if (sprite->color.a == 0) {
+						return;
+					}
+				}
+
+				if (filter.passes(typed_entity)) {
+					combiner(typed_entity);
+				}
+			}
+		);
+	};
+
+	if (const auto world_captured_region = ::find_aabb_of(cosm, for_each_target)) {
+		miniature_generator_state request;
+		auto cam = find_current_camera_eye();
+
+		request.output_path = output_path;
+		request.world_captured_region = *world_captured_region;
+
+		if (const bool is_miniature = !reveal) {
+			const auto bigger_side = request.world_captured_region.get_size().bigger_side();
+			if (bigger_side > max_size) {
+				request.zoom = max_size / bigger_side;
+
+				/* Allow zooming to four times the size of the miniature */
+				request.zoom *= 4.0f;
+				request.zoom = std::min(request.zoom, 1.0f);
+			}
+			else {
+				request.zoom = 1.0f;
+			}
+		}
+		else {
+			request.zoom = cam ? cam->zoom : 1.0f;
+		}
+
+		request.reveal_when_complete = reveal;
+
+		const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+		request.screen_size = screen_size;
+		request.max_miniature_size = max_size;
+		LOG("Requesting miniature. Screen size: %x. Max size: %x. World captured region: %x (%x). Zoom: %x", screen_size, max_size, *world_captured_region, world_captured_region->get_size(), request.zoom);
+
+		miniature_generator.reset();
+		miniature_generator.emplace(std::move(request));
+	}
+}
+
+bool editor_setup::is_generating_miniature() const {
+	return miniature_generator.has_value();
 }
 
 template struct edit_resource_command<editor_sprite_resource>;

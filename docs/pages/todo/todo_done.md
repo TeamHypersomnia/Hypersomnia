@@ -5955,3 +5955,31 @@ This will discard your redo history."
 - rename conditional_get_by_dynamic_id -> constrained...
 - rename specific -> typed for entity handles and creation
 
+- Fixing the SIGSEGVs due to reallocations.
+    - Safest would be to delegate the entity creations for later and only allowing direct create entity calls in special cases (e.g. in gun system we might create missiles straight away for performance because surely we don't have any handles to missiles)
+    - Note that removing pointers from entity handles and dereferencing them each time solves only half of the problem
+        - There might be references to components dangling as well
+        - It would needlessly complicate our code then
+    - So we need to either:
+        - Delegate all creations for later, possibly with lambdas attached
+            - Might introduce some new bugs but will remove existing ones so it's still safer
+        - Pre-reserve, but that would be silly as we'd need to know how to estimate the amount of potentially allocated entities of each type
+        - Change the allocation algorithm to one that preserves addresses, but that's a no-go
+            - Entities wouldn't be contiguous in memory anymore
+    - Also think how you'd approach it assuming you would be willing to handle couldnt-allocate-entity scenario in every case we create entity
+        - Because then we could pre-reserve some reasonable amounts and just check if the amount has been exceeded
+            - Well that would suck for timing-intensive entities like missiles
+            - Plus it sucks we have to allocate memory up front
+    - The only problem with deferring creation is we kinda cannot the ids without some hardcore prediction code
+        - And we might want to save created entities like spawned bomb to spawned handle
+    - In scripts we will anyway won't allow to store references to components etc for that exact reason
+        - Will only operate through explicit funcs like set_position(id), set_color etc. so will operate on safe ids only and components will be transparent
+    - We'll probably end up with a hybrid so we'll just defer only the most dangerous creation cases
+        - (dangerous because they might happen deep inside some logic that already has some handles/pointers setup)
+    - so spawn_bomb should probably be fine
+    - but we'll obviously defer the cloning inside perform transfer
+
+    - Let's also put explicit_allocating_entities = true above where we start allocating
+        - and ensure we don't do it anywhere else
+        - or just straight make it private and require access struct
+

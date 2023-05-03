@@ -54,6 +54,8 @@ struct editor_inspector_gui : standard_window_mixin<editor_inspector_gui> {
 	debugger_image_preview neon_map_picker_preview;
 	std::size_t num_last_resources_last_time = 0;
 
+	int max_full_screenshot_size = 10000;
+
 	template <class T>
 	bool inspects_any() const {
 		for (const auto& inspected : all_inspected) {

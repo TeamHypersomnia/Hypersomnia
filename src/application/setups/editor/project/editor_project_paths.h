@@ -13,6 +13,7 @@ struct editor_project_paths {
 	augs::path_type project_json;
 	augs::path_type autosave_json;
 	augs::path_type miniature;
+	augs::path_type screenshot;
 
 	augs::path_type signature;
 

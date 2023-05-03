@@ -136,6 +136,7 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	autosave_json = in_folder("autosave.json");
 	editor_view = in_folder("editor_view.json");
 	miniature = in_folder("miniature.png");
+	screenshot = in_folder("screenshot.png");
 	signature = in_folder("signature");
 
 	compressed_json = in_cache("compressed.lz4");
@@ -149,6 +150,7 @@ bool editor_project_paths::is_project_specific_file(const augs::path_type& path)
 		|| path == autosave_json
 		|| path == editor_view
 		|| path == miniature
+		|| path == screenshot
 		|| path == signature
 		|| path == compressed_json
 		|| path == resource_hashes

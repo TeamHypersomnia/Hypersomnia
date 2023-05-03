@@ -1,4 +1,5 @@
 #include "application/main/miniature_generator.h"
+#include "augs/log.h"
 
 augs::image combine_grid_into_whole(
 	std::vector<augs::image>& imgs,
@@ -68,32 +69,45 @@ augs::image combine_grid_into_whole(
 miniature_generator_state::capture_info miniature_generator_state::calc_info() const {
 	const auto world_region_size = world_captured_region.get_size();
 
-	const auto screen_region_size = world_region_size * zoom;
+	const auto screen_space_region_size = world_region_size * zoom;
 	const auto world_cell_size = screen_size / zoom;
 
-	const auto grid_size = vec2u(screen_region_size / screen_size) + vec2i(1, 1);
+	const auto grid_size = vec2u(
+		std::ceil(screen_space_region_size.x / screen_size.x),
+		std::ceil(screen_space_region_size.y / screen_size.y)
+	);
 
 	capture_info out;
 
 	{
 		const auto current_idx = screenshot_parts.size();
-		const auto current_coords = vec2u(current_idx % grid_size.x, current_idx / grid_size.x);
+
+		const auto current_grid_coords = vec2u(
+			current_idx % grid_size.x,
+			current_idx / grid_size.x
+		);
 
 		const auto world_lt = world_captured_region.left_top();
 		const auto half_offset = world_cell_size / 2;
-		const auto world_current_cell_center = half_offset + world_lt + world_cell_size * current_coords;
+
+		const auto world_current_cell_center = 
+			world_lt
+			+ current_grid_coords * world_cell_size
+			+ half_offset
+		;
 
 		out.current_eye.transform.pos = world_current_cell_center;
 		out.current_eye.zoom = zoom;
 
 		out.current_screenshot_bounds = xywhi(0, 0, screen_size.x, screen_size.y);
 
-		if (current_coords.x == grid_size.x - 1) {
-			out.current_screenshot_bounds.w = std::fmod(screen_region_size.x, screen_size.x);
+		if (current_grid_coords.x == grid_size.x - 1) {
+			out.current_screenshot_bounds.w = std::fmod(screen_space_region_size.x, screen_size.x);
 		}
 
-		if (current_coords.y == grid_size.y - 1) {
-			out.current_screenshot_bounds.h = std::fmod(screen_region_size.y, screen_size.y);
+		if (current_grid_coords.y == grid_size.y - 1) {
+			out.current_screenshot_bounds.h = std::fmod(screen_space_region_size.y, screen_size.y);
+			out.current_screenshot_bounds.y = screen_size.y - out.current_screenshot_bounds.h;
 		}
 	}
 
@@ -107,7 +121,7 @@ std::size_t miniature_generator_state::total_num_parts() const {
 }
 
 augs::image miniature_generator_state::concatenate_parts() {
-	return combine_grid_into_whole(screenshot_parts, calc_info().grid_size.x, true, vec2u(world_captured_region.get_size()));
+	return combine_grid_into_whole(screenshot_parts, calc_info().grid_size.x, true, vec2u(world_captured_region.get_size() * zoom));
 }
 
 void miniature_generator_state::save_to_file() {
@@ -115,9 +129,13 @@ void miniature_generator_state::save_to_file() {
 
 	const auto unscaled_size = vec2(final_image.get_size());
 	const auto bigger = unscaled_size.bigger_side();
-	const auto target_miniature_dimensions = unscaled_size * max_miniature_size / bigger;
 
-	final_image.scale(vec2u(target_miniature_dimensions));
+	if (bigger > max_miniature_size) {
+		const auto target_miniature_dimensions = unscaled_size * max_miniature_size / bigger;
+
+		final_image.scale(vec2u(target_miniature_dimensions));
+	}
+
 	final_image.save_as_png(output_path);
 }
 
@@ -136,7 +154,9 @@ void miniature_generator_state::request_screenshot(augs::renderer& r) {
 
 	if (screenshot_parts.size() < total_num_parts()) {
 		request_in_progress = true;
-		r.screenshot(calc_info().current_screenshot_bounds);
+		const auto info = calc_info();
+		const auto ss_bounds = info.current_screenshot_bounds;
+		r.screenshot(ss_bounds);
 	}
 }
 

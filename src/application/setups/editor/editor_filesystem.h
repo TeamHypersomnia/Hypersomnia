@@ -362,6 +362,10 @@ struct editor_filesystem_node {
 		for_each_file_recursive([&id_counter, &out_subjects, &project_folder](auto& node) {
 			auto path = project_folder / node.get_path_in_project();
 
+			if (node.sanitization_skipped) {
+				return;
+			}
+
 			if (!node.custom_thumbnail_path.empty()) {
 				path = node.custom_thumbnail_path;
 			}

@@ -6,6 +6,13 @@ summary: Just a hidden scratchpad.
 ---
 
 
+- caki crash
+	- changing fy minilab reloaded remake to de_labs2
+		- vars was null
+	- message.txt 
+- lopa crash
+	- when pressing OK 
+	- we have logs on discord
 
 
 - Weapon collider is fucked when it's in the other hand
@@ -170,3 +177,7 @@ Solved:
 	- Most probably as the pool was read from the network it didn't reserve a capacity for objects vector
 	- But it read indirectors vector and indirectors.size() is taken as pool's capacity() so it didn't need to explicitly reserve
 
+## Rest
+
+- why prod-debug doesn't see details.lua? wrong cwd?
+    - was because of build in console mode

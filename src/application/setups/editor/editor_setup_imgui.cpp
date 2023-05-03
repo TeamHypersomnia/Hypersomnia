@@ -15,6 +15,22 @@
 void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
 
+	if (miniature_generator.has_value()) {
+		if (miniature_generator->complete()) {
+			if (miniature_generator->reveal_when_complete) {
+				in.window.reveal_in_explorer(miniature_generator->output_path);
+				recent_message.set("Saved arena screenshot to:\n%x", miniature_generator->output_path);
+				recent_message.show_for_at_least_ms = 10000;
+			}
+			else {
+				recent_message.set("Saved arena miniature to\n%x", miniature_generator->output_path);
+				recent_message.show_for_at_least_ms = 10000;
+			}
+
+			miniature_generator.reset();
+		}
+	}
+
 	if (is_playtesting() && gui.playtest_immersive) {
 		return;
 	}

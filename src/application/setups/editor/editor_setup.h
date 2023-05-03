@@ -55,6 +55,8 @@
 #include "application/setups/editor/gui/editor_recent_message.h"
 #include "application/arena/arena_playtesting_context.h"
 
+#include "application/main/miniature_generator.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -142,6 +144,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	std::optional<simple_popup> autosave_popup;
 	std::optional<simple_popup> invalid_filenames_popup;
 	std::optional<simple_popup> redirect_or_missing_popup;
+
+	std::optional<miniature_generator_state> miniature_generator;
 
 	editor_forbidden_paths_result last_invalid_paths;
 
@@ -658,9 +662,7 @@ public:
 
 	augs::path_type get_unofficial_content_dir() const;
 
-	auto get_render_layer_filter() const {
-		return render_layer_filter::disabled();
-	}
+	augs::maybe<render_layer_filter> get_render_layer_filter() const;
 
 	void draw_custom_gui(const draw_setup_gui_input&);
 	void draw_custom_gui_over_imgui(const draw_setup_gui_input&);
@@ -697,9 +699,6 @@ public:
 	const arena_player_metas* find_player_metas() const {
 		return nullptr;
 	}
-
-	void after_all_drawcalls(game_frame_buffer&) {}
-	void do_game_main_thread_synced_op(renderer_backend_result&) {}
 
 	bool is_mover_active() const {
 		return mover.is_active(history);
@@ -778,4 +777,10 @@ public:
 	const auto& get_scene() const {
 		return scene;
 	}
+
+	void after_all_drawcalls(game_frame_buffer&);
+	void do_game_main_thread_synced_op(renderer_backend_result&);
+
+	void request_arena_screenshot(const augs::path_type& output_path, int max_size, bool reveal);
+	bool is_generating_miniature() const;
 };

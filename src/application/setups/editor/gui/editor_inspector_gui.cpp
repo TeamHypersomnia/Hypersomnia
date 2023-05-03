@@ -1969,6 +1969,38 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				in.setup.get_scene().save_as_bytes(intercosm_paths("/tmp", "dump"));
 			}
 #endif
+
+			ImGui::Separator();
+
+			text_color("Miniatures & screenshots", yellow);
+
+			ImGui::Separator();
+
+			if (!in.setup.is_generating_miniature()) {
+				constexpr int standard_miniature_size = 400;
+
+				text_disabled("Generate a small 400x400 miniature.\nFor previewing arena in catalogues.");
+				if (ImGui::Button("Generate miniature")) {
+					in.setup.request_arena_screenshot(in.setup.get_paths().miniature, standard_miniature_size, false);
+				}
+
+				if (ImGui::IsItemHovered()) {
+					text_tooltip(std::string("Generate a small 400x400 miniature.\n\nWill be saved to ") + in.setup.get_paths().miniature.string());
+				}
+
+				text_disabled("Generate a full arena screenshot.\nMight be useful for content creators.");
+
+				if (ImGui::Button("Full arena screenshot")) {
+					in.setup.request_arena_screenshot(in.setup.get_paths().screenshot, max_full_screenshot_size, true);
+
+					text_tooltip(typesafe_sprintf("Generate a full screenshot of at most %xx%x size.\n\nWill be saved to %x", max_full_screenshot_size, max_full_screenshot_size, in.setup.get_paths().miniature.string()));
+				}
+
+				auto scope = scoped_indent();
+				ImGui::SliderInt("Max screenshot size", &max_full_screenshot_size, 100, 10000);
+				text_disabled("Screenshots are taken with the current zoom,\nthen scaled down if required.");
+			}
+
 		}
 		else if (project_current_tab == inspected_project_tab_type::PLAYTESTING) {
 			edit_project_settings_command cmd;

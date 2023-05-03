@@ -31,6 +31,7 @@ public:
 
 	vec2 screen_size;
 	float max_miniature_size = 400.f;
+	bool reveal_when_complete = false;
 
 	camera_eye get_current_camera() const;
 	bool complete() const;
