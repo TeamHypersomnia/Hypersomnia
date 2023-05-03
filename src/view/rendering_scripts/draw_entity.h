@@ -93,9 +93,9 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			}
 
 			{
-				const auto& v = sprite.neon_intensity_vibration;
+				const auto& v = sprite.neon_alpha_vibration;
 
-				if (v.is_enabled && sprite.vibrate_diffuse_as_well) {
+				if (v.is_enabled && sprite.vibrate_diffuse_too) {
 					const auto id = typed_handle.get_id();
 					const auto mult = in.randomizing.advance_and_get_neon_mult(id, v.value);
 
@@ -597,7 +597,7 @@ FORCE_INLINE void specific_draw_neon_map(
 		}
 
 		{
-			const auto& v = renderable.neon_intensity_vibration;
+			const auto& v = renderable.neon_alpha_vibration;
 
 			if (v.is_enabled) {
 				const auto id = typed_handle.get_id();

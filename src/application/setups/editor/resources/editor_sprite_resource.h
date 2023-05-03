@@ -52,6 +52,8 @@ struct editor_sprite_resource_physical {
 	bool is_static = false;
 	bool is_see_through = false;
 	bool is_throw_through = false;
+	bool is_melee_throw_through = false;
+	bool is_shoot_through = false;
 
 	real32 density = 0.7f;
 	real32 friction = 0.0f;
@@ -59,6 +61,8 @@ struct editor_sprite_resource_physical {
 
 	real32 linear_damping = 6.5f;
 	real32 angular_damping = 6.5f;
+
+	real32 collision_sound_strength_mult = 1.0f;
 
 	editor_typed_resource_id<editor_material_resource> material;
 
@@ -84,6 +88,9 @@ struct editor_sprite_resource_editable {
 
 	augs::maybe<float> color_wave_speed = augs::maybe<float>(1.0f, false);
 	augs::maybe<float> rotate_continuously_degrees_per_sec = augs::maybe<float>(360.0f, false);
+
+	augs::maybe<intensity_vibration_input> neon_alpha_vibration;
+	bool vibrate_diffuse_too = false;
 
 	editor_sprite_resource_physical as_physical;
 	editor_sprite_resource_nonphysical as_nonphysical;

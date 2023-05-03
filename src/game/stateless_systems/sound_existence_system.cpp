@@ -58,13 +58,13 @@ void play_collision_sound(
 	) {
 		auto play_sound = [&](const auto* sound_def) {
 			if (sound_def) {
-				const auto impulse = strength * subject_coll->collision_sound_gain_mult * collider_coll->collision_sound_gain_mult;
+				const auto impulse = strength * subject_coll->collision_sound_strength_mult * collider_coll->collision_sound_strength_mult;
 
 				const auto gain_mult = impulse * impulse * sound_def->gain_mult;
 				const auto pitch_mult = impulse * sound_def->pitch_mult;
 
 				if (gain_mult > 0.01f) {
-					// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_gain_mult, collider_coll.collision_sound_gain_mult);
+					// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_strength_mult, collider_coll.collision_sound_strength_mult);
 
 					auto effect = sound_def->effect;
 

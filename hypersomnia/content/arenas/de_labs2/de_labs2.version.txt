@@ -1,5 +1,0 @@
-Hypersomnia version 1.1.8121
-Revision no.: 8121 (clean)
-Build date: Tue May 2 14:02:14 2023
-Commit message:
-Major stability fixes (complet(...)

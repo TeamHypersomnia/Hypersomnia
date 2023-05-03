@@ -344,6 +344,7 @@ enum class test_sound_decorations {
 
 	FOOTSTEP_DIRT,
 	FOOTSTEP_FLOOR,
+	FOOTSTEP_AIR_DUCT,
 
 	COUNT
 	// END GEN INTROSPECTOR

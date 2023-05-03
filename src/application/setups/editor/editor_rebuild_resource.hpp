@@ -355,6 +355,8 @@ void setup_scene_object_from_resource(
 				sprite.effect = augs::sprite_special_effect::CONTINUOUS_ROTATION;
 				sprite.effect_speed_multiplier = editable.rotate_continuously_degrees_per_sec.value / 360.0f;
 			}
+
+			sprite.neon_alpha_vibration = editable.neon_alpha_vibration;
 		}
 
 		if (auto animation = scene.template find<invariants::animation>()) {
@@ -393,6 +395,8 @@ void setup_scene_object_from_resource(
 			if (physical.is_throw_through) {
 				fixtures->filter.maskBits &= ~(1 << int(filter_category::FLYING));
 			}
+
+			fixtures->collision_sound_strength_mult = physical.collision_sound_strength_mult;
 		}
 
 		if (domain == editor_sprite_domain::BACKGROUND) {

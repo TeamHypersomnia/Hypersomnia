@@ -13,7 +13,7 @@
 
 struct intensity_vibration_input {
 	// GEN INTROSPECTOR struct intensity_vibration_input
-	real32 change_per_sec = 100.f;
+	real32 change_per_second = 100.f;
 	rgba_channel lower = 150;
 	rgba_channel upper = 255;
 	pad_bytes<2> pad;
@@ -102,8 +102,8 @@ namespace augs {
 		sprite_special_effect effect = sprite_special_effect::NONE;
 		real32 effect_speed_multiplier = 1.f;
 
-		augs::maybe<intensity_vibration_input> neon_intensity_vibration;
-		bool vibrate_diffuse_as_well = false;
+		augs::maybe<intensity_vibration_input> neon_alpha_vibration;
+		bool vibrate_diffuse_too = false;
 		bool tile_excess_size = false;
 		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR

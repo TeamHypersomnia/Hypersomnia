@@ -22,6 +22,7 @@ debugger_paths::debugger_paths(
 	entropies_live_file = in_folder(".live");
 
 	int_lua_file = in_folder(".int.lua");
+	json_export_file = in_folder(".json");
 	rulesets_lua_file = in_folder(".rulesets.lua");
 
 	default_export_path = target_folder / (project_name + "-export");

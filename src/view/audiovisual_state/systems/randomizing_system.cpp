@@ -20,7 +20,7 @@ float randomizing_system::advance_and_get_neon_mult(
 	auto& walk = (*it.first).second;
 
 	const auto diff = in.upper - in.lower;
-	const auto unit_speed = in.change_per_sec * dt.in_seconds();
+	const auto unit_speed = in.change_per_second * dt.in_seconds();
 	const auto h = unit_speed / 2;
 
 	auto& mult = walk.walk_state;

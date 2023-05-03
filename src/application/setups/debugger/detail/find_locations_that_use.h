@@ -169,7 +169,17 @@ void find_locations_that_use_flavour(
 	const candidate_id_locations l,
 	F&& location_callback
 ) {
-	const auto num_entities = l.cosm.get_solvable_inferred().flavour_ids.get_entities_by_flavour_id(id).size();
+	int num_entities = 0;
+
+	l.cosm.for_each_entity(
+		[&]<typename H>(const H& h) {
+			if constexpr(std::is_same_v<E, typename H::used_entity_type>) {
+				if (h.get_flavour_id() == id) {
+					++num_entities;
+				}
+			}
+		}
+	);
 
 	if (num_entities > 0) {
 		location_callback(typesafe_sprintf("%x Entities of this flavour", num_entities));

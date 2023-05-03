@@ -259,7 +259,7 @@ namespace test_flavours {
 				test_ground_order::ON_ON_FLOOR
 			);
 
-			meta.get<invariants::sprite>().neon_intensity_vibration.is_enabled = true;
+			meta.get<invariants::sprite>().neon_alpha_vibration.is_enabled = true;
 		}
 
 		fish_flavour(
@@ -308,6 +308,15 @@ namespace test_flavours {
 			160,
 			200
 		);
+
+#if 0
+		flavour_with_sprite(
+			test_static_decorations::BLANK,
+			test_scene_image_id::BLANK,
+			test_ground_order::ON_FLOOR,
+			white
+		);
+#endif
 
 		flavour_with_sprite(
 			test_static_decorations::LAB_WALL_A2_FOREGROUND,
@@ -498,6 +507,16 @@ namespace test_flavours {
 			-1,
 			0.9f,
 			0.6f
+		);
+
+		flavour_with_sound(
+			test_sound_decorations::FOOTSTEP_AIR_DUCT,
+			test_scene_sound_id::FOOTSTEP_AIR_DUCT,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1,
+			1.0f,
+			1.0f
 		);
 
 		make_loop(flavour_with_sound(

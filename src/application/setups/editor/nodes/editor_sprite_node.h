@@ -12,6 +12,7 @@ struct editor_sprite_node_editable {
 	real32 rotation = 0.0f;
 	augs::maybe<vec2i, false> size;
 	rgba color = white;
+	rgba neon_color = white;
 
 	bool flip_horizontally = false;
 	bool flip_vertically = false;

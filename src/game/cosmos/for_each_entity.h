@@ -53,3 +53,13 @@ void cosmos::for_each_flavour_having(F&& callback) const {
 	});
 }
 
+template <class E, class F>
+void cosmos::for_each_flavour_and_id(F&& callback) const {
+	for_each_id_and_object(
+		get_flavours<E>(), 
+		[&callback](const raw_entity_flavour_id& id, const entity_flavour<E>& flavour) {
+			callback(typed_entity_flavour_id<E>(id), flavour);
+		}
+	);
+}
+

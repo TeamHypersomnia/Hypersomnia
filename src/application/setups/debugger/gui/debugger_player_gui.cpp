@@ -13,6 +13,7 @@
 
 #include "application/setups/debugger/detail/update_official_content.h"
 #include "application/setups/debugger/commands/detail/debugger_property_accessors.h"
+#include "application/setups/debugger/detail/export_intercosm_to_json.h"
 
 void debugger_player_gui::perform(const debugger_command_input cmd_in) {
 	using namespace augs::imgui;
@@ -180,7 +181,7 @@ void debugger_player_gui::perform(const debugger_command_input cmd_in) {
 	checkbox("Overwrite perks", settings.overwrite_perks);
 
 	if (ImGui::Button("Update official content")) {
-		update_official_content(cmd_in, settings);
+		::update_official_content(cmd_in, settings);
 	}
 
 	if (ImGui::Button("Redirect to /gfx")) {
@@ -202,5 +203,9 @@ void debugger_player_gui::perform(const debugger_command_input cmd_in) {
 	if (ImGui::Button("Force reset cosmos clock")) {
 		auto& csm = folder.commanded->work.world;
 		debugger_property_accessors::force_set_clock(csm, 0);
+	}
+
+	if (ImGui::Button("Try export to json")) {
+		::export_intercosm_to_json(cmd_in);
 	}
 }

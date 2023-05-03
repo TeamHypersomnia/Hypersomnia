@@ -40,7 +40,7 @@ namespace invariants {
 
 		assets::physical_material_id material;
 
-		real32 collision_sound_gain_mult = 1.f;
+		real32 collision_sound_strength_mult = 1.f;
 
 		real32 density = 1.f;
 		real32 friction = 0.f;

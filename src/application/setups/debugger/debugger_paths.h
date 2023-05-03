@@ -54,6 +54,7 @@ struct debugger_paths {
 	augs::path_type entropies_live_file;
 
 	augs::path_type int_lua_file;
+	augs::path_type json_export_file;
 	augs::path_type rulesets_lua_file;
 
 	augs::path_type default_export_path;
