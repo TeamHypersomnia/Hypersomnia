@@ -1423,7 +1423,7 @@ EDIT_FUNCTION(
 
 			MULTIPROPERTY("Round time", bomb_defusal.round_time);
 			MULTIPROPERTY("Round end time", bomb_defusal.round_end_time);
-			MULTIPROPERTY("Rounds in match", bomb_defusal.rounds_in_match);
+			MULTIPROPERTY("Max team score", bomb_defusal.max_team_score);
 
 			ImGui::Separator();
 

@@ -34,7 +34,7 @@ struct editor_bomb_defusal_mode {
 	uint32_t buy_time = 30;
 	uint32_t round_time = 120;
 	uint32_t round_end_time = 5;
-	uint32_t rounds_in_match = 30;
+	uint32_t max_team_score = 16;
 
 	per_actual_faction<editor_requested_equipment> warmup_equipment;
 	// END GEN INTROSPECTOR

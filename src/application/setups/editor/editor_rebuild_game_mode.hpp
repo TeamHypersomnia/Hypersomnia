@@ -152,7 +152,7 @@ ruleset_id setup_ruleset_from_editor_mode(
 			rules.freeze_secs = vars.freeze_time;
 			rules.round_secs = vars.round_time;
 			rules.round_end_secs = vars.round_end_time;
-			rules.max_rounds = vars.rounds_in_match;
+			rules.max_rounds = (std::max(2u, vars.max_team_score) - 1) * 2;
 			rules.buy_secs_after_freeze = vars.buy_time;
 
 			::for_each_faction(
