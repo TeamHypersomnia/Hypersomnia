@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "de_silo",
-        "version_timestamp": "2023-05-03 21:38:22.277590 UTC"
+        "version_timestamp": "2023-05-03 22:48:51.502114 UTC"
     },
     "about": {
         "author": "lia",
@@ -9,7 +9,7 @@
         "welcome_message": "[color=vslightgray]Welcome to [/color][color=orange]THE ABANDONED ROCKET SILO.[/color]\n\nlia - [color=cyan]MAPPING[/color]\nMarcel Windys - [color=cyan]WARMUP THEME[/color]\n\nThis creepy and incredibly tactical\ncommunity map will test your [color=cyan]CQB[/color] \nto the utmost limit."
     },
     "settings": {
-        "default_server_mode": "quick_test",
+        "default_server_mode": "bomb_defusal",
         "include_disabled_nodes": false,
         "ambient_light_color": [71, 113, 183, 255],
         "warmup_theme": {
