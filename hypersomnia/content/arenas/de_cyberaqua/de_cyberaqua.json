@@ -5,10 +5,7 @@
     },
     "settings": {
         "default_server_mode": "bomb_defusal",
-        "ambient_light_color": [0, 67, 90, 255],
-        "warmup_theme": {
-            "id": null
-        }
+        "ambient_light_color": [0, 67, 90, 255]
     },
     "playtesting": {
         "mode": "quick_test"
