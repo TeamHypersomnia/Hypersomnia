@@ -14,10 +14,3 @@ void load_intercosm_and_rulesets(
 	intercosm& scene,
 	predefined_rulesets& rulesets
 );
-
-void make_test_online_arena(
-	sol::state& lua,
-	intercosm& scene,
-	online_mode_and_rules&,
-	predefined_rulesets& rulesets
-);

@@ -6,7 +6,6 @@
 
 #include "application/setups/server/server_setup.h"
 #include "application/config_lua_table.h"
-#include "application/arena/arena_utils.h"
 
 #include "application/network/server_adapter.hpp"
 

@@ -101,22 +101,6 @@ inline void load_arena_from_string(
 	}
 }
 
-inline void load_arena_legacy(
-	const choose_arena_input in
-) {
-	const auto legacy_paths = arena_paths(in.name);
-
-	LOG_NOFORMAT("Loading from Solv file: " + legacy_paths.int_paths.solv_file.string());
-
-	::load_intercosm_and_rulesets(
-		legacy_paths,
-		in.handle.scene,
-		in.handle.rulesets
-	);
-
-	in.clean_round_state = in.handle.scene.world.get_solvable().significant;
-}
-
 struct server_choose_arena_result {
 	augs::secure_hash_type required_hash = augs::secure_hash_type();
 	augs::path_type arena_folder_path;
@@ -130,25 +114,11 @@ inline server_choose_arena_result choose_arena_server(
 	auto result = server_choose_arena_result();
 
 	if (const auto path = ::server_choose_arena_file_by(in.name); !path.empty()) {
-		if (augs::exists(path)) {
-			LOG_NOFORMAT("Loading arena from: " + path.string());
+		LOG_NOFORMAT("Loading arena from: " + path.string());
 
-			::load_arena_from_path(in, path, std::addressof(result.required_hash));
+		::load_arena_from_path(in, path, std::addressof(result.required_hash));
 
-			result.arena_folder_path = path.parent_path();
-		}
-		else {
-			/* 
-				LEGACY CLAUSE: TO BE REMOVED 
-				For now we check if the project json file exists.
-
-				Once we remove legacy maps, we'll just assume that the project file exists and catch exceptions in case it does not.
-			*/
-
-			::load_arena_legacy(in);
-
-			result.arena_folder_path = arena_paths(in.name).folder_path;
-		}
+		result.arena_folder_path = path.parent_path();
 	}
 	else {
 		in.make_default();
@@ -188,28 +158,19 @@ inline client_find_arena_result choose_arena_client(
 	client_find_arena_result result;
 	bool altered = false;
 
-	if (required_hash == augs::secure_hash_type()) {
-		// LEGACY CLAUSE: TO BE REMOVED
-		if (in.name.empty()) {
-			in.make_default();
-			altered = true;
-		}
-		else {
-			::load_arena_legacy(in);
-			altered = true;
+	result = ::client_find_arena(in.name, required_hash);
 
-			result.arena_folder_path = arena_paths(in.name).folder_path;
-		}
+	if (const auto maybe_arena_folder = result.arena_folder_path) {
+		LOG_NOFORMAT("Arena with a matching hash found in: " + maybe_arena_folder->string());
+
+		::load_arena_from_string(in, *maybe_arena_folder, result.json_document);
+		altered = true;
 	}
 	else {
-		result = ::client_find_arena(in.name, required_hash);
+		LOG_NOFORMAT("Couldn't find arena with a matching hash. Creating default.");
 
-		if (const auto maybe_arena_folder = result.arena_folder_path) {
-			LOG_NOFORMAT("Arena with a matching hash found in: " + maybe_arena_folder->string());
-
-			::load_arena_from_string(in, *maybe_arena_folder, result.json_document);
-			altered = true;
-		}
+		in.make_default();
+		altered = true;
 	}
 
 	if (altered) {

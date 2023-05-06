@@ -1,8 +1,13 @@
+#ifdef BUILD_DEBUGGER_SETUP
+#define BUILD_INTERCOSM_IO 1
+#elif DEBUG_DESYNCS
+#define BUILD_INTERCOSM_IO 1
+#else
+#define BUILD_INTERCOSM_IO 0
+#endif
+
 #include "application/intercosm.h"
 #include "game/cosmos/cosmic_functions.h"
-#include "application/intercosm_io.hpp"
-
-#include "augs/templates/introspection_utils/recursive_clear.h"
 
 #include "game/organization/all_messages_includes.h"
 #include "game/cosmos/change_common_significant.hpp"
@@ -16,19 +21,20 @@
 #include "test_scenes/scenes/minimal_scene.h"
 #include "test_scenes/test_scene_settings.h"
 
+#if BUILD_INTERCOSM_IO
+#include "application/intercosm_io.hpp"
+
 #include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/byte_file.h"
+#include "application/arena/arena_paths.h"
+#endif
 
 #include "game/modes/bomb_defusal.h"
 #include "game/modes/test_mode.h"
 
-#include "application/arena/arena_paths.h"
 #include "application/predefined_rulesets.h"
 
-static_assert(has_introspect_base_v<const entity_solvable<const controlled_character>>);
-static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_assets>);
-static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
-
+#if BUILD_INTERCOSM_IO
 void load_intercosm_and_rulesets(
 	const arena_paths& paths,
 	intercosm& scene,
@@ -43,17 +49,13 @@ void load_intercosm_and_rulesets(
 		/* Just let it happen */
 	}
 }
+#endif
 
 void snap_interpolated_to_logical(cosmos&);
 
 void intercosm::clear() {
 	cosmic::clear(world);
 	viewables.clear();
-
-#if 0
-	augs::recursive_clear(version);
-	version.commit_number = 0;
-#endif
 }
 
 void intercosm::populate_official_content(
@@ -149,10 +151,6 @@ void intercosm::make_test_scene(
 #endif
 }
 
-void intercosm::save_as_lua(const intercosm_path_op op) const {
-	augs::save_as_lua_table(op.lua, *this, op.path);
-}
-
 void intercosm::post_load_state_correction() {
 	world.change_common_significant([&](cosmos_common_significant& common) {
 		/*
@@ -170,6 +168,21 @@ void intercosm::post_load_state_correction() {
 	world.reinfer_everything();
 	snap_interpolated_to_logical(world);
 	world.request_resample();
+}
+
+
+void intercosm::update_offsets_of(const assets::image_id& id, const changer_callback_result result) {
+	world.change_common_significant(
+		[&](cosmos_common_significant& common) {
+			common.logical_assets.get_offsets(id) = viewables.image_definitions[id].meta.offsets;
+			return result;
+		}
+	);
+}
+
+#if BUILD_INTERCOSM_IO
+void intercosm::save_as_lua(const intercosm_path_op op) const {
+	augs::save_as_lua_table(op.lua, *this, op.path);
 }
 
 void intercosm::load_from_lua(const intercosm_path_op op) {
@@ -210,15 +223,12 @@ void intercosm::load_from_bytes(const intercosm_paths& paths) {
 	post_load_state_correction();
 }
 
-void intercosm::update_offsets_of(const assets::image_id& id, const changer_callback_result result) {
-	world.change_common_significant(
-		[&](cosmos_common_significant& common) {
-			common.logical_assets.get_offsets(id) = viewables.image_definitions[id].meta.offsets;
-			return result;
-		}
-	);
-}
+static_assert(has_introspect_base_v<const entity_solvable<const controlled_character>>);
+static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_assets>);
+static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
 
 static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::pool<int, make_vector, unsigned>>);
 static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::make_nontrivial_constant_vector, unsigned>>);
 static_assert(augs::has_lua_readwrite_overloads_v<make_entity_pool<controlled_character>>);
+
+#endif

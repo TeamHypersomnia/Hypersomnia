@@ -3,7 +3,6 @@
 #include "application/predefined_rulesets.h"
 #include "application/arena/mode_and_rules.h"
 
-#include "application/arena/arena_utils.h"
 #include "test_scenes/test_scene_settings.h"
 #include "view/game_drawing_settings.h"
 #include "application/setups/editor/project/editor_project_paths.h"
