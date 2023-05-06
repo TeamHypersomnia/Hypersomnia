@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- If something is shoot-through, character weapons shouldn't collide with it either
+
 - Investigate why is changing maps moving to spectator
     - same thing when entering playtesting
     - probably something with faction remapping

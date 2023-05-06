@@ -357,6 +357,7 @@ void setup_scene_object_from_resource(
 			}
 
 			sprite.neon_alpha_vibration = editable.neon_alpha_vibration;
+			sprite.vibrate_diffuse_too = editable.vibrate_diffuse_too;
 		}
 
 		if (auto animation = scene.template find<invariants::animation>()) {
@@ -394,6 +395,10 @@ void setup_scene_object_from_resource(
 
 			if (physical.is_throw_through) {
 				fixtures->filter.maskBits &= ~(1 << int(filter_category::FLYING));
+			}
+
+			if (physical.is_shoot_through) {
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::BULLET));
 			}
 
 			fixtures->collision_sound_strength_mult = physical.collision_sound_strength_mult;

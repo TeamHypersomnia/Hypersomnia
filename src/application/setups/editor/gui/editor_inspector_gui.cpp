@@ -372,6 +372,7 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& 
 	MULTIPROPERTY("Flip vertically", flip_vertically);
 
 	MULTIPROPERTY("Color", color);
+	MULTIPROPERTY("Neon color", neon_color);
 
 	MULTIPROPERTY("Resize", size.is_enabled);
 
@@ -947,6 +948,16 @@ EDIT_FUNCTION(
 
 			MULTIPROPERTY("Color neon", neon_color);
 
+			MULTIPROPERTY("Neon alpha vibration", neon_alpha_vibration.is_enabled);
+
+			if (insp.neon_alpha_vibration.is_enabled) {
+				auto indent = scoped_indent();
+				MULTIPROPERTY("Lower", neon_alpha_vibration.value.lower);
+				MULTIPROPERTY("Upper", neon_alpha_vibration.value.upper);
+				MULTIPROPERTY("Change per second", neon_alpha_vibration.value.change_per_second);
+				MULTIPROPERTY("Vibrate diffuse too", vibrate_diffuse_too);
+			}
+
 			std::optional<std::size_t> removed_i;
 
 			text("Click on the image to add neon light sources.");
@@ -1081,6 +1092,7 @@ EDIT_FUNCTION(
 		MULTIPROPERTY("Density", as_physical.density);
 		MULTIPROPERTY("Friction", as_physical.friction);
 		MULTIPROPERTY("Bounciness", as_physical.bounciness);
+		MULTIPROPERTY("Collision sound strength mult", as_physical.collision_sound_strength_mult);
 
 		MULTIPROPERTY("Is body static", as_physical.is_static);
 
@@ -1103,6 +1115,12 @@ EDIT_FUNCTION(
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, grenades and knives will freely fly over this object.\nBullets and characters will still collide.");
+		}
+
+		MULTIPROPERTY("Is shoot-through", as_physical.is_shoot_through);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If enabled, bullets will freely fly over this object.\nCharacters will still collide.");
 		}
 	}
 	else {

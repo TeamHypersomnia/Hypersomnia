@@ -37,6 +37,8 @@ void setup_entity_from_node(
 		sprite.colorize = editable.color;
 		sprite.colorize *= layer.editable.tint;
 
+		sprite.colorize_neon = editable.neon_color;
+
 		const auto opacity = layer.editable.opacity;
 
 		if (opacity != 1.0f) {
