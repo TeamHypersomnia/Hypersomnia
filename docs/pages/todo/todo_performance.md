@@ -5,6 +5,13 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Use callgrind to see what happens when the physics slows down due to hard calculations
+	- e.g. when character is stuck inside two colliders
+	- can e.g. spawn it in the red room on cyberaqua for a test
+
+- Debug the performance difference between native de_cyberaqua and the new de_cyberaqua
+	- around 1200-1400 fps on CT spawn on the old one, 800-1000 on the new one
+
 - Optimizing post-culling so Ad hoc atlas only holds resized down images (except the one previewed in some color/shape picker)
 	- ad_hoc_in_atlas_map can have get_unscaled_size instead of tarnishing the augs::atlas_entry
 		- But wait, what would we really use this method for?
