@@ -3,6 +3,10 @@
         "name": "de_cyberaqua",
         "version_timestamp": "2023-05-06 01:28:50.462132 UTC"
     },
+    "about": {
+        "author": "Pythagoras",
+        "short_description": "Underwater biotech lab is under attack.\nDon't let them lay hands on any expensive equipment."
+    },
     "settings": {
         "default_server_mode": "bomb_defusal",
         "ambient_light_color": [0, 67, 90, 255]
