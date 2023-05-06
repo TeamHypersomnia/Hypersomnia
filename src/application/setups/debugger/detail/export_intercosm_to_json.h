@@ -388,7 +388,7 @@ void export_intercosm_to_json(const debugger_command_input cmd_in) {
 
 				to.pos = transform.pos;
 				to.color = light.color;
-				to.falloff.radius = light.calc_reach_trimmed().bigger_side() / 10;
+				to.falloff.radius = light.calc_reach_trimmed().bigger_side() / 3;
 
 				node.unique_name = name;
 				project.nodes.pools.get_for<editor_light_node>().allocate(node);

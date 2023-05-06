@@ -137,7 +137,7 @@ namespace test_flavours {
 			test_scene_physical_material_id::METAL,
 			0.2f,
 			20.f
-		);
+		).template get<invariants::render>().layer = render_layer::FOREGROUND;
 
 		static_obstacle(
 			flavour_with_sprite(
@@ -148,7 +148,7 @@ namespace test_flavours {
 			test_scene_physical_material_id::METAL,
 			0.2f,
 			20.f
-		);
+		).template get<invariants::render>().layer = render_layer::FOREGROUND;
 
 		static_obstacle(
 			flavour_with_sprite(
@@ -159,7 +159,7 @@ namespace test_flavours {
 			test_scene_physical_material_id::METAL,
 			0.2f,
 			20.f
-		);
+		).template get<invariants::render>().layer = render_layer::FOREGROUND;
 
 		static_obstacle(
 			flavour_with_sprite(
@@ -170,7 +170,7 @@ namespace test_flavours {
 			test_scene_physical_material_id::METAL,
 			0.2f,
 			20.f
-		);
+		).template get<invariants::render>().layer = render_layer::FOREGROUND;
 
 		static_glass_obstacle(
 			flavour_with_sprite(

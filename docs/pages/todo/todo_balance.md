@@ -6,6 +6,9 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
+- Flashbangs should consider crosshair position rather than player position for calculating intensity
+	- This is especially important when we have sniper scopes
+
 - We could bind C to silently swap weapon between hands?
 
 - We should lock in the trajectory for the thrown grenade/knife the moment we press the hotkey for it

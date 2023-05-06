@@ -47,7 +47,7 @@ struct default_widget_handler {
 	}
 };
 
-#define EDIT_ATTENUATIONS 0
+#define EDIT_ATTENUATIONS 1
 
 #define PROPERTY(label, MEMBER) \
 edit_property(result, label, special_handler, insp.MEMBER);
@@ -692,6 +692,9 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 	ImGui::Separator();
 	text("Falloff");
 
+	MULTIPROPERTY("Radius", falloff.radius);
+	MULTIPROPERTY("Strength", falloff.strength);
+
 #if EDIT_ATTENUATIONS
 	thread_local editor_tweaked_widget_tracker tracker;
 	thread_local editor_light_falloff operated_falloff;
@@ -736,42 +739,41 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 		}
 	};
 
-	MULTIPROPERTY("Constant", falloff.constant);
-	rebalance_coeffs(
-		insp.falloff.constant,
+	if (auto scope = augs::imgui::scoped_tree_node_ex("Attenuations (advanced)")) {
+		MULTIPROPERTY("Constant", falloff.constant);
+		rebalance_coeffs(
+			insp.falloff.constant,
 
-		insp.falloff.linear,
-		insp.falloff.quadratic,
-		operated_falloff.linear,
-		operated_falloff.quadratic,
-		false
-	);
+			insp.falloff.linear,
+			insp.falloff.quadratic,
+			operated_falloff.linear,
+			operated_falloff.quadratic,
+			false
+		);
 
-	MULTIPROPERTY("Linear", falloff.linear);
-	rebalance_coeffs(
-		insp.falloff.linear,
+		MULTIPROPERTY("Linear", falloff.linear);
+		rebalance_coeffs(
+			insp.falloff.linear,
 
-		insp.falloff.constant,
-		insp.falloff.quadratic,
-		operated_falloff.constant,
-		operated_falloff.quadratic,
-		false
-	);
+			insp.falloff.constant,
+			insp.falloff.quadratic,
+			operated_falloff.constant,
+			operated_falloff.quadratic,
+			false
+		);
 
-	MULTIPROPERTY("Quadratic", falloff.quadratic);
-	rebalance_coeffs(
-		insp.falloff.quadratic,
+		MULTIPROPERTY("Quadratic", falloff.quadratic);
+		rebalance_coeffs(
+			insp.falloff.quadratic,
 
-		insp.falloff.constant,
-		insp.falloff.linear,
-		operated_falloff.constant,
-		operated_falloff.linear,
-		false
-	);
+			insp.falloff.constant,
+			insp.falloff.linear,
+			operated_falloff.constant,
+			operated_falloff.linear,
+			false
+		);
+	}
 #endif
-
-	MULTIPROPERTY("Radius", falloff.radius);
-	MULTIPROPERTY("Strength", falloff.strength);
 
 	MULTIPROPERTY("Custom falloff for walls", wall_falloff.is_enabled);
 
@@ -792,45 +794,47 @@ EDIT_FUNCTION(editor_light_node_editable& insp, T& es) {
 		if (insp.wall_falloff.is_enabled) {
 			auto ind = scoped_indent();
 
-#if EDIT_ATTENUATIONS
-			auto& edited_foff = insp.wall_falloff.value;
-
-			MULTIPROPERTY("Constant", wall_falloff.value.constant);
-			rebalance_coeffs(
-				edited_foff.constant,
-
-				edited_foff.linear,
-				edited_foff.quadratic,
-				operated_falloff.linear,
-				operated_falloff.quadratic,
-				true
-			);
-
-			MULTIPROPERTY("Linear", wall_falloff.value.linear);
-			rebalance_coeffs(
-				edited_foff.linear,
-
-				edited_foff.constant,
-				edited_foff.quadratic,
-				operated_falloff.constant,
-				operated_falloff.quadratic,
-				true
-			);
-
-			MULTIPROPERTY("Quadratic", wall_falloff.value.quadratic);
-			rebalance_coeffs(
-				edited_foff.quadratic,
-
-				edited_foff.constant,
-				edited_foff.linear,
-				operated_falloff.constant,
-				operated_falloff.linear,
-				true
-			);
-#endif
-
 			MULTIPROPERTY("Radius", wall_falloff.value.radius);
 			MULTIPROPERTY("Strength", wall_falloff.value.strength);
+
+#if EDIT_ATTENUATIONS
+			if (auto scope = augs::imgui::scoped_tree_node_ex("Attenuations (advanced)")) {
+				auto& edited_foff = insp.wall_falloff.value;
+
+				MULTIPROPERTY("Constant", wall_falloff.value.constant);
+				rebalance_coeffs(
+					edited_foff.constant,
+
+					edited_foff.linear,
+					edited_foff.quadratic,
+					operated_falloff.linear,
+					operated_falloff.quadratic,
+					true
+				);
+
+				MULTIPROPERTY("Linear", wall_falloff.value.linear);
+				rebalance_coeffs(
+					edited_foff.linear,
+
+					edited_foff.constant,
+					edited_foff.quadratic,
+					operated_falloff.constant,
+					operated_falloff.quadratic,
+					true
+				);
+
+				MULTIPROPERTY("Quadratic", wall_falloff.value.quadratic);
+				rebalance_coeffs(
+					edited_foff.quadratic,
+
+					edited_foff.constant,
+					edited_foff.linear,
+					operated_falloff.constant,
+					operated_falloff.linear,
+					true
+				);
+			}
+#endif
 		}
 	}
 
@@ -891,6 +895,7 @@ EDIT_FUNCTION(
 	//ImGui::Separator();
 
 	MULTIPROPERTY("Color", color);
+	MULTIPROPERTY("Neon color", neon_color);
 	//ImGui::Separator();
 	MULTIPROPERTY("Size", size);
 

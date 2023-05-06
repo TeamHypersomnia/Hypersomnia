@@ -31,8 +31,8 @@ namespace test_flavours {
 
 				footstep_effect_input effect;
 				effect.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_FLOOR);
-				effect.sound.modifier.gain = 1;
-				effect.sound.modifier.pitch = 1;
+				effect.sound.modifier.gain = 0.6;
+				effect.sound.modifier.pitch = 0.9;
 				effect.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
 
 				ground_def.footstep_effect.emplace(effect);
@@ -192,7 +192,7 @@ namespace test_flavours {
 
 			footstep_effect_input dirt;
 			dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_FLOOR);
-			dirt.sound.modifier.gain = 1.f;
+			dirt.sound.modifier.gain = 0.6f;
 			dirt.sound.modifier.pitch = 0.8f;
 			dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
 

@@ -519,6 +519,27 @@ namespace test_flavours {
 			1.0f
 		);
 
+		flavour_with_sound(
+			test_sound_decorations::FOOTSTEP_FENCE,
+			test_scene_sound_id::FOOTSTEP_FENCE,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1,
+			1.0f,
+			1.0f
+		);
+
+		flavour_with_sound(
+			test_sound_decorations::FOOTSTEP_STANDARD,
+			test_scene_sound_id::STANDARD_FOOTSTEP,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1,
+			1.0f,
+			1.0f
+		);
+
+
 		make_loop(flavour_with_sound(
 			test_sound_decorations::AQUARIUM_AMBIENCE_LEFT,
 			test_scene_sound_id::AQUARIUM_AMBIENCE_LEFT,
@@ -537,7 +558,7 @@ namespace test_flavours {
 			0.f
 		));
 
-		(flavour_with_sound(
+		make_loop(flavour_with_sound(
 			test_sound_decorations::POWERLINE_NOISE,
 			test_scene_sound_id::HUMMING_DISABLED,
 			augs::distance_model::LINEAR_DISTANCE_CLAMPED,
