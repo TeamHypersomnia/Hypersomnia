@@ -143,6 +143,7 @@ TEST_CASE("Pool UndoDeletes") {
 	}
 }
 
+#if !IS_PRODUCTION_BUILD
 template <class T>
 void test_pool() {
 	T p;
@@ -182,4 +183,5 @@ TEST_CASE("Pool Readwrite") {
 	test_pool<augs::pool<float, make_vector, unsigned char>>();
 }
 
+#endif
 #endif
