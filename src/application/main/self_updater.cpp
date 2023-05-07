@@ -936,6 +936,8 @@ self_update_result check_and_apply_updates(
 		augs::imgui::render();
 
 		if (window.has_value()) {
+			renderer.clear_current_fbo();
+
 			ensure(imgui_atlas.has_value());
 
 			if (imgui_atlas.has_value()) {
@@ -947,8 +949,6 @@ self_update_result check_and_apply_updates(
 					nullptr
 				);
 			}
-
-			renderer.clear_current_fbo();
 
 			rendering_result.clear();
 
