@@ -4,6 +4,8 @@
 #include "augs/network/network_types.h"
 
 struct cmd_line_params {
+	std::string live_log_path;
+
 	augs::path_type exe_path;
 	augs::path_type debugger_target;
 	augs::path_type editor_target;
@@ -102,6 +104,9 @@ struct cmd_line_params {
 				if (argc > 2) {
 					connect_address = argv[i++];
 				}
+			}
+			else if (a == "--live-log") {
+				live_log_path  = argv[i++];
 			}
 			else {
 

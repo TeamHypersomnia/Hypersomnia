@@ -115,6 +115,7 @@ bool log_to_live_file = false;
 std::string log_timestamp_format;
 
 extern std::mutex log_mutex;
+extern std::string live_log_path;
 
 #if PLATFORM_UNIX
 std::atomic<int> signal_status = 0;
@@ -245,20 +246,30 @@ work_result work(const int argc, const char* const * const argv) try {
 	{
 		std::unique_lock<std::mutex> lock(log_mutex);
 
-		::log_to_live_file = config.log_to_live_file;
+		if (config.log_to_live_file) {
+			/* Might have been set in main.cpp so do not disable it here */
+			::log_to_live_file = config.log_to_live_file;
+		}
+
 		::log_timestamp_format = config.log_timestamp_format;
-	}
-
-	if (config.log_to_live_file) {
-		augs::remove_file(get_path_in_log_files("live_debug.txt"));
-
-		LOG("Live log was enabled due to a flag in config.");
-		LOG("Live log file created at %x", augs::date_time().get_readable());
 	}
 
 	LOG("Parsing command-line parameters.");
 
 	const auto params = cmd_line_params(argc, argv);
+
+	if (::log_to_live_file) {
+		if (config.remove_live_log_file_on_start) {
+			augs::remove_file(::live_log_path);
+		}
+
+		if (config.log_to_live_file) {
+			LOG("Live log was enabled due to a flag in config.");
+		}
+		else if (params.live_log_path.size() > 0) {
+			LOG(std::string("Live log was enabled due to a flag: --live-log ") + params.live_log_path);
+		}
+	}
 
 	const auto fp_test_settings = [&]() {
 		auto result = config.float_consistency_test;

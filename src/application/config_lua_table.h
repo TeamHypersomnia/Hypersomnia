@@ -100,6 +100,7 @@ struct config_lua_table {
 	// GEN INTROSPECTOR struct config_lua_table
 	launch_type launch_on_game_start = launch_type::TEST_SCENE;
 	bool log_to_live_file = false;
+	bool remove_live_log_file_on_start = true;
 
 	std::string log_timestamp_format = std::string("[%m-%d-%y %H:%M:%S] ");
 

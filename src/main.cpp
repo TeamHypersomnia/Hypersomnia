@@ -13,6 +13,9 @@
 
 extern std::mutex log_mutex;
 
+extern std::string live_log_path;
+extern bool log_to_live_file;
+
 #ifdef __APPLE__   
 #include "CoreFoundation/CoreFoundation.h"
 #include <unistd.h>
@@ -113,6 +116,14 @@ int main(const int argc, const char* const * const argv) {
 		std::unique_lock<std::mutex> lock(log_mutex);
 
 		::current_app_type = params.type;
+
+		if (!params.live_log_path.empty()) {
+			::log_to_live_file = true;
+			::live_log_path = params.live_log_path;
+		}
+		else {
+			::live_log_path = ::get_path_in_log_files("live_debug.txt");
+		}
 	}
 
 	if (params.help_only) {

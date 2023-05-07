@@ -29,6 +29,7 @@ std::mutex log_mutex;
 
 extern bool log_to_live_file;
 extern std::string log_timestamp_format;
+std::string live_log_path;
 app_type current_app_type;
 
 std::string get_path_in_log_files(const std::string& name) {
@@ -158,7 +159,7 @@ void LOG_NOFORMAT(const std::string& s) {
 #endif
 
 		if (log_to_live_file) {
-			std::ofstream recording_file(get_path_in_log_files("live_debug.txt"), std::ios::out | std::ios::app);
+			std::ofstream recording_file(live_log_path, std::ios::out | std::ios::app);
 			recording_file << f << std::endl;
 		}
 	};
