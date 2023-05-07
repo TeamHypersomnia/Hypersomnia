@@ -291,18 +291,6 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::BOMBSITE_B);
-			invariants::box_marker marker;
-			marker.type = area_marker_type::BOMBSITE_DUMMY_B;
-
-			components::marker marker_meta;
-			marker_meta.faction = faction_type::RESISTANCE;
-
-			meta.set(marker);
-			meta.set(marker_meta);
-		}
-
-		{
 			auto& meta = get_test_flavour(flavours, test_box_markers::BUY_AREA);
 
 			invariants::box_marker marker;

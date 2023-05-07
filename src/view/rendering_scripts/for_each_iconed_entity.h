@@ -3,6 +3,20 @@
 #include "view/faction_view_settings.h"
 #include "game/detail/visible_entities.hpp"
 
+inline auto get_letter_icon(const marker_letter_type marker) {
+	using I = assets::necessary_image_id;
+
+	switch (marker) {
+		case marker_letter_type::A: return I::EDITOR_ICON_BOMBSITE_A;
+		case marker_letter_type::B: return I::EDITOR_ICON_BOMBSITE_B;
+		case marker_letter_type::C: return I::EDITOR_ICON_BOMBSITE_C;
+		case marker_letter_type::D: return I::EDITOR_ICON_BOMBSITE_D;
+
+		default:
+			return I::EDITOR_ICON_BOMBSITE_A;
+	}
+}
+
 struct marker_icon {
 	using I = assets::necessary_image_id;
 	I id = I::INVALID;
@@ -16,15 +30,7 @@ struct marker_icon {
 		const auto type = p.type;
 
 		if (type == area_marker_type::BOMBSITE) {
-			result.id = I::EDITOR_ICON_BOMBSITE_A;
-			result.col = get_faction_color(meta.faction);
-		}
-		else if (type == area_marker_type::BOMBSITE_DUMMY_B) {
-			result.id = I::EDITOR_ICON_BOMBSITE_B;
-			result.col = get_faction_color(meta.faction);
-		}
-		else if (type == area_marker_type::BOMBSITE_DUMMY_C) {
-			result.id = I::EDITOR_ICON_BOMBSITE_C;
+			result.id = get_letter_icon(meta.letter);
 			result.col = get_faction_color(meta.faction);
 		}
 		else if (type == area_marker_type::BUY_ZONE) {

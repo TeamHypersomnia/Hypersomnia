@@ -26,7 +26,7 @@ namespace components {
 
 		// GEN INTROSPECTOR struct components::marker
 		faction_type faction = faction_type::METROPOLIS;
-		pad_bytes<sizeof(item_flavour_id) + sizeof(int)> dummy_compat;
+		marker_letter_type letter = marker_letter_type::A;
 		// END GEN INTROSPECTOR
 	};
 }

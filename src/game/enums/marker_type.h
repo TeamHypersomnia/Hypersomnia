@@ -5,6 +5,7 @@ enum class marker_letter_type {
 	A,
 	B,
 	C,
+	D,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -21,8 +22,6 @@ enum class point_marker_type {
 enum class area_marker_type {
 	// GEN INTROSPECTOR enum class area_marker_type
 	BOMBSITE,
-	BOMBSITE_DUMMY_B,
-	BOMBSITE_DUMMY_C,
 	BUY_ZONE,
 
 	ORGANISM_AREA,
@@ -33,10 +32,5 @@ enum class area_marker_type {
 };
 
 inline bool is_bombsite(const area_marker_type t) {
-	switch(t) {
-		case area_marker_type::BOMBSITE: return true;
-		case area_marker_type::BOMBSITE_DUMMY_B: return true;
-		case area_marker_type::BOMBSITE_DUMMY_C: return true;
-		default: return false;
-	}
+	return t == area_marker_type::BOMBSITE;
 }

@@ -104,7 +104,7 @@ void setup_entity_from_node(
 	else if constexpr(is_one_of_v<N, editor_point_marker_node, editor_area_marker_node>) {
 		auto& marker = agg.template get<components::marker>();
 		marker.faction = editable.faction;
-		// TODO: add letter to the fields once we can freely modify cosmos ABI
+		marker.letter = editable.letter;
 	}
 
 	if (auto geo = agg.template find<components::overridden_geo>()) {
