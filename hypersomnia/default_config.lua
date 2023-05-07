@@ -2,7 +2,8 @@ return {
   launch_on_game_start = "MAIN_MENU",
   log_to_live_file = false,
 
-  log_timestamp_format = "[%d-%m-%y %H:%M:%S] ",
+  log_timestamp_format = "[%H:%M:%S] ",
+  --log_timestamp_format = "[%d-%m-%y %H:%M:%S] ",
   --log_timestamp_format = "",
 
   server_list_provider = {
@@ -752,7 +753,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 	send_heartbeat_to_server_list_once_every_secs = 10,
 	resolve_server_list_address_once_every_secs = 60,
     sleep_mult = 0.1,
-    log_performance_once_every_secs = 1,
+    log_performance_once_every_secs = 0,
 
 	kick_if_no_network_payloads_for_secs = 10,
 	move_to_spectators_if_afk_for_secs = 120,
