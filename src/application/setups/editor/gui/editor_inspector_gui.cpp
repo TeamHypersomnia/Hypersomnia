@@ -267,6 +267,16 @@ bool edit_property(
 				return false;
 			}
 		}
+		else if constexpr(std::is_same_v<uint16_t, T>) {
+			if (label.find("Num particles") != std::string::npos) {
+				if (slider(label, property, uint16_t(0u), MAX_WANDERING_PIXELS)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+		}
 
 		if (drag(label, property)) { 
 			result = typesafe_sprintf("Set %x to %x in %x", label, property);
@@ -1094,7 +1104,7 @@ EDIT_FUNCTION(
 		MULTIPROPERTY("Bounciness", as_physical.bounciness);
 		MULTIPROPERTY("Collision sound strength mult", as_physical.collision_sound_strength_mult);
 
-		MULTIPROPERTY("Is body static", as_physical.is_static);
+		MULTIPROPERTY("Immovable", as_physical.is_static);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, will be permanently set in place.\nWon't move no matter what.\nUse it on layout-defining walls and objects.");
@@ -1105,19 +1115,19 @@ EDIT_FUNCTION(
 			MULTIPROPERTY("Angular damping", as_physical.angular_damping);
 		}
 
-		MULTIPROPERTY("Is see-through", as_physical.is_see_through);
+		MULTIPROPERTY("See-through", as_physical.is_see_through);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, lets the light through.\nEnemies will be visible behind this object.\nUse it on walls of glass.");
 		}
 
-		MULTIPROPERTY("Is throw-through", as_physical.is_throw_through);
+		MULTIPROPERTY("Grenades fly over", as_physical.is_throw_through);
 
 		if (ImGui::IsItemHovered()) {
-			text_tooltip("If enabled, grenades and knives will freely fly over this object.\nBullets and characters will still collide.");
+			text_tooltip("If enabled, grenades will freely fly over this object.\nBullets and characters will still collide.");
 		}
 
-		MULTIPROPERTY("Is shoot-through", as_physical.is_shoot_through);
+		MULTIPROPERTY("Bullets fly over", as_physical.is_shoot_through);
 
 		if (ImGui::IsItemHovered()) {
 			text_tooltip("If enabled, bullets will freely fly over this object.\nCharacters will still collide.");

@@ -5984,3 +5984,4 @@ This will discard your redo history."
         - or just straight make it private and require access struct
 
 - log timestamps
+- Fix wandering pixels crash

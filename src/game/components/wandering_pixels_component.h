@@ -3,11 +3,13 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/pad_bytes.h"
 
+constexpr uint16_t MAX_WANDERING_PIXELS = 5000;
+
 namespace components {
 	struct wandering_pixels {
 		// GEN INTROSPECTOR struct components::wandering_pixels
 		rgba color = white;
-		unsigned num_particles = 0u;
+		uint16_t num_particles = 0u;
 		bool force_particles_within_bounds = false;
 		bool illuminate = false;
 		pad_bytes<2> pad;

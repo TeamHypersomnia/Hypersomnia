@@ -51,7 +51,7 @@ namespace augs {
 				out = static_cast<bool>(from.GetUint());
 			}
 		}
-		else if constexpr(std::is_same_v<T, uint8_t> || std::is_same_v<T, unsigned char>) {
+		else if constexpr(std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t> || std::is_same_v<T, unsigned char>) {
 			if (from.IsUint()) {
 				out = static_cast<T>(from.GetUint());
 			}

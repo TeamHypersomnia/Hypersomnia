@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix callouts rendering
+
+- rcon password should be *
+
 - If something is shoot-through, character weapons shouldn't collide with it either
 
 - Investigate why is changing maps moving to spectator
