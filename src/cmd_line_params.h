@@ -57,7 +57,6 @@ struct cmd_line_params {
 			}
 			else if (a == "--upgraded-successfully") {
 				upgraded_successfully = true;
-				suppress_server_webhook = true;
 			}
 			else if (a == "--dedicated-server") {
 				type = app_type::DEDICATED_SERVER;
