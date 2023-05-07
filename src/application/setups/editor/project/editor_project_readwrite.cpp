@@ -620,6 +620,11 @@ namespace editor_project_readwrite {
 						writer.Key("type");
 						writer.String(pseudoid);
 
+						if (typed_node.active != defaults.active) {
+							writer.Key("active");
+							writer.Bool(typed_node.active);
+						}
+
 						::setup_node_defaults(defaults.editable, *resource);
 
 						/* 
@@ -1056,6 +1061,10 @@ namespace editor_project_readwrite {
 								auto& pool = loaded.nodes.pools.get_for<node_type>();
 
 								const auto [new_raw_id, new_node] = pool.allocate();
+
+								if (const auto maybe_active = GetIf<bool>(json_node, "active")) {
+									new_node.active = *maybe_active;
+								}
 
 								new_node.resource_id = typed_resource_id;
 								new_node.unique_name = id;
