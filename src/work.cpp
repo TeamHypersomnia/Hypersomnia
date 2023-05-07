@@ -112,6 +112,9 @@
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
+std::string log_timestamp_format;
+
+extern std::mutex log_mutex;
 
 #if PLATFORM_UNIX
 std::atomic<int> signal_status = 0;
@@ -239,10 +242,15 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	auto& config = *config_ptr;
 
+	{
+		std::unique_lock<std::mutex> lock(log_mutex);
+
+		::log_to_live_file = config.log_to_live_file;
+		::log_timestamp_format = config.log_timestamp_format;
+	}
+
 	if (config.log_to_live_file) {
 		augs::remove_file(get_path_in_log_files("live_debug.txt"));
-
-		log_to_live_file = true;
 
 		LOG("Live log was enabled due to a flag in config.");
 		LOG("Live log file created at %x", augs::date_time().get_readable());

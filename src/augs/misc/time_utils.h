@@ -20,6 +20,7 @@ namespace augs {
 		}
 
 		std::string get_readable() const;
+		std::string get_readable_format(const char* fmt) const;
 		std::string get_readable_day_hour() const;
 		std::string get_readable_for_file() const;
 

@@ -11,6 +11,8 @@
 #include "cmd_line_params.h"
 #include "build_info.h"
 
+extern std::mutex log_mutex;
+
 #ifdef __APPLE__   
 #include "CoreFoundation/CoreFoundation.h"
 #include <unistd.h>
@@ -107,7 +109,11 @@ int main(const int argc, const char* const * const argv) {
 #endif
 	}
 
-	::current_app_type = params.type;
+	{
+		std::unique_lock<std::mutex> lock(log_mutex);
+
+		::current_app_type = params.type;
+	}
 
 	if (params.help_only) {
 		std::cout << get_help_section() << std::endl;

@@ -2,6 +2,9 @@ return {
   launch_on_game_start = "MAIN_MENU",
   log_to_live_file = false,
 
+  log_timestamp_format = "[%d-%m-%y %H:%M:%S] ",
+  --log_timestamp_format = "",
+
   server_list_provider = {
 	  address = "masterserver.hypersomnia.xyz",
 	  default_port = 8420

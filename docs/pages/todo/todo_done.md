@@ -5983,3 +5983,4 @@ This will discard your redo history."
         - and ensure we don't do it anywhere else
         - or just straight make it private and require access struct
 
+- log timestamps

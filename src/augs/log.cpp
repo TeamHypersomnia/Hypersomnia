@@ -9,6 +9,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/string/string_templates.h"
 #include "augs/log_path_getters.h"
+#include "augs/misc/time_utils.h"
 
 #if PLATFORM_UNIX
 #define OUTPUT_TO_STDOUT 1
@@ -27,6 +28,7 @@
 std::mutex log_mutex;
 
 extern bool log_to_live_file;
+extern std::string log_timestamp_format;
 app_type current_app_type;
 
 std::string get_path_in_log_files(const std::string& name) {
@@ -145,21 +147,29 @@ std::string program_log::get_complete() const {
 	return logs;
 }
 
-void LOG_NOFORMAT(const std::string& f) {
+void LOG_NOFORMAT(const std::string& s) {
 #if ENABLE_LOG 
 	std::unique_lock<std::mutex> lock(log_mutex);
 
-	program_log::get_current().push_entry({ f });
-
+	auto lg = [&](const auto& f) {
+		program_log::get_current().push_entry({ f });
 #if OUTPUT_TO_STDOUT
-	std::cout << f << std::endl;
+		std::cout << f << std::endl;
 #endif
 
-	if (log_to_live_file) {
-		std::ofstream recording_file(get_path_in_log_files("live_debug.txt"), std::ios::out | std::ios::app);
-		recording_file << f << std::endl;
+		if (log_to_live_file) {
+			std::ofstream recording_file(get_path_in_log_files("live_debug.txt"), std::ios::out | std::ios::app);
+			recording_file << f << std::endl;
+		}
+	};
+
+	if (log_timestamp_format.empty()) {
+		lg(s);
+	}
+	else {
+		lg(augs::date_time().get_readable_format(::log_timestamp_format.c_str()) + s);
 	}
 #else
-	(void)f;
+	(void)s;
 #endif
 }

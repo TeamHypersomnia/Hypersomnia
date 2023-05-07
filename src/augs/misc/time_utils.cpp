@@ -139,19 +139,21 @@ std::optional<std::chrono::system_clock::time_point> augs::date_time::from_utc_t
 }
 #endif
 
-std::string augs::date_time::get_readable_for_file() const {
+std::string augs::date_time::get_readable_format(const char* fmt) const {
 	std::tm local_time = *std::localtime(&t);
-	return typesafe_sprintf("%x", std::put_time(&local_time, "%y.%m.%d at %H-%M-%S"));
+	return typesafe_sprintf("%x", std::put_time(&local_time, fmt));
+}
+
+std::string augs::date_time::get_readable_for_file() const {
+	return get_readable_format("%y.%m.%d at %H-%M-%S");
 }
 
 std::string augs::date_time::get_readable_day_hour() const {
-	std::tm local_time = *std::localtime(&t);
-	return typesafe_sprintf("%x", std::put_time(&local_time, "%m-%d-%y %H:%M:%S"));
+	return get_readable_format("%d-%m-%y %H:%M:%S");
 }
 
 std::string augs::date_time::get_readable() const {
-	std::tm local_time = *std::localtime(&t);
-	return typesafe_sprintf("%x", std::put_time(&local_time, "%H:%M:%S on %m.%d.%y"));
+	return get_readable_format("%H:%M:%S on %d.%m.%y");
 }
 
 std::string augs::date_time::how_long_ago() const {

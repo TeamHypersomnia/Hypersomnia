@@ -101,6 +101,8 @@ struct config_lua_table {
 	launch_type launch_on_game_start = launch_type::TEST_SCENE;
 	bool log_to_live_file = false;
 
+	std::string log_timestamp_format = std::string("[%m-%d-%y %H:%M:%S] ");
+
 	float_consistency_test_settings float_consistency_test;
 
 	address_and_port server_list_provider;
