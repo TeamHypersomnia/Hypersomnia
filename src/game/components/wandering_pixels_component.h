@@ -3,7 +3,7 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/pad_bytes.h"
 
-constexpr uint16_t MAX_WANDERING_PIXELS = 5000;
+constexpr uint16_t MAX_WANDERING_PIXELS = 10000;
 
 namespace components {
 	struct wandering_pixels {
