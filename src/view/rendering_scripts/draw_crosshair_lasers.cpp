@@ -140,7 +140,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				cosm.get_si(),
 				line_from,
 				line_to,
-				predefined_queries::crosshair_laser_except_characters(),
+				predefined_queries::crosshair_laser(),
 				subject
 			);
 

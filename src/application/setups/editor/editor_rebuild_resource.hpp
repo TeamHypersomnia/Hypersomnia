@@ -399,6 +399,7 @@ void setup_scene_object_from_resource(
 
 			if (physical.is_shoot_through) {
 				fixtures->filter.maskBits &= ~(1 << int(filter_category::BULLET));
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::CHARACTER_WEAPON));
 			}
 
 			fixtures->collision_sound_strength_mult = physical.collision_sound_strength_mult;

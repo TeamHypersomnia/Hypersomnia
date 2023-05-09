@@ -11,7 +11,19 @@ static auto make_flags(Args... enums) {
 }
 
 static auto standard_participation_bitset() {
-	return augs::enum_bitset<C>(C::QUERY, C::BULLET, C::WALL, C::CHARACTER, C::LYING_ITEM, C::GROUND, C::FLYING, C::TRIGGER, C::SHELL, C::GLASS_OBSTACLE);
+	return augs::enum_bitset<C>(
+		C::QUERY,
+		C::BULLET,
+		C::WALL,
+		C::CHARACTER,
+		C::CHARACTER_WEAPON,
+		C::LYING_ITEM,
+		C::GROUND,
+		C::FLYING,
+		C::TRIGGER,
+		C::SHELL,
+		C::GLASS_OBSTACLE
+	);
 }
 
 static auto standard_participation() {
@@ -35,15 +47,8 @@ namespace predefined_queries {
 
 	b2Filter crosshair_laser() {
 		b2Filter out;
-		out.categoryBits = make_flags(C::QUERY);
+		out.categoryBits = make_flags(C::BULLET);
 		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE, C::CHARACTER);
-		return out;
-	}
-
-	b2Filter crosshair_laser_except_characters() {
-		b2Filter out;
-		out.categoryBits = make_flags(C::QUERY);
-		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE);
 		return out;
 	}
 
@@ -97,6 +102,12 @@ predefined_filters::predefined_filters() {
 	}
 	{
 
+		auto& out = filters[predefined_filter_type::CHARACTER_WEAPON];
+		out.categoryBits = make_flags(C::CHARACTER_WEAPON);
+		out.maskBits = standard_participation_except();
+	}
+	{
+
 		auto& out = filters[predefined_filter_type::GROUND];
 		out.categoryBits = make_flags(C::GROUND);
 		out.maskBits = standard_participation_except(C::FLYING);
@@ -105,7 +116,7 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::LYING_ITEM];
 		out.categoryBits = make_flags(C::LYING_ITEM);
-		out.maskBits = standard_participation_except(C::CHARACTER);
+		out.maskBits = standard_participation_except(C::CHARACTER, C::CHARACTER_WEAPON);
 	}
 	{
 
@@ -123,7 +134,7 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::SHELL];
 		out.categoryBits = make_flags(C::SHELL);
-		out.maskBits = standard_participation_except(C::BULLET, C::FLYING, C::TRIGGER);
+		out.maskBits = standard_participation_except(C::BULLET, C::FLYING, C::TRIGGER, C::CHARACTER_WEAPON);
 	}
 	{
 

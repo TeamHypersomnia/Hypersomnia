@@ -11,6 +11,7 @@ enum class filter_category {
 	BULLET,
 	WALL,
 	CHARACTER,
+	CHARACTER_WEAPON,
 	LYING_ITEM,
 	GROUND,
 	FLYING,
@@ -27,7 +28,6 @@ namespace predefined_queries {
 	filter_type melee_query();
 	filter_type melee_solid_obstacle_query();
 	filter_type crosshair_laser();
-	filter_type crosshair_laser_except_characters();
 	filter_type pathfinding();
 	filter_type renderable();
 	filter_type force_explosion();
@@ -37,6 +37,7 @@ enum class predefined_filter_type {
 	// GEN INTROSPECTOR enum class predefined_filter_type
 	WALL,
 	CHARACTER,
+	CHARACTER_WEAPON,
 	GROUND,
 	LYING_ITEM,
 	FLYING_BULLET,
