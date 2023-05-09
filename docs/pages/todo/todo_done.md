@@ -5987,3 +5987,4 @@ This will discard your redo history."
 - Fix wandering pixels crash
 - also censor in demo files (should show server names anyway)
 - send heartbeat on map change
+- remove legacy gui code and reliable channel cpp

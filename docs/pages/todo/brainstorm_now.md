@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- remove legacy gui code and reliable channel cpp
 - Simple event system
     - First usecase: Teleports and Playing sounds
     - Best to be able to attach it to any entity
