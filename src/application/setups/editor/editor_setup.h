@@ -284,7 +284,7 @@ public:
 
 	editor_layer* find_layer(const std::string& name);
 	const editor_layer* find_layer(const std::string& name) const;
-	void create_new_layer(const std::string& name_pattern = "New layer");
+	void create_new_layer(const std::string& name_pattern = "Layer");
 
 	std::string get_free_layer_name() const;
 	std::string get_free_layer_name_for(const std::string& name_pattern) const;

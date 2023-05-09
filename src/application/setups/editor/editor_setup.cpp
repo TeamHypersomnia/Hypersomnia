@@ -1696,15 +1696,18 @@ std::string editor_setup::get_free_node_name_for(const std::string& new_name) co
 }
 
 std::string editor_setup::get_free_layer_name_for(const std::string& name_pattern) const {
+	const bool is_default = name_pattern == "Layer";
 	return augs::first_free_string(
 		name_pattern, 
 		" %x", 
-		[this](const auto& candidate){ return nullptr == find_layer(candidate); }
+		[this](const auto& candidate){ return nullptr == find_layer(candidate); },
+		is_default,
+		is_default ? 1 : 0
 	);
 }
 
 std::string editor_setup::get_free_layer_name() const {
-	return get_free_layer_name_for("New layer");
+	return get_free_layer_name_for("Layer");
 }
 
 

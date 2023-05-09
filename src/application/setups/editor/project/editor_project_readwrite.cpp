@@ -1127,7 +1127,7 @@ namespace editor_project_readwrite {
 				}
 
 				editor_layer layer;
-				layer.unique_name = "New layer";
+				layer.unique_name = "Layer 1";
 				layer.hierarchy.nodes = std::move(fallback_node_order);
 
 				nodes_registered = layer.hierarchy.nodes.size();
