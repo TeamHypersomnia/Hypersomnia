@@ -1530,7 +1530,8 @@ void settings_gui_state::perform(
 					revertable_checkbox(SCOPE_CFG_NVP(log_solvable_hashes));
 				}
 
-				revertable_checkbox("Show developer console", config.session.show_developer_console);
+				revertable_checkbox("Show performance", config.session.show_performance);
+				revertable_checkbox("Show logs", config.session.show_performance);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);
 				revertable_slider("Camera query aabb mult", config.session.camera_query_aabb_mult, 0.10f, 5.f);
 				

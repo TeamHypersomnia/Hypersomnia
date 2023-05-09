@@ -88,7 +88,8 @@ return {
   },
 
   app_controls = {
-    F1 = "SHOW_DEVELOPER_DETAILS"
+    F1 = "SHOW_PERFORMANCE",
+    F12 = "SHOW_LOGS"
   },
 
   game_controls = {
@@ -647,7 +648,8 @@ treat_as_music_sounds_longer_than_secs = 5,
   },
   session = {
     hide_settings_ingame = true,
-    show_developer_console = false,
+    show_performance = false,
+    show_logs = false,
     camera_query_aabb_mult = 1.0
   },
   test_scene = {

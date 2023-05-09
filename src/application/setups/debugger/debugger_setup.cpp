@@ -1201,11 +1201,6 @@ bool debugger_setup::handle_input_before_imgui(
 				}
 			}
 
-			switch (k) {
-				case key::F12: save_as(window); return true;
-				default: break;
-			}
-
 			if (has_shift) {
 				switch (k) {
 					case key::F5: fill_with_test_scene(); return true;

@@ -1831,10 +1831,27 @@ work_result work(const int argc, const char* const * const argv) try {
 		using T = decltype(intent);
 
 		switch (intent) {
-			case T::SHOW_DEVELOPER_DETAILS: {
+			case T::SHOW_PERFORMANCE: {
 				change_with_save([&](config_lua_table& cfg) {
-					bool& f = cfg.session.show_developer_console;
+					bool& f = cfg.session.show_performance;
 					f = !f;
+
+					if (f) {
+						cfg.session.show_logs = false;
+					}
+				});
+
+				break;
+			}
+
+			case T::SHOW_LOGS: {
+				change_with_save([&](config_lua_table& cfg) {
+					bool& f = cfg.session.show_logs;
+					f = !f;
+
+					if (f) {
+						cfg.session.show_performance = false;
+					}
 				});
 
 				break;
@@ -3231,7 +3248,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				);
 			};
 
-			auto show_developer_details = [&](augs::renderer& chosen_renderer) {
+			auto show_performance_details = [&](augs::renderer& chosen_renderer) {
 				auto scope = measure_scope(game_thread_performance.debug_details);
 
 				const auto viewed_character = get_viewed_character();
@@ -3248,12 +3265,20 @@ work_result work(const int argc, const char* const * const argv) try {
 					get_audiovisuals().performance
 				);
 
-				draw_debug_details(
+				::show_performance_details(
 					get_drawer_for(chosen_renderer),
 					streaming.get_loaded_gui_fonts().gui,
 					screen_size,
 					viewed_character,
 					debug_summaries
+				);
+			};
+
+			auto show_recent_logs = [&](augs::renderer& chosen_renderer) {
+				::show_recent_logs(
+					get_drawer_for(chosen_renderer),
+					streaming.get_loaded_gui_fonts().gui,
+					screen_size
 				);
 			};
 
@@ -3418,14 +3443,22 @@ work_result work(const int argc, const char* const * const argv) try {
 				do_flash_afterimage(chosen_renderer);
 			};
 
-			auto show_developer_details_job = [&]() {
-				show_developer_details(debug_details_renderer);
+			auto show_performance_details_job = [&]() {
+				show_performance_details(debug_details_renderer);
+			};
+
+			auto show_recent_logs_job = [&]() {
+				show_recent_logs(debug_details_renderer);
 			};
 
 			enqueue_visibility_jobs();
 
-			if (new_viewing_config.session.show_developer_console) {
-				thread_pool.enqueue(show_developer_details_job);
+			if (new_viewing_config.session.show_performance) {
+				thread_pool.enqueue(show_performance_details_job);
+			}
+
+			if (new_viewing_config.session.show_logs) {
+				thread_pool.enqueue(show_recent_logs_job);
 			}
 
 			if (non_zero_cosmos) {
@@ -3538,7 +3571,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		configurables.apply_main_thread(get_read_buffer().new_settings);
 		configurables.sync_back_into(config);
 
-		if (config.session.show_developer_console) {
+		if (config.session.show_performance) {
 			const auto viewed_character = get_viewed_character();
 
 			viewed_character.get_cosmos().profiler.prepare_summary_info();

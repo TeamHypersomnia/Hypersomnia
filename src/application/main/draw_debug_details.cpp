@@ -82,7 +82,22 @@ void debug_details_summaries::acquire(
 	}
 }
 
-void draw_debug_details(
+void show_recent_logs(
+	const augs::drawer output,
+	const augs::baked_font& gui_font,
+	const vec2i screen_size
+) {
+	(void)screen_size;
+	const auto max_lines = 30;
+
+	print(
+		output, 
+		vec2i(9, 0),
+		augs::gui::text::format_recent_program_log(gui_font, max_lines).mult_alpha(150.f / 255)
+	);
+}
+
+void show_performance_details(
 	const augs::drawer output,
 	const augs::baked_font& gui_font,
 	const vec2i screen_size,
@@ -91,20 +106,9 @@ void draw_debug_details(
 ) {
 	using namespace augs::gui::text;
 
-	const auto log_line_width = 600;
+	const auto av_line_width = 500;
 	const auto net_line_width = 400;
-	const auto cosm_line_width = 400;
-
-	{
-		const auto max_lines = 30;
-
-		print(
-			output, 
-			vec2i(screen_size.x - log_line_width, 0),
-			augs::gui::text::format_recent_program_log(gui_font, max_lines).mult_alpha(150.f / 255),
-			log_line_width
-		);
-	}
+	const auto cosm_line_width = 500;
 
 	thread_local auto total_details = formatted_string();
 	total_details.clear();
@@ -169,17 +173,21 @@ void draw_debug_details(
 	total_details += { "Frame\n", category_style };
 	total_details += { summaries.frame, text_style };
 
-
-	total_details += { "Audiovisual\n", category_style };
-	total_details += { summaries.audiovisual, text_style };
-
-	total_details += { "Viewables streaming\n", category_style };
-	total_details += { summaries.streaming, text_style };
-
-	total_details += { "General atlas\n", category_style };
-	total_details += { summaries.general_atlas, text_style };
-
 	print(output, { 0, 0 }, total_details);
+
+	{
+		total_details.clear();
+
+		total_details += { "Cosmos\n", category_style };
+		total_details += { summaries.cosmic, text_style };
+
+		print(
+			output, 
+			{ screen_size.x - net_line_width - cosm_line_width - av_line_width, 0 }, 
+			total_details, 
+			cosm_line_width
+		);
+	}
 
 	{
 		total_details.clear();
@@ -199,7 +207,7 @@ void draw_debug_details(
 
 		print(
 			output, 
-			{ screen_size.x - log_line_width - net_line_width, 0 }, 
+			{ screen_size.x - net_line_width - av_line_width, 0 }, 
 			total_details, 
 			net_line_width
 		);
@@ -208,14 +216,20 @@ void draw_debug_details(
 	{
 		total_details.clear();
 
-		total_details += { "Cosmos\n", category_style };
-		total_details += { summaries.cosmic, text_style };
+		total_details += { "Audiovisual\n", category_style };
+		total_details += { summaries.audiovisual, text_style };
+
+		total_details += { "Viewables streaming\n", category_style };
+		total_details += { summaries.streaming, text_style };
+
+		total_details += { "General atlas\n", category_style };
+		total_details += { summaries.general_atlas, text_style };
 
 		print(
 			output, 
-			{ screen_size.x - log_line_width - net_line_width - cosm_line_width, 0 }, 
+			{ screen_size.x - av_line_width, 0 }, 
 			total_details, 
-			cosm_line_width
+			av_line_width
 		);
 	}
 

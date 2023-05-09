@@ -40,10 +40,16 @@ struct debug_details_summaries {
 	);
 };
 
-void draw_debug_details(
+void show_performance_details(
 	const augs::drawer output,
 	const augs::baked_font& gui_font,
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
 	const debug_details_summaries&
+);
+
+void show_recent_logs(
+	const augs::drawer output,
+	const augs::baked_font& gui_font,
+	const vec2i screen_size
 );

@@ -3607,7 +3607,7 @@ which can be done from Settings->Reset all settings to factory default.
 		game_gui_job();
 		post_game_gui();
 
-		show_developer_details()
+		show_performance_details()
 
 		join all
 
