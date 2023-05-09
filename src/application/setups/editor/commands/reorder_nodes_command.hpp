@@ -23,6 +23,10 @@ inline void reorder_nodes_command::undo(editor_command_input in) {
 	original_orders.clear();
 
 	in.setup.inspect_only(nodes_to_move);
+
+	if (!in.skip_inspector) {
+		in.setup.scroll_once_to(nodes_to_move[0]);
+	}
 }
 
 inline void reorder_nodes_command::redo(editor_command_input in) {
@@ -56,10 +60,14 @@ inline void reorder_nodes_command::redo(editor_command_input in) {
 
 		target_layer_id = create_layer->get_allocated_id();
 
-		in.setup.scroll_once_to(target_layer_id);
+		if (!in.skip_inspector) {
+			in.setup.scroll_once_to(target_layer_id);
+		}
 	}
 	else {
-		in.setup.scroll_once_to(nodes_to_move[0]);
+		if (!in.skip_inspector) {
+			in.setup.scroll_once_to(nodes_to_move[0]);
+		}
 	}
 
 	auto target_layer = in.setup.find_layer(target_layer_id);

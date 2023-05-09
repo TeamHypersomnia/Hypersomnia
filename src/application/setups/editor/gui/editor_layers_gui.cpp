@@ -270,7 +270,8 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		in.dragged_resource.unset();
 	};
 
-	auto accept_dragged_nodes = [&](
+	auto move_nodes_to_layer = [&](
+		editor_node_id anchor_node_id, 
 		editor_layer_id target_layer_id, 
 		const std::size_t target_index
 	) {
@@ -281,16 +282,23 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		command.target_layer_id = target_layer_id;
 		command.target_index = target_index;
 
-		if (in.setup.is_inspected(dragged_node) && all_inspected.size() > 1) {
+		if (in.setup.is_inspected(anchor_node_id) && all_inspected.size() > 1) {
 			command.nodes_to_move = all_inspected;
 			command.built_description = typesafe_sprintf("Reordered %x nodes", all_inspected.size());
 		}
 		else {
-			command.nodes_to_move = { dragged_node };
-			command.built_description = typesafe_sprintf("Reordered %x", in.setup.get_name(dragged_node));
+			command.nodes_to_move = { anchor_node_id };
+			command.built_description = typesafe_sprintf("Reordered %x", in.setup.get_name(anchor_node_id));
 		}
 
 		in.setup.post_new_command(command);
+	};
+
+	auto accept_dragged_nodes = [&](
+		editor_layer_id target_layer_id, 
+		const std::size_t target_index
+	) {
+		move_nodes_to_layer(dragged_node, target_layer_id, target_index);
 	};
 
 	auto accept_dragged_layers = [&](
@@ -337,10 +345,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 		const int node_level = 1;
 
 		const bool node_disabled = !node.active || !layer.is_active();
-
-		if (node_disabled) {
-			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
-		}
 
 		{
 			const auto before_pos = ImGui::GetCursorPos();
@@ -485,11 +489,56 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 				}
 
+				bool skip_scroll = false;
 				if (ImGui::BeginPopupContextItem()) {
 					//in.setup.inspect_only(node_id);
 
 					if (ImGui::Selectable("Rename (F2)")) {
 						rename_this_node = true;
+					}
+
+					if (ImGui::BeginMenu("Move to layer...")) {
+						const auto& ordered = in.setup.get_layers();
+
+						thread_local ImGuiTextFilter layer_filter;
+
+						filter_with_hint(layer_filter, "##LayersFilter", "Filter layers...");
+
+						for (const editor_layer_id lid : ordered) {
+							auto layer = in.setup.find_layer(lid);
+
+							ensure(layer != nullptr);
+
+							if (layer == nullptr) {
+								continue;
+							}
+
+							const auto name = layer->get_display_name();
+
+							if (layer_filter.IsActive() && !layer_filter.PassFilter(name.c_str())) {
+								continue;
+							}
+
+							const bool highlight = layer_id == lid;
+
+							auto colored_selectable = scoped_selectable_colors(highlight ? inspected_cols : bg_cols);
+
+							auto disabled = maybe_disabled_only_cols(!layer->is_active());
+
+							if (ImGui::Selectable(name.c_str(), highlight)) {
+								move_nodes_to_layer(node_id, lid, 0);
+								layer->is_open = true;
+								in.setup.scroll_once_to(node_id);
+								skip_scroll = true;
+							}
+
+							if (const bool layer_is_empty = layer->hierarchy.nodes.empty()) {
+								ImGui::SameLine();
+								text_disabled("(empty)");
+							}
+						}
+
+						ImGui::EndMenu();
 					}
 
 					if constexpr(std::is_same_v<T, editor_prefab_node>) {
@@ -513,10 +562,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					entity_to_highlight = in.setup.to_entity_id(node_id);
 				}
 
-				if (scroll_once_to == inspected_variant(node_id)) {
-					scroll_once_to = std::nullopt;
+				if (!skip_scroll) {
+					if (scroll_once_to == inspected_variant(node_id)) {
+						scroll_once_to = std::nullopt;
 
-					ImGui::SetScrollHereY(0.5f);
+						ImGui::SetScrollHereY(0.5f);
+					}
 				}
 
 				if (ImGui::BeginDragDropSource()) {
@@ -600,6 +651,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					}
 				}
 				else {
+					auto disabled = maybe_disabled_cols(node_disabled);
 					text(label);
 				}
 			}
@@ -636,10 +688,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 			ImGui::NextColumn();
 		}
-
-		if (node_disabled) {
-			ImGui::PopStyleColor();
-		}
 	};
 
 	{
@@ -667,7 +715,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			}
 
 			auto& layer = *maybe_layer;
-			const bool was_disabled = !layer.is_active();
+			const bool layer_disabled = !layer.is_active();
 
 			auto id_scope = scoped_id(id_counter++);
 			const auto label = layer.unique_name;
@@ -754,10 +802,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				const bool is_dragged = window && payload && payload->SourceId == sid;
 
 				auto colored_selectable = scoped_selectable_colors(is_dragged ? dragged_cols : (is_visually_inspected ? inspected_cols : bg_cols));
-
-				if (was_disabled) {
-					ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
-				}
 
 				const auto before_pos = ImGui::GetCursorPos();
 
@@ -1001,7 +1045,10 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 						}
 					}
 					else {
-						text(label);
+						{
+							auto disabled = maybe_disabled_cols(layer_disabled);
+							text(label);
+						}
 
 						if (const bool layer_is_empty = layer.hierarchy.nodes.empty()) {
 							ImGui::SameLine();
@@ -1012,10 +1059,6 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 				if (selectable_double_clicked && !was_arrow_hovered && !was_arrow_clicked) {
 					layer.is_open = !layer.is_open;
-				}
-
-				if (was_disabled) {
-					ImGui::PopStyleColor();
 				}
 			}
 
@@ -1028,7 +1071,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				];
 
 				const auto scaled_icon_size = vec2::scaled_to_max_size(visibility_icon.get_original_size(), max_icon_size);
-				const auto cols = was_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
+				const auto cols = layer_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
 
 				if (game_image_button("###Visibility", visibility_icon, scaled_icon_size, cols, augs::imgui_atlas_type::GAME)) {
 					const auto next_value = !layer.is_active();
