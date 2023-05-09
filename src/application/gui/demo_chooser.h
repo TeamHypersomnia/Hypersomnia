@@ -27,7 +27,7 @@ class demo_chooser : keyboard_acquiring_popup {
 
 	struct path_meta {
 		std::string write_time = "Unknown";
-		std::string server_address = "Unknown";
+		std::string server_name = "Unknown";
 	};
 
 	std::unordered_map<augs::path_type, path_meta> path_metas;
@@ -63,10 +63,10 @@ public:
 
 					try {
 						auto t = augs::with_exceptions<std::ifstream>(full_path, std::ios::in | std::ios::binary);
-						decltype(demo_file_meta::server_address) addr;
-						augs::read_bytes(t, addr);
+						decltype(demo_file_meta::server_name) name;
+						augs::read_bytes(t, name);
 
-						meta.server_address = addr;
+						meta.server_name = name;
 						meta.write_time = augs::date_time(augs::last_write_time(full_path)).how_long_ago();
 					}
 					catch (const std::ifstream::failure&) {
@@ -153,7 +153,7 @@ public:
 
 					const bool passes_anything = 
 						filter.PassFilter(filename.c_str())
-						||  filter.PassFilter(path_meta.server_address.c_str())
+						||  filter.PassFilter(path_meta.server_name.c_str())
 						||  filter.PassFilter(path_meta.write_time.c_str())
 					;
 
@@ -167,7 +167,12 @@ public:
 					ImGui::NextColumn();
 					text_disabled(readable_bytesize(augs::get_file_size(l.get_full_path().path)));
 					ImGui::NextColumn();
-					text_disabled(path_meta.server_address);
+
+					{
+						const auto displayed_server_name = path_meta.server_name.empty() ? std::string("Custom game server") : path_meta.server_name;
+						text_disabled(displayed_server_name);
+					}
+
 					ImGui::NextColumn();
 				}
 			}

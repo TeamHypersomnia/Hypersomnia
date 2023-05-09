@@ -126,6 +126,9 @@ bool start_client_gui_state::perform(
 				catch (const std::ifstream::failure& err) {
 					demo_choice_result = D::FILE_OPEN_ERROR;
 				}
+				catch (const augs::stream_read_error& err) {
+					demo_choice_result = D::FILE_OPEN_ERROR;
+				}
 			}
 
 			switch (demo_choice_result) {
@@ -442,7 +445,7 @@ bool start_client_gui_state::perform(
 				into_start.replay_demo.clear();
 
 				if (into_start.chosen_address_type == connect_address_type::CUSTOM) {
-					into_start.displayed_connecting_server_name = "the game server";
+					into_start.displayed_connecting_server_name = "";
 				}
 				else if (into_start.chosen_address_type == connect_address_type::OFFICIAL) {
 					into_start.displayed_connecting_server_name = into_start.preferred_official_address;

@@ -5,6 +5,7 @@
 
 struct demo_file_meta {
 	// GEN INTROSPECTOR struct demo_file_meta
+	server_name_type server_name;
 	address_string_type server_address;
 	hypersomnia_version version;
 	// END GEN INTROSPECTOR

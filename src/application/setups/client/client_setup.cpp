@@ -158,6 +158,7 @@ void client_setup::flush_demo_steps() {
 
 			if (!was_demo_meta_written) {
 				demo_file_meta meta;
+				meta.server_name = displayed_connecting_server_name;
 				meta.server_address = last_addr.address;
 				meta.version = hypersomnia_version();
 				augs::write_bytes(out, meta);
@@ -1442,7 +1443,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				ImGui::Separator();
 			}
 			else {
-				text_color(typesafe_sprintf("Connected to %x.", displayed_connecting_server_name), green);
+				text_color(typesafe_sprintf("Connected to %x.", get_displayed_connecting_server_name()), green);
 
 				if (state == C::NETCODE_NEGOTIATING_CONNECTION) {
 					text("Initializing connection...");
@@ -1469,7 +1470,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (state == C::NETCODE_NEGOTIATING_CONNECTION && adapter->is_connecting()) {
-			text("Connecting to %x\nTime: %2f seconds", displayed_connecting_server_name, get_current_time() - when_initiated_connection);
+			text("Connecting to %x\nTime: %2f seconds", get_displayed_connecting_server_name(), get_current_time() - when_initiated_connection);
 
 			text("\n");
 			ImGui::Separator();
@@ -1487,10 +1488,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				text("Lost connection to the server.");
 			}
 			else if (state == C::NETCODE_NEGOTIATING_CONNECTION) {
-				text("Failed to establish connection with %x", displayed_connecting_server_name);
+				text("Failed to establish connection with %x", get_displayed_connecting_server_name());
 			}
 			else {
-				text("Failed to join %x", displayed_connecting_server_name);
+				text("Failed to join %x", get_displayed_connecting_server_name());
 			}
 
 			print_reason_if_any();

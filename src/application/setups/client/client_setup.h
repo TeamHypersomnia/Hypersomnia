@@ -797,4 +797,12 @@ public:
 
 	void special_request(special_client_request);
 	bool try_load_arena_according_to(const server_solvable_vars&, bool allow_download);
+
+	std::string get_displayed_connecting_server_name() const {
+		if (displayed_connecting_server_name.empty()) {
+			return "the game server";
+		}
+
+		return displayed_connecting_server_name;
+	}
 };
