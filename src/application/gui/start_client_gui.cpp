@@ -440,6 +440,17 @@ bool start_client_gui_state::perform(
 			if (ImGui::Button("Connect!")) {
 				clear_demo_choice();
 				into_start.replay_demo.clear();
+
+				if (into_start.chosen_address_type == connect_address_type::CUSTOM) {
+					into_start.displayed_connecting_server_name = "the game server";
+				}
+				else if (into_start.chosen_address_type == connect_address_type::OFFICIAL) {
+					into_start.displayed_connecting_server_name = into_start.preferred_official_address;
+				}
+				else if (into_start.chosen_address_type == connect_address_type::REPLAY) {
+					into_start.displayed_connecting_server_name = "demo replay";
+				}
+
 				result = true;
 				//show = false;
 			}

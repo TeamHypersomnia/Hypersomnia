@@ -14,6 +14,8 @@ struct client_start_input {
 	std::string preferred_official_address = "";
 
 	augs::path_type replay_demo;
+
+	std::string displayed_connecting_server_name = "the game server";
 	// END GEN INTROSPECTOR
 
 	address_and_port get_address_and_port() const;

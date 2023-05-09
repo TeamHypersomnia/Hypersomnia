@@ -72,6 +72,7 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	void show_server_list(const std::string& label, const std::vector<server_list_entry*>&);
 	std::optional<netcode_address_t> requested_connection;
+	std::string displayed_connecting_server_name = "the game server";
 
 	net_time_t when_last_started_refreshing_server_list = 0;
 

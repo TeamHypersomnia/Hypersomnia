@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- also censor in demo files (should show server names anyway)
+- send heartbeat on map change
+- remove legacy gui code and reliable channel cpp
 - Simple event system
     - First usecase: Teleports and Playing sounds
     - Best to be able to attach it to any entity

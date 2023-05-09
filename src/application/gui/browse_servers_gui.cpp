@@ -401,6 +401,8 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 			if (ImGui::IsMouseDoubleClicked(0)) {
 				LOG("Double-clicked server list entry: %x (%x). Connecting.", ToString(s.address), d.server_name);
 
+				displayed_connecting_server_name = s.heartbeat.server_name;
+
 				if (s.progress.found_on_internal_network) {
 					requested_connection = s.heartbeat.internal_network_address;
 				}
@@ -899,6 +901,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	if (requested_connection.has_value()) {
 		in.client_start.set_custom(::ToString(*requested_connection));
+		in.client_start.displayed_connecting_server_name = displayed_connecting_server_name;
 
 		return true;
 	}

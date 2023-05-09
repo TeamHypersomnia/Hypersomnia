@@ -94,6 +94,8 @@ class client_setup :
 	simulation_receiver receiver;
 
 	address_and_port last_addr;
+	std::string displayed_connecting_server_name;
+
 	netcode_address_t resolved_server_address;
 	client_state_type state = client_state_type::NETCODE_NEGOTIATING_CONNECTION;
 

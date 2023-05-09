@@ -223,6 +223,7 @@ client_setup::client_setup(
 	lua(lua),
 	official(official),
 	last_addr(in.get_address_and_port()),
+	displayed_connecting_server_name(in.displayed_connecting_server_name),
 	vars(initial_vars),
 	adapter(std::make_unique<client_adapter>(preferred_binding_port)),
 	client_time(get_current_time()),
@@ -1441,7 +1442,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				ImGui::Separator();
 			}
 			else {
-				text_color(typesafe_sprintf("Connected to %x.", last_addr.address), green);
+				text_color(typesafe_sprintf("Connected to %x.", displayed_connecting_server_name), green);
 
 				if (state == C::NETCODE_NEGOTIATING_CONNECTION) {
 					text("Initializing connection...");
@@ -1468,7 +1469,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (state == C::NETCODE_NEGOTIATING_CONNECTION && adapter->is_connecting()) {
-			text("Connecting to %x\nTime: %2f seconds", last_addr.address, get_current_time() - when_initiated_connection);
+			text("Connecting to %x\nTime: %2f seconds", displayed_connecting_server_name, get_current_time() - when_initiated_connection);
 
 			text("\n");
 			ImGui::Separator();
@@ -1486,10 +1487,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				text("Lost connection to the server.");
 			}
 			else if (state == C::NETCODE_NEGOTIATING_CONNECTION) {
-				text("Failed to establish connection with %x", last_addr.address);
+				text("Failed to establish connection with %x", displayed_connecting_server_name);
 			}
 			else {
-				text("Failed to join %x", last_addr.address);
+				text("Failed to join %x", displayed_connecting_server_name);
 			}
 
 			print_reason_if_any();
