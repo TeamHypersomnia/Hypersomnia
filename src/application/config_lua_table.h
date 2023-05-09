@@ -56,6 +56,13 @@
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
 	MAIN_MENU,
+	LAST_ACTIVITY
+	// END GEN INTROSPECTOR
+};
+
+enum class activity_type {
+	// GEN INTROSPECTOR enum class activity_type
+	MAIN_MENU,
 
 	TEST_SCENE,
 
@@ -98,7 +105,9 @@ struct config_lua_table {
 	config_lua_table(sol::state&, const augs::path_type& config_lua_path);
 
 	// GEN INTROSPECTOR struct config_lua_table
-	launch_type launch_on_game_start = launch_type::TEST_SCENE;
+	activity_type last_activity = activity_type::MAIN_MENU;
+	launch_type launch_at_startup = launch_type::LAST_ACTIVITY;
+
 	bool log_to_live_file = false;
 	bool remove_live_log_file_on_start = true;
 
@@ -182,7 +191,7 @@ struct config_lua_table {
 	bool operator==(const config_lua_table& b) const;
 	bool operator!=(const config_lua_table& b) const;
 
-	launch_type get_launch_mode() const;
+	activity_type get_last_activity() const;
 	input_recording_type get_input_recording_mode() const;
 
 	void save_patch(sol::state&, const config_lua_table& source, const augs::path_type& target_path) const;

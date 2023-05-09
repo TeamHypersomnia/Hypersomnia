@@ -8,6 +8,16 @@ summary: Just a hidden scratchpad.
 
 - reverb area
 
+- Do not hold name map in solvable
+    - Pointless to sync over the network
+    - serves no purpose logic-side as entity ids can serve identification
+    - Only callouts should have it
+        - however callouts can just have a flavour allocated
+    - Alright maybe specific_names will come in handy
+        - Right now it's only used to map entity ids to nicknames
+        - But we shouldn't draw it like that
+        - Yeah but let's leave it like that for now, no time for this
+
 - black stroke for stamina/health circular bars because they're invisible on brighter maps
 
 - Show a tooltip with some basic info when hovering resources in filesystem view like the initial size e.g. 32x64

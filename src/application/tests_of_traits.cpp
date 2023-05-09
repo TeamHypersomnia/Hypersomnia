@@ -356,10 +356,10 @@ struct tests_of_traits {
 	//static_assert(sizeof(cosmos) < 1000000, "Possible stack overflow due to cosmos on the stack");
 
 
-	static_assert(is_introspective_leaf_v<launch_type>);
-	static_assert(has_enum_to_string_v<launch_type>);
-	static_assert(has_enum_to_string_v<launch_type>);
-	static_assert(has_for_each_enum_v<launch_type>);
+	static_assert(is_introspective_leaf_v<activity_type>);
+	static_assert(has_enum_to_string_v<activity_type>);
+	static_assert(has_enum_to_string_v<activity_type>);
+	static_assert(has_for_each_enum_v<activity_type>);
 	static_assert(has_for_each_enum_v<input_recording_type>);
 
 	static_assert(augs::has_custom_to_lua_value_v<augs::path_type>);

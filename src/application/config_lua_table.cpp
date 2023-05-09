@@ -40,8 +40,8 @@ void config_lua_table::save_patch(sol::state& lua, const config_lua_table& sourc
 	augs::save_as_lua_patch(lua, source, *this, target_path);
 }
 
-launch_type config_lua_table::get_launch_mode() const {
-	return launch_on_game_start;
+activity_type config_lua_table::get_last_activity() const {
+	return last_activity;
 }
 
 input_recording_type config_lua_table::get_input_recording_mode() const {

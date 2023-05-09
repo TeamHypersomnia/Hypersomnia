@@ -422,7 +422,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	if (log_directory_existed) {
 		if (const auto last_failure_log = find_last_incorrect_exit()) {
 			change_with_save([&](config_lua_table& cfg) {
-				cfg.launch_on_game_start = launch_type::MAIN_MENU;
+				cfg.last_activity = activity_type::MAIN_MENU;
 			});
 
 			const auto notice_pre_content = "Looks like the game has crashed since the last time.\n\n";
@@ -530,7 +530,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	recreate_auxiliary_socket();
 
-	auto pending_launch = std::optional<launch_type>();
+	auto pending_launch = std::optional<activity_type>();
 
 	auto stun_provider = stun_server_provider(config.nat_detection.stun_server_list);
 
@@ -1029,9 +1029,9 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 #endif
 
-	auto launch_on_game_start = [&](const launch_type mode) {
+	auto save_last_activity = [&](const activity_type mode) {
 		change_with_save([mode](config_lua_table& cfg) {
-			cfg.launch_on_game_start = mode;
+			cfg.last_activity = mode;
 		});
 	};
 
@@ -1057,7 +1057,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					LOG("The chosen server is behind NAT. Delaying the client launch until it is traversed.");
 
 					chosen_server_nat = info->heartbeat.nat;
-					pending_launch = launch_type::CLIENT;
+					pending_launch = activity_type::CLIENT;
 					launch_main_menu();
 					return false;
 				}
@@ -1086,7 +1086,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			);
 		});
 
-		launch_on_game_start(launch_type::CLIENT);
+		save_last_activity(activity_type::CLIENT);
 
 		return true;
 	};
@@ -1100,19 +1100,19 @@ work_result work(const int argc, const char* const * const argv) try {
 			);
 		});
 
-		launch_on_game_start(launch_type::EDITOR);
+		save_last_activity(activity_type::EDITOR);
 	};
 
-	auto launch_setup = [&](const launch_type mode) {
+	auto launch_setup = [&](const activity_type mode) {
 		LOG("Launched mode: %x", augs::enum_to_string(mode));
 
 		switch (mode) {
-			case launch_type::MAIN_MENU:
+			case activity_type::MAIN_MENU:
 				launch_main_menu();
 				break;
 
 #if BUILD_NETWORKING
-			case launch_type::CLIENT: {
+			case activity_type::CLIENT: {
 				const bool ignore_nat_check = false;
 
 				if (!launch_client(ignore_nat_check)) {
@@ -1122,12 +1122,12 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 			}
 
-			case launch_type::SERVER: {
+			case activity_type::SERVER: {
 				if (config.server.allow_nat_traversal) {
 					if (!nat_detection_complete()) {
 						LOG("NAT detection in progress. Delaying the server launch.");
 
-						pending_launch = launch_type::SERVER;
+						pending_launch = activity_type::SERVER;
 						launch_main_menu();
 						return;
 					}
@@ -1161,12 +1161,12 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 			}
 
-			case launch_type::DEBUGGER:
+			case activity_type::DEBUGGER:
 				launch_debugger(lua);
 
 				break;
 
-			case launch_type::EDITOR:
+			case activity_type::EDITOR:
 				if (!params.editor_target.empty()) {
 					launch_editor(params.editor_target);
 				}
@@ -1191,7 +1191,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					}
 				}
 
-			case launch_type::EDITOR_PROJECT_SELECTOR:
+			case activity_type::EDITOR_PROJECT_SELECTOR:
 				setup_launcher([&]() {
 					emplace_current_setup(
 						std::in_place_type_t<project_selector_setup>()
@@ -1200,7 +1200,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				break;
 
-			case launch_type::TEST_SCENE:
+			case activity_type::TEST_SCENE:
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<test_scene_setup>(),
 						lua,
@@ -1216,11 +1216,11 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 		}
 
-		launch_on_game_start(mode);
+		save_last_activity(mode);
 	};
 
 	auto finalize_pending_launch = [&]() {
-		if (pending_launch == launch_type::CLIENT) {
+		if (pending_launch == activity_type::CLIENT) {
 			const bool ignore_nat_check = true;
 			launch_client(ignore_nat_check);
 		}
@@ -1304,7 +1304,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		client_start_requested = false;
 
-		launch_setup(launch_type::CLIENT);
+		launch_setup(activity_type::CLIENT);
 	};
 
 	auto get_browse_servers_input = [&]() {
@@ -1361,13 +1361,13 @@ work_result work(const int argc, const char* const * const argv) try {
 			);
 
 			if (start_server_gui.instance_type == server_instance_type::INTEGRATED) {
-				launch_setup(launch_type::SERVER);
+				launch_setup(activity_type::SERVER);
 			}
 			else {
 				augs::spawn_detached_process(params.exe_path.string(), "--dedicated-server");
 				config.client_start.set_custom(typesafe_sprintf("%x:%x", config.server_start.ip, chosen_server_port()));
 
-				launch_setup(launch_type::CLIENT);
+				launch_setup(activity_type::CLIENT);
 			}
 		}
 	};
@@ -1592,12 +1592,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			switch (result) {
 				case custom_imgui_result::GO_TO_MAIN_MENU:
-					launch_setup(launch_type::MAIN_MENU);
+					launch_setup(activity_type::MAIN_MENU);
 					break;
 
 				case custom_imgui_result::RETRY:
 					if constexpr(std::is_same_v<S, client_setup>) {
-						launch_setup(launch_type::CLIENT);
+						launch_setup(activity_type::CLIENT);
 					}
 
 					break;
@@ -1765,13 +1765,13 @@ work_result work(const int argc, const char* const * const argv) try {
 				if (pending_launch.has_value()) {
 					const auto l = pending_launch;
 
-					if (l == launch_type::SERVER) {
+					if (l == activity_type::SERVER) {
 						if (nat_detection_complete()) {
 							finalize_pending_launch();
 						}
 					}
 
-					if (l == launch_type::CLIENT) {
+					if (l == activity_type::CLIENT) {
 						if (nat_detection_complete()) {
 							if (nat_traversal == std::nullopt) {
 								start_nat_traversal();
@@ -1934,11 +1934,11 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::LOCAL_TEST_SCENE:
-				launch_setup(launch_type::TEST_SCENE);
+				launch_setup(activity_type::TEST_SCENE);
 				break;
 
 			case T::EDITOR:
-				launch_setup(launch_type::EDITOR_PROJECT_SELECTOR);
+				launch_setup(activity_type::EDITOR_PROJECT_SELECTOR);
 				break;
 
 			case T::SETTINGS:
@@ -1971,7 +1971,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::QUIT_TO_MENU:
-				launch_setup(launch_type::MAIN_MENU);
+				launch_setup(activity_type::MAIN_MENU);
 				break;
 
 			case T::SETTINGS:
@@ -2350,7 +2350,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		launch_debugger(lua, params.debugger_target);
 	}
 	else if (params.start_server) {
-		launch_setup(launch_type::SERVER);
+		launch_setup(activity_type::SERVER);
 	}
 	else if (params.should_connect) {
 		{
@@ -2363,10 +2363,15 @@ work_result work(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		launch_setup(launch_type::CLIENT);
+		launch_setup(activity_type::CLIENT);
 	}
 	else {
-		launch_setup(config.get_launch_mode());
+		if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
+			launch_setup(config.get_last_activity());
+		}
+		else {
+			launch_setup(activity_type::MAIN_MENU);
+		}
 	}
 
 	/* 
@@ -2693,7 +2698,7 @@ work_result work(const int argc, const char* const * const argv) try {
 								switch (setup.escape()) {
 									case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; return true;
 									case setup_escape_result::JUST_FETCH: return true;
-									case setup_escape_result::GO_TO_MAIN_MENU: launch_setup(launch_type::MAIN_MENU); return true;
+									case setup_escape_result::GO_TO_MAIN_MENU: launch_setup(activity_type::MAIN_MENU); return true;
 									case setup_escape_result::QUIT_PLAYTESTING: restore_background_setup(); return true;
 									default: return false;
 								}

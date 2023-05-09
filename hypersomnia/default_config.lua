@@ -1,5 +1,6 @@
 return {
-  launch_on_game_start = "MAIN_MENU",
+  launch_at_startup = "LAST_ACTIVITY", -- or "MAIN_MENU"
+
   log_to_live_file = false,
   remove_live_log_file_on_start = true,
 
@@ -283,7 +284,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     fade_danger_indicator_for_seconds = 2,
 
     draw_offscreen_callouts = true,
-	offscreen_reference_mode = "SCREEN_CENTER",
+	offscreen_reference_mode = "CHARACTER_POSITION",
 	enabled_draw_teammate_indicators = 1,
 	enabled_draw_tactical_indicators = 1,
 	enabled_draw_danger_indicators = "255 50 50 255",

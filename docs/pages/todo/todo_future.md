@@ -5,6 +5,12 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Fun idea for crouch-behind implementation
+	- A shoot-through surface becomes non-see-through when we're close to it while crouching
+		- It becomes see through immediately when we aim towards it (simple raycast test)
+		- Then aiming towards immediately counts as "standing up"
+	- This would require some 
+
 - Modes should be able to specify enabled/disabled layers
 	- This way we can encode an alternative destroyed environkment for a zombie mode, in the same map! Instead of creating e.g. zm_cyberaqua
 		- Ofc this would also need an ambient light color override

@@ -6,6 +6,30 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Simple event system
+    - First usecase: Teleports and Playing sounds
+    - Best to be able to attach it to any entity
+        - No additional complexity cosmos-side as we'll have a map from entity ids to events
+            - since events will be scarce
+    - Most event data should not be transmitted through the network
+        - As it doesn't change generally
+        - So we might even want to have it in solvable
+    - However even simple playing sound will want to have some state
+        - E.g. whether the sound is already playing, to not spawn a new one
+    - Separate marker type for event areas
+        - We thought about it but it's pointless
+        - The only advantage is we could make them sensors and they could respond to onenter/onquit
+
+- Teleportation Target node specification
+    - We might want to specify velocity after teleport
+        - Several teleporters might point to the same target
+            - Would then be nice to only specify the velocity once
+        - Teleport target point marker then?
+        - Note it would be silly to make "any node" a potential teleport target because it would have to be rotated in a direction too
+            - So a point marker will be best here
+            - And if it's a teleport target it will have an additional "magnitude" property
+    
+
 - Fix callouts rendering
 
 - rcon password should be *
