@@ -374,7 +374,7 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 
 			const auto& our_external_address = response.address;
 
-			log_info("port probe response: %x -> %x", ::ToString(from), ::ToString(our_external_address));
+			log_info("port probe response: <%x> -> <%x>", ::ToString(from), ::ToString(our_external_address));
 
 			finish_port_probe(from, our_external_address);
 
@@ -402,7 +402,7 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 		if (const auto translated = read_stun_response(request.source_request, bytes, packet_bytes)) {
 			const auto& our_external_address = *translated;
 
-			log_info("received STUN response: %x -> %x", ::ToString(from), ::ToString(our_external_address));
+			log_info("received STUN response: <%x> -> <%x>", ::ToString(from), ::ToString(our_external_address));
 
 			request.translated_address = our_external_address;
 			return;
@@ -464,7 +464,7 @@ std::string stringize_bytes(const std::vector<std::byte>& bytes) {
 double yojimbo_time();
 
 std::string describe_packet(const netcode_queued_packet& p, const std::optional<int> saved_ttl) {
-	return typesafe_sprintf("[PACKET%x] [%f] %x (%x bytes): %x", p.ttl ? typesafe_sprintf(" TTL = %x (def: %x)", *p.ttl, saved_ttl ? *saved_ttl : -1337) : "", yojimbo_time(), ToString(p.to), p.bytes.size(), stringize_bytes(p.bytes));
+	return typesafe_sprintf("[PACKET%x] [%f] %x (%x bytes): %x", p.ttl ? typesafe_sprintf(" TTL = %x (def: %x)", *p.ttl, saved_ttl ? *saved_ttl : -1337) : "", yojimbo_time(), std::string("<") + ToString(p.to) + ">", p.bytes.size(), stringize_bytes(p.bytes));
 }
 
 void netcode_packet_queue::send_one(netcode_socket_t socket, log_function log_sink) {

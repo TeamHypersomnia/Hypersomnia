@@ -34,6 +34,24 @@ struct nat_traversal_details_window {
 		aborted = false;
 	}
 
+	static auto censor_ips(std::string text) {
+		bool censoring = false;
+
+		for (std::size_t i = 0; i < text.size(); ++i) {
+			if (text[i] == '<') {
+				censoring = true;
+			}
+			else if (text[i] == '>') {
+				censoring = false;
+			}
+			else if (censoring) {
+				text[i] = '*';
+			}
+		}
+
+		return text;
+	}
+
 	bool perform(
 		augs::window& window,
 		const port_type bound_local_port,
@@ -114,7 +132,8 @@ struct nat_traversal_details_window {
 				ImGui::Separator();
 
 				const auto log_color = rgba(210, 210, 210, 255);
-				text_color(shown_attempt.log_text, log_color);
+
+				text_color(censor_ips(shown_attempt.log_text), log_color);
 			}
 
 			{

@@ -29,7 +29,7 @@ nat_traversal_session::nat_traversal_session(const nat_traversal_input& input, s
 	chosen_masterserver_port_probe(stun_provider.get_next_port_probe(input.detection_settings.port_probing).default_port)
 {
 	log_info("---- BEGIN NAT TRAVERSAL ----");
-	log_info("Begin traversing %x.", ::ToString(input.traversed_address));
+	log_info("Begin traversing <%x>.", ::ToString(input.traversed_address));
 	log_info("Session timestamp: %f", session_guid);
 
 	log_info("Client NAT: %x", nat_type_to_string(input.client.type));
@@ -292,7 +292,7 @@ void nat_traversal_session::handle_packet(const netcode_address_t& from, uint8_t
 		if (const auto maybe_session_guid = read_nat_traversal_success_packet(packet_buffer, packet_bytes)) {
 
 			if (*maybe_session_guid == session_guid) {
-				log_info("Success packet arrived from: %x (session timestamp: %f)", ::ToString(from), *maybe_session_guid);
+				log_info("Success packet arrived from: <%x> (session timestamp: %f)", ::ToString(from), *maybe_session_guid);
 				log_info("Successfully traversed the host.");
 				set(state::TRAVERSAL_COMPLETE);
 				log_info("---- FINISH NAT TRAVERSAL ----");
@@ -408,7 +408,7 @@ std::optional<netcode_address_t> stun_session::query_result() const {
 bool stun_session::handle_packet(const std::byte* const packet_buffer, const int num_bytes_received) {
 	if (const auto translated = read_stun_response(source_request, packet_buffer, num_bytes_received)) {
 		if (stun_host.has_value()) {
-			log_info(typesafe_sprintf("received STUN response: %x -> %x", ::ToString(*stun_host), ::ToString(*translated)));
+			log_info(typesafe_sprintf("received STUN response: <%x> -> <%x>", ::ToString(*stun_host), ::ToString(*translated)));
 		}
 
 		when_completed = yojimbo_time();
