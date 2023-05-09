@@ -945,8 +945,22 @@ void server_details_gui_state::perform(const server_list_entry& entry) {
 	auto internal_address = internal_addr ? ::ToString(*internal_addr) : std::string("Unknown yet");
 
 	acquire_keyboard_once();
-	input_text("External IP address", external_address, ImGuiInputTextFlags_ReadOnly);
-	input_text("Internal IP address", internal_address, ImGuiInputTextFlags_ReadOnly);
+
+	const bool censor_ips = true;
+
+	if (censor_ips) {
+		if (ImGui::Button("Copy External IP address to clipboard")) {
+			ImGui::SetClipboardText(external_address.c_str());
+		}
+
+		if (ImGui::Button("Copy Internal IP address to clipboard")) {
+			ImGui::SetClipboardText(internal_address.c_str());
+		}
+	}
+	else {
+		input_text("External IP address", external_address, ImGuiInputTextFlags_ReadOnly);
+		input_text("Internal IP address", internal_address, ImGuiInputTextFlags_ReadOnly);
+	}
 
 	input_text("Server name", heartbeat.server_name, ImGuiInputTextFlags_ReadOnly);
 
