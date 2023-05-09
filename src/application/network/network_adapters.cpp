@@ -103,7 +103,7 @@ bool server_adapter::has_messages_to_send(const client_id_type& id, const game_c
 std::string resolve_address_result::report() const {
 	switch (result) {
 		case resolve_result_type::OK:
-			return typesafe_sprintf("Successfully resolved %x to <%x>", host, ::ToString(addr));
+			return typesafe_sprintf("Successfully resolved %x to %x", host, ::ToString(addr));
 		case resolve_result_type::COULDNT_RESOLVE_HOST:
 			return typesafe_sprintf("Couldn't resolve %x: host unreachable.", host);
 		case resolve_result_type::INVALID_ADDRESS:

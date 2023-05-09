@@ -5,6 +5,8 @@
 
 std::string nat_traversal_state_to_string(const nat_traversal_session::state state);
 std::string nat_type_to_string(const nat_type type);
+std::string censor_ips(std::string text);
+
 rgba nat_traversal_state_to_color(const nat_traversal_session::state state);
 
 struct nat_traversal_details_window {
@@ -32,24 +34,6 @@ struct nat_traversal_details_window {
 		attempts.clear();
 		current_attempt_index = -1;
 		aborted = false;
-	}
-
-	static auto censor_ips(std::string text) {
-		bool censoring = false;
-
-		for (std::size_t i = 0; i < text.size(); ++i) {
-			if (text[i] == '<') {
-				censoring = true;
-			}
-			else if (text[i] == '>') {
-				censoring = false;
-			}
-			else if (censoring) {
-				text[i] = '*';
-			}
-		}
-
-		return text;
 	}
 
 	bool perform(
@@ -133,7 +117,7 @@ struct nat_traversal_details_window {
 
 				const auto log_color = rgba(210, 210, 210, 255);
 
-				text_color(censor_ips(shown_attempt.log_text), log_color);
+				text_color(::censor_ips(shown_attempt.log_text), log_color);
 			}
 
 			{

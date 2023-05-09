@@ -473,3 +473,21 @@ rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
 }
 
 
+std::string censor_ips(std::string text) {
+	bool censoring = false;
+
+	for (std::size_t i = 0; i < text.size(); ++i) {
+		if (text[i] == '<') {
+			censoring = true;
+		}
+		else if (text[i] == '>') {
+			censoring = false;
+		}
+		else if (censoring) {
+			text[i] = '*';
+		}
+	}
+
+	return text;
+}
+

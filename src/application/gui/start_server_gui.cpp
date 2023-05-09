@@ -10,6 +10,7 @@
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
+std::string censor_ips(std::string text);
 void perform_arena_chooser(arena_identifier& current_arena);
 
 bool start_server_gui_state::perform(
@@ -102,7 +103,7 @@ as well as to test your skills in a laggy environment.
 		}
 
 		const auto log_color = rgba(210, 210, 210, 255);
-		text_color(log_text, log_color);
+		text_color(::censor_ips(log_text), log_color);
 	}
 
 #if NDEBUG && PLATFORM_UNIX

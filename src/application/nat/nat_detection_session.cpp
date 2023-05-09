@@ -374,7 +374,7 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 
 			const auto& our_external_address = response.address;
 
-			log_info("port probe response: <%x> -> <%x>", ::ToString(from), ::ToString(our_external_address));
+			log_info("port probe response: %x -> <%x>", ::ToString(from), ::ToString(our_external_address));
 
 			finish_port_probe(from, our_external_address);
 
@@ -402,7 +402,7 @@ void nat_detection_session::handle_packet(const netcode_address_t& from, uint8_t
 		if (const auto translated = read_stun_response(request.source_request, bytes, packet_bytes)) {
 			const auto& our_external_address = *translated;
 
-			log_info("received STUN response: <%x> -> <%x>", ::ToString(from), ::ToString(our_external_address));
+			log_info("received STUN response: %x -> <%x>", ::ToString(from), ::ToString(our_external_address));
 
 			request.translated_address = our_external_address;
 			return;
