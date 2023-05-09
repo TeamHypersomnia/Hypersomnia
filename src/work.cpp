@@ -193,7 +193,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		result.server.suppress_new_community_server_webhook = true;
 
 #if PLATFORM_UNIX
-		result.client_start.chosen_address_type = connect_address_type::CUSTOM;
+		result.client_start.chosen_address_type = connect_address_type::CUSTOM_ADDRESS;
 		result.window.fullscreen = false;
 #endif
 #endif
@@ -1920,7 +1920,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					client_start_requested = true;
 				}
 
-				config.client_start.chosen_address_type = connect_address_type::CUSTOM;
+				config.client_start.chosen_address_type = connect_address_type::CUSTOM_ADDRESS;
 
 				break;
 				

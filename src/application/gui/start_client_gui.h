@@ -36,6 +36,7 @@ public:
 
 	demo_file_meta demo_meta;
 	demo_choice_result_type demo_choice_result = demo_choice_result_type::SHOULD_ANALYZE;
+	std::string custom_address;
 	std::string demo_size;
 
 	bool allow_start = false;

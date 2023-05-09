@@ -3,7 +3,7 @@
 enum class connect_address_type {
 	// GEN INTROSPECTOR enum class connect_address_type
 	OFFICIAL,
-	CUSTOM,
+	CUSTOM_ADDRESS,
 	REPLAY,
 
 	COUNT

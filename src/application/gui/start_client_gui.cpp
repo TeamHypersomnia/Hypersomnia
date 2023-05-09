@@ -31,7 +31,7 @@ address_and_port client_start_input::get_address_and_port() const {
 
 void client_start_input::set_custom(const std::string& target) { 
 	custom_address = target;
-	chosen_address_type = connect_address_type::CUSTOM;
+	chosen_address_type = connect_address_type::CUSTOM_ADDRESS;
 }
 
 void start_client_gui_state::clear_demo_choice() {
@@ -194,10 +194,10 @@ bool start_client_gui_state::perform(
 
 		// auto& scope_cfg = into;
 
-		if (into_start.chosen_address_type == connect_address_type::CUSTOM) {
+		if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
 
-			input_text<100>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", into_start.custom_address);
+			input_text<100>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address);
 		}
 		else {
 			auto& preferred = into_start.preferred_official_address;
@@ -429,6 +429,9 @@ bool start_client_gui_state::perform(
 
 		checkbox("Record demo", into_vars.demo_recording_path.is_enabled);
 
+		if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
+			text_disabled("It is best to use the server browser to connect to custom servers.\nThe server browser allows you to connect to servers behind routers.");
+		}
 		//text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 	}
 
@@ -444,8 +447,9 @@ bool start_client_gui_state::perform(
 				clear_demo_choice();
 				into_start.replay_demo.clear();
 
-				if (into_start.chosen_address_type == connect_address_type::CUSTOM) {
+				if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
 					into_start.displayed_connecting_server_name = "";
+					into_start.custom_address = custom_address;
 				}
 				else if (into_start.chosen_address_type == connect_address_type::OFFICIAL) {
 					into_start.displayed_connecting_server_name = into_start.preferred_official_address;
