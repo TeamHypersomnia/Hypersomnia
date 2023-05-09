@@ -1115,7 +1115,13 @@ void settings_gui_state::perform(
 				const auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
 
 				revertable_input_text(label, scope_cfg.nickname);
-				revertable_input_text(SCOPE_CFG_NVP(rcon_password));
+
+				{
+					thread_local bool show = false;
+					const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+
+					input_text(SCOPE_CFG_NVP(rcon_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.rcon_password);
+				}
 
 				revertable_checkbox("Record demo", scope_cfg.demo_recording_path.is_enabled);
 
@@ -1214,11 +1220,21 @@ void settings_gui_state::perform(
 				if (auto node = scoped_tree_node("RCON")) {
 					auto& scope_cfg = config.private_server;
 
-					input_text(SCOPE_CFG_NVP(rcon_password)); revert(scope_cfg.rcon_password);
-					text_disabled("A rcon can change maps, alter modes, kick/ban players and perform other administrative activities.");
+					{
+						thread_local bool show = false;
+						const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
 
-					input_text(SCOPE_CFG_NVP(master_rcon_password)); revert(scope_cfg.master_rcon_password);
-					text_disabled("A master rcon can additionally change the rcon password in case of an emergency.");
+						input_text(SCOPE_CFG_NVP(rcon_password), flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.rcon_password);
+						text_disabled("A rcon can change maps, alter modes, kick/ban players and perform other administrative activities.");
+					}
+
+					{
+						thread_local bool show = false;
+						const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+
+						input_text(SCOPE_CFG_NVP(master_rcon_password), flags); revert(scope_cfg.master_rcon_password);
+						text_disabled("A master rcon can additionally change the rcon password in case of an emergency.");
+					}
 
 					{
 						auto& scope_cfg = config.server;
