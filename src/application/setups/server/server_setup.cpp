@@ -1145,6 +1145,8 @@ void server_setup::choose_arena(const std::string& name) {
 			local_collected.control(cmd);
 		}
 	}
+
+	request_immediate_heartbeat();
 }
 
 void server_setup::accept_game_gui_events(const game_gui_entropy_type& events) {

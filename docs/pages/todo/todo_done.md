@@ -5985,3 +5985,5 @@ This will discard your redo history."
 
 - log timestamps
 - Fix wandering pixels crash
+- also censor in demo files (should show server names anyway)
+- send heartbeat on map change
