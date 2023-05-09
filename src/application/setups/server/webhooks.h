@@ -58,8 +58,16 @@ namespace telegram_webhooks {
 		const std::string& new_server_ip,
 		const bool is_editor_playtesting_session
 	) {
+#define SHOW_IPS_IN_WEBHOOKS 0
+
+#if SHOW_IPS_IN_WEBHOOKS
 		const std::string hosted_at = is_editor_playtesting_session ? " at " : " hosted at ";
 		const std::string full_description = "*" + escaped_nick(new_server_name) + "*" + hosted_at + "*" + new_server_ip + "*";
+#else
+		const std::string hosted = is_editor_playtesting_session ? "." : " hosted.";
+		const std::string full_description = "*" + escaped_nick(new_server_name) + "*" + hosted;
+		(void)new_server_ip;
+#endif
 
 		return {
 			{ "chat_id", channel_id, "", "" },
