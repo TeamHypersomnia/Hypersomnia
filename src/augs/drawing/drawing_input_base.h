@@ -33,5 +33,6 @@ struct sprite_drawing_input : drawing_input_base {
 	using drawing_input_base::drawing_input_base;
 
 	double global_time_seconds = 0.0;
+	vec2i tile_size = vec2i(0, 0);
 	flip_flags flip;
 };

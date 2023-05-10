@@ -16,11 +16,10 @@ namespace augs {
 		const vec2 pos,
 		F callback, 
 		const real32 final_rotation, 
-		const augs::atlas_entry& diffuse,
+		const vec2i tile_size,
 		const camera_cone& cone
 	) {
 		const auto total_size = spr.get_size();
-		const auto tile_size = diffuse.get_original_size();
 		const auto times = total_size / tile_size;
 
 		const auto vis = [&]() {
@@ -165,15 +164,15 @@ namespace augs {
 		const auto& entry = manager.at(spr.image_id);
 		const auto& diffuse = entry.diffuse;
 
-		const auto original_size = vec2i(diffuse.get_original_size());
-
 		if (in.use_neon_map) {
 			const auto& maybe_neon_map = entry.neon_map;
 
 			if (maybe_neon_map.exists()) {
 				const auto original_neon_size = vec2(maybe_neon_map.get_original_size());
 
-				if (spr.tile_excess_size && drawn_size.x >= original_size.x && drawn_size.y >= original_size.y) {
+				if (spr.tile_excess_size && drawn_size.x >= in.tile_size.x && drawn_size.y >= in.tile_size.y) {
+					const auto neon_size_mult = vec2(in.tile_size) / diffuse.get_original_size();
+
 					for_each_tile(
 						spr,
 						pos,
@@ -184,16 +183,17 @@ namespace augs {
 								maybe_neon_map,
 								piece_pos,
 								final_rotation,
-								original_neon_size,
+								original_neon_size * neon_size_mult,
 								spr.neon_color
 							);
 						},
 						final_rotation,
-						diffuse,
+						in.tile_size,
 						in.cone
 					);
 				}
 				else {
+					const auto original_size = vec2i(diffuse.get_original_size());
 					const auto neon_size_mult = vec2(drawn_size) / original_size;
 
 					detail_draw(
@@ -209,7 +209,7 @@ namespace augs {
 			}
 		}
 		else {
-			if (spr.tile_excess_size && drawn_size.x >= original_size.x && drawn_size.y >= original_size.y) {
+			if (spr.tile_excess_size && drawn_size.x >= in.tile_size.x && drawn_size.y >= in.tile_size.y) {
 				for_each_tile(
 					spr,
 					pos,
@@ -223,7 +223,7 @@ namespace augs {
 						);
 					},
 					final_rotation,
-					diffuse,
+					in.tile_size,
 					in.cone
 				);
 			}

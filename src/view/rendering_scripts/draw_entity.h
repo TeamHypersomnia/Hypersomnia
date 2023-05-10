@@ -85,6 +85,10 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				result.flip = *flips;
 			}
 
+			if (sprite.tile_excess_size) {
+				result.tile_size = typed_handle.template get<invariants::sprite>().size;
+			}
+
 			result.renderable_transform = viewing_transform;
 			result.global_time_seconds = in.global_time_seconds;
 
@@ -157,27 +161,21 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 				const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
 
-				if (const auto displayed_frame = ::find_frame(animation_def, animation, logicals)) {
-					const auto image_id = displayed_frame->image_id;
+				if (const auto displayed_frame = ::find_first_and_current_frame(animation_def, animation, logicals);
+					displayed_frame.first && displayed_frame.second
+				) {
+					const auto reference_image_id = displayed_frame.first->image_id;
+					const auto displayed_image_id = displayed_frame.second->image_id;
 
 					auto animated = sprite;
-					animated.image_id = image_id;
-					animated.size = in.manager.at(image_id).get_original_size();
+					animated.image_id = displayed_image_id;
 
-					/*
-						Resize accordingly.
-					*/
+					const auto this_frame_size_mult = 
+						vec2(in.manager.at(displayed_image_id).get_original_size())
+						   / in.manager.at(reference_image_id).get_original_size()
+					;
 
-					if constexpr(H::template has<components::overridden_geo>()) {
-						auto result = typed_handle.template get<invariants::sprite>();
-						const auto& s = typed_handle.template get<components::overridden_geo>().get();
-
-						if (s.is_enabled) {
-							if (result.size.x != 0.0f && result.size.y != 0.0f) {
-								animated.size = vec2i(vec2(animated.size) * s.value / result.size);
-							}
-						}
-					}
+					animated.size = vec2i(vec2(animated.size) * this_frame_size_mult);
 
 					render_visitor(animated, in.manager, input);
 					return;

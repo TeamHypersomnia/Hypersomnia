@@ -41,6 +41,33 @@ const plain_animation_frame* find_action_frame(
 }
 
 template <class L>
+std::pair<const plain_animation_frame*, const plain_animation_frame*> find_first_and_current_frame(
+	const assets::plain_animation_id& anim_id,
+	const components::animation& anim_state,
+	const L& logicals
+) {
+	if (const auto anim = logicals.find(anim_id)) {
+		const auto n = static_cast<unsigned>(anim->frames.size());
+		return {
+			/* Return the reference frame too e.g. for size mult calculation */
+			std::addressof(anim->frames[0]),
+			std::addressof(anim->frames[anim_state.state.frame_num % n])
+		};
+	}
+
+	return { nullptr, nullptr };
+}
+
+template <class L>
+decltype(auto) find_first_and_current_frame(
+	const invariants::animation& anim_def,
+	const components::animation& anim_state,
+	const L& logicals
+) {
+	return find_first_and_current_frame(anim_def.id, anim_state, logicals);
+}
+
+template <class L>
 const plain_animation_frame* find_frame(
 	const assets::plain_animation_id& anim_id,
 	const components::animation& anim_state,
