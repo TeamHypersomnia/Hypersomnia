@@ -394,11 +394,15 @@ void setup_scene_object_from_resource(
 			}
 
 			if (physical.is_throw_through) {
-				fixtures->filter.maskBits &= ~(1 << int(filter_category::FLYING));
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::FLYING_EXPLOSIVE));
+			}
+
+			if (physical.is_melee_throw_through) {
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::FLYING_MELEE));
 			}
 
 			if (physical.is_shoot_through) {
-				fixtures->filter.maskBits &= ~(1 << int(filter_category::BULLET));
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::FLYING_BULLET));
 				fixtures->filter.maskBits &= ~(1 << int(filter_category::CHARACTER_WEAPON));
 			}
 

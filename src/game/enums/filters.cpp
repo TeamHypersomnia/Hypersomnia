@@ -13,13 +13,14 @@ static auto make_flags(Args... enums) {
 static auto standard_participation_bitset() {
 	return augs::enum_bitset<C>(
 		C::QUERY,
-		C::BULLET,
 		C::WALL,
 		C::CHARACTER,
 		C::CHARACTER_WEAPON,
 		C::LYING_ITEM,
 		C::GROUND,
-		C::FLYING,
+		C::FLYING_BULLET,
+		C::FLYING_EXPLOSIVE,
+		C::FLYING_MELEE,
 		C::TRIGGER,
 		C::SHELL,
 		C::GLASS_OBSTACLE
@@ -47,7 +48,7 @@ namespace predefined_queries {
 
 	b2Filter crosshair_laser() {
 		b2Filter out;
-		out.categoryBits = make_flags(C::BULLET);
+		out.categoryBits = make_flags(C::FLYING_BULLET);
 		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE, C::CHARACTER);
 		return out;
 	}
@@ -55,7 +56,7 @@ namespace predefined_queries {
 	b2Filter melee_query() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
-		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE, C::CHARACTER, C::LYING_ITEM, C::FLYING);
+		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE, C::CHARACTER, C::LYING_ITEM, C::FLYING_EXPLOSIVE, C::FLYING_MELEE);
 		return out;
 	}
 
@@ -76,14 +77,25 @@ namespace predefined_queries {
 	b2Filter force_explosion() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
-		out.maskBits = standard_participation_except(C::BULLET);
+		out.maskBits = standard_participation_except(C::FLYING_BULLET);
 		return out;
 	}
 
 	b2Filter renderable() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
-		out.maskBits = make_flags(C::BULLET, C::CHARACTER, C::LYING_ITEM, C::WALL, C::GROUND, C::SHELL, C::GLASS_OBSTACLE, C::FLYING);
+		out.maskBits = make_flags(
+			C::WALL,
+			C::CHARACTER,
+			C::LYING_ITEM,
+			C::GROUND,
+			C::FLYING_BULLET,
+			C::FLYING_EXPLOSIVE,
+			C::FLYING_MELEE,
+			C::SHELL,
+			C::GLASS_OBSTACLE
+		);
+
 		return out;
 	}
 }
@@ -110,7 +122,7 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::GROUND];
 		out.categoryBits = make_flags(C::GROUND);
-		out.maskBits = standard_participation_except(C::FLYING);
+		out.maskBits = standard_participation_except(C::FLYING_EXPLOSIVE, C::FLYING_BULLET, C::FLYING_MELEE);
 	}
 	{
 
@@ -119,22 +131,26 @@ predefined_filters::predefined_filters() {
 		out.maskBits = standard_participation_except(C::CHARACTER, C::CHARACTER_WEAPON);
 	}
 	{
-
-		auto& out = filters[predefined_filter_type::FLYING_ITEM];
-		out.categoryBits = make_flags(C::FLYING);
-		out.maskBits = standard_participation_except(C::LYING_ITEM);
+		auto& out = filters[predefined_filter_type::FLYING_BULLET];
+		out.categoryBits = make_flags(C::FLYING_BULLET);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET);
 	}
 	{
 
-		auto& out = filters[predefined_filter_type::FLYING_BULLET];
-		out.categoryBits = make_flags(C::BULLET);
-		out.maskBits = standard_participation_except(C::BULLET);
+		auto& out = filters[predefined_filter_type::FLYING_EXPLOSIVE];
+		out.categoryBits = make_flags(C::FLYING_EXPLOSIVE);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE);
+	}
+	{
+		auto& out = filters[predefined_filter_type::FLYING_MELEE];
+		out.categoryBits = make_flags(C::FLYING_MELEE);
+		out.maskBits = standard_participation_except(C::LYING_ITEM);
 	}
 	{
 
 		auto& out = filters[predefined_filter_type::SHELL];
 		out.categoryBits = make_flags(C::SHELL);
-		out.maskBits = standard_participation_except(C::BULLET, C::FLYING, C::TRIGGER, C::CHARACTER_WEAPON);
+		out.maskBits = standard_participation_except(C::FLYING_BULLET, C::FLYING_BULLET, C::FLYING_EXPLOSIVE, C::FLYING_MELEE, C::TRIGGER, C::CHARACTER_WEAPON);
 	}
 	{
 

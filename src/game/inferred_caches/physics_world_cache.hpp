@@ -26,7 +26,7 @@ inline auto to_b2Body_type(const rigid_body_type t) {
 };
 
 template <class E>
-auto calc_is_bullet(const E& handle) {
+auto calc_needs_analytic_physics(const E& handle) {
 	const auto& rigid_body = handle.template get<invariants::rigid_body>();
 
 	if (is_like_thrown_explosive(handle)) {
@@ -61,17 +61,25 @@ auto calc_filters(const E& handle) {
 		return filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 	}
 
-	if (is_like_thrown_explosive(handle)
-		|| is_like_thrown_melee(handle)
-		|| is_like_melee_in_action(handle)
-	) {
-		return filters[predefined_filter_type::FLYING_ITEM];
+	if (is_like_thrown_melee(handle)) {
+		return filters[predefined_filter_type::FLYING_MELEE];
+	}
+
+	if (is_like_thrown_explosive(handle)) {
+		return filters[predefined_filter_type::FLYING_EXPLOSIVE];
 	}
 
 	{
 		const auto capability = handle.get_owning_transfer_capability();
 
 		if (capability && capability != handle) {
+			/*
+				Note that a melee in action will still collide with shoot/throw-through surfaces,
+				because melee_system uses predefined_queries::melee_query()
+				to filter for potential damage targets.
+				This is a good thing because we might still want to hit low lying objects.
+			*/
+
 			return filters[predefined_filter_type::CHARACTER_WEAPON];
 		}
 	}
@@ -127,7 +135,7 @@ void physics_world_cache::specific_infer_rigid_body_from_scratch(const E& handle
 
 	def.userData = unversioned_entity_id(handle);
 
-	def.bullet = calc_is_bullet(handle);
+	def.bullet = calc_needs_analytic_physics(handle);
 	def.allowSleep = physics_def.allow_sleep;
 
 	const auto damping = ::calc_damping_mults(handle, physics_def);
@@ -200,7 +208,7 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 	
 			/* These have no side-effects */
 			::infer_damping(handle, body);
-			body.SetBullet(calc_is_bullet(handle));
+			body.SetBullet(calc_needs_analytic_physics(handle));
 	
 			if (handle.template has<components::missile>()) {
 				body.SetFixedRotation(true);

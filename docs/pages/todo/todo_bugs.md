@@ -5,13 +5,15 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- if server is down after update check if removing the single second delay between interrupt and restart didn't break something
+	- it was put in restart_servers for some reason but I don't recall why
 
 - caki crash
 	- changing fy minilab reloaded remake to de_labs2
 		- vars was null
 	- message.txt 
 - lopa crash
-	- when pressing OK 
+	- when pressing OK on renaming gifs
 	- we have logs on discord
 
 

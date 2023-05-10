@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- foostep speed could be fixed within the same parameter tbh
+
+- Deploy last builds should not delete uploaded maps
+    - Why not keep it in the server's user/downloaded?
+        - well we want officials too to be listed on the page
+    - test it
+
 - Simple event system
     - First usecase: Teleports and Playing sounds
     - Best to be able to attach it to any entity

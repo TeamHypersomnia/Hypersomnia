@@ -1124,13 +1124,19 @@ EDIT_FUNCTION(
 		MULTIPROPERTY("Grenades fly over", as_physical.is_throw_through);
 
 		if (ImGui::IsItemHovered()) {
-			text_tooltip("If enabled, grenades will freely fly over this object.\nBullets and characters will still collide.");
+			text_tooltip("If enabled, grenades will freely fly over this object.\nNOTE that rockets will fly over this object as well.");
+		}
+
+		MULTIPROPERTY("Knives fly over", as_physical.is_melee_throw_through);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If enabled, knives and all thrown melees will freely fly over this object.");
 		}
 
 		MULTIPROPERTY("Bullets fly over", as_physical.is_shoot_through);
 
 		if (ImGui::IsItemHovered()) {
-			text_tooltip("If enabled, bullets will freely fly over this object.\nCharacters will still collide.");
+			text_tooltip("If enabled, bullets and magic missiles will freely fly over this object.\nCharacters will still collide - except their weapons.\n\nNote that rockets are NOT considered bullets.\nFor these, you must tick Grenades fly over.");
 		}
 	}
 	else {
