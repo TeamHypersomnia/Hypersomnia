@@ -11,6 +11,7 @@
 enum class custom_imgui_result {
 	NONE,
 	GO_TO_MAIN_MENU,
+	GO_TO_PROJECT_SELECTOR,
 	RETRY,
 	OPEN_SELECTED_PROJECT,
 

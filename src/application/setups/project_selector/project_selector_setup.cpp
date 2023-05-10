@@ -379,13 +379,13 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 
 		switch (current_tab) {
 			case project_tab_type::MY_PROJECTS:
-			return tab.perform_list(ad_hoc, "Last modified", in.window);
+			return tab.perform_list(ad_hoc, "Last updated", in.window);
 
 			case project_tab_type::OFFICIAL_ARENAS:
-			return tab.perform_list(ad_hoc, "Last modified", in.window);
+			return tab.perform_list(ad_hoc, "Last updated", in.window);
 
 			case project_tab_type::DOWNLOADED_ARENAS:
-			return tab.perform_list(ad_hoc, "Last modified", in.window);
+			return tab.perform_list(ad_hoc, "Last updated", in.window);
 
 			default:
 			return false;

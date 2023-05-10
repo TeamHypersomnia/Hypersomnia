@@ -1599,6 +1599,10 @@ work_result work(const int argc, const char* const * const argv) try {
 					launch_setup(activity_type::MAIN_MENU);
 					break;
 
+				case custom_imgui_result::GO_TO_PROJECT_SELECTOR:
+					launch_setup(activity_type::EDITOR_PROJECT_SELECTOR);
+					break;
+
 				case custom_imgui_result::RETRY:
 					if constexpr(std::is_same_v<S, client_setup>) {
 						launch_setup(activity_type::CLIENT);

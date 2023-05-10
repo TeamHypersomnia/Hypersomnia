@@ -59,6 +59,12 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 			if (ImGui::MenuItem("Reveal in explorer", "CTRL+SHIFT+E")) {
 				in.window.reveal_in_explorer(paths.project_json);
 			}
+
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Go back to Projects list")) {
+				imgui_return_once = custom_imgui_result::GO_TO_PROJECT_SELECTOR;
+			}
 		}
 
 		auto item_if = [](const bool condition, const char* label, const char* shortcut = nullptr) {
