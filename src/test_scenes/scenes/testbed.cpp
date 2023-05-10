@@ -633,7 +633,7 @@ namespace test_scenes {
 		for (std::size_t i = 0; i < num_characters; ++i) {
 			auto transform = character_transforms[i];
 
-			const bool is_metropolis = i % 2 == 0;
+			const bool is_metropolis = i % 2 == 0 && i != 8;
 			const auto new_character = create(is_metropolis ? metropolis_type : resistance_type, transform);
 
 			new_characters[i] = new_character;

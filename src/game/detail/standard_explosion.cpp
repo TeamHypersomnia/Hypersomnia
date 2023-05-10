@@ -88,15 +88,25 @@ void standard_explosion_input::instantiate(
 	const auto subject = cosm[subject_if_any];
 	const auto subject_alive = subject.alive();
 
+	std::optional<faction_type> sender_faction;
+
 	if (subject_alive) {
+		sender_faction = subject.get_official_faction();
+
 		if (subject.template has<components::sentience>()) {
 			::mark_caused_danger(subject, sound.modifier, explosion_location);
+			sender_faction = subject.get_official_faction();
 		}
 		else if (const auto sender = subject.template find<components::sender>()) {
 			if (const auto sender_capability = cosm[sender->capability_of_sender]) {
 				::mark_caused_danger(sender_capability, sound.modifier, explosion_location);
+				sender_faction = sender_capability.get_official_faction();
 			}
 		}
+	}
+
+	if (sender_faction == faction_type::SPECTATOR) {
+		sender_faction = std::nullopt;
 	}
 
 	if (subject_alive) {
@@ -187,6 +197,14 @@ void standard_explosion_input::instantiate(
 
 				if (is_self) {
 					return callback_result::CONTINUE;
+				}
+
+				if (!hit_friendlies && sender_faction.has_value()) {
+					if (const auto capability = victim.get_owning_transfer_capability()) {
+						if (*sender_faction == capability.get_official_faction()) {
+							return callback_result::CONTINUE;
+						}
+					}
 				}
 
 				const bool is_explosion_body = victim.has<components::cascade_explosion>();

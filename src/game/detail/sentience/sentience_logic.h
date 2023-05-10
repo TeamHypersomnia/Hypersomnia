@@ -27,9 +27,9 @@ void resurrect(const logic_step step, const E& typed_handle) {
 
 	if (sentience.has_exploded) {
 		sentience.has_exploded = false;
-
-		typed_handle.infer_colliders_from_scratch();
 	}
+
+	typed_handle.infer_colliders_from_scratch();
 }
 
 void handle_corpse_damage(

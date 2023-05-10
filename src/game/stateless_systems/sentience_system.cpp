@@ -272,6 +272,8 @@ static void handle_special_result(const logic_step step, const messages::health_
 
 	auto knockout = [&]() {
 		perform_knockout(subject, step, impact_dir, origin);
+		/* So that dead bodies don't collide with characters */
+		subject.infer_colliders_from_scratch();
 	};
 
 	using result_type = messages::health_event::result_type;
@@ -445,246 +447,255 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 	return h;
 }
 
-void sentience_system::apply_damage_and_generate_health_events(const logic_step step) const {
-	const auto& damages = step.get_queue<messages::damage_message>();
+void sentience_system::process_damage_message(const messages::damage_message& d, const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 	const auto& clk = cosm.get_clock();
 	const auto now = clk.now;
 
-	for (const auto& d : damages) {
-		const auto subject = cosm[d.subject];
-		const auto& def = d.damage;
+	const auto subject = cosm[d.subject];
+	const auto& def = d.damage;
 
-		auto apply_impact_impulse = [&]() {
-			auto considered_impulse = def.impact_impulse;
+	auto apply_impact_impulse = [&]() {
+		auto considered_impulse = def.impact_impulse;
 
-			if (considered_impulse > 0.f) {
-				/*
-					Note: armored players will experience a greater kickback from an interference explosion,
-					but that is not a scripted behaviour. It is because without armor, the Consciousness Points are depleted almost instantaneously,
-					thus forcibly stopping the sprint, which is implemented via an increase in inertia.
-				*/
+		if (considered_impulse > 0.f) {
+			/*
+				Note: armored players will experience a greater kickback from an interference explosion,
+				but that is not a scripted behaviour. It is because without armor, the Consciousness Points are depleted almost instantaneously,
+				thus forcibly stopping the sprint, which is implemented via an increase in inertia.
+			*/
 
-				considered_impulse *= def.impulse_multiplier_against_sentience;
+			considered_impulse *= def.impulse_multiplier_against_sentience;
 
-				const auto subject_of_impact = subject.get_owner_of_colliders().template get<components::rigid_body>();
-				const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
+			const auto subject_of_impact = subject.get_owner_of_colliders().template get<components::rigid_body>();
+			const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
 
-				const auto impact = vec2(d.impact_velocity).set_length(considered_impulse);
+			const auto impact = vec2(d.impact_velocity).set_length(considered_impulse);
 
-				subject_of_impact.apply_impulse(impact, d.point_of_impact - subject_of_impact_mass_pos);
+			subject_of_impact.apply_impulse(impact, d.point_of_impact - subject_of_impact_mass_pos);
+		}
+	};
+
+	auto* const sentience = subject.find<components::sentience>();
+
+	messages::health_event event_template;
+	event_template.subject = d.subject;
+	event_template.point_of_impact = d.point_of_impact;
+	event_template.impact_velocity = d.impact_velocity;
+	event_template.special_result = messages::health_event::result_type::NONE;
+	event_template.origin = d.origin;
+	event_template.source_adversity = d.type;
+	event_template.head_transform = d.head_transform;
+
+	auto& is_headshot = event_template.origin.circumstances.headshot;
+
+	if (!sentient_and_alive(subject)) {
+		/* Disallow headshots on corpses */
+		is_headshot = false;
+	}
+
+	const auto& amount = def.base * (is_headshot ? d.headshot_mult : 1.0f);
+
+	auto process_and_post_health = [&](const auto& event) {
+		process_and_post_health_event(event, step);
+	};
+
+	if (sentience) {
+		const auto& s = *sentience;
+
+		auto contribute_to_damage = [&](const auto applied, const auto hp, const auto pe) {
+			const auto& origin = d.origin;
+			const auto inflicting_capability = origin.get_guilty_of_damaging(subject);
+
+			auto& owners = sentience->damage_owners;
+			bool found = false;
+
+			for (auto& o : owners) {
+				if (o.who == inflicting_capability) {
+					o.applied_damage += applied;
+					o.hp_loss += hp;
+					o.pe_loss += pe;
+					++o.hits;
+					found = true;
+				}
 			}
+
+			if (!found) {
+				const auto new_one = damage_owner { inflicting_capability, 1, applied, hp, pe };
+
+				if (owners.size() == owners.max_size()) {
+					if (owners.back() < new_one) {
+						owners.back() = new_one;
+					}
+				}
+				else {
+					owners.push_back(new_one);
+				}
+			}
+
+			sort_range(owners);
 		};
 
-		auto* const sentience = subject.find<components::sentience>();
+		auto& health = s.get<health_meter_instance>();
+		auto& consciousness = s.get<consciousness_meter_instance>();
+		auto& personal_electricity = s.get<personal_electricity_meter_instance>();
 
-		messages::health_event event_template;
-		event_template.subject = d.subject;
-		event_template.point_of_impact = d.point_of_impact;
-		event_template.impact_velocity = d.impact_velocity;
-		event_template.special_result = messages::health_event::result_type::NONE;
-		event_template.origin = d.origin;
-		event_template.source_adversity = d.type;
-		event_template.head_transform = d.head_transform;
+		const auto absorption = ::find_active_pe_absorption(subject);
+		const auto is_shield_enabled = [&absorption]() { return absorption.has_value(); };
 
-		auto& is_headshot = event_template.origin.circumstances.headshot;
+		meter_value_type reported_pe_damage = 0;
+		meter_value_type reported_hp_damage = 0;
 
-		if (!sentient_and_alive(subject)) {
-			/* Disallow headshots on corpses */
-			is_headshot = false;
+		auto apply_ped = [event_template, &reported_pe_damage, &personal_electricity, &process_and_post_health](const meter_value_type amount) {
+			auto event = event_template;
+
+			event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY;
+			event.damage = personal_electricity.calc_damage_result(amount);
+			reported_pe_damage = event.damage.effective;
+
+			if (event.damage.effective != 0) {
+				process_and_post_health(event);
+			}
+
+			return event.damage;
+		};
+
+		if (d.type == adverse_element_type::FORCE && health.is_enabled()) {
+			auto event = event_template;
+
+			auto after_shield_damage = amount;
+
+			if (is_shield_enabled()) {
+				const auto mult = std::max(0.01f, absorption->first.hp);
+				after_shield_damage = apply_ped(amount / mult).excessive * mult;
+				event.is_remainder_after_shield_destruction = true;
+			}
+
+			if (after_shield_damage > 0) {
+				event.target = messages::health_event::target_type::HEALTH;
+
+				event.damage = health.calc_damage_result(after_shield_damage);
+				reported_hp_damage = event.damage.effective;
+
+				if (event.damage.effective != 0 || event.damage.excessive != 0) {
+					process_and_post_health(event);
+				}
+			}
 		}
 
-		const auto& amount = def.base * (is_headshot ? d.headshot_mult : 1.0f);
+		else if (d.type == adverse_element_type::INTERFERENCE && consciousness.is_enabled()) {
+			auto event = event_template;
 
-		auto process_and_post_health = [&](const auto& event) {
-			process_and_post_health_event(event, step);
-		};
+			auto after_shield_damage = amount;
 
-		if (sentience) {
-			const auto& s = *sentience;
+			if (is_shield_enabled()) {
+				const auto mult = std::max(0.01f, absorption->first.cp);
+				after_shield_damage = apply_ped(amount / mult).excessive * mult;
+			}
 
-			auto contribute_to_damage = [&](const auto applied, const auto hp, const auto pe) {
-				const auto& origin = d.origin;
-				const auto inflicting_capability = origin.get_guilty_of_damaging(subject);
-
-				auto& owners = sentience->damage_owners;
-				bool found = false;
-
-				for (auto& o : owners) {
-					if (o.who == inflicting_capability) {
-						o.applied_damage += applied;
-						o.hp_loss += hp;
-						o.pe_loss += pe;
-						++o.hits;
-						found = true;
-					}
-				}
-
-				if (!found) {
-					const auto new_one = damage_owner { inflicting_capability, 1, applied, hp, pe };
-
-					if (owners.size() == owners.max_size()) {
-						if (owners.back() < new_one) {
-							owners.back() = new_one;
-						}
-					}
-					else {
-						owners.push_back(new_one);
-					}
-				}
-
-				sort_range(owners);
-			};
-
-			auto& health = s.get<health_meter_instance>();
-			auto& consciousness = s.get<consciousness_meter_instance>();
-			auto& personal_electricity = s.get<personal_electricity_meter_instance>();
-
-			const auto absorption = ::find_active_pe_absorption(subject);
-			const auto is_shield_enabled = [&absorption]() { return absorption.has_value(); };
-
-			meter_value_type reported_pe_damage = 0;
-			meter_value_type reported_hp_damage = 0;
-
-			auto apply_ped = [event_template, &reported_pe_damage, &personal_electricity, &process_and_post_health](const meter_value_type amount) {
-				auto event = event_template;
-
-				event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY;
-				event.damage = personal_electricity.calc_damage_result(amount);
-				reported_pe_damage = event.damage.effective;
+			if (after_shield_damage > 0) {
+				event.target = messages::health_event::target_type::CONSCIOUSNESS;
+				event.damage = consciousness.calc_damage_result(after_shield_damage);
 
 				if (event.damage.effective != 0) {
 					process_and_post_health(event);
 				}
-
-				return event.damage;
-			};
-
-			if (d.type == adverse_element_type::FORCE && health.is_enabled()) {
-				auto event = event_template;
-
-				auto after_shield_damage = amount;
-
-				if (is_shield_enabled()) {
-					const auto mult = std::max(0.01f, absorption->first.hp);
-					after_shield_damage = apply_ped(amount / mult).excessive * mult;
-					event.is_remainder_after_shield_destruction = true;
-				}
-
-				if (after_shield_damage > 0) {
-					event.target = messages::health_event::target_type::HEALTH;
-
-					event.damage = health.calc_damage_result(after_shield_damage);
-					reported_hp_damage = event.damage.effective;
-
-					if (event.damage.effective != 0 || event.damage.excessive != 0) {
-						process_and_post_health(event);
-					}
-				}
-			}
-
-			else if (d.type == adverse_element_type::INTERFERENCE && consciousness.is_enabled()) {
-				auto event = event_template;
-
-				auto after_shield_damage = amount;
-
-				if (is_shield_enabled()) {
-					const auto mult = std::max(0.01f, absorption->first.cp);
-					after_shield_damage = apply_ped(amount / mult).excessive * mult;
-				}
-
-				if (after_shield_damage > 0) {
-					event.target = messages::health_event::target_type::CONSCIOUSNESS;
-					event.damage = consciousness.calc_damage_result(after_shield_damage);
-
-					if (event.damage.effective != 0) {
-						process_and_post_health(event);
-					}
-				}
-			}
-
-			else if (d.type == adverse_element_type::PED && personal_electricity.is_enabled()) {
-				if (is_shield_enabled()) {
-					apply_ped(static_cast<meter_value_type>(amount * 2.5));
-				}
-				else {
-					apply_ped(amount);
-				}
-			}
-
-			else if (d.type == adverse_element_type::FLASH) {
-				const auto flashbang = cosm[d.origin.cause.entity];
-
-				if (const auto explosive = flashbang.template find<invariants::explosive>()) {
-					const auto epicentre_vec = flashbang.get_logic_transform().pos - d.point_of_impact;
-					const auto distance_from_epicentre = epicentre_vec.length();
-					const auto max_distance = explosive->explosion.effective_radius;
-					const auto r = repro::sqrt(std::max(0.f, 1 - distance_from_epicentre / max_distance));
-					{
-						auto& secs = sentience->audio_flash_secs;
-
-						secs = std::max(0.f, secs);
-						secs = std::max(secs, r * amount);
-					}
-
-					{
-						auto& secs = sentience->visual_flash_secs;
-
-						const auto epicentre_dir = epicentre_vec / distance_from_epicentre;
-
-						const auto look_dir = subject.get_logic_transform().get_direction();
-						const auto until = subject.get<invariants::sentience>().soften_flash_until_look_mult;
-						const auto look_mult = std::max(until, (look_dir.dot(epicentre_dir) + 1) / 2);
-
-						secs = std::max(0.f, secs);
-						secs = std::max(secs, r * amount * look_mult);
-					}
-				}
-			}
-
-			if (reported_hp_damage > 0 || reported_pe_damage > 0) {
-				contribute_to_damage(amount, reported_hp_damage, reported_pe_damage);
 			}
 		}
 
-		const auto owning_capability = subject.get_owning_transfer_capability();
+		else if (d.type == adverse_element_type::PED && personal_electricity.is_enabled()) {
+			if (is_shield_enabled()) {
+				apply_ped(static_cast<meter_value_type>(amount * 2.5));
+			}
+			else {
+				apply_ped(amount);
+			}
+		}
 
-		if (d.damage.shake.any()) {
-			if (auto* const head = subject.find<components::head>()) {
-				if (const auto* const crosshair = subject.find_crosshair()) {
-					const auto recoil_amount = crosshair->recoil.rotation;
-					const auto recoil_dir = augs::sgn(recoil_amount);
-					const auto considered_amount = (recoil_dir == 0 ? 1 : recoil_dir) * std::min(1.f, std::max(repro::fabs(recoil_amount), 0.2f));
+		else if (d.type == adverse_element_type::FLASH) {
+			const auto flashbang = cosm[d.origin.cause.entity];
 
-					const auto& head_def = subject.get<invariants::head>();
+			if (const auto explosive = flashbang.template find<invariants::explosive>()) {
+				const auto epicentre_vec = flashbang.get_logic_transform().pos - d.point_of_impact;
+				const auto distance_from_epicentre = epicentre_vec.length();
+				const auto max_distance = explosive->explosion.effective_radius;
+				const auto r = repro::sqrt(std::max(0.f, 1 - distance_from_epicentre / max_distance));
+				{
+					auto& secs = sentience->audio_flash_secs;
 
-					head->shake_rotation_amount += considered_amount * head_def.impulse_mult_on_shake;
+					secs = std::max(0.f, secs);
+					secs = std::max(secs, r * amount);
+				}
+
+				{
+					auto& secs = sentience->visual_flash_secs;
+
+					const auto epicentre_dir = epicentre_vec / distance_from_epicentre;
+
+					const auto look_dir = subject.get_logic_transform().get_direction();
+					const auto until = subject.get<invariants::sentience>().soften_flash_until_look_mult;
+					const auto look_mult = std::max(until, (look_dir.dot(epicentre_dir) + 1) / 2);
+
+					secs = std::max(0.f, secs);
+					secs = std::max(secs, r * amount * look_mult);
 				}
 			}
+		}
 
-			auto apply_shake = [&](const auto& to_whom) {
-				to_whom.template dispatch_on_having_all<invariants::sentience>([&](const auto& typed_victim) {
-					const auto& sentience_def = typed_victim.template get<invariants::sentience>();
-					auto& sentience = typed_victim.template get<components::sentience>();
+		if (reported_hp_damage > 0 || reported_pe_damage > 0) {
+			contribute_to_damage(amount, reported_hp_damage, reported_pe_damage);
+		}
+	}
 
-					auto considered_shake = d.damage.shake;
-					considered_shake.apply(now, sentience_def, sentience);
-				});
-			};
+	const auto owning_capability = subject.get_owning_transfer_capability();
 
-			if (sentience) {
-				apply_shake(subject);
-			}
-			else if (owning_capability) {
-				apply_shake(owning_capability);
+	if (d.damage.shake.any()) {
+		if (auto* const head = subject.find<components::head>()) {
+			if (const auto* const crosshair = subject.find_crosshair()) {
+				const auto recoil_amount = crosshair->recoil.rotation;
+				const auto recoil_dir = augs::sgn(recoil_amount);
+				const auto considered_amount = (recoil_dir == 0 ? 1 : recoil_dir) * std::min(1.f, std::max(repro::fabs(recoil_amount), 0.2f));
+
+				const auto& head_def = subject.get<invariants::head>();
+
+				head->shake_rotation_amount += considered_amount * head_def.impulse_mult_on_shake;
 			}
 		}
 
-		const bool held_item = sentience == nullptr && owning_capability;
+		auto apply_shake = [&](const auto& to_whom) {
+			to_whom.template dispatch_on_having_all<invariants::sentience>([&](const auto& typed_victim) {
+				const auto& sentience_def = typed_victim.template get<invariants::sentience>();
+				auto& sentience = typed_victim.template get<components::sentience>();
 
-		if (!held_item) {
-			apply_impact_impulse();
+				auto considered_shake = d.damage.shake;
+				considered_shake.apply(now, sentience_def, sentience);
+			});
+		};
+
+		if (sentience) {
+			apply_shake(subject);
 		}
+		else if (owning_capability) {
+			apply_shake(owning_capability);
+		}
+	}
+
+	const bool held_item = sentience == nullptr && owning_capability;
+
+	if (!held_item) {
+		apply_impact_impulse();
+	}
+}
+
+void sentience_system::process_damages_and_generate_health_events(const logic_step step) const {
+	const auto& damages = step.get_queue<messages::damage_message>();
+
+	for (const auto& d : damages) {
+		if (d.processed) {
+			continue;
+		}
+
+		process_damage_message(d, step);
 	}
 }
 

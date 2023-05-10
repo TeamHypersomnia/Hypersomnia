@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- damage_charges_before_destruction -> damage_until_before_destruction
 - foostep speed could be fixed within the same parameter tbh
 
 - Deploy last builds should not delete uploaded maps

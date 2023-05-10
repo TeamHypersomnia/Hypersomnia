@@ -100,10 +100,14 @@ predefined_filters::predefined_filters() {
 		out.maskBits = standard_participation();
 	}
 	{
-
 		auto& out = filters[predefined_filter_type::CHARACTER];
 		out.categoryBits = make_flags(C::CHARACTER);
 		out.maskBits = standard_participation_except();
+	}
+	{
+		auto& out = filters[predefined_filter_type::DEAD_CHARACTER];
+		out.categoryBits = make_flags(C::CHARACTER);
+		out.maskBits = standard_participation_except(C::CHARACTER, C::CHARACTER_WEAPON);
 	}
 	{
 

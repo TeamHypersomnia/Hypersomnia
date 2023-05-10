@@ -34,7 +34,8 @@ struct standard_explosion_input {
 	real32 ring_duration_seconds = 0.20f;
 	adverse_element_type type = adverse_element_type::FORCE;
 	bool create_thunders_effect = false;
-	pad_bytes<3> pad;
+	bool hit_friendlies = true;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 
 	auto& operator*=(const real32 scalar) {

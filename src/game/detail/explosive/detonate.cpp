@@ -66,6 +66,9 @@ void detonate(const detonate_input in, const bool destroy_subject) {
 			if (const auto maybe_subject_sender = subject.find<components::sender>()) {
 				sender_info = *maybe_subject_sender;
 			}
+			else {
+				sender_info.faction_of_sender = subject.get_official_faction();
+			}
 
 			sender_info.set_direct(subject);
 

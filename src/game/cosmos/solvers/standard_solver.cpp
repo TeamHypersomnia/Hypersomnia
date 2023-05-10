@@ -192,9 +192,15 @@ void standard_solve(const logic_step step) {
 	{
 		auto scope = measure_scope(performance.sentiences);
 
+		/* 
+			Called before process_damages_and_generate_health_events 
+			because it's meant to process health events posted externally
+			(e.g. forced deaths, posted by the game mode - for example when changing teams)
+		*/
 		sentience_system().process_special_results_of_health_events(step);
+
 		sentience_system().regenerate_values_and_advance_spell_logic(step);
-		sentience_system().apply_damage_and_generate_health_events(step);
+		sentience_system().process_damages_and_generate_health_events(step);
 		sentience_system().cooldown_aimpunches(step);
 	}
 

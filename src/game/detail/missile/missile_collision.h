@@ -1,7 +1,9 @@
 #pragma once
+#include "game/messages/damage_message.h"
 #include "game/detail/physics/missile_surface_info.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/missile/headshot_detection.hpp"
+#include "game/stateless_systems/sentience_system.h"
 
 struct missile_collision_result {
 	transformr transform_of_impact;
@@ -101,19 +103,10 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	const auto sentience = surface_handle.template find<invariants::sentience>();
 	const bool surface_sentient = sentience != nullptr;
 
-	if (info.should_detonate() && missile_def.destroy_upon_damage) {
+	bool should_consume_charge = false;
+
+	auto consume_charge_and_destroy = [&]() {
 		--charges;
-		
-		detonate_if(typed_missile.get_id(), point, step);
-
-		{
-			const auto& total_damage_amount = damage_msg.damage.base;
-
-			if (augs::is_positive_epsilon(total_damage_amount)) {
-				startle_nearby_organisms(cosm, point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
-				startle_nearby_organisms(cosm, point, total_damage_amount * 6.f, 50.f + total_damage_amount * 2.f, startle_type::IMMEDIATE);
-			}
-		}
 
 		// delete only once
 		if (charges == 0) {
@@ -134,6 +127,21 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 				);
 			}
 		}
+	};
+
+	if (info.should_detonate() && missile_def.destroy_upon_damage) {
+		detonate_if(typed_missile.get_id(), point, step);
+
+		{
+			const auto& total_damage_amount = damage_msg.damage.base;
+
+			if (augs::is_positive_epsilon(total_damage_amount)) {
+				startle_nearby_organisms(cosm, point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
+				startle_nearby_organisms(cosm, point, total_damage_amount * 6.f, 50.f + total_damage_amount * 2.f, startle_type::IMMEDIATE);
+			}
+		}
+
+		should_consume_charge = true;
 	}
 
 	if (send_damage && contact_start) {
@@ -195,7 +203,25 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			}
 		}
 
+		if (const auto sentience_comp = surface_handle.template find<components::sentience>()) {
+			sentience_system().process_damage_message(damage_msg, step);
+			damage_msg.processed = true;
+
+			if (!sentience_comp->is_conscious()) {
+				should_consume_charge = false;
+			}
+		}
+
+		if (should_consume_charge) {
+			consume_charge_and_destroy();
+		}
+
 		step.post_message(damage_msg);
+	}
+	else {
+		if (should_consume_charge) {
+			consume_charge_and_destroy();
+		}
 	}
 
 	return missile_collision_result { transformr { point, impact_dir.degrees() }, charges };

@@ -40,5 +40,5 @@ For example, a function that is concerned with detonatable entities - ``demoliti
 ## Other examples
 
 - ```gun_system::launch_shots_due_to_pressed_triggers```
-- ```sentience_system::apply_damage_and_generate_health_events```
+- ```sentience_system::process_damages_and_generate_health_events```
 - ```sound_system::update_sound_properties```

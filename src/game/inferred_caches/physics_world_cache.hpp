@@ -88,6 +88,12 @@ auto calc_filters(const E& handle) {
 		if (sentience->has_exploded) {
 			return filter_type();
 		}
+
+		if (!sentience->is_conscious()) {
+			return filters[predefined_filter_type::DEAD_CHARACTER];
+		}
+
+		return filters[predefined_filter_type::CHARACTER];
 	}
 
 	return colliders_data.filter;
