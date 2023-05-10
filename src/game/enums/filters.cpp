@@ -113,7 +113,7 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::CHARACTER_WEAPON];
 		out.categoryBits = make_flags(C::CHARACTER_WEAPON);
-		out.maskBits = standard_participation_except();
+		out.maskBits = standard_participation_except(C::CHARACTER_WEAPON, C::CHARACTER);
 	}
 	{
 

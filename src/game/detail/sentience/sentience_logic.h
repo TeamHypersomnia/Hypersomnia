@@ -24,6 +24,7 @@ void resurrect(const logic_step step, const E& typed_handle) {
 
 	sentience.detached = {};
 	sentience.when_corpse_catched_fire = {};
+	sentience.when_knocked_out = {};
 
 	if (sentience.has_exploded) {
 		sentience.has_exploded = false;
