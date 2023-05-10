@@ -66,6 +66,7 @@ struct plain_sprited_body {
 		invariants::fixtures,
 		invariants::sprite,
 		invariants::render,
+		invariants::animation,
 
 		invariants::interpolation
 	>;
@@ -74,7 +75,8 @@ struct plain_sprited_body {
 		components::sprite,
 		components::sorting_order,
 		components::overridden_geo,
-		components::rigid_body
+		components::rigid_body,
+		components::animation
 	>;
 
 	using synchronized_arrays = type_list<
