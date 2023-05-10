@@ -1881,19 +1881,15 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 }
 
 setup_escape_result server_setup::escape() {
-	if (solvable_vars.playtesting_context) {
-		return setup_escape_result::QUIT_PLAYTESTING;
-	}
-
 	if (!is_gameplay_on()) {
-		return setup_escape_result::GO_TO_MAIN_MENU;
+		return quit_playtesting_or(setup_escape_result::GO_TO_MAIN_MENU);
 	}
 
 	if (integrated_client_gui.rcon.escape()) {
 		return setup_escape_result::JUST_FETCH;
 	}
 
-	return arena_gui_base::escape();
+	return quit_playtesting_or(arena_gui_base::escape());
 }
 
 bool server_setup::is_gameplay_on() const {

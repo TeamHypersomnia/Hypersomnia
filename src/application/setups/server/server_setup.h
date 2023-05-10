@@ -99,6 +99,14 @@ class server_setup :
 		return result;
 	}
 
+	auto quit_playtesting_or(setup_escape_result result) const {
+		if (solvable_vars.playtesting_context && result == setup_escape_result::GO_TO_MAIN_MENU) {
+			return setup_escape_result::QUIT_PLAYTESTING;
+		}
+
+		return result;
+	}
+
 	server_step_type current_simulation_step = 0;
 
 	augs::serialization_buffers buffers;

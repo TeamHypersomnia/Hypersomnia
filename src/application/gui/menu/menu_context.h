@@ -14,6 +14,7 @@ struct menu_context_dependencies {
 	const augs::baked_font& gui_font;
 	const all_necessary_sounds& sounds;
 	const augs::audio_volume_settings& audio_volume;
+	const bool will_quit_to_editor;
 };
 
 template <bool is_const, class Enum>

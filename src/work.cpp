@@ -863,6 +863,9 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	auto restore_background_setup = [&]() {
 		current_setup = std::move(background_setup);
+		background_setup = std::unique_ptr<setup_variant>();
+
+		ingame_menu.show = false;
 	};
 
 	auto visit_current_setup = [&](auto callback) -> decltype(auto) {
@@ -1394,7 +1397,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
 			necessary_sounds,
-			viewing_config.audio_volume
+			viewing_config.audio_volume,
+			background_setup != nullptr
 		};
 	};
 
@@ -1988,7 +1992,13 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::QUIT_TO_MENU:
-				launch_setup(activity_type::MAIN_MENU);
+				if (background_setup != nullptr) {
+					restore_background_setup();
+				}
+				else {
+					launch_setup(activity_type::MAIN_MENU);
+				}
+
 				break;
 
 			case T::SETTINGS:
