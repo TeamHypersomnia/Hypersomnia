@@ -110,7 +110,7 @@ void thunder_system::advance(
 							cosm.get_si(),
 							child.from,
 							child.to,
-							predefined_queries::crosshair_laser()
+							filters[predefined_filter_type::CHARACTER]
 						);
 
 						if (raycast.hit) {

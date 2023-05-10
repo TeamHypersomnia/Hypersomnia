@@ -19,6 +19,8 @@
 #include "augs/drawing/drawing.hpp"
 #include "augs/log.h"
 
+#include "game/modes/detail/item_purchase_logic.hpp"
+
 void draw_crosshair_procedurally(
 	const crosshair_drawing_settings& settings,
 	augs::drawer_with_default target,
@@ -114,7 +116,8 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 		const auto make_laser_from_to = [&](
 			const const_entity_handle subject,
 			const vec2 line_from,
-			vec2 line_to
+			vec2 line_to,
+			const b2Filter& filter
 		) {
 			auto detected_color = cyan;
 
@@ -123,12 +126,11 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 					cosm.get_si(),
 					line_from,
 					line_to,
-					predefined_queries::crosshair_laser(),
+					filter,
 					subject
 				);
 
-				if (raycast.hit)
-				{
+				if (raycast.hit) {
 					detected_color = calc_color(cosm[raycast.what_entity]);
 				}
 			}
@@ -140,7 +142,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				cosm.get_si(),
 				line_from,
 				line_to,
-				predefined_queries::crosshair_laser(),
+				filter,
 				subject
 			);
 
@@ -165,7 +167,21 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 		for (const auto& subject_item_id : in.character.get_wielded_items()) {
 			const auto subject_item = cosm[subject_item_id];
 
-			if (subject_item.has<components::gun>() || is_weapon_like(subject_item)) {
+			std::optional<b2Filter> queried_filter;
+
+			if (subject_item.has<components::gun>()) {
+				queried_filter = ::calc_gun_bullet_physical_filter(subject_item);
+			}
+
+			if (subject_item.has<components::hand_fuse>()) {
+				queried_filter = filters[predefined_filter_type::FLYING_EXPLOSIVE];
+			}
+
+			if (subject_item.has<components::melee>()) {
+				queried_filter = filters[predefined_filter_type::FLYING_MELEE];
+			}
+
+			if (queried_filter.has_value()) {
 				const auto rifle_transform = subject_item.get_viewing_transform(in.interpolation);
 				const auto barrel_center = calc_barrel_center(subject_item, rifle_transform);
 				const auto muzzle = calc_muzzle_transform(subject_item, rifle_transform).pos;
@@ -179,7 +195,8 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 					make_laser_from_to(
 						subject_item,
 						line_from,
-						line_to
+						line_to,
+						*queried_filter
 					);
 				}
 			}

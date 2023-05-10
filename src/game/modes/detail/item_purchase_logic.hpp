@@ -3,6 +3,7 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/modes/detail/flavour_getters.h"
 #include "game/modes/detail/spell_getters.h"
+#include "game/enums/filters.h"
 
 template <class E>
 int num_carryable_pieces(
@@ -233,6 +234,33 @@ auto calc_default_charge_flavour(const E& handle) {
 	}
 
 	return item_flavour_id();
+}
+
+template <class E>
+auto calc_gun_bullet_physical_filter(const E& subject_gun) {
+	auto filter = filters[predefined_filter_type::FLYING_BULLET];
+
+	if (const auto charge_flavour = ::calc_default_charge_flavour(subject_gun); charge_flavour.is_set()) {
+		auto& cosm = subject_gun.get_cosmos();
+
+		cosm.on_flavour(
+			charge_flavour,
+			[&](const auto& typed_charge_flavour) {
+				if (const auto cartridge_def = typed_charge_flavour.template find<invariants::cartridge>()) {
+					if (const auto round_flavour = cartridge_def->round_flavour; round_flavour.is_set()) {
+						cosm.on_flavour(
+							round_flavour,
+							[&](const auto& typed_round_flavour) {
+								filter = typed_round_flavour.template get<invariants::fixtures>().filter;
+							}
+						);
+					}
+				}
+			}
+		);
+	}
+
+	return filter;
 }
 
 template <class E>
