@@ -2182,9 +2182,9 @@ namespace test_flavours {
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::GRADOBICIE_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::GRADOBICIE_ROUND);
 
-				cartridge.num_rounds_spawned = 12;
+				cartridge.num_rounds_spawned = 13;
 				cartridge.rounds_spread_degrees = 12.f;
-				cartridge.rounds_spread_degrees_variation = 4.f;
+				cartridge.rounds_spread_degrees_variation = 0.f;
 
 				meta.set(cartridge);
 			}

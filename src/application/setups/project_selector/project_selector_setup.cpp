@@ -30,6 +30,8 @@
 #include "augs/readwrite/json_readwrite.h"
 #include "augs/window_framework/window.h"
 
+#include "augs/templates/in_order_of.h"
+
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 250;
 
@@ -201,6 +203,7 @@ void project_selector_setup::customize_for_viewing(config_lua_table& config) con
 }
 
 bool projects_list_tab_state::perform_list(
+	ImGuiTextFilter& filter,
 	const ad_hoc_in_atlas_map& ad_hoc_atlas,
 	std::optional<std::string> timestamp_column_name,
 	augs::window& window
@@ -232,8 +235,7 @@ bool projects_list_tab_state::perform_list(
 			if (is_current) {
 				ascending = !ascending;
 			}
-			else 
-			{
+			else {
 				sort_by_column = current_col;
 				ascending = true;
 			}
@@ -264,9 +266,13 @@ bool projects_list_tab_state::perform_list(
 
 	const auto line_h = ImGui::GetTextLineHeight();
 
-	for (const auto& entry : entries) {
+	auto process_entry = [&](const auto& entry) {
 		const auto& path = entry.arena_path;
 		const auto arena_name = entry.get_arena_name();
+
+		if (filter.IsActive() && !filter.PassFilter(arena_name.c_str())) {
+			return;
+		}
 
 		const auto selectable_size = ImVec2(0, 1 + miniature_size_v);
 		auto id = scoped_id(entry.miniature_index);
@@ -344,6 +350,31 @@ bool projects_list_tab_state::perform_list(
 
 			ImGui::NextColumn();
 		}
+	};
+
+	if (sort_by_column == 0) {
+		::in_order_of(
+			entries,
+			[&](const auto& entry) {
+				return entry.get_arena_name();
+			},
+			[&](const auto& a, const auto& b) {
+				return ascending ? augs::natural_order(a, b) : augs::natural_order(b, a);
+			},
+			process_entry
+		);
+	}
+	else {
+		::in_order_of(
+			entries,
+			[&](const auto& entry) {
+				return entry.meta.version_timestamp;
+			},
+			[&](const auto& a, const auto& b) {
+				return ascending ? a < b : a > b;
+			},
+			process_entry
+		);
 	}
 
 	return false;
@@ -373,19 +404,21 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 
 	(void)left_buttons_column_size;
 
+	thread_local ImGuiTextFilter filter;
+
 	auto perform_arena_list = [&]() {
 		auto& tab = tabs[current_tab];
 		auto& ad_hoc = in.ad_hoc_atlas;
 
 		switch (current_tab) {
 			case project_tab_type::MY_PROJECTS:
-			return tab.perform_list(ad_hoc, "Last updated", in.window);
+			return tab.perform_list(filter, ad_hoc, "Last updated", in.window);
 
 			case project_tab_type::OFFICIAL_ARENAS:
-			return tab.perform_list(ad_hoc, "Last updated", in.window);
+			return tab.perform_list(filter, ad_hoc, "Last updated", in.window);
 
 			case project_tab_type::DOWNLOADED_ARENAS:
-			return tab.perform_list(ad_hoc, "Last updated", in.window);
+			return tab.perform_list(filter, ad_hoc, "Last updated", in.window);
 
 			default:
 			return false;
@@ -424,7 +457,6 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 		const auto text_h = ImGui::GetTextLineHeight();
 		const auto space_for_clone_button = text_h * (button_padding_mult * 2 + button_size_mult);
 
-		thread_local ImGuiTextFilter filter;
 		filter.Draw();
 
 		{

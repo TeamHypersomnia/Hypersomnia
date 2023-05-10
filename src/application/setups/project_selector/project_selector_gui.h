@@ -29,9 +29,11 @@ struct project_list_entry {
 
 using project_list_entries = std::vector<project_list_entry>;
 
+struct ImGuiTextFilter;
+
 struct projects_list_tab_state {
 	// GEN INTROSPECTOR struct projects_list_tab_state
-	int sort_by_column = 0;
+	int sort_by_column = 1;
 	bool ascending = false;
 	// END GEN INTROSPECTOR
 
@@ -39,6 +41,7 @@ struct projects_list_tab_state {
 	project_list_entries entries;
 
 	bool perform_list(
+		ImGuiTextFilter& filter,
 		const ad_hoc_in_atlas_map& ad_hoc_atlas,
 		std::optional<std::string> timestamp_column_name,
 		augs::window& window

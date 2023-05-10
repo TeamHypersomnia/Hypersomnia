@@ -39,10 +39,6 @@ summary: That which we are brainstorming at the moment.
 
 - Fix callouts rendering
 
-- rcon password should be *
-
-- If something is shoot-through, character weapons shouldn't collide with it either
-
 - Investigate why is changing maps moving to spectator
     - same thing when entering playtesting
     - probably something with faction remapping
@@ -59,12 +55,6 @@ summary: That which we are brainstorming at the moment.
     - and also for generate miniature button
 
 - the whole bullshit with perform_transfer would be a non-issue if our inventory system was normal
-
-- So we'll probably make an creation_system
-
-- what's the point of postconstruct callback in just_create_entity if it accepts a generic handle?
-     - or does it accept a typed one?
-
 
 - maybe don't use sleep on dedicated server as it might not be precise
 

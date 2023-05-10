@@ -5989,3 +5989,12 @@ This will discard your redo history."
 - send heartbeat on map change
 - remove legacy gui code and reliable channel cpp
 - Deploy last builds should push a webhook
+- rcon password should be *
+
+- If something is shoot-through, character weapons shouldn't collide with it either
+
+
+- So we'll probably make an creation_system
+
+- what's the point of postconstruct callback in just_create_entity if it accepts a generic handle?
+     - or does it accept a typed one?
