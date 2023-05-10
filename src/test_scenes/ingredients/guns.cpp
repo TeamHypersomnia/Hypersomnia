@@ -270,7 +270,7 @@ namespace test_flavours {
 
 			test_flavours::add_bullet_round_physics(meta);
 			meta.template get<invariants::rigid_body>().damping.linear = 2.8f;
-			meta.template get<invariants::fixtures>().filter = filters[predefined_filter_type::FLYING_EXPLOSIVE];
+			meta.template get<invariants::fixtures>().filter = filters[predefined_filter_type::FLYING_ROCKET];
 			meta.template get<invariants::fixtures>().density *= 0.07f;
 
 			invariants::missile missile;

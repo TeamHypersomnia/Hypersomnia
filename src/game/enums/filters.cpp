@@ -130,9 +130,16 @@ predefined_filters::predefined_filters() {
 	}
 	{
 
-		auto& out = filters[predefined_filter_type::FLYING_EXPLOSIVE];
+		/* Rockets should collide with characters */
+		auto& out = filters[predefined_filter_type::FLYING_ROCKET];
 		out.categoryBits = make_flags(C::FLYING_EXPLOSIVE);
 		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE);
+	}
+	{
+
+		auto& out = filters[predefined_filter_type::FLYING_EXPLOSIVE];
+		out.categoryBits = make_flags(C::FLYING_EXPLOSIVE);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_EXPLOSIVE, C::CHARACTER, C::CHARACTER_WEAPON);
 	}
 	{
 		auto& out = filters[predefined_filter_type::FLYING_MELEE];
