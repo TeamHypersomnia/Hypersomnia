@@ -164,6 +164,21 @@ FORCE_INLINE void detail_specific_entity_drawer(
 					animated.image_id = image_id;
 					animated.size = in.manager.at(image_id).get_original_size();
 
+					/*
+						Resize accordingly.
+					*/
+
+					if constexpr(H::template has<components::overridden_geo>()) {
+						auto result = typed_handle.template get<invariants::sprite>();
+						const auto& s = typed_handle.template get<components::overridden_geo>().get();
+
+						if (s.is_enabled) {
+							if (result.size.x != 0.0f && result.size.y != 0.0f) {
+								animated.size = vec2i(vec2(animated.size) * s.value / result.size);
+							}
+						}
+					}
+
 					render_visitor(animated, in.manager, input);
 					return;
 				}

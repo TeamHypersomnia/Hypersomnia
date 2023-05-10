@@ -227,7 +227,8 @@ struct dynamic_decoration {
 		components::sorting_order,
 		components::animation,
 		components::transform,
-		components::movement_path
+		components::movement_path,
+		components::overridden_geo
 	>;
 
 	using synchronized_arrays = type_list<
