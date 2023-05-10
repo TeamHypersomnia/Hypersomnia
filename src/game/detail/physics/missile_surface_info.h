@@ -11,6 +11,7 @@ public:
 	bool surface_is_held_item = false;
 	bool surface_is_lying_item = false;
 	bool surface_is_missile = false;
+	bool surface_is_unconscious_body = false;
 
 	entity_id surface_capability;
 
@@ -54,7 +55,12 @@ public:
 		}
 
 		surface_is_lying_item = surface_is_item && !surface_capability.is_set();
-		is_fly_through = surface_is_missile || ignore_altogether || surface_is_lying_item || surface.template get<invariants::fixtures>().bullets_fly_through;
+
+		if (const auto sentience = surface.template find<components::sentience>()) {
+			surface_is_unconscious_body = !sentience->is_conscious();
+		}
+
+		is_fly_through = surface_is_missile || ignore_altogether || surface_is_lying_item || surface_is_unconscious_body || surface.template get<invariants::fixtures>().bullets_fly_through;
 	}
 
 	bool should_ignore_altogether() const {
