@@ -305,7 +305,7 @@ namespace test_flavours {
 
 				auto& eff = a.damage.effects;
 				eff.impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
-				eff.sentience_impact = {};
+				eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
 			}
 
 			{
@@ -315,7 +315,7 @@ namespace test_flavours {
 
 				auto& eff = a.damage.effects;
 				eff.impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
-				eff.sentience_impact = {};
+				eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
 			}
 
 			auto& snd = meta.template get<invariants::continuous_sound>().effect;

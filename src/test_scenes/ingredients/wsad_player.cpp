@@ -235,9 +235,9 @@ namespace test_flavours {
 
 			sentience.shake_settings.max_duration_ms = 1800.f;
 			sentience.shake_settings.duration_mult = 0.65f;
-			sentience.shake_settings.final_mult = 0.7f;
+			sentience.shake_settings.final_mult = 0.55f;
 
-			sentience.knockout_impulse.linear *= 0.7f;
+			sentience.knockout_impulse.linear *= 0.3f;
 			sentience.knockout_impulse.angular = 5.f;
 
 			sentience.const_inertia_damage_ratio = 1.0f;
@@ -262,6 +262,7 @@ namespace test_flavours {
 			sentience.health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 			sentience.corpse_health_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 			sentience.headshot_sound.id = to_sound_id(test_scene_sound_id::HEADSHOT);
+			sentience.headshot_sound.modifier.doppler_factor = 0.5f;
 			sentience.death_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 
 			sentience.head_hitbox_radius = 11.0f;
