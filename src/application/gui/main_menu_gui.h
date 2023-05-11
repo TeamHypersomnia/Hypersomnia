@@ -51,7 +51,7 @@ struct main_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::L)) {
-			button_callback(main_menu_button_type::LOCAL_TEST_SCENE);
+			button_callback(main_menu_button_type::SHOOTING_RANGE);
 			return true;
 		}
 

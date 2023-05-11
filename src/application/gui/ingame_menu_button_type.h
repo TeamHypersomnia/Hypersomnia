@@ -7,7 +7,7 @@ enum class ingame_menu_button_type {
 	BROWSE_SERVERS,
 	SETTINGS,
 	QUIT_TO_MENU,
-	QUIT,
+	QUIT_GAME,
 
 	COUNT
 	// END GEN INTROSPECTOR

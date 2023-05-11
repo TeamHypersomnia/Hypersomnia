@@ -64,7 +64,7 @@ enum class activity_type {
 	// GEN INTROSPECTOR enum class activity_type
 	MAIN_MENU,
 
-	TEST_SCENE,
+	SHOOTING_RANGE,
 
 	EDITOR,
 	EDITOR_PROJECT_SELECTOR,

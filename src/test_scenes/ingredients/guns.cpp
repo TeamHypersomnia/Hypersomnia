@@ -485,6 +485,8 @@ namespace test_flavours {
 				dest_eff.spawn_exploding_ring = true;
 				dest_eff.particles.modifier.colorize = white;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
+
+				missile.damage.effects.sentience_impact = dest_eff;
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
@@ -849,6 +851,8 @@ namespace test_flavours {
 				dest_eff.particles.modifier.colorize = pink;
 				dest_eff.spawn_exploding_ring = true;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
+
+				missile.damage.effects.sentience_impact = dest_eff;
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);

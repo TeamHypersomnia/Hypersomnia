@@ -1203,7 +1203,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				break;
 
-			case activity_type::TEST_SCENE:
+			case activity_type::SHOOTING_RANGE:
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<test_scene_setup>(),
 						lua,
@@ -1958,8 +1958,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				break;
 
-			case T::LOCAL_TEST_SCENE:
-				launch_setup(activity_type::TEST_SCENE);
+			case T::SHOOTING_RANGE:
+				launch_setup(activity_type::SHOOTING_RANGE);
 				break;
 
 			case T::EDITOR:
@@ -2009,7 +2009,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				settings_gui.open();
 				break;
 
-			case T::QUIT:
+			case T::QUIT_GAME:
 				LOG("Quitting due to Quit pressed in ingame menu.");
 				request_quit();
 				break;
