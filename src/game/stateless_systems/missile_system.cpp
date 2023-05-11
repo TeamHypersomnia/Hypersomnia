@@ -149,7 +149,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				it.point
 			)) {
 				missile.saved_point_of_impact_before_death = result->transform_of_impact;
-				missile.damage_charges_before_destruction = result->new_charges_value;
+				missile.damage_until_before_destruction = result->new_charges_value;
 			}
 		});
 
@@ -288,7 +288,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 					{
 						auto& m = simulated_missile;
-						m.damage_charges_before_destruction = 1;
+						m.damage_until_before_destruction = 1;
 						m.power_multiplier_of_sender = 1.f;
 						m.headshot_multiplier_of_sender = throw_def.headshot_multiplier;
 						m.head_radius_multiplier_of_sender = throw_def.head_radius_multiplier;
@@ -350,7 +350,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 			auto& missile_def = it.template get<invariants::missile>();
 		
 			const bool already_detonated_in_this_step = 
-				missile.damage_charges_before_destruction == 0
+				missile.damage_until_before_destruction == 0
 			;
 
 			if (missile_def.constrain_lifetime && !already_detonated_in_this_step) {

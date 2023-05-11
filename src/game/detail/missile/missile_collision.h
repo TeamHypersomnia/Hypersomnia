@@ -58,7 +58,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 	const bool should_send_damage =
 		missile_def.damage_upon_collision
-		&& missile.damage_charges_before_destruction > 0
+		&& missile.damage_until_before_destruction > 0
 	;
 
 	if (!should_send_damage) {
@@ -92,7 +92,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	const auto impact_velocity = collider_impact_velocity;
 	const auto impact_dir = vec2(impact_velocity).normalize();
 
-	auto charges = missile.damage_charges_before_destruction;
+	auto charges = missile.damage_until_before_destruction;
 	const bool send_damage = charges > 0;
 
 	messages::damage_message damage_msg;

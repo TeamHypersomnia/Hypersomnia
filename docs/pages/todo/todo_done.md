@@ -5998,3 +5998,4 @@ This will discard your redo history."
 
 - what's the point of postconstruct callback in just_create_entity if it accepts a generic handle?
      - or does it accept a typed one?
+- damage_until_before_destruction -> damage_until_before_destruction

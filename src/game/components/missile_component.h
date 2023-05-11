@@ -28,7 +28,7 @@ using remnant_flavour_vector = augs::constant_size_vector<remnant_flavour_id, 4>
 namespace components {
 	struct missile {
 		// GEN INTROSPECTOR struct components::missile
-		int damage_charges_before_destruction = 1;
+		int damage_until_before_destruction = 1;
 		real32 power_multiplier_of_sender = 1.f;
 		real32 headshot_multiplier_of_sender = 1.f;
 		real32 head_radius_multiplier_of_sender = 1.f;
