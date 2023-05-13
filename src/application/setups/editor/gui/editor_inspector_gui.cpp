@@ -1600,6 +1600,8 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			ImGui::SetColumnWidth(0, region_avail - ImGui::CalcTextSize("Reset").x - ImGui::GetStyle().FramePadding.x);
 		}
 
+		const bool include_resources_from_selected_nodes = (node_current_tab == inspected_node_tab_type::RESOURCE);
+
 		if constexpr(is_pathed_resource_v<R>) {
 			/* Preserve extension when displaying name */
 			name = resource.external_file.path_in_project.filename().string();
@@ -1613,23 +1615,52 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			;
 
 			reveal_in_explorer_button(full_path);
+
+			auto resource_type_label = std::string(resource.get_type_name());
+
+			if (override_inspector_state == std::nullopt) {
+				const auto cnt = all_inspected.size();
+				if (cnt > 1) {
+					resource_type_label += typesafe_sprintf(" (%x sel.)", cnt);
+				}
+			}
+
+			text_color(resource_type_label + ": ", yellow);
+
+			ImGui::SameLine();
+			text(name);
 		}
+		else {
+			auto resource_type_label = std::string(resource.get_type_name());
 
-		auto label = std::string(resource.get_type_name());
+			if (override_inspector_state == std::nullopt) {
+				const auto cnt = all_inspected.size();
+				if (cnt > 1) {
+					resource_type_label += typesafe_sprintf(" (%x sel.)", cnt);
+				}
+			}
 
-		if (override_inspector_state == std::nullopt) {
-			const auto cnt = all_inspected.size();
-			if (cnt > 1) {
-				label += typesafe_sprintf(" (%x sel.)", cnt);
+			text_color(resource_type_label + ": ", yellow);
+
+			ImGui::SameLine();
+
+			auto edited_resource_name = resource.unique_name;
+
+			if (input_text<100>("##ResourceName", edited_resource_name, ImGuiInputTextFlags_EnterReturnsTrue)) {
+				if (edited_resource_name != resource.unique_name && !edited_resource_name.empty()) {
+					auto name_cmd = in.setup.make_command_from_selected_typed_resources<rename_resource_command, R>("Renamed ", include_resources_from_selected_nodes);
+					name_cmd.after = edited_resource_name;
+
+					if (name_cmd.size() == 1) {
+						name_cmd.built_description = typesafe_sprintf("Renamed resource to %x", name_cmd.after);
+					}
+
+					if (!name_cmd.empty()) {
+						in.setup.post_new_command(std::move(name_cmd)); 
+					}
+				}
 			}
 		}
-
-		text_color(label + ": ", yellow);
-
-		ImGui::SameLine();
-		text(name);
-
-		const bool include_resources_from_selected_nodes = (node_current_tab == inspected_node_tab_type::RESOURCE);
 
 		auto cmd = in.setup.make_command_from_selected_typed_resources<edit_resource_command<R>, R>("Edited ", include_resources_from_selected_nodes);
 		num_last_resources_last_time = cmd.entries.size();

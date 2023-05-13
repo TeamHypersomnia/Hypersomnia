@@ -125,6 +125,10 @@ struct editor_filesystem_node {
 		}
 	}
 
+	void open_all_parents() {
+		for_each_parent([](auto& node){ node.is_open = true; });
+	}
+
 	template <class F>
 	void for_each_entry_recursive(F&& callback) {
 		in_ui_order(std::forward<F>(callback), true);

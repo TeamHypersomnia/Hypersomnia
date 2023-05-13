@@ -4,21 +4,20 @@
 #include "application/setups/editor/nodes/all_editor_node_types_declaration.h"
 
 template <class T>
-struct edit_resource_command;
+struct create_resource_command;
 
 template <class T>
-struct edit_node_command;
+struct edit_resource_command;
+
+struct delete_resources_command;
+
+struct rename_resource_command;
 
 template <class T>
 struct create_node_command;
 
 template <class T>
-struct delete_node_command;
-
-namespace augs {
-	template <class Derived, class... CommandTypes>
-	class history;
-};
+struct edit_node_command;
 
 struct delete_nodes_command;
 struct clone_nodes_command;
@@ -53,8 +52,16 @@ struct replace_whole_project_command;
 
 struct editor_history;
 
+namespace augs {
+	template <class Derived, class... CommandTypes>
+	class history;
+};
+
 using editor_history_base = augs::history<
 	editor_history,
+
+	create_resource_command<editor_material_resource>,
+
 	edit_resource_command<editor_sprite_resource>,
 	edit_resource_command<editor_sound_resource>,
 	edit_resource_command<editor_light_resource>,
@@ -71,6 +78,9 @@ using editor_history_base = augs::history<
 
 	edit_resource_command<editor_prefab_resource>,
 	edit_resource_command<editor_game_mode_resource>,
+
+	rename_resource_command,
+	delete_resources_command,
 
 	edit_node_command<editor_sprite_node>,
 	edit_node_command<editor_sound_node>,

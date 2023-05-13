@@ -175,7 +175,7 @@ editor_icon_info editor_setup::get_icon_for(
 		return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_SOUND], augs::imgui_atlas_type::GAME };
 	}
 	else if constexpr(std::is_same_v<T, editor_material_resource>) {
-		return { in.necessary_images[assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON], augs::imgui_atlas_type::GAME };
+		return { in.necessary_images[assets::necessary_image_id::EDITOR_ICON_MATERIAL], augs::imgui_atlas_type::GAME };
 	}
 	else if constexpr(is_one_of_v<T, editor_prefab_resource>) {
 		return { in.necessary_images[assets::necessary_image_id::SPELL_BORDER], augs::imgui_atlas_type::GAME };

@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Watch out when adding reference counts to materials and other specific resources
+    - Them being referenced will trigger a writeout of external resources
+    - We need to separately rescan them 
+    - rescan_resources_to_track should really be rescan_resources_to_track
+        - should it return a bool info PER EVERY POOL?
+            - Actually not, just return for externals but properly detect if it's these
+
 - foostep speed could be fixed within the same parameter tbh
 
 - Deploy last builds should not delete uploaded maps

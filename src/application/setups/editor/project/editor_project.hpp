@@ -89,9 +89,9 @@ void editor_project::for_each_resource(F&& callback) const {
 	);
 }
 
-inline bool editor_project::rescan_pathed_resources_to_track(const O& officials, const editor_official_resource_map& officials_map) const {
-	const bool any_references = recount_references(officials, false);
-	const bool any_changes = mark_changed_resources(officials_map);
+inline bool editor_project::rescan_resources_to_track(const O& officials, const editor_official_resource_map& officials_map) const {
+	const bool any_references_to_pathed = recount_references(officials, false);
+	const bool any_changes_to_pathed = mark_changed_resources(officials_map);
 
-	return any_references || any_changes;
+	return any_references_to_pathed || any_changes_to_pathed;
 }

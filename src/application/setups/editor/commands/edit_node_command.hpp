@@ -57,10 +57,6 @@ void edit_node_command<T>::redo(editor_command_input in) {
 	}
 }
 
-void rename_node_command::push_entry(const editor_node_id id) {
-	entries.push_back({ id, {} });
-}
-
 void change_resource_command::push_entry(const editor_node_id id) {
 	entries.push_back({ id, {}, {} });
 }
@@ -139,6 +135,10 @@ void change_resource_command::undo(editor_command_input in) {
 	if (do_inspector) {
 		in.setup.after_quietly_adding_inspected();
 	}
+}
+
+void rename_node_command::push_entry(const editor_node_id id) {
+	entries.push_back({ id, {} });
 }
 
 void rename_node_command::undo(editor_command_input in) {

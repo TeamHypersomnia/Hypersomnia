@@ -82,6 +82,19 @@ auto editor_setup::make_command_from_selected_nodes(const std::string& preffix, 
 	);
 }
 
+template <class T, class... Args>
+auto editor_setup::make_command_from_selected_resources(const std::string& preffix, Args&&... args) const {
+	return ::make_command_from_selections<T>(
+		*this,
+		[&](auto callback) {
+			gui.inspector.for_each_inspected<editor_resource_id>(callback);
+		},
+		preffix,
+		"resources",
+		std::forward<Args>(args)...
+	);
+}
+
 template <class T, class Node, class... Args>
 auto editor_setup::make_command_from_selected_typed_nodes(const std::string& preffix, Args&&... args) const {
 	return ::make_command_from_selections<T>(

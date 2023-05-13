@@ -39,3 +39,40 @@ struct edit_resource_command {
 		return built_description;
 	}
 };
+
+struct rename_resource_command {
+	editor_command_meta meta;
+
+	struct entry {
+		editor_resource_id resource_id;
+		std::string before;
+	};
+
+	std::vector<entry> entries;
+
+	void push_entry(editor_resource_id);
+
+	template <class T>
+	void push_entry(const editor_typed_resource_id<T>& t) {
+		push_entry(t.operator editor_resource_id());
+	}
+
+	std::string after;
+
+	std::string built_description;
+
+	void undo(editor_command_input in);
+	void redo(editor_command_input in);
+
+	auto size() const {
+		return entries.size();
+	}
+
+	auto empty() const {
+		return entries.empty();
+	}
+
+	const auto& describe() const {
+		return built_description;
+	}
+};

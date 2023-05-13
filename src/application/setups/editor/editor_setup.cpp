@@ -22,6 +22,7 @@
 #include "application/setups/editor/resources/editor_sound_resource.h"
 
 #include "application/setups/editor/commands/create_layer_command.hpp"
+#include "application/setups/editor/commands/create_resource_command.hpp"
 #include "application/setups/editor/commands/edit_node_command.hpp"
 #include "application/setups/editor/commands/edit_project_settings_command.hpp"
 #include "application/setups/editor/commands/edit_layer_command.hpp"
@@ -840,6 +841,10 @@ void editor_setup::report_changed_paths(const editor_paths_changed_report& chang
 	redirect_or_missing_popup = changes_popup;
 }
 
+void editor_setup::rebuild_project_internal_resources_gui() {
+	gui.filesystem.rebuild_project_special_filesystem(*this);
+}
+
 void editor_setup::on_project_assigned(const bool undoing_to_first_revision) {
 	const bool during_activate = false;
 	const auto result = rebuild_pathed_resources();
@@ -848,7 +853,7 @@ void editor_setup::on_project_assigned(const bool undoing_to_first_revision) {
 	report_changed_paths(result);	
 	autosave_if_redirected(result, during_activate, undoing_to_first_revision);
 
-	gui.filesystem.rebuild_project_special_filesystem(*this);
+	rebuild_project_internal_resources_gui();
 }
 
 void editor_setup::assign_project(const editor_project& new_project, const bool undoing_to_first_revision) {
@@ -1117,12 +1122,17 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 		We'll need to know if any resources we actually reference are now missing.
 	*/
 
-	rescan_missing_resources(std::addressof(changes.missing));
+	rescan_missing_pathed_resources(std::addressof(changes.missing));
 
 	return changes;
 }
 
-void editor_setup::rescan_missing_resources(std::vector<augs::path_type>* const out_report) { 
+void editor_setup::on_resource_references_changed() {
+	should_recount_internal_resource_references = true;
+	rescan_missing_pathed_resources();
+}
+
+void editor_setup::rescan_missing_pathed_resources(std::vector<augs::path_type>* const out_report) { 
 	auto& rebuilt_project = project;
 	rebuilt_project.last_missing_resources.clear();
 
@@ -1144,7 +1154,7 @@ void editor_setup::rescan_missing_resources(std::vector<augs::path_type>* const 
 
 	std::vector<entry> missing_entries;
 
-	rebuilt_project.rescan_pathed_resources_to_track(official.resources, official.resource_map);
+	rebuilt_project.rescan_resources_to_track(official.resources, official.resource_map);
 
 	auto check_missing = [&]<typename R>(const R& resource, const editor_typed_resource_id<R> id) {
 		if constexpr(is_pathed_resource_v<R>) {
@@ -1509,7 +1519,7 @@ void editor_setup::undo() {
 		}
 
 		if (should_rescan_missing) {
-			rescan_missing_resources();
+			on_resource_references_changed();
 		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
@@ -1558,7 +1568,7 @@ void editor_setup::redo() {
 		}
 
 		if (should_rescan_missing) {
-			rescan_missing_resources();
+			on_resource_references_changed();
 		}
 
 		if (prev_inspected != get_all_inspected<editor_node_id>()) {
@@ -1658,7 +1668,12 @@ const editor_layer* editor_setup::find_layer(const std::string& name) const {
 }
 
 void editor_setup::start_renaming_selection() {
-	gui.layers.request_rename = true;
+	if (gui.inspector.inspects_only<editor_resource_id>()) {
+		gui.filesystem.request_rename = true;
+	}
+	else {
+		gui.layers.request_rename = true;
+	}
 }
 
 std::unordered_map<std::string, editor_node_id> editor_setup::make_name_to_node_map() const {
@@ -1675,6 +1690,44 @@ std::unordered_map<std::string, editor_node_id> editor_setup::make_name_to_node_
 	);
 
 	return result;
+}
+
+std::unordered_map<std::string, editor_resource_id> editor_setup::make_name_to_internal_resource_map() const {
+	std::unordered_map<std::string, editor_resource_id> result;
+
+	project.resources.for_each(
+		[&]<typename P>(const P& resource_pool) {
+			using R = typename P::mapped_type;
+
+			if constexpr(!is_pathed_resource_v<R>) {
+				auto register_resource = [&]<typename T>(const auto id, const T& object) {
+					result[object.get_display_name()] = editor_typed_resource_id<T> { id }.operator editor_resource_id();
+				};
+
+				resource_pool.for_each_id_and_object(register_resource);
+			}
+		}
+	);
+
+	return result;
+}
+
+std::string editor_setup::get_free_internal_resource_name_for(const std::string& new_name) const {
+	if (new_name.empty()) {
+		return get_free_internal_resource_name_for("Unnamed resource");
+	}
+
+	const auto name_map = make_name_to_internal_resource_map();
+
+	auto is_resource_name_free = [&](const auto& name) {
+		return !found_in(name_map, name);
+	};
+
+	return augs::first_free_string(
+		new_name,
+		" (%x)",
+		is_resource_name_free
+	);
 }
 
 std::string editor_setup::get_free_node_name_for(const std::string& new_name) const {
@@ -3386,6 +3439,15 @@ void editor_setup::request_arena_screenshot(const augs::path_type& output_path, 
 bool editor_setup::is_generating_miniature() const {
 	return miniature_generator.has_value();
 }
+
+void editor_setup::recount_internal_resource_references_if_needed() {
+	if (should_recount_internal_resource_references) {
+		project.recount_references(official.resources, false);
+		should_recount_internal_resource_references = false;
+	}
+}
+
+template struct create_resource_command<editor_material_resource>;
 
 template struct edit_resource_command<editor_sprite_resource>;
 template struct edit_resource_command<editor_sound_resource>;

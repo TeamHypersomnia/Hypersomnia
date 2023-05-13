@@ -45,6 +45,8 @@ struct editor_material_resource {
 	std::optional<test_scene_physical_material_id> official_tag;
 	mutable assets::physical_material_id scene_asset_id;
 
+	mutable uint32_t reference_count = 0u;
+
 	std::string unique_name;
 	const auto& get_display_name() const {
 		return unique_name;

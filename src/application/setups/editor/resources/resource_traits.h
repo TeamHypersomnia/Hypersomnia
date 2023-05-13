@@ -17,3 +17,6 @@ constexpr bool is_pathed_resource_v =
 	std::is_same_v<R, editor_sprite_resource> 
 	|| std::is_same_v<R, editor_sound_resource>
 ;
+
+template <class R>
+constexpr bool is_internal_resource_v = !is_pathed_resource_v<R>;

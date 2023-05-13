@@ -41,9 +41,11 @@ namespace editor_widgets {
 				after_item_callback();
 			}
 
-			if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-				auto scope = scoped_tooltip();
-				text_color(tooltip, tint);
+			if (!tooltip.empty()) {
+				if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+					auto scope = scoped_tooltip();
+					text_color(tooltip, tint);
+				}
 			}
 
 			final_pos = ImGui::GetCursorPos();

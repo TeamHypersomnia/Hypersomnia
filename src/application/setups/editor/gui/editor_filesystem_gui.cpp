@@ -19,6 +19,7 @@
 
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "augs/string/path_sanitization.h"
+#include "application/setups/editor/detail/has_reference_count.h"
 
 editor_filesystem_gui::editor_filesystem_gui(const std::string& name) : base(name) {
 	setup_special_filesystem(project_special_root);
@@ -377,6 +378,10 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 			override_is_inspected = in.setup.is_inspected(inspected_special::PROJECT_SETTINGS);
 		}
 
+		if (scroll_once == inspected_variant(node.associated_resource)) {
+			ImGui::SetScrollHereY(0.5f);
+		}
+
 		const bool pressed = filesystem_node_widget(
 			in.setup,
 			node,
@@ -493,15 +498,36 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	ImGui::Separator();
 
 	if (!showing_official()) {
-		const bool special_resource_inspected = false;
-
 		if (icon_button("##NewResource", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_ADD], [](){}, "New special resource", !showing_official())) {
+			ImGui::OpenPopup("New Resource Options");
+		}
 
+		const std::array<rgba, 3> icon_bg_cols = {
+			rgba(0, 0, 0, 0),
+			rgba(35, 60, 90, 255),
+			rgba(35+10, 60+10, 90+10, 255)
+		};
+
+		if (ImGui::BeginPopup("New Resource Options")) {
+			auto padding = vec2(0.5f, 0.0f);
+			const bool pad_from_left = false;
+
+			if (selectable_with_icon(in.necessary_images[assets::necessary_image_id::EDITOR_ICON_MATERIAL], "New Material", 1.0f, padding, white, icon_bg_cols, 0.f, pad_from_left)) {
+				create_resource_command<editor_material_resource> cmd;
+				cmd.created_resource.unique_name = "Unnamed material";
+
+				const auto id = in.setup.post_new_command(std::move(cmd)).get_resource_id();
+				(void)id;
+			}
+
+			ImGui::EndPopup();
 		}
 
 		ImGui::SameLine();
 
-		if (icon_button("##Clone", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Clone selection", special_resource_inspected)) {
+		/* Not implemented */
+		const bool can_clone_selection = false;
+		if (icon_button("##Clone", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_CLONE], [](){}, "Clone selection", can_clone_selection)) {
 
 		}
 
@@ -516,9 +542,51 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 
 			const auto remove_tint = rgba(220, 80, 80, 255);
 
-			if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], [](){}, "Delete selection", !showing_official() && special_resource_inspected, remove_tint, remove_bgs)) {
+			bool any_refs_to_selected = false;
+			bool any_deletable_selected = false;
+			bool only_deletable_selected = true;
+			
+			in.setup.for_each_inspected<editor_resource_id>([&](const editor_resource_id id) { 
+				in.setup.on_resource(id, [&]<typename R>(const R& typed_resource, const auto) {
+					if constexpr(is_internal_resource_v<R> && has_reference_count_v<R>) {
+						in.setup.recount_internal_resource_references_if_needed();
 
+						any_deletable_selected = true;
+
+						if (typed_resource.reference_count > 0) {
+							any_refs_to_selected = true;
+						}
+					}
+					else {
+						only_deletable_selected = false;
+					}
+				});
+			});
+
+			auto remove_tooltip = [&]() {
+				if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+					auto scope = scoped_tooltip();
+
+					if (any_refs_to_selected) {
+						text("Selected resources cannot be removed,\nas they are being used within the project.");
+					}
+					else {
+						text("Delete selection");
+					}
+				}
+			};
+
+			const bool can_remove = any_deletable_selected && only_deletable_selected && !any_refs_to_selected;
+
+			if (icon_button("##Remove", in.necessary_images[assets::necessary_image_id::EDITOR_ICON_REMOVE], remove_tooltip, "", !showing_official() && can_remove, remove_tint, remove_bgs)) {
+
+				auto command = in.setup.make_command_from_selected_resources<delete_resources_command>("Deleted ");
+
+				if (!command.empty()) {
+					in.setup.post_new_command(std::move(command));
+				}
 			}
+
 		}
 
 		ImGui::SameLine();
@@ -527,6 +595,19 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 	text_disabled("(Special resources)");
 
 	currently_viewed_root = &get_viewed_special_root();
+
+	if (scroll_once.has_value()) {
+		/* Open the folder to which we're going to scroll to */
+
+		auto open_relevant_folder = [&](editor_filesystem_node& node) {
+			if (scroll_once == inspected_variant(node.associated_resource)) {
+				node.open_all_parents();
+			}
+		};
+
+		currently_viewed_root->in_ui_order(open_relevant_folder, true, true);
+	}
+
 	currently_viewed_root->in_ui_order(node_callback, with_closed_folders, true);
 }
 
@@ -540,7 +621,7 @@ void editor_filesystem_gui::clear_drag_drop() {
 
 void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& root) {
 	root.clear();
-	root.subfolders.resize(11);
+	root.subfolders.resize(12);
 	root.should_sort = false;
 
 	auto i = 0;
@@ -557,6 +638,8 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	auto& point_markers_folder = root.subfolders[i++];
 	auto& area_markers_folder = root.subfolders[i++];
 
+	auto& materials_folder = root.subfolders[i++];
+
 	auto& prefabs_folder = root.subfolders[i++];
 	auto& game_modes_folder = root.subfolders[i++];
 
@@ -571,6 +654,8 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 
 	point_markers_folder.name = "Point markers";
 	area_markers_folder.name = "Area markers";
+
+	materials_folder.name = "Materials";
 
 	prefabs_folder.name = "Prefabs";
 	game_modes_folder.name = "Game modes";
@@ -607,6 +692,8 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	auto& point_markers_folder = root.subfolders[i++];
 	auto& area_markers_folder = root.subfolders[i++];
 
+	auto& materials_folder = root.subfolders[i++];
+
 	auto& prefabs_folder = root.subfolders[i++];
 	auto& game_modes_folder = root.subfolders[i++];
 
@@ -632,7 +719,7 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 			const auto& built_officials = setup.get_built_official_content();
 
-			if constexpr(is_one_of_v<resource_type, editor_prefab_resource, editor_game_mode_resource, editor_point_marker_resource, editor_area_marker_resource>) {
+			if constexpr(is_one_of_v<resource_type, editor_prefab_resource, editor_game_mode_resource, editor_point_marker_resource, editor_area_marker_resource, editor_material_resource>) {
 				new_node.name = typed_resource.get_display_name();
 			}
 			else {
@@ -695,6 +782,8 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 
 	handle(point_markers_folder, resources.get_pool_for<editor_point_marker_resource>(), assets::necessary_image_id::DANGER_INDICATOR);
 	handle(area_markers_folder, resources.get_pool_for<editor_area_marker_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);
+
+	handle(materials_folder, resources.get_pool_for<editor_material_resource>(), assets::necessary_image_id::EDITOR_ICON_MATERIAL);
 
 	handle(prefabs_folder, resources.get_pool_for<editor_prefab_resource>(), assets::necessary_image_id::SPELL_BORDER);
 	handle(game_modes_folder, resources.get_pool_for<editor_game_mode_resource>(), assets::necessary_image_id::EDITOR_TOOL_HOST_SERVER);

@@ -169,6 +169,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	bool dirty_after_loading_autosave = false;
 	bool dirty_after_redirecting_paths = false;
+	bool should_recount_internal_resource_references = false;
 
 	std::optional<custom_imgui_result> imgui_return_once;
 
@@ -185,7 +186,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 		const bool undoing_to_first_revision
 	);
 
-	void rescan_missing_resources(std::vector<augs::path_type>* out_report = nullptr);
+	void rescan_missing_pathed_resources(std::vector<augs::path_type>* out_report = nullptr);
+	void on_resource_references_changed();
 
 	void remove_autosave_file();
 	void force_autosave();
@@ -202,6 +204,11 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	friend create_layer_command;
 	friend delete_layers_command;
+
+	template <class T>
+	friend struct create_resource_command;
+
+	friend delete_resources_command;
 
 	template <class T>
 	friend struct create_node_command;
@@ -303,6 +310,12 @@ public:
 	template <class F>
 	decltype(auto) on_resource(const editor_resource_id& id, F&& callback) const;
 
+	template <class F>
+	decltype(auto) on_internal_resource(const editor_resource_id& id, F&& callback);
+
+	template <class F>
+	decltype(auto) on_internal_resource(const editor_resource_id& id, F&& callback) const;
+
 	template <class T>
 	decltype(auto) find_node(const editor_typed_node_id<T>& id);
 
@@ -364,7 +377,10 @@ public:
 	void scroll_once_to(inspected_variant);
 
 	std::unordered_map<std::string, editor_node_id> make_name_to_node_map() const;
+	std::unordered_map<std::string, editor_resource_id> make_name_to_internal_resource_map() const;
+
 	std::string get_free_node_name_for(const std::string& new_name) const;
+	std::string get_free_internal_resource_name_for(const std::string& new_name) const;
 
 	bool exists(const editor_resource_id&) const;
 
@@ -382,6 +398,9 @@ public:
 
 	template <class T, class... Args>
 	auto make_command_from_selected_nodes(const std::string& preffix, Args&&...) const;
+
+	template <class T, class... Args>
+	auto make_command_from_selected_resources(const std::string& preffix, Args&&...) const;
 
 	template <class T, class Node, class... Args>
 	auto make_command_from_selected_typed_nodes(const std::string& preffix, Args&&...) const;
@@ -783,4 +802,7 @@ public:
 
 	void request_arena_screenshot(const augs::path_type& output_path, int max_size, bool reveal);
 	bool is_generating_miniature() const;
+
+	void rebuild_project_internal_resources_gui();
+	void recount_internal_resource_references_if_needed();
 };

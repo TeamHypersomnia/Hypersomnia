@@ -112,7 +112,7 @@ struct editor_project {
 	bool recount_references(const O& officials, bool recount_officials) const;
 	bool mark_changed_resources(const editor_official_resource_map& officials_map) const;
 
-	bool rescan_pathed_resources_to_track(const O& officials, const editor_official_resource_map& officials_map) const;
+	bool rescan_resources_to_track(const O& officials, const editor_official_resource_map& officials_map) const;
 
 	template <class R, class F>
 	void for_each_resource(F&& callback) const;

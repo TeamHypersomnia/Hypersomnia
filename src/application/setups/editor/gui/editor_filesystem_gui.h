@@ -71,5 +71,9 @@ private:
 
 	void setup_special_filesystem(editor_filesystem_node& root);
 	void rebuild_special_filesystem(editor_filesystem_node& root, bool official, editor_setup&);
+
+	/* Will be implemented later */
+	bool request_rename = false;
+	std::optional<inspected_variant> currently_renamed_object;
 };
 

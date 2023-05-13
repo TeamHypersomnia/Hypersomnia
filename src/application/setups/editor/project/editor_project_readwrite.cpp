@@ -144,14 +144,17 @@ auto FindObject(F& from, const std::string& label) -> std::optional<decltype(std
 }
 
 bool editor_project::recount_references(const O& officials, const bool recount_officials) const {
-	bool any_project_resources_referenced = false;
+	bool any_pathed_project_resources_referenced = false;
 
 	auto clear_refs = [&]<typename P>(const P& pool) {
 		using resource_type = typename P::mapped_type;
 
-		if constexpr(has_reference_count_v<resource_type>) {
-			for (auto& resource : pool) {
+		for (auto& resource : pool) {
+			if constexpr(has_reference_count_v<resource_type>) {
 				resource.reference_count = 0;
+			}
+
+			if constexpr(has_changes_detected_v<resource_type>) {
 				resource.changes_detected = false;
 			}
 		}
@@ -171,7 +174,9 @@ bool editor_project::recount_references(const O& officials, const bool recount_o
 
 			if (const auto resource = find_resource(officials, id)) {
 				if (!id.is_official) {
-					any_project_resources_referenced = true;
+					if constexpr(is_pathed_resource_v<R>) {
+						any_pathed_project_resources_referenced = true;
+					}
 				}
 
 				resource->reference_count += 1;
@@ -181,16 +186,16 @@ bool editor_project::recount_references(const O& officials, const bool recount_o
 
 	on_each_resource_id_in_project(*this, count_refs);
 
-	return any_project_resources_referenced;
+	return any_pathed_project_resources_referenced;
 }
 
 bool editor_project::mark_changed_resources(const editor_official_resource_map& officials_map) const {
-	bool any_project_resources_changed = false;
+	bool any_pathed_project_resources_changed = false;
 
 	auto mark_changed = [&]<typename P>(const P& pool) {
 		using resource_type = typename P::mapped_type;
 
-		if constexpr(has_reference_count_v<resource_type>) {
+		if constexpr(has_changes_detected_v<resource_type>) {
 			auto defaults = decltype(resource_type::editable)();
 			::setup_resource_defaults(defaults, officials_map);
 
@@ -217,7 +222,9 @@ bool editor_project::mark_changed_resources(const editor_official_resource_map& 
 				resource.changes_detected = changed;
 
 				if (changed) {
-					any_project_resources_changed = true;
+					if constexpr(is_pathed_resource_v<resource_type>) {
+						any_pathed_project_resources_changed = true;
+					}
 				}
 			}
 		}
@@ -225,7 +232,7 @@ bool editor_project::mark_changed_resources(const editor_official_resource_map& 
 
 	resources.pools.for_each_container(mark_changed);
 
-	return any_project_resources_changed;
+	return any_pathed_project_resources_changed;
 }
 
 namespace editor_project_readwrite {
@@ -249,7 +256,7 @@ namespace editor_project_readwrite {
 			because ids are compared by stringified ids when either is set.
 		*/
 
-		const bool any_external_resources_to_track = project.rescan_pathed_resources_to_track(officials, officials_map);
+		const bool any_external_resources_to_track = project.rescan_resources_to_track(officials, officials_map);
 
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
