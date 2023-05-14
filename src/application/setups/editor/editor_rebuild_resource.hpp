@@ -265,6 +265,8 @@ void setup_scene_object_from_resource(
 	if constexpr(std::is_same_v<editor_material_resource, R>) {
 		scene.unit_damage_for_effects = editable.unit_damage_for_effects;
 		scene.standard_damage_sound = to_game_effect(editable.damage_sound);
+		scene.suppress_damager_impact_sound = editable.suppress_damager_impact_sound;
+		scene.suppress_damager_destruction_sound = editable.suppress_damager_destruction_sound;
 
 		auto to_game_collision_def = [&to_game_effect](const auto& from) {
 			collision_sound_def out;

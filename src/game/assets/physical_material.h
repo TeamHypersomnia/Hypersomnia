@@ -35,6 +35,9 @@ struct physical_material {
 	collision_sound_def default_collision;
 
 	sound_effect_input standard_damage_sound;
+	bool suppress_damager_impact_sound = false;
+	bool suppress_damager_destruction_sound = false;
+
 	particle_effect_input standard_damage_particles;
 	real32 unit_damage_for_effects = 30.f;
 	// END GEN INTROSPECTOR

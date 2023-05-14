@@ -41,6 +41,9 @@ struct editor_material_resource_editable {
 	editor_collision_sound_def default_collision;
 
 	editor_sound_effect damage_sound;
+	bool suppress_damager_impact_sound = false;
+	bool suppress_damager_destruction_sound = false;
+
 	editor_particle_effect damage_particles;
 
 	real32 unit_damage_for_effects = 30.f;

@@ -416,47 +416,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			}
 		}
 
-		{
-			auto do_effect = [&](const auto& effect_def) {
-				effect_def.sound.start(
-					step,
-					mark_coll(sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)),
-					always_predictable_v
-				);
-			};
-
-			const bool sentient = subject.has<components::sentience>();
-
-			const auto& e = d.damage.effects;
-
-			if (d.inflictor_destructed) {
-				if (sentient) {
-					if (e.sentience_impact.sound.id.is_set()) {
-						// Bullet against body sound, but currently there are no sounds like this in the game
-						do_effect(e.sentience_impact);
-					}
-				}
-				else {
-					// Bullet against wall sound
-					auto eff = e.destruction;
-					eff.sound.modifier.pitch *= step.step_rng.randval(0.8f, 1.2f);
-
-					do_effect(eff);
-				}
-			}
-			else {
-				if (sentient) {
-					if (e.sentience_impact.sound.id.is_set()) {
-						// E.g. knife against body sound
-						do_effect(e.sentience_impact);
-					}
-				}
-				else {
-					// E.g. knife against wall sound
-					do_effect(e.impact);
-				}
-			}
-		}
+		bool suppress_impact_sound = false;
+		bool suppress_destruction_sound = false;
 
 		if (d.type == adverse_element_type::FORCE) {
 			if (const auto* const mat = logicals.find(::calc_physical_material(subject))) {
@@ -471,6 +432,55 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 					mark_coll(sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)),
 					always_predictable_v
 				);
+
+				suppress_impact_sound = mat->suppress_damager_impact_sound;
+				suppress_destruction_sound = mat->suppress_damager_destruction_sound;
+			}
+		}
+
+		{
+			auto do_effect = [&](const auto& effect_def) {
+				effect_def.sound.start(
+					step,
+					mark_coll(sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)),
+					always_predictable_v
+				);
+			};
+
+			const bool sentient = subject.has<components::sentience>();
+
+			const auto& e = d.damage.effects;
+
+			if (d.inflictor_destructed) {
+				if (!suppress_destruction_sound) {
+					if (sentient) {
+						if (e.sentience_impact.sound.id.is_set()) {
+							// Bullet against body sound, but currently there are no sounds like this in the game
+							do_effect(e.sentience_impact);
+						}
+					}
+					else {
+						// Bullet against wall sound
+						auto eff = e.destruction;
+						eff.sound.modifier.pitch *= step.step_rng.randval(0.8f, 1.2f);
+
+						do_effect(eff);
+					}
+				}
+			}
+			else {
+				if (!suppress_impact_sound) {
+					if (sentient) {
+						if (e.sentience_impact.sound.id.is_set()) {
+							// E.g. knife against body sound
+							do_effect(e.sentience_impact);
+						}
+					}
+					else {
+						// E.g. knife against wall sound
+						do_effect(e.impact);
+					}
+				}
 			}
 		}
 	}

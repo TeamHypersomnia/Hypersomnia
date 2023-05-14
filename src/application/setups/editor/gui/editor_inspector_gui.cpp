@@ -1298,19 +1298,21 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 
 	MULTIPROPERTY("Max ricochet angle", max_ricochet_angle);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("0 - never ricochets.\n180 - always ricochets (like a perfectly reflecting mirror).\nThe higher the angle, the easier it is to ricochet.");
-	}
+	tooltip_on_hover("0 - never ricochets.\n180 - always ricochets (like a perfectly reflecting mirror).\nThe higher the angle, the easier it is to ricochet.");
 
 	MULTIPROPERTY("Point-blank ricochets", point_blank_ricochets);
 
-	if (ImGui::IsItemHovered()) {
-		text_tooltip("Normally bullets never ricochet if fired very close to the surface.\nThis setting enables ricochets even at point-blank range.");
-	}
-
+	tooltip_on_hover("Normally bullets never ricochet if fired very close to the surface.\nThis setting enables ricochets even at point-blank range.");
 
 	text_disabled("Played when exposed to any damage,\ne.g. the surface is shot/knifed.");
 	SOUND_EFFECT_LEAN_MULTIPROPERTY("Damage sound", damage_sound);
+
+	if (auto scope = augs::imgui::scoped_tree_node_ex("Suppress")) {
+		MULTIPROPERTY("Suppress damager impact sound", suppress_damager_impact_sound);
+		tooltip_on_hover("Tick to silence the default melee impact/bullet penetration sound.");
+		MULTIPROPERTY("Suppress damager destruction sound", suppress_damager_destruction_sound);
+		tooltip_on_hover("Tick to silence the default bullet destruction sound.");
+	}
 
 	ImGui::Separator();
 	text_color("Default collision sound", yellow);
@@ -1333,10 +1335,10 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		MULTIPROPERTY("Collision sound sensitivity", default_collision.collision_sound_sensitivity);
 
 		tooltip_on_hover(sensitivity_tooltip);
-
-		MULTIPROPERTY("Override opposite collision sound", default_collision.override_opposite_collision_sound);
-		override_opposite_collision_sound_tooltip();
 	}
+
+	MULTIPROPERTY("Override opposite collision sound", default_collision.override_opposite_collision_sound);
+	override_opposite_collision_sound_tooltip();
 
 	ImGui::Separator();
 	text_color("Specific collisions", yellow);
@@ -1401,9 +1403,10 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 				tooltip_on_hover(pitch_tooltip);
 				if (edit_property(result, "Collision sound sensitivity", special_handler, coll.collision_sound_sensitivity)) write_to_others();
 				tooltip_on_hover(sensitivity_tooltip);
-				if (edit_property(result, "Override opposite collision sound", special_handler, coll.override_opposite_collision_sound)) write_to_others();
-				override_opposite_collision_sound_tooltip();
 			}
+
+			if (edit_property(result, "Override opposite collision sound", special_handler, coll.override_opposite_collision_sound)) write_to_others();
+			override_opposite_collision_sound_tooltip();
 		}
 	}
 
