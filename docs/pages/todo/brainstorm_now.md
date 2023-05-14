@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Setting "hurt" to materials is tempting but this should really be as a "on_collision" event
+    - Same with spawning explosions etc
+
 - We might need to have global settings for collision pairs after all
     - The default ones should always let the other play
 

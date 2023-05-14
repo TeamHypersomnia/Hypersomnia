@@ -237,8 +237,26 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Gain" || label == "Pitch") {
+			if (label == "Gain" || label == "Pitch" || label == "Min pitch" || label == "Max pitch") {
 				if (slider(label, property, 0.0f, 10.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Collision sound sensitivity") {
+				if (slider(label, property, 0.0f, 3.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Max ricochet angle") {
+				if (slider(label, property, 0.0f, 180.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
@@ -1102,7 +1120,7 @@ EDIT_FUNCTION(
 		MULTIPROPERTY("Density", as_physical.density);
 		MULTIPROPERTY("Friction", as_physical.friction);
 		MULTIPROPERTY("Bounciness", as_physical.bounciness);
-		MULTIPROPERTY("Collision sound strength mult", as_physical.collision_sound_strength_mult);
+		MULTIPROPERTY("Collision sound sensitivity", as_physical.collision_sound_sensitivity);
 
 		MULTIPROPERTY("Immovable", as_physical.is_static);
 
@@ -1265,13 +1283,120 @@ EDIT_FUNCTION(editor_particles_resource_editable& insp, T& es) {
 	return result;
 }
 
-EDIT_FUNCTION(editor_material_resource_editable& insp, T& es) {
-	auto special_handler = default_widget_handler();
+EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_handler& special_handler) {
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
 
+	auto override_opposite_collision_sound_tooltip = []() {
+		if (ImGui::IsItemHovered()) {
+			auto scope = scoped_tooltip();
+			text("If ticked, the collision sound chosen by the other surface will be silenced.\n\nExample:\n");
+			text("Normally, if e.g. Wood specifies a default \"woody\" collision\nand Fence specifies a metallic sound for Fence<->Wood collision,\nboth would be played whenever a crate hits a fence.\nBut you could want to silence the woody effect to strongly emphasize the fence sound.");
+		}
+	};
+
 	MULTIPROPERTY("Max ricochet angle", max_ricochet_angle);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("0 - never ricochets.\n180 - always ricochets.\nThe higher the angle, the easier it is to ricochet.");
+	}
+
+	MULTIPROPERTY("Point-blank ricochets", point_blank_ricochets);
+
+	if (ImGui::IsItemHovered()) {
+		text_tooltip("Normally bullets never ricochet if fired very close to the surface.\nThis setting enables ricochets even at point-blank range.");
+	}
+
+
+	text_disabled("Played when exposed to any damage,\ne.g. the surface is shot/knifed.");
+	SOUND_EFFECT_LEAN_MULTIPROPERTY("Damage sound", damage_sound);
+
+	ImGui::Separator();
+	text_color("Default collision sound", yellow);
+	ImGui::Separator();
+
+	text_disabled("Played by default, when colliding with anything.");
+
+	MULTIPROPERTY("Sound", default_collision.sound);
+	MULTIPROPERTY("Min pitch", default_collision.min_pitch);
+	MULTIPROPERTY("Max pitch", default_collision.max_pitch);
+	MULTIPROPERTY("Collision sound sensitivity", default_collision.collision_sound_sensitivity);
+
+	MULTIPROPERTY("Override opposite collision sound", default_collision.override_opposite_collision_sound);
+	override_opposite_collision_sound_tooltip();
+
+	ImGui::Separator();
+	text_color("Specific collisions", yellow);
+	ImGui::Separator();
+
+	text_disabled("You can specify non-default sounds for\ncollisions with specific materials.");
+
+	bool collisions_different = false;
+
+	for (auto& e : es) {
+		if (!(insp.specific_collisions == e.after.specific_collisions)) {
+			collisions_different = true;
+		}
+	}
+
+	if (ImGui::Button("Add specific collision")) {
+		insp.specific_collisions.push_back({});
+		result = "Added new specific collision in %x";
+
+		for (auto& e : es) {
+			auto& lc = e.after.specific_collisions;
+			lc.push_back({});
+		}
+	}
+
+	auto cols = maybe_different_value_cols({}, collisions_different);
+
+	std::optional<std::size_t> removed_i;
+
+	for (auto& coll : insp.specific_collisions) {
+		const auto idx = index_in(insp.specific_collisions, coll);
+
+		auto id_but = typesafe_sprintf("-##Coll%x", idx);
+		const auto id_str = typesafe_sprintf("SpecificCollision%x", idx);
+		auto this_scope = scoped_id(id_str.c_str());
+
+		ImGui::Separator();
+
+		if (ImGui::Button(id_but.c_str())) {
+			removed_i = idx;
+		}
+
+		auto write_to_others = [&]() {
+			for (auto& e : es) {
+				auto& lc = e.after.specific_collisions;
+
+				if (idx < lc.size()) {
+					lc[idx] = coll;
+				}
+			}
+		};
+
+		if (edit_property(result, "Collider", special_handler, coll.first)) write_to_others();
+		if (edit_property(result, "Sound", special_handler, coll.second.sound)) write_to_others();
+		if (edit_property(result, "Min pitch", special_handler, coll.second.min_pitch)) write_to_others();
+		if (edit_property(result, "Max pitch", special_handler, coll.second.max_pitch)) write_to_others();
+		if (edit_property(result, "Collision sound sensitivity", special_handler, coll.second.collision_sound_sensitivity)) write_to_others();
+		if (edit_property(result, "Override opposite collision sound", special_handler, coll.second.override_opposite_collision_sound)) write_to_others();
+		override_opposite_collision_sound_tooltip();
+	}
+
+	if (removed_i) {
+		for (auto& e : es) {
+			auto& lc = e.after.specific_collisions;
+
+			if (*removed_i < lc.size()) {
+				lc.erase(lc.begin() + *removed_i);
+			}
+		}
+
+		result = typesafe_sprintf("Removed Collision %x in %x", *removed_i);
+	}
 
 	return result;
 }
@@ -1751,6 +1876,9 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				};
 
 				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, picker, shape_picker, id_handler);
+			}
+			else if constexpr(std::is_same_v<R, editor_material_resource>) {
+				changed = perform_editable_gui(edited_copy, cmd.entries, id_handler);
 			}
 			else if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
 				changed = perform_editable_gui(edited_copy, cmd.entries, hypothetical_defaults, resource.type, id_handler);

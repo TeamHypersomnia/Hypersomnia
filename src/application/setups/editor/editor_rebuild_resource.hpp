@@ -210,7 +210,18 @@ void setup_scene_object_from_resource(
 			}
 		};
 
-		if constexpr(std::is_same_v<T, editor_sound_effect>) {
+		if constexpr(std::is_same_v<T, editor_typed_resource_id<editor_sound_resource>>) {
+			sound_effect_input out;
+			out.id = get_asset_id_of(in);
+
+			if (const auto parent_res = find_resource(in)) {
+				const auto& resource_modifier = parent_res->editable;
+				do_full_modifier(out.modifier, resource_modifier);
+			}
+
+			return out;
+		}
+		else if constexpr(std::is_same_v<T, editor_sound_effect>) {
 			sound_effect_input out;
 			out.id = get_asset_id_of(in.id);
 
@@ -254,6 +265,31 @@ void setup_scene_object_from_resource(
 	if constexpr(std::is_same_v<editor_material_resource, R>) {
 		scene.unit_damage_for_effects = editable.unit_damage_for_effects;
 		scene.standard_damage_sound = to_game_effect(editable.damage_sound);
+
+		auto to_game_collision_def = [&to_game_effect](const auto& from) {
+			collision_sound_def out;
+			out.effect = to_game_effect(from.sound);
+			out.pitch_bound.set(from.min_pitch, from.max_pitch);
+			out.collision_sound_sensitivity = from.collision_sound_sensitivity;
+			out.cooldown_duration = from.cooldown_duration;
+			out.occurences_before_cooldown = from.occurences_before_cooldown;
+			out.override_opposite_collision_sound = from.override_opposite_collision_sound;
+
+			return out;
+		};
+
+		scene.default_collision = to_game_collision_def(editable.default_collision);
+
+		for (auto& entry : editable.specific_collisions) {
+			const auto mapped_id = get_asset_id_of(entry.first);
+
+			scene.collision_sound_matrix[mapped_id] = to_game_collision_def(entry.second);
+
+			if (mapped_id == to_physical_material_id(test_scene_physical_material_id::CHARACTER)) {
+				/* Blank so must override */
+				scene.collision_sound_matrix[mapped_id].override_opposite_collision_sound = true;
+			}
+		}
 	}
 	else if constexpr(std::is_same_v<editor_particles_resource, R>) {
 		if constexpr(std::is_same_v<R, particle_effect>) {
@@ -380,6 +416,7 @@ void setup_scene_object_from_resource(
 			if (const auto material = find_resource(physical.material)) {
 				fixtures->material = material->scene_asset_id;
 				fixtures->max_ricochet_angle = material->editable.max_ricochet_angle;
+				fixtures->point_blank_ricochets = material->editable.point_blank_ricochets;
 			}
 
 			fixtures->density = physical.density;
@@ -406,7 +443,7 @@ void setup_scene_object_from_resource(
 				fixtures->filter.maskBits &= ~(1 << int(filter_category::CHARACTER_WEAPON));
 			}
 
-			fixtures->collision_sound_strength_mult = physical.collision_sound_strength_mult;
+			fixtures->collision_sound_sensitivity = physical.collision_sound_sensitivity;
 		}
 
 		if (domain == editor_sprite_domain::BACKGROUND) {

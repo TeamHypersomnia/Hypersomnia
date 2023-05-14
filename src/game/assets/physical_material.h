@@ -12,9 +12,9 @@ struct collision_sound_def {
 
 	// GEN INTROSPECTOR struct collision_sound_def
 	sound_effect_input effect;
-	bound pitch = bound(0.9f, 1.5f);
-	real32 gain_mult = 1.f / 225.f;
-	real32 pitch_mult = 1.f / 185.f;
+	bound pitch_bound = bound(0.9f, 1.5f);
+
+	real32 collision_sound_sensitivity = 1.0f;
 
 	real32 cooldown_duration = 250.f;
 	int occurences_before_cooldown = 3;
@@ -37,10 +37,5 @@ struct physical_material {
 	sound_effect_input standard_damage_sound;
 	particle_effect_input standard_damage_particles;
 	real32 unit_damage_for_effects = 30.f;
-	std::string name;
 	// END GEN INTROSPECTOR
-
-	const auto& get_name() const {
-		return name;
-	}
 };

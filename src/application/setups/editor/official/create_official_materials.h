@@ -31,14 +31,6 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 			else if (enum_id == test_scene_physical_material_id::VENT) {
 				res.editable.max_ricochet_angle = 20.0f;
 			}
-			else {
-				/* 
-					For now only allow well-defined wall resources.
-					Skip grenade, flashbang, knife etc.
-				*/
-
-				return;
-			}
 
 			pool.allocate(res);
 		});

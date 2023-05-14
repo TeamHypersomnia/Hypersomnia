@@ -55,20 +55,26 @@ void play_collision_sound(
 			return;
 		}
 
-		const auto impulse = strength * subject_coll->collision_sound_strength_mult * collider_coll->collision_sound_strength_mult;
+		const auto impulse = strength * subject_coll->collision_sound_sensitivity * collider_coll->collision_sound_sensitivity;
 
-		const auto gain_mult = impulse * impulse * sound_def->gain_mult;
-		const auto pitch_mult = impulse * sound_def->pitch_mult;
+		constexpr real32 gain_normalizer = 1.f / 225.f;
+		constexpr real32 pitch_normalizer = 1.f / 185.f;
+
+		auto nicely_scaled_sound_sens = sound_def->collision_sound_sensitivity;
+		nicely_scaled_sound_sens *= nicely_scaled_sound_sens*nicely_scaled_sound_sens;
+
+		const auto gain_mult = impulse * impulse * nicely_scaled_sound_sens * gain_normalizer;
+		const auto pitch_mult = impulse * pitch_normalizer;
 
 		if (gain_mult <= 0.01f) {
 			return;
 		}
 
-		// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_strength_mult, collider_coll.collision_sound_strength_mult);
+		// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_sensitivity, collider_coll.collision_sound_sensitivity);
 
 		auto effect = sound_def->effect;
 
-		const auto& pitch_bound = sound_def->pitch;
+		const auto& pitch_bound = sound_def->pitch_bound;
 		effect.modifier.pitch *= std::max(pitch_bound.first, pitch_bound.second - pitch_mult);
 		effect.modifier.gain *= std::min(1.f, gain_mult);
 
@@ -88,11 +94,15 @@ void play_collision_sound(
 			start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
 		}
 
-		// TODO: PARAMETRIZE!
-		effect.modifier.max_distance = 2700.f;
-		effect.modifier.reference_distance = 700.f;
+		if (effect.modifier.max_distance == -1) {
+			effect.modifier.max_distance = 2700.f;
+		}
 
-		/* TODO: properly determine predictability based on who thrown the item! */
+		if (effect.modifier.reference_distance == -1) {
+			effect.modifier.reference_distance = 700.f;
+		}
+
+		/* TODO: properly determine predictability based on who threw the item! */
 		/* TODO: properly determine predictability based on if the collider's owning capability is a player! */
 
 		effect.start(step, start, always_predictable_v);

@@ -62,7 +62,7 @@ struct editor_sprite_resource_physical {
 	real32 linear_damping = 6.5f;
 	real32 angular_damping = 6.5f;
 
-	real32 collision_sound_strength_mult = 1.0f;
+	real32 collision_sound_sensitivity = 1.0f;
 
 	editor_typed_resource_id<editor_material_resource> material;
 

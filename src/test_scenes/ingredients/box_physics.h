@@ -74,7 +74,7 @@ namespace test_flavours {
 		fixtures_def.filter = filters[predefined_filter_type::SHELL];
 		fixtures_def.restitution = 1.2f;
 		fixtures_def.density = 0.0005f;
-		fixtures_def.collision_sound_strength_mult = 100.f;
+		fixtures_def.collision_sound_sensitivity = 100.f;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 		meta.set(fixtures_def);
@@ -92,7 +92,7 @@ namespace test_flavours {
 		fixtures_def.filter = filters[predefined_filter_type::SHELL];
 		fixtures_def.restitution = 1.8f;
 		fixtures_def.density = 0.0001f;
-		fixtures_def.collision_sound_strength_mult = 1000.f;
+		fixtures_def.collision_sound_sensitivity = 1000.f;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 		meta.set(fixtures_def);
@@ -126,7 +126,7 @@ namespace test_flavours {
 		
 		fixtures_def.filter = filters[predefined_filter_type::FLYING_BULLET];
 		fixtures_def.density = 1;
-		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::STANDARD_MISSILE);
+		fixtures_def.material = {};
 		fixtures_def.max_ricochet_angle = 0.f;
 
 		meta.set(fixtures_def);

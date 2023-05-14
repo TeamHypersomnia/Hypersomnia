@@ -71,14 +71,14 @@ static void ricochet_missile_against_surface(
 
 	RIC_LOG_NVPS(left_b, hit_facing, right_b);
 
-	if (hit_facing > left_b && hit_facing < right_b) {
+	if (max_ricochet_angle >= 180 || (hit_facing > left_b && hit_facing < right_b)) {
 		{
 			const bool born_cooldown = clk.lasts(
 				missile_def.ricochet_born_cooldown_ms,
 				typed_missile.when_born()
 			);
 
-			if (born_cooldown) {
+			if (!surface_fixtures.point_blank_ricochets && born_cooldown) {
 				RIC_LOG("Rico: born cooldown");
 				return;
 			}

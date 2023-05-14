@@ -12,16 +12,19 @@ struct editor_collision_sound_def {
 	using bound = augs::bound<real32>;
 
 	// GEN INTROSPECTOR struct editor_collision_sound_def
-	editor_sound_effect effect;
-	bound pitch = bound(0.9f, 1.5f);
-	real32 gain_mult = 1.f / 225.f;
-	real32 pitch_mult = 1.f / 185.f;
+	editor_typed_resource_id<editor_sound_resource> sound;
+	real32 min_pitch = 0.9f;
+	real32 max_pitch = 1.5f;
+
+	real32 collision_sound_sensitivity = 1.0f;
 
 	real32 cooldown_duration = 250.f;
 	int occurences_before_cooldown = 3;
 
 	bool override_opposite_collision_sound = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_collision_sound_def&) const = default;
 };
 
 struct editor_material_resource_editable {
@@ -31,13 +34,16 @@ struct editor_material_resource_editable {
 	>>;
 
 	// GEN INTROSPECTOR struct editor_material_resource_editable
-	collision_pairs_type collision_pairs;
+	collision_pairs_type specific_collisions;
+
+	editor_collision_sound_def default_collision;
 
 	editor_sound_effect damage_sound;
 	editor_particle_effect damage_particles;
 
 	real32 unit_damage_for_effects = 30.f;
 	real32 max_ricochet_angle = 20.0f;
+	bool point_blank_ricochets = false;
 	// END GEN INTROSPECTOR
 };
 

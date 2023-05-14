@@ -16,9 +16,8 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 
 	all_definitions.reserve(enum_count(test_id_type()));
 
-	augs::for_each_enum_except_bounds([&](const test_id_type id) {
-		auto alloc = all_definitions.allocate();
-		alloc.object.name = format_enum(id);
+	augs::for_each_enum_except_bounds([&](const test_id_type) {
+		all_definitions.allocate();
 	});
 
 	using bound = augs::bound<real32>;
@@ -88,8 +87,8 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 
 	{
 		collision_sound_def def;
-		def.pitch = bound(0.9f, 1.25f);
-		def.gain_mult *= 5.0f;
+		def.pitch_bound = bound(0.9f, 1.25f);
+		def.collision_sound_sensitivity = 5.0f;
 
 		def.occurences_before_cooldown = 1;
 
