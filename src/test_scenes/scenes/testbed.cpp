@@ -674,6 +674,13 @@ namespace test_scenes {
 			}
 		}
 
+		create(test_plain_sprited_bodies::CRATE, vec2(800, 1000));
+
+		create(test_plain_sprited_bodies::TRIANGLE_COLLIDER_VENT, vec2(1000, 1000));
+		create(test_plain_sprited_bodies::TRIANGLE_COLLIDER_GLASS, vec2(1000, 1150));
+		create(test_plain_sprited_bodies::TRIANGLE_COLLIDER_METAL, vec2(1000, 1300));
+		create(test_plain_sprited_bodies::TRIANGLE_COLLIDER_WOOD, vec2(1000, 1450));
+
 		{
 			const vec2 coords[] = {
 				{ 1200, 5400 },

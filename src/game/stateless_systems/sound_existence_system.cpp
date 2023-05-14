@@ -49,64 +49,133 @@ void play_collision_sound(
 	const bool col_missile = col.find<invariants::missile>();
 
 	const bool for_damage_cooldown = sub_missile || col_missile;
+	
+	auto play_sound = [&](const auto* sound_def) {
+		if (sound_def == nullptr) {
+			return;
+		}
 
-	const auto* const subject_coll_material = logicals.find(calc_physical_material(sub));
-	const auto* const collider_coll_material = logicals.find(calc_physical_material(col));
+		const auto impulse = strength * subject_coll->collision_sound_strength_mult * collider_coll->collision_sound_strength_mult;
 
-	if (subject_coll_material != nullptr
-		&& collider_coll_material != nullptr
-	) {
-		auto play_sound = [&](const auto* sound_def) {
-			if (sound_def) {
-				const auto impulse = strength * subject_coll->collision_sound_strength_mult * collider_coll->collision_sound_strength_mult;
+		const auto gain_mult = impulse * impulse * sound_def->gain_mult;
+		const auto pitch_mult = impulse * sound_def->pitch_mult;
 
-				const auto gain_mult = impulse * impulse * sound_def->gain_mult;
-				const auto pitch_mult = impulse * sound_def->pitch_mult;
+		if (gain_mult <= 0.01f) {
+			return;
+		}
 
-				if (gain_mult > 0.01f) {
-					// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_strength_mult, collider_coll.collision_sound_strength_mult);
+		// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_strength_mult, collider_coll.collision_sound_strength_mult);
 
-					auto effect = sound_def->effect;
+		auto effect = sound_def->effect;
 
-					const auto& pitch_bound = sound_def->pitch;
-					effect.modifier.pitch *= std::max(pitch_bound.first, pitch_bound.second - pitch_mult);
-					effect.modifier.gain *= std::min(1.f, gain_mult);
+		const auto& pitch_bound = sound_def->pitch;
+		effect.modifier.pitch *= std::max(pitch_bound.first, pitch_bound.second - pitch_mult);
+		effect.modifier.gain *= std::min(1.f, gain_mult);
 
-					auto start = sound_effect_start_input::fire_and_forget(location);
+		auto start = sound_effect_start_input::fire_and_forget(location);
 
-					if (for_damage_cooldown) {
-						const auto missile = sub_missile ? sub : col;
-						const auto wall = sub_missile ? col : sub;
+		if (for_damage_cooldown) {
+			const auto missile = sub_missile ? sub : col;
+			const auto wall = sub_missile ? col : sub;
 
-						const auto capability = missile.template get<components::sender>().capability_of_sender;
+			const auto capability = missile.template get<components::sender>().capability_of_sender;
 
-						start.mark_as_missile_impact(capability, wall);
-					}
-					else {
-						start.mark_source_collision(sub, col);
-						start.collision_sound_cooldown_duration = sound_def->cooldown_duration;
-						start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
-					}
+			start.mark_as_missile_impact(capability, wall);
+		}
+		else {
+			start.mark_source_collision(sub, col);
+			start.collision_sound_cooldown_duration = sound_def->cooldown_duration;
+			start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
+		}
 
-					// TODO: PARAMETRIZE!
-					effect.modifier.max_distance = 2700.f;
-					effect.modifier.reference_distance = 700.f;
+		// TODO: PARAMETRIZE!
+		effect.modifier.max_distance = 2700.f;
+		effect.modifier.reference_distance = 700.f;
 
-					/* TODO: properly determine predictability based on who thrown the item! */
-					/* TODO: properly determine predictability based on if the collider's owning capability is a player! */
+		/* TODO: properly determine predictability based on who thrown the item! */
+		/* TODO: properly determine predictability based on if the collider's owning capability is a player! */
 
-					effect.start(step, start, always_predictable_v);
-				}
+		effect.start(step, start, always_predictable_v);
+	};
+
+
+	/*
+		Multiple cases to distinguish.
+
+		Both materials null - no sound.
+		Only one material exists - play the default collision of the existing one.
+
+		Both materials exist - here's where it gets complex.
+		We also assume every material has a properly setup default collision.
+
+		We want to both be able to specify standard "default" sounds so we don't have to map
+	
+		A->B mapping exists but B->A mapping doesn't:
+			Play A->B
+			If A->B specifies Play other material's collision sound, play B's default
+
+		Both A->B mapping and B->A mapping exist
+
+		Neither mapping exists
+
+	*/
+
+	const auto subject_material_id = calc_physical_material(sub);
+	const auto collider_material_id = calc_physical_material(col);
+
+	const auto* const subject_coll_material = logicals.find(subject_material_id);
+	const auto* const collider_coll_material = logicals.find(collider_material_id);
+
+	if (subject_coll_material == nullptr && collider_coll_material == nullptr) {
+		return;
+	}
+
+	if (subject_coll_material != nullptr && collider_coll_material == nullptr) {
+		play_sound(&subject_coll_material->default_collision);
+		return;
+	}
+
+	if (subject_coll_material == nullptr && collider_coll_material != nullptr) {
+		play_sound(&collider_coll_material->default_collision);
+		return;
+	}
+
+	if (subject_coll_material != nullptr && collider_coll_material != nullptr) {
+		auto first = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_material_id);
+		auto second = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_material_id);
+
+		/* If no mapping, consider defaults */
+		if (first == nullptr) {
+			first = &subject_coll_material->default_collision;
+		}
+
+		if (second == nullptr) {
+			second = &collider_coll_material->default_collision;
+		}
+
+		auto play_both = [&]() {
+			play_sound(first);
+
+			if (first != second) {
+				play_sound(second);
 			}
 		};
 
-		const auto first_def = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_coll->material);
-		const auto second_def = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_coll->material);
-
-		play_sound(first_def);
-
-		if (second_def != first_def) {
-			play_sound(second_def);
+		if (!first->override_opposite_collision_sound && !second->override_opposite_collision_sound) {
+			/* If both allow each other, play both */
+			play_both();
+		}
+		else if (first->override_opposite_collision_sound && second->override_opposite_collision_sound) {
+			/* If both try to silence each other, also play both */
+			play_both();
+		}
+		else {
+			if (first->override_opposite_collision_sound) {
+				play_sound(first);
+			}
+			else if (second->override_opposite_collision_sound) {
+				play_sound(second);
+			}
 		}
 	}
 }
@@ -380,10 +449,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		}
 
 		if (d.type == adverse_element_type::FORCE) {
-			const auto& fixtures = subject.get<invariants::fixtures>();
-
-			if (const auto* const mat = logicals.find(fixtures.material)) {
-				const auto unit = mat->unit_effect_damage;
+			if (const auto* const mat = logicals.find(::calc_physical_material(subject))) {
+				const auto unit = mat->unit_damage_for_effects;
 				const auto mult = d.damage.base / unit;
 				
 				auto effect = mat->standard_damage_sound;

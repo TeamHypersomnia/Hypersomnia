@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We might need to have global settings for collision pairs after all
+    - The default ones should always let the other play
+
+- We should handle "scripting" before "grouping"
+    - Internal references to nodes need to be properly resolved
+        - This is even the case with simple cloning of say teleport + teleport target
+
+- When thinking of events, it's the most important to plan for the json format
+    - Note that instead of setting "conditions" for "on enter", we can just conditionally spawn entities that have these properties set
+
 - Watch out when adding reference counts to materials and other specific resources
     - Them being referenced will trigger a writeout of external resources
     - We need to separately rescan them 

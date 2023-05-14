@@ -18,23 +18,25 @@ struct editor_collision_sound_def {
 	real32 pitch_mult = 1.f / 185.f;
 
 	real32 cooldown_duration = 250.f;
-	int occurences_before_cooldown = 4;
+	int occurences_before_cooldown = 3;
+
+	bool override_opposite_collision_sound = false;
 	// END GEN INTROSPECTOR
 };
 
 struct editor_material_resource_editable {
-	using collision_sound_matrix_type = std::vector<augs::simple_pair<
+	using collision_pairs_type = std::vector<augs::simple_pair<
 		editor_typed_resource_id<editor_material_resource>, 
 		editor_collision_sound_def
 	>>;
 
 	// GEN INTROSPECTOR struct editor_material_resource_editable
-	collision_sound_matrix_type collision_sound_matrix;
+	collision_pairs_type collision_pairs;
 
-	editor_sound_effect standard_damage_sound;
-	editor_particle_effect standard_damage_particles;
+	editor_sound_effect damage_sound;
+	editor_particle_effect damage_particles;
 
-	real32 unit_effect_damage = 30.f;
+	real32 unit_damage_for_effects = 30.f;
 	real32 max_ricochet_angle = 20.0f;
 	// END GEN INTROSPECTOR
 };

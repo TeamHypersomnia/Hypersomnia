@@ -17,7 +17,9 @@ struct collision_sound_def {
 	real32 pitch_mult = 1.f / 185.f;
 
 	real32 cooldown_duration = 250.f;
-	int occurences_before_cooldown = 4;
+	int occurences_before_cooldown = 3;
+
+	bool override_opposite_collision_sound = false;
 	// END GEN INTROSPECTOR
 };
 
@@ -30,9 +32,11 @@ struct physical_material {
 	// GEN INTROSPECTOR struct physical_material
 	collision_sound_matrix_type collision_sound_matrix;
 
+	collision_sound_def default_collision;
+
 	sound_effect_input standard_damage_sound;
 	particle_effect_input standard_damage_particles;
-	real32 unit_effect_damage = 30.f;
+	real32 unit_damage_for_effects = 30.f;
 	std::string name;
 	// END GEN INTROSPECTOR
 

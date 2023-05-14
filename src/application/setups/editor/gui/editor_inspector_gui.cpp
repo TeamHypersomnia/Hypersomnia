@@ -1271,7 +1271,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es) {
 	bool last_result = false;
 	std::string result;
 
-	(void)insp; (void)es; (void)last_result;
+	MULTIPROPERTY("Max ricochet angle", max_ricochet_angle);
 
 	return result;
 }

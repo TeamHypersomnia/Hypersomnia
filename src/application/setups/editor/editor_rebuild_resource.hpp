@@ -252,8 +252,8 @@ void setup_scene_object_from_resource(
 	};
 
 	if constexpr(std::is_same_v<editor_material_resource, R>) {
-		scene.unit_effect_damage = editable.unit_effect_damage;
-		scene.standard_damage_sound = to_game_effect(editable.standard_damage_sound);
+		scene.unit_damage_for_effects = editable.unit_damage_for_effects;
+		scene.standard_damage_sound = to_game_effect(editable.damage_sound);
 	}
 	else if constexpr(std::is_same_v<editor_particles_resource, R>) {
 		if constexpr(std::is_same_v<R, particle_effect>) {

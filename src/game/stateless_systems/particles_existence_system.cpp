@@ -22,6 +22,7 @@
 #include "game/stateless_systems/particles_existence_system.h"
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/physics/calc_physical_material.hpp"
 
 void particles_existence_system::displace_streams(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -194,10 +195,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		}
 
 		if (d.type == adverse_element_type::FORCE && d.damage.base > 0) {
-			const auto& fixtures = subject.get<invariants::fixtures>();
-
-			if (const auto* const mat = logicals.find(fixtures.material)) {
-				const auto unit = mat->unit_effect_damage;
+			if (const auto* const mat = logicals.find(calc_physical_material(subject))) {
+				const auto unit = mat->unit_damage_for_effects;
 				const auto mult = d.damage.base / unit;
 
 				auto effect = mat->standard_damage_particles;

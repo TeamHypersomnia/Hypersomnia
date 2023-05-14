@@ -148,6 +148,7 @@ namespace test_flavours {
 
 			fixtures_invariant.filter = filters[predefined_filter_type::CHARACTER];
 			fixtures_invariant.density = 1.0;
+			fixtures_invariant.material = to_physical_material_id(test_scene_physical_material_id::CHARACTER);
 
 			meta.set(body);
 			meta.set(fixtures_invariant);
