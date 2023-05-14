@@ -370,6 +370,13 @@ namespace augs {
 			text(std::forward<T>(args)...);
 		}
 
+		template <class... T>
+		void tooltip_on_hover(T&&... args) {
+			if (ImGui::IsItemHovered()) {
+				text_tooltip(std::forward<T>(args)...);
+			}
+		}
+
 		inline void text_disabled(const std::string& t) {
 			text_color(t, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 		}

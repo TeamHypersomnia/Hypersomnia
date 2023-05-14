@@ -11,7 +11,14 @@ struct editor_material_resource;
 struct editor_collision_sound_def {
 	using bound = augs::bound<real32>;
 
+	/* 
+		Note that "collider" field will just be left empty in default_collision 
+		and will thus not get serialized.
+	*/
+
 	// GEN INTROSPECTOR struct editor_collision_sound_def
+	editor_typed_resource_id<editor_material_resource> collider;
+
 	editor_typed_resource_id<editor_sound_resource> sound;
 	real32 min_pitch = 0.9f;
 	real32 max_pitch = 1.5f;
@@ -28,13 +35,8 @@ struct editor_collision_sound_def {
 };
 
 struct editor_material_resource_editable {
-	using collision_pairs_type = std::vector<augs::simple_pair<
-		editor_typed_resource_id<editor_material_resource>, 
-		editor_collision_sound_def
-	>>;
-
 	// GEN INTROSPECTOR struct editor_material_resource_editable
-	collision_pairs_type specific_collisions;
+	std::vector<editor_collision_sound_def> specific_collisions;
 
 	editor_collision_sound_def default_collision;
 

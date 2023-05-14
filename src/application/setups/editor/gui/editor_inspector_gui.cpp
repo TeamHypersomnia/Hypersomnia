@@ -1292,14 +1292,14 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		if (ImGui::IsItemHovered()) {
 			auto scope = scoped_tooltip();
 			text("If ticked, the collision sound chosen by the other surface will be silenced.\n\nExample:\n");
-			text("Normally, if e.g. Wood specifies a default \"woody\" collision\nand Fence specifies a metallic sound for Fence<->Wood collision,\nboth would be played whenever a crate hits a fence.\nBut you could want to silence the woody effect to strongly emphasize the fence sound.");
+			text("Normally, if e.g. a crate specifies a default \"woody\" collision\nand a fence specifies a metallic sound for Fence<->Wood collision,\nboth would be played whenever a crate hits a fence.\nBut you could want to silence the crate's woody effect to strongly emphasize the fence sound.");
 		}
 	};
 
 	MULTIPROPERTY("Max ricochet angle", max_ricochet_angle);
 
 	if (ImGui::IsItemHovered()) {
-		text_tooltip("0 - never ricochets.\n180 - always ricochets.\nThe higher the angle, the easier it is to ricochet.");
+		text_tooltip("0 - never ricochets.\n180 - always ricochets (like a perfectly reflecting mirror).\nThe higher the angle, the easier it is to ricochet.");
 	}
 
 	MULTIPROPERTY("Point-blank ricochets", point_blank_ricochets);
@@ -1319,12 +1319,24 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 	text_disabled("Played by default, when colliding with anything.");
 
 	MULTIPROPERTY("Sound", default_collision.sound);
-	MULTIPROPERTY("Min pitch", default_collision.min_pitch);
-	MULTIPROPERTY("Max pitch", default_collision.max_pitch);
-	MULTIPROPERTY("Collision sound sensitivity", default_collision.collision_sound_sensitivity);
 
-	MULTIPROPERTY("Override opposite collision sound", default_collision.override_opposite_collision_sound);
-	override_opposite_collision_sound_tooltip();
+	const auto sensitivity_tooltip = "High values:\nCollison sound volume will always be 100% even if you barely touch it.\nGood for e.g. bouncers/trampolines.\n\nLow values:\nVolume will scale more smoothly with how strongly you hit the surface.\nPerfect for e.g. bags of dirt.";
+
+	const auto pitch_tooltip = "Collision sound varies depending on angle of impact.\nThe sound might be higher and sometimes lower.";
+
+	if (insp.default_collision.sound.is_set()) {
+		MULTIPROPERTY("Min pitch", default_collision.min_pitch);
+		tooltip_on_hover(pitch_tooltip);
+		MULTIPROPERTY("Max pitch", default_collision.max_pitch);
+		tooltip_on_hover(pitch_tooltip);
+
+		MULTIPROPERTY("Collision sound sensitivity", default_collision.collision_sound_sensitivity);
+
+		tooltip_on_hover(sensitivity_tooltip);
+
+		MULTIPROPERTY("Override opposite collision sound", default_collision.override_opposite_collision_sound);
+		override_opposite_collision_sound_tooltip();
+	}
 
 	ImGui::Separator();
 	text_color("Specific collisions", yellow);
@@ -1377,13 +1389,22 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 			}
 		};
 
-		if (edit_property(result, "Collider", special_handler, coll.first)) write_to_others();
-		if (edit_property(result, "Sound", special_handler, coll.second.sound)) write_to_others();
-		if (edit_property(result, "Min pitch", special_handler, coll.second.min_pitch)) write_to_others();
-		if (edit_property(result, "Max pitch", special_handler, coll.second.max_pitch)) write_to_others();
-		if (edit_property(result, "Collision sound sensitivity", special_handler, coll.second.collision_sound_sensitivity)) write_to_others();
-		if (edit_property(result, "Override opposite collision sound", special_handler, coll.second.override_opposite_collision_sound)) write_to_others();
-		override_opposite_collision_sound_tooltip();
+		if (edit_property(result, "Collider", special_handler, coll.collider)) write_to_others();
+
+		if (coll.collider.is_set()) {
+			if (edit_property(result, "Sound", special_handler, coll.sound)) write_to_others();
+
+			if (coll.sound.is_set()) {
+				if (edit_property(result, "Min pitch", special_handler, coll.min_pitch)) write_to_others();
+				tooltip_on_hover(pitch_tooltip);
+				if (edit_property(result, "Max pitch", special_handler, coll.max_pitch)) write_to_others();
+				tooltip_on_hover(pitch_tooltip);
+				if (edit_property(result, "Collision sound sensitivity", special_handler, coll.collision_sound_sensitivity)) write_to_others();
+				tooltip_on_hover(sensitivity_tooltip);
+				if (edit_property(result, "Override opposite collision sound", special_handler, coll.override_opposite_collision_sound)) write_to_others();
+				override_opposite_collision_sound_tooltip();
+			}
+		}
 	}
 
 	if (removed_i) {

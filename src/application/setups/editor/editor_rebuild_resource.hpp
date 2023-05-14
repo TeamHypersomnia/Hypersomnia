@@ -281,9 +281,9 @@ void setup_scene_object_from_resource(
 		scene.default_collision = to_game_collision_def(editable.default_collision);
 
 		for (auto& entry : editable.specific_collisions) {
-			const auto mapped_id = get_asset_id_of(entry.first);
+			const auto mapped_id = get_asset_id_of(entry.collider);
 
-			scene.collision_sound_matrix[mapped_id] = to_game_collision_def(entry.second);
+			scene.collision_sound_matrix[mapped_id] = to_game_collision_def(entry);
 
 			if (mapped_id == to_physical_material_id(test_scene_physical_material_id::CHARACTER)) {
 				/* Blank so must override */
