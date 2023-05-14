@@ -385,6 +385,44 @@ namespace editor_project_readwrite {
 			augs::write_json_diff(writer, project, project_defaults);
 		};
 
+		auto write_materials = [&]() {
+			const auto& materials = project.resources.get_pool_for<editor_material_resource>();
+
+			if (materials.empty()) {
+				return;
+			}
+
+			writer.Key("materials");
+			writer.StartArray();
+
+			const auto defaults = editor_material_resource_editable();
+
+			auto write = [&](const auto& material) {
+				const auto& editable = material.editable;
+
+				writer.StartObject();
+				writer.Key("id");
+				writer.String(material.unique_name);
+
+				augs::write_json_diff(writer, editable, defaults);
+
+				writer.EndObject();
+			};
+
+			::in_order_of(
+				materials,
+				[&](const auto& material) {
+					return material.unique_name;
+				},
+				[&](const auto& a, const auto& b) {
+					return augs::natural_order(a, b);
+				},
+				write
+			);
+
+			writer.EndArray();
+		};
+
 		auto write_modes = [&]() {
 			const auto& modes = project.get_game_modes();
 
@@ -647,7 +685,9 @@ namespace editor_project_readwrite {
 
 		write_project_structs();
 		write_modes();
+
 		write_external_resources();
+		write_materials();
 
 		write_layers();
 		write_nodes();
@@ -743,6 +783,39 @@ namespace editor_project_readwrite {
 			static_assert(augs::has_custom_to_json_value_v<decltype(editor_playtesting_settings::mode)>);
 
 			augs::read_json(document, loaded);
+		};
+
+		auto read_materials = [&]() {
+			const auto maybe_materials = FindArray(document, "materials");
+
+			if (!maybe_materials) {
+				return;
+			}
+
+			for (auto& resource : *maybe_materials) {
+				if (!resource.IsObject()) {
+					continue;
+				}
+
+				if (!resource.HasMember("id") || !resource["id"].IsString()) {
+					if (strict) {
+						throw augs::json_deserialization_error("Missing \"id\" property for a material!");
+					}
+
+					continue;
+				}
+
+				const auto id = resource["id"].GetString();
+
+				editor_material_resource new_material;
+				new_material.unique_name = id;
+
+				augs::read_json(resource, new_material.editable);
+
+				auto& pool = loaded.resources.get_pool_for<editor_material_resource>();
+				const auto result = pool.allocate(std::move(new_material));
+				register_new_resource(std::string("!") + id, result);
+			}
 		};
 
 		auto read_modes = [&]() {
@@ -926,13 +999,6 @@ namespace editor_project_readwrite {
 					sanitization::sanitize_downloaded_file_path(project_dir, untrusted_path)
 				);
 			}
-		};
-
-		auto read_internal_resources = [&]() {
-			/* 
-				For now we won't have any.
-				All of them are official.
-			*/
 		};
 
 		struct node_meta {
@@ -1235,7 +1301,7 @@ namespace editor_project_readwrite {
 		create_fallback_quick_test_mode_if_none();
 
 		read_external_resources();
-		read_internal_resources();
+		read_materials();
 
 		read_nodes();
 		read_layers();

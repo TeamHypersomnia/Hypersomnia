@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- remove update_official_content from debugger setup
+
 - Setting "hurt" to materials is tempting but this should really be as a "on_collision" event
     - Same with spawning explosions etc
 

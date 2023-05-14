@@ -169,7 +169,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	bool dirty_after_loading_autosave = false;
 	bool dirty_after_redirecting_paths = false;
-	bool should_recount_internal_resource_references = false;
+	bool should_recount_internal_resource_references = true;
 
 	std::optional<custom_imgui_result> imgui_return_once;
 

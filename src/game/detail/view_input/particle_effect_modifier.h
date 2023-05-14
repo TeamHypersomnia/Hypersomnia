@@ -14,4 +14,6 @@ struct particle_effect_modifier {
 		scale_lifetimes *= scalar;
 		return *this;
 	}
+
+	bool operator==(const particle_effect_modifier&) const = default;
 };	

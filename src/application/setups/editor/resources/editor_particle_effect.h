@@ -9,5 +9,7 @@ struct editor_particle_effect : particle_effect_modifier {
 	// GEN INTROSPECTOR struct editor_particle_effect
 	editor_typed_resource_id<editor_particles_resource> resource_id;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_particle_effect&) const = default;
 };
 
