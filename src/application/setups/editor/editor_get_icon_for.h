@@ -39,7 +39,7 @@ rgba editor_setup::get_icon_color_for(
 			node_color = object.editable.color;
 		}
 		else if constexpr(std::is_same_v<T, editor_particles_node>) {
-			node_color = object.editable.colorize;
+			node_color = object.editable.color;
 		}
 		else if constexpr(std::is_same_v<T, editor_wandering_pixels_node>) {
 			node_color = object.editable.color;
@@ -92,7 +92,7 @@ rgba editor_setup::get_icon_color_for(
 		return white;
 	}
 	else if constexpr(std::is_same_v<T, editor_particles_resource>) {
-		return object.editable.colorize;
+		return object.editable.color;
 	}
 	else if constexpr(std::is_same_v<T, editor_material_resource>) {
 		return white;

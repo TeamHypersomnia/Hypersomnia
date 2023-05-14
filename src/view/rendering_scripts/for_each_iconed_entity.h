@@ -159,7 +159,7 @@ void for_each_iconed_entity(
 			handle,
 			chosen_icon,
 			handle.get_logic_transform(),
-			handle.template get<invariants::continuous_particles>().effect.modifier.colorize
+			handle.template get<invariants::continuous_particles>().effect.modifier.color
 		);
 	});
 

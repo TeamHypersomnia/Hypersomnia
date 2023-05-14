@@ -46,7 +46,7 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 		glass.standard_damage_sound.resource_id = to_resource_id(official_sounds::GLASS_DAMAGE);
 
 		glass.standard_damage_particles.resource_id = to_resource_id(official_particles::GLASS_DAMAGE);
-		glass.standard_damage_particles.colorize = rgba(142, 186, 197, 255);
+		glass.standard_damage_particles.color = rgba(142, 186, 197, 255);
 	}
 
 	//using bound = augs::bound<real32>;

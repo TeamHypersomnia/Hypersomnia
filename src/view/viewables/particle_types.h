@@ -259,7 +259,7 @@ struct homing_animated_particle {
 
 template <class T>
 T& apply_to_particle(const particle_effect_modifier& m, T& p) {
-	p.colorize(m.colorize);
+	p.colorize(m.color);
 
 	if constexpr(has_lifetime_v<T>) {
 		p.max_lifetime_ms *= m.scale_lifetimes;

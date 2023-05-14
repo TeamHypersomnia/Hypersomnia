@@ -86,7 +86,7 @@ namespace test_flavours {
 					auto& a = melee.actions[weapon_action_type::PRIMARY];
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_PRIMARY);
 					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
-					a.init_particles.modifier.colorize = color;
+					a.init_particles.modifier.color = color;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_PRIMARY_SMOKE);
 					a.obstacle_hit_rotation_inertia_ms = 1000.f;
 					a.obstacle_hit_recoil_mult = 1.1f * weight_mult;
@@ -131,7 +131,7 @@ namespace test_flavours {
 					auto& a = melee.actions[weapon_action_type::SECONDARY];
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
 					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
-					a.init_particles.modifier.colorize = color;
+					a.init_particles.modifier.color = color;
 					a.damage.shake.mult *= 1.15f;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_SECONDARY_SMOKE);
 					a.wielder_impulse = 717.f;
@@ -193,7 +193,7 @@ namespace test_flavours {
 
 			invariants::continuous_particles particles_def;
 			particles_def.effect.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_TRACE);
-			particles_def.effect.modifier.colorize = orange;
+			particles_def.effect.modifier.color = orange;
 			meta.set(particles_def);
 
 			for (auto& a : meta.get<invariants::melee>().actions) {
@@ -267,7 +267,7 @@ namespace test_flavours {
 			
 			invariants::continuous_particles particles_def;
 			particles_def.effect.id = to_particle_effect_id(test_scene_particle_effect_id::POSEIDON_THROWER_TRACE);
-			particles_def.effect.modifier.colorize = rgba(0, 200, 255, 255);
+			particles_def.effect.modifier.color = rgba(0, 200, 255, 255);
 			meta.set(particles_def);
 
 			for (auto& a : meta.get<invariants::melee>().actions) {

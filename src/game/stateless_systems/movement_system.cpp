@@ -468,7 +468,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					particles.modifier.scale_amounts *= scale;
 					particles.modifier.scale_lifetimes *= scale;
-					particles.modifier.colorize = green;
+					particles.modifier.color = green;
 
 					effect_transform.rotation += 180;
 

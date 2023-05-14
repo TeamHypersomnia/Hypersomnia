@@ -203,7 +203,7 @@ namespace test_flavours {
 					remnant_def.lifetime_secs = 1.f * lifetime_mult;
 					remnant_def.start_shrinking_when_remaining_ms = 350.f * lifetime_mult;
 					remnant_def.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-					remnant_def.trace_particles.modifier.colorize = orange;
+					remnant_def.trace_particles.modifier.color = orange;
 					meta.set(remnant_def);
 				}
 
@@ -280,7 +280,7 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = white;
+				dest_eff.particles.modifier.color = white;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
@@ -345,17 +345,17 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = white;
+				dest_eff.particles.modifier.color = white;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
+			missile.trace_particles.modifier.color = rgba(202, 185, 89, 255);
 			missile.trace_particles.modifier.scale_amounts = 3.f;
 			missile.trace_particles.modifier.scale_lifetimes = 0.3f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.muzzle_leave_particles.modifier.color = white;//{ 255, 218, 5, 255 };
 			missile.damage.base = 10;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
@@ -414,17 +414,17 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = white;
+				dest_eff.particles.modifier.color = white;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
+			missile.trace_particles.modifier.color = rgba(202, 185, 89, 255);
 			missile.trace_particles.modifier.scale_amounts = 3.f;
 			missile.trace_particles.modifier.scale_lifetimes = 0.3f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.muzzle_leave_particles.modifier.color = white;//{ 255, 218, 5, 255 };
 			missile.damage.base = 10;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
@@ -483,19 +483,19 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = true;
-				dest_eff.particles.modifier.colorize = white;
+				dest_eff.particles.modifier.color = white;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 
 				missile.damage.effects.sentience_impact = dest_eff;
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
-			missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
+			missile.trace_particles.modifier.color = rgba(202, 185, 89, 255);
 			missile.trace_particles.modifier.scale_amounts = 8.5f;
 			missile.trace_particles.modifier.scale_lifetimes = 1.2f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.muzzle_leave_particles.modifier.color = white;//{ 255, 218, 5, 255 };
 			missile.muzzle_leave_particles.modifier.scale_amounts = 1.5f;
 			missile.muzzle_leave_particles.modifier.scale_lifetimes = 1.5f;
 			missile.damage.base = 10;
@@ -556,17 +556,17 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = white;
+				dest_eff.particles.modifier.color = white;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE_PRECISE);
-			missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
+			missile.trace_particles.modifier.color = rgba(202, 185, 89, 255);
 			missile.trace_particles.modifier.scale_amounts = 7.f;
 			missile.trace_particles.modifier.scale_lifetimes = 1.1f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.muzzle_leave_particles.modifier.color = white;//{ 255, 218, 5, 255 };
 			missile.muzzle_leave_particles.modifier.scale_amounts = 1.5f;
 			missile.muzzle_leave_particles.modifier.scale_lifetimes = 1.5f;
 			missile.damage.base = 10;
@@ -642,17 +642,17 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = white;
+				dest_eff.particles.modifier.color = white;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
-			missile.trace_particles.modifier.colorize = rgba(255, 100, 0, 255);
+			missile.trace_particles.modifier.color = rgba(255, 100, 0, 255);
 			missile.trace_particles.modifier.scale_amounts = 1.1f;
 			missile.trace_particles.modifier.scale_lifetimes = 0.8f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.muzzle_leave_particles.modifier.color = white;//{ 255, 218, 5, 255 };
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			//missile.damage.shake *= 1 / 1.3f;
 
@@ -710,19 +710,19 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = white;
+				dest_eff.particles.modifier.color = white;
 				dest_eff.particles.modifier.scale_amounts *= 1.4f;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
+			missile.trace_particles.modifier.color = rgba(202, 185, 89, 255);
 			missile.trace_particles.modifier.scale_amounts = 35.f;
 			missile.trace_particles.modifier.scale_lifetimes = 0.4f;
 
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.muzzle_leave_particles.modifier.color = white;//{ 255, 218, 5, 255 };
 			missile.muzzle_leave_particles.modifier *= 2.f;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			missile.damage.impact_impulse *= 1.5f;
@@ -783,16 +783,16 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.color = cyan;
 				dest_eff.particles.modifier.scale_amounts = 0.2f;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = white;
+			missile.trace_particles.modifier.color = white;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.muzzle_leave_particles.modifier.color = cyan;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
@@ -848,7 +848,7 @@ namespace test_flavours {
 
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
-				dest_eff.particles.modifier.colorize = pink;
+				dest_eff.particles.modifier.color = pink;
 				dest_eff.spawn_exploding_ring = true;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 
@@ -856,7 +856,7 @@ namespace test_flavours {
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.color = cyan;
 			missile.trace_particles.modifier.scale_amounts = 1.2f;
 			missile.trace_particles.modifier.scale_lifetimes = 2.0f;
 
@@ -866,7 +866,7 @@ namespace test_flavours {
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
-			missile.ricochet_particles.modifier.colorize = cyan;
+			missile.ricochet_particles.modifier.color = cyan;
 			missile.ricochet_born_cooldown_ms = 17.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
@@ -918,16 +918,16 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = red;
+				dest_eff.particles.modifier.color = red;
 				dest_eff.particles.modifier.scale_amounts = 0.2f;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = red;
+			missile.trace_particles.modifier.color = red;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = red;
+			missile.muzzle_leave_particles.modifier.color = red;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
@@ -985,16 +985,16 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.color = cyan;
 				dest_eff.particles.modifier.scale_amounts = 0.2f;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ICE_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.color = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.muzzle_leave_particles.modifier.color = cyan;
 			missile.muzzle_leave_particles.modifier.scale_amounts /= 3.f;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
@@ -1055,15 +1055,15 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.color = cyan;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ICE_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.color = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.muzzle_leave_particles.modifier.color = cyan;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
@@ -1123,17 +1123,17 @@ namespace test_flavours {
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
-				dest_eff.particles.modifier.colorize = pro90_round_col;
+				dest_eff.particles.modifier.color = pro90_round_col;
 				dest_eff.particles.modifier.scale_amounts = 0.2f;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = pro90_round_col;
+			missile.trace_particles.modifier.color = pro90_round_col;
 			missile.trace_particles.modifier.scale_amounts = 0.5f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = pro90_round_col;
+			missile.muzzle_leave_particles.modifier.color = pro90_round_col;
 			missile.muzzle_leave_particles.modifier.scale_amounts *= 0.5f;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
@@ -1190,21 +1190,21 @@ namespace test_flavours {
 
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
-				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.color = cyan;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.color = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
 			missile.trace_particles_fly_backwards = true;
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.muzzle_leave_particles.modifier.color = cyan;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
-			missile.ricochet_particles.modifier.colorize = cyan;
+			missile.ricochet_particles.modifier.color = cyan;
 			missile.ricochet_born_cooldown_ms = 17.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
@@ -1254,22 +1254,22 @@ namespace test_flavours {
 
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
-				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.color = cyan;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.color = cyan;
 			missile.trace_particles.modifier.scale_amounts *= 0.5f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::COVERT_PISTOL_MUZZLE_LEAVE_EXPLOSION);
 			missile.trace_particles_fly_backwards = true;
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.muzzle_leave_particles.modifier.color = cyan;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
-			missile.ricochet_particles.modifier.colorize = cyan;
+			missile.ricochet_particles.modifier.color = cyan;
 			missile.ricochet_born_cooldown_ms = 17.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
@@ -1319,12 +1319,12 @@ namespace test_flavours {
 
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
-				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.color = cyan;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.color = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SZTURM_MUZZLE_LEAVE_EXPLOSION);
 			missile.trace_particles_fly_backwards = false;
@@ -1332,7 +1332,7 @@ namespace test_flavours {
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
-			missile.ricochet_particles.modifier.colorize = cyan;
+			missile.ricochet_particles.modifier.color = cyan;
 			missile.ricochet_born_cooldown_ms = 17.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
@@ -1375,17 +1375,17 @@ namespace test_flavours {
 
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
-				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.color = cyan;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.color = cyan;
 			missile.trace_particles.modifier.scale_amounts = 2.5f;
 			missile.trace_particles.modifier.scale_lifetimes = 2.f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.muzzle_leave_particles.modifier.color = cyan;
 			missile.muzzle_leave_particles.modifier.scale_amounts = 1.8f;
 			missile.muzzle_leave_particles.modifier.scale_lifetimes = 1.4f;
 
@@ -1482,15 +1482,15 @@ namespace test_flavours {
 
 			{
 				auto& dest_eff = missile.damage.effects.destruction;
-				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.color = cyan;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.color = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
-			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.muzzle_leave_particles.modifier.color = cyan;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
@@ -1729,7 +1729,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = cyan;
+				cartridge.shell_trace_particles.modifier.color = cyan;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND);
@@ -1755,7 +1755,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = cyan;
+				cartridge.shell_trace_particles.modifier.color = cyan;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::COVERT_CYAN_ROUND);
@@ -1781,7 +1781,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = cyan;
+				cartridge.shell_trace_particles.modifier.color = cyan;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SZTURM_ROUND);
@@ -1807,7 +1807,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = cyan;
+				cartridge.shell_trace_particles.modifier.color = cyan;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::PISTOL_CYAN_ROUND);
@@ -1833,7 +1833,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = pro90_round_col;
+				cartridge.shell_trace_particles.modifier.color = pro90_round_col;
 
 				//cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::PRO90_ROUND);
@@ -1864,7 +1864,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = steel_color;
+				cartridge.shell_trace_particles.modifier.color = steel_color;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::STEEL_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::STEEL_ROUND);
@@ -1890,7 +1890,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = pink;
+				cartridge.shell_trace_particles.modifier.color = pink;
 				cartridge.shell_trace_particles.modifier *= 2.5f;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::HPSR_SHELL);
@@ -1917,7 +1917,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = steel_color;
+				cartridge.shell_trace_particles.modifier.color = steel_color;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::BULLDUP2000_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::BULLDUP2000_ROUND);
@@ -1943,7 +1943,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = steel_color;
+				cartridge.shell_trace_particles.modifier.color = steel_color;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::HUNTER_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::HUNTER_ROUND);
@@ -1969,7 +1969,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = steel_color;
+				cartridge.shell_trace_particles.modifier.color = steel_color;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::GALILEA_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::GALILEA_ROUND);
@@ -2006,7 +2006,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = orange;
+				cartridge.shell_trace_particles.modifier.color = orange;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SKULL_ROCKET_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SKULL_ROCKET_FLYING);
@@ -2032,7 +2032,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = rgba(202, 186, 89, 255);
+				cartridge.shell_trace_particles.modifier.color = rgba(202, 186, 89, 255);
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::ORANGE_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::ORANGE_ROUND);
@@ -2058,7 +2058,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = white;
+				cartridge.shell_trace_particles.modifier.color = white;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::DEAGLE_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::DEAGLE_ROUND);
@@ -2084,7 +2084,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = red;
+				cartridge.shell_trace_particles.modifier.color = red;
 				cartridge.shell_trace_particles.modifier.scale_amounts = 1.5f;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SHOTGUN_RED_SHELL);
@@ -2117,7 +2117,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = cyan;
+				cartridge.shell_trace_particles.modifier.color = cyan;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::ZAMIEC_ROUND);
@@ -2145,7 +2145,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = cyan;
+				cartridge.shell_trace_particles.modifier.color = cyan;
 
 				//cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::PISTOL_CYAN_ROUND);
@@ -2180,7 +2180,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = cyan;
+				cartridge.shell_trace_particles.modifier.color = cyan;
 				cartridge.shell_trace_particles.modifier.scale_amounts = 1.5f;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::GRADOBICIE_SHELL);

@@ -162,7 +162,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					ring.maximum_duration_seconds = 0.16f;
 
-					ring.color = effect.modifier.colorize;
+					ring.color = effect.modifier.color;
 					ring.center = impact_transform.pos;
 
 					step.post_message(std::move(msg));

@@ -191,7 +191,7 @@ void play_learnt_spell_effect(
 		});
 
 		auto effect = assets.standard_learnt_spell_particles;
-		effect.modifier.colorize = col;
+		effect.modifier.color = col;
 		effect.start(step, particle_effect_start_input::orbit_local(subject, {}).set_homing(subject), predictable_only_by(subject));
 	}
 }

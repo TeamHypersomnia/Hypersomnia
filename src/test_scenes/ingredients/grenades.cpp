@@ -518,7 +518,7 @@ namespace test_flavours {
 			fuse.defused_sound[0].id = to_sound_id(test_scene_sound_id::STEAM_BURST);
 			fuse.defused_sound[1].id = to_sound_id(test_scene_sound_id::POWER_OUT);
 			fuse.defused_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEAM_BURST);
-			fuse.defused_particles.modifier.colorize = cyan;
+			fuse.defused_particles.modifier.color = cyan;
 			fuse.defused_particles.modifier.scale_amounts = 2.5f;
 			fuse.defused_particles.modifier.scale_lifetimes = 2.5f;
 

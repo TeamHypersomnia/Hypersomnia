@@ -113,7 +113,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		auto& metal = all_definitions[to_physical_material_id(test_scene_physical_material_id::METAL)];
 		metal.standard_damage_sound.id = to_sound_id(test_scene_sound_id::COLLISION_METAL_METAL);
 		metal.standard_damage_particles.id = to_particle_effect_id(test_scene_particle_effect_id::METAL_DAMAGE);
-		metal.standard_damage_particles.modifier.colorize = rgba(251, 255, 181, 255);
+		metal.standard_damage_particles.modifier.color = rgba(251, 255, 181, 255);
 		metal.unit_damage_for_effects = 20.f;
 	}
 
@@ -122,7 +122,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		vent.standard_damage_sound.id = to_sound_id(test_scene_sound_id::AIR_DUCT_IMPACT);
 		vent.standard_damage_sound.modifier.pitch = 1.f;
 		vent.standard_damage_particles.id = to_particle_effect_id(test_scene_particle_effect_id::METAL_DAMAGE);
-		vent.standard_damage_particles.modifier.colorize = rgba(251, 255, 181, 255);
+		vent.standard_damage_particles.modifier.color = rgba(251, 255, 181, 255);
 		vent.unit_damage_for_effects = 20.f;
 	}
 
@@ -130,14 +130,14 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		auto& wood = all_definitions[to_physical_material_id(test_scene_physical_material_id::WOOD)];
 		wood.standard_damage_sound.id = to_sound_id(test_scene_sound_id::WOOD_DAMAGE);
 		wood.standard_damage_particles.id = to_particle_effect_id(test_scene_particle_effect_id::WOOD_DAMAGE);
-		wood.standard_damage_particles.modifier.colorize = rgba(204 - 50, 182 - 50, 175 - 50, 255);
+		wood.standard_damage_particles.modifier.color = rgba(204 - 50, 182 - 50, 175 - 50, 255);
 	}
 
 	{
 		auto& glass = all_definitions[to_physical_material_id(test_scene_physical_material_id::GLASS)];
 		glass.standard_damage_sound.id = to_sound_id(test_scene_sound_id::GLASS_DAMAGE);
 		glass.standard_damage_particles.id = to_particle_effect_id(test_scene_particle_effect_id::GLASS_DAMAGE);
-		glass.standard_damage_particles.modifier.colorize = rgba(142, 186, 197, 255);
+		glass.standard_damage_particles.modifier.color = rgba(142, 186, 197, 255);
 		glass.suppress_damager_destruction_sound = true;
 	}
 }

@@ -26,7 +26,7 @@ void ignite_charging_particles(
 	const rgba col
 ) {
 	auto effect = spell_data.charging_particles;
-	effect.modifier.colorize = col;
+	effect.modifier.color = col;
 
 	effect.start(
 		step,

@@ -147,7 +147,7 @@ namespace test_flavours {
 				def.base_speed = base_speed;
 				def.sine_speed_boost = sine_speed_boost;
 				def.bubble_effect.id = to_particle_effect_id(test_scene_particle_effect_id::FISH_BUBBLE);
-				def.bubble_effect.modifier.colorize = bubble_neon;
+				def.bubble_effect.modifier.color = bubble_neon;
 				def.base_bubble_interval_ms = 200.f;
 
 				def.sine_wandering_amplitude = 1.f;
@@ -179,7 +179,7 @@ namespace test_flavours {
 			auto& def = wandering.value;
 
 			def.bubble_effect.id = to_particle_effect_id(insect_sparkles);
-			def.bubble_effect.modifier.colorize = white;
+			def.bubble_effect.modifier.color = white;
 
 			def.sine_wandering_amplitude = sine_wandering_amplitude;
 			def.sine_wandering_period = sine_wandering_period;
@@ -609,7 +609,7 @@ namespace test_flavours {
 
 			invariants::continuous_particles particles_def;
 			particles_def.effect.id = to_particle_effect_id(particles_id);
-			particles_def.effect.modifier.colorize = col;
+			particles_def.effect.modifier.color = col;
 			meta.set(particles_def);
 
 			return meta;
@@ -625,6 +625,30 @@ namespace test_flavours {
 			test_particles_decorations::FLOWER_BUBBLES,
 			test_scene_particle_effect_id::FLOWER_BUBBLES,
 			rgba(bubble_neon.rgb(), 255)
+		);
+
+		flavour_with_particles(
+			test_particles_decorations::GLASS_DAMAGE,
+			test_scene_particle_effect_id::GLASS_DAMAGE,
+			white
+		);
+
+		flavour_with_particles(
+			test_particles_decorations::WOOD_DAMAGE,
+			test_scene_particle_effect_id::WOOD_DAMAGE,
+			white
+		);
+
+		flavour_with_particles(
+			test_particles_decorations::METAL_DAMAGE,
+			test_scene_particle_effect_id::METAL_DAMAGE,
+			white
+		);
+
+		flavour_with_particles(
+			test_particles_decorations::EXHAUSTED_SMOKE,
+			test_scene_particle_effect_id::EXHAUSTED_SMOKE,
+			white
 		);
 
 		{

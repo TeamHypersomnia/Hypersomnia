@@ -23,8 +23,7 @@ void create_particles(const intercosm& scene, editor_resource_pools& pools) {
 			res.official_tag = enum_id;
 			res.scene_flavour_id = flavour_id;
 			res.editable.wandering = cp.wandering;
-			// TODO: Change to "color"
-			res.editable.colorize = cp.effect.modifier.colorize;
+			res.editable.color = cp.effect.modifier.color;
 
 			pool.allocate(res);
 		});
