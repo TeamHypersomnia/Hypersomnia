@@ -9,9 +9,21 @@ struct particle_effect_modifier {
 	real32 scale_lifetimes = 1.f;
 	// END GEN INTROSPECTOR
 
+	void sanitize() {
+		scale_amounts = std::min(scale_amounts, 100.0f);
+		scale_lifetimes = std::min(scale_lifetimes, 100.0f);
+	}
+
 	auto& operator*=(const real32 scalar) {
 		scale_amounts *= scalar;
 		scale_lifetimes *= scalar;
+		return *this;
+	}
+
+	auto& operator*=(const particle_effect_modifier& b) {
+		color *= b.color;
+		scale_amounts *= b.scale_amounts;
+		scale_lifetimes *= b.scale_lifetimes;
 		return *this;
 	}
 

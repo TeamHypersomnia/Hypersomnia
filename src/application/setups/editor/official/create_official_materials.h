@@ -43,9 +43,9 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 	{
 		auto& glass = create_material(official_materials::GLASS);
 
-		glass.standard_damage_sound.resource_id = to_resource_id(official_sounds::GLASS_DAMAGE);
+		glass.standard_damage_sound.id = to_resource_id(official_sounds::GLASS_DAMAGE);
 
-		glass.standard_damage_particles.resource_id = to_resource_id(official_particles::GLASS_DAMAGE);
+		glass.standard_damage_particles.id = to_resource_id(official_particles::GLASS_DAMAGE);
 		glass.standard_damage_particles.color = rgba(142, 186, 197, 255);
 	}
 
@@ -73,14 +73,14 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 
 		{
 			auto& entry = get_resource(a_id, pools).collision_sound_matrix[b_id];
-			def_template.effect.resource_id = c_id;
+			def_template.effect.id = c_id;
 			entry = def_template;
 		}
 
 		if (both_ways) {
 			auto& entry = get_resource(b_id, pools).collision_sound_matrix[a_id];
 
-			def_template.effect.resource_id = c_id;
+			def_template.effect.id = c_id;
 			entry = def_template;
 		}
 	};

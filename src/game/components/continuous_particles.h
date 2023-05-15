@@ -23,7 +23,7 @@ struct stream_wandering_state {
 namespace invariants {
 	struct continuous_particles {
 		// GEN INTROSPECTOR struct invariants::continuous_particles
-		particle_effect_input effect;
+		assets::particle_effect_id effect_id;
 		augs::maybe<stream_wandering> wandering;
 		real32 max_lifetime_ms = -1.f;
 		// END GEN INTROSPECTOR
@@ -34,6 +34,7 @@ namespace components {
 	struct continuous_particles {
 		// GEN INTROSPECTOR struct components::continuous_particles
 		stream_wandering_state wandering_state;
+		particle_effect_modifier modifier;
 		// END GEN INTROSPECTOR
 	};
 }

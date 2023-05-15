@@ -128,6 +128,14 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 		MULTIPROPERTY("Pitch", field.pitch);\
 	}
 
+#define PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY(label, field) \
+	MULTIPROPERTY(label, field.color);\
+	MULTIPROPERTY(label, field.scale_amounts);\
+	MULTIPROPERTY(label, field.scale_lifetimes);
+
+#define PARTICLE_EFFECT_MULTIPROPERTY(label, field) \
+	MULTIPROPERTY(label, field.id);\
+	PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY(label, field);
 
 #define MULTIPROPERTY_POSITION(field) \
 	MULTIPROPERTY("Position X", pos.x); \
@@ -260,6 +268,28 @@ bool edit_property(
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
+
+				return false;
+			}
+
+			if (label == "Scale lifetimes") {
+				if (slider(label, property, 0.0f, 100.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("Alter how long until particles disappear in this effect.");
+
+				return false;
+			}
+
+			if (label == "Scale amounts") {
+				if (slider(label, property, 0.0f, 100.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("Alter the amount of particles in this effect.");
 
 				return false;
 			}
@@ -879,6 +909,10 @@ EDIT_FUNCTION(editor_particles_node_editable& insp, T& es) {
 	MULTIPROPERTY_POSITION(pos);
 	MULTIPROPERTY("Rotation", rotation);
 
+	MULTIPROPERTY("Color", color);
+	MULTIPROPERTY("Scale amounts", scale_amounts);
+	MULTIPROPERTY("Scale lifetimes", scale_lifetimes);
+
 	return result;
 }
 
@@ -1306,6 +1340,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 
 	text_disabled("Played when exposed to any damage,\ne.g. the surface is shot/knifed.");
 	SOUND_EFFECT_LEAN_MULTIPROPERTY("Damage sound", damage_sound);
+	PARTICLE_EFFECT_MULTIPROPERTY("Damage particles", damage_particles);
 
 	if (auto scope = augs::imgui::scoped_tree_node_ex("Suppress")) {
 		MULTIPROPERTY("Suppress damager impact sound", suppress_damager_impact_sound);

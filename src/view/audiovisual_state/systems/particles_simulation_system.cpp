@@ -797,13 +797,15 @@ void particles_simulation_system::advance_visible_streams(
 		continuous_particles_caches,
 		[](const auto h) -> std::optional<packaged_particle_effect> {
 			const auto& continuous_particles = h.template get<invariants::continuous_particles>();
+			const auto& cp = h.template get<components::continuous_particles>();
 
 			packaged_particle_effect particles;
 
 			particles.start = particle_effect_start_input::at_entity(h);
 			particles.start.stream_infinitely = true;
 
-			particles.input = continuous_particles.effect;
+			particles.input.id = continuous_particles.effect_id;
+			particles.input.modifier = cp.modifier;
 
 			if (!particles.input.id.is_set()) {
 				return std::nullopt;

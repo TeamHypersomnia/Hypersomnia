@@ -192,9 +192,12 @@ namespace test_flavours {
 			);
 
 			invariants::continuous_particles particles_def;
-			particles_def.effect.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_TRACE);
-			particles_def.effect.modifier.color = orange;
+			particles_def.effect_id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_TRACE);
 			meta.set(particles_def);
+
+			components::continuous_particles particles;
+			particles.modifier.color = orange;
+			meta.set(particles);
 
 			for (auto& a : meta.get<invariants::melee>().actions) {
 				a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
@@ -266,9 +269,12 @@ namespace test_flavours {
 			);
 			
 			invariants::continuous_particles particles_def;
-			particles_def.effect.id = to_particle_effect_id(test_scene_particle_effect_id::POSEIDON_THROWER_TRACE);
-			particles_def.effect.modifier.color = rgba(0, 200, 255, 255);
+			particles_def.effect_id = to_particle_effect_id(test_scene_particle_effect_id::POSEIDON_THROWER_TRACE);
 			meta.set(particles_def);
+
+			components::continuous_particles particles;
+			particles.modifier.color = rgba(0, 200, 255, 255);
+			meta.set(particles);
 
 			for (auto& a : meta.get<invariants::melee>().actions) {
 				a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::POSEIDON_THROWER_ATTACK);

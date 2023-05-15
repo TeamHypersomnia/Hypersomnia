@@ -608,9 +608,12 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
 			invariants::continuous_particles particles_def;
-			particles_def.effect.id = to_particle_effect_id(particles_id);
-			particles_def.effect.modifier.color = col;
+			particles_def.effect_id = to_particle_effect_id(particles_id);
 			meta.set(particles_def);
+
+			components::continuous_particles particles;
+			particles.modifier.color = col;
+			meta.set(particles);
 
 			return meta;
 		};

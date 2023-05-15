@@ -256,7 +256,8 @@ void setup_scene_object_from_resource(
 		else if constexpr(std::is_same_v<T, editor_particle_effect>) {
 			particle_effect_input out;
 			out.modifier = static_cast<particle_effect_modifier>(in);
-			out.id = get_asset_id_of(in.resource_id);
+			out.modifier.sanitize();
+			out.id = get_asset_id_of(in.id);
 
 			return out;
 		}
@@ -265,6 +266,7 @@ void setup_scene_object_from_resource(
 	if constexpr(std::is_same_v<editor_material_resource, R>) {
 		scene.unit_damage_for_effects = editable.unit_damage_for_effects;
 		scene.standard_damage_sound = to_game_effect(editable.damage_sound);
+		scene.standard_damage_particles = to_game_effect(editable.damage_particles);
 		scene.suppress_damager_impact_sound = editable.suppress_damager_impact_sound;
 		scene.suppress_damager_destruction_sound = editable.suppress_damager_destruction_sound;
 
@@ -302,8 +304,16 @@ void setup_scene_object_from_resource(
 		}
 		else {
 			auto& particles = scene.template get<invariants::continuous_particles>();
-			particles.effect.id = resource.scene_asset_id;
-			particles.effect.modifier = static_cast<particle_effect_modifier>(editable);
+			particles.effect_id = resource.scene_asset_id;
+			/*
+				Keep invariant modifier at default.
+				Why?
+				The continuous_particles flavour will only be used to spawn nodes and we want to
+				customize modifiers on a per-entity basis.
+
+				(We actually removed effect modifier from the invariant.)
+			*/
+			//particles.effect.modifier = static_cast<particle_effect_modifier>(editable);
 		}
 	}
 	else if constexpr(std::is_same_v<editor_wandering_pixels_resource, R>) {

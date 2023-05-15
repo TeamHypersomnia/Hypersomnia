@@ -101,6 +101,11 @@ void setup_entity_from_node(
 		wandering_pixels = static_cast<const components::wandering_pixels&>(editable);
 		wandering_pixels.num_particles = std::min(MAX_WANDERING_PIXELS, wandering_pixels.num_particles);
 	}
+	else if constexpr(std::is_same_v<N, editor_particles_node>) {
+		auto& cp = agg.template get<components::continuous_particles>();
+		cp.modifier = static_cast<const particle_effect_modifier&>(editable);
+		cp.modifier.sanitize();
+	}
 	else if constexpr(is_one_of_v<N, editor_point_marker_node, editor_area_marker_node>) {
 		auto& marker = agg.template get<components::marker>();
 		marker.faction = editable.faction;
