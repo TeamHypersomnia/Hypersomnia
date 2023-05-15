@@ -67,14 +67,14 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 			entry = def_template;
 
 			if (silence_other) {
-				entry.override_opposite_collision_sound = true;
+				entry.silence_opposite_collision_sound = true;
 			}
 		}
 	};
 
 	{
 		collision_sound_def def_template;
-		def_template.override_opposite_collision_sound = true;
+		def_template.silence_opposite_collision_sound = true;
 
 		set_default(test_scene_physical_material_id::CHARACTER, test_scene_sound_id::BLANK, def_template);
 	}
@@ -138,6 +138,6 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		glass.standard_damage_sound.id = to_sound_id(test_scene_sound_id::GLASS_DAMAGE);
 		glass.standard_damage_particles.id = to_particle_effect_id(test_scene_particle_effect_id::GLASS_DAMAGE);
 		glass.standard_damage_particles.modifier.color = rgba(142, 186, 197, 255);
-		glass.suppress_damager_destruction_sound = true;
+		glass.silence_damager_destruction_sound = true;
 	}
 }

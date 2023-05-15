@@ -1325,7 +1325,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 	bool last_result = false;
 	std::string result;
 
-	auto override_opposite_collision_sound_tooltip = []() {
+	auto silence_opposite_collision_sound_tooltip = []() {
 		if (ImGui::IsItemHovered()) {
 			auto scope = scoped_tooltip();
 			text("If ticked, the collision sound chosen by the other surface will be silenced.\n\nExample:\n");
@@ -1349,10 +1349,10 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		PARTICLE_EFFECT_MULTIPROPERTY("Damage particles", damage_particles);
 	}
 
-	if (auto scope = augs::imgui::scoped_tree_node_ex("Suppress")) {
-		MULTIPROPERTY("Suppress damager impact sound", suppress_damager_impact_sound);
+	if (auto scope = augs::imgui::scoped_tree_node_ex("Silence damager")) {
+		MULTIPROPERTY("Silence damager impact sound", silence_damager_impact_sound);
 		tooltip_on_hover("Tick to silence the default melee impact/bullet penetration sound.");
-		MULTIPROPERTY("Suppress damager destruction sound", suppress_damager_destruction_sound);
+		MULTIPROPERTY("Silence damager destruction sound", silence_damager_destruction_sound);
 		tooltip_on_hover("Tick to silence the default bullet destruction sound.");
 	}
 
@@ -1384,8 +1384,8 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		PARTICLE_EFFECT_MULTIPROPERTY("Particles (optional)", default_collision.particles);
 	}
 
-	MULTIPROPERTY("Override opposite collision sound", default_collision.override_opposite_collision_sound);
-	override_opposite_collision_sound_tooltip();
+	MULTIPROPERTY("Silence opposite collision sound", default_collision.silence_opposite_collision_sound);
+	silence_opposite_collision_sound_tooltip();
 
 	ImGui::Separator();
 	text_color("Specific collisions", yellow);
@@ -1452,8 +1452,8 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 				tooltip_on_hover(sensitivity_tooltip);
 			}
 
-			if (edit_property(result, "Override opposite collision sound", special_handler, coll.override_opposite_collision_sound)) write_to_others();
-			override_opposite_collision_sound_tooltip();
+			if (edit_property(result, "Silence opposite collision sound", special_handler, coll.silence_opposite_collision_sound)) write_to_others();
+			silence_opposite_collision_sound_tooltip();
 		}
 	}
 

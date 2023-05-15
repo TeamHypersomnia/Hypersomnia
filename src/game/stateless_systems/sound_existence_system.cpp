@@ -183,19 +183,19 @@ void play_collision_sound(
 			}
 		};
 
-		if (!first->override_opposite_collision_sound && !second->override_opposite_collision_sound) {
+		if (!first->silence_opposite_collision_sound && !second->silence_opposite_collision_sound) {
 			/* If both allow each other, play both */
 			play_both();
 		}
-		else if (first->override_opposite_collision_sound && second->override_opposite_collision_sound) {
+		else if (first->silence_opposite_collision_sound && second->silence_opposite_collision_sound) {
 			/* If both try to silence each other, also play both */
 			play_both();
 		}
 		else {
-			if (first->override_opposite_collision_sound) {
+			if (first->silence_opposite_collision_sound) {
 				play_sound(first);
 			}
-			else if (second->override_opposite_collision_sound) {
+			else if (second->silence_opposite_collision_sound) {
 				play_sound(second);
 			}
 		}
@@ -447,8 +447,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 					always_predictable_v
 				);
 
-				suppress_impact_sound = mat->suppress_damager_impact_sound;
-				suppress_destruction_sound = mat->suppress_damager_destruction_sound;
+				suppress_impact_sound = mat->silence_damager_impact_sound;
+				suppress_destruction_sound = mat->silence_damager_destruction_sound;
 			}
 		}
 

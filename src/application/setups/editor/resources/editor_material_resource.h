@@ -29,7 +29,7 @@ struct editor_collision_sound_def {
 	real32 cooldown_duration = 250.f;
 	int occurences_before_cooldown = 3;
 
-	bool override_opposite_collision_sound = false;
+	bool silence_opposite_collision_sound = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_collision_sound_def&) const = default;
@@ -42,8 +42,8 @@ struct editor_material_resource_editable {
 	editor_collision_sound_def default_collision;
 
 	editor_sound_effect damage_sound;
-	bool suppress_damager_impact_sound = false;
-	bool suppress_damager_destruction_sound = false;
+	bool silence_damager_impact_sound = false;
+	bool silence_damager_destruction_sound = false;
 
 	editor_particle_effect damage_particles;
 

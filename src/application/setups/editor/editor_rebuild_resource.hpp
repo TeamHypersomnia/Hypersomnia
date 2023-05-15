@@ -267,8 +267,8 @@ void setup_scene_object_from_resource(
 		scene.unit_damage_for_effects = editable.unit_damage_for_effects;
 		scene.standard_damage_sound = to_game_effect(editable.damage_sound);
 		scene.standard_damage_particles = to_game_effect(editable.damage_particles);
-		scene.suppress_damager_impact_sound = editable.suppress_damager_impact_sound;
-		scene.suppress_damager_destruction_sound = editable.suppress_damager_destruction_sound;
+		scene.silence_damager_impact_sound = editable.silence_damager_impact_sound;
+		scene.silence_damager_destruction_sound = editable.silence_damager_destruction_sound;
 
 		auto to_game_collision_def = [&to_game_effect](const auto& from) {
 			collision_sound_def out;
@@ -278,7 +278,7 @@ void setup_scene_object_from_resource(
 			out.collision_sound_sensitivity = from.collision_sound_sensitivity;
 			out.cooldown_duration = from.cooldown_duration;
 			out.occurences_before_cooldown = from.occurences_before_cooldown;
-			out.override_opposite_collision_sound = from.override_opposite_collision_sound;
+			out.silence_opposite_collision_sound = from.silence_opposite_collision_sound;
 
 			return out;
 		};
@@ -292,7 +292,7 @@ void setup_scene_object_from_resource(
 
 			if (mapped_id == to_physical_material_id(test_scene_physical_material_id::CHARACTER)) {
 				/* Blank so must override */
-				scene.collision_sound_matrix[mapped_id].override_opposite_collision_sound = true;
+				scene.collision_sound_matrix[mapped_id].silence_opposite_collision_sound = true;
 			}
 		}
 	}
