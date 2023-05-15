@@ -1343,7 +1343,11 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 
 	text_disabled("Played when exposed to any damage,\ne.g. the surface is shot/knifed.");
 	SOUND_EFFECT_LEAN_MULTIPROPERTY("Damage sound", damage_sound);
-	PARTICLE_EFFECT_MULTIPROPERTY("Damage particles", damage_particles);
+
+	{
+		auto scope = scoped_id("Damage particles");
+		PARTICLE_EFFECT_MULTIPROPERTY("Damage particles", damage_particles);
+	}
 
 	if (auto scope = augs::imgui::scoped_tree_node_ex("Suppress")) {
 		MULTIPROPERTY("Suppress damager impact sound", suppress_damager_impact_sound);
@@ -1353,7 +1357,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 	}
 
 	ImGui::Separator();
-	text_color("Default collision sound", yellow);
+	text_color("Default collision", yellow);
 	ImGui::Separator();
 
 	text_disabled("Played by default, when colliding with anything.");
@@ -1373,6 +1377,11 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		MULTIPROPERTY("Collision sound sensitivity", default_collision.collision_sound_sensitivity);
 
 		tooltip_on_hover(sensitivity_tooltip);
+	}
+
+	{
+		auto scope = scoped_id("Particles (optional)");
+		PARTICLE_EFFECT_MULTIPROPERTY("Particles (optional)", default_collision.particles);
 	}
 
 	MULTIPROPERTY("Override opposite collision sound", default_collision.override_opposite_collision_sound);

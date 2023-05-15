@@ -12,6 +12,7 @@ struct collision_sound_def {
 
 	// GEN INTROSPECTOR struct collision_sound_def
 	sound_effect_input effect;
+	particle_effect_input particles;
 	bound pitch_bound = bound(0.9f, 1.5f);
 
 	real32 collision_sound_sensitivity = 1.0f;

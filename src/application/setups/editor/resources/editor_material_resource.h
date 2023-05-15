@@ -20,6 +20,7 @@ struct editor_collision_sound_def {
 	editor_typed_resource_id<editor_material_resource> collider;
 
 	editor_typed_resource_id<editor_sound_resource> sound;
+	editor_particle_effect particles;
 	real32 min_pitch = 0.9f;
 	real32 max_pitch = 1.5f;
 

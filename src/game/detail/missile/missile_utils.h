@@ -2,7 +2,7 @@
 
 void play_collision_sound(
 	const real32 strength,
-	const vec2 location,
+	const transformr location,
 	const const_entity_handle sub,
 	const const_entity_handle col,
 	const logic_step step

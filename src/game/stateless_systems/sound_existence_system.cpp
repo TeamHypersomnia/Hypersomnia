@@ -31,7 +31,7 @@
 
 void play_collision_sound(
 	const real32 strength,
-	const vec2 location,
+	const transformr location,
 	const const_entity_handle sub,
 	const const_entity_handle col,
 	const logic_step step
@@ -71,6 +71,18 @@ void play_collision_sound(
 		}
 
 		// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_sensitivity, collider_coll.collision_sound_sensitivity);
+
+		{
+			auto effect = sound_def->particles;
+
+			if (effect.id.is_set()) {
+				effect.start(
+					step,
+					particle_effect_start_input::fire_and_forget(location),
+					always_predictable_v
+				);
+			}
+		}
 
 		auto effect = sound_def->effect;
 
@@ -210,7 +222,9 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			const auto collision_sound_strength = c.normal_impulse;
 
 			if (subject.alive() && collider.alive()) {
-				::play_collision_sound(collision_sound_strength, c.point, subject, collider, step);
+				auto impact_dir = c.collider_impact_velocity;
+				impact_dir.normalize();
+				::play_collision_sound(collision_sound_strength, transformr(c.point, impact_dir.degrees()), subject, collider, step);
 			}
 
 			// skip the next, swapped collision message

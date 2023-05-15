@@ -273,6 +273,7 @@ void setup_scene_object_from_resource(
 		auto to_game_collision_def = [&to_game_effect](const auto& from) {
 			collision_sound_def out;
 			out.effect = to_game_effect(from.sound);
+			out.particles = to_game_effect(from.particles);
 			out.pitch_bound.set(from.min_pitch, from.max_pitch);
 			out.collision_sound_sensitivity = from.collision_sound_sensitivity;
 			out.cooldown_duration = from.cooldown_duration;
