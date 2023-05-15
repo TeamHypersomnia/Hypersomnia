@@ -23,6 +23,7 @@ void create_particles(const intercosm& scene, editor_resource_pools& pools) {
 			res.unique_name = to_lowercase(augs::enum_to_string(enum_id));
 			res.official_tag = enum_id;
 			res.scene_flavour_id = flavour_id;
+			res.scene_asset_id = cp_def.effect_id;
 			res.editable.wandering = cp_def.wandering;
 			res.editable.color = cp.modifier.color;
 

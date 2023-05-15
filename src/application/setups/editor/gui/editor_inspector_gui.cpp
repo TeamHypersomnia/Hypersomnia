@@ -129,13 +129,16 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 	}
 
 #define PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY(label, field) \
-	MULTIPROPERTY(label, field.color);\
-	MULTIPROPERTY(label, field.scale_amounts);\
-	MULTIPROPERTY(label, field.scale_lifetimes);
+	MULTIPROPERTY("Color", field.color);\
+	MULTIPROPERTY("Scale amounts", field.scale_amounts);\
+	MULTIPROPERTY("Scale lifetimes", field.scale_lifetimes);
 
 #define PARTICLE_EFFECT_MULTIPROPERTY(label, field) \
 	MULTIPROPERTY(label, field.id);\
-	PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY(label, field);
+	if (insp.field.id.is_set()) {\
+		auto indent = scoped_indent();\
+		PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY(label, field);\
+	}
 
 #define MULTIPROPERTY_POSITION(field) \
 	MULTIPROPERTY("Position X", pos.x); \
