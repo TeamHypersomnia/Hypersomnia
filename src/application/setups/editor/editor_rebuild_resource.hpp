@@ -276,8 +276,9 @@ void setup_scene_object_from_resource(
 			out.particles = to_game_effect(from.particles);
 			out.pitch_bound.set(from.min_pitch, from.max_pitch);
 			out.collision_sound_sensitivity = from.collision_sound_sensitivity;
-			out.cooldown_duration = from.cooldown_duration;
-			out.occurences_before_cooldown = from.occurences_before_cooldown;
+			out.unmute_after_ms = from.unmute_after_ms;
+			out.mute_after_playing_times = from.mute_after_playing_times;
+			out.min_interval_ms = from.min_interval_ms;
 			out.silence_opposite_collision_sound = from.silence_opposite_collision_sound;
 
 			return out;

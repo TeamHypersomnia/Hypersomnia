@@ -51,8 +51,8 @@ void sound_system::clear() {
 	fading_sources.clear();
 	firearm_engine_caches.clear();
 	continuous_sound_caches.clear();
-	collision_sound_cooldowns.clear();
-	damage_sound_cooldowns.clear();
+	collision_sound_successions.clear();
+	damage_sound_successions.clear();
 	id_pool.reset(SOUNDS_SOURCES_IN_POOL);
 }
 
@@ -536,30 +536,38 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 					if (start.is_missile_impact()) {
 						const auto max_occurences = in.settings.missile_impact_occurences_before_cooldown;
 
-						const auto it = damage_sound_cooldowns.try_emplace(key);
-						auto& cooldown = (*it.first).second;
+						const auto it = damage_sound_successions.try_emplace(key);
+						auto& succession = (*it.first).second;
 
-						if (cooldown.consecutive_occurences >= max_occurences) {
+						if (succession.consecutive_occurences >= max_occurences) {
 							continue;
 						}
 
-						++cooldown.consecutive_occurences;
-						cooldown.max_ms = in.settings.missile_impact_sound_cooldown_duration;
+						++succession.consecutive_occurences;
+						succession.max_ms = in.settings.missile_impact_sound_cooldown_duration;
 					}
 					else {
-						const auto it = collision_sound_cooldowns.try_emplace(key);
+						const auto it = collision_sound_successions.try_emplace(key);
 
-						auto& cooldown = (*it.first).second;
+						auto& succession = (*it.first).second;
 
-						++cooldown.consecutive_occurences;
-						cooldown.remaining_ms = start.collision_sound_cooldown_duration;
+						++succession.consecutive_occurences;
+						succession.remaining_ms = start.collision_unmute_after_ms;
 
-						// LOG_NVPS(cooldown.consecutive_occurences);
+						// LOG_NVPS(succession.consecutive_occurences);
 
-						if (cooldown.consecutive_occurences > start.collision_sound_occurences_before_cooldown) {
+						if (succession.consecutive_occurences > start.collision_mute_after_playing_times) {
 							// LOG("Skipping");
 							continue;
 						}
+
+						auto& cooldown = collision_sound_cooldowns[key];
+
+						if (cooldown > 0.0f) {
+							continue;
+						}
+
+						cooldown = start.collision_min_interval_ms;
 					}
 				}
 			}
@@ -965,7 +973,7 @@ void sound_system::fade_sources(
 	const augs::audio_renderer& renderer,
 	const augs::delta dt
 ) {
-	erase_if (collision_sound_cooldowns, [&](auto& it) {
+	erase_if (collision_sound_successions, [&](auto& it) {
 		auto& c = it.second;
 
 		c.remaining_ms -= dt.in_milliseconds();
@@ -977,7 +985,19 @@ void sound_system::fade_sources(
 		return false;
 	});
 
-	erase_if (damage_sound_cooldowns, [&](auto& it) {
+	erase_if (collision_sound_cooldowns, [&](auto& it) {
+		auto& c = it.second;
+
+		c -= dt.in_milliseconds();
+
+		if (c <= 0.f) {
+			return true;
+		}
+
+		return false;
+	});
+
+	erase_if (damage_sound_successions, [&](auto& it) {
 		auto& c = it.second;
 
 		c.current_ms += dt.in_milliseconds();

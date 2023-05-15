@@ -35,7 +35,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 			def_template = *maybe_def_template;
 		}
 		else {
-			def_template.occurences_before_cooldown = 3;
+			def_template.mute_after_playing_times = 3;
 		}
 
 		const auto c_id = to_sound_id(c);
@@ -90,7 +90,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		def.pitch_bound = bound(0.9f, 1.25f);
 		def.collision_sound_sensitivity = 5.0f;
 
-		def.occurences_before_cooldown = 1;
+		def.mute_after_playing_times = 1;
 
 		set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::WOOD, test_scene_sound_id::COLLISION_KNIFE_WOOD, true, def);
 		set_default(test_scene_physical_material_id::KNIFE, test_scene_sound_id::COLLISION_KNIFE_METAL, def);
@@ -98,7 +98,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 
 	{
 		collision_sound_def def;
-		def.occurences_before_cooldown = 1;
+		def.mute_after_playing_times = 1;
 		def.effect.modifier.gain *= 0.6f;
 
 		set_default(test_scene_physical_material_id::VENT, test_scene_sound_id::AIR_DUCT_COLLISION, def);

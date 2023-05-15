@@ -17,8 +17,9 @@ struct collision_sound_def {
 
 	real32 collision_sound_sensitivity = 1.0f;
 
-	real32 cooldown_duration = 250.f;
-	int occurences_before_cooldown = 3;
+	real32 min_interval_ms = 0.f;
+	real32 unmute_after_ms = 250.f;
+	uint32_t mute_after_playing_times = 4;
 
 	bool silence_opposite_collision_sound = false;
 	// END GEN INTROSPECTOR

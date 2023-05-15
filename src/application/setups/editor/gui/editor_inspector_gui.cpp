@@ -296,6 +296,28 @@ bool edit_property(
 
 				return false;
 			}
+
+			if (label == "Minimum interval (ms)") {
+				if (slider(label, property, 0.0f, 2000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("Minimum amount of time that must elapse\nbetween playing two consecutive collision sounds.");
+
+				return false;
+			}
+
+			if (label == "Unmute after (ms)") {
+				if (slider(label, property, 0.0f, 2000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("The amount of time surface must not be touched\nin order for collision sounds to be played again,\nafter having been played 'Mute after playing times' quickly.");
+
+				return false;
+			}
 		}
 		else if constexpr(std::is_same_v<uint32_t, T>) {
 			if (label.find("Fish") != std::string::npos || label.find("austics") != std::string::npos) {
@@ -314,6 +336,17 @@ bool edit_property(
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
+
+				return false;
+			}
+
+			if (label == "Mute after playing times") {
+				if (slider(label, property, 1u, 20u)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("Will be played at most this many times in a quick succession.\nThen the sound will stop playing altogether until surfaces stops colliding.\n\nExplanation:\nNote that when the player starts hugging a wall,\nthe collision sound will normally be played once or twice and then go silent.\nThis is to prevent spamming the sounds constantly\nwhen you want to walk along walls while touching them.\n\nPicking a value:\nA short wooden 'knock' sound is fine to be repeated even 3-4 times\nas the player grazes the wooden surface with a rifle.\n\nHowever, a very iconic and lengthy knife clanging sound,\nor a sturdy bag collapsing sound\nshouldn't be played too often even if happens twice in a split second.\nSetting the parameter to 1 is appropriate for such sounds.");
 
 				return false;
 			}
@@ -1341,6 +1374,10 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 
 	tooltip_on_hover("Normally bullets never ricochet if fired very close to the surface.\nThis setting enables ricochets even at point-blank range.");
 
+	ImGui::Separator();
+	text_color("Default damage behavior", yellow);
+	ImGui::Separator();
+
 	text_disabled("Played when exposed to any damage,\ne.g. the surface is shot/knifed.");
 	SOUND_EFFECT_LEAN_MULTIPROPERTY("Damage sound", damage_sound);
 
@@ -1357,7 +1394,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 	}
 
 	ImGui::Separator();
-	text_color("Default collision", yellow);
+	text_color("Default collision behavior", yellow);
 	ImGui::Separator();
 
 	text_disabled("Played by default, when colliding with anything.");
@@ -1377,6 +1414,12 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		MULTIPROPERTY("Collision sound sensitivity", default_collision.collision_sound_sensitivity);
 
 		tooltip_on_hover(sensitivity_tooltip);
+
+		if (auto scope = augs::imgui::scoped_tree_node_ex("Cooldowns")) {
+			MULTIPROPERTY("Minimum interval (ms)", default_collision.min_interval_ms);
+			MULTIPROPERTY("Mute after playing times", default_collision.mute_after_playing_times);
+			MULTIPROPERTY("Unmute after (ms)", default_collision.unmute_after_ms);
+		}
 	}
 
 	{
@@ -1450,6 +1493,12 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 				tooltip_on_hover(pitch_tooltip);
 				if (edit_property(result, "Collision sound sensitivity", special_handler, coll.collision_sound_sensitivity)) write_to_others();
 				tooltip_on_hover(sensitivity_tooltip);
+
+				if (auto scope = augs::imgui::scoped_tree_node_ex("Cooldowns")) {
+					if (edit_property(result, "Minimum interval (ms)", special_handler, coll.min_interval_ms)) write_to_others();
+					if (edit_property(result, "Mute after playing times", special_handler, coll.mute_after_playing_times)) write_to_others();
+					if (edit_property(result, "Unmute after (ms)", special_handler, coll.unmute_after_ms)) write_to_others();
+				}
 			}
 
 			if (edit_property(result, "Silence opposite collision sound", special_handler, coll.silence_opposite_collision_sound)) write_to_others();

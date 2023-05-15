@@ -102,8 +102,9 @@ void play_collision_sound(
 		}
 		else {
 			start.mark_source_collision(sub, col);
-			start.collision_sound_cooldown_duration = sound_def->cooldown_duration;
-			start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
+			start.collision_unmute_after_ms = sound_def->unmute_after_ms;
+			start.collision_mute_after_playing_times = sound_def->mute_after_playing_times;
+			start.collision_min_interval_ms = sound_def->min_interval_ms;
 		}
 
 		if (effect.modifier.max_distance == -1) {
@@ -148,56 +149,44 @@ void play_collision_sound(
 	const auto* const subject_coll_material = logicals.find(subject_material_id);
 	const auto* const collider_coll_material = logicals.find(collider_material_id);
 
-	if (subject_coll_material == nullptr && collider_coll_material == nullptr) {
+	if (subject_coll_material == nullptr || collider_coll_material == nullptr) {
 		return;
 	}
 
-	if (subject_coll_material != nullptr && collider_coll_material == nullptr) {
-		play_sound(&subject_coll_material->default_collision);
-		return;
+	auto first = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_material_id);
+	auto second = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_material_id);
+
+	/* If no mapping, consider defaults */
+	if (first == nullptr) {
+		first = &subject_coll_material->default_collision;
 	}
 
-	if (subject_coll_material == nullptr && collider_coll_material != nullptr) {
-		play_sound(&collider_coll_material->default_collision);
-		return;
+	if (second == nullptr) {
+		second = &collider_coll_material->default_collision;
 	}
 
-	if (subject_coll_material != nullptr && collider_coll_material != nullptr) {
-		auto first = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_material_id);
-		auto second = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_material_id);
+	auto play_both = [&]() {
+		play_sound(first);
 
-		/* If no mapping, consider defaults */
-		if (first == nullptr) {
-			first = &subject_coll_material->default_collision;
+		if (first != second) {
+			play_sound(second);
 		}
+	};
 
-		if (second == nullptr) {
-			second = &collider_coll_material->default_collision;
-		}
-
-		auto play_both = [&]() {
+	if (!first->silence_opposite_collision_sound && !second->silence_opposite_collision_sound) {
+		/* If both allow each other, play both */
+		play_both();
+	}
+	else if (first->silence_opposite_collision_sound && second->silence_opposite_collision_sound) {
+		/* If both try to silence each other, also play both */
+		play_both();
+	}
+	else {
+		if (first->silence_opposite_collision_sound) {
 			play_sound(first);
-
-			if (first != second) {
-				play_sound(second);
-			}
-		};
-
-		if (!first->silence_opposite_collision_sound && !second->silence_opposite_collision_sound) {
-			/* If both allow each other, play both */
-			play_both();
 		}
-		else if (first->silence_opposite_collision_sound && second->silence_opposite_collision_sound) {
-			/* If both try to silence each other, also play both */
-			play_both();
-		}
-		else {
-			if (first->silence_opposite_collision_sound) {
-				play_sound(first);
-			}
-			else if (second->silence_opposite_collision_sound) {
-				play_sound(second);
-			}
+		else if (second->silence_opposite_collision_sound) {
+			play_sound(second);
 		}
 	}
 }

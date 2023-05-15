@@ -68,7 +68,7 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 			def_template = *maybe_def_template;
 		}
 		else {
-			def_template.occurences_before_cooldown = 3;
+			def_template.mute_after_playing_times = 3;
 		}
 
 		{

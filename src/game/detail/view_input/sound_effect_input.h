@@ -30,15 +30,18 @@ struct sound_effect_start_input {
 	faction_type listener_faction = faction_type::SPECTATOR;
 	std::size_t variation_number = static_cast<std::size_t>(-1);
 	collision_sound_source source_collision;
-	real32 collision_sound_cooldown_duration = 250.f;
-	int collision_sound_occurences_before_cooldown = 4;
+
+	real32 collision_min_interval_ms = 50.f;
+	real32 collision_unmute_after_ms = 250.f;
+	int collision_mute_after_playing_times = 4;
+
 	bool clear_when_target_entity_deleted = false;
 	bool clear_when_target_alive = false;
 	bool clear_when_target_conscious = false;
 	bool silent_trace_like = false;
 
 	bool is_missile_impact() const {
-		return collision_sound_occurences_before_cooldown < 0;
+		return collision_mute_after_playing_times < 0;
 	}
 
 	static sound_effect_start_input fire_and_forget(const transformr where) {
@@ -83,7 +86,7 @@ struct sound_effect_start_input {
 	auto& mark_as_missile_impact(const entity_id sub, const entity_id col) {
 		source_collision.subject = sub;
 		source_collision.collider = col;
-		collision_sound_occurences_before_cooldown = -1;
+		collision_mute_after_playing_times = -1;
 
 		return *this;
 	}

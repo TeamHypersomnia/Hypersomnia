@@ -118,7 +118,7 @@ static void ricochet_missile_against_surface(
 		rigid_body.set_transform(new_transform);
 
 		const auto effect_transform = transformr(point, reflected_dir.degrees());
-		::play_collision_sound(angle_mult * 150.f, effect_transform, typed_missile, surface_handle, step);
+		//::play_collision_sound(angle_mult * 150.f, effect_transform, typed_missile, surface_handle, step);
 
 		{
 			const auto& effect = missile_def.ricochet_particles;
