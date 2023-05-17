@@ -1,7 +1,7 @@
 <a name="intro"></a>
 <div align="center">
 
-![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/1ec851c2-cba0-4187-aa48-110b8b40dc65)
+![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/8ccf0d22-317d-459d-8c19-3b4830968545)
 
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 [![Build Status](https://github.com/TeamHypersomnia/Hypersomnia/workflows/Linux%20build/badge.svg)](https://github.com/TeamHypersomnia/Hypersomnia/actions)
