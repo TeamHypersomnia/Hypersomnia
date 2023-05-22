@@ -279,8 +279,8 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::BOMBSITE_A);
-			invariants::box_marker marker;
+			auto& meta = get_test_flavour(flavours, test_area_markers::BOMBSITE_A);
+			invariants::area_marker marker;
 			marker.type = area_marker_type::BOMBSITE;
 
 			components::marker marker_meta;
@@ -291,35 +291,35 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::BUY_AREA);
+			auto& meta = get_test_flavour(flavours, test_area_markers::BUY_AREA);
 
-			invariants::box_marker marker;
+			invariants::area_marker marker;
 			marker.type = area_marker_type::BUY_ZONE;
 			meta.set(marker);
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::CALLOUT_T_SPAWN);
+			auto& meta = get_test_flavour(flavours, test_area_markers::CALLOUT_T_SPAWN);
 
-			invariants::box_marker marker;
+			invariants::area_marker marker;
 			marker.type = area_marker_type::CALLOUT;
 			meta.set(marker);
 			meta.get<components::sorting_order>().order = static_cast<sorting_order_type>(test_marker_order::CALLOUT_NESTED);
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::CALLOUT_CT_SPAWN);
+			auto& meta = get_test_flavour(flavours, test_area_markers::CALLOUT_CT_SPAWN);
 
-			invariants::box_marker marker;
+			invariants::area_marker marker;
 			marker.type = area_marker_type::CALLOUT;
 			meta.set(marker);
 			meta.get<components::sorting_order>().order = static_cast<sorting_order_type>(test_marker_order::CALLOUT_NESTED);
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_box_markers::CALLOUT_ROOM);
+			auto& meta = get_test_flavour(flavours, test_area_markers::CALLOUT_ROOM);
 
-			invariants::box_marker marker;
+			invariants::area_marker marker;
 			marker.type = area_marker_type::CALLOUT;
 			meta.set(marker);
 		}

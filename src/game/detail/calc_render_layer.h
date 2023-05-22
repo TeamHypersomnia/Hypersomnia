@@ -47,8 +47,8 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 		else if constexpr(H::template has<invariants::point_marker>()) {
 			return render_layer::POINT_MARKERS;
 		}
-		else if constexpr(H::template has<invariants::box_marker>()) {
-			const auto& m = handle.template get<invariants::box_marker>();
+		else if constexpr(H::template has<invariants::area_marker>()) {
+			const auto& m = handle.template get<invariants::area_marker>();
 
 			if (m.type == area_marker_type::CALLOUT) {
 				return render_layer::CALLOUT_MARKERS;

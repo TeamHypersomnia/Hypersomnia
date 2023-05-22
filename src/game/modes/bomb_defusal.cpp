@@ -103,8 +103,8 @@ bomb_defusal::participating_factions bomb_defusal::calc_participating_factions(c
 
 	participating_factions output;
 
-	cosm.template for_each_having<invariants::box_marker>([&](const auto& typed_handle) {
-		const auto& marker = typed_handle.template get<invariants::box_marker>();
+	cosm.template for_each_having<invariants::area_marker>([&](const auto& typed_handle) {
+		const auto& marker = typed_handle.template get<invariants::area_marker>();
 
 		if (::is_bombsite(marker.type)) {
 			output.bombing = typed_handle.get_official_faction();

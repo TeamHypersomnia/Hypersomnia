@@ -39,15 +39,15 @@ void allocate_flavours_and_assets_for_resource(
 		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
 	}
 	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
-		using entity_type = box_marker;
+		using entity_type = area_marker;
 
-		auto& flavour_pool = common.flavours.get_for<box_marker>();
+		auto& flavour_pool = common.flavours.get_for<area_marker>();
 		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
 	}
 	else if constexpr(std::is_same_v<editor_prefab_resource, R>) {
-		using entity_type = box_marker;
+		using entity_type = area_marker;
 
-		auto& flavour_pool = common.flavours.get_for<box_marker>();
+		auto& flavour_pool = common.flavours.get_for<area_marker>();
 		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
 	}
 	else if constexpr(std::is_same_v<editor_game_mode_resource, R>) {
@@ -326,11 +326,11 @@ void setup_scene_object_from_resource(
 		marker.type = resource.editable.type;
 	}
 	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
-		auto& marker = scene.template get<invariants::box_marker>();
+		auto& marker = scene.template get<invariants::area_marker>();
 		marker.type = resource.editable.type;
 	}
 	else if constexpr(std::is_same_v<editor_prefab_resource, R>) {
-		auto& marker = scene.template get<invariants::box_marker>();
+		auto& marker = scene.template get<invariants::area_marker>();
 		marker.type = area_marker_type::PREFAB;
 	}
 	else if constexpr(std::is_same_v<editor_game_mode_resource, R>) {

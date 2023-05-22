@@ -135,7 +135,7 @@ void physics_mixin<E>::infer_transform() const {
 	cosm.get_solvable_inferred({}).physics.infer_rigid_body(self);
 	cosm.get_solvable_inferred({}).tree_of_npo.infer_cache_for(self);
 
-	if (self.template has<invariants::box_marker>()) {
+	if (self.template has<invariants::area_marker>()) {
 		cosm.get_solvable_inferred({}).organisms.recalculate_grid(self);
 	}
 }

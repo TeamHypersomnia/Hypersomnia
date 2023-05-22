@@ -69,7 +69,7 @@ auto on_shape_representation(
 	const A& shapized_entity,
 	F&& callback
 ) {
-	if constexpr(A::template has<invariants::box_marker>()) {
+	if constexpr(A::template has<invariants::area_marker>()) {
 		const auto& b = shapized_entity.get_logical_size(); 
 		const auto si = shapized_entity.get_cosmos().get_si();
 

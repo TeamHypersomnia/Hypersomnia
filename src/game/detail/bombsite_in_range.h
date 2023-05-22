@@ -23,12 +23,12 @@ bool bombsite_in_range_of_entity(const E& queried_entity) {
 	bool found = false;
 
 	entities.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto& area) {
-		return area.template dispatch_on_having_all_ret<invariants::box_marker>([&](const auto& typed_area) {
+		return area.template dispatch_on_having_all_ret<invariants::area_marker>([&](const auto& typed_area) {
 			if constexpr(is_nullopt_v<decltype(typed_area)>) {
 				return callback_result::CONTINUE;
 			}
 			else {
-				const auto& marker = typed_area.template get<invariants::box_marker>();
+				const auto& marker = typed_area.template get<invariants::area_marker>();
 
 				if (::is_bombsite(marker.type)) {
 					if (matched_faction == typed_area.get_official_faction()) {

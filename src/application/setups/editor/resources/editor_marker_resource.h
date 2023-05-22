@@ -41,7 +41,7 @@ struct editor_area_marker_resource {
 
 	editor_area_marker_resource_editable editable;
 
-	mutable std::variant<typed_entity_flavour_id<box_marker>> scene_flavour_id;
+	mutable std::variant<typed_entity_flavour_id<area_marker>> scene_flavour_id;
 
 	std::string unique_name;
 	const auto& get_display_name() const {

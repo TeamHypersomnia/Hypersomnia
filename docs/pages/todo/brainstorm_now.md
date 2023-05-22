@@ -6,7 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Let's also decide
+- Let's also decide straight away if we make a new entity type for portal
+    - Maybe it should just be a marker body and have some metadata, will be easiest one
+    - We won't avoid adding new entity types in the future
 
 - Making markers into physical sensors detecting bullets etc
     - They need physical bodies
@@ -515,7 +517,7 @@ able to request per map
 - btw in a playtesting session in quick_test mode, all clients should join the opposing team
     - for balance of course! The mapper knows literally everything about the map
 
-- area_marker/box_marker naming consistency
+- area_marker/area_marker naming consistency
     - though it's not significant in json state
 
 - Turbo-simple Online Playtesting Ctrl+P implementation

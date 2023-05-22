@@ -30,12 +30,12 @@ bool buy_area_in_range(const E& subject) {
 	bool found = false;
 
 	entities.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto& handle) {
-		return handle.template dispatch_on_having_all_ret<invariants::box_marker>([&](const auto& typed_handle) {
+		return handle.template dispatch_on_having_all_ret<invariants::area_marker>([&](const auto& typed_handle) {
 			if constexpr(is_nullopt_v<decltype(typed_handle)>) {
 				return callback_result::CONTINUE;
 			}
 			else {
-				const auto& marker = typed_handle.template get<invariants::box_marker>();
+				const auto& marker = typed_handle.template get<invariants::area_marker>();
 
 				if (area_marker_type::BUY_ZONE == marker.type) {
 					if (matched_faction == typed_handle.get_official_faction()) {

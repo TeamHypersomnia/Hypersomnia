@@ -375,8 +375,8 @@ enum class test_point_markers {
 	// END GEN INTROSPECTOR
 };
 
-enum class test_box_markers {
-	// GEN INTROSPECTOR enum class test_box_markers
+enum class test_area_markers {
+	// GEN INTROSPECTOR enum class test_area_markers
 	BOMBSITE_A,
 	BUY_AREA,
 

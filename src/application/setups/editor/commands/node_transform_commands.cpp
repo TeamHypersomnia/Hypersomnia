@@ -840,7 +840,7 @@ void flip_nodes_command::flip_entities(cosmos& cosm) {
 							because they do not support flip flags.
 						*/
 
-						const bool is_area = typed_handle.template find<invariants::box_marker>();
+						const bool is_area = typed_handle.template find<invariants::area_marker>();
 
 						if (is_area) {
 							if (flip.vertically) {

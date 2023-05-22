@@ -215,8 +215,8 @@ namespace test_flavours {
 		);
 
 		{
-			auto& meta = get_test_flavour(in.flavours, test_box_markers::ORGANISM_AREA);
-			invariants::box_marker marker;
+			auto& meta = get_test_flavour(in.flavours, test_area_markers::ORGANISM_AREA);
+			invariants::area_marker marker;
 			marker.type = area_marker_type::ORGANISM_AREA;
 
 			components::marker marker_meta;

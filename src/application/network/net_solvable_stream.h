@@ -3,7 +3,7 @@
 template <class V>
 constexpr bool never_changes_in_game = is_one_of_v<V,
 	make_entity_pool<static_decoration>,
-	make_entity_pool<box_marker>,
+	make_entity_pool<area_marker>,
 	make_entity_pool<particles_decoration>,
 	make_entity_pool<wandering_pixels_decoration>,
 	make_entity_pool<point_marker>,

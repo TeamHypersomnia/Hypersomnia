@@ -469,12 +469,12 @@ struct point_marker {
 	>;
 };
 
-struct box_marker {
+struct area_marker {
 	static constexpr std::size_t statically_allocated_entities = 1000;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariant_list = type_list<
-		invariants::box_marker
+		invariants::area_marker
 	>;
 
 	using component_list = type_list<

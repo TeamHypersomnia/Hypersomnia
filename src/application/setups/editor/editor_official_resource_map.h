@@ -17,7 +17,7 @@ struct editor_official_resource_map {
 	Map<test_particles_decorations, editor_particles_resource> particles_decorations;
 	Map<test_wandering_pixels_decorations, editor_wandering_pixels_resource> wandering_pixels;
 	Map<point_marker_type, editor_point_marker_resource> point_markers;
-	Map<area_marker_type, editor_area_marker_resource> box_markers;
+	Map<area_marker_type, editor_area_marker_resource> area_markers;
 
 	Map<test_shootable_weapons, editor_firearm_resource> firearms;
 	Map<test_container_items, editor_ammunition_resource> magazines;

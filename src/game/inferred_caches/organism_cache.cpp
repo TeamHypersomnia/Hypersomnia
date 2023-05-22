@@ -39,7 +39,7 @@ void organism_cache::destroy_cache_of(const const_entity_handle& handle) {
 	handle.constrained_dispatch<concerned>([&](const auto& typed_handle) {
 		using E = remove_cref<decltype(typed_handle)>;
 
-		if constexpr(E::template has<invariants::box_marker>()) {
+		if constexpr(E::template has<invariants::area_marker>()) {
 			const auto id = handle.get_id();
 			grids.erase(id);
 		}

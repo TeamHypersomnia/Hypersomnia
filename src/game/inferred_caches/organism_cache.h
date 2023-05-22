@@ -70,7 +70,7 @@ public:
 	template <class E>
 	struct concerned_with {
 		static constexpr bool value = 
-			is_potential_organism_v<E> || has_all_of_v<E, invariants::box_marker>
+			is_potential_organism_v<E> || has_all_of_v<E, invariants::area_marker>
 		;
 	};	
 

@@ -67,7 +67,7 @@ struct marker_icon {
 	}
 
 	template <class F>
-	marker_icon(const invariants::box_marker& p, const components::marker& meta, F get_faction_color) {
+	marker_icon(const invariants::area_marker& p, const components::marker& meta, F get_faction_color) {
 		*this = from_area(p, meta, get_faction_color);
 	}
 
@@ -104,8 +104,8 @@ void for_each_iconed_entity(
 					m.col
 				);
 			}
-			else if constexpr(E::template has<invariants::box_marker>()) {
-				const auto m = marker_icon(typed_handle.template get<invariants::box_marker>(), marker, get_faction_color);
+			else if constexpr(E::template has<invariants::area_marker>()) {
+				const auto m = marker_icon(typed_handle.template get<invariants::area_marker>(), marker, get_faction_color);
 
 				callback(
 					typed_handle,

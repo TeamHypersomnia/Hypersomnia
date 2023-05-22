@@ -789,7 +789,7 @@ namespace test_scenes {
 				};
 
 				floor_align(test_static_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
-				floor_align(test_box_markers::CALLOUT_ROOM).set_size(total_floor_size);
+				floor_align(test_area_markers::CALLOUT_ROOM).set_size(total_floor_size);
 
 				floor_align(test_plain_sprited_bodies::HARD_WOODEN_WALL)
 					.ro().ti().stretch_b().again()
@@ -1129,7 +1129,7 @@ namespace test_scenes {
 			const auto dragon_fish = test_dynamic_decorations::DRAGON_FISH;
 			const auto rainbow_dragon_fish = test_dynamic_decorations::RAINBOW_DRAGON_FISH;
 
-			const auto origin_entity_id = create(test_box_markers::ORGANISM_AREA, aquarium_origin).set_logical_size(aquarium_size * 2).get_id();
+			const auto origin_entity_id = create(test_area_markers::ORGANISM_AREA, aquarium_origin).set_logical_size(aquarium_size * 2).get_id();
 
 			auto create_fish = [&, origin_entity_id](auto t, auto where, bool disable_eff = false) {
 				const auto decor = create(t, where);
@@ -1192,13 +1192,13 @@ namespace test_scenes {
 		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
 
-		create(test_box_markers::BUY_AREA, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
-		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
+		create(test_area_markers::BUY_AREA, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_area_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
 
-		create(test_box_markers::CALLOUT_CT_SPAWN, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
-		create(test_box_markers::CALLOUT_T_SPAWN, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
+		create(test_area_markers::CALLOUT_CT_SPAWN, vec2(480, -1892)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::RESISTANCE);
+		create(test_area_markers::CALLOUT_T_SPAWN, vec2(480, 200)).set_logical_size(vec2(1200, 200)).set_associated_faction(faction_type::METROPOLIS);
 
-		create(test_box_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));
+		create(test_area_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));
 
 		//create(test_hand_explosives::BOMB, vec2(280, 200));
 
@@ -1215,7 +1215,7 @@ namespace test_scenes {
 			auto insects_origin = transformr({ 500, 213 }, 0);
 			auto insects_size = vec2(2000, 1000);
 
-			auto insects_area_id = create(test_box_markers::ORGANISM_AREA, insects_origin).set_logical_size(insects_size).get_id();
+			auto insects_area_id = create(test_area_markers::ORGANISM_AREA, insects_origin).set_logical_size(insects_size).get_id();
 
 			auto create_insect = [&](auto t, auto off, auto rot) {
 				const auto decor = create(t, transformr(insects_origin.pos + off, rot));

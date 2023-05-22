@@ -52,7 +52,7 @@ bool organism_cache::reset_grid_for(const E& area) {
 	LOG("Resetting grid for %x", area);
 #endif
 
-	if (const auto marker = area.template find<invariants::box_marker>()) {
+	if (const auto marker = area.template find<invariants::area_marker>()) {
 		if (marker->type == area_marker_type::ORGANISM_AREA) {
 			if (const auto aabb = area.find_aabb()) {
 				auto& grid = grids[id];
@@ -86,7 +86,7 @@ void organism_cache::recalculate_grid(const E& area) {
 
 template <class E>
 void organism_cache::specific_infer_cache_for(const E& handle) {
-	if constexpr(E::template has<invariants::box_marker>()) {
+	if constexpr(E::template has<invariants::area_marker>()) {
 		recalculate_grid(handle);
 	}
 	else {

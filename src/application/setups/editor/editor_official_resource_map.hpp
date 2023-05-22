@@ -23,7 +23,7 @@ auto& editor_official_resource_map::get_container(S& self, const T&) {
 		return self.point_markers;
 	}
 	else if constexpr(std::is_same_v<T, area_marker_type>) {
-		return self.box_markers;
+		return self.area_markers;
 	}
 	else if constexpr(std::is_same_v<T, test_static_lights>) {
 		return self.lights;

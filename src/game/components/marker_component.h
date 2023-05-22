@@ -11,10 +11,10 @@ namespace invariants {
 		// END GEN INTROSPECTOR
 	};
 
-	struct box_marker {
+	struct area_marker {
 		static constexpr bool reinfer_when_tweaking = true;
 
-		// GEN INTROSPECTOR struct invariants::box_marker
+		// GEN INTROSPECTOR struct invariants::area_marker
 		area_marker_type type = area_marker_type::BOMBSITE;
 		// END GEN INTROSPECTOR
 	};

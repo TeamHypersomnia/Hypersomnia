@@ -61,7 +61,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						transform.pos,
 						[&](const auto area_id) {
 							if (const auto area_entity = cosm[area_id]) {
-								if (const auto area = area_entity.template find<invariants::box_marker>()) {
+								if (const auto area = area_entity.template find<invariants::area_marker>()) {
 									if (area->type == area_marker_type::ORGANISM_AREA) {
 										return true;
 									}
@@ -251,7 +251,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto bound_avoidance = origin.dispatch([&](const auto& typed_origin) {
 					if (const auto tr = typed_origin.find_logic_transform()) {
 						if (const auto size = typed_origin.get_logical_size(); size.area() > 0) {
-							if (const auto area = typed_origin.template find<invariants::box_marker>()) {
+							if (const auto area = typed_origin.template find<invariants::area_marker>()) {
 								return augs::steer_to_avoid_edges(
 									velocity,
 									tip_pos,

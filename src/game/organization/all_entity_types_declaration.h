@@ -19,7 +19,7 @@ struct remnant_body;
 struct sound_decoration;
 struct particles_decoration;
 struct point_marker;
-struct box_marker;
+struct area_marker;
 struct explosion_body;
 struct tool_item;
 
@@ -41,7 +41,7 @@ using all_entity_types = type_list<
 	sound_decoration,
 	particles_decoration,
 	point_marker,
-	box_marker,
+	area_marker,
 	explosion_body,
 	tool_item
 >;
@@ -64,7 +64,7 @@ using all_entity_types = type_list<
 	MACRO(sound_decoration) \
 	MACRO(particles_decoration) \
 	MACRO(point_marker) \
-	MACRO(box_marker) \
+	MACRO(area_marker) \
 	MACRO(explosion_body) \
 	MACRO(tool_item)
 

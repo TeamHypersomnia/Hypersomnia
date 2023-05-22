@@ -258,7 +258,7 @@ void enqueue_illuminated_rendering_jobs(
 
 			if (callouts.is_enabled) {
 				visible.for_each<render_layer::CALLOUT_MARKERS>(cosm, [&](const auto e) {
-					e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
+					e.template dispatch_on_having_all<invariants::area_marker>([&](const auto typed_handle) { 
 						const auto where = typed_handle.get_logic_transform();
 						const auto& callout_alpha = callouts.value;
 

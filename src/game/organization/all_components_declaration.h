@@ -44,7 +44,7 @@ namespace invariants {
 	struct continuous_sound;
 	struct continuous_particles;
 	struct point_marker;
-	struct box_marker;
+	struct area_marker;
 	struct cascade_explosion;
 	struct tool;
 	struct melee;
@@ -113,7 +113,7 @@ using assert_first_implies_second = type_list<
 	type_pair<invariants::wandering_pixels, components::position>,
 	type_pair<components::continuous_particles, invariants::continuous_particles>,
 	type_pair<invariants::light, components::transform>,
-	type_pair<invariants::box_marker, components::marker>,
+	type_pair<invariants::area_marker, components::marker>,
 	type_pair<invariants::point_marker, components::marker>
 >;
 
@@ -123,7 +123,7 @@ using assert_never_together = type_list<
 	type_pair<components::position, components::transform>,
 	type_pair<components::rigid_body, components::wandering_pixels>,
 	type_pair<invariants::melee, invariants::missile>,
-	type_pair<invariants::box_marker, invariants::point_marker>
+	type_pair<invariants::area_marker, invariants::point_marker>
 >;
 
 using always_present_invariants = type_list<
@@ -206,7 +206,7 @@ using invariant_list_t = List<
 	invariants::continuous_sound,
 	invariants::continuous_particles,
 	invariants::point_marker,
-	invariants::box_marker,
+	invariants::area_marker,
 	invariants::cascade_explosion,
 	invariants::tool,
 	invariants::melee,

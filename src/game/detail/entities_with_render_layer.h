@@ -12,7 +12,7 @@ using entities_with_render_layer = entity_types_having_any_of<
 	invariants::continuous_particles,
 	invariants::continuous_sound,
 	invariants::point_marker,
-	invariants::box_marker,
+	invariants::area_marker,
 	invariants::wandering_pixels
 >;
 
