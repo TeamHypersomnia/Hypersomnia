@@ -174,6 +174,18 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 		// TODO: markers should have their own tonpo!!!
 		// At some point this might start lagging in editor
 
+		/*
+			The reason we do this:
+
+			Zooming out does not zoom the clickable icons for area/point markers.
+			To make them candidates, we need to add them all. 
+
+			Otherwise the clickable icon area would not match its rendered silhouette.
+			This is only related to zooming in editor so obviously this is not needed for the game itself.
+			Spots aren't rendered at all and areas, if rendered, are actually zoomed, the game does not render icons for the areas,
+			much less is there a way to click them.
+		*/
+
 		cosm.for_each_having<invariants::point_marker>(
 			[&](const auto typed_handle) {
 				register_visible(cosm, typed_handle);

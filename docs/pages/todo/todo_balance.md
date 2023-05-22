@@ -6,6 +6,8 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
+- wait for network confirmations for collision sounds
+
 - Flashbangs should consider crosshair position rather than player position for calculating intensity
 	- This is especially important when we have sniper scopes
 

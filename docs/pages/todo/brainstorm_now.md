@@ -6,6 +6,54 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Let's also decide
+
+- Making markers into physical sensors detecting bullets etc
+    - They need physical bodies
+    - Can't we make them plain_sprited_bodies?
+        - Just a different render layer
+        - To not have to write syncs etc
+            - The only problem would be with rendering it
+            - But maybe a layer will do
+
+- Physics observation
+    - Sensors don't work with Time of Impact apparently
+        - So we have to make portals not sensors but legit bodies that simply ignore all contacts and do not presolve
+    - BeginContact/EndContact are always posted (or can be posted) on separate steps
+        - Despite both actually happening at the same time
+
+- Portals are complicated enough that they shouldn't be implemented as on enter/on quit events
+    - Just another zone with its own parameters
+        - We could later allow circles as zones
+            - just "shape: circle" and then it will accept "radius". The "side" will be saved too if the shape is changed
+    - Yeah let's make it an area marker
+        - YES! Note that in the future, area marker shapes will be editable in-world
+            - Just like any other entity but area markers are probably the most obvious usecase for that functionality
+    - And let's have a portal_target point marker
+        - Thought about an area but a better option is to have multiple portal targets and just shuffle them
+    - And let's have a stateless portal_system 
+    - Target Flag: spawn_relative_to_portal_center
+        - Yeah note every point might want its own set of flags like whether to apply velocity
+    - And have an area called Play sound too
+        - Having areas instead of on_enter events feels good as you can instantly see all events on scene
+        - The only downside is if you wanted an event area that moves 
+            - BUT later we'll be able to attach areas to moving entities (like we wanted e.g. lights)
+    - Also research cs2d events, i think there's something similar like conditional spawning and just special trigger areas?
+    - Also instead of spawn on exist have activate on x activated
+        - because otherwise we won't be able to have cyclical events like this door spawns when the other stops being active etc
+            - active implies spawned and destroyed implies inactive anyway
+            - Simple activity system
+                - It's not expected to be a bottleneck for now so let's not keep two pools, maybe several inactive entities per map
+                - Just skip it internally in the calls to cosm.for_each_having<...> etc, by a flag
+                - And it will have to be kept un-inferred from all physical systems and tonpos etc
+    - Btw we could hold event areas as separate entity types too
+        - Flavours would have all the vectors of events etc
+    - Since this is flexible we could for now have a portal system
+    - For portals though this could be just a plain sprited body with a flag or two
+        - or a complex_physical_body
+        - Note we can optimize later too
+    
+
 - remove update_official_content from debugger setup
 
 - Setting "hurt" to materials is tempting but this should really be as a "on_collision" event

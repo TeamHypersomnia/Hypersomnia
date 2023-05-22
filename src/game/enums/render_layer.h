@@ -23,6 +23,7 @@ enum class render_layer {
 	LIGHTS,
 	AREA_MARKERS,
 	POINT_MARKERS,
+	AREA_SENSORS,
 	CALLOUT_MARKERS,
 
 	COUNT

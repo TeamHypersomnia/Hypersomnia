@@ -372,7 +372,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			return;
 		}
 
-		visible.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto e) {
+		visible.for_each<render_layer::AREA_MARKERS, render_layer::AREA_SENSORS>(cosm, [&](const auto e) {
 			e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
 				const auto where = typed_handle.get_logic_transform();
 				const auto& marker_alpha = markers.value;
