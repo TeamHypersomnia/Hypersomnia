@@ -36,6 +36,7 @@ class test_scene_setup : public default_setup_settings {
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
+	static constexpr bool handles_window_input = true;
 
 	test_scene_setup(
 		sol::state& lua,
@@ -43,8 +44,10 @@ public:
 		const input_recording_type recording_type
 	);
 
+	float speed = 1.0f;
+
 	auto get_audiovisual_speed() const {
-		return 1.0;
+		return speed;
 	}
 
 	const auto& get_viewed_cosmos() const {
@@ -94,7 +97,9 @@ public:
 		const setup_advance_input& in,
 		const C& callbacks
 	) {
-		timer.advance(in.frame_delta);
+		auto dt = in.frame_delta;
+		dt *= speed;
+		timer.advance(dt);
 
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
@@ -165,4 +170,12 @@ public:
 
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
+
+	bool handle_input_before_imgui(
+		handle_input_before_imgui_input in
+	);
+
+	bool handle_input_before_game(
+		const handle_input_before_game_input
+	);
 };

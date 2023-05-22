@@ -411,8 +411,8 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			break;
 		}
 
-		if (subject_fixtures.standard_collision_resolution_disabled() 
-			|| collider_fixtures.standard_collision_resolution_disabled()
+		if (subject_fixtures.ignore_standard_collision_resolution() 
+			|| collider_fixtures.ignore_standard_collision_resolution()
 		) {
 			contact->SetEnabled(false);
 		}
@@ -420,7 +420,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		if (subject.has<components::missile>() || is_like_thrown_melee(subject) || is_like_melee_in_action(subject)) {
 			const auto info = missile_surface_info(subject, collider);
 
-			if (info.ignore_standard_impulse() || collider.has<components::sentience>()) {
+			if (info.ignore_standard_collision_resolution() || collider.has<components::sentience>()) {
 				contact->SetEnabled(false);
 				post_collision_messages = false;
 				break;

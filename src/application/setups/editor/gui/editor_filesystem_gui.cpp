@@ -652,8 +652,8 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	melee_weapons_folder.name = "Melee weapons";
 	explosives_folder.name = "Explosives";
 
-	point_markers_folder.name = "Point markers";
-	area_markers_folder.name = "Area markers";
+	point_markers_folder.name = "Spots";
+	area_markers_folder.name = "Zones";
 
 	materials_folder.name = "Materials";
 

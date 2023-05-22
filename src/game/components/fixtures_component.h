@@ -67,7 +67,7 @@ namespace invariants {
 			return driver_shoot_through;
 		}
 
-		bool standard_collision_resolution_disabled() const {
+		bool ignore_standard_collision_resolution() const {
 			return disable_standard_collision_resolution;
 		}
 	};

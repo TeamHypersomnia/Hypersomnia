@@ -67,7 +67,7 @@ public:
 		return ignore_altogether;
 	}
 
-	bool ignore_standard_impulse() const {
+	bool ignore_standard_collision_resolution() const {
 		return is_fly_through;
 	}
 
