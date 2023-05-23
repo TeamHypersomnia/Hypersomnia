@@ -161,6 +161,15 @@ editor_icon_info editor_setup::get_icon_for(
 			return *result;
 		}
 	}
+	else if constexpr(std::is_same_v<T, editor_node_id>) {
+		auto icon_getter = [&](const auto& typed_node, const auto) { 
+			return get_icon_for(typed_node, in);
+		};
+
+		if (const auto result = on_node(object, icon_getter)) {
+			return *result;
+		}
+	}
 	else if constexpr(has_thumbnail_id_v<T>) {
 		if (auto ad_hoc = mapped_or_nullptr(in.ad_hoc_atlas, object.thumbnail_id)) {
 			return { *ad_hoc, augs::imgui_atlas_type::AD_HOC };

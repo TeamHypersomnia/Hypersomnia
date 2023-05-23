@@ -7,7 +7,8 @@ constexpr bool never_changes_in_game = is_one_of_v<V,
 	make_entity_pool<particles_decoration>,
 	make_entity_pool<wandering_pixels_decoration>,
 	make_entity_pool<point_marker>,
-	make_entity_pool<static_light>
+	make_entity_pool<static_light>,
+	make_entity_pool<area_sensor>
 >;
 
 using physics_bodies = make_entity_pool<plain_sprited_body>;
@@ -56,25 +57,25 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 			const auto this_idx = index_in(storage, s);
 			const auto this_id = current_pool.find_nth_id(this_idx);
 
-			const auto static_byte = [&]() -> char {
+			const auto has_changed_byte = [&]() -> uint8_t {
 				if (is_always_static) {
-					return 1;
+					return 0;
 				}
 
 				static_assert(std::is_trivially_copyable_v<remove_cref<decltype(s)>>);
 
 				if (const auto correspondent_initial = initial_pool.find(this_id)) {
 					if (!std::memcmp(std::addressof(s), correspondent_initial, sizeof(*correspondent_initial))) {
-						return 2;
+						return 0;
 					}
 				}
 
-				return 0;
+				return 1;
 			}();
 			 
-			augs::write_bytes(*this, static_byte);
+			augs::write_bytes(*this, has_changed_byte);
 			
-			if (static_byte == 0) {
+			if (has_changed_byte != 0) {
 				augs::write_bytes(*this, s);
 			}
 			else {
@@ -85,7 +86,10 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 
 	void special_write(const physics_bodies_vector& storage) {
 		special_write_static_or_not(storage, [&](const auto& flav) {
-			return flav.template get<invariants::rigid_body>().body_type == rigid_body_type::ALWAYS_STATIC;
+			return 
+				flav.template get<invariants::rigid_body>().body_type == rigid_body_type::ALWAYS_STATIC && 
+				!flav.template get<invariants::animation>().id.is_set() /* Need to properly serialize animation state */
+			;
 		});
 	}
 
@@ -130,10 +134,10 @@ struct net_solvable_stream_cref : augs::cref_memory_stream {
 		using unversioned_id_type = typename remove_cref<decltype(initial_bodies)>::unversioned_id_type;
 
 		for (size_type i = 0; i < n; ++i) {
-			char static_byte;
-			augs::read_bytes(*this, static_byte);
+			uint8_t has_changed_byte;
+			augs::read_bytes(*this, has_changed_byte);
 
-			if (static_byte == 0) {
+			if (has_changed_byte != 0) {
 				augs::read_bytes(*this, storage[i]);
 			}
 			else {

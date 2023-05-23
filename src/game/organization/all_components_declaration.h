@@ -86,6 +86,7 @@ namespace components {
 	struct melee_fighter;
 	struct marker;
 	struct sorting_order;
+	struct portal;
 }
 
 using assert_always_together = type_list<
@@ -168,7 +169,8 @@ using component_list_t = List<
 	components::overridden_geo,
 	components::cascade_explosion,
 	components::marker,
-	components::sorting_order
+	components::sorting_order,
+	components::portal
 >;
 
 template <template <class...> class List>

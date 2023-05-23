@@ -22,6 +22,7 @@ struct point_marker;
 struct area_marker;
 struct explosion_body;
 struct tool_item;
+struct area_sensor;
 
 using all_entity_types = type_list<
 	plain_sprited_body,
@@ -43,7 +44,8 @@ using all_entity_types = type_list<
 	point_marker,
 	area_marker,
 	explosion_body,
-	tool_item
+	tool_item,
+	area_sensor
 >;
 
 #define FOR_ALL_ENTITY_TYPES(MACRO) \
@@ -66,7 +68,8 @@ using all_entity_types = type_list<
 	MACRO(point_marker) \
 	MACRO(area_marker) \
 	MACRO(explosion_body) \
-	MACRO(tool_item)
+	MACRO(tool_item) \
+	MACRO(area_sensor)
 
 using entity_type_id = type_in_list_id<all_entity_types>;
 

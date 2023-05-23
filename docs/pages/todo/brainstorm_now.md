@@ -6,9 +6,41 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- portals todo
+    - calc_filters from 
+
+- Portal system
+    - Need a way to continuously update
+    - Begin/End contact initialize "progress"
+        - We can then either advance the teleportation progress from a flag/speed variable or from the contact list
+        - Problematically we have to also cool it down when we're outside of a portal
+        - The question being whether the reinference won't induce broken begin/end contact pairs
+        - Would be best to do the broad pass inside step_and_set_new_transforms already to avoid fetching all bodies twice
+        - The portal itself can just increase the progresses
+
+
+- We need to rename all "specific_" to "typed_"
+
+- Would be best if we could create flavours per node
+    - For things like portals which we want to heavily customize per node
+        - all the while these parameters aren't modified by the solvable code
+    - What would it take?
+        - Node itself would need to hold the scene asset id
+            - Perhaps make it optional and choose it when creating entity
+        - And we'd need to iterate over editor nodes
+    - This is good because this a) frees the network b) reduces solvable size c) moves resource creation code to one place
+    - Our point of contention is that we have to redo the logic for filters and we'd have to hold filter data per marker entity
+        - But if it's a portal it could be maybe justified
+
 - Let's also decide straight away if we make a new entity type for portal
     - Maybe it should just be a marker body and have some metadata, will be easiest one
     - We won't avoid adding new entity types in the future
+    - It will have some state and perhaps some processing too so it can't be wrong
+    - Although perhaps no processing
+    - If we want teleportation delay, we certainly need some state per-physics body
+        - The completion %
+        - Also iterate contacts instead of holding a set of currently affected entities
+    - But the only alternatives would be holding some mapped state in solvable which sucks and slowly degenerates into how other games work
 
 - Making markers into physical sensors detecting bullets etc
     - They need physical bodies
@@ -31,7 +63,7 @@ summary: That which we are brainstorming at the moment.
     - Yeah let's make it an area marker
         - YES! Note that in the future, area marker shapes will be editable in-world
             - Just like any other entity but area markers are probably the most obvious usecase for that functionality
-    - And let's have a portal_target point marker
+    - And let's have a portal_exit point marker
         - Thought about an area but a better option is to have multiple portal targets and just shuffle them
     - And let's have a stateless portal_system 
     - Target Flag: spawn_relative_to_portal_center

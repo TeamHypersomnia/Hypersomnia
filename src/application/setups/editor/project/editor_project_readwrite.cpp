@@ -2,6 +2,8 @@
 #include "augs/string/path_sanitization.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/detail/is_editor_typed_resource.h"
+#include "application/setups/editor/nodes/editor_typed_node_id.h"
+#include "application/setups/editor/detail/is_editor_typed_node.h"
 #include "application/setups/editor/detail/has_reference_count.h"
 #include "application/setups/editor/resources/resource_traits.h"
 #include "augs/image/image.h"
@@ -32,6 +34,31 @@ namespace augs {
 			out = {};
 		}
 	}
+
+	template <class T, class R>
+	void to_json_value(T& out, const editor_typed_node_id<R>& from) {
+		if (from.is_set()) {
+			out.String(from._serialized_node_name);
+		}
+		else {
+			out.Null();
+		}
+	}
+
+	template <class T, class R>
+	void from_json_value(T& from, editor_typed_node_id<R>& out) {
+		if (from.IsString()) {
+			out._serialized_node_name = from.GetString();
+
+			if (out._serialized_node_name.empty()) {
+				out = {};
+			}
+		}
+
+		if (from.IsNull() || (from.IsBool() && !from.GetBool())) {
+			out = {};
+		}
+	}
 }
 
 #include "application/setups/editor/editor_view.h"
@@ -52,6 +79,7 @@ namespace augs {
 #include "application/setups/editor/defaults/editor_resource_defaults.h"
 #include "application/setups/editor/defaults/editor_node_defaults.h"
 #include "application/setups/editor/project/on_each_resource_id_in_project.hpp"
+#include "application/setups/editor/project/on_each_node_id_in_project.hpp"
 
 #if 0
 template <class R>
@@ -113,6 +141,27 @@ void unpack_string_id(const modes_map& modes, editor_typed_resource_id<editor_ga
 	}
 
 	id._serialized_resource_name.clear();
+}
+
+template <class M, class N>
+void unpack_string_id(const M& node_name_map, editor_typed_node_id<N>& id, const bool strict) {
+	if (id._serialized_node_name.empty()) {
+		return;
+	}
+
+	if (auto found = mapped_or_nullptr(node_name_map, id._serialized_node_name)) {
+		id = editor_typed_node_id<N>::from_generic(found->id);
+	}
+	else {
+		if (strict) {
+			throw augs::json_deserialization_error(
+				"Invalid node property: \"%x\"\nNode not found!",
+				id._serialized_node_name
+			);
+		}
+	}
+
+	id._serialized_node_name.clear();
 }
 #endif
 
@@ -316,10 +365,8 @@ namespace editor_project_readwrite {
 			project.resources.pools.for_each_container(resolve_pseudoids);
 		};
 
-		auto get_pseudoid = [&]<typename R>(const editor_typed_resource_id<R>& resource_id, const R* resource = nullptr) {
-			if (resource == nullptr) {
-				resource = project.find_resource(officials, resource_id);
-			}
+		auto get_pseudoid = [&]<typename R>(const editor_typed_resource_id<R>& resource_id) {
+			const auto resource = project.find_resource(officials, resource_id);
 
 			if (resource) {
 				if constexpr(is_pathed_resource_v<R>) {
@@ -356,12 +403,33 @@ namespace editor_project_readwrite {
 			::on_each_resource_id_in_project(subject, clean);
 		};
 
-		auto stringify_id = [&get_pseudoid](auto& typed_id) {
+		auto stringify_resource_id = [&get_pseudoid](auto& typed_id) {
 			typed_id._serialized_resource_name = get_pseudoid(typed_id);
 		};
 
-		auto stringify_resource_ids = [&stringify_id](auto& subject) {
-			::on_each_resource_id_in_project(subject, stringify_id);
+		auto stringify_resource_ids = [&stringify_resource_id](const editor_project& subject) {
+			::on_each_resource_id_in_project(subject, stringify_resource_id);
+		};
+
+		auto clean_stringified_node_ids = [](const editor_project& subject) {
+			auto clean = [&](auto& id) {
+				id._serialized_node_name.clear();
+			};
+
+			::on_each_node_id_in_project(subject, clean);
+		};
+
+		auto stringify_node_id = [&project](auto& typed_id) {
+			if (const auto node = project.find_node(typed_id)) {
+				typed_id._serialized_node_name = node->unique_name;
+			}
+			else {
+				typed_id._serialized_node_name.clear();
+			}
+		};
+
+		auto stringify_node_ids = [&stringify_node_id](const editor_project& subject) {
+			::on_each_node_id_in_project(subject, stringify_node_id);
 		};
 
 		auto setup_project_defaults = [&]() {
@@ -435,24 +503,11 @@ namespace editor_project_readwrite {
 
 			auto defaults = editor_game_mode_resource();
 			::setup_game_mode_defaults(defaults.editable, officials_map);
-			::on_each_resource_id_in_object(defaults.editable, stringify_id);
+			::on_each_resource_id_in_object(defaults.editable, stringify_resource_id);
 
 			auto write = [&](const auto& mode) {
 				writer.Key(mode.unique_name);
-
-				auto write = [&]<typename I>(const I&) {
-					if constexpr(std::is_same_v<I, editor_quick_test_mode>) {
-						augs::write_json_diff(writer, mode.editable.quick_test, defaults.editable.quick_test, true);
-					}
-					else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
-						augs::write_json_diff(writer, mode.editable.bomb_defusal, defaults.editable.bomb_defusal, true);
-					}
-					else {
-						static_assert(always_false_v<I>, "Non-exhaustive if constexpr!");
-					}
-				};
-
-				mode.type.dispatch(write);
+				augs::write_json_diff(writer, mode.editable, defaults.editable, true);
 			};
 
 			::in_order_of(
@@ -529,7 +584,7 @@ namespace editor_project_readwrite {
 
 				auto defaults = decltype(R::editable)();
 				::setup_resource_defaults(defaults, officials_map);
-				::on_each_resource_id_in_object(defaults, stringify_id);
+				::on_each_resource_id_in_object(defaults, stringify_resource_id);
 
 				if constexpr(is_pathed_resource_v<R>) {
 					auto write = [&](const auto& typed_resource) {
@@ -639,22 +694,7 @@ namespace editor_project_readwrite {
 						defaults.editable.pos = typed_node.editable.pos + vec2(1, 1);
 
 						augs::write_json_diff(writer, typed_node.editable, defaults.editable);
-						::on_each_resource_id_in_object(defaults.editable, stringify_id);
-
-						if constexpr(std::is_same_v<node_type, editor_prefab_node>) {
-							using E = editor_builtin_prefab_type;
-
-							const auto prefab_type = resource->editable.type;
-
-							switch (prefab_type) {
-								case E::AQUARIUM:
-									augs::write_json_diff(writer, typed_node.editable.as_aquarium, defaults.editable.as_aquarium);
-									break;
-
-								default:
-									break;
-							}
-						}
+						::on_each_resource_id_in_object(defaults.editable, stringify_resource_id);
 
 						writer.EndObject();
 					}
@@ -680,6 +720,7 @@ namespace editor_project_readwrite {
 
 		stringify_resource_ids(project_defaults);
 		stringify_resource_ids(project);
+		stringify_node_ids(project);
 
 		writer.StartObject();
 
@@ -702,6 +743,7 @@ namespace editor_project_readwrite {
 		augs::save_as_text(json_path, s.GetString());
 
 		clean_stringified_resource_ids(project);
+		clean_stringified_node_ids(project);
 	}
 
 	editor_project read_project_json(
@@ -1006,7 +1048,7 @@ namespace editor_project_readwrite {
 			bool assigned_to_layer = false;
 		};
 
-		std::unordered_map<std::string, node_meta> node_map;
+		std::unordered_map<std::string, node_meta> node_name_map;
 
 		const bool create_fallback_node_order = [&]() {
 			auto layers = FindArray(document, "layers");
@@ -1087,7 +1129,7 @@ namespace editor_project_readwrite {
 						else {
 							using node_type = typename R::node_type;
 
-							const auto map_result = node_map.try_emplace(id, node_meta());
+							const auto map_result = node_name_map.try_emplace(id, node_meta());
 
 							if (const bool is_unique = map_result.second) {
 								auto& pool = loaded.nodes.pools.get_for<node_type>();
@@ -1105,21 +1147,6 @@ namespace editor_project_readwrite {
 
 								::setup_node_defaults(new_node.editable, typed_resource);
 								augs::read_json(json_node, new_node.editable);
-
-								if constexpr(std::is_same_v<node_type, editor_prefab_node>) {
-									using E = editor_builtin_prefab_type;
-
-									const auto prefab_type = typed_resource.editable.type;
-
-									switch (prefab_type) {
-										case E::AQUARIUM:
-											augs::read_json(json_node, new_node.editable.as_aquarium);
-											break;
-
-										default:
-											break;
-									}
-								}
 
 								const auto new_typed_id = editor_typed_node_id<node_type>::from_raw(new_raw_id);
 								const auto new_id = new_typed_id.operator editor_node_id();
@@ -1196,7 +1223,7 @@ namespace editor_project_readwrite {
 							if (layer_node.IsString()) {
 								const auto node_id = layer_node.GetString();
 								
-								if (const auto found_node = mapped_or_nullptr(node_map, node_id)) {
+								if (const auto found_node = mapped_or_nullptr(node_name_map, node_id)) {
 									if (found_node->assigned_to_layer) {
 										if (strict) {
 											throw augs::json_deserialization_error(
@@ -1256,10 +1283,10 @@ namespace editor_project_readwrite {
 			}
 
 			if (strict) {
-				if (nodes_registered < node_map.size()) {
+				if (nodes_registered < node_name_map.size()) {
 					throw augs::json_deserialization_error(
 						"Error reading layers:\n%x nodes weren't assigned to any layer!", 
-						node_map.size() - nodes_registered
+						node_name_map.size() - nodes_registered
 					);
 				}
 			}
@@ -1281,7 +1308,7 @@ namespace editor_project_readwrite {
 			}
 		};
 
-		auto unstringify_id = [&]<typename R>(editor_typed_resource_id<R>& typed_id) {
+		auto unstringify_resource_id = [&]<typename R>(editor_typed_resource_id<R>& typed_id) {
 			if constexpr(std::is_same_v<R, editor_game_mode_resource>) {
 				::unpack_string_id(mode_map, typed_id, strict);
 			}
@@ -1291,7 +1318,15 @@ namespace editor_project_readwrite {
 		};
 
 		auto unstringify_resource_ids = [&]() {
-			::on_each_resource_id_in_project(loaded, unstringify_id);
+			::on_each_resource_id_in_project(loaded, unstringify_resource_id);
+		};
+
+		auto unstringify_node_id = [&]<typename N>(editor_typed_node_id<N>& typed_id) {
+			::unpack_string_id(node_name_map, typed_id, strict);
+		};
+
+		auto unstringify_node_ids = [&]() {
+			::on_each_node_id_in_project(loaded, unstringify_node_id);
 		};
 
 		initialize_project_structs();
@@ -1307,6 +1342,7 @@ namespace editor_project_readwrite {
 		read_layers();
 
 		unstringify_resource_ids();
+		unstringify_node_ids();
 
 		if (!loaded.playtesting.mode.is_set()) {
 			::setup_default_quick_test_mode(loaded.playtesting, loaded.get_game_modes());

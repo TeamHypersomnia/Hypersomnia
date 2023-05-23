@@ -85,6 +85,17 @@ void editor_setup::for_each_resource(F&& callback, bool for_official) const {
 	);
 }
 
+template <class N, class F>
+void editor_setup::for_each_node(F&& callback) const {
+	project.nodes.template get_pool_for<N>().for_each_id_and_object(
+		[&](const auto& raw_id, const auto& object) {
+			const auto typed_id = editor_typed_node_id<N>::from_raw(raw_id);
+
+			callback(typed_id, object);
+		}
+	);
+}
+
 template <class T>
 decltype(auto) editor_setup::find_node(const editor_typed_node_id<T>& id) {
 	return project.find_node(id);

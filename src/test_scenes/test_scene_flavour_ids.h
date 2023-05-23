@@ -363,6 +363,7 @@ enum class test_particles_decorations {
 	METAL_DAMAGE,
 	WOOD_DAMAGE,
 	EXHAUSTED_SMOKE,
+	DASH_SMOKE,
 
 	COUNT
 	// END GEN INTROSPECTOR

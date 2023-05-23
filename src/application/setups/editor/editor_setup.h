@@ -331,6 +331,9 @@ public:
 	template <class R, class F>
 	void for_each_resource(F&& callback, bool official) const;
 
+	template <class N, class F>
+	void for_each_node(F&& callback) const;
+
 	template <class F>
 	void for_each_dashed_line(F&&) const;
 

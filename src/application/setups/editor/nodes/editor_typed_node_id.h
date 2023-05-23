@@ -8,6 +8,8 @@ struct editor_typed_node_id {
 	using target_type = E;
 	editor_node_pool_id raw;
 
+	mutable std::string _serialized_node_name = "";
+
 	void set(const editor_node_pool_id& new_raw) {
 		raw = new_raw;
 	}

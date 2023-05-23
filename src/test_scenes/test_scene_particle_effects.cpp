@@ -4308,7 +4308,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = acquire_effect(test_scene_particle_effect_id::STANDARD_DASH);
+		auto& effect = acquire_effect(test_scene_particle_effect_id::DASH_SMOKE);
 
 		{
 			particles_emission em;

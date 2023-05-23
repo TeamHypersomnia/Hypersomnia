@@ -126,6 +126,12 @@ packaged_official_content::packaged_official_content(sol::state& lua) {
 
 	create_official_prefabs();
 	for_each_resource<editor_prefab_resource>(map_with_type);
+
+	auto find_lambda = [&](auto id) {
+		return resources.find_typed(id);
+	};
+
+	::setup_resource_defaults_after_creating_officials(find_lambda, resource_map);
 }
 
 editor_setup::editor_setup(

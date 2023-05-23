@@ -6,11 +6,9 @@
 struct editor_pathed_resource {
 	static constexpr bool json_ignore = true;
 
-	// GEN INTROSPECTOR struct editor_pathed_resource
 	augs::path_type path_in_project;
 	std::string file_hash;
 	augs::file_time_type stamp_when_hashed;
-	// END GEN INTROSPECTOR
 
 	editor_pathed_resource(
 		const augs::path_type& path_in_project, 

@@ -1,7 +1,7 @@
 #pragma once
 
 template <class T>
-struct recurse_to_find_ids {
+struct recurse_to_find_resource_ids {
 	static constexpr bool value = 
 		!is_one_of_v<T, editor_node_pools, editor_resource_pools, editor_layers>
 		&& !augs::has_custom_to_json_value_v<T>;
@@ -17,7 +17,7 @@ void on_each_resource_id_in_object(O& object, F callback) {
 		}
 	};
 
-	augs::on_each_object_in_object<recurse_to_find_ids>(object, handle);
+	augs::on_each_object_in_object<recurse_to_find_resource_ids>(object, handle);
 }
 
 template <class P, class F>

@@ -36,6 +36,8 @@ struct special_physics {
 	signi_entity_id during_cooldown_ignore_collision_with;
 	bool during_cooldown_ignore_other_cooled_down = true;
 	pad_bytes<3> pad;
+	real32 teleportation_progress = 0.0f;
+	real32 teleportation_progress_falloff_speed = 0.0f;
 #if TODO_CARS
 	signi_entity_id owner_friction_ground;
 	friction_connection_vector owner_friction_grounds = {};

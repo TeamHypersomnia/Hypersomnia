@@ -318,6 +318,28 @@ bool edit_property(
 
 				return false;
 			}
+
+			if (label == "Impulse when appearing") {
+				if (slider(label, property, 0.0f, 5000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("How strongly to push bodies that appear through this portal target.\nBodies will be pushed in the direction this spot is facing.");
+
+				return false;
+			}
+
+			if (label == "Entering time (ms)") {
+				if (slider(label, property, 0.0f, 5000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("How much time you have to stay inside the portal\nin order to appear on the other side.");
+
+				return false;
+			}
 		}
 		else if constexpr(std::is_same_v<uint32_t, T>) {
 			if (label.find("Fish") != std::string::npos || label.find("austics") != std::string::npos) {
@@ -631,6 +653,13 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 		MULTIPROPERTY("Letter", letter);
 	}
 
+	if (type == point_marker_type::PORTAL_EXIT) {
+		MULTIPROPERTY("Impulse when appearing", as_portal_exit.impulse_on_exit);
+		MULTIPROPERTY("Preserve entry offset", as_portal_exit.preserve_entry_offset);
+
+		tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how the body entered the portal.\n\nTick if you want to create a 'seamless' portal,\ni.e. when you want the player to not even notice that they just warped somewhere.");
+	}
+
 	return result;
 }
 
@@ -652,6 +681,29 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 
 	if (has_letter(type)) {
 		MULTIPROPERTY("Letter", letter);
+	}
+
+	if (type == area_marker_type::PORTAL) {
+		MULTIPROPERTY("Seamless portal", as_portal.seamless_portal);
+		tooltip_on_hover("Tick to disable all delays, sounds, effects and impulses.\nThis will make the portal seamless - the subjects will instantly change positions.\nUseful if you want to teleport the player without them even knowing,\nfor creating some mind-bending labrinyths.");
+
+		MULTIPROPERTY("Entering time (ms)", as_portal.enter_time_ms);
+		//MULTIPROPERTY("Disappeared time (ms)", as_portal.travel_time_ms);
+		SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
+		//SOUND_EFFECT_LEAN_MULTIPROPERTY("Disappear sound", as_portal.disappear_sound);
+		SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
+		PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
+
+		ImGui::Separator();
+		text_color("Reacts to", yellow);
+		ImGui::Separator();
+
+		MULTIPROPERTY("Characters", as_portal.reacts_to.characters);
+		MULTIPROPERTY("Bullets", as_portal.reacts_to.bullets);
+		MULTIPROPERTY("Flying explosives", as_portal.reacts_to.flying_explosives);
+		MULTIPROPERTY("Flying melees", as_portal.reacts_to.flying_melees);
+		MULTIPROPERTY("Lying items", as_portal.reacts_to.lying_items);
+		MULTIPROPERTY("Obstacles", as_portal.reacts_to.obstacles);
 	}
 
 	return result;

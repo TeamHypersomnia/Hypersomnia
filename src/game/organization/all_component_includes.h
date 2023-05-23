@@ -49,5 +49,6 @@
 #include "game/components/cascade_explosion_component.h"
 #include "game/components/tool_component.h"
 #include "game/components/sorting_order_component.h"
+#include "game/components/portal_component.h"
 
 #include "game/inferred_caches/physics_cache_data.h"

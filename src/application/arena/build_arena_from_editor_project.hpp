@@ -118,17 +118,17 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 	/* Create resources */
 
+	auto get_asset_id_of = [&]<typename R>(const editor_typed_resource_id<R>& resource_id) {
+		using asset_type = decltype(R::scene_asset_id);
+
+		if (const auto resource = find_resource(resource_id)) {
+			return resource->scene_asset_id;
+		}
+
+		return asset_type();
+	};
+
 	auto setup_flavours_and_assets = [&]<typename P>(const P& pool) {
-		auto get_asset_id_of = [&]<typename R>(const editor_typed_resource_id<R>& resource_id) {
-			using asset_type = decltype(R::scene_asset_id);
-
-			if (const auto resource = find_resource(resource_id)) {
-				return resource->scene_asset_id;
-			}
-
-			return asset_type();
-		};
-
 		using R = typename P::value_type;
 
 		for (const R& resource : pool) {
@@ -191,6 +191,9 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	/* Create nodes */
 
 	auto total_order = sorting_order_type(0);
+
+	thread_local std::vector<editor_node_id> nodes_dependent_on_nodes;
+	nodes_dependent_on_nodes.clear();
 
 	auto populate = [&](const logic_step step) {
 		for (const auto layer_id : reverse(project.layers.order)) {
@@ -295,7 +298,9 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 				}
 				else {
 					auto entity_from_node = [&]<typename H>(const H& handle, auto& agg) {
-						::setup_entity_from_node(
+						const bool dependent_on_other_nodes = ::setup_entity_from_node(
+							get_asset_id_of,
+							find_resource,
 							total_order++, 
 							*layer,
 							typed_node, 
@@ -303,6 +308,10 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							handle, 
 							agg
 						);
+
+						if (dependent_on_other_nodes) {
+							nodes_dependent_on_nodes.push_back(node_id.operator editor_node_id());
+						}
 
 						if (is_prefab_child) {
 							::make_unselectable(agg);
@@ -351,6 +360,34 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 				});
 			}
 		}
+
+		auto resolve_node_dependencies = [&]() {
+			auto typed_resolve = [&]<typename N>(const editor_typed_node_id<N> id) {
+				if (auto node = project.find_node(id)) {
+					return node->scene_entity_id;
+				}
+
+				return entity_id();
+			};
+
+			for (const auto& dependent : nodes_dependent_on_nodes) {
+				project.on_node(dependent, [&]<typename node_type>(const node_type& typed_dependent, const auto) {
+					if constexpr(std::is_same_v<node_type, editor_area_marker_node>) {
+						if (auto handle = scene.world[typed_dependent.scene_entity_id]) {
+							handle.dispatch(
+								[&](const auto& typed_handle) {
+									if (auto portal = typed_handle.template find<components::portal>()) {
+										portal->portal_exit = typed_resolve(typed_dependent.editable.as_portal.portal_exit);
+									}
+								}
+							);
+						}
+					}
+				});
+			}
+		};
+
+		resolve_node_dependencies();
 	};
 
 	/* 

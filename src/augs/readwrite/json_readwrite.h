@@ -201,8 +201,13 @@ namespace augs {
 								}
 							}
 							else {
-								if (from.HasMember(label)) {
-									read_json(from[label], field);
+								if constexpr(json_serialize_in_parent_v<Field>) {
+									read_json(from, field);
+								}
+								else {
+									if (from.HasMember(label)) {
+										read_json(from[label], field);
+									}
 								}
 							}
 						}
@@ -463,12 +468,17 @@ namespace augs {
 							}
 						}
 						else {
-							if (field == reference_field) {
-								return;
+							if constexpr(json_serialize_in_parent_v<Field>) {
+								write_json_diff(to, field, reference_field, false);
 							}
+							else {
+								if (field == reference_field) {
+									return;
+								}
 
-							to.Key(label);
-							write_json_diff(to, field, reference_field, true);
+								to.Key(label);
+								write_json_diff(to, field, reference_field, true);
+							}
 						}
 					}
 				},

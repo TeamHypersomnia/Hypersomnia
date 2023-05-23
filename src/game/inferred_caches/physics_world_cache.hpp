@@ -96,6 +96,10 @@ auto calc_filters(const E& handle) {
 		return filters[predefined_filter_type::CHARACTER];
 	}
 
+	if (const auto portal = handle.template find<components::portal>()) {
+
+	}
+
 	return colliders_data.filter;
 }
 

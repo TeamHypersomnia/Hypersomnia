@@ -28,6 +28,8 @@ struct editor_requested_equipment {
 };
 
 struct editor_bomb_defusal_mode {
+	static constexpr bool json_serialize_in_parent = true;
+
 	// GEN INTROSPECTOR struct editor_bomb_defusal_mode
 	uint32_t warmup_time = 81;
 	uint32_t freeze_time = 10;
@@ -41,6 +43,8 @@ struct editor_bomb_defusal_mode {
 };
 
 struct editor_quick_test_mode {
+	static constexpr bool json_serialize_in_parent = true;
+
 	// GEN INTROSPECTOR struct editor_quick_test_mode
 	per_actual_faction<editor_requested_equipment> equipment;
 	uint32_t respawn_time_ms = 1000;

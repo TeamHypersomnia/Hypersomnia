@@ -1,6 +1,8 @@
 #pragma once
 #include "application/setups/editor/gui/widgets/resource_chooser.h"
+#include "application/setups/editor/gui/widgets/node_chooser.h"
 #include "application/setups/editor/detail/is_editor_typed_resource.h"
+#include "application/setups/editor/detail/is_editor_typed_node.h"
 
 struct id_widget_handler {
 	editor_setup& setup;
@@ -8,7 +10,10 @@ struct id_widget_handler {
 	bool allow_none = true;
 
 	template <class T>
-	static constexpr bool handles = is_editor_typed_resource_id_v<T>;
+	static constexpr bool handles = 
+		is_editor_typed_resource_id_v<T>
+		|| is_editor_typed_node_id_v<T>
+	;
 
 	auto get_none_label(const std::string& label) const {
 		if (label == "Footstep sound") {
@@ -25,33 +30,60 @@ struct id_widget_handler {
 		T& property,
 		const bool show_icon = true
 	) {
+		bool modified = false;
+		const auto none_label = std::string(get_none_label(label));
+
 		static_assert(handles<T>);
 
-		auto resource = setup.find_resource(property);
+		if constexpr(is_editor_typed_resource_id_v<T>) {
+			auto resource = setup.find_resource(property);
+			const auto displayed_resource_name = resource ? resource->get_display_name() : none_label;
 
-		const auto none_label = std::string(get_none_label(label));
-		const auto displayed_resource_name = resource ? resource->get_display_name() : none_label;
+			using R = typename T::target_type;
+			thread_local resource_chooser<R> chooser;
 
-		using R = typename T::target_type;
-		thread_local resource_chooser<R> chooser;
+			chooser.perform(
+				label,
+				displayed_resource_name,
+				property,
+				setup,
+				icon_in,
+				allow_none,
+				[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
+					result = typesafe_sprintf("Changed resource to %x", chosen_name);
+					modified = true;
+					property = chosen_id;
+				},
+				none_label,
+				show_icon
+			);
+		}
+		else if constexpr(is_editor_typed_node_id_v<T>) {
+			auto node = setup.find_node(property);
+			const auto displayed_node_name = node ? node->get_display_name() : none_label;
 
-		bool modified = false;
+			using R = typename T::target_type;
+			thread_local node_chooser<R> chooser;
 
-		chooser.perform(
-			label,
-			displayed_resource_name,
-			property,
-			setup,
-			icon_in,
-			allow_none,
-			[&](const editor_typed_resource_id<R>& chosen_id, const auto& chosen_name) {
-				result = typesafe_sprintf("Changed resource to %x", chosen_name);
-				modified = true;
-				property = chosen_id;
-			},
-			none_label,
-			show_icon
-		);
+			chooser.perform(
+				label,
+				displayed_node_name,
+				property,
+				setup,
+				icon_in,
+				allow_none,
+				[&](const editor_typed_node_id<R>& chosen_id, const auto& chosen_name) {
+					result = typesafe_sprintf("Changed node to %x", chosen_name);
+					modified = true;
+					property = chosen_id;
+				},
+				none_label,
+				show_icon
+			);
+		}
+		else {
+			static_assert(always_false_v<T>, "Non-exhaustive if constepxr");
+		}
 
 		if (allow_none) {
 			if (property.is_set()) {

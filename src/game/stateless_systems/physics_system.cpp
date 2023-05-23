@@ -60,6 +60,9 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 			rigid_body.update_after_step(body);
 
 			physics.recurential_friction_handler(step, &body, body.m_ownerFrictionGround);
+
+			special_physics& special = rigid_body.get_special();
+			special.teleportation_progress += special.teleportation_progress_falloff_speed;
 		}
 	);
 #endif

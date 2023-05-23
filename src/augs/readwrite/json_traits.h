@@ -65,4 +65,19 @@ namespace augs {
 
 	template <class T>
 	constexpr bool json_ignore_v = json_ignore<remove_cref<T>>::value;
+
+	template <class T, class = void>
+	struct json_serialize_in_parent : std::false_type {};
+
+	template <class T>
+	struct json_serialize_in_parent<
+		T, 
+		decltype(
+			T::json_serialize_in_parent,
+			void()
+		)
+	> : std::bool_constant<T::json_serialize_in_parent> {};
+
+	template <class T>
+	constexpr bool json_serialize_in_parent_v = json_serialize_in_parent<remove_cref<T>>::value;
 }

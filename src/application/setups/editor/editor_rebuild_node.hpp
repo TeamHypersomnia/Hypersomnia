@@ -1,4 +1,5 @@
 #pragma once
+#include "application/setups/editor/to_game_effect.hpp"
 
 template <class T>
 void make_unselectable(T& agg) {
@@ -10,8 +11,10 @@ void make_unselectable_handle(T handle) {
 	::make_unselectable(handle.get({}));
 }
 
-template <class N, class R, class H, class A>
-void setup_entity_from_node(
+template <class G, class F, class N, class R, class H, class A>
+bool setup_entity_from_node(
+	G get_asset_id_of,
+	F find_resource,
 	const sorting_order_type total_order,
 	const editor_layer& layer,
 	const N& node, 
@@ -19,6 +22,12 @@ void setup_entity_from_node(
 	H& handle, 
 	A& agg
 ) {
+	auto to_game_effect = [&](const auto& from) {
+		return ::convert_to_game_effect(get_asset_id_of, find_resource, from);
+	};
+
+	bool dependent_on_other_nodes = false;
+
 	using Editable = decltype(node.editable);
 	auto& editable = node.editable;
 
@@ -110,6 +119,39 @@ void setup_entity_from_node(
 		auto& marker = agg.template get<components::marker>();
 		marker.faction = editable.faction;
 		marker.letter = editable.letter;
+
+		if constexpr(std::is_same_v<N, editor_area_marker_node>) {
+			if (resource.editable.type == area_marker_type::PORTAL) {
+				if (editable.as_portal.portal_exit.is_set()) {
+					dependent_on_other_nodes = true;
+				}
+
+				if (const auto portal = agg.template find<components::portal>()) {
+					auto& to = *portal;
+					const auto& from = editable.as_portal;
+
+					if (from.seamless_portal) {
+						to.enter_time_ms = 0.f;
+						to.travel_time_ms = 0.f;
+					}
+					else {
+						to.enter_time_ms = from.enter_time_ms;
+						to.travel_time_ms = from.travel_time_ms;
+
+						to.enter_sound = to_game_effect(from.enter_sound);
+						to.travel_sound = to_game_effect(from.travel_sound);
+						to.exit_sound = to_game_effect(from.exit_sound);
+						to.travel_particles = to_game_effect(from.travel_particles);
+						to.exit_particles = to_game_effect(from.exit_particles);
+					}
+				}
+			}
+		}
+		else if constexpr(std::is_same_v<N, editor_point_marker_node>) {
+			auto portal_exit = marker.get_portal_exit();
+			portal_exit.impulse_on_exit = editable.as_portal_exit.impulse_on_exit;
+			portal_exit.preserve_entry_offset = editable.as_portal_exit.preserve_entry_offset;
+		}
 	}
 
 	if (auto geo = agg.template find<components::overridden_geo>()) {
@@ -125,6 +167,8 @@ void setup_entity_from_node(
 
 	handle.set_logic_transform(node.get_transform());
 	(void)resource;
+
+	return dependent_on_other_nodes;
 }
 
 template <class N, class R, class H>

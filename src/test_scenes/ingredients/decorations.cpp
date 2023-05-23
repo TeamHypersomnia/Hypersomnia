@@ -654,6 +654,12 @@ namespace test_flavours {
 			white
 		);
 
+		flavour_with_particles(
+			test_particles_decorations::DASH_SMOKE,
+			test_scene_particle_effect_id::DASH_SMOKE,
+			white
+		);
+
 		{
 			auto& meta = flavour_with_particles(
 				test_particles_decorations::WANDERING_SMOKE,

@@ -3,7 +3,7 @@
 struct editor_sprite_resource;
 
 struct aquarium_prefab_node {
-	static constexpr bool json_ignore = true;
+	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct aquarium_prefab_node
 

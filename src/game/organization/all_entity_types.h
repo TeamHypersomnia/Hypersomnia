@@ -542,3 +542,29 @@ struct tool_item {
 		colliders_cache
 	>;
 };
+
+struct area_sensor {
+	static constexpr std::size_t statically_allocated_entities = 100;
+	static constexpr std::size_t statically_allocated_flavours = 10;
+
+	using invariant_list = type_list<
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::area_marker,
+		invariants::interpolation
+	>;
+
+	using component_list = type_list<
+		components::sorting_order,
+		components::marker,
+		components::overridden_geo,
+		components::rigid_body,
+		components::portal
+	>;
+
+	using synchronized_arrays = type_list<
+		rigid_body_cache,
+		colliders_cache,
+		components::interpolation
+	>;
+};

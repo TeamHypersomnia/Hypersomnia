@@ -19,4 +19,7 @@ void setup_node_defaults(N& new_node, const R& resource) {
 	else if constexpr(std::is_same_v<R, editor_prefab_resource>) {
 		new_node = resource.editable.default_node_properties;
 	}
+	else if constexpr(std::is_same_v<R, editor_area_marker_resource>) {
+		new_node = resource.editable.node_defaults;
+	}
 }

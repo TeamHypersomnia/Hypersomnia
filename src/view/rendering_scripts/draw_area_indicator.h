@@ -8,6 +8,18 @@ enum class drawn_indicator_type {
 	INGAME
 };
 
+inline bool always_hide_in_game(const area_marker_type t) {
+	switch (t) {
+		case area_marker_type::ORGANISM_AREA:
+		case area_marker_type::PREFAB:
+		case area_marker_type::PORTAL:
+			return true;
+
+		default:
+			return false;
+	}
+}
+
 template <class E>
 void draw_area_indicator(
 	const E& typed_handle, 
@@ -20,7 +32,7 @@ void draw_area_indicator(
 ) {
 	if (const auto marker = typed_handle.template find<invariants::area_marker>()) {
 		if (type == drawn_indicator_type::INGAME) {
-			if (marker->type == area_marker_type::ORGANISM_AREA || marker->type == area_marker_type::PREFAB) {
+			if (::always_hide_in_game(marker->type)) {
 				return;
 			}
 		}
