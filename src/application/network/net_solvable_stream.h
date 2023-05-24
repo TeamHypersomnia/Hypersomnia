@@ -42,8 +42,8 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 		(void)storage;
 	}
 
-	template <class V, class Pred>
-	void special_write_static_or_not(const V& storage, Pred pred) {
+	template <class V, class NeverChanges>
+	void special_write_if_changed(const V& storage, NeverChanges never_changes_pred) {
 		using E = entity_type_of<typename V::value_type>;
 
 		const auto& body_flavours = flavours.template get_for<E>();
@@ -53,12 +53,12 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 		augs::write_bytes(*this, storage.size());
 
 		for (const auto& s : storage) {
-			const bool is_always_static = pred(body_flavours[s.flavour_id]);
+			const bool never_changes_at_all = never_changes_pred(body_flavours[s.flavour_id]);
 			const auto this_idx = index_in(storage, s);
 			const auto this_id = current_pool.find_nth_id(this_idx);
 
 			const auto has_changed_byte = [&]() -> uint8_t {
-				if (is_always_static) {
+				if (never_changes_at_all) {
 					return 0;
 				}
 
@@ -85,18 +85,22 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 	}
 
 	void special_write(const physics_bodies_vector& storage) {
-		special_write_static_or_not(storage, [&](const auto& flav) {
+		auto never_changes_pred = [&](const auto& flav) {
 			return 
-				flav.template get<invariants::rigid_body>().body_type == rigid_body_type::ALWAYS_STATIC && 
-				!flav.template get<invariants::animation>().id.is_set() /* Need to properly serialize animation state */
+				flav.template get<invariants::rigid_body>().body_type == rigid_body_type::ALWAYS_STATIC
+				&& !flav.template get<invariants::animation>().id.is_set() /* Otherwise need to properly serialize animation state */
 			;
-		});
+		};
+
+		special_write_if_changed(storage, never_changes_pred);
 	}
 
 	void special_write(const dynamic_decorations_vector& storage) {
-		special_write_static_or_not(storage, [&](const auto& flav) {
+		auto never_changes_pred = [&](const auto& flav) {
 			return flav.template get<invariants::animation>().is_irrelevant_to_logic;
-		});
+		};
+
+		special_write_if_changed(storage, never_changes_pred);
 	}
 };
 

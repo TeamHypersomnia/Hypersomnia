@@ -6,8 +6,32 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We might want a nice enum like in Unity to decide if we want impulse/velocity change/velocity replace
+
+- Possible bug related to reinference
+    - Suppose BeginContact is posted due to a ToI bullet/portal collision
+    - At this point the bullet has already flied past the portal
+        - But EndContact will only be reported the next simulation step
+    - Suppose complete reinference happens before the next step
+        - All contacts are destroyed.
+        - Will EndContact be triggered? Probably not.
+            - *might* actually be called by b2ContactManager::Destroy but really there's no need to keep flags depending
+            - we have enough state in contact lists, it's perfect for that
+    - Therefore we cannot rely on Begin/End contact to set a flag for whether to increment teleportation progress.
+    - For each portal, we need to iterate existing contacts.
+    - After reinference the contact will likely stop existing.
+    - The only thing BeginContact could really do is trigger quiet portals.
+        - But I figure iterating existing contacts will do just as well 
+            - The ToI impacts will be reported too this way because they always exist for at least a single step
+
+- quiet portal should also set the preserve offset flag
+    - so we'll probably remove it from portal exit
+
 - portals todo
     - calc_filters from 
+    - setup default effects
+    - debug json serialize in parent
+    - check how cache creates fixtures for it despite lack of sprite invariant
 
 - Portal system
     - Need a way to continuously update

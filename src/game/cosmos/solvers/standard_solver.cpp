@@ -36,6 +36,7 @@
 #include "game/stateless_systems/movement_path_system.h"
 #include "game/stateless_systems/animation_system.h"
 #include "game/stateless_systems/remnant_system.h"
+#include "game/stateless_systems/portal_system.h"
 
 #include "game/organization/all_messages_includes.h"
 
@@ -173,6 +174,7 @@ void standard_solve(const logic_step step) {
 	}
 
 	physics_system().post_and_clear_accumulated_collision_messages(step);
+	portal_system().advance_portal_logic(step);
 
 	trace_system().lengthen_sprites_of_traces(step);
 

@@ -553,7 +553,7 @@ struct game_state_checks {
 	//static_assert(2 == sum_matching_in_v<is_flavour_id, cosmos_solvable_significant>);
 
 	/* A temporary exception for the portal component */
-	static_assert(sum_matching_in_v<is_asset_id, cosmos_solvable_significant> == 5);
+	static_assert(sum_matching_in_v<is_asset_id, cosmos_solvable_significant> == 6);
 
 	/* 
 		Assets should not hold any flavour id, because flavours are conceptually higher-level than assets. 

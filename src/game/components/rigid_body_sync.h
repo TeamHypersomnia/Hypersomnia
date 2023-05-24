@@ -11,6 +11,7 @@
 class physics_world_cache;
 class physics_system;
 class b2Body;
+struct b2ContactEdge;
 
 template <class E, class B>
 void infer_damping(const E& handle, B& b);
@@ -93,12 +94,16 @@ public:
 
 	void apply_force(const vec2) const;
 	void apply_force(const vec2, const vec2 center_offset, const bool wake = true) const;
+	void apply_torque(float) const;
 	void apply_impulse(const vec2) const;
 	void apply_impulse(const vec2, const vec2 center_offset, const bool wake = true) const;
 
 	void apply_angular_impulse(const float) const;
 
 	void apply(impulse_input) const;
+
+	void apply_linear(vec2 direction, impulse_amount_def impulse) const;
+	void apply_angular(impulse_amount_def impulse) const;
 
 	template <class body_type>
 	void update_after_step(const body_type& b) const {
@@ -115,6 +120,14 @@ public:
 
 	auto& get_special() const {
 		return get_raw_component({}).special;
+	}
+
+	b2ContactEdge* get_contact_list() const { 
+		if (auto cache = find_cache()) {
+			return cache->body.get()->GetContactList();
+		}
+
+		return nullptr;
 	}
 
 	vec2 get_velocity() const;
@@ -238,9 +251,66 @@ void component_synchronizer<E, components::rigid_body>::apply_force(
 }
 
 template <class E>
+void component_synchronizer<E, components::rigid_body>::apply_torque(
+	const float amount
+) const {
+	apply_angular_impulse(handle.get_cosmos().get_fixed_delta().in_seconds() * amount);
+}
+
+template <class E>
 void component_synchronizer<E, components::rigid_body>::apply(const impulse_input impulse) const {
 	apply_impulse(impulse.linear, vec2(0, 0), true);
 	apply_angular_impulse(impulse.angular);
+}
+
+template <class E>
+void component_synchronizer<E, components::rigid_body>::apply_linear(const vec2 direction, const impulse_amount_def impulse) const {
+	if (impulse.amount == 0.0f) {
+		return;
+	}
+
+	switch (impulse.mode) {
+		case impulse_type::FORCE:
+			apply_force(direction * impulse.amount);
+			break;
+		case impulse_type::IMPULSE:
+			apply_impulse(direction * impulse.amount);
+			break;
+		case impulse_type::ADD_VELOCITY:
+			set_velocity(get_velocity() + direction * impulse.amount);
+			break;
+		case impulse_type::SET_VELOCITY:
+			set_velocity(direction * impulse.amount);
+			break;
+
+		default:
+			break;
+	}
+}
+
+template <class E>
+void component_synchronizer<E, components::rigid_body>::apply_angular(const impulse_amount_def impulse) const {
+	if (impulse.amount == 0.0f) {
+		return;
+	}
+
+	switch (impulse.mode) {
+		case impulse_type::FORCE:
+			apply_torque(impulse.amount * DEG_TO_RAD<float>);
+			break;
+		case impulse_type::IMPULSE:
+			apply_angular_impulse(impulse.amount * DEG_TO_RAD<float>);
+			break;
+		case impulse_type::ADD_VELOCITY:
+			set_angular_velocity(get_degree_velocity() + impulse.amount);
+			break;
+		case impulse_type::SET_VELOCITY:
+			set_angular_velocity(impulse.amount);
+			break;
+
+		default:
+			break;
+	}
 }
 
 template <class E>

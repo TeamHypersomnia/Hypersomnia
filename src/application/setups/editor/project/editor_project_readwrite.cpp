@@ -685,6 +685,7 @@ namespace editor_project_readwrite {
 						}
 
 						::setup_node_defaults(defaults.editable, *resource);
+						::on_each_resource_id_in_object(defaults.editable, stringify_resource_id);
 
 						/* 
 							Force position to always be written,
@@ -694,7 +695,6 @@ namespace editor_project_readwrite {
 						defaults.editable.pos = typed_node.editable.pos + vec2(1, 1);
 
 						augs::write_json_diff(writer, typed_node.editable, defaults.editable);
-						::on_each_resource_id_in_object(defaults.editable, stringify_resource_id);
 
 						writer.EndObject();
 					}

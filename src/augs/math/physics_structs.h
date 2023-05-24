@@ -40,6 +40,24 @@ struct impulse_input {
 	}
 };
 
+enum class impulse_type {
+	// GEN INTROSPECTOR enum class impulse_type
+	FORCE,
+	IMPULSE,
+	ADD_VELOCITY,
+	SET_VELOCITY
+	// END GEN INTROSPECTOR
+};
+
+struct impulse_amount_def {
+	// GEN INTROSPECTOR struct impulse_amount_def
+	real32 amount = 1000.0f;
+	impulse_type mode = impulse_type::IMPULSE;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const impulse_amount_def& b) const = default;
+};
+
 struct damping_input {
 	// GEN INTROSPECTOR struct damping_input
 	vec2 linear;

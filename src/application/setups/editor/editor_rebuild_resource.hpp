@@ -270,6 +270,19 @@ void setup_scene_object_from_resource(
 	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
 		auto& marker = scene.template get<invariants::area_marker>();
 		marker.type = resource.editable.type;
+
+		if (auto fixtures = scene.template find<invariants::fixtures>()) {
+			/*
+				It's an area sensor.
+			*/
+
+			fixtures->filter = filters[predefined_filter_type::PORTAL];
+			fixtures->disable_standard_collision_resolution = true;
+		}
+
+		if (auto rigid_body = scene.template find<invariants::rigid_body>()) {
+			rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
+		}
 	}
 	else if constexpr(std::is_same_v<editor_prefab_resource, R>) {
 		auto& marker = scene.template get<invariants::area_marker>();

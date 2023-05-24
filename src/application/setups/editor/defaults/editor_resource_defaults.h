@@ -18,7 +18,7 @@ void setup_resource_defaults_after_creating_officials(
 	if (auto portal = find_resource(o[area_marker_type::PORTAL])) {
 		auto& to = portal->editable.node_defaults.as_portal;
 
-		to.travel_particles.id = o[test_particles_decorations::EXHAUSTED_SMOKE];
+		to.enter_particles.id = o[test_particles_decorations::EXHAUSTED_SMOKE];
 		to.exit_particles.id = o[test_particles_decorations::DASH_SMOKE];
 	}	
 }

@@ -4,8 +4,6 @@
 #include "application/setups/editor/nodes/editor_node_base.h"
 #include "application/setups/editor/resources/editor_typed_resource_id.h"
 #include "application/setups/editor/resources/editor_marker_resource.h"
-#include "game/enums/marker_type.h"
-#include "game/enums/faction_type.h"
 #include "application/setups/editor/nodes/editor_marker_node_editable.h"
 
 struct editor_point_marker_node : editor_node_base<

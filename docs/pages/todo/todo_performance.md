@@ -5,6 +5,14 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- TIL Box2D uses ToI by default against static bodies.
+	- Maybe we could let mapper disable it for improved performance?
+	- Only glitch I could think of is grenades flying over thin walls
+		- but flying objects should have bullet flag set anyway
+		- And they actually do in calc_needs_analytic_physics! So it's not a problem.
+			- as for players, they already clip sometimes anyway lol
+			- so the mapper would ensure there are no too-thin static walls which is anyway a problem with the clipping/shoot-through glitch
+
 - Use callgrind to see what happens when the physics slows down due to hard calculations
 	- e.g. when character is stuck inside two colliders
 	- can e.g. spawn it in the red room on cyberaqua for a test

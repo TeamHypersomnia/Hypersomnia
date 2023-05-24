@@ -97,7 +97,7 @@ auto calc_filters(const E& handle) {
 	}
 
 	if (const auto portal = handle.template find<components::portal>()) {
-
+		return portal->custom_filter;
 	}
 
 	return colliders_data.filter;
@@ -434,6 +434,41 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		constructed_fixtures.emplace_back(new_fix);
 	};
 
+	auto from_box = [&](vec2 size, const real32 additional_rotation) {
+		size.x = std::max(1.f, size.x);
+		size.y = std::max(1.f, size.y);
+
+		size = si.get_meters(size);
+
+		const auto hx = size.x / 2;
+		const auto hy = size.y / 2;
+
+		std::array<vec2, 4> verts;
+
+		verts[0].set(-hx, -hy);
+		verts[1].set( hx, -hy);
+		verts[2].set( hx,  hy);
+		verts[3].set(-hx,  hy);
+
+		const auto off_meters = si.get_meters(connection.shape_offset.pos);
+		const auto total_rotation = additional_rotation + connection.shape_offset.rotation;
+
+		for (auto& v : verts) {
+			v.rotate(total_rotation);
+			v += off_meters;
+		}
+
+		b2PolygonShape ps;
+		ps.Set(verts.data(), verts.size());
+
+		fixdef.shape = &ps;
+		b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
+
+		new_fix->index_in_component = 0;
+
+		constructed_fixtures.emplace_back(new_fix);
+	};
+
 	if (is_like_thrown_explosive(handle)) {
 		if (const auto fuse = handle.template find<invariants::hand_fuse>()) {
 			from_circle_shape(fuse->circle_shape_radius_when_released);
@@ -482,43 +517,21 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 				return 0.f;
 			}();
 
-			auto size = handle.get_logical_size();
-
-			size.x = std::max(1.f, size.x);
-			size.y = std::max(1.f, size.y);
-
-			size = si.get_meters(size);
-
-			const auto hx = size.x / 2;
-			const auto hy = size.y / 2;
-
-			std::array<vec2, 4> verts;
-
-			verts[0].set(-hx, -hy);
-			verts[1].set( hx, -hy);
-			verts[2].set( hx,  hy);
-			verts[3].set(-hx,  hy);
-
-			const auto off_meters = si.get_meters(connection.shape_offset.pos);
-			const auto total_rotation = additional_rotation + connection.shape_offset.rotation;
-
-			for (auto& v : verts) {
-				v.rotate(total_rotation);
-				v += off_meters;
-			}
-
-			b2PolygonShape ps;
-			ps.Set(verts.data(), verts.size());
-
-			fixdef.shape = &ps;
-			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
-
-			new_fix->index_in_component = 0;
-
-			constructed_fixtures.emplace_back(new_fix);
+			from_box(handle.get_logical_size(), additional_rotation);
 		}
 
 		return;
+	}
+
+	if (handle.template has<invariants::area_marker>()) {
+		if (const auto geo = handle.template find<components::overridden_geo>()) {
+			auto& s = geo.get();
+
+			if (s.is_enabled) {
+				from_box(s.value, 0.0f);
+				return;
+			}
+		}
 	}
 
 	LOG_NVPS(handle);

@@ -17,11 +17,10 @@ static auto standard_participation_bitset() {
 		C::CHARACTER,
 		C::CHARACTER_WEAPON,
 		C::LYING_ITEM,
-		C::GROUND,
+		C::CAR_FLOOR,
 		C::FLYING_BULLET,
 		C::FLYING_EXPLOSIVE,
 		C::FLYING_MELEE,
-		C::TRIGGER,
 		C::SHELL,
 		C::GLASS_OBSTACLE
 	);
@@ -81,7 +80,7 @@ namespace predefined_queries {
 			C::WALL,
 			C::CHARACTER,
 			C::LYING_ITEM,
-			C::GROUND,
+			C::CAR_FLOOR,
 			C::FLYING_BULLET,
 			C::FLYING_EXPLOSIVE,
 			C::FLYING_MELEE,
@@ -117,8 +116,8 @@ predefined_filters::predefined_filters() {
 	}
 	{
 
-		auto& out = filters[predefined_filter_type::GROUND];
-		out.categoryBits = make_flags(C::GROUND);
+		auto& out = filters[predefined_filter_type::CAR_FLOOR];
+		out.categoryBits = make_flags(C::CAR_FLOOR);
 		out.maskBits = standard_participation_except(C::FLYING_EXPLOSIVE, C::FLYING_BULLET, C::FLYING_MELEE);
 	}
 	{
@@ -154,7 +153,7 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::SHELL];
 		out.categoryBits = make_flags(C::SHELL);
-		out.maskBits = standard_participation_except(C::FLYING_BULLET, C::FLYING_BULLET, C::FLYING_EXPLOSIVE, C::FLYING_MELEE, C::TRIGGER, C::CHARACTER_WEAPON);
+		out.maskBits = standard_participation_except(C::FLYING_BULLET, C::FLYING_BULLET, C::FLYING_EXPLOSIVE, C::FLYING_MELEE, C::CHARACTER_WEAPON);
 	}
 	{
 
@@ -167,6 +166,14 @@ predefined_filters::predefined_filters() {
 		auto& out = filters[predefined_filter_type::GLASS_OBSTACLE];
 		out.categoryBits = make_flags(C::GLASS_OBSTACLE);
 		out.maskBits = standard_participation();
+	}
+
+	{
+		auto& out = filters[predefined_filter_type::PORTAL];
+		out.categoryBits = make_flags(C::QUERY);
+
+		/* This is just a default that will be overridden by editor_filter_flags anyway. */
+		out.maskBits = standard_participation_except(C::CHARACTER_WEAPON, C::CAR_FLOOR);
 	}
 }
 

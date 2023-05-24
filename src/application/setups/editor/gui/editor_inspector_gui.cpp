@@ -319,8 +319,19 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Impulse when appearing") {
-				if (slider(label, property, 0.0f, 5000.0f)) { 
+			if (begins_with(label, "Linear impulse")) {
+				if (slider(label, property, 0.0f, 10000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("How strongly to push bodies that appear through this portal target.\nBodies will be pushed in the direction this spot is facing.");
+
+				return false;
+			}
+
+			if (begins_with(label, "Angular impulse")) {
+				if (slider(label, property, 0.0f, 2000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
@@ -654,10 +665,38 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 	}
 
 	if (type == point_marker_type::PORTAL_EXIT) {
-		MULTIPROPERTY("Impulse when appearing", as_portal_exit.impulse_on_exit);
-		MULTIPROPERTY("Preserve entry offset", as_portal_exit.preserve_entry_offset);
+		ImGui::Separator();
+		text_color("Character exit impulse", yellow);
+		ImGui::Separator();
 
-		tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how the body entered the portal.\n\nTick if you want to create a 'seamless' portal,\ni.e. when you want the player to not even notice that they just warped somewhere.");
+		text_disabled("How strong to push characters forward\nwhen they appear through this portal exit.");
+
+		MULTIPROPERTY("Linear impulse##CharLinear", as_portal_exit.exit_impulses.character_impulse.amount);
+
+		{
+			auto scope = scoped_indent();
+			MULTIPROPERTY("Mode##CharLinear", as_portal_exit.exit_impulses.character_impulse.mode);
+		}
+
+		ImGui::Separator();
+		text_color("Object exit impulse", yellow);
+		ImGui::Separator();
+
+		text_disabled("How strong to push all other objects forward\nwhen they appear through this portal exit.");
+
+		MULTIPROPERTY("Linear impulse##ObjLinear", as_portal_exit.exit_impulses.object_impulse.amount);
+
+		{
+			auto scope = scoped_indent();
+			MULTIPROPERTY("Mode##ObjLinear", as_portal_exit.exit_impulses.object_impulse.mode);
+		}
+
+		MULTIPROPERTY("Angular impulse##ObjAngular", as_portal_exit.exit_impulses.object_angular_impulse.amount);
+
+		{
+			auto scope = scoped_indent();
+			MULTIPROPERTY("Mode##ObjAngular", as_portal_exit.exit_impulses.object_angular_impulse.mode);
+		}
 	}
 
 	return result;
@@ -684,15 +723,21 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 	}
 
 	if (type == area_marker_type::PORTAL) {
-		MULTIPROPERTY("Seamless portal", as_portal.seamless_portal);
-		tooltip_on_hover("Tick to disable all delays, sounds, effects and impulses.\nThis will make the portal seamless - the subjects will instantly change positions.\nUseful if you want to teleport the player without them even knowing,\nfor creating some mind-bending labrinyths.");
+		MULTIPROPERTY("Quiet portal", as_portal.quiet_portal);
+		tooltip_on_hover("Convenience option to disable all delays, sounds and effects.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
-		MULTIPROPERTY("Entering time (ms)", as_portal.enter_time_ms);
-		//MULTIPROPERTY("Disappeared time (ms)", as_portal.travel_time_ms);
-		SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
-		//SOUND_EFFECT_LEAN_MULTIPROPERTY("Disappear sound", as_portal.disappear_sound);
-		SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
-		PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
+		MULTIPROPERTY("Exit preserves entry offset", as_portal.exit_preserves_entry_offset);
+
+		tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how the body entered the portal.\n\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.");
+
+		if (!insp.as_portal.quiet_portal) {
+			MULTIPROPERTY("Entering time (ms)", as_portal.enter_time_ms);
+			//MULTIPROPERTY("Disappeared time (ms)", as_portal.travel_time_ms);
+			SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
+			//SOUND_EFFECT_LEAN_MULTIPROPERTY("Disappear sound", as_portal.disappear_sound);
+			SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
+			PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
+		}
 
 		ImGui::Separator();
 		text_color("Reacts to", yellow);
@@ -703,6 +748,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		MULTIPROPERTY("Flying explosives", as_portal.reacts_to.flying_explosives);
 		MULTIPROPERTY("Flying melees", as_portal.reacts_to.flying_melees);
 		MULTIPROPERTY("Lying items", as_portal.reacts_to.lying_items);
+		MULTIPROPERTY("Shells", as_portal.reacts_to.shells);
 		MULTIPROPERTY("Obstacles", as_portal.reacts_to.obstacles);
 	}
 

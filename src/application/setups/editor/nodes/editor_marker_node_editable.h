@@ -2,6 +2,7 @@
 #include "application/setups/editor/resources/editor_particle_effect.h"
 #include "application/setups/editor/resources/editor_sound_effect.h"
 #include "application/setups/editor/nodes/editor_typed_node_id.h"
+#include "game/components/marker_component.h"
 
 struct editor_point_marker_node;
 
@@ -12,10 +13,13 @@ struct editor_filter_flags {
 	bool flying_explosives = false;
 	bool flying_melees = false;
 	bool lying_items = true;
+	bool shells = true;
 	bool obstacles = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_filter_flags& b) const = default;
+
+	uint16_t get_mask_bits() const;
 };
 
 struct editor_portal_info {
@@ -25,18 +29,22 @@ struct editor_portal_info {
 	float enter_time_ms = 1000.0f;
 	float travel_time_ms = 1000.0f;
 
+	editor_sound_effect begin_entering_sound;
+
 	editor_sound_effect enter_sound;
-	editor_sound_effect travel_sound;
 	editor_sound_effect exit_sound;
 
-	editor_particle_effect travel_particles;
+	editor_particle_effect begin_entering_particles;
+
+	editor_particle_effect enter_particles;
 	editor_particle_effect exit_particles;
 
 	editor_typed_node_id<editor_point_marker_node> portal_exit;
 
 	editor_filter_flags reacts_to;
 
-	bool seamless_portal = false;
+	bool quiet_portal = false;
+	bool exit_preserves_entry_offset = false;
 	// END GEN INTROSPECTOR
 };
 
@@ -44,8 +52,7 @@ struct editor_portal_exit_info {
 	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct editor_portal_exit_info
-	float impulse_on_exit = 1000.0f;
-	bool preserve_entry_offset = false;
+	portal_exit_impulses exit_impulses;
 	// END GEN INTROSPECTOR
 };
 

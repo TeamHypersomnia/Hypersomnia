@@ -1,5 +1,6 @@
 #pragma once
 #include "application/setups/editor/to_game_effect.hpp"
+#include "augs/misc/enum/enum_bitset.h"
 
 template <class T>
 void make_unselectable(T& agg) {
@@ -130,7 +131,9 @@ bool setup_entity_from_node(
 					auto& to = *portal;
 					const auto& from = editable.as_portal;
 
-					if (from.seamless_portal) {
+					to.exit_preserves_entry_offset = from.exit_preserves_entry_offset;
+
+					if (from.quiet_portal) {
 						to.enter_time_ms = 0.f;
 						to.travel_time_ms = 0.f;
 					}
@@ -138,19 +141,22 @@ bool setup_entity_from_node(
 						to.enter_time_ms = from.enter_time_ms;
 						to.travel_time_ms = from.travel_time_ms;
 
+						to.begin_entering_sound = to_game_effect(from.begin_entering_sound);
+
 						to.enter_sound = to_game_effect(from.enter_sound);
-						to.travel_sound = to_game_effect(from.travel_sound);
 						to.exit_sound = to_game_effect(from.exit_sound);
-						to.travel_particles = to_game_effect(from.travel_particles);
+
+						to.enter_particles = to_game_effect(from.enter_particles);
 						to.exit_particles = to_game_effect(from.exit_particles);
 					}
+
+					to.custom_filter = filters[predefined_filter_type::PORTAL];
+					to.custom_filter.maskBits = from.reacts_to.get_mask_bits(); 
 				}
 			}
 		}
 		else if constexpr(std::is_same_v<N, editor_point_marker_node>) {
-			auto portal_exit = marker.get_portal_exit();
-			portal_exit.impulse_on_exit = editable.as_portal_exit.impulse_on_exit;
-			portal_exit.preserve_entry_offset = editable.as_portal_exit.preserve_entry_offset;
+			marker.portal_exit = editable.as_portal_exit.exit_impulses;
 		}
 	}
 
@@ -237,4 +243,26 @@ inline real32 editor_light_falloff::calc_attenuation_mult_for_requested_radius()
 
 	const auto cutoff_alpha = strength;
 	return 255.f / (atten_at_edge * float(std::max(rgba_channel(1), cutoff_alpha)));
+}
+
+inline uint16_t editor_filter_flags::get_mask_bits() const {
+	using C = filter_category;
+
+	auto flags = augs::enum_bitset<C>();
+
+	auto set = [&flags](const bool f, const C c) {
+		if (f) {
+			flags.set(c);
+		}
+	};
+
+	set(characters, C::CHARACTER);
+	set(bullets, C::FLYING_BULLET);
+	set(flying_explosives, C::FLYING_EXPLOSIVE);
+	set(flying_melees, C::FLYING_MELEE);
+	set(lying_items, C::LYING_ITEM);
+	set(shells, C::SHELL);
+	set(obstacles, C::WALL);
+
+	return static_cast<uint16>(flags.to_ulong());
 }
