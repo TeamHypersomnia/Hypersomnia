@@ -265,7 +265,7 @@ void component_synchronizer<E, components::rigid_body>::apply(const impulse_inpu
 
 template <class E>
 void component_synchronizer<E, components::rigid_body>::apply_linear(const vec2 direction, const impulse_amount_def impulse) const {
-	if (impulse.amount == 0.0f) {
+	if (impulse.amount == 0.0f && impulse.mode != impulse_type::SET_VELOCITY) {
 		return;
 	}
 
@@ -290,7 +290,7 @@ void component_synchronizer<E, components::rigid_body>::apply_linear(const vec2 
 
 template <class E>
 void component_synchronizer<E, components::rigid_body>::apply_angular(const impulse_amount_def impulse) const {
-	if (impulse.amount == 0.0f) {
+	if (impulse.amount == 0.0f && impulse.mode != impulse_type::SET_VELOCITY) {	
 		return;
 	}
 

@@ -209,6 +209,15 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					special.inside_portal.unset();
 
+					if (portal.after_exit_cooldown_ms > 0.0f) {
+						special.dropped_or_created_cooldown.set(
+							portal.after_exit_cooldown_ms,
+							cosm.get_timestamp()
+						);
+
+						special.during_cooldown_ignore_collision_with = portal_handle.get_id();
+					}
+
 					propagate_teleport_state_to_children(typed_contacted_entity);
 
 					if (reinfer_colliders) {
@@ -223,6 +232,7 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 void portal_system::advance_portal_logic(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto dt = cosm.get_fixed_delta();
+	const auto& clk = cosm.get_clock();
 
 	thread_local std::vector<entity_id> to_refresh_colliders;
 	to_refresh_colliders.clear();
@@ -243,6 +253,10 @@ void portal_system::advance_portal_logic(const logic_step step) {
 
 			auto advance_portal_entering = [&](const auto typed_contacted_entity) {
 				auto& special = typed_contacted_entity.template get<components::rigid_body>().get_special();
+
+				if (special.dropped_or_created_cooldown.lasts(clk)) {
+					return;
+				}
 
 				auto enter_portal = [&]() {
 					if (portal_exit.alive()) {

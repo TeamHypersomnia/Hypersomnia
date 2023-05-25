@@ -33,6 +33,9 @@ struct editor_portal_info {
 
 	float enter_time_ms = 1000.0f;
 	float travel_time_ms = 1000.0f;
+	float after_exit_cooldown_ms = 200.0f;
+
+	editor_filter_flags reacts_to;
 
 	sentience_shake enter_shake = { 1000.0f, 1.0f };
 	sentience_shake exit_shake = { 1000.0f, 1.0f };
@@ -46,8 +49,6 @@ struct editor_portal_info {
 	editor_particle_effect exit_particles;
 
 	editor_typed_node_id<editor_point_marker_node> portal_exit;
-
-	editor_filter_flags reacts_to;
 	// END GEN INTROSPECTOR
 };
 

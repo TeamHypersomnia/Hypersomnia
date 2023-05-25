@@ -761,6 +761,8 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 
 			MULTIPROPERTY("Entering time (ms)", as_portal.enter_time_ms);
 			MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
+			MULTIPROPERTY("After exit cooldown (ms)", as_portal.after_exit_cooldown_ms);
+			tooltip_on_hover("Applies only to portals whose exit is inside/close to the portal itself.\nBy default, a freshly teleported object will ignore the the same portal for a split second,\nto prevent an infinite loop where it perpetually teleports and cannot get out.");
 
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Begin entering sound", as_portal.begin_entering_sound);
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);

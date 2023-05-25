@@ -33,6 +33,9 @@ summary: That which we are brainstorming at the moment.
             - The ToI impacts will be reported too this way because they always exist for at least a single step
 
 - portals todo
+    - ignore portal once teleported through it
+        - reuse dropped cooldown
+
     - snap interpolation
     - stop begin sound effect when quitting portal?
         - not sure if this makes sense tbh

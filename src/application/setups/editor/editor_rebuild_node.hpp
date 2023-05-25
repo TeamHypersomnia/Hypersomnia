@@ -132,6 +132,7 @@ bool setup_entity_from_node(
 					const auto& from = editable.as_portal;
 
 					to.exit_preserves_entry_offset = from.exit_preserves_entry_offset;
+					to.after_exit_cooldown_ms = from.after_exit_cooldown_ms;
 
 					if (from.quiet_portal) {
 						to.enter_time_ms = 0.f;
