@@ -64,6 +64,14 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	(void)in;
 
 	if constexpr(H::template has<invariants::sprite>()) {
+		float teleport_alpha = 1.0f;
+
+		if constexpr(H::template has<components::rigid_body>()) {
+			const auto& special = typed_handle.template get<components::rigid_body>().get_special();
+
+			teleport_alpha = 1.0f - std::clamp(special.teleport_progress, 0.0f, 1.0f);
+		}
+
 		const auto sprite = [&typed_handle]() {
 			auto result = typed_handle.template get<invariants::sprite>();
 
@@ -117,6 +125,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 				result.disable_special_effects = sprite_comp.disable_special_effects;
 			}
+
+			result.colorize.mult_alpha(teleport_alpha);
 
 			return result;
 		}();

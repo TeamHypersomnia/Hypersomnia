@@ -627,3 +627,6 @@ summary: Just a hidden scratchpad.
     - This way we'll be able to identify clients with one less bit
     - Well, it's actually aligned to a byte anyway when serializing so this won't have any effect on bandwidth
 
+- quiet portal should also set the preserve offset flag
+    - so we'll probably remove it from portal exit
+

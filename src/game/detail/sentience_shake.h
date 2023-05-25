@@ -21,14 +21,14 @@ struct sentience_shake_settings {
 
 struct sentience_shake {
 	// GEN INTROSPECTOR struct sentience_shake
+	real32 strength = 1.f;
 	real32 duration_ms = 0.f;
-	real32 mult = 1.f;
 	// END GEN INTROSPECTOR
 
 	static auto zero() {
 		sentience_shake out;
+		out.strength = 0.f;
 		out.duration_ms = 0.f;
-		out.mult = 0.f;
 		return out;
 	}
 
@@ -43,9 +43,11 @@ struct sentience_shake {
 	) const;
 
 	auto& operator*=(const real32 scalar) {
+		strength *= scalar;
 		duration_ms *= scalar;
-		mult *= scalar;
 
 		return *this;
 	}
+
+	bool operator==(const sentience_shake& b) const = default;
 };

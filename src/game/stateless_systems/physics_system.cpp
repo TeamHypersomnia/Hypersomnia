@@ -7,6 +7,7 @@
 #include "game/cosmos/for_each_entity.h"
 
 #include "game/stateless_systems/physics_system.h"
+#include "game/stateless_systems/portal_system.h"
 
 #define OVER_BODIES 0
 
@@ -63,6 +64,16 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 
 			special_physics& special = rigid_body.get_special();
 			special.teleport_progress -= special.teleport_progress_falloff_speed;
+
+			if (special.inside_portal.is_set()) {
+				if (special.teleport_progress >= 1.0f) {
+					portal_system().finalize_portal_exit(
+						step,
+						handle,
+						true
+					);
+				}
+			}
 		}
 	);
 #endif

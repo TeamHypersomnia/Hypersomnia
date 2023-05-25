@@ -6,7 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- We might want a nice enum like in Unity to decide if we want impulse/velocity change/velocity replace
+- Portal system
+    - Need a way to continuously update
+    - Begin/End contact initialize "progress"
+        - We can then either advance the teleportation progress from a flag/speed variable or from the contact list
+        - Problematically we have to also cool it down when we're outside of a portal
+        - The question being whether the reinference won't induce broken begin/end contact pairs
+        - Would be best to do the broad pass inside step_and_set_new_transforms already to avoid fetching all bodies twice
+        - The portal itself can just increase the progresses
+    - We should probably keep the updated subjects in either processing lists or cosmos global solvable
 
 - Possible bug related to reinference
     - Suppose BeginContact is posted due to a ToI bullet/portal collision
@@ -24,23 +32,22 @@ summary: That which we are brainstorming at the moment.
         - But I figure iterating existing contacts will do just as well 
             - The ToI impacts will be reported too this way because they always exist for at least a single step
 
-- quiet portal should also set the preserve offset flag
-    - so we'll probably remove it from portal exit
-
 - portals todo
+    - snap interpolation
+    - stop begin sound effect when quitting portal?
+        - not sure if this makes sense tbh
+            - begin sound should be short enough
+            - and we don't want to adjust logical length to sound length because we want easy customization of delays
+
+        - this will allow us to set one sound for both start and culmination  
+        - "continuous entering" sound effect can simply be implemented by adding another ambient sound with a small range
+    - force fields: cosm.for_each_having<components::rigid_body, invariants::area_marker>(
+
     - calc_filters from 
     - setup default effects
     - debug json serialize in parent
     - check how cache creates fixtures for it despite lack of sprite invariant
 
-- Portal system
-    - Need a way to continuously update
-    - Begin/End contact initialize "progress"
-        - We can then either advance the teleportation progress from a flag/speed variable or from the contact list
-        - Problematically we have to also cool it down when we're outside of a portal
-        - The question being whether the reinference won't induce broken begin/end contact pairs
-        - Would be best to do the broad pass inside step_and_set_new_transforms already to avoid fetching all bodies twice
-        - The portal itself can just increase the progresses
 
 
 - We need to rename all "specific_" to "typed_"

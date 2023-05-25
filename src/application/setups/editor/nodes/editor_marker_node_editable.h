@@ -4,6 +4,8 @@
 #include "application/setups/editor/nodes/editor_typed_node_id.h"
 #include "game/components/marker_component.h"
 
+#include "game/detail/sentience_shake.h"
+
 struct editor_point_marker_node;
 
 struct editor_filter_flags {
@@ -26,25 +28,26 @@ struct editor_portal_info {
 	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct editor_portal_info
+	bool quiet_portal = false;
+	bool exit_preserves_entry_offset = false;
+
 	float enter_time_ms = 1000.0f;
 	float travel_time_ms = 1000.0f;
 
-	editor_sound_effect begin_entering_sound;
+	sentience_shake enter_shake = { 1000.0f, 1.0f };
+	sentience_shake exit_shake = { 1000.0f, 1.0f };
 
+	editor_sound_effect begin_entering_sound;
 	editor_sound_effect enter_sound;
 	editor_sound_effect exit_sound;
 
 	editor_particle_effect begin_entering_particles;
-
 	editor_particle_effect enter_particles;
 	editor_particle_effect exit_particles;
 
 	editor_typed_node_id<editor_point_marker_node> portal_exit;
 
 	editor_filter_flags reacts_to;
-
-	bool quiet_portal = false;
-	bool exit_preserves_entry_offset = false;
 	// END GEN INTROSPECTOR
 };
 

@@ -100,6 +100,12 @@ auto calc_filters(const E& handle) {
 		return portal->custom_filter;
 	}
 
+	if (const auto rigid = handle.template find<components::rigid_body>()) {
+		if (rigid.get_special().inside_portal.is_set()) {
+			return filter_type();
+		}
+	}
+
 	return colliders_data.filter;
 }
 

@@ -6004,3 +6004,5 @@ This will discard your redo history."
     - We should have a "dependency resolution" pass once all entities are created and fully setup
         - this could be done even by the same logic that simply looks for reference counts
 
+- We might want a nice enum like in Unity to decide if we want impulse/velocity change/velocity replace
+

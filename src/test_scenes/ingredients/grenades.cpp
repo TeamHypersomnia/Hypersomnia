@@ -83,7 +83,7 @@ namespace test_flavours {
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 1900.f;
-			dmg.shake.mult = 1.2f;
+			dmg.shake.strength = 1.2f;
 
 			meta.set(explosive);
 		}
@@ -101,7 +101,7 @@ namespace test_flavours {
 			e.sound.modifier.reference_distance = 2000.f;
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 1500.f;
-			dmg.shake.mult = 1.4f;
+			dmg.shake.strength = 1.4f;
 			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
 			e.inner_ring_color = yellow;
 			e.outer_ring_color = orange;
@@ -163,7 +163,7 @@ namespace test_flavours {
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 2000.f;
-			dmg.shake.mult = 1.6f;
+			dmg.shake.strength = 1.6f;
 
 			{
 				auto e = in;
@@ -248,7 +248,7 @@ namespace test_flavours {
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 1400.f;
-			dmg.shake.mult = 0.9f;
+			dmg.shake.strength = 0.9f;
 
 			meta.set(explosive);
 		}
@@ -322,7 +322,7 @@ namespace test_flavours {
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 2500.f;
-			dmg.shake.mult = 1.4f;
+			dmg.shake.strength = 1.4f;
 
 			return in;
 		}();
@@ -581,7 +581,7 @@ namespace test_flavours {
 
 				dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 				dmg.shake.duration_ms = 2100.f;
-				dmg.shake.mult = 1.4f;
+				dmg.shake.strength = 1.4f;
 
 				explosive.explosion = in;
 

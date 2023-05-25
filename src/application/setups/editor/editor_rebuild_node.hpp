@@ -141,11 +141,14 @@ bool setup_entity_from_node(
 						to.enter_time_ms = from.enter_time_ms;
 						to.travel_time_ms = from.travel_time_ms;
 
-						to.begin_entering_sound = to_game_effect(from.begin_entering_sound);
+						to.enter_shake = from.enter_shake;
+						to.exit_shake = from.exit_shake;
 
+						to.begin_entering_sound = to_game_effect(from.begin_entering_sound);
 						to.enter_sound = to_game_effect(from.enter_sound);
 						to.exit_sound = to_game_effect(from.exit_sound);
 
+						to.begin_entering_particles = to_game_effect(from.begin_entering_particles);
 						to.enter_particles = to_game_effect(from.enter_particles);
 						to.exit_particles = to_game_effect(from.exit_particles);
 					}

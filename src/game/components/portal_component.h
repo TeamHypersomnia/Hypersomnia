@@ -10,6 +10,9 @@ namespace components {
 		float enter_time_ms = 1000.0f;
 		float travel_time_ms = 1000.0f;
 
+		sentience_shake enter_shake;
+		sentience_shake exit_shake;
+
 		b2Filter custom_filter;
 		bool exit_preserves_entry_offset = false;
 		pad_bytes<1> pad;
@@ -22,7 +25,12 @@ namespace components {
 		particle_effect_input enter_particles;
 		particle_effect_input exit_particles;
 
-		entity_id portal_exit;
+		signi_entity_id portal_exit;
 		// END GEN INTROSPECTOR
+
+		portal() {
+			/* Mark component as disabled by default */
+			custom_filter.maskBits = 0;
+		}
 	};
 }

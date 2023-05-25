@@ -6,7 +6,7 @@ void sentience_shake::apply(
 	const invariants::sentience& sentience_def,
 	components::sentience& sentience
 ) const {
-	if (augs::is_zero(mult)) {
+	if (augs::is_zero(strength)) {
 		return;
 	}
 
@@ -15,5 +15,5 @@ void sentience_shake::apply(
 	sentience.time_of_last_shake = now;
 
 	sentience.shake.duration_ms = std::clamp(duration_ms * s.duration_mult, sentience.shake.duration_ms, s.max_duration_ms);
-	//sentience.shake.mult = std::clamp(mult * s.mult, sentience.shake.mult, sentience_def.shake_settings.max_mult);
+	//sentience.shake.strength = std::clamp(strength * s.mult, sentience.shake.strength, sentience_def.shake_settings.max_mult);
 }

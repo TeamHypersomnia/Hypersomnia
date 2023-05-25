@@ -112,7 +112,7 @@ namespace test_flavours {
 					}
 
 					a.damage.base = int(27.f * weight_mult * dmg_mult);
-					a.damage.shake.mult *= 0.9f;
+					a.damage.shake.strength *= 0.9f;
 					a.damage.impact_impulse = 20.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 1700.f;
@@ -132,7 +132,7 @@ namespace test_flavours {
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
 					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
 					a.init_particles.modifier.color = color;
-					a.damage.shake.mult *= 1.15f;
+					a.damage.shake.strength *= 1.15f;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_SECONDARY_SMOKE);
 					a.wielder_impulse = 717.f;
 					a.wielder_inert_for_ms = 300.f * weight_mult;

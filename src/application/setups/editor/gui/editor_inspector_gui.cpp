@@ -330,6 +330,24 @@ bool edit_property(
 				return false;
 			}
 
+			if (ends_with(label, "shake strength")) {
+				if (slider(label, property, 0.0f, 3.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (ends_with(label, "shake duration (ms)")) {
+				if (slider(label, property, 0.0f, 3000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
 			if (begins_with(label, "Angular impulse")) {
 				if (slider(label, property, 0.0f, 2000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
@@ -731,11 +749,25 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how the body entered the portal.\n\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.");
 
 		if (!insp.as_portal.quiet_portal) {
+			MULTIPROPERTY("Enter shake strength", as_portal.enter_shake.strength);
+			tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully enter the portal.");
+			MULTIPROPERTY("Enter shake duration (ms)", as_portal.enter_shake.duration_ms);
+			tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully enter the portal.");
+
+			MULTIPROPERTY("Exit shake strength", as_portal.exit_shake.strength);
+			tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully exit the portal.");
+			MULTIPROPERTY("Exit shake duration (ms)", as_portal.exit_shake.duration_ms);
+			tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully exit the portal.");
+
 			MULTIPROPERTY("Entering time (ms)", as_portal.enter_time_ms);
-			//MULTIPROPERTY("Disappeared time (ms)", as_portal.travel_time_ms);
+			MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
+
+			SOUND_EFFECT_LEAN_MULTIPROPERTY("Begin entering sound", as_portal.begin_entering_sound);
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
-			//SOUND_EFFECT_LEAN_MULTIPROPERTY("Disappear sound", as_portal.disappear_sound);
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
+
+			PARTICLE_EFFECT_MULTIPROPERTY("Begin entering particles", as_portal.begin_entering_particles);
+			PARTICLE_EFFECT_MULTIPROPERTY("Enter particles", as_portal.enter_particles);
 			PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
 		}
 
