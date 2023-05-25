@@ -3,6 +3,13 @@
 #include "game/enums/faction_type.h"
 #include "augs/math/physics_structs.h"
 
+enum class marker_shape_type {
+	// GEN INTROSPECTOR enum class marker_shape_type
+	BOX,
+	CIRCLE
+	// END GEN INTROSPECTOR
+};
+
 namespace invariants {
 	struct point_marker {
 		static constexpr bool reinfer_when_tweaking = true;
@@ -39,6 +46,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::marker
 		faction_type faction = faction_type::METROPOLIS;
 		marker_letter_type letter = marker_letter_type::A;
+		marker_shape_type shape = marker_shape_type::BOX;
 
 		portal_exit_impulses portal_exit;
 		// END GEN INTROSPECTOR

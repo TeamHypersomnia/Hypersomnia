@@ -39,6 +39,8 @@ struct special_physics {
 	real32 teleport_progress = 0.0f;
 	real32 teleport_progress_falloff_speed = 0.0f;
 	signi_entity_id inside_portal;
+	vec2 saved_velocity;
+	real32 saved_angular_velocity = 0.f;
 #if TODO_CARS
 	signi_entity_id owner_friction_ground;
 	friction_connection_vector owner_friction_grounds = {};

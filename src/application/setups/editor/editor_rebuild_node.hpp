@@ -156,6 +156,10 @@ bool setup_entity_from_node(
 
 					to.custom_filter = filters[predefined_filter_type::PORTAL];
 					to.custom_filter.maskBits = from.reacts_to.get_mask_bits(); 
+
+					if (const auto marker = agg.template find<components::marker>()) {
+						marker->shape = marker_shape_type::CIRCLE;
+					}
 				}
 			}
 		}

@@ -42,7 +42,7 @@ namespace behaviours {
 				attitude.last_seen_target_position_inspected = true;
 			}
 			else {
-				movement.set_flags_from_closest_direction(pathfinding.get_current_navigation_point() - subject.get_logic_transform().pos);
+				movement.flags.set_from_closest_direction(pathfinding.get_current_navigation_point() - subject.get_logic_transform().pos);
 			}
 		}
 	}

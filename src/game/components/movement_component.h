@@ -74,6 +74,10 @@ struct movement_flags {
 	bool any_moving_requested() const {
 		return left || right || forward || backward;
 	}
+
+	vec2 get_force_requested_by_input(const vec2& axes) const;
+	void set_flags_from_target_direction(vec2 d);
+	void set_from_closest_direction(vec2 d);
 };
 
 namespace components {
@@ -98,9 +102,6 @@ namespace components {
 		// END GEN INTROSPECTOR
 
 		void reset_movement_flags();
-		vec2 get_force_requested_by_input(const vec2& axes) const;
-		void set_flags_from_target_direction(vec2 d);
-		void set_flags_from_closest_direction(vec2 d);
 	};
 }
 

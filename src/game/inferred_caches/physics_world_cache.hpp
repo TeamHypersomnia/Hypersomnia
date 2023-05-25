@@ -440,7 +440,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		constructed_fixtures.emplace_back(new_fix);
 	};
 
-	auto from_box = [&](vec2 size, const real32 additional_rotation) {
+	auto from_box_shape = [&](vec2 size, const real32 additional_rotation) {
 		size.x = std::max(1.f, size.x);
 		size.y = std::max(1.f, size.y);
 
@@ -523,19 +523,27 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 				return 0.f;
 			}();
 
-			from_box(handle.get_logical_size(), additional_rotation);
+			from_box_shape(handle.get_logical_size(), additional_rotation);
 		}
 
 		return;
 	}
 
 	if (handle.template has<invariants::area_marker>()) {
-		if (const auto geo = handle.template find<components::overridden_geo>()) {
-			auto& s = geo.get();
+		if (const auto marker = handle.template find<components::marker>()) {
+			if (const auto geo = handle.template find<components::overridden_geo>()) {
+				auto& s = geo.get();
 
-			if (s.is_enabled) {
-				from_box(s.value, 0.0f);
-				return;
+				if (s.is_enabled) {
+					if (marker->shape == marker_shape_type::BOX) {
+						from_box_shape(s.value, 0.0f);
+					}
+					else {
+						from_circle_shape(s.value.smaller_side());
+					}
+
+					return;
+				}
 			}
 		}
 	}

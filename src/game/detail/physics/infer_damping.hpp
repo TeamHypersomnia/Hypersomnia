@@ -39,7 +39,13 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 			damping.linear *= inertia_mult;
 		}
 
-		const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
+		auto flags = movement.flags;
+
+		if (typed_handle.is_frozen()) {
+			flags = {};
+		}
+
+		const auto requested_by_input = flags.get_force_requested_by_input(movement_def.input_acceleration_axes);
 
 		if (requested_by_input.is_nonzero()) {
 			if (movement.was_sprint_effective) {

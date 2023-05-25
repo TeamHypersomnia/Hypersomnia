@@ -42,7 +42,7 @@ namespace behaviours {
 			movement.reset_movement_flags();
 		}
 		else {
-			movement.set_flags_from_closest_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
+			movement.flags.set_from_closest_direction(t.get_goal<minimize_recoil_through_movement_goal>().movement_direction);
 		}
 	}
 }

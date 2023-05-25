@@ -53,6 +53,10 @@ struct basic_vec2 {
 		return std::max(x, y);
 	}
 
+	type smaller_side() const {
+		return std::min(x, y);
+	}
+
 	basic_vec2 get_sticking_offset(const rectangle_sticking mode) {
 		basic_vec2 res;
 		switch (mode) {

@@ -91,9 +91,22 @@ static void perform_enter_effects(const logic_step step, const H& typed_contacte
 	{
 		auto effect = portal.enter_sound;
 
+		auto start_input = sound_effect_start_input::fire_and_forget(contacted_entity_transform);
+
+		const bool is_instant_exit = portal.travel_time_ms <= 0.f;
+
+		if (!is_instant_exit) {
+			/* 
+				Set listener only if they have the chance to hear the sound.
+				Otherwise it's pointless as they will instantly appear elsewhere.
+			*/
+
+			start_input.set_listener(typed_contacted_entity);
+		}
+
 		effect.start(
 			step,
-			sound_effect_start_input::fire_and_forget(contacted_entity_transform).set_listener(typed_contacted_entity),
+			start_input,
 			predictability
 		);
 	}
@@ -107,7 +120,9 @@ static void perform_exit_effects(const logic_step step, const H& typed_contacted
 
 	do_shake(typed_contacted_entity, portal.exit_shake);
 
-	const auto predictability = predictable_only_by(typed_contacted_entity);
+	const bool is_instant_exit = portal.travel_time_ms <= 0.f;
+
+	const auto predictability = is_instant_exit ? predictable_only_by(typed_contacted_entity) : always_predictable_v;
 
 	{
 		auto effect = portal.exit_particles;
@@ -192,6 +207,8 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 					typed_contacted_entity.set_logic_transform(final_transform);
 					::snap_interpolated_to(typed_contacted_entity, final_transform);
 
+					rigid_body.restore_velocities();
+
 					const auto portal_exit_direction = portal_exit_transform->get_direction();
 
 					if (const bool is_sentient = typed_contacted_entity.template has<components::sentience>()) {
@@ -252,7 +269,8 @@ void portal_system::advance_portal_logic(const logic_step step) {
 			const auto rigid_body = typed_portal_handle.template get<components::rigid_body>();
 
 			auto advance_portal_entering = [&](const auto typed_contacted_entity) {
-				auto& special = typed_contacted_entity.template get<components::rigid_body>().get_special();
+				auto contacted_rigid = typed_contacted_entity.template get<components::rigid_body>();
+				auto& special = contacted_rigid.get_special();
 
 				if (special.dropped_or_created_cooldown.lasts(clk)) {
 					return;
@@ -273,6 +291,9 @@ void portal_system::advance_portal_logic(const logic_step step) {
 								special.teleport_progress_falloff_speed = -::calc_unit_progress_per_step(dt, portal.travel_time_ms);
 
 								special.inside_portal = typed_portal_handle.get_id();
+
+								contacted_rigid.backup_velocities();
+								contacted_rigid.set_velocity(vec2::zero);
 
 								return true;
 							}

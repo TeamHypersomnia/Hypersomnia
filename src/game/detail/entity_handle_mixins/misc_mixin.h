@@ -217,7 +217,22 @@ public:
 		const auto self = *static_cast<const E*>(this);
 
 		if (const auto movement = self.template find<components::movement>()) {
-			return movement->frozen;
+			if (movement->frozen) {
+				return true;
+			}
+		}
+
+		if (const auto rigid_body = self.template find<components::rigid_body>()) {
+			if (rigid_body.get_special().inside_portal.is_set()) {
+				return true;
+			}
+		}
+
+		if (const auto sentience = self.template find<components::sentience>()) {
+			if (!sentience->is_conscious()) {
+				// sentient_and_unconscious
+				return true;
+			}
 		}
 
 		return false;

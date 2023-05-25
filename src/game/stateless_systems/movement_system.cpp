@@ -66,27 +66,29 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 			it.subject,
 			[&](const auto subject) {
 				if (auto* const movement = subject.template find<components::movement>()) {
+					auto& flags = movement->flags;
+
 					switch (it.intent) {
 						case game_intent_type::MOVE_FORWARD:
-							movement->flags.forward = it.was_pressed();
+							flags.forward = it.was_pressed();
 							break;
 						case game_intent_type::MOVE_BACKWARD:
-							movement->flags.backward = it.was_pressed();
+							flags.backward = it.was_pressed();
 							break;
 						case game_intent_type::MOVE_LEFT:
-							movement->flags.left = it.was_pressed();
+							flags.left = it.was_pressed();
 							break;
 						case game_intent_type::MOVE_RIGHT:
-							movement->flags.right = it.was_pressed();
+							flags.right = it.was_pressed();
 							break;
 						case game_intent_type::WALK_SILENTLY:
-							movement->flags.walking = it.was_pressed();
+							flags.walking = it.was_pressed();
 							break;
 						case game_intent_type::SPRINT:
-							movement->flags.sprinting = it.was_pressed();
+							flags.sprinting = it.was_pressed();
 							break;
 						case game_intent_type::DASH:
-							movement->flags.dashing = it.was_pressed();
+							flags.dashing = it.was_pressed();
 							break;
 
 						default: break;
@@ -118,14 +120,15 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			components::sentience* const sentience = it.template find<components::sentience>();
 			const bool is_sentient = sentience != nullptr;
 
-			if (sentient_and_unconscious(it)) {
-				/* Behave as if all input was unset */
-				movement.reset_movement_flags();
+			auto considered_flags = movement.flags;
+
+			if (it.is_frozen()) {
+				considered_flags = {};
 			}
 
 			auto movement_force_mult = 1.f;
 
-			movement.was_sprint_effective = movement.flags.sprinting;
+			movement.was_sprint_effective = considered_flags.sprinting;
 
 			value_meter::damage_result cp_damage_by_sprint;
 
@@ -152,7 +155,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				return haste_type::NONE;
 			}();
 
-			const auto requested_by_input_aa = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
+			const auto requested_by_input_aa = considered_flags.get_force_requested_by_input(movement_def.input_acceleration_axes);
 			const bool non_zero_requested = requested_by_input_aa.is_nonzero();
 			const auto requested_by_input = [&]() {
 				if (!movement.keep_movement_forces_relative_to_crosshair) {
@@ -212,7 +215,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					movement_force_mult *= 1.3f;
 				}
 
-				if (movement.flags.dashing) {
+				if (considered_flags.dashing) {
 					if (::dash_conditions_fulfilled(it)) {
 						if (const auto crosshair_offset = it.find_crosshair_offset()) {
 							const auto cp_damage_by_dash = cp.calc_damage_result(
@@ -276,7 +279,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			};
 
 			const bool is_walking = !movement.was_sprint_effective && [&]() {
-				return movement.flags.walking;
+				return considered_flags.walking;
 			}();
 
 			movement.was_walk_effective = is_walking;

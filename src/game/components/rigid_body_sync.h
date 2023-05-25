@@ -85,6 +85,8 @@ public:
 	void set_velocity(const vec2) const;
 	void set_angular_velocity(const float) const;
 
+	void set_radian_velocity(const float) const;
+
 	void set_transform(const transformr&) const;
 	
 	template <class id_type>
@@ -144,6 +146,16 @@ public:
 	bool test_point(const vec2) const;
 
 	std::optional<ltrb> find_aabb() const;
+
+	void backup_velocities() const {
+		get_special().saved_velocity = get_velocity();
+		get_special().saved_angular_velocity = get_radian_velocity();
+	}
+
+	void restore_velocities() const {
+		set_velocity(get_special().saved_velocity);
+		set_radian_velocity(get_special().saved_angular_velocity);
+	}
 };
 
 template <class E>
@@ -228,8 +240,13 @@ void component_synchronizer<E, components::rigid_body>::set_velocity(const vec2 
 
 template <class E>
 void component_synchronizer<E, components::rigid_body>::set_angular_velocity(const float degrees) const {
+	set_radian_velocity(degrees * DEG_TO_RAD<float>);
+}
+
+template <class E>
+void component_synchronizer<E, components::rigid_body>::set_radian_velocity(const float radians) const {
 	auto& v = get_raw_component({}).angular_velocity;
-	v = DEG_TO_RAD<float> * degrees;
+	v = radians;
 
 	if (const auto body = find_body()) {
 		body->SetAngularVelocity(v);

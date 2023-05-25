@@ -60,6 +60,6 @@ namespace behaviours {
 			resultant_evasion += goal.dangers[i].recommended_evasion * goal.dangers[i].amount;
 		}
 
-		movement.set_flags_from_closest_direction(resultant_evasion);
+		movement.flags.set_from_closest_direction(resultant_evasion);
 	}
 }

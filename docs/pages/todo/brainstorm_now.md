@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- we really need to fix that angular/radian/degree nomenclature for velocities
+
 - Portal system
     - Need a way to continuously update
     - Begin/End contact initialize "progress"

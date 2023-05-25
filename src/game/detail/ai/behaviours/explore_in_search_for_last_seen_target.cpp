@@ -46,7 +46,7 @@ namespace behaviours {
 				ensure(false);
 			}
 			else {
-				movement.set_flags_from_closest_direction(pathfinding.get_current_navigation_point() - subject.get_logic_transform().pos);
+				movement.flags.set_from_closest_direction(pathfinding.get_current_navigation_point() - subject.get_logic_transform().pos);
 			}
 		}
 	}
