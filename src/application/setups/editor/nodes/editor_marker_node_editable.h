@@ -28,12 +28,14 @@ struct editor_portal_info {
 	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct editor_portal_info
-	bool quiet_portal = false;
-	bool exit_preserves_entry_offset = false;
+	bool quiet_entry = false;
+	bool quiet_exit = false;
+
+	bool preserve_entry_offset = false;
 
 	float enter_time_ms = 1000.0f;
 	float travel_time_ms = 1000.0f;
-	float after_exit_cooldown_ms = 200.0f;
+	float exit_cooldown_ms = 200.0f;
 
 	editor_filter_flags reacts_to;
 
@@ -49,13 +51,6 @@ struct editor_portal_info {
 	editor_particle_effect exit_particles;
 
 	editor_typed_node_id<editor_point_marker_node> portal_exit;
-	// END GEN INTROSPECTOR
-};
-
-struct editor_portal_exit_info {
-	static constexpr bool json_serialize_in_parent = true;
-
-	// GEN INTROSPECTOR struct editor_portal_exit_info
 	portal_exit_impulses exit_impulses;
 	// END GEN INTROSPECTOR
 };
@@ -67,8 +62,6 @@ struct editor_point_marker_node_editable {
 
 	vec2 pos;
 	real32 rotation = 0.0f;
-
-	editor_portal_exit_info as_portal_exit;
 	// END GEN INTROSPECTOR
 };
 

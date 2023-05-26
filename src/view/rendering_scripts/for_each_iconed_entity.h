@@ -42,6 +42,10 @@ struct marker_icon {
 			result.id = I::EDITOR_ICON_ORGANISM_AREA;
 			result.col = green;
 		}
+		else if (type == area_marker_type::PORTAL) {
+			result.id = I::EDITOR_ICON_PORTAL;
+			result.col = green;
+		}
 		else if (type == area_marker_type::CALLOUT) {
 			result.id = I::GUI_CURSOR_TEXT_INPUT;
 			result.col = white;

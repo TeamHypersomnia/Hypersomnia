@@ -56,6 +56,11 @@ struct impulse_amount_def {
 	// END GEN INTROSPECTOR
 
 	bool operator==(const impulse_amount_def& b) const = default;
+
+	void set_zero() {
+		amount = 0.0f;
+		mode = impulse_type::IMPULSE;
+	}
 };
 
 struct damping_input {

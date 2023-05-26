@@ -6,6 +6,34 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- For bidirectional portals, we will need to ignore the TARGET portal, not the SOURCE portal
+    - otherwise the infinite loop will still occur
+    - That's why we should just have a single Portal marker, and ditch PORTAL_EXIT completely
+    - Now there are three cases for the portal targets:
+        - Different portal: an ordinary portal. Target is ignored so the teleport is not triggered right away there.
+        - The same, source portal: portal behaves like a trampoline when it's entered. Can also denote a one-directional portal.
+        - Dead entity - the "invisibility gate" - will simply not teleport
+
+- portal finishing touches
+    - set/add character inertia (const/linear)
+    - convenience flag: trampoline_like that automatically sets delays to 0 and sets entry offset preservation to true
+    - cooldowns for sounds
+        - because shotgun pellets will spam them massively
+        - or just make a special case for shotgun pellets tbh
+            - like only the first of the 'series' spawns a sound
+            - solved: just ignore for shells/bullets/remnants altogether for now
+    - btw watch out if components::portal doesnt have any state that needs synchronization actually
+        - however sound cooldowns are only view related so they don't need to be
+    - setup default effect ids
+
+- FFA planning
+    - Lying weapons are unlimited
+        - They replace the ones currently in inventory
+        - It is the mode that determines lying weapon behavior
+        - Although if a map supports both defusal and ffa we'd like to remove the lying items on bomb defusal mode
+    - As a first iteration we can just set default equipment for resistance and metropolis and only let players choose there
+        - yeah lying "armory" items will be next mvp
+
 - we really need to fix that angular/radian/degree nomenclature for velocities
 
 - Portal system

@@ -5,6 +5,14 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Move these to cosmos global solvable:
+	real32 teleport_progress = 0.0f;
+	real32 teleport_progress_falloff_speed = 0.0f;
+	signi_entity_id inside_portal;
+	vec2 saved_velocity;
+	real32 saved_angular_velocity = 0.f;
+- Only hold a float for modified alpha inside rigid bodies
+
 - TIL Box2D uses ToI by default against static bodies.
 	- Maybe we could let mapper disable it for improved performance?
 	- Only glitch I could think of is grenades flying over thin walls

@@ -33,12 +33,16 @@ void do_shake(const H& typed_contacted_entity, const sentience_shake& shake_def)
 
 template <class H>
 static bool skip_portal_effects(const H& typed_contacted_entity) {
-	/* Skip all effects for shells to not spam overly */
-	return typed_contacted_entity.template has<components::remnant>();
+	/* Skip all effects for shells and bullets to avoid effect spam */
+
+	return 
+		typed_contacted_entity.template has<components::remnant>()
+		|| typed_contacted_entity.template has<components::missile>()
+	;
 }
 
 template <class H>
-static void perform_begin_entering_effects(const logic_step step, const H& typed_contacted_entity, const components::portal& portal) {
+static void play_begin_entering_effects(const logic_step step, const H& typed_contacted_entity, const components::portal& portal) {
 	if (skip_portal_effects(typed_contacted_entity)) {
 		return;
 	}
@@ -68,7 +72,7 @@ static void perform_begin_entering_effects(const logic_step step, const H& typed
 };
 
 template <class H>
-static void perform_enter_effects(const logic_step step, const H& typed_contacted_entity, const components::portal& portal) {
+static void play_enter_effects(const logic_step step, const H& typed_contacted_entity, const components::portal& portal) {
 	if (skip_portal_effects(typed_contacted_entity)) {
 		return;
 	}
@@ -113,7 +117,7 @@ static void perform_enter_effects(const logic_step step, const H& typed_contacte
 };
 
 template <class H>
-static void perform_exit_effects(const logic_step step, const H& typed_contacted_entity, const components::portal& portal) {
+static void play_exit_effects(const logic_step step, const H& typed_contacted_entity, const components::portal& portal) {
 	if (skip_portal_effects(typed_contacted_entity)) {
 		return;
 	}
@@ -185,15 +189,13 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 		if (portal_exit.alive()) {
 			if (const auto portal_exit_transform = portal_exit.find_logic_transform()) {
-				if (const auto portal_exit_marker = portal_exit.template find<components::marker>()) {
-					const auto e = portal_exit_marker->get_portal_exit();
-
+				if (const auto portal_exit_portal = portal_exit.template find<components::portal>()) {
 					auto final_transform = transformr { 
 						portal_exit_transform->pos,
 						contacted_entity_transform.rotation
 					};
 
-					if (portal.exit_preserves_entry_offset) {
+					if (portal.preserve_entry_offset) {
 						final_transform.pos += contacted_entity_transform.pos - portal_entry_transform.pos;
 					}
 
@@ -211,28 +213,32 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					const auto portal_exit_direction = portal_exit_transform->get_direction();
 
+					const auto impulses = portal_exit_portal->exit_impulses;
+
 					if (const bool is_sentient = typed_contacted_entity.template has<components::sentience>()) {
-						rigid_body.apply_linear(portal_exit_direction, e.character_impulse);
+						rigid_body.apply_linear(portal_exit_direction, impulses.character_exit_impulse);
 					}
 					else {
-						rigid_body.apply_linear(portal_exit_direction, e.object_impulse);
-						rigid_body.apply_angular(e.object_angular_impulse);
+						rigid_body.apply_linear(portal_exit_direction, impulses.object_exit_impulse);
+						rigid_body.apply_angular(impulses.object_exit_angular_impulse);
 					}
 
-					perform_exit_effects(step, typed_contacted_entity, portal);
+					play_exit_effects(step, typed_contacted_entity, *portal_exit_portal);
 
 					special.teleport_progress = 0.0f;
 					special.teleport_progress_falloff_speed = 0.0f;
 
 					special.inside_portal.unset();
 
-					if (portal.after_exit_cooldown_ms > 0.0f) {
+					const auto cooldown = portal_exit_portal->exit_cooldown_ms;
+
+					if (cooldown > 0.0f) {
 						special.dropped_or_created_cooldown.set(
-							portal.after_exit_cooldown_ms,
+							cooldown,
 							cosm.get_timestamp()
 						);
 
-						special.during_cooldown_ignore_collision_with = portal_handle.get_id();
+						special.during_cooldown_ignore_collision_with = portal_exit.get_id();
 					}
 
 					propagate_teleport_state_to_children(typed_contacted_entity);
@@ -280,7 +286,7 @@ void portal_system::advance_portal_logic(const logic_step step) {
 					if (portal_exit.alive()) {
 						if (const auto portal_exit_transform = portal_exit.find_logic_transform()) {
 							if (const auto portal_exit_marker = portal_exit.template find<components::marker>()) {
-								perform_enter_effects(step, typed_contacted_entity, portal);
+								play_enter_effects(step, typed_contacted_entity, portal);
 
 								/* 
 									Now it's the responsibility of physics_system to call back finalize_portal_exit,
@@ -312,7 +318,7 @@ void portal_system::advance_portal_logic(const logic_step step) {
 
 					if (special.teleport_progress <= 0.f) {
 						special.teleport_progress = progress_added;
-						perform_begin_entering_effects(step, typed_contacted_entity, portal);
+						play_begin_entering_effects(step, typed_contacted_entity, portal);
 					}
 					else {
 						special.teleport_progress += progress_added;

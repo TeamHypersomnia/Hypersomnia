@@ -9,24 +9,28 @@ namespace components {
 		// GEN INTROSPECTOR struct components::portal
 		float enter_time_ms = 1000.0f;
 		float travel_time_ms = 1000.0f;
-		float after_exit_cooldown_ms = 100.0f;
 
 		b2Filter custom_filter;
-		bool exit_preserves_entry_offset = false;
+		bool preserve_entry_offset = false;
 		pad_bytes<1> pad;
 
 		sentience_shake enter_shake;
-		sentience_shake exit_shake;
 
 		sound_effect_input begin_entering_sound;
 		sound_effect_input enter_sound;
-		sound_effect_input exit_sound;
 
 		particle_effect_input begin_entering_particles;
 		particle_effect_input enter_particles;
-		particle_effect_input exit_particles;
 
 		signi_entity_id portal_exit;
+
+		float exit_cooldown_ms = 100.0f;
+
+		sentience_shake exit_shake;
+		sound_effect_input exit_sound;
+		particle_effect_input exit_particles;
+
+		portal_exit_impulses exit_impulses;
 		// END GEN INTROSPECTOR
 
 		portal() {

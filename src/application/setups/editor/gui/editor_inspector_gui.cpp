@@ -359,13 +359,22 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Entering time (ms)") {
+			if (label == "Enter time (ms)") {
 				if (slider(label, property, 0.0f, 5000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
 
 				tooltip_on_hover("How much time you have to stay inside the portal\nin order to appear on the other side.");
+
+				return false;
+			}
+
+			if (label == "Exit cooldown (ms)") {
+				if (slider(label, property, 0.0f, 2000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
 
 				return false;
 			}
@@ -682,41 +691,6 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 		MULTIPROPERTY("Letter", letter);
 	}
 
-	if (type == point_marker_type::PORTAL_EXIT) {
-		ImGui::Separator();
-		text_color("Character exit impulse", yellow);
-		ImGui::Separator();
-
-		text_disabled("How strong to push characters forward\nwhen they appear through this portal exit.");
-
-		MULTIPROPERTY("Linear impulse##CharLinear", as_portal_exit.exit_impulses.character_impulse.amount);
-
-		{
-			auto scope = scoped_indent();
-			MULTIPROPERTY("Mode##CharLinear", as_portal_exit.exit_impulses.character_impulse.mode);
-		}
-
-		ImGui::Separator();
-		text_color("Object exit impulse", yellow);
-		ImGui::Separator();
-
-		text_disabled("How strong to push all other objects forward\nwhen they appear through this portal exit.");
-
-		MULTIPROPERTY("Linear impulse##ObjLinear", as_portal_exit.exit_impulses.object_impulse.amount);
-
-		{
-			auto scope = scoped_indent();
-			MULTIPROPERTY("Mode##ObjLinear", as_portal_exit.exit_impulses.object_impulse.mode);
-		}
-
-		MULTIPROPERTY("Angular impulse##ObjAngular", as_portal_exit.exit_impulses.object_angular_impulse.amount);
-
-		{
-			auto scope = scoped_indent();
-			MULTIPROPERTY("Mode##ObjAngular", as_portal_exit.exit_impulses.object_angular_impulse.mode);
-		}
-	}
-
 	return result;
 }
 
@@ -741,36 +715,31 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 	}
 
 	if (type == area_marker_type::PORTAL) {
-		MULTIPROPERTY("Quiet portal", as_portal.quiet_portal);
-		tooltip_on_hover("Convenience option to disable all delays, sounds and effects.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
+		ImGui::Separator();
+		text_color("AS ENTRY", cyan);
+		ImGui::Separator();
 
-		MULTIPROPERTY("Exit preserves entry offset", as_portal.exit_preserves_entry_offset);
+		MULTIPROPERTY("Quiet entry", as_portal.quiet_entry);
+		tooltip_on_hover("Convenience option to disable all delays, sounds and particles on entry.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
-		tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how the body entered the portal.\n\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.");
+		MULTIPROPERTY("Preserve entry offset", as_portal.preserve_entry_offset);
 
-		if (!insp.as_portal.quiet_portal) {
+		tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how far from the center did object enter the portal.\n\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.");
+
+		if (!insp.as_portal.quiet_entry) {
 			MULTIPROPERTY("Enter shake strength", as_portal.enter_shake.strength);
 			tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully enter the portal.");
 			MULTIPROPERTY("Enter shake duration (ms)", as_portal.enter_shake.duration_ms);
 			tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully enter the portal.");
 
-			MULTIPROPERTY("Exit shake strength", as_portal.exit_shake.strength);
-			tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully exit the portal.");
-			MULTIPROPERTY("Exit shake duration (ms)", as_portal.exit_shake.duration_ms);
-			tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully exit the portal.");
-
-			MULTIPROPERTY("Entering time (ms)", as_portal.enter_time_ms);
+			MULTIPROPERTY("Enter time (ms)", as_portal.enter_time_ms);
 			MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
-			MULTIPROPERTY("After exit cooldown (ms)", as_portal.after_exit_cooldown_ms);
-			tooltip_on_hover("Applies only to portals whose exit is inside/close to the portal itself.\nBy default, a freshly teleported object will ignore the the same portal for a split second,\nto prevent an infinite loop where it perpetually teleports and cannot get out.");
 
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Begin entering sound", as_portal.begin_entering_sound);
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
-			SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
 
 			PARTICLE_EFFECT_MULTIPROPERTY("Begin entering particles", as_portal.begin_entering_particles);
 			PARTICLE_EFFECT_MULTIPROPERTY("Enter particles", as_portal.enter_particles);
-			PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
 		}
 
 		ImGui::Separator();
@@ -784,6 +753,63 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		MULTIPROPERTY("Lying items", as_portal.reacts_to.lying_items);
 		MULTIPROPERTY("Shells", as_portal.reacts_to.shells);
 		MULTIPROPERTY("Obstacles", as_portal.reacts_to.obstacles);
+
+		ImGui::Separator();
+		text_color("AS EXIT", orange);
+		ImGui::Separator();
+
+		MULTIPROPERTY("Quiet exit", as_portal.quiet_exit);
+		tooltip_on_hover("Convenience option to disable all impulses, sounds and particles on exit.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
+
+		if (!insp.as_portal.quiet_exit) {
+			SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
+			PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
+
+			ImGui::Separator();
+			text_color("Character exit", yellow);
+			ImGui::Separator();
+
+			MULTIPROPERTY("Exit shake strength", as_portal.exit_shake.strength);
+			tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully exit the portal.");
+			MULTIPROPERTY("Exit shake duration (ms)", as_portal.exit_shake.duration_ms);
+			tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully exit the portal.");
+
+			text_disabled("How strong to push characters forward\nwhen they appear through this portal exit.");
+
+			MULTIPROPERTY("Linear impulse##CharLinear", as_portal.exit_impulses.character_exit_impulse.amount);
+
+			{
+				auto scope = scoped_indent();
+				MULTIPROPERTY("Mode##CharLinear", as_portal.exit_impulses.character_exit_impulse.mode);
+			}
+
+			ImGui::Separator();
+			text_color("Object exit", yellow);
+			ImGui::Separator();
+
+			text_disabled("How strong to push all other objects forward\nwhen they appear through this portal exit.");
+
+			MULTIPROPERTY("Linear impulse##ObjLinear", as_portal.exit_impulses.object_exit_impulse.amount);
+
+			{
+				auto scope = scoped_indent();
+				MULTIPROPERTY("Mode##ObjLinear", as_portal.exit_impulses.object_exit_impulse.mode);
+			}
+
+			MULTIPROPERTY("Angular impulse##ObjAngular", as_portal.exit_impulses.object_exit_angular_impulse.amount);
+
+			{
+				auto scope = scoped_indent();
+				MULTIPROPERTY("Mode##ObjAngular", as_portal.exit_impulses.object_exit_angular_impulse.mode);
+			}
+		}
+
+		ImGui::Separator();
+		text_disabled("Advanced");
+
+		MULTIPROPERTY("Exit cooldown (ms)", as_portal.exit_cooldown_ms);
+		tooltip_on_hover("Since the exit is a portal that can be entered too,\nwe need to ignore it for a split second,\nto prevent an infinite loop where an object perpetually teleports back and forth.");
+
 	}
 
 	return result;

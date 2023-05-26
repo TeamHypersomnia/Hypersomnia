@@ -15,9 +15,7 @@ enum class point_marker_type {
 	// GEN INTROSPECTOR enum class point_marker_type
 	TEAM_SPAWN,
 	FFA_SPAWN,
-	PLAYTESTING_SPAWN,
-
-	PORTAL_EXIT
+	PLAYTESTING_SPAWN
 	// END GEN INTROSPECTOR
 };
 

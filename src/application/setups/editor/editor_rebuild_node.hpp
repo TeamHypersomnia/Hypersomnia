@@ -131,10 +131,10 @@ bool setup_entity_from_node(
 					auto& to = *portal;
 					const auto& from = editable.as_portal;
 
-					to.exit_preserves_entry_offset = from.exit_preserves_entry_offset;
-					to.after_exit_cooldown_ms = from.after_exit_cooldown_ms;
+					to.preserve_entry_offset = from.preserve_entry_offset;
+					to.exit_cooldown_ms = from.exit_cooldown_ms;
 
-					if (from.quiet_portal) {
+					if (from.quiet_entry) {
 						to.enter_time_ms = 0.f;
 						to.travel_time_ms = 0.f;
 					}
@@ -143,15 +143,23 @@ bool setup_entity_from_node(
 						to.travel_time_ms = from.travel_time_ms;
 
 						to.enter_shake = from.enter_shake;
-						to.exit_shake = from.exit_shake;
 
 						to.begin_entering_sound = to_game_effect(from.begin_entering_sound);
 						to.enter_sound = to_game_effect(from.enter_sound);
-						to.exit_sound = to_game_effect(from.exit_sound);
 
 						to.begin_entering_particles = to_game_effect(from.begin_entering_particles);
 						to.enter_particles = to_game_effect(from.enter_particles);
+					}
+
+					if (from.quiet_exit) {
+						to.exit_impulses.set_zero();
+					}
+					else {
+						to.exit_impulses = editable.as_portal.exit_impulses;
+
+						to.exit_sound = to_game_effect(from.exit_sound);
 						to.exit_particles = to_game_effect(from.exit_particles);
+						to.exit_shake = from.exit_shake;
 					}
 
 					to.custom_filter = filters[predefined_filter_type::PORTAL];
@@ -164,7 +172,6 @@ bool setup_entity_from_node(
 			}
 		}
 		else if constexpr(std::is_same_v<N, editor_point_marker_node>) {
-			marker.portal_exit = editable.as_portal_exit.exit_impulses;
 		}
 	}
 
