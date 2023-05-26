@@ -17,6 +17,7 @@ summary: That which we are brainstorming at the moment.
 - portal finishing touches
     - set/add character inertia (const/linear)
     - convenience flag: trampoline_like that automatically sets delays to 0 and sets entry offset preservation to true
+        - sets portal target to itself
     - cooldowns for sounds
         - because shotgun pellets will spam them massively
         - or just make a special case for shotgun pellets tbh

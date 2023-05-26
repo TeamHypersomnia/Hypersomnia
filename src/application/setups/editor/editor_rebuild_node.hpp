@@ -162,6 +162,15 @@ bool setup_entity_from_node(
 						to.exit_shake = from.exit_shake;
 					}
 
+					if (from.trampoline_like) {
+						to.travel_time_ms = 0.f;
+						to.preserve_entry_offset = true;
+
+						to.enter_shake = sentience_shake::zero();
+						to.enter_sound = {};
+						to.enter_particles = {};
+					}
+
 					to.custom_filter = filters[predefined_filter_type::PORTAL];
 					to.custom_filter.maskBits = from.reacts_to.get_mask_bits(); 
 

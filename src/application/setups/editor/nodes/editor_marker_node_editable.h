@@ -31,6 +31,7 @@ struct editor_portal_info {
 	bool quiet_entry = false;
 	bool quiet_exit = false;
 
+	bool trampoline_like = false;
 	bool preserve_entry_offset = false;
 
 	float enter_time_ms = 1000.0f;

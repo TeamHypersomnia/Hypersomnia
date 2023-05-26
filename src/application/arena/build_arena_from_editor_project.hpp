@@ -377,7 +377,12 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							handle.dispatch(
 								[&](const auto& typed_handle) {
 									if (auto portal = typed_handle.template find<components::portal>()) {
-										portal->portal_exit = typed_resolve(typed_dependent.editable.as_portal.portal_exit);
+										if (typed_dependent.editable.as_portal.trampoline_like) {
+											portal->portal_exit = typed_handle.get_id();
+										}
+										else {
+											portal->portal_exit = typed_resolve(typed_dependent.editable.as_portal.portal_exit);
+										}
 									}
 								}
 							);

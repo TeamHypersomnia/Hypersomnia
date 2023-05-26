@@ -719,27 +719,51 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		text_color("AS ENTRY", cyan);
 		ImGui::Separator();
 
+		MULTIPROPERTY("Trampoline-like", as_portal.trampoline_like);
+		tooltip_on_hover("Convenience option to disable travel and set target to itself.\nThis will make the portal work like a trampoline -\nObjects will not be teleported, they will simply be pushed with a force,\nin accordance with AS EXIT parameters.");
+
+		const bool trampoline = insp.as_portal.trampoline_like;
+
+		if (!trampoline) {
+			MULTIPROPERTY("Portal exit", as_portal.portal_exit);
+			tooltip_on_hover("Where to teleport entering objects.\nCan only be another portal.\nIf you leave it empty, the character will just stay invisible and won't teleport anywhere.\nIf you set it to itself, the portal will behave like a trampoline.");
+		}
+
+		if (!trampoline) {
+			MULTIPROPERTY("Preserve entry offset", as_portal.preserve_entry_offset);
+
+			tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how far from the center did object enter the portal.\n\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.");
+		}
+
 		MULTIPROPERTY("Quiet entry", as_portal.quiet_entry);
 		tooltip_on_hover("Convenience option to disable all delays, sounds and particles on entry.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
-		MULTIPROPERTY("Preserve entry offset", as_portal.preserve_entry_offset);
-
-		tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how far from the center did object enter the portal.\n\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.");
 
 		if (!insp.as_portal.quiet_entry) {
-			MULTIPROPERTY("Enter shake strength", as_portal.enter_shake.strength);
-			tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully enter the portal.");
-			MULTIPROPERTY("Enter shake duration (ms)", as_portal.enter_shake.duration_ms);
-			tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully enter the portal.");
+			if (!trampoline) {
+				MULTIPROPERTY("Enter shake strength", as_portal.enter_shake.strength);
+				tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully enter the portal.");
+				MULTIPROPERTY("Enter shake duration (ms)", as_portal.enter_shake.duration_ms);
+				tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully enter the portal.");
+			}
 
 			MULTIPROPERTY("Enter time (ms)", as_portal.enter_time_ms);
-			MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
+
+			if (!trampoline) {
+				MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
+			}
 
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Begin entering sound", as_portal.begin_entering_sound);
-			SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
+
+			if (!trampoline) {
+				SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
+			}
 
 			PARTICLE_EFFECT_MULTIPROPERTY("Begin entering particles", as_portal.begin_entering_particles);
-			PARTICLE_EFFECT_MULTIPROPERTY("Enter particles", as_portal.enter_particles);
+
+			if (!trampoline) {
+				PARTICLE_EFFECT_MULTIPROPERTY("Enter particles", as_portal.enter_particles);
+			}
 		}
 
 		ImGui::Separator();

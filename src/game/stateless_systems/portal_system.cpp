@@ -49,6 +49,11 @@ static void play_begin_entering_effects(const logic_step step, const H& typed_co
 
 	const auto predictability = predictable_only_by(typed_contacted_entity);
 
+	const bool is_instant_entry = portal.enter_time_ms <= 0.f;
+
+	if (is_instant_entry) {
+		return;
+	}
 
 	{
 		auto effect = portal.begin_entering_particles;
