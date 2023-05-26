@@ -92,7 +92,7 @@ summary: That which we are brainstorming at the moment.
     - What would it take?
         - Node itself would need to hold the scene asset id
             - Perhaps make it optional and choose it when creating entity
-        - And we'd need to iterate over editor nodes
+        - And we'd need to iterate over editor nodes twice
     - This is good because this a) frees the network b) reduces solvable size c) moves resource creation code to one place
     - Our point of contention is that we have to redo the logic for filters and we'd have to hold filter data per marker entity
         - But if it's a portal it could be maybe justified

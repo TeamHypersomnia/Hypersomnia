@@ -660,6 +660,12 @@ namespace test_flavours {
 			white
 		);
 
+		flavour_with_particles(
+			test_particles_decorations::PORTAL_CIRCLE,
+			test_scene_particle_effect_id::PORTAL_CIRCLE,
+			white
+		);
+
 		{
 			auto& meta = flavour_with_particles(
 				test_particles_decorations::WANDERING_SMOKE,

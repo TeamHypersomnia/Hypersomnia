@@ -365,6 +365,8 @@ enum class test_particles_decorations {
 	EXHAUSTED_SMOKE,
 	DASH_SMOKE,
 
+	PORTAL_CIRCLE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

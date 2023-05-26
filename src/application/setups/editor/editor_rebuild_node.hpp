@@ -178,9 +178,11 @@ bool setup_entity_from_node(
 						marker->shape = marker_shape_type::CIRCLE;
 					}
 				}
+
+				if (const auto portal = agg.template find<components::continuous_particles>()) {
+
+				}
 			}
-		}
-		else if constexpr(std::is_same_v<N, editor_point_marker_node>) {
 		}
 	}
 
