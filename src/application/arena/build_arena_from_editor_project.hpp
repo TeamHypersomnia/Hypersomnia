@@ -10,6 +10,7 @@
 #include "test_scenes/test_scene_flavours.h"
 
 #include "application/arena/build_arena_from_editor_project.h"
+#include "application/setups/editor/detail/has_custom_scene_flavour_id.h"
 
 template <class A>
 void build_arena_from_editor_project(A arena_handle, const build_arena_input in) {
@@ -190,6 +191,28 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 	/* Create nodes */
 
+	{
+		auto setup_per_node_flavours = [&]<typename P>(const P& pool) {
+			using N = typename P::value_type;
+
+			if constexpr(has_custom_scene_flavour_id_v<N>) {
+				for (const auto& node : pool) {
+					if (auto resource = find_resource(node.resource_id)) {
+						::setup_per_node_flavour(
+							get_asset_id_of,
+							find_resource,
+							*resource,
+							node,
+							common
+						);
+					}
+				}
+			}
+		};
+
+		project.nodes.for_each(setup_per_node_flavours);
+	}
+
 	auto total_order = sorting_order_type(0);
 
 	thread_local std::vector<editor_node_id> nodes_dependent_on_nodes;
@@ -216,6 +239,16 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 				}
 
 				const auto resource = find_resource(typed_node.resource_id);
+
+				const auto scene_flavour_id = [&]() {
+					if constexpr(has_custom_scene_flavour_id_v<node_type>) {
+						if (typed_node.custom_scene_flavour_id.has_value()) {
+							return *typed_node.custom_scene_flavour_id;
+						}
+					}
+
+					return resource->scene_flavour_id;
+				}();
 
 				if (resource == nullptr) {
 					return;
@@ -262,7 +295,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							apply_layer_modifiers_on_special_entity(new_id);
 						},
 
-						resource->scene_flavour_id
+						scene_flavour_id
 					);
 				}
 				else if constexpr(is_one_of_v<node_type, editor_melee_node, editor_explosive_node>) {
@@ -277,7 +310,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							apply_layer_modifiers_on_special_entity(new_id);
 						},
 
-						resource->scene_flavour_id
+						scene_flavour_id
 					);
 				}
 				else if constexpr(std::is_same_v<node_type, editor_ammunition_node>) {
@@ -293,7 +326,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 							apply_layer_modifiers_on_special_entity(new_id);
 						},
 
-						resource->scene_flavour_id
+						scene_flavour_id
 					);
 				}
 				else {
@@ -339,7 +372,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 
 							setup_node_entity_mapping(new_handle.get_id());
 						},
-						resource->scene_flavour_id
+						scene_flavour_id
 					);
 				}
 			};

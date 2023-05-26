@@ -446,3 +446,58 @@ void setup_scene_object_from_resource(
 		static_assert(always_false_v<R>, "Non-exhaustive if constexpr");
 	}
 }
+
+template <class R, class N>
+void setup_per_node_flavour(
+	const R& resource,
+	const N& node,
+	cosmos_common_significant& common
+) {
+	const auto& editable = node.editable;
+
+	if constexpr(std::is_same_v<editor_area_marker_node, N>) {
+		if (resource.editable.type == area_marker_type::PORTAL) {
+			using entity_type = area_sensor;
+
+			auto& flavour_pool = common.flavours.get_for<entity_type>();
+			node.custom_scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
+
+		}
+	}
+}
+
+template <class A, class F, class R, class N>
+void setup_per_node_flavour(
+	A get_asset_id_of,
+	F find_resource,
+	const R& resource,
+	const N& node,
+	cosmos_common_significant& common
+) {
+	const auto& editable = node.editable;
+
+	auto to_game_effect = [&](const auto& in) {
+		return ::convert_to_game_effect(get_asset_id_of, find_resource, in);
+	};
+
+	if constexpr(std::is_same_v<editor_area_marker_node, N>) {
+		if (resource.editable.type == area_marker_type::PORTAL) {
+			using entity_type = area_sensor;
+
+			auto& flavour_pool = common.flavours.get_for<entity_type>();
+			auto allocated = flavour_pool.allocate();
+
+			node.custom_scene_flavour_id = typed_entity_flavour_id<entity_type>(allocated.key);
+
+			auto& scene = allocated.object;
+
+			if (const auto particles = scene.template find<invariants::continuous_particles>()) {
+				particles->effect_id = get_asset_id_of(editable.as_portal.ambience_particles.id);
+			}
+
+			if (auto sound = scene.template find<invariants::continuous_sound>()) {
+				sound->effect = to_game_effect(editable.as_portal.ambience_sound);
+			}
+		}
+	}
+}

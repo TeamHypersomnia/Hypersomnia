@@ -551,6 +551,8 @@ struct area_sensor {
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::area_marker,
+		invariants::continuous_particles,
+		invariants::continuous_sound,
 		invariants::interpolation
 	>;
 
@@ -559,7 +561,8 @@ struct area_sensor {
 		components::marker,
 		components::overridden_geo,
 		components::rigid_body,
-		components::portal
+		components::portal,
+		components::continuous_particles
 	>;
 
 	using synchronized_arrays = type_list<

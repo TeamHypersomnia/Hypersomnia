@@ -23,6 +23,8 @@ struct editor_area_marker_node : editor_node_base<
 	editor_area_marker_resource,
 	editor_area_marker_node_editable
 > {
+	mutable std::optional<decltype(resource_type::scene_flavour_id)> custom_scene_flavour_id;
+
 	auto get_transform() const {
 		return transformr(editable.pos, editable.rotation);
 	}

@@ -7,6 +7,7 @@ struct particle_effect_modifier {
 	rgba color = white;
 	real32 scale_amounts = 1.f;
 	real32 scale_lifetimes = 1.f;
+	real32 radius = 0.0f;
 	// END GEN INTROSPECTOR
 
 	void sanitize() {

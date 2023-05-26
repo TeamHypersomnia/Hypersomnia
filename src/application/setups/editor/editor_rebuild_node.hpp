@@ -178,10 +178,6 @@ bool setup_entity_from_node(
 						marker->shape = marker_shape_type::CIRCLE;
 					}
 				}
-
-				if (const auto portal = agg.template find<components::continuous_particles>()) {
-
-				}
 			}
 		}
 	}

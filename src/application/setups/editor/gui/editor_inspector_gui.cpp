@@ -113,6 +113,7 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 	PROPERTY(label, field.id);\
 	/* TODO: warmup_theme needs to be a sound_effect input for these to have any effect at all! */\
 	if (false && insp.field.id.is_set()) {\
+		auto here_id = scoped_id(label);\
 		auto indent = scoped_indent();\
 \
 		PROPERTY("Gain", field.gain);\
@@ -122,6 +123,7 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 #define SOUND_EFFECT_LEAN_MULTIPROPERTY(label, field) \
 	MULTIPROPERTY(label, field.id);\
 	if (insp.field.id.is_set()) {\
+		auto here_id = scoped_id(label);\
 		auto indent = scoped_indent();\
 \
 		MULTIPROPERTY("Gain", field.gain);\
@@ -136,6 +138,7 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 #define PARTICLE_EFFECT_MULTIPROPERTY(label, field) \
 	MULTIPROPERTY(label, field.id);\
 	if (insp.field.id.is_set()) {\
+		auto here_id = scoped_id(label);\
 		auto indent = scoped_indent();\
 		PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY(label, field);\
 	}
@@ -752,6 +755,9 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			if (!trampoline) {
 				MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
 			}
+
+			PARTICLE_EFFECT_MULTIPROPERTY("Ambience (particles)", as_portal.ambience_particles);
+			SOUND_EFFECT_LEAN_MULTIPROPERTY("Ambience (sound)", as_portal.ambience_sound);
 
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Begin entering sound", as_portal.begin_entering_sound);
 
@@ -1563,10 +1569,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 	text_disabled("Played when exposed to any damage,\ne.g. the surface is shot/knifed.");
 	SOUND_EFFECT_LEAN_MULTIPROPERTY("Damage sound", damage_sound);
 
-	{
-		auto scope = scoped_id("Damage particles");
-		PARTICLE_EFFECT_MULTIPROPERTY("Damage particles", damage_particles);
-	}
+	PARTICLE_EFFECT_MULTIPROPERTY("Damage particles", damage_particles);
 
 	if (auto scope = augs::imgui::scoped_tree_node_ex("Silence damager")) {
 		MULTIPROPERTY("Silence damager impact sound", silence_damager_impact_sound);
@@ -1604,10 +1607,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		}
 	}
 
-	{
-		auto scope = scoped_id("Particles (optional)");
-		PARTICLE_EFFECT_MULTIPROPERTY("Particles (optional)", default_collision.particles);
-	}
+	PARTICLE_EFFECT_MULTIPROPERTY("Particles (optional)", default_collision.particles);
 
 	MULTIPROPERTY("Silence opposite collision sound", default_collision.silence_opposite_collision_sound);
 	silence_opposite_collision_sound_tooltip();

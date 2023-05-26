@@ -40,8 +40,14 @@ struct editor_portal_info {
 
 	editor_filter_flags reacts_to;
 
+	rgba color_primary = cyan;
+	rgba color_secondary = turquoise;
+
 	sentience_shake enter_shake = { 1000.0f, 1.0f };
 	sentience_shake exit_shake = { 1000.0f, 1.0f };
+
+	editor_sound_effect ambience_sound;
+	editor_particle_effect ambience_particles;
 
 	editor_sound_effect begin_entering_sound;
 	editor_sound_effect enter_sound;
