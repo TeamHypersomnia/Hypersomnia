@@ -3,6 +3,7 @@
 #include "application/setups/editor/resources/editor_sound_effect.h"
 #include "application/setups/editor/nodes/editor_typed_node_id.h"
 #include "game/components/marker_component.h"
+#include "game/detail/view_input/continuous_rings_input.h"
 
 #include "game/detail/sentience_shake.h"
 
@@ -40,8 +41,9 @@ struct editor_portal_info {
 
 	editor_filter_flags reacts_to;
 
-	rgba color_primary = cyan;
-	rgba color_secondary = turquoise;
+	augs::maybe<continuous_rings_input> rings_effect = continuous_rings_input();
+	float highlight_size_mult = 2.05f;
+	rgba highlight_color = rgba(0, 255, 255, 150);
 
 	sentience_shake enter_shake = { 1000.0f, 1.0f };
 	sentience_shake exit_shake = { 1000.0f, 1.0f };
@@ -57,9 +59,13 @@ struct editor_portal_info {
 	editor_particle_effect enter_particles;
 	editor_particle_effect exit_particles;
 
-	editor_typed_node_id<editor_point_marker_node> portal_exit;
+	editor_typed_node_id<editor_area_marker_node> portal_exit;
 	portal_exit_impulses exit_impulses;
 	// END GEN INTROSPECTOR
+
+	editor_portal_info() {
+		ambience_particles.color = cyan;
+	}
 };
 
 struct editor_point_marker_node_editable {

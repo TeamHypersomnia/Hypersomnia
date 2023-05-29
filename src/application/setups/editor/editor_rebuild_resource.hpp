@@ -41,10 +41,7 @@ void allocate_flavours_and_assets_for_resource(
 	}
 	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
 		if (editable.type == area_marker_type::PORTAL) {
-			using entity_type = area_sensor;
 
-			auto& flavour_pool = common.flavours.get_for<entity_type>();
-			resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
 		}
 		else {
 			using entity_type = area_marker;
@@ -270,19 +267,6 @@ void setup_scene_object_from_resource(
 	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
 		auto& marker = scene.template get<invariants::area_marker>();
 		marker.type = resource.editable.type;
-
-		if (auto fixtures = scene.template find<invariants::fixtures>()) {
-			/*
-				It's an area sensor.
-			*/
-
-			fixtures->filter = filters[predefined_filter_type::PORTAL];
-			fixtures->disable_standard_collision_resolution = true;
-		}
-
-		if (auto rigid_body = scene.template find<invariants::rigid_body>()) {
-			rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
-		}
 	}
 	else if constexpr(std::is_same_v<editor_prefab_resource, R>) {
 		auto& marker = scene.template get<invariants::area_marker>();
@@ -447,25 +431,6 @@ void setup_scene_object_from_resource(
 	}
 }
 
-template <class R, class N>
-void setup_per_node_flavour(
-	const R& resource,
-	const N& node,
-	cosmos_common_significant& common
-) {
-	const auto& editable = node.editable;
-
-	if constexpr(std::is_same_v<editor_area_marker_node, N>) {
-		if (resource.editable.type == area_marker_type::PORTAL) {
-			using entity_type = area_sensor;
-
-			auto& flavour_pool = common.flavours.get_for<entity_type>();
-			node.custom_scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
-
-		}
-	}
-}
-
 template <class A, class F, class R, class N>
 void setup_per_node_flavour(
 	A get_asset_id_of,
@@ -497,6 +462,22 @@ void setup_per_node_flavour(
 
 			if (auto sound = scene.template find<invariants::continuous_sound>()) {
 				sound->effect = to_game_effect(editable.as_portal.ambience_sound);
+			}
+			
+			auto& marker = scene.template get<invariants::area_marker>();
+			marker.type = resource.editable.type;
+
+			if (auto fixtures = scene.template find<invariants::fixtures>()) {
+				/*
+					It's an area sensor.
+				*/
+
+				fixtures->filter = filters[predefined_filter_type::PORTAL];
+				fixtures->disable_standard_collision_resolution = true;
+			}
+
+			if (auto rigid_body = scene.template find<invariants::rigid_body>()) {
+				rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
 			}
 		}
 	}

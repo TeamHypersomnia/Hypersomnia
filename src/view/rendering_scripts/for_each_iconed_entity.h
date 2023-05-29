@@ -111,11 +111,17 @@ void for_each_iconed_entity(
 			else if constexpr(E::template has<invariants::area_marker>()) {
 				const auto m = marker_icon(typed_handle.template get<invariants::area_marker>(), marker, get_faction_color);
 
+				auto col = m.col;
+
+				if constexpr(E::template has<components::portal>()) {
+					col = typed_handle.template get<components::portal>().rings_effect.value.inner_color;
+				}
+
 				callback(
 					typed_handle,
 					m.id, 
 					typed_handle.get_logic_transform(),
-					m.col
+					col
 				);
 			}
 			else {

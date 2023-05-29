@@ -149,6 +149,91 @@ void exploding_ring_system::advance(
 	});
 }
 
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/for_each_entity.h"
+#include "game/cosmos/typed_entity_handle.h"
+#include "game/cosmos/entity_handle.h"
+
+void exploding_ring_system::draw_continuous_rings(
+	const cosmos& cosm,
+	const augs::drawer_with_default output,
+	augs::special_buffer& specials,
+	const camera_cone cone
+) const {
+	const auto& eye = cone.eye;
+
+	const auto queried_camera_aabb = cone.get_visible_world_rect_aabb();
+
+	const auto sane_default_ratio = 0.5f;
+
+	cosm.for_each_having<components::portal>(
+		[&](const auto& typed_portal_handle) {
+			const auto& portal = typed_portal_handle.template get<components::portal>();
+
+			if (!portal.rings_effect.is_enabled) {
+				return;
+			}
+
+			const auto& e = portal.rings_effect.value;
+
+			if (const auto aabb = typed_portal_handle.find_aabb()) {
+				if (!queried_camera_aabb.hover(*aabb)) {
+					return;
+				}
+			}
+
+			const auto passed = sane_default_ratio * global_time_seconds * e.effect_speed;
+
+			const auto radius = typed_portal_handle.get_logical_size().smaller_side() / 2;
+			const auto ring_center = typed_portal_handle.get_logic_transform().pos;
+
+			auto draw_rings_with = [&](
+				const auto inner_start,
+				const auto inner_end,
+				const auto outer_start,
+				const auto outer_end,
+				auto color,
+				const auto speed_mult,
+				const float min_alpha = 0.0f,
+				const float max_alpha = 0.8f
+			) {
+				const auto ratio = float(std::sin(2 * PI<float> * passed * speed_mult) + 1) / 2;
+
+				const auto inner_radius_now = augs::interp(inner_start, inner_end, ratio) / eye.zoom;
+				const auto outer_radius_now = augs::interp(outer_start, outer_end, ratio) / eye.zoom;
+
+				color.a = static_cast<rgba_channel>(color.a * std::clamp(1.f - ratio, min_alpha, max_alpha));
+
+				const auto aabb_size = vec2::square(outer_radius_now * 2 * eye.zoom);
+				const auto ring_ltrb = ltrbi::center_and_size(ring_center, aabb_size);
+
+				augs::special sp;
+
+				sp.v1 = cone.to_screen_space(ring_center);
+				sp.v1.y = cone.screen_size.y - sp.v1.y;
+
+				sp.v2.x = inner_radius_now * eye.zoom * eye.zoom;
+				sp.v2.y = outer_radius_now * eye.zoom * eye.zoom;
+
+				output.aabb(
+					ring_ltrb,
+					color
+				);
+
+				for (int s = 0; s < 6; ++s) {
+					specials.push_back(sp);
+				}
+			};
+
+			draw_rings_with(0.0f, radius/2.f, radius / 2, radius / 1.2f, e.inner_color, 1.0f, 0.05f );
+			draw_rings_with(0.0f, 0.0f, radius / 2, radius / 1.2f, e.inner_color, 0.4212f, 0.05f);
+
+			draw_rings_with(radius / 1.5f, radius / 2.0f, radius, radius / 1.2f, e.outer_color, 1.243f, 0.0f, 0.5f);
+			draw_rings_with(0.0f, radius/10.0f, radius, radius, e.outer_color, 1.0f, 0.3f, 0.6f);
+		}
+	);
+}
+
 void exploding_ring_system::draw_rings(
 	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
@@ -163,12 +248,12 @@ void exploding_ring_system::draw_rings(
 		const auto world_explosion_center = r.center;
 
 		const auto passed = global_time_seconds - e.time_of_occurence_seconds;
-		auto ratio = passed / r.maximum_duration_seconds;
+		const auto ratio = passed / r.maximum_duration_seconds;
 
 		const auto inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio) / eye.zoom;
 		const auto outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio) / eye.zoom;
 
-		const auto aabb_size = vec2::square(outer_radius_now * 2);
+		const auto aabb_size = vec2::square(outer_radius_now * 2 * eye.zoom);
 		const auto explosion_ltrb = ltrbi::center_and_size(world_explosion_center, aabb_size);
 
 		if (!queried_camera_aabb.hover(explosion_ltrb)) {
@@ -220,6 +305,46 @@ void exploding_ring_system::draw_rings(
 	}
 }
 
+void exploding_ring_system::draw_highlights_of_continuous_rings(
+	const cosmos& cosm,
+	const augs::drawer output,
+	const augs::atlas_entry highlight_tex,
+	const camera_cone cone
+) const {
+	const auto queried_camera_aabb = cone.get_visible_world_rect_aabb();
+
+	cosm.for_each_having<components::portal>(
+		[&](const auto& typed_portal_handle) {
+			const auto& portal = typed_portal_handle.template get<components::portal>();
+
+			const auto& e = portal;
+
+			if (e.highlight_size_mult == 0.0f) {
+				return;
+			}
+
+			if (const auto aabb = typed_portal_handle.find_aabb()) {
+				if (!queried_camera_aabb.hover(*aabb)) {
+					return;
+				}
+			}
+
+			const auto radius = e.highlight_size_mult * typed_portal_handle.get_logical_size().smaller_side() / 2;
+			const auto ring_center = typed_portal_handle.get_logic_transform().pos;
+
+			const auto aabb_size = vec2::square(radius * 2);
+			const auto highlight_ltrb = ltrbi::center_and_size(ring_center, aabb_size);
+			const auto highlight_col = e.highlight_color;
+
+			output.aabb(
+				highlight_tex,
+				highlight_ltrb,
+				highlight_col
+			);
+		}
+	);
+}
+
 void exploding_ring_system::draw_highlights_of_explosions(
 	const augs::drawer output,
 	const augs::atlas_entry highlight_tex,
@@ -229,7 +354,7 @@ void exploding_ring_system::draw_highlights_of_explosions(
 
 	for (const auto& r : rings) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
-		auto ratio = passed / (r.in.maximum_duration_seconds * 1.2);
+		const auto ratio = passed / (r.in.maximum_duration_seconds * 1.2);
 
 		const auto radius = std::max(r.in.outer_radius_end_value, r.in.outer_radius_start_value);
 		auto highlight_col = r.in.color;

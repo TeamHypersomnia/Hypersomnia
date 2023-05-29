@@ -152,6 +152,11 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 			else {
 				std::visit(
 					[&]<typename E>(const typed_entity_flavour_id<E>& typed_flavour_id) {
+						if (!typed_flavour_id.is_set()) {
+							/* Might be unset because nodes for this resource might have their own custom flavors */
+							return;
+						}
+
 						auto& flavour_pool = common.flavours.get_for<E>();
 						auto& flavour = flavour_pool.get(typed_flavour_id.raw);
 

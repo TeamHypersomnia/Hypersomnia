@@ -574,7 +574,7 @@ void particles_simulation_system::advance_visible_streams(
 		const auto infinitely = effect.start.stream_infinitely;
 
 		for (auto& instance : instances) {
-			const auto stream_alivity_mult = infinitely ? 1.f : instance.calc_alivity_mult();
+			const auto stream_alivity_mult = std::fmod(instance.calc_alivity_mult(), 1.0f);
 			const auto stream_delta = instance.advance_lifetime_get_dt(delta, infinitely);
 
 			if (!visible_in_camera) {
@@ -624,10 +624,15 @@ void particles_simulation_system::advance_visible_streams(
 				
 				const auto& emission = instance.source_emission;
 
-				if (
-					instance.randomize_spawn_point_within_circle_of_inner_radius > 0.f
-					|| instance.randomize_spawn_point_within_circle_of_outer_radius > 0.f
-				) {
+				auto considered_inner = instance.randomize_spawn_point_within_circle_of_inner_radius;
+				auto considered_outer = instance.randomize_spawn_point_within_circle_of_outer_radius;
+
+				if (modifier.radius != 0.0f) {
+					considered_inner = 0.0f;
+					considered_outer = modifier.radius;
+				}
+
+				if (considered_inner > 0.f || considered_outer > 0.f) {
 					const auto size_mult = augs::interp(
 						instance.starting_spawn_circle_size_multiplier,
 						instance.ending_spawn_circle_size_multiplier,
@@ -635,8 +640,8 @@ void particles_simulation_system::advance_visible_streams(
 					);
 					
 					final_particle_position += rng.random_point_in_ring(
-						size_mult * instance.randomize_spawn_point_within_circle_of_inner_radius,
-						size_mult * instance.randomize_spawn_point_within_circle_of_outer_radius
+						size_mult * considered_inner,
+						size_mult * considered_outer
 					);
 				}
 
@@ -752,6 +757,15 @@ void particles_simulation_system::advance_visible_streams(
 
 			if (const auto subject = cosm[it.first]) {
 				if (subject.get_name() != it.second.recorded.name) {
+					return true;
+				}
+
+				if (auto particles = subject.template find<invariants::continuous_particles>()) {
+					if (particles->effect_id != it.second.cache.original.input.id) {
+						return true;
+					}
+				}
+				else {
 					return true;
 				}
 			}

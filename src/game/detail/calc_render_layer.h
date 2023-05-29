@@ -54,6 +54,10 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 				return render_layer::CALLOUT_MARKERS;
 			}
 
+			if (m.type == area_marker_type::PORTAL) {
+				return render_layer::AREA_SENSORS;
+			}
+
 			return render_layer::AREA_MARKERS;
 		}
 		else if constexpr(H::template has<invariants::light>()) {

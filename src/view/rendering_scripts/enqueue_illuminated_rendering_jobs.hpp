@@ -555,7 +555,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto special_effects_job = [&exploding_rings, &dedicated, get_drawer_for, &thunders, queried_cone, get_line_drawer_for]() {
+	auto special_effects_job = [&cosm, &exploding_rings, &dedicated, get_drawer_for, &thunders, queried_cone, get_line_drawer_for]() {
 		{
 			thunders.draw_thunders(
 				get_line_drawer_for(D::THUNDERS),
@@ -565,6 +565,15 @@ void enqueue_illuminated_rendering_jobs(
 
 		{
 			exploding_rings.draw_rings(
+				get_drawer_for(D::EXPLODING_RINGS),
+				dedicated[D::EXPLODING_RINGS].specials,
+				queried_cone
+			);
+		}
+
+		{
+			exploding_rings.draw_continuous_rings(
+				cosm,
 				get_drawer_for(D::EXPLODING_RINGS),
 				dedicated[D::EXPLODING_RINGS].specials,
 				queried_cone

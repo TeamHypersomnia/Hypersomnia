@@ -115,6 +115,7 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 	if (false && insp.field.id.is_set()) {\
 		auto here_id = scoped_id(label);\
 		auto indent = scoped_indent();\
+		auto indent2 = scoped_indent();\
 \
 		PROPERTY("Gain", field.gain);\
 		PROPERTY("Pitch", field.pitch);\
@@ -125,6 +126,7 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 	if (insp.field.id.is_set()) {\
 		auto here_id = scoped_id(label);\
 		auto indent = scoped_indent();\
+		auto indent2 = scoped_indent();\
 \
 		MULTIPROPERTY("Gain", field.gain);\
 		MULTIPROPERTY("Pitch", field.pitch);\
@@ -140,6 +142,7 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 	if (insp.field.id.is_set()) {\
 		auto here_id = scoped_id(label);\
 		auto indent = scoped_indent();\
+		auto indent2 = scoped_indent();\
 		PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY(label, field);\
 	}
 
@@ -251,6 +254,25 @@ bool edit_property(
 				return false;
 			}
 
+			if (label == "Effect speed") {
+				if (slider(label, property, 0.0f, 10.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Highlight size mult") {
+				if (slider(label, property, 0.0f, 3.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+
 			if (label == "Gain" || label == "Pitch" || label == "Min pitch" || label == "Max pitch") {
 				if (slider(label, property, 0.0f, 10.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
@@ -284,7 +306,7 @@ bool edit_property(
 					return true;
 				}
 
-				tooltip_on_hover("Alter how long until particles disappear in this effect.");
+				tooltip_on_hover("How long until particles disappear in this effect.");
 
 				return false;
 			}
@@ -295,7 +317,7 @@ bool edit_property(
 					return true;
 				}
 
-				tooltip_on_hover("Alter the amount of particles in this effect.");
+				tooltip_on_hover("Scales the amount of particles in this effect.");
 
 				return false;
 			}
@@ -697,8 +719,7 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 	return result;
 }
 
-EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_marker_resource& resource) {
-	auto special_handler = default_widget_handler();
+EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_marker_resource& resource, const id_widget_handler& special_handler) {
 	using namespace augs::imgui;
 	bool last_result = false;
 	std::string result;
@@ -754,6 +775,29 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 
 			if (!trampoline) {
 				MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
+			}
+
+			MULTIPROPERTY("Highlight color", as_portal.highlight_color);
+			MULTIPROPERTY("Highlight size mult", as_portal.highlight_size_mult);
+
+			MULTIPROPERTY("Rings effect", as_portal.rings_effect.is_enabled);
+
+			if (last_result) {
+				if (insp.as_portal.rings_effect.is_enabled) {
+					result = "Enabled Rings effect in %x";
+				}
+				else {
+					result = "Disabled Rings effect in %x";
+				}
+			}
+
+			if (insp.as_portal.rings_effect.is_enabled) {
+				auto scope = scoped_indent();
+
+				MULTIPROPERTY("Effect speed", as_portal.rings_effect.value.effect_speed);
+
+				MULTIPROPERTY("Inner color", as_portal.rings_effect.value.inner_color);
+				MULTIPROPERTY("Outer color", as_portal.rings_effect.value.outer_color);
 			}
 
 			PARTICLE_EFFECT_MULTIPROPERTY("Ambience (particles)", as_portal.ambience_particles);
@@ -2319,7 +2363,12 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				const auto resource = in.setup.find_resource(node.resource_id);
 				ensure(resource != nullptr);
 
-				changed = perform_editable_gui(edited_copy, cmd.entries, *resource);
+				if constexpr(std::is_same_v<N, editor_area_marker_node>) {
+					changed = perform_editable_gui(edited_copy, cmd.entries, *resource, id_handler);
+				}
+				else {
+					changed = perform_editable_gui(edited_copy, cmd.entries, *resource);
+				}
 			}
 			else {
 				changed = perform_editable_gui(edited_copy, cmd.entries);

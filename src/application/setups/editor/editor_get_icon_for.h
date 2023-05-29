@@ -61,7 +61,7 @@ rgba editor_setup::get_icon_color_for(
 					icon = marker_icon::from_area(maybe_resource->editable, object.editable, get_faction_color);
 
 					if (maybe_resource->editable.type == area_marker_type::PORTAL) {
-						icon.col = object.editable.as_portal.color_primary;
+						icon.col = object.editable.as_portal.rings_effect.value.inner_color;
 					}
 				}
 
@@ -89,6 +89,18 @@ rgba editor_setup::get_icon_color_for(
 			return rgba(0, 0, 0, 0);
 		}
 	}
+	else if constexpr(std::is_same_v<T, editor_node_id>) {
+		auto icon_getter = [&](const auto& typed_resource, const auto) { 
+			return get_icon_color_for(typed_resource);
+		};
+
+		if (const auto result = on_node(object, icon_getter)) {
+			return *result;
+		}
+		else {
+			return rgba(0, 0, 0, 0);
+		}
+	}
 	else if constexpr(std::is_same_v<T, editor_sprite_resource>) {
 		return object.editable.color;
 	}
@@ -109,7 +121,11 @@ rgba editor_setup::get_icon_color_for(
 	}
 	else {
 		const auto sprite = std::visit(
-			[&](const auto& typed) {
+			[&](const auto& typed) -> const invariants::sprite* {
+				if (!typed.is_set()) {
+					return nullptr;
+				}
+
 				return scene.world.get_flavour(typed).template find<invariants::sprite>();
 			},
 

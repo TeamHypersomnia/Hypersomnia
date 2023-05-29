@@ -540,6 +540,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					cast_highlight,
 					queried_cone
 				);
+
+				exploding_rings.draw_highlights_of_continuous_rings(
+					cosm,
+					get_drawer(),
+					cast_highlight,
+					queried_cone
+				);
 			},
 			write_fow_to_stencil,
 			cone,

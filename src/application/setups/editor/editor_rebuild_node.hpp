@@ -137,8 +137,13 @@ bool setup_entity_from_node(
 					if (from.quiet_entry) {
 						to.enter_time_ms = 0.f;
 						to.travel_time_ms = 0.f;
+						to.highlight_size_mult = 0.0f;
 					}
 					else {
+						to.rings_effect = from.rings_effect;
+						to.highlight_size_mult = from.highlight_size_mult;
+						to.highlight_color = from.highlight_color;
+
 						to.enter_time_ms = from.enter_time_ms;
 						to.travel_time_ms = from.travel_time_ms;
 
@@ -176,6 +181,17 @@ bool setup_entity_from_node(
 
 					if (const auto marker = agg.template find<components::marker>()) {
 						marker->shape = marker_shape_type::CIRCLE;
+					}
+
+					if (const auto particles = agg.template find<components::continuous_particles>()) {
+						particles->modifier = static_cast<const particle_effect_modifier&>(editable.as_portal.ambience_particles);
+						particles->modifier.sanitize();
+
+						const auto radius = float(editable.size.smaller_side()) / 2;
+						const auto basic_radius = 128.0f;
+
+						particles->modifier.radius = radius;
+						particles->modifier.scale_amounts *= radius / basic_radius;
 					}
 				}
 			}
@@ -285,6 +301,8 @@ inline uint16_t editor_filter_flags::get_mask_bits() const {
 	set(lying_items, C::LYING_ITEM);
 	set(shells, C::SHELL);
 	set(obstacles, C::WALL);
+
+	flags.set(C::QUERY);
 
 	return static_cast<uint16>(flags.to_ulong());
 }

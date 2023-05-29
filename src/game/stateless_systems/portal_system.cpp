@@ -280,6 +280,11 @@ void portal_system::advance_portal_logic(const logic_step step) {
 			const auto rigid_body = typed_portal_handle.template get<components::rigid_body>();
 
 			auto advance_portal_entering = [&](const auto typed_contacted_entity) {
+				if (typed_contacted_entity.template has<components::portal>()) {
+					/* Don't teleport portals */
+					return;
+				}
+
 				auto contacted_rigid = typed_contacted_entity.template get<components::rigid_body>();
 				auto& special = contacted_rigid.get_special();
 

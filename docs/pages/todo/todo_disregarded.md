@@ -630,3 +630,22 @@ summary: Just a hidden scratchpad.
 - quiet portal should also set the preserve offset flag
     - so we'll probably remove it from portal exit
 
+
+- Possible bug related to reinference
+    - Suppose BeginContact is posted due to a ToI bullet/portal collision
+    - At this point the bullet has already flied past the portal
+        - But EndContact will only be reported the next simulation step
+    - Suppose complete reinference happens before the next step
+        - All contacts are destroyed.
+        - Will EndContact be triggered? Probably not.
+            - *might* actually be called by b2ContactManager::Destroy but really there's no need to keep flags depending
+            - we have enough state in contact lists, it's perfect for that
+    - Therefore we cannot rely on Begin/End contact to set a flag for whether to increment teleportation progress.
+    - For each portal, we need to iterate existing contacts.
+    - After reinference the contact will likely stop existing.
+    - The only thing BeginContact could really do is trigger quiet portals.
+        - But I figure iterating existing contacts will do just as well 
+            - The ToI impacts will be reported too this way because they always exist for at least a single step
+	- Disregarded: we won't rely on begins and ends
+		- we'll always iterate contact lists, for force fields as well
+		- We have to anyway because we have to apply forces continuously

@@ -539,7 +539,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 						from_box_shape(s.value, 0.0f);
 					}
 					else {
-						from_circle_shape(s.value.smaller_side());
+						const auto radius = s.value.smaller_side() / 2;
+						from_circle_shape(radius);
 					}
 
 					return;

@@ -33,7 +33,7 @@ class node_chooser : keyboard_acquiring_popup {
 	ImGuiTextFilter filter;
 
 public:
-	template <class F>
+	template <class F, class L>
 	bool perform(
 		const std::string& label, 
 		const std::string& current_source,
@@ -42,6 +42,7 @@ public:
 		const editor_icon_info_in icon_in,
 		const bool allow_none,
 		F on_choice,
+		L should_add,
 		const std::string none_label = "(None)",
 		const bool show_icon = true
 	) {
@@ -81,7 +82,9 @@ public:
 				sorted_nodes.clear();
 
 				auto adder_lbd = [&](const auto& id, const auto& node) {
-					sorted_nodes.push_back({ node.get_display_name(), id });
+					if (should_add(node)) {
+						sorted_nodes.push_back({ node.get_display_name(), id });
+					}
 				};
 
 				setup.template for_each_node<R>(adder_lbd);

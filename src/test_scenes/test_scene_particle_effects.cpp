@@ -4791,7 +4791,7 @@ void load_test_scene_particle_effects(
 				set_with_size(particle_definition,
 					to_image_id(test_scene_image_id::BLANK), 
 					vec2i(i % 2 + 1, i % 2 + 1), 
-					cyan
+					white
 				);
 
 				particle_definition.alpha_levels = 1;
@@ -4808,7 +4808,7 @@ void load_test_scene_particle_effects(
 				
 				set(particle_definition,
 				anim.frames[2].image_id, 
-				turquoise
+				rgba(255, 255, 255, 200)
 				);
 
 				particle_definition.alpha_levels = 1;
@@ -4823,6 +4823,8 @@ void load_test_scene_particle_effects(
 			em.should_particles_look_towards_velocity = false;
 			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
 			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(500.f, 500.f);
+			em.starting_spawn_circle_size_multiplier = float_range(1.f, 1.f);
+			em.ending_spawn_circle_size_multiplier = float_range(1.3f, 1.3f);
 
 			em.randomize_acceleration = true;
 
@@ -4851,7 +4853,7 @@ void load_test_scene_particle_effects(
 				particle_definition.animation.state.frame_num = i;
 				particle_definition.animation.speed_factor = 2.f;
 				particle_definition.animation.id = cast_blink_id;
-				particle_definition.color = cyan;
+				particle_definition.color = white;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -4861,7 +4863,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 0;
-				set(particle_definition, anim.frames[2].image_id, cyan);
+				set(particle_definition, anim.frames[2].image_id, white);
 				particle_definition.alpha_levels = 1;
 
 				em.add_particle_definition(particle_definition);
@@ -4876,7 +4878,7 @@ void load_test_scene_particle_effects(
 				set_with_size(particle_definition,
 					to_image_id(test_scene_image_id::BLANK), 
 					vec2i(1, 1),
-					cyan
+					white
 				);
 
 				em.add_particle_definition(particle_definition);
@@ -4888,6 +4890,8 @@ void load_test_scene_particle_effects(
 			em.should_particles_look_towards_velocity = false;
 			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
 			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(500.f, 500.f);
+			em.starting_spawn_circle_size_multiplier = float_range(1.f, 1.f);
+			em.ending_spawn_circle_size_multiplier = float_range(1.3f, 1.3f);
 
 			em.randomize_acceleration = true;
 

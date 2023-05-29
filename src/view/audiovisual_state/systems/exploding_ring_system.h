@@ -50,6 +50,20 @@ public:
 		const camera_cone cone
 	) const;
 
+	void draw_continuous_rings(
+		const cosmos& cosm,
+		const augs::drawer_with_default output,
+		augs::special_buffer& specials,
+		const camera_cone cone
+	) const;
+
+	void draw_highlights_of_continuous_rings(
+		const cosmos& cosm,
+		const augs::drawer output,
+		const augs::atlas_entry highlight_tex,
+		const camera_cone cone
+	) const;
+
 	void draw_highlights_of_explosions(
 		const augs::drawer output,
 		const augs::atlas_entry highlight_tex,

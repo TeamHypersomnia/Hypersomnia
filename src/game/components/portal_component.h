@@ -3,6 +3,7 @@
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "augs/misc/timing/stepped_timing.h"
+#include "game/detail/view_input/continuous_rings_input.h"
 
 namespace components {
 	struct portal {
@@ -31,6 +32,11 @@ namespace components {
 		particle_effect_input exit_particles;
 
 		portal_exit_impulses exit_impulses;
+
+		augs::maybe<continuous_rings_input> rings_effect;
+
+		float highlight_size_mult = 1.0f;
+		rgba highlight_color = white;
 		// END GEN INTROSPECTOR
 
 		portal() {

@@ -77,6 +77,7 @@ namespace predefined_queries {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
 		out.maskBits = make_flags(
+			C::QUERY,
 			C::WALL,
 			C::CHARACTER,
 			C::LYING_ITEM,

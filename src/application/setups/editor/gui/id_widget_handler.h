@@ -77,6 +77,15 @@ struct id_widget_handler {
 					modified = true;
 					property = chosen_id;
 				},
+				[&](const auto& node) { 
+					if (const auto resource = setup.find_resource(node.resource_id)) {
+						if (resource->editable.type == area_marker_type::PORTAL) {
+							return true;
+						}
+					}
+
+					return false;
+				},
 				none_label,
 				show_icon
 			);

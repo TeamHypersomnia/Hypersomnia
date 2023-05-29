@@ -6,26 +6,49 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- For bidirectional portals, we will need to ignore the TARGET portal, not the SOURCE portal
-    - otherwise the infinite loop will still occur
-    - That's why we should just have a single Portal marker, and ditch PORTAL_EXIT completely
-    - Now there are three cases for the portal targets:
-        - Different portal: an ordinary portal. Target is ignored so the teleport is not triggered right away there.
-        - The same, source portal: portal behaves like a trampoline when it's entered. Can also denote a one-directional portal.
-        - Dead entity - the "invisibility gate" - will simply not teleport
+- continiuous color rings
+    - Do we want it to be accessible outside of portal?
+        - i.e. as a "particle" effect?
+            - I don't think so.
+            - We need a struct for it anyway
+            - And let's encourage visual consistency, i.e. those rings are only for portals
+            - We need a struct for continuous ring info anyway
+                - and we can later reuse it for other things if need be like a force field
+                - or even particle decorations
+
 
 - portal finishing touches
     - set/add character inertia (const/linear)
-    - convenience flag: trampoline_like that automatically sets delays to 0 and sets entry offset preservation to true
-        - sets portal target to itself
-    - cooldowns for sounds
-        - because shotgun pellets will spam them massively
-        - or just make a special case for shotgun pellets tbh
-            - like only the first of the 'series' spawns a sound
-            - solved: just ignore for shells/bullets/remnants altogether for now
     - btw watch out if components::portal doesnt have any state that needs synchronization actually
         - however sound cooldowns are only view related so they don't need to be
     - setup default effect ids
+
+    - force fields: cosm.for_each_having<components::rigid_body, invariants::area_marker>(
+    - setup default effects
+
+    - done/disregarded
+        - ignore portal once teleported through it
+            - reuse dropped cooldown
+
+        - calc_filters from 
+        - debug json serialize in parent
+        - check how cache creates fixtures for it despite lack of sprite invariant
+        - convenience flag: trampoline_like that automatically sets delays to 0 and sets entry offset preservation to true
+            - sets portal target to itself
+        - cooldowns for sounds
+            - because shotgun pellets will spam them massively
+            - or just make a special case for shotgun pellets tbh
+                - like only the first of the 'series' spawns a sound
+                - solved: just ignore for shells/bullets/remnants altogether for now
+
+        - snap interpolation
+        - stop begin sound effect when quitting portal?
+            - not sure if this makes sense tbh
+                - begin sound should be short enough
+                - and we don't want to adjust logical length to sound length because we want easy customization of delays
+
+            - this will allow us to set one sound for both start and culmination  
+            - "continuous entering" sound effect can simply be implemented by adding another ambient sound with a small range
 
 - FFA planning
     - Lying weapons are unlimited
@@ -37,121 +60,7 @@ summary: That which we are brainstorming at the moment.
 
 - we really need to fix that angular/radian/degree nomenclature for velocities
 
-- Portal system
-    - Need a way to continuously update
-    - Begin/End contact initialize "progress"
-        - We can then either advance the teleportation progress from a flag/speed variable or from the contact list
-        - Problematically we have to also cool it down when we're outside of a portal
-        - The question being whether the reinference won't induce broken begin/end contact pairs
-        - Would be best to do the broad pass inside step_and_set_new_transforms already to avoid fetching all bodies twice
-        - The portal itself can just increase the progresses
-    - We should probably keep the updated subjects in either processing lists or cosmos global solvable
-
-- Possible bug related to reinference
-    - Suppose BeginContact is posted due to a ToI bullet/portal collision
-    - At this point the bullet has already flied past the portal
-        - But EndContact will only be reported the next simulation step
-    - Suppose complete reinference happens before the next step
-        - All contacts are destroyed.
-        - Will EndContact be triggered? Probably not.
-            - *might* actually be called by b2ContactManager::Destroy but really there's no need to keep flags depending
-            - we have enough state in contact lists, it's perfect for that
-    - Therefore we cannot rely on Begin/End contact to set a flag for whether to increment teleportation progress.
-    - For each portal, we need to iterate existing contacts.
-    - After reinference the contact will likely stop existing.
-    - The only thing BeginContact could really do is trigger quiet portals.
-        - But I figure iterating existing contacts will do just as well 
-            - The ToI impacts will be reported too this way because they always exist for at least a single step
-
-- portals todo
-    - ignore portal once teleported through it
-        - reuse dropped cooldown
-
-    - snap interpolation
-    - stop begin sound effect when quitting portal?
-        - not sure if this makes sense tbh
-            - begin sound should be short enough
-            - and we don't want to adjust logical length to sound length because we want easy customization of delays
-
-        - this will allow us to set one sound for both start and culmination  
-        - "continuous entering" sound effect can simply be implemented by adding another ambient sound with a small range
-    - force fields: cosm.for_each_having<components::rigid_body, invariants::area_marker>(
-
-    - calc_filters from 
-    - setup default effects
-    - debug json serialize in parent
-    - check how cache creates fixtures for it despite lack of sprite invariant
-
-
-
 - We need to rename all "specific_" to "typed_"
-
-- Would be best if we could create flavours per node
-    - For things like portals which we want to heavily customize per node
-        - all the while these parameters aren't modified by the solvable code
-    - What would it take?
-        - Node itself would need to hold the scene asset id
-            - Perhaps make it optional and choose it when creating entity
-        - And we'd need to iterate over editor nodes twice
-    - This is good because this a) frees the network b) reduces solvable size c) moves resource creation code to one place
-    - Our point of contention is that we have to redo the logic for filters and we'd have to hold filter data per marker entity
-        - But if it's a portal it could be maybe justified
-
-- Let's also decide straight away if we make a new entity type for portal
-    - Maybe it should just be a marker body and have some metadata, will be easiest one
-    - We won't avoid adding new entity types in the future
-    - It will have some state and perhaps some processing too so it can't be wrong
-    - Although perhaps no processing
-    - If we want teleportation delay, we certainly need some state per-physics body
-        - The completion %
-        - Also iterate contacts instead of holding a set of currently affected entities
-    - But the only alternatives would be holding some mapped state in solvable which sucks and slowly degenerates into how other games work
-
-- Making markers into physical sensors detecting bullets etc
-    - They need physical bodies
-    - Can't we make them plain_sprited_bodies?
-        - Just a different render layer
-        - To not have to write syncs etc
-            - The only problem would be with rendering it
-            - But maybe a layer will do
-
-- Physics observation
-    - Sensors don't work with Time of Impact apparently
-        - So we have to make portals not sensors but legit bodies that simply ignore all contacts and do not presolve
-    - BeginContact/EndContact are always posted (or can be posted) on separate steps
-        - Despite both actually happening at the same time
-
-- Portals are complicated enough that they shouldn't be implemented as on enter/on quit events
-    - Just another zone with its own parameters
-        - We could later allow circles as zones
-            - just "shape: circle" and then it will accept "radius". The "side" will be saved too if the shape is changed
-    - Yeah let's make it an area marker
-        - YES! Note that in the future, area marker shapes will be editable in-world
-            - Just like any other entity but area markers are probably the most obvious usecase for that functionality
-    - And let's have a portal_exit point marker
-        - Thought about an area but a better option is to have multiple portal targets and just shuffle them
-    - And let's have a stateless portal_system 
-    - Target Flag: spawn_relative_to_portal_center
-        - Yeah note every point might want its own set of flags like whether to apply velocity
-    - And have an area called Play sound too
-        - Having areas instead of on_enter events feels good as you can instantly see all events on scene
-        - The only downside is if you wanted an event area that moves 
-            - BUT later we'll be able to attach areas to moving entities (like we wanted e.g. lights)
-    - Also research cs2d events, i think there's something similar like conditional spawning and just special trigger areas?
-    - Also instead of spawn on exist have activate on x activated
-        - because otherwise we won't be able to have cyclical events like this door spawns when the other stops being active etc
-            - active implies spawned and destroyed implies inactive anyway
-            - Simple activity system
-                - It's not expected to be a bottleneck for now so let's not keep two pools, maybe several inactive entities per map
-                - Just skip it internally in the calls to cosm.for_each_having<...> etc, by a flag
-                - And it will have to be kept un-inferred from all physical systems and tonpos etc
-    - Btw we could hold event areas as separate entity types too
-        - Flavours would have all the vectors of events etc
-    - Since this is flexible we could for now have a portal system
-    - For portals though this could be just a plain sprited body with a flag or two
-        - or a complex_physical_body
-        - Note we can optimize later too
-    
 
 - remove update_official_content from debugger setup
 
