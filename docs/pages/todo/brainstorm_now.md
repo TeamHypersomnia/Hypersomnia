@@ -27,6 +27,8 @@ summary: That which we are brainstorming at the moment.
     - setup default effects
 
     - done/disregarded
+        - post a pure-color highlight on entry and exit
+
         - ignore portal once teleported through it
             - reuse dropped cooldown
 

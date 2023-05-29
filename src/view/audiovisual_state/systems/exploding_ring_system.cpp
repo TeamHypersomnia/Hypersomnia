@@ -319,7 +319,7 @@ void exploding_ring_system::draw_highlights_of_continuous_rings(
 
 			const auto& e = portal;
 
-			if (e.highlight_size_mult == 0.0f) {
+			if (e.light_size_mult == 0.0f) {
 				return;
 			}
 
@@ -329,12 +329,12 @@ void exploding_ring_system::draw_highlights_of_continuous_rings(
 				}
 			}
 
-			const auto radius = e.highlight_size_mult * typed_portal_handle.get_logical_size().smaller_side() / 2;
+			const auto radius = e.light_size_mult * typed_portal_handle.get_logical_size().smaller_side() / 2;
 			const auto ring_center = typed_portal_handle.get_logic_transform().pos;
 
 			const auto aabb_size = vec2::square(radius * 2);
 			const auto highlight_ltrb = ltrbi::center_and_size(ring_center, aabb_size);
-			const auto highlight_col = e.highlight_color;
+			const auto highlight_col = e.light_color;
 
 			output.aabb(
 				highlight_tex,

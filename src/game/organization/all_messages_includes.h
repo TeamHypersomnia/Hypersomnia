@@ -13,6 +13,7 @@
 #include "game/messages/performed_transfer_message.h"
 #include "game/messages/exhausted_cast_message.h"
 #include "game/messages/exploding_ring_effect.h"
+#include "game/messages/pure_color_highlight_message.h"
 #include "game/messages/thunder_effect.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/messages/changed_identities_message.h"

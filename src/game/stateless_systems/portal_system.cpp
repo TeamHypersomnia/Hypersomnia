@@ -7,6 +7,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/snap_interpolation_to_logical.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+#include "game/messages/pure_color_highlight_message.h"
 
 auto calc_unit_progress_per_step(const augs::delta& dt, const real32 time_ms) {
 	const auto seconds_to_complete = time_ms / 1000;
@@ -74,6 +75,15 @@ static void play_begin_entering_effects(const logic_step step, const H& typed_co
 			predictability
 		);
 	}
+
+	if (portal.begin_entering_highlight_ms != 0.0f) {
+		messages::pure_color_highlight h;
+		h.subject = typed_contacted_entity.get_id();
+		h.input.maximum_duration_seconds = portal.begin_entering_highlight_ms / 1000;
+		h.input.starting_alpha_ratio = 1.0f;
+		h.input.color = portal.rings_effect.value.inner_color;
+		step.post_message(h);
+	}
 };
 
 template <class H>
@@ -123,6 +133,17 @@ static void play_enter_effects(const logic_step step, const H& typed_contacted_e
 
 template <class H>
 static void play_exit_effects(const logic_step step, const H& typed_contacted_entity, const components::portal& portal) {
+	/* Always post pure color highlight even for small objects, no problem with that */
+
+	if (portal.begin_entering_highlight_ms != 0.0f) {
+		messages::pure_color_highlight h;
+		h.subject = typed_contacted_entity.get_id();
+		h.input.maximum_duration_seconds = portal.exit_highlight_ms / 1000;
+		h.input.starting_alpha_ratio = 1.0f;
+		h.input.color = portal.rings_effect.value.inner_color;
+		step.post_message(h);
+	}
+
 	if (skip_portal_effects(typed_contacted_entity)) {
 		return;
 	}

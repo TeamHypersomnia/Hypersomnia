@@ -15,6 +15,9 @@ namespace components {
 		bool preserve_entry_offset = false;
 		pad_bytes<1> pad;
 
+		float begin_entering_highlight_ms = 1000.0f;
+		float exit_highlight_ms = 220.0f;
+
 		sentience_shake enter_shake;
 
 		sound_effect_input begin_entering_sound;
@@ -35,8 +38,8 @@ namespace components {
 
 		augs::maybe<continuous_rings_input> rings_effect;
 
-		float highlight_size_mult = 1.0f;
-		rgba highlight_color = white;
+		float light_size_mult = 1.0f;
+		rgba light_color = white;
 		// END GEN INTROSPECTOR
 
 		portal() {

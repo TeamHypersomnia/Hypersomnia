@@ -137,15 +137,20 @@ bool setup_entity_from_node(
 					if (from.quiet_entry) {
 						to.enter_time_ms = 0.f;
 						to.travel_time_ms = 0.f;
-						to.highlight_size_mult = 0.0f;
+						to.light_size_mult = 0.0f;
+
+						to.begin_entering_highlight_ms = 0;
+						to.rings_effect.is_enabled = false;
 					}
 					else {
-						to.rings_effect = from.rings_effect;
-						to.highlight_size_mult = from.highlight_size_mult;
-						to.highlight_color = from.highlight_color;
-
 						to.enter_time_ms = from.enter_time_ms;
 						to.travel_time_ms = from.travel_time_ms;
+
+						to.light_size_mult = from.light_size_mult;
+						to.light_color = from.light_color;
+
+						to.begin_entering_highlight_ms = from.begin_entering_highlight_ms;
+						to.rings_effect = from.rings_effect;
 
 						to.enter_shake = from.enter_shake;
 
@@ -158,6 +163,7 @@ bool setup_entity_from_node(
 
 					if (from.quiet_exit) {
 						to.exit_impulses.set_zero();
+						to.exit_highlight_ms = 0.0f;
 					}
 					else {
 						to.exit_impulses = editable.as_portal.exit_impulses;
@@ -165,6 +171,7 @@ bool setup_entity_from_node(
 						to.exit_sound = to_game_effect(from.exit_sound);
 						to.exit_particles = to_game_effect(from.exit_particles);
 						to.exit_shake = from.exit_shake;
+						to.exit_highlight_ms = from.exit_highlight_ms;
 					}
 
 					if (from.trampoline_like) {

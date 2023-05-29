@@ -17,7 +17,7 @@ struct editor_filter_flags {
 	bool flying_melees = false;
 	bool lying_items = true;
 	bool shells = true;
-	bool obstacles = false;
+	bool obstacles = true;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_filter_flags& b) const = default;
@@ -41,9 +41,12 @@ struct editor_portal_info {
 
 	editor_filter_flags reacts_to;
 
+	float begin_entering_highlight_ms = 1000.0f;
+	float exit_highlight_ms = 220.0f;
+
 	augs::maybe<continuous_rings_input> rings_effect = continuous_rings_input();
-	float highlight_size_mult = 2.05f;
-	rgba highlight_color = rgba(0, 255, 255, 150);
+	float light_size_mult = 2.05f;
+	rgba light_color = rgba(0, 255, 255, 150);
 
 	sentience_shake enter_shake = { 1000.0f, 1.0f };
 	sentience_shake exit_shake = { 1000.0f, 1.0f };

@@ -7,6 +7,7 @@
 #include "view/viewables/all_viewables_declaration.h"
 #include "game/cosmos/entity_id.h"
 #include "game/components/transform_component.h"
+#include "game/messages/pure_color_highlight_message.h"
 #include "view/view_container_sizes.h"
 
 class cosmos;
@@ -22,11 +23,7 @@ struct draw_renderable_input;
 class pure_color_highlight_system {
 public:
 	struct highlight {
-		struct input {
-			float maximum_duration_seconds = 0.f;
-			float starting_alpha_ratio = 0.f;
-			rgba color = white;
-		} in;
+		pure_color_highlight_input in;
 		
 		double time_of_occurence_seconds = 0.0;
 	};
@@ -36,7 +33,7 @@ private:
 	std::unordered_map<entity_id, highlight> highlights;
 public:
 	
-	void add(entity_id, highlight::input);
+	void add(entity_id, pure_color_highlight_input);
 	void advance(const augs::delta dt);
 	
 	void draw_highlights(

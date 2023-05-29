@@ -586,7 +586,7 @@ void audiovisual_state::standard_post_solve(
 			if (augs::is_nonzero(h.damage.total())) {
 				const auto cols = color_info(h);
 
-				pure_color_highlight_system::highlight::input new_highlight;
+				pure_color_highlight_input new_highlight;
 
 				new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.damage.ratio_effective_to_maximum * 5);
 				new_highlight.maximum_duration_seconds = input.damage_indication.character_silhouette_damage_highlight_secs;

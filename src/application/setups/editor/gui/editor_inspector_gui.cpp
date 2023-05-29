@@ -373,6 +373,15 @@ bool edit_property(
 				return false;
 			}
 
+			if (ends_with(label, "highlight time (ms)")) {
+				if (slider(label, property, 0.0f, 3000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
 			if (begins_with(label, "Angular impulse")) {
 				if (slider(label, property, 0.0f, 2000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
@@ -777,8 +786,11 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 				MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
 			}
 
-			MULTIPROPERTY("Highlight color", as_portal.highlight_color);
-			MULTIPROPERTY("Highlight size mult", as_portal.highlight_size_mult);
+			MULTIPROPERTY("Begin entering highlight time (ms)", as_portal.begin_entering_highlight_ms);
+			tooltip_on_hover("Highlights any entered object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
+
+			MULTIPROPERTY("Light color", as_portal.light_color);
+			MULTIPROPERTY("Light size mult", as_portal.light_size_mult);
 
 			MULTIPROPERTY("Rings effect", as_portal.rings_effect.is_enabled);
 
@@ -836,6 +848,9 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		tooltip_on_hover("Convenience option to disable all impulses, sounds and particles on exit.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
 		if (!insp.as_portal.quiet_exit) {
+			MULTIPROPERTY("Exit highlight time (ms)", as_portal.exit_highlight_ms);
+			tooltip_on_hover("Highlights any exiting object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
+
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
 			PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
 

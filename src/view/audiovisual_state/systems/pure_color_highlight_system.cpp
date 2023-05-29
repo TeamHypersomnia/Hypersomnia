@@ -19,7 +19,7 @@ void pure_color_highlight_system::clear() {
 	highlights.clear();
 }
 
-void pure_color_highlight_system::add(const entity_id target, const highlight::input new_in) {
+void pure_color_highlight_system::add(const entity_id target, const pure_color_highlight_input new_in) {
 	auto new_highlight = highlight();
 	new_highlight.in = new_in;
 	new_highlight.time_of_occurence_seconds = global_time_seconds;
