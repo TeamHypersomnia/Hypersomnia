@@ -456,12 +456,19 @@ void setup_per_node_flavour(
 
 			auto& scene = allocated.object;
 
+			const auto& from = editable.as_portal;
+
+			const auto radius = float(editable.size.smaller_side()) / 2;
+
 			if (const auto particles = scene.template find<invariants::continuous_particles>()) {
-				particles->effect_id = get_asset_id_of(editable.as_portal.ambience_particles.id);
+				particles->effect_id = get_asset_id_of(from.ambience_particles.id);
 			}
 
 			if (auto sound = scene.template find<invariants::continuous_sound>()) {
-				sound->effect = to_game_effect(editable.as_portal.ambience_sound);
+				sound->effect = to_game_effect(from.ambience_sound);
+				sound->effect.modifier.repetitions = -1;
+				sound->effect.modifier.max_distance = radius * from.ambience_sound_distance_mult;
+				sound->effect.modifier.reference_distance = sound->effect.modifier.max_distance / 1.5f;
 			}
 			
 			auto& marker = scene.template get<invariants::area_marker>();

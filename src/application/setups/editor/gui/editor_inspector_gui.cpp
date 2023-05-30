@@ -350,7 +350,7 @@ bool edit_property(
 					return true;
 				}
 
-				tooltip_on_hover("How strongly to push bodies that appear through this portal target.\nBodies will be pushed in the direction this spot is facing.");
+				tooltip_on_hover("How strongly to push bodies that appear through this portal.\nBodies will be pushed in the direction this spot is facing.");
 
 				return false;
 			}
@@ -388,7 +388,7 @@ bool edit_property(
 					return true;
 				}
 
-				tooltip_on_hover("How strongly to push bodies that appear through this portal target.\nBodies will be pushed in the direction this spot is facing.");
+				tooltip_on_hover("How strongly to push bodies that appear through this portal.\nBodies will be pushed in the direction this spot is facing.");
 
 				return false;
 			}
@@ -400,6 +400,17 @@ bool edit_property(
 				}
 
 				tooltip_on_hover("How much time you have to stay inside the portal\nin order to appear on the other side.");
+
+				return false;
+			}
+
+			if (label == "Exit inertia duration (ms)") {
+				if (slider(label, property, 0.0f, 2000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("How long the character is \"airborne\" after exiting.\nWhen \"airborne\", the character moves very fast, the price being\nyou have less control over the movement direction.");
 
 				return false;
 			}
@@ -471,6 +482,19 @@ bool edit_property(
 				result = typesafe_sprintf("Switched %x to %x in %x", label, property);
 				return true;
 			}
+		}
+		else if constexpr(std::is_same_v<T, impulse_type>) {
+			if (enum_combo_constrained<
+				impulse_type, 
+				impulse_type::IMPULSE,
+				impulse_type::ADD_VELOCITY,
+				impulse_type::SET_VELOCITY
+			>(label, property)) { 
+				result = typesafe_sprintf("Switched %x to %x in %x", label, property);
+				return true;
+			}
+
+			tooltip_on_hover("Impulse: the lighter the object, the further it will fly.\n\nAdd velocity: all objects will be sped up by exactly the same amount\nregardless of their mass.\n\nSet velocity: the same as Add velocity, \nbut the object's velocity will be replaced rather than added to.\nThis means that the velocity with which the object entered does not matter.");
 		}
 		else {
 			if (enum_combo(label, property)) { 
@@ -815,6 +839,15 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			PARTICLE_EFFECT_MULTIPROPERTY("Ambience (particles)", as_portal.ambience_particles);
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Ambience (sound)", as_portal.ambience_sound);
 
+			if (insp.as_portal.ambience_sound.id.is_set()) {
+				auto scope = scoped_indent();
+				auto scope2 = scoped_indent();
+
+				MULTIPROPERTY("Ambience sound distance mult", as_portal.ambience_sound_distance_mult);
+
+				tooltip_on_hover("How far away the portal ambience will be heard.\n1.2 means it will only be heard within the 120%% of the portal radius\n(so basically only very close).");
+			}
+
 			SOUND_EFFECT_LEAN_MULTIPROPERTY("Begin entering sound", as_portal.begin_entering_sound);
 
 			if (!trampoline) {
@@ -858,12 +891,14 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			text_color("Character exit", yellow);
 			ImGui::Separator();
 
+			text_disabled("Forces to apply when a character appears\nthrough this portal exit.");
+
 			MULTIPROPERTY("Exit shake strength", as_portal.exit_shake.strength);
 			tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully exit the portal.");
 			MULTIPROPERTY("Exit shake duration (ms)", as_portal.exit_shake.duration_ms);
 			tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully exit the portal.");
 
-			text_disabled("How strong to push characters forward\nwhen they appear through this portal exit.");
+			MULTIPROPERTY("Exit inertia duration (ms)", as_portal.exit_impulses.character_exit_inertia_ms);
 
 			MULTIPROPERTY("Linear impulse##CharLinear", as_portal.exit_impulses.character_exit_impulse.amount);
 
@@ -876,7 +911,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			text_color("Object exit", yellow);
 			ImGui::Separator();
 
-			text_disabled("How strong to push all other objects forward\nwhen they appear through this portal exit.");
+			text_disabled("Forces to apply when any object appears\nthrough this portal exit.");
 
 			MULTIPROPERTY("Linear impulse##ObjLinear", as_portal.exit_impulses.object_exit_impulse.amount);
 

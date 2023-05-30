@@ -489,6 +489,38 @@ namespace test_flavours {
 			return meta;
 		};
 
+		make_loop(flavour_with_sound(
+			test_sound_decorations::PORTAL_AMBIENCE,
+			test_scene_sound_id::PORTAL_AMBIENCE,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1
+		));
+
+		flavour_with_sound(
+			test_sound_decorations::PORTAL_BEGIN_ENTERING,
+			test_scene_sound_id::PORTAL_BEGIN_ENTERING,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1
+		);
+
+		flavour_with_sound(
+			test_sound_decorations::PORTAL_ENTER,
+			test_scene_sound_id::PORTAL_ENTER,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1
+		);
+
+		flavour_with_sound(
+			test_sound_decorations::PORTAL_EXIT,
+			test_scene_sound_id::PORTAL_EXIT,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1
+		);
+
 		flavour_with_sound(
 			test_sound_decorations::FOOTSTEP_DIRT,
 			test_scene_sound_id::FOOTSTEP_DIRT,

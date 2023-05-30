@@ -52,6 +52,8 @@ struct editor_portal_info {
 	sentience_shake exit_shake = { 1000.0f, 1.0f };
 
 	editor_sound_effect ambience_sound;
+	float ambience_sound_distance_mult = 2.0f;
+
 	editor_particle_effect ambience_particles;
 
 	editor_sound_effect begin_entering_sound;

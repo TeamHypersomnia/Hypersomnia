@@ -243,6 +243,10 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					if (const bool is_sentient = typed_contacted_entity.template has<components::sentience>()) {
 						rigid_body.apply_linear(portal_exit_direction, impulses.character_exit_impulse);
+
+						if (const auto movement = typed_contacted_entity.template find<components::movement>()) {
+							movement->linear_inertia_ms += impulses.character_exit_inertia_ms;
+						}
 					}
 					else {
 						rigid_body.apply_linear(portal_exit_direction, impulses.object_exit_impulse);

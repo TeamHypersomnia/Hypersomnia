@@ -6093,3 +6093,14 @@ This will discard your redo history."
         - Note we can optimize later too
     
 
+- continiuous color rings
+    - Do we want it to be accessible outside of portal?
+        - i.e. as a "particle" effect?
+            - I don't think so.
+            - We need a struct for it anyway
+            - And let's encourage visual consistency, i.e. those rings are only for portals
+            - We need a struct for continuous ring info anyway
+                - and we can later reuse it for other things if need be like a force field
+                - or even particle decorations
+
+

@@ -6,18 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- continiuous color rings
-    - Do we want it to be accessible outside of portal?
-        - i.e. as a "particle" effect?
-            - I don't think so.
-            - We need a struct for it anyway
-            - And let's encourage visual consistency, i.e. those rings are only for portals
-            - We need a struct for continuous ring info anyway
-                - and we can later reuse it for other things if need be like a force field
-                - or even particle decorations
+- Billan crash
 
+- "Override map setting (not recommended)" for FOV
+    - And an optional FOV setting
 
 - portal finishing touches
+    - remove FORCE so that people don't set it wrongly there and get confused unnecessarily 
+        - think we should just have a separate editor_impulse_type without FORCE whatsoever
+        - the force field will *not* have all these options, they make no sense there
+            - Only the force amount and whether to scale with mass (Proportional to mass)
+            - Should be mass-invariant by default so not proportional, like everything moves there at the same speed
+            - Characters will need some continuous inertia probably (maybe by setting it with std::max between current and target?)
+                - certainly makes sense for characters to be more inert in the force field, will make for a nice surf experience
+    - and add some easy descriptions for impulse/add velocity etc since it's complex!
+
+    - several simple "color presets" could let us avoid the need to tweak a million color controls
+    - either remove bursts from the enum combos or automatically make them streams somehow
+
     - set/add character inertia (const/linear)
     - btw watch out if components::portal doesnt have any state that needs synchronization actually
         - however sound cooldowns are only view related so they don't need to be

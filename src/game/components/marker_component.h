@@ -32,13 +32,15 @@ struct portal_exit_impulses {
 	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct portal_exit_impulses
-	impulse_amount_def character_exit_impulse = { 5000.0f, impulse_type::ADD_VELOCITY };
+	float character_exit_inertia_ms = 1000.0f;
+	impulse_amount_def character_exit_impulse = { 2000.0f, impulse_type::ADD_VELOCITY };
 
-	impulse_amount_def object_exit_impulse = { 1000.0f, impulse_type::ADD_VELOCITY };
+	impulse_amount_def object_exit_impulse = { 2000.0f, impulse_type::ADD_VELOCITY };
 	impulse_amount_def object_exit_angular_impulse = { 1000.0f, impulse_type::IMPULSE };
 	// END GEN INTROSPECTOR
 
 	void set_zero() {
+		character_exit_inertia_ms = 0.0f;
 		character_exit_impulse.set_zero();
 		object_exit_impulse.set_zero();
 		object_exit_angular_impulse.set_zero();
