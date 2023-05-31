@@ -345,7 +345,7 @@ bool edit_property(
 			}
 
 			if (begins_with(label, "Linear impulse")) {
-				if (slider(label, property, 0.0f, 10000.0f)) { 
+				if (slider(label, property, 0.0f, 20000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
@@ -808,6 +808,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		tooltip_on_hover("Convenience option to disable all visuals, sounds and particles on entry.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
 		if (!insp.as_portal.disable_all_entry_effects) {
+			MULTIPROPERTY("Color preset", as_portal.color_preset);
 			MULTIPROPERTY("Auto scale pitches", as_portal.auto_scale_pitches);
 
 			tooltip_on_hover("When altering enter/travel time,\nautomatically scale pitch of entering/travelling sounds.\n\nE.g. if you set Enter time to 500ms,\nthe Begin entering sound will automatically have 2x the normal pitch.\nAnalogously with Travel time and Enter sound.");
@@ -879,6 +880,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		ImGui::Separator();
 
 		MULTIPROPERTY("Characters", as_portal.reacts_to.characters);
+		MULTIPROPERTY("Character weapons", as_portal.reacts_to.character_weapons);
 		MULTIPROPERTY("Bullets", as_portal.reacts_to.bullets);
 		MULTIPROPERTY("Flying explosives", as_portal.reacts_to.flying_explosives);
 		MULTIPROPERTY("Flying melees", as_portal.reacts_to.flying_melees);

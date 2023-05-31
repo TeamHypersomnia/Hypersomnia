@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- If we just 
+					if (ce->other->m_last_teleport_progress_timestamp == now) {
+						continue;
+					}
+    - then if two portals overlap (background one and a normal one)
+        - one can "steal" from the other
+    - on the other hand we need this counter to prevent contacts from re-beginning entering after teleporting (which only changes transform in physics_system but old contacts are still there)
+
 - Billan crash
 
 - "Override map setting (not recommended)" for FOV
@@ -15,6 +23,13 @@ summary: That which we are brainstorming at the moment.
     - fix decrease opacity math
 
     - several simple "color presets" could let us avoid the need to tweak a million color controls
+        - json wise we'd like to have just color_preset: CYAN/ORANGE/GREEN etc
+            - and only writeout the customized color fields
+            - however this will complicate our default setup flow as defaults will now depend on values
+            - but is there any other way?
+            - we'd like to let people just specify the color
+            - what if they just override the color settings?
+
     - We will reuse portals as force fields
         - The logic would be nearly identical so there's no point introducing another entity/node type
         - Force field will even be a useful effect for the portal as well
@@ -24,6 +39,9 @@ summary: That which we are brainstorming at the moment.
             - And just a flag whether it should pull proportional to mass
 
     - thrown melees get teleported faster?
+        - Was likely due to more amount of contacts for convex bodies.
+            - solved with m_last_teleport_progress_timestamp
+                - this also let us handle characters holding weapons
         - same with dropped items though
         - maybe they get processed twice due to attachments?
         - melee has no attachment tho

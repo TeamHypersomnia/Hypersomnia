@@ -315,6 +315,7 @@ inline uint16_t editor_filter_flags::get_mask_bits() const {
 	};
 
 	set(characters, C::CHARACTER);
+	set(character_weapons, C::CHARACTER_WEAPON);
 	set(bullets, C::FLYING_BULLET);
 	set(flying_explosives, C::FLYING_EXPLOSIVE);
 	set(flying_melees, C::FLYING_MELEE);

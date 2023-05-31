@@ -80,6 +80,12 @@ struct rgba {
 
 	void set(const rgba);
 
+	auto with_alpha(const rgba_channel new_a) const {
+		auto b = *this;
+		b.a = new_a;
+		return b;
+	}
+
 	rgba& mult_alpha(float);
 	rgba& multiply_rgb(float);
 	rgba& mult_brightness(float);

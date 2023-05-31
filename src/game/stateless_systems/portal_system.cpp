@@ -300,6 +300,7 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						}
 					}
 
+					rigid_body.body().m_last_teleport_progress_timestamp = cosm.get_total_steps_passed();
 					typed_contacted_entity.set_logic_transform(final_transform);
 					::snap_interpolated_to(typed_contacted_entity, final_transform);
 
@@ -336,6 +337,7 @@ void portal_system::advance_portal_logic(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto dt = cosm.get_fixed_delta();
 	const auto& clk = cosm.get_clock();
+	const auto now = cosm.get_total_steps_passed();
 
 	thread_local std::vector<entity_id> to_refresh_colliders;
 	to_refresh_colliders.clear();
@@ -357,13 +359,13 @@ void portal_system::advance_portal_logic(const logic_step step) {
 			auto advance_portal_entering = [&](const auto typed_contacted_entity) {
 				if (typed_contacted_entity.template has<components::portal>()) {
 					/* Don't teleport portals */
-					return;
+					return false;
 				}
 
 				if (portal.ignore_airborne_characters) {
 					if (auto movement = typed_contacted_entity.template find<components::movement>()) {
 						if (movement->const_inertia_ms > 0.0f || movement->linear_inertia_ms > 0.0f || movement->portal_inertia_ms > 0.0f) {
-							return;
+							return false;
 						}
 					}
 				}
@@ -373,7 +375,7 @@ void portal_system::advance_portal_logic(const logic_step step) {
 
 				if (special.dropped_or_created_cooldown.lasts(clk)) {
 					if (special.during_cooldown_ignore_collision_with == typed_portal_handle.get_id()) {
-						return;
+						return false;
 					}
 				}
 
@@ -451,6 +453,8 @@ void portal_system::advance_portal_logic(const logic_step step) {
 				*/
 
 				::propagate_teleport_state_to_children(typed_contacted_entity);
+
+				return true;
 			};
 
 			for (auto ce = rigid_body.get_contact_list(); ce != nullptr; ce = ce->next) {
@@ -476,7 +480,17 @@ void portal_system::advance_portal_logic(const logic_step step) {
 						continue;
 					}
 
-					contacted_entity.template dispatch_on_having_all<components::rigid_body>(advance_portal_entering);
+					if (ce->other->m_last_teleport_progress_timestamp == now) {
+						continue;
+					}
+
+					auto advance = [&](const auto typed_contacted_entity) {
+						if (advance_portal_entering(typed_contacted_entity)) {
+							ce->other->m_last_teleport_progress_timestamp = now;
+						}
+					};
+
+					contacted_entity.template dispatch_on_having_all<components::rigid_body>(advance);
 				}
 			}
 		}

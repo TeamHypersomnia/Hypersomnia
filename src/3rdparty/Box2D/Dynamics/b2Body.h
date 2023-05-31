@@ -454,6 +454,7 @@ public:
 	float32 m_sleepTime;
 
 	Userdata m_userData;
+	uint32_t m_last_teleport_progress_timestamp = 0;
 };
 
 inline b2BodyType b2Body::GetType() const

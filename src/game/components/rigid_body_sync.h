@@ -61,6 +61,7 @@ class component_synchronizer<E, components::rigid_body>
 
 	using base = synchronizer_base<E, components::rigid_body>;
 	using base::handle;
+	friend class portal_system;
 
 public:
 	using base::base;

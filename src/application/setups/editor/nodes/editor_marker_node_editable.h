@@ -5,6 +5,8 @@
 #include "game/components/marker_component.h"
 #include "game/detail/view_input/continuous_rings_input.h"
 
+#include "application/setups/editor/nodes/editor_color_preset.h"
+
 #include "game/detail/sentience_shake.h"
 #include "game/enums/portal_enums.h"
 
@@ -13,6 +15,7 @@ struct editor_point_marker_node;
 struct editor_filter_flags {
 	// GEN INTROSPECTOR struct editor_filter_flags
 	bool characters = true;
+	bool character_weapons = false;
 	bool bullets = false;
 	bool flying_explosives = false;
 	bool flying_melees = false;
@@ -32,6 +35,8 @@ struct editor_portal_info {
 	// GEN INTROSPECTOR struct editor_portal_info
 	bool disable_all_entry_effects = false;
 	bool disable_all_exit_effects = false;
+
+	editor_color_preset color_preset = editor_color_preset::CYAN;
 
 	bool auto_scale_pitches = true;
 	bool trampoline_like = false;

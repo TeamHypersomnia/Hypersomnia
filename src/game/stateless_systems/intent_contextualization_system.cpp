@@ -118,7 +118,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 		const auto subject = cosm[it.subject];
 
-		if (subject.is_frozen()) {
+		if (subject.is_frozen() && it.was_pressed()) {
 			continue;
 		}
 
