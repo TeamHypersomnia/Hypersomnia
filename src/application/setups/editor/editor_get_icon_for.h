@@ -61,7 +61,7 @@ rgba editor_setup::get_icon_color_for(
 					icon = marker_icon::from_area(maybe_resource->editable, object.editable, get_faction_color);
 
 					if (maybe_resource->editable.type == area_marker_type::PORTAL) {
-						icon.col = object.editable.as_portal.rings_effect.value.inner_color;
+						icon.col = object.editable.as_portal.get_icon_color();
 					}
 				}
 

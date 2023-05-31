@@ -146,6 +146,19 @@ if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
 		PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY(label, field);\
 	}
 
+#define PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY_NOCOLOR(label, field) \
+	MULTIPROPERTY("Scale amounts", field.scale_amounts);\
+	MULTIPROPERTY("Scale lifetimes", field.scale_lifetimes);
+
+#define PARTICLE_EFFECT_MULTIPROPERTY_NOCOLOR(label, field) \
+	MULTIPROPERTY(label, field.id);\
+	if (insp.field.id.is_set()) {\
+		auto here_id = scoped_id(label);\
+		auto indent = scoped_indent();\
+		auto indent2 = scoped_indent();\
+		PARTICLE_EFFECT_MODIFIER_MULTIPROPERTY_NOCOLOR(label, field);\
+	}
+
 #define MULTIPROPERTY_POSITION(field) \
 	MULTIPROPERTY("Position X", pos.x); \
 	MULTIPROPERTY("Position Y", pos.y);
@@ -752,6 +765,26 @@ EDIT_FUNCTION(editor_point_marker_node_editable& insp, T& es, const editor_point
 	return result;
 }
 
+rgba editor_portal_info::get_icon_color() const {
+	if (color_preset == editor_color_preset::CUSTOM) {
+		return rings_effect.value.inner_color;
+	}
+
+	return get_editor_color_preset(color_preset).portal.inner_ring;
+}
+
+void editor_portal_info::apply(const editor_color_preset preset) {
+	auto cols = get_editor_color_preset(preset).portal;
+
+	rings_effect.value.inner_color = cols.inner_ring;
+	rings_effect.value.outer_color = cols.outer_ring;
+	light_color = cols.light;
+	ambience_particles.color = cols.ambience_particles;
+	begin_entering_particles.color = cols.begin_entering_particles;
+	enter_particles.color = cols.enter_particles;
+	exit_particles.color = cols.exit_particles;
+}
+
 EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_marker_resource& resource, const id_widget_handler& special_handler) {
 	using namespace augs::imgui;
 	bool last_result = false;
@@ -779,6 +812,34 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 	}
 
 	if (type == area_marker_type::PORTAL) {
+		ImGui::ColorButton("##Cbutton", insp.as_portal.get_icon_color().operator ImVec4());
+
+		ImGui::SameLine();
+		MULTIPROPERTY("Color preset", as_portal.color_preset);
+
+		if (insp.as_portal.color_preset == editor_color_preset::CUSTOM) {
+			MULTIPROPERTY("Inner ring color", as_portal.rings_effect.value.inner_color);
+			MULTIPROPERTY("Outer ring color", as_portal.rings_effect.value.outer_color);
+
+			MULTIPROPERTY("Light color", as_portal.light_color);
+
+			if (insp.as_portal.ambience_particles.id.is_set()) {
+				MULTIPROPERTY("Ambience (particles)", as_portal.ambience_particles.color);
+			}
+
+			if (insp.as_portal.begin_entering_particles.id.is_set()) {
+				MULTIPROPERTY("Begin entering particles", as_portal.begin_entering_particles.color);
+			}
+
+			if (insp.as_portal.enter_particles.id.is_set()) {
+				MULTIPROPERTY("Enter particles", as_portal.enter_particles.color);
+			}
+
+			if (insp.as_portal.exit_particles.id.is_set()) {
+				MULTIPROPERTY("Exit particles", as_portal.exit_particles.color);
+			}
+		}
+
 		ImGui::Separator();
 		text_color("AS ENTRY", cyan);
 		ImGui::Separator();
@@ -808,19 +869,19 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		tooltip_on_hover("Convenience option to disable all visuals, sounds and particles on entry.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
 		if (!insp.as_portal.disable_all_entry_effects) {
-			MULTIPROPERTY("Color preset", as_portal.color_preset);
 			MULTIPROPERTY("Auto scale pitches", as_portal.auto_scale_pitches);
 
 			tooltip_on_hover("When altering enter/travel time,\nautomatically scale pitch of entering/travelling sounds.\n\nE.g. if you set Enter time to 500ms,\nthe Begin entering sound will automatically have 2x the normal pitch.\nAnalogously with Travel time and Enter sound.");
 
 			if (auto scope = augs::imgui::scoped_tree_node_ex("Visual effects")) {
+
 				MULTIPROPERTY("Begin entering highlight time (ms)", as_portal.begin_entering_highlight_ms);
 				tooltip_on_hover("Highlights any entered object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
 				MULTIPROPERTY("Decrease opacity to", as_portal.decrease_opacity_to);
 
 				tooltip_on_hover("As objects enter the portal, they will become \nless and less visible until they finally disappear.\n\nYou can control the target to which opacity is decreased.\nIf you want objects to become fully invisible before teleporting, set to 0.\nIf you want to disable this effect (to make the portal undetectible), set it to maximum: 255.");
 
-				MULTIPROPERTY("Light color", as_portal.light_color);
+				//MULTIPROPERTY("Light color", as_portal.light_color);
 				MULTIPROPERTY("Light size mult", as_portal.light_size_mult);
 
 				MULTIPROPERTY("Rings effect", as_portal.rings_effect.is_enabled);
@@ -839,15 +900,15 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 
 					MULTIPROPERTY("Effect speed", as_portal.rings_effect.value.effect_speed);
 
-					MULTIPROPERTY("Inner color", as_portal.rings_effect.value.inner_color);
-					MULTIPROPERTY("Outer color", as_portal.rings_effect.value.outer_color);
+					//MULTIPROPERTY("Inner color", as_portal.rings_effect.value.inner_color);
+					//MULTIPROPERTY("Outer color", as_portal.rings_effect.value.outer_color);
 				}
 
-				PARTICLE_EFFECT_MULTIPROPERTY("Ambience (particles)", as_portal.ambience_particles);
-				PARTICLE_EFFECT_MULTIPROPERTY("Begin entering particles", as_portal.begin_entering_particles);
+				PARTICLE_EFFECT_MULTIPROPERTY_NOCOLOR("Ambience (particles)", as_portal.ambience_particles);
+				PARTICLE_EFFECT_MULTIPROPERTY_NOCOLOR("Begin entering particles", as_portal.begin_entering_particles);
 
 				if (!trampoline) {
-					PARTICLE_EFFECT_MULTIPROPERTY("Enter particles", as_portal.enter_particles);
+					PARTICLE_EFFECT_MULTIPROPERTY_NOCOLOR("Enter particles", as_portal.enter_particles);
 					//MULTIPROPERTY("Enter shake strength", as_portal.enter_shake.strength);
 					//tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully enter the portal.");
 					MULTIPROPERTY("Enter shake duration (ms)", as_portal.enter_shake.duration_ms);
@@ -906,7 +967,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 				tooltip_on_hover("Highlights any exiting object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
 
 				SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
-				PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
+				PARTICLE_EFFECT_MULTIPROPERTY_NOCOLOR("Exit particles", as_portal.exit_particles);
 			}
 
 			if (auto scope = augs::imgui::scoped_tree_node_ex("Character exit forces")) {

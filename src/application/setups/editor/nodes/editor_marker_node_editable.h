@@ -78,6 +78,9 @@ struct editor_portal_info {
 	portal_exit_position exit_position = portal_exit_position::PORTAL_CENTER_PLUS_ENTERING_OFFSET;
 	// END GEN INTROSPECTOR
 
+	void apply(editor_color_preset);
+	rgba get_icon_color() const;
+
 	editor_portal_info() {
 		ambience_particles.color = cyan;
 	}

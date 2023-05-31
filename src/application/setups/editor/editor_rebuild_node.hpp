@@ -127,7 +127,11 @@ bool setup_entity_from_node(
 
 				if (const auto portal = agg.template find<components::portal>()) {
 					auto& to = *portal;
-					const auto& from = editable.as_portal;
+					auto from = editable.as_portal;
+
+					if (from.color_preset != editor_color_preset::CUSTOM) {
+						from.apply(from.color_preset);
+					}
 
 					to.exit_cooldown_ms = from.exit_cooldown_ms;
 
@@ -172,7 +176,7 @@ bool setup_entity_from_node(
 						}
 
 						if (const auto particles = agg.template find<components::continuous_particles>()) {
-							particles->modifier = static_cast<const particle_effect_modifier&>(editable.as_portal.ambience_particles);
+							particles->modifier = static_cast<const particle_effect_modifier&>(from.ambience_particles);
 							particles->modifier.sanitize();
 
 							const auto radius = float(editable.size.smaller_side()) / 2;
@@ -188,7 +192,7 @@ bool setup_entity_from_node(
 						to.exit_highlight_ms = 0.0f;
 					}
 					else {
-						to.exit_impulses = editable.as_portal.exit_impulses;
+						to.exit_impulses = from.exit_impulses;
 
 						to.exit_sound = to_game_effect(from.exit_sound);
 						to.exit_particles = to_game_effect(from.exit_particles);
