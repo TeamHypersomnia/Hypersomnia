@@ -460,7 +460,7 @@ void setup_per_node_flavour(
 
 			const auto radius = float(editable.size.smaller_side()) / 2;
 
-			if (!from.undetectable_entry) {
+			if (!from.disable_all_entry_effects) {
 				if (const auto particles = scene.template find<invariants::continuous_particles>()) {
 					particles->effect_id = get_asset_id_of(from.ambience_particles.id);
 				}

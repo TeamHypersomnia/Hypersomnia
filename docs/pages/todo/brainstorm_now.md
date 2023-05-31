@@ -12,6 +12,9 @@ summary: That which we are brainstorming at the moment.
     - And an optional FOV setting
 
 - portal finishing touches
+    - fix decrease opacity math
+    - maybe allow box
+
     - several simple "color presets" could let us avoid the need to tweak a million color controls
     - We will reuse portals as force fields
         - The logic would be nearly identical so there's no point introducing another entity/node type
@@ -25,29 +28,30 @@ summary: That which we are brainstorming at the moment.
         - same with dropped items though
         - maybe they get processed twice due to attachments?
         - melee has no attachment tho
-    - Make these exit portal parameters:
-        - Exit position
-            - Always center
-            - As entered
-            - At boundary
-        - Exit direction 
-            - Portal direction
-            - As entered
 
-    - separate "portal inertia" in movement that doesn't remove the ability to move
-        - and hard limit to like 3 seconds it so that it doesn't accumulate when you enter a loop and suddenly exit it
     - good particle effects
 
     - either remove bursts from the enum combos or automatically make them streams somehow
 
-    - set/add character inertia (const/linear)
     - btw watch out if components::portal doesnt have any state that needs synchronization actually
         - however sound cooldowns are only view related so they don't need to be
-    - setup default effect ids
 
     - force fields: cosm.for_each_having<components::rigid_body, invariants::area_marker>(
 
     - done/disregarded
+        - "require zero inertia"
+        - separate "portal inertia" in movement that doesn't remove the ability to move
+            - and hard limit to like 3 seconds it so that it doesn't accumulate when you enter a loop and suddenly exit it
+        - setup default effect ids
+        - set/add character inertia (const/linear)
+        - Make these exit portal parameters:
+            - Exit position
+                - Always center
+                - As entered
+                - At boundary
+            - Exit direction 
+                - Portal direction
+                - As entered
         - setup default effects
         - fix alpha so that a=0 shows only when we actually teleport
         - and add some easy descriptions for impulse/add velocity etc since it's complex!

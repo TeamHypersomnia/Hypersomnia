@@ -285,8 +285,8 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						rigid_body.apply_linear(portal_exit_direction, impulses.character_exit_impulse);
 
 						if (const auto movement = typed_contacted_entity.template find<components::movement>()) {
-							//movement->linear_inertia_ms += impulses.character_exit_inertia_ms;
-							movement->portal_inertia_ms += impulses.character_exit_inertia_ms;
+							//movement->linear_inertia_ms += impulses.character_exit_airborne_ms;
+							movement->portal_inertia_ms += impulses.character_exit_airborne_ms;
 						}
 					}
 					else {
@@ -358,6 +358,14 @@ void portal_system::advance_portal_logic(const logic_step step) {
 				if (typed_contacted_entity.template has<components::portal>()) {
 					/* Don't teleport portals */
 					return;
+				}
+
+				if (portal.ignore_airborne_characters) {
+					if (auto movement = typed_contacted_entity.template find<components::movement>()) {
+						if (movement->const_inertia_ms > 0.0f || movement->linear_inertia_ms > 0.0f || movement->portal_inertia_ms > 0.0f) {
+							return;
+						}
+					}
 				}
 
 				auto contacted_rigid = typed_contacted_entity.template get<components::rigid_body>();

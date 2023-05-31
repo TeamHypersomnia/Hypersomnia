@@ -542,6 +542,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 			movement.portal_inertia_ms -= delta_ms;
 			movement.portal_inertia_ms = std::clamp(movement.portal_inertia_ms, 0.0f, 3000.0f);
+			movement.linear_inertia_ms = std::clamp(movement.linear_inertia_ms, 0.0f, 3000.0f);
 		}
 	);
 }

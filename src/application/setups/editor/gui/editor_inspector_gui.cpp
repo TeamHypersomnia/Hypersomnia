@@ -393,7 +393,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Enter time (ms)") {
+			if (label == "Enter time (ms)" || label == "Travel time (ms)") {
 				if (slider(label, property, 0.0f, 5000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -404,7 +404,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Exit inertia duration (ms)") {
+			if (label == "Exit airborne duration (ms)") {
 				if (slider(label, property, 0.0f, 2000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -786,20 +786,24 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			tooltip_on_hover("Where to teleport entering objects.\nCan only be another portal.\nIf you leave it empty, the character will just stay invisible and won't teleport anywhere.\nIf you set it to itself, the portal will behave like a trampoline.");
 		}
 
-		MULTIPROPERTY("Undetectable entry", as_portal.undetectable_entry);
-		tooltip_on_hover("Convenience option to disable all delays, sounds and particles on entry.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
+		MULTIPROPERTY("Ignore airborne characters", as_portal.ignore_airborne_characters);
+		tooltip_on_hover("'Airborne' characters are ones that only just exited a portal or e.g. during dash.\nThis is useful for making portals that only react when you 'land'.\nA perfect usecase is the background portal on 'surf' maps\nthat teleports you back to the beginning if you happen to miss a trampoline.");
 
 
-		if (!insp.as_portal.undetectable_entry) {
-			tooltip_on_hover("When altering enter/travel time,\nautomatically scale pitch of entering/travelling sounds.\n\nE.g. if you set Enter time to 500ms,\nthe Begin entering sound will automatically have 2x the normal pitch.\nAnalogously with Travel time and Enter sound.");
+		MULTIPROPERTY("Enter time (ms)", as_portal.enter_time_ms);
 
-			MULTIPROPERTY("Enter time (ms)", as_portal.enter_time_ms);
+		if (!trampoline) {
+			MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
+		}
 
-			if (!trampoline) {
-				MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
-			}
+		MULTIPROPERTY("Disable all entry effects", as_portal.disable_all_entry_effects);
 
+		tooltip_on_hover("Convenience option to disable all visuals, sounds and particles on entry.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
+
+		if (!insp.as_portal.disable_all_entry_effects) {
 			MULTIPROPERTY("Auto scale pitches", as_portal.auto_scale_pitches);
+
+			tooltip_on_hover("When altering enter/travel time,\nautomatically scale pitch of entering/travelling sounds.\n\nE.g. if you set Enter time to 500ms,\nthe Begin entering sound will automatically have 2x the normal pitch.\nAnalogously with Travel time and Enter sound.");
 
 			if (auto scope = augs::imgui::scoped_tree_node_ex("Visual effects")) {
 				MULTIPROPERTY("Begin entering highlight time (ms)", as_portal.begin_entering_highlight_ms);
@@ -884,10 +888,10 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 
 		MULTIPROPERTY("Exit direction", as_portal.exit_direction);
 
-		MULTIPROPERTY("Undetectable exit", as_portal.undetectable_exit);
+		MULTIPROPERTY("Disable all exit effects", as_portal.disable_all_exit_effects);
 		tooltip_on_hover("Convenience option to disable all impulses, sounds and particles on exit.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
-		if (!insp.as_portal.undetectable_exit) {
+		if (!insp.as_portal.disable_all_exit_effects) {
 			if (auto scope = augs::imgui::scoped_tree_node_ex("Exit effects")) {
 				MULTIPROPERTY("Exit highlight time (ms)", as_portal.exit_highlight_ms);
 				tooltip_on_hover("Highlights any exiting object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
@@ -904,7 +908,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 				MULTIPROPERTY("Exit shake duration (ms)", as_portal.exit_shake.duration_ms);
 				tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully exit the portal.");
 
-				MULTIPROPERTY("Exit inertia duration (ms)", as_portal.exit_impulses.character_exit_inertia_ms);
+				MULTIPROPERTY("Exit airborne duration (ms)", as_portal.exit_impulses.character_exit_airborne_ms);
 
 				MULTIPROPERTY("Linear impulse##CharLinear", as_portal.exit_impulses.character_exit_impulse.amount);
 

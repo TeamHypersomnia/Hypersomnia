@@ -123,9 +123,7 @@ bool setup_entity_from_node(
 
 		if constexpr(std::is_same_v<N, editor_area_marker_node>) {
 			if (resource.editable.type == area_marker_type::PORTAL) {
-				if (editable.as_portal.portal_exit.is_set()) {
-					dependent_on_other_nodes = true;
-				}
+				dependent_on_other_nodes = true;
 
 				if (const auto portal = agg.template find<components::portal>()) {
 					auto& to = *portal;
@@ -133,9 +131,12 @@ bool setup_entity_from_node(
 
 					to.exit_cooldown_ms = from.exit_cooldown_ms;
 
-					if (from.undetectable_entry) {
-						to.enter_time_ms = 0.f;
-						to.travel_time_ms = 0.f;
+					to.ignore_airborne_characters = from.ignore_airborne_characters;
+
+					to.enter_time_ms = from.enter_time_ms;
+					to.travel_time_ms = from.travel_time_ms;
+
+					if (from.disable_all_entry_effects) {
 						to.light_size_mult = 0.0f;
 
 						to.begin_entering_highlight_ms = 0;
@@ -143,9 +144,6 @@ bool setup_entity_from_node(
 						to.decrease_opacity_to = 255;
 					}
 					else {
-						to.enter_time_ms = from.enter_time_ms;
-						to.travel_time_ms = from.travel_time_ms;
-
 						to.light_size_mult = from.light_size_mult;
 						to.light_color = from.light_color;
 
@@ -185,7 +183,7 @@ bool setup_entity_from_node(
 						}
 					}
 
-					if (from.undetectable_exit) {
+					if (from.disable_all_exit_effects) {
 						to.exit_impulses.set_zero();
 						to.exit_highlight_ms = 0.0f;
 					}
@@ -211,11 +209,11 @@ bool setup_entity_from_node(
 
 					to.custom_filter = filters[predefined_filter_type::PORTAL];
 					to.custom_filter.maskBits = from.reacts_to.get_mask_bits(); 
-
-					if (const auto marker = agg.template find<components::marker>()) {
-						marker->shape = marker_shape_type::CIRCLE;
-					}
 				}
+			}
+
+			if (const auto marker = agg.template find<components::marker>()) {
+				marker->shape = editable.shape;
 			}
 		}
 	}

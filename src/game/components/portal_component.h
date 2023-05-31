@@ -14,7 +14,7 @@ namespace components {
 
 		b2Filter custom_filter;
 		rgba_channel decrease_opacity_to = 0;
-		pad_bytes<1> pad;
+		bool ignore_airborne_characters = false;
 
 		float begin_entering_highlight_ms = 1000.0f;
 		float exit_highlight_ms = 220.0f;

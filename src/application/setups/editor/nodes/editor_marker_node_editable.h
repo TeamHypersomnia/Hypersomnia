@@ -30,11 +30,12 @@ struct editor_portal_info {
 	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct editor_portal_info
-	bool undetectable_entry = false;
-	bool undetectable_exit = false;
+	bool disable_all_entry_effects = false;
+	bool disable_all_exit_effects = false;
 
 	bool auto_scale_pitches = true;
 	bool trampoline_like = false;
+	bool ignore_airborne_characters = false;
 
 	float enter_time_ms = 1000.0f;
 	float travel_time_ms = 1000.0f;
@@ -50,8 +51,8 @@ struct editor_portal_info {
 	float light_size_mult = 2.05f;
 	rgba light_color = rgba(0, 255, 255, 150);
 
-	sentience_shake enter_shake = { 1.0f, 1000.0f };
-	sentience_shake exit_shake = { 1.0f, 1000.0f };
+	sentience_shake enter_shake = { 1.0f, 1500.0f };
+	sentience_shake exit_shake = { 1.0f, 1500.0f };
 
 	editor_sound_effect ambience_sound;
 	float ambience_sound_distance_mult = 2.0f;
@@ -91,6 +92,7 @@ struct editor_area_marker_node_editable {
 	// GEN INTROSPECTOR struct editor_area_marker_node_editable
 	faction_type faction = faction_type::RESISTANCE;
 	marker_letter_type letter = marker_letter_type::A;
+	marker_shape_type shape = marker_shape_type::BOX;
 
 	vec2 pos;
 	real32 rotation = 0.0f;
