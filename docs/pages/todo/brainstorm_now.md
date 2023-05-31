@@ -16,46 +16,46 @@ summary: That which we are brainstorming at the moment.
 
 - Billan crash
 
+- either remove bursts from the enum combos or automatically make them streams somehow
+
+- We will reuse portals as force fields
+    - The logic would be nearly identical so there's no point introducing another entity/node type
+    - Force field will even be a useful effect for the portal as well
+        - We'll give one by default that pulls towards the center
+        - By giving a minus someone can set it to pull outwards
+        - And also torque
+        - And just a flag whether it should pull proportional to mass
+    - Let force fields increase portal inertia
+        - slowly with a maximum, two parameters per each force field
+
 - "Override map setting (not recommended)" for FOV
     - And an optional FOV setting
 
 - portal finishing touches
     - fix decrease opacity math
-
-    - several simple "color presets" could let us avoid the need to tweak a million color controls
-        - json wise we'd like to have just color_preset: CYAN/ORANGE/GREEN etc
-            - and only writeout the customized color fields
-            - however this will complicate our default setup flow as defaults will now depend on values
-            - but is there any other way?
-            - we'd like to let people just specify the color
-            - what if they just override the color settings?
-
-    - We will reuse portals as force fields
-        - The logic would be nearly identical so there's no point introducing another entity/node type
-        - Force field will even be a useful effect for the portal as well
-            - We'll give one by default that pulls towards the center
-            - By giving a minus someone can set it to pull outwards
-            - And also torque
-            - And just a flag whether it should pull proportional to mass
-
-    - thrown melees get teleported faster?
-        - Was likely due to more amount of contacts for convex bodies.
-            - solved with m_last_teleport_progress_timestamp
-                - this also let us handle characters holding weapons
-        - same with dropped items though
-        - maybe they get processed twice due to attachments?
-        - melee has no attachment tho
-
     - good particle effects
-
-    - either remove bursts from the enum combos or automatically make them streams somehow
 
     - btw watch out if components::portal doesnt have any state that needs synchronization actually
         - however sound cooldowns are only view related so they don't need to be
 
-    - force fields: cosm.for_each_having<components::rigid_body, invariants::area_marker>(
-
     - done/disregarded
+        - thrown melees get teleported faster?
+            - Was likely due to more amount of contacts for convex bodies.
+                - solved with m_last_teleport_progress_timestamp
+                    - this also let us handle characters holding weapons
+
+            - same with dropped items though
+            - maybe they get processed twice due to attachments?
+            - melee has no attachment tho
+
+        - several simple "color presets" could let us avoid the need to tweak a million color controls
+            - json wise we'd like to have just color_preset: CYAN/ORANGE/GREEN etc
+                - and only writeout the customized color fields
+                - however this will complicate our default setup flow as defaults will now depend on values
+                - but is there any other way?
+                - we'd like to let people just specify the color
+                - what if they just override the color settings?
+
         - maybe allow box
         - "require zero inertia"
         - separate "portal inertia" in movement that doesn't remove the ability to move

@@ -20,7 +20,12 @@ auto perform_dash(
 ) {
 	{
 		auto& movement = subject.template get<components::movement>();
+
 		movement.linear_inertia_ms += make_inert_for_ms;
+
+		if (movement.portal_inertia_ms > 0.0f) {
+			movement.portal_inertia_ms += make_inert_for_ms / 4;
+		}
 	}
 
 	const auto body = subject.template find<components::rigid_body>();
