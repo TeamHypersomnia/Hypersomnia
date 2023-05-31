@@ -164,7 +164,7 @@ bool setup_entity_from_node(
 						to.decrease_opacity_to = from.decrease_opacity_to;
 
 						if (from.auto_scale_pitches) {
-							const auto max_pitch = 3.5f;
+							const auto max_pitch = 2.5f;
 
 							if (to.enter_time_ms != 0.0f) {
 								to.begin_entering_sound.modifier.pitch *= std::min(max_pitch, 1.0f / (to.enter_time_ms / 500.0f));

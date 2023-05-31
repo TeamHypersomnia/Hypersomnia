@@ -68,6 +68,9 @@ enum class test_scene_particle_effect_id {
 	CORPSE_CATCH_FIRE,
 
 	PORTAL_CIRCLE,
+	PORTAL_BEGIN_ENTERING,
+	PORTAL_ENTER,
+	PORTAL_EXIT,
 
 	COUNT
 	// END GEN INTROSPECTOR

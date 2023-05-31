@@ -28,7 +28,8 @@ void setup_resource_defaults_after_creating_officials(
 		to.enter_sound.id = o[test_sound_decorations::PORTAL_ENTER];
 		to.exit_sound.id = o[test_sound_decorations::PORTAL_EXIT];
 
-		to.enter_particles.id = o[test_particles_decorations::EXHAUSTED_SMOKE];
-		to.exit_particles.id = o[test_particles_decorations::DASH_SMOKE];
+		to.begin_entering_particles.id = o[test_particles_decorations::PORTAL_BEGIN_ENTERING];
+		to.enter_particles.id = o[test_particles_decorations::PORTAL_ENTER];
+		to.exit_particles.id = o[test_particles_decorations::PORTAL_EXIT];
 	}	
 }

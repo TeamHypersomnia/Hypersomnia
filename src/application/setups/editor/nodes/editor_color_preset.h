@@ -35,6 +35,7 @@ inline auto get_editor_color_preset(const editor_color_preset t) {
 			o.portal.outer_ring = turquoise.with_alpha(200);
 			o.portal.light = cyan.with_alpha(150);
 			o.portal.ambience_particles = cyan;
+			o.portal.begin_entering_particles = o.portal.enter_particles = o.portal.exit_particles = o.portal.ambience_particles;
 			break;
 
 		case editor_color_preset::YELLOW:
@@ -42,6 +43,7 @@ inline auto get_editor_color_preset(const editor_color_preset t) {
 			o.portal.outer_ring = rgba(222, 167, 0, 200);
 			o.portal.light = rgba(222, 167, 0, 200);
 			o.portal.ambience_particles = rgba(222, 167, 0, 255);
+			o.portal.begin_entering_particles = o.portal.enter_particles = o.portal.exit_particles = o.portal.ambience_particles;
 			break;
 
 		case editor_color_preset::GREEN:
@@ -49,6 +51,7 @@ inline auto get_editor_color_preset(const editor_color_preset t) {
 			o.portal.outer_ring = green.with_alpha(200);
 			o.portal.light = green.with_alpha(150);
 			o.portal.ambience_particles = green;
+			o.portal.begin_entering_particles = o.portal.enter_particles = o.portal.exit_particles = o.portal.ambience_particles;
 			break;
 
 		case editor_color_preset::RED:
@@ -56,6 +59,7 @@ inline auto get_editor_color_preset(const editor_color_preset t) {
 			o.portal.outer_ring = rgba(128, 0, 0, 200);
 			o.portal.light = red.with_alpha(150);
 			o.portal.ambience_particles = red;
+			o.portal.begin_entering_particles = o.portal.enter_particles = o.portal.exit_particles = o.portal.ambience_particles;
 			break;
 
 		case editor_color_preset::PINK:
@@ -63,6 +67,7 @@ inline auto get_editor_color_preset(const editor_color_preset t) {
 			o.portal.outer_ring = rgba(143, 0, 255, 200);
 			o.portal.light = rgba(143, 0, 255, 150);
 			o.portal.ambience_particles = pink;
+			o.portal.begin_entering_particles = o.portal.enter_particles = o.portal.exit_particles = o.portal.ambience_particles;
 			break;
 
 		default:

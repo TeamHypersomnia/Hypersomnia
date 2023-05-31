@@ -698,6 +698,24 @@ namespace test_flavours {
 			white
 		);
 
+		flavour_with_particles(
+			test_particles_decorations::PORTAL_ENTER,
+			test_scene_particle_effect_id::PORTAL_ENTER,
+			white
+		);
+
+		flavour_with_particles(
+			test_particles_decorations::PORTAL_EXIT,
+			test_scene_particle_effect_id::PORTAL_EXIT,
+			white
+		);
+
+		flavour_with_particles(
+			test_particles_decorations::PORTAL_BEGIN_ENTERING,
+			test_scene_particle_effect_id::PORTAL_BEGIN_ENTERING,
+			white
+		);
+
 		{
 			auto& meta = flavour_with_particles(
 				test_particles_decorations::WANDERING_SMOKE,
