@@ -33,7 +33,7 @@ struct portal_exit_impulses {
 
 	// GEN INTROSPECTOR struct portal_exit_impulses
 	float character_exit_airborne_ms = 400.0f;
-	impulse_amount_def character_exit_impulse = { 6000.0f, impulse_type::ADD_VELOCITY };
+	impulse_amount_def character_exit_impulse = { 10000.0f, impulse_type::ADD_VELOCITY };
 
 	impulse_amount_def object_exit_impulse = { 6000.0f, impulse_type::ADD_VELOCITY };
 	impulse_amount_def object_exit_angular_impulse = { 1000.0f, impulse_type::ADD_VELOCITY };

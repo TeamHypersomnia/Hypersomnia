@@ -17,7 +17,7 @@ void setup_resource_defaults_after_creating_officials(
 ) {
 	if (auto portal = find_resource(o[area_marker_type::PORTAL])) {
 		portal->editable.node_defaults.shape = marker_shape_type::CIRCLE;
-		portal->editable.node_defaults.size = vec2(512, 512);
+		portal->editable.node_defaults.size = vec2(768, 768);
 
 		auto& to = portal->editable.node_defaults.as_portal;
 

@@ -16,9 +16,9 @@ struct editor_filter_flags {
 	// GEN INTROSPECTOR struct editor_filter_flags
 	bool characters = true;
 	bool character_weapons = false;
-	bool bullets = false;
-	bool flying_explosives = false;
-	bool flying_melees = false;
+	bool bullets = true;
+	bool flying_explosives = true;
+	bool flying_melees = true;
 	bool lying_items = true;
 	bool shells = true;
 	bool obstacles = true;
@@ -49,8 +49,8 @@ struct editor_portal_info {
 	editor_filter_flags reacts_to;
 
 	float begin_entering_highlight_ms = 1000.0f;
-	rgba_channel decrease_opacity_to = 3;
-	float exit_highlight_ms = 500.0f;
+	rgba_channel decrease_opacity_to = 0;
+	float exit_highlight_ms = 700.0f;
 
 	augs::maybe<continuous_rings_input> rings_effect = continuous_rings_input();
 	float light_size_mult = 2.05f;
@@ -82,7 +82,7 @@ struct editor_portal_info {
 	rgba get_icon_color() const;
 
 	editor_portal_info() {
-		ambience_particles.color = cyan;
+		apply(editor_color_preset::CYAN);
 	}
 };
 
