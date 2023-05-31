@@ -52,12 +52,24 @@ void pure_color_highlight_system::draw_highlights(
 			continue;
 		}
 
+		float teleport_alpha = 1.0f;
+
+		if (auto rigid_body = subject.find<components::rigid_body>()) {
+			teleport_alpha = rigid_body.get_teleport_alpha();
+		}
+
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
 		const auto ratio = std::max(0.f, 1.f - static_cast<float>(passed / r.in.maximum_duration_seconds));
 		
+		auto time_ratio = std::sqrt(std::sqrt(ratio));
+
+		if (!r.in.use_sqrt) {
+			time_ratio = ratio * ratio;
+		}
+
 		const auto target_color = rgba { 
 			r.in.color.rgb(),
-			static_cast<rgba_channel>(255.f * std::sqrt(std::sqrt(ratio)) * r.in.starting_alpha_ratio)
+			static_cast<rgba_channel>(255.f * time_ratio * r.in.starting_alpha_ratio * teleport_alpha)
 		};
 
 		draw_color_highlight(subject, target_color, in);

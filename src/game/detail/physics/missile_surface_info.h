@@ -43,7 +43,7 @@ public:
 		}
 
 		/* Also don't allow the missile to collide with any held item/motorcycle of the source character */
-		ignore_altogether = missile_sender.is_sender_subject(surface);
+		ignore_altogether = missile_sender.is_sender_subject(surface) || surface.template has<components::portal>();
 		surface_is_item = surface.template has<components::item>();
 		surface_is_missile = surface.template has<components::missile>();
 

@@ -6,6 +6,7 @@ struct pure_color_highlight_input {
 	float maximum_duration_seconds = 0.f;
 	float starting_alpha_ratio = 0.f;
 	rgba color = white;
+	bool use_sqrt = true;
 };
 
 namespace messages {

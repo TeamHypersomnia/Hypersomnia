@@ -19,6 +19,8 @@
 #include "augs/math/physics_structs.h"
 #include "game/detail/physics/colliders_connection.h"
 
+using rgba_channel = unsigned char;
+
 struct friction_connection {
 	// GEN INTROSPECTOR struct friction_connection
 	signi_entity_id target;
@@ -35,7 +37,8 @@ struct special_physics {
 	augs::stepped_cooldown dropped_or_created_cooldown;
 	signi_entity_id during_cooldown_ignore_collision_with;
 	bool during_cooldown_ignore_other_cooled_down = true;
-	pad_bytes<3> pad;
+	rgba_channel teleport_decrease_opacity_to = 0;
+	pad_bytes<2> pad;
 	real32 teleport_progress = 0.0f;
 	real32 teleport_progress_falloff_speed = 0.0f;
 	signi_entity_id inside_portal;
@@ -47,6 +50,8 @@ struct special_physics {
 #endif
 	// END GEN INTROSPECTOR
 	//float measured_carried_mass = 0.f;
+
+	float get_teleport_alpha() const;
 };
 
 struct physics_engine_transforms {

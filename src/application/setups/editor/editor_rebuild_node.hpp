@@ -131,16 +131,16 @@ bool setup_entity_from_node(
 					auto& to = *portal;
 					const auto& from = editable.as_portal;
 
-					to.preserve_entry_offset = from.preserve_entry_offset;
 					to.exit_cooldown_ms = from.exit_cooldown_ms;
 
-					if (from.quiet_entry) {
+					if (from.undetectable_entry) {
 						to.enter_time_ms = 0.f;
 						to.travel_time_ms = 0.f;
 						to.light_size_mult = 0.0f;
 
 						to.begin_entering_highlight_ms = 0;
 						to.rings_effect.is_enabled = false;
+						to.decrease_opacity_to = 255;
 					}
 					else {
 						to.enter_time_ms = from.enter_time_ms;
@@ -159,9 +159,33 @@ bool setup_entity_from_node(
 
 						to.begin_entering_particles = to_game_effect(from.begin_entering_particles);
 						to.enter_particles = to_game_effect(from.enter_particles);
+						to.decrease_opacity_to = from.decrease_opacity_to;
+
+						if (from.auto_scale_pitches) {
+							const auto max_pitch = 3.5f;
+
+							if (to.enter_time_ms != 0.0f) {
+								to.begin_entering_sound.modifier.pitch *= std::min(max_pitch, 1.0f / (to.enter_time_ms / 1000.0f));
+							}
+
+							if (to.travel_time_ms != 0.0f) {
+								to.enter_sound.modifier.pitch *= std::min(max_pitch, 1.0f / (to.travel_time_ms / 1000.0f));
+							}
+						}
+
+						if (const auto particles = agg.template find<components::continuous_particles>()) {
+							particles->modifier = static_cast<const particle_effect_modifier&>(editable.as_portal.ambience_particles);
+							particles->modifier.sanitize();
+
+							const auto radius = float(editable.size.smaller_side()) / 2;
+							const auto basic_radius = 128.0f;
+
+							particles->modifier.radius = radius;
+							particles->modifier.scale_amounts *= radius / basic_radius;
+						}
 					}
 
-					if (from.quiet_exit) {
+					if (from.undetectable_exit) {
 						to.exit_impulses.set_zero();
 						to.exit_highlight_ms = 0.0f;
 					}
@@ -174,9 +198,11 @@ bool setup_entity_from_node(
 						to.exit_highlight_ms = from.exit_highlight_ms;
 					}
 
+					to.exit_position = from.exit_position;
+					to.exit_direction = from.exit_direction;
+
 					if (from.trampoline_like) {
 						to.travel_time_ms = 0.f;
-						to.preserve_entry_offset = true;
 
 						to.enter_shake = sentience_shake::zero();
 						to.enter_sound = {};
@@ -188,17 +214,6 @@ bool setup_entity_from_node(
 
 					if (const auto marker = agg.template find<components::marker>()) {
 						marker->shape = marker_shape_type::CIRCLE;
-					}
-
-					if (const auto particles = agg.template find<components::continuous_particles>()) {
-						particles->modifier = static_cast<const particle_effect_modifier&>(editable.as_portal.ambience_particles);
-						particles->modifier.sanitize();
-
-						const auto radius = float(editable.size.smaller_side()) / 2;
-						const auto basic_radius = 128.0f;
-
-						particles->modifier.radius = radius;
-						particles->modifier.scale_amounts *= radius / basic_radius;
 					}
 				}
 			}

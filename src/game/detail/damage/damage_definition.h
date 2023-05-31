@@ -22,7 +22,7 @@ struct damage_effects {
 struct damage_definition {
 	// GEN INTROSPECTOR struct damage_definition
 	real32 base = 0.f;
-	sentience_shake shake = { 400.f, 1.f };
+	sentience_shake shake = sentience_shake::zero();
 
 	real32 impact_impulse = 10.f;
 	real32 impulse_multiplier_against_sentience = 10.f;

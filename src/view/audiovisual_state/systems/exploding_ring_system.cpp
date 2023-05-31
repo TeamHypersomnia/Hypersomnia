@@ -323,18 +323,16 @@ void exploding_ring_system::draw_highlights_of_continuous_rings(
 				return;
 			}
 
-			if (const auto aabb = typed_portal_handle.find_aabb()) {
-				if (!queried_camera_aabb.hover(*aabb)) {
-					return;
-				}
-			}
-
 			const auto radius = e.light_size_mult * typed_portal_handle.get_logical_size().smaller_side() / 2;
 			const auto ring_center = typed_portal_handle.get_logic_transform().pos;
 
 			const auto aabb_size = vec2::square(radius * 2);
 			const auto highlight_ltrb = ltrbi::center_and_size(ring_center, aabb_size);
 			const auto highlight_col = e.light_color;
+
+			if (!queried_camera_aabb.hover(highlight_ltrb)) {
+				return;
+			}
 
 			output.aabb(
 				highlight_tex,

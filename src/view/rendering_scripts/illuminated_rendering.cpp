@@ -722,3 +722,20 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		in.general_atlas->set_as_current(renderer);
 	}
 }
+
+float special_physics::get_teleport_alpha() const {
+	if (inside_portal.is_set()) {
+		return 0.0f;
+	}
+
+	if (teleport_progress == 0.0f) {
+		return 1.0f;
+	}
+
+	auto result = 1.0f - std::clamp(teleport_progress, 0.0f, 1.0f);
+	result *= result;
+
+	const auto unit = float(teleport_decrease_opacity_to) / 255.0f;
+	return augs::interp(unit, 1.0f, result);
+}
+

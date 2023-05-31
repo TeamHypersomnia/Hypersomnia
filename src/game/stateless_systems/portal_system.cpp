@@ -8,6 +8,7 @@
 #include "game/detail/snap_interpolation_to_logical.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/messages/pure_color_highlight_message.h"
+#include "game/detail/melee/like_melee.h"
 
 auto calc_unit_progress_per_step(const augs::delta& dt, const real32 time_ms) {
 	const auto seconds_to_complete = time_ms / 1000;
@@ -82,6 +83,7 @@ static void play_begin_entering_effects(const logic_step step, const H& typed_co
 		h.input.maximum_duration_seconds = portal.begin_entering_highlight_ms / 1000;
 		h.input.starting_alpha_ratio = 1.0f;
 		h.input.color = portal.rings_effect.value.inner_color;
+		h.input.use_sqrt = false;
 		step.post_message(h);
 	}
 };
@@ -141,6 +143,7 @@ static void play_exit_effects(const logic_step step, const H& typed_contacted_en
 		h.input.maximum_duration_seconds = portal.exit_highlight_ms / 1000;
 		h.input.starting_alpha_ratio = 1.0f;
 		h.input.color = portal.rings_effect.value.inner_color;
+		h.input.use_sqrt = false;
 		step.post_message(h);
 	}
 
@@ -186,6 +189,7 @@ static void propagate_teleport_state_to_children(const H& typed_contacted_entity
 			s.teleport_progress = special.teleport_progress;
 			s.teleport_progress_falloff_speed = special.teleport_progress_falloff_speed;
 			s.inside_portal = special.inside_portal;
+			s.teleport_decrease_opacity_to = special.teleport_decrease_opacity_to;
 		}
 	};
 
@@ -221,8 +225,40 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						contacted_entity_transform.rotation
 					};
 
-					if (portal.preserve_entry_offset) {
-						final_transform.pos += contacted_entity_transform.pos - portal_entry_transform.pos;
+					const auto radius = portal_exit.get_logical_size().smaller_side() / 2;
+
+					rigid_body.restore_velocities();
+
+					auto portal_exit_direction = portal_exit_transform->get_direction();
+
+					switch (portal_exit_portal->exit_direction) {
+						case portal_exit_direction::PORTAL_DIRECTION:
+							break;
+
+						case portal_exit_direction::ENTERING_VELOCITY:
+							portal_exit_direction = rigid_body.get_velocity();
+							portal_exit_direction.normalize();
+							break;
+
+						case portal_exit_direction::REVERSE_ENTERING_VELOCITY:
+							portal_exit_direction = rigid_body.get_velocity();
+							portal_exit_direction.normalize();
+							portal_exit_direction = -portal_exit_direction;
+							break;
+
+						default:
+							break;
+					};
+
+					switch (portal_exit_portal->exit_position) {
+						case portal_exit_position::PORTAL_CENTER_PLUS_ENTERING_OFFSET:
+							final_transform.pos += contacted_entity_transform.pos - portal_entry_transform.pos;
+							break;
+						case portal_exit_position::PORTAL_BOUNDARY:
+							final_transform.pos += portal_exit_direction * radius;
+							break;
+						default:
+							break;
 					}
 
 					/*
@@ -232,14 +268,12 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						"Note: contacts are updated on the next call to b2World::Step."
 					*/
 
-					typed_contacted_entity.set_logic_transform(final_transform);
-					::snap_interpolated_to(typed_contacted_entity, final_transform);
-
-					rigid_body.restore_velocities();
-
-					const auto portal_exit_direction = portal_exit_transform->get_direction();
-
 					const auto impulses = portal_exit_portal->exit_impulses;
+
+					const bool should_set_rotation_to_new_vel = 
+						typed_contacted_entity.template has<components::missile>()
+						|| ::is_like_thrown_melee(typed_contacted_entity)
+					;
 
 					if (const bool is_sentient = typed_contacted_entity.template has<components::sentience>()) {
 						rigid_body.apply_linear(portal_exit_direction, impulses.character_exit_impulse);
@@ -250,8 +284,17 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 					}
 					else {
 						rigid_body.apply_linear(portal_exit_direction, impulses.object_exit_impulse);
-						rigid_body.apply_angular(impulses.object_exit_angular_impulse);
+
+						if (should_set_rotation_to_new_vel) {
+							final_transform.rotation = rigid_body.get_velocity().degrees();
+						}
+						else {
+							rigid_body.apply_angular(impulses.object_exit_angular_impulse);
+						}
 					}
+
+					typed_contacted_entity.set_logic_transform(final_transform);
+					::snap_interpolated_to(typed_contacted_entity, final_transform);
 
 					play_exit_effects(step, typed_contacted_entity, *portal_exit_portal);
 
@@ -314,7 +357,9 @@ void portal_system::advance_portal_logic(const logic_step step) {
 				auto& special = contacted_rigid.get_special();
 
 				if (special.dropped_or_created_cooldown.lasts(clk)) {
-					return;
+					if (special.during_cooldown_ignore_collision_with == typed_portal_handle.get_id()) {
+						return;
+					}
 				}
 
 				auto enter_portal = [&]() {
@@ -347,6 +392,7 @@ void portal_system::advance_portal_logic(const logic_step step) {
 				if (!special.inside_portal.is_set()) {
 					/* STATE: Entering portal. */
 					special.teleport_progress_falloff_speed = ::calc_unit_progress_per_step(dt, portal.enter_time_ms);
+					special.teleport_decrease_opacity_to = portal.decrease_opacity_to;
 
 					/* 2 * to account for physics system decreasing it every step */
 					const auto progress_added = 2 * special.teleport_progress_falloff_speed;
@@ -393,6 +439,16 @@ void portal_system::advance_portal_logic(const logic_step step) {
 			};
 
 			for (auto ce = rigid_body.get_contact_list(); ce != nullptr; ce = ce->next) {
+				auto ct = ce->contact;
+
+				if (ct == nullptr) {
+					continue;
+				}
+
+				if (!ct->IsTouching()) {
+					continue;
+				}
+
 				if (ce->other) {
 					/* 
 						Note this will always default to the owning transfer capability,

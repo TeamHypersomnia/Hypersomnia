@@ -56,7 +56,7 @@ void main()
         else if (is_between(startingAngleVec, endingAngleVec, v)) {
             vec3 darkened_pixel = vec3(max(0.0f, theColor.r - 0.5), max(0.0f, theColor.g - 0.5), max(0.0f, theColor.b - 0.5));
 
-            outputColor = vec4(darkened_pixel.r, darkened_pixel.g, darkened_pixel.b, 0.3);
+            outputColor = vec4(darkened_pixel.r, darkened_pixel.g, darkened_pixel.b, theColor.a * 0.3);
         }
         else {
             discard;

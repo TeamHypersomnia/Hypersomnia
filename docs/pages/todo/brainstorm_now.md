@@ -12,14 +12,30 @@ summary: That which we are brainstorming at the moment.
     - And an optional FOV setting
 
 - portal finishing touches
-    - remove FORCE so that people don't set it wrongly there and get confused unnecessarily 
-        - think we should just have a separate editor_impulse_type without FORCE whatsoever
-        - the force field will *not* have all these options, they make no sense there
-            - Only the force amount and whether to scale with mass (Proportional to mass)
-            - Should be mass-invariant by default so not proportional, like everything moves there at the same speed
-            - Characters will need some continuous inertia probably (maybe by setting it with std::max between current and target?)
-                - certainly makes sense for characters to be more inert in the force field, will make for a nice surf experience
-    - and add some easy descriptions for impulse/add velocity etc since it's complex!
+    - We will reuse portals as force fields
+        - The logic would be nearly identical so there's no point introducing another entity/node type
+        - Force field will even be a useful effect for the portal as well
+            - We'll give one by default that pulls towards the center
+            - By giving a minus someone can set it to pull outwards
+            - And also torque
+            - And just a flag whether it should pull proportional to mass
+
+    - thrown melees get teleported faster?
+        - same with dropped items though
+        - maybe they get processed twice due to attachments?
+        - melee has no attachment tho
+    - Make these exit portal parameters:
+        - Exit position
+            - Always center
+            - As entered
+            - At boundary
+        - Exit direction 
+            - Portal direction
+            - As entered
+
+    - separate "portal inertia" in movement that doesn't remove the ability to move
+        - and hard limit to like 3 seconds it so that it doesn't accumulate when you enter a loop and suddenly exit it
+    - good particle effects
 
     - several simple "color presets" could let us avoid the need to tweak a million color controls
     - either remove bursts from the enum combos or automatically make them streams somehow
@@ -33,6 +49,15 @@ summary: That which we are brainstorming at the moment.
     - setup default effects
 
     - done/disregarded
+        - fix alpha so that a=0 shows only when we actually teleport
+        - and add some easy descriptions for impulse/add velocity etc since it's complex!
+        - remove FORCE so that people don't set it wrongly there and get confused unnecessarily 
+            - think we should just have a separate editor_impulse_type without FORCE whatsoever
+            - the force field will *not* have all these options, they make no sense there
+                - Only the force amount and whether to scale with mass (Proportional to mass)
+                - Should be mass-invariant by default so not proportional, like everything moves there at the same speed
+                - Characters will need some continuous inertia probably (maybe by setting it with std::max between current and target?)
+                    - certainly makes sense for characters to be more inert in the force field, will make for a nice surf experience
         - post a pure-color highlight on entry and exit
 
         - ignore portal once teleported through it

@@ -66,10 +66,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	if constexpr(H::template has<invariants::sprite>()) {
 		float teleport_alpha = 1.0f;
 
-		if constexpr(H::template has<components::rigid_body>()) {
-			const auto& special = typed_handle.template get<components::rigid_body>().get_special();
-
-			teleport_alpha = 1.0f - std::clamp(special.teleport_progress, 0.0f, 1.0f);
+		if constexpr(!for_gui && H::template has<components::rigid_body>()) {
+			teleport_alpha = typed_handle.template get<components::rigid_body>().get_teleport_alpha();
 		}
 
 		const auto sprite = [&typed_handle]() {
@@ -304,6 +302,8 @@ FORCE_INLINE void specific_entity_drawer(
 
 	if constexpr (H::template has<invariants::torso>()) {
 		if constexpr (H::template has<components::movement>()) {
+			const float teleport_alpha = typed_handle.template get<components::rigid_body>().get_teleport_alpha();
+
 			const auto& torso = typed_handle.template get<invariants::torso>();
 			const auto& movement = typed_handle.template get<components::movement>();
 
@@ -314,7 +314,7 @@ FORCE_INLINE void specific_entity_drawer(
 
 			const auto face_degrees = viewing_transform.rotation;
 
-			auto render_frame = [&in, &render_visitor, &typed_handle](
+			auto draw_torso_frame = [teleport_alpha, &in, &render_visitor, &typed_handle](
 				const auto& frame,
 				const transformr where
 			) {
@@ -325,6 +325,7 @@ FORCE_INLINE void specific_entity_drawer(
 
 				auto input = in.make_input_for<invariants::sprite>();
 				input.renderable_transform = where;
+				input.colorize.mult_alpha(teleport_alpha);
 
 				input.flip = frame.flip;
 				render_visitor(sprite, in.manager, input);
@@ -375,7 +376,7 @@ FORCE_INLINE void specific_entity_drawer(
 							f = !f;
 						}
 						
-						render_frame(
+						draw_torso_frame(
 							frame_with_flip,
 							{ (viewing_transform * leg_offset).pos, leg_anim.rotation }
 						);
@@ -467,7 +468,7 @@ FORCE_INLINE void specific_entity_drawer(
 						f = !f;
 					}
 
-					render_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees });
+					draw_torso_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees });
 				}
 
 				draw_items_recursively(true);
@@ -513,6 +514,8 @@ FORCE_INLINE void specific_entity_drawer(
 						if (head_dim) {
 							input.colorize.multiply_rgb(0.75f);
 						}
+
+						input.colorize.mult_alpha(teleport_alpha);
 
 						if (!should_draw_dim_but_this_is_neon) {
 							render_visitor(sprite, in.manager, input);

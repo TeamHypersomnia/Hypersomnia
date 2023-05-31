@@ -35,8 +35,8 @@ struct portal_exit_impulses {
 	float character_exit_inertia_ms = 1000.0f;
 	impulse_amount_def character_exit_impulse = { 2000.0f, impulse_type::ADD_VELOCITY };
 
-	impulse_amount_def object_exit_impulse = { 2000.0f, impulse_type::ADD_VELOCITY };
-	impulse_amount_def object_exit_angular_impulse = { 1000.0f, impulse_type::IMPULSE };
+	impulse_amount_def object_exit_impulse = { 6000.0f, impulse_type::ADD_VELOCITY };
+	impulse_amount_def object_exit_angular_impulse = { 1000.0f, impulse_type::ADD_VELOCITY };
 	// END GEN INTROSPECTOR
 
 	void set_zero() {

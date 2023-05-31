@@ -44,6 +44,13 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	const auto& interp = in.interpolation;
 
 	const auto& watched_character = cosm[in.viewed_character_id];
+
+	float teleport_alpha = 1.0f;
+
+	if (auto rigid_body = watched_character.find<components::rigid_body>()) {
+		teleport_alpha = rigid_body.get_teleport_alpha();
+	}
+
 	const auto watched_character_transform = watched_character.get_viewing_transform(interp);
 	const auto queried_camera_aabb = in.queried_cone.get_visible_world_rect_aabb();
 
@@ -149,14 +156,17 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 						std::get<health_meter>(meter_metas).appearance
 					;
 
-					const auto bar_color = chosen_appearance.bar_color;
+					auto bar_color = chosen_appearance.bar_color;
+					bar_color.mult_alpha(teleport_alpha);
 
 					// brighten up the health bar a little
-					const auto bright_bar_color = draw_shield ? rgba(bar_color).mult_brightness(1.25f) : bar_color;
+					auto bright_bar_color = draw_shield ? rgba(bar_color).mult_brightness(1.25f) : bar_color;
+					bright_bar_color.mult_alpha(teleport_alpha);
 
 					auto dark_bar_color = rgba(bar_color) * 0.4f;
 					// now we have a bit less alpha too
 					dark_bar_color.a = 200;
+					dark_bar_color.mult_alpha(teleport_alpha);
 
 					const auto bar_center = in.text_camera.to_screen_space(transform.pos + vec2(0, outermost_circle_radius));
 
@@ -219,6 +229,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 						auto white_bar_color = white;
 						white_bar_color.mult_alpha(1.0f - highlight->passed_mult);
+						white_bar_color.mult_alpha(teleport_alpha);
 
 						bars_output.aabb(tex, white_bar_origin, white_bar_color);
 
@@ -318,7 +329,8 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 				const auto value = info.value;
 
-				const auto health_col = info.color;
+				auto health_col = info.color;
+				health_col.mult_alpha(teleport_alpha);
 
 				meter_output.aabb_centered(this_tex, vec2(transform.pos).discard_fract(), health_col);
 
@@ -388,6 +400,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 								auto remaining_ammo_color = white;
 								remaining_ammo_color.a = 200;
+								remaining_ammo_color.mult_alpha(teleport_alpha);
 
 								const auto remaining_ammo_text = std::to_string(count_melees);
 								new_info.text = formatted_string { remaining_ammo_text, { in.gui_font, remaining_ammo_color } };
@@ -439,6 +452,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 								auto ammo_color = augs::interp(white, red_violet, (1 - ammo_ratio)* (1 - ammo_ratio));
 								ammo_color.a = 200;
+								ammo_color.mult_alpha(teleport_alpha);
 
 								meter_output.aabb_centered(this_tex, vec2(transform.pos).discard_fract(), ammo_color);
 
@@ -466,6 +480,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 								auto remaining_ammo_color = augs::interp(white, red_violet, (1 - remaining_ratio)* (1 - remaining_ratio));
 								remaining_ammo_color.a = 200;
+								remaining_ammo_color.mult_alpha(teleport_alpha);
 
 								if (in.settings.draw_remaining_ammo) {
 									const auto remaining_ammo_text = " /" + std::to_string(remaining_ammo);
@@ -510,10 +525,15 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					const auto text_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(cam.eye.zoom * (radius + 6.f), bbox, info.angle) - bbox / 2;
 					//health_points.pos = screen_space_circle_center + vec2::from_degrees(in.angle).set_length(circle_displacement_length);
 
+					auto stroke_color = black;
+					stroke_color.mult_alpha(teleport_alpha);
+
 					augs::gui::text::print_stroked(
 						augs::drawer { info.is_nickname ? in.nicknames : in.health_numbers },
 						text_pos,
-						text
+						text,
+						{},
+						stroke_color
 					);
 				}
 			}

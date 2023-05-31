@@ -777,7 +777,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		ImGui::Separator();
 
 		MULTIPROPERTY("Trampoline-like", as_portal.trampoline_like);
-		tooltip_on_hover("Convenience option to disable travel and set target to itself.\nThis will make the portal work like a trampoline -\nObjects will not be teleported, they will simply be pushed with a force,\nin accordance with AS EXIT parameters.");
+		tooltip_on_hover("Convenience option to disable travel and set target to itself.\nThis will make the portal work like a trampoline -\nObjects will not be teleported, they will simply be pushed with a force,\nin accordance with AS EXIT parameters.\n\nRemember to customize Enter time (ms)!\nSet it to 0 if you want everything to bounce instantly.");
 
 		const bool trampoline = insp.as_portal.trampoline_like;
 
@@ -786,23 +786,12 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			tooltip_on_hover("Where to teleport entering objects.\nCan only be another portal.\nIf you leave it empty, the character will just stay invisible and won't teleport anywhere.\nIf you set it to itself, the portal will behave like a trampoline.");
 		}
 
-		if (!trampoline) {
-			MULTIPROPERTY("Preserve entry offset", as_portal.preserve_entry_offset);
-
-			tooltip_on_hover("If ticked, exit position will be slightly offset to match\nexactly how far from the center did object enter the portal.\n\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.");
-		}
-
-		MULTIPROPERTY("Quiet entry", as_portal.quiet_entry);
+		MULTIPROPERTY("Undetectable entry", as_portal.undetectable_entry);
 		tooltip_on_hover("Convenience option to disable all delays, sounds and particles on entry.\nThis will make the portal 'seamless' - the subjects will instantly change positions.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
 
-		if (!insp.as_portal.quiet_entry) {
-			if (!trampoline) {
-				MULTIPROPERTY("Enter shake strength", as_portal.enter_shake.strength);
-				tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully enter the portal.");
-				MULTIPROPERTY("Enter shake duration (ms)", as_portal.enter_shake.duration_ms);
-				tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully enter the portal.");
-			}
+		if (!insp.as_portal.undetectable_entry) {
+			tooltip_on_hover("When altering enter/travel time,\nautomatically scale pitch of entering/travelling sounds.\n\nE.g. if you set Enter time to 500ms,\nthe Begin entering sound will automatically have 2x the normal pitch.\nAnalogously with Travel time and Enter sound.");
 
 			MULTIPROPERTY("Enter time (ms)", as_portal.enter_time_ms);
 
@@ -810,54 +799,67 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 				MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
 			}
 
-			MULTIPROPERTY("Begin entering highlight time (ms)", as_portal.begin_entering_highlight_ms);
-			tooltip_on_hover("Highlights any entered object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
+			MULTIPROPERTY("Auto scale pitches", as_portal.auto_scale_pitches);
 
-			MULTIPROPERTY("Light color", as_portal.light_color);
-			MULTIPROPERTY("Light size mult", as_portal.light_size_mult);
+			if (auto scope = augs::imgui::scoped_tree_node_ex("Visual effects")) {
+				MULTIPROPERTY("Begin entering highlight time (ms)", as_portal.begin_entering_highlight_ms);
+				tooltip_on_hover("Highlights any entered object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
+				MULTIPROPERTY("Decrease opacity to", as_portal.decrease_opacity_to);
 
-			MULTIPROPERTY("Rings effect", as_portal.rings_effect.is_enabled);
+				tooltip_on_hover("As objects enter the portal, they will become \nless and less visible until they finally disappear.\n\nYou can control the target to which opacity is decreased.\nIf you want objects to become fully invisible before teleporting, set to 0.\nIf you want to disable this effect (to make the portal undetectible), set it to maximum: 255.");
 
-			if (last_result) {
+				MULTIPROPERTY("Light color", as_portal.light_color);
+				MULTIPROPERTY("Light size mult", as_portal.light_size_mult);
+
+				MULTIPROPERTY("Rings effect", as_portal.rings_effect.is_enabled);
+
+				if (last_result) {
+					if (insp.as_portal.rings_effect.is_enabled) {
+						result = "Enabled Rings effect in %x";
+					}
+					else {
+						result = "Disabled Rings effect in %x";
+					}
+				}
+
 				if (insp.as_portal.rings_effect.is_enabled) {
-					result = "Enabled Rings effect in %x";
+					auto scope = scoped_indent();
+
+					MULTIPROPERTY("Effect speed", as_portal.rings_effect.value.effect_speed);
+
+					MULTIPROPERTY("Inner color", as_portal.rings_effect.value.inner_color);
+					MULTIPROPERTY("Outer color", as_portal.rings_effect.value.outer_color);
 				}
-				else {
-					result = "Disabled Rings effect in %x";
+
+				PARTICLE_EFFECT_MULTIPROPERTY("Ambience (particles)", as_portal.ambience_particles);
+				PARTICLE_EFFECT_MULTIPROPERTY("Begin entering particles", as_portal.begin_entering_particles);
+
+				if (!trampoline) {
+					PARTICLE_EFFECT_MULTIPROPERTY("Enter particles", as_portal.enter_particles);
+					//MULTIPROPERTY("Enter shake strength", as_portal.enter_shake.strength);
+					//tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully enter the portal.");
+					MULTIPROPERTY("Enter shake duration (ms)", as_portal.enter_shake.duration_ms);
+					tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully enter the portal.");
 				}
 			}
 
-			if (insp.as_portal.rings_effect.is_enabled) {
-				auto scope = scoped_indent();
+			if (auto scope = augs::imgui::scoped_tree_node_ex("Sound effects")) {
+				SOUND_EFFECT_LEAN_MULTIPROPERTY("Ambience (sound)", as_portal.ambience_sound);
 
-				MULTIPROPERTY("Effect speed", as_portal.rings_effect.value.effect_speed);
+				if (insp.as_portal.ambience_sound.id.is_set()) {
+					auto scope = scoped_indent();
+					auto scope2 = scoped_indent();
 
-				MULTIPROPERTY("Inner color", as_portal.rings_effect.value.inner_color);
-				MULTIPROPERTY("Outer color", as_portal.rings_effect.value.outer_color);
-			}
+					MULTIPROPERTY("Ambience sound distance mult", as_portal.ambience_sound_distance_mult);
 
-			PARTICLE_EFFECT_MULTIPROPERTY("Ambience (particles)", as_portal.ambience_particles);
-			SOUND_EFFECT_LEAN_MULTIPROPERTY("Ambience (sound)", as_portal.ambience_sound);
+					tooltip_on_hover("How far away the portal ambience will be heard.\n1.2 means it will only be heard within the 120%% of the portal radius\n(so basically only very close).");
+				}
 
-			if (insp.as_portal.ambience_sound.id.is_set()) {
-				auto scope = scoped_indent();
-				auto scope2 = scoped_indent();
+				SOUND_EFFECT_LEAN_MULTIPROPERTY("Begin entering sound", as_portal.begin_entering_sound);
 
-				MULTIPROPERTY("Ambience sound distance mult", as_portal.ambience_sound_distance_mult);
-
-				tooltip_on_hover("How far away the portal ambience will be heard.\n1.2 means it will only be heard within the 120%% of the portal radius\n(so basically only very close).");
-			}
-
-			SOUND_EFFECT_LEAN_MULTIPROPERTY("Begin entering sound", as_portal.begin_entering_sound);
-
-			if (!trampoline) {
-				SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
-			}
-
-			PARTICLE_EFFECT_MULTIPROPERTY("Begin entering particles", as_portal.begin_entering_particles);
-
-			if (!trampoline) {
-				PARTICLE_EFFECT_MULTIPROPERTY("Enter particles", as_portal.enter_particles);
+				if (!trampoline) {
+					SOUND_EFFECT_LEAN_MULTIPROPERTY("Enter sound", as_portal.enter_sound);
+				}
 			}
 		}
 
@@ -877,63 +879,67 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		text_color("AS EXIT", orange);
 		ImGui::Separator();
 
-		MULTIPROPERTY("Quiet exit", as_portal.quiet_exit);
+		MULTIPROPERTY("Exit position", as_portal.exit_position);
+		tooltip_on_hover("PORTAL_CENTER - always spawn objects exactly at this portal center.\n\nPORTAL_CENTER_PLUS_ENTERING_OFFSET -\nexit position will be slightly offset to match\nexactly how far from the center did object enter the portal.\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.\nPreferred setting for trampoline portals.\n\nPORTAL_BOUNDARY - will spawn objects on the edge of this portal\naccording to Exit direction.");
+
+		MULTIPROPERTY("Exit direction", as_portal.exit_direction);
+
+		MULTIPROPERTY("Undetectable exit", as_portal.undetectable_exit);
 		tooltip_on_hover("Convenience option to disable all impulses, sounds and particles on exit.\n\nNecessary for 'undetectable' portals,\nwhen you want the player to not even notice that they just warped somewhere.\n This could even let you create some mind-bending creepy labrinyths.");
 
-		if (!insp.as_portal.quiet_exit) {
-			MULTIPROPERTY("Exit highlight time (ms)", as_portal.exit_highlight_ms);
-			tooltip_on_hover("Highlights any exiting object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
+		if (!insp.as_portal.undetectable_exit) {
+			if (auto scope = augs::imgui::scoped_tree_node_ex("Exit effects")) {
+				MULTIPROPERTY("Exit highlight time (ms)", as_portal.exit_highlight_ms);
+				tooltip_on_hover("Highlights any exiting object in pure color.\nThe color is automatically set to Rings effect -> Inner color.");
 
-			SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
-			PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
-
-			ImGui::Separator();
-			text_color("Character exit", yellow);
-			ImGui::Separator();
-
-			text_disabled("Forces to apply when a character appears\nthrough this portal exit.");
-
-			MULTIPROPERTY("Exit shake strength", as_portal.exit_shake.strength);
-			tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully exit the portal.");
-			MULTIPROPERTY("Exit shake duration (ms)", as_portal.exit_shake.duration_ms);
-			tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully exit the portal.");
-
-			MULTIPROPERTY("Exit inertia duration (ms)", as_portal.exit_impulses.character_exit_inertia_ms);
-
-			MULTIPROPERTY("Linear impulse##CharLinear", as_portal.exit_impulses.character_exit_impulse.amount);
-
-			{
-				auto scope = scoped_indent();
-				MULTIPROPERTY("Mode##CharLinear", as_portal.exit_impulses.character_exit_impulse.mode);
+				SOUND_EFFECT_LEAN_MULTIPROPERTY("Exit sound", as_portal.exit_sound);
+				PARTICLE_EFFECT_MULTIPROPERTY("Exit particles", as_portal.exit_particles);
 			}
 
-			ImGui::Separator();
-			text_color("Object exit", yellow);
-			ImGui::Separator();
+			if (auto scope = augs::imgui::scoped_tree_node_ex("Character exit forces")) {
+				text_disabled("Forces to apply when a character appears\nthrough this portal exit.");
 
-			text_disabled("Forces to apply when any object appears\nthrough this portal exit.");
+				//MULTIPROPERTY("Exit shake strength", as_portal.exit_shake.strength);
+				//tooltip_on_hover("Applies only to characters.\nHow strong to shake the character\nwhen they successfully exit the portal.");
+				MULTIPROPERTY("Exit shake duration (ms)", as_portal.exit_shake.duration_ms);
+				tooltip_on_hover("Applies only to characters.\nHow long to shake the character for\nwhen they successfully exit the portal.");
 
-			MULTIPROPERTY("Linear impulse##ObjLinear", as_portal.exit_impulses.object_exit_impulse.amount);
+				MULTIPROPERTY("Exit inertia duration (ms)", as_portal.exit_impulses.character_exit_inertia_ms);
 
-			{
-				auto scope = scoped_indent();
-				MULTIPROPERTY("Mode##ObjLinear", as_portal.exit_impulses.object_exit_impulse.mode);
+				MULTIPROPERTY("Linear impulse##CharLinear", as_portal.exit_impulses.character_exit_impulse.amount);
+
+				{
+					auto scope = scoped_indent();
+					MULTIPROPERTY("Mode##CharLinear", as_portal.exit_impulses.character_exit_impulse.mode);
+				}
 			}
 
-			MULTIPROPERTY("Angular impulse##ObjAngular", as_portal.exit_impulses.object_exit_angular_impulse.amount);
+			if (auto scope = augs::imgui::scoped_tree_node_ex("Character exit forces")) {
+				text_color("Object exit forces", yellow);
 
-			{
-				auto scope = scoped_indent();
-				MULTIPROPERTY("Mode##ObjAngular", as_portal.exit_impulses.object_exit_angular_impulse.mode);
+				text_disabled("Forces to apply when any object appears\nthrough this portal exit.");
+
+				MULTIPROPERTY("Linear impulse##ObjLinear", as_portal.exit_impulses.object_exit_impulse.amount);
+
+				{
+					auto scope = scoped_indent();
+					MULTIPROPERTY("Mode##ObjLinear", as_portal.exit_impulses.object_exit_impulse.mode);
+				}
+
+				MULTIPROPERTY("Angular impulse##ObjAngular", as_portal.exit_impulses.object_exit_angular_impulse.amount);
+
+				{
+					auto scope = scoped_indent();
+					MULTIPROPERTY("Mode##ObjAngular", as_portal.exit_impulses.object_exit_angular_impulse.mode);
+				}
 			}
 		}
 
-		ImGui::Separator();
-		text_disabled("Advanced");
+		if (auto scope = augs::imgui::scoped_tree_node_ex("Advanced")) {
+			MULTIPROPERTY("Exit cooldown (ms)", as_portal.exit_cooldown_ms);
+			tooltip_on_hover("Since the exit is a portal that can be entered too,\nwe need to ignore it for a split second,\nto prevent an infinite loop where an object perpetually teleports back and forth.");
 
-		MULTIPROPERTY("Exit cooldown (ms)", as_portal.exit_cooldown_ms);
-		tooltip_on_hover("Since the exit is a portal that can be entered too,\nwe need to ignore it for a split second,\nto prevent an infinite loop where an object perpetually teleports back and forth.");
-
+		}
 	}
 
 	return result;

@@ -4,6 +4,7 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/continuous_rings_input.h"
+#include "game/enums/portal_enums.h"
 
 namespace components {
 	struct portal {
@@ -12,7 +13,7 @@ namespace components {
 		float travel_time_ms = 1000.0f;
 
 		b2Filter custom_filter;
-		bool preserve_entry_offset = false;
+		rgba_channel decrease_opacity_to = 0;
 		pad_bytes<1> pad;
 
 		float begin_entering_highlight_ms = 1000.0f;
@@ -37,6 +38,9 @@ namespace components {
 		portal_exit_impulses exit_impulses;
 
 		augs::maybe<continuous_rings_input> rings_effect;
+
+		portal_exit_direction exit_direction = portal_exit_direction::PORTAL_DIRECTION;
+		portal_exit_position exit_position = portal_exit_position::PORTAL_CENTER;
 
 		float light_size_mult = 1.0f;
 		rgba light_color = white;

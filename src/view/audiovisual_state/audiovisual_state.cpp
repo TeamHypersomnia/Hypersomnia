@@ -595,5 +595,11 @@ void audiovisual_state::standard_post_solve(
 				highlights.add(h.subject, new_highlight);
 			}
 		}
+
+		const auto pure_color_highlights = step.get_queue<messages::pure_color_highlight>();
+
+		for (const auto& h : pure_color_highlights) {
+			highlights.add(h.subject, h.input);
+		}
 	}
 }

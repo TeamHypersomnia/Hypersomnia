@@ -502,7 +502,8 @@ namespace test_flavours {
 			test_scene_sound_id::PORTAL_BEGIN_ENTERING,
 			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
 			-1,
-			-1
+			-1,
+			1,1,0.5f
 		);
 
 		flavour_with_sound(
@@ -510,7 +511,8 @@ namespace test_flavours {
 			test_scene_sound_id::PORTAL_ENTER,
 			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
 			-1,
-			-1
+			-1,
+			1,1,0.5f
 		);
 
 		flavour_with_sound(

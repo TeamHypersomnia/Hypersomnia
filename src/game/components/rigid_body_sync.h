@@ -124,6 +124,10 @@ public:
 		return get_raw_component({}).special;
 	}
 
+	auto get_teleport_alpha() const {
+		return get_special().get_teleport_alpha();
+	}
+
 	b2ContactEdge* get_contact_list() const { 
 		if (auto cache = find_cache()) {
 			return cache->body.get()->GetContactList();

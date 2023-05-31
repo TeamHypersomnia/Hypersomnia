@@ -6,6 +6,7 @@
 #include "game/detail/view_input/continuous_rings_input.h"
 
 #include "game/detail/sentience_shake.h"
+#include "game/enums/portal_enums.h"
 
 struct editor_point_marker_node;
 
@@ -29,11 +30,11 @@ struct editor_portal_info {
 	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct editor_portal_info
-	bool quiet_entry = false;
-	bool quiet_exit = false;
+	bool undetectable_entry = false;
+	bool undetectable_exit = false;
 
+	bool auto_scale_pitches = true;
 	bool trampoline_like = false;
-	bool preserve_entry_offset = false;
 
 	float enter_time_ms = 1000.0f;
 	float travel_time_ms = 1000.0f;
@@ -42,14 +43,15 @@ struct editor_portal_info {
 	editor_filter_flags reacts_to;
 
 	float begin_entering_highlight_ms = 1000.0f;
-	float exit_highlight_ms = 220.0f;
+	rgba_channel decrease_opacity_to = 3;
+	float exit_highlight_ms = 500.0f;
 
 	augs::maybe<continuous_rings_input> rings_effect = continuous_rings_input();
 	float light_size_mult = 2.05f;
 	rgba light_color = rgba(0, 255, 255, 150);
 
-	sentience_shake enter_shake = { 1000.0f, 1.0f };
-	sentience_shake exit_shake = { 1000.0f, 1.0f };
+	sentience_shake enter_shake = { 1.0f, 1000.0f };
+	sentience_shake exit_shake = { 1.0f, 1000.0f };
 
 	editor_sound_effect ambience_sound;
 	float ambience_sound_distance_mult = 2.0f;
@@ -66,6 +68,8 @@ struct editor_portal_info {
 
 	editor_typed_node_id<editor_area_marker_node> portal_exit;
 	portal_exit_impulses exit_impulses;
+	portal_exit_direction exit_direction = portal_exit_direction::PORTAL_DIRECTION;
+	portal_exit_position exit_position = portal_exit_position::PORTAL_CENTER_PLUS_ENTERING_OFFSET;
 	// END GEN INTROSPECTOR
 
 	editor_portal_info() {
