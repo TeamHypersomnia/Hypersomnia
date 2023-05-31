@@ -531,16 +531,19 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				movement.surface_slowdown_ms -= delta_ms;
 			}
 
-			if (constant_inertia) {
-				movement.const_inertia_ms = std::min(300.f, movement.const_inertia_ms);
-				movement.const_inertia_ms -= delta_ms;
+			if (!rigid_body.get_special().inside_portal.is_set()) {
+				if (constant_inertia) {
+					movement.const_inertia_ms = std::min(300.f, movement.const_inertia_ms);
+					movement.const_inertia_ms -= delta_ms;
+				}
+
+				if (linear_inertia) {
+					movement.linear_inertia_ms -= delta_ms;
+				}
+
+				movement.portal_inertia_ms -= delta_ms;
 			}
 
-			if (linear_inertia) {
-				movement.linear_inertia_ms -= delta_ms;
-			}
-
-			movement.portal_inertia_ms -= delta_ms;
 			movement.portal_inertia_ms = std::clamp(movement.portal_inertia_ms, 0.0f, 3000.0f);
 			movement.linear_inertia_ms = std::clamp(movement.linear_inertia_ms, 0.0f, 3000.0f);
 		}
