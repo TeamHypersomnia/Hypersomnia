@@ -6,14 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- If we just 
-					if (ce->other->m_last_teleport_progress_timestamp == now) {
-						continue;
-					}
-    - then if two portals overlap (background one and a normal one)
-        - one can "steal" from the other
-    - on the other hand we need this counter to prevent contacts from re-beginning entering after teleporting (which only changes transform in physics_system but old contacts are still there)
-
 - Billan crash
 
 - either remove bursts from the enum combos or automatically make them streams somehow
@@ -34,6 +26,7 @@ summary: That which we are brainstorming at the moment.
 - portal finishing touches
     - fix decrease opacity math
     - good particle effects
+    - setup good defaults w/sounds etc
 
     - btw watch out if components::portal doesnt have any state that needs synchronization actually
         - however sound cooldowns are only view related so they don't need to be

@@ -363,7 +363,7 @@ bool edit_property(
 					return true;
 				}
 
-				tooltip_on_hover("How strongly to push bodies that appear through this portal.\nBodies will be pushed in the direction this spot is facing.");
+				tooltip_on_hover("How strongly to push.");
 
 				return false;
 			}
@@ -845,7 +845,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		ImGui::Separator();
 
 		MULTIPROPERTY("Trampoline-like", as_portal.trampoline_like);
-		tooltip_on_hover("Convenience option to disable travel and set target to itself.\nThis will make the portal work like a trampoline -\nObjects will not be teleported, they will simply be pushed with a force,\nin accordance with AS EXIT parameters.\n\nRemember to customize Enter time (ms)!\nSet it to 0 if you want everything to bounce instantly.");
+		tooltip_on_hover("Convenience option to disable enter/travel delay and set target to itself.\nThis will make the portal work like a trampoline -\nObjects will not be teleported, they will simply be pushed with a force,\nin accordance with AS EXIT parameters.");
 
 		const bool trampoline = insp.as_portal.trampoline_like;
 
@@ -858,10 +858,11 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		tooltip_on_hover("'Airborne' characters are ones that only just exited a portal or e.g. during dash.\nThis is useful for making portals that only react when you 'land'.\nA perfect usecase is the background portal on 'surf' maps\nthat teleports you back to the beginning if you happen to miss a trampoline.");
 
 
-		MULTIPROPERTY("Enter time (ms)", as_portal.enter_time_ms);
-
 		if (!trampoline) {
+			MULTIPROPERTY("Enter time (ms)", as_portal.enter_time_ms);
+			tooltip_on_hover("The time it takes to enter the portal and disappear.");
 			MULTIPROPERTY("Travel time (ms)", as_portal.travel_time_ms);
+			tooltip_on_hover("The time it takes exit the portal after disappearing.");
 		}
 
 		MULTIPROPERTY("Disable all entry effects", as_portal.disable_all_entry_effects);

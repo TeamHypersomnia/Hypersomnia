@@ -183,3 +183,11 @@ Solved:
 
 - why prod-debug doesn't see details.lua? wrong cwd?
     - was because of build in console mode
+
+- If we just 
+					if (ce->other->m_last_teleport_progress_timestamp == now) {
+						continue;
+					}
+    - then if two portals overlap (background one and a normal one)
+        - one can "steal" from the other
+    - on the other hand we need this counter to prevent contacts from re-beginning entering after teleporting (which only changes transform in physics_system but old contacts are still there)

@@ -42,8 +42,8 @@ struct editor_portal_info {
 	bool trampoline_like = false;
 	bool ignore_airborne_characters = false;
 
-	float enter_time_ms = 1000.0f;
-	float travel_time_ms = 1000.0f;
+	float enter_time_ms = 500.0f;
+	float travel_time_ms = 500.0f;
 	float exit_cooldown_ms = 200.0f;
 
 	editor_filter_flags reacts_to;

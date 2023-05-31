@@ -258,7 +258,7 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					switch (portal_exit_portal->exit_position) {
 						case portal_exit_position::PORTAL_CENTER_PLUS_ENTERING_OFFSET:
-							final_transform.pos += contacted_entity_transform.pos - portal_entry_transform.pos;
+							final_transform.pos += (contacted_entity_transform.pos - portal_entry_transform.pos).trim_length(radius);
 							break;
 						case portal_exit_position::PORTAL_BOUNDARY:
 							final_transform.pos += portal_exit_direction * radius;
@@ -276,10 +276,13 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					const auto impulses = portal_exit_portal->exit_impulses;
 
-					const bool should_set_rotation_to_new_vel = 
+					const bool is_missile_like = 
 						typed_contacted_entity.template has<components::missile>()
 						|| ::is_like_thrown_melee(typed_contacted_entity)
 					;
+
+					const bool should_set_rotation_to_new_vel = is_missile_like;
+					const bool should_only_redirect_velocity = typed_contacted_entity.template has<components::missile>();
 
 					if (const bool is_sentient = typed_contacted_entity.template has<components::sentience>()) {
 						rigid_body.apply_linear(portal_exit_direction, impulses.character_exit_impulse);
@@ -290,7 +293,12 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						}
 					}
 					else {
-						rigid_body.apply_linear(portal_exit_direction, impulses.object_exit_impulse);
+						if (should_only_redirect_velocity) {
+							rigid_body.set_velocity(rigid_body.get_velocity().length() * portal_exit_direction);
+						}
+						else {
+							rigid_body.apply_linear(portal_exit_direction, impulses.object_exit_impulse);
+						}
 
 						if (should_set_rotation_to_new_vel) {
 							final_transform.rotation = rigid_body.get_velocity().degrees();

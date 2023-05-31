@@ -167,11 +167,11 @@ bool setup_entity_from_node(
 							const auto max_pitch = 3.5f;
 
 							if (to.enter_time_ms != 0.0f) {
-								to.begin_entering_sound.modifier.pitch *= std::min(max_pitch, 1.0f / (to.enter_time_ms / 1000.0f));
+								to.begin_entering_sound.modifier.pitch *= std::min(max_pitch, 1.0f / (to.enter_time_ms / 500.0f));
 							}
 
 							if (to.travel_time_ms != 0.0f) {
-								to.enter_sound.modifier.pitch *= std::min(max_pitch, 1.0f / (to.travel_time_ms / 1000.0f));
+								to.enter_sound.modifier.pitch *= std::min(max_pitch, 1.0f / (to.travel_time_ms / 500.0f));
 							}
 						}
 
@@ -205,6 +205,7 @@ bool setup_entity_from_node(
 
 					if (from.trampoline_like) {
 						to.travel_time_ms = 0.f;
+						to.enter_time_ms = 0.f;
 
 						to.enter_shake = sentience_shake::zero();
 						to.enter_sound = {};
