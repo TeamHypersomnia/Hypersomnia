@@ -18,6 +18,8 @@ void setup_resource_defaults_after_creating_officials(
 	if (auto portal = find_resource(o[area_marker_type::PORTAL])) {
 		auto& to = portal->editable.node_defaults.as_portal;
 
+		portal->editable.node_defaults.shape = marker_shape_type::CIRCLE;
+
 		to.ambience_particles.id = o[test_particles_decorations::PORTAL_CIRCLE];
 		to.ambience_sound.id = o[test_sound_decorations::PORTAL_AMBIENCE];
 

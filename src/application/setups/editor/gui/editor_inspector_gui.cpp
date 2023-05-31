@@ -771,6 +771,13 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		MULTIPROPERTY("Letter", letter);
 	}
 
+	const bool has_shape = type == area_marker_type::PORTAL;
+
+	if (has_shape) {
+		MULTIPROPERTY("Shape", shape);
+		tooltip_on_hover("Note that rectangular effects for portals are not supported yet,\nbut the physical sensor itself will work just fine as a box.");
+	}
+
 	if (type == area_marker_type::PORTAL) {
 		ImGui::Separator();
 		text_color("AS ENTRY", cyan);

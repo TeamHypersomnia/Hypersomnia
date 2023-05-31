@@ -13,7 +13,6 @@ summary: That which we are brainstorming at the moment.
 
 - portal finishing touches
     - fix decrease opacity math
-    - maybe allow box
 
     - several simple "color presets" could let us avoid the need to tweak a million color controls
     - We will reuse portals as force fields
@@ -39,6 +38,7 @@ summary: That which we are brainstorming at the moment.
     - force fields: cosm.for_each_having<components::rigid_body, invariants::area_marker>(
 
     - done/disregarded
+        - maybe allow box
         - "require zero inertia"
         - separate "portal inertia" in movement that doesn't remove the ability to move
             - and hard limit to like 3 seconds it so that it doesn't accumulate when you enter a loop and suddenly exit it
