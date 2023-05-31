@@ -236,7 +236,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Animation speed factor" || label == "Positional vibration" || label == "Intensity vibration") {
+			if (label == "Animation speed factor" || label == "Positional vibration" || label == "Intensity vibration" || label == "Light size mult") {
 				if (slider(label, property, 0.0f, 5.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -914,9 +914,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 				}
 			}
 
-			if (auto scope = augs::imgui::scoped_tree_node_ex("Character exit forces")) {
-				text_color("Object exit forces", yellow);
-
+			if (auto scope = augs::imgui::scoped_tree_node_ex("Object exit forces")) {
 				text_disabled("Forces to apply when any object appears\nthrough this portal exit.");
 
 				MULTIPROPERTY("Linear impulse##ObjLinear", as_portal.exit_impulses.object_exit_impulse.amount);

@@ -23,7 +23,7 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 		const auto& movement = typed_handle.template get<components::movement>();
 		const auto& movement_def = typed_handle.template get<invariants::movement>();
 
-		const bool is_inert = movement.const_inertia_ms > 0.f || movement.linear_inertia_ms > 0.f;
+		const bool is_inert = movement.const_inertia_ms > 0.f || movement.linear_inertia_ms > 0.f || movement.portal_inertia_ms > 0.f;
 
 		if (movement.const_inertia_ms > 0.f) {
 			damping.linear = 2;
@@ -35,6 +35,15 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 		{
 			const auto m = movement_def.max_linear_inertia_when_movement_possible;
 			const auto inertia_mult = std::clamp(1.f - movement.linear_inertia_ms / m, 0.f, 1.f);
+
+			damping.linear *= inertia_mult;
+		}
+
+		{
+			const auto max_considered_portal_inertia = 500.0f;
+			const auto m = max_considered_portal_inertia;
+
+			const auto inertia_mult = std::clamp(1.f - movement.portal_inertia_ms / m, 0.f, 1.f);
 
 			damping.linear *= inertia_mult;
 		}

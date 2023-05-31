@@ -483,7 +483,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 			};
 
-			const auto animation_dt = ::legs_frozen(it) ? 0.f : delta_ms * speed_mult;
+			const bool freeze_leg_frame = movement.portal_inertia_ms > 0.0f || ::legs_frozen(it);
+			const auto animation_dt = freeze_leg_frame ? 0.f : delta_ms * speed_mult;
 
 			auto& backward = movement.four_ways_animation.backward;
 			auto& amount = movement.animation_amount;
@@ -538,6 +539,9 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			if (linear_inertia) {
 				movement.linear_inertia_ms -= delta_ms;
 			}
+
+			movement.portal_inertia_ms -= delta_ms;
+			movement.portal_inertia_ms = std::clamp(movement.portal_inertia_ms, 0.0f, 3000.0f);
 		}
 	);
 }

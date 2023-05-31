@@ -95,6 +95,7 @@ namespace components {
 		real32 dash_cooldown_ms = 0.f;
 		real32 const_inertia_ms = 0.f;
 		real32 linear_inertia_ms = 0.f;
+		real32 portal_inertia_ms = 0.f;
 
 		real32 animation_amount = 0.f;
 

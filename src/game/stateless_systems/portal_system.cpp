@@ -231,17 +231,23 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					auto portal_exit_direction = portal_exit_transform->get_direction();
 
+					auto considered_velocity = rigid_body.get_velocity();
+
+					if (considered_velocity == vec2::zero) {
+						considered_velocity = vec2(1.0f, 0.0f);
+					}
+
 					switch (portal_exit_portal->exit_direction) {
 						case portal_exit_direction::PORTAL_DIRECTION:
 							break;
 
 						case portal_exit_direction::ENTERING_VELOCITY:
-							portal_exit_direction = rigid_body.get_velocity();
+							portal_exit_direction = considered_velocity;
 							portal_exit_direction.normalize();
 							break;
 
 						case portal_exit_direction::REVERSE_ENTERING_VELOCITY:
-							portal_exit_direction = rigid_body.get_velocity();
+							portal_exit_direction = considered_velocity;
 							portal_exit_direction.normalize();
 							portal_exit_direction = -portal_exit_direction;
 							break;
@@ -279,7 +285,8 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						rigid_body.apply_linear(portal_exit_direction, impulses.character_exit_impulse);
 
 						if (const auto movement = typed_contacted_entity.template find<components::movement>()) {
-							movement->linear_inertia_ms += impulses.character_exit_inertia_ms;
+							//movement->linear_inertia_ms += impulses.character_exit_inertia_ms;
+							movement->portal_inertia_ms += impulses.character_exit_inertia_ms;
 						}
 					}
 					else {

@@ -12,6 +12,7 @@ summary: That which we are brainstorming at the moment.
     - And an optional FOV setting
 
 - portal finishing touches
+    - several simple "color presets" could let us avoid the need to tweak a million color controls
     - We will reuse portals as force fields
         - The logic would be nearly identical so there's no point introducing another entity/node type
         - Force field will even be a useful effect for the portal as well
@@ -37,7 +38,6 @@ summary: That which we are brainstorming at the moment.
         - and hard limit to like 3 seconds it so that it doesn't accumulate when you enter a loop and suddenly exit it
     - good particle effects
 
-    - several simple "color presets" could let us avoid the need to tweak a million color controls
     - either remove bursts from the enum combos or automatically make them streams somehow
 
     - set/add character inertia (const/linear)
@@ -46,9 +46,9 @@ summary: That which we are brainstorming at the moment.
     - setup default effect ids
 
     - force fields: cosm.for_each_having<components::rigid_body, invariants::area_marker>(
-    - setup default effects
 
     - done/disregarded
+        - setup default effects
         - fix alpha so that a=0 shows only when we actually teleport
         - and add some easy descriptions for impulse/add velocity etc since it's complex!
         - remove FORCE so that people don't set it wrongly there and get confused unnecessarily 
