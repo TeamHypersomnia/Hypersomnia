@@ -270,6 +270,8 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 				};
 
 				auto setup_node_entity_mapping = [&](const auto new_entity_id) {
+					typed_node.scene_entity_id = new_entity_id;
+
 					if (in.scene_entity_to_node == nullptr) {
 						return;
 					}
@@ -284,7 +286,6 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 					}
 
 					mapping.back() = node_id.operator editor_node_id();
-					typed_node.scene_entity_id = new_entity_id;
 				};
 
 				if constexpr(std::is_same_v<node_type, editor_firearm_node>) {
