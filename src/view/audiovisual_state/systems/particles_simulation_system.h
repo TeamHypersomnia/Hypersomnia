@@ -195,7 +195,8 @@ public:
 		const vec2 position,
 		const float basic_velocity_degrees,
 		const float spread,
-		const particles_emission& emission
+		const particles_emission& emission,
+		const vec2 additional_vel = vec2::zero
 	) {
 		const auto& templates = emission.get_definitions<particle_type>();
 		auto new_particle = templates[rng.randval(0u, static_cast<unsigned>(templates.size()) - 1)];
@@ -204,7 +205,7 @@ public:
 		const auto chosen_speed = rng.randval(speed);
 		const auto new_velocity = vec2::from_degrees(velocity_degrees) * chosen_speed;
 		
-		new_particle.set_velocity(new_velocity);
+		new_particle.set_velocity(new_velocity + emission.chase_velocity_mult * additional_vel);
 		new_particle.set_position(position);
 		new_particle.multiply_size(rng.randval(emission.size_multiplier));
 		

@@ -11,6 +11,7 @@ struct absolute_or_local {
 	entity_id target;
 	transformr offset;
 	bool face_velocity = false;
+	bool chase_velocity = false;
 
 	template <class C, class I>
 	auto find_transform(C& cosm, I& interp) {
@@ -22,12 +23,10 @@ struct absolute_or_local {
 		return find_transform_impl(*this, cosm, interp);
 	}
 
-	bool operator==(const absolute_or_local b) const {
-		return target == b.target && offset == b.offset && face_velocity == b.face_velocity;
-	}
+	bool operator==(const absolute_or_local& b) const = default;
 
 	auto hash() const {
-		return augs::hash_multiple(target, offset, face_velocity);
+		return augs::hash_multiple(target, offset, face_velocity, chase_velocity);
 	}
 };
 

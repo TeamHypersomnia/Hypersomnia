@@ -42,6 +42,11 @@ struct particle_effect_start_input {
 		positioning.face_velocity = true;
 		return *this;	
 	}
+
+	auto& chase_velocity() {
+		positioning.chase_velocity = true;
+		return *this;	
+	}
 };
 
 struct particle_effect_input {

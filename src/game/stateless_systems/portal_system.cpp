@@ -160,9 +160,13 @@ static void play_exit_effects(const logic_step step, const H& typed_contacted_en
 	{
 		auto effect = portal.exit_particles;
 
+		auto in = particle_effect_start_input::at_entity(typed_contacted_entity);
+		in.positioning.face_velocity = true;
+		in.positioning.chase_velocity = true;
+		
 		effect.start(
 			step,
-			particle_effect_start_input::at_entity(typed_contacted_entity).face_velocity(),
+			in,
 			predictability
 		);
 	}

@@ -53,6 +53,7 @@ struct particles_emission {
 	bound ending_homing_force = bound(0.f, 0.f);
 
 	float initial_rotation_variation = 0.f;
+	float chase_velocity_mult = 0.0f;
 	bool randomize_acceleration = false;
 	bool scale_damping_to_velocity = false;
 	bool should_particles_look_towards_velocity = true;

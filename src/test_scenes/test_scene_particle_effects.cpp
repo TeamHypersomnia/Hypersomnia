@@ -5150,6 +5150,7 @@ void load_test_scene_particle_effects(
 			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
 			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(70.f, 70.f);
 			em.randomize_acceleration = true;
+			//em.chase_velocity_mult = 0.1f;
 
 			effect.emissions.push_back(em);
 		}
@@ -5231,6 +5232,7 @@ void load_test_scene_particle_effects(
 			em.size_multiplier = float_range(0.20, 0.30);
 			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
+			//em.chase_velocity_mult = 0.0f;
 
 			effect.emissions.push_back(em);
 		}
@@ -5274,6 +5276,7 @@ void load_test_scene_particle_effects(
 			em.size_multiplier = float_range(0.20, 0.30);
 			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
+			//em.chase_velocity_mult = 0.1f;
 
 			effect.emissions.push_back(em);
 		}
@@ -5329,6 +5332,7 @@ void load_test_scene_particle_effects(
 			em.should_particles_look_towards_velocity = false;
 			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 0.f);
 			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(60.f, 60.f);
+			//em.chase_velocity_mult = 0.1f;
 
 			effect.emissions.push_back(em);
 		}

@@ -567,7 +567,8 @@ void particles_simulation_system::advance_visible_streams(
 		emission_instances_type& instances, 
 		const transformr current_transform,
 		const bool visible_in_camera,
-		const packaged_particle_effect& effect
+		const packaged_particle_effect& effect,
+		const vec2 chased_velocity = vec2::zero
 	) {
 		const auto& modifier = effect.input.modifier;
 		const auto homing_target = effect.start.homing_target;
@@ -658,7 +659,8 @@ void particles_simulation_system::advance_visible_streams(
 						final_particle_position,
 						current_transform.rotation + instance.swing_spread * static_cast<float>(std::sin((instance.stream_lifetime_ms / 1000.f) * 2 * PI<float> * instance.swings_per_sec)),
 						instance.spread,
-						emission
+						emission,
+						chased_velocity
 					);
 
 					return ::apply_to_particle(modifier, particle);
@@ -719,7 +721,17 @@ void particles_simulation_system::advance_visible_streams(
 
 			const bool visible_in_camera = cam_aabb.hover(where->pos);
 
-			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			auto chased_velocity = vec2::zero;
+
+			if (chase.chase_velocity) {
+				if (chase.target.is_set()) {
+					if (const auto target_handle = cosm[chase.target]) {
+						chased_velocity = target_handle.get_effective_velocity();
+					}
+				}
+			}
+
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original, chased_velocity);
 			return c.is_over();
 		});
 
@@ -788,7 +800,17 @@ void particles_simulation_system::advance_visible_streams(
 			*where += displacement;
 			const bool visible_in_camera = cam_aabb.hover(where->pos);
 
-			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			auto chased_velocity = vec2::zero;
+
+			if (chase.chase_velocity) {
+				if (chase.target.is_set()) {
+					if (const auto target_handle = cosm[chase.target]) {
+						chased_velocity = target_handle.get_effective_velocity();
+					}
+				}
+			}
+
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original, chased_velocity);
 			return false;
 		});
 	}
