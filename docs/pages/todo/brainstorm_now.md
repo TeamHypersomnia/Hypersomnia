@@ -8,17 +8,19 @@ summary: That which we are brainstorming at the moment.
 
 - Billan crash
 
-- either remove bursts from the enum combos or automatically make them streams somehow
+- chase velocity flag for exit portal particles
+    - so that they can be seen on an extremely fast moving character
 
-- We will reuse portals as force fields
-    - The logic would be nearly identical so there's no point introducing another entity/node type
-    - Force field will even be a useful effect for the portal as well
-        - We'll give one by default that pulls towards the center
-        - By giving a minus someone can set it to pull outwards
-        - And also torque
-        - And just a flag whether it should pull proportional to mass
-    - Let force fields increase portal inertia
-        - slowly with a maximum, two parameters per each force field
+- ensure exit sounds are played in place and only the listener is set to the traveller subject
+    - bystanders would otherwise hear insane doppler effect
+        - though on the other hand if you and your friend are flying together you'll hear his exit sound with insane doppler but idc
+
+- corpses i think dont teleport
+    - they'll automatically react if Characters are ticked
+        - For surf ski shouldn't be a problem because we won't respawn the player in place like in quick_test
+        - it will always respawn the player at entry so they can get ready to start again
+
+- either remove bursts from the enum combos or automatically make them streams somehow
 
 - "Override map setting (not recommended)" for FOV
     - And an optional FOV setting
@@ -97,6 +99,16 @@ summary: That which we are brainstorming at the moment.
 
             - this will allow us to set one sound for both start and culmination  
             - "continuous entering" sound effect can simply be implemented by adding another ambient sound with a small range
+        - We will reuse portals as force fields
+            - The logic would be nearly identical so there's no point introducing another entity/node type
+            - Force field will even be a useful effect for the portal as well
+                - We'll give one by default that pulls towards the center
+                - By giving a minus someone can set it to pull outwards
+                - And also torque
+                - And just a flag whether it should pull proportional to mass
+            - Let force fields increase portal inertia
+                - slowly with a maximum, two parameters per each force field
+
 
 - FFA planning
     - Lying weapons are unlimited

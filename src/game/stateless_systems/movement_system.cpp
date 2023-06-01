@@ -263,6 +263,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				movement.dash_cooldown_ms -= delta_ms;
 			}
 
+			const bool portal_inertia = movement.portal_inertia_ms > 0.f;
 			const bool linear_inertia = movement.linear_inertia_ms > 0.f;
 			const bool surface_slowdown = movement.surface_slowdown_ms > 0.f;
 			const bool constant_inertia = movement.const_inertia_ms > 0.f;
@@ -290,10 +291,17 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 			if (propelling) {
 				if (movement.was_sprint_effective) {
-					movement_force_mult /= 2.f;
+					if (portal_inertia) {
+						if (is_sentient) {
+							sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint.effective * 0.5f;
+						}
+					}
+					else {
+						movement_force_mult /= 2.f;
 
-					if (is_sentient) {
-						sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint.effective;
+						if (is_sentient) {
+							sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint.effective;
+						}
 					}
 				}
 

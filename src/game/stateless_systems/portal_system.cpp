@@ -430,8 +430,12 @@ void portal_system::advance_portal_logic(const logic_step step) {
 						special.teleport_progress += progress_added;
 					}
 
+					bool apply_force_field = true;
+
 					if (special.teleport_progress >= 1.0f) {
 						if (enter_portal()) {
+							apply_force_field = false;
+
 							if (is_instant_exit) {
 								/* Teleporting finished. Reset progress variables. */
 								const bool should_reinfer = false;
@@ -451,6 +455,106 @@ void portal_system::advance_portal_logic(const logic_step step) {
 							*/
 
 							special.teleport_progress = 1.0f;
+						}
+					}
+
+					if (apply_force_field) {
+						if (portal.force_field.is_enabled) {
+							const auto& f = portal.force_field.value;
+
+							const auto portal_transform = typed_portal_handle.get_logic_transform();
+
+							vec2 direction = vec2(1, 0);
+
+							switch (f.direction) {
+								case force_field_direction::FIELD_DIRECTION:
+									direction = portal_transform.get_direction();
+									break;
+								case force_field_direction::INWARD:
+									direction = portal_transform.pos - contacted_rigid.get_position();
+									direction.normalize();
+									break;
+								case force_field_direction::OUTWARD:
+									direction = contacted_rigid.get_position() - portal_transform.pos;
+									direction.normalize();
+									break;
+								case force_field_direction::CIRCULAR:
+									direction = contacted_rigid.get_position() - portal_transform.pos;
+									direction.normalize();
+									direction = direction.perpendicular_cw();
+									break;
+								default:
+									break;
+							}
+
+							auto force_applied = direction;
+
+							float airborne_accel = 1.0f;
+
+							if (f.falloff != force_field_falloff::NONE) {
+								const auto radius = typed_portal_handle.get_logical_size().smaller_side() / 2;
+								auto distance = (portal_transform.pos - contacted_rigid.get_position()).length();
+
+								auto falloff_mult = std::clamp(1.0f - (radius == 0.0f ? 0.0f : distance / radius), 0.0f, 1.0f);
+
+								switch (f.falloff) {
+									case force_field_falloff::LINEAR:
+										break;
+									case force_field_falloff::QUADRATIC:
+										falloff_mult *= falloff_mult;
+									case force_field_falloff::SQRT:
+										falloff_mult = repro::sqrt(falloff_mult);
+										break;
+									default:
+										falloff_mult = 1.0f;
+										break;
+								}
+
+								if (f.stronger_towards_center) {
+									falloff_mult = std::max(falloff_mult, 0.1f);
+								}
+								else {
+									falloff_mult = 1.0f - falloff_mult;
+								}
+
+								force_applied *= falloff_mult;
+								airborne_accel *= falloff_mult;
+							}
+
+							if (f.mass_invariant) {
+								force_applied *= contacted_rigid.get_mass();
+							}
+
+							if (const auto movement = typed_contacted_entity.template find<components::movement>()) {
+								const bool flight_conditions = movement->was_sprint_effective || f.fly_even_without_sprint;
+
+								if (flight_conditions) {
+									if (movement->portal_inertia_ms < f.character_target_airborne_ms) {
+										const auto dt_ms = dt.in_milliseconds();
+
+										/* Have to add once because it's continuously damped in movement system */
+										movement->portal_inertia_ms += dt_ms;
+
+										const auto final_accel = f.character_airborne_acceleration * airborne_accel;
+										movement->portal_inertia_ms += dt_ms * final_accel;
+									}
+								}
+
+								force_applied *= f.character_force;
+							}
+							else {
+								force_applied *= f.object_force;
+
+								auto t = f.object_torque;
+
+								if (f.mass_invariant) {
+									t *= contacted_rigid.get_inertia();
+								}
+
+								contacted_rigid.apply_torque(t);
+							}
+
+							contacted_rigid.apply_force(force_applied);
 						}
 					}
 				}

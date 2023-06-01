@@ -267,7 +267,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Effect speed") {
+			if (label == "Effect speed" || label == "Character airborne increase speed") {
 				if (slider(label, property, 0.0f, 10.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -357,7 +357,7 @@ bool edit_property(
 				return false;
 			}
 
-			if (begins_with(label, "Linear impulse")) {
+			if (begins_with(label, "Linear impulse") || label == "Character force" || label == "Object force") {
 				if (slider(label, property, 0.0f, 20000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -395,13 +395,13 @@ bool edit_property(
 				return false;
 			}
 
-			if (begins_with(label, "Angular impulse")) {
+			if (begins_with(label, "Angular impulse") || label == "Object torque") {
 				if (slider(label, property, 0.0f, 2000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
 
-				tooltip_on_hover("How strongly to push bodies that appear through this portal.\nBodies will be pushed in the direction this spot is facing.");
+				tooltip_on_hover("How strongly to rotate.");
 
 				return false;
 			}
@@ -417,8 +417,8 @@ bool edit_property(
 				return false;
 			}
 
-			if (label == "Exit airborne duration (ms)") {
-				if (slider(label, property, 0.0f, 2000.0f)) { 
+			if (label == "Exit airborne duration (ms)" || label == "Character target airborne (ms)") {
+				if (slider(label, property, 0.0f, 3000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}
@@ -937,6 +937,54 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			}
 		}
 
+		{
+			MULTIPROPERTY("##ForceField", as_portal.force_field.is_enabled);
+
+			if (last_result) {
+				if (insp.as_portal.force_field.is_enabled) {
+					result = "Enabled force field in %x";
+				}
+				else {
+					result = "Disabled force field in %x";
+				}
+			}
+
+			ImGui::SameLine();
+
+			auto disabled = maybe_disabled_only_cols(!insp.as_portal.force_field.is_enabled);
+
+			auto scope = augs::imgui::scoped_tree_node_ex("Force field");
+
+			if (scope) {
+				auto actually_disabled = maybe_disabled_cols(!insp.as_portal.force_field.is_enabled);
+
+				MULTIPROPERTY("Direction", as_portal.force_field.value.direction);
+
+				MULTIPROPERTY("Falloff", as_portal.force_field.value.falloff);
+				tooltip_on_hover("None:\nthe force will have the same strength everywhere.\n\nLinear:\nthe force will be the strongest near the center,\nweakest on boundaries (or vice versa).\n\nQuadratic:\nsame as linear, but will drop/increase very quickly with distance.\n\nSqrt: \nSame as linear, but will drop/increase slowly with distance.");
+
+				if (insp.as_portal.force_field.value.falloff != force_field_falloff::NONE) {
+					auto ind = scoped_indent();
+					MULTIPROPERTY("Stronger towards center", as_portal.force_field.value.stronger_towards_center);
+					tooltip_on_hover("If ticked, forces will be stronger\nnear the the center instead of boundaries.\nUntick for the reverse.");
+
+					MULTIPROPERTY("Falloff decreases airborne acceleration", as_portal.force_field.value.falloff_decreases_airborne_acceleration);
+					tooltip_on_hover("Normally, falloff only influences the applied force.\nHowever, this option also lets you scale the speed\nwith which the character becomes 'airborne'.");
+				}
+
+
+				MULTIPROPERTY("Character force", as_portal.force_field.value.character_force);
+				MULTIPROPERTY("Character target airborne (ms)", as_portal.force_field.value.character_target_airborne_ms);
+				MULTIPROPERTY("Character airborne increase speed", as_portal.force_field.value.character_airborne_acceleration);
+				MULTIPROPERTY("Fly even without sprint", as_portal.force_field.value.fly_even_without_sprint);
+				tooltip_on_hover("Normally, you have to sprint to fully take advantage\nof the force field's physics. This spends stamina, although only 50%\nof the amount when sprinting on land.\nTick this to create a force field that doesn't require sprint.");
+
+				MULTIPROPERTY("Object force", as_portal.force_field.value.object_force);
+				MULTIPROPERTY("Object torque", as_portal.force_field.value.object_torque);
+				MULTIPROPERTY("Mass invariant", as_portal.force_field.value.mass_invariant);
+			}
+		}
+
 		ImGui::Separator();
 		text_color("Reacts to", yellow);
 		ImGui::Separator();
@@ -955,7 +1003,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		ImGui::Separator();
 
 		MULTIPROPERTY("Exit position", as_portal.exit_position);
-		tooltip_on_hover("PORTAL_CENTER - always spawn objects exactly at this portal center.\n\nPORTAL_CENTER_PLUS_ENTERING_OFFSET -\nexit position will be slightly offset to match\nexactly how far from the center did object enter the portal.\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.\nPreferred setting for trampoline portals.\n\nPORTAL_BOUNDARY - will spawn objects on the edge of this portal\naccording to Exit direction.");
+		tooltip_on_hover("Portal center:\nalways spawn objects exactly at this portal center.\n\nPortal center plus entering offset:\nexit position will be slightly offset to match\nexactly how far from the center did object enter the portal.\nNecessary to make the portals fully undetectable,\nas normally the player will notice their character has been shifted\nto match the portal exit position.\nPreferred setting for trampoline portals.\n\nPortal boundary:\nwill spawn objects on the edge of this portal\naccording to Exit direction.");
 
 		MULTIPROPERTY("Exit direction", as_portal.exit_direction);
 

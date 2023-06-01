@@ -140,6 +140,8 @@ bool setup_entity_from_node(
 					to.enter_time_ms = from.enter_time_ms;
 					to.travel_time_ms = from.travel_time_ms;
 
+					to.force_field = from.force_field;
+
 					if (from.disable_all_entry_effects) {
 						to.light_size_mult = 0.0f;
 

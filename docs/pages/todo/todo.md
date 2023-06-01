@@ -6,6 +6,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- The "Race" mode for surf maps could count how fast someone entered the final portal
+	- E.g. 12000 entering velocity = +12 score, 1000 velocity = +1 score etc
+	- This way players could compete within a single loop
+
 - reverb area
 
 - Do not hold name map in solvable

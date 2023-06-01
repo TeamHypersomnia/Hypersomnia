@@ -38,6 +38,7 @@ namespace components {
 		portal_exit_impulses exit_impulses;
 
 		augs::maybe<continuous_rings_input> rings_effect;
+		augs::maybe<force_field_def> force_field;
 
 		portal_exit_direction exit_direction = portal_exit_direction::PORTAL_DIRECTION;
 		portal_exit_position exit_position = portal_exit_position::PORTAL_CENTER;

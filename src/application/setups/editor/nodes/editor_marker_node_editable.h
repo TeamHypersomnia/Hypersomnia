@@ -15,7 +15,7 @@ struct editor_point_marker_node;
 struct editor_filter_flags {
 	// GEN INTROSPECTOR struct editor_filter_flags
 	bool characters = true;
-	bool character_weapons = false;
+	bool character_weapons = true;
 	bool bullets = true;
 	bool flying_explosives = true;
 	bool flying_melees = true;
@@ -45,6 +45,8 @@ struct editor_portal_info {
 	float enter_time_ms = 500.0f;
 	float travel_time_ms = 500.0f;
 	float exit_cooldown_ms = 200.0f;
+
+	augs::maybe<force_field_def> force_field = augs::maybe<force_field_def>(force_field_def(), false);
 
 	editor_filter_flags reacts_to;
 

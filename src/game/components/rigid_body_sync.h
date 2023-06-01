@@ -99,7 +99,7 @@ public:
 	void apply_force(const vec2, const vec2 center_offset, const bool wake = true) const;
 	void apply_torque(float) const;
 	void apply_impulse(const vec2) const;
-	void apply_impulse(const vec2, const vec2 center_offset, const bool wake = true) const;
+	void apply_impulse(const vec2, const vec2 center_offset, const bool wake = true, const float epsilon = 2.0f) const;
 
 	void apply_angular_impulse(const float) const;
 
@@ -269,7 +269,7 @@ void component_synchronizer<E, components::rigid_body>::apply_force(
 	const vec2 center_offset, 
 	const bool wake
 ) const {
-	apply_impulse(handle.get_cosmos().get_fixed_delta().in_seconds() * pixels, center_offset, wake);
+	apply_impulse(handle.get_cosmos().get_fixed_delta().in_seconds() * pixels, center_offset, wake, 0.0f);
 }
 
 template <class E>
@@ -344,9 +344,10 @@ template <class E>
 void component_synchronizer<E, components::rigid_body>::apply_impulse(
 	const vec2 pixels, 
 	const vec2 center_offset, 
-	const bool wake
+	const bool wake,
+	const float epsilon
 ) const {
-	if (pixels.is_epsilon(2.f)) {
+	if (epsilon != 0.0f && pixels.is_epsilon(epsilon)) {
 		return;
 	}
 

@@ -28,6 +28,45 @@ namespace invariants {
 	};
 }
 
+enum class force_field_falloff {
+	// GEN INTROSPECTOR enum class force_field_falloff
+	NONE,
+	LINEAR,
+	QUADRATIC,
+	SQRT
+	// END GEN INTROSPECTOR
+};
+
+enum class force_field_direction {
+	// GEN INTROSPECTOR enum class force_field_direction
+	FIELD_DIRECTION,
+	INWARD,
+	OUTWARD,
+	CIRCULAR
+	// END GEN INTROSPECTOR
+};
+
+struct force_field_def {
+	// GEN INTROSPECTOR struct force_field_def
+	force_field_direction direction = force_field_direction::INWARD;
+	force_field_falloff falloff = force_field_falloff::QUADRATIC;
+
+	float character_force = 3000.0f;
+	float character_target_airborne_ms = 300.0f;
+	float character_airborne_acceleration = 0.2f;
+
+	float object_force = 300.0f;
+	float object_torque = 10.0f;
+
+	bool mass_invariant = true;
+	bool stronger_towards_center = false;
+	bool fly_even_without_sprint = false;
+	bool falloff_decreases_airborne_acceleration = true;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const force_field_def&) const = default;
+};
+
 struct portal_exit_impulses {
 	static constexpr bool json_serialize_in_parent = true;
 
