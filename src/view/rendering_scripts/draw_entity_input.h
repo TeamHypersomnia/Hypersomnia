@@ -12,7 +12,7 @@ struct specific_draw_input {
 	const images_in_atlas_map& manager;
 	const double global_time_seconds;
 	const flip_flags flip;
-	randomizing_system& randomizing;
+	const randomizing_system& randomizing;
 	const camera_cone cone;
 
 	template <class T>

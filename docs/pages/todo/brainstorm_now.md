@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Billan crash
-
 - chase velocity flag for exit portal particles
     - so that they can be seen on an extremely fast moving character
 

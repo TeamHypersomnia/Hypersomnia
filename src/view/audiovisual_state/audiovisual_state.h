@@ -84,7 +84,7 @@ struct audiovisual_state {
 
 	audiovisual_profiler performance;
 
-	mutable randomizing_system randomizing;
+	randomizing_system randomizing;
 	
 	template <class T>
 	auto& get() {
@@ -103,7 +103,7 @@ struct audiovisual_state {
 	void clear();
 
 private:
-	randomization& get_rng() const {
+	randomization& get_rng() {
 		return randomizing.rng;
 	}
 };

@@ -107,7 +107,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 				if (v.is_enabled && sprite.vibrate_diffuse_too) {
 					const auto id = typed_handle.get_id();
-					const auto mult = in.randomizing.advance_and_get_neon_mult(id, v.value);
+					const auto mult = in.randomizing.get_random_walk_mult(id, v.value);
 
 					result.colorize.mult_alpha(mult);
 				}
@@ -627,7 +627,7 @@ FORCE_INLINE void specific_draw_neon_map(
 
 			if (v.is_enabled) {
 				const auto id = typed_handle.get_id();
-				const auto mult = in.randomizing.advance_and_get_neon_mult(id, v.value);
+				const auto mult = in.randomizing.get_random_walk_mult(id, v.value);
 
 				input.colorize.mult_alpha(mult);
 			}

@@ -5,6 +5,10 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Billan crash
+	- fixed: randomization system was mutable; and was thus used by multiple threads where it called try_emplace on walk states.
+		- this is a prime example of how mutable can bite us in the ass, so let's not do this in rendering code because it is multithreaded
+
 - if server is down after update check if removing the single second delay between interrupt and restart didn't break something
 	- it was put in restart_servers for some reason but I don't recall why
 

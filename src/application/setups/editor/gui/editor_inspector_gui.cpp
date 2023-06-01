@@ -1461,7 +1461,7 @@ EDIT_FUNCTION(
 				auto indent = scoped_indent();
 				MULTIPROPERTY("Lower", neon_alpha_vibration.value.lower);
 				MULTIPROPERTY("Upper", neon_alpha_vibration.value.upper);
-				MULTIPROPERTY("Change per second", neon_alpha_vibration.value.change_per_second);
+				//MULTIPROPERTY("Change per second", neon_alpha_vibration.value.change_per_second);
 				MULTIPROPERTY("Vibrate diffuse too", vibrate_diffuse_too);
 			}
 

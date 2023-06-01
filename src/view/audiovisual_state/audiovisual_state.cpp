@@ -161,6 +161,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		particles.preallocate_particle_buffers(input.particles_output);
 
 		advance_damage_indication();
+
+		randomizing.advance(dt);
 	};
 
 	auto launch_particle_jobs = [&]() {

@@ -19,17 +19,17 @@ struct randomizing_system {
 		real32 walk_state = 0.5f;
 	};
 
-	augs::delta last_frame_delta = augs::delta::zero;
-
-	audiovisual_cache_map<walk_cache> neon_intensity_walks;
+	std::array<walk_cache, 10> random_walks;
 
 	void reserve_caches_for_entities(const size_t);
 	void clear();
 
-	float advance_and_get_neon_mult(
+	void advance(augs::delta);
+
+	float get_random_walk_mult(
 		const entity_id id,
 		const intensity_vibration_input& in
-	);
+	) const;
 
 	randomization rng;
 };

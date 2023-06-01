@@ -2361,7 +2361,6 @@ work_result work(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		get_audiovisuals().randomizing.last_frame_delta = frame_delta;
 		audiovisual_step(audio_renderer, frame_delta, setup.get_audiovisual_speed(), viewing_config);
 	};
 
