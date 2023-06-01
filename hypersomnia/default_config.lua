@@ -679,7 +679,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       y = 700
     },
 	vsync_mode = "OFF",
-	disabled_max_fps = 300,
+	enabled_max_fps = 400,
 	max_fps_method = "YIELD"
   },
   faction_view = {
