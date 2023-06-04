@@ -24,7 +24,7 @@ Forever free and open-source :heart:
 
 *[(for older versions click here)](https://hypersomnia.xyz/builds)*
 
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/X7m2vDXIaxA/0.jpg)](https://www.youtube.com/watch?v=X7m2vDXIaxA "Video Title")
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/Nlh_dyd_V7w/0.jpg)](https://www.youtube.com/watch?v=Nlh_dyd_V7w "Video Title")
 
 </div>
 
