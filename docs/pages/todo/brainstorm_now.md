@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix grenade count counter in starting equipment
+- Optional: set_and_add_velocity mode that redirects old velocity AND adds another impulse
+    - Or maybe a flag - redirect velocity
+        - Note however it doesn't make sense if e.g. the exit direction is set to entering velocity
+            - well in this case the redirect will just have no effect
+                - so i guess it only makes sense when portal exit direction = portal direction?
+    - "redirect_and_set_velocity"
+
+- Fix a performance problem with dashed lines, on a per-line basis
+
+- We should totally make a convenience resource for force fields
+    - and it will be a box by default with some nice particles like in portal, but rectangular
+    - and maybe can add a sprite from the get go although that won't be necessary for now
+
 - chase velocity flag for exit portal particles
     - so that they can be seen on an extremely fast moving character
 
