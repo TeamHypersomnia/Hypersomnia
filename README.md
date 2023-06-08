@@ -61,9 +61,9 @@ To understand the repository's folder structure, make sure to read the [document
 
 ## Gallery
 
-An example 4v4 fight:
+An example 4v4 match:
 
-_(from 2019, note it's before headshots and bullet penetration)_
+_(from 2019, note it's way before headshots and bullet penetration)_
 
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/X7m2vDXIaxA/0.jpg)](https://www.youtube.com/watch?v=X7m2vDXIaxA "Video Title")
 
