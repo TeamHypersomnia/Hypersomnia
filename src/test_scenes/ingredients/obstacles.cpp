@@ -82,7 +82,7 @@ namespace test_flavours {
 		auto dynamic_obstacle = [&](
 			auto& meta,
 			const auto material
-		) {
+		) -> auto& {
 			test_flavours::add_standard_dynamic_body(meta);
 
 			auto& fixtures_def = meta.template get<invariants::fixtures>();
@@ -94,6 +94,8 @@ namespace test_flavours {
 
 			meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL);
 			meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS);
+
+			return meta;
 		};
 
 		dynamic_obstacle(
@@ -103,7 +105,7 @@ namespace test_flavours {
 				test_obstacle_order::OPAQUE
 			),
 			test_scene_physical_material_id::WOOD
-		);
+		).template get<invariants::fixtures>().penetrability *= 1.2f;
 
 		static_obstacle(
 			flavour_with_sprite(
