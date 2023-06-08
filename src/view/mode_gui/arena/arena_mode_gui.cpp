@@ -915,7 +915,7 @@ void arena_gui_state::draw_mode_gui(
 				pen.x += cfg.weapon_icon_horizontal_pad;
 
 				if (was_wallbang) {
-					auto col = rgba(get_col(ko.victim));
+					//auto col = rgba(get_col(ko.victim));
 					const auto origin = ltrb(pen - vec2i(0, wallbang_icon_size.y / 2), wallbang_icon_size);
 
 					general_drawer.aabb_bordered(
@@ -930,7 +930,7 @@ void arena_gui_state::draw_mode_gui(
 				}
 
 				if (was_headshot) {
-					auto col = rgba(get_col(ko.victim));
+					//auto col = rgba(get_col(ko.victim));
 					const auto origin = ltrb(pen - vec2i(0, headshot_icon_size.y / 2), headshot_icon_size);
 
 					general_drawer.aabb_bordered(
