@@ -21,6 +21,7 @@ struct editor_sprite_node_editable {
 	bool randomize_color_wave_offset = false;
 
 	float animation_speed_factor = 1.0f;
+	real32 penetrability = 1.0f;
 	// END GEN INTROSPECTOR
 };
 

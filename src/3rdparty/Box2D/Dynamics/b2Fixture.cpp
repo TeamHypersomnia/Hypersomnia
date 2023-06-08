@@ -37,6 +37,9 @@ b2Fixture::b2Fixture()
 	m_shape = NULL;
 	m_density = 0.0f;
 	index_in_component = -1;
+	penetrated_forward = false;
+	penetrated_backward = false;
+	penetration_processed_flag = false;
 }
 
 void b2Fixture::Create(b2BlockAllocator* allocator, b2Body* body, const b2FixtureDef* def)

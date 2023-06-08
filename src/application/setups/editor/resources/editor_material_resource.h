@@ -51,6 +51,7 @@ struct editor_material_resource_editable {
 	real32 unit_damage_for_effects = 30.f;
 	real32 max_ricochet_angle = 20.0f;
 	bool point_blank_ricochets = false;
+	real32 penetrability = 1.0f;
 	// END GEN INTROSPECTOR
 };
 

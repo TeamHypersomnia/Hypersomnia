@@ -368,9 +368,18 @@ void setup_scene_object_from_resource(
 		if (auto fixtures = scene.template find<invariants::fixtures>()) {
 			if (const auto material = find_resource(physical.material)) {
 				fixtures->material = material->scene_asset_id;
+
+				/* 
+					These should be read in runtime from material but caching like is is more performant,
+					since realistically materials of simple walls will never change (which is why they're specified in an INVARIANT::fixtures).
+				*/
+
 				fixtures->max_ricochet_angle = material->editable.max_ricochet_angle;
 				fixtures->point_blank_ricochets = material->editable.point_blank_ricochets;
+				fixtures->penetrability = material->editable.penetrability;
 			}
+
+			fixtures->penetrability *= physical.penetrability;
 
 			fixtures->density = physical.density;
 			fixtures->friction = physical.friction;

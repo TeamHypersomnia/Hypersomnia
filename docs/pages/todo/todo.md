@@ -164,20 +164,6 @@ summary: Just a hidden scratchpad.
 
 ## Others
 
-- Future idea: bullet penetration
-	- Restores balance to pistols
-		- All pistols except for deagle and revolver would be non-penetrating
-			- Similarly with SMGs
-		- This is good because it finally gives a good usecase for rifles
-	- Implementation
-		- To not break existing physics, we'd spawn a new bullet in place of the one that would normally be destroyed
-		- It's set to not trigger the initial collision with the colliding body
-		- However it should detect the end of contact with the wall body as it flies
-			- And when contact ends just spawn a particle effect, not sure if playing sound again won't be an overkill but we could try
-		- Maybe it loses potency not per wall hit (because there might be multiple walls on the way) for every frame n under a wall
-			- Actually it might be better to count that additional duration hit when the hit begins
-			- We'll anyway have polygonal wall obstacles so that irregular walls aren't just composed of multiple rectangles stacked together
-		
 
 - Reset properties to default under Right-click 
 	- Could be easy but arguably not needed right now

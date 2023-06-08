@@ -649,3 +649,16 @@ summary: Just a hidden scratchpad.
 	- Disregarded: we won't rely on begins and ends
 		- we'll always iterate contact lists, for force fields as well
 		- We have to anyway because we have to apply forces continuously
+
+- Do not apply impact force if we penetrate
+    - Only upon exit
+	- MEH, pointless after we fixed it
+
+
+- We should automatically expire if vel =~ 0 during penetration
+    - Because if we damp during penetration the distance travelled will be smaller and smaller
+        - which could lead to very long penetration
+	- NAH, just constrain lifetimes
+
+- What if instead of raycast we just test overlap with a fabricated b2 edge?
+    - PROBLEM: overlap may report something against which we graze, but then if raycasts don't report anything we'll treat it as if it completely overlaps

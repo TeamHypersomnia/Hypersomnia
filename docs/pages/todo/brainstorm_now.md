@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Portals should take precedence in the layer order
+    - Why doesn't it work out of the box? It should because we're iterating them linearly
+
 - fix grenade count counter in starting equipment
 - Optional: set_and_add_velocity mode that redirects old velocity AND adds another impulse
     - Or maybe a flag - redirect velocity

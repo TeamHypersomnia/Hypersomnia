@@ -211,6 +211,12 @@ public:
 	b2Filter m_filter;
 
 	FixtureUserdata m_userData;
+
+	b2Vec2 forward_point;
+	b2Vec2 backward_point;
+	bool penetrated_forward;
+	bool penetrated_backward;
+	bool penetration_processed_flag;
 };
 
 inline b2Shape::Type b2Fixture::GetType() const

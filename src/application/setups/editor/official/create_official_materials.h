@@ -1,6 +1,8 @@
 #pragma once
 #include "test_scenes/test_scene_physical_materials.h"
 
+real32 get_material_penetrability(test_scene_physical_material_id id);
+
 void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 	// auto& materials = scene.world.get_common_significant().logical_assets.physical_materials;
 	(void)scene;
@@ -31,6 +33,8 @@ void create_materials(const intercosm& scene, editor_resource_pools& pools) {
 			else if (enum_id == test_scene_physical_material_id::VENT) {
 				res.editable.max_ricochet_angle = 20.0f;
 			}
+
+			res.editable.penetrability = get_material_penetrability(enum_id);
 
 			pool.allocate(res);
 		});

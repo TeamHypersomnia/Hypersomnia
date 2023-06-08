@@ -328,6 +328,7 @@ enum class test_scene_image_id {
 	RESISTANCE_BROKEN_HEAD_ICON,
 
 	HEADSHOT_ICON,
+	WALLBANG_ICON,
 
 	TRIANGLE_COLLIDER,
 

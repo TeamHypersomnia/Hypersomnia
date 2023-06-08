@@ -25,6 +25,10 @@ static void ricochet_missile_against_surface(
 
 	const auto info = missile_surface_info(typed_missile, surface_handle);
 
+	if (missile.during_penetration) {
+		return;
+	}
+
 	if (!info.is_ricochetable()) {
 		RIC_LOG("non-ricochetable surface, IGNORED");
 		return;

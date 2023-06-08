@@ -6104,3 +6104,158 @@ This will discard your redo history."
                 - or even particle decorations
 
 
+- Would be best to unit penetrability against METAL
+    - Because it's the most common material, more common than wood
+
+- Raycasting for penetration reduction
+    - You can determine the final impact position exactly
+        - By a simple proportion for the hit where we can no longer travel
+    - Note there might be no intersections at all if the bullet moved inside the same fixture
+    - First backward tracking raycast hit should become the target point for "exit" particles
+
+- Bullet penetration
+	- Restores balance to pistols
+		- All pistols except for deagle and revolver would be non-penetrating
+			- Similarly with SMGs
+		- This is good because it finally gives a good usecase for rifles
+	- Implementation
+        - Partial solution: Bullets should be implemented via partial raycasts!
+            - They can still participate in physics, but with zero filters
+            - Every step the path is traced with a raycast and collisions resolved right there
+            - This will let us easily calculate the % of bullet covered every step
+            - This has many advantages beyond penetration
+                - More performant than bullet bodies
+                - Less glitches during ricochets
+                - Crosshair laser can exactly predict ricochets AND trajectories (sometimes it might wrongly show that a bullet will pass)
+            - Cons
+                - Duality might complicate implementation a bit esp with handling collisions
+                    - Though we could just post collision messages
+                    - Still we have to set correct positions depending on raycast hits
+                        - Easy to do though
+                - Some collisions might be missed?
+                    - SOLUTION: WE CAN USE b2EDGESHAPE!!!
+                        - or at least we might do for the post-penetrating bullets if we want to preserve bullet 'thickness'
+
+                    - E.g if a character flicks through the bullet trajectory from frame A to B we won't detect it
+                    - but would it be detected under toi? I think it just sweeps the path of the bullet against non-sweeped fixtures
+            - This class of missiles won't have angular velocity so it's fine
+            - Rockets/magic missiles would use the old system 
+
+        - Try again
+            - Bullet hits via an edge shape.
+                - The ray-continuation might or might not hit a surface.
+            - No preliminary checks - If something is impenetrable, we still want to allow bullet to pass if it only grazes the surface
+            - We disable all wall collisions through filters. Bullet continues to travel.
+                - Problem: shooting parallel to a wall will skip collisions, though it would be almost impossible to pull off
+                - remember the solver is meant to *separate* contacts
+            - Every frame we check if the bullet still overlaps anything. If it does not, we 
+
+        - Try again
+            - Bullet hits via an edge shape.
+                - The ray-continuation might or might not hit a surface.
+            - We perform a preliminary check 
+            - If something is impenetrable, we still want to allow bullet to pass if it only grazes the surface
+            - Whether for all or just this one, we disable the collision.
+            - The bullet continues to travel. 
+            - And it continues to be drawn. The difference between a) just disappearing trace b) trace + disappearing bullet will not be noticeable
+                - maybe even it will look a bit better?
+                - WE ANYWAY WANT FEEDBACK ON HOW FAR THE BULLET PENETRATES!
+            - Bullet's render layer is changed to 'under' obstacles (via a flag in missile component)
+                - Tested with PLANTED_ITEMS. We'll use this layer and it will not be noticeable at all.
+                - Notice even if the render layer is changed "too late" as in final EndContact is reported once the bullet is so far away from the wall, the interpolation will instantly pick up the changes and will render the interpolated bullet correctly with the new render layer
+                - Or just skip rendering diffuse but keep neon
+                - WE ANYWAY WANT FEEDBACK ON HOW FAR THE BULLET PENETRATES!
+                - Changing layer will be easier for now
+            - Now for how collisions are ignored
+                - Disabling contacts is better because we can detect when the bullet finally leaves
+                - However it is the raycasts that should determine if the bullet is out or not
+            - So we disable all contacts as if by "disable standard collision resolution".
+            - With an if clause that if a character is on the way, it will still be hit
+            - But then we can as well just change filters and not bother with contacts
+            - The raycasts determine when the bullet is "out"
+                - Regarding edgeshape/ray difference, Note that a false negative (false "in") is not possible, only false positive
+                    - and a false positive will be corrected by another contact if we reinitiate filters
+                - it might just behave less than ideal if we shoot really close to the wall, the bullet will then think it is penetrating every step
+                    - but eventually it will expire like that
+                    - tho maybe it will work somehow if physics is going to displace that bullet somehow
+                    - but still we need to bring it closer to expiration with just hits through contacts
+            - Merely hitting should take away a constant charge, only then does the thickness matter
+                - A constant times material penetrability
+                - Good both for balance and because it's a sanity mechanism for expiring bullets that keep only grazing the surface
+            - BUT HEY, Why not use actual contacts to determine if we're fully out?
+                - Let raycasts ONLY be responsible for reducing charge, not for determining if we're out or not
+            - The Q being do we get EndContact if we disable them?
+                - If not by endcontact, we can do this the same we do with portals
+                    - by iterating contact list
+                - From docs I think it's posted anyway
+                - might be cleaner to iterate after all since we don't care about substepping here
+                    - though begin/end contact may be cleaner as well because the relevant code is closer there
+
+        - Still, even if bullets are b2edgeshapes, we don't know how to implement it physically.
+            - We can either
+                - a) ignore only the currently penetrated fixture, one by one
+                    - perhaps ignoring effects until there are a) no contacts again b) bullet expires
+                - b) disable all filters, maybe until we end the contact 
+            - just keep in mind edge shape is a bit fatter than raycast
+                - Worst that happens is bullet collides but a raycast later doesn't detect anything 
+                    - But that's a good thing!
+                        - It will make the bullet properly go further if it touches just by an edge, and it still spawns a nice collison effect as if it "barely went through". But it still goes through, as indicated by the crosshair laser
+                    - The damage will be always decreased on first impact (?)
+                        - It wouldn't need to be. As I said it's good that it goes unaffected if the crosshair shows, and the impact will only make as much as spawn effects maybe
+
+        - Perhaps let's first think the physical aspect through and only later about how we'd render it.
+            - How would we do it if consistency of rendering/effects were not an issue?
+            - Then, on impact:
+                - first check if the surface is penetrable at all
+                    - if it has 0 penetrability - easy case. Just destroy bullet like always.
+                - keep the new bullet's position 
+                - set the velocity back to what it was (note it's important to remember prev velocity as some bullets might have damping)
+
+        - Effect duplication
+            - We should scale the secondary effects proportionally to how much damage is left
+            - But we should always play the primary one unaffected if only for a good feedback experience (so that you know you hit the primary target)
+        - To render the penetrating bullet or not
+            - If we render, first positioning is problematic to not make it appear suddenly
+            - If we do not, it will look awkward under transparent or semi-transparent objects
+                - Not just transparent objects.
+                - Consider that a bullet can penetrate an opaque object only with a small part of its body.
+                - it would be good to render it in that case
+            - If we render, it also has to be beneath the object
+            - Timestep invariance
+        - If we always render, it might look awkward when the bullet hits a thin impenetrable wall
+            - because the bullet will fly further for at least a single step
+        - We can perform a First-impact penetration test that will work most of the time
+
+        - Ignoring collision with the penetrated object
+            - Not so obvious.
+                - We have to ignore on the "first contact with this entity" basis
+                    - it needs to only be once because technically an impacted crate could be rotating very fast
+                - But Consider an entity with several fixtures
+                - If they're next to each other, we don't want to spawn another collision effect
+                - If they're far away from each other (because the body is convex), we do want to spawn another collision effect
+                - You can't prevent duplicating effects really.
+                    - Consider a static wall made up of several static entities.
+                    - No way to distinguish that the effects shouldn't be played multiple times. 
+                - Then, we could play a sound only once the bullet either:
+                    - is fully exhausted
+                    - hits a player
+                - and for intermediate fixtures only show particles (without exploding rings)
+        - Timestep independence
+            - This might work completely different if we have low vs high timesteps
+            - For starters, if we let the bullet live, we should first handle the decrease in damage and only later the damage messages
+            
+    
+        - Handling finishing traces
+            - Detecting penetration with the first sweep is problematic
+                - Stronger bullets will pretty much always penetrate 
+            - So we should always render the finishing trace
+                - it looks good like a penetrating bullet anyway
+
+		- To not break existing physics, we'd spawn a new bullet in place of the one that would normally be destroyed
+		- It's set to not trigger the initial collision with the colliding body
+		- However it should detect the end of contact with the wall body as it flies
+			- And when contact ends just spawn a particle effect, not sure if playing sound again won't be an overkill but we could try
+		- Maybe it loses potency not per wall hit (because there might be multiple walls on the way) for every frame n under a wall
+			- Actually it might be better to count that additional duration hit when the hit begins
+			- We'll anyway have polygonal wall obstacles so that irregular walls aren't just composed of multiple rectangles stacked together
+		

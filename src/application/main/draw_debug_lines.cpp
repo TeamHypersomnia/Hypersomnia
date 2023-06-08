@@ -60,3 +60,41 @@ void draw_debug_lines(
 	}
 }
 
+void draw_headshot_debug_lines(
+	vec2 missile_pos,
+	vec2 impact_dir,
+	vec2 head_pos,
+	float head_radius
+) {
+	if (DEBUG_DRAWING.draw_headshot_detection) {
+		DEBUG_PERSISTENT_LINES.emplace_back(
+			cyan,
+			missile_pos,
+			missile_pos + impact_dir * 100
+		);
+
+		DEBUG_PERSISTENT_LINES.emplace_back(
+			red,
+			head_pos,
+			head_pos + vec2(0, head_radius)
+		);
+
+		DEBUG_PERSISTENT_LINES.emplace_back(
+			red,
+			head_pos,
+			head_pos + vec2(head_radius, 0)
+		);
+
+		DEBUG_PERSISTENT_LINES.emplace_back(
+			red,
+			head_pos,
+			head_pos + vec2(-head_radius, 0)
+		);
+
+		DEBUG_PERSISTENT_LINES.emplace_back(
+			red,
+			head_pos,
+			head_pos + vec2(0, -head_radius)
+		);
+	}
+}

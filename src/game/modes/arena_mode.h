@@ -135,6 +135,7 @@ struct arena_mode_view_rules {
 	augs::enum_array<assets::image_id, scoreboard_icon_type> icons;
 	assets::image_id money_icon;
 	per_actual_faction<assets::image_id> headshot_icons;
+	assets::image_id wallbang_icon;
 
 	fog_of_war_settings fog_of_war;
 	double audiovisual_speed = 1.0;

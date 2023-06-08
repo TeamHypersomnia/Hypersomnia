@@ -183,6 +183,8 @@ void standard_solve(const logic_step step) {
 	{
 		auto scope = measure_scope(performance.missiles);
 
+		missile_system().advance_penetrations(step);
+
 		missile_system().ricochet_missiles(step);
 		missile_system().detonate_colliding_missiles(step);
 		missile_system().detonate_expired_missiles(step);

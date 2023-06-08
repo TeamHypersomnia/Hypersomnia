@@ -225,6 +225,7 @@ static void report_weapon(const auto enum_id, H handle) {
 
 	entry.shots_per_second = 1000.0f / practical_shot_cooldown;
 	entry.damage = gun.damage_multiplier * 10.0f;
+	entry.penetration = gun.basic_penetration_distance;
 	entry.headshot_damage = entry.damage * gun.headshot_multiplier;
 	entry.price = item.standard_price;
 	entry.kill_award = gun.adversarial.knockout_award;
@@ -326,7 +327,7 @@ namespace test_scenes {
 		rs.factions[faction_type::RESISTANCE].initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 
 		rs.factions[faction_type::METROPOLIS].initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		rs.factions[faction_type::METROPOLIS].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::ZAMIEC);
+		rs.factions[faction_type::METROPOLIS].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
 		rs.factions[faction_type::METROPOLIS].initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
 		rs.factions[faction_type::METROPOLIS].initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 		rs.factions[faction_type::METROPOLIS].initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::ASSAULT_RATTLE);
@@ -480,6 +481,7 @@ namespace test_scenes {
 		rs.view.headshot_icons[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
 		rs.view.headshot_icons[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
 		rs.view.headshot_icons[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
+		rs.view.wallbang_icon = to_image_id(test_scene_image_id::WALLBANG_ICON);
 
 		rs.view.square_logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
 		// TODO: add atlantis logo
@@ -676,10 +678,10 @@ namespace test_scenes {
 
 		create(test_plain_sprited_bodies::CRATE, vec2(800, 1000));
 
-		create(test_plain_sprited_bodies::TRIANGLE_COLLIDER_VENT, vec2(1000, 1000));
-		create(test_plain_sprited_bodies::TRIANGLE_COLLIDER_GLASS, vec2(1000, 1150));
-		create(test_plain_sprited_bodies::TRIANGLE_COLLIDER_METAL, vec2(1000, 1300));
-		create(test_plain_sprited_bodies::TRIANGLE_COLLIDER_WOOD, vec2(1000, 1450));
+		create(test_plain_sprited_bodies::BOX_COLLIDER_GLASS, vec2(900, 300));
+		create(test_plain_sprited_bodies::BOX_COLLIDER_WOOD, vec2(900, 300+150));
+		create(test_plain_sprited_bodies::BOX_COLLIDER_METAL, vec2(900, 300+300));
+		create(test_plain_sprited_bodies::BOX_COLLIDER_VENT, vec2(900, 300+450));
 
 		{
 			const vec2 coords[] = {

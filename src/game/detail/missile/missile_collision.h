@@ -5,11 +5,13 @@
 #include "game/detail/missile/headshot_detection.hpp"
 #include "game/stateless_systems/sentience_system.h"
 
+void draw_headshot_debug_lines(vec2 missile_pos, vec2 impact_dir, vec2 head_pos, float head_radius);
+
 struct missile_collision_result {
 	transformr transform_of_impact;
-	int new_charges_value = 0;
+	bool deleted_already = false;
+	bool penetration_began = false;
 };
-
 
 enum class missile_collision_type {
 	CONTACT_START,
@@ -43,7 +45,8 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	const auto& clk = cosm.get_clock();
 	const auto& now = clk.now;
 
-	RIC_LOG("(DET) MISSILE %x WITH: %x", pre_solve ? "PRE SOLVE" : "CONTACT START", surface_handle);
+	//LOG("(DET) MISSILE %x WITH: %x", pre_solve ? "PRE SOLVE" : "CONTACT START", surface_handle);
+	//LOG_NVPS(point, typed_missile.get_logic_transform().pos);
 
 	const auto& ricochet_cooldown_ms = missile_def.ricochet_cooldown_ms;
 	(void)missile_def;
@@ -58,7 +61,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 	const bool should_send_damage =
 		missile_def.damage_upon_collision
-		&& missile.damage_until_before_destruction > 0
+		&& !missile.deleted_already
 	;
 
 	if (!should_send_damage) {
@@ -68,21 +71,18 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	if (pre_solve) {
 		/* With a PreSolve must have happened a PostSolve that altered our initial velocity. */
 
+		/* Not sure if this is needed here actually but let it be */
 		make_velocity_face_body_orientation(typed_missile);
 	}
 
 	{
+		const bool missile_ricochetted_in_this_step = 
+			missile.when_last_ricocheted.was_set()
+			&& now.step <= missile.when_last_ricocheted.step + 1
+		;
 
-#if USER_RICOCHET_COOLDOWNS
-		const bool ricochet_cooldown = clk.lasts(
-			ricochet_cooldown_ms,
-			missile.when_last_ricocheted
-		);
-#else
-		const bool ricochet_cooldown = now.step <= missile.when_last_ricocheted.step + 1;
-#endif
-		if (ricochet_cooldown) {
-			RIC_LOG("DET: rico cooldown, no impact");
+		if (missile_ricochetted_in_this_step) {
+			RIC_LOG("DET: This impact counted as ricochet already.");
 			return std::nullopt;
 		}
 
@@ -92,103 +92,90 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	const auto impact_velocity = collider_impact_velocity;
 	const auto impact_dir = vec2(impact_velocity).normalize();
 
-	auto charges = missile.damage_until_before_destruction;
-	const bool send_damage = charges > 0;
+	bool penetration_began = false;
+	auto deleted_already = missile.deleted_already;
 
-	messages::damage_message damage_msg;
-	damage_msg.indices = indices;
-	damage_msg.damage = missile_def.damage;
-	damage_msg.damage *= missile.power_multiplier_of_sender;
+	const auto sentience_def = surface_handle.template find<invariants::sentience>();
+	const auto sentience = surface_handle.template find<components::sentience>();
 
-	const auto sentience = surface_handle.template find<invariants::sentience>();
-	const bool surface_sentient = sentience != nullptr;
+	const bool surface_sentient = sentience_def != nullptr && sentience != nullptr;
 
-	bool should_consume_charge = false;
+	auto finalize_bullet = [&]() {
+		if (!missile_def.destroy_upon_damage) {
+			return;
+		}
 
-	auto consume_charge_and_destroy = [&]() {
-		--charges;
+		deleted_already = true;
 
-		// delete only once
-		if (charges == 0) {
-			step.queue_deletion_of(typed_missile, "Missile collision");
-			damage_msg.inflictor_destructed = true;
+		step.queue_deletion_of(typed_missile, "Missile collision");
 
-			auto rng = cosm.get_nontemporal_rng_for(typed_missile);
+		auto rng = cosm.get_nontemporal_rng_for(typed_missile);
 
-			if (!surface_sentient) {
-				spawn_bullet_remnants(
-					access,
-					step,
-					rng,
-					missile_def.remnant_flavours,
-					collision_normal,
-					impact_dir,
-					point
-				);
-			}
+		if (!surface_sentient) {
+			spawn_bullet_remnants(
+				access,
+				step,
+				rng,
+				missile_def.remnant_flavours,
+				collision_normal,
+				impact_dir,
+				point
+			);
 		}
 	};
 
-	if (info.should_detonate() && missile_def.destroy_upon_damage) {
-		detonate_if(typed_missile.get_id(), point, step);
+	auto penetrate_or_finalize = [&]() {
+		if (missile.penetration_distance_remaining > 0.0f) {
+			if (!missile.during_penetration) {
+				penetration_began = true;
+			}
+		}
+		else {
+			finalize_bullet();
+		}
+	};
 
-		{
-			const auto& total_damage_amount = damage_msg.damage.base;
+	if (contact_start && !deleted_already) {
+		messages::damage_message damage_msg;
+		damage_msg.indices = indices;
+		damage_msg.damage = missile_def.damage;
+		damage_msg.damage *= missile.power_multiplier_of_sender;
 
-			if (augs::is_positive_epsilon(total_damage_amount)) {
-				startle_nearby_organisms(cosm, point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
-				startle_nearby_organisms(cosm, point, total_damage_amount * 6.f, 50.f + total_damage_amount * 2.f, startle_type::IMMEDIATE);
+		const auto dist_remaining = missile.penetration_distance_remaining;
+		const auto dist_starting = missile.starting_penetration_distance;
+
+		if (info.should_detonate()) {
+			detonate_if(typed_missile.get_id(), point, step);
+
+			{
+				const auto& total_damage_amount = damage_msg.damage.base;
+
+				if (augs::is_positive_epsilon(total_damage_amount)) {
+					startle_nearby_organisms(cosm, point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
+					startle_nearby_organisms(cosm, point, total_damage_amount * 6.f, 50.f + total_damage_amount * 2.f, startle_type::IMMEDIATE);
+				}
 			}
 		}
 
-		should_consume_charge = true;
-	}
-
-	if (send_damage && contact_start) {
 		damage_msg.origin = damage_origin(typed_missile);
 		damage_msg.subject = surface_handle;
 		damage_msg.impact_velocity = impact_velocity;
 		damage_msg.point_of_impact = point;
 
+		if (dist_remaining != dist_starting && dist_starting != 0.0f) {
+			damage_msg.damage *= dist_remaining / dist_starting;
+			damage_msg.origin.circumstances.wallbang = true;
+		}
+
 		if (surface_sentient) {
 			const auto missile_pos = point;
 			const auto head_transform = ::calc_head_transform(surface_handle);
-			const auto head_radius = sentience->head_hitbox_radius * missile.head_radius_multiplier_of_sender;
+			const auto head_radius = sentience_def->head_hitbox_radius * missile.head_radius_multiplier_of_sender;
 
 			if (head_transform.has_value()) {
 				const auto head_pos = head_transform->pos;
 
-				if (DEBUG_DRAWING.draw_headshot_detection) {
-					DEBUG_PERSISTENT_LINES.emplace_back(
-						cyan,
-						missile_pos,
-						missile_pos + impact_dir * 100
-					);
-
-					DEBUG_PERSISTENT_LINES.emplace_back(
-						red,
-						head_pos,
-						head_pos + vec2(0, head_radius)
-					);
-
-					DEBUG_PERSISTENT_LINES.emplace_back(
-						red,
-						head_pos,
-						head_pos + vec2(head_radius, 0)
-					);
-
-					DEBUG_PERSISTENT_LINES.emplace_back(
-						red,
-						head_pos,
-						head_pos + vec2(-head_radius, 0)
-					);
-
-					DEBUG_PERSISTENT_LINES.emplace_back(
-						red,
-						head_pos,
-						head_pos + vec2(0, -head_radius)
-					);
-				}
+				::draw_headshot_debug_lines(missile_pos, impact_dir, head_pos, head_radius);
 
 				if (::headshot_detected(
 					missile_pos,
@@ -201,28 +188,24 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 					damage_msg.head_transform = *head_transform;
 				}
 			}
-		}
 
-		if (const auto sentience_comp = surface_handle.template find<components::sentience>()) {
 			sentience_system().process_damage_message(damage_msg, step);
 			damage_msg.processed = true;
 
-			if (!sentience_comp->is_conscious()) {
-				should_consume_charge = false;
+			if (sentience->is_conscious()) {
+				finalize_bullet();
+				damage_msg.spawn_destruction_effects = true;
 			}
 		}
-
-		if (should_consume_charge) {
-			consume_charge_and_destroy();
+		else {
+			if (!info.ignore_standard_collision_resolution()) {
+				penetrate_or_finalize();
+				damage_msg.spawn_destruction_effects = true;
+			}
 		}
 
 		step.post_message(damage_msg);
 	}
-	else {
-		if (should_consume_charge) {
-			consume_charge_and_destroy();
-		}
-	}
 
-	return missile_collision_result { transformr { point, impact_dir.degrees() }, charges };
+	return missile_collision_result { transformr { point, impact_dir.degrees() }, deleted_already, penetration_began };
 }

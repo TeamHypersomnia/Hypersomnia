@@ -34,6 +34,7 @@ float32 raycast_input::ReportFixture(
 
 	output.hit = true;
 	output.what_entity = fixture->GetBody()->GetUserData();
+	output.what_fixture = fixture;
 	output.normal = normal;
 
 	if (save_all) {

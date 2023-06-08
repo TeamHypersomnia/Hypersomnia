@@ -277,6 +277,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 
 	const auto si = cosm.get_si();
 	const auto clk = cosm.get_clock();
+	const auto& now = clk.now;
 
 	std::array<messages::collision_message, 2> msgs;
 
@@ -421,6 +422,16 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			const auto info = missile_surface_info(subject, collider);
 
 			if (info.ignore_standard_collision_resolution() || collider.has<components::sentience>()) {
+				contact->SetEnabled(false);
+				post_collision_messages = false;
+				break;
+			}
+		}
+
+		if (const auto missile = subject.find<components::missile>()) {
+			const bool ricochet_cooldown = missile->when_last_ricocheted.was_set() && now.step <= missile->when_last_ricocheted.step + 1;
+
+			if (ricochet_cooldown) {
 				contact->SetEnabled(false);
 				post_collision_messages = false;
 				break;

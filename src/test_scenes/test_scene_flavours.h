@@ -68,6 +68,8 @@ auto& get_test_flavour(const all_entity_flavours& flavours, const T enum_id) {
 	return into[flavour_id];
 }
 
+float get_penetration(const test_shootable_weapons w);
+
 template <class T>
 auto& get_test_flavour(all_entity_flavours& flavours, const T enum_id) {
 	using E = test_flavours_map::at<T>;
@@ -93,6 +95,10 @@ auto& get_test_flavour(all_entity_flavours& flavours, const T enum_id) {
 	const auto flavour_id = to_raw_flavour_id(enum_id);
 	auto& new_flavour = into[flavour_id];
 	new_flavour.template get<invariants::text_details>().name = format_enum(enum_id);
+
+	if constexpr(std::is_same_v<test_shootable_weapons, T>) {
+		new_flavour.template get<invariants::gun>().basic_penetration_distance = get_penetration(enum_id);
+	}
 
 	return new_flavour;
 }

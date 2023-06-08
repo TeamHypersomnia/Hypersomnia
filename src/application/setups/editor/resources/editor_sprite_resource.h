@@ -58,6 +58,7 @@ struct editor_sprite_resource_physical {
 	real32 density = 0.7f;
 	real32 friction = 0.0f;
 	real32 bounciness = 0.2f;
+	real32 penetrability = 1.0f;
 
 	real32 linear_damping = 6.5f;
 	real32 angular_damping = 6.5f;

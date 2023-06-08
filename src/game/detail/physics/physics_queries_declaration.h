@@ -19,10 +19,20 @@ void for_each_in_aabb_meters(
 );
 
 template <class F>
-void for_each_intersection_with_shape_meters(
+void for_each_intersection_with_shape_meters_generic(
 	const b2World& b2world,
 	const si_scaling si,
 	const b2Shape* const shape,
+	const b2Transform queried_shape_transform,
+	const b2Filter filter,
+	F callback
+);
+
+template <class S, class F>
+void for_each_intersection_with_shape_meters(
+	const b2World& b2world,
+	const si_scaling si,
+	const S& shape,
 	const b2Transform queried_shape_transform,
 	const b2Filter filter,
 	F callback

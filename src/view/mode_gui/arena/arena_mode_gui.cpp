@@ -851,12 +851,26 @@ void arena_gui_state::draw_mode_gui(
 				const auto& headshot_entry = in.images_in_atlas.find_or(headshot_icon).diffuse;
 				const auto headshot_icon_size = was_headshot ? headshot_entry.get_original_size() : vec2u::zero;
 
-				const auto times_padded = was_headshot ? 3 : 2;
+				const bool was_wallbang = ko.origin.circumstances.wallbang;
+				const auto wallbang_icon = mode_input.rules.view.wallbang_icon;
+
+				const auto& wallbang_entry = in.images_in_atlas.find_or(wallbang_icon).diffuse;
+				const auto wallbang_icon_size = was_wallbang ? wallbang_entry.get_original_size() : vec2u::zero;
+
+				auto times_padded = 2;
+
+				if (was_headshot) {
+					++times_padded;
+				}
+
+				if (was_wallbang) {
+					++times_padded;
+				}
 
 				const auto total_bbox = xywhi(
 					pen.x,
 					pen.y,
-					cfg.inside_knockout_box_pad * 2 + cfg.weapon_icon_horizontal_pad * times_padded + headshot_icon_size.x + tool_size.x + lhs_bbox.x + rhs_bbox.x, 
+					cfg.inside_knockout_box_pad * 2 + cfg.weapon_icon_horizontal_pad * times_padded + headshot_icon_size.x + wallbang_icon_size.x + tool_size.x + lhs_bbox.x + rhs_bbox.x, 
 					cfg.inside_knockout_box_pad * 2 + std::max(tool_size.y, std::max(lhs_bbox.y, rhs_bbox.y))
 				);
 
@@ -900,6 +914,21 @@ void arena_gui_state::draw_mode_gui(
 				pen.x += tool_size.x;
 				pen.x += cfg.weapon_icon_horizontal_pad;
 
+				if (was_wallbang) {
+					auto col = rgba(get_col(ko.victim));
+					const auto origin = ltrb(pen - vec2i(0, wallbang_icon_size.y / 2), wallbang_icon_size);
+
+					general_drawer.aabb_bordered(
+						wallbang_entry,
+						origin,
+						orange,
+						black
+					);
+
+					pen.x += wallbang_icon_size.x;
+					pen.x += cfg.weapon_icon_horizontal_pad;
+				}
+
 				if (was_headshot) {
 					auto col = rgba(get_col(ko.victim));
 					const auto origin = ltrb(pen - vec2i(0, headshot_icon_size.y / 2), headshot_icon_size);
@@ -907,7 +936,7 @@ void arena_gui_state::draw_mode_gui(
 					general_drawer.aabb_bordered(
 						headshot_entry,
 						origin,
-						col,
+						orange,
 						black
 					);
 

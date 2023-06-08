@@ -3,6 +3,23 @@
 #include "game/cosmos/cosmos.h"
 #include "game/components/fixtures_component.h"
 
+real32 get_material_penetrability(const test_scene_physical_material_id id) {
+	using T = test_scene_physical_material_id;
+
+	switch (id) {
+		case T::WOOD:
+			return 1.5f;
+		case T::METAL:
+			return 1.0f;
+		case T::GLASS:
+			return 1.65f;
+		case T::VENT:
+			return 1.25f;
+		default:
+			return 1.0f;
+	}
+}
+
 namespace test_flavours {
 	void populate_crate_flavours(const populate_flavours_input in) {
 		auto& caches = in.caches;
@@ -26,6 +43,7 @@ namespace test_flavours {
 			fixtures_def.density = 100.f;
 			fixtures_def.max_ricochet_angle = max_ricochet_angle;
 			fixtures_def.material = to_physical_material_id(material);
+			fixtures_def.penetrability = get_material_penetrability(material);
 
 			meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL);
 			meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS);
@@ -72,6 +90,7 @@ namespace test_flavours {
 			fixtures_def.restitution = 0.8f;
 			fixtures_def.density = 0.7f;
 			fixtures_def.material = to_physical_material_id(material);
+			fixtures_def.penetrability = get_material_penetrability(material);
 
 			meta.template get<invariants::render>().special_functions.set(special_render_function::ILLUMINATE_AS_WALL);
 			meta.template get<invariants::render>().special_functions.set(special_render_function::COVER_GROUND_NEONS);

@@ -284,6 +284,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
+			missile.use_polygon_shape = true;
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SKULL_ROCKET_TRACE);
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SKULL_ROCKET_MUZZLE_LEAVE_EXPLOSION);
@@ -1379,6 +1380,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			}
 
+			missile.use_polygon_shape = true;
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 			missile.trace_particles.modifier.color = cyan;
 			missile.trace_particles.modifier.scale_amounts = 2.5f;
@@ -1495,6 +1497,7 @@ namespace test_flavours {
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 
+			missile.use_polygon_shape = true;
 			missile.homing_towards_hostile_strength = 1.0f;
 			missile.damage.base = 24;
 			missile.damage.impact_impulse = 450.f;
@@ -2909,7 +2912,7 @@ namespace test_flavours {
 				"Standard issue silenced rifle."
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BILMER2000_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 300.f;
@@ -2939,8 +2942,6 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BILMER_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000, white);
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
 			set_density_mult(meta, 1.35);
@@ -2960,7 +2961,7 @@ namespace test_flavours {
 				"Standard issue assault carbine."
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SZTURM_MUZZLE);
 
@@ -2986,8 +2987,6 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BILMER_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SZTURM, white);
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
 			set_density_mult(meta, 1.4);
@@ -3008,7 +3007,7 @@ namespace test_flavours {
 				"Pretty good SMG."
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
 
@@ -3035,8 +3034,6 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::PRO90_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.15f);
@@ -3062,7 +3059,7 @@ namespace test_flavours {
 				"Zamieć"
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ZAMIEC_MUZZLE);
 
@@ -3091,8 +3088,6 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::ZAMIEC_CHAMBERING);
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::ZAMIEC_SHOT);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ZAMIEC, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 0.9f);
@@ -3118,7 +3113,7 @@ namespace test_flavours {
 				"Pretty good SMG."
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_MUZZLE);
 
@@ -3144,8 +3139,6 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_CHAMBERING);
-
-			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYBERSPRAY, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -3174,7 +3167,7 @@ namespace test_flavours {
 				"Standard issue sample rifle."
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BAKA47_MUZZLE);
 
@@ -3201,8 +3194,6 @@ namespace test_flavours {
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BAKA47_SHOT);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BAKA47, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.4);
@@ -3222,7 +3213,7 @@ namespace test_flavours {
 				"Standard issue sample rifle."
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::GALILEA_MUZZLE);
 
@@ -3248,8 +3239,6 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GALILEA, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 2.f);
@@ -3269,7 +3258,7 @@ namespace test_flavours {
 				"Standard issue sample rifle."
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::LEWSII_MUZZLE);
 
@@ -3325,7 +3314,7 @@ namespace test_flavours {
 				"Standard issue sample rifle."
 			;
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PLASMA_MUZZLE);
 
@@ -3352,8 +3341,6 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN, white);
 
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -3370,7 +3357,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::KEK9);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
 
@@ -3396,8 +3383,6 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::MEDIUM_PISTOL_CHAMBERING);
 			gun_def.adversarial.knockout_award = static_cast<money_type>(850);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 0.8f);
@@ -3414,7 +3399,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::SN69);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
 
@@ -3440,8 +3425,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::LIGHT_PISTOL_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SN69, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 0.7f);
@@ -3457,7 +3440,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AWKA);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::HPSR_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 8000.f;
@@ -3492,8 +3475,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.recoil.pattern_progress_per_shot *= 9.0f;
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HPSR, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 2.0f);
@@ -3512,7 +3493,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::HUNTER);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::HUNTER_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 8000.f;
@@ -3547,8 +3528,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.recoil.pattern_progress_per_shot *= 6.0f;
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::HUNTER, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 0.8f);
@@ -3567,7 +3546,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AO44);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::AO44_MUZZLE);
 
@@ -3607,8 +3586,6 @@ namespace test_flavours {
 			gun_def.num_burst_bullets = 3;
 			gun_def.burst_recoil_mult = 0.4f;
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 2.3f);
@@ -3626,7 +3603,7 @@ namespace test_flavours {
 
 			meta.template get<invariants::text_details>().name = "Rocket Launcher ELON";
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ELON_HRL_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 6000.f;
@@ -3660,8 +3637,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.recoil.pattern_progress_per_shot *= 12.0f;
 			gun_def.allow_chambering_with_akimbo = true;
-
-			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELON_HRL, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -3701,7 +3676,7 @@ namespace test_flavours {
 
 			meta.template get<invariants::text_details>().name = "BullDup 2000";
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BULLDUP2000_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 5500.f;
@@ -3730,8 +3705,6 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULLDUP2000, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 2.0f);
@@ -3750,7 +3723,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::WARX);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::WARX_FQ12_MUZZLE);
 
@@ -3779,8 +3752,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.recoil.pattern_progress_per_shot *= 3.0f;
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::WARX_FQ12, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.5f);
@@ -3798,7 +3769,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::GRADOBICIE);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::GRADOBICIE_MUZZLE);
 
@@ -3827,8 +3798,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.recoil.pattern_progress_per_shot *= 5.0f;
 			
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GRADOBICIE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 0.9f);
@@ -3865,7 +3834,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::CALICO);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CALICO_MUZZLE);
 
@@ -3892,8 +3861,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::CALICO_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CALICO, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.5f);
@@ -3909,7 +3876,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BULWARK);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BULWARK_MUZZLE);
 
@@ -3936,8 +3903,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HEAVY_PISTOL_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.85f);
@@ -3954,7 +3919,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::COVERT);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::COVERT_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.reference_distance = 200.f;
@@ -3985,8 +3950,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HEAVY_PISTOL_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::COVERT, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.5f);
@@ -4003,7 +3966,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::DEAGLE);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::DEAGLE_MUZZLE);
 			gun_def.muzzle_shot_sound.modifier.max_distance = 7000.f;
@@ -4036,8 +3999,6 @@ namespace test_flavours {
 
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::DEAGLE_CHAMBERING);
 
-			meta.set(gun_def);
-
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DEAGLE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 2.6f);
@@ -4055,7 +4016,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AMPLIFIER_ARM);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RIFLE_MUZZLE);
 
@@ -4070,8 +4031,6 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::AMPLIFIER_ARM_MISSILE);
 			gun_def.adversarial.knockout_award = static_cast<money_type>(150);
-
-			meta.set(gun_def);
 
 			default_gun_props(meta);
 			set_density_mult(meta, 0.8f);
@@ -4090,7 +4049,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BLUNAZ);
 
-			invariants::gun gun_def;
+			auto& gun_def = meta.get<invariants::gun>();
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BLUNAZ_MUZZLE);
 
@@ -4108,8 +4067,6 @@ namespace test_flavours {
 			gun_def.kickback_towards_wielder = kickback_mult * 150.f;
 			gun_def.recoil_multiplier = 3.25f;
 
-			meta.set(gun_def);
-
 			default_gun_props(meta);
 			set_density_mult(meta, 0.7f);
 
@@ -4123,5 +4080,37 @@ namespace test_flavours {
 			meta.set(item);
 			meta.get<invariants::item>().standard_price = 2600;
 		}
+	}
+}
+
+float get_penetration(const test_shootable_weapons w) {
+	using W = test_shootable_weapons;
+
+	switch(w) {
+		case W::AMPLIFIER_ARM:  return 0.0f;
+		case W::ELON:           return 0.0f;
+		case W::BLUNAZ:         return 0.0f;
+		case W::KEK9:           return 15.0f;
+		case W::SN69:           return 15.0f;
+		case W::CALICO:         return 26.0f;
+		case W::BULWARK:        return 26.0f;
+		case W::PRO90:          return 26.0f;
+		case W::WARX:           return 30.0f;
+		case W::COVERT:         return 30.0f;
+		case W::GRADOBICIE:     return 40.0f;
+		case W::CYBERSPRAY:     return 40.0f;
+		case W::ZAMIEC:         return 50.0f;
+		case W::GALILEA:        return 110.0f;
+		case W::BILMER2000:     return 110.0f;
+		case W::BAKA47:         return 110.0f;
+		case W::SZTURM:         return 110.0f;
+		case W::DATUM:          return 110.0f;
+		case W::LEWS:           return 110.0f;
+		case W::AO44:           return 110.0f;
+		case W::DEAGLE:         return 120.0f;
+		case W::BULLDUP2000:    return 140.0f;
+		case W::HUNTER:         return 140.0f;
+		case W::AWKA:           return 170.0f;
+		default: return 0.0f;
 	}
 }

@@ -131,6 +131,8 @@ namespace invariants {
 		assets::plain_animation_id shoot_animation;
 		adversarial_meta adversarial = { static_cast<money_type>(500) };
 		real32 shell_spawn_delay_mult = 0.f;
+
+		real32 basic_penetration_distance = 15.0f;
 		// END GEN INTROSPECTOR
 
 		auto get_steam_schedule_heat() const {

@@ -68,6 +68,7 @@ struct json_firearm_entry {
 
 	int pellets_per_shot = 1;
 	float damage = 0;
+	float penetration = 0;
 	float headshot_damage = 0;
 	float shots_per_second = 0;
 	float min_bullet_speed = 0;

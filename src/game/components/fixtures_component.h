@@ -46,6 +46,7 @@ namespace invariants {
 		real32 friction = 0.f;
 		real32 restitution = 0.f;
 
+		real32 penetrability = 1.0f;
 		real32 max_ricochet_angle = 10.f;
 		bool point_blank_ricochets = false;
 		pad_bytes<3> pad;

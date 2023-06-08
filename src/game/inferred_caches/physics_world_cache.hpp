@@ -57,6 +57,12 @@ template <class E>
 auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();
 
+	if (const auto missile = handle.template find<components::missile>()) {
+		if (missile->during_penetration) {
+			return filters[predefined_filter_type::PENETRATING_BULLET];
+		}
+	}
+
 	if (is_like_planted_or_defused_bomb(handle)) {
 		return filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 	}
@@ -475,12 +481,23 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		constructed_fixtures.emplace_back(new_fix);
 	};
 
+	auto from_edge_shape = [&](real32 segment_length) {
+		from_box_shape(vec2(segment_length, 0.01f), 0.0f);
+	};
+
 	if (is_like_thrown_explosive(handle)) {
 		if (const auto fuse = handle.template find<invariants::hand_fuse>()) {
 			from_circle_shape(fuse->circle_shape_radius_when_released);
 		}
 
 		return;
+	}
+
+	if (const auto missile = handle.template find<invariants::missile>()) {
+		if (!missile->use_polygon_shape) {
+			from_edge_shape(handle.get_logical_size().x);
+			return;
+		}
 	}
 
 	if (const auto expl_body = handle.template find<invariants::cascade_explosion>()) {

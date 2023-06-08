@@ -33,10 +33,11 @@ struct joint_cache {
 #endif
 
 struct physics_raycast_output {
-	bool hit = false;
+	b2Fixture* what_fixture = nullptr;
 	vec2 intersection;
 	vec2 normal;
 	unversioned_entity_id what_entity;
+	bool hit = false;
 };
 
 class physics_world_cache {
@@ -126,6 +127,11 @@ public:
 	template <class... Args>
 	void for_each_intersection_with_shape_meters(Args&&... args) const {
 		::for_each_intersection_with_shape_meters(get_b2world(), std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	void for_each_intersection_with_shape_meters_generic(Args&&... args) const {
+		::for_each_intersection_with_shape_meters_generic(get_b2world(), std::forward<Args>(args)...);
 	}
 
 	template <class... Args>

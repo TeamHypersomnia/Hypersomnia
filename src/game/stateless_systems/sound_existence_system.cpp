@@ -454,7 +454,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 			const auto& e = d.damage.effects;
 
-			if (d.inflictor_destructed) {
+			if (d.spawn_destruction_effects) {
 				if (!suppress_destruction_sound) {
 					if (sentient) {
 						if (e.sentience_impact.sound.id.is_set()) {

@@ -623,8 +623,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		draw_interaction_sensor();
 
 		renderer.call_and_clear_lines();
-		shaders.illuminated->set_as_current(renderer);
 	}
+
+	shaders.illuminated->set_as_current(renderer);
 
 	renderer.call_triangles(D::SOLID_OBSTACLES);
 	renderer.call_triangles(D::REMNANTS);

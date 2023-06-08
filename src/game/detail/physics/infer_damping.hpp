@@ -75,6 +75,17 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 		}
 	});
 
+	handle.template dispatch_on_having_all<components::missile>([&damping](const auto& typed_handle) {
+		const auto& missile = typed_handle.template get<components::missile>();
+
+		const auto dist_remaining = missile.penetration_distance_remaining;
+		const auto dist_starting = missile.starting_penetration_distance;
+
+		if (dist_remaining != dist_starting && dist_starting != 0.0f) {
+			damping.linear += 2.0f * (1.0f - dist_remaining / dist_starting);
+		}
+	});
+
 	return damping.sanitize();
 }
 

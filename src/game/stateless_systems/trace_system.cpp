@@ -99,10 +99,12 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 
 			const auto& trace_def = typed_deleted.template get<invariants::trace>();
 
+			bool during_penetration = false;
 			auto transform_of_finishing = typed_deleted.get_logic_transform();
 
 			if (const auto missile = typed_deleted.template find<components::missile>()) {
 				transform_of_finishing = missile->saved_point_of_impact_before_death;
+				during_penetration = missile->during_penetration;
 
 				const auto w = typed_deleted.get_logical_size().x;
 				transform_of_finishing.pos -= transform_of_finishing.get_direction() * (w / 2);
@@ -123,7 +125,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 				[transform_of_finishing](const auto typed_handle, auto&&...) {
 					typed_handle.set_logic_transform(transform_of_finishing);
 				},
-				[transform_of_finishing, trace](const auto typed_handle) {
+				[transform_of_finishing, trace, during_penetration](const auto typed_handle) {
 					{
 						auto& interp = get_corresponding<components::interpolation>(typed_handle);
 						interp.set_place_of_birth(transform_of_finishing);
@@ -133,6 +135,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 						auto& copied_trace = typed_handle.template get<components::trace>();
 						copied_trace = trace;
 						copied_trace.is_it_a_finishing_trace = true;
+						copied_trace.during_penetration = during_penetration;
 					}
 				}
 			)) {

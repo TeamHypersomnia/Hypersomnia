@@ -304,6 +304,17 @@ bool edit_property(
 				return false;
 			}
 
+			if (label == "Penetrability") {
+				if (slider(label, property, 0.0f, 4.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				tooltip_on_hover("0 - impenetrable.\n1 - default value.\nThe higher the penetrability,\nthe easier it is to wallbang.\nA value of 2 means that the bullets\nwill travel twice as far while penetrating.");
+
+				return false;
+			}
+
 			if (label == "Max ricochet angle") {
 				if (slider(label, property, 0.0f, 180.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
@@ -632,6 +643,11 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& 
 
 		MULTIPROPERTY("Randomize starting animation frame", randomize_starting_animation_frame);
 
+	}
+
+	if (resource.editable.domain == editor_sprite_domain::PHYSICAL) {
+		text_disabled("Tip: you can also set penetrability\nper-resource or even per-material.\nAll three will combine.\nModify it per-node as a last resort.");
+		MULTIPROPERTY("Penetrability", penetrability);
 	}
 
 	return result;
@@ -1599,6 +1615,7 @@ EDIT_FUNCTION(
 		MULTIPROPERTY("Density", as_physical.density);
 		MULTIPROPERTY("Friction", as_physical.friction);
 		MULTIPROPERTY("Bounciness", as_physical.bounciness);
+		MULTIPROPERTY("Penetrability", as_physical.penetrability);
 		MULTIPROPERTY("Collision sound sensitivity", as_physical.collision_sound_sensitivity);
 
 		MULTIPROPERTY("Immovable", as_physical.is_static);
@@ -1775,6 +1792,7 @@ EDIT_FUNCTION(editor_material_resource_editable& insp, T& es, const id_widget_ha
 		}
 	};
 
+	MULTIPROPERTY("Penetrability", penetrability);
 	MULTIPROPERTY("Max ricochet angle", max_ricochet_angle);
 
 	tooltip_on_hover("0 - never ricochets.\n180 - always ricochets (like a perfectly reflecting mirror).\nThe higher the angle, the easier it is to ricochet.");

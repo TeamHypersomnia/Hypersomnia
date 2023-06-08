@@ -23,7 +23,8 @@ struct damage_cause {
 struct damage_circumstances {
 	// GEN INTROSPECTOR struct damage_circumstances
 	bool headshot = false;
-	pad_bytes<3> pad;
+	bool wallbang = false;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 };
 

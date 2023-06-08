@@ -174,7 +174,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			const bool sentient = subject.template has<components::sentience>();
 			const bool vulnerable = sentient_and_vulnerable(subject);
 
-			if (d.inflictor_destructed) {
+			if (d.spawn_destruction_effects) {
 				if (sentient) {
 					if (e.sentience_impact.particles.id.is_set()) {
 						do_effect(e.sentience_impact);

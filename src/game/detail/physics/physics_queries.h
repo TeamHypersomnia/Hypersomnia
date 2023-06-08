@@ -101,6 +101,18 @@ void for_each_intersection_with_shape_meters(
 }
 
 template <class F>
+void for_each_intersection_with_shape_meters_generic(
+	const b2World& b2world,
+	const si_scaling si,
+	const b2Shape* const shape,
+	const b2Transform queried_shape_transform,
+	const b2Filter filter,
+	F callback
+) {
+	for_each_intersection_with_shape_meters(b2world, si, *shape, queried_shape_transform, filter, callback);
+}
+
+template <class F>
 void for_each_intersection_with_circle_meters(
 	const b2World& b2world,
 	const si_scaling si,

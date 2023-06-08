@@ -133,6 +133,16 @@ predefined_filters::predefined_filters() {
 		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET);
 	}
 	{
+		auto& out = filters[predefined_filter_type::PENETRATING_BULLET];
+		out.categoryBits = make_flags(C::FLYING_BULLET);
+		out.maskBits = standard_participation_except(C::LYING_ITEM, C::FLYING_BULLET, C::WALL, C::GLASS_OBSTACLE);
+	}
+	{
+		auto& out = filters[predefined_filter_type::PENETRATING_PROGRESS_QUERY];
+		out.categoryBits = make_flags(C::FLYING_BULLET);
+		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE);
+	}
+	{
 
 		/* Rockets should collide with characters */
 		auto& out = filters[predefined_filter_type::FLYING_ROCKET];

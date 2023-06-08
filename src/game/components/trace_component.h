@@ -24,7 +24,8 @@ namespace components {
 
 		bool is_it_a_finishing_trace = false;
 		bool enabled = true;
-		pad_bytes<2> pad;
+		bool during_penetration = false;
+		pad_bytes<1> pad;
 		// END GEN INTROSPECTOR
 
 		void reset(

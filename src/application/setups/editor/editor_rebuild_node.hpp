@@ -54,6 +54,10 @@ bool setup_entity_from_node(
 		if (opacity != 1.0f) {
 			sprite.colorize.mult_alpha(opacity);
 		}
+
+		if (auto body = agg.template find<components::rigid_body>()) {
+			body->special.penetrability = editable.penetrability;
+		}
 	}
 	else if constexpr(std::is_same_v<N, editor_light_node>) {
 		auto set_attn_from_falloff = [&](auto& attn, const auto& foff) {
