@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- bump that version
+
+- buff all non-penetrating weapons now like smgs and shotguns 
+    - and warx should be cheaper
+
 - Portals should take precedence in the layer order
     - Why doesn't it work out of the box? It should because we're iterating them linearly
 

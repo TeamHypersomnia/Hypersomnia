@@ -1047,7 +1047,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 1.5f;
+			meta.template get<invariants::rigid_body>().damping.linear = 1.35f;
 
 			invariants::missile missile;
 
@@ -1115,7 +1115,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 1.5f;
+			meta.template get<invariants::rigid_body>().damping.linear = 1.2f;
 
 			invariants::missile missile;
 
@@ -1144,7 +1144,7 @@ namespace test_flavours {
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 			missile.damage.base = 10;
 			missile.damage.shake *= 0.45f;
-			missile.max_lifetime_ms = 500.f;
+			missile.max_lifetime_ms = 600.f;
 
 			missile.trace_sound.id = {};
 
@@ -2189,7 +2189,7 @@ namespace test_flavours {
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::GRADOBICIE_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::GRADOBICIE_ROUND);
 
-				cartridge.num_rounds_spawned = 13;
+				cartridge.num_rounds_spawned = 14;
 				cartridge.rounds_spread_degrees = 12.f;
 				cartridge.rounds_spread_degrees_variation = 0.f;
 
@@ -3012,7 +3012,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4100.f, 4200.f};
+			gun_def.muzzle_velocity = {4900.f, 5400.f};
 			gun_def.shot_cooldown_ms = 61.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3064,7 +3064,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ZAMIEC_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4550.f, 4550.f};
+			gun_def.muzzle_velocity = {5300.f, 6000.f};
 			gun_def.shot_cooldown_ms = 75.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3118,7 +3118,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CYBERSPRAY_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4150.f, 4800.f};
+			gun_def.muzzle_velocity = {5350.f, 5800.f};
 			gun_def.shot_cooldown_ms = 40.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
@@ -3728,7 +3728,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::WARX_FQ12_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = { 4000.f, 5000.f };
+			gun_def.muzzle_velocity = { 4600.f, 5600.f };
 			gun_def.shot_cooldown_ms = 200.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
@@ -3740,7 +3740,7 @@ namespace test_flavours {
 			gun_def.head_radius_multiplier = 0.4f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.recoil_multiplier = 2.3f;
+			gun_def.recoil_multiplier = 1.0f;
 			gun_def.kickback_towards_wielder = kickback_mult * 60.f;
 
 			gun_def.maximum_heat = 2.f;
@@ -3758,7 +3758,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 3100;
+			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 650.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 			only_allow_mag(meta, test_container_items::WARX_FQ12_MAGAZINE);
@@ -3774,7 +3774,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::GRADOBICIE_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = { 3300.f, 5800.f };
+			gun_def.muzzle_velocity = { 4200.f, 6300.f };
 			gun_def.shot_cooldown_ms = 300.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::GRADOBICIE_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
@@ -4092,11 +4092,11 @@ float get_penetration(const test_shootable_weapons w) {
 		case W::BLUNAZ:         return 0.0f;
 		case W::KEK9:           return 15.0f;
 		case W::SN69:           return 15.0f;
-		case W::CALICO:         return 26.0f;
-		case W::BULWARK:        return 26.0f;
 		case W::PRO90:          return 26.0f;
-		case W::WARX:           return 30.0f;
+		case W::CALICO:         return 30.0f;
+		case W::BULWARK:        return 30.0f;
 		case W::COVERT:         return 30.0f;
+		case W::WARX:           return 30.0f;
 		case W::GRADOBICIE:     return 40.0f;
 		case W::CYBERSPRAY:     return 40.0f;
 		case W::ZAMIEC:         return 50.0f;
