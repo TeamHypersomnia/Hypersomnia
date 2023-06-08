@@ -26,6 +26,9 @@ Forever free and open-source :heart:
 
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/Nlh_dyd_V7w/0.jpg)](https://www.youtube.com/watch?v=Nlh_dyd_V7w "Video Title")
 
+
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/URWjNtUArDo/0.jpg)](https://www.youtube.com/watch?v=URWjNtUArDo "Video Title")
+
 </div>
 
 - [Introduction](#introduction)
@@ -58,10 +61,11 @@ To understand the repository's folder structure, make sure to read the [document
 
 ## Gallery
 
-Watch gameplays on YouTube:
+An example 4v4 fight:
 
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/Aey0L1jZpiA/0.jpg)](https://www.youtube.com/watch?v=Aey0L1jZpiA "Video Title")
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/0vlUOO5l0jw/0.jpg)](https://www.youtube.com/watch?v=0vlUOO5l0jw "Video Title")
+_(from 2019, note it's before headshots and bullet penetration)_
+
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/X7m2vDXIaxA/0.jpg)](https://www.youtube.com/watch?v=X7m2vDXIaxA "Video Title")
 
 # Quick gameplay instructions
 
