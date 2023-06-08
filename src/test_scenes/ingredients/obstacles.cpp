@@ -12,7 +12,7 @@ real32 get_material_penetrability(const test_scene_physical_material_id id) {
 		case T::METAL:
 			return 1.0f;
 		case T::GLASS:
-			return 1.65f;
+			return 2.0f;
 		case T::VENT:
 			return 1.25f;
 		default:
