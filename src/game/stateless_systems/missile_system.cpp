@@ -73,9 +73,6 @@ void missile_system::advance_penetrations(const logic_step step) {
 	(void)now;
 	//const auto& delta = step.get_delta();
 
-	thread_local std::vector<b2Fixture*> hits;
-	hits.clear();
-
 	cosm.for_each_having<components::missile>(
 		[&](const auto& it) {
 			auto& missile = it.template get<components::missile>();
@@ -154,6 +151,9 @@ void missile_system::advance_penetrations(const logic_step step) {
 			}
 
 			/* Fill forward facing hits */
+
+			thread_local std::vector<b2Fixture*> hits;
+			hits.clear();
 
 			{
 				/* 
@@ -252,6 +252,9 @@ void missile_system::advance_penetrations(const logic_step step) {
 					if (const auto body = handle.template find<components::rigid_body>()) {
 						penetrability *= body.get_special().penetrability;
 					}
+				}
+				else {
+					continue;
 				}
 
 				const auto considered_p1 = fixture.penetrated_forward ? vec2(fixture.forward_point) : p1;
