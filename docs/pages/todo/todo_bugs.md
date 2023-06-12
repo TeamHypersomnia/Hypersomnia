@@ -5,6 +5,13 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- fy twoj stary bug
+    - Solved: The server didn't check for autosave in official maps, but sometimes autosave might end up there
+
+    - there's an autosave, maybe this is the issue?
+    - the other hash was the old file's and it is what got sent
+    - maybe pepsik had the old one saved and had no autosave and requested the old hash 
+
 - Billan crash
 	- fixed: randomization system was mutable; and was thus used by multiple threads where it called try_emplace on walk states.
 		- this is a prime example of how mutable can bite us in the ass, so let's not do this in rendering code because it is multithreaded

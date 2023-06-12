@@ -71,6 +71,8 @@ void missile_system::advance_penetrations(const logic_step step) {
 
 	const auto now = cosm.get_timestamp();
 	(void)now;
+
+	thread_local std::vector<b2Fixture*> hits;
 	//const auto& delta = step.get_delta();
 
 	cosm.for_each_having<components::missile>(
@@ -150,10 +152,9 @@ void missile_system::advance_penetrations(const logic_step step) {
 				DEBUG_PERSISTENT_LINES.emplace_back(cyan, p1, p2);
 			}
 
-			/* Fill forward facing hits */
-
-			thread_local std::vector<b2Fixture*> hits;
 			hits.clear();
+
+			/* Fill forward facing hits */
 
 			{
 				/* 

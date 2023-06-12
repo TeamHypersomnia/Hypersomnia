@@ -37,10 +37,8 @@ augs::path_type server_choose_arena_file_by(const std::string& name) {
 		if (augs::exists(arena_path)) {
 			auto paths = editor_project_paths(arena_path);
 
-			if (candidate_folder == EDITOR_PROJECTS_DIR) {
-				if (augs::exists(paths.autosave_json)) {
-					return paths.autosave_json;
-				}
+			if (augs::exists(paths.autosave_json)) {
+				return paths.autosave_json;
 			}
 
 			return paths.project_json;
