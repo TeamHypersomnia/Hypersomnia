@@ -618,7 +618,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.game_mode = arena.on_mode(
 		[&](const auto& m) {
 			using M = remove_cref<decltype(m)>;
-			return online_mode_type_id::of<M>();
+			return mode_type_id::of<M>();
 		}
 	);
 

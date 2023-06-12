@@ -72,7 +72,7 @@ class client_setup :
 	predefined_rulesets rulesets;
 
 	/* Other replicated state */
-	online_mode_and_rules current_mode;
+	mode_and_rules current_mode;
 	server_vars sv_vars;
 	server_solvable_vars sv_solvable_vars;
 	augs::path_type current_arena_folder;
@@ -80,7 +80,7 @@ class client_setup :
 	mode_player_id client_player_id;
 
 	cosmos predicted_cosmos;
-	online_mode_and_rules predicted_mode;
+	mode_and_rules predicted_mode;
 
 	std::vector<special_client_request> pending_requests;
 	bool now_resyncing = false;

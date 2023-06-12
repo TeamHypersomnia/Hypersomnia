@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Default spawn generation for FFA-like modes
+    - later, GunGame will be team-based
+
 - The "Race" mode for surf maps could count how fast someone entered the final portal
 	- E.g. 12000 entering velocity = +12 score, 1000 velocity = +1 score etc
 	- This way players could compete within a single loop

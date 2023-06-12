@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Gungame
+    - Spawn protection
+        - Reuse teleport alpha logic
+        - Disable collision resolution in missile surface
+        - Just set a timer in sentience
+    - Disable dropping
+        - Except for knives
+            - For this let's make all dropped items disappear after 10 secs, like in test mode
+        - We don't want other weapons to be dropped because people will just drop stronger weapons to the team leader
+            - They'll still be able to pick others' knives though, but maybe it's not that bad
+    - Basic equipment
+        - So that we can specify basic knife/armor/backpacks too
+
 - Portals should take precedence in the layer order
     - Why doesn't it work out of the box? It should because we're iterating them linearly
 

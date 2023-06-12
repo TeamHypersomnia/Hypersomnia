@@ -73,7 +73,7 @@ class server_setup :
 	predefined_rulesets rulesets;
 
 	/* Other replicated state */
-	online_mode_and_rules current_mode;
+	mode_and_rules current_mode;
 
 	client_vars integrated_client_vars;
 	server_vars vars;

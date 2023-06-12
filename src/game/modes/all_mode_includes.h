@@ -9,18 +9,10 @@
 #include "augs/templates/transform_types.h"
 #include "augs/templates/list_utils.h"
 
-using all_online_modes = type_list<
-	bomb_defusal,
-	test_mode
->;
-
 using all_modes = type_list<
-	bomb_defusal,
-	test_mode
+	test_mode,
+	bomb_defusal
 >;
 
 using all_modes_variant = replace_list_type_t<all_modes, std::variant>;
-using all_online_modes_variant = replace_list_type_t<all_online_modes, std::variant>;
-
 using mode_type_id = type_in_list_id<all_modes>;
-using online_mode_type_id = type_in_list_id<all_online_modes>;

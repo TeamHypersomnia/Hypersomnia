@@ -13,7 +13,7 @@ struct server_heartbeat {
 	// GEN INTROSPECTOR struct server_heartbeat
 	server_name_type server_name;
 	arena_identifier current_arena;
-	online_mode_type_id game_mode;
+	mode_type_id game_mode;
 
 	uint8_t num_fighting;
 	uint8_t max_fighting;

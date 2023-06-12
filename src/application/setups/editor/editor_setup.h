@@ -102,9 +102,6 @@ struct intercosm;
 struct editor_resource_pools;
 struct editor_official_resource_map;
 
-template <bool C, class ModeVariantType>
-class basic_arena_handle;
-
 template <bool C>
 using editor_arena_handle = basic_arena_handle<C, mode_and_rules>;
 

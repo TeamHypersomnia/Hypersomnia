@@ -11,7 +11,7 @@
 template <bool C>
 struct full_arena_snapshot_payload {
 	maybe_const_ref_t<C, cosmos_solvable_significant> signi;
-	maybe_const_ref_t<C, online_mode_and_rules> mode;
+	maybe_const_ref_t<C, mode_and_rules> mode;
 	maybe_const_ref_t<C, uint32_t> client_id;
 	maybe_const_ref_t<C, rcon_level_type> rcon;
 };

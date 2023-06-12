@@ -25,4 +25,3 @@ struct basic_mode_and_rules {
 };
 
 using mode_and_rules = basic_mode_and_rules<all_modes_variant>;
-using online_mode_and_rules = basic_mode_and_rules<all_online_modes_variant>;
