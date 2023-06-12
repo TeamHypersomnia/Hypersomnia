@@ -6264,3 +6264,4 @@ This will discard your redo history."
 - buff all non-penetrating weapons now like smgs and shotguns 
     - and warx should be cheaper
 
+- fix grenade count counter in starting equipment

@@ -26,7 +26,7 @@ struct cosmos_solvable_significant;
 
 struct bomb_defusal_faction_rules {
 	// GEN INTROSPECTOR struct bomb_defusal_faction_rules
-	requested_equipment initial_eq;
+	requested_equipment round_start_eq;
 	requested_equipment warmup_initial_eq;
 	// END GEN INTROSPECTOR
 };

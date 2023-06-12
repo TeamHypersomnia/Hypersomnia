@@ -22,4 +22,10 @@ inline void setup_game_mode_defaults(
 	e.bomb_defusal.warmup_equipment.resistance.melee = o[test_melee_weapons::FURY_THROWER];
 	e.bomb_defusal.warmup_equipment.resistance.extra_ammo_pieces = 3;
 	e.bomb_defusal.warmup_equipment.resistance.backpack = true;
+
+	e.bomb_defusal.round_start_equipment.metropolis.firearm = o[test_shootable_weapons::SN69];
+	e.bomb_defusal.round_start_equipment.metropolis.melee = o[test_melee_weapons::CYAN_SCYTHE];
+
+	e.bomb_defusal.round_start_equipment.resistance.firearm = o[test_shootable_weapons::KEK9];
+	e.bomb_defusal.round_start_equipment.resistance.melee = o[test_melee_weapons::YELLOW_DAGGER];
 }

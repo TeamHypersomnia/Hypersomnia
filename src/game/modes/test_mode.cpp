@@ -39,7 +39,7 @@ void test_mode::init_spawned(const input_type in, const entity_id id, const logi
 	auto access = allocate_new_entity_access();
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		in.rules.factions[typed_handle.get_official_faction()].initial_eq.generate_for(access, typed_handle, step, 1);
+		in.rules.factions[typed_handle.get_official_faction()].round_start_eq.generate_for(access, typed_handle, step, 1);
 
 		if (auto crosshair = typed_handle.template find<components::crosshair>()) {
 			crosshair->recoil = {};

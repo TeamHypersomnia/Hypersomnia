@@ -39,6 +39,7 @@ struct editor_bomb_defusal_mode {
 	uint32_t max_team_score = 16;
 
 	per_actual_faction<editor_requested_equipment> warmup_equipment;
+	per_actual_faction<editor_requested_equipment> round_start_equipment;
 	// END GEN INTROSPECTOR
 };
 

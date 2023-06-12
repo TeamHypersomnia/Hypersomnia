@@ -22,7 +22,7 @@ class cosmos;
 
 struct test_mode_faction_rules {
 	// GEN INTROSPECTOR struct test_mode_faction_rules
-	requested_equipment initial_eq;
+	requested_equipment round_start_eq;
 	// END GEN INTROSPECTOR
 };
 

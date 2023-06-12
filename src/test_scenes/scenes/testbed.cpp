@@ -320,23 +320,23 @@ namespace test_scenes {
 	void testbed::setup(test_mode_ruleset& rs) {
 		rs.name = "Standard test ruleset";
 
-		rs.factions[faction_type::RESISTANCE].initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		rs.factions[faction_type::RESISTANCE].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
-		rs.factions[faction_type::RESISTANCE].initial_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
-		rs.factions[faction_type::RESISTANCE].initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
-		rs.factions[faction_type::RESISTANCE].initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
+		rs.factions[faction_type::RESISTANCE].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		rs.factions[faction_type::RESISTANCE].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
+		rs.factions[faction_type::RESISTANCE].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
+		rs.factions[faction_type::RESISTANCE].round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+		rs.factions[faction_type::RESISTANCE].round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 
-		rs.factions[faction_type::METROPOLIS].initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		rs.factions[faction_type::METROPOLIS].initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
-		rs.factions[faction_type::METROPOLIS].initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
-		rs.factions[faction_type::METROPOLIS].initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
-		rs.factions[faction_type::METROPOLIS].initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::ASSAULT_RATTLE);
+		rs.factions[faction_type::METROPOLIS].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		rs.factions[faction_type::METROPOLIS].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
+		rs.factions[faction_type::METROPOLIS].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+		rs.factions[faction_type::METROPOLIS].round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+		rs.factions[faction_type::METROPOLIS].round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::ASSAULT_RATTLE);
 #if 0
-		rs.initial_eq.over_back_wearable = to_entity_flavour_id(test_hand_explosives::BOMB);
+		rs.round_start_eq.over_back_wearable = to_entity_flavour_id(test_hand_explosives::BOMB);
 #endif
 
-		fill_range(rs.factions[faction_type::METROPOLIS].initial_eq.spells_to_give, true);
-		fill_range(rs.factions[faction_type::RESISTANCE].initial_eq.spells_to_give, true);
+		fill_range(rs.factions[faction_type::METROPOLIS].round_start_eq.spells_to_give, true);
+		fill_range(rs.factions[faction_type::RESISTANCE].round_start_eq.spells_to_give, true);
 	}
 
 	void testbed::setup(bomb_defusal_ruleset& rs) {
@@ -383,11 +383,11 @@ namespace test_scenes {
 			auto& resistance = rs.factions[faction_type::RESISTANCE];
 			auto& metropolis = rs.factions[faction_type::METROPOLIS];
 
-			resistance.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-			metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+			resistance.round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+			metropolis.round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
-			resistance.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
-			metropolis.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
+			resistance.round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
+			metropolis.round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 
 			resistance.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			metropolis.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
@@ -399,19 +399,19 @@ namespace test_scenes {
 			resistance.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::FURY_THROWER);
 			metropolis.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::POSEIDON);
 
-			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SN69);
-			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::KEK9);
+			metropolis.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SN69);
+			resistance.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::KEK9);
 #endif
 
 #if GIVE_FULL
-			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
-			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
+			metropolis.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
+			resistance.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
 
-			metropolis.initial_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
-			metropolis.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+			metropolis.round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+			metropolis.round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 
-			resistance.initial_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
-			resistance.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+			resistance.round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
+			resistance.round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 #endif
 		}
 

@@ -132,7 +132,7 @@ ruleset_id setup_ruleset_from_editor_mode(
 
 			::for_each_faction(
 				[&](const faction_type f) {
-					rules.factions[f].initial_eq = ::to_game_requested_equipment(vars.equipment[f], find_resource, f);
+					rules.factions[f].round_start_eq = ::to_game_requested_equipment(vars.equipment[f], find_resource, f);
 				}
 			);
 
@@ -158,6 +158,7 @@ ruleset_id setup_ruleset_from_editor_mode(
 			::for_each_faction(
 				[&](const faction_type f) {
 					rules.factions[f].warmup_initial_eq = ::to_game_requested_equipment(vars.warmup_equipment[f], find_resource, f);
+					rules.factions[f].round_start_eq = ::to_game_requested_equipment(vars.round_start_equipment[f], find_resource, f);
 				}
 			);
 

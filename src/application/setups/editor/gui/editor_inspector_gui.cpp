@@ -82,7 +82,7 @@ edit_property(result, label, special_handler, insp.MEMBER);
 	MULTIPROPERTY("Explosive", field.explosive);\
 	if (insp.field.explosive.is_set()) {\
 		auto ind = scoped_indent();\
-		MULTIPROPERTY("Count", field.num_explosives)\
+		MULTIPROPERTY("Explosives count", field.num_explosives)\
 	}\
 \
 	MULTIPROPERTY("Backpack", field.backpack);\
@@ -460,7 +460,7 @@ bool edit_property(
 				}
 			}
 
-			if (label.find("Extra ammo pieces") != std::string::npos) {
+			if (label.find("Extra ammo pieces") != std::string::npos || label == "Explosives count") {
 				if (slider(label, property, 0u, 10u)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
@@ -2133,6 +2133,10 @@ EDIT_FUNCTION(
 			ImGui::Separator();
 
 			FACTION_EQUIPMENT_PROPERTY("Warmup equipment", bomb_defusal.warmup_equipment);
+
+			ImGui::Separator();
+
+			FACTION_EQUIPMENT_PROPERTY("Round start equipment", bomb_defusal.round_start_equipment);
 		}
 		else {
 			static_assert(always_false_v<I>, "Non-exhaustive if constexpr");

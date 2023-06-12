@@ -324,7 +324,7 @@ void bomb_defusal::init_spawned(
 			const auto& eq = 
 				state == arena_mode_state::WARMUP
 				? faction_rules.warmup_initial_eq
-				: faction_rules.initial_eq
+				: faction_rules.round_start_eq
 			;
 
 			eq.generate_for(access, typed_handle, step, 1);
