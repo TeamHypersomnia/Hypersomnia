@@ -64,7 +64,7 @@ std::string hypersomnia_version::get_summary() const {
 }
 
 std::string hypersomnia_version::get_version_string() const {
-	return typesafe_sprintf("1.1.%x", commit_number);
+	return typesafe_sprintf("1.2.%x", commit_number);
 }
 
 #else

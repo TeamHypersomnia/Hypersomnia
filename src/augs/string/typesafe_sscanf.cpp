@@ -31,6 +31,8 @@ TEST_CASE("TypesafeSscanf", "TypesafeSscanfSeveralTests") {
 	REQUIRE(!is_more_recent("1.0.0", "1.0.1"));
 	REQUIRE(!is_more_recent("1.0.438", "1.1.0"));
 	REQUIRE(is_more_recent("1.1.0", "1.0.438"));
+	REQUIRE(is_more_recent("1.2.0", "1.1.8594"));
+	REQUIRE(is_more_recent("1.2.0000", "1.1.8594"));
 	REQUIRE(!is_more_recent("1.0.38", "1.0.38"));
 	REQUIRE(!is_more_recent("2.0.0", "3.0.0"));
 	REQUIRE(!is_more_recent("2.999.43", "3.0.0"));

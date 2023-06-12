@@ -15,7 +15,7 @@ if [ -f "$EXE_PATH" ]; then
 	COMMIT_HASH=$(git rev-parse HEAD)
 	COMMIT_NUMBER=$(git rev-list --count master)
 	COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-	VERSION="1.1.$COMMIT_NUMBER"
+	VERSION="1.2.$COMMIT_NUMBER"
 	RELEASE_NOTES_FILENAME="release_notes.txt"
 	FILE_PATH="Hypersomnia-for-$PLATFORM.sfx"
 	UPLOAD_URL="https://hypersomnia.xyz/upload_artifact.php"

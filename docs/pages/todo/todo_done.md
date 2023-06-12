@@ -6259,3 +6259,8 @@ This will discard your redo history."
 			- Actually it might be better to count that additional duration hit when the hit begins
 			- We'll anyway have polygonal wall obstacles so that irregular walls aren't just composed of multiple rectangles stacked together
 		
+- bump that version
+
+- buff all non-penetrating weapons now like smgs and shotguns 
+    - and warx should be cheaper
+

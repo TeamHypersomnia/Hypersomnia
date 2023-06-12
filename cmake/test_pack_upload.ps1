@@ -45,7 +45,7 @@ $filePath = "Hypersomnia-for-$platform.exe"
 $commitHash = $(git rev-parse HEAD)
 $commitNumber = $(git rev-list --count master)
 $commitMessage = $(git log -1 --pretty=%B)
-$version = "1.1.$commitNumber"
+$version = "1.2.$commitNumber"
 
 mv $target_exe Hypersomnia.exe
 Get-ChildItem
