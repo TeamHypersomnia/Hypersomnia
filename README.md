@@ -111,6 +111,7 @@ In this section I will detail the interesting technological aspects of *Hypersom
 
 - **[rectpack2D,](https://github.com/TeamHypersomnia/rectpack2D) written for packing textures, became famous and was used in [Assassin's Creed: Valhalla.](https://www.youtube.com/watch?v=2KnjDL4DnwM&t=2382s)**
 - My Entity-Component-System [idea from 2013](https://github.com/TeamHypersomnia/Hypersomnia/issues/264) was later **[employed by Unity game engine in 2018.](https://patents.google.com/patent/US10599560B2/en)**
+  - **[Original SE article.](https://gamedev.stackexchange.com/questions/58693/grouping-entities-of-the-same-component-set-into-linear-memory/)**
 - Networking is based on **cross-platform simulation determinism**. 
   - This technique is traditionally used by RTS games with hundreds of continuously moving soldier units. 
     - It is impractical to update every single one of them through the network. 
@@ -130,8 +131,8 @@ In this section I will detail the interesting technological aspects of *Hypersom
 - [Cute fish/insect AI with flocking behaviors.](https://www.youtube.com/watch?v=0vlUOO5l0jw) Full source: [movement_path_system.cpp.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/game/stateless_systems/movement_path_system.cpp)
   - These too are synchronized through the network!
     - Other players will see fish and insects in the same positions, even though they **do not contribute to network traffic.**
-  - Fish and insects will react to shots and explosions!
-    - And when they're scared, they'll keep closer to members of the same species.
+  - Fish and insects react to shots and explosions!
+    - And once they're scared, they keep closer to members of the same species.
 - [Anyone can host the entire *Hypersomnia* server infrastructure.](https://github.com/TeamHypersomnia/Hypersomnia-admin-shell) 
   - The Editor, the game server *and* the masterserver (server list keeper) are **all embedded in the same game executable**, on every OS. 
   - You could run a separate server list for your own community around a completely modded version of *Hypersomnia*!
@@ -271,8 +272,8 @@ You can reconfigure all bindings by going to Settings->Controls tab.
 - Shift - sprint, it drains stamina.
 - Space - dash, it drains quite a lot of stamina.
 - Left control - move quietly.
-- T - open the shop. Usually, the shop is off during warmup.
-- O - change team. You should just pick Auto-assign to preserve balance.
+- B - open the shop. Usually, the shop is off during warmup.
+- M - change team. You should just pick Auto-assign to preserve balance.
 - G - drop the most recently wielded item.
 - H - hide the most recently wielded item. Can fail if you have no space in your inventory!
 - E - Pick up items/defuse the bomb. If you move when defusing, the timer is reset, so stay still. You can shoot, though. Just remember to keep the trigger in the bomb's range, they have to touch.
