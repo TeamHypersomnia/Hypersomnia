@@ -123,14 +123,14 @@ In this section I will detail the interesting technological aspects of *Hypersom
 - You can host a working game server *from the main menu* - the game is able to **forward ports out of the box!**
   - The algorithm requires a third party server - in this case, the masterserver (server list keeper) facilitates the traversal.
   - Very simple in principle. Using Google STUN servers, we first detect the NAT type for both the client and the server (conic, symmetric or no NAT), as well as the difference in ports between packets outgoing to two different addresses ("port delta").
-  - Both parties send packets to the masterserver which in turns relays what was the last external port ``P`` of the other party.
+  - Both parties send packets to the masterserver which in turn relays what was the last external port ``P`` of the other party.
   - Both parties then spam e.g. 10-20 UDP packets at ports ``P + delta * n``.
   - Even a pair of symmetric NATs will form a connection if they have a deterministic port delta - although after a while. The connection will fail if either the client or the server has a symmetric NAT with randomized port selection. In practice however, most routers are conic which makes punchthrough work instantly.
 - [Cute fish/insect AI with flocking behaviors.](https://www.youtube.com/watch?v=0vlUOO5l0jw) Full source: [movement_path_system.cpp.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/game/stateless_systems/movement_path_system.cpp)
   - These too are synchronized through the network!
     - Other players will see fish and insects in the same positions, even though they **do not contribute to network traffic.**
   - Fish and insects will react to shots and explosions!
-    - And when they're scared, they'll keep closer and cling to members of the same species.
+    - And when they're scared, they'll keep closer to members of the same species.
 - [Anyone can host the entire *Hypersomnia* server infrastructure.](https://github.com/TeamHypersomnia/Hypersomnia-admin-shell) 
   - The Editor, the game server *and* the masterserver (server list keeper) are **all embedded in the same game executable**, on every OS. 
   - You could run a separate server list for your own community around a completely modded version of *Hypersomnia*!
@@ -138,7 +138,7 @@ In this section I will detail the interesting technological aspects of *Hypersom
 
     ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/0479fca0-f836-4f6a-b5a5-dc2317bb4b95)
 
-    - Not only that, [it will verify](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/application/main/verify_signature.h) that the update came from the verified [developer public key](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h).
+    - Not only that, [it will verify](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/application/main/verify_signature.h) that the update came from the verified [developer public key](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h), with a call to ``ssh-keygen``.
       - If the [build hosting](https://hypersomnia.xyz/builds/latest/) were hacked and a malicious game version uploaded, the existing game clients **will refuse** to apply the updates.
 - ..and I'm signing builds **offline with a [Trezor hardware wallet](https://github.com/TeamHypersomnia/Hypersomnia-admin-shell/blob/master/developer_sign_file.sh).**
   This is how *every* update looks like on my end:
