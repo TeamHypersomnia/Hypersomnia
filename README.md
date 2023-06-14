@@ -108,7 +108,7 @@ I use a lot of 3rdparty libraries like ``Box2D`` (physics) or ``yojimbo`` (trans
 
 In this section I will detail the interesting technological aspects of *Hypersomnia*:
 
-- **[rectpack2D,](https://github.com/TeamHypersomnia/rectpack2D) written for packing game textures, became famous and was used even in [Assassin's Creed: Valhalla.](https://www.youtube.com/watch?v=2KnjDL4DnwM&t=2382s)**
+- **[rectpack2D,](https://github.com/TeamHypersomnia/rectpack2D) written for packing textures, became famous and was used in [Assassin's Creed: Valhalla.](https://www.youtube.com/watch?v=2KnjDL4DnwM&t=2382s)**
 - My Entity-Component-System [idea from 2013](https://github.com/TeamHypersomnia/Hypersomnia/issues/264) was later **[employed by Unity game engine in 2018.](https://patents.google.com/patent/US10599560B2/en)**
 - Networking is based on **cross-platform simulation determinism**. 
   - This technique is traditionally used by RTS games with hundreds of continuously moving soldier units. 
@@ -253,7 +253,7 @@ In this section I will detail the interesting technological aspects of *Hypersom
     - You will enter the game as the host.
     - The connecting clients will automatically download the map in its current version with all its custom resources.
       - And they can later **create their own remake** - maps are saved in JSON, after all!
-    - Pressing ESC will let you stop the session and go back to the Editor **exactly as you left it**, enabling ultra-efficient iteration cycles.
+    - ESC will let you stop the session and go back to the Editor **exactly as you left it**, enabling ultra-efficient iteration cycles.
     - This is possible because the server, the game and the editor are **all within the same executable.**
     - The official Discord will also be notified that you're playtesting a map, so others can join in on the fun!
 
