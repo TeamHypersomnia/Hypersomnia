@@ -88,8 +88,9 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
 
 - **[24 unique firearms!](https://hypersomnia.xyz/weapons)**
   - And an extra 4 grenade types, 7 melee weapons and 6 magic spells.
+- **[10 community maps](https://hypersomnia.xyz/arenas)** and counting!
 - **2 game modes**: *Bomb defusal* and *Gun game*.
-- An **in-game map editor** that lets you host a **work-in-progress map** to *instantly* play it with your friends, **even behind a router**!
+- An **in-game map editor** that lets you host a **work-in-progress map** to *instantly* play it with your friends, **even behind a router!**
 
     ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/1744ed72-612a-4af1-afbc-1a9d0c5750b3)
 
