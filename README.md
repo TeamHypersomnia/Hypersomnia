@@ -78,7 +78,7 @@ the project began with a single childhood dream:
 
 In the future, the game might introduce elements of RPG with hardcore PvP mechanics.
 
-Set in a hypothetical afterlife reality, it shall provide joy through fierce fights, benevolent behaviors, fulfillment of elaborate social roles or sowing panic as a traitor to altruists.
+Set in a hypothetical afterlife reality, it shall provide joy through fierce fights, benevolent behaviors, fulfillment of elaborate social roles or sowing panic as a traitor to the altruists.
 
 Declare allegiance to one of the three factions whose apple of discord is a disparity between prevailing notions of moral excellence.
 
@@ -87,7 +87,7 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
 # Features
 
 - **[24 unique firearms!](https://hypersomnia.xyz/weapons)**
-  - And an extra 4 grenade types, 7 melee weapons and 6 magic spells.
+  - And an extra 4 grenade types, 7 melee weapons as well as 6 magic spells!
 - **[10 community maps](https://hypersomnia.xyz/arenas)** and counting!
 - **2 game modes**: *Bomb defusal* and *Gun game*.
 - An **in-game map editor** that lets you host a **work-in-progress map** to *instantly* play it with your friends, **even behind a router!**
@@ -507,7 +507,7 @@ ln -s managers/open_file_ranger.zsh open_file.local
 None of the symlinks will be tracked by git.  
 
 Currently, the following file managers are supported:
-- [ranger](https://github.com/ranger/ranger) ``--choosefile`` and ``--selectfile`` options
+- [ranger](https://github.com/ranger/ranger) through ``--choosefile`` and ``--selectfile`` options
 
 ## MacOS instructions
 
