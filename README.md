@@ -46,6 +46,7 @@ _(from 2019, note it's way before headshots and bullet penetration)_
 - [Introduction](#introduction)
 - [Features](#features)
 - [Tech highlights](#tech-highlights)
+- [Background](#background)
 - [Quick gameplay instructions](#quick-gameplay-instructions)
 - [How to build](#how-to-build)
   - [Windows instructions](#windows-instructions)
@@ -101,46 +102,86 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
 
 # Tech highlights
 
-*Hypersomnia* has been in development **since 2013** (as seen in the commit history).
-
-It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. This [cute minigame for PUBG](https://www.youtube.com/watch?v=tSP5P0QGWa4) was my last programming gig, and the proceeds allowed me to focus entirely on *Hypersomnia*.
-
-I use a lot of 3rdparty libraries like ``Box2D`` (physics) or ``yojimbo`` (transport layer) - [everything not on this list,](https://github.com/TeamHypersomnia/Hypersomnia/tree/master/src/3rdparty) however, is written pretty much from scratch, in pure C++.
-
-In this section I will detail the interesting technological aspects of *Hypersomnia*:
-
 - **[rectpack2D,](https://github.com/TeamHypersomnia/rectpack2D) written for packing textures, became famous and was used in [Assassin's Creed: Valhalla.](https://www.youtube.com/watch?v=2KnjDL4DnwM&t=2382s)**
+  - Used also by [a drone manufacturing company](https://pages.skydio.com/rs/784-TUF-591/images/Open%20Source%20Software%20Notice%20v0.2.html) and in [2 scientific papers](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=teamhypersomnia&btnG=).
 - My Entity-Component-System [idea from 2013](https://github.com/TeamHypersomnia/Hypersomnia/issues/264) was later **[employed by Unity game engine in 2018.](https://patents.google.com/patent/US10599560B2/en)**
   - **[Original SE article.](https://gamedev.stackexchange.com/questions/58693/grouping-entities-of-the-same-component-set-into-linear-memory/)**
 - Networking is based on **cross-platform simulation determinism**. 
   - This technique is traditionally used by RTS games with hundreds of continuously moving soldier units. 
-    - It is impractical to update every single one of them through the network. 
-    - Instead, only the player inputs are sent through ("I clicked here", "I gave this command") - the clients simulate *everything else* locally, on their own. Think playing chess with your friend over the phone. You won't ever say aloud the entire state of the chessboard, only the movements ("Queen to H5").
-  - Similarly in *Hypersomnia*, you can have thousands of dynamic crates or bullets on the map - as long as there are e.g. two player-controlled characters, the bandwidth will be around ``40 kbit/s (= 5 KB/s)`` under a tickrate of 60 Hz. Only player-controlled characters contribute to traffic. 
-  - Here, it's made possible by [STREFLOP](https://nicolas.brodu.net/programmation/streflop/index.html) and using the same compiler everywhere (``clang``). This would be very hard to pull off in a commercial engine, or straight impossible in a closed source one.
-    - It's not the end of the story though. To make this work, I had to dig through the depths of Box2D to make even the order of contact resolution fully deterministic, as well as implement my own portable RNGs. You can't even iterate an ``std::unordered_map`` without possibly breaking determinism!
-  - Thanks to this, lag is hidden exceptionally well as the game doesn't just mindlessly "extrapolate" frames visually - rather, it simulates the entire game world forward *offscreen* to accurately predict the future.
-  - As a result, even the silliest details like bullet shells are fully synchronized *without* paying for it with traffic.
-  - For the very curious - here's my [2016 article on this architecture](https://teamhypersomnia.github.io/newscast/full-blown-networking-with-latency-hiding-for-physics), although it's a longer read.
+    - It is impractical to continuously update every single one of them through the network. 
+    - Instead, only the player inputs are transmitted ("I clicked here", "I gave this command") - the clients simulate *everything else* locally, on their own. Think playing chess with your friend over the phone. You won't ever say aloud the entire state of the chessboard, only the movements ("Queen to H5").
+  - But *Hypersomnia* is not an RTS - since it's physics-based, it uses *floats* heavily, not just *integers*.
+    - When floating point calculations are involved, simulation determinism becomes [extremely hard.](https://gafferongames.com/post/floating_point_determinism/)
+    - To achieve it in *Hypersomnia*, I had to: 
+      - Use the same compiler - ``clang`` - on **all** OSes. It's very nice of LLVM to be ieee754-compliant by default.
+      - Replace all math functions like ``std::sin``, ``std::sqrt`` by these from [STREFLOP](https://nicolas.brodu.net/programmation/streflop/index.html)..
+      - ..after which ``streflop::sqrt`` became a huge bottleneck - thankfully, I found another efficient [ieee754-compliant implementation.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/3rdparty/streflop/libm/flt-32/e_sqrtf.h)
+  - Apart from worrying about floats.. 
+    - I had to watch out even when iterating ``std::unordered_map`` - often replacing them with deterministically ordered ``std::map``.
+    - I had to use a [portable RNG (xorshift)](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/augs/misc/xorshift.hpp), ditching the entire ``<random>`` header (its implementation differs across OSes).
+  - Another magical trick was needed to ensure the **physics itself is fully deterministic:**
+    - Problem: when a new client connects, it receives the initial physics state - but the packets contain just the body positions, rotations and velocities.
+    - In particular, it doesn't contain the "hot" physics state such as the already tracked contacts, or the already built/balanced quadtree for fast collision detection.
+    - What if there are already some players on the server, and several bodies overlap the moment a new player joins?
+    - The new client will recreate the entire internal physics state on its own, using just the pos/vel/rotation data, but the contacts might be created in a different order than that of the existing clients! The fresh quadtree might end up completely different too from the one that has already seen many insertions/deletions during a long gaming session - so it might later report collisions in different order.
+    - My solution was one of the greatest stroke of epiphany I ever experienced:
+      - When a new client connects, **force already connected clients to completely rebuild the physics state from the positions, rotations and velocities as if they have just connected themselves.** *drops the mic*
+      - As long as building the internal physics data from pos/vel/rotation data is deterministic, the in-game clients will have the *exact same state* as the newly connected client.
+      - I apply the same principle in many other areas of networking. Throughout my codebase, I call this process *[cache reinference.](https://wiki.hypersomnia.xyz/reinference)*
+  - All this would be very hard to pull off in a commercial engine, or straight impossible in a closed source one.
+  - Yet in *Hypersomnia*, you can have thousands of dynamic crates or bullets on the map - as long as there are e.g. two player-controlled characters, the traffic will be around ``40 kbit/s (= 5 KB/s)`` under a tickrate of 60 Hz. **Only player-controlled characters** contribute to traffic. 
+    - Even the silliest details like bullet shells are fully synchronized *without* paying for it with network traffic.
+  - As a bonus, lag is hidden exceptionally well as the game doesn't just mindlessly "extrapolate" frames visually - rather, it simulates the entire game world forward *offscreen* to accurately predict the future.
+  - For the very curious - here's an [article from my old abandoned blog](https://teamhypersomnia.github.io/newscast/full-blown-networking-with-latency-hiding-for-physics), showing how I achieved this as early as in 2016.
 - You can host a working game server *from the main menu* - the game is able to **forward ports out of the box!**
   - The algorithm requires a third party server - in this case, the masterserver (server list keeper) facilitates the traversal.
   - Very simple in principle. Using Google STUN servers, we first detect the NAT type for both the client and the server (conic, symmetric or no NAT), as well as the difference in ports between packets outgoing to two different addresses ("port delta").
   - Both parties send packets to the masterserver which in turn relays what was the last external port ``P`` of the other party.
   - Both parties then spam e.g. 10-20 UDP packets at ports ``P + delta * n``.
   - Even a pair of symmetric NATs will form a connection if they have a deterministic port delta - although after a while. The connection will fail if either the client or the server has a symmetric NAT with randomized port selection. In practice however, most routers are conic which makes punchthrough work instantly.
-- [Cute fish/insect AI with flocking behaviors.](https://www.youtube.com/watch?v=0vlUOO5l0jw) Full source: [movement_path_system.cpp.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/game/stateless_systems/movement_path_system.cpp)
+- Cute fish and insect AI **[with flocking behaviors.](https://www.youtube.com/watch?v=0vlUOO5l0jw)** Full source: [movement_path_system.cpp.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/game/stateless_systems/movement_path_system.cpp)
   - These too are synchronized through the network!
-    - Other players will see fish and insects in the same positions, even though they **do not contribute to network traffic.**
+    - Other players see fish and insects in the same positions, even though they **do not contribute to network traffic.**
   - Fish and insects react to shots and explosions!
     - And once they're scared, they keep closer to members of the same species.
-- [Anyone can host the entire *Hypersomnia* server infrastructure.](https://github.com/TeamHypersomnia/Hypersomnia-admin-shell) 
+- Anyone can host **[the entire *Hypersomnia* server infrastructure.](https://github.com/TeamHypersomnia/Hypersomnia-admin-shell)**
   - The Editor, the game server *and* the masterserver (server list keeper) are **all embedded in the same game executable**, on every OS. 
   - You could run a separate server list for your own community around a completely modded version of *Hypersomnia*!
+- Memory pool [implementation](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/augs/misc/pool/pool.h) with:
+  - **Contiguous storage**.
+    - All game objects in existence are kept **linearly in memory** (in a simple ``std::vector``).
+      - It means blazing-fast iteration of all game objects of the same type, as well as trivial pool serialization.
+  - **O(1)** allocation (mostly a glorified ``push_back``).
+  - **O(1)** free (via ``std::swap`` with the last element and ``pop_back`` - a very known idiom).
+  - **O(1)** dereference.
+    - The *only* caveat being: a dereference involves **four** reads from memory (instead of just **one** with a direct pointer and **two** with a pointer + array index):
+    - It has to first read the ``indirection_array`` pointer **(1)**.
+      - The indirection array contains the current index of the requested object within the vector of all allocated objects.
+      - This index is located at ``indirection_array[identifier]`` **(2)**.
+    - Then it reads the actual ``objects`` vector pointer **(3)**.
+    - Finally, it reads the object itself at ``objects[indirection_array[identifier]]`` **(4)**.
+    - (Note that the ``objects`` and ``indirection_array`` will usually be cached already so subsequent dereferences will be reduced to two fetches from RAM at most).
+    - This works because ``indirection_array`` is kept up-to-date whenever objects are allocated or removed.
+  - **Fully resizable**. You don't have to pass a maximum pool size. It will expand on its own.
+  - **Fully deterministic.** Given the same sequence of allocations and frees starting from a given initial pool state, the allocations will produce the same integer identifiers and objects will have exactly the same order in the linear memory.
+    - When a client connects and the server sends it the initial world state, it includes the entire **internal state** of the game object pools.
+      - It means the pools themselves are *a part of the game simulation* - I don't have to send any "creation" notification events through the network whenever entities are created as the clients **deterministically simulate allocations on their own** resulting in identical object identifiers as well as their orders in memory.
+  - **Perfectly undoable allocations and frees.** 
+    - The Editor requires all commands to implement a deterministic undo/redo, especially ones that create or delete a resource.
+    - Suppose you create a custom Material in the editor and it now has an integer identifier ``I``.
+      - You later set this Material to some walls on the scene. The walls now refer to identifier ``I``.
+      - Now you want to undo all the way back to before you even created the Material.
+      - The Material gets deleted from the pool.
+      - Now you actually want to *redo* all of these commands back.
+      - You first redo the Material allocation command.
+      - But if the pool uses a non-undoable allocation scheme, the material could now be allocated with the id ``I+1``.
+      - This means that the subsequent commands (that alter the walls material) will set an identifier that is now invalid - ``I``.
+      - To solve this problem, my memory pool implementation provides ``undo_last_allocate`` apart from the standard ``free``. It's used by the commands that have to undo creating a resource (which means deleting it). It will free the object in a way that the next allocation will result in an identical integer id and internal pool state (with allocated objects order) as before freeing the resource. It is an optional feature for the sake of editor commands that is never used during actual gameplay. Analogously, there is an ``undo_last_free``.
 - Built-in self-updater: the game will download and apply updates automatically.
 
     ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/0479fca0-f836-4f6a-b5a5-dc2317bb4b95)
 
-    - Not only that, [it will verify](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/application/main/verify_signature.h) that the update came from the verified [developer public key](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h), with a call to ``ssh-keygen``.
+    - Not only that, [it will verify](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/application/main/verify_signature.h) that the update came from the hardcoded [developer public key](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h), with a call to ``ssh-keygen``.
       - If the [build hosting](https://hypersomnia.xyz/builds/latest/) were hacked and a malicious game version uploaded, the existing game clients **will refuse** to apply the updates.
 - ..and I'm signing builds **offline with a [Trezor hardware wallet](https://github.com/TeamHypersomnia/Hypersomnia-admin-shell/blob/master/developer_sign_file.sh).**
   This is how *every* update looks like on my end:
@@ -261,6 +302,23 @@ In this section I will detail the interesting technological aspects of *Hypersom
 
   - The Editor took well over a year to implement.
   - It paid off big time - there is now a neat [catalogue of community maps](https://hypersomnia.xyz/arenas) - every one of them downloadable.
+
+# Background
+
+*Hypersomnia* has been in development **since 2013** (as seen in the commit history).
+
+It didn't take 10 years of uninterrupted coding, though - in the meantime, I worked commercially to cover my costs of living. This [cute minigame for PUBG](https://www.youtube.com/watch?v=tSP5P0QGWa4) was my last programming gig, and the proceeds allowed me to focus entirely on *Hypersomnia*.
+
+I use a lot of 3rdparty libraries like ``Box2D`` (physics) or ``yojimbo`` (transport layer) - [everything not on this list,](https://github.com/TeamHypersomnia/Hypersomnia/tree/master/src/3rdparty) however, is written pretty much from scratch, in pure C++.
+
+Many believe that writing games without an engine is no more than *reinventing the wheel*, or put more bluntly, a complete waste of time.
+
+**I hope this project serves as a great testament to the opposite.**
+
+If I never embarked on this journey, I would have never made some of the interesting discoveries detailed in [Tech highlights section.](#tech-highlights)
+Video game internals are just so vast and interdisciplinary that they have limitless potential for creative breakthroughs, and it is a waste to never even entertain the idea that some widely used solutions can be replaced by something absolutely ingenious.
+
+It is not a bad thing that game engines exist. If you want to be competitive writing a game without one, then you are forced to come up with a design so unique that it would be hard or impossible to do it in a commercial engine. This alone helps developers arrive to exceptional game ideas.
 
 # Quick gameplay instructions
 
