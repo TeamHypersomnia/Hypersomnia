@@ -95,16 +95,18 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
 
     ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/1744ed72-612a-4af1-afbc-1a9d0c5750b3)
 
-  - ..and when connecting, custom maps and resources are automatically synchronized:
+  - Your friends will **automatically download your map** with all its custom resources!
 
-    ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/6ef8fbd9-f7ab-4d33-b338-b6440f1032a5)
+    *(like in CS 1.6)*
+
+    ![image](https://github.com/TeamHypersomnia/Hypersomnia/assets/3588717/daeb96d1-0ea5-41c6-89f8-3ef25013570d)
 
 
 # Tech highlights
 
 - **[rectpack2D,](https://github.com/TeamHypersomnia/rectpack2D) written for packing textures, became famous and was used in [Assassin's Creed: Valhalla.](https://www.youtube.com/watch?v=2KnjDL4DnwM&t=2382s)**
-  - Used also by [a drone manufacturing company](https://pages.skydio.com/rs/784-TUF-591/images/Open%20Source%20Software%20Notice%20v0.2.html) and in [2 scientific papers](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=teamhypersomnia&btnG=).
-- My Entity-Component-System [idea from 2013](https://github.com/TeamHypersomnia/Hypersomnia/issues/264) was later **[employed by Unity game engine in 2018.](https://patents.google.com/patent/US10599560B2/en)**
+  - Used also by [a drone manufacturing company](https://pages.skydio.com/rs/784-TUF-591/images/Open%20Source%20Software%20Notice%20v0.2.html) and in [2 scientific papers.](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=teamhypersomnia&btnG=)
+- My Entity-Component-System [idea from 2013](https://github.com/TeamHypersomnia/Hypersomnia/issues/264) describes techniques similar to **[Unity game engine patent from 2018.](https://patents.google.com/patent/US10599560B2/en)**
   - **[Original SE article.](https://gamedev.stackexchange.com/questions/58693/grouping-entities-of-the-same-component-set-into-linear-memory/)**
 - Networking is based on **cross-platform simulation determinism**. 
   - This technique is traditionally used by RTS games with hundreds of continuously moving soldier units. 
@@ -114,7 +116,7 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
     - When floating point calculations are involved, simulation determinism becomes [extremely hard.](https://gafferongames.com/post/floating_point_determinism/)
     - To achieve it in *Hypersomnia*, I had to: 
       - Use the same compiler - ``clang`` - on **all** OSes. It's very nice of LLVM to be ieee754-compliant by default.
-      - Replace all math functions like ``std::sin``, ``std::sqrt`` by these from [STREFLOP](https://nicolas.brodu.net/programmation/streflop/index.html)..
+      - Replace all math functions like ``std::sin``, ``std::sqrt`` by these from [STREFLOP.](https://nicolas.brodu.net/programmation/streflop/index.html)
       - ..after which ``streflop::sqrt`` became a huge bottleneck - thankfully, I found another efficient [ieee754-compliant implementation.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/3rdparty/streflop/libm/flt-32/e_sqrtf.h)
   - Apart from worrying about floats.. 
     - I had to watch out even when iterating ``std::unordered_map`` - often replacing them with deterministically ordered ``std::map``.
