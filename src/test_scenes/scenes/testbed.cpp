@@ -678,10 +678,10 @@ namespace test_scenes {
 
 		create(test_plain_sprited_bodies::CRATE, vec2(800, 1000));
 
-		create(test_plain_sprited_bodies::BOX_COLLIDER_GLASS, vec2(900, 300));
-		create(test_plain_sprited_bodies::BOX_COLLIDER_WOOD, vec2(900, 300+150));
-		create(test_plain_sprited_bodies::BOX_COLLIDER_METAL, vec2(900, 300+300));
-		create(test_plain_sprited_bodies::BOX_COLLIDER_VENT, vec2(900, 300+450));
+		create(test_plain_sprited_bodies::BOX_COLLIDER_GLASS, vec2(900, 300)).set_logical_size(vec2(32, 128));
+		create(test_plain_sprited_bodies::BOX_COLLIDER_WOOD, vec2(900, 300+150)).set_logical_size(vec2(32, 128));
+		create(test_plain_sprited_bodies::BOX_COLLIDER_METAL, vec2(900, 300+300)).set_logical_size(vec2(32, 128));
+		create(test_plain_sprited_bodies::BOX_COLLIDER_VENT, vec2(900, 300+450)).set_logical_size(vec2(32, 128));
 
 		{
 			const vec2 coords[] = {
