@@ -15,7 +15,7 @@
 #include "game/components/attitude_component.h"
 #include "game/components/melee_fighter_component.h"
 #include "game/components/container_component.h"
-#include "game/modes/arena_mode.h"
+#include "game/modes/arena_mode_structs.h"
 #include "view/maybe_official_path_declaration.h"
 #include "game/detail/inventory/requested_equipment.h"
 #include "game/modes/detail/item_purchase_structs.h"

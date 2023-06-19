@@ -2,7 +2,7 @@
 #include "augs/ensure_rel.h"
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/messages/health_event.h"
-#include "game/modes/bomb_defusal.hpp"
+#include "game/modes/arena_mode.hpp"
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"

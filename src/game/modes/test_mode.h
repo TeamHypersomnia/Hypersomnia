@@ -9,7 +9,7 @@
 #include "view/character_hud_type.h"
 
 #include "game/modes/session_id.h"
-#include "game/modes/arena_mode.h"
+#include "game/modes/arena_mode_structs.h"
 #include "augs/templates/continue_or_callback_result.h"
 
 #include "application/arena/arena_playtesting_context.h"

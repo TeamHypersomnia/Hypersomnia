@@ -711,7 +711,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/hand_fuse_component.cpp"
 	"src/game/debug_draw.cpp"
 	"src/game/detail/explosive/detonate.cpp"
-	"src/game/modes/bomb_defusal.cpp"
+	"src/game/modes/arena_mode.cpp"
 	"src/view/mode_gui/arena/arena_mode_gui.cpp"
 	"src/view/asset_funcs.cpp"
 	"src/view/mode_gui/arena/arena_scoreboard_gui.cpp"
