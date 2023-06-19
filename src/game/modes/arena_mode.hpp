@@ -1,10 +1,10 @@
 #pragma once
-#include "game/modes/bomb_defusal.h"
+#include "game/modes/arena_mode.h"
 #include "augs/templates/continue_or_callback_result.h"
 #include "game/cosmos/entity_handle.h"
 
 template <class F>
-void bomb_defusal::for_each_player_in(const faction_type faction, F&& callback) const {
+void arena_mode::for_each_player_in(const faction_type faction, F&& callback) const {
 	for (auto& it : players) {
 		if (it.second.get_faction() == faction) {
 			if (continue_or_callback_result(std::forward<F>(callback), it.first, it.second) == callback_result::ABORT) {
@@ -15,8 +15,8 @@ void bomb_defusal::for_each_player_in(const faction_type faction, F&& callback) 
 }
 
 template <class F>
-void bomb_defusal::for_each_player_best_to_worst_in(const faction_type faction, F&& callback) const {
-	std::vector<std::pair<bomb_defusal_player, mode_player_id>> sorted_players;
+void arena_mode::for_each_player_best_to_worst_in(const faction_type faction, F&& callback) const {
+	std::vector<std::pair<arena_mode_player, mode_player_id>> sorted_players;
 
 	for_each_player_in(faction, [&](
 		const auto& id, 
@@ -33,7 +33,7 @@ void bomb_defusal::for_each_player_best_to_worst_in(const faction_type faction, 
 }
 
 template <class F>
-decltype(auto) bomb_defusal::on_bomb_entity(const const_input in, F callback) const {
+decltype(auto) arena_mode::on_bomb_entity(const const_input in, F callback) const {
 	auto& cosm = in.cosm;
 
 	if (!bomb_entity.is_set()) {

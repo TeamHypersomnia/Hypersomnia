@@ -17,7 +17,7 @@ struct intercosm_path_op {
 struct test_scene_settings;
 
 struct test_mode_ruleset;
-struct bomb_defusal_ruleset;
+struct arena_mode_ruleset;
 
 void post_load_state_correction(
 	cosmos_common_significant&,
@@ -34,13 +34,13 @@ struct intercosm {
 		sol::state&, 
 		test_scene_settings,
 		test_mode_ruleset&,
-		bomb_defusal_ruleset* = nullptr
+		arena_mode_ruleset* = nullptr
 	);
 
 	void populate_official_content(
 		sol::state&, 
 		unsigned tickrate,
-		bomb_defusal_ruleset&,
+		arena_mode_ruleset&,
 		test_mode_ruleset&
 	);
 

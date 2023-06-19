@@ -3,12 +3,12 @@
 #include "application/setups/editor/resources/editor_resource_pools.h"
 #include "application/intercosm.h"
 
-#include "game/modes/bomb_defusal.h"
+#include "game/modes/arena_mode.h"
 #include "game/modes/test_mode.h"
 
 struct packaged_official_content {
 	test_mode_ruleset default_test_ruleset;
-	bomb_defusal_ruleset default_bomb_ruleset;
+	arena_mode_ruleset default_bomb_ruleset;
 	intercosm built_content;
 
 	/* 

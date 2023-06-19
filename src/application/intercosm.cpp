@@ -29,7 +29,7 @@
 #include "application/arena/arena_paths.h"
 #endif
 
-#include "game/modes/bomb_defusal.h"
+#include "game/modes/arena_mode.h"
 #include "game/modes/test_mode.h"
 
 #include "application/predefined_rulesets.h"
@@ -61,7 +61,7 @@ void intercosm::clear() {
 void intercosm::populate_official_content(
 	sol::state& lua, 
 	const unsigned tickrate,
-	bomb_defusal_ruleset& bomb_defusal,
+	arena_mode_ruleset& arena_ruleset,
 	test_mode_ruleset& test_ruleset
 ) {
 	clear();
@@ -86,16 +86,16 @@ void intercosm::populate_official_content(
 	});
 
 	auto populator = test_scenes::testbed();
-	populator.setup(bomb_defusal);
+	populator.setup(arena_ruleset);
 	populator.setup(test_ruleset);
-	bomb_defusal.speeds.tickrate = tickrate;
+	arena_ruleset.speeds.tickrate = tickrate;
 }
 
 void intercosm::make_test_scene(
 	sol::state& lua, 
 	const test_scene_settings settings,
 	test_mode_ruleset& test_mode,
-	bomb_defusal_ruleset* const bomb_defusal
+	arena_mode_ruleset* const arena_ruleset
 ) {
 	clear();
 
@@ -114,8 +114,8 @@ void intercosm::make_test_scene(
 			return changer_callback_result::REFRESH;
 		});
 
-		if (bomb_defusal) {
-			bomb_defusal->speeds.tickrate = settings.scene_tickrate;
+		if (arena_ruleset) {
+			arena_ruleset->speeds.tickrate = settings.scene_tickrate;
 		}
 
 		auto entropy = cosmic_entropy();
@@ -130,8 +130,8 @@ void intercosm::make_test_scene(
 
 		populator.setup(test_mode);
 
-		if (bomb_defusal != nullptr) {
-			populator.setup(*bomb_defusal);
+		if (arena_ruleset != nullptr) {
+			populator.setup(*arena_ruleset);
 		}
 
 		snap_interpolated_to_logical(world);
@@ -147,7 +147,7 @@ void intercosm::make_test_scene(
 	(void)lua;
 	(void)settings;
 	(void)test_mode;
-	(void)bomb_defusal;
+	(void)arena_ruleset;
 #endif
 }
 

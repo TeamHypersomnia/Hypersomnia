@@ -396,7 +396,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
     test_scene = {
       scene_tickrate = 60,
-      start_bomb_defusal = true
+      start_arena_mode = true
     },
     camera = {
       panning_speed = 1

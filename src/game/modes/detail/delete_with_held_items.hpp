@@ -2,7 +2,7 @@
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
-class bomb_defusal;
+class arena_mode;
 
 void reverse_perform_deletions(const deletion_queue& deletions, cosmos& cosm);
 
@@ -14,7 +14,7 @@ static void delete_with_held_items(const I in, const logic_step step, const H ha
 
 		handle.for_each_contained_item_recursive(
 			[&](const auto& contained) {
-				if constexpr(std::is_same_v<bomb_defusal, typename I::mode_type>) {
+				if constexpr(std::is_same_v<arena_mode, typename I::mode_type>) {
 					const auto& bomb_flavour = in.rules.bomb_flavour;
 
 					if (bomb_flavour.is_set()) {

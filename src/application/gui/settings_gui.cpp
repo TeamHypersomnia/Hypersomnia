@@ -1264,15 +1264,6 @@ void settings_gui_state::perform(
 
 					revertable_drag("commands for undoing", config.editor.remember_last_n_commands, 1, 10, 2000);
 #endif
-
-#if 0
-					if (auto node = scoped_tree_node("Test scene generation")) {
-						auto& scope_cfg = config.editor.test_scene;
-						
-						revertable_slider(SCOPE_CFG_NVP(scene_tickrate), 10u, 300u);
-						revertable_checkbox(SCOPE_CFG_NVP(start_bomb_defusal));
-					}
-#endif
 				}	
 				
 				if (auto node = scoped_tree_node("Action notifications")) {

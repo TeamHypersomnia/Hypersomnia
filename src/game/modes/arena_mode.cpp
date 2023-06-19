@@ -34,10 +34,10 @@
 #include "game/modes/detail/delete_with_held_items.hpp"
 #include "game/modes/detail/hud_message_players.h"
 
-using input_type = bomb_defusal::input;
-using const_input_type = bomb_defusal::const_input;
+using input_type = arena_mode::input;
+using const_input_type = arena_mode::const_input;
 
-int bomb_defusal_player_stats::calc_score() const {
+int arena_mode_player_stats::calc_score() const {
 	return 
 		knockouts * 2 
 		+ assists 
@@ -47,23 +47,23 @@ int bomb_defusal_player_stats::calc_score() const {
 	;
 }
 
-bool bomb_defusal_player::operator<(const bomb_defusal_player& b) const {
+bool arena_mode_player::operator<(const arena_mode_player& b) const {
 	const auto ao = arena_player_order { get_chosen_name(), stats.calc_score() };
 	const auto bo = arena_player_order { b.get_chosen_name(), b.stats.calc_score() };
 
 	return ao < bo;
 }
 
-std::size_t bomb_defusal::get_round_rng_seed(const cosmos& cosm) const {
+std::size_t arena_mode::get_round_rng_seed(const cosmos& cosm) const {
 	(void)cosm;
 	return clock_before_setup.now.step + get_current_round_number(); 
 }
 
-std::size_t bomb_defusal::get_step_rng_seed(const cosmos& cosm) const {
+std::size_t arena_mode::get_step_rng_seed(const cosmos& cosm) const {
 	return get_round_rng_seed(cosm) + cosm.get_total_steps_passed();
 }
 
-faction_choice_result bomb_defusal::choose_faction(const const_input_type in, const mode_player_id& id, const faction_type faction) {
+faction_choice_result arena_mode::choose_faction(const const_input_type in, const mode_player_id& id, const faction_type faction) {
 	if (const auto entry = find(id)) {
 		const auto previous_faction = entry->get_faction();
 
@@ -81,7 +81,7 @@ faction_choice_result bomb_defusal::choose_faction(const const_input_type in, co
 	return faction_choice_result::FAILED;
 }
 
-bomb_defusal::participating_factions bomb_defusal::calc_participating_factions(const const_input_type in) const {
+arena_mode::participating_factions arena_mode::calc_participating_factions(const const_input_type in) const {
 	const auto& cosm = in.cosm;
 	const auto spawnable = calc_spawnable_factions(cosm);
 
@@ -111,13 +111,13 @@ bomb_defusal::participating_factions bomb_defusal::calc_participating_factions(c
 	return output;
 }
 
-faction_type bomb_defusal::get_opposing_faction(const const_input_type in, const faction_type faction) const {
+faction_type arena_mode::get_opposing_faction(const const_input_type in, const faction_type faction) const {
 	const auto participating = calc_participating_factions(in);
 
 	return faction == participating.bombing ? participating.defusing : participating.bombing;
 }
 
-faction_type bomb_defusal::calc_weakest_faction(const const_input_type in) const {
+faction_type arena_mode::calc_weakest_faction(const const_input_type in) const {
 	const auto participating = calc_participating_factions(in);
 
 	struct {
@@ -139,7 +139,7 @@ faction_type bomb_defusal::calc_weakest_faction(const const_input_type in) const
 	return weakest.type;
 }
 
-faction_type bomb_defusal::get_player_faction(const mode_player_id& id) const {
+faction_type arena_mode::get_player_faction(const mode_player_id& id) const {
 	if (const auto entry = find(id)) {
 		return entry->get_faction();
 	}
@@ -154,7 +154,7 @@ void arena_mode_set_transferred_item_meta(const H handle, int charges, const ite
 	item.owner_meta = meta;
 }
 
-void bomb_defusal::init_spawned(
+void arena_mode::init_spawned(
 	const input_type in, 
 	const entity_id id, 
 	const logic_step step,
@@ -329,7 +329,7 @@ void bomb_defusal::init_spawned(
 	});
 }
 
-void bomb_defusal::teleport_to_next_spawn(const input in, const entity_id id) {
+void arena_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 	auto& cosm = in.cosm;
 	const auto handle = cosm[id];
 
@@ -377,7 +377,7 @@ void bomb_defusal::teleport_to_next_spawn(const input in, const entity_id id) {
 	});
 }
 
-bool bomb_defusal::add_player_custom(const input_type in, const add_player_input& add_in) {
+bool arena_mode::add_player_custom(const input_type in, const add_player_input& add_in) {
 	auto& cosm = in.cosm;
 	(void)cosm;
 
@@ -408,7 +408,7 @@ bool bomb_defusal::add_player_custom(const input_type in, const add_player_input
 	return true;
 }
 
-mode_player_id bomb_defusal::add_player(const input_type in, const entity_name_str& chosen_name) {
+mode_player_id arena_mode::add_player(const input_type in, const entity_name_str& chosen_name) {
 	if (const auto new_id = find_first_free_player(); new_id.is_set()) {
 		const auto result = add_player_custom(in, { new_id, chosen_name });
 		(void)result;
@@ -419,7 +419,7 @@ mode_player_id bomb_defusal::add_player(const input_type in, const entity_name_s
 	return {};
 }
 
-void bomb_defusal::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
+void arena_mode::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
 	handle_duel_desertion(in, step, id);
 
 	const auto controlled_character_id = lookup(id);
@@ -435,7 +435,7 @@ void bomb_defusal::remove_player(input_type in, const logic_step step, const mod
 	}
 }
 
-mode_entity_id bomb_defusal::lookup(const mode_player_id& id) const {
+mode_entity_id arena_mode::lookup(const mode_player_id& id) const {
 	if (const auto entry = find(id)) {
 		return entry->controlled_character_id;
 	}
@@ -443,7 +443,7 @@ mode_entity_id bomb_defusal::lookup(const mode_player_id& id) const {
 	return mode_entity_id::dead();
 }
 
-void bomb_defusal::reshuffle_spawns(const cosmos& cosm, const faction_type faction) {
+void arena_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction) {
 	const auto reshuffle_seed = get_step_rng_seed(cosm) + static_cast<unsigned>(faction);
 	auto rng = randomization(reshuffle_seed);
 
@@ -472,7 +472,7 @@ void bomb_defusal::reshuffle_spawns(const cosmos& cosm, const faction_type facti
 }
 
 template <class C, class F>
-void bomb_defusal::for_each_player_handle_in(C& cosm, const faction_type faction, F&& callback) const {
+void arena_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F&& callback) const {
 	for_each_player_in(faction, [&](const auto&, const auto& data) {
 		if (const auto handle = cosm[data.controlled_character_id]) {
 			return handle.template dispatch_on_having_all_ret<components::sentience>([&](const auto& typed_player) {
@@ -489,7 +489,7 @@ void bomb_defusal::for_each_player_handle_in(C& cosm, const faction_type faction
 	});
 }
 
-std::size_t bomb_defusal::num_conscious_players_in(const cosmos& cosm, const faction_type faction) const {
+std::size_t arena_mode::num_conscious_players_in(const cosmos& cosm, const faction_type faction) const {
 	auto total = std::size_t(0);
 
 	for_each_player_handle_in(cosm, faction, [&](const auto& handle) {
@@ -501,7 +501,7 @@ std::size_t bomb_defusal::num_conscious_players_in(const cosmos& cosm, const fac
 	return total;
 }
 
-std::size_t bomb_defusal::num_players_in(const faction_type faction) const {
+std::size_t arena_mode::num_players_in(const faction_type faction) const {
 	auto total = std::size_t(0);
 
 	for_each_player_in(faction, [&](auto&&...) {
@@ -511,7 +511,7 @@ std::size_t bomb_defusal::num_players_in(const faction_type faction) const {
 	return total;
 }
 
-void bomb_defusal::assign_free_color_to_best_uncolored(const const_input_type in, const faction_type in_faction, const rgba free_color) {
+void arena_mode::assign_free_color_to_best_uncolored(const const_input_type in, const faction_type in_faction, const rgba free_color) {
 	const auto fallback_color = in.rules.excess_player_color;
 
 	if (free_color == rgba::zero) {
@@ -548,7 +548,7 @@ void bomb_defusal::assign_free_color_to_best_uncolored(const const_input_type in
 	}
 }
 
-void bomb_defusal::on_faction_changed_for(const const_input_type in, const faction_type previous_faction, const mode_player_id& id) { 
+void arena_mode::on_faction_changed_for(const const_input_type in, const faction_type previous_faction, const mode_player_id& id) { 
 	if (const auto entry = find(id)) {
 		{
 			const auto free_color = entry->assigned_color;
@@ -593,7 +593,7 @@ void bomb_defusal::on_faction_changed_for(const const_input_type in, const facti
 	}
 }
 
-faction_choice_result bomb_defusal::auto_assign_faction(const input_type in, const mode_player_id& id) {
+faction_choice_result arena_mode::auto_assign_faction(const input_type in, const mode_player_id& id) {
 	if (const auto entry = find(id)) {
 		auto& f = entry->session.faction;
 		const auto previous_faction = f;
@@ -615,7 +615,7 @@ faction_choice_result bomb_defusal::auto_assign_faction(const input_type in, con
 	return faction_choice_result::FAILED;
 }
 
-void bomb_defusal::set_players_frozen(const input_type in, const bool flag) {
+void arena_mode::set_players_frozen(const input_type in, const bool flag) {
 	auto& current_flag = current_round.cache_players_frozen;
 
 	if (current_flag == flag) {
@@ -633,7 +633,7 @@ void bomb_defusal::set_players_frozen(const input_type in, const bool flag) {
 	}
 }
 
-void bomb_defusal::release_triggers_of_weapons_of_players(const input_type in) {
+void arena_mode::release_triggers_of_weapons_of_players(const input_type in) {
 	for (auto& it : players) {
 		auto& player_data = it.second;
 
@@ -647,7 +647,7 @@ void bomb_defusal::release_triggers_of_weapons_of_players(const input_type in) {
 	}
 }
 
-void bomb_defusal::spawn_bomb_near_players(const input_type in) {
+void arena_mode::spawn_bomb_near_players(const input_type in) {
 	auto avg_pos = vec2::zero;
 	auto avg_dir = vec2::zero;
 
@@ -679,7 +679,7 @@ void bomb_defusal::spawn_bomb_near_players(const input_type in) {
 }
 
 
-entity_handle bomb_defusal::spawn_bomb(const input_type in) {
+entity_handle arena_mode::spawn_bomb(const input_type in) {
 	auto access = allocate_new_entity_access();
 
 	const auto new_bomb = just_create_entity(access, in.cosm, in.rules.bomb_flavour);
@@ -687,7 +687,7 @@ entity_handle bomb_defusal::spawn_bomb(const input_type in) {
 	return new_bomb;
 }
 
-bool bomb_defusal::give_bomb_to_random_player(const input_type in, const logic_step step) {
+bool arena_mode::give_bomb_to_random_player(const input_type in, const logic_step step) {
 	auto& cosm = in.cosm;
 
 	bool existing_bomb_found = false;
@@ -753,7 +753,7 @@ bool bomb_defusal::give_bomb_to_random_player(const input_type in, const logic_s
 }
 
 
-entity_id bomb_defusal::create_character_for_player(
+entity_id arena_mode::create_character_for_player(
 	const input_type in, 
 	const logic_step step,
 	const mode_player_id id,
@@ -826,7 +826,7 @@ entity_id bomb_defusal::create_character_for_player(
 	return entity_id::dead();
 }
 
-void bomb_defusal::play_start_round_sound(const input_type in, const const_logic_step step) { 
+void arena_mode::play_start_round_sound(const input_type in, const const_logic_step step) { 
 	const auto start_event = 
 		is_first_round_in_half(in) ?
 		battle_event::PREPARE_TO_FIGHT :
@@ -859,10 +859,10 @@ void bomb_defusal::play_start_round_sound(const input_type in, const const_logic
 	}
 }
 
-void bomb_defusal::setup_round(
+void arena_mode::setup_round(
 	const input_type in, 
 	const logic_step step, 
-	const bomb_defusal::round_transferred_players& transfers
+	const arena_mode::round_transferred_players& transfers
 ) {
 	auto access = allocate_new_entity_access();
 
@@ -964,7 +964,7 @@ void bomb_defusal::setup_round(
 	step.post_message(messages::hud_message { messages::special_hud_command::CLEAR });
 }
 
-bomb_defusal::round_transferred_players bomb_defusal::make_transferred_players(const input_type in) const {
+arena_mode::round_transferred_players arena_mode::make_transferred_players(const input_type in) const {
 	round_transferred_players result;
 
 	const auto& cosm = in.cosm;
@@ -1030,7 +1030,7 @@ bomb_defusal::round_transferred_players bomb_defusal::make_transferred_players(c
 	return result;
 }
 
-void bomb_defusal::start_next_round(const input_type in, const logic_step step, const round_start_type type) {
+void arena_mode::start_next_round(const input_type in, const logic_step step, const round_start_type type) {
 	state = arena_mode_state::LIVE;
 
 	if (type == round_start_type::KEEP_EQUIPMENTS) {
@@ -1041,7 +1041,7 @@ void bomb_defusal::start_next_round(const input_type in, const logic_step step, 
 	}
 }
 
-mode_player_id bomb_defusal::lookup(const entity_id& controlled_character_id) const {
+mode_player_id arena_mode::lookup(const entity_id& controlled_character_id) const {
 	for (const auto& p : players) {
 		if (p.second.controlled_character_id == controlled_character_id) {
 			return p.first;
@@ -1051,7 +1051,7 @@ mode_player_id bomb_defusal::lookup(const entity_id& controlled_character_id) co
 	return mode_player_id::dead();
 }
 
-bomb_defusal_player_stats* bomb_defusal::stats_of(const mode_player_id& id) {
+arena_mode_player_stats* arena_mode::stats_of(const mode_player_id& id) {
 	if (const auto p = find(id)) {
 		return std::addressof(p->stats);
 	}
@@ -1059,7 +1059,7 @@ bomb_defusal_player_stats* bomb_defusal::stats_of(const mode_player_id& id) {
 	return nullptr;
 }
 
-void bomb_defusal::count_knockout(const const_logic_step step, const input_type in, const entity_id victim, const components::sentience& sentience) {
+void arena_mode::count_knockout(const const_logic_step step, const input_type in, const entity_id victim, const components::sentience& sentience) {
 	const auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 	const auto& origin = sentience.knockout_origin;
@@ -1081,7 +1081,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 
 	auto assists = sentience.damage_owners;
 
-	bomb_defusal_knockout ko;
+	arena_mode_knockout ko;
 
 	auto make_participant = [&](auto& participant, const auto& handle) {
 		participant = {};
@@ -1115,7 +1115,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 	count_knockout(step, in, ko);
 }
 
-void bomb_defusal::count_knockout(const const_logic_step step, const input_type in, const arena_mode_knockout ko) {
+void arena_mode::count_knockout(const const_logic_step step, const input_type in, const arena_mode_knockout ko) {
 	current_round.knockouts.push_back(ko);
 
 	auto on_counted_knockout = [&](const auto stats, const auto knockouts_dt) {
@@ -1338,14 +1338,14 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 	}
 }
 
-bool bomb_defusal::is_halfway_round(const const_input_type in) const {
+bool arena_mode::is_halfway_round(const const_input_type in) const {
 	const auto max_rounds = in.rules.get_num_rounds();
 	const auto current_round = get_current_round_number();
 
 	return current_round == max_rounds / 2;
 }
 
-bool bomb_defusal::is_final_round(const const_input_type in) const {
+bool arena_mode::is_final_round(const const_input_type in) const {
 	const auto max_rounds = in.rules.get_num_rounds();
 	const auto current_round = get_current_round_number();
 
@@ -1362,7 +1362,7 @@ bool bomb_defusal::is_final_round(const const_input_type in) const {
 	return someone_has_over_half || current_round >= max_rounds;
 }
 
-void bomb_defusal::make_win(const input_type in, const logic_step step, const faction_type winner) {
+void arena_mode::make_win(const input_type in, const logic_step step, const faction_type winner) {
 	const auto p = calc_participating_factions(in);
 	const auto loser = winner == p.defusing ? p.bombing : p.defusing;
 
@@ -1410,7 +1410,7 @@ void bomb_defusal::make_win(const input_type in, const logic_step step, const fa
 	}
 }
 
-void bomb_defusal::play_sound_globally(const const_logic_step step, const assets::sound_id sound_id, const predictability_info info) const {
+void arena_mode::play_sound_globally(const const_logic_step step, const assets::sound_id sound_id, const predictability_info info) const {
 	sound_effect_input effect;
 	effect.id = sound_id;
 	effect.modifier.always_direct_listener = true;
@@ -1421,7 +1421,7 @@ void bomb_defusal::play_sound_globally(const const_logic_step step, const assets
 	effect.start(step, input, info);
 }
 
-void bomb_defusal::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id, const predictability_info info) const {
+void arena_mode::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id, const predictability_info info) const {
 	sound_effect_input effect;
 	effect.id = id;
 	effect.modifier.always_direct_listener = true;
@@ -1433,7 +1433,7 @@ void bomb_defusal::play_faction_sound(const const_logic_step step, const faction
 	effect.start(step, input, info);
 }
 
-void bomb_defusal::play_win_theme(const input_type in, const const_logic_step step, const faction_type winner) const {
+void arena_mode::play_win_theme(const input_type in, const const_logic_step step, const faction_type winner) const {
 	if (const auto sound_id = in.rules.view.win_themes[winner]; sound_id.is_set()) {
 		sound_effect_input effect;
 		effect.id = sound_id;
@@ -1446,7 +1446,7 @@ void bomb_defusal::play_win_theme(const input_type in, const const_logic_step st
 	}
 }
 
-void bomb_defusal::play_win_sound(const input_type in, const const_logic_step step, const faction_type winner) const {
+void arena_mode::play_win_sound(const input_type in, const const_logic_step step, const faction_type winner) const {
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([&](const faction_type t) {
@@ -1456,7 +1456,7 @@ void bomb_defusal::play_win_sound(const input_type in, const const_logic_step st
 	});
 }
 
-void bomb_defusal::play_sound_for(const input_type in, const const_logic_step step, const battle_event event, const predictability_info info) const {
+void arena_mode::play_sound_for(const input_type in, const const_logic_step step, const battle_event event, const predictability_info info) const {
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([&](const faction_type t) {
@@ -1464,13 +1464,13 @@ void bomb_defusal::play_sound_for(const input_type in, const const_logic_step st
 	});
 }
 
-void bomb_defusal::play_faction_sound_for(const input_type in, const const_logic_step step, const battle_event event, const faction_type t, const predictability_info info) const {
+void arena_mode::play_faction_sound_for(const input_type in, const const_logic_step step, const battle_event event, const faction_type t, const predictability_info info) const {
 	if (const auto sound_id = in.rules.view.event_sounds[t][event]; sound_id.is_set()) {
 		play_faction_sound(step, t, sound_id, info);
 	}
 }
 
-void bomb_defusal::play_bomb_defused_sound(const input_type in, const const_logic_step step, const faction_type winner) const {
+void arena_mode::play_bomb_defused_sound(const input_type in, const const_logic_step step, const faction_type winner) const {
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([&](const faction_type t) {
@@ -1504,7 +1504,7 @@ void bomb_defusal::play_bomb_defused_sound(const input_type in, const const_logi
 	});
 }
 
-void bomb_defusal::process_win_conditions(const input_type in, const logic_step step) {
+void arena_mode::process_win_conditions(const input_type in, const logic_step step) {
 	auto& cosm = in.cosm;
 
 	const auto p = calc_participating_factions(in);
@@ -1579,7 +1579,7 @@ void bomb_defusal::process_win_conditions(const input_type in, const logic_step 
 	}
 }
 
-void bomb_defusal::swap_assigned_factions(const bomb_defusal::participating_factions& p) {
+void arena_mode::swap_assigned_factions(const arena_mode::participating_factions& p) {
 	for (auto& it : players) {
 		auto& player_data = it.second;
 		auto& faction = player_data.session.faction;
@@ -1587,10 +1587,10 @@ void bomb_defusal::swap_assigned_factions(const bomb_defusal::participating_fact
 	}
 }
 
-void bomb_defusal::scramble_assigned_factions(const bomb_defusal::participating_factions& p) {
+void arena_mode::scramble_assigned_factions(const arena_mode::participating_factions& p) {
 	auto rng = randomization(scramble_counter++);
 
-	std::vector<bomb_defusal_player*> ptrs;
+	std::vector<arena_mode_player*> ptrs;
 	ptrs.reserve(players.size());
 
 	for (auto& it : players) {
@@ -1606,7 +1606,7 @@ void bomb_defusal::scramble_assigned_factions(const bomb_defusal::participating_
 	}
 }
 
-void bomb_defusal::handle_special_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
+void arena_mode::handle_special_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	const auto& g = entropy.general;
 
 	std::visit(
@@ -1656,7 +1656,7 @@ void bomb_defusal::handle_special_commands(const input_type in, const mode_entro
 	);
 }
 
-arena_migrated_session bomb_defusal::emigrate() const {
+arena_migrated_session arena_mode::emigrate() const {
 	arena_migrated_session session;
 
 	for (const auto& emigrated_player : players) {
@@ -1671,7 +1671,7 @@ arena_migrated_session bomb_defusal::emigrate() const {
 	return session;
 }
 
-void bomb_defusal::migrate(const input_type in, const arena_migrated_session& session) {
+void arena_mode::migrate(const input_type in, const arena_migrated_session& session) {
 	ensure(players.empty());
 	ensure_eq(0u, get_current_round_number());
 
@@ -1716,7 +1716,7 @@ void bomb_defusal::migrate(const input_type in, const arena_migrated_session& se
 	next_session_id = session.next_session_id;
 }
 
-void bomb_defusal::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
+void arena_mode::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	const auto& g = entropy.general;
 
 	if (logically_set(g.added_player)) {
@@ -1761,11 +1761,11 @@ void bomb_defusal::add_or_remove_players(const input_type in, const mode_entropy
 	}
 }
 
-mode_player_id bomb_defusal::find_first_free_player() const {
+mode_player_id arena_mode::find_first_free_player() const {
 	return first_free_key(players, mode_player_id::first());
 }
 
-void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& entropy, const logic_step step) {
+void arena_mode::execute_player_commands(const input_type in, mode_entropy& entropy, const logic_step step) {
 	auto access = allocate_new_entity_access();
 
 	const auto current_round = get_current_round_number();
@@ -2036,7 +2036,7 @@ void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& en
 	}
 }
 
-void bomb_defusal::spawn_and_kick_bots(const input_type in, const logic_step step) {
+void arena_mode::spawn_and_kick_bots(const input_type in, const logic_step step) {
 	const auto& names = in.rules.bot_names;
 	const auto requested_bots = std::min(
 		in.rules.bot_quota,
@@ -2075,7 +2075,7 @@ void bomb_defusal::spawn_and_kick_bots(const input_type in, const logic_step ste
 	}
 }
 
-void bomb_defusal::spawn_characters_for_recently_assigned(const input_type in, const logic_step step) {
+void arena_mode::spawn_characters_for_recently_assigned(const input_type in, const logic_step step) {
 	for (const auto& it : players) {
 		const auto& player_data = it.second;
 		const auto id = it.first;
@@ -2102,7 +2102,7 @@ void bomb_defusal::spawn_characters_for_recently_assigned(const input_type in, c
 	}
 }
 
-void bomb_defusal::handle_game_commencing(const input_type in, const logic_step step) {
+void arena_mode::handle_game_commencing(const input_type in, const logic_step step) {
 	if (commencing_timer_ms != -1.f) {
 		commencing_timer_ms -= step.get_delta().in_milliseconds();
 
@@ -2140,7 +2140,7 @@ void bomb_defusal::handle_game_commencing(const input_type in, const logic_step 
 	}
 }
 
-void bomb_defusal::end_warmup_and_go_live(const input_type in, const logic_step step) {
+void arena_mode::end_warmup_and_go_live(const input_type in, const logic_step step) {
 	if (state != arena_mode_state::WARMUP) {
 		return;
 	}
@@ -2153,11 +2153,11 @@ void bomb_defusal::end_warmup_and_go_live(const input_type in, const logic_step 
 	check_duel_of_honor(in, step);
 }
 
-bool bomb_defusal::is_first_round_in_half(const const_input_type in) const { 
+bool arena_mode::is_first_round_in_half(const const_input_type in) const { 
 	return is_halfway_round(in) || get_current_round_number() == 0;
 }
 
-mode_player_id bomb_defusal::find_best_player_in(faction_type faction) const {
+mode_player_id arena_mode::find_best_player_in(faction_type faction) const {
 	auto best = mode_player_id::dead();
 	std::optional<int> best_score;
 
@@ -2173,7 +2173,7 @@ mode_player_id bomb_defusal::find_best_player_in(faction_type faction) const {
 	return best;
 }
 
-void bomb_defusal::report_match_result(const input_type in, const logic_step step) {
+void arena_mode::report_match_result(const input_type in, const logic_step step) {
 	const auto p = calc_participating_factions(in);
 
 	const auto result = calc_match_result(in);
@@ -2254,7 +2254,7 @@ void bomb_defusal::report_match_result(const input_type in, const logic_step ste
 	step.post_message(summary);
 }
 
-void bomb_defusal::post_team_match_start(const input_type in, const logic_step step) {
+void arena_mode::post_team_match_start(const input_type in, const logic_step step) {
 	const auto p = calc_participating_factions(in);
 
 	messages::team_match_start_message start;
@@ -2273,7 +2273,7 @@ void bomb_defusal::post_team_match_start(const input_type in, const logic_step s
 	step.post_message(start);
 }
 
-void bomb_defusal::check_duel_of_honor(const input_type in, const logic_step step) {
+void arena_mode::check_duel_of_honor(const input_type in, const logic_step step) {
 	const auto p = calc_participating_factions(in);
 
 	LOG("Checking if there is a duel of honor.");
@@ -2305,7 +2305,7 @@ void bomb_defusal::check_duel_of_honor(const input_type in, const logic_step ste
 	}
 }
 
-void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
+void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	if (state == arena_mode_state::INIT) {
 		restart_match(in, step);
 	}
@@ -2391,7 +2391,7 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 	}
 }
 
-void bomb_defusal::mode_post_solve(const input_type in, const mode_entropy& entropy, const const_logic_step step) {
+void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entropy, const const_logic_step step) {
 	auto access = allocate_new_entity_access();
 
 	(void)entropy;
@@ -2491,7 +2491,7 @@ void bomb_defusal::mode_post_solve(const input_type in, const mode_entropy& entr
 	}
 }
 
-void bomb_defusal::respawn_the_dead(const input_type in, const logic_step step, const unsigned after_ms) {
+void arena_mode::respawn_the_dead(const input_type in, const logic_step step, const unsigned after_ms) {
 	auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 
@@ -2519,7 +2519,7 @@ void bomb_defusal::respawn_the_dead(const input_type in, const logic_step step, 
 
 const float match_begins_in_secs_v = 4.f;
 
-float bomb_defusal::get_warmup_seconds_left(const const_input_type in) const {
+float arena_mode::get_warmup_seconds_left(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
 		return static_cast<float>(in.rules.warmup_secs) - get_seconds_passed_in_cosmos(in);
 	}
@@ -2527,7 +2527,7 @@ float bomb_defusal::get_warmup_seconds_left(const const_input_type in) const {
 	return -1.f;
 }
 
-float bomb_defusal::get_match_begins_in_seconds(const const_input_type in) const {
+float arena_mode::get_match_begins_in_seconds(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
 		const auto secs = get_seconds_passed_in_cosmos(in);
 		const auto warmup_secs = static_cast<float>(in.rules.warmup_secs);
@@ -2550,19 +2550,19 @@ float bomb_defusal::get_match_begins_in_seconds(const const_input_type in) const
 	return -1.f;
 }
 
-float bomb_defusal::get_seconds_passed_in_cosmos(const const_input_type in) const {
+float arena_mode::get_seconds_passed_in_cosmos(const const_input_type in) const {
 	return in.cosm.get_clock().now.in_seconds(round_speeds.calc_ticking_delta());
 }
 
-float bomb_defusal::get_round_seconds_passed(const const_input_type in) const {
+float arena_mode::get_round_seconds_passed(const const_input_type in) const {
 	return get_seconds_passed_in_cosmos(in) - static_cast<float>(in.rules.freeze_secs);
 }
 
-float bomb_defusal::get_freeze_seconds_left(const const_input_type in) const {
+float arena_mode::get_freeze_seconds_left(const const_input_type in) const {
 	return static_cast<float>(in.rules.freeze_secs) - get_seconds_passed_in_cosmos(in);
 }
 
-float bomb_defusal::get_buy_seconds_left(const const_input_type in) const {
+float arena_mode::get_buy_seconds_left(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
 		if (!in.rules.warmup_enable_item_shop) {
 			return 0.f;
@@ -2578,11 +2578,11 @@ float bomb_defusal::get_buy_seconds_left(const const_input_type in) const {
 	return static_cast<float>(in.rules.freeze_secs + in.rules.buy_secs_after_freeze) - get_seconds_passed_in_cosmos(in);
 }
 
-float bomb_defusal::get_round_seconds_left(const const_input_type in) const {
+float arena_mode::get_round_seconds_left(const const_input_type in) const {
 	return static_cast<float>(in.rules.round_secs) + in.rules.freeze_secs - get_seconds_passed_in_cosmos(in);
 }
 
-float bomb_defusal::get_seconds_since_win(const const_input_type in) const {
+float arena_mode::get_seconds_since_win(const const_input_type in) const {
 	const auto& last_win = current_round.last_win;
 
 	if (!last_win.was_set()) {
@@ -2594,7 +2594,7 @@ float bomb_defusal::get_seconds_since_win(const const_input_type in) const {
 	return clk.diff_seconds(last_win.when);
 }
 
-float bomb_defusal::get_match_summary_seconds_left(const const_input_type in) const {
+float arena_mode::get_match_summary_seconds_left(const const_input_type in) const {
 	if (const auto since_win = get_seconds_since_win(in); since_win != -1.f) {
 		return static_cast<float>(in.rules.match_summary_seconds) - since_win;
 	}
@@ -2602,7 +2602,7 @@ float bomb_defusal::get_match_summary_seconds_left(const const_input_type in) co
 	return -1.f;
 }
 
-float bomb_defusal::get_round_end_seconds_left(const const_input_type in) const {
+float arena_mode::get_round_end_seconds_left(const const_input_type in) const {
 	if (!current_round.last_win.was_set()) {
 		return -1.f;
 	}
@@ -2610,7 +2610,7 @@ float bomb_defusal::get_round_end_seconds_left(const const_input_type in) const 
 	return static_cast<float>(in.rules.round_end_secs) - get_seconds_since_win(in);
 }
 
-bool bomb_defusal::bomb_exploded(const const_input_type in) const {
+bool arena_mode::bomb_exploded(const const_input_type in) const {
 	if (!in.rules.bomb_flavour.is_set()) {
 		return false;
 	}
@@ -2625,7 +2625,7 @@ bool bomb_defusal::bomb_exploded(const const_input_type in) const {
 	});
 }
 
-entity_id bomb_defusal::get_character_who_defused_bomb(const const_input_type in) const {
+entity_id arena_mode::get_character_who_defused_bomb(const const_input_type in) const {
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
 		if constexpr(is_nullopt_v<decltype(typed_bomb)>) {
 			return entity_id();
@@ -2642,7 +2642,7 @@ entity_id bomb_defusal::get_character_who_defused_bomb(const const_input_type in
 	});
 }
 
-bool bomb_defusal::bomb_planted(const const_input_type in) const {
+bool arena_mode::bomb_planted(const const_input_type in) const {
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
 		if constexpr(is_nullopt_v<decltype(typed_bomb)>) {
 			return false;
@@ -2653,7 +2653,7 @@ bool bomb_defusal::bomb_planted(const const_input_type in) const {
 	});
 }
 
-real32 bomb_defusal::get_critical_seconds_left(const const_input_type in) const {
+real32 arena_mode::get_critical_seconds_left(const const_input_type in) const {
 	if (!bomb_planted(in)) {
 		return -1.f;
 	}
@@ -2676,7 +2676,7 @@ real32 bomb_defusal::get_critical_seconds_left(const const_input_type in) const 
 	});
 }
 
-float bomb_defusal::get_seconds_since_planting(const const_input_type in) const {
+float arena_mode::get_seconds_since_planting(const const_input_type in) const {
 	if (!bomb_planted(in)) {
 		return -1.f;
 	}
@@ -2697,7 +2697,7 @@ float bomb_defusal::get_seconds_since_planting(const const_input_type in) const 
 	});
 }
 
-unsigned bomb_defusal::get_current_round_number() const {
+unsigned arena_mode::get_current_round_number() const {
 	unsigned total = 0;
 
 	for_each_faction([&](const auto f) {
@@ -2707,11 +2707,11 @@ unsigned bomb_defusal::get_current_round_number() const {
 	return total;
 }
 
-unsigned bomb_defusal::get_score(const faction_type f) const {
+unsigned arena_mode::get_score(const faction_type f) const {
 	return factions[f].score;
 }
 
-arena_mode_match_result bomb_defusal::calc_match_result(const const_input_type in) const {
+arena_mode_match_result arena_mode::calc_match_result(const const_input_type in) const {
 	const auto p = calc_participating_factions(in);
 
 	if (get_score(p.bombing) == get_score(p.defusing)) {
@@ -2739,8 +2739,8 @@ arena_mode_match_result bomb_defusal::calc_match_result(const const_input_type i
 }
 
 template <class S, class E>
-auto bomb_defusal::find_player_by_impl(S& self, const E& identifier) {
-	using R = maybe_const_ptr_t<std::is_const_v<S>, std::pair<const mode_player_id, bomb_defusal_player>>;
+auto arena_mode::find_player_by_impl(S& self, const E& identifier) {
+	using R = maybe_const_ptr_t<std::is_const_v<S>, std::pair<const mode_player_id, arena_mode_player>>;
 
 	for (auto& it : self.players) {
 		auto& player_data = it.second;
@@ -2760,15 +2760,15 @@ auto bomb_defusal::find_player_by_impl(S& self, const E& identifier) {
 	return R(nullptr);
 }
 
-bomb_defusal_player* bomb_defusal::find(const mode_player_id& id) {
+arena_mode_player* arena_mode::find(const mode_player_id& id) {
 	return mapped_or_nullptr(players, id);
 }
 
-const bomb_defusal_player* bomb_defusal::find(const mode_player_id& id) const {
+const arena_mode_player* arena_mode::find(const mode_player_id& id) const {
 	return mapped_or_nullptr(players, id);
 }
 
-mode_player_id bomb_defusal::lookup(const session_id_type& session_id) const {
+mode_player_id arena_mode::lookup(const session_id_type& session_id) const {
 	if (const auto r = find_player_by_impl(*this, session_id)) {
 		return r->first;
 	}
@@ -2776,7 +2776,7 @@ mode_player_id bomb_defusal::lookup(const session_id_type& session_id) const {
 	return {};
 }
 
-const bomb_defusal_player* bomb_defusal::find(const session_id_type& session_id) const {
+const arena_mode_player* arena_mode::find(const session_id_type& session_id) const {
 	if (const auto r = find_player_by_impl(*this, session_id)) {
 		return std::addressof(r->second);
 	}
@@ -2784,7 +2784,7 @@ const bomb_defusal_player* bomb_defusal::find(const session_id_type& session_id)
 	return nullptr;
 }
 
-bomb_defusal_player* bomb_defusal::find_player_by(const entity_name_str& chosen_name) {
+arena_mode_player* arena_mode::find_player_by(const entity_name_str& chosen_name) {
 	if (const auto r = find_player_by_impl(*this, chosen_name)) {
 		return std::addressof(r->second);
 	}
@@ -2792,7 +2792,7 @@ bomb_defusal_player* bomb_defusal::find_player_by(const entity_name_str& chosen_
 	return nullptr;
 }
 
-const bomb_defusal_player* bomb_defusal::find_player_by(const entity_name_str& chosen_name) const {
+const arena_mode_player* arena_mode::find_player_by(const entity_name_str& chosen_name) const {
 	if (const auto r = find_player_by_impl(*this, chosen_name)) {
 		return std::addressof(r->second);
 	}
@@ -2800,7 +2800,7 @@ const bomb_defusal_player* bomb_defusal::find_player_by(const entity_name_str& c
 	return nullptr;
 }
 
-void bomb_defusal::restart_match(const input_type in, const logic_step step) {
+void arena_mode::restart_match(const input_type in, const logic_step step) {
 	reset_players_stats(in);
 	factions = {};
 	had_first_blood = false;
@@ -2821,7 +2821,7 @@ void bomb_defusal::restart_match(const input_type in, const logic_step step) {
 	setup_round(in, step);
 }
 
-unsigned bomb_defusal::calc_max_faction_score() const {
+unsigned arena_mode::calc_max_faction_score() const {
 	unsigned maximal = 0;
 
 	for_each_faction([&](const auto f) {
@@ -2832,7 +2832,7 @@ unsigned bomb_defusal::calc_max_faction_score() const {
 }
 
 
-void bomb_defusal::clear_players_round_state(const input_type in) {
+void arena_mode::clear_players_round_state(const input_type in) {
 	(void)in;
 
 	for (auto& it : players) {
@@ -2840,14 +2840,14 @@ void bomb_defusal::clear_players_round_state(const input_type in) {
 	}
 }
 
-void bomb_defusal::set_players_money_to_initial(const input_type in) {
+void arena_mode::set_players_money_to_initial(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
 		p.stats.money = in.rules.economy.initial_money;
 	}
 }
 
-void bomb_defusal::reset_players_stats(const input_type in) {
+void arena_mode::reset_players_stats(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
 		p.stats = {};
@@ -2858,7 +2858,7 @@ void bomb_defusal::reset_players_stats(const input_type in) {
 	set_players_money_to_initial(in);
 }
 
-void bomb_defusal::give_monetary_award(const input_type in, const mode_player_id id, money_type amount) {
+void arena_mode::give_monetary_award(const input_type in, const mode_player_id id, money_type amount) {
 	if (state == arena_mode_state::WARMUP) {
 		return;
 	}
@@ -2879,7 +2879,7 @@ void bomb_defusal::give_monetary_award(const input_type in, const mode_player_id
 	}
 }
 
-bool bomb_defusal::suitable_for_spectating(
+bool arena_mode::suitable_for_spectating(
 	const const_input in, 
 	const mode_player_id& who, 
 	const mode_player_id& by, 
@@ -2902,7 +2902,7 @@ bool bomb_defusal::suitable_for_spectating(
 	return false;
 }
 
-bool bomb_defusal::conscious_or_can_still_spectate(
+bool arena_mode::conscious_or_can_still_spectate(
 	const const_input in, 
 	const mode_player_id& who, 
 	const real32 limit_in_seconds
@@ -2928,7 +2928,7 @@ bool bomb_defusal::conscious_or_can_still_spectate(
 	});
 }
 
-mode_player_id bomb_defusal::get_next_to_spectate(
+mode_player_id arena_mode::get_next_to_spectate(
 	const const_input_type in, 
 	const arena_player_order_info& after, 
 	const faction_type& spectator_faction, 
@@ -3007,7 +3007,7 @@ mode_player_id bomb_defusal::get_next_to_spectate(
 	return {};
 }
 
-augs::maybe<rgba> bomb_defusal::get_current_fallback_color_for(const const_input_type in, const faction_type faction) const {
+augs::maybe<rgba> arena_mode::get_current_fallback_color_for(const const_input_type in, const faction_type faction) const {
 	const auto& r = in.rules;
 
 	if (!r.enable_player_colors) {
@@ -3035,19 +3035,19 @@ augs::maybe<rgba> bomb_defusal::get_current_fallback_color_for(const const_input
 	return {};
 }
 
-uint32_t bomb_defusal::get_num_players() const {
+uint32_t arena_mode::get_num_players() const {
 	return players.size();
 }
 
-uint32_t bomb_defusal::get_num_active_players() const {
+uint32_t arena_mode::get_num_active_players() const {
 	return get_num_players() - num_players_in(faction_type::SPECTATOR);
 }
 
-uint32_t bomb_defusal::get_max_num_active_players(const const_input_type in) const {
+uint32_t arena_mode::get_max_num_active_players(const const_input_type in) const {
 	return in.rules.max_players_per_team * 2;
 }
 
-void bomb_defusal::handle_duel_desertion(const input_type in, const logic_step step, const mode_player_id& deserter_id) { 
+void arena_mode::handle_duel_desertion(const input_type in, const logic_step step, const mode_player_id& deserter_id) { 
 	if (is_match_summary() && is_final_round(in)) {
 		/* Not a desertion when the outcome is known already */
 		return;
@@ -3080,15 +3080,15 @@ void bomb_defusal::handle_duel_desertion(const input_type in, const logic_step s
 	}
 }
 
-mode_player_id bomb_defusal::get_opponent_duellist(const mode_player_id& id) const {
+mode_player_id arena_mode::get_opponent_duellist(const mode_player_id& id) const {
 	 return id == duellist_1 ? duellist_2 : duellist_1;
 }
 
-bool bomb_defusal::is_a_duellist(const mode_player_id& id) const {
+bool arena_mode::is_a_duellist(const mode_player_id& id) const {
 	return id == duellist_1 || id == duellist_2;
 }
 
-void bomb_defusal::clear_duel() {
+void arena_mode::clear_duel() {
 	duellist_1 = mode_player_id::dead();
 	duellist_2 = mode_player_id::dead();
 }

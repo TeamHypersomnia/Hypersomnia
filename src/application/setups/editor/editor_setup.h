@@ -41,7 +41,7 @@
 #include "augs/graphics/imgui_payload.h"
 #include "application/setups/editor/commands/node_transform_commands.h"
 
-#include "game/modes/bomb_defusal.h"
+#include "game/modes/arena_mode.h"
 
 #include "game/stateless_systems/animation_system.h"
 #include "view/faction_view_settings.h"

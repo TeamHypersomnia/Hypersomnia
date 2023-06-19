@@ -50,7 +50,7 @@ struct debugger_grid_settings {
 struct debugger_test_scene_settings {
 	// GEN INTROSPECTOR struct debugger_test_scene_settings
 	unsigned scene_tickrate = 144;
-	bool start_bomb_defusal = false; 
+	bool start_arena_mode = false; 
 	// END GEN INTROSPECTOR
 };
 

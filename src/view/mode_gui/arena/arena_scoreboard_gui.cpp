@@ -4,7 +4,7 @@
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/modes/bomb_defusal.hpp"
+#include "game/modes/arena_mode.hpp"
 #include "game/modes/test_mode.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_lua_table.h"
@@ -766,8 +766,8 @@ template void arena_scoreboard_gui::draw_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&, 
 
-	const bomb_defusal& mode, 
-	const typename bomb_defusal::const_input&
+	const arena_mode& mode, 
+	const typename arena_mode::const_input&
 ) const;
 
 template void arena_scoreboard_gui::draw_gui(

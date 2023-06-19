@@ -142,7 +142,7 @@ public:
 
 		rulesets = {};
 
-		bomb_defusal_ruleset bomb_ruleset;
+		arena_mode_ruleset bomb_ruleset;
 
 		test_scene_settings settings;
 		settings.scene_tickrate = 60;
@@ -163,14 +163,14 @@ public:
 		bomb_ruleset.warmup_secs = 0;
 
 		const auto bomb_ruleset_id = raw_ruleset_id(0);
-		rulesets.all.template get_for<bomb_defusal>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));
+		rulesets.all.template get_for<arena_mode>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));
 
 		current_mode.rules_id = bomb_ruleset_id;
-		current_mode.state = bomb_defusal();
+		current_mode.state = arena_mode();
 
 		ruleset_id id;
 		id.raw = bomb_ruleset_id;
-		id.type_id.set<bomb_defusal>();
+		id.type_id.set<arena_mode>();
 
 		rulesets.meta.server_default = id;
 		rulesets.meta.playtest_default = id;

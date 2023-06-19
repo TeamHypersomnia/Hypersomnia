@@ -55,7 +55,7 @@ auto to_game_requested_equipment(
 	return result;
 }
 
-using default_rulesets_tuple = std::tuple<test_mode_ruleset, bomb_defusal_ruleset>;
+using default_rulesets_tuple = std::tuple<test_mode_ruleset, arena_mode_ruleset>;
 
 template <class F>
 ruleset_id setup_ruleset_from_editor_mode(
@@ -143,7 +143,7 @@ ruleset_id setup_ruleset_from_editor_mode(
 		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
 			auto& vars = game_mode.editable.bomb_defusal;
 
-			using T = bomb_defusal;
+			using T = arena_mode;
 
 			result.type_id.set<T>();
 

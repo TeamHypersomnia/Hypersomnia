@@ -12,7 +12,7 @@
 
 #include "game/cosmos/cosmos.h"
 #include "game/modes/test_mode.h"
-#include "game/modes/bomb_defusal.h"
+#include "game/modes/arena_mode.h"
 #include "augs/string/format_enum.h"
 #include "game/detail/damage_origin.hpp"
 #include "augs/misc/action_list/standard_actions.h"
@@ -1273,15 +1273,15 @@ template void arena_gui_state::draw_mode_gui(
 template void arena_gui_state::draw_mode_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&,
-	const bomb_defusal&, 
-	const bomb_defusal::const_input&,
+	const arena_mode&, 
+	const arena_mode::const_input&,
 	prediction_input
 ) const;
 
 template mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 	draw_mode_gui_input, 
-	const bomb_defusal&, 
-	const typename bomb_defusal::const_input&,
+	const arena_mode&, 
+	const typename arena_mode::const_input&,
 	prediction_input
 );
 

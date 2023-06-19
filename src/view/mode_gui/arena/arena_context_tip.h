@@ -209,7 +209,7 @@ inline void draw_context_tip(
 			return cosm[result];
 		}();
 
-		if constexpr(std::is_same_v<M, bomb_defusal>) {
+		if constexpr(std::is_same_v<M, arena_mode>) {
 			if (bomb) {
 				const auto participants = typed_mode.calc_participating_factions(mode_input);
 

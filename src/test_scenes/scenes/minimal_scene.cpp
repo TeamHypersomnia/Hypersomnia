@@ -18,7 +18,7 @@
 #include "view/viewables/image_cache.h"
 
 #include "test_scenes/scenes/test_scene_node.h"
-#include "game/modes/bomb_defusal.h"
+#include "game/modes/arena_mode.h"
 #include "augs/math/cascade_aligner.h"
 #include "game/modes/test_mode.h"
 #include "game/inferred_caches/organism_cache.hpp"
@@ -28,7 +28,7 @@ namespace test_scenes {
 		rs.name = "Minimal test ruleset";
 	}
 
-	void minimal_scene::setup(bomb_defusal_ruleset& rs) {
+	void minimal_scene::setup(arena_mode_ruleset& rs) {
 		rs.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
 
 		rs.player_colors = {

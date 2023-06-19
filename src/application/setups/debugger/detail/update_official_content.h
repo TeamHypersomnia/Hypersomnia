@@ -34,7 +34,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 	auto test = std::make_unique<intercosm>();
 
 	test_mode_ruleset offi_tt;
-	bomb_defusal_ruleset offi_bt;
+	arena_mode_ruleset offi_bt;
 
 	test->make_test_scene(cmd_in.lua, test_scene_settings(), offi_tt, &offi_bt);
 
@@ -338,7 +338,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 	);
 
 	{
-		auto& cust_economy = (*folder.commanded->rulesets.all.get_for<bomb_defusal>().begin()).second.economy;
+		auto& cust_economy = (*folder.commanded->rulesets.all.get_for<arena_mode>().begin()).second.economy;
 
 		if (settings.overwrite_economy_vars) {
 			cust_economy = offi_bt.economy;
@@ -349,7 +349,7 @@ inline void update_official_content(const debugger_command_input cmd_in, update_
 
 
 	{
-		auto& cust_rulesets = (*folder.commanded->rulesets.all.get_for<bomb_defusal>().begin()).second;
+		auto& cust_rulesets = (*folder.commanded->rulesets.all.get_for<arena_mode>().begin()).second;
 
 		if (settings.overwrite_whole_ruleset) {
 			const auto previous = cust_rulesets;

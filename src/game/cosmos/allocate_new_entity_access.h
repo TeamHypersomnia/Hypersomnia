@@ -116,7 +116,7 @@ class allocate_new_entity_access {
 		I promise I'll be careful.
 	*/
 
-	friend class bomb_defusal;
+	friend class arena_mode;
 
 	/*
 		Mounting logic needs to perform some partial transfers.

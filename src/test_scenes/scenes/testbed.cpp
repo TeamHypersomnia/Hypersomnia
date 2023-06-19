@@ -35,7 +35,7 @@
 
 #include "test_scenes/scenes/test_scene_node.h"
 #include "game/modes/test_mode.h"
-#include "game/modes/bomb_defusal.h"
+#include "game/modes/arena_mode.h"
 #include "game/detail/inventory/generate_equipment.h"
 
 #include "game/cosmos/for_each_entity.h"
@@ -339,7 +339,7 @@ namespace test_scenes {
 		fill_range(rs.factions[faction_type::RESISTANCE].round_start_eq.spells_to_give, true);
 	}
 
-	void testbed::setup(bomb_defusal_ruleset& rs) {
+	void testbed::setup(arena_mode_ruleset& rs) {
 		rs.bot_names = {
 			"daedalus",
 			"icarus",
