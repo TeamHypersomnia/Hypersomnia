@@ -5,7 +5,6 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/for_each_entity.h"
-#include "game/modes/mode_common.h"
 #include "augs/templates/continue_or_callback_result.h"
 
 template <class F>

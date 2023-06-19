@@ -6,6 +6,12 @@ permalink: todo_balance
 summary: Balancing issues to be solved.
 ---
 
+- buff those flashbangs
+
+- either all smgs/shotguns should wallbang through 32 metal or none
+	- would be terribly unbalanced otherwise
+
+
 - wait for network confirmations for collision sounds
 
 - Flashbangs should consider crosshair position rather than player position for calculating intensity

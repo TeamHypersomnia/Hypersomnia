@@ -25,6 +25,15 @@ struct b2Filter
 		;
 	}
 
+	static auto nothing() {
+		b2Filter out;
+		out.categoryBits = 0;
+		out.maskBits = 0;
+		out.groupIndex = 0;
+
+		return out;
+	}
+
 	bool operator!=(const b2Filter& b) const {
 		return !operator==(b);
 	}

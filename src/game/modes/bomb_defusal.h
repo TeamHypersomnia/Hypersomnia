@@ -9,7 +9,6 @@
 #include "game/modes/mode_entropy.h"
 #include "game/detail/economy/money_type.h"
 #include "game/modes/mode_player_id.h"
-#include "game/modes/mode_common.h"
 #include "game/components/movement_component.h"
 #include "game/enums/battle_event.h"
 #include "augs/misc/enum/enum_array.h"
@@ -111,7 +110,6 @@ struct bomb_defusal_ruleset {
 	bomb_defusal_view_rules view;
 
 	augs::speed_vars speeds;
-	augs::maybe<sentience_shake_settings> override_shake;
 	// END GEN INTROSPECTOR
 
 	bool should_hide_details_when_spectating_enemies() const {
@@ -137,13 +135,6 @@ struct bomb_defusal_faction_state {
 		consecutive_losses = 0;
 		shuffled_spawns.clear();
 	}
-};
-
-struct arena_mode_player_round_state {
-	// GEN INTROSPECTOR struct arena_mode_player_round_state
-	item_purchases_vector done_purchases;
-	arena_mode_awards_vector awards;
-	// END GEN INTROSPECTOR
 };
 
 struct bomb_defusal_player_stats {
@@ -202,16 +193,6 @@ struct bomb_defusal_player {
 	auto get_order() const {
 		return arena_player_order_info { get_chosen_name(), stats.calc_score() };
 	}
-};
-
-enum class arena_mode_state {
-	// GEN INTROSPECTOR enum class arena_mode_state
-	INIT,
-	WARMUP,
-	LIVE,
-	ROUND_END_DELAY,
-	MATCH_SUMMARY
-	// END GEN INTROSPECTOR
 };
 
 using cosmos_clock = augs::stepped_clock;
@@ -289,16 +270,12 @@ public:
 			return result;
 		}
 
-		void make_swapped(faction_type& f) const {
+		faction_type get_swapped(faction_type f) const {
 			if (f == bombing) {
-				f = defusing;
-				return;
+				return defusing;
 			}
 
-			if (f == defusing) {
-				f = bombing;
-				return;
-			}
+			return bombing;
 		}
 	};
 
@@ -340,7 +317,6 @@ private:
 	using round_transferred_players = std::unordered_map<mode_player_id, round_transferred_player>;
 	round_transferred_players make_transferred_players(input) const;
 
-	bool still_freezed() const;
 	void make_win(input, logic_step, faction_type);
 
 	entity_id create_character_for_player(input, logic_step, mode_player_id, std::optional<transfer_meta> = std::nullopt);
@@ -422,33 +398,35 @@ private:
 	void set_players_money_to_initial(input);
 	void clear_players_round_state(input);
 
-	void post_award(input, mode_player_id, money_type amount);
+	void give_monetary_award(input, mode_player_id, money_type amount);
 
 	template <class C, class F>
 	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
 	// GEN INTROSPECTOR class bomb_defusal
-	unsigned rng_seed_offset = 0;
-
-	entity_id bomb_entity;
-	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
+
 	per_actual_faction<bomb_defusal_faction_state> factions;
 	std::map<mode_player_id, player_type> players;
 	bomb_defusal_round_state current_round;
 
-	bool was_first_blood = false;
-	bool should_commence_when_ready = false;
+	cosmos_clock clock_before_setup;
 	real32 commencing_timer_ms = -1.f;
-	unsigned current_num_bots = 0;
-	entity_id bomb_detonation_theme;
+
+	bool had_first_blood = false;
+	bool should_commence_when_ready = false;
+
+	uint32_t current_num_bots = 0;
 	augs::speed_vars round_speeds;
 	session_id_type next_session_id = session_id_type::first();
-	unsigned scramble_counter = 0;
-	unsigned prepare_to_fight_counter = 0;
+	uint32_t scramble_counter = 0;
+	uint32_t prepare_to_fight_counter = 0;
 
 	mode_player_id duellist_1 = mode_player_id::dead();
 	mode_player_id duellist_2 = mode_player_id::dead();
+
+	entity_id bomb_entity;
+	entity_id bomb_detonation_theme;
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;

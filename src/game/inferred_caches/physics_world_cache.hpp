@@ -92,7 +92,7 @@ auto calc_filters(const E& handle) {
 
 	if (const auto sentience = handle.template find<components::sentience>()) {
 		if (sentience->has_exploded) {
-			return filter_type();
+			return filter_type::nothing();
 		}
 
 		if (!sentience->is_conscious()) {

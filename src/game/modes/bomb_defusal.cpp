@@ -32,23 +32,7 @@
 #include "game/messages/hud_message.h"
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/modes/detail/delete_with_held_items.hpp"
-
-#define LOG_BOMB_DEFUSAL 0
-
-template <class... Args>
-void BMB_LOG(Args&&... args) {
-#if LOG_BOMB_DEFUSAL
-	LOG(std::forward<Args>(args)...);
-#else
-	((void)args, ...);
-#endif
-}
-
-#if LOG_BOMB_DEFUSAL
-#define BMB_LOG_NVPS LOG_NVPS
-#else
-#define BMB_LOG_NVPS BMB_LOG
-#endif
+#include "game/modes/detail/hud_message_players.h"
 
 using input_type = bomb_defusal::input;
 using const_input_type = bomb_defusal::const_input;
@@ -72,7 +56,7 @@ bool bomb_defusal_player::operator<(const bomb_defusal_player& b) const {
 
 std::size_t bomb_defusal::get_round_rng_seed(const cosmos& cosm) const {
 	(void)cosm;
-	return rng_seed_offset + clock_before_setup.now.step + get_current_round_number(); 
+	return clock_before_setup.now.step + get_current_round_number(); 
 }
 
 std::size_t bomb_defusal::get_step_rng_seed(const cosmos& cosm) const {
@@ -843,7 +827,6 @@ entity_id bomb_defusal::create_character_for_player(
 }
 
 void bomb_defusal::play_start_round_sound(const input_type in, const const_logic_step step) { 
-
 	const auto start_event = 
 		is_first_round_in_half(in) ?
 		battle_event::PREPARE_TO_FIGHT :
@@ -1068,6 +1051,14 @@ mode_player_id bomb_defusal::lookup(const entity_id& controlled_character_id) co
 	return mode_player_id::dead();
 }
 
+bomb_defusal_player_stats* bomb_defusal::stats_of(const mode_player_id& id) {
+	if (const auto p = find(id)) {
+		return std::addressof(p->stats);
+	}
+
+	return nullptr;
+}
+
 void bomb_defusal::count_knockout(const const_logic_step step, const input_type in, const entity_id victim, const components::sentience& sentience) {
 	const auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
@@ -1076,7 +1067,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 
 	if (victim_handle.dead()) {
 		return;
-	}
+}
 
 	const auto knockouter = [&]() {
 		if (const auto candidate = origin.get_guilty_of_damaging(victim_handle)) {
@@ -1124,56 +1115,6 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 	count_knockout(step, in, ko);
 }
 
-bomb_defusal_player_stats* bomb_defusal::stats_of(const mode_player_id& id) {
-	if (const auto p = find(id)) {
-		return std::addressof(p->stats);
-	}
-
-	return nullptr;
-}
-
-
-template <class T>
-void hud_message_2_players(
-	const const_logic_step step,
-	std::string preffix,
-	std::string mid,
-	std::string suffix,
-	const T* first,
-	const T* second,
-	bool bbcode = false
-) {
-	messages::two_player_message msg;
-
-	if (first) {
-		msg.first_name = first->get_chosen_name();
-		msg.first_faction = first->get_faction();
-	}
-
-	if (second) {
-		msg.second_name = second->get_chosen_name();
-		msg.second_faction = second->get_faction();
-	}
-
-	msg.preffix = std::move(preffix);
-	msg.mid = std::move(mid);
-	msg.suffix = std::move(suffix);
-	msg.bbcode = bbcode;
-
-	step.post_message(messages::hud_message { std::move(msg) });
-}
-
-template <class T>
-void hud_message_1_player(
-	const const_logic_step step,
-	std::string preffix,
-	std::string suffix,
-	const T* first,
-	bool bbcode = false
-) {
-	hud_message_2_players(step, preffix, "", suffix, first, (T*)nullptr, bbcode);
-}
-
 void bomb_defusal::count_knockout(const const_logic_step step, const input_type in, const arena_mode_knockout ko) {
 	current_round.knockouts.push_back(ko);
 
@@ -1200,7 +1141,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 					- Humiliation
 				*/
 
-				if (was_first_blood) {
+				if (had_first_blood) {
 					const auto num_kos = stats->knockout_streak;
 					const auto current_streak = in.rules.view.find_streak(num_kos);
 
@@ -1250,11 +1191,11 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 			return;
 		}
 
-		if (!was_first_blood) {
+		if (!had_first_blood) {
 			play_sound_for(in, step, battle_event::FIRST_BLOOD, never_predictable_v);
 			hud_message_2_players(step, "[color=orange]FIRST BLOOD!![/color] ", " drew first blood on ", " !", find(ko.knockouter.id), find(ko.victim.id), true);
 
-			was_first_blood = true;
+			had_first_blood = true;
 		}
 
 		if (const auto victim_info = find(ko.victim.id)) {
@@ -1350,7 +1291,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 		}
 		else if (ko.knockouter.faction == ko.victim.faction) {
 			knockouts_dt = -1;
-			post_award(in, ko.knockouter.id, in.rules.economy.team_kill_penalty * -1);
+			give_monetary_award(in, ko.knockouter.id, in.rules.economy.team_kill_penalty * -1);
 		}
 
 		if (knockouts_dt > 0) {
@@ -1369,7 +1310,7 @@ void bomb_defusal::count_knockout(const const_logic_step step, const input_type 
 			});
 
 			if (award.has_value()) {
-				post_award(in, ko.knockouter.id, *award);
+				give_monetary_award(in, ko.knockouter.id, *award);
 			}
 		}
 
@@ -1455,7 +1396,7 @@ void bomb_defusal::make_win(const input_type in, const logic_step step, const fa
 		const auto& player_id = p.first;
 		const auto faction = p.second.get_faction();
 
-		post_award(in, player_id, faction == winner ? winner_award : loser_award);
+		give_monetary_award(in, player_id, faction == winner ? winner_award : loser_award);
 	}
 
 	if (is_halfway_round(in) || is_final_round(in)) {
@@ -1591,7 +1532,7 @@ void bomb_defusal::process_win_conditions(const input_type in, const logic_step 
 			s->bomb_explosions += 1;
 		}
 
-		post_award(in, planting_player, in.rules.economy.bomb_explosion_award);
+		give_monetary_award(in, planting_player, in.rules.economy.bomb_explosion_award);
 		standard_win(p.bombing);
 		return;
 	}
@@ -1605,7 +1546,7 @@ void bomb_defusal::process_win_conditions(const input_type in, const logic_step 
 			s->bomb_defuses += 1;
 		}
 
-		post_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
+		give_monetary_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
 		make_win(in, step, winner);
 		play_win_theme(in, step, winner);
 
@@ -1641,7 +1582,8 @@ void bomb_defusal::process_win_conditions(const input_type in, const logic_step 
 void bomb_defusal::swap_assigned_factions(const bomb_defusal::participating_factions& p) {
 	for (auto& it : players) {
 		auto& player_data = it.second;
-		p.make_swapped(player_data.session.faction);
+		auto& faction = player_data.session.faction;
+		faction = p.get_swapped(faction);
 	}
 }
 
@@ -2066,7 +2008,7 @@ void bomb_defusal::execute_player_commands(const input_type in, mode_entropy& en
 
 						handle_duel_desertion(in, step, id);
 
-						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(final_faction));
+						LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(final_faction));
 
 						if (death_request.has_value()) {
 							step.post_message(*death_request);
@@ -2432,7 +2374,7 @@ void bomb_defusal::mode_pre_solve(const input_type in, const mode_entropy& entro
 
 				swap_assigned_factions(p);
 
-				was_first_blood = false;
+				had_first_blood = false;
 
 				std::swap(factions[p.bombing].score, factions[p.defusing].score);
 
@@ -2526,7 +2468,7 @@ void bomb_defusal::mode_post_solve(const input_type in, const mode_entropy& entr
 						s->bomb_plants += 1;
 					}
 
-					post_award(in, planter, in.rules.economy.bomb_plant_award);
+					give_monetary_award(in, planter, in.rules.economy.bomb_plant_award);
 				}
 			}
 		});
@@ -2861,7 +2803,7 @@ const bomb_defusal_player* bomb_defusal::find_player_by(const entity_name_str& c
 void bomb_defusal::restart_match(const input_type in, const logic_step step) {
 	reset_players_stats(in);
 	factions = {};
-	was_first_blood = false;
+	had_first_blood = false;
 	prepare_to_fight_counter = 0;
 	clear_duel();
 
@@ -2916,7 +2858,7 @@ void bomb_defusal::reset_players_stats(const input_type in) {
 	set_players_money_to_initial(in);
 }
 
-void bomb_defusal::post_award(const input_type in, const mode_player_id id, money_type amount) {
+void bomb_defusal::give_monetary_award(const input_type in, const mode_player_id id, money_type amount) {
 	if (state == arena_mode_state::WARMUP) {
 		return;
 	}

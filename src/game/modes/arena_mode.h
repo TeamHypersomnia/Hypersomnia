@@ -12,8 +12,31 @@
 #include "game/modes/arena_player_order.h"
 #include "game/modes/session_id.h"
 #include "view/character_hud_type.h"
+#include "augs/misc/timing/speed_vars.h"
 
 using mode_entity_id = entity_id;
+
+enum class arena_mode_state {
+	// GEN INTROSPECTOR enum class arena_mode_state
+	INIT,
+	WARMUP,
+	LIVE,
+	ROUND_END_DELAY,
+	MATCH_SUMMARY
+	// END GEN INTROSPECTOR
+};
+
+enum class scoreboard_icon_type {
+	// GEN INTROSPECTOR enum class scoreboard_icon_type
+	DEATH_ICON,
+	UNCONSCIOUS_ICON,
+	NO_AMMO_ICON,
+	BOMB_ICON,
+	DEFUSE_KIT_ICON,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
 
 struct arena_migrated_player {
 	// GEN INTROSPECTOR struct arena_migrated_player
@@ -76,6 +99,8 @@ struct arena_mode_knockout {
 	// END GEN INTROSPECTOR
 };
 
+using arena_mode_knockouts_vector = std::vector<arena_mode_knockout>;
+
 struct arena_mode_award {
 	// GEN INTROSPECTOR struct arena_mode_award
 	augs::stepped_clock when;
@@ -85,15 +110,12 @@ struct arena_mode_award {
 	// END GEN INTROSPECTOR
 };
 
-enum class scoreboard_icon_type {
-	// GEN INTROSPECTOR enum class scoreboard_icon_type
-	DEATH_ICON,
-	UNCONSCIOUS_ICON,
-	NO_AMMO_ICON,
-	BOMB_ICON,
-	DEFUSE_KIT_ICON,
+using arena_mode_awards_vector = std::vector<arena_mode_award>;
 
-	COUNT
+struct arena_mode_player_round_state {
+	// GEN INTROSPECTOR struct arena_mode_player_round_state
+	item_purchases_vector done_purchases;
+	arena_mode_awards_vector awards;
 	// END GEN INTROSPECTOR
 };
 
@@ -180,6 +202,3 @@ struct arena_mode_match_result {
 		return winner == std::nullopt;
 	}
 };
-
-using arena_mode_knockouts_vector = std::vector<arena_mode_knockout>;
-using arena_mode_awards_vector = std::vector<arena_mode_award>;
