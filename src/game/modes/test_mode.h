@@ -38,7 +38,11 @@ struct test_mode_view_rules {
 	// END GEN INTROSPECTOR
 };
 
+class test_mode;
+
 struct test_mode_ruleset {
+	using mode_type = test_mode;
+
 	// GEN INTROSPECTOR struct test_mode_ruleset
 	std::string name = "Unnamed test scene mode vars";
 
@@ -46,6 +50,8 @@ struct test_mode_ruleset {
 	per_actual_faction<test_mode_faction_rules> factions;
 	test_mode_view_rules view;
 	// END GEN INTROSPECTOR
+
+	test_mode_ruleset();
 
 	bool should_hide_details_when_spectating_enemies() const {
 		return true;

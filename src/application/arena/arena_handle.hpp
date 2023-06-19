@@ -1,6 +1,6 @@
 #pragma once
 
-template <bool C, class ModeAndRulesType>
+template <bool C, class ModeVariant, class RulesVariant>
 class basic_arena_handle;
 
 template <class A>
@@ -24,8 +24,8 @@ bool is_spectator(const A& handle, const mode_player_id& id) {
 	return faction == std::nullopt || faction == faction_type::SPECTATOR;
 }
 
-template <bool C, class M>
-bool found_in(const basic_arena_handle<C, M>& handle, const mode_player_id& id) {
+template <bool C, class M, class I>
+bool found_in(const basic_arena_handle<C, M, I>& handle, const mode_player_id& id) {
 	return handle.on_mode(
 		[&](const auto& typed_mode) {
 			return typed_mode.find(id) != nullptr;

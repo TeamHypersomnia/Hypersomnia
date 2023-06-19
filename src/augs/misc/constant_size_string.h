@@ -35,6 +35,10 @@ namespace augs {
 			return arr.data();
 		}
 
+		bool operator==(const std::string& b) const {
+			return len == b.length() && !std::memcmp(data(), b.data(), len);
+		}
+
 		template <unsigned B>
 		bool operator==(const constant_size_string<B>& b) const {
 			return len == b.len && !std::memcmp(data(), b.data(), len);

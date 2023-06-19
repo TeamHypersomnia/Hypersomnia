@@ -90,9 +90,7 @@ void packaged_official_content::for_each_resource(F callback) {
 packaged_official_content::packaged_official_content(sol::state& lua) {
 	built_content.populate_official_content(
 		lua,
-		60,
-		default_bomb_ruleset,
-		default_test_ruleset
+		60
 	);
 
 	::create_official_resources(built_content, resources);

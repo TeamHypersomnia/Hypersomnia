@@ -12,7 +12,7 @@ test_scene_setup::test_scene_setup(
 	const input_recording_type recording_type
 ) {
 #if BUILD_TEST_SCENES
-	scene.make_test_scene(lua, settings, ruleset);
+	scene.make_test_scene(lua, settings);
 	auto& cosm = scene.world;
 
 	local_player_id = mode.add_player({ ruleset, cosm }, "Player", faction_type::METROPOLIS);

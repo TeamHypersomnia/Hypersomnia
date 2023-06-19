@@ -31,15 +31,34 @@ struct editor_bomb_defusal_mode {
 	static constexpr bool json_serialize_in_parent = true;
 
 	// GEN INTROSPECTOR struct editor_bomb_defusal_mode
+	uint32_t max_team_score = 16;
+
 	uint32_t warmup_time = 81;
 	uint32_t freeze_time = 10;
 	uint32_t buy_time = 30;
 	uint32_t round_time = 120;
 	uint32_t round_end_time = 5;
-	uint32_t max_team_score = 16;
 
 	per_actual_faction<editor_requested_equipment> warmup_equipment;
 	per_actual_faction<editor_requested_equipment> round_start_equipment;
+	// END GEN INTROSPECTOR
+};
+
+struct editor_gun_game_mode {
+	static constexpr bool json_serialize_in_parent = true;
+
+	// GEN INTROSPECTOR struct editor_gun_game_mode
+	uint32_t max_team_score = 16;
+
+	uint32_t warmup_time = 81;
+	uint32_t freeze_time = 10;
+	uint32_t round_time = 60 * 20;
+	uint32_t round_end_time = 5;
+
+	per_actual_faction<editor_requested_equipment> basic_equipment;
+	per_actual_faction<editor_requested_equipment> final_equipment;
+
+	std::vector<editor_typed_resource_id<editor_firearm_resource>> progression;
 	// END GEN INTROSPECTOR
 };
 

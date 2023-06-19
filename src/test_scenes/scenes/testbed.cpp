@@ -46,6 +46,7 @@
 #include "augs/readwrite/json_readwrite.h"
 #include "game/detail/flavour_presentation.h"
 #include "game/inferred_caches/organism_cache.hpp"
+#include "game/cosmos/solvers/standard_solver.h"
 
 static bool reported = false;
 
@@ -316,189 +317,193 @@ static void save_all_reported_weapons() {
 	augs::save_as_json(reported_spells, LOG_FILES_DIR "/all_spells.json");
 }
 
-namespace test_scenes {
-	void testbed::setup(test_mode_ruleset& rs) {
-		rs.name = "Standard test ruleset";
+test_mode_ruleset::test_mode_ruleset() {
+	auto& rs = *this;
 
-		rs.factions[faction_type::RESISTANCE].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		rs.factions[faction_type::RESISTANCE].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
-		rs.factions[faction_type::RESISTANCE].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
-		rs.factions[faction_type::RESISTANCE].round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
-		rs.factions[faction_type::RESISTANCE].round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
+	rs.name = "Standard test ruleset";
 
-		rs.factions[faction_type::METROPOLIS].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		rs.factions[faction_type::METROPOLIS].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
-		rs.factions[faction_type::METROPOLIS].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
-		rs.factions[faction_type::METROPOLIS].round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
-		rs.factions[faction_type::METROPOLIS].round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::ASSAULT_RATTLE);
+	rs.factions[faction_type::RESISTANCE].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+	rs.factions[faction_type::RESISTANCE].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
+	rs.factions[faction_type::RESISTANCE].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
+	rs.factions[faction_type::RESISTANCE].round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+	rs.factions[faction_type::RESISTANCE].round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
+
+	rs.factions[faction_type::METROPOLIS].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+	rs.factions[faction_type::METROPOLIS].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
+	rs.factions[faction_type::METROPOLIS].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+	rs.factions[faction_type::METROPOLIS].round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+	rs.factions[faction_type::METROPOLIS].round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::ASSAULT_RATTLE);
 #if 0
-		rs.round_start_eq.over_back_wearable = to_entity_flavour_id(test_hand_explosives::BOMB);
+	rs.round_start_eq.over_back_wearable = to_entity_flavour_id(test_hand_explosives::BOMB);
 #endif
 
-		fill_range(rs.factions[faction_type::METROPOLIS].round_start_eq.spells_to_give, true);
-		fill_range(rs.factions[faction_type::RESISTANCE].round_start_eq.spells_to_give, true);
-	}
+	fill_range(rs.factions[faction_type::METROPOLIS].round_start_eq.spells_to_give, true);
+	fill_range(rs.factions[faction_type::RESISTANCE].round_start_eq.spells_to_give, true);
+}
 
-	void testbed::setup(arena_mode_ruleset& rs) {
-		rs.bot_names = {
-			"daedalus",
-			"icarus",
-			"geneotech",
-			"pbc",
-			"adam.jensen",
-			"Spicmir",
-			"Pythagoras",
-			"Billan",
-			"Billans",
-			"bilmik"
-		};
+arena_mode_ruleset::arena_mode_ruleset() {
+	auto& rs = *this;
 
-		rs.player_colors = {
-			rgba(0, 255, 0, 255), // green
-			rgba(0, 255, 255, 255), // cyan
-			rgba(255, 255, 0, 255), // yellow
-			rgba(255, 90, 255, 255), // pink
-			rgba(255, 136, 0, 255), // orange
-			rgba(255, 34, 30, 255), // red
-			rgba(121, 48, 255, 255), // purple
-			rgba(0, 121, 255, 255), // blue
-			rgba(32, 141, 0, 255) // dark green
+	rs.bot_names = {
+		"daedalus",
+		"icarus",
+		"geneotech",
+		"pbc",
+		"adam.jensen",
+		"Spicmir",
+		"Pythagoras",
+		"Billan",
+		"Billans",
+		"bilmik"
+	};
+
+	rs.player_colors = {
+		rgba(0, 255, 0, 255), // green
+		rgba(0, 255, 255, 255), // cyan
+		rgba(255, 255, 0, 255), // yellow
+		rgba(255, 90, 255, 255), // pink
+		rgba(255, 136, 0, 255), // orange
+		rgba(255, 34, 30, 255), // red
+		rgba(121, 48, 255, 255), // purple
+		rgba(0, 121, 255, 255), // blue
+		rgba(32, 141, 0, 255) // dark green
 #if OBSCURE_COLORS
-			,rgba(86, 34, 0, 255), // brown
-			rgba(133, 133, 133, 255), // gray
-			rgba(119, 187, 255, 255), // light blue
-			rgba(0, 0, 0, 255), // black
+		,rgba(86, 34, 0, 255), // brown
+		rgba(133, 133, 133, 255), // gray
+		rgba(119, 187, 255, 255), // light blue
+		rgba(0, 0, 0, 255), // black
 #endif
-		};
+	};
 
-		rs.excess_player_color = rgba(210, 210, 210, 255);
-		rs.default_player_color = rgba(255, 255, 0, 255);
+	rs.excess_player_color = rgba(210, 210, 210, 255);
+	rs.default_player_color = rgba(255, 255, 0, 255);
 
-		rs.bot_quota = 0;
+	rs.bot_quota = 0;
 
-		rs.name = "Standard bomb ruleset";
-		rs.economy.initial_money = 2000;
+	rs.name = "Standard bomb ruleset";
+	rs.economy.initial_money = 2000;
 
-		{
-			auto& resistance = rs.factions[faction_type::RESISTANCE];
-			auto& metropolis = rs.factions[faction_type::METROPOLIS];
+	{
+		auto& resistance = rs.factions[faction_type::RESISTANCE];
+		auto& metropolis = rs.factions[faction_type::METROPOLIS];
 
-			resistance.round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-			metropolis.round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		resistance.round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		metropolis.round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
-			resistance.round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
-			metropolis.round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
+		resistance.round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
+		metropolis.round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 
-			resistance.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-			metropolis.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		resistance.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		metropolis.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
 #define GIVE_FULL 0
 #define GIVE_AMMO 1
 
 #if GIVE_AMMO
-			resistance.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::FURY_THROWER);
-			metropolis.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::POSEIDON);
+		resistance.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::FURY_THROWER);
+		metropolis.warmup_initial_eq.weapon = to_entity_flavour_id(test_melee_weapons::POSEIDON);
 
-			metropolis.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SN69);
-			resistance.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::KEK9);
+		metropolis.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SN69);
+		resistance.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::KEK9);
 #endif
 
 #if GIVE_FULL
-			metropolis.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
-			resistance.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
+		metropolis.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
+		resistance.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
 
-			metropolis.round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
-			metropolis.round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+		metropolis.round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+		metropolis.round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 
-			resistance.round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
-			resistance.round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
+		resistance.round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
+		resistance.round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 #endif
-		}
-
-		{
-			auto& mt = rs.view.event_sounds[faction_type::METROPOLIS];
-
-			mt[battle_event::START] = to_sound_id(test_scene_sound_id::MT_START);
-			mt[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::MT_BOMB_PLANTED);
-			mt[battle_event::BOMB_DEFUSED] = to_sound_id(test_scene_sound_id::MT_BOMB_DEFUSED);
-			mt[battle_event::IM_DEFUSING_THE_BOMB] = to_sound_id(test_scene_sound_id::RE_SECURING_OBJECTIVE);
-			mt[battle_event::ITS_TOO_LATE_RUN] = to_sound_id(test_scene_sound_id::MT_ITS_TOO_LATE_RUN);
-
-			mt[battle_event::ONE_VERSUS_ONE] = to_sound_id(test_scene_sound_id::ANNOUNCE_MAYTHEFORCE);
-			mt[battle_event::ONE_VERSUS_MANY] = to_sound_id(test_scene_sound_id::ANNOUNCE_ONEANDONLY);
-			mt[battle_event::HEADSHOT] = to_sound_id(test_scene_sound_id::ANNOUNCE_HEADSHOT);
-			mt[battle_event::HUMILIATION] = to_sound_id(test_scene_sound_id::ANNOUNCE_HUMILIATION);
-
-			mt[battle_event::PREPARE_TO_FIGHT] = to_sound_id(test_scene_sound_id::ANNOUNCE_PREPARE);
-			mt[battle_event::FIRST_BLOOD] = to_sound_id(test_scene_sound_id::ANNOUNCE_FIRSTBLOOD);
-		}
-
-		{
-			auto& re = rs.view.event_sounds[faction_type::RESISTANCE];
-			re = rs.view.event_sounds[faction_type::METROPOLIS];
-			re[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::RE_BOMB_PLANTED);
-		}
-
-		{
-			auto& streaks = rs.view.streak_defs;
-
-			auto add_streak = [&](const int num, const auto& message, const auto sound) {
-				streaks.push_back({ num, message, to_sound_id(sound) });
-			};
-
-			add_streak(3,  "Multi-Kill!", test_scene_sound_id::ANNOUNCE_MULTIKILL);
-			add_streak(4,  "Mega-Kill!", test_scene_sound_id::ANNOUNCE_MEGAKILL);
-			add_streak(5,  "Ultra-Kill!", test_scene_sound_id::ANNOUNCE_ULTRAKILL);
-			add_streak(6,  "Monster-Kill!", test_scene_sound_id::ANNOUNCE_MONSTERKILL);
-			add_streak(7,  "Killing Spree!", test_scene_sound_id::ANNOUNCE_KILLINGSPREE);
-			add_streak(8,  "Wicked Sick!", test_scene_sound_id::ANNOUNCE_WICKEDSICK);
-			add_streak(9,  "Rampage!", test_scene_sound_id::ANNOUNCE_RAMPAGE);
-			add_streak(10, "Ludacriss-Kill!", test_scene_sound_id::ANNOUNCE_LUDACRISSKILL);
-			add_streak(11, "Unstoppable!", test_scene_sound_id::ANNOUNCE_UNSTOPPABLE);
-			add_streak(12, "Godlike!", test_scene_sound_id::ANNOUNCE_GODLIKE);
-			add_streak(13, "Holy Shit!", test_scene_sound_id::ANNOUNCE_HOLYSHIT);
-		}
-
-		{
-			auto& mt = rs.view.win_sounds.metropolis;
-
-			mt[faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
-			mt[faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
-		}
-
-		{
-			auto& re = rs.view.win_sounds.resistance;
-			re = rs.view.win_sounds[faction_type::METROPOLIS];
-		}
-
-		rs.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
-		rs.view.bomb_soon_explodes_theme = to_entity_flavour_id(test_sound_decorations::GENERIC_BOMB_SOON_EXPLODES_THEME);
-		rs.view.secs_until_detonation_to_start_theme = 11;
-
-		rs.view.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
-		rs.view.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);
-		rs.view.logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_LOGO);
-		rs.view.headshot_icons[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
-		rs.view.headshot_icons[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
-		rs.view.headshot_icons[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
-		rs.view.wallbang_icon = to_image_id(test_scene_image_id::WALLBANG_ICON);
-
-		rs.view.square_logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
-		// TODO: add atlantis logo
-		rs.view.square_logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
-		rs.view.square_logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_SQUARE_LOGO);
-
-		{
-			rs.view.icons[scoreboard_icon_type::DEATH_ICON] = to_image_id(test_scene_image_id::DEATH_ICON);
-			rs.view.icons[scoreboard_icon_type::UNCONSCIOUS_ICON] = to_image_id(test_scene_image_id::UNCONSCIOUS_ICON);
-			rs.view.icons[scoreboard_icon_type::NO_AMMO_ICON] = to_image_id(test_scene_image_id::NO_AMMO_ICON);
-			rs.view.icons[scoreboard_icon_type::BOMB_ICON] = to_image_id(test_scene_image_id::BOMB_ICON);
-			rs.view.icons[scoreboard_icon_type::DEFUSE_KIT_ICON] = to_image_id(test_scene_image_id::DEFUSE_KIT_ICON);
-		}
-
-		rs.view.money_icon = to_image_id(test_scene_image_id::MONEY_ICON);
 	}
 
+	{
+		auto& mt = rs.view.event_sounds[faction_type::METROPOLIS];
+
+		mt[battle_event::START] = to_sound_id(test_scene_sound_id::MT_START);
+		mt[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::MT_BOMB_PLANTED);
+		mt[battle_event::BOMB_DEFUSED] = to_sound_id(test_scene_sound_id::MT_BOMB_DEFUSED);
+		mt[battle_event::IM_DEFUSING_THE_BOMB] = to_sound_id(test_scene_sound_id::RE_SECURING_OBJECTIVE);
+		mt[battle_event::ITS_TOO_LATE_RUN] = to_sound_id(test_scene_sound_id::MT_ITS_TOO_LATE_RUN);
+
+		mt[battle_event::ONE_VERSUS_ONE] = to_sound_id(test_scene_sound_id::ANNOUNCE_MAYTHEFORCE);
+		mt[battle_event::ONE_VERSUS_MANY] = to_sound_id(test_scene_sound_id::ANNOUNCE_ONEANDONLY);
+		mt[battle_event::HEADSHOT] = to_sound_id(test_scene_sound_id::ANNOUNCE_HEADSHOT);
+		mt[battle_event::HUMILIATION] = to_sound_id(test_scene_sound_id::ANNOUNCE_HUMILIATION);
+
+		mt[battle_event::PREPARE_TO_FIGHT] = to_sound_id(test_scene_sound_id::ANNOUNCE_PREPARE);
+		mt[battle_event::FIRST_BLOOD] = to_sound_id(test_scene_sound_id::ANNOUNCE_FIRSTBLOOD);
+	}
+
+	{
+		auto& re = rs.view.event_sounds[faction_type::RESISTANCE];
+		re = rs.view.event_sounds[faction_type::METROPOLIS];
+		re[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::RE_BOMB_PLANTED);
+	}
+
+	{
+		auto& streaks = rs.view.streak_defs;
+
+		auto add_streak = [&](const int num, const auto& message, const auto sound) {
+			streaks.push_back({ num, message, to_sound_id(sound) });
+		};
+
+		add_streak(3,  "Multi-Kill!", test_scene_sound_id::ANNOUNCE_MULTIKILL);
+		add_streak(4,  "Mega-Kill!", test_scene_sound_id::ANNOUNCE_MEGAKILL);
+		add_streak(5,  "Ultra-Kill!", test_scene_sound_id::ANNOUNCE_ULTRAKILL);
+		add_streak(6,  "Monster-Kill!", test_scene_sound_id::ANNOUNCE_MONSTERKILL);
+		add_streak(7,  "Killing Spree!", test_scene_sound_id::ANNOUNCE_KILLINGSPREE);
+		add_streak(8,  "Wicked Sick!", test_scene_sound_id::ANNOUNCE_WICKEDSICK);
+		add_streak(9,  "Rampage!", test_scene_sound_id::ANNOUNCE_RAMPAGE);
+		add_streak(10, "Ludacriss-Kill!", test_scene_sound_id::ANNOUNCE_LUDACRISSKILL);
+		add_streak(11, "Unstoppable!", test_scene_sound_id::ANNOUNCE_UNSTOPPABLE);
+		add_streak(12, "Godlike!", test_scene_sound_id::ANNOUNCE_GODLIKE);
+		add_streak(13, "Holy Shit!", test_scene_sound_id::ANNOUNCE_HOLYSHIT);
+	}
+
+	{
+		auto& mt = rs.view.win_sounds.metropolis;
+
+		mt[faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
+		mt[faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
+	}
+
+	{
+		auto& re = rs.view.win_sounds.resistance;
+		re = rs.view.win_sounds[faction_type::METROPOLIS];
+	}
+
+	rs.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
+	rs.view.bomb_soon_explodes_theme = to_entity_flavour_id(test_sound_decorations::GENERIC_BOMB_SOON_EXPLODES_THEME);
+	rs.view.secs_until_detonation_to_start_theme = 11;
+
+	rs.view.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
+	rs.view.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);
+	rs.view.logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_LOGO);
+	rs.view.headshot_icons[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
+	rs.view.headshot_icons[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
+	rs.view.headshot_icons[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::HEADSHOT_ICON);
+	rs.view.wallbang_icon = to_image_id(test_scene_image_id::WALLBANG_ICON);
+
+	rs.view.square_logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
+	// TODO: add atlantis logo
+	rs.view.square_logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
+	rs.view.square_logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_SQUARE_LOGO);
+
+	{
+		rs.view.icons[scoreboard_icon_type::DEATH_ICON] = to_image_id(test_scene_image_id::DEATH_ICON);
+		rs.view.icons[scoreboard_icon_type::UNCONSCIOUS_ICON] = to_image_id(test_scene_image_id::UNCONSCIOUS_ICON);
+		rs.view.icons[scoreboard_icon_type::NO_AMMO_ICON] = to_image_id(test_scene_image_id::NO_AMMO_ICON);
+		rs.view.icons[scoreboard_icon_type::BOMB_ICON] = to_image_id(test_scene_image_id::BOMB_ICON);
+		rs.view.icons[scoreboard_icon_type::DEFUSE_KIT_ICON] = to_image_id(test_scene_image_id::DEFUSE_KIT_ICON);
+	}
+
+	rs.view.money_icon = to_image_id(test_scene_image_id::MONEY_ICON);
+}
+
+namespace test_scenes {
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {
 		auto& world = step.get_cosmos();
 		report_all_spells(world);
@@ -1250,5 +1255,14 @@ namespace test_scenes {
 		}
 
 		save_all_reported_weapons();
+	}
+
+	void testbed::populate_with_entities(const loaded_image_caches_map& caches, const logic_step_input input) {
+		standard_solver()(
+			input,
+			solver_callbacks(
+				[&](const logic_step step) { populate(caches, step); }
+			)
+		);
 	}
 }

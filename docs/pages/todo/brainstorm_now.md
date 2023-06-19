@@ -6,6 +6,35 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- current_arena -> arena/map
+
+- How do we go from here?
+    - To not have to repeatedly setup some common ruleset data too (like announcer sounds), we'd have to have not a variant, but an actual tuple of all sub-modes.
+    - This means we'd pretty much have a single ruleset.
+        - But editor wise we'd have several.
+        - and they'd allow custom announcer sounds? That would be silly too I guess
+        - although technically not a worry for now until it's doable
+        - but we need to think if we shouldn't make some common "arena" rules common for all of gungame, bomb defusal, tdm etc
+
+- Editor UI
+    - We should show all game modes by default so that a mapper can instantly customize the map for this mode without browsing
+    - Deciding up-front what modes are supported for a map is unnecessary friction
+        - Esp if someone wants to experiment quickly and later decide
+    - There's no reason to make modes hidden too, if someone wants to play around and test if a map works with a mode
+    - We'd have to introduce a "hidden" flag but that's pointless
+    - Then there's also no point in serializing all the modes for whom values didn't change
+    - Let's just create all by default
+    - e.g. cs2d has lots of map-centric scripting and they all just launch something by default I guess too
+    
+- We run into the same problem in editor specification
+    - Things like announcer etc will repeat
+        - however I'd argue these things won't really be editable
+            - at most a map can e.g. override some sound files by path
+
+- To be completely honest we don't even have to approach the variantization 100%
+    - although we indeed have to detect which mode it is
+        - so at least this should be through the variant
+
 - Not sure if we approach the game modes correctly
     - Note our modes will have an insane amount of shared functionality
         - We would have to include 

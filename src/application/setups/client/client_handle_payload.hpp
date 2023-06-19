@@ -181,7 +181,7 @@ message_handler_result client_setup::handle_payload(
 
 					initial_snapshot_payload {
 						signi,
-						current_mode,
+						current_mode_state,
 						read_client_id,
 						client_gui.rcon.level
 					}

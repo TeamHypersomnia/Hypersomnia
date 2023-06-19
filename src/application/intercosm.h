@@ -16,9 +16,6 @@ struct intercosm_path_op {
 
 struct test_scene_settings;
 
-struct test_mode_ruleset;
-struct arena_mode_ruleset;
-
 void post_load_state_correction(
 	cosmos_common_significant&,
 	const all_viewables_defs&
@@ -32,16 +29,12 @@ struct intercosm {
 
 	void make_test_scene(
 		sol::state&, 
-		test_scene_settings,
-		test_mode_ruleset&,
-		arena_mode_ruleset* = nullptr
+		test_scene_settings
 	);
 
 	void populate_official_content(
 		sol::state&, 
-		unsigned tickrate,
-		arena_mode_ruleset&,
-		test_mode_ruleset&
+		unsigned tickrate
 	);
 
 	void load_from_bytes(const intercosm_paths&);

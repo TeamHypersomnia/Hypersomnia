@@ -736,7 +736,7 @@ bool client_setup::try_load_arena_according_to(const server_solvable_vars& new_v
 				referential_arena,
 				official,
 				new_vars.current_arena,
-				new_vars.override_default_ruleset,
+				new_vars.game_mode,
 				clean_round_state,
 				new_vars.playtesting_context,
 				keep_loaded_project
@@ -818,7 +818,7 @@ bool client_setup::try_load_arena_according_to(const server_solvable_vars& new_v
 
 	/* Prepare the predicted cosmos. */
 	predicted_cosmos = scene.world;
-	predicted_mode = current_mode;
+	predicted_mode = current_mode_state;
 
 	return true;
 }

@@ -1688,7 +1688,7 @@ void do_server_vars(
 	perform_arena_chooser(vars.current_arena);
 	revert(vars.current_arena);
 
-	input_text(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
+	input_text(SCOPE_CFG_NVP(game_mode)); revert(scope_cfg.game_mode);
 }
 
 void do_server_vars(

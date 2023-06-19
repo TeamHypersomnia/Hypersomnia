@@ -14,13 +14,10 @@
 #include "application/setups/setup_common.h"
 #include "game/modes/all_mode_includes.h"
 #include "game/modes/mode_entropy.h"
-#include "game/modes/ruleset_id.h"
 
 #include "augs/network/network_types.h"
 #include "application/setups/server/server_vars.h"
 #include "application/setups/server/server_client_state.h"
-#include "application/predefined_rulesets.h"
-#include "application/arena/mode_and_rules.h"
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/misc/serialization_buffers.h"
 
@@ -70,10 +67,10 @@ class server_setup :
 	intercosm scene;
 	cosmos_solvable_significant clean_round_state;
 
-	predefined_rulesets rulesets;
+	all_rulesets_variant ruleset;
 
 	/* Other replicated state */
-	mode_and_rules current_mode;
+	all_modes_variant current_mode_state;
 
 	client_vars integrated_client_vars;
 	server_vars vars;
@@ -180,10 +177,10 @@ private:
 	template <class H, class S>
 	static decltype(auto) get_arena_handle_impl(S& self) {
 		return H {
-			self.current_mode,
+			self.current_mode_state,
 			self.scene,
 			self.scene.world,
-			self.rulesets,
+			self.ruleset,
 			self.clean_round_state
 		};
 	}

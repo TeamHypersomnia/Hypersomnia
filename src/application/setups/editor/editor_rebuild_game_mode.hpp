@@ -58,21 +58,13 @@ auto to_game_requested_equipment(
 using default_rulesets_tuple = std::tuple<test_mode_ruleset, arena_mode_ruleset>;
 
 template <class F>
-ruleset_id setup_ruleset_from_editor_mode(
+auto setup_ruleset_from_editor_mode(
 	const editor_game_mode_resource& game_mode,
 	F find_resource,
-	const default_rulesets_tuple& defaults,
-	const raw_ruleset_id next_id,
-	predefined_rulesets& rulesets,
 	const editor_arena_settings& settings,
 	const editor_playtesting_settings* overrides
 ) {
-	ruleset_id result;
-	result.raw = next_id;
-
-	auto alloc = [&]<typename T>(T& new_ruleset) {
-		rulesets.all.template get<make_ruleset_map<T>>().try_emplace(next_id, std::move(new_ruleset));
-	};
+	all_rulesets_variant result;
 
 	auto apply_global_settings = [&]<typename T>(T& rules) {
 		if constexpr(std::is_same_v<T, test_mode_ruleset>) {
@@ -126,8 +118,8 @@ ruleset_id setup_ruleset_from_editor_mode(
 
 			using T = test_mode;
 
-			result.type_id.set<T>();
-			auto rules = std::get<typename T::ruleset_type>(defaults);
+			auto rules = typename T::ruleset_type();
+
 			rules.respawn_after_ms = vars.respawn_time_ms;
 
 			::for_each_faction(
@@ -138,16 +130,15 @@ ruleset_id setup_ruleset_from_editor_mode(
 
 			apply_overrides(rules);
 
-			alloc(rules);
+			result = rules;
 		}
 		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
 			auto& vars = game_mode.editable.bomb_defusal;
 
 			using T = arena_mode;
 
-			result.type_id.set<T>();
+			auto rules = typename T::ruleset_type();
 
-			auto rules = std::get<typename T::ruleset_type>(defaults);
 			rules.warmup_secs = vars.warmup_time;
 			rules.freeze_secs = vars.freeze_time;
 			rules.round_secs = vars.round_time;
@@ -164,7 +155,7 @@ ruleset_id setup_ruleset_from_editor_mode(
 
 			apply_overrides(rules);
 
-			alloc(rules);
+			result = rules;
 		}
 		else {
 			static_assert(always_false_v<I>, "Non-exhaustive if constexpr");

@@ -32,25 +32,6 @@
 #include "game/modes/arena_mode.h"
 #include "game/modes/test_mode.h"
 
-#include "application/predefined_rulesets.h"
-
-#if BUILD_INTERCOSM_IO
-void load_intercosm_and_rulesets(
-	const arena_paths& paths,
-	intercosm& scene,
-	predefined_rulesets& rulesets
-) {
-	scene.load_from_bytes(paths.int_paths);
-
-	try {
-		augs::load_from_bytes(rulesets, paths.rulesets_file_path);
-	}
-	catch (const augs::file_open_error&) {
-		/* Just let it happen */
-	}
-}
-#endif
-
 void snap_interpolated_to_logical(cosmos&);
 
 void intercosm::clear() {
@@ -60,9 +41,7 @@ void intercosm::clear() {
 
 void intercosm::populate_official_content(
 	sol::state& lua, 
-	const unsigned tickrate,
-	arena_mode_ruleset& arena_ruleset,
-	test_mode_ruleset& test_ruleset
+	const unsigned tickrate
 ) {
 	clear();
 
@@ -84,18 +63,11 @@ void intercosm::populate_official_content(
 		s.clk.dt = augs::delta::steps_per_second(tickrate);
 		return changer_callback_result::DONT_REFRESH;
 	});
-
-	auto populator = test_scenes::testbed();
-	populator.setup(arena_ruleset);
-	populator.setup(test_ruleset);
-	arena_ruleset.speeds.tickrate = tickrate;
 }
 
 void intercosm::make_test_scene(
 	sol::state& lua, 
-	const test_scene_settings settings,
-	test_mode_ruleset& test_mode,
-	arena_mode_ruleset* const arena_ruleset
+	const test_scene_settings settings
 ) {
 	clear();
 
@@ -114,10 +86,6 @@ void intercosm::make_test_scene(
 			return changer_callback_result::REFRESH;
 		});
 
-		if (arena_ruleset) {
-			arena_ruleset->speeds.tickrate = settings.scene_tickrate;
-		}
-
 		auto entropy = cosmic_entropy();
 		populator.populate_with_entities(caches, { world, entropy, solve_settings() });
 
@@ -127,12 +95,6 @@ void intercosm::make_test_scene(
 			s.clk.dt = augs::delta::steps_per_second(settings.scene_tickrate);
 			return changer_callback_result::DONT_REFRESH;
 		});
-
-		populator.setup(test_mode);
-
-		if (arena_ruleset != nullptr) {
-			populator.setup(*arena_ruleset);
-		}
 
 		snap_interpolated_to_logical(world);
 	};
@@ -146,8 +108,6 @@ void intercosm::make_test_scene(
 #else
 	(void)lua;
 	(void)settings;
-	(void)test_mode;
-	(void)arena_ruleset;
 #endif
 }
 

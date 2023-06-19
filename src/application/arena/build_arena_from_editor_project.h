@@ -12,6 +12,7 @@ using scene_entity_to_node_map = per_entity_type_array<std::vector<editor_node_i
 
 struct build_arena_input {
 	const editor_project& project;
+	const ruleset_name_type& override_game_mode;
 	const augs::path_type& project_resources_parent_folder;
 	const packaged_official_content& official;
 	scene_entity_to_node_map* scene_entity_to_node;

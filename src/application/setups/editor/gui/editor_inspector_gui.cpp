@@ -2122,13 +2122,14 @@ EDIT_FUNCTION(
 			FACTION_EQUIPMENT_PROPERTY("Equipment", quick_test.equipment);
 		}
 		else if constexpr(std::is_same_v<I, editor_bomb_defusal_mode>) {
+			MULTIPROPERTY("Max team score", bomb_defusal.max_team_score);
+
 			MULTIPROPERTY("Warmup time", bomb_defusal.warmup_time);
 			MULTIPROPERTY("Freeze time", bomb_defusal.freeze_time);
 			MULTIPROPERTY("Buy time", bomb_defusal.buy_time);
 
 			MULTIPROPERTY("Round time", bomb_defusal.round_time);
 			MULTIPROPERTY("Round end time", bomb_defusal.round_end_time);
-			MULTIPROPERTY("Max team score", bomb_defusal.max_team_score);
 
 			ImGui::Separator();
 

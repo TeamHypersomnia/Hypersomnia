@@ -46,9 +46,6 @@
 #include "game/stateless_systems/animation_system.h"
 #include "view/faction_view_settings.h"
 
-#include "application/arena/mode_and_rules.h"
-#include "application/predefined_rulesets.h"
-
 #include "application/arena/arena_handle.h"
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/setups/client/client_vars.h"
@@ -56,6 +53,7 @@
 #include "application/arena/arena_playtesting_context.h"
 
 #include "application/main/miniature_generator.h"
+#include "application/network/network_common.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -103,7 +101,7 @@ struct editor_resource_pools;
 struct editor_official_resource_map;
 
 template <bool C>
-using editor_arena_handle = basic_arena_handle<C, mode_and_rules>;
+using editor_arena_handle = online_arena_handle<C>;
 
 class editor_setup : public default_setup_settings, public arena_gui_mixin<editor_setup> {
 	using arena_gui_base = arena_gui_mixin<editor_setup>;
@@ -115,8 +113,8 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	intercosm scene;
 
 	/* Arena handle essentials */
-	predefined_rulesets rulesets;
-	mode_and_rules current_mode;
+	all_rulesets_variant ruleset;
+	all_modes_variant current_mode_state;
 	cosmos_solvable_significant clean_round_state;
 
 	entropy_accumulator total_collected;
@@ -232,10 +230,10 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	template <class H, class S>
 	static decltype(auto) get_arena_handle_impl(S& self) {
 		return H {
-			self.current_mode,
+			self.current_mode_state,
 			self.scene,
 			self.scene.world,
-			self.rulesets,
+			self.ruleset,
 			self.clean_round_state
 		};
 	}

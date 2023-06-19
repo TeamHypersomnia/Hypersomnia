@@ -19,11 +19,6 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	const auto& project = in.project;
 	const auto& official = in.official;
 
-	const auto built_default_modes = default_rulesets_tuple { 
-		official.default_test_ruleset,
-		official.default_bomb_ruleset
-	};
-
 	auto find_resource = project.make_find_resource_lambda(official.resources);
 
 	auto& scene = arena_handle.scene;
@@ -35,51 +30,53 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 		}
 	}
 
-	auto rebuild_game_modes = [&]() {
-		const auto& pool = project.resources.get_pool_for<editor_game_mode_resource>();
-
-		auto& rulesets = arena_handle.rulesets;
-
-		rulesets = {};
-
-		auto id_counter = raw_ruleset_id(0);
-
+	auto rebuild_game_mode = [&]() {
 		using R = editor_game_mode_resource;
 
-		pool.for_each_id_and_object(
-			[&](const auto& raw_id, const R& game_mode) {
-				const auto typed_id = editor_typed_resource_id<R>::from_raw(raw_id, false);
+		const auto& pool = project.resources.get_pool_for<editor_game_mode_resource>();
 
-				const bool pass_playtesting_overrides = in.for_playtesting;
-				const editor_playtesting_settings* overrides = nullptr;
+		const auto chosen_mode_id = [&]() {
+			if (!in.override_game_mode.empty()) {
+				editor_typed_resource_id<R> out;
 
-				if (pass_playtesting_overrides) {
-					overrides = std::addressof(project.playtesting);
-				}
-
-				const auto rules_id = ::setup_ruleset_from_editor_mode(
-					game_mode,
-					find_resource,
-					built_default_modes,
-					id_counter,
-					rulesets,
-					project.settings,
-					overrides
+				pool.for_each_id_and_object(
+					[&](const auto& raw_id, const R& game_mode) {
+						if (in.override_game_mode == game_mode.unique_name) {
+							out = editor_typed_resource_id<R>::from_raw(raw_id, false);
+						}
+					}
 				);
 
-				if (typed_id == project.settings.default_server_mode) {
-					rulesets.meta.server_default = rules_id;
-				}
-
-				if (typed_id == project.playtesting.mode) {
-					rulesets.meta.playtest_default = rules_id;
-				}
-
-				++id_counter;
+				return out;
 			}
-		);
 
-		arena_handle.current_mode.choose(rulesets.meta.playtest_default);
+			if (in.for_playtesting) {
+				return project.playtesting.mode;
+			}
+			
+			return project.settings.default_server_mode;
+		}();
+
+		if (const auto game_mode = pool.find(chosen_mode_id.raw)) {
+			const bool pass_playtesting_overrides = in.for_playtesting;
+			const editor_playtesting_settings* overrides = nullptr;
+
+			if (pass_playtesting_overrides) {
+				overrides = std::addressof(project.playtesting);
+			}
+
+			const auto result_ruleset = ::setup_ruleset_from_editor_mode(
+				*game_mode,
+				find_resource,
+				project.settings,
+				overrides
+			);
+
+			arena_handle.choose_mode(result_ruleset);
+		}
+		else {
+			arena_handle.choose_mode(test_mode_ruleset());
+		}
 	};
 
 	cosmos_common_significant& common = scene.world.get_common_significant(cosmos_common_significant_access());
@@ -188,11 +185,11 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 	});
 
 	/*
-		Modes must be created after flavors because rulesets
-		have some flavour ids as properties.
+		The game mode must be created after flavours 
+		because rulesets have some flavour ids as properties.
 	*/
 
-	rebuild_game_modes();
+	rebuild_game_mode();
 
 	/* Create nodes */
 

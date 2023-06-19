@@ -12,11 +12,13 @@
 
 void editor_setup::rebuild_arena(const bool editor_preview) {
 	const bool for_playtesting = true;
+	const auto override_game_mode = ruleset_name_type("");
 
 	::build_arena_from_editor_project<editor_arena_handle<false>>(
 		get_arena_handle(),
 		{
 			project,
+			override_game_mode,
 			paths.project_folder,
 			official,
 			std::addressof(scene_entity_to_node),

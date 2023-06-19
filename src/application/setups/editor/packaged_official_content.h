@@ -7,8 +7,6 @@
 #include "game/modes/test_mode.h"
 
 struct packaged_official_content {
-	test_mode_ruleset default_test_ruleset;
-	arena_mode_ruleset default_bomb_ruleset;
 	intercosm built_content;
 
 	/* 

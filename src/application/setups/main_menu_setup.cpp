@@ -127,7 +127,7 @@ main_menu_setup::main_menu_setup(
 	auto& cosm = intro.world;
 
 	if (is_intro_scene_available) {
-		intro.make_test_scene(lua, { false, 60 }, ruleset);
+		intro.make_test_scene(lua, { false, 60 });
 		viewed_character_id = cosm[mode.lookup(mode.add_player({ ruleset, cosm }, "Player", faction_type::METROPOLIS))].get_id();
 	}
 

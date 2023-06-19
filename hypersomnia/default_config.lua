@@ -741,7 +741,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 	},
 
 	current_arena = "de_cyberaqua",
-	override_default_ruleset = "",
+	game_mode = "",
   },
 
   server = {

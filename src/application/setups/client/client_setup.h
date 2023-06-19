@@ -18,8 +18,6 @@
 #include "augs/network/network_types.h"
 #include "application/setups/server/rcon_level.h"
 
-#include "application/predefined_rulesets.h"
-#include "application/arena/mode_and_rules.h"
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/misc/serialization_buffers.h"
 
@@ -69,10 +67,10 @@ class client_setup :
 	intercosm scene;
 	cosmos_solvable_significant clean_round_state;
 
-	predefined_rulesets rulesets;
+	all_rulesets_variant ruleset;
 
 	/* Other replicated state */
-	mode_and_rules current_mode;
+	all_modes_variant current_mode_state;
 	server_vars sv_vars;
 	server_solvable_vars sv_solvable_vars;
 	augs::path_type current_arena_folder;
@@ -80,7 +78,7 @@ class client_setup :
 	mode_player_id client_player_id;
 
 	cosmos predicted_cosmos;
-	mode_and_rules predicted_mode;
+	all_modes_variant predicted_mode;
 
 	std::vector<special_client_request> pending_requests;
 	bool now_resyncing = false;
@@ -173,7 +171,7 @@ class client_setup :
 				self.predicted_mode,
 				self.scene,
 				self.predicted_cosmos,
-				self.rulesets,
+				self.ruleset,
 				self.clean_round_state
 			};
 		}
@@ -181,10 +179,10 @@ class client_setup :
 			ensure_eq(t, client_arena_type::REFERENTIAL);
 
 			return H {
-				self.current_mode,
+				self.current_mode_state,
 				self.scene,
 				self.scene.world,
-				self.rulesets,
+				self.ruleset,
 				self.clean_round_state
 			};
 		}

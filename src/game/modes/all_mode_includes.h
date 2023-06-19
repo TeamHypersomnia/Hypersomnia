@@ -14,5 +14,12 @@ using all_modes = type_list<
 	arena_mode
 >;
 
+using all_rulesets = type_list<
+	test_mode_ruleset,
+	arena_mode_ruleset
+>;
+
 using all_modes_variant = replace_list_type_t<all_modes, std::variant>;
+using all_rulesets_variant = replace_list_type_t<all_rulesets, std::variant>;
+
 using mode_type_id = type_in_list_id<all_modes>;

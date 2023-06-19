@@ -254,7 +254,7 @@ struct debugger_property_accessors {
 					})
 				);
 			},
-			in.folder.player.current_mode.state
+			in.folder.player.current_mode_state
 		);
 	}
 
@@ -291,7 +291,7 @@ struct debugger_property_accessors {
 					);
 				}
 			},
-			in.folder.player.current_mode.state
+			in.folder.player.current_mode_state
 		);
 	}
 

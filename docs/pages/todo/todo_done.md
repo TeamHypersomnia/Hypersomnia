@@ -6265,3 +6265,23 @@ This will discard your redo history."
     - and warx should be cheaper
 
 - fix grenade count counter in starting equipment
+	test_mode_ruleset default_test_ruleset;
+	arena_mode_ruleset default_bomb_ruleset;
+    - Why isn't this generated on the go in the first place?
+        - Let's easily populate them on the go
+        - just watch out for tickrates
+            - we keep it at default of 60 for now but it shouldn't be taken from the cosmos
+
+- We could extremely simplify in built arena state too
+    - How about we ditch the variants completely
+    - For now it would only be for discriminating test vs arena mode which sucks
+- Kind of don't wanna rewrite the test mode
+- Theoretically okay to keep that variantization for modes completely unlike arena
+    - like racing
+- Yeah let's keep it for some completely different modes, low upkeep tbh
+
+
+- So let's first adjust the ruleset mapping logistics
+    - There's no point in loading all rulesets. 
+        - Why? If we want to e.g. disable/enable nodes per mode, we need to rebuild the map anyway
+        - Though for switching modes we need to keep the data of which are available

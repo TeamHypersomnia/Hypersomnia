@@ -1074,7 +1074,7 @@ void server_setup::choose_arena(const std::string& name) {
 			arena,
 			official,
 			name,
-			solvable_vars.override_default_ruleset,
+			solvable_vars.game_mode,
 			clean_round_state,
 			solvable_vars.playtesting_context,
 			std::addressof(*last_loaded_project)
@@ -1206,7 +1206,7 @@ void server_setup::send_full_arena_snapshot_to(const client_id_type client_id) {
 
 		full_arena_snapshot_payload<true> {
 			scene.world.get_solvable().significant,
-			current_mode,
+			current_mode_state,
 			sent_client_id,
 			get_rcon_level(client_id)
 		}

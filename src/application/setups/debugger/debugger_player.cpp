@@ -155,7 +155,7 @@ double debugger_player::get_total_secs(const debugger_folder& folder) const {
 }
 
 void debugger_player::initialize_testing(debugger_folder& f) {
-	choose_mode(f.commanded->rulesets.meta.playtest_default);
+	//choose_mode(f.commanded->rulesets.meta.playtest_default);
 
 	save_state_before_start(f);
 	reset_mode();
@@ -221,7 +221,7 @@ mode_entity_id debugger_player::lookup_character(const mode_player_id id) const 
 		[&](const auto& typed_mode) { 
 			return typed_mode.lookup(id);
 		},
-		current_mode.state
+		current_mode_state
 	);
 }
 
@@ -280,7 +280,7 @@ void debugger_player::reset_mode() {
 		[&](auto& typed_mode) {
 			typed_mode = {};
 		},
-		current_mode.state
+		current_mode_state
 	);
 }
 
@@ -321,13 +321,6 @@ void debugger_player::request_steps(const debugger_player::step_type amount) {
 
 void debugger_player::set_dirty() {
 	dirty = true;
-}
-
-void debugger_player::choose_mode(const ruleset_id& id) {
-	ensure(!has_testing_started());
-
-	set_dirty();
-	current_mode.choose(id);
 }
 
 void debugger_player::adjust_entropy(const debugger_folder& folder, debugger_player_entropy_type& entropy, const bool neg) const {

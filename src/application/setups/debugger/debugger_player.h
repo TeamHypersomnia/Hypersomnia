@@ -11,7 +11,7 @@
 #include "application/setups/debugger/debugger_commanded_state.h"
 #include "game/cosmos/entropy_recording_options.h"
 
-#include "application/arena/mode_and_rules.h"
+#include "application/network/network_common.h"
 #include "augs/templates/snapshotted_player.h"
 
 struct cosmos_solvable_significant;
@@ -60,11 +60,8 @@ auto player_advance_input(
 	return player_advance_input_t<C> { in, callbacks };
 }
 
-template <bool C, class ModeVariantType>
-class basic_arena_handle;
-
 template <bool C>
-using debugger_arena_handle = basic_arena_handle<C, mode_and_rules>;
+using debugger_arena_handle = online_arena_handle<C>;
 
 class debugger_player : public debugger_player_base {
 	using base = debugger_player_base;
@@ -76,7 +73,7 @@ private:
 	using step_type = base::step_type;
 
 	// GEN INTROSPECTOR class debugger_player
-	mode_and_rules current_mode;
+	all_modes_variant current_mode_state;
 	player_before_start_state before_start;
 
 public:
@@ -93,7 +90,7 @@ private:
 	template <class H, class S, class E>
 	static decltype(auto) get_arena_handle_impl(S& self, E& folder) {
 		return H {
-			self.current_mode,
+			self.current_mode_state,
 			folder.commanded->work,
 			folder.commanded->work.world,
 			folder.commanded->rulesets,
@@ -177,12 +174,11 @@ public:
 	}
 
 	const auto& get_current_mode() const {
-		return current_mode.state;
+		return current_mode_state;
 	}
 
 	void set_dirty();
 
-	void choose_mode(const ruleset_id& id);
 	void read_live_entropies(const augs::path_type& from);
 
 	double get_audiovisual_speed(const debugger_folder&) const;

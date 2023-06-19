@@ -14,7 +14,7 @@ struct choose_arena_input {
 	online_arena_handle<false> handle;
 	const packaged_official_content& official;
 	const arena_identifier& name;
-	const ruleset_name_type& override_default_ruleset;
+	const ruleset_name_type& override_game_mode;
 	cosmos_solvable_significant& clean_round_state;
 	std::optional<arena_playtesting_context> playtesting_context;
 	editor_project* keep_loaded_project;
@@ -27,6 +27,7 @@ struct choose_arena_input {
 		LOG_NOFORMAT("Couldn't load requested arena, so making a default one.");
 
 		handle.make_default(lua, clean_round_state);
+		handle.choose_mode(test_mode_ruleset());
 	}
 };
 
@@ -52,6 +53,7 @@ inline void load_arena_from_path(
 		in.handle,
 		{
 			project,
+			in.override_game_mode,
 			project_dir,
 			in.official,
 			entity_to_node,
@@ -87,6 +89,7 @@ inline void load_arena_from_string(
 		in.handle,
 		{
 			project,
+			in.override_game_mode,
 			project_dir,
 			in.official,
 			entity_to_node,
@@ -122,18 +125,6 @@ inline server_choose_arena_result choose_arena_server(
 	}
 	else {
 		in.make_default();
-	}
-
-	if (in.override_default_ruleset.size() > 0) {
-		// handle.current_mode.choose(in.override_default_ruleset);
-	}
-	else {
-		const auto launched_mode = in.is_for_playtesting() ?
-			in.handle.rulesets.meta.playtest_default :
-			in.handle.rulesets.meta.server_default
-		;
-
-		in.handle.current_mode.choose(launched_mode);
 	}
 
 	in.handle.migrate_mode_session(emigrated_session);
@@ -174,18 +165,6 @@ inline client_find_arena_result choose_arena_client(
 	}
 
 	if (altered) {
-		if (in.override_default_ruleset.size() > 0) {
-			// in.handle.current_mode.choose(in.override_default_ruleset);
-		}
-		else {
-			const auto launched_mode = in.is_for_playtesting() ?
-				in.handle.rulesets.meta.playtest_default :
-				in.handle.rulesets.meta.server_default
-			;
-
-			in.handle.current_mode.choose(launched_mode);
-		}
-
 		in.handle.migrate_mode_session(emigrated_session);
 
 		in.handle.on_mode(

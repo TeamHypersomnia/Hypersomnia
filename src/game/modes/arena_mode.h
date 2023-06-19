@@ -54,7 +54,11 @@ struct arena_mode_economy_rules {
 	// END GEN INTROSPECTOR
 };
 
+class arena_mode;
+
 struct arena_mode_ruleset {
+	using mode_type = arena_mode;
+
 	// GEN INTROSPECTOR struct arena_mode_ruleset
 	std::string name = "Unnamed bomb mode ruleset";
 
@@ -100,6 +104,8 @@ struct arena_mode_ruleset {
 
 	augs::speed_vars speeds;
 	// END GEN INTROSPECTOR
+
+	arena_mode_ruleset();
 
 	bool should_hide_details_when_spectating_enemies() const {
 		return true;

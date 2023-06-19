@@ -1,7 +1,5 @@
 #pragma once
 #include "augs/templates/maybe_const.h"
-#include "application/predefined_rulesets.h"
-#include "application/arena/mode_and_rules.h"
 
 #include "test_scenes/test_scene_settings.h"
 #include "view/game_drawing_settings.h"
@@ -10,7 +8,7 @@
 struct arena_paths;
 struct game_drawing_settings;
 
-template <bool C, class ModeAndRulesType>
+template <bool C, class ModeVariant, class RulesVariant>
 class basic_arena_handle {
 	template <class E, class F>
 	static decltype(auto) on_mode_with_input_impl(
@@ -22,10 +20,7 @@ class basic_arena_handle {
 				using M = remove_cref<decltype(typed_mode)>;
 				using I = typename M::template basic_input<C>;
 				
-				const auto vars = mapped_or_nullptr(
-					self.rulesets.all.template get_for<M>(), 
-					self.current_mode.rules_id
-				);
+				const auto vars = std::get_if<typename M::ruleset_type>(std::addressof(self.ruleset));
 
 				ensure(vars != nullptr);
 
@@ -51,7 +46,7 @@ class basic_arena_handle {
 			[&](auto& typed_mode) -> decltype(auto) {
 				using M = remove_cref<decltype(typed_mode)>;
 				
-				const auto vars = mapped_or_nullptr(self.rulesets.all.template get_for<M>(), self.current_mode.rules_id);
+				const auto vars = std::get_if<typename M::ruleset_type>(std::addressof(self.ruleset));
 				ensure(vars != nullptr);
 
 				return callback(typed_mode, *vars);
@@ -60,16 +55,16 @@ class basic_arena_handle {
 	}
 
 public:
-	maybe_const_ref_t<C, ModeAndRulesType> current_mode;
+	maybe_const_ref_t<C, ModeVariant> current_mode_state;
 	maybe_const_ref_t<C, intercosm> scene;
 	maybe_const_ref_t<C, cosmos> advanced_cosm;
-	maybe_const_ref_t<C, predefined_rulesets> rulesets;
+	maybe_const_ref_t<C, RulesVariant> ruleset;
 	const cosmos_solvable_significant& clean_round_state;
 
 	template <class T>
 	void transfer_all_solvables(T& from) {
 		advanced_cosm.assign_solvable(from.advanced_cosm);
-		current_mode = from.current_mode;
+		current_mode_state = from.current_mode_state;
 	}
 
 	template <class... Args>
@@ -80,6 +75,17 @@ public:
 	template <class... Args>
 	decltype(auto) on_mode_with_rules(Args&&... args) const {
 		return this->on_mode_with_rules_impl(*this, std::forward<Args>(args)...);
+	}
+
+	auto choose_mode(const RulesVariant& v) {
+		ruleset = v;
+
+		std::visit(
+			[&]<typename T>(const T&) {
+				current_mode_state = typename T::mode_type();
+			}, 
+			ruleset
+		);
 	}
 
 	auto get_current_round_number() const {
@@ -130,7 +136,7 @@ public:
 
 	template <class F>
 	decltype(auto) on_mode(F&& f) const {
-		return std::visit(std::forward<F>(f), current_mode.state);
+		return std::visit(std::forward<F>(f), current_mode_state);
 	}
 
 	template <class S>
@@ -138,42 +144,14 @@ public:
 		S& lua,
 		cosmos_solvable_significant& target_clean_round_state
 	) const {
-		scene.clear();
-
-		rulesets = {};
-
-		arena_mode_ruleset bomb_ruleset;
-
-		test_scene_settings settings;
-		settings.scene_tickrate = 60;
-
 		{
-			test_mode_ruleset dummy;
+			scene.clear();
 
-			scene.make_test_scene(
-				lua,
-				settings,
-				dummy,
-				std::addressof(bomb_ruleset)
-			);
+			test_scene_settings settings;
+			settings.scene_tickrate = 60;
+
+			scene.make_test_scene(lua, settings);
 		}
-
-		bomb_ruleset.bot_quota = 0;
-		bomb_ruleset.bot_names.clear();
-		bomb_ruleset.warmup_secs = 0;
-
-		const auto bomb_ruleset_id = raw_ruleset_id(0);
-		rulesets.all.template get_for<arena_mode>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));
-
-		current_mode.rules_id = bomb_ruleset_id;
-		current_mode.state = arena_mode();
-
-		ruleset_id id;
-		id.raw = bomb_ruleset_id;
-		id.type_id.set<arena_mode>();
-
-		rulesets.meta.server_default = id;
-		rulesets.meta.playtest_default = id;
 
 		target_clean_round_state = advanced_cosm.get_solvable().significant;
 	}

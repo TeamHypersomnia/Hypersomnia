@@ -11,7 +11,6 @@
 #include "augs/readwrite/lua_file.h"
 #include "game/cosmos/entity_handle.h"
 
-#include "application/arena/arena_utils.h"
 #include "hypersomnia_version.h"
 
 #include "application/arena/arena_handle.hpp"

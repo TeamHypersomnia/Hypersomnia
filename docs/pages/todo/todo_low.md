@@ -4,6 +4,9 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- rename server_solvable to something else? "vars" at least maybe
+    - this should honestly be under a single "server" struct probably, later will be easy to pull off with serialize_in_parent if we have config in json
+
 - percents next to nickname
     - client will have to send them on their own every second like ping, on volatile statistics channel
 

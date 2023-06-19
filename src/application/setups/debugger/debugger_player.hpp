@@ -77,7 +77,7 @@ auto debugger_player::make_snapshotted_advance_input(const player_advance_input_
 
 			augs::write_bytes(ms, history.get_current_revision());
 
-			augs::write_bytes(ms, current_mode.state);
+			augs::write_bytes(ms, current_mode_state);
 			augs::write_bytes(ms, *folder.commanded);
 
 			return std::move(ms);//ms.operator std::vector<std::byte>&&();
@@ -115,7 +115,7 @@ auto debugger_player::make_load_snapshot(const player_advance_input_t<C> in) {
 			history.force_set_current_revision(revision);
 		}
 
-		augs::read_bytes(ss, current_mode.state);
+		augs::read_bytes(ss, current_mode_state);
 		augs::read_bytes(ss, *folder.commanded);
 	};
 }
