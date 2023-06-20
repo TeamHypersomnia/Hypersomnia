@@ -320,8 +320,6 @@ static void save_all_reported_weapons() {
 test_mode_ruleset::test_mode_ruleset() {
 	auto& rs = *this;
 
-	rs.name = "Standard test ruleset";
-
 	rs.factions[faction_type::RESISTANCE].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 	rs.factions[faction_type::RESISTANCE].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
 	rs.factions[faction_type::RESISTANCE].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
@@ -380,7 +378,6 @@ arena_mode_ruleset::arena_mode_ruleset() {
 
 	rs.bot_quota = 0;
 
-	rs.name = "Standard bomb ruleset";
 	rs.economy.initial_money = 2000;
 
 	{

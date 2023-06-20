@@ -78,6 +78,8 @@ struct portal_exit_impulses {
 	impulse_amount_def object_exit_angular_impulse = { 1000.0f, impulse_type::ADD_VELOCITY };
 	// END GEN INTROSPECTOR
 
+	bool operator==(const portal_exit_impulses&) const = default;
+
 	void set_zero() {
 		character_exit_airborne_ms = 0.0f;
 		character_exit_impulse.set_zero();

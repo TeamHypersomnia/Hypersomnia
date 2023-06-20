@@ -14,6 +14,8 @@ namespace components {
 		bool illuminate = false;
 		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const wandering_pixels&) const = default;
 	};
 }
 

@@ -80,6 +80,8 @@ struct editor_portal_info {
 	portal_exit_position exit_position = portal_exit_position::PORTAL_CENTER_PLUS_ENTERING_OFFSET;
 	// END GEN INTROSPECTOR
 
+	bool operator==(const editor_portal_info&) const = default;
+
 	void apply(editor_color_preset);
 	rgba get_icon_color() const;
 
@@ -96,6 +98,8 @@ struct editor_point_marker_node_editable {
 	vec2 pos;
 	real32 rotation = 0.0f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_point_marker_node_editable&) const = default;
 };
 
 struct editor_area_marker_node_editable {
@@ -110,4 +114,6 @@ struct editor_area_marker_node_editable {
 
 	editor_portal_info as_portal;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_area_marker_node_editable&) const = default;
 };

@@ -53,6 +53,8 @@ struct editor_material_resource_editable {
 	bool point_blank_ricochets = false;
 	real32 penetrability = 1.0f;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_material_resource_editable&) const = default;
 };
 
 struct editor_material_resource {

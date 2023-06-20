@@ -5,6 +5,11 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- lifting system
+	- small/light objects become part of the player fixtures exactly as they were picked, LPM then throws and RPM puts down
+	- large objects can only be pulled
+		- some simple joint could be at work or just bidirectional seeking behavior
+
 - Fun idea for crouch-behind implementation
 	- A shoot-through surface becomes non-see-through when we're close to it while crouching
 		- It becomes see through immediately when we aim towards it (simple raycast test)

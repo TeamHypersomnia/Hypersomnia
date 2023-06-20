@@ -82,6 +82,8 @@ struct aquarium_prefab_node {
 	rgba top_lamp_color = rgba(0, 179, 255, 0);
 	rgba sand_lamp_color = rgba(0, 99, 126, 255);
 	// END GEN INTROSPECTOR
+
+	bool operator==(const aquarium_prefab_node&) const = default;
 };
 
 struct editor_prefab_node_editable {
@@ -92,4 +94,6 @@ struct editor_prefab_node_editable {
 
 	aquarium_prefab_node as_aquarium;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_prefab_node_editable&) const = default;
 };

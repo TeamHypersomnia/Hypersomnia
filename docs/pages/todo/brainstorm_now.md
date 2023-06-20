@@ -6,6 +6,51 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- To be completely honest we don't even have to approach the variantization 100%
+    - although we indeed have to detect which mode it is
+        - so at least this should be through the variant
+
+- Not sure if we approach the game modes correctly
+    - Note our modes will have an insane amount of shared functionality
+        - We would have to include 
+    - It might be easier to have just a single god-mode (no pun intended)
+        - and just specify separate win conditions
+            - otherwise we'll end up repeating compilation of the same code across all .cpps and bloat both compilation time and exe
+    - What if we had some kind of a visitor? Or a variant?
+    - Let's have one "god" game mode called team based or something
+        - and the round states etc have variants
+        - variants are declared in one place and they have some functions
+
+    - Actually just call it arena mode
+        - surf/racing aren't "arenas", these will be the only not found in the variants
+
+    - Q1: how does arena_mode.cpp know what mode it actually is?
+        - Ruleset will be the first to determine it
+        - Simply std::variant<bomb_defusal_state, gun_game_state> specific_mode;
+            - mode-specific info will probably be inside 
+    - Q2: how do we abstract it from the editor and UX?
+        - the modes are now either standalone.. (test_mode, racing_mode)
+            - ..or arena_mode submodes (like bomb_defusal, gun_game etc.)
+                - without arena_mode being counted itself too
+        - so we can't easily call for_each_game_mode
+        - As for the editor, we anyway have separate editor structs (thank lord)
+            - so it will be transparent
+        - the only problem will then be in building game modes from editor modes
+    - Q3: Cases of variantization? Won't we have too many calls to visit?
+        - we'll have simple accessors like on_mode_state, on_round_state
+        - Cases
+            - Round transferred state (and application)
+                - Most of the cases it will be the same though - transfer entire equipment
+                - We could preserve this behavior for gg too but just replace the equipment later
+                    - Simple, just clear all items except personal deposit
+            - Ruleset
+            - Mode state
+            - Round state
+                - bomb entity id etc
+            - Faction state
+                - If we need per-round per-faction state we'll simply reset this part of faction state per round
+            - Player state
+    
 - current_arena -> arena/map
 
 - How do we go from here?
@@ -31,51 +76,6 @@ summary: That which we are brainstorming at the moment.
         - however I'd argue these things won't really be editable
             - at most a map can e.g. override some sound files by path
 
-- To be completely honest we don't even have to approach the variantization 100%
-    - although we indeed have to detect which mode it is
-        - so at least this should be through the variant
-
-- Not sure if we approach the game modes correctly
-    - Note our modes will have an insane amount of shared functionality
-        - We would have to include 
-    - It might be easier to have just a single god-mode (pun intended)
-        - and just specify separate win conditions
-            - otherwise we'll end up repeating compilation of the same code across all .cpps and bloat both compilation time and exe
-    - What if we had some kind of a visitor? Or a variant?
-    - Let's have one "god" game mode called team based or something
-        - and the round states etc have variants
-        - variants are declared in one place and they have some functions
-
-    - Actually just call it arena mode
-        - surf/racing aren't "arenas", these will be the only not found in the variants
-
-    - Q1: how does arena_mode.cpp know what mode it actually is?
-        - Ruleset will be the first to determine it
-        - Simply std::variant<bomb_defusal_state, gun_game_state> specific_mode;
-            - ode-specific info will probably be inside 
-    - Q2: how do we abstract it from the editor and UX?
-        - the modes are now either standalone.. (test_mode, racing_mode)
-            - ..or arena_mode submodes (like bomb_defusal, gun_game etc.)
-                - without arena_mode being counted itself too
-        - so we can't easily call for_each_game_mode
-        - As for the editor, we anyway have separate editor structs (thank lord)
-            - so it will be transparent
-        - the only problem will then be in building game modes from editor modes
-    - Q3: Cases of variantization? Won't we have too many calls to visit?
-        - we'll have simple accessors like on_mode_state, on_round_state
-        - Cases
-            - Round transferred state (and application)
-                - Most of the cases it will be the same though - transfer entire equipment
-                - We could preserve this behavior for gg too but just replace the equipment later
-                    - Simple, just clear all items except personal deposit
-            - Ruleset
-            - Mode state
-            - Round state
-                - bomb entity id etc
-            - Faction state
-                - If we need per-round per-faction state we'll simply reset this part of faction state per round
-            - Player state
-    
 
 - server should send the list of maps it has to the rcon
 

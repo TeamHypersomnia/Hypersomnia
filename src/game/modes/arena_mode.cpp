@@ -2533,16 +2533,7 @@ float arena_mode::get_match_begins_in_seconds(const const_input_type in) const {
 		const auto warmup_secs = static_cast<float>(in.rules.warmup_secs);
 
 		if (secs >= warmup_secs) {
-			// TODO: Remove this once we fix the map format
-			const auto match_begins_in_secs = [&]() {
-				if (in.rules.name.find("de_labs2")) {
-					return 5.f;
-				}
-
-				return match_begins_in_secs_v;
-			}();
-
-			/* It's after the warmup. */
+			const auto match_begins_in_secs = match_begins_in_secs_v;
 			return warmup_secs + match_begins_in_secs - secs;
 		}
 	}

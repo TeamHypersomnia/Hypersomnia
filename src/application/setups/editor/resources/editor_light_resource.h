@@ -8,6 +8,8 @@ struct editor_light_resource_editable {
 	// GEN INTROSPECTOR struct editor_light_resource_editable
 	bool dummy = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_light_resource_editable&) const = default;
 };
 
 struct editor_light_node;

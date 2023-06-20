@@ -11,6 +11,8 @@ struct editor_wandering_pixels_resource_editable {
 	components::wandering_pixels node_defaults;
 	vec2i default_size;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_wandering_pixels_resource_editable&) const = default;
 };
 
 struct editor_wandering_pixels_node;

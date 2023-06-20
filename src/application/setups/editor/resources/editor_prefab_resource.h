@@ -14,6 +14,8 @@ struct editor_prefab_resource_editable {
 
 	editor_prefab_node_editable default_node_properties;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_prefab_resource_editable&) const = default;
 };
 
 struct editor_prefab_node;

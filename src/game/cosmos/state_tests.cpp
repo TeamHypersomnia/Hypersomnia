@@ -15,8 +15,6 @@
 #include "game/organization/all_component_includes.h"
 #include "game/organization/for_each_component_type.h"
 
-#include "augs/templates/introspection_utils/rewrite_members.h"
-
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/log_path_getters.h"

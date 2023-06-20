@@ -23,45 +23,12 @@
 class cosmos;
 struct cosmos_solvable_significant;
 
-struct arena_mode_faction_rules {
-	// GEN INTROSPECTOR struct arena_mode_faction_rules
-	requested_equipment round_start_eq;
-	requested_equipment warmup_initial_eq;
-	// END GEN INTROSPECTOR
-};
-
-struct arena_mode_economy_rules {
-	// GEN INTROSPECTOR struct arena_mode_economy_rules
-	money_type initial_money = 2000;
-	money_type maximum_money = 20000;
-	money_type warmup_initial_money = 20000;
-
-	money_type losing_faction_award = 1700;
-	money_type winning_faction_award = 3700;
-	money_type consecutive_loss_bonus = 500;
-	unsigned max_consecutive_loss_bonuses = 4;
-
-	money_type team_kill_penalty = 1000;
-
-	money_type lost_but_bomb_planted_team_bonus = 800;
-	money_type defused_team_bonus = 1200;
-
-	money_type bomb_plant_award = 600;
-	money_type bomb_explosion_award = 1000;
-	money_type bomb_defuse_award = 1000;
-
-	bool give_extra_mags_on_first_purchase = true;
-	// END GEN INTROSPECTOR
-};
-
 class arena_mode;
 
 struct arena_mode_ruleset {
 	using mode_type = arena_mode;
 
 	// GEN INTROSPECTOR struct arena_mode_ruleset
-	std::string name = "Unnamed bomb mode ruleset";
-
 	std::vector<entity_name_str> bot_names;
 	std::vector<rgba> player_colors;
 
@@ -69,19 +36,19 @@ struct arena_mode_ruleset {
 	rgba default_player_color = orange;
 
 	bool enable_player_colors = true;
-	unsigned bot_quota = 8;
+	uint32_t bot_quota = 8;
 
-	unsigned allow_spawn_for_secs_after_starting = 10;
-	unsigned max_players_per_team = 32;
-	unsigned round_secs = 120;
-	unsigned round_end_secs = 5;
-	unsigned freeze_secs = 10;
-	unsigned buy_secs_after_freeze = 30;
-	unsigned warmup_secs = 45;
-	unsigned warmup_respawn_after_ms = 2000;
-	unsigned max_rounds = 30;
-	unsigned match_summary_seconds = 15;
-	unsigned game_commencing_seconds = 3;
+	uint32_t allow_spawn_for_secs_after_starting = 10;
+	uint32_t max_players_per_team = 32;
+	uint32_t round_secs = 120;
+	uint32_t round_end_secs = 5;
+	uint32_t freeze_secs = 10;
+	uint32_t buy_secs_after_freeze = 30;
+	uint32_t warmup_secs = 45;
+	uint32_t warmup_respawn_after_ms = 2000;
+	uint32_t max_rounds = 30;
+	uint32_t match_summary_seconds = 15;
+	uint32_t game_commencing_seconds = 3;
 	meter_value_type minimal_damage_for_assist = 41;
 	per_actual_faction<arena_mode_faction_rules> factions;
 
@@ -189,12 +156,6 @@ struct arena_mode_player {
 		return arena_player_order_info { get_chosen_name(), stats.calc_score() };
 	}
 };
-
-using cosmos_clock = augs::stepped_clock;
-
-using arena_mode_win = arena_mode_win;
-using arena_mode_knockout = arena_mode_knockout;
-using arena_mode_knockouts_vector = arena_mode_knockouts_vector;
 
 struct arena_mode_round_state {
 	// GEN INTROSPECTOR struct arena_mode_round_state
@@ -405,7 +366,7 @@ private:
 	std::map<mode_player_id, player_type> players;
 	arena_mode_round_state current_round;
 
-	cosmos_clock clock_before_setup;
+	augs::stepped_clock clock_before_setup;
 	real32 commencing_timer_ms = -1.f;
 
 	bool had_first_blood = false;

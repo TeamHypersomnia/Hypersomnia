@@ -9,6 +9,8 @@ struct editor_explosive_resource_editable {
 	// GEN INTROSPECTOR struct editor_explosive_resource_editable
 	bool dummy = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_explosive_resource_editable&) const = default;
 };
 
 struct editor_explosive_node;

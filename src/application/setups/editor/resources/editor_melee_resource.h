@@ -9,6 +9,8 @@ struct editor_melee_resource_editable {
 	// GEN INTROSPECTOR struct editor_melee_resource_editable
 	bool dummy = false;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_melee_resource_editable&) const = default;
 };
 
 struct editor_melee_node;

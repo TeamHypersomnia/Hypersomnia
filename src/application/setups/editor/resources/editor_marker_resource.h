@@ -10,6 +10,8 @@ struct editor_point_marker_resource_editable {
 	// GEN INTROSPECTOR struct editor_point_marker_resource_editable
 	point_marker_type type = point_marker_type::TEAM_SPAWN;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_point_marker_resource_editable&) const = default;
 };
 
 struct editor_point_marker_node;
@@ -35,6 +37,8 @@ struct editor_area_marker_resource_editable {
 	area_marker_type type = area_marker_type::BOMBSITE;
 	editor_area_marker_node_editable node_defaults;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_area_marker_resource_editable&) const = default;
 };
 
 struct editor_area_marker_node;

@@ -21,8 +21,5 @@ namespace test_scenes {
 				)
 			);
 		}
-
-		void setup(test_mode_ruleset&);
-		void setup(arena_mode_ruleset&);
 	};
 }

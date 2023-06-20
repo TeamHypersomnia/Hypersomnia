@@ -6,7 +6,6 @@
 #include "game/cosmos/entity_handle.h"
 
 #include "augs/misc/machine_entropy.h"
-#include "augs/templates/introspection_utils/rewrite_members.h"
 #include "game/cosmos/entropy_recording_options.h"
 
 

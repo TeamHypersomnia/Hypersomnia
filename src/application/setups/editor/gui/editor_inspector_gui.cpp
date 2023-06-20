@@ -21,7 +21,6 @@
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/resources/resource_traits.h"
-#include "augs/templates/introspection_utils/introspective_equal.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "test_scenes/test_scene_flavours.h"
 #include "application/setups/debugger/property_debugger/widgets/non_standard_shape_widget.h"
@@ -2369,7 +2368,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 				const bool multiple = cmd.entries.size() > 1;
 
 				for (std::size_t i = 0; i < cmd.entries.size(); ++i) {
-					if (!augs::introspective_equal(hypothetical_defaults[i], cmd.entries[i].after)) {
+					if (!(hypothetical_defaults[i] == cmd.entries[i].after)) {
 						already_default = false;
 						break;
 					}
@@ -2669,7 +2668,7 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 
 		auto do_reset_button_for_project_settings = [&](auto cmd, auto& defaults, auto& edited_copy, const auto label) {
 			::setup_project_defaults(defaults, project.get_game_modes(), official_map);
-			const bool already_default = augs::introspective_equal(defaults, edited_copy);
+			const bool already_default = defaults == edited_copy;
 
 			if (reset_button(already_default, false)) {
 				cmd.after = defaults;

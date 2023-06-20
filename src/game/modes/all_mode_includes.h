@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include "game/modes/test_mode.h"
 #include "game/modes/arena_mode.h"
+#include "game/modes/arena_submodes.h"
 
 #include "augs/templates/per_type.h"
 #include "augs/templates/type_in_list_id.h"
