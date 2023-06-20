@@ -287,10 +287,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 					http_client.set_read_timeout(5);
 					http_client.set_write_timeout(5);
 
-					const auto game_mode_name = data.game_mode.dispatch([](auto d) {
-						using D = decltype(d);
-						return format_field_name(get_type_name<D>());
-					});
+					const auto game_mode_name = std::string(data.game_mode);
 
 					auto items = discord_webhooks::form_new_community_server(
 						"Server list",

@@ -230,4 +230,8 @@ public:
 	}
 
 	void remove_old_lying_items(input, logic_step);
+
+	game_mode_name_type get_name(const_input) const {
+		return "Test mode";
+	}
 };

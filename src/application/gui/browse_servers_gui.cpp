@@ -419,13 +419,8 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 
 		ImGui::NextColumn();
 
-		if (d.game_mode.is_set()) {
-			const auto game_mode_name = d.game_mode.dispatch([](auto d) {
-				using D = decltype(d);
-				return format_field_name(get_type_name<D>());
-			});
-
-			do_text(game_mode_name);
+		if (d.game_mode.size() > 0) {
+			do_text(std::string(d.game_mode));
 		}
 		else {
 			do_text("<unknown>");

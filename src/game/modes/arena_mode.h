@@ -569,4 +569,6 @@ public:
 
 	void handle_duel_desertion(input, logic_step, const mode_player_id&);
 	void report_match_result(input, logic_step);
+
+	game_mode_name_type get_name(const_input) const;
 };

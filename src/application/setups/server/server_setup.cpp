@@ -211,7 +211,7 @@ bool server_heartbeat::is_valid() const {
 		return false;
 	}
 
-	return max_online >= 2 && !server_name.empty() && !current_arena.empty();
+	return max_online >= 2 && !server_name.empty() && !current_arena.empty() && !game_mode.empty();
 }
 
 template <class F>
@@ -615,10 +615,9 @@ void server_setup::send_heartbeat_to_server_list() {
 	heartbeat.nat = nat_traversal.last_detected_nat;
 	heartbeat.server_name = vars.server_name;
 	heartbeat.current_arena = solvable_vars.current_arena;
-	heartbeat.game_mode = arena.on_mode(
-		[&](const auto& m) {
-			using M = remove_cref<decltype(m)>;
-			return mode_type_id::of<M>();
+	heartbeat.game_mode = arena.on_mode_with_input(
+		[&](const auto& mode, const auto& input) {
+			return mode.get_name(input);
 		}
 	);
 

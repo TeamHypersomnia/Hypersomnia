@@ -2,7 +2,9 @@
 #include "game/organization/special_flavour_id_types.h"
 
 struct bomb_defusal_ruleset {
-
+	// GEN INTROSPECTOR struct bomb_defusal_ruleset
+	bool dummy = false;
+	// END GEN INTROSPECTOR
 };
 
 struct gun_game_ruleset {

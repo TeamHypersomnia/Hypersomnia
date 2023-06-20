@@ -3084,3 +3084,6 @@ void arena_mode::clear_duel() {
 	duellist_2 = mode_player_id::dead();
 }
 
+game_mode_name_type arena_mode::get_name(const_input) const {
+	return "Bomb defusal";
+}
