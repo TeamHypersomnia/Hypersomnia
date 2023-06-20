@@ -2,6 +2,7 @@
 #include "augs/ensure.h"
 #include "augs/templates/traits/triviality_traits.h"
 #include "augs/templates/container_templates.h"
+#include "augs/templates/enum_introspect.h"
 
 namespace augs {
 	namespace event {
@@ -468,5 +469,19 @@ namespace augs {
 				return key::INVALID;
 			}
 		}
+	}
+}
+
+namespace augs {
+	template <>
+	std::string enum_to_string(event::keys::key k) {
+		auto str = event::keys::key_to_string(event::keys::key(k));
+		erase_if(str, [](const auto ch) { return ch == ' '; });
+		return str;
+	}
+
+	template <>
+	std::string enum_to_string(event::message k) {
+		return event::message_to_string(event::message(k));
 	}
 }

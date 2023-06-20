@@ -12,6 +12,7 @@
 #include "application/setups/editor/editor_filesystem_node_type.h"
 #include "augs/string/path_sanitization.h"
 #include "augs/string/to_forward_slashes.h"
+#include "view/necessary_image_id.h"
 
 namespace augs {
 	bool natural_order(const std::string& a, const std::string& b);

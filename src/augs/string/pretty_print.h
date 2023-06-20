@@ -68,13 +68,10 @@ S& pretty_print(S& os, const T& val) {
 			os << static_cast<std::underlying_type_t<T>>(val);
 		};
 
+		(void)write_underlying;
+
 #if ENUM_INTROSPECT_INCLUDED
-		if constexpr(has_enum_to_string_v<T>) {
-			os << augs::enum_to_string(val);
-		}
-		else {
-			write_underlying();
-		}
+		os << augs::enum_to_string(val);
 #else
 		write_underlying();
 #endif

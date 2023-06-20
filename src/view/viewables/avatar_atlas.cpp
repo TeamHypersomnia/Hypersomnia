@@ -3,7 +3,6 @@
 
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/image_definition.h"
-#include "augs/templates/introspect.h"
 
 avatar_atlas_output create_avatar_atlas(avatar_atlas_input in) {
 	thread_local atlas_input_subjects atlas_subjects;

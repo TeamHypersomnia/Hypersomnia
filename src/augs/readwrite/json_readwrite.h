@@ -77,8 +77,6 @@ namespace augs {
 			}
 		}
 		else if constexpr(std::is_enum_v<T>) {
-			static_assert(has_enum_to_string_v<T>, "This enum does not provide a an enum_to_string overload.");
-
 			if (from.IsString()) {
 				const auto stringized_enum = from.GetString();
 
@@ -304,8 +302,6 @@ namespace augs {
 			to.Uint(from);
 		}
 		else if constexpr(std::is_enum_v<T>) {
-			static_assert(has_enum_to_string_v<T>, "This enum does not provide a an enum_to_string overload.");
-
 			to.String(enum_to_string(from));
 		}
 		else {

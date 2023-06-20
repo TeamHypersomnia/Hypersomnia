@@ -1,6 +1,5 @@
 #include "augs/drawing/drawing.h"
 #include "augs/drawing/drawing.hpp"
-#include "augs/templates/introspect.h"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"

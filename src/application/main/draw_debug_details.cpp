@@ -1,5 +1,4 @@
 #include "augs/gui/text/printer.h"
-#include "augs/templates/introspect.h"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
@@ -11,6 +10,8 @@
 #include "application/session_profiler.h"
 #include "application/main/draw_debug_details.h"
 #include "augs/network/network_types.h"
+
+#include "augs/templates/introspect.h"
 
 #include "build_info.h"
 

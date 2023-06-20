@@ -1,6 +1,7 @@
 #include "augs/string/string_templates.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/path_tree_structs.h"
+#include "augs/filesystem/path.h"
 
 void path_tree_settings::do_tweakers() {
 	using namespace augs::imgui;

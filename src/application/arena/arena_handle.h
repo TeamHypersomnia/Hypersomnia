@@ -5,6 +5,9 @@
 #include "view/game_drawing_settings.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 
+class test_mode;
+struct intercosm;
+
 struct arena_paths;
 struct game_drawing_settings;
 

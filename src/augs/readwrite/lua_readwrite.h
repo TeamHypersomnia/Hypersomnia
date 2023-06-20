@@ -59,30 +59,23 @@ namespace augs {
 			}
 		}
 		else if constexpr(std::is_enum_v<T>) {
-			if constexpr(has_enum_to_string_v<T>) {
-				if (object.is<std::string>()) {
-					const auto stringized_enum = object.as<std::string>();
+			if (object.is<std::string>()) {
+				const auto stringized_enum = object.as<std::string>();
 
-					if (
-						const auto* enumized = mapped_or_nullptr(
-							get_string_to_enum_map<T>(), 
-							stringized_enum
-						)
-					) {
-						into = *enumized;
-					}
-					else {
-						LOG(
-							"Failed to read \"%x\" into %x enum. Check if such option exists, or if spelling is correct.",
-							stringized_enum,
-							get_type_name<T>()
-						);
-					}
+				if (
+					const auto* enumized = mapped_or_nullptr(
+						get_string_to_enum_map<T>(), 
+						stringized_enum
+					)
+				) {
+					into = *enumized;
 				}
-			}
-			else {
-				if (object.is<int>()) {
-					into = static_cast<T>(object.as<int>());
+				else {
+					LOG(
+						"Failed to read \"%x\" into %x enum. Check if such option exists, or if spelling is correct.",
+						stringized_enum,
+						get_type_name<T>()
+					);
 				}
 			}
 		}
@@ -361,12 +354,7 @@ namespace augs {
 			return field;
 		}
 		else if constexpr(std::is_enum_v<T>) {
-			if constexpr(has_enum_to_string_v<T>) {
-				return enum_to_string(field);
-			}
-			else {
-				return static_cast<int>(field);
-			}
+			return enum_to_string(field);
 		}
 		else {
 			static_assert(always_false_v<T>, "Non-exhaustive to_lua_representation");

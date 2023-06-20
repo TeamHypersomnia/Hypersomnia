@@ -6,7 +6,6 @@
 #include "augs/templates/for_each_type.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/introspection_traits.h"
-#include "augs/templates/traits/enum_introspection_traits.h"
 
 #include "augs/templates/introspect_declaration.h"
 

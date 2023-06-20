@@ -7,6 +7,8 @@ header-files:
 @HYPERSOMNIA_HEADERS_WITH_INTROSPECTED_CLASSES_NEWLINE_SEPARATED@
 generated-file-path:
 @GENERATED_SOURCES_PATH@/introspectors.h
+generated-enums-path:
+@GENERATED_SOURCES_PATH@/enums.cpp
 generated-specializations-path:
 @GENERATED_SOURCES_PATH@/specializations.h
 introspector-field-format:
@@ -27,17 +29,20 @@ struct types_in<%x, __T>{
 };
 
 enum-field-format:
-		case T::%x: return "%x";
+"%x",
 enum-introspector-body-format:
-	template <class... A>
-	const char* enum_to_string(const %x e, A...) {
-		/* Make dependent */
-		using T = std::conditional_t<sizeof...(A) == 0, decltype(e), int>;
+template <>
+const char* ets_i<%x>(int32_t e) {
+	constexpr std::array<const char*, %x> vals = {
+		%x
+	};
 
-		switch(e) {
-%x		default: return "UnknownEnumValue";
-		}
+	if (e < %x) {
+		return vals[e];
 	}
+
+	return "UnknownEnumValue";
+}
 
 enum-arg-format:
 enum-to-args-body-format:
@@ -61,39 +66,12 @@ generated-file-format:
 
 // Forward declarations
 
-namespace augs {
-	namespace event {
-		enum class message;
-		std::string message_to_string(const message);
-		
-		namespace keys {
-			enum class key;
-			std::string key_to_string(const key);
-		}
-	}
-}
-
 struct ImGuiStyle;
 struct ImVec2;
 struct ImVec4;
 
 %xnamespace augs {
-	/* Hand-written enum introspectors that do not fit into the standard schema begin here */
-
-	template <class... T>
-	std::string enum_to_string(const event::keys::key k, T...) {
-		auto str = event::keys::key_to_string(k);
-		erase_if(str, [](const auto ch) { return ch == ' '; });
-		return str;
-	}
-	
-	template <class... T>
-	std::string enum_to_string(const event::message k, T...) {
-		return event::message_to_string(k);
-	}
-
-	/* Generated introspectors begin here */
-%x	struct introspection_access {
+	struct introspection_access {
 		template <class T, class B>
 		struct types_in;
 

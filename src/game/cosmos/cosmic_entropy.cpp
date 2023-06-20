@@ -1,6 +1,5 @@
 #include "augs/templates/logically_empty.h"
 #include "augs/templates/container_templates.h"
-#include "augs/templates/introspect.h"
 #include "cosmic_entropy.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"

@@ -5,7 +5,6 @@
 #include "augs/enums/callback_result.h"
 #include "augs/build_settings/compiler_defines.h"
 
-#include "augs/templates/introspect_declaration.h"
 #include "augs/templates/maybe_const.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
@@ -44,6 +43,9 @@ public:
 	
 	template <class F>
 	void for_each_child_entity_recursive(F&& callback) const {
+		(void)callback;
+
+#if 0
 		const auto self = *static_cast<const entity_handle_type*>(this);
 		auto& cosm = self.get_cosmos();
 
@@ -63,6 +65,7 @@ public:
 				);
 			}
 		);
+#endif
 	}
 
 	void map_child_entity(const child_entity_name n, const entity_id p) const;

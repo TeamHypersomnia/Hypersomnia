@@ -1,4 +1,4 @@
-#include "augs/templates/introspect.h"
+#include "augs/templates/enum_introspect.h"
 #include "augs/string/string_templates.h"
 
 #include "augs/gui/button_corners.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/templates/introspect.h"
+#include "augs/templates/enum_introspect.h"
 #include "augs/string/string_templates_declaration.h"
 
 template <class Enum>

@@ -29,7 +29,7 @@ using sprite_size_type = vec2i;
 namespace augs {
 	enum class sprite_special_effect /* : unsigned char */ {
 		// GEN INTROSPECTOR enum class augs::sprite_special_effect
-		NONE = 0,
+		NONE,
 		COLOR_WAVE,
 		CONTINUOUS_ROTATION,
 		COUNT
