@@ -54,8 +54,6 @@ cosmos& cosmos::operator=(const cosmos& b) {
 	return *this;
 }
 
-const cosmos cosmos::zero = {};
-
 template <class T>
 T cosmos::calculate_solvable_signi_hash() const {
 	if constexpr(std::is_same_v<T, uint32_t>) {
@@ -133,6 +131,10 @@ rng_seed_type cosmos::get_nontemporal_rng_seed_for(const entity_id id) const {
 
 bool cosmos::empty() const {
 	return get_solvable().empty();
+}
+
+bool cosmos::completely_unset() const {
+	return empty() && get_common_significant().flavours.size() == 0;
 }
 
 void cosmos::set(const cosmos_solvable_significant& new_signi) {

@@ -34,6 +34,8 @@ class project_selector_setup : public default_setup_settings {
 	bool rebuild_miniatures = true;
 	ad_hoc_entry_id miniature_index_counter = 0;
 
+	cosmos zero_cosm;
+
 	void scan_for_all_arenas();
 
 	bool create_new_project_files();
@@ -63,7 +65,7 @@ public:
 	}
 
 	const auto& get_viewed_cosmos() const {
-		return cosmos::zero;
+		return zero_cosm;
 	}
 
 	auto get_interpolation_ratio() const {

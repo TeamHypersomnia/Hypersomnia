@@ -33,8 +33,6 @@ public:
 	/* A detail only for performance benchmarks */
 	mutable cosmic_profiler profiler;
 
-	static const cosmos zero;
-
 	cosmos();
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 
@@ -201,6 +199,7 @@ public:
 	}
 	
 	bool empty() const;
+	bool completely_unset() const;
 
 	/*
 		Shortcuts for heavily used functions for sanity

@@ -33,7 +33,7 @@ void debug_details_summaries::acquire(
 	session_performance.summary(session);
 	audiovisual_performance.summary(audiovisual);
 
-	if (std::addressof(cosm) == std::addressof(cosmos::zero)) {
+	if (cosm.completely_unset()) {
 		cosmic.clear();
 	}
 	else {

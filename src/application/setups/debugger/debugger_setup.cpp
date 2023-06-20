@@ -67,7 +67,7 @@ double debugger_setup::get_audiovisual_speed() const {
 }
 
 const cosmos& debugger_setup::get_viewed_cosmos() const {
-	return anything_opened() ? work().world : cosmos::zero; 
+	return anything_opened() ? work().world : zero_cosmos; 
 }
 
 double debugger_setup::get_interpolation_ratio() const {

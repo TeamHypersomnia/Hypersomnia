@@ -1612,7 +1612,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				case custom_imgui_result::OPEN_SELECTED_PROJECT:
 					if constexpr(std::is_same_v<S, project_selector_setup>) {
-						auto backup = setup;
+						auto backup = std::make_unique<setup_variant>(setup);
 
 						const auto path = setup.get_selected_project_path();
 
@@ -1623,7 +1623,7 @@ work_result work(const int argc, const char* const * const argv) try {
 							const auto full_content = typesafe_sprintf("Failed to load: %x\nReason:\n\n%x", path, err.what());
 							failed_to_load_arena_popup = simple_popup { "Error", full_content, "" };
 
-							current_setup = std::make_unique<setup_variant>(std::move(backup));
+							current_setup = std::move(backup);
 						}
 					}
 
@@ -3363,7 +3363,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			const auto viewed_character = get_viewed_character();
 			const auto& viewed_cosmos = viewed_character.get_cosmos();
-			const bool non_zero_cosmos = std::addressof(viewed_cosmos) != std::addressof(cosmos::zero);
+			const bool non_zero_cosmos = !viewed_cosmos.completely_unset();
 
 			auto enqueue_visibility_jobs = [&]() {
 				const auto& interp = get_audiovisuals().get<interpolation_system>();

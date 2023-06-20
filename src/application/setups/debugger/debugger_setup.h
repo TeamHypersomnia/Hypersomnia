@@ -87,6 +87,8 @@ class debugger_setup : public arena_gui_mixin<debugger_setup> {
 	friend debugger_summary_gui;
 	friend debugger_coordinates_gui;
 
+	cosmos zero_cosmos;
+
 	double global_time_seconds = 0.0;
 
 	entropy_accumulator total_collected;

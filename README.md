@@ -111,7 +111,7 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
 - Networking is based on **cross-platform simulation determinism**. 
   - This technique is traditionally used by RTS games with hundreds of continuously moving soldier units. 
     - It is impractical to continuously update every single one of them through the network. 
-    - Instead, only the player inputs are transmitted ("I clicked here", "I gave this command") - the clients simulate *everything else* locally, on their own. Think playing chess with your friend over the phone. You won't ever say aloud the entire state of the chessboard, only the movements ("Queen to H5").
+    - Instead, only the player inputs are transmitted ("I moved mouse here", "I pressed this button") - the clients simulate *everything else* locally, on their own. Think playing chess with your friend over the phone. You won't ever say aloud the entire state of the chessboard, only the movements ("Queen to H5").
   - But *Hypersomnia* is not an RTS - since it's physics-based, it uses *floats* heavily, not just *integers*.
     - When floating point calculations are involved, simulation determinism becomes [extremely hard.](https://gafferongames.com/post/floating_point_determinism/)
     - To achieve it in *Hypersomnia*, I had to: 
