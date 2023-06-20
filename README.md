@@ -22,7 +22,7 @@ Forever free and open-source :heart:
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" height=70 hspace=1 vspace=20> </a>
 <br undefined>
 
-Only 40 MB!
+Only 25 MB!
 
 *Archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
 
