@@ -15,7 +15,8 @@ struct fog_of_war_appearance_settings {
 enum class offscreen_reference_type {
 	// GEN INTROSPECTOR enum class offscreen_reference_type
 	SCREEN_CENTER,
-	CHARACTER_POSITION
+	CHARACTER_POSITION,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

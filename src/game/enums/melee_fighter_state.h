@@ -6,6 +6,7 @@ enum class melee_fighter_state {
 	IN_ACTION,
 	RETURNING,
 	CLASH_RETURNING,
-	COOLDOWN
+	COOLDOWN,
+	COUNT
 	// END GEN INTROSPECTOR
 };

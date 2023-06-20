@@ -11,7 +11,8 @@ enum class crosshair_orbit_type {
 	// GEN INTROSPECTOR enum class crosshair_orbit_type
 	NONE,
 	ANGLED,
-	LOOK
+	LOOK,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

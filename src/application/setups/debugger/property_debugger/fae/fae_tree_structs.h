@@ -10,7 +10,8 @@
 enum class fae_view_type {
 	// GEN INTROSPECTOR enum class fae_view_type
 	FLAVOURS,
-	ENTITIES
+	ENTITIES,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

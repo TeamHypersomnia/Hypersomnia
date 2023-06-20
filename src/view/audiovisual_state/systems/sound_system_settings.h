@@ -12,7 +12,8 @@ enum class sound_processing_frequency {
 enum class listener_position_reference {
 	// GEN INTROSPECTOR enum class listener_position_reference
 	SCREEN_CENTER,
-	CHARACTER_POSITION
+	CHARACTER_POSITION,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

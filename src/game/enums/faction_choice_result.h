@@ -9,7 +9,8 @@ enum class faction_choice_result {
 	TEAM_IS_FULL,
 	GAME_IS_FULL,
 	NEED_TO_BE_ALIVE_FOR_SPECTATOR,
-	CHANGED
+	CHANGED,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

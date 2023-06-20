@@ -3,7 +3,7 @@
 
 enum class test_scene_image_id {
 	// GEN INTROSPECTOR enum class test_scene_image_id
-	BLANK = 0,
+	BLANK,
 
 	BLANK_2X2,
 

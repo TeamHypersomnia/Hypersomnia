@@ -4,7 +4,8 @@
 
 enum class editor_builtin_prefab_type {
 	// GEN INTROSPECTOR enum class editor_builtin_prefab_type
-	AQUARIUM
+	AQUARIUM,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

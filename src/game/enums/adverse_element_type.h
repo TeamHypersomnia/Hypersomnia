@@ -7,7 +7,8 @@ enum class adverse_element_type /* : unsigned char */ {
 	PED,
 	INTERFERENCE,
 	FLASH,
-	SMOKE
+	SMOKE,
+	COUNT
 
 	// END GEN INTROSPECTOR
 };

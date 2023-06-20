@@ -56,7 +56,8 @@
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
 	MAIN_MENU,
-	LAST_ACTIVITY
+	LAST_ACTIVITY,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 
@@ -80,7 +81,6 @@ enum class activity_type {
 
 	CLIENT_AND_SERVER,
 	TWO_CLIENTS_AND_SERVER,
-
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -13,6 +13,7 @@ enum class buy_menu_type {
 	GRENADES,
 	SPELLS,
 	ARMORS,
-	TOOLS
+	TOOLS,
+	COUNT
 	// END GEN INTROSPECTOR
 };

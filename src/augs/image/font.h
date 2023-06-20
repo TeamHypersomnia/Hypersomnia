@@ -105,7 +105,8 @@ namespace augs {
 		// GEN INTROSPECTOR enum class augs::ranges_add_condition
 		ALWAYS,
 		NEVER,
-		ONLY_IN_PRODUCTION
+		ONLY_IN_PRODUCTION,
+		COUNT
 		// END GEN INTROSPECTOR enum class ranges_add_condition
 	};
 

@@ -32,7 +32,8 @@ namespace augs {
 enum class gun_special_state {
 	// GEN INTROSPECTOR enum class gun_special_state
 	NONE,
-	AFTER_BURST
+	AFTER_BURST,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

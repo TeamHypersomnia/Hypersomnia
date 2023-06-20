@@ -40,18 +40,7 @@ enum-introspector-body-format:
 	}
 
 enum-arg-format:
-			T::%x
 enum-to-args-body-format:
-	template <class F>
-	void enum_to_args_impl(const %x e, F f) {
-		/* Make dependent */
-		using T = std::conditional_t<std::is_same_v<F, int>, int, decltype(e)>;
-
-		f(
-%x		);
-	}
-
-
 generated-file-format:
 #pragma once
 #include <tuple>

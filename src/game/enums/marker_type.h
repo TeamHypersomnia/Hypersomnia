@@ -15,7 +15,8 @@ enum class point_marker_type {
 	// GEN INTROSPECTOR enum class point_marker_type
 	TEAM_SPAWN,
 	FFA_SPAWN,
-	PLAYTESTING_SPAWN
+	PLAYTESTING_SPAWN,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 
@@ -29,7 +30,8 @@ enum class area_marker_type {
 	PORTAL,
 
 	CALLOUT,
-	PREFAB
+	PREFAB,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

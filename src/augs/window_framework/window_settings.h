@@ -9,7 +9,8 @@ namespace augs {
 		// GEN INTROSPECTOR enum class augs::vsync_type
 		OFF,
 		ON,
-		ADAPTIVE
+		ADAPTIVE,
+		COUNT
 		// END GEN INTROSPECTOR
 	};
 
@@ -18,7 +19,8 @@ namespace augs {
 		SLEEP,
 		SLEEP_ZERO,
 		YIELD,
-		BUSY
+		BUSY,
+		COUNT
 		// END GEN INTROSPECTOR
 	};
 

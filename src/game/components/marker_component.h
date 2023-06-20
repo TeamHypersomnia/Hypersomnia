@@ -6,7 +6,8 @@
 enum class marker_shape_type {
 	// GEN INTROSPECTOR enum class marker_shape_type
 	BOX,
-	CIRCLE
+	CIRCLE,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 
@@ -33,7 +34,8 @@ enum class force_field_falloff {
 	NONE,
 	LINEAR,
 	QUADRATIC,
-	SQRT
+	SQRT,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 
@@ -42,7 +44,8 @@ enum class force_field_direction {
 	FIELD_DIRECTION,
 	INWARD,
 	OUTWARD,
-	CIRCULAR
+	CIRCULAR,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

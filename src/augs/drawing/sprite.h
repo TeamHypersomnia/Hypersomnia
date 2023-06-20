@@ -31,7 +31,8 @@ namespace augs {
 		// GEN INTROSPECTOR enum class augs::sprite_special_effect
 		NONE = 0,
 		COLOR_WAVE,
-		CONTINUOUS_ROTATION
+		CONTINUOUS_ROTATION,
+		COUNT
 		// END GEN INTROSPECTOR
 	};
 

@@ -6,7 +6,8 @@ enum class interaction_result_type {
 	IN_RANGE_BUT_CANT,
 
 	CAN_BEGIN,
-	IN_PROGRESS
+	IN_PROGRESS,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

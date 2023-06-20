@@ -6,7 +6,8 @@
 enum class swap_buffers_moment {
 	// GEN INTROSPECTOR enum class swap_buffers_moment
 	AFTER_HELPING_LOGIC_THREAD,
-	AFTER_GL_COMMANDS
+	AFTER_GL_COMMANDS,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

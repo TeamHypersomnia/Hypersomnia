@@ -8,7 +8,8 @@ namespace augs {
 		NONE,
 		JUMPING,
 		MARKING,
-		REMOVING
+		REMOVING,
+		COUNT
 		// END GEN INTROSPECTOR
 	};
 

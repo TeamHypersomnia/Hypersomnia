@@ -6,6 +6,7 @@ enum class gun_action_type /* : unsigned char */ {
 
 	BOLT_ACTION,
 	SEMI_AUTOMATIC,
-	AUTOMATIC
+	AUTOMATIC,
+	COUNT
 	// END GEN INTROSPECTOR
 };

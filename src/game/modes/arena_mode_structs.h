@@ -23,7 +23,8 @@ enum class arena_mode_state {
 	WARMUP,
 	LIVE,
 	ROUND_END_DELAY,
-	MATCH_SUMMARY
+	MATCH_SUMMARY,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

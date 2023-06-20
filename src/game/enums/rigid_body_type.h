@@ -6,6 +6,7 @@ enum class rigid_body_type /* : unsigned char */ {
 	KINEMATIC,
 	DYNAMIC,
 
-	ALWAYS_STATIC
+	ALWAYS_STATIC,
+	COUNT
 	// END GEN INTROSPECTOR
 };

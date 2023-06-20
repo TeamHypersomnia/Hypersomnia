@@ -45,7 +45,8 @@ enum class impulse_type {
 	FORCE,
 	IMPULSE,
 	ADD_VELOCITY,
-	SET_VELOCITY
+	SET_VELOCITY,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

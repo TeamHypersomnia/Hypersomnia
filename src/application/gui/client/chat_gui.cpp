@@ -61,9 +61,6 @@ bool chat_gui_state::add_entry_from_game_notification(
 			using FR = faction_choice_result;
 
 			switch (result) {
-				case FR::FAILED:
-					make_entry("Unknown problem encountered while trying to change team.");
-					break;
 				case FR::THE_SAME:
 #if 0
 					if (target == faction_type::SPECTATOR) {
@@ -97,6 +94,11 @@ bool chat_gui_state::add_entry_from_game_notification(
 						make_public_entry("%x has joined the %x.", msg.subject_name, format_enum(target)); 
 					}
 
+					break;
+
+				case FR::FAILED:
+				default:
+					make_entry("Unknown problem encountered while trying to change team.");
 					break;
 			}
 

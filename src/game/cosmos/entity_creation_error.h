@@ -4,8 +4,9 @@
 enum class entity_creation_error_type {
 	// GEN INTROSPECTOR enum class entity_creation_error_type
 	POOL_FULL,
-	DEAD_FLAVOUR
+	DEAD_FLAVOUR,
 	// END GEN INTROSPECTOR
+	COUNT
 };
 
 struct entity_creation_error : std::runtime_error {

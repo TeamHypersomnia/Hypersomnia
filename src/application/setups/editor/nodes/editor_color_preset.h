@@ -9,6 +9,7 @@ enum class editor_color_preset {
 	GREEN,
 	PINK,
 	WHITE,
+	COUNT
 	// END GEN INTROSPECTOR
 };
 

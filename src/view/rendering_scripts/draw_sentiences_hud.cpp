@@ -135,8 +135,6 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 			}
 
 			switch (in.settings.enemy_hud_mode) {
-				case character_hud_type::NONE:
-					return;
 				case character_hud_type::SMALL_HEALTH_BAR: {
 					if (!in.is_reasonably_in_view(drawn_character)) {
 						return;
@@ -246,6 +244,8 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 				}
 				case character_hud_type::FULL:
 					break;
+				default:
+					return;
 			}
 		}
 

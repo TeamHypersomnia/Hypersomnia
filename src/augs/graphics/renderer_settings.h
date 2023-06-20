@@ -4,7 +4,8 @@ namespace augs {
 	enum class filtering_type {
 		// GEN INTROSPECTOR enum class augs::filtering_type
 		NEAREST_NEIGHBOR,
-		LINEAR
+		LINEAR,
+		COUNT
 		// END GEN INTROSPECTOR
 	};
 

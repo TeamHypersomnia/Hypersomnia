@@ -28,46 +28,20 @@ constexpr bool has_INVALID_v = has_INVALID<T>::value;
 
 namespace augs {
 	template <class F>
-	void for_each_enum(F callback) {
-		using Enum = argument_t<F, 0>;
-
-		enum_to_args_impl(
-			Enum(),
-			[callback](const auto... all_enums) {
-				for (const auto _enum : { all_enums... }) {
-					callback(_enum);
-				}
-			}
-		);
-	}
-
-	template <class F>
 	void for_each_enum_except_bounds(F callback) {
 		using Enum = argument_t<F, 0>;
+		using Int = std::underlying_type_t<Enum>;
 
-		enum_to_args_impl(
-			Enum(),
-			[callback](const auto... all_enums) {
-				auto perform = [callback](const Enum e) {
-					if constexpr(has_COUNT_v<Enum>) {
-						if (e == Enum::COUNT) {
-							return;
-						}
-					}
-					
-					if constexpr(has_INVALID_v<Enum>) {
-						if (e == Enum::INVALID) {
-							return;
-						}
-					}
+		for (Int i = 0; i < Int(Enum::COUNT); ++i) {
+			const Enum e = Enum(i);
 
-					callback(e);
-				};
-
-				for (const auto _enum : { all_enums... }) {
-					perform(_enum);
+			if constexpr(has_INVALID_v<Enum>) {
+				if (e == Enum::INVALID) {
+					continue;
 				}
 			}
-		);
+
+			callback(e);
+		}
 	}
 }
