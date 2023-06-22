@@ -6,6 +6,8 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/for_each_entity.h"
 #include "augs/templates/continue_or_callback_result.h"
+#include "game/detail/explosive/like_explosive.h"
+#include "game/detail/melee/like_melee.h"
 
 template <class F>
 void for_each_faction(F callback) {
@@ -29,54 +31,75 @@ inline auto calc_spawnable_factions(const cosmos& cosm) {
 
 using player_character_type = controlled_character;
 
+void reverse_perform_deletions(const deletion_queue& deletions, cosmos& cosm);
+
 inline void remove_test_characters(cosmos& cosm) {
-	std::vector<entity_id> q;
+	deletion_queue q;
 
 	cosm.for_each_having<invariants::sentience>(
 		[&](const auto typed_handle) {
 			if constexpr(std::is_same_v<entity_type_of<decltype(typed_handle)>, player_character_type>) {
-				q.push_back(typed_handle.get_id());
+				q.push_back(entity_id(typed_handle.get_id()));
 
 				typed_handle.for_each_contained_item_recursive(
 					[&](const auto& it) {
-						q.push_back(it.get_id());
+						q.push_back(entity_id(it.get_id()));
 					}
 				);
 			}
 		}
 	);
 
-
-	for (const auto& e : q) {
-		if (const auto h = cosm[e]) {
-			cosmic::delete_entity(h);
-		}
-	}
+	reverse_perform_deletions(q, cosm);
 }
 
-inline void remove_test_dropped_items(cosmos& cosm) {
-	std::vector<entity_id> q;
+inline void remove_all_dropped_items(cosmos& cosm, const float delay_for_mags = 0.0f, bool allow_melees = false) {
+	deletion_queue q;
+
+	auto& clk = cosm.get_clock();
 
 	cosm.for_each_having<components::item>(
 		[&](const auto typed_handle) {
+			if (is_like_thrown_explosive(typed_handle)) {
+				return;
+			}
+
+			if (allow_melees) {
+				if (typed_handle.template has<components::melee>()) {
+					return;
+				}
+			}
+
+			if (is_like_thrown_melee(typed_handle)) {
+				return;
+			}
+
 			if (typed_handle.get_current_slot().dead()) {
-				q.push_back(typed_handle.get_id());
+				if (delay_for_mags > 0.0f) {
+					if (typed_handle.template get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
+						const bool dont_delete_yet = clk.lasts(
+							delay_for_mags,
+							typed_handle.when_last_transferred()
+						);
+
+						if (dont_delete_yet) {
+							return;
+						}
+					}
+				}
+
+				q.push_back(entity_id(typed_handle.get_id()));
 
 				typed_handle.for_each_contained_item_recursive(
 					[&](const auto& it) {
-						q.push_back(it.get_id());
+						q.push_back(entity_id(it.get_id()));
 					}
 				);
 			}
 		}
 	);
 
-
-	for (const auto& e : q) {
-		if (const auto h = cosm[e]) {
-			cosmic::delete_entity(h);
-		}
-	}
+	reverse_perform_deletions(q, cosm);
 }
 
 inline auto find_faction_character_flavour(const cosmos& cosm, const faction_type faction) {

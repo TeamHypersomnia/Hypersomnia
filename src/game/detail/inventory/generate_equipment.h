@@ -46,7 +46,9 @@ entity_id requested_equipment::generate_for_impl(
 		return new_entity;
 	};
 
-	auto transfer = [&cosm, &on_step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) {
+	auto recoils = perform_recoils;
+
+	auto transfer = [recoils, &cosm, &on_step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) {
 		if (to.dead()) {
 			return;
 		}
@@ -63,6 +65,7 @@ entity_id requested_equipment::generate_for_impl(
 		request.params.bypass_mounting_requirements = true;
 		request.params.play_transfer_sounds = max_effects_played > 0 && play_effects;
 		request.params.play_transfer_particles = max_effects_played > 0 && play_effects;
+		request.params.perform_recoils = recoils;
 
 		const auto result = perform_transfer_no_step(request, cosm);
 
@@ -297,4 +300,18 @@ entity_id requested_equipment::generate_for_impl(
 	}
 
 	return result_weapon;
+}
+
+inline bool requested_equipment::has_weapon(entity_flavour_id id) const {
+	if (id == weapon || id == back_wearable || id == belt_wearable || id == personal_deposit_wearable || id == shoulder_wearable || id == armor_wearable) {
+		return true;
+	}
+
+	for (auto o : other_equipment) {
+		if (o.second == id) {
+			return true;
+		}
+	}
+
+	return false;
 }

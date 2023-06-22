@@ -75,6 +75,8 @@ edit_property(result, label, special_handler, insp.MEMBER);
 #define EDIT_FUNCTION template <class T> std::string perform_editable_gui
 #define SINGLE_EDIT_FUNCTION std::string perform_editable_gui_single
 
+bool force_show_extra_ammo = false;
+
 #define EQUIPMENT_PROPERTIES(field) \
 	MULTIPROPERTY("Firearm", field.firearm);\
 	MULTIPROPERTY("Melee", field.melee);\
@@ -86,7 +88,9 @@ edit_property(result, label, special_handler, insp.MEMBER);
 \
 	MULTIPROPERTY("Backpack", field.backpack);\
 	MULTIPROPERTY("Electric armor", field.electric_armor);\
-	MULTIPROPERTY("Extra ammo pieces", field.extra_ammo_pieces);
+	if (force_show_extra_ammo || insp.field.firearm.is_set()) {\
+	MULTIPROPERTY("Extra ammo pieces", field.extra_ammo_pieces);\
+	}
 
 #define EQUIPMENT_PROPERTY(label, field) \
 if (auto scope = augs::imgui::scoped_tree_node_ex(label)) {\
@@ -448,6 +452,15 @@ bool edit_property(
 			}
 		}
 		else if constexpr(std::is_same_v<uint32_t, T>) {
+			if (label == "Respawn after (ms)" || label == "Spawn protection (ms)") {
+				if (slider(label, property, 0u, 10000u)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
 			if (label.find("Fish") != std::string::npos || label.find("austics") != std::string::npos) {
 				if (label.find("count") != std::string::npos) {
 					if (slider(label, property, 0u, 50u)) { 
@@ -2070,6 +2083,7 @@ SINGLE_EDIT_FUNCTION(editor_playtesting_settings& insp, const editor_playtesting
 	PROPERTY("Skip warmup", skip_warmup);
 	PROPERTY("Skip freeze time", skip_freeze_time);
 	PROPERTY("Unlimited money", unlimited_money);
+	PROPERTY("Bots (static)", bots);
 
 	return result;
 }
@@ -2105,8 +2119,8 @@ EDIT_FUNCTION(
 	editor_game_mode_resource_editable& insp,
 	T& es,
 	const std::vector<editor_game_mode_resource_editable>& defaults,
-	const editor_game_mode_resource::type_type type,
-	const id_widget_handler& special_handler
+	const editor_game_mode_id type,
+	id_widget_handler special_handler
 ) {
 	using namespace augs::imgui;
 	std::string result;
@@ -2130,6 +2144,12 @@ EDIT_FUNCTION(
 			MULTIPROPERTY("Round time", bomb_defusal.round_time);
 			MULTIPROPERTY("Round end time", bomb_defusal.round_end_time);
 
+			MULTIPROPERTY("Respawn after (ms)", bomb_defusal.respawn_after_ms);
+
+			tooltip_on_hover("This will turn this mode into a team deathmatch\nwhere you have to either plant/defuse or\nkill enemy players fast enough until the moment\nwhere nobody is left alive.");
+
+			MULTIPROPERTY("Spawn protection (ms)", bomb_defusal.spawn_protection_ms);
+
 			ImGui::Separator();
 
 			FACTION_EQUIPMENT_PROPERTY("Warmup equipment", bomb_defusal.warmup_equipment);
@@ -2137,6 +2157,106 @@ EDIT_FUNCTION(
 			ImGui::Separator();
 
 			FACTION_EQUIPMENT_PROPERTY("Round start equipment", bomb_defusal.round_start_equipment);
+		}
+		else if constexpr(std::is_same_v<I, editor_gun_game_mode>) {
+			force_show_extra_ammo = true;
+			FACTION_EQUIPMENT_PROPERTY("Basic equipment", gun_game.basic_equipment);
+			force_show_extra_ammo = false;
+			tooltip_on_hover("Basic equipment to give at every level except the final.\nNote the \"Firearm\" here will become a secondary weapon.");
+
+			FACTION_EQUIPMENT_PROPERTY("Final equipment", gun_game.final_equipment);
+			tooltip_on_hover("Complete equipment at the final level,\nafter all weapons from Weapon Progression have been cycled.\n\nNote that to beat the final level,\nyou have to kill with any of the items specified here.\n\nE.g. if Hunter is the penultimate weapon and you make a double-kill with it,\nyou will not advance two levels (thus winning),\nbut will still have to score a kill with the knife specified here.");
+
+			MULTIPROPERTY("Can throw melee on final level", gun_game.can_throw_melee_on_final_level);
+			tooltip_on_hover("You might end up without weapons if you throw your only knife.\n");
+
+			ImGui::Separator();
+			text_color("Weapon Progression", yellow);
+			ImGui::Separator();
+
+			{
+				bool progressions_different = false;
+
+				for (auto& e : es) {
+					if (!(insp.gun_game.progression == e.after.gun_game.progression)) {
+						progressions_different = true;
+					}
+				}
+
+				if (ImGui::Button("Add weapon")) {
+					insp.gun_game.progression.push_back({});
+					result = "Added new weapon in %x";
+
+					for (auto& e : es) {
+						auto& lc = e.after.gun_game.progression;
+						lc.push_back({});
+					}
+				}
+
+				auto cols = maybe_different_value_cols({}, progressions_different);
+
+				std::optional<std::size_t> removed_i;
+
+				for (auto& prog : insp.gun_game.progression) {
+					const auto idx = index_in(insp.gun_game.progression, prog);
+
+					auto id_but = typesafe_sprintf("-##Prog%x", idx);
+					const auto id_str = typesafe_sprintf("Progression%x", idx);
+					auto this_scope = scoped_id(id_str.c_str());
+
+					if (ImGui::Button(id_but.c_str())) {
+						removed_i = idx;
+					}
+
+					ImGui::SameLine();
+
+					auto write_to_others = [&]() {
+						for (auto& e : es) {
+							auto& lc = e.after.gun_game.progression;
+
+							if (idx < lc.size()) {
+								lc[idx] = prog;
+							}
+						}
+					};
+
+					special_handler.allow_none = false;
+					auto label = typesafe_sprintf("Level %x", idx);
+					if (edit_property(result, label, special_handler, prog)) write_to_others();
+					special_handler.allow_none = true;
+				}
+
+				if (removed_i) {
+					for (auto& e : es) {
+						auto& lc = e.after.gun_game.progression;
+
+						if (*removed_i < lc.size()) {
+							lc.erase(lc.begin() + *removed_i);
+						}
+					}
+
+					result = typesafe_sprintf("Removed Weapon %x in %x", *removed_i);
+				}
+			}
+
+			ImGui::Separator();
+
+			MULTIPROPERTY("Max team score", gun_game.max_team_score);
+
+			MULTIPROPERTY("Warmup time", gun_game.warmup_time);
+			MULTIPROPERTY("Freeze time", gun_game.freeze_time);
+
+			MULTIPROPERTY("Round time", gun_game.round_time);
+			MULTIPROPERTY("Round end time", gun_game.round_end_time);
+
+			MULTIPROPERTY("Respawn after (ms)", gun_game.respawn_after_ms);
+			MULTIPROPERTY("Spawn protection (ms)", gun_game.spawn_protection_ms);
+
+			ImGui::Separator();
+
+			FACTION_EQUIPMENT_PROPERTY("Warmup equipment", gun_game.warmup_equipment);
+
+			ImGui::Separator();
 		}
 		else {
 			static_assert(always_false_v<I>, "Non-exhaustive if constexpr");

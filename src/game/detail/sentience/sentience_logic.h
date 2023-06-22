@@ -10,7 +10,7 @@
 struct damage_origin;
 
 template <class E>
-void resurrect(const logic_step step, const E& typed_handle) {
+void resurrect(const logic_step step, const E& typed_handle, const float spawn_protection_ms = 0.0f) {
 	auto& sentience = typed_handle.template get<components::sentience>();
 
 	for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
@@ -28,6 +28,13 @@ void resurrect(const logic_step step, const E& typed_handle) {
 
 	if (sentience.has_exploded) {
 		sentience.has_exploded = false;
+	}
+
+	if (spawn_protection_ms > 0.0f) {
+		sentience.spawn_protection_cooldown.set(
+			spawn_protection_ms,
+			cosm.get_timestamp()
+		);
 	}
 
 	typed_handle.infer_colliders_from_scratch();

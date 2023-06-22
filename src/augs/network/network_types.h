@@ -27,7 +27,6 @@ constexpr std::size_t max_arena_file_path_length_v = 70;
 constexpr std::size_t max_version_timestamp_length_v = 70;
 constexpr std::size_t max_total_file_path_length_v = 250;
 
-constexpr std::size_t max_ruleset_name_length_v = 30;
 constexpr std::size_t max_arenas_in_pool_v = 50;
 
 constexpr std::size_t max_transferred_file_size_v = 10 * 1024 * 1024; // 10 MB
@@ -37,9 +36,8 @@ constexpr std::size_t max_packet_size_v = 4 * 1024;
 
 constexpr std::size_t max_address_string_length_v = 255;
 
-using ruleset_name_type = augs::constant_size_string<max_ruleset_name_length_v>;
 using server_name_type = augs::constant_size_string<max_server_name_length_v>;
-using game_mode_name_type = augs::constant_size_string<max_server_name_length_v>;
+using game_mode_name_type = augs::constant_size_string<max_game_mode_name_length_v>;
 using arena_identifier = augs::constant_size_string<max_arena_name_length_v>;
 using address_string_type = augs::constant_size_string<max_address_string_length_v>;
 

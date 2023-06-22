@@ -819,27 +819,6 @@ bool project_selector_setup::create_new_project_files() {
 					writer.EndObject();
 				}
 
-				writer.Key("game_modes");
-
-				{
-					writer.StartObject();
-					writer.Key("quick_test");
-
-					{
-						writer.StartObject();
-						writer.EndObject();
-					}
-
-					writer.Key("bomb_defusal");
-
-					{
-						writer.StartObject();
-						writer.EndObject();
-					}
-
-					writer.EndObject();
-				}
-
 				/* These aren't necessary because we're properly finding sensible defaults in the serializer */
 	#if 0
 				writer.Key("settings");

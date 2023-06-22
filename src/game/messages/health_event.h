@@ -32,6 +32,7 @@ namespace messages {
 		bool was_dead = false;
 		bool was_conscious = true;
 		bool is_remainder_after_shield_destruction = false;
+		bool processed_special = false;
 
 		static auto request_death(
 			const entity_id of_whom,

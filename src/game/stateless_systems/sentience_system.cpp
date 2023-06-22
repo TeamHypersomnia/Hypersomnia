@@ -317,6 +317,10 @@ void sentience_system::process_special_results_of_health_events(const logic_step
 	const auto& events = step.template get_queue<messages::health_event>();
 
 	for (const auto& h : events) {
+		if (h.processed_special) {
+			continue;
+		}
+
 		handle_special_result(step, h);
 	}
 }
@@ -444,6 +448,8 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 	handle_special_result(step, h);
 
+	h.processed_special = true;
+
 	return h;
 }
 
@@ -477,6 +483,10 @@ void sentience_system::process_damage_message(const messages::damage_message& d,
 	};
 
 	auto* const sentience = subject.find<components::sentience>();
+
+	if (sentience && sentience->spawn_protection_cooldown.lasts(clk)) {
+		return;
+	}
 
 	messages::health_event event_template;
 	event_template.subject = d.subject;

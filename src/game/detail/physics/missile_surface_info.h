@@ -58,6 +58,10 @@ public:
 
 		if (const auto sentience = surface.template find<components::sentience>()) {
 			surface_is_unconscious_body = !sentience->is_conscious();
+
+			if (sentience->spawn_protection_cooldown.lasts(surface.get_cosmos().get_clock())) {
+				ignore_altogether = true;
+			}
 		}
 
 		is_fly_through = surface_is_missile || ignore_altogether || surface_is_lying_item || surface_is_unconscious_body || surface.template get<invariants::fixtures>().bullets_fly_through;

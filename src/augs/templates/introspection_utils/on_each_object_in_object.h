@@ -24,7 +24,7 @@ namespace augs {
 
 								using D = remove_cref<decltype(dyn)>;
 
-								if constexpr(!is_introspective_leaf_v<D>) {
+								if constexpr(ShouldRecurse<D>::value && !is_introspective_leaf_v<D>) {
 									on_each_object_in_object<ShouldRecurse>(dyn, std::forward<F>(callback));
 								}
 							},

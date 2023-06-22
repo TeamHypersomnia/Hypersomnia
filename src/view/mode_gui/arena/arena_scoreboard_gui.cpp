@@ -190,7 +190,7 @@ void arena_scoreboard_gui::draw_gui(
 		{ 22, " " },
 		{ scoreboard_avatar_icon_side, " " },
 		{ sz.x, "Player" },
-		{ calc_size("999999$").x, "Money", true },
+		{ calc_size("999999$").x, typed_mode.levelling_enabled(mode_input) ? "Level" : "Money", true },
 
 		{ calc_size("999").x, "K", true },
 		{ calc_size("999").x, "A", true },
@@ -672,7 +672,12 @@ void arena_scoreboard_gui::draw_gui(
 
 			if constexpr(!std::is_same_v<M, test_mode>) {
 				auto do_money = [&]() {
-					col_text(typesafe_sprintf("%x$", stats.money));
+					if (typed_mode.levelling_enabled(mode_input)) {
+						col_text(typesafe_sprintf("%x", stats.level));
+					}
+					else {
+						col_text(typesafe_sprintf("%x$", stats.money));
+					}
 				};
 
 				if (draw_in.demo_replay_mode || mode_input.rules.view.show_money_of_opponents) {

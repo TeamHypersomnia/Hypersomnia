@@ -37,7 +37,7 @@ void debugger_player::force_add_bots_if_quota_zero(debugger_folder& folder) {
 	playtest_default.type_id.dispatch([&](auto e) {
 		using E = decltype(e);
 
-		if constexpr(E::round_based) {
+		if constexpr(std::is_same_v<arena_mode, E>) {
 			auto& rs = current->rulesets.all.get_for<E>()[playtest_default.raw];
 
 			if (rs.bot_quota == 0) {

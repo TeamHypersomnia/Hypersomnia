@@ -312,19 +312,21 @@ inline void draw_context_tip(
 		}
 
 		if constexpr(!std::is_same_v<M, test_mode>) {
-			if (::buy_area_in_range(viewed_character)) {
-				if (!buy_menu_opened) {
-					if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
-						text("It is too late to buy items.");
-						return total_text;
+			if (mode_input.rules.has_economy()) {
+				if (::buy_area_in_range(viewed_character)) {
+					if (!buy_menu_opened) {
+						if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
+							text("It is too late to buy items.");
+							return total_text;
+						}
+
+						text("Press");
+						hotkey(general_gui_intent_type::BUY_MENU);
+						text("to buy items.");
 					}
 
-					text("Press");
-					hotkey(general_gui_intent_type::BUY_MENU);
-					text("to buy items.");
+					return total_text;
 				}
-
-				return total_text;
 			}
 		}
 

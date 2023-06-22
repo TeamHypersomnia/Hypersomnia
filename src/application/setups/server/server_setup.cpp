@@ -919,6 +919,10 @@ void server_setup::apply(const private_server_vars& private_new_vars, const bool
 }
 
 void server_setup::apply(const server_vars& new_vars, const bool force) {
+	/* 
+		Note these settings will be forced when applied through rcon. 
+	*/
+
 	const bool any_difference = 
 		force || 
 		new_vars != vars
@@ -955,6 +959,10 @@ void server_setup::apply(const server_vars& new_vars, const bool force) {
 }
 
 void server_setup::apply(const server_solvable_vars& new_vars, const bool force) {
+	/* 
+		Note these settings will be forced when applied through rcon. 
+	*/
+
 	const bool any_difference = 
 		force || 
 		new_vars != solvable_vars
@@ -970,7 +978,7 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 	}
 
 	if (any_difference) {
-		if (force || old_vars.current_arena != new_vars.current_arena) {
+		if (force || old_vars.current_arena != new_vars.current_arena || old_vars.game_mode != new_vars.game_mode) {
 			try {
 				choose_arena(new_vars.current_arena);
 			}

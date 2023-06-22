@@ -109,7 +109,6 @@ public:
 	using player_type = test_mode_player;
 
 	static constexpr bool needs_clean_round_state = false;
-	static constexpr bool round_based = false;
 
 	template <bool C>
 	struct basic_input {
@@ -233,5 +232,9 @@ public:
 
 	game_mode_name_type get_name(const_input) const {
 		return "Test mode";
+	}
+
+	bool levelling_enabled(const_input) const {
+		return false;
 	}
 };

@@ -1,5 +1,15 @@
 #pragma once
 #include "game/detail/inventory/perform_transfer.h"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+
+template <class E>
+void queue_delete_all_owned_items(const logic_step step, const E handle) {
+	handle.for_each_contained_item_recursive(
+		[&](const auto& contained) {
+			step.queue_deletion_of(entity_id(contained.get_id()), "queue_delete_all_owned_items");
+		}
+	);
+}
 
 template <class F, class E>
 void drop_from_all_slots(const invariants::container& container, const E handle, const impulse_mults impulse, F result_callback) {

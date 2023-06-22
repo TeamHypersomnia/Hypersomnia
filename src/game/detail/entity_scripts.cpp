@@ -145,6 +145,12 @@ entity_id get_closest_hostile(
 			[&](const b2Fixture& fix) {
 				const const_entity_handle s = cosm[get_body_entity_that_owns(fix)];
 
+				if (auto sentience = s.find<components::sentience>()) {
+					if (sentience->spawn_protection_cooldown.lasts(cosm.get_clock())) {
+						return callback_result::CONTINUE;
+					}
+				}
+
 				if (s != subject && s.has<components::attitude>() && !sentient_and_unconscious(s)) {
 					const auto calculated_attitude = calc_attitude(s, subject_attitude);
 

@@ -102,7 +102,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 	auto& cosm = step.get_cosmos();
 
 	{
-#if UNUSED
+#if 0
 		auto& events = step.get_queue<messages::motion_message>();
 		
 		for (auto& it : events) {
@@ -204,7 +204,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 }
 
 void intent_contextualization_system::contextualize_movement_intents(const logic_step step) {
-#if LEGACY
+#if 0
 	auto& cosm = step.get_cosmos();
 	auto& intents = step.get_queue<messages::intent_message>();
 

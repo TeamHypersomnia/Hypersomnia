@@ -156,6 +156,7 @@ void arena_mode_set_transferred_item_meta(const H handle, int charges, const ite
 
 void arena_mode::init_spawned(
 	const input_type in, 
+	const mode_player_id player_id,
 	const entity_id id, 
 	const logic_step step,
 	const std::optional<transfer_meta> transferred
@@ -167,7 +168,10 @@ void arena_mode::init_spawned(
 	auto access = allocate_new_entity_access();
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
-		if (transferred.has_value() && transferred->player.survived) {
+		if (levelling_enabled(in)) {
+			reset_equipment_for(step, in, player_id, typed_handle);
+		}
+		else if (transferred.has_value() && transferred->player.survived) {
 			const auto& eq = transferred->player.saved_eq;
 
 			if (const auto sentience = typed_handle.template find<components::sentience>()) {
@@ -314,7 +318,7 @@ void arena_mode::init_spawned(
 			eq.generate_for(access, typed_handle, step, 1);
 		}
 
-		::resurrect(step, typed_handle);
+		::resurrect(step, typed_handle, in.rules.spawn_protection_ms);
 
 		if (transferred.has_value()) {
 			typed_handle.template get<components::movement>().flags = transferred->player.movement;
@@ -780,7 +784,7 @@ entity_id arena_mode::create_character_for_player(
 					[](entity_handle) {},
 					[&](const entity_handle new_character) {
 						teleport_to_next_spawn(in, new_character);
-						init_spawned(in, new_character, step, transferred);
+						init_spawned(in, id, new_character, step, transferred);
 					}
 				);
 
@@ -904,7 +908,7 @@ void arena_mode::setup_round(
 		(in.rules.delete_lying_items_on_warmup && state == arena_mode_state::WARMUP)
 		|| in.rules.delete_lying_items_on_round_start
 	) {
-		remove_test_dropped_items(cosm);
+		remove_all_dropped_items(cosm);
 	}
 
 	current_round = {};
@@ -950,8 +954,10 @@ void arena_mode::setup_round(
 	}
 
 	if (state != arena_mode_state::WARMUP) {
-		if (!give_bomb_to_random_player(in, step)) {
-			spawn_bomb_near_players(in);
+		if (in.rules.has_bomb_mechanics()) {
+			if (!give_bomb_to_random_player(in, step)) {
+				spawn_bomb_near_players(in);
+			}
 		}
 	}
 
@@ -1059,7 +1065,73 @@ arena_mode_player_stats* arena_mode::stats_of(const mode_player_id& id) {
 	return nullptr;
 }
 
-void arena_mode::count_knockout(const const_logic_step step, const input_type in, const entity_id victim, const components::sentience& sentience) {
+template <class E>
+static void delete_all_owned_items(const E handle) {
+	deletion_queue q;
+
+	auto& cosm = handle.get_cosmos();
+
+	handle.for_each_contained_item_recursive(
+		[&](const auto& contained) {
+			q.push_back(entity_id(contained.get_id()));
+		}
+	);
+
+	::reverse_perform_deletions(q, cosm);
+}
+
+template <class H>
+void arena_mode::reset_equipment_for(const logic_step step, const input_type in, const mode_player_id id, H player_handle) {
+	auto access = allocate_new_entity_access();
+
+	if (const auto player_data = find(id)) {
+		auto& stats = player_data->stats;
+
+		if (!levelling_enabled(in)) {
+			return;
+		}
+
+		if (auto gg = std::get_if<gun_game_rules>(&in.rules.subrules)) {
+			const bool is_final_level = stats.level == gg->get_final_level();
+
+			::delete_all_owned_items(player_handle);
+
+			if (auto transfers = player_handle.template find<components::item_slot_transfers>()) {
+				transfers->allow_drop_and_pick = false;
+
+				if (is_final_level) {
+					transfers->allow_melee_throws = gg->can_throw_melee_on_final_level;
+				}
+				else {
+					transfers->allow_melee_throws = true;
+				}
+			}
+
+			const auto faction = player_data->get_faction();
+
+			if (stats.level < static_cast<int>(gg->progression.size())) {
+				const auto next = gg->progression[stats.level];
+
+				auto eq = gg->basic_eq[faction];
+				eq.perform_recoils = false;
+				eq.weapon = next;
+				eq.generate_for(access, player_handle, step, 1);
+			}
+			else {
+				if (is_final_level) {
+					auto eq = gg->final_eq[faction];
+					eq.perform_recoils = false;
+					eq.generate_for(access, player_handle, step, 1);
+				}
+				else {
+					/* Ignore if we're above the final level as this basically means a win. */
+				}
+			}
+		}
+	}
+}
+
+void arena_mode::count_knockout(const logic_step step, const input_type in, const entity_id victim, const components::sentience& sentience) {
 	const auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 	const auto& origin = sentience.knockout_origin;
@@ -1115,10 +1187,10 @@ void arena_mode::count_knockout(const const_logic_step step, const input_type in
 	count_knockout(step, in, ko);
 }
 
-void arena_mode::count_knockout(const const_logic_step step, const input_type in, const arena_mode_knockout ko) {
+void arena_mode::count_knockout(const logic_step step, const input_type in, const arena_mode_knockout ko) {
 	current_round.knockouts.push_back(ko);
 
-	auto on_counted_knockout = [&](const auto stats, const auto knockouts_dt) {
+	auto announce_knockout = [&](const auto stats, const auto knockouts_dt) {
 		const auto controlled_character_id = lookup(ko.knockouter.id);
 
 		if (state == arena_mode_state::WARMUP) {
@@ -1184,7 +1256,7 @@ void arena_mode::count_knockout(const const_logic_step step, const input_type in
 		}
 	};
 
-	auto on_counted_death = [&](const auto stats) {
+	auto announce_death = [&](const auto stats) {
 		stats->knockout_streak = 0;
 
 		if (state == arena_mode_state::WARMUP) {
@@ -1196,6 +1268,10 @@ void arena_mode::count_knockout(const const_logic_step step, const input_type in
 			hud_message_2_players(step, "[color=orange]FIRST BLOOD!![/color] ", " drew first blood on ", " !", find(ko.knockouter.id), find(ko.victim.id), true);
 
 			had_first_blood = true;
+		}
+
+		if (in.rules.respawn_after_ms > 0.0f) {
+			return;
 		}
 
 		if (const auto victim_info = find(ko.victim.id)) {
@@ -1316,12 +1392,90 @@ void arena_mode::count_knockout(const const_logic_step step, const input_type in
 
 		if (const auto s = stats_of(ko.knockouter.id)) {
 			s->knockouts += knockouts_dt;
-			on_counted_knockout(s, knockouts_dt);
+
+			announce_knockout(s, knockouts_dt);
+
+			if (levelling_enabled(in)) {
+				requested_equipment final_eq;
+
+				const auto final_level = std::visit([&]<typename S>(const S& subrules) {
+					if constexpr(std::is_same_v<S, gun_game_rules>) {
+						final_eq = subrules.final_eq[ko.knockouter.faction];
+						return subrules.get_final_level();
+					}
+
+					return 0;
+				}, in.rules.subrules);
+
+				auto before_level = s->level;
+
+				if (knockouts_dt > 0) {
+					bool weapon_requirement_met = true;
+
+					if (s->level == final_level) {
+						weapon_requirement_met  = ko.origin.on_tool_used(in.cosm, [&](const auto& tool) {
+							if constexpr(is_nullopt_v<decltype(tool)>) {
+
+							}
+							else if constexpr(is_spell_v<decltype(tool)>) {
+
+							}
+							else {
+								if (!final_eq.has_weapon(entity_flavour_id(tool))) {
+									return false;
+								}
+							}
+
+							return true;
+						});
+					}
+
+					if (weapon_requirement_met) {
+						const bool tool_humiliating = ko.origin.cause.is_humiliating(in.cosm);
+
+						if (tool_humiliating) {
+							s->level += 2;
+
+							/* Prevent jumping from the one before final straight to victory */
+							if (s->level == final_level + 1) {
+								s->level = final_level;
+							}
+
+							if (const auto v = stats_of(ko.victim.id)) {
+								v->level -= 1;
+								v->level = std::max(0, v->level);
+							}
+						}
+						else {
+							s->level += 1;
+						}
+					}
+				}
+				else if (knockouts_dt < 0) {
+					s->level -= 1;
+					s->level = std::max(0, s->level);
+				}
+
+				if (before_level != s->level) {
+					const bool victory_already = s->level > final_level;
+
+					if (victory_already) {
+						standard_victory(in, step, ko.knockouter.faction);
+					}
+					else {
+						on_player_handle(in.cosm, ko.knockouter.id, [&](const auto& player_handle) {
+							if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+								reset_equipment_for(step, in, ko.knockouter.id, player_handle);
+							}
+						});
+					}
+				}
+			}
 		}
 
 		if (const auto s = stats_of(ko.victim.id)) {
 			s->deaths += 1;
-			on_counted_death(s);
+			announce_death(s);
 		}
 	}
 
@@ -1362,7 +1516,7 @@ bool arena_mode::is_final_round(const const_input_type in) const {
 	return someone_has_over_half || current_round >= max_rounds;
 }
 
-void arena_mode::make_win(const input_type in, const logic_step step, const faction_type winner) {
+void arena_mode::count_win(const input_type in, const const_logic_step step, const faction_type winner) {
 	const auto p = calc_participating_factions(in);
 	const auto loser = winner == p.defusing ? p.bombing : p.defusing;
 
@@ -1504,79 +1658,99 @@ void arena_mode::play_bomb_defused_sound(const input_type in, const const_logic_
 	});
 }
 
+void arena_mode::standard_victory(const input_type in, const const_logic_step step, const faction_type winner, const bool announce, const bool play_theme) {
+	count_win(in, step, winner);
+
+	if (play_theme) {
+		play_win_theme(in, step, winner);
+	}
+
+	if (announce) {
+		play_win_sound(in, step, winner);
+	}
+}
+
 void arena_mode::process_win_conditions(const input_type in, const logic_step step) {
 	auto& cosm = in.cosm;
 
 	const auto p = calc_participating_factions(in);
 
-	auto standard_win = [&](const auto winner) {
-		make_win(in, step, winner);
-		play_win_theme(in, step, winner);
-		play_win_sound(in, step, winner);
+	auto victory_for = [&](const auto winner) {
+		standard_victory(in, step, winner);
 	};
 
-	/* Bomb-based win-conditions */
+	if (in.rules.has_bomb_mechanics()) {
+		/* Bomb-based win-conditions */
 
-	auto stop_bomb_detonation_theme = [&]() {
-		if (cosm[bomb_detonation_theme]) {
-			step.queue_deletion_of(bomb_detonation_theme, "Bomb detonation theme interrupted.");
-			bomb_detonation_theme.unset();
+		auto stop_bomb_detonation_theme = [&]() {
+			if (cosm[bomb_detonation_theme]) {
+				step.queue_deletion_of(bomb_detonation_theme, "Bomb detonation theme interrupted.");
+				bomb_detonation_theme.unset();
+			}
+		};
+
+		if (bomb_exploded(in)) {
+			stop_bomb_detonation_theme();
+			const auto planting_player = current_round.bomb_planter;
+
+			if (const auto s = stats_of(planting_player)) {
+				s->bomb_explosions += 1;
+			}
+
+			give_monetary_award(in, planting_player, in.rules.economy.bomb_explosion_award);
+			victory_for(p.bombing);
+			return;
+		}
+
+		if (const auto character_who_defused = cosm[get_character_who_defused_bomb(in)]) {
+			stop_bomb_detonation_theme();
+			const auto winner = p.defusing;
+			const auto defusing_player = lookup(character_who_defused);
+
+			if (const auto s = stats_of(defusing_player)) {
+				s->bomb_defuses += 1;
+			}
+
+			give_monetary_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
+			standard_victory(in, step, winner, false);
+			play_bomb_defused_sound(in, step, winner);
+			return;
+		}
+
+		if (!bomb_planted(in) && get_round_seconds_left(in) <= 0.f) {
+			/* Time-out */
+			victory_for(p.defusing);
+			return;
+		}
+
+		/* Kill-based win-conditions */
+
+		if (num_players_in(p.bombing) > 0) {
+			if (!bomb_planted(in) && 0 == num_conscious_players_in(cosm, p.bombing)) {
+				/* All bombing players have been neutralized. */
+				victory_for(p.defusing);
+				return;
+			}
+		}
+
+		if (num_players_in(p.defusing) > 0) {
+			if (0 == num_conscious_players_in(cosm, p.defusing)) {
+				/* All defusing players have been neutralized. */
+				victory_for(p.bombing);
+				return;
+			}
+		}
+	}
+
+#if 0
+	auto process_subrules_conditions = [&](const S& subrules) {
+		if constexpr(std::is_same_v<S, gun_game_rules>) {
+
 		}
 	};
 
-	if (bomb_exploded(in)) {
-		stop_bomb_detonation_theme();
-		const auto planting_player = current_round.bomb_planter;
-
-		if (const auto s = stats_of(planting_player)) {
-			s->bomb_explosions += 1;
-		}
-
-		give_monetary_award(in, planting_player, in.rules.economy.bomb_explosion_award);
-		standard_win(p.bombing);
-		return;
-	}
-
-	if (const auto character_who_defused = cosm[get_character_who_defused_bomb(in)]) {
-		stop_bomb_detonation_theme();
-		const auto winner = p.defusing;
-		const auto defusing_player = lookup(character_who_defused);
-
-		if (const auto s = stats_of(defusing_player)) {
-			s->bomb_defuses += 1;
-		}
-
-		give_monetary_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
-		make_win(in, step, winner);
-		play_win_theme(in, step, winner);
-
-		play_bomb_defused_sound(in, step, winner);
-		return;
-	}
-
-	if (!bomb_planted(in) && get_round_seconds_left(in) <= 0.f) {
-		/* Time-out */
-		standard_win(p.defusing);
-		return;
-	}
-
-	/* Kill-based win-conditions */
-
-	if (num_players_in(p.bombing) > 0) {
-		if (!bomb_planted(in) && 0 == num_conscious_players_in(cosm, p.bombing)) {
-			/* All bombing players have been neutralized. */
-			standard_win(p.defusing);
-			return;
-		}
-	}
-
-	if (num_players_in(p.defusing) > 0) {
-		if (0 == num_conscious_players_in(cosm, p.defusing)) {
-			/* All defusing players have been neutralized. */
-			standard_win(p.bombing);
-			return;
-		}
-	}
+	std::visit(process_subrules_conditions, in.rules.subrules);
+#endif
 }
 
 void arena_mode::swap_assigned_factions(const arena_mode::participating_factions& p) {
@@ -2173,7 +2347,7 @@ mode_player_id arena_mode::find_best_player_in(faction_type faction) const {
 	return best;
 }
 
-void arena_mode::report_match_result(const input_type in, const logic_step step) {
+void arena_mode::report_match_result(const input_type in, const const_logic_step step) {
 	const auto p = calc_participating_factions(in);
 
 	const auto result = calc_match_result(in);
@@ -2310,6 +2484,19 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 		restart_match(in, step);
 	}
 
+	if (state != arena_mode_state::WARMUP) {
+		auto specific_presolve = [&]<typename S>(const S&) {
+			if constexpr(std::is_same_v<S, gun_game_rules>) {
+				auto& cosm = step.get_cosmos();
+
+				const auto delay_for_mags = 2000.0f;
+				remove_all_dropped_items(cosm, delay_for_mags, true);
+			}
+		};
+
+		std::visit(specific_presolve, in.rules.subrules);
+	}
+
 	spawn_and_kick_bots(in, step);
 	add_or_remove_players(in, entropy, step);
 	handle_special_commands(in, entropy, step);
@@ -2337,6 +2524,17 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 		}
 	}
 	else if (state == arena_mode_state::LIVE) {
+		if (in.rules.respawn_after_ms > 0) {
+			/* 
+				In case the character is dead due to changing factions,
+				this will delete the character and respawn it with the proper faction.
+
+				Note this already worked like this in the warmup deathmatch.
+			*/
+
+			respawn_the_dead(in, step, in.rules.respawn_after_ms);
+		}
+
 		if (get_freeze_seconds_left(in) <= 0.f) {
 			if (current_round.cache_players_frozen) {
 				play_start_round_sound(in, step);
@@ -2383,6 +2581,8 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 				});
 
 				set_players_money_to_initial(in);
+				set_players_level_to_initial(in);
+
 				start_next_round(in, step, round_start_type::DONT_KEEP_EQUIPMENTS);
 			}
 
@@ -2391,7 +2591,7 @@ void arena_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy
 	}
 }
 
-void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entropy, const const_logic_step step) {
+void arena_mode::mode_post_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	auto access = allocate_new_entity_access();
 
 	(void)entropy;
@@ -2507,10 +2707,15 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 					after_ms,
 					sentience.when_knocked_out
 				)) {
+					round_transferred_player transfer;
+					transfer.movement = player_handle.template get<components::movement>().flags;
+
 					delete_with_held_items(in, step, player_handle);
 					player_data.controlled_character_id.unset();
 
-					create_character_for_player(in, step, id, std::nullopt);
+					messages::changed_identities_message dummy_msg;
+					const auto meta = transfer_meta { transfer, dummy_msg };
+					create_character_for_player(in, step, id, meta);
 				}
 			}
 		});
@@ -2554,6 +2759,10 @@ float arena_mode::get_freeze_seconds_left(const const_input_type in) const {
 }
 
 float arena_mode::get_buy_seconds_left(const const_input_type in) const {
+	if (!in.rules.has_economy()) {
+		return 0.f;
+	}
+
 	if (state == arena_mode_state::WARMUP) {
 		if (!in.rules.warmup_enable_item_shop) {
 			return 0.f;
@@ -2602,7 +2811,7 @@ float arena_mode::get_round_end_seconds_left(const const_input_type in) const {
 }
 
 bool arena_mode::bomb_exploded(const const_input_type in) const {
-	if (!in.rules.bomb_flavour.is_set()) {
+	if (!in.rules.has_bomb_mechanics()) {
 		return false;
 	}
 
@@ -2829,12 +3038,23 @@ void arena_mode::clear_players_round_state(const input_type in) {
 	for (auto& it : players) {
 		it.second.stats.round_state = {};
 	}
+
+	set_players_level_to_initial(in);
 }
 
 void arena_mode::set_players_money_to_initial(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
 		p.stats.money = in.rules.economy.initial_money;
+	}
+}
+
+void arena_mode::set_players_level_to_initial(const input_type in) {
+	(void)in;
+
+	for (auto& it : players) {
+		auto& p = it.second;
+		p.stats.level = 0;
 	}
 }
 
@@ -3084,6 +3304,14 @@ void arena_mode::clear_duel() {
 	duellist_2 = mode_player_id::dead();
 }
 
-game_mode_name_type arena_mode::get_name(const_input) const {
-	return "Bomb defusal";
+game_mode_name_type arena_mode::get_name(const_input_type in) const {
+	return std::visit([](const auto& s) { return s.get_name(); }, in.rules.subrules);
+}
+
+bool arena_mode_ruleset::has_economy() const {
+	return std::visit([](const auto& s) { return s.has_economy(); }, subrules);
+}
+
+bool arena_mode::levelling_enabled(const_input_type in) const {
+	return state != arena_mode_state::WARMUP && std::holds_alternative<gun_game_rules>(in.rules.subrules);
 }

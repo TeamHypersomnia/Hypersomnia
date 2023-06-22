@@ -971,6 +971,14 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				const bool is_secondary_like = r.intent == game_intent_type::DROP_SECONDARY || r.intent == game_intent_type::THROW_SECONDARY;
 
 				if (is_throw || is_drop) {
+					{
+						auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
+
+						if (!transfers_state.allow_drop_and_pick) {
+							return;
+						}
+					}
+
 					do_drop_or_throw(typed_subject, is_throw, is_drop, is_secondary_like);
 					return;
 				}
@@ -1287,6 +1295,10 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	cosm.for_each_having<components::melee_fighter>([&](const auto& it) {
 		auto& transfers_state = it.template get<components::item_slot_transfers>();
 		const auto& wielded_melees = it.get_wielded_melees();
+
+		if (!transfers_state.allow_melee_throws) {
+			return;
+		}
 
 		auto interrupt_throw_request = [&]() {
 			transfers_state.when_throw_requested = {};

@@ -114,8 +114,13 @@ void perform_knockout(
 		auto& sentience = typed_subject.template get<components::sentience>();
 		auto& sentience_def = typed_subject.template get<invariants::sentience>();
 		
-		if (const auto* const container = typed_subject.template find<invariants::container>()) {
-			drop_from_all_slots(*container, entity_handle(typed_subject), sentience_def.drop_impulse_on_knockout, step);
+		if (typed_subject.template get<components::item_slot_transfers>().allow_drop_and_pick) {
+			if (const auto* const container = typed_subject.template find<invariants::container>()) {
+				drop_from_all_slots(*container, entity_handle(typed_subject), sentience_def.drop_impulse_on_knockout, step);
+			}
+		}
+		else {
+			::queue_delete_all_owned_items(step, typed_subject);
 		}
 
 		if (const auto* const driver = typed_subject.template find<components::driver>();

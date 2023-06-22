@@ -106,6 +106,15 @@ void standard_solve(const logic_step step) {
 			) {
 				/* TODO: Allow storing drops if we are in close proximity. */
 				if (result.authorized_capability == player_entity) {
+
+					if (result.relation_type == capability_relation::DROP) {
+						if (const auto capability = player_entity.find<components::item_slot_transfers>()) {
+							if (!capability->allow_drop_and_pick) {
+								continue;
+							}
+						}
+					}
+
 					perform_transfer(t, step);
 				}
 			}

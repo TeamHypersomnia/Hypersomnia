@@ -54,7 +54,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	const specific_draw_input& in,
 	T render_visitor,
 	const transformr viewing_transform,
-	const bool flip_vertically = false
+	const bool flip_vertically = false,
+	const float mult_alpha = 1.0f
 ) {
 	using H = cref_typed_entity_handle<E>;
 
@@ -69,6 +70,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		if constexpr(!for_gui && H::template has<components::rigid_body>()) {
 			teleport_alpha = typed_handle.template get<components::rigid_body>().get_teleport_alpha();
 		}
+
+		teleport_alpha *= mult_alpha;
 
 		const auto sprite = [&typed_handle]() {
 			auto result = typed_handle.template get<invariants::sprite>();
@@ -302,12 +305,23 @@ FORCE_INLINE void specific_entity_drawer(
 
 	if constexpr (H::template has<invariants::torso>()) {
 		if constexpr (H::template has<components::movement>()) {
-			const float teleport_alpha = typed_handle.template get<components::rigid_body>().get_teleport_alpha();
+			float teleport_alpha = typed_handle.template get<components::rigid_body>().get_teleport_alpha();
+
+			const auto& sentience = typed_handle.template get<components::sentience>();
 
 			const auto& torso = typed_handle.template get<invariants::torso>();
 			const auto& movement = typed_handle.template get<components::movement>();
 
 			const auto& cosm = typed_handle.get_cosmos();
+
+			float spawn_prot_mult = 1.0f;
+
+			if (sentience.spawn_protection_cooldown.lasts(cosm.get_clock())) {
+				spawn_prot_mult = 0.45f;
+			}
+
+			teleport_alpha *= spawn_prot_mult;
+
 			const auto& logicals = cosm.get_logical_assets();
 
 			const auto velocity = typed_handle.get_effective_velocity();
@@ -430,7 +444,8 @@ FORCE_INLINE void specific_entity_drawer(
 									in,
 									render_visitor,
 									viewing_transform * attachment_offset.offset,
-									attachment_offset.flip_geometry
+									attachment_offset.flip_geometry,
+									spawn_prot_mult
 								);
 							}
 						);
@@ -472,8 +487,6 @@ FORCE_INLINE void specific_entity_drawer(
 				}
 
 				draw_items_recursively(true);
-
-				const auto& sentience = typed_handle.template get<components::sentience>();
 
 				const auto head_drawing = calc_head_drawing_type(sentience);
 

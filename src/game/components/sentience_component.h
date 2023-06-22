@@ -59,6 +59,7 @@ namespace components {
 		augs::stepped_timestamp time_of_last_exertion;
 
 		augs::stepped_cooldown cast_cooldown_for_all_spells;
+		augs::stepped_cooldown spawn_protection_cooldown;
 
 		meter_instance_tuple meters;
 

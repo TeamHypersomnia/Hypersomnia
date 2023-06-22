@@ -28,4 +28,60 @@ inline void setup_game_mode_defaults(
 
 	e.bomb_defusal.round_start_equipment.resistance.firearm = o[test_shootable_weapons::KEK9];
 	e.bomb_defusal.round_start_equipment.resistance.melee = o[test_melee_weapons::YELLOW_DAGGER];
+
+	e.gun_game.progression = {
+		o[test_shootable_weapons::ELON],
+		o[test_shootable_weapons::BULLDUP2000],
+		o[test_shootable_weapons::LEWS],
+
+		o[test_shootable_weapons::DATUM],
+		o[test_shootable_weapons::BAKA47],
+		o[test_shootable_weapons::SZTURM],
+		o[test_shootable_weapons::BILMER2000],
+		o[test_shootable_weapons::GALILEA],
+
+		o[test_shootable_weapons::AMPLIFIER_ARM],
+
+		o[test_shootable_weapons::PRO90],
+		o[test_shootable_weapons::CYBERSPRAY],
+		o[test_shootable_weapons::ZAMIEC],
+
+		o[test_shootable_weapons::WARX],
+		o[test_shootable_weapons::GRADOBICIE],
+
+		o[test_shootable_weapons::DEAGLE],
+		o[test_shootable_weapons::COVERT],
+		o[test_shootable_weapons::AO44],
+		o[test_shootable_weapons::CALICO],
+		o[test_shootable_weapons::BULWARK],
+
+		o[test_shootable_weapons::KEK9],
+		o[test_shootable_weapons::SN69],
+
+		o[test_shootable_weapons::AWKA],
+		o[test_shootable_weapons::HUNTER]
+	};
+
+	editor_requested_equipment basic_eq;
+	basic_eq.melee = o[test_melee_weapons::ELECTRIC_RAPIER];
+	basic_eq.backpack = true;
+	basic_eq.extra_ammo_pieces = 6;
+
+	editor_requested_equipment final_eq;
+	final_eq.electric_armor = true;
+	final_eq.melee = o[test_melee_weapons::YELLOW_DAGGER];
+
+	e.gun_game.basic_equipment[faction_type::METROPOLIS] = basic_eq;
+	e.gun_game.basic_equipment[faction_type::RESISTANCE] = basic_eq;
+
+	e.gun_game.final_equipment[faction_type::METROPOLIS] = final_eq;
+	e.gun_game.final_equipment[faction_type::RESISTANCE] = final_eq;
+
+	editor_requested_equipment warmup_eq;
+	warmup_eq.melee = o[test_melee_weapons::ELECTRIC_RAPIER];
+	warmup_eq.explosive = o[test_hand_explosives::FORCE_GRENADE];
+	warmup_eq.num_explosives = 3;
+
+	e.gun_game.warmup_equipment.resistance = warmup_eq;
+	e.gun_game.warmup_equipment.metropolis = warmup_eq;
 }

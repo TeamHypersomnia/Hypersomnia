@@ -1655,11 +1655,45 @@ void settings_gui_state::perform(
 #include "application/gui/arena_chooser.h"
 #include "application/arena/arena_paths.h"
 #include "application/gui/config_nvp.h"
+#include "application/setups/editor/resources/editor_game_mode_resource.h"
 
-void perform_arena_chooser(
+bool perform_game_mode_chooser(
+	game_mode_name_type& current_mode
+) {
+	const auto displayed_str = current_mode.empty() ? std::string("(Map default)") : std::string(current_mode);
+
+	bool chosen = false;
+
+	if (auto combo = augs::imgui::scoped_combo("Game mode", displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
+		auto do_entry = [&](const std::string& value, const std::string& displayed_value) {
+			const bool is_current = value == current_mode;
+
+			if (ImGui::Selectable(displayed_value.c_str(), is_current)) {
+				ImGui::CloseCurrentPopup();
+
+				current_mode = value;
+				chosen = true;
+
+				LOG("Mode selected: %x", displayed_value);
+			}
+		};
+
+		do_entry("", "(Map default)");
+
+		for_each_type_in_list<editor_all_game_modes>([&]<typename M>(M) {
+			do_entry(M::get_identifier(), M::get_display_name());
+		});
+	}
+
+	return chosen;
+}
+
+bool perform_arena_chooser(
 	arena_identifier& current_arena
 ) {
 	thread_local arena_chooser chooser;
+
+	bool changed = false;
 
 	chooser.perform(
 		"Arena",
@@ -1669,8 +1703,11 @@ void perform_arena_chooser(
 		EDITOR_PROJECTS_DIR,
 		[&](const auto& chosen_arena_path) {
 			current_arena = chosen_arena_path.filename().string();
+			changed = true;
 		}
 	);
+
+	return changed;
 }
 
 void do_server_vars(
@@ -1679,16 +1716,16 @@ void do_server_vars(
 ) {
 	using namespace augs::imgui;
 
-	int field_id = 499999;
-
-	auto& scope_cfg = vars;
-
 	auto revert = make_revert_button_lambda(vars, last_saved_vars);
 
-	perform_arena_chooser(vars.current_arena);
+	if (perform_arena_chooser(vars.current_arena)) {
+		vars.game_mode = "";
+	}
+
 	revert(vars.current_arena);
 
-	input_text(SCOPE_CFG_NVP(game_mode)); revert(scope_cfg.game_mode);
+	perform_game_mode_chooser(vars.game_mode);
+	revert(vars.game_mode);
 }
 
 void do_server_vars(

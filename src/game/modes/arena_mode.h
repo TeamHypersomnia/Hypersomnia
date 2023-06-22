@@ -19,6 +19,7 @@
 #include "augs/enums/callback_result.h"
 #include "game/enums/faction_choice_result.h"
 #include "game/modes/session_id.h"
+#include "game/modes/arena_submodes.h"
 
 class cosmos;
 struct cosmos_solvable_significant;
@@ -37,6 +38,9 @@ struct arena_mode_ruleset {
 
 	bool enable_player_colors = true;
 	uint32_t bot_quota = 8;
+
+	uint32_t respawn_after_ms = 0;
+	uint32_t spawn_protection_ms = 0;
 
 	uint32_t allow_spawn_for_secs_after_starting = 10;
 	uint32_t max_players_per_team = 32;
@@ -70,6 +74,8 @@ struct arena_mode_ruleset {
 	arena_mode_view_rules view;
 
 	augs::speed_vars speeds;
+
+	all_subrules_variant subrules;
 	// END GEN INTROSPECTOR
 
 	arena_mode_ruleset();
@@ -82,6 +88,9 @@ struct arena_mode_ruleset {
 		/* Make it even */
 		return std::max((max_rounds / 2) * 2, 2u);
 	}
+
+	bool has_economy() const;
+	bool has_bomb_mechanics() const { return bomb_flavour.is_set(); }
 };
 
 struct arena_mode_faction_state {
@@ -114,6 +123,8 @@ struct arena_mode_player_stats {
 
 	int bomb_defuses = 0;
 
+	int level = 0;
+
 	arena_mode_player_round_state round_state;
 	// END GEN INTROSPECTOR
 
@@ -127,6 +138,7 @@ struct arena_mode_player {
 	rgba assigned_color = rgba::zero;
 	arena_mode_player_stats stats;
 	uint32_t round_when_chosen_faction = static_cast<uint32_t>(-1); 
+
 	bool is_bot = false;
 	// END GEN INTROSPECTOR
 
@@ -179,7 +191,6 @@ public:
 	using player_type = arena_mode_player;
 
 	static constexpr bool needs_clean_round_state = true;
-	static constexpr bool round_based = true;
 
 	template <bool C>
 	struct basic_input {
@@ -273,20 +284,26 @@ private:
 	using round_transferred_players = std::unordered_map<mode_player_id, round_transferred_player>;
 	round_transferred_players make_transferred_players(input) const;
 
-	void make_win(input, logic_step, faction_type);
+	void count_win(input, const_logic_step, faction_type);
+
+	void standard_victory(input, const_logic_step, faction_type, bool announce = true, bool play_theme = true);
 
 	entity_id create_character_for_player(input, logic_step, mode_player_id, std::optional<transfer_meta> = std::nullopt);
+
+	template <class H>
+	void reset_equipment_for(logic_step step, input in, mode_player_id ko, H character_handle);
 
 	void teleport_to_next_spawn(input, entity_id character);
 	void init_spawned(
 		input, 
+		mode_player_id,
 		entity_id character, 
 		logic_step, 
 		std::optional<transfer_meta> = std::nullopt
 	);
 
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
-	void mode_post_solve(input, const mode_entropy&, const_logic_step);
+	void mode_post_solve(input, const mode_entropy&, logic_step);
 
 	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS);
 	void setup_round(input, logic_step, const round_transferred_players& = {});
@@ -319,8 +336,8 @@ private:
 	std::size_t get_round_rng_seed(const cosmos&) const;
 	std::size_t get_step_rng_seed(const cosmos&) const;
 
-	void count_knockout(const_logic_step, input, entity_id victim, const components::sentience&);
-	void count_knockout(const_logic_step, input, arena_mode_knockout);
+	void count_knockout(logic_step, input, entity_id victim, const components::sentience&);
+	void count_knockout(logic_step, input, arena_mode_knockout);
 
 	entity_handle spawn_bomb(input);
 	bool give_bomb_to_random_player(input, logic_step);
@@ -352,6 +369,7 @@ private:
 
 	void reset_players_stats(input);
 	void set_players_money_to_initial(input);
+	void set_players_level_to_initial(input);
 	void clear_players_round_state(input);
 
 	void give_monetary_award(input, mode_player_id, money_type amount);
@@ -463,9 +481,9 @@ public:
 					mode_pre_solve(in, entropy, step);
 					execute_player_commands(in, entropy, step);
 				},
-				[&](const const_logic_step step) {
+				[&](const logic_step step) {
 					mode_post_solve(in, entropy, step);
-					callbacks.post_solve(step);
+					callbacks.post_solve(const_logic_step(step));
 				},
 				callbacks.post_cleanup
 			)
@@ -568,7 +586,11 @@ public:
 	void clear_duel();
 
 	void handle_duel_desertion(input, logic_step, const mode_player_id&);
-	void report_match_result(input, logic_step);
+	void report_match_result(input, const_logic_step);
 
 	game_mode_name_type get_name(const_input) const;
+
+	bool can_respawn_already() const;
+
+	bool levelling_enabled(const_input) const;
 };

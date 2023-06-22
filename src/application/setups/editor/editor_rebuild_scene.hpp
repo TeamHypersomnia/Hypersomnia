@@ -12,7 +12,7 @@
 
 void editor_setup::rebuild_arena(const bool editor_preview) {
 	const bool for_playtesting = true;
-	const auto override_game_mode = ruleset_name_type("");
+	const auto override_game_mode = game_mode_name_type("");
 
 	::build_arena_from_editor_project<editor_arena_handle<false>>(
 		get_arena_handle(),

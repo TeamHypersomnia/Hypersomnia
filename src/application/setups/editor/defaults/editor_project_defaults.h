@@ -29,7 +29,7 @@ inline void setup_default_server_mode(
 }
 
 template <class M>
-inline void setup_default_quick_test_mode(
+inline void setup_default_playtesting_mode(
 	editor_playtesting_settings& defaults,
 	const M& modes
 ) {
@@ -68,7 +68,7 @@ void setup_project_defaults(
 	const M& modes,
 	const editor_official_resource_map& o
 ) {
-	::setup_default_quick_test_mode(defaults, modes);
+	::setup_default_playtesting_mode(defaults, modes);
 	(void)o;
 }
 

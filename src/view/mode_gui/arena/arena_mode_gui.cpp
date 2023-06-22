@@ -197,7 +197,7 @@ mode_player_entropy arena_gui_state::perform_imgui_and_advance(
 		buy_menu.show = false;
 	}
 
-	if constexpr(M::round_based) {
+	if constexpr(std::is_same_v<arena_mode, M>) {
 		if (prediction.play_unpredictable) {
 			const auto p = typed_mode.calc_participating_factions(mode_input);
 
@@ -1197,6 +1197,10 @@ void arena_gui_state::draw_mode_gui(
 			}
 
 			const bool draw_money = [&]() {
+				if (!mode_input.rules.has_economy()) {
+					return false;
+				}
+
 				if (in.demo_replay_mode) {
 					return true;
 				}

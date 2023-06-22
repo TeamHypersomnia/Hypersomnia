@@ -29,7 +29,10 @@ struct requested_equipment {
 	other_equipment_vector other_equipment;
 
 	learnt_spells_array_type spells_to_give = {};
+	bool perform_recoils = true;
 	// END GEN INTROSPECTOR
+
+	bool has_weapon(entity_flavour_id) const;
 
 	template <class E>
 	entity_id generate_for(

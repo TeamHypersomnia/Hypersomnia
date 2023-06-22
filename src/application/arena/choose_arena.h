@@ -14,7 +14,7 @@ struct choose_arena_input {
 	online_arena_handle<false> handle;
 	const packaged_official_content& official;
 	const arena_identifier& name;
-	const ruleset_name_type& override_game_mode;
+	const game_mode_name_type& override_game_mode;
 	cosmos_solvable_significant& clean_round_state;
 	std::optional<arena_playtesting_context> playtesting_context;
 	editor_project* keep_loaded_project;

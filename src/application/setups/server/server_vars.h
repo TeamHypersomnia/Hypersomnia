@@ -30,7 +30,7 @@ struct server_solvable_vars {
 
 	arena_identifier current_arena = "";
 	augs::secure_hash_type required_arena_hash = augs::secure_hash_type();
-	ruleset_name_type game_mode = "";
+	game_mode_name_type game_mode = "";
 	std::optional<arena_playtesting_context> playtesting_context;
 	// END GEN INTROSPECTOR
 };

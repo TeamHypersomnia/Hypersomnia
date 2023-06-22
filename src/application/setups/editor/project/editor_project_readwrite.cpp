@@ -498,14 +498,30 @@ namespace editor_project_readwrite {
 				return;
 			}
 
-			writer.Key("game_modes");
-			writer.StartObject();
-
 			auto defaults = editor_game_mode_resource();
 			::setup_game_mode_defaults(defaults.editable, officials_map);
 			::on_each_resource_id_in_object(defaults.editable, stringify_resource_id);
 
+			bool all_default = true;
+
+			for (auto& m : modes) {
+				if (!(m.editable == defaults.editable)) {
+					all_default = false;
+				}
+			}
+
+			if (all_default) {
+				return;
+			}
+
+			writer.Key("game_modes");
+			writer.StartObject();
+
 			auto write = [&](const auto& mode) {
+				if (mode.editable == defaults.editable) {
+					return;
+				}
+
 				writer.Key(mode.unique_name);
 				augs::write_json_diff(writer, mode.editable, defaults.editable, true);
 			};
@@ -883,13 +899,24 @@ namespace editor_project_readwrite {
 					augs::read_json(mode.value, specific_game_mode);
 				};
 
-				if (key == "quick_test") {
-					new_game_mode.type.set<editor_quick_test_mode>();
-					read_into(new_game_mode.editable.quick_test);
+				auto try_read = [&]<typename M>(M& into) {
+					if (key == M::get_identifier()) {
+						new_game_mode.type.set<M>();
+						read_into(into);
+						return true;
+					}
+
+					return false;
+				};
+
+				if (try_read(new_game_mode.editable.quick_test)) {
+
 				}
-				else if (key == "bomb_defusal") {
-					new_game_mode.type.set<editor_bomb_defusal_mode>();
-					read_into(new_game_mode.editable.bomb_defusal);
+				else if (try_read(new_game_mode.editable.bomb_defusal)) {
+					
+				}
+				else if (try_read(new_game_mode.editable.gun_game)) {
+
 				}
 				else {
 					if (strict) {
@@ -1292,20 +1319,28 @@ namespace editor_project_readwrite {
 			}
 		};
 
-		auto create_fallback_quick_test_mode_if_none = [&]() {
+		auto create_all_missing_modes = [&]() {
 			auto& modes = loaded.get_game_modes();
 
-			if (modes.empty()) {
-				editor_game_mode_resource new_game_mode;
-				::setup_game_mode_defaults(new_game_mode.editable, officials_map);
+			editor_game_mode_resource new_game_mode;
+			::setup_game_mode_defaults(new_game_mode.editable, officials_map);
 
-				const auto key = "quick_test";
-				new_game_mode.type.set<editor_quick_test_mode>();
+			auto register_if_missing = [&]<typename S>(S) {
+				auto key = S::get_identifier();
+				if (found_in(mode_map, key)) {
+					return;
+				}
+
+				new_game_mode.type.set<S>();
 				new_game_mode.unique_name = key;
 
-				const auto result = modes.allocate(std::move(new_game_mode));
+				const auto result = modes.allocate(new_game_mode);
 				register_new_resource(key, result);
-			}
+			};
+
+			register_if_missing(editor_quick_test_mode());
+			register_if_missing(editor_bomb_defusal_mode());
+			register_if_missing(editor_gun_game_mode());
 		};
 
 		auto unstringify_resource_id = [&]<typename R>(editor_typed_resource_id<R>& typed_id) {
@@ -1333,7 +1368,7 @@ namespace editor_project_readwrite {
 		read_project_structs();
 
 		read_modes();
-		create_fallback_quick_test_mode_if_none();
+		create_all_missing_modes();
 
 		read_external_resources();
 		read_materials();
@@ -1345,7 +1380,7 @@ namespace editor_project_readwrite {
 		unstringify_node_ids();
 
 		if (!loaded.playtesting.mode.is_set()) {
-			::setup_default_quick_test_mode(loaded.playtesting, loaded.get_game_modes());
+			::setup_default_playtesting_mode(loaded.playtesting, loaded.get_game_modes());
 		}
 
 		if (!loaded.settings.default_server_mode.is_set()) {

@@ -36,6 +36,10 @@ static void delete_with_held_items(const I in, const logic_step step, const H ha
 			}
 		);
 
+		if (auto sentience = handle.template find<components::sentience>()) {
+			q.push_back(sentience->detached.head);
+		}
+
 		reverse_perform_deletions(q, handle.get_cosmos());
 	}
 }

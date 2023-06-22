@@ -214,6 +214,10 @@ editor_icon_info editor_setup::get_icon_for(
 			return { in.necessary_images[assets::necessary_image_id::BOMB_INDICATOR], augs::imgui_atlas_type::GAME };
 		}
 
+		if (object.type.template is<editor_gun_game_mode>()) {
+			return { in.necessary_images[assets::necessary_image_id::DEATH_INDICATOR], augs::imgui_atlas_type::GAME };
+		}
+
 		if (object.type.template is<editor_quick_test_mode>()) {
 			return { in.necessary_images[assets::necessary_image_id::EDITOR_TOOL_PLAYTEST], augs::imgui_atlas_type::GAME };
 		}

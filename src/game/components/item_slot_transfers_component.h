@@ -32,7 +32,9 @@ namespace components {
 		only_pick_these_items_vector only_pick_these_items = {};
 
 		bool pick_all_touched_items_if_list_to_pick_empty = true;
-		pad_bytes<3> pad;
+		bool allow_drop_and_pick = true;
+		bool allow_melee_throws = true;
+		pad_bytes<1> pad;
 
 		signi_wielding_setup pending_reload_on_setup;
 

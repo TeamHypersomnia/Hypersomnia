@@ -6285,3 +6285,34 @@ This will discard your redo history."
     - There's no point in loading all rulesets. 
         - Why? If we want to e.g. disable/enable nodes per mode, we need to rebuild the map anyway
         - Though for switching modes we need to keep the data of which are available
+- Time limit?
+
+- Problems with disallowing drops
+    - There are also magazine drops
+    - Knockout will also drop weapons
+- Will be the easiest to just delete all lying items
+    - will work automatically for throws too
+- Easiest setup:
+    - forbid simple dropping from intents
+    - forbid picking up too (just in case deletion is delayed by a step e.g.)
+    - delete all lying items immediately from the mode logic
+
+- Could just have a flag tbh in sentience "glued_inventory"
+
+- And how do we handle dropping knives and weapons
+    - Will require some flag to the solver
+
+- Prevent deadlocking where a player can't do anything after losing their knife etc.
+    - esp. if knives of both players disappear
+
+- Either the rulesets or subrulesets will have multitude of functions like
+    - has_economy
+        - it already implies has_buying
+    - least code if we just do it inside the arena_ruleset and check if its gungame etc 
+        - even tho its kinda ugly
+
+- For GG let's do the thing that will work the quickest pls
+
+- Maybe just don't delete lying knives at all?
+    - They'll be deleted with owned objects anyway.
+
