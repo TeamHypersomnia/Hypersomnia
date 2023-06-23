@@ -90,6 +90,9 @@ bool force_show_extra_ammo = false;
 	MULTIPROPERTY("Electric armor", field.electric_armor);\
 	if (force_show_extra_ammo || insp.field.firearm.is_set()) {\
 	MULTIPROPERTY("Extra ammo pieces", field.extra_ammo_pieces);\
+	}\
+	if (auto scope = augs::imgui::scoped_tree_node_ex("Advanced")) {\
+		MULTIPROPERTY("Haste (secs)", field.haste_time);\
 	}
 
 #define EQUIPMENT_PROPERTY(label, field) \
@@ -245,6 +248,15 @@ bool edit_property(
 
 			if (label == "Radius") {
 				if (slider(label, property, 0.0f, 2000.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Haste (secs)") {
+				if (slider(label, property, 0.0f, 600.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
 					return true;
 				}

@@ -30,6 +30,8 @@ struct requested_equipment {
 
 	learnt_spells_array_type spells_to_give = {};
 	bool perform_recoils = true;
+
+	float haste_time = 0.0f;
 	// END GEN INTROSPECTOR
 
 	bool has_weapon(entity_flavour_id) const;

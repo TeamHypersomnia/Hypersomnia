@@ -26,6 +26,7 @@ auto to_game_requested_equipment(
 
 	requested_equipment result;
 	result.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+	result.haste_time = requested.haste_time;
 
 	if (requested.backpack) {
 		const auto default_backpack = 

@@ -19,6 +19,8 @@ struct editor_requested_equipment {
 	uint32_t extra_ammo_pieces = 2;
 
 	uint32_t num_explosives = 1;
+
+	float haste_time = 0.0f;
 	// END GEN INTROSPECTOR
 
 	bool is_set() const {
@@ -79,7 +81,7 @@ struct editor_gun_game_mode {
 	per_actual_faction<editor_requested_equipment> basic_equipment;
 	per_actual_faction<editor_requested_equipment> final_equipment;
 
-	bool can_throw_melee_on_final_level = true;
+	bool can_throw_melee_on_final_level = false;
 
 	std::vector<editor_typed_resource_id<editor_firearm_resource>> progression;
 	// END GEN INTROSPECTOR

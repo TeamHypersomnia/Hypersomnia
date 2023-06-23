@@ -67,9 +67,13 @@ inline void setup_game_mode_defaults(
 	basic_eq.backpack = true;
 	basic_eq.extra_ammo_pieces = 6;
 
+	/* To coincide with the spawn protection */
+	basic_eq.haste_time = 3;
+
 	editor_requested_equipment final_eq;
 	final_eq.electric_armor = true;
 	final_eq.melee = o[test_melee_weapons::YELLOW_DAGGER];
+	final_eq.haste_time = 600;
 
 	e.gun_game.basic_equipment[faction_type::METROPOLIS] = basic_eq;
 	e.gun_game.basic_equipment[faction_type::RESISTANCE] = basic_eq;
