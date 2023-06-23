@@ -138,7 +138,17 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				GREATER
 			};
 
+			const bool is_walking = !movement.was_sprint_effective && [&]() {
+				return considered_flags.walking;
+			}();
+
+			movement.was_walk_effective = is_walking;
+
 			const auto current_haste = [&]() {
+				if (is_walking) {
+					return haste_type::NONE;
+				}
+
 				if (is_sentient) {
 					const auto& haste = sentience->get<haste_perk_instance>();
 
@@ -278,12 +288,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				return idx;
 			};
-
-			const bool is_walking = !movement.was_sprint_effective && [&]() {
-				return considered_flags.walking;
-			}();
-
-			movement.was_walk_effective = is_walking;
 
 			const auto time_to_gain_speed_ms = 100.f;
 			const bool should_decelerate_due_to_walk = is_walking && movement.animation_amount >= time_to_gain_speed_ms;
