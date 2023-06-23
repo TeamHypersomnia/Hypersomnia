@@ -256,13 +256,13 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		elapsed_secs += dt_this_frame;
 	}
 
-	const auto faction = (listening_character ? listening_character.get_official_faction() : faction_type::SPECTATOR);
+	const auto listening_faction = (listening_character ? listening_character.get_official_faction() : faction_type::SPECTATOR);
 	const auto target_faction = original.start.listener_faction;
 
 	const bool is_direct_listener = 
 		original.input.modifier.always_direct_listener 
 		|| (listening_character.alive() && listening_character == original.start.direct_listener)
-		|| (target_faction != faction_type::SPECTATOR && faction == target_faction)
+		|| (listening_character.dead() && listening_faction == target_faction && target_faction != faction_type::SPECTATOR)
 	;
 
 	const auto& cosm = in.get_cosmos();
