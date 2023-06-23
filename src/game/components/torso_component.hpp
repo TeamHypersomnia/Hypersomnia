@@ -18,7 +18,7 @@ auto calc_stance_id(
 	const auto n = wielded_items.size();
 
 	if (n == 0) {
-		return item_holding_stance::BARE_LIKE;
+		return item_holding_stance::FISTS_LIKE;
 	}
 
 	auto stance_of = [&](const auto i) {

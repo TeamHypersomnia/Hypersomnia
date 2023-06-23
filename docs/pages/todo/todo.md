@@ -6,6 +6,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Fist fighting could work by spawning an invisible fist melee item but only during attack
+	- What if we have an invisible item without space etc that is only visible to melee system and drawer?
+		- but you also need to infer collider or no?
+
 - Default spawn generation for FFA-like modes
     - later, GunGame will be team-based
 

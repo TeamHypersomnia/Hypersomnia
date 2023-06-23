@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- !kill in console or autokill 
+    - just remember it forces a level back
+    - what was the problem with just autokilling when nothing in inventory again?
+        - hard to detect against backpacks i guess
+    - dont autokill, let's just implement fist fighting
+
 - To be completely honest we don't even have to approach the variantization 100%
     - although we indeed have to detect which mode it is
         - so at least this should be through the variant

@@ -461,6 +461,8 @@ arena_mode_ruleset::arena_mode_ruleset() {
 	}
 
 	{
+		rs.view.level_up_sound.id = to_sound_id(test_scene_sound_id::LEVEL_UP);
+
 		auto& mt = rs.view.win_sounds.metropolis;
 
 		mt[faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);

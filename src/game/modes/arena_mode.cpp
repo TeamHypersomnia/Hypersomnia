@@ -1465,6 +1465,13 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 					else {
 						on_player_handle(in.cosm, ko.knockouter.id, [&](const auto& player_handle) {
 							if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+								if (s->level > before_level) {
+									auto start = sound_effect_start_input::at_listener(player_handle);
+									start.listener_faction = ko.knockouter.faction;
+
+									in.rules.view.level_up_sound.start(step, start, never_predictable_v);
+								}
+
 								reset_equipment_for(step, in, ko.knockouter.id, player_handle);
 							}
 						});

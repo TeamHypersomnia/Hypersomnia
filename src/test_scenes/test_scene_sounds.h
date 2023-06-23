@@ -259,6 +259,8 @@ enum class test_scene_sound_id {
 	ANNOUNCE_KILLINGSPREE,
 	ANNOUNCE_UNSTOPPABLE,
 
+	LEVEL_UP,
+
 	ARABESQUE,
 
 	COUNT

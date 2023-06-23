@@ -171,6 +171,8 @@ struct arena_mode_view_rules {
 
 	theme_flavour_type bomb_soon_explodes_theme;
 	unsigned secs_until_detonation_to_start_theme = 10;
+
+	sound_effect_input level_up_sound;
 	// END GEN INTROSPECTOR
 
 	bool past_all_streaks(const int current_streak_count) const {

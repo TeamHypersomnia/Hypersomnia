@@ -111,6 +111,16 @@ namespace test_flavours {
 					knife_like.actions[weapon_action_type::SECONDARY].returner = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_KNIFE_SECD_RETURN);
 				}
 
+				{
+					auto& fists_like = torso_def.stances[item_holding_stance::FISTS_LIKE];
+
+					fists_like.carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_BARE_WALK);
+					fists_like.actions[weapon_action_type::PRIMARY].perform = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_KNIFE_PRIM);
+					fists_like.actions[weapon_action_type::SECONDARY].perform = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_KNIFE_SECD);
+					fists_like.actions[weapon_action_type::PRIMARY].returner = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_KNIFE_PRIM_RETURN);
+					fists_like.actions[weapon_action_type::SECONDARY].returner = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_KNIFE_SECD_RETURN);
+				}
+
 				torso_def.stances[item_holding_stance::AKIMBO].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_AKIMBO_WALK);
 				act(item_holding_stance::AKIMBO, weapon_action_type::PRIMARY, test_scene_torso_animation_id::METROPOLIS_TORSO_AKIMBO_SHOT);
 				torso_def.stances[item_holding_stance::AKIMBO].chambering = torso_def.stances[item_holding_stance::AKIMBO].actions[weapon_action_type::PRIMARY].perform;
@@ -514,6 +524,16 @@ namespace test_flavours {
 					knife_like.actions[weapon_action_type::PRIMARY].returner = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_KNIFE_PRIM_RETURN);
 					knife_like.actions[weapon_action_type::SECONDARY].returner = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_KNIFE_SECD_RETURN);
 				}
+				{
+					auto& fists_like = torso_def.stances[item_holding_stance::FISTS_LIKE];
+
+					fists_like.carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_BARE_WALK);
+					fists_like.actions[weapon_action_type::PRIMARY].perform = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_KNIFE_PRIM);
+					fists_like.actions[weapon_action_type::SECONDARY].perform = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_KNIFE_SECD);
+					fists_like.actions[weapon_action_type::PRIMARY].returner = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_KNIFE_PRIM_RETURN);
+					fists_like.actions[weapon_action_type::SECONDARY].returner = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_KNIFE_SECD_RETURN);
+				}
+
 
 				torso_def.stances[item_holding_stance::AKIMBO].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_AKIMBO_WALK);
 				act(item_holding_stance::AKIMBO, weapon_action_type::PRIMARY, test_scene_torso_animation_id::RESISTANCE_TORSO_AKIMBO_SHOT);
