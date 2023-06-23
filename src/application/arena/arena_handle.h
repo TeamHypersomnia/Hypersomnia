@@ -4,6 +4,7 @@
 #include "test_scenes/test_scene_settings.h"
 #include "view/game_drawing_settings.h"
 #include "application/setups/editor/project/editor_project_paths.h"
+#include "augs/log.h"
 
 class test_mode;
 struct intercosm;
@@ -24,6 +25,10 @@ class basic_arena_handle {
 				using I = typename M::template basic_input<C>;
 				
 				const auto vars = std::get_if<typename M::ruleset_type>(std::addressof(self.ruleset));
+
+				if (vars == nullptr) {
+					LOG_NVPS(self.current_mode_state.index(), self.ruleset.index());
+				}
 
 				ensure(vars != nullptr);
 
@@ -50,6 +55,11 @@ class basic_arena_handle {
 				using M = remove_cref<decltype(typed_mode)>;
 				
 				const auto vars = std::get_if<typename M::ruleset_type>(std::addressof(self.ruleset));
+
+				if (vars == nullptr) {
+					LOG_NVPS(self.current_mode_state.index(), self.ruleset.index());
+				}
+
 				ensure(vars != nullptr);
 
 				return callback(typed_mode, *vars);

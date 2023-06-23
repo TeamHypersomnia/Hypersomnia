@@ -43,10 +43,15 @@ message_handler_result client_setup::handle_payload(
 		}
 
 		const auto& new_arena = new_vars.current_arena;
+		const auto& new_mode = new_vars.game_mode;
 
 		LOG_NVPS(new_arena);
 
-		const bool reload_arena = new_arena != sv_solvable_vars.current_arena;
+		const bool reload_arena = 
+			new_arena != sv_solvable_vars.current_arena
+			|| new_mode != sv_solvable_vars.game_mode
+			|| new_vars.required_arena_hash != sv_solvable_vars.required_arena_hash
+		;
 
 		sv_solvable_vars = new_vars;
 		client_gui.rcon.on_arrived(new_vars);

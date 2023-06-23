@@ -720,7 +720,7 @@ bool client_setup::finalize_arena_download() {
 bool client_setup::try_load_arena_according_to(const server_solvable_vars& new_vars, bool allow_download) {
 	const auto& new_arena = new_vars.current_arena;
 
-	LOG("Trying to load arena: %x", new_arena);
+	LOG("Trying to load arena: %x (game_mode: %x)", new_arena, new_vars.game_mode.empty() ? "default" : new_vars.game_mode.c_str());
 	LOG("Required arena hash: %x", augs::to_hex_format(new_vars.required_arena_hash));
 
 	try {
