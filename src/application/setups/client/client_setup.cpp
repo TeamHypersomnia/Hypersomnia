@@ -718,7 +718,7 @@ bool client_setup::finalize_arena_download() {
 }
 
 bool client_setup::try_load_arena_according_to(const server_solvable_vars& new_vars, bool allow_download) {
-	const auto& new_arena = new_vars.current_arena;
+	const auto& new_arena = new_vars.arena;
 
 	LOG("Trying to load arena: %x (game_mode: %x)", new_arena, new_vars.game_mode.empty() ? "default" : new_vars.game_mode.c_str());
 	LOG("Required arena hash: %x", augs::to_hex_format(new_vars.required_arena_hash));
@@ -735,7 +735,7 @@ bool client_setup::try_load_arena_according_to(const server_solvable_vars& new_v
 				lua,
 				referential_arena,
 				official,
-				new_vars.current_arena,
+				new_vars.arena,
 				new_vars.game_mode,
 				clean_round_state,
 				new_vars.playtesting_context,
@@ -806,12 +806,12 @@ bool client_setup::try_load_arena_according_to(const server_solvable_vars& new_v
 		return false;
 	}
 	catch (const augs::json_deserialization_error& err) {
-		set_disconnect_reason(typesafe_sprintf("Failed to load \"%x\":\n%x.", new_vars.current_arena, err.what()));
+		set_disconnect_reason(typesafe_sprintf("Failed to load \"%x\":\n%x.", new_vars.arena, err.what()));
 
 		return false;
 	}
 	catch (const std::exception& err) {
-		set_disconnect_reason(typesafe_sprintf("Failed to load \"%x\":\n%x.", new_vars.current_arena, err.what()));
+		set_disconnect_reason(typesafe_sprintf("Failed to load \"%x\":\n%x.", new_vars.arena, err.what()));
 
 		return false;
 	}

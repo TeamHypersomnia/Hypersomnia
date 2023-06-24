@@ -28,7 +28,7 @@ struct server_solvable_vars {
 	// GEN INTROSPECTOR struct server_solvable_vars
 	arena_switching_settings arena_switching;
 
-	arena_identifier current_arena = "";
+	arena_identifier arena = "";
 	augs::secure_hash_type required_arena_hash = augs::secure_hash_type();
 	game_mode_name_type game_mode = "";
 	std::optional<arena_playtesting_context> playtesting_context;

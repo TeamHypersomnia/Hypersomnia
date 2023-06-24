@@ -614,7 +614,7 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	heartbeat.nat = nat_traversal.last_detected_nat;
 	heartbeat.server_name = vars.server_name;
-	heartbeat.current_arena = solvable_vars.current_arena;
+	heartbeat.current_arena = solvable_vars.arena;
 	heartbeat.game_mode = arena.on_mode_with_input(
 		[&](const auto& mode, const auto& input) {
 			return mode.get_name(input);
@@ -978,12 +978,12 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 	}
 
 	if (any_difference) {
-		if (force || old_vars.current_arena != new_vars.current_arena || old_vars.game_mode != new_vars.game_mode) {
+		if (force || old_vars.arena != new_vars.arena || old_vars.game_mode != new_vars.game_mode) {
 			try {
-				choose_arena(new_vars.current_arena);
+				choose_arena(new_vars.arena);
 			}
 			catch (const augs::json_deserialization_error& err) {
-				LOG("Failed to load \"%x\":\n%x.", new_vars.current_arena, err.what());
+				LOG("Failed to load \"%x\":\n%x.", new_vars.arena, err.what());
 
 				const auto test_scene_arena = "";
 				choose_arena(test_scene_arena);
@@ -997,7 +997,7 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 
 				/* This should never really happen as we'll always check before allowing admin to set a map name. */
 
-				LOG("Arena named \"%x\" was not found on the server!\nLoading the default arena instead.", new_vars.current_arena);
+				LOG("Arena named \"%x\" was not found on the server!\nLoading the default arena instead.", new_vars.arena);
 
 				const auto test_scene_arena = "";
 				choose_arena(test_scene_arena);
@@ -1087,7 +1087,7 @@ void server_setup::choose_arena(const std::string& name) {
 			std::addressof(*last_loaded_project)
 		});
 
-		solvable_vars.current_arena = name;
+		solvable_vars.arena = name;
 		solvable_vars.required_arena_hash = result.required_hash;
 		current_arena_folder = result.arena_folder_path;
 
@@ -1544,7 +1544,7 @@ message_handler_result server_setup::handle_rcon_payload(
 		return continue_v;
 	}
 	else if constexpr(std::is_same_v<P, server_solvable_vars>) {
-		LOG("New server solvable vars from the client (%x).", typed_payload.current_arena);
+		LOG("New server solvable vars from the client (%x).", typed_payload.arena);
 
 		apply(typed_payload, true);
 
@@ -1994,7 +1994,7 @@ const server_name_type& server_setup::get_server_name() const {
 }
 
 std::string server_setup::get_current_arena_name() const {
-	return solvable_vars.current_arena;
+	return solvable_vars.arena;
 }
 
 server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) const {

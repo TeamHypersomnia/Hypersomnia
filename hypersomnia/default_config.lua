@@ -740,7 +740,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       vote_rounds_before = 0
 	},
 
-	current_arena = "de_cyberaqua",
+	arena = "de_cyberaqua",
 	game_mode = "",
   },
 

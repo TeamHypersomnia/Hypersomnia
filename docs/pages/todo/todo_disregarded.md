@@ -662,3 +662,10 @@ summary: Just a hidden scratchpad.
 
 - What if instead of raycast we just test overlap with a fabricated b2 edge?
     - PROBLEM: overlap may report something against which we graze, but then if raycasts don't report anything we'll treat it as if it completely overlaps
+
+- !kill in console or autokill 
+    - just remember it forces a level back
+    - what was the problem with just autokilling when nothing in inventory again?
+        - hard to detect against backpacks i guess
+    - dont autokill, let's just implement fist fighting
+

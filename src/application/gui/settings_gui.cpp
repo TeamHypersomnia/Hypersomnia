@@ -1718,11 +1718,11 @@ void do_server_vars(
 
 	auto revert = make_revert_button_lambda(vars, last_saved_vars);
 
-	if (perform_arena_chooser(vars.current_arena)) {
+	if (perform_arena_chooser(vars.arena)) {
 		vars.game_mode = "";
 	}
 
-	revert(vars.current_arena);
+	revert(vars.arena);
 
 	perform_game_mode_chooser(vars.game_mode);
 	revert(vars.game_mode);

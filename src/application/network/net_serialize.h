@@ -170,7 +170,7 @@ namespace net_messages {
 			return false;
 		}
 
-		return sanitization::arena_name_safe(c.current_arena);
+		return sanitization::arena_name_safe(c.arena);
 	}
 
 	template <class Stream>

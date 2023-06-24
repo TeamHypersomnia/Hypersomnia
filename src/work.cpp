@@ -1653,7 +1653,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 						auto playtest_solvable_vars = config.server_solvable;
 						playtest_solvable_vars.playtesting_context = setup.make_playtesting_context();
-						playtest_solvable_vars.current_arena = setup.get_arena_name();
+						playtest_solvable_vars.arena = setup.get_arena_name();
 
 						background_setup = std::move(current_setup);
 

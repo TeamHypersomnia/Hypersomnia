@@ -124,7 +124,7 @@ as well as to test your skills in a laggy environment.
 
 		input_text("Server name", into_vars.server_name);
 
-		if (perform_arena_chooser(into_solvable_vars.current_arena)) {
+		if (perform_arena_chooser(into_solvable_vars.arena)) {
 			into_solvable_vars.game_mode = "";
 		}
 

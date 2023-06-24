@@ -42,13 +42,13 @@ message_handler_result client_setup::handle_payload(
 			LOG("Received corrected vars from the server");
 		}
 
-		const auto& new_arena = new_vars.current_arena;
+		const auto& new_arena = new_vars.arena;
 		const auto& new_mode = new_vars.game_mode;
 
 		LOG_NVPS(new_arena);
 
 		const bool reload_arena = 
-			new_arena != sv_solvable_vars.current_arena
+			new_arena != sv_solvable_vars.arena
 			|| new_mode != sv_solvable_vars.game_mode
 			|| new_vars.required_arena_hash != sv_solvable_vars.required_arena_hash
 		;
