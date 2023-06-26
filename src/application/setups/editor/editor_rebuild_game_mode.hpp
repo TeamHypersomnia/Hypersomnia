@@ -195,6 +195,9 @@ auto setup_ruleset_from_editor_mode(
 			rules.view.show_info_icons_of_opponents = true;
 			rules.view.show_money_of_opponents = true;
 
+			/* Always spawn */
+			rules.allow_spawn_for_secs_after_starting = static_cast<uint32_t>(-1);
+
 			if (rules.respawn_after_ms <= 0.0f) {
 				rules.respawn_after_ms = 20.0f;
 			}
