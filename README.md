@@ -111,7 +111,8 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
     - It is impractical to continuously update every single one of them through the network. 
     - Instead, only the player inputs are transmitted ("I moved mouse here", "I pressed this button") - the clients simulate *everything else* locally, on their own. Think playing chess with your friend over the phone. You won't ever say aloud the entire state of the chessboard, only the movements ("Queen to H5").
   - But *Hypersomnia* is not an RTS - since it's physics-based, it uses *floats* heavily, not just *integers*.
-    - When floating point calculations are involved, simulation determinism becomes [extremely hard.](https://gafferongames.com/post/floating_point_determinism/)
+    - When floating point calculations are involved, simulation determinism becomes **extremely hard.**
+      - See why in this [excellent article by Glenn Fiedler.](https://gafferongames.com/post/floating_point_determinism/)
     - To achieve it in *Hypersomnia*, I had to: 
       - Use the same compiler - ``clang`` - on **all** OSes. It's very nice of LLVM to be ieee754-compliant by default.
       - Replace all math functions like ``std::sin``, ``std::sqrt`` by these from [STREFLOP.](https://nicolas.brodu.net/programmation/streflop/index.html)
