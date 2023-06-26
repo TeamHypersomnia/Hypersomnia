@@ -66,3 +66,22 @@ namespace augs {
 #error "Unsupported platform!"
 #endif
 
+
+namespace augs {
+#if PLATFORM_WINDOWS
+	void open_url(const std::string& url) {
+		augs::shell(url);
+	}
+#elif PLATFORM_LINUX
+	void open_url(const std::string& url) {
+		std::string command = "xdg-open " + url;
+		std::system(command.c_str());
+	}
+#elif PLATFORM_MACOS
+	void open_url(const std::string& url) {
+        std::string command = "open " + url;
+		std::system(command.c_str());
+	}
+#endif
+}
+

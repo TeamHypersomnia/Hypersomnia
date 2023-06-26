@@ -33,10 +33,15 @@ public:
 
 	rgba colorize = white;
 	bool click_callback_required = false;
-	pad_bytes<3> pad;
+	bool is_discord = false;
+	pad_bytes<2> pad;
 
 	template <class M>
 	vec2i get_target_button_size(const M& manager, const augs::baked_font& gui_font) const {
+		if (is_discord) {
+			return manager.at(assets::necessary_image_id::DISCORD_BUTTON).get_original_size();
+		}
+
 		return corners.internal_size_to_cornered_size(
 			manager,
 			augs::gui::text::get_text_bbox({ appearing_caption.get_total_target_text(), gui_font } )
@@ -185,5 +190,9 @@ public:
 			internal_rc.left_top(),
 			{ gui_font , color }
 		);
+
+		if (this_id->is_discord) {
+			output.aabb(necessarys.at(assets::necessary_image_id::DISCORD_BUTTON), this_tree_entry.get_absolute_rect(), white);
+		}
 	}
 };

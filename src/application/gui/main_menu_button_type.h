@@ -2,6 +2,7 @@
 
 enum class main_menu_button_type {
 	// GEN INTROSPECTOR enum class main_menu_button_type
+	JOIN_DISCORD,
 	CONNECT_TO_OFFICIAL_SERVER,
 	BROWSE_SERVERS,
 	HOST_SERVER,

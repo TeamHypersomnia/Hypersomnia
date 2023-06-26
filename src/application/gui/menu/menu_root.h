@@ -50,6 +50,11 @@ public:
 		const vec2i size
 	) {
 		for (size_t i = 0; i < buttons.size(); ++i) {
+			if (buttons[i].is_discord) {
+				buttons[i].rc.set_size(manager.at(assets::necessary_image_id::DISCORD_BUTTON).get_original_size());
+				continue;
+			}
+
 			auto this_size = size;
 
 			const auto bbox = buttons[i].corners.cornered_size_to_internal_size(manager, buttons[i].get_target_button_size(manager, gui_font));

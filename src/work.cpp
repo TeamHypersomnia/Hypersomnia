@@ -1921,6 +1921,10 @@ work_result work(const int argc, const char* const * const argv) try {
 		using T = decltype(t);
 
 		switch (t) {
+			case T::JOIN_DISCORD:
+				augs::open_url("https://discord.com/invite/YC49E4G");
+				break;
+
 			case T::BROWSE_SERVERS:
 				browse_servers_gui.open();
 

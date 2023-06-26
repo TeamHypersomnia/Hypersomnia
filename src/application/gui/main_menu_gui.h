@@ -123,6 +123,8 @@ struct main_menu_gui {
 			root.buttons[i].set_complete_caption(format_enum(e));
 		}
 
+		root.buttons[0].is_discord = true;
+
 		world.advance_elements(context, vdt);
 		world.rebuild_layouts(context);
 		world.build_tree_data_into(context);
