@@ -570,7 +570,7 @@ Currently, the following file managers are supported:
 
 ## MacOS instructions
 
-Refer to [MacOS_build.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/.github/workflows/macos_build.yml) file for up-to-date instructions.
+Refer to [MacOS_build.yml](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/.github/workflows/MacOS_build.yml) file for up-to-date instructions.
 
 # Contributing
 
