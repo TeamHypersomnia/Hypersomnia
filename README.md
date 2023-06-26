@@ -104,8 +104,8 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
 
 - **[rectpack2D,](https://github.com/TeamHypersomnia/rectpack2D) written for packing textures, became famous and was used in [Assassin's Creed: Valhalla.](https://www.youtube.com/watch?v=2KnjDL4DnwM&t=2382s)**
   - Used also by [a drone manufacturing company](https://pages.skydio.com/rs/784-TUF-591/images/Open%20Source%20Software%20Notice%20v0.2.html) and in [2 scientific papers.](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=teamhypersomnia&btnG=)
-- My Entity-Component-System [idea from 2013](https://github.com/TeamHypersomnia/Hypersomnia/issues/264) describes techniques similar to **[Unity Engine patent from 2018.](https://patents.google.com/patent/US10599560B2/en)**
-  - **[Original SE article.](https://gamedev.stackexchange.com/questions/58693/grouping-entities-of-the-same-component-set-into-linear-memory/)**
+- My Entity-Component-System **[idea from 2013](https://gamedev.stackexchange.com/questions/58693/grouping-entities-of-the-same-component-set-into-linear-memory/)** describes techniques similar to **[Unity Engine patent from 2018.](https://patents.google.com/patent/US10599560B2/en)**
+  - **[See this discussion.](https://github.com/TeamHypersomnia/Hypersomnia/issues/264)**
 - Networking is based on **cross-platform simulation determinism**. 
   - This technique is traditionally used by RTS games with hundreds of continuously moving soldier units. 
     - It is impractical to continuously update every single one of them through the network. 
