@@ -9,6 +9,8 @@
 #include "application/setups/debugger/property_debugger/widgets/keyboard_acquiring_popup.h"
 #include "view/asset_funcs.h"
 #include "augs/log.h"
+#include "augs/string/path_sanitization.h"
+#include "application/setups/debugger/detail/maybe_different_colors.h"
 
 class arena_chooser : keyboard_acquiring_popup {
 	using I = std::string;
@@ -125,11 +127,17 @@ public:
 					ImGui::SetScrollHereY();
 				}
 
-				if (ImGui::Selectable(arena_name.c_str(), is_current, ImGuiSelectableFlags_SpanAllColumns)) {
-					ImGui::CloseCurrentPopup();
+				bool enabled = sanitization::arena_name_safe(arena_name);
+				auto disabled = maybe_disabled_cols({}, !enabled);
+				auto cond = cond_scoped_style_color(!enabled, ImGuiCol_Text, ImVec4(rgba(150, 40, 40, 255)));
 
-					LOG("Arena selected: %x", button_path);
-					on_choice(button_path);
+				if (ImGui::Selectable(arena_name.c_str(), is_current, ImGuiSelectableFlags_SpanAllColumns)) {
+					if (enabled) {
+						ImGui::CloseCurrentPopup();
+
+						LOG("Arena selected: %x", button_path);
+						on_choice(button_path);
+					}
 				}
 			};
 

@@ -1974,9 +1974,11 @@ work_result work(const int argc, const char* const * const argv) try {
 				settings_gui.open();
 				break;
 
+#if 0
 			case T::CREATORS:
 				main_menu->launch_creators_screen();
 				break;
+#endif
 
 			case T::QUIT:
 				LOG("Quitting due to Quit pressed in main menu.");

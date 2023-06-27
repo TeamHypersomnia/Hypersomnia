@@ -10,7 +10,6 @@ enum class main_menu_button_type {
 	SHOOTING_RANGE,
 	EDITOR,
 	SETTINGS,
-	CREATORS,
 	QUIT,
 
 	COUNT

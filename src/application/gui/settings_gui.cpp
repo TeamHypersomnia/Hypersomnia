@@ -1762,7 +1762,7 @@ void do_server_vars(
 	revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
 	revertable_input_text(SCOPE_CFG_NVP(server_name));
 
-	revertable_checkbox("Allow NAT traversal", scope_cfg.allow_nat_traversal);
+	revertable_checkbox("I'm behind router", scope_cfg.allow_nat_traversal);
 
 	revertable_slider("Max file bandwidth (per second)", scope_cfg.max_file_bandwidth, 0.0f, 4.f, "%.2f MB");
 
