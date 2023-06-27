@@ -1,0 +1,2799 @@
+{
+    "meta": {
+        "name": "menu",
+        "version_timestamp": "2023-06-27 23:00:06.132481 UTC"
+    },
+    "about": {
+        "author": "Pythagoras",
+        "welcome_message": ""
+    },
+    "settings": {
+        "default_server_mode": "quick_test",
+        "include_disabled_nodes": false,
+        "ambient_light_color": [0, 67, 90, 255]
+    },
+    "playtesting": {
+        "mode": "quick_test",
+        "bots": 53
+    },
+    "game_modes": {
+        "quick_test": {
+            "equipment": {
+                "metropolis": {
+                    "firearm": "awka",
+                    "melee": "cyan_scythe"
+                },
+                "resistance": {
+                    "firearm": null,
+                    "melee": null,
+                    "backpack": false,
+                    "electric_armor": true
+                }
+            }
+        }
+    },
+    "external_resources": [
+        {
+            "path": "gfx/garden/bush.png",
+            "file_hash": "c2175c5d0915e83fe56616ce31a5b19257a4cb295d8158df90420dfac7062324",
+            "id": "@bush",
+            "neon_map": {
+                "standard_deviation": 9.0,
+                "amplification": 190.0,
+                "light_colors": [[133, 196, 112, 255], [127, 178, 109, 255], [115, 166, 101, 255], [108, 158, 93, 255], [91, 130, 80, 255], [114, 165, 100, 255], [112, 161, 98, 255]
+                ]
+            },
+            "color": [255, 211, 105, 255],
+            "neon_color": [255, 255, 86, 212],
+            "size": [121, 121],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0
+        },
+        {
+            "path": "gfx/garden/donic2.png",
+            "file_hash": "853b1fccf37395f29727bd0deb9308e7288e124257d7e092fe9d1ce072c6502d",
+            "id": "@donic2",
+            "neon_map": {
+                "light_colors": [[0, 211, 255, 255]
+                ]
+            },
+            "size": [272, 128],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    },
+                    "walking_speed": 0.5
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/donicv2.png",
+            "file_hash": "22d30ca2311a08f44fca570fbcbdeb9776d92edcf34a2ec664cdf63cb87bef30",
+            "id": "@donicv2",
+            "neon_map": {
+                "amplification": 120.0,
+                "light_colors": [[0, 255, 0, 255], [0, 255, 255, 255]
+                ]
+            },
+            "size": [518, 160],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_dirt"
+                    },
+                    "walking_speed": 0.4000000059604645
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/fern.png",
+            "file_hash": "1ac8d8c8d9a11dce236c6e5c2264d0aedf7d59427551f77544837ee599fadf08",
+            "id": "@fern",
+            "domain": "FOREGROUND",
+            "neon_map": {
+                "standard_deviation": 8.0,
+                "amplification": 140.0,
+                "light_colors": [[107, 219, 197, 255], [51, 166, 130, 255]
+                ]
+            },
+            "color": [255, 255, 106, 255],
+            "size": [126, 121],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "full_illumination": true,
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/grass_1.png",
+            "file_hash": "6175d6eccd2f2c8d95dccc75189a821feb7da9f2953a9f5539269cd73c8ceb4c",
+            "id": "@grass_1",
+            "color": [255, 254, 254, 255],
+            "neon_color": [255, 255, 255, 212],
+            "size": [128, 128],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_dirt"
+                    },
+                    "walking_speed": 0.9399999976158142
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/grass_2.png",
+            "file_hash": "65d723d28f8837e5a1de1b30064a28188814c1b7bcadc007b9537a7da43e8e16",
+            "id": "@grass_2",
+            "color": [255, 254, 254, 255],
+            "neon_color": [255, 255, 255, 212],
+            "size": [128, 128],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_dirt"
+                    },
+                    "walking_speed": 0.8999999761581421
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/grass_dune_1.png",
+            "file_hash": "17db41626adf3ba75069323a748b32526fd841b76f77604b86d049776f93faf8",
+            "id": "@grass_dune_1",
+            "color": [255, 254, 254, 255],
+            "neon_color": [255, 255, 255, 212],
+            "size": [136, 110],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_dirt"
+                    },
+                    "walking_speed": 0.8999999761581421
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/grass_dune_2.png",
+            "file_hash": "18dce67fa4468737edb9ea7c719be588dd5da28355ec3764f5be58b5c30758b4",
+            "id": "@grass_dune_2",
+            "color": [255, 254, 254, 255],
+            "neon_color": [255, 255, 255, 212],
+            "size": [137, 126],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_dirt"
+                    },
+                    "walking_speed": 0.8999999761581421
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/kratka.png",
+            "file_hash": "66cec44e55bab8beaed67f6868f34051a5ff4ebac50c076573cf86b98ddacc99",
+            "id": "@kratka",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [128, 32],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.800000011920929,
+                        "id": "footstep_fence"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/monstera.png",
+            "file_hash": "7ce3aa85907930464331868ac27cac89ecb887bf866fbd88a0b7c146e401445e",
+            "id": "@monstera",
+            "domain": "FOREGROUND",
+            "neon_map": {
+                "standard_deviation": 8.0,
+                "radius": [
+                    100,
+                    100
+                ],
+                "amplification": 140.0,
+                "light_colors": [[212, 248, 110, 255], [129, 165, 35, 255]
+                ]
+            },
+            "color": [132, 255, 200, 255],
+            "neon_color": [129, 255, 209, 255],
+            "size": [136, 154],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "full_illumination": true,
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/monstera_donica.png",
+            "file_hash": "3d25cb4a690e2b5c8d79e9d414c28dc8203eafd7c3cb869bbf3d00c64d262191",
+            "id": "@monstera_donica",
+            "neon_map": {
+                "standard_deviation": 8.0,
+                "amplification": 220.0,
+                "alpha_multiplier": 0.699999988079071,
+                "light_colors": [[210, 121, 121, 255], [198, 85, 85, 255], [116, 108, 109, 255], [38, 32, 32, 255]
+                ]
+            },
+            "size": [96, 96],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_dirt"
+                    },
+                    "walking_speed": 0.699999988079071
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/orange_flowerpot.png",
+            "file_hash": "97dc12901c389a466551f1ba598b14706d72c4bddbe24b6c885cbc95da6124f2",
+            "id": "@orange_flowerpot",
+            "neon_map": {
+                "standard_deviation": 8.0,
+                "amplification": 220.0,
+                "alpha_multiplier": 0.5,
+                "light_colors": [[255, 185, 38, 255], [61, 39, 28, 255]
+                ]
+            },
+            "size": [84, 84],
+            "stretch_when_resized": true,
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_dirt"
+                    },
+                    "walking_speed": 0.699999988079071
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/stone_pavement.png",
+            "file_hash": "81de681ab55711a1b704e642c52d35d2aa379049a289ce8e6789b65d1c4f63d3",
+            "id": "@stone_pavement",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [128, 128],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_standard"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/stone_pavement_bottom.png",
+            "file_hash": "ee30bf0ee6a7b29e387b01548e62216136f5e8696687a5fc451b7eff5b81fe64",
+            "id": "@stone_pavement_bottom",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [128, 22],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_standard"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/stone_pavement_bottom_right.png",
+            "file_hash": "f7b98b2febe51505f4cfb917d9d182c0706cb3a80d70ddd87c40eff94155498e",
+            "id": "@stone_pavement_bottom_right",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [14, 10],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_standard"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/stone_pavement_left.png",
+            "file_hash": "c85e4b18c8cd90ddecbe2974f98e23ef779bee6b320d99ffc42e3fb18131c019",
+            "id": "@stone_pavement_left",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [27, 128],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_standard"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/stone_pavement_right.png",
+            "file_hash": "e6dfa1ddcfbfa6f14cf7fce3d750e5e2a645b620721034f12abdc9fe46ceeb7c",
+            "id": "@stone_pavement_right",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [24, 128],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_standard"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/stone_pavement_top.png",
+            "file_hash": "bee9dc49f444ef59d8df6d129486dde1fd1895a893db1eeb55ef7764973ee673",
+            "id": "@stone_pavement_top",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [128, 32],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_standard"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/stone_pavement_top_left.png",
+            "file_hash": "11380283c92a15a7ddedc397146aa4981d57a29f81d7221e6e8f159d2ae5b47e",
+            "id": "@stone_pavement_top_left",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [14, 15],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_standard"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/garden/stone_pavement_top_right.png",
+            "file_hash": "c6c626d99367ed6d2ac63ad781975a2b01ddb8b87e7b91d97dec4014f559e70c",
+            "id": "@stone_pavement_top_right",
+            "color": [255, 255, 162, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [20, 15],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421,
+                        "id": "footstep_standard"
+                    }
+                }
+            }
+        },
+        {
+            "path": "sfx/garden_ambience.ogg",
+            "file_hash": "9d78d3277628418a8b205970fd79a0d8d79814fa1158cb5d3462823f0bc06e38",
+            "id": "@garden_ambience",
+            "spatialize": false,
+            "loop": true
+        }
+    ],
+    "layers": [
+        {
+            "id": "Layer 3",
+            "nodes": [
+                "portal_circle"
+            ]
+        },
+        {
+            "id": "Layer 2"
+        },
+        {
+            "id": "Layer 1",
+            "nodes": [
+                "Wandering pixels (6)",
+                "monstera_donica (7)",
+                "monstera_donica (6)",
+                "monstera_donica (4)",
+                "Monstera",
+                "Monstera (10)",
+                "Grass dune 2 (11)",
+                "Monstera (9)"
+            ]
+        },
+        {
+            "id": "Layer 14",
+            "nodes": [
+                "cicada (15)",
+                "cicada (14)",
+                "cicada (13)",
+                "cicada (12)",
+                "cicada (11)",
+                "cicada (10)",
+                "cicada (9)",
+                "cicada (8)",
+                "cicada (7)",
+                "cicada (6)",
+                "cicada (5)",
+                "cicada (4)",
+                "cicada (3)",
+                "cicada (2)",
+                "cicada (1)",
+                "cicada"
+            ]
+        },
+        {
+            "id": "Layer 13",
+            "nodes": [
+                "garden_ambience"
+            ]
+        },
+        {
+            "id": "Layer 12",
+            "nodes": [
+                "crosshair",
+                "spawn"
+            ]
+        },
+        {
+            "id": "Layer 11",
+            "nodes": [
+                "mota (4)",
+                "mota (3)",
+                "mota (2)",
+                "mota (1)",
+                "mota"
+            ]
+        },
+        {
+            "id": "Layer 9",
+            "nodes": [
+                "donic2 (1)",
+                "donic2-up",
+                "donic2"
+            ]
+        },
+        {
+            "id": "garden lights",
+            "nodes": [
+                "Strong lamp (2)",
+                "Strong lamp (31)",
+                "Strong lamp (32)",
+                "Strong lamp (33)",
+                "Strong lamp (35)"
+            ]
+        },
+        {
+            "id": "New layer",
+            "nodes": [
+                "Wandering pixels",
+                "Wandering pixels (1)",
+                "Wandering pixels (3)",
+                "Wandering pixels (4)",
+                "Wandering pixels (15)",
+                "flower_cyan (15)",
+                "flower_cyan (14)",
+                "flower_cyan (13)",
+                "flower_cyan (17)",
+                "flower_cyan (16)",
+                "flower_cyan (12)",
+                "flower_cyan (11)",
+                "Wandering pixels (10)",
+                "Wandering pixels (2)",
+                "Wandering pixels (5)",
+                "Wandering pixels (9)",
+                "Wandering pixels (7)",
+                "Wandering pixels (11)",
+                "Wandering pixels (14)",
+                "Wandering pixels (13)",
+                "Wandering pixels (12)",
+                "Wandering pixels (8)",
+                "Organism area",
+                "Monstera (12)",
+                "Fern (26)",
+                "Fern (27)",
+                "Fern (25)",
+                "Fern (24)",
+                "Fern (23)",
+                "donicv2 (1)",
+                "Fern (14)",
+                "Monstera (14)",
+                "Monstera (13)",
+                "Monstera (11)",
+                "Monstera (8)",
+                "Monstera (2)",
+                "Monstera (1)",
+                "Monstera (15)",
+                "Monstera (3)",
+                "monstera_donica (10)",
+                "monstera_donica (9)",
+                "monstera_donica (8)",
+                "monstera_donica (5)",
+                "monstera_donica (3)",
+                "monstera_donica (2)",
+                "monstera_donica (1)",
+                "monstera_donica",
+                "orange_flowerpot (2)",
+                "orange_flowerpot (9)",
+                "orange_flowerpot (1)",
+                "orange_flowerpot",
+                "Monstera (4)",
+                "monstera_donica (17)",
+                "monstera_donica (16)",
+                "monstera_donica (15)",
+                "monstera_donica (18)-up-right-up",
+                "Fern (32)-up-right-up",
+                "monstera_donica (18)-up-right",
+                "Fern (32)-up-right",
+                "monstera_donica (18)-up",
+                "Fern (32)-up",
+                "monstera_donica (18)",
+                "Fern (32)",
+                "monstera_donica (14)",
+                "monstera_donica (13)",
+                "monstera_donica (12)",
+                "Fern",
+                "Fern (2)",
+                "Fern (1)",
+                "Fern (31)",
+                "Fern (30)",
+                "Fern (29)",
+                "Fern (28)",
+                "Fern (3)",
+                "Monstera (5)",
+                "Monstera (6)",
+                "Monstera (7)",
+                "Fern (16)",
+                "Fern (13)",
+                "Fern (19)",
+                "orange_flowerpot (8)",
+                "Fern (20)",
+                "Fern (22)",
+                "Fern (21)",
+                "Fern (17)",
+                "Fern (15)",
+                "Fern (12)",
+                "Fern (11)",
+                "Fern (10)",
+                "flower_pink (7)",
+                "flower_pink (6)",
+                "flower_pink (5)",
+                "flower_pink (4)",
+                "flower_pink (3)",
+                "flower_pink (2)",
+                "flower_pink (1)",
+                "flower_cyan (8)",
+                "flower_cyan (7)",
+                "flower_cyan (6)",
+                "flower_cyan (9)",
+                "flower_cyan (10)",
+                "flower_cyan (5)",
+                "flower_cyan (4)",
+                "flower_cyan (3)",
+                "flower_cyan (2)",
+                "flower_cyan (1)",
+                "flower_cyan",
+                "donicv2",
+                "orange_flowerpot (7)",
+                "orange_flowerpot (6)",
+                "orange_flowerpot (5)",
+                "orange_flowerpot (4)",
+                "flower_pink",
+                "monstera_donica (11)",
+                "Fern (8)",
+                "Fern (7)",
+                "Fern (5)",
+                "Fern (4)",
+                "Mota (5)",
+                "Mota (9)",
+                "Mota (8)",
+                "Mota (7)",
+                "Mota (6)",
+                "Mota (4)",
+                "Mota (3)",
+                "Mota (2)",
+                "Mota (1)",
+                "Mota",
+                "Bush (4)",
+                "Bush (3)",
+                "Grass dune 1 (1)",
+                "Grass dune 2",
+                "Grass dune 1 (17)",
+                "Grass dune 2 (20)",
+                "Grass dune 2 (19)",
+                "Grass dune 1 (3)",
+                "Grass dune 2 (1)",
+                "Grass dune 2 (2)",
+                "Grass dune 2 (3)",
+                "Grass dune 2 (4)",
+                "Grass dune 1 (4)",
+                "Grass dune 2 (5)",
+                "Grass dune 2 (6)",
+                "Grass dune 2 (7)",
+                "Grass dune 2 (8)",
+                "Grass dune 1 (5)",
+                "Grass dune 2 (9)",
+                "Grass dune 2 (10)",
+                "Grass dune 2 (12)",
+                "Grass dune 1 (6)",
+                "Grass dune 1 (7)",
+                "Grass dune 1 (8)",
+                "Grass dune 1 (9)",
+                "Grass dune 1 (10)",
+                "Grass dune 2 (13)",
+                "Grass dune 1 (11)",
+                "Grass dune 1 (12)",
+                "Grass dune 1 (13)",
+                "Grass dune 1 (21)",
+                "Grass dune 1 (20)",
+                "Orange flowerpot (12)-up (2)",
+                "Grass dune 1 (19)",
+                "Grass dune 1 (18)",
+                "Orange flowerpot (12)-up (1)",
+                "Grass dune 1 (14)",
+                "Grass dune 1 (15)",
+                "Grass dune 2 (14)",
+                "Grass dune 2 (15)",
+                "Grass dune 2 (16)",
+                "Grass dune 2 (17)",
+                "Grass dune 2 (18)",
+                "Grass dune 1 (16)",
+                "bush (3)",
+                "monstera_donica (19)",
+                "bush (6)",
+                "bush (10)",
+                "bush (9)",
+                "bush (5)",
+                "bush (4)",
+                "bush (13)",
+                "bush (12)",
+                "bush (14)",
+                "bush (2)",
+                "bush (1)",
+                "bush (8)",
+                "bush (11)",
+                "bush (7)",
+                "bush",
+                "Kratka (1)",
+                "Orange flowerpot (12)-up",
+                "Grass dune 1",
+                "Kratka (4)",
+                "Grass dune 1 (2)",
+                "Stone pavement top",
+                "Stone pavement top (7)",
+                "Stone pavement bottom (6)",
+                "Stone pavement (13)",
+                "Stone pavement (12)",
+                "Stone pavement left (7)",
+                "Stone pavement right (5)",
+                "Stone pavement bottom right (1)",
+                "Stone pavement bottom (5)",
+                "Stone pavement top (6)",
+                "Stone pavement bottom (4)",
+                "Stone pavement top right (1)",
+                "Stone pavement top right",
+                "Stone pavement top (8)-down",
+                "Stone pavement top (8)",
+                "Stone pavement top (5)",
+                "Stone pavement right (4)",
+                "Stone pavement bottom (3)",
+                "Stone pavement left (6)",
+                "Stone pavement bottom (2)",
+                "Stone pavement top (4)",
+                "Stone pavement left (5)",
+                "Stone pavement top (3)",
+                "Stone pavement left (4)",
+                "Stone pavement left (3)",
+                "Stone pavement right (7)",
+                "Stone pavement right (6)",
+                "Stone pavement right (3)",
+                "Stone pavement right (2)",
+                "Stone pavement bottom (1)",
+                "Stone pavement left (2)",
+                "Stone pavement left (1)",
+                "Stone pavement left",
+                "Stone pavement bottom right",
+                "Stone pavement top (2)-left",
+                "Stone pavement top (2)",
+                "Stone pavement right (1)",
+                "Stone pavement top (1)",
+                "Stone pavement top left",
+                "Stone pavement right",
+                "Stone pavement bottom",
+                "Stone pavement (10)",
+                "Stone pavement (11)",
+                "Stone pavement (9)",
+                "Stone pavement (8)",
+                "Stone pavement (7)",
+                "Stone pavement",
+                "Stone pavement (6)",
+                "Stone pavement (5)",
+                "wandering_smoke (1)",
+                "Stone pavement (4)",
+                "Stone pavement (3)",
+                "Stone pavement (2)",
+                "Stone pavement (1)",
+                "Grass 1",
+                "Grass 1 (2)",
+                "Grass 1 (3)",
+                "Grass 1 (4)",
+                "Grass 1 (5)",
+                "Grass 1 (1)",
+                "Grass 1 (6)",
+                "Strong lamp",
+                "Strong lamp (34)"
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "id": "Monstera (12)",
+            "type": "@monstera",
+            "pos": [3308.0, -355.0],
+            "rotation": -360.0
+        },
+        {
+            "id": "Fern (14)",
+            "type": "@fern",
+            "pos": [1607.697998046875, 241.89846801757813],
+            "rotation": -142.84759521484375,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (14)",
+            "type": "@monstera",
+            "pos": [1532.0, -290.0],
+            "rotation": -360.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (13)",
+            "type": "@monstera",
+            "pos": [2707.0, 316.0],
+            "rotation": 90.0,
+            "color": [0, 216, 255, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Monstera (11)",
+            "type": "@monstera",
+            "pos": [3213.0, -708.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "Monstera",
+            "type": "@monstera",
+            "pos": [2166.0, -772.0],
+            "rotation": -345.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (10)",
+            "type": "@monstera",
+            "pos": [2425.0, -778.0],
+            "rotation": 165.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (9)",
+            "type": "@monstera",
+            "pos": [2522.0, -775.0],
+            "rotation": -105.0
+        },
+        {
+            "id": "Monstera (8)",
+            "type": "@monstera",
+            "pos": [1939.0, -124.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "Monstera (2)",
+            "type": "@monstera",
+            "pos": [1820.0, -755.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Monstera (3)",
+            "type": "@monstera",
+            "pos": [1729.0, -589.0],
+            "rotation": 75.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "Monstera (4)",
+            "type": "@monstera",
+            "pos": [2504.0, -434.0],
+            "rotation": 105.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern",
+            "type": "@fern",
+            "pos": [2011.95263671875, 547.0064697265625],
+            "rotation": -174.58001708984375,
+            "size": [126, 121]
+        },
+        {
+            "id": "Fern (1)",
+            "type": "@fern",
+            "pos": [3169.973388671875, -479.991943359375],
+            "rotation": -176.96287536621094,
+            "size": [126, 121]
+        },
+        {
+            "id": "Fern (3)",
+            "type": "@fern",
+            "pos": [2522.94970703125, 578.0025634765625],
+            "rotation": -5.796356201171875,
+            "size": [126, 121]
+        },
+        {
+            "id": "Monstera (5)",
+            "type": "@monstera",
+            "pos": [1689.0, -306.0],
+            "rotation": -78.0333251953125,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (6)",
+            "type": "@monstera",
+            "pos": [2001.0, -512.0],
+            "rotation": -75.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "Monstera (7)",
+            "type": "@monstera",
+            "pos": [2236.0, -81.0],
+            "rotation": -165.0
+        },
+        {
+            "id": "Fern (13)",
+            "type": "@fern",
+            "pos": [2141.42041015625, 219.229736328125],
+            "rotation": 57.269561767578125,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (12)",
+            "type": "@fern",
+            "pos": [2686.501708984375, -344.4593505859375],
+            "rotation": -94.65435791015625,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (11)",
+            "type": "@fern",
+            "pos": [1279.99462890625, 98.00015258789063],
+            "rotation": -0.60821533203125,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (10)",
+            "type": "@fern",
+            "pos": [2595.95947265625, 574.0017700195313],
+            "rotation": -4.65435791015625,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (8)",
+            "type": "@fern",
+            "pos": [2028.6744384765625, 226.1204833984375],
+            "rotation": 40.59162902832031,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (4)",
+            "type": "@fern",
+            "pos": [1791.0, 248.0],
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Mota (5)",
+            "type": "mota",
+            "pos": [1791.8013916015625, -417.4820251464844],
+            "rotation": 43.71792221069336
+        },
+        {
+            "id": "Mota (4)",
+            "type": "mota",
+            "pos": [1859.6077880859375, 0.04821106791496277],
+            "rotation": 23.220439910888672
+        },
+        {
+            "id": "Mota (3)",
+            "type": "mota",
+            "pos": [2414.20068359375, 432.505126953125],
+            "rotation": -19.780927658081055
+        },
+        {
+            "id": "Mota (2)",
+            "type": "mota",
+            "pos": [1440.77099609375, 523.973388671875],
+            "rotation": -179.05661010742188
+        },
+        {
+            "id": "Mota (1)",
+            "type": "mota",
+            "pos": [1612.60791015625, 181.05133056640625],
+            "rotation": 1.276302456855774
+        },
+        {
+            "id": "Mota",
+            "type": "mota",
+            "pos": [2031.51171875, -336.2264404296875],
+            "rotation": -31.099599838256836
+        },
+        {
+            "id": "Bush (4)",
+            "type": "@bush",
+            "pos": [1962.0, 1092.0],
+            "rotation": -90.0,
+            "size": [121, 121]
+        },
+        {
+            "id": "Bush (3)",
+            "type": "@bush",
+            "pos": [2278.5, 1220.0],
+            "rotation": -90.0,
+            "size": [121, 242]
+        },
+        {
+            "id": "Grass dune 1 (1)",
+            "type": "@grass_dune_1",
+            "pos": [2805.0, -394.0]
+        },
+        {
+            "id": "Grass dune 2",
+            "type": "@grass_dune_2",
+            "pos": [2717.059326171875, -108.76368713378906],
+            "rotation": -28.20489501953125
+        },
+        {
+            "id": "Grass dune 1 (3)",
+            "type": "@grass_dune_1",
+            "pos": [1909.0, 532.0],
+            "rotation": -44.24205017089844
+        },
+        {
+            "id": "Grass dune 2 (1)",
+            "type": "@grass_dune_2",
+            "pos": [2491.0, -458.0]
+        },
+        {
+            "id": "Grass dune 2 (2)",
+            "type": "@grass_dune_2",
+            "pos": [2629.045654296875, -702.7910766601563],
+            "rotation": -24.69830322265625
+        },
+        {
+            "id": "Grass dune 2 (3)",
+            "type": "@grass_dune_2",
+            "pos": [2246.045654296875, -435.79107666015625],
+            "rotation": -24.69830322265625
+        },
+        {
+            "id": "Grass dune 2 (4)",
+            "type": "@grass_dune_2",
+            "pos": [2215.112548828125, -74.68396759033203],
+            "rotation": -39.19889831542969
+        },
+        {
+            "id": "Grass dune 1 (4)",
+            "type": "@grass_dune_1",
+            "pos": [2080.0, -42.0],
+            "rotation": -52.539886474609375
+        },
+        {
+            "id": "Grass dune 2 (5)",
+            "type": "@grass_dune_2",
+            "pos": [2057.0166015625, 399.128173828125],
+            "rotation": -14.853683471679688
+        },
+        {
+            "id": "Grass dune 2 (6)",
+            "type": "@grass_dune_2",
+            "pos": [2025.11865234375, 511.3235778808594],
+            "rotation": -40.3289794921875,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass dune 2 (7)",
+            "type": "@grass_dune_2",
+            "pos": [2893.118896484375, 491.3235778808594],
+            "rotation": -40.3289794921875
+        },
+        {
+            "id": "Grass dune 2 (8)",
+            "type": "@grass_dune_2",
+            "pos": [2936.8203125, 573.3839721679688],
+            "rotation": -129.82081604003906
+        },
+        {
+            "id": "Grass dune 1 (5)",
+            "type": "@grass_dune_1",
+            "pos": [2933.0, 531.0],
+            "rotation": -20.970291137695313
+        },
+        {
+            "id": "Grass dune 2 (9)",
+            "type": "@grass_dune_2",
+            "pos": [2938.572509765625, 632.4946899414063],
+            "rotation": -98.3333740234375
+        },
+        {
+            "id": "Grass dune 2 (10)",
+            "type": "@grass_dune_2",
+            "pos": [1597.0, 369.0]
+        },
+        {
+            "id": "Grass dune 2 (12)",
+            "type": "@grass_dune_2",
+            "pos": [1358.0926513671875, 396.28985595703125],
+            "rotation": -35.43267822265625
+        },
+        {
+            "id": "Grass dune 1 (6)",
+            "type": "@grass_dune_1",
+            "pos": [2784.0, 201.0],
+            "rotation": -37.11639404296875
+        },
+        {
+            "id": "Grass dune 1 (7)",
+            "type": "@grass_dune_1",
+            "pos": [2567.0, 719.0],
+            "rotation": -37.11639404296875
+        },
+        {
+            "id": "Grass dune 1 (8)",
+            "type": "@grass_dune_1",
+            "pos": [1675.0, -263.0],
+            "rotation": -32.974639892578125
+        },
+        {
+            "id": "Grass dune 1 (9)",
+            "type": "@grass_dune_1",
+            "pos": [1741.0, -205.0],
+            "rotation": -122.97463989257813
+        },
+        {
+            "id": "Grass dune 1 (10)",
+            "type": "@grass_dune_1",
+            "pos": [1674.0, -134.0],
+            "rotation": -212.97463989257813
+        },
+        {
+            "id": "Grass dune 2 (13)",
+            "type": "@grass_dune_2",
+            "pos": [2123.208740234375, 511.4065246582031],
+            "rotation": -54.381988525390625
+        },
+        {
+            "id": "Grass dune 1 (11)",
+            "type": "@grass_dune_1",
+            "pos": [2857.0, -85.0],
+            "rotation": -142.11639404296875
+        },
+        {
+            "id": "Grass dune 1 (12)",
+            "type": "@grass_dune_1",
+            "pos": [2829.0, 44.0],
+            "rotation": -67.11639404296875
+        },
+        {
+            "id": "Grass dune 1 (13)",
+            "type": "@grass_dune_1",
+            "pos": [2089.0, -171.0],
+            "rotation": -142.11639404296875
+        },
+        {
+            "id": "Grass dune 1 (14)",
+            "type": "@grass_dune_1",
+            "pos": [1303.0, -388.0],
+            "rotation": -322.11639404296875
+        },
+        {
+            "id": "Grass dune 1 (15)",
+            "type": "@grass_dune_1",
+            "pos": [1340.0, -373.0],
+            "rotation": -295.53900146484375
+        },
+        {
+            "id": "Grass dune 2 (14)",
+            "type": "@grass_dune_2",
+            "pos": [2300.11865234375, 1124.3236083984375],
+            "rotation": -40.3289794921875,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass dune 2 (15)",
+            "type": "@grass_dune_2",
+            "pos": [2332.0166015625, 1012.128173828125],
+            "rotation": -14.853683471679688
+        },
+        {
+            "id": "Grass dune 2 (16)",
+            "type": "@grass_dune_2",
+            "pos": [2398.208740234375, 1124.406494140625],
+            "rotation": -54.381988525390625
+        },
+        {
+            "id": "Grass dune 2 (17)",
+            "type": "@grass_dune_2",
+            "pos": [1948.11865234375, 860.3236083984375],
+            "rotation": -40.3289794921875,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass dune 2 (18)",
+            "type": "@grass_dune_2",
+            "pos": [2019.8233642578125, 1085.381103515625],
+            "rotation": -130.3289794921875,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass dune 1 (16)",
+            "type": "@grass_dune_1",
+            "pos": [2057.0, 809.0],
+            "rotation": -44.24205017089844
+        },
+        {
+            "id": "Kratka (1)",
+            "type": "@kratka",
+            "pos": [2896.0, -672.0],
+            "rotation": -90.0,
+            "size": [2432, 32]
+        },
+        {
+            "id": "Grass dune 1",
+            "type": "@grass_dune_1",
+            "pos": [1352.0, -470.0],
+            "rotation": -322.11639404296875
+        },
+        {
+            "id": "Kratka (4)",
+            "type": "@kratka",
+            "pos": [2304.0, 1264.0001220703125],
+            "rotation": -360.0,
+            "size": [2560, 32]
+        },
+        {
+            "id": "Grass dune 1 (2)",
+            "type": "@grass_dune_1",
+            "pos": [2551.0, 282.0],
+            "rotation": -20.970291137695313
+        },
+        {
+            "id": "Stone pavement top",
+            "type": "@stone_pavement_top",
+            "pos": [1856.0, -16.0],
+            "size": [896, 32]
+        },
+        {
+            "id": "Stone pavement top (7)",
+            "type": "@stone_pavement_top",
+            "pos": [2707.0, 981.0],
+            "size": [768, 32]
+        },
+        {
+            "id": "Stone pavement bottom (6)",
+            "type": "@stone_pavement_bottom",
+            "pos": [2707.0, 1136.0],
+            "size": [768, 22]
+        },
+        {
+            "id": "Stone pavement (13)",
+            "type": "@stone_pavement",
+            "pos": [2707.0, 1061.0],
+            "size": [768, 128]
+        },
+        {
+            "id": "Stone pavement (12)",
+            "type": "@stone_pavement",
+            "pos": [3163.0, 960.0],
+            "size": [128, 640]
+        },
+        {
+            "id": "Stone pavement left (7)",
+            "type": "@stone_pavement_left",
+            "pos": [3085.0, 960.0],
+            "size": [27, 640]
+        },
+        {
+            "id": "Stone pavement right (5)",
+            "type": "@stone_pavement_right",
+            "pos": [3239.0, 960.0],
+            "size": [24, 640]
+        },
+        {
+            "id": "Stone pavement bottom right (1)",
+            "type": "@stone_pavement_bottom_right",
+            "pos": [1543.0, 645.0]
+        },
+        {
+            "id": "Stone pavement bottom (5)",
+            "type": "@stone_pavement_bottom",
+            "pos": [1344.0, 651.0],
+            "size": [384, 22]
+        },
+        {
+            "id": "Stone pavement top (6)",
+            "type": "@stone_pavement_top",
+            "pos": [1280.0, 496.0],
+            "size": [256, 32]
+        },
+        {
+            "id": "Stone pavement bottom (4)",
+            "type": "@stone_pavement_bottom",
+            "pos": [1600.0, -373.0],
+            "size": [384, 22]
+        },
+        {
+            "id": "Stone pavement top right (1)",
+            "type": "@stone_pavement_top_right",
+            "pos": [1930.0, -520.0]
+        },
+        {
+            "id": "Stone pavement top right",
+            "type": "@stone_pavement_top_right",
+            "pos": [2826.0, 376.0]
+        },
+        {
+            "id": "Stone pavement top (5)",
+            "type": "@stone_pavement_top",
+            "pos": [3136.0, 496.0],
+            "size": [640, 32]
+        },
+        {
+            "id": "Stone pavement right (4)",
+            "type": "@stone_pavement_right",
+            "pos": [2828.0, 448.0],
+            "size": [24, 128]
+        },
+        {
+            "id": "Stone pavement bottom (3)",
+            "type": "@stone_pavement_bottom",
+            "pos": [3072.0, 651.0],
+            "size": [768, 22]
+        },
+        {
+            "id": "Stone pavement left (6)",
+            "type": "@stone_pavement_left",
+            "pos": [2674.0, 576.0],
+            "size": [27, 128]
+        },
+        {
+            "id": "Stone pavement bottom (2)",
+            "type": "@stone_pavement_bottom",
+            "pos": [2368.0, 523.0],
+            "size": [640, 22]
+        },
+        {
+            "id": "Stone pavement top (4)",
+            "type": "@stone_pavement_top",
+            "pos": [2432.0, 368.0],
+            "size": [768, 32]
+        },
+        {
+            "id": "Stone pavement left (5)",
+            "type": "@stone_pavement_left",
+            "pos": [1778.0, -192.0],
+            "size": [27, 384]
+        },
+        {
+            "id": "Stone pavement top (3)",
+            "type": "@stone_pavement_top",
+            "pos": [1664.0, -528.0],
+            "size": [512, 32]
+        },
+        {
+            "id": "Stone pavement left (4)",
+            "type": "@stone_pavement_left",
+            "pos": [1394.0, -448.0],
+            "size": [27, 128]
+        },
+        {
+            "id": "Stone pavement left (3)",
+            "type": "@stone_pavement_left",
+            "pos": [1394.0, 256.0],
+            "size": [27, 512]
+        },
+        {
+            "id": "Stone pavement right (3)",
+            "type": "@stone_pavement_right",
+            "pos": [1548.0, 384.0],
+            "size": [24, 512]
+        },
+        {
+            "id": "Stone pavement right (2)",
+            "type": "@stone_pavement_right",
+            "pos": [1932.0, -256.0],
+            "size": [24, 512]
+        },
+        {
+            "id": "Stone pavement bottom (1)",
+            "type": "@stone_pavement_bottom",
+            "pos": [1920.0, 139.0],
+            "size": [768, 22]
+        },
+        {
+            "id": "Stone pavement left (2)",
+            "type": "@stone_pavement_left",
+            "pos": [2034.0, 448.0],
+            "size": [27, 128]
+        },
+        {
+            "id": "Stone pavement left (1)",
+            "type": "@stone_pavement_left",
+            "pos": [2290.0, -128.0],
+            "size": [27, 1024]
+        },
+        {
+            "id": "Stone pavement left",
+            "type": "@stone_pavement_left",
+            "pos": [2674.0, -768.0],
+            "size": [27, 256]
+        },
+        {
+            "id": "Stone pavement bottom right",
+            "type": "@stone_pavement_bottom_right",
+            "pos": [2823.0, -507.0]
+        },
+        {
+            "id": "Stone pavement top (2)",
+            "type": "@stone_pavement_top",
+            "pos": [3088.0, -192.0],
+            "rotation": -270.0,
+            "size": [1408, 32]
+        },
+        {
+            "id": "Stone pavement right (1)",
+            "type": "@stone_pavement_right",
+            "pos": [2444.0, -64.0],
+            "size": [24, 896]
+        },
+        {
+            "id": "Stone pavement top (1)",
+            "type": "@stone_pavement_top",
+            "pos": [2496.0, -656.0],
+            "size": [384, 32]
+        },
+        {
+            "id": "Stone pavement top left",
+            "type": "@stone_pavement_top_left",
+            "pos": [2297.0, -648.0]
+        },
+        {
+            "id": "Stone pavement right",
+            "type": "@stone_pavement_right",
+            "pos": [2828.0, -704.0],
+            "size": [24, 384]
+        },
+        {
+            "id": "Stone pavement bottom",
+            "type": "@stone_pavement_bottom",
+            "pos": [2624.0, -501.0],
+            "size": [384, 22]
+        },
+        {
+            "id": "Stone pavement (11)",
+            "type": "@stone_pavement",
+            "pos": [3072.0, 576.0],
+            "rotation": -90.0,
+            "size": [128, 768]
+        },
+        {
+            "id": "Stone pavement (9)",
+            "type": "@stone_pavement",
+            "pos": [3008.0, -192.0],
+            "rotation": -270.0,
+            "size": [1408, 128],
+            "color": [255, 255, 181, 255]
+        },
+        {
+            "id": "Stone pavement (8)",
+            "type": "@stone_pavement",
+            "pos": [2432.0, 448.0],
+            "size": [768, 128]
+        },
+        {
+            "id": "Stone pavement (7)",
+            "type": "@stone_pavement",
+            "pos": [1280.0, 576.0],
+            "rotation": -90.0,
+            "size": [128, 256]
+        },
+        {
+            "id": "Stone pavement (1)",
+            "type": "@stone_pavement",
+            "pos": [1600.0, -448.0],
+            "size": [384, 128]
+        },
+        {
+            "id": "Stone pavement",
+            "type": "@stone_pavement",
+            "pos": [1856.0, -256.0],
+            "size": [128, 512]
+        },
+        {
+            "id": "Stone pavement (6)",
+            "type": "@stone_pavement",
+            "pos": [1472.0, 384.0],
+            "size": [128, 512]
+        },
+        {
+            "id": "Stone pavement (5)",
+            "type": "@stone_pavement",
+            "pos": [1856.0, 64.0],
+            "size": [896, 128]
+        },
+        {
+            "id": "Stone pavement (4)",
+            "type": "@stone_pavement",
+            "pos": [2368.0, -64.0],
+            "size": [128, 896]
+        },
+        {
+            "id": "Stone pavement (3)",
+            "type": "@stone_pavement",
+            "pos": [2496.0, -576.0],
+            "size": [384, 128]
+        },
+        {
+            "id": "Stone pavement (2)",
+            "type": "@stone_pavement",
+            "pos": [2752.0, -704.0],
+            "size": [128, 384]
+        },
+        {
+            "id": "Grass 1",
+            "type": "@grass_1",
+            "pos": [2432.0, -1216.0],
+            "size": [1024, 3968],
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass 1 (1)",
+            "type": "@grass_1",
+            "pos": [-1280.0, -1408.0],
+            "size": [6656, 3584]
+        },
+        {
+            "id": "Grass 1 (2)",
+            "type": "@grass_1",
+            "pos": [-1600.0, 576.0],
+            "size": [6016, 384],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Grass 1 (3)",
+            "type": "@grass_1",
+            "pos": [1728.0, 576.0],
+            "size": [640, 384]
+        },
+        {
+            "id": "Grass 1 (4)",
+            "type": "@grass_1",
+            "pos": [5184.0, -1536.0],
+            "size": [4480, 3328],
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass 1 (5)",
+            "type": "@grass_1",
+            "pos": [5120.0, 448.0],
+            "size": [4608, 640],
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass 1 (6)",
+            "type": "@grass_1",
+            "pos": [1408.0, 2752.0],
+            "size": [12032, 3968],
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass dune 2 (19)",
+            "type": "@grass_dune_2",
+            "pos": [2094.82177734375, 958.5745849609375],
+            "rotation": -160.3289794921875,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass dune 2 (20)",
+            "type": "@grass_dune_2",
+            "pos": [1981.708740234375, 987.0479125976563],
+            "rotation": -134.8536834716797
+        },
+        {
+            "id": "Grass dune 1 (17)",
+            "type": "@grass_dune_1",
+            "pos": [2170.787353515625, 1048.798095703125],
+            "rotation": -164.24205017089844
+        },
+        {
+            "id": "Orange flowerpot (12)-up",
+            "type": "@orange_flowerpot",
+            "pos": [1363.0, -353.342529296875],
+            "rotation": -34.50810241699219,
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (15)",
+            "type": "@fern",
+            "pos": [1726.501708984375, 220.5406494140625],
+            "rotation": -94.65435791015625,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "neon_color": [0, 255, 0, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (17)",
+            "type": "@fern",
+            "pos": [2478.501708984375, -217.4593505859375],
+            "rotation": -94.65435791015625,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "Stone pavement top (2)-left",
+            "type": "@stone_pavement_top",
+            "pos": [2928.0, -192.0],
+            "rotation": -90.0,
+            "size": [1408, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "orange_flowerpot",
+            "type": "@orange_flowerpot",
+            "pos": [2710.0, 310.0]
+        },
+        {
+            "id": "orange_flowerpot (1)",
+            "type": "@orange_flowerpot",
+            "pos": [2602.0, 566.0]
+        },
+        {
+            "id": "orange_flowerpot (2)",
+            "type": "@orange_flowerpot",
+            "pos": [2006.0, 554.0]
+        },
+        {
+            "id": "monstera_donica",
+            "type": "@monstera_donica",
+            "pos": [2514.0, -432.0]
+        },
+        {
+            "id": "monstera_donica (1)",
+            "type": "@monstera_donica",
+            "pos": [1680.0, -304.0]
+        },
+        {
+            "id": "monstera_donica (2)",
+            "type": "@monstera_donica",
+            "pos": [2233.0, -91.0]
+        },
+        {
+            "id": "monstera_donica (3)",
+            "type": "@monstera_donica",
+            "pos": [2020.0, -498.0]
+        },
+        {
+            "id": "monstera_donica (4)",
+            "type": "@monstera_donica",
+            "pos": [2164.0, -780.0]
+        },
+        {
+            "id": "monstera_donica (5)",
+            "type": "@monstera_donica",
+            "pos": [1810.0, -752.0]
+        },
+        {
+            "id": "monstera_donica (6)",
+            "type": "@monstera_donica",
+            "pos": [2442.0, -771.0]
+        },
+        {
+            "id": "monstera_donica (7)",
+            "type": "@monstera_donica",
+            "pos": [2521.0, -778.0]
+        },
+        {
+            "id": "monstera_donica (8)",
+            "type": "@monstera_donica",
+            "pos": [3219.0, -711.0]
+        },
+        {
+            "id": "monstera_donica (9)",
+            "type": "@monstera_donica",
+            "pos": [3324.0, -342.0]
+        },
+        {
+            "id": "monstera_donica (10)",
+            "type": "@monstera_donica",
+            "pos": [1530.0, -297.0]
+        },
+        {
+            "id": "Fern (5)",
+            "type": "@fern",
+            "pos": [2223.791748046875, 161.04541015625],
+            "rotation": -24.606735229492188,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (7)",
+            "type": "@fern",
+            "pos": [2696.1884765625, -61.963134765625],
+            "rotation": 22.149200439453125,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "monstera_donica (11)",
+            "type": "@monstera_donica",
+            "pos": [1944.0, -129.0]
+        },
+        {
+            "id": "flower_pink",
+            "type": "flower_pink",
+            "pos": [1987.0, -417.0]
+        },
+        {
+            "id": "flower_cyan",
+            "type": "flower_cyan",
+            "pos": [2216.0, -97.0],
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (1)",
+            "type": "flower_cyan",
+            "pos": [2593.0, 332.0],
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (2)",
+            "type": "flower_cyan",
+            "pos": [2565.0, 267.0],
+            "rotation": -64.60137176513672,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (3)",
+            "type": "flower_cyan",
+            "pos": [2512.0, 182.0],
+            "rotation": 70.16033935546875,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_pink (1)",
+            "type": "flower_pink",
+            "pos": [2023.0, -230.0],
+            "rotation": 38.14488220214844,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_pink (2)",
+            "type": "flower_pink",
+            "pos": [1983.0, -336.0],
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_pink (3)",
+            "type": "flower_pink",
+            "pos": [2041.0, -297.0],
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_pink (4)",
+            "type": "flower_pink",
+            "pos": [1961.0, -228.0],
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "donic2",
+            "type": "@donic2",
+            "pos": [2816.0, 96.0],
+            "rotation": 90.0,
+            "size": [544, 128]
+        },
+        {
+            "id": "donic2 (1)",
+            "type": "@donic2",
+            "pos": [1681.0, -592.0],
+            "size": [544, 128]
+        },
+        {
+            "id": "Monstera (1)",
+            "type": "@monstera",
+            "pos": [1913.0, -588.0],
+            "rotation": 75.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "Monstera (15)",
+            "type": "@monstera",
+            "pos": [1456.0, -581.0],
+            "rotation": 75.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "flower_pink (5)",
+            "type": "flower_pink",
+            "pos": [2042.0, -77.0],
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_pink (6)",
+            "type": "flower_pink",
+            "pos": [2095.0, -163.0],
+            "rotation": 90.0,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_pink (7)",
+            "type": "flower_pink",
+            "pos": [2149.0, -50.0],
+            "rotation": 61.368499755859375,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (4)",
+            "type": "flower_cyan",
+            "pos": [2498.0, 312.0],
+            "rotation": -13.030609130859375,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "Fern (19)",
+            "type": "@fern",
+            "pos": [1893.501708984375, 251.5406494140625],
+            "rotation": 94.65435791015625,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (20)",
+            "type": "@fern",
+            "pos": [2209.501708984375, 221.5406494140625],
+            "rotation": -94.65435791015625,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (21)",
+            "type": "@fern",
+            "pos": [2210.767333984375, -226.16104125976563],
+            "rotation": 60.808380126953125,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (22)",
+            "type": "@fern",
+            "pos": [2633.290283203125, -455.4154052734375],
+            "rotation": -4.65435791015625,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "flower_cyan (5)",
+            "type": "flower_cyan",
+            "pos": [2508.344970703125, -58.997642517089844],
+            "rotation": 39.39556884765625,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (6)",
+            "type": "flower_cyan",
+            "pos": [2571.3212890625, -91.38802337646484],
+            "rotation": 103.9969482421875,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (7)",
+            "type": "flower_cyan",
+            "pos": [2625.225830078125, -263.43701171875],
+            "rotation": -30.7647705078125,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (8)",
+            "type": "flower_cyan",
+            "pos": [2609.53759765625, -186.08987426757813],
+            "rotation": 127.051025390625,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "orange_flowerpot (4)",
+            "type": "@orange_flowerpot",
+            "pos": [2484.0, -216.0]
+        },
+        {
+            "id": "orange_flowerpot (5)",
+            "type": "@orange_flowerpot",
+            "pos": [2699.0, -53.0]
+        },
+        {
+            "id": "orange_flowerpot (6)",
+            "type": "@orange_flowerpot",
+            "pos": [2634.0, -458.0]
+        },
+        {
+            "id": "orange_flowerpot (7)",
+            "type": "@orange_flowerpot",
+            "pos": [2226.0, -217.0]
+        },
+        {
+            "id": "donicv2",
+            "type": "@donicv2",
+            "pos": [1853.0, 209.0]
+        },
+        {
+            "id": "Fern (16)",
+            "type": "@fern",
+            "pos": [2156.42041015625, 157.229736328125],
+            "rotation": 57.269561767578125,
+            "size": [126, 121],
+            "flip_vertically": true
+        },
+        {
+            "id": "orange_flowerpot (8)",
+            "type": "@orange_flowerpot",
+            "pos": [2196.0, 202.0],
+            "size": [168, 168]
+        },
+        {
+            "id": "donic2-up",
+            "type": "@donic2",
+            "pos": [2816.0, -312.0],
+            "rotation": -90.0,
+            "size": [272, 128],
+            "flip_vertically": true
+        },
+        {
+            "id": "flower_cyan (9)",
+            "type": "flower_cyan",
+            "pos": [2470.344970703125, -133.99765014648438],
+            "rotation": 39.39556884765625,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "Mota (6)",
+            "type": "mota",
+            "pos": [2446.60791015625, -48.95178985595703],
+            "rotation": 23.220439910888672
+        },
+        {
+            "id": "Mota (7)",
+            "type": "mota",
+            "pos": [2320.60791015625, -432.9517822265625],
+            "rotation": 23.220439910888672
+        },
+        {
+            "id": "Mota (8)",
+            "type": "mota",
+            "pos": [2670.60791015625, 112.0482177734375],
+            "rotation": 23.220439910888672
+        },
+        {
+            "id": "Mota (9)",
+            "type": "mota",
+            "pos": [3024.60791015625, -112.9517822265625],
+            "rotation": 23.220439910888672
+        },
+        {
+            "id": "donicv2 (1)",
+            "type": "@donicv2",
+            "pos": [1507.0, -132.0],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Fern (23)",
+            "type": "@fern",
+            "pos": [1441.75048828125, -161.4593505859375],
+            "rotation": 94.65435791015625,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "neon_color": [0, 255, 0, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (24)",
+            "type": "@fern",
+            "pos": [1562.74365234375, -145.4593505859375],
+            "rotation": -94.65435791015625,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "neon_color": [0, 255, 0, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (25)",
+            "type": "@fern",
+            "pos": [1486.74365234375, -67.4593505859375],
+            "rotation": -94.65435791015625,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "neon_color": [0, 255, 0, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (26)",
+            "type": "@fern",
+            "pos": [1685.94677734375, -132.10153198242188],
+            "rotation": 142.84759521484375,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "neon_color": [0, 255, 0, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (27)",
+            "type": "@fern",
+            "pos": [1312.74365234375, -131.4593505859375],
+            "rotation": -94.65435791015625,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "neon_color": [0, 255, 0, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "flower_cyan (10)",
+            "type": "flower_cyan",
+            "pos": [2588.344970703125, 162.00234985351563],
+            "rotation": -20.60443115234375,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "orange_flowerpot (9)",
+            "type": "@orange_flowerpot",
+            "pos": [2518.0, 566.0]
+        },
+        {
+            "id": "bush",
+            "type": "@bush",
+            "pos": [2527.81689453125, -222.68301391601563],
+            "rotation": -30.0,
+            "color": [181, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "bush (1)",
+            "type": "@bush",
+            "pos": [2684.0, -157.0],
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (2)",
+            "type": "@bush",
+            "pos": [2684.0, 99.0],
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (3)",
+            "type": "@bush",
+            "pos": [2659.0, -317.0],
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (4)",
+            "type": "@bush",
+            "pos": [2588.0, 285.0],
+            "size": [121, 121],
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (5)",
+            "type": "@bush",
+            "pos": [2716.0, 227.0],
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (6)",
+            "type": "@bush",
+            "active": false,
+            "pos": [2563.0, 3.0],
+            "color": [181, 255, 0, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Orange flowerpot (12)-up (1)",
+            "type": "@orange_flowerpot",
+            "pos": [1612.9609375, 385.24493408203125],
+            "rotation": 145.49188232421875,
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass dune 1 (18)",
+            "type": "@grass_dune_1",
+            "pos": [1635.9609375, 404.90240478515625],
+            "rotation": -115.53900146484375
+        },
+        {
+            "id": "Grass dune 1 (19)",
+            "type": "@grass_dune_1",
+            "pos": [1672.9609375, 419.90240478515625],
+            "rotation": -142.11639404296875
+        },
+        {
+            "id": "Orange flowerpot (12)-up (2)",
+            "type": "@orange_flowerpot",
+            "pos": [2003.7626953125, 399.69354248046875],
+            "rotation": 100.49188232421875,
+            "flip_vertically": true
+        },
+        {
+            "id": "Grass dune 1 (20)",
+            "type": "@grass_dune_1",
+            "pos": [2033.926025390625, 397.33001708984375],
+            "rotation": -160.53900146484375
+        },
+        {
+            "id": "Grass dune 1 (21)",
+            "type": "@grass_dune_1",
+            "pos": [2070.695556640625, 381.7736511230469],
+            "rotation": -187.11639404296875
+        },
+        {
+            "id": "monstera_donica (12)",
+            "type": "@monstera_donica",
+            "pos": [1904.0, 368.0]
+        },
+        {
+            "id": "monstera_donica (13)",
+            "type": "@monstera_donica",
+            "pos": [2117.0, 595.0]
+        },
+        {
+            "id": "monstera_donica (14)",
+            "type": "@monstera_donica",
+            "pos": [2377.0, 584.0],
+            "rotation": -30.0,
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "Fern (28)",
+            "type": "@fern",
+            "pos": [2365.94970703125, 619.0025634765625],
+            "rotation": -5.796356201171875,
+            "size": [126, 121],
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "Fern (29)",
+            "type": "@fern",
+            "pos": [2217.94970703125, 586.0025634765625],
+            "rotation": -5.796356201171875,
+            "size": [126, 121],
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "monstera_donica (15)",
+            "type": "@monstera_donica",
+            "pos": [2220.0, 581.0],
+            "rotation": -30.0,
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "Fern (30)",
+            "type": "@fern",
+            "pos": [1203.05078125, 419.99737548828125],
+            "rotation": 174.20364379882813,
+            "size": [126, 121],
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "Fern (31)",
+            "type": "@fern",
+            "pos": [1337.05078125, 433.99737548828125],
+            "rotation": 174.20364379882813,
+            "size": [126, 121],
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "monstera_donica (16)",
+            "type": "@monstera_donica",
+            "pos": [1335.0, 431.0],
+            "rotation": -30.0,
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "monstera_donica (17)",
+            "type": "@monstera_donica",
+            "pos": [1211.0, 425.0],
+            "rotation": -30.0,
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "Fern (32)",
+            "type": "@fern",
+            "pos": [3141.94970703125, 443.0025634765625],
+            "rotation": -5.796356201171875,
+            "size": [126, 121],
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "monstera_donica (18)",
+            "type": "@monstera_donica",
+            "pos": [3153.0, 408.0],
+            "rotation": -30.0,
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "Fern (32)-up",
+            "type": "@fern",
+            "pos": [3144.94970703125, 272.8590087890625],
+            "rotation": 5.796356201171875,
+            "size": [126, 121],
+            "color": [0, 255, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "monstera_donica (18)-up",
+            "type": "@monstera_donica",
+            "pos": [3153.0, 276.861572265625],
+            "rotation": 30.0,
+            "color": [0, 255, 255, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (32)-up-right",
+            "type": "@fern",
+            "pos": [3157.18896484375, 133.8590087890625],
+            "rotation": -5.796356201171875,
+            "size": [126, 121],
+            "color": [0, 255, 255, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "monstera_donica (18)-up-right",
+            "type": "@monstera_donica",
+            "pos": [3158.138671875, 141.861572265625],
+            "rotation": -30.0,
+            "color": [0, 255, 255, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (32)-up-right-up",
+            "type": "@fern",
+            "pos": [3173.18896484375, 18.7474365234375],
+            "rotation": 5.796356201171875,
+            "size": [126, 121],
+            "color": [0, 255, 255, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "monstera_donica (18)-up-right-up",
+            "type": "@monstera_donica",
+            "pos": [3169.138671875, 15.744873046875],
+            "rotation": 30.0,
+            "color": [0, 255, 255, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "monstera_donica (19)",
+            "type": "@monstera_donica",
+            "pos": [2695.0, -164.0],
+            "rotation": -30.0,
+            "color": [0, 255, 255, 255]
+        },
+        {
+            "id": "mota",
+            "type": "mota",
+            "pos": [1719.0, 586.0]
+        },
+        {
+            "id": "mota (1)",
+            "type": "mota",
+            "pos": [1663.0, -78.0]
+        },
+        {
+            "id": "mota (2)",
+            "type": "mota",
+            "pos": [1684.0, 442.0]
+        },
+        {
+            "id": "mota (3)",
+            "type": "mota",
+            "pos": [1639.0, -1.0]
+        },
+        {
+            "id": "mota (4)",
+            "type": "mota",
+            "pos": [1683.0, -430.0]
+        },
+        {
+            "id": "Stone pavement right (6)",
+            "type": "@stone_pavement_right",
+            "pos": [1140.0, 576.0],
+            "rotation": -180.0,
+            "size": [24, 128]
+        },
+        {
+            "id": "Fern (2)",
+            "type": "@fern",
+            "pos": [3171.973388671875, -378.991943359375],
+            "rotation": -176.96287536621094,
+            "size": [126, 121]
+        },
+        {
+            "id": "bush (7)",
+            "type": "@bush",
+            "pos": [2476.81689453125, 589.3170166015625],
+            "rotation": -30.0,
+            "color": [181, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "bush (8)",
+            "type": "@bush",
+            "pos": [3185.81689453125, -370.6830139160156],
+            "rotation": -30.0,
+            "color": [181, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "bush (9)",
+            "type": "@bush",
+            "pos": [2211.0, 291.0],
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (10)",
+            "type": "@bush",
+            "pos": [3235.0, -548.0],
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (11)",
+            "type": "@bush",
+            "pos": [3180.81689453125, -466.6829833984375],
+            "rotation": -30.0,
+            "color": [181, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Stone pavement right (7)",
+            "type": "@stone_pavement_right",
+            "pos": [3468.0, 576.0],
+            "rotation": -180.0,
+            "size": [24, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Stone pavement (10)",
+            "type": "@stone_pavement",
+            "pos": [3712.0, -144.00001525878906],
+            "rotation": -90.0,
+            "size": [256, 1280]
+        },
+        {
+            "id": "Stone pavement top (8)",
+            "type": "@stone_pavement_top",
+            "pos": [3728.0, -288.0],
+            "size": [1280, 32]
+        },
+        {
+            "id": "Stone pavement top (8)-down",
+            "type": "@stone_pavement_top",
+            "pos": [3728.0, 0.0],
+            "size": [1280, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "cicada",
+            "type": "cicada",
+            "pos": [2335.0, -387.0]
+        },
+        {
+            "id": "cicada (1)",
+            "type": "cicada",
+            "pos": [2422.0, -336.0]
+        },
+        {
+            "id": "cicada (2)",
+            "type": "cicada",
+            "pos": [2353.0, -268.0]
+        },
+        {
+            "id": "cicada (3)",
+            "type": "cicada",
+            "pos": [2339.0, -330.0]
+        },
+        {
+            "id": "cicada (4)",
+            "type": "cicada",
+            "pos": [2361.0, -333.0]
+        },
+        {
+            "id": "cicada (5)",
+            "type": "cicada",
+            "pos": [2393.0, -296.0]
+        },
+        {
+            "id": "cicada (6)",
+            "type": "cicada",
+            "pos": [2330.0, 279.0]
+        },
+        {
+            "id": "cicada (7)",
+            "type": "cicada",
+            "pos": [2362.0, 347.0]
+        },
+        {
+            "id": "cicada (8)",
+            "type": "cicada",
+            "pos": [2326.0, 375.0]
+        },
+        {
+            "id": "cicada (9)",
+            "type": "cicada",
+            "pos": [2373.0, 425.0]
+        },
+        {
+            "id": "cicada (10)",
+            "type": "cicada",
+            "pos": [2407.0, 400.0]
+        },
+        {
+            "id": "cicada (11)",
+            "type": "cicada",
+            "pos": [3027.0, 323.0]
+        },
+        {
+            "id": "cicada (12)",
+            "type": "cicada",
+            "pos": [3011.0, 293.0]
+        },
+        {
+            "id": "cicada (13)",
+            "type": "cicada",
+            "pos": [3100.0, 240.0]
+        },
+        {
+            "id": "cicada (14)",
+            "type": "cicada",
+            "pos": [3066.0, 197.0]
+        },
+        {
+            "id": "cicada (15)",
+            "type": "cicada",
+            "pos": [3065.0, 196.0]
+        },
+        {
+            "id": "Grass dune 2 (11)",
+            "type": "@grass_dune_2",
+            "pos": [2121.0166015625, 595.128173828125],
+            "rotation": -14.853683471679688
+        },
+        {
+            "id": "flower_cyan (11)",
+            "type": "flower_cyan",
+            "pos": [3238.0, 290.0],
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (12)",
+            "type": "flower_cyan",
+            "pos": [3266.0, 415.0],
+            "rotation": -64.60137176513672,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (13)",
+            "type": "flower_cyan",
+            "pos": [3224.0, 51.0],
+            "rotation": 70.16033935546875,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (14)",
+            "type": "flower_cyan",
+            "pos": [3210.0, 181.0],
+            "rotation": -13.030609130859375,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (15)",
+            "type": "flower_cyan",
+            "pos": [3300.344970703125, 31.002349853515625],
+            "rotation": -20.60443115234375,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (16)",
+            "type": "flower_cyan",
+            "pos": [3298.0, 242.0],
+            "rotation": -64.60137176513672,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "flower_cyan (17)",
+            "type": "flower_cyan",
+            "pos": [3328.0, 334.0],
+            "rotation": -136.23199462890625,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "bush (12)",
+            "type": "@bush",
+            "pos": [3288.0, 119.0],
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (13)",
+            "type": "@bush",
+            "active": false,
+            "pos": [3281.7978515625, 345.41571044921875],
+            "rotation": -38.15415954589844,
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (14)",
+            "type": "@bush",
+            "pos": [2580.840087890625, 8.753982543945313],
+            "rotation": -66.04985046386719,
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "garden_ambience",
+            "type": "@garden_ambience",
+            "pos": [2540.0, -5.0]
+        },
+        {
+            "id": "Strong lamp",
+            "type": "point_light",
+            "pos": [2225.0, -975.0],
+            "color": [0, 255, 195, 83],
+            "falloff": {
+                "radius": 1234.47705078125,
+                "strength": 9
+            },
+            "wall_falloff": {}
+        },
+        {
+            "id": "Strong lamp (2)",
+            "type": "point_light",
+            "pos": [3185.0, 1281.0],
+            "color": [80, 255, 71, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (31)",
+            "type": "point_light",
+            "pos": [2503.0, -491.0],
+            "color": [80, 255, 71, 77],
+            "falloff": {
+                "radius": 576.2490234375,
+                "strength": 19
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (32)",
+            "type": "point_light",
+            "pos": [1951.0, -481.0],
+            "color": [80, 255, 71, 91],
+            "falloff": {
+                "radius": 1141.2740478515625,
+                "strength": 9
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            },
+            "positional_vibration": 0.0
+        },
+        {
+            "id": "Strong lamp (33)",
+            "type": "point_light",
+            "pos": [1343.0, 255.0],
+            "color": [80, 255, 71, 100],
+            "falloff": {
+                "radius": 593.1265258789063,
+                "strength": 22
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (34)",
+            "type": "point_light",
+            "pos": [3295.0, -129.0],
+            "color": [70, 255, 0, 164],
+            "falloff": {
+                "radius": 512.8584594726563
+            },
+            "wall_falloff": {}
+        },
+        {
+            "id": "Strong lamp (35)",
+            "type": "point_light",
+            "pos": [1919.0, 609.0],
+            "color": [80, 255, 71, 126],
+            "falloff": {
+                "radius": 1233.0579833984375,
+                "strength": 8
+            },
+            "wall_falloff": {
+                "radius": 1569.6199951171875,
+                "strength": 24
+            },
+            "positional_vibration": 0.0,
+            "intensity_vibration": 0.0
+        },
+        {
+            "id": "wandering_smoke (1)",
+            "type": "wandering_smoke",
+            "color": [0, 255, 0, 255],
+            "scale_amounts": 0.5,
+            "scale_lifetimes": 4.0,
+            "pos": [4186.0, -155.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "portal_circle",
+            "type": "portal_circle",
+            "color": [0, 255, 0, 255],
+            "pos": [3535.0, -136.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Wandering pixels",
+            "type": "wandering_pixels",
+            "color": [80, 255, 71, 101],
+            "illuminate": false,
+            "pos": [2064.0, 96.0],
+            "size": [1728, 1344]
+        },
+        {
+            "id": "Wandering pixels (1)",
+            "type": "aquarium_pixels_dim",
+            "color": [80, 255, 71, 255],
+            "num_particles": 50,
+            "force_particles_within_bounds": false,
+            "pos": [2080.0, 96.0],
+            "size": [1728, 1344]
+        },
+        {
+            "id": "Wandering pixels (3)",
+            "type": "wandering_pixels",
+            "color": [0, 255, 255, 255],
+            "num_particles": 290,
+            "pos": [2848.0, -48.0],
+            "size": [128, 800]
+        },
+        {
+            "id": "Wandering pixels (4)",
+            "type": "wandering_pixels",
+            "color": [107, 219, 82, 255],
+            "illuminate": false,
+            "pos": [1352.0, 720.0],
+            "size": [400, 128]
+        },
+        {
+            "id": "Wandering pixels (5)",
+            "type": "wandering_pixels",
+            "color": [107, 219, 82, 255],
+            "pos": [2203.0, -296.0],
+            "size": [165, 512]
+        },
+        {
+            "id": "Wandering pixels (6)",
+            "type": "wandering_pixels",
+            "color": [107, 219, 82, 255],
+            "illuminate": false,
+            "pos": [2440.0, -768.0],
+            "size": [400, 128]
+        },
+        {
+            "id": "Wandering pixels (7)",
+            "type": "wandering_pixels",
+            "color": [107, 219, 82, 255],
+            "illuminate": false,
+            "pos": [1608.0, 528.0],
+            "size": [112, 512]
+        },
+        {
+            "id": "Wandering pixels (8)",
+            "type": "wandering_pixels",
+            "color": [255, 0, 212, 255],
+            "num_particles": 97,
+            "pos": [2084.0, -110.0],
+            "size": [310, 128]
+        },
+        {
+            "id": "Wandering pixels (9)",
+            "type": "wandering_pixels",
+            "color": [107, 219, 82, 255],
+            "illuminate": false,
+            "pos": [1824.0, 320.0],
+            "size": [352, 512]
+        },
+        {
+            "id": "Wandering pixels (11)",
+            "type": "wandering_pixels",
+            "color": [255, 0, 212, 255],
+            "num_particles": 97,
+            "pos": [1984.0, -336.0],
+            "size": [128, 288]
+        },
+        {
+            "id": "Wandering pixels (12)",
+            "type": "wandering_pixels",
+            "color": [255, 222, 0, 255],
+            "num_particles": 97,
+            "pos": [2144.0, 208.0],
+            "size": [192, 160]
+        },
+        {
+            "id": "Wandering pixels (13)",
+            "type": "wandering_pixels",
+            "color": [43, 255, 0, 255],
+            "num_particles": 97,
+            "pos": [1520.0, -128.0],
+            "size": [544, 128]
+        },
+        {
+            "id": "Wandering pixels (14)",
+            "type": "wandering_pixels",
+            "color": [43, 255, 0, 255],
+            "num_particles": 97,
+            "pos": [1840.0, 192.0],
+            "size": [544, 128]
+        },
+        {
+            "id": "Wandering pixels (2)",
+            "type": "wandering_pixels",
+            "color": [0, 131, 255, 255],
+            "num_particles": 290,
+            "pos": [2527.0, -98.0],
+            "size": [257, 195]
+        },
+        {
+            "id": "Wandering pixels (10)",
+            "type": "wandering_pixels",
+            "color": [0, 131, 255, 255],
+            "num_particles": 226,
+            "pos": [2560.0, 257.0],
+            "size": [257, 195]
+        },
+        {
+            "id": "Wandering pixels (15)",
+            "type": "wandering_pixels",
+            "color": [0, 131, 255, 255],
+            "num_particles": 226,
+            "pos": [3259.0, 237.0],
+            "size": [228, 445]
+        },
+        {
+            "id": "spawn",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [2507.0, 98.0],
+            "rotation": -171.9368896484375
+        },
+        {
+            "id": "crosshair",
+            "type": "ffa_spawn",
+            "pos": [1756.0, 299.0]
+        },
+        {
+            "id": "Organism area",
+            "type": "organism_area",
+            "pos": [2343.0, 47.0],
+            "size": [1920, 1430]
+        }
+    ]
+}

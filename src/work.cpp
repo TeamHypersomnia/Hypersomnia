@@ -1044,7 +1044,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			main_menu_gui = {};
 			
 			setup_launcher([&]() {
-				emplace_main_menu(lua, config.main_menu);
+				emplace_main_menu(lua, *official, config.main_menu);
 			});
 		}
 	};

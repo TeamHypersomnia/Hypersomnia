@@ -8,6 +8,7 @@
 #include "application/setups/editor/packaged_official_content_declaration.h"
 
 #include "application/setups/editor/project/editor_project.h"
+#include "application/network/network_common.h"
 
 struct choose_arena_input {
 	sol::state& lua;

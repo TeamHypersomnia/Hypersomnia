@@ -649,7 +649,7 @@ EDIT_FUNCTION(editor_sprite_node_editable& insp, T& es, editor_sprite_resource& 
 		MULTIPROPERTY("Randomize color wave offset", randomize_color_wave_offset);
 	}
 
-	const bool is_animation = !resource.animation_frames.empty();
+	const bool is_animation = !resource.animation_frames.empty() || (resource.official_tag.has_value() && std::holds_alternative<test_dynamic_decorations>(resource.official_tag.value()));
 
 	if (is_animation) {
 		ImGui::Separator();

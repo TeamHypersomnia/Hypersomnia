@@ -36,6 +36,9 @@
 #include "hypersomnia_version.h"
 #include "application/main/self_updater.h"
 
+#include "application/arena/choose_arena.h"
+#include "application/setups/editor/packaged_official_content.h"
+
 using namespace augs::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
@@ -85,6 +88,7 @@ void main_menu_setup::query_latest_news(const std::string& url) {
 
 main_menu_setup::main_menu_setup(
 	sol::state& lua,
+	const packaged_official_content& official,
 	const main_menu_settings settings
 ) {
 	try {
@@ -122,12 +126,53 @@ main_menu_setup::main_menu_setup(
 	}
 
 	// TODO: actually load a cosmos with its resources from a file/folder
-	const bool is_intro_scene_available = settings.menu_intro_scene_intercosm_path.string().size() > 0;
+	const bool is_intro_scene_available = settings.menu_background_arena_path.string().size() > 0;
 
 	auto& cosm = intro.world;
 
 	if (is_intro_scene_available) {
-		intro.make_test_scene(lua, { false, 60 });
+		editor_project project;
+
+		all_modes_variant mv;
+		all_rulesets_variant rv;
+
+		cosmos_solvable_significant dummy;
+
+		current_arena_folder = settings.menu_background_arena_path;
+		auto paths = editor_project_paths(current_arena_folder);
+
+		auto handle = online_arena_handle<false>{ 
+			mv,
+			intro,
+			intro.world,
+			rv,
+			dummy
+		};
+
+		::load_arena_from_path(
+			{
+				lua,
+				handle,
+				official,
+				"",
+				"",
+				dummy,
+				std::nullopt,
+				&project
+			},
+
+			paths.project_json,
+			nullptr
+		);
+
+		if (auto m = std::get_if<test_mode>(&mv)) {
+			mode = *m;
+		}
+
+		if (auto r = std::get_if<test_mode_ruleset>(&rv)) {
+			ruleset = *r;
+		}
+
 		viewed_character_id = cosm[mode.lookup(mode.add_player({ ruleset, cosm }, "Player", faction_type::METROPOLIS))].get_id();
 	}
 

@@ -42,6 +42,8 @@ namespace sol {
 	class state;
 }
 
+struct packaged_official_content;
+
 class main_menu_setup : public default_setup_settings {
 	std::shared_future<std::string> latest_news;
 	vec2 latest_news_pos = { 0.f, 0.f };
@@ -58,6 +60,8 @@ class main_menu_setup : public default_setup_settings {
 	augs::sound_source menu_theme_source;
 	std::optional<augs::single_sound_buffer> menu_theme;
 
+	augs::path_type current_arena_folder;
+
 #if TODO
 	bool draw_menu_gui = false;
 	bool roll_news = false;
@@ -73,7 +77,7 @@ class main_menu_setup : public default_setup_settings {
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 
-	main_menu_setup(sol::state&, const main_menu_settings);
+	main_menu_setup(sol::state&, const packaged_official_content&, const main_menu_settings);
 
 	void query_latest_news(const std::string& url);
 
@@ -165,7 +169,7 @@ public:
 	}
 
 	augs::path_type get_unofficial_content_dir() const {
-		return {};
+		return current_arena_folder;
 	}
 
 	auto get_render_layer_filter() const {
