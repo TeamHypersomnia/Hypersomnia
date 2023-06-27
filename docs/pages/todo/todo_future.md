@@ -5,6 +5,9 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- MacOS fix: make non-raw input work
+	- although this will only bite you in the ass with reveal to explorer etc, and even then not necessarily
+
 - lifting system
 	- small/light objects become part of the player fixtures exactly as they were picked, LPM then throws and RPM puts down
 	- large objects can only be pulled

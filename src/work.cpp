@@ -217,7 +217,8 @@ work_result work(const int argc, const char* const * const argv) try {
 #endif
 
 #if PLATFORM_MACOS
-		result.window.fullscreen = false;
+		result.window.fullscreen = true;
+		result.window.raw_mouse_input = true;
 #endif
 
 		return result_ptr;

@@ -471,7 +471,7 @@ namespace augs {
 	}
 
 	void window::set_cursor_visible_impl(bool) {
-
+		/* Implemented with GLFW_CURSOR_DISABLED */
 	}
 
 	bool window::set_cursor_clipping_impl(bool clip) {

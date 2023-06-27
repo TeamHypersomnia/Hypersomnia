@@ -20,6 +20,7 @@ void save_log_and_terminate() {
 
 	if (augs::window::current_exists()) {
 		augs::window::get_current().set_cursor_clipping(false);
+		augs::window::get_current().set_cursor_visible(true);
 	}
 	
 	LOG("\nIf the game crashes repeatedly, consider deleting the \"cache\" folder.");
