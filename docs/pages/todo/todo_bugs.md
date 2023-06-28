@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- editor crashes when deleting lots (almost all) reources which are still in use
+
 - another crash - when we died after killing ourselves with a grenade
 Program terminated with signal SIGSEGV, Segmentation fault.
 #0  std::__1::__hash_table<std::__1::__hash_value_type<collision_cooldown_key, sound_system::collision_sound_succession>, std::__1::__unordered_map_hasher<colli

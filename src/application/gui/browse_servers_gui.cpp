@@ -440,7 +440,7 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 
 		ImGui::NextColumn();
 
-		const auto secs_ago = augs::date_time::secs_since_epoch() - s.appeared_when;
+		const auto secs_ago = augs::date_time::secs_since_epoch() - s.time_hosted;
 		text_disabled(augs::date_time::format_how_long_ago(true, secs_ago));
 
 		ImGui::NextColumn();
@@ -509,7 +509,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 				server_list_entry entry;
 
 				augs::read_bytes(stream, entry.address);
-				augs::read_bytes(stream, entry.appeared_when);
+				augs::read_bytes(stream, entry.time_hosted);
 				augs::read_bytes(stream, entry.heartbeat);
 
 				server_list.emplace_back(std::move(entry));
@@ -621,7 +621,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		};
 
 		auto by_appeared = [](const T& a, const T& b) {
-			return a->appeared_when > b->appeared_when;
+			return a->time_hosted > b->time_hosted;
 		};
 
 		auto make_comparator = [&](auto op1, auto op2, auto op3) {

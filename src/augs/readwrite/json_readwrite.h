@@ -346,7 +346,13 @@ namespace augs {
 				[&to](const auto& label, const auto& field) {
 					using Field = remove_cref<decltype(field)>;
 					if constexpr(!is_padding_field_v<Field> && !json_ignore_v<Field>) {
-						if constexpr(is_maybe_v<Field>) {
+						if constexpr(is_optional_v<Field>) {
+							if (field.has_value()) {
+								to.Key(label);
+								write_json(to, *field);
+							}
+						}
+						else if constexpr(is_maybe_v<Field>) {
 							if (field.is_enabled) {
 								to.Key(label);
 								write_json(to, field.value);

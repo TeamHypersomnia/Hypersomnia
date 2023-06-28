@@ -43,7 +43,7 @@ struct ping_progress {
 
 struct server_list_entry {
 	netcode_address_t address;
-	double appeared_when;
+	double time_hosted;
 	server_heartbeat heartbeat;
 
 	ping_progress progress;

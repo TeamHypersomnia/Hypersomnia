@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
     
+- crate caption
+- map statistics from server_list_json
+    - counted only when >= 2 players are fighting
+
+- linux -g notice
+- show tips with names in test scene setup
+
 - verify those map file hashes either during upload stage or hosting stage
 
 - settings ui overhaul
