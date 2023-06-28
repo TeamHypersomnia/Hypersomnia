@@ -4,6 +4,7 @@ struct server_list_entry_json {
 	// GEN INTROSPECTOR struct server_list_entry_json
 	std::string server_version;
 
+	std::string name;
 	std::string ip;
 
 	double time_hosted = 0.0;

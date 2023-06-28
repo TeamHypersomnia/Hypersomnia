@@ -167,7 +167,9 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 			next.server_version = data.server_version;
 
+			next.name = data.server_name;
 			next.ip = ::ToString(server.first);
+
 			next.time_hosted = server.second.meta.time_hosted;
 			next.time_last_heartbeat = server.second.time_last_heartbeat;
 			next.arena = data.current_arena;
