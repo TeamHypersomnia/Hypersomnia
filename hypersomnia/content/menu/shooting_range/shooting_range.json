@@ -1,0 +1,2514 @@
+{
+    "meta": {
+        "name": "shooting_range",
+        "version_timestamp": "2023-06-28 03:32:06.536440 UTC"
+    },
+    "about": {
+        "author": "Pythagoras",
+        "welcome_message": "  h"
+    },
+    "settings": {
+        "default_server_mode": "quick_test",
+        "ambient_light_color": [0, 67, 90, 255]
+    },
+    "playtesting": {
+        "mode": "quick_test",
+        "bots": 53
+    },
+    "game_modes": {
+        "quick_test": {
+            "equipment": {
+                "metropolis": {
+                    "firearm": null,
+                    "melee": null
+                },
+                "resistance": {
+                    "firearm": null,
+                    "melee": null,
+                    "backpack": false,
+                    "electric_armor": true
+                }
+            }
+        }
+    },
+    "external_resources": [
+        {
+            "path": "captions/glass.png",
+            "file_hash": "3d44ea0d1a7ba7a6fae076c21988ff4a727107138c9ed44250550b5d342a9afe",
+            "id": "@captions/glass.png",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [0, 180, 255, 255],
+            "neon_color": [0, 180, 255, 255],
+            "size": [293, 68]
+        },
+        {
+            "path": "captions/metal.png",
+            "file_hash": "11df902f92cf18590e317c917c6e089a07a69d0843ddaaf575fbe5c737dc04d0",
+            "id": "@captions/metal.png",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "size": [291, 66]
+        },
+        {
+            "path": "captions/vent.png",
+            "file_hash": "a5bb4864ebd02475245eec67542069a0aec31372063593057ca7842cdd674ae8",
+            "id": "@captions/vent.png",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [0, 255, 126, 255],
+            "neon_color": [0, 255, 126, 255],
+            "size": [236, 66]
+        },
+        {
+            "path": "captions/wood.png",
+            "file_hash": "aef50032f491c555a2c7f798bbadc0ff1245475e928124497a1bca51440a7f21",
+            "id": "@captions/wood.png",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [255, 127, 0, 255],
+            "neon_color": [255, 127, 0, 255],
+            "size": [235, 68]
+        },
+        {
+            "path": "gfx/water_room_floor.png",
+            "file_hash": "67c17418dc25e164ebf0265d50490fd9388da8ff0e37ae4d7838b2a9d8a4b7ed",
+            "id": "@water_room_floor",
+            "neon_map": {
+                "standard_deviation": 8.0,
+                "amplification": 10.0,
+                "light_colors": [[95, 205, 228, 255]
+                ]
+            },
+            "neon_color": [255, 255, 255, 106],
+            "size": [64, 64],
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "id": "footstep_floor"
+                    }
+                }
+            }
+        },
+        {
+            "path": "gfx/water_room_floor_2.png",
+            "file_hash": "9d7d4e14d04d6bda52e7c7b59ed0f177caadf5e3a486fde33f1fce82883e0826",
+            "id": "@water_room_floor_2",
+            "color": [255, 132, 132, 255],
+            "neon_color": [255, 255, 255, 106],
+            "size": [64, 64],
+            "OFF_rotate_continuously_degrees_per_sec": 1.0,
+            "as_nonphysical": {
+                "custom_footstep": {
+                    "sound": {
+                        "gain": 0.6000000238418579,
+                        "pitch": 0.8999999761581421
+                    }
+                }
+            }
+        },
+        {
+            "path": "materials/glass.png",
+            "file_hash": "ff96148205abf557486063d54c77ea8d8ee5613551eb5253bf8e755929e02a30",
+            "id": "@materials/glass.png",
+            "domain": "PHYSICAL",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [0, 180, 255, 255],
+            "neon_color": [255, 255, 255, 81],
+            "size": [1, 1],
+            "stretch_when_resized": true,
+            "as_physical": {
+                "is_static": true,
+                "is_see_through": true,
+                "material": "glass"
+            }
+        },
+        {
+            "path": "materials/metal.png",
+            "file_hash": "ff96148205abf557486063d54c77ea8d8ee5613551eb5253bf8e755929e02a30",
+            "id": "@materials/metal.png",
+            "domain": "PHYSICAL",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "neon_color": [255, 255, 255, 72],
+            "size": [1, 1],
+            "stretch_when_resized": true,
+            "as_physical": {
+                "is_static": true,
+                "is_see_through": true
+            }
+        },
+        {
+            "path": "materials/vent.png",
+            "file_hash": "ff96148205abf557486063d54c77ea8d8ee5613551eb5253bf8e755929e02a30",
+            "id": "@materials/vent.png",
+            "domain": "PHYSICAL",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [0, 255, 126, 255],
+            "neon_color": [255, 255, 255, 72],
+            "size": [1, 1],
+            "stretch_when_resized": true,
+            "as_physical": {
+                "is_static": true,
+                "is_see_through": true,
+                "material": "vent"
+            }
+        },
+        {
+            "path": "materials/wood.png",
+            "file_hash": "ff96148205abf557486063d54c77ea8d8ee5613551eb5253bf8e755929e02a30",
+            "id": "@materials/wood.png",
+            "domain": "PHYSICAL",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [255, 171, 0, 255],
+            "neon_color": [255, 171, 0, 123],
+            "size": [1, 1],
+            "stretch_when_resized": true,
+            "as_physical": {
+                "is_static": true,
+                "is_see_through": true,
+                "material": "wood"
+            }
+        }
+    ],
+    "layers": [
+        {
+            "id": "Layer 6",
+            "nodes": [
+                "aquarium_ambience_right",
+                "aquarium_ambience_left"
+            ]
+        },
+        {
+            "id": "Layer 5",
+            "nodes": [
+                "crate (1)",
+                "crate"
+            ]
+        },
+        {
+            "id": "Layer 4",
+            "nodes": [
+                "portal (7)",
+                "portal (6)",
+                "portal (8)",
+                "portal (11)",
+                "portal (5)",
+                "portal (4)"
+            ]
+        },
+        {
+            "id": "Layer 3",
+            "nodes": [
+                "lab_wall-up (1)-left",
+                "lab_wall (1)-left",
+                "lab_wall-up-left (1)",
+                "lab_wall-left (1)",
+                "lab_wall-up-left",
+                "lab_wall-left",
+                "lab_wall-up (1)",
+                "lab_wall (1)",
+                "lab_wall-up",
+                "lab_wall",
+                "aquarium"
+            ]
+        },
+        {
+            "id": "knifes",
+            "nodes": [
+                "assault_rattle-right (1)",
+                "fury_thrower-right (1)",
+                "poseidon-right (1)",
+                "yellow_dagger-right (1)",
+                "cyan_scythe-right (1)",
+                "mini_knife-right (1)",
+                "assault_rattle (1)",
+                "fury_thrower (1)",
+                "poseidon (1)",
+                "yellow_dagger (1)",
+                "cyan_scythe (1)",
+                "mini_knife (1)",
+                "assault_rattle-right",
+                "fury_thrower-right",
+                "poseidon-right",
+                "yellow_dagger-right",
+                "cyan_scythe-right",
+                "mini_knife-right",
+                "assault_rattle",
+                "fury_thrower",
+                "poseidon",
+                "yellow_dagger",
+                "cyan_scythe",
+                "mini_knife"
+            ]
+        },
+        {
+            "id": "portals",
+            "nodes": [
+                "portal (1)",
+                "portal (3)",
+                "portal (2)",
+                "portal"
+            ]
+        },
+        {
+            "id": "Layer 2",
+            "nodes": [
+                "Water room floor 2 (4)",
+                "team_spawn (16)"
+            ]
+        },
+        {
+            "id": "Layer 12",
+            "nodes": [
+                "force_grenade (1)-down-down (1)",
+                "flashbang (1)-down-down (1)",
+                "ped_grenade (1)-down-down (1)",
+                "interference_grenade (1)-down-down (1)",
+                "force_grenade-down-down (1)",
+                "flashbang-down-down (1)",
+                "ped_grenade-down-down (1)",
+                "interference_grenade-down-down (1)",
+                "force_grenade (1)-down (3)",
+                "flashbang (1)-down (3)",
+                "ped_grenade (1)-down (3)",
+                "interference_grenade (1)-down (3)",
+                "force_grenade-down (3)",
+                "flashbang-down (3)",
+                "ped_grenade-down (3)",
+                "interference_grenade-down (3)",
+                "force_grenade (1)-down (2)",
+                "flashbang (1)-down (2)",
+                "ped_grenade (1)-down (2)",
+                "interference_grenade (1)-down (2)",
+                "force_grenade-down (2)",
+                "flashbang-down (2)",
+                "ped_grenade-down (2)",
+                "interference_grenade-down (2)",
+                "force_grenade (3)",
+                "flashbang (3)",
+                "ped_grenade (3)",
+                "interference_grenade (3)",
+                "force_grenade (2)",
+                "flashbang (2)",
+                "ped_grenade (2)",
+                "interference_grenade (2)",
+                "force_grenade (1)-down-down",
+                "flashbang (1)-down-down",
+                "ped_grenade (1)-down-down",
+                "interference_grenade (1)-down-down",
+                "force_grenade-down-down",
+                "flashbang-down-down",
+                "ped_grenade-down-down",
+                "interference_grenade-down-down",
+                "force_grenade (1)-down (1)",
+                "flashbang (1)-down (1)",
+                "ped_grenade (1)-down (1)",
+                "interference_grenade (1)-down (1)",
+                "force_grenade-down (1)",
+                "flashbang-down (1)",
+                "ped_grenade-down (1)",
+                "interference_grenade-down (1)",
+                "force_grenade (1)-down",
+                "flashbang (1)-down",
+                "ped_grenade (1)-down",
+                "interference_grenade (1)-down",
+                "force_grenade-down",
+                "flashbang-down",
+                "ped_grenade-down",
+                "interference_grenade-down",
+                "force_grenade (1)",
+                "flashbang (1)",
+                "ped_grenade (1)",
+                "interference_grenade (1)",
+                "force_grenade",
+                "flashbang",
+                "ped_grenade",
+                "interference_grenade"
+            ]
+        },
+        {
+            "id": "Layer 11",
+            "is_open_in_editor": false
+        },
+        {
+            "id": "Layer 9",
+            "is_open_in_editor": false
+        },
+        {
+            "id": "Layer 8",
+            "is_open_in_editor": false,
+            "nodes": [
+                "dev_floor_32 (7)",
+                "dev_floor_32 (6)",
+                "dev_floor_32 (5)",
+                "dev_floor_32 (4)",
+                "dev_floor_32 (3)",
+                "dev_floor_32 (2)",
+                "dev_floor_32 (1)",
+                "dev_floor_32"
+            ]
+        },
+        {
+            "id": "Layer 7",
+            "nodes": [
+                "dev_floor_128 (2)",
+                "dev_floor_128"
+            ]
+        },
+        {
+            "id": "weapons2-right",
+            "nodes": [
+                "cyberspray-right",
+                "warx-right",
+                "sn69-right",
+                "ao44 (1)-right",
+                "calico-right",
+                "bulwark-right",
+                "covert-right",
+                "kek9-right",
+                "deagle-right",
+                "zamiec-right",
+                "galilea-right",
+                "gradobicie-right",
+                "pro90-right"
+            ]
+        },
+        {
+            "id": "weapons1-right",
+            "nodes": [
+                "elon-right",
+                "lews-right",
+                "bulldup2000-right",
+                "awka-right",
+                "amplifier_arm-right",
+                "datum-right",
+                "szturm-right",
+                "bilmer2000-right",
+                "baka47-right",
+                "blunaz-right",
+                "hunter (1)-right"
+            ]
+        },
+        {
+            "id": "weapons1",
+            "nodes": [
+                "elon",
+                "lews",
+                "bulldup2000",
+                "awka",
+                "amplifier_arm",
+                "datum",
+                "szturm",
+                "bilmer2000",
+                "baka47",
+                "blunaz",
+                "hunter (1)"
+            ]
+        },
+        {
+            "id": "weapons2",
+            "nodes": [
+                "cyberspray",
+                "warx",
+                "sn69",
+                "ao44 (1)",
+                "calico",
+                "bulwark",
+                "covert",
+                "kek9",
+                "deagle",
+                "zamiec",
+                "galilea",
+                "gradobicie",
+                "pro90"
+            ]
+        },
+        {
+            "id": "Layer 1",
+            "nodes": [
+                "team_spawn (32)",
+                "team_spawn (31)",
+                "team_spawn (30)",
+                "team_spawn (29)",
+                "team_spawn (28)",
+                "team_spawn (27)",
+                "team_spawn (26)",
+                "team_spawn (25)",
+                "team_spawn (24)",
+                "team_spawn (23)",
+                "team_spawn (22)",
+                "team_spawn (34)",
+                "team_spawn (21)",
+                "team_spawn (20)",
+                "team_spawn (19)",
+                "team_spawn (18)",
+                "team_spawn (17)",
+                "team_spawn (15)",
+                "team_spawn (14)",
+                "team_spawn (13)",
+                "team_spawn (12)",
+                "team_spawn (11)",
+                "team_spawn (8)",
+                "team_spawn (7)",
+                "team_spawn (6)",
+                "team_spawn (5)",
+                "team_spawn (4)",
+                "team_spawn (3)",
+                "team_spawn (33)",
+                "team_spawn (1)",
+                "team_spawn (9)",
+                "team_spawn (2)",
+                "team_spawn (10)",
+                "team_spawn",
+                "vent (8)",
+                "vent (7)",
+                "vent (6)",
+                "vent (5)",
+                "vent (1)",
+                "vent (2)",
+                "vent (3)",
+                "vent (4)",
+                "metal (8)-right",
+                "metal (7)-right",
+                "metal (6)-right",
+                "metal (5)-right",
+                "glass (8)-right",
+                "glass (7)-right",
+                "glass (6)-right",
+                "glass (5)-right",
+                "wood (8)-right",
+                "wood (7)-right",
+                "wood (6)-right",
+                "wood (5)-right",
+                "metal (1)",
+                "metal (2)",
+                "metal (3)",
+                "metal (4)",
+                "glass (1)",
+                "glass (2)",
+                "glass (3)",
+                "glass (4)",
+                "wood (1)",
+                "wood (2)",
+                "wood (3)",
+                "wood (4)",
+                "glass",
+                "vent",
+                "metal",
+                "wood",
+                "dev_floor_64",
+                "dev_floor_64 (1)",
+                "water_room_floor_2 (1)-right (1)",
+                "water_room_floor_2 (1)-right",
+                "water_room_floor_2 (1)",
+                "water_room_floor_2 (2)-right",
+                "water_room_floor_2 (2)",
+                "water_room_floor_2 (3)-right",
+                "water_room_floor_2 (3)",
+                "water_room_floor_2-right",
+                "water_room_floor_2",
+                "dev_floor_256"
+            ]
+        },
+        {
+            "id": "callouts",
+            "is_open_in_editor": false,
+            "active": false,
+            "nodes": [
+                "Jungle",
+                "Tetris",
+                "Tetris (1)",
+                "Cross",
+                "Fans",
+                "Gate",
+                "Mixer",
+                "Toxic",
+                "Brains",
+                "Brains (1)",
+                "Subway",
+                "Fork",
+                "Office",
+                "Rotate",
+                "T vent",
+                "Helipad",
+                "Cargo",
+                "T spawn",
+                "Cache",
+                "Secret",
+                "Secret (1)",
+                "CT ninja",
+                "CT ninja (1)",
+                "Ninja",
+                "Ninja (1)",
+                "Garden corner",
+                "Long",
+                "Lobby",
+                "Radars",
+                "Generator",
+                "Elevator",
+                "CT vent",
+                "Panel",
+                "Computers",
+                "Connector",
+                "Pump",
+                "Glass",
+                "CT spawn",
+                "Servers (6)",
+                "Med",
+                "Highway",
+                "Garden (6)",
+                "Mixer (1)",
+                "Garden (5)",
+                "Servers (5)",
+                "Hiding",
+                "Bay",
+                "Plaza",
+                "Backdoor",
+                "Maze",
+                "B vent (1)",
+                "B vent",
+                "Servers (7)",
+                "Servers (8)",
+                "Dead end"
+            ]
+        },
+        {
+            "id": "garden lights",
+            "nodes": [
+                "Strong lamp",
+                "Strong lamp (2)"
+            ]
+        },
+        {
+            "id": "colliders",
+            "opacity": 0.0
+        },
+        {
+            "id": "New layer",
+            "nodes": [
+                "Water room floor-brighter-right",
+                "Water room floor-brighter",
+                "Water room floor-brighter (1)"
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "id": "Water room floor-brighter (1)",
+            "type": "@water_room_floor",
+            "pos": [1920.0, 1408.0],
+            "size": [3968, 256],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "Water room floor 2 (4)",
+            "type": "@water_room_floor_2",
+            "pos": [-352.0, 160.0],
+            "size": [13248, 2752]
+        },
+        {
+            "id": "dev_floor_256",
+            "type": "dev_floor_256",
+            "pos": [0.0, 5248.0],
+            "size": [1536, 7424]
+        },
+        {
+            "id": "wood (4)",
+            "type": "@materials/wood.png",
+            "pos": [-272.0, 3391.999755859375],
+            "size": [32, 128]
+        },
+        {
+            "id": "wood (3)",
+            "type": "@materials/wood.png",
+            "pos": [-288.0, 3520.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "wood (2)",
+            "type": "@materials/wood.png",
+            "pos": [-304.0, 3648.0],
+            "size": [96, 128]
+        },
+        {
+            "id": "wood (1)",
+            "type": "@materials/wood.png",
+            "pos": [-320.0, 3775.999755859375],
+            "size": [128, 128]
+        },
+        {
+            "id": "glass (4)",
+            "type": "@materials/glass.png",
+            "pos": [-272.0, 3904.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "glass (3)",
+            "type": "@materials/glass.png",
+            "pos": [-288.0, 4032.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "glass (2)",
+            "type": "@materials/glass.png",
+            "pos": [-304.0, 4160.0],
+            "size": [96, 128]
+        },
+        {
+            "id": "glass (1)",
+            "type": "@materials/glass.png",
+            "pos": [-320.0, 4288.0],
+            "size": [128, 128]
+        },
+        {
+            "id": "metal (4)",
+            "type": "@materials/metal.png",
+            "pos": [-272.0, 4416.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "metal (3)",
+            "type": "@materials/metal.png",
+            "pos": [-288.0, 4544.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "metal (2)",
+            "type": "@materials/metal.png",
+            "pos": [-304.0, 4672.0],
+            "size": [96, 128]
+        },
+        {
+            "id": "metal (1)",
+            "type": "@materials/metal.png",
+            "pos": [-320.0, 4800.0],
+            "size": [128, 128]
+        },
+        {
+            "id": "vent (4)",
+            "type": "@materials/vent.png",
+            "pos": [-272.0, 4928.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "vent (3)",
+            "type": "@materials/vent.png",
+            "pos": [-288.0, 5056.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "vent (2)",
+            "type": "@materials/vent.png",
+            "pos": [-304.0, 5184.0],
+            "size": [96, 128]
+        },
+        {
+            "id": "vent (1)",
+            "type": "@materials/vent.png",
+            "pos": [-320.0, 5312.0],
+            "size": [128, 128]
+        },
+        {
+            "id": "glass",
+            "type": "@captions/glass.png",
+            "pos": [0.0, 3872.0],
+            "color": [0, 207, 255, 255]
+        },
+        {
+            "id": "wood",
+            "type": "@captions/wood.png",
+            "pos": [0.0, 3360.0]
+        },
+        {
+            "id": "metal",
+            "type": "@captions/metal.png",
+            "pos": [0.0, 4383.0]
+        },
+        {
+            "id": "vent",
+            "type": "@captions/vent.png",
+            "pos": [0.0, 4895.0]
+        },
+        {
+            "id": "vent (5)",
+            "type": "@materials/vent.png",
+            "pos": [272.0, 4928.0],
+            "size": [32, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "vent (6)",
+            "type": "@materials/vent.png",
+            "pos": [288.0, 5056.0],
+            "size": [64, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "vent (7)",
+            "type": "@materials/vent.png",
+            "pos": [304.0, 5184.0],
+            "size": [96, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "vent (8)",
+            "type": "@materials/vent.png",
+            "pos": [320.0, 5312.0],
+            "size": [128, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "wood (5)-right",
+            "type": "@materials/wood.png",
+            "pos": [272.0, 3392.0],
+            "size": [32, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "wood (6)-right",
+            "type": "@materials/wood.png",
+            "pos": [288.0, 3520.0],
+            "size": [64, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "wood (7)-right",
+            "type": "@materials/wood.png",
+            "pos": [304.0, 3648.0],
+            "size": [96, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "wood (8)-right",
+            "type": "@materials/wood.png",
+            "pos": [320.0, 3776.0],
+            "size": [128, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "glass (5)-right",
+            "type": "@materials/glass.png",
+            "pos": [272.0, 3904.0],
+            "size": [32, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "glass (6)-right",
+            "type": "@materials/glass.png",
+            "pos": [288.0, 4032.0],
+            "size": [64, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "glass (7)-right",
+            "type": "@materials/glass.png",
+            "pos": [304.0, 4160.0],
+            "size": [96, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "glass (8)-right",
+            "type": "@materials/glass.png",
+            "pos": [320.0, 4288.0],
+            "size": [128, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "metal (5)-right",
+            "type": "@materials/metal.png",
+            "pos": [272.0, 4416.0],
+            "size": [32, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "metal (6)-right",
+            "type": "@materials/metal.png",
+            "pos": [288.0, 4544.0],
+            "size": [64, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "metal (7)-right",
+            "type": "@materials/metal.png",
+            "pos": [304.0, 4672.0],
+            "size": [96, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "metal (8)-right",
+            "type": "@materials/metal.png",
+            "pos": [320.0, 4800.0],
+            "size": [128, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "dev_floor_64 (1)",
+            "type": "dev_floor_64",
+            "pos": [-320.0, 4352.0],
+            "size": [128, 2048]
+        },
+        {
+            "id": "dev_floor_64",
+            "type": "dev_floor_64",
+            "pos": [320.0, 4352.0],
+            "size": [128, 2048]
+        },
+        {
+            "id": "dev_floor_128",
+            "type": "dev_floor_128",
+            "pos": [-448.0, 4352.0],
+            "size": [128, 2048]
+        },
+        {
+            "id": "dev_floor_128 (2)",
+            "type": "dev_floor_128",
+            "pos": [448.0, 4352.0],
+            "size": [128, 2048]
+        },
+        {
+            "id": "dev_floor_32",
+            "type": "dev_floor_32",
+            "pos": [-304.0, 3392.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "dev_floor_32 (1)",
+            "type": "dev_floor_32",
+            "pos": [-304.0, 3904.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "dev_floor_32 (2)",
+            "type": "dev_floor_32",
+            "pos": [-304.0, 4416.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "dev_floor_32 (3)",
+            "type": "dev_floor_32",
+            "pos": [-304.0, 4928.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "dev_floor_32 (4)",
+            "type": "dev_floor_32",
+            "pos": [304.0, 4928.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "dev_floor_32 (5)",
+            "type": "dev_floor_32",
+            "pos": [304.0, 4416.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "dev_floor_32 (6)",
+            "type": "dev_floor_32",
+            "pos": [304.0, 3904.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "dev_floor_32 (7)",
+            "type": "dev_floor_32",
+            "pos": [304.0, 3392.0],
+            "size": [32, 128]
+        },
+        {
+            "id": "Water room floor-brighter",
+            "type": "@water_room_floor",
+            "pos": [-3872.0, 5088.0],
+            "size": [6208, 7744],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "water_room_floor_2",
+            "type": "@water_room_floor_2",
+            "pos": [-1056.0, 5248.0],
+            "size": [192, 7424]
+        },
+        {
+            "id": "water_room_floor_2 (1)",
+            "type": "@water_room_floor_2",
+            "pos": [-1920.0, 5248.0],
+            "size": [384, 7424]
+        },
+        {
+            "id": "water_room_floor_2 (2)",
+            "type": "@water_room_floor_2",
+            "pos": [-1440.0, 5248.0],
+            "size": [192, 7424]
+        },
+        {
+            "id": "water_room_floor_2 (3)",
+            "type": "@water_room_floor_2",
+            "pos": [-800.0, 5248.0],
+            "size": [64, 7424]
+        },
+        {
+            "id": "water_room_floor_2 (1)-right",
+            "type": "@water_room_floor_2",
+            "pos": [1920.0, 5248.0],
+            "size": [384, 7424],
+            "flip_horizontally": true
+        },
+        {
+            "id": "water_room_floor_2 (2)-right",
+            "type": "@water_room_floor_2",
+            "pos": [1440.0, 5248.0],
+            "size": [192, 7424],
+            "flip_horizontally": true
+        },
+        {
+            "id": "water_room_floor_2 (3)-right",
+            "type": "@water_room_floor_2",
+            "pos": [800.0, 5248.0],
+            "size": [64, 7424],
+            "flip_horizontally": true
+        },
+        {
+            "id": "water_room_floor_2-right",
+            "type": "@water_room_floor_2",
+            "pos": [1056.0, 5248.0],
+            "size": [192, 7424],
+            "flip_horizontally": true
+        },
+        {
+            "id": "Water room floor-brighter-right",
+            "type": "@water_room_floor",
+            "pos": [2336.0, 5248.0],
+            "size": [3136, 7424],
+            "color": [255, 132, 132, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "water_room_floor_2 (1)-right (1)",
+            "type": "@water_room_floor_2",
+            "pos": [5088.0, 5248.0],
+            "size": [2368, 7424],
+            "flip_horizontally": true
+        },
+        {
+            "id": "lab_wall",
+            "type": "lab_wall",
+            "pos": [3040.0, 1200.0],
+            "size": [1856, 32]
+        },
+        {
+            "id": "lab_wall-up",
+            "type": "lab_wall",
+            "pos": [3040.0, 1168.0],
+            "size": [1856, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "lab_wall (1)",
+            "type": "lab_wall",
+            "pos": [3984.0, 4031.99951171875],
+            "rotation": 90.0,
+            "size": [5760, 32]
+        },
+        {
+            "id": "lab_wall-up (1)",
+            "type": "lab_wall",
+            "pos": [4016.0, 4031.99951171875],
+            "rotation": 90.0,
+            "size": [5760, 32],
+            "flip_vertically": true
+        },
+        {
+            "id": "lab_wall-left",
+            "type": "lab_wall",
+            "pos": [-3040.0, 1200.0],
+            "size": [1856, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "lab_wall-up-left",
+            "type": "lab_wall",
+            "pos": [-3040.0, 1168.0],
+            "size": [1856, 32],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "lab_wall (1)-left",
+            "type": "lab_wall",
+            "pos": [-3984.0, 4031.99951171875],
+            "rotation": -90.0,
+            "size": [5760, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "lab_wall-up (1)-left",
+            "type": "lab_wall",
+            "pos": [-4016.0, 4031.99951171875],
+            "rotation": -90.0,
+            "size": [5760, 32],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "lab_wall-left (1)",
+            "type": "lab_wall",
+            "pos": [0.0, 6960.0],
+            "size": [8064, 32],
+            "flip_horizontally": true
+        },
+        {
+            "id": "lab_wall-up-left (1)",
+            "type": "lab_wall",
+            "pos": [0.0, 6928.0],
+            "size": [8064, 32],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "crate",
+            "type": "crate",
+            "pos": [-319.0, 3200.999755859375]
+        },
+        {
+            "id": "crate (1)",
+            "type": "crate",
+            "pos": [321.0, 3202.0]
+        },
+        {
+            "id": "aquarium_ambience_left",
+            "type": "aquarium_ambience_left",
+            "pos": [-619.0, 1274.0]
+        },
+        {
+            "id": "aquarium_ambience_right",
+            "type": "aquarium_ambience_right",
+            "pos": [825.0, 1292.0]
+        },
+        {
+            "id": "Strong lamp (2)",
+            "type": "point_light",
+            "pos": [2945.0, 1297.0],
+            "color": [80, 255, 71, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp",
+            "type": "point_light",
+            "pos": [-2577.0, 1327.0],
+            "color": [80, 255, 71, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "interference_grenade",
+            "type": "interference_grenade",
+            "pos": [-2071.0, 3293.0]
+        },
+        {
+            "id": "ped_grenade",
+            "type": "ped_grenade",
+            "pos": [-1970.9998779296875, 3298.0]
+        },
+        {
+            "id": "flashbang",
+            "type": "flashbang",
+            "pos": [-1870.9998779296875, 3298.0]
+        },
+        {
+            "id": "force_grenade",
+            "type": "force_grenade",
+            "pos": [-1770.9998779296875, 3298.0]
+        },
+        {
+            "id": "interference_grenade (1)",
+            "type": "interference_grenade",
+            "pos": [-2071.0, 3453.0]
+        },
+        {
+            "id": "ped_grenade (1)",
+            "type": "ped_grenade",
+            "pos": [-1970.9998779296875, 3458.000244140625]
+        },
+        {
+            "id": "flashbang (1)",
+            "type": "flashbang",
+            "pos": [-1870.9998779296875, 3458.000244140625]
+        },
+        {
+            "id": "force_grenade (1)",
+            "type": "force_grenade",
+            "pos": [-1770.9998779296875, 3458.000244140625]
+        },
+        {
+            "id": "interference_grenade-down",
+            "type": "interference_grenade",
+            "pos": [-2071.0, 3778.0]
+        },
+        {
+            "id": "ped_grenade-down",
+            "type": "ped_grenade",
+            "pos": [-1970.9998779296875, 3773.0]
+        },
+        {
+            "id": "flashbang-down",
+            "type": "flashbang",
+            "pos": [-1870.9998779296875, 3773.0]
+        },
+        {
+            "id": "force_grenade-down",
+            "type": "force_grenade",
+            "pos": [-1770.9998779296875, 3773.0]
+        },
+        {
+            "id": "interference_grenade (1)-down",
+            "type": "interference_grenade",
+            "pos": [-2071.0, 3618.0]
+        },
+        {
+            "id": "ped_grenade (1)-down",
+            "type": "ped_grenade",
+            "pos": [-1970.9998779296875, 3613.0]
+        },
+        {
+            "id": "flashbang (1)-down",
+            "type": "flashbang",
+            "pos": [-1870.9998779296875, 3613.0]
+        },
+        {
+            "id": "force_grenade (1)-down",
+            "type": "force_grenade",
+            "pos": [-1770.9998779296875, 3613.0]
+        },
+        {
+            "id": "interference_grenade-down (1)",
+            "type": "interference_grenade",
+            "pos": [-2071.0, 4418.0]
+        },
+        {
+            "id": "ped_grenade-down (1)",
+            "type": "ped_grenade",
+            "pos": [-1970.9998779296875, 4413.0]
+        },
+        {
+            "id": "flashbang-down (1)",
+            "type": "flashbang",
+            "pos": [-1870.9998779296875, 4413.0]
+        },
+        {
+            "id": "force_grenade-down (1)",
+            "type": "force_grenade",
+            "pos": [-1770.9998779296875, 4413.0]
+        },
+        {
+            "id": "interference_grenade (1)-down (1)",
+            "type": "interference_grenade",
+            "pos": [-2071.0, 4258.0]
+        },
+        {
+            "id": "ped_grenade (1)-down (1)",
+            "type": "ped_grenade",
+            "pos": [-1970.9998779296875, 4253.0]
+        },
+        {
+            "id": "flashbang (1)-down (1)",
+            "type": "flashbang",
+            "pos": [-1870.9998779296875, 4253.0]
+        },
+        {
+            "id": "force_grenade (1)-down (1)",
+            "type": "force_grenade",
+            "pos": [-1770.9998779296875, 4253.0]
+        },
+        {
+            "id": "interference_grenade-down-down",
+            "type": "interference_grenade",
+            "pos": [-2071.0, 3933.000244140625]
+        },
+        {
+            "id": "ped_grenade-down-down",
+            "type": "ped_grenade",
+            "pos": [-1970.9998779296875, 3938.0]
+        },
+        {
+            "id": "flashbang-down-down",
+            "type": "flashbang",
+            "pos": [-1870.9998779296875, 3938.0]
+        },
+        {
+            "id": "force_grenade-down-down",
+            "type": "force_grenade",
+            "pos": [-1770.9998779296875, 3938.0]
+        },
+        {
+            "id": "interference_grenade (1)-down-down",
+            "type": "interference_grenade",
+            "pos": [-2071.0, 4093.0]
+        },
+        {
+            "id": "ped_grenade (1)-down-down",
+            "type": "ped_grenade",
+            "pos": [-1970.9998779296875, 4098.0]
+        },
+        {
+            "id": "flashbang (1)-down-down",
+            "type": "flashbang",
+            "pos": [-1870.9998779296875, 4098.0]
+        },
+        {
+            "id": "force_grenade (1)-down-down",
+            "type": "force_grenade",
+            "pos": [-1770.9998779296875, 4098.0]
+        },
+        {
+            "id": "interference_grenade (2)",
+            "type": "interference_grenade",
+            "pos": [1769.0, 3293.0]
+        },
+        {
+            "id": "ped_grenade (2)",
+            "type": "ped_grenade",
+            "pos": [1869.0, 3298.0]
+        },
+        {
+            "id": "flashbang (2)",
+            "type": "flashbang",
+            "pos": [1969.0, 3298.0]
+        },
+        {
+            "id": "force_grenade (2)",
+            "type": "force_grenade",
+            "pos": [2069.0, 3298.0]
+        },
+        {
+            "id": "interference_grenade (3)",
+            "type": "interference_grenade",
+            "pos": [1769.0, 3453.0]
+        },
+        {
+            "id": "ped_grenade (3)",
+            "type": "ped_grenade",
+            "pos": [1869.0, 3458.000244140625]
+        },
+        {
+            "id": "flashbang (3)",
+            "type": "flashbang",
+            "pos": [1969.0, 3458.000244140625]
+        },
+        {
+            "id": "force_grenade (3)",
+            "type": "force_grenade",
+            "pos": [2069.0, 3458.000244140625]
+        },
+        {
+            "id": "interference_grenade-down (2)",
+            "type": "interference_grenade",
+            "pos": [1769.0, 3778.0]
+        },
+        {
+            "id": "ped_grenade-down (2)",
+            "type": "ped_grenade",
+            "pos": [1869.0, 3773.0]
+        },
+        {
+            "id": "flashbang-down (2)",
+            "type": "flashbang",
+            "pos": [1969.0, 3773.0]
+        },
+        {
+            "id": "force_grenade-down (2)",
+            "type": "force_grenade",
+            "pos": [2069.0, 3773.0]
+        },
+        {
+            "id": "interference_grenade (1)-down (2)",
+            "type": "interference_grenade",
+            "pos": [1769.0, 3618.0]
+        },
+        {
+            "id": "ped_grenade (1)-down (2)",
+            "type": "ped_grenade",
+            "pos": [1869.0, 3613.0]
+        },
+        {
+            "id": "flashbang (1)-down (2)",
+            "type": "flashbang",
+            "pos": [1969.0, 3613.0]
+        },
+        {
+            "id": "force_grenade (1)-down (2)",
+            "type": "force_grenade",
+            "pos": [2069.0, 3613.0]
+        },
+        {
+            "id": "interference_grenade-down (3)",
+            "type": "interference_grenade",
+            "pos": [1769.0, 4418.0]
+        },
+        {
+            "id": "ped_grenade-down (3)",
+            "type": "ped_grenade",
+            "pos": [1869.0, 4413.0]
+        },
+        {
+            "id": "flashbang-down (3)",
+            "type": "flashbang",
+            "pos": [1969.0, 4413.0]
+        },
+        {
+            "id": "force_grenade-down (3)",
+            "type": "force_grenade",
+            "pos": [2069.0, 4413.0]
+        },
+        {
+            "id": "interference_grenade (1)-down (3)",
+            "type": "interference_grenade",
+            "pos": [1769.0, 4258.0]
+        },
+        {
+            "id": "ped_grenade (1)-down (3)",
+            "type": "ped_grenade",
+            "pos": [1869.0, 4253.0]
+        },
+        {
+            "id": "flashbang (1)-down (3)",
+            "type": "flashbang",
+            "pos": [1969.0, 4253.0]
+        },
+        {
+            "id": "force_grenade (1)-down (3)",
+            "type": "force_grenade",
+            "pos": [2069.0, 4253.0]
+        },
+        {
+            "id": "interference_grenade-down-down (1)",
+            "type": "interference_grenade",
+            "pos": [1769.0, 3933.000244140625]
+        },
+        {
+            "id": "ped_grenade-down-down (1)",
+            "type": "ped_grenade",
+            "pos": [1869.0, 3938.0]
+        },
+        {
+            "id": "flashbang-down-down (1)",
+            "type": "flashbang",
+            "pos": [1969.0, 3938.0]
+        },
+        {
+            "id": "force_grenade-down-down (1)",
+            "type": "force_grenade",
+            "pos": [2069.0, 3938.0]
+        },
+        {
+            "id": "interference_grenade (1)-down-down (1)",
+            "type": "interference_grenade",
+            "pos": [1769.0, 4093.0]
+        },
+        {
+            "id": "ped_grenade (1)-down-down (1)",
+            "type": "ped_grenade",
+            "pos": [1869.0, 4098.0]
+        },
+        {
+            "id": "flashbang (1)-down-down (1)",
+            "type": "flashbang",
+            "pos": [1969.0, 4098.0]
+        },
+        {
+            "id": "force_grenade (1)-down-down (1)",
+            "type": "force_grenade",
+            "pos": [2069.0, 4098.0]
+        },
+        {
+            "id": "mini_knife",
+            "type": "mini_knife",
+            "pos": [-1306.0, 4613.0]
+        },
+        {
+            "id": "cyan_scythe",
+            "type": "cyan_scythe",
+            "pos": [-1306.0, 4713.0]
+        },
+        {
+            "id": "yellow_dagger",
+            "type": "yellow_dagger",
+            "pos": [-1306.0, 4813.0]
+        },
+        {
+            "id": "poseidon",
+            "type": "poseidon",
+            "pos": [-1306.0, 4913.0]
+        },
+        {
+            "id": "fury_thrower",
+            "type": "fury_thrower",
+            "pos": [-1306.0, 5013.0]
+        },
+        {
+            "id": "assault_rattle",
+            "type": "assault_rattle",
+            "pos": [-1306.0, 5113.0]
+        },
+        {
+            "id": "mini_knife-right",
+            "type": "mini_knife",
+            "pos": [-1177.0001220703125, 4614.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "cyan_scythe-right",
+            "type": "cyan_scythe",
+            "pos": [-1177.0001220703125, 4714.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "yellow_dagger-right",
+            "type": "yellow_dagger",
+            "pos": [-1177.0001220703125, 4814.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "poseidon-right",
+            "type": "poseidon",
+            "pos": [-1177.0001220703125, 4914.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "fury_thrower-right",
+            "type": "fury_thrower",
+            "pos": [-1177.0001220703125, 5014.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "assault_rattle-right",
+            "type": "assault_rattle",
+            "pos": [-1177.0001220703125, 5114.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "mini_knife (1)",
+            "type": "mini_knife",
+            "pos": [1174.0, 4613.0]
+        },
+        {
+            "id": "cyan_scythe (1)",
+            "type": "cyan_scythe",
+            "pos": [1174.0, 4713.0]
+        },
+        {
+            "id": "yellow_dagger (1)",
+            "type": "yellow_dagger",
+            "pos": [1174.0, 4813.0]
+        },
+        {
+            "id": "poseidon (1)",
+            "type": "poseidon",
+            "pos": [1174.0, 4913.0]
+        },
+        {
+            "id": "fury_thrower (1)",
+            "type": "fury_thrower",
+            "pos": [1174.0, 5013.0]
+        },
+        {
+            "id": "assault_rattle (1)",
+            "type": "assault_rattle",
+            "pos": [1174.0, 5113.0]
+        },
+        {
+            "id": "mini_knife-right (1)",
+            "type": "mini_knife",
+            "pos": [1303.0, 4614.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "cyan_scythe-right (1)",
+            "type": "cyan_scythe",
+            "pos": [1303.0, 4714.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "yellow_dagger-right (1)",
+            "type": "yellow_dagger",
+            "pos": [1303.0, 4814.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "poseidon-right (1)",
+            "type": "poseidon",
+            "pos": [1303.0, 4914.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "fury_thrower-right (1)",
+            "type": "fury_thrower",
+            "pos": [1303.0, 5014.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "assault_rattle-right (1)",
+            "type": "assault_rattle",
+            "pos": [1303.0, 5114.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "sn69",
+            "type": "sn69",
+            "pos": [-1056.0, 3300.0]
+        },
+        {
+            "id": "kek9",
+            "type": "kek9",
+            "pos": [-1056.0, 3400.0]
+        },
+        {
+            "id": "bulwark",
+            "type": "bulwark",
+            "pos": [-1056.0, 3500.0]
+        },
+        {
+            "id": "calico",
+            "type": "calico",
+            "pos": [-1056.0, 3600.0]
+        },
+        {
+            "id": "ao44 (1)",
+            "type": "ao44",
+            "pos": [-1056.0, 3700.0]
+        },
+        {
+            "id": "covert",
+            "type": "covert",
+            "pos": [-1056.0, 3800.0]
+        },
+        {
+            "id": "deagle",
+            "type": "deagle",
+            "pos": [-1056.0, 3900.0]
+        },
+        {
+            "id": "gradobicie",
+            "type": "gradobicie",
+            "pos": [-1056.0, 4300.0]
+        },
+        {
+            "id": "galilea",
+            "type": "galilea",
+            "pos": [-1440.0, 3300.0]
+        },
+        {
+            "id": "zamiec",
+            "type": "zamiec",
+            "pos": [-1056.0, 4000.0]
+        },
+        {
+            "id": "cyberspray",
+            "type": "cyberspray",
+            "pos": [-1056.0, 4100.0]
+        },
+        {
+            "id": "pro90",
+            "type": "pro90",
+            "pos": [-1056.0, 4200.0]
+        },
+        {
+            "id": "warx",
+            "type": "warx",
+            "pos": [-1056.0, 4400.0]
+        },
+        {
+            "id": "hunter (1)",
+            "type": "hunter",
+            "pos": [-1440.0, 3400.0]
+        },
+        {
+            "id": "blunaz",
+            "type": "blunaz",
+            "pos": [-1440.0, 3500.0]
+        },
+        {
+            "id": "baka47",
+            "type": "baka47",
+            "pos": [-1440.0, 3600.0]
+        },
+        {
+            "id": "bilmer2000",
+            "type": "bilmer2000",
+            "pos": [-1440.0, 3700.0]
+        },
+        {
+            "id": "szturm",
+            "type": "szturm",
+            "pos": [-1440.0, 3800.0]
+        },
+        {
+            "id": "datum",
+            "type": "datum",
+            "pos": [-1440.0, 3900.0]
+        },
+        {
+            "id": "amplifier_arm",
+            "type": "amplifier_arm",
+            "pos": [-1440.0, 4000.0]
+        },
+        {
+            "id": "awka",
+            "type": "awka",
+            "pos": [-1440.0, 4100.0]
+        },
+        {
+            "id": "bulldup2000",
+            "type": "bulldup2000",
+            "pos": [-1440.0, 4200.0]
+        },
+        {
+            "id": "lews",
+            "type": "lews",
+            "pos": [-1440.0, 4300.0]
+        },
+        {
+            "id": "elon",
+            "type": "elon",
+            "pos": [-1440.0, 4400.0]
+        },
+        {
+            "id": "elon-right",
+            "type": "elon",
+            "pos": [1060.0, 4400.0]
+        },
+        {
+            "id": "lews-right",
+            "type": "lews",
+            "pos": [1063.0, 4300.0]
+        },
+        {
+            "id": "bulldup2000-right",
+            "type": "bulldup2000",
+            "pos": [1060.0, 4200.0]
+        },
+        {
+            "id": "awka-right",
+            "type": "awka",
+            "pos": [1060.0, 4100.0]
+        },
+        {
+            "id": "amplifier_arm-right",
+            "type": "amplifier_arm",
+            "pos": [1060.0, 4000.0]
+        },
+        {
+            "id": "datum-right",
+            "type": "datum",
+            "pos": [1060.0, 3900.0]
+        },
+        {
+            "id": "szturm-right",
+            "type": "szturm",
+            "pos": [1063.0, 3800.0]
+        },
+        {
+            "id": "bilmer2000-right",
+            "type": "bilmer2000",
+            "pos": [1060.0, 3700.0]
+        },
+        {
+            "id": "baka47-right",
+            "type": "baka47",
+            "pos": [1060.0, 3600.0]
+        },
+        {
+            "id": "blunaz-right",
+            "type": "blunaz",
+            "pos": [1060.0, 3500.0]
+        },
+        {
+            "id": "hunter (1)-right",
+            "type": "hunter",
+            "pos": [1060.0, 3400.0]
+        },
+        {
+            "id": "cyberspray-right",
+            "type": "cyberspray",
+            "pos": [1447.0, 4100.0]
+        },
+        {
+            "id": "warx-right",
+            "type": "warx",
+            "pos": [1447.0, 4400.0]
+        },
+        {
+            "id": "sn69-right",
+            "type": "sn69",
+            "pos": [1447.0, 3300.0]
+        },
+        {
+            "id": "ao44 (1)-right",
+            "type": "ao44",
+            "pos": [1444.0, 3700.0]
+        },
+        {
+            "id": "calico-right",
+            "type": "calico",
+            "pos": [1444.0, 3600.0]
+        },
+        {
+            "id": "bulwark-right",
+            "type": "bulwark",
+            "pos": [1444.0, 3500.0]
+        },
+        {
+            "id": "covert-right",
+            "type": "covert",
+            "pos": [1447.0, 3800.0]
+        },
+        {
+            "id": "kek9-right",
+            "type": "kek9",
+            "pos": [1444.0, 3400.0]
+        },
+        {
+            "id": "deagle-right",
+            "type": "deagle",
+            "pos": [1444.0, 3900.0]
+        },
+        {
+            "id": "zamiec-right",
+            "type": "zamiec",
+            "pos": [1447.0, 4000.0]
+        },
+        {
+            "id": "galilea-right",
+            "type": "galilea",
+            "pos": [1060.0, 3300.0]
+        },
+        {
+            "id": "gradobicie-right",
+            "type": "gradobicie",
+            "pos": [1444.0, 4300.0]
+        },
+        {
+            "id": "pro90-right",
+            "type": "pro90",
+            "pos": [1447.0, 4200.0]
+        },
+        {
+            "id": "aquarium",
+            "type": "aquarium",
+            "pos": [0.0, 896.0],
+            "size": [4224, 768]
+        },
+        {
+            "id": "team_spawn",
+            "type": "team_spawn",
+            "pos": [-195.0, 3903.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (2)",
+            "type": "team_spawn",
+            "pos": [-195.0, 4289.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (9)",
+            "type": "team_spawn",
+            "pos": [-197.0, 4161.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (10)",
+            "type": "team_spawn",
+            "pos": [-197.0, 4031.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (1)",
+            "type": "team_spawn",
+            "pos": [-193.0, 3393.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (3)",
+            "type": "team_spawn",
+            "pos": [-195.0, 3521.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (4)",
+            "type": "team_spawn",
+            "pos": [-193.0, 3779.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (5)",
+            "type": "team_spawn",
+            "pos": [-195.0, 3651.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (6)",
+            "type": "team_spawn",
+            "pos": [-197.0, 4413.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (7)",
+            "type": "team_spawn",
+            "pos": [-199.0, 4541.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (8)",
+            "type": "team_spawn",
+            "pos": [-197.0, 4799.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (11)",
+            "type": "team_spawn",
+            "pos": [-199.0, 4671.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (12)",
+            "type": "team_spawn",
+            "pos": [-197.0, 4925.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (13)",
+            "type": "team_spawn",
+            "pos": [-199.0, 5053.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (14)",
+            "type": "team_spawn",
+            "pos": [-197.0, 5311.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (15)",
+            "type": "team_spawn",
+            "pos": [-199.0, 5183.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (16)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [1231.0, 5753.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "team_spawn (17)",
+            "type": "team_spawn",
+            "pos": [453.0, 3903.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (18)",
+            "type": "team_spawn",
+            "pos": [451.0, 4031.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (19)",
+            "type": "team_spawn",
+            "pos": [453.0, 4289.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (20)",
+            "type": "team_spawn",
+            "pos": [451.0, 4161.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (21)",
+            "type": "team_spawn",
+            "pos": [455.0, 3393.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (22)",
+            "type": "team_spawn",
+            "pos": [453.0, 3521.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (23)",
+            "type": "team_spawn",
+            "pos": [455.0, 3779.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (24)",
+            "type": "team_spawn",
+            "pos": [453.0, 3651.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (25)",
+            "type": "team_spawn",
+            "pos": [451.0, 4413.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (26)",
+            "type": "team_spawn",
+            "pos": [449.0, 4541.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (27)",
+            "type": "team_spawn",
+            "pos": [451.0, 4799.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (28)",
+            "type": "team_spawn",
+            "pos": [449.0, 4671.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (29)",
+            "type": "team_spawn",
+            "pos": [451.0, 4925.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (30)",
+            "type": "team_spawn",
+            "pos": [449.0, 5053.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (31)",
+            "type": "team_spawn",
+            "pos": [451.0, 5311.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (32)",
+            "type": "team_spawn",
+            "pos": [449.0, 5183.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (33)",
+            "type": "team_spawn",
+            "pos": [-193.0, 3201.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (34)",
+            "type": "team_spawn",
+            "pos": [449.0, 3201.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Servers (8)",
+            "type": "callout",
+            "pos": [2688.0, -4544.0],
+            "size": [768, 896]
+        },
+        {
+            "id": "Servers (7)",
+            "type": "callout",
+            "pos": [2432.0, -3904.0],
+            "size": [1280, 384]
+        },
+        {
+            "id": "Servers (6)",
+            "type": "callout",
+            "pos": [1408.0, -4352.0],
+            "size": [768, 1280]
+        },
+        {
+            "id": "Med",
+            "type": "callout",
+            "pos": [-96.0, 2112.0],
+            "size": [576, 896]
+        },
+        {
+            "id": "Highway",
+            "type": "callout",
+            "pos": [320.0, -3968.0],
+            "size": [1408, 512]
+        },
+        {
+            "id": "Garden (6)",
+            "type": "callout",
+            "pos": [2064.0, 96.0],
+            "size": [1824, 1344]
+        },
+        {
+            "id": "Mixer (1)",
+            "type": "callout",
+            "pos": [1792.0, 1072.0],
+            "size": [128, 480]
+        },
+        {
+            "id": "Garden (5)",
+            "type": "callout",
+            "pos": [2816.0, -736.0],
+            "size": [1408, 320]
+        },
+        {
+            "id": "Hiding",
+            "type": "callout",
+            "pos": [960.0, 3184.0],
+            "size": [960, 608]
+        },
+        {
+            "id": "Bay",
+            "type": "callout",
+            "pos": [672.0, 2720.0],
+            "size": [2112, 320]
+        },
+        {
+            "id": "Plaza",
+            "type": "callout",
+            "pos": [2128.0, 2080.0],
+            "size": [800, 1536]
+        },
+        {
+            "id": "Backdoor",
+            "type": "callout",
+            "pos": [3344.0, -1840.0],
+            "size": [800, 672]
+        },
+        {
+            "id": "Maze",
+            "type": "callout",
+            "pos": [192.0, 1024.0],
+            "size": [1152, 1280]
+        },
+        {
+            "id": "B vent (1)",
+            "type": "callout",
+            "pos": [2784.0, -3440.0],
+            "size": [1408, 480]
+        },
+        {
+            "id": "B vent",
+            "type": "callout",
+            "pos": [3280.0, -4032.0],
+            "size": [416, 704]
+        },
+        {
+            "id": "Dead end",
+            "type": "callout",
+            "pos": [3744.0, -3712.0],
+            "size": [512, 1344]
+        },
+        {
+            "id": "Long",
+            "type": "callout",
+            "pos": [-80.0, -4560.0],
+            "size": [2208, 672]
+        },
+        {
+            "id": "Lobby",
+            "type": "callout",
+            "pos": [-768.0, -3904.0],
+            "size": [768, 640]
+        },
+        {
+            "id": "Radars",
+            "type": "callout",
+            "pos": [-896.0, -3136.0],
+            "size": [2048, 896]
+        },
+        {
+            "id": "Generator",
+            "type": "callout",
+            "pos": [960.0, 2112.0],
+            "size": [1536, 832]
+        },
+        {
+            "id": "Elevator",
+            "type": "callout",
+            "pos": [640.0, -2928.0],
+            "size": [960, 736]
+        },
+        {
+            "id": "CT vent",
+            "type": "callout",
+            "pos": [1248.0, -2304.0],
+            "size": [1280, 512]
+        },
+        {
+            "id": "Panel",
+            "type": "callout",
+            "pos": [1856.0, -1312.0],
+            "size": [384, 832]
+        },
+        {
+            "id": "Computers",
+            "type": "callout",
+            "pos": [1216.0, -1888.0],
+            "size": [1664, 320]
+        },
+        {
+            "id": "Connector",
+            "type": "callout",
+            "pos": [64.0, -1664.0],
+            "size": [640, 512]
+        },
+        {
+            "id": "Pump",
+            "type": "callout",
+            "pos": [608.0, -1184.0],
+            "size": [448, 1088]
+        },
+        {
+            "id": "Glass",
+            "type": "callout",
+            "pos": [1440.0, -768.0],
+            "size": [1216, 256]
+        },
+        {
+            "id": "CT spawn",
+            "type": "callout",
+            "pos": [2496.0, -1392.0],
+            "size": [896, 1056]
+        },
+        {
+            "id": "Servers (5)",
+            "type": "callout",
+            "pos": [2048.0, -4832.0],
+            "size": [512, 320]
+        },
+        {
+            "id": "Jungle",
+            "type": "callout",
+            "pos": [1632.0, -416.0],
+            "size": [832, 320]
+        },
+        {
+            "id": "Tetris",
+            "type": "callout",
+            "pos": [2816.0, -2432.0],
+            "size": [1856, 512]
+        },
+        {
+            "id": "Tetris (1)",
+            "type": "callout",
+            "pos": [1920.0, -2944.0],
+            "size": [1600, 512]
+        },
+        {
+            "id": "Cross",
+            "type": "callout",
+            "pos": [384.0, -128.0],
+            "size": [1536, 1024]
+        },
+        {
+            "id": "Fans",
+            "type": "callout",
+            "pos": [2048.0, -4400.0],
+            "size": [512, 512]
+        },
+        {
+            "id": "Gate",
+            "type": "callout",
+            "pos": [1728.0, -3456.0],
+            "size": [704, 512]
+        },
+        {
+            "id": "Mixer",
+            "type": "callout",
+            "pos": [1248.0, 1264.0],
+            "size": [960, 864]
+        },
+        {
+            "id": "Toxic",
+            "type": "callout",
+            "pos": [2976.0, 2112.0],
+            "size": [896, 768]
+        },
+        {
+            "id": "Brains",
+            "type": "callout",
+            "pos": [-1592.0, -1760.0],
+            "size": [656, 576]
+        },
+        {
+            "id": "Brains (1)",
+            "type": "callout",
+            "pos": [-920.0, -1760.0],
+            "size": [688, 576]
+        },
+        {
+            "id": "Subway",
+            "type": "callout",
+            "pos": [768.0, -3504.0],
+            "size": [1216, 416]
+        },
+        {
+            "id": "Fork",
+            "type": "callout",
+            "pos": [-640.0, -128.0],
+            "size": [512, 768]
+        },
+        {
+            "id": "Office",
+            "type": "callout",
+            "pos": [-1248.0, -1760.0],
+            "size": [1984, 1216]
+        },
+        {
+            "id": "Rotate",
+            "type": "callout",
+            "pos": [-352.0, -2496.0],
+            "size": [704, 384]
+        },
+        {
+            "id": "T vent",
+            "type": "callout",
+            "pos": [-1152.0, -448.0],
+            "size": [512, 960]
+        },
+        {
+            "id": "Helipad",
+            "type": "callout",
+            "pos": [-2736.0, -1536.0],
+            "size": [928, 768]
+        },
+        {
+            "id": "Cargo",
+            "type": "callout",
+            "pos": [-2304.0, -768.0],
+            "size": [1792, 768]
+        },
+        {
+            "id": "T spawn",
+            "type": "callout",
+            "pos": [-3248.0, -2192.0],
+            "size": [928, 736]
+        },
+        {
+            "id": "Cache",
+            "type": "callout",
+            "pos": [-2560.0, -3008.0],
+            "size": [1280, 1152]
+        },
+        {
+            "id": "Secret",
+            "type": "callout",
+            "pos": [2976.0, 1504.0],
+            "size": [896, 320]
+        },
+        {
+            "id": "Secret (1)",
+            "type": "callout",
+            "pos": [3248.0, 864.0],
+            "size": [544, 960]
+        },
+        {
+            "id": "CT ninja",
+            "type": "callout",
+            "pos": [2400.0, -768.0],
+            "size": [576, 128]
+        },
+        {
+            "id": "CT ninja (1)",
+            "type": "callout",
+            "pos": [2176.0, -464.0],
+            "size": [128, 480]
+        },
+        {
+            "id": "Ninja",
+            "type": "callout",
+            "pos": [1408.0, 704.0],
+            "size": [512, 128]
+        },
+        {
+            "id": "Ninja (1)",
+            "type": "callout",
+            "pos": [1600.0, 496.0],
+            "size": [128, 288]
+        },
+        {
+            "id": "Garden corner",
+            "type": "callout",
+            "pos": [960.0, 576.0],
+            "size": [384, 384]
+        },
+        {
+            "id": "portal",
+            "type": "portal",
+            "pos": [-1216.0001220703125, 2720.0],
+            "rotation": 90.0,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "portal_exit": "portal (3)",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (1)",
+            "type": "portal",
+            "pos": [-1208.0001220703125, 5871.99951171875],
+            "rotation": -90.0,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "portal_exit": "portal (2)",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (2)",
+            "type": "portal",
+            "pos": [1248.0, 2720.0],
+            "rotation": 90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "portal_exit": "portal (1)",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (3)",
+            "type": "portal",
+            "pos": [1232.0001220703125, 5872.0],
+            "rotation": -90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "portal_exit": "portal",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (4)",
+            "type": "portal",
+            "pos": [-3584.0, 6528.0],
+            "color_preset": "PINK",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (5)",
+            "type": "portal",
+            "pos": [3584.0, 6528.0],
+            "rotation": -90.0,
+            "color_preset": "PINK",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (6)",
+            "type": "portal",
+            "pos": [3584.0, 1728.0001220703125],
+            "rotation": -180.0,
+            "color_preset": "PINK",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (7)",
+            "type": "portal",
+            "pos": [-3584.0, 1600.0],
+            "rotation": 90.0,
+            "color_preset": "PINK",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (8)",
+            "type": "portal",
+            "pos": [3584.0, 4096.0],
+            "rotation": -90.0,
+            "color_preset": "PINK",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (11)",
+            "type": "portal",
+            "pos": [3584.0, 5760.0],
+            "rotation": -90.0,
+            "color_preset": "PINK",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        }
+    ]
+}

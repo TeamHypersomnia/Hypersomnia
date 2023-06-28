@@ -27,7 +27,8 @@ test_scene_setup::test_scene_setup(
 
 	cosmos_solvable_significant dummy;
 
-	current_arena_folder = "user/projects/shooting_range";
+	//current_arena_folder = "user/projects/shooting_range";
+	current_arena_folder = "content/menu/shooting_range";
 	auto paths = editor_project_paths(current_arena_folder);
 
 	auto handle = online_arena_handle<false>{ 
