@@ -27,7 +27,7 @@ ENV BUILD_FOLDER_SUFFIX=headless
 COPY . /hypersomnia
 WORKDIR /hypersomnia
 
-RUN cmake/build.sh Release x64 "-DHYPERSOMNIA_DEDICATED_SERVER=1 -DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=1" && \
+RUN cmake/build.sh Release x64 "-DHYPERSOMNIA_DEDICATED_SERVER=1 -DGENERATE_DEBUG_INFORMATION=0" && \
     ninja all -C build/current
 
 FROM ubuntu:bionic

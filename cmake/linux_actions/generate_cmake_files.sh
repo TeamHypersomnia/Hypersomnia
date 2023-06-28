@@ -1,6 +1,6 @@
 c_compiler=clang-14
 cxx_compiler=clang++-14
-other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=1 -DBUILD_DEBUGGER_SETUP=0 -DBUILD_IN_CONSOLE_MODE=0"
+other_cmake_flags="-DGENERATE_DEBUG_INFORMATION=1 -DBUILD_DEBUGGER_SETUP=0"
 
 ${c_compiler} -v && ${cxx_compiler} -v && cmake --version
 export CC=${c_compiler}

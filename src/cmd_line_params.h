@@ -41,6 +41,9 @@ struct cmd_line_params {
 			if (begins_with(a, "-psn")) {
 				continue;
 			}
+			else if (a == "--keep-cwd") {
+				keep_cwd = true;
+			}
 			else if (a == "--unit-tests-only") {
 				unit_tests_only = true;
 				keep_cwd = true;

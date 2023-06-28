@@ -102,7 +102,7 @@ int main(const int argc, const char* const * const argv) {
 		std::filesystem::current_path(exe_dir);
 		std::cout << "CHANGED CWD TO: " << std::filesystem::current_path().string() << std::endl;
 
-#elif PLATFORM_UNIX && !BUILD_IN_CONSOLE_MODE
+#elif PLATFORM_UNIX
 		if (auto exe_path = get_current_exe_path(); !exe_path.empty()) {
 			exe_path.replace_filename("");
 			std::cout << "CHANGING CWD TO: " << exe_path.string() << std::endl;

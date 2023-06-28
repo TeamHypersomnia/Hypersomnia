@@ -1765,7 +1765,7 @@ if(${CMAKE_GENERATOR} STREQUAL "Unix makefiles" OR ${CMAKE_GENERATOR} STREQUAL "
 	set(HYPERSOMNIA_WORKING_DIR ${HYPERSOMNIA_EXE_RESOURCES_DIR})
 
 	add_custom_target(run
-		COMMAND Hypersomnia
+		COMMAND Hypersomnia --keep-cwd
 		DEPENDS Hypersomnia
 		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)
@@ -1793,7 +1793,7 @@ if(${CMAKE_GENERATOR} STREQUAL "Unix makefiles" OR ${CMAKE_GENERATOR} STREQUAL "
 	)
 
 	add_custom_target(tests
-		COMMAND Hypersomnia --unit-tests-only --test-fp-consistency 20000000
+		COMMAND Hypersomnia --keep-cwd --unit-tests-only --test-fp-consistency 20000000
 		DEPENDS Hypersomnia
 		WORKING_DIRECTORY ${HYPERSOMNIA_WORKING_DIR} 
 	)

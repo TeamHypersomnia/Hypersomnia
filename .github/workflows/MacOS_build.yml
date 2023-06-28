@@ -31,7 +31,7 @@ jobs:
     - name: Install sodium
       run: brew install libsodium
     - name: Generate CMake files
-      run: export LDFLAGS="-framework Cocoa -framework IOKit -framework CoreFoundation" && cmake/build.sh Release x64 '-DUSE_GLFW=1 -DGENERATE_DEBUG_INFORMATION=0 -DBUILD_DEBUGGER_SETUP=0 -DBUILD_IN_CONSOLE_MODE=0 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl'
+      run: export LDFLAGS="-framework Cocoa -framework IOKit -framework CoreFoundation" && cmake/build.sh Release x64 '-DUSE_GLFW=1 -DGENERATE_DEBUG_INFORMATION=0 -DBUILD_DEBUGGER_SETUP=0 -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl'
     - name: Build
       run: pushd build/current && ninja tests -k 0 && popd
     - name: Archivize the build
