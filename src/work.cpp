@@ -1208,6 +1208,8 @@ work_result work(const int argc, const char* const * const argv) try {
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<test_scene_setup>(),
 						lua,
+						config.client.nickname,
+						*official,
 						config.test_scene,
 						config.get_input_recording_mode()
 					);

@@ -142,8 +142,6 @@ entity_id requested_equipment::generate_for_impl(
 	auto make_ammo_piece = [&](const auto& flavour) {
 		if (flavour.is_set()) {
 			if (const auto piece = make_owned_item(flavour)) {
-				piece.set_charges(1);
-
 				if (const auto mag_deposit = piece[slot_function::ITEM_DEPOSIT]) {
 					const auto final_charge_flavour = [&]() {
 						if (eq.non_standard_charge.is_set()) {

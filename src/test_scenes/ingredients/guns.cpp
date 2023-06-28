@@ -2175,7 +2175,7 @@ namespace test_flavours {
 
 			{
 				components::item item;
-				item.charges = 8;
+				item.charges = 10;
 				meta.set(item);
 			}
 
@@ -3808,7 +3808,7 @@ namespace test_flavours {
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6.5");
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().flip_when_reloading = true;
-			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 14;
+			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 2;
 
 			auto& slots = meta.get<invariants::container>().slots;
 

@@ -6,8 +6,13 @@
 #include "application/config_lua_table.h"
 #include "application/setups/test_scene_setup.h"
 
+#include "application/arena/choose_arena.h"
+#include "application/setups/editor/packaged_official_content.h"
+
 test_scene_setup::test_scene_setup(
 	sol::state& lua,
+	std::string nickname,
+	const packaged_official_content& official,
 	const test_scene_settings settings,
 	const input_recording_type recording_type
 ) {
@@ -15,8 +20,59 @@ test_scene_setup::test_scene_setup(
 	scene.make_test_scene(lua, settings);
 	auto& cosm = scene.world;
 
-	local_player_id = mode.add_player({ ruleset, cosm }, "Player", faction_type::METROPOLIS);
+	editor_project project;
+
+	all_modes_variant mv;
+	all_rulesets_variant rv;
+
+	cosmos_solvable_significant dummy;
+
+	current_arena_folder = "user/projects/shooting_range";
+	auto paths = editor_project_paths(current_arena_folder);
+
+	auto handle = online_arena_handle<false>{ 
+		mv,
+		scene,
+		scene.world,
+		rv,
+		dummy
+	};
+
+	::load_arena_from_path(
+		{
+			lua,
+			handle,
+			official,
+			"",
+			"",
+			dummy,
+			std::nullopt,
+			&project
+		},
+
+		paths.project_json,
+		nullptr
+	);
+
+	if (auto m = std::get_if<test_mode>(&mv)) {
+		mode = *m;
+	}
+
+	if (auto r = std::get_if<test_mode_ruleset>(&rv)) {
+		ruleset = *r;
+	}
+
+	for (auto& p : project.nodes.template get_pool_for<editor_point_marker_node>()) {
+		if (p.editable.faction == faction_type::RESISTANCE) {
+			auto new_id = mode.add_player({ ruleset, cosm }, nickname, faction_type::RESISTANCE);
+			mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
+			mode.teleport_to_next_spawn({ ruleset, cosm }, new_id, mode.find(new_id)->controlled_character_id);
+		}
+	}
+
+	local_player_id = mode.add_player({ ruleset, cosm }, nickname, faction_type::METROPOLIS);
 	viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
+	mode.infinite_ammo_for = viewed_character_id;
 #else
 	(void)lua;
 	(void)settings;
@@ -33,7 +89,7 @@ void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Hypersomnia test scene";
 
 	if (speed < 1.0f) {
-		config.interpolation.enabled = false;
+		//config.interpolation.enabled = false;
 	}
 }
 

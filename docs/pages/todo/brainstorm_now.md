@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
     
+- verify those map file hashes either during upload stage or hosting stage
+
+- settings ui overhaul
+    - put some controls switches under Advanced
+    - logarithmic scale for sound?
+        - and also make default master less than 1
+
 - current_arena -> arena/map
 
 - How do we go from here?

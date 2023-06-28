@@ -52,10 +52,27 @@ void test_mode::init_spawned(const input_type in, const entity_id id, const logi
 	});
 }
 
-void test_mode::teleport_to_next_spawn(const input_type in, const entity_id id) {
+void test_mode::teleport_to_next_spawn(const input_type in, const mode_player_id mode_id, const entity_id id) {
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
+		auto tp_to = [&](const auto spawn) {
+			const auto spawn_transform = spawn.get_logic_transform();
+			typed_handle.set_logic_transform(spawn_transform);
+			::snap_interpolated_to(typed_handle, spawn_transform);
+
+			if (const auto crosshair = typed_handle.find_crosshair()) {
+				crosshair->base_offset = spawn_transform.get_direction() * 200;
+			}
+		};
+
+		if (const auto p = find(mode_id)) {
+			if (const auto dedicated = in.cosm[p->dedicated_spawn]) {
+				tp_to(dedicated);
+				return;
+			}
+		}
+
 		const auto faction = typed_handle.get_official_faction();
 		const auto num_spawns = get_num_faction_spawns(in.cosm, faction);
 
@@ -71,14 +88,7 @@ void test_mode::teleport_to_next_spawn(const input_type in, const entity_id id) 
 		normalize_spawn_index();
 
 		if (const auto spawn = ::find_faction_spawn(in.cosm, faction, current_spawn_index)) {
-			const auto spawn_transform = spawn.get_logic_transform();
-			typed_handle.set_logic_transform(spawn_transform);
-			::snap_interpolated_to(typed_handle, spawn_transform);
-
-			if (const auto crosshair = typed_handle.find_crosshair()) {
-				crosshair->base_offset = spawn_transform.get_direction() * 200;
-			}
-
+			tp_to(spawn);
 			normalize_spawn_index();
 		}
 	});
@@ -130,7 +140,7 @@ void test_mode::create_controlled_character_for(const input_type in, const mode_
 					}
 				}
 				else {
-					teleport_to_next_spawn(in, new_character);
+					teleport_to_next_spawn(in, id, new_character);
 				}
 
 				pending_inits.push_back(new_character);
@@ -278,7 +288,7 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 			in.rules.respawn_after_ms,
 			sentience.when_knocked_out
 		)) {
-			teleport_to_next_spawn(in, typed_handle);
+			teleport_to_next_spawn(in, lookup(typed_handle.get_id()), typed_handle);
 			init_spawned(in, typed_handle, step);
 
 			sentience.when_knocked_out = {};
@@ -286,6 +296,52 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 	});
 
 	remove_old_lying_items(in, step);
+
+	if (auto character = in.cosm[infinite_ammo_for]) {
+		auto guns = character.get_wielded_guns();
+
+		for (auto g : guns) {
+			const auto weapon = in.cosm[g];
+
+			const auto ammo_piece_flavour = ::calc_purchasable_ammo_piece(weapon);
+
+			auto total_ammo_for_this_weapon = 0;
+
+			character.for_each_contained_item_recursive(
+				[&](const auto& ammo_piece) {
+					if (entity_flavour_id(ammo_piece.get_flavour_id()) == weapon.get_flavour_id()) {
+						return recursive_callback_result::CONTINUE_DONT_RECURSE;
+					}
+
+					if (entity_flavour_id(ammo_piece.get_flavour_id()) == ammo_piece_flavour) {
+						auto count_charge_stack = [&](const auto& ammo_stack) {
+							if (ammo_stack.template has<invariants::cartridge>()) {
+								total_ammo_for_this_weapon += ammo_stack.template get<components::item>().get_charges();
+							}
+						};
+
+						count_charge_stack(ammo_piece);
+
+						ammo_piece.for_each_contained_item_recursive(count_charge_stack);
+
+						return recursive_callback_result::CONTINUE_DONT_RECURSE;
+					}
+
+					return recursive_callback_result::CONTINUE_AND_RECURSE;
+				},
+				std::nullopt
+			);
+
+			if (total_ammo_for_this_weapon == 0) {
+				auto access = allocate_new_entity_access();
+				requested_equipment eq;
+				eq.non_standard_mag = ammo_piece_flavour;
+				eq.num_given_ammo_pieces = 1;
+				eq.perform_recoils = false;
+				eq.generate_for(access, character, step, 0);
+			}
+		}
+	}
 }
 
 arena_migrated_session test_mode::emigrate() const {
@@ -337,6 +393,11 @@ auto test_mode::find_player_by_impl(S& self, const E& identifier) {
 		}
 		else if constexpr(std::is_same_v<session_id_type, E>) {
 			if (player_data.session.id == identifier) {
+				return std::addressof(it);
+			}
+		}
+		else if constexpr(std::is_same_v<entity_id, E>) {
+			if (player_data.controlled_character_id == identifier) {
 				return std::addressof(it);
 			}
 		}

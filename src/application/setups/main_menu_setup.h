@@ -48,7 +48,7 @@ class main_menu_setup : public default_setup_settings {
 	std::shared_future<std::string> latest_news;
 	vec2 latest_news_pos = { 0.f, 0.f };
 
-	intercosm intro;
+	intercosm scene;
 	test_mode mode;
 	test_mode_ruleset ruleset;
 	entity_id viewed_character_id;
@@ -86,7 +86,7 @@ public:
 	}
 
 	const auto& get_viewed_cosmos() const {
-		return intro.world;
+		return scene.world;
 	}
 
 	auto get_interpolation_ratio() const {
@@ -104,7 +104,7 @@ public:
 	}
 
 	const auto& get_viewable_defs() const {
-		return intro.viewables;
+		return scene.viewables;
 	}
 
 	auto perform_custom_imgui(perform_custom_imgui_input) {
@@ -139,7 +139,7 @@ public:
 			mode_entropy entropy;
 
 			mode.advance(
-				{ ruleset, intro.world },
+				{ ruleset, scene.world },
 				entropy,
 				callbacks,
 				solve_settings()
@@ -183,7 +183,7 @@ public:
 
 	template <class F>
 	void on_mode_with_input(F&& callback) const {
-		callback(mode, test_mode::const_input { ruleset, intro.world });
+		callback(mode, test_mode::const_input { ruleset, scene.world });
 	}
 
 	auto get_game_gui_subject_id() const {

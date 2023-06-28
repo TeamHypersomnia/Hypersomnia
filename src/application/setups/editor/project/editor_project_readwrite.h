@@ -4,6 +4,8 @@
 
 struct editor_view;
 struct editor_project;
+struct editor_project_about;
+struct editor_project_meta;
 
 struct editor_resource_pools;
 struct editor_official_resource_map;

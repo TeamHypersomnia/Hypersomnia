@@ -6371,3 +6371,8 @@ This will discard your redo history."
     - Let's just create all by default
     - e.g. cs2d has lots of map-centric scripting and they all just launch something by default I guess too
     
+- a nicer shooting range read from json
+    - first impression is important
+
+- fix that .part
+

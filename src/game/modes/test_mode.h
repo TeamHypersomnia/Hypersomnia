@@ -80,6 +80,7 @@ struct test_mode_player {
 	player_session_data session;
 	mode_entity_id controlled_character_id;
 	test_mode_player_stats stats;
+	entity_id dedicated_spawn;
 	// END GEN INTROSPECTOR
 
 	bool operator<(const test_mode_player& b) const;
@@ -126,8 +127,8 @@ public:
 	using input = basic_input<false>;
 	using const_input = basic_input<true>;
 
+	void teleport_to_next_spawn(input, mode_player_id, entity_id character);
 private:
-	void teleport_to_next_spawn(input, entity_id character);
 	void init_spawned(input, entity_id character, logic_step);
 
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
@@ -142,6 +143,7 @@ public:
 
 	session_id_type next_session_id = session_id_type::first();
 	std::optional<arena_playtesting_context> playtesting_context;
+	entity_id infinite_ammo_for;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& nickname, const faction_type);

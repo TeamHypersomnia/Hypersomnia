@@ -128,7 +128,7 @@ main_menu_setup::main_menu_setup(
 	// TODO: actually load a cosmos with its resources from a file/folder
 	const bool is_intro_scene_available = settings.menu_background_arena_path.string().size() > 0;
 
-	auto& cosm = intro.world;
+	auto& cosm = scene.world;
 
 	if (is_intro_scene_available) {
 		editor_project project;
@@ -143,8 +143,8 @@ main_menu_setup::main_menu_setup(
 
 		auto handle = online_arena_handle<false>{ 
 			mv,
-			intro,
-			intro.world,
+			scene,
+			scene.world,
 			rv,
 			dummy
 		};

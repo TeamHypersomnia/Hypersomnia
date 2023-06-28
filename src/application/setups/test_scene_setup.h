@@ -24,6 +24,8 @@ namespace sol {
 	class state;
 }
 
+struct packaged_official_content;
+
 class test_scene_setup : public default_setup_settings {
 	test_mode mode;
 	test_mode_ruleset ruleset;
@@ -34,12 +36,16 @@ class test_scene_setup : public default_setup_settings {
 	entity_id viewed_character_id;
 	mode_player_id local_player_id;
 
+	augs::path_type current_arena_folder;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 
 	test_scene_setup(
 		sol::state& lua,
+		std::string nickname,
+		const packaged_official_content&,
 		const test_scene_settings,
 		const input_recording_type recording_type
 	);
@@ -131,7 +137,7 @@ public:
 	}
 
 	augs::path_type get_unofficial_content_dir() const {
-		return {};
+		return current_arena_folder;
 	}
 
 	auto get_render_layer_filter() const {
