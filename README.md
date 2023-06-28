@@ -24,6 +24,8 @@ Forever free and open-source :heart:
 
 <img src="https://hypersomnia.xyz/images/windows_icon.svg" height=16 hspace=1></a> Only 25 MB!
 
+<img src="https://hypersomnia.xyz/images/linux_icon.svg" height=16 hspace=1></a> is built with ``-g``
+
 *Archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
 
 # Watch gameplay

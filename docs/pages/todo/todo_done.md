@@ -6376,3 +6376,4 @@ This will discard your redo history."
 
 - fix that .part
 
+- linux -g notice
