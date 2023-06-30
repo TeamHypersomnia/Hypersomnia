@@ -1,6 +1,10 @@
 #pragma once
 #include "augs/misc/secure_hash.h"
 
+struct file_download_link_payload {
+	address_string_type file_address;
+};
+
 struct file_download_payload {
 	std::vector<std::byte> file_bytes;
 };

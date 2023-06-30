@@ -69,6 +69,15 @@ message_handler_result client_setup::handle_payload(
 
 		return advance_downloading_session(payload.file_bytes);
 	}
+	else if constexpr (std::is_same_v<T, file_download_link_payload>) {
+		if (is_replaying()) {
+			return continue_v;
+		}
+
+		/* Unimplemented */
+
+		return abort_v;
+	}
 	else if constexpr (std::is_same_v<T, server_vars>) {
 		const auto& new_vars = payload;
 

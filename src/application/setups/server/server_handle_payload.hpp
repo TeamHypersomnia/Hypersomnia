@@ -284,7 +284,7 @@ message_handler_result server_setup::handle_payload(
 
 	}
 	else if constexpr (std::is_same_v<T, ::request_arena_file_download>) {
-		if (!vars.allow_arena_file_downloads) {
+		if (!vars.allow_direct_arena_file_downloads) {
 			kick(client_id, "This server disabled downloading arenas.");
 			return abort_v;
 		}

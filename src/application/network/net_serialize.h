@@ -83,6 +83,11 @@ namespace net_messages {
 	}
 
 	template <class Stream>
+	bool serialize(Stream& s, ::file_download_link_payload& c) {
+		return serialize_fixed_size_str(s, c.file_address);
+	}
+
+	template <class Stream>
 	bool serialize(Stream& s, ::client_requested_chat& c) {
 		if (!serialize_enum(s, c.target)) {
 			LOG("FAILED TO SERIALIZE ENUM! %x", int(c.target));

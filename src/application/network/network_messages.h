@@ -261,6 +261,11 @@ namespace net_messages {
 		static constexpr bool client_to_server = true;
 	};
 
+	struct file_download_link : net_message_with_payload<::file_download_link_payload> {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+	};
+
 	struct file_download : only_block_message {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
@@ -302,6 +307,7 @@ namespace net_messages {
 		player_avatar_exchange*,
 		request_arena_file_download*,
 		file_download*,
+		file_download_link*,
 		download_progress_message*
 	>;
 	

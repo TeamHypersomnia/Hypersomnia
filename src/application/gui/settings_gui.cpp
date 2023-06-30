@@ -1764,6 +1764,7 @@ void do_server_vars(
 
 	revertable_checkbox("I'm behind router", scope_cfg.allow_nat_traversal);
 
+	//revertable_input_text(SCOPE_CFG_NVP(external_arena_files_host));
 	revertable_slider("Max file bandwidth (per second)", scope_cfg.max_file_bandwidth, 0.0f, 4.f, "%.2f MB");
 
 	if (auto node = scoped_tree_node("Time limits")) {
