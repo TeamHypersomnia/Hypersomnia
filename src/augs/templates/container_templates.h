@@ -36,18 +36,11 @@ void assign_begin_end(C1& to, const C2& from) {
 
 template <class Container, class F>
 void erase_if(Container& v, F f) {
-	if constexpr(can_access_data_v<Container>) {
+	if constexpr(is_constant_size_vector_v<Container>) {
 		v.erase(std::remove_if(v.begin(), v.end(), f), v.end());
 	}
 	else {
-		for (auto it = v.begin(); it != v.end(); ) {
-			if (f(*it)) {
-				it = v.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
+		std::erase_if(v, std::forward<F>(f));
 	}
 }
 
