@@ -2316,7 +2316,7 @@ void server_setup::refresh_runtime_info_for_rcon() {
 			augs::for_each_in_directory(
 				root,
 				[&](const auto& p) {
-					out_entries.push_back({ std::filesystem::relative(p, root) });
+					out_entries.push_back({ std::filesystem::relative(p, root).string() });
 					return callback_result::CONTINUE;
 				},
 				[](const auto&) { return callback_result::CONTINUE; }
