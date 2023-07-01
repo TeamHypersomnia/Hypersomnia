@@ -203,7 +203,7 @@ vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 					camera_crosshair_offset /= bound;
 				}
 
-				camera_crosshair_offset *= camera_cone(current_eye, screen_size).get_visible_world_area() * settings.look_bound_expand * current_eye.zoom;
+				camera_crosshair_offset *= camera_cone(current_eye, screen_size).get_visible_world_area() * std::min(0.5f, settings.look_bound_expand) * current_eye.zoom;
 			}
 		}
 	}

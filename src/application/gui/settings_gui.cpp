@@ -966,7 +966,7 @@ void settings_gui_state::perform(
 				if (auto node = scoped_tree_node("Camera")) {
 					auto& scope_cfg = config.camera;
 
-					revertable_slider(SCOPE_CFG_NVP(look_bound_expand), 0.2f, 2.f);
+					revertable_slider(SCOPE_CFG_NVP(look_bound_expand), 0.0f, 0.5f);
 					
 					revertable_checkbox(SCOPE_CFG_NVP(enable_smoothing));
 
