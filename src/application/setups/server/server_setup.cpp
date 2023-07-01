@@ -923,7 +923,7 @@ server_public_vars server_setup::make_public_vars() const {
 	pub.required_arena_hash = current_arena_hash;
 	pub.playtesting_context = vars.playtesting_context;
 
-	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR);
+	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR.string());
 
 	if (is_user_project) {
 		pub.external_arena_files_provider.clear();

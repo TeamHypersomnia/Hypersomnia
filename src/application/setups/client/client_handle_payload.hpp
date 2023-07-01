@@ -35,12 +35,14 @@ message_handler_result client_setup::handle_payload(
 		const auto& new_vars = payload;
 
 		if (are_initial_vars) {
-			LOG("Received initial vars from the server");
+			LOG("Received initial public vars from the server");
 			state = client_state_type::RECEIVING_INITIAL_SNAPSHOT;
 		}
 		else {
-			LOG("Received corrected vars from the server");
+			LOG("Received corrected public vars from the server");
 		}
+
+		LOG("external_arena_files_provider: %x", new_vars.external_arena_files_provider);
 
 		const auto& new_arena = new_vars.arena;
 		const auto& new_mode = new_vars.game_mode;
