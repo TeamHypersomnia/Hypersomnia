@@ -104,7 +104,7 @@ struct cmd_line_params {
 			else if (a == "--connect") {
 				should_connect = true;
 				
-				if (argc > 2) {
+				if (i + 1 < argc) {
 					connect_address = argv[i++];
 				}
 			}

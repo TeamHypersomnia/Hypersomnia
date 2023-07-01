@@ -71,8 +71,7 @@ class client_setup :
 
 	/* Other replicated state */
 	all_modes_variant current_mode_state;
-	server_vars sv_vars;
-	server_solvable_vars sv_solvable_vars;
+	server_public_vars sv_public_vars;
 	augs::path_type current_arena_folder;
 
 	mode_player_id client_player_id;
@@ -794,7 +793,7 @@ public:
 	bool finalize_arena_download();
 
 	void special_request(special_client_request);
-	bool try_load_arena_according_to(const server_solvable_vars&, bool allow_download);
+	bool try_load_arena_according_to(const server_public_vars&, bool allow_download);
 
 	std::string get_displayed_connecting_server_name() const {
 		if (displayed_connecting_server_name.empty()) {

@@ -6,7 +6,21 @@
 
 namespace augs {
 	template <class B, class S>
-	auto make_read_stream(const B* const bytes, const S n) {
+	auto make_ptr_write_stream(B* const bytes, const S n) {
+		static_assert(std::is_integral_v<S>);
+
+		const auto buf = augs::pointer_to_buffer { 
+			reinterpret_cast<std::byte*>(bytes), 
+			static_cast<std::size_t>(n) 
+		};
+
+		auto stream = augs::ptr_memory_stream(buf);
+		stream.set_write_pos(0);
+		return stream;
+	}
+
+	template <class B, class S>
+	auto make_ptr_read_stream(const B* const bytes, const S n) {
 		static_assert(std::is_integral_v<S>);
 
 		const auto buf = augs::cpointer_to_buffer { 
@@ -64,7 +78,7 @@ namespace augs {
 
 	template <class T, class B, class S>
 	auto from_bytes(const B* buffer, const S num_bytes) {
-		auto stream = augs::make_read_stream(buffer, num_bytes);
+		auto stream = augs::make_ptr_read_stream(buffer, num_bytes);
 		return read_bytes<T>(stream);
 	}
 

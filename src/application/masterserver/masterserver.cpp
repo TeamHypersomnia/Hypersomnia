@@ -338,7 +338,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			return;
 		}
 
-		if (auto discord_webhook_url = parsed_url(cfg.private_server.discord_webhook_url); discord_webhook_url.valid()) {
+		if (auto discord_webhook_url = parsed_url(cfg.server_private.discord_webhook_url); discord_webhook_url.valid()) {
 			MSR_LOG("Posting a discord webhook job");
 
 			push_webhook_job(
@@ -376,15 +376,15 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			);
 		}
 		else {
-			if (cfg.private_server.discord_webhook_url.size() > 0) {
+			if (cfg.server_private.discord_webhook_url.size() > 0) {
 				MSR_LOG("Discord webhook url was invalid.");
 			}
 		}
 
-		if (auto telegram_webhook_url = parsed_url(cfg.private_server.telegram_webhook_url); telegram_webhook_url.valid()) {
+		if (auto telegram_webhook_url = parsed_url(cfg.server_private.telegram_webhook_url); telegram_webhook_url.valid()) {
 			MSR_LOG("Posting a telegram webhook job");
 
-			auto telegram_channel_id = cfg.private_server.telegram_channel_id;
+			auto telegram_channel_id = cfg.server_private.telegram_channel_id;
 
 			push_webhook_job(
 				[ip_str, data, telegram_webhook_url, telegram_channel_id]() -> std::string {
@@ -417,7 +417,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			);
 		}
 		else {
-			if (cfg.private_server.telegram_webhook_url.size() > 0) {
+			if (cfg.server_private.telegram_webhook_url.size() > 0) {
 				MSR_LOG("Discord webhook url was invalid.");
 			}
 		}

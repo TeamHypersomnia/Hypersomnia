@@ -6,7 +6,7 @@
 #include "augs/misc/timing/timer.h"
 
 struct server_vars;
-struct server_solvable_vars;
+struct server_public_vars;
 class nat_detection_session;
 
 class start_server_gui_state : public standard_window_mixin<start_server_gui_state> {
@@ -24,7 +24,6 @@ public:
 	bool perform(
 		server_start_input& into,
 		server_vars&,
-		server_solvable_vars&,
 
 		const nat_detection_session*,
 		const port_type currently_bound_port

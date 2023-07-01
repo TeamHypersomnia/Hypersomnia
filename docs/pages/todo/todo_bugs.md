@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- normalize the footstep sounds
+
 - editor crashes when deleting lots (almost all) reources which are still in use
 
 - another crash - when we died after killing ourselves with a grenade

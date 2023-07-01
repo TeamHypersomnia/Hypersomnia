@@ -21,7 +21,7 @@ message_handler_result client_setup::handle_payload(
 		}
 	}
 
-	if constexpr (std::is_same_v<T, server_solvable_vars>) {
+	if constexpr (std::is_same_v<T, server_public_vars>) {
 		if (downloading.has_value()) {
 			/* 
 				Ignore.
@@ -48,13 +48,12 @@ message_handler_result client_setup::handle_payload(
 		LOG_NVPS(new_arena);
 
 		const bool reload_arena = 
-			new_arena != sv_solvable_vars.arena
-			|| new_mode != sv_solvable_vars.game_mode
-			|| new_vars.required_arena_hash != sv_solvable_vars.required_arena_hash
+			new_arena != sv_public_vars.arena
+			|| new_mode != sv_public_vars.game_mode
+			|| new_vars.required_arena_hash != sv_public_vars.required_arena_hash
 		;
 
-		sv_solvable_vars = new_vars;
-		client_gui.rcon.on_arrived(new_vars);
+		sv_public_vars = new_vars;
 
 		if (are_initial_vars || reload_arena) {
 			if (!try_load_arena_according_to(new_vars, true)) {
@@ -79,10 +78,10 @@ message_handler_result client_setup::handle_payload(
 		return abort_v;
 	}
 	else if constexpr (std::is_same_v<T, server_vars>) {
-		const auto& new_vars = payload;
-
-		sv_vars = new_vars;
-		client_gui.rcon.on_arrived(new_vars);
+		client_gui.rcon.on_arrived(payload);
+	}
+	else if constexpr (std::is_same_v<T, server_runtime_info>) {
+		client_gui.rcon.on_arrived(payload);
 	}
 	else if constexpr (std::is_same_v<T, server_broadcasted_chat>) {
 		const auto author_id = payload.author;

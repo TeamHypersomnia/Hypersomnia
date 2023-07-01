@@ -502,7 +502,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		LOG("Server list response bytes: %x", bytes.size());
 
-		auto stream = augs::make_read_stream(bytes.data(), bytes.size());
+		auto stream = augs::make_ptr_read_stream(bytes.data(), bytes.size());
 
 		try {
 			while (stream.has_unread_bytes()) {

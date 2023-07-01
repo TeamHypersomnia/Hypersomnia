@@ -665,9 +665,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			*official,
 			start,
 			config.server,
-			config.server_solvable,
+			config.server_private,
 			config.client,
-			config.private_server,
 			config.dedicated_server,
 
 			make_server_nat_traversal_input(),
@@ -1151,9 +1150,8 @@ work_result work(const int argc, const char* const * const argv) try {
 						*official,
 						start,
 						config.server,
-						config.server_solvable,
+						config.server_private,
 						config.client,
-						config.private_server,
 						std::nullopt,
 
 						make_server_nat_traversal_input(),
@@ -1349,7 +1347,6 @@ work_result work(const int argc, const char* const * const argv) try {
 		const bool launched_from_server_start_gui = start_server_gui.perform(
 			config.server_start, 
 			config.server, 
-			config.server_solvable,
 			nat_detection.has_value() ? std::addressof(*nat_detection) : nullptr,
 			get_bound_local_port()
 		);
@@ -1362,7 +1359,6 @@ work_result work(const int argc, const char* const * const argv) try {
 					cfg.server_start = config.server_start;
 					cfg.client = config.client;
 					cfg.server = config.server;
-					cfg.server_solvable = config.server_solvable;
 				}
 			);
 
@@ -1653,10 +1649,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 						auto playtest_vars = config.server;
 						playtest_vars.server_name = "${MY_NICKNAME} is creating " + setup.get_arena_name();
-
-						auto playtest_solvable_vars = config.server_solvable;
-						playtest_solvable_vars.playtesting_context = setup.make_playtesting_context();
-						playtest_solvable_vars.arena = setup.get_arena_name();
+						playtest_vars.playtesting_context = setup.make_playtesting_context();
+						playtest_vars.arena = setup.get_arena_name();
 
 						background_setup = std::move(current_setup);
 
@@ -1666,9 +1660,8 @@ work_result work(const int argc, const char* const * const argv) try {
 								*official,
 								start,
 								playtest_vars,
-								playtest_solvable_vars,
+								config.server_private,
 								config.client,
-								config.private_server,
 								std::nullopt,
 
 								make_server_nat_traversal_input(),

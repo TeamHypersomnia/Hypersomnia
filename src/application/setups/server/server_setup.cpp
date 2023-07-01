@@ -43,6 +43,7 @@
 
 #include "application/setups/server/server_json_events.h"
 #include "augs/readwrite/json_readwrite.h"
+#include "application/setups/editor/editor_paths.h"
 
 const auto only_connected_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
@@ -60,9 +61,8 @@ server_setup::server_setup(
 	const packaged_official_content& official,
 	const augs::server_listen_input& in,
 	const server_vars& initial_vars,
-	const server_solvable_vars& initial_solvable_vars,
+	const server_private_vars& private_initial_vars,
 	const client_vars& integrated_client_vars,
-	const private_server_vars& private_initial_vars,
 	const std::optional<augs::dedicated_server_input> dedicated,
 	const server_nat_traversal_input& nat_traversal_input,
 	bool suppress_community_server_webhook_this_run
@@ -90,19 +90,16 @@ server_setup::server_setup(
 	nat_traversal(nat_traversal_input, resolved_server_list_addr),
 	suppress_community_server_webhook_this_run(suppress_community_server_webhook_this_run)
 {
-	const bool force = true;
-
 	{
 		auto initial_vars_modified = initial_vars;
 		auto source_server_name = std::string(initial_vars_modified.server_name);
 		str_ops(source_server_name).replace_all("${MY_NICKNAME}", std::string(integrated_client_vars.nickname));
 		initial_vars_modified.server_name = source_server_name;
 
-		apply(initial_vars_modified, force);
+		apply(initial_vars_modified, true);
 	}
 
-	apply(private_initial_vars, force);
-	apply(initial_solvable_vars, force);
+	apply(private_initial_vars);
 
 	if (private_initial_vars.master_rcon_password.empty()) {
 		LOG("WARNING! The master rcon password is empty! This means that only the localhost can access the master rcon.");
@@ -160,6 +157,7 @@ server_setup::server_setup(
 	}
 
 	resolve_server_list();
+	refresh_runtime_info_for_rcon();
 }
 
 void server_setup::reset_afk_timer() {
@@ -613,8 +611,8 @@ void server_setup::send_heartbeat_to_server_list() {
 	server_heartbeat heartbeat;
 
 	heartbeat.nat = nat_traversal.last_detected_nat;
-	heartbeat.server_name = vars.server_name;
-	heartbeat.current_arena = solvable_vars.arena;
+	heartbeat.server_name = get_server_name();
+	heartbeat.current_arena = get_current_arena_name();
 	heartbeat.game_mode = arena.on_mode_with_input(
 		[&](const auto& mode, const auto& input) {
 			return mode.get_name(input);
@@ -639,7 +637,7 @@ void server_setup::send_heartbeat_to_server_list() {
 	);
 
 	heartbeat.server_version = hypersomnia_version().get_version_string();
-	heartbeat.is_editor_playtesting_server = solvable_vars.playtesting_context.has_value();
+	heartbeat.is_editor_playtesting_server = vars.playtesting_context.has_value();
 
 	heartbeat.validate();
 	heartbeat_buffer.clear();
@@ -911,102 +909,98 @@ void server_setup::customize_for_viewing(config_lua_table& config) const {
 	}
 }
 
-void server_setup::apply(const private_server_vars& private_new_vars, const bool force) {
+void server_setup::apply(const server_private_vars& private_new_vars) {
 	const auto old_vars = private_vars;
 	private_vars = private_new_vars;
-
-	(void)force;
 }
 
-void server_setup::apply(const server_vars& new_vars, const bool force) {
-	/* 
-		Note these settings will be forced when applied through rcon. 
-	*/
+server_public_vars server_setup::make_public_vars() const {
+	server_public_vars pub;
 
-	const bool any_difference = 
-		force || 
-		new_vars != vars
-	;
+	pub.arena = vars.arena;
+	pub.game_mode = vars.game_mode;
 
-	const auto old_vars = vars;
+	pub.required_arena_hash = current_arena_hash;
+	pub.playtesting_context = vars.playtesting_context;
+
+	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR);
+
+	if (is_user_project) {
+		pub.external_arena_files_provider.clear();
+	}
+	else {
+		pub.external_arena_files_provider = vars.external_arena_files_provider;
+	}
+
+	return pub;
+}
+
+void server_setup::apply(const server_vars& new_vars, const bool first_time) {
+	if (!first_time) {
+		if (new_vars == vars) {
+			return;
+		}
+	}
+
+	const auto previous_arena = vars.arena;
+
+	const bool reload_arena = first_time || vars.arena != new_vars.arena || vars.game_mode != new_vars.game_mode;
+	const bool reload_net_sim = first_time || vars.network_simulator != new_vars.network_simulator;
+
 	vars = new_vars;
 
-	{
-		auto& rcon_gui = integrated_client_gui.rcon;
-		rcon_gui.on_arrived(new_vars);
-	}
+	if (reload_arena) {
+		try {
+			rechoose_arena();
+		}
+		catch (const augs::json_deserialization_error& err) {
+			LOG("Failed to load \"%x\":\n%x. Keepign the current arena.", vars.arena, err.what());
 
-	if (any_difference) {
-		auto broadcast_new_vars_to_rcons = [&](const auto recipient_id, auto&) {
-			const auto rcon_level = get_rcon_level(recipient_id);
+			vars.arena = previous_arena;
+			rechoose_arena();
+		}
+		catch (const augs::file_open_error& err) {
+			LOG("Arena named \"%x\" was not found on the server! Keeping the current arena.", new_vars.arena);
 
-			if (rcon_level >= rcon_level_type::BASIC) {
-				server->send_payload(
-					recipient_id,
-					game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+			vars.arena = previous_arena;
+			rechoose_arena();
+		}
+		catch (...) {
+			LOG("Failed to load \"%x\":\nUnknown error. Keeping the current arena.", vars.arena);
 
-					new_vars
-				);
-			}
-		};
-
-		for_each_id_and_client(broadcast_new_vars_to_rcons, only_connected_v);
-
-		if (force || old_vars.network_simulator != new_vars.network_simulator) {
-			server->set(new_vars.network_simulator);
+			vars.arena = previous_arena;
+			rechoose_arena();
 		}
 	}
-}
-
-void server_setup::apply(const server_solvable_vars& new_vars, const bool force) {
-	/* 
-		Note these settings will be forced when applied through rcon. 
-	*/
-
-	const bool any_difference = 
-		force || 
-		new_vars != solvable_vars
-	;
-
-	const auto old_vars = solvable_vars;
-	solvable_vars = new_vars;
 
 	{
 		auto& rcon_gui = integrated_client_gui.rcon;
-		rcon_gui.on_arrived(new_vars);
-		LOG("Set on arrived");
+		rcon_gui.on_arrived(vars);
 	}
 
-	if (any_difference) {
-		if (force || old_vars.arena != new_vars.arena || old_vars.game_mode != new_vars.game_mode) {
-			try {
-				choose_arena(new_vars.arena);
-			}
-			catch (const augs::json_deserialization_error& err) {
-				LOG("Failed to load \"%x\":\n%x.", new_vars.arena, err.what());
+	if (reload_net_sim) {
+		server->set(vars.network_simulator);
+	}
 
-				const auto test_scene_arena = "";
-				choose_arena(test_scene_arena);
-			}
-			catch (const augs::file_open_error& err) {
-				/* 
-					TODO!!! 
-					In case of loading errors, we should update the config to the previously working map (or empty string). 
-					We should also remove this line: "vars = cfg.server;" since it will update the arena name despite not having it loaded.
-				*/
+	auto broadcast_new_vars_to_rcons = [&](const auto recipient_id, auto&) {
+		const auto rcon_level = get_rcon_level(recipient_id);
 
-				/* This should never really happen as we'll always check before allowing admin to set a map name. */
+		if (rcon_level >= rcon_level_type::BASIC) {
+			server->send_payload(
+				recipient_id,
+				game_channel_type::RELIABLE_MESSAGES,
 
-				LOG("Arena named \"%x\" was not found on the server!\nLoading the default arena instead.", new_vars.arena);
-
-				const auto test_scene_arena = "";
-				choose_arena(test_scene_arena);
-			}
-			catch (...) {
-				const auto test_scene_arena = "";
-				choose_arena(test_scene_arena);
-			}
+				vars
+			);
 		}
+	};
+
+	for_each_id_and_client(broadcast_new_vars_to_rcons, only_connected_v);
+
+	const auto new_public_vars = make_public_vars();
+
+	if (first_time || last_broadcast_public_vars != new_public_vars) {
+		last_broadcast_public_vars = new_public_vars;
 
 		auto broadcast_new_vars = [&](const auto recipient_id, const auto& c) {
 			if (c.should_pause_solvable_stream()) {
@@ -1015,9 +1009,9 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 
 			server->send_payload(
 				recipient_id,
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+				game_channel_type::RELIABLE_MESSAGES,
 
-				solvable_vars
+				new_public_vars
 			);
 		};
 
@@ -1027,13 +1021,11 @@ void server_setup::apply(const server_solvable_vars& new_vars, const bool force)
 
 void server_setup::apply(const config_lua_table& cfg) {
 	/* 
-		If we just apply the changes from game settings,
+		If we just applied the changes from game settings,
 		RCON would not work on the integrated server and it would be confusing.
 	*/
 
-	/* const bool force = false; */
-	/* apply(cfg.server, force); */
-	/* apply(cfg.server_solvable, force); */
+	/* apply(cfg.server); */
 
 	integrated_client_vars = cfg.client;
 
@@ -1070,8 +1062,8 @@ void register_external_resources_of(
 	);
 }
 
-void server_setup::choose_arena(const std::string& name) {
-	LOG("Choosing arena: %x", name);
+void server_setup::rechoose_arena() {
+	LOG("Choosing arena: %x", vars.arena);
 
 	const auto& arena = get_arena_handle();
 
@@ -1080,17 +1072,16 @@ void server_setup::choose_arena(const std::string& name) {
 			lua,
 			arena,
 			official,
-			name,
-			solvable_vars.game_mode,
+			vars.arena,
+			vars.game_mode,
 			clean_round_state,
-			solvable_vars.playtesting_context,
+			vars.playtesting_context,
 			std::addressof(*last_loaded_project)
 		});
 
-		solvable_vars.arena = name;
-		solvable_vars.required_arena_hash = result.required_hash;
+		current_arena_hash = result.required_hash;
 		current_arena_folder = result.arena_folder_path;
-
+			
 		const auto arena_json_hash = result.required_hash;
 		LOG("Chosen arena hash: %x", augs::to_hex_format(arena_json_hash));
 
@@ -1134,7 +1125,7 @@ void server_setup::choose_arena(const std::string& name) {
 		if (!player_added_to_mode(admin_id)) {
 			mode_entropy_general cmd;
 
-			const auto& playtesting_context = solvable_vars.playtesting_context;
+			const auto& playtesting_context = vars.playtesting_context;
 			auto admin_faction = faction_type::SPECTATOR;
 
 			if (playtesting_context) {
@@ -1204,7 +1195,7 @@ void server_setup::send_full_arena_snapshot_to(const client_id_type client_id) {
 
 	server->send_payload(
 		client_id, 
-		game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+		game_channel_type::RELIABLE_MESSAGES, 
 
 		buffers,
 
@@ -1223,9 +1214,9 @@ void server_setup::send_full_arena_snapshot_to(const client_id_type client_id) {
 void server_setup::send_complete_solvable_state_to(const client_id_type client_id) {
 	server->send_payload(
 		client_id, 
-		game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+		game_channel_type::RELIABLE_MESSAGES, 
 
-		solvable_vars
+		last_broadcast_public_vars
 	);
 
 	send_full_arena_snapshot_to(client_id);
@@ -1235,7 +1226,7 @@ void server_setup::send_complete_solvable_state_to(const client_id_type client_i
 
 		server->send_payload(
 			recipient_client_id,
-			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+			game_channel_type::RELIABLE_MESSAGES,
 
 			downloaded_settings
 		);
@@ -1401,7 +1392,7 @@ void server_setup::advance_clients_state() {
 					if (session_id_of_avatar) {
 						server->send_payload(
 							recipient_client_id,
-							game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+							game_channel_type::RELIABLE_MESSAGES,
 
 							*session_id_of_avatar,
 							cc.meta.avatar
@@ -1417,9 +1408,16 @@ void server_setup::advance_clients_state() {
 			if (rcon_level >= rcon_level_type::BASIC) {
 				server->send_payload(
 					client_id, 
-					game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+					game_channel_type::RELIABLE_MESSAGES, 
 
 					vars
+				);
+
+				server->send_payload(
+					client_id, 
+					game_channel_type::RELIABLE_MESSAGES, 
+
+					runtime_info
 				);
 			}
 		};
@@ -1459,7 +1457,7 @@ void server_setup::advance_clients_state() {
 
 #if 0
 		else if (c.state == S::RECEIVING_INITIAL_SNAPSHOT_CORRECTION) {
-			if (!server->has_messages_to_send(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS)) {
+			if (!server->has_messages_to_send(client_id, game_channel_type::RELIABLE_MESSAGES)) {
 				c.set_in_game(server_time);
 			}
 
@@ -1502,6 +1500,7 @@ void server_setup::schedule_shutdown() {
 
 template <class P>
 message_handler_result server_setup::handle_rcon_payload(
+	const rcon_level_type level,
 	const P& typed_payload
 ) {
 	using namespace rcon_commands;
@@ -1514,6 +1513,18 @@ message_handler_result server_setup::handle_rcon_payload(
 		return continue_v;
 	}
 	else if constexpr(std::is_same_v<P, special>) {
+		if (level == rcon_level_type::BASIC) {
+			if (typed_payload != special::REQUEST_RUNTIME_INFO) {
+				/* 
+					Basic RCON can only ask REQUEST_RUNTIME_INFO.
+					The other tasks are administrative.
+				*/
+
+				LOG("Unauthorized RCON usage.");
+				return abort_v;
+			}
+		}
+
 		switch (typed_payload) {
 			case special::SHUTDOWN: {
 				LOG("Shutting down due to rcon's request.");
@@ -1531,6 +1542,11 @@ message_handler_result server_setup::handle_rcon_payload(
 				return continue_v;
 			}
 
+			case special::REQUEST_RUNTIME_INFO: 
+				refresh_runtime_info_for_rcon();
+
+				return continue_v;
+
 			default:
 				LOG("Unsupported rcon command.");
 				return continue_v;
@@ -1538,13 +1554,6 @@ message_handler_result server_setup::handle_rcon_payload(
 	}
 	else if constexpr(std::is_same_v<P, server_vars>) {
 		LOG("New server vars from the client.");
-
-		apply(typed_payload, true);
-
-		return continue_v;
-	}
-	else if constexpr(std::is_same_v<P, server_solvable_vars>) {
-		LOG("New server solvable vars from the client (%x).", typed_payload.arena);
 
 		apply(typed_payload, true);
 
@@ -1597,7 +1606,7 @@ void server_setup::rebroadcast_public_settings() {
 
 			server->send_payload(
 				recipient_client_id, 
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+				game_channel_type::RELIABLE_MESSAGES,
 
 				broadcasted_update
 			);
@@ -1700,7 +1709,7 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 #if CONTEXTS_SEPARATE
 				server->send_payload(
 					client_id, 
-					game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+					game_channel_type::RELIABLE_MESSAGES,
 
 					context
 				);
@@ -1716,7 +1725,7 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 		/* TODO PERFORMANCE: only serialize the message once and multicast the same buffer to all clients! */
 		server->send_payload(
 			client_id,
-			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+			game_channel_type::RELIABLE_MESSAGES,
 
 			total
 		);
@@ -1868,7 +1877,7 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 
 			if (!arena_gui.scoreboard.show && rcon_gui.show) {
 				auto on_new_payload = [&](const auto& new_payload) {
-					handle_rcon_payload(new_payload);
+					handle_rcon_payload(rcon_level_type::MASTER, new_payload);
 				};
 
 				const bool has_maintenance = false;
@@ -1994,7 +2003,7 @@ const server_name_type& server_setup::get_server_name() const {
 }
 
 std::string server_setup::get_current_arena_name() const {
-	return solvable_vars.arena;
+	return vars.arena;
 }
 
 server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) const {
@@ -2123,7 +2132,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		else {
 			server->send_payload(
 				recipient_client_id,
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+				game_channel_type::RELIABLE_MESSAGES,
 
 				payload
 			);
@@ -2182,7 +2191,7 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 
 	server->send_payload(
 		kicked_id,
-		game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+		game_channel_type::RELIABLE_MESSAGES,
 
 		message
 	);
@@ -2296,6 +2305,48 @@ bool server_setup::player_added_to_mode(const mode_player_id mode_id) const {
 
 const netcode_socket_t* server_setup::find_underlying_socket() const {
 	return server->find_underlying_socket();
+}
+
+void server_setup::refresh_runtime_info_for_rcon() {
+	auto& out_entries = runtime_info.arenas_on_disk;
+	out_entries.clear();
+
+	auto add_from = [&](const auto& root) {
+		try {
+			augs::for_each_in_directory(
+				root,
+				[&](const auto& p) {
+					out_entries.push_back({ std::filesystem::relative(p, root) });
+					return callback_result::CONTINUE;
+				},
+				[](const auto&) { return callback_result::CONTINUE; }
+			);
+		}
+		catch (...) {
+
+		}
+	};
+
+	add_from(OFFICIAL_ARENAS_DIR);
+	add_from(DOWNLOADED_ARENAS_DIR);
+	add_from(EDITOR_PROJECTS_DIR);
+
+	auto broadcast_new_info_to_rcons = [&](const auto recipient_id, auto&) {
+		const auto rcon_level = get_rcon_level(recipient_id);
+
+		if (rcon_level >= rcon_level_type::BASIC) {
+			server->send_payload(
+				recipient_id,
+				game_channel_type::RELIABLE_MESSAGES,
+
+				runtime_info
+			);
+		}
+	};
+
+	LOG("Refreshed runtime info. Arenas on disk: %x", out_entries.size());
+
+	for_each_id_and_client(broadcast_new_info_to_rcons, only_connected_v);
 }
 
 #include "augs/readwrite/to_bytes.h"

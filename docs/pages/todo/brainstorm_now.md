@@ -6,7 +6,43 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
     
-- crate caption
+
+- Map catalogue
+    - Problems to solve
+        - What if we update maps while the servers already have them loaded?
+            - The existing clients still need a way to download the correct ones
+            - The custom servers will likely have tcp/ip file downloads enabled so it should still work as a backstop
+            - Whereas we can take care to restart the official server when we update maps
+        - The server has to know whether the arena it hosts is actually available to download or it will constantly send wrong links
+            - But the link it sends is the same anyway; why not just send the host in the settings and let the client figure it out on their own?
+                - let the client figure out whether the map is on the external provider and just send requests if its not
+
+            - Why not just query the json file at the host every time the map is hosted/chosen by the server?
+                - If it differs, or can't reach the host, only allow direct transfers
+                - Can even query every time someone wants to download
+                    - the client waits anyway for a file payload so they can wait until we query the host too no prob
+                    - anyways if it's hosted from user/projects than we always disallow anyway, we only check with user/downloads
+
+            - btw we'll just send the download link once which will be the arena root and the client will download the rest on its own
+
+            - Plus the dedicated servers with public ip can actually make server's file coincide with what is served over https 
+
+            - How about we determine it by whether it's in user/projects or in downloaded arenas?
+                - though downloaded arenas might be from somewhere else too
+            - if user/projects - always direct
+            - 
+    - First let's replace udp downloads with direct http downloads
+        - Idea: server could provide a link instead of an actual file
+        - This is tempting because it's the server's responsibility then to provide up to date files and we can preserve the whole flow
+    - Generally, the client asks for hash - it gets either the block message (or tcp/ip connection request) or the external link message
+- Maybe it's easier to just skip the bullshit with optional links and just start tcp ip connection
+    - Most of the time arena files will be hosted on the same server
+        - Well they have to have these files anyway to run the simulation
+    - yea i think it'll be better for now
+- Unless we autoupload any map to the host
+    - Yeah I think it's bad to assume tcp will also work after punching
+- In any case, if we're not doing tcp/ip, we need the file_download_link payload regardless if we're doing uploads or some relay
+
 - map statistics from server_list_json
     - counted only when >= 2 players are fighting
 
@@ -355,7 +391,7 @@ summary: That which we are brainstorming at the moment.
             - So player's avatar wouldn't arrive until after we've downloaded the map
                 - Not a bad thing; they will be in spectators anyway and this way we even prioritize bandwidth
         - So the q is if the game will behave correctly when we can stay in downloading state both during IN_GAME state as well as RECEIVING_INITIAL_SNAPSHOT
-            - Cannot be an earlier state since the first server_solvable_vars triggers RECEIVING_INITIAL_SNAPSHOT
+            - Cannot be an earlier state since the first server_public_vars triggers RECEIVING_INITIAL_SNAPSHOT
                 - it will stay in that mode until we finish download
                     - that is because IN_GAME is triggered only with the first initial arena state payload
 
@@ -378,7 +414,7 @@ summary: That which we are brainstorming at the moment.
 - What happens if the current arena changes during our download session?
     - Note as it stands we're applying server solvables as they go
         - We only pause the entropy streams 
-    - So I guess we should also resynchronize the server solvable vars
+    - So I guess we should also resynchronize the server game vars
         - Wouldn't it be easier to stop all solvable streams and just revert client back to WELCOME_ARRIVED state upon resync?
             - And do not interrupt map downloads
 
@@ -391,7 +427,7 @@ summary: That which we are brainstorming at the moment.
 - Pausing solvable streams for clients
     - Do we want to though?
         - Some important public client settings are sent through
-    - We can easily interrupt just the entropy streams and leave server solvable vars and public settings intact
+    - We can easily interrupt just the entropy streams and leave server game vars and public settings intact
 
 - Disable naming maps "autosave"
     - Otherwise it might fuck up maps, autosave will literally be deleted
@@ -431,7 +467,7 @@ able to request per map
         - Why? The server might change the map while the client is already in game!
     - So let's even begin by designing AND testing for this case
         - SO - What if we're already connected and the map changes to a non-existing map?
-            - This could only happen with a new server solvable vars
+            - This could only happen with a new server game vars
 
     - The server does not really have to hold the json file in memory, although it might be useful
         - At first we can treat it like any other file
@@ -616,7 +652,7 @@ able to request per map
                 - The only corner case is when a mapper wants to host a version of the map they've downloaded but we'll handle it later
     - It will be mostly transparent to the user because they'll choose the map from the arena selector
     - current_arena is literally just a *hint* for the client where to look for a map with a given hash
-        - will be sent through server solvable vars too probably
+        - will be sent through server game vars too probably
         - server_vars (note: not SOLVABLE vars) will have a load_arena_by_path
             - This will be the setting set by the arena selector and this will load the arena once
                 - Nothing stops us from loading a map external to the game even although that's not recommended

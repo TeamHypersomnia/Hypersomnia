@@ -536,7 +536,7 @@ void client_setup::request_file_download(const augs::secure_hash_type& hash) {
 	LOG("Requesting file download: %x", augs::to_hex_format(hash));
 
 	send_payload(
-		game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+		game_channel_type::RELIABLE_MESSAGES,
 		request
 	);
 
@@ -553,6 +553,11 @@ bool client_setup::start_downloading_arena(
 	downloading = arena_downloading_session(new_arena_name);
 
 	augs::create_directories(downloading->part_dir_path);
+
+	send_payload(
+		game_channel_type::RELIABLE_MESSAGES,
+		special_client_request::WAIT_IM_DOWNLOADING_EXTERNALLY
+	);
 
 	if (downloading->try_load_json_from_part_folder(project_hash)) {
 		if (const auto first_resource_to_download = downloading->next_hash_to_download()) {
@@ -710,14 +715,14 @@ bool client_setup::finalize_arena_download() {
 			return false;
 		}
 		else {
-			return try_load_arena_according_to(sv_solvable_vars, false);
+			return try_load_arena_according_to(sv_public_vars, false);
 		}
 	}
 
 	return false;
 }
 
-bool client_setup::try_load_arena_according_to(const server_solvable_vars& new_vars, bool allow_download) {
+bool client_setup::try_load_arena_according_to(const server_public_vars& new_vars, bool allow_download) {
 	const auto& new_arena = new_vars.arena;
 
 	LOG("Trying to load arena: %x (game_mode: %x)", new_arena, new_vars.game_mode.empty() ? "default" : new_vars.game_mode.c_str());
@@ -1030,7 +1035,7 @@ void client_setup::send_pending_commands() {
 
 	auto send_settings = [&]() {
 		send_payload(
-			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+			game_channel_type::RELIABLE_MESSAGES,
 			std::as_const(requested_settings)
 		);
 
@@ -1061,7 +1066,7 @@ void client_setup::send_pending_commands() {
 				const auto dummy_client_id = session_id_type::dead();
 
 				send_payload(
-					game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+					game_channel_type::RELIABLE_MESSAGES,
 
 					dummy_client_id,
 					payload
@@ -1081,7 +1086,7 @@ void client_setup::send_pending_commands() {
 					const auto dummy_client_id = session_id_type::dead();
 
 					send_payload(
-						game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+						game_channel_type::RELIABLE_MESSAGES,
 
 						dummy_client_id,
 						payload
@@ -1105,7 +1110,7 @@ void client_setup::send_pending_commands() {
 
 	for (const auto& pending_request : pending_requests) {
 		send_payload(
-			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+			game_channel_type::RELIABLE_MESSAGES,
 			pending_request
 		);
 	}
@@ -1183,7 +1188,7 @@ void client_setup::send_silly_dummy_msg_to_prevent_pointless_sent_packet_assert_
 			silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo.progress = percent_complete * 255;
 
 			send_payload(
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+				game_channel_type::RELIABLE_MESSAGES,
 				silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo
 			);
 		}
@@ -1224,7 +1229,7 @@ void client_setup::perform_chat_input_bar() {
 		message.message = chat.current_message;
 
 		send_payload(
-			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+			game_channel_type::RELIABLE_MESSAGES,
 			message
 		);
 
@@ -1309,16 +1314,16 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			payload = new_payload;
 
 			send_payload(
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+				game_channel_type::RELIABLE_MESSAGES,
 				payload
 			);
 		};
 
-		const bool has_maintenance = true;
+		const bool is_remote_server = true;
 
 		perform_rcon_gui(
 			rcon_gui,
-			has_maintenance,
+			is_remote_server,
 			on_new_payload
 		);
 	}
@@ -1399,7 +1404,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				text_color(downloading->arena_name, yellow);
 				ImGui::Separator();
 
-				const auto this_progress = adapter->get_block_progress(game_channel_type::SERVER_SOLVABLE_AND_STEPS);
+				const auto this_progress = adapter->get_block_progress(game_channel_type::RELIABLE_MESSAGES);
 				const auto this_percent_complete = this_progress.blockSize == 0 ? 0.0f : float(this_progress.downloadedBytes) / this_progress.blockSize;
 
 				if (downloading->is_downloading_resources()) {
@@ -1557,7 +1562,7 @@ void client_setup::send_to_server(
 	total_client_entropy& new_local_entropy
 ) {
 	send_payload(
-		game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+		game_channel_type::RELIABLE_MESSAGES,
 		new_local_entropy
 	);
 }

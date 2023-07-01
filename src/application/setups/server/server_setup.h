@@ -73,10 +73,18 @@ class server_setup :
 	all_modes_variant current_mode_state;
 
 	client_vars integrated_client_vars;
+
 	server_vars vars;
-	server_solvable_vars solvable_vars;
+	server_private_vars private_vars;
+
+	server_public_vars last_broadcast_public_vars;
+
+	server_runtime_info runtime_info;
+
 	augs::path_type current_arena_folder;
-	private_server_vars private_vars;
+	augs::secure_hash_type current_arena_hash;
+
+	server_public_vars make_public_vars() const;
 
 	/* The rest is server-specific */
 	sol::state& lua;
@@ -89,7 +97,7 @@ class server_setup :
 	std::optional<augs::dedicated_server_input> dedicated;
 
 	auto quit_playtesting_or(custom_imgui_result result) const {
-		if (solvable_vars.playtesting_context && result == custom_imgui_result::GO_TO_MAIN_MENU) {
+		if (vars.playtesting_context && result == custom_imgui_result::GO_TO_MAIN_MENU) {
 			return custom_imgui_result::QUIT_PLAYTESTING;
 		}
 
@@ -97,7 +105,7 @@ class server_setup :
 	}
 
 	auto quit_playtesting_or(setup_escape_result result) const {
-		if (solvable_vars.playtesting_context && result == setup_escape_result::GO_TO_MAIN_MENU) {
+		if (vars.playtesting_context && result == setup_escape_result::GO_TO_MAIN_MENU) {
 			return setup_escape_result::QUIT_PLAYTESTING;
 		}
 
@@ -223,6 +231,7 @@ private:
 
 	template <class P>
 	message_handler_result handle_rcon_payload(
+		rcon_level_type,
 		const P& payload
 	);
 
@@ -253,9 +262,8 @@ public:
 		const packaged_official_content& official,
 		const augs::server_listen_input&,
 		const server_vars&,
-		const server_solvable_vars&,
+		const server_private_vars&,
 		const client_vars& integrated_client_vars,
-		const private_server_vars&,
 		std::optional<augs::dedicated_server_input>,
 
 		const server_nat_traversal_input& nat_traversal_input,
@@ -293,11 +301,10 @@ public:
 	void customize_for_viewing(config_lua_table&) const;
 
 	void apply(const config_lua_table&);
-	void apply(const server_vars&, bool force);
-	void apply(const server_solvable_vars&, bool force);
-	void apply(const private_server_vars&, bool force);
+	void apply(const server_vars&, bool first_time = false);
+	void apply(const server_private_vars&);
 
-	void choose_arena(const std::string& name);
+	void rechoose_arena();
 
 	std::string describe_client(const client_id_type id) const;
 	void log_malicious_client(const client_id_type id);
@@ -603,4 +610,6 @@ public:
 	void send_goodbye_to_masterserver();
 
 	void broadcast_shutdown_message();
+
+	void refresh_runtime_info_for_rcon();
 };

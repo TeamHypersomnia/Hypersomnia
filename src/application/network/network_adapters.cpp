@@ -45,7 +45,7 @@ game_connection_config::game_connection_config() {
 	timeout = 10;
 
 	{
-		auto& solvable_stream = channel[static_cast<int>(game_channel_type::SERVER_SOLVABLE_AND_STEPS)];
+		auto& solvable_stream = channel[static_cast<int>(game_channel_type::RELIABLE_MESSAGES)];
 		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 		solvable_stream.maxBlockSize = max_block_size_v;
 		solvable_stream.sentPacketBufferSize = 1024 * 2;

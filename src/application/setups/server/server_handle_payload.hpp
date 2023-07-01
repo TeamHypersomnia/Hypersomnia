@@ -96,7 +96,7 @@ message_handler_result server_setup::handle_payload(
 		if (level >= rcon_level_type::BASIC) {
 			const auto result = std::visit(
 				[&](const auto& typed_payload) {
-					return handle_rcon_payload(typed_payload);
+					return handle_rcon_payload(level, typed_payload);
 				},
 				payload
 			);
@@ -160,6 +160,13 @@ message_handler_result server_setup::handle_payload(
 	else if constexpr (std::is_same_v<T, special_client_request>) {
 		switch (payload) {
 			case special_client_request::RESET_AFK_TIMER:
+				c.last_keyboard_activity_time = server_time;
+				break;
+
+			case special_client_request::WAIT_IM_DOWNLOADING_EXTERNALLY:
+				c.is_downloading_files = true;
+
+				c.last_valid_payload_time = server_time;
 				c.last_keyboard_activity_time = server_time;
 				break;
 
@@ -255,7 +262,7 @@ message_handler_result server_setup::handle_payload(
 								auto broadcast_avatar = [this, session_id_of_avatar, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
 									server->send_payload(
 										recipient_client_id,
-										game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+										game_channel_type::RELIABLE_MESSAGES,
 
 										*session_id_of_avatar,
 										client_with_updated_avatar.meta.avatar
@@ -336,7 +343,7 @@ message_handler_result server_setup::handle_payload(
 
 			server->send_payload(
 				client_id, 
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+				game_channel_type::RELIABLE_MESSAGES, 
 
 				sent_file_payload
 			);

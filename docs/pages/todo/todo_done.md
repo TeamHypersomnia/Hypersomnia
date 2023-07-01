@@ -6377,3 +6377,7 @@ This will discard your redo history."
 - fix that .part
 
 - linux -g notice
+- server_public_vars
+
+- merge solvable vars with server vars
+    - solvable vars should only exist at runtime and actually be called arena switched command

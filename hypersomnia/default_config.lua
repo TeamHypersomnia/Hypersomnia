@@ -70,12 +70,6 @@ return {
 	"arena.hypersomnia.xyz"
   },
 
-  server_start = {
-	ip = "127.0.0.1",
-	port = 0,
-	slots = 64
-  },
-
   client_start = {
   	default_port = 8412,
 	custom_address = "127.0.0.1",
@@ -734,57 +728,15 @@ treat_as_music_sounds_longer_than_secs = 5,
     character_silhouette_damage_highlight_secs = 0.12
   },
 
-  server_solvable = {
-	arena_switching = {
-      switch_once_every_n_matches = 2,
-      vote_rounds_before = 0
-	},
+  -- Private vars aren't known to any clients.
 
-	arena = "de_cyberaqua",
-	game_mode = "",
+  server_start = {
+	ip = "127.0.0.1",
+	port = 0,
+	slots = 64
   },
 
-  server = {
-	server_name = "${MY_NICKNAME}'s server",
-
-	allow_nat_traversal = true,
-
-	notified_server_list = {
-		address = "masterserver.hypersomnia.xyz",
-  		default_port = 8430
-	},
-
-	send_heartbeat_to_server_list_once_every_secs = 10,
-	resolve_server_list_address_once_every_secs = 60,
-    sleep_mult = 0.1,
-    log_performance_once_every_secs = 0,
-
-	kick_if_no_network_payloads_for_secs = 10,
-	move_to_spectators_if_afk_for_secs = 120,
-	kick_if_afk_for_secs = 2 * 3600,
-	time_limit_to_enter_game_since_connection = 15,
-
-	send_packets_once_every_tick = 1,
-	reset_resync_timer_once_every_secs = 4,
-	max_client_resyncs = 30,
-
-	disabled_network_simulator = {
-      latency_ms = 50,
-      jitter_ms = 10,
-      loss_percent = 1,
-	  duplicates_percent = 1,
-	},
-
-	max_buffered_client_commands = 1280,
-	state_hash_once_every_tick = 1,
-    send_net_statistics_update_once_every_secs = 1,
-
-    auto_authorize_loopback_for_rcon = true,
-	max_unauthorized_rcon_commands = 100,
-	max_bots = 0
-  },
-
-  private_server = {
+  server_private = {
     master_rcon_password = "",
     rcon_password = "",
     discord_webhook_url = "",
@@ -792,8 +744,49 @@ treat_as_music_sounds_longer_than_secs = 5,
     telegram_channel_id = "@hypersomnia_monitor"
   },
 
-  dedicated_server = {
+  server = {
+    server_name = "${MY_NICKNAME}'s server",
 
+    arena = "de_cyberaqua",
+    game_mode = "",
+
+    external_arena_files_provider = "https://hypersomnia.xyz/arenas",
+
+    allow_nat_traversal = true,
+
+    notified_server_list = {
+      address = "masterserver.hypersomnia.xyz",
+      default_port = 8430
+    },
+
+    send_heartbeat_to_server_list_once_every_secs = 10,
+    resolve_server_list_address_once_every_secs = 60,
+    sleep_mult = 0.1,
+    log_performance_once_every_secs = 0,
+
+    kick_if_no_network_payloads_for_secs = 10,
+    move_to_spectators_if_afk_for_secs = 120,
+    kick_if_afk_for_secs = 2 * 3600,
+    time_limit_to_enter_game_since_connection = 15,
+
+    send_packets_once_every_tick = 1,
+    reset_resync_timer_once_every_secs = 4,
+    max_client_resyncs = 30,
+
+    disabled_network_simulator = {
+      latency_ms = 50,
+      jitter_ms = 10,
+      loss_percent = 1,
+      duplicates_percent = 1,
+    },
+
+    max_buffered_client_commands = 1280,
+    state_hash_once_every_tick = 1,
+    send_net_statistics_update_once_every_secs = 1,
+
+    auto_authorize_loopback_for_rcon = true,
+    max_unauthorized_rcon_commands = 100,
+    max_bots = 0
   },
 
   client = {

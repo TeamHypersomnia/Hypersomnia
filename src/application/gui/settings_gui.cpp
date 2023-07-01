@@ -1206,19 +1206,21 @@ void settings_gui_state::perform(
 				ImGui::Separator();
 
 				do_server_vars(
-					config.server_solvable,
-					last_saved_config.server_solvable
+					config.server,
+					last_saved_config.server,
+					rcon_pane::ARENAS
 				);
 
 				ImGui::Separator();
 
 				do_server_vars(
 					config.server,
-					last_saved_config.server
+					last_saved_config.server,
+					rcon_pane::VARS
 				);
 
 				if (auto node = scoped_tree_node("RCON")) {
-					auto& scope_cfg = config.private_server;
+					auto& scope_cfg = config.server_private;
 
 					{
 						thread_local bool show = false;
@@ -1689,7 +1691,8 @@ bool perform_game_mode_chooser(
 }
 
 bool perform_arena_chooser(
-	arena_identifier& current_arena
+	arena_identifier& current_arena,
+	const server_runtime_info* info
 ) {
 	thread_local arena_chooser chooser;
 
@@ -1701,6 +1704,7 @@ bool perform_arena_chooser(
 		OFFICIAL_ARENAS_DIR,
 		DOWNLOADED_ARENAS_DIR,
 		EDITOR_PROJECTS_DIR,
+		info,
 		[&](const auto& chosen_arena_path) {
 			current_arena = chosen_arena_path.filename().string();
 			changed = true;
@@ -1711,76 +1715,72 @@ bool perform_arena_chooser(
 }
 
 void do_server_vars(
-	server_solvable_vars& vars,
-	server_solvable_vars& last_saved_vars
-) {
-	using namespace augs::imgui;
-
-	auto revert = make_revert_button_lambda(vars, last_saved_vars);
-
-	if (perform_arena_chooser(vars.arena)) {
-		vars.game_mode = "";
-	}
-
-	revert(vars.arena);
-
-	perform_game_mode_chooser(vars.game_mode);
-	revert(vars.game_mode);
-}
-
-void do_server_vars(
 	server_vars& vars,
-	server_vars& last_saved_vars
+	server_vars& last_saved_vars,
+	rcon_pane pane,
+	const server_runtime_info* runtime_info
 ) {
 	using namespace augs::imgui;
 
-	int field_id = 999999;
-
-	auto& scope_cfg = vars;
-
 	auto revert = make_revert_button_lambda(vars, last_saved_vars);
 
-	auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
-		slider(l, f, std::forward<decltype(args)>(args)...);
-		revert(f);
-	};
+	if (pane == rcon_pane::ARENAS) {
+		if (perform_arena_chooser(vars.arena, runtime_info)) {
+			vars.game_mode = "";
+		}
 
-	auto revertable_input_text = [&](auto l, auto& f, auto&&... args) {
-		input_text(l, f, std::forward<decltype(args)>(args)...);
-		revert(f);
-	};
+		revert(vars.arena);
 
-	auto revertable_checkbox = [&](auto l, auto& f, auto&&... args) {
-		checkbox(l, f, std::forward<decltype(args)>(args)...);
-		revert(f);
-	};
-
-	text_color("General", yellow);
-
-	ImGui::Separator();
-
-	revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
-	revertable_input_text(SCOPE_CFG_NVP(server_name));
-
-	revertable_checkbox("I'm behind router", scope_cfg.allow_nat_traversal);
-
-	//revertable_input_text(SCOPE_CFG_NVP(external_arena_files_host));
-	revertable_slider("Max file bandwidth (per second)", scope_cfg.max_file_bandwidth, 0.0f, 4.f, "%.2f MB");
-
-	if (auto node = scoped_tree_node("Time limits")) {
-		revertable_slider(SCOPE_CFG_NVP(move_to_spectators_if_afk_for_secs), 10u, 6000u);
-		revertable_slider(SCOPE_CFG_NVP(kick_if_afk_for_secs), 10u, 2 * 3600u);
-		revertable_slider(SCOPE_CFG_NVP(kick_if_no_network_payloads_for_secs), 2u, 300u);
-		revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 5u, 300u);
+		perform_game_mode_chooser(vars.game_mode);
+		revert(vars.game_mode);
 	}
+	else if (pane == rcon_pane::VARS) {
+		int field_id = 999998;
 
-	ImGui::Separator();
+		auto& scope_cfg = vars;
 
-	text_color("Dedicated server", yellow);
+		auto revertable_slider = [&](auto l, auto& f, auto&&... args) {
+			slider(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
 
-	ImGui::Separator();
+		auto revertable_input_text = [&](auto l, auto& f, auto&&... args) {
+			input_text(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
 
-	revertable_slider(SCOPE_CFG_NVP(sleep_mult), 0.0f, 0.9f);
+		auto revertable_checkbox = [&](auto l, auto& f, auto&&... args) {
+			checkbox(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
+		text_color("General", yellow);
+
+		ImGui::Separator();
+
+		revertable_input_text(SCOPE_CFG_NVP(notified_server_list.address));
+		revertable_input_text(SCOPE_CFG_NVP(server_name));
+
+		revertable_checkbox("I'm behind router", scope_cfg.allow_nat_traversal);
+
+		//revertable_input_text(SCOPE_CFG_NVP(external_arena_files_provider));
+		revertable_slider("Max file bandwidth (per second)", scope_cfg.max_file_bandwidth, 0.0f, 4.f, "%.2f MB");
+
+		if (auto node = scoped_tree_node("Time limits")) {
+			revertable_slider(SCOPE_CFG_NVP(move_to_spectators_if_afk_for_secs), 10u, 6000u);
+			revertable_slider(SCOPE_CFG_NVP(kick_if_afk_for_secs), 10u, 2 * 3600u);
+			revertable_slider(SCOPE_CFG_NVP(kick_if_no_network_payloads_for_secs), 2u, 300u);
+			revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 5u, 300u);
+		}
+
+		ImGui::Separator();
+
+		text_color("Dedicated server", yellow);
+
+		ImGui::Separator();
+
+		revertable_slider(SCOPE_CFG_NVP(sleep_mult), 0.0f, 0.9f);
+	}
 }
 
 #undef CONFIG_NVP

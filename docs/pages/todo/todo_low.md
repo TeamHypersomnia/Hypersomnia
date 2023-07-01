@@ -4,6 +4,12 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- crate caption
+- send heartbeats when state changes too
+    - but dont skip sending heartbeats because the servers will disappear otherwise
+    - btw has to reserialize even if heartbeats are same because time_last_heartbeat will be inaccurate
+        - unless we treat it as a time of last change which is useful on its own
+
 - rename server_solvable to something else? "vars" at least maybe
     - this should honestly be under a single "server" struct probably, later will be easy to pull off with serialize_in_parent if we have config in json
 

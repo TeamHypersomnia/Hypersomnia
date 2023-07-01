@@ -11,13 +11,17 @@
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
 std::string censor_ips(std::string text);
-bool perform_arena_chooser(arena_identifier& current_arena);
+
+bool perform_arena_chooser(
+	arena_identifier& current_arena,
+	const server_runtime_info* info = nullptr
+);
+
 bool perform_game_mode_chooser(game_mode_name_type& current_arena);
 
 bool start_server_gui_state::perform(
 	server_start_input& into,
 	server_vars& into_vars,
-	server_solvable_vars& into_solvable_vars,
 
 	const nat_detection_session* nat_detection,
 	const port_type currently_bound_port
@@ -124,11 +128,11 @@ as well as to test your skills in a laggy environment.
 
 		input_text("Server name", into_vars.server_name);
 
-		if (perform_arena_chooser(into_solvable_vars.arena)) {
-			into_solvable_vars.game_mode = "";
+		if (perform_arena_chooser(into_vars.arena)) {
+			into_vars.game_mode = "";
 		}
 
-		perform_game_mode_chooser(into_solvable_vars.game_mode);
+		perform_game_mode_chooser(into_vars.game_mode);
 
 		slider("Slots", into.slots, 2, 64);
 

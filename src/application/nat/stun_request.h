@@ -46,7 +46,7 @@ inline std::optional<netcode_address_t> read_stun_response(
 	const std::size_t packet_bytes
 ) {
 	try {
-		auto stream = augs::make_read_stream(packet_buffer, packet_bytes);
+		auto stream = augs::make_ptr_read_stream(packet_buffer, packet_bytes);
 
 		const auto response = augs::read_bytes<STUNMessageHeader>(stream);
 
