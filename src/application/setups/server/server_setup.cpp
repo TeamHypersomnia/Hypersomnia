@@ -44,6 +44,8 @@
 #include "application/setups/server/server_json_events.h"
 #include "augs/readwrite/json_readwrite.h"
 #include "application/setups/editor/editor_paths.h"
+#include "game/modes/arena_mode.hpp"
+#include "game/messages/game_notification.h"
 
 const auto only_connected_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
@@ -285,6 +287,8 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 		const auto& summaries = step.get_queue<messages::match_summary_message>();
 
 		for (const auto& summary : summaries) {
+			request_immediate_heartbeat();
+
 			push_match_summary_webhook(summary);
 			log_match_end_json(summary);
 		}
@@ -294,6 +298,8 @@ void server_setup::default_server_post_solve(const const_logic_step step) {
 		const auto& ends = step.get_queue<messages::match_summary_ended>();
 
 		for (const auto& ended : ends) {
+			request_immediate_heartbeat();
+
 			if (ended.is_final) {
 				schedule_shutdown();
 			}
@@ -638,6 +644,36 @@ void server_setup::send_heartbeat_to_server_list() {
 
 	heartbeat.server_version = hypersomnia_version().get_version_string();
 	heartbeat.is_editor_playtesting_server = vars.playtesting_context.has_value();
+
+	arena.on_mode_with_input(
+		[&heartbeat](const auto& mode, const auto&) {
+			auto fill = [&](const auto faction, auto& target) {
+				thread_local std::vector<server_heartbeat_player_info> players;
+				players.clear();
+
+				mode.for_each_player_in(
+					faction,
+					[&](const auto, const auto& player) {
+						auto converted = [](auto i) {
+							return static_cast<uint8_t>(std::clamp(i, 0, 255));
+						};
+
+						players.push_back({ player.get_chosen_name(), converted(player.stats.calc_score()), converted(player.stats.deaths) });
+					}
+				);
+
+				sort_range(players);
+				target.assign(players.begin(), players.begin() + std::min(players.size(), target.max_size()));
+			};
+
+			fill(faction_type::RESISTANCE, heartbeat.players_resistance);
+			fill(faction_type::METROPOLIS, heartbeat.players_metropolis);
+			fill(faction_type::SPECTATOR, heartbeat.players_spectating);
+
+			heartbeat.score_resistance = mode.get_faction_score(faction_type::RESISTANCE);
+			heartbeat.score_metropolis = mode.get_faction_score(faction_type::METROPOLIS);
+		}
+	);
 
 	heartbeat.validate();
 	heartbeat_buffer.clear();

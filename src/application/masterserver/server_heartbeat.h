@@ -7,6 +7,24 @@
 bool operator==(const netcode_address_t& a, const netcode_address_t& b);
 bool operator!=(const netcode_address_t& a, const netcode_address_t& b);
 
+struct server_heartbeat_player_info {
+	// GEN INTROSPECTOR struct server_heartbeat_player_info
+	client_nickname_type nickname;
+	uint8_t score = 0;
+	uint8_t deaths = 0;
+	// END GEN INTROSPECTOR
+
+	bool operator<(const server_heartbeat_player_info& b) const {
+		if (score == b.score && nickname == b.nickname) {
+			return deaths > b.deaths;
+		}
+
+		return std::tie(score, nickname) < std::tie(b.score, b.nickname);
+	}
+
+	bool operator==(const server_heartbeat_player_info&) const = default;
+};
+
 struct server_heartbeat {
 	static constexpr bool force_read_field_by_field = true;
 
@@ -26,6 +44,13 @@ struct server_heartbeat {
 	bool suppress_new_community_server_webhook = false;
 	game_version_identifier server_version = "Unknown";
 	bool is_editor_playtesting_server = false;
+
+	uint8_t score_resistance = 0;
+	uint8_t score_metropolis = 0;
+
+	augs::constant_size_vector<server_heartbeat_player_info, 32> players_resistance;
+	augs::constant_size_vector<server_heartbeat_player_info, 32> players_metropolis;
+	augs::constant_size_vector<server_heartbeat_player_info, 32> players_spectating;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_heartbeat&) const = default;

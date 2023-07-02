@@ -33,6 +33,7 @@
 #include "application/setups/server/server_nat_traversal.h"
 
 #include "application/setups/server/rcon_level.h"
+#include "game/messages/game_notification.h"
 
 struct netcode_socket_t;
 struct config_lua_table;
@@ -410,6 +411,14 @@ public:
 
 				if (is_dedicated()) {
 					auto post_solve = [&](auto old_callback, const const_logic_step step) {
+						{
+							auto& notifications = step.get_queue<messages::game_notification>();
+
+							if (!notifications.empty()) {
+								request_immediate_heartbeat();
+							}
+						}
+
 						default_server_post_solve(step);
 						old_callback(step);
 					};
@@ -429,6 +438,10 @@ public:
 				else {
 					auto post_solve = [&](auto old_callback, const const_logic_step step) {
 						auto& notifications = step.get_queue<messages::game_notification>();
+
+						if (!notifications.empty()) {
+							request_immediate_heartbeat();
+						}
 
 						const auto current_time = get_current_time();
 

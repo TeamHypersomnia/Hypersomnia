@@ -190,6 +190,13 @@ void perform_masterserver(const config_lua_table& cfg) try {
 				next.is_editor_playtesting_server = data.is_editor_playtesting_server;
 			}
 
+			next.score_resistance = data.score_resistance;
+			next.score_metropolis = data.score_metropolis;
+
+			next.players_resistance = data.players_resistance;
+			next.players_metropolis = data.players_metropolis;
+			next.players_spectating = data.players_spectating;
+
 			augs::write_json(writer, next);
 		}
 

@@ -1315,7 +1315,8 @@ work_result work(const int argc, const char* const * const argv) try {
 		return browse_servers_input {
 			config.server_list_provider,
 			config.client_start,
-			config.official_arena_servers
+			config.official_arena_servers,
+			config.faction_view
 		};
 	};
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "application/masterserver/server_heartbeat.h"
 
 struct server_list_entry_json {
 	// GEN INTROSPECTOR struct server_list_entry_json
@@ -21,6 +22,13 @@ struct server_list_entry_json {
 
 	std::optional<std::string> internal_network_address;
 	std::optional<bool> is_editor_playtesting_server;
+
+	uint8_t score_resistance = 0;
+	uint8_t score_metropolis = 0;
+
+	augs::constant_size_vector<server_heartbeat_player_info, 32> players_resistance;
+	augs::constant_size_vector<server_heartbeat_player_info, 32> players_metropolis;
+	augs::constant_size_vector<server_heartbeat_player_info, 32> players_spectating;
 	// END GEN INTROSPECTOR
 };
 
