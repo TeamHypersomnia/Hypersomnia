@@ -32,15 +32,12 @@ inline void setup_game_mode_defaults(
 	e.gun_game.progression = {
 		o[test_shootable_weapons::ELON],
 		o[test_shootable_weapons::BULLDUP2000],
-		o[test_shootable_weapons::LEWS],
 
 		o[test_shootable_weapons::DATUM],
 		o[test_shootable_weapons::BAKA47],
 		o[test_shootable_weapons::SZTURM],
 		o[test_shootable_weapons::BILMER2000],
 		o[test_shootable_weapons::GALILEA],
-
-		o[test_shootable_weapons::AMPLIFIER_ARM],
 
 		o[test_shootable_weapons::PRO90],
 		o[test_shootable_weapons::CYBERSPRAY],
