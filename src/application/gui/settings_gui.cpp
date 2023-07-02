@@ -429,6 +429,7 @@ void settings_gui_state::perform(
 				text("At startup, launch.."); ImGui::SameLine();
 				revertable_enum("##LaunchAtStartup", config.launch_at_startup);
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
+				revertable_checkbox("Auto-zoom", config.drawing.auto_zoom);
 
 				if (!config.window.fullscreen) {
 					auto indent = scoped_indent();

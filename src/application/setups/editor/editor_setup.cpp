@@ -599,6 +599,8 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		get_arena_handle().adjust(config.drawing);
 	}
 	else {
+		config.drawing.auto_zoom = false;
+
 		config.drawing.draw_area_markers.is_enabled = false;
 		config.drawing.draw_aabb_highlighter = false;
 		config.interpolation.enabled = false;

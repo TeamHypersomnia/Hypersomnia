@@ -1471,7 +1471,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		return true;
 	};
 
-	auto get_camera_eye = [&]() {		
+	auto get_camera_eye = [&](const config_lua_table& config) {		
 		auto logic_eye = [&]() {
 			if(const auto custom = visit_current_setup(
 				[](const auto& setup) { 
@@ -1488,25 +1488,27 @@ work_result work(const int argc, const char* const * const argv) try {
 			return gameplay_camera.get_current_eye();
 		}();
 
-		const float target_resolution_height = 1080;
-		const float screen_h = float(logic_get_screen_size().y);
+		if (config.drawing.auto_zoom) {
+			const float target_resolution_height = 1080;
+			const float screen_h = float(logic_get_screen_size().y);
 
-		if (screen_h > target_resolution_height) {
-			logic_eye.zoom *= screen_h / target_resolution_height;
+			if (screen_h > target_resolution_height) {
+				logic_eye.zoom *= screen_h / target_resolution_height;
+			}
 		}
 
 		return logic_eye;
 	};
 
-	auto get_camera_cone = [&]() {		
-		return camera_cone(get_camera_eye(), logic_get_screen_size());
+	auto get_camera_cone = [&](const config_lua_table& config) {		
+		return camera_cone(get_camera_eye(config), logic_get_screen_size());
 	};
 
 	auto get_queried_cone = [&](const config_lua_table& config) {		
 		const auto query_mult = config.session.camera_query_aabb_mult;
 
 		const auto queried_cone = [&]() {
-			auto c = get_camera_cone();
+			auto c = get_camera_cone(config);
 			c.eye.zoom /= query_mult;
 			return c;
 		}();
@@ -1526,7 +1528,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			setup.customize_for_viewing(config_copy);
 			setup.apply(config_copy);
 
-			if (get_camera_eye().zoom < 1.f) {
+			if (get_camera_eye(config_copy).zoom < 1.f) {
 				/* Force linear filtering when zooming out */
 				config_copy.renderer.default_filtering = augs::filtering_type::LINEAR;
 			}
@@ -2043,8 +2045,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	visible_entities all_visible;
 
-	auto get_character_camera = [&]() -> character_camera {
-		return { get_viewed_character(), { get_camera_eye(), logic_get_screen_size() } };
+	auto get_character_camera = [&](const config_lua_table& config) -> character_camera {
+		return { get_viewed_character(), { get_camera_eye(config), logic_get_screen_size() } };
 	};
 
 	auto reacquire_visible_entities = [&](
@@ -2054,7 +2056,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	) {
 		auto scope = measure_scope(game_thread_performance.camera_visibility_query);
 
-		auto queried_eye = get_camera_eye();
+		auto queried_eye = get_camera_eye(config);
 		queried_eye.zoom /= viewing_config.session.camera_query_aabb_mult;
 
 		const auto queried_cone = camera_cone(queried_eye, screen_size);
@@ -2092,7 +2094,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					entropy_accumulator::input {
 						input_cfg, 
 						logic_get_screen_size(), 
-						get_camera_eye().zoom 
+						get_camera_eye(viewing_config).zoom 
 					}
 				)) {
 					return vec2(motion->offset) * input_cfg.character.crosshair_sensitivity;
@@ -2210,7 +2212,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			inv_tickrate,
 			get_interpolation_ratio(),
 
-			get_character_camera(),
+			get_character_camera(viewing_config),
 			get_queried_cone(viewing_config),
 			all_visible,
 
@@ -2253,7 +2255,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				streaming.loaded_sounds,
 				viewing_config.audio_volume,
 				viewing_config.sound,
-				get_character_camera(),
+				get_character_camera(viewing_config),
 				viewing_config.performance,
 				viewing_config.damage_indication,
 				settings
@@ -2310,7 +2312,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				[&viewing_config, &setup_post_cleanup](const const_logic_step& step) { setup_post_cleanup(viewing_config, step); }
 			);
 
-			const auto zoom = get_camera_eye().zoom;
+			const auto zoom = get_camera_eye(viewing_config).zoom;
 			const auto input_cfg = get_current_input_settings(viewing_config);
 
 			if constexpr(std::is_same_v<S, client_setup>) {
@@ -2979,7 +2981,7 @@ work_result work(const int argc, const char* const * const argv) try {
 						viewing_config.hotbar,
 						viewing_config.drawing,
 						viewing_config.inventory_gui_controls,
-						get_camera_eye(),
+						get_camera_eye(viewing_config),
 						get_drawer_for(chosen_renderer)
 					}
 				};
@@ -3014,7 +3016,7 @@ work_result work(const int argc, const char* const * const argv) try {
 						get_interpolation_ratio(),
 						get_drawer_for(chosen_renderer).default_texture,
 						new_viewing_config,
-						get_camera_cone()
+						get_camera_cone(new_viewing_config)
 					);
 				}
 			};
@@ -3032,7 +3034,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			auto make_draw_setup_gui_input = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
 				return draw_setup_gui_input {
 					all_visible,
-					get_camera_cone(),
+					get_camera_cone(new_viewing_config),
 					get_blank_texture(),
 					new_viewing_config,
 					streaming.necessary_images_in_atlas,
@@ -3200,7 +3202,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					});
 				}
 
-				auto cone = get_camera_cone();
+				auto cone = get_camera_cone(viewing_config);
 				cone.eye.transform.pos.discard_fract();
 
 				return illuminated_rendering_input {
