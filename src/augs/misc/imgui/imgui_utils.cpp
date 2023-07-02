@@ -90,6 +90,8 @@ namespace augs {
 
 			io.MouseDoubleClickMaxDist = 100.f;
 			GetStyle() = initial_style;
+
+			// ImGui::GetStyle().ScaleAllSizes(2.0f);
 		}
 
 		void setup_io_settings(

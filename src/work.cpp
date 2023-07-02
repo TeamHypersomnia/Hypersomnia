@@ -1472,19 +1472,30 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	auto get_camera_eye = [&]() {		
-		if(const auto custom = visit_current_setup(
-			[](const auto& setup) { 
-				return setup.find_current_camera_eye(); 
+		auto logic_eye = [&]() {
+			if(const auto custom = visit_current_setup(
+				[](const auto& setup) { 
+					return setup.find_current_camera_eye(); 
+				}
+			)) {
+				return *custom;
 			}
-		)) {
-			return *custom;
-		}
-		
-		if (get_viewed_character().dead()) {
-			return camera_eye();
+			
+			if (get_viewed_character().dead()) {
+				return camera_eye();
+			}
+
+			return gameplay_camera.get_current_eye();
+		}();
+
+		const float target_resolution_height = 1080;
+		const float screen_h = float(logic_get_screen_size().y);
+
+		if (screen_h > target_resolution_height) {
+			logic_eye.zoom *= screen_h / target_resolution_height;
 		}
 
-		return gameplay_camera.get_current_eye();
+		return logic_eye;
 	};
 
 	auto get_camera_cone = [&]() {		

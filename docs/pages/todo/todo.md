@@ -6,6 +6,18 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- arbitrary upscaling (only UI left)
+    - verdict: use zoom on gameplay, let's render GUI to a separate fbo and stretch it
+
+    - as for the game literally nothing else is required except zoom=2
+
+    - will partially solve the resolution advantage problem
+    - note that we'll have to adjust UI positions too, just zooming in won't do
+        - fastest will be to stretch it with an fbo, as we won't have to rebuild ui fonts
+        - do we really have to use an fbo though if we already virtually render it in 1920x1080?
+        - what about mouse position?
+    - will have to first scale the get_window_size value
+
 - Fist fighting could work by spawning an invisible fist melee item but only during attack
 	- What if we have an invisible item without space etc that is only visible to melee system and drawer?
 		- but you also need to infer collider or no?

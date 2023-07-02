@@ -465,12 +465,8 @@ Current platforms are actively tested and supported:
 
 Arch Linux:
 
-- ``pkg-config``
-- ``libx11``
-- ``libxcb``
-- ``xcb-util-keysyms``
-- ``libsodium``
-- Might need more - you are on your own here (like very Arch user).
+- ``libc++ lld pkg-config libx11 libxcb xcb-util-keysyms libsodium``
+- Might need more - [let us know](https://github.com/TeamHypersomnia/Hypersomnia/issues) if this list is missing something.
 
 Ubuntu:
 
