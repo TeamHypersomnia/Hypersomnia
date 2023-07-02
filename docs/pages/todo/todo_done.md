@@ -6381,3 +6381,6 @@ This will discard your redo history."
 
 - merge solvable vars with server vars
     - solvable vars should only exist at runtime and actually be called arena switched command
+
+- show spectator after finishing downloads
+    - people get confused when they don't see the window

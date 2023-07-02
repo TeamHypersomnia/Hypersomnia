@@ -550,6 +550,9 @@ bool client_setup::start_downloading_arena(
 	const std::string& new_arena_name,
 	const augs::secure_hash_type& project_hash
 ) {
+	/* Re-show once download completes as we'll be moved to spectator. */
+	arena_gui.choose_team.show = true;
+
 	downloading = arena_downloading_session(new_arena_name);
 
 	augs::create_directories(downloading->part_dir_path);
@@ -754,7 +757,11 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 			current_arena_folder = *choice_result.arena_folder_path;
 
 			arena_gui.reset();
-			arena_gui.choose_team.show = !is_replaying() && ::is_spectator(referential_arena, get_local_player_id());
+
+			if (!is_replaying() && ::is_spectator(referential_arena, get_local_player_id())) {
+				arena_gui.choose_team.show = true;
+			}
+
 			client_gui.rcon.show = false;
 		}
 		else {

@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
     
+- let's first do the http downloads as it's the biggest fun bottleneck now
+
+- add player lists to server browser
+
+- remove lewsii and amplifier arm from the gungame progression
+    - sad but necessary, amplifier arm breaks flow kinda and people dont get how to use lewsii
 
 - Map catalogue
     - Problems to solve
