@@ -10,9 +10,6 @@ summary: That which we are brainstorming at the moment.
 
 - add player lists to server browser
 
-- remove lewsii and amplifier arm from the gungame progression
-    - sad but necessary, amplifier arm breaks flow kinda and people dont get how to use lewsii
-
 - Map catalogue
     - Problems to solve
         - What if we update maps while the servers already have them loaded?
@@ -60,8 +57,6 @@ summary: That which we are brainstorming at the moment.
     - put some controls switches under Advanced
     - logarithmic scale for sound?
         - and also make default master less than 1
-
-- current_arena -> arena/map
 
 - How do we go from here?
     - To not have to repeatedly setup some common ruleset data too (like announcer sounds), we'd have to have not a variant, but an actual tuple of all sub-modes.

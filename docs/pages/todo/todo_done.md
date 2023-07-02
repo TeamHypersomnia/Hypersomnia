@@ -6384,3 +6384,8 @@ This will discard your redo history."
 
 - show spectator after finishing downloads
     - people get confused when they don't see the window
+- remove lewsii and amplifier arm from the gungame progression
+    - sad but necessary, amplifier arm breaks flow kinda and people dont get how to use lewsii
+
+- current_arena -> arena/map
+

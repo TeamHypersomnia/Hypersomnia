@@ -756,11 +756,10 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 		if (choice_result.arena_folder_path.has_value()) {
 			current_arena_folder = *choice_result.arena_folder_path;
 
-			arena_gui.reset();
+			const bool was_showing_choose_team = arena_gui.choose_team.show;
 
-			if (!is_replaying() && ::is_spectator(referential_arena, get_local_player_id())) {
-				arena_gui.choose_team.show = true;
-			}
+			arena_gui.reset();
+			arena_gui.choose_team.show = !is_replaying() && (was_showing_choose_team || ::is_spectator(referential_arena, get_local_player_id()));
 
 			client_gui.rcon.show = false;
 		}
