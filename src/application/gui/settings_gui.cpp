@@ -429,7 +429,6 @@ void settings_gui_state::perform(
 				text("At startup, launch.."); ImGui::SameLine();
 				revertable_enum("##LaunchAtStartup", config.launch_at_startup);
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
-				revertable_checkbox("Auto-zoom", config.drawing.auto_zoom);
 
 				if (!config.window.fullscreen) {
 					auto indent = scoped_indent();
@@ -438,6 +437,16 @@ void settings_gui_state::perform(
 				}
 
 				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
+
+				revertable_checkbox("Auto-zoom", config.drawing.auto_zoom);
+
+				tooltip_on_hover("The game will automatically zoom in\nto render the same area it would render\nif it was running under 1080p resolution.");
+
+				if (!config.drawing.auto_zoom) {
+					auto indent = scoped_indent();
+
+					revertable_slider("Custom zoom", config.drawing.custom_zoom, 1.0f, 10.0f, "%.1f");
+				}
 
 				revertable_enum_radio("Vsync mode", config.window.vsync_mode);
 

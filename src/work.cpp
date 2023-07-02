@@ -1471,7 +1471,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		return true;
 	};
 
-	auto get_camera_eye = [&](const config_lua_table& config) {		
+	auto get_camera_eye = [&](const config_lua_table& viewing_config) {		
 		auto logic_eye = [&]() {
 			if(const auto custom = visit_current_setup(
 				[](const auto& setup) { 
@@ -1488,7 +1488,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			return gameplay_camera.get_current_eye();
 		}();
 
-		if (config.drawing.auto_zoom) {
+		if (viewing_config.drawing.auto_zoom) {
 			const float target_resolution_height = 1080;
 			const float screen_h = float(logic_get_screen_size().y);
 
@@ -1496,19 +1496,22 @@ work_result work(const int argc, const char* const * const argv) try {
 				logic_eye.zoom *= screen_h / target_resolution_height;
 			}
 		}
+		else if (viewing_config.drawing.custom_zoom != 1.0f) {
+			logic_eye.zoom *= std::max(1.0f, viewing_config.drawing.custom_zoom);
+		}
 
 		return logic_eye;
 	};
 
-	auto get_camera_cone = [&](const config_lua_table& config) {		
-		return camera_cone(get_camera_eye(config), logic_get_screen_size());
+	auto get_camera_cone = [&](const config_lua_table& viewing_config) {		
+		return camera_cone(get_camera_eye(viewing_config), logic_get_screen_size());
 	};
 
-	auto get_queried_cone = [&](const config_lua_table& config) {		
-		const auto query_mult = config.session.camera_query_aabb_mult;
+	auto get_queried_cone = [&](const config_lua_table& viewing_config) {		
+		const auto query_mult = viewing_config.session.camera_query_aabb_mult;
 
 		const auto queried_cone = [&]() {
-			auto c = get_camera_cone(config);
+			auto c = get_camera_cone(viewing_config);
 			c.eye.zoom /= query_mult;
 			return c;
 		}();
@@ -2045,8 +2048,8 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	visible_entities all_visible;
 
-	auto get_character_camera = [&](const config_lua_table& config) -> character_camera {
-		return { get_viewed_character(), { get_camera_eye(config), logic_get_screen_size() } };
+	auto get_character_camera = [&](const config_lua_table& viewing_config) -> character_camera {
+		return { get_viewed_character(), { get_camera_eye(viewing_config), logic_get_screen_size() } };
 	};
 
 	auto reacquire_visible_entities = [&](
@@ -2056,7 +2059,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	) {
 		auto scope = measure_scope(game_thread_performance.camera_visibility_query);
 
-		auto queried_eye = get_camera_eye(config);
+		auto queried_eye = get_camera_eye(viewing_config);
 		queried_eye.zoom /= viewing_config.session.camera_query_aabb_mult;
 
 		const auto queried_cone = camera_cone(queried_eye, screen_size);
@@ -2438,12 +2441,12 @@ work_result work(const int argc, const char* const * const argv) try {
 		};
 	};
 
-	auto make_create_menu_context = [&](const config_lua_table& cfg) {
+	auto make_create_menu_context = [&](const config_lua_table& viewing_config) {
 		return [&](auto& gui) {
 			return gui.create_context(
 				logic_get_screen_size(),
 				common_input_state,
-				create_menu_context_deps(cfg)
+				create_menu_context_deps(viewing_config)
 			);
 		};
 	};

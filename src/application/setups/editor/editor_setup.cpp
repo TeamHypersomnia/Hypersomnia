@@ -600,6 +600,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	}
 	else {
 		config.drawing.auto_zoom = false;
+		config.drawing.custom_zoom = 1.0f;
 
 		config.drawing.draw_area_markers.is_enabled = false;
 		config.drawing.draw_aabb_highlighter = false;

@@ -36,7 +36,8 @@ struct crosshair_drawing_settings {
 
 struct game_drawing_settings {
 	// GEN INTROSPECTOR struct game_drawing_settings
-	bool auto_zoom = true;
+	bool auto_zoom = false;
+	float custom_zoom = 1.0f;
 
 	bool draw_crosshairs = true;
 	bool draw_weapon_laser = true;
