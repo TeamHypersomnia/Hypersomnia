@@ -6,7 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
     
-- let's first do the http downloads as it's the biggest fun bottleneck now
+- Http downloads from external arena provider.
+    - Problem: a server might easily end up with out-of-date maps on disk.
+        - Either someone might start a dedicated server without updating it (though the normal game client will autoupdate 'tracked' maps on start)
+            - Or a running server might end up having out-of-date maps if new ones are uploaded to some public provider.
+    - The server can check for updates *before* launching the maps.
 
 - add player lists to server browser
 

@@ -632,7 +632,6 @@ treat_as_music_sounds_longer_than_secs = 5,
     speed = 1000
   },
   main_menu = {
-    latest_news_url = "hypersomnia.xyz/latest_post",
     menu_intro_scene_entropy_path = "abc",
     menu_background_arena_path = "content/menu/menu",
     menu_theme_path = "",

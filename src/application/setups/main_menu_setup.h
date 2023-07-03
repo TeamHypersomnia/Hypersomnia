@@ -46,7 +46,7 @@ struct packaged_official_content;
 
 class main_menu_setup : public default_setup_settings {
 	std::shared_future<std::string> latest_news;
-	vec2 latest_news_pos = { 0.f, 0.f };
+	vec2 latest_news_pos = { 1920.f, 0.f };
 
 	intercosm scene;
 	test_mode mode;
@@ -129,7 +129,7 @@ public:
 		const setup_advance_input in,
 		const C& callbacks
 	) {
-		latest_news_pos.x += in.frame_delta.per_second(50.f);
+		latest_news_pos.x -= in.frame_delta.per_second(50.f);
 
 		timer.advance(in.frame_delta);
 

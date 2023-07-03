@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "menu",
-        "version_timestamp": "2023-06-27 23:00:06.132481 UTC"
+        "version_timestamp": "2023-07-03 12:26:02.546412 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -33,6 +33,14 @@
         }
     },
     "external_resources": [
+        {
+            "path": "gfx/blanks/blank4.png",
+            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
+            "id": "@blank4",
+            "domain": "FOREGROUND",
+            "size": [1, 1],
+            "stretch_when_resized": true
+        },
         {
             "path": "gfx/garden/bush.png",
             "file_hash": "c2175c5d0915e83fe56616ce31a5b19257a4cb295d8158df90420dfac7062324",
@@ -432,6 +440,22 @@
             }
         },
         {
+            "path": "menu_game_logo.png",
+            "file_hash": "421db1f8f65dcf1008fd1ad1cb1e2593eaa75531dd7d5030f49104416561d794",
+            "id": "@menu_game_logo",
+            "domain": "FOREGROUND",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [225, 254, 225, 255],
+            "neon_color": [0, 255, 32, 255],
+            "size": [585, 104],
+            "as_nonphysical": {
+                "full_illumination": true
+            }
+        },
+        {
             "path": "sfx/garden_ambience.ogg",
             "file_hash": "9d78d3277628418a8b205970fd79a0d8d79814fa1158cb5d3462823f0bc06e38",
             "id": "@garden_ambience",
@@ -441,29 +465,56 @@
     ],
     "layers": [
         {
+            "id": "Layer 5",
+            "is_open_in_editor": false,
+            "nodes": [
+                "menu_game_logo"
+            ]
+        },
+        {
+            "id": "Layer 4",
+            "is_open_in_editor": false,
+            "nodes": [
+                "crate (5)",
+                "crate (4)",
+                "crate (3)",
+                "crate (2)",
+                "crate (1)",
+                "crate"
+            ]
+        },
+        {
             "id": "Layer 3",
+            "is_open_in_editor": false,
             "nodes": [
                 "portal_circle"
             ]
         },
         {
-            "id": "Layer 2"
-        },
-        {
             "id": "Layer 1",
+            "is_open_in_editor": false,
             "nodes": [
+                "Wandering pixels (16)",
                 "Wandering pixels (6)",
                 "monstera_donica (7)",
                 "monstera_donica (6)",
+                "monstera_donica (23)",
+                "monstera_donica (22)",
+                "monstera_donica (21)",
+                "monstera_donica (20)",
                 "monstera_donica (4)",
+                "Monstera (16)",
                 "Monstera",
+                "Monstera (17)",
                 "Monstera (10)",
                 "Grass dune 2 (11)",
+                "Monstera (18)",
                 "Monstera (9)"
             ]
         },
         {
             "id": "Layer 14",
+            "is_open_in_editor": false,
             "nodes": [
                 "cicada (15)",
                 "cicada (14)",
@@ -485,19 +536,21 @@
         },
         {
             "id": "Layer 13",
+            "is_open_in_editor": false,
             "nodes": [
                 "garden_ambience"
             ]
         },
         {
             "id": "Layer 12",
+            "is_open_in_editor": false,
             "nodes": [
-                "crosshair",
                 "spawn"
             ]
         },
         {
             "id": "Layer 11",
+            "is_open_in_editor": false,
             "nodes": [
                 "mota (4)",
                 "mota (3)",
@@ -508,14 +561,15 @@
         },
         {
             "id": "Layer 9",
+            "is_open_in_editor": false,
             "nodes": [
-                "donic2 (1)",
                 "donic2-up",
                 "donic2"
             ]
         },
         {
             "id": "garden lights",
+            "is_open_in_editor": false,
             "nodes": [
                 "Strong lamp (2)",
                 "Strong lamp (31)",
@@ -526,6 +580,7 @@
         },
         {
             "id": "New layer",
+            "is_open_in_editor": false,
             "nodes": [
                 "Wandering pixels",
                 "Wandering pixels (1)",
@@ -562,6 +617,7 @@
                 "Monstera (13)",
                 "Monstera (11)",
                 "Monstera (8)",
+                "Monstera (19)",
                 "Monstera (2)",
                 "Monstera (1)",
                 "Monstera (15)",
@@ -571,6 +627,7 @@
                 "monstera_donica (8)",
                 "monstera_donica (5)",
                 "monstera_donica (3)",
+                "monstera_donica (24)",
                 "monstera_donica (2)",
                 "monstera_donica (1)",
                 "monstera_donica",
@@ -602,6 +659,7 @@
                 "Fern (28)",
                 "Fern (3)",
                 "Monstera (5)",
+                "Monstera (20)",
                 "Monstera (6)",
                 "Monstera (7)",
                 "Fern (16)",
@@ -613,7 +671,6 @@
                 "Fern (21)",
                 "Fern (17)",
                 "Fern (15)",
-                "Fern (12)",
                 "Fern (11)",
                 "Fern (10)",
                 "flower_pink (7)",
@@ -624,6 +681,7 @@
                 "flower_pink (2)",
                 "flower_pink (1)",
                 "flower_cyan (8)",
+                "flower_cyan (18)",
                 "flower_cyan (7)",
                 "flower_cyan (6)",
                 "flower_cyan (9)",
@@ -639,6 +697,7 @@
                 "orange_flowerpot (6)",
                 "orange_flowerpot (5)",
                 "orange_flowerpot (4)",
+                "flower_pink (8)",
                 "flower_pink",
                 "monstera_donica (11)",
                 "Fern (8)",
@@ -668,6 +727,7 @@
                 "Grass dune 2 (3)",
                 "Grass dune 2 (4)",
                 "Grass dune 1 (4)",
+                "Grass dune 2 (21)",
                 "Grass dune 2 (5)",
                 "Grass dune 2 (6)",
                 "Grass dune 2 (7)",
@@ -699,7 +759,6 @@
                 "Grass dune 2 (17)",
                 "Grass dune 2 (18)",
                 "Grass dune 1 (16)",
-                "bush (3)",
                 "monstera_donica (19)",
                 "bush (6)",
                 "bush (10)",
@@ -920,14 +979,6 @@
             "type": "@fern",
             "pos": [2141.42041015625, 219.229736328125],
             "rotation": 57.269561767578125,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
-            "id": "Fern (12)",
-            "type": "@fern",
-            "pos": [2686.501708984375, -344.4593505859375],
-            "rotation": -94.65435791015625,
             "size": [126, 121],
             "flip_vertically": true
         },
@@ -1720,7 +1771,8 @@
         {
             "id": "flower_pink",
             "type": "flower_pink",
-            "pos": [1987.0, -417.0]
+            "pos": [1987.0, -417.0],
+            "starting_animation_frame": 3
         },
         {
             "id": "flower_cyan",
@@ -1758,13 +1810,13 @@
         {
             "id": "flower_pink (2)",
             "type": "flower_pink",
-            "pos": [1983.0, -336.0],
+            "pos": [2031.0, -296.0],
             "randomize_starting_animation_frame": true
         },
         {
             "id": "flower_pink (3)",
             "type": "flower_pink",
-            "pos": [2041.0, -297.0],
+            "pos": [2086.0, -252.0],
             "randomize_starting_animation_frame": true
         },
         {
@@ -1778,12 +1830,6 @@
             "type": "@donic2",
             "pos": [2816.0, 96.0],
             "rotation": 90.0,
-            "size": [544, 128]
-        },
-        {
-            "id": "donic2 (1)",
-            "type": "@donic2",
-            "pos": [1681.0, -592.0],
             "size": [544, 128]
         },
         {
@@ -1848,7 +1894,7 @@
         {
             "id": "Fern (21)",
             "type": "@fern",
-            "pos": [2210.767333984375, -226.16104125976563],
+            "pos": [2195.767333984375, -204.16104125976563],
             "rotation": 60.808380126953125,
             "size": [126, 121],
             "flip_vertically": true
@@ -1856,7 +1902,7 @@
         {
             "id": "Fern (22)",
             "type": "@fern",
-            "pos": [2633.290283203125, -455.4154052734375],
+            "pos": [2625.290283203125, -426.4154052734375],
             "rotation": -4.65435791015625,
             "size": [126, 121],
             "flip_vertically": true
@@ -1880,7 +1926,7 @@
         {
             "id": "flower_cyan (7)",
             "type": "flower_cyan",
-            "pos": [2625.225830078125, -263.43701171875],
+            "pos": [2634.225830078125, -251.43701171875],
             "rotation": -30.7647705078125,
             "flip_horizontally": true,
             "randomize_starting_animation_frame": true
@@ -1906,12 +1952,13 @@
         {
             "id": "orange_flowerpot (6)",
             "type": "@orange_flowerpot",
-            "pos": [2634.0, -458.0]
+            "pos": [2636.0, -433.0],
+            "rotation": 4.6759490966796875
         },
         {
             "id": "orange_flowerpot (7)",
             "type": "@orange_flowerpot",
-            "pos": [2226.0, -217.0]
+            "pos": [2211.0, -203.0]
         },
         {
             "id": "donicv2",
@@ -2061,12 +2108,6 @@
             "id": "bush (2)",
             "type": "@bush",
             "pos": [2684.0, 99.0],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (3)",
-            "type": "@bush",
-            "pos": [2659.0, -317.0],
             "color": [181, 255, 0, 255]
         },
         {
@@ -2533,6 +2574,129 @@
             "color": [181, 255, 0, 255]
         },
         {
+            "id": "crate",
+            "type": "crate",
+            "pos": [3327.00048828125, 734.9999389648438],
+            "rotation": -4.419008731842041
+        },
+        {
+            "id": "crate (1)",
+            "type": "crate",
+            "pos": [2562.000244140625, 746.9999389648438],
+            "rotation": 8.839943885803223
+        },
+        {
+            "id": "crate (2)",
+            "type": "crate",
+            "pos": [1358.000244140625, 571.9998168945313],
+            "rotation": -0.7043184638023376
+        },
+        {
+            "id": "crate (3)",
+            "type": "crate",
+            "pos": [3003.0, 709.9999389648438],
+            "rotation": 6.038854598999023
+        },
+        {
+            "id": "crate (4)",
+            "type": "crate",
+            "pos": [2857.000244140625, 709.9998779296875],
+            "rotation": -1.1782230138778687
+        },
+        {
+            "id": "crate (5)",
+            "type": "crate",
+            "pos": [2713.0, 723.9998779296875],
+            "rotation": -0.8967928290367126
+        },
+        {
+            "id": "Grass dune 2 (21)",
+            "type": "@grass_dune_2",
+            "pos": [1726.034912109375, 513.1837158203125],
+            "rotation": -21.559661865234375
+        },
+        {
+            "id": "menu_game_logo",
+            "type": "@menu_game_logo",
+            "pos": [2396.0, -316.0]
+        },
+        {
+            "id": "Monstera (16)",
+            "type": "@monstera",
+            "pos": [1856.0, 758.0],
+            "rotation": -345.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (17)",
+            "type": "@monstera",
+            "pos": [2115.0, 752.0],
+            "rotation": 165.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (18)",
+            "type": "@monstera",
+            "pos": [2212.0, 755.0],
+            "rotation": -105.0
+        },
+        {
+            "id": "Monstera (19)",
+            "type": "@monstera",
+            "pos": [1510.0, 775.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "monstera_donica (20)",
+            "type": "@monstera_donica",
+            "pos": [1859.0, 744.0]
+        },
+        {
+            "id": "monstera_donica (21)",
+            "type": "@monstera_donica",
+            "pos": [1502.0, 763.0]
+        },
+        {
+            "id": "monstera_donica (22)",
+            "type": "@monstera_donica",
+            "pos": [2124.0, 753.0]
+        },
+        {
+            "id": "monstera_donica (23)",
+            "type": "@monstera_donica",
+            "pos": [2222.0, 738.0]
+        },
+        {
+            "id": "flower_cyan (18)",
+            "type": "flower_cyan",
+            "pos": [2662.225830078125, 202.56298828125],
+            "rotation": -30.7647705078125,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "Monstera (20)",
+            "type": "@monstera",
+            "active": false,
+            "pos": [2159.0, -469.0],
+            "rotation": -94.2947998046875,
+            "flip_vertically": true
+        },
+        {
+            "id": "monstera_donica (24)",
+            "type": "@monstera_donica",
+            "active": false,
+            "pos": [2154.0, -488.0]
+        },
+        {
+            "id": "flower_pink (8)",
+            "type": "flower_pink",
+            "active": false,
+            "pos": [1979.0, -353.0]
+        },
+        {
             "id": "garden_ambience",
             "type": "@garden_ambience",
             "pos": [2540.0, -5.0]
@@ -2778,16 +2942,19 @@
             "size": [228, 445]
         },
         {
+            "id": "Wandering pixels (16)",
+            "type": "wandering_pixels",
+            "color": [107, 219, 82, 255],
+            "illuminate": false,
+            "pos": [2130.0, 762.0],
+            "size": [400, 128]
+        },
+        {
             "id": "spawn",
             "type": "team_spawn",
             "faction": "METROPOLIS",
-            "pos": [2507.0, 98.0],
+            "pos": [2497.0, 81.0],
             "rotation": -171.9368896484375
-        },
-        {
-            "id": "crosshair",
-            "type": "ffa_spawn",
-            "pos": [1756.0, 299.0]
         },
         {
             "id": "Organism area",
