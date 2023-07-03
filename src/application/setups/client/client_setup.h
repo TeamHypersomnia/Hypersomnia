@@ -454,8 +454,7 @@ class client_setup :
 				performance.accepted_commands.measure(result.total_accepted);
 
 				if (result.malicious_server) {
-					LOG("There was a problem unpacking steps from the server. Disconnecting.");
-					log_malicious_server();
+					set_disconnect_reason("There was a problem unpacking steps from the server. Disconnecting.");
 					disconnect();
 				}
 
@@ -549,8 +548,6 @@ class client_setup :
 	}
 
 	void perform_demo_player_imgui(augs::window& window);
-
-	void log_malicious_server();
 	void snap_interpolation_of_viewed();
 
 public:
@@ -788,7 +785,7 @@ public:
 		const augs::secure_hash_type& project_hash
 	);
 
-	message_handler_result advance_downloading_session(const std::vector<std::byte>& new_file);
+	message_handler_result advance_downloading_session(const std::vector<std::byte>& next_received_file);
 
 	bool finalize_arena_download();
 

@@ -1,6 +1,14 @@
 #pragma once
+#include <functional>
+#include <vector>
+#include <string>
+#include <optional>
+#include "augs/filesystem/path.h"
+#include "augs/misc/secure_hash.h"
 
 struct arena_downloading_session {
+	using file_requester = std::function<void(const augs::secure_hash_type&, const augs::path_type&)>;
+
 	struct file_hash_info {
 		bool marked_for_download_already = false;
 		std::vector<augs::path_type> output_files;
@@ -25,11 +33,17 @@ struct arena_downloading_session {
 
 	std::unordered_map<augs::secure_hash_type, augs::path_type> content_database;
 
+	file_requester request_file_download;
+
+	arena_downloading_session(
+		const std::string& arena_name,
+		file_requester request_file_download
+	);
+
 	void build_content_database_from_candidate_folders();
-
-	arena_downloading_session(const std::string& arena_name);
-
 	bool try_load_json_from_part_folder(const augs::secure_hash_type&);
+
+	std::optional<augs::secure_hash_type> next_hash_to_download();
 
 	void handle_downloaded_project_json(const std::vector<std::byte>&);
 	void create_files_from_downloaded(const std::vector<std::byte>&);
@@ -50,7 +64,6 @@ struct arena_downloading_session {
 	);
 
 	bool requested_hash_matches(const std::vector<std::byte>&) const;
-	std::optional<augs::secure_hash_type> next_hash_to_download();
 
 	std::size_t get_downloaded_file_index() const {
 		if (current_resource_idx) {
@@ -66,5 +79,5 @@ struct arena_downloading_session {
 
 	std::string get_displayed_file_path() const;
 
-	std::optional<std::string> rearrange_directories();
+	std::optional<std::string> final_rearrange_directories();
 };

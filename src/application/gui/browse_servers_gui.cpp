@@ -7,7 +7,7 @@
 #include "application/gui/browse_servers_gui.h"
 #include "augs/network/netcode_utils.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
-#include "3rdparty/cpp-httplib/httplib.h"
+#include "3rdparty/include_httplib.h"
 #include "augs/templates/thread_templates.h"
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/pointer_to_buffer.h"
@@ -21,6 +21,7 @@
 #include "application/network/resolve_address.h"
 #include "application/masterserver/masterserver_requests.h"
 #include "application/masterserver/gameserver_command_readwrite.h"
+#include "augs/misc/httplib_utils.h"
 
 constexpr auto ping_retry_interval = 1;
 constexpr auto reping_interval = 10;
@@ -478,8 +479,6 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 	}
 }
 
-bool successful(const int http_status_code);
-
 const resolve_address_result* browse_servers_gui_state::find_resolved_official(const netcode_address_t& n) {
 	for (const auto& o : official_server_addresses) {
 		auto compared_for_officiality = o.addr;
@@ -497,6 +496,8 @@ const resolve_address_result* browse_servers_gui_state::find_resolved_official(c
 }
 
 bool browse_servers_gui_state::perform(const browse_servers_input in) {
+	using namespace httplib_utils;
+
 	if (!show) {
 		return false;
 	}

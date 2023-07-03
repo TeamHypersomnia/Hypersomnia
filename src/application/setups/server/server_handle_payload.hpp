@@ -164,6 +164,18 @@ message_handler_result server_setup::handle_payload(
 				break;
 
 			case special_client_request::WAIT_IM_DOWNLOADING_EXTERNALLY:
+				if (!c.is_downloading_files) {
+					server_broadcasted_chat message;
+					message.target = chat_target_type::DOWNLOADING_FILES;
+
+					if (const auto session_id = find_session_id(client_id)) {
+						message.author = *session_id;
+
+						const auto except = client_id;
+						broadcast(message, except);
+					}
+				}
+
 				c.is_downloading_files = true;
 
 				c.last_valid_payload_time = server_time;
@@ -324,18 +336,6 @@ message_handler_result server_setup::handle_payload(
 			}
 			catch (...) {
 				return kick_file_not_found();
-			}
-
-			if (!c.is_downloading_files) {
-				server_broadcasted_chat message;
-				message.target = chat_target_type::DOWNLOADING_FILES;
-
-				if (const auto session_id = find_session_id(client_id)) {
-					message.author = *session_id;
-
-					const auto except = client_id;
-					broadcast(message, except);
-				}
 			}
 
 			c.is_downloading_files = true;

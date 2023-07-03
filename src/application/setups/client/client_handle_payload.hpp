@@ -175,8 +175,7 @@ message_handler_result client_setup::handle_payload(
 		*/
 
 		if (!now_resyncing && state < client_state_type::RECEIVING_INITIAL_SNAPSHOT) {
-			LOG("The server has sent initial state early (state: %x). Disconnecting.", state);
-			log_malicious_server();
+			set_disconnect_reason(typesafe_sprintf("The server has sent initial state early (state: %x). Disconnecting.", state));
 			return abort_v;
 		}
 
@@ -238,9 +237,7 @@ message_handler_result client_setup::handle_payload(
 #if CONTEXTS_SEPARATE
 	else if constexpr (std::is_same_v<T, prestep_client_context>) {
 		if (state != client_state_type::IN_GAME) {
-			LOG("The server has sent prestep context too early (state: %x). Disconnecting.", state);
-
-			log_malicious_server();
+			set_disconnect_reason(typesafe_sprintf("The server has sent prestep context too early (state: %x). Disconnecting.", state));
 			return abort_v;
 		}
 
@@ -258,9 +255,7 @@ message_handler_result client_setup::handle_payload(
 		}
 
 		if (state != client_state_type::IN_GAME) {
-			LOG("The server has sent entropy too early (state: %x). Disconnecting.", state);
-
-			log_malicious_server();
+			set_disconnect_reason(typesafe_sprintf("The server has sent entropy too early (state: %x). Disconnecting.", state));
 			return abort_v;
 		}
 
