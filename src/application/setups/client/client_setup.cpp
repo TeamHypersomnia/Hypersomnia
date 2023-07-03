@@ -341,11 +341,6 @@ void client_setup::request_file_download(const augs::secure_hash_type& hash) {
 		game_channel_type::RELIABLE_MESSAGES,
 		request
 	);
-
-	if (downloading) {
-		downloading->last_requested_file_hash = hash;
-		LOG(downloading->get_displayed_file_path());
-	}
 }
 
 bool client_setup::start_downloading_arena(
@@ -362,29 +357,17 @@ bool client_setup::start_downloading_arena(
 
 	downloading = arena_downloading_session(new_arena_name, file_requester);
 
-	send_payload(
-		game_channel_type::RELIABLE_MESSAGES,
-		special_client_request::WAIT_IM_DOWNLOADING_EXTERNALLY
-	);
+	if (downloading->start(project_hash)) {
+		send_payload(
+			game_channel_type::RELIABLE_MESSAGES,
+			special_client_request::WAIT_IM_DOWNLOADING_EXTERNALLY
+		);
 
-	if (downloading->try_load_json_from_part_folder(project_hash)) {
-		if (const auto first_resource_to_download = downloading->next_hash_to_download()) {
-			request_file_download(*first_resource_to_download);
-		}
-		else {
-			/* 
-				Will likely never happen as it would mean the part folder was already complete.
-				But you never know.
-			*/
-
-			return finalize_arena_download();
-		}
+		return true;
 	}
 	else {
-		request_file_download(project_hash);
+		return finalize_arena_download();
 	}
-
-	return true;
 }
 
 message_handler_result client_setup::advance_downloading_session(
@@ -398,69 +381,33 @@ message_handler_result client_setup::advance_downloading_session(
 		return abort_v;
 	}
 
-	const bool matches = downloading->requested_hash_matches(next_received_file);
-
-	if (!matches) {
-		set_disconnect_reason(typesafe_sprintf("The server sent a file with an incorrect hash.\nExpected: %x\nActual: %x\nDisconnecting.", augs::to_hex_format(downloading->last_requested_file_hash), augs::to_hex_format(augs::secure_hash(next_received_file))));
-		return abort_v;
-	}
-
-	const bool is_project_json_file = downloading->is_downloading_project_json();
-
-	if (is_project_json_file) {
-		try {
-			/* 
-				This could only fail due to read_only_external_resources throwing,
-				which means the json file is ill-formed, unsafe or otherwise incorrect.
-			*/
-
-			downloading->handle_downloaded_project_json(next_received_file);
-		}
-		catch (const augs::json_deserialization_error& err) {
-			set_disconnect_reason("Server sent an invalid arena json file. Disconnecting. Details:\n%x", err.what());
-			return abort_v;
-		}
-		catch (...) {
-			set_disconnect_reason("Server sent an invalid arena json file. Disconnecting.");
-			return abort_v;
-		}
-	}
-	else {
-		downloading->create_files_from_downloaded(next_received_file);
-	}
-
-	if (const auto next_resource_to_download = downloading->next_hash_to_download()) {
-		request_file_download(*next_resource_to_download);
+	if (downloading->advance_with(next_received_file)) {
+		return continue_v;
 	}
 	else {
 		if (finalize_arena_download()) {
 			special_request(special_client_request::RESYNC_ARENA_AFTER_FILES_DOWNLOADED);
+
+			return continue_v;
 		}
 		else {
 			return abort_v;
 		}
 	}
-
-	return continue_v;
 }
 
 bool client_setup::finalize_arena_download() {
 	ensure(downloading.has_value());
 
-	if (downloading) {
-		const auto error = downloading->final_rearrange_directories();
+	if (downloading->has_errors()) {
+		set_disconnect_reason(downloading->get_error());
 		downloading = std::nullopt;
-
-		if (error) {
-			set_disconnect_reason(*error);
-			return false;
-		}
-		else {
-			return try_load_arena_according_to(sv_public_vars, false);
-		}
+		return false;
 	}
 
-	return false;
+	downloading = std::nullopt;
+
+	return try_load_arena_according_to(sv_public_vars, false);
 }
 
 bool client_setup::try_load_arena_according_to(const server_public_vars& new_vars, bool allow_download) {
@@ -1005,26 +952,6 @@ void client_setup::perform_demo_player_imgui(augs::window& window) {
 	}
 }
 
-std::string arena_downloading_session::get_displayed_file_path() const {
-	if (is_downloading_project_json()) {
-		return json_path_in_part_dir.filename().string();
-	}
-
-	if (current_resource_idx) {
-		if (*current_resource_idx < all_needed_resources.size()) {
-			const auto currently_downloaded_hash = all_needed_resources[*current_resource_idx];
-
-			if (const auto entry = mapped_or_nullptr(output_files_by_hash, currently_downloaded_hash)) {
-				if (entry->output_files.size() > 0) {
-					return entry->output_files[0].string();
-				}
-			}
-		}
-	}
-
-	return "";
-}
-
 custom_imgui_result client_setup::perform_custom_imgui(
 	const perform_custom_imgui_input in
 ) {
@@ -1140,7 +1067,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				const auto this_progress = adapter->get_block_progress(game_channel_type::RELIABLE_MESSAGES);
 				const auto this_percent_complete = this_progress.blockSize == 0 ? 0.0f : float(this_progress.downloadedBytes) / this_progress.blockSize;
 
-				if (downloading->is_downloading_resources()) {
+				if (downloading->now_downloading_external_resources()) {
 					const auto downloaded_index = downloading->get_downloaded_file_index();
 					const auto num_all = downloading->num_all_downloaded_files();
 

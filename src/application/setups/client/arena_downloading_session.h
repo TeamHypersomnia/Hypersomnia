@@ -7,7 +7,7 @@
 #include "augs/misc/secure_hash.h"
 
 struct arena_downloading_session {
-	using file_requester = std::function<void(const augs::secure_hash_type&, const augs::path_type&)>;
+	using file_requester_type = std::function<void(const augs::secure_hash_type&, const augs::path_type&)>;
 
 	struct file_hash_info {
 		bool marked_for_download_already = false;
@@ -30,40 +30,28 @@ struct arena_downloading_session {
 	std::optional<std::size_t> current_resource_idx;
 
 	std::unordered_map<augs::secure_hash_type, file_hash_info> output_files_by_hash;
-
 	std::unordered_map<augs::secure_hash_type, augs::path_type> content_database;
 
-	file_requester request_file_download;
+	using hash_and_url = std::pair<augs::secure_hash_type, augs::path_type>;
 
 	arena_downloading_session(
 		const std::string& arena_name,
-		file_requester request_file_download
+		file_requester_type file_requester
 	);
 
-	void build_content_database_from_candidate_folders();
-	bool try_load_json_from_part_folder(const augs::secure_hash_type&);
+	bool start(const augs::secure_hash_type&);
 
-	std::optional<augs::secure_hash_type> next_hash_to_download();
-
-	void handle_downloaded_project_json(const std::vector<std::byte>&);
-	void create_files_from_downloaded(const std::vector<std::byte>&);
-	
-	bool is_downloading_project_json() const {
-		return current_resource_idx == std::nullopt;
-	}
-
-	bool is_downloading_resources() const {
-		return current_resource_idx.has_value();
-	}
-
-	void determine_needed_resources();
-
-	bool try_find_and_paste_file_locally(
-		const augs::secure_hash_type& hash,
-		const augs::path_type& path_in_project
+	bool advance_with(
+		const std::vector<std::byte>& next_received_file
 	);
 
-	bool requested_hash_matches(const std::vector<std::byte>&) const;
+	bool has_errors() const {
+		return last_error.has_value();
+	}
+
+	auto get_error() const {
+		return last_error.has_value() ? *last_error : std::string();
+	}
 
 	std::size_t get_downloaded_file_index() const {
 		if (current_resource_idx) {
@@ -78,6 +66,40 @@ struct arena_downloading_session {
 	}
 
 	std::string get_displayed_file_path() const;
+
+	bool now_downloading_project_json() const {
+		return current_resource_idx == std::nullopt;
+	}
+
+	bool now_downloading_external_resources() const {
+		return current_resource_idx.has_value();
+	}
+
+private:
+	file_requester_type file_requester;
+
+	std::optional<std::string> last_error;
+
+	void finalize_arena_download();
+
+	void request_file_download(const hash_and_url&);
+
+	void build_content_database_from_candidate_folders();
+	bool try_load_json_from_part_folder(const augs::secure_hash_type&);
+
+	std::optional<hash_and_url> next_to_download();
+
+	void handle_downloaded_project_json(const std::vector<std::byte>&);
+	void create_files_from_downloaded(const std::vector<std::byte>&);
+	
+	void determine_needed_resources();
+
+	bool try_find_and_paste_file_locally(
+		const augs::secure_hash_type& hash,
+		const augs::path_type& path_in_project
+	);
+
+	bool requested_hash_matches(const std::vector<std::byte>&) const;
 
 	std::optional<std::string> final_rearrange_directories();
 };

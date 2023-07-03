@@ -2385,6 +2385,23 @@ void server_setup::refresh_runtime_info_for_rcon() {
 	for_each_id_and_client(broadcast_new_info_to_rcons, only_connected_v);
 }
 
+void server_setup::set_client_is_downloading_files(const client_id_type client_id, server_client_state& c) {
+	if (!c.is_downloading_files) {
+		server_broadcasted_chat message;
+		message.target = chat_target_type::DOWNLOADING_FILES;
+
+		if (const auto session_id = find_session_id(client_id)) {
+			message.author = *session_id;
+
+			const auto except = client_id;
+			broadcast(message, except);
+		}
+	}
+
+	c.is_downloading_files = true;
+}
+
+
 #include "augs/readwrite/to_bytes.h"
 
 // TODO: rewrite unit tests to use streams since we're no longer using preserialized_message 
