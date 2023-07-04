@@ -46,8 +46,8 @@ jobs:
     - name: Build
       run: pushd build/current && ninja tests -k 0 && popd
 
-    - name: Archivize the build
-      run: cmake/archive_and_upload.sh Linux master
+    - name: Generate downloadable archives
+      run: cmake/generate_archives.sh Linux master
 
     - uses: actions/upload-artifact@v3
       with:
