@@ -5,7 +5,7 @@ PLATFORM=$1
 GIT_BRANCH=$2
 
 if [ "$GIT_BRANCH" != "master" ]; then
-	echo "Branch is $GIT_BRANCH. Skipping upload."
+	echo "Branch is $GIT_BRANCH. Skipping archivization."
 	exit 0
 fi
 
@@ -65,5 +65,5 @@ if [ -f "$EXE_PATH" ]; then
 		tar -czf $TAR_PATH hypersomnia
 	fi
 else
-	echo "No exe found. Not uploading."
+	echo "No exe found. Nothing to archivize."
 fi
