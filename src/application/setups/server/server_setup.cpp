@@ -113,6 +113,7 @@ server_setup::server_setup(
 
 	if (dedicated == std::nullopt) {
 		integrated_client.init(server_time);
+		integrated_client.state = client_state_type::IN_GAME;
 		integrated_client.settings.chosen_nickname = integrated_client_vars.nickname;
 
 		if (!integrated_client_vars.avatar_image_path.empty()) {
@@ -1507,6 +1508,11 @@ void server_setup::advance_clients_state() {
 			contribute_to_step_entropy();
 		}
 	};
+
+	/* 
+		Default means it will be iterated over all clients, even disconnected ones, 
+		to the exception of the integrated client.
+	*/
 
 	for_each_id_and_client(process_client);
 

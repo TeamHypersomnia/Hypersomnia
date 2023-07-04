@@ -508,15 +508,17 @@ void arena_scoreboard_gui::draw_gui(
 				const auto ping = (*in.player_metas)[player_id.value].stats.ping;
 				auto ping_str = typesafe_sprintf("%x", ping);
 
-				if (ping == 0) {
-					ping_str = "Host";
-				}
+				if (ping >= 0) {
+					if (ping == 0) {
+						ping_str = "Host";
+					}
 
-				if (ping == 255) {
-					ping_str = ">254";
-				}
+					if (ping >= 255) {
+						ping_str = ">254";
+					}
 
-				col_text(ping_str);
+					col_text(ping_str);
+				}
 			}
 
 			next_col();
