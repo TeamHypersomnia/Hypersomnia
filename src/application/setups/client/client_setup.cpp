@@ -484,6 +484,8 @@ message_handler_result client_setup::advance_downloading_session(
 bool client_setup::finalize_arena_download() {
 	ensure(downloading.has_value());
 
+	external_downloader = nullptr;
+
 	if (downloading->has_errors()) {
 		set_disconnect_reason(downloading->get_error());
 		downloading = std::nullopt;
@@ -1386,6 +1388,7 @@ void client_setup::disconnect() {
 	}
 
 	adapter->disconnect();
+	downloading = std::nullopt;
 }
 
 bool client_setup::is_gameplay_on() const {
