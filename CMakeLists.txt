@@ -1191,6 +1191,10 @@ if(UNIX)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif()
 
+if(LINUX)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -unwindlib=libgcc")
+endif()
+
 # We configure additional flags for linker.
 
 if (CLANG AND NOT MSVC)
