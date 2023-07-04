@@ -35,6 +35,7 @@ struct server_client_state {
 	bool pushed_connected_webhook = false;
 
 	bool is_downloading_files = false;
+	bool is_downloading_files_directly = false;
 
 	arena_player_meta meta;
 

@@ -749,6 +749,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/hud_messages/hud_messages_gui.cpp"
 	"src/application/setups/editor/gui/editor_toolbar_gui.cpp"
 	"src/application/setups/client/arena_downloading_session.cpp"
+	"src/application/setups/client/https_file_downloader.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

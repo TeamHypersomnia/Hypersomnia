@@ -1248,6 +1248,10 @@ void server_setup::send_full_arena_snapshot_to(const client_id_type client_id) {
 }
 
 void server_setup::send_complete_solvable_state_to(const client_id_type client_id) {
+	/*
+		Three things: server public vars, client public settings, and the full state snapshot.
+	*/
+
 	server->send_payload(
 		client_id, 
 		game_channel_type::RELIABLE_MESSAGES, 
@@ -1514,7 +1518,7 @@ void server_setup::advance_clients_state() {
 void server_setup::broadcast_shutdown_message() {
 	server_broadcasted_chat message;
 	message.target = chat_target_type::SERVER_SHUTTING_DOWN;
-	message.recipient_shall_kindly_leave = true;
+	message.recipient_effect = recipient_effect_type::DISCONNECT;
 
 	broadcast(message);
 
@@ -1779,7 +1783,7 @@ void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& e
 }
 
 void server_setup::send_packets_to_clients_downloading_files() {
-	const auto target_bandwidth = vars.max_file_bandwidth * 1024 * 1024;
+	const auto target_bandwidth = vars.max_direct_file_bandwidth * 1024 * 1024;
 	const auto max_packets_at_a_time = 10; // 10k at a time can be sent, so to achieve max bandwidth, just 200 fps on a server is enough.
 
 	/* 
@@ -1801,7 +1805,7 @@ void server_setup::send_packets_to_clients_downloading_files() {
 	int num_downloaders = 0;
 
 	for_each_id_and_client([&num_downloaders](const auto, auto& c){
-		if (c.is_downloading_files) {
+		if (c.is_downloading_files_directly) {
 			++num_downloaders;
 		}
 	}, connected_and_integrated_v);
@@ -1813,7 +1817,7 @@ void server_setup::send_packets_to_clients_downloading_files() {
 	packet_interval *= num_downloaders;
 
 	auto send_packets = [&](const auto, auto& c) {
-		if (c.is_downloading_files) {
+		if (c.is_downloading_files_directly) {
 			int times_sent = 0;
 
 			while (c.when_last_sent_file_packet <= current_time && times_sent < max_packets_at_a_time) {
@@ -2223,7 +2227,7 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 	const auto except = kicked_id;
 	broadcast(message, except);
 
-	message.recipient_shall_kindly_leave = true;
+	message.recipient_effect = recipient_effect_type::DISCONNECT;
 
 	server->send_payload(
 		kicked_id,

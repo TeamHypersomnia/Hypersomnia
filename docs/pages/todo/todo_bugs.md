@@ -167,6 +167,16 @@ We have a demo file
 
 # Done
 
+- Problem: solvable stream might be stopped at an arbitrary point when we start downloading externally
+	- fixed with FINISHED_DOWNLOADING notification
+	- worked earlier because the client was sending packets regularly not just keepalives
+	- some entropies might not get through if you download externally and only send keepalive packets
+		- then they suddenly can appear once you start exchanging packets regularly
+	- in case of direct downloads this goes over the reliable channel
+		- so the first file packet can only arrive after the initial solvable gets through
+		- which is why we always end with in-game
+
+
 - all_necessary_sounds might cause a crash on destruct too
 
 - remember to fix your system time before hosting

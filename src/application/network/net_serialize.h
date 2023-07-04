@@ -109,9 +109,11 @@ namespace net_messages {
 			return false;
 		}
 
-		serialize_bool(s, c.recipient_shall_kindly_leave);
-
 		if (!serialize_enum(s, c.target)) {
+			return false;
+		}
+
+		if (!serialize_enum(s, c.recipient_effect)) {
 			return false;
 		}
 

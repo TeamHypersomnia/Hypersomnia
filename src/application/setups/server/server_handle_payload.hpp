@@ -163,7 +163,7 @@ message_handler_result server_setup::handle_payload(
 				c.last_keyboard_activity_time = server_time;
 				break;
 
-			case special_client_request::WAIT_IM_DOWNLOADING_EXTERNALLY:
+			case special_client_request::WAIT_IM_DOWNLOADING_ARENA:
 				set_client_is_downloading_files(client_id, c);
 
 				c.last_valid_payload_time = server_time;
@@ -184,13 +184,24 @@ message_handler_result server_setup::handle_payload(
 
 					if (const auto session_id = find_session_id(client_id)) {
 						message.author = *session_id;
+					}
 
+					{
 						const auto except = client_id;
 						broadcast(message, except);
 					}
+
+					message.recipient_effect = recipient_effect_type::RESUME_RECEIVING_SOLVABLES;
+
+					server->send_payload(
+						client_id,
+						game_channel_type::RELIABLE_MESSAGES,
+						message
+					);
 				}
 
 				c.is_downloading_files = false;
+				c.is_downloading_files_directly = false;
 
 				/* Prevent kick after the inactivity period */
 
@@ -327,6 +338,7 @@ message_handler_result server_setup::handle_payload(
 			}
 
 			set_client_is_downloading_files(client_id, c);
+			c.is_downloading_files_directly = true;
 			c.when_last_sent_file_packet = get_current_time();
 
 			server->send_payload(

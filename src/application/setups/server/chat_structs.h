@@ -5,7 +5,7 @@
 #include "game/enums/faction_type.h"
 #include "game/modes/session_id.h"
 
-enum class chat_target_type : unsigned char {
+enum class chat_target_type : uint8_t {
 	GENERAL,
 	TEAM_ONLY,
 
@@ -23,6 +23,14 @@ enum class chat_target_type : unsigned char {
 	COUNT
 };
 
+enum class recipient_effect_type : uint8_t {
+	NONE,
+	DISCONNECT,
+	RESUME_RECEIVING_SOLVABLES,
+
+	COUNT
+};
+
 struct client_requested_chat {
 	static constexpr auto buf_len = max_chat_message_length_v;
 
@@ -36,5 +44,5 @@ struct server_broadcasted_chat {
 	session_id_type author = session_id_type::dead();
 	chat_target_type target;
 	augs::constant_size_string<buf_len> message;
-	bool recipient_shall_kindly_leave = false;
+	recipient_effect_type recipient_effect = recipient_effect_type::NONE;
 };

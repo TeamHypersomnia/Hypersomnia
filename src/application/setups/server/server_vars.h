@@ -91,7 +91,7 @@ struct server_vars {
 	float log_performance_once_every_secs = 1;
 	float sleep_mult = 0.1f;
 
-	float max_file_bandwidth = 2.0f;
+	float max_direct_file_bandwidth = 2.0f;
 
 	server_webhook_vars webhooks;
 

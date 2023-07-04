@@ -147,8 +147,6 @@ void arena_downloading_session::request_file_download(const hash_and_url& entry)
 
 	last_requested_file_hash = hash;
 	file_requester(hash, url_in_provider);
-
-	LOG(get_displayed_file_path());
 }
 
 bool arena_downloading_session::try_load_json_from_part_folder(

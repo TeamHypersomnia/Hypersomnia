@@ -22,7 +22,7 @@ message_handler_result client_setup::handle_payload(
 	}
 
 	if constexpr (std::is_same_v<T, server_public_vars>) {
-		if (downloading.has_value()) {
+		if (pause_solvable_stream) {
 			/* 
 				Ignore.
 				We will resync everything once we're done anyway.
@@ -91,6 +91,11 @@ message_handler_result client_setup::handle_payload(
 		std::string sender_player_nickname;
 		auto sender_player_faction = faction_type::SPECTATOR;
 
+		if (payload.recipient_effect == recipient_effect_type::RESUME_RECEIVING_SOLVABLES) {
+			/* Has to set it as we have potentially no mode properly setup yet. */
+			sender_player_nickname = vars.nickname;
+		}
+
 		get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
 			[&](const auto& typed_mode) {
 				if (auto entry = typed_mode.find(author_id)) {
@@ -121,7 +126,7 @@ message_handler_result client_setup::handle_payload(
 			client_gui.chat.add_entry(std::move(new_entry));
 		}
 
-		if (payload.recipient_shall_kindly_leave) {
+		if (payload.recipient_effect == recipient_effect_type::DISCONNECT) {
 			if (payload.target == chat_target_type::SERVER_SHUTTING_DOWN) {
 				const auto msg = std::string(payload.message);
 
@@ -156,15 +161,19 @@ message_handler_result client_setup::handle_payload(
 			LOG_NVPS(last_disconnect_reason);
 
 			return abort_v;
-		}	
+		}
+		else if (payload.recipient_effect == recipient_effect_type::RESUME_RECEIVING_SOLVABLES) {
+			pause_solvable_stream = false;
+		}
 	}
 	else if constexpr (std::is_same_v<T, initial_snapshot_payload>) {
-		if (downloading.has_value()) {
+		if (pause_solvable_stream) {
 			/* 
 				Ignore.
 				We will resync everything once we're done anyway.
 			*/
 
+			LOG("Ignoring initial_snapshot_payload during download.");
 			return continue_v;
 		}
 
@@ -245,12 +254,13 @@ message_handler_result client_setup::handle_payload(
 	}
 #endif
 	else if constexpr (std::is_same_v<T, networked_server_step_entropy>) {
-		if (downloading.has_value()) {
+		if (pause_solvable_stream) {
 			/* 
 				Ignore.
 				We will resync everything once we're done anyway.
 			*/
 
+			LOG("Ignoring networked_server_step_entropy during download.");
 			return continue_v;
 		}
 
@@ -286,7 +296,7 @@ message_handler_result client_setup::handle_payload(
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
 	else if constexpr (std::is_same_v<T, public_settings_update>) {
-		if (downloading.has_value()) {
+		if (pause_solvable_stream) {
 			/* 
 				Ignore.
 				We will resync everything once we're done anyway.

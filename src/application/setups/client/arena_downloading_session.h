@@ -8,6 +8,7 @@
 #include "augs/misc/secure_hash.h"
 
 struct arena_downloading_session {
+private:
 	using file_requester_type = std::function<void(const augs::secure_hash_type&, const augs::path_type&)>;
 
 	struct file_hash_info {
@@ -35,6 +36,7 @@ struct arena_downloading_session {
 
 	using hash_and_url = std::pair<augs::secure_hash_type, augs::path_type>;
 
+public:
 	arena_downloading_session(
 		const std::string& arena_name,
 		file_requester_type file_requester
@@ -74,6 +76,10 @@ struct arena_downloading_session {
 
 	bool now_downloading_external_resources() const {
 		return current_resource_idx.has_value();
+	}
+
+	const auto& get_arena_name() const {
+		return arena_name;
 	}
 
 private:

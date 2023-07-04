@@ -61,6 +61,6 @@ struct client_vars {
 	augs::path_type avatar_image_path;
 	augs::maybe<std::string> demo_recording_path = augs::maybe<std::string>::enabled(DEMOS_DIR.string());
 
-	float max_file_bandwidth = 2.0f;
+	float max_direct_file_bandwidth = 2.0f;
 	// END GEN INTROSPECTOR
 };
