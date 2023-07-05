@@ -594,6 +594,10 @@ public:
 	const cosmos& get_viewed_cosmos() const;
 
 	auto get_interpolation_ratio() const {
+		if (pause_solvable_stream) {
+			return 0.0;
+		}
+
 		const auto dt_secs = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
 
 		if (is_replaying()) {
