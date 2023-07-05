@@ -14,6 +14,40 @@ namespace sanitization {
 }
 
 namespace net_messages {
+	template <class Stream, class T>
+	bool unsafe_serialize(Stream& s, T& c) {
+		std::vector<std::byte> bytes;
+
+		if (Stream::IsWriting) {
+			bytes = augs::to_bytes(c);
+		}
+
+		auto length = static_cast<int>(bytes.size());
+
+		/* 
+			To properly get a bound on its maximum size,
+			this type needs to be trivially copyable.
+		*/
+
+		static_assert(std::is_trivially_copyable_v<T>);
+		serialize_int(s, length, 0, sizeof(T));
+
+		if (Stream::IsReading) {
+			bytes.resize(length);
+		}
+
+		serialize_bytes(s, (uint8_t*)bytes.data(), length);
+
+		try {
+			augs::from_bytes(bytes, c);
+		}
+		catch (...) {
+			return false;
+		}
+
+		return true;
+	}
+
 	template <class Stream, class V>
 	bool serialize_trivial_as_bytes(Stream& s, V& v) {
 		static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, V>);
@@ -124,46 +158,12 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream& s, ::net_statistics_update& c) {
-		return serialize_vector_uint8_t(s, c.ping_values, 0, max_mode_players_v);
+		return unsafe_serialize(s, c);
 	}
 
 	template <class Stream>
 	bool serialize(Stream& s, rcon_commands::special& c) {
 		return serialize_enum(s, c);
-	}
-
-	template <class Stream, class T>
-	bool unsafe_serialize(Stream& s, T& c) {
-		std::vector<std::byte> bytes;
-
-		if (Stream::IsWriting) {
-			bytes = augs::to_bytes(c);
-		}
-
-		auto length = static_cast<int>(bytes.size());
-
-		/* 
-			To properly get a bound on its maximum size,
-			this type needs to be trivially copyable.
-		*/
-
-		static_assert(std::is_trivially_copyable_v<T>);
-		serialize_int(s, length, 0, sizeof(T));
-
-		if (Stream::IsReading) {
-			bytes.resize(length);
-		}
-
-		serialize_bytes(s, (uint8_t*)bytes.data(), length);
-
-		try {
-			augs::from_bytes(bytes, c);
-		}
-		catch (...) {
-			return false;
-		}
-
-		return true;
 	}
 
 	template <class Stream>

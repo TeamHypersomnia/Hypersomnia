@@ -921,27 +921,21 @@ void client_setup::exchange_file_packets() {
 	const auto target_bandwidth = vars.max_direct_file_bandwidth * 1024 * 1024;
 	const auto max_packets_at_a_time = 10;
 
-	const auto packets_per_second = float(target_bandwidth) / block_fragment_size_v;
-
-	if (packets_per_second <= 1.0f) {
-		send_keepalive_download_progress();
-		return;
-	}
-
+	const auto packets_per_second = std::max(2.0f, float(target_bandwidth) / block_fragment_size_v);
 	const auto packet_interval = 1.0f / packets_per_second;
 
 	int times_sent = 0;
 
+	send_keepalive_download_progress();
+
 	while (client_time <= current_time && times_sent < max_packets_at_a_time) {
 		client_time += packet_interval;
 
-		adapter->send_packets();
+		send_packets();
 		handle_incoming_payloads();
-		++times_sent;
-		++times_sent_packets;
-	}
 
-	send_download_progress_to_prevent_sent_packet_assert_in_yojimbo();
+		++times_sent;
+	}
 
 	if (client_time < current_time) {
 		client_time = current_time;
@@ -960,34 +954,23 @@ void client_setup::send_download_progress() {
 	);
 }
 
-void client_setup::send_keepalive_download_progress() {
-	ensure(downloading.has_value());
-
-	const auto new_time = yojimbo_time();
-	const bool can_already = new_time - when_sent_last_keepalive > 1.0;
+bool client_setup::send_keepalive_download_progress() {
+	const auto new_time = get_current_time();
+	const bool can_already = new_time - when_sent_last_keepalive >= 0.5f;
 
 	if (can_already) {
 		LOG("Sending keepalive download progress.");
 
-		client_time = new_time;
-		when_sent_last_keepalive = client_time;
-
+		when_sent_last_keepalive = new_time;
 		send_download_progress();
 
-		adapter->send_packets();
-		handle_incoming_payloads();
+		return true;
 	}
+
+	return false;
 }
 
-void client_setup::send_download_progress_to_prevent_sent_packet_assert_in_yojimbo() {
-	if (times_sent_packets > 1000) {
-		times_sent_packets = 0;
-
-		send_download_progress();
-	}
-}
-
-void client_setup::send_packets_if_its_time() {
+void client_setup::send_packets() {
 	if (is_replaying()) {
 		return;
 	}
@@ -995,8 +978,6 @@ void client_setup::send_packets_if_its_time() {
 	if (vars.network_simulator.value.loss_percent >= 100.f) {
 		return;
 	}
-
-	++times_sent_packets;
 
 	adapter->send_packets();
 }

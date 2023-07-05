@@ -145,8 +145,6 @@ class client_setup :
 	demo_step_num_type recorded_demo_step = 0;
 	std::size_t written_messages = 0;
 
-	std::size_t times_sent_packets = 0;
-
 	std::vector<demo_step> unflushed_demo_steps;
 	std::vector<demo_step> demo_steps_being_flushed;
 	std::future<void> future_flushed_demo;
@@ -206,8 +204,7 @@ class client_setup :
 
 	void handle_incoming_payloads();
 	void send_pending_commands();
-	void send_packets_if_its_time();
-	void send_download_progress_to_prevent_sent_packet_assert_in_yojimbo();
+	void send_packets();
 	void exchange_file_packets();
 	void traverse_nat_if_required();
 
@@ -341,7 +338,7 @@ class client_setup :
 
 		{
 			auto scope = measure_scope(performance.sending_packets);
-			send_packets_if_its_time();
+			send_packets();
 			traverse_nat_if_required();
 		}
 
@@ -576,7 +573,7 @@ class client_setup :
 	void advance_external_downloader();
 
 	void send_download_progress();
-	void send_keepalive_download_progress();
+	bool send_keepalive_download_progress();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -705,7 +702,9 @@ public:
 		if (client_time < current_time) {
 			if (downloading) {
 				if (is_trying_external_download()) {
-					send_keepalive_download_progress();
+					if (send_keepalive_download_progress()) {
+						send_packets();
+					}
 
 					advance_external_downloader();
 				}

@@ -782,7 +782,7 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     max_buffered_client_commands = 1280,
     state_hash_once_every_tick = 1,
-    send_net_statistics_update_once_every_secs = 1,
+    send_net_statistics_update_once_every_secs = 0.5,
 
     auto_authorize_loopback_for_rcon = true,
     max_unauthorized_rcon_commands = 100,

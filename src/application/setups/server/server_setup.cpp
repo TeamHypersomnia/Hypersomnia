@@ -1601,7 +1601,7 @@ message_handler_result server_setup::handle_rcon_payload(
 	else if constexpr(std::is_same_v<P, server_vars>) {
 		LOG("New server vars from the client.");
 
-		apply(typed_payload, true);
+		apply(typed_payload);
 
 		return continue_v;
 	}
@@ -1670,25 +1670,41 @@ void server_setup::broadcast_net_statistics() {
 	if (interval > 0 && server_time - when_last_sent_net_statistics > std::max(interval, 0.5f)) {
 		net_statistics_update update;
 
-		auto gather_stats = [&](const auto client_id, const auto& c) {
-			if (c.state != client_state_type::IN_GAME) {
-				return;
-			}
+		auto clamped = [](const auto value) {
+			return static_cast<uint8_t>(std::clamp(value, 1, 255));
+		};
 
-			const auto max_ping = std::numeric_limits<uint8_t>::max();
-			const auto clamped_ping = [&]() {
+		auto reread_stats = [&](const auto client_id, auto& c) {
+			const auto clamped_ping = [&]() -> uint8_t {
 				if (to_mode_player_id(client_id) == get_local_player_id()) {
 					return 0;
 				}
 
 				const auto info = server->get_network_info(client_id);
 				const auto rounded_ping = static_cast<int>(std::round(info.rtt_ms));
-				return std::clamp(rounded_ping, 1, int(max_ping));
+				return clamped(rounded_ping);
 			}();
 
-			last_player_metas[client_id].stats.ping = clamped_ping;
+			c.meta.stats.ping = clamped_ping;
 
-			update.ping_values.push_back(static_cast<uint8_t>(clamped_ping));
+			if (!c.is_downloading_files) {
+				/* Set to 100% */
+				c.meta.stats.download_progress = 255;
+			}
+
+			integrated_player_metas[client_id].stats = c.meta.stats;
+		};
+
+		auto fill_update = [&](const auto, const auto& c) {
+			const auto ping = static_cast<uint8_t>(c.meta.stats.ping);
+			const auto progress = c.meta.stats.download_progress;
+
+			const auto entry = net_statistics_entry {
+				ping,
+				progress
+			};
+
+			update.stats.push_back(entry);
 		};
 
 		auto send_stats = [&](const auto client_id, const auto& c) {
@@ -1709,7 +1725,9 @@ void server_setup::broadcast_net_statistics() {
 			);
 		};
 
-		for_each_id_and_client(gather_stats, connected_and_integrated_v);
+		for_each_id_and_client(reread_stats, connected_and_integrated_v);
+		for_each_id_and_client(fill_update, connected_and_integrated_v);
+
 		for_each_id_and_client(send_stats, only_connected_v);
 
 		when_last_sent_net_statistics = server_time;
@@ -2251,7 +2269,7 @@ void server_setup::ban(const client_id_type& id, const std::string& reason) {
 
 std::optional<arena_player_metas> server_setup::get_new_player_metas() {
 	if (rebuild_player_meta_viewables) {
-		auto& metas = last_player_metas;
+		auto& metas = integrated_player_metas;
 		
 		auto make_meta = [&](const auto client_id, const auto& cc) {
 			metas[client_id].avatar.image_bytes = cc.meta.avatar.image_bytes;
@@ -2267,7 +2285,7 @@ std::optional<arena_player_metas> server_setup::get_new_player_metas() {
 }
 
 const arena_player_metas* server_setup::find_player_metas() const {
-	return std::addressof(last_player_metas);
+	return std::addressof(integrated_player_metas);
 }
 	
 bool server_setup::handle_input_before_game(

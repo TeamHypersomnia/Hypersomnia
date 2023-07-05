@@ -147,7 +147,7 @@ class server_setup :
 	bool request_restart_after_shutdown = false;
 
 	bool rebuild_player_meta_viewables = false;
-	arena_player_metas last_player_metas;
+	arena_player_metas integrated_player_metas;
 
 	client_gui_state integrated_client_gui;
 	std::string failure_reason;

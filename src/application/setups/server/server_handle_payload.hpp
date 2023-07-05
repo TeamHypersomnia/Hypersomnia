@@ -299,7 +299,8 @@ message_handler_result server_setup::handle_payload(
 		}
 	}
 	else if constexpr (std::is_same_v<T, ::download_progress_message>) {
-
+		c.meta.stats.download_progress = payload.progress;
+		LOG("Client %x download progress: %x", client_id, float(payload.progress) / 255);
 	}
 	else if constexpr (std::is_same_v<T, ::request_arena_file_download>) {
 		if (!vars.allow_direct_arena_file_downloads) {

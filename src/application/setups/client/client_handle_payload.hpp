@@ -317,16 +317,20 @@ message_handler_result client_setup::handle_payload(
 		player_metas[payload.subject_id.value].public_settings = payload.new_settings;
 	}
 	else if constexpr (std::is_same_v<T, net_statistics_update>) {
-		const auto& ping_values = payload.ping_values;
+		const auto& mode_player_stats = payload.stats;
 
-		int ping_value_i = 0;
+		std::size_t player_i = 0;
 
 		get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
 			[&](const auto& typed_mode) {
 				typed_mode.for_each_player_id(
 					[&](const mode_player_id& id) {
-						if (ping_value_i < static_cast<int>(ping_values.size())) {
-							player_metas[id.value].stats.ping = ping_values[ping_value_i++];
+						if (player_i < mode_player_stats.size()) {
+							auto& in_stats = mode_player_stats[player_i++];
+							auto& out_stats = player_metas[id.value].stats;
+
+							out_stats.ping = in_stats.ping;
+							out_stats.download_progress = in_stats.download_progress;
 
 							return callback_result::CONTINUE;
 						}
