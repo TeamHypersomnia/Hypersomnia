@@ -155,19 +155,28 @@ message_handler_result server_setup::handle_payload(
 		}
 
 		c.pending_entropies.emplace_back(std::move(payload));
-		//LOG("Received %x th command from client. ", c.pending_entropies.size());
+		// LOG("Received %xth command from client. ", c.pending_entropies.size());
 	}
 	else if constexpr (std::is_same_v<T, special_client_request>) {
+		auto wait_download = [&](const auto type) {
+			set_client_is_downloading_files(client_id, c, type);
+
+			c.reset_solvable_stream();
+			c.last_valid_payload_time = server_time;
+			c.last_keyboard_activity_time = server_time;
+		};
+
 		switch (payload) {
 			case special_client_request::RESET_AFK_TIMER:
 				c.last_keyboard_activity_time = server_time;
 				break;
 
-			case special_client_request::WAIT_IM_DOWNLOADING_ARENA:
-				set_client_is_downloading_files(client_id, c, downloading_type::EXTERNALLY);
+			case special_client_request::WAIT_IM_DOWNLOADING_ARENA_EXTERNALLY:
+				wait_download(downloading_type::EXTERNALLY);
+				break;
 
-				c.last_valid_payload_time = server_time;
-				c.last_keyboard_activity_time = server_time;
+			case special_client_request::WAIT_IM_DOWNLOADING_ARENA_DIRECTLY:
+				wait_download(downloading_type::DIRECTLY);
 				break;
 
 			case special_client_request::RESYNC_ARENA_AFTER_FILES_DOWNLOADED:
@@ -209,9 +218,14 @@ message_handler_result server_setup::handle_payload(
 
 				/* 
 					Resync entire solvable as if the client has just connected. 
+
+					The client's solvable stream is guaranteed to be clean right now (unless they're malicious but it's their loss)
+
+					It's because client makes sure to start sending entropies
+					ONLY AFTER RECEIVING the first full state snapshot,
+					as if they have just connected for the first time.
 				*/
 
-				c.reset_solvable_stream();
 				send_complete_solvable_state_to(client_id);
 				reinference_necessary = true;
 

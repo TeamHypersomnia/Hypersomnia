@@ -332,6 +332,7 @@ class client_setup :
 					get_local_player_id()
 				);
 
+				//LOG("In game. Sending client entropy. Predicted %x: ", receiver.predicted_entropies.size());
 				send_to_server(new_client_entropy);
 			}
 		}

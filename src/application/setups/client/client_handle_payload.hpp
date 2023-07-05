@@ -164,6 +164,13 @@ message_handler_result client_setup::handle_payload(
 		}
 		else if (payload.recipient_effect == recipient_effect_type::RESUME_RECEIVING_SOLVABLES) {
 			pause_solvable_stream = false;
+
+			/*
+				Stop sending entropies until the next full arena snapshot,
+				as if we just have entered the game.
+			*/
+
+			state = client_state_type::RECEIVING_INITIAL_SNAPSHOT;
 		}
 	}
 	else if constexpr (std::is_same_v<T, initial_snapshot_payload>) {

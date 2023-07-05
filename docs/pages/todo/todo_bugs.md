@@ -167,6 +167,16 @@ We have a demo file
 
 # Done
 
+- WE DON'T WANT TO CLEAR client pending entropies on desync because it might happen mid-gameplay. We want to apply all actions applied during resync.
+- Note client begins sending net entropies as soon as receiving RESUME_SOLVABLES but clears them soon after when they receive initial snapshot.
+	- The server thinks these entropies came after clearing them.
+	- The server does not know which of the arrived client entropies are post client-side clear.
+- Note it's different with RESYNC command on desync.
+	- So we shouldn't clear solvable stream there.
+	- ::RESYNC_ARENA arrives synchronously with other client-entropies.
+		- so the server knows that all entropies post-resync are after clearing.
+	- However we don't want to clear the buffer here because resync request might arrive mid-gameplay.
+
 - Problem: solvable stream might be stopped at an arbitrary point when we start downloading externally
 	- fixed with FINISHED_DOWNLOADING notification
 	- worked earlier because the client was sending packets regularly not just keepalives

@@ -319,20 +319,6 @@ client_setup::~client_setup() {
 }
 
 void client_setup::request_direct_file_download(const augs::secure_hash_type& hash) {
-	{
-		/*
-			As soon as downloading.has_value(),
-			entropies stop being unpacked altogether (in_game becomes false),
-			and no incoming entropies are handled from the server.
-
-			The receiver will be untouched until after the download has completed.
-			The server is instructed to clear the client's pending entropies,
-			as well as accepted pending entropy counter, on their side as well.
-		*/
-
-		receiver.clear();
-	}
-
 	request_arena_file_download request;
 	request.requested_file_hash = hash;
 
@@ -386,8 +372,30 @@ bool client_setup::start_downloading_session() {
 	if (downloading->start(last_download_request.project_hash)) {
 		send_payload(
 			game_channel_type::RELIABLE_MESSAGES,
-			special_client_request::WAIT_IM_DOWNLOADING_ARENA
+			is_trying_external_download() ? 
+			special_client_request::WAIT_IM_DOWNLOADING_ARENA_EXTERNALLY : 
+			special_client_request::WAIT_IM_DOWNLOADING_ARENA_DIRECTLY
 		);
+
+		/*
+			As soon as pause_solvable_stream == true,
+			entropies stop being unpacked altogether (in_game becomes false),
+			they stop being sent,
+			and no incoming entropies are handled from the server.
+
+			The receiver in its clean state will be untouched until after these three are completed:
+			- the download has completed and RESYNC_ARENA_AFTER_FILES_DOWNLOADED is sent,
+			- the server responds with RESUME_RECEIVING_SOLVABLES, which makes the client go into RECEIVING_INITIAL_SNAPSHOT state.
+			- and THEN the server sends the full arena snapshot.
+
+			Sending entropies will resume as well due to state changing from RECEIVING_INITIAL_SNAPSHOT to IN_GAME.
+
+			The server is instructed to clear the client's pending entropies/accepted entropy counter
+			on receiving RESYNC_ARENA_AFTER_FILES_DOWNLOADED.
+		*/
+
+		LOG("Clear simulation receiver: starting download.");
+		receiver.clear();
 
 		pause_solvable_stream = true;
 
@@ -1257,6 +1265,9 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				else if (state == C::RECEIVING_INITIAL_SNAPSHOT_CORRECTION) {
 					text("Receiving the initial state correction:");
 				}
+				else if (pause_solvable_stream) {
+					text("Download complete. Rejoining the game.");
+				}
 				else {
 					text("Unknown error.");
 				}
@@ -1373,7 +1384,7 @@ void client_setup::disconnect() {
 }
 
 bool client_setup::is_gameplay_on() const {
-	if (downloading.has_value()) {
+	if (pause_solvable_stream) {
 		return false;
 	}
 
