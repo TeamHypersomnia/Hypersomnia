@@ -1687,7 +1687,7 @@ void server_setup::broadcast_net_statistics() {
 
 			c.meta.stats.ping = clamped_ping;
 
-			if (!c.is_downloading_files) {
+			if (c.downloading_status == downloading_type::NONE) {
 				/* Set to 100% */
 				c.meta.stats.download_progress = 255;
 			}
@@ -1829,7 +1829,7 @@ void server_setup::send_packets_to_clients_downloading_files() {
 	int num_downloaders = 0;
 
 	for_each_id_and_client([&num_downloaders](const auto, auto& c){
-		if (c.is_downloading_files_directly) {
+		if (c.downloading_status == downloading_type::DIRECTLY) {
 			++num_downloaders;
 		}
 	}, connected_and_integrated_v);
@@ -1841,7 +1841,7 @@ void server_setup::send_packets_to_clients_downloading_files() {
 	packet_interval *= num_downloaders;
 
 	auto send_packets = [&](const auto, auto& c) {
-		if (c.is_downloading_files_directly) {
+		if (c.downloading_status == downloading_type::DIRECTLY) {
 			int times_sent = 0;
 
 			while (c.when_last_sent_file_packet <= current_time && times_sent < max_packets_at_a_time) {
@@ -2413,10 +2413,15 @@ void server_setup::refresh_runtime_info_for_rcon() {
 	for_each_id_and_client(broadcast_new_info_to_rcons, only_connected_v);
 }
 
-void server_setup::set_client_is_downloading_files(const client_id_type client_id, server_client_state& c) {
-	if (!c.is_downloading_files) {
+void server_setup::set_client_is_downloading_files(const client_id_type client_id, server_client_state& c, const downloading_type type) {
+	if (type > c.downloading_status) {
 		server_broadcasted_chat message;
-		message.target = chat_target_type::DOWNLOADING_FILES;
+
+		message.target = 
+			type == downloading_type::DIRECTLY ? 
+			chat_target_type::DOWNLOADING_FILES_DIRECTLY : 
+			chat_target_type::DOWNLOADING_FILES
+		;
 
 		if (const auto session_id = find_session_id(client_id)) {
 			message.author = *session_id;
@@ -2426,7 +2431,7 @@ void server_setup::set_client_is_downloading_files(const client_id_type client_i
 		}
 	}
 
-	c.is_downloading_files = true;
+	c.downloading_status = type;
 }
 
 

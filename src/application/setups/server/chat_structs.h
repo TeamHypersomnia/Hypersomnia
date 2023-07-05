@@ -19,6 +19,7 @@ enum class chat_target_type : uint8_t {
 	FINISHED_DOWNLOADING,
 
 	SERVER_SHUTTING_DOWN,
+	DOWNLOADING_FILES_DIRECTLY,
 
 	COUNT
 };

@@ -164,7 +164,7 @@ message_handler_result server_setup::handle_payload(
 				break;
 
 			case special_client_request::WAIT_IM_DOWNLOADING_ARENA:
-				set_client_is_downloading_files(client_id, c);
+				set_client_is_downloading_files(client_id, c, downloading_type::EXTERNALLY);
 
 				c.last_valid_payload_time = server_time;
 				c.last_keyboard_activity_time = server_time;
@@ -173,7 +173,7 @@ message_handler_result server_setup::handle_payload(
 			case special_client_request::RESYNC_ARENA_AFTER_FILES_DOWNLOADED:
 				LOG("Client is asking for a resync after download.");
 				
-				if (!c.is_downloading_files) {
+				if (c.downloading_status == downloading_type::NONE) {
 					LOG("Client notified about downloads completion twice.");
 					return abort_v;
 				}
@@ -200,8 +200,7 @@ message_handler_result server_setup::handle_payload(
 					);
 				}
 
-				c.is_downloading_files = false;
-				c.is_downloading_files_directly = false;
+				c.downloading_status = downloading_type::NONE;
 
 				/* Prevent kick after the inactivity period */
 
@@ -338,8 +337,7 @@ message_handler_result server_setup::handle_payload(
 				return kick_file_not_found();
 			}
 
-			set_client_is_downloading_files(client_id, c);
-			c.is_downloading_files_directly = true;
+			set_client_is_downloading_files(client_id, c, downloading_type::DIRECTLY);
 			c.when_last_sent_file_packet = get_current_time();
 
 			server->send_payload(

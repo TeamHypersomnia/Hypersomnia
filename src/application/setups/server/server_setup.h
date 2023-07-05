@@ -626,5 +626,5 @@ public:
 
 	void refresh_runtime_info_for_rcon();
 
-	void set_client_is_downloading_files(client_id_type, server_client_state& c);
+	void set_client_is_downloading_files(client_id_type, server_client_state& c, downloading_type);
 };

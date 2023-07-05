@@ -11,6 +11,12 @@
 
 using client_pending_entropies = std::vector<total_client_entropy>;
 
+enum class downloading_type {
+	NONE,
+	EXTERNALLY,
+	DIRECTLY
+};
+
 struct server_client_state {
 	using type = client_state_type;
 
@@ -34,8 +40,7 @@ struct server_client_state {
 	std::string uploaded_avatar_url;
 	bool pushed_connected_webhook = false;
 
-	bool is_downloading_files = false;
-	bool is_downloading_files_directly = false;
+	downloading_type downloading_status = downloading_type::NONE;
 
 	arena_player_meta meta;
 
@@ -50,7 +55,7 @@ struct server_client_state {
 	}
 
 	bool should_move_to_spectators_due_to_afk(const server_vars& v, const net_time_t server_time) const {
-		if (is_downloading_files) {
+		if (downloading_status != downloading_type::NONE) {
 			return true;
 		}
 
@@ -61,7 +66,7 @@ struct server_client_state {
 	}
 
 	bool should_kick_due_to_afk(const server_vars& v, const net_time_t server_time) const {
-		if (is_downloading_files) {
+		if (downloading_status != downloading_type::NONE) {
 			return false;
 		}
 
@@ -72,7 +77,7 @@ struct server_client_state {
 	}
 
 	bool should_kick_due_to_inactivity(const server_vars& v, const net_time_t server_time) const {
-		if (is_downloading_files) {
+		if (downloading_status != downloading_type::NONE) {
 			return false;
 		}
 
@@ -109,7 +114,7 @@ struct server_client_state {
 	}
 
 	bool should_pause_solvable_stream() const {
-		return is_downloading_files; 
+		return downloading_status != downloading_type::NONE; 
 	}
 
 	std::string get_nickname() const {
