@@ -42,4 +42,4 @@ chmod +x linuxdeploy-x86_64.AppImage
 mkdir -p /tmp/AppDir/usr/share/
 cp -r hypersomnia/ /tmp/AppDir/usr/share/
 
-OUTPUT="Hypersomnia.AppImage" ARCH=x86_64 ./linuxdeploy-x86_64.AppImage --appdir=/tmp/AppDir --icon-file=hypersomnia/content/gfx/metropolis_square_logo.png --icon-filename=Hypersomnia --desktop-file=Hypersomnia.desktop --executable=build/current/Hypersomnia --custom-apprun=AppRun --output=appimage
+OUTPUT="Hypersomnia.AppImage" UPDATE_INFORMATION="zsync|https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage.zsync" ARCH=x86_64 ./linuxdeploy-x86_64.AppImage --appdir=/tmp/AppDir --icon-file=hypersomnia/content/gfx/metropolis_square_logo.png --icon-filename=Hypersomnia --desktop-file=Hypersomnia.desktop --executable=build/current/Hypersomnia --custom-apprun=AppRun --output=appimage

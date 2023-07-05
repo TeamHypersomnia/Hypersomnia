@@ -54,3 +54,4 @@ jobs:
         name: Linux-AppImage
         path: |
           Hypersomnia.AppImage
+          Hypersomnia.AppImage.zsync
