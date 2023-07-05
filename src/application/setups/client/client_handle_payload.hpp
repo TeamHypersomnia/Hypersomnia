@@ -100,7 +100,7 @@ message_handler_result client_setup::handle_payload(
 			[&](const auto& typed_mode) {
 				if (auto entry = typed_mode.find(author_id)) {
 					sender_player_faction = entry->get_faction();
-					sender_player_nickname = entry->get_chosen_name();
+					sender_player_nickname = entry->get_nickname();
 				}
 			}
 		);

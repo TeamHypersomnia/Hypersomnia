@@ -2,7 +2,7 @@
 #include "game/common_state/entity_name_str.h"
 
 struct arena_player_order {
-	const entity_name_str& chosen_name;
+	const entity_name_str& nickname;
 	const int score;
 
 	bool operator<(const arena_player_order& b) const {
@@ -10,7 +10,7 @@ struct arena_player_order {
 		const auto bs = b.score;
 
 		if (as == bs) {
-			return chosen_name < b.chosen_name;
+			return nickname < b.nickname;
 		}
 
 		return as > bs;
@@ -18,13 +18,13 @@ struct arena_player_order {
 };
 
 struct arena_player_order_info {
-	entity_name_str chosen_name;
+	entity_name_str nickname;
 	int score = 0;
 
 	bool operator<(const arena_player_order_info& b) const {
 		return 
-			arena_player_order { chosen_name, score } 
-			< arena_player_order { b.chosen_name, b.score } 
+			arena_player_order { nickname, score } 
+			< arena_player_order { b.nickname, b.score } 
 		;
 	}
 };

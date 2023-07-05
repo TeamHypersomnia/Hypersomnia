@@ -285,7 +285,7 @@ void arena_scoreboard_gui::draw_gui(
 	const auto max_score = typed_mode.calc_max_faction_score();
 
 	auto get_nickname_str = [&](const auto& player_id, const auto& player_data) {
-		auto str = player_data.get_chosen_name();
+		auto str = player_data.get_nickname();
 
 		if (in.player_metas) {
 			const auto progress = (*in.player_metas)[player_id.value].stats.download_progress;

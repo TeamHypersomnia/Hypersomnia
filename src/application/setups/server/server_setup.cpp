@@ -659,7 +659,7 @@ void server_setup::send_heartbeat_to_server_list() {
 							return static_cast<uint8_t>(std::clamp(i, 0, 255));
 						};
 
-						players.push_back({ player.get_chosen_name(), converted(player.stats.calc_score()), converted(player.stats.deaths) });
+						players.push_back({ player.get_nickname(), converted(player.stats.calc_score()), converted(player.stats.deaths) });
 					}
 				);
 
@@ -910,7 +910,7 @@ std::string server_setup::find_client_nickname(const client_id_type& id) const {
 	get_arena_handle().on_mode(
 		[&](const auto& mode) {
 			if (const auto entry = mode.find(to_mode_player_id(id))) {
-				nickname = ": " + entry->get_chosen_name();
+				nickname = ": " + entry->get_nickname();
 			}
 		}
 	);
@@ -2155,7 +2155,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		[&](const auto& typed_mode) {
 			if (const auto entry = typed_mode.find(payload.author)) {
 				sender_player_faction = entry->get_faction();
-				sender_player_nickname = entry->get_chosen_name();
+				sender_player_nickname = entry->get_nickname();
 			}
 		}
 	);

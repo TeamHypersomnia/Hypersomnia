@@ -48,8 +48,8 @@ int arena_mode_player_stats::calc_score() const {
 }
 
 bool arena_mode_player::operator<(const arena_mode_player& b) const {
-	const auto ao = arena_player_order { get_chosen_name(), stats.calc_score() };
-	const auto bo = arena_player_order { b.get_chosen_name(), b.stats.calc_score() };
+	const auto ao = arena_player_order { get_nickname(), stats.calc_score() };
+	const auto bo = arena_player_order { b.get_nickname(), b.stats.calc_score() };
 
 	return ao < bo;
 }
@@ -394,7 +394,7 @@ bool arena_mode::add_player_custom(const input_type in, const add_player_input& 
 	}
 
 	LOG_NVPS(new_id.value, next_session_id.value);
-	new_player.session.chosen_name = add_in.name;
+	new_player.session.nickname = add_in.name;
 	new_player.session.id = next_session_id;
 	++next_session_id;
 
@@ -412,9 +412,9 @@ bool arena_mode::add_player_custom(const input_type in, const add_player_input& 
 	return true;
 }
 
-mode_player_id arena_mode::add_player(const input_type in, const entity_name_str& chosen_name) {
+mode_player_id arena_mode::add_player(const input_type in, const entity_name_str& nickname) {
 	if (const auto new_id = find_first_free_player(); new_id.is_set()) {
-		const auto result = add_player_custom(in, { new_id, chosen_name });
+		const auto result = add_player_custom(in, { new_id, nickname });
 		(void)result;
 		ensure(result);
 		return new_id;
@@ -795,7 +795,7 @@ entity_id arena_mode::create_character_for_player(
 		}();
 
 		if (handle.alive()) {
-			cosmic::set_specific_name(handle, p.get_chosen_name());
+			cosmic::set_specific_name(handle, p.get_nickname());
 
 			if (const auto sentience = handle.template find<components::sentience>()) {
 				if (in.rules.enable_player_colors) {
@@ -1161,7 +1161,7 @@ void arena_mode::count_knockout(const logic_step step, const input_type in, cons
 		if (const auto mode_id = lookup(handle.get_id()); mode_id.is_set()) {
 			if (const auto player_data = find(mode_id)) {
 				participant.id = mode_id;
-				participant.name = player_data->get_chosen_name();
+				participant.name = player_data->get_nickname();
 				participant.faction = player_data->get_faction();
 			}
 		}
@@ -1891,7 +1891,7 @@ void arena_mode::migrate(const input_type in, const arena_migrated_session& sess
 
 		new_player.session.faction = faction_mapping.at(new_player.session.faction);
 		on_faction_changed_for(in, faction_type::DEFAULT, mode_id);
-		LOG("Moving %x to %x", new_player.get_chosen_name(), format_enum(new_player.get_faction()));
+		LOG("Moving %x to %x", new_player.get_nickname(), format_enum(new_player.get_faction()));
 	}
 
 	next_session_id = session.next_session_id;
@@ -1909,7 +1909,7 @@ void arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 			messages::game_notification notification;
 
 			notification.subject_mode_id = a.id;
-			notification.subject_name = entry->get_chosen_name();
+			notification.subject_name = entry->get_nickname();
 			notification.payload = messages::joined_or_left::JOINED;
 
 			step.post_message(std::move(notification));
@@ -1928,7 +1928,7 @@ void arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 			messages::game_notification notification;
 
 			notification.subject_mode_id = g.removed_player;
-			notification.subject_name = entry->get_chosen_name();
+			notification.subject_name = entry->get_nickname();
 			notification.payload = messages::joined_or_left::LEFT;
 
 			step.post_message(std::move(notification));
@@ -2202,7 +2202,7 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 
 					messages::game_notification notification;
 					notification.subject_mode_id = id;
-					notification.subject_name = player_data->get_chosen_name();
+					notification.subject_name = player_data->get_nickname();
 					notification.payload = choice;
 
 					step.post_message(std::move(notification));
@@ -2378,7 +2378,7 @@ void arena_mode::report_match_result(const input_type in, const const_logic_step
 		new_entry.kills = player.stats.knockouts;
 		new_entry.assists = player.stats.assists;
 		new_entry.deaths = player.stats.deaths;
-		new_entry.nickname = player.get_chosen_name();
+		new_entry.nickname = player.get_nickname();
 		new_entry.score = player.stats.calc_score();
 
 		return new_entry;
@@ -2442,7 +2442,7 @@ void arena_mode::post_team_match_start(const input_type in, const logic_step ste
 
 	auto setup_team = [&](auto& into, const auto faction) {
 		for_each_player_in(faction, [&](const auto&, const auto& data) {
-			into.push_back({ data.get_chosen_name() });
+			into.push_back({ data.get_nickname() });
 
 			return callback_result::CONTINUE;
 		});
@@ -2476,8 +2476,8 @@ void arena_mode::check_duel_of_honor(const input_type in, const logic_step step)
 					duellist_2 = second_id;
 
 					messages::duel_of_honor_message duel;
-					duel.first_player = first->get_chosen_name();
-					duel.second_player = second->get_chosen_name();
+					duel.first_player = first->get_nickname();
+					duel.second_player = second->get_nickname();
 
 					step.post_message(duel);
 				}
@@ -2953,7 +2953,7 @@ auto arena_mode::find_player_by_impl(S& self, const E& identifier) {
 		auto& player_data = it.second;
 
 		if constexpr(std::is_same_v<entity_name_str, E>) {
-			if (player_data.session.chosen_name == identifier) {
+			if (player_data.session.nickname == identifier) {
 				return std::addressof(it);
 			}
 		}
@@ -2991,16 +2991,16 @@ const arena_mode_player* arena_mode::find(const session_id_type& session_id) con
 	return nullptr;
 }
 
-arena_mode_player* arena_mode::find_player_by(const entity_name_str& chosen_name) {
-	if (const auto r = find_player_by_impl(*this, chosen_name)) {
+arena_mode_player* arena_mode::find_player_by(const entity_name_str& nickname) {
+	if (const auto r = find_player_by_impl(*this, nickname)) {
 		return std::addressof(r->second);
 	}
 
 	return nullptr;
 }
 
-const arena_mode_player* arena_mode::find_player_by(const entity_name_str& chosen_name) const {
-	if (const auto r = find_player_by_impl(*this, chosen_name)) {
+const arena_mode_player* arena_mode::find_player_by(const entity_name_str& nickname) const {
+	if (const auto r = find_player_by_impl(*this, nickname)) {
 		return std::addressof(r->second);
 	}
 
@@ -3218,7 +3218,7 @@ mode_player_id arena_mode::get_next_to_spectate(
 	}
 
 	// TODO: Optimize
-	if (const auto player = find_player_by(it->chosen_name)) {
+	if (const auto player = find_player_by(it->nickname)) {
 		return lookup(player->controlled_character_id);
 	}
 
@@ -3288,8 +3288,8 @@ void arena_mode::handle_duel_desertion(const input_type in, const logic_step ste
 
 			duel_interrupted.deserter_score = get_score(deserter_faction);
 			duel_interrupted.opponent_score = get_score(opponent_faction);
-			duel_interrupted.deserter_nickname = deserter_state->get_chosen_name();
-			duel_interrupted.opponent_nickname = opponent_state->get_chosen_name();
+			duel_interrupted.deserter_nickname = deserter_state->get_nickname();
+			duel_interrupted.opponent_nickname = opponent_state->get_nickname();
 
 			step.post_message(duel_interrupted);
 		}

@@ -142,8 +142,8 @@ struct arena_mode_player {
 	bool is_bot = false;
 	// END GEN INTROSPECTOR
 
-	arena_mode_player(const entity_name_str& chosen_name = {}) {
-		session.chosen_name = chosen_name;
+	arena_mode_player(const entity_name_str& nickname = {}) {
+		session.nickname = nickname;
 	}
 
 	bool operator<(const arena_mode_player& b) const;
@@ -152,8 +152,8 @@ struct arena_mode_player {
 		return session.is_set();
 	}
 
-	const auto& get_chosen_name() const {
-		return session.chosen_name;
+	const auto& get_nickname() const {
+		return session.nickname;
 	}
 
 	const auto& get_faction() const {
@@ -165,7 +165,7 @@ struct arena_mode_player {
 	}
 
 	auto get_order() const {
-		return arena_player_order_info { get_chosen_name(), stats.calc_score() };
+		return arena_player_order_info { get_nickname(), stats.calc_score() };
 	}
 };
 
@@ -360,7 +360,7 @@ private:
 	bool add_player_custom(input, const add_player_input&);
 
 	void remove_player(input, logic_step, const mode_player_id&);
-	mode_player_id add_player(input, const entity_name_str& chosen_name);
+	mode_player_id add_player(input, const entity_name_str& nickname);
 
 	faction_choice_result auto_assign_faction(input, const mode_player_id&);
 	faction_choice_result choose_faction(const_input, const mode_player_id&, const faction_type faction);
@@ -448,9 +448,9 @@ public:
 
 	unsigned get_score(faction_type) const;
 
-	player_type* find_player_by(const entity_name_str& chosen_name);
+	player_type* find_player_by(const entity_name_str& nickname);
 	player_type* find(const mode_player_id&);
-	const player_type* find_player_by(const entity_name_str& chosen_name) const;
+	const player_type* find_player_by(const entity_name_str& nickname) const;
 	const player_type* find(const mode_player_id&) const;
 
 	const player_type* find(const session_id_type&) const;

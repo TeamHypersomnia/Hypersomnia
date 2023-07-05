@@ -145,7 +145,7 @@ void test_mode::create_controlled_character_for(const input_type in, const mode_
 
 				pending_inits.push_back(new_character);
 
-				cosmic::set_specific_name(new_character, entry->get_chosen_name());
+				cosmic::set_specific_name(new_character, entry->get_nickname());
 				entry->controlled_character_id = new_character.get_id();
 			}
 		);
@@ -184,7 +184,7 @@ bool test_mode::add_player_custom(const input_type in, const add_player_input& a
 		return false;
 	}
 
-	new_player.session.chosen_name = add_in.name;
+	new_player.session.nickname = add_in.name;
 	new_player.session.id = next_session_id;
 	new_player.session.faction = considered_faction;
 	++next_session_id;
@@ -206,7 +206,7 @@ void test_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 			messages::game_notification notification;
 
 			notification.subject_mode_id = a.id;
-			notification.subject_name = entry->get_chosen_name();
+			notification.subject_name = entry->get_nickname();
 			notification.payload = messages::joined_or_left::JOINED;
 
 			step.post_message(std::move(notification));
@@ -218,7 +218,7 @@ void test_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 			messages::game_notification notification;
 
 			notification.subject_mode_id = g.removed_player;
-			notification.subject_name = entry->get_chosen_name();
+			notification.subject_name = entry->get_nickname();
 			notification.payload = messages::joined_or_left::LEFT;
 
 			step.post_message(std::move(notification));
@@ -387,7 +387,7 @@ auto test_mode::find_player_by_impl(S& self, const E& identifier) {
 		auto& player_data = it.second;
 
 		if constexpr(std::is_same_v<entity_name_str, E>) {
-			if (player_data.session.chosen_name == identifier) {
+			if (player_data.session.nickname == identifier) {
 				return std::addressof(it);
 			}
 		}
@@ -430,16 +430,16 @@ const test_mode_player* test_mode::find(const session_id_type& session_id) const
 	return nullptr;
 }
 
-test_mode_player* test_mode::find_player_by(const entity_name_str& chosen_name) {
-	if (const auto r = find_player_by_impl(*this, chosen_name)) {
+test_mode_player* test_mode::find_player_by(const entity_name_str& nickname) {
+	if (const auto r = find_player_by_impl(*this, nickname)) {
 		return std::addressof(r->second);
 	}
 
 	return nullptr;
 }
 
-const test_mode_player* test_mode::find_player_by(const entity_name_str& chosen_name) const {
-	if (const auto r = find_player_by_impl(*this, chosen_name)) {
+const test_mode_player* test_mode::find_player_by(const entity_name_str& nickname) const {
+	if (const auto r = find_player_by_impl(*this, nickname)) {
 		return std::addressof(r->second);
 	}
 
@@ -470,8 +470,8 @@ uint32_t test_mode::get_max_num_active_players(const const_input) const {
 }
 
 bool test_mode_player::operator<(const test_mode_player& b) const {
-	const auto ao = arena_player_order { get_chosen_name(), stats.calc_score() };
-	const auto bo = arena_player_order { b.get_chosen_name(), b.stats.calc_score() };
+	const auto ao = arena_player_order { get_nickname(), stats.calc_score() };
+	const auto bo = arena_player_order { b.get_nickname(), b.stats.calc_score() };
 
 	return ao < bo;
 }

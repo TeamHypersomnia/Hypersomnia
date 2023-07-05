@@ -490,7 +490,7 @@ void arena_gui_state::draw_mode_gui(
 
 				if (tool_owner.is_set()) {
 					if (const auto owner_data = typed_mode.find(tool_owner)) {
-						return owner_data->get_chosen_name() + "'s";
+						return owner_data->get_nickname() + "'s";
 					}
 				}
 

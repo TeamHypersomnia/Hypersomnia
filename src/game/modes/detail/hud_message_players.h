@@ -13,12 +13,12 @@ void hud_message_2_players(
 	messages::two_player_message msg;
 
 	if (first) {
-		msg.first_name = first->get_chosen_name();
+		msg.first_name = first->get_nickname();
 		msg.first_faction = first->get_faction();
 	}
 
 	if (second) {
-		msg.second_name = second->get_chosen_name();
+		msg.second_name = second->get_nickname();
 		msg.second_faction = second->get_faction();
 	}
 

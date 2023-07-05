@@ -116,7 +116,7 @@ void arena_spectator_gui::draw_gui(
 	});
 
 	const bool last_man_standing = num_conscious == 1 && spectated_is_conscious;
-	const auto name_text = formatted_string(spectated->get_chosen_name(), style(in.gui_fonts.larger_gui, white));
+	const auto name_text = formatted_string(spectated->get_nickname(), style(in.gui_fonts.larger_gui, white));
 
 	const auto& key_map = in.config.general_gui_controls;
 
