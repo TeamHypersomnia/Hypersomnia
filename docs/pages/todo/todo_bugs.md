@@ -5,6 +5,13 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- It looks like the stuck udp transmissions were due to acks not going through because of too small sequence buffers for acked packets.
+	- We WON'T have this problem normally because we're otherwise always sending at a tickrate of 60.
+		- so the packets will go through.
+		- (even with claarity it went through if we set bandwidth to 0)
+		- So we shouldn't worry about initial state because these blocks will be small and always sent without additional bandwidth
+	- However to not bloat the ack system + have adaptive bandwidth we could simply just send hash+index requests over the unreliable channel, given the file sizes (provided along with json file preferably)
+
 - normalize the footstep sounds
 
 - editor crashes when deleting lots (almost all) reources which are still in use

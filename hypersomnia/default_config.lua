@@ -51,7 +51,7 @@ return {
 
 	cert_pem_path = "",
 	key_pem_path = "",
-      max_direct_file_bandwidth = 0.5
+      max_direct_file_bandwidth = 1
   },
 
   float_consistency_test = {
@@ -824,7 +824,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       show_recent_chat_messages_num = 30,
       keep_recent_chat_messages_for_seconds = 22,
 	},
-      max_direct_file_bandwidth = 0.5
+      max_direct_file_bandwidth = 1
   },
 
   performance = {
