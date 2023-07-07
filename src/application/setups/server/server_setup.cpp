@@ -964,7 +964,7 @@ server_public_vars server_setup::make_public_vars() const {
 
 	pub.required_arena_hash = current_arena_hash;
 	pub.playtesting_context = vars.playtesting_context;
-	//pub.from_autosave = current_arena_from_autosave;
+	pub.arena_from_autosave = current_arena_from_autosave;
 
 	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR.string());
 

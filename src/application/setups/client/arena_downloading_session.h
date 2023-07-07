@@ -39,7 +39,8 @@ private:
 public:
 	arena_downloading_session(
 		const std::string& arena_name,
-		file_requester_type file_requester
+		file_requester_type file_requester,
+		bool from_autosave
 	);
 
 	bool start(const augs::secure_hash_type&);
@@ -84,6 +85,7 @@ public:
 
 private:
 	file_requester_type file_requester;
+	bool from_autosave = false;
 
 	std::optional<std::string> last_error;
 

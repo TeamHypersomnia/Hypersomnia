@@ -9,10 +9,12 @@
 
 arena_downloading_session::arena_downloading_session(
 	const std::string& arena_name,
-	arena_downloading_session::file_requester_type file_requester
+	arena_downloading_session::file_requester_type file_requester,
+	const bool from_autosave
 ) : 
 	arena_name(arena_name),
-	file_requester(file_requester)
+	file_requester(file_requester),
+	from_autosave(from_autosave)
 {
 	part_dir_path = DOWNLOADED_ARENAS_DIR / arena_name;
 	part_dir_path += ".part";
@@ -50,7 +52,8 @@ bool arena_downloading_session::start(const augs::secure_hash_type& project_hash
 		}
 	}
 	else {
-		const auto json_url = arena_name + ".json";
+		const auto autosave_url = std::string("autosave.json");
+		const auto json_url = from_autosave ? autosave_url : arena_name + ".json";
 
 		request_file_download({ project_hash, json_url });
 		return true;

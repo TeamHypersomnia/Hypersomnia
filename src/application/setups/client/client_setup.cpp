@@ -344,7 +344,11 @@ bool client_setup::setup_external_arena_download_session() {
 			this->external_downloader->download_file(location);
 		};
 
-		downloading = arena_downloading_session(last_download_request.arena_name, external_file_requester);
+		downloading = arena_downloading_session(
+			last_download_request.arena_name,
+			external_file_requester,
+			sv_public_vars.arena_from_autosave
+		);
 
 		return true;
 	}
@@ -365,7 +369,11 @@ void client_setup::setup_direct_arena_download_session() {
 		this->request_direct_file_download(hash);
 	};
 
-	downloading = arena_downloading_session(last_download_request.arena_name, direct_file_requester);
+	downloading = arena_downloading_session(
+		last_download_request.arena_name,
+		direct_file_requester,
+		sv_public_vars.arena_from_autosave
+	);
 }
 
 bool client_setup::start_downloading_session() {
