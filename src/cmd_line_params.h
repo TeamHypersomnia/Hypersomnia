@@ -4,6 +4,8 @@
 #include "augs/network/network_types.h"
 
 struct cmd_line_params {
+	std::string complete_command_line;
+
 	std::string live_log_path;
 
 	augs::path_type exe_path;
@@ -35,9 +37,12 @@ struct cmd_line_params {
 
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
+		complete_command_line = exe_path;
 
 		for (int i = 1; i < argc;) {
 			const auto a = std::string(argv[i++]);
+
+			complete_command_line += " " + a;
 
 			if (begins_with(a, "-psn")) {
 				continue;

@@ -229,6 +229,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	LOG("Parsing command-line parameters.");
 
 	const auto params = cmd_line_params(argc, argv);
+	LOG("Complete command line:\n%x", params.complete_command_line);
 
 	auto config_ptr = [&]() {
 		auto result = std::make_unique<config_lua_table>(canon_config);

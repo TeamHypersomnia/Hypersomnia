@@ -1122,7 +1122,7 @@ void settings_gui_state::perform(
 			case settings_pane::CLIENT: {
 				auto& scope_cfg = config.client;
 
-				const auto label = typesafe_sprintf("Chosen nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
+				const auto label = typesafe_sprintf("Nickname (%x-%x characters)", min_nickname_length_v, max_nickname_length_v);
 
 				revertable_input_text(label, scope_cfg.nickname);
 

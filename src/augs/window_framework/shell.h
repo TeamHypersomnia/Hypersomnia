@@ -6,5 +6,10 @@ namespace augs {
 	void open_url(const std::string&);
 	void open_text_editor(const std::string& on_file);
 
-	int restart_application(const std::string& executable, const std::string& arguments);
+	int restart_application(
+		const int previous_argc,
+		const char* const * const previous_argv,
+		const std::string& executable,
+		std::vector<std::string> arguments
+	);
 }

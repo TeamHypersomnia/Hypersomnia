@@ -184,23 +184,16 @@ int main(const int argc, const char* const * const argv) {
 				return EXIT_FAILURE;
 			}
 
-			case work_result::RELAUNCH: {
-				LOG("main: Application requested relaunch.");
-				save_success_logs();
-
-				return augs::restart_application(exe_path.string(), "");
-			}
-
 			case work_result::RELAUNCH_DEDICATED_SERVER: {
 				LOG("main: Dedicated server requested relaunch.");
 				save_success_logs();
 
-				return augs::restart_application(exe_path.string(), "--dedicated-server --suppress-server-webhook");
+				return augs::restart_application(argc, argv, exe_path.string(), { "--suppress-server-webhook" });
 			}
 
 			case work_result::RELAUNCH_UPGRADED: {
 				LOG("main: Application requested relaunch due to a successful upgrade.");
-				return augs::restart_application(exe_path.string(), "--upgraded-successfully");
+				return augs::restart_application(argc, argv, exe_path.string(), { "--upgraded-successfully" });
 			}
 
 			default: 

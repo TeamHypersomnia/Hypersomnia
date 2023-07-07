@@ -23,21 +23,13 @@ namespace augs {
 	void open_text_editor(const std::string& on_file) {
 		augs::shell("\"" + std::filesystem::absolute(augs::path_type(on_file)).string() + "\"");
 	}
-
-	int restart_application(const std::string& executable, const std::string& arguments) {
-		if (augs::spawn_detached_process(executable, arguments)) {
-			return EXIT_SUCCESS;
-		}
-
-		return EXIT_FAILURE;
-	}
 }
 #elif PLATFORM_UNIX
 #include <cstdlib>
 
 namespace augs {
 	int shell(const std::string& s) {
-		const auto command = "$SHELL -c \"" + s + "\"";
+		const auto command = "$SHELL -c '" + s + "'";
 		LOG("SHELL COMMAND: %x", command);
 		return std::system(command.c_str());
 	}
@@ -52,14 +44,6 @@ namespace augs {
 #endif
 
 		augs::shell(command.string());
-	}
-
-	int restart_application(const std::string& executable, const std::string& arguments) {
-		if (augs::spawn_detached_process(executable, arguments)) {
-			return EXIT_SUCCESS;
-		}
-
-		return EXIT_FAILURE;
 	}
 }
 #else
@@ -85,3 +69,40 @@ namespace augs {
 #endif
 }
 
+#include "augs/templates/container_templates.h"
+
+namespace augs {
+	int restart_application(
+		const int previous_argc, 
+		const char* const * const previous_argv,
+		const std::string& executable, 
+		std::vector<std::string> added_arguments
+	) {
+		auto previous_arguments = std::string();
+
+		for (int i = 1; i < previous_argc; ++i) {
+			const auto arg = std::string(previous_argv[i]);
+			previous_arguments += arg + " ";
+
+			/* Prevent duplicate flags */
+			erase_element(added_arguments, arg);
+		}
+
+		auto all_added_arguments = std::string();
+
+		for (const auto& a : added_arguments) {
+			all_added_arguments += a + " ";
+		}
+
+		if (all_added_arguments.size() > 0) {
+			/* Remove trailing space */
+			all_added_arguments.pop_back();
+		}
+
+		if (augs::spawn_detached_process(executable, previous_arguments + all_added_arguments)) {
+			return EXIT_SUCCESS;
+		}
+
+		return EXIT_FAILURE;
+	}
+}

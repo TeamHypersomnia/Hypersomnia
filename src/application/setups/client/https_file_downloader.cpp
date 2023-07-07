@@ -26,8 +26,8 @@ void https_file_downloader::worker_func() {
 	client.enable_server_certificate_verification(true);
 #endif
 	client.set_follow_location(true);
-	client.set_read_timeout(2);
-	client.set_write_timeout(2);
+	client.set_read_timeout(3);
+	client.set_write_timeout(3);
 	client.set_keep_alive(true);
 
 	while (keepRunning) {

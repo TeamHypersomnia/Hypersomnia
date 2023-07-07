@@ -6,46 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- post external fixing
-    - nah it's something with hashes actually, probably autosaves at work again, or clrfs, see the downloaded logs
-
-    - maybe increase http timeout to 3? if there were problems with externals we'd see it on our own
-    - send stat keepalives more often because they get stuck or just not stop sending packets at all
-    
-- We could also use UDT later, looks legit
-    - just send the list of all hashes once and send it in a single chunk?
-    - per file is okay too I guess
-
-- guess for now we could leave a conservative number like 1mb and focus on ingame map catalogue
-
-- we could just send big-ass packets and hope for the best but with just 1% packet loss we'd lose 10% packets at 600 kb/s (since then i'd need to send 10 packets), that becomes way worse if the loss is 2-3%
-    - so literally any block based approach that i come up with will be vastly better
-
-- well the udp approach is certainly more fun and decentralized
-    - and we can easily read the files asynchronously
-        - note that since the messages are by definition unreliable the clients themselves will repeat the requests until the files are loaded lol
-    - just have to send the project file size and then ask for the list of all file sizes in a block
-
-- wait.. can't we just setup a tcp/ip relay with the masterserver?
-    - We need it anyway to establish a connection in the first place
-
-    
-- Such large packet buffers could really fuck up our performance
-    - and these udp transfers might still fail
-    - but let's at least test it
-
-- chosen_name -> nickname
-- Http downloads from external arena provider.
-    - Problem: a server might easily end up with out-of-date maps on disk.
-        - Either someone might start a dedicated server without updating it (though the normal game client will autoupdate 'tracked' maps on start)
-            - Or a running server might end up having out-of-date maps if new ones are uploaded to some public provider.
-    - The server can check for a specific map update *before* launching the map.
-        - The previous map can simply be on indefinitely
-        - Could even be precached during match summary
-
-- add player lists to server browser
+- relaunch the server with the exact same CLI
 
 - Map catalogue
+    - Note external arena provider and ingame catalogue source are conceptually two different links
+        - even though they'll coincide for the official server
+
     - Problems to solve
         - What if we update maps while the servers already have them loaded?
             - The existing clients still need a way to download the correct ones
@@ -80,6 +46,45 @@ summary: That which we are brainstorming at the moment.
 - Unless we autoupload any map to the host
     - Yeah I think it's bad to assume tcp will also work after punching
 - In any case, if we're not doing tcp/ip, we need the file_download_link payload regardless if we're doing uploads or some relay
+
+
+- post external fixing
+    - nah it's something with hashes actually, probably autosaves at work again, or clrfs, see the downloaded logs
+
+    - maybe increase http timeout to 3? if there were problems with externals we'd see it on our own
+    - send stat keepalives more often because they get stuck or just not stop sending packets at all
+    
+- We could also use UDT later, looks legit
+    - just send the list of all hashes once and send it in a single chunk?
+    - per file is okay too I guess
+
+- guess for now we could leave a conservative number like 1mb and focus on ingame map catalogue
+
+- we could just send big-ass packets and hope for the best but with just 1% packet loss we'd lose 10% packets at 600 kb/s (since then i'd need to send 10 packets), that becomes way worse if the loss is 2-3%
+    - so literally any block based approach that i come up with will be vastly better
+
+- well the udp approach is certainly more fun and decentralized
+    - and we can easily read the files asynchronously
+        - note that since the messages are by definition unreliable the clients themselves will repeat the requests until the files are loaded lol
+    - just have to send the project file size and then ask for the list of all file sizes in a block
+
+- wait.. can't we just setup a tcp/ip relay with the masterserver?
+    - We need it anyway to establish a connection in the first place
+
+    
+- Such large packet buffers could really fuck up our performance
+    - and these udp transfers might still fail
+    - but let's at least test it
+
+- Http downloads from external arena provider.
+    - Problem: a server might easily end up with out-of-date maps on disk.
+        - Either someone might start a dedicated server without updating it (though the normal game client will autoupdate 'tracked' maps on start)
+            - Or a running server might end up having out-of-date maps if new ones are uploaded to some public provider.
+    - The server can check for a specific map update *before* launching the map.
+        - The previous map can simply be on indefinitely
+        - Could even be precached during match summary
+
+- add player lists to server browser
 
 - map statistics from server_list_json
     - counted only when >= 2 players are fighting
