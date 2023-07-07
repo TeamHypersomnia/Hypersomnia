@@ -79,6 +79,10 @@ public:
 							augs::for_each_in_directory(
 								root,
 								[&](const auto& p) {
+									if (::ends_with(p.string(), ".part") || ::ends_with(p.string(), ".old")) {
+										return callback_result::CONTINUE;
+									}
+
 									out_entries.push_back({ std::filesystem::relative(p, root) });
 									return callback_result::CONTINUE;
 								},

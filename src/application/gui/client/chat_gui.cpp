@@ -180,6 +180,12 @@ chat_gui_entry chat_gui_entry::from(
 			new_entry.overridden_message_color = yellow;
 			break;
 
+		case chat_target_type::DOWNLOADING_FILES_DIRECTLY:
+			new_entry.author.clear();
+			new_entry.message = typesafe_sprintf("%x is downloading files directly over UDP.", author);
+			new_entry.overridden_message_color = yellow;
+			break;
+
 		case chat_target_type::FINISHED_DOWNLOADING:
 			new_entry.author.clear();
 			new_entry.message = typesafe_sprintf("%x finished downloading files.", author);

@@ -138,7 +138,11 @@ struct main_menu_gui {
 		const auto output = context.get_output();
 		const auto screen_size = context.get_screen_size();
 
-		output.color_overlay(screen_size, rgba{ 0, 0, 0, 140 });
+		const bool draw_overlay = false;
+
+		if (draw_overlay) {
+			output.color_overlay(screen_size, rgba{ 0, 0, 0, 140 });
+		}
 
 		root.draw_background_behind_buttons(context);
 		world.draw(context);

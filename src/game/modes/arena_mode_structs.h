@@ -42,13 +42,13 @@ enum class scoreboard_icon_type {
 
 struct arena_migrated_player {
 	// GEN INTROSPECTOR struct arena_migrated_player
-	entity_name_str chosen_name;
+	entity_name_str nickname;
 	session_id_type id = session_id_type::dead();
 	faction_type faction = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
 
 	bool is_set() const {
-		return !chosen_name.empty();
+		return !nickname.empty();
 	}
 };
 

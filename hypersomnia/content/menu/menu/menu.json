@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "menu",
-        "version_timestamp": "2023-06-27 23:00:06.132481 UTC"
+        "version_timestamp": "2023-07-03 23:44:10.519497 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -13,8 +13,7 @@
         "ambient_light_color": [0, 67, 90, 255]
     },
     "playtesting": {
-        "mode": "quick_test",
-        "bots": 53
+        "mode": "quick_test"
     },
     "game_modes": {
         "quick_test": {
@@ -33,6 +32,14 @@
         }
     },
     "external_resources": [
+        {
+            "path": "gfx/blanks/blank4.png",
+            "file_hash": "9e090662f4d3ea91946d4464ede66453eba1975716c16b877453c8061040c438",
+            "id": "@blank4",
+            "domain": "FOREGROUND",
+            "size": [1, 1],
+            "stretch_when_resized": true
+        },
         {
             "path": "gfx/garden/bush.png",
             "file_hash": "c2175c5d0915e83fe56616ce31a5b19257a4cb295d8158df90420dfac7062324",
@@ -432,6 +439,22 @@
             }
         },
         {
+            "path": "menu_game_logo.png",
+            "file_hash": "421db1f8f65dcf1008fd1ad1cb1e2593eaa75531dd7d5030f49104416561d794",
+            "id": "@menu_game_logo",
+            "domain": "FOREGROUND",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [225, 254, 225, 255],
+            "neon_color": [0, 255, 32, 255],
+            "size": [585, 104],
+            "as_nonphysical": {
+                "full_illumination": true
+            }
+        },
+        {
             "path": "sfx/garden_ambience.ogg",
             "file_hash": "9d78d3277628418a8b205970fd79a0d8d79814fa1158cb5d3462823f0bc06e38",
             "id": "@garden_ambience",
@@ -441,25 +464,32 @@
     ],
     "layers": [
         {
-            "id": "Layer 3",
+            "id": "Layer 5",
             "nodes": [
-                "portal_circle"
+                "menu_game_logo"
             ]
         },
         {
-            "id": "Layer 2"
-        },
-        {
-            "id": "Layer 1",
+            "id": "Layer 11",
             "nodes": [
-                "Wandering pixels (6)",
-                "monstera_donica (7)",
-                "monstera_donica (6)",
-                "monstera_donica (4)",
-                "Monstera",
-                "Monstera (10)",
-                "Grass dune 2 (11)",
-                "Monstera (9)"
+                "mota (4)",
+                "mota (3)",
+                "mota (6)",
+                "mota (5)",
+                "mota (2)",
+                "mota (1)",
+                "mota",
+                "Mota (5)",
+                "Mota (9)",
+                "Mota (8)",
+                "Mota (7)",
+                "Mota (6)",
+                "Mota (4)",
+                "Mota (10)",
+                "Mota (3)",
+                "Mota (2)",
+                "Mota (1)",
+                "Mota"
             ]
         },
         {
@@ -474,6 +504,9 @@
                 "cicada (9)",
                 "cicada (8)",
                 "cicada (7)",
+                "cicada (18)",
+                "cicada (17)",
+                "cicada (16)",
                 "cicada (6)",
                 "cicada (5)",
                 "cicada (4)",
@@ -484,7 +517,49 @@
             ]
         },
         {
+            "id": "Layer 4",
+            "is_open_in_editor": false,
+            "nodes": [
+                "crate (5)",
+                "crate (4)",
+                "crate (3)",
+                "crate (2)",
+                "crate (1)",
+                "crate"
+            ]
+        },
+        {
+            "id": "Layer 3",
+            "is_open_in_editor": false,
+            "nodes": [
+                "portal_circle"
+            ]
+        },
+        {
+            "id": "Layer 1",
+            "is_open_in_editor": false,
+            "nodes": [
+                "Wandering pixels (16)",
+                "Wandering pixels (6)",
+                "monstera_donica (7)",
+                "monstera_donica (6)",
+                "monstera_donica (23)",
+                "monstera_donica (22)",
+                "monstera_donica (21)",
+                "monstera_donica (20)",
+                "monstera_donica (4)",
+                "Monstera (16)",
+                "Monstera",
+                "Monstera (17)",
+                "Monstera (10)",
+                "Grass dune 2 (11)",
+                "Monstera (18)",
+                "Monstera (9)"
+            ]
+        },
+        {
             "id": "Layer 13",
+            "is_open_in_editor": false,
             "nodes": [
                 "garden_ambience"
             ]
@@ -492,30 +567,21 @@
         {
             "id": "Layer 12",
             "nodes": [
-                "crosshair",
                 "spawn"
-            ]
-        },
-        {
-            "id": "Layer 11",
-            "nodes": [
-                "mota (4)",
-                "mota (3)",
-                "mota (2)",
-                "mota (1)",
-                "mota"
             ]
         },
         {
             "id": "Layer 9",
             "nodes": [
-                "donic2 (1)",
+                "donic2-up-up (1)",
+                "donic2-up-up",
                 "donic2-up",
                 "donic2"
             ]
         },
         {
             "id": "garden lights",
+            "is_open_in_editor": false,
             "nodes": [
                 "Strong lamp (2)",
                 "Strong lamp (31)",
@@ -529,6 +595,7 @@
             "nodes": [
                 "Wandering pixels",
                 "Wandering pixels (1)",
+                "Wandering pixels (17)",
                 "Wandering pixels (3)",
                 "Wandering pixels (4)",
                 "Wandering pixels (15)",
@@ -562,6 +629,7 @@
                 "Monstera (13)",
                 "Monstera (11)",
                 "Monstera (8)",
+                "Monstera (19)",
                 "Monstera (2)",
                 "Monstera (1)",
                 "Monstera (15)",
@@ -571,6 +639,7 @@
                 "monstera_donica (8)",
                 "monstera_donica (5)",
                 "monstera_donica (3)",
+                "monstera_donica (24)",
                 "monstera_donica (2)",
                 "monstera_donica (1)",
                 "monstera_donica",
@@ -602,6 +671,7 @@
                 "Fern (28)",
                 "Fern (3)",
                 "Monstera (5)",
+                "Monstera (20)",
                 "Monstera (6)",
                 "Monstera (7)",
                 "Fern (16)",
@@ -613,7 +683,6 @@
                 "Fern (21)",
                 "Fern (17)",
                 "Fern (15)",
-                "Fern (12)",
                 "Fern (11)",
                 "Fern (10)",
                 "flower_pink (7)",
@@ -624,6 +693,8 @@
                 "flower_pink (2)",
                 "flower_pink (1)",
                 "flower_cyan (8)",
+                "flower_cyan (18)",
+                "flower_cyan (19)",
                 "flower_cyan (7)",
                 "flower_cyan (6)",
                 "flower_cyan (9)",
@@ -639,22 +710,16 @@
                 "orange_flowerpot (6)",
                 "orange_flowerpot (5)",
                 "orange_flowerpot (4)",
+                "flower_pink (8)",
                 "flower_pink",
                 "monstera_donica (11)",
+                "Fern (12)",
+                "Fern (9)",
+                "Fern (6)",
                 "Fern (8)",
                 "Fern (7)",
                 "Fern (5)",
                 "Fern (4)",
-                "Mota (5)",
-                "Mota (9)",
-                "Mota (8)",
-                "Mota (7)",
-                "Mota (6)",
-                "Mota (4)",
-                "Mota (3)",
-                "Mota (2)",
-                "Mota (1)",
-                "Mota",
                 "Bush (4)",
                 "Bush (3)",
                 "Grass dune 1 (1)",
@@ -668,6 +733,7 @@
                 "Grass dune 2 (3)",
                 "Grass dune 2 (4)",
                 "Grass dune 1 (4)",
+                "Grass dune 2 (21)",
                 "Grass dune 2 (5)",
                 "Grass dune 2 (6)",
                 "Grass dune 2 (7)",
@@ -699,7 +765,6 @@
                 "Grass dune 2 (17)",
                 "Grass dune 2 (18)",
                 "Grass dune 1 (16)",
-                "bush (3)",
                 "monstera_donica (19)",
                 "bush (6)",
                 "bush (10)",
@@ -708,13 +773,14 @@
                 "bush (4)",
                 "bush (13)",
                 "bush (12)",
+                "bush (3)",
+                "bush",
                 "bush (14)",
                 "bush (2)",
                 "bush (1)",
                 "bush (8)",
                 "bush (11)",
                 "bush (7)",
-                "bush",
                 "Kratka (1)",
                 "Orange flowerpot (12)-up",
                 "Grass dune 1",
@@ -868,7 +934,7 @@
         {
             "id": "Monstera (4)",
             "type": "@monstera",
-            "pos": [2504.0, -434.0],
+            "pos": [3156.0, -600.0],
             "rotation": 105.0,
             "flip_horizontally": true,
             "flip_vertically": true
@@ -924,14 +990,6 @@
             "flip_vertically": true
         },
         {
-            "id": "Fern (12)",
-            "type": "@fern",
-            "pos": [2686.501708984375, -344.4593505859375],
-            "rotation": -94.65435791015625,
-            "size": [126, 121],
-            "flip_vertically": true
-        },
-        {
             "id": "Fern (11)",
             "type": "@fern",
             "pos": [1279.99462890625, 98.00015258789063],
@@ -964,42 +1022,6 @@
             "size": [126, 121],
             "color": [0, 255, 0, 255],
             "flip_vertically": true
-        },
-        {
-            "id": "Mota (5)",
-            "type": "mota",
-            "pos": [1791.8013916015625, -417.4820251464844],
-            "rotation": 43.71792221069336
-        },
-        {
-            "id": "Mota (4)",
-            "type": "mota",
-            "pos": [1859.6077880859375, 0.04821106791496277],
-            "rotation": 23.220439910888672
-        },
-        {
-            "id": "Mota (3)",
-            "type": "mota",
-            "pos": [2414.20068359375, 432.505126953125],
-            "rotation": -19.780927658081055
-        },
-        {
-            "id": "Mota (2)",
-            "type": "mota",
-            "pos": [1440.77099609375, 523.973388671875],
-            "rotation": -179.05661010742188
-        },
-        {
-            "id": "Mota (1)",
-            "type": "mota",
-            "pos": [1612.60791015625, 181.05133056640625],
-            "rotation": 1.276302456855774
-        },
-        {
-            "id": "Mota",
-            "type": "mota",
-            "pos": [2031.51171875, -336.2264404296875],
-            "rotation": -31.099599838256836
         },
         {
             "id": "Bush (4)",
@@ -1613,8 +1635,8 @@
         {
             "id": "Fern (17)",
             "type": "@fern",
-            "pos": [2478.501708984375, -217.4593505859375],
-            "rotation": -94.65435791015625,
+            "pos": [1872.5191650390625, 484.6370849609375],
+            "rotation": -105.90418243408203,
             "size": [126, 121],
             "flip_vertically": true
         },
@@ -1644,7 +1666,7 @@
         {
             "id": "monstera_donica",
             "type": "@monstera_donica",
-            "pos": [2514.0, -432.0]
+            "pos": [3161.0, -590.0]
         },
         {
             "id": "monstera_donica (1)",
@@ -1720,7 +1742,8 @@
         {
             "id": "flower_pink",
             "type": "flower_pink",
-            "pos": [1987.0, -417.0]
+            "pos": [1986.0, -305.0],
+            "starting_animation_frame": 3
         },
         {
             "id": "flower_cyan",
@@ -1758,13 +1781,13 @@
         {
             "id": "flower_pink (2)",
             "type": "flower_pink",
-            "pos": [1983.0, -336.0],
+            "pos": [2149.0, -113.0],
             "randomize_starting_animation_frame": true
         },
         {
             "id": "flower_pink (3)",
             "type": "flower_pink",
-            "pos": [2041.0, -297.0],
+            "pos": [1963.0, -40.0],
             "randomize_starting_animation_frame": true
         },
         {
@@ -1778,12 +1801,6 @@
             "type": "@donic2",
             "pos": [2816.0, 96.0],
             "rotation": 90.0,
-            "size": [544, 128]
-        },
-        {
-            "id": "donic2 (1)",
-            "type": "@donic2",
-            "pos": [1681.0, -592.0],
             "size": [544, 128]
         },
         {
@@ -1809,7 +1826,7 @@
         {
             "id": "flower_pink (6)",
             "type": "flower_pink",
-            "pos": [2095.0, -163.0],
+            "pos": [2061.0, -159.0],
             "rotation": 90.0,
             "randomize_starting_animation_frame": true
         },
@@ -1848,15 +1865,16 @@
         {
             "id": "Fern (21)",
             "type": "@fern",
-            "pos": [2210.767333984375, -226.16104125976563],
+            "pos": [3312.767333984375, 139.83895874023438],
             "rotation": 60.808380126953125,
             "size": [126, 121],
+            "color": [0, 255, 255, 255],
             "flip_vertically": true
         },
         {
             "id": "Fern (22)",
             "type": "@fern",
-            "pos": [2633.290283203125, -455.4154052734375],
+            "pos": [1964.290283203125, -400.4154052734375],
             "rotation": -4.65435791015625,
             "size": [126, 121],
             "flip_vertically": true
@@ -1880,7 +1898,7 @@
         {
             "id": "flower_cyan (7)",
             "type": "flower_cyan",
-            "pos": [2625.225830078125, -263.43701171875],
+            "pos": [2719.225830078125, 153.56298828125],
             "rotation": -30.7647705078125,
             "flip_horizontally": true,
             "randomize_starting_animation_frame": true
@@ -1896,7 +1914,7 @@
         {
             "id": "orange_flowerpot (4)",
             "type": "@orange_flowerpot",
-            "pos": [2484.0, -216.0]
+            "pos": [1883.0, 493.0]
         },
         {
             "id": "orange_flowerpot (5)",
@@ -1906,12 +1924,14 @@
         {
             "id": "orange_flowerpot (6)",
             "type": "@orange_flowerpot",
-            "pos": [2634.0, -458.0]
+            "pos": [1988.0, -393.0],
+            "rotation": 4.6759490966796875
         },
         {
             "id": "orange_flowerpot (7)",
             "type": "@orange_flowerpot",
-            "pos": [2226.0, -217.0]
+            "pos": [1899.0, 595.0],
+            "rotation": 4.822540283203125
         },
         {
             "id": "donicv2",
@@ -1947,30 +1967,6 @@
             "rotation": 39.39556884765625,
             "flip_horizontally": true,
             "randomize_starting_animation_frame": true
-        },
-        {
-            "id": "Mota (6)",
-            "type": "mota",
-            "pos": [2446.60791015625, -48.95178985595703],
-            "rotation": 23.220439910888672
-        },
-        {
-            "id": "Mota (7)",
-            "type": "mota",
-            "pos": [2320.60791015625, -432.9517822265625],
-            "rotation": 23.220439910888672
-        },
-        {
-            "id": "Mota (8)",
-            "type": "mota",
-            "pos": [2670.60791015625, 112.0482177734375],
-            "rotation": 23.220439910888672
-        },
-        {
-            "id": "Mota (9)",
-            "type": "mota",
-            "pos": [3024.60791015625, -112.9517822265625],
-            "rotation": 23.220439910888672
         },
         {
             "id": "donicv2 (1)",
@@ -2012,7 +2008,7 @@
         {
             "id": "Fern (26)",
             "type": "@fern",
-            "pos": [1685.94677734375, -132.10153198242188],
+            "pos": [1685.94677734375, -131.10153198242188],
             "rotation": 142.84759521484375,
             "size": [126, 121],
             "color": [0, 255, 0, 255],
@@ -2044,14 +2040,6 @@
             "pos": [2518.0, 566.0]
         },
         {
-            "id": "bush",
-            "type": "@bush",
-            "pos": [2527.81689453125, -222.68301391601563],
-            "rotation": -30.0,
-            "color": [181, 255, 0, 255],
-            "flip_horizontally": true
-        },
-        {
             "id": "bush (1)",
             "type": "@bush",
             "pos": [2684.0, -157.0],
@@ -2061,12 +2049,6 @@
             "id": "bush (2)",
             "type": "@bush",
             "pos": [2684.0, 99.0],
-            "color": [181, 255, 0, 255]
-        },
-        {
-            "id": "bush (3)",
-            "type": "@bush",
-            "pos": [2659.0, -317.0],
             "color": [181, 255, 0, 255]
         },
         {
@@ -2216,7 +2198,7 @@
         {
             "id": "Fern (32)-up",
             "type": "@fern",
-            "pos": [3144.94970703125, 272.8590087890625],
+            "pos": [3165.94970703125, 277.8590087890625],
             "rotation": 5.796356201171875,
             "size": [126, 121],
             "color": [0, 255, 255, 255],
@@ -2272,31 +2254,6 @@
             "pos": [2695.0, -164.0],
             "rotation": -30.0,
             "color": [0, 255, 255, 255]
-        },
-        {
-            "id": "mota",
-            "type": "mota",
-            "pos": [1719.0, 586.0]
-        },
-        {
-            "id": "mota (1)",
-            "type": "mota",
-            "pos": [1663.0, -78.0]
-        },
-        {
-            "id": "mota (2)",
-            "type": "mota",
-            "pos": [1684.0, 442.0]
-        },
-        {
-            "id": "mota (3)",
-            "type": "mota",
-            "pos": [1639.0, -1.0]
-        },
-        {
-            "id": "mota (4)",
-            "type": "mota",
-            "pos": [1683.0, -430.0]
         },
         {
             "id": "Stone pavement right (6)",
@@ -2377,86 +2334,6 @@
             "flip_vertically": true
         },
         {
-            "id": "cicada",
-            "type": "cicada",
-            "pos": [2335.0, -387.0]
-        },
-        {
-            "id": "cicada (1)",
-            "type": "cicada",
-            "pos": [2422.0, -336.0]
-        },
-        {
-            "id": "cicada (2)",
-            "type": "cicada",
-            "pos": [2353.0, -268.0]
-        },
-        {
-            "id": "cicada (3)",
-            "type": "cicada",
-            "pos": [2339.0, -330.0]
-        },
-        {
-            "id": "cicada (4)",
-            "type": "cicada",
-            "pos": [2361.0, -333.0]
-        },
-        {
-            "id": "cicada (5)",
-            "type": "cicada",
-            "pos": [2393.0, -296.0]
-        },
-        {
-            "id": "cicada (6)",
-            "type": "cicada",
-            "pos": [2330.0, 279.0]
-        },
-        {
-            "id": "cicada (7)",
-            "type": "cicada",
-            "pos": [2362.0, 347.0]
-        },
-        {
-            "id": "cicada (8)",
-            "type": "cicada",
-            "pos": [2326.0, 375.0]
-        },
-        {
-            "id": "cicada (9)",
-            "type": "cicada",
-            "pos": [2373.0, 425.0]
-        },
-        {
-            "id": "cicada (10)",
-            "type": "cicada",
-            "pos": [2407.0, 400.0]
-        },
-        {
-            "id": "cicada (11)",
-            "type": "cicada",
-            "pos": [3027.0, 323.0]
-        },
-        {
-            "id": "cicada (12)",
-            "type": "cicada",
-            "pos": [3011.0, 293.0]
-        },
-        {
-            "id": "cicada (13)",
-            "type": "cicada",
-            "pos": [3100.0, 240.0]
-        },
-        {
-            "id": "cicada (14)",
-            "type": "cicada",
-            "pos": [3066.0, 197.0]
-        },
-        {
-            "id": "cicada (15)",
-            "type": "cicada",
-            "pos": [3065.0, 196.0]
-        },
-        {
             "id": "Grass dune 2 (11)",
             "type": "@grass_dune_2",
             "pos": [2121.0166015625, 595.128173828125],
@@ -2531,6 +2408,407 @@
             "pos": [2580.840087890625, 8.753982543945313],
             "rotation": -66.04985046386719,
             "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "crate",
+            "type": "crate",
+            "pos": [3327.00048828125, 734.9999389648438],
+            "rotation": -4.419008731842041
+        },
+        {
+            "id": "crate (1)",
+            "type": "crate",
+            "pos": [2562.000244140625, 746.9999389648438],
+            "rotation": 8.839943885803223
+        },
+        {
+            "id": "crate (2)",
+            "type": "crate",
+            "pos": [1358.000244140625, 571.9998168945313],
+            "rotation": -0.7043184638023376
+        },
+        {
+            "id": "crate (3)",
+            "type": "crate",
+            "pos": [3003.0, 709.9999389648438],
+            "rotation": 6.038854598999023
+        },
+        {
+            "id": "crate (4)",
+            "type": "crate",
+            "pos": [2857.000244140625, 709.9998779296875],
+            "rotation": -1.1782230138778687
+        },
+        {
+            "id": "crate (5)",
+            "type": "crate",
+            "pos": [2713.0, 723.9998779296875],
+            "rotation": -0.8967928290367126
+        },
+        {
+            "id": "Grass dune 2 (21)",
+            "type": "@grass_dune_2",
+            "pos": [1726.034912109375, 513.1837158203125],
+            "rotation": -21.559661865234375
+        },
+        {
+            "id": "menu_game_logo",
+            "type": "@menu_game_logo",
+            "pos": [2396.0, -307.0]
+        },
+        {
+            "id": "Monstera (16)",
+            "type": "@monstera",
+            "pos": [1856.0, 758.0],
+            "rotation": -345.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (17)",
+            "type": "@monstera",
+            "pos": [2115.0, 752.0],
+            "rotation": 165.0,
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Monstera (18)",
+            "type": "@monstera",
+            "pos": [2212.0, 755.0],
+            "rotation": -105.0
+        },
+        {
+            "id": "Monstera (19)",
+            "type": "@monstera",
+            "pos": [1510.0, 775.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "monstera_donica (20)",
+            "type": "@monstera_donica",
+            "pos": [1859.0, 744.0]
+        },
+        {
+            "id": "monstera_donica (21)",
+            "type": "@monstera_donica",
+            "pos": [1502.0, 763.0]
+        },
+        {
+            "id": "monstera_donica (22)",
+            "type": "@monstera_donica",
+            "pos": [2124.0, 753.0]
+        },
+        {
+            "id": "monstera_donica (23)",
+            "type": "@monstera_donica",
+            "pos": [2222.0, 738.0]
+        },
+        {
+            "id": "flower_cyan (18)",
+            "type": "flower_cyan",
+            "pos": [2662.225830078125, 202.56298828125],
+            "rotation": -30.7647705078125,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "Monstera (20)",
+            "type": "@monstera",
+            "active": false,
+            "pos": [2159.0, -469.0],
+            "rotation": -94.2947998046875,
+            "flip_vertically": true
+        },
+        {
+            "id": "monstera_donica (24)",
+            "type": "@monstera_donica",
+            "active": false,
+            "pos": [2154.0, -488.0]
+        },
+        {
+            "id": "flower_pink (8)",
+            "type": "flower_pink",
+            "active": false,
+            "pos": [1979.0, -353.0]
+        },
+        {
+            "id": "donic2-up-up",
+            "type": "@donic2",
+            "pos": [2816.0, -584.0],
+            "rotation": 90.0,
+            "size": [272, 128]
+        },
+        {
+            "id": "flower_cyan (19)",
+            "type": "flower_cyan",
+            "pos": [2541.225830078125, -178.43701171875],
+            "rotation": -83.21295166015625,
+            "flip_horizontally": true,
+            "randomize_starting_animation_frame": true
+        },
+        {
+            "id": "donic2-up-up (1)",
+            "type": "@donic2",
+            "active": false,
+            "pos": [1704.0, 592.0],
+            "rotation": -180.0,
+            "size": [272, 128]
+        },
+        {
+            "id": "Fern (6)",
+            "type": "@fern",
+            "active": false,
+            "pos": [2120.67431640625, -505.8795166015625],
+            "rotation": 40.59162902832031,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "bush",
+            "type": "@bush",
+            "active": false,
+            "pos": [2112.840087890625, -511.24603271484375],
+            "rotation": -66.04985046386719,
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "bush (3)",
+            "type": "@bush",
+            "active": false,
+            "pos": [2207.840087890625, -528.2460327148438],
+            "rotation": -66.04985046386719,
+            "color": [181, 255, 0, 255]
+        },
+        {
+            "id": "Fern (9)",
+            "type": "@fern",
+            "active": false,
+            "pos": [2233.06640625, -506.9122009277344],
+            "rotation": -34.40837097167969,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true,
+            "flip_vertically": true
+        },
+        {
+            "id": "Fern (12)",
+            "type": "@fern",
+            "active": false,
+            "pos": [2172.310791015625, -513.998291015625],
+            "rotation": 4.4083709716796875,
+            "size": [126, 121],
+            "color": [0, 255, 0, 255],
+            "flip_vertically": true
+        },
+        {
+            "id": "Mota (5)",
+            "type": "mota",
+            "pos": [1850.80126953125, -199.4820098876953],
+            "rotation": 43.717926025390625
+        },
+        {
+            "id": "Mota (4)",
+            "type": "mota",
+            "pos": [1711.6077880859375, -353.9517822265625],
+            "rotation": 23.220458984375
+        },
+        {
+            "id": "Mota (3)",
+            "type": "mota",
+            "pos": [1766.20068359375, -204.494873046875],
+            "rotation": -19.78094482421875
+        },
+        {
+            "id": "Mota (2)",
+            "type": "mota",
+            "pos": [1444.80419921875, 221.9898681640625],
+            "rotation": -0.943389892578125
+        },
+        {
+            "id": "Mota (1)",
+            "type": "mota",
+            "pos": [1477.60791015625, 30.05133056640625],
+            "rotation": -1.27630615234375
+        },
+        {
+            "id": "Mota",
+            "type": "mota",
+            "pos": [2031.51171875, -336.2264404296875],
+            "rotation": -31.099599838256836
+        },
+        {
+            "id": "Mota (6)",
+            "type": "mota",
+            "pos": [1772.60791015625, -453.9520263671875],
+            "rotation": -23.220458984375
+        },
+        {
+            "id": "Mota (7)",
+            "type": "mota",
+            "pos": [1818.8702392578125, -484.2950134277344],
+            "rotation": -66.779541015625
+        },
+        {
+            "id": "Mota (8)",
+            "type": "mota",
+            "pos": [1847.60791015625, -372.9520263671875],
+            "rotation": -23.220458984375
+        },
+        {
+            "id": "Mota (9)",
+            "type": "mota",
+            "pos": [1808.60791015625, -269.9520263671875],
+            "rotation": -23.220458984375
+        },
+        {
+            "id": "mota",
+            "type": "mota",
+            "pos": [1565.0, 278.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "mota (1)",
+            "type": "mota",
+            "pos": [1663.0, -78.0]
+        },
+        {
+            "id": "mota (2)",
+            "type": "mota",
+            "pos": [1442.0, 471.0]
+        },
+        {
+            "id": "mota (3)",
+            "type": "mota",
+            "pos": [1594.0, -386.0]
+        },
+        {
+            "id": "mota (4)",
+            "type": "mota",
+            "pos": [2097.0, -400.0]
+        },
+        {
+            "id": "cicada",
+            "type": "cicada",
+            "pos": [2247.0, 94.0]
+        },
+        {
+            "id": "cicada (1)",
+            "type": "cicada",
+            "pos": [2422.0, -336.0]
+        },
+        {
+            "id": "cicada (2)",
+            "type": "cicada",
+            "pos": [2353.0, -268.0]
+        },
+        {
+            "id": "cicada (3)",
+            "type": "cicada",
+            "pos": [2339.0, -330.0]
+        },
+        {
+            "id": "cicada (4)",
+            "type": "cicada",
+            "pos": [2361.0, -333.0]
+        },
+        {
+            "id": "cicada (5)",
+            "type": "cicada",
+            "pos": [2393.0, -296.0]
+        },
+        {
+            "id": "cicada (6)",
+            "type": "cicada",
+            "pos": [2351.60400390625, -44.19944381713867],
+            "rotation": 53.46833801269531
+        },
+        {
+            "id": "cicada (7)",
+            "type": "cicada",
+            "pos": [2075.0, 126.0]
+        },
+        {
+            "id": "cicada (8)",
+            "type": "cicada",
+            "pos": [2410.3310546875, -32.1866569519043],
+            "rotation": 31.18670654296875
+        },
+        {
+            "id": "cicada (9)",
+            "type": "cicada",
+            "pos": [2316.962890625, 99.04010009765625],
+            "rotation": -4.428436279296875
+        },
+        {
+            "id": "cicada (10)",
+            "type": "cicada",
+            "pos": [2307.274169921875, -123.17003631591797],
+            "rotation": 26.364837646484375
+        },
+        {
+            "id": "cicada (11)",
+            "type": "cicada",
+            "pos": [2409.582763671875, -180.20225524902344],
+            "rotation": 51.71485900878906
+        },
+        {
+            "id": "cicada (12)",
+            "type": "cicada",
+            "pos": [2274.31298828125, 250.81808471679688],
+            "rotation": 29.659225463867188
+        },
+        {
+            "id": "cicada (13)",
+            "type": "cicada",
+            "pos": [2369.50244140625, -124.20710754394531],
+            "rotation": 45.204833984375
+        },
+        {
+            "id": "cicada (14)",
+            "type": "cicada",
+            "pos": [2592.185546875, 22.3267822265625],
+            "rotation": 120.8177490234375
+        },
+        {
+            "id": "cicada (15)",
+            "type": "cicada",
+            "pos": [2612.19091796875, 37.34954833984375],
+            "rotation": -237.28330993652344
+        },
+        {
+            "id": "mota (5)",
+            "type": "mota",
+            "pos": [1501.0, 562.0]
+        },
+        {
+            "id": "mota (6)",
+            "type": "mota",
+            "pos": [1597.0, 408.0]
+        },
+        {
+            "id": "cicada (16)",
+            "type": "cicada",
+            "pos": [2120.0, 50.0]
+        },
+        {
+            "id": "cicada (17)",
+            "type": "cicada",
+            "pos": [2092.0, -17.0]
+        },
+        {
+            "id": "cicada (18)",
+            "type": "cicada",
+            "pos": [2132.0, 0.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "Mota (10)",
+            "type": "mota",
+            "pos": [1855.501953125, -440.1345520019531],
+            "rotation": 70.21907043457031
         },
         {
             "id": "garden_ambience",
@@ -2670,9 +2948,9 @@
             "id": "Wandering pixels (3)",
             "type": "wandering_pixels",
             "color": [0, 255, 255, 255],
-            "num_particles": 290,
-            "pos": [2848.0, -48.0],
-            "size": [128, 800]
+            "num_particles": 345,
+            "pos": [2848.0, -192.0],
+            "size": [128, 1088]
         },
         {
             "id": "Wandering pixels (4)",
@@ -2758,7 +3036,7 @@
             "type": "wandering_pixels",
             "color": [0, 131, 255, 255],
             "num_particles": 290,
-            "pos": [2527.0, -98.0],
+            "pos": [2539.0, -122.0],
             "size": [257, 195]
         },
         {
@@ -2766,8 +3044,8 @@
             "type": "wandering_pixels",
             "color": [0, 131, 255, 255],
             "num_particles": 226,
-            "pos": [2560.0, 257.0],
-            "size": [257, 195]
+            "pos": [2608.0, 242.0],
+            "size": [278, 227]
         },
         {
             "id": "Wandering pixels (15)",
@@ -2778,22 +3056,34 @@
             "size": [228, 445]
         },
         {
+            "id": "Wandering pixels (16)",
+            "type": "wandering_pixels",
+            "color": [107, 219, 82, 255],
+            "illuminate": false,
+            "pos": [2130.0, 762.0],
+            "size": [400, 128]
+        },
+        {
+            "id": "Wandering pixels (17)",
+            "type": "wandering_pixels",
+            "active": false,
+            "color": [0, 255, 255, 255],
+            "num_particles": 43,
+            "pos": [1696.0, 600.0],
+            "size": [288, 144]
+        },
+        {
             "id": "spawn",
             "type": "team_spawn",
             "faction": "METROPOLIS",
-            "pos": [2507.0, 98.0],
+            "pos": [2497.0, 81.0],
             "rotation": -171.9368896484375
-        },
-        {
-            "id": "crosshair",
-            "type": "ffa_spawn",
-            "pos": [1756.0, 299.0]
         },
         {
             "id": "Organism area",
             "type": "organism_area",
-            "pos": [2343.0, 47.0],
-            "size": [1920, 1430]
+            "pos": [2295.0, 8.0],
+            "size": [1941, 1132]
         }
     ]
 }

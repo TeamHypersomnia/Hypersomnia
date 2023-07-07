@@ -21,7 +21,8 @@ struct cmd_line_params {
 	int test_fp_consistency = -1;
 	std::string connect_address;
 
-	bool disallow_nat_traversal = false;
+	bool no_router = false;
+
 	bool suppress_server_webhook = false;
 	bool suppress_autoupdate = false;
 
@@ -66,8 +67,8 @@ struct cmd_line_params {
 			else if (a == "--dedicated-server") {
 				type = app_type::DEDICATED_SERVER;
 			}
-			else if (a == "--disallow-nat-traversal") {
-				disallow_nat_traversal = true;
+			else if (a == "--no-router") {
+				no_router = true;
 			}
 			else if (a == "--suppress-server-webhook") {
 				suppress_server_webhook = true;

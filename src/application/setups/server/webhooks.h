@@ -1,7 +1,7 @@
 #pragma once
 #define RAPIDJSON_HAS_STDSTRING 1
 
-#include "3rdparty/cpp-httplib/httplib.h"
+#include "3rdparty/include_httplib.h"
 #include "augs/string/parse_url.h"
 
 #include "rapidjson/document.h"

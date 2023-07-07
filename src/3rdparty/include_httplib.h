@@ -11,3 +11,5 @@ using http_client_type = httplib::SSLClient;
 #else
 using http_client_type = httplib::Client;
 #endif
+
+#undef ADD

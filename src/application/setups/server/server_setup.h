@@ -84,6 +84,7 @@ class server_setup :
 
 	augs::path_type current_arena_folder;
 	augs::secure_hash_type current_arena_hash;
+	bool current_arena_from_autosave = false;
 
 	server_public_vars make_public_vars() const;
 
@@ -147,7 +148,7 @@ class server_setup :
 	bool request_restart_after_shutdown = false;
 
 	bool rebuild_player_meta_viewables = false;
-	arena_player_metas last_player_metas;
+	arena_player_metas integrated_player_metas;
 
 	client_gui_state integrated_client_gui;
 	std::string failure_reason;
@@ -625,4 +626,6 @@ public:
 	void broadcast_shutdown_message();
 
 	void refresh_runtime_info_for_rcon();
+
+	void set_client_is_downloading_files(client_id_type, server_client_state& c, downloading_type);
 };

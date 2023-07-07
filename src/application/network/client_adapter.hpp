@@ -58,7 +58,7 @@ message_handler_result client_adapter::process_message(yojimbo::Message& m, H&& 
 			constexpr bool forbidden_message_type = !net_message_type::server_to_client;
 
 			if constexpr(forbidden_message_type) {
-				handler.log_malicious_server();
+				handler.set_disconnect_reason("The server has sent an invalid message type.");
 				return message_handler_result::ABORT_AND_DISCONNECT;
 			}
 			else {

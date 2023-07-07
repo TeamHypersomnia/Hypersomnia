@@ -48,12 +48,19 @@
 
 struct config_lua_table;
 
+class https_file_downloader;
+
 constexpr double default_inv_tickrate = 1 / 60.0;
 
 class client_adapter;
 
 struct netcode_socket_t;
 struct packaged_official_content;
+
+struct arena_download_input {
+	std::string arena_name;
+	augs::secure_hash_type project_hash;
+};
 
 class client_setup : 
 	public default_setup_settings,
@@ -108,6 +115,7 @@ class client_setup :
 	net_time_t when_initiated_connection = 0.0;
 	net_time_t when_sent_client_settings = -1;
 	net_time_t when_sent_nat_punch_request = -1;
+	net_time_t when_sent_last_keepalive = 0;
 
 	std::string last_disconnect_reason;
 	bool print_only_disconnect_reason = false;
@@ -116,7 +124,12 @@ class client_setup :
 	bool has_sent_avatar = false;
 	client_gui_state client_gui;
 
+	arena_download_input last_download_request;
+
 	std::optional<arena_downloading_session> downloading;
+	bool pause_solvable_stream = false;
+
+	std::unique_ptr<https_file_downloader> external_downloader;
 
 	using untimely_payload_variant = std::variant<arena_player_avatar_payload>;
 
@@ -132,8 +145,6 @@ class client_setup :
 	demo_step_num_type recorded_demo_step = 0;
 	std::size_t written_messages = 0;
 
-	std::size_t times_sent_packets = 0;
-
 	std::vector<demo_step> unflushed_demo_steps;
 	std::vector<demo_step> demo_steps_being_flushed;
 	std::future<void> future_flushed_demo;
@@ -141,6 +152,10 @@ class client_setup :
 
 	client_demo_player demo_player;
 	/* No client state follows later in code. */
+
+	bool is_trying_external_download() const {
+		return external_downloader != nullptr;
+	}
 
 	template <class U>
 	bool handle_untimely(U&, session_id_type);
@@ -189,8 +204,7 @@ class client_setup :
 
 	void handle_incoming_payloads();
 	void send_pending_commands();
-	void send_packets_if_its_time();
-	void send_silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo();
+	void send_packets();
 	void exchange_file_packets();
 	void traverse_nat_if_required();
 
@@ -318,13 +332,14 @@ class client_setup :
 					get_local_player_id()
 				);
 
+				//LOG("In game. Sending client entropy. Predicted %x: ", receiver.predicted_entropies.size());
 				send_to_server(new_client_entropy);
 			}
 		}
 
 		{
 			auto scope = measure_scope(performance.sending_packets);
-			send_packets_if_its_time();
+			send_packets();
 			traverse_nat_if_required();
 		}
 
@@ -454,8 +469,7 @@ class client_setup :
 				performance.accepted_commands.measure(result.total_accepted);
 
 				if (result.malicious_server) {
-					LOG("There was a problem unpacking steps from the server. Disconnecting.");
-					log_malicious_server();
+					set_disconnect_reason("There was a problem unpacking steps from the server. Disconnecting.");
 					disconnect();
 				}
 
@@ -549,9 +563,18 @@ class client_setup :
 	}
 
 	void perform_demo_player_imgui(augs::window& window);
-
-	void log_malicious_server();
 	void snap_interpolation_of_viewed();
+
+	void request_direct_file_download(const augs::secure_hash_type&);
+
+	bool setup_external_arena_download_session();
+	void setup_direct_arena_download_session();
+	bool start_downloading_session();
+
+	void advance_external_downloader();
+
+	void send_download_progress();
+	bool send_keepalive_download_progress();
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -572,6 +595,10 @@ public:
 	const cosmos& get_viewed_cosmos() const;
 
 	auto get_interpolation_ratio() const {
+		if (pause_solvable_stream) {
+			return 0.0;
+		}
+
 		const auto dt_secs = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
 
 		if (is_replaying()) {
@@ -679,7 +706,18 @@ public:
 
 		if (client_time < current_time) {
 			if (downloading) {
-				exchange_file_packets();
+				if (is_trying_external_download()) {
+					if (send_keepalive_download_progress()) {
+						send_packets();
+						handle_incoming_payloads();
+					}
+
+					advance_external_downloader();
+				}
+				else {
+					exchange_file_packets();
+				}
+
 				update_stats(in.network_stats);
 			}
 			else {
@@ -781,14 +819,9 @@ public:
 	void after_all_drawcalls(game_frame_buffer&) {}
 	void do_game_main_thread_synced_op(renderer_backend_result&) {}
 
-	void request_file_download(const augs::secure_hash_type&);
+	bool start_downloading_arena(const arena_download_input&);
 
-	bool start_downloading_arena(
-		const std::string& new_arena_name,
-		const augs::secure_hash_type& project_hash
-	);
-
-	message_handler_result advance_downloading_session(const std::vector<std::byte>& new_file);
+	message_handler_result advance_downloading_session(const std::vector<std::byte>& next_received_file);
 
 	bool finalize_arena_download();
 
@@ -802,4 +835,8 @@ public:
 
 		return displayed_connecting_server_name;
 	}
+
+	auto get_current_file_download_progress() const;
+	float get_current_file_percent_complete() const;
+	float get_total_download_percent_complete(const bool smooth) const;
 };

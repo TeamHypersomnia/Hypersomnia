@@ -4556,7 +4556,7 @@ Advantages:
 - Bump version to 1.1.X after introducing signed builds
 	- test_pack_upload.ps1
 	- hypersomnia_version.cpp.in
-	- archive_and_upload.sh
+	- generate_archives.sh
 
 - Devops
 	- Maybe add somewhere that commit hash?

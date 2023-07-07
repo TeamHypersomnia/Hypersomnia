@@ -45,6 +45,7 @@
 #include "application/setups/editor/packaged_official_content.h"
 #include "augs/filesystem/directory.h"
 #include "augs/readwrite/json_readwrite_errors.h"
+#include "application/setups/client/https_file_downloader.h"
 
 void client_demo_player::play_demo_from(const augs::path_type& p) {
 	source_path = p;
@@ -317,412 +318,199 @@ client_setup::~client_setup() {
 	wait_for_demo_flush();
 }
 
-arena_downloading_session::arena_downloading_session(const std::string& arena_name) : arena_name(arena_name) {
-	part_dir_path = DOWNLOADED_ARENAS_DIR / arena_name;
-	part_dir_path += ".part";
-
-	old_dir_path = DOWNLOADED_ARENAS_DIR / arena_name;
-	old_dir_path += ".old";
-
-	json_path_in_part_dir = part_dir_path / arena_name;
-	json_path_in_part_dir += ".json";
-
-	target_dir_path = DOWNLOADED_ARENAS_DIR / arena_name;
-
-	arena_already_exists = augs::exists(target_dir_path);
-
-	build_content_database_from_candidate_folders();
-}
-
-void arena_downloading_session::build_content_database_from_candidate_folders() {
-	auto try_load_from = [&](const auto& parent, const auto& json_path) {
-		try {
-			const auto externals = editor_project_readwrite::read_only_external_resources(
-				parent,
-				augs::file_to_string(json_path)
-			);
-
-			for (const auto& e : externals) {
-				const auto hash = e.second;
-				content_database[hash] = parent / e.first;
-			}
-
-			return true;
-		}
-		catch (...) {
-
-		}
-
-		return false;
-	};
-
-	if (arena_already_exists) {
-		auto paths = editor_project_paths(target_dir_path);
-
-		if (!try_load_from(target_dir_path, paths.autosave_json)) {
-			try_load_from(target_dir_path, paths.project_json);
-		}
-	}
-}
-
-std::optional<augs::secure_hash_type> arena_downloading_session::next_hash_to_download() {
-	if (current_resource_idx == std::nullopt) {
-		current_resource_idx = 0;
-	}
-	else {
-		++(*current_resource_idx);
-	}
-
-	if (*current_resource_idx < all_needed_resources.size()) {
-		const auto hash = all_needed_resources[*current_resource_idx];
-
-		if (const auto entry = mapped_or_nullptr(output_files_by_hash, hash)) {
-			if (entry->output_files.size() > 0) {
-				LOG("Downloading %x...", entry->output_files[0]);
-			}
-		}
-
-		return hash;
-	}
-
-	return std::nullopt;
-}
-
-bool arena_downloading_session::try_load_json_from_part_folder(
-	const augs::secure_hash_type& required_hash
-) {
-	try {
-		project_json = augs::file_to_string_crlf_to_lf(json_path_in_part_dir);
-
-		if (augs::secure_hash(project_json) == required_hash) {
-			determine_needed_resources();
-
-			return true;
-		}
-	}
-	catch (...) {
-
-	}
-
-	project_json.clear();
-	return false;
-}
-
-bool arena_downloading_session::try_find_and_paste_file_locally(
-	const augs::secure_hash_type& required_hash,
-	const augs::path_type& path_in_project
-) {
-	/*
-		Maybe it's already there.
-		Can happen if the map was being downloaded before but interrupted halfway.
-	*/
-
-	const auto target_full_path = part_dir_path / path_in_project;
-
-	try {
-		if (required_hash == augs::secure_hash(augs::file_to_bytes(target_full_path))) {
-			return true;
-		}
-	}
-	catch (...) {
-	
-	}
-
-	/*
-		TODO: Properly read the original arena's json and determine by hash where to look for a candidate file.
-		Only there get the path candidates and check if the hashes are indeed correct.
-	*/
-
-	try {
-		if (const auto found_source_path = mapped_or_nullptr(content_database, required_hash)) {
-			if (required_hash == augs::secure_hash(augs::file_to_bytes(*found_source_path))) {
-				augs::create_directories_for(target_full_path);
-				std::filesystem::copy(*found_source_path, target_full_path);
-
-				return true;
-			}
-		}
-	}
-	catch (...) {
-
-	}
-
-	return false;
-}
-
-void arena_downloading_session::determine_needed_resources() {
-	const auto& parent_folder_for_sanitization_checks = part_dir_path;
-
-	const auto externals = editor_project_readwrite::read_only_external_resources(
-		parent_folder_for_sanitization_checks,
-		project_json
-	);
-
-	for (const auto& e : externals) {
-		const auto hash = e.second;
-
-		auto& entry = output_files_by_hash[hash];
-		entry.output_files.push_back(e.first);
-
-		if (entry.marked_for_download_already) {
-			continue;
-		}
-		
-		{
-			const auto path_in_project = e.first;
-
-			if (try_find_and_paste_file_locally(hash, path_in_project)) {
-				continue;
-			}
-		}
-
-		all_needed_resources.push_back(hash);
-		entry.marked_for_download_already = true;
-	}
-}
-
-bool arena_downloading_session::requested_hash_matches(
-	const std::vector<std::byte>& bytes
-) const {
-	return augs::secure_hash(bytes) == last_requested_file_hash;
-}
-
-void arena_downloading_session::handle_downloaded_project_json(
-	const std::vector<std::byte>& bytes
-) {
-	project_json.assign(
-		reinterpret_cast<const char*>(&bytes[0]), 
-		reinterpret_cast<const char*>(&bytes[0] + bytes.size())
-	);
-
-	determine_needed_resources();
-
-	augs::save_as_text(json_path_in_part_dir, project_json);
-}
-
-void arena_downloading_session::create_files_from_downloaded(
-	const std::vector<std::byte>& bytes
-) {
-	const auto& entry = output_files_by_hash[last_requested_file_hash];
-
-	ensure(entry.marked_for_download_already);
-
-	for (const auto& target_path : entry.output_files) {
-		const auto full_path = part_dir_path / target_path;
-
-		augs::create_directories_for(full_path);
-		augs::bytes_to_file(bytes, full_path);
-	}
-}
-
-void client_setup::request_file_download(const augs::secure_hash_type& hash) {
-	{
-		/*
-			As soon as downloading.has_value(),
-			entropies stop being unpacked altogether (in_game becomes false),
-			and no incoming entropies are handled from the server.
-
-			The receiver will be untouched until after the download has completed.
-			The server is instructed to clear the client's pending entropies,
-			as well as accepted pending entropy counter, on their side as well.
-		*/
-
-		receiver.clear();
-	}
-
+void client_setup::request_direct_file_download(const augs::secure_hash_type& hash) {
 	request_arena_file_download request;
 	request.requested_file_hash = hash;
-
-	LOG("Requesting file download: %x", augs::to_hex_format(hash));
 
 	send_payload(
 		game_channel_type::RELIABLE_MESSAGES,
 		request
 	);
+}
 
-	if (downloading) {
-		downloading->last_requested_file_hash = hash;
-		LOG(downloading->get_displayed_file_path());
+bool client_setup::setup_external_arena_download_session() {
+	if (sv_public_vars.external_arena_files_provider.empty()) {
+		LOG("No external link was provided for the arena files.");
+		return false;
+	}
+
+	if (const auto parsed = parsed_url(sv_public_vars.external_arena_files_provider); parsed.valid()) {
+		LOG("External arena files provider: %x", sv_public_vars.external_arena_files_provider);
+
+		external_downloader = std::make_unique<https_file_downloader>(parsed);
+
+		auto external_file_requester = [this](const augs::secure_hash_type&, const augs::path_type& path) {
+			const auto location = typesafe_sprintf("%x/%x", last_download_request.arena_name, path.string());
+			this->external_downloader->download_file(location);
+		};
+
+		downloading = arena_downloading_session(
+			last_download_request.arena_name,
+			external_file_requester,
+			sv_public_vars.arena_from_autosave
+		);
+
+		return true;
+	}
+	else {
+		LOG("Couldn't parse %x: ", sv_public_vars.external_arena_files_provider);
+	}
+
+	return false;
+}
+
+void client_setup::setup_direct_arena_download_session() {
+	LOG("Requesting direct arena download over UDP.");
+
+	external_downloader = nullptr;
+
+	auto direct_file_requester = [this](const augs::secure_hash_type& hash, const augs::path_type& path) {
+		LOG("Requesting direct download over UDP: %x (hash: %x)", path, augs::to_hex_format(hash));
+		this->request_direct_file_download(hash);
+	};
+
+	downloading = arena_downloading_session(
+		last_download_request.arena_name,
+		direct_file_requester,
+		sv_public_vars.arena_from_autosave
+	);
+}
+
+bool client_setup::start_downloading_session() {
+	if (downloading->start(last_download_request.project_hash)) {
+		send_payload(
+			game_channel_type::RELIABLE_MESSAGES,
+			is_trying_external_download() ? 
+			special_client_request::WAIT_IM_DOWNLOADING_ARENA_EXTERNALLY : 
+			special_client_request::WAIT_IM_DOWNLOADING_ARENA_DIRECTLY
+		);
+
+		/*
+			As soon as pause_solvable_stream == true,
+			entropies stop being unpacked altogether (in_game becomes false),
+			they stop being sent,
+			and no incoming entropies are handled from the server.
+
+			The receiver in its clean state will be untouched until after these three are completed:
+			- the download has completed and RESYNC_ARENA_AFTER_FILES_DOWNLOADED is sent,
+			- the server responds with RESUME_RECEIVING_SOLVABLES, which makes the client go into RECEIVING_INITIAL_SNAPSHOT state.
+			- and THEN the server sends the full arena snapshot.
+
+			Sending entropies will resume as well due to state changing from RECEIVING_INITIAL_SNAPSHOT to IN_GAME.
+
+			The server is instructed to clear the client's pending entropies/accepted entropy counter
+			on receiving RESYNC_ARENA_AFTER_FILES_DOWNLOADED.
+		*/
+
+		LOG("Clear simulation receiver: starting download.");
+		receiver.clear();
+
+		pause_solvable_stream = true;
+
+		return true;
+	}
+	else {
+		return finalize_arena_download();
 	}
 }
 
-bool client_setup::start_downloading_arena(
-	const std::string& new_arena_name,
-	const augs::secure_hash_type& project_hash
-) {
+bool client_setup::start_downloading_arena(const arena_download_input& request) {
+	LOG("Start downloading arena: %x (hash: %x)", request.arena_name, augs::to_hex_format(request.project_hash));
+
+	last_download_request = request;
+
 	/* Re-show once download completes as we'll be moved to spectator. */
 	arena_gui.choose_team.show = true;
 
-	downloading = arena_downloading_session(new_arena_name);
+	if (!setup_external_arena_download_session()) {
+		setup_direct_arena_download_session();
+	}
 
-	augs::create_directories(downloading->part_dir_path);
+	return start_downloading_session();
+}
 
-	send_payload(
-		game_channel_type::RELIABLE_MESSAGES,
-		special_client_request::WAIT_IM_DOWNLOADING_EXTERNALLY
-	);
+static std::vector<std::byte> string_to_bytes(const std::string& bytes) {
+	std::vector<std::byte> result;
+	result.resize(bytes.size());
+	std::memcpy(result.data(), bytes.data(), bytes.size());
 
-	if (downloading->try_load_json_from_part_folder(project_hash)) {
-		if (const auto first_resource_to_download = downloading->next_hash_to_download()) {
-			request_file_download(*first_resource_to_download);
+	return result;
+}
+
+void client_setup::advance_external_downloader() {
+	ensure(external_downloader != nullptr);
+	ensure(downloading != std::nullopt);
+
+	auto fallback_to_direct_download = [&]() {
+		setup_direct_arena_download_session();
+
+		if (!start_downloading_session()) {
+			LOG("Couldn't start downloading session after failing external. Disconnecting.");
+
+			disconnect();
 		}
-		else {
-			/* 
-				Will likely never happen as it would mean the part folder was already complete.
-				But you never know.
-			*/
+	};
 
-			return finalize_arena_download();
+	if (const auto new_file = external_downloader->get_downloaded_file()) {
+		if (advance_downloading_session(string_to_bytes(new_file->second)) == message_handler_result::ABORT_AND_DISCONNECT) {
+			LOG("External downloading session failed: %x", last_disconnect_reason);
+			last_disconnect_reason = {};
+
+			fallback_to_direct_download();
 		}
 	}
 	else {
-		request_file_download(project_hash);
-	}
+		if (const bool external_download_failed = !external_downloader->is_running()) {
+			LOG("External downloading session failed.");
 
-	return true;
+			fallback_to_direct_download();
+		}
+	}
 }
 
 message_handler_result client_setup::advance_downloading_session(
-	const std::vector<std::byte>& new_bytes
+	const std::vector<std::byte>& next_received_file
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
 	constexpr auto continue_v = message_handler_result::CONTINUE;
 
+	LOG("New file bytes arrived. Size: %x", next_received_file.size());
+
 	if (downloading == std::nullopt) {
-		LOG("The server sent a file despite no request. Disconnecting.");
-
-		log_malicious_server();
+		set_disconnect_reason("The server sent a file despite no request. Disconnecting.");
 		return abort_v;
 	}
 
-	const bool matches = downloading->requested_hash_matches(new_bytes);
-
-	if (!matches) {
-		LOG("The server sent a file with an incorrect hash.\nExpected: %x\nActual: %x\nDisconnecting.", augs::to_hex_format(downloading->last_requested_file_hash), augs::to_hex_format(augs::secure_hash(new_bytes)));
-
-		log_malicious_server();
-		return abort_v;
-	}
-
-	const bool is_project_json_file = downloading->is_downloading_project_json();
-
-	if (is_project_json_file) {
-		try {
-			/* 
-				This could only fail due to read_only_external_resources throwing,
-				which means the json file is ill-formed, unsafe or otherwise incorrect.
-			*/
-
-			downloading->handle_downloaded_project_json(new_bytes);
-		}
-		catch (const augs::json_deserialization_error& err) {
-			LOG("Server sent an invalid arena json file. Disconnecting. Details:\n%x", err.what());
-
-			log_malicious_server();
-			return abort_v;
-		}
-		catch (...) {
-			LOG("Server sent an invalid arena json file. Disconnecting.");
-
-			log_malicious_server();
-			return abort_v;
-		}
-	}
-	else {
-		downloading->create_files_from_downloaded(new_bytes);
-	}
-
-	if (const auto next_resource_to_download = downloading->next_hash_to_download()) {
-		request_file_download(*next_resource_to_download);
+	if (downloading->advance_with(next_received_file)) {
+		return continue_v;
 	}
 	else {
 		if (finalize_arena_download()) {
+			LOG("Sending RESYNC_ARENA_AFTER_FILES_DOWNLOADED.");
 			special_request(special_client_request::RESYNC_ARENA_AFTER_FILES_DOWNLOADED);
+
+			return continue_v;
 		}
 		else {
 			return abort_v;
 		}
 	}
-
-	return continue_v;
-}
-
-std::optional<std::string> arena_downloading_session::rearrange_directories() {
-	auto make_error = [&](const auto& err) {
-		return typesafe_sprintf(
-			"Failed to complete %x download:\n%x",
-			arena_name,
-			err.what()
-		);
-	};
-
-	std::optional<std::string> result;
-
-	auto try_remove = [&result, make_error](const auto& to_remove) {
-		if (!augs::exists(to_remove)) {
-			return true;
-		}
-
-		try {
-			std::filesystem::remove_all(to_remove);
-			return true;
-		}
-		catch (const std::filesystem::filesystem_error& err) {
-			result = make_error(err);
-		}
-		catch (const std::exception& err) {
-			result = make_error(err);
-		}
-
-		return false;
-	};
-
-	auto try_move = [&result, make_error](const auto& from, const auto& to) {
-		try {
-			std::filesystem::rename(from, to);
-			return true;
-		}
-		catch (const std::filesystem::filesystem_error& err) {
-			result = make_error(err) + typesafe_sprintf("\nCould not move:\n%x ->\n%x", from, to);
-		}
-		catch (const std::exception& err) {
-			result = make_error(err);
-		}
-
-		return false;
-	};
-
-	if (try_remove(old_dir_path)) {
-		if (augs::exists(target_dir_path)) {
-			if (try_move(target_dir_path, old_dir_path)) {
-				try_move(part_dir_path, target_dir_path);
-			}
-		}
-		else {
-			try_move(part_dir_path, target_dir_path);
-		}
-	}
-
-	return result;
 }
 
 bool client_setup::finalize_arena_download() {
 	ensure(downloading.has_value());
 
-	if (downloading) {
-		const auto error = downloading->rearrange_directories();
-		downloading = std::nullopt;
+	external_downloader = nullptr;
 
-		if (error) {
-			set_disconnect_reason(*error);
-			return false;
-		}
-		else {
-			return try_load_arena_according_to(sv_public_vars, false);
-		}
+	if (downloading->has_errors()) {
+		set_disconnect_reason(downloading->get_error());
+		downloading = std::nullopt;
+		return false;
 	}
 
-	return false;
+	downloading = std::nullopt;
+
+	return try_load_arena_according_to(sv_public_vars, false);
 }
 
 bool client_setup::try_load_arena_according_to(const server_public_vars& new_vars, bool allow_download) {
@@ -781,7 +569,7 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 			}
 			else if (choice_result.not_found_any) {
 				if (allow_download) {
-					return start_downloading_arena(new_arena, new_vars.required_arena_hash);
+					return start_downloading_arena({ new_arena, new_vars.required_arena_hash });
 				}
 				else {
 					set_disconnect_reason(typesafe_sprintf(
@@ -979,15 +767,12 @@ bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
 				const auto size = augs::image::get_size(new_avatar.image_bytes);
 
 				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
-					LOG("The server has tried to send an avatar of size %xx%x!", size.x, size.y);
-					log_malicious_server();
+					set_disconnect_reason(typesafe_sprintf("The server has tried to send an avatar of size %xx%x!", size.x, size.y));
 					return false;
 				}
 			}
 			catch (const augs::image_loading_error& err) {
-				LOG("The server has tried to send an invalid avatar!");
-				LOG(err.what());
-				log_malicious_server();
+				set_disconnect_reason("The server has tried to send an invalid avatar!\n%x", err.what());
 				return false;
 			}
 		}
@@ -1149,59 +934,59 @@ void client_setup::exchange_file_packets() {
 
 	const auto current_time = get_current_time();
 
-	const auto target_bandwidth = vars.max_file_bandwidth * 1024 * 1024;
+	const auto target_bandwidth = vars.max_direct_file_bandwidth * 1024 * 1024;
 	const auto max_packets_at_a_time = 10;
 
-	const auto packets_per_second = float(target_bandwidth) / block_fragment_size_v;
-
-	if (packets_per_second == 0.0f) {
-		return;
-	}
-
+	const auto packets_per_second = std::max(2.0f, float(target_bandwidth) / block_fragment_size_v);
 	const auto packet_interval = 1.0f / packets_per_second;
 
 	int times_sent = 0;
 
+	send_keepalive_download_progress();
+
 	while (client_time <= current_time && times_sent < max_packets_at_a_time) {
 		client_time += packet_interval;
 
-		adapter->send_packets();
+		send_packets();
 		handle_incoming_payloads();
-		++times_sent;
-		++times_sent_packets;
-	}
 
-	send_silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo();
+		++times_sent;
+	}
 
 	if (client_time < current_time) {
 		client_time = current_time;
 	}
 }
 
-void client_setup::send_silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo() {
-	if (times_sent_packets > 1000) {
-		times_sent_packets = 0;
+void client_setup::send_download_progress() {
+	ensure(downloading.has_value());
 
-		if (downloading) {
-			const auto downloaded_index = downloading->get_downloaded_file_index();
-			const auto num_all = downloading->num_all_downloaded_files();
+	::download_progress_message progress;
+	progress.progress = get_total_download_percent_complete(true) * 255;
 
-			/* Looks more pro without the easing per-file after all */
-
-			const auto percent_complete = (num_all == 1) ? 1.f : ((float(downloaded_index) /*+ this_percent_complete*/) / (num_all - 1));
-
-			::download_progress_message silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo;
-			silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo.progress = percent_complete * 255;
-
-			send_payload(
-				game_channel_type::RELIABLE_MESSAGES,
-				silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo
-			);
-		}
-	}
+	send_payload(
+		game_channel_type::RELIABLE_MESSAGES,
+		progress
+	);
 }
 
-void client_setup::send_packets_if_its_time() {
+bool client_setup::send_keepalive_download_progress() {
+	const auto new_time = get_current_time();
+	const bool can_already = new_time - when_sent_last_keepalive >= 0.5f;
+
+	if (can_already) {
+		LOG("Sending keepalive download progress.");
+
+		when_sent_last_keepalive = new_time;
+		send_download_progress();
+
+		return true;
+	}
+
+	return false;
+}
+
+void client_setup::send_packets() {
 	if (is_replaying()) {
 		return;
 	}
@@ -1210,19 +995,7 @@ void client_setup::send_packets_if_its_time() {
 		return;
 	}
 
-	++times_sent_packets;
-
-	send_silly_dummy_msg_to_prevent_pointless_sent_packet_assert_in_yojimbo();
-
 	adapter->send_packets();
-}
-
-void client_setup::log_malicious_server() {
-	set_disconnect_reason("The client is out of date, or the server might be malicious.\nIf your game is up to date, please report this fact to the developers\n - send them the files in the \"logs\" folder.", true);
-
-#if !IS_PRODUCTION_BUILD
-	ensure(false && "Server has sent some invalid data.");
-#endif
 }
 
 void client_setup::perform_chat_input_bar() {
@@ -1278,24 +1051,40 @@ void client_setup::perform_demo_player_imgui(augs::window& window) {
 	}
 }
 
-std::string arena_downloading_session::get_displayed_file_path() const {
-	if (is_downloading_project_json()) {
-		return json_path_in_part_dir.filename().string();
+auto client_setup::get_current_file_download_progress() const {
+	const bool externally = external_downloader != nullptr;
+
+	return
+		externally ?
+
+		yojimbo::BlockProgress {
+			uint32_t(external_downloader->get_downloaded_bytes()),
+			uint32_t(external_downloader->get_total_bytes())
+		} :
+
+		adapter->get_block_progress(game_channel_type::RELIABLE_MESSAGES)
+	;
+}
+
+float client_setup::get_current_file_percent_complete() const {
+	auto this_progress = get_current_file_download_progress();
+	return this_progress.blockSize == 0 ? 0.0f : float(this_progress.downloadedBytes) / this_progress.blockSize;
+}
+
+float client_setup::get_total_download_percent_complete(const bool smooth) const {
+	const auto downloaded_index = downloading->get_downloaded_file_index();
+	const auto num_all = downloading->num_all_downloaded_files();
+
+	/* Looks more pro without the easing per-file after all */
+
+	auto this_percent_complete = 0.0f;
+
+	if (smooth) {
+		this_percent_complete = get_current_file_percent_complete();
 	}
 
-	if (current_resource_idx) {
-		if (*current_resource_idx < all_needed_resources.size()) {
-			const auto currently_downloaded_hash = all_needed_resources[*current_resource_idx];
-
-			if (const auto entry = mapped_or_nullptr(output_files_by_hash, currently_downloaded_hash)) {
-				if (entry->output_files.size() > 0) {
-					return entry->output_files[0].string();
-				}
-			}
-		}
-	}
-
-	return "";
+	const auto percent_complete = (num_all == 1) ? 1.f : ((float(downloaded_index) + this_percent_complete) / (num_all - 1));
+	return percent_complete;
 }
 
 custom_imgui_result client_setup::perform_custom_imgui(
@@ -1407,19 +1196,36 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			if (downloading.has_value()) {
 				text_color("Downloading:", green);
 				ImGui::SameLine();
-				text_color(downloading->arena_name, yellow);
+				text_color(downloading->get_arena_name(), yellow);
 				ImGui::Separator();
 
-				const auto this_progress = adapter->get_block_progress(game_channel_type::RELIABLE_MESSAGES);
-				const auto this_percent_complete = this_progress.blockSize == 0 ? 0.0f : float(this_progress.downloadedBytes) / this_progress.blockSize;
+				const bool externally = external_downloader != nullptr;
 
-				if (downloading->is_downloading_resources()) {
+				const auto bytes_per_second = 
+					externally ?
+					external_downloader->get_bandwidth() :
+					double(adapter->get_network_info().received_kbps * 1000 / 8)
+				;
+
+				const auto this_progress = get_current_file_download_progress();
+				const auto this_percent_complete = get_current_file_percent_complete();
+
+				if (externally) {
+					text_color("External mirror: ", cyan);
+					ImGui::SameLine();
+					text(sv_public_vars.external_arena_files_provider);
+					ImGui::Separator();
+				}
+				else {
+					text_color("Downloading directly over UDP.", yellow);
+					ImGui::Separator();
+				}
+
+				if (downloading->now_downloading_external_resources()) {
 					const auto downloaded_index = downloading->get_downloaded_file_index();
 					const auto num_all = downloading->num_all_downloaded_files();
 
 					/* Looks more pro without the easing per-file after all */
-
-					const auto percent_complete = (num_all == 1) ? 1.f : ((float(downloaded_index) /*+ this_percent_complete*/) / (num_all - 1));
 
 					text(typesafe_sprintf(
 						"File: %x of %x",
@@ -1427,7 +1233,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 						num_all
 					));
 
-					ImGui::ProgressBar(percent_complete, ImVec2(-1.0f,0.0f));
+					ImGui::ProgressBar(get_total_download_percent_complete(false), ImVec2(-1.0f,0.0f));
 
 					text("\n");
 				}
@@ -1438,8 +1244,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 					ImGui::ProgressBar(this_percent_complete, ImVec2(-1.0f, 0.0f));
 
-					const auto speed_kbps = adapter->get_network_info().received_kbps;
-					const auto readable_speed = readable_bytesize(speed_kbps * 1000 / 8, "%2f");
+					const auto readable_speed = readable_bytesize(bytes_per_second , "%2f");
 
 					text(typesafe_sprintf(
 						"%x / %x",
@@ -1467,6 +1272,9 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				}
 				else if (state == C::RECEIVING_INITIAL_SNAPSHOT_CORRECTION) {
 					text("Receiving the initial state correction:");
+				}
+				else if (pause_solvable_stream) {
+					text("Download complete. Rejoining the game.");
 				}
 				else {
 					text("Unknown error.");
@@ -1580,10 +1388,11 @@ void client_setup::disconnect() {
 	}
 
 	adapter->disconnect();
+	downloading = std::nullopt;
 }
 
 bool client_setup::is_gameplay_on() const {
-	if (downloading.has_value()) {
+	if (pause_solvable_stream) {
 		return false;
 	}
 

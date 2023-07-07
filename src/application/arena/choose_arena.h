@@ -25,7 +25,7 @@ struct choose_arena_input {
 	}
 
 	void make_default() {
-		LOG_NOFORMAT("Couldn't load requested arena, so making a default one.");
+		LOG_NOFORMAT("Couldn't find arena with a matching hash.\nCreating default scene until another one is chosen.");
 
 		handle.make_default(lua, clean_round_state);
 		handle.choose_mode(test_mode_ruleset());
@@ -159,8 +159,6 @@ inline client_find_arena_result choose_arena_client(
 		altered = true;
 	}
 	else {
-		LOG_NOFORMAT("Couldn't find arena with a matching hash. Creating default.");
-
 		in.make_default();
 		altered = true;
 	}

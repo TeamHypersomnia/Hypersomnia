@@ -155,25 +155,34 @@ message_handler_result server_setup::handle_payload(
 		}
 
 		c.pending_entropies.emplace_back(std::move(payload));
-		//LOG("Received %x th command from client. ", c.pending_entropies.size());
+		// LOG("Received %xth command from client. ", c.pending_entropies.size());
 	}
 	else if constexpr (std::is_same_v<T, special_client_request>) {
+		auto wait_download = [&](const auto type) {
+			set_client_is_downloading_files(client_id, c, type);
+
+			c.reset_solvable_stream();
+			c.last_valid_payload_time = server_time;
+			c.last_keyboard_activity_time = server_time;
+		};
+
 		switch (payload) {
 			case special_client_request::RESET_AFK_TIMER:
 				c.last_keyboard_activity_time = server_time;
 				break;
 
-			case special_client_request::WAIT_IM_DOWNLOADING_EXTERNALLY:
-				c.is_downloading_files = true;
+			case special_client_request::WAIT_IM_DOWNLOADING_ARENA_EXTERNALLY:
+				wait_download(downloading_type::EXTERNALLY);
+				break;
 
-				c.last_valid_payload_time = server_time;
-				c.last_keyboard_activity_time = server_time;
+			case special_client_request::WAIT_IM_DOWNLOADING_ARENA_DIRECTLY:
+				wait_download(downloading_type::DIRECTLY);
 				break;
 
 			case special_client_request::RESYNC_ARENA_AFTER_FILES_DOWNLOADED:
 				LOG("Client is asking for a resync after download.");
 				
-				if (!c.is_downloading_files) {
+				if (c.downloading_status == downloading_type::NONE) {
 					LOG("Client notified about downloads completion twice.");
 					return abort_v;
 				}
@@ -184,13 +193,23 @@ message_handler_result server_setup::handle_payload(
 
 					if (const auto session_id = find_session_id(client_id)) {
 						message.author = *session_id;
+					}
 
+					{
 						const auto except = client_id;
 						broadcast(message, except);
 					}
+
+					message.recipient_effect = recipient_effect_type::RESUME_RECEIVING_SOLVABLES;
+
+					server->send_payload(
+						client_id,
+						game_channel_type::RELIABLE_MESSAGES,
+						message
+					);
 				}
 
-				c.is_downloading_files = false;
+				c.downloading_status = downloading_type::NONE;
 
 				/* Prevent kick after the inactivity period */
 
@@ -199,9 +218,14 @@ message_handler_result server_setup::handle_payload(
 
 				/* 
 					Resync entire solvable as if the client has just connected. 
+
+					The client's solvable stream is guaranteed to be clean right now (unless they're malicious but it's their loss)
+
+					It's because client makes sure to start sending entropies
+					ONLY AFTER RECEIVING the first full state snapshot,
+					as if they have just connected for the first time.
 				*/
 
-				c.reset_solvable_stream();
 				send_complete_solvable_state_to(client_id);
 				reinference_necessary = true;
 
@@ -288,7 +312,8 @@ message_handler_result server_setup::handle_payload(
 		}
 	}
 	else if constexpr (std::is_same_v<T, ::download_progress_message>) {
-
+		c.meta.stats.download_progress = payload.progress;
+		LOG("Client %x download progress: %x", client_id, float(payload.progress) / 255);
 	}
 	else if constexpr (std::is_same_v<T, ::request_arena_file_download>) {
 		if (!vars.allow_direct_arena_file_downloads) {
@@ -326,19 +351,7 @@ message_handler_result server_setup::handle_payload(
 				return kick_file_not_found();
 			}
 
-			if (!c.is_downloading_files) {
-				server_broadcasted_chat message;
-				message.target = chat_target_type::DOWNLOADING_FILES;
-
-				if (const auto session_id = find_session_id(client_id)) {
-					message.author = *session_id;
-
-					const auto except = client_id;
-					broadcast(message, except);
-				}
-			}
-
-			c.is_downloading_files = true;
+			set_client_is_downloading_files(client_id, c, downloading_type::DIRECTLY);
 			c.when_last_sent_file_packet = get_current_time();
 
 			server->send_payload(

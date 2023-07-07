@@ -98,7 +98,7 @@ main_menu_setup::main_menu_setup(
 		// LOG("Warning: could not load the main menu theme:\n%x", err.what());
 	}
 
-	query_latest_news(settings.latest_news_url);
+	//query_latest_news(settings.latest_news_url);
 
 	const auto menu_config_patch_path = "content/menu/config.lua";
 
@@ -210,6 +210,7 @@ void main_menu_setup::draw_overlays(
 	const augs::baked_font& gui_font,
 	const vec2i screen_size
 ) const {
+#if MENU_LOGO_IN_GUI
 	const auto game_logo = necessarys.at(assets::necessary_image_id::MENU_GAME_LOGO);
 	const auto game_logo_size = game_logo.get_original_size();
 
@@ -217,15 +218,24 @@ void main_menu_setup::draw_overlays(
 	game_logo_rect.set_position({ screen_size.x / 2.f - game_logo_size.x / 2.f, 50.f });
 	game_logo_rect.set_size(game_logo_size);
 
-	output.aabb(game_logo, game_logo_rect);
+	const bool draw_menu_logo = false;
 
-	if (is_ready(latest_news)) {
+	if (draw_menu_logo) {
+		output.aabb(game_logo, game_logo_rect);
+	}
+#endif
+
+	(void)necessarys;
+
+	const bool show_latest_news = false;
+
+	if (show_latest_news) {
 		print_stroked(
 			output,
 			vec2i(latest_news_pos),
-			from_bbcode ( latest_news.get(), { gui_font, cyan } )
+			from_bbcode ( typesafe_sprintf("[color=green]Latest change:[/color] %x", hypersomnia_version().commit_message), { gui_font, white } )
 		);
-	};
+	}
 
 	const auto s = style { gui_font, white };
 

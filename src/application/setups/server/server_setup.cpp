@@ -113,6 +113,7 @@ server_setup::server_setup(
 
 	if (dedicated == std::nullopt) {
 		integrated_client.init(server_time);
+		integrated_client.state = client_state_type::IN_GAME;
 		integrated_client.settings.chosen_nickname = integrated_client_vars.nickname;
 
 		if (!integrated_client_vars.avatar_image_path.empty()) {
@@ -617,6 +618,11 @@ void server_setup::send_heartbeat_to_server_list() {
 	server_heartbeat heartbeat;
 
 	heartbeat.nat = nat_traversal.last_detected_nat;
+
+	if (!vars.allow_nat_traversal) {
+		heartbeat.nat.type = nat_type::PUBLIC_INTERNET;
+	}
+
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
 	heartbeat.game_mode = arena.on_mode_with_input(
@@ -658,7 +664,7 @@ void server_setup::send_heartbeat_to_server_list() {
 							return static_cast<uint8_t>(std::clamp(i, 0, 255));
 						};
 
-						players.push_back({ player.get_chosen_name(), converted(player.stats.calc_score()), converted(player.stats.deaths) });
+						players.push_back({ player.get_nickname(), converted(player.stats.calc_score()), converted(player.stats.deaths) });
 					}
 				);
 
@@ -909,7 +915,7 @@ std::string server_setup::find_client_nickname(const client_id_type& id) const {
 	get_arena_handle().on_mode(
 		[&](const auto& mode) {
 			if (const auto entry = mode.find(to_mode_player_id(id))) {
-				nickname = ": " + entry->get_chosen_name();
+				nickname = ": " + entry->get_nickname();
 			}
 		}
 	);
@@ -958,6 +964,7 @@ server_public_vars server_setup::make_public_vars() const {
 
 	pub.required_arena_hash = current_arena_hash;
 	pub.playtesting_context = vars.playtesting_context;
+	pub.arena_from_autosave = current_arena_from_autosave;
 
 	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR.string());
 
@@ -1115,11 +1122,13 @@ void server_setup::rechoose_arena() {
 			std::addressof(*last_loaded_project)
 		});
 
-		current_arena_hash = result.required_hash;
 		current_arena_folder = result.arena_folder_path;
+		const auto paths = editor_project_paths(current_arena_folder);
+
+		current_arena_hash = result.required_hash;
+		current_arena_from_autosave = augs::exists(paths.autosave_json);
 			
-		const auto arena_json_hash = result.required_hash;
-		LOG("Chosen arena hash: %x", augs::to_hex_format(arena_json_hash));
+		LOG("Chosen arena hash: %x", augs::to_hex_format(current_arena_hash));
 
 		::register_external_resources_of(
 			*last_loaded_project,
@@ -1127,9 +1136,7 @@ void server_setup::rechoose_arena() {
 			arena_files_database
 		);
 
-		const auto paths = editor_project_paths(current_arena_folder);
-
-		if (augs::exists(paths.autosave_json)) {
+		if (current_arena_from_autosave) {
 			LOG("Arena was loaded from the autosave.");
 
 			/* 
@@ -1143,10 +1150,10 @@ void server_setup::rechoose_arena() {
 				(except for external resources in the json file).
 		   	*/
 
-			arena_files_database[arena_json_hash] = paths.autosave_json;
+			arena_files_database[current_arena_hash] = paths.autosave_json;
 		}
 		else {
-			arena_files_database[arena_json_hash] = paths.project_json;
+			arena_files_database[current_arena_hash] = paths.project_json;
 		}
 	}
 
@@ -1248,6 +1255,10 @@ void server_setup::send_full_arena_snapshot_to(const client_id_type client_id) {
 }
 
 void server_setup::send_complete_solvable_state_to(const client_id_type client_id) {
+	/*
+		Three things: server public vars, client public settings, and the full state snapshot.
+	*/
+
 	server->send_payload(
 		client_id, 
 		game_channel_type::RELIABLE_MESSAGES, 
@@ -1504,6 +1515,11 @@ void server_setup::advance_clients_state() {
 		}
 	};
 
+	/* 
+		Default means it will be iterated over all clients, even disconnected ones, 
+		to the exception of the integrated client.
+	*/
+
 	for_each_id_and_client(process_client);
 
 	{
@@ -1514,7 +1530,7 @@ void server_setup::advance_clients_state() {
 void server_setup::broadcast_shutdown_message() {
 	server_broadcasted_chat message;
 	message.target = chat_target_type::SERVER_SHUTTING_DOWN;
-	message.recipient_shall_kindly_leave = true;
+	message.recipient_effect = recipient_effect_type::DISCONNECT;
 
 	broadcast(message);
 
@@ -1591,7 +1607,7 @@ message_handler_result server_setup::handle_rcon_payload(
 	else if constexpr(std::is_same_v<P, server_vars>) {
 		LOG("New server vars from the client.");
 
-		apply(typed_payload, true);
+		apply(typed_payload);
 
 		return continue_v;
 	}
@@ -1660,25 +1676,41 @@ void server_setup::broadcast_net_statistics() {
 	if (interval > 0 && server_time - when_last_sent_net_statistics > std::max(interval, 0.5f)) {
 		net_statistics_update update;
 
-		auto gather_stats = [&](const auto client_id, const auto& c) {
-			if (c.state != client_state_type::IN_GAME) {
-				return;
-			}
+		auto clamped = [](const auto value) {
+			return static_cast<uint8_t>(std::clamp(value, 1, 255));
+		};
 
-			const auto max_ping = std::numeric_limits<uint8_t>::max();
-			const auto clamped_ping = [&]() {
+		auto reread_stats = [&](const auto client_id, auto& c) {
+			const auto clamped_ping = [&]() -> uint8_t {
 				if (to_mode_player_id(client_id) == get_local_player_id()) {
 					return 0;
 				}
 
 				const auto info = server->get_network_info(client_id);
 				const auto rounded_ping = static_cast<int>(std::round(info.rtt_ms));
-				return std::clamp(rounded_ping, 1, int(max_ping));
+				return clamped(rounded_ping);
 			}();
 
-			last_player_metas[client_id].stats.ping = clamped_ping;
+			c.meta.stats.ping = clamped_ping;
 
-			update.ping_values.push_back(static_cast<uint8_t>(clamped_ping));
+			if (c.downloading_status == downloading_type::NONE) {
+				/* Set to 100% */
+				c.meta.stats.download_progress = 255;
+			}
+
+			integrated_player_metas[client_id].stats = c.meta.stats;
+		};
+
+		auto fill_update = [&](const auto, const auto& c) {
+			const auto ping = static_cast<uint8_t>(c.meta.stats.ping);
+			const auto progress = c.meta.stats.download_progress;
+
+			const auto entry = net_statistics_entry {
+				ping,
+				progress
+			};
+
+			update.stats.push_back(entry);
 		};
 
 		auto send_stats = [&](const auto client_id, const auto& c) {
@@ -1699,7 +1731,9 @@ void server_setup::broadcast_net_statistics() {
 			);
 		};
 
-		for_each_id_and_client(gather_stats, connected_and_integrated_v);
+		for_each_id_and_client(reread_stats, connected_and_integrated_v);
+		for_each_id_and_client(fill_update, connected_and_integrated_v);
+
 		for_each_id_and_client(send_stats, only_connected_v);
 
 		when_last_sent_net_statistics = server_time;
@@ -1779,7 +1813,7 @@ void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& e
 }
 
 void server_setup::send_packets_to_clients_downloading_files() {
-	const auto target_bandwidth = vars.max_file_bandwidth * 1024 * 1024;
+	const auto target_bandwidth = vars.max_direct_file_bandwidth * 1024 * 1024;
 	const auto max_packets_at_a_time = 10; // 10k at a time can be sent, so to achieve max bandwidth, just 200 fps on a server is enough.
 
 	/* 
@@ -1801,7 +1835,7 @@ void server_setup::send_packets_to_clients_downloading_files() {
 	int num_downloaders = 0;
 
 	for_each_id_and_client([&num_downloaders](const auto, auto& c){
-		if (c.is_downloading_files) {
+		if (c.downloading_status == downloading_type::DIRECTLY) {
 			++num_downloaders;
 		}
 	}, connected_and_integrated_v);
@@ -1813,7 +1847,7 @@ void server_setup::send_packets_to_clients_downloading_files() {
 	packet_interval *= num_downloaders;
 
 	auto send_packets = [&](const auto, auto& c) {
-		if (c.is_downloading_files) {
+		if (c.downloading_status == downloading_type::DIRECTLY) {
 			int times_sent = 0;
 
 			while (c.when_last_sent_file_packet <= current_time && times_sent < max_packets_at_a_time) {
@@ -2127,7 +2161,7 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std
 		[&](const auto& typed_mode) {
 			if (const auto entry = typed_mode.find(payload.author)) {
 				sender_player_faction = entry->get_faction();
-				sender_player_nickname = entry->get_chosen_name();
+				sender_player_nickname = entry->get_nickname();
 			}
 		}
 	);
@@ -2223,7 +2257,7 @@ void server_setup::kick(const client_id_type& kicked_id, const std::string& reas
 	const auto except = kicked_id;
 	broadcast(message, except);
 
-	message.recipient_shall_kindly_leave = true;
+	message.recipient_effect = recipient_effect_type::DISCONNECT;
 
 	server->send_payload(
 		kicked_id,
@@ -2241,7 +2275,7 @@ void server_setup::ban(const client_id_type& id, const std::string& reason) {
 
 std::optional<arena_player_metas> server_setup::get_new_player_metas() {
 	if (rebuild_player_meta_viewables) {
-		auto& metas = last_player_metas;
+		auto& metas = integrated_player_metas;
 		
 		auto make_meta = [&](const auto client_id, const auto& cc) {
 			metas[client_id].avatar.image_bytes = cc.meta.avatar.image_bytes;
@@ -2257,7 +2291,7 @@ std::optional<arena_player_metas> server_setup::get_new_player_metas() {
 }
 
 const arena_player_metas* server_setup::find_player_metas() const {
-	return std::addressof(last_player_metas);
+	return std::addressof(integrated_player_metas);
 }
 	
 bool server_setup::handle_input_before_game(
@@ -2384,6 +2418,28 @@ void server_setup::refresh_runtime_info_for_rcon() {
 
 	for_each_id_and_client(broadcast_new_info_to_rcons, only_connected_v);
 }
+
+void server_setup::set_client_is_downloading_files(const client_id_type client_id, server_client_state& c, const downloading_type type) {
+	if (type > c.downloading_status) {
+		server_broadcasted_chat message;
+
+		message.target = 
+			type == downloading_type::DIRECTLY ? 
+			chat_target_type::DOWNLOADING_FILES_DIRECTLY : 
+			chat_target_type::DOWNLOADING_FILES
+		;
+
+		if (const auto session_id = find_session_id(client_id)) {
+			message.author = *session_id;
+
+			const auto except = client_id;
+			broadcast(message, except);
+		}
+	}
+
+	c.downloading_status = type;
+}
+
 
 #include "augs/readwrite/to_bytes.h"
 

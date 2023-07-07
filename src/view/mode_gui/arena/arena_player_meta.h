@@ -9,7 +9,8 @@ struct arena_player_avatar_payload {
 };
 
 struct arena_player_network_stats {
-	int ping = 0;
+	int ping = -1;
+	uint8_t download_progress = 255;
 };
 
 struct arena_player_meta {

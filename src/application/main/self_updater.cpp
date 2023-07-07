@@ -48,14 +48,9 @@
 extern std::atomic<int> signal_status;
 #endif
 
-bool successful(const int http_status_code) {
-	return http_status_code >= 200 && http_status_code < 300;
-}
+#include "augs/misc/httplib_utils.h"
 
-template <class... F>
-decltype(auto) launch_download(http_client_type& client, const std::string& resource, F&&... args) {
-	return client.Get(resource.c_str(), std::forward<F>(args)...);
-}
+using namespace httplib_utils;
 
 using R = self_update_result_type;
 namespace fs = std::filesystem;

@@ -36,12 +36,12 @@ augs::hash_string_type get_hex_representation(const augs::secure_hash_type& byte
 }
 
 namespace augs {
-	void crlf_to_lf(std::string& input) {
+	std::size_t crlf_to_lf(char* input, std::size_t n) {
 		std::size_t read_idx = 0;
 		std::size_t write_idx = 0;
 
-		while (read_idx < input.size()) {
-			if (input[read_idx] == '\r' && read_idx + 1 < input.size() && input[read_idx + 1] == '\n') {
+		while (read_idx < n) {
+			if (input[read_idx] == '\r' && read_idx + 1 < n && input[read_idx + 1] == '\n') {
 				input[write_idx++] = '\n';
 				read_idx += 2;  // Skip the '\r' and the '\n'
 			} else {
@@ -49,7 +49,15 @@ namespace augs {
 			}
 		}
 
-		input.resize(write_idx);  // Truncate the string to the new size
+		return write_idx;
+	}
+
+	void crlf_to_lf(std::string& input) {
+		input.resize(crlf_to_lf(input.data(), input.size()));
+	}
+
+	void crlf_to_lf(std::vector<std::byte>& input) {
+		input.resize(crlf_to_lf(reinterpret_cast<char*>(input.data()), input.size()));
 	}
 
 	secure_hash_type to_secure_hash_byte_format(const std::string& hex_string) {

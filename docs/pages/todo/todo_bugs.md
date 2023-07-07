@@ -5,6 +5,16 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- It looks like the stuck udp transmissions were due to acks not going through because of too small sequence buffers for acked packets.
+	- We WON'T have this problem normally because we're otherwise always sending at a tickrate of 60.
+		- so the packets will go through.
+		- (even with claarity it went through if we set bandwidth to 0)
+		- So we shouldn't worry about initial state because these blocks will be small and always sent without additional bandwidth
+	- However to not bloat the ack system + have adaptive bandwidth we could simply just send hash+index requests over the unreliable channel, given the file sizes (provided along with json file preferably)
+	- And now I see that increasing these buffers really screws up performance (0.3ms->3ms for adapter advance, unacceptable)
+	- We should really implement a simple protocol for requesting chunks, will be fun too
+	- each chunk will have a small overhead for blake hash+sliceindex, so maybe 36 bytes? acceptable
+
 - normalize the footstep sounds
 
 - editor crashes when deleting lots (almost all) reources which are still in use
@@ -166,6 +176,26 @@ We have a demo file
 	- ?
 
 # Done
+
+- WE DON'T WANT TO CLEAR client pending entropies on desync because it might happen mid-gameplay. We want to apply all actions applied during resync.
+- Note client begins sending net entropies as soon as receiving RESUME_SOLVABLES but clears them soon after when they receive initial snapshot.
+	- The server thinks these entropies came after clearing them.
+	- The server does not know which of the arrived client entropies are post client-side clear.
+- Note it's different with RESYNC command on desync.
+	- So we shouldn't clear solvable stream there.
+	- ::RESYNC_ARENA arrives synchronously with other client-entropies.
+		- so the server knows that all entropies post-resync are after clearing.
+	- However we don't want to clear the buffer here because resync request might arrive mid-gameplay.
+
+- Problem: solvable stream might be stopped at an arbitrary point when we start downloading externally
+	- fixed with FINISHED_DOWNLOADING notification
+	- worked earlier because the client was sending packets regularly not just keepalives
+	- some entropies might not get through if you download externally and only send keepalive packets
+		- then they suddenly can appear once you start exchanging packets regularly
+	- in case of direct downloads this goes over the reliable channel
+		- so the first file packet can only arrive after the initial solvable gets through
+		- which is why we always end with in-game
+
 
 - all_necessary_sounds might cause a crash on destruct too
 

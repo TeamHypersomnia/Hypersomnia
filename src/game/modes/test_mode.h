@@ -89,8 +89,8 @@ struct test_mode_player {
 		return session.is_set();
 	}
 
-	const auto& get_chosen_name() const {
-		return session.chosen_name;
+	const auto& get_nickname() const {
+		return session.nickname;
 	}
 
 	const auto& get_faction() const {
@@ -187,9 +187,9 @@ public:
 	template <class S, class E>
 	static auto find_player_by_impl(S& self, const E& identifier);
 
-	player_type* find_player_by(const entity_name_str& chosen_name);
+	player_type* find_player_by(const entity_name_str& nickname);
 	player_type* find(const mode_player_id&);
-	const player_type* find_player_by(const entity_name_str& chosen_name) const;
+	const player_type* find_player_by(const entity_name_str& nickname) const;
 	const player_type* find(const mode_player_id&) const;
 
 	const player_type* find(const session_id_type&) const;

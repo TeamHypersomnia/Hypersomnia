@@ -1163,7 +1163,9 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(max_predicted_client_commands), 0u, 3000u);
 				}
 
-				revertable_slider("Max file bandwidth (per second)", scope_cfg.max_file_bandwidth, 0.0f, 4.f, "%.2f MB");
+				revertable_slider("Max direct file bandwidth (per second)", scope_cfg.max_direct_file_bandwidth, 0.0f, 2.f, "%.2f MB");
+
+				tooltip_on_hover("If the external provider does not have the hosted map,\nthe client will download it directly through UDP as a fallback mechanism.\nNote this will always be the case with Editor playtesting.");
 
 				ImGui::Separator();
 
@@ -1773,8 +1775,11 @@ void do_server_vars(
 
 		revertable_checkbox("I'm behind router", scope_cfg.allow_nat_traversal);
 
-		//revertable_input_text(SCOPE_CFG_NVP(external_arena_files_provider));
-		revertable_slider("Max file bandwidth (per second)", scope_cfg.max_file_bandwidth, 0.0f, 4.f, "%.2f MB");
+		revertable_input_text(SCOPE_CFG_NVP(external_arena_files_provider));
+		tooltip_on_hover("Clients will first try to download missing files from this URL.\nIf for any reason the download fails or the files are out of date,\nthe clients will request a direct UDP transfer.");
+
+		revertable_slider("Max direct file bandwidth (per second)", scope_cfg.max_direct_file_bandwidth, 0.0f, 2.f, "%.2f MB");
+		tooltip_on_hover("If the external provider does not have the hosted map,\nclients will download it directly through UDP as a fallback mechanism.\nNote this will always be the case with Editor playtesting.");
 
 		if (auto node = scoped_tree_node("Time limits")) {
 			revertable_slider(SCOPE_CFG_NVP(move_to_spectators_if_afk_for_secs), 10u, 6000u);

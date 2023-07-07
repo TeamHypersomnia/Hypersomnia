@@ -99,7 +99,7 @@ mode_entropy_general debugger_modes_gui::perform(const debugger_settings& settin
 
 						if (players_node) {
 							for (const auto& p : typed_mode.get_players()) {
-								const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.get_chosen_name(), p.first.value);
+								const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.get_nickname(), p.first.value);
 
 								if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {
 									const auto player_handle = cosm[p.second.controlled_character_id];

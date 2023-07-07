@@ -37,6 +37,7 @@ struct server_public_vars {
 	std::optional<arena_playtesting_context> playtesting_context;
 
 	address_string_type external_arena_files_provider;
+	bool arena_from_autosave = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_public_vars&) const = default;
@@ -91,7 +92,7 @@ struct server_vars {
 	float log_performance_once_every_secs = 1;
 	float sleep_mult = 0.1f;
 
-	float max_file_bandwidth = 2.0f;
+	float max_direct_file_bandwidth = 2.0f;
 
 	server_webhook_vars webhooks;
 

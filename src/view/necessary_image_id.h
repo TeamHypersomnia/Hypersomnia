@@ -18,8 +18,6 @@ namespace assets {
 		GUI_CURSOR_MINUS,
 		GUI_CURSOR_ERROR,
 	
-		MENU_GAME_LOGO,
-	
 		MENU_BUTTON,
 	
 		MENU_BUTTON_LT,

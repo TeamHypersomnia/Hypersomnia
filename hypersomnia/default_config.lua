@@ -50,7 +50,7 @@ return {
 	server_list_port = 8420,
 
 	cert_pem_path = "",
-	key_pem_path = "",
+	key_pem_path = ""
   },
 
   float_consistency_test = {
@@ -632,7 +632,6 @@ treat_as_music_sounds_longer_than_secs = 5,
     speed = 1000
   },
   main_menu = {
-    latest_news_url = "hypersomnia.xyz/latest_post",
     menu_intro_scene_entropy_path = "abc",
     menu_background_arena_path = "content/menu/menu",
     menu_theme_path = "",
@@ -782,11 +781,12 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     max_buffered_client_commands = 1280,
     state_hash_once_every_tick = 1,
-    send_net_statistics_update_once_every_secs = 1,
+    send_net_statistics_update_once_every_secs = 0.5,
 
     auto_authorize_loopback_for_rcon = true,
     max_unauthorized_rcon_commands = 100,
-    max_bots = 0
+    max_bots = 0,
+    max_direct_file_bandwidth = 1
   },
 
   client = {
@@ -823,7 +823,8 @@ treat_as_music_sounds_longer_than_secs = 5,
 	  },
       show_recent_chat_messages_num = 30,
       keep_recent_chat_messages_for_seconds = 22,
-	}
+	},
+      max_direct_file_bandwidth = 1
   },
 
   performance = {
