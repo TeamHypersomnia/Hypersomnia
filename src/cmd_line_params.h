@@ -37,7 +37,7 @@ struct cmd_line_params {
 
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
-		complete_command_line = exe_path;
+		complete_command_line = exe_path.string();
 
 		for (int i = 1; i < argc;) {
 			const auto a = std::string(argv[i++]);
