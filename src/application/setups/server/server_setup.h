@@ -84,6 +84,7 @@ class server_setup :
 
 	augs::path_type current_arena_folder;
 	augs::secure_hash_type current_arena_hash;
+	bool current_arena_from_autosave = false;
 
 	server_public_vars make_public_vars() const;
 

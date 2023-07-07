@@ -964,6 +964,7 @@ server_public_vars server_setup::make_public_vars() const {
 
 	pub.required_arena_hash = current_arena_hash;
 	pub.playtesting_context = vars.playtesting_context;
+	//pub.from_autosave = current_arena_from_autosave;
 
 	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR.string());
 
@@ -1121,11 +1122,13 @@ void server_setup::rechoose_arena() {
 			std::addressof(*last_loaded_project)
 		});
 
-		current_arena_hash = result.required_hash;
 		current_arena_folder = result.arena_folder_path;
+		const auto paths = editor_project_paths(current_arena_folder);
+
+		current_arena_hash = result.required_hash;
+		current_arena_from_autosave = augs::exists(paths.autosave_json);
 			
-		const auto arena_json_hash = result.required_hash;
-		LOG("Chosen arena hash: %x", augs::to_hex_format(arena_json_hash));
+		LOG("Chosen arena hash: %x", augs::to_hex_format(current_arena_hash));
 
 		::register_external_resources_of(
 			*last_loaded_project,
@@ -1133,9 +1136,7 @@ void server_setup::rechoose_arena() {
 			arena_files_database
 		);
 
-		const auto paths = editor_project_paths(current_arena_folder);
-
-		if (augs::exists(paths.autosave_json)) {
+		if (current_arena_from_autosave) {
 			LOG("Arena was loaded from the autosave.");
 
 			/* 
@@ -1149,10 +1150,10 @@ void server_setup::rechoose_arena() {
 				(except for external resources in the json file).
 		   	*/
 
-			arena_files_database[arena_json_hash] = paths.autosave_json;
+			arena_files_database[current_arena_hash] = paths.autosave_json;
 		}
 		else {
-			arena_files_database[arena_json_hash] = paths.project_json;
+			arena_files_database[current_arena_hash] = paths.project_json;
 		}
 	}
 

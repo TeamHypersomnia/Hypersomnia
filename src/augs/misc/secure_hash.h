@@ -9,7 +9,9 @@ namespace augs {
 	using secure_hash_type = std::array<uint8_t, 32>;
 	using hash_string_type = augs::constant_size_string<64>;
 
+	std::size_t crlf_to_lf(char*, std::size_t n);
 	void crlf_to_lf(std::string&);
+	void crlf_to_lf(std::vector<std::byte>&);
 
 	hash_string_type to_hex_format(const secure_hash_type& hstr);
 	secure_hash_type to_secure_hash_byte_format(const std::string& hex_string);

@@ -274,6 +274,13 @@ void arena_downloading_session::determine_needed_resources() {
 bool arena_downloading_session::requested_hash_matches(
 	const std::vector<std::byte>& bytes
 ) const {
+	if (now_downloading_project_json()) {
+		auto converted_to_lf = bytes;
+		augs::crlf_to_lf(converted_to_lf);
+
+		return augs::secure_hash(converted_to_lf) == last_requested_file_hash;
+	}
+
 	return augs::secure_hash(bytes) == last_requested_file_hash;
 }
 
