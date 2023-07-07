@@ -709,6 +709,7 @@ public:
 				if (is_trying_external_download()) {
 					if (send_keepalive_download_progress()) {
 						send_packets();
+						handle_incoming_payloads();
 					}
 
 					advance_external_downloader();

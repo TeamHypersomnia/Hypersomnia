@@ -43,7 +43,6 @@ public:
 	);
 
 	void send_packets();
-	void receive_packets();
 
 	template <class... Args>
 	bool send_payload(

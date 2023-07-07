@@ -519,10 +519,6 @@ void client_adapter::send_packets() {
 	client.SendPackets();
 }
 
-void client_adapter::receive_packets() {
-	client.ReceivePackets();
-}
-
 bool client_adapter::can_send_message(const game_channel_type& channel) const {
 	return client.CanSendMessage(static_cast<channel_id_type>(channel));
 }
