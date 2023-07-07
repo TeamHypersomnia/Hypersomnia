@@ -50,8 +50,7 @@ return {
 	server_list_port = 8420,
 
 	cert_pem_path = "",
-	key_pem_path = "",
-      max_direct_file_bandwidth = 1
+	key_pem_path = ""
   },
 
   float_consistency_test = {
@@ -786,7 +785,8 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     auto_authorize_loopback_for_rcon = true,
     max_unauthorized_rcon_commands = 100,
-    max_bots = 0
+    max_bots = 0,
+    max_direct_file_bandwidth = 1
   },
 
   client = {

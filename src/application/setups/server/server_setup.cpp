@@ -618,6 +618,11 @@ void server_setup::send_heartbeat_to_server_list() {
 	server_heartbeat heartbeat;
 
 	heartbeat.nat = nat_traversal.last_detected_nat;
+
+	if (!vars.allow_nat_traversal) {
+		heartbeat.nat.type = nat_type::PUBLIC_INTERNET;
+	}
+
 	heartbeat.server_name = get_server_name();
 	heartbeat.current_arena = get_current_arena_name();
 	heartbeat.game_mode = arena.on_mode_with_input(

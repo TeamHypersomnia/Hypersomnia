@@ -11,6 +11,9 @@ summary: Just a hidden scratchpad.
 		- (even with claarity it went through if we set bandwidth to 0)
 		- So we shouldn't worry about initial state because these blocks will be small and always sent without additional bandwidth
 	- However to not bloat the ack system + have adaptive bandwidth we could simply just send hash+index requests over the unreliable channel, given the file sizes (provided along with json file preferably)
+	- And now I see that increasing these buffers really screws up performance (0.3ms->3ms for adapter advance, unacceptable)
+	- We should really implement a simple protocol for requesting chunks, will be fun too
+	- each chunk will have a small overhead for blake hash+sliceindex, so maybe 36 bytes? acceptable
 
 - normalize the footstep sounds
 

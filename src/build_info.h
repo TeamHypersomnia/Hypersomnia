@@ -98,6 +98,9 @@ Options:
                                 Contrary to the --dedicated-server option, this lets you play on your own server within the same game instance.
     --dedicated-server          The same as --server, but applies some settings suitable for a dedicated server instance.
                                 For example - the game will be started without a window.
+                                Remember to set --no-router if you're hosting e.g. on a proper VPS without a router.
+	--no-router					Disables NAT traversal for incoming connections. NAT traversal is unnecessary if you forwarded the ports,
+                                plan to only play over LAN or have a proper server instance with a dedicated IP address, without a router.
 
 If debugger_file_path is supplied and it is a directory,
 the game will automatically launch the editor to try and open the project inside it, if there is one.)"

@@ -226,6 +226,10 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	auto& canon_config = *canon_config_ptr;
 
+	LOG("Parsing command-line parameters.");
+
+	const auto params = cmd_line_params(argc, argv);
+
 	auto config_ptr = [&]() {
 		auto result = std::make_unique<config_lua_table>(canon_config);
 
@@ -235,6 +239,10 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		if (augs::exists(force_config_path)) {
 			result->load_patch(lua, force_config_path);
+		}
+
+		if (params.no_router) {
+			result->server.allow_nat_traversal = false;
 		}
 
 		return result;
@@ -254,10 +262,6 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		::log_timestamp_format = config.log_timestamp_format;
 	}
-
-	LOG("Parsing command-line parameters.");
-
-	const auto params = cmd_line_params(argc, argv);
 
 	if (::log_to_live_file) {
 		if (config.remove_live_log_file_on_start) {
