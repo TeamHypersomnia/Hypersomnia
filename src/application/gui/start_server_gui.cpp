@@ -111,15 +111,6 @@ as well as to test your skills in a laggy environment.
 		text_color(::censor_ips(log_text), log_color);
 	}
 
-#if NDEBUG && PLATFORM_UNIX
-	const bool is_dedicated = instance_type == server_instance_type::DEDICATED;
-	const bool please_use_cmdline = is_dedicated;
-#else
-	const bool please_use_cmdline = false;
-#endif
-
-	const bool is_disabled = please_use_cmdline;
-
 	{
 		auto child = scoped_child("host view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
@@ -224,14 +215,9 @@ as well as to test your skills in a laggy environment.
 			ImGui::Separator();
 		}
 
-		if (is_disabled) {
-			text_color("On Linux, please use the command line to spawn a dedicated server.", red);
-		}
-		else {
-			text_disabled("See Settings->Server for more options to tweak.\n\n");
+		text_disabled("See Settings->Server for more options to tweak.\n\n");
 
-			//text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
-		}
+		//text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
 	}
 
 	{
@@ -240,7 +226,7 @@ as well as to test your skills in a laggy environment.
 		ImGui::Separator();
 
 		{
-			auto scope = maybe_disabled_cols({}, !is_nickname_valid_characters(into_vars.server_name) || is_disabled);
+			auto scope = maybe_disabled_cols({}, !is_nickname_valid_characters(into_vars.server_name));
 
 			if (ImGui::Button("Launch!")) {
 				result = true;
