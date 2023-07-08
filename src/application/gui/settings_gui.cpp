@@ -1253,7 +1253,8 @@ void settings_gui_state::perform(
 					{
 						auto& scope_cfg = config.server;
 						revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_loopback_for_rcon));
-						revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_internal_for_rcon));
+						revertable_checkbox("Auto authorize internal network clients for rcon", scope_cfg.auto_authorize_internal_for_rcon);
+						tooltip_on_hover("Use cautiously. This will authorize clients coming from addresses\nlike 192.168.0.1 for total control over the server.\n\nUse only in trusted settings like in your home network.");
 					}
 				}
 
