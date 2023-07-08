@@ -47,6 +47,7 @@ struct editor_portal_info {
 	float exit_cooldown_ms = 200.0f;
 
 	augs::maybe<force_field_def> force_field = augs::maybe<force_field_def>(force_field_def(), false);
+	augs::maybe<hurt_def> hurt = augs::maybe<hurt_def>(hurt_def(), false);
 
 	editor_filter_flags reacts_to;
 

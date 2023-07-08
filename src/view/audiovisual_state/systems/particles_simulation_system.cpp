@@ -570,6 +570,11 @@ void particles_simulation_system::advance_visible_streams(
 		const packaged_particle_effect& effect,
 		const vec2 chased_velocity = vec2::zero
 	) {
+		auto particles_checked_cone = queried_cone;
+		particles_checked_cone.eye.zoom /= 2.f;
+
+		const auto particles_cam_aabb = particles_checked_cone.get_visible_world_rect_aabb();
+
 		const auto& modifier = effect.input.modifier;
 		const auto homing_target = effect.start.homing_target;
 		const auto infinitely = effect.start.stream_infinitely;
@@ -625,25 +630,39 @@ void particles_simulation_system::advance_visible_streams(
 				
 				const auto& emission = instance.source_emission;
 
-				auto considered_inner = instance.randomize_spawn_point_within_circle_of_inner_radius;
-				auto considered_outer = instance.randomize_spawn_point_within_circle_of_outer_radius;
+				if (modifier.box != vec2::zero) {
+					const auto rx = rng.randval(0.f, 1.f) - 0.5f;
+					const auto ry = rng.randval(0.f, 1.f) - 0.5f;
 
-				if (modifier.radius != 0.0f) {
-					considered_inner = 0.0f;
-					considered_outer = modifier.radius;
+					final_particle_position += modifier.box * vec2(rx, ry).rotate(current_transform.rotation);
+				}
+				else {
+					auto considered_inner = instance.randomize_spawn_point_within_circle_of_inner_radius;
+					auto considered_outer = instance.randomize_spawn_point_within_circle_of_outer_radius;
+
+					if (modifier.radius != 0.0f) {
+						considered_inner = 0.0f;
+						considered_outer = modifier.radius;
+					}
+
+					if (considered_inner > 0.f || considered_outer > 0.f) {
+						const auto size_mult = augs::interp(
+							instance.starting_spawn_circle_size_multiplier,
+							instance.ending_spawn_circle_size_multiplier,
+							emission.use_sqrt_to_ease_spawn_circle ? std::sqrt(stream_alivity_mult) : stream_alivity_mult
+						);
+						
+						final_particle_position += rng.random_point_in_ring(
+							size_mult * considered_inner,
+							size_mult * considered_outer
+						);
+					}
 				}
 
-				if (considered_inner > 0.f || considered_outer > 0.f) {
-					const auto size_mult = augs::interp(
-						instance.starting_spawn_circle_size_multiplier,
-						instance.ending_spawn_circle_size_multiplier,
-						emission.use_sqrt_to_ease_spawn_circle ? std::sqrt(stream_alivity_mult) : stream_alivity_mult
-					);
-					
-					final_particle_position += rng.random_point_in_ring(
-						size_mult * considered_inner,
-						size_mult * considered_outer
-					);
+				const bool visible_in_camera = particles_cam_aabb.hover(final_particle_position);
+
+				if (!visible_in_camera) {
+					continue;
 				}
 
 				/* MSVC ICE workaround */
@@ -699,7 +718,7 @@ void particles_simulation_system::advance_visible_streams(
 
 	{
 		auto checked_cone = queried_cone;
-		checked_cone.eye.zoom /= 2.5f;
+		checked_cone.eye.zoom /= 2.f;
 
 		const auto cam_aabb = checked_cone.get_visible_world_rect_aabb();
 

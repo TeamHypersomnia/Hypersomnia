@@ -6,11 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- relaunch the server with the exact same CLI
+- Updating all the servers automatically
+    - MS could send packets with signatures of the new version 
+        - Then the servers will know it's legit, even if it's spoofed it literally only helps
+        - We don't even have to download the entire archive then. We'll just have one more thing to sign, the new version message.
 
 - Map catalogue
     - Note external arena provider and ingame catalogue source are conceptually two different links
         - even though they'll coincide for the official server
+        - BUT After all let's make the catalogue read from the server vars.
+            - Why? Because if the end-user chooses a different provider they'll expect that hosting a server will take the same link as provider too.
 
     - Problems to solve
         - What if we update maps while the servers already have them loaded?

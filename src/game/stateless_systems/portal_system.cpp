@@ -9,6 +9,7 @@
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/messages/pure_color_highlight_message.h"
 #include "game/detail/melee/like_melee.h"
+#include "game/messages/damage_message.h"
 
 auto calc_unit_progress_per_step(const augs::delta& dt, const real32 time_ms) {
 	const auto seconds_to_complete = time_ms / 1000;
@@ -217,6 +218,7 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 		const auto& portal = portal_handle.template get<components::portal>();
 
 		const auto portal_exit = cosm[portal.portal_exit];
+		const bool trampoline_like = portal_handle == portal_exit;
 
 		const auto contacted_entity_transform = typed_contacted_entity.get_logic_transform();
 		const auto portal_entry_transform = portal_handle.get_logic_transform();
@@ -229,7 +231,11 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						contacted_entity_transform.rotation
 					};
 
-					const auto radius = portal_exit.get_logical_size().smaller_side() / 2;
+					const auto& portal_exit_marker = portal_exit.template get<components::marker>();
+					const auto shape = portal_exit_marker.shape;
+					const auto logical_size = portal_exit.get_logical_size();
+
+					const auto radius = logical_size.smaller_side() / 2;
 
 					rigid_body.restore_velocities();
 
@@ -262,8 +268,22 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					switch (portal_exit_portal->exit_position) {
 						case portal_exit_position::PORTAL_CENTER_PLUS_ENTERING_OFFSET:
-							final_transform.pos += (contacted_entity_transform.pos - portal_entry_transform.pos).trim_length(radius);
+						{
+							auto dir = contacted_entity_transform.pos - portal_entry_transform.pos;
+
+							if (!trampoline_like) {
+								if (shape == marker_shape_type::CIRCLE) {
+									dir = dir.trim_length(radius);
+								}
+								else {
+									dir = dir.clamp(logical_size / 2);
+								}
+							}
+
+							final_transform.pos += dir;
+
 							break;
+						}
 						case portal_exit_position::PORTAL_BOUNDARY:
 							final_transform.pos += portal_exit_direction * radius;
 							break;
@@ -317,6 +337,20 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 					::snap_interpolated_to(typed_contacted_entity, final_transform);
 
 					play_exit_effects(step, typed_contacted_entity, *portal_exit_portal);
+
+					if (portal_exit_portal->hurt.is_enabled) {
+						const auto& hurt = portal_exit_portal->hurt.value;
+
+						messages::damage_message msg;
+						msg.subject = typed_contacted_entity;
+						msg.damage.base = hurt.damage;
+						msg.origin.cause = damage_cause(portal_exit);
+						msg.origin.sender.set(typed_contacted_entity);
+						msg.impact_velocity = considered_velocity;
+						msg.point_of_impact = contacted_entity_transform.pos;
+
+						step.post_message(msg);
+					}
 
 					special.teleport_progress = 0.0f;
 					special.teleport_progress_falloff_speed = 0.0f;

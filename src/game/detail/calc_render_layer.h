@@ -54,7 +54,7 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 				return render_layer::CALLOUT_MARKERS;
 			}
 
-			if (m.type == area_marker_type::PORTAL) {
+			if (::is_portal_based(m.type)) {
 				return render_layer::AREA_SENSORS;
 			}
 

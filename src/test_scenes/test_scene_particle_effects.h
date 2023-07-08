@@ -72,6 +72,8 @@ enum class test_scene_particle_effect_id {
 	PORTAL_ENTER,
 	PORTAL_EXIT,
 
+	LAVA_CIRCLE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

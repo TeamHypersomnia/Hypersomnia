@@ -844,14 +844,17 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		MULTIPROPERTY("Letter", letter);
 	}
 
-	const bool has_shape = type == area_marker_type::PORTAL;
+	const bool has_shape = ::is_portal_based(type);
 
 	if (has_shape) {
 		MULTIPROPERTY("Shape", shape);
 		tooltip_on_hover("Note that rectangular effects for portals are not supported yet,\nbut the physical sensor itself will work just fine as a box.");
 	}
 
-	if (type == area_marker_type::PORTAL) {
+	const bool is_hurt = type == area_marker_type::HURT;
+	(void)is_hurt;
+
+	if (::is_portal_based(type)) {
 		ImGui::ColorButton("##Cbutton", insp.as_portal.get_icon_color().operator ImVec4());
 
 		ImGui::SameLine();

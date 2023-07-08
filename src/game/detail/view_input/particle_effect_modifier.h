@@ -8,6 +8,7 @@ struct particle_effect_modifier {
 	real32 scale_amounts = 1.f;
 	real32 scale_lifetimes = 1.f;
 	real32 radius = 0.0f;
+	vec2 box = vec2::zero;
 	// END GEN INTROSPECTOR
 
 	void sanitize() {

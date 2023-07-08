@@ -6389,3 +6389,7 @@ This will discard your redo history."
 
 - current_arena -> arena/map
 
+- relaunch the server with the exact same CLI
+    - always the whole game actually
+    - but remember to not pass duplicate flags
+

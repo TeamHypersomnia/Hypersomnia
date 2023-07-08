@@ -13,6 +13,7 @@ inline bool always_hide_in_game(const area_marker_type t) {
 		case area_marker_type::ORGANISM_AREA:
 		case area_marker_type::PREFAB:
 		case area_marker_type::PORTAL:
+		case area_marker_type::HURT:
 			return true;
 
 		default:

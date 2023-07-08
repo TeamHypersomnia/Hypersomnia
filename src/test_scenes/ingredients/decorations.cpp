@@ -522,6 +522,22 @@ namespace test_flavours {
 		);
 
 		flavour_with_sound(
+			test_sound_decorations::FIRE_DAMAGE,
+			test_scene_sound_id::FIRE_DAMAGE,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1
+		);
+
+		flavour_with_sound(
+			test_sound_decorations::LAVA_AMBIENCE,
+			test_scene_sound_id::LAVA_AMBIENCE,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			-1,
+			-1
+		);
+
+		flavour_with_sound(
 			test_sound_decorations::FOOTSTEP_DIRT,
 			test_scene_sound_id::FOOTSTEP_DIRT,
 			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
@@ -695,6 +711,12 @@ namespace test_flavours {
 		flavour_with_particles(
 			test_particles_decorations::PORTAL_CIRCLE,
 			test_scene_particle_effect_id::PORTAL_CIRCLE,
+			white
+		);
+
+		flavour_with_particles(
+			test_particles_decorations::LAVA_CIRCLE,
+			test_scene_particle_effect_id::LAVA_CIRCLE,
 			white
 		);
 

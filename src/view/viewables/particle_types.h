@@ -22,7 +22,7 @@ template <class T>
 constexpr bool has_lifetime_v = has_lifetime<T>::value;
 
 struct general_particle {
-	static constexpr std::size_t statically_allocate = 5000;
+	static constexpr std::size_t statically_allocate = 10000;
 
 	// GEN INTROSPECTOR struct general_particle
 	vec2 pos;
@@ -158,7 +158,7 @@ struct animation_in_particle {
 };
 
 struct animated_particle {
-	static constexpr std::size_t statically_allocate = 5000;
+	static constexpr std::size_t statically_allocate = 10000;
 
 	// GEN INTROSPECTOR struct animated_particle
 	vec2 pos;

@@ -49,6 +49,14 @@ enum class force_field_direction {
 	// END GEN INTROSPECTOR
 };
 
+struct hurt_def {
+	// GEN INTROSPECTOR struct hurt_def
+	float damage = 35.0f;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const hurt_def&) const = default;
+};
+
 struct force_field_def {
 	// GEN INTROSPECTOR struct force_field_def
 	force_field_direction direction = force_field_direction::INWARD;

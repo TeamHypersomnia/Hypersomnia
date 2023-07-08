@@ -8,6 +8,7 @@ enum class editor_color_preset {
 	RED,
 	GREEN,
 	PINK,
+	LAVA,
 	WHITE,
 	COUNT
 	// END GEN INTROSPECTOR
@@ -60,6 +61,14 @@ inline auto get_editor_color_preset(const editor_color_preset t) {
 			o.portal.outer_ring = rgba(128, 0, 0, 200);
 			o.portal.light = red.with_alpha(150);
 			o.portal.ambience_particles = red;
+			o.portal.begin_entering_particles = o.portal.enter_particles = o.portal.exit_particles = o.portal.ambience_particles;
+			break;
+
+		case editor_color_preset::LAVA:
+			o.portal.inner_ring = rgba(255, 102, 0, 255);
+			o.portal.outer_ring = rgba(128, 0, 0, 200);
+			o.portal.light = red.with_alpha(150);
+			o.portal.ambience_particles = rgba(255, 102, 0, 255);
 			o.portal.begin_entering_particles = o.portal.enter_particles = o.portal.exit_particles = o.portal.ambience_particles;
 			break;
 

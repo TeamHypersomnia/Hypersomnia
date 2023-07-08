@@ -60,7 +60,7 @@ rgba editor_setup::get_icon_color_for(
 				else if constexpr(std::is_same_v<T, editor_area_marker_node>) {
 					icon = marker_icon::from_area(maybe_resource->editable, object.editable, get_faction_color);
 
-					if (maybe_resource->editable.type == area_marker_type::PORTAL) {
+					if (::is_portal_based(maybe_resource->editable.type)) {
 						icon.col = object.editable.as_portal.get_icon_color();
 					}
 				}

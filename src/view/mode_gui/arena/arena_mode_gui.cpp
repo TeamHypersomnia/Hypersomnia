@@ -63,32 +63,54 @@ struct tool_layout_meta {
 };
 
 tool_layout_meta make_tool_layout(
+	const augs::atlas_entry death_hurt_icon,
 	const assets::image_id death_fallback_icon,
 	augs::vertex_triangle_buffer& output_buffer,
 	const damage_origin& origin,
 	const cosmos& cosm,
 	const images_in_atlas_map& images_in_atlas
 ) {
+	auto from_image = [&](const assets::image_id image_id) {
+		//LOG_NVPS(image_id.get_cache_index(), static_cast<std::size_t>(image_id.get_cache_index()), images_in_atlas.size());
+		const auto& entry = images_in_atlas.find_or(image_id).diffuse;
+
+		auto meta = tool_layout_meta();
+
+		meta.aabb = ltrb(vec2::zero, entry.get_original_size());
+		meta.draw = [&](const ltrb target_aabb) {
+			augs::drawer{ output_buffer }.aabb(
+				entry,
+				target_aabb,
+				white
+			);
+		};
+
+		return meta;
+	};
+
 	return origin.on_tool_used(cosm, [&](const auto& tool) -> tool_layout_meta {
 		using T = remove_cref<decltype(tool)>;
 
-		auto from_image = [&](const auto image_id) {
-			//LOG_NVPS(image_id.get_cache_index(), static_cast<std::size_t>(image_id.get_cache_index()), images_in_atlas.size());
-			const auto& entry = images_in_atlas.find_or(image_id).diffuse;
+		if (auto causer = cosm[origin.cause.entity]) {
+			if (auto portal = causer.template find<components::portal>()) {
+				if (portal->hurt.is_enabled) {
+					auto entry = death_hurt_icon;
 
-			auto meta = tool_layout_meta();
+					auto meta = tool_layout_meta();
 
-			meta.aabb = ltrb(vec2::zero, entry.get_original_size());
-			meta.draw = [&](const ltrb target_aabb) {
-				augs::drawer{ output_buffer }.aabb(
-					entry,
-					target_aabb,
-					white
-				);
-			};
+					meta.aabb = ltrb(vec2::zero, entry.get_original_size());
+					meta.draw = [&](const ltrb target_aabb) {
+						augs::drawer{ output_buffer }.aabb(
+							entry,
+							target_aabb,
+							orange
+						);
+					};
 
-			return meta;
-		};
+					return meta;
+				}
+			}
+		}
 
 		if constexpr(is_nullopt_v<T>) {
 			return from_image(death_fallback_icon);
@@ -348,6 +370,7 @@ void arena_gui_state::draw_mode_gui(
 		using namespace augs::gui::text;
 
 		const auto death_fallback_icon = mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON];
+		const auto death_hurt_icon = in.necessary_images[assets::necessary_image_id::EDITOR_ICON_HURT];
 
 		const auto local_player_faction = [&]() -> std::optional<faction_type> {
 			if (const auto p = typed_mode.find(local_player_id)) {
@@ -558,6 +581,7 @@ void arena_gui_state::draw_mode_gui(
 			const auto free_w_for_tool = total_text_size.x - killer_nickname_text_size.x;
 
 			const auto layout = make_tool_layout(
+				death_hurt_icon,
 				death_fallback_icon,
 				get_drawer().output_buffer,
 				killer_origin,
@@ -818,6 +842,7 @@ void arena_gui_state::draw_mode_gui(
 				}();
 
 				const auto layout = make_tool_layout(
+					death_hurt_icon,
 					death_fallback_icon,
 					get_drawer().output_buffer,
 					ko.origin,

@@ -28,12 +28,23 @@ enum class area_marker_type {
 	ORGANISM_AREA,
 
 	PORTAL,
+	HURT,
 
 	CALLOUT,
 	PREFAB,
 	COUNT
 	// END GEN INTROSPECTOR
 };
+
+inline bool is_portal_based(const area_marker_type t) {
+	switch (t) {
+		case area_marker_type::PORTAL:
+		case area_marker_type::HURT:
+			return true;
+		default:
+			return false;
+	}
+}
 
 inline bool is_bombsite(const area_marker_type t) {
 	return t == area_marker_type::BOMBSITE;

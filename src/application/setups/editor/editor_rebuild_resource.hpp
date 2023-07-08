@@ -40,7 +40,7 @@ void allocate_flavours_and_assets_for_resource(
 		resource.scene_flavour_id = typed_entity_flavour_id<entity_type>(flavour_pool.allocate().key);
 	}
 	else if constexpr(std::is_same_v<editor_area_marker_resource, R>) {
-		if (editable.type == area_marker_type::PORTAL) {
+		if (::is_portal_based(editable.type)) {
 
 		}
 		else {
@@ -455,7 +455,7 @@ void setup_per_node_flavour(
 	};
 
 	if constexpr(std::is_same_v<editor_area_marker_node, N>) {
-		if (resource.editable.type == area_marker_type::PORTAL) {
+		if (is_portal_based(resource.editable.type)) {
 			using entity_type = area_sensor;
 
 			auto& flavour_pool = common.flavours.get_for<entity_type>();

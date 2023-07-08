@@ -353,6 +353,9 @@ enum class test_sound_decorations {
 	PORTAL_ENTER,
 	PORTAL_EXIT,
 
+	FIRE_DAMAGE,
+	LAVA_AMBIENCE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
@@ -374,6 +377,8 @@ enum class test_particles_decorations {
 	PORTAL_BEGIN_ENTERING,
 	PORTAL_ENTER,
 	PORTAL_EXIT,
+
+	LAVA_CIRCLE,
 
 	COUNT
 	// END GEN INTROSPECTOR
