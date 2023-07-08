@@ -5346,7 +5346,7 @@ void load_test_scene_particle_effects(
 			particles_emission em;
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(80, 100);
-			em.particles_per_sec = float_range(500, 500);
+			em.particles_per_sec = float_range(250, 250);
 			em.stream_lifetime_ms = float_range(180, 180);
 			em.base_speed = float_range(50, 400);
 			em.rotation_speed = float_range(0, 0);

@@ -186,9 +186,10 @@ bool setup_entity_from_node(
 							particles->modifier = static_cast<const particle_effect_modifier&>(from.ambience_particles);
 							particles->modifier.sanitize();
 
-							if (editable.shape == marker_shape_type::BOX) {
+							// for now always force rectangular particles for HURT because rectangular LAVA CIRCLE looks better (I know ugly)
+							if (resource.editable.type == area_marker_type::HURT || editable.shape == marker_shape_type::BOX) {
 								const auto basic_area = 128 * 128 * PI<float>;
-								const auto this_area = editable.size.area() / 2;
+								const auto this_area = editable.size.area() / 1.4f;
 
 								particles->modifier.box = editable.size;
 								particles->modifier.scale_amounts *= this_area / basic_area;
