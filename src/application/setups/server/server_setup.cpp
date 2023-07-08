@@ -2144,6 +2144,11 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	}
 
 	if (::safe_equal(c.settings.rcon_password, private_vars.rcon_password)) {
+		if (private_vars.master_rcon_password.empty()) {
+			LOG("Authorized the remote client for master rcon.");
+			return rcon_level_type::MASTER;
+		}
+
 		LOG("Authorized the remote client for basic rcon.");
 		return rcon_level_type::BASIC;
 	}
