@@ -33,7 +33,7 @@ void setup_resource_defaults_after_creating_officials(
 		to.exit_particles.id = o[test_particles_decorations::PORTAL_EXIT];
 	}	
 
-	if (auto portal = find_resource(o[area_marker_type::HURT])) {
+	if (auto portal = find_resource(o[area_marker_type::HAZARD])) {
 		portal->editable.node_defaults.shape = marker_shape_type::BOX;
 		portal->editable.node_defaults.size = vec2(128, 128);
 
@@ -62,7 +62,7 @@ void setup_resource_defaults_after_creating_officials(
 		to.exit_impulses.object_exit_impulse.amount /= 3;
 		to.exit_direction = portal_exit_direction::REVERSE_ENTERING_VELOCITY;
 
-		to.hurt.emplace(hurt_def());
+		to.hazard.emplace(hazard_def());
 		to.rings_effect.is_enabled = false;
 	}
 }

@@ -338,12 +338,12 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 
 					play_exit_effects(step, typed_contacted_entity, *portal_exit_portal);
 
-					if (portal_exit_portal->hurt.is_enabled) {
-						const auto& hurt = portal_exit_portal->hurt.value;
+					if (portal_exit_portal->hazard.is_enabled) {
+						const auto& hazard = portal_exit_portal->hazard.value;
 
 						messages::damage_message msg;
 						msg.subject = typed_contacted_entity;
-						msg.damage.base = hurt.damage;
+						msg.damage.base = hazard.damage;
 						msg.origin.cause = damage_cause(portal_exit);
 						msg.origin.sender.set(typed_contacted_entity);
 						msg.impact_velocity = considered_velocity;

@@ -28,7 +28,7 @@ enum class area_marker_type {
 	ORGANISM_AREA,
 
 	PORTAL,
-	HURT,
+	HAZARD,
 
 	CALLOUT,
 	PREFAB,
@@ -39,7 +39,7 @@ enum class area_marker_type {
 inline bool is_portal_based(const area_marker_type t) {
 	switch (t) {
 		case area_marker_type::PORTAL:
-		case area_marker_type::HURT:
+		case area_marker_type::HAZARD:
 			return true;
 		default:
 			return false;

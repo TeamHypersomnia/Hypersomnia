@@ -851,7 +851,7 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		tooltip_on_hover("Note that rectangular effects for portals are not supported yet,\nbut the physical sensor itself will work just fine as a box.");
 	}
 
-	const bool is_hurt = type == area_marker_type::HURT;
+	const bool is_hurt = type == area_marker_type::HAZARD;
 	(void)is_hurt;
 
 	if (::is_portal_based(type)) {
@@ -981,27 +981,27 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		}
 
 		{
-			MULTIPROPERTY("##Hurt", as_portal.hurt.is_enabled);
+			MULTIPROPERTY("##hazard", as_portal.hazard.is_enabled);
 
 			if (last_result) {
-				if (insp.as_portal.hurt.is_enabled) {
-					result = "Enabled hurt in %x";
+				if (insp.as_portal.hazard.is_enabled) {
+					result = "Enabled hazard in %x";
 				}
 				else {
-					result = "Disabled hurt in %x";
+					result = "Disabled hazard in %x";
 				}
 			}
 
 			ImGui::SameLine();
 
-			auto disabled = maybe_disabled_only_cols(!insp.as_portal.hurt.is_enabled);
+			auto disabled = maybe_disabled_only_cols(!insp.as_portal.hazard.is_enabled);
 
-			auto scope = augs::imgui::scoped_tree_node_ex("Hurt");
+			auto scope = augs::imgui::scoped_tree_node_ex("Hazard");
 
 			if (scope) {
-				auto actually_disabled = maybe_disabled_cols(!insp.as_portal.hurt.is_enabled);
+				auto actually_disabled = maybe_disabled_cols(!insp.as_portal.hazard.is_enabled);
 
-				MULTIPROPERTY("Damage", as_portal.hurt.value.damage);
+				MULTIPROPERTY("Damage", as_portal.hazard.value.damage);
 			}
 		}
 

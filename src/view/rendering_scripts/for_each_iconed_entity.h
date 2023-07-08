@@ -46,8 +46,8 @@ struct marker_icon {
 			result.id = I::EDITOR_ICON_PORTAL;
 			result.col = white;
 		}
-		else if (type == area_marker_type::HURT) {
-			result.id = I::EDITOR_ICON_HURT;
+		else if (type == area_marker_type::HAZARD) {
+			result.id = I::EDITOR_ICON_HAZARD;
 			result.col = rgba(255, 102, 0, 255);
 		}
 		else if (type == area_marker_type::CALLOUT) {

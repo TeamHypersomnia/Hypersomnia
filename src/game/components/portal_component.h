@@ -39,7 +39,7 @@ namespace components {
 
 		augs::maybe<continuous_rings_input> rings_effect;
 		augs::maybe<force_field_def> force_field;
-		augs::maybe<hurt_def> hurt;
+		augs::maybe<hazard_def> hazard;
 
 		portal_exit_direction exit_direction = portal_exit_direction::PORTAL_DIRECTION;
 		portal_exit_position exit_position = portal_exit_position::PORTAL_CENTER;

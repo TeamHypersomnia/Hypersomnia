@@ -49,12 +49,12 @@ enum class force_field_direction {
 	// END GEN INTROSPECTOR
 };
 
-struct hurt_def {
-	// GEN INTROSPECTOR struct hurt_def
+struct hazard_def {
+	// GEN INTROSPECTOR struct hazard_def
 	float damage = 35.0f;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const hurt_def&) const = default;
+	bool operator==(const hazard_def&) const = default;
 };
 
 struct force_field_def {

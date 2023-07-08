@@ -145,7 +145,7 @@ bool setup_entity_from_node(
 					to.travel_time_ms = from.travel_time_ms;
 
 					to.force_field = from.force_field;
-					to.hurt = from.hurt;
+					to.hazard = from.hazard;
 
 					if (from.disable_all_entry_effects) {
 						to.light_size_mult = 0.0f;
@@ -186,8 +186,8 @@ bool setup_entity_from_node(
 							particles->modifier = static_cast<const particle_effect_modifier&>(from.ambience_particles);
 							particles->modifier.sanitize();
 
-							// for now always force rectangular particles for HURT because rectangular LAVA CIRCLE looks better (I know ugly)
-							if (resource.editable.type == area_marker_type::HURT || editable.shape == marker_shape_type::BOX) {
+							// for now always force rectangular particles for HAZARD because rectangular LAVA CIRCLE looks better (I know ugly)
+							if (resource.editable.type == area_marker_type::HAZARD || editable.shape == marker_shape_type::BOX) {
 								const auto basic_area = 128 * 128 * PI<float>;
 								const auto this_area = editable.size.area() / 1.4f;
 
