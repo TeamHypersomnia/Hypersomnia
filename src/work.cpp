@@ -1054,6 +1054,8 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	auto launch_client = [&](const bool ignore_nat_check) {
+		bool public_internet = false;
+
 		if (ignore_nat_check) {
 			LOG("Finished NAT traversal. Connecting immediately.");
 		}
@@ -1071,16 +1073,23 @@ work_result work(const int argc, const char* const * const argv) try {
 				}
 				else {
 					LOG("The chosen server is in the public internet. Connecting immediately.");
+					public_internet = true;
 				}
 			}
 			else {
 				LOG("The chosen server was not found in the browser list.");
+				public_internet = true;
 			}
 		}
 
 		setup_launcher([&]() {
-			const auto bound_port = get_bound_local_port();
+			auto bound_port = get_bound_local_port();
 			auxiliary_socket.reset();
+
+			if (public_internet) {
+				LOG("Connecting without a specific port requirement.");
+				bound_port = 0;
+			}
 
 			LOG("Starting client setup. Binding to a port: %x (%x was preferred)", bound_port, last_requested_local_port);
 
@@ -1372,7 +1381,9 @@ work_result work(const int argc, const char* const * const argv) try {
 				launch_setup(activity_type::SERVER);
 			}
 			else {
-				augs::spawn_detached_process(params.exe_path.string(), "--dedicated-server");
+				auxiliary_socket.reset();
+
+				augs::restart_application(argc, argv, params.exe_path.string(), { "--dedicated-server" });
 				config.client_start.set_custom(typesafe_sprintf("%x:%x", config.server_start.ip, chosen_server_port()));
 
 				launch_setup(activity_type::CLIENT);
