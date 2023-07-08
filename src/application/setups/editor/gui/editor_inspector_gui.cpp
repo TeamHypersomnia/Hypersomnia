@@ -981,6 +981,31 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		}
 
 		{
+			MULTIPROPERTY("##Hurt", as_portal.hurt.is_enabled);
+
+			if (last_result) {
+				if (insp.as_portal.hurt.is_enabled) {
+					result = "Enabled hurt in %x";
+				}
+				else {
+					result = "Disabled hurt in %x";
+				}
+			}
+
+			ImGui::SameLine();
+
+			auto disabled = maybe_disabled_only_cols(!insp.as_portal.hurt.is_enabled);
+
+			auto scope = augs::imgui::scoped_tree_node_ex("Hurt");
+
+			if (scope) {
+				auto actually_disabled = maybe_disabled_cols(!insp.as_portal.hurt.is_enabled);
+
+				MULTIPROPERTY("Damage", as_portal.hurt.value.damage);
+			}
+		}
+
+		{
 			MULTIPROPERTY("##ForceField", as_portal.force_field.is_enabled);
 
 			if (last_result) {

@@ -581,7 +581,7 @@ void sentience_system::process_damage_message(const messages::damage_message& d,
 				event.is_remainder_after_shield_destruction = true;
 			}
 
-			if (after_shield_damage > 0) {
+			if (after_shield_damage != 0) {
 				event.target = messages::health_event::target_type::HEALTH;
 
 				event.damage = health.calc_damage_result(after_shield_damage);
