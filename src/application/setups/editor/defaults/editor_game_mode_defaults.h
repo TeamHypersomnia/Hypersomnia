@@ -46,6 +46,9 @@ inline void setup_game_mode_defaults(
 		o[test_shootable_weapons::WARX],
 		o[test_shootable_weapons::GRADOBICIE],
 
+		o[test_shootable_weapons::AWKA],
+		o[test_shootable_weapons::HUNTER],
+
 		o[test_shootable_weapons::DEAGLE],
 		o[test_shootable_weapons::COVERT],
 		o[test_shootable_weapons::AO44],
@@ -53,10 +56,7 @@ inline void setup_game_mode_defaults(
 		o[test_shootable_weapons::BULWARK],
 
 		o[test_shootable_weapons::KEK9],
-		o[test_shootable_weapons::SN69],
-
-		o[test_shootable_weapons::AWKA],
-		o[test_shootable_weapons::HUNTER]
+		o[test_shootable_weapons::SN69]
 	};
 
 	editor_requested_equipment basic_eq;
