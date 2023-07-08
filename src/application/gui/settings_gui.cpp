@@ -1253,6 +1253,7 @@ void settings_gui_state::perform(
 					{
 						auto& scope_cfg = config.server;
 						revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_loopback_for_rcon));
+						revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_internal_for_rcon));
 					}
 				}
 

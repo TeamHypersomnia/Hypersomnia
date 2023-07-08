@@ -2120,6 +2120,9 @@ bool safe_equal(const decltype(requested_client_settings::rcon_password)& candid
 	return matches == static_cast<int>(actual_password.size());
 }
 
+netcode_address_t to_netcode_addr(const yojimbo::Address& t);
+bool is_internal(const netcode_address_t& address);
+
 rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const { 
 	if (is_integrated()) {
 		if (id == get_integrated_client_id()) {
@@ -2134,6 +2137,13 @@ rcon_level_type server_setup::get_rcon_level(const client_id_type& id) const {
 	if (vars.auto_authorize_loopback_for_rcon) {
 		if (server->get_client_address(id).IsLoopback()) {
 			LOG("Auto-authorizing the loopback client for master rcon.");
+			return rcon_level_type::MASTER;
+		}
+	}
+
+	if (vars.auto_authorize_internal_for_rcon) {
+		if (is_internal(to_netcode_addr(server->get_client_address(id)))) {
+			LOG("Auto-authorizing the internal network client %x for master rcon.", ::ToString(server->get_client_address(id)));
 			return rcon_level_type::MASTER;
 		}
 	}

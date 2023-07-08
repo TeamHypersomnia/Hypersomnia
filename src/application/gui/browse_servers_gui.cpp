@@ -170,7 +170,7 @@ server_list_entry* browse_servers_gui_state::find_entry_by_internal_address(cons
 	return nullptr;
 }
 
-static bool is_internal(const netcode_address_t& address) {
+bool is_internal(const netcode_address_t& address) {
 	if (address.type == NETCODE_ADDRESS_IPV4) {
 		auto ip = address.data.ipv4;
 
