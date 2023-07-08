@@ -895,7 +895,18 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			auto scope = maybe_disabled_cols({}, !selected_server.is_set());
 
 			if (ImGui::Button("Connect")) {
-				requested_connection = selected_server.address;
+				auto& s = selected_server;
+
+				LOG("Double-clicked server list entry: %x (%x). Connecting.", ToString(s.address), s.heartbeat.server_name);
+
+				displayed_connecting_server_name = s.heartbeat.server_name;
+
+				if (s.progress.found_on_internal_network) {
+					requested_connection = s.heartbeat.internal_network_address;
+				}
+				else {
+					requested_connection = s.address;
+				}
 			}
 
 			ImGui::SameLine();

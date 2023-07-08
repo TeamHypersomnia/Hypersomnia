@@ -1384,6 +1384,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				auxiliary_socket.reset();
 
 				augs::restart_application(argc, argv, params.exe_path.string(), { "--dedicated-server" });
+				config.client_start.displayed_connecting_server_name = "local dedicated server";
 				config.client_start.set_custom(typesafe_sprintf("%x:%x", config.server_start.ip, chosen_server_port()));
 
 				launch_setup(activity_type::CLIENT);
