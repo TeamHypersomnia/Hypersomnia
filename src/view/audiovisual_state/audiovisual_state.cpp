@@ -41,12 +41,6 @@ void interpolation_system::set_updated_interpolated_transform(
 	info.interpolated_transform = updated_value;
 }
 
-void audiovisual_state::clear() {
-	systems.for_each([](auto& sys) {
-		sys.clear();
-	});
-}
-
 void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 	systems.for_each([n](auto& sys) {
 		using T = remove_cref<decltype(sys)>;
@@ -63,7 +57,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto scope = measure_scope(performance.advance);
 
 	const auto viewed_character = input.camera.viewed_character;
-	const auto input_camera = input.camera;
 	const auto queried_cone = input.queried_cone;
 	const auto& cosm = viewed_character.get_cosmos();
 	
@@ -80,11 +73,9 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	}
 
 	const auto& anims = input.plain_animations;
-	const auto audio_renderer = input.audio_renderer;
 
 	auto& rng = get_rng();
 
-	auto& sounds = get<sound_system>();
 	auto& thunders = get<thunder_system>();
 	auto& exploding_rings = get<exploding_ring_system>();
 	auto& damage_indication = get<damage_indication_system>();
@@ -279,42 +270,45 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto& sound_freq = input.sound_settings.processing_frequency;
 	const bool sound_every_step = sound_freq == sound_processing_frequency::EVERY_SIMULATION_STEP;
 
-	auto update_sound_properties = [audio_renderer, sound_every_step, scaled_state_dt, viewed_character, dt, input, &sounds, &interp, input_camera]() {
-		auto ear = input_camera;
+	const auto chosen_update_dt = sound_every_step ? *scaled_state_dt : dt;
 
-		if (viewed_character) {
-			ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
-		}
-		
-		sounds.update_sound_properties(
-			{
-				*audio_renderer,
-				sounds,
-				input.audio_volume,
-				input.sound_settings,
-				input.sounds,
-				interp,
-				ear,
-				input_camera.cone,
-				sound_every_step ? *scaled_state_dt : dt,
-				input.speed_multiplier,
-				input.inv_tickrate,
-				input.interpolation_ratio
-			}
-		);
-	};
+	/* Fading should take the same amount of time regardless of audiovisual speed multiplier */
+	const auto chosen_fade_dt =   sound_every_step ? *state_dt : frame_dt;
 
-	auto fade_sound_sources = [audio_renderer, sound_every_step, &sounds, frame_dt, state_dt]() {
-		sounds.fade_sources(*audio_renderer, sound_every_step ? *state_dt : frame_dt);
-	};
-
-	auto& command_buffers = input.command_buffers;
-
-	auto audio_job = [this, &command_buffers, update_sound_properties, fade_sound_sources]() {
+	auto audio_job = [this, input, chosen_update_dt, chosen_fade_dt]() {
 		auto scope = measure_scope(performance.sound_logic);
 
-		update_sound_properties();
-		fade_sound_sources();
+		const auto viewed_character = input.camera.viewed_character;
+		auto& interpol = this->get<interpolation_system>();
+
+		auto& command_buffers = input.command_buffers;
+
+		{
+			auto ear = input.camera;
+
+			if (viewed_character) {
+				ear.cone.eye.transform = viewed_character.get_viewing_transform(interpol);
+			}
+			
+			this->get<sound_system>().update_sound_properties(
+				{
+					*input.audio_renderer,
+					this->get<sound_system>(),
+					input.audio_volume,
+					input.sound_settings,
+					input.sounds,
+					interpol,
+					ear,
+					ear.cone,
+					chosen_update_dt,
+					input.speed_multiplier,
+					input.inv_tickrate,
+					input.interpolation_ratio
+				}
+			);
+		}
+
+		this->get<sound_system>().fade_sources(*input.audio_renderer, chosen_fade_dt);
 
 		command_buffers.submit_write_buffer();
 	};
@@ -325,7 +319,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	launch_wandering_pixels_jobs();
 
 	const bool should_update_audio = [&]() {
-		if (audio_renderer == nullptr) {
+		if (input.audio_renderer == nullptr) {
 			return false;
 		}
 

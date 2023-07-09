@@ -24,6 +24,7 @@
 #include "view/audiovisual_state/audiovisual_post_solve_settings.h"
 #include "view/audiovisual_state/particle_triangle_buffers.h"
 #include "application/performance_settings.h"
+#include "view/character_camera.h"
 
 class cosmos;
 class visible_entities;
@@ -57,7 +58,7 @@ struct audiovisual_advance_input {
 	const double inv_tickrate;
 	const double interpolation_ratio;
 
-	const character_camera& camera;
+	const character_camera camera;
 	const camera_cone queried_cone;
 
 	const visible_entities& all_visible;
@@ -100,7 +101,6 @@ struct audiovisual_state {
 	void standard_post_solve(const const_logic_step, audiovisual_post_solve_input);
 	void spread_past_infection(const const_logic_step);
 	void reserve_caches_for_entities(const std::size_t);
-	void clear();
 
 private:
 	randomization& get_rng() {
