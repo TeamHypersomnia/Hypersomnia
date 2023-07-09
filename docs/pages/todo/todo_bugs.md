@@ -250,6 +250,9 @@ We have a demo file
 
 # Done
 
+- fix dinkydinky crash
+	- stb_image bug fixed by this PR https://github.com/nothings/stb/pull/1404
+
 - WE DON'T WANT TO CLEAR client pending entropies on desync because it might happen mid-gameplay. We want to apply all actions applied during resync.
 - Note client begins sending net entropies as soon as receiving RESUME_SOLVABLES but clears them soon after when they receive initial snapshot.
 	- The server thinks these entropies came after clearing them.

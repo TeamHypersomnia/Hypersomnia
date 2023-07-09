@@ -1,3 +1,25 @@
+/*
+	DO NOT UPDATE THIS FILE DIRECTLY FROM stb REPO BECAUSE IT HAS A BUG!
+	DO NOT UPDATE THIS FILE DIRECTLY FROM stb REPO BECAUSE IT HAS A BUG!
+	DO NOT UPDATE THIS FILE DIRECTLY FROM stb REPO BECAUSE IT HAS A BUG!
+	DO NOT UPDATE THIS FILE DIRECTLY FROM stb REPO BECAUSE IT HAS A BUG!
+	DO NOT UPDATE THIS FILE DIRECTLY FROM stb REPO BECAUSE IT HAS A BUG!
+	DO NOT UPDATE THIS FILE DIRECTLY FROM stb REPO BECAUSE IT HAS A BUG!
+	DO NOT UPDATE THIS FILE DIRECTLY FROM stb REPO BECAUSE IT HAS A BUG!
+	DO NOT UPDATE THIS FILE DIRECTLY FROM stb REPO BECAUSE IT HAS A BUG!
+
+
+	See https://github.com/nothings/stb/pull/1404
+
+*/
+
+
+
+
+
+
+
+
 /* stb_image - v2.28 - public domain image loader - http://nothings.org/stb
                                   no warranty implied; use at your own risk
 
@@ -7019,7 +7041,7 @@ static void *stbi__load_gif_main(stbi__context *s, int **delays, int *x, int *y,
             }
             memcpy( out + ((layers - 1) * stride), u, stride );
             if (layers >= 2) {
-               two_back = out - 2 * stride;
+               two_back = out + ((layers - 2) * stride);
             }
 
             if (delays) {
