@@ -48,7 +48,10 @@ if [ -n \$latest_version ]; then
      { [ \$latest_version_major -eq \$current_version_major ] && [ \$latest_version_minor -gt \$current_version_minor ]; } || \\
      { [ \$latest_version_major -eq \$current_version_major ] && [ \$latest_version_minor -eq \$current_version_minor ] && [ \$latest_version_patchlevel -gt \$current_version_patchlevel ]; }; then
     "\${APPDIR}"/usr/bin/AppImageUpdate-x86_64.AppImage \$APPIMAGE
-    rm -rf "\${config_home}"
+    if [ -d "\${config_home}.old" ]; then
+      rm -rf "\${config_home}.old"
+    fi
+    mv "\${config_home}" "\${config_home}.old"
     exec "\$APPIMAGE" \$@
     exit 0
   fi
@@ -57,6 +60,12 @@ fi
 if ! [ -d "\${config_home}" ]; then
   mkdir -p "\${config_home}"
   cp -r "\${APPDIR}"/usr/share/hypersomnia/* "\${config_home}"
+  if [ -d "\${config_home}.old"/user ]; then
+    cp -r "\${config_home}.old"/user "\${config_home}"
+  fi
+  if [ -d "\${config_home}.old"/logs ]; then
+    cp -r "\${config_home}.old"/logs "\${config_home}"
+  fi
 fi
 cd "\${config_home}"
 "\${APPDIR}"/usr/bin/Hypersomnia --keep-cwd --no-update \$@
