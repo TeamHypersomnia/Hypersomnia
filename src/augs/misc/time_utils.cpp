@@ -139,9 +139,18 @@ std::optional<std::chrono::system_clock::time_point> augs::date_time::from_utc_t
 }
 #endif
 
+std::mutex localtime_mutex;
+
 std::string augs::date_time::get_readable_format(const char* fmt) const {
-	std::tm local_time = *std::localtime(&t);
-	return typesafe_sprintf("%x", std::put_time(&local_time, fmt));
+	std::string result;
+
+	{
+		std::unique_lock<std::mutex> lock(localtime_mutex);
+		std::tm local_time = *std::localtime(&t);
+		result = typesafe_sprintf("%x", std::put_time(&local_time, fmt));
+	}
+
+	return result;
 }
 
 std::string augs::date_time::get_readable_for_file() const {
