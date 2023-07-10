@@ -1510,7 +1510,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			const float target_resolution_height = 1080;
 			const float screen_h = float(logic_get_screen_size().y);
 
-			if (screen_h > target_resolution_height) {
+			if (screen_h != target_resolution_height) {
 				logic_eye.zoom *= screen_h / target_resolution_height;
 			}
 		}
