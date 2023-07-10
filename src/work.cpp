@@ -332,7 +332,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	auto last_update_result = self_update_result();
 	
-	if (config.http_client.update_on_launch && !params.suppress_autoupdate) {
+	if (params.only_check_update_availability_and_quit || (config.http_client.update_on_launch && !params.suppress_autoupdate)) {
 		/* 
 			TODO: SKIP UPDATING IF THERE ARE UNSAVED CHANGES IN EDITOR PROJECTS! 
 			This could potentially erase someone's work because of breaking changes to editor files' binary structure!
@@ -349,6 +349,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		;
 
 		last_update_result = check_and_apply_updates(
+			params.only_check_update_availability_and_quit,
 			*imgui_atlas_image,
 			config.http_client,
 			config.window,
@@ -356,6 +357,15 @@ work_result work(const int argc, const char* const * const argv) try {
 		);
 
 		LOG_NVPS(last_update_result.type);
+
+		if (params.only_check_update_availability_and_quit) {
+			if (last_update_result.type == update_result::UPDATE_AVAILABLE) {
+				return work_result::REPORT_UPDATE_AVAILABLE;
+			}
+			else {
+				return work_result::REPORT_UPDATE_UNAVAILABLE;
+			}
+		}
 
 		if (last_update_result.type == update_result::UPGRADED) {
 			LOG("work: Upgraded successfully. Requesting relaunch.");

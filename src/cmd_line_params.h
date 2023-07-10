@@ -19,6 +19,7 @@ struct cmd_line_params {
 	app_type type = app_type::GAME_CLIENT;
 	bool upgraded_successfully = false;
 	bool should_connect = false;
+	bool only_check_update_availability_and_quit = false;
 	bool keep_cwd = false;
 	int test_fp_consistency = -1;
 	std::string connect_address;
@@ -59,6 +60,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--version" || a == "-v") {
 				version_only = true;
+			}
+			else if (a == "--is-update-available") {
+				only_check_update_availability_and_quit = true;
 			}
 			else if (a == "--server") {
 				start_server = true;

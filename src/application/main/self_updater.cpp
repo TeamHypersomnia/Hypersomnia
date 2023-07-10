@@ -56,6 +56,7 @@ using R = self_update_result_type;
 namespace fs = std::filesystem;
 
 self_update_result check_and_apply_updates(
+	const bool only_check_availability_and_quit,
 	const augs::image& imgui_atlas_image,
 	const http_client_settings& http_settings,
 	augs::window_settings window_settings,
@@ -152,6 +153,11 @@ self_update_result check_and_apply_updates(
 		}
 
 		LOG("Newer version available. Requesting upgrade. \nOld: %x\nNew: %x", current_version, new_version);
+	}
+	
+	if (only_check_availability_and_quit) {
+		result.type = R::UPDATE_AVAILABLE;
+		return result;
 	}
 
 	const auto archive_path = typesafe_sprintf("%x/Hypersomnia-for-%x.%x", update_path, PLATFORM_STRING, ARCHIVE_EXTENSION);

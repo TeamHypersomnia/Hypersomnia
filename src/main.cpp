@@ -175,6 +175,16 @@ int main(const int argc, const char* const * const argv) {
 		};
 
 		switch (completed_work_result) {
+			case work_result::REPORT_UPDATE_AVAILABLE: 
+				LOG("Update available.");
+				save_success_logs();
+				return 1;
+
+			case work_result::REPORT_UPDATE_UNAVAILABLE: 
+				LOG("Update unavailable.");
+				save_success_logs();
+				return 0;
+
 			case work_result::SUCCESS: 
 				save_success_logs();
 				return EXIT_SUCCESS;
