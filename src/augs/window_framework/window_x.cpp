@@ -866,6 +866,7 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 	void window::set_cursor_pos(vec2i pos) {
     	XWarpPointer(display, None, window_id, 0, 0, 0, 0, pos.x, pos.y);
 		XSync(display, False);
+		last_mouse_pos = pos;
 	}
 
 	bool window::set_cursor_clipping_impl(const bool flag) {

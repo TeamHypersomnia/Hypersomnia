@@ -2632,6 +2632,14 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				concatenate(new_window_entropy, write_buffer.new_window_entropy);
 
+				on_specific_setup([&](editor_setup& editor) {
+					if (editor.warp_cursor_once) {
+						editor.warp_cursor_once = false;
+
+						common_input_state.mouse.pos = ImGui::GetIO().MousePos;
+					}
+				});
+
 				if (get_viewed_character().dead()) {
 					game_gui_mode = true;
 				}

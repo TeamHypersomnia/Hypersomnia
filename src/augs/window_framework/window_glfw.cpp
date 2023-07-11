@@ -404,6 +404,7 @@ namespace augs {
 	}
 
 	void window::set_cursor_pos(vec2i) {
+		last_mouse_pos = pos;
 	
 	}
 

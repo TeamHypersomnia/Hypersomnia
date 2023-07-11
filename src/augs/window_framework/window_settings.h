@@ -45,7 +45,7 @@ namespace augs {
 		}
 
 		bool is_raw_mouse_input() const {
-			return raw_mouse_input;
+			return fullscreen || raw_mouse_input;
 		}
 	};
 }

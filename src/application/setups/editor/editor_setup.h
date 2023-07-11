@@ -803,4 +803,6 @@ public:
 
 	void rebuild_project_internal_resources_gui();
 	void recount_internal_resource_references_if_needed();
+
+	bool warp_cursor_once = false;
 };
