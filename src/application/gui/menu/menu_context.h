@@ -15,6 +15,7 @@ struct menu_context_dependencies {
 	const all_necessary_sounds& sounds;
 	const augs::audio_volume_settings& audio_volume;
 	const bool will_quit_to_editor;
+	const bool will_quit_to_projects;
 };
 
 template <bool is_const, class Enum>

@@ -95,7 +95,7 @@ public:
 	}
 
 	auto escape() {
-		return setup_escape_result::IGNORE;
+		return setup_escape_result::GO_TO_MAIN_MENU;
 	}
 
 	double get_inv_tickrate() const {

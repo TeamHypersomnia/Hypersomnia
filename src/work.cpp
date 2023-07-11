@@ -1425,7 +1425,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			streaming.get_loaded_gui_fonts().gui,
 			necessary_sounds,
 			viewing_config.audio_volume,
-			background_setup != nullptr
+			background_setup != nullptr,
+			has_current_setup() && std::holds_alternative<editor_setup>(*current_setup)
 		};
 	};
 
@@ -2046,7 +2047,12 @@ work_result work(const int argc, const char* const * const argv) try {
 					restore_background_setup();
 				}
 				else {
-					launch_setup(activity_type::MAIN_MENU);
+					if (has_current_setup() && std::holds_alternative<editor_setup>(*current_setup)) {
+						launch_setup(activity_type::EDITOR_PROJECT_SELECTOR);
+					}
+					else {
+						launch_setup(activity_type::MAIN_MENU);
+					}
 				}
 
 				break;
