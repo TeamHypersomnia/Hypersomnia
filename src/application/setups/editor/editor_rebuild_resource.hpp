@@ -323,7 +323,15 @@ void setup_scene_object_from_resource(
 
 			on_domain_specific([&](auto& specific) {
 				render.special_functions.set(special_render_function::ILLUMINATE_AS_WALL, specific.illuminate_like_wall);
-				render.special_functions.set(special_render_function::COVER_GROUND_NEONS, specific.cover_background_neons);
+
+				if (domain == editor_sprite_domain::FOREGROUND) {
+					render.special_functions.set(special_render_function::COVER_GROUND_NEONS, false);
+					render.special_functions.set(special_render_function::COVER_GROUND_NEONS_FOREGROUND, specific.cover_background_neons);
+				}
+				else {
+					render.special_functions.set(special_render_function::COVER_GROUND_NEONS, specific.cover_background_neons);
+					render.special_functions.set(special_render_function::COVER_GROUND_NEONS_FOREGROUND, false);
+				}
 			});
 		}
 

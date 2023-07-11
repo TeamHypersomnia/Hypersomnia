@@ -336,9 +336,25 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	renderer.call_triangles(D::GROUND_NEONS);
 	renderer.set_standard_blending();
-	in.neon_occlusion_callback();
+	in.neon_occlusion_callback(false);
 	renderer.call_triangles(D::GROUND_NEON_OCCLUDERS);
 	renderer.set_additive_blending();
+
+	draw_sentience_neons();
+
+	renderer.call_triangles(D::DROPPED_ITEMS_NEONS);
+	renderer.call_triangles(D::UNDER_FOREGROUND_NEONS);
+
+	in.neon_callback();
+
+	renderer.set_standard_blending();
+	in.neon_occlusion_callback(true);
+	renderer.call_triangles(D::FOREGROUND_NEON_OCCLUDERS);
+	renderer.set_additive_blending();
+
+	renderer.call_triangles(D::FOREGROUND_NEONS);
+
+	renderer.call_and_clear_triangles();
 
 	setup_light_shader();
 	overlay_light_polygons();
@@ -349,14 +365,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 	performance.num_drawn_wall_lights.measure(num_wall_lights);
 
 	standard_shader.set_as_current(renderer);
-
-	draw_sentience_neons();
-
-	renderer.call_triangles(D::FOREGROUND_NEONS);
-	renderer.call_triangles(D::DROPPED_ITEMS_NEONS);
-
-	in.neon_callback();
-	renderer.call_and_clear_triangles();
 
 	restore_renderer();
 }
