@@ -50,6 +50,7 @@ struct editor_sprite_resource_nonphysical {
 struct editor_sprite_resource_physical {
 	// GEN INTROSPECTOR struct editor_sprite_resource_physical
 	bool is_static = false;
+	bool is_walk_through = false;
 	bool is_see_through = false;
 	bool is_throw_through = false;
 	bool is_melee_throw_through = false;

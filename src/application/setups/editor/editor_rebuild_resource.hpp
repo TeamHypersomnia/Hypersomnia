@@ -392,6 +392,15 @@ void setup_scene_object_from_resource(
 				fixtures->filter = filters[predefined_filter_type::WALL];
 			}
 
+			if (physical.is_walk_through) {
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::CHARACTER));
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::CHARACTER_WEAPON));
+
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::WALL));
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::LYING_ITEM));
+				fixtures->filter.maskBits &= ~(1 << int(filter_category::SHELL));
+			}
+
 			if (physical.is_throw_through) {
 				fixtures->filter.maskBits &= ~(1 << int(filter_category::FLYING_EXPLOSIVE));
 			}

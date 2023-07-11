@@ -1681,6 +1681,12 @@ EDIT_FUNCTION(
 			MULTIPROPERTY("Angular damping", as_physical.angular_damping);
 		}
 
+		MULTIPROPERTY("Walk-through", as_physical.is_walk_through);
+
+		if (ImGui::IsItemHovered()) {
+			text_tooltip("If enabled, won't collide with characters.\nImagine a smoke that blocks the line of sight,\nbut lets all physical bodies through.");
+		}
+
 		MULTIPROPERTY("See-through", as_physical.is_see_through);
 
 		if (ImGui::IsItemHovered()) {
