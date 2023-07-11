@@ -18,13 +18,19 @@ Forever free and open-source :heart:
 # Download the game
 
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Windows.zip"> <img src="https://hypersomnia.xyz/images/windows_icon.svg" height=70 hspace=1> </a>
-<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-Linux.tar.gz"> <img src="https://hypersomnia.xyz/images/linux_icon.svg" height=70 hspace=1 vspace=20> </a>
+<a href="https://hypersomnia.xyz/builds/latest/Hypersomnia.AppImage"> <img src="https://hypersomnia.xyz/images/linux_icon.svg" height=70 hspace=1 vspace=20> </a>
 <a href="https://hypersomnia.xyz/builds/latest/Hypersomnia-for-MacOS.dmg"> <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/MacOS_logo_%282017%29.svg" height=70 hspace=1 vspace=20> </a>
 <br undefined>
 
-<img src="https://hypersomnia.xyz/images/windows_icon.svg" height=16 hspace=1></a> Only 27 MB!
+<!---
+<img src="https://hypersomnia.xyz/images/windows_icon.svg" height=16 hspace=1></a> 
+-->
 
+Only 27 MB!
+
+<!---
 <img src="https://hypersomnia.xyz/images/linux_icon.svg" height=16 hspace=1></a> is built with ``-g``
+-->
 
 *Archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
 
