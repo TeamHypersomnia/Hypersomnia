@@ -339,6 +339,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       hovered_dashed_line_color = "255 255 255 140"
     },
 
+    warp_cursor_when_moving_nodes = false,
     matched_entity_color = "0 255 0 80",
 
     rectangular_selection_color = "65 131 196 60",

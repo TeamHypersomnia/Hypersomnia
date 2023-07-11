@@ -445,6 +445,15 @@ bool editor_setup::handle_input_before_game(
 				case key::R: rotate_selection_once_by(-90); return true;
 				case key::H: flip_selection_horizontally(); return true;
 				case key::V: flip_selection_vertically(); return true;
+				case key::T: 
+					if (!settings.warp_cursor_when_moving_nodes) {
+						warp_cursor_to_center(in.window);
+					}
+
+					start_moving_selection(); 
+
+					return true;
+
 				default: break;
 			}
 		}
@@ -460,7 +469,15 @@ bool editor_setup::handle_input_before_game(
 				case key::C: clone_selection(); return true;
 				case key::DEL: delete_selection(); return true;
 
-				case key::T: start_moving_selection(); return true;
+				case key::T: 
+					if (settings.warp_cursor_when_moving_nodes) {
+						warp_cursor_to_center(in.window);
+					}
+
+					start_moving_selection(); 
+
+					return true;
+
 				case key::E: start_resizing_selection(false); return true;
 				case key::R: start_rotating_selection(); return true;
 				case key::W: reset_rotation_of_selected_nodes(); return true;

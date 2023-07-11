@@ -1300,6 +1300,8 @@ void settings_gui_state::perform(
 				}
 
 				if (auto node = scoped_tree_node("Interface")) {
+					revertable_checkbox("Warp cursor when moving nodes with T", config.editor.warp_cursor_when_moving_nodes);
+
 					if (auto node = scoped_tree_node("Grid")) {
 						auto& scope_cfg = config.editor.grid.render;
 

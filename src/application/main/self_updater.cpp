@@ -680,6 +680,8 @@ self_update_result check_and_apply_updates(
 								return R::COULDNT_SAVE_BINARY;
 							}
 							
+							(void)is_appimage;
+
 							/* AppImage flow 1) No managing NEW_HYPERSOMNIA/OLD_HYPERSOMNIA. */
 							if (!is_appimage) {
 								/* Create fresh NEW_HYPERSOMNIA folder - remove the old one */
