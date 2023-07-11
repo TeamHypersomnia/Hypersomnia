@@ -80,8 +80,38 @@ namespace augs {
 	) {
 		auto previous_arguments = std::string();
 
+		bool is_appimage = false;
+
+#if PLATFORM_LINUX
 		for (int i = 1; i < previous_argc; ++i) {
 			const auto arg = std::string(previous_argv[i]);
+
+			if (arg == "--appimage-path") {
+				LOG("Restarting the app as an AppImage. Skipping --keep-cwd and --appimage-path arguments.");
+				is_appimage = true;
+			}
+		}
+#endif
+
+		for (int i = 1; i < previous_argc; ++i) {
+			const auto arg = std::string(previous_argv[i]);
+
+			if (is_appimage) {
+				/* 
+					Prevent duplicating the flags given by the AppImage run script. 
+				*/
+
+				if (arg == "--keep-cwd") {
+					continue;
+				}
+
+				if (arg == "--appimage-path") {
+					/* Skip the value as well */
+					++i;
+					continue;
+				}
+			}
+
 			previous_arguments += arg + " ";
 
 			/* Prevent duplicate flags */

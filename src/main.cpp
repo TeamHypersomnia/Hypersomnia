@@ -87,6 +87,13 @@ int main(const int argc, const char* const * const argv) {
 	std::setlocale(LC_NUMERIC, "C");
 
 	const auto params = cmd_line_params(argc, argv);
+
+	if (params.version_line_only) {
+		std::cout << hypersomnia_version().get_version_string() << std::endl;
+
+		return EXIT_SUCCESS;
+	}
+
 #ifdef __APPLE__    
 	const auto exe_path = get_executable_path();
 #else

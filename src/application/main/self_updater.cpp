@@ -30,6 +30,7 @@
 #include "application/main/verify_signature.h"
 #include "application/main/extract_archive.h"
 #include "hypersomnia_version.h"
+#include "augs/window_framework/exec.h"
 
 #if PLATFORM_MACOS
 #define PLATFORM_STRING "MacOS"
@@ -55,7 +56,10 @@ using namespace httplib_utils;
 using R = self_update_result_type;
 namespace fs = std::filesystem;
 
+void rename_cwd_to_old();
+
 self_update_result check_and_apply_updates(
+	const augs::path_type& current_appimage_path,
 	const bool only_check_availability_and_quit,
 	const augs::image& imgui_atlas_image,
 	const http_client_settings& http_settings,
@@ -80,7 +84,19 @@ self_update_result check_and_apply_updates(
 	http_client.set_write_timeout(http_settings.update_connection_timeout_secs);
 
 	const auto& update_path = http_settings.self_update_path;
-	const auto version_path = typesafe_sprintf("%x/version-%x.txt", update_path, PLATFORM_STRING);
+
+#if PLATFORM_LINUX
+	const bool is_appimage = !current_appimage_path.empty();
+#else
+	const bool is_appimage = false;
+	(void)current_appimage_path;
+#endif
+
+	const auto version_path = 
+		is_appimage ? 
+		typesafe_sprintf("%x/version-AppImage.txt", update_path) :
+		typesafe_sprintf("%x/version-%x.txt", update_path, PLATFORM_STRING)
+	;
 
 	auto log_null_response = [&http_client]() {
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
@@ -160,8 +176,27 @@ self_update_result check_and_apply_updates(
 		return result;
 	}
 
-	const auto archive_path = typesafe_sprintf("%x/Hypersomnia-for-%x.%x", update_path, PLATFORM_STRING, ARCHIVE_EXTENSION);
+	const auto archive_path = 
+		is_appimage ? 
+		typesafe_sprintf("%x/Hypersomnia.AppImage", update_path) :
+		typesafe_sprintf("%x/Hypersomnia-for-%x.%x", update_path, PLATFORM_STRING, ARCHIVE_EXTENSION)
+	;
+
 	LOG_NVPS(version_path, archive_path);
+
+	if (is_appimage) {
+		/*
+			Changes in flow when we update an AppImage, chronologically:
+
+			1) No managing NEW_HYPERSOMNIA/OLD_HYPERSOMNIA. 
+			2) No extracting necessary (yay).
+			3) Do not move around any folders in the cwd.
+			4) rm/mv just the single downloaded AppImage.
+			5) Instead simply rename cwd to cwd.old. The run script will populate the new cwd with the necessary config and content files.
+		*/
+
+		LOG("Updating from an AppImage: %x", archive_path);
+	}
 
 	const auto win_bg = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 	auto fix_background_color = scoped_style_color(ImGuiCol_WindowBg, ImVec4{win_bg.x, win_bg.y, win_bg.z, 1.f});
@@ -236,7 +271,20 @@ self_update_result check_and_apply_updates(
 	LOG("Launching download.");
 
 	const auto archive_filename = augs::path_type(archive_path).filename();
-	const auto target_archive_path = GENERATED_FILES_DIR / archive_filename;
+
+	auto appimage_new_path = current_appimage_path;
+	appimage_new_path += ".new";
+
+	/* 
+		The new AppImage has to be on the same device as the current,
+		otherwise the final std::filesystem::rename will fail with "Invalid cross-device link" error.
+	*/
+
+	const auto target_archive_path = 
+		is_appimage ?
+		appimage_new_path :
+		GENERATED_FILES_DIR / archive_filename
+	;
 
 	const auto NEW_path = augs::path_type(NEW_HYPERSOMNIA);
 	const auto OLD_path = augs::path_type(OLD_HYPERSOMNIA);
@@ -338,8 +386,12 @@ self_update_result check_and_apply_updates(
 	};
 
 	auto rm_rf = [&mbox_guarded_action](const auto& p) {
+		/*
+			Note that std::filesystem::remove_all does not need escaping with " like a command argument.
+		*/
+
 		auto do_remove = [&]() {
-			LOG("rm -rf %x", p);
+			LOG("rm -rf \"%x\"", p);
 			fs::remove_all(p);
 		};
 
@@ -357,8 +409,11 @@ self_update_result check_and_apply_updates(
 	};
 
 	auto mv = [&mbox_guarded_action](const auto& a, const auto& b) {
+		/*
+			Note that std::filesystem::rename does not need escaping with " like a command argument.
+		*/
 		auto do_rename = [&]() {
-			LOG("mv %x %x", a, b);
+			LOG("mv \"%x\" \"%x\"", a, b);
 
 			fs::rename(a, b);
 		};
@@ -445,7 +500,9 @@ self_update_result check_and_apply_updates(
 		ImGui::NextColumn();
 	};
 
-	auto print_download_progress_bar = [&downloaded_bytes, &total_bytes, &archive_filename]() {
+	augs::timer download_progress_timer;
+
+	auto print_download_progress_bar = [&download_progress_timer, &downloaded_bytes, &total_bytes, &archive_filename]() {
 		const auto len = downloaded_bytes.load();
 		const auto total = total_bytes.load();
 
@@ -482,6 +539,11 @@ self_update_result check_and_apply_updates(
 		text("\n");
 
 		ImGui::ProgressBar(static_cast<float>(completion_mult), ImVec2(-1.0f,0.0f));
+
+		if (download_progress_timer.get<std::chrono::seconds>() > 1.0/3) {
+			LOG("Download progress: %x%", completion_mult * 100);
+			download_progress_timer.reset();
+		}
 
 		text("\n");
 	};
@@ -581,7 +643,7 @@ self_update_result check_and_apply_updates(
 					}
 
 					completed_save = launch_async(
-						[guarded_save_as_bytes, make_executable, rm_rf, mkdir_p, new_signature, new_binary_bytes = std::move(response->body), target_archive_path, NEW_path]() {
+						[is_appimage, guarded_save_as_bytes, make_executable, rm_rf, mkdir_p, new_signature, new_binary_bytes = std::move(response->body), target_archive_path, NEW_path]() {
 							auto failed = [](const auto e) {
 								return e == callback_result::ABORT;
 							};
@@ -618,14 +680,17 @@ self_update_result check_and_apply_updates(
 								return R::COULDNT_SAVE_BINARY;
 							}
 							
-							/* Create fresh NEW_HYPERSOMNIA folder - remove the old one */
+							/* AppImage flow 1) No managing NEW_HYPERSOMNIA/OLD_HYPERSOMNIA. */
+							if (!is_appimage) {
+								/* Create fresh NEW_HYPERSOMNIA folder - remove the old one */
 
-							if (failed(rm_rf(NEW_path))) {
-								return R::COULDNT_SAVE_BINARY;
-							}
+								if (failed(rm_rf(NEW_path))) {
+									return R::COULDNT_SAVE_BINARY;
+								}
 
-							if (failed(mkdir_p(NEW_path))) {
-								return R::COULDNT_SAVE_BINARY;
+								if (failed(mkdir_p(NEW_path))) {
+									return R::COULDNT_SAVE_BINARY;
+								}
 							}
 
 							return R::NONE;
@@ -643,9 +708,73 @@ self_update_result check_and_apply_updates(
 					const auto exit_code = completed_save.get();
 
 					if (exit_code == code_successful) {
-						extractor.emplace(target_archive_path, NEW_path, exit_requested);
-						current_state = state::EXTRACTING;
-						LOG("Extracting.");
+						/* AppImage flow 2) No extracting necessary (yay). */
+						if (is_appimage) {
+							try {
+								/* 
+									Verify that the version is the same as the claimed new one.
+									The claimed one is already known to be more recent.
+
+									This time verify this on a signed version file,
+									so that we are immune to a rollback attack.
+								*/
+
+								const auto signed_downloaded_version = augs::exec(typesafe_sprintf("%x --version-line", target_archive_path.string()));
+
+								if (signed_downloaded_version == new_version) {
+									/* Serious stuff begins here. */
+
+									LOG("Downloaded version matches the claimed one. Swapping AppImages.");
+
+									result.exit_with_failure_if_not_upgraded = true;
+									current_state = state::MOVING_FILES_AROUND;
+
+									auto appimage_move_files_around_procedure = [target_archive_path, current_appimage_path, rm_rf, mv]() {
+										/* AppImage flow 3) Do not move around any folders in the cwd. */
+										/* AppImage flow 4) rm/mv just the single downloaded AppImage. */
+
+										if (rm_rf(current_appimage_path) == callback_result::ABORT) {
+											return callback_result::ABORT;
+										}
+
+										if (mv(target_archive_path, current_appimage_path) == callback_result::ABORT) {
+											return callback_result::ABORT;
+										}
+
+										try {
+											/* 
+												AppImage flow 5) Instead simply rename cwd to cwd.old. 
+												The run script will populate the cwd with the necessary config and content files.
+
+												It will also bring back the user/log files from the .old folder.
+											*/
+
+											rename_cwd_to_old();
+											return callback_result::CONTINUE;
+										}
+										catch (...) {
+											return callback_result::ABORT;
+										}
+									};
+
+									completed_move = launch_async(appimage_move_files_around_procedure);
+								}
+								else {
+									LOG("Downloaded version DOES NOT MATCH the claimed one! (%x != %x). Possible rollback attack!", signed_downloaded_version, new_version);
+									interrupt(R::DOWNLOADED_BINARY_WAS_OLDER);
+								}
+							}
+							catch (...) {
+								LOG("Couldn't verify the version of the downloaded archive.");
+
+								interrupt(R::DOWNLOADED_BINARY_WAS_OLDER);
+							}
+						}
+						else {
+							extractor.emplace(target_archive_path, NEW_path, exit_requested);
+							current_state = state::EXTRACTING;
+							LOG("Extracting.");
+						}
 					}
 					else {
 						interrupt(exit_code);
@@ -655,6 +784,8 @@ self_update_result check_and_apply_updates(
 				print_saving_progress();
 			}
 			else if (current_state == state::EXTRACTING) {
+				ensure(!is_appimage);
+
 				if (extractor->has_completed()) {
 					auto move_files_around_procedure = [target_archive_path, NEW_path, OLD_path, rm_rf, mkdir_p, mv]() {
 						const auto paths_from_old_version_to_keep = std::array<augs::path_type, 2> {
@@ -979,4 +1110,27 @@ self_update_result check_and_apply_updates(
 	}
 
 	return result;
+}
+
+void rename_cwd_to_old() {
+	LOG("rename_cwd_to_old: CWD: %x", fs::current_path());
+	fs::path cwd = fs::current_path();
+
+	// make a new name for cwd
+	fs::path new_cwd = cwd;
+	new_cwd += ".old";
+
+	LOG("rename_cwd_to_old: Remove CWD.old: %x", new_cwd);
+	fs::remove_all(new_cwd);
+
+	LOG("rename_cwd_to_old: Change CWD to CWD/..: %x", cwd.parent_path());
+	fs::current_path(cwd.parent_path());
+
+	LOG("rename_cwd_to_old: Rename %x to %x", cwd, new_cwd);
+	fs::rename(cwd, new_cwd);
+
+	// change current working directory back to the newly renamed directory
+	// won't really be necessary as we're quitting but just in case something wants to dump logs
+	LOG("rename_cwd_to_old: Set CWD to .old: %x", new_cwd);
+	fs::current_path(new_cwd);
 }

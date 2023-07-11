@@ -17,6 +17,7 @@ struct cmd_line_params {
 	bool unit_tests_only = false;
 	bool help_only = false;
 	bool version_only = false;
+	bool version_line_only = false;
 	bool start_server = false;
 	app_type type = app_type::GAME_CLIENT;
 	bool upgraded_successfully = false;
@@ -70,6 +71,7 @@ struct cmd_line_params {
 			}
 			else if (a == "--appimage-path") {
 				appimage_path = get_next();
+				exe_path = appimage_path;
 			}
 			else if (a == "--unit-tests-only") {
 				unit_tests_only = true;
@@ -77,6 +79,9 @@ struct cmd_line_params {
 			}
 			else if (a == "--help" || a == "-h") {
 				help_only = true;
+			}
+			else if (a == "--version-line") {
+				version_line_only = true;
 			}
 			else if (a == "--version" || a == "-v") {
 				version_only = true;

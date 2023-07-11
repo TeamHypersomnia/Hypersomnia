@@ -354,6 +354,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		;
 
 		last_update_result = check_and_apply_updates(
+			params.appimage_path,
 			params.only_check_update_availability_and_quit,
 			*imgui_atlas_image,
 			config.http_client,

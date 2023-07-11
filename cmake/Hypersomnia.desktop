@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Categories=Game
+Name=Hypersomnia
+Exec=Hypersomnia
+Icon=Hypersomnia
+StartupNotify=false
+Terminal=false

@@ -20,7 +20,7 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v3
@@ -46,6 +46,9 @@ jobs:
     - name: Build
       run: pushd build/current && ninja tests -k 0 && popd
 
+    - name: Build AppImage
+      run: cmake/appimage_builder.sh
+
     - name: Generate downloadable archives
       run: cmake/generate_archives.sh Linux master
 
@@ -53,5 +56,6 @@ jobs:
       with:
         name: Linux-binaries
         path: |
+          Hypersomnia.AppImage
           Hypersomnia-for-*
           hypersomnia/release_notes.txt
