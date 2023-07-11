@@ -37,7 +37,7 @@ dst="${config_home}/"
 
 for file in "$src"*; do
     base=$(basename "$file")
-    if [[ ! -e "$dst$base" ]]; then
+    if [ ! -e "$dst$base" ]; then
         cp -r "$file" "$dst"
     fi
 done
