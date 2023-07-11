@@ -5,10 +5,12 @@
 
 struct cmd_line_params {
 	std::string complete_command_line;
+	std::string parsed_as;
 
 	std::string live_log_path;
 
 	augs::path_type exe_path;
+	augs::path_type appimage_path;
 	augs::path_type debugger_target;
 	augs::path_type editor_target;
 	augs::path_type consistency_report;
@@ -39,17 +41,35 @@ struct cmd_line_params {
 	cmd_line_params(const int argc, const char* const * const argv) {
 		exe_path = argv[0];
 		complete_command_line = exe_path.string();
+		parsed_as = std::string();
 
-		for (int i = 1; i < argc;) {
-			const auto a = std::string(argv[i++]);
+		for (int i = 1; i < argc; ++i) {
+			const auto a = std::string(argv[i]);
 
 			complete_command_line += " " + a;
+			parsed_as += typesafe_sprintf("%x=%x ", i, a);
+		}
+
+		for (int i = 1; i < argc; ++i) {
+			auto get_next = [&i, argc, argv]() {
+				if (i + 1 < argc) {
+					return argv[++i];
+				}
+
+				return "";
+			};
+
+			const auto a = std::string(argv[i]);
 
 			if (begins_with(a, "-psn")) {
+				/* MacOS process identifier. Ignore. */
 				continue;
 			}
 			else if (a == "--keep-cwd") {
 				keep_cwd = true;
+			}
+			else if (a == "--appimage-path") {
+				appimage_path = get_next();
 			}
 			else if (a == "--unit-tests-only") {
 				unit_tests_only = true;
@@ -86,40 +106,37 @@ struct cmd_line_params {
 				type = app_type::MASTERSERVER;
 			}
 			else if (a == "--test-fp-consistency") {
-				test_fp_consistency = std::atoi(argv[i++]);
+				test_fp_consistency = std::atoi(get_next());
 				keep_cwd = true;
 			}
 			else if (a == "--nat-punch-port") {
-				first_udp_command_port = std::atoi(argv[i++]);
+				first_udp_command_port = std::atoi(get_next());
 			}
 			else if (a == "--server-list-port") {
-				server_list_port = std::atoi(argv[i++]);
+				server_list_port = std::atoi(get_next());
 			}
 			else if (a == "--consistency-report") {
-				consistency_report = argv[i++];
+				consistency_report = get_next();
 			}
 			else if (a == "--verify-updater") {
 				is_updater = true;
-				verified_archive = argv[i++];
+				verified_archive = get_next();
 			}
 			else if (a == "--verify") {
-				verified_archive = argv[i++];
+				verified_archive = get_next();
 			}
 			else if (a == "--edit") {
-				editor_target = argv[i++];
+				editor_target = get_next();
 			}
 			else if (a == "--signature") {
-				verified_signature = argv[i++];
+				verified_signature = get_next();
 			}
 			else if (a == "--connect") {
 				should_connect = true;
-				
-				if (i + 1 < argc) {
-					connect_address = argv[i++];
-				}
+				connect_address = get_next();
 			}
 			else if (a == "--live-log") {
-				live_log_path  = argv[i++];
+				live_log_path = get_next();
 			}
 			else {
 

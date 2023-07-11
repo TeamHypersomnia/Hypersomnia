@@ -230,6 +230,11 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	const auto params = cmd_line_params(argc, argv);
 	LOG("Complete command line:\n%x", params.complete_command_line);
+	LOG("Parsed as:\n%x", params.parsed_as);
+
+	if (!params.appimage_path.empty()) {
+		LOG("Running from an AppImage: %x", params.appimage_path);
+	}
 
 	auto config_ptr = [&]() {
 		auto result = std::make_unique<config_lua_table>(canon_config);
