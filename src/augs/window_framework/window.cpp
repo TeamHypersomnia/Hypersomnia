@@ -36,7 +36,7 @@ namespace augs {
 
 	std::optional<event::change> window::sync_mouse_on_click_activate(const event::change& new_change) {
 		if (/* should_sync_mouse */ new_change.msg == event::message::click_activate
-			&& get_current_settings().is_raw_mouse_input()
+			&& get_current_settings().draws_own_cursor()
 		) {
 			if (const auto screen_space = find_cursor_pos()) {
 				const auto window_pos = get_window_rect().get_position();
@@ -139,7 +139,7 @@ namespace augs {
 	std::optional<event::change> window::handle_mousemove(const basic_vec2<short> new_pos) {
 		event::change change;
 
-		if (!current_settings.is_raw_mouse_input() && !mouse_pos_paused) {
+		if (!current_settings.draws_own_cursor() && !mouse_pos_paused) {
 			change.data.mouse.rel = new_pos - basic_vec2<short>(last_mouse_pos);
 			
 			last_mouse_pos = new_pos;

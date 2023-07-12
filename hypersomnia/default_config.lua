@@ -666,7 +666,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       x = 189,
       y = 208
     },
-    raw_mouse_input = false,
+    draw_own_cursor_in_fullscreen = false,
     log_keystrokes = false,
     size = {
       x = 1200,

@@ -436,6 +436,10 @@ void settings_gui_state::perform(
 					revertable_checkbox(CONFIG_NVP(window.border));
 				}
 
+				revertable_checkbox("Draw own cursor in fullscreen", config.window.draw_own_cursor_in_fullscreen);
+
+				tooltip_on_hover("In fullscreen, the game can draw its own cursor\nwhich may work better for some setups.\nE.g. sometimes the system cursor disappears in fullscreen on Windows.");
+
 				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
 
 				revertable_checkbox("Auto-zoom", config.drawing.auto_zoom);

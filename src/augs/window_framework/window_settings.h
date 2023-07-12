@@ -33,7 +33,7 @@ namespace augs {
 		vec2i position = vec2i(100, 10);
 		unsigned bpp = 24;
 		vec2i size = vec2i(1280, 768);
-		bool raw_mouse_input = true;
+		bool draw_own_cursor_in_fullscreen = true;
 		bool log_keystrokes = false;
 		vsync_type vsync_mode = vsync_type::OFF;
 		maybe<int> max_fps = maybe<int>::disabled(60);
@@ -44,14 +44,12 @@ namespace augs {
 			return { position, size };
 		}
 
-#if PLATFORM_LINUX
-		bool is_raw_mouse_input() const {
-			return raw_mouse_input;
+		bool draws_own_cursor() const {
+			if (fullscreen) {
+				return draw_own_cursor_in_fullscreen;
+			}
+
+			return false;
 		}
-#else
-		bool is_raw_mouse_input() const {
-			return fullscreen || raw_mouse_input;
-		}
-#endif
 	};
 }

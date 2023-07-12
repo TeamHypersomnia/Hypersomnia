@@ -216,9 +216,19 @@ work_result work(const int argc, const char* const * const argv) try {
 		result.audio.enable_hrtf = false;
 #endif
 
+#if PLATFORM_LINUX
+		/* 
+			We don't yet properly implement detecting whether the app is in fs or not. 
+			So better use the system cursor so that we don't clip it accidentally. 
+		*/
+
+		result.window.draw_own_cursor_in_fullscreen = false;
+#else
+		result.window.draw_own_cursor_in_fullscreen = true;
+#endif
+
 #if PLATFORM_MACOS
 		result.window.fullscreen = true;
-		result.window.raw_mouse_input = true;
 #endif
 
 		return result_ptr;
@@ -1861,12 +1871,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	auto decide_on_cursor_clipping = [&](const bool in_direct_gameplay, const auto& cfg) {
 		get_write_buffer().should_clip_cursor = (
 			in_direct_gameplay
-			|| (
-				cfg.window.is_raw_mouse_input()
-#if TODO
-				&& !cfg.session.use_system_cursor_for_gui
-#endif
-			)
+			|| cfg.window.draws_own_cursor()
 		);
 	};
 
@@ -2492,6 +2497,10 @@ work_result work(const int argc, const char* const * const argv) try {
 		};
 	};
 
+	auto close_next_imgui_window = [&]() {
+
+	};
+
 	auto let_imgui_hijack_mouse = [&](auto&& create_game_gui_context, auto&& create_menu_context) {
 		if (!ImGui::GetIO().WantCaptureMouse) {
 			return;
@@ -2805,6 +2814,9 @@ work_result work(const int argc, const char* const * const argv) try {
 							}
 
 							releases.set_all();
+						}
+						else {
+							close_next_imgui_window();
 						}
 
 						continue;
@@ -3184,7 +3196,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			};
 
 			auto draw_non_menu_cursor = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config, const assets::necessary_image_id menu_chosen_cursor) {
-				const bool should_draw_our_cursor = viewing_config.window.is_raw_mouse_input() && !window.is_mouse_pos_paused();
+				const bool should_draw_our_cursor = viewing_config.window.draws_own_cursor() && !window.is_mouse_pos_paused();
 				const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
 				auto get_drawer = [&]() {

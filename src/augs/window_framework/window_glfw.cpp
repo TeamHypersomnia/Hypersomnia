@@ -274,7 +274,7 @@ namespace augs {
 			auto dt = new_mouse_pos - platform->last_mouse_pos;
 			platform->last_mouse_pos = new_mouse_pos;
 
-			if (is_active() && (current_settings.is_raw_mouse_input() || mouse_pos_paused)) {
+			if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
 				LOG_NVPS(dt.x, dt.y);
 				auto ch = do_raw_motion({
 					static_cast<short>(dt.x),

@@ -290,7 +290,7 @@ namespace augs {
 			return change;
 
 		case WM_INPUT:
-			if (is_active() && (current_settings.is_raw_mouse_input() || mouse_pos_paused)) {
+			if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
 				thread_local BYTE lpb[sizeof(RAWINPUT)];
 				thread_local UINT dwSize = sizeof(RAWINPUT);
 
@@ -325,7 +325,7 @@ namespace augs {
 				default: return std::nullopt;
 				}
 
-				if (change.msg == event::message::deactivate && current_settings.is_raw_mouse_input()) {
+				if (change.msg == event::message::deactivate && current_settings.draws_own_cursor()) {
 					set_cursor_pos(last_mouse_pos);
 				}
 			}

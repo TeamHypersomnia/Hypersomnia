@@ -694,7 +694,7 @@ namespace augs {
 							smallest_raw_y_unit = std::min(std::abs(y), smallest_raw_y_unit);
 						}
 
-						if (is_active() && (current_settings.is_raw_mouse_input() || mouse_pos_paused)) {
+						if (is_active() && (current_settings.draws_own_cursor() || mouse_pos_paused)) {
 							auto ch = do_raw_motion({
 								static_cast<short>(x / smallest_raw_x_unit),
 								static_cast<short>(y / smallest_raw_y_unit) 

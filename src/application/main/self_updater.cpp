@@ -208,7 +208,6 @@ self_update_result check_and_apply_updates(
 
 	window_settings.size = window_size;
 	window_settings.fullscreen = false;
-	window_settings.raw_mouse_input = false;
 	window_settings.border = false;
 
 	std::optional<augs::window> window;
