@@ -266,6 +266,8 @@ bool projects_list_tab_state::perform_list(
 
 	const auto line_h = ImGui::GetTextLineHeight();
 
+	bool anything_chosen = false;
+
 	auto process_entry = [&](const auto& entry) {
 		const auto& path = entry.arena_path;
 		const auto arena_name = entry.get_arena_name();
@@ -290,6 +292,13 @@ bool projects_list_tab_state::perform_list(
 
 			if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
 				selected_arena_path = path;
+			}
+
+			if (!anything_chosen && ImGui::IsItemClicked()) {
+				if (ImGui::IsMouseDoubleClicked(0)) {
+					anything_chosen = true;
+					selected_arena_path = path;
+				}
 			}
 
 			if (ImGui::BeginPopupContextItem()) {
@@ -377,7 +386,7 @@ bool projects_list_tab_state::perform_list(
 		);
 	}
 
-	return false;
+	return anything_chosen;
 }
 
 
@@ -463,21 +472,15 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 			auto scope = scoped_child("Project list view", ImVec2(proj_list_width, -space_for_clone_button));
 
 			if (const bool choice_performed = perform_arena_list()) {
-				auto& tab = tabs[current_tab];
-
 				const bool can_open_directly = current_tab == project_tab_type::MY_PROJECTS;
 				const bool needs_to_clone_before_open = !can_open_directly;
 
-				const auto& source_project_path = tab.selected_arena_path;
-
 				if (can_open_directly) {
-					const auto& target_project_path = source_project_path;
-
-					(void)target_project_path;
+					return project_list_view_result::OPEN_SELECTED_PROJECT;
 
 				}
 				else if (needs_to_clone_before_open) {
-
+					return project_list_view_result::OPEN_CREATE_FROM_SELECTED_DIALOG;
 				}
 			}
 		}
