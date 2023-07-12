@@ -16,6 +16,7 @@ typedef XID GLXWindow;
 typedef XID GLXDrawable;
 
 typedef uint32_t xcb_window_t;
+struct xcb_screen_t;
 typedef unsigned long Window;
 
 struct _XDisplay;
@@ -89,6 +90,7 @@ namespace augs {
 		GLXContext context = 0;
 		GLXWindow glxwindow = 0;
 		xcb_window_t window_id = 0;
+		xcb_screen_t* screen = 0;
 		GLXDrawable drawable = 0;
 		Display *display = nullptr;
 		Window root = 0;
@@ -209,5 +211,9 @@ namespace augs {
 			const std::string& caption,
 			const std::string& text
 		);
+
+		auto get_last_mouse_pos() const {
+			return last_mouse_pos;
+		}
 	};
 }

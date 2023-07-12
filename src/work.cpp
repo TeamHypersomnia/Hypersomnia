@@ -1959,6 +1959,7 @@ work_result work(const int argc, const char* const * const argv) try {
 	bool should_quit = false;
 
 	augs::event::state common_input_state;
+	common_input_state.mouse.pos = window.get_last_mouse_pos();
 
 	std::function<void()> request_quit;
 
