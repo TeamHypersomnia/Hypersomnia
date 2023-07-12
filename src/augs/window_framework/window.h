@@ -112,7 +112,7 @@ namespace augs {
 
 		bool can_control_window_geometry = true;
 
-		bool active = false;
+		bool active = true;
 
 		bool cursor_clipping = false;
 		bool cursor_visible = true;

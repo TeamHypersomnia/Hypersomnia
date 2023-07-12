@@ -403,7 +403,7 @@ namespace augs {
 		glfwMakeContextCurrent(nullptr);
 	}
 
-	void window::set_cursor_pos(vec2i) {
+	void window::set_cursor_pos(const vec2i pos) {
 		last_mouse_pos = pos;
 	
 	}

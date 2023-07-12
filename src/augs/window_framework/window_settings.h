@@ -44,8 +44,14 @@ namespace augs {
 			return { position, size };
 		}
 
+#if PLATFORM_LINUX
+		bool is_raw_mouse_input() const {
+			return raw_mouse_input;
+		}
+#else
 		bool is_raw_mouse_input() const {
 			return fullscreen || raw_mouse_input;
 		}
+#endif
 	};
 }
