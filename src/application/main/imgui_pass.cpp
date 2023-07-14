@@ -108,4 +108,6 @@ void perform_imgui_pass(
 	custom_imgui_logic();
 
 	augs::imgui::render();
+
+	augs::imgui::next_window_to_close = std::nullopt;
 }

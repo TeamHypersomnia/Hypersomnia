@@ -41,6 +41,9 @@ static void augs_SetClipboardText(void*, const char* text) {
 
 namespace augs {
 	namespace imgui {
+		/* Definition */
+		std::optional<ImGuiID> next_window_to_close;
+
 		context_raii::~context_raii() {
 			ImGui::DestroyContext();
 		}

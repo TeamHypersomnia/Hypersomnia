@@ -1004,6 +1004,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 
 		browse_servers_gui.close();
+		settings_gui.close();
 
 		main_menu.reset();
 		current_setup.reset();
@@ -2498,7 +2499,13 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	auto close_next_imgui_window = [&]() {
+		ImGuiContext& g = *GImGui;
 
+		if (g.WindowsFocusOrder.size() > 0) {
+			if (g.WindowsFocusOrder.back()) {
+				augs::imgui::next_window_to_close = g.WindowsFocusOrder.back()->ID; 
+			}
+		}
 	};
 
 	auto let_imgui_hijack_mouse = [&](auto&& create_game_gui_context, auto&& create_menu_context) {

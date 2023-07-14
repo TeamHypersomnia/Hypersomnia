@@ -10,6 +10,8 @@
 
 namespace augs {
 	namespace imgui {
+		extern std::optional<ImGuiID> next_window_to_close;
+
 		template <class T>
 		struct window_scope {
 			T guard;
@@ -54,7 +56,7 @@ namespace augs {
 		}
 
 		template <class... T>
-		auto cond_scoped_window(const bool do_it, T&&... args) {
+		auto cond_scoped_window(const bool do_it, const auto label, bool* show, T&&... args) {
 			auto guard = scope_guard([](){ ImGui::End(); });
 
 			if (!do_it) {
@@ -62,7 +64,23 @@ namespace augs {
 				return window_scope(std::move(guard), false);
 			}
 			else {
-				const bool is_open = ImGui::Begin(std::forward<T>(args)...);
+				const bool is_open = ImGui::Begin(label, show, std::forward<T>(args)...);
+
+				ImGuiWindow* window = ImGui::GetCurrentWindow();
+
+				if (next_window_to_close.has_value()) {
+					if (next_window_to_close == window->ID) {
+						ImGui::End();
+						if (show) {
+							*show = false;
+						}
+						next_window_to_close = std::nullopt;
+
+						guard.release();
+						return window_scope(std::move(guard), false);
+					}
+				}
+
 				return window_scope(std::move(guard), is_open);
 			}
 		}
