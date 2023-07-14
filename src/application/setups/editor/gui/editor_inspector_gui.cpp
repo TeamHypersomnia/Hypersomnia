@@ -557,11 +557,8 @@ bool edit_property(
 			return true;
 		}
 	}
-	else if constexpr(is_constant_size_string_v<T>) {
-		if (input_text(label, property, ImGuiInputTextFlags_EnterReturnsTrue)) { 
-			result = typesafe_sprintf("Edited %x in %x", label);
-			return true;
-		}
+	else {
+		static_assert(always_false_v<T>, "Non-exhaustive if constexpr");
 	}
 
 	return false;
@@ -2097,7 +2094,9 @@ SINGLE_EDIT_FUNCTION(editor_project_about& insp) {
 	using namespace augs::imgui;
 	std::string result;
 
-	PROPERTY("Author", author);
+	if (input_text("Author", insp.author)) {
+		result = "Edited Author in %x";
+	}
 
 	ImGui::Separator();
 
