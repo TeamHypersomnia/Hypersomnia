@@ -733,7 +733,7 @@ treat_as_music_sounds_longer_than_secs = 5,
   server_start = {
 	ip = "127.0.0.1",
 	port = 0,
-	slots = 64
+	slots = 16
   },
 
   server_private = {
