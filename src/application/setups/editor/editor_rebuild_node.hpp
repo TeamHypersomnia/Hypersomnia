@@ -231,6 +231,7 @@ bool setup_entity_from_node(
 
 					to.custom_filter = filters[predefined_filter_type::PORTAL];
 					to.custom_filter.maskBits = from.reacts_to.get_mask_bits(); 
+					to.reacts_to_factions = from.reacts_to_factions;
 				}
 			}
 

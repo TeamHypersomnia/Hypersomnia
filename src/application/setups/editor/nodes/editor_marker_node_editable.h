@@ -50,6 +50,7 @@ struct editor_portal_info {
 	augs::maybe<hazard_def> hazard = augs::maybe<hazard_def>(hazard_def(), false);
 
 	editor_filter_flags reacts_to;
+	per_actual_faction<bool> reacts_to_factions = { true, true, true };
 
 	float begin_entering_highlight_ms = 1000.0f;
 	rgba_channel decrease_opacity_to = 0;

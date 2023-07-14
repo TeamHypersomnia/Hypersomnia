@@ -354,6 +354,11 @@ namespace augs {
 
 		xcb_set_input_focus(connection, XCB_INPUT_FOCUS_POINTER_ROOT, window_id, XCB_CURRENT_TIME);
 		xcb_flush(connection);
+		
+		/* Set it again because it sometimes doesn't properly do it for the first time */
+		if (settings.fullscreen) {
+			set_fullscreen_hint(true);
+		}
 	}
 
 	void window::destroy() {

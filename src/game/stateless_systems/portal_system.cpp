@@ -630,6 +630,20 @@ void portal_system::advance_portal_logic(const logic_step step) {
 						continue;
 					}
 
+					const bool filters_factions = 
+						!portal.reacts_to_factions.metropolis
+						|| !portal.reacts_to_factions.resistance
+						|| !portal.reacts_to_factions.atlantis
+					;
+
+					if (filters_factions)  {
+						if (const auto capability = contacted_entity.get_owning_transfer_capability()) {
+							if (!portal.reacts_to_factions[capability.get_official_faction()]) {
+								continue;
+							}
+						}
+					}
+
 					if (ce->other->m_last_teleport_progress_timestamp == now) {
 						continue;
 					}

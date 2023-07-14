@@ -1067,6 +1067,14 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		MULTIPROPERTY("Obstacles", as_portal.reacts_to.obstacles);
 
 		ImGui::Separator();
+		text_color("Reacts to factions", yellow);
+		ImGui::Separator();
+		
+		MULTIPROPERTY("Resistance", as_portal.reacts_to_factions.resistance);
+		MULTIPROPERTY("Metropolis", as_portal.reacts_to_factions.metropolis);
+		MULTIPROPERTY("Atlantis", as_portal.reacts_to_factions.atlantis);
+
+		ImGui::Separator();
 		text_color("AS EXIT", orange);
 		ImGui::Separator();
 

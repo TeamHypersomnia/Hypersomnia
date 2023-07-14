@@ -5,6 +5,7 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/continuous_rings_input.h"
 #include "game/enums/portal_enums.h"
+#include "game/enums/faction_type.h"
 
 namespace components {
 	struct portal {
@@ -46,6 +47,8 @@ namespace components {
 
 		float light_size_mult = 1.0f;
 		rgba light_color = white;
+		per_actual_faction<bool> reacts_to_factions = { true, true, true };
+		pad_bytes<1> pad;
 		// END GEN INTROSPECTOR
 
 		portal() {
