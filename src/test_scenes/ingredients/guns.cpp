@@ -3022,9 +3022,9 @@ namespace test_flavours {
 			gun_def.head_radius_multiplier = 0.4f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 15.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 1.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(250);
-			gun_def.recoil_multiplier = 0.25f;
+			gun_def.recoil_multiplier = 0.1f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;

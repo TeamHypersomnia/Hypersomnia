@@ -127,6 +127,37 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		return nullptr;
 	};
 
+	auto banlist_to_set = [](const auto& path) {
+		std::unordered_set<std::string> out;
+
+		try {
+			auto content = augs::file_to_string(path);
+			auto s = std::stringstream(content);
+
+			for (std::string line; std::getline(s, line); ) {
+				out.emplace(line);
+			}
+		}
+		catch (...) {
+
+		}
+
+		return out;
+	};
+
+	auto banlist_notifications 	= banlist_to_set(augs::path_type(USER_FILES_DIR) / "masterserver_banlist_notifications.txt");
+	auto banlist_servers 		= banlist_to_set(augs::path_type(USER_FILES_DIR) / "masterserver_banlist_servers.txt");
+
+	auto is_banned_notifications = [&](netcode_address_t t) {
+		t.port = 0;
+		return found_in(banlist_notifications, ::ToString(t));
+	};
+
+	auto is_banned_server = [&](netcode_address_t t) {
+		t.port = 0;
+		return found_in(banlist_servers, ::ToString(t));
+	};
+
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
 
 	std::vector<std::byte> serialized_list;
@@ -337,6 +368,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	auto push_new_server_webhook = [&](const netcode_address_t& from, const server_heartbeat& data) {
 		const auto ip_str = ::ToString(from);
 
+		if (is_banned_notifications(from)) {
+			return;
+		}
+
 		const auto passed = since_launch.get<std::chrono::seconds>();
 		const auto mute_for_secs = settings.suppress_community_server_webhooks_after_launch_for_secs;
 
@@ -457,6 +492,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			const auto packet_bytes = netcode_socket_receive_packet(&socket, &from, packet_buffer, NETCODE_MAX_PACKET_BYTES);
 
 			if (packet_bytes < 1) {
+				return;
+			}
+
+			if (is_banned_server(from)) {
 				return;
 			}
 
