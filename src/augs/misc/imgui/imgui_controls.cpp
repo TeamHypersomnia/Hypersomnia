@@ -16,7 +16,8 @@ namespace augs {
 			const rgba label_color,
 			const std::array<rgba, 3> bg_cols,
 			const float icon_rotation,
-			const bool pad_from_left
+			const bool pad_from_left,
+			const std::function<void()> after_cb
 		) {
 			const auto text_h = ImGui::GetTextLineHeight();
 			const auto button_size = ImVec2(0, text_h * size_mult);
@@ -32,6 +33,10 @@ namespace augs {
 				auto id = scoped_id(label.c_str());
 
 				result = ImGui::Selectable("###Button", true, ImGuiSelectableFlags_None, button_size);
+
+				if (after_cb) {
+					after_cb();
+				}
 			}
 
 			{

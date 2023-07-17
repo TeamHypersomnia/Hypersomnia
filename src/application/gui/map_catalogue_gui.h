@@ -20,6 +20,7 @@ struct map_catalogue_entry {
 	// END GEN INTROSPECTOR
 
 	ad_hoc_entry_id miniature_id = 0;
+	std::optional<std::string> version_on_disk;
 };
 
 struct ad_hoc_in_atlas_map;
@@ -52,8 +53,8 @@ class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_s
 	int sort_by_column = 1;
 	bool ascending = false;
 
-
-	std::unordered_set<std::string> selected_arenas;
+	std::set<std::string> selected_arenas;
+	const map_catalogue_entry* last_selected = nullptr;
 
 	ImGuiTextFilter filter;
 

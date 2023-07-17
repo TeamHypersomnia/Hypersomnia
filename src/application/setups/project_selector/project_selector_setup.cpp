@@ -33,7 +33,7 @@
 #include "augs/templates/in_order_of.h"
 
 constexpr auto miniature_size_v = 80;
-constexpr auto preview_size_v = 250;
+constexpr auto preview_size_v = 400;
 
 std::string sanitize_arena_short_description(std::string in) {
 	int newlines = 0;
@@ -514,7 +514,6 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 			if (selected_entry != nullptr) {
 				auto& entry = *selected_entry;
 				auto& about = entry.about;
-				(void)about;
 
 				const auto image_padding = vec2(5, 5);
 				const auto image_internal_padding = vec2i(15, 15);

@@ -13,7 +13,8 @@ namespace augs {
 			rgba label_color,
 			std::array<rgba, 3> bg_cols,
 			float rotation = 0.0f,
-			bool pad_from_left = true
+			bool pad_from_left = true,
+			std::function<void()> after_cb = nullptr
 		);
 	}
 }

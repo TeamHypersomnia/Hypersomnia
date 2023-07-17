@@ -23,6 +23,7 @@
 #include "application/setups/editor/project/editor_project_paths.h"
 
 constexpr auto miniature_size_v = 80;
+constexpr auto preview_size_v = 400;
 
 struct map_catalogue_gui_internal {
 	//std::optional<arena_downloading_session> session;
@@ -259,14 +260,17 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 				if (ImGui::GetIO().KeyCtrl) {
 					if (found_in(selected_arenas, arena_name)) {
 						selected_arenas.erase(arena_name);
+						last_selected = nullptr;
 					}
 					else {
 						selected_arenas.emplace(arena_name);
+						last_selected = std::addressof(entry);
 					}
 				}
 				else {
 					selected_arenas.clear();
 					selected_arenas.emplace(arena_name);
+					last_selected = std::addressof(entry);
 				}
 			}
 
@@ -306,7 +310,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 		text(arena_name);
 		ImGui::SameLine();
-		text_disabled(" - by " + entry.author);
+		text_disabled("- by " + entry.author);
 
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
@@ -451,14 +455,70 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 				perform_list(in);
 			}
 
-			auto do_big_button = [&](auto label, auto icon, auto col, std::array<rgba, 3> bg_cols) {
+			{
+				ImGui::SameLine();
+
+				auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
+
+				auto scope = scoped_child("Project description view", ImVec2(proj_desc_width, -space_for_dl_button), false);
+
+				auto selected_entry = last_selected;
+
+				if (selected_entry != nullptr) {
+					auto& entry = *selected_entry;
+
+					const auto image_padding = vec2(5, 5);
+					const auto image_internal_padding = vec2i(15, 15);
+					const auto preview_entry = mapped_or_nullptr(in.ad_hoc_atlas, entry.miniature_id);
+					const auto target_preview_size = vec2::square(preview_size_v);
+
+					if (preview_entry != nullptr) {
+						const auto preview_size = preview_entry->get_original_size();
+						const auto resized_preview_size = vec2i(vec2(preview_size) * (static_cast<float>(preview_size_v) / preview_size.bigger_side()));
+
+						const auto offset = (target_preview_size - resized_preview_size) / 2;
+
+						auto bg_size = target_preview_size + image_internal_padding * 2;
+						bg_size.x = ImGui::GetContentRegionAvail().x;
+
+						game_image(in.necessary_images[assets::necessary_image_id::BLANK], bg_size, rgba(0, 0, 0, 100), image_padding, augs::imgui_atlas_type::GAME);
+						game_image(*preview_entry, resized_preview_size, white, offset + image_padding + image_internal_padding, augs::imgui_atlas_type::AD_HOC);
+
+						invisible_button("invisible_preview", target_preview_size + image_padding + image_internal_padding * 2);
+
+						auto fix_background_color = scoped_style_color(ImGuiCol_ChildBg, ImVec4{0.0f, 0.0f, 0.0f, 0.0f});
+
+						shift_cursor(image_padding);
+
+						auto scope = scoped_child("descview", ImVec2(0, 0), true);
+
+						text(std::string(entry.name));
+						ImGui::SameLine();
+						text_disabled(std::string("- by ") + entry.author);
+
+						ImGui::Separator();
+
+						ImGui::PushTextWrapPos();
+
+						text_color(entry.short_description, rgba(210, 210, 210, 255));
+
+						ImGui::PopTextWrapPos();
+					}
+				}
+				else {
+					text_disabled("(No project selected)");
+				}
+			}
+
+			auto do_big_button = [&](auto label, auto icon, auto col, std::array<rgba, 3> bg_cols, auto after) {
 				return selectable_with_icon(
 					in.necessary_images[icon],
 					label,
 					button_size_mult,
 					vec2(1.0f, button_padding_mult),
 					col,
-					bg_cols
+					bg_cols, 0.0f, true,
+					after
 				);
 			};
 
@@ -471,7 +531,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 					rgba(25, 25, 25, 255),
 					rgba(50, 50, 50, 255),
 					rgba(50, 50, 50, 255)
-				});
+				}, [](){});
 			}
 			else {
 				auto dl_label = typesafe_sprintf("Download %x maps", selected_arenas.size());
@@ -480,11 +540,29 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 					dl_label = "Download " + *selected_arenas.begin();
 				}
 
+				auto after_cb = [&]() {
+					if (ImGui::IsItemHovered()) {
+						if (selected_arenas.size() > 1) {
+							auto arenas = std::string();
+
+							for (const auto& s : selected_arenas) {
+								arenas += s + "\n";
+							}
+
+							if (arenas.size() > 0) {
+								arenas.pop_back();
+							}
+
+							text_tooltip(arenas);
+						}
+					}
+				};
+
 				do_big_button(dl_label, icon, rgba(100, 255, 100, 255), {
 					rgba(10, 50, 10, 255),
 					rgba(20, 70, 20, 255),
 					rgba(20, 90, 20, 255)
-				});
+				}, after_cb);
 			}
 
 		}
@@ -510,6 +588,8 @@ void map_catalogue_gui_state::refresh(const map_catalogue_input in) {
 	}
 
 	map_list.clear();
+	selected_arenas.clear();
+	last_selected = nullptr;
 
 	last_error = {};
 
