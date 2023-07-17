@@ -1,7 +1,3 @@
-#if BUILD_OPENSSL
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-#endif
-
 #include <future>
 
 #include "application/gui/browse_servers_gui.h"

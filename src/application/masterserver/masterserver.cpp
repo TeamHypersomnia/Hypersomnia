@@ -27,6 +27,7 @@
 #include "3rdparty/rapidjson/include/rapidjson/prettywriter.h"
 #include "augs/readwrite/json_readwrite.h"
 
+std::string to_lowercase(std::string s);
 std::string ToString(const netcode_address_t&);
 
 #if PLATFORM_UNIX
@@ -128,14 +129,20 @@ void perform_masterserver(const config_lua_table& cfg) try {
 	};
 
 	auto banlist_to_set = [](const auto& path) {
-		std::unordered_set<std::string> out;
+		std::pair<std::unordered_set<std::string>, std::unordered_set<std::string>> out;
 
 		try {
 			auto content = augs::file_to_string(path);
 			auto s = std::stringstream(content);
 
 			for (std::string line; std::getline(s, line); ) {
-				out.emplace(line);
+				auto space = line.find(' ');
+				out.first.insert(line.substr(0, space));
+
+				if (space != std::string::npos) {
+					auto server_name = line.substr(space + 1);
+					out.second.insert(::to_lowercase(server_name));
+				}
 			}
 		}
 		catch (...) {
@@ -150,12 +157,20 @@ void perform_masterserver(const config_lua_table& cfg) try {
 
 	auto is_banned_notifications = [&](netcode_address_t t) {
 		t.port = 0;
-		return found_in(banlist_notifications, ::ToString(t));
+		return found_in(banlist_notifications.first, ::ToString(t));
 	};
 
 	auto is_banned_server = [&](netcode_address_t t) {
 		t.port = 0;
-		return found_in(banlist_servers, ::ToString(t));
+		return found_in(banlist_servers.first, ::ToString(t));
+	};
+
+	auto is_banned_notifications_name = [&](const std::string& t) {
+		return found_in(banlist_notifications.second, ::to_lowercase(t));
+	};
+
+	auto is_banned_server_name = [&](const std::string& t) {
+		return found_in(banlist_servers.second, ::to_lowercase(t));
 	};
 
 	std::unordered_map<netcode_address_t, masterserver_client> server_list;
@@ -372,6 +387,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 			return;
 		}
 
+		if (is_banned_notifications_name(data.server_name)) {
+			return;
+		}
+
 		const auto passed = since_launch.get<std::chrono::seconds>();
 		const auto mute_for_secs = settings.suppress_community_server_webhooks_after_launch_for_secs;
 
@@ -532,6 +551,10 @@ void perform_masterserver(const config_lua_table& cfg) try {
 						}
 					}
 					else if constexpr(std::is_same_v<R, masterserver_in::heartbeat>) {
+						if (is_banned_server_name(typed_request.server_name)) {
+							return;
+						}
+
 						if (typed_request.is_valid()) {
 							auto it = server_list.try_emplace(from);
 

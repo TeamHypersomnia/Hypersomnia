@@ -6393,3 +6393,7 @@ This will discard your redo history."
     - always the whole game actually
     - but remember to not pass duplicate flags
 
+- dont require enter to confirm some textboxes like in about
+- esc in project selector goes straight to main menu and editor has just quit to projects
+- banlist for notifications
+

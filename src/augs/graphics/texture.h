@@ -52,8 +52,7 @@ namespace augs {
 			texture(const texture&) = delete;
 			texture& operator=(const texture&) = delete;
 
-			void texImage2D(renderer&, const vec2u size, const unsigned char* const source);
-			void texImage2D(renderer&, const image& rgba_source);
+			void texImage2D(renderer&, image&& rgba_source);
 
 			void set_filtering(augs::renderer&, filtering_type);
 

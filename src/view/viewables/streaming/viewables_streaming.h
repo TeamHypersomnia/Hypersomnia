@@ -110,6 +110,9 @@ public:
 	texture_in_progress<avatar_atlas_output> avatars;
 	texture_in_progress<ad_hoc_atlas_output> ad_hoc;
 
+	std::optional<ad_hoc_atlas_subjects> last_requested_ad_hoc_atlas;
+	std::optional<arena_player_metas> last_requested_player_metas;
+
 	viewables_streaming_profiler performance;
 
 	loaded_sounds_map loaded_sounds;

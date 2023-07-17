@@ -5,8 +5,7 @@
 namespace augs {
 	namespace graphics {
 		struct texImage2D_command {
-			vec2u size;
-			const unsigned char* source;
+			image source;
 		};
 
 		struct set_filtering_command {

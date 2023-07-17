@@ -58,6 +58,7 @@
 #include "application/gui/start_client_gui.h"
 #include "application/gui/start_server_gui.h"
 #include "application/gui/browse_servers_gui.h"
+#include "application/gui/map_catalogue_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 
 #include "application/masterserver/masterserver.h"
@@ -830,18 +831,20 @@ work_result work(const int argc, const char* const * const argv) try {
 		return main_menu != nullptr;
 	};
 
-	auto emplace_main_menu = [&p = main_menu] (auto&&... args) {
-		if (p == nullptr) {
-			p = std::make_unique<main_menu_setup>(std::forward<decltype(args)>(args)...);
-		}
-	};
-
 	settings_gui_state settings_gui = std::string("Settings");
 	start_client_gui_state start_client_gui = std::string("Connect to server");
 	start_server_gui_state start_server_gui = std::string("Host a server");
 
 	bool was_browser_open_in_main_menu = false;
 	browse_servers_gui_state browse_servers_gui = std::string("Browse servers");
+	map_catalogue_gui_state map_catalogue_gui = std::string("Download maps");
+
+	auto emplace_main_menu = [&map_catalogue_gui, &p = main_menu] (auto&&... args) {
+		if (p == nullptr) {
+			p = std::make_unique<main_menu_setup>(std::forward<decltype(args)>(args)...);
+			map_catalogue_gui.rebuild_miniatures();
+		}
+	};
 
 	auto find_chosen_server_info = [&]() {
 		return browse_servers_gui.find_entry(config.client_start);
@@ -969,6 +972,10 @@ work_result work(const int argc, const char* const * const argv) try {
 				new_player_metas = setup.get_new_player_metas();
 				new_ad_hoc_images = setup.get_new_ad_hoc_images();
 			});
+
+			if (!has_current_setup()) {
+				new_ad_hoc_images = map_catalogue_gui.get_new_ad_hoc_images();
+			}
 		}
 
 		streaming.load_all({
@@ -1004,6 +1011,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		}
 
 		browse_servers_gui.close();
+		map_catalogue_gui.close();
 		settings_gui.close();
 
 		main_menu.reset();
@@ -1361,11 +1369,32 @@ work_result work(const int argc, const char* const * const argv) try {
 		};
 	};
 
+	auto get_map_catalogue_input = [&]() {
+		return map_catalogue_input {
+			config.server.external_arena_files_provider,
+			streaming.ad_hoc.in_atlas,
+			streaming.necessary_images_in_atlas,
+			window
+		};
+	};
+
 	auto perform_browse_servers = [&]() {
 		const bool perform_result = browse_servers_gui.perform(get_browse_servers_input());
 
 		if (perform_result) {
 			start_client_setup();
+		}
+	};
+
+	auto perform_map_catalogue = [&]() {
+		const bool perform_result = map_catalogue_gui.perform(get_map_catalogue_input());
+
+		if (perform_result) {
+			change_with_save(
+				[&](auto& cfg) {
+					cfg.server.external_arena_files_provider = config.server.external_arena_files_provider;
+				}
+			);
 		}
 	};
 
@@ -1806,12 +1835,12 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				browse_servers_gui.advance_ping_logic();
 
-				{
-					const bool show_server_browser = !has_current_setup() || ingame_menu.show;
+				if (const bool show_server_browser = !has_current_setup() || ingame_menu.show) {
+					perform_browse_servers();
+				}
 
-					if (show_server_browser) {
-						perform_browse_servers();
-					}
+				if (const bool show_map_catalogue = !has_current_setup()) {
+					perform_map_catalogue();
 				}
 
 				if (!has_current_setup()) {
@@ -1979,12 +2008,16 @@ work_result work(const int argc, const char* const * const argv) try {
 				augs::open_url("https://discord.com/invite/YC49E4G");
 				break;
 
+			case T::DOWNLOAD_MAPS:
+				map_catalogue_gui.open();
+				break;
+
 			case T::BROWSE_SERVERS:
 				browse_servers_gui.open();
 
 				break;
 
-			case T::CONNECT_TO_OFFICIAL_SERVER:
+			case T::PLAY_ON_THE_OFFICIAL_SERVER:
 				start_client_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
@@ -2848,11 +2881,6 @@ work_result work(const int argc, const char* const * const argv) try {
 					{
 						auto control_main_menu = [&]() {
 							if (has_main_menu() && !has_current_setup()) {
-								if (e.was_pressed(augs::event::keys::key::D)) {
-									launch_debugger(lua);
-									return true;
-								}
-
 								if (main_menu_gui.show) {
 									main_menu_gui.control(create_menu_context(main_menu_gui), e, do_main_menu_option);
 								}
@@ -3019,11 +3047,11 @@ work_result work(const int argc, const char* const * const argv) try {
 				);
 			};
 
-			auto finalize_loading_viewables = [&](const auto& new_viewing_config) {
+			auto finalize_loading_viewables = [&](const bool measure_atlas_uploading) {
 				streaming.finalize_load({
 					audio_buffers,
 					get_current_frame_num(),
-					new_viewing_config.debug.measure_atlas_uploading,
+					measure_atlas_uploading,
 					get_general_renderer(),
 					get_audiovisuals().get<sound_system>()
 				});
@@ -3393,11 +3421,11 @@ work_result work(const int argc, const char* const * const argv) try {
 				game_gui_mode = true;
 			}
 
+			reload_needed_viewables();
+			finalize_loading_viewables(config.debug.measure_atlas_uploading);
+
 			const auto input_result = perform_input_pass();
 			const auto& new_viewing_config = input_result.viewing_config;
-
-			reload_needed_viewables();
-			finalize_loading_viewables(new_viewing_config);
 
 			auto audio_renderer = std::optional<augs::audio_renderer>();
 

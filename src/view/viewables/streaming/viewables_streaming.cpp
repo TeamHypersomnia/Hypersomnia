@@ -77,16 +77,22 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	const auto& unofficial_content_dir = in.unofficial_content_dir;
 	const auto max_atlas_size = in.max_atlas_size;
 
+	if (in.new_player_metas.has_value()) {
+		last_requested_player_metas = std::move(in.new_player_metas);
+	}
+
 	/* Avatar atlas pass */
 	if (avatars.work_slot_free(current_frame)) {
-		if (in.new_player_metas.has_value()) {
+		if (last_requested_player_metas.has_value()) {
 			auto avatar_atlas_in = avatar_atlas_input {
-				std::move(*in.new_player_metas),
+				std::move(*last_requested_player_metas),
 				max_atlas_size,
 
 				nullptr,
 				avatars.pbo_fallback
 			};
+
+			last_requested_player_metas = std::nullopt;
 
 			avatars.submit_work([avatar_atlas_in]() { 
 				return create_avatar_atlas(avatar_atlas_in);
@@ -94,15 +100,21 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 		}
 	}
 
+	if (in.ad_hoc_subjects.has_value()) {
+		last_requested_ad_hoc_atlas = std::move(in.ad_hoc_subjects);
+	}
+
 	if (ad_hoc.work_slot_free(current_frame)) {
-		if (in.ad_hoc_subjects.has_value()) {
+		if (last_requested_ad_hoc_atlas.has_value()) {
 			auto ad_hoc_atlas_in = ad_hoc_atlas_input {
-				std::move(*in.ad_hoc_subjects),
+				std::move(*last_requested_ad_hoc_atlas),
 				max_atlas_size,
 
 				nullptr,
 				ad_hoc.pbo_fallback
 			};
+
+			last_requested_ad_hoc_atlas = std::nullopt;
 
 			ad_hoc.submit_work([ad_hoc_atlas_in]() { 
 				return create_ad_hoc_atlas(ad_hoc_atlas_in);
@@ -316,7 +328,9 @@ void texture_in_progress<output_type>::finalize_load(augs::renderer& renderer) {
 		in_atlas = std::move(result.atlas_entries);
 
 		const auto atlas_size = result.atlas_size;
-		texture.texImage2D(renderer, atlas_size, std::addressof(pbo_fallback.data()->r));
+		texture.texImage2D(renderer, augs::image(std::move(pbo_fallback), atlas_size));
+		pbo_fallback = {};
+		renderer.finish();
 		texture.set_filtering(renderer, augs::filtering_type::LINEAR);
 
 		augs::graphics::texture::set_current_to_previous(renderer);
@@ -349,7 +363,8 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		/* Done, overwrite */
 		now_loaded_defs = new_loaded_defs;
 
-		general_atlas.texImage2D(in.renderer, result.atlas_size, std::addressof(pbo_fallback.data()->r));
+		general_atlas.texImage2D(in.renderer, augs::image(std::move(pbo_fallback), result.atlas_size));
+		pbo_fallback = {};
 		general_atlas_submitted_when = current_frame;
 	}
 

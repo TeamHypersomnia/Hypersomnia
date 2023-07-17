@@ -45,6 +45,11 @@ struct main_menu_gui {
 		const augs::event::change change,
 		B button_callback
 	) {
+		if (change.was_pressed(augs::event::keys::key::D)) {
+			button_callback(main_menu_button_type::DOWNLOAD_MAPS);
+			return true;
+		}
+
 		if (change.was_pressed(augs::event::keys::key::E)) {
 			button_callback(main_menu_button_type::EDITOR);
 			return true;
@@ -61,7 +66,7 @@ struct main_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::C)) {
-			button_callback(main_menu_button_type::CONNECT_TO_OFFICIAL_SERVER);
+			button_callback(main_menu_button_type::PLAY_ON_THE_OFFICIAL_SERVER);
 			return true;
 		}
 
@@ -116,6 +121,7 @@ struct main_menu_gui {
 		const auto& gui_font = context.get_gui_font();
 
 		root.set_menu_buttons_colors(cyan);
+		root.buttons[std::size_t(main_menu_button_type::DOWNLOAD_MAPS)].colorize = green;
 		root.set_menu_buttons_sizes(context.get_necessary_images(), gui_font, { 1000, 1000 });
 
 		for (std::size_t i = 0; i < root.buttons.size(); ++i) {

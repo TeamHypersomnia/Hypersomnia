@@ -35,6 +35,22 @@
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 250;
 
+std::string sanitize_arena_short_description(std::string in) {
+	int newlines = 0;
+
+	for (auto& c : in) {
+		if (c == '\n') {
+			++newlines;
+
+			if (newlines > 1) {
+				c = ' ';
+			}
+		}
+	}
+
+	return in;
+}
+
 static augs::path_type get_arenas_directory(const project_tab_type tab_type) {
 	switch (tab_type) {
 		case project_tab_type::MY_PROJECTS:
@@ -340,7 +356,7 @@ bool projects_list_tab_state::perform_list(
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
 
-		text_disabled(entry.about.short_description);
+		text_disabled(sanitize_arena_short_description(entry.about.short_description));
 
 		ImGui::SetCursorPos(after_pos);
 

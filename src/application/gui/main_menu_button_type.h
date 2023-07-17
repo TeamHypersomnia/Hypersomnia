@@ -3,7 +3,8 @@
 enum class main_menu_button_type {
 	// GEN INTROSPECTOR enum class main_menu_button_type
 	JOIN_DISCORD,
-	CONNECT_TO_OFFICIAL_SERVER,
+	DOWNLOAD_MAPS,
+	PLAY_ON_THE_OFFICIAL_SERVER,
 	BROWSE_SERVERS,
 	HOST_SERVER,
 	CONNECT_TO_SERVER,

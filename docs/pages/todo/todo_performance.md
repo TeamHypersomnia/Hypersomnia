@@ -5,6 +5,13 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Fix the problem with massive performance hit when something lands between walls
+	- Could this be a problem with posting collision sounds?
+		- shouldn't be as there are cooldowns
+	- Probably substepping
+
+
+
 - Move these to cosmos global solvable:
 	real32 teleport_progress = 0.0f;
 	real32 teleport_progress_falloff_speed = 0.0f;

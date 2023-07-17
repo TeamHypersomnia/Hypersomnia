@@ -111,6 +111,8 @@ namespace augs {
 			const unsigned channels = 4,
 			const unsigned pitch = 0
 		);
+
+		image(std::vector<rgba>&& in, vec2u size) : v(std::move(in)), size(size) {}
 		
 		void fill(const rgba fill_color);
 		void flip_y();

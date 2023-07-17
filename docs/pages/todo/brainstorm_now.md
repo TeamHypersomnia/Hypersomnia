@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- maybe migrate server to appimage after all
+    - but we'll still have a problem with syncing the new config force lua from the repo
+        - maybe we can sync only this file and have our own config.lua
+    - just prepare one with -g for the server
+    - will still require less space than tar.gz + sfx
+    - just find out how to not strip debug symbols from the appimage 
+
+- masterserver can easily be controlled with https+api key
+
+- keep being spectator when half ends
+
+- a notice on /servers to not launch with screen or something else to be able to autoupdate
+
 - Updating all the servers automatically
     - MS could send packets with signatures of the new version 
         - Then the servers will know it's legit, even if it's spoofed it literally only helps

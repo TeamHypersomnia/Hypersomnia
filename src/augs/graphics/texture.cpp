@@ -8,26 +8,22 @@
 namespace augs {
 	namespace graphics {
 		void texture::perform(backend_access, const texImage2D_command& cmd) { 
-			texImage2D(cmd.size, cmd.source);
+			texImage2D(cmd.source);
 		}
 
 		void texture::perform(backend_access, const set_filtering_command& cmd) { 
 			set_filtering(cmd.type);
 		}
 
-		void texture::texImage2D(renderer& r, const vec2u new_size, const unsigned char* const source) {
+		void texture::texImage2D(renderer& r, image&& source) {
 			set_as_current(r);
 
-			size = new_size;
+			size = source.get_size();
 
 			r.push_object_command(
 				*this,
-				texImage2D_command { new_size, source }
+				texImage2D_command { std::move(source) }
 			);
-		}
-
-		void texture::texImage2D(renderer& r, const image& rgba_source) {
-			texImage2D(r, rgba_source.get_size(), rgba_source.data());
 		}
 
 		void texture::set_filtering(renderer& r, const filtering_type type) {

@@ -262,7 +262,6 @@ bool start_client_gui_state::perform(
 		};
 
 		thread_local std::future<loading_result> avatar_loading_result;
-		thread_local loading_result last_loading_result;
 
 		auto reload_avatar = [&](const std::string& from_path) {
 			const bool avatar_upload_completed = augs::has_completed(current_frame, avatar_submitted_when);
@@ -387,9 +386,8 @@ bool start_client_gui_state::perform(
 		}
 
 		if (::valid_and_is_ready(avatar_loading_result)) {
-			last_loading_result = avatar_loading_result.get();
+			auto result = avatar_loading_result.get();
 
-			auto& result = last_loading_result;
 			const auto& error_msg = result.error_message;
 
 			was_shrinked = false;
@@ -403,7 +401,7 @@ bool start_client_gui_state::perform(
 			else if (result.new_path.has_value()) {
 				p = *result.new_path;
 
-				avatar_preview_tex.texImage2D(renderer, result.loaded_image);
+				avatar_preview_tex.texImage2D(renderer, std::move(result.loaded_image));
 				avatar_preview_tex.set_filtering(renderer, augs::filtering_type::LINEAR);
 
 				augs::graphics::texture::set_current_to_previous(renderer);
