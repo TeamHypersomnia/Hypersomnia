@@ -115,7 +115,7 @@ static editor_project_about read_about_from(const augs::path_type& arena_folder_
 	return editor_project_readwrite::read_only_project_about(paths.project_json);
 }
 
-static editor_project_meta read_meta_from(const augs::path_type& arena_folder_path) {
+editor_project_meta read_meta_from(const augs::path_type& arena_folder_path) {
 	const auto paths = editor_project_paths(arena_folder_path);
 
 	return editor_project_readwrite::read_only_project_meta(paths.project_json);

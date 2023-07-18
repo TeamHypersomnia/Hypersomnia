@@ -21,6 +21,14 @@ struct map_catalogue_entry {
 
 	ad_hoc_entry_id miniature_id = 0;
 	std::optional<std::string> version_on_disk;
+
+	enum class state {
+		NOT_FOUND,
+		ON_DISK,
+		UPDATE_AVAILABLE
+	};
+
+	state get_state() const;
 };
 
 struct ad_hoc_in_atlas_map;
@@ -53,6 +61,8 @@ class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_s
 	int sort_by_column = 1;
 	bool ascending = false;
 
+	std::unordered_set<std::string> official_names;
+
 	std::set<std::string> selected_arenas;
 	const map_catalogue_entry* last_selected = nullptr;
 
@@ -66,6 +76,10 @@ class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_s
 	bool list_refresh_in_progress() const;
 	void refresh(map_catalogue_input);
 
+	void rescan_official_arenas();
+
+	static void rescan_versions_on_disk(std::vector<map_catalogue_entry>&);
+
 public:
 
 	using base = standard_window_mixin<map_catalogue_gui_state>;
@@ -74,6 +88,8 @@ public:
 
 	bool perform(map_catalogue_input);
 	void rebuild_miniatures();
+
+	void rescan_versions_on_disk();
 
 	std::optional<std::vector<ad_hoc_atlas_subject>> get_new_ad_hoc_images();
 };

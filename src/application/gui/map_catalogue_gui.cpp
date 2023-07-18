@@ -21,6 +21,7 @@
 #include "augs/misc/time_utils.h"
 #include "augs/templates/in_order_of.h"
 #include "application/setups/editor/project/editor_project_paths.h"
+#include "application/setups/editor/project/editor_project_meta.h"
 
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
@@ -30,13 +31,26 @@ struct map_catalogue_gui_internal {
 	//https_file_downloader downloader;
 };
 
-map_catalogue_gui_state::~map_catalogue_gui_state() = default;
+void map_catalogue_gui_state::rescan_official_arenas() {
+	official_names.clear();
+
+	auto register_arena = [&](const auto& path) {
+		official_names.emplace(path.filename().string());
+		return callback_result::CONTINUE;
+	};
+
+	const auto source_directory = augs::path_type(OFFICIAL_ARENAS_DIR);
+
+	augs::for_each_directory_in_directory(source_directory, register_arena);
+}
 
 map_catalogue_gui_state::map_catalogue_gui_state(const std::string& title) 
 	: base(title), data(std::make_unique<map_catalogue_gui_internal>()) 
 {
-
+	rescan_official_arenas();
 }
+
+map_catalogue_gui_state::~map_catalogue_gui_state() = default;
 
 std::mutex miniature_mutex;
 
@@ -166,7 +180,39 @@ std::optional<std::vector<ad_hoc_atlas_subject>> map_catalogue_gui_state::get_ne
 	return std::nullopt;
 }
 
+editor_project_meta read_meta_from(const augs::path_type& arena_folder_path);
+
+void map_catalogue_gui_state::rescan_versions_on_disk(std::vector<map_catalogue_entry>& entries) {
+	const auto downloads_directory = augs::path_type(DOWNLOADED_ARENAS_DIR);
+
+	for (auto& m : entries) {
+		try {
+			const auto path = downloads_directory / m.name;
+
+			m.version_on_disk = read_meta_from(path).version_timestamp;
+		}
+		catch (...) {
+			m.version_on_disk = std::nullopt;
+		}
+	}
+}
+
 std::string sanitize_arena_short_description(std::string in);
+
+using S = map_catalogue_entry::state;
+
+S map_catalogue_entry::get_state() const {
+	if (version_on_disk.has_value()) {
+		if (version_on_disk == version_timestamp) {
+			return S::ON_DISK;
+		}
+		else {
+			return S::UPDATE_AVAILABLE;
+		}
+	}
+
+	return S::NOT_FOUND;
+}
 
 void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	using namespace augs::imgui;
@@ -218,7 +264,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	}
 
 	do_column("Name");
-	do_column("Last updated");
+	do_column("Last modified");
 
 	ImGui::Separator();
 
@@ -229,14 +275,6 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	auto process_entry = [&](const auto& entry) {
 		const auto arena_name = entry.name;
 		const auto arena_folder_path = downloads_directory / arena_name;
-		const auto paths = editor_project_paths(arena_folder_path);
-
-		const auto sanitized = sanitization::sanitize_arena_path(downloads_directory, paths.arena_name);
-		const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
-
-		if (!sanitized_path || *sanitized_path != arena_folder_path) {
-			return;
-		}
 
 		if (filter.IsActive() && !filter.PassFilter(arena_name.c_str()) && !filter.PassFilter(entry.author.c_str())) {
 			return;
@@ -250,13 +288,38 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		const auto local_pos = ImGui::GetCursorPos();
 
 		{
-			auto darkened_selectables = scoped_selectable_colors({
-				rgba(255, 255, 255, 20),
-				rgba(255, 255, 255, 30),
-				rgba(255, 255, 255, 60)
-			});
+			auto selectable_cols = [&]() -> std::array<rgba, 3> {
+				switch (entry.get_state()) {
+					case S::ON_DISK:
+						return {
+							rgba(0, 46, 0, 131),
+							rgba(0, 130, 0, 100),
+							rgba(0, 130, 0, 150)
+						};
+					case S::UPDATE_AVAILABLE:
+						return {
+							rgba(46, 46, 0, 100),
+							rgba(130, 130, 0, 100),
+							rgba(130, 130, 0, 140)
+						};
 
-			if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
+					case S::NOT_FOUND:
+					default:
+						return {
+							rgba(255, 255, 255, 0),
+							rgba(255, 255, 255, 30),
+							rgba(255, 255, 255, 60)
+						};
+				}
+			}();
+
+			if (is_selected) {
+				selectable_cols[0] = selectable_cols[1] = selectable_cols[2];
+			}
+
+			auto darkened_selectables = scoped_selectable_colors(selectable_cols);
+
+			if (ImGui::Selectable("##Entry", true, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
 				if (ImGui::GetIO().KeyCtrl) {
 					if (found_in(selected_arenas, arena_name)) {
 						selected_arenas.erase(arena_name);
@@ -276,7 +339,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 			if (ImGui::BeginPopupContextItem()) {
 				if (ImGui::Selectable("Reveal in explorer")) {
-					in.window.reveal_in_explorer(*sanitized_path);
+					in.window.reveal_in_explorer(arena_folder_path);
 				}
 
 				ImGui::EndPopup();
@@ -331,6 +394,15 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 			);
 
 			text_disabled(ago);
+
+			const auto map_state = entry.get_state();
+
+			if (map_state == S::ON_DISK) {
+				text_color("Up to date.", green);
+			}
+			else if (map_state == S::UPDATE_AVAILABLE) {
+				text_color("Update available!", yellow);
+			}
 
 			ImGui::NextColumn();
 		}
@@ -498,6 +570,17 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 						ImGui::Separator();
 
+						const auto map_state = entry.get_state();
+
+						if (map_state == S::ON_DISK) {
+							text_color("This map is on your disk.", green);
+							ImGui::Separator();
+						}
+						else if (map_state == S::UPDATE_AVAILABLE) {
+							text_color("This map can be updated.", yellow);
+							ImGui::Separator();
+						}
+
 						ImGui::PushTextWrapPos();
 
 						text_color(entry.short_description, rgba(210, 210, 210, 255));
@@ -594,7 +677,7 @@ void map_catalogue_gui_state::refresh(const map_catalogue_input in) {
 	last_error = {};
 
 	future_response = launch_async(
-		[this, address = in.external_arena_files_provider]() -> std::vector<map_catalogue_entry> {
+		[this, officials = this->official_names, address = in.external_arena_files_provider]() -> std::vector<map_catalogue_entry> {
 			if (const auto parsed = parsed_url(address); parsed.valid()) {
 				const auto ca_path = CA_CERT_PATH;
 				auto client = http_client_type(parsed.host);
@@ -625,9 +708,26 @@ void map_catalogue_gui_state::refresh(const map_catalogue_input in) {
 				try {
 					auto result = augs::from_json_string<std::vector<map_catalogue_entry>>(response->body);
 
+					erase_if(result, [&](const auto& e) { 
+						const auto downloads_directory = augs::path_type(DOWNLOADED_ARENAS_DIR);
+						const auto arena_name = e.name;
+						const auto arena_folder_path = downloads_directory / arena_name;
+
+						const auto sanitized = sanitization::sanitize_arena_path(downloads_directory, arena_name);
+						const auto sanitized_path = std::get_if<augs::path_type>(&sanitized);
+
+						if (!sanitized_path || *sanitized_path != arena_folder_path) {
+							return true;
+						}
+
+						return found_in(officials, e.name); 
+					});
+
 					for (auto& r : result) {
 						r.short_description = sanitize_arena_short_description(r.short_description);
 					}
+
+					rescan_versions_on_disk(result);
 
 					return result;
 				}
