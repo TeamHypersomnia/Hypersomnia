@@ -78,7 +78,7 @@ struct texture_in_progress {
 };
 
 class viewables_streaming {
-	std::vector<rgba> pbo_fallback;
+	std::vector<rgba> general_atlas_pbo_fallback;
 
 	all_loaded_gui_fonts loaded_gui_fonts;
 

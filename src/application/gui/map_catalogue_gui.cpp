@@ -408,7 +408,11 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		const auto arena_folder_path = downloads_directory / arena_name;
 
 		if (filter.IsActive() && !filter.PassFilter(arena_name.c_str()) && !filter.PassFilter(entry.author.c_str())) {
+			entry.passed_filter = false;
 			return;
+		}
+		else {
+			entry.passed_filter = true;
 		}
 
 		const auto selectable_size = ImVec2(0, 1 + miniature_size_v);
@@ -568,8 +572,13 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 			ImGui::NextColumn();
 
 			if (maybe_progress) {
-				text_color(typesafe_sprintf("%2f%", (*maybe_progress) * 100), cyan);
-				text_color(typesafe_sprintf("Downloading..."), cyan);
+				if ((*maybe_progress) == 0.0f) {
+					text_color(typesafe_sprintf("Queued."), cyan);
+				}
+				else {
+					text_color(typesafe_sprintf("Downloading..."), cyan);
+					text_color(typesafe_sprintf("%2f%", (*maybe_progress) * 100), cyan);
+				}
 			}
 			else {
 				const auto date = augs::date_time::from_utc_timestamp(entry.version_timestamp);
@@ -720,6 +729,37 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 				ImGui::SetKeyboardFocusHere(0);
 			}
 
+			if (ImGui::Button("Select all")) {
+				bool all_selected_already = true;
+
+				for (auto& entry : map_list) {
+					if (entry.passed_filter) {
+						const auto entry_id = std::addressof(entry);
+						const bool is_selected = found_in(selected_arenas, entry_id);
+
+						if (!is_selected) {
+							all_selected_already = false;
+
+							break;
+						}
+					}
+				}
+
+				for (auto& entry : map_list) {
+					const auto entry_id = std::addressof(entry);
+
+					if (entry.passed_filter) {
+						if (all_selected_already) {
+							selected_arenas.erase(entry_id);
+						}
+						else {
+							selected_arenas.emplace(entry_id);
+						}
+					}
+				}
+			}
+
+			ImGui::SameLine();
 			filter_with_hint(filter, "##HierarchyFilter", "Filter maps...");
 
 			const auto avail = ImGui::GetContentRegionAvail();

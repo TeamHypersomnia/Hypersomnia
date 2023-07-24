@@ -110,11 +110,11 @@ void arena_downloading_session::advance_with(
 			}
 		}
 		catch (const augs::json_deserialization_error& err) {
-			last_error = typesafe_sprintf("Server sent an invalid arena json file. Disconnecting. Details:\n%x", err.what());
+			last_error = typesafe_sprintf("Server sent an invalid arena json file. Details:\n%x", err.what());
 			return;
 		}
 		catch (...) {
-			last_error = std::string("Server sent an invalid arena json file. Disconnecting.");
+			last_error = std::string("Server sent an invalid arena json file.");
 			return;
 		}
 	}
@@ -136,7 +136,7 @@ void arena_downloading_session::advance_with(
 		}
 		else {
 			last_error = typesafe_sprintf(
-				"The server sent a file with an incorrect hash.\nExpected: %x\nActual: %x\nDisconnecting.",
+				"The server sent a file with an incorrect hash.\nExpected: %x\nActual: %x\n",
 				last_requested_file_hash,
 				augs::secure_hash(next_received_file)
 			);
@@ -323,7 +323,7 @@ bool arena_downloading_session::handle_downloaded_project_json(
 
 	if (!project_json_matches(project_json_hash, project_json)) {
 		last_error = typesafe_sprintf(
-			"The server sent a project json file with an incorrect hash/timestamp.\nExpected: %x\nActual hash: %x\nActual timestamp: %x\nDisconnecting.",
+			"The server sent a project json file with an incorrect hash/timestamp.\nExpected: %x\nActual hash: %x\nActual timestamp: %x\n",
 			project_json_hash,
 			augs::secure_hash(project_json),
 			editor_project_readwrite::read_only_project_timestamp(project_json)

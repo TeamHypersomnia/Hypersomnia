@@ -201,7 +201,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 			if (pbo_buffer == nullptr) {
 				/* Prepare fallback */
-				pbo_fallback.clear();
+				general_atlas_pbo_fallback.clear();
 			}
 
 			general_atlas_progress.emplace();
@@ -220,7 +220,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				max_atlas_size,
 
 				pbo_buffer,
-				pbo_fallback
+				general_atlas_pbo_fallback
 			};
 
 			future_general_atlas = launch_async(
@@ -363,8 +363,8 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		/* Done, overwrite */
 		now_loaded_defs = new_loaded_defs;
 
-		general_atlas.texImage2D(in.renderer, augs::image(std::move(pbo_fallback), result.atlas_size));
-		pbo_fallback = {};
+		general_atlas.texImage2D(in.renderer, augs::image(std::move(general_atlas_pbo_fallback), result.atlas_size));
+		general_atlas_pbo_fallback = {};
 		general_atlas_submitted_when = current_frame;
 	}
 

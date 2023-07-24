@@ -23,6 +23,7 @@ struct map_catalogue_entry {
 	ad_hoc_entry_id miniature_id = 0;
 	std::optional<std::string> version_on_disk;
 	mutable std::size_t last_displayed_index = 0;
+	mutable bool passed_filter = true;
 
 	enum class state {
 		NOT_FOUND,
