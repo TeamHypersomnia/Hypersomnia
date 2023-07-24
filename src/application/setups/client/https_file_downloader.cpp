@@ -91,7 +91,11 @@ void https_file_downloader::download_file(const std::string& path) {
 	{
 		std::lock_guard<std::mutex> lock(queueMutex);
 		downloadQueue.push(path);
+
+		downloadedBytes = 0;
+		totalBytes = 0;
 	}
+
 	queueCondition.notify_one(); // notify the worker thread
 }
 

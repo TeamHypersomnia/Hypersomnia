@@ -1064,6 +1064,11 @@ auto client_setup::get_current_file_download_progress() const {
 
 float client_setup::get_current_file_percent_complete() const {
 	auto this_progress = get_current_file_download_progress();
+
+	if (this_progress.blockSize == 0) {
+		return 0.0f;
+	}
+
 	return this_progress.blockSize == 0 ? 0.0f : float(this_progress.downloadedBytes) / this_progress.blockSize;
 }
 

@@ -88,6 +88,10 @@ void multi_arena_synchronizer::for_each_with_progress(F callback) const {
 }
 
 float multi_arena_synchronizer::get_current_file_percent_complete() const {
+	if (data->external.get_total_bytes() == 0) {
+		return 0.0f;
+	}
+
 	return float(data->external.get_downloaded_bytes()) / data->external.get_total_bytes();
 }
 
@@ -861,9 +865,35 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 			if (downloading.has_value()) {
 				auto cols = maybe_disabled_cols({}, true);
 
+				const auto total_progress = downloading->get_total_progress();
+
+				if (auto window = ImGui::GetCurrentWindow(); window && total_progress > 0.0f) {
+					const auto min_x = window->ParentWorkRect.Min.x;
+					const auto max_x = window->ParentWorkRect.Max.x;
+					const auto avail_x = max_x - min_x;
+
+					const auto fill_color = rgba(20, 70, 20, 255);
+
+					const auto flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_Disabled;
+
+					auto cscope = scoped_preserve_cursor();
+
+					auto progress_cols = scoped_selectable_colors({ fill_color, fill_color, fill_color });
+
+					const auto text_h = ImGui::GetTextLineHeight();
+					const auto button_size = ImVec2(0, text_h * button_size_mult);
+
+					auto fill_size = button_size;
+					fill_size.x = avail_x * total_progress;
+
+					shift_cursor(vec2(0, text_h * button_padding_mult));
+
+					ImGui::Selectable("##ButtonBgDownloadProgress", true, flags, fill_size);
+				}
+
 				const auto num_maps = downloading->get_input().size();
 				const auto num_label = num_maps == 1 ? downloading->get_input()[0].name : typesafe_sprintf("%x maps", num_maps);
-				const auto progress_label = typesafe_sprintf("Downloading %x... %f2%", num_label, downloading->get_total_progress() * 100);
+				const auto progress_label = typesafe_sprintf("Downloading %x... %f2%", num_label, total_progress * 100);
 
 				auto after_cb = [&]() {
 					if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -883,10 +913,10 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 					}
 				};
 
-				do_big_button(progress_label, icon, rgba(100, 100, 100, 255), {
-					rgba(25, 25, 25, 255),
-					rgba(50, 50, 50, 255),
-					rgba(50, 50, 50, 255)
+				do_big_button(progress_label, icon, rgba(100, 255, 100, 255), {
+					rgba(25, 25, 25, 0),
+					rgba(50, 50, 50, 0),
+					rgba(50, 50, 50, 0)
 				}, after_cb);
 			}
 			else {
