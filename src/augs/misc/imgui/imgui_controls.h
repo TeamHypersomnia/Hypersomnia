@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "3rdparty/imgui/imgui.h"
 #include "augs/texture_atlas/atlas_entry.h"
 #include "augs/graphics/rgba.h"

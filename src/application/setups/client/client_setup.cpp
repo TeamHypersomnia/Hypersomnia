@@ -1222,7 +1222,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 						num_all
 					));
 
-					ImGui::ProgressBar(get_total_download_percent_complete(false), ImVec2(-1.0f,0.0f));
+					ImGui::ProgressBar(get_total_download_percent_complete(true), ImVec2(-1.0f,0.0f));
 
 					text("\n");
 				}

@@ -34,7 +34,7 @@ arena_downloading_session::arena_downloading_session(
 	start();
 }
 
-float arena_downloading_session::get_total_percent_complete(float this_percent_complete) const {
+float arena_downloading_session::get_total_percent_complete(const float this_percent_complete) const {
 	const auto downloaded_index = get_downloaded_file_index();
 	const auto num_all = num_all_downloaded_files();
 
@@ -43,8 +43,11 @@ float arena_downloading_session::get_total_percent_complete(float this_percent_c
 		return 0.0f;
 	}
 
-	const auto percent_complete = (num_all == 1) ? 1.f : ((float(downloaded_index) + this_percent_complete) / (num_all - 1));
-	return percent_complete;
+	if (num_all == 1) {
+		return this_percent_complete;
+	}
+
+	return (float(downloaded_index) + this_percent_complete) / num_all;
 }
 
 void arena_downloading_session::start() {
