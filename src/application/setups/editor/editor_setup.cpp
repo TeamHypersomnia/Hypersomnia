@@ -229,30 +229,41 @@ editor_setup::editor_setup(
 			dirty_after_loading_autosave = true;
 			//recent_message.set("Loaded an autosave file.\nTo go back to last saved changes instead,\npress Undo (CTRL+Z).");
 			//recent_message.show_for_at_least_ms = 10000;
+
+			return true;
 		}
 		catch (const augs::json_deserialization_error& err) {
 			throw augs::json_deserialization_error("(%x):\n%x", path.filename().string(), err.what());
 		}
 		catch (...) {
 			LOG("No autosaved changes were found.");
-
-			/*
-				This is otherwise already called by assign_project in replace_whole_project_command.
-				If we don't load autosave, we need to manually call this for the current project.
-
-				Autosave will be triggered here if any redirects happen. That's not a bad thing,
-				because at this point no autosave exists.
-			*/
-
-			const bool undoing_to_first_revision = false;
-			on_project_assigned(undoing_to_first_revision);
 		}
+
+		return false;
+	};
+
+	auto do_on_project_assigned = [&]() {
+		/*
+			If we load autosave, this is already called in replace_whole_project_command (which calls assign_project).
+			If we don't load autosave, we need to manually call this for the current project.
+
+			Autosave will be triggered here if any redirects happen. That's not a bad thing,
+			because if we called this, it means no autosave exists.
+		*/
+
+		const bool undoing_to_first_revision = false;
+		on_project_assigned(undoing_to_first_revision);
 	};
 
 	if (try_read_saved_revision_from(paths.last_saved_json)) {
-		try_read_autosave_revision_from(paths.project_json);
+		if (!try_read_autosave_revision_from(paths.project_json)) {
+			do_on_project_assigned();
+		}
 	}
-	else if (!try_read_saved_revision_from(paths.project_json)) {
+	else if (try_read_saved_revision_from(paths.project_json)) {
+		do_on_project_assigned();
+	}
+	else {
 		/* At least one of either project.json or last_saved.json must exist. */
 		throw augs::json_deserialization_error("Error: %x not found.", paths.project_json.string());
 	}

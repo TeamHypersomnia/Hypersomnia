@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <optional>
+#include <variant>
 #include "augs/filesystem/path.h"
 #include "augs/misc/secure_hash.h"
 #include "augs/network/network_types.h"
