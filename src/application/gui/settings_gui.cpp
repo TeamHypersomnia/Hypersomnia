@@ -1290,6 +1290,14 @@ void settings_gui_state::perform(
 					text("If loaded autosave, show: ");
 					ImGui::SameLine();
 					revertable_enum("##WhenAutosave", config.editor.autosave.if_loaded_autosave_show);
+					revertable_checkbox("Alert when loaded autosave", config.editor.autosave.alert_when_loaded_autosave);
+
+					if (config.editor.autosave.if_loaded_autosave_show == editor_autosave_load_option::AUTOSAVED_VERSION) {
+						tooltip_on_hover("Whenever you open a project that has autosaved changes,\nthis will show a popup that forces you to click OK so that\nyou never miss the fact you've opened an autosave.\n\nYou can safely untick it if the popup annoys you.");
+					}
+					else {
+						tooltip_on_hover("Whenever you open a project that has autosaved changes,\nthis will show a popup that forces you to click OK so that\nyou never miss the fact autosave is available.\n\nYou can safely untick it if the popup annoys you.");
+					}
 				}	
 				
 				if (auto node = scoped_tree_node("Action notifications")) {

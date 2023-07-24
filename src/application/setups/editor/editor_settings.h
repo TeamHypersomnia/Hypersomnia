@@ -19,6 +19,7 @@ struct editor_autosave_settings {
 	bool periodically = true;
 	double once_every_min = 1.0;
 	editor_autosave_load_option if_loaded_autosave_show = editor_autosave_load_option::AUTOSAVED_VERSION;
+	bool alert_when_loaded_autosave = true;
 	// END GEN INTROSPECTOR
 
 	bool interval_changed(const editor_autosave_settings b) const {

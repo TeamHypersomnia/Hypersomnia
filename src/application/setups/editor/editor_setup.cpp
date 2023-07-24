@@ -224,7 +224,9 @@ editor_setup::editor_setup(
 			}
 
 			if (!autosave_popup.has_value()) {
-				autosave_popup = new_autosave_popup;
+				if (settings.autosave.alert_when_loaded_autosave) {
+					autosave_popup = new_autosave_popup;
+				}
 			}
 
 			post_new_command(std::move(cmd));
