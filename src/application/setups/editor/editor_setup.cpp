@@ -142,78 +142,119 @@ editor_setup::editor_setup(
 
 	constexpr bool strict = true;
 
-	try {
-		project = editor_project_readwrite::read_project_json(
-			paths.project_json,
-			official.resources,
-			official.resource_map,
-			strict
-		);
+	constexpr bool convert_legacy_autosave = true;
 
-		/* Will be overwritten to the new name upon the first save. */
-		project.meta.name = paths.arena_name;
+	if (convert_legacy_autosave) {
+		if (augs::exists(paths.legacy_autosave_json)) {
+			if (augs::exists(paths.project_json)) {
+				std::filesystem::rename(paths.project_json, paths.last_saved_json);
+			}
+
+			std::filesystem::rename(paths.legacy_autosave_json, paths.project_json);
+
+			simple_popup new_autosave_popup;
+
+			new_autosave_popup.title = "SUCCESS!";
+			new_autosave_popup.warning_notice_above = "Converted legacy autosave.json filenames.";
+			new_autosave_popup.message = "No further action is required.";
+
+			autosave_popup = new_autosave_popup;
+		}
 	}
-	catch (const augs::json_deserialization_error& err) {
-		throw augs::json_deserialization_error("(%x):\n%x", paths.project_json.filename().string(), err.what());
+
+	auto try_read_saved_revision_from = [&](const auto& path) {
+		try {
+			project = editor_project_readwrite::read_project_json(
+				path,
+				official.resources,
+				official.resource_map,
+				strict
+			);
+
+			/* Will be overwritten to the new name upon the first save. */
+			project.meta.name = paths.arena_name;
+
+			history.mark_revision_as_saved();
+
+			rescan_physical_filesystem();
+
+			return true;
+		}
+		catch (const augs::json_deserialization_error& err) {
+			throw augs::json_deserialization_error("(%x):\n%x", path.filename().string(), err.what());
+		}
+		catch (...) {
+			LOG("No %x file was found.", path.string());
+		}
+
+		return false;
+	};
+
+	auto try_read_autosave_revision_from = [&](const auto& path) {
+		try {
+			auto autosaved_project = std::make_unique<editor_project>(editor_project_readwrite::read_project_json(
+				path,
+				official.resources,
+				official.resource_map,
+				strict
+			));
+
+			autosaved_project->meta.name = paths.arena_name;
+
+			simple_popup new_autosave_popup;
+			new_autosave_popup.title = "WARNING!";
+
+			replace_whole_project_command cmd;
+			cmd.after = std::move(autosaved_project);
+			cmd.before = std::make_unique<editor_project>(project);
+			cmd.built_description = std::string("Loaded autosave from ") + path.filename().string();
+
+			new_autosave_popup.warning_notice_above = "Loaded an autosave file from " + path.filename().string() + ".";
+
+			new_autosave_popup.message = "To go back to last saved changes instead,\npress Undo (CTRL+Z).\n\nIt is best practice to save your work (CTRL+S) before exiting the game.";
+
+			if (!autosave_popup.has_value()) {
+				autosave_popup = new_autosave_popup;
+			}
+
+			post_new_command(std::move(cmd));
+			history.mark_revision_as_autosaved();
+			autosave_timer.reset();
+
+			/*
+				We need this so that the autosave file isn't removed 
+				when the user exits the editor on a saved revision without explicitly saving it.
+			*/
+
+			dirty_after_loading_autosave = true;
+			//recent_message.set("Loaded an autosave file.\nTo go back to last saved changes instead,\npress Undo (CTRL+Z).");
+			//recent_message.show_for_at_least_ms = 10000;
+		}
+		catch (const augs::json_deserialization_error& err) {
+			throw augs::json_deserialization_error("(%x):\n%x", path.filename().string(), err.what());
+		}
+		catch (...) {
+			LOG("No autosaved changes were found.");
+
+			/*
+				This is otherwise already called by assign_project in replace_whole_project_command.
+				If we don't load autosave, we need to manually call this for the current project.
+
+				Autosave will be triggered here if any redirects happen. That's not a bad thing,
+				because at this point no autosave exists.
+			*/
+
+			const bool undoing_to_first_revision = false;
+			on_project_assigned(undoing_to_first_revision);
+		}
+	};
+
+	if (try_read_saved_revision_from(paths.last_saved_json)) {
+		try_read_autosave_revision_from(paths.project_json);
 	}
-
-	history.mark_revision_as_saved();
-
-	rescan_physical_filesystem();
-
-	try {
-		auto autosaved_project = std::make_unique<editor_project>(editor_project_readwrite::read_project_json(
-			paths.autosave_json,
-			official.resources,
-			official.resource_map,
-			strict
-		));
-
-		autosaved_project->meta.name = paths.arena_name;
-
-		simple_popup new_autosave_popup;
-		new_autosave_popup.title = "WARNING!";
-
-		replace_whole_project_command cmd;
-		cmd.after = std::move(autosaved_project);
-		cmd.before = std::make_unique<editor_project>(project);
-		cmd.built_description = std::string("Loaded autosave from ") + paths.autosave_json.filename().string();
-
-		new_autosave_popup.warning_notice_above = "Loaded an autosave file from " + paths.autosave_json.filename().string() + ".";
-
-		new_autosave_popup.message = "To go back to last saved changes instead,\npress Undo (CTRL+Z).\n\nIt is best practice to save your work (CTRL+S) before exiting the game.";
-
-		autosave_popup = new_autosave_popup;
-
-		post_new_command(std::move(cmd));
-		history.mark_revision_as_autosaved();
-		autosave_timer.reset();
-
-		/*
-			We need this so that the autosave file isn't removed 
-			when the user exits the editor on a saved revision without explicitly saving it.
-		*/
-
-		dirty_after_loading_autosave = true;
-		//recent_message.set("Loaded an autosave file.\nTo go back to last saved changes instead,\npress Undo (CTRL+Z).");
-		//recent_message.show_for_at_least_ms = 10000;
-	}
-	catch (const augs::json_deserialization_error& err) {
-		throw augs::json_deserialization_error("(%x):\n%x", paths.autosave_json.filename().string(), err.what());
-	}
-	catch (...) {
-		LOG("No autosave file was found.");
-
-		/*
-			This is otherwise already called by assign_project in replace_whole_project_command.
-			If we don't load autosave, we need to manually call this for the current project.
-
-			Autosave will be triggered here if any redirects happen. That's not a bad thing,
-			because at this point no autosave exists.
-		*/
-
-		const bool undoing_to_first_revision = false;
-		on_project_assigned(undoing_to_first_revision);
+	else if (!try_read_saved_revision_from(paths.project_json)) {
+		/* At least one of either project.json or last_saved.json must exist. */
+		throw augs::json_deserialization_error("Error: %x not found.", paths.project_json.string());
 	}
 
 	load_gui_state();
@@ -227,16 +268,16 @@ editor_setup::~editor_setup() {
 	autosave_now_if_needed();
 
 	/*
-		Remove autosave only if we're at saved revision.
+		Restore last_saved.json to project.json only if we're at saved revision.
 
 		Note we're "dirty" if we've just loaded autosave and the user hasn't yet saved any revision to decide which one they want.
 		We're also "dirty" if we haven't saved after auto-redirecting pathed resources.
 
-		In these cases, autosave file will not be removed even if we're at a saved revision in history.
+		In these cases, last_saved.json will not be restored even if we're at a saved revision in history.
 	*/
 
 	if (everything_completely_saved()) {
-		remove_autosave_file();
+		restore_last_saved_json();
 	}
 
 	LOG("DTOR finished: ~editor_setup");
@@ -1212,8 +1253,14 @@ void editor_setup::rescan_missing_pathed_resources(std::vector<augs::path_type>*
 	// LOG_NVPS(rebuilt_project.last_missing_resources.size(), rebuilt_project.last_unbacked_resources.size());
 }
 
-void editor_setup::remove_autosave_file() {
-	augs::remove_file(paths.autosave_json);
+void editor_setup::remove_last_saved_json() {
+	augs::remove_file(paths.last_saved_json);
+}
+
+void editor_setup::restore_last_saved_json() {
+	if (augs::exists(paths.last_saved_json)) {
+		std::filesystem::rename(paths.last_saved_json, paths.project_json);
+	}
 }
 
 void editor_setup::save() {
@@ -1227,7 +1274,7 @@ void editor_setup::save() {
 
 	recent_message.set("Saved the project to %x", paths.project_json.filename().string());
 
-	remove_autosave_file();
+	remove_last_saved_json();
 }
 
 void editor_setup::save_project_file_as(const augs::path_type& path) {
@@ -1277,9 +1324,22 @@ bool editor_setup::autosave_needed() const {
 }
 
 void editor_setup::force_autosave() {
-	save_project_file_as(paths.autosave_json);
+	bool just_backed_up_message = false;
 
-	recent_message.set("Autosaved current changes to: %x", paths.autosave_json.filename().string());
+	if (!augs::exists(paths.last_saved_json)) {
+		std::filesystem::rename(paths.project_json, paths.last_saved_json);
+		just_backed_up_message = true;
+	}
+
+	save_project_file_as(paths.project_json);
+
+	if (just_backed_up_message) {
+		recent_message.set("Autosaved current changes to: %x\nPrevious version backup at: %x", paths.project_json.filename().string(), paths.last_saved_json.filename().string());
+	}
+	else {
+		recent_message.set("Autosaved current changes to: %x", paths.project_json.filename().string());
+	}
+
 	history.mark_revision_as_autosaved();
 	autosave_timer.reset();
 }
@@ -2278,7 +2338,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			|| try_preffix("Exported", green)
 			|| try_preffix("Written", green)
 			|| try_preffix("Saved the project", green)
-			|| try_preffix("Loaded an autosave file.", green)
+			|| try_preffix("Loaded autosaved changes.", green)
 			|| try_preffix("Saved", green)
 			|| try_preffix("Loaded", green)
 			|| try_preffix("Opened", green)

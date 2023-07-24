@@ -347,8 +347,7 @@ bool client_setup::setup_external_arena_download_session() {
 		downloading = arena_downloading_session(
 			last_download_request.arena_name,
 			last_download_request.project_hash,
-			external_file_requester,
-			sv_public_vars.arena_from_autosave
+			external_file_requester
 		);
 
 		return true;
@@ -373,8 +372,7 @@ void client_setup::setup_direct_arena_download_session() {
 	downloading = arena_downloading_session(
 		last_download_request.arena_name,
 		last_download_request.project_hash,
-		direct_file_requester,
-		sv_public_vars.arena_from_autosave
+		direct_file_requester
 	);
 }
 

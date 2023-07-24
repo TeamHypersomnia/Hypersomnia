@@ -10,10 +10,6 @@ std::string editor_project_paths::load_project_json() const {
 	return augs::file_to_string_crlf_to_lf(project_json);
 }
 
-std::string editor_project_paths::load_autosave_json() const {
-	return augs::file_to_string_crlf_to_lf(autosave_json);
-}
-
 augs::path_type server_choose_arena_file_by(const std::string& name) {
 	if (!sanitization::arena_name_safe(name)) {
 		return {};
@@ -36,10 +32,6 @@ augs::path_type server_choose_arena_file_by(const std::string& name) {
 
 		if (augs::exists(arena_path)) {
 			auto paths = editor_project_paths(arena_path);
-
-			if (augs::exists(paths.autosave_json)) {
-				return paths.autosave_json;
-			}
 
 			return paths.project_json;
 		}
@@ -96,14 +88,6 @@ client_find_arena_result client_find_arena(
 				if (required_hash == augs::secure_hash(result.json_document)) {
 					return result;
 				}
-
-				if (candidate_folder == EDITOR_PROJECTS_DIR) {
-					result.json_document = folder_paths.load_autosave_json();
-
-					if (required_hash == augs::secure_hash(result.json_document)) {
-						return result;
-					}
-				}
 			}
 			catch (...) {
 
@@ -131,7 +115,8 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	};
 
 	project_json = in_folder(arena_name + ".json");
-	autosave_json = in_folder("autosave.json");
+	legacy_autosave_json = in_folder("autosave.json");
+	last_saved_json = in_folder("last_saved.json");
 	editor_view = in_folder("editor_view.json");
 	miniature = in_folder("miniature.png");
 	screenshot = in_folder("screenshot.png");
@@ -145,7 +130,8 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 bool editor_project_paths::is_project_specific_file(const augs::path_type& path) const {
 	return 
 		path == project_json
-		|| path == autosave_json
+		|| path == legacy_autosave_json
+		|| path == last_saved_json
 		|| path == editor_view
 		|| path == miniature
 		|| path == screenshot

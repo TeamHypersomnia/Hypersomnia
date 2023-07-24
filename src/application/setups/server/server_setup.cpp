@@ -964,7 +964,6 @@ server_public_vars server_setup::make_public_vars() const {
 
 	pub.required_arena_hash = current_arena_hash;
 	pub.playtesting_context = vars.playtesting_context;
-	pub.arena_from_autosave = current_arena_from_autosave;
 
 	const bool is_user_project = ::begins_with(current_arena_folder.string(), EDITOR_PROJECTS_DIR.string());
 
@@ -1126,7 +1125,6 @@ void server_setup::rechoose_arena() {
 		const auto paths = editor_project_paths(current_arena_folder);
 
 		current_arena_hash = result.required_hash;
-		current_arena_from_autosave = augs::exists(paths.autosave_json);
 			
 		LOG("Chosen arena hash: %x", current_arena_hash);
 
@@ -1136,25 +1134,7 @@ void server_setup::rechoose_arena() {
 			arena_files_database
 		);
 
-		if (current_arena_from_autosave) {
-			LOG("Arena was loaded from the autosave.");
-
-			/* 
-				Properly point to the autosave file if it was the one to be loaded.
-				Otherwise the client would receive the wrong file.
-
-				Note even though we might have loaded an autosave file,
-				The client will always download the arena file as project_name.json.
-
-				The server does not control how filenames are being set on the client
-				(except for external resources in the json file).
-		   	*/
-
-			arena_files_database[current_arena_hash] = paths.autosave_json;
-		}
-		else {
-			arena_files_database[current_arena_hash] = paths.project_json;
-		}
+		arena_files_database[current_arena_hash] = paths.project_json;
 	}
 
 	arena_gui.reset();

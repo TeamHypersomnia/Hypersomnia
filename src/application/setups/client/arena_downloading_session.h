@@ -47,8 +47,7 @@ public:
 	arena_downloading_session(
 		const std::string& arena_name,
 		const hash_or_timestamp& project_json_hash,
-		file_requester_type file_requester,
-		bool from_autosave
+		file_requester_type file_requester
 	);
 
 	bool in_progress() const;
@@ -94,7 +93,6 @@ public:
 
 private:
 	file_requester_type file_requester;
-	bool from_autosave = false;
 
 	std::optional<std::string> last_error;
 

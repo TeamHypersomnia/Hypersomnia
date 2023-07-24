@@ -184,7 +184,9 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	void rescan_missing_pathed_resources(std::vector<augs::path_type>* out_report = nullptr);
 	void on_resource_references_changed();
 
-	void remove_autosave_file();
+	void remove_last_saved_json();
+	void restore_last_saved_json();
+
 	void force_autosave();
 	void autosave_now_if_needed();
 	bool autosave_needed() const;

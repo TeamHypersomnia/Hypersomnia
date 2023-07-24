@@ -102,8 +102,7 @@ void multi_arena_synchronizer::init_next_session() {
 		data->current_session = arena_downloading_session(
 			current_input.name,
 			current_input.version,
-			data->make_requester(current_input.name),
-			false
+			data->make_requester(current_input.name)
 		);
 	}
 }
@@ -587,13 +586,8 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 			else {
 				const auto date = augs::date_time::from_utc_timestamp(entry.version_timestamp);
 
-				const auto ago = typesafe_sprintf(
-					"%x\n%x", 
-					date.get_readable_day_hour(),
-					date.how_long_ago_tell_seconds()
-				);
-
-				text_disabled(ago);
+				text_disabled(date.how_long_ago_tell_seconds());
+				tooltip_on_hover(date.get_readable_day_hour());
 
 				const auto map_state = entry.get_state();
 

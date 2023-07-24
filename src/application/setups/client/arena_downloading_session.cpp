@@ -12,13 +12,11 @@
 arena_downloading_session::arena_downloading_session(
 	const std::string& arena_name,
 	const hash_or_timestamp& project_json_hash,
-	arena_downloading_session::file_requester_type file_requester,
-	const bool from_autosave
+	arena_downloading_session::file_requester_type file_requester
 ) : 
 	arena_name(arena_name),
 	project_json_hash(project_json_hash),
-	file_requester(file_requester),
-	from_autosave(from_autosave)
+	file_requester(file_requester)
 {
 	part_dir_path = DOWNLOADED_ARENAS_DIR / arena_name;
 	part_dir_path += ".part";
@@ -71,8 +69,7 @@ void arena_downloading_session::start() {
 		}
 	}
 	else {
-		const auto autosave_url = std::string("autosave.json");
-		const auto json_url = from_autosave ? autosave_url : arena_name + ".json";
+		const auto json_url = arena_name + ".json";
 
 		auto requested_project_json_hash = augs::secure_hash_type();
 
@@ -179,9 +176,7 @@ void arena_downloading_session::build_content_database_from_candidate_folders() 
 	if (arena_already_exists) {
 		auto paths = editor_project_paths(target_dir_path);
 
-		if (!register_content_in(target_dir_path, paths.autosave_json)) {
-			register_content_in (target_dir_path, paths.project_json);
-		}
+		register_content_in (target_dir_path, paths.project_json);
 	}
 }
 
