@@ -16,6 +16,7 @@ namespace augs {
 
 		using renderer_command_payload = std::variant<
 			drawcall_command,
+			drawcall_custom_buffer_command,
 			drawcall_dedicated_command,
 			drawcall_dedicated_vector_command,
 			no_arg_command,

@@ -773,13 +773,13 @@ void arena_scoreboard_gui::draw_gui(
 
 	if (avatar_triangles.size() > 0) {
 		in.avatar_atlas->set_as_current(in.renderer);
-		in.renderer.call_triangles(avatar_triangles);
+		in.renderer.call_triangles(augs::dedicated_buffer::AVATARS);
 
 		augs::graphics::texture::set_current_to_previous(in.renderer);
 	}
 
 	if (color_indicator_triangles.size() > 0) {
-		in.renderer.call_triangles(color_indicator_triangles);
+		in.renderer.call_triangles(augs::dedicated_buffer::SCOREBOARD_COLOR_INDICATORS);
 	}
 }
 

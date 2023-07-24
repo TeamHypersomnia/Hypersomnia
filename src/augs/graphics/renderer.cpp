@@ -42,7 +42,7 @@ namespace augs {
 		push_command(std::move(cmd));
 	}
 
-	void renderer::call_triangles(const vertex_triangle_buffer& buffer) {
+	void renderer::call_triangles_direct_ptr(const vertex_triangle_buffer& buffer) {
 		if (buffer.empty()) {
 			return;
 		}
@@ -52,6 +52,19 @@ namespace augs {
 		drawcall_command cmd;
 		cmd.triangles = buffer.data();
 		cmd.count = buffer.size();
+
+		push_command(std::move(cmd));
+	}
+
+	void renderer::call_triangles(vertex_triangle_buffer&& buffer) {
+		if (buffer.empty()) {
+			return;
+		}
+
+		num_total_triangles_drawn += buffer.size();
+
+		drawcall_custom_buffer_command cmd;
+		cmd.buffer = std::move(buffer);
 
 		push_command(std::move(cmd));
 	}

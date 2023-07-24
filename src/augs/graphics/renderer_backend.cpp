@@ -25,6 +25,7 @@ void buffer_data(
   	GLenum usage
 ) {
 #if USE_BUFFER_SUB_DATA
+	(void)usage;
 	GL_CHECK(glBufferSubData(target, 0, size, data));
 #else
 	GL_CHECK(glBufferData(target, size, data, usage));
@@ -227,6 +228,14 @@ namespace augs {
 					}
 					else if constexpr(same<C, drawcall_command>) {
 						perform(typed_cmd);
+					}
+					else if constexpr(same<C, drawcall_custom_buffer_command>) {
+						drawcall_command translated_cmd;
+
+						translated_cmd.triangles = typed_cmd.buffer.data();
+						translated_cmd.count = typed_cmd.buffer.size();
+
+						perform(translated_cmd);
 					}
 					else if constexpr(same<C, drawcall_dedicated_command>) {
 						const auto& buffers = dedicated[typed_cmd.type];

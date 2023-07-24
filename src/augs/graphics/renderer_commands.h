@@ -40,6 +40,10 @@ namespace augs {
 		rgba col;
 	};
 
+	struct drawcall_custom_buffer_command {
+		vertex_triangle_buffer buffer;
+	};
+
 	struct drawcall_command {
 		const vertex_triangle* triangles = nullptr;
 		const vertex_line* lines = nullptr;

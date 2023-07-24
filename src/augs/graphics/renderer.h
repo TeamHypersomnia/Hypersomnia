@@ -171,7 +171,8 @@ namespace augs {
 		void set_overwriting_blending();
 		void set_additive_blending();
 		
-		void call_triangles(const vertex_triangle_buffer&);
+		void call_triangles_direct_ptr(const vertex_triangle_buffer&);
+		void call_triangles(vertex_triangle_buffer&&);
 
 		void call_triangles(dedicated_buffer_vector, uint32_t index);
 		void call_triangles(dedicated_buffer);

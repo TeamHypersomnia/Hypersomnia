@@ -149,11 +149,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	/* Drawing lambdas */
 
 	auto draw_particles = [&](const particle_layer layer) {
-		renderer.call_triangles(in.drawn_particles.diffuse[layer]);
+		renderer.call_triangles_direct_ptr(in.drawn_particles.diffuse[layer]);
 	};
 
 	auto draw_particles_neons = [&]() {
-		renderer.call_triangles(in.drawn_particles.neons);
+		renderer.call_triangles_direct_ptr(in.drawn_particles.neons);
 	};
 
 #if BUILD_STENCIL_BUFFER
