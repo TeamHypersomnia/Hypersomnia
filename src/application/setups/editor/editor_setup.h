@@ -106,6 +106,9 @@ using editor_arena_handle = online_arena_handle<C>;
 class editor_setup : public default_setup_settings, public arena_gui_mixin<editor_setup> {
 	using arena_gui_base = arena_gui_mixin<editor_setup>;
 
+	editor_settings settings;
+	editor_autosave_settings last_autosave_settings;
+
 	augs::timer autosave_timer;
 
 	const packaged_official_content& official;
@@ -149,8 +152,6 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	editor_filesystem_node official_files_root;
 
 	const editor_project_paths paths;
-	editor_settings settings;
-	editor_autosave_settings last_autosave_settings;
 
 	editor_recent_message recent_message;
 
@@ -246,6 +247,7 @@ public:
 	static constexpr bool has_additional_highlights = true;
 
 	editor_setup(
+		const editor_settings& settings,
 		const packaged_official_content& official,
 		const augs::path_type& project_path
 	);

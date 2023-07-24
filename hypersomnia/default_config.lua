@@ -325,7 +325,8 @@ treat_as_music_sounds_longer_than_secs = 5,
 
     autosave = {
       enabled = true,
-      once_every_min = 2
+      once_every_min = 2,
+      if_loaded_autosave_show = "AUTOSAVE"
     },
 
     camera = {

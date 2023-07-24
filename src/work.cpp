@@ -1147,6 +1147,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		setup_launcher([&]() {
 			emplace_current_setup(
 				std::in_place_type_t<editor_setup>(),
+				config.editor,
 				*official,
 				std::forward<decltype(args)>(args)...
 			);

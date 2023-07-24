@@ -1284,6 +1284,12 @@ void settings_gui_state::perform(
 
 					revertable_drag("commands for undoing", config.editor.remember_last_n_commands, 1, 10, 2000);
 #endif
+
+					ImGui::Separator();
+
+					text("If loaded autosave, show: ");
+					ImGui::SameLine();
+					revertable_enum("##WhenAutosave", config.editor.autosave.if_loaded_autosave_show);
 				}	
 				
 				if (auto node = scoped_tree_node("Action notifications")) {

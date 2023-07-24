@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Host on double click with this chosen map
+
 - remove official maps from the in-game catalogue
 - also fix that autosave.json scheme
 

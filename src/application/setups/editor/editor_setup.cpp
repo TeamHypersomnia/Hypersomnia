@@ -133,9 +133,10 @@ packaged_official_content::packaged_official_content(sol::state& lua) {
 }
 
 editor_setup::editor_setup(
+	const editor_settings& settings,
 	const packaged_official_content& official,
 	const augs::path_type& project_path
-) : official(official), paths(project_path) {
+) : settings(settings), last_autosave_settings(settings.autosave), official(official), paths(project_path) {
 	create_official_filesystems();
 
 	LOG("Loading editor project at: %x", project_path);
@@ -209,9 +210,18 @@ editor_setup::editor_setup(
 			cmd.before = std::make_unique<editor_project>(project);
 			cmd.built_description = std::string("Loaded autosave from ") + path.filename().string();
 
-			new_autosave_popup.warning_notice_above = "Loaded an autosave file from " + path.filename().string() + ".";
+			if (settings.autosave.if_loaded_autosave_show == editor_autosave_load_option::LAST_SAVED_VERSION) {
+				new_autosave_popup.warning_notice_above = "Autosaved changes are available in: " + path.filename().string();
 
-			new_autosave_popup.message = "To go back to last saved changes instead,\npress Undo (CTRL+Z).\n\nIt is best practice to save your work (CTRL+S) before exiting the game.";
+				new_autosave_popup.message = "You're now on the last saved version from: " + paths.last_saved_json.filename().string() + ".\n";
+				new_autosave_popup.message += "To load the autosave, press Redo (CTRL+SHIFT+Z).\n\nIt is best practice to save your work (CTRL+S) before exiting the game.";
+			}
+			else {
+				new_autosave_popup.warning_notice_above = "Loaded autosaved changes from " + path.filename().string() + ".";
+
+				new_autosave_popup.message = "To go back to last saved changes instead,\npress Undo (CTRL+Z).\n\nIt is best practice to save your work (CTRL+S) before exiting the game.";
+
+			}
 
 			if (!autosave_popup.has_value()) {
 				autosave_popup = new_autosave_popup;
@@ -273,6 +283,10 @@ editor_setup::editor_setup(
 
 	rebuild_arena();
 	save_last_project_location();
+
+	if (settings.autosave.if_loaded_autosave_show == editor_autosave_load_option::LAST_SAVED_VERSION) {
+		undo();
+	}
 }
 
 editor_setup::~editor_setup() {
