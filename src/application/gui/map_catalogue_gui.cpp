@@ -22,14 +22,10 @@
 #include "augs/templates/in_order_of.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "application/setups/editor/project/editor_project_meta.h"
+#include "augs/readwrite/to_bytes.h"
 
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
-
-struct map_catalogue_gui_internal {
-	//std::optional<arena_downloading_session> session;
-	//https_file_downloader downloader;
-};
 
 void map_catalogue_gui_state::rescan_official_arenas() {
 	official_names.clear();
@@ -44,8 +40,125 @@ void map_catalogue_gui_state::rescan_official_arenas() {
 	augs::for_each_directory_in_directory(source_directory, register_arena);
 }
 
-map_catalogue_gui_state::map_catalogue_gui_state(const std::string& title) 
-	: base(title), data(std::make_unique<map_catalogue_gui_internal>()) 
+struct multi_arena_synchronizer_internal {
+	https_file_downloader external;
+	std::optional<arena_downloading_session> current_session;
+
+	multi_arena_synchronizer_internal(const parsed_url& url) : external(url) {}
+
+	auto make_requester(std::string arena_name) {
+		return [&downloader = this->external, arena_name](const augs::secure_hash_type&, const augs::path_type& path) {
+			const auto location = typesafe_sprintf("%x/%x", arena_name, path.string());
+			downloader.download_file(location);
+		};
+	}
+};
+
+multi_arena_synchronizer::multi_arena_synchronizer(
+	const arena_synchronizer_input& arena_names,
+	const parsed_url& parent_folder_url
+) : 
+	input(arena_names), 
+	data(std::make_unique<multi_arena_synchronizer_internal>(parent_folder_url))
+{
+	init_next_session();
+}
+
+multi_arena_synchronizer::~multi_arena_synchronizer() = default;
+
+template <class F>
+void multi_arena_synchronizer::for_each_with_progress(F callback) const {
+	/* 
+		For now there's no parallel downloads,
+		so all maps before the current have 100%, 0% after, and non-0 for the current.
+	*/
+
+	for (std::size_t i = 0; i < input.size(); ++i) {
+		float progress = 0.0f;
+
+		if (i < current_map) {
+			progress = 1.0f;
+		}
+		else if (i == current_map) {
+			progress = session().get_total_percent_complete(get_current_file_percent_complete());
+		}
+
+		callback(input[i].name, progress);
+	}
+}
+
+float multi_arena_synchronizer::get_current_file_percent_complete() const {
+	return float(data->external.get_downloaded_bytes()) / data->external.get_total_bytes();
+}
+
+void multi_arena_synchronizer::init_next_session() {
+	if (current_map < input.size()) {
+		const auto& current_input = input[current_map];
+
+		data->current_session = arena_downloading_session(
+			current_input.name,
+			current_input.version,
+			data->make_requester(current_input.name),
+			false
+		);
+	}
+}
+
+arena_downloading_session& multi_arena_synchronizer::session() {
+	return *data->current_session;
+}
+
+const arena_downloading_session& multi_arena_synchronizer::session() const {
+	return *data->current_session;
+}
+
+void multi_arena_synchronizer::advance() {
+	if (finished()) {
+		return;
+	}
+
+	if (const auto new_file = data->external.get_downloaded_file()) {
+		session().advance_with(augs::make_ptr_read_stream(new_file->second));
+	}
+
+	if (session().finished()) {
+		if (session().has_error()) {
+			LOG("Failed to download %x: %x", session().get_arena_name(), session().get_error());
+
+			last_error = session().get_error();
+		}
+
+		++current_map;
+
+		init_next_session();
+	}
+}
+
+bool multi_arena_synchronizer::finished() const {
+	return current_map >= input.size();
+}
+
+std::optional<std::string> multi_arena_synchronizer::get_error() const {
+	return last_error;
+}
+
+float multi_arena_synchronizer::get_total_progress() const {
+	std::size_t all = 0;
+	float total = 0.0f;
+
+	for_each_with_progress([&](const auto&, const float progress) {
+		++all;
+		total += progress;
+	});
+
+	if (all == 0) {
+		return 1.0f;
+	}
+
+	return total / all;
+}
+
+map_catalogue_gui_state::map_catalogue_gui_state(const std::string& title) : base(title)
 {
 	rescan_official_arenas();
 }
@@ -197,6 +310,10 @@ void map_catalogue_gui_state::rescan_versions_on_disk(std::vector<map_catalogue_
 	}
 }
 
+void map_catalogue_gui_state::rescan_versions_on_disk() {
+	rescan_versions_on_disk(map_list);
+}
+
 std::string sanitize_arena_short_description(std::string in);
 
 using S = map_catalogue_entry::state;
@@ -272,7 +389,21 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 	const auto downloads_directory = augs::path_type(DOWNLOADED_ARENAS_DIR);
 
-	auto process_entry = [&](const auto& entry) {
+	std::unordered_map<std::string, float> progress_of;
+
+	if (downloading.has_value()) {
+		downloading->for_each_with_progress(
+			[&](const auto& name, const float progress) {
+				progress_of[name] = progress;
+			}
+		);
+	}
+
+	std::size_t display_idx = 0;
+
+	auto process_entry = [&](auto& entry) {
+		entry.last_displayed_index = display_idx++;
+
 		const auto arena_name = entry.name;
 		const auto arena_folder_path = downloads_directory / arena_name;
 
@@ -283,7 +414,20 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		const auto selectable_size = ImVec2(0, 1 + miniature_size_v);
 		auto id = scoped_id(arena_name.c_str());
 
-		const bool is_selected = found_in(selected_arenas, arena_name);
+		auto entry_id = std::addressof(entry);
+		const bool is_selected = found_in(selected_arenas, entry_id);
+		auto maybe_progress = mapped_or_nullptr(progress_of, arena_name);
+
+		if (maybe_progress && *maybe_progress >= 1.0f) {
+			if (entry.version_timestamp != entry.version_on_disk) {
+				selected_arenas.erase(entry_id);
+			}
+
+			entry.version_on_disk = entry.version_timestamp;
+			maybe_progress = nullptr;
+		}
+
+		const bool is_downloading = maybe_progress != nullptr;
 
 		const auto local_pos = ImGui::GetCursorPos();
 
@@ -317,29 +461,67 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 				selectable_cols[0] = selectable_cols[1] = selectable_cols[2];
 			}
 
+			if (maybe_progress) {
+				const auto downloaded_bg_color = rgba(12, 25, 60, 255);
+				const auto fill_color = rgba(0, 130, 0, 255);
+
+				if (auto window = ImGui::GetCurrentWindow()) {
+					const auto min_x = window->ParentWorkRect.Min.x;
+					const auto max_x = window->ParentWorkRect.Max.x;
+					const auto avail_x = max_x - min_x;
+
+					const auto flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_Disabled;
+
+					{
+						auto cscope = scoped_preserve_cursor();
+
+						auto progress_bg_cols = scoped_selectable_colors({ downloaded_bg_color, downloaded_bg_color, downloaded_bg_color });
+
+						auto fill_size = selectable_size;
+
+						ImGui::Selectable("##EntryBgBg", true, flags, fill_size);
+					}
+
+					if (*maybe_progress > 0.0f) {
+						auto cscope = scoped_preserve_cursor();
+
+						auto progress_cols = scoped_selectable_colors({ fill_color, fill_color, fill_color });
+
+						auto fill_size = selectable_size;
+						fill_size.x = avail_x * (*maybe_progress);
+
+						ImGui::Selectable("##EntryBg", true, flags, fill_size);
+					}
+				}
+			}
+
 			auto darkened_selectables = scoped_selectable_colors(selectable_cols);
 
-			if (ImGui::Selectable("##Entry", true, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
+			if (ImGui::Selectable("##Entry", !is_downloading, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
 				if (ImGui::GetIO().KeyCtrl) {
-					if (found_in(selected_arenas, arena_name)) {
-						selected_arenas.erase(arena_name);
+					if (found_in(selected_arenas, entry_id)) {
+						selected_arenas.erase(entry_id);
 						last_selected = nullptr;
 					}
 					else {
-						selected_arenas.emplace(arena_name);
-						last_selected = std::addressof(entry);
+						selected_arenas.emplace(entry_id);
+						last_selected = entry_id;
 					}
 				}
 				else {
 					selected_arenas.clear();
-					selected_arenas.emplace(arena_name);
-					last_selected = std::addressof(entry);
+					selected_arenas.emplace(entry_id);
+					last_selected = entry_id;
 				}
 			}
 
 			if (ImGui::BeginPopupContextItem()) {
-				if (ImGui::Selectable("Reveal in explorer")) {
-					in.window.reveal_in_explorer(arena_folder_path);
+				{
+					auto scope = maybe_disabled_cols({}, entry.get_state() == S::NOT_FOUND);
+
+					if (ImGui::Selectable("Reveal in explorer")) {
+						in.window.reveal_in_explorer(arena_folder_path);
+					}
 				}
 
 				ImGui::EndPopup();
@@ -385,23 +567,29 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		if (num_columns > 1) {
 			ImGui::NextColumn();
 
-			const auto date = augs::date_time::from_utc_timestamp(entry.version_timestamp);
-
-			const auto ago = typesafe_sprintf(
-				"%x\n%x", 
-				date.get_readable_day_hour(),
-				date.how_long_ago_tell_seconds()
-			);
-
-			text_disabled(ago);
-
-			const auto map_state = entry.get_state();
-
-			if (map_state == S::ON_DISK) {
-				text_color("Up to date.", green);
+			if (maybe_progress) {
+				text_color(typesafe_sprintf("%2f%", (*maybe_progress) * 100), cyan);
+				text_color(typesafe_sprintf("Downloading..."), cyan);
 			}
-			else if (map_state == S::UPDATE_AVAILABLE) {
-				text_color("Update available!", yellow);
+			else {
+				const auto date = augs::date_time::from_utc_timestamp(entry.version_timestamp);
+
+				const auto ago = typesafe_sprintf(
+					"%x\n%x", 
+					date.get_readable_day_hour(),
+					date.how_long_ago_tell_seconds()
+				);
+
+				text_disabled(ago);
+
+				const auto map_state = entry.get_state();
+
+				if (map_state == S::ON_DISK) {
+					text_color("Up to date.", green);
+				}
+				else if (map_state == S::UPDATE_AVAILABLE) {
+					text_color("Update available!", yellow);
+				}
 			}
 
 			ImGui::NextColumn();
@@ -438,6 +626,10 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	ImGui::Columns(1);
 }
 
+void map_catalogue_gui_state::request_rescan() {
+	should_rescan = true;
+}
+
 bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 	using namespace httplib_utils;
 	using namespace augs::imgui;
@@ -454,13 +646,32 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		return false;
 	}
 
-	bool mofified = false;
+	bool modified = false;
 
 	const auto couldnt_download = std::string("Couldn't download the server list.\n");
 
 	if (!refreshed_once) {
 		refreshed_once = true;
 		refresh(in);
+	}
+
+	if (downloading.has_value()) {
+		downloading->advance();
+	}
+
+	if (should_rescan) {
+		should_rescan = false;
+
+		if (!downloading.has_value() && !refresh_in_progress()) {
+			LOG("Rescanning map catalogue on disk due to window activate.");
+			rescan_versions_on_disk();
+		}
+	}
+
+	if (download_failed_popup.has_value()) {
+		if (download_failed_popup->perform()) {
+			download_failed_popup = std::nullopt;
+		}
 	}
 
 	if (valid_and_is_ready(future_response)) {
@@ -480,7 +691,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		}
 
 		if (ImGui::IsItemDeactivatedAfterEdit()) {
-			mofified = true;
+			modified = true;
 			refresh(in);
 		}
 	}
@@ -607,51 +818,121 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 			const auto icon = assets::necessary_image_id::DOWNLOAD_ICON;
 
-			if (selected_arenas.empty()) {
+			if (downloading.has_value()) {
 				auto cols = maybe_disabled_cols({}, true);
 
-				do_big_button("No map selected.", icon, rgba(100, 100, 100, 255), {
-					rgba(25, 25, 25, 255),
-					rgba(50, 50, 50, 255),
-					rgba(50, 50, 50, 255)
-				}, [](){});
-			}
-			else {
-				auto dl_label = typesafe_sprintf("Download %x maps", selected_arenas.size());
-
-				if (selected_arenas.size() == 1) {
-					dl_label = "Download " + *selected_arenas.begin();
-				}
+				const auto num_maps = downloading->get_input().size();
+				const auto num_label = num_maps == 1 ? downloading->get_input()[0].name : typesafe_sprintf("%x maps", num_maps);
+				const auto progress_label = typesafe_sprintf("Downloading %x... %f2%", num_label, downloading->get_total_progress() * 100);
 
 				auto after_cb = [&]() {
-					if (ImGui::IsItemHovered()) {
-						if (selected_arenas.size() > 1) {
-							auto arenas = std::string();
+					if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+						auto arenas = std::string();
 
-							for (const auto& s : selected_arenas) {
-								arenas += s + "\n";
+						downloading->for_each_with_progress(
+							[&](const auto& name, const float progress) {
+								arenas += typesafe_sprintf("%x: %2f%\n", name, progress);
 							}
+						);
 
-							if (arenas.size() > 0) {
-								arenas.pop_back();
-							}
-
-							text_tooltip(arenas);
+						if (arenas.size() > 0) {
+							arenas.pop_back();
 						}
+
+						text_tooltip(arenas);
 					}
 				};
 
-				do_big_button(dl_label, icon, rgba(100, 255, 100, 255), {
-					rgba(10, 50, 10, 255),
-					rgba(20, 70, 20, 255),
-					rgba(20, 90, 20, 255)
+				do_big_button(progress_label, icon, rgba(100, 100, 100, 255), {
+					rgba(25, 25, 25, 255),
+					rgba(50, 50, 50, 255),
+					rgba(50, 50, 50, 255)
 				}, after_cb);
 			}
+			else {
+				arena_synchronizer_input downloadable_arenas;
+			   
+				for (const auto s : selected_arenas) {
+					if (s->get_state() != S::ON_DISK) {
+						downloadable_arenas.push_back({ s->name, s->version_timestamp, s->last_displayed_index });
+					}
+				}
 
+				sort_range(downloadable_arenas);
+
+				if (selected_arenas.empty()) {
+					auto cols = maybe_disabled_cols({}, true);
+
+					do_big_button("No map selected.", icon, rgba(100, 100, 100, 255), {
+						rgba(25, 25, 25, 255),
+						rgba(50, 50, 50, 255),
+						rgba(50, 50, 50, 255)
+					}, [](){});
+				}
+				else if (downloadable_arenas.empty()) {
+					auto cols = maybe_disabled_cols({}, true);
+
+					do_big_button("All selected arenas are up to date.", icon, rgba(100, 100, 100, 255), {
+						rgba(25, 25, 25, 255),
+						rgba(50, 50, 50, 255),
+						rgba(50, 50, 50, 255)
+					}, [](){});
+				}
+				else {
+					auto dl_label = typesafe_sprintf("Download %x maps", downloadable_arenas.size());
+
+					if (downloadable_arenas.size() == 1) {
+						dl_label = "Download " + (*downloadable_arenas.begin()).name;
+					}
+
+					auto after_cb = [&]() {
+						if (ImGui::IsItemHovered()) {
+							if (downloadable_arenas.size() > 1) {
+								auto arenas = std::string();
+
+								for (const auto& s : downloadable_arenas) {
+									arenas += s.name + "\n";
+								}
+
+								if (arenas.size() > 0) {
+									arenas.pop_back();
+								}
+
+								text_tooltip(arenas);
+							}
+						}
+					};
+
+					const bool should_download = do_big_button(dl_label, icon, rgba(100, 255, 100, 255), {
+						rgba(10, 50, 10, 255),
+						rgba(20, 70, 20, 255),
+						rgba(20, 90, 20, 255)
+					}, after_cb);
+
+					if (should_download) {
+						downloading.emplace(downloadable_arenas, parsed_url(in.external_arena_files_provider));
+					}
+				}
+			}
 		}
 	}
 
-	return mofified;
+	if (downloading.has_value() && downloading->finished()) {
+		if (const auto error = downloading->get_error()) {
+			auto popup = simple_popup();
+
+			popup.title = "Failed to download maps";
+			popup.message = *error;
+
+			download_failed_popup = popup;
+		}
+
+		downloading = std::nullopt;
+		rescan_versions_on_disk();
+		should_rescan = false;
+	}
+
+	return modified;
 }
 
 bool map_catalogue_gui_state::list_refresh_in_progress() const {
@@ -728,6 +1009,7 @@ void map_catalogue_gui_state::refresh(const map_catalogue_input in) {
 					}
 
 					rescan_versions_on_disk(result);
+					should_rescan = false;
 
 					return result;
 				}

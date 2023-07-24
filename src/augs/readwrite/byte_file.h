@@ -51,9 +51,10 @@ namespace augs {
 		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(bytes.data()), bytes.size());
 	}
 
-	inline void bytes_to_file(const std::vector<std::byte>& bytes, const path_type& path) {
+	template <class S>
+	inline void bytes_to_file(const S& source, const path_type& path) {
 		auto out = open_binary_output_stream(path);
-		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(bytes.data()), bytes.size());
+		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(source.data()), source.size());
 	}
 
 	template <class S, class ContainerType>

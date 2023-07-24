@@ -12,7 +12,7 @@ struct editor_project_meta {
 	game_version_identifier game_version;
 	augs::constant_size_string<max_arena_name_length_v> name;
 	augs::constant_size_string<arena_public_key_length_v> author_public_key;
-	augs::constant_size_string<max_version_timestamp_length_v> version_timestamp;
+	version_timestamp_string version_timestamp;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_project_meta&) const = default;

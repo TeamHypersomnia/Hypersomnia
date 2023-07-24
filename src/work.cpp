@@ -1156,6 +1156,11 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	auto launch_setup = [&](const activity_type mode) {
+		if (map_catalogue_gui.is_downloading()) {
+			LOG("Cannot launch %x. Download in progress.", augs::enum_to_string(mode));
+			return;
+		}
+
 		LOG("Launched mode: %x", augs::enum_to_string(mode));
 
 		switch (mode) {
@@ -2717,6 +2722,8 @@ work_result work(const int argc, const char* const * const argv) try {
 							if (config.content_regeneration.rescan_assets_on_window_focus) {
 								streaming.request_rescan();
 							}
+
+							map_catalogue_gui.request_rescan();
 						}
 
 						if (e.msg == message::deactivate) {

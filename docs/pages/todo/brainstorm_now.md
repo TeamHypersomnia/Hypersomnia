@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- remove official maps from the in-game catalogue
+- also fix that autosave.json scheme
+
 - maybe migrate server to appimage after all
     - but we'll still have a problem with syncing the new config force lua from the repo
         - maybe we can sync only this file and have our own config.lua

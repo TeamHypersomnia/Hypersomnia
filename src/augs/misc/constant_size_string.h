@@ -122,3 +122,8 @@ namespace augs {
 		}
 	};
 }
+
+template <unsigned const_count>
+std::ostream& operator<<(std::ostream& out, const augs::constant_size_string<const_count>& x) {
+	return out << x.c_str();
+}

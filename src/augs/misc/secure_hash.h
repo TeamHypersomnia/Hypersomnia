@@ -7,7 +7,7 @@
 
 namespace augs {
 	using secure_hash_type = std::array<uint8_t, 32>;
-	using hash_string_type = augs::constant_size_string<64>;
+	using hash_string_type = constant_size_string<64>;
 
 	std::size_t crlf_to_lf(char*, std::size_t n);
 	void crlf_to_lf(std::string&);
@@ -18,7 +18,8 @@ namespace augs {
 
 	secure_hash_type secure_hash(const std::byte* bytes, std::size_t n);
 
-	inline secure_hash_type secure_hash(const std::string& bytes) {
+	template <class S>
+	inline secure_hash_type secure_hash(const S& bytes) {
 		return secure_hash(
 			reinterpret_cast<const std::byte*>(bytes.data()),
 			bytes.size()

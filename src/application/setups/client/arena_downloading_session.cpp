@@ -5,14 +5,18 @@
 #include "application/setups/editor/project/editor_project_readwrite.h"
 #include "application/setups/editor/project/editor_project_paths.h"
 #include "augs/readwrite/json_readwrite_errors.h"
+#include "augs/readwrite/memory_stream.h"
 #include "augs/log.h"
+#include "augs/readwrite/pointer_to_buffer.h"
 
 arena_downloading_session::arena_downloading_session(
 	const std::string& arena_name,
+	const hash_or_timestamp& project_json_hash,
 	arena_downloading_session::file_requester_type file_requester,
 	const bool from_autosave
 ) : 
 	arena_name(arena_name),
+	project_json_hash(project_json_hash),
 	file_requester(file_requester),
 	from_autosave(from_autosave)
 {
@@ -26,20 +30,33 @@ arena_downloading_session::arena_downloading_session(
 	json_path_in_part_dir += ".json";
 
 	target_dir_path = DOWNLOADED_ARENAS_DIR / arena_name;
+
+	start();
 }
 
-bool arena_downloading_session::start(const augs::secure_hash_type& project_hash) {
+float arena_downloading_session::get_total_percent_complete(float this_percent_complete) const {
+	const auto downloaded_index = get_downloaded_file_index();
+	const auto num_all = num_all_downloaded_files();
+
+	if (num_all == 0) {
+		/* Can't estimate if we don't even have the json file. */
+		return 0.0f;
+	}
+
+	const auto percent_complete = (num_all == 1) ? 1.f : ((float(downloaded_index) + this_percent_complete) / (num_all - 1));
+	return percent_complete;
+}
+
+void arena_downloading_session::start() {
 	arena_already_exists = augs::exists(target_dir_path);
 
 	build_content_database_from_candidate_folders();
 
 	augs::create_directories(part_dir_path);
 
-	if (try_load_json_from_part_folder(project_hash)) {
+	if (try_load_json_from_part_folder()) {
 		if (const auto first_resource_to_download = next_to_download()) {
 			request_file_download(*first_resource_to_download);
-
-			return true;
 		}
 		else {
 			/* 
@@ -48,15 +65,24 @@ bool arena_downloading_session::start(const augs::secure_hash_type& project_hash
 			*/
 
 			finalize_arena_download();
-			return false;
 		}
 	}
 	else {
 		const auto autosave_url = std::string("autosave.json");
 		const auto json_url = from_autosave ? autosave_url : arena_name + ".json";
 
-		request_file_download({ project_hash, json_url });
-		return true;
+		auto requested_project_json_hash = augs::secure_hash_type();
+
+		if (const auto hash = std::get_if<augs::secure_hash_type>(&project_json_hash)) {
+			requested_project_json_hash = *hash;
+		}
+
+		/* 
+			Hash will be zero if we pass the timestamp instead of hash. 
+			This will only happen in the context where the file requester cares only about the path (the https downloader).
+		*/
+
+		request_file_download({ requested_project_json_hash, json_url });
 	}
 }
 
@@ -66,50 +92,62 @@ void arena_downloading_session::finalize_arena_download() {
 	}
 }
 
-bool arena_downloading_session::advance_with(
-	const std::vector<std::byte>& next_received_file
-) {
-	const bool matches = requested_hash_matches(next_received_file);
-
-	if (!matches) {
-		last_error = typesafe_sprintf("The server sent a file with an incorrect hash.\nExpected: %x\nActual: %x\nDisconnecting.", augs::to_hex_format(last_requested_file_hash), augs::to_hex_format(augs::secure_hash(next_received_file)));
-
+bool arena_downloading_session::in_progress() const {
+	if (last_error.has_value()) {
 		return false;
 	}
 
-	const bool is_project_json_file = now_downloading_project_json();
+	return last_requested_file_hash.has_value();
+} 
 
-	if (is_project_json_file) {
+void arena_downloading_session::advance_with(
+	const augs::cptr_memory_stream next_received_file
+) {
+	if (still_downloading_project_json()) {
 		try {
-			/* 
-				This could only fail due to read_only_external_resources throwing,
-				which means the json file is ill-formed, unsafe or otherwise incorrect.
-			*/
-
-			handle_downloaded_project_json(next_received_file);
+			if (!handle_downloaded_project_json(next_received_file)) {
+				return;
+			}
 		}
 		catch (const augs::json_deserialization_error& err) {
 			last_error = typesafe_sprintf("Server sent an invalid arena json file. Disconnecting. Details:\n%x", err.what());
-			return false;
+			return;
 		}
 		catch (...) {
 			last_error = std::string("Server sent an invalid arena json file. Disconnecting.");
-			return false;
+			return;
 		}
 	}
 	else {
-		create_files_from_downloaded(next_received_file);
+		ensure(last_requested_file_hash.has_value());
+
+		const auto requested = *last_requested_file_hash;
+		const bool requested_hash_matches = requested == augs::secure_hash(next_received_file);
+
+		if (requested_hash_matches) {
+			create_files_matching_hash(requested, next_received_file);
+
+			/* 
+				Nullopt last_requested_file_hash will mark the end of download,
+				if no more files will now be requested.
+			*/
+
+			last_requested_file_hash = std::nullopt;
+		}
+		else {
+			last_error = typesafe_sprintf(
+				"The server sent a file with an incorrect hash.\nExpected: %x\nActual: %x\nDisconnecting.",
+				last_requested_file_hash,
+				augs::secure_hash(next_received_file)
+			);
+		}
 	}
 
 	if (const auto next_resource_to_download = next_to_download()) {
 		request_file_download(*next_resource_to_download);
-
-		return true;
 	}
 	else {
 		finalize_arena_download();
-
-		return false;
 	}
 }
 
@@ -152,14 +190,12 @@ void arena_downloading_session::request_file_download(const hash_and_url& entry)
 	file_requester(hash, url_in_provider);
 }
 
-bool arena_downloading_session::try_load_json_from_part_folder(
-	const augs::secure_hash_type& required_hash
-) {
+bool arena_downloading_session::try_load_json_from_part_folder() {
 	try {
-		project_json = augs::file_to_string_crlf_to_lf(json_path_in_part_dir);
+		const auto project_json = augs::file_to_string_crlf_to_lf(json_path_in_part_dir);
 
-		if (augs::secure_hash(project_json) == required_hash) {
-			determine_needed_resources();
+		if (project_json_matches(project_json_hash, project_json)) {
+			determine_needed_resources_from(project_json);
 
 			return true;
 		}
@@ -168,7 +204,6 @@ bool arena_downloading_session::try_load_json_from_part_folder(
 
 	}
 
-	project_json.clear();
 	return false;
 }
 
@@ -243,7 +278,7 @@ bool arena_downloading_session::try_find_and_paste_file_locally(
 	return false;
 }
 
-void arena_downloading_session::determine_needed_resources() {
+void arena_downloading_session::determine_needed_resources_from(const std::string& project_json) {
 	const auto& parent_folder_for_sanitization_checks = part_dir_path;
 
 	const auto externals = editor_project_readwrite::read_only_external_resources(
@@ -274,36 +309,41 @@ void arena_downloading_session::determine_needed_resources() {
 	}
 }
 
-bool arena_downloading_session::requested_hash_matches(
-	const std::vector<std::byte>& bytes
-) const {
-	if (now_downloading_project_json()) {
-		auto converted_to_lf = bytes;
-		augs::crlf_to_lf(converted_to_lf);
-
-		return augs::secure_hash(converted_to_lf) == last_requested_file_hash;
-	}
-
-	return augs::secure_hash(bytes) == last_requested_file_hash;
-}
-
-void arena_downloading_session::handle_downloaded_project_json(
-	const std::vector<std::byte>& bytes
+bool arena_downloading_session::handle_downloaded_project_json(
+	const augs::cptr_memory_stream bytes
 ) {
-	project_json.assign(
-		reinterpret_cast<const char*>(&bytes[0]), 
-		reinterpret_cast<const char*>(&bytes[0] + bytes.size())
+	last_requested_file_hash = std::nullopt;
+
+	auto project_json = std::string(
+		reinterpret_cast<const char*>(bytes.data()), 
+		reinterpret_cast<const char*>(bytes.data() + bytes.size())
 	);
 
-	determine_needed_resources();
+	augs::crlf_to_lf(project_json);
+
+	if (!project_json_matches(project_json_hash, project_json)) {
+		last_error = typesafe_sprintf(
+			"The server sent a project json file with an incorrect hash/timestamp.\nExpected: %x\nActual hash: %x\nActual timestamp: %x\nDisconnecting.",
+			project_json_hash,
+			augs::secure_hash(project_json),
+			editor_project_readwrite::read_only_project_timestamp(project_json)
+		);
+
+		return false;
+	}
+
+	determine_needed_resources_from(project_json);
 
 	augs::save_as_text(json_path_in_part_dir, project_json);
+
+	return true;
 }
 
-void arena_downloading_session::create_files_from_downloaded(
-	const std::vector<std::byte>& bytes
+void arena_downloading_session::create_files_matching_hash(
+	const augs::secure_hash_type& hash,
+	const augs::cptr_memory_stream bytes
 ) {
-	const auto& entry = output_files_by_hash.at(last_requested_file_hash);
+	const auto& entry = output_files_by_hash.at(hash);
 
 	ensure(entry.marked_for_download_already);
 
@@ -375,7 +415,7 @@ std::optional<std::string> arena_downloading_session::final_rearrange_directorie
 }
 
 std::string arena_downloading_session::get_displayed_file_path() const {
-	if (now_downloading_project_json()) {
+	if (still_downloading_project_json()) {
 		return json_path_in_part_dir.filename().string();
 	}
 
@@ -392,5 +432,21 @@ std::string arena_downloading_session::get_displayed_file_path() const {
 	}
 
 	return "";
+}
+
+bool arena_downloading_session::project_json_matches(const hash_or_timestamp& ts, const std::string& project_json) {
+	if (const auto required_hash = std::get_if<augs::secure_hash_type>(&ts)) {
+		return augs::secure_hash(project_json) == *required_hash;
+	}
+	else if (const auto timestamp = std::get_if<version_timestamp_string>(&ts)) {
+		try {
+			return editor_project_readwrite::read_only_project_timestamp(project_json) == *timestamp;
+		}
+		catch (...) {
+			return false;
+		}
+	}
+
+	return false;
 }
 

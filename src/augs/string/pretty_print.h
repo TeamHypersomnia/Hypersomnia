@@ -6,6 +6,7 @@
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/is_monostate.h"
 #include "augs/templates/traits/has_begin_and_end.h"
+#include "augs/misc/constant_size_string.h"
 #include "augs/templates/identity_templates.h"
 
 template <class T, class = void>
@@ -17,6 +18,12 @@ struct has_string<T, decltype(std::declval<T&>().string(), void())> : std::true_
 template <class T>
 constexpr bool has_string_v = has_string<T>::value;
 
+namespace augs {
+	using secure_hash_type = std::array<uint8_t, 32>;
+	using hash_string_type = constant_size_string<64>;
+	hash_string_type to_hex_format(const secure_hash_type& hstr);
+}
+
 template <class S, class T>
 S& pretty_print(S& os, const T& val) {
 	if constexpr(can_stream_left_v<S, T> && !has_string_v<T>) {
@@ -26,6 +33,9 @@ S& pretty_print(S& os, const T& val) {
 		else {
 			os << val;
 		}
+	}
+	else if constexpr(std::is_same_v<augs::secure_hash_type, T>) {
+		os << augs::to_hex_format(val);
 	}
 	else if constexpr(std::is_convertible_v<T, std::string>) {
 		os << val.operator std::string();

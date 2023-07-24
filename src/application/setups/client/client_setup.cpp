@@ -346,6 +346,7 @@ bool client_setup::setup_external_arena_download_session() {
 
 		downloading = arena_downloading_session(
 			last_download_request.arena_name,
+			last_download_request.project_hash,
 			external_file_requester,
 			sv_public_vars.arena_from_autosave
 		);
@@ -365,19 +366,20 @@ void client_setup::setup_direct_arena_download_session() {
 	external_downloader = nullptr;
 
 	auto direct_file_requester = [this](const augs::secure_hash_type& hash, const augs::path_type& path) {
-		LOG("Requesting direct download over UDP: %x (hash: %x)", path, augs::to_hex_format(hash));
+		LOG("Requesting direct download over UDP: %x (hash: %x)", path, hash);
 		this->request_direct_file_download(hash);
 	};
 
 	downloading = arena_downloading_session(
 		last_download_request.arena_name,
+		last_download_request.project_hash,
 		direct_file_requester,
 		sv_public_vars.arena_from_autosave
 	);
 }
 
 bool client_setup::start_downloading_session() {
-	if (downloading->start(last_download_request.project_hash)) {
+	if (downloading->in_progress()) {
 		send_payload(
 			game_channel_type::RELIABLE_MESSAGES,
 			is_trying_external_download() ? 
@@ -415,7 +417,7 @@ bool client_setup::start_downloading_session() {
 }
 
 bool client_setup::start_downloading_arena(const arena_download_input& request) {
-	LOG("Start downloading arena: %x (hash: %x)", request.arena_name, augs::to_hex_format(request.project_hash));
+	LOG("Start downloading arena: %x (hash: %x)", request.arena_name, request.project_hash);
 
 	last_download_request = request;
 
@@ -427,14 +429,6 @@ bool client_setup::start_downloading_arena(const arena_download_input& request) 
 	}
 
 	return start_downloading_session();
-}
-
-static std::vector<std::byte> string_to_bytes(const std::string& bytes) {
-	std::vector<std::byte> result;
-	result.resize(bytes.size());
-	std::memcpy(result.data(), bytes.data(), bytes.size());
-
-	return result;
 }
 
 void client_setup::advance_external_downloader() {
@@ -452,7 +446,7 @@ void client_setup::advance_external_downloader() {
 	};
 
 	if (const auto new_file = external_downloader->get_downloaded_file()) {
-		if (advance_downloading_session(string_to_bytes(new_file->second)) == message_handler_result::ABORT_AND_DISCONNECT) {
+		if (advance_downloading_session(augs::make_ptr_read_stream(new_file->second)) == message_handler_result::ABORT_AND_DISCONNECT) {
 			LOG("External downloading session failed: %x", last_disconnect_reason);
 			last_disconnect_reason = {};
 
@@ -469,7 +463,7 @@ void client_setup::advance_external_downloader() {
 }
 
 message_handler_result client_setup::advance_downloading_session(
-	const std::vector<std::byte>& next_received_file
+	const augs::cptr_memory_stream next_received_file
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
 	constexpr auto continue_v = message_handler_result::CONTINUE;
@@ -481,7 +475,9 @@ message_handler_result client_setup::advance_downloading_session(
 		return abort_v;
 	}
 
-	if (downloading->advance_with(next_received_file)) {
+	downloading->advance_with(next_received_file);
+
+	if (downloading->in_progress()) {
 		return continue_v;
 	}
 	else {
@@ -502,7 +498,7 @@ bool client_setup::finalize_arena_download() {
 
 	external_downloader = nullptr;
 
-	if (downloading->has_errors()) {
+	if (downloading->has_error()) {
 		set_disconnect_reason(downloading->get_error());
 		downloading = std::nullopt;
 		return false;
@@ -517,7 +513,7 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 	const auto& new_arena = new_vars.arena;
 
 	LOG("Trying to load arena: %x (game_mode: %x)", new_arena, new_vars.game_mode.empty() ? "default" : new_vars.game_mode.c_str());
-	LOG("Required arena hash: %x", augs::to_hex_format(new_vars.required_arena_hash));
+	LOG("Required arena hash: %x", new_vars.required_arena_hash);
 
 	try {
 		const auto& referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
@@ -1072,19 +1068,7 @@ float client_setup::get_current_file_percent_complete() const {
 }
 
 float client_setup::get_total_download_percent_complete(const bool smooth) const {
-	const auto downloaded_index = downloading->get_downloaded_file_index();
-	const auto num_all = downloading->num_all_downloaded_files();
-
-	/* Looks more pro without the easing per-file after all */
-
-	auto this_percent_complete = 0.0f;
-
-	if (smooth) {
-		this_percent_complete = get_current_file_percent_complete();
-	}
-
-	const auto percent_complete = (num_all == 1) ? 1.f : ((float(downloaded_index) + this_percent_complete) / (num_all - 1));
-	return percent_complete;
+	return downloading->get_total_percent_complete(smooth ? get_current_file_percent_complete() : 0.0f);
 }
 
 custom_imgui_result client_setup::perform_custom_imgui(

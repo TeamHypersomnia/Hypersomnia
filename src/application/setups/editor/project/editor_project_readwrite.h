@@ -44,6 +44,7 @@ namespace editor_project_readwrite {
 
 	editor_project_about read_only_project_about(const augs::path_type& json_path);
 	editor_project_meta read_only_project_meta(const augs::path_type& json_path);
+	version_timestamp_string read_only_project_timestamp(const std::string& project_json);
 
 	using external_resource_database = std::vector<std::pair<augs::path_type, augs::secure_hash_type>>;
 

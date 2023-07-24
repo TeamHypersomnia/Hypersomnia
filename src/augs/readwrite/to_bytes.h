@@ -31,6 +31,11 @@ namespace augs {
 		return augs::cptr_memory_stream(buf);
 	}
 
+	template <class S>
+	augs::cptr_memory_stream make_ptr_read_stream(const S& source) {
+		return make_ptr_read_stream(source.data(), source.size());
+	}
+
 	template <class B, class T>
 	void assign_bytes(B& buffer, const T& object) {
 		buffer.clear();

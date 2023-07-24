@@ -68,7 +68,7 @@ message_handler_result client_setup::handle_payload(
 			return continue_v;
 		}
 
-		return advance_downloading_session(payload.file_bytes);
+		return advance_downloading_session(augs::make_ptr_read_stream(payload.file_bytes));
 	}
 	else if constexpr (std::is_same_v<T, file_download_link_payload>) {
 		if (is_replaying()) {

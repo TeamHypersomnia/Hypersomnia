@@ -821,7 +821,7 @@ public:
 
 	bool start_downloading_arena(const arena_download_input&);
 
-	message_handler_result advance_downloading_session(const std::vector<std::byte>& next_received_file);
+	message_handler_result advance_downloading_session(augs::cptr_memory_stream next_received_file);
 
 	bool finalize_arena_download();
 

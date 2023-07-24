@@ -1471,4 +1471,10 @@ namespace editor_project_readwrite {
 
 		return augs::from_json_subobject<editor_project_meta>(document, "meta");
 	}
+
+	version_timestamp_string read_only_project_timestamp(const std::string& project_json) {
+		const auto document = augs::json_document_from(project_json);
+
+		return augs::from_json_subobject<editor_project_meta>(document, "meta").version_timestamp;
+	}
 }

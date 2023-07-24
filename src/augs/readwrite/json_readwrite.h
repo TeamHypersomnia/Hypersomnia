@@ -248,6 +248,20 @@ namespace augs {
 		return document;
 	}
 
+	inline rapidjson::Document json_document_from(const char* const json, const std::size_t length) {
+		rapidjson::Document document;
+
+		if (document.Parse(json, length).HasParseError()) {
+			throw json_deserialization_error(
+				"Couldn't parse JSON: %x\nOffset: %x", 
+				GetParseError_En(document.GetParseError()),
+				document.GetErrorOffset()
+			);
+		}
+
+		return document;
+	}
+
 	inline rapidjson::Document json_document_from(const augs::path_type& path) {
 		return json_document_from(file_to_string(path));
 	}

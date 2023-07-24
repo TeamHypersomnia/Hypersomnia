@@ -1128,7 +1128,7 @@ void server_setup::rechoose_arena() {
 		current_arena_hash = result.required_hash;
 		current_arena_from_autosave = augs::exists(paths.autosave_json);
 			
-		LOG("Chosen arena hash: %x", augs::to_hex_format(current_arena_hash));
+		LOG("Chosen arena hash: %x", current_arena_hash);
 
 		::register_external_resources_of(
 			*last_loaded_project,
