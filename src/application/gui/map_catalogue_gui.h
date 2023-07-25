@@ -136,6 +136,7 @@ class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_s
 
 	static void rescan_versions_on_disk(std::vector<map_catalogue_entry>&);
 
+	bool launch_download_on_last_selected = false;
 	std::optional<simple_popup> download_failed_popup;
 
 	bool should_rescan = false;
@@ -155,4 +156,6 @@ public:
 	std::optional<std::vector<ad_hoc_atlas_subject>> get_new_ad_hoc_images();
 
 	bool is_downloading() const { return downloading.has_value(); }
+
+	std::optional<std::string> open_host_window;
 };

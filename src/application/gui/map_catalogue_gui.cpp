@@ -504,7 +504,23 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 			auto darkened_selectables = scoped_selectable_colors(selectable_cols);
 
-			if (ImGui::Selectable("##Entry", !is_downloading, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
+			ImGui::Selectable("##Entry", !is_downloading, ImGuiSelectableFlags_SpanAllColumns, selectable_size);
+
+			auto do_host = [&]() {
+				open_host_window = arena_name;
+			};
+
+			auto do_update = [&]() {
+				launch_download_on_last_selected = true;
+			};
+
+			auto select_this = [&]() {
+				selected_arenas.clear();
+				selected_arenas.emplace(entry_id);
+				last_selected = entry_id;
+			};
+
+			if (ImGui::IsItemClicked()) {
 				if (ImGui::GetIO().KeyCtrl) {
 					if (found_in(selected_arenas, entry_id)) {
 						selected_arenas.erase(entry_id);
@@ -516,14 +532,45 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 					}
 				}
 				else {
-					selected_arenas.clear();
-					selected_arenas.emplace(entry_id);
-					last_selected = entry_id;
+					select_this();
+				}
+
+				if (!ImGui::GetIO().KeyCtrl) {
+					if (ImGui::IsMouseDoubleClicked(0)) {
+						if (entry.get_state() == S::ON_DISK) {
+							do_host();
+						}
+						else {
+							do_update();
+						}
+					}
 				}
 			}
 
 			if (ImGui::BeginPopupContextItem()) {
+				if (!is_selected) {
+					select_this();
+				}
+
 				{
+					if (entry.get_state() == S::ON_DISK) {
+						if (ImGui::Selectable("Host")) {
+							do_host();
+						}
+					}
+					else if (entry.get_state() == S::UPDATE_AVAILABLE) {
+						if (ImGui::Selectable("Update")) {
+							do_update();
+						}
+					}
+					else if (entry.get_state() == S::NOT_FOUND) {
+						if (ImGui::Selectable("Download")) {
+							do_update();
+						}
+					}
+
+					ImGui::Separator();
+
 					auto scope = maybe_disabled_cols({}, entry.get_state() == S::NOT_FOUND);
 
 					if (ImGui::Selectable("Reveal in explorer")) {
@@ -973,7 +1020,8 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 						rgba(20, 90, 20, 255)
 					}, after_cb);
 
-					if (should_download) {
+					if (should_download || launch_download_on_last_selected) {
+						launch_download_on_last_selected = false;
 						downloading.emplace(downloadable_arenas, parsed_url(in.external_arena_files_provider));
 					}
 				}

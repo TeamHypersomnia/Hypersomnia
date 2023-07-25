@@ -91,7 +91,7 @@ namespace augs {
 			io.GetClipboardTextFn = augs_GetClipboardText;
 #endif
 
-			io.MouseDoubleClickMaxDist = 100.f;
+			//io.MouseDoubleClickMaxDist = 100.f;
 			GetStyle() = initial_style;
 
 			// ImGui::GetStyle().ScaleAllSizes(2.0f);

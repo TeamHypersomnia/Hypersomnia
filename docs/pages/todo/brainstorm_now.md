@@ -23,8 +23,6 @@ summary: That which we are brainstorming at the moment.
         - Prevent syncing any files until no udp download sessions are live
             - Only problematic until we implement kicking/banning
 
-- Host on double click with this chosen map
-
 - Alright we really need to sort out how custom maps are stored on the server
     - 1) Separate official/custom maps on hypersomnia.xyz
     - 2) Keep official ones immutably in content/arenas

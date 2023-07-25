@@ -307,6 +307,9 @@ bool projects_list_tab_state::perform_list(
 			});
 
 			if (ImGui::Selectable("##Entry", is_selected, ImGuiSelectableFlags_SpanAllColumns, selectable_size)) {
+			}
+
+			if (ImGui::IsItemClicked()) {
 				selected_arena_path = path;
 			}
 

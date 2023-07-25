@@ -1402,6 +1402,13 @@ work_result work(const int argc, const char* const * const argv) try {
 				}
 			);
 		}
+
+		if (map_catalogue_gui.open_host_window.has_value()) {
+			config.server.arena = *map_catalogue_gui.open_host_window;
+			start_server_gui.open();
+
+			map_catalogue_gui.open_host_window = std::nullopt;
+		}
 	};
 
 	auto perform_start_client = [&](const auto frame_num) {

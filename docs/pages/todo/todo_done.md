@@ -6404,3 +6404,5 @@ This will discard your redo history."
 - also fix that autosave.json scheme
 - Per-mode layer activation/deactivation
 
+- Host on double click with this chosen map
+
