@@ -109,6 +109,9 @@ struct editor_project {
 	editor_layer* find_layer(const editor_layer_id& id);
 	const editor_layer* find_layer(const editor_layer_id& id) const;
 
+	editor_layer* find_layer(const std::string& name);
+	editor_layer_id find_layer_id(const std::string& name) const;
+
 	bool recount_references(const O& officials, bool recount_officials) const;
 	bool mark_changed_resources(const editor_official_resource_map& officials_map) const;
 

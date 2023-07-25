@@ -64,8 +64,49 @@ namespace augs {
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/project/editor_project.h"
 #include "application/setups/editor/project/editor_project.hpp"
-#include "application/setups/editor/project/editor_project_readwrite.h"
 
+namespace augs {
+	/* 
+		This is ugly-ass but will only be used for layer id i/o,
+		layers can be serialized first because they have no dependencies
+	*/
+
+	auto*& written_editor_project() {
+		thread_local const editor_project* project = nullptr;
+		return project;
+	}
+
+	auto*& read_editor_project() {
+		thread_local editor_project* project = nullptr;
+		return project;
+	}
+
+	template <class T>
+	void to_json_value(T& out, const editor_layer_id& from) {
+		if (from.is_set()) {
+			if (const auto layer = written_editor_project()->find_layer(from)) {
+				out.String(layer->unique_name.c_str());
+			}
+		}
+		else {
+			out.Null();
+		}
+	}
+
+	template <class T>
+	void from_json_value(T& from, editor_layer_id& out) {
+		if (from.IsString()) {
+			out = read_editor_project()->find_layer_id(from.GetString());
+		}
+
+		if (from.IsNull() || (from.IsBool() && !from.GetBool())) {
+			out = {};
+		}
+	}
+
+}
+
+#include "application/setups/editor/project/editor_project_readwrite.h"
 #include "application/setups/editor/editor_official_resource_map.hpp"
 #include "application/setups/editor/defaults/editor_game_mode_defaults.h"
 #include "application/setups/editor/defaults/editor_project_defaults.h"
@@ -304,6 +345,9 @@ namespace editor_project_readwrite {
 			If we scanned later, mark_changed_resources could return false positives,
 			because ids are compared by stringified ids when either is set.
 		*/
+
+		/* This pointer will only be used for layer id i/o. */
+		augs::written_editor_project() = std::addressof(project);
 
 		const bool any_external_resources_to_track = project.rescan_resources_to_track(officials, officials_map);
 
@@ -788,6 +832,9 @@ namespace editor_project_readwrite {
 
 		editor_project loaded;
 
+		/* This pointer will only be used for layer id i/o. */
+		augs::read_editor_project() = std::addressof(loaded);
+
 		auto resource_map = officials_map.create_name_to_id_map();
 		auto mode_map = modes_map();
 
@@ -895,14 +942,12 @@ namespace editor_project_readwrite {
 				editor_game_mode_resource new_game_mode;
 				::setup_game_mode_defaults(new_game_mode.editable, officials_map);
 
-				auto read_into = [&](auto& specific_game_mode) {
-					augs::read_json(mode.value, specific_game_mode);
-				};
+				augs::read_json(mode.value, new_game_mode.editable.common);
 
 				auto try_read = [&]<typename M>(M& into) {
 					if (key == M::get_identifier()) {
 						new_game_mode.type.set<M>();
-						read_into(into);
+						augs::read_json(mode.value, into);
 						return true;
 					}
 
@@ -1367,14 +1412,14 @@ namespace editor_project_readwrite {
 		initialize_project_structs();
 		read_project_structs();
 
-		read_modes();
-		create_all_missing_modes();
-
 		read_external_resources();
 		read_materials();
 
 		read_nodes();
 		read_layers();
+
+		read_modes();
+		create_all_missing_modes();
 
 		unstringify_resource_ids();
 		unstringify_node_ids();

@@ -3,10 +3,22 @@
 #include "game/enums/faction_type.h"
 #include "augs/templates/type_in_list_id.h"
 #include "game/modes/arena_submodes.h"
+#include "application/setups/editor/project/editor_layer_id.h"
 
 struct editor_firearm_resource;
 struct editor_melee_resource;
 struct editor_explosive_resource;
+
+struct editor_mode_common {
+	static constexpr bool json_serialize_in_parent = true;
+
+	// GEN INTROSPECTOR struct editor_mode_common
+	std::vector<editor_layer_id> activate_layers;
+	std::vector<editor_layer_id> deactivate_layers;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const editor_mode_common&) const = default;
+};
 
 struct editor_requested_equipment {
 	// GEN INTROSPECTOR struct editor_requested_equipment
@@ -118,6 +130,8 @@ struct editor_quick_test_mode {
 
 struct editor_game_mode_resource_editable {
 	// GEN INTROSPECTOR struct editor_game_mode_resource_editable
+	editor_mode_common common;
+
 	editor_quick_test_mode quick_test;
 	editor_bomb_defusal_mode bomb_defusal;
 	editor_gun_game_mode gun_game;

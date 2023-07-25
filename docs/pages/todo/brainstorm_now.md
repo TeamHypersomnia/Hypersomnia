@@ -6,10 +6,31 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Server might choose a map whose new version is available
+    - Might happen when hosting from the main menu..
+    - ..or during gameplay
+    - in both cases we can just have an std::future that switches to the new map once it's completed
+        - and simply prevent choose_arena from choosing this map
+        - in which case, if it's hosted from the main menu, it'd go to the test scene
+    - However we need to check if a new version is available and that takes a bit
+        - So we'd like to always switch to the new map preemptively, maybe at least when hosting
+        - and then run the updater in the background, the files will have been loaded anyway
+        - while we check for the new version, prevent direct udp download?
+        - in this case we'd like to avoid checking for hash when client downloads externally, because the external provider will be the source of truth
+- Syncing maps (even manually through RCON) might break existing UDP download sessions
+    - We either:
+        - Load all files to memory per hash but it will grow dangerously
+        - Prevent syncing any files until no udp download sessions are live
+            - Only problematic until we implement kicking/banning
+
 - Host on double click with this chosen map
 
-- remove official maps from the in-game catalogue
-- also fix that autosave.json scheme
+- Alright we really need to sort out how custom maps are stored on the server
+    - 1) Separate official/custom maps on hypersomnia.xyz
+    - 2) Keep official ones immutably in content/arenas
+    - 3) Keep custom ones in user/downloads/arenas and point the php page to it
+        - Doesn't matter if it's in .config or whatever, we'll just need to copy it around per each update somehow
+    - For custom servers it sorta works out of the box since they don't serve the php page
 
 - maybe migrate server to appimage after all
     - but we'll still have a problem with syncing the new config force lua from the repo

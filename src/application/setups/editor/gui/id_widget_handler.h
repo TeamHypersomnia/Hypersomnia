@@ -1,6 +1,7 @@
 #pragma once
 #include "application/setups/editor/gui/widgets/resource_chooser.h"
 #include "application/setups/editor/gui/widgets/node_chooser.h"
+#include "application/setups/editor/gui/widgets/layer_chooser.h"
 #include "application/setups/editor/detail/is_editor_typed_resource.h"
 #include "application/setups/editor/detail/is_editor_typed_node.h"
 
@@ -11,7 +12,8 @@ struct id_widget_handler {
 
 	template <class T>
 	static constexpr bool handles = 
-		is_editor_typed_resource_id_v<T>
+		std::is_same_v<T, editor_layer_id>
+		|| is_editor_typed_resource_id_v<T>
 		|| is_editor_typed_node_id_v<T>
 	;
 
@@ -35,7 +37,28 @@ struct id_widget_handler {
 
 		static_assert(handles<T>);
 
-		if constexpr(is_editor_typed_resource_id_v<T>) {
+		if constexpr(std::is_same_v<T, editor_layer_id>) {
+			auto layer = setup.find_layer(property);
+			const auto displayed_resource_name = layer ? layer->get_display_name() : none_label;
+
+			thread_local layer_chooser chooser;
+
+			chooser.perform(
+				label,
+				displayed_resource_name,
+				property,
+				setup,
+				allow_none,
+				[&](const editor_layer_id& chosen_id, const auto& chosen_name) {
+					result = typesafe_sprintf("Changed layer to %x", chosen_name);
+					modified = true;
+					property = chosen_id;
+				},
+				[](auto&&...) { return true; },
+				none_label
+			);
+		}
+		else if constexpr(is_editor_typed_resource_id_v<T>) {
 			auto resource = setup.find_resource(property);
 			const auto displayed_resource_name = resource ? resource->get_display_name() : none_label;
 

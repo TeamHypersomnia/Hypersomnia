@@ -2179,6 +2179,138 @@ EDIT_FUNCTION(
 	std::string result;
 	bool last_result = false;
 
+	if (auto scope = augs::imgui::scoped_tree_node_ex("Layers")) {
+		if (auto scope = augs::imgui::scoped_tree_node_ex("Activate")) {
+			bool progressions_different = false;
+
+			for (auto& e : es) {
+				if (!(insp.common.activate_layers == e.after.common.activate_layers)) {
+					progressions_different = true;
+				}
+			}
+
+			if (ImGui::Button("Add layer")) {
+				insp.common.activate_layers.push_back({});
+				result = "New entry in %x";
+
+				for (auto& e : es) {
+					auto& lc = e.after.common.activate_layers;
+					lc.push_back({});
+				}
+			}
+
+			auto cols = maybe_different_value_cols({}, progressions_different);
+
+			std::optional<std::size_t> removed_i;
+
+			for (auto& prog : insp.common.activate_layers) {
+				const auto idx = index_in(insp.common.activate_layers, prog);
+
+				auto id_but = typesafe_sprintf("-##Elem%x", idx);
+				const auto id_str = typesafe_sprintf("Element%x", idx);
+				auto this_scope = scoped_id(id_str.c_str());
+
+				if (ImGui::Button(id_but.c_str())) {
+					removed_i = idx;
+				}
+
+				ImGui::SameLine();
+
+				auto write_to_others = [&]() {
+					for (auto& e : es) {
+						auto& lc = e.after.common.activate_layers;
+
+						if (idx < lc.size()) {
+							lc[idx] = prog;
+						}
+					}
+				};
+
+				special_handler.allow_none = false;
+				auto label = typesafe_sprintf("Level %x", idx);
+				if (edit_property(result, label, special_handler, prog)) write_to_others();
+				special_handler.allow_none = true;
+			}
+
+			if (removed_i) {
+				for (auto& e : es) {
+					auto& lc = e.after.common.activate_layers;
+
+					if (*removed_i < lc.size()) {
+						lc.erase(lc.begin() + *removed_i);
+					}
+				}
+
+				result = typesafe_sprintf("Removed entry %x from %x", *removed_i);
+			}
+		}
+
+		if (auto scope = augs::imgui::scoped_tree_node_ex("Deactivate")) {
+			bool progressions_different = false;
+
+			for (auto& e : es) {
+				if (!(insp.common.deactivate_layers == e.after.common.deactivate_layers)) {
+					progressions_different = true;
+				}
+			}
+
+			if (ImGui::Button("Add layer")) {
+				insp.common.deactivate_layers.push_back({});
+				result = "New entry in %x";
+
+				for (auto& e : es) {
+					auto& lc = e.after.common.deactivate_layers;
+					lc.push_back({});
+				}
+			}
+
+			auto cols = maybe_different_value_cols({}, progressions_different);
+
+			std::optional<std::size_t> removed_i;
+
+			for (auto& prog : insp.common.deactivate_layers) {
+				const auto idx = index_in(insp.common.deactivate_layers, prog);
+
+				auto id_but = typesafe_sprintf("-##Elem%x", idx);
+				const auto id_str = typesafe_sprintf("Element%x", idx);
+				auto this_scope = scoped_id(id_str.c_str());
+
+				if (ImGui::Button(id_but.c_str())) {
+					removed_i = idx;
+				}
+
+				ImGui::SameLine();
+
+				auto write_to_others = [&]() {
+					for (auto& e : es) {
+						auto& lc = e.after.common.deactivate_layers;
+
+						if (idx < lc.size()) {
+							lc[idx] = prog;
+						}
+					}
+				};
+
+				special_handler.allow_none = false;
+				auto label = typesafe_sprintf("Level %x", idx);
+				if (edit_property(result, label, special_handler, prog)) write_to_others();
+				special_handler.allow_none = true;
+			}
+
+			if (removed_i) {
+				for (auto& e : es) {
+					auto& lc = e.after.common.deactivate_layers;
+
+					if (*removed_i < lc.size()) {
+						lc.erase(lc.begin() + *removed_i);
+					}
+				}
+
+				result = typesafe_sprintf("Removed entry %x from %x", *removed_i);
+			}
+		}
+	}
+
 	auto edit = [&]<typename I>(const I&) {
 		if constexpr(std::is_same_v<I, editor_quick_test_mode>) {
 			MULTIPROPERTY("Respawn time (ms)", quick_test.respawn_time_ms);

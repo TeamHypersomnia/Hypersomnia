@@ -1759,13 +1759,7 @@ const editor_layer* editor_setup::find_layer(const editor_layer_id& id) const {
 }
 
 editor_layer* editor_setup::find_layer(const std::string& name) {
-	for (auto& layer : project.layers.pool) {
-		if (layer.unique_name == name) {
-			return std::addressof(layer);
-		}
-	}
-
-	return nullptr;
+	return project.find_layer(name);
 }
 
 const editor_layer* editor_setup::find_layer(const std::string& name) const {
@@ -3209,7 +3203,23 @@ void editor_setup::start_playtesting() {
 		return;
 	}
 
+	bool needs_rebuild = false;
+
 	if (project.settings.include_disabled_nodes) {
+		needs_rebuild = true;
+	}
+
+	if (auto mode = project.get_game_modes().find(project.playtesting.mode.raw)) {
+		if (mode->editable.common.activate_layers.size() > 0) {
+			needs_rebuild = true;
+		}
+
+		if (mode->editable.common.deactivate_layers.size() > 0) {
+			needs_rebuild = true;
+		}
+	}
+
+	if (needs_rebuild) {
 		rebuild_arena(false);
 	}
 

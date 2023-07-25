@@ -6397,3 +6397,10 @@ This will discard your redo history."
 - esc in project selector goes straight to main menu and editor has just quit to projects
 - banlist for notifications
 
+- remove official maps from the in-game catalogue
+- also fix that autosave.json scheme
+
+- remove official maps from the in-game catalogue
+- also fix that autosave.json scheme
+- Per-mode layer activation/deactivation
+

@@ -78,6 +78,31 @@ inline editor_layer* editor_project::find_layer(const editor_layer_id& id) {
 inline const editor_layer* editor_project::find_layer(const editor_layer_id& id) const {
 	return layers.pool.find(id);
 }
+
+inline editor_layer* editor_project::find_layer(const std::string& name) {
+	for (auto& layer : layers.pool) {
+		if (layer.unique_name == name) {
+			return std::addressof(layer);
+		}
+	}
+
+	return nullptr;
+}
+
+inline editor_layer_id editor_project::find_layer_id(const std::string& name) const {
+	editor_layer_id found;
+
+	layers.pool.for_each_id_and_object(
+		[&](const auto& id, const auto& object) {
+			if (object.unique_name == name) {
+				found = id;
+			}
+		}
+	);
+
+	return found;
+}
+
 template <class R, class F>
 void editor_project::for_each_resource(F&& callback) const {
 	resources.template get_pool_for<R>().for_each_id_and_object(
