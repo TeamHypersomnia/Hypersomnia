@@ -13,10 +13,14 @@ template<typename T, typename... A>
 void typesafe_sprintf_detail(std::size_t starting_pos, std::string& target_str, T&& val, A&& ...a) {
 	starting_pos = target_str.find('%', starting_pos);
 
-	if (starting_pos != std::string::npos) {
+	while (starting_pos != std::string::npos) {
 		std::ostringstream replacement;
 
 		auto num_special_letters = 0u;
+
+		if (starting_pos + 1 >= target_str.length()) {
+			return;
+		}
 
 		if (const auto opcode = target_str[starting_pos + 1];
 			opcode == 'x'
@@ -26,7 +30,7 @@ void typesafe_sprintf_detail(std::size_t starting_pos, std::string& target_str, 
 		else {
 			constexpr auto max_special_letters = 2u;
 
-			while (num_special_letters < max_special_letters) {
+			while (num_special_letters < max_special_letters && starting_pos + 1 + num_special_letters < target_str.length()) {
 				const auto opcode = target_str[starting_pos + 1 + num_special_letters];
 				
 				bool understood_op = true;
@@ -68,6 +72,11 @@ void typesafe_sprintf_detail(std::size_t starting_pos, std::string& target_str, 
 				num_chars_to_replace,
 				replacement.str()
 			);
+
+			break;
+		}
+		else {
+			starting_pos = target_str.find('%', starting_pos + 1);
 		}
 	}
 
