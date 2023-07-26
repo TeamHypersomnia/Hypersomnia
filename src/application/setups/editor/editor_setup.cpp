@@ -155,7 +155,7 @@ editor_setup::editor_setup(
 
 			simple_popup new_autosave_popup;
 
-			new_autosave_popup.title = "SUCCESS!";
+			new_autosave_popup.title = "SUCCESS";
 			new_autosave_popup.warning_notice_above = "Converted legacy autosave.json filenames.";
 			new_autosave_popup.message = "No further action is required.";
 
@@ -203,7 +203,7 @@ editor_setup::editor_setup(
 			autosaved_project->meta.name = paths.arena_name;
 
 			simple_popup new_autosave_popup;
-			new_autosave_popup.title = "WARNING!";
+			new_autosave_popup.title = "WARNING";
 
 			replace_whole_project_command cmd;
 			cmd.after = std::move(autosaved_project);
@@ -877,7 +877,7 @@ void editor_setup::rescan_physical_filesystem() {
 			details += "\n\n";
 		}
 
-		ignored_popup.title = "Invalid filenames detected!";
+		ignored_popup.title = "Invalid filenames detected";
 		ignored_popup.message = summary;
 		ignored_popup.details = details;
 

@@ -96,6 +96,10 @@ public:
 	std::optional<std::string> get_error() const;
 };
 
+class headless_map_catalogue {
+
+};
+
 class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_state> {
 	std::vector<map_catalogue_entry> map_list;
 	std::future<std::vector<map_catalogue_entry>> future_response;
@@ -130,7 +134,7 @@ class map_catalogue_gui_state : public standard_window_mixin<map_catalogue_gui_s
 
 	bool refresh_in_progress() const;
 	bool list_refresh_in_progress() const;
-	void refresh(map_catalogue_input);
+	void refresh(address_string_type);
 
 	void rescan_official_arenas();
 
@@ -157,5 +161,5 @@ public:
 
 	bool is_downloading() const { return downloading.has_value(); }
 
-	std::optional<std::string> open_host_window;
+	std::optional<std::string> open_host_server_window;
 };

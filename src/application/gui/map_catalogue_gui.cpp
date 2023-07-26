@@ -507,7 +507,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 			ImGui::Selectable("##Entry", !is_downloading, ImGuiSelectableFlags_SpanAllColumns, selectable_size);
 
 			auto do_host = [&]() {
-				open_host_window = arena_name;
+				open_host_server_window = arena_name;
 			};
 
 			auto do_update = [&]() {
@@ -706,7 +706,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 	if (!refreshed_once) {
 		refreshed_once = true;
-		refresh(in);
+		refresh(in.external_arena_files_provider);
 	}
 
 	if (downloading.has_value()) {
@@ -730,6 +730,8 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 	if (valid_and_is_ready(future_response)) {
 		map_list = future_response.get();
+
+		should_rescan = false;
 		focus_on_filter_once = true;
 
 		request_miniatures(in);
@@ -746,7 +748,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 		if (ImGui::IsItemDeactivatedAfterEdit()) {
 			modified = true;
-			refresh(in);
+			refresh(in.external_arena_files_provider);
 		}
 	}
 
@@ -756,7 +758,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		auto scope = maybe_disabled_cols({}, refresh_in_progress());
 
 		if (ImGui::Button("Refresh")) {
-			refresh(in);
+			refresh(in.external_arena_files_provider);
 		}
 	}
 
@@ -1036,6 +1038,8 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 			popup.title = "Failed to download maps";
 			popup.message = *error;
 
+			LOG_NOFORMAT(popup.make_log());
+
 			download_failed_popup = popup;
 		}
 
@@ -1055,7 +1059,7 @@ bool map_catalogue_gui_state::refresh_in_progress() const {
 	return list_refresh_in_progress() || future_downloaded_miniatures.valid();
 }
 
-void map_catalogue_gui_state::refresh(const map_catalogue_input in) {
+void map_catalogue_gui_state::refresh(const address_string_type address) {
 	using namespace httplib;
 	using namespace httplib_utils;
 
@@ -1070,7 +1074,7 @@ void map_catalogue_gui_state::refresh(const map_catalogue_input in) {
 	last_error = {};
 
 	future_response = launch_async(
-		[this, officials = this->official_names, address = in.external_arena_files_provider]() -> std::vector<map_catalogue_entry> {
+		[&last_error = this->last_error, officials = this->official_names, address]() -> std::vector<map_catalogue_entry> {
 			if (const auto parsed = parsed_url(address); parsed.valid()) {
 				const auto ca_path = CA_CERT_PATH;
 				auto client = http_client_type(parsed.host);
@@ -1120,8 +1124,7 @@ void map_catalogue_gui_state::refresh(const map_catalogue_input in) {
 						r.short_description = sanitize_arena_short_description(r.short_description);
 					}
 
-					rescan_versions_on_disk(result);
-					should_rescan = false;
+					map_catalogue_gui_state::rescan_versions_on_disk(result);
 
 					return result;
 				}

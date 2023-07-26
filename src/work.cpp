@@ -109,6 +109,7 @@
 
 #include "application/main/self_updater.h"
 #include "application/setups/editor/packaged_official_content.h"
+#include "augs/string/parse_url.h"
 #include "work_result.h"
 
 std::function<void()> ensure_handler;
@@ -642,6 +643,32 @@ work_result work(const int argc, const char* const * const argv) try {
 
 	if (params.type == app_type::DEDICATED_SERVER) {
 		LOG("Starting the dedicated server at port: %x", chosen_server_port());
+
+		{
+			bool sync = false;
+
+			if (config.server.sync_all_external_maps_on_startup) {
+				LOG("sync_all_external_maps_on_startup specified.");
+				sync = true;
+			}
+			else if (params.sync_external_maps) {
+				LOG("--sync-external-maps specified.");
+				sync = true;
+			}
+
+			if (sync) {
+				const auto& provider = config.server.external_arena_files_provider;
+
+				if (const auto parsed = parsed_url(provider); parsed.valid()) {
+					LOG("Syncing all maps from %x.", provider);
+
+
+				}
+				else {
+					LOG("Couldn't parse: \"%x\". Aborting sync.", provider);
+				}
+			}
+		}
 
 		auto handle_sigint = [&]() {
 #if PLATFORM_UNIX
@@ -1403,11 +1430,11 @@ work_result work(const int argc, const char* const * const argv) try {
 			);
 		}
 
-		if (map_catalogue_gui.open_host_window.has_value()) {
-			config.server.arena = *map_catalogue_gui.open_host_window;
+		if (map_catalogue_gui.open_host_server_window.has_value()) {
+			config.server.arena = *map_catalogue_gui.open_host_server_window;
 			start_server_gui.open();
 
-			map_catalogue_gui.open_host_window = std::nullopt;
+			map_catalogue_gui.open_host_server_window = std::nullopt;
 		}
 	};
 

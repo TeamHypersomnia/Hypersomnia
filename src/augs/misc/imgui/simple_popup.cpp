@@ -41,6 +41,10 @@ simple_popup simple_popup::sum_all(const std::vector<simple_popup>& popups) {
 	return result;
 }
 
+std::string simple_popup::make_log() const {
+	return title + ": " + message;
+}
+
 int simple_popup::perform(const std::vector<button>& buttons) {
 	using namespace augs::imgui;
 

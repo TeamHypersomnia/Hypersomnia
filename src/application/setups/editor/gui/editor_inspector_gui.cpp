@@ -2227,7 +2227,7 @@ EDIT_FUNCTION(
 				};
 
 				special_handler.allow_none = false;
-				auto label = typesafe_sprintf("Level %x", idx);
+				auto label = typesafe_sprintf("Layer %x", idx);
 				if (edit_property(result, label, special_handler, prog)) write_to_others();
 				special_handler.allow_none = true;
 			}
@@ -2292,7 +2292,7 @@ EDIT_FUNCTION(
 				};
 
 				special_handler.allow_none = false;
-				auto label = typesafe_sprintf("Level %x", idx);
+				auto label = typesafe_sprintf("Layer %x", idx);
 				if (edit_property(result, label, special_handler, prog)) write_to_others();
 				special_handler.allow_none = true;
 			}

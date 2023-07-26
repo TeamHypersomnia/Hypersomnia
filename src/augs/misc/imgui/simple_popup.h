@@ -20,4 +20,5 @@ struct simple_popup {
 
 	bool details_expanded = false;
 	int perform(const std::vector<button>& buttons = {});
+	std::string make_log() const;
 };
