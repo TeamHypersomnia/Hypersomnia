@@ -27,7 +27,24 @@
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
 
-void map_catalogue_gui_state::rescan_official_arenas() {
+editor_project_meta read_meta_from(const augs::path_type& arena_folder_path);
+
+static void rescan_versions_on_disk(std::vector<map_catalogue_entry>& into) {
+	const auto downloads_directory = augs::path_type(DOWNLOADED_ARENAS_DIR);
+
+	for (auto& m : into) {
+		try {
+			const auto path = downloads_directory / m.name;
+
+			m.version_on_disk = read_meta_from(path).version_timestamp;
+		}
+		catch (...) {
+			m.version_on_disk = std::nullopt;
+		}
+	}
+}
+
+void headless_map_catalogue::rescan_official_arenas() {
 	official_names.clear();
 
 	auto register_arena = [&](const auto& path) {
@@ -145,6 +162,22 @@ std::optional<std::string> multi_arena_synchronizer::get_error() const {
 	return last_error;
 }
 
+std::optional<std::string> multi_arena_synchronizer::get_current_map_name() const {
+	if (current_map < input.size()) {
+		return input[current_map].name;
+	}
+
+	return std::nullopt;
+}
+
+float multi_arena_synchronizer::get_current_map_progress() const {
+	if (data->current_session.has_value()) {
+		return session().get_total_percent_complete(get_current_file_percent_complete());
+	}
+
+	return 1.0f;
+}
+
 float multi_arena_synchronizer::get_total_progress() const {
 	std::size_t all = 0;
 	float total = 0.0f;
@@ -161,11 +194,13 @@ float multi_arena_synchronizer::get_total_progress() const {
 	return total / all;
 }
 
-map_catalogue_gui_state::map_catalogue_gui_state(const std::string& title) : base(title)
-{
+headless_map_catalogue::headless_map_catalogue() {
 	rescan_official_arenas();
 }
 
+headless_map_catalogue::~headless_map_catalogue() = default;
+
+map_catalogue_gui_state::map_catalogue_gui_state(const std::string& title) : base(title) {}
 map_catalogue_gui_state::~map_catalogue_gui_state() = default;
 
 std::mutex miniature_mutex;
@@ -174,14 +209,14 @@ void map_catalogue_gui_state::request_miniatures(const map_catalogue_input in) {
 	using namespace httplib_utils;
 
 	completed_miniatures.clear();
-	completed_miniatures.resize(map_list.size());
+	completed_miniatures.resize(headless.get_map_list().size());
 
 	has_next_miniature.store(0);
 
 	future_downloaded_miniatures = launch_async([
 		&miniature_counter = this->has_next_miniature,
 		&result = this->completed_miniatures,
-		for_maps = this->map_list,
+		&for_maps = this->headless.get_map_list(),
 		address = in.external_arena_files_provider
 	]() {
 			if (const auto parsed = parsed_url(address); parsed.valid()) {
@@ -273,6 +308,8 @@ std::optional<std::vector<ad_hoc_atlas_subject>> map_catalogue_gui_state::get_ne
 			last_miniatures = completed_miniatures;
 		}
 
+		const auto& map_list = headless.get_map_list();
+
 		if (last_miniatures.size() != map_list.size()) {
 			LOG_NVPS(last_miniatures.size(), map_list.size());
 		}
@@ -296,25 +333,8 @@ std::optional<std::vector<ad_hoc_atlas_subject>> map_catalogue_gui_state::get_ne
 	return std::nullopt;
 }
 
-editor_project_meta read_meta_from(const augs::path_type& arena_folder_path);
-
-void map_catalogue_gui_state::rescan_versions_on_disk(std::vector<map_catalogue_entry>& entries) {
-	const auto downloads_directory = augs::path_type(DOWNLOADED_ARENAS_DIR);
-
-	for (auto& m : entries) {
-		try {
-			const auto path = downloads_directory / m.name;
-
-			m.version_on_disk = read_meta_from(path).version_timestamp;
-		}
-		catch (...) {
-			m.version_on_disk = std::nullopt;
-		}
-	}
-}
-
-void map_catalogue_gui_state::rescan_versions_on_disk() {
-	rescan_versions_on_disk(map_list);
+void headless_map_catalogue::rescan_versions_on_disk() {
+	::rescan_versions_on_disk(map_list);
 }
 
 std::string sanitize_arena_short_description(std::string in);
@@ -394,17 +414,21 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 	std::unordered_map<std::string, float> progress_of;
 
-	if (downloading.has_value()) {
-		downloading->for_each_with_progress(
-			[&](const auto& name, const float progress) {
-				progress_of[name] = progress;
-			}
-		);
+	{
+		const auto& downloading = headless.get_downloading();
+
+		if (downloading.has_value()) {
+			downloading->for_each_with_progress(
+				[&](const auto& name, const float progress) {
+					progress_of[name] = progress;
+				}
+			);
+		}
 	}
 
 	std::size_t display_idx = 0;
 
-	auto process_entry = [&](auto& entry) {
+	auto process_entry = [&](const auto& entry) {
 		entry.last_displayed_index = display_idx++;
 
 		const auto arena_name = entry.name;
@@ -434,7 +458,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 			maybe_progress = nullptr;
 		}
 
-		const bool is_downloading = maybe_progress != nullptr;
+		const bool downloading_this_map = maybe_progress != nullptr;
 
 		const auto local_pos = ImGui::GetCursorPos();
 
@@ -504,7 +528,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 			auto darkened_selectables = scoped_selectable_colors(selectable_cols);
 
-			ImGui::Selectable("##Entry", !is_downloading, ImGuiSelectableFlags_SpanAllColumns, selectable_size);
+			ImGui::Selectable("##Entry", !downloading_this_map, ImGuiSelectableFlags_SpanAllColumns, selectable_size);
 
 			auto do_host = [&]() {
 				open_host_server_window = arena_name;
@@ -650,11 +674,9 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 		}
 	};
 
-	auto& entries = map_list;
-
 	if (sort_by_column == 0) {
 		::in_order_of(
-			entries,
+			headless.get_map_list(),
 			[&](const auto& entry) {
 				return entry.name;
 			},
@@ -666,7 +688,7 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	}
 	else {
 		::in_order_of(
-			entries,
+			headless.get_map_list(),
 			[&](const auto& entry) {
 				return entry.version_timestamp;
 			},
@@ -680,8 +702,60 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 	ImGui::Columns(1);
 }
 
-void map_catalogue_gui_state::request_rescan() {
+
+void headless_map_catalogue::request_rescan() {
 	should_rescan = true;
+}
+
+void map_catalogue_gui_state::request_rescan() {
+	headless.request_rescan();
+}
+
+arena_synchronizer_input headless_map_catalogue::launch_download_all(const address_string_type& address) {
+	arena_synchronizer_input downloadable_arenas;
+
+	for (const auto& s : map_list) {
+		if (s.get_state() != S::ON_DISK) {
+			downloadable_arenas.push_back({ s.name, s.version_timestamp, s.last_displayed_index });
+		}
+	}
+
+	sort_range(downloadable_arenas);
+
+	launch_download(downloadable_arenas, parsed_url(address));
+
+	return downloadable_arenas;
+}
+
+headless_catalogue_result headless_map_catalogue::advance(const headless_map_catalogue_input in) {
+	auto result = headless_catalogue_result::IN_PROGRESS;
+
+	if (!refreshed_once) {
+		refreshed_once = true;
+		refresh(in.external_arena_files_provider);
+	}
+
+	if (should_rescan) {
+		should_rescan = false;
+
+		if (!downloading.has_value() && !list_refresh_in_progress()) {
+			LOG("Rescanning map catalogue on disk due to window activate.");
+			rescan_versions_on_disk();
+		}
+	}
+
+	if (downloading.has_value()) {
+		downloading->advance();
+	}
+
+	if (valid_and_is_ready(future_response)) {
+		map_list = future_response.get();
+
+		should_rescan = false;
+		result = headless_catalogue_result::LIST_REFRESH_COMPLETE;
+	}
+
+	return result;
 }
 
 bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
@@ -700,54 +774,31 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		return false;
 	}
 
-	bool modified = false;
+	{
+		const auto advance_result = headless.advance(in.make_headless());
 
-	const auto couldnt_download = std::string("Couldn't download the server list.\n");
+		if (advance_result == headless_catalogue_result::LIST_REFRESH_COMPLETE) {
+			focus_on_filter_once = true;
 
-	if (!refreshed_once) {
-		refreshed_once = true;
-		refresh(in.external_arena_files_provider);
-	}
-
-	if (downloading.has_value()) {
-		downloading->advance();
-	}
-
-	if (should_rescan) {
-		should_rescan = false;
-
-		if (!downloading.has_value() && !refresh_in_progress()) {
-			LOG("Rescanning map catalogue on disk due to window activate.");
-			rescan_versions_on_disk();
+			request_miniatures(in);
 		}
-	}
-
-	if (download_failed_popup.has_value()) {
-		if (download_failed_popup->perform()) {
-			download_failed_popup = std::nullopt;
-		}
-	}
-
-	if (valid_and_is_ready(future_response)) {
-		map_list = future_response.get();
-
-		should_rescan = false;
-		focus_on_filter_once = true;
-
-		request_miniatures(in);
 	}
 
 	if (valid_and_is_ready(future_downloaded_miniatures)) {
 		future_downloaded_miniatures.get();
 	}
 
+	bool address_modified = false;
+
 	{
+		auto scope = maybe_disabled_cols({}, refresh_in_progress() || is_downloading());
+
 		if (input_text("Provider", in.external_arena_files_provider)) {
 
 		}
 
 		if (ImGui::IsItemDeactivatedAfterEdit()) {
-			modified = true;
+			address_modified = true;
 			refresh(in.external_arena_files_provider);
 		}
 	}
@@ -755,17 +806,19 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 	{
 		ImGui::SameLine();
 
-		auto scope = maybe_disabled_cols({}, refresh_in_progress());
+		auto scope = maybe_disabled_cols({}, refresh_in_progress() || is_downloading());
 
 		if (ImGui::Button("Refresh")) {
 			refresh(in.external_arena_files_provider);
 		}
 	}
 
-	if (list_refresh_in_progress()) {
+	if (headless.list_refresh_in_progress()) {
 		text_color("Downloading catalogue...", yellow);
 	}
 	else {
+		const auto last_error = headless.get_list_catalogue_error();
+
 		if (last_error.size() > 0) {
 			text_color("Failed to download the catalogue.\n", red);
 			text_color(last_error, red);
@@ -779,7 +832,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 			if (ImGui::Button("Select all")) {
 				bool all_selected_already = true;
 
-				for (auto& entry : map_list) {
+				for (auto& entry : headless.get_map_list()) {
 					if (entry.passed_filter) {
 						const auto entry_id = std::addressof(entry);
 						const bool is_selected = found_in(selected_arenas, entry_id);
@@ -792,7 +845,7 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 					}
 				}
 
-				for (auto& entry : map_list) {
+				for (auto& entry : headless.get_map_list()) {
 					const auto entry_id = std::addressof(entry);
 
 					if (entry.passed_filter) {
@@ -904,6 +957,8 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 			};
 
 			const auto icon = assets::necessary_image_id::DOWNLOAD_ICON;
+
+			const auto& downloading = headless.get_downloading();
 
 			if (downloading.has_value()) {
 				auto cols = maybe_disabled_cols({}, true);
@@ -1024,13 +1079,25 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 					if (should_download || launch_download_on_last_selected) {
 						launch_download_on_last_selected = false;
-						downloading.emplace(downloadable_arenas, parsed_url(in.external_arena_files_provider));
+						headless.launch_download(downloadable_arenas, parsed_url(in.external_arena_files_provider));
 					}
 				}
 			}
 		}
 	}
 
+	headless.finalize_download();
+
+	if (headless.download_failed_popup.has_value()) {
+		if (headless.download_failed_popup->perform()) {
+			headless.download_failed_popup = std::nullopt;
+		}
+	}
+
+	return address_modified;
+}
+
+bool headless_map_catalogue::finalize_download() {
 	if (downloading.has_value() && downloading->finished()) {
 		if (const auto error = downloading->get_error()) {
 			auto popup = simple_popup();
@@ -1046,35 +1113,45 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 		downloading = std::nullopt;
 		rescan_versions_on_disk();
 		should_rescan = false;
+
+		return true;
 	}
 
-	return modified;
+	return false;
 }
 
-bool map_catalogue_gui_state::list_refresh_in_progress() const {
+bool headless_map_catalogue::list_refresh_in_progress() const {
 	return future_response.valid();
 }
 
 bool map_catalogue_gui_state::refresh_in_progress() const {
-	return list_refresh_in_progress() || future_downloaded_miniatures.valid();
+	return headless.list_refresh_in_progress() || future_downloaded_miniatures.valid();
 }
 
 void map_catalogue_gui_state::refresh(const address_string_type address) {
-	using namespace httplib;
-	using namespace httplib_utils;
-
 	if (refresh_in_progress()) {
 		return;
 	}
 
-	map_list.clear();
 	selected_arenas.clear();
 	last_selected = nullptr;
 
-	last_error = {};
+	headless.refresh(address);
+}
+
+void headless_map_catalogue::refresh(const address_string_type address) {
+	using namespace httplib;
+	using namespace httplib_utils;
+
+	if (downloading.has_value() || list_refresh_in_progress()) {
+		return;
+	}
+
+	map_list.clear();
+	list_catalogue_error = {};
 
 	future_response = launch_async(
-		[&last_error = this->last_error, officials = this->official_names, address]() -> std::vector<map_catalogue_entry> {
+		[&last_error = this->list_catalogue_error, officials = this->official_names, address]() -> std::vector<map_catalogue_entry> {
 			if (const auto parsed = parsed_url(address); parsed.valid()) {
 				const auto ca_path = CA_CERT_PATH;
 				auto client = http_client_type(parsed.host);
@@ -1124,7 +1201,7 @@ void map_catalogue_gui_state::refresh(const address_string_type address) {
 						r.short_description = sanitize_arena_short_description(r.short_description);
 					}
 
-					map_catalogue_gui_state::rescan_versions_on_disk(result);
+					::rescan_versions_on_disk(result);
 
 					return result;
 				}
@@ -1143,4 +1220,3 @@ void map_catalogue_gui_state::refresh(const address_string_type address) {
 		}
 	);
 }
-

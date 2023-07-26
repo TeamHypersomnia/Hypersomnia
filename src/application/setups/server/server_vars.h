@@ -98,7 +98,7 @@ struct server_vars {
 
 	bool shutdown_after_first_match = false;
 
-	bool sync_all_external_maps_on_startup = false;
+	bool sync_all_external_arenas_on_startup = false;
 	// END GEN INTROSPECTOR
 };
 

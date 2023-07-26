@@ -644,32 +644,6 @@ work_result work(const int argc, const char* const * const argv) try {
 	if (params.type == app_type::DEDICATED_SERVER) {
 		LOG("Starting the dedicated server at port: %x", chosen_server_port());
 
-		{
-			bool sync = false;
-
-			if (config.server.sync_all_external_maps_on_startup) {
-				LOG("sync_all_external_maps_on_startup specified.");
-				sync = true;
-			}
-			else if (params.sync_external_maps) {
-				LOG("--sync-external-maps specified.");
-				sync = true;
-			}
-
-			if (sync) {
-				const auto& provider = config.server.external_arena_files_provider;
-
-				if (const auto parsed = parsed_url(provider); parsed.valid()) {
-					LOG("Syncing all maps from %x.", provider);
-
-
-				}
-				else {
-					LOG("Couldn't parse: \"%x\". Aborting sync.", provider);
-				}
-			}
-		}
-
 		auto handle_sigint = [&]() {
 #if PLATFORM_UNIX
 			if (signal_status != 0) {
@@ -691,6 +665,98 @@ work_result work(const int argc, const char* const * const argv) try {
 			return false;
 
 		};
+
+		{
+			bool sync = false;
+
+			if (config.server.sync_all_external_arenas_on_startup) {
+				LOG("sync_all_external_arenas_on_startup specified.");
+				sync = true;
+			}
+			else if (params.sync_external_arenas) {
+				LOG("--sync-external-arenas specified.");
+				sync = true;
+			}
+
+			if (sync) {
+				const auto& provider = config.server.external_arena_files_provider;
+
+				if (const auto parsed = parsed_url(provider); parsed.valid()) {
+					LOG("External arena provider: %x", provider);
+
+					headless_map_catalogue headless;
+
+					augs::timer last_report;
+
+					auto report_progress = [&]() {
+						if (const auto& dl = headless.get_downloading()) {
+							if (const auto current = dl->get_current_map_name()) {
+								const auto i = dl->get_current_map_index();
+								const auto total = dl->get_total_maps();
+
+								LOG(
+									"Syncing %x (%x/%x): %2f% complete. (Total: %2f%)", 
+									*current, i, total,
+									100 * dl->get_current_map_progress(),
+									100 * dl->get_total_progress()
+								);
+							}
+						}
+					};
+
+					while (true) {
+						if (headless.advance({ provider }) == headless_catalogue_result::LIST_REFRESH_COMPLETE) {
+							const auto last_error = headless.get_list_catalogue_error();
+
+							if (last_error.size() > 0) {
+								LOG("Failed to download the catalogue. Reason:\n%x", last_error);
+								break;
+							}
+							else {
+								const auto all = headless.launch_download_all({ provider });
+
+								if (all.empty()) {
+									LOG("All arenas are up to date. There's nothing to sync.");
+									break;
+								}
+
+								std::string all_report;
+
+								for (const auto& a : all) {
+									all_report += a.name + ", ";
+								}
+
+								if (all_report.size() >= 2) {
+									all_report.pop_back();
+									all_report.pop_back();
+								}
+
+								LOG("Syncing %x arena(s): %x", all.size(), all_report);
+							}
+						}
+
+						if (last_report.get<std::chrono::seconds>() > 0.5) {
+							last_report.reset();
+							report_progress();
+						}
+
+						if (headless.finalize_download()) {
+							LOG("Finished syncing all arenas.");
+							break;
+						}
+
+						if (handle_sigint()) {
+							return work_result::SUCCESS;
+						}
+
+						yojimbo_sleep(1.0 / 1000);
+					}
+				}
+				else {
+					LOG("Couldn't parse arena provider URL: \"%x\". Aborting sync.", provider);
+				}
+			}
+		}
 
 		if (config.server.allow_nat_traversal) {
 			if (nat_detection.has_value()) {

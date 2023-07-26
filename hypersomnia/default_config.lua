@@ -753,6 +753,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     game_mode = "",
 
     external_arena_files_provider = "https://hypersomnia.xyz/arenas",
+    sync_all_external_arenas_on_startup = false,
 
     allow_nat_traversal = true,
 

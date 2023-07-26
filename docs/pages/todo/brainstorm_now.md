@@ -6,6 +6,44 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Editor: Grouping.
+    - Ctrl+G groupizes selection.
+        - Duplicating a group instantiates it.
+        - Can group several entities with a ctrl+g and immediately create instances this way.
+    - Group instance parameters.
+        - Position
+        - Rotation
+        - Colorize (optional)
+        - There's not much
+        - These are the only things visible in the inspector when you inspect a group instance.
+    - (Hard) Editing/customizing grouped subnodes.
+        - Proposal: have a "Groups" dock appear splitting below Layers.
+            - Only groups are visible, can expand them like layers.
+            - The subnodes then are editable.
+            - Would be best to have a full-fledged screen on black background for editing a group.
+                - because then grid will work properly etc
+            - automatically shown when you select a group subnode.
+                - goes back when you select something in Layers
+                    - or just when Layers window activates
+            - And drag-dropping the top-level group instantiates it like a resource.
+            - Groups in this window are sorted by dependencies.
+    - (Hard) Serialization.
+        - Would probably need to serialize them before nodes.
+        - Even though there are nodes inside too, but they are more "virtual"
+
+
+- Fix spawns in gungame mode - they're currently shuffled per-round
+
+- Alright we really need to sort out how custom maps are stored on the server
+    - for now just
+        - symlink user/downloads to ~/community_arenas per each update
+        - page with all downloads etc. should point to ~/community_arenas and say "Community Arenas
+    - ultimately
+        - 1) Separate official/custom maps on hypersomnia.xyz
+        - 2) Keep official ones immutably in content/arenas (done)
+        - 3) Keep custom ones in .config/user/downloads/arenas and point the php page to it (works with .tar.gz too just have to symlink each time)
+        - For custom servers it sorta works out of the box since they don't serve the php page
+
 - Server might choose a map whose new version is available
     - Might happen when hosting from the main menu..
     - ..or during gameplay
@@ -23,12 +61,6 @@ summary: That which we are brainstorming at the moment.
         - Prevent syncing any files until no udp download sessions are live
             - Only problematic until we implement kicking/banning
 
-- Alright we really need to sort out how custom maps are stored on the server
-    - 1) Separate official/custom maps on hypersomnia.xyz
-    - 2) Keep official ones immutably in content/arenas
-    - 3) Keep custom ones in user/downloads/arenas and point the php page to it
-        - Doesn't matter if it's in .config or whatever, we'll just need to copy it around per each update somehow
-    - For custom servers it sorta works out of the box since they don't serve the php page
 
 - maybe migrate server to appimage after all
     - but we'll still have a problem with syncing the new config force lua from the repo

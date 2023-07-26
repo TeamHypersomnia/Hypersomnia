@@ -24,7 +24,7 @@ struct cmd_line_params {
 	bool should_connect = false;
 	bool only_check_update_availability_and_quit = false;
 	bool keep_cwd = false;
-	bool sync_external_maps = false;
+	bool sync_external_arenas = false;
 
 	int test_fp_consistency = -1;
 	std::string connect_address;
@@ -145,8 +145,8 @@ struct cmd_line_params {
 			else if (a == "--live-log") {
 				live_log_path = get_next();
 			}
-			else if (a == "--sync-external-maps") {
-				sync_external_maps = true;
+			else if (a == "--sync-external-arenas") {
+				sync_external_arenas = true;
 			}
 			else {
 
