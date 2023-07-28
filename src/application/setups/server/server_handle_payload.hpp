@@ -390,17 +390,7 @@ message_handler_result server_setup::handle_payload(
 
 			if (file_bytes.empty()) {
 				try {
-					if (found_file->path.extension() == ".json") {
-						const auto str = augs::file_to_string_crlf_to_lf(found_file->path);
-
-						file_bytes.assign(
-							reinterpret_cast<const std::byte*>(str.data()),
-							reinterpret_cast<const std::byte*>(str.data() + str.size())
-						);
-					}
-					else {
-						file_bytes = augs::file_to_bytes(found_file->path);
-					}
+					file_bytes = augs::file_to_bytes(found_file->path);
 				}
 				catch (...) {
 					return kick_file_not_found();
