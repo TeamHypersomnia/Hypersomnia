@@ -210,6 +210,7 @@ message_handler_result server_setup::handle_payload(
 				}
 
 				c.downloading_status = downloading_type::NONE;
+				c.now_downloading_file = std::nullopt;
 
 				/* Prevent kick after the inactivity period */
 
@@ -315,6 +316,64 @@ message_handler_result server_setup::handle_payload(
 		c.meta.stats.download_progress = payload.progress;
 		LOG("Client %x download progress: %x", client_id, float(payload.progress) / 255);
 	}
+	else if constexpr (std::is_same_v<T, ::file_chunks_request_payload>) {
+		if (!c.now_downloading_file.has_value()) {
+			return message_handler_result::CONTINUE;
+		}
+
+		const auto found_file = mapped_or_nullptr(arena_files_database, *c.now_downloading_file);
+
+		if (found_file == nullptr) {
+			return message_handler_result::CONTINUE;
+		}
+
+		for (const auto chunk_index : payload.requests) {
+			if (c.direct_file_chunks_left == 0) {
+				break;
+			}
+
+			--c.direct_file_chunks_left;
+
+			const auto& bytes = found_file->cached_file;
+
+			const auto bytes_n = bytes.size();
+
+			if (bytes_n == 0) {
+				kick(client_id, "Requested file was null.");
+				return abort_v;
+			}
+
+			auto num_all_chunks = bytes_n / file_chunk_size_v;
+
+			if (bytes_n % file_chunk_size_v != 0) {
+				++num_all_chunks;
+			}
+
+			const bool is_last_chunk = chunk_index == num_all_chunks - 1;
+
+			const auto bytes_start = 							std::size_t(chunk_index) * file_chunk_size_v;
+			const auto bytes_end   = is_last_chunk ? bytes_n : (std::size_t(bytes_start) + file_chunk_size_v);
+
+			ensure(bytes_end <= bytes_n);
+
+			const auto bytes_copied = bytes_end - bytes_start;
+
+			file_chunk_packet packet;
+			packet.index = chunk_index;
+			packet.file_hash = *c.now_downloading_file;
+
+			std::memcpy(packet.chunk_bytes.data(), bytes.data() + bytes_start, bytes_copied);
+
+			if (auto s = find_underlying_socket()) {
+				auto address = to_netcode_addr(server->get_client_address(client_id));
+
+				const auto num_packet_bytes = sizeof(packet);
+				// LOG("sending chunk %x to %x (%x bytes). CMD: %x", chunk_index, ::ToString(address), num_packet_bytes, packet.command);
+				auto socket = *s;
+				netcode_socket_send_packet(&socket, &address, reinterpret_cast<void*>(&packet), num_packet_bytes);
+			}
+		}
+	}
 	else if constexpr (std::is_same_v<T, ::request_arena_file_download>) {
 		if (!vars.allow_direct_arena_file_downloads) {
 			kick(client_id, "This server disabled downloading arenas.");
@@ -326,33 +385,35 @@ message_handler_result server_setup::handle_payload(
 			return abort_v;
 		};
 
-		/*
-		   	TODO: Check if the previous file transfer is complete, for security.
-			Should probably check if the channel is empty, and if it's not, just kick.
-		*/
+		if (const auto found_file = mapped_or_nullptr(arena_files_database, payload.requested_file_hash)) {
+			auto& file_bytes = found_file->cached_file;
 
-		if (const auto found_file_path = mapped_or_nullptr(arena_files_database, payload.requested_file_hash)) {
-			file_download_payload sent_file_payload;
+			if (file_bytes.empty()) {
+				try {
+					if (found_file->path.extension() == ".json") {
+						const auto str = augs::file_to_string_crlf_to_lf(found_file->path);
 
-			try {
-				if (found_file_path->extension() == ".json") {
-					const auto str = augs::file_to_string_crlf_to_lf(*found_file_path);
-
-					sent_file_payload.file_bytes.assign(
-						reinterpret_cast<const std::byte*>(str.data()),
-						reinterpret_cast<const std::byte*>(str.data() + str.size())
-					);
+						file_bytes.assign(
+							reinterpret_cast<const std::byte*>(str.data()),
+							reinterpret_cast<const std::byte*>(str.data() + str.size())
+						);
+					}
+					else {
+						file_bytes = augs::file_to_bytes(found_file->path);
+					}
 				}
-				else {
-					sent_file_payload.file_bytes = augs::file_to_bytes(*found_file_path);
+				catch (...) {
+					return kick_file_not_found();
 				}
-			}
-			catch (...) {
-				return kick_file_not_found();
 			}
 
 			set_client_is_downloading_files(client_id, c, downloading_type::DIRECTLY);
 			c.when_last_sent_file_packet = get_current_time();
+			c.now_downloading_file = payload.requested_file_hash;
+			c.direct_file_chunks_left = 0;
+
+			file_download_payload sent_file_payload;
+			sent_file_payload.num_file_bytes = file_bytes.size();
 
 			server->send_payload(
 				client_id, 

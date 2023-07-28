@@ -56,7 +56,12 @@ class server_adapter;
 struct resolve_address_result;
 struct editor_project;
 
-using arena_files_database_type = std::unordered_map<augs::secure_hash_type, augs::path_type>;
+struct arena_files_database_entry {
+	augs::path_type path;
+	std::vector<std::byte> cached_file;
+};
+
+using arena_files_database_type = std::unordered_map<augs::secure_hash_type, arena_files_database_entry>;
 
 class server_setup : 
 	public default_setup_settings,
@@ -204,7 +209,7 @@ private:
 	void send_full_arena_snapshot_to(const client_id_type);
 	void send_complete_solvable_state_to(const client_id_type);
 
-	void send_packets_to_clients_downloading_files();
+	void refresh_available_direct_download_bandwidths();
 	void send_packets_if_its_time();
 
 	void send_heartbeat_to_server_list();
@@ -478,7 +483,7 @@ public:
 			step_collected.clear();
 		}
 
-		send_packets_to_clients_downloading_files();
+		refresh_available_direct_download_bandwidths();
 
 		log_performance();
 	}
@@ -613,8 +618,6 @@ public:
 	std::string get_current_arena_name() const;
 
 	void default_server_post_solve(const const_logic_step step);
-
-	void register_external_resources_of(const editor_project&);
 
 	void log_match_end_json(const messages::match_summary_message&);
 	void log_match_start_json(const messages::team_match_start_message&);

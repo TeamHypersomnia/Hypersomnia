@@ -116,6 +116,32 @@ namespace net_messages {
 		return true;
 	}
 
+	template <class Stream, uint32_t Max>
+	bool serialize_fixed_size_vector_uint16_t(Stream& s, augs::constant_size_vector<uint16_t, Max>& e) {
+		auto length = static_cast<int>(e.size());
+
+		serialize_int(s, length, 0, Max);
+
+		if (Stream::IsReading) {
+			e.resize(length);
+		}
+
+		serialize_bytes(s, (uint8_t*)e.data(), length * sizeof(uint16_t));
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, ::file_download_payload& c) {
+		serialize_int(s, c.num_file_bytes, 1, max_direct_download_file_size_v);
+
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, ::file_chunks_request_payload& c) {
+		return serialize_fixed_size_vector_uint16_t(s, c.requests);
+	}
+
 	template <class Stream>
 	bool serialize(Stream& s, ::file_download_link_payload& c) {
 		return serialize_fixed_size_str(s, c.file_address);

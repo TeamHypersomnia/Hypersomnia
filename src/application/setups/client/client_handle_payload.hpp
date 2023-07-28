@@ -68,7 +68,19 @@ message_handler_result client_setup::handle_payload(
 			return continue_v;
 		}
 
-		return advance_downloading_session(augs::make_ptr_read_stream(payload.file_bytes));
+		if (direct_downloader.has_value()) {
+			set_disconnect_reason("The server sent a file payload despite an ongoing download.");
+			return abort_v;
+		}
+
+		if (!last_requested_direct_file_hash.has_value()) {
+			set_disconnect_reason("The server sent a file payload despite no download request.");
+			return abort_v;
+		}
+
+		direct_downloader = direct_file_download(*last_requested_direct_file_hash, payload.num_file_bytes);
+
+		return continue_v;
 	}
 	else if constexpr (std::is_same_v<T, file_download_link_payload>) {
 		if (is_replaying()) {

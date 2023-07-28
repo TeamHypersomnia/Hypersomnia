@@ -46,6 +46,8 @@
 #include "augs/filesystem/directory.h"
 #include "augs/readwrite/json_readwrite_errors.h"
 #include "application/setups/client/https_file_downloader.h"
+#include "application/setups/server/file_chunk_packet.h"
+#include "application/setups/client/direct_file_download.hpp"
 
 void client_demo_player::play_demo_from(const augs::path_type& p) {
 	source_path = p;
@@ -214,6 +216,37 @@ bool client_setup::send_payload(Args&&... args) {
 	return adapter->send_payload(std::forward<Args>(args)...);
 }
 
+bool client_setup::handle_auxiliary_command(std::byte* const bytes, const int n) {
+	if (!direct_downloader.has_value()) {
+		return false;
+	}
+
+	if (n != sizeof(file_chunk_packet)) {
+		return false;
+	}
+	
+	const file_chunk_packet& chunk = *reinterpret_cast<file_chunk_packet*>(bytes);
+
+	if (!chunk.header_valid()) {
+		return false;
+	}
+
+	uint32_t data_received = 0;
+
+	if (const auto complete_file = direct_downloader->advance(chunk, data_received); complete_file.has_value()) {
+		direct_downloader = std::nullopt;
+		last_requested_direct_file_hash = std::nullopt;
+
+		advance_downloading_session(augs::make_ptr_read_stream(*complete_file));
+	}
+
+	if (data_received != 0) {
+		direct_bandwidth.newDataReceived(data_received);
+	}
+
+	return true;
+}
+
 client_setup::client_setup(
 	sol::state& lua,
 	const packaged_official_content& official,
@@ -227,7 +260,9 @@ client_setup::client_setup(
 	last_addr(in.get_address_and_port()),
 	displayed_connecting_server_name(in.displayed_connecting_server_name),
 	vars(initial_vars),
-	adapter(std::make_unique<client_adapter>(preferred_binding_port)),
+	adapter(std::make_unique<client_adapter>(preferred_binding_port, [this](std::byte* bytes, std::size_t n) {
+		return handle_auxiliary_command(bytes, n);
+	})),
 	client_time(get_current_time()),
 	when_initiated_connection(get_current_time())
 {
@@ -321,6 +356,7 @@ client_setup::~client_setup() {
 void client_setup::request_direct_file_download(const augs::secure_hash_type& hash) {
 	request_arena_file_download request;
 	request.requested_file_hash = hash;
+	last_requested_direct_file_hash = hash;
 
 	send_payload(
 		game_channel_type::RELIABLE_MESSAGES,
@@ -926,30 +962,47 @@ void client_setup::exchange_file_packets() {
 		return;
 	}
 
-	const auto current_time = get_current_time();
+	const auto inv_tickrate = default_inv_tickrate;
 
 	const auto target_bandwidth = vars.max_direct_file_bandwidth * 1024 * 1024;
-	const auto max_packets_at_a_time = 10;
+	const auto target_bandwidth_per_tick = target_bandwidth * inv_tickrate;
 
-	const auto packets_per_second = std::max(2.0f, float(target_bandwidth) / block_fragment_size_v);
-	const auto packet_interval = 1.0f / packets_per_second;
-
-	int times_sent = 0;
+	const auto chunks_per_tick = std::max(
+		uint32_t(1),
+		uint32_t(target_bandwidth_per_tick / file_chunk_size_v)
+	);
 
 	send_keepalive_download_progress();
 
-	while (client_time <= current_time && times_sent < max_packets_at_a_time) {
-		client_time += packet_interval;
+	double chunk_interval = 0.032;
 
-		send_packets();
-		handle_incoming_payloads();
+	if (direct_downloader.has_value()) {
+		file_chunks_request_payload chunks;
 
-		++times_sent;
+		for (uint32_t i = 0; i < chunks_per_tick; ++i) {
+			auto& next_chunk = direct_downloader->request_next_chunk();
+
+			if (next_chunk.last_sent + chunk_interval > client_time) {
+				continue;
+			}
+
+			next_chunk.last_sent = client_time;
+
+			// LOG_NVPS(next_chunk.index);
+
+			chunks.requests.push_back(next_chunk.index);
+		}
+
+		send_payload(
+			game_channel_type::VOLATILE_STATISTICS,
+			chunks
+		);
 	}
 
-	if (client_time < current_time) {
-		client_time = current_time;
-	}
+	send_packets();
+	handle_incoming_payloads();
+
+	client_time += inv_tickrate;
 }
 
 void client_setup::send_download_progress() {
@@ -1046,18 +1099,21 @@ void client_setup::perform_demo_player_imgui(augs::window& window) {
 }
 
 auto client_setup::get_current_file_download_progress() const {
-	const bool externally = external_downloader != nullptr;
-
-	return
-		externally ?
-
-		yojimbo::BlockProgress {
+	if (external_downloader != nullptr) {
+		return yojimbo::BlockProgress {
 			uint32_t(external_downloader->get_downloaded_bytes()),
 			uint32_t(external_downloader->get_total_bytes())
-		} :
+		};
+	}
 
-		adapter->get_block_progress(game_channel_type::RELIABLE_MESSAGES)
-	;
+	if (direct_downloader.has_value()) {
+		return yojimbo::BlockProgress {
+			uint32_t(direct_downloader->get_downloaded_bytes()),
+			uint32_t(direct_downloader->get_total_bytes())
+		};
+	}
+
+	return yojimbo::BlockProgress { 0, 0 };
 }
 
 float client_setup::get_current_file_percent_complete() const {
@@ -1191,7 +1247,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				const auto bytes_per_second = 
 					externally ?
 					external_downloader->get_bandwidth() :
-					double(adapter->get_network_info().received_kbps * 1000 / 8)
+					direct_bandwidth.getAverageSpeed()
 				;
 
 				const auto this_progress = get_current_file_download_progress();

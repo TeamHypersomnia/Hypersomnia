@@ -65,7 +65,7 @@ game_connection_config::game_connection_config() {
 		stats.type = yojimbo::CHANNEL_TYPE_UNRELIABLE_UNORDERED;
 	}
 
-	serverPerClientMemory = 20 * 1024 * 1024;
+	serverPerClientMemory = 14 * 1024 * 1024;
 	clientMemory = 1024 * 1024 * 50;
 
 	networkSimulator = true;
@@ -197,7 +197,15 @@ void server_adapter::receive_packets_from(const client_id_type& id) {
 	server.ReceivePacketsFrom(id);
 }
 
-client_adapter::client_adapter(const std::optional<port_type> preferred_binding_port) :
+bool client_auxiliary_command_function(void* context, uint8_t* packet, int bytes) {
+	auto* adapter = reinterpret_cast<client_adapter*>(context);
+	return adapter->auxiliary_command_callback(reinterpret_cast<std::byte*>(packet), bytes);
+}
+
+client_adapter::client_adapter(
+	const std::optional<port_type> preferred_binding_port,
+	client_auxiliary_command_callback_type auxiliary_command_callback
+) :
 	connection_config(),
 	adapter(nullptr),
 	client(
@@ -206,8 +214,10 @@ client_adapter::client_adapter(const std::optional<port_type> preferred_binding_
 		connection_config, 
 		adapter, 
 		yojimbo_time()
-	)
-{}
+	),
+	auxiliary_command_callback(auxiliary_command_callback)
+{
+}
 
 std::optional<unsigned long> get_trailing_number(const std::string& s);
 std::string cut_trailing_number(const std::string& s);
@@ -507,6 +517,11 @@ resolve_address_result client_adapter::connect(const address_and_port& in) {
 		addresses,
 		2
 	);
+
+	if (auto detail = client.GetClientDetail()) {
+		detail->config.auxiliary_command_function = client_auxiliary_command_function;
+		detail->config.auxiliary_command_context = this;
+	}
 
 	return resolved_addr;
 }

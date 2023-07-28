@@ -10,18 +10,7 @@
 
 #include "augs/string/parse_url.h"
 
-class BandwidthMonitor {
-public:
-	BandwidthMonitor();
-	void newDataReceived(std::size_t bytes);
-	double getAverageSpeed() const;
-
-private:
-	std::deque<std::pair<std::size_t, double>> data_;
-	std::size_t total_bytes_;
-	double last_time_;
-	std::atomic<double> average_speed_;
-};
+#include "application/setups/client/bandwidth_monitor.h"
 
 class https_file_downloader {
 	parsed_url parsed;

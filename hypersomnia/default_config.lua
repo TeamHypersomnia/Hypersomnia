@@ -791,7 +791,7 @@ treat_as_music_sounds_longer_than_secs = 5,
     auto_authorize_internal_for_rcon = false,
     max_unauthorized_rcon_commands = 100,
     max_bots = 0,
-    max_direct_file_bandwidth = 1
+    max_direct_file_bandwidth = 6
   },
 
   client = {
@@ -829,7 +829,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       show_recent_chat_messages_num = 30,
       keep_recent_chat_messages_for_seconds = 22,
 	},
-      max_direct_file_bandwidth = 1
+      max_direct_file_bandwidth = 2
   },
 
   performance = {

@@ -26,6 +26,8 @@ struct server_client_state {
 
 	net_time_t when_last_sent_file_packet = 0.0f;
 
+	std::optional<augs::secure_hash_type> now_downloading_file;
+
 	requested_client_settings settings;
 	bool rebroadcast_public_settings = false;
 
@@ -43,6 +45,8 @@ struct server_client_state {
 	downloading_type downloading_status = downloading_type::NONE;
 
 	arena_player_meta meta;
+
+	uint32_t direct_file_chunks_left = 0;
 
 	server_client_state() = default;
 	server_client_state(const net_time_t server_time) {

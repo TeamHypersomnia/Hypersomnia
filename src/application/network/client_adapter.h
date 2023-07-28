@@ -7,11 +7,16 @@
 struct netcode_socket_t;
 struct resolve_address_result;
 
+using client_auxiliary_command_callback_type = std::function<bool (std::byte*, std::size_t n)>;
+
 class client_adapter {
+	friend bool client_auxiliary_command_function(void* context, uint8_t* packet, int bytes);
+
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;
 	yojimbo::Client client;
+	client_auxiliary_command_callback_type auxiliary_command_callback;
 
 	friend GameAdapter;
 
@@ -33,7 +38,7 @@ class client_adapter {
 	bool has_messages_to_send(const game_channel_type&) const;
 
 public:
-	client_adapter(std::optional<port_type> preferred_binding_port);
+	client_adapter(std::optional<port_type> preferred_binding_port, client_auxiliary_command_callback_type);
 	resolve_address_result connect(const address_and_port&);
 
 	template <class H>

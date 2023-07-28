@@ -144,6 +144,10 @@ bool server_nat_traversal::handle_auxiliary_command(
 		return true;
 	}
 
+	if (packet_bytes < 1) {
+		return false;
+	}
+
 	const bool is_auxiliary_cmd = packet_buffer[0] == static_cast<std::byte>(NETCODE_AUXILIARY_COMMAND_PACKET);
 
 	if (!is_auxiliary_cmd) {

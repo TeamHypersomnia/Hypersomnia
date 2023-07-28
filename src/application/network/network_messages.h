@@ -281,19 +281,14 @@ namespace net_messages {
 		static constexpr bool client_to_server = false;
 	};
 
-	struct file_download : only_block_message {
+	struct file_download : net_message_with_payload<::file_download_payload> {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
+	};
 
-		bool read_payload(
-			file_download_payload&
-		);
-
-		template <class F>
-		bool write_payload(
-			F block_allocator,
-			const file_download_payload&
-		);
+	struct file_chunks_request : net_message_with_payload<::file_chunks_request_payload> {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
 	};
 
 	struct download_progress_message : net_message_with_payload<::download_progress_message> {
@@ -324,7 +319,8 @@ namespace net_messages {
 		request_arena_file_download*,
 		file_download*,
 		file_download_link*,
-		download_progress_message*
+		download_progress_message*,
+		file_chunks_request*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

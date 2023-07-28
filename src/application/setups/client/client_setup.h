@@ -45,6 +45,8 @@
 #include "application/nat/nat_detection_settings.h"
 #include "3rdparty/yojimbo/netcode.io/netcode.h"
 #include "application/setups/client/arena_downloading_session.h"
+#include "application/setups/client/direct_file_download.h"
+#include "application/setups/client/bandwidth_monitor.h"
 
 struct config_lua_table;
 
@@ -130,6 +132,9 @@ class client_setup :
 	bool pause_solvable_stream = false;
 
 	std::unique_ptr<https_file_downloader> external_downloader;
+	std::optional<direct_file_download> direct_downloader;
+	std::optional<augs::secure_hash_type> last_requested_direct_file_hash;
+	BandwidthMonitor direct_bandwidth;
 
 	using untimely_payload_variant = std::variant<arena_player_avatar_payload>;
 
@@ -839,4 +844,6 @@ public:
 	auto get_current_file_download_progress() const;
 	float get_current_file_percent_complete() const;
 	float get_total_download_percent_complete(const bool smooth) const;
+
+	bool handle_auxiliary_command(std::byte*, int n);
 };

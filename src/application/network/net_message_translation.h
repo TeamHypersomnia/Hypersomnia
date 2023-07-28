@@ -288,32 +288,4 @@ namespace net_messages {
 
 		return true;
 	}
-
-	inline bool file_download::read_payload(
-		file_download_payload& payload
-	) {
-		auto data = reinterpret_cast<const std::byte*>(GetBlockData());
-		auto size = static_cast<std::size_t>(GetBlockSize());
-
-		if (size > max_transferred_file_size_v) {
-			return false;
-		}
-
-		payload.file_bytes.resize(size);
-		std::memcpy(payload.file_bytes.data(), data, size);
-
-		return true;
-	}
-
-	template <class F>
-	inline bool file_download::write_payload(
-		F block_allocator,
-		const file_download_payload& payload
-	) {
-		const auto& file = payload.file_bytes;
-		auto block = block_allocator(file.size());
-		std::memcpy(block, file.data(), file.size());
-
-		return true;
-	}
 }

@@ -19,6 +19,11 @@ namespace augs {
 		return stream;
 	}
 
+	template <class S>
+	auto make_ptr_write_stream(const S& source) {
+		return make_ptr_write_stream(source.data(), source.size());
+	}
+
 	template <class B, class S>
 	auto make_ptr_read_stream(const B* const bytes, const S n) {
 		static_assert(std::is_integral_v<S>);

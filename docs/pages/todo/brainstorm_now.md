@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- recheck what happens if missing arena is chosen, afaik it chose de_jedrula still and reported hash of 0
+
 - Editor: Grouping.
     - Ctrl+G groupizes selection.
         - Duplicating a group instantiates it.
@@ -45,6 +47,12 @@ summary: That which we are brainstorming at the moment.
         - For custom servers it sorta works out of the box since they don't serve the php page
 
 - Server might choose a map whose new version is available
+    - For now: We'll have handled most cases if we auto-update the map we host. Or prompt to update it.
+        - Why?
+            - The dedicated servers will probably restart periodically
+        - People will most likely choose the catalogue to choose the map to host either way
+            - but won't hurt to prompt
+
     - Might happen when hosting from the main menu..
     - ..or during gameplay
     - in both cases we can just have an std::future that switches to the new map once it's completed

@@ -1097,7 +1097,7 @@ void register_external_resources_of(
 			if constexpr(is_pathed_resource_v<R>) {
 				for (auto& resource : pool) {
 					const auto& file = resource.external_file;
-					database[augs::to_secure_hash_byte_format(file.file_hash)] = arena_folder_path / file.path_in_project;
+					database[augs::to_secure_hash_byte_format(file.file_hash)] = { arena_folder_path / file.path_in_project, {} };
 				}
 			}
 		}
@@ -1134,7 +1134,7 @@ void server_setup::rechoose_arena() {
 			arena_files_database
 		);
 
-		arena_files_database[current_arena_hash] = paths.project_json;
+		arena_files_database[current_arena_hash] = { paths.project_json, {} };
 	}
 
 	arena_gui.reset();
@@ -1792,26 +1792,12 @@ void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& e
 	}
 }
 
-void server_setup::send_packets_to_clients_downloading_files() {
+void server_setup::refresh_available_direct_download_bandwidths() {
 	const auto target_bandwidth = vars.max_direct_file_bandwidth * 1024 * 1024;
-	const auto max_packets_at_a_time = 10; // 10k at a time can be sent, so to achieve max bandwidth, just 200 fps on a server is enough.
+	const auto target_bandwidth_per_tick = target_bandwidth * get_inv_tickrate();
 
-	/* 
-		Afaik just one fragment is sent per packet, 
-		even if max packet size would allow for more.
-	*/
+	const auto chunks_per_tick = target_bandwidth_per_tick / file_chunk_size_v;
 
-	const auto packets_per_second = float(target_bandwidth) / block_fragment_size_v;
-
-	if (packets_per_second == 0.0f) {
-		return;
-	}
-
-	auto packet_interval = 1.0f / packets_per_second;
-
-	const auto current_time = get_current_time();
-
-	auto max_times_sent = 0;
 	int num_downloaders = 0;
 
 	for_each_id_and_client([&num_downloaders](const auto, auto& c){
@@ -1824,36 +1810,18 @@ void server_setup::send_packets_to_clients_downloading_files() {
 		return;
 	}
 
-	packet_interval *= num_downloaders;
+	const auto chunks_per_tick_per_downloader = std::max(uint32_t(1), uint32_t(chunks_per_tick / num_downloaders));
 
-	auto send_packets = [&](const auto, auto& c) {
+	auto refresh_chunks = [&](const auto, auto& c) {
 		if (c.downloading_status == downloading_type::DIRECTLY) {
-			int times_sent = 0;
-
-			while (c.when_last_sent_file_packet <= current_time && times_sent < max_packets_at_a_time) {
-				c.when_last_sent_file_packet += packet_interval;
-
-#if 0
-				server->send_packets_to(client_id);
-				server->receive_packets_from(client_id);
-#endif
-				++times_sent;
-			}
-
-			max_times_sent = std::max(times_sent, max_times_sent);
-
-			if (c.when_last_sent_file_packet < current_time) {
-				c.when_last_sent_file_packet = current_time;
-			}
+			c.direct_file_chunks_left = chunks_per_tick_per_downloader;
+		}
+		else {
+			c.direct_file_chunks_left = 0;
 		}
 	};
 
-	for_each_id_and_client(send_packets, connected_and_integrated_v);
-
-	for (int i = 0; i < max_times_sent; ++i) {
-		server->send_packets();
-		handle_client_messages();
-	}
+	for_each_id_and_client(refresh_chunks, connected_and_integrated_v);
 }
 
 void server_setup::send_packets_if_its_time() {
