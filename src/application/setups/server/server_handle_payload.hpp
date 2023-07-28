@@ -349,20 +349,24 @@ message_handler_result server_setup::handle_payload(
 				++num_all_chunks;
 			}
 
-			const bool is_last_chunk = chunk_index == num_all_chunks - 1;
-
-			const auto bytes_start = 							std::size_t(chunk_index) * file_chunk_size_v;
-			const auto bytes_end   = is_last_chunk ? bytes_n : (std::size_t(bytes_start) + file_chunk_size_v);
-
-			ensure(bytes_end <= bytes_n);
-
-			const auto bytes_copied = bytes_end - bytes_start;
-
 			file_chunk_packet packet;
 			packet.index = chunk_index;
 			packet.file_hash = *c.now_downloading_file;
 
+			const auto last_chunk_index = num_all_chunks - 1;
+
+			if (chunk_index <= last_chunk_index) {
+				const bool is_last_chunk = chunk_index == last_chunk_index;
+
+			const auto bytes_start = 							std::size_t(chunk_index) * file_chunk_size_v;
+			const auto bytes_end   = is_last_chunk ? bytes_n : (std::size_t(bytes_start) + file_chunk_size_v);
+
+				ensure(bytes_end <= bytes_n);
+
+				const auto bytes_copied = bytes_end - bytes_start;
+
 			std::memcpy(packet.chunk_bytes.data(), bytes.data() + bytes_start, bytes_copied);
+			}
 
 			if (auto s = find_underlying_socket()) {
 				auto address = to_netcode_addr(server->get_client_address(client_id));
