@@ -1792,7 +1792,87 @@ void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& e
 	}
 }
 
-void server_setup::refresh_available_direct_download_bandwidths() {
+void server_setup::clean_unused_cached_files() {
+	if (opened_arena_files.empty()) {
+		return;
+	}
+
+	cached_currently_downloaded_files.clear();
+
+	auto gather_downloaded = [&](const auto, auto& c) {
+		if (c.now_downloading_file.has_value()) {
+			cached_currently_downloaded_files.emplace(*c.now_downloading_file);
+		}
+	};
+
+	for_each_id_and_client(gather_downloaded, connected_and_integrated_v);
+
+	erase_if(
+		opened_arena_files,
+		[&](const auto& opened) {
+			if (!found_in(cached_currently_downloaded_files, opened)) {
+				arena_files_database[opened].free_opened_file();
+
+				return true;
+			}
+
+			return false;
+		}
+	);
+}
+
+bool server_setup::send_file_chunk(const client_id_type client_id, const arena_files_database_entry& entry, const file_chunk_index_type chunk_index) {
+	const auto& c = clients[client_id];
+
+	const auto& bytes = entry.cached_file;
+	const auto bytes_n = bytes.size();
+
+	auto num_all_chunks = bytes_n / file_chunk_size_v;
+
+	if (bytes_n % file_chunk_size_v != 0) {
+		++num_all_chunks;
+	}
+
+	if (bytes_n == 0) {
+		num_all_chunks = 1;
+	}
+
+	file_chunk_packet packet;
+	packet.index = chunk_index;
+	packet.file_hash = *c.now_downloading_file;
+
+	const auto last_chunk_index = num_all_chunks - 1;
+
+	if (chunk_index <= last_chunk_index) {
+		const bool is_last_chunk = chunk_index == last_chunk_index;
+
+		const auto bytes_start = 							std::size_t(chunk_index) * file_chunk_size_v;
+		const auto bytes_end   = is_last_chunk ? bytes_n : (std::size_t(bytes_start) + file_chunk_size_v);
+
+		ensure(bytes_end <= bytes_n);
+
+		const auto bytes_copied = bytes_end - bytes_start;
+
+		if (bytes_copied != 0) {
+			std::memcpy(packet.chunk_bytes.data(), bytes.data() + bytes_start, bytes_copied);
+		}
+
+		if (auto s = find_underlying_socket()) {
+			auto address = to_netcode_addr(server->get_client_address(client_id));
+
+			const auto num_packet_bytes = sizeof(packet);
+			// LOG("sending chunk %x to %x (%x bytes). CMD: %x", chunk_index, ::ToString(address), num_packet_bytes, packet.command);
+			auto socket = *s;
+			netcode_socket_send_packet(&socket, &address, reinterpret_cast<void*>(&packet), num_packet_bytes);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+file_chunk_index_type server_setup::calc_num_chunks_per_tick_per_downloader() const {
 	const auto target_bandwidth = vars.max_direct_file_bandwidth * 1024 * 1024;
 	const auto target_bandwidth_per_tick = target_bandwidth * get_inv_tickrate();
 
@@ -1807,14 +1887,20 @@ void server_setup::refresh_available_direct_download_bandwidths() {
 	}, connected_and_integrated_v);
 
 	if (num_downloaders == 0) {
-		return;
+		return 0;
 	}
 
 	const auto chunks_per_tick_per_downloader = std::max(uint32_t(1), uint32_t(chunks_per_tick / num_downloaders));
 
+	return file_chunk_index_type(chunks_per_tick_per_downloader);
+}
+
+void server_setup::refresh_available_direct_download_bandwidths() {
+	const auto num_chunks = calc_num_chunks_per_tick_per_downloader();
+
 	auto refresh_chunks = [&](const auto, auto& c) {
 		if (c.downloading_status == downloading_type::DIRECTLY) {
-			c.direct_file_chunks_left = chunks_per_tick_per_downloader;
+			c.direct_file_chunks_left = num_chunks;
 		}
 		else {
 			c.direct_file_chunks_left = 0;

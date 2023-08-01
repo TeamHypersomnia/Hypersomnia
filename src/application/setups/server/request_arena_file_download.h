@@ -16,5 +16,6 @@ struct file_chunks_request_payload {
 
 struct request_arena_file_download {
 	augs::secure_hash_type requested_file_hash;
+	file_chunk_index_type num_chunks_to_presend = 0; 
 };
 

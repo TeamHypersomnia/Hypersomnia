@@ -34,6 +34,7 @@
 
 #include "application/setups/server/rcon_level.h"
 #include "game/messages/game_notification.h"
+#include "application/setups/server/file_chunk_packet.h"
 
 struct netcode_socket_t;
 struct config_lua_table;
@@ -59,6 +60,10 @@ struct editor_project;
 struct arena_files_database_entry {
 	augs::path_type path;
 	std::vector<std::byte> cached_file;
+
+	void free_opened_file() {
+		std::vector<std::byte>().swap(cached_file);
+	}
 };
 
 using arena_files_database_type = std::unordered_map<augs::secure_hash_type, arena_files_database_entry>;
@@ -101,6 +106,9 @@ class server_setup :
 
 	augs::server_listen_input last_start;
 	std::optional<augs::dedicated_server_input> dedicated;
+
+	std::unordered_set<augs::secure_hash_type> cached_currently_downloaded_files;
+	std::unordered_set<augs::secure_hash_type> opened_arena_files;
 
 	auto quit_playtesting_or(custom_imgui_result result) const {
 		if (vars.playtesting_context && result == custom_imgui_result::GO_TO_MAIN_MENU) {
@@ -484,6 +492,7 @@ public:
 		}
 
 		refresh_available_direct_download_bandwidths();
+		clean_unused_cached_files();
 
 		log_performance();
 	}
@@ -630,4 +639,9 @@ public:
 	void refresh_runtime_info_for_rcon();
 
 	void set_client_is_downloading_files(client_id_type, server_client_state& c, downloading_type);
+
+	file_chunk_index_type calc_num_chunks_per_tick_per_downloader() const;
+
+	bool send_file_chunk(client_id_type id, const arena_files_database_entry& entry, file_chunk_index_type i);
+	void clean_unused_cached_files();
 };

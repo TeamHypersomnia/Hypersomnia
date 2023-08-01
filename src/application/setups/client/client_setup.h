@@ -134,6 +134,8 @@ class client_setup :
 	std::unique_ptr<https_file_downloader> external_downloader;
 	std::optional<direct_file_download> direct_downloader;
 	std::optional<augs::secure_hash_type> last_requested_direct_file_hash;
+	uint32_t num_skip_chunks = 0;
+	std::vector<file_chunk_packet> buffered_chunk_packets;
 	BandwidthMonitor direct_bandwidth;
 
 	using untimely_payload_variant = std::variant<arena_player_avatar_payload>;
@@ -713,8 +715,8 @@ public:
 			if (downloading) {
 				if (is_trying_external_download()) {
 					if (send_keepalive_download_progress()) {
-						send_packets();
 						handle_incoming_payloads();
+						send_packets();
 					}
 
 					advance_external_downloader();
@@ -846,4 +848,7 @@ public:
 	float get_total_download_percent_complete(const bool smooth) const;
 
 	bool handle_auxiliary_command(std::byte*, int n);
+
+	void handle_received(const file_chunk_packet& chunk);
+	file_chunk_index_type calc_num_chunks_per_tick() const;
 };

@@ -362,7 +362,13 @@ namespace net_messages {
 
 	template <typename Stream>
 	bool serialize(Stream& stream, ::request_arena_file_download& payload) {
-		return serialize_fixed_byte_array(stream, payload.requested_file_hash);
+		if (!serialize_fixed_byte_array(stream, payload.requested_file_hash)) {
+			return false;
+		}
+
+		serialize_int(stream, payload.num_chunks_to_presend, 0, std::numeric_limits<uint16_t>::max());
+
+		return true;
 	}
 
 	template <typename Stream>

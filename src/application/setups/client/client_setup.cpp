@@ -216,20 +216,8 @@ bool client_setup::send_payload(Args&&... args) {
 	return adapter->send_payload(std::forward<Args>(args)...);
 }
 
-bool client_setup::handle_auxiliary_command(std::byte* const bytes, const int n) {
-	if (!direct_downloader.has_value()) {
-		return false;
-	}
-
-	if (n != sizeof(file_chunk_packet)) {
-		return false;
-	}
-	
-	const file_chunk_packet& chunk = *reinterpret_cast<file_chunk_packet*>(bytes);
-
-	if (!chunk.header_valid()) {
-		return false;
-	}
+void client_setup::handle_received(const file_chunk_packet& chunk) {
+	ensure(direct_downloader.has_value());
 
 	uint32_t data_received = 0;
 
@@ -243,6 +231,29 @@ bool client_setup::handle_auxiliary_command(std::byte* const bytes, const int n)
 	if (data_received != 0) {
 		direct_bandwidth.newDataReceived(data_received);
 	}
+}
+
+bool client_setup::handle_auxiliary_command(std::byte* const bytes, const int n) {
+	if (n != sizeof(file_chunk_packet)) {
+		return false;
+	}
+	
+	const file_chunk_packet& chunk = *reinterpret_cast<file_chunk_packet*>(bytes);
+
+	if (!chunk.header_valid()) {
+		return false;
+	}
+
+	if (!direct_downloader.has_value()) {
+		if (last_requested_direct_file_hash == chunk.file_hash) {
+			buffered_chunk_packets.push_back(chunk);
+			return true;
+		}
+
+		return false;
+	}
+
+	handle_received(chunk);
 
 	return true;
 }
@@ -356,6 +367,11 @@ client_setup::~client_setup() {
 void client_setup::request_direct_file_download(const augs::secure_hash_type& hash) {
 	request_arena_file_download request;
 	request.requested_file_hash = hash;
+	/* Send a burst for the first time */
+	request.num_chunks_to_presend = calc_num_chunks_per_tick() * 2;
+	num_skip_chunks = request.num_chunks_to_presend;
+	buffered_chunk_packets.clear();
+
 	last_requested_direct_file_hash = hash;
 
 	send_payload(
@@ -957,11 +973,7 @@ void client_setup::traverse_nat_if_required() {
 	}
 }
 
-void client_setup::exchange_file_packets() {
-	if (!is_connected()) {
-		return;
-	}
-
+file_chunk_index_type client_setup::calc_num_chunks_per_tick() const {
 	const auto inv_tickrate = default_inv_tickrate;
 
 	const auto target_bandwidth = vars.max_direct_file_bandwidth * 1024 * 1024;
@@ -972,14 +984,31 @@ void client_setup::exchange_file_packets() {
 		uint32_t(target_bandwidth_per_tick / file_chunk_size_v)
 	);
 
+	return chunks_per_tick;
+}
+
+void client_setup::exchange_file_packets() {
+	if (!is_connected()) {
+		return;
+	}
+
 	send_keepalive_download_progress();
 
-	double chunk_interval = 0.032;
+	const auto inv_tickrate = default_inv_tickrate;
+	const double chunk_interval = inv_tickrate * 2;
+
+	handle_incoming_payloads();
 
 	if (direct_downloader.has_value()) {
 		file_chunks_request_payload chunks;
 
-		for (uint32_t i = 0; i < chunks_per_tick; ++i) {
+		for (uint32_t i = 0; i < num_skip_chunks; ++i) {
+			direct_downloader->request_next_chunk().last_sent = client_time;
+		}
+
+		num_skip_chunks = 0;
+
+		for (uint32_t i = 0; i < calc_num_chunks_per_tick(); ++i) {
 			auto& next_chunk = direct_downloader->request_next_chunk();
 
 			if (next_chunk.last_sent + chunk_interval > client_time) {
@@ -1000,7 +1029,6 @@ void client_setup::exchange_file_packets() {
 	}
 
 	send_packets();
-	handle_incoming_payloads();
 
 	client_time += inv_tickrate;
 }

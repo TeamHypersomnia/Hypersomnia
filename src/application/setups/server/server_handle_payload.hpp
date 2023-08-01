@@ -6,6 +6,7 @@ message_handler_result server_setup::handle_payload(
 	F&& read_payload
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
+	constexpr auto continue_v = message_handler_result::CONTINUE;
 	constexpr bool is_easy_v = payload_easily_movable_v<T>;
 
 	std::conditional_t<is_easy_v, T, std::monostate> payload;
@@ -21,6 +22,11 @@ message_handler_result server_setup::handle_payload(
 	namespace N = net_messages;
 
 	auto& c = clients[client_id];
+
+	if (c.when_kicked.has_value()) {
+		return continue_v;
+	}
+
 	ensure(c.is_set());
 
 	if constexpr (std::is_same_v<T, requested_client_settings>) {
@@ -318,13 +324,13 @@ message_handler_result server_setup::handle_payload(
 	}
 	else if constexpr (std::is_same_v<T, ::file_chunks_request_payload>) {
 		if (!c.now_downloading_file.has_value()) {
-			return message_handler_result::CONTINUE;
+			return continue_v;
 		}
 
 		const auto found_file = mapped_or_nullptr(arena_files_database, *c.now_downloading_file);
 
 		if (found_file == nullptr) {
-			return message_handler_result::CONTINUE;
+			return continue_v;
 		}
 
 		for (const auto chunk_index : payload.requests) {
@@ -334,59 +340,17 @@ message_handler_result server_setup::handle_payload(
 
 			--c.direct_file_chunks_left;
 
-			const auto& bytes = found_file->cached_file;
-
-			const auto bytes_n = bytes.size();
-
-			if (bytes_n == 0) {
-				kick(client_id, "Requested file was null.");
-				return abort_v;
-			}
-
-			auto num_all_chunks = bytes_n / file_chunk_size_v;
-
-			if (bytes_n % file_chunk_size_v != 0) {
-				++num_all_chunks;
-			}
-
-			file_chunk_packet packet;
-			packet.index = chunk_index;
-			packet.file_hash = *c.now_downloading_file;
-
-			const auto last_chunk_index = num_all_chunks - 1;
-
-			if (chunk_index <= last_chunk_index) {
-				const bool is_last_chunk = chunk_index == last_chunk_index;
-
-			const auto bytes_start = 							std::size_t(chunk_index) * file_chunk_size_v;
-			const auto bytes_end   = is_last_chunk ? bytes_n : (std::size_t(bytes_start) + file_chunk_size_v);
-
-				ensure(bytes_end <= bytes_n);
-
-				const auto bytes_copied = bytes_end - bytes_start;
-
-			std::memcpy(packet.chunk_bytes.data(), bytes.data() + bytes_start, bytes_copied);
-			}
-
-			if (auto s = find_underlying_socket()) {
-				auto address = to_netcode_addr(server->get_client_address(client_id));
-
-				const auto num_packet_bytes = sizeof(packet);
-				// LOG("sending chunk %x to %x (%x bytes). CMD: %x", chunk_index, ::ToString(address), num_packet_bytes, packet.command);
-				auto socket = *s;
-				netcode_socket_send_packet(&socket, &address, reinterpret_cast<void*>(&packet), num_packet_bytes);
-			}
+			send_file_chunk(client_id, *found_file, chunk_index);
 		}
 	}
 	else if constexpr (std::is_same_v<T, ::request_arena_file_download>) {
 		if (!vars.allow_direct_arena_file_downloads) {
 			kick(client_id, "This server disabled downloading arenas.");
-			return abort_v;
+			return continue_v;
 		}
 
 		auto kick_file_not_found = [&]() {
 			kick(client_id, "Requested file was not found on the server.");
-			return abort_v;
 		};
 
 		if (const auto found_file = mapped_or_nullptr(arena_files_database, payload.requested_file_hash)) {
@@ -395,9 +359,11 @@ message_handler_result server_setup::handle_payload(
 			if (file_bytes.empty()) {
 				try {
 					file_bytes = augs::file_to_bytes(found_file->path);
+					opened_arena_files.emplace(payload.requested_file_hash);
 				}
 				catch (...) {
-					return kick_file_not_found();
+					kick_file_not_found();
+					return continue_v;
 				}
 			}
 
@@ -415,9 +381,18 @@ message_handler_result server_setup::handle_payload(
 
 				sent_file_payload
 			);
+
+			const auto max_to_presend = uint16_t(calc_num_chunks_per_tick_per_downloader() * 2);
+			const auto num_to_presend = std::min(max_to_presend, payload.num_chunks_to_presend);
+
+			for (file_chunk_index_type chunk_index = 0; chunk_index < num_to_presend; ++chunk_index) {
+				if (!send_file_chunk(client_id, *found_file, chunk_index)) {
+					break;
+				}
+			}
 		}
 		else {
-			return kick_file_not_found();
+			kick_file_not_found();
 		}
 	}
 	else {
@@ -425,6 +400,6 @@ message_handler_result server_setup::handle_payload(
 	}
 
 	c.last_valid_payload_time = server_time;
-	return message_handler_result::CONTINUE;
+	return continue_v;
 }
 

@@ -80,6 +80,17 @@ message_handler_result client_setup::handle_payload(
 
 		direct_downloader = direct_file_download(*last_requested_direct_file_hash, payload.num_file_bytes);
 
+		for (const auto& buffered_chunk : buffered_chunk_packets) {
+			if (direct_downloader.has_value()) {
+				handle_received(buffered_chunk);
+			}
+			else {
+				break;
+			}
+		}
+
+		buffered_chunk_packets.clear();
+
 		return continue_v;
 	}
 	else if constexpr (std::is_same_v<T, file_download_link_payload>) {
