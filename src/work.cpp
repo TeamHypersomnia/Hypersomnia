@@ -263,6 +263,10 @@ work_result work(const int argc, const char* const * const argv) try {
 			result->server.allow_nat_traversal = false;
 		}
 
+		if (result->client.nickname.empty()) {
+			result->client.nickname = augs::get_user_name();
+		}
+
 		return result;
 	}();
 

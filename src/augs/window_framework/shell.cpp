@@ -136,3 +136,39 @@ namespace augs {
 		return EXIT_FAILURE;
 	}
 }
+
+#if PLATFORM_WINDOWS
+#include <Lmcons.h>
+namespace augs {
+	std::string get_user_name() {
+		char username[UNLEN + 1]; // UNLEN is defined in Lmcons.h
+		DWORD username_len = UNLEN + 1;
+		GetUserName(username, &username_len);
+		return std::string(username);
+	}
+}
+
+#elif PLATFORM_UNIX
+
+#include <unistd.h>
+#include <pwd.h>
+
+namespace augs {
+	std::string get_user_name() {
+		char* login = getlogin();
+		if (login != nullptr) {
+			return std::string(login);
+		}
+		login = getenv("USER");
+		if (login != nullptr) {
+			return std::string(login);
+		}
+		struct passwd *pw = getpwuid(geteuid());
+		if (pw != nullptr) {
+			return std::string(pw->pw_name);
+		}
+		return "";
+	}
+}
+
+#endif

@@ -795,7 +795,7 @@ treat_as_music_sounds_longer_than_secs = 5,
   },
 
   client = {
-	nickname = "Player",
+	nickname = "",
 	rcon_password = "",
 
 	net = {

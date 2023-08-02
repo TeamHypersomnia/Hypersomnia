@@ -12,4 +12,6 @@ namespace augs {
 		const std::string& executable,
 		std::vector<std::string> arguments
 	);
+
+	std::string get_user_name();
 }
