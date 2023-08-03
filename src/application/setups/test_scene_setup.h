@@ -16,6 +16,8 @@
 #include "application/input/entropy_accumulator.h"
 #include "application/setups/setup_common.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
+#include "view/mode_gui/arena/arena_gui_mixin.h"
+#include "application/network/network_common.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -26,9 +28,25 @@ namespace sol {
 
 struct packaged_official_content;
 
-class test_scene_setup : public default_setup_settings {
-	test_mode mode;
-	test_mode_ruleset ruleset;
+enum class test_scene_type {
+	TUTORIAL,
+	SHOOTING_RANGE
+};
+
+struct tutorial_state {
+	uint32_t level = 0;
+
+};
+
+template <bool C>
+using test_arena_handle = online_arena_handle<C>;
+
+class test_scene_setup : public default_setup_settings, public arena_gui_mixin<test_scene_setup> {
+	using arena_gui_base = arena_gui_mixin<test_scene_setup>;
+
+	all_rulesets_variant ruleset;
+	all_modes_variant current_mode_state;
+	cosmos_solvable_significant clean_round_state;
 
 	intercosm scene;
 	entropy_accumulator total_collected;
@@ -37,6 +55,20 @@ class test_scene_setup : public default_setup_settings {
 	mode_player_id local_player_id;
 
 	augs::path_type current_arena_folder;
+	test_scene_type type;
+
+	tutorial_state tutorial;
+
+	template <class H, class S>
+	static decltype(auto) get_arena_handle_impl(S& self) {
+		return H {
+			self.current_mode_state,
+			self.scene,
+			self.scene.world,
+			self.ruleset,
+			self.clean_round_state
+		};
+	}
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -47,7 +79,8 @@ public:
 		std::string nickname,
 		const packaged_official_content&,
 		const test_scene_settings,
-		const input_recording_type recording_type
+		const input_recording_type recording_type,
+		const test_scene_type type
 	);
 
 	float speed = 1.0f;
@@ -90,9 +123,7 @@ public:
 		return;
 	}
 
-	auto escape() {
-		return setup_escape_result::IGNORE;
-	}
+	setup_escape_result escape();
 
 	auto get_inv_tickrate() const {
 		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
@@ -116,11 +147,15 @@ public:
 				in.make_accumulator_input()
 			);
 
-			mode.advance(
-				{ ruleset, scene.world },
-				total,
-				callbacks,
-				solve_settings()
+			get_arena_handle().on_mode_with_input(
+				[&](auto& mode, const auto& input) {
+					mode.advance(
+						input,
+						total,
+						callbacks,
+						solve_settings()
+					);
+				}
 			);
 		}
 	}
@@ -144,18 +179,13 @@ public:
 		return render_layer_filter::disabled();
 	}
 
-	void draw_custom_gui(const draw_setup_gui_input&) {}
+	void draw_custom_gui(const draw_setup_gui_input&);
 
 	void ensure_handler() {}
 	bool requires_cursor() const { return false; }
 
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return total_collected;
-	}
-
-	template <class F>
-	void on_mode_with_input(F&& callback) const {
-		callback(mode, test_mode::const_input { ruleset, scene.world });
 	}
 
 	auto get_game_gui_subject_id() const {
@@ -184,4 +214,22 @@ public:
 	bool handle_input_before_game(
 		const handle_input_before_game_input
 	);
+
+	bool is_gameplay_on() const { return true; }
+
+	mode_player_id get_local_player_id() const {
+		return local_player_id;
+	}
+
+	test_arena_handle<false> get_arena_handle();
+	test_arena_handle<true> get_arena_handle() const;
+
+	template <class F>
+	decltype(auto) on_mode_with_input(F&& callback) const {
+		return get_arena_handle().on_mode_with_input(std::forward<F>(callback));
+	}
+
+	bool is_tutorial() const {
+		return type == test_scene_type::TUTORIAL;
+	}
 };

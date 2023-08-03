@@ -47,27 +47,29 @@ public:
 	void draw_rings(
 		const augs::drawer_with_default output,
 		augs::special_buffer& specials,
-		const camera_cone cone
+		const camera_cone queried_cone,
+		const camera_cone actual_cone
 	) const;
 
 	void draw_continuous_rings(
 		const cosmos& cosm,
 		const augs::drawer_with_default output,
 		augs::special_buffer& specials,
-		const camera_cone cone
+		const camera_cone queried_cone,
+		const camera_cone actual_cone
 	) const;
 
 	void draw_highlights_of_continuous_rings(
 		const cosmos& cosm,
 		const augs::drawer output,
 		const augs::atlas_entry highlight_tex,
-		const camera_cone cone
+		const camera_cone queried_cone
 	) const;
 
 	void draw_highlights_of_explosions(
 		const augs::drawer output,
 		const augs::atlas_entry highlight_tex,
-		const camera_cone cone
+		const camera_cone queried_cone
 	) const;
 
 	void reserve_caches_for_entities(const size_t) const {}

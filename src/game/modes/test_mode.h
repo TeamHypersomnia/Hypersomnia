@@ -81,7 +81,13 @@ struct test_mode_player {
 	mode_entity_id controlled_character_id;
 	test_mode_player_stats stats;
 	entity_id dedicated_spawn;
+
+	bool hide_in_scoreboard = false;
 	// END GEN INTROSPECTOR
+
+	auto should_hide_in_scoreboard() const {
+		return hide_in_scoreboard;
+	}
 
 	bool operator<(const test_mode_player& b) const;
 
@@ -238,5 +244,9 @@ public:
 
 	bool levelling_enabled(const_input) const {
 		return false;
+	}
+
+	const auto& get_players() const {
+		return players;
 	}
 };

@@ -514,6 +514,10 @@ void setup_per_node_flavour(
 			if (auto rigid_body = scene.template find<invariants::rigid_body>()) {
 				rigid_body->body_type = rigid_body_type::ALWAYS_STATIC;
 			}
+
+			if (from.context_tip.is_enabled) {
+				scene.template get<invariants::text_details>().description = from.context_tip.value;
+			}
 		}
 	}
 }

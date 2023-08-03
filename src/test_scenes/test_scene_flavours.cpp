@@ -44,6 +44,14 @@ namespace test_flavours {
 			return meta;
 		};
 
+		auto cover_ground_neons = [&](auto& meta) -> auto& {
+			auto& render = meta.template get<invariants::render>();
+			render.special_functions.set(special_render_function::COVER_GROUND_NEONS);
+			return meta;
+		};
+
+		(void)cover_ground_neons;
+
 		auto flavour_with_tiled_sprite = [&](auto&&... args) -> auto& {
 			auto& meta = flavour_with_sprite(std::forward<decltype(args)>(args)...);
 			meta.template get<invariants::sprite>().tile_excess_size = true;

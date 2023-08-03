@@ -557,6 +557,12 @@ bool edit_property(
 			return true;
 		}
 	}
+	else if constexpr(std::is_same_v<T, std::string>) {
+		if (input_multiline_text(label, property, 3)) {
+			result = "Edited %x";
+			return true;
+		}
+	}
 	else {
 		static_assert(always_false_v<T>, "Non-exhaustive if constexpr");
 	}
@@ -1133,6 +1139,27 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 			MULTIPROPERTY("Exit cooldown (ms)", as_portal.exit_cooldown_ms);
 			tooltip_on_hover("Since the exit is a portal that can be entered too,\nwe need to ignore it for a split second,\nto prevent an infinite loop where an object perpetually teleports back and forth.");
 
+		}
+
+		MULTIPROPERTY("Context tip", as_portal.context_tip.is_enabled);
+
+		if (last_result) {
+			if (insp.as_portal.context_tip.is_enabled) {
+				result = "Enabled Context tip in %x";
+			}
+			else {
+				result = "Disabled Context tip in %x";
+			}
+		}
+
+		{
+			auto scope = scoped_id("CONTEXTTIP");
+
+			if (insp.as_portal.context_tip.is_enabled) {
+				auto ind = scoped_indent();
+
+				MULTIPROPERTY("##ContextTip", as_portal.context_tip.value);
+			}
 		}
 	}
 

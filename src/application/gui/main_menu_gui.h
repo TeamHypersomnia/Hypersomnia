@@ -60,6 +60,11 @@ struct main_menu_gui {
 			return true;
 		}
 
+		if (change.was_pressed(augs::event::keys::key::T)) {
+			button_callback(main_menu_button_type::TUTORIAL);
+			return true;
+		}
+
 		if (change.was_pressed(augs::event::keys::key::S)) {
 			button_callback(main_menu_button_type::SETTINGS);
 			return true;

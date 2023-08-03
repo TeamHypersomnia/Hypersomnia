@@ -342,7 +342,7 @@ void arena_gui_state::draw_mode_gui(
 			mode_in.config,
 			general_drawer,
 			in.screen_size,
-			in.gui_fonts.gui,
+			in.gui_fonts.larger_gui,
 			cosm[tipped_character_id],
 			tipped_faction,
 			choose_team.show,

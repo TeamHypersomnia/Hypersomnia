@@ -14,39 +14,33 @@ test_scene_setup::test_scene_setup(
 	std::string nickname,
 	const packaged_official_content& official,
 	const test_scene_settings settings,
-	const input_recording_type recording_type
-) {
+	const input_recording_type recording_type,
+	const test_scene_type type
+) : type(type) {
 #if BUILD_TEST_SCENES
 	scene.make_test_scene(lua, settings);
 	auto& cosm = scene.world;
 
 	editor_project project;
 
-	all_modes_variant mv;
-	all_rulesets_variant rv;
-
-	cosmos_solvable_significant dummy;
-
 	//current_arena_folder = "user/projects/shooting_range";
-	current_arena_folder = "content/menu/shooting_range";
-	auto paths = editor_project_paths(current_arena_folder);
+	if (type == test_scene_type::TUTORIAL) {
+		current_arena_folder = "content/menu/tutorial";
+	}
+	else {
+		current_arena_folder = "content/menu/shooting_range";
+	}
 
-	auto handle = online_arena_handle<false>{ 
-		mv,
-		scene,
-		scene.world,
-		rv,
-		dummy
-	};
+	auto paths = editor_project_paths(current_arena_folder);
 
 	::load_arena_from_path(
 		{
 			lua,
-			handle,
+			get_arena_handle(),
 			official,
 			"",
 			"",
-			dummy,
+			clean_round_state,
 			std::nullopt,
 			&project
 		},
@@ -55,25 +49,28 @@ test_scene_setup::test_scene_setup(
 		nullptr
 	);
 
-	if (auto m = std::get_if<test_mode>(&mv)) {
-		mode = *m;
-	}
+	get_arena_handle().on_mode_with_input(
+		[&]<typename M>(M& mode, const auto& input) {
+			if constexpr(std::is_same_v<test_mode, M>) {
+				for (auto& p : project.nodes.template get_pool_for<editor_point_marker_node>()) {
+					if (p.editable.faction == faction_type::RESISTANCE) {
+						auto new_id = mode.add_player(input, nickname, faction_type::RESISTANCE);
+						mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
+						mode.find(new_id)->hide_in_scoreboard = true;
+						mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
+					}
+				}
 
-	if (auto r = std::get_if<test_mode_ruleset>(&rv)) {
-		ruleset = *r;
-	}
+				local_player_id = mode.add_player(input, nickname, faction_type::METROPOLIS);
+				viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
 
-	for (auto& p : project.nodes.template get_pool_for<editor_point_marker_node>()) {
-		if (p.editable.faction == faction_type::RESISTANCE) {
-			auto new_id = mode.add_player({ ruleset, cosm }, nickname, faction_type::RESISTANCE);
-			mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
-			mode.teleport_to_next_spawn({ ruleset, cosm }, new_id, mode.find(new_id)->controlled_character_id);
+				mode.infinite_ammo_for = viewed_character_id;
+			}
+			else {
+				ensure("Unsupported mode." && false);
+			}
 		}
-	}
-
-	local_player_id = mode.add_player({ ruleset, cosm }, nickname, faction_type::METROPOLIS);
-	viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
-	mode.infinite_ammo_for = viewed_character_id;
+	);
 #else
 	(void)lua;
 	(void)settings;
@@ -84,6 +81,9 @@ test_scene_setup::test_scene_setup(
 		//
 		//}
 	}
+
+	/* Close any window that might be open by default */
+	escape();
 }
 
 void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
@@ -91,6 +91,19 @@ void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 
 	if (speed < 1.0f) {
 		//config.interpolation.enabled = false;
+	}
+
+	if (is_tutorial()) {
+		auto& mult = config.session.camera_query_aabb_mult;
+
+		if (std::clamp(mult, 1.0f, 1.7f) == mult) {
+			/* We want the first impression to be good so increase it in case there are any glitches. */
+			mult = 1.5f;
+		}
+
+		if (tutorial.level == 0) {
+			config.drawing.draw_hotbar = false;
+		}
 	}
 }
 
@@ -106,11 +119,23 @@ bool test_scene_setup::handle_input_before_imgui(
 	return false;
 }
 
+void test_scene_setup::draw_custom_gui(const draw_setup_gui_input& in) { 
+	arena_gui_base::draw_custom_gui(in);
+}
+
+setup_escape_result test_scene_setup::escape() {
+	return arena_gui_base::escape();
+}
+
 bool test_scene_setup::handle_input_before_game(
 	const handle_input_before_game_input in
 ) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
+
+	if (arena_gui_base::handle_input_before_game(in)) {
+		return true;
+	}
 
 	const auto ch = in.e.get_key_change();
 
@@ -137,4 +162,12 @@ bool test_scene_setup::handle_input_before_game(
 	}
 
 	return false;
+}
+
+test_arena_handle<false> test_scene_setup::get_arena_handle() {
+	return get_arena_handle_impl<test_arena_handle<false>>(*this);
+}
+
+test_arena_handle<true> test_scene_setup::get_arena_handle() const {
+	return get_arena_handle_impl<test_arena_handle<true>>(*this);
 }

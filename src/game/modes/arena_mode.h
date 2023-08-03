@@ -164,6 +164,10 @@ struct arena_mode_player {
 		return session.id;
 	}
 
+	auto should_hide_in_scoreboard() const {
+		return false;
+	}
+
 	auto get_order() const {
 		return arena_player_order_info { get_nickname(), stats.calc_score() };
 	}

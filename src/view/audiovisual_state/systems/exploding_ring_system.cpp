@@ -158,11 +158,11 @@ void exploding_ring_system::draw_continuous_rings(
 	const cosmos& cosm,
 	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
-	const camera_cone cone
+	const camera_cone queried_cone,
+	const camera_cone actual_cone
 ) const {
-	const auto& eye = cone.eye;
-
-	const auto queried_camera_aabb = cone.get_visible_world_rect_aabb();
+	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
+	const auto& eye = actual_cone.eye;
 
 	const auto sane_default_ratio = 0.5f;
 
@@ -209,8 +209,8 @@ void exploding_ring_system::draw_continuous_rings(
 
 				augs::special sp;
 
-				sp.v1 = cone.to_screen_space(ring_center);
-				sp.v1.y = cone.screen_size.y - sp.v1.y;
+				sp.v1 = actual_cone.to_screen_space(ring_center);
+				sp.v1.y = actual_cone.screen_size.y - sp.v1.y;
 
 				sp.v2.x = inner_radius_now * eye.zoom * eye.zoom;
 				sp.v2.y = outer_radius_now * eye.zoom * eye.zoom;
@@ -237,11 +237,11 @@ void exploding_ring_system::draw_continuous_rings(
 void exploding_ring_system::draw_rings(
 	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
-	const camera_cone cone
+	const camera_cone queried_cone,
+	const camera_cone actual_cone
 ) const {
-	const auto& eye = cone.eye;
-
-	const auto queried_camera_aabb = cone.get_visible_world_rect_aabb();
+	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
+	const auto& eye = actual_cone.eye;
 
 	for (const auto& e : rings) {
 		const auto& r = e.in;
@@ -261,8 +261,8 @@ void exploding_ring_system::draw_rings(
 		}
 
 		augs::special sp;
-		sp.v1 = cone.to_screen_space(world_explosion_center);
-		sp.v1.y = cone.screen_size.y - sp.v1.y;
+		sp.v1 = actual_cone.to_screen_space(world_explosion_center);
+		sp.v1.y = actual_cone.screen_size.y - sp.v1.y;
 
 		sp.v2.x = inner_radius_now * eye.zoom * eye.zoom;
 		sp.v2.y = outer_radius_now * eye.zoom * eye.zoom;
@@ -309,9 +309,9 @@ void exploding_ring_system::draw_highlights_of_continuous_rings(
 	const cosmos& cosm,
 	const augs::drawer output,
 	const augs::atlas_entry highlight_tex,
-	const camera_cone cone
+	const camera_cone queried_cone
 ) const {
-	const auto queried_camera_aabb = cone.get_visible_world_rect_aabb();
+	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
 
 	cosm.for_each_having<components::portal>(
 		[&](const auto& typed_portal_handle) {
@@ -346,9 +346,9 @@ void exploding_ring_system::draw_highlights_of_continuous_rings(
 void exploding_ring_system::draw_highlights_of_explosions(
 	const augs::drawer output,
 	const augs::atlas_entry highlight_tex,
-	const camera_cone cone
+	const camera_cone queried_cone
 ) const {
-	const auto queried_camera_aabb = cone.get_visible_world_rect_aabb();
+	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
 
 	for (const auto& r : rings) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;

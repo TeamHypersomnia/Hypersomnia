@@ -3,6 +3,8 @@
 #include "game/detail/bombsite_in_range.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/detail/use_interaction_logic.h"
+#include "view/mode_gui/arena/render_text_with_hotkeys.hpp"
+#include "view/mode_gui/arena/on_first_touching_portal.hpp"
 
 template <class E, class M, class I>
 inline void draw_context_tip(
@@ -42,7 +44,7 @@ inline void draw_context_tip(
 		const auto found_k = key_or_default(m, key);
 
 		if (found_k == keys::key()) {
-			return colored(" (UNASSIGNED) ", settings.bound_key_color);
+			return colored("(UNASSIGNED)", settings.bound_key_color);
 		}
 
 		const auto key_str = [&]() {
@@ -61,7 +63,7 @@ inline void draw_context_tip(
 			return alt_char + " (" + shortened + ")" ;
 		}();
 
-		return colored(" " + key_str + " ", settings.bound_key_color);
+		return colored(key_str, settings.bound_key_color);
 	};
 
 	const auto final_pos = vec2i(screen_size.x / 2, settings.tip_offset_mult * screen_size.y);
@@ -116,7 +118,7 @@ inline void draw_context_tip(
 		}
 	};
 
-	const auto total_text = [&]() {
+	const auto total_text = [&]() -> formatted_string {
 		formatted_string total_text;
 
 		auto break_line = [&]() {
@@ -153,30 +155,32 @@ inline void draw_context_tip(
 			total_text += colored(str, col);
 		};
 
-		if (current_faction == faction_type::SPECTATOR) {
-			if (!team_choice_opened) {
-				text("You are a Spectator. Press");
-				hotkey(general_gui_intent_type::CHOOSE_TEAM);
-				text("to change teams.");
-			}
+		(void)text_colored;
+
+		auto do_text = [&](const auto& input) {
+			render_text_with_hotkeys(input, text, break_line, hotkey);
 
 			return total_text;
+		};
+
+		if (current_faction == faction_type::SPECTATOR) {
+			if (!team_choice_opened) {
+				return do_text("You are a Spectator. Press {CHOOSE_TEAM} to change teams.");
+			}
+
+			return {};
 		}
 
 		if (viewed_character.dead()) {
-			return total_text;
+			return {};
 		}
 
 		if (!sentient_and_conscious(viewed_character)) {
-			return total_text;
+			return {};
 		}
 
 		if (is_cursor_released) {
-			text("You have released the cursor and can now interact with GUI.");
-			break_line();
-			text("To control the crosshair, press"); hotkey(general_gui_intent_type::TOGGLE_MOUSE_CURSOR); text("again.");
-
-			return total_text;
+			return do_text("You have released the cursor and can now interact with GUI.\nTo control the crosshair, press {TOGGLE_MOUSE_CURSOR} again.");
 		}
 
 		bool is_bomb_in_hand = false;
@@ -214,43 +218,32 @@ inline void draw_context_tip(
 				const auto participants = typed_mode.calc_participating_factions(mode_input);
 
 				if (participants.defusing == current_faction) {
-					text("You've stolen the bomb! Escape!");
-					break_line();
-					text("Careful, enemies know where you go with the bomb.");
-					return total_text;
+					return do_text("You've stolen the bomb! Escape!\nCareful, enemies know where you go with the bomb.");
 				}
 			}
 		}
 
 		if (bomb_being_armed) {
-			text("Stay still while planting the bomb!");
-
-			return total_text;
+			return do_text("Stay still while planting the bomb!");
 		}
 
 		if (is_bomb_in_hand) {
 			if (::bombsite_in_range(bomb)) {
-				text("Press and hold");
-				hotkey(bomb_hand_index == 0 ? game_intent_type::SHOOT : game_intent_type::SHOOT_SECONDARY);
-				text("to plant the bomb.");
-
-				return total_text;
+				if (bomb_hand_index == 0) {
+					return do_text("Press and hold {SHOOT} to plant the bomb.");
+				}
+				else {
+					return do_text("Press and hold {SHOOT_SECONDARY} to plant the bomb.");
+				}
 			}
 			else {
-				text("You cannot plant the bomb here.");
-				break_line();
-				text("Find the bombsite!");
-				return total_text;
+				return do_text("You cannot plant the bomb here.\nFind the bombsite!");
 			}
 		}
 
 		if (::bombsite_in_range_of_entity(viewed_character)) {
 			if (bomb) {
-				text("Press");
-				hotkey(game_intent_type::WIELD_BOMB);
-				text("to pull out the bomb.");
-
-				return total_text;
+				return do_text("Press {WIELD_BOMB} to pull out the bomb.");
 			}
 		}
 
@@ -262,9 +255,9 @@ inline void draw_context_tip(
 				const auto pickup_slot = viewed_character.find_pickup_target_slot_for(item_handle, { slot_finding_opt::OMIT_MOUNTED_SLOTS });
 
 				if (pickup_slot.alive()) {
-					text("Press");
+					text("Press ");
 					hotkey(game_intent_type::INTERACT);
-					text("to pick up ");
+					text(" to pick up ");
 
 					const auto& item_name = item_handle.get_name();
 					total_text += colored(item_name, settings.item_name_color);
@@ -289,18 +282,18 @@ inline void draw_context_tip(
 
 					if (viewed_character.get_wielded_items().size() > 0) {
 						break_line();
-						text("Hide items with");
+						text("Hide items with ");
 						hotkey(inventory_gui_intent_type::HOLSTER);
-						text("or drop them with");
+						text(" or drop them with ");
 						hotkey(game_intent_type::DROP);
-						text("to defuse faster!");
+						text(" to defuse faster!");
 					}
 				}
 
 				if (typed_interaction.can_begin_interaction()) {
-					text("Press");
+					text("Press ");
 					hotkey(game_intent_type::INTERACT);
-					text("to defuse the bomb.");
+					text(" to defuse the bomb.");
 				}
 			}
 		};
@@ -313,22 +306,24 @@ inline void draw_context_tip(
 
 		if constexpr(!std::is_same_v<M, test_mode>) {
 			if (mode_input.rules.has_economy()) {
-				if (::buy_area_in_range(viewed_character)) {
-					if (!buy_menu_opened) {
-						if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
-							text("It is too late to buy items.");
-							return total_text;
-						}
-
-						text("Press");
-						hotkey(general_gui_intent_type::BUY_MENU);
-						text("to buy items.");
+				if (::buy_area_in_range(viewed_character) && !buy_menu_opened) {
+					if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
+						return do_text("It is too late to buy items.");
 					}
 
-					return total_text;
+					return do_text("Press {BUY_MENU} to buy items.");
 				}
 			}
 		}
+
+		on_first_touching_portal(
+			viewed_character,
+			[&](const auto& portal) {
+				if (const auto details = portal.template find<invariants::text_details>()) {
+					::render_text_with_hotkeys(details->description, text, break_line, hotkey);
+				}
+			}
+		);
 
 		(void)viewed_character;
 		return total_text;

@@ -9,6 +9,7 @@ enum class main_menu_button_type {
 	HOST_SERVER,
 	CONNECT_TO_SERVER,
 	SHOOTING_RANGE,
+	TUTORIAL,
 	EDITOR,
 	SETTINGS,
 	QUIT,

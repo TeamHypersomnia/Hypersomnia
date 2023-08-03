@@ -80,6 +80,8 @@ struct editor_portal_info {
 	portal_exit_impulses exit_impulses;
 	portal_exit_direction exit_direction = portal_exit_direction::PORTAL_DIRECTION;
 	portal_exit_position exit_position = portal_exit_position::PORTAL_CENTER_PLUS_ENTERING_OFFSET;
+
+	augs::maybe<std::string> context_tip;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const editor_portal_info&) const = default;

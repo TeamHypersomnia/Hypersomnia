@@ -23,6 +23,7 @@ void enqueue_illuminated_rendering_jobs(
 	const auto& settings = in.drawing;
 	const auto& damage_indication_settings = in.damage_indication;
 	const auto& queried_cone = in.queried_cone;
+	const auto& actual_cone = in.camera.cone;
 	const auto& visible = in.all_visible;
 	const auto& interp = av.template get<interpolation_system>();
 	const auto& damage_indication = av.template get<damage_indication_system>();
@@ -562,7 +563,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto special_effects_job = [&cosm, &exploding_rings, &dedicated, get_drawer_for, &thunders, queried_cone, get_line_drawer_for]() {
+	auto special_effects_job = [&cosm, &exploding_rings, &dedicated, get_drawer_for, &thunders, queried_cone, actual_cone, get_line_drawer_for]() {
 		{
 			thunders.draw_thunders(
 				get_line_drawer_for(D::THUNDERS),
@@ -574,7 +575,8 @@ void enqueue_illuminated_rendering_jobs(
 			exploding_rings.draw_rings(
 				get_drawer_for(D::EXPLODING_RINGS),
 				dedicated[D::EXPLODING_RINGS].specials,
-				queried_cone
+				queried_cone,
+				actual_cone
 			);
 		}
 
@@ -583,7 +585,8 @@ void enqueue_illuminated_rendering_jobs(
 				cosm,
 				get_drawer_for(D::EXPLODING_RINGS),
 				dedicated[D::EXPLODING_RINGS].specials,
-				queried_cone
+				queried_cone,
+				actual_cone
 			);
 		}
 	};

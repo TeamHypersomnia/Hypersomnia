@@ -94,7 +94,15 @@ void arena_scoreboard_gui::draw_gui(
 	const int num_participating_factions = 2;
 
 	auto estimated_window_height = [&]() {
-		const auto player_cells_h = cell_h * typed_mode.get_num_players();
+		auto num_players = uint32_t(0);
+
+		for (auto& p : typed_mode.get_players()) {
+			if (!p.second.should_hide_in_scoreboard()) {
+				++num_players;
+			}
+		}
+
+		const auto player_cells_h = cell_h * num_players;
 		const auto headline_cells_h = cell_h * 3 * num_participating_factions;
 
 		const auto num_spectators = typed_mode.num_players_in(faction_type::SPECTATOR);
@@ -312,6 +320,10 @@ void arena_scoreboard_gui::draw_gui(
 			const auto& id, 
 			const auto& player
 		) {
+			if (player.should_hide_in_scoreboard()) {
+				return;
+			}
+
 			sorted_players.emplace_back(player, id);
 		});
 

@@ -1254,6 +1254,14 @@ work_result work(const int argc, const char* const * const argv) try {
 	};
 
 	auto launch_setup = [&](const activity_type mode) {
+		if (mode != activity_type::TUTORIAL && !config.skip_tutorial) {
+			change_with_save(
+				[&](auto& cfg) {
+					cfg.skip_tutorial = true;
+				}
+			);
+		}
+
 		if (map_catalogue_gui.is_downloading()) {
 			LOG("Cannot launch %x. Download in progress.", augs::enum_to_string(mode));
 			return;
@@ -1361,7 +1369,22 @@ work_result work(const int argc, const char* const * const argv) try {
 						config.client.nickname,
 						*official,
 						config.test_scene,
-						config.get_input_recording_mode()
+						config.get_input_recording_mode(),
+						test_scene_type::SHOOTING_RANGE
+					);
+				});
+
+				break;
+
+			case activity_type::TUTORIAL:
+				setup_launcher([&]() {
+					emplace_current_setup(std::in_place_type_t<test_scene_setup>(),
+						lua,
+						config.client.nickname,
+						*official,
+						config.test_scene,
+						config.get_input_recording_mode(),
+						test_scene_type::TUTORIAL
 					);
 				});
 
@@ -2166,6 +2189,10 @@ work_result work(const int argc, const char* const * const argv) try {
 				launch_setup(activity_type::SHOOTING_RANGE);
 				break;
 
+			case T::TUTORIAL:
+				launch_setup(activity_type::TUTORIAL);
+				break;
+
 			case T::EDITOR:
 				launch_setup(activity_type::EDITOR_PROJECT_SELECTOR);
 				break;
@@ -2608,7 +2635,12 @@ work_result work(const int argc, const char* const * const argv) try {
 	}
 	else {
 		if (config.launch_at_startup == launch_type::LAST_ACTIVITY) {
-			launch_setup(config.get_last_activity());
+			if (!config.skip_tutorial) {
+				launch_setup(activity_type::TUTORIAL);
+			}
+			else {
+				launch_setup(config.get_last_activity());
+			}
 		}
 		else {
 			launch_setup(activity_type::MAIN_MENU);

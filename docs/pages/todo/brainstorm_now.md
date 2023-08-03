@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Settings: split Gameplay tab into HUD and Rendering (or idk name it somehow else)
+- Editor: Fix lighting inconsistency between with and without FOV
+    - Seen on shooting range with wood material
+    - we'll use vent for the tutorial
+
 - recheck what happens if missing arena is chosen, afaik it chose de_jedrula still and reported hash of 0
 
 - Editor: Grouping.
