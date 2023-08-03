@@ -27,6 +27,8 @@ struct editor_resource_id;
 
 struct editor_official_resource_map;
 
+using name_to_node_map_type = std::unordered_map<std::string, editor_node_id>;
+
 struct editor_project {
 	// GEN INTROSPECTOR struct editor_project
 	editor_project_meta meta;
@@ -119,6 +121,8 @@ struct editor_project {
 
 	template <class R, class F>
 	void for_each_resource(F&& callback) const;
+
+	name_to_node_map_type make_name_to_node_map() const;
 
 private:
 	template <class S, class Officials, class F>

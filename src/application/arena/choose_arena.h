@@ -35,10 +35,10 @@ struct choose_arena_input {
 inline void load_arena_from_path(
 	const choose_arena_input in,
 	const augs::path_type& json_path,
-	augs::secure_hash_type* const output_arena_hash
+	augs::secure_hash_type* const output_arena_hash,
+	scene_entity_to_node_map* const entity_to_node = nullptr
 ) {
 	const bool strict = true;
-	scene_entity_to_node_map* const entity_to_node = nullptr;
 
 	auto project = editor_project_readwrite::read_project_json(
 		json_path,
@@ -72,10 +72,10 @@ inline void load_arena_from_path(
 inline void load_arena_from_string(
 	const choose_arena_input in,
 	const augs::path_type& project_dir,
-	const std::string& json_document
+	const std::string& json_document,
+	scene_entity_to_node_map* const entity_to_node = nullptr
 ) {
 	const bool strict = true;
-	scene_entity_to_node_map* const entity_to_node = nullptr;
 
 	auto project = editor_project_readwrite::read_project_json(
 		project_dir,

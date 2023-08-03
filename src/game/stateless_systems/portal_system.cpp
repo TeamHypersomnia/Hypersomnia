@@ -10,6 +10,7 @@
 #include "game/messages/pure_color_highlight_message.h"
 #include "game/detail/melee/like_melee.h"
 #include "game/messages/damage_message.h"
+#include "game/messages/game_notification.h"
 
 auto calc_unit_progress_per_step(const augs::delta& dt, const real32 time_ms) {
 	const auto seconds_to_complete = time_ms / 1000;
@@ -335,6 +336,17 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 					rigid_body.body().m_last_teleport_progress_timestamp = cosm.get_total_steps_passed();
 					typed_contacted_entity.set_logic_transform(final_transform);
 					::snap_interpolated_to(typed_contacted_entity, final_transform);
+
+					{
+						messages::game_notification notification;
+
+						notification.payload = messages::teleportation { 
+							typed_contacted_entity.get_id(),
+							portal_exit.get_id() 
+						};
+
+						step.post_message(notification);
+					}
 
 					play_exit_effects(step, typed_contacted_entity, *portal_exit_portal);
 

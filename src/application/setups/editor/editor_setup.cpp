@@ -1781,20 +1781,8 @@ void editor_setup::start_renaming_selection() {
 	}
 }
 
-std::unordered_map<std::string, editor_node_id> editor_setup::make_name_to_node_map() const {
-	std::unordered_map<std::string, editor_node_id> result;
-
-	project.nodes.for_each(
-		[&](const auto& node_pool) {
-			auto register_node = [&]<typename T>(const auto id, const T& object) {
-				result[object.get_display_name()] = editor_typed_node_id<T> { id }.operator editor_node_id();
-			};
-
-			node_pool.for_each_id_and_object(register_node);
-		}
-	);
-
-	return result;
+name_to_node_map_type editor_setup::make_name_to_node_map() const {
+	return project.make_name_to_node_map();
 }
 
 std::unordered_map<std::string, editor_resource_id> editor_setup::make_name_to_internal_resource_map() const {
@@ -2007,18 +1995,7 @@ void editor_setup::scroll_once_to(inspected_variant id) {
 }
 
 editor_node_id editor_setup::to_node_id(entity_id id) const {
-	if (!id.is_set()) {
-		return {};
-	}
-
-	const auto& mapping = scene_entity_to_node[id.type_id.get_index()];
-	const auto node_index = id.raw.indirection_index;
-
-	if (node_index < mapping.size()) {
-		return mapping[node_index];
-	}
-
-	return {};
+	return ::entity_to_node_id(scene_entity_to_node, id);
 }
 
 augs::path_type editor_setup::get_unofficial_content_dir() const {

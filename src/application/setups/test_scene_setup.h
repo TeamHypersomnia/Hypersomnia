@@ -18,6 +18,8 @@
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/network/network_common.h"
+#include "application/setups/editor/project/editor_project.h"
+#include "application/arena/scene_entity_to_node_map.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -46,13 +48,21 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 
 	all_rulesets_variant ruleset;
 	all_modes_variant current_mode_state;
+
+	std::string nickname;
+
 	cosmos_solvable_significant clean_round_state;
+	all_modes_variant clean_mode_state;
 
 	intercosm scene;
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	entity_id viewed_character_id;
 	mode_player_id local_player_id;
+
+	editor_project project;
+	scene_entity_to_node_map entity_to_node;
+	name_to_node_map_type name_to_node;
 
 	augs::path_type current_arena_folder;
 	test_scene_type type;
@@ -129,6 +139,8 @@ public:
 		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
 	}
 
+	bool post_solve(const const_logic_step step);
+
 	template <class C>
 	void advance(
 		const setup_advance_input& in,
@@ -140,6 +152,16 @@ public:
 
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
+		auto get_solve_settings = [&]() {
+			solve_settings settings;
+
+			if (scene.world.get_total_steps_passed() <= clean_round_state.clk.now.step + 1) {
+				settings.play_transfer_sounds = false;
+			}
+
+			return settings;
+		};
+
 		while (steps--) {
 			const auto total = total_collected.extract(
 				get_viewed_character(), 
@@ -147,14 +169,42 @@ public:
 				in.make_accumulator_input()
 			);
 
+
 			get_arena_handle().on_mode_with_input(
 				[&](auto& mode, const auto& input) {
+					bool restarted = false;
+
+					auto with_post_solve = solver_callbacks(
+						callbacks.pre_solve,
+						[&](const const_logic_step step) {
+							if (this->post_solve(step)) {
+								/* Prevent post-solving the old step if we've only just restarted. */
+								restarted = true;
+								return;
+							}
+
+							callbacks.post_solve(step);
+						},
+						callbacks.post_cleanup
+					);
+
 					mode.advance(
 						input,
 						total,
-						callbacks,
-						solve_settings()
+						with_post_solve,
+						get_solve_settings()
 					);
+
+					if (restarted) {
+						/* Advance once normally*/
+
+						mode.advance(
+							input,
+							total,
+							callbacks,
+							get_solve_settings()
+						);
+					}
 				}
 			);
 		}
@@ -232,4 +282,7 @@ public:
 	bool is_tutorial() const {
 		return type == test_scene_type::TUTORIAL;
 	}
+
+	void restart_mode();
+	void restart_arena();
 };

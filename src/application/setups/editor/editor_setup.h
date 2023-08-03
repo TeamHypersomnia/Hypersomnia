@@ -54,6 +54,7 @@
 
 #include "application/main/miniature_generator.h"
 #include "application/network/network_common.h"
+#include "application/arena/scene_entity_to_node_map.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -126,7 +127,7 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 
 	bool playtesting = false;
 
-	per_entity_type_array<std::vector<editor_node_id>> scene_entity_to_node;
+	scene_entity_to_node_map scene_entity_to_node;
 
 	editor_project project;
 	editor_gui gui;
@@ -378,7 +379,7 @@ public:
 
 	void scroll_once_to(inspected_variant);
 
-	std::unordered_map<std::string, editor_node_id> make_name_to_node_map() const;
+	name_to_node_map_type make_name_to_node_map() const;
 	std::unordered_map<std::string, editor_resource_id> make_name_to_internal_resource_map() const;
 
 	std::string get_free_node_name_for(const std::string& new_name) const;

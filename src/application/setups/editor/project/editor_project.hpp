@@ -120,3 +120,19 @@ inline bool editor_project::rescan_resources_to_track(const O& officials, const 
 
 	return any_references_to_pathed || any_changes_to_pathed;
 }
+
+inline name_to_node_map_type editor_project::make_name_to_node_map() const {
+	std::unordered_map<std::string, editor_node_id> result;
+
+	nodes.for_each(
+		[&](const auto& node_pool) {
+			auto register_node = [&]<typename T>(const auto id, const T& object) {
+				result[object.get_display_name()] = editor_typed_node_id<T> { id }.operator editor_node_id();
+			};
+
+			node_pool.for_each_id_and_object(register_node);
+		}
+	);
+
+	return result;
+}

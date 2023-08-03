@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-03 17:14:27.481342 UTC"
+        "version_timestamp": "2023-08-03 22:00:57.497606 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -288,14 +288,14 @@
         {
             "id": "dev_floor_256",
             "type": "dev_floor_256",
-            "pos": [0.0, -640.0],
-            "size": [1536, 3584]
+            "pos": [0.0, -384.0],
+            "size": [1536, 3072]
         },
         {
             "id": "vent (1)",
             "type": "@materials/vent.png",
-            "pos": [-960.0000610351563, -1152.0],
-            "size": [384, 4608]
+            "pos": [-960.0000610351563, -896.0],
+            "size": [384, 4096]
         },
         {
             "id": "floor_left",
@@ -313,8 +313,8 @@
         {
             "id": "vent (9)",
             "type": "@materials/vent.png",
-            "pos": [960.0000610351563, -1152.0],
-            "size": [384, 4608]
+            "pos": [960.0000610351563, -896.0],
+            "size": [384, 4096]
         },
         {
             "id": "vent (10)",
@@ -333,15 +333,15 @@
         {
             "id": "vent",
             "type": "@materials/vent.png",
-            "pos": [0.0, -3551.999755859375],
+            "pos": [0.0, -3039.999755859375],
             "rotation": 90.0,
             "size": [192, 2304]
         },
         {
             "id": "floor_top",
             "type": "@water_room_floor_2",
-            "pos": [0.0, -4416.0],
-            "size": [10752, 4096]
+            "pos": [0.0, -4192.0],
+            "size": [10752, 4544]
         },
         {
             "id": "dev_floor_256 (1)",
@@ -518,7 +518,7 @@
         {
             "id": "floor_right (3)",
             "type": "@water_room_floor",
-            "pos": [0.0, -2944.0],
+            "pos": [0.0, -2432.0],
             "size": [1408, 768],
             "color": [255, 132, 132, 255]
         },
@@ -712,7 +712,7 @@
         {
             "id": "exit0",
             "type": "portal",
-            "pos": [-0.000095367431640625, -2944.0009765625],
+            "pos": [-0.000095367431640625, -2432.001220703125],
             "rotation": -90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,

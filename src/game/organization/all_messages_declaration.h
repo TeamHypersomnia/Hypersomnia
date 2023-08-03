@@ -31,6 +31,7 @@ namespace messages {
 	struct exploding_ring_effect;
 	struct pure_color_highlight;
 	struct mode_notification;
+	struct game_notification;
 	struct hud_message;
 	struct duel_of_honor_message;
 	struct match_summary_message;
@@ -78,6 +79,7 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::pure_color_highlight,
 
 	messages::mode_notification,
+	messages::game_notification,
 	messages::hud_message,
 
 	messages::duel_of_honor_message,

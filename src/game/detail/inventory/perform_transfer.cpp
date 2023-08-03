@@ -51,13 +51,15 @@ void perform_transfer_result::play_effects(const logic_step step) const {
 	const auto predicting = source.is_set() ? source : target;
 	const auto predictability = predicting.is_set() ? predictable_only_by(predicting) : never_predictable_v;
 
-	if (transfer_sound.has_value()) {
-		// TODO: PARAMETRIZE!
+	if (step.get_settings().play_transfer_sounds) {
+		if (transfer_sound.has_value()) {
+			// TODO: PARAMETRIZE!
 
-		auto t = transfer_sound;
-		t->input.modifier.max_distance = 2000.f;
-		t->input.modifier.reference_distance = 600.f;
-		t->post(step, predictability);
+			auto t = transfer_sound;
+			t->input.modifier.max_distance = 2000.f;
+			t->input.modifier.reference_distance = 600.f;
+			t->post(step, predictability);
+		}
 	}
 
 	if (transfer_particles.has_value()) {

@@ -2,13 +2,12 @@
 #include <vector>
 #include "augs/filesystem/path.h"
 #include "game/cosmos/cosmos_common_significant_access.h"
+#include "application/arena/scene_entity_to_node_map.h"
 
 struct editor_project;
 struct packaged_official_content;
 struct editor_node_id;
 struct cosmos_solvable_significant;
-
-using scene_entity_to_node_map = per_entity_type_array<std::vector<editor_node_id>>;
 
 struct build_arena_input {
 	const editor_project& project;
