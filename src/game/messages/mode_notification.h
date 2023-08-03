@@ -14,11 +14,9 @@ namespace messages {
 		faction_type target_faction = faction_type::DEFAULT;
 	};
 
-	using notification_variant = std::variant<faction_choice, joined_or_left>;
-
-	struct game_notification {
+	struct mode_notification {
 		mode_player_id subject_mode_id;
 		std::string subject_name;
-		notification_variant payload;
+		std::variant<faction_choice, joined_or_left> payload;
 	};
 }

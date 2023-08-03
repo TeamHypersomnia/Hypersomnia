@@ -28,7 +28,7 @@
 
 #include "game/cosmos/just_create_entity_functional.h"
 #include "game/detail/visible_entities.hpp"
-#include "game/messages/game_notification.h"
+#include "game/messages/mode_notification.h"
 #include "game/messages/hud_message.h"
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/modes/detail/delete_with_held_items.hpp"
@@ -1906,7 +1906,7 @@ void arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 		(void)result;
 
 		if (const auto entry = find(a.id)) {
-			messages::game_notification notification;
+			messages::mode_notification notification;
 
 			notification.subject_mode_id = a.id;
 			notification.subject_name = entry->get_nickname();
@@ -1925,7 +1925,7 @@ void arena_mode::add_or_remove_players(const input_type in, const mode_entropy& 
 
 	if (logically_set(g.removed_player)) {
 		if (const auto entry = find(g.removed_player)) {
-			messages::game_notification notification;
+			messages::mode_notification notification;
 
 			notification.subject_mode_id = g.removed_player;
 			notification.subject_name = entry->get_nickname();
@@ -2200,7 +2200,7 @@ void arena_mode::execute_player_commands(const input_type in, mode_entropy& entr
 					choice.result = result;
 					choice.target_faction = final_faction;
 
-					messages::game_notification notification;
+					messages::mode_notification notification;
 					notification.subject_mode_id = id;
 					notification.subject_name = player_data->get_nickname();
 					notification.payload = choice;

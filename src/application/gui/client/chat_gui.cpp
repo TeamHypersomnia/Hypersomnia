@@ -7,16 +7,16 @@
 #include "augs/gui/text/printer.h"
 #include "augs/drawing/drawing.h"
 #include "augs/string/format_enum.h"
-#include "game/messages/game_notification.h"
+#include "game/messages/mode_notification.h"
 #include "augs/templates/identity_templates.h"
 
 void LOG_NOFORMAT(const std::string& f);
 
 const auto standard_gray_v = rgba(200, 200, 200, 255);
 
-bool chat_gui_state::add_entry_from_game_notification(
+bool chat_gui_state::add_entry_from_mode_notification(
 	const net_time_t timestamp,
-	const messages::game_notification& msg,
+	const messages::mode_notification& msg,
 	const mode_player_id current_mode_id
 ) {
 	using namespace messages;

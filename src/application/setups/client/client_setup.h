@@ -398,12 +398,12 @@ class client_setup :
 					}
 
 					{
-						auto& notifications = step.get_queue<messages::game_notification>();
+						auto& notifications = step.get_queue<messages::mode_notification>();
 
 						const auto current_time = get_current_time();
 
 						erase_if(notifications, [this, current_time](const auto& msg) {
-							return client_gui.chat.add_entry_from_game_notification(current_time, msg, get_local_player_id());
+							return client_gui.chat.add_entry_from_mode_notification(current_time, msg, get_local_player_id());
 						});
 					}
 

@@ -33,7 +33,7 @@
 #include "application/setups/server/server_nat_traversal.h"
 
 #include "application/setups/server/rcon_level.h"
-#include "game/messages/game_notification.h"
+#include "game/messages/mode_notification.h"
 #include "application/setups/server/file_chunk_packet.h"
 
 struct netcode_socket_t;
@@ -425,7 +425,7 @@ public:
 				if (is_dedicated()) {
 					auto post_solve = [&](auto old_callback, const const_logic_step step) {
 						{
-							auto& notifications = step.get_queue<messages::game_notification>();
+							auto& notifications = step.get_queue<messages::mode_notification>();
 
 							if (!notifications.empty()) {
 								request_immediate_heartbeat();
@@ -450,7 +450,7 @@ public:
 				}
 				else {
 					auto post_solve = [&](auto old_callback, const const_logic_step step) {
-						auto& notifications = step.get_queue<messages::game_notification>();
+						auto& notifications = step.get_queue<messages::mode_notification>();
 
 						if (!notifications.empty()) {
 							request_immediate_heartbeat();
@@ -459,7 +459,7 @@ public:
 						const auto current_time = get_current_time();
 
 						erase_if(notifications, [this, current_time](const auto& msg) {
-							return integrated_client_gui.chat.add_entry_from_game_notification(current_time, msg, get_local_player_id());
+							return integrated_client_gui.chat.add_entry_from_mode_notification(current_time, msg, get_local_player_id());
 						});
 
 						default_server_post_solve(step);

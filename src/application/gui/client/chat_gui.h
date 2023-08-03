@@ -6,7 +6,7 @@
 #include "augs/texture_atlas/atlas_entry.h"
 
 namespace messages {
-	struct game_notification;
+	struct mode_notification;
 };
 
 namespace augs {
@@ -57,9 +57,9 @@ struct chat_gui_state {
 		}
 	}
 
-	bool add_entry_from_game_notification(
+	bool add_entry_from_mode_notification(
 		net_time_t,
-		const messages::game_notification&,
+		const messages::mode_notification&,
 		const mode_player_id current_mode_id
 	);
 

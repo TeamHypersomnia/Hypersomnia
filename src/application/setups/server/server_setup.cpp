@@ -45,7 +45,7 @@
 #include "augs/readwrite/json_readwrite.h"
 #include "application/setups/editor/editor_paths.h"
 #include "game/modes/arena_mode.hpp"
-#include "game/messages/game_notification.h"
+#include "game/messages/mode_notification.h"
 
 const auto only_connected_v = server_setup::for_each_flags {
 	server_setup::for_each_flag::ONLY_CONNECTED
