@@ -1754,6 +1754,9 @@ work_result work(const int argc, const char* const * const argv) try {
 				d.nickname_characters_for_offscreen_indicators = 0;
 			}
 
+			if (!game_gui_mode_flag) {
+				config_copy.drawing.draw_inventory = false;
+			}
 
 			return config_copy;
 		});
