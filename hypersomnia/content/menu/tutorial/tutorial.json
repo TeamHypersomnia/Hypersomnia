@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-03 22:00:57.497606 UTC"
+        "version_timestamp": "2023-08-04 17:49:07.914174 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -193,12 +193,25 @@
     ],
     "layers": [
         {
-            "id": "Layer 1",
+            "id": "Level3",
             "nodes": [
-                "dev_floor_256 (12)",
-                "dev_floor_256 (11)",
-                "dev_floor_128 (1)",
-                "dev_floor_128"
+                "tip3_1",
+                "entry3",
+                "exit3",
+                "vent (13)",
+                "vent (16)",
+                "vent (17)",
+                "vent (18)",
+                "dev_floor_256 (15)",
+                "dev_floor_256 (16)",
+                "dev_floor_256 (17)",
+                "Strong lamp (6)",
+                "Strong lamp (7)",
+                "floor_right (6)",
+                "floor_top (3)",
+                "floor_bottom (3)",
+                "floor_right (7)",
+                "floor_left (3)"
             ]
         },
         {
@@ -206,11 +219,18 @@
             "nodes": [
                 "point_light (3)",
                 "point_light (2)",
+                "point_light (5)",
+                "point_light (4)",
                 "point_light (1)",
                 "point_light",
+                "dev_floor_256 (12)",
+                "dev_floor_256 (11)",
+                "dev_floor_128 (1)",
+                "dev_floor_128",
                 "hazard (4)",
                 "hazard (3)",
                 "hazard (1)",
+                "hazard (6)",
                 "hazard",
                 "tip2_1",
                 "entry2",
@@ -242,6 +262,8 @@
                 "tip1_1",
                 "entry1",
                 "exit1",
+                "tip0_2 (2)",
+                "dev_floor_256 (13)",
                 "vent (2)",
                 "vent (3)",
                 "vent (4)",
@@ -583,6 +605,92 @@
             "size": [1024, 2816]
         },
         {
+            "id": "dev_floor_256 (13)",
+            "type": "dev_floor_256",
+            "pos": [0.0, 6400.0],
+            "size": [1536, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (13)",
+            "type": "@materials/vent.png",
+            "pos": [0.0, 23968.0],
+            "rotation": 90.0,
+            "size": [192, 2304]
+        },
+        {
+            "id": "vent (16)",
+            "type": "@materials/vent.png",
+            "pos": [0.0, 28607.998046875],
+            "rotation": 90.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (17)",
+            "type": "@materials/vent.png",
+            "pos": [960.0000610351563, 26240.0],
+            "size": [384, 4352]
+        },
+        {
+            "id": "vent (18)",
+            "type": "@materials/vent.png",
+            "pos": [-960.0000610351563, 26240.0],
+            "size": [384, 4352]
+        },
+        {
+            "id": "dev_floor_256 (15)",
+            "type": "dev_floor_256",
+            "pos": [0.0, 25728.0],
+            "size": [1536, 256],
+            "color": [255, 0, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (16)",
+            "type": "dev_floor_256",
+            "pos": [0.0, 27392.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (17)",
+            "type": "dev_floor_256",
+            "pos": [0.0, 26240.0],
+            "size": [1536, 2304]
+        },
+        {
+            "id": "floor_right (6)",
+            "type": "@water_room_floor",
+            "pos": [0.0, 24576.0],
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_top (3)",
+            "type": "@water_room_floor_2",
+            "pos": [0.0, 23200.0],
+            "size": [10752, 3776]
+        },
+        {
+            "id": "floor_bottom (3)",
+            "type": "@water_room_floor_2",
+            "pos": [0.0, 29248.0],
+            "size": [10752, 2048]
+        },
+        {
+            "id": "floor_right (7)",
+            "type": "@water_room_floor",
+            "pos": [3264.0, 26048.0],
+            "size": [4224, 4352],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_left (3)",
+            "type": "@water_room_floor",
+            "pos": [-3264.0, 26048.0],
+            "size": [4224, 4352],
+            "color": [255, 132, 132, 255]
+        },
+        {
             "id": "Strong lamp (1)",
             "type": "point_light",
             "pos": [-897.0, 1279.0],
@@ -700,6 +808,50 @@
             "id": "point_light (3)",
             "type": "point_light",
             "pos": [-513.0, 15999.0],
+            "color": [255, 0, 0, 80]
+        },
+        {
+            "id": "Strong lamp (6)",
+            "type": "point_light",
+            "pos": [897.0, 27521.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (7)",
+            "type": "point_light",
+            "pos": [-1025.0, 27583.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "point_light (4)",
+            "type": "point_light",
+            "pos": [513.0, 25729.0],
+            "color": [255, 0, 0, 80]
+        },
+        {
+            "id": "point_light (5)",
+            "type": "point_light",
+            "pos": [-513.0, 25729.0],
             "color": [255, 0, 0, 80]
         },
         {
@@ -900,6 +1052,7 @@
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "portal_exit": "entry3",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -962,6 +1115,97 @@
             "type": "hazard",
             "pos": [1856.0, 15360.0009765625],
             "size": [384, 512],
+            "hazard": {
+                "damage": 200.0
+            }
+        },
+        {
+            "id": "tip0_2 (2)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [0.0, 6400.0],
+            "size": [1536, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Running costs Stamina.\nWalk or stand still to regenerate faster."
+        },
+        {
+            "id": "tip3_1",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [0.0, 27392.001953125],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Hold {WALK_SILENTLY} to walk silently.\nEnemies will not hear your footsteps.\nWalk over the red floor!"
+        },
+        {
+            "id": "entry3",
+            "type": "portal",
+            "pos": [-0.000095367431640625, 28160.0],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "exit3",
+            "type": "portal",
+            "pos": [-0.000095367431640625, 24575.998046875],
+            "rotation": -90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "portal_exit": "entry2",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "hazard (6)",
+            "type": "hazard",
+            "pos": [0.0, 25728.0],
+            "size": [1536, 256],
+            "ignore_airborne_characters": false,
+            "ignore_walking_characters": true,
             "hazard": {
                 "damage": 200.0
             }

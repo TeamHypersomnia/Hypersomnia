@@ -41,6 +41,7 @@ struct editor_portal_info {
 	bool auto_scale_pitches = true;
 	bool trampoline_like = false;
 	bool ignore_airborne_characters = false;
+	bool ignore_walking_characters = false;
 
 	float enter_time_ms = 500.0f;
 	float travel_time_ms = 500.0f;

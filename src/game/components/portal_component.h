@@ -48,7 +48,7 @@ namespace components {
 		float light_size_mult = 1.0f;
 		rgba light_color = white;
 		per_actual_faction<bool> reacts_to_factions = { true, true, true };
-		pad_bytes<1> pad;
+		bool ignore_walking_characters = false;
 		// END GEN INTROSPECTOR
 
 		portal() {

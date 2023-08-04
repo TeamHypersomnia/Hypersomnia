@@ -904,6 +904,9 @@ EDIT_FUNCTION(editor_area_marker_node_editable& insp, T& es, const editor_area_m
 		tooltip_on_hover("'Airborne' characters are ones that only just exited a portal or e.g. during dash.\nThis is useful for making portals that only react when you 'land'.\nA perfect usecase is the background portal on 'surf' maps\nthat teleports you back to the beginning if you happen to miss a trampoline.");
 
 
+		MULTIPROPERTY("Ignore walking characters", as_portal.ignore_walking_characters);
+		tooltip_on_hover("Characters walking silently will be unaffected by this portal.");
+
 		if (!trampoline) {
 			MULTIPROPERTY("Enter time (ms)", as_portal.enter_time_ms);
 			tooltip_on_hover("The time it takes to enter the portal and disappear.");

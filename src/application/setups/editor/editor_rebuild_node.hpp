@@ -140,6 +140,7 @@ bool setup_entity_from_node(
 					to.exit_cooldown_ms = from.exit_cooldown_ms;
 
 					to.ignore_airborne_characters = from.ignore_airborne_characters;
+					to.ignore_walking_characters = from.ignore_walking_characters;
 
 					to.enter_time_ms = from.enter_time_ms;
 					to.travel_time_ms = from.travel_time_ms;

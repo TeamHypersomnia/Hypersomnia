@@ -428,6 +428,14 @@ void portal_system::advance_portal_logic(const logic_step step) {
 					}
 				}
 
+				if (portal.ignore_walking_characters) {
+					if (auto movement = typed_contacted_entity.template find<components::movement>()) {
+						if (movement->was_walk_effective) {
+							return false;
+						}
+					}
+				}
+
 				auto contacted_rigid = typed_contacted_entity.template get<components::rigid_body>();
 				auto& special = contacted_rigid.get_special();
 
