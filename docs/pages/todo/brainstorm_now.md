@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Tutorial levels
+    - Choosing with numbers (have to for akimbo)
+    - Holster/previous weapon
+        - Maybe the green areas could teleport when they detect step completion to mash several steps into a single level
+    - Akimbo
+    - Knives: throwing especially with scroll down/up
+    - Toggle laser
+    - Ricochets
+
 - Settings: split Gameplay tab into HUD and Rendering (or idk name it somehow else)
 - Editor: Fix lighting inconsistency between with and without FOV
     - Seen on shooting range with wood material

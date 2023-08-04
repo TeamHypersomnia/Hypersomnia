@@ -1309,6 +1309,10 @@ void editor_setup::save_project_file_as(const augs::path_type& path) {
 
 	project.meta.version_timestamp = augs::date_time::get_utc_timestamp();
 
+	if (project.about.author.empty()) {
+		project.about.author = std::string(simulated_client.nickname);
+	}
+
 	editor_project_readwrite::write_project_json(
 		path,
 		project,

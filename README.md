@@ -324,10 +324,8 @@ Many believe that writing games without an engine is no more than *reinventing t
 
 **I hope this project serves as a great testament to the opposite.**
 
-If I never embarked on this journey, I would have never made some of the interesting discoveries detailed in [Tech highlights section.](#tech-highlights)
+Had I never embarked on this journey, I would have never made some of the interesting discoveries detailed in [Tech highlights section.](#tech-highlights)
 Video game internals are just so vast and interdisciplinary that they have limitless potential for creative breakthroughs, and it is a waste to never even entertain the idea that some widely used solutions can be replaced by something absolutely ingenious.
-
-It is not a bad thing that game engines exist. If you want to be competitive writing a game without one, then you are forced to come up with a design so unique that it would be hard or impossible to do it in a commercial engine. This alone helps developers arrive to exceptional game ideas.
 
 # Quick gameplay instructions
 
@@ -555,7 +553,7 @@ You might want to follow some additional configuration to make the experience be
 #### Opening and revealing files
 
 The *Hypersomnia* editor can reveal files in explorer.
-The game may also want to open files in other contexts, e.g. for choosing the avatar.
+Also, the game may prompt you to select a file, e.g. to choose the avatar.
 On Windows, this is accomplished through an ``IFileDialog``.  
 Needless to say, such a class does not exist on Linux.  
 *Hypersomnia* provides shell scripts for common file managers in ``hypersomnia/detail/unix/managers``.  
