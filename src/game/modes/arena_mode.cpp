@@ -428,7 +428,7 @@ void arena_mode::remove_player(input_type in, const logic_step step, const mode_
 
 	const auto controlled_character_id = lookup(id);
 
-	::delete_with_held_items(in, step, in.cosm[controlled_character_id]);
+	::delete_with_held_items_except(in.rules.bomb_flavour, step, in.cosm[controlled_character_id]);
 
 	if (const auto entry = find(id)) {
 		const auto previous_faction = entry->get_faction();
@@ -2717,7 +2717,7 @@ void arena_mode::respawn_the_dead(const input_type in, const logic_step step, co
 					round_transferred_player transfer;
 					transfer.movement = player_handle.template get<components::movement>().flags;
 
-					delete_with_held_items(in, step, player_handle);
+					::delete_with_held_items_except(in.rules.bomb_flavour, step, player_handle);
 					player_data.controlled_character_id.unset();
 
 					messages::changed_identities_message dummy_msg;

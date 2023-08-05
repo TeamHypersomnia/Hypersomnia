@@ -103,7 +103,7 @@ mode_player_id test_mode::add_player(input_type in, const entity_name_str& name,
 void test_mode::remove_player(input_type in, const logic_step step, const mode_player_id id) {
 	const auto controlled_character_id = lookup(id);
 
-	::delete_with_held_items(in, step, in.cosm[controlled_character_id]);
+	::delete_with_held_items_except({}, step, in.cosm[controlled_character_id]);
 
 	erase_element(players, id);
 }

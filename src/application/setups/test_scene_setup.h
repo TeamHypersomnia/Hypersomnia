@@ -310,7 +310,7 @@ public:
 	const_entity_handle to_handle(const std::string&) const;
 
 	bool is_killed(const std::string& name) const;
-	void remove(const std::string& name);
+	void remove(logic_step step, const std::string& name);
 
 	void request_checkpoint_restart() { restart_requested = true; }
 };

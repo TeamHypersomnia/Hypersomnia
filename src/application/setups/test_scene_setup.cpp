@@ -14,6 +14,8 @@
 #include "augs/string/typesafe_sscanf.h"
 #include "augs/gui/text/printer.h"
 
+#include "game/modes/detail/delete_with_held_items.hpp"
+
 using portal_marker = editor_area_marker_node;
 
 test_scene_setup::test_scene_setup(
@@ -150,9 +152,14 @@ bool test_scene_setup::is_killed(const std::string& name) const {
 	return false;
 }
 
-void test_scene_setup::remove(const std::string& name) {
+void test_scene_setup::remove(logic_step step, const std::string& name) {
 	if (auto h = to_handle(name)) {
-		cosmic::delete_entity(h);
+		if (h.template has<components::sentience>()) {
+			::delete_with_held_items_except({}, step, h);
+		}
+		else {
+			step.queue_deletion_of(h, "test_scene_setup::remove");
+		}
 	}
 }
 
@@ -160,6 +167,9 @@ void test_scene_setup::restart_mode() {
 	auto& cosm = scene.world;
 
 	const auto current_teleport = typesafe_sprintf("entry%x", tutorial.level);
+
+	const bool is_akimbo_level = tutorial.level == 5;
+	const bool is_duals_level = tutorial.level == 6;
 
 	get_arena_handle().on_mode_with_input(
 		[&]<typename M>(M& mode, const auto& input) {
@@ -173,7 +183,7 @@ void test_scene_setup::restart_mode() {
 						mode.teleport_to_next_spawn(input, new_id, opponent_id);
 
 						if (is_tutorial()) {
-							mode.find(new_id)->allow_respawn = false;
+							mode.find(new_id)->allow_respawn = is_akimbo_level;
 						}
 
 						opponents[p.unique_name] = opponent_id;
@@ -193,7 +203,7 @@ void test_scene_setup::restart_mode() {
 					mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
 				}
 
-				if (!is_tutorial()) {
+				if (!is_tutorial() || is_akimbo_level || is_duals_level) {
 					mode.infinite_ammo_for = viewed_character_id;
 				}
 			}
@@ -207,12 +217,16 @@ void test_scene_setup::restart_mode() {
 void test_scene_setup::do_tutorial_logic(const logic_step step) {
 	(void)step;
 
+	auto get_opp = [&](int i, int j) {
+		return typesafe_sprintf("kill%x_%x", i, j);
+	};
+
 	auto exists = [&](int i, int j) {
-		return to_entity(typesafe_sprintf("kill%x_%x", i, j)) != entity_id();
+		return to_entity(get_opp(i, j)) != entity_id();
 	};
 
 	auto killed = [&](int i, int j) {
-		return is_killed(typesafe_sprintf("kill%x_%x", i, j));
+		return is_killed(get_opp(i, j));
 	};
 
 	auto obs = [&](int i, int j = 0) {
@@ -241,12 +255,18 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 		}
 
 		if (all_killed) {
-			remove(obs(i));
+			remove(step, obs(i));
+
+			if (const bool is_akimbo_level = tutorial.level == 5) {
+				for (int jj = 1; jj < j; ++jj) {
+					remove(step, get_opp(i, jj));
+				}
+			}
 
 			int k = 0;
 
 			while (to_entity(obs(i, ++k)).is_set()) {
-				remove(obs(i, k));
+				remove(step, obs(i, k));
 			}
 		}
 	}

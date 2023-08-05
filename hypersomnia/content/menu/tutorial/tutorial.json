@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-05 21:41:17.081922 UTC"
+        "version_timestamp": "2023-08-05 23:57:54.018335 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -210,60 +210,69 @@
     ],
     "layers": [
         {
-            "id": "Layer 4",
+            "id": "Layer 1"
+        },
+        {
+            "id": "Level6",
             "nodes": [
-                "obs2 (2)",
-                "obs2 (1)",
-                "crate (1)",
-                "crate (2)",
-                "crate",
-                "obs3",
-                "obs2"
+                "hazard (7)",
+                "floor_right (14)",
+                "dev_floor_256 (32)",
+                "tip3_1 (5)",
+                "dev_floor_256 (31)",
+                "tip3_1 (3)",
+                "tip3_1 (4)",
+                "tip3_1 (6)",
+                "entry6",
+                "exit6",
+                "vent (26)",
+                "vent (27)",
+                "vent (28)",
+                "vent (29)",
+                "dev_floor_256 (30)",
+                "dev_floor_256 (33)",
+                "dev_floor_256 (35)",
+                "Strong lamp (12)",
+                "Strong lamp (13)",
+                "floor_right (13)",
+                "deagle (1)",
+                "deagle"
             ]
         },
         {
-            "id": "Layer 3",
+            "id": "Level5",
             "nodes": [
-                "baka47_magazine (2)",
-                "baka47_magazine (1)",
-                "baka47_magazine (10)",
-                "baka47_magazine (8)",
-                "baka47_magazine (6)",
-                "baka47_magazine (5)",
-                "baka47_magazine (15)",
-                "baka47_magazine (14)",
-                "baka47_magazine (13)",
-                "baka47_magazine (12)",
-                "baka47_magazine (11)"
-            ]
-        },
-        {
-            "id": "Layer 2",
-            "nodes": [
-                "obs1",
-                "kill1_3",
-                "kill1_2",
-                "point_light (14)",
-                "point_light (13)",
-                "point_light (12)",
-                "point_light (11)",
-                "point_light (10)",
-                "point_light (9)",
-                "kill3_1",
-                "kill3_3",
-                "kill3_2",
-                "kill2_1",
-                "kill2_2",
-                "kill1_1"
-            ]
-        },
-        {
-            "id": "Layer 1",
-            "nodes": [
-                "point_light (8)",
-                "point_light (7)",
-                "point_light (6)",
-                "baka47"
+                "obs4 (2)",
+                "obs4",
+                "kill4_1",
+                "kill4_2",
+                "tip3_1 (7)",
+                "tip3_1 (2)",
+                "tip3_1 (1)",
+                "entry5",
+                "exit5",
+                "vent (19)",
+                "vent (20)",
+                "obs4 (4)",
+                "obs4 (3)",
+                "obs4 (1)",
+                "vent (21)",
+                "vent (23)",
+                "dev_floor_256 (34)",
+                "dev_floor_256 (28)",
+                "dev_floor_256 (29)",
+                "Strong lamp (10)",
+                "Strong lamp (11)",
+                "floor_right (11)",
+                "floor_top (6)",
+                "floor_bottom (5)",
+                "datum (1)",
+                "zamiec",
+                "zamiec_magazine (1)",
+                "zamiec_magazine",
+                "datum_gun_magazine (1)",
+                "datum_gun_magazine",
+                "floor_left (5)"
             ]
         },
         {
@@ -285,6 +294,43 @@
                 "entry4",
                 "dev_floor_256 (25)",
                 "exit4",
+                "obs2 (2)",
+                "obs2 (1)",
+                "crate (1)",
+                "crate (2)",
+                "crate",
+                "obs3",
+                "obs2",
+                "baka47_magazine (2)",
+                "baka47_magazine (1)",
+                "baka47_magazine (10)",
+                "baka47_magazine (8)",
+                "baka47_magazine (6)",
+                "baka47_magazine (5)",
+                "baka47_magazine (15)",
+                "baka47_magazine (14)",
+                "baka47_magazine (13)",
+                "baka47_magazine (12)",
+                "baka47_magazine (11)",
+                "obs1",
+                "kill1_3",
+                "kill1_2",
+                "point_light (14)",
+                "point_light (13)",
+                "point_light (12)",
+                "point_light (11)",
+                "point_light (10)",
+                "point_light (9)",
+                "kill3_1",
+                "kill3_3",
+                "kill3_2",
+                "kill2_1",
+                "kill2_2",
+                "kill1_1",
+                "point_light (8)",
+                "point_light (7)",
+                "point_light (6)",
+                "baka47",
                 "floor_right (10)",
                 "floor_top (5)",
                 "hard_wooden_wall (1)",
@@ -319,9 +365,12 @@
         {
             "id": "Level3",
             "nodes": [
+                "hazard (6)",
                 "tip3_1",
                 "entry3",
                 "exit3",
+                "point_light (5)",
+                "point_light (4)",
                 "vent (13)",
                 "vent (16)",
                 "vent (17)",
@@ -343,8 +392,6 @@
             "nodes": [
                 "point_light (3)",
                 "point_light (2)",
-                "point_light (5)",
-                "point_light (4)",
                 "point_light (1)",
                 "point_light",
                 "dev_floor_256 (12)",
@@ -354,7 +401,6 @@
                 "hazard (4)",
                 "hazard (3)",
                 "hazard (1)",
-                "hazard (6)",
                 "hazard",
                 "tip2_1",
                 "entry2",
@@ -412,6 +458,7 @@
                 "tip0_2",
                 "tip0_1",
                 "exit0",
+                "team_spawn",
                 "team_spawn (1)",
                 "team_spawn (16)",
                 "vent",
@@ -955,12 +1002,14 @@
         {
             "id": "crate",
             "type": "crate",
-            "pos": [4736.0, 44480.0]
+            "pos": [4736.0, 44480.0],
+            "penetrability": 1.5
         },
         {
             "id": "crate (1)",
             "type": "crate",
-            "pos": [4800.0, 43840.0]
+            "pos": [4800.0, 43840.0],
+            "penetrability": 1.5
         },
         {
             "id": "dev_floor_256 (22)",
@@ -972,7 +1021,8 @@
         {
             "id": "crate (2)",
             "type": "crate",
-            "pos": [4928.0, 44160.0]
+            "pos": [4928.0, 44160.0],
+            "penetrability": 1.5
         },
         {
             "id": "dev_floor_256 (23)",
@@ -1069,6 +1119,189 @@
             "type": "hard_wooden_wall",
             "pos": [2944.0, 44160.0],
             "size": [256, 256]
+        },
+        {
+            "id": "vent (19)",
+            "type": "@materials/vent.png",
+            "pos": [11456.0, -3872.00390625],
+            "rotation": 90.0,
+            "size": [192, 2304]
+        },
+        {
+            "id": "vent (20)",
+            "type": "@materials/vent.png",
+            "pos": [11456.0, 1023.9984741210938],
+            "rotation": 90.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (21)",
+            "type": "@materials/vent.png",
+            "pos": [12416.0, -1472.0],
+            "size": [384, 4608]
+        },
+        {
+            "id": "vent (23)",
+            "type": "@materials/vent.png",
+            "pos": [10496.0, -1472.0],
+            "size": [384, 4608]
+        },
+        {
+            "id": "dev_floor_256 (29)",
+            "type": "dev_floor_256",
+            "pos": [11456.0, -192.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "floor_right (11)",
+            "type": "@water_room_floor",
+            "pos": [11456.0, -3264.0],
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_top (6)",
+            "type": "@water_room_floor_2",
+            "pos": [16768.0, -7648.0],
+            "size": [21120, 7616]
+        },
+        {
+            "id": "floor_bottom (5)",
+            "type": "@water_room_floor_2",
+            "pos": [16640.0, 1728.0],
+            "size": [20992, 2048]
+        },
+        {
+            "id": "floor_left (5)",
+            "type": "@water_room_floor",
+            "pos": [16640.0, -1568.0],
+            "size": [21120, 4544],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "obs4",
+            "type": "@yellow_barrier",
+            "pos": [11456.0, -1952.0],
+            "rotation": 90.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "obs4 (1)",
+            "type": "@materials/vent.png",
+            "pos": [11456.0, -2256.0],
+            "size": [16, 544],
+            "penetrability": 0.0
+        },
+        {
+            "id": "obs4 (2)",
+            "type": "@yellow_barrier",
+            "pos": [11456.0, -2528.0],
+            "rotation": 90.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "dev_floor_256 (28)",
+            "type": "dev_floor_256",
+            "pos": [11456.0, -1792.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs4 (3)",
+            "type": "@materials/vent.png",
+            "pos": [11008.0, -2240.0],
+            "size": [640, 512],
+            "penetrability": 0.0
+        },
+        {
+            "id": "obs4 (4)",
+            "type": "@materials/vent.png",
+            "pos": [11904.0, -2240.0],
+            "size": [640, 512],
+            "penetrability": 0.0
+        },
+        {
+            "id": "dev_floor_256 (32)",
+            "type": "dev_floor_256",
+            "pos": [19072.0, -3328.0],
+            "size": [1536, 2304],
+            "color": [255, 0, 0, 255]
+        },
+        {
+            "id": "vent (26)",
+            "type": "@materials/vent.png",
+            "pos": [19072.0, -8512.00390625],
+            "rotation": 90.0,
+            "size": [256, 2304]
+        },
+        {
+            "id": "vent (27)",
+            "type": "@materials/vent.png",
+            "pos": [19072.0, 1023.9984741210938],
+            "rotation": 90.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (28)",
+            "type": "@materials/vent.png",
+            "pos": [20032.0, -3775.999755859375],
+            "size": [384, 9216]
+        },
+        {
+            "id": "vent (29)",
+            "type": "@materials/vent.png",
+            "pos": [18112.0, -3775.999755859375],
+            "size": [384, 9216]
+        },
+        {
+            "id": "dev_floor_256 (33)",
+            "type": "dev_floor_256",
+            "pos": [19072.0, -1600.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (35)",
+            "type": "dev_floor_256",
+            "pos": [19072.0, -192.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "floor_right (13)",
+            "type": "@water_room_floor",
+            "pos": [19072.0, -3040.0],
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "dev_floor_256 (30)",
+            "type": "dev_floor_256",
+            "pos": [19072.0, -2048.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "floor_right (14)",
+            "type": "@water_room_floor",
+            "pos": [19072.0, -7872.0],
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "dev_floor_256 (31)",
+            "type": "dev_floor_256",
+            "pos": [19072.0, -6080.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (34)",
+            "type": "dev_floor_256",
+            "pos": [11456.0, -2624.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
         },
         {
             "id": "Strong lamp (1)",
@@ -1320,6 +1553,70 @@
             "color": [255, 255, 0, 74]
         },
         {
+            "id": "Strong lamp (10)",
+            "type": "point_light",
+            "pos": [12353.0, -95.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (11)",
+            "type": "point_light",
+            "pos": [10431.0, -33.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (12)",
+            "type": "point_light",
+            "pos": [19969.0, -95.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (13)",
+            "type": "point_light",
+            "pos": [18047.0, -33.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
             "id": "baka47_magazine (1)",
             "type": "baka47_magazine",
             "pos": [1498.0, 43977.0]
@@ -1375,9 +1672,53 @@
             "pos": [4282.0, 44086.0]
         },
         {
+            "id": "zamiec_magazine",
+            "type": "zamiec_magazine",
+            "pos": [11332.0, -1481.0]
+        },
+        {
+            "id": "zamiec_magazine (1)",
+            "type": "zamiec_magazine",
+            "pos": [11387.0, -1481.0]
+        },
+        {
+            "id": "datum_gun_magazine",
+            "type": "datum_gun_magazine",
+            "pos": [11514.0, -1530.0]
+        },
+        {
+            "id": "datum_gun_magazine (1)",
+            "type": "datum_gun_magazine",
+            "pos": [11578.0, -1530.0]
+        },
+        {
             "id": "baka47",
             "type": "baka47",
             "pos": [-134.0, 45240.0]
+        },
+        {
+            "id": "zamiec",
+            "type": "zamiec",
+            "pos": [11381.0, -1416.0],
+            "rotation": -45.0
+        },
+        {
+            "id": "datum (1)",
+            "type": "datum",
+            "pos": [11541.0, -1416.0],
+            "rotation": -135.0
+        },
+        {
+            "id": "deagle (1)",
+            "type": "deagle",
+            "pos": [19172.001953125, -1379.9998779296875],
+            "rotation": -135.0
+        },
+        {
+            "id": "deagle",
+            "type": "deagle",
+            "pos": [18987.998046875, -1379.9998779296875],
+            "rotation": -45.0
         },
         {
             "id": "team_spawn (16)",
@@ -1397,7 +1738,7 @@
             "type": "team_spawn",
             "active": false,
             "faction": "METROPOLIS",
-            "pos": [-129.0, 45057.0],
+            "pos": [-129.0, 46303.0],
             "rotation": -90.0
         },
         {
@@ -1445,6 +1786,26 @@
             "rotation": -180.0
         },
         {
+            "id": "kill4_2",
+            "type": "team_spawn",
+            "pos": [11513.0, -2321.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill4_1",
+            "type": "team_spawn",
+            "pos": [11399.0, -2321.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "team_spawn",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [11455.0, -1.0],
+            "rotation": -90.0
+        },
+        {
             "id": "exit0",
             "type": "portal",
             "pos": [-0.000095367431640625, -3456.001220703125],
@@ -1452,6 +1813,9 @@
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "portal_exit": "entry1",
             "character_exit_impulse": {
                 "amount": 20000.0
@@ -1533,6 +1897,9 @@
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "portal_exit": "entry2",
             "character_exit_impulse": {
                 "amount": 20000.0
@@ -1575,6 +1942,9 @@
             "trampoline_like": true,
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "character_exit_impulse": {
                 "amount": 5000.0,
                 "mode": "SET_VELOCITY"
@@ -1616,6 +1986,9 @@
             "trampoline_like": true,
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "character_exit_impulse": {
                 "amount": 5000.0,
                 "mode": "SET_VELOCITY"
@@ -1635,6 +2008,9 @@
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "portal_exit": "entry3",
             "character_exit_impulse": {
                 "amount": 20000.0
@@ -1742,7 +2118,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Hold {WALK_SILENTLY} to walk silently.\nEnemies will not hear your footsteps.\nWalk over the red floor!"
+            "context_tip": "Hold {WALK_SILENTLY} to walk silently.\nEnemies won't hear your footsteps.\nWalk over the red floor!"
         },
         {
             "id": "entry3",
@@ -1753,6 +2129,9 @@
             "trampoline_like": true,
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "character_exit_impulse": {
                 "amount": 5000.0,
                 "mode": "SET_VELOCITY"
@@ -1772,6 +2151,9 @@
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "portal_exit": "entry4",
             "character_exit_impulse": {
                 "amount": 20000.0
@@ -1823,6 +2205,9 @@
             "trampoline_like": true,
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "character_exit_impulse": {
                 "amount": 5000.0,
                 "mode": "SET_VELOCITY"
@@ -1842,10 +2227,13 @@
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry3",
+            "portal_exit": "entry5",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -1895,7 +2283,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {SHOOT} to shoot.\nKill the Resistance soldier to continue.\nYou can restart any time if you run out of ammo."
+            "context_tip": "Press {SHOOT} to shoot.\nKill the Resistance soldier to continue.\nIf you run out of ammo, you can always restart this level."
         },
         {
             "id": "tip4_1 (3)",
@@ -2000,7 +2388,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "If you get stuck, press Escape.\nThen click \"Restart from last checkpoint\"."
+            "context_tip": "Whenever you get stuck, press Escape.\nThen click \"Restart from last checkpoint\"."
         },
         {
             "id": "tip4_1 (7)",
@@ -2064,6 +2452,270 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Tip: you can shoot while reloading!\nThis will fire the one bullet left in the chamber."
+        },
+        {
+            "id": "tip3_1 (1)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [11456.0, -192.0],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You can dual wield any two weapons."
+        },
+        {
+            "id": "entry5",
+            "type": "portal",
+            "pos": [11456.0, 576.00048828125],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "exit5",
+            "type": "portal",
+            "pos": [11456.0, -3264.00830078125],
+            "rotation": -90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry6",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (2)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [11456.0, -1792.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Hold {HOTBAR_0} and {HOTBAR_1} to dual wield.\nTry killing both enemies at the same time."
+        },
+        {
+            "id": "hazard (7)",
+            "type": "hazard",
+            "pos": [19072.0, -3328.0],
+            "size": [1536, 2304],
+            "exit_cooldown_ms": 500.0,
+            "hazard": {
+                "damage": 30.0
+            },
+            "exit_shake": {
+                "duration_ms": 0.0
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_angular_impulse": {
+                "amount": 0.0
+            }
+        },
+        {
+            "id": "tip3_1 (4)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [19072.0, -1600.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Hold {HOTBAR_0} and {HOTBAR_1} to dual wield Deagles.\nUse their massive recoil to quickly jump over the red floor."
+        },
+        {
+            "id": "tip3_1 (6)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [19072.0, -192.0],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You move really slow when dual-wielding.\nHowever, you can compensate with kickback!"
+        },
+        {
+            "id": "entry6",
+            "type": "portal",
+            "pos": [19072.0, 544.00048828125],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "exit6",
+            "type": "portal",
+            "pos": [19072.0, -7872.0068359375],
+            "rotation": -90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry6",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (3)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [19072.0, -2048.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Aim in the opposite direction (down).\nHold {SPRINT} and {MOVE_FORWARD} while shooting both Deagles."
+        },
+        {
+            "id": "tip3_1 (5)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [19072.0, -6080.0],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Good job!"
+        },
+        {
+            "id": "tip3_1 (7)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [11456.0, -2624.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "{RELOAD} will automatically reload both weapons."
         }
     ]
 }
