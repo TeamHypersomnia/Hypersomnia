@@ -32,6 +32,7 @@ void on_first_touching_portal(
 					(void)portal;
 
 					callback(contacted_entity);
+					return;
 				}
 			}
 		}

@@ -69,7 +69,7 @@ namespace predefined_queries {
 	b2Filter force_explosion() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
-		out.maskBits = standard_participation_except(C::FLYING_BULLET);
+		out.maskBits = standard_participation_except(C::FLYING_BULLET, C::LYING_ITEM, C::SHELL);
 		return out;
 	}
 

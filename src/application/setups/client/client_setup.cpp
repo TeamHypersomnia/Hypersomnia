@@ -574,6 +574,7 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 
 		const auto choice_result = ::choose_arena_client(
 			{
+				editor_project_readwrite::reading_settings(),
 				lua,
 				referential_arena,
 				official,
@@ -581,7 +582,8 @@ bool client_setup::try_load_arena_according_to(const server_public_vars& new_var
 				new_vars.game_mode,
 				clean_round_state,
 				new_vars.playtesting_context,
-				keep_loaded_project
+				keep_loaded_project,
+				nullptr
 			},
 
 			new_vars.required_arena_hash

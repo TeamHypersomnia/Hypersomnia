@@ -313,6 +313,10 @@ void setup_scene_object_from_resource(
 
 						return render_layer::FOREGROUND;
 					case editor_sprite_domain::PHYSICAL:
+						if (editable.as_physical.is_shoot_through) {
+							return render_layer::OBSTACLES_UNDER_MISSILES;
+						}
+
 						return render_layer::SOLID_OBSTACLES;
 
 					default:

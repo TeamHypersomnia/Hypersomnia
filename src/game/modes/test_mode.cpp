@@ -46,9 +46,6 @@ void test_mode::init_spawned(const input_type in, const entity_id id, const logi
 		}
 
 		::resurrect(step, typed_handle);
-
-		auto& sentience = typed_handle.template get<components::sentience>();
-		fill_range(sentience.learnt_spells, true);
 	});
 }
 
@@ -288,7 +285,13 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 			in.rules.respawn_after_ms,
 			sentience.when_knocked_out
 		)) {
-			teleport_to_next_spawn(in, lookup(typed_handle.get_id()), typed_handle);
+			const auto player_id = lookup(typed_handle.get_id());
+
+			if (!find(player_id)->allow_respawn) {
+				return;
+			}
+
+			teleport_to_next_spawn(in, player_id, typed_handle);
 			init_spawned(in, typed_handle, step);
 
 			sentience.when_knocked_out = {};

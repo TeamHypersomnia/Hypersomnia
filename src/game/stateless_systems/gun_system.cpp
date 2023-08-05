@@ -1051,7 +1051,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					(void)logicals;
 	#endif
 
-					drop_if_empty();
+					if (step.get_settings().drop_weapons_if_empty) {
+						drop_if_empty();
+					}
 
 					/* Interrupt fluid reloads, like the pump shotgun */
 					if (const auto chamber_magazine_slot = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE]) {

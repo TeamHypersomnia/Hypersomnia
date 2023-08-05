@@ -992,6 +992,16 @@ work_result work(const int argc, const char* const * const argv) try {
 		return current_setup != nullptr;
 	};
 
+	auto is_during_tutorial = [&]() {
+		if (has_current_setup()) {
+			if (const auto setup = std::get_if<test_scene_setup>(std::addressof(*current_setup))) {
+				return setup->is_tutorial();
+			}
+		}
+
+		return false;
+	};
+
 	auto restore_background_setup = [&]() {
 		current_setup = std::move(background_setup);
 		background_setup = std::unique_ptr<setup_variant>();
@@ -1607,7 +1617,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			necessary_sounds,
 			viewing_config.audio_volume,
 			background_setup != nullptr,
-			has_current_setup() && std::holds_alternative<editor_setup>(*current_setup)
+			has_current_setup() && std::holds_alternative<editor_setup>(*current_setup),
+			is_during_tutorial()
 		};
 	};
 
@@ -2222,6 +2233,14 @@ work_result work(const int argc, const char* const * const argv) try {
 		using T = decltype(t);
 
 		switch (t) {
+			case T::SERVER_DETAILS:
+				if (is_during_tutorial()) {
+					std::get<test_scene_setup>(*current_setup).request_checkpoint_restart();
+					ingame_menu.show = false;
+				}
+
+				break;
+
 			case T::BROWSE_SERVERS:
 				browse_servers_gui.open();
 				break;

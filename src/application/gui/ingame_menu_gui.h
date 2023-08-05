@@ -114,6 +114,12 @@ struct ingame_menu_gui {
 					root.buttons[i].set_complete_caption("Quit to Projects");
 				}
 			}
+
+			if (e == ingame_menu_button_type::SERVER_DETAILS) {
+				if (context.deps.is_tutorial) {
+					root.buttons[i].set_complete_caption("Restart from last checkpoint");
+				}
+			}
 		}
 
 		world.advance_elements(context, vdt);

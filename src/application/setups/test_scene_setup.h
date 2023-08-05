@@ -69,6 +69,9 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 
 	tutorial_state tutorial;
 
+	std::unordered_map<std::string, entity_id> opponents;
+	bool restart_requested = false;
+
 	template <class H, class S>
 	static decltype(auto) get_arena_handle_impl(S& self) {
 		return H {
@@ -140,6 +143,7 @@ public:
 	}
 
 	bool post_solve(const const_logic_step step);
+	void pre_solve(const logic_step step);
 
 	template <class C>
 	void advance(
@@ -159,6 +163,7 @@ public:
 				settings.play_transfer_sounds = false;
 			}
 
+			settings.drop_weapons_if_empty = false;
 			return settings;
 		};
 
@@ -175,7 +180,10 @@ public:
 					bool restarted = false;
 
 					auto with_post_solve = solver_callbacks(
-						callbacks.pre_solve,
+						[&](const logic_step step) {
+							this->pre_solve(step);
+							callbacks.pre_solve(step);
+						},
 						[&](const const_logic_step step) {
 							if (this->post_solve(step)) {
 								/* Prevent post-solving the old step if we've only just restarted. */
@@ -196,7 +204,7 @@ public:
 					);
 
 					if (restarted) {
-						/* Advance once normally*/
+						/* Advance once normally */
 
 						mode.advance(
 							input,
@@ -285,4 +293,24 @@ public:
 
 	void restart_mode();
 	void restart_arena();
+
+	void do_tutorial_logic(logic_step);
+
+	template <class T>
+	const T* find(const std::string& name) const;
+
+	template <class T>
+	const T* find(const editor_node_id& id) const;
+
+	template <class T>
+	const T* find(const entity_id& id) const;
+
+	entity_id to_entity(const std::string&) const;
+	entity_handle to_handle(const std::string&);
+	const_entity_handle to_handle(const std::string&) const;
+
+	bool is_killed(const std::string& name) const;
+	void remove(const std::string& name);
+
+	void request_checkpoint_restart() { restart_requested = true; }
 };

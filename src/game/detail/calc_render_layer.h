@@ -29,10 +29,10 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 			return render_layer::REMNANTS;
 		}
 		else if constexpr(H::template has<components::missile>()) {
-			return render_layer::PLANTED_ITEMS;
+			return render_layer::MISSILES;
 		}
 		else if constexpr(H::template has<components::trace>()) {
-			return render_layer::PLANTED_ITEMS;
+			return render_layer::MISSILES;
 		}
 		else if constexpr(H::template has<invariants::sentience>()) {
 			return render_layer::SENTIENCES;

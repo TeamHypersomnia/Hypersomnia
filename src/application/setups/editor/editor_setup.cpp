@@ -141,8 +141,6 @@ editor_setup::editor_setup(
 
 	LOG("Loading editor project at: %x", project_path);
 
-	constexpr bool strict = true;
-
 	constexpr bool convert_legacy_autosave = true;
 
 	if (convert_legacy_autosave) {
@@ -168,8 +166,7 @@ editor_setup::editor_setup(
 			project = editor_project_readwrite::read_project_json(
 				path,
 				official.resources,
-				official.resource_map,
-				strict
+				official.resource_map
 			);
 
 			/* Will be overwritten to the new name upon the first save. */
@@ -196,8 +193,7 @@ editor_setup::editor_setup(
 			auto autosaved_project = std::make_unique<editor_project>(editor_project_readwrite::read_project_json(
 				path,
 				official.resources,
-				official.resource_map,
-				strict
+				official.resource_map
 			));
 
 			autosaved_project->meta.name = paths.arena_name;

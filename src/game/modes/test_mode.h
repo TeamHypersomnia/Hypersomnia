@@ -83,6 +83,7 @@ struct test_mode_player {
 	entity_id dedicated_spawn;
 
 	bool hide_in_scoreboard = false;
+	bool allow_respawn = true;
 	// END GEN INTROSPECTOR
 
 	auto should_hide_in_scoreboard() const {

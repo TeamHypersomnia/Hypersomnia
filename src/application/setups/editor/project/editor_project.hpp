@@ -20,12 +20,30 @@ decltype(auto) editor_project::find_resource_impl(S& self, Officials& officials,
 }
 
 template <class T>
-decltype(auto) editor_project::find_node(const editor_typed_node_id<T>& id) {
+T* editor_project::find_node(const editor_node_id& generic_id) {
+	if (generic_id.type_id.is<T>()) {
+		return find_node(editor_typed_node_id<T>::from_generic(generic_id));
+	}
+
+	return nullptr;
+}
+
+template <class T>
+const T* editor_project::find_node(const editor_node_id& generic_id) const {
+	if (generic_id.type_id.is<T>()) {
+		return find_node(editor_typed_node_id<T>::from_generic(generic_id));
+	}
+
+	return nullptr;
+}
+
+template <class T>
+T* editor_project::find_node(const editor_typed_node_id<T>& id) {
 	return nodes.find_typed(id);
 }
 
 template <class T>
-decltype(auto) editor_project::find_node(const editor_typed_node_id<T>& id) const {
+const T* editor_project::find_node(const editor_typed_node_id<T>& id) const {
 	return nodes.find_typed(id);
 }
 
@@ -40,12 +58,12 @@ decltype(auto) editor_project::on_node(const editor_node_id& id, F&& callback) c
 }
 
 template <class T>
-decltype(auto) editor_project::find_resource(editor_resource_pools& officials, const editor_typed_resource_id<T>& id) {
+T* editor_project::find_resource(editor_resource_pools& officials, const editor_typed_resource_id<T>& id) {
 	return find_resource_impl(*this, officials, id);
 }
 
 template <class T>
-decltype(auto) editor_project::find_resource(const editor_resource_pools& officials, const editor_typed_resource_id<T>& id) const {
+const T* editor_project::find_resource(const editor_resource_pools& officials, const editor_typed_resource_id<T>& id) const {
 	return find_resource_impl(*this, officials, id);
 }
 

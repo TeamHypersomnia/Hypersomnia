@@ -12,16 +12,9 @@
 #include "game/messages/game_notification.h"
 #include "application/setups/editor/project/editor_project.hpp"
 #include "augs/string/typesafe_sscanf.h"
+#include "augs/gui/text/printer.h"
 
-using portal_id = editor_typed_node_id<editor_area_marker_node>;
-
-auto make_portal_id_type(const editor_node_id id) {
-	if (id.type_id.is<editor_area_marker_node>()) {
-		return portal_id::from_generic(id);
-	}
-
-	return portal_id();
-}
+using portal_marker = editor_area_marker_node;
 
 test_scene_setup::test_scene_setup(
 	sol::state& lua,
@@ -42,8 +35,12 @@ test_scene_setup::test_scene_setup(
 
 	auto paths = editor_project_paths(current_arena_folder);
 
+	auto json_read_settings = editor_project_readwrite::reading_settings();
+	json_read_settings.read_inactive_nodes = false;
+
 	::load_arena_from_path(
 		{
+			json_read_settings,
 			lua,
 			get_arena_handle(),
 			official,
@@ -51,12 +48,12 @@ test_scene_setup::test_scene_setup(
 			"",
 			clean_round_state,
 			std::nullopt,
-			&project
+			&project,
+			std::addressof(entity_to_node)
 		},
 
 		paths.project_json,
-		nullptr,
-		std::addressof(entity_to_node)
+		nullptr
 	);
 
 	clean_mode_state = current_mode_state;
@@ -95,6 +92,70 @@ void test_scene_setup::restart_arena() {
 	character().get<components::movement>().flags = pre_movement_flags;
 }
 
+template <class T>
+const T* test_scene_setup::find(const entity_id& id) const {
+	return find<T>(::entity_to_node_id(entity_to_node, id));
+}
+
+template <class T>
+const T* test_scene_setup::find(const editor_node_id& generic_id) const {
+	return project.find_node<T>(generic_id);
+}
+
+template <class T>
+const T* test_scene_setup::find(const std::string& name) const {
+	if (const auto generic_id = mapped_or_nullptr(name_to_node, name)) {
+		return find<T>(*generic_id);
+	}
+
+	return nullptr;
+}
+
+entity_handle test_scene_setup::to_handle(const std::string& name) {
+	return scene.world[to_entity(name)];
+}
+
+const_entity_handle test_scene_setup::to_handle(const std::string& name) const{
+	return scene.world[to_entity(name)];
+}
+
+entity_id test_scene_setup::to_entity(const std::string& name) const {
+	if (const auto opp = mapped_or_nullptr(opponents, name)) {
+		return *opp;
+	}
+
+	if (const auto generic_id = mapped_or_nullptr(name_to_node, name)) {
+		entity_id id;
+
+		project.on_node(
+			*generic_id,
+			[&](const auto& typed_node, const auto&) {
+				id = typed_node.scene_entity_id;
+			}
+		);
+
+		return id;
+	}
+
+	return {};
+}
+
+bool test_scene_setup::is_killed(const std::string& name) const {
+	if (auto h = to_handle(name)) {
+		if (auto sent = h.template find<components::sentience>()) {
+			return !sent->is_conscious();
+		}
+	}
+
+	return false;
+}
+
+void test_scene_setup::remove(const std::string& name) {
+	if (auto h = to_handle(name)) {
+		cosmic::delete_entity(h);
+	}
+}
+
 void test_scene_setup::restart_mode() {
 	auto& cosm = scene.world;
 
@@ -108,7 +169,14 @@ void test_scene_setup::restart_mode() {
 						const auto new_id = mode.add_player(input, nickname, faction_type::RESISTANCE);
 						mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
 						mode.find(new_id)->hide_in_scoreboard = true;
-						mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
+						const auto opponent_id = mode.find(new_id)->controlled_character_id;
+						mode.teleport_to_next_spawn(input, new_id, opponent_id);
+
+						if (is_tutorial()) {
+							mode.find(new_id)->allow_respawn = false;
+						}
+
+						opponents[p.unique_name] = opponent_id;
 					}
 				}
 
@@ -120,12 +188,14 @@ void test_scene_setup::restart_mode() {
 
 				ensure(player != nullptr)
 
-				if (const auto tp = project.find_node(make_portal_id_type(name_to_node[current_teleport]))) {
+				if (const auto tp = find<portal_marker>(current_teleport)) {
 					player->dedicated_spawn = tp->scene_entity_id;
 					mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
 				}
 
-				mode.infinite_ammo_for = viewed_character_id;
+				if (!is_tutorial()) {
+					mode.infinite_ammo_for = viewed_character_id;
+				}
 			}
 			else {
 				ensure("Unsupported mode." && false);
@@ -134,9 +204,67 @@ void test_scene_setup::restart_mode() {
 	);
 }
 
+void test_scene_setup::do_tutorial_logic(const logic_step step) {
+	(void)step;
+
+	auto exists = [&](int i, int j) {
+		return to_entity(typesafe_sprintf("kill%x_%x", i, j)) != entity_id();
+	};
+
+	auto killed = [&](int i, int j) {
+		return is_killed(typesafe_sprintf("kill%x_%x", i, j));
+	};
+
+	auto obs = [&](int i, int j = 0) {
+		if (j == 0) {
+			return std::string("obs") + std::to_string(i);
+		}
+
+		return typesafe_sprintf("obs%x (%x)", i, j);
+	};
+
+	for (int i = 1;; ++i) {
+		if (!exists(i, 1)) {
+			break;
+		}
+
+		bool all_killed = true;
+
+		int j = 1;
+
+		while (exists(i, j)) {
+			if (!killed(i, j)) {
+				all_killed = false;
+			}
+
+			++j;
+		}
+
+		if (all_killed) {
+			remove(obs(i));
+
+			int k = 0;
+
+			while (to_entity(obs(i, ++k)).is_set()) {
+				remove(obs(i, k));
+			}
+		}
+	}
+}
+
+void test_scene_setup::pre_solve(const logic_step step) {
+	do_tutorial_logic(step);
+}
 
 bool test_scene_setup::post_solve(const const_logic_step step) {
 	const auto& notifications = step.get_queue<messages::game_notification>();
+
+	if (restart_requested) {
+		restart_requested = false;
+
+		restart_arena();
+		return true;
+	}
 
 	auto& cosm = scene.world;
 
@@ -148,9 +276,7 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 	for (const auto& n : notifications) {
 		if (const auto tp = std::get_if<messages::teleportation>(std::addressof(n.payload))) {
 			if (tp->teleported == viewed_character_id) {
-				const auto node_id = ::entity_to_node_id(entity_to_node, tp->to_portal);
-
-				if (const auto portal = project.find_node(make_portal_id_type(node_id))) {
+				if (const auto portal = find<portal_marker>(tp->to_portal)) {
 					const auto& name = portal->unique_name;
 
 					if (begins_with(name, "entry")) {
@@ -185,7 +311,7 @@ void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 			mult = 1.5f;
 		}
 
-		if (tutorial.level < 10) {
+		if (tutorial.level < 4) {
 			config.drawing.draw_hotbar = false;
 		}
 	}
@@ -205,6 +331,26 @@ bool test_scene_setup::handle_input_before_imgui(
 
 void test_scene_setup::draw_custom_gui(const draw_setup_gui_input& in) { 
 	arena_gui_base::draw_custom_gui(in);
+
+#if 0
+	using namespace augs::gui::text;
+	using namespace augs::gui;
+
+	const auto screen_size = in.screen_size;
+
+	using FS = formatted_string;
+
+	auto colored = [&](const auto& text, const auto& color) {
+		return FS(std::string(text), { in.gui_fonts.gui, color });
+	};
+
+	print_stroked(
+		in.get_drawer(),
+		vec2i(screen_size.x / 2, 2),
+		colored("Tutorial", white),
+		{ augs::ralign::CX, augs::ralign::T }
+	);
+#endif
 }
 
 setup_escape_result test_scene_setup::escape() {

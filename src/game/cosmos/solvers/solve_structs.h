@@ -11,4 +11,5 @@ struct solve_settings {
 	entity_id disable_knockouts;
 	bool simulate_decorative_organisms = true;
 	bool play_transfer_sounds = true;
+	bool drop_weapons_if_empty = true;
 };

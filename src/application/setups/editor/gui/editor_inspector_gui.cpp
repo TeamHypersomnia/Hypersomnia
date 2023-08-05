@@ -88,6 +88,7 @@ bool force_show_extra_ammo = false;
 \
 	MULTIPROPERTY("Backpack", field.backpack);\
 	MULTIPROPERTY("Electric armor", field.electric_armor);\
+	MULTIPROPERTY("All spells", field.all_spells);\
 	if (force_show_extra_ammo || insp.field.firearm.is_set()) {\
 	MULTIPROPERTY("Extra ammo pieces", field.extra_ammo_pieces);\
 	}\

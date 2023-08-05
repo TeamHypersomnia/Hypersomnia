@@ -26,6 +26,7 @@ struct editor_requested_equipment {
 	editor_typed_resource_id<editor_melee_resource> melee;
 	editor_typed_resource_id<editor_explosive_resource> explosive;
 
+	bool all_spells = false;
 	bool backpack = false;
 	bool electric_armor = false;
 	uint32_t extra_ammo_pieces = 2;

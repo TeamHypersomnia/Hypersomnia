@@ -806,7 +806,7 @@ void settings_gui_state::perform(
 									return "Press a key, ESC to abort, Enter to clear...";
 								}
 
-								return key ? key_to_string_shortened(*key) : "(Unassigned)";
+								return key ? key_to_string(*key) : "(Unassigned)";
 							}();
 
 							const auto captured_bg_col = rgba(255, 20, 0, 80);
@@ -853,7 +853,7 @@ void settings_gui_state::perform(
 								const auto found = find_already_assigned_action(new_key);
 
 								auto make_popup = [&]() {
-									const auto key_name = key_to_string_shortened(new_key);
+									const auto key_name = key_to_string(new_key);
 									const auto current_action_str = format_enum(a);
 
 									const auto description = typesafe_sprintf(

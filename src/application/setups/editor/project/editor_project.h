@@ -82,10 +82,10 @@ struct editor_project {
 	using O = editor_resource_pools;
 
 	template <class T>
-	decltype(auto) find_resource(O& officials, const editor_typed_resource_id<T>& id);
+	T* find_resource(O& officials, const editor_typed_resource_id<T>& id);
 
 	template <class T>
-	decltype(auto) find_resource(const O& officials, const editor_typed_resource_id<T>& id) const;
+	const T* find_resource(const O& officials, const editor_typed_resource_id<T>& id) const;
 
 	template <class F>
 	decltype(auto) on_resource(O& officials, const editor_resource_id& id, F&& callback);
@@ -94,10 +94,16 @@ struct editor_project {
 	decltype(auto) on_resource(const O& officials, const editor_resource_id& id, F&& callback) const;
 
 	template <class T>
-	decltype(auto) find_node(const editor_typed_node_id<T>& id);
+	T* find_node(const editor_node_id& id);
 
 	template <class T>
-	decltype(auto) find_node(const editor_typed_node_id<T>& id) const;
+	const T* find_node(const editor_node_id& id) const;
+
+	template <class T>
+	T* find_node(const editor_typed_node_id<T>& id);
+
+	template <class T>
+	const T* find_node(const editor_typed_node_id<T>& id) const;
 
 	template <class F>
 	decltype(auto) on_node(const editor_node_id& id, F&& callback);

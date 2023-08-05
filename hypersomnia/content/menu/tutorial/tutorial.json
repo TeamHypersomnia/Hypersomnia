@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-04 17:49:07.914174 UTC"
+        "version_timestamp": "2023-08-05 21:41:17.081922 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -9,6 +9,7 @@
     },
     "settings": {
         "default_server_mode": "quick_test",
+        "include_disabled_nodes": false,
         "ambient_light_color": [0, 67, 90, 255]
     },
     "playtesting": {
@@ -117,6 +118,22 @@
             }
         },
         {
+            "path": "gfx/yellow_barrier.png",
+            "file_hash": "476d3f37c8629632a11f7b5102840f4e54629ab285299588ce8550538ee0d177",
+            "id": "@yellow_barrier",
+            "domain": "PHYSICAL",
+            "neon_map": {
+                "light_colors": [[232, 199, 65, 255]
+                ]
+            },
+            "size": [32, 128],
+            "as_physical": {
+                "is_static": true,
+                "is_see_through": true,
+                "is_shoot_through": true
+            }
+        },
+        {
             "path": "materials/glass.png",
             "file_hash": "ff96148205abf557486063d54c77ea8d8ee5613551eb5253bf8e755929e02a30",
             "id": "@materials/glass.png",
@@ -192,6 +209,113 @@
         }
     ],
     "layers": [
+        {
+            "id": "Layer 4",
+            "nodes": [
+                "obs2 (2)",
+                "obs2 (1)",
+                "crate (1)",
+                "crate (2)",
+                "crate",
+                "obs3",
+                "obs2"
+            ]
+        },
+        {
+            "id": "Layer 3",
+            "nodes": [
+                "baka47_magazine (2)",
+                "baka47_magazine (1)",
+                "baka47_magazine (10)",
+                "baka47_magazine (8)",
+                "baka47_magazine (6)",
+                "baka47_magazine (5)",
+                "baka47_magazine (15)",
+                "baka47_magazine (14)",
+                "baka47_magazine (13)",
+                "baka47_magazine (12)",
+                "baka47_magazine (11)"
+            ]
+        },
+        {
+            "id": "Layer 2",
+            "nodes": [
+                "obs1",
+                "kill1_3",
+                "kill1_2",
+                "point_light (14)",
+                "point_light (13)",
+                "point_light (12)",
+                "point_light (11)",
+                "point_light (10)",
+                "point_light (9)",
+                "kill3_1",
+                "kill3_3",
+                "kill3_2",
+                "kill2_1",
+                "kill2_2",
+                "kill1_1"
+            ]
+        },
+        {
+            "id": "Layer 1",
+            "nodes": [
+                "point_light (8)",
+                "point_light (7)",
+                "point_light (6)",
+                "baka47"
+            ]
+        },
+        {
+            "id": "Level4",
+            "nodes": [
+                "tip4_1 (2)",
+                "tip4_1 (6)",
+                "tip4_1 (5)",
+                "dev_floor_256 (23)",
+                "dev_floor_256 (22)",
+                "tip4_1 (7)",
+                "tip4_1 (9)",
+                "dev_floor_256 (27)",
+                "tip4_1 (4)",
+                "tip4_1 (3)",
+                "tip4_1 (8)",
+                "tip4_1 (1)",
+                "tip4_1",
+                "entry4",
+                "dev_floor_256 (25)",
+                "exit4",
+                "floor_right (10)",
+                "floor_top (5)",
+                "hard_wooden_wall (1)",
+                "hard_wooden_wall (4)",
+                "hard_wooden_wall (10)",
+                "hard_wooden_wall (2)",
+                "hard_wooden_wall (3)",
+                "hard_wooden_wall",
+                "vent (22)",
+                "vent (24)",
+                "vent (25)",
+                "dev_floor_256 (18)",
+                "dev_floor_256 (20)",
+                "dev_floor_256 (19)",
+                "dev_floor_256 (26)",
+                "dev_floor_256 (14)",
+                "dev_floor_256 (21)",
+                "Strong lamp (8)",
+                "floor_right (8)",
+                "Strong lamp (9)",
+                "hard_wooden_wall (9)",
+                "hard_wooden_wall (8)",
+                "floor_top (4)",
+                "floor_bottom (4)",
+                "hard_wooden_wall (7)",
+                "hard_wooden_wall (6)",
+                "hard_wooden_wall (5)",
+                "floor_right (9)",
+                "floor_left (4)"
+            ]
+        },
         {
             "id": "Level3",
             "nodes": [
@@ -283,15 +407,18 @@
         {
             "id": "Level0",
             "nodes": [
+                "tip0_2 (3)",
                 "tip0_2 (1)",
                 "tip0_2",
                 "tip0_1",
                 "exit0",
+                "team_spawn (1)",
                 "team_spawn (16)",
                 "vent",
                 "vent (10)",
                 "vent (9)",
                 "vent (1)",
+                "dev_floor_256 (24)",
                 "dev_floor_256 (10)",
                 "dev_floor_256 (2)",
                 "dev_floor_256 (1)",
@@ -310,14 +437,14 @@
         {
             "id": "dev_floor_256",
             "type": "dev_floor_256",
-            "pos": [0.0, -384.0],
-            "size": [1536, 3072]
+            "pos": [0.0, -640.0],
+            "size": [1536, 3584]
         },
         {
             "id": "vent (1)",
             "type": "@materials/vent.png",
-            "pos": [-960.0000610351563, -896.0],
-            "size": [384, 4096]
+            "pos": [-960.0000610351563, -1408.0],
+            "size": [384, 5120]
         },
         {
             "id": "floor_left",
@@ -335,8 +462,8 @@
         {
             "id": "vent (9)",
             "type": "@materials/vent.png",
-            "pos": [960.0000610351563, -896.0],
-            "size": [384, 4096]
+            "pos": [960.0000610351563, -1408.0],
+            "size": [384, 5120]
         },
         {
             "id": "vent (10)",
@@ -355,7 +482,7 @@
         {
             "id": "vent",
             "type": "@materials/vent.png",
-            "pos": [0.0, -3039.999755859375],
+            "pos": [0.0, -4063.99951171875],
             "rotation": 90.0,
             "size": [192, 2304]
         },
@@ -533,14 +660,14 @@
         {
             "id": "dev_floor_256 (10)",
             "type": "dev_floor_256",
-            "pos": [0.0, -1664.0],
+            "pos": [0.0, -2688.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "floor_right (3)",
             "type": "@water_room_floor",
-            "pos": [0.0, -2432.0],
+            "pos": [0.0, -3456.0],
             "size": [1408, 768],
             "color": [255, 132, 132, 255]
         },
@@ -689,6 +816,259 @@
             "pos": [-3264.0, 26048.0],
             "size": [4224, 4352],
             "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "vent (22)",
+            "type": "@materials/vent.png",
+            "pos": [-128.0, 47359.99609375],
+            "rotation": 90.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (24)",
+            "type": "@materials/vent.png",
+            "pos": [832.0, 46112.0],
+            "size": [384, 2112]
+        },
+        {
+            "id": "vent (25)",
+            "type": "@materials/vent.png",
+            "pos": [-1088.0, 45216.0],
+            "size": [384, 3904]
+        },
+        {
+            "id": "dev_floor_256 (21)",
+            "type": "dev_floor_256",
+            "pos": [-128.0, 46272.0],
+            "size": [1536, 1792],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "floor_right (8)",
+            "type": "@water_room_floor",
+            "pos": [2432.0, 42304.0],
+            "size": [768, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_top (4)",
+            "type": "@water_room_floor_2",
+            "pos": [2336.0, 41856.0],
+            "size": [15168, 6400]
+        },
+        {
+            "id": "floor_bottom (4)",
+            "type": "@water_room_floor_2",
+            "pos": [2336.0, 48000.0],
+            "size": [15168, 2048]
+        },
+        {
+            "id": "floor_right (9)",
+            "type": "@water_room_floor",
+            "pos": [4512.0, 46016.0],
+            "size": [10816, 1920],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_left (4)",
+            "type": "@water_room_floor",
+            "pos": [-3392.0, 44800.0],
+            "size": [4224, 4352],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "dev_floor_256 (14)",
+            "type": "dev_floor_256",
+            "pos": [1408.0, 44160.0],
+            "size": [256, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (18)",
+            "type": "dev_floor_256",
+            "pos": [-128.0, 44800.0],
+            "size": [1536, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs2",
+            "type": "@yellow_barrier",
+            "pos": [2464.0, 44160.0],
+            "size": [64, 768]
+        },
+        {
+            "id": "dev_floor_256 (19)",
+            "type": "dev_floor_256",
+            "pos": [2304.0, 44160.0],
+            "size": [256, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall",
+            "type": "hard_wooden_wall",
+            "pos": [3328.0, 44800.0],
+            "size": [5376, 512]
+        },
+        {
+            "id": "hard_wooden_wall (1)",
+            "type": "hard_wooden_wall",
+            "pos": [3072.0, 43520.0],
+            "size": [7936, 512]
+        },
+        {
+            "id": "obs1",
+            "type": "hard_wooden_wall",
+            "pos": [1152.0, 44160.0],
+            "size": [256, 768]
+        },
+        {
+            "id": "obs2 (1)",
+            "type": "@yellow_barrier",
+            "pos": [2849.0, 44416.0],
+            "size": [64, 256]
+        },
+        {
+            "id": "obs2 (2)",
+            "type": "@yellow_barrier",
+            "pos": [2849.0, 43904.0],
+            "size": [64, 256]
+        },
+        {
+            "id": "hard_wooden_wall (3)",
+            "type": "hard_wooden_wall",
+            "pos": [4096.0, 44032.0],
+            "size": [256, 512]
+        },
+        {
+            "id": "dev_floor_256 (20)",
+            "type": "dev_floor_256",
+            "pos": [4352.0, 44416.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs3",
+            "type": "@yellow_barrier",
+            "pos": [4512.0, 44160.0],
+            "size": [64, 768]
+        },
+        {
+            "id": "crate",
+            "type": "crate",
+            "pos": [4736.0, 44480.0]
+        },
+        {
+            "id": "crate (1)",
+            "type": "crate",
+            "pos": [4800.0, 43840.0]
+        },
+        {
+            "id": "dev_floor_256 (22)",
+            "type": "dev_floor_256",
+            "pos": [3328.0, 44160.0],
+            "size": [256, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "crate (2)",
+            "type": "crate",
+            "pos": [4928.0, 44160.0]
+        },
+        {
+            "id": "dev_floor_256 (23)",
+            "type": "dev_floor_256",
+            "pos": [3840.0, 44160.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (2)",
+            "type": "hard_wooden_wall",
+            "pos": [3584.0, 44224.0],
+            "size": [256, 640]
+        },
+        {
+            "id": "hard_wooden_wall (4)",
+            "type": "hard_wooden_wall",
+            "pos": [3584.0, 43872.0],
+            "size": [256, 64]
+        },
+        {
+            "id": "dev_floor_256 (24)",
+            "type": "dev_floor_256",
+            "pos": [0.0, -1664.0],
+            "size": [1536, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (25)",
+            "type": "dev_floor_256",
+            "pos": [6528.0, 44032.0],
+            "size": [768, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (5)",
+            "type": "hard_wooden_wall",
+            "pos": [7296.0, 44544.0],
+            "size": [512, 2560]
+        },
+        {
+            "id": "hard_wooden_wall (6)",
+            "type": "hard_wooden_wall",
+            "pos": [5760.0, 45440.0],
+            "size": [512, 768]
+        },
+        {
+            "id": "hard_wooden_wall (7)",
+            "type": "hard_wooden_wall",
+            "pos": [6528.0, 46080.0],
+            "size": [2048, 512]
+        },
+        {
+            "id": "floor_right (10)",
+            "type": "@water_room_floor",
+            "pos": [6528.0, 44800.0],
+            "size": [768, 1792],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_top (5)",
+            "type": "@water_room_floor_2",
+            "pos": [6528.0, 45376.0],
+            "size": [1024, 896]
+        },
+        {
+            "id": "dev_floor_256 (26)",
+            "type": "dev_floor_256",
+            "pos": [1856.0, 44160.0],
+            "size": [256, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (8)",
+            "type": "hard_wooden_wall",
+            "pos": [5376.0, 44032.0],
+            "size": [256, 512]
+        },
+        {
+            "id": "hard_wooden_wall (9)",
+            "type": "hard_wooden_wall",
+            "pos": [5888.0, 44288.0],
+            "size": [256, 512]
+        },
+        {
+            "id": "dev_floor_256 (27)",
+            "type": "dev_floor_256",
+            "pos": [5632.0, 43904.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (10)",
+            "type": "hard_wooden_wall",
+            "pos": [2944.0, 44160.0],
+            "size": [256, 256]
         },
         {
             "id": "Strong lamp (1)",
@@ -855,6 +1235,151 @@
             "color": [255, 0, 0, 80]
         },
         {
+            "id": "Strong lamp (8)",
+            "type": "point_light",
+            "pos": [769.0, 46273.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (9)",
+            "type": "point_light",
+            "pos": [-1153.0, 46335.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "point_light (6)",
+            "type": "point_light",
+            "pos": [-767.0, 43905.0]
+        },
+        {
+            "id": "point_light (7)",
+            "type": "point_light",
+            "pos": [1296.0, 43840.0],
+            "color": [255, 255, 0, 255]
+        },
+        {
+            "id": "point_light (8)",
+            "type": "point_light",
+            "pos": [1296.0, 44481.0],
+            "color": [255, 255, 0, 255]
+        },
+        {
+            "id": "point_light (9)",
+            "type": "point_light",
+            "pos": [2783.0, 44484.0],
+            "color": [255, 255, 0, 47]
+        },
+        {
+            "id": "point_light (10)",
+            "type": "point_light",
+            "pos": [2782.0, 43842.0],
+            "color": [255, 255, 0, 47]
+        },
+        {
+            "id": "point_light (11)",
+            "type": "point_light",
+            "pos": [4354.0, 44483.0],
+            "color": [255, 255, 0, 47]
+        },
+        {
+            "id": "point_light (12)",
+            "type": "point_light",
+            "pos": [4353.0, 43841.0],
+            "color": [255, 255, 0, 47]
+        },
+        {
+            "id": "point_light (13)",
+            "type": "point_light",
+            "pos": [3948.0, 43802.0],
+            "color": [255, 255, 0, 73]
+        },
+        {
+            "id": "point_light (14)",
+            "type": "point_light",
+            "pos": [5728.0, 44512.0],
+            "color": [255, 255, 0, 74]
+        },
+        {
+            "id": "baka47_magazine (1)",
+            "type": "baka47_magazine",
+            "pos": [1498.0, 43977.0]
+        },
+        {
+            "id": "baka47_magazine (2)",
+            "type": "baka47_magazine",
+            "pos": [1498.0, 43849.0]
+        },
+        {
+            "id": "baka47_magazine (5)",
+            "type": "baka47_magazine",
+            "pos": [1498.0, 44105.0]
+        },
+        {
+            "id": "baka47_magazine (6)",
+            "type": "baka47_magazine",
+            "pos": [1498.0, 44233.0]
+        },
+        {
+            "id": "baka47_magazine (8)",
+            "type": "baka47_magazine",
+            "pos": [1498.0, 44361.0]
+        },
+        {
+            "id": "baka47_magazine (10)",
+            "type": "baka47_magazine",
+            "pos": [1498.0, 44489.0]
+        },
+        {
+            "id": "baka47_magazine (11)",
+            "type": "baka47_magazine",
+            "pos": [4282.0, 43830.0]
+        },
+        {
+            "id": "baka47_magazine (12)",
+            "type": "baka47_magazine",
+            "pos": [4282.0, 43894.0]
+        },
+        {
+            "id": "baka47_magazine (13)",
+            "type": "baka47_magazine",
+            "pos": [4282.0, 43958.0]
+        },
+        {
+            "id": "baka47_magazine (14)",
+            "type": "baka47_magazine",
+            "pos": [4282.0, 44022.0]
+        },
+        {
+            "id": "baka47_magazine (15)",
+            "type": "baka47_magazine",
+            "pos": [4282.0, 44086.0]
+        },
+        {
+            "id": "baka47",
+            "type": "baka47",
+            "pos": [-134.0, 45240.0]
+        },
+        {
             "id": "team_spawn (16)",
             "type": "team_spawn",
             "faction": "METROPOLIS",
@@ -862,9 +1387,67 @@
             "rotation": -90.0
         },
         {
+            "id": "kill1_1",
+            "type": "team_spawn",
+            "pos": [703.0, 44161.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (1)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [-129.0, 45057.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "kill1_2",
+            "type": "team_spawn",
+            "active": false,
+            "pos": [127.0, 44415.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill1_3",
+            "type": "team_spawn",
+            "active": false,
+            "pos": [-129.0, 44417.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill2_2",
+            "type": "team_spawn",
+            "pos": [2946.0, 43903.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill2_1",
+            "type": "team_spawn",
+            "pos": [2944.0, 44417.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill3_2",
+            "type": "team_spawn",
+            "pos": [4897.0, 44447.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill3_1",
+            "type": "team_spawn",
+            "pos": [4929.0, 43841.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill3_3",
+            "type": "team_spawn",
+            "pos": [5076.0, 44107.0],
+            "rotation": -180.0
+        },
+        {
             "id": "exit0",
             "type": "portal",
-            "pos": [-0.000095367431640625, -2432.001220703125],
+            "pos": [-0.000095367431640625, -3456.001220703125],
             "rotation": -90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -1084,7 +1667,7 @@
             "id": "tip0_2 (1)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [0.0, -1664.0],
+            "pos": [0.0, -2688.0],
             "size": [1536, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -1099,7 +1682,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Enter the yellow portal to continue."
+            "context_tip": "Let us begin!\nEnter the yellow portal."
         },
         {
             "id": "hazard (3)",
@@ -1189,7 +1772,7 @@
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
-            "portal_exit": "entry2",
+            "portal_exit": "entry4",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -1209,6 +1792,278 @@
             "hazard": {
                 "damage": 200.0
             }
+        },
+        {
+            "id": "tip4_1",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-128.0, 46272.0],
+            "size": [1536, 1792],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Time to shoot things up.\nPick up the weapon on the floor."
+        },
+        {
+            "id": "entry4",
+            "type": "portal",
+            "pos": [-128.00009155273438, 46912.00390625],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "exit4",
+            "type": "portal",
+            "pos": [6528.0, 45311.9921875],
+            "rotation": -90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry3",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip4_1 (1)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [1408.0, 44160.0],
+            "size": [256, 768],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Pick up magazines and press {RELOAD} to reload."
+        },
+        {
+            "id": "tip4_1 (2)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-128.0, 44800.0],
+            "size": [1536, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {SHOOT} to shoot.\nKill the Resistance soldier to continue.\nYou can restart any time if you run out of ammo."
+        },
+        {
+            "id": "tip4_1 (3)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [2304.0, 44160.0],
+            "size": [256, 768],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {TOGGLE_WEAPON_LASER} to toggle laser.\nDashed lines indicate a physical obstacle."
+        },
+        {
+            "id": "tip4_1 (4)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [4352.0, 44416.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Enemies are invisible behind obstacles.\nBullets can still penetrate and kill."
+        },
+        {
+            "id": "tip4_1 (5)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [3328.0, 44160.0],
+            "size": [256, 768],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {HOLSTER} to hide your weapon.\nYou will fit in tight corridors."
+        },
+        {
+            "id": "tip4_1 (6)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [3840.000244140625, 44160.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {LAST_USED_WEAPON} to pull your gun back.\n{LAST_USED_WEAPON} quickly switches to the last used gun (or bare hands)."
+        },
+        {
+            "id": "tip0_2 (3)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [0.0, -1664.0],
+            "size": [1536, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "If you get stuck, press Escape.\nThen click \"Restart from last checkpoint\"."
+        },
+        {
+            "id": "tip4_1 (7)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [6528.0, 44032.0],
+            "size": [768, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {DROP} to drop your weapon.\nThis frees inventory space."
+        },
+        {
+            "id": "tip4_1 (8)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [1856.0, 44160.0],
+            "size": [256, 768],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: double-tapping {RELOAD} lets you reload faster.\nThis drops the mag to the ground. You can pick it up later!"
+        },
+        {
+            "id": "tip4_1 (9)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [5632.0, 43904.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: you can shoot while reloading!\nThis will fire the one bullet left in the chamber."
         }
     ]
 }

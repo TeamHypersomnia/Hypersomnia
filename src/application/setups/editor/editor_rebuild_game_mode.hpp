@@ -58,6 +58,8 @@ auto to_game_requested_equipment(
 		result.other_equipment.push_back({ num_explosives, to_flavour(requested.explosive) });
 	}
 
+	fill_range(result.spells_to_give, requested.all_spells);
+
 	return result;
 }
 

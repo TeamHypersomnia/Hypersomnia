@@ -1111,6 +1111,7 @@ void server_setup::rechoose_arena() {
 
 	{
 		const auto result = ::choose_arena_server({
+			editor_project_readwrite::reading_settings(),
 			lua,
 			arena,
 			official,
@@ -1118,13 +1119,14 @@ void server_setup::rechoose_arena() {
 			vars.game_mode,
 			clean_round_state,
 			vars.playtesting_context,
-			std::addressof(*last_loaded_project)
+			std::addressof(*last_loaded_project),
+			nullptr
 		});
 
 		current_arena_folder = result.arena_folder_path;
 		const auto paths = editor_project_paths(current_arena_folder);
 
-		current_arena_hash = result.required_hash;
+		current_arena_hash = result.loaded_arena_hash;
 			
 		LOG("Chosen arena hash: %x", current_arena_hash);
 

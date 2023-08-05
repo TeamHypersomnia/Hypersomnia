@@ -810,14 +810,14 @@ namespace editor_project_readwrite {
 		const augs::path_type& json_path,
 		const editor_resource_pools& officials,
 		const editor_official_resource_map& officials_map,
-		const bool strict,
+		const reading_settings settings,
 		augs::secure_hash_type* const output_arena_hash
 	) {
 		const auto project_dir = json_path.parent_path();
 
 		const auto read_string = output_arena_hash != nullptr ? augs::file_to_string_crlf_to_lf : augs::file_to_string;
 
-		return read_project_json(project_dir, read_string(json_path), officials, officials_map, strict, output_arena_hash);
+		return read_project_json(project_dir, read_string(json_path), officials, officials_map, settings, output_arena_hash);
 	}
 
 	editor_project read_project_json(
@@ -825,9 +825,10 @@ namespace editor_project_readwrite {
 		const std::string& loaded_project_json,
 		const editor_resource_pools& officials,
 		const editor_official_resource_map& officials_map,
-		const bool strict,
+		const reading_settings settings,
 		augs::secure_hash_type* const output_arena_hash
 	) {
+		const bool strict = settings.strict;
 		const auto document = augs::json_document_from(loaded_project_json);
 
 		editor_project loaded;
@@ -1000,17 +1001,17 @@ namespace editor_project_readwrite {
 					continue;
 				}
 
-				if (!resource.HasMember("id") || !resource["id"].IsString()) {
+				if (!resource.HasMember("file_hash") || !resource["file_hash"].IsString()) {
 					if (strict) {
-						throw augs::json_deserialization_error("Missing \"id\" property for %x!", resource["path"].GetString());
+						throw augs::json_deserialization_error("Missing \"file_hash\" property for %x!", resource["path"].GetString());
 					}
 
 					continue;
 				}
 
-				if (!resource.HasMember("file_hash") || !resource["file_hash"].IsString()) {
+				if (!resource.HasMember("id") || !resource["id"].IsString()) {
 					if (strict) {
-						throw augs::json_deserialization_error("Missing \"file_hash\" property for %x!", resource["path"].GetString());
+						throw augs::json_deserialization_error("Missing \"id\" property for %x!", resource["path"].GetString());
 					}
 
 					continue;
@@ -1121,6 +1122,7 @@ namespace editor_project_readwrite {
 		};
 
 		std::unordered_map<std::string, node_meta> node_name_map;
+		std::unordered_set<std::string> skipped_nodes;
 
 		const bool create_fallback_node_order = [&]() {
 			auto layers = FindArray(document, "layers");
@@ -1201,6 +1203,19 @@ namespace editor_project_readwrite {
 						else {
 							using node_type = typename R::node_type;
 
+							if (!settings.read_inactive_nodes) {
+								if (const auto maybe_active = GetIf<bool>(json_node, "active")) {
+									if (!*maybe_active) {
+										skipped_nodes.emplace(id);
+										return;
+									}
+								}
+								else if (const bool inactive_by_default = !node_type().active) {
+									skipped_nodes.emplace(id);
+									return;
+								}
+							}
+
 							const auto map_result = node_name_map.try_emplace(id, node_meta());
 
 							if (const bool is_unique = map_result.second) {
@@ -1280,6 +1295,17 @@ namespace editor_project_readwrite {
 					continue;
 				}
 
+				if (!settings.read_inactive_nodes) {
+					if (const auto maybe_active = GetIf<bool>(json_layer, "active")) {
+						if (!*maybe_active) {
+							continue;
+						}
+					}
+					else if (const bool inactive_by_default = !editor_layer_editable().active) {
+						continue;
+					}
+				}
+
 				editor_layer layer;
 				layer.unique_name = *id;
 
@@ -1315,12 +1341,14 @@ namespace editor_project_readwrite {
 									}
 								}
 								else {
-									if (strict) {
-										throw augs::json_deserialization_error(
-											"Error reading layer \"%x\": node \"%x\" not found!", 
-											layer.unique_name,
-											node_id
-										);
+									if (!found_in(skipped_nodes, node_id) ) {
+										if (strict) {
+											throw augs::json_deserialization_error(
+												"Error reading layer \"%x\": node \"%x\" not found!", 
+												layer.unique_name,
+												node_id
+											);
+										}
 									}
 								}
 							}

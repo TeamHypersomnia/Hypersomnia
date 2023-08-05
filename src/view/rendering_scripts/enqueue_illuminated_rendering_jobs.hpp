@@ -328,6 +328,8 @@ void enqueue_illuminated_rendering_jobs(
 			auto job = [h1 = make_helper(D::UNDER_FOREGROUND_NEONS), h2 = make_helper(D::FOREGROUND_NEONS)]() {
 				h1.draw_neons<
 					render_layer::PLANTED_ITEMS,
+					render_layer::OBSTACLES_UNDER_MISSILES,
+					render_layer::MISSILES,
 					render_layer::SOLID_OBSTACLES,
 					render_layer::REMNANTS
 					/* Sentiences would come here if not for the fact that they have special neon logic */
@@ -484,7 +486,9 @@ void enqueue_illuminated_rendering_jobs(
 			auto job = [h = make_helper(D::GROUND)]() {
 				h.draw<
 					render_layer::GROUND,
-					render_layer::PLANTED_ITEMS
+					render_layer::PLANTED_ITEMS,
+					render_layer::OBSTACLES_UNDER_MISSILES,
+					render_layer::MISSILES
 				>();
 			};
 

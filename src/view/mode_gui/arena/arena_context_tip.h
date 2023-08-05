@@ -48,7 +48,7 @@ inline void draw_context_tip(
 		}
 
 		const auto key_str = [&]() {
-			const auto shortened = key_to_string_shortened(found_k);
+			const auto shortened = key_to_string(found_k);
 
 			if (shortened.length() == 1) {
 				return "\"" + shortened + "\"";
