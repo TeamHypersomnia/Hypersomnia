@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-06 01:07:09.801484 UTC"
+        "version_timestamp": "2023-08-06 17:27:25.670283 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -210,9 +210,23 @@
     ],
     "layers": [
         {
+            "id": "Layer 5",
+            "nodes": [
+                "szturm"
+            ]
+        },
+        {
+            "id": "Layer 4",
+            "nodes": [
+                "dev_floor_64 (1)",
+                "dev_floor_64"
+            ]
+        },
+        {
             "id": "Layer 3",
             "nodes": [
-                "kek9_magazine (2)"
+                "wood (2)",
+                "wood (1)"
             ]
         },
         {
@@ -220,6 +234,56 @@
         },
         {
             "id": "Layer 1"
+        },
+        {
+            "id": "Level7",
+            "nodes": [
+                "wood",
+                "glass (1)",
+                "glass",
+                "obs5",
+                "obs6 (3)",
+                "obs6",
+                "obs6 (1)",
+                "obs6 (2)",
+                "obs5 (1)",
+                "obs5 (2)",
+                "kill5_2",
+                "kill5_3",
+                "kill5_4",
+                "kill6_3",
+                "kill6_4",
+                "kill6_2",
+                "kill6_1",
+                "kill5_1",
+                "tip3_1 (13)",
+                "tip3_1 (12)",
+                "tip3_1 (11)",
+                "tip3_1 (8)",
+                "tip3_1 (9)",
+                "tip3_1 (10)",
+                "entry7",
+                "exit7",
+                "vent (31)",
+                "hard_wooden_wall (16)",
+                "hard_wooden_wall (15)",
+                "hard_wooden_wall (14)",
+                "hard_wooden_wall (13)",
+                "vent (32)",
+                "vent (33)",
+                "dev_floor_256 (43)",
+                "dev_floor_256 (40)",
+                "dev_floor_256 (41)",
+                "dev_floor_256 (42)",
+                "Strong lamp (14)",
+                "Strong lamp (17)",
+                "Strong lamp (16)",
+                "Strong lamp (15)",
+                "floor_right (8)",
+                "floor_top (7)",
+                "floor_bottom (6)",
+                "floor_left (6)"
+            ]
         },
         {
             "id": "Level6",
@@ -287,6 +351,8 @@
         {
             "id": "Level4",
             "nodes": [
+                "kek9_magazine",
+                "kek9_magazine (2)",
                 "tip4_1 (2)",
                 "tip4_1 (12)",
                 "tip4_1 (10)",
@@ -295,6 +361,7 @@
                 "dev_floor_256 (38)",
                 "dev_floor_256 (36)",
                 "dev_floor_256 (23)",
+                "dev_floor_256 (39)",
                 "dev_floor_256 (22)",
                 "tip4_1 (7)",
                 "tip4_1 (11)",
@@ -302,6 +369,7 @@
                 "dev_floor_256 (37)",
                 "dev_floor_256 (27)",
                 "tip4_1 (4)",
+                "tip4_1 (13)",
                 "tip4_1 (3)",
                 "tip4_1 (8)",
                 "tip4_1 (1)",
@@ -1346,6 +1414,212 @@
             "color": [0, 255, 0, 255]
         },
         {
+            "id": "dev_floor_256 (39)",
+            "type": "dev_floor_256",
+            "pos": [2944.0, 43904.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs5 (2)",
+            "type": "@yellow_barrier",
+            "pos": [29664.001953125, 8832.0],
+            "size": [64, 1280]
+        },
+        {
+            "id": "vent (31)",
+            "type": "@materials/vent.png",
+            "pos": [32640.0, 8832.0],
+            "size": [384, 2048]
+        },
+        {
+            "id": "vent (32)",
+            "type": "@materials/vent.png",
+            "pos": [30431.998046875, 8000.0],
+            "rotation": -90.0,
+            "size": [384, 4032]
+        },
+        {
+            "id": "vent (33)",
+            "type": "@materials/vent.png",
+            "pos": [30431.998046875, 9664.0],
+            "rotation": -90.0,
+            "size": [384, 4032]
+        },
+        {
+            "id": "dev_floor_256 (41)",
+            "type": "dev_floor_256",
+            "pos": [29824.0, 8832.0],
+            "rotation": -90.0,
+            "size": [1280, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (42)",
+            "type": "dev_floor_256",
+            "pos": [31424.0, 8832.0],
+            "rotation": -90.0,
+            "size": [1280, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "floor_right (8)",
+            "type": "@water_room_floor",
+            "pos": [25728.0, 8832.0],
+            "rotation": -90.0,
+            "size": [896, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_top (7)",
+            "type": "@water_room_floor_2",
+            "pos": [23616.0, 7456.0],
+            "size": [21120, 7616]
+        },
+        {
+            "id": "floor_bottom (6)",
+            "type": "@water_room_floor_2",
+            "pos": [23744.0, 16768.0],
+            "size": [20992, 2048]
+        },
+        {
+            "id": "floor_left (6)",
+            "type": "@water_room_floor",
+            "pos": [23680.0, 13472.0],
+            "size": [21120, 4544],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "glass",
+            "type": "@materials/glass.png",
+            "pos": [29151.998046875, 8224.0],
+            "size": [960, 64]
+        },
+        {
+            "id": "glass (1)",
+            "type": "@materials/glass.png",
+            "pos": [29151.998046875, 9440.0],
+            "size": [960, 64],
+            "penetrability": 0.0
+        },
+        {
+            "id": "obs5 (1)",
+            "type": "@yellow_barrier",
+            "pos": [28607.99609375, 8832.0],
+            "rotation": -180.0,
+            "size": [128, 1280]
+        },
+        {
+            "id": "wood",
+            "type": "@materials/wood.png",
+            "pos": [29179.083984375, 8836.1962890625],
+            "rotation": -45.0,
+            "size": [512, 768],
+            "color": [254, 255, 255, 255],
+            "penetrability": 0.0
+        },
+        {
+            "id": "obs5",
+            "type": "@yellow_barrier",
+            "pos": [28864.001953125, 8799.9990234375],
+            "rotation": -90.0,
+            "size": [320, 384]
+        },
+        {
+            "id": "dev_floor_256 (40)",
+            "type": "dev_floor_256",
+            "pos": [28544.0, 8832.0],
+            "rotation": -90.0,
+            "size": [1280, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (13)",
+            "type": "hard_wooden_wall",
+            "pos": [26816.0, 8000.0],
+            "size": [3200, 384]
+        },
+        {
+            "id": "hard_wooden_wall (14)",
+            "type": "hard_wooden_wall",
+            "pos": [26816.0, 9664.0],
+            "size": [3200, 384]
+        },
+        {
+            "id": "hard_wooden_wall (15)",
+            "type": "hard_wooden_wall",
+            "pos": [27072.0, 8832.0],
+            "size": [1664, 896]
+        },
+        {
+            "id": "obs6 (2)",
+            "type": "@yellow_barrier",
+            "pos": [26304.0, 9376.0],
+            "rotation": -90.0,
+            "size": [192, 128]
+        },
+        {
+            "id": "obs6 (1)",
+            "type": "@yellow_barrier",
+            "pos": [26304.0, 8288.0],
+            "rotation": -90.0,
+            "size": [192, 128]
+        },
+        {
+            "id": "obs6",
+            "type": "@yellow_barrier",
+            "pos": [27584.0, 9375.9990234375],
+            "rotation": -90.0,
+            "size": [192, 128]
+        },
+        {
+            "id": "wood (1)",
+            "type": "@materials/wood.png",
+            "pos": [27422.0, 9344.0],
+            "size": [192, 128]
+        },
+        {
+            "id": "wood (2)",
+            "type": "@materials/wood.png",
+            "pos": [27424.0, 8320.0],
+            "size": [192, 128]
+        },
+        {
+            "id": "obs6 (3)",
+            "type": "@yellow_barrier",
+            "pos": [27584.0, 8287.9990234375],
+            "rotation": -90.0,
+            "size": [192, 128]
+        },
+        {
+            "id": "hard_wooden_wall (16)",
+            "type": "hard_wooden_wall",
+            "pos": [24384.0, 8832.0],
+            "size": [1664, 2048]
+        },
+        {
+            "id": "dev_floor_256 (43)",
+            "type": "dev_floor_256",
+            "pos": [28032.0, 8832.0],
+            "rotation": -90.0,
+            "size": [1280, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_64",
+            "type": "dev_floor_64",
+            "pos": [27552.0, 9376.0],
+            "size": [64, 192],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_64 (1)",
+            "type": "dev_floor_64",
+            "pos": [27552.0, 8288.0],
+            "size": [64, 192],
+            "color": [0, 255, 0, 255]
+        },
+        {
             "id": "Strong lamp (1)",
             "type": "point_light",
             "pos": [-897.0, 1279.0],
@@ -1659,6 +1933,70 @@
             }
         },
         {
+            "id": "Strong lamp (14)",
+            "type": "point_light",
+            "pos": [31521.0, 7807.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (15)",
+            "type": "point_light",
+            "pos": [31583.0, 9729.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (16)",
+            "type": "point_light",
+            "pos": [26431.0, 9345.0],
+            "color": [255, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (17)",
+            "type": "point_light",
+            "pos": [26431.0, 8319.0],
+            "color": [255, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
             "id": "baka47_magazine (1)",
             "type": "baka47_magazine",
             "pos": [1498.0, 43977.0]
@@ -1731,7 +2069,12 @@
         {
             "id": "kek9_magazine (2)",
             "type": "kek9_magazine",
-            "pos": [3912.0, 43938.0]
+            "pos": [3906.000244140625, 43944.0]
+        },
+        {
+            "id": "kek9_magazine",
+            "type": "kek9_magazine",
+            "pos": [3906.000244140625, 43863.0]
         },
         {
             "id": "baka47",
@@ -1768,6 +2111,12 @@
             "pos": [3840.000244140625, 43910.0]
         },
         {
+            "id": "szturm",
+            "type": "szturm",
+            "pos": [30187.146484375, 8811.353515625],
+            "rotation": -45.0
+        },
+        {
             "id": "team_spawn (16)",
             "type": "team_spawn",
             "active": false,
@@ -1784,6 +2133,7 @@
         {
             "id": "team_spawn (1)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [-129.0, 46303.0],
             "rotation": -90.0
@@ -1847,10 +2197,49 @@
         {
             "id": "team_spawn",
             "type": "team_spawn",
-            "active": false,
             "faction": "METROPOLIS",
-            "pos": [11455.0, -1.0],
-            "rotation": -90.0
+            "pos": [31871.0, 8959.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill5_1",
+            "type": "team_spawn",
+            "pos": [28927.0, 9087.0]
+        },
+        {
+            "id": "kill5_2",
+            "type": "team_spawn",
+            "pos": [28863.0, 8511.0]
+        },
+        {
+            "id": "kill5_4",
+            "type": "team_spawn",
+            "pos": [28801.0, 9025.0]
+        },
+        {
+            "id": "kill5_3",
+            "type": "team_spawn",
+            "pos": [28737.0, 8575.0]
+        },
+        {
+            "id": "kill6_1",
+            "type": "team_spawn",
+            "pos": [26687.0, 9345.0]
+        },
+        {
+            "id": "kill6_2",
+            "type": "team_spawn",
+            "pos": [26497.0, 9345.0]
+        },
+        {
+            "id": "kill6_4",
+            "type": "team_spawn",
+            "pos": [26815.0, 8319.0]
+        },
+        {
+            "id": "kill6_3",
+            "type": "team_spawn",
+            "pos": [26623.0, 8321.0]
         },
         {
             "id": "exit0",
@@ -2691,7 +3080,7 @@
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry6",
+            "portal_exit": "entry7",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -2825,7 +3214,201 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Tip: whenever moving around, switch to bare hands with {HOLSTER}.\nThis way you're extremely fast. Press {LAST_USED_WEAPON} only once you need your gun."
+            "context_tip": "Tip: whenever moving around, switch to bare hands with {HOLSTER} or {LAST_USED_WEAPON}.\nThis way you're extremely fast. Press {LAST_USED_WEAPON} only once you need your gun."
+        },
+        {
+            "id": "tip4_1 (13)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [2944.0, 43904.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: gun recoil is the same every time.\nYou can learn the pattern!"
+        },
+        {
+            "id": "tip3_1 (9)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [29824.0, 8832.0],
+            "size": [256, 1280],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Try killing enemies behind the impenetrable orange box.\nShoot the glassy surface from an angle."
+        },
+        {
+            "id": "tip3_1 (10)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [31424.0, 8832.0],
+            "size": [2048, 1280],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Bullets can bounce against walls!\nGlass is the easiest to ricochet off."
+        },
+        {
+            "id": "entry7",
+            "type": "portal",
+            "pos": [32192.001953125, 8703.9990234375],
+            "rotation": -180.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "exit7",
+            "type": "portal",
+            "pos": [25727.99609375, 8831.9990234375],
+            "rotation": -180.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry6",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (8)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [28544.0, 8832.0],
+            "size": [256, 1280],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "It's a very powerful technique.\nYou can surprise enemies hiding around the corners."
+        },
+        {
+            "id": "tip3_1 (11)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [28032.0, 8832.0],
+            "size": [256, 1280],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "It is possible to bounce off ALL surfaces.\nWood is the hardest, but absolutely possible!"
+        },
+        {
+            "id": "tip3_1 (12)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [27551.998046875, 9376.0],
+            "size": [64, 192],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: Press {HOLSTER}."
+        },
+        {
+            "id": "tip3_1 (13)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [27551.998046875, 8288.0],
+            "size": [64, 192],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: Press {HOLSTER}."
         }
     ]
 }

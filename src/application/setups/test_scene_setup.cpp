@@ -170,6 +170,7 @@ void test_scene_setup::restart_mode() {
 
 	const bool is_akimbo_level = tutorial.level == 5;
 	const bool is_duals_level = tutorial.level == 6;
+	const bool is_ricochets_level = tutorial.level == 7;
 
 	get_arena_handle().on_mode_with_input(
 		[&]<typename M>(M& mode, const auto& input) {
@@ -203,7 +204,7 @@ void test_scene_setup::restart_mode() {
 					mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
 				}
 
-				if (!is_tutorial() || is_akimbo_level || is_duals_level) {
+				if (!is_tutorial() || is_akimbo_level || is_duals_level || is_ricochets_level) {
 					mode.infinite_ammo_for = viewed_character_id;
 				}
 			}
