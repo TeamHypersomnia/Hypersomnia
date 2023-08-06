@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-05 23:57:54.018335 UTC"
+        "version_timestamp": "2023-08-06 01:07:09.801484 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -210,6 +210,15 @@
     ],
     "layers": [
         {
+            "id": "Layer 3",
+            "nodes": [
+                "kek9_magazine (2)"
+            ]
+        },
+        {
+            "id": "Layer 2"
+        },
+        {
             "id": "Layer 1"
         },
         {
@@ -279,12 +288,18 @@
             "id": "Level4",
             "nodes": [
                 "tip4_1 (2)",
+                "tip4_1 (12)",
+                "tip4_1 (10)",
                 "tip4_1 (6)",
                 "tip4_1 (5)",
+                "dev_floor_256 (38)",
+                "dev_floor_256 (36)",
                 "dev_floor_256 (23)",
                 "dev_floor_256 (22)",
                 "tip4_1 (7)",
+                "tip4_1 (11)",
                 "tip4_1 (9)",
+                "dev_floor_256 (37)",
                 "dev_floor_256 (27)",
                 "tip4_1 (4)",
                 "tip4_1 (3)",
@@ -307,7 +322,6 @@
                 "baka47_magazine (8)",
                 "baka47_magazine (6)",
                 "baka47_magazine (5)",
-                "baka47_magazine (15)",
                 "baka47_magazine (14)",
                 "baka47_magazine (13)",
                 "baka47_magazine (12)",
@@ -337,6 +351,8 @@
                 "hard_wooden_wall (4)",
                 "hard_wooden_wall (10)",
                 "hard_wooden_wall (2)",
+                "hard_wooden_wall (12)",
+                "hard_wooden_wall (11)",
                 "hard_wooden_wall (3)",
                 "hard_wooden_wall",
                 "vent (22)",
@@ -349,10 +365,10 @@
                 "dev_floor_256 (14)",
                 "dev_floor_256 (21)",
                 "Strong lamp (8)",
-                "floor_right (8)",
                 "Strong lamp (9)",
                 "hard_wooden_wall (9)",
                 "hard_wooden_wall (8)",
+                "kek9",
                 "floor_top (4)",
                 "floor_bottom (4)",
                 "hard_wooden_wall (7)",
@@ -891,13 +907,6 @@
             "color": [0, 255, 0, 255]
         },
         {
-            "id": "floor_right (8)",
-            "type": "@water_room_floor",
-            "pos": [2432.0, 42304.0],
-            "size": [768, 768],
-            "color": [255, 132, 132, 255]
-        },
-        {
             "id": "floor_top (4)",
             "type": "@water_room_floor_2",
             "pos": [2336.0, 41856.0],
@@ -953,14 +962,14 @@
         {
             "id": "hard_wooden_wall",
             "type": "hard_wooden_wall",
-            "pos": [3328.0, 44800.0],
-            "size": [5376, 512]
+            "pos": [3840.000244140625, 44800.0],
+            "size": [6400, 512]
         },
         {
             "id": "hard_wooden_wall (1)",
             "type": "hard_wooden_wall",
-            "pos": [3072.0, 43520.0],
-            "size": [7936, 512]
+            "pos": [1152.0, 43520.0],
+            "size": [4096, 512]
         },
         {
             "id": "obs1",
@@ -983,64 +992,64 @@
         {
             "id": "hard_wooden_wall (3)",
             "type": "hard_wooden_wall",
-            "pos": [4096.0, 44032.0],
-            "size": [256, 512]
+            "pos": [4608.0, 43776.0],
+            "size": [1280, 1024]
         },
         {
             "id": "dev_floor_256 (20)",
             "type": "dev_floor_256",
-            "pos": [4352.0, 44416.0],
-            "size": [256, 256],
+            "pos": [5376.0, 44288.0],
+            "size": [256, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "obs3",
             "type": "@yellow_barrier",
-            "pos": [4512.0, 44160.0],
-            "size": [64, 768]
+            "pos": [5536.0, 43904.0],
+            "size": [64, 1280]
         },
         {
             "id": "crate",
             "type": "crate",
-            "pos": [4736.0, 44480.0],
+            "pos": [5771.0, 44128.0],
             "penetrability": 1.5
         },
         {
             "id": "crate (1)",
             "type": "crate",
-            "pos": [4800.0, 43840.0],
+            "pos": [5835.0, 43488.0],
             "penetrability": 1.5
         },
         {
             "id": "dev_floor_256 (22)",
             "type": "dev_floor_256",
-            "pos": [3328.0, 44160.0],
-            "size": [256, 768],
+            "pos": [3328.0, 43520.0],
+            "size": [256, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "crate (2)",
             "type": "crate",
-            "pos": [4928.0, 44160.0],
+            "pos": [5963.0, 43808.0],
             "penetrability": 1.5
         },
         {
             "id": "dev_floor_256 (23)",
             "type": "dev_floor_256",
-            "pos": [3840.0, 44160.0],
+            "pos": [3840.0, 43648.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "hard_wooden_wall (2)",
             "type": "hard_wooden_wall",
-            "pos": [3584.0, 44224.0],
-            "size": [256, 640]
+            "pos": [3584.0, 43968.0],
+            "size": [256, 1152]
         },
         {
             "id": "hard_wooden_wall (4)",
             "type": "hard_wooden_wall",
-            "pos": [3584.0, 43872.0],
+            "pos": [3584.0, 43360.0],
             "size": [256, 64]
         },
         {
@@ -1053,39 +1062,39 @@
         {
             "id": "dev_floor_256 (25)",
             "type": "dev_floor_256",
-            "pos": [6528.0, 44032.0],
-            "size": [768, 256],
+            "pos": [7552.0, 43584.0],
+            "size": [768, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "hard_wooden_wall (5)",
             "type": "hard_wooden_wall",
-            "pos": [7296.0, 44544.0],
+            "pos": [8320.0, 44544.0],
             "size": [512, 2560]
         },
         {
             "id": "hard_wooden_wall (6)",
             "type": "hard_wooden_wall",
-            "pos": [5760.0, 45440.0],
+            "pos": [6783.99951171875, 45440.0],
             "size": [512, 768]
         },
         {
             "id": "hard_wooden_wall (7)",
             "type": "hard_wooden_wall",
-            "pos": [6528.0, 46080.0],
+            "pos": [7551.99951171875, 46080.0],
             "size": [2048, 512]
         },
         {
             "id": "floor_right (10)",
             "type": "@water_room_floor",
-            "pos": [6528.0, 44800.0],
+            "pos": [7552.0, 44800.0],
             "size": [768, 1792],
             "color": [255, 132, 132, 255]
         },
         {
             "id": "floor_top (5)",
             "type": "@water_room_floor_2",
-            "pos": [6528.0, 45376.0],
+            "pos": [7552.0, 45376.0],
             "size": [1024, 896]
         },
         {
@@ -1098,19 +1107,19 @@
         {
             "id": "hard_wooden_wall (8)",
             "type": "hard_wooden_wall",
-            "pos": [5376.0, 44032.0],
-            "size": [256, 512]
+            "pos": [6400.0, 43776.0],
+            "size": [256, 1024]
         },
         {
             "id": "hard_wooden_wall (9)",
             "type": "hard_wooden_wall",
-            "pos": [5888.0, 44288.0],
+            "pos": [6912.00048828125, 44288.0],
             "size": [256, 512]
         },
         {
             "id": "dev_floor_256 (27)",
             "type": "dev_floor_256",
-            "pos": [5632.0, 43904.0],
+            "pos": [6656.0, 44160.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
@@ -1301,6 +1310,39 @@
             "type": "dev_floor_256",
             "pos": [11456.0, -2624.0],
             "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (11)",
+            "type": "hard_wooden_wall",
+            "pos": [3456.000244140625, 42752.0],
+            "size": [1536, 1024]
+        },
+        {
+            "id": "dev_floor_256 (36)",
+            "type": "dev_floor_256",
+            "pos": [3840.0, 44160.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (12)",
+            "type": "hard_wooden_wall",
+            "pos": [6400.0, 42752.0],
+            "size": [4352, 1024]
+        },
+        {
+            "id": "dev_floor_256 (37)",
+            "type": "dev_floor_256",
+            "pos": [6144.0, 44288.0],
+            "size": [256, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (38)",
+            "type": "dev_floor_256",
+            "pos": [4224.0, 44416.0],
+            "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
@@ -1531,25 +1573,25 @@
         {
             "id": "point_light (11)",
             "type": "point_light",
-            "pos": [4354.0, 44483.0],
+            "pos": [5378.0, 44483.0],
             "color": [255, 255, 0, 47]
         },
         {
             "id": "point_light (12)",
             "type": "point_light",
-            "pos": [4353.0, 43841.0],
+            "pos": [5377.0, 43841.0],
             "color": [255, 255, 0, 47]
         },
         {
             "id": "point_light (13)",
             "type": "point_light",
-            "pos": [3948.0, 43802.0],
+            "pos": [3935.0, 43297.0],
             "color": [255, 255, 0, 73]
         },
         {
             "id": "point_light (14)",
             "type": "point_light",
-            "pos": [5728.0, 44512.0],
+            "pos": [6752.0, 44512.0],
             "color": [255, 255, 0, 74]
         },
         {
@@ -1649,27 +1691,22 @@
         {
             "id": "baka47_magazine (11)",
             "type": "baka47_magazine",
-            "pos": [4282.0, 43830.0]
+            "pos": [5306.0, 43318.0]
         },
         {
             "id": "baka47_magazine (12)",
             "type": "baka47_magazine",
-            "pos": [4282.0, 43894.0]
+            "pos": [5306.0, 43382.0]
         },
         {
             "id": "baka47_magazine (13)",
             "type": "baka47_magazine",
-            "pos": [4282.0, 43958.0]
+            "pos": [5306.0, 43446.0]
         },
         {
             "id": "baka47_magazine (14)",
             "type": "baka47_magazine",
-            "pos": [4282.0, 44022.0]
-        },
-        {
-            "id": "baka47_magazine (15)",
-            "type": "baka47_magazine",
-            "pos": [4282.0, 44086.0]
+            "pos": [5306.0, 43510.0]
         },
         {
             "id": "zamiec_magazine",
@@ -1690,6 +1727,11 @@
             "id": "datum_gun_magazine (1)",
             "type": "datum_gun_magazine",
             "pos": [11578.0, -1530.0]
+        },
+        {
+            "id": "kek9_magazine (2)",
+            "type": "kek9_magazine",
+            "pos": [3912.0, 43938.0]
         },
         {
             "id": "baka47",
@@ -1721,8 +1763,14 @@
             "rotation": -45.0
         },
         {
+            "id": "kek9",
+            "type": "kek9",
+            "pos": [3840.000244140625, 43910.0]
+        },
+        {
             "id": "team_spawn (16)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [1.0, 639.0],
             "rotation": -90.0
@@ -1736,7 +1784,6 @@
         {
             "id": "team_spawn (1)",
             "type": "team_spawn",
-            "active": false,
             "faction": "METROPOLIS",
             "pos": [-129.0, 46303.0],
             "rotation": -90.0
@@ -1770,19 +1817,19 @@
         {
             "id": "kill3_2",
             "type": "team_spawn",
-            "pos": [4897.0, 44447.0],
+            "pos": [5932.0, 44095.0],
             "rotation": -180.0
         },
         {
             "id": "kill3_1",
             "type": "team_spawn",
-            "pos": [4929.0, 43841.0],
+            "pos": [5964.0, 43489.0],
             "rotation": -180.0
         },
         {
             "id": "kill3_3",
             "type": "team_spawn",
-            "pos": [5076.0, 44107.0],
+            "pos": [6111.0, 43755.0],
             "rotation": -180.0
         },
         {
@@ -2222,7 +2269,7 @@
         {
             "id": "exit4",
             "type": "portal",
-            "pos": [6528.0, 45311.9921875],
+            "pos": [7551.99951171875, 45311.9921875],
             "rotation": -90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -2310,8 +2357,8 @@
             "id": "tip4_1 (4)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [4352.0, 44416.0],
-            "size": [256, 256],
+            "pos": [5376.0, 44288.0],
+            "size": [256, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -2325,14 +2372,14 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Enemies are invisible behind obstacles.\nBullets can still penetrate and kill."
+            "context_tip": "Enemies are invisible behind obstacles.\nBullets can still penetrate and kill - depending on the gun."
         },
         {
             "id": "tip4_1 (5)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [3328.0, 44160.0],
-            "size": [256, 768],
+            "pos": [3328.0, 43520.0],
+            "size": [256, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -2352,7 +2399,7 @@
             "id": "tip4_1 (6)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [3840.000244140625, 44160.0],
+            "pos": [3840.000244140625, 43648.0],
             "size": [256, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -2394,8 +2441,8 @@
             "id": "tip4_1 (7)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [6528.0, 44032.0],
-            "size": [768, 256],
+            "pos": [7551.99951171875, 43584.0],
+            "size": [768, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -2436,7 +2483,7 @@
             "id": "tip4_1 (9)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [5632.0, 43904.0],
+            "pos": [6656.0, 44160.0],
             "size": [256, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -2451,7 +2498,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Tip: you can shoot while reloading!\nThis will fire the one bullet left in the chamber."
+            "context_tip": "Tip: try shooting while reloading!\nThis will fire the bullet left in the chamber."
         },
         {
             "id": "tip3_1 (1)",
@@ -2716,6 +2763,69 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "{RELOAD} will automatically reload both weapons."
+        },
+        {
+            "id": "tip4_1 (10)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [3840.000244140625, 44160.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Your weapons show on the hotbar.\nPress a corresponding number ({HOTBAR_0} or {HOTBAR_1}) to pull one out."
+        },
+        {
+            "id": "tip4_1 (11)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [6144.0, 44288.0],
+            "size": [256, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: press {HOTBAR_0} several times in a row.\nThis toggles between right-handed and left-handed stance!\n"
+        },
+        {
+            "id": "tip4_1 (12)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [4224.0, 44416.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: whenever moving around, switch to bare hands with {HOLSTER}.\nThis way you're extremely fast. Press {LAST_USED_WEAPON} only once you need your gun."
         }
     ]
 }

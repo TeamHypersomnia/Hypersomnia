@@ -163,7 +163,7 @@ public:
 				settings.play_transfer_sounds = false;
 			}
 
-			settings.drop_weapons_if_empty = false;
+			//settings.drop_weapons_if_empty = false;
 			return settings;
 		};
 
