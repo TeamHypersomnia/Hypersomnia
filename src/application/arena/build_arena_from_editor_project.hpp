@@ -319,7 +319,7 @@ void build_arena_from_editor_project(A arena_handle, const build_arena_input in)
 						scene_flavour_id
 					);
 				}
-				else if constexpr(is_one_of_v<node_type, editor_melee_node, editor_explosive_node>) {
+				else if constexpr(is_one_of_v<node_type, editor_melee_node, editor_explosive_node, editor_tool_node>) {
 					std::visit(
 						[&](const auto& typed) {
 							requested_equipment r;

@@ -73,6 +73,7 @@ using editor_history_base = augs::history<
 
 	edit_resource_command<editor_firearm_resource>,
 	edit_resource_command<editor_ammunition_resource>,
+	edit_resource_command<editor_tool_resource>,
 	edit_resource_command<editor_melee_resource>,
 	edit_resource_command<editor_explosive_resource>,
 
@@ -92,6 +93,7 @@ using editor_history_base = augs::history<
 
 	edit_node_command<editor_firearm_node>,
 	edit_node_command<editor_ammunition_node>,
+	edit_node_command<editor_tool_node>,
 	edit_node_command<editor_melee_node>,
 	edit_node_command<editor_explosive_node>,
 
@@ -114,6 +116,7 @@ using editor_history_base = augs::history<
 
 	create_node_command<editor_firearm_node>,
 	create_node_command<editor_ammunition_node>,
+	create_node_command<editor_tool_node>,
 	create_node_command<editor_melee_node>,
 	create_node_command<editor_explosive_node>,
 

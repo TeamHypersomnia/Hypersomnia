@@ -287,9 +287,11 @@ entity_id requested_equipment::generate_for_impl(
 
 	if constexpr(!to_the_ground) {
 		if (const auto sentience = character.template find<components::sentience>()) {
-			auto& haste = sentience->template get<haste_perk_instance>();
-			haste.timing.set_for_duration(haste_time * 1000, cosm.get_timestamp()); 
-			haste.is_greater = true;
+			if (haste_time > 0.f) {
+				auto& haste = sentience->template get<haste_perk_instance>();
+				haste.timing.set_for_duration(haste_time * 1000, cosm.get_timestamp()); 
+				haste.is_greater = true;
+			}
 
 			for (const auto& s : eq.spells_to_give) {
 				if (s) {

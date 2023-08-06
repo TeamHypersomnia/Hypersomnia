@@ -31,8 +31,8 @@ auto to_game_requested_equipment(
 	if (requested.backpack) {
 		const auto default_backpack = 
 			associated_faction == faction_type::METROPOLIS ?
-			test_container_items::METROPOLIS_BACKPACK :
-			test_container_items::RESISTANCE_BACKPACK
+			test_tool_items::METROPOLIS_BACKPACK :
+			test_tool_items::RESISTANCE_BACKPACK
 		;
 
 		result.back_wearable = to_entity_flavour_id(default_backpack);

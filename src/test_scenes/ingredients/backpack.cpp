@@ -18,7 +18,7 @@ namespace test_flavours {
 		auto& caches = in.caches;
 
 		{
-			auto& meta = get_test_flavour(flavours, test_container_items::METROPOLIS_BACKPACK);
+			auto& meta = get_test_flavour(flavours, test_tool_items::METROPOLIS_BACKPACK);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::METROPOLIS_BACKPACK, white);
 
@@ -44,9 +44,9 @@ namespace test_flavours {
 			meta.set(item);
 
 			{
-				auto& brown = get_test_flavour(flavours, test_container_items::RESISTANCE_BACKPACK);
+				auto& brown = get_test_flavour(flavours, test_tool_items::RESISTANCE_BACKPACK);
 				brown = meta;
-				brown.get<invariants::text_details>().name = format_enum(test_container_items::RESISTANCE_BACKPACK);
+				brown.get<invariants::text_details>().name = format_enum(test_tool_items::RESISTANCE_BACKPACK);
 				brown.get<invariants::item>().specific_to = faction_type::RESISTANCE;
 				brown.get<invariants::item>().standard_price = 700;
 				brown.get<invariants::container>().slots[slot_function::ITEM_DEPOSIT].space_available = to_space_units("20");

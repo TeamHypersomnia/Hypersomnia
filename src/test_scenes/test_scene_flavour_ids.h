@@ -250,8 +250,6 @@ enum class test_container_items {
 	// GEN INTROSPECTOR enum class test_container_items
 	STANDARD_PERSONAL_DEPOSIT,
 
-	METROPOLIS_BACKPACK,
-	RESISTANCE_BACKPACK,
 	BILMER2000_MAGAZINE,
 	DATUM_GUN_MAGAZINE,
 	BAKA47_MAGAZINE,
@@ -433,12 +431,11 @@ enum class test_explosion_bodies {
 
 enum class test_tool_items {
 	// GEN INTROSPECTOR enum class test_tool_items
+	METROPOLIS_BACKPACK,
+	RESISTANCE_BACKPACK,
+
 	DEFUSE_KIT,
-
 	ELECTRIC_ARMOR,
-
-	MAGE_ARMOR,
-	MAGE_APPARATUS,
 
 	COUNT
 	// END GEN INTROSPECTOR

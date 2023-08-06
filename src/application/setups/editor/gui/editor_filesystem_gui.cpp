@@ -621,7 +621,7 @@ void editor_filesystem_gui::clear_drag_drop() {
 
 void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& root) {
 	root.clear();
-	root.subfolders.resize(12);
+	root.subfolders.resize(13);
 	root.should_sort = false;
 
 	auto i = 0;
@@ -634,6 +634,8 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	auto& ammunition_folder = root.subfolders[i++];
 	auto& melee_weapons_folder = root.subfolders[i++];
 	auto& explosives_folder = root.subfolders[i++];
+
+	auto& tools_folder = root.subfolders[i++];
 
 	auto& point_markers_folder = root.subfolders[i++];
 	auto& area_markers_folder = root.subfolders[i++];
@@ -651,6 +653,8 @@ void editor_filesystem_gui::setup_special_filesystem(editor_filesystem_node& roo
 	ammunition_folder.name = "Ammunition";
 	melee_weapons_folder.name = "Melee weapons";
 	explosives_folder.name = "Explosives";
+
+	tools_folder.name = "Tools";
 
 	point_markers_folder.name = "Spots";
 	area_markers_folder.name = "Zones";
@@ -688,6 +692,8 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	auto& ammunition_folder = root.subfolders[i++];
 	auto& melee_weapons_folder = root.subfolders[i++];
 	auto& explosives_folder = root.subfolders[i++];
+
+	auto& tools_folder = root.subfolders[i++];
 
 	auto& point_markers_folder = root.subfolders[i++];
 	auto& area_markers_folder = root.subfolders[i++];
@@ -779,6 +785,8 @@ void editor_filesystem_gui::rebuild_special_filesystem(editor_filesystem_node& r
 	handle(ammunition_folder, resources.get_pool_for<editor_ammunition_resource>(), assets::necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
 	handle(melee_weapons_folder, resources.get_pool_for<editor_melee_resource>(), assets::necessary_image_id::SHOULDER_SLOT_ICON);
 	handle(explosives_folder, resources.get_pool_for<editor_explosive_resource>(), assets::necessary_image_id::BOMB_INDICATOR);
+
+	handle(tools_folder, resources.get_pool_for<editor_tool_resource>(), assets::necessary_image_id::DEFUSING_INDICATOR);
 
 	handle(point_markers_folder, resources.get_pool_for<editor_point_marker_resource>(), assets::necessary_image_id::DANGER_INDICATOR);
 	handle(area_markers_folder, resources.get_pool_for<editor_area_marker_resource>(), assets::necessary_image_id::EDITOR_ICON_BOMBSITE_A);

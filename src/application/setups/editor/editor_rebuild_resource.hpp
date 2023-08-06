@@ -65,6 +65,9 @@ void allocate_flavours_and_assets_for_resource(
 	else if constexpr(std::is_same_v<editor_ammunition_resource, R>) {
 		ensure(false && "not implemented");
 	}
+	else if constexpr(std::is_same_v<editor_tool_resource, R>) {
+		ensure(false && "not implemented");
+	}
 	else if constexpr(std::is_same_v<editor_melee_resource, R>) {
 		ensure(false && "not implemented");
 	}
@@ -279,6 +282,9 @@ void setup_scene_object_from_resource(
 		ensure(false && "not implemented");
 	}
 	else if constexpr(std::is_same_v<editor_ammunition_resource, R>) {
+		ensure(false && "not implemented");
+	}
+	else if constexpr(std::is_same_v<editor_tool_resource, R>) {
 		ensure(false && "not implemented");
 	}
 	else if constexpr(std::is_same_v<editor_melee_resource, R>) {

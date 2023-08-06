@@ -3,7 +3,9 @@
 #include "application/setups/editor/resources/editor_resource_id.h"
 
 template <class S, class T>
-auto& editor_official_resource_map::get_container(S& self, const T&) {
+auto& editor_official_resource_map::get_container(S& self, const T& id) {
+	(void)id;
+
 	if constexpr(std::is_same_v<T, test_static_decorations>) {
 		return self.static_decorations;
 	}
@@ -39,6 +41,9 @@ auto& editor_official_resource_map::get_container(S& self, const T&) {
 	}
 	else if constexpr(std::is_same_v<T, test_shootable_charges>) {
 		return self.shootable_charges;
+	}
+	else if constexpr(std::is_same_v<T, test_tool_items>) {
+		return self.tools;
 	}
 	else if constexpr(std::is_same_v<T, test_melee_weapons>) {
 		return self.melees;

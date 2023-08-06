@@ -8,6 +8,7 @@
 
 #include "application/setups/editor/nodes/editor_firearm_node.h"
 #include "application/setups/editor/nodes/editor_ammunition_node.h"
+#include "application/setups/editor/nodes/editor_tool_node.h"
 #include "application/setups/editor/nodes/editor_melee_node.h"
 #include "application/setups/editor/nodes/editor_explosive_node.h"
 

@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "shooting_range",
-        "version_timestamp": "2023-08-05 19:30:24.683459 UTC"
+        "version_timestamp": "2023-08-06 21:00:28.929293 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -248,6 +248,10 @@
                 "yellow_dagger (1)",
                 "cyan_scythe (1)",
                 "mini_knife (1)",
+                "electric_rapier-right (1)",
+                "electric_rapier (1)",
+                "electric_rapier-right",
+                "electric_rapier",
                 "assault_rattle-right",
                 "fury_thrower-right",
                 "poseidon-right",
@@ -527,6 +531,10 @@
                 "water_room_floor_2 (3)-right",
                 "water_room_floor_2 (3)",
                 "water_room_floor_2-right",
+                "resistance_backpack",
+                "metropolis_backpack",
+                "defuse_kit",
+                "electric_armor",
                 "water_room_floor_2",
                 "dev_floor_256"
             ]
@@ -1407,17 +1415,17 @@
         {
             "id": "poseidon",
             "type": "poseidon",
-            "pos": [-1306.0, 4913.0]
+            "pos": [-1306.0, 5013.0]
         },
         {
             "id": "fury_thrower",
             "type": "fury_thrower",
-            "pos": [-1306.0, 5013.0]
+            "pos": [-1306.0, 5113.0]
         },
         {
             "id": "assault_rattle",
             "type": "assault_rattle",
-            "pos": [-1306.0, 5113.0]
+            "pos": [-1306.0, 5213.0]
         },
         {
             "id": "mini_knife-right",
@@ -1440,19 +1448,19 @@
         {
             "id": "poseidon-right",
             "type": "poseidon",
-            "pos": [-1177.0001220703125, 4914.0],
+            "pos": [-1177.0001220703125, 5014.0],
             "rotation": 180.0
         },
         {
             "id": "fury_thrower-right",
             "type": "fury_thrower",
-            "pos": [-1177.0001220703125, 5014.0],
+            "pos": [-1177.0001220703125, 5114.0],
             "rotation": 180.0
         },
         {
             "id": "assault_rattle-right",
             "type": "assault_rattle",
-            "pos": [-1177.0001220703125, 5114.0],
+            "pos": [-1177.0001220703125, 5214.0],
             "rotation": 180.0
         },
         {
@@ -1473,17 +1481,17 @@
         {
             "id": "poseidon (1)",
             "type": "poseidon",
-            "pos": [1174.0, 4913.0]
+            "pos": [1174.0, 5013.0]
         },
         {
             "id": "fury_thrower (1)",
             "type": "fury_thrower",
-            "pos": [1174.0, 5013.0]
+            "pos": [1174.0, 5113.0]
         },
         {
             "id": "assault_rattle (1)",
             "type": "assault_rattle",
-            "pos": [1174.0, 5113.0]
+            "pos": [1174.0, 5213.0]
         },
         {
             "id": "mini_knife-right (1)",
@@ -1506,19 +1514,41 @@
         {
             "id": "poseidon-right (1)",
             "type": "poseidon",
-            "pos": [1303.0, 4914.0],
+            "pos": [1303.0, 5014.0],
             "rotation": 180.0
         },
         {
             "id": "fury_thrower-right (1)",
             "type": "fury_thrower",
-            "pos": [1303.0, 5014.0],
+            "pos": [1303.0, 5114.0],
             "rotation": 180.0
         },
         {
             "id": "assault_rattle-right (1)",
             "type": "assault_rattle",
-            "pos": [1303.0, 5114.0],
+            "pos": [1303.0, 5214.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "electric_rapier",
+            "type": "electric_rapier",
+            "pos": [-1305.0, 4913.0]
+        },
+        {
+            "id": "electric_rapier-right",
+            "type": "electric_rapier",
+            "pos": [-1177.0, 4913.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "electric_rapier (1)",
+            "type": "electric_rapier",
+            "pos": [1174.0, 4913.0]
+        },
+        {
+            "id": "electric_rapier-right (1)",
+            "type": "electric_rapier",
+            "pos": [1303.0, 4913.0],
             "rotation": 180.0
         },
         {
@@ -1760,6 +1790,26 @@
             "id": "pro90-right",
             "type": "pro90",
             "pos": [1447.0, 4200.0]
+        },
+        {
+            "id": "electric_armor",
+            "type": "electric_armor",
+            "pos": [-2064.0, 2992.0]
+        },
+        {
+            "id": "defuse_kit",
+            "type": "defuse_kit",
+            "pos": [-1977.0, 2992.0]
+        },
+        {
+            "id": "metropolis_backpack",
+            "type": "metropolis_backpack",
+            "pos": [-1870.9998779296875, 2992.0]
+        },
+        {
+            "id": "resistance_backpack",
+            "type": "resistance_backpack",
+            "pos": [-1782.0, 2992.0]
         },
         {
             "id": "aquarium",

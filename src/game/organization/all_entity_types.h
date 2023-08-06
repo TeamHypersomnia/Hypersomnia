@@ -521,6 +521,7 @@ struct tool_item {
 	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::animation,
+		invariants::container,
 		invariants::item,
 		invariants::rigid_body,
 		invariants::fixtures,
@@ -538,6 +539,7 @@ struct tool_item {
 
 	using synchronized_arrays = type_list<
 		components::interpolation,
+		items_of_slots_cache,
 		rigid_body_cache,
 		colliders_cache
 	>;

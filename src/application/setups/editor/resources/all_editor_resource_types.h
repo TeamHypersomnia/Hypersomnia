@@ -7,6 +7,7 @@
 
 #include "application/setups/editor/resources/editor_firearm_resource.h"
 #include "application/setups/editor/resources/editor_ammunition_resource.h"
+#include "application/setups/editor/resources/editor_tool_resource.h"
 #include "application/setups/editor/resources/editor_melee_resource.h"
 #include "application/setups/editor/resources/editor_wandering_pixels_resource.h"
 #include "application/setups/editor/resources/editor_explosive_resource.h"

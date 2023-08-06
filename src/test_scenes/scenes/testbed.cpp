@@ -322,13 +322,13 @@ test_mode_ruleset::test_mode_ruleset() {
 
 	rs.factions[faction_type::RESISTANCE].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 	rs.factions[faction_type::RESISTANCE].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
-	rs.factions[faction_type::RESISTANCE].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
+	rs.factions[faction_type::RESISTANCE].round_start_eq.back_wearable = to_entity_flavour_id(test_tool_items::RESISTANCE_BACKPACK);
 	rs.factions[faction_type::RESISTANCE].round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 	rs.factions[faction_type::RESISTANCE].round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 
 	rs.factions[faction_type::METROPOLIS].round_start_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 	rs.factions[faction_type::METROPOLIS].round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
-	rs.factions[faction_type::METROPOLIS].round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+	rs.factions[faction_type::METROPOLIS].round_start_eq.back_wearable = to_entity_flavour_id(test_tool_items::METROPOLIS_BACKPACK);
 	rs.factions[faction_type::METROPOLIS].round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 	rs.factions[faction_type::METROPOLIS].round_start_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::ASSAULT_RATTLE);
 #if 0
@@ -408,10 +408,10 @@ arena_mode_ruleset::arena_mode_ruleset() {
 		metropolis.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
 		resistance.round_start_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
 
-		metropolis.round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::METROPOLIS_BACKPACK);
+		metropolis.round_start_eq.back_wearable = to_entity_flavour_id(test_tool_items::METROPOLIS_BACKPACK);
 		metropolis.round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 
-		resistance.round_start_eq.back_wearable = to_entity_flavour_id(test_container_items::RESISTANCE_BACKPACK);
+		resistance.round_start_eq.back_wearable = to_entity_flavour_id(test_tool_items::RESISTANCE_BACKPACK);
 		resistance.round_start_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_ARMOR);
 #endif
 	}
@@ -519,8 +519,8 @@ namespace test_scenes {
 		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
 		const auto flash_type = test_hand_explosives::FLASHBANG;
 
-		const auto sample_backpack = test_container_items::METROPOLIS_BACKPACK;
-		const auto brown_backpack = test_container_items::RESISTANCE_BACKPACK;
+		const auto sample_backpack = test_tool_items::METROPOLIS_BACKPACK;
+		const auto brown_backpack = test_tool_items::RESISTANCE_BACKPACK;
 
 #if TODO_CARS
 		const auto car = prefabs::create_car(step, transformr( { 1490, 340 }, -180));
@@ -619,7 +619,7 @@ namespace test_scenes {
 			}
 		};
 
-		auto give_backpack = [&](const auto& character, const test_container_items c) {
+		auto give_backpack = [&](const auto& character, const test_tool_items c) {
 			requested_equipment r;
 			r.back_wearable = to_entity_flavour_id(c);
 

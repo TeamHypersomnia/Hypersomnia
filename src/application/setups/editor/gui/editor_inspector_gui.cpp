@@ -721,6 +721,19 @@ EDIT_FUNCTION(editor_ammunition_node_editable& insp, T& es) {
 	return result;
 }
 
+EDIT_FUNCTION(editor_tool_node_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
+	using namespace augs::imgui;
+	bool last_result = false;
+	std::string result;
+
+	MULTIPROPERTY_POSITION(pos);
+	MULTIPROPERTY("Rotation", rotation);
+
+	return result;
+}
+
+
 EDIT_FUNCTION(editor_melee_node_editable& insp, T& es) {
 	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
@@ -2048,6 +2061,17 @@ EDIT_FUNCTION(editor_firearm_resource_editable& insp, T& es) {
 }
 
 EDIT_FUNCTION(editor_ammunition_resource_editable& insp, T& es) {
+	auto special_handler = default_widget_handler();
+	using namespace augs::imgui;
+	bool last_result = false;
+	std::string result;
+
+	(void)insp; (void)es; (void)last_result;
+
+	return result;
+}
+
+EDIT_FUNCTION(editor_tool_resource_editable& insp, T& es) {
 	auto special_handler = default_widget_handler();
 	using namespace augs::imgui;
 	bool last_result = false;
