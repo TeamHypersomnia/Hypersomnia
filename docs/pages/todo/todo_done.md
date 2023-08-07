@@ -6409,3 +6409,5 @@ This will discard your redo history."
 - A flag to sync all maps on server startup
     - So that the server can be set-up in one-go with a non-existing map
 
+- (separate area with a sniper rifle) When you hit close to a center, you score a headshot.
+    - self-healing character

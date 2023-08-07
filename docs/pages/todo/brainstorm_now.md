@@ -6,6 +6,25 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Tutorial levels
+    - Grenades
+    - Planting/defusing bomb?
+    - Surfing
+    - that's all, final portal goes to the shooting range
+        - or maybe two portals for that?
+- Done
+    - Walking
+    - Ricochets
+    - Knives: 
+        - Kill with primary/secondary, could be just one level
+        - throwing especially with scroll down/up
+    - Akimbo
+    - First weapon
+        - Choosing with numbers (have to for akimbo)
+        - Holster/previous weapon
+            - Maybe the green areas could teleport when they detect step completion to mash several steps into a single level
+        - Toggle laser, show which surface is shoot through
+
 - Fix miniatures not downloading!!! Both externally and through UDP
     - Don't make a "metaresource", this will overcomplicate things.
         - Just force it to become a normal resource but it is always referenced (if it's backed, always with non-default properties, if it's unbacked, always default)
@@ -20,19 +39,6 @@ summary: That which we are brainstorming at the moment.
     - Dash should just take stamina on credit like in souls
     - We can make the dash a little more expensive to compensate so that we can still do 4 dashes on a full bar
         - This game is too fast anyway so we wouldn't want more dashes here
-
-- Tutorial levels
-    - Walking
-    - First weapon
-        - Choosing with numbers (have to for akimbo)
-        - Holster/previous weapon
-            - Maybe the green areas could teleport when they detect step completion to mash several steps into a single level
-        - Toggle laser, show which surface is shoot through
-    - Akimbo
-    - Knives: 
-        - Kill with primary/secondary, could be just one level
-        - throwing especially with scroll down/up
-    - Ricochets
 
 - Settings: split Gameplay tab into HUD and Rendering (or idk name it somehow else)
 - Editor: Fix lighting inconsistency between with and without FOV

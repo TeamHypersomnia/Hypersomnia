@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-06 22:56:30.629818 UTC"
+        "version_timestamp": "2023-08-07 17:09:35.947166 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -130,6 +130,8 @@
             "as_physical": {
                 "is_static": true,
                 "is_see_through": true,
+                "is_throw_through": true,
+                "is_melee_throw_through": true,
                 "is_shoot_through": true
             }
         },
@@ -149,6 +151,7 @@
             "as_physical": {
                 "is_static": true,
                 "is_see_through": true,
+                "bounciness": 1.5,
                 "material": "glass"
             }
         },
@@ -166,7 +169,8 @@
             "stretch_when_resized": true,
             "as_physical": {
                 "is_static": true,
-                "is_see_through": true
+                "is_see_through": true,
+                "is_melee_throw_through": true
             }
         },
         {
@@ -210,73 +214,194 @@
     ],
     "layers": [
         {
-            "id": "Layer 7",
+            "id": "Layer 2",
             "nodes": [
-                "metropolis_backpack"
+                "electric_rapier (3)-right-up-up",
+                "electric_rapier (2)-right-up-up",
+                "electric_rapier (1)-right-up-up",
+                "electric_rapier-right-up-up",
+                "electric_rapier (3)-right-up",
+                "electric_rapier (2)-right-up",
+                "electric_rapier (1)-right-up",
+                "electric_rapier-right-up",
+                "electric_rapier (3)-right",
+                "electric_rapier (2)-right",
+                "electric_rapier (1)-right",
+                "electric_rapier-right",
+                "electric_rapier (3)-up-up",
+                "electric_rapier (2)-up-up",
+                "electric_rapier (1)-up-up",
+                "electric_rapier-up-up",
+                "electric_rapier (3)-up",
+                "electric_rapier (2)-up",
+                "electric_rapier (1)-up",
+                "electric_rapier-up",
+                "electric_rapier (3)",
+                "electric_rapier (2)",
+                "electric_rapier (1)",
+                "electric_rapier"
             ]
         },
         {
-            "id": "Layer 6"
-        },
-        {
-            "id": "Level7",
+            "id": "Layer 1",
             "nodes": [
-                "awka (1)",
-                "awka",
-                "hazard (5)",
-                "floor_right (12)",
-                "dev_floor_256 (44)",
-                "tip3_1 (14)",
-                "dev_floor_256 (45)",
-                "tip3_1 (12)",
-                "tip3_1 (20)",
-                "tip3_1 (19)",
-                "tip3_1 (18)",
-                "tip3_1 (15)",
-                "tip3_1 (17)",
-                "entry7",
-                "exit7",
-                "vent (30)",
-                "vent (38)",
-                "vent (37)",
-                "vent (34)",
-                "vent (35)",
-                "vent (36)",
-                "dev_floor_256 (52)",
-                "dev_floor_256 (51)",
-                "dev_floor_256 (50)",
-                "dev_floor_256 (49)",
-                "dev_floor_256 (46)",
-                "dev_floor_256 (48)",
-                "Strong lamp (18)",
-                "Strong lamp (19)"
+                "obs12 (1)-left",
+                "obs12 (1)",
+                "obs12 (2)-left",
+                "obs12 (2)",
+                "obs12-left",
+                "obs12",
+                "obs10",
+                "obs9"
             ]
         },
         {
-            "id": "Layer 5",
+            "id": "Level11",
             "nodes": [
-                "szturm"
+                "vent (45)",
+                "vent (46)",
+                "tip3_1 (27)",
+                "entry11",
+                "vent (51)",
+                "dev_floor_256 (60)",
+                "Strong lamp (25)",
+                "Strong lamp (24)",
+                "hazard (10)",
+                "hazard (9)",
+                "hazard (8)",
+                "dev_floor_128 (2)",
+                "dev_floor_64",
+                "dev_floor_256 (64)",
+                "dev_floor_256 (66)",
+                "dev_floor_256 (62)",
+                "floor_right (17)",
+                "floor_right (16)",
+                "assault_rattle",
+                "tip3_1 (28)",
+                "tip3_1 (26)",
+                "tip3_1 (30)",
+                "exit11",
+                "vent (43)",
+                "dev_floor_256 (61)",
+                "dev_floor_256 (59)",
+                "dev_floor_256 (63)"
             ]
         },
         {
-            "id": "Layer 4"
-        },
-        {
-            "id": "Layer 3",
+            "id": "Level10",
             "nodes": [
-                "obs6 (4)",
-                "obs6 (5)"
+                "exit10",
+                "obs11 (4)",
+                "fury_thrower (8)",
+                "fury_thrower (5)",
+                "fury_thrower (4)",
+                "fury_thrower (7)",
+                "fury_thrower (6)",
+                "fury_thrower (3)",
+                "fury_thrower (2)",
+                "fury_thrower (1)",
+                "obs11 (7)",
+                "obs11 (6)",
+                "obs11 (5)",
+                "kill11_1",
+                "obs11 (11)",
+                "obs11 (10)",
+                "obs11 (9)",
+                "kill11_3",
+                "obs11 (2)",
+                "obs11 (8)",
+                "obs11 (1)",
+                "obs11 (12)",
+                "obs11",
+                "obs11 (3)",
+                "kill11_2",
+                "tip3_1 (32)",
+                "entry10",
+                "vent (49)",
+                "vent (44)",
+                "vent (48)",
+                "vent (47)",
+                "dev_floor_256 (65)",
+                "Strong lamp (22)",
+                "Strong lamp (23)"
             ]
         },
         {
-            "id": "Layer 2"
-        },
-        {
-            "id": "Layer 1"
+            "id": "Level9",
+            "nodes": [
+                "yellow_dagger (5)",
+                "yellow_dagger (4)",
+                "yellow_dagger (7)",
+                "yellow_dagger (11)",
+                "yellow_dagger (10)",
+                "yellow_dagger (9)",
+                "yellow_dagger (3)",
+                "yellow_dagger (8)",
+                "yellow_dagger (2)",
+                "yellow_dagger (6)",
+                "yellow_dagger (1)",
+                "yellow_dagger",
+                "poseidon (11)",
+                "poseidon (10)",
+                "poseidon (9)",
+                "poseidon (8)",
+                "poseidon (7)",
+                "poseidon (6)",
+                "fury_thrower",
+                "obs12 (4)",
+                "obs12 (3)-left",
+                "obs12 (3)",
+                "obs10 (3)",
+                "obs10 (2)",
+                "obs10 (1)",
+                "obs9 (1)",
+                "kill12_1",
+                "kill12_2",
+                "kill10_2",
+                "kill9_1",
+                "kill10_1",
+                "kill9_2",
+                "kill8_1",
+                "kill7_1",
+                "floor_right (15)",
+                "poseidon (5)",
+                "poseidon (4)",
+                "poseidon (3)",
+                "poseidon (2)",
+                "poseidon (1)",
+                "poseidon",
+                "tip3_1 (29)",
+                "tip3_1 (25)",
+                "tip3_1 (24)",
+                "tip3_1 (13)",
+                "dev_floor_256 (67)",
+                "dev_floor_256 (58)",
+                "dev_floor_256 (57)",
+                "dev_floor_256 (53)",
+                "tip3_1 (23)",
+                "tip3_1 (16)",
+                "tip3_1 (21)",
+                "tip3_1 (22)",
+                "entry9",
+                "exit9",
+                "vent (39)",
+                "vent (40)",
+                "vent (41)",
+                "vent (42)",
+                "dev_floor_256 (47)",
+                "dev_floor_256 (54)",
+                "dev_floor_256 (55)",
+                "dev_floor_256 (56)",
+                "Strong lamp (20)",
+                "Strong lamp (21)"
+            ]
         },
         {
             "id": "Level8",
             "nodes": [
+                "obs6 (4)",
+                "obs6 (5)",
+                "szturm",
                 "wood",
                 "glass (1)",
                 "glass",
@@ -287,6 +412,10 @@
                 "obs6 (2)",
                 "obs5 (1)",
                 "obs5 (2)",
+                "obs8",
+                "wood (3)",
+                "wood (2)",
+                "obs7",
                 "kill5_2",
                 "kill5_3",
                 "kill5_4",
@@ -319,11 +448,48 @@
                 "floor_right (8)",
                 "floor_top (7)",
                 "floor_bottom (6)",
+                "calico",
                 "floor_left (6)"
             ]
         },
         {
+            "id": "Level7",
+            "nodes": [
+                "metropolis_backpack",
+                "awka (1)",
+                "awka",
+                "hazard (5)",
+                "floor_right (12)",
+                "dev_floor_256 (44)",
+                "tip3_1 (14)",
+                "dev_floor_256 (45)",
+                "tip3_1 (12)",
+                "tip3_1 (20)",
+                "tip3_1 (19)",
+                "tip3_1 (18)",
+                "tip3_1 (15)",
+                "tip3_1 (17)",
+                "entry7",
+                "exit7",
+                "vent (30)",
+                "vent (38)",
+                "vent (37)",
+                "vent (34)",
+                "vent (35)",
+                "vent (36)",
+                "dev_floor_256 (52)",
+                "dev_floor_256 (51)",
+                "dev_floor_256 (50)",
+                "dev_floor_256 (49)",
+                "dev_floor_256 (46)",
+                "dev_floor_256 (48)",
+                "Strong lamp (18)",
+                "Strong lamp (19)"
+            ]
+        },
+        {
             "id": "Level6",
+            "is_open_in_editor": false,
             "nodes": [
                 "hazard (7)",
                 "floor_right (14)",
@@ -391,20 +557,28 @@
                 "kek9_magazine",
                 "kek9_magazine (2)",
                 "tip4_1 (2)",
+                "tip4_1 (18)",
+                "tip4_1 (17)",
                 "tip4_1 (12)",
+                "tip4_1 (16)",
                 "tip4_1 (10)",
                 "tip4_1 (6)",
                 "tip4_1 (5)",
+                "dev_floor_256 (72)",
+                "dev_floor_256 (71)",
                 "dev_floor_256 (38)",
+                "dev_floor_256 (27)",
                 "dev_floor_256 (36)",
                 "dev_floor_256 (23)",
                 "dev_floor_256 (39)",
                 "dev_floor_256 (22)",
                 "tip4_1 (7)",
                 "tip4_1 (11)",
+                "tip4_1 (14)",
                 "tip4_1 (9)",
                 "dev_floor_256 (37)",
-                "dev_floor_256 (27)",
+                "dev_floor_256 (68)",
+                "tip4_1 (15)",
                 "tip4_1 (4)",
                 "tip4_1 (13)",
                 "tip4_1 (3)",
@@ -412,6 +586,8 @@
                 "tip4_1 (1)",
                 "tip4_1",
                 "entry4",
+                "dev_floor_256 (70)",
+                "dev_floor_256 (69)",
                 "dev_floor_256 (25)",
                 "exit4",
                 "obs2 (2)",
@@ -419,6 +595,10 @@
                 "crate (1)",
                 "crate (2)",
                 "crate",
+                "obs13 (3)",
+                "obs13",
+                "obs13 (1)",
+                "obs13 (2)",
                 "obs3",
                 "obs2",
                 "baka47_magazine (2)",
@@ -427,6 +607,10 @@
                 "baka47_magazine (8)",
                 "baka47_magazine (6)",
                 "baka47_magazine (5)",
+                "baka47_magazine (7)",
+                "baka47_magazine (4)",
+                "baka47_magazine (3)",
+                "baka47_magazine",
                 "baka47_magazine (14)",
                 "baka47_magazine (13)",
                 "baka47_magazine (12)",
@@ -434,6 +618,11 @@
                 "obs1",
                 "kill1_3",
                 "kill1_2",
+                "point_light (18)",
+                "point_light (19)",
+                "point_light (17)",
+                "point_light (16)",
+                "point_light (15)",
                 "point_light (14)",
                 "point_light (13)",
                 "point_light (12)",
@@ -441,6 +630,15 @@
                 "point_light (10)",
                 "point_light (9)",
                 "kill3_1",
+                "kill13_9",
+                "kill13_8",
+                "kill13_7",
+                "kill13_6",
+                "kill13_1",
+                "kill13_2",
+                "kill13_3",
+                "kill13_4",
+                "kill13_5",
                 "kill3_3",
                 "kill3_2",
                 "kill2_1",
@@ -457,6 +655,7 @@
                 "hard_wooden_wall (10)",
                 "hard_wooden_wall (2)",
                 "hard_wooden_wall (12)",
+                "hard_wooden_wall (18)",
                 "hard_wooden_wall (11)",
                 "hard_wooden_wall (3)",
                 "hard_wooden_wall",
@@ -471,6 +670,7 @@
                 "dev_floor_256 (21)",
                 "Strong lamp (8)",
                 "Strong lamp (9)",
+                "hard_wooden_wall (17)",
                 "hard_wooden_wall (9)",
                 "hard_wooden_wall (8)",
                 "kek9",
@@ -485,6 +685,7 @@
         },
         {
             "id": "Level3",
+            "is_open_in_editor": false,
             "nodes": [
                 "hazard (6)",
                 "tip3_1",
@@ -510,6 +711,7 @@
         },
         {
             "id": "Level2",
+            "is_open_in_editor": false,
             "nodes": [
                 "point_light (3)",
                 "point_light (2)",
@@ -548,6 +750,7 @@
         },
         {
             "id": "Level1",
+            "is_open_in_editor": false,
             "nodes": [
                 "hazard (2)",
                 "tip1_1",
@@ -1014,20 +1217,20 @@
         {
             "id": "floor_top (4)",
             "type": "@water_room_floor_2",
-            "pos": [2336.0, 41856.0],
-            "size": [15168, 6400]
+            "pos": [4032.0, 41792.0],
+            "size": [18560, 6272]
         },
         {
             "id": "floor_bottom (4)",
             "type": "@water_room_floor_2",
-            "pos": [2336.0, 48000.0],
-            "size": [15168, 2048]
+            "pos": [4032.0, 48000.0],
+            "size": [18560, 2048]
         },
         {
             "id": "floor_right (9)",
             "type": "@water_room_floor",
-            "pos": [4512.0, 46016.0],
-            "size": [10816, 1920],
+            "pos": [6208.0, 45952.0],
+            "size": [14208, 2048],
             "color": [255, 132, 132, 255]
         },
         {
@@ -1128,7 +1331,7 @@
         {
             "id": "dev_floor_256 (22)",
             "type": "dev_floor_256",
-            "pos": [3328.0, 43520.0],
+            "pos": [3328.0, 42240.0],
             "size": [256, 512],
             "color": [0, 255, 0, 255]
         },
@@ -1141,20 +1344,20 @@
         {
             "id": "dev_floor_256 (23)",
             "type": "dev_floor_256",
-            "pos": [3840.0, 43648.0],
+            "pos": [3840.0, 42368.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "hard_wooden_wall (2)",
             "type": "hard_wooden_wall",
-            "pos": [3584.0, 43968.0],
-            "size": [256, 1152]
+            "pos": [3584.0, 43328.0],
+            "size": [256, 2432]
         },
         {
             "id": "hard_wooden_wall (4)",
             "type": "hard_wooden_wall",
-            "pos": [3584.0, 43360.0],
+            "pos": [3584.0, 42080.0],
             "size": [256, 64]
         },
         {
@@ -1167,15 +1370,15 @@
         {
             "id": "dev_floor_256 (25)",
             "type": "dev_floor_256",
-            "pos": [7552.0, 43584.0],
-            "size": [768, 512],
+            "pos": [8320.0, 44800.0],
+            "size": [512, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "hard_wooden_wall (5)",
             "type": "hard_wooden_wall",
-            "pos": [8320.0, 44544.0],
-            "size": [512, 2560]
+            "pos": [8256.0, 44160.0],
+            "size": [2432, 256]
         },
         {
             "id": "hard_wooden_wall (6)",
@@ -1186,14 +1389,14 @@
         {
             "id": "hard_wooden_wall (7)",
             "type": "hard_wooden_wall",
-            "pos": [7551.99951171875, 46080.0],
-            "size": [2048, 512]
+            "pos": [8256.0, 45568.0],
+            "size": [3456, 512]
         },
         {
             "id": "floor_right (10)",
             "type": "@water_room_floor",
-            "pos": [7552.0, 44800.0],
-            "size": [768, 1792],
+            "pos": [7552.0, 44832.0],
+            "size": [768, 832],
             "color": [255, 132, 132, 255]
         },
         {
@@ -1212,21 +1415,14 @@
         {
             "id": "hard_wooden_wall (8)",
             "type": "hard_wooden_wall",
-            "pos": [6400.0, 43776.0],
-            "size": [256, 1024]
+            "pos": [6400.0, 43648.0],
+            "size": [256, 768]
         },
         {
             "id": "hard_wooden_wall (9)",
             "type": "hard_wooden_wall",
             "pos": [6912.00048828125, 44288.0],
             "size": [256, 512]
-        },
-        {
-            "id": "dev_floor_256 (27)",
-            "type": "dev_floor_256",
-            "pos": [6656.0, 44160.0],
-            "size": [256, 256],
-            "color": [0, 255, 0, 255]
         },
         {
             "id": "hard_wooden_wall (10)",
@@ -1420,73 +1616,73 @@
         {
             "id": "hard_wooden_wall (11)",
             "type": "hard_wooden_wall",
-            "pos": [3456.000244140625, 42752.0],
-            "size": [1536, 1024]
+            "pos": [2944.0, 42368.0],
+            "size": [512, 1792]
         },
         {
             "id": "dev_floor_256 (36)",
             "type": "dev_floor_256",
-            "pos": [3840.0, 44160.0],
+            "pos": [3328.0, 43392.0],
             "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "hard_wooden_wall (12)",
             "type": "hard_wooden_wall",
-            "pos": [6400.0, 42752.0],
-            "size": [4352, 1024]
+            "pos": [6976.0, 42368.0],
+            "size": [6016, 1792]
         },
         {
             "id": "dev_floor_256 (37)",
             "type": "dev_floor_256",
-            "pos": [6144.0, 44288.0],
-            "size": [256, 512],
+            "pos": [6528.0, 44288.0],
+            "size": [512, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (38)",
             "type": "dev_floor_256",
-            "pos": [4224.0, 44416.0],
-            "size": [256, 256],
+            "pos": [3840.0, 43520.0],
+            "size": [256, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (39)",
             "type": "dev_floor_256",
-            "pos": [2944.0, 43904.0],
-            "size": [256, 256],
+            "pos": [9216.0, 43648.0],
+            "size": [512, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "obs5 (2)",
             "type": "@yellow_barrier",
-            "pos": [29664.001953125, 8832.0],
+            "pos": [22304.0, 9472.0],
             "size": [64, 1280]
         },
         {
             "id": "vent (31)",
             "type": "@materials/vent.png",
-            "pos": [32640.0, 8832.0],
+            "pos": [25280.0, 9472.0],
             "size": [384, 2048]
         },
         {
             "id": "vent (32)",
             "type": "@materials/vent.png",
-            "pos": [30431.998046875, 8000.0],
+            "pos": [23071.99609375, 8640.0],
             "rotation": -90.0,
             "size": [384, 4032]
         },
         {
             "id": "vent (33)",
             "type": "@materials/vent.png",
-            "pos": [30431.998046875, 9664.0],
+            "pos": [23071.99609375, 10304.0],
             "rotation": -90.0,
             "size": [384, 4032]
         },
         {
             "id": "dev_floor_256 (41)",
             "type": "dev_floor_256",
-            "pos": [29824.0, 8832.0],
+            "pos": [22464.0, 9472.0],
             "rotation": -90.0,
             "size": [1280, 256],
             "color": [0, 255, 0, 255]
@@ -1494,7 +1690,7 @@
         {
             "id": "dev_floor_256 (42)",
             "type": "dev_floor_256",
-            "pos": [31424.0, 8832.0],
+            "pos": [24064.0, 9472.0],
             "rotation": -90.0,
             "size": [1280, 2048],
             "color": [0, 255, 0, 255]
@@ -1502,7 +1698,7 @@
         {
             "id": "floor_right (8)",
             "type": "@water_room_floor",
-            "pos": [25728.0, 8832.0],
+            "pos": [18368.0, 9472.0],
             "rotation": -90.0,
             "size": [896, 768],
             "color": [255, 132, 132, 255]
@@ -1510,46 +1706,46 @@
         {
             "id": "floor_top (7)",
             "type": "@water_room_floor_2",
-            "pos": [23616.0, 7456.0],
-            "size": [21120, 7616]
+            "pos": [39872.0, 7712.0],
+            "size": [53632, 7616]
         },
         {
             "id": "floor_bottom (6)",
             "type": "@water_room_floor_2",
-            "pos": [23744.0, 16768.0],
-            "size": [20992, 2048]
+            "pos": [39840.0, 16640.0],
+            "size": [53184, 2048]
         },
         {
             "id": "floor_left (6)",
             "type": "@water_room_floor",
-            "pos": [23680.0, 13472.0],
-            "size": [21120, 4544],
+            "pos": [40064.0, 13344.0],
+            "size": [54016, 4544],
             "color": [255, 132, 132, 255]
         },
         {
             "id": "glass",
             "type": "@materials/glass.png",
-            "pos": [29151.998046875, 8224.0],
+            "pos": [21792.0, 8864.0],
             "size": [960, 64]
         },
         {
             "id": "glass (1)",
             "type": "@materials/glass.png",
-            "pos": [29151.998046875, 9440.0],
+            "pos": [21792.0, 10080.0],
             "size": [960, 64],
             "penetrability": 0.0
         },
         {
             "id": "obs5 (1)",
             "type": "@yellow_barrier",
-            "pos": [28607.99609375, 8832.0],
+            "pos": [21247.994140625, 9472.0],
             "rotation": -180.0,
             "size": [128, 1280]
         },
         {
             "id": "wood",
             "type": "@materials/wood.png",
-            "pos": [29179.083984375, 8836.1962890625],
+            "pos": [21819.08203125, 9476.1962890625],
             "rotation": -45.0,
             "size": [512, 768],
             "color": [254, 255, 255, 255],
@@ -1558,14 +1754,14 @@
         {
             "id": "obs5",
             "type": "@yellow_barrier",
-            "pos": [28864.001953125, 8799.9990234375],
+            "pos": [21504.0, 9439.9990234375],
             "rotation": -90.0,
             "size": [320, 384]
         },
         {
             "id": "dev_floor_256 (40)",
             "type": "dev_floor_256",
-            "pos": [28544.0, 8832.0],
+            "pos": [21184.0, 9472.0],
             "rotation": -90.0,
             "size": [1280, 256],
             "color": [0, 255, 0, 255]
@@ -1573,71 +1769,71 @@
         {
             "id": "hard_wooden_wall (13)",
             "type": "hard_wooden_wall",
-            "pos": [26816.0, 8000.0],
+            "pos": [19456.0, 8640.0],
             "size": [3200, 384]
         },
         {
             "id": "hard_wooden_wall (14)",
             "type": "hard_wooden_wall",
-            "pos": [26816.0, 9664.0],
+            "pos": [19456.0, 10304.0],
             "size": [3200, 384]
         },
         {
             "id": "hard_wooden_wall (15)",
             "type": "hard_wooden_wall",
-            "pos": [27072.0, 8832.0],
+            "pos": [19712.0, 9472.0],
             "size": [1664, 896]
         },
         {
             "id": "obs6 (2)",
             "type": "@yellow_barrier",
-            "pos": [26304.0, 9376.0],
+            "pos": [18944.0, 10016.0],
             "rotation": -90.0,
             "size": [192, 128]
         },
         {
             "id": "obs6 (1)",
             "type": "@yellow_barrier",
-            "pos": [26304.0, 8288.0],
+            "pos": [18944.0, 8928.0],
             "rotation": -90.0,
             "size": [192, 128]
         },
         {
             "id": "obs6",
             "type": "@yellow_barrier",
-            "pos": [27584.0, 9375.9990234375],
+            "pos": [20224.0, 10015.9990234375],
             "rotation": -90.0,
             "size": [192, 128]
         },
         {
             "id": "obs6 (5)",
             "type": "@materials/wood.png",
-            "pos": [27422.0, 9344.0],
+            "pos": [20062.0, 9984.0],
             "size": [192, 128]
         },
         {
             "id": "obs6 (4)",
             "type": "@materials/wood.png",
-            "pos": [27424.0, 8320.0],
+            "pos": [20064.0, 8960.0],
             "size": [192, 128]
         },
         {
             "id": "obs6 (3)",
             "type": "@yellow_barrier",
-            "pos": [27584.0, 8287.9990234375],
+            "pos": [20224.0, 8927.9990234375],
             "rotation": -90.0,
             "size": [192, 128]
         },
         {
             "id": "hard_wooden_wall (16)",
             "type": "hard_wooden_wall",
-            "pos": [24384.0, 8832.0],
+            "pos": [17024.0, 9472.0],
             "size": [1664, 2048]
         },
         {
             "id": "dev_floor_256 (43)",
             "type": "dev_floor_256",
-            "pos": [28032.0, 8832.0],
+            "pos": [20672.0, 9472.0],
             "rotation": -90.0,
             "size": [1280, 256],
             "color": [0, 255, 0, 255]
@@ -1743,6 +1939,516 @@
             "type": "dev_floor_256",
             "pos": [25344.0, -4032.0],
             "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "floor_right (15)",
+            "type": "@water_room_floor",
+            "pos": [38400.0, 6464.0],
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "dev_floor_256 (53)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 9472.0],
+            "size": [1536, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (39)",
+            "type": "@materials/vent.png",
+            "pos": [38400.0, 5823.99609375],
+            "rotation": 90.0,
+            "size": [256, 2304]
+        },
+        {
+            "id": "vent (40)",
+            "type": "@materials/vent.png",
+            "pos": [38400.0, 15231.9990234375],
+            "rotation": 90.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (41)",
+            "type": "@materials/vent.png",
+            "pos": [39360.0, 10496.0],
+            "size": [384, 9088]
+        },
+        {
+            "id": "vent (42)",
+            "type": "@materials/vent.png",
+            "pos": [37440.0, 10496.0],
+            "size": [384, 9088]
+        },
+        {
+            "id": "dev_floor_256 (54)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 12160.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (55)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 12608.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (56)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 14016.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs7",
+            "type": "@materials/wood.png",
+            "pos": [38400.0, 11680.0],
+            "size": [1536, 192]
+        },
+        {
+            "id": "wood (2)",
+            "type": "@materials/wood.png",
+            "pos": [37952.0, 10688.0],
+            "size": [640, 896]
+        },
+        {
+            "id": "dev_floor_256 (47)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 11456.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "wood (3)",
+            "type": "@materials/wood.png",
+            "pos": [38848.0, 10688.0],
+            "size": [640, 896]
+        },
+        {
+            "id": "obs8",
+            "type": "@materials/wood.png",
+            "pos": [38400.0, 10112.0],
+            "size": [1536, 256]
+        },
+        {
+            "id": "obs9 (1)",
+            "type": "@yellow_barrier",
+            "pos": [38400.00390625, 9184.0],
+            "rotation": 90.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "dev_floor_256 (57)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 8832.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs10 (1)",
+            "type": "@yellow_barrier",
+            "pos": [38400.00390625, 8160.00048828125],
+            "rotation": 90.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "dev_floor_256 (58)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 8320.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs10 (2)",
+            "type": "@yellow_barrier",
+            "pos": [37952.00390625, 8064.00048828125],
+            "rotation": 90.0,
+            "size": [128, 640]
+        },
+        {
+            "id": "obs10 (3)",
+            "type": "@yellow_barrier",
+            "pos": [38848.00390625, 8064.00048828125],
+            "rotation": 90.0,
+            "size": [128, 640]
+        },
+        {
+            "id": "obs11 (2)",
+            "type": "@materials/metal.png",
+            "pos": [47424.0, 12576.0],
+            "size": [256, 64]
+        },
+        {
+            "id": "obs11 (3)",
+            "type": "@materials/metal.png",
+            "pos": [47424.0, 12768.0],
+            "size": [256, 64]
+        },
+        {
+            "id": "floor_right (16)",
+            "type": "@water_room_floor",
+            "pos": [57216.0, 5888.0],
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "vent (43)",
+            "type": "@materials/vent.png",
+            "pos": [57215.99609375, 5247.99560546875],
+            "rotation": 90.0,
+            "size": [256, 2304]
+        },
+        {
+            "id": "vent (44)",
+            "type": "@materials/vent.png",
+            "pos": [47424.0, 15359.9990234375],
+            "rotation": 90.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (45)",
+            "type": "@materials/vent.png",
+            "pos": [58176.0, 9696.0],
+            "size": [384, 8640]
+        },
+        {
+            "id": "vent (46)",
+            "type": "@materials/vent.png",
+            "pos": [56256.0, 9696.0],
+            "size": [384, 8640]
+        },
+        {
+            "id": "dev_floor_256 (63)",
+            "type": "dev_floor_256",
+            "pos": [57216.0, 11456.0],
+            "size": [1536, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (65)",
+            "type": "dev_floor_256",
+            "pos": [47424.0, 14144.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs11",
+            "type": "@materials/metal.png",
+            "pos": [47520.0, 12672.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "obs11 (1)",
+            "type": "@materials/metal.png",
+            "pos": [47328.0, 12672.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "obs11 (4)",
+            "type": "@materials/wood.png",
+            "pos": [47424.0, 12352.0],
+            "size": [1536, 128]
+        },
+        {
+            "id": "dev_floor_256 (62)",
+            "type": "dev_floor_256",
+            "pos": [57216.0, 10432.0],
+            "size": [1536, 512],
+            "color": [255, 0, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (66)",
+            "type": "dev_floor_256",
+            "pos": [57216.0, 9280.0],
+            "size": [1536, 512],
+            "color": [255, 0, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (64)",
+            "type": "dev_floor_256",
+            "pos": [57216.0, 8064.0],
+            "size": [1536, 512],
+            "color": [255, 0, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (59)",
+            "type": "dev_floor_256",
+            "pos": [57216.0, 8448.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs11 (5)",
+            "type": "@materials/metal.png",
+            "pos": [46912.0, 12768.0],
+            "size": [256, 64]
+        },
+        {
+            "id": "obs11 (6)",
+            "type": "@materials/metal.png",
+            "pos": [47008.0, 12672.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "obs11 (7)",
+            "type": "@materials/metal.png",
+            "pos": [46912.0, 12576.0],
+            "size": [256, 64]
+        },
+        {
+            "id": "obs11 (8)",
+            "type": "@materials/metal.png",
+            "pos": [46816.0, 12672.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "obs11 (9)",
+            "type": "@materials/metal.png",
+            "pos": [47936.0, 12768.0],
+            "size": [256, 64]
+        },
+        {
+            "id": "obs11 (10)",
+            "type": "@materials/metal.png",
+            "pos": [48032.0, 12672.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "obs11 (11)",
+            "type": "@materials/metal.png",
+            "pos": [47936.0, 12576.0],
+            "size": [256, 64]
+        },
+        {
+            "id": "obs11 (12)",
+            "type": "@materials/metal.png",
+            "pos": [47840.0, 12672.0],
+            "size": [64, 128]
+        },
+        {
+            "id": "vent (47)",
+            "type": "@materials/vent.png",
+            "pos": [46464.0, 13216.0],
+            "size": [384, 3904]
+        },
+        {
+            "id": "vent (48)",
+            "type": "@materials/vent.png",
+            "pos": [48384.0, 13216.0],
+            "size": [384, 3904]
+        },
+        {
+            "id": "dev_floor_256 (60)",
+            "type": "dev_floor_256",
+            "pos": [57216.0, 12992.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (51)",
+            "type": "@materials/vent.png",
+            "pos": [57215.99609375, 14207.9990234375],
+            "rotation": 90.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "floor_right (17)",
+            "type": "@water_room_floor",
+            "pos": [47424.0, 11776.0],
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "vent (49)",
+            "type": "@materials/vent.png",
+            "pos": [47424.0, 11071.9990234375],
+            "rotation": 90.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "dev_floor_256 (61)",
+            "type": "dev_floor_256",
+            "pos": [57216.0, 6912.0],
+            "size": [1536, 1024],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_64",
+            "type": "dev_floor_64",
+            "pos": [57216.0, 8992.0],
+            "size": [1536, 64],
+            "color": [255, 0, 0, 255]
+        },
+        {
+            "id": "dev_floor_128 (2)",
+            "type": "dev_floor_128",
+            "pos": [57216.0, 7744.0],
+            "size": [1536, 128],
+            "color": [255, 0, 0, 255]
+        },
+        {
+            "id": "obs9",
+            "type": "@materials/glass.png",
+            "pos": [38400.0, 8992.0],
+            "size": [1536, 64]
+        },
+        {
+            "id": "obs10",
+            "type": "@materials/glass.png",
+            "pos": [38400.0, 7968.0],
+            "size": [1536, 64]
+        },
+        {
+            "id": "dev_floor_256 (67)",
+            "type": "dev_floor_256",
+            "pos": [38400.0, 7808.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs12",
+            "type": "@materials/glass.png",
+            "pos": [38912.0, 7232.0],
+            "size": [128, 384]
+        },
+        {
+            "id": "obs12 (1)",
+            "type": "@materials/glass.png",
+            "pos": [39008.0, 7616.00048828125],
+            "rotation": 90.0,
+            "size": [128, 320]
+        },
+        {
+            "id": "obs12 (2)",
+            "type": "@materials/glass.png",
+            "pos": [39072.0, 7104.0],
+            "rotation": 90.0,
+            "size": [128, 192]
+        },
+        {
+            "id": "obs12 (3)",
+            "type": "@yellow_barrier",
+            "pos": [38912.0, 7487.99951171875],
+            "rotation": -180.0,
+            "size": [128, 128]
+        },
+        {
+            "id": "obs12 (4)",
+            "type": "@yellow_barrier",
+            "pos": [38400.0, 7071.99951171875],
+            "rotation": -90.0,
+            "size": [64, 896]
+        },
+        {
+            "id": "obs12 (1)-left",
+            "type": "@materials/glass.png",
+            "pos": [37792.0, 7616.00048828125],
+            "rotation": -90.0,
+            "size": [128, 320],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs12 (2)-left",
+            "type": "@materials/glass.png",
+            "pos": [37728.0, 7104.0],
+            "rotation": -90.0,
+            "size": [128, 192],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs12-left",
+            "type": "@materials/glass.png",
+            "pos": [37888.0, 7232.0],
+            "size": [128, 384],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs12 (3)-left",
+            "type": "@yellow_barrier",
+            "pos": [37888.0, 7487.99951171875],
+            "rotation": -180.0,
+            "size": [128, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs13 (2)",
+            "type": "@yellow_barrier",
+            "pos": [7328.0, 43648.0],
+            "size": [64, 768]
+        },
+        {
+            "id": "obs13 (1)",
+            "type": "@yellow_barrier",
+            "pos": [7648.00048828125, 43648.0],
+            "size": [64, 768]
+        },
+        {
+            "id": "obs13",
+            "type": "@yellow_barrier",
+            "pos": [7968.0, 43648.0],
+            "size": [64, 768]
+        },
+        {
+            "id": "dev_floor_256 (68)",
+            "type": "dev_floor_256",
+            "pos": [7168.0, 43648.0],
+            "size": [256, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs13 (3)",
+            "type": "@yellow_barrier",
+            "pos": [8288.0, 43648.0],
+            "size": [64, 768]
+        },
+        {
+            "id": "dev_floor_256 (69)",
+            "type": "dev_floor_256",
+            "pos": [8896.0, 44800.0],
+            "size": [256, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (70)",
+            "type": "dev_floor_256",
+            "pos": [9344.0, 44800.0],
+            "size": [256, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (17)",
+            "type": "hard_wooden_wall",
+            "pos": [10368.0, 44032.0],
+            "size": [768, 3584]
+        },
+        {
+            "id": "dev_floor_256 (27)",
+            "type": "dev_floor_256",
+            "pos": [3328.0, 42880.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (18)",
+            "type": "hard_wooden_wall",
+            "pos": [3584.0, 41728.0],
+            "size": [768, 512]
+        },
+        {
+            "id": "dev_floor_256 (71)",
+            "type": "dev_floor_256",
+            "pos": [3840.0, 44288.0],
+            "size": [256, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (72)",
+            "type": "dev_floor_256",
+            "pos": [3840.0, 42880.0],
+            "size": [256, 256],
             "color": [0, 255, 0, 255]
         },
         {
@@ -1985,7 +2691,7 @@
         {
             "id": "point_light (13)",
             "type": "point_light",
-            "pos": [3935.0, 43297.0],
+            "pos": [3935.0, 42015.0],
             "color": [255, 255, 0, 73]
         },
         {
@@ -2061,7 +2767,7 @@
         {
             "id": "Strong lamp (14)",
             "type": "point_light",
-            "pos": [31521.0, 7807.0],
+            "pos": [24161.0, 8447.0],
             "color": [80, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -2077,7 +2783,7 @@
         {
             "id": "Strong lamp (15)",
             "type": "point_light",
-            "pos": [31583.0, 9729.0],
+            "pos": [24223.0, 10369.0],
             "color": [80, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -2093,7 +2799,7 @@
         {
             "id": "Strong lamp (16)",
             "type": "point_light",
-            "pos": [26431.0, 9345.0],
+            "pos": [19071.0, 9985.0],
             "color": [255, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -2109,7 +2815,7 @@
         {
             "id": "Strong lamp (17)",
             "type": "point_light",
-            "pos": [26431.0, 8319.0],
+            "pos": [19071.0, 8959.0],
             "color": [255, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -2153,6 +2859,434 @@
                 "radius": 962.9630126953125,
                 "strength": 23
             }
+        },
+        {
+            "id": "Strong lamp (20)",
+            "type": "point_light",
+            "pos": [39297.0, 14113.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (21)",
+            "type": "point_light",
+            "pos": [37375.0, 14175.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (22)",
+            "type": "point_light",
+            "pos": [48321.0, 14241.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (23)",
+            "type": "point_light",
+            "pos": [46399.0, 14303.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (24)",
+            "type": "point_light",
+            "pos": [56191.0, 13151.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (25)",
+            "type": "point_light",
+            "pos": [58113.0, 13089.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "point_light (15)",
+            "type": "point_light",
+            "pos": [6655.0, 43391.0],
+            "color": [255, 255, 0, 74]
+        },
+        {
+            "id": "point_light (16)",
+            "type": "point_light",
+            "pos": [7810.0, 44018.0],
+            "color": [255, 255, 0, 74]
+        },
+        {
+            "id": "point_light (17)",
+            "type": "point_light",
+            "pos": [9857.0, 43327.0],
+            "color": [255, 255, 0, 74]
+        },
+        {
+            "id": "point_light (18)",
+            "type": "point_light",
+            "pos": [8895.0, 43967.0],
+            "color": [255, 255, 0, 74]
+        },
+        {
+            "id": "point_light (19)",
+            "type": "point_light",
+            "pos": [9921.0, 45247.0],
+            "color": [255, 255, 0, 74]
+        },
+        {
+            "id": "fury_thrower",
+            "type": "fury_thrower",
+            "pos": [38400.0, 12870.0]
+        },
+        {
+            "id": "poseidon",
+            "type": "poseidon",
+            "pos": [37716.0, 9928.0]
+        },
+        {
+            "id": "poseidon (1)",
+            "type": "poseidon",
+            "pos": [37716.0, 9864.0]
+        },
+        {
+            "id": "poseidon (2)",
+            "type": "poseidon",
+            "pos": [37716.0, 9800.0]
+        },
+        {
+            "id": "poseidon (3)",
+            "type": "poseidon",
+            "pos": [37804.0, 9800.0]
+        },
+        {
+            "id": "poseidon (4)",
+            "type": "poseidon",
+            "pos": [37804.0, 9864.0]
+        },
+        {
+            "id": "poseidon (5)",
+            "type": "poseidon",
+            "pos": [37804.0, 9928.0]
+        },
+        {
+            "id": "poseidon (6)",
+            "type": "poseidon",
+            "pos": [37996.0, 9800.0]
+        },
+        {
+            "id": "poseidon (7)",
+            "type": "poseidon",
+            "pos": [37996.0, 9864.0]
+        },
+        {
+            "id": "poseidon (8)",
+            "type": "poseidon",
+            "pos": [37996.0, 9928.0]
+        },
+        {
+            "id": "poseidon (9)",
+            "type": "poseidon",
+            "pos": [38100.0, 9800.0]
+        },
+        {
+            "id": "poseidon (10)",
+            "type": "poseidon",
+            "pos": [38100.0, 9864.0]
+        },
+        {
+            "id": "poseidon (11)",
+            "type": "poseidon",
+            "pos": [38100.0, 9928.0]
+        },
+        {
+            "id": "yellow_dagger",
+            "type": "yellow_dagger",
+            "pos": [37781.0, 8314.0]
+        },
+        {
+            "id": "yellow_dagger (1)",
+            "type": "yellow_dagger",
+            "pos": [37781.0, 8378.0]
+        },
+        {
+            "id": "yellow_dagger (2)",
+            "type": "yellow_dagger",
+            "pos": [37909.0, 8378.0]
+        },
+        {
+            "id": "yellow_dagger (3)",
+            "type": "yellow_dagger",
+            "pos": [37845.0, 8378.0]
+        },
+        {
+            "id": "yellow_dagger (4)",
+            "type": "yellow_dagger",
+            "pos": [37845.0, 8314.0]
+        },
+        {
+            "id": "yellow_dagger (5)",
+            "type": "yellow_dagger",
+            "pos": [37909.0, 8314.0]
+        },
+        {
+            "id": "yellow_dagger (6)",
+            "type": "yellow_dagger",
+            "pos": [37973.0, 8314.0]
+        },
+        {
+            "id": "yellow_dagger (7)",
+            "type": "yellow_dagger",
+            "pos": [38037.0, 8314.0]
+        },
+        {
+            "id": "yellow_dagger (8)",
+            "type": "yellow_dagger",
+            "pos": [38101.0, 8314.0]
+        },
+        {
+            "id": "yellow_dagger (9)",
+            "type": "yellow_dagger",
+            "pos": [37973.0, 8378.0]
+        },
+        {
+            "id": "yellow_dagger (10)",
+            "type": "yellow_dagger",
+            "pos": [38101.0, 8378.0]
+        },
+        {
+            "id": "yellow_dagger (11)",
+            "type": "yellow_dagger",
+            "pos": [38037.0, 8378.0]
+        },
+        {
+            "id": "fury_thrower (1)",
+            "type": "fury_thrower",
+            "pos": [47381.0, 12922.0]
+        },
+        {
+            "id": "fury_thrower (2)",
+            "type": "fury_thrower",
+            "pos": [47467.0, 12922.0]
+        },
+        {
+            "id": "assault_rattle",
+            "type": "assault_rattle",
+            "pos": [57216.0, 11849.0]
+        },
+        {
+            "id": "fury_thrower (3)",
+            "type": "fury_thrower",
+            "pos": [47573.0, 12922.0]
+        },
+        {
+            "id": "fury_thrower (4)",
+            "type": "fury_thrower",
+            "pos": [47275.0, 12922.0]
+        },
+        {
+            "id": "fury_thrower (5)",
+            "type": "fury_thrower",
+            "pos": [47147.0, 12922.0]
+        },
+        {
+            "id": "fury_thrower (6)",
+            "type": "fury_thrower",
+            "pos": [47701.0, 12922.0]
+        },
+        {
+            "id": "fury_thrower (7)",
+            "type": "fury_thrower",
+            "pos": [47829.0, 12922.0]
+        },
+        {
+            "id": "fury_thrower (8)",
+            "type": "fury_thrower",
+            "pos": [47019.0, 12922.0]
+        },
+        {
+            "id": "electric_rapier",
+            "type": "electric_rapier",
+            "pos": [38164.0, 7640.0]
+        },
+        {
+            "id": "electric_rapier (1)",
+            "type": "electric_rapier",
+            "pos": [38268.0, 7640.0]
+        },
+        {
+            "id": "electric_rapier (2)",
+            "type": "electric_rapier",
+            "pos": [38164.0, 7560.0]
+        },
+        {
+            "id": "electric_rapier (3)",
+            "type": "electric_rapier",
+            "pos": [38268.0, 7560.0]
+        },
+        {
+            "id": "electric_rapier-right",
+            "type": "electric_rapier",
+            "pos": [38636.0, 7640.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "electric_rapier (1)-right",
+            "type": "electric_rapier",
+            "pos": [38531.99609375, 7640.0],
+            "rotation": 180.0
+        },
+        {
+            "id": "electric_rapier (2)-right",
+            "type": "electric_rapier",
+            "pos": [38636.0, 7560.00048828125],
+            "rotation": 180.0
+        },
+        {
+            "id": "electric_rapier (3)-right",
+            "type": "electric_rapier",
+            "pos": [38531.99609375, 7560.00048828125],
+            "rotation": 180.0
+        },
+        {
+            "id": "electric_rapier-up",
+            "type": "electric_rapier",
+            "pos": [38164.0, 7464.0]
+        },
+        {
+            "id": "electric_rapier (1)-up",
+            "type": "electric_rapier",
+            "pos": [38268.0, 7464.0]
+        },
+        {
+            "id": "electric_rapier (2)-up",
+            "type": "electric_rapier",
+            "pos": [38164.0, 7544.0]
+        },
+        {
+            "id": "electric_rapier (3)-up",
+            "type": "electric_rapier",
+            "pos": [38268.0, 7544.0]
+        },
+        {
+            "id": "electric_rapier-up-up",
+            "type": "electric_rapier",
+            "pos": [38164.0, 7448.0]
+        },
+        {
+            "id": "electric_rapier (1)-up-up",
+            "type": "electric_rapier",
+            "pos": [38268.0, 7448.0]
+        },
+        {
+            "id": "electric_rapier (2)-up-up",
+            "type": "electric_rapier",
+            "pos": [38164.0, 7368.0]
+        },
+        {
+            "id": "electric_rapier (3)-up-up",
+            "type": "electric_rapier",
+            "pos": [38268.0, 7368.0]
+        },
+        {
+            "id": "electric_rapier-right-up",
+            "type": "electric_rapier",
+            "pos": [38636.0, 7464.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "electric_rapier (1)-right-up",
+            "type": "electric_rapier",
+            "pos": [38532.0, 7464.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "electric_rapier (2)-right-up",
+            "type": "electric_rapier",
+            "pos": [38636.0, 7544.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "electric_rapier (3)-right-up",
+            "type": "electric_rapier",
+            "pos": [38532.0, 7544.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "electric_rapier-right-up-up",
+            "type": "electric_rapier",
+            "pos": [38636.0, 7448.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "electric_rapier (1)-right-up-up",
+            "type": "electric_rapier",
+            "pos": [38532.0, 7448.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "electric_rapier (2)-right-up-up",
+            "type": "electric_rapier",
+            "pos": [38636.0, 7368.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "electric_rapier (3)-right-up-up",
+            "type": "electric_rapier",
+            "pos": [38532.0, 7368.0],
+            "rotation": -180.0
         },
         {
             "id": "baka47_magazine (1)",
@@ -2227,12 +3361,32 @@
         {
             "id": "kek9_magazine (2)",
             "type": "kek9_magazine",
-            "pos": [3906.000244140625, 43944.0]
+            "pos": [3425.999755859375, 43735.0]
         },
         {
             "id": "kek9_magazine",
             "type": "kek9_magazine",
-            "pos": [3906.000244140625, 43863.0]
+            "pos": [3357.0, 43735.0]
+        },
+        {
+            "id": "baka47_magazine",
+            "type": "baka47_magazine",
+            "pos": [6586.0, 43318.0]
+        },
+        {
+            "id": "baka47_magazine (3)",
+            "type": "baka47_magazine",
+            "pos": [6586.0, 43382.0]
+        },
+        {
+            "id": "baka47_magazine (4)",
+            "type": "baka47_magazine",
+            "pos": [6586.0, 43446.0]
+        },
+        {
+            "id": "baka47_magazine (7)",
+            "type": "baka47_magazine",
+            "pos": [6586.0, 43510.0]
         },
         {
             "id": "baka47",
@@ -2266,12 +3420,12 @@
         {
             "id": "kek9",
             "type": "kek9",
-            "pos": [3840.000244140625, 43910.0]
+            "pos": [3249.000244140625, 43735.0]
         },
         {
             "id": "szturm",
             "type": "szturm",
-            "pos": [30187.146484375, 8811.353515625],
+            "pos": [22827.14453125, 9451.353515625],
             "rotation": -45.0
         },
         {
@@ -2287,6 +3441,11 @@
             "rotation": 240.00001525878906
         },
         {
+            "id": "calico",
+            "type": "calico",
+            "pos": [47424.0, 13047.0]
+        },
+        {
             "id": "metropolis_backpack",
             "type": "metropolis_backpack",
             "pos": [25349.0, -2682.0],
@@ -2295,6 +3454,7 @@
         {
             "id": "team_spawn (16)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [1.0, 639.0],
             "rotation": -90.0
@@ -2308,7 +3468,6 @@
         {
             "id": "team_spawn (1)",
             "type": "team_spawn",
-            "active": false,
             "faction": "METROPOLIS",
             "pos": [-129.0, 46303.0],
             "rotation": -90.0
@@ -2374,48 +3533,168 @@
             "type": "team_spawn",
             "active": false,
             "faction": "METROPOLIS",
-            "pos": [25215.0, 63.0],
+            "pos": [38593.0, 14207.0],
             "rotation": -90.0
         },
         {
             "id": "kill5_1",
             "type": "team_spawn",
-            "pos": [28927.0, 9087.0]
+            "pos": [21567.0, 9727.0]
         },
         {
             "id": "kill5_2",
             "type": "team_spawn",
-            "pos": [28863.0, 8511.0]
+            "pos": [21503.0, 9151.0]
         },
         {
             "id": "kill5_4",
             "type": "team_spawn",
-            "pos": [28801.0, 9025.0]
+            "pos": [21441.0, 9665.0]
         },
         {
             "id": "kill5_3",
             "type": "team_spawn",
-            "pos": [28737.0, 8575.0]
+            "pos": [21377.0, 9215.0]
         },
         {
             "id": "kill6_1",
             "type": "team_spawn",
-            "pos": [26687.0, 9345.0]
+            "pos": [19327.0, 9985.0]
         },
         {
             "id": "kill6_2",
             "type": "team_spawn",
-            "pos": [26497.0, 9345.0]
+            "pos": [19137.0, 9985.0]
         },
         {
             "id": "kill6_4",
             "type": "team_spawn",
-            "pos": [26815.0, 8319.0]
+            "pos": [19455.0, 8959.0]
         },
         {
             "id": "kill6_3",
             "type": "team_spawn",
-            "pos": [26623.0, 8321.0]
+            "pos": [19263.0, 8961.0]
+        },
+        {
+            "id": "kill7_1",
+            "type": "team_spawn",
+            "pos": [38401.0, 11905.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill8_1",
+            "type": "team_spawn",
+            "pos": [38401.0, 10305.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill9_2",
+            "type": "team_spawn",
+            "pos": [38145.0, 9089.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill9_1",
+            "type": "team_spawn",
+            "pos": [38657.0, 9089.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill10_2",
+            "type": "team_spawn",
+            "pos": [38463.0, 8063.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill10_1",
+            "type": "team_spawn",
+            "pos": [38335.0, 8063.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill11_2",
+            "type": "team_spawn",
+            "pos": [47423.0, 12673.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill11_1",
+            "type": "team_spawn",
+            "pos": [46911.0, 12673.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill11_3",
+            "type": "team_spawn",
+            "pos": [47935.0, 12673.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill12_2",
+            "type": "team_spawn",
+            "pos": [39039.0, 7295.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill12_1",
+            "type": "team_spawn",
+            "pos": [37761.0, 7295.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill13_5",
+            "type": "team_spawn",
+            "pos": [7487.0, 43391.0],
+            "rotation": -225.0
+        },
+        {
+            "id": "kill13_4",
+            "type": "team_spawn",
+            "pos": [7489.0, 43647.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill13_9",
+            "type": "team_spawn",
+            "pos": [7489.0, 43905.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "kill13_3",
+            "type": "team_spawn",
+            "pos": [7807.0, 43393.0],
+            "rotation": -315.0
+        },
+        {
+            "id": "kill13_2",
+            "type": "team_spawn",
+            "pos": [7809.0, 43649.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill13_1",
+            "type": "team_spawn",
+            "pos": [7809.0, 43903.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "kill13_6",
+            "type": "team_spawn",
+            "pos": [8129.0, 43393.0],
+            "rotation": -360.0
+        },
+        {
+            "id": "kill13_7",
+            "type": "team_spawn",
+            "pos": [8131.0, 43649.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill13_8",
+            "type": "team_spawn",
+            "pos": [8131.0, 43903.0],
+            "rotation": -90.0
         },
         {
             "id": "exit0",
@@ -2834,7 +4113,7 @@
         {
             "id": "exit4",
             "type": "portal",
-            "pos": [7551.99951171875, 45311.9921875],
+            "pos": [7551.99951171875, 44799.9921875],
             "rotation": -90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -2943,7 +4222,7 @@
             "id": "tip4_1 (5)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [3328.0, 43520.0],
+            "pos": [3328.0, 42240.0],
             "size": [256, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -2958,13 +4237,13 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {HOLSTER} to hide your weapon.\nYou will fit in tight corridors."
+            "context_tip": "Press {HOLSTER} to hide your gun.\nYou will fit in tight corridors."
         },
         {
             "id": "tip4_1 (6)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [3840.000244140625, 43648.0],
+            "pos": [3840.000244140625, 42368.0],
             "size": [256, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -2979,7 +4258,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {LAST_USED_WEAPON} to pull your gun back.\n{LAST_USED_WEAPON} quickly switches to the last used gun (or bare hands)."
+            "context_tip": "Press {LAST_USED_WEAPON} to pull your gun back.\n{LAST_USED_WEAPON} now quickly switches between the gun and free hands."
         },
         {
             "id": "tip0_2 (3)",
@@ -3006,8 +4285,8 @@
             "id": "tip4_1 (7)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [7551.99951171875, 43584.0],
-            "size": [768, 512],
+            "pos": [8320.0, 44800.0],
+            "size": [512, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -3048,8 +4327,8 @@
             "id": "tip4_1 (9)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [6656.0, 44160.0],
-            "size": [256, 256],
+            "pos": [9344.0, 44800.0],
+            "size": [256, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -3333,7 +4612,7 @@
             "id": "tip4_1 (10)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [3840.000244140625, 44160.0],
+            "pos": [3328.0, 43392.0],
             "size": [256, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -3354,8 +4633,8 @@
             "id": "tip4_1 (11)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [6144.0, 44288.0],
-            "size": [256, 512],
+            "pos": [8896.0, 44800.0],
+            "size": [256, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -3375,8 +4654,8 @@
             "id": "tip4_1 (12)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [4224.0, 44416.0],
-            "size": [256, 256],
+            "pos": [3840.000244140625, 43520.0],
+            "size": [256, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -3390,14 +4669,14 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Tip: whenever moving around, switch to bare hands with {HOLSTER} or {LAST_USED_WEAPON}.\nThis way you're extremely fast. Press {LAST_USED_WEAPON} only once you need your gun."
+            "context_tip": "This means you can move extremely fast,\neven with a very heavy weapon!"
         },
         {
             "id": "tip4_1 (13)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [2944.0, 43904.0],
-            "size": [256, 256],
+            "pos": [9216.0, 43648.0],
+            "size": [512, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -3417,7 +4696,7 @@
             "id": "tip3_1 (9)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [29824.0, 8832.0],
+            "pos": [22464.0, 9472.0],
             "size": [256, 1280],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -3432,13 +4711,13 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Try killing enemies behind the impenetrable orange box.\nShoot the glassy surface from an angle."
+            "context_tip": "Shoot the glassy surface from an angle.\nKill 4 enemies covering behind the corner."
         },
         {
             "id": "tip3_1 (10)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [31424.0, 8832.0],
+            "pos": [24064.0, 9472.0],
             "size": [2048, 1280],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -3458,7 +4737,7 @@
         {
             "id": "entry8",
             "type": "portal",
-            "pos": [32192.001953125, 8703.9990234375],
+            "pos": [24832.0, 9343.9990234375],
             "rotation": -180.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -3481,7 +4760,7 @@
         {
             "id": "exit8",
             "type": "portal",
-            "pos": [25727.99609375, 8831.9990234375],
+            "pos": [18367.99609375, 9471.9990234375],
             "rotation": -180.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -3492,7 +4771,7 @@
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry6",
+            "portal_exit": "entry9",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -3506,7 +4785,7 @@
             "id": "tip3_1 (8)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [28544.0, 8832.0],
+            "pos": [21184.0, 9472.0],
             "size": [256, 1280],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -3521,13 +4800,13 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "It's a very powerful technique.\nYou can surprise enemies hiding around the corners."
+            "context_tip": "It's a hardcore technique.\nYou can surprise enemies in hiding."
         },
         {
             "id": "tip3_1 (11)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [28032.0, 8832.0],
+            "pos": [20672.0, 9472.0],
             "size": [256, 1280],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -3542,7 +4821,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "It is possible to bounce off ALL surfaces.\nWood is the hardest, but absolutely possible!"
+            "context_tip": "ALL surfaces can bounce bullets.\nWood is the hardest, but absolutely possible!"
         },
         {
             "id": "hazard (5)",
@@ -3760,6 +5039,594 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "It's time for the Deagle trick..\n..but with two Awkas instead."
+        },
+        {
+            "id": "tip3_1 (13)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 9472.0],
+            "size": [1536, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Knives can be thrown quickly.\nAim at the enemy and spam {THROW_KNIFE}."
+        },
+        {
+            "id": "tip3_1 (16)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 12160.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You can use the laser ({TOGGLE_WEAPON_LASER}) with knives too.\nTry aiming for the head, especially with the strong attack."
+        },
+        {
+            "id": "tip3_1 (21)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 12608.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {SHOOT} for a fast, weak attack.\nPress {SHOOT_SECONDARY} for a strong, slow attack."
+        },
+        {
+            "id": "tip3_1 (22)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 14016.0],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Time to chop things up.\nPick up the red knife."
+        },
+        {
+            "id": "entry9",
+            "type": "portal",
+            "pos": [38400.0, 14752.0],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "exit9",
+            "type": "portal",
+            "pos": [38400.0, 6463.9931640625],
+            "rotation": -90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry10",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (23)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 11456.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Damage is proportional to current speed.\nHit the enemy with a strong attack while sprinting. ({SPRINT})"
+        },
+        {
+            "id": "tip3_1 (24)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 8832.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You can throw two knives at once!\nSimply {THROW_TWO_KNIVES}."
+        },
+        {
+            "id": "tip3_1 (25)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 8320.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "For better aim, dual-wield knives by holding {HOTBAR_0} and {HOTBAR_1}.\nThen {THROW_KNIFE} or {THROW_TWO_KNIVES}."
+        },
+        {
+            "id": "tip3_1 (30)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [57215.99609375, 11456.0],
+            "size": [1536, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Run while pressing strong attack.\n({SPRINT} + {SHOOT_SECONDARY})"
+        },
+        {
+            "id": "tip3_1 (32)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [47424.0, 14144.0],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You can throw knives when shooting - even when reloading!\nTry it out! This can really save your life."
+        },
+        {
+            "id": "entry10",
+            "type": "portal",
+            "pos": [47424.0, 14880.0],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "exit11",
+            "type": "portal",
+            "pos": [57215.99609375, 5887.99365234375],
+            "rotation": -90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry7",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "hazard (8)",
+            "type": "hazard",
+            "pos": [57215.99609375, 10432.0],
+            "size": [1536, 512],
+            "exit_cooldown_ms": 500.0,
+            "hazard": {
+                "damage": 200.0
+            },
+            "exit_shake": {
+                "duration_ms": 0.0
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_angular_impulse": {
+                "amount": 0.0
+            }
+        },
+        {
+            "id": "hazard (9)",
+            "type": "hazard",
+            "pos": [57215.99609375, 9248.0],
+            "size": [1536, 576],
+            "exit_cooldown_ms": 500.0,
+            "hazard": {
+                "damage": 200.0
+            },
+            "exit_shake": {
+                "duration_ms": 0.0
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_angular_impulse": {
+                "amount": 0.0
+            }
+        },
+        {
+            "id": "hazard (10)",
+            "type": "hazard",
+            "pos": [57215.99609375, 8000.0],
+            "size": [1536, 640],
+            "exit_cooldown_ms": 500.0,
+            "hazard": {
+                "damage": 200.0
+            },
+            "exit_shake": {
+                "duration_ms": 0.0
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_angular_impulse": {
+                "amount": 0.0
+            }
+        },
+        {
+            "id": "tip3_1 (26)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [57215.99609375, 8448.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Will you manage?\nOr will you perish?"
+        },
+        {
+            "id": "entry11",
+            "type": "portal",
+            "pos": [57215.99609375, 13728.0],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (27)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [57215.99609375, 12992.0],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "The Assault Rattle has a cool feature.\nIts strong attack lets you jump extremely far!"
+        },
+        {
+            "id": "exit10",
+            "type": "portal",
+            "pos": [47424.0, 11775.9931640625],
+            "rotation": -90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry11",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (28)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [57215.99609375, 6912.00048828125],
+            "size": [1536, 1024],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Good job!"
+        },
+        {
+            "id": "tip3_1 (29)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [38400.0, 7808.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Thrown knives can bounce against walls and kill enemies."
+        },
+        {
+            "id": "tip4_1 (14)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [7168.0, 43648.0],
+            "size": [256, 768],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "These enemies can only be killed with headshots. Use Baka47.\nCan you kill two in one shot? What about three?"
+        },
+        {
+            "id": "tip4_1 (15)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [6528.0, 44288.0],
+            "size": [512, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Headshots deal triple damage.\nBullet path has to intersect the head in the center."
+        },
+        {
+            "id": "tip4_1 (16)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [3328.0, 42880.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Use {LAST_USED_WEAPON} to quickly switch to the last used gun."
+        },
+        {
+            "id": "tip4_1 (17)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [3840.000244140625, 44288.0],
+            "size": [256, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "So whenever you can, always free your hands with {HOLSTER}.\nThen tap {LAST_USED_WEAPON} to alternate between combat and fast movement!"
+        },
+        {
+            "id": "tip4_1 (18)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [3840.000244140625, 42880.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Your speed depends only on what's in your hands."
         }
     ]
 }
