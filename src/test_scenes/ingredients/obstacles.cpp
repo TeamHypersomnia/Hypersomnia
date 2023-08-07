@@ -87,6 +87,7 @@ namespace test_flavours {
 
 			auto& fixtures_def = meta.template get<invariants::fixtures>();
 
+			fixtures_def.filter.maskBits &= ~(1 << int(filter_category::FLYING_EXPLOSIVE));
 			fixtures_def.restitution = 0.8f;
 			fixtures_def.density = 0.7f;
 			fixtures_def.material = to_physical_material_id(material);

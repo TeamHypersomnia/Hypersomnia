@@ -7,12 +7,14 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Tutorial levels
-    - Grenades
     - Planting/defusing bomb?
+    - Spells but maybe just preliminary
+        - Press haste, kill enemies with the triad etc.
     - Surfing
     - that's all, final portal goes to the shooting range
         - or maybe two portals for that?
 - Done
+    - Grenades
     - Walking
     - Ricochets
     - Knives: 

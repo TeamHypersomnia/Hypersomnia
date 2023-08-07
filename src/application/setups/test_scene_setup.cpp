@@ -171,7 +171,7 @@ void test_scene_setup::restart_mode() {
 	const bool is_akimbo_level = tutorial.level == 5;
 	const bool is_duals_level = tutorial.level == 6;
 	const bool is_ricochets_level = tutorial.level == 8;
-	const bool is_try_throwing_reloading_level = tutorial.level == 10;
+	const bool is_try_throwing_reloading_level = tutorial.level == 10 || tutorial.level == 13;
 
 	get_arena_handle().on_mode_with_input(
 		[&]<typename M>(M& mode, const auto& input) {
@@ -220,7 +220,11 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 	(void)step;
 
 	auto get_opp = [&](int i, int j) {
-		return typesafe_sprintf("kill%x_%x", i, j);
+		if (j == 0) {
+			return std::string("kill") + std::to_string(i);
+		}
+
+		return typesafe_sprintf("kill%x (%x)", i, j);
 	};
 
 	auto exists = [&](int i, int j) {
@@ -258,19 +262,28 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 				}
 			}
 		}
+
 	}
 
 	for (int i = 1;; ++i) {
-		if (!exists(i, 1)) {
+		if (!exists(i, 0)) {
 			break;
 		}
 
 		bool all_killed = true;
 
-		int j = 1;
+		int j = 0;
 
 		while (exists(i, j)) {
 			if (!killed(i, j)) {
+				if (const auto disable_armor = i == 14 || i == 16) {
+					if (auto handle = to_handle(get_opp(i, j))) {
+						if (auto armor = handle[slot_function::TORSO_ARMOR].get_item_if_any()) {
+							step.queue_deletion_of(armor, "disable armor");
+						}
+					}
+				}
+
 				all_killed = false;
 			}
 
@@ -286,7 +299,7 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 			const bool have_to_kill_simultaneously = is_akimbo_level;
 
 			if (have_to_kill_simultaneously) {
-				for (int jj = 1; jj < j; ++jj) {
+				for (int jj = 0; jj < j; ++jj) {
 					remove(step, get_opp(i, jj));
 				}
 			}

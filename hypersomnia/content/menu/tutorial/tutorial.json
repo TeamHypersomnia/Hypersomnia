@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-07 17:09:35.947166 UTC"
+        "version_timestamp": "2023-08-07 21:00:54.864344 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -214,7 +214,277 @@
     ],
     "layers": [
         {
-            "id": "Layer 2",
+            "id": "Layer 2"
+        },
+        {
+            "id": "Layer 1",
+            "nodes": [
+                "vent (50)",
+                "vent (52)"
+            ]
+        },
+        {
+            "id": "Level13",
+            "nodes": [
+                "floor_right (18)",
+                "exit12 (1)",
+                "flashbang (28)",
+                "ped_grenade (14)",
+                "force_grenade (59)",
+                "force_grenade (58)",
+                "force_grenade (57)",
+                "ped_grenade (15)",
+                "flashbang (29)",
+                "flashbang (30)",
+                "ped_grenade (16)",
+                "force_grenade (56)",
+                "ped_grenade (17)",
+                "flashbang (31)",
+                "flashbang (32)",
+                "ped_grenade (18)",
+                "force_grenade (91)",
+                "force_grenade (90)",
+                "ped_grenade (19)",
+                "flashbang (33)",
+                "flashbang (34)",
+                "ped_grenade (20)",
+                "force_grenade (63)",
+                "force_grenade (62)",
+                "ped_grenade (21)",
+                "flashbang (35)",
+                "obs15",
+                "obs15 (1)",
+                "crate (10)",
+                "crate (9)",
+                "crate (8)",
+                "crate (7)",
+                "crate (6)",
+                "kill15 (1)",
+                "kill15 (2)",
+                "kill15",
+                "tip3_1 (39)",
+                "tip3_1 (38)",
+                "entry13",
+                "vent (58)",
+                "vent (57)",
+                "vent (56)",
+                "vent (55)",
+                "calico (1)",
+                "dev_floor_256 (80)",
+                "dev_floor_256 (79)",
+                "Strong lamp (39)",
+                "Strong lamp (38)",
+                "Strong lamp (37)",
+                "Strong lamp (36)",
+                "Strong lamp (35)",
+                "Strong lamp (34)",
+                "Strong lamp (33)",
+                "hard_wooden_wall (19)",
+                "floor_right (19)",
+                "exit12",
+                "interference_grenade",
+                "interference_grenade (1)",
+                "interference_grenade (2)",
+                "interference_grenade (3)",
+                "interference_grenade (4)",
+                "interference_grenade (5)",
+                "interference_grenade (6)",
+                "interference_grenade (7)",
+                "interference_grenade (8)",
+                "interference_grenade (9)",
+                "interference_grenade (10)",
+                "interference_grenade (11)",
+                "interference_grenade (12)",
+                "interference_grenade (13)",
+                "interference_grenade (14)",
+                "interference_grenade (15)",
+                "interference_grenade (16)",
+                "interference_grenade (17)",
+                "interference_grenade (18)",
+                "interference_grenade (19)",
+                "interference_grenade (20)",
+                "interference_grenade (21)",
+                "interference_grenade (22)",
+                "interference_grenade (23)",
+                "interference_grenade (24)",
+                "interference_grenade (25)",
+                "interference_grenade (26)",
+                "interference_grenade (27)",
+                "flashbang",
+                "flashbang (1)",
+                "flashbang (2)",
+                "flashbang (3)",
+                "flashbang (4)",
+                "flashbang (5)",
+                "flashbang (6)",
+                "flashbang (7)",
+                "flashbang (8)",
+                "flashbang (9)",
+                "flashbang (10)",
+                "flashbang (11)",
+                "flashbang (12)",
+                "flashbang (13)",
+                "flashbang (14)",
+                "flashbang (15)",
+                "flashbang (16)",
+                "flashbang (17)",
+                "flashbang (18)",
+                "flashbang (19)",
+                "flashbang (20)",
+                "flashbang (21)",
+                "flashbang (22)",
+                "flashbang (23)",
+                "flashbang (24)",
+                "flashbang (25)",
+                "flashbang (26)",
+                "flashbang (27)",
+                "force_grenade (83)",
+                "force_grenade (82)",
+                "force_grenade (81)",
+                "force_grenade (80)",
+                "ped_grenade (22)",
+                "ped_grenade (23)",
+                "ped_grenade (24)",
+                "ped_grenade (25)",
+                "ped_grenade (26)",
+                "ped_grenade (27)",
+                "force_grenade (73)",
+                "force_grenade (72)",
+                "force_grenade (71)",
+                "force_grenade (70)",
+                "ped_grenade",
+                "ped_grenade (1)",
+                "ped_grenade (2)",
+                "ped_grenade (3)",
+                "ped_grenade (4)",
+                "ped_grenade (5)",
+                "ped_grenade (6)",
+                "ped_grenade (7)",
+                "ped_grenade (8)",
+                "ped_grenade (9)",
+                "ped_grenade (10)",
+                "ped_grenade (11)",
+                "ped_grenade (12)",
+                "ped_grenade (13)",
+                "obs17 (2)",
+                "obs17",
+                "obs17 (1)",
+                "tip3_1 (37)",
+                "tip3_1 (36)",
+                "tip3_1 (40)",
+                "tip3_1 (35)",
+                "dev_floor_256 (77)",
+                "dev_floor_256 (78)",
+                "dev_floor_256 (81)",
+                "dev_floor_256 (76)",
+                "kill17",
+                "kill17 (1)",
+                "force_grenade (55)",
+                "force_grenade (54)",
+                "force_grenade (53)",
+                "force_grenade (52)",
+                "force_grenade (51)",
+                "force_grenade (50)",
+                "force_grenade (49)",
+                "force_grenade (48)",
+                "force_grenade (47)",
+                "force_grenade (46)",
+                "force_grenade (45)",
+                "force_grenade (44)",
+                "force_grenade (43)",
+                "force_grenade (42)",
+                "force_grenade (41)",
+                "force_grenade (40)",
+                "force_grenade (39)",
+                "force_grenade (38)",
+                "force_grenade (37)",
+                "force_grenade (36)",
+                "force_grenade (35)",
+                "force_grenade (34)",
+                "force_grenade (33)",
+                "force_grenade (32)",
+                "force_grenade (31)",
+                "force_grenade (30)",
+                "force_grenade (29)",
+                "force_grenade (28)",
+                "obs14",
+                "obs14 (1)",
+                "tip3_1 (34)",
+                "dev_floor_256 (75)",
+                "force_grenade (27)",
+                "force_grenade (26)",
+                "force_grenade (25)",
+                "force_grenade (24)",
+                "force_grenade (23)",
+                "force_grenade (22)",
+                "force_grenade (21)",
+                "force_grenade (20)",
+                "force_grenade (19)",
+                "force_grenade (18)",
+                "force_grenade (17)",
+                "force_grenade (16)",
+                "force_grenade (15)",
+                "force_grenade (14)",
+                "force_grenade (12)",
+                "force_grenade (11)",
+                "force_grenade (10)",
+                "force_grenade (9)",
+                "force_grenade (8)",
+                "force_grenade (7)",
+                "force_grenade (6)",
+                "force_grenade (5)",
+                "force_grenade (4)",
+                "force_grenade (3)",
+                "force_grenade (2)",
+                "force_grenade (1)",
+                "force_grenade (13)",
+                "force_grenade",
+                "obs16",
+                "obs16 (1)",
+                "crate (5)",
+                "crate (3)",
+                "kill14",
+                "kill14 (1)",
+                "kill14 (2)",
+                "kill16",
+                "kill16 (1)",
+                "kill16 (2)",
+                "tip3_1 (33)",
+                "tip3_1 (31)",
+                "entry12",
+                "hard_wooden_wall (24)",
+                "hard_wooden_wall (21)",
+                "hard_wooden_wall (22)",
+                "hard_wooden_wall (23)",
+                "dev_floor_256 (74)",
+                "dev_floor_256 (73)",
+                "Strong lamp (32)",
+                "Strong lamp (41)",
+                "Strong lamp (31)",
+                "Strong lamp (42)",
+                "Strong lamp (52)",
+                "Strong lamp (51)",
+                "Strong lamp (50)",
+                "Strong lamp (49)",
+                "Strong lamp (45)",
+                "Strong lamp (44)",
+                "Strong lamp (48)",
+                "Strong lamp (43)",
+                "Strong lamp (47)",
+                "Strong lamp (29)",
+                "Strong lamp (30)",
+                "Strong lamp (46)",
+                "Strong lamp (40)",
+                "Strong lamp (28)",
+                "Strong lamp (26)",
+                "Strong lamp (27)",
+                "floor_top (8)",
+                "floor_bottom (7)",
+                "floor_left (7)"
+            ]
+        },
+        {
+            "id": "Level11",
             "nodes": [
                 "electric_rapier (3)-right-up-up",
                 "electric_rapier (2)-right-up-up",
@@ -239,12 +509,7 @@
                 "electric_rapier (3)",
                 "electric_rapier (2)",
                 "electric_rapier (1)",
-                "electric_rapier"
-            ]
-        },
-        {
-            "id": "Layer 1",
-            "nodes": [
+                "electric_rapier",
                 "obs12 (1)-left",
                 "obs12 (1)",
                 "obs12 (2)-left",
@@ -252,12 +517,7 @@
                 "obs12-left",
                 "obs12",
                 "obs10",
-                "obs9"
-            ]
-        },
-        {
-            "id": "Level11",
-            "nodes": [
+                "obs9",
                 "vent (45)",
                 "vent (46)",
                 "tip3_1 (27)",
@@ -303,18 +563,18 @@
                 "obs11 (7)",
                 "obs11 (6)",
                 "obs11 (5)",
-                "kill11_1",
+                "kill11",
                 "obs11 (11)",
                 "obs11 (10)",
                 "obs11 (9)",
-                "kill11_3",
+                "kill11 (1)",
                 "obs11 (2)",
                 "obs11 (8)",
                 "obs11 (1)",
                 "obs11 (12)",
                 "obs11",
                 "obs11 (3)",
-                "kill11_2",
+                "kill11 (2)",
                 "tip3_1 (32)",
                 "entry10",
                 "vent (49)",
@@ -355,14 +615,14 @@
                 "obs10 (2)",
                 "obs10 (1)",
                 "obs9 (1)",
-                "kill12_1",
-                "kill12_2",
-                "kill10_2",
-                "kill9_1",
-                "kill10_1",
-                "kill9_2",
-                "kill8_1",
-                "kill7_1",
+                "kill12",
+                "kill12 (1)",
+                "kill10 (1)",
+                "kill9 (1)",
+                "kill10",
+                "kill9",
+                "kill8",
+                "kill7",
                 "floor_right (15)",
                 "poseidon (5)",
                 "poseidon (4)",
@@ -416,14 +676,14 @@
                 "wood (3)",
                 "wood (2)",
                 "obs7",
-                "kill5_2",
-                "kill5_3",
-                "kill5_4",
-                "kill6_3",
-                "kill6_4",
-                "kill6_2",
-                "kill6_1",
-                "kill5_1",
+                "kill5 (1)",
+                "kill5 (2)",
+                "kill5 (3)",
+                "kill6",
+                "kill6 (1)",
+                "kill6 (2)",
+                "kill6 (3)",
+                "kill5",
                 "tip3_1 (11)",
                 "tip3_1 (8)",
                 "tip3_1 (9)",
@@ -448,12 +708,14 @@
                 "floor_right (8)",
                 "floor_top (7)",
                 "floor_bottom (6)",
+                "team_spawn (5)",
                 "calico",
                 "floor_left (6)"
             ]
         },
         {
             "id": "Level7",
+            "is_open_in_editor": false,
             "nodes": [
                 "metropolis_backpack",
                 "awka (1)",
@@ -520,8 +782,8 @@
             "nodes": [
                 "obs4 (2)",
                 "obs4",
-                "kill4_1",
-                "kill4_2",
+                "kill4",
+                "kill4 (1)",
                 "tip3_1 (7)",
                 "tip3_1 (2)",
                 "tip3_1 (1)",
@@ -553,6 +815,7 @@
         },
         {
             "id": "Level4",
+            "is_open_in_editor": false,
             "nodes": [
                 "kek9_magazine",
                 "kek9_magazine (2)",
@@ -616,8 +879,6 @@
                 "baka47_magazine (12)",
                 "baka47_magazine (11)",
                 "obs1",
-                "kill1_3",
-                "kill1_2",
                 "point_light (18)",
                 "point_light (19)",
                 "point_light (17)",
@@ -629,21 +890,21 @@
                 "point_light (11)",
                 "point_light (10)",
                 "point_light (9)",
-                "kill3_1",
-                "kill13_9",
-                "kill13_8",
-                "kill13_7",
-                "kill13_6",
-                "kill13_1",
-                "kill13_2",
-                "kill13_3",
-                "kill13_4",
-                "kill13_5",
-                "kill3_3",
-                "kill3_2",
-                "kill2_1",
-                "kill2_2",
-                "kill1_1",
+                "kill3 (2)",
+                "kill13",
+                "kill13 (1)",
+                "kill13 (2)",
+                "kill13 (3)",
+                "kill13 (4)",
+                "kill13 (5)",
+                "kill13 (6)",
+                "kill13 (7)",
+                "kill13 (8)",
+                "kill3",
+                "kill3 (1)",
+                "kill2",
+                "kill2 (1)",
+                "kill1",
                 "point_light (8)",
                 "point_light (7)",
                 "point_light (6)",
@@ -782,6 +1043,9 @@
                 "tip0_2",
                 "tip0_1",
                 "exit0",
+                "team_spawn (4)",
+                "team_spawn (3)",
+                "team_spawn (2)",
                 "team_spawn",
                 "team_spawn (1)",
                 "team_spawn (16)",
@@ -1473,8 +1737,8 @@
         {
             "id": "floor_top (6)",
             "type": "@water_room_floor_2",
-            "pos": [17984.0, -8704.0],
-            "size": [23552, 9728]
+            "pos": [17984.0, -8160.0],
+            "size": [23552, 10816]
         },
         {
             "id": "floor_bottom (5)",
@@ -2452,6 +2716,278 @@
             "color": [0, 255, 0, 255]
         },
         {
+            "id": "hard_wooden_wall (24)",
+            "type": "hard_wooden_wall",
+            "pos": [25024.0, 22656.001953125],
+            "rotation": -180.0,
+            "size": [512, 2560]
+        },
+        {
+            "id": "hard_wooden_wall (21)",
+            "type": "hard_wooden_wall",
+            "pos": [14528.0009765625, 22656.001953125],
+            "rotation": -180.0,
+            "size": [512, 2560]
+        },
+        {
+            "id": "hard_wooden_wall (22)",
+            "type": "hard_wooden_wall",
+            "pos": [19776.0, 23680.0],
+            "rotation": 90.0,
+            "size": [512, 9984]
+        },
+        {
+            "id": "hard_wooden_wall (23)",
+            "type": "hard_wooden_wall",
+            "pos": [19776.0, 21632.0],
+            "rotation": 90.0,
+            "size": [512, 9984]
+        },
+        {
+            "id": "dev_floor_256 (73)",
+            "type": "dev_floor_256",
+            "pos": [15808.0, 22656.0],
+            "size": [2048, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "floor_left (7)",
+            "type": "@water_room_floor",
+            "pos": [40448.0, 28384.0],
+            "size": [55488, 4544],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_bottom (7)",
+            "type": "@water_room_floor_2",
+            "pos": [40096.0, 33504.0],
+            "size": [54912, 5696]
+        },
+        {
+            "id": "floor_top (8)",
+            "type": "@water_room_floor_2",
+            "pos": [40512.0, 22368.0],
+            "size": [55040, 7616]
+        },
+        {
+            "id": "obs16 (1)",
+            "type": "@yellow_barrier",
+            "pos": [17376.0, 22656.001953125],
+            "rotation": -180.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "dev_floor_256 (74)",
+            "type": "dev_floor_256",
+            "pos": [17216.0, 22656.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs16",
+            "type": "@yellow_barrier",
+            "pos": [18848.001953125, 22656.001953125],
+            "rotation": -180.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "crate (3)",
+            "type": "crate",
+            "pos": [18464.0, 22400.0]
+        },
+        {
+            "id": "crate (5)",
+            "type": "crate",
+            "pos": [18336.0, 23232.0]
+        },
+        {
+            "id": "hard_wooden_wall (19)",
+            "type": "hard_wooden_wall",
+            "pos": [18112.0, 22016.0],
+            "size": [256, 256]
+        },
+        {
+            "id": "dev_floor_256 (75)",
+            "type": "dev_floor_256",
+            "pos": [19264.0, 22656.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs14 (1)",
+            "type": "@yellow_barrier",
+            "pos": [19424.0, 22656.001953125],
+            "rotation": -180.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "obs14",
+            "type": "@yellow_barrier",
+            "pos": [20000.0, 22656.001953125],
+            "rotation": -180.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "dev_floor_256 (76)",
+            "type": "dev_floor_256",
+            "pos": [20288.0, 22656.0],
+            "size": [512, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs17 (1)",
+            "type": "@yellow_barrier",
+            "pos": [21088.0, 22656.001953125],
+            "rotation": -180.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "obs17",
+            "type": "@yellow_barrier",
+            "pos": [22304.001953125, 22144.001953125],
+            "rotation": -180.0,
+            "size": [64, 512]
+        },
+        {
+            "id": "floor_right (19)",
+            "type": "@water_room_floor",
+            "pos": [24256.0, 22656.0],
+            "rotation": 90.0,
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "dev_floor_256 (78)",
+            "type": "dev_floor_256",
+            "pos": [22976.0, 22656.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (79)",
+            "type": "dev_floor_256",
+            "pos": [15680.0, 28416.0],
+            "rotation": 90.0,
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (80)",
+            "type": "dev_floor_256",
+            "pos": [17408.0, 28416.0],
+            "rotation": 90.0,
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (55)",
+            "type": "@materials/vent.png",
+            "pos": [17312.0, 27456.0],
+            "rotation": 90.0,
+            "size": [384, 5312]
+        },
+        {
+            "id": "vent (56)",
+            "type": "@materials/vent.png",
+            "pos": [17312.0, 29376.0],
+            "rotation": 90.0,
+            "size": [384, 5312]
+        },
+        {
+            "id": "vent (57)",
+            "type": "@materials/vent.png",
+            "pos": [14464.001953125, 28416.0],
+            "rotation": -180.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "crate (6)",
+            "type": "crate",
+            "pos": [18336.0, 28160.0]
+        },
+        {
+            "id": "crate (7)",
+            "type": "crate",
+            "pos": [17952.0, 28576.0]
+        },
+        {
+            "id": "crate (8)",
+            "type": "crate",
+            "pos": [18208.0, 28992.001953125]
+        },
+        {
+            "id": "obs15 (1)",
+            "type": "@yellow_barrier",
+            "pos": [17568.0, 28416.0],
+            "rotation": -180.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "obs15",
+            "type": "@yellow_barrier",
+            "pos": [18912.001953125, 28416.0],
+            "rotation": -180.0,
+            "size": [64, 1536]
+        },
+        {
+            "id": "floor_right (18)",
+            "type": "@water_room_floor",
+            "pos": [19456.0, 28416.0],
+            "rotation": 90.0,
+            "size": [1408, 768],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "crate (9)",
+            "type": "crate",
+            "pos": [17984.0, 27840.0]
+        },
+        {
+            "id": "crate (10)",
+            "type": "crate",
+            "pos": [18688.0, 28032.0]
+        },
+        {
+            "id": "vent (58)",
+            "type": "@materials/vent.png",
+            "pos": [20160.001953125, 28416.0],
+            "rotation": -180.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "dev_floor_256 (81)",
+            "type": "dev_floor_256",
+            "pos": [20928.0, 22656.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (77)",
+            "type": "dev_floor_256",
+            "pos": [22464.0, 22656.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (52)",
+            "type": "@materials/vent.png",
+            "pos": [21632.0, 22656.0],
+            "size": [512, 1024]
+        },
+        {
+            "id": "vent (50)",
+            "type": "@materials/vent.png",
+            "pos": [22112.0, 22656.0],
+            "size": [448, 512]
+        },
+        {
+            "id": "obs17 (2)",
+            "type": "@yellow_barrier",
+            "pos": [22304.001953125, 23168.001953125],
+            "rotation": -180.0,
+            "size": [64, 512]
+        },
+        {
             "id": "Strong lamp (1)",
             "type": "point_light",
             "pos": [-897.0, 1279.0],
@@ -2987,6 +3523,1258 @@
             "color": [255, 255, 0, 74]
         },
         {
+            "id": "Strong lamp (26)",
+            "type": "point_light",
+            "pos": [15711.0, 23553.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (27)",
+            "type": "point_light",
+            "pos": [15649.0, 21631.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (28)",
+            "type": "point_light",
+            "pos": [18703.0, 23443.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (30)",
+            "type": "point_light",
+            "pos": [18711.0, 21860.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (31)",
+            "type": "point_light",
+            "pos": [18108.0, 23443.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (32)",
+            "type": "point_light",
+            "pos": [18305.0, 21863.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (33)",
+            "type": "point_light",
+            "pos": [15521.0, 27391.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (34)",
+            "type": "point_light",
+            "pos": [15583.0, 29313.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (35)",
+            "type": "point_light",
+            "pos": [18559.0, 29247.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (36)",
+            "type": "point_light",
+            "pos": [17471.0, 29057.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (37)",
+            "type": "point_light",
+            "pos": [18561.0, 27585.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (38)",
+            "type": "point_light",
+            "pos": [17921.0, 29247.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (39)",
+            "type": "point_light",
+            "pos": [18177.0, 27583.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (40)",
+            "type": "point_light",
+            "pos": [17695.0, 23480.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (41)",
+            "type": "point_light",
+            "pos": [18377.0, 23447.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (42)",
+            "type": "point_light",
+            "pos": [17871.0, 21854.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (29)",
+            "type": "point_light",
+            "pos": [19585.0, 21825.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (43)",
+            "type": "point_light",
+            "pos": [19577.0, 23453.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (44)",
+            "type": "point_light",
+            "pos": [21313.0, 21953.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 986.8770141601563,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (45)",
+            "type": "point_light",
+            "pos": [21309.0, 23388.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 986.8770141601563,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (46)",
+            "type": "point_light",
+            "pos": [17537.0, 21823.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (47)",
+            "type": "point_light",
+            "pos": [19903.0, 21951.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (48)",
+            "type": "point_light",
+            "pos": [19892.0, 23385.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (49)",
+            "type": "point_light",
+            "pos": [21878.0, 23404.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 986.8770141601563,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (50)",
+            "type": "point_light",
+            "pos": [20832.0, 23403.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 986.8770141601563,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (51)",
+            "type": "point_light",
+            "pos": [20888.0, 21960.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 986.8770141601563,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (52)",
+            "type": "point_light",
+            "pos": [21859.0, 21934.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 986.8770141601563,
+                "strength": 23
+            }
+        },
+        {
+            "id": "force_grenade",
+            "type": "force_grenade",
+            "pos": [16947.0, 22121.0]
+        },
+        {
+            "id": "force_grenade (1)",
+            "type": "force_grenade",
+            "pos": [16947.0, 22217.0]
+        },
+        {
+            "id": "force_grenade (2)",
+            "type": "force_grenade",
+            "pos": [16942.0, 22313.0]
+        },
+        {
+            "id": "force_grenade (3)",
+            "type": "force_grenade",
+            "pos": [16947.0, 22409.0]
+        },
+        {
+            "id": "force_grenade (4)",
+            "type": "force_grenade",
+            "pos": [16947.0, 22505.0]
+        },
+        {
+            "id": "force_grenade (5)",
+            "type": "force_grenade",
+            "pos": [16947.0, 22601.0]
+        },
+        {
+            "id": "force_grenade (6)",
+            "type": "force_grenade",
+            "pos": [16942.0, 22697.0]
+        },
+        {
+            "id": "force_grenade (7)",
+            "type": "force_grenade",
+            "pos": [16947.0, 22793.0]
+        },
+        {
+            "id": "force_grenade (8)",
+            "type": "force_grenade",
+            "pos": [16947.0, 22889.0]
+        },
+        {
+            "id": "force_grenade (9)",
+            "type": "force_grenade",
+            "pos": [16947.0, 22985.0]
+        },
+        {
+            "id": "force_grenade (10)",
+            "type": "force_grenade",
+            "pos": [16947.0, 23081.0]
+        },
+        {
+            "id": "force_grenade (11)",
+            "type": "force_grenade",
+            "pos": [16942.0, 23177.0]
+        },
+        {
+            "id": "force_grenade (12)",
+            "type": "force_grenade",
+            "pos": [16947.0, 23273.0]
+        },
+        {
+            "id": "force_grenade (13)",
+            "type": "force_grenade",
+            "pos": [16942.0, 22025.0]
+        },
+        {
+            "id": "force_grenade (14)",
+            "type": "force_grenade",
+            "pos": [17011.0, 22121.0]
+        },
+        {
+            "id": "force_grenade (15)",
+            "type": "force_grenade",
+            "pos": [17006.0, 22025.0]
+        },
+        {
+            "id": "force_grenade (16)",
+            "type": "force_grenade",
+            "pos": [17011.0, 22217.0]
+        },
+        {
+            "id": "force_grenade (17)",
+            "type": "force_grenade",
+            "pos": [17006.0, 22313.0]
+        },
+        {
+            "id": "force_grenade (18)",
+            "type": "force_grenade",
+            "pos": [17011.0, 22409.0]
+        },
+        {
+            "id": "force_grenade (19)",
+            "type": "force_grenade",
+            "pos": [17011.0, 22505.0]
+        },
+        {
+            "id": "force_grenade (20)",
+            "type": "force_grenade",
+            "pos": [17011.0, 22601.0]
+        },
+        {
+            "id": "force_grenade (21)",
+            "type": "force_grenade",
+            "pos": [17006.0, 22697.0]
+        },
+        {
+            "id": "force_grenade (22)",
+            "type": "force_grenade",
+            "pos": [17011.0, 22793.0]
+        },
+        {
+            "id": "force_grenade (23)",
+            "type": "force_grenade",
+            "pos": [17011.0, 22889.0]
+        },
+        {
+            "id": "force_grenade (24)",
+            "type": "force_grenade",
+            "pos": [17011.0, 22985.0]
+        },
+        {
+            "id": "force_grenade (25)",
+            "type": "force_grenade",
+            "pos": [17011.0, 23081.0]
+        },
+        {
+            "id": "force_grenade (26)",
+            "type": "force_grenade",
+            "pos": [17006.0, 23177.0]
+        },
+        {
+            "id": "force_grenade (27)",
+            "type": "force_grenade",
+            "pos": [17011.0, 23273.0]
+        },
+        {
+            "id": "force_grenade (28)",
+            "type": "force_grenade",
+            "pos": [18995.0, 22121.0]
+        },
+        {
+            "id": "force_grenade (29)",
+            "type": "force_grenade",
+            "pos": [18990.0, 22025.0]
+        },
+        {
+            "id": "force_grenade (30)",
+            "type": "force_grenade",
+            "pos": [18995.0, 22217.0]
+        },
+        {
+            "id": "force_grenade (31)",
+            "type": "force_grenade",
+            "pos": [18990.0, 22313.0]
+        },
+        {
+            "id": "force_grenade (32)",
+            "type": "force_grenade",
+            "pos": [18995.0, 22409.0]
+        },
+        {
+            "id": "force_grenade (33)",
+            "type": "force_grenade",
+            "pos": [18995.0, 22505.0]
+        },
+        {
+            "id": "force_grenade (34)",
+            "type": "force_grenade",
+            "pos": [18995.0, 22601.0]
+        },
+        {
+            "id": "force_grenade (35)",
+            "type": "force_grenade",
+            "pos": [18990.0, 22697.0]
+        },
+        {
+            "id": "force_grenade (36)",
+            "type": "force_grenade",
+            "pos": [18995.0, 22793.0]
+        },
+        {
+            "id": "force_grenade (37)",
+            "type": "force_grenade",
+            "pos": [18995.0, 22889.0]
+        },
+        {
+            "id": "force_grenade (38)",
+            "type": "force_grenade",
+            "pos": [18995.0, 22985.0]
+        },
+        {
+            "id": "force_grenade (39)",
+            "type": "force_grenade",
+            "pos": [18995.0, 23081.0]
+        },
+        {
+            "id": "force_grenade (40)",
+            "type": "force_grenade",
+            "pos": [18990.0, 23177.0]
+        },
+        {
+            "id": "force_grenade (41)",
+            "type": "force_grenade",
+            "pos": [18995.0, 23273.0]
+        },
+        {
+            "id": "force_grenade (42)",
+            "type": "force_grenade",
+            "pos": [19059.0, 22121.0]
+        },
+        {
+            "id": "force_grenade (43)",
+            "type": "force_grenade",
+            "pos": [19054.0, 22025.0]
+        },
+        {
+            "id": "force_grenade (44)",
+            "type": "force_grenade",
+            "pos": [19059.0, 22217.0]
+        },
+        {
+            "id": "force_grenade (45)",
+            "type": "force_grenade",
+            "pos": [19054.0, 22313.0]
+        },
+        {
+            "id": "force_grenade (46)",
+            "type": "force_grenade",
+            "pos": [19059.0, 22409.0]
+        },
+        {
+            "id": "force_grenade (47)",
+            "type": "force_grenade",
+            "pos": [19059.0, 22505.0]
+        },
+        {
+            "id": "force_grenade (48)",
+            "type": "force_grenade",
+            "pos": [19059.0, 22601.0]
+        },
+        {
+            "id": "force_grenade (49)",
+            "type": "force_grenade",
+            "pos": [19054.0, 22697.0]
+        },
+        {
+            "id": "force_grenade (50)",
+            "type": "force_grenade",
+            "pos": [19059.0, 22793.0]
+        },
+        {
+            "id": "force_grenade (51)",
+            "type": "force_grenade",
+            "pos": [19059.0, 22889.0]
+        },
+        {
+            "id": "force_grenade (52)",
+            "type": "force_grenade",
+            "pos": [19059.0, 22985.0]
+        },
+        {
+            "id": "force_grenade (53)",
+            "type": "force_grenade",
+            "pos": [19059.0, 23081.0]
+        },
+        {
+            "id": "force_grenade (54)",
+            "type": "force_grenade",
+            "pos": [19054.0, 23177.0]
+        },
+        {
+            "id": "force_grenade (55)",
+            "type": "force_grenade",
+            "pos": [19059.0, 23273.0]
+        },
+        {
+            "id": "ped_grenade (13)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 22121.0]
+        },
+        {
+            "id": "ped_grenade (12)",
+            "type": "ped_grenade",
+            "pos": [20654.0, 22025.0]
+        },
+        {
+            "id": "ped_grenade (11)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 22217.0]
+        },
+        {
+            "id": "ped_grenade (10)",
+            "type": "ped_grenade",
+            "pos": [20654.0, 22313.0]
+        },
+        {
+            "id": "ped_grenade (9)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 22409.0]
+        },
+        {
+            "id": "ped_grenade (8)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 22505.0]
+        },
+        {
+            "id": "ped_grenade (7)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 22601.0]
+        },
+        {
+            "id": "ped_grenade (6)",
+            "type": "ped_grenade",
+            "pos": [20654.0, 22697.0]
+        },
+        {
+            "id": "ped_grenade (5)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 22793.0]
+        },
+        {
+            "id": "ped_grenade (4)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 22889.0]
+        },
+        {
+            "id": "ped_grenade (3)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 22985.0]
+        },
+        {
+            "id": "ped_grenade (2)",
+            "type": "ped_grenade",
+            "pos": [20659.0, 23081.0]
+        },
+        {
+            "id": "ped_grenade (1)",
+            "type": "ped_grenade",
+            "pos": [20654.0, 23177.0]
+        },
+        {
+            "id": "ped_grenade",
+            "type": "ped_grenade",
+            "pos": [20659.0, 23273.0]
+        },
+        {
+            "id": "force_grenade (70)",
+            "type": "force_grenade",
+            "pos": [20723.0, 22121.0]
+        },
+        {
+            "id": "force_grenade (71)",
+            "type": "force_grenade",
+            "pos": [20718.0, 22025.0]
+        },
+        {
+            "id": "force_grenade (72)",
+            "type": "force_grenade",
+            "pos": [20723.0, 22217.0]
+        },
+        {
+            "id": "force_grenade (73)",
+            "type": "force_grenade",
+            "pos": [20718.0, 22313.0]
+        },
+        {
+            "id": "ped_grenade (27)",
+            "type": "ped_grenade",
+            "pos": [20723.0, 22409.0]
+        },
+        {
+            "id": "ped_grenade (26)",
+            "type": "ped_grenade",
+            "pos": [20723.0, 22505.0]
+        },
+        {
+            "id": "ped_grenade (25)",
+            "type": "ped_grenade",
+            "pos": [20723.0, 22601.0]
+        },
+        {
+            "id": "ped_grenade (24)",
+            "type": "ped_grenade",
+            "pos": [20718.0, 22697.0]
+        },
+        {
+            "id": "ped_grenade (23)",
+            "type": "ped_grenade",
+            "pos": [20723.0, 22793.0]
+        },
+        {
+            "id": "ped_grenade (22)",
+            "type": "ped_grenade",
+            "pos": [20723.0, 22889.0]
+        },
+        {
+            "id": "force_grenade (80)",
+            "type": "force_grenade",
+            "pos": [20723.0, 22985.0]
+        },
+        {
+            "id": "force_grenade (81)",
+            "type": "force_grenade",
+            "pos": [20723.0, 23081.0]
+        },
+        {
+            "id": "force_grenade (82)",
+            "type": "force_grenade",
+            "pos": [20718.0, 23177.0]
+        },
+        {
+            "id": "force_grenade (83)",
+            "type": "force_grenade",
+            "pos": [20723.0, 23273.0]
+        },
+        {
+            "id": "flashbang (27)",
+            "type": "flashbang",
+            "pos": [22669.0, 22130.0]
+        },
+        {
+            "id": "flashbang (26)",
+            "type": "flashbang",
+            "pos": [22664.0, 22034.0]
+        },
+        {
+            "id": "flashbang (25)",
+            "type": "flashbang",
+            "pos": [22669.0, 22226.0]
+        },
+        {
+            "id": "flashbang (24)",
+            "type": "flashbang",
+            "pos": [22664.0, 22322.0]
+        },
+        {
+            "id": "flashbang (23)",
+            "type": "flashbang",
+            "pos": [22669.0, 22418.0]
+        },
+        {
+            "id": "flashbang (22)",
+            "type": "flashbang",
+            "pos": [22669.0, 22514.0]
+        },
+        {
+            "id": "flashbang (21)",
+            "type": "flashbang",
+            "pos": [22669.0, 22610.0]
+        },
+        {
+            "id": "flashbang (20)",
+            "type": "flashbang",
+            "pos": [22664.0, 22706.0]
+        },
+        {
+            "id": "flashbang (19)",
+            "type": "flashbang",
+            "pos": [22669.0, 22802.0]
+        },
+        {
+            "id": "flashbang (18)",
+            "type": "flashbang",
+            "pos": [22669.0, 22898.0]
+        },
+        {
+            "id": "flashbang (17)",
+            "type": "flashbang",
+            "pos": [22669.0, 22994.0]
+        },
+        {
+            "id": "flashbang (16)",
+            "type": "flashbang",
+            "pos": [22669.0, 23090.0]
+        },
+        {
+            "id": "flashbang (15)",
+            "type": "flashbang",
+            "pos": [22664.0, 23186.0]
+        },
+        {
+            "id": "flashbang (14)",
+            "type": "flashbang",
+            "pos": [22669.0, 23282.0]
+        },
+        {
+            "id": "flashbang (13)",
+            "type": "flashbang",
+            "pos": [22733.0, 22130.0]
+        },
+        {
+            "id": "flashbang (12)",
+            "type": "flashbang",
+            "pos": [22728.0, 22034.0]
+        },
+        {
+            "id": "flashbang (11)",
+            "type": "flashbang",
+            "pos": [22733.0, 22226.0]
+        },
+        {
+            "id": "flashbang (10)",
+            "type": "flashbang",
+            "pos": [22728.0, 22322.0]
+        },
+        {
+            "id": "flashbang (9)",
+            "type": "flashbang",
+            "pos": [22733.0, 22418.0]
+        },
+        {
+            "id": "flashbang (8)",
+            "type": "flashbang",
+            "pos": [22733.0, 22514.0]
+        },
+        {
+            "id": "flashbang (7)",
+            "type": "flashbang",
+            "pos": [22733.0, 22610.0]
+        },
+        {
+            "id": "flashbang (6)",
+            "type": "flashbang",
+            "pos": [22728.0, 22706.0]
+        },
+        {
+            "id": "flashbang (5)",
+            "type": "flashbang",
+            "pos": [22733.0, 22802.0]
+        },
+        {
+            "id": "flashbang (4)",
+            "type": "flashbang",
+            "pos": [22733.0, 22898.0]
+        },
+        {
+            "id": "flashbang (3)",
+            "type": "flashbang",
+            "pos": [22733.0, 22994.0]
+        },
+        {
+            "id": "flashbang (2)",
+            "type": "flashbang",
+            "pos": [22733.0, 23090.0]
+        },
+        {
+            "id": "flashbang (1)",
+            "type": "flashbang",
+            "pos": [22728.0, 23186.0]
+        },
+        {
+            "id": "flashbang",
+            "type": "flashbang",
+            "pos": [22733.0, 23282.0]
+        },
+        {
+            "id": "interference_grenade (27)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 22130.0]
+        },
+        {
+            "id": "interference_grenade (26)",
+            "type": "interference_grenade",
+            "pos": [23177.0, 22034.0]
+        },
+        {
+            "id": "interference_grenade (25)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 22226.0]
+        },
+        {
+            "id": "interference_grenade (24)",
+            "type": "interference_grenade",
+            "pos": [23177.0, 22322.0]
+        },
+        {
+            "id": "interference_grenade (23)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 22418.0]
+        },
+        {
+            "id": "interference_grenade (22)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 22514.0]
+        },
+        {
+            "id": "interference_grenade (21)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 22610.0]
+        },
+        {
+            "id": "interference_grenade (20)",
+            "type": "interference_grenade",
+            "pos": [23177.0, 22706.0]
+        },
+        {
+            "id": "interference_grenade (19)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 22802.0]
+        },
+        {
+            "id": "interference_grenade (18)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 22898.0]
+        },
+        {
+            "id": "interference_grenade (17)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 22994.0]
+        },
+        {
+            "id": "interference_grenade (16)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 23090.0]
+        },
+        {
+            "id": "interference_grenade (15)",
+            "type": "interference_grenade",
+            "pos": [23177.0, 23186.0]
+        },
+        {
+            "id": "interference_grenade (14)",
+            "type": "interference_grenade",
+            "pos": [23182.0, 23282.0]
+        },
+        {
+            "id": "interference_grenade (13)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 22130.0]
+        },
+        {
+            "id": "interference_grenade (12)",
+            "type": "interference_grenade",
+            "pos": [23241.0, 22034.0]
+        },
+        {
+            "id": "interference_grenade (11)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 22226.0]
+        },
+        {
+            "id": "interference_grenade (10)",
+            "type": "interference_grenade",
+            "pos": [23241.0, 22322.0]
+        },
+        {
+            "id": "interference_grenade (9)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 22418.0]
+        },
+        {
+            "id": "interference_grenade (8)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 22514.0]
+        },
+        {
+            "id": "interference_grenade (7)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 22610.0]
+        },
+        {
+            "id": "interference_grenade (6)",
+            "type": "interference_grenade",
+            "pos": [23241.0, 22706.0]
+        },
+        {
+            "id": "interference_grenade (5)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 22802.0]
+        },
+        {
+            "id": "interference_grenade (4)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 22898.0]
+        },
+        {
+            "id": "interference_grenade (3)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 22994.0]
+        },
+        {
+            "id": "interference_grenade (2)",
+            "type": "interference_grenade",
+            "pos": [23246.0, 23090.0]
+        },
+        {
+            "id": "interference_grenade (1)",
+            "type": "interference_grenade",
+            "pos": [23241.0, 23186.0]
+        },
+        {
+            "id": "interference_grenade",
+            "type": "interference_grenade",
+            "pos": [23246.0, 23282.0]
+        },
+        {
+            "id": "flashbang (35)",
+            "type": "flashbang",
+            "pos": [17149.0, 28169.0]
+        },
+        {
+            "id": "ped_grenade (21)",
+            "type": "ped_grenade",
+            "pos": [17149.0, 28265.0]
+        },
+        {
+            "id": "force_grenade (62)",
+            "type": "force_grenade",
+            "pos": [17149.0, 28360.998046875]
+        },
+        {
+            "id": "force_grenade (63)",
+            "type": "force_grenade",
+            "pos": [17144.0, 28457.0]
+        },
+        {
+            "id": "ped_grenade (20)",
+            "type": "ped_grenade",
+            "pos": [17149.0, 28553.0]
+        },
+        {
+            "id": "flashbang (34)",
+            "type": "flashbang",
+            "pos": [17149.0, 28649.0]
+        },
+        {
+            "id": "flashbang (33)",
+            "type": "flashbang",
+            "pos": [17213.0, 28169.0]
+        },
+        {
+            "id": "ped_grenade (19)",
+            "type": "ped_grenade",
+            "pos": [17213.0, 28265.0]
+        },
+        {
+            "id": "force_grenade (90)",
+            "type": "force_grenade",
+            "pos": [17213.0, 28360.998046875]
+        },
+        {
+            "id": "force_grenade (91)",
+            "type": "force_grenade",
+            "pos": [17208.0, 28457.0]
+        },
+        {
+            "id": "ped_grenade (18)",
+            "type": "ped_grenade",
+            "pos": [17213.0, 28553.0]
+        },
+        {
+            "id": "flashbang (32)",
+            "type": "flashbang",
+            "pos": [17213.0, 28649.0]
+        },
+        {
+            "id": "flashbang (31)",
+            "type": "flashbang",
+            "pos": [17021.0, 28169.0]
+        },
+        {
+            "id": "ped_grenade (17)",
+            "type": "ped_grenade",
+            "pos": [17021.0, 28265.0]
+        },
+        {
+            "id": "force_grenade (56)",
+            "type": "force_grenade",
+            "pos": [17021.0, 28360.998046875]
+        },
+        {
+            "id": "ped_grenade (16)",
+            "type": "ped_grenade",
+            "pos": [17021.0, 28553.0]
+        },
+        {
+            "id": "flashbang (30)",
+            "type": "flashbang",
+            "pos": [17021.0, 28649.0]
+        },
+        {
+            "id": "flashbang (29)",
+            "type": "flashbang",
+            "pos": [17085.0, 28169.0]
+        },
+        {
+            "id": "ped_grenade (15)",
+            "type": "ped_grenade",
+            "pos": [17085.0, 28265.0]
+        },
+        {
+            "id": "force_grenade (57)",
+            "type": "force_grenade",
+            "pos": [17085.0, 28360.998046875]
+        },
+        {
+            "id": "force_grenade (58)",
+            "type": "force_grenade",
+            "pos": [17080.0, 28457.0]
+        },
+        {
+            "id": "ped_grenade (14)",
+            "type": "ped_grenade",
+            "pos": [17085.0, 28553.0]
+        },
+        {
+            "id": "flashbang (28)",
+            "type": "flashbang",
+            "pos": [17085.0, 28649.0]
+        },
+        {
+            "id": "force_grenade (59)",
+            "type": "force_grenade",
+            "pos": [17016.0, 28457.0]
+        },
+        {
             "id": "fury_thrower",
             "type": "fury_thrower",
             "pos": [38400.0, 12870.0]
@@ -3446,6 +5234,11 @@
             "pos": [47424.0, 13047.0]
         },
         {
+            "id": "calico (1)",
+            "type": "calico",
+            "pos": [16856.0, 28407.0]
+        },
+        {
             "id": "metropolis_backpack",
             "type": "metropolis_backpack",
             "pos": [25349.0, -2682.0],
@@ -3460,7 +5253,7 @@
             "rotation": -90.0
         },
         {
-            "id": "kill1_1",
+            "id": "kill1",
             "type": "team_spawn",
             "pos": [703.0, 44161.0],
             "rotation": -180.0
@@ -3468,62 +5261,48 @@
         {
             "id": "team_spawn (1)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
-            "pos": [-129.0, 46303.0],
-            "rotation": -90.0
+            "pos": [15807.0, 22463.0]
         },
         {
-            "id": "kill1_2",
-            "type": "team_spawn",
-            "active": false,
-            "pos": [127.0, 44415.0],
-            "rotation": 90.0
-        },
-        {
-            "id": "kill1_3",
-            "type": "team_spawn",
-            "active": false,
-            "pos": [-129.0, 44417.0],
-            "rotation": 90.0
-        },
-        {
-            "id": "kill2_2",
+            "id": "kill2 (1)",
             "type": "team_spawn",
             "pos": [2946.0, 43903.0],
             "rotation": -180.0
         },
         {
-            "id": "kill2_1",
+            "id": "kill2",
             "type": "team_spawn",
             "pos": [2944.0, 44417.0],
             "rotation": -180.0
         },
         {
-            "id": "kill3_2",
+            "id": "kill3 (1)",
             "type": "team_spawn",
             "pos": [5932.0, 44095.0],
             "rotation": -180.0
         },
         {
-            "id": "kill3_1",
+            "id": "kill3 (2)",
             "type": "team_spawn",
             "pos": [5964.0, 43489.0],
             "rotation": -180.0
         },
         {
-            "id": "kill3_3",
+            "id": "kill3",
             "type": "team_spawn",
             "pos": [6111.0, 43755.0],
             "rotation": -180.0
         },
         {
-            "id": "kill4_2",
+            "id": "kill4 (1)",
             "type": "team_spawn",
             "pos": [11513.0, -2321.0],
             "rotation": 90.0
         },
         {
-            "id": "kill4_1",
+            "id": "kill4",
             "type": "team_spawn",
             "pos": [11399.0, -2321.0],
             "rotation": 90.0
@@ -3537,164 +5316,257 @@
             "rotation": -90.0
         },
         {
-            "id": "kill5_1",
+            "id": "kill5",
             "type": "team_spawn",
             "pos": [21567.0, 9727.0]
         },
         {
-            "id": "kill5_2",
+            "id": "kill5 (1)",
             "type": "team_spawn",
             "pos": [21503.0, 9151.0]
         },
         {
-            "id": "kill5_4",
+            "id": "kill5 (3)",
             "type": "team_spawn",
             "pos": [21441.0, 9665.0]
         },
         {
-            "id": "kill5_3",
+            "id": "kill5 (2)",
             "type": "team_spawn",
             "pos": [21377.0, 9215.0]
         },
         {
-            "id": "kill6_1",
+            "id": "kill6 (3)",
             "type": "team_spawn",
             "pos": [19327.0, 9985.0]
         },
         {
-            "id": "kill6_2",
+            "id": "kill6 (2)",
             "type": "team_spawn",
             "pos": [19137.0, 9985.0]
         },
         {
-            "id": "kill6_4",
+            "id": "kill6 (1)",
             "type": "team_spawn",
             "pos": [19455.0, 8959.0]
         },
         {
-            "id": "kill6_3",
+            "id": "kill6",
             "type": "team_spawn",
             "pos": [19263.0, 8961.0]
         },
         {
-            "id": "kill7_1",
+            "id": "kill7",
             "type": "team_spawn",
             "pos": [38401.0, 11905.0],
             "rotation": 90.0
         },
         {
-            "id": "kill8_1",
+            "id": "kill8",
             "type": "team_spawn",
             "pos": [38401.0, 10305.0],
             "rotation": 90.0
         },
         {
-            "id": "kill9_2",
+            "id": "kill9",
             "type": "team_spawn",
             "pos": [38145.0, 9089.0],
             "rotation": 90.0
         },
         {
-            "id": "kill9_1",
+            "id": "kill9 (1)",
             "type": "team_spawn",
             "pos": [38657.0, 9089.0],
             "rotation": 90.0
         },
         {
-            "id": "kill10_2",
+            "id": "kill10 (1)",
             "type": "team_spawn",
             "pos": [38463.0, 8063.0],
             "rotation": 90.0
         },
         {
-            "id": "kill10_1",
+            "id": "kill10",
             "type": "team_spawn",
             "pos": [38335.0, 8063.0],
             "rotation": 90.0
         },
         {
-            "id": "kill11_2",
+            "id": "kill11 (2)",
             "type": "team_spawn",
             "pos": [47423.0, 12673.0],
             "rotation": 90.0
         },
         {
-            "id": "kill11_1",
+            "id": "kill11",
             "type": "team_spawn",
             "pos": [46911.0, 12673.0],
             "rotation": 90.0
         },
         {
-            "id": "kill11_3",
+            "id": "kill11 (1)",
             "type": "team_spawn",
             "pos": [47935.0, 12673.0],
             "rotation": 90.0
         },
         {
-            "id": "kill12_2",
+            "id": "kill12 (1)",
             "type": "team_spawn",
             "pos": [39039.0, 7295.0],
             "rotation": 90.0
         },
         {
-            "id": "kill12_1",
+            "id": "kill12",
             "type": "team_spawn",
             "pos": [37761.0, 7295.0],
             "rotation": 90.0
         },
         {
-            "id": "kill13_5",
+            "id": "kill13 (8)",
             "type": "team_spawn",
             "pos": [7487.0, 43391.0],
             "rotation": -225.0
         },
         {
-            "id": "kill13_4",
+            "id": "kill13 (7)",
             "type": "team_spawn",
             "pos": [7489.0, 43647.0],
             "rotation": -180.0
         },
         {
-            "id": "kill13_9",
+            "id": "kill13",
             "type": "team_spawn",
             "pos": [7489.0, 43905.0],
             "rotation": -90.0
         },
         {
-            "id": "kill13_3",
+            "id": "kill13 (6)",
             "type": "team_spawn",
             "pos": [7807.0, 43393.0],
             "rotation": -315.0
         },
         {
-            "id": "kill13_2",
+            "id": "kill13 (5)",
             "type": "team_spawn",
             "pos": [7809.0, 43649.0],
             "rotation": -180.0
         },
         {
-            "id": "kill13_1",
+            "id": "kill13 (4)",
             "type": "team_spawn",
             "pos": [7809.0, 43903.0],
             "rotation": -90.0
         },
         {
-            "id": "kill13_6",
+            "id": "kill13 (3)",
             "type": "team_spawn",
             "pos": [8129.0, 43393.0],
             "rotation": -360.0
         },
         {
-            "id": "kill13_7",
+            "id": "kill13 (2)",
             "type": "team_spawn",
             "pos": [8131.0, 43649.0],
             "rotation": -180.0
         },
         {
-            "id": "kill13_8",
+            "id": "kill13 (1)",
             "type": "team_spawn",
             "pos": [8131.0, 43903.0],
             "rotation": -90.0
+        },
+        {
+            "id": "kill16",
+            "type": "team_spawn",
+            "pos": [18305.0, 22399.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill16 (1)",
+            "type": "team_spawn",
+            "pos": [18561.0, 23169.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill16 (2)",
+            "type": "team_spawn",
+            "pos": [18561.0, 22689.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill14 (2)",
+            "type": "team_spawn",
+            "pos": [19839.0, 22753.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill14 (1)",
+            "type": "team_spawn",
+            "pos": [19839.0, 23233.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill14",
+            "type": "team_spawn",
+            "pos": [19837.0, 22209.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill17 (1)",
+            "type": "team_spawn",
+            "pos": [22081.0, 23041.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill17",
+            "type": "team_spawn",
+            "pos": [22081.0, 22273.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill15",
+            "type": "team_spawn",
+            "pos": [18753.0, 28417.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill15 (1)",
+            "type": "team_spawn",
+            "pos": [18753.0, 29055.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill15 (2)",
+            "type": "team_spawn",
+            "pos": [18751.0, 27775.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "team_spawn (2)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [-319.0, 46401.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "team_spawn (3)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [11326.0, 35.0]
+        },
+        {
+            "id": "team_spawn (4)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [38222.0, 13744.0]
+        },
+        {
+            "id": "team_spawn (5)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [47445.0, 13906.0]
         },
         {
             "id": "exit0",
@@ -4321,7 +6193,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Tip: double-tapping {RELOAD} lets you reload faster.\nThis drops the mag to the ground. You can pick it up later!"
+            "context_tip": "Tip: double-tapping {RELOAD} reloads faster.\nThis drops the mag to the ground. You can pick it up later!"
         },
         {
             "id": "tip4_1 (9)",
@@ -5080,7 +6952,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "You can use the laser ({TOGGLE_WEAPON_LASER}) with knives too.\nTry aiming for the head, especially with the strong attack."
+            "context_tip": "You can use the laser ({TOGGLE_WEAPON_LASER}) with knives too.\nAim for headshots, especially with the strong attack."
         },
         {
             "id": "tip3_1 (21)",
@@ -5274,7 +7146,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "You can throw knives when shooting - even when reloading!\nTry it out! This can really save your life."
+            "context_tip": "You can toss knives in ANY situation. Even when reloading a gun!\nTry it out! {THROW_KNIFE} or {THROW_TWO_KNIVES}. This can save your life."
         },
         {
             "id": "entry10",
@@ -5313,7 +7185,7 @@
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry7",
+            "portal_exit": "entry12",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -5455,7 +7327,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "The Assault Rattle has a cool feature.\nIts strong attack lets you jump extremely far!"
+            "context_tip": "Assault Rattle has a cool feature.\nIts strong attack lets you jump!"
         },
         {
             "id": "exit10",
@@ -5627,6 +7499,285 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Your speed depends only on what's in your hands."
+        },
+        {
+            "id": "exit12",
+            "type": "portal",
+            "pos": [24256.0, 22656.0],
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry13",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (31)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [15808.0, 22656.0],
+            "size": [2048, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Time to blow things up.\nPick up some grenades."
+        },
+        {
+            "id": "entry12",
+            "type": "portal",
+            "pos": [15424.0009765625, 22656.0],
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (33)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [17216.0, 22656.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {SHOOT} to throw. Hold to cook it (watch out!).\nUse {TOGGLE_WEAPON_LASER} to see what you can throw over."
+        },
+        {
+            "id": "tip3_1 (34)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [19264.0, 22656.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {SHOOT_SECONDARY} to throw a grenade close."
+        },
+        {
+            "id": "tip3_1 (35)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [20288.0, 22656.0],
+            "size": [512, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "There are other kinds of grenades.\nBlue ones instantly destroy armor and Mana."
+        },
+        {
+            "id": "tip3_1 (36)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [22464.0, 22656.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Flashbangs blind and deafen nearby enemies.\nTest it on yourself with {SHOOT_SECONDARY}."
+        },
+        {
+            "id": "tip3_1 (37)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [22976.0, 22656.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Yellow ones are the cheapest - they only drain stamina and throw enemies away.\nThey also force gun ignition  - good for trolling rocket launcher users."
+        },
+        {
+            "id": "entry13",
+            "type": "portal",
+            "pos": [14944.0, 28416.0],
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (38)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [15680.0, 28416.0],
+            "size": [2048, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Just like with knives, you toss grenades in any situation -\neven when shooting or reloading!"
+        },
+        {
+            "id": "tip3_1 (39)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [17408.0, 28416.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {THROW_FORCE_GRENADE} to quickly toss a Force Grenade.\n{THROW_PED_GRENADE} for PED grenades. {THROW_FLASHBANG} for Flashbangs."
+        },
+        {
+            "id": "exit12 (1)",
+            "type": "portal",
+            "pos": [19456.0, 28416.0],
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry11",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (40)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [20928.0, 22656.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: Quickly toss a PED with {THROW_PED_GRENADE}.\nQuickly toss a Force grenade with {THROW_FORCE_GRENADE}."
         }
     ]
 }
