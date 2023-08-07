@@ -69,27 +69,24 @@ void visible_entities::sort(const cosmos& cosm) {
 	}
 }
 
-/* We're using our own flags instead of unordered_set implementation for it to be deterministic */
-
-template <class T>
-using make_flags = std::array<bool, T::statically_allocated_entities>;
-
-using all_flags = per_entity_type_container<make_flags>;
-
 void visible_entities::acquire_physical(const visible_entities_query input) {
 	const auto& cosm = input.cosm;
 	const auto camera = input.cone;
 
 	const auto& physics = cosm.get_solvable_inferred().physics;
 
-	thread_local auto unique_flags = all_flags();
-	thread_local auto unique_from_physics = std::vector<entity_id>();
+	auto& unique_from_physics = _cache_unique_from_physics;
 	unique_from_physics.clear();
 
 	auto get_flag_for = [&](const entity_id& e) -> bool& {
-		return unique_flags.visit(e.type_id, [&](auto& typed_flags) -> bool& {
-			return typed_flags[e.raw.indirection_index];
+		bool* vis_flag = nullptr;
+
+		cosm[e].dispatch_on_having_all<invariants::fixtures>([&](const auto& typed_handle) {
+			vis_flag = std::addressof(get_corresponding<colliders_cache>(typed_handle).connection.cache_registered_in_visible_entities);
 		});
+
+		ensure(vis_flag != nullptr);
+		return *vis_flag;
 	};
 
 	auto unset_all_on_exit = augs::scope_guard(

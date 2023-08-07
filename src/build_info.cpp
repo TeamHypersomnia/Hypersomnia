@@ -61,17 +61,19 @@ void dump_detailed_sizeof_information(const augs::path_type& where) {
 	add_sorted_lines();
 	lines.clear();
 
-	for_each_entity_solvable_type([&](auto s, auto){
-		using T = decltype(s);
+	if constexpr (statically_allocate_entities) {
+		for_each_entity_solvable_type([&](auto s, auto){
+			using T = decltype(s);
 
-		const auto max_n = entity_type_of<T>::statically_allocated_entities;
-		const auto max_n_bytes = sizeof(T) * max_n;
-		const auto readable_max_n_bytes = readable_bytesize(max_n_bytes);
+			const auto max_n = entity_type_of<T>::statically_allocated_entities;
+			const auto max_n_bytes = sizeof(T) * max_n;
+			const auto readable_max_n_bytes = readable_bytesize(max_n_bytes);
 
-		lines.push_back(typesafe_sprintf("%x (%x) from %x of %x\n", max_n_bytes, readable_max_n_bytes, max_n, get_type_name_strip_namespace<T>()));
-	});
+			lines.push_back(typesafe_sprintf("%x (%x) from %x of %x\n", max_n_bytes, readable_max_n_bytes, max_n, get_type_name_strip_namespace<T>()));
+		});
 
-	content += "\n";
+		content += "\n";
+	}
 
 	add_sorted_lines();
 	lines.clear();
@@ -87,17 +89,19 @@ void dump_detailed_sizeof_information(const augs::path_type& where) {
 	add_sorted_lines();
 	lines.clear();
 
-	for_each_entity_type([&](auto e){
-		using T = entity_flavour<decltype(e)>;
+	if constexpr (statically_allocate_entities) {
+		for_each_entity_type([&](auto e){
+			using T = entity_flavour<decltype(e)>;
 
-		const auto max_n = entity_type_of<T>::statically_allocated_flavours;
-		const auto max_n_bytes = sizeof(T) * max_n;
-		const auto readable_max_n_bytes = readable_bytesize(max_n_bytes);
+			const auto max_n = entity_type_of<T>::statically_allocated_flavours;
+			const auto max_n_bytes = sizeof(T) * max_n;
+			const auto readable_max_n_bytes = readable_bytesize(max_n_bytes);
 
-		lines.push_back(typesafe_sprintf("%x (%x) from %x of %x\n", max_n_bytes, readable_max_n_bytes, max_n, get_type_name_strip_namespace<T>()));
-	});
+			lines.push_back(typesafe_sprintf("%x (%x) from %x of %x\n", max_n_bytes, readable_max_n_bytes, max_n, get_type_name_strip_namespace<T>()));
+		});
 
-	content += "\n";
+		content += "\n";
+	}
 
 	add_sorted_lines();
 	lines.clear();

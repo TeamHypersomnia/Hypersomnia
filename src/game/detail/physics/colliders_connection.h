@@ -8,7 +8,8 @@ struct colliders_connection {
 	entity_id owner;
 	transformr shape_offset;
 	bool flip_geometry = false;
-	pad_bytes<3> pad;
+	mutable bool cache_registered_in_visible_entities = false;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 
 	static auto none() {

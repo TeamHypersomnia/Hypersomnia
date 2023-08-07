@@ -5,24 +5,6 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
-#0  visible_entities::register_visible(cosmos const&, entity_id) ()
-[Current thread is 1 (Thread 0x7fc43e3476c0 (LWP 50031))]
-#0  visible_entities::register_visible(cosmos const&, entity_id) ()
-#1  augs::scope_guard<visible_entities::acquire_physical(visible_entities_query)::$_1>::~scope_guard() ()
-#2  visible_entities::acquire_physical(visible_entities_query) ()
-#3  visible_entities::reacquire_all(visible_entities_query) ()
-#4  work(int, char const* const*)::$_34::operator()(augs::audio_renderer const*, augs::delta, double, config_lua_table const&) const ()
-#5  _ZNSt3__116__variant_detail12__visitation6__base12__dispatcherIJLm1EEE10__dispatchB6v15007IONS1_9__variant15__value_visitorIZZ4workiPKPKcENK3$_2clIZZ4workiS
-B_ENK4$_36clEPKN4augs14audio_rendererENSF_5deltaERK17input_pass_resultEUlRT_E_EEDcSN_EUlSO_E_EEJRNS0_6__baseILNS0_6_TraitE1EJ16test_scene_setup12editor_setup22p
-roject_selector_setup12client_setup12server_setupEEEEEEDcSN_DpT0_ ()
-#6  work(int, char const* const*)::$_40::operator()() const::{lambda()#1}::operator()() const ()
-#7  void* std::__1::__thread_proxy[abi:v15007]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struc
-t> >, work(int, char const* const*)::$_40> >(void*) ()
-#8  ?? () from /usr/lib/libc.so.6
-#9  ?? () from /usr/lib/libc.so.6
-
-
-
 - It looks like the stuck udp transmissions were due to acks not going through because of too small sequence buffers for acked packets.
 	- We WON'T have this problem normally because we're otherwise always sending at a tickrate of 60.
 		- so the packets will go through.
@@ -396,3 +378,25 @@ Solved:
     - then if two portals overlap (background one and a normal one)
         - one can "steal" from the other
     - on the other hand we need this counter to prevent contacts from re-beginning entering after teleporting (which only changes transform in physics_system but old contacts are still there)
+
+# Done
+
+- define-out the statically allocate variables because otherwise we get things like this:
+	#0  visible_entities::register_visible(cosmos const&, entity_id) ()
+	[Current thread is 1 (Thread 0x7fc43e3476c0 (LWP 50031))]
+	#0  visible_entities::register_visible(cosmos const&, entity_id) ()
+	#1  augs::scope_guard<visible_entities::acquire_physical(visible_entities_query)::$_1>::~scope_guard() ()
+	#2  visible_entities::acquire_physical(visible_entities_query) ()
+	#3  visible_entities::reacquire_all(visible_entities_query) ()
+	#4  work(int, char const* const*)::$_34::operator()(augs::audio_renderer const*, augs::delta, double, config_lua_table const&) const ()
+	#5  _ZNSt3__116__variant_detail12__visitation6__base12__dispatcherIJLm1EEE10__dispatchB6v15007IONS1_9__variant15__value_visitorIZZ4workiPKPKcENK3$_2clIZZ4workiS
+	B_ENK4$_36clEPKN4augs14audio_rendererENSF_5deltaERK17input_pass_resultEUlRT_E_EEDcSN_EUlSO_E_EEJRNS0_6__baseILNS0_6_TraitE1EJ16test_scene_setup12editor_setup22p
+	roject_selector_setup12client_setup12server_setupEEEEEEDcSN_DpT0_ ()
+	#6  work(int, char const* const*)::$_40::operator()() const::{lambda()#1}::operator()() const ()
+	#7  void* std::__1::__thread_proxy[abi:v15007]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struc
+	t> >, work(int, char const* const*)::$_40> >(void*) ()
+	#8  ?? () from /usr/lib/libc.so.6
+	#9  ?? () from /usr/lib/libc.so.6
+
+
+

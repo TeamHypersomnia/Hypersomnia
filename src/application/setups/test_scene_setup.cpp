@@ -248,7 +248,7 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 
 		const auto only_headshot_enemies_index = 13;
 
-		while (exists(only_headshot_enemies_index, ++j)) {
+		while (exists(only_headshot_enemies_index, j)) {
 			if (auto handle = to_handle(get_opp(only_headshot_enemies_index, j))) {
 				if (auto sent = handle.template find<components::sentience>()) {
 					auto& hp = sent->get<health_meter_instance>();
@@ -261,6 +261,8 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 					}
 				}
 			}
+
+			++j;
 		}
 
 	}
@@ -306,8 +308,9 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 
 			int k = 0;
 
-			while (to_entity(obs(i, ++k)).is_set()) {
+			while (to_entity(obs(i, k)).is_set()) {
 				remove(step, obs(i, k));
+				++k;
 			}
 		}
 	}

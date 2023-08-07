@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-07 21:00:54.864344 UTC"
+        "version_timestamp": "2023-08-07 21:56:27.406815 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -269,7 +269,7 @@
                 "vent (57)",
                 "vent (56)",
                 "vent (55)",
-                "calico (1)",
+                "hunter",
                 "dev_floor_256 (80)",
                 "dev_floor_256 (79)",
                 "Strong lamp (39)",
@@ -4912,7 +4912,7 @@
         {
             "id": "assault_rattle",
             "type": "assault_rattle",
-            "pos": [57216.0, 11849.0]
+            "pos": [57215.99609375, 11849.0]
         },
         {
             "id": "fury_thrower (3)",
@@ -5011,12 +5011,12 @@
         {
             "id": "electric_rapier-up-up",
             "type": "electric_rapier",
-            "pos": [38164.0, 7448.0]
+            "pos": [38164.0, 7448.00048828125]
         },
         {
             "id": "electric_rapier (1)-up-up",
             "type": "electric_rapier",
-            "pos": [38268.0, 7448.0]
+            "pos": [38268.0, 7448.00048828125]
         },
         {
             "id": "electric_rapier (2)-up-up",
@@ -5055,13 +5055,13 @@
         {
             "id": "electric_rapier-right-up-up",
             "type": "electric_rapier",
-            "pos": [38636.0, 7448.0],
+            "pos": [38636.0, 7448.00048828125],
             "rotation": -180.0
         },
         {
             "id": "electric_rapier (1)-right-up-up",
             "type": "electric_rapier",
-            "pos": [38532.0, 7448.0],
+            "pos": [38532.0, 7448.00048828125],
             "rotation": -180.0
         },
         {
@@ -5234,8 +5234,8 @@
             "pos": [47424.0, 13047.0]
         },
         {
-            "id": "calico (1)",
-            "type": "calico",
+            "id": "hunter",
+            "type": "hunter",
             "pos": [16856.0, 28407.0]
         },
         {
@@ -5261,9 +5261,8 @@
         {
             "id": "team_spawn (1)",
             "type": "team_spawn",
-            "active": false,
             "faction": "METROPOLIS",
-            "pos": [15807.0, 22463.0]
+            "pos": [15843.0, 28203.0]
         },
         {
             "id": "kill2 (1)",
@@ -5559,12 +5558,14 @@
         {
             "id": "team_spawn (4)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [38222.0, 13744.0]
         },
         {
             "id": "team_spawn (5)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [47445.0, 13906.0]
         },
@@ -7125,7 +7126,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Run while pressing strong attack.\n({SPRINT} + {SHOOT_SECONDARY})"
+            "context_tip": "Press strong attack while running.\n({SPRINT} + {SHOOT_SECONDARY})"
         },
         {
             "id": "tip3_1 (32)",

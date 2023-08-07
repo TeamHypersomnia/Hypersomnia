@@ -52,6 +52,8 @@ class visible_entities {
 		void sort();
 	};
 
+	std::vector<entity_id> _cache_unique_from_physics;
+
 	using per_layer_type = per_render_layer_t<layer_register>;
 	per_layer_type per_layer;
 
