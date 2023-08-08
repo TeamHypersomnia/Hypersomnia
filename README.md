@@ -77,7 +77,7 @@ The game has been online and playable since 2017. It brings together:
 - the pixel art nostalgia of oldschool RPGs..
 - ..and the potential for endless creativity thanks to an in-game map editor!
 
-*Hypersomnia* aims to become **the ultimate open-source 2D shooter** - a grand community project extensible without limit.
+*Hypersomnia* aims to be **the ultimate open-source 2D shooter** - a grand community project extensible without limit.
 
 Declare allegiance to one of the three factions whose apple of discord is a disparity between prevailing notions of moral excellence:
 
