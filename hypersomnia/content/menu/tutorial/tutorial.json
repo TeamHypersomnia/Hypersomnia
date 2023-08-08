@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-07 21:56:27.406815 UTC"
+        "version_timestamp": "2023-08-07 22:57:00.148848 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -256,7 +256,6 @@
                 "obs15 (1)",
                 "crate (10)",
                 "crate (9)",
-                "crate (8)",
                 "crate (7)",
                 "crate (6)",
                 "kill15 (1)",
@@ -269,7 +268,7 @@
                 "vent (57)",
                 "vent (56)",
                 "vent (55)",
-                "hunter",
+                "bilmer2000",
                 "dev_floor_256 (80)",
                 "dev_floor_256 (79)",
                 "Strong lamp (39)",
@@ -2911,11 +2910,6 @@
             "pos": [17952.0, 28576.0]
         },
         {
-            "id": "crate (8)",
-            "type": "crate",
-            "pos": [18208.0, 28992.001953125]
-        },
-        {
             "id": "obs15 (1)",
             "type": "@yellow_barrier",
             "pos": [17568.0, 28416.0],
@@ -5234,8 +5228,8 @@
             "pos": [47424.0, 13047.0]
         },
         {
-            "id": "hunter",
-            "type": "hunter",
+            "id": "bilmer2000",
+            "type": "bilmer2000",
             "pos": [16856.0, 28407.0]
         },
         {

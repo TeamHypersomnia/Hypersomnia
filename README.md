@@ -9,7 +9,7 @@
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 <a href="https://discord.gg/YC49E4G"><img src="https://discordapp.com/api/guilds/284464744411430912/embed.png"></img></a>
 
-An online shooter with relentless dynamics.  
+Online shooter with relentless dynamics.  
 Challenge your friend to an intense duel, or gather two clans to fight a spectacular war.  
 
 Written in modern C++, without a game engine!
@@ -70,26 +70,22 @@ Only 27 MB!
 
 *Hypersomnia* is a competitive arena released as free software.
 
-It brings together:
+The game has been online and playable since 2017. It brings together:
+
 - the tactics of *Counter-Strike*, 
 - the dynamics of *Hotline Miami*,
 - the pixel art nostalgia of oldschool RPGs..
-- ..and the potential for limitless community content thanks to an in-game map editor!
+- ..and the potential for endless creativity thanks to an in-game map editor!
 
-The game is already playable and runs a **server instance 24/7.**
+*Hypersomnia* aims to become **the ultimate open-source 2D shooter** - a grand community project extensible without limit.
 
-Although currently intended for quick online matches,
-the project began with a single childhood dream:
-
-*To create an MMO shooter with a persistent universe.*
-
-In the future, the game might introduce elements of RPG with hardcore PvP mechanics.
-
-Set in a hypothetical afterlife reality, it shall provide joy through fierce fights, benevolent behaviors, fulfillment of elaborate social roles or sowing panic as a traitor to the altruists.
-
-Declare allegiance to one of the three factions whose apple of discord is a disparity between prevailing notions of moral excellence.
+Declare allegiance to one of the three factions whose apple of discord is a disparity between prevailing notions of moral excellence:
 
 **Metropolis. Atlantis. Resistance.**
+
+Will you take revenge for an unethical simulation of the inferior universe?
+Will you support the cruel experiments to win total control over metempsychosis? 
+Or will you join the underground civilization that awaits the end of war in this dangerous afterlife reality?
 
 # Features
 
