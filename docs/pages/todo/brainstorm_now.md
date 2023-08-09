@@ -6,7 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- H shouldnt register another wielding setup when hands are already bare
+- Cull/fade sound sources that are obviously too far away
+    - we need to fade them if they're playing so they delete
+        - actually just stop them since they should be inaudible already
+
+- Switch to previous weapon when:
+    - throwing nade
+    - planting bomb
 
 - Tutorial levels
     - Spells but maybe just preliminary

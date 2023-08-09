@@ -6411,3 +6411,5 @@ This will discard your redo history."
 
 - (separate area with a sniper rifle) When you hit close to a center, you score a headshot.
     - self-healing character
+- H shouldnt register another wielding setup when hands are already bare
+

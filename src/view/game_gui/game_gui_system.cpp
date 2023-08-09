@@ -256,7 +256,11 @@ void game_gui_system::control_hotbar_and_action_button(
 
 			if (r.intent == inventory_gui_intent_type::HOLSTER) {
 				const auto current_setup = wielding_setup::from_current(gui_entity);
-				request_setup(wielding_setup::bare_hands(), current_setup);
+
+				if (current_setup != wielding_setup::bare_hands()) {
+					request_setup(wielding_setup::bare_hands(), current_setup);
+				}
+
 				return;
 			}
 		}
