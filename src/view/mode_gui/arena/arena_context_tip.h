@@ -222,6 +222,13 @@ inline void draw_context_tip(
 				}
 			}
 		}
+		else {
+			if (bomb) {
+				if (current_faction == faction_type::METROPOLIS) {
+					return do_text("You've stolen the bomb! Escape!\nCareful, enemies always see the bomb's location!");
+				}
+			}
+		}
 
 		if (bomb_being_armed) {
 			return do_text("Stay still while planting the bomb!");

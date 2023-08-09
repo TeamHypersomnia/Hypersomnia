@@ -15,6 +15,7 @@
 #include "augs/gui/text/printer.h"
 
 #include "game/modes/detail/delete_with_held_items.hpp"
+#include "game/detail/hand_fuse_logic.h"
 
 using portal_marker = editor_area_marker_node;
 
@@ -164,6 +165,9 @@ void test_scene_setup::remove(logic_step step, const std::string& name) {
 }
 
 void test_scene_setup::restart_mode() {
+	should_init_level = true;
+	restart_arena_in_ms = -1;
+
 	auto& cosm = scene.world;
 
 	const auto current_teleport = typesafe_sprintf("entry%x", tutorial.level);
@@ -171,8 +175,9 @@ void test_scene_setup::restart_mode() {
 	const bool is_akimbo_level = tutorial.level == 5;
 	const bool is_duals_level = tutorial.level == 6;
 	const bool is_ricochets_level = tutorial.level == 8;
-	const bool is_planting_level = tutorial.level == 14;
 	const bool is_try_throwing_reloading_level = tutorial.level == 10 || tutorial.level == 13;
+	const bool is_planting_level = tutorial.level == 14;
+	const bool is_defusing_level = tutorial.level == 15;
 
 	const auto player_faction = is_planting_level ? faction_type::RESISTANCE : faction_type::METROPOLIS;
 	const auto enemy_faction  = player_faction == faction_type::METROPOLIS ? faction_type::RESISTANCE : faction_type::METROPOLIS;
@@ -181,8 +186,16 @@ void test_scene_setup::restart_mode() {
 		auto b1 = to_handle("bomb1");
 		auto b2 = to_handle("bomb2");
 
-		b1.template get<components::hand_fuse>().fuse_delay_ms = 2000;
+		b1.template get<components::hand_fuse>().fuse_delay_ms = 3000;
 		b2.template get<components::hand_fuse>().fuse_delay_ms = 2000;
+	}
+
+	if (is_defusing_level) {
+		auto b1 = to_handle("planted1");
+		auto b2 = to_handle("planted2");
+
+		b1.template get<components::hand_fuse>().fuse_delay_ms = 20000;
+		b2.template get<components::hand_fuse>().fuse_delay_ms = 18000;
 	}
 
 	get_arena_handle().on_mode_with_input(
@@ -217,7 +230,7 @@ void test_scene_setup::restart_mode() {
 					mode.teleport_to_next_spawn(input, new_id, mode.find(new_id)->controlled_character_id);
 				}
 
-				if (!is_tutorial() || is_akimbo_level || is_duals_level || is_ricochets_level || is_try_throwing_reloading_level) {
+				if (!is_tutorial() || is_akimbo_level || is_duals_level || is_ricochets_level || is_try_throwing_reloading_level || is_defusing_level) {
 					mode.infinite_ammo_for = viewed_character_id;
 				}
 			}
@@ -281,11 +294,85 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 
 	auto& cosm = scene.world;
 
-	const bool is_planting_level = tutorial.level == 14;
-
-	if (is_planting_level) {
+	if (const bool is_planting_level = tutorial.level == 14) {
 		if (auto armor = cosm[viewed_character_id][slot_function::TORSO_ARMOR].get_item_if_any()) {
 			step.queue_deletion_of(armor, "disable armor");
+		}
+
+		if (to_handle("bomb1").dead()) {
+			remove(step, "obs_bomb1");
+		}
+
+		if (to_handle("bomb2").dead()) {
+			remove(step, "obs_bomb2");
+		}
+	}
+
+	if (restart_arena_in_ms > 0) {
+		restart_arena_in_ms -= step.get_delta().in_milliseconds();
+
+		if (restart_arena_in_ms <= 0) {
+			restart_arena();
+		}
+	}
+
+	if (const bool is_defusing_level = tutorial.level == 15) {
+		auto carrier = to_handle("carrier");
+		auto carrier_bomb = to_handle("carrier_bomb");
+
+		ensure(carrier); 
+		ensure(carrier_bomb);
+
+		if (should_init_level) {
+			const auto pickup_slot = carrier.find_pickup_target_slot_for(carrier_bomb, { slot_finding_opt::OMIT_MOUNTED_SLOTS });
+
+			if (pickup_slot.alive()) {
+				perform_transfer(item_slot_transfer_request::standard(entity_id(carrier_bomb.get_id()), pickup_slot), step);
+			}
+		}
+		else {
+			if (carrier_bomb.get_owning_transfer_capability() == viewed_character_id) {
+				remove(step, "obs_carrier");
+			}
+		}
+
+		auto b1 = to_handle("planted1");
+		auto b2 = to_handle("planted2");
+
+		if (b1.dead() || b2.dead()) {
+			if (restart_arena_in_ms < 0) {
+				restart_arena_in_ms = 1000.0f;
+			}
+		}
+		else {
+			bool arm_second = false;
+
+			b1.dispatch_on_having_all<components::hand_fuse>([&](const auto& typed_fused) {
+				auto fuse_logic = fuse_logic_provider(typed_fused, step);
+
+				if (should_init_level) {
+					fuse_logic.arm_explosive(arming_source_type::SHOOT_INTENT, false);
+				}
+				else {
+					if (fuse_logic.defused()) {
+						arm_second = true;
+						remove(step, "obs_def1");
+					}
+				}
+			});
+
+			b2.dispatch_on_having_all<components::hand_fuse>([&](const auto& typed_fused) {
+				auto fuse_logic = fuse_logic_provider(typed_fused, step);
+
+				if (fuse_logic.defused()) {
+					remove(step, "obs_def2");
+				}
+				else {
+					if (arm_second && !fuse_logic.armed()) {
+						fuse_logic.arm_explosive(arming_source_type::SHOOT_INTENT, true);
+					}
+				}
+			});
 		}
 	}
 
@@ -336,6 +423,8 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 			}
 		}
 	}
+
+	should_init_level = false;
 }
 
 void test_scene_setup::pre_solve(const logic_step step) {

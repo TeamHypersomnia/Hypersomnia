@@ -170,7 +170,7 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 		out.categoryBits = make_flags(C::LYING_ITEM);
-		out.maskBits = make_flags(C::QUERY, C::SHELL);
+		out.maskBits = make_flags(C::QUERY);
 	}
 	{
 

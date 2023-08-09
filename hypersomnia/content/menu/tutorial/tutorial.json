@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-09 16:14:01.064948 UTC"
+        "version_timestamp": "2023-08-09 18:02:33.700379 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -234,12 +234,85 @@
     ],
     "layers": [
         {
+            "id": "Layer 1",
+            "nodes": [
+                "electric_rapier (5)",
+                "electric_rapier (4)",
+                "bulwark"
+            ]
+        },
+        {
+            "id": "Level15",
+            "nodes": [
+                "floor_right (21)",
+                "exit16",
+                "galilea",
+                "obs21",
+                "obs20",
+                "obs_def1",
+                "obs_carrier",
+                "obs_def2",
+                "carrier_bomb",
+                "carrier",
+                "kill21 (2)",
+                "kill21",
+                "kill21 (1)",
+                "kill20",
+                "kill20 (1)",
+                "bsite (1)",
+                "bombsite (2)",
+                "bombsite (3)",
+                "planted2",
+                "planted1",
+                "tip3_1 (47)",
+                "tip3_1 (45)",
+                "tip3_1 (50)",
+                "tip3_1 (49)",
+                "tip3_1 (46)",
+                "tip3_1 (48)",
+                "entry15",
+                "hard_wooden_wall (31)",
+                "hard_wooden_wall (32)",
+                "hard_wooden_wall (41)",
+                "hard_wooden_wall (40)",
+                "hard_wooden_wall (39)",
+                "hard_wooden_wall (33)",
+                "hard_wooden_wall (34)",
+                "hard_wooden_wall (38)",
+                "hard_wooden_wall (35)",
+                "hard_wooden_wall (36)",
+                "hard_wooden_wall (37)",
+                "asite (1)",
+                "dev_floor_256 (88)",
+                "dev_floor_256 (86)",
+                "dev_floor_256 (91)",
+                "dev_floor_256 (90)",
+                "dev_floor_256 (87)",
+                "dev_floor_256 (89)",
+                "Strong lamp (56)",
+                "Strong lamp (67)",
+                "Strong lamp (65)",
+                "Strong lamp (60)",
+                "Strong lamp (66)",
+                "Strong lamp (61)",
+                "Strong lamp (69)",
+                "Strong lamp (68)",
+                "Strong lamp (71)",
+                "Strong lamp (70)",
+                "Strong lamp (62)",
+                "Strong lamp (63)",
+                "Strong lamp (64)"
+            ]
+        },
+        {
             "id": "Level14",
             "nodes": [
                 "floor_right (20)",
                 "exit14",
-                "obs18",
-                "obs19",
+                "obs_bomb1",
+                "obs_bomb2",
+                "kill19 (2)",
+                "kill19 (1)",
                 "kill19",
                 "kill18",
                 "bsite",
@@ -247,8 +320,11 @@
                 "bombsite",
                 "bomb2",
                 "bomb1",
+                "electric_rapier (6)",
+                "tip3_1 (52)",
                 "tip3_1 (43)",
                 "tip3_1 (41)",
+                "tip3_1 (51)",
                 "tip3_1 (44)",
                 "tip3_1 (42)",
                 "entry14",
@@ -260,6 +336,7 @@
                 "hard_wooden_wall (28)",
                 "hard_wooden_wall (29)",
                 "asite",
+                "dev_floor_256 (92)",
                 "dev_floor_256 (84)",
                 "dev_floor_256 (82)",
                 "dev_floor_256 (85)",
@@ -327,14 +404,13 @@
                 "Strong lamp (35)",
                 "Strong lamp (34)",
                 "Strong lamp (33)",
-                "floor_top (8)",
                 "floor_bottom (7)",
+                "defuse_kit",
                 "floor_left (7)"
             ]
         },
         {
             "id": "Level12",
-            "is_open_in_editor": false,
             "nodes": [
                 "vent (50)",
                 "vent (52)",
@@ -536,6 +612,7 @@
                 "Strong lamp (40)",
                 "Strong lamp (28)",
                 "Strong lamp (26)",
+                "floor_top (8)",
                 "Strong lamp (27)"
             ]
         },
@@ -1098,7 +1175,6 @@
         },
         {
             "id": "Level0",
-            "is_open_in_editor": false,
             "nodes": [
                 "tip0_2 (3)",
                 "tip0_2 (1)",
@@ -3095,7 +3171,7 @@
             "flip_horizontally": true
         },
         {
-            "id": "obs19",
+            "id": "obs_bomb2",
             "type": "@yellow_barrier",
             "pos": [30784.0, 28544.0],
             "rotation": -180.0,
@@ -3160,11 +3236,203 @@
             "flip_horizontally": true
         },
         {
-            "id": "obs18",
+            "id": "obs_bomb1",
             "type": "@yellow_barrier",
             "pos": [32576.0, 28160.0],
             "rotation": -180.0,
             "size": [128, 768],
+            "flip_horizontally": true
+        },
+        {
+            "id": "floor_right (21)",
+            "type": "@water_room_floor",
+            "pos": [58048.0, 28480.0],
+            "rotation": 90.0,
+            "size": [896, 896],
+            "color": [255, 132, 132, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs_def1",
+            "type": "@yellow_barrier",
+            "pos": [54015.99609375, 28351.998046875],
+            "size": [256, 128],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs_def2",
+            "type": "@yellow_barrier",
+            "pos": [55871.99609375, 28416.0],
+            "size": [128, 1536],
+            "flip_horizontally": true
+        },
+        {
+            "id": "bsite (1)",
+            "type": "@bsite",
+            "pos": [55360.0, 28864.0]
+        },
+        {
+            "id": "hard_wooden_wall (31)",
+            "type": "hard_wooden_wall",
+            "pos": [58815.99609375, 28351.998046875],
+            "size": [384, 1408],
+            "flip_horizontally": true
+        },
+        {
+            "id": "hard_wooden_wall (32)",
+            "type": "hard_wooden_wall",
+            "pos": [50496.0, 28416.0],
+            "size": [384, 2304],
+            "flip_horizontally": true
+        },
+        {
+            "id": "hard_wooden_wall (33)",
+            "type": "hard_wooden_wall",
+            "pos": [54848.0, 28544.0],
+            "rotation": 90.0,
+            "size": [1280, 128]
+        },
+        {
+            "id": "hard_wooden_wall (34)",
+            "type": "hard_wooden_wall",
+            "pos": [54208.0, 28096.0],
+            "rotation": -90.0,
+            "size": [896, 128]
+        },
+        {
+            "id": "hard_wooden_wall (35)",
+            "type": "hard_wooden_wall",
+            "pos": [53631.99609375, 28351.998046875],
+            "rotation": -180.0,
+            "size": [512, 128]
+        },
+        {
+            "id": "hard_wooden_wall (36)",
+            "type": "hard_wooden_wall",
+            "pos": [54848.0, 27456.0],
+            "rotation": 90.0,
+            "size": [384, 8320],
+            "flip_horizontally": true
+        },
+        {
+            "id": "hard_wooden_wall (37)",
+            "type": "hard_wooden_wall",
+            "pos": [54848.00390625, 29376.0],
+            "rotation": 90.0,
+            "size": [384, 8320],
+            "flip_horizontally": true
+        },
+        {
+            "id": "asite (1)",
+            "type": "@asite",
+            "pos": [53760.0, 27968.0]
+        },
+        {
+            "id": "dev_floor_256 (87)",
+            "type": "dev_floor_256",
+            "pos": [54528.0, 28288.0],
+            "rotation": 90.0,
+            "size": [512, 512],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "dev_floor_256 (89)",
+            "type": "dev_floor_256",
+            "pos": [51712.0, 28416.0],
+            "size": [2048, 1536],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs20",
+            "type": "@yellow_barrier",
+            "pos": [53408.0, 27968.0],
+            "size": [64, 640],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs21",
+            "type": "@yellow_barrier",
+            "pos": [55359.99609375, 28575.998046875],
+            "rotation": 90.0,
+            "size": [64, 896],
+            "flip_horizontally": true
+        },
+        {
+            "id": "dev_floor_256 (86)",
+            "type": "dev_floor_256",
+            "pos": [53248.0, 28416.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "dev_floor_256 (88)",
+            "type": "dev_floor_256",
+            "pos": [54016.0, 28416.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "hard_wooden_wall (38)",
+            "type": "hard_wooden_wall",
+            "pos": [53631.99609375, 28799.99609375],
+            "rotation": -180.0,
+            "size": [512, 768]
+        },
+        {
+            "id": "dev_floor_256 (90)",
+            "type": "dev_floor_256",
+            "pos": [56192.0, 28416.0],
+            "size": [512, 1536],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "obs_carrier",
+            "type": "@yellow_barrier",
+            "pos": [57344.0, 27776.0],
+            "size": [256, 256],
+            "flip_horizontally": true
+        },
+        {
+            "id": "hard_wooden_wall (39)",
+            "type": "hard_wooden_wall",
+            "pos": [56576.0, 28160.0],
+            "rotation": 90.0,
+            "size": [1024, 256]
+        },
+        {
+            "id": "hard_wooden_wall (40)",
+            "type": "hard_wooden_wall",
+            "pos": [57344.0078125, 28544.00390625],
+            "rotation": 90.0,
+            "size": [1280, 256]
+        },
+        {
+            "id": "dev_floor_256 (91)",
+            "type": "dev_floor_256",
+            "pos": [56960.0, 28416.0],
+            "size": [512, 512],
+            "color": [0, 255, 0, 255],
+            "flip_horizontally": true
+        },
+        {
+            "id": "hard_wooden_wall (41)",
+            "type": "hard_wooden_wall",
+            "pos": [58240.015625, 29120.001953125],
+            "rotation": 90.0,
+            "size": [128, 1536]
+        },
+        {
+            "id": "dev_floor_256 (92)",
+            "type": "dev_floor_256",
+            "pos": [31232.0, 28928.0],
+            "rotation": -90.0,
+            "size": [256, 768],
+            "color": [0, 255, 0, 255],
             "flip_horizontally": true
         },
         {
@@ -4231,6 +4499,214 @@
             }
         },
         {
+            "id": "Strong lamp (56)",
+            "type": "point_light",
+            "pos": [54979.0, 29136.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (60)",
+            "type": "point_light",
+            "pos": [53699.0, 27687.0],
+            "color": [254, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (61)",
+            "type": "point_light",
+            "pos": [55639.0, 29137.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (62)",
+            "type": "point_light",
+            "pos": [55403.0, 27700.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (63)",
+            "type": "point_light",
+            "pos": [51615.0, 27519.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (64)",
+            "type": "point_light",
+            "pos": [51553.0, 29441.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (65)",
+            "type": "point_light",
+            "pos": [54119.0, 28247.0],
+            "color": [254, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (66)",
+            "type": "point_light",
+            "pos": [55745.0, 28673.0],
+            "color": [255, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (67)",
+            "type": "point_light",
+            "pos": [54335.0, 27711.0],
+            "color": [254, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (68)",
+            "type": "point_light",
+            "pos": [53249.0, 29119.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (69)",
+            "type": "point_light",
+            "pos": [52929.0, 27777.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (70)",
+            "type": "point_light",
+            "pos": [57151.0, 29057.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (71)",
+            "type": "point_light",
+            "pos": [56767.0, 27713.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
             "id": "force_grenade",
             "type": "force_grenade",
             "pos": [16947.0, 22121.0]
@@ -5061,6 +5537,23 @@
             "pos": [31979.998046875, 29204.0]
         },
         {
+            "id": "planted1",
+            "type": "bomb",
+            "pos": [53979.00390625, 27876.998046875],
+            "rotation": -30.000001907348633
+        },
+        {
+            "id": "planted2",
+            "type": "bomb",
+            "pos": [55195.0, 28900.998046875],
+            "rotation": 60.000003814697266
+        },
+        {
+            "id": "carrier_bomb",
+            "type": "bomb",
+            "pos": [56980.0, 27884.0]
+        },
+        {
             "id": "fury_thrower",
             "type": "fury_thrower",
             "pos": [38400.0, 12870.0]
@@ -5363,6 +5856,21 @@
             "rotation": -180.0
         },
         {
+            "id": "electric_rapier (4)",
+            "type": "electric_rapier",
+            "pos": [52844.0, 28488.0]
+        },
+        {
+            "id": "electric_rapier (5)",
+            "type": "electric_rapier",
+            "pos": [52844.0, 28551.998046875]
+        },
+        {
+            "id": "electric_rapier (6)",
+            "type": "electric_rapier",
+            "pos": [31251.998046875, 28744.0]
+        },
+        {
             "id": "baka47_magazine (1)",
             "type": "baka47_magazine",
             "pos": [1498.0, 43977.0]
@@ -5525,10 +6033,25 @@
             "pos": [16856.0, 28407.0]
         },
         {
+            "id": "galilea",
+            "type": "galilea",
+            "pos": [52925.0, 28409.0]
+        },
+        {
+            "id": "bulwark",
+            "type": "bulwark",
+            "pos": [53034.00390625, 28489.001953125]
+        },
+        {
             "id": "metropolis_backpack",
             "type": "metropolis_backpack",
             "pos": [25349.0, -2682.0],
             "rotation": 90.0
+        },
+        {
+            "id": "defuse_kit",
+            "type": "defuse_kit",
+            "pos": [54519.0, 27929.998046875]
         },
         {
             "id": "team_spawn (16)",
@@ -5548,7 +6071,7 @@
             "id": "team_spawn (1)",
             "type": "team_spawn",
             "faction": "METROPOLIS",
-            "pos": [35583.0, 28289.0]
+            "pos": [51585.0, 28671.0]
         },
         {
             "id": "kill2 (1)",
@@ -5864,7 +6387,55 @@
             "id": "kill19",
             "type": "team_spawn",
             "pos": [31361.0, 28031.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill21 (1)",
+            "type": "team_spawn",
+            "pos": [55103.0, 28991.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "kill20 (1)",
+            "type": "team_spawn",
+            "pos": [53889.0, 27905.0],
             "rotation": -180.0
+        },
+        {
+            "id": "kill20",
+            "type": "team_spawn",
+            "pos": [53951.0, 28159.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill21",
+            "type": "team_spawn",
+            "pos": [55388.0, 28754.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "kill21 (2)",
+            "type": "team_spawn",
+            "pos": [55681.0, 28863.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "carrier",
+            "type": "team_spawn",
+            "pos": [56961.0, 27903.0],
+            "rotation": -120.0
+        },
+        {
+            "id": "kill19 (1)",
+            "type": "team_spawn",
+            "pos": [31103.0, 27969.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill19 (2)",
+            "type": "team_spawn",
+            "pos": [31105.0, 28223.0],
+            "rotation": 90.0
         },
         {
             "id": "exit0",
@@ -8088,9 +8659,9 @@
                 "bullets": false
             },
             "reacts_to_factions": {
-                "resistance": false
+                "metropolis": false
             },
-            "portal_exit": "entry11",
+            "portal_exit": "entry15",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -8119,12 +8690,12 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "As a Resistance soldier, your task will often be to plant the bomb.\nIf you can't do it within the time limit, Metropolis wins the round."
+            "context_tip": "When playing Resistance, you must detonate the bomb to win.\nIf you can't plant it within the time limit, you lose the round."
         },
         {
             "id": "entry14",
             "type": "portal",
-            "pos": [36192.0, 28544.0],
+            "pos": [35968.0, 28544.0],
             "rotation": -180.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -8169,7 +8740,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "There is usually more than one bombsite - named A, B and C.\nDetonating any single one wins the round for Resistance."
+            "context_tip": "Often, there is more than one bombsite - named A, B and C.\nDetonating any single one wins the round for Resistance."
         },
         {
             "id": "bombsite (1)",
@@ -8218,7 +8789,238 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "First, enter the bombsite - it's always marked with red lines.\nIt's likely heavily defended by enemy players."
+            "context_tip": "First, enter the bombsite - it's always marked with red lines.\nIt's usually defended by Metropolis players."
+        },
+        {
+            "id": "exit16",
+            "type": "portal",
+            "pos": [58048.0, 28480.001953125],
+            "rotation": -180.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry11",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "bombsite (2)",
+            "type": "bombsite",
+            "letter": "B",
+            "pos": [55360.0, 28864.0],
+            "size": [768, 384]
+        },
+        {
+            "id": "bombsite (3)",
+            "type": "bombsite",
+            "pos": [53760.0, 27968.0],
+            "size": [512, 384]
+        },
+        {
+            "id": "tip3_1 (46)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [54528.0078125, 28288.0],
+            "rotation": -180.0,
+            "size": [512, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Quick! Grab the Defuse kit.\nIt will let you defuse TWICE as fast!"
+        },
+        {
+            "id": "tip3_1 (48)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [51712.0, 28416.0],
+            "size": [2048, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Quick! Retake the bombsite and defuse the bomb!"
+        },
+        {
+            "id": "entry15",
+            "type": "portal",
+            "pos": [50976.0, 28416.0],
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (45)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [53248.01171875, 28416.0],
+            "rotation": -180.0,
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Kill the terrorists first!"
+        },
+        {
+            "id": "tip3_1 (47)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [54015.99609375, 28416.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Another bomb's already ticking!"
+        },
+        {
+            "id": "tip3_1 (49)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [56192.01171875, 28416.0],
+            "rotation": -180.0,
+            "size": [512, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You did well! Good job!"
+        },
+        {
+            "id": "tip3_1 (50)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [56960.0078125, 28416.0],
+            "rotation": -180.0,
+            "size": [512, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "When you kill the enemy carrying the bomb,\nyou can steal it and run away! Try it!"
+        },
+        {
+            "id": "tip3_1 (51)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [32768.0, 28992.001953125],
+            "size": [512, 384],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Avoid the explosion! Take cover!"
+        },
+        {
+            "id": "tip3_1 (52)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [31232.0, 28928.0],
+            "size": [768, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Guess what - you can toss knives and nades while planting!\nTry it out!"
         }
     ]
 }

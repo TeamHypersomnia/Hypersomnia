@@ -9,6 +9,7 @@
 #include "game/detail/bombsite_in_range.h"
 #include "game/messages/battle_event_message.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "augs/log.h"
 
 template <class E>
 struct stepless_fuse_logic_provider {
@@ -66,6 +67,14 @@ struct stepless_fuse_logic_provider {
 
 	void defuse() const {
 		fuse.when_armed = {};
+	}
+
+	bool defused() const {
+		return fuse.defused();
+	}
+
+	bool armed() const {
+		return fuse.armed();
 	}
 
 	void start_arming() const {
@@ -188,32 +197,40 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 		base(fused_entity), step(step) 
 	{}
 
-	void arm_explosive(const arming_source_type source_type) const {
-		if (::arm_explosive_cooldown_passed(holder)) {
-			auto& transfers = holder.template get<components::item_slot_transfers>();
-			transfers.when_last_armed_explosive = clk.now;
-		}
-		else {
-			return;
+	void arm_explosive(const arming_source_type source_type, bool play_sound = true) const {
+		if (holder) {
+			if (::arm_explosive_cooldown_passed(holder)) {
+				auto& transfers = holder.template get<components::item_slot_transfers>();
+				transfers.when_last_armed_explosive = clk.now;
+			}
+			else {
+				return;
+			}
 		}
 
 		fuse.arming_source = source_type;
 		fuse.when_armed = clk.now;
 		fuse.slot_when_armed = fused_entity.get_current_slot().get_type();
 
-		fused_entity.template get<components::sender>().set(holder);
+		if (holder) {
+			fused_entity.template get<components::sender>().set(holder);
+		}
 
-		fuse_def.armed_sound.start(
-			step,
-			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
-			predictable_only_by(holder)
-		);
+		if (play_sound) {
+			fuse_def.armed_sound.start(
+				step,
+				sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
+				predictable_only_by(holder)
+			);
+		}
 
 		if (fuse_def.always_release_when_armed) {
-			release_explosive();
+			release_explosive(play_sound);
 
-			if (const auto sentience = holder.template find<components::sentience>()) {
-				sentience->hand_flags = {};
+			if (holder) {
+				if (const auto sentience = holder.template find<components::sentience>()) {
+					sentience->hand_flags = {};
+				}
 			}
 		}
 	}
@@ -228,42 +245,49 @@ struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
 		fuse.amount_defused = -1.f;
 	}
 
-	void release_explosive() const {
+	void release_explosive(const bool play_sound = true) const {
 		// const auto& explosive = fused_entity.template get<invariants::explosive>();
 
-		const auto total_impulse = [&]() {
-			if (const auto capability = holder.template find<invariants::item_slot_transfers>()) {
-				if (fuse.arming_source == arming_source_type::SHOOT_SECONDARY_INTENT) {
-					return capability->standard_drop_impulse + fuse_def.additional_secondary_release_impulse;
+		if (holder) {
+			const auto total_impulse = [&]() {
+				if (const auto capability = holder.template find<invariants::item_slot_transfers>()) {
+					if (fuse.arming_source == arming_source_type::SHOOT_SECONDARY_INTENT) {
+						return capability->standard_drop_impulse + fuse_def.additional_secondary_release_impulse;
+					}
+
+					return capability->standard_throw_impulse + fuse_def.additional_release_impulse;
 				}
 
-				return capability->standard_throw_impulse + fuse_def.additional_release_impulse;
+				return impulse_mults();
+			}();
+
+			auto request = item_slot_transfer_request::drop(fused_entity, total_impulse);
+			request.params.apply_standard_impulse = false;
+
+			if (fuse_def.override_release_impulse) {
+				/* True for the bomb so it never gets thrown. */
+				request.params.additional_drop_impulse = fuse_def.additional_release_impulse;
 			}
 
-			return impulse_mults();
-		}();
+			/* 
+				Note that the dropping transfer will effectively reinfer
+				the colliders and the rigid body of the explosive,
+				so no further refreshing is required.
+			*/
 
-		auto request = item_slot_transfer_request::drop(fused_entity, total_impulse);
-		request.params.apply_standard_impulse = false;
-
-		if (fuse_def.override_release_impulse) {
-			/* True for the bomb so it never gets thrown. */
-			request.params.additional_drop_impulse = fuse_def.additional_release_impulse;
+			perform_transfer(request, step);
+		}
+		else {
+			refresh_fused_physics();
 		}
 
-		/* 
-			Note that the dropping transfer will effectively reinfer
-			the colliders and the rigid body of the explosive,
-			so no further refreshing is required.
-		*/
-
-		perform_transfer(request, step);
-
-		fuse_def.release_sound.start(
-			step,
-			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
-			predictable_only_by(holder)
-		);
+		if (play_sound) {
+			fuse_def.release_sound.start(
+				step,
+				sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
+				predictable_only_by(holder)
+			);
+		}
 	}
 
 	void interrupt_arming() const {

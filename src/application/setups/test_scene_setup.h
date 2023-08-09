@@ -68,6 +68,8 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	test_scene_type type;
 
 	tutorial_state tutorial;
+	bool should_init_level = false;
+	float restart_arena_in_ms = -1;
 
 	std::unordered_map<std::string, entity_id> opponents;
 	bool restart_requested = false;
