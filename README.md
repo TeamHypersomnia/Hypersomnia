@@ -83,7 +83,7 @@ Declare allegiance to one of the three factions whose apple of discord is a disp
 
 **Metropolis. Atlantis. Resistance.**
 
-Will you take revenge for an unethical simulation of the inferior universe?
+Will you take revenge for the unethical simulation of an inferior universe?
 Will you support the cruel experiments to win total control over metempsychosis? 
 Or will you join the underground civilization that awaits the end of war in this dangerous afterlife reality?
 

@@ -237,7 +237,7 @@ inline void draw_context_tip(
 				}
 			}
 			else {
-				return do_text("You cannot plant the bomb here.\nFind the bombsite!");
+				return do_text("You cannot plant the bomb here.\nFind the bombsite! It's marked with red lines.");
 			}
 		}
 

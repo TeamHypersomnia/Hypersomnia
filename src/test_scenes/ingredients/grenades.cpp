@@ -51,8 +51,13 @@ namespace test_flavours {
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
 				fuse.additional_secondary_release_impulse.linear = 2000.f;
-				fuse.fuse_delay_ms = 1200.f;
 
+				meta.set(fuse);
+			}
+
+			{
+				components::hand_fuse fuse;
+				fuse.fuse_delay_ms = 1200.f;
 				meta.set(fuse);
 			}
 
@@ -139,8 +144,13 @@ namespace test_flavours {
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
 				fuse.additional_secondary_release_impulse.linear = 2000.f;
-				fuse.fuse_delay_ms = 800.f;
 
+				meta.set(fuse);
+			}
+
+			{
+				components::hand_fuse fuse;
+				fuse.fuse_delay_ms = 800.f;
 				meta.set(fuse);
 			}
 
@@ -224,8 +234,13 @@ namespace test_flavours {
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::FLASHBANG);
 				fuse.additional_release_impulse.linear = 3000.f;
 				fuse.additional_secondary_release_impulse.linear = 2000.f;
-				fuse.fuse_delay_ms = 800.f;
 
+				meta.set(fuse);
+			}
+
+			{
+				components::hand_fuse fuse;
+				fuse.fuse_delay_ms = 800.f;
 				meta.set(fuse);
 			}
 
@@ -278,6 +293,12 @@ namespace test_flavours {
 				fuse.additional_release_impulse.linear = 3000.f;
 				fuse.additional_secondary_release_impulse.linear = 2000.f;
 
+				meta.set(fuse);
+			}
+
+			{
+				components::hand_fuse fuse;
+				fuse.fuse_delay_ms = 800.f;
 				meta.set(fuse);
 			}
 
@@ -496,6 +517,12 @@ namespace test_flavours {
 
 			meta.set(item);
 
+			{
+				components::hand_fuse fuse;
+				fuse.fuse_delay_ms = 35000.f;
+				meta.set(fuse);
+			}
+
 			invariants::hand_fuse fuse; 
 			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
@@ -506,7 +533,6 @@ namespace test_flavours {
 			fuse.fuse_delay_ms = 35000.f;
 			fuse.set_bomb_vars(1500.f, 10000.f);
 #else
-			fuse.fuse_delay_ms = 35000.f;
 			fuse.set_bomb_vars(2500.f, 8000.f);
 #endif
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);

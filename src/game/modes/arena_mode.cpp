@@ -2873,12 +2873,11 @@ real32 arena_mode::get_critical_seconds_left(const const_input_type in) const {
 			return -1.f;
 		}
 		else {
-			const auto& fuse_def = typed_bomb.template get<invariants::hand_fuse>();
 			const auto& fuse = typed_bomb.template get<components::hand_fuse>();
 
 			const auto when_armed = fuse.when_armed;
 
-			return clk.get_remaining_secs(fuse_def.fuse_delay_ms, when_armed);
+			return clk.get_remaining_secs(fuse.fuse_delay_ms, when_armed);
 		}
 	});
 }

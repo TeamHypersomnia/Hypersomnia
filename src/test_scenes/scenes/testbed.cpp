@@ -62,7 +62,7 @@ static void report_explosive(const auto enum_id, H handle) {
 
 	auto& item = handle.template get<invariants::item>();
 	auto& explosive = handle.template get<invariants::explosive>();
-	auto& fuse = handle.template get<invariants::hand_fuse>();
+	auto& fuse = handle.template get<components::hand_fuse>();
 
 	json_explosive_entry entry;
 

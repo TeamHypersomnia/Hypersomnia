@@ -2,6 +2,7 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/inventory/item_mounting.hpp"
 #include "game/detail/weapon_like.h"
+#include "game/detail/explosive/like_explosive.h"
 
 template <class E>
 template <class F>
@@ -138,7 +139,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 	};
 
 	{
-		if (::is_weapon_like(picked_item)) {
+		if (::is_weapon_like(picked_item) && !::is_like_plantable_bomb(picked_item)) {
 			/* If it is a weapon, try to hold them in hands before trying containers. */
 
 			const auto& searched_root_container = *static_cast<const E*>(this);

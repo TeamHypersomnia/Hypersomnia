@@ -171,14 +171,26 @@ void test_scene_setup::restart_mode() {
 	const bool is_akimbo_level = tutorial.level == 5;
 	const bool is_duals_level = tutorial.level == 6;
 	const bool is_ricochets_level = tutorial.level == 8;
+	const bool is_planting_level = tutorial.level == 14;
 	const bool is_try_throwing_reloading_level = tutorial.level == 10 || tutorial.level == 13;
+
+	const auto player_faction = is_planting_level ? faction_type::RESISTANCE : faction_type::METROPOLIS;
+	const auto enemy_faction  = player_faction == faction_type::METROPOLIS ? faction_type::RESISTANCE : faction_type::METROPOLIS;
+
+	if (is_planting_level) {
+		auto b1 = to_handle("bomb1");
+		auto b2 = to_handle("bomb2");
+
+		b1.template get<components::hand_fuse>().fuse_delay_ms = 2000;
+		b2.template get<components::hand_fuse>().fuse_delay_ms = 2000;
+	}
 
 	get_arena_handle().on_mode_with_input(
 		[&]<typename M>(M& mode, const auto& input) {
 			if constexpr(std::is_same_v<test_mode, M>) {
 				for (auto& p : project.nodes.template get_pool_for<editor_point_marker_node>()) {
 					if (p.editable.faction == faction_type::RESISTANCE) {
-						const auto new_id = mode.add_player(input, nickname, faction_type::RESISTANCE);
+						const auto new_id = mode.add_player(input, nickname, enemy_faction);
 						mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
 						mode.find(new_id)->hide_in_scoreboard = true;
 						const auto opponent_id = mode.find(new_id)->controlled_character_id;
@@ -192,7 +204,7 @@ void test_scene_setup::restart_mode() {
 					}
 				}
 
-				local_player_id = mode.add_player(input, nickname, faction_type::METROPOLIS);
+				local_player_id = mode.add_player(input, nickname, player_faction);
 				viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
 
 				const auto new_id = local_player_id;
@@ -267,6 +279,16 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 
 	}
 
+	auto& cosm = scene.world;
+
+	const bool is_planting_level = tutorial.level == 14;
+
+	if (is_planting_level) {
+		if (auto armor = cosm[viewed_character_id][slot_function::TORSO_ARMOR].get_item_if_any()) {
+			step.queue_deletion_of(armor, "disable armor");
+		}
+	}
+
 	for (int i = 1;; ++i) {
 		if (!exists(i, 0)) {
 			break;
@@ -278,7 +300,7 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 
 		while (exists(i, j)) {
 			if (!killed(i, j)) {
-				if (const auto disable_armor = i == 14 || i == 16) {
+				if (const auto disable_armor = i == 14 || i == 16 || i == 18 || i == 19) {
 					if (auto handle = to_handle(get_opp(i, j))) {
 						if (auto armor = handle[slot_function::TORSO_ARMOR].get_item_if_any()) {
 							step.queue_deletion_of(armor, "disable armor");

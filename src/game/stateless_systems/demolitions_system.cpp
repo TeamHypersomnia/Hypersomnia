@@ -56,9 +56,8 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 				}
 
 				const auto when_armed = fuse.when_armed;
-				const auto& fuse_def = it.template get<invariants::hand_fuse>();
 
-				if (clk.is_ready(fuse_def.fuse_delay_ms, when_armed)) {
+				if (clk.is_ready(fuse.fuse_delay_ms, when_armed)) {
 					detonate_if(it, step);
 				}
 			}

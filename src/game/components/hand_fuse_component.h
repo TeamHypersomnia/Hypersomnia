@@ -7,8 +7,6 @@
 #include "game/enums/slot_function.h"
 #include "game/enums/faction_type.h"
 
-// TODO: Fix those byte-sized enums finally in introspector generator
-
 namespace components {
 	struct hand_fuse {
 		enum arming_source_type {
@@ -20,6 +18,7 @@ namespace components {
 		};
 
 		// GEN INTROSPECTOR struct components::hand_fuse
+		real32 fuse_delay_ms = 800.f;
 		augs::stepped_timestamp when_armed;
 
 		real32 amount_defused = -1.f;
@@ -45,8 +44,6 @@ using arming_source_type = components::hand_fuse::arming_source_type;
 namespace invariants {
 	struct hand_fuse {
 		// GEN INTROSPECTOR struct invariants::hand_fuse
-		real32 fuse_delay_ms = 800.f;
-
 		bool can_only_arm_at_bombsites = false;
 		bool always_release_when_armed = false;
 		bool must_stand_still_to_arm = false;

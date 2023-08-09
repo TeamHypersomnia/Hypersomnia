@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- H shouldnt register another wielding setup when hands are already bare
+
 - Tutorial levels
     - Planting/defusing bomb?
     - Spells but maybe just preliminary

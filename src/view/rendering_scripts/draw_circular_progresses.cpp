@@ -115,7 +115,7 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 			if (fuse.armed()) {
 				const auto highlight_amount = static_cast<float>(1 - (
 					(global_time_seconds - fuse.when_armed.in_seconds(dt))
-					/ (fuse_def.fuse_delay_ms / 1000.f) 
+					/ (fuse.fuse_delay_ms / 1000.f) 
 				));
 
 				if (fuse_def.has_delayed_arming()) {
