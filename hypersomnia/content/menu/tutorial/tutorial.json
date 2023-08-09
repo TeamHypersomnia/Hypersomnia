@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-09 20:30:18.831103 UTC"
+        "version_timestamp": "2023-08-09 20:54:51.343768 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -419,7 +419,6 @@
         },
         {
             "id": "Level13",
-            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (18)",
                 "exit13",
@@ -692,7 +691,6 @@
         },
         {
             "id": "Level11",
-            "is_open_in_editor": false,
             "nodes": [
                 "electric_rapier (3)-right-up-up",
                 "electric_rapier (2)-right-up-up",
@@ -757,7 +755,6 @@
         },
         {
             "id": "Level10",
-            "is_open_in_editor": false,
             "nodes": [
                 "exit10",
                 "obs11 (4)",
@@ -797,7 +794,6 @@
         },
         {
             "id": "Level9",
-            "is_open_in_editor": false,
             "nodes": [
                 "yellow_dagger (5)",
                 "yellow_dagger (4)",
@@ -868,7 +864,6 @@
         },
         {
             "id": "Level8",
-            "is_open_in_editor": false,
             "nodes": [
                 "obs6 (4)",
                 "obs6 (5)",
@@ -926,7 +921,6 @@
         },
         {
             "id": "Level7",
-            "is_open_in_editor": false,
             "nodes": [
                 "metropolis_backpack",
                 "awka (1)",
@@ -989,7 +983,6 @@
         },
         {
             "id": "Level5",
-            "is_open_in_editor": false,
             "nodes": [
                 "obs4 (2)",
                 "obs4",
@@ -1026,7 +1019,6 @@
         },
         {
             "id": "Level4",
-            "is_open_in_editor": false,
             "nodes": [
                 "kek9_magazine",
                 "kek9_magazine (2)",
@@ -1157,7 +1149,6 @@
         },
         {
             "id": "Level3",
-            "is_open_in_editor": false,
             "nodes": [
                 "hazard (6)",
                 "tip3_1",
@@ -1183,7 +1174,6 @@
         },
         {
             "id": "Level2",
-            "is_open_in_editor": false,
             "nodes": [
                 "point_light (3)",
                 "point_light (2)",
@@ -1247,7 +1237,6 @@
         },
         {
             "id": "Level0",
-            "is_open_in_editor": false,
             "nodes": [
                 "tip0_2 (3)",
                 "tip0_2 (1)",
@@ -1376,21 +1365,21 @@
         {
             "id": "vent (3)",
             "type": "@materials/vent.png",
-            "pos": [-0.000004196293048153166, 10688.0],
+            "pos": [-0.000004196293048153166, 10943.9990234375],
             "rotation": 90.0,
             "size": [384, 2304]
         },
         {
             "id": "vent (4)",
             "type": "@materials/vent.png",
-            "pos": [960.0000610351563, 7808.0],
-            "size": [384, 5376]
+            "pos": [960.0000610351563, 7936.0],
+            "size": [384, 5632]
         },
         {
             "id": "vent (5)",
             "type": "@materials/vent.png",
-            "pos": [-960.0000610351563, 7808.0],
-            "size": [384, 5376]
+            "pos": [-960.0000610351563, 7936.0],
+            "size": [384, 5632]
         },
         {
             "id": "dev_floor_256 (3)",
@@ -1402,8 +1391,8 @@
         {
             "id": "dev_floor_256 (4)",
             "type": "dev_floor_256",
-            "pos": [0.0, 9472.0],
-            "size": [1536, 2048],
+            "pos": [0.0, 9600.0],
+            "size": [1536, 2304],
             "color": [0, 255, 0, 255]
         },
         {
@@ -1608,7 +1597,7 @@
         {
             "id": "vent (16)",
             "type": "@materials/vent.png",
-            "pos": [0.0, 28607.998046875],
+            "pos": [0.0, 28608.001953125],
             "rotation": 90.0,
             "size": [384, 2304]
         },
@@ -1680,27 +1669,27 @@
         {
             "id": "vent (22)",
             "type": "@materials/vent.png",
-            "pos": [-128.0, 47359.99609375],
+            "pos": [-128.0, 47615.99609375],
             "rotation": 90.0,
             "size": [384, 2304]
         },
         {
             "id": "vent (24)",
             "type": "@materials/vent.png",
-            "pos": [832.0, 46112.0],
-            "size": [384, 2112]
+            "pos": [832.0, 46240.0],
+            "size": [384, 2368]
         },
         {
             "id": "vent (25)",
             "type": "@materials/vent.png",
-            "pos": [-1088.0, 45216.0],
-            "size": [384, 3904]
+            "pos": [-1088.0, 45344.0],
+            "size": [384, 4160]
         },
         {
             "id": "dev_floor_256 (21)",
             "type": "dev_floor_256",
-            "pos": [-128.0, 46272.0],
-            "size": [1536, 1792],
+            "pos": [-128.0, 46400.0],
+            "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
@@ -1712,8 +1701,8 @@
         {
             "id": "floor_bottom (4)",
             "type": "@water_room_floor_2",
-            "pos": [4032.0, 48000.0],
-            "size": [18560, 2048]
+            "pos": [4032.0, 48384.0],
+            "size": [18560, 2816]
         },
         {
             "id": "floor_right (9)",
@@ -2180,8 +2169,7 @@
             "id": "dev_floor_256 (42)",
             "type": "dev_floor_256",
             "pos": [24064.0, 9472.0],
-            "rotation": -90.0,
-            "size": [1280, 2048],
+            "size": [2048, 1280],
             "color": [0, 255, 0, 255]
         },
         {
@@ -3092,16 +3080,14 @@
             "id": "dev_floor_256 (79)",
             "type": "dev_floor_256",
             "pos": [15680.0, 28416.0],
-            "rotation": 90.0,
-            "size": [1536, 2048],
+            "size": [2048, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (80)",
             "type": "dev_floor_256",
             "pos": [17408.0, 28416.0],
-            "rotation": 90.0,
-            "size": [1536, 256],
+            "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
@@ -3252,8 +3238,7 @@
             "id": "dev_floor_256 (83)",
             "type": "dev_floor_256",
             "pos": [35456.0, 28544.0],
-            "rotation": -90.0,
-            "size": [1536, 2048],
+            "size": [2048, 1536],
             "color": [0, 255, 0, 255],
             "flip_horizontally": true
         },
@@ -3418,7 +3403,6 @@
             "id": "dev_floor_256 (87)",
             "type": "dev_floor_256",
             "pos": [54528.0, 28288.0],
-            "rotation": 90.0,
             "size": [512, 512],
             "color": [0, 255, 0, 255],
             "flip_horizontally": true
@@ -6582,7 +6566,6 @@
         {
             "id": "team_spawn (16)",
             "type": "team_spawn",
-            "active": false,
             "faction": "METROPOLIS",
             "pos": [1.0, 639.0],
             "rotation": -90.0
@@ -6967,8 +6950,9 @@
         {
             "id": "team_spawn (6)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
-            "pos": [42497.0, 51007.0]
+            "pos": [24257.0, 51327.0]
         },
         {
             "id": "kill22 (1)",
@@ -7149,7 +7133,7 @@
         {
             "id": "entry1",
             "type": "portal",
-            "pos": [-0.000095367431640625, 10239.9990234375],
+            "pos": [-0.000095367431640625, 10368.0],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -7193,7 +7177,7 @@
         {
             "id": "entry2",
             "type": "portal",
-            "pos": [-0.000095367431640625, 19200.0],
+            "pos": [-0.000095367431640625, 19072.0],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -7336,7 +7320,7 @@
         {
             "id": "entry3",
             "type": "portal",
-            "pos": [-0.000095367431640625, 28160.0],
+            "pos": [-0.000095367431640625, 28032.0],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -7412,7 +7396,7 @@
         {
             "id": "entry4",
             "type": "portal",
-            "pos": [-128.00009155273438, 46912.00390625],
+            "pos": [-128.00009155273438, 47040.00390625],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -7690,7 +7674,7 @@
         {
             "id": "entry5",
             "type": "portal",
-            "pos": [11456.0, 576.00048828125],
+            "pos": [11456.0, 448.0005187988281],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -7823,7 +7807,7 @@
         {
             "id": "entry6",
             "type": "portal",
-            "pos": [19072.0, 544.00048828125],
+            "pos": [19072.0, 448.00048828125],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -8059,7 +8043,7 @@
         {
             "id": "entry8",
             "type": "portal",
-            "pos": [24832.0, 9343.9990234375],
+            "pos": [24704.0, 9471.9990234375],
             "rotation": -180.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -8234,7 +8218,7 @@
         {
             "id": "entry7",
             "type": "portal",
-            "pos": [25344.0, 736.00048828125],
+            "pos": [25344.0, 640.00048828125],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -8449,7 +8433,7 @@
         {
             "id": "entry9",
             "type": "portal",
-            "pos": [38400.0, 14752.0],
+            "pos": [38400.0, 14656.0],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -8596,12 +8580,12 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "You can toss knives in ANY situation. Even when reloading a gun!\nTry it out! {THROW_KNIFE} or {THROW_TWO_KNIVES}. This can save your life."
+            "context_tip": "You can toss knives in ANY situation. Even while reloading a gun!\nTry it out! {THROW_KNIFE} or {THROW_TWO_KNIVES}. This can save your life."
         },
         {
             "id": "entry10",
             "type": "portal",
-            "pos": [47424.0, 14880.0],
+            "pos": [47424.0, 14784.0],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -8738,7 +8722,7 @@
         {
             "id": "entry11",
             "type": "portal",
-            "pos": [57215.99609375, 13728.0],
+            "pos": [57215.99609375, 13631.9990234375],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -8997,7 +8981,7 @@
         {
             "id": "entry12",
             "type": "portal",
-            "pos": [14144.0, 22656.0],
+            "pos": [13888.0, 22656.0],
             "color_preset": "GREEN",
             "trampoline_like": true,
             "enter_time_ms": 0.0,
@@ -9124,7 +9108,7 @@
         {
             "id": "entry13",
             "type": "portal",
-            "pos": [14944.0, 28416.0],
+            "pos": [15039.9990234375, 28416.0],
             "color_preset": "GREEN",
             "trampoline_like": true,
             "enter_time_ms": 0.0,
@@ -9276,7 +9260,7 @@
         {
             "id": "entry14",
             "type": "portal",
-            "pos": [35968.0, 28544.0],
+            "pos": [36096.0, 28544.0],
             "rotation": -180.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -9455,7 +9439,7 @@
         {
             "id": "entry15",
             "type": "portal",
-            "pos": [51328.00390625, 28416.0],
+            "pos": [51072.0, 28416.0],
             "color_preset": "GREEN",
             "trampoline_like": true,
             "enter_time_ms": 0.0,
@@ -9622,7 +9606,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Electric Armor makes Mana absorb all damage.\nIt is effectively a second HP bar."
+            "context_tip": "Electric Armor makes PE absorb all damage.\nIt is effectively a second HP bar."
         },
         {
             "id": "tip3_1 (55)",
@@ -9708,12 +9692,12 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "You can buy Spells.\nThey will drain Mana."
+            "context_tip": "You can cast Spells.\nThey consume PE (Personal Electricity)."
         },
         {
             "id": "entry16",
             "type": "portal",
-            "pos": [23808.0, 50944.0],
+            "pos": [23552.0, 50944.0],
             "color_preset": "GREEN",
             "trampoline_like": true,
             "enter_time_ms": 0.0,
@@ -9795,7 +9779,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Just like HP, Mana slowly regenerates.\nWithout enough Mana, spells appear grayed out."
+            "context_tip": "Just like HP, PE slowly regenerates.\nWithout enough PE, spells appear grayed out."
         },
         {
             "id": "tip3_1 (60)",
@@ -9928,7 +9912,7 @@
         {
             "id": "entry17",
             "type": "portal",
-            "pos": [41984.0, 50816.0],
+            "pos": [41728.0, 50816.0],
             "color_preset": "GREEN",
             "trampoline_like": true,
             "enter_time_ms": 0.0,
