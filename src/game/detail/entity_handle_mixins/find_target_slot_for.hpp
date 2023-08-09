@@ -149,12 +149,6 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 				std::swap(finding_order.front(), finding_order.back());
 			}
 		}
-
-		if (::is_armor_like(picked_item)) {
-			/* If it is an armor, try to hold them in hands before trying containers. */
-
-			std::swap(finding_order.front(), finding_order.back());
-		}
 	}
 
 	return find_slot_for(picked_item, finding_order, opts);

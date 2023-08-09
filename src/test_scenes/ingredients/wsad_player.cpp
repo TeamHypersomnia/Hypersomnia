@@ -231,8 +231,6 @@ namespace test_flavours {
 					slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
 					slot_def.always_allow_exactly_one_item = true;
 					slot_def.space_available = to_space_units("1000");
-					slot_def.mounting_duration_ms = 1000.f;
-					slot_def.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 					container.slots[slot_function::TORSO_ARMOR] = slot_def;
 				}
 

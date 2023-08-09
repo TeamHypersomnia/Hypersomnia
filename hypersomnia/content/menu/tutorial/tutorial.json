@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-09 18:02:33.700379 UTC"
+        "version_timestamp": "2023-08-09 19:44:13.347135 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -234,16 +234,11 @@
     ],
     "layers": [
         {
-            "id": "Layer 1",
+            "id": "Level15",
             "nodes": [
                 "electric_rapier (5)",
                 "electric_rapier (4)",
-                "bulwark"
-            ]
-        },
-        {
-            "id": "Level15",
-            "nodes": [
+                "bulwark",
                 "floor_right (21)",
                 "exit16",
                 "galilea",
@@ -274,6 +269,7 @@
                 "hard_wooden_wall (31)",
                 "hard_wooden_wall (32)",
                 "hard_wooden_wall (41)",
+                "hard_wooden_wall (42)",
                 "hard_wooden_wall (40)",
                 "hard_wooden_wall (39)",
                 "hard_wooden_wall (33)",
@@ -285,11 +281,13 @@
                 "asite (1)",
                 "dev_floor_256 (88)",
                 "dev_floor_256 (86)",
+                "team_spawn (6)",
                 "dev_floor_256 (91)",
                 "dev_floor_256 (90)",
                 "dev_floor_256 (87)",
                 "dev_floor_256 (89)",
                 "Strong lamp (56)",
+                "Strong lamp (63)",
                 "Strong lamp (67)",
                 "Strong lamp (65)",
                 "Strong lamp (60)",
@@ -297,11 +295,10 @@
                 "Strong lamp (61)",
                 "Strong lamp (69)",
                 "Strong lamp (68)",
+                "Strong lamp (64)",
                 "Strong lamp (71)",
                 "Strong lamp (70)",
-                "Strong lamp (62)",
-                "Strong lamp (63)",
-                "Strong lamp (64)"
+                "Strong lamp (62)"
             ]
         },
         {
@@ -584,6 +581,8 @@
                 "kill16",
                 "kill16 (1)",
                 "kill16 (2)",
+                "tip3_1 (55)",
+                "tip3_1 (53)",
                 "tip3_1 (33)",
                 "tip3_1 (31)",
                 "entry12",
@@ -591,7 +590,10 @@
                 "hard_wooden_wall (21)",
                 "hard_wooden_wall (22)",
                 "hard_wooden_wall (23)",
+                "dev_floor_256 (95)",
+                "dev_floor_256 (93)",
                 "dev_floor_256 (74)",
+                "electric_armor",
                 "dev_floor_256 (73)",
                 "Strong lamp (32)",
                 "Strong lamp (41)",
@@ -611,9 +613,9 @@
                 "Strong lamp (46)",
                 "Strong lamp (40)",
                 "Strong lamp (28)",
+                "Strong lamp (27)",
                 "Strong lamp (26)",
-                "floor_top (8)",
-                "Strong lamp (27)"
+                "floor_top (8)"
             ]
         },
         {
@@ -888,7 +890,6 @@
         },
         {
             "id": "Level6",
-            "is_open_in_editor": false,
             "nodes": [
                 "hazard (7)",
                 "floor_right (14)",
@@ -916,7 +917,6 @@
         },
         {
             "id": "Level5",
-            "is_open_in_editor": false,
             "nodes": [
                 "obs4 (2)",
                 "obs4",
@@ -2863,28 +2863,28 @@
         {
             "id": "hard_wooden_wall (21)",
             "type": "hard_wooden_wall",
-            "pos": [14528.0009765625, 22656.001953125],
+            "pos": [13248.0029296875, 22656.001953125],
             "rotation": -180.0,
             "size": [512, 2560]
         },
         {
             "id": "hard_wooden_wall (22)",
             "type": "hard_wooden_wall",
-            "pos": [19776.0, 23680.0],
+            "pos": [19136.0, 23680.0],
             "rotation": 90.0,
-            "size": [512, 9984]
+            "size": [512, 11264]
         },
         {
             "id": "hard_wooden_wall (23)",
             "type": "hard_wooden_wall",
-            "pos": [19776.0, 21632.0],
+            "pos": [19136.0, 21632.0],
             "rotation": 90.0,
-            "size": [512, 9984]
+            "size": [512, 11264]
         },
         {
             "id": "dev_floor_256 (73)",
             "type": "dev_floor_256",
-            "pos": [15808.0, 22656.0],
+            "pos": [14528.0, 22656.0],
             "size": [2048, 1536],
             "color": [0, 255, 0, 255]
         },
@@ -2904,8 +2904,8 @@
         {
             "id": "floor_top (8)",
             "type": "@water_room_floor_2",
-            "pos": [40512.0, 22368.0],
-            "size": [55040, 7616]
+            "pos": [39552.0, 22304.0],
+            "size": [56960, 7616]
         },
         {
             "id": "obs16 (1)",
@@ -3274,8 +3274,8 @@
         {
             "id": "hard_wooden_wall (31)",
             "type": "hard_wooden_wall",
-            "pos": [58815.99609375, 28351.998046875],
-            "size": [384, 1408],
+            "pos": [58815.99609375, 28160.0],
+            "size": [384, 1792],
             "flip_horizontally": true
         },
         {
@@ -3309,9 +3309,9 @@
         {
             "id": "hard_wooden_wall (36)",
             "type": "hard_wooden_wall",
-            "pos": [54848.0, 27456.0],
+            "pos": [53696.00390625, 27584.001953125],
             "rotation": 90.0,
-            "size": [384, 8320],
+            "size": [128, 6016],
             "flip_horizontally": true
         },
         {
@@ -3393,16 +3393,16 @@
         {
             "id": "obs_carrier",
             "type": "@yellow_barrier",
-            "pos": [57344.0, 27776.0],
-            "size": [256, 256],
+            "pos": [57280.0, 27712.0],
+            "size": [128, 384],
             "flip_horizontally": true
         },
         {
             "id": "hard_wooden_wall (39)",
             "type": "hard_wooden_wall",
-            "pos": [56576.0, 28160.0],
+            "pos": [56576.0, 28288.0],
             "rotation": 90.0,
-            "size": [1024, 256]
+            "size": [1280, 256]
         },
         {
             "id": "hard_wooden_wall (40)",
@@ -3414,7 +3414,7 @@
         {
             "id": "dev_floor_256 (91)",
             "type": "dev_floor_256",
-            "pos": [56960.0, 28416.0],
+            "pos": [56960.0, 28672.0],
             "size": [512, 512],
             "color": [0, 255, 0, 255],
             "flip_horizontally": true
@@ -3434,6 +3434,27 @@
             "size": [256, 768],
             "color": [0, 255, 0, 255],
             "flip_horizontally": true
+        },
+        {
+            "id": "dev_floor_256 (93)",
+            "type": "dev_floor_256",
+            "pos": [15936.0, 22656.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (95)",
+            "type": "dev_floor_256",
+            "pos": [16576.0, 22656.0],
+            "size": [512, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "hard_wooden_wall (42)",
+            "type": "hard_wooden_wall",
+            "pos": [54655.9921875, 27135.99609375],
+            "rotation": -180.0,
+            "size": [8704, 768]
         },
         {
             "id": "Strong lamp (1)",
@@ -3969,38 +3990,6 @@
             "type": "point_light",
             "pos": [9921.0, 45247.0],
             "color": [255, 255, 0, 74]
-        },
-        {
-            "id": "Strong lamp (26)",
-            "type": "point_light",
-            "pos": [15711.0, 23553.0],
-            "color": [255, 0, 0, 94],
-            "falloff": {
-                "constant": 0.968999981880188,
-                "linear": 0.03100001811981201,
-                "radius": 752.2059936523438,
-                "strength": 12
-            },
-            "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
-            }
-        },
-        {
-            "id": "Strong lamp (27)",
-            "type": "point_light",
-            "pos": [15649.0, 21631.0],
-            "color": [255, 0, 0, 94],
-            "falloff": {
-                "constant": 0.968999981880188,
-                "linear": 0.03100001811981201,
-                "radius": 752.2059936523438,
-                "strength": 12
-            },
-            "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
-            }
         },
         {
             "id": "Strong lamp (28)",
@@ -4563,38 +4552,6 @@
             }
         },
         {
-            "id": "Strong lamp (63)",
-            "type": "point_light",
-            "pos": [51615.0, 27519.0],
-            "color": [80, 255, 0, 94],
-            "falloff": {
-                "constant": 0.968999981880188,
-                "linear": 0.03100001811981201,
-                "radius": 752.2059936523438,
-                "strength": 12
-            },
-            "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
-            }
-        },
-        {
-            "id": "Strong lamp (64)",
-            "type": "point_light",
-            "pos": [51553.0, 29441.0],
-            "color": [80, 255, 0, 94],
-            "falloff": {
-                "constant": 0.968999981880188,
-                "linear": 0.03100001811981201,
-                "radius": 752.2059936523438,
-                "strength": 12
-            },
-            "wall_falloff": {
-                "radius": 962.9630126953125,
-                "strength": 23
-            }
-        },
-        {
             "id": "Strong lamp (65)",
             "type": "point_light",
             "pos": [54119.0, 28247.0],
@@ -4693,7 +4650,71 @@
         {
             "id": "Strong lamp (71)",
             "type": "point_light",
-            "pos": [56767.0, 27713.0],
+            "pos": [56767.0, 27649.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (26)",
+            "type": "point_light",
+            "pos": [15679.0, 23361.0],
+            "color": [0, 249, 255, 61],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (27)",
+            "type": "point_light",
+            "pos": [15679.0, 21951.0],
+            "color": [0, 249, 255, 67],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (63)",
+            "type": "point_light",
+            "pos": [53953.0, 29119.0],
+            "color": [254, 0, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (64)",
+            "type": "point_light",
+            "pos": [58495.0, 27393.0],
             "color": [80, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -6054,6 +6075,11 @@
             "pos": [54519.0, 27929.998046875]
         },
         {
+            "id": "electric_armor",
+            "type": "electric_armor",
+            "pos": [15680.0, 22656.0]
+        },
+        {
             "id": "team_spawn (16)",
             "type": "team_spawn",
             "active": false,
@@ -6070,8 +6096,9 @@
         {
             "id": "team_spawn (1)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
-            "pos": [51585.0, 28671.0]
+            "pos": [14593.0, 22911.0]
         },
         {
             "id": "kill2 (1)",
@@ -6422,7 +6449,7 @@
         {
             "id": "carrier",
             "type": "team_spawn",
-            "pos": [56961.0, 27903.0],
+            "pos": [56959.0, 28223.0],
             "rotation": -120.0
         },
         {
@@ -6436,6 +6463,12 @@
             "type": "team_spawn",
             "pos": [31105.0, 28223.0],
             "rotation": 90.0
+        },
+        {
+            "id": "team_spawn (6)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [51519.0, 28415.0]
         },
         {
             "id": "exit0",
@@ -8396,7 +8429,7 @@
             "id": "tip3_1 (31)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [15808.0, 22656.0],
+            "pos": [14528.0, 22656.0],
             "size": [2048, 1536],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -8411,12 +8444,12 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Time to blow things up.\nPick up some grenades."
+            "context_tip": "Time to blow things up.\nBut first let's wear some protection."
         },
         {
             "id": "entry12",
             "type": "portal",
-            "pos": [15424.0009765625, 22656.0],
+            "pos": [14144.0, 22656.0],
             "color_preset": "GREEN",
             "trampoline_like": true,
             "enter_time_ms": 0.0,
@@ -8789,7 +8822,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "First, enter the bombsite - it's always marked with red lines.\nIt's usually defended by Metropolis players."
+            "context_tip": "First, enter the bombsite - it's always marked with red lines.\nIt is usually defended by Metropolis players."
         },
         {
             "id": "exit16",
@@ -8848,7 +8881,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Quick! Grab the Defuse kit.\nIt will let you defuse TWICE as fast!"
+            "context_tip": "Quick! Grab the Defuse kit.\nYou will defuse TWICE as fast!"
         },
         {
             "id": "tip3_1 (48)",
@@ -8874,7 +8907,7 @@
         {
             "id": "entry15",
             "type": "portal",
-            "pos": [50976.0, 28416.0],
+            "pos": [51328.00390625, 28416.0],
             "color_preset": "GREEN",
             "trampoline_like": true,
             "enter_time_ms": 0.0,
@@ -8962,7 +8995,7 @@
             "id": "tip3_1 (50)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [56960.0078125, 28416.0],
+            "pos": [56960.0078125, 28672.0],
             "rotation": -180.0,
             "size": [512, 512],
             "color_preset": "GREEN",
@@ -9021,6 +9054,48 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Guess what - you can toss knives and nades while planting!\nTry it out!"
+        },
+        {
+            "id": "tip3_1 (53)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [15936.0, 22656.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Electric Armor makes Mana absorb all damage.\nIt is effectively a second HP bar."
+        },
+        {
+            "id": "tip3_1 (55)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [16576.0, 22656.0],
+            "size": [512, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Cons? You walk a little slower and glow in the dark.\nOkay, let's pick up some grenades!"
         }
     ]
 }

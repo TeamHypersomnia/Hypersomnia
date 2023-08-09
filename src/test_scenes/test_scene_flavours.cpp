@@ -340,11 +340,11 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("5");
+			item.space_occupied_per_charge = to_space_units("50");
 			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::TORSO_ARMOR };
 			item.standard_price = static_cast<money_type>(1800);
 
-			meta.template get<invariants::fixtures>().density *= 2.f;
+			meta.template get<invariants::fixtures>().density *= 20.f;
 			meta.template get<invariants::fixtures>().restitution = 0.7f;
 
 			meta.set(item);

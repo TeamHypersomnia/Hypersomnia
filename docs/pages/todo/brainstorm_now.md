@@ -9,13 +9,13 @@ summary: That which we are brainstorming at the moment.
 - H shouldnt register another wielding setup when hands are already bare
 
 - Tutorial levels
-    - Planting/defusing bomb?
     - Spells but maybe just preliminary
         - Press haste, kill enemies with the triad etc.
     - Surfing
     - that's all, final portal goes to the shooting range
         - or maybe two portals for that?
 - Done
+    - Planting/defusing bomb?
     - Grenades
     - Walking
     - Ricochets
