@@ -178,6 +178,7 @@ void test_scene_setup::restart_mode() {
 	const bool is_try_throwing_reloading_level = tutorial.level == 10 || tutorial.level == 13;
 	const bool is_planting_level = tutorial.level == 14;
 	const bool is_defusing_level = tutorial.level == 15;
+	const bool is_offensive_spells_level = tutorial.level == 17;
 
 	const auto player_faction = is_planting_level ? faction_type::RESISTANCE : faction_type::METROPOLIS;
 	const auto enemy_faction  = player_faction == faction_type::METROPOLIS ? faction_type::RESISTANCE : faction_type::METROPOLIS;
@@ -232,6 +233,10 @@ void test_scene_setup::restart_mode() {
 
 				if (!is_tutorial() || is_akimbo_level || is_duals_level || is_ricochets_level || is_try_throwing_reloading_level || is_defusing_level) {
 					mode.infinite_ammo_for = viewed_character_id;
+				}
+
+				if (is_offensive_spells_level) {
+					cosm[viewed_character_id].get<components::sentience>().spells_drain_pe = false;
 				}
 			}
 			else {
@@ -387,7 +392,7 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 
 		while (exists(i, j)) {
 			if (!killed(i, j)) {
-				if (const auto disable_armor = i == 14 || i == 16 || i == 18 || i == 19) {
+				if (const auto disable_armor = i == 14 || i == 16 || i == 18 || i == 19 || i == 22 || i == 23 || i == 24) {
 					if (auto handle = to_handle(get_opp(i, j))) {
 						if (auto armor = handle[slot_function::TORSO_ARMOR].get_item_if_any()) {
 							step.queue_deletion_of(armor, "disable armor");

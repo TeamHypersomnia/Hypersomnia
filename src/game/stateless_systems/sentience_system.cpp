@@ -108,7 +108,10 @@ void sentience_system::cast_spells(const logic_step step) const {
 						sentience.currently_casted_spell = spell;
 						sentience.time_of_last_spell_cast = now;
 
-						personal_electricity.value -= common.personal_electricity_required;
+						if (sentience.spells_drain_pe) {
+							personal_electricity.value -= common.personal_electricity_required;
+						}
+
 						sentience.transform_when_spell_casted = subject.get_logic_transform();
 
 						spell_instance_data.cast_cooldown.set(

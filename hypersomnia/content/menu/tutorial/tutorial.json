@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-09 19:44:13.347135 UTC"
+        "version_timestamp": "2023-08-09 20:30:18.831103 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -22,6 +22,7 @@
                 "metropolis": {
                     "firearm": null,
                     "melee": null,
+                    "all_spells": true,
                     "backpack": false
                 },
                 "resistance": {
@@ -234,13 +235,83 @@
     ],
     "layers": [
         {
+            "id": "Level17",
+            "nodes": [
+                "obs23",
+                "obs24",
+                "obs22",
+                "kill24",
+                "kill23",
+                "kill23 (1)",
+                "kill23 (2)",
+                "kill23 (3)",
+                "kill22 (2)",
+                "kill22",
+                "kill22 (1)",
+                "exit17",
+                "tip3_1 (65)",
+                "tip3_1 (57)",
+                "blunaz",
+                "tip3_1 (61)",
+                "tip3_1 (62)",
+                "dev_floor_256 (102)",
+                "dev_floor_256 (97)",
+                "dev_floor_256 (106)",
+                "dev_floor_256 (103)",
+                "tip3_1 (63)",
+                "tip3_1 (64)",
+                "entry17",
+                "vent (61)",
+                "vent (62)",
+                "vent (63)",
+                "vent (64)",
+                "dev_floor_256 (104)",
+                "dev_floor_256 (105)",
+                "Strong lamp (75)",
+                "Strong lamp (79)",
+                "Strong lamp (80)",
+                "Strong lamp (81)",
+                "Strong lamp (82)",
+                "Strong lamp (83)"
+            ]
+        },
+        {
+            "id": "Level16",
+            "nodes": [
+                "dev_floor_256 (98)",
+                "hazard (11)",
+                "exit16",
+                "tip3_1 (60)",
+                "tip3_1 (59)",
+                "tip3_1 (58)",
+                "dev_floor_256 (101)",
+                "dev_floor_256 (100)",
+                "dev_floor_256 (99)",
+                "tip3_1 (54)",
+                "tip3_1 (56)",
+                "entry16",
+                "vent (53)",
+                "vent (54)",
+                "vent (59)",
+                "vent (60)",
+                "dev_floor_256 (94)",
+                "dev_floor_256 (96)",
+                "Strong lamp (72)",
+                "Strong lamp (73)",
+                "Strong lamp (74)",
+                "Strong lamp (76)",
+                "Strong lamp (77)",
+                "Strong lamp (78)"
+            ]
+        },
+        {
             "id": "Level15",
             "nodes": [
                 "electric_rapier (5)",
                 "electric_rapier (4)",
                 "bulwark",
                 "floor_right (21)",
-                "exit16",
+                "exit15",
                 "galilea",
                 "obs21",
                 "obs20",
@@ -348,6 +419,7 @@
         },
         {
             "id": "Level13",
+            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (18)",
                 "exit13",
@@ -917,6 +989,7 @@
         },
         {
             "id": "Level5",
+            "is_open_in_editor": false,
             "nodes": [
                 "obs4 (2)",
                 "obs4",
@@ -1149,7 +1222,6 @@
         },
         {
             "id": "Level1",
-            "is_open_in_editor": false,
             "nodes": [
                 "hazard (2)",
                 "tip1_1",
@@ -1175,6 +1247,7 @@
         },
         {
             "id": "Level0",
+            "is_open_in_editor": false,
             "nodes": [
                 "tip0_2 (3)",
                 "tip0_2 (1)",
@@ -1203,6 +1276,20 @@
                 "floor_bottom",
                 "floor_right",
                 "floor_left"
+            ]
+        },
+        {
+            "id": "Floors",
+            "nodes": [
+                "floor_bottom (8)",
+                "vent (70)",
+                "vent (69)",
+                "vent (68)",
+                "vent (67)",
+                "vent (66)",
+                "vent (65)",
+                "floor_left (8)",
+                "floor_top (9)"
             ]
         }
     ],
@@ -3457,6 +3544,222 @@
             "size": [8704, 768]
         },
         {
+            "id": "floor_bottom (8)",
+            "type": "@water_room_floor_2",
+            "pos": [45888.0, 55712.0],
+            "size": [54912, 5696]
+        },
+        {
+            "id": "floor_left (8)",
+            "type": "@water_room_floor",
+            "pos": [45536.0, 50592.0],
+            "size": [55488, 4544],
+            "color": [255, 132, 132, 255]
+        },
+        {
+            "id": "floor_top (9)",
+            "type": "@water_room_floor_2",
+            "pos": [46912.0, 44512.0],
+            "size": [56960, 7616]
+        },
+        {
+            "id": "vent (53)",
+            "type": "@materials/vent.png",
+            "pos": [30400.0, 50944.0],
+            "rotation": -180.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (54)",
+            "type": "@materials/vent.png",
+            "pos": [22976.0, 50944.0],
+            "rotation": -180.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (59)",
+            "type": "@materials/vent.png",
+            "pos": [26687.998046875, 51904.00390625],
+            "rotation": 90.0,
+            "size": [384, 7040]
+        },
+        {
+            "id": "vent (60)",
+            "type": "@materials/vent.png",
+            "pos": [26687.998046875, 49984.00390625],
+            "rotation": 90.0,
+            "size": [384, 7040]
+        },
+        {
+            "id": "dev_floor_256 (94)",
+            "type": "dev_floor_256",
+            "pos": [25600.0, 50944.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (96)",
+            "type": "dev_floor_256",
+            "pos": [24192.0, 50944.0],
+            "size": [2048, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (98)",
+            "type": "dev_floor_256",
+            "pos": [26624.0, 50944.0],
+            "size": [1792, 1536],
+            "color": [255, 0, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (99)",
+            "type": "dev_floor_256",
+            "pos": [27904.0, 50944.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (100)",
+            "type": "dev_floor_256",
+            "pos": [28416.0, 50944.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (101)",
+            "type": "dev_floor_256",
+            "pos": [28928.0, 50944.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (97)",
+            "type": "dev_floor_256",
+            "pos": [46464.0, 50944.0],
+            "size": [256, 1280],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (103)",
+            "type": "dev_floor_256",
+            "pos": [45184.0, 51200.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (61)",
+            "type": "@materials/vent.png",
+            "pos": [48576.0, 50816.0],
+            "rotation": -180.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (62)",
+            "type": "@materials/vent.png",
+            "pos": [41152.0, 50816.0],
+            "rotation": -180.0,
+            "size": [384, 2304]
+        },
+        {
+            "id": "vent (63)",
+            "type": "@materials/vent.png",
+            "pos": [44863.99609375, 51776.0],
+            "rotation": 90.0,
+            "size": [384, 7040]
+        },
+        {
+            "id": "vent (64)",
+            "type": "@materials/vent.png",
+            "pos": [44863.99609375, 49856.00390625],
+            "rotation": 90.0,
+            "size": [384, 7040]
+        },
+        {
+            "id": "dev_floor_256 (104)",
+            "type": "dev_floor_256",
+            "pos": [43776.0, 50816.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (105)",
+            "type": "dev_floor_256",
+            "pos": [42368.0, 50816.0],
+            "size": [2048, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "obs22",
+            "type": "@yellow_barrier",
+            "pos": [44000.0, 50816.00390625],
+            "rotation": -180.0,
+            "size": [192, 1536]
+        },
+        {
+            "id": "obs24",
+            "type": "@yellow_barrier",
+            "pos": [46303.9921875, 50432.00390625],
+            "rotation": -180.0,
+            "size": [64, 256]
+        },
+        {
+            "id": "obs23",
+            "type": "@yellow_barrier",
+            "pos": [45568.0, 50784.0],
+            "rotation": -90.0,
+            "size": [192, 512]
+        },
+        {
+            "id": "vent (65)",
+            "type": "@materials/vent.png",
+            "pos": [45184.0, 50560.0],
+            "size": [256, 1024]
+        },
+        {
+            "id": "vent (66)",
+            "type": "@materials/vent.png",
+            "pos": [45184.0, 51456.0],
+            "size": [256, 256]
+        },
+        {
+            "id": "vent (67)",
+            "type": "@materials/vent.png",
+            "pos": [46208.0, 50176.0],
+            "size": [768, 256]
+        },
+        {
+            "id": "vent (68)",
+            "type": "@materials/vent.png",
+            "pos": [46080.0, 51072.0],
+            "size": [512, 1024]
+        },
+        {
+            "id": "dev_floor_256 (106)",
+            "type": "dev_floor_256",
+            "pos": [45952.0, 50432.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (69)",
+            "type": "@materials/vent.png",
+            "pos": [46848.0, 51328.00390625],
+            "size": [512, 512]
+        },
+        {
+            "id": "vent (70)",
+            "type": "@materials/vent.png",
+            "pos": [46848.0, 50304.0],
+            "size": [512, 512]
+        },
+        {
+            "id": "dev_floor_256 (102)",
+            "type": "dev_floor_256",
+            "pos": [46976.0, 50816.0],
+            "size": [256, 512],
+            "color": [0, 255, 0, 255]
+        },
+        {
             "id": "Strong lamp (1)",
             "type": "point_light",
             "pos": [-897.0, 1279.0],
@@ -4715,6 +5018,198 @@
             "id": "Strong lamp (64)",
             "type": "point_light",
             "pos": [58495.0, 27393.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (72)",
+            "type": "point_light",
+            "pos": [26689.0, 50111.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (73)",
+            "type": "point_light",
+            "pos": [26433.0, 51775.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (74)",
+            "type": "point_light",
+            "pos": [27073.0, 50113.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (76)",
+            "type": "point_light",
+            "pos": [27071.0, 51775.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (77)",
+            "type": "point_light",
+            "pos": [24095.0, 51841.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (78)",
+            "type": "point_light",
+            "pos": [24033.0, 49919.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (75)",
+            "type": "point_light",
+            "pos": [44865.0, 49983.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (79)",
+            "type": "point_light",
+            "pos": [44609.0, 51647.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (80)",
+            "type": "point_light",
+            "pos": [45249.0, 49985.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (81)",
+            "type": "point_light",
+            "pos": [45247.0, 51647.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (82)",
+            "type": "point_light",
+            "pos": [42271.0, 51713.0],
+            "color": [80, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (83)",
+            "type": "point_light",
+            "pos": [42209.0, 49791.0],
             "color": [80, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -6064,6 +6559,11 @@
             "pos": [53034.00390625, 28489.001953125]
         },
         {
+            "id": "blunaz",
+            "type": "blunaz",
+            "pos": [46730.0, 50822.0]
+        },
+        {
             "id": "metropolis_backpack",
             "type": "metropolis_backpack",
             "pos": [25349.0, -2682.0],
@@ -6468,7 +6968,55 @@
             "id": "team_spawn (6)",
             "type": "team_spawn",
             "faction": "METROPOLIS",
-            "pos": [51519.0, 28415.0]
+            "pos": [42497.0, 51007.0]
+        },
+        {
+            "id": "kill22 (1)",
+            "type": "team_spawn",
+            "pos": [44289.0, 50369.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill22",
+            "type": "team_spawn",
+            "pos": [44289.0, 51265.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill22 (2)",
+            "type": "team_spawn",
+            "pos": [44607.0, 50817.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "kill23 (3)",
+            "type": "team_spawn",
+            "pos": [45439.0, 51519.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "kill23 (2)",
+            "type": "team_spawn",
+            "pos": [45697.0, 51519.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "kill23 (1)",
+            "type": "team_spawn",
+            "pos": [45439.0, 50945.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill23",
+            "type": "team_spawn",
+            "pos": [45697.0, 50945.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "kill24",
+            "type": "team_spawn",
+            "pos": [46145.0, 50431.0],
+            "rotation": -180.0
         },
         {
             "id": "exit0",
@@ -8529,7 +9077,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "There are other kinds of grenades.\nBlue ones instantly destroy armor and Mana."
+            "context_tip": "There are other kinds of grenades.\nPED (blue ones) instantly destroy armor and PE."
         },
         {
             "id": "tip3_1 (36)",
@@ -8825,7 +9373,7 @@
             "context_tip": "First, enter the bombsite - it's always marked with red lines.\nIt is usually defended by Metropolis players."
         },
         {
-            "id": "exit16",
+            "id": "exit15",
             "type": "portal",
             "pos": [58048.0, 28480.001953125],
             "rotation": -180.0,
@@ -8838,7 +9386,7 @@
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry11",
+            "portal_exit": "entry16",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -9096,6 +9644,350 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Cons? You walk a little slower and glow in the dark.\nOkay, let's pick up some grenades!"
+        },
+        {
+            "id": "exit16",
+            "type": "portal",
+            "pos": [29696.0, 50944.0],
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry17",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (54)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [25600.0, 50944.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {SPECIAL_ACTION_BUTTON_1} to cast Haste.\nYou will run faster for a while."
+        },
+        {
+            "id": "tip3_1 (56)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [24192.0, 50944.0],
+            "size": [2048, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You can buy Spells.\nThey will drain Mana."
+        },
+        {
+            "id": "entry16",
+            "type": "portal",
+            "pos": [23808.0, 50944.0],
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "hazard (11)",
+            "type": "hazard",
+            "pos": [26624.0, 50944.0],
+            "size": [1792, 1536],
+            "exit_cooldown_ms": 500.0,
+            "hazard": {
+                "damage": 30.0
+            },
+            "exit_shake": {
+                "duration_ms": 0.0
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_impulse": {
+                "amount": 0.0
+            },
+            "object_exit_angular_impulse": {
+                "amount": 0.0
+            }
+        },
+        {
+            "id": "tip3_1 (58)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [28928.0, 50944.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "{SPECIAL_ACTION_BUTTON_6} will restore your Health."
+        },
+        {
+            "id": "tip3_1 (59)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [28416.0, 50944.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Just like HP, Mana slowly regenerates.\nWithout enough Mana, spells appear grayed out."
+        },
+        {
+            "id": "tip3_1 (60)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [27904.0, 50944.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "{SPECIAL_ACTION_BUTTON_5} will restore your Stamina."
+        },
+        {
+            "id": "exit17",
+            "type": "portal",
+            "pos": [47872.0, 50816.0],
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry14",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (57)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [45184.0, 51200.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {SPECIAL_ACTION_BUTTON_3} to launch three massive explosions.\nThese cannot hurt you."
+        },
+        {
+            "id": "tip3_1 (62)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [46464.0, 50944.0],
+            "size": [256, 1280],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You can counter Spell users with Blunaz.\nIt instantly drains victim's PE - but is otherwise useless."
+        },
+        {
+            "id": "tip3_1 (63)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [43776.0, 50816.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {SPECIAL_ACTION_BUTTON_4} to cast three magic missiles.\nWatch out, you can die from the explosion! "
+        },
+        {
+            "id": "tip3_1 (64)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [42368.0, 50816.0],
+            "size": [2048, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Let's try some offensive spells.\nIn the Tutorial, they won't consume PE."
+        },
+        {
+            "id": "entry17",
+            "type": "portal",
+            "pos": [41984.0, 50816.0],
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "tip3_1 (65)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [45952.0, 50432.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Press {SPECIAL_ACTION_BUTTON_2} for a small, instant explosion."
+        },
+        {
+            "id": "tip3_1 (61)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [46976.0, 50816.0],
+            "size": [256, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "It is a great alternative to PED grenades.\nTry it on yourself!"
         }
     ]
 }

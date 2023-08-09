@@ -80,7 +80,8 @@ namespace components {
 		sentience_shake shake = sentience_shake::zero();
 
 		bool is_requesting_interaction = false;
-		pad_bytes<3> pad;
+		bool spells_drain_pe = true;
+		pad_bytes<2> pad;
 		interaction_result_type last_interaction_result = interaction_result_type::NOTHING_FOUND;
 
 		damage_owners_vector damage_owners;
