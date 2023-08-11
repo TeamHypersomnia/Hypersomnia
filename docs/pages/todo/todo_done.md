@@ -6413,3 +6413,37 @@ This will discard your redo history."
     - self-healing character
 - H shouldnt register another wielding setup when hands are already bare
 
+- Read only the layer for the current tutorial level + the next (so that we read the portal entry of the next level, which is required by the exit portal of current).
+    - This will improve framerate and it's good to welcome players with an extremely high one.
+    - THIS ALSO SOLVES (this is for later):
+        - There's too many portal ambiences in the tutorial level and it causes the game to miss sounds.
+            - Cull/fade sound sources that are obviously too far away
+                - we need to fade them if they're playing so they delete
+                    - actually just stop them abruptly since they'll be inaudible at that point anyway
+
+- Tutorial levels
+- Done
+    - Spells but maybe just preliminary
+        - Press haste, kill enemies with the triad etc.
+    - Surfing
+    - that's all, final portal goes to the shooting range
+        - or maybe two portals for that?
+    - Planting/defusing bomb?
+    - Grenades
+    - Walking
+    - Ricochets
+    - Knives: 
+        - Kill with primary/secondary, could be just one level
+        - throwing especially with scroll down/up
+    - Akimbo
+    - First weapon
+        - Choosing with numbers (have to for akimbo)
+        - Holster/previous weapon
+            - Maybe the green areas could teleport when they detect step completion to mash several steps into a single level
+        - Toggle laser, show which surface is shoot through
+
+- When nade is thrown..
+    - For now, instead of requesting a "Q" in gui, we can:
+        - ..just pull out the same type automatically to the hand if it exists in inventory.
+            - can be done logic-side.
+        - alternatively pull any other grenade. Can as well pick the first that's returned by for each item recursive, will most likely coincide with the hotbar.

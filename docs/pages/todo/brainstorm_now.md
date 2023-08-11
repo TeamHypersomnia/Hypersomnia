@@ -6,13 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Simplify stamina
+    - Remove the white edge denoting limit
+    - Dash should just take stamina on credit like in souls
+    - We can make the dash a little more expensive to compensate so that we can still do 4 dashes on a full bar
+        - This game is too fast anyway so we wouldn't want more dashes here
 - LPM doesnt shoot if right-handed stance is on
 
-- When nade is thrown..
-    - For now, instead of requesting a "Q" in gui, we can:
-        - ..just pull out the same type automatically to the hand if it exists in inventory.
-            - can be done logic-side.
-        - alternatively pull any other grenade. Can as well pick the first that's returned by for each item recursive, will most likely coincide with the hotbar.
 - DISREGARDED:
     - Switch to previous weapon when:
         - throwing nade
@@ -20,35 +20,6 @@ summary: That which we are brainstorming at the moment.
     - nOT NECESSARILY - why?
         - After planting the bomb, you might want to default to holster to quickly jump off.
             - very important in competitive environments where every second matters
-
-- Read only the layer for the current tutorial level + the next (so that we read the portal entry of the next level, which is required by the exit portal of current).
-    - This will improve framerate and it's good to welcome players with an extremely high one.
-    - THIS ALSO SOLVES (this is for later):
-        - There's too many portal ambiences in the tutorial level and it causes the game to miss sounds.
-            - Cull/fade sound sources that are obviously too far away
-                - we need to fade them if they're playing so they delete
-                    - actually just stop them abruptly since they'll be inaudible at that point anyway
-
-- Tutorial levels
-    - Spells but maybe just preliminary
-        - Press haste, kill enemies with the triad etc.
-    - Surfing
-    - that's all, final portal goes to the shooting range
-        - or maybe two portals for that?
-- Done
-    - Planting/defusing bomb?
-    - Grenades
-    - Walking
-    - Ricochets
-    - Knives: 
-        - Kill with primary/secondary, could be just one level
-        - throwing especially with scroll down/up
-    - Akimbo
-    - First weapon
-        - Choosing with numbers (have to for akimbo)
-        - Holster/previous weapon
-            - Maybe the green areas could teleport when they detect step completion to mash several steps into a single level
-        - Toggle laser, show which surface is shoot through
 
 - Fix miniatures not downloading!!! Both externally and through UDP
     - Don't make a "metaresource", this will overcomplicate things.
@@ -59,11 +30,6 @@ summary: That which we are brainstorming at the moment.
         - Just have a separate external resource field in editor project so that it doesn't appear as a valid resource in editor
             - but gets written to json and thus requested when downloading nevertheless
 
-- Simplify stamina
-    - Remove the white edge denoting limit
-    - Dash should just take stamina on credit like in souls
-    - We can make the dash a little more expensive to compensate so that we can still do 4 dashes on a full bar
-        - This game is too fast anyway so we wouldn't want more dashes here
 
 - Settings: split Gameplay tab into HUD and Rendering (or idk name it somehow else)
 - Editor: Fix lighting inconsistency between with and without FOV

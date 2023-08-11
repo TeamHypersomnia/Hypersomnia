@@ -23,6 +23,10 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/weapon_like.h"
+#include "game/detail/inventory/perform_wielding.hpp"
+#include "game/detail/inventory/wielding_setup.hpp"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+#include "game/detail/inventory/wield_same_as.hpp"
 
 using namespace augs;
 
@@ -194,6 +198,14 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 							if (source == arming_source_type::SHOOT_INTENT || source == arming_source_type::SHOOT_SECONDARY_INTENT) {
 								fuse_logic.release_explosive_if_armed();
+
+								subject.dispatch_on_having_all<components::sentience>([&](const auto& typed_subject) {
+									auto current_wielding = wielding_setup::from_current(typed_subject);
+
+									if (current_wielding.is_bare_hands(cosm)) {
+										::wield_same_as(typed_fused, step, typed_subject);
+									}
+								});
 							}
 						}
 					}

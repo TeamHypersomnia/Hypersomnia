@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-11 20:23:46.236668 UTC"
+        "version_timestamp": "2023-08-11 19:28:59.661403 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1074,6 +1074,7 @@
         },
         {
             "id": "Level12",
+            "is_open_in_editor": false,
             "nodes": [
                 "vent (50)",
                 "vent (52)",
@@ -1139,7 +1140,6 @@
                 "force_grenade (83)",
                 "force_grenade (82)",
                 "force_grenade (81)",
-                "team_spawn (14)",
                 "force_grenade (80)",
                 "ped_grenade (22)",
                 "ped_grenade (23)",
@@ -10801,7 +10801,6 @@
         {
             "id": "team_spawn (10)",
             "type": "team_spawn",
-            "active": false,
             "faction": "METROPOLIS",
             "pos": [-24513.0, 114497.0]
         },
@@ -10825,12 +10824,6 @@
             "active": false,
             "faction": "METROPOLIS",
             "pos": [-50177.0, 192641.0]
-        },
-        {
-            "id": "team_spawn (14)",
-            "type": "team_spawn",
-            "faction": "METROPOLIS",
-            "pos": [14337.0, 22847.0]
         },
         {
             "id": "exit0",

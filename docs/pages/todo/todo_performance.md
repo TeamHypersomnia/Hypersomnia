@@ -5,6 +5,11 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Cull/fade sound sources that are obviously too far away
+	- we need to fade them if they're playing so they delete
+		- actually just stop them abruptly since they'll be inaudible at that point anyway
+	- this is about more than just performance because sounds are simply missed
+
 - Fix the problem with massive performance hit when something lands between walls
 	- Could this be a problem with posting collision sounds?
 		- shouldn't be as there are cooldowns
