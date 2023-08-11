@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-11 16:42:14.399177 UTC"
+        "version_timestamp": "2023-08-11 19:28:59.661403 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -47,6 +47,18 @@
             "size": [293, 68]
         },
         {
+            "path": "captions/menu.png",
+            "file_hash": "c40b0009b01b152e98c5635c00de3552a00b1332302e2417325f9c501b224058",
+            "id": "@menu",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [0, 255, 0, 255],
+            "neon_color": [0, 255, 0, 255],
+            "size": [281, 73]
+        },
+        {
             "path": "captions/metal.png",
             "file_hash": "11df902f92cf18590e317c917c6e089a07a69d0843ddaaf575fbe5c737dc04d0",
             "id": "@captions/metal.png",
@@ -55,6 +67,30 @@
                 ]
             },
             "size": [291, 66]
+        },
+        {
+            "path": "captions/range.png",
+            "file_hash": "b48f30bc5d35a7be466277cc1a914911e534d7f009473701bb3ab51f3d7ea06e",
+            "id": "@range",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [0, 255, 255, 255],
+            "neon_color": [0, 255, 255, 255],
+            "size": [349, 74]
+        },
+        {
+            "path": "captions/surf.png",
+            "file_hash": "8fb07c1b23c80004206c78f5b43989625be0b20fc7dbb232814137d05a1685ac",
+            "id": "@surf",
+            "neon_map": {
+                "light_colors": [[255, 255, 255, 255]
+                ]
+            },
+            "color": [255, 0, 255, 255],
+            "neon_color": [255, 0, 255, 255],
+            "size": [263, 74]
         },
         {
             "path": "captions/vent.png",
@@ -240,6 +276,382 @@
     ],
     "layers": [
         {
+            "id": "Level21",
+            "nodes": [
+                "exit19",
+                "point_light (106)",
+                "arrow (122)",
+                "arrow (133)",
+                "arrow (132)",
+                "point_light (102)",
+                "arrow (174)",
+                "arrow (173)",
+                "arrow (172)",
+                "point_light (124)",
+                "point_light (123)",
+                "arrow (171)",
+                "arrow (170)",
+                "arrow (186)",
+                "point_light (131)",
+                "arrow (185)",
+                "arrow (184)",
+                "arrow (183)",
+                "arrow (182)",
+                "arrow (181)",
+                "point_light (130)",
+                "point_light (129)",
+                "point_light (107)",
+                "arrow (179)",
+                "point_light (128)",
+                "arrow (178)",
+                "arrow (177)",
+                "arrow (176)",
+                "arrow (175)",
+                "arrow (135)",
+                "point_light (127)",
+                "point_light (126)",
+                "point_light (125)",
+                "arrow (134)",
+                "arrow (169)",
+                "arrow (168)",
+                "arrow (167)",
+                "point_light (122)",
+                "arrow (166)",
+                "arrow (165)",
+                "arrow (164)",
+                "arrow (163)",
+                "arrow (162)",
+                "point_light (121)",
+                "point_light (120)",
+                "point_light (119)",
+                "arrow (161)",
+                "point_light (118)",
+                "portal (45)",
+                "arrow (160)",
+                "point_light (117)",
+                "arrow (159)",
+                "arrow (158)",
+                "arrow (157)",
+                "arrow (156)",
+                "arrow (155)",
+                "point_light (116)",
+                "point_light (115)",
+                "point_light (114)",
+                "arrow (154)",
+                "arrow (110)-right (3)",
+                "arrow (110)-right (2)",
+                "arrow (153)",
+                "arrow (109)-right (1)",
+                "arrow (91)-right (1)",
+                "arrow (152)",
+                "arrow (108)-right (1)",
+                "arrow (90)-right (1)",
+                "arrow (151)",
+                "arrow (107)-right (1)",
+                "arrow (39)-right (1)",
+                "arrow (150)",
+                "arrow (38)-right-right (1)-left-left-up-up-up-up-up (1)",
+                "arrow (106)-right-left-left-up-up-up-up-up (1)",
+                "arrow (106)-right-right (1)-left-up-up-up-up-up (1)",
+                "arrow (38)-right-right (1)-left-left-up-up-up-up (1)",
+                "arrow (106)-right-left-left-up-up-up-up (1)",
+                "arrow (106)-right-right (1)-left-up-up-up-up (1)",
+                "arrow (38)-right-right (1)-left-up-up-up-up (1)",
+                "arrow (38)-right-right (1)-left-left-up-up-up (1)",
+                "arrow (106)-right-left-left-up-up-up (1)",
+                "arrow (106)-right-right (1)-left-up-up-up (1)",
+                "arrow (38)-right-right (1)-left-up-up-up (1)",
+                "arrow (106)-right-left-up-up-up (1)",
+                "arrow (38)-right-right (1)-left-left-up-up (1)",
+                "arrow (106)-right-left-left-up-up (1)",
+                "arrow (106)-right-right (1)-left-up-up (1)",
+                "arrow (38)-right-right (1)-left-up-up (1)",
+                "arrow (106)-right-left-up-up (1)",
+                "arrow (38)-right-left-up-up (1)",
+                "arrow (38)-right-right (1)-left-left-up (1)",
+                "arrow (106)-right-left-left-up (1)",
+                "arrow (106)-right-right (1)-left-up (1)",
+                "arrow (38)-right-right (1)-left-up (1)",
+                "arrow (106)-right-left-up (1)",
+                "arrow (38)-right-left-up (1)",
+                "arrow (38)-right-right (1)-left-left (1)",
+                "arrow (106)-right-left-left (1)",
+                "arrow (106)-right-right (1)-left (1)",
+                "arrow (38)-right-right (1)-left (1)",
+                "arrow (106)-right-left (1)",
+                "arrow (38)-right-left (1)",
+                "arrow (106)-left-up (1)",
+                "arrow (106)-left (1)",
+                "arrow (38)-left (1)",
+                "arrow (106)-right (1)",
+                "arrow (38)-right (1)",
+                "arrow (149)",
+                "arrow (148)",
+                "point_light (113)",
+                "arrow (147)",
+                "arrow (146)",
+                "arrow (145)",
+                "arrow (144)",
+                "point_light (112)",
+                "point_light (110)",
+                "point_light (108)",
+                "point_light (103)",
+                "point_light (95)",
+                "point_light (94)",
+                "portal (41)",
+                "portal (37)",
+                "portal (36)",
+                "portal (29)",
+                "portal (35)",
+                "point_light (79)",
+                "arrow (128)",
+                "point_light (52)",
+                "arrow (104)",
+                "arrow (103)",
+                "point_light (60)",
+                "arrow (101)",
+                "arrow (127)",
+                "arrow (126)",
+                "arrow (125)",
+                "arrow (124)",
+                "point_light (101)",
+                "point_light (100)",
+                "arrow (123)",
+                "point_light (99)",
+                "arrow (121)",
+                "arrow (120)",
+                "point_light (98)",
+                "arrow (119)",
+                "point_light (97)",
+                "arrow (117)",
+                "arrow (116)",
+                "arrow (115)",
+                "point_light (96)",
+                "arrow (114)",
+                "arrow (113)",
+                "arrow (136)",
+                "point_light (109)",
+                "arrow (112)",
+                "arrow (111)",
+                "point_light (92)",
+                "arrow (100)",
+                "arrow (96)",
+                "point_light (83)",
+                "arrow (46)",
+                "arrow (45)",
+                "arrow (44)",
+                "point_light (43)",
+                "point_light (41)",
+                "arrow (43)",
+                "arrow (42)",
+                "arrow (41)",
+                "arrow (40)",
+                "point_light (39)",
+                "arrow (28)",
+                "arrow (29)",
+                "arrow (30)",
+                "arrow (31)",
+                "point_light (36)",
+                "arrow (89)",
+                "arrow (88)",
+                "arrow (87)",
+                "arrow (86)",
+                "arrow (85)",
+                "point_light (62)",
+                "point_light (58)",
+                "arrow (84)",
+                "arrow (50)",
+                "arrow (49)",
+                "arrow (48)",
+                "arrow (47)",
+                "point_light (46)",
+                "point_light (45)",
+                "point_light (44)",
+                "arrow (32)",
+                "arrow (33)",
+                "arrow (34)",
+                "arrow (35)",
+                "arrow (36)",
+                "arrow (37)",
+                "arrow (143)",
+                "arrow (142)",
+                "arrow (141)",
+                "point_light (93)",
+                "arrow (140)",
+                "arrow (139)",
+                "arrow (138)",
+                "arrow (130)",
+                "arrow (129)",
+                "point_light (104)",
+                "point_light (86)",
+                "point_light (91)",
+                "point_light (85)",
+                "arrow (105)",
+                "point_light (80)",
+                "arrow (131)",
+                "point_light (105)",
+                "arrow (102)",
+                "arrow (95)",
+                "arrow (118)",
+                "arrow (99)",
+                "arrow (98)",
+                "point_light (84)",
+                "point_light (82)",
+                "arrow (97)",
+                "arrow (110)-right (1)",
+                "arrow (110)-right",
+                "arrow (110)",
+                "arrow (109)-right",
+                "arrow (91)-right",
+                "arrow (109)",
+                "arrow (108)-right",
+                "arrow (90)-right",
+                "arrow (108)",
+                "arrow (107)-right",
+                "arrow (39)-right",
+                "arrow (107)",
+                "arrow (38)-right-right (1)-left-left-up-up-up-up-up",
+                "arrow (106)-right-left-left-up-up-up-up-up",
+                "arrow (106)-right-right (1)-left-up-up-up-up-up",
+                "arrow (38)-right-right (1)-left-left-up-up-up-up",
+                "arrow (106)-right-left-left-up-up-up-up",
+                "arrow (106)-right-right (1)-left-up-up-up-up",
+                "arrow (38)-right-right (1)-left-up-up-up-up",
+                "arrow (38)-right-right (1)-left-left-up-up-up",
+                "arrow (106)-right-left-left-up-up-up",
+                "arrow (106)-right-right (1)-left-up-up-up",
+                "arrow (38)-right-right (1)-left-up-up-up",
+                "arrow (106)-right-left-up-up-up",
+                "arrow (38)-right-right (1)-left-left-up-up",
+                "arrow (106)-right-left-left-up-up",
+                "arrow (106)-right-right (1)-left-up-up",
+                "arrow (38)-right-right (1)-left-up-up",
+                "arrow (106)-right-left-up-up",
+                "arrow (38)-right-left-up-up",
+                "arrow (38)-right-right (1)-left-left-up",
+                "arrow (106)-right-left-left-up",
+                "arrow (106)-right-right (1)-left-up",
+                "arrow (38)-right-right (1)-left-up",
+                "arrow (106)-right-left-up",
+                "arrow (38)-right-left-up",
+                "arrow (38)-right-right (1)-left-left",
+                "arrow (106)-right-left-left",
+                "arrow (106)-right-right (1)-left",
+                "arrow (38)-right-right (1)-left",
+                "arrow (106)-right-left",
+                "arrow (38)-right-left",
+                "arrow (106)-left-up",
+                "arrow (106)-left",
+                "arrow (38)-left",
+                "arrow (106)-right",
+                "arrow (38)-right",
+                "arrow (106)",
+                "arrow (94)",
+                "point_light (81)",
+                "arrow (91)",
+                "arrow (90)",
+                "arrow (39)",
+                "arrow (38)",
+                "point_light (42)",
+                "point_light (78)",
+                "point_light (90)",
+                "point_light (89)",
+                "point_light (88)",
+                "point_light (87)",
+                "point_light (40)",
+                "point_light (37)",
+                "arrow (137)",
+                "point_light (111)",
+                "arrow (92)",
+                "arrow (93)",
+                "portal (9)",
+                "portal (15)",
+                "portal (16)",
+                "portal (18)",
+                "portal (44)",
+                "portal (43)",
+                "portal (49)",
+                "portal (48)",
+                "portal (42)",
+                "portal (40)",
+                "portal (39)",
+                "portal (25)",
+                "portal (47)",
+                "portal (46)",
+                "portal (28)",
+                "portal (38)",
+                "portal (33)",
+                "portal (26)",
+                "portal (27)",
+                "portal (30)",
+                "portal (31)",
+                "portal (32)",
+                "dev_floor_256 (125)",
+                "dev_floor_256 (133)",
+                "dev_floor_256 (135)",
+                "team_spawn (13)",
+                "congrats",
+                "hard_surf_start",
+                "vent (97)",
+                "vent (106)",
+                "vent (105)",
+                "vent (101)",
+                "vent (98)",
+                "vent (99)",
+                "vent (100)",
+                "vent (102)",
+                "vent (107)",
+                "vent (103)",
+                "point_light (38)",
+                "point_light (66)",
+                "point_light (74)",
+                "point_light (75)",
+                "point_light (76)",
+                "point_light (77)",
+                "vent (104)",
+                "dev_floor_256 (136)",
+                "dev_floor_256 (137)"
+            ]
+        },
+        {
+            "id": "Level20",
+            "nodes": [
+                "arrow (187)-right",
+                "arrow (187)",
+                "point_light (135)",
+                "point_light (132)",
+                "arrow (180)",
+                "surf",
+                "range",
+                "menu",
+                "main_menu",
+                "surf_portal",
+                "shooting_range",
+                "dev_floor_256 (124)",
+                "dev_floor_256 (123)",
+                "dev_floor_256 (129)",
+                "team_spawn (12)",
+                "surf_start (5)",
+                "surf_start (4)",
+                "tip2_1 (7)",
+                "vent (90)",
+                "vent (78)",
+                "vent (96)",
+                "vent (79)",
+                "vent (88)",
+                "vent (89)",
+                "vent (77)",
+                "vent (95)",
+                "vent (94)",
+                "vent (93)",
+                "vent (91)",
+                "vent (92)",
+                "entry20",
+                "dev_floor_256 (134)",
+                "dev_floor_256 (130)"
+            ]
+        },
+        {
             "id": "Level19",
             "nodes": [
                 "exit19 (1)",
@@ -416,6 +828,7 @@
         },
         {
             "id": "Level17",
+            "is_open_in_editor": false,
             "nodes": [
                 "obs23",
                 "obs24",
@@ -457,6 +870,7 @@
         },
         {
             "id": "Level16",
+            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_256 (98)",
                 "hazard (11)",
@@ -487,6 +901,7 @@
         },
         {
             "id": "Level15",
+            "is_open_in_editor": false,
             "nodes": [
                 "electric_rapier (5)",
                 "electric_rapier (4)",
@@ -1047,6 +1462,7 @@
         },
         {
             "id": "Level8",
+            "is_open_in_editor": false,
             "nodes": [
                 "team_spawn (7)",
                 "obs6 (4)",
@@ -1167,6 +1583,7 @@
         },
         {
             "id": "Level5",
+            "is_open_in_editor": false,
             "nodes": [
                 "obs4 (2)",
                 "obs4",
@@ -1201,6 +1618,7 @@
         },
         {
             "id": "Level4",
+            "is_open_in_editor": false,
             "nodes": [
                 "kek9_magazine",
                 "kek9_magazine (2)",
@@ -1236,7 +1654,6 @@
                 "tip4_1 (1)",
                 "team_spawn (8)",
                 "tip4_1",
-                "shooting_range",
                 "entry4",
                 "dev_floor_256 (70)",
                 "dev_floor_256 (69)",
@@ -1354,6 +1771,7 @@
         },
         {
             "id": "Level2",
+            "is_open_in_editor": false,
             "nodes": [
                 "point_light (3)",
                 "point_light (2)",
@@ -1443,6 +1861,7 @@
         },
         {
             "id": "Floors",
+            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (9)",
                 "floor_right (7)",
@@ -3935,255 +4354,255 @@
         {
             "id": "vent (71)",
             "type": "@materials/vent.png",
-            "pos": [-25536.0, 109504.0],
+            "pos": [-11008.0, 104384.0],
             "size": [384, 13312]
         },
         {
             "id": "vent (72)",
             "type": "@materials/vent.png",
-            "pos": [-23648.0, 109504.0],
+            "pos": [-9120.0, 104384.0],
             "size": [320, 13312]
         },
         {
             "id": "vent (73)",
             "type": "@materials/vent.png",
-            "pos": [-24608.0, 116352.0],
+            "pos": [-10079.9990234375, 111232.0078125],
             "rotation": 90.0,
             "size": [384, 2240]
         },
         {
             "id": "dev_floor_256 (107)",
             "type": "dev_floor_256",
-            "pos": [-24576.0, 115136.0],
+            "pos": [-10048.0, 110016.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (109)",
             "type": "dev_floor_256",
-            "pos": [-24576.0, 113728.0],
+            "pos": [-10048.0, 108608.0],
             "size": [1536, 768]
         },
         {
             "id": "dev_floor_256 (110)",
             "type": "dev_floor_256",
-            "pos": [-24576.0, 113728.0],
+            "pos": [-10048.0, 108608.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (111)",
             "type": "dev_floor_256",
-            "pos": [-24576.0, 104256.0],
+            "pos": [-10048.0, 99136.0],
             "size": [1536, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (112)",
             "type": "dev_floor_256",
-            "pos": [-24576.0, 103744.0],
+            "pos": [-10048.0, 98624.0],
             "size": [1536, 256]
         },
         {
             "id": "dev_floor_256 (113)",
             "type": "dev_floor_256",
-            "pos": [-24576.0, 103360.0],
+            "pos": [-10048.0, 98240.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (114)",
             "type": "dev_floor_256",
-            "pos": [-22400.0, 99584.0],
+            "pos": [-7872.0, 94464.0],
             "size": [40192, 38656],
             "color": [71, 0, 71, 255]
         },
         {
             "id": "dev_floor_256 (115)",
             "type": "dev_floor_256",
-            "pos": [-24576.0, 102976.0],
+            "pos": [-10048.0, 97856.0],
             "size": [1536, 256]
         },
         {
             "id": "vent (74)",
             "type": "@materials/vent.png",
-            "pos": [-9279.998046875, 97087.984375],
+            "pos": [5248.00390625, 91967.984375],
             "rotation": -90.0,
             "size": [384, 2560]
         },
         {
             "id": "vent (75)",
             "type": "@materials/vent.png",
-            "pos": [-9280.001953125, 95967.9921875],
+            "pos": [5247.998046875, 90848.0078125],
             "rotation": -90.0,
             "size": [320, 2560]
         },
         {
             "id": "dev_floor_256 (108)",
             "type": "dev_floor_256",
-            "pos": [-9920.0, 96512.0],
+            "pos": [4608.0, 91392.0],
             "size": [1280, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "arrow",
             "type": "@arrow",
-            "pos": [-24579.0, 112518.0],
+            "pos": [-10051.0, 107398.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (1)",
             "type": "@arrow",
-            "pos": [-24579.0, 111482.0],
+            "pos": [-10051.0, 106362.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (2)",
             "type": "@arrow",
-            "pos": [-24579.0, 110470.0],
+            "pos": [-10051.0, 105350.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (3)",
             "type": "@arrow",
-            "pos": [-24579.0, 109434.0],
+            "pos": [-10051.0, 104314.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (4)",
             "type": "@arrow",
-            "pos": [-24579.0, 108410.0],
+            "pos": [-10051.0, 103290.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (5)",
             "type": "@arrow",
-            "pos": [-24573.0, 107386.0],
+            "pos": [-10045.0, 102266.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (6)",
             "type": "@arrow",
-            "pos": [-24573.0, 106362.0],
+            "pos": [-10045.0, 101242.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (7)",
             "type": "@arrow",
-            "pos": [-24579.0, 105286.0],
+            "pos": [-10051.0, 100166.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (8)",
             "type": "@arrow",
-            "pos": [-24579.0, 102138.0],
+            "pos": [-10051.0, 97018.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (9)",
             "type": "@arrow",
-            "pos": [-24579.0, 101102.0],
+            "pos": [-10051.0, 95982.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (10)",
             "type": "@arrow",
-            "pos": [-24579.0, 100090.0],
+            "pos": [-10051.0, 94970.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (11)",
             "type": "@arrow",
-            "pos": [-24579.0, 99054.0],
+            "pos": [-10051.0, 93934.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (12)",
             "type": "@arrow",
-            "pos": [-24579.0, 98030.0],
+            "pos": [-10051.0, 92910.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (13)",
             "type": "@arrow",
-            "pos": [-24573.0, 97006.0],
+            "pos": [-10045.0, 91886.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (14)",
             "type": "@arrow",
-            "pos": [-24070.0, 96515.0]
+            "pos": [-9542.0, 91395.0]
         },
         {
             "id": "arrow (15)",
             "type": "@arrow",
-            "pos": [-22994.0, 96509.0]
+            "pos": [-8466.0, 91389.0]
         },
         {
             "id": "arrow (16)",
             "type": "@arrow",
-            "pos": [-22022.0, 96515.0]
+            "pos": [-7494.0, 91395.0]
         },
         {
             "id": "arrow (17)",
             "type": "@arrow",
-            "pos": [-20946.0, 96509.0]
+            "pos": [-6418.0, 91389.0]
         },
         {
             "id": "arrow (18)",
             "type": "@arrow",
-            "pos": [-19974.0, 96515.0]
+            "pos": [-5446.0, 91395.0]
         },
         {
             "id": "arrow (19)",
             "type": "@arrow",
-            "pos": [-18898.0, 96509.0]
+            "pos": [-4370.0, 91389.0]
         },
         {
             "id": "arrow (20)",
             "type": "@arrow",
-            "pos": [-17926.0, 96515.0]
+            "pos": [-3398.0, 91395.0]
         },
         {
             "id": "arrow (21)",
             "type": "@arrow",
-            "pos": [-16850.0, 96509.0]
+            "pos": [-2322.0, 91389.0]
         },
         {
             "id": "arrow (22)",
             "type": "@arrow",
-            "pos": [-15878.0, 96515.0]
+            "pos": [-1350.0, 91395.0]
         },
         {
             "id": "arrow (23)",
             "type": "@arrow",
-            "pos": [-14802.0, 96509.0]
+            "pos": [-274.0, 91389.0]
         },
         {
             "id": "arrow (24)",
             "type": "@arrow",
-            "pos": [-13830.0, 96515.0]
+            "pos": [698.0, 91395.0]
         },
         {
             "id": "arrow (25)",
             "type": "@arrow",
-            "pos": [-12754.0, 96509.0]
+            "pos": [1774.0, 91389.0]
         },
         {
             "id": "arrow (26)",
             "type": "@arrow",
-            "pos": [-11782.0, 96515.0]
+            "pos": [2746.0, 91395.0]
         },
         {
             "id": "dev_floor_256 (116)",
             "type": "dev_floor_256",
-            "pos": [-9024.0, 96512.0],
+            "pos": [5504.0, 91392.0],
             "size": [512, 768]
         },
         {
             "id": "arrow (27)",
             "type": "@arrow",
-            "pos": [-10758.0, 96515.0]
+            "pos": [3770.0, 91395.0]
         },
         {
             "id": "dev_floor_256 (117)",
@@ -4225,305 +4644,1840 @@
         {
             "id": "vent (76)",
             "type": "@materials/vent.png",
-            "pos": [-7871.998046875, 96543.984375],
+            "pos": [6656.005859375, 91423.984375],
             "rotation": -90.0,
             "size": [1472, 256]
         },
         {
             "id": "dev_floor_256 (121)",
             "type": "dev_floor_256",
-            "pos": [-8384.0, 96512.0],
+            "pos": [6144.0, 91392.0],
             "size": [768, 768],
             "color": [0, 176, 255, 255]
         },
         {
             "id": "arrow (52)",
             "type": "@arrow",
-            "pos": [-50243.0, 187578.0],
+            "pos": [53885.0, 100090.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (53)",
             "type": "@arrow",
-            "pos": [-50243.0, 188614.0],
+            "pos": [53885.0, 101126.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (54)",
             "type": "@arrow",
-            "pos": [-50243.0, 189626.0],
+            "pos": [53885.0, 102138.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (55)",
             "type": "@arrow",
-            "pos": [-50243.0, 190662.0],
+            "pos": [53885.0, 103174.0],
             "rotation": -90.0
         },
         {
             "id": "dev_floor_256 (127)",
             "type": "dev_floor_256",
-            "pos": [-50240.0, 191872.0],
+            "pos": [53888.0, 104384.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (128)",
             "type": "dev_floor_256",
-            "pos": [-50240.0, 193280.0],
+            "pos": [53888.0, 105792.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "vent (80)",
             "type": "@materials/vent.png",
-            "pos": [-50272.00390625, 194496.0],
+            "pos": [53855.98828125, 107008.0078125],
             "rotation": 90.0,
             "size": [384, 2240]
         },
         {
             "id": "vent (81)",
             "type": "@materials/vent.png",
-            "pos": [-49312.0, 192896.0],
+            "pos": [54815.99609375, 105407.9921875],
             "size": [320, 2816]
         },
         {
             "id": "vent (82)",
             "type": "@materials/vent.png",
-            "pos": [-51200.0, 192896.0],
+            "pos": [52928.00390625, 105407.9921875],
             "size": [384, 2816]
         },
         {
             "id": "dev_floor_256 (131)",
             "type": "dev_floor_256",
-            "pos": [-50240.0, 191872.0],
+            "pos": [53888.0, 104384.0],
             "size": [1536, 768]
         },
         {
             "id": "dev_floor_256 (132)",
             "type": "dev_floor_256",
-            "pos": [-48064.0, 195968.0],
-            "size": [104704, 104960],
+            "pos": [54528.0, 102080.0],
+            "size": [59136, 65536],
             "color": [71, 0, 71, 255]
         },
         {
             "id": "arrow (56)",
             "type": "@arrow",
-            "pos": [-49734.0, 186563.0]
+            "pos": [54394.0, 99075.0]
         },
         {
             "id": "arrow (57)",
             "type": "@arrow",
-            "pos": [-48658.0, 186557.0]
+            "pos": [55470.0, 99069.0]
         },
         {
             "id": "arrow (58)",
             "type": "@arrow",
-            "pos": [-47686.0, 186563.0]
+            "pos": [56442.0, 99075.0]
         },
         {
             "id": "arrow (59)",
             "type": "@arrow",
-            "pos": [-46610.0, 186557.0]
+            "pos": [57518.0, 99069.0]
         },
         {
             "id": "vent (83)",
             "type": "@materials/vent.png",
-            "pos": [-51200.0, 195712.0],
+            "pos": [52927.99609375, 108224.0],
             "rotation": -180.0,
             "size": [384, 2048]
         },
         {
             "id": "vent (84)",
             "type": "@materials/vent.png",
-            "pos": [-49312.0, 195712.0],
+            "pos": [54815.99609375, 108224.0],
             "rotation": -180.0,
             "size": [320, 2048]
         },
         {
             "id": "vent (85)",
             "type": "@materials/vent.png",
-            "pos": [-50240.00390625, 196096.015625],
+            "pos": [53888.0, 108608.03125],
             "rotation": 90.0,
             "size": [256, 1024]
         },
         {
             "id": "dev_floor_256 (126)",
             "type": "dev_floor_256",
-            "pos": [-50240.0, 196096.0],
+            "pos": [53888.0, 108608.0],
             "size": [1536, 1280],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (122)",
             "type": "dev_floor_256",
-            "pos": [-50240.0, 195072.0],
+            "pos": [53888.0, 107584.0],
             "size": [1536, 768],
             "color": [194, 207, 255, 255]
         },
         {
             "id": "vent (86)",
             "type": "@materials/vent.png",
-            "pos": [-49728.00390625, 195584.015625],
+            "pos": [54399.98828125, 108096.0234375],
             "rotation": 90.0,
             "size": [256, 512]
         },
         {
             "id": "vent (87)",
             "type": "@materials/vent.png",
-            "pos": [-50752.0, 195584.015625],
+            "pos": [53376.0, 108096.0234375],
             "rotation": 90.0,
             "size": [256, 512]
         },
         {
             "id": "arrow (51)",
             "type": "@arrow",
-            "pos": [-46083.0, 187066.0],
+            "pos": [58045.0, 99578.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (60)",
             "type": "@arrow",
-            "pos": [-46083.0, 188102.0],
+            "pos": [58045.0, 100614.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (61)",
             "type": "@arrow",
-            "pos": [-46083.0, 189242.0],
+            "pos": [58045.0, 101754.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (62)",
             "type": "@arrow",
-            "pos": [-46083.0, 190278.0],
+            "pos": [58045.0, 102790.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (63)",
             "type": "@arrow",
-            "pos": [-46083.0, 191354.0],
+            "pos": [58045.0, 103866.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (64)",
             "type": "@arrow",
-            "pos": [-46083.0, 192390.0],
+            "pos": [58045.0, 104902.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (65)",
             "type": "@arrow",
-            "pos": [-46083.0, 193786.0],
+            "pos": [58045.0, 106298.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (66)",
             "type": "@arrow",
-            "pos": [-46083.0, 194822.0],
+            "pos": [58045.0, 107334.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (67)",
             "type": "@arrow",
-            "pos": [-46083.0, 195834.0],
+            "pos": [58045.0, 108346.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (68)",
             "type": "@arrow",
-            "pos": [-46083.0, 196870.0],
+            "pos": [58045.0, 109382.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (69)",
             "type": "@arrow",
-            "pos": [-46083.0, 197882.0],
+            "pos": [58045.0, 110394.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (70)",
             "type": "@arrow",
-            "pos": [-46083.0, 198918.0],
+            "pos": [58045.0, 111430.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (71)",
             "type": "@arrow",
-            "pos": [-46083.0, 199930.0],
+            "pos": [58045.0, 112442.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (72)",
             "type": "@arrow",
-            "pos": [-46083.0, 200966.0],
+            "pos": [58045.0, 113478.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (73)",
             "type": "@arrow",
-            "pos": [-46083.0, 201978.0],
+            "pos": [58045.0, 114490.0],
             "rotation": 90.0
         },
         {
             "id": "arrow (75)",
             "type": "@arrow",
-            "pos": [-46586.0, 202493.0],
+            "pos": [57542.0, 115005.0],
             "rotation": -180.0
         },
         {
             "id": "arrow (76)",
             "type": "@arrow",
-            "pos": [-47622.0, 202493.0],
+            "pos": [56506.0, 115005.0],
             "rotation": -180.0
         },
         {
             "id": "arrow (77)",
             "type": "@arrow",
-            "pos": [-48634.0, 202493.0],
+            "pos": [55494.0, 115005.0],
             "rotation": -180.0
         },
         {
             "id": "arrow (78)",
             "type": "@arrow",
-            "pos": [-49670.0, 202493.0],
+            "pos": [54458.0, 115005.0],
             "rotation": -180.0
         },
         {
             "id": "arrow (74)",
             "type": "@arrow",
-            "pos": [-50243.0, 201990.0],
+            "pos": [53885.0, 114502.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (79)",
             "type": "@arrow",
-            "pos": [-50243.0, 200978.0],
+            "pos": [53885.0, 113490.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (80)",
             "type": "@arrow",
-            "pos": [-50243.0, 199942.0],
+            "pos": [53885.0, 112454.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (81)",
             "type": "@arrow",
-            "pos": [-50243.0, 198930.0],
+            "pos": [53885.0, 111442.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (82)",
             "type": "@arrow",
-            "pos": [-50243.0, 197894.0],
+            "pos": [53885.0, 110406.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (83)",
             "type": "@arrow",
-            "pos": [-50243.0, 196882.0],
+            "pos": [53885.0, 109394.0],
             "rotation": -90.0
+        },
+        {
+            "id": "dev_floor_256 (123)",
+            "type": "dev_floor_256",
+            "pos": [-15168.0, 28800.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (129)",
+            "type": "dev_floor_256",
+            "pos": [-15168.0, 30208.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (90)",
+            "type": "@materials/vent.png",
+            "pos": [-15296.0048828125, 31392.00390625],
+            "rotation": 90.0,
+            "size": [320, 2304]
+        },
+        {
+            "id": "vent (91)",
+            "type": "@materials/vent.png",
+            "pos": [-14272.0, 29951.998046875],
+            "size": [256, 2560]
+        },
+        {
+            "id": "vent (92)",
+            "type": "@materials/vent.png",
+            "pos": [-16192.0, 29951.998046875],
+            "size": [512, 2560]
+        },
+        {
+            "id": "dev_floor_256 (130)",
+            "type": "dev_floor_256",
+            "pos": [-13376.0, 28160.0],
+            "size": [1024, 2048],
+            "color": [71, 0, 71, 255]
+        },
+        {
+            "id": "vent (77)",
+            "type": "@materials/vent.png",
+            "pos": [-15167.9990234375, 27904.0],
+            "size": [512, 512]
+        },
+        {
+            "id": "vent (79)",
+            "type": "@materials/vent.png",
+            "pos": [-14016.0, 27648.001953125],
+            "size": [256, 1024]
+        },
+        {
+            "id": "vent (88)",
+            "type": "@materials/vent.png",
+            "pos": [-16320.0, 27904.0],
+            "size": [256, 1536]
+        },
+        {
+            "id": "vent (89)",
+            "type": "@materials/vent.png",
+            "pos": [-15167.9990234375, 27264.001953125],
+            "size": [2048, 256]
+        },
+        {
+            "id": "vent (93)",
+            "type": "@materials/vent.png",
+            "pos": [-14016.0, 30112.0],
+            "size": [256, 2880]
+        },
+        {
+            "id": "vent (94)",
+            "type": "@materials/vent.png",
+            "pos": [-13632.0009765625, 29440.0],
+            "size": [512, 512]
+        },
+        {
+            "id": "vent (95)",
+            "type": "@materials/vent.png",
+            "pos": [-13120.0, 29440.0],
+            "size": [512, 512]
+        },
+        {
+            "id": "vent (78)",
+            "type": "@materials/vent.png",
+            "pos": [-13375.9990234375, 27264.001953125],
+            "rotation": 90.0,
+            "size": [256, 1024]
+        },
+        {
+            "id": "vent (96)",
+            "type": "@materials/vent.png",
+            "pos": [-12736.0, 28416.0],
+            "size": [256, 2560]
+        },
+        {
+            "id": "menu",
+            "type": "@menu",
+            "pos": [-15680.0, 27556.0]
+        },
+        {
+            "id": "range",
+            "type": "@range",
+            "pos": [-14656.0, 27556.0]
+        },
+        {
+            "id": "surf",
+            "type": "@surf",
+            "pos": [-13376.0, 27557.0]
+        },
+        {
+            "id": "dev_floor_256 (124)",
+            "type": "dev_floor_256",
+            "pos": [-14016.0, 28416.0],
+            "size": [256, 512],
+            "color": [255, 0, 255, 255]
+        },
+        {
+            "id": "arrow (28)",
+            "type": "@arrow",
+            "pos": [140142.0, 102333.0]
+        },
+        {
+            "id": "arrow (29)",
+            "type": "@arrow",
+            "pos": [139066.0, 102339.0]
+        },
+        {
+            "id": "arrow (30)",
+            "type": "@arrow",
+            "pos": [138094.0, 102333.0]
+        },
+        {
+            "id": "arrow (31)",
+            "type": "@arrow",
+            "pos": [137018.0, 102339.0]
+        },
+        {
+            "id": "arrow (32)",
+            "type": "@arrow",
+            "pos": [140669.0, 108038.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (33)",
+            "type": "@arrow",
+            "pos": [140669.0, 107002.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (34)",
+            "type": "@arrow",
+            "pos": [140669.0, 105606.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (35)",
+            "type": "@arrow",
+            "pos": [140669.0, 104570.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (36)",
+            "type": "@arrow",
+            "pos": [140669.0, 103494.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (37)",
+            "type": "@arrow",
+            "pos": [140669.0, 102458.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (92)",
+            "type": "@arrow",
+            "pos": [136509.0, 102842.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (93)",
+            "type": "@arrow",
+            "pos": [136509.0, 103878.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "dev_floor_256 (133)",
+            "type": "dev_floor_256",
+            "pos": [136000.0, 107264.0],
+            "size": [1024, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (135)",
+            "type": "dev_floor_256",
+            "pos": [136512.0, 106368.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (97)",
+            "type": "@materials/vent.png",
+            "pos": [137408.0, 107392.0078125],
+            "rotation": -180.0,
+            "size": [256, 1024]
+        },
+        {
+            "id": "vent (98)",
+            "type": "@materials/vent.png",
+            "pos": [135616.0, 107776.0],
+            "rotation": -180.0,
+            "size": [256, 256]
+        },
+        {
+            "id": "vent (99)",
+            "type": "@materials/vent.png",
+            "pos": [136256.0, 107776.0234375],
+            "rotation": 90.0,
+            "size": [256, 1024]
+        },
+        {
+            "id": "vent (100)",
+            "type": "@materials/vent.png",
+            "pos": [137024.0, 107776.0234375],
+            "rotation": 90.0,
+            "size": [256, 512]
+        },
+        {
+            "id": "vent (102)",
+            "type": "@materials/vent.png",
+            "pos": [136512.0, 106688.015625],
+            "rotation": 90.0,
+            "size": [384, 2048]
+        },
+        {
+            "id": "vent (103)",
+            "type": "@materials/vent.png",
+            "pos": [137408.0, 106240.0],
+            "size": [256, 512]
+        },
+        {
+            "id": "vent (104)",
+            "type": "@materials/vent.png",
+            "pos": [135616.0, 102848.0],
+            "size": [256, 7296]
+        },
+        {
+            "id": "dev_floor_256 (136)",
+            "type": "dev_floor_256",
+            "pos": [136512.0, 106112.0],
+            "size": [1536, 256]
+        },
+        {
+            "id": "dev_floor_256 (137)",
+            "type": "dev_floor_256",
+            "pos": [137408.0, 102784.0],
+            "size": [59136, 65536],
+            "color": [71, 0, 71, 255]
+        },
+        {
+            "id": "arrow (38)",
+            "type": "@arrow",
+            "pos": [132406.359375, 120438.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (39)",
+            "type": "@arrow",
+            "pos": [131673.796875, 119705.796875],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (90)",
+            "type": "@arrow",
+            "pos": [130958.203125, 118990.203125],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (91)",
+            "type": "@arrow",
+            "pos": [130225.640625, 118257.640625],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (94)",
+            "type": "@arrow",
+            "pos": [129590.359375, 117622.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (97)",
+            "type": "@arrow",
+            "pos": [128829.0, 115386.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (98)",
+            "type": "@arrow",
+            "pos": [128829.0, 114126.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (99)",
+            "type": "@arrow",
+            "pos": [128829.0, 113090.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (95)",
+            "type": "@arrow",
+            "pos": [128829.0, 111049.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (102)",
+            "type": "@arrow",
+            "pos": [128829.0, 110037.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (106)",
+            "type": "@arrow",
+            "pos": [132918.359375, 120438.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (107)",
+            "type": "@arrow",
+            "pos": [132185.796875, 119705.796875],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (108)",
+            "type": "@arrow",
+            "pos": [131470.203125, 118990.203125],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (109)",
+            "type": "@arrow",
+            "pos": [130737.640625, 118257.640625],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (110)",
+            "type": "@arrow",
+            "pos": [130102.359375, 117622.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (90)-right",
+            "type": "@arrow",
+            "pos": [132000.546875, 118990.203125],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (108)-right",
+            "type": "@arrow",
+            "pos": [132512.546875, 118990.203125],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (39)-right",
+            "type": "@arrow",
+            "pos": [132716.140625, 119705.796875],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (107)-right",
+            "type": "@arrow",
+            "pos": [133228.140625, 119705.796875],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (38)-right",
+            "type": "@arrow",
+            "pos": [133448.703125, 120438.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (106)-right",
+            "type": "@arrow",
+            "pos": [133960.703125, 120438.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (91)-right",
+            "type": "@arrow",
+            "pos": [131267.96875, 118257.640625],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (109)-right",
+            "type": "@arrow",
+            "pos": [131779.953125, 118257.640625],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (110)-right",
+            "type": "@arrow",
+            "pos": [130632.6875, 117622.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "vent (101)",
+            "type": "@materials/vent.png",
+            "pos": [135968.015625, 107264.0],
+            "rotation": -180.0,
+            "size": [64, 256]
+        },
+        {
+            "id": "vent (105)",
+            "type": "@materials/vent.png",
+            "pos": [136224.03125, 107007.9921875],
+            "rotation": -180.0,
+            "size": [64, 256]
+        },
+        {
+            "id": "vent (106)",
+            "type": "@materials/vent.png",
+            "pos": [136224.03125, 107519.9921875],
+            "rotation": -180.0,
+            "size": [64, 256]
+        },
+        {
+            "id": "dev_floor_256 (125)",
+            "type": "dev_floor_256",
+            "pos": [136896.0, 107264.0],
+            "size": [768, 768],
+            "color": [194, 207, 255, 255]
+        },
+        {
+            "id": "arrow (40)",
+            "type": "@arrow",
+            "pos": [141202.0, 108547.0]
+        },
+        {
+            "id": "arrow (41)",
+            "type": "@arrow",
+            "pos": [142278.0, 108541.0]
+        },
+        {
+            "id": "arrow (42)",
+            "type": "@arrow",
+            "pos": [143250.0, 108547.0]
+        },
+        {
+            "id": "arrow (43)",
+            "type": "@arrow",
+            "pos": [144326.0, 108541.0]
+        },
+        {
+            "id": "arrow (44)",
+            "type": "@arrow",
+            "pos": [145298.0, 108547.0]
+        },
+        {
+            "id": "arrow (45)",
+            "type": "@arrow",
+            "pos": [146374.0, 108541.0]
+        },
+        {
+            "id": "arrow (46)",
+            "type": "@arrow",
+            "pos": [147346.0, 108547.0]
+        },
+        {
+            "id": "arrow (47)",
+            "type": "@arrow",
+            "pos": [152317.0, 109062.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (48)",
+            "type": "@arrow",
+            "pos": [152317.0, 110138.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (49)",
+            "type": "@arrow",
+            "pos": [152317.0, 111174.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (50)",
+            "type": "@arrow",
+            "pos": [152317.0, 112570.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (84)",
+            "type": "@arrow",
+            "pos": [152317.0, 113606.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (85)",
+            "type": "@arrow",
+            "pos": [152317.0, 114630.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (86)",
+            "type": "@arrow",
+            "pos": [152317.0, 115706.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (87)",
+            "type": "@arrow",
+            "pos": [152317.0, 116742.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (88)",
+            "type": "@arrow",
+            "pos": [152317.0, 118138.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (89)",
+            "type": "@arrow",
+            "pos": [152317.0, 119174.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (96)",
+            "type": "@arrow",
+            "pos": [148614.0, 108547.0]
+        },
+        {
+            "id": "arrow (100)",
+            "type": "@arrow",
+            "pos": [149690.0, 108541.0]
+        },
+        {
+            "id": "arrow (111)",
+            "type": "@arrow",
+            "pos": [150662.0, 108547.0]
+        },
+        {
+            "id": "arrow (112)",
+            "type": "@arrow",
+            "pos": [151738.0, 108541.0]
+        },
+        {
+            "id": "arrow (113)",
+            "type": "@arrow",
+            "pos": [151814.0, 120701.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (114)",
+            "type": "@arrow",
+            "pos": [150738.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (115)",
+            "type": "@arrow",
+            "pos": [149766.0, 120701.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (116)",
+            "type": "@arrow",
+            "pos": [148690.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (117)",
+            "type": "@arrow",
+            "pos": [147718.0, 120701.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (119)",
+            "type": "@arrow",
+            "pos": [145374.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (120)",
+            "type": "@arrow",
+            "pos": [144402.0, 120701.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (121)",
+            "type": "@arrow",
+            "pos": [143326.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (123)",
+            "type": "@arrow",
+            "pos": [142256.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (124)",
+            "type": "@arrow",
+            "pos": [141284.0, 120701.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (125)",
+            "type": "@arrow",
+            "pos": [140208.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (126)",
+            "type": "@arrow",
+            "pos": [139236.0, 120701.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (127)",
+            "type": "@arrow",
+            "pos": [137968.0, 120701.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (118)",
+            "type": "@arrow",
+            "pos": [128829.0, 112134.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (131)",
+            "type": "@arrow",
+            "pos": [128835.0, 109050.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (136)",
+            "type": "@arrow",
+            "pos": [134982.0, 107267.0]
+        },
+        {
+            "id": "arrow (137)",
+            "type": "@arrow",
+            "pos": [136515.0, 105286.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-left",
+            "type": "@arrow",
+            "pos": [131876.0, 120438.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-left",
+            "type": "@arrow",
+            "pos": [131364.0, 120438.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-left",
+            "type": "@arrow",
+            "pos": [130834.0, 120438.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left",
+            "type": "@arrow",
+            "pos": [130322.0, 120438.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left",
+            "type": "@arrow",
+            "pos": [129791.0, 120438.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left",
+            "type": "@arrow",
+            "pos": [129279.0, 120438.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left",
+            "type": "@arrow",
+            "pos": [128240.0, 120442.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left",
+            "type": "@arrow",
+            "pos": [128771.0, 120442.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-left-up",
+            "type": "@arrow",
+            "pos": [130834.0, 119934.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-up",
+            "type": "@arrow",
+            "pos": [130322.0, 119934.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-up",
+            "type": "@arrow",
+            "pos": [129791.0, 119934.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up",
+            "type": "@arrow",
+            "pos": [129279.0, 119934.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up",
+            "type": "@arrow",
+            "pos": [128240.0, 119938.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up",
+            "type": "@arrow",
+            "pos": [128771.0, 119938.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-left-up-up",
+            "type": "@arrow",
+            "pos": [130834.0, 119430.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-up-up",
+            "type": "@arrow",
+            "pos": [130322.0, 119430.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-up-up",
+            "type": "@arrow",
+            "pos": [129791.0, 119430.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up-up",
+            "type": "@arrow",
+            "pos": [129279.0, 119430.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up-up",
+            "type": "@arrow",
+            "pos": [128240.0, 119434.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up-up",
+            "type": "@arrow",
+            "pos": [128771.0, 119434.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (106)-left-up",
+            "type": "@arrow",
+            "pos": [131364.0, 119938.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-up-up-up",
+            "type": "@arrow",
+            "pos": [130322.0, 118926.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-up-up-up",
+            "type": "@arrow",
+            "pos": [129791.0, 118926.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up-up-up",
+            "type": "@arrow",
+            "pos": [129279.0, 118926.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up-up-up",
+            "type": "@arrow",
+            "pos": [128240.0, 118930.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up-up-up",
+            "type": "@arrow",
+            "pos": [128771.0, 118930.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-up-up-up-up",
+            "type": "@arrow",
+            "pos": [129791.0, 118422.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up-up-up-up",
+            "type": "@arrow",
+            "pos": [129279.0, 118422.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up-up-up-up",
+            "type": "@arrow",
+            "pos": [128240.0, 118426.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up-up-up-up",
+            "type": "@arrow",
+            "pos": [128771.0, 118426.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up-up-up-up-up",
+            "type": "@arrow",
+            "pos": [129279.0, 117918.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up-up-up-up-up",
+            "type": "@arrow",
+            "pos": [128240.0, 117922.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up-up-up-up-up",
+            "type": "@arrow",
+            "pos": [128771.0, 117922.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (101)",
+            "type": "@arrow",
+            "pos": [137990.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (103)",
+            "type": "@arrow",
+            "pos": [137018.0, 120701.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (104)",
+            "type": "@arrow",
+            "pos": [135942.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (110)-right (1)",
+            "type": "@arrow",
+            "pos": [131163.03125, 117622.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (128)",
+            "type": "@arrow",
+            "pos": [134906.0, 120707.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (105)",
+            "type": "@arrow",
+            "pos": [130621.0, 115384.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (129)",
+            "type": "@arrow",
+            "pos": [130621.0, 114124.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (130)",
+            "type": "@arrow",
+            "pos": [130621.0, 113088.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (138)",
+            "type": "@arrow",
+            "pos": [130621.0, 112132.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (139)",
+            "type": "@arrow",
+            "pos": [130621.0, 111047.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (140)",
+            "type": "@arrow",
+            "pos": [130621.0, 110035.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (141)",
+            "type": "@arrow",
+            "pos": [130627.0, 109048.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (142)",
+            "type": "@arrow",
+            "pos": [128835.0, 108092.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (143)",
+            "type": "@arrow",
+            "pos": [130627.0, 108090.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (144)",
+            "type": "@arrow",
+            "pos": [129454.359375, 106614.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (145)",
+            "type": "@arrow",
+            "pos": [128721.796875, 105881.796875],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (146)",
+            "type": "@arrow",
+            "pos": [128006.203125, 105166.203125],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (147)",
+            "type": "@arrow",
+            "pos": [127273.640625, 104433.640625],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (148)",
+            "type": "@arrow",
+            "pos": [126638.359375, 103798.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (149)",
+            "type": "@arrow",
+            "pos": [129966.359375, 106614.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (38)-right (1)",
+            "type": "@arrow",
+            "pos": [130496.703125, 106614.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (106)-right (1)",
+            "type": "@arrow",
+            "pos": [131008.703125, 106614.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (38)-left (1)",
+            "type": "@arrow",
+            "pos": [128924.0, 106614.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-left (1)",
+            "type": "@arrow",
+            "pos": [128412.0, 106614.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-left-up (1)",
+            "type": "@arrow",
+            "pos": [128412.0, 106114.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-left (1)",
+            "type": "@arrow",
+            "pos": [127882.0, 106614.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left (1)",
+            "type": "@arrow",
+            "pos": [127370.0, 106614.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left (1)",
+            "type": "@arrow",
+            "pos": [126839.0, 106614.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left (1)",
+            "type": "@arrow",
+            "pos": [126327.0, 106614.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left (1)",
+            "type": "@arrow",
+            "pos": [125288.0, 106618.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left (1)",
+            "type": "@arrow",
+            "pos": [125819.0, 106618.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-left-up (1)",
+            "type": "@arrow",
+            "pos": [127882.0, 106110.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-up (1)",
+            "type": "@arrow",
+            "pos": [127370.0, 106110.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-up (1)",
+            "type": "@arrow",
+            "pos": [126839.0, 106110.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up (1)",
+            "type": "@arrow",
+            "pos": [126327.0, 106110.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up (1)",
+            "type": "@arrow",
+            "pos": [125288.0, 106114.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up (1)",
+            "type": "@arrow",
+            "pos": [125819.0, 106114.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-left-up-up (1)",
+            "type": "@arrow",
+            "pos": [127882.0, 105606.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-up-up (1)",
+            "type": "@arrow",
+            "pos": [127370.0, 105606.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-up-up (1)",
+            "type": "@arrow",
+            "pos": [126839.0, 105606.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up-up (1)",
+            "type": "@arrow",
+            "pos": [126327.0, 105606.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up-up (1)",
+            "type": "@arrow",
+            "pos": [125288.0, 105610.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up-up (1)",
+            "type": "@arrow",
+            "pos": [125819.0, 105610.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (106)-right-left-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [127370.0, 105102.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [126839.0, 105102.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [126327.0, 105102.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [125288.0, 105106.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [125819.0, 105106.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-up-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [126839.0, 104598.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [126327.0, 104598.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [125288.0, 104602.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [125819.0, 104602.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (106)-right-right (1)-left-up-up-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [126327.0, 104094.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "arrow (106)-right-left-left-up-up-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [125288.0, 104098.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (38)-right-right (1)-left-left-up-up-up-up-up (1)",
+            "type": "@arrow",
+            "pos": [125819.0, 104098.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (150)",
+            "type": "@arrow",
+            "pos": [129233.796875, 105881.796875],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (39)-right (1)",
+            "type": "@arrow",
+            "pos": [129764.140625, 105881.796875],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (107)-right (1)",
+            "type": "@arrow",
+            "pos": [130276.140625, 105881.796875],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (151)",
+            "type": "@arrow",
+            "pos": [128518.203125, 105166.203125],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (90)-right (1)",
+            "type": "@arrow",
+            "pos": [129048.546875, 105166.203125],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (108)-right (1)",
+            "type": "@arrow",
+            "pos": [129560.546875, 105166.203125],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (152)",
+            "type": "@arrow",
+            "pos": [127785.640625, 104433.640625],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (91)-right (1)",
+            "type": "@arrow",
+            "pos": [128315.96875, 104433.640625],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (109)-right (1)",
+            "type": "@arrow",
+            "pos": [128827.953125, 104433.640625],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (153)",
+            "type": "@arrow",
+            "pos": [127150.359375, 103798.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (110)-right (2)",
+            "type": "@arrow",
+            "pos": [127680.6875, 103798.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (110)-right (3)",
+            "type": "@arrow",
+            "pos": [128211.03125, 103798.359375],
+            "rotation": -135.0
+        },
+        {
+            "id": "arrow (154)",
+            "type": "@arrow",
+            "pos": [125877.0, 101562.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (155)",
+            "type": "@arrow",
+            "pos": [125877.0, 100302.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (156)",
+            "type": "@arrow",
+            "pos": [125877.0, 99266.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (157)",
+            "type": "@arrow",
+            "pos": [125877.0, 98310.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (158)",
+            "type": "@arrow",
+            "pos": [125877.0, 97225.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (159)",
+            "type": "@arrow",
+            "pos": [125877.0, 96213.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (160)",
+            "type": "@arrow",
+            "pos": [125883.0, 95226.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (161)",
+            "type": "@arrow",
+            "pos": [127669.0, 101560.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (162)",
+            "type": "@arrow",
+            "pos": [127669.0, 100300.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (163)",
+            "type": "@arrow",
+            "pos": [127669.0, 99264.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (164)",
+            "type": "@arrow",
+            "pos": [127669.0, 98308.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (165)",
+            "type": "@arrow",
+            "pos": [127669.0, 97223.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (166)",
+            "type": "@arrow",
+            "pos": [127669.0, 96211.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (167)",
+            "type": "@arrow",
+            "pos": [127675.0, 95224.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (168)",
+            "type": "@arrow",
+            "pos": [125883.0, 94268.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (169)",
+            "type": "@arrow",
+            "pos": [127675.0, 94266.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (170)",
+            "type": "@arrow",
+            "pos": [126550.0, 93445.0]
+        },
+        {
+            "id": "arrow (171)",
+            "type": "@arrow",
+            "pos": [127626.0, 93439.0]
+        },
+        {
+            "id": "arrow (172)",
+            "type": "@arrow",
+            "pos": [128598.0, 93445.0]
+        },
+        {
+            "id": "arrow (173)",
+            "type": "@arrow",
+            "pos": [129674.0, 93439.0]
+        },
+        {
+            "id": "arrow (174)",
+            "type": "@arrow",
+            "pos": [130646.0, 93445.0]
+        },
+        {
+            "id": "arrow (132)",
+            "type": "@arrow",
+            "pos": [131642.0, 93437.0]
+        },
+        {
+            "id": "arrow (133)",
+            "type": "@arrow",
+            "pos": [132730.0, 93443.0]
+        },
+        {
+            "id": "arrow (122)",
+            "type": "@arrow",
+            "pos": [133754.0, 93443.0]
+        },
+        {
+            "id": "arrow (134)",
+            "type": "@arrow",
+            "pos": [134339.0, 93960.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (135)",
+            "type": "@arrow",
+            "pos": [134339.0, 95220.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (175)",
+            "type": "@arrow",
+            "pos": [134339.0, 96256.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (176)",
+            "type": "@arrow",
+            "pos": [134339.0, 97212.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (177)",
+            "type": "@arrow",
+            "pos": [134339.0, 98297.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (178)",
+            "type": "@arrow",
+            "pos": [134339.0, 99309.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (179)",
+            "type": "@arrow",
+            "pos": [134333.0, 100296.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (181)",
+            "type": "@arrow",
+            "pos": [134339.0, 101542.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (182)",
+            "type": "@arrow",
+            "pos": [134339.0, 102578.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (183)",
+            "type": "@arrow",
+            "pos": [134339.0, 103534.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (184)",
+            "type": "@arrow",
+            "pos": [134339.0, 104619.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (185)",
+            "type": "@arrow",
+            "pos": [134339.0, 105631.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (186)",
+            "type": "@arrow",
+            "pos": [134333.0, 106618.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "vent (107)",
+            "type": "@materials/vent.png",
+            "pos": [136640.0, 99328.0],
+            "rotation": 90.0,
+            "size": [256, 1792]
+        },
+        {
+            "id": "arrow (180)",
+            "type": "@arrow",
+            "pos": [-14406.0, 28413.0]
+        },
+        {
+            "id": "arrow (187)",
+            "type": "@arrow",
+            "pos": [-13501.0, 28422.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (187)-right",
+            "type": "@arrow",
+            "pos": [-13251.0, 28422.0],
+            "rotation": 90.0,
+            "flip_horizontally": true
+        },
+        {
+            "id": "dev_floor_256 (134)",
+            "type": "dev_floor_256",
+            "pos": [-15168.0, 28160.0],
+            "size": [2048, 2048],
+            "color": [116, 112, 112, 255]
         },
         {
             "id": "Strong lamp (1)",
@@ -5992,7 +7946,7 @@
         {
             "id": "point_light (20)",
             "type": "point_light",
-            "pos": [-24575.0, 111297.0],
+            "pos": [-10047.0, 106177.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6001,7 +7955,7 @@
         {
             "id": "point_light (21)",
             "type": "point_light",
-            "pos": [-24575.0, 109311.0],
+            "pos": [-10047.0, 104191.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6010,7 +7964,7 @@
         {
             "id": "point_light (22)",
             "type": "point_light",
-            "pos": [-24575.0, 107519.0],
+            "pos": [-10047.0, 102399.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6019,7 +7973,7 @@
         {
             "id": "point_light (23)",
             "type": "point_light",
-            "pos": [-24577.0, 105537.0],
+            "pos": [-10049.0, 100417.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6028,7 +7982,7 @@
         {
             "id": "point_light (24)",
             "type": "point_light",
-            "pos": [-24577.0, 112577.0],
+            "pos": [-10049.0, 107457.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6037,7 +7991,7 @@
         {
             "id": "point_light (25)",
             "type": "point_light",
-            "pos": [-24575.0, 100289.0],
+            "pos": [-10047.0, 95169.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6046,7 +8000,7 @@
         {
             "id": "point_light (26)",
             "type": "point_light",
-            "pos": [-24577.0, 101569.0],
+            "pos": [-10049.0, 96449.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6055,7 +8009,7 @@
         {
             "id": "point_light (27)",
             "type": "point_light",
-            "pos": [-24575.0, 98303.0],
+            "pos": [-10047.0, 93183.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6064,7 +8018,7 @@
         {
             "id": "point_light (28)",
             "type": "point_light",
-            "pos": [-24575.0, 96511.0],
+            "pos": [-10047.0, 91391.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6073,7 +8027,7 @@
         {
             "id": "point_light (30)",
             "type": "point_light",
-            "pos": [-22979.0, 96449.0],
+            "pos": [-8451.0, 91329.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6082,7 +8036,7 @@
         {
             "id": "point_light (31)",
             "type": "point_light",
-            "pos": [-20993.0, 96449.0],
+            "pos": [-6465.0, 91329.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6091,7 +8045,7 @@
         {
             "id": "point_light (32)",
             "type": "point_light",
-            "pos": [-18817.0, 96447.0],
+            "pos": [-4289.0, 91327.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6100,7 +8054,7 @@
         {
             "id": "point_light (29)",
             "type": "point_light",
-            "pos": [-17153.0, 96451.0],
+            "pos": [-2625.0, 91331.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6109,7 +8063,7 @@
         {
             "id": "point_light (33)",
             "type": "point_light",
-            "pos": [-14977.0, 96449.0],
+            "pos": [-449.0, 91329.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6118,7 +8072,7 @@
         {
             "id": "point_light (34)",
             "type": "point_light",
-            "pos": [-13375.0, 96447.0],
+            "pos": [1153.0, 91327.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6127,7 +8081,7 @@
         {
             "id": "point_light (35)",
             "type": "point_light",
-            "pos": [-11199.0, 96445.0],
+            "pos": [3329.0, 91325.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6148,7 +8102,7 @@
         {
             "id": "point_light (49)",
             "type": "point_light",
-            "pos": [-50239.0, 187455.0],
+            "pos": [53889.0, 99967.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6157,7 +8111,7 @@
         {
             "id": "point_light (50)",
             "type": "point_light",
-            "pos": [-50241.0, 190721.0],
+            "pos": [53887.0, 103233.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6166,7 +8120,7 @@
         {
             "id": "point_light (51)",
             "type": "point_light",
-            "pos": [-50239.0, 189441.0],
+            "pos": [53889.0, 101953.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6175,7 +8129,7 @@
         {
             "id": "point_light (53)",
             "type": "point_light",
-            "pos": [-46657.0, 184961.0],
+            "pos": [57471.0, 97473.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6184,7 +8138,7 @@
         {
             "id": "point_light (54)",
             "type": "point_light",
-            "pos": [-46081.0, 187071.0],
+            "pos": [58047.0, 99583.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6193,7 +8147,7 @@
         {
             "id": "point_light (55)",
             "type": "point_light",
-            "pos": [-46081.0, 189313.0],
+            "pos": [58047.0, 101825.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6202,7 +8156,7 @@
         {
             "id": "point_light (56)",
             "type": "point_light",
-            "pos": [-46081.0, 191359.0],
+            "pos": [58047.0, 103871.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6211,7 +8165,7 @@
         {
             "id": "point_light (57)",
             "type": "point_light",
-            "pos": [-46081.0, 193793.0],
+            "pos": [58047.0, 106305.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6220,7 +8174,7 @@
         {
             "id": "point_light (59)",
             "type": "point_light",
-            "pos": [-46081.0, 196545.0],
+            "pos": [58047.0, 109057.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6229,7 +8183,7 @@
         {
             "id": "point_light (61)",
             "type": "point_light",
-            "pos": [-46081.0, 198655.0],
+            "pos": [58047.0, 111167.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6238,7 +8192,7 @@
         {
             "id": "point_light (63)",
             "type": "point_light",
-            "pos": [-46081.0, 200833.0],
+            "pos": [58047.0, 113345.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6247,7 +8201,7 @@
         {
             "id": "point_light (64)",
             "type": "point_light",
-            "pos": [-46081.0, 201855.0],
+            "pos": [58047.0, 114367.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6256,7 +8210,7 @@
         {
             "id": "point_light (65)",
             "type": "point_light",
-            "pos": [-47169.0, 202497.0],
+            "pos": [56959.0, 115009.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6265,7 +8219,7 @@
         {
             "id": "point_light (67)",
             "type": "point_light",
-            "pos": [-48961.0, 202497.0],
+            "pos": [55167.0, 115009.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6274,7 +8228,7 @@
         {
             "id": "point_light (68)",
             "type": "point_light",
-            "pos": [-50241.0, 201407.0],
+            "pos": [53887.0, 113919.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6283,7 +8237,7 @@
         {
             "id": "point_light (69)",
             "type": "point_light",
-            "pos": [-50241.0, 200129.0],
+            "pos": [53887.0, 112641.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6292,7 +8246,7 @@
         {
             "id": "point_light (70)",
             "type": "point_light",
-            "pos": [-50241.0, 198977.0],
+            "pos": [53887.0, 111489.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6301,7 +8255,7 @@
         {
             "id": "point_light (71)",
             "type": "point_light",
-            "pos": [-50241.0, 197759.0],
+            "pos": [53887.0, 110271.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6310,7 +8264,7 @@
         {
             "id": "point_light (72)",
             "type": "point_light",
-            "pos": [-50241.0, 196737.0],
+            "pos": [53887.0, 109249.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 620.864990234375
@@ -6319,7 +8273,7 @@
         {
             "id": "point_light (73)",
             "type": "point_light",
-            "pos": [-48193.0, 186559.0],
+            "pos": [55935.0, 99071.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6328,7 +8282,7 @@
         {
             "id": "point_light (47)",
             "type": "point_light",
-            "pos": [-49153.0, 186559.0],
+            "pos": [54975.0, 99071.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -6337,10 +8291,693 @@
         {
             "id": "point_light (48)",
             "type": "point_light",
-            "pos": [-46081.0, 195199.0],
+            "pos": [58047.0, 107711.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (36)",
+            "type": "point_light",
+            "pos": [140095.0, 98177.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (38)",
+            "type": "point_light",
+            "pos": [136511.0, 103937.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (66)",
+            "type": "point_light",
+            "pos": [140671.0, 107009.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (74)",
+            "type": "point_light",
+            "pos": [140673.0, 105153.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (75)",
+            "type": "point_light",
+            "pos": [140673.0, 103553.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (76)",
+            "type": "point_light",
+            "pos": [138111.0, 102337.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (77)",
+            "type": "point_light",
+            "pos": [139455.0, 102335.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (37)",
+            "type": "point_light",
+            "pos": [131991.0, 120029.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (78)",
+            "type": "point_light",
+            "pos": [130724.0, 118762.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (81)",
+            "type": "point_light",
+            "pos": [128831.0, 115777.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (82)",
+            "type": "point_light",
+            "pos": [128833.0, 114177.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (84)",
+            "type": "point_light",
+            "pos": [128829.0, 110340.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (87)",
+            "type": "point_light",
+            "pos": [136449.0, 120703.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (88)",
+            "type": "point_light",
+            "pos": [133697.0, 120129.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (89)",
+            "type": "point_light",
+            "pos": [133375.0, 118273.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (90)",
+            "type": "point_light",
+            "pos": [131327.0, 116737.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (39)",
+            "type": "point_light",
+            "pos": [141823.0, 108543.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (41)",
+            "type": "point_light",
+            "pos": [146839.0, 108543.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (43)",
+            "type": "point_light",
+            "pos": [144705.0, 108545.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (44)",
+            "type": "point_light",
+            "pos": [152319.0, 110143.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (45)",
+            "type": "point_light",
+            "pos": [152319.0, 112577.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (46)",
+            "type": "point_light",
+            "pos": [152321.0, 114241.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (58)",
+            "type": "point_light",
+            "pos": [152319.0, 116735.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (62)",
+            "type": "point_light",
+            "pos": [152319.0, 119551.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (83)",
+            "type": "point_light",
+            "pos": [148107.0, 108543.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (92)",
+            "type": "point_light",
+            "pos": [150655.0, 108545.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (96)",
+            "type": "point_light",
+            "pos": [150337.0, 120705.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (97)",
+            "type": "point_light",
+            "pos": [146945.0, 120703.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (98)",
+            "type": "point_light",
+            "pos": [145023.0, 120703.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (99)",
+            "type": "point_light",
+            "pos": [143809.0, 120705.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (100)",
+            "type": "point_light",
+            "pos": [139585.0, 120705.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (101)",
+            "type": "point_light",
+            "pos": [141887.0, 120705.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (105)",
+            "type": "point_light",
+            "pos": [128835.0, 109353.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (109)",
+            "type": "point_light",
+            "pos": [134359.0, 107265.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (111)",
+            "type": "point_light",
+            "pos": [136517.0, 105345.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (40)",
+            "type": "point_light",
+            "pos": [129663.0, 120257.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (42)",
+            "type": "point_light",
+            "pos": [128383.0, 118719.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (60)",
+            "type": "point_light",
+            "pos": [137621.0, 120705.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (79)",
+            "type": "point_light",
+            "pos": [134207.0, 120641.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (52)",
+            "type": "point_light",
+            "pos": [135413.0, 120703.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (80)",
+            "type": "point_light",
+            "pos": [130623.0, 115775.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (85)",
+            "type": "point_light",
+            "pos": [130625.0, 114175.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (91)",
+            "type": "point_light",
+            "pos": [130621.0, 110338.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (93)",
+            "type": "point_light",
+            "pos": [130627.0, 109351.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (94)",
+            "type": "point_light",
+            "pos": [129039.0, 106205.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (95)",
+            "type": "point_light",
+            "pos": [126711.0, 106433.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (103)",
+            "type": "point_light",
+            "pos": [130423.0, 104449.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (108)",
+            "type": "point_light",
+            "pos": [128375.0, 102913.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (110)",
+            "type": "point_light",
+            "pos": [127772.0, 104938.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (112)",
+            "type": "point_light",
+            "pos": [125431.0, 104895.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (113)",
+            "type": "point_light",
+            "pos": [125879.0, 101953.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (114)",
+            "type": "point_light",
+            "pos": [125881.0, 100353.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (115)",
+            "type": "point_light",
+            "pos": [125879.0, 97921.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (116)",
+            "type": "point_light",
+            "pos": [125877.0, 96516.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (117)",
+            "type": "point_light",
+            "pos": [125883.0, 95529.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (118)",
+            "type": "point_light",
+            "pos": [127671.0, 101951.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (119)",
+            "type": "point_light",
+            "pos": [127673.0, 100351.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (120)",
+            "type": "point_light",
+            "pos": [127671.0, 97919.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (121)",
+            "type": "point_light",
+            "pos": [127669.0, 96514.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (122)",
+            "type": "point_light",
+            "pos": [127675.0, 95527.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (123)",
+            "type": "point_light",
+            "pos": [130139.0, 93441.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (124)",
+            "type": "point_light",
+            "pos": [128005.0, 93443.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (102)",
+            "type": "point_light",
+            "pos": [132223.0, 93439.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (106)",
+            "type": "point_light",
+            "pos": [133491.0, 93439.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (125)",
+            "type": "point_light",
+            "pos": [134335.0, 95169.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (126)",
+            "type": "point_light",
+            "pos": [134337.0, 97601.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (127)",
+            "type": "point_light",
+            "pos": [134339.0, 99006.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (128)",
+            "type": "point_light",
+            "pos": [134333.0, 99993.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (107)",
+            "type": "point_light",
+            "pos": [134335.0, 101491.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (129)",
+            "type": "point_light",
+            "pos": [134337.0, 103923.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (130)",
+            "type": "point_light",
+            "pos": [134339.0, 105328.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (131)",
+            "type": "point_light",
+            "pos": [134333.0, 106315.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (86)",
+            "type": "point_light",
+            "pos": [128769.0, 112067.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (104)",
+            "type": "point_light",
+            "pos": [130561.0, 112065.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (132)",
+            "type": "point_light",
+            "pos": [-13377.0, 28415.0],
+            "falloff": {
+                "radius": 1000.0
+            }
+        },
+        {
+            "id": "point_light (135)",
+            "type": "point_light",
+            "pos": [-14273.0, 28417.0],
+            "color": [255, 0, 255, 255],
+            "falloff": {
+                "radius": 340.4259948730469
             }
         },
         {
@@ -8170,6 +10807,21 @@
         {
             "id": "team_spawn (11)",
             "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [-50177.0, 192641.0]
+        },
+        {
+            "id": "team_spawn (12)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [-15105.0, 29569.0]
+        },
+        {
+            "id": "team_spawn (13)",
+            "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [-50177.0, 192641.0]
         },
@@ -11126,7 +13778,7 @@
         {
             "id": "entry18",
             "type": "portal",
-            "pos": [-24576.0, 115776.015625],
+            "pos": [-10047.998046875, 110656.015625],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -11150,7 +13802,7 @@
             "id": "tip2_1 (1)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-24576.0, 115136.0],
+            "pos": [-10048.0, 110016.0],
             "size": [1536, 2048],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -11165,13 +13817,13 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Some maps let you surf!"
+            "context_tip": "Surfing with portals is possible!"
         },
         {
             "id": "portal",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-24576.0, 108992.0078125],
+            "pos": [-10048.0, 103872.0],
             "size": [1536, 8704],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11192,7 +13844,7 @@
         {
             "id": "portal (1)",
             "type": "portal",
-            "pos": [-24576.0, 113152.0],
+            "pos": [-10047.998046875, 108032.0078125],
             "rotation": -90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11211,7 +13863,7 @@
             "id": "surf_start",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-24576.0, 113728.0],
+            "pos": [-10048.0, 108607.9921875],
             "size": [1536, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -11237,7 +13889,7 @@
             "id": "surf_start (1)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-24576.0, 104256.0078125],
+            "pos": [-10048.0, 99136.0],
             "size": [1536, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -11261,7 +13913,7 @@
             "id": "surf_start (2)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-24576.0, 103360.0],
+            "pos": [-10048.0, 98240.0],
             "size": [1536, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -11280,12 +13932,12 @@
                 "amount": 0.0
             },
             "exit_position": "PORTAL_CENTER",
-            "context_tip": "Now you'll have to make a quick turn to the right.\nHold {MOVE_FORWARD} until you hit the second portal. Then press and hold {MOVE_RIGHT}."
+            "context_tip": "You'll have to make a quick turn to the right.\nHold {MOVE_FORWARD} until you hit the second portal. Then press and hold {MOVE_RIGHT}."
         },
         {
             "id": "portal (2)",
             "type": "portal",
-            "pos": [-24576.0, 102656.015625],
+            "pos": [-10047.998046875, 97536.0234375],
             "rotation": -90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11304,7 +13956,7 @@
             "id": "portal (3)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-26016.0, 92896.0],
+            "pos": [-11488.0, 87776.0],
             "size": [30912, 19904],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11325,7 +13977,7 @@
         {
             "id": "portal (4)",
             "type": "portal",
-            "pos": [-24576.0, 96512.0],
+            "pos": [-10048.0, 91392.0],
             "size": [512, 512],
             "color_preset": "WHITE",
             "trampoline_like": true,
@@ -11343,7 +13995,7 @@
             "id": "surf_start (3)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-9920.0, 96512.0],
+            "pos": [4608.0, 91392.0],
             "size": [1280, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -11367,7 +14019,7 @@
             "id": "portal (5)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-33568.0, 108928.0],
+            "pos": [-19040.0, 103807.9921875],
             "size": [15680, 12160],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11389,7 +14041,7 @@
             "id": "portal (6)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-15648.0, 108896.0],
+            "pos": [-1120.0, 103776.0],
             "size": [15680, 12096],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11411,7 +14063,7 @@
             "id": "portal (7)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-5504.0, 100064.0],
+            "pos": [9024.0, 94944.0],
             "size": [10112, 5568],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11433,7 +14085,7 @@
             "id": "portal (8)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-5472.0, 89376.0],
+            "pos": [9056.0, 84256.0],
             "size": [10176, 12864],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11559,8 +14211,9 @@
         {
             "id": "shooting_range",
             "type": "portal",
-            "pos": [22144.0, 101184.0078125],
+            "pos": [-14656.0, 27904.009765625],
             "rotation": -90.0,
+            "size": [512, 512],
             "reacts_to": {
                 "bullets": false
             },
@@ -11579,7 +14232,7 @@
         {
             "id": "exit18",
             "type": "portal",
-            "pos": [-8384.0, 96512.0],
+            "pos": [6144.0, 91392.0],
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
@@ -11603,7 +14256,7 @@
             "id": "portal (11)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-35104.0, 189696.0],
+            "pos": [69024.0, 102208.0],
             "size": [28096, 62720],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11625,7 +14278,7 @@
             "id": "portal (12)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-64703.99609375, 189792.0],
+            "pos": [39424.0, 102304.0],
             "size": [26624, 62272],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11647,7 +14300,7 @@
             "id": "portal (14)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-50272.0, 175008.0],
+            "pos": [53856.0, 87520.0],
             "size": [2240, 32960],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11668,7 +14321,7 @@
         {
             "id": "portal (17)",
             "type": "portal",
-            "pos": [-50240.00390625, 191296.0],
+            "pos": [53888.0, 103808.0078125],
             "rotation": -90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11687,7 +14340,7 @@
             "id": "surf_start (7)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-50240.0, 191872.0],
+            "pos": [53888.0, 104384.0],
             "size": [1536, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -11707,13 +14360,13 @@
                 "amount": 0.0
             },
             "exit_position": "PORTAL_CENTER",
-            "context_tip": "Tip: Use dash to boost ({DASH}). It prolongs airborne time.\nHowever, Sprint ({SPRINT}) is useless when flying. Don't use it."
+            "context_tip": "Tip: Use dash to boost ({DASH}). It prolongs airborne time.\nDon't use Sprint ({SPRINT}). It is useless when flying."
         },
         {
             "id": "tip2_1 (4)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-50240.0, 193280.0],
+            "pos": [53888.0, 105792.0078125],
             "size": [1536, 2048],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -11733,7 +14386,7 @@
         {
             "id": "entry19",
             "type": "portal",
-            "pos": [-50240.00390625, 193920.015625],
+            "pos": [53888.0, 106432.03125],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -11756,7 +14409,7 @@
         {
             "id": "portal (10)",
             "type": "portal",
-            "pos": [-50240.0, 186560.0],
+            "pos": [53888.0, 99072.0],
             "size": [512, 512],
             "color_preset": "WHITE",
             "trampoline_like": true,
@@ -11772,7 +14425,7 @@
         {
             "id": "portal (19)",
             "type": "portal",
-            "pos": [-46080.0, 186560.0],
+            "pos": [58048.0, 99072.0],
             "rotation": 90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11789,7 +14442,7 @@
         {
             "id": "portal (21)",
             "type": "portal",
-            "pos": [-46080.0, 188672.0],
+            "pos": [58048.0, 101184.0078125],
             "rotation": 90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11806,7 +14459,7 @@
         {
             "id": "portal (20)",
             "type": "portal",
-            "pos": [-46080.0, 190528.0],
+            "pos": [58048.0, 103040.015625],
             "rotation": 90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11823,7 +14476,7 @@
         {
             "id": "portal (22)",
             "type": "portal",
-            "pos": [-46080.0, 192768.0],
+            "pos": [58048.0, 105280.0078125],
             "rotation": 90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11840,7 +14493,7 @@
         {
             "id": "exit19 (1)",
             "type": "portal",
-            "pos": [-50240.0, 195072.0],
+            "pos": [53888.0, 107584.0078125],
             "rotation": 90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -11851,7 +14504,7 @@
             "reacts_to_factions": {
                 "resistance": false
             },
-            "portal_exit": "entry18",
+            "portal_exit": "entry20",
             "character_exit_impulse": {
                 "amount": 20000.0
             },
@@ -11864,7 +14517,7 @@
         {
             "id": "portal (23)",
             "type": "portal",
-            "pos": [-46080.0, 202496.015625],
+            "pos": [58048.0, 115008.03125],
             "rotation": -180.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11881,7 +14534,7 @@
         {
             "id": "portal (24)",
             "type": "portal",
-            "pos": [-50240.0, 202496.015625],
+            "pos": [53888.0, 115008.03125],
             "rotation": -90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -11899,7 +14552,7 @@
             "id": "tip2_1 (5)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-50240.0, 196096.0],
+            "pos": [53888.0, 108607.9921875],
             "size": [1536, 1280],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -11920,7 +14573,7 @@
             "id": "portal (13)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-50272.0, 208832.0],
+            "pos": [53856.0, 121343.9921875],
             "size": [2240, 24192],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -11937,6 +14590,718 @@
                 "id": null
             },
             "portal_exit": "surf_start (7)"
+        },
+        {
+            "id": "surf_start (4)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-15167.9990234375, 28800.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "exit_position": "PORTAL_CENTER",
+            "context_tip": "The left portal will take you to the Main menu.\nOr, you can go to Shooting range to test all 20+ weapons."
+        },
+        {
+            "id": "tip2_1 (7)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-15167.9990234375, 30207.998046875],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "You have completed the Tutorial!\nThank you for playing!"
+        },
+        {
+            "id": "entry20",
+            "type": "portal",
+            "pos": [-15168.005859375, 30848.0234375],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "main_menu",
+            "type": "portal",
+            "pos": [-15680.0, 27904.009765625],
+            "rotation": -90.0,
+            "size": [512, 512],
+            "color_preset": "GREEN",
+            "reacts_to": {
+                "bullets": false
+            },
+            "portal_exit": "main_menu",
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "surf_portal",
+            "type": "portal",
+            "pos": [-13376.0, 27904.009765625],
+            "rotation": -90.0,
+            "size": [512, 512],
+            "color_preset": "PINK",
+            "reacts_to": {
+                "bullets": false
+            },
+            "portal_exit": "hard_surf_start",
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "surf_start (5)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-14016.0, 28416.0],
+            "size": [256, 512],
+            "color_preset": "PINK",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "exit_position": "PORTAL_CENTER",
+            "context_tip": "Not enough surfing?\nHow about a really hardcore trial?"
+        },
+        {
+            "id": "exit19",
+            "type": "portal",
+            "pos": [136896.015625, 107264.015625],
+            "rotation": 90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry20",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "portal (9)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [151616.0, 102912.0],
+            "size": [28160, 62720],
+            "color_preset": "PINK",
+            "ignore_airborne_characters": true,
+            "enter_time_ms": 0.0,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "id": null
+            },
+            "begin_entering_particles": {
+                "id": null
+            },
+            "portal_exit": "hard_surf_start"
+        },
+        {
+            "id": "portal (15)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [122112.0, 103007.9921875],
+            "size": [26752, 62272],
+            "color_preset": "PINK",
+            "ignore_airborne_characters": true,
+            "enter_time_ms": 0.0,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "id": null
+            },
+            "begin_entering_particles": {
+                "id": null
+            },
+            "portal_exit": "hard_surf_start"
+        },
+        {
+            "id": "portal (16)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [136512.0, 121536.0],
+            "size": [2048, 25216],
+            "color_preset": "PINK",
+            "ignore_airborne_characters": true,
+            "enter_time_ms": 0.0,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "id": null
+            },
+            "begin_entering_particles": {
+                "id": null
+            },
+            "portal_exit": "hard_surf_start"
+        },
+        {
+            "id": "portal (18)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [136512.0, 88864.0],
+            "size": [2048, 34240],
+            "color_preset": "PINK",
+            "ignore_airborne_characters": true,
+            "enter_time_ms": 0.0,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "id": null
+            },
+            "begin_entering_particles": {
+                "id": null
+            },
+            "portal_exit": "hard_surf_start"
+        },
+        {
+            "id": "portal (26)",
+            "type": "portal",
+            "pos": [140672.0, 108544.0],
+            "rotation": -360.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (27)",
+            "type": "portal",
+            "pos": [140672.0, 105984.0078125],
+            "rotation": 90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (30)",
+            "type": "portal",
+            "pos": [140672.0, 102336.0],
+            "rotation": 90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (31)",
+            "type": "portal",
+            "pos": [136512.0, 102336.0],
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (32)",
+            "type": "portal",
+            "pos": [136512.015625, 105792.015625],
+            "rotation": -90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_airborne_ms": 700.0,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "hard_surf_start",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [136512.0, 106368.0078125],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "exit_position": "PORTAL_CENTER",
+            "context_tip": "Now there is no turning back."
+        },
+        {
+            "id": "portal (33)",
+            "type": "portal",
+            "pos": [142912.0, 108543.9921875],
+            "rotation": -360.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (38)",
+            "type": "portal",
+            "pos": [152320.03125, 111552.0390625],
+            "rotation": -270.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (39)",
+            "type": "portal",
+            "pos": [152320.0, 115584.03125],
+            "rotation": -270.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (40)",
+            "type": "portal",
+            "pos": [152320.0, 118144.03125],
+            "rotation": -270.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (42)",
+            "type": "portal",
+            "pos": [152320.0, 120704.0],
+            "rotation": -180.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (43)",
+            "type": "portal",
+            "pos": [148287.984375, 120704.0],
+            "rotation": -180.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (44)",
+            "type": "portal",
+            "pos": [146495.984375, 120704.0],
+            "rotation": -180.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (46)",
+            "type": "portal",
+            "pos": [133604.1875, 120676.3515625],
+            "rotation": 224.99998474121094,
+            "size": [1920, 1984],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 7000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (47)",
+            "type": "portal",
+            "pos": [128831.9921875, 116864.0],
+            "rotation": -90.0,
+            "size": [1536, 1536],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_airborne_ms": 800.0,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (28)",
+            "type": "portal",
+            "pos": [152320.03125, 108544.046875],
+            "rotation": -270.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "congrats",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [136000.0, 107264.0],
+            "size": [1024, 768],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "exit_position": "PORTAL_CENTER",
+            "context_tip": "CONGRATULATIONS!"
+        },
+        {
+            "id": "portal (25)",
+            "type": "portal",
+            "pos": [130624.0, 116864.0],
+            "rotation": -90.0,
+            "size": [1536, 1536],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_airborne_ms": 800.0,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (35)",
+            "type": "portal",
+            "pos": [130604.40625, 107372.1328125],
+            "rotation": 224.99998474121094,
+            "size": [1024, 1024],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 7000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (36)",
+            "type": "portal",
+            "pos": [125879.9921875, 103040.0],
+            "rotation": -90.0,
+            "size": [1536, 1536],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_airborne_ms": 800.0,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (37)",
+            "type": "portal",
+            "pos": [127672.0, 103040.0],
+            "rotation": -90.0,
+            "size": [1536, 1536],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_airborne_ms": 800.0,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (41)",
+            "type": "portal",
+            "pos": [125880.0078125, 93442.0],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (45)",
+            "type": "portal",
+            "pos": [127672.0, 93440.0],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_airborne_ms": 1000.0,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (29)",
+            "type": "portal",
+            "pos": [128808.2890625, 107368.46875],
+            "rotation": 224.99998474121094,
+            "size": [1216, 1024],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 7000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (48)",
+            "type": "portal",
+            "pos": [134336.0, 107264.0],
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (49)",
+            "type": "portal",
+            "pos": [134336.0, 93440.0],
+            "rotation": 90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
         }
     ]
 }
