@@ -6447,3 +6447,5 @@ This will discard your redo history."
         - ..just pull out the same type automatically to the hand if it exists in inventory.
             - can be done logic-side.
         - alternatively pull any other grenade. Can as well pick the first that's returned by for each item recursive, will most likely coincide with the hotbar.
+- LPM doesnt shoot if right-handed stance is on
+

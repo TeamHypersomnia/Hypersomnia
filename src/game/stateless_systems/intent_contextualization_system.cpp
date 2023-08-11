@@ -141,7 +141,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			if (requested_index != static_cast<std::size_t>(-1)) {
 				const auto& idx = requested_index;
 
-				const auto action = subject.calc_hand_action(idx);
+				const auto action = subject.calc_viable_hand_action(idx);
 				callee = action.held_item;
 				action_type = action.type;
 

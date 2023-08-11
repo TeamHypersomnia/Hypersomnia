@@ -113,7 +113,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 		const auto chosen_action = [&]() {
 			for (std::size_t i = 0; i < hand_count_v; ++i) {
 				if (::get_hand_flag(it, i)) {
-					const auto action = it.calc_hand_action(i);
+					const auto action = it.calc_viable_hand_action(i);
 					return action.type;
 				}
 			}

@@ -2,6 +2,7 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/components/item_sync.h"
+#include "game/detail/weapon_like.h"
 
 template <class E>
 std::optional<unsigned> inventory_mixin<E>::find_space_occupied() const {
@@ -120,12 +121,11 @@ typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_if_any_
 }
 
 template <class E>
-hand_action inventory_mixin<E>::calc_hand_action(const std::size_t requested_index) const {
-	const auto& self = *static_cast<const E*>(this);
-
-	const auto in_primary = self.get_if_any_item_in_hand_no(0);
-	const auto in_secondary = self.get_if_any_item_in_hand_no(1);
-
+hand_action calc_hand_action(
+	const std::size_t requested_index,
+	const E in_primary,
+	const E in_secondary
+) {
 	if (in_primary.alive() && in_secondary.alive()) {
 		return {
 			requested_index,
@@ -150,6 +150,35 @@ hand_action inventory_mixin<E>::calc_hand_action(const std::size_t requested_ind
 
 	return { static_cast<std::size_t>(-1), entity_id(), weapon_action_type::COUNT };
 }
+
+template <class E>
+hand_action inventory_mixin<E>::calc_hand_action(const std::size_t requested_index) const {
+	const auto& self = *static_cast<const E*>(this);
+
+	const auto in_primary = self.get_if_any_item_in_hand_no(0);
+	const auto in_secondary = self.get_if_any_item_in_hand_no(1);
+
+	return ::calc_hand_action(requested_index, in_primary, in_secondary);
+}
+
+template <class E>
+hand_action inventory_mixin<E>::calc_viable_hand_action(const std::size_t requested_index) const {
+	const auto& self = *static_cast<const E*>(this);
+
+	auto actionable_or_default = [&](const auto& candidate) {
+		if (::is_weapon_like(candidate) || ::is_armor_like(candidate)) {
+			return candidate;
+		}
+
+		return self.get_cosmos()[entity_id()];
+	};
+
+	const auto in_primary = actionable_or_default(self.get_if_any_item_in_hand_no(0));
+	const auto in_secondary = actionable_or_default(self.get_if_any_item_in_hand_no(1));
+
+	return ::calc_hand_action(requested_index, in_primary, in_secondary);
+}
+
 
 template <class E>
 bool inventory_mixin<E>::only_secondary_holds_item() const {

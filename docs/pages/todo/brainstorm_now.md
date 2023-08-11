@@ -11,7 +11,6 @@ summary: That which we are brainstorming at the moment.
     - Dash should just take stamina on credit like in souls
     - We can make the dash a little more expensive to compensate so that we can still do 4 dashes on a full bar
         - This game is too fast anyway so we wouldn't want more dashes here
-- LPM doesnt shoot if right-handed stance is on
 
 - DISREGARDED:
     - Switch to previous weapon when:
