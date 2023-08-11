@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-11 15:52:10.347399 UTC"
+        "version_timestamp": "2023-08-11 16:42:14.399177 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -240,9 +240,101 @@
     ],
     "layers": [
         {
-            "id": "Level18",
-            "is_open_in_editor": false,
+            "id": "Level19",
             "nodes": [
+                "exit19 (1)",
+                "arrow (59)",
+                "arrow (58)",
+                "arrow (57)",
+                "arrow (56)",
+                "point_light (53)",
+                "arrow (66)",
+                "arrow (65)",
+                "arrow (64)",
+                "arrow (63)",
+                "arrow (62)",
+                "arrow (61)",
+                "arrow (60)",
+                "arrow (51)",
+                "arrow (78)",
+                "arrow (77)",
+                "arrow (76)",
+                "arrow (75)",
+                "arrow (83)",
+                "arrow (82)",
+                "arrow (81)",
+                "arrow (80)",
+                "arrow (79)",
+                "arrow (74)",
+                "arrow (73)",
+                "arrow (72)",
+                "arrow (71)",
+                "arrow (70)",
+                "arrow (69)",
+                "arrow (68)",
+                "arrow (67)",
+                "arrow (52)",
+                "arrow (53)",
+                "arrow (54)",
+                "arrow (55)",
+                "portal (11)",
+                "portal (12)",
+                "portal (13)",
+                "portal (14)",
+                "portal (24)",
+                "portal (23)",
+                "portal (22)",
+                "portal (20)",
+                "portal (21)",
+                "portal (19)",
+                "portal (10)",
+                "portal (17)",
+                "dev_floor_256 (127)",
+                "dev_floor_256 (122)",
+                "dev_floor_256 (126)",
+                "dev_floor_256 (128)",
+                "team_spawn (11)",
+                "surf_start (7)",
+                "tip2_1 (5)",
+                "tip2_1 (4)",
+                "vent (84)",
+                "vent (83)",
+                "vent (87)",
+                "vent (86)",
+                "vent (85)",
+                "vent (80)",
+                "vent (81)",
+                "point_light (49)",
+                "point_light (50)",
+                "point_light (72)",
+                "point_light (71)",
+                "point_light (70)",
+                "point_light (69)",
+                "point_light (68)",
+                "point_light (67)",
+                "point_light (65)",
+                "point_light (64)",
+                "point_light (63)",
+                "point_light (61)",
+                "point_light (48)",
+                "point_light (59)",
+                "point_light (57)",
+                "point_light (56)",
+                "point_light (55)",
+                "point_light (47)",
+                "point_light (73)",
+                "point_light (54)",
+                "point_light (51)",
+                "vent (82)",
+                "entry19",
+                "dev_floor_256 (131)",
+                "dev_floor_256 (132)"
+            ]
+        },
+        {
+            "id": "Level18",
+            "nodes": [
+                "exit18",
                 "arrow (27)",
                 "arrow (26)",
                 "arrow (25)",
@@ -292,16 +384,19 @@
                 "point_light (25)",
                 "portal (1)",
                 "dev_floor_256 (113)",
+                "dev_floor_256 (121)",
                 "dev_floor_256 (116)",
                 "dev_floor_256 (108)",
                 "surf_start (3)",
                 "vent (75)",
+                "vent (76)",
                 "vent (74)",
                 "dev_floor_256 (111)",
                 "dev_floor_256 (110)",
                 "dev_floor_256 (107)",
                 "surf_start (2)",
                 "surf_start (1)",
+                "team_spawn (10)",
                 "surf_start",
                 "tip2_1 (1)",
                 "vent (73)",
@@ -321,7 +416,6 @@
         },
         {
             "id": "Level17",
-            "is_open_in_editor": false,
             "nodes": [
                 "obs23",
                 "obs24",
@@ -3913,22 +4007,22 @@
         {
             "id": "vent (74)",
             "type": "@materials/vent.png",
-            "pos": [-7359.99755859375, 97087.984375],
+            "pos": [-9279.998046875, 97087.984375],
             "rotation": -90.0,
-            "size": [384, 6400]
+            "size": [384, 2560]
         },
         {
             "id": "vent (75)",
             "type": "@materials/vent.png",
-            "pos": [-7360.001953125, 95967.9921875],
+            "pos": [-9280.001953125, 95967.9921875],
             "rotation": -90.0,
-            "size": [320, 6400]
+            "size": [320, 2560]
         },
         {
             "id": "dev_floor_256 (108)",
             "type": "dev_floor_256",
-            "pos": [-9792.0, 96512.0],
-            "size": [1536, 768],
+            "pos": [-9920.0, 96512.0],
+            "size": [1280, 768],
             "color": [0, 255, 0, 255]
         },
         {
@@ -4083,8 +4177,8 @@
         {
             "id": "dev_floor_256 (116)",
             "type": "dev_floor_256",
-            "pos": [-6592.0, 96512.0],
-            "size": [4864, 768]
+            "pos": [-9024.0, 96512.0],
+            "size": [512, 768]
         },
         {
             "id": "arrow (27)",
@@ -4127,6 +4221,309 @@
             "pos": [512.0, 15360.0],
             "size": [512, 512],
             "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (76)",
+            "type": "@materials/vent.png",
+            "pos": [-7871.998046875, 96543.984375],
+            "rotation": -90.0,
+            "size": [1472, 256]
+        },
+        {
+            "id": "dev_floor_256 (121)",
+            "type": "dev_floor_256",
+            "pos": [-8384.0, 96512.0],
+            "size": [768, 768],
+            "color": [0, 176, 255, 255]
+        },
+        {
+            "id": "arrow (52)",
+            "type": "@arrow",
+            "pos": [-50243.0, 187578.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (53)",
+            "type": "@arrow",
+            "pos": [-50243.0, 188614.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (54)",
+            "type": "@arrow",
+            "pos": [-50243.0, 189626.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (55)",
+            "type": "@arrow",
+            "pos": [-50243.0, 190662.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "dev_floor_256 (127)",
+            "type": "dev_floor_256",
+            "pos": [-50240.0, 191872.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (128)",
+            "type": "dev_floor_256",
+            "pos": [-50240.0, 193280.0],
+            "size": [1536, 2048],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "vent (80)",
+            "type": "@materials/vent.png",
+            "pos": [-50272.00390625, 194496.0],
+            "rotation": 90.0,
+            "size": [384, 2240]
+        },
+        {
+            "id": "vent (81)",
+            "type": "@materials/vent.png",
+            "pos": [-49312.0, 192896.0],
+            "size": [320, 2816]
+        },
+        {
+            "id": "vent (82)",
+            "type": "@materials/vent.png",
+            "pos": [-51200.0, 192896.0],
+            "size": [384, 2816]
+        },
+        {
+            "id": "dev_floor_256 (131)",
+            "type": "dev_floor_256",
+            "pos": [-50240.0, 191872.0],
+            "size": [1536, 768]
+        },
+        {
+            "id": "dev_floor_256 (132)",
+            "type": "dev_floor_256",
+            "pos": [-48064.0, 195968.0],
+            "size": [104704, 104960],
+            "color": [71, 0, 71, 255]
+        },
+        {
+            "id": "arrow (56)",
+            "type": "@arrow",
+            "pos": [-49734.0, 186563.0]
+        },
+        {
+            "id": "arrow (57)",
+            "type": "@arrow",
+            "pos": [-48658.0, 186557.0]
+        },
+        {
+            "id": "arrow (58)",
+            "type": "@arrow",
+            "pos": [-47686.0, 186563.0]
+        },
+        {
+            "id": "arrow (59)",
+            "type": "@arrow",
+            "pos": [-46610.0, 186557.0]
+        },
+        {
+            "id": "vent (83)",
+            "type": "@materials/vent.png",
+            "pos": [-51200.0, 195712.0],
+            "rotation": -180.0,
+            "size": [384, 2048]
+        },
+        {
+            "id": "vent (84)",
+            "type": "@materials/vent.png",
+            "pos": [-49312.0, 195712.0],
+            "rotation": -180.0,
+            "size": [320, 2048]
+        },
+        {
+            "id": "vent (85)",
+            "type": "@materials/vent.png",
+            "pos": [-50240.00390625, 196096.015625],
+            "rotation": 90.0,
+            "size": [256, 1024]
+        },
+        {
+            "id": "dev_floor_256 (126)",
+            "type": "dev_floor_256",
+            "pos": [-50240.0, 196096.0],
+            "size": [1536, 1280],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (122)",
+            "type": "dev_floor_256",
+            "pos": [-50240.0, 195072.0],
+            "size": [1536, 768],
+            "color": [194, 207, 255, 255]
+        },
+        {
+            "id": "vent (86)",
+            "type": "@materials/vent.png",
+            "pos": [-49728.00390625, 195584.015625],
+            "rotation": 90.0,
+            "size": [256, 512]
+        },
+        {
+            "id": "vent (87)",
+            "type": "@materials/vent.png",
+            "pos": [-50752.0, 195584.015625],
+            "rotation": 90.0,
+            "size": [256, 512]
+        },
+        {
+            "id": "arrow (51)",
+            "type": "@arrow",
+            "pos": [-46083.0, 187066.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (60)",
+            "type": "@arrow",
+            "pos": [-46083.0, 188102.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (61)",
+            "type": "@arrow",
+            "pos": [-46083.0, 189242.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (62)",
+            "type": "@arrow",
+            "pos": [-46083.0, 190278.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (63)",
+            "type": "@arrow",
+            "pos": [-46083.0, 191354.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (64)",
+            "type": "@arrow",
+            "pos": [-46083.0, 192390.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (65)",
+            "type": "@arrow",
+            "pos": [-46083.0, 193786.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (66)",
+            "type": "@arrow",
+            "pos": [-46083.0, 194822.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (67)",
+            "type": "@arrow",
+            "pos": [-46083.0, 195834.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (68)",
+            "type": "@arrow",
+            "pos": [-46083.0, 196870.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (69)",
+            "type": "@arrow",
+            "pos": [-46083.0, 197882.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (70)",
+            "type": "@arrow",
+            "pos": [-46083.0, 198918.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (71)",
+            "type": "@arrow",
+            "pos": [-46083.0, 199930.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (72)",
+            "type": "@arrow",
+            "pos": [-46083.0, 200966.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (73)",
+            "type": "@arrow",
+            "pos": [-46083.0, 201978.0],
+            "rotation": 90.0
+        },
+        {
+            "id": "arrow (75)",
+            "type": "@arrow",
+            "pos": [-46586.0, 202493.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (76)",
+            "type": "@arrow",
+            "pos": [-47622.0, 202493.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (77)",
+            "type": "@arrow",
+            "pos": [-48634.0, 202493.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (78)",
+            "type": "@arrow",
+            "pos": [-49670.0, 202493.0],
+            "rotation": -180.0
+        },
+        {
+            "id": "arrow (74)",
+            "type": "@arrow",
+            "pos": [-50243.0, 201990.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (79)",
+            "type": "@arrow",
+            "pos": [-50243.0, 200978.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (80)",
+            "type": "@arrow",
+            "pos": [-50243.0, 199942.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (81)",
+            "type": "@arrow",
+            "pos": [-50243.0, 198930.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (82)",
+            "type": "@arrow",
+            "pos": [-50243.0, 197894.0],
+            "rotation": -90.0
+        },
+        {
+            "id": "arrow (83)",
+            "type": "@arrow",
+            "pos": [-50243.0, 196882.0],
+            "rotation": -90.0
         },
         {
             "id": "Strong lamp (1)",
@@ -5747,6 +6144,204 @@
             "type": "point_light",
             "pos": [6209.0, 43327.0],
             "color": [255, 0, 0, 63]
+        },
+        {
+            "id": "point_light (49)",
+            "type": "point_light",
+            "pos": [-50239.0, 187455.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (50)",
+            "type": "point_light",
+            "pos": [-50241.0, 190721.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (51)",
+            "type": "point_light",
+            "pos": [-50239.0, 189441.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (53)",
+            "type": "point_light",
+            "pos": [-46657.0, 184961.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (54)",
+            "type": "point_light",
+            "pos": [-46081.0, 187071.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (55)",
+            "type": "point_light",
+            "pos": [-46081.0, 189313.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (56)",
+            "type": "point_light",
+            "pos": [-46081.0, 191359.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (57)",
+            "type": "point_light",
+            "pos": [-46081.0, 193793.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (59)",
+            "type": "point_light",
+            "pos": [-46081.0, 196545.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (61)",
+            "type": "point_light",
+            "pos": [-46081.0, 198655.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (63)",
+            "type": "point_light",
+            "pos": [-46081.0, 200833.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (64)",
+            "type": "point_light",
+            "pos": [-46081.0, 201855.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (65)",
+            "type": "point_light",
+            "pos": [-47169.0, 202497.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (67)",
+            "type": "point_light",
+            "pos": [-48961.0, 202497.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (68)",
+            "type": "point_light",
+            "pos": [-50241.0, 201407.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (69)",
+            "type": "point_light",
+            "pos": [-50241.0, 200129.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (70)",
+            "type": "point_light",
+            "pos": [-50241.0, 198977.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (71)",
+            "type": "point_light",
+            "pos": [-50241.0, 197759.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (72)",
+            "type": "point_light",
+            "pos": [-50241.0, 196737.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 620.864990234375
+            }
+        },
+        {
+            "id": "point_light (73)",
+            "type": "point_light",
+            "pos": [-48193.0, 186559.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (47)",
+            "type": "point_light",
+            "pos": [-49153.0, 186559.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
+        },
+        {
+            "id": "point_light (48)",
+            "type": "point_light",
+            "pos": [-46081.0, 195199.0],
+            "color": [255, 255, 255, 109],
+            "falloff": {
+                "radius": 2000.0
+            }
         },
         {
             "id": "force_grenade",
@@ -7493,6 +8088,7 @@
         {
             "id": "team_spawn (6)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [24257.0, 51327.0]
         },
@@ -7564,6 +8160,18 @@
             "active": false,
             "faction": "METROPOLIS",
             "pos": [11419.0, -17.0]
+        },
+        {
+            "id": "team_spawn (10)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-24513.0, 114497.0]
+        },
+        {
+            "id": "team_spawn (11)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-50177.0, 192641.0]
         },
         {
             "id": "exit0",
@@ -10672,7 +11280,7 @@
                 "amount": 0.0
             },
             "exit_position": "PORTAL_CENTER",
-            "context_tip": "This time you have to make a quick turn to the right.\nHold {MOVE_FORWARD} until you hit the second portal. Then press and hold {MOVE_RIGHT}."
+            "context_tip": "Now you'll have to make a quick turn to the right.\nHold {MOVE_FORWARD} until you hit the second portal. Then press and hold {MOVE_RIGHT}."
         },
         {
             "id": "portal (2)",
@@ -10735,8 +11343,8 @@
             "id": "surf_start (3)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-9792.0, 96512.0],
-            "size": [1536, 768],
+            "pos": [-9920.0, 96512.0],
+            "size": [1280, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -10825,8 +11433,8 @@
             "id": "portal (8)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-5472.0, 89248.0],
-            "size": [10176, 12608],
+            "pos": [-5472.0, 89376.0],
+            "size": [10176, 12864],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
             "enter_time_ms": 0.0,
@@ -10951,7 +11559,7 @@
         {
             "id": "shooting_range",
             "type": "portal",
-            "pos": [1599.9998779296875, 100736.0078125],
+            "pos": [22144.0, 101184.0078125],
             "rotation": -90.0,
             "reacts_to": {
                 "bullets": false
@@ -10967,6 +11575,368 @@
             },
             "exit_position": "PORTAL_BOUNDARY",
             "context_tip": ""
+        },
+        {
+            "id": "exit18",
+            "type": "portal",
+            "pos": [-8384.0, 96512.0],
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry19",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "portal (11)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-35104.0, 189696.0],
+            "size": [28096, 62720],
+            "color_preset": "PINK",
+            "ignore_airborne_characters": true,
+            "enter_time_ms": 0.0,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "id": null
+            },
+            "begin_entering_particles": {
+                "id": null
+            },
+            "portal_exit": "surf_start (7)"
+        },
+        {
+            "id": "portal (12)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-64703.99609375, 189792.0],
+            "size": [26624, 62272],
+            "color_preset": "PINK",
+            "ignore_airborne_characters": true,
+            "enter_time_ms": 0.0,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "id": null
+            },
+            "begin_entering_particles": {
+                "id": null
+            },
+            "portal_exit": "surf_start (7)"
+        },
+        {
+            "id": "portal (14)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-50272.0, 175008.0],
+            "size": [2240, 32960],
+            "color_preset": "PINK",
+            "ignore_airborne_characters": true,
+            "enter_time_ms": 0.0,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "id": null
+            },
+            "begin_entering_particles": {
+                "id": null
+            },
+            "portal_exit": "surf_start (7)"
+        },
+        {
+            "id": "portal (17)",
+            "type": "portal",
+            "pos": [-50240.00390625, 191296.0],
+            "rotation": -90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_airborne_ms": 700.0,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "surf_start (7)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-50240.0, 191872.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "character_exit_airborne_ms": 0.0,
+            "character_exit_impulse": {
+                "amount": 0.0
+            },
+            "exit_position": "PORTAL_CENTER",
+            "context_tip": "Tip: Use dash to boost ({DASH}). It prolongs airborne time.\nHowever, Sprint ({SPRINT}) is useless when flying. Don't use it."
+        },
+        {
+            "id": "tip2_1 (4)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-50240.0, 193280.0],
+            "size": [1536, 2048],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "This track requires you to make a full circle.\nGood luck."
+        },
+        {
+            "id": "entry19",
+            "type": "portal",
+            "pos": [-50240.00390625, 193920.015625],
+            "rotation": -90.0,
+            "color_preset": "GREEN",
+            "trampoline_like": true,
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "character_exit_impulse": {
+                "amount": 5000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "exit_position": "PORTAL_BOUNDARY",
+            "context_tip": ""
+        },
+        {
+            "id": "portal (10)",
+            "type": "portal",
+            "pos": [-50240.0, 186560.0],
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (19)",
+            "type": "portal",
+            "pos": [-46080.0, 186560.0],
+            "rotation": 90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (21)",
+            "type": "portal",
+            "pos": [-46080.0, 188672.0],
+            "rotation": 90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (20)",
+            "type": "portal",
+            "pos": [-46080.0, 190528.0],
+            "rotation": 90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (22)",
+            "type": "portal",
+            "pos": [-46080.0, 192768.0],
+            "rotation": 90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "exit19 (1)",
+            "type": "portal",
+            "pos": [-50240.0, 195072.0],
+            "rotation": 90.0,
+            "color_preset": "YELLOW",
+            "enter_time_ms": 0.0,
+            "travel_time_ms": 0.0,
+            "reacts_to": {
+                "bullets": false
+            },
+            "reacts_to_factions": {
+                "resistance": false
+            },
+            "portal_exit": "entry18",
+            "character_exit_impulse": {
+                "amount": 20000.0
+            },
+            "object_exit_impulse": {
+                "amount": 10818.5048828125,
+                "mode": "SET_VELOCITY"
+            },
+            "context_tip": ""
+        },
+        {
+            "id": "portal (23)",
+            "type": "portal",
+            "pos": [-46080.0, 202496.015625],
+            "rotation": -180.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "portal (24)",
+            "type": "portal",
+            "pos": [-50240.0, 202496.015625],
+            "rotation": -90.0,
+            "size": [512, 512],
+            "color_preset": "WHITE",
+            "trampoline_like": true,
+            "character_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            },
+            "object_exit_impulse": {
+                "amount": 20000.0,
+                "mode": "SET_VELOCITY"
+            }
+        },
+        {
+            "id": "tip2_1 (5)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-50240.0, 196096.0],
+            "size": [1536, 1280],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Congratulations!\nYou're now a certified surfer!"
+        },
+        {
+            "id": "portal (13)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [-50272.0, 208832.0],
+            "size": [2240, 24192],
+            "color_preset": "PINK",
+            "ignore_airborne_characters": true,
+            "enter_time_ms": 0.0,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "id": null
+            },
+            "begin_entering_particles": {
+                "id": null
+            },
+            "portal_exit": "surf_start (7)"
         }
     ]
 }
