@@ -21,14 +21,16 @@
 using portal_marker = editor_area_marker_node;
 
 test_scene_setup::test_scene_setup(
-	sol::state& lua,
 	std::string nickname,
 	const packaged_official_content& official,
-	const test_scene_settings settings,
-	const input_recording_type recording_type,
+	//const input_recording_type recording_type,
 	const test_scene_type type
 ) : official(official), nickname(nickname), type(type) {
-	scene.make_test_scene(lua, settings);
+	init(type);
+}
+
+void test_scene_setup::init(const test_scene_type new_type) {
+	type = new_type;
 
 	if (type == test_scene_type::TUTORIAL) {
 		current_arena_folder = "content/menu/tutorial";
@@ -85,11 +87,11 @@ test_scene_setup::test_scene_setup(
 
 	restart_arena();
 
-	if (recording_type != input_recording_type::DISABLED) {
+	//if (recording_type != input_recording_type::DISABLED) {
 		//if (player.try_to_load_or_save_new_session(USER_FILES_DIR "/sessions/", "recorded.inputs")) {
 		//
 		//}
-	}
+	//}
 
 	/* Close any window that might be open by default */
 	escape();
@@ -142,11 +144,13 @@ void test_scene_setup::restart_arena() {
 
 	restart_mode();
 
-	if (tutorial.level == 0) { 
-		/* First level has a nice default. */
-	}
-	else {
-		character().get<components::crosshair>() = pre_crosshair;
+	if (is_tutorial()) {
+		if (tutorial.level == 0) { 
+			/* First level has a nice default. */
+		}
+		else {
+			character().get<components::crosshair>() = pre_crosshair;
+		}
 	}
 
 	character().get<components::movement>().flags = pre_movement_flags;
@@ -235,6 +239,7 @@ void test_scene_setup::restart_mode() {
 	const bool is_try_throwing_reloading_level = tutorial.level == 10 || tutorial.level == 13;
 	const bool is_planting_level = tutorial.level == 14;
 	const bool is_defusing_level = tutorial.level == 15;
+	const bool is_normal_spells_level = tutorial.level == 16;
 	const bool is_offensive_spells_level = tutorial.level == 17;
 
 	const auto player_faction = is_planting_level ? faction_type::RESISTANCE : faction_type::METROPOLIS;
@@ -292,8 +297,22 @@ void test_scene_setup::restart_mode() {
 					mode.infinite_ammo_for = viewed_character_id;
 				}
 
+				if (is_normal_spells_level) {
+					auto& s = cosm[viewed_character_id].get<components::sentience>();
+
+					s.learnt_spells[0] = true;
+					s.learnt_spells[4] = true;
+					s.learnt_spells[5] = true;
+				}
+
 				if (is_offensive_spells_level) {
-					cosm[viewed_character_id].get<components::sentience>().spells_drain_pe = false;
+					auto& s = cosm[viewed_character_id].get<components::sentience>();
+
+					s.spells_drain_pe = false;
+
+					s.learnt_spells[1] = true;
+					s.learnt_spells[2] = true;
+					s.learnt_spells[3] = true;
 				}
 			}
 			else {
@@ -514,11 +533,21 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 		return false;
 	}
 
+	bool shooting_range = false;
+
 	for (const auto& n : notifications) {
 		if (const auto tp = std::get_if<messages::teleportation>(std::addressof(n.payload))) {
 			if (tp->teleported == viewed_character_id) {
 				if (const auto portal = find<portal_marker>(tp->to_portal)) {
 					const auto& name = portal->unique_name;
+
+					if (name == "main_menu") {
+						special_result = custom_imgui_result::GO_TO_MAIN_MENU;
+					}
+
+					if (name == "shooting_range") {
+						shooting_range = true;
+					}
 
 					if (begins_with(name, "entry")) {
 						uint32_t new_level = 0;
@@ -532,6 +561,20 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 				}
 			}
 		}
+	}
+
+	if (shooting_range) {
+		auto character = [&]() {
+			return cosm[get_controlled_character_id()];
+		};
+
+		auto pre_crosshair = character() ? character().get<components::crosshair>() : components::crosshair();
+		auto pre_movement_flags = character() ? character().get<components::movement>().flags : components::movement().flags;
+
+		init(test_scene_type::SHOOTING_RANGE);
+
+		character().get<components::crosshair>() = pre_crosshair;
+		character().get<components::movement>().flags = pre_movement_flags;
 	}
 
 	return false;

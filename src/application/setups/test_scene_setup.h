@@ -77,6 +77,8 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 	std::unordered_map<std::string, entity_id> opponents;
 	bool restart_requested = false;
 
+	std::optional<custom_imgui_result> special_result;
+
 	template <class H, class S>
 	static decltype(auto) get_arena_handle_impl(S& self) {
 		return H {
@@ -88,16 +90,15 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 		};
 	}
 
+	void init(test_scene_type type);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 
 	test_scene_setup(
-		sol::state& lua,
 		std::string nickname,
 		const packaged_official_content&,
-		const test_scene_settings,
-		const input_recording_type recording_type,
 		const test_scene_type type
 	);
 
@@ -132,6 +133,10 @@ public:
 	}
 
 	auto perform_custom_imgui(perform_custom_imgui_input) {
+		if (special_result) {
+			return *special_result;
+		}
+
 		return custom_imgui_result::NONE;
 	}
 
