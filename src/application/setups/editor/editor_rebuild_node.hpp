@@ -1,6 +1,9 @@
 #pragma once
 #include "application/setups/editor/to_game_effect.hpp"
 #include "augs/misc/enum/enum_bitset.h"
+#include "view/audiovisual_state/systems/legacy_light_mults.h"
+#include "game/enums/filters.h"
+#include "augs/templates/traits/has_flip.h"
 
 template <class T>
 void make_unselectable(T& agg) {

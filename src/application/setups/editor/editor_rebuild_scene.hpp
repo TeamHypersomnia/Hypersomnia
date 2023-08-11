@@ -5,7 +5,6 @@
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/cosmos/solvers/standard_solver.h"
 #include "view/audiovisual_state/systems/legacy_light_mults.h"
-#include "game/cosmos/change_common_significant.hpp"
 
 #include "application/arena/arena_handle.h"
 #include "application/arena/build_arena_from_editor_project.h"

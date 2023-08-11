@@ -6,8 +6,9 @@
 #include "application/config_lua_table.h"
 #include "application/setups/test_scene_setup.h"
 
-#include "application/arena/choose_arena.h"
 #include "application/setups/editor/packaged_official_content.h"
+#include "application/setups/editor/project/editor_project_readwrite.h"
+#include "application/arena/build_arena_from_editor_project.hpp"
 
 #include "game/messages/game_notification.h"
 #include "application/setups/editor/project/editor_project.hpp"
@@ -26,7 +27,7 @@ test_scene_setup::test_scene_setup(
 	const test_scene_settings settings,
 	const input_recording_type recording_type,
 	const test_scene_type type
-) : nickname(nickname), type(type) {
+) : official(official), nickname(nickname), type(type) {
 	scene.make_test_scene(lua, settings);
 
 	if (type == test_scene_type::TUTORIAL) {
@@ -36,33 +37,53 @@ test_scene_setup::test_scene_setup(
 		current_arena_folder = "content/menu/shooting_range";
 	}
 
-	auto paths = editor_project_paths(current_arena_folder);
+	{
+		auto json_read_settings = editor_project_readwrite::reading_settings();
+		json_read_settings.read_inactive_nodes = false;
 
-	auto json_read_settings = editor_project_readwrite::reading_settings();
-	json_read_settings.read_inactive_nodes = false;
-
-	::load_arena_from_path(
-		{
+		project = editor_project_readwrite::read_project_json(
+			get_paths().project_json,
+			official.resources,
+			official.resource_map,
 			json_read_settings,
-			lua,
-			get_arena_handle(),
-			official,
-			"",
-			"",
-			clean_round_state,
-			std::nullopt,
-			&project,
-			std::addressof(entity_to_node)
-		},
+			nullptr
+		);
+	}
 
-		paths.project_json,
-		nullptr
-	);
-
-	clean_mode_state = current_mode_state;
 	name_to_node = project.make_name_to_node_map();
 
-	restart_mode();
+	{
+		auto& markers = project.nodes.template get_pool_for<editor_point_marker_node>();
+
+		bool found = false;
+
+		for (auto& p : markers) {
+			if (p.editable.faction == faction_type::METROPOLIS) {
+				if (!p.active) {
+					continue;
+				}
+
+				if (found) {
+					p.active = false;
+					continue;
+				}
+
+				found = true;
+				const auto id = editor_typed_node_id<editor_point_marker_node>::from_raw(markers.get_id_of(p)).operator editor_node_id();
+
+				const auto parent = project.find_parent_layer(id);
+
+				ensure(parent.has_value());
+				ensure(parent->layer_ptr != nullptr);
+
+				if (!typesafe_sscanf(parent->layer_ptr->unique_name, "Level%x", tutorial.level)) {
+					tutorial.level = 0;
+				}
+			}
+		}
+	};
+
+	restart_arena();
 
 	if (recording_type != input_recording_type::DISABLED) {
 		//if (player.try_to_load_or_save_new_session(USER_FILES_DIR "/sessions/", "recorded.inputs")) {
@@ -83,15 +104,51 @@ void test_scene_setup::restart_arena() {
 		return cosm[get_controlled_character_id()];
 	};
 
-	auto pre_crosshair = character().get<components::crosshair>();
-	auto pre_movement_flags = character().get<components::movement>().flags;
+	auto pre_crosshair = character() ? character().get<components::crosshair>() : components::crosshair();
+	auto pre_movement_flags = character() ? character().get<components::movement>().flags : components::movement().flags;
 
-	cosm.set(clean_round_state);
-	current_mode_state = clean_mode_state;
+	{
+		for (auto& l : project.layers.pool) {
+			if (begins_with(l.unique_name, "Level")) {
+				uint32_t layer_level = 0;
+
+				if (!typesafe_sscanf(l.unique_name, "Level%x", layer_level)) {
+					l.editable.active = false;
+				}
+
+				l.editable.active = layer_level == tutorial.level || layer_level == tutorial.level + 1;
+			}
+		}
+
+		project.clear_cached_scene_node_data();
+		opponents.clear();
+
+		::build_arena_from_editor_project(
+			get_arena_handle(),
+			{
+				project,
+				"",
+				get_paths().project_folder,
+				official,
+				std::addressof(entity_to_node),
+				nullptr,
+				false, /* for_playtesting */
+				false /* editor_preview */
+			}
+		);
+
+		clean_step_number = scene.world.get_clock().now.step;
+	}
 
 	restart_mode();
 
-	character().get<components::crosshair>() = pre_crosshair;
+	if (tutorial.level == 0) { 
+		/* First level has a nice default. */
+	}
+	else {
+		character().get<components::crosshair>() = pre_crosshair;
+	}
+
 	character().get<components::movement>().flags = pre_movement_flags;
 }
 
@@ -203,7 +260,7 @@ void test_scene_setup::restart_mode() {
 		[&]<typename M>(M& mode, const auto& input) {
 			if constexpr(std::is_same_v<test_mode, M>) {
 				for (auto& p : project.nodes.template get_pool_for<editor_point_marker_node>()) {
-					if (p.editable.faction == faction_type::RESISTANCE) {
+					if (p.scene_entity_id.is_set() && p.editable.faction == faction_type::RESISTANCE) {
 						const auto new_id = mode.add_player(input, nickname, enemy_faction);
 						mode.find(new_id)->dedicated_spawn = p.scene_entity_id;
 						mode.find(new_id)->hide_in_scoreboard = true;
@@ -381,9 +438,9 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 		}
 	}
 
-	for (int i = 1;; ++i) {
+	for (int i = 1; i < 30; ++i) {
 		if (!exists(i, 0)) {
-			break;
+			continue;
 		}
 
 		bool all_killed = true;
@@ -415,9 +472,13 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 			const bool have_to_kill_simultaneously = is_akimbo_level;
 
 			if (have_to_kill_simultaneously) {
-				for (int jj = 0; jj < j; ++jj) {
-					remove(step, get_opp(i, jj));
-				}
+				get_arena_handle().on_mode_with_input(
+					[&]<typename M>(M& mode, const auto&) {
+						if constexpr(std::is_same_v<test_mode, M>) {
+							mode.for_each_player_in(faction_type::RESISTANCE, [&mode](auto id, auto) { mode.find(id)->allow_respawn = false; });
+						}
+					}
+				);
 			}
 
 			int k = 0;
@@ -448,7 +509,7 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 
 	auto& cosm = scene.world;
 
-	if (cosm.get_total_steps_passed() <= clean_round_state.clk.now.step + 1) {
+	if (cosm.get_total_steps_passed() <= clean_step_number + 1) {
 		/* Otherwise we'd have an infinite loop. */
 		return false;
 	}

@@ -154,3 +154,55 @@ inline name_to_node_map_type editor_project::make_name_to_node_map() const {
 
 	return result;
 }
+
+inline std::optional<parent_layer_info> editor_project::convert_to_parent_layer_info(const editor_layer_id layer_id) const {
+	parent_layer_info info;
+
+	const auto& order = layers.order;
+
+	for (std::size_t l = 0; l < order.size(); ++l) {
+		if (layer_id == order[l]) {
+			if (const auto layer = find_layer(layer_id)) {
+				return parent_layer_info { layer_id, layer, l, 0 };
+			}
+		}
+	}
+
+	return std::nullopt;
+}
+
+inline std::optional<parent_layer_info> editor_project::find_parent_layer(const editor_node_id node_id) const {
+	if (!node_id.is_set()) {
+		return std::nullopt;
+	}
+
+	parent_layer_info info;
+
+	const auto& order = layers.order;
+
+	for (std::size_t l = 0; l < order.size(); ++l) {
+		const auto layer_id = order[l];
+
+		if (const auto layer = find_layer(layer_id)) {
+			const auto& nodes = layer->hierarchy.nodes;
+
+			for (std::size_t i = 0; i < nodes.size(); ++i) {
+				if (nodes[i] == node_id) {
+					return parent_layer_info { layer_id, layer, l, i };
+				}
+			}
+		}
+	}
+
+	return std::nullopt;
+}
+
+inline void editor_project::clear_cached_scene_node_data() {
+	nodes.for_each(
+		[&](auto& pool) {
+			for (auto& node : pool) {
+				node.scene_entity_id.unset();
+			}
+		}
+	);
+}

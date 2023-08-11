@@ -491,26 +491,3 @@ void rebuild_prefab_nodes(
 	}
 }
 
-template <class F>
-void editor_setup::rebuild_prefab_nodes(
-	const editor_typed_node_id<editor_prefab_node> prefab_node_id,
-	F&& on_created_child,
-	const bool call_reverse
-) {
-	const auto prefab_node = find_node(prefab_node_id);
-
-	if (prefab_node == nullptr) {
-		return;
-	}
-
-	auto find_res_lbd = [&](auto&&... args) -> decltype(auto) { 
-		return find_resource(std::forward<decltype(args)>(args)... ); 
-	};
-
-	::rebuild_prefab_nodes(
-		*prefab_node,
-		find_res_lbd,
-		std::forward<F>(on_created_child),
-		call_reverse
-	);
-}

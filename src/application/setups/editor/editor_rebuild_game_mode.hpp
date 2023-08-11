@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/remove_cref.h"
+#include "test_scenes/test_scene_flavours.h"
 
 template <class F>
 void for_each_faction(F callback) {

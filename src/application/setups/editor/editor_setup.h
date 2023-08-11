@@ -268,13 +268,6 @@ public:
 	void customize_for_viewing(config_lua_table&) const;
 	std::optional<ad_hoc_atlas_subjects> get_new_ad_hoc_images();
 
-	struct parent_layer_info {
-		editor_layer_id layer_id;
-		const editor_layer* layer_ptr = nullptr;
-		std::size_t layer_index;
-		std::size_t index_in_layer;
-	};
-
 	std::optional<parent_layer_info> find_parent_layer(editor_node_id id) const;
 	std::optional<parent_layer_info> convert_to_parent_layer_info(editor_layer_id id) const;
 
@@ -726,7 +719,7 @@ public:
 		return mover.is_active(history);
 	}
 
-	std::optional<editor_setup::parent_layer_info> find_best_layer_for_new_node() const;
+	std::optional<parent_layer_info> find_best_layer_for_new_node() const;
 
 	const auto& get_last_inspected_layer_or_node() const {
 		return gui.inspector.get_last_inspected_layer_or_node();

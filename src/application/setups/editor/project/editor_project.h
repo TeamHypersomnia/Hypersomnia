@@ -29,6 +29,13 @@ struct editor_official_resource_map;
 
 using name_to_node_map_type = std::unordered_map<std::string, editor_node_id>;
 
+struct parent_layer_info {
+	editor_layer_id layer_id;
+	const editor_layer* layer_ptr = nullptr;
+	std::size_t layer_index;
+	std::size_t index_in_layer;
+};
+
 struct editor_project {
 	// GEN INTROSPECTOR struct editor_project
 	editor_project_meta meta;
@@ -129,6 +136,11 @@ struct editor_project {
 	void for_each_resource(F&& callback) const;
 
 	name_to_node_map_type make_name_to_node_map() const;
+
+	std::optional<parent_layer_info> find_parent_layer(editor_node_id id) const;
+	std::optional<parent_layer_info> convert_to_parent_layer_info(editor_layer_id id) const;
+
+	void clear_cached_scene_node_data();
 
 private:
 	template <class S, class Officials, class F>

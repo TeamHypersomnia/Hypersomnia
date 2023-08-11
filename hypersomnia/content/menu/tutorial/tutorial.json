@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-09 22:40:43.525443 UTC"
+        "version_timestamp": "2023-08-11 14:44:54.200285 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -22,7 +22,6 @@
                 "metropolis": {
                     "firearm": null,
                     "melee": null,
-                    "all_spells": true,
                     "backpack": false
                 },
                 "resistance": {
@@ -242,6 +241,7 @@
     "layers": [
         {
             "id": "Level18",
+            "is_open_in_editor": false,
             "nodes": [
                 "arrow (27)",
                 "arrow (26)",
@@ -393,9 +393,7 @@
         },
         {
             "id": "Level15",
-            "is_open_in_editor": false,
             "nodes": [
-                "team_spawn (7)",
                 "electric_rapier (5)",
                 "electric_rapier (4)",
                 "bulwark",
@@ -563,9 +561,7 @@
                 "Strong lamp (35)",
                 "Strong lamp (34)",
                 "Strong lamp (33)",
-                "floor_bottom (7)",
-                "defuse_kit",
-                "floor_left (7)"
+                "defuse_kit"
             ]
         },
         {
@@ -777,8 +773,7 @@
                 "Strong lamp (40)",
                 "Strong lamp (28)",
                 "Strong lamp (27)",
-                "Strong lamp (26)",
-                "floor_top (8)"
+                "Strong lamp (26)"
             ]
         },
         {
@@ -833,7 +828,6 @@
                 "dev_floor_256 (64)",
                 "dev_floor_256 (66)",
                 "dev_floor_256 (62)",
-                "floor_right (17)",
                 "floor_right (16)",
                 "assault_rattle",
                 "tip3_1 (28)",
@@ -850,6 +844,7 @@
             "id": "Level10",
             "is_open_in_editor": false,
             "nodes": [
+                "floor_right (17)",
                 "exit10",
                 "obs11 (4)",
                 "fury_thrower (8)",
@@ -959,8 +954,8 @@
         },
         {
             "id": "Level8",
-            "is_open_in_editor": false,
             "nodes": [
+                "team_spawn (7)",
                 "obs6 (4)",
                 "obs6 (5)",
                 "szturm",
@@ -986,8 +981,9 @@
                 "kill6 (2)",
                 "kill6 (3)",
                 "kill5",
-                "tip3_1 (11)",
                 "tip3_1 (8)",
+                "tip3_1 (66)",
+                "tip3_1 (11)",
                 "tip3_1 (9)",
                 "tip3_1 (10)",
                 "entry8",
@@ -999,8 +995,9 @@
                 "hard_wooden_wall (13)",
                 "vent (32)",
                 "vent (33)",
-                "dev_floor_256 (43)",
                 "dev_floor_256 (40)",
+                "dev_floor_256 (118)",
+                "dev_floor_256 (43)",
                 "dev_floor_256 (41)",
                 "dev_floor_256 (42)",
                 "Strong lamp (14)",
@@ -1008,11 +1005,8 @@
                 "Strong lamp (16)",
                 "Strong lamp (15)",
                 "floor_right (8)",
-                "floor_top (7)",
-                "floor_bottom (6)",
                 "team_spawn (5)",
-                "calico",
-                "floor_left (6)"
+                "calico"
             ]
         },
         {
@@ -1074,14 +1068,12 @@
                 "dev_floor_256 (35)",
                 "Strong lamp (12)",
                 "Strong lamp (13)",
-                "floor_right (13)",
                 "deagle (1)",
                 "deagle"
             ]
         },
         {
             "id": "Level5",
-            "is_open_in_editor": false,
             "nodes": [
                 "obs4 (2)",
                 "obs4",
@@ -1090,6 +1082,7 @@
                 "tip3_1 (7)",
                 "tip3_1 (2)",
                 "tip3_1 (1)",
+                "team_spawn (9)",
                 "entry5",
                 "exit5",
                 "vent (19)",
@@ -1105,15 +1098,12 @@
                 "Strong lamp (10)",
                 "Strong lamp (11)",
                 "floor_right (11)",
-                "floor_top (6)",
-                "floor_bottom (5)",
                 "datum (1)",
                 "zamiec",
                 "zamiec_magazine (1)",
                 "zamiec_magazine",
                 "datum_gun_magazine (1)",
-                "datum_gun_magazine",
-                "floor_left (5)"
+                "datum_gun_magazine"
             ]
         },
         {
@@ -1151,6 +1141,7 @@
                 "tip4_1 (3)",
                 "tip4_1 (8)",
                 "tip4_1 (1)",
+                "team_spawn (8)",
                 "tip4_1",
                 "entry4",
                 "dev_floor_256 (70)",
@@ -1190,6 +1181,7 @@
                 "point_light (15)",
                 "point_light (14)",
                 "point_light (13)",
+                "point_light (6)",
                 "point_light (12)",
                 "point_light (11)",
                 "point_light (10)",
@@ -1211,10 +1203,10 @@
                 "kill1",
                 "point_light (8)",
                 "point_light (7)",
-                "point_light (6)",
+                "obs1 (1)",
+                "obs1 (2)",
                 "baka47",
                 "floor_right (10)",
-                "floor_top (5)",
                 "hard_wooden_wall (1)",
                 "hard_wooden_wall (4)",
                 "hard_wooden_wall (10)",
@@ -1239,13 +1231,9 @@
                 "hard_wooden_wall (9)",
                 "hard_wooden_wall (8)",
                 "kek9",
-                "floor_top (4)",
-                "floor_bottom (4)",
                 "hard_wooden_wall (7)",
                 "hard_wooden_wall (6)",
-                "hard_wooden_wall (5)",
-                "floor_right (9)",
-                "floor_left (4)"
+                "hard_wooden_wall (5)"
             ]
         },
         {
@@ -1267,11 +1255,7 @@
                 "dev_floor_256 (17)",
                 "Strong lamp (6)",
                 "Strong lamp (7)",
-                "floor_right (6)",
-                "floor_top (3)",
-                "floor_bottom (3)",
-                "floor_right (7)",
-                "floor_left (3)"
+                "floor_right (6)"
             ]
         },
         {
@@ -1289,6 +1273,8 @@
                 "hazard (3)",
                 "hazard (1)",
                 "hazard",
+                "tip2_1 (3)",
+                "tip2_1 (2)",
                 "tip2_1",
                 "entry2",
                 "exit2",
@@ -1301,15 +1287,13 @@
                 "vent (11)",
                 "dev_floor_256 (9)",
                 "dev_floor_256 (6)",
+                "dev_floor_256 (120)",
+                "dev_floor_256 (119)",
                 "dev_floor_256 (7)",
                 "dev_floor_256 (8)",
                 "Strong lamp (4)",
                 "floor_right (5)",
-                "Strong lamp (5)",
-                "floor_top (2)",
-                "floor_bottom (2)",
-                "floor_right (2)",
-                "floor_left (2)"
+                "Strong lamp (5)"
             ]
         },
         {
@@ -1331,11 +1315,7 @@
                 "dev_floor_256 (5)",
                 "Strong lamp",
                 "Strong lamp (3)",
-                "floor_right (4)",
-                "floor_top (1)",
-                "floor_bottom (1)",
-                "floor_right (1)",
-                "floor_left (1)"
+                "floor_right (4)"
             ]
         },
         {
@@ -1364,17 +1344,42 @@
                 "dev_floor_256",
                 "Strong lamp (2)",
                 "Strong lamp (1)",
-                "floor_right (3)",
-                "floor_top",
-                "floor_bottom",
-                "floor_right",
-                "floor_left"
+                "floor_right (3)"
             ]
         },
         {
             "id": "Floors",
-            "is_open_in_editor": false,
             "nodes": [
+                "floor_right (9)",
+                "floor_right (7)",
+                "floor_right (2)",
+                "floor_right (1)",
+                "floor_right",
+                "floor_left (7)",
+                "floor_left (6)",
+                "floor_left (5)",
+                "floor_left (4)",
+                "floor_left (3)",
+                "floor_left (2)",
+                "floor_left (1)",
+                "floor_left",
+                "floor_top (8)",
+                "floor_top (7)",
+                "floor_top (6)",
+                "floor_top (5)",
+                "floor_top (4)",
+                "floor_top (3)",
+                "floor_top (2)",
+                "floor_top (1)",
+                "floor_top",
+                "floor_bottom (7)",
+                "floor_bottom (6)",
+                "floor_bottom (5)",
+                "floor_bottom (4)",
+                "floor_bottom (3)",
+                "floor_bottom (2)",
+                "floor_bottom (1)",
+                "floor_bottom",
                 "floor_bottom (8)",
                 "vent (70)",
                 "vent (69)",
@@ -1812,8 +1817,8 @@
         {
             "id": "floor_right (9)",
             "type": "@water_room_floor",
-            "pos": [6208.0, 45952.0],
-            "size": [14208, 2048],
+            "pos": [6208.0, 46144.0],
+            "size": [14208, 1664],
             "color": [255, 132, 132, 255]
         },
         {
@@ -1972,14 +1977,14 @@
         {
             "id": "hard_wooden_wall (7)",
             "type": "hard_wooden_wall",
-            "pos": [8256.0, 45568.0],
-            "size": [3456, 512]
+            "pos": [8896.0, 45568.0],
+            "size": [3712, 512]
         },
         {
             "id": "floor_right (10)",
             "type": "@water_room_floor",
-            "pos": [7552.0, 44832.0],
-            "size": [768, 832],
+            "pos": [7552.0, 44800.0],
+            "size": [768, 768],
             "color": [255, 132, 132, 255]
         },
         {
@@ -2162,13 +2167,6 @@
             "color": [0, 255, 0, 255]
         },
         {
-            "id": "floor_right (13)",
-            "type": "@water_room_floor",
-            "pos": [19072.0, -3040.0],
-            "size": [1408, 768],
-            "color": [255, 132, 132, 255]
-        },
-        {
             "id": "dev_floor_256 (30)",
             "type": "dev_floor_256",
             "pos": [19072.0, -2048.0],
@@ -2280,7 +2278,7 @@
         {
             "id": "floor_right (8)",
             "type": "@water_room_floor",
-            "pos": [18368.0, 9472.0],
+            "pos": [18112.0, 9472.0],
             "rotation": -90.0,
             "size": [896, 768],
             "color": [255, 132, 132, 255]
@@ -2341,24 +2339,16 @@
             "size": [320, 384]
         },
         {
-            "id": "dev_floor_256 (40)",
-            "type": "dev_floor_256",
-            "pos": [21184.0, 9472.0],
-            "rotation": -90.0,
-            "size": [1280, 256],
-            "color": [0, 255, 0, 255]
-        },
-        {
             "id": "hard_wooden_wall (13)",
             "type": "hard_wooden_wall",
-            "pos": [19456.0, 8640.0],
-            "size": [3200, 384]
+            "pos": [19328.0, 8640.0],
+            "size": [3456, 384]
         },
         {
             "id": "hard_wooden_wall (14)",
             "type": "hard_wooden_wall",
-            "pos": [19456.0, 10304.0],
-            "size": [3200, 384]
+            "pos": [19328.0, 10304.0],
+            "size": [3456, 384]
         },
         {
             "id": "hard_wooden_wall (15)",
@@ -2409,7 +2399,7 @@
         {
             "id": "hard_wooden_wall (16)",
             "type": "hard_wooden_wall",
-            "pos": [17024.0, 9472.0],
+            "pos": [16768.0, 9472.0],
             "size": [1664, 2048]
         },
         {
@@ -3003,8 +2993,8 @@
         {
             "id": "hard_wooden_wall (17)",
             "type": "hard_wooden_wall",
-            "pos": [10368.0, 44032.0],
-            "size": [768, 3584]
+            "pos": [10368.0, 43776.0],
+            "size": [768, 3072]
         },
         {
             "id": "dev_floor_256 (27)",
@@ -3851,261 +3841,291 @@
         {
             "id": "vent (71)",
             "type": "@materials/vent.png",
-            "pos": [64.0, 81984.0],
+            "pos": [-25536.0, 109504.0],
             "size": [384, 13312]
         },
         {
             "id": "vent (72)",
             "type": "@materials/vent.png",
-            "pos": [1952.0, 81984.0],
+            "pos": [-23648.0, 109504.0],
             "size": [320, 13312]
         },
         {
             "id": "vent (73)",
             "type": "@materials/vent.png",
-            "pos": [991.9999389648438, 88831.9921875],
+            "pos": [-24608.0, 116352.0],
             "rotation": 90.0,
             "size": [384, 2240]
         },
         {
             "id": "dev_floor_256 (107)",
             "type": "dev_floor_256",
-            "pos": [1024.0, 87616.0],
+            "pos": [-24576.0, 115136.0],
             "size": [1536, 2048],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (109)",
             "type": "dev_floor_256",
-            "pos": [1024.0, 86208.0],
+            "pos": [-24576.0, 113728.0],
             "size": [1536, 768]
         },
         {
             "id": "dev_floor_256 (110)",
             "type": "dev_floor_256",
-            "pos": [1024.0, 86208.0],
+            "pos": [-24576.0, 113728.0],
             "size": [1536, 256],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (111)",
             "type": "dev_floor_256",
-            "pos": [1024.0, 76736.0],
+            "pos": [-24576.0, 104256.0],
             "size": [1536, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (112)",
             "type": "dev_floor_256",
-            "pos": [1024.0, 76224.0],
+            "pos": [-24576.0, 103744.0],
             "size": [1536, 256]
         },
         {
             "id": "dev_floor_256 (113)",
             "type": "dev_floor_256",
-            "pos": [1024.0, 75840.0],
+            "pos": [-24576.0, 103360.0],
             "size": [1536, 512],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (114)",
             "type": "dev_floor_256",
-            "pos": [3200.0, 72064.0],
+            "pos": [-22400.0, 99584.0],
             "size": [40192, 38656],
             "color": [71, 0, 71, 255]
         },
         {
             "id": "dev_floor_256 (115)",
             "type": "dev_floor_256",
-            "pos": [1024.0, 75456.0],
+            "pos": [-24576.0, 102976.0],
             "size": [1536, 256]
         },
         {
             "id": "vent (74)",
             "type": "@materials/vent.png",
-            "pos": [18240.001953125, 69567.984375],
+            "pos": [-7359.99755859375, 97087.984375],
             "rotation": -90.0,
             "size": [384, 6400]
         },
         {
             "id": "vent (75)",
             "type": "@materials/vent.png",
-            "pos": [18239.998046875, 68447.9921875],
+            "pos": [-7360.001953125, 95967.9921875],
             "rotation": -90.0,
             "size": [320, 6400]
         },
         {
             "id": "dev_floor_256 (108)",
             "type": "dev_floor_256",
-            "pos": [15808.0, 68992.0],
+            "pos": [-9792.0, 96512.0],
             "size": [1536, 768],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "arrow",
             "type": "@arrow",
-            "pos": [1021.0, 84998.0],
+            "pos": [-24579.0, 112518.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (1)",
             "type": "@arrow",
-            "pos": [1021.0, 83962.0],
+            "pos": [-24579.0, 111482.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (2)",
             "type": "@arrow",
-            "pos": [1021.0, 82950.0],
+            "pos": [-24579.0, 110470.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (3)",
             "type": "@arrow",
-            "pos": [1021.0, 81914.0],
+            "pos": [-24579.0, 109434.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (4)",
             "type": "@arrow",
-            "pos": [1021.0, 80890.0],
+            "pos": [-24579.0, 108410.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (5)",
             "type": "@arrow",
-            "pos": [1027.0, 79866.0],
+            "pos": [-24573.0, 107386.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (6)",
             "type": "@arrow",
-            "pos": [1027.0, 78842.0],
+            "pos": [-24573.0, 106362.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (7)",
             "type": "@arrow",
-            "pos": [1021.0, 77766.0],
+            "pos": [-24579.0, 105286.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (8)",
             "type": "@arrow",
-            "pos": [1021.0, 74618.0],
+            "pos": [-24579.0, 102138.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (9)",
             "type": "@arrow",
-            "pos": [1021.0, 73582.0],
+            "pos": [-24579.0, 101102.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (10)",
             "type": "@arrow",
-            "pos": [1021.0, 72570.0],
+            "pos": [-24579.0, 100090.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (11)",
             "type": "@arrow",
-            "pos": [1021.0, 71534.0],
+            "pos": [-24579.0, 99054.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (12)",
             "type": "@arrow",
-            "pos": [1021.0, 70510.0],
+            "pos": [-24579.0, 98030.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (13)",
             "type": "@arrow",
-            "pos": [1027.0, 69486.0],
+            "pos": [-24573.0, 97006.0],
             "rotation": -90.0
         },
         {
             "id": "arrow (14)",
             "type": "@arrow",
-            "pos": [1530.0, 68995.0]
+            "pos": [-24070.0, 96515.0]
         },
         {
             "id": "arrow (15)",
             "type": "@arrow",
-            "pos": [2606.0, 68989.0]
+            "pos": [-22994.0, 96509.0]
         },
         {
             "id": "arrow (16)",
             "type": "@arrow",
-            "pos": [3578.0, 68995.0]
+            "pos": [-22022.0, 96515.0]
         },
         {
             "id": "arrow (17)",
             "type": "@arrow",
-            "pos": [4654.0, 68989.0]
+            "pos": [-20946.0, 96509.0]
         },
         {
             "id": "arrow (18)",
             "type": "@arrow",
-            "pos": [5626.0, 68995.0]
+            "pos": [-19974.0, 96515.0]
         },
         {
             "id": "arrow (19)",
             "type": "@arrow",
-            "pos": [6702.0, 68989.0]
+            "pos": [-18898.0, 96509.0]
         },
         {
             "id": "arrow (20)",
             "type": "@arrow",
-            "pos": [7674.0, 68995.0]
+            "pos": [-17926.0, 96515.0]
         },
         {
             "id": "arrow (21)",
             "type": "@arrow",
-            "pos": [8750.0, 68989.0]
+            "pos": [-16850.0, 96509.0]
         },
         {
             "id": "arrow (22)",
             "type": "@arrow",
-            "pos": [9722.0, 68995.0]
+            "pos": [-15878.0, 96515.0]
         },
         {
             "id": "arrow (23)",
             "type": "@arrow",
-            "pos": [10798.0, 68989.0]
+            "pos": [-14802.0, 96509.0]
         },
         {
             "id": "arrow (24)",
             "type": "@arrow",
-            "pos": [11770.0, 68995.0]
+            "pos": [-13830.0, 96515.0]
         },
         {
             "id": "arrow (25)",
             "type": "@arrow",
-            "pos": [12846.0, 68989.0]
+            "pos": [-12754.0, 96509.0]
         },
         {
             "id": "arrow (26)",
             "type": "@arrow",
-            "pos": [13818.0, 68995.0]
+            "pos": [-11782.0, 96515.0]
         },
         {
             "id": "dev_floor_256 (116)",
             "type": "dev_floor_256",
-            "pos": [19008.0, 68992.0],
+            "pos": [-6592.0, 96512.0],
             "size": [4864, 768]
         },
         {
             "id": "arrow (27)",
             "type": "@arrow",
-            "pos": [14842.0, 68995.0]
+            "pos": [-10758.0, 96515.0]
         },
         {
             "id": "dev_floor_256 (117)",
             "type": "dev_floor_256",
             "pos": [7168.0, 43648.0],
             "size": [256, 768],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (40)",
+            "type": "dev_floor_256",
+            "pos": [18752.0, 9472.0],
+            "rotation": -90.0,
+            "size": [1280, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (118)",
+            "type": "dev_floor_256",
+            "pos": [21184.0, 9472.0],
+            "rotation": -90.0,
+            "size": [1280, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (119)",
+            "type": "dev_floor_256",
+            "pos": [0.0, 17024.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (120)",
+            "type": "dev_floor_256",
+            "pos": [512.0, 15360.0],
+            "size": [512, 512],
             "color": [0, 255, 0, 255]
         },
         {
@@ -4305,21 +4325,22 @@
             }
         },
         {
-            "id": "point_light (6)",
+            "id": "obs1 (2)",
             "type": "point_light",
-            "pos": [-767.0, 43905.0]
+            "pos": [1012.0, 43759.0],
+            "color": [255, 0, 0, 158]
         },
         {
             "id": "point_light (7)",
             "type": "point_light",
             "pos": [1296.0, 43840.0],
-            "color": [255, 255, 0, 255]
+            "color": [1, 255, 0, 255]
         },
         {
             "id": "point_light (8)",
             "type": "point_light",
             "pos": [1296.0, 44481.0],
-            "color": [255, 255, 0, 255]
+            "color": [0, 255, 0, 255]
         },
         {
             "id": "point_light (9)",
@@ -4342,8 +4363,8 @@
         {
             "id": "point_light (12)",
             "type": "point_light",
-            "pos": [5377.0, 43841.0],
-            "color": [255, 255, 0, 47]
+            "pos": [5639.0, 43320.0],
+            "color": [255, 0, 0, 91]
         },
         {
             "id": "point_light (13)",
@@ -4355,7 +4376,7 @@
             "id": "point_light (14)",
             "type": "point_light",
             "pos": [6752.0, 44512.0],
-            "color": [255, 255, 0, 74]
+            "color": [0, 255, 0, 74]
         },
         {
             "id": "Strong lamp (10)",
@@ -5574,7 +5595,7 @@
         {
             "id": "point_light (20)",
             "type": "point_light",
-            "pos": [1025.0, 83777.0],
+            "pos": [-24575.0, 111297.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5583,7 +5604,7 @@
         {
             "id": "point_light (21)",
             "type": "point_light",
-            "pos": [1025.0, 81791.0],
+            "pos": [-24575.0, 109311.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5592,7 +5613,7 @@
         {
             "id": "point_light (22)",
             "type": "point_light",
-            "pos": [1025.0, 79999.0],
+            "pos": [-24575.0, 107519.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5601,7 +5622,7 @@
         {
             "id": "point_light (23)",
             "type": "point_light",
-            "pos": [1023.0, 78017.0],
+            "pos": [-24577.0, 105537.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5610,7 +5631,7 @@
         {
             "id": "point_light (24)",
             "type": "point_light",
-            "pos": [1023.0, 85057.0],
+            "pos": [-24577.0, 112577.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5619,7 +5640,7 @@
         {
             "id": "point_light (25)",
             "type": "point_light",
-            "pos": [1025.0, 72769.0],
+            "pos": [-24575.0, 100289.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5628,7 +5649,7 @@
         {
             "id": "point_light (26)",
             "type": "point_light",
-            "pos": [1023.0, 74049.0],
+            "pos": [-24577.0, 101569.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5637,7 +5658,7 @@
         {
             "id": "point_light (27)",
             "type": "point_light",
-            "pos": [1025.0, 70783.0],
+            "pos": [-24575.0, 98303.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5646,7 +5667,7 @@
         {
             "id": "point_light (28)",
             "type": "point_light",
-            "pos": [1025.0, 68991.0],
+            "pos": [-24575.0, 96511.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5655,7 +5676,7 @@
         {
             "id": "point_light (30)",
             "type": "point_light",
-            "pos": [2621.0, 68929.0],
+            "pos": [-22979.0, 96449.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5664,7 +5685,7 @@
         {
             "id": "point_light (31)",
             "type": "point_light",
-            "pos": [4607.0, 68929.0],
+            "pos": [-20993.0, 96449.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5673,7 +5694,7 @@
         {
             "id": "point_light (32)",
             "type": "point_light",
-            "pos": [6783.0, 68927.0],
+            "pos": [-18817.0, 96447.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5682,7 +5703,7 @@
         {
             "id": "point_light (29)",
             "type": "point_light",
-            "pos": [8447.0, 68931.0],
+            "pos": [-17153.0, 96451.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5691,7 +5712,7 @@
         {
             "id": "point_light (33)",
             "type": "point_light",
-            "pos": [10623.0, 68929.0],
+            "pos": [-14977.0, 96449.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5700,7 +5721,7 @@
         {
             "id": "point_light (34)",
             "type": "point_light",
-            "pos": [12225.0, 68927.0],
+            "pos": [-13375.0, 96447.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
@@ -5709,11 +5730,23 @@
         {
             "id": "point_light (35)",
             "type": "point_light",
-            "pos": [14401.0, 68925.0],
+            "pos": [-11199.0, 96445.0],
             "color": [255, 255, 255, 109],
             "falloff": {
                 "radius": 2000.0
             }
+        },
+        {
+            "id": "obs1 (1)",
+            "type": "point_light",
+            "pos": [1007.0, 44560.0],
+            "color": [255, 0, 0, 158]
+        },
+        {
+            "id": "point_light (6)",
+            "type": "point_light",
+            "pos": [6209.0, 43327.0],
+            "color": [255, 0, 0, 63]
         },
         {
             "id": "force_grenade",
@@ -7372,6 +7405,7 @@
         {
             "id": "team_spawn (2)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [-319.0, 46401.0],
             "rotation": -90.0
@@ -7516,7 +7550,20 @@
             "type": "team_spawn",
             "active": false,
             "faction": "METROPOLIS",
-            "pos": [51519.0, 28801.0]
+            "pos": [24255.0, 9281.0]
+        },
+        {
+            "id": "team_spawn (8)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [-193.0, 46143.0]
+        },
+        {
+            "id": "team_spawn (9)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [11419.0, -17.0]
         },
         {
             "id": "exit0",
@@ -7996,7 +8043,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {SHOOT} to shoot.\nKill the Resistance soldier to continue.\nIf you run out of ammo, you can always restart this level."
+            "context_tip": "Press {SHOOT} to shoot.\nKill the Resistance soldier to continue.\nWatch your ammo! You can always restart this level."
         },
         {
             "id": "tip4_1 (3)",
@@ -8149,7 +8196,7 @@
             "id": "tip4_1 (9)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [9344.0, 44800.0],
+            "pos": [8896.0, 44800.0],
             "size": [256, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -8455,7 +8502,7 @@
             "id": "tip4_1 (11)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [8896.0, 44800.0],
+            "pos": [9344.0, 44800.0],
             "size": [256, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -8470,7 +8517,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Tip: press {HOTBAR_0} several times in a row.\nThis toggles between right-handed and left-handed stance!\n"
+            "context_tip": "Tip: press the same number (e.g. {HOTBAR_0}) several times in a row.\nThis toggles between right-handed and left-handed stance!\n"
         },
         {
             "id": "tip4_1 (12)",
@@ -8533,7 +8580,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Shoot the glassy surface from an angle.\nKill 4 enemies covering behind the corner."
+            "context_tip": "Shoot the glassy surface from an angle.\nKill 4 enemies camping behind the corners."
         },
         {
             "id": "tip3_1 (10)",
@@ -8582,7 +8629,7 @@
         {
             "id": "exit8",
             "type": "portal",
-            "pos": [18367.99609375, 9471.9990234375],
+            "pos": [18111.99609375, 9471.9990234375],
             "rotation": -180.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -8602,27 +8649,6 @@
                 "mode": "SET_VELOCITY"
             },
             "context_tip": ""
-        },
-        {
-            "id": "tip3_1 (8)",
-            "type": "portal",
-            "shape": "BOX",
-            "pos": [21184.0, 9472.0],
-            "size": [256, 1280],
-            "color_preset": "GREEN",
-            "auto_scale_pitches": false,
-            "enter_time_ms": 20.0,
-            "exit_cooldown_ms": 0.0,
-            "decrease_opacity_to": 255,
-            "OFF_rings_effect": {},
-            "light_size_mult": 0.0,
-            "ambience_sound": {
-                "id": null
-            },
-            "ambience_particles": {
-                "scale_amounts": 0.30000001192092896
-            },
-            "context_tip": "It's a hardcore technique.\nYou can surprise enemies in hiding."
         },
         {
             "id": "tip3_1 (11)",
@@ -10492,7 +10518,7 @@
         {
             "id": "entry18",
             "type": "portal",
-            "pos": [1023.9998779296875, 88256.0078125],
+            "pos": [-24576.0, 115776.015625],
             "rotation": -90.0,
             "color_preset": "GREEN",
             "trampoline_like": true,
@@ -10516,7 +10542,7 @@
             "id": "tip2_1 (1)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [1024.0, 87616.0],
+            "pos": [-24576.0, 115136.0],
             "size": [1536, 2048],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -10537,7 +10563,7 @@
             "id": "portal",
             "type": "portal",
             "shape": "BOX",
-            "pos": [1024.0, 81472.0],
+            "pos": [-24576.0, 108992.0078125],
             "size": [1536, 8704],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -10558,7 +10584,7 @@
         {
             "id": "portal (1)",
             "type": "portal",
-            "pos": [1024.0, 85632.0],
+            "pos": [-24576.0, 113152.0],
             "rotation": -90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -10577,7 +10603,7 @@
             "id": "surf_start",
             "type": "portal",
             "shape": "BOX",
-            "pos": [1024.0, 86208.0],
+            "pos": [-24576.0, 113728.0],
             "size": [1536, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -10603,7 +10629,7 @@
             "id": "surf_start (1)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [1024.0, 76736.0],
+            "pos": [-24576.0, 104256.0078125],
             "size": [1536, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -10627,7 +10653,7 @@
             "id": "surf_start (2)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [1024.0, 75840.0],
+            "pos": [-24576.0, 103360.0],
             "size": [1536, 512],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -10651,7 +10677,7 @@
         {
             "id": "portal (2)",
             "type": "portal",
-            "pos": [1024.0, 75136.0078125],
+            "pos": [-24576.0, 102656.015625],
             "rotation": -90.0,
             "size": [512, 512],
             "color_preset": "WHITE",
@@ -10670,7 +10696,7 @@
             "id": "portal (3)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-416.0, 65376.0],
+            "pos": [-26016.0, 92896.0],
             "size": [30912, 19904],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -10691,7 +10717,7 @@
         {
             "id": "portal (4)",
             "type": "portal",
-            "pos": [1024.0, 68992.0],
+            "pos": [-24576.0, 96512.0],
             "size": [512, 512],
             "color_preset": "WHITE",
             "trampoline_like": true,
@@ -10709,7 +10735,7 @@
             "id": "surf_start (3)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [15808.0, 68992.0],
+            "pos": [-9792.0, 96512.0],
             "size": [1536, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -10733,7 +10759,7 @@
             "id": "portal (5)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-7968.0, 81408.0],
+            "pos": [-33568.0, 108928.0],
             "size": [15680, 12160],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -10755,7 +10781,7 @@
             "id": "portal (6)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [9952.0, 81376.0],
+            "pos": [-15648.0, 108896.0],
             "size": [15680, 12096],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -10777,7 +10803,7 @@
             "id": "portal (7)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [20096.0, 72544.0],
+            "pos": [-5504.0, 100064.0],
             "size": [10112, 5568],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -10799,7 +10825,7 @@
             "id": "portal (8)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [20128.0, 61728.00390625],
+            "pos": [-5472.0, 89248.0],
             "size": [10176, 12608],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
@@ -10837,6 +10863,90 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Bullet trajectory ({TOGGLE_WEAPON_LASER}) must cross the enemy's head.\nIt's possible to headshot even from the side!"
+        },
+        {
+            "id": "tip3_1 (8)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [18752.0, 9472.0],
+            "size": [256, 1280],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Good job!\nThis is a very important technique."
+        },
+        {
+            "id": "tip3_1 (66)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [21184.0, 9472.0],
+            "size": [256, 1280],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "ALL surfaces can bounce bullets.\nWood is the hardest, but absolutely possible!"
+        },
+        {
+            "id": "tip2_1 (2)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [0.0, 17024.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Hold {MOVE_FORWARD} and then press {DASH}."
+        },
+        {
+            "id": "tip2_1 (3)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [512.0, 15360.0009765625],
+            "size": [512, 512],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Hold {MOVE_RIGHT} and then press {DASH}.\nDash direction is the same as movement direction."
         }
     ]
 }

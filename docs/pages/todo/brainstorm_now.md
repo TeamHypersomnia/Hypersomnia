@@ -6,13 +6,28 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Cull/fade sound sources that are obviously too far away
-    - we need to fade them if they're playing so they delete
-        - actually just stop them since they should be inaudible already
+- LPM doesnt shoot if right-handed stance is on
 
-- Switch to previous weapon when:
-    - throwing nade
-    - planting bomb
+- When nade is thrown..
+    - For now, instead of requesting a "Q" in gui, we can:
+        - ..just pull out the same type automatically to the hand if it exists in inventory.
+            - can be done logic-side.
+        - alternatively pull any other grenade. Can as well pick the first that's returned by for each item recursive, will most likely coincide with the hotbar.
+- DISREGARDED:
+    - Switch to previous weapon when:
+        - throwing nade
+        - planting bomb
+    - nOT NECESSARILY - why?
+        - After planting the bomb, you might want to default to holster to quickly jump off.
+            - very important in competitive environments where every second matters
+
+- Read only the layer for the current tutorial level + the next (so that we read the portal entry of the next level, which is required by the exit portal of current).
+    - This will improve framerate and it's good to welcome players with an extremely high one.
+    - THIS ALSO SOLVES (this is for later):
+        - There's too many portal ambiences in the tutorial level and it causes the game to miss sounds.
+            - Cull/fade sound sources that are obviously too far away
+                - we need to fade them if they're playing so they delete
+                    - actually just stop them abruptly since they'll be inaudible at that point anyway
 
 - Tutorial levels
     - Spells but maybe just preliminary

@@ -20,6 +20,7 @@
 #include "application/network/network_common.h"
 #include "application/setups/editor/project/editor_project.h"
 #include "application/arena/scene_entity_to_node_map.h"
+#include "application/setups/editor/project/editor_project_paths.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -46,13 +47,15 @@ using test_arena_handle = online_arena_handle<C>;
 class test_scene_setup : public default_setup_settings, public arena_gui_mixin<test_scene_setup> {
 	using arena_gui_base = arena_gui_mixin<test_scene_setup>;
 
+	const packaged_official_content& official;
+
 	all_rulesets_variant ruleset;
 	all_modes_variant current_mode_state;
 
 	std::string nickname;
 
-	cosmos_solvable_significant clean_round_state;
-	all_modes_variant clean_mode_state;
+	cosmos_solvable_significant dummy_clean_round_state;
+	uint32_t clean_step_number = 0;
 
 	intercosm scene;
 	entropy_accumulator total_collected;
@@ -81,7 +84,7 @@ class test_scene_setup : public default_setup_settings, public arena_gui_mixin<t
 			self.scene,
 			self.scene.world,
 			self.ruleset,
-			self.clean_round_state
+			self.dummy_clean_round_state
 		};
 	}
 
@@ -161,7 +164,7 @@ public:
 		auto get_solve_settings = [&]() {
 			solve_settings settings;
 
-			if (scene.world.get_total_steps_passed() <= clean_round_state.clk.now.step + 1) {
+			if (scene.world.get_total_steps_passed() <= clean_step_number + 1) {
 				settings.play_transfer_sounds = false;
 			}
 
@@ -223,6 +226,8 @@ public:
 	template <class T>
 	void control(const T& t) {
 		total_collected.control(t);
+		arena_gui_base::arena_gui.buy_menu.show = false;
+		arena_gui_base::arena_gui.choose_team.show = false;
 	}
 
 	void accept_game_gui_events(const game_gui_entropy_type&);
@@ -315,4 +320,8 @@ public:
 	void remove(logic_step step, const std::string& name);
 
 	void request_checkpoint_restart() { restart_requested = true; }
+
+	auto get_paths() const {
+		return editor_project_paths(current_arena_folder);
+	}
 };

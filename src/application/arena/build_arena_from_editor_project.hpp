@@ -11,6 +11,9 @@
 
 #include "application/arena/build_arena_from_editor_project.h"
 #include "application/setups/editor/detail/has_custom_scene_flavour_id.h"
+#include "game/cosmos/change_common_significant.hpp"
+#include "game/cosmos/create_entity.hpp"
+#include "game/detail/inventory/generate_equipment.h"
 
 template <class A>
 void build_arena_from_editor_project(A arena_handle, const build_arena_input in) {

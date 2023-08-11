@@ -1876,30 +1876,8 @@ std::size_t editor_setup::find_layer_index(const editor_layer_id id) const {
 	return ::find_index_in(project.layers.order, id);
 }
 
-std::optional<editor_setup::parent_layer_info> editor_setup::find_parent_layer(const editor_node_id node_id) const {
-	if (!node_id.is_set()) {
-		return std::nullopt;
-	}
-
-	parent_layer_info info;
-
-	const auto& layers = project.layers.order;
-
-	for (std::size_t l = 0; l < layers.size(); ++l) {
-		const auto layer_id = layers[l];
-
-		if (const auto layer = find_layer(layer_id)) {
-			const auto& nodes = layer->hierarchy.nodes;
-
-			for (std::size_t i = 0; i < nodes.size(); ++i) {
-				if (nodes[i] == node_id) {
-					return parent_layer_info { layer_id, layer, l, i };
-				}
-			}
-		}
-	}
-
-	return std::nullopt;
+std::optional<parent_layer_info> editor_setup::find_parent_layer(const editor_node_id node_id) const {
+	return project.find_parent_layer(node_id);
 }
 
 std::string editor_setup::get_name(const entity_id id) const {
@@ -3033,9 +3011,9 @@ double editor_setup::get_interpolation_ratio() const {
 	return global_time_seconds / get_inv_tickrate();
 }
 
-std::optional<editor_setup::parent_layer_info> editor_setup::find_best_layer_for_new_node() const {
+std::optional<parent_layer_info> editor_setup::find_best_layer_for_new_node() const {
 	return std::visit(
-		[&]<typename T>(const T& inspected_id) -> std::optional<editor_setup::parent_layer_info> {
+		[&]<typename T>(const T& inspected_id) -> std::optional<parent_layer_info> {
 			if constexpr(std::is_same_v<T, editor_layer_id>) {
 				return convert_to_parent_layer_info(inspected_id);
 			}
@@ -3050,20 +3028,8 @@ std::optional<editor_setup::parent_layer_info> editor_setup::find_best_layer_for
 	);
 }
 
-std::optional<editor_setup::parent_layer_info> editor_setup::convert_to_parent_layer_info(const editor_layer_id layer_id) const {
-	parent_layer_info info;
-
-	const auto& layers = project.layers.order;
-
-	for (std::size_t l = 0; l < layers.size(); ++l) {
-		if (layer_id == layers[l]) {
-			if (const auto layer = find_layer(layer_id)) {
-				return parent_layer_info { layer_id, layer, l, 0 };
-			}
-		}
-	}
-
-	return std::nullopt;
+std::optional<parent_layer_info> editor_setup::convert_to_parent_layer_info(const editor_layer_id layer_id) const {
+	return project.convert_to_parent_layer_info(layer_id);
 }
 
 void editor_setup::quiet_set_last_inspected_layer_or_node(const inspected_variant inspected) {
@@ -3324,6 +3290,30 @@ bool editor_setup::should_warp_cursor_before_cloning() const {
 
 void editor_setup::toggle_sounds_preview() {
 	gui.sounds_preview = !gui.sounds_preview;
+}
+
+template <class F>
+void editor_setup::rebuild_prefab_nodes(
+	const editor_typed_node_id<editor_prefab_node> prefab_node_id,
+	F&& on_created_child,
+	const bool call_reverse
+) {
+	const auto prefab_node = find_node(prefab_node_id);
+
+	if (prefab_node == nullptr) {
+		return;
+	}
+
+	auto find_res_lbd = [&](auto&&... args) -> decltype(auto) { 
+		return find_resource(std::forward<decltype(args)>(args)... ); 
+	};
+
+	::rebuild_prefab_nodes(
+		*prefab_node,
+		find_res_lbd,
+		std::forward<F>(on_created_child),
+		call_reverse
+	);
 }
 
 void unpack_prefab_command::redo(editor_command_input in) {
