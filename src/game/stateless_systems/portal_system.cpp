@@ -334,8 +334,14 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 					}
 
 					rigid_body.body().m_last_teleport_progress_timestamp = cosm.get_total_steps_passed();
+
+					const bool should_snap_interp = (contacted_entity_transform.pos - final_transform.pos).length() > 1.0;
+
 					typed_contacted_entity.set_logic_transform(final_transform);
-					::snap_interpolated_to(typed_contacted_entity, final_transform);
+
+					if (should_snap_interp) {
+						::snap_interpolated_to(typed_contacted_entity, final_transform);
+					}
 
 					{
 						messages::game_notification notification;
@@ -358,7 +364,7 @@ void portal_system::finalize_portal_exit(const logic_step step, const entity_han
 						msg.damage.base = hazard.damage;
 						msg.origin.cause = damage_cause(portal_exit);
 						msg.origin.sender.set(typed_contacted_entity);
-						msg.impact_velocity = considered_velocity;
+						msg.impact_velocity = vec2::zero;
 						msg.point_of_impact = contacted_entity_transform.pos;
 
 						step.post_message(msg);

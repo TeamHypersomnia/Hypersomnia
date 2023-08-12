@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-12 16:23:04.623782 UTC"
+        "version_timestamp": "2023-08-12 18:16:33.668168 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1287,7 +1287,6 @@
         },
         {
             "id": "Level11",
-            "is_open_in_editor": false,
             "nodes": [
                 "vent (45)",
                 "vent (46)",
@@ -1314,6 +1313,7 @@
                 "vent (43)",
                 "dev_floor_256 (61)",
                 "dev_floor_256 (59)",
+                "team_spawn (1)",
                 "dev_floor_256 (63)"
             ]
         },
@@ -1468,7 +1468,6 @@
         },
         {
             "id": "Level8",
-            "is_open_in_editor": false,
             "nodes": [
                 "team_spawn (7)",
                 "obs6 (4)",
@@ -1513,8 +1512,7 @@
                 "Strong lamp (17)",
                 "Strong lamp (16)",
                 "Strong lamp (15)",
-                "floor_right (8)",
-                "team_spawn (5)"
+                "floor_right (8)"
             ]
         },
         {
@@ -1583,7 +1581,6 @@
         },
         {
             "id": "Level5",
-            "is_open_in_editor": false,
             "nodes": [
                 "obs4 (2)",
                 "obs4",
@@ -1618,7 +1615,6 @@
         },
         {
             "id": "Level4",
-            "is_open_in_editor": false,
             "nodes": [
                 "kek9_magazine",
                 "kek9_magazine (2)",
@@ -1647,6 +1643,7 @@
                 "dev_floor_256 (117)",
                 "dev_floor_256 (68)",
                 "tip4_1 (15)",
+                "tip4_1 (20)",
                 "tip4_1 (4)",
                 "tip4_1 (13)",
                 "tip4_1 (3)",
@@ -1731,6 +1728,7 @@
                 "vent (24)",
                 "vent (25)",
                 "dev_floor_256 (18)",
+                "dev_floor_256 (139)",
                 "dev_floor_256 (20)",
                 "dev_floor_256 (19)",
                 "dev_floor_256 (26)",
@@ -1832,19 +1830,13 @@
         },
         {
             "id": "Level0",
-            "is_open_in_editor": false,
             "nodes": [
                 "tip0_2 (3)",
                 "tip0_2 (1)",
                 "tip0_2",
                 "tip0_1",
                 "exit0",
-                "team_spawn (4)",
-                "team_spawn (3)",
-                "team_spawn (2)",
                 "team_spawn",
-                "team_spawn (1)",
-                "team_spawn (16)",
                 "vent",
                 "vent (10)",
                 "vent (9)",
@@ -6486,6 +6478,13 @@
             "color": [0, 255, 0, 255]
         },
         {
+            "id": "dev_floor_256 (139)",
+            "type": "dev_floor_256",
+            "pos": [5376.0, 43648.0],
+            "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
             "id": "Strong lamp (1)",
             "type": "point_light",
             "pos": [-897.0, 1279.0],
@@ -10343,25 +10342,10 @@
             "pos": [15680.0, 22656.0]
         },
         {
-            "id": "team_spawn (16)",
-            "type": "team_spawn",
-            "active": false,
-            "faction": "METROPOLIS",
-            "pos": [1.0, 639.0],
-            "rotation": -90.0
-        },
-        {
             "id": "kill1",
             "type": "team_spawn",
             "pos": [703.0, 44161.0],
             "rotation": -180.0
-        },
-        {
-            "id": "team_spawn (1)",
-            "type": "team_spawn",
-            "active": false,
-            "faction": "METROPOLIS",
-            "pos": [14593.0, 22911.0]
         },
         {
             "id": "kill2 (1)",
@@ -10410,7 +10394,7 @@
             "type": "team_spawn",
             "active": false,
             "faction": "METROPOLIS",
-            "pos": [38593.0, 14207.0],
+            "pos": [143.0, 270.0],
             "rotation": -90.0
         },
         {
@@ -10630,35 +10614,6 @@
             "rotation": -180.0
         },
         {
-            "id": "team_spawn (2)",
-            "type": "team_spawn",
-            "active": false,
-            "faction": "METROPOLIS",
-            "pos": [-319.0, 46401.0],
-            "rotation": -90.0
-        },
-        {
-            "id": "team_spawn (3)",
-            "type": "team_spawn",
-            "active": false,
-            "faction": "METROPOLIS",
-            "pos": [11326.0, 35.0]
-        },
-        {
-            "id": "team_spawn (4)",
-            "type": "team_spawn",
-            "active": false,
-            "faction": "METROPOLIS",
-            "pos": [38222.0, 13744.0]
-        },
-        {
-            "id": "team_spawn (5)",
-            "type": "team_spawn",
-            "active": false,
-            "faction": "METROPOLIS",
-            "pos": [47445.0, 13906.0]
-        },
-        {
             "id": "kill18",
             "type": "team_spawn",
             "pos": [32639.0, 29055.0]
@@ -10824,6 +10779,7 @@
         {
             "id": "team_spawn (14)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [14337.0, 22847.0]
         },
@@ -10861,6 +10817,12 @@
             "active": false,
             "faction": "METROPOLIS",
             "pos": [25153.0, -193.0]
+        },
+        {
+            "id": "team_spawn (1)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [56833.0, 13153.0]
         },
         {
             "id": "exit0",
@@ -11124,6 +11086,9 @@
             "size": [384, 512],
             "hazard": {
                 "damage": 200.0
+            },
+            "character_exit_impulse": {
+                "amount": 3333.3330078125
             }
         },
         {
@@ -11529,7 +11494,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "You can dual wield any two weapons."
+            "context_tip": "You can dual-wield any two weapons."
         },
         {
             "id": "entry5",
@@ -11597,7 +11562,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Hold both {HOTBAR_0} and {HOTBAR_1} to dual wield.\nTry killing both enemies at the same time."
+            "context_tip": "Hold two numbers to dual-wield. E.g. {HOTBAR_0} and {HOTBAR_1}.\nTry killing both enemies at the same time."
         },
         {
             "id": "hazard (7)",
@@ -12398,7 +12363,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press strong attack while running.\n({SPRINT} + {SHOOT_SECONDARY})"
+            "context_tip": "Press strong attack while running.\n({SPRINT} + {MOVE_FORWARD}, then {SHOOT_SECONDARY})"
         },
         {
             "id": "tip3_1 (32)",
@@ -12477,12 +12442,8 @@
             "hazard": {
                 "damage": 200.0
             },
-            "exit_shake": {
-                "duration_ms": 0.0
-            },
-            "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
-                "amount": 0.0
+                "amount": 3333.3330078125
             },
             "object_exit_impulse": {
                 "amount": 0.0
@@ -12500,12 +12461,8 @@
             "hazard": {
                 "damage": 200.0
             },
-            "exit_shake": {
-                "duration_ms": 0.0
-            },
-            "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
-                "amount": 0.0
+                "amount": 3333.3330078125
             },
             "object_exit_impulse": {
                 "amount": 0.0
@@ -12523,12 +12480,8 @@
             "hazard": {
                 "damage": 200.0
             },
-            "exit_shake": {
-                "duration_ms": 0.0
-            },
-            "character_exit_airborne_ms": 0.0,
             "character_exit_impulse": {
-                "amount": 0.0
+                "amount": 3333.3330078125
             },
             "object_exit_impulse": {
                 "amount": 0.0
@@ -14201,7 +14154,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "ALL surfaces can bounce bullets.\nWood is the hardest, but absolutely possible!"
+            "context_tip": "It lets you kill enemies without them ever seeing you!\nA VERY important technique."
         },
         {
             "id": "tip2_1 (2)",
@@ -15360,6 +15313,27 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Aim in the opposite direction (down).\nHold {SPRINT} and {MOVE_FORWARD} while shooting both Awkas."
+        },
+        {
+            "id": "tip4_1 (20)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [5376.0, 43648.0],
+            "size": [256, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Tip: there are 3 enemies,\neach hiding behind a crate."
         }
     ]
 }
