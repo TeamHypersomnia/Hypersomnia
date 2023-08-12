@@ -10,6 +10,14 @@ bool is_weapon_like(const E& typed_handle) {
 }
 
 template <class E>
+bool is_stackable_in_hotbar(const E& typed_handle) {
+	return 
+		typed_handle.template has<components::hand_fuse>()
+		|| typed_handle.template has<components::melee>()
+	;
+}
+
+template <class E>
 bool is_magazine_like(const E& typed_handle) {
 	if (const auto item = typed_handle.template find<invariants::item>()) {
 		return item->categories_for_slot_compatibility.test(item_category::MAGAZINE);

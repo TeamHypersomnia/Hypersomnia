@@ -42,13 +42,7 @@ struct constrained_entity_flavour_id {
 		return raw.is_set() && type_id.is_set();
 	}
 
-	bool operator==(const constrained_entity_flavour_id<C...> b) const {
-		return raw == b.raw && type_id == b.type_id; 
-	}
-
-	bool operator!=(const constrained_entity_flavour_id<C...> b) const {
-		return !operator==(b);
-	}
+	bool operator==(const constrained_entity_flavour_id<C...>& b) const noexcept = default;
 
 	operator entity_flavour_id() const {
 		return { raw, type_id };

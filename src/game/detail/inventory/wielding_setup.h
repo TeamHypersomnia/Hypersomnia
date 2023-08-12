@@ -60,7 +60,10 @@ struct basic_wielding_setup  {
 	template <class C>
 	bool is_bare_hands(const C& cosm) const;
 
-	auto& flip() {
+	template <class C>
+	bool equivalent_to(const C& cosm, const basic_wielding_setup<id_type>&) const;
+
+	auto& switch_hands() {
 		std::swap(hand_selections[0], hand_selections[1]);
 		return *this;
 	}

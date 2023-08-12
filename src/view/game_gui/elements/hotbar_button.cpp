@@ -20,45 +20,73 @@
 using namespace augs::gui::text;
 using namespace augs::gui;
 
-const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability) const {
-	const auto& cosm = owner_transfer_capability.get_cosmos();
-	const auto handle = cosm[last_assigned_entity];
-
-	if (handle.alive()) {
-		if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
-			const auto slot = handle.get_current_slot();
-			const bool should_ignore = slot->is_mounted_slot() && slot.get_type() != slot_function::TORSO_ARMOR;
-
-			if (!should_ignore) {
-				return handle;
-			}
-		}
+bool hotbar_button::is_assigned(const const_entity_handle item) const {
+	if (item.dead()) {
+		return false;
 	}
 
-	return cosm[entity_id()];
+	return 
+		last_assigned    == last_assigned_type(item.get_id()) 
+		|| last_assigned == last_assigned_type(item.get_flavour_id())
+	;
+}
+
+const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability) const {
+	return std::visit(
+		[&]<typename A>(const A& assigned) {
+			const auto& cosm = owner_transfer_capability.get_cosmos();
+			if constexpr(std::is_same_v<A, entity_id>) {
+				const auto handle = cosm[assigned];
+
+				if (handle.alive()) {
+					if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
+						const auto slot = handle.get_current_slot();
+						const bool should_ignore = slot->is_mounted_slot() && slot.get_type() != slot_function::TORSO_ARMOR;
+
+						if (!should_ignore) {
+							return handle;
+						}
+					}
+				}
+
+				return cosm[entity_id()];
+			}
+			else {
+				entity_id found;
+
+				owner_transfer_capability.for_each_contained_item_recursive(
+					[&](const auto& item) {
+						if (item.get_flavour_id() == assigned) {
+							found = item.get_id();
+
+							return recursive_callback_result::ABORT;
+						}
+
+						return recursive_callback_result::CONTINUE_AND_RECURSE;
+					}
+				);
+
+				return cosm[found];
+			}
+		},
+		last_assigned
+	);
 }
 
 bool hotbar_button::is_selected_as_primary(const const_entity_handle owner_transfer_capability) const {
-	const auto assigned_entity = get_assigned_entity(owner_transfer_capability);
+	const auto actually_owned = get_assigned_entity(owner_transfer_capability).alive();
 
-	return assigned_entity.alive() && owner_transfer_capability.get_if_any_item_in_hand_no(0) == assigned_entity;
+	return actually_owned && is_assigned(owner_transfer_capability.get_if_any_item_in_hand_no(0));
 }
 
 bool hotbar_button::is_selected_as_secondary(const const_entity_handle owner_transfer_capability) const {
-	const auto assigned_entity = get_assigned_entity(owner_transfer_capability);
+	const auto actually_owned = get_assigned_entity(owner_transfer_capability).alive();
 
-	return assigned_entity.alive() && owner_transfer_capability.get_if_any_item_in_hand_no(1) == assigned_entity;
+	return actually_owned && is_assigned(owner_transfer_capability.get_if_any_item_in_hand_no(1));
 }
 
-entity_handle hotbar_button::get_assigned_entity(const entity_handle owner_transfer_capability) const {
-	auto& cosm = owner_transfer_capability.get_cosmos();
-	const auto handle = cosm[last_assigned_entity];
-
-	if (handle.get_owning_transfer_capability() == owner_transfer_capability) {
-		return handle;
-	}
-
-	return cosm[entity_id()];
+void hotbar_button::clear_assigned() {
+	last_assigned = entity_id();
 }
 
 button_corners_info hotbar_button::get_button_corners_info() const {
@@ -337,7 +365,7 @@ void hotbar_button::draw(
 		ensure(assigned_entity.has<components::item>());
 
 		item_button_in_item location;
-		location.item_id = this_id->last_assigned_entity;
+		location.item_id = assigned_entity.get_id();
 
 		const auto dereferenced = context.dereference_location(location);
 		ensure(dereferenced != nullptr);

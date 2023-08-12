@@ -70,7 +70,7 @@ struct entity_id {
 		return entity_id();
 	}
 
-	bool operator==(const entity_id& b) const = default;
+	bool operator==(const entity_id& b) const noexcept = default;
 
 	void unset() {
 		raw.unset();

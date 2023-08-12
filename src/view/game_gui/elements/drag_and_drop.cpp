@@ -40,8 +40,7 @@ void drag_and_drop_callback(
 
 			if (hotbar_location != nullptr) {
 				gui.clear_hotbar_button_assignment(
-					hotbar_location.get_location().index, 
-					context.get_subject_entity()
+					hotbar_location.get_location().index
 				);
 			}
 			else {

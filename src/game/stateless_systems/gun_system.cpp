@@ -527,7 +527,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 
 						if (hs[1].is_set() && !hs[0].is_set()) {
-							requested_wield.flip();
+							requested_wield.switch_hands();
 						}
 
 						if (std::nullopt == calc_reloading_context_for(capability, gun_entity)) {

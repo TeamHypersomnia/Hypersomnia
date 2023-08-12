@@ -6,6 +6,7 @@
 #include "view/game_gui/game_gui_context.h"
 
 using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;
+using last_assigned_type = std::variant<entity_id, entity_flavour_id>;
 
 class hotbar_button : public game_gui_rect_node {
 public:
@@ -15,7 +16,7 @@ public:
 	using this_in_item = dereferenced_location<hotbar_button_in_character_gui>;
 	using const_this_in_item = const_dereferenced_location<hotbar_button_in_character_gui>;
 
-	entity_id last_assigned_entity;
+	last_assigned_type last_assigned;
 
 	augs::gui::appearance_detector detector;
 
@@ -32,8 +33,10 @@ public:
 
 	button_corners_info get_button_corners_info() const;
 
+	void clear_assigned();
+
+	bool is_assigned(const_entity_handle) const;
 	const_entity_handle get_assigned_entity(const const_entity_handle owner_transfer_capability) const;
-	entity_handle get_assigned_entity(const entity_handle owner_transfer_capability) const;
 
 	bool is_selected_as_primary(const const_entity_handle owner_transfer_capability) const;
 	bool is_selected_as_secondary(const const_entity_handle owner_transfer_capability) const;

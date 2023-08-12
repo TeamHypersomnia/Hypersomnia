@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- allow stamina going negative with yellow nades
+    - will make sense using them finally
+
 - Simplify stamina
     - Remove the white edge denoting limit
     - Dash should just take stamina on credit like in souls

@@ -4,6 +4,19 @@
 
 template <class I>
 template <class C>
+bool basic_wielding_setup<I>::equivalent_to(const C& cosm, const basic_wielding_setup<I>& b) const {
+	auto both_same_stackable_flavour = [](auto aa, auto bb) {
+		return aa.alive() && bb.alive() && ::is_stackable_in_hotbar(aa) && aa.get_flavour_id() == bb.get_flavour_id();
+	};
+
+	const auto equal_0 = hand_selections[0] == b.hand_selections[0] || both_same_stackable_flavour(cosm[hand_selections[0]], cosm[b.hand_selections[0]]);
+	const auto equal_1 = hand_selections[1] == b.hand_selections[1] || both_same_stackable_flavour(cosm[hand_selections[1]], cosm[b.hand_selections[1]]);
+
+	return equal_0 && equal_1;
+}
+
+template <class I>
+template <class C>
 bool basic_wielding_setup<I>::is_bare_hands(const C& cosm) const {
 	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
 		if (cosm[hand_selections[i]]) {
