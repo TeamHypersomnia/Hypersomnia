@@ -31,7 +31,7 @@ bool hotbar_button::is_assigned(const const_entity_handle item) const {
 	;
 }
 
-const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability, int* const out_stackable_count) const {
+const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability, int* const out_stackable_count, int offset) const {
 	return std::visit(
 		[&]<typename A>(const A& assigned) {
 			const auto& cosm = owner_transfer_capability.get_cosmos();
@@ -58,6 +58,11 @@ const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle
 					[&](const auto& item) {
 						if (item.get_flavour_id() == assigned) {
 							found = item.get_id();
+
+							if (offset > 0) {
+								--offset;
+								return recursive_callback_result::CONTINUE_AND_RECURSE;
+							}
 
 							if (out_stackable_count) {
 								++(*out_stackable_count);

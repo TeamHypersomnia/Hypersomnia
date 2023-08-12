@@ -109,12 +109,15 @@ wielding_setup character_gui::get_setup_from_button_indices(
 	const auto primary = hotbar_button_index_for_primary_selection;
 	const auto secondary = hotbar_button_index_for_secondary_selection;
 
+	/* For dual-wielding two stacked */
+	const int second_offset = primary == secondary ? 1 : 0;
+
 	if (primary != -1) {
 		output.hand_selections[0] = hotbar_buttons[static_cast<size_t>(primary)].get_assigned_entity(gui_entity);
 	}
 
 	if (secondary != -1) {
-		output.hand_selections[1] = hotbar_buttons[static_cast<size_t>(secondary)].get_assigned_entity(gui_entity);
+		output.hand_selections[1] = hotbar_buttons[static_cast<size_t>(secondary)].get_assigned_entity(gui_entity, nullptr, second_offset);
 	}
 
 	return output;

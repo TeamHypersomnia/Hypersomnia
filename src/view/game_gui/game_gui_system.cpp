@@ -285,9 +285,9 @@ void game_gui_system::control_hotbar_and_action_button(
 			if (gui.hotbar_buttons[hotbar_button_index].get_assigned_entity(gui_entity)) {
 				/* Something is assigned to that button */
 				if (i.was_pressed()) {
-					const bool should_dual_wield = currently_held_index > -1;
+					const bool wants_dual_wield = currently_held_index > -1;
 
-					if (should_dual_wield) {
+					if (wants_dual_wield) {
 						const auto akimbo_setup = gui.get_setup_from_button_indices(
 							gui_entity, 
 							currently_held_index, 
@@ -337,6 +337,35 @@ void game_gui_system::control_hotbar_and_action_button(
 				}
 				else {
 					currently_held_index = -1;
+				}
+			}
+			else {
+				/* 
+					Corner case: 
+
+					What if we want to dual-wield two entities stacked into the same hotbar button?
+					We can communicate this by choosing an empty slot as the second one.
+				*/
+
+				const bool wants_dual_wield = currently_held_index > -1;
+
+				if (wants_dual_wield && i.was_pressed()) {
+					int count = 0;
+					gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity, &count);
+
+					const bool held_is_stacked = count > 1;
+
+					if (held_is_stacked) {
+						const auto akimbo_setup = gui.get_setup_from_button_indices(
+							gui_entity, 
+							currently_held_index, 
+							currently_held_index
+						);
+
+						queue_wielding(gui_entity, akimbo_setup);
+
+						currently_held_index = -1;
+					}
 				}
 			}
 		}

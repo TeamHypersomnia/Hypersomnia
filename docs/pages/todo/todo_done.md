@@ -6449,3 +6449,10 @@ This will discard your redo history."
         - alternatively pull any other grenade. Can as well pick the first that's returned by for each item recursive, will most likely coincide with the hotbar.
 - LPM doesnt shoot if right-handed stance is on
 
+- allow stamina going negative with yellow nades
+    - will make sense using them finally
+- Simplify stamina
+    - Remove the white edge denoting limit
+    - Dash should just take stamina on credit like in souls
+    - We can make the dash a little more expensive to compensate so that we can still do 4 dashes on a full bar
+        - This game is too fast anyway so we wouldn't want more dashes here

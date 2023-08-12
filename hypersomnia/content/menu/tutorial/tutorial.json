@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-11 23:44:18.618917 UTC"
+        "version_timestamp": "2023-08-12 16:23:04.623782 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -10824,7 +10824,6 @@
         {
             "id": "team_spawn (14)",
             "type": "team_spawn",
-            "active": false,
             "faction": "METROPOLIS",
             "pos": [14337.0, 22847.0]
         },
@@ -10859,6 +10858,7 @@
         {
             "id": "team_spawn (20)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [25153.0, -193.0]
         },
