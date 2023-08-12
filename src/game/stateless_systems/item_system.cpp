@@ -54,6 +54,7 @@
 #include "game/detail/gun/gun_getters.h"
 #include "game/detail/explosive/like_explosive.h"
 #include "game/cosmos/might_allocate_entities_having.hpp"
+#include "game/detail/inventory/wield_same_as.hpp"
 
 enum class reload_advance_result {
 	DIFFERENT_VIABLE,
@@ -837,6 +838,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			}
 
 			if (thrown_melees > 0) {
+				augs::constant_size_vector<entity_id, 2> thrown_ids;
+
 				auto& fighter = typed_subject.template get<components::melee_fighter>();
 				
 				const bool suitable_state = 
@@ -858,6 +861,10 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 							}
 
 							do_drop(h);
+
+							if (thrown_ids.size() < thrown_ids.max_size()) {
+								thrown_ids.push_back(h.get_id());
+							}
 
 							{
 								const auto& effect = melee_def->actions.at(weapon_action_type::PRIMARY).init_particles;
@@ -911,6 +918,19 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						);
 
 						wield_after_throwing_knives = {};
+					}
+					else {
+						constexpr bool rewield_melees = false;
+
+						if constexpr(rewield_melees) {
+							if (thrown_ids.size() > 0) {
+								auto current_wielding = wielding_setup::from_current(typed_subject);
+
+								if (current_wielding.is_bare_hands(cosm)) {
+									::wield_same_melee_as(cosm[thrown_ids[0]], step, typed_subject);
+								}
+							}
+						}
 					}
 				}
 

@@ -22,7 +22,8 @@ template <class E>
 void perform_wielding(
 	const logic_step step,
 	const E& self,
-	const wielding_setup& request
+	const wielding_setup& request,
+	const bool should_play_effects = true
 ) {
 	if (logically_empty(request)) {
 		return;
@@ -227,23 +228,26 @@ void perform_wielding(
 		try_hand(i);
 	}
 
-	bool wield_played = false;
+	if (should_play_effects) {
+		bool wield_played = false;
 
-	for (const auto& r : reverse(results)) {
-		if (r.result.result.is_wield()) {
-			r.play_effects(step);
-			wield_played = true;
-			break;
-		}
-	}
-
-	if (!wield_played) {
 		for (const auto& r : reverse(results)) {
-			if (r.result.result.is_wear() || r.result.result.is_holster()) {
+			if (r.result.result.is_wield()) {
 				r.play_effects(step);
+				wield_played = true;
+				break;
+			}
+		}
+
+		if (!wield_played) {
+			for (const auto& r : reverse(results)) {
+				if (r.result.result.is_wear() || r.result.result.is_holster()) {
+					r.play_effects(step);
+				}
 			}
 		}
 	}
+
 
 #else
 	/* Brute force approach: 
