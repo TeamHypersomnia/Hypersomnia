@@ -283,7 +283,6 @@ namespace test_flavours {
 			sentience.exertion_cooldown_for_cp_regen_ms = 500.f;
 			sentience.dash_drains_cp = 60.f;
 			sentience.cp_regen_mult_when_moving = 0.3f;
-			sentience.minimum_cp_to_sprint = 0.08f;
 
 			sentience_inst.get<health_meter_instance>().set_value(100);
 			sentience_inst.get<health_meter_instance>().set_maximum_value(100);
@@ -293,8 +292,8 @@ namespace test_flavours {
 			sentience_inst.get<personal_electricity_meter_instance>().set_maximum_value(100);
 			sentience_inst.get<personal_electricity_meter_instance>().regeneration_unit = 1.2;
 			sentience_inst.get<personal_electricity_meter_instance>().regeneration_interval_ms = 2000;
-			sentience_inst.get<consciousness_meter_instance>().set_value(350);
-			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(350);
+			sentience_inst.get<consciousness_meter_instance>().set_value(300);
+			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(300);
 			sentience_inst.get<consciousness_meter_instance>().regeneration_unit = 10;
 			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 130;
 

@@ -203,7 +203,6 @@ namespace invariants {
 
 		particle_effect_input health_decrease_particles;
 
-		real32 minimum_cp_to_sprint = 0.1f;
 		real32 sprint_drains_cp_per_second = 4.f;
 		real32 dash_drains_cp = 15.f;
 		real32 base_detached_head_speed = 2000.f;

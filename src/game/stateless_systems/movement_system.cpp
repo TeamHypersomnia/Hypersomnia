@@ -130,7 +130,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 			movement.was_sprint_effective = considered_flags.sprinting;
 
-			value_meter::damage_result cp_damage_by_sprint;
+			auto cp_damage_by_sprint = 0.0f;
 
 			enum class haste_type {
 				NONE,
@@ -200,22 +200,17 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				auto& cp = sentience->get<consciousness_meter_instance>();
 
-				const auto minimum_cp_to_sprint = cp.get_maximum_value() * def.minimum_cp_to_sprint;
-
 #if SLOW_DOWN_IF_CP_CRITICAL
-				if (cp.value < minimum_cp_to_sprint - AUGS_EPSILON<real32>) {
+				if (cp.value < AUGS_EPSILON<real32>) {
 					movement_force_mult /= 2;
 				}
 #endif
 
-				cp_damage_by_sprint = cp.calc_damage_result(
-					def.sprint_drains_cp_per_second * delta.in_seconds(),
-					minimum_cp_to_sprint
-				);
+				cp_damage_by_sprint = def.sprint_drains_cp_per_second * delta.in_seconds();
 
-				if (cp_damage_by_sprint.excessive > 0) {
+				if (cp.value <= 0.0f) {
+					cp_damage_by_sprint = 0.0f;
 					movement.was_sprint_effective = false;
-					//movement.flags.sprinting = false;
 				}
 
 				if (current_haste == haste_type::GREATER) {
@@ -225,42 +220,37 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					movement_force_mult *= 1.3f;
 				}
 
-				if (considered_flags.dashing) {
+				if (considered_flags.dashing && cp.value > 0.0f) {
 					if (::dash_conditions_fulfilled(it)) {
 						if (const auto crosshair_offset = it.find_crosshair_offset()) {
-							const auto cp_damage_by_dash = cp.calc_damage_result(
-								def.dash_drains_cp,
-								minimum_cp_to_sprint
+							const auto cp_damage_by_dash = def.dash_drains_cp;
+
+							const auto final_direction = 
+								non_zero_requested
+								? vec2(requested_by_input).normalize()
+								: vec2(it.get_effective_velocity()).normalize()
+							;
+
+							const auto dash_effect_mult = ::perform_dash(
+								it,
+								final_direction,
+
+								movement_def.dash_impulse,
+								movement_def.dash_inert_ms,
+								dash_flag::PROPORTIONAL_TO_CURRENT_SPEED
 							);
 
-							if (cp_damage_by_dash.excessive <= 0) {
-								const auto final_direction = 
-									non_zero_requested
-									? vec2(requested_by_input).normalize()
-									: vec2(it.get_effective_velocity()).normalize()
-								;
-
-								const auto dash_effect_mult = ::perform_dash(
+							if (dash_effect_mult > 0.f) {
+								::perform_dash_effects(
+									step,
 									it,
-									final_direction,
-
-									movement_def.dash_impulse,
-									movement_def.dash_inert_ms,
-									dash_flag::PROPORTIONAL_TO_CURRENT_SPEED
+									dash_effect_mult,
+									predictable_only_by(it)
 								);
 
-								if (dash_effect_mult > 0.f) {
-									::perform_dash_effects(
-										step,
-										it,
-										dash_effect_mult,
-										predictable_only_by(it)
-									);
-
-									cp.value -= cp_damage_by_dash.effective;
-									sentience->time_of_last_exertion = cosm.get_timestamp();
-									movement.dash_cooldown_ms = movement_def.dash_cooldown_ms;
-								}
+								cp.value -= cp_damage_by_dash;
+								sentience->time_of_last_exertion = cosm.get_timestamp();
+								movement.dash_cooldown_ms = movement_def.dash_cooldown_ms;
 							}
 						}
 					}
@@ -297,14 +287,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				if (movement.was_sprint_effective) {
 					if (portal_inertia) {
 						if (is_sentient) {
-							sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint.effective * 0.5f;
+							sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint * 0.5f;
 						}
 					}
 					else {
 						movement_force_mult /= 2.f;
 
 						if (is_sentient) {
-							sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint.effective;
+							sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint;
 						}
 					}
 				}

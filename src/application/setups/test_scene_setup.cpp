@@ -17,6 +17,7 @@
 
 #include "game/modes/detail/delete_with_held_items.hpp"
 #include "game/detail/hand_fuse_logic.h"
+#include "game/detail/calc_ammo_info.hpp"
 
 using portal_marker = editor_area_marker_node;
 
@@ -394,6 +395,18 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 
 		if (restart_arena_in_ms <= 0) {
 			restart_arena();
+		}
+	}
+
+	if (const bool is_weapon_level = tutorial.level == 4) {
+		if (const bool still_first_stage = to_handle("obs1").alive()) {
+			const bool baka_empty = 0 == ::calc_ammo_info(to_handle("baka47")).total_charges;
+
+			if (baka_empty) {
+				if (restart_arena_in_ms < 0) {
+					restart_arena_in_ms = 500.0f;
+				}
+			}
 		}
 	}
 

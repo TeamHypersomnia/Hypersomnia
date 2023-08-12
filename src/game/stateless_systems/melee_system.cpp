@@ -73,7 +73,6 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 	cosm.for_each_having<components::melee_fighter>([&](const auto& it) {
 		const auto& fighter_def = it.template get<invariants::melee_fighter>();
-		const auto& sentience_def = it.template get<invariants::sentience>();
 		auto& sentience = it.template get<components::sentience>();
 
 		auto& fighter = it.template get<components::melee_fighter>();
@@ -137,19 +136,15 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 					if (augs::is_positive_epsilon(current_attack_def.cp_required)) {
 						auto& consciousness = sentience.template get<consciousness_meter_instance>();
-						const auto minimum_cp_to_attack = consciousness.get_maximum_value() * sentience_def.minimum_cp_to_sprint;
 
-						const auto consciousness_damage_by_attack = consciousness.calc_damage_result(
-							current_attack_def.cp_required,
-							minimum_cp_to_attack
-						);
-
-						if (consciousness_damage_by_attack.excessive > 0) {
+						if (consciousness.value <= 0.0f) {
 							return;
 						}
 
+						const auto consciousness_damage_by_attack = current_attack_def.cp_required;
+
 						sentience.time_of_last_exertion = cosm.get_timestamp();
-						consciousness.value -= consciousness_damage_by_attack.effective;
+						consciousness.value -= consciousness_damage_by_attack;
 					}
 
 					state = melee_fighter_state::IN_ACTION;

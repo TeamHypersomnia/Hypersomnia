@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-11 19:28:59.661403 UTC"
+        "version_timestamp": "2023-08-11 23:36:36.923072 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -277,6 +277,7 @@
     "layers": [
         {
             "id": "Level21",
+            "is_open_in_editor": false,
             "nodes": [
                 "exit19",
                 "point_light (106)",
@@ -615,6 +616,7 @@
         },
         {
             "id": "Level20",
+            "is_open_in_editor": false,
             "nodes": [
                 "arrow (187)-right",
                 "arrow (187)",
@@ -901,7 +903,6 @@
         },
         {
             "id": "Level15",
-            "is_open_in_editor": false,
             "nodes": [
                 "electric_rapier (5)",
                 "electric_rapier (4)",
@@ -911,6 +912,8 @@
                 "galilea",
                 "obs21",
                 "obs20",
+                "team_spawn (19)",
+                "defuse_kit",
                 "obs_def1",
                 "obs_carrier",
                 "obs_def2",
@@ -969,7 +972,6 @@
         },
         {
             "id": "Level14",
-            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (20)",
                 "exit14",
@@ -1015,7 +1017,6 @@
         },
         {
             "id": "Level13",
-            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (18)",
                 "exit13",
@@ -1061,6 +1062,7 @@
                 "vent (55)",
                 "bilmer2000",
                 "dev_floor_256 (80)",
+                "team_spawn (18)",
                 "dev_floor_256 (79)",
                 "Strong lamp (39)",
                 "Strong lamp (38)",
@@ -1068,13 +1070,11 @@
                 "Strong lamp (36)",
                 "Strong lamp (35)",
                 "Strong lamp (34)",
-                "Strong lamp (33)",
-                "defuse_kit"
+                "Strong lamp (33)"
             ]
         },
         {
             "id": "Level12",
-            "is_open_in_editor": false,
             "nodes": [
                 "vent (50)",
                 "vent (52)",
@@ -1140,6 +1140,7 @@
                 "force_grenade (83)",
                 "force_grenade (82)",
                 "force_grenade (81)",
+                "team_spawn (14)",
                 "force_grenade (80)",
                 "ped_grenade (22)",
                 "ped_grenade (23)",
@@ -1288,38 +1289,6 @@
             "id": "Level11",
             "is_open_in_editor": false,
             "nodes": [
-                "electric_rapier (3)-right-up-up",
-                "electric_rapier (2)-right-up-up",
-                "electric_rapier (1)-right-up-up",
-                "electric_rapier-right-up-up",
-                "electric_rapier (3)-right-up",
-                "electric_rapier (2)-right-up",
-                "electric_rapier (1)-right-up",
-                "electric_rapier-right-up",
-                "electric_rapier (3)-right",
-                "electric_rapier (2)-right",
-                "electric_rapier (1)-right",
-                "electric_rapier-right",
-                "electric_rapier (3)-up-up",
-                "electric_rapier (2)-up-up",
-                "electric_rapier (1)-up-up",
-                "electric_rapier-up-up",
-                "electric_rapier (3)-up",
-                "electric_rapier (2)-up",
-                "electric_rapier (1)-up",
-                "electric_rapier-up",
-                "electric_rapier (3)",
-                "electric_rapier (2)",
-                "electric_rapier (1)",
-                "electric_rapier",
-                "obs12 (1)-left",
-                "obs12 (1)",
-                "obs12 (2)-left",
-                "obs12 (2)",
-                "obs12-left",
-                "obs12",
-                "obs10",
-                "obs9",
                 "vent (45)",
                 "vent (46)",
                 "tip3_1 (27)",
@@ -1350,8 +1319,9 @@
         },
         {
             "id": "Level10",
-            "is_open_in_editor": false,
             "nodes": [
+                "team_spawn (17)",
+                "calico",
                 "floor_right (17)",
                 "exit10",
                 "obs11 (4)",
@@ -1391,8 +1361,43 @@
         },
         {
             "id": "Level9",
-            "is_open_in_editor": false,
             "nodes": [
+                "obs12 (1)-left",
+                "obs12 (1)",
+                "obs12 (2)-left",
+                "obs12 (2)",
+                "obs12-left",
+                "obs12",
+                "obs10",
+                "obs9",
+                "electric_rapier (3)-right-up-up",
+                "electric_rapier (2)-right-up-up",
+                "electric_rapier (1)-right-up-up",
+                "electric_rapier-right-up-up",
+                "electric_rapier (3)-right-up",
+                "electric_rapier (2)-right-up",
+                "electric_rapier (1)-right-up",
+                "electric_rapier-right-up",
+                "electric_rapier (3)-right",
+                "electric_rapier (2)-right",
+                "electric_rapier (1)-right",
+                "electric_rapier-right",
+                "electric_rapier (3)-up-up",
+                "electric_rapier (2)-up-up",
+                "electric_rapier (1)-up-up",
+                "electric_rapier-up-up",
+                "electric_rapier (3)-up",
+                "electric_rapier (2)-up",
+                "electric_rapier (1)-up",
+                "electric_rapier-up",
+                "electric_rapier (3)",
+                "electric_rapier (2)",
+                "electric_rapier (1)",
+                "electric_rapier",
+                "obs7",
+                "obs8",
+                "wood (3)",
+                "wood (2)",
                 "yellow_dagger (5)",
                 "yellow_dagger (4)",
                 "yellow_dagger (7)",
@@ -1411,6 +1416,7 @@
                 "poseidon (8)",
                 "poseidon (7)",
                 "poseidon (6)",
+                "team_spawn (15)",
                 "fury_thrower",
                 "obs12 (4)",
                 "obs12 (3)-left",
@@ -1478,17 +1484,11 @@
                 "obs6 (2)",
                 "obs5 (1)",
                 "obs5 (2)",
-                "obs8",
-                "wood (3)",
-                "wood (2)",
-                "obs7",
                 "kill5 (1)",
                 "kill5 (2)",
                 "kill5 (3)",
                 "kill6",
                 "kill6 (1)",
-                "kill6 (2)",
-                "kill6 (3)",
                 "kill5",
                 "tip3_1 (8)",
                 "tip3_1 (66)",
@@ -1514,23 +1514,25 @@
                 "Strong lamp (16)",
                 "Strong lamp (15)",
                 "floor_right (8)",
-                "team_spawn (5)",
-                "calico"
+                "team_spawn (5)"
             ]
         },
         {
             "id": "Level7",
-            "is_open_in_editor": false,
             "nodes": [
+                "tip3_1 (12)",
+                "dev_floor_256 (52)",
+                "tip3_1 (67)",
+                "dev_floor_256 (138)",
                 "metropolis_backpack",
                 "awka (1)",
                 "awka",
                 "hazard (5)",
                 "floor_right (12)",
                 "dev_floor_256 (44)",
+                "team_spawn (20)",
                 "tip3_1 (14)",
                 "dev_floor_256 (45)",
-                "tip3_1 (12)",
                 "tip3_1 (20)",
                 "tip3_1 (19)",
                 "tip3_1 (18)",
@@ -1544,7 +1546,6 @@
                 "vent (34)",
                 "vent (35)",
                 "vent (36)",
-                "dev_floor_256 (52)",
                 "dev_floor_256 (51)",
                 "dev_floor_256 (50)",
                 "dev_floor_256 (49)",
@@ -1556,7 +1557,6 @@
         },
         {
             "id": "Level6",
-            "is_open_in_editor": false,
             "nodes": [
                 "hazard (7)",
                 "floor_right (14)",
@@ -1861,7 +1861,6 @@
         },
         {
             "id": "Floors",
-            "is_open_in_editor": false,
             "nodes": [
                 "floor_right (9)",
                 "floor_right (7)",
@@ -2926,28 +2925,28 @@
         {
             "id": "floor_right (12)",
             "type": "@water_room_floor",
-            "pos": [25344.0, -8448.0],
+            "pos": [25344.0, -8768.0],
             "size": [1408, 768],
             "color": [255, 132, 132, 255]
         },
         {
             "id": "dev_floor_256 (44)",
             "type": "dev_floor_256",
-            "pos": [25344.0, -5568.0],
+            "pos": [25344.0, -6080.0],
             "size": [1536, 2304],
             "color": [255, 0, 0, 255]
         },
         {
             "id": "dev_floor_256 (45)",
             "type": "dev_floor_256",
-            "pos": [25344.0, -7424.0],
+            "pos": [25344.0, -7744.0],
             "size": [1536, 1024],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "vent (30)",
             "type": "@materials/vent.png",
-            "pos": [25344.0, -9088.00390625],
+            "pos": [25344.0, -9408.0029296875],
             "rotation": 90.0,
             "size": [256, 2304]
         },
@@ -2961,14 +2960,14 @@
         {
             "id": "vent (35)",
             "type": "@materials/vent.png",
-            "pos": [26304.0, -3968.0],
-            "size": [384, 9984]
+            "pos": [26304.0, -4128.0],
+            "size": [384, 10304]
         },
         {
             "id": "vent (36)",
             "type": "@materials/vent.png",
-            "pos": [24384.0, -3968.0],
-            "size": [384, 9984]
+            "pos": [24384.0, -4128.0],
+            "size": [384, 10304]
         },
         {
             "id": "dev_floor_256 (46)",
@@ -6478,6 +6477,13 @@
             "pos": [-15168.0, 28160.0],
             "size": [2048, 2048],
             "color": [116, 112, 112, 255]
+        },
+        {
+            "id": "dev_floor_256 (138)",
+            "type": "dev_floor_256",
+            "pos": [25344.0, -4544.0],
+            "size": [1536, 256],
+            "color": [0, 255, 0, 255]
         },
         {
             "id": "Strong lamp (1)",
@@ -10429,24 +10435,14 @@
             "pos": [21377.0, 9215.0]
         },
         {
-            "id": "kill6 (3)",
-            "type": "team_spawn",
-            "pos": [19327.0, 9985.0]
-        },
-        {
-            "id": "kill6 (2)",
+            "id": "kill6 (1)",
             "type": "team_spawn",
             "pos": [19137.0, 9985.0]
         },
         {
-            "id": "kill6 (1)",
-            "type": "team_spawn",
-            "pos": [19455.0, 8959.0]
-        },
-        {
             "id": "kill6",
             "type": "team_spawn",
-            "pos": [19263.0, 8961.0]
+            "pos": [19329.0, 8961.0]
         },
         {
             "id": "kill7",
@@ -10801,6 +10797,7 @@
         {
             "id": "team_spawn (10)",
             "type": "team_spawn",
+            "active": false,
             "faction": "METROPOLIS",
             "pos": [-24513.0, 114497.0]
         },
@@ -10824,6 +10821,47 @@
             "active": false,
             "faction": "METROPOLIS",
             "pos": [-50177.0, 192641.0]
+        },
+        {
+            "id": "team_spawn (14)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [14337.0, 22847.0]
+        },
+        {
+            "id": "team_spawn (15)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [38209.0, 13951.0]
+        },
+        {
+            "id": "team_spawn (17)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [47041.0, 14271.0]
+        },
+        {
+            "id": "team_spawn (18)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [15743.0, 28737.0]
+        },
+        {
+            "id": "team_spawn (19)",
+            "type": "team_spawn",
+            "active": false,
+            "faction": "METROPOLIS",
+            "pos": [51839.0, 28607.0]
+        },
+        {
+            "id": "team_spawn (20)",
+            "type": "team_spawn",
+            "faction": "METROPOLIS",
+            "pos": [25153.0, -193.0]
         },
         {
             "id": "exit0",
@@ -11934,7 +11972,7 @@
         {
             "id": "hazard (5)",
             "type": "hazard",
-            "pos": [25344.0, -5568.0],
+            "pos": [25344.0, -6080.0],
             "size": [1536, 2304],
             "exit_cooldown_ms": 500.0,
             "hazard": {
@@ -11958,7 +11996,7 @@
             "id": "tip3_1 (14)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [25344.0, -7424.0],
+            "pos": [25344.0, -7744.0],
             "size": [1536, 1024],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
@@ -12043,7 +12081,7 @@
         {
             "id": "exit7",
             "type": "portal",
-            "pos": [25344.0, -8448.0068359375],
+            "pos": [25344.0, -8768.0068359375],
             "rotation": -90.0,
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
@@ -12125,7 +12163,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Now just press {HOLSTER} and walk through the corridor."
+            "context_tip": "Now just press {HOLSTER} and walk through the corridor.\nYou must face to the side."
         },
         {
             "id": "tip3_1 (12)",
@@ -12146,7 +12184,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "It's time for the Deagle trick..\n..but with two Awkas instead."
+            "context_tip": "It's time for the Deagle trick..\n..but with two Awkas instead.\nHold {HOTBAR_0} and {HOTBAR_1} to dual-wield."
         },
         {
             "id": "tip3_1 (13)",
@@ -12298,7 +12336,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Damage is proportional to current speed.\nHit the enemy with a strong attack while sprinting. ({SPRINT})"
+            "context_tip": "The faster you are, the harder you hit.\nAttack with {SHOOT_SECONDARY} while sprinting full speed."
         },
         {
             "id": "tip3_1 (24)",
@@ -12948,7 +12986,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Just like knives, you can toss grenades in any situation -\neven when shooting or reloading!"
+            "context_tip": "Just like knives, you can toss grenades in any situation -\neven while shooting or reloading!"
         },
         {
             "id": "tip3_1 (39)",
@@ -12969,7 +13007,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {THROW_FORCE_GRENADE} to quickly toss a Force Grenade.\n{THROW_PED_GRENADE} for PED grenades. {THROW_FLASHBANG} for Flashbangs."
+            "context_tip": "{THROW_FORCE_GRENADE} quickly tosses a Force Grenade.\n{THROW_PED_GRENADE} tosses PED grenades.\n{THROW_FLASHBANG} tosses Flashbangs."
         },
         {
             "id": "exit13",
@@ -13013,7 +13051,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Tip: Quickly toss a PED with {THROW_PED_GRENADE}.\nQuickly toss a Force grenade with {THROW_FORCE_GRENADE}."
+            "context_tip": "Tip: Grenades can bounce against walls to reach around corners."
         },
         {
             "id": "exit14",
@@ -13057,7 +13095,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "When playing Resistance, you must detonate the bomb to win.\nIf you can't plant it within the time limit, you lose the round."
+            "context_tip": "When playing Resistance, you must detonate the bomb to win.\nIf you don't plant it within the time limit, you lose the round."
         },
         {
             "id": "entry14",
@@ -14013,7 +14051,7 @@
             "character_exit_impulse": {
                 "amount": 0.0
             },
-            "context_tip": "Awesome!\nLet's try something harder."
+            "context_tip": "Good job!\nLet's get serious now."
         },
         {
             "id": "portal (5)",
@@ -15302,6 +15340,27 @@
                 "amount": 20000.0,
                 "mode": "SET_VELOCITY"
             }
+        },
+        {
+            "id": "tip3_1 (67)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [25344.0, -4544.0],
+            "size": [1536, 256],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Aim in the opposite direction (down).\nHold {SPRINT} and {MOVE_FORWARD} while shooting both Awkas."
         }
     ]
 }

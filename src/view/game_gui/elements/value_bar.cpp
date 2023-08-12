@@ -201,17 +201,6 @@ void value_bar::draw(
 				);
 			}
 		}
-
-		if (/* should_draw_one_tenth_mark */ meter_id(vertical_index).is<consciousness_meter_instance>()) {
-			auto r = ltrb();
-
-			r.l = value_bar_rect.l + value_bar_rect.w() / 10;
-			r.t = full_bar_rect_bordered.t;
-			r.b = full_bar_rect_bordered.b;
-			r.r = r.l + 1;
-
-			output.aabb(r);
-		}
 	}
 }
 
