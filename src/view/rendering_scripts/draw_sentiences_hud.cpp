@@ -32,6 +32,7 @@
 #include "view/audiovisual_state/systems/damage_indication_system.h"
 
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/explosive/like_explosive.h"
 
 using namespace augs::gui::text;
 
@@ -383,33 +384,54 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 						if (hand.alive() && hand.has_items()) {
 							const auto weapon = cosm[hand.get_items_inside()[0]];
 
-							if (weapon.find<components::melee>() && in.settings.draw_remaining_ammo && !drawn_melee_count_once) {
-								drawn_melee_count_once = true;
-								int count_melees = 0;
+							if (in.settings.draw_remaining_ammo) {
+								auto draw_count = [&](const int count) {
+									circle_info new_info;
 
-								watched_character.for_each_contained_item_recursive(
-									[&](const auto& typed_item) {
-										if (typed_item.template find<components::melee>()) {
-											++count_melees;
+									auto remaining_ammo_color = white;
+									remaining_ammo_color.a = 200;
+									remaining_ammo_color.mult_alpha(teleport_alpha);
+
+									const auto remaining_ammo_text = std::to_string(count);
+									new_info.text = formatted_string { remaining_ammo_text, { in.gui_font, remaining_ammo_color } };
+									new_info.angle = lower_outside;
+									new_info.circle_radius_mult_for_text = 0.85f;
+
+									push_textual_info(new_info);
+								};
+
+								if (weapon.has<components::melee>() && !drawn_melee_count_once) {
+									drawn_melee_count_once = true;
+									int count_melees = 0;
+
+									watched_character.for_each_contained_item_recursive(
+										[&](const auto& typed_item) {
+											if (typed_item.template find<components::melee>()) {
+												++count_melees;
+											}
 										}
-									},
-									std::nullopt
-								);
+									);
 
-								circle_info new_info;
+									draw_count(count_melees);
 
-								auto remaining_ammo_color = white;
-								remaining_ammo_color.a = 200;
-								remaining_ammo_color.mult_alpha(teleport_alpha);
+									return;
+								}
 
-								const auto remaining_ammo_text = std::to_string(count_melees);
-								new_info.text = formatted_string { remaining_ammo_text, { in.gui_font, remaining_ammo_color } };
-								new_info.angle = lower_outside;
-								new_info.circle_radius_mult_for_text = 0.85f;
+								if (weapon.has<components::hand_fuse>() && !::is_like_plantable_bomb(weapon)) {
+									int count_this_kind = 0;
 
-								push_textual_info(new_info);
+									watched_character.for_each_contained_item_recursive(
+										[&](const auto& typed_item) {
+											if (typed_item.get_flavour_id() == weapon.get_flavour_id()) {
+												++count_this_kind;
+											}
+										}
+									);
 
-								return;
+									draw_count(count_this_kind);
+
+									return;
+								}
 							}
 
 							const auto ammo_info = calc_ammo_info(weapon);

@@ -36,7 +36,7 @@ public:
 	void clear_assigned();
 
 	bool is_assigned(const_entity_handle) const;
-	const_entity_handle get_assigned_entity(const const_entity_handle owner_transfer_capability) const;
+	const_entity_handle get_assigned_entity(const const_entity_handle owner_transfer_capability, int* out_stackable_count = nullptr) const;
 
 	bool is_selected_as_primary(const const_entity_handle owner_transfer_capability) const;
 	bool is_selected_as_secondary(const const_entity_handle owner_transfer_capability) const;

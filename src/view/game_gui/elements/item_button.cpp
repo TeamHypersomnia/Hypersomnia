@@ -376,6 +376,23 @@ void item_button::draw_proc(
 				);
 			}
 		}
+
+		if (f.overridden_charge_count.has_value()) {
+			auto label_color = white;
+
+			const auto label_text = formatted_string {
+				std::to_string(*f.overridden_charge_count), { context.get_gui_font(), label_color }
+			};
+
+			const auto label_bbox = get_text_bbox(label_text);
+			const auto pos = f.overridden_charges_pos ? (*f.overridden_charges_pos + vec2(-label_bbox.x - 4, 4)) : this_tree_entry.get_absolute_rect().right_bottom() - label_bbox;
+
+			print_stroked(
+				output,
+				pos,
+				label_text
+			);
+		}
 	}
 
 	if (f.draw_border) {

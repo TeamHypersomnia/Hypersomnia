@@ -31,7 +31,7 @@ bool hotbar_button::is_assigned(const const_entity_handle item) const {
 	;
 }
 
-const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability) const {
+const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle owner_transfer_capability, int* const out_stackable_count) const {
 	return std::visit(
 		[&]<typename A>(const A& assigned) {
 			const auto& cosm = owner_transfer_capability.get_cosmos();
@@ -58,6 +58,11 @@ const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle
 					[&](const auto& item) {
 						if (item.get_flavour_id() == assigned) {
 							found = item.get_id();
+
+							if (out_stackable_count) {
+								++(*out_stackable_count);
+								return recursive_callback_result::CONTINUE_AND_RECURSE;
+							}
 
 							return recursive_callback_result::ABORT;
 						}
@@ -146,7 +151,9 @@ void hotbar_button::draw(
 	
 	const auto internal_rc = corners.cornered_rc_to_internal_rc(necessarys, absolute_rc);
 	
-	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability);
+	int stackable_count = 0;
+
+	const auto assigned_entity = this_id->get_assigned_entity(owner_transfer_capability, &stackable_count);
 	const bool has_assigned_entity = assigned_entity.alive();
 
 	const bool is_in_primary = this_id->is_selected_as_primary(owner_transfer_capability);
@@ -379,6 +386,11 @@ void hotbar_button::draw(
 		f.decrease_border_alpha = false;
 		f.draw_container_opened_mark = false;
 		f.draw_charges = false;
+
+		if (stackable_count > 1) {
+			f.overridden_charge_count = stackable_count;
+		}
+
 		f.always_draw_charges_as_closed = true;
 		f.draw_attachments_even_if_open = true;
 		f.expand_size_to_grid = false;
