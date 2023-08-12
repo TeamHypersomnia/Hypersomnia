@@ -143,7 +143,7 @@ namespace augs {
 	std::string get_user_name() {
 		char username[UNLEN + 1]; // UNLEN is defined in Lmcons.h
 		DWORD username_len = UNLEN + 1;
-		GetUserName(username, &username_len);
+		GetUserNameA(username, &username_len);
 		return std::string(username);
 	}
 }
