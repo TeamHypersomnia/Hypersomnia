@@ -302,7 +302,7 @@ static void handle_special_result(const logic_step step, const messages::health_
 			break;
 
 		case result_type::LOSS_OF_CONSCIOUSNESS:
-			consciousness.value = 0.f;
+		//consciousness.value = 0.f;
 			//knockout();
 
 			break;
@@ -370,11 +370,14 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 				movement.const_inertia_ms += amount * sentience_def.const_inertia_damage_ratio;
 				//movement.linear_inertia_ms += amount * sentience_def.linear_inertia_damage_ratio;
 
-				const auto consciousness_ratio = consciousness.get_ratio();
-				const auto health_ratio = health.get_ratio();
-
 				const auto prev_consciousness = consciousness.value;
-				consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * consciousness.maximum);
+
+				if (consciousness.value > 0) {
+					const auto consciousness_ratio = consciousness.get_ratio();
+					const auto health_ratio = health.get_ratio();
+
+					consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * consciousness.maximum);
+				}
 
 				if (!health.is_positive()) {
 					if (allow_special_result()) {
@@ -601,14 +604,14 @@ void sentience_system::process_damage_message(const messages::damage_message& d,
 
 			auto after_shield_damage = amount;
 
-			if (is_shield_enabled()) {
+			if (amount > 0 && is_shield_enabled()) {
 				const auto mult = std::max(0.01f, absorption->first.cp);
 				after_shield_damage = apply_ped(amount / mult).excessive * mult;
 			}
 
-			if (after_shield_damage > 0) {
+			if (after_shield_damage != 0) {
 				event.target = messages::health_event::target_type::CONSCIOUSNESS;
-				event.damage = consciousness.calc_damage_result(after_shield_damage);
+				event.damage = consciousness.calc_damage_result(after_shield_damage, -consciousness.maximum);
 
 				if (event.damage.effective != 0) {
 					process_and_post_health(event);

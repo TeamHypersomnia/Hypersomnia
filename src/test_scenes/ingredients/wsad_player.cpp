@@ -303,7 +303,7 @@ namespace test_flavours {
 				auto& in = explosive.explosion;
 				auto& dmg = in.damage;
 
-				dmg.base = 30.f;
+				dmg.base = -100.f;
 				in.inner_ring_color = orange;
 				in.outer_ring_color = yellow;
 				in.effective_radius = 350.f;
