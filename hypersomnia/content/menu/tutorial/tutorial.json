@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-12 18:30:46.496586 UTC"
+        "version_timestamp": "2023-08-12 18:57:44.313378 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -14133,7 +14133,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Good job!\nThis is a very important technique."
+            "context_tip": "Good job!\n"
         },
         {
             "id": "tip3_1 (66)",
@@ -14154,7 +14154,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "This way, enemies can die without ever seeing you!\nA VERY important technique."
+            "context_tip": "This way, enemies can die without ever seeing you!"
         },
         {
             "id": "tip2_1 (2)",
