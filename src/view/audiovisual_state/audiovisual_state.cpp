@@ -62,7 +62,12 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	
 	const auto frame_dt = input.frame_delta;
 
-	const auto state_dt = input.new_state_delta;
+	auto state_dt = input.new_state_delta;
+
+	if (!state_dt.has_value()) {
+		state_dt = augs::delta::zero;
+	}
+
 	auto scaled_state_dt = state_dt;
 
 	auto dt = frame_dt;
