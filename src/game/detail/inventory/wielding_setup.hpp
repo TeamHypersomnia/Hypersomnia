@@ -17,6 +17,12 @@ bool basic_wielding_setup<I>::equivalent_to(const C& cosm, const basic_wielding_
 
 template <class I>
 template <class C>
+bool basic_wielding_setup<I>::equivalent_to_or_switched(const C& cosm, const basic_wielding_setup<I>& b) const {
+	return equivalent_to(cosm, b) || equivalent_to(cosm, b.get_switched_hands());
+}
+
+template <class I>
+template <class C>
 bool basic_wielding_setup<I>::is_bare_hands(const C& cosm) const {
 	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
 		if (cosm[hand_selections[i]]) {

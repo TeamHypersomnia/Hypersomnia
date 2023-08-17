@@ -293,10 +293,11 @@ void game_gui_system::control_hotbar_and_action_button(
 
 						const auto current_setup = wielding_setup::from_current(gui_entity);
 						bool skip_wield = false;
+						bool skip_save = false;
 
 						const auto& cosm = gui_entity.get_cosmos();
 
-						if (new_setup.equivalent_to(cosm, current_setup)) {
+						if (new_setup.equivalent_to_or_switched(cosm, current_setup)) {
 							auto is_nade_or_none = [&](auto h) {
 								if (cosm[h].dead()) {
 									return true;
@@ -310,12 +311,17 @@ void game_gui_system::control_hotbar_and_action_button(
 								skip_wield = true;
 							}
 							else {
+								new_setup = current_setup;
 								new_setup.switch_hands();
+								skip_save = true;
 							}
 						}
 
 						if (!skip_wield) {
-							gui.save_as_last_setup(current_setup);
+							if (!skip_save) {
+								gui.save_as_last_setup(current_setup);
+							}
+
 							queue_wielding(gui_entity, new_setup);
 						}
 					}
@@ -380,7 +386,7 @@ void game_gui_system::control_hotbar_and_action_button(
 
 			const auto& cosm = gui_entity.get_cosmos();
 
-			if (current_setup.equivalent_to(cosm, wielding)) {
+			if (current_setup.equivalent_to_or_switched(cosm, wielding)) {
 				queue_wielding(gui_entity, wielding_setup::bare_hands());
 			}
 			else {
