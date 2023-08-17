@@ -15,14 +15,14 @@
 
 template <template <class...> class List>
 using spell_list_t = List<
-	haste,
 	fury_of_the_aeons,
 	ultimate_wrath_of_the_aeons,
+	electric_triad,
+	haste,
+	exaltation,
 #if ELECTRIC_SHIELD_AS_SPELL
 	electric_shield,
 #endif
-	electric_triad,
-	exaltation,
 	echoes_of_the_higher_realms
 >;
 
@@ -40,5 +40,5 @@ constexpr bool is_spell_v = is_one_of_list_v<remove_cref<T>, spell_list_t<type_l
 	
 using learnt_spells_array_type = std::array<
 	bool,
-	aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4>
+	num_types_in_list_v<spell_instance_tuple>
 >;

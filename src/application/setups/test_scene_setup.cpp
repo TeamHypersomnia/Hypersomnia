@@ -301,9 +301,9 @@ void test_scene_setup::restart_mode() {
 				if (is_normal_spells_level) {
 					auto& s = cosm[viewed_character_id].get<components::sentience>();
 
-					s.learnt_spells[0] = true;
-					s.learnt_spells[4] = true;
-					s.learnt_spells[5] = true;
+					s.learnt_spells[spell_id::of<haste>().get_index()] = true;
+					s.learnt_spells[spell_id::of<exaltation>().get_index()] = true;
+					s.learnt_spells[spell_id::of<echoes_of_the_higher_realms>().get_index()] = true;
 				}
 
 				if (is_offensive_spells_level) {
@@ -311,9 +311,15 @@ void test_scene_setup::restart_mode() {
 
 					s.spells_drain_pe = false;
 
-					s.learnt_spells[1] = true;
-					s.learnt_spells[2] = true;
-					s.learnt_spells[3] = true;
+					s.learnt_spells[spell_id::of<fury_of_the_aeons>().get_index()] = true;
+					s.learnt_spells[spell_id::of<ultimate_wrath_of_the_aeons>().get_index()] = true;
+					s.learnt_spells[spell_id::of<electric_triad>().get_index()] = true;
+				}
+
+				if (const bool is_range = !is_tutorial()) {
+					auto& s = cosm[viewed_character_id].get<components::sentience>();
+
+					s.spells_drain_pe = false;
 				}
 			}
 			else {

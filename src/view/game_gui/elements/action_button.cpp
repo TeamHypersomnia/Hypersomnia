@@ -36,7 +36,7 @@ void action_button::draw(
 		bound_key != augs::event::keys::key::INVALID
 	) {
 		const auto& sentience = context.get_subject_entity().get<components::sentience>();
-		const auto bound_spell = get_bound_spell(context, this_id);
+		const auto bound_spell = get_bound_spell(context.get_subject_entity(), this_id);
 
 		if (!bound_spell.is_set()) {
 			return;
@@ -211,14 +211,11 @@ void action_button::draw(
 }
 
 spell_id action_button::get_bound_spell(
-	const const_game_gui_context context,
+	const const_entity_handle subject,
 	const const_this_in_item this_id
 ) {
-	const auto bound_spell = this_id->bound_spell;
-	const auto& sentience = context.get_subject_entity().get<components::sentience>();
-
-	if (bound_spell.is_set() && sentience.is_learnt(bound_spell)) {
-		return bound_spell;
+	if (const auto sentience = subject.find<components::sentience>()) {
+		return sentience->get_nth_learnt(this_id.get_location().index);
 	}
 
 	return spell_id();
@@ -251,7 +248,7 @@ void action_button::respond_to_events(
 		this_id->detector.update_appearance(info);
 
 		if (info.msg == gui_event::lclick) {
-			const auto bound_spell = get_bound_spell(context, this_id);
+			const auto bound_spell = get_bound_spell(context.get_subject_entity(), this_id);
 			
 			if (bound_spell.is_set()) {
 				context.get_game_gui_system().pending.cast_spell = bound_spell;

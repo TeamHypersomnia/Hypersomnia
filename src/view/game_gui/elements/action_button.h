@@ -16,10 +16,8 @@ public:
 
 	augs::gui::appearance_detector detector;
 
-	spell_id bound_spell;
-	
 	static spell_id get_bound_spell(
-		const const_game_gui_context, 
+		const const_entity_handle subject, 
 		const const_this_in_item this_id
 	);
 

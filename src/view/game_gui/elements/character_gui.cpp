@@ -556,7 +556,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 					);
 				}
 				else if constexpr(std::is_same_v<T, action_button_in_character_gui>) {
-					const auto bound_spell = action_button::get_bound_spell(context, dereferenced);
+					const auto bound_spell = action_button::get_bound_spell(context.get_subject_entity(), dereferenced);
 
 					if (bound_spell.is_set()) {
 						tooltip_text = bound_spell.dispatch(

@@ -8,6 +8,7 @@
 #include "augs/templates/hash_templates.h"
 #include "augs/templates/remove_cref.h"
 #include "augs/ensure.h"
+#include "augs/ensure_rel.h"
 
 namespace augs {
 	struct introspection_access;
@@ -90,7 +91,7 @@ public:
 
 	void set_index(const index_type idx) {
 		index = idx;
-		ensure(is_set());
+		ensure_less(index, max_index_v);
 	}
 
 	index_type get_index() const {

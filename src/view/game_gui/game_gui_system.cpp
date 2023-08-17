@@ -95,22 +95,7 @@ game_gui_system::pending_entropy_type game_gui_system::get_and_clear_pending_eve
 }
 
 character_gui& game_gui_system::get_character_gui(const entity_id id) {
-	const auto it = character_guis.find(id);
-
-	if (it == character_guis.end()) {
-		auto& new_gui = (*character_guis.try_emplace(id).first).second;
-		
-		new_gui.action_buttons[0].bound_spell.set<haste>();
-		new_gui.action_buttons[1].bound_spell.set<fury_of_the_aeons>();
-		new_gui.action_buttons[2].bound_spell.set<ultimate_wrath_of_the_aeons>();
-		new_gui.action_buttons[3].bound_spell.set<electric_triad>();
-		new_gui.action_buttons[4].bound_spell.set<echoes_of_the_higher_realms>();
-		new_gui.action_buttons[5].bound_spell.set<exaltation>();
-		
-		return new_gui;
-	}
-	
-	return (*it).second;
+	return character_guis[id];
 }
 
 const character_gui& game_gui_system::get_character_gui(const entity_id id) const {
@@ -378,9 +363,12 @@ void game_gui_system::control_hotbar_and_action_button(
 			action_b.detector.update_appearance(i.was_pressed() ? gui_event::ldown : gui_event::lup);
 
 			if (i.was_pressed()) {
-				const auto bound_spell = action_b.bound_spell;
+				auto index = int(special_action_index);
+				auto id = action_button_in_character_gui{index};
+				auto loc = make_dereferenced_location(&gui.action_buttons[index], id);
+				auto bound_spell = action_button::get_bound_spell(gui_entity, loc);
 
-				if (bound_spell.is_set() && gui_entity.get<components::sentience>().is_learnt(bound_spell)) {
+				if (bound_spell.is_set()) {
 					pending.cast_spell = bound_spell;
 				}
 			}
@@ -609,7 +597,7 @@ void game_gui_system::rebuild_layouts(
 			for (size_t i = 0; i < element.action_buttons.size(); ++i) {
 				auto id = action_button_in_character_gui{int(i)};
 				auto loc = make_dereferenced_location(&element.action_buttons[i], id);
-				auto bound = action_button::get_bound_spell(context, loc);
+				auto bound = action_button::get_bound_spell(context.get_subject_entity(), loc);
 
 				if (bound.is_set()) {
 					++used_action_buttons;
@@ -637,7 +625,7 @@ void game_gui_system::rebuild_layouts(
 			for (size_t i = 0; i < element.action_buttons.size(); ++i) {
 				auto id = action_button_in_character_gui{int(i)};
 				auto loc = make_dereferenced_location(&element.action_buttons[i], id);
-				auto bound = action_button::get_bound_spell(context, loc);
+				auto bound = action_button::get_bound_spell(context.get_subject_entity(), loc);
 
 				if (bound.is_set()) {
 					set_rc(element.action_buttons[i]);

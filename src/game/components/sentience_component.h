@@ -64,6 +64,7 @@ namespace components {
 		meter_instance_tuple meters;
 
 		learnt_spells_array_type learnt_spells = {};
+		pad_bytes<aligned_num_of_bytes_v<sizeof(learnt_spells_array_type), 4> - sizeof(learnt_spells_array_type)> pad2;
 
 		spell_instance_tuple spells;
 		perk_instance_tuple perks;
@@ -111,6 +112,23 @@ namespace components {
 			const bool in_progress = last_interaction_result == interaction_result_type::IN_PROGRESS;
 
 			return just_begun || in_progress;
+		}
+
+		spell_id get_nth_learnt(uint32_t n) const {
+			for (uint32_t i = 0; i < learnt_spells.size(); ++i) {
+				if (learnt_spells[i]) {
+					if (n == 0) {
+						spell_id id;
+						id.set_index(i);
+
+						return id;
+					}
+
+					--n;
+				}
+			}
+
+			return spell_id();
 		}
 
 		bool is_learnt(const spell_id id) const {
