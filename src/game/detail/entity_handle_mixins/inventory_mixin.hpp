@@ -166,6 +166,10 @@ hand_action inventory_mixin<E>::calc_viable_hand_action(const std::size_t reques
 	const auto& self = *static_cast<const E*>(this);
 
 	auto actionable_or_default = [&](const auto& candidate) {
+		if (candidate.dead()) {
+			return self.get_cosmos()[entity_id()];
+		}
+
 		if (::is_weapon_like(candidate) || ::is_armor_like(candidate)) {
 			return candidate;
 		}
