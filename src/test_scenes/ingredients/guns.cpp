@@ -3593,7 +3593,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 1000;
 			set_chambering_duration_ms(meta, 200.f);
-			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 		}
@@ -3871,6 +3871,7 @@ namespace test_flavours {
 			only_allow_mag(meta, test_container_items::CALICO_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("2");
 		}
 
 		{
@@ -3914,6 +3915,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("2.5");
 		}
 
 		{
@@ -3961,6 +3963,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("2.8");
 		}
 
 		{
@@ -4010,7 +4013,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
-			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("5");
 		}
 
 		{
