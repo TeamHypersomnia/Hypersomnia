@@ -38,21 +38,21 @@ namespace augs {
 
 	void window::set_cursor_pos(vec2i) {}
 
-	std::optional<std::string> window::open_file_dialog(
+	std::optional<path_type> window::open_file_dialog(
 		const std::vector<file_dialog_filter>&,
 		const std::string& 
 	) {
 		return std::nullopt;
 	}
 
-	std::optional<std::string> window::save_file_dialog(
+	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>&,
 		const std::string& 
 	) {
 		return std::nullopt;
 	}
 
-	std::optional<std::string> window::choose_directory_dialog(
+	std::optional<path_type> window::choose_directory_dialog(
 		const std::string& 
 	) {
 		return std::nullopt;

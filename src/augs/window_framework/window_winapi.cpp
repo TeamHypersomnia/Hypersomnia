@@ -39,8 +39,8 @@ auto get_hinstance() {
 
 augs::window* window_ptr = nullptr;
 
-static std::string PickContainer(const std::wstring& custom_title) {
-	std::string result;
+static augs::path_type PickContainer(const std::wstring& custom_title) {
+	augs::path_type result;
     IFileDialog *pfd;
     
     if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd))))
@@ -64,8 +64,7 @@ static std::string PickContainer(const std::wstring& custom_title) {
                     MessageBox(NULL, L"GetIDListName() failed", NULL, NULL);
                 }
 
-			result = augs::path_type(g_path).string();
-			str_ops(result).replace_all("\\", "/");
+				result = augs::path_type(g_path);
 
                 psi->Release();
             }
@@ -683,7 +682,7 @@ namespace augs {
 		return filter;
 	}
 
-	std::optional<std::string> window::open_file_dialog(
+	std::optional<path_type> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		const std::string& custom_title
 	) {
@@ -715,15 +714,14 @@ namespace augs {
 		});
 
 		if (GetOpenFileName(&ofn) == TRUE) {
-			auto result = augs::path_type(ofn.lpstrFile);
-			return str_ops(result.string()).replace_all("\\", "/");
+			return augs::path_type(ofn.lpstrFile);
 		}
 		else {
 			return std::nullopt;
 		}
 	}
 
-	std::optional<std::string> window::choose_directory_dialog(
+	std::optional<path_type> window::choose_directory_dialog(
 		const std::string& custom_title
 	) {
 		const auto title = widen(custom_title);
@@ -736,7 +734,7 @@ namespace augs {
 		return std::nullopt;
 	}
 
-	std::optional<std::string> window::save_file_dialog(
+	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& filters,
 		const std::string& custom_title
 	) {

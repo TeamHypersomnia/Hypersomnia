@@ -273,7 +273,7 @@ editor_setup::editor_setup(
 	}
 	else {
 		/* At least one of either project.json or last_saved.json must exist. */
-		throw augs::json_deserialization_error("Error: %x not found.", paths.project_json.string());
+		throw augs::json_deserialization_error("Error: %x not found.", paths.project_json);
 	}
 
 	load_gui_state();
@@ -860,7 +860,7 @@ void editor_setup::rescan_physical_filesystem() {
 		}
 
 		for (const auto& r : last_invalid_paths) {
-			details += r.forbidden_path.string();
+			details += augs::string_windows_friendly(r.forbidden_path);
 
 			if (r.can_be_renamed()) {
 				details += std::string(" ->\n") + r.get_suggested_path().string();

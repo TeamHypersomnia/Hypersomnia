@@ -19,6 +19,7 @@
 #include "augs/misc/constant_size_string.h"
 #include "augs/misc/imgui/imgui_controls.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/filesystem/path.h"
 
 namespace augs {
 	namespace imgui {
@@ -70,6 +71,20 @@ namespace augs {
 		bool input_text(const std::string& label, std::string& value, Args&&... args) {
 			std::array<char, buffer_size> buf;
 			return input_text(buf, label, value, std::forward<Args>(args)...);
+		}
+
+		template <std::size_t buffer_size = 1000, class... Args>
+		bool input_text(const std::string& label, path_type& value, Args&&... args) {
+			std::array<char, buffer_size> buf;
+
+			std::string s = string_windows_friendly(value);
+
+			if (input_text(buf, label, s, std::forward<Args>(args)...)) {
+				value = path_windows_friendly(s);
+				return true;
+			}
+
+			return false;
 		}
 
 		template <unsigned buffer_size, class... Args>

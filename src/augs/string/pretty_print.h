@@ -8,6 +8,7 @@
 #include "augs/templates/traits/has_begin_and_end.h"
 #include "augs/misc/constant_size_string.h"
 #include "augs/templates/identity_templates.h"
+#include "augs/filesystem/path.h"
 
 template <class T, class = void>
 struct has_string : std::false_type {};
@@ -58,7 +59,12 @@ S& pretty_print(S& os, const T& val) {
 		);
 	}	
 	else if constexpr(has_string_v<T>) {
-		os << val.string();
+		if constexpr(std::is_same_v<T, augs::path_type>) {
+			os << augs::string_windows_friendly(val);
+		}
+		else {
+			static_assert(always_false_v<T>, "what?");
+		}
 	}	
 	else if constexpr(has_first_and_second_types_v<T>) {
 		os << "[";

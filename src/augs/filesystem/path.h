@@ -6,9 +6,39 @@
 std::string to_forward_slashes(std::string);
 std::string format_field_name(std::string s);
 
+#if PLATFORM_WINDOWS
+std::string wstr_to_utf8(const wchar_t *wstr);
+#endif
+
 namespace augs {
 #if READWRITE_OVERLOAD_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
+#endif
+
+#if PLATFORM_WINDOWS
+	inline augs::path_type path_windows_friendly(const std::string& s_utf8) {
+		return std::filesystem::u8path(s_utf8);
+	}
+
+	inline std::string string_windows_friendly(const augs::path_type& p_wide) {
+		return wstr_to_utf8(p_wide.c_str());
+	}
+
+	inline augs::path_type make_windows_friendly(const augs::path_type& p_wide) {
+		return std::filesystem::u8path(string_windows_friendly(p_wide));
+	}
+#else
+	inline augs::path_type path_windows_friendly(const std::string& s_utf8) {
+		return s_utf8;
+	}
+
+	inline std::string string_windows_friendly(const augs::path_type& p_wide) {
+		return p_wide.string();
+	}
+
+	inline augs::path_type make_windows_friendly(const augs::path_type& p_wide) {
+		return p_wide;
+	}
 #endif
 
 	template <class Archive>

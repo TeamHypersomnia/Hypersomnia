@@ -409,7 +409,7 @@ namespace augs {
 	}
 
 #if PLATFORM_LINUX
-	static std::optional<std::string> read_chosen_path(const augs::path_type& script_path) {
+	static std::optional<path_type> read_chosen_path(const augs::path_type& script_path) {
 		const auto& temp_result = GENERATED_FILES_DIR "/last_file_path.txt";
 
 		try {
@@ -423,7 +423,7 @@ namespace augs {
 		}
 	}
 
-	static std::optional<std::string> choose_path(const augs::path_type& script_path) {
+	static std::optional<path_type> choose_path(const augs::path_type& script_path) {
 		if (!augs::exists(script_path)) {
 			LOG("WARNING! Could not find the script file: %x.", script_path);
 			return std::nullopt;
@@ -434,7 +434,7 @@ namespace augs {
 	}
 #endif
 
-	std::optional<std::string> window::open_file_dialog(
+	std::optional<path_type> window::open_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
 	) {
@@ -445,7 +445,7 @@ namespace augs {
 #endif
 	}
 
-	std::optional<std::string> window::save_file_dialog(
+	std::optional<path_type> window::save_file_dialog(
 		const std::vector<file_dialog_filter>& /* filters */,
 		const std::string& /* custom_title */
 	) {
@@ -456,7 +456,7 @@ namespace augs {
 #endif
 	}
 
-	std::optional<std::string> window::choose_directory_dialog(
+	std::optional<path_type> window::choose_directory_dialog(
 		const std::string& /* custom_title */
 	) {
 #if PLATFORM_LINUX

@@ -24,7 +24,7 @@ namespace augs {
 		using namespace std::filesystem;
 
 		for (recursive_directory_iterator i(dir_path), end; i != end; ++i) {
-			const auto p = i->path();
+			const auto p = make_windows_friendly(i->path());
 
 			if (is_directory(p)) {
 				directory_callback(p);
@@ -44,7 +44,7 @@ namespace augs {
 		using namespace std::filesystem;
 
 		for (directory_iterator i(dir_path), end; i != end; ++i) {
-			const auto p = i->path();
+			const auto p = make_windows_friendly(i->path());
 
 			if (is_directory(p)) {
 				if (directory_callback(p) == callback_result::ABORT) {

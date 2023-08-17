@@ -445,11 +445,13 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 					/* Iterate in reverse so we first rename the descendants. */
 					for (const auto& r : reverse(last_invalid_paths)) {
 						if (r.can_be_renamed()) {
-							const auto& wrong = resolve_project_path(r.forbidden_path);
+							const auto wrong = augs::make_windows_friendly(resolve_project_path(r.forbidden_path));
 							const auto good = resolve_project_path(r.get_suggested_path());
+							
+							LOG("Renaming %x to %x.", wrong, good);
 
 							try {
-								LOG("Renaming %x to %x. %x %x", wrong, good, augs::exists(wrong), augs::exists(good));
+								LOG("Old exists: %x. New exists: %x.", augs::exists(wrong), augs::exists(good));
 
 								if (augs::exists(wrong) && !augs::exists(good)) {
 									std::filesystem::rename(wrong, good);

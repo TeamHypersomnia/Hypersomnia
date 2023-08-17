@@ -227,7 +227,7 @@ bool start_client_gui_state::perform(
 		input_text(label, into_vars.nickname);
 
 		struct loading_result {
-			std::optional<std::string> new_path;
+			std::optional<augs::path_type> new_path;
 			augs::image loaded_image;
 			std::string error_message;
 
@@ -263,10 +263,10 @@ bool start_client_gui_state::perform(
 
 		thread_local std::future<loading_result> avatar_loading_result;
 
-		auto reload_avatar = [&](const std::string& from_path) {
+		auto reload_avatar = [&](const augs::path_type& from_path) {
 			const bool avatar_upload_completed = augs::has_completed(current_frame, avatar_submitted_when);
 
-			if (avatar_upload_completed && !avatar_loading_result.valid() && from_path.size() > 0) {
+			if (avatar_upload_completed && !avatar_loading_result.valid() && !from_path.empty()) {
 				avatar_loading_result = launch_async(
 					[from_path]() {
 						loading_result out;
@@ -288,7 +288,7 @@ bool start_client_gui_state::perform(
 			}
 		};
 
-		std::string p = into_vars.avatar_image_path.string();
+		augs::path_type p = into_vars.avatar_image_path;
 
 		if (input_text<512>("Avatar image", p, ImGuiInputTextFlags_EnterReturnsTrue)) {
 			reload_avatar(p);
@@ -330,7 +330,7 @@ bool start_client_gui_state::perform(
 			mouse_has_to_move_off_browse = false;
 		}
 
-		if (p.size() > 0) {
+		if (!p.empty()) {
 			ImGui::SameLine();
 
 			if (ImGui::Button("Clear") && !error_popup) {
@@ -344,7 +344,7 @@ bool start_client_gui_state::perform(
 		const auto half_size = first_size / 2;
 		const auto icon_size = vec2::square(22);
 
-		if (p.size() > 0) {
+		if (!p.empty()) {
 			augs::atlas_entry entry;
 			entry.atlas_space = xywh(0, 0, 1, 1);
 

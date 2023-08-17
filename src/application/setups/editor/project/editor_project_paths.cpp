@@ -102,7 +102,7 @@ client_find_arena_result client_find_arena(
 }
 
 editor_project_paths::editor_project_paths(const augs::path_type& target_folder) : project_folder(target_folder) {
-	arena_name = target_folder.filename().string();
+	arena_name = augs::string_windows_friendly(target_folder.filename());
 
 	auto in_folder = [&](const auto& rest) {
 		return target_folder / rest;

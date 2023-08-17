@@ -51,10 +51,10 @@ struct forbidden_path_result {
 		const augs::path_type& p,
 		const sanitization::forbidden_path_type r
 	) : forbidden_path(p), reason(r) {
-		const auto bad_filename = forbidden_path.filename().string();
+		const auto bad_filename = augs::string_windows_friendly(forbidden_path.filename());
 		const auto good_filename = sanitization::try_generate_sanitized_filename(bad_filename);
 
-		len = p.string().length();
+		len = augs::string_windows_friendly(p).length();
 
 		if (good_filename != bad_filename) {
 			suggested_filename = good_filename;
@@ -312,7 +312,7 @@ struct editor_filesystem_node {
 				add_file_or_folder(untrusted_path.filename(), true);
 			}
 			else {
-				auto filename_to_sanitize = ::to_forward_slashes(relative_in_project.string());
+				auto filename_to_sanitize = ::to_forward_slashes(augs::string_windows_friendly(relative_in_project));
 
 				if (folder) {
 					/* Add a dummy extension to silence the NO_EXTENSION error for folders */
