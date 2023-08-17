@@ -94,6 +94,10 @@ public:
 		return char_gui;
 	}
 
+	auto get_hotbar_settings() const {
+		return dependencies.hotbar;
+	}
+
 	const cosmos& get_cosmos() const {
 		return handle.get_cosmos();
 	}

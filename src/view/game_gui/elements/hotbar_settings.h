@@ -7,7 +7,9 @@ struct hotbar_settings {
 	// GEN INTROSPECTOR struct hotbar_settings
 	bool increase_inside_alpha_when_selected = false;
 	bool colorize_inside_when_selected = true;
-	pad_bytes<2> pad;
+
+	bool hide_unassigned_hotbar_buttons = true;
+	bool autocollapse_hotbar_buttons = true;
 
 	rgba primary_selected_color = rgba(0, 255, 255, 255);
 	rgba secondary_selected_color = rgba(86, 156, 214, 255);

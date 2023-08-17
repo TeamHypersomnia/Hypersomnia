@@ -282,7 +282,7 @@ void hotbar_button::draw(
 					}
 				}
 				
-				if (type == button_corner_type::LB_COMPLEMENT) {
+				if (has_assigned_entity && type == button_corner_type::LB_COMPLEMENT) {
 					const auto intent_for_this_button = 
 						static_cast<inventory_gui_intent_type>(
 							static_cast<int>(

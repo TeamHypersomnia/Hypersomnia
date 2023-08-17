@@ -702,7 +702,13 @@ void settings_gui_state::perform(
 
 					revertable_checkbox(SCOPE_CFG_NVP(autodrop_magazines_of_dropped_weapons));
 					// revertable_checkbox(SCOPE_CFG_NVP(autodrop_holstered_armed_explosives));
+				}
+
+				{
+					auto& scope_cfg = config.hotbar;
+
 					revertable_checkbox(SCOPE_CFG_NVP(autocollapse_hotbar_buttons));
+					revertable_checkbox(SCOPE_CFG_NVP(hide_unassigned_hotbar_buttons));
 				}
 
 				const auto binding_text_color = rgba(255, 255, 255, 255);

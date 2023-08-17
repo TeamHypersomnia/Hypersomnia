@@ -620,13 +620,16 @@ treat_as_music_sounds_longer_than_secs = 5,
 	}
   },
   hotbar = {
+    autocollapse_hotbar_buttons = true,
+    hide_unassigned_hotbar_buttons = true,
+
     colorize_inside_when_selected = true,
     increase_inside_alpha_when_selected = false,
     primary_selected_color = "0 255 255 255",
     secondary_selected_color = "86 156 214 255"
   },
   game_gui = {
-	autodrop_holstered_armed_explosives = true,
+    autodrop_holstered_armed_explosives = true,
     autodrop_magazines_of_dropped_weapons = true,
     autocollapse_hotbar_buttons = true
   },

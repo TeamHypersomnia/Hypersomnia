@@ -1,6 +1,7 @@
 #pragma once
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/necessary_resources.h"
+#include "view/game_gui/elements/hotbar_settings.h"
 
 namespace augs {
 	struct baked_font;
@@ -16,4 +17,5 @@ struct game_gui_context_dependencies {
 	const augs::baked_font& gui_font;
 	randomizing_system& randomizing;
 	const game_gui_settings& game_gui;
+	const hotbar_settings hotbar;
 };

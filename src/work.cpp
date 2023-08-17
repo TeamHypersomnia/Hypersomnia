@@ -1600,7 +1600,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
 			get_audiovisuals().randomizing,
-			viewing_config.game_gui
+			viewing_config.game_gui,
+			viewing_config.hotbar
 		};
 	};
 

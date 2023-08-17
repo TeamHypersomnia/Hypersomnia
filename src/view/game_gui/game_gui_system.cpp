@@ -411,7 +411,7 @@ void game_gui_system::advance(
 ) {
 	const auto subject = context.get_subject_entity();
 
-	const auto& settings = context.dependencies.game_gui;
+	const auto settings = context.get_hotbar_settings();
 
 	ensure(subject.alive());
 
@@ -549,16 +549,24 @@ void game_gui_system::rebuild_layouts(
 	const auto& image_defs = context.get_image_metas();
 	auto& element = context.get_character_gui();
 
+	const bool hide_unassigned_hotbar_buttons = context.get_hotbar_settings().hide_unassigned_hotbar_buttons;
+
 	if (root_entity.has<components::item_slot_transfers>()) {
 		const auto screen_size = context.get_screen_size();
 
-		int max_hotbar_height = 0;
+		int max_hotbar_height = 55;
 
 		{
 			int total_width = 0;
 
 			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
 				const auto& hb = element.hotbar_buttons[i];
+
+				if (hide_unassigned_hotbar_buttons) {
+					if (const auto ent = hb.get_assigned_entity(root_entity); ent.dead()) {
+						continue;
+					}
+				}
 
 				const auto bbox = hb.get_bbox(necessarys, image_defs, root_entity);
 				max_hotbar_height = std::max(max_hotbar_height, bbox.y);
@@ -572,20 +580,27 @@ void game_gui_system::rebuild_layouts(
 			int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
 
 			const auto set_rc = [&](auto& hb) {
-				//if (const auto ent = hb.get_assigned_entity(root_entity); ent.alive()) {
-					const auto bbox = hb.get_bbox(necessarys, image_defs, root_entity);
+				if (hide_unassigned_hotbar_buttons) {
+					if (const auto ent = hb.get_assigned_entity(root_entity); ent.dead()) {
+						hb.rc = {};
 
-					hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
+						return;
+					}
+				}
 
-					current_x += bbox.x + left_rc_spacing + right_rc_spacing;
-					//}
-					//else {
-						//hb.rc = {};
-						//}
+				const auto bbox = hb.get_bbox(necessarys, image_defs, root_entity);
+
+				hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
+
+				current_x += bbox.x + left_rc_spacing + right_rc_spacing;
 			};
 
 			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {
 				set_rc(element.hotbar_buttons[i]);
+			}
+
+			if (total_width == 0) {
+				max_hotbar_height = 0;
 			}
 		}
 
