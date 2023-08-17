@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-17 18:58:18.791433 UTC"
+        "version_timestamp": "2023-08-17 19:06:09.633823 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -16225,7 +16225,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Backpack will be handy to carry lots of grenades."
+            "context_tip": "A backpack will let you carry lots of grenades."
         },
         {
             "id": "tip3_1 (70)",
@@ -16254,7 +16254,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Take as many as you want!"
+            "context_tip": "Now take as many as you want!"
         }
     ]
 }
