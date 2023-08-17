@@ -98,7 +98,12 @@ namespace augs {
 			const path_type& reported_path
 		);
 
-		void from_image_bytes(
+		void from_bytes_stbi(
+			const std::vector<std::byte>& from,
+			const path_type& reported_path
+		);
+
+		void from_png_bytes(
 			const std::vector<std::byte>& from, 
 			const path_type& reported_path
 		);

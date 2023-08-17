@@ -727,7 +727,7 @@ namespace augs {
 		const auto title = widen(custom_title);
 		const auto choice = ::PickContainer(title);
 
-		if (choice.size() > 0) {
+		if (!choice.empty()) {
 			return choice;
 		}
 
@@ -775,7 +775,7 @@ namespace augs {
 				}
 			}
 
-			return str_ops(result.string()).replace_all("\\", "/");
+			return result;
 		}
 		else {
 			return std::nullopt;

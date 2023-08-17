@@ -254,7 +254,7 @@ namespace augs {
 				int y;
 				int comp;
 
-				const auto str_path = file_path.string();
+				const auto str_path = string_windows_friendly(make_windows_friendly(file_path));
 
 				if (!stbi_info(str_path.c_str(), &x, &y, &comp)) {
 					throw image_loading_error("Failed to read size of %x:\nstbi_info returned 0!", file_path);
@@ -332,33 +332,10 @@ namespace augs {
 		else if (extension == ".bin") {
 			from_binary_file(path);
 		}
-#if 0
-		else if (extension == ".gif") {
-			auto f = gif_to_frames(path);
-
-			if (f.size() > 0) {
-				from_bytes(f[0].serialized_frame, "dummy.gif");
-			}
-			else {
-				throw image_loading_error("Failed to load image %x:\nNo frames in gif!", path);
-			}
-		}
-#endif
 		else {
-			int width;
-			int height;
-			int comp;
-
-			const auto str_path = path.string();
-			const auto result = stbi_load(str_path.c_str(), &width, &height, &comp, 4);
-
-			if (result == nullptr) {
-				throw image_loading_error(
-					"Failed to load image %x (earlier loaded into memory):\nstbi returned NULL", path
-				);
-			}
-
-			load_stbi_buffer(result, width, height);
+			auto& loaded_bytes = thread_local_file_buffer();
+			augs::file_to_bytes(path, loaded_bytes);
+			from_bytes_stbi(loaded_bytes, path);
 		}
 
 		throw_if_zero_size(path, size);
@@ -371,7 +348,7 @@ namespace augs {
 
 		try {
 			augs::file_to_bytes(path, loaded_bytes);
-			from_image_bytes(loaded_bytes, path);
+			from_png_bytes(loaded_bytes, path);
 		}
 		catch (const augs::file_open_error& err) {
 			throw image_loading_error(
@@ -400,6 +377,25 @@ namespace augs {
 		);
 	}
 
+	void image::from_bytes_stbi(
+		const std::vector<std::byte>& from,
+		const path_type& reported_path
+	) {
+		int width;
+		int height;
+		int comp;
+
+		const auto result = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(from.data()), static_cast<int>(from.size()), &width, &height, &comp, 4);
+
+		if (result == nullptr) {
+			throw image_loading_error(
+				"Failed to load image %x (earlier loaded into memory):\nstbi returned NULL", reported_path
+			);
+		}
+
+		load_stbi_buffer(result, width, height);
+	}
+	
 	void image::from_bytes(
 		const std::vector<std::byte>& from, 
 		const path_type& reported_path
@@ -407,7 +403,7 @@ namespace augs {
 		const auto extension = reported_path.extension();
 
 		if (extension == ".png") {
-			from_image_bytes(from, reported_path);
+			from_png_bytes(from, reported_path);
 		}
 		else if (extension == ".bin") {
 			auto in = augs::cref_memory_stream(from);
@@ -427,23 +423,6 @@ namespace augs {
 		}
 		else {
 			/* Detect extension */
-
-			auto load_general = [this, &reported_path, &from]() {
-				int width;
-				int height;
-				int comp;
-
-				const auto result = stbi_load_from_memory(reinterpret_cast<stbi_uc const*>(from.data()), static_cast<int>(from.size()), &width, &height, &comp, 4);
-
-				if (result == nullptr) {
-					throw image_loading_error(
-						"Failed to load image %x (earlier loaded into memory):\nstbi returned NULL", reported_path
-					);
-				}
-
-				load_stbi_buffer(result, width, height);
-			};
-
 			auto in = augs::cref_memory_stream(from);
 
 			auto magic_numbers = decltype(get_bin_file_magic_numbers())();
@@ -454,12 +433,12 @@ namespace augs {
 				augs::read_bytes(in, v);
 			}
 			else {
-				load_general();
+				from_bytes_stbi(from, reported_path);
 			}
 		}
 	}
 
-	void image::from_image_bytes(
+	void image::from_png_bytes(
 		const std::vector<std::byte>& from, 
 		const path_type& reported_path
 	) {
