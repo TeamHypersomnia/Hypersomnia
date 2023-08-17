@@ -33,6 +33,12 @@ bool basic_wielding_setup<I>::is_bare_hands(const C& cosm) const {
 	return true;
 }
 
+template <class I>
+template <class C>
+bool basic_wielding_setup<I>::is_left_handed(const C& cosm) const {
+	return cosm[hand_selections[1]].alive() && cosm[hand_selections[0]].dead();
+}
+
 template <class A, class B>
 entity_id get_wieldable_if_available(
 	const A& gui_entity,

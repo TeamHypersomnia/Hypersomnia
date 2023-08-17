@@ -61,6 +61,9 @@ struct basic_wielding_setup  {
 	bool is_bare_hands(const C& cosm) const;
 
 	template <class C>
+	bool is_left_handed(const C& cosm) const;
+
+	template <class C>
 	bool equivalent_to(const C& cosm, const basic_wielding_setup<id_type>&) const;
 
 	template <class C>

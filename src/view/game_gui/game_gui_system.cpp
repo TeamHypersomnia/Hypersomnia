@@ -380,7 +380,15 @@ void game_gui_system::control_hotbar_and_action_button(
 			}
 		}
 		else if (i.intent == inventory_gui_intent_type::LAST_USED_WEAPON && i.was_pressed()) {
-			const auto wielding = gui.make_wielding_setup_for_last_hotbar_selection_setup(gui_entity, input);
+			auto wielding = gui.make_wielding_setup_for_last_hotbar_selection_setup(gui_entity, input);
+
+			const bool reset_lefthanded_to_righthanded = true;
+
+			if (reset_lefthanded_to_righthanded) {
+				if (wielding.is_left_handed(gui_entity.get_cosmos())) {
+					wielding.switch_hands();
+				}
+			}
 
 			const auto current_setup = wielding_setup::from_current(gui_entity);
 
