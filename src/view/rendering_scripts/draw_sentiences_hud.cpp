@@ -75,7 +75,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 		if (is_enemy) {
 			const auto& danger_indicators = in.settings.draw_danger_indicators;
 
-			if (danger_indicators.is_enabled) {
+			if (danger_indicators.is_enabled && is_conscious) {
 				const auto show_danger_secs = in.settings.show_danger_indicator_for_seconds;
 				const auto fade_danger_secs = in.settings.fade_danger_indicator_for_seconds;
 
