@@ -1,6 +1,6 @@
 {
     "grid": {
-        "unit_pixels": 32,
+        "unit_pixels": 64,
         "unit_degrees": 15
     },
     "show_grid": false,
@@ -8,10 +8,10 @@
     "ignore_groups": false,
     "panned_camera": {
         "transform": {
-            "pos": [18643.33984375, 9433.2197265625],
+            "pos": [-14310.0185546875, 29463.154296875],
             "rotation": 0.0
         },
-        "zoom": 0.7306649684906006
+        "zoom": 0.41477343440055847
     },
     "rect_select_mode": "EVERYTHING"
 }

@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add context tips as separate resource, just like hazards, portal-based
 
 - DISREGARDED:
     - Switch to previous weapon when:

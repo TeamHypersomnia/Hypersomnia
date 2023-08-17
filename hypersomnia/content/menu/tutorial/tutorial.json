@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-12 18:57:44.313378 UTC"
+        "version_timestamp": "2023-08-17 18:58:18.791433 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -82,7 +82,7 @@
         },
         {
             "path": "captions/surf.png",
-            "file_hash": "8fb07c1b23c80004206c78f5b43989625be0b20fc7dbb232814137d05a1685ac",
+            "file_hash": "99dc0a53037b99e1e1512300f2e117241e64f3485a5782f02458f56c243cc46e",
             "id": "@surf",
             "neon_map": {
                 "light_colors": [[255, 255, 255, 255]
@@ -90,7 +90,7 @@
             },
             "color": [255, 0, 255, 255],
             "neon_color": [255, 0, 255, 255],
-            "size": [263, 74]
+            "size": [613, 74]
         },
         {
             "path": "captions/vent.png",
@@ -616,11 +616,12 @@
         },
         {
             "id": "Level20",
-            "is_open_in_editor": false,
             "nodes": [
                 "arrow (187)-right",
                 "arrow (187)",
+                "point_light (133)",
                 "point_light (135)",
+                "point_light (137)",
                 "point_light (132)",
                 "arrow (180)",
                 "surf",
@@ -698,8 +699,6 @@
                 "portal (24)",
                 "portal (23)",
                 "portal (22)",
-                "portal (20)",
-                "portal (21)",
                 "portal (19)",
                 "portal (10)",
                 "portal (17)",
@@ -830,7 +829,6 @@
         },
         {
             "id": "Level17",
-            "is_open_in_editor": false,
             "nodes": [
                 "obs23",
                 "obs24",
@@ -872,7 +870,6 @@
         },
         {
             "id": "Level16",
-            "is_open_in_editor": false,
             "nodes": [
                 "dev_floor_256 (98)",
                 "hazard (11)",
@@ -1054,6 +1051,10 @@
                 "kill15 (2)",
                 "kill15",
                 "tip3_1 (39)",
+                "metropolis_backpack (1)",
+                "tip3_1 (70)",
+                "tip3_1 (69)",
+                "tip3_1 (68)",
                 "tip3_1 (38)",
                 "entry13",
                 "vent (58)",
@@ -1061,6 +1062,9 @@
                 "vent (56)",
                 "vent (55)",
                 "bilmer2000",
+                "dev_floor_256 (142)",
+                "dev_floor_256 (141)",
+                "dev_floor_256 (140)",
                 "dev_floor_256 (80)",
                 "team_spawn (18)",
                 "dev_floor_256 (79)",
@@ -1510,6 +1514,8 @@
                 "dev_floor_256 (42)",
                 "Strong lamp (14)",
                 "Strong lamp (17)",
+                "Strong lamp (85)",
+                "Strong lamp (84)",
                 "Strong lamp (16)",
                 "Strong lamp (15)",
                 "floor_right (8)"
@@ -1616,8 +1622,6 @@
         {
             "id": "Level4",
             "nodes": [
-                "kek9_magazine",
-                "kek9_magazine (2)",
                 "tip4_1 (2)",
                 "tip4_1 (18)",
                 "tip4_1 (17)",
@@ -1668,18 +1672,13 @@
                 "obs3",
                 "obs2",
                 "baka47_magazine (2)",
-                "baka47_magazine (1)",
-                "baka47_magazine (10)",
                 "baka47_magazine (8)",
-                "baka47_magazine (6)",
                 "baka47_magazine (5)",
-                "baka47_magazine (7)",
                 "baka47_magazine (4)",
+                "baka47_magazine (1)",
                 "baka47_magazine (3)",
                 "baka47_magazine",
-                "baka47_magazine (14)",
                 "baka47_magazine (13)",
-                "baka47_magazine (12)",
                 "baka47_magazine (11)",
                 "obs1",
                 "point_light (18)",
@@ -1692,6 +1691,7 @@
                 "point_light (6)",
                 "point_light (12)",
                 "point_light (11)",
+                "point_light (134)",
                 "point_light (10)",
                 "point_light (9)",
                 "kill3 (2)",
@@ -1739,7 +1739,7 @@
                 "hard_wooden_wall (17)",
                 "hard_wooden_wall (9)",
                 "hard_wooden_wall (8)",
-                "kek9",
+                "ao44",
                 "hard_wooden_wall (7)",
                 "hard_wooden_wall (6)",
                 "hard_wooden_wall (5)"
@@ -1747,7 +1747,6 @@
         },
         {
             "id": "Level3",
-            "is_open_in_editor": false,
             "nodes": [
                 "hazard (6)",
                 "tip3_1",
@@ -2232,7 +2231,7 @@
             "type": "dev_floor_256",
             "pos": [0.0, 25728.0],
             "size": [1536, 256],
-            "color": [255, 0, 0, 255]
+            "color": [0, 0, 255, 255]
         },
         {
             "id": "dev_floor_256 (16)",
@@ -2885,13 +2884,15 @@
             "id": "obs6 (5)",
             "type": "@materials/wood.png",
             "pos": [20062.0, 9984.0],
-            "size": [192, 128]
+            "size": [192, 128],
+            "color": [255, 200, 255, 255]
         },
         {
             "id": "obs6 (4)",
             "type": "@materials/wood.png",
             "pos": [20064.0, 8960.0],
-            "size": [192, 128]
+            "size": [192, 128],
+            "color": [255, 200, 255, 255]
         },
         {
             "id": "obs6 (3)",
@@ -3685,23 +3686,23 @@
         {
             "id": "dev_floor_256 (80)",
             "type": "dev_floor_256",
-            "pos": [17408.0, 28416.0],
+            "pos": [17088.0, 28416.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "vent (55)",
             "type": "@materials/vent.png",
-            "pos": [17312.0, 27456.0],
+            "pos": [18112.001953125, 27456.0],
             "rotation": 90.0,
-            "size": [384, 5312]
+            "size": [384, 6912]
         },
         {
             "id": "vent (56)",
             "type": "@materials/vent.png",
-            "pos": [17312.0, 29376.0],
+            "pos": [18112.001953125, 29376.0],
             "rotation": 90.0,
-            "size": [384, 5312]
+            "size": [384, 6912]
         },
         {
             "id": "vent (57)",
@@ -3713,31 +3714,31 @@
         {
             "id": "crate (6)",
             "type": "crate",
-            "pos": [18336.0, 28160.0]
+            "pos": [19936.0, 28160.0]
         },
         {
             "id": "crate (7)",
             "type": "crate",
-            "pos": [17952.0, 28576.0]
+            "pos": [19552.0, 28576.0]
         },
         {
             "id": "obs15 (1)",
             "type": "@yellow_barrier",
-            "pos": [17568.0, 28416.0],
+            "pos": [18847.998046875, 28416.0],
             "rotation": -180.0,
             "size": [64, 1536]
         },
         {
             "id": "obs15",
             "type": "@yellow_barrier",
-            "pos": [18912.001953125, 28416.0],
+            "pos": [20512.001953125, 28416.0],
             "rotation": -180.0,
             "size": [64, 1536]
         },
         {
             "id": "floor_right (18)",
             "type": "@water_room_floor",
-            "pos": [19456.0, 28416.0],
+            "pos": [21056.0, 28416.0],
             "rotation": 90.0,
             "size": [1408, 768],
             "color": [255, 132, 132, 255]
@@ -3745,17 +3746,17 @@
         {
             "id": "crate (9)",
             "type": "crate",
-            "pos": [17984.0, 27840.0]
+            "pos": [19584.0, 27840.0]
         },
         {
             "id": "crate (10)",
             "type": "crate",
-            "pos": [18688.0, 28032.0]
+            "pos": [20288.0, 28032.0]
         },
         {
             "id": "vent (58)",
             "type": "@materials/vent.png",
-            "pos": [20160.001953125, 28416.0],
+            "pos": [21760.001953125, 28416.0],
             "rotation": -180.0,
             "size": [384, 2304]
         },
@@ -4938,8 +4939,8 @@
         {
             "id": "dev_floor_256 (123)",
             "type": "dev_floor_256",
-            "pos": [-15168.0, 28800.0],
-            "size": [1536, 256],
+            "pos": [-15168.0, 28544.0],
+            "size": [2048, 256],
             "color": [0, 255, 0, 255]
         },
         {
@@ -4959,8 +4960,8 @@
         {
             "id": "vent (91)",
             "type": "@materials/vent.png",
-            "pos": [-14272.0, 29951.998046875],
-            "size": [256, 2560]
+            "pos": [-14272.0, 30207.998046875],
+            "size": [256, 2048]
         },
         {
             "id": "vent (92)",
@@ -4984,8 +4985,8 @@
         {
             "id": "vent (79)",
             "type": "@materials/vent.png",
-            "pos": [-14016.0, 27648.001953125],
-            "size": [256, 1024]
+            "pos": [-14016.0, 27904.0],
+            "size": [256, 1536]
         },
         {
             "id": "vent (88)",
@@ -5002,8 +5003,8 @@
         {
             "id": "vent (93)",
             "type": "@materials/vent.png",
-            "pos": [-14016.0, 30112.0],
-            "size": [256, 2880]
+            "pos": [-14016.0, 30368.0],
+            "size": [256, 2368]
         },
         {
             "id": "vent (94)",
@@ -5048,7 +5049,7 @@
         {
             "id": "dev_floor_256 (124)",
             "type": "dev_floor_256",
-            "pos": [-14016.0, 28416.0],
+            "pos": [-14016.0, 28928.0],
             "size": [256, 512],
             "color": [255, 0, 255, 255]
         },
@@ -6448,7 +6449,7 @@
         {
             "id": "arrow (180)",
             "type": "@arrow",
-            "pos": [-14406.0, 28413.0]
+            "pos": [-14406.0, 28925.0]
         },
         {
             "id": "arrow (187)",
@@ -6482,6 +6483,27 @@
             "type": "dev_floor_256",
             "pos": [5376.0, 43648.0],
             "size": [256, 256],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (140)",
+            "type": "dev_floor_256",
+            "pos": [17600.0, 28416.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (141)",
+            "type": "dev_floor_256",
+            "pos": [18112.0, 28416.0],
+            "size": [256, 1536],
+            "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "dev_floor_256 (142)",
+            "type": "dev_floor_256",
+            "pos": [18688.0, 28416.0],
+            "size": [256, 1536],
             "color": [0, 255, 0, 255]
         },
         {
@@ -6640,13 +6662,13 @@
             "id": "point_light (4)",
             "type": "point_light",
             "pos": [513.0, 25729.0],
-            "color": [255, 0, 0, 80]
+            "color": [0, 0, 255, 80]
         },
         {
             "id": "point_light (5)",
             "type": "point_light",
             "pos": [-513.0, 25729.0],
-            "color": [255, 0, 0, 80]
+            "color": [0, 0, 255, 80]
         },
         {
             "id": "Strong lamp (8)",
@@ -7119,7 +7141,7 @@
         {
             "id": "Strong lamp (35)",
             "type": "point_light",
-            "pos": [18559.0, 29247.0],
+            "pos": [20159.0, 29247.0],
             "color": [80, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -7151,7 +7173,7 @@
         {
             "id": "Strong lamp (37)",
             "type": "point_light",
-            "pos": [18561.0, 27585.0],
+            "pos": [20161.0, 27585.0],
             "color": [80, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -7167,7 +7189,7 @@
         {
             "id": "Strong lamp (38)",
             "type": "point_light",
-            "pos": [17921.0, 29247.0],
+            "pos": [19521.0, 29247.0],
             "color": [80, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -7183,7 +7205,7 @@
         {
             "id": "Strong lamp (39)",
             "type": "point_light",
-            "pos": [18177.0, 27583.0],
+            "pos": [19777.0, 27583.0],
             "color": [80, 255, 0, 94],
             "falloff": {
                 "constant": 0.968999981880188,
@@ -8979,10 +9001,66 @@
         {
             "id": "point_light (135)",
             "type": "point_light",
-            "pos": [-14273.0, 28417.0],
+            "pos": [-14273.0, 28929.0],
             "color": [255, 0, 255, 255],
             "falloff": {
                 "radius": 340.4259948730469
+            }
+        },
+        {
+            "id": "point_light (134)",
+            "type": "point_light",
+            "pos": [3324.0, 43140.0],
+            "color": [255, 255, 0, 47]
+        },
+        {
+            "id": "Strong lamp (84)",
+            "type": "point_light",
+            "pos": [20403.0, 10020.0],
+            "color": [255, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "Strong lamp (85)",
+            "type": "point_light",
+            "pos": [20422.0, 8955.0],
+            "color": [255, 255, 0, 94],
+            "falloff": {
+                "constant": 0.968999981880188,
+                "linear": 0.03100001811981201,
+                "radius": 752.2059936523438,
+                "strength": 12
+            },
+            "wall_falloff": {
+                "radius": 962.9630126953125,
+                "strength": 23
+            }
+        },
+        {
+            "id": "point_light (133)",
+            "type": "point_light",
+            "pos": [-16001.0, 27839.0],
+            "color": [0, 255, 0, 54],
+            "falloff": {
+                "radius": 1430.1070556640625
+            }
+        },
+        {
+            "id": "point_light (137)",
+            "type": "point_light",
+            "pos": [-13377.0, 29183.0],
+            "color": [255, 255, 255, 55],
+            "falloff": {
+                "radius": 424.7309875488281
             }
         },
         {
@@ -9688,122 +9766,122 @@
         {
             "id": "flashbang (35)",
             "type": "flashbang",
-            "pos": [17149.0, 28169.0]
+            "pos": [18446.0, 28174.0]
         },
         {
             "id": "ped_grenade (21)",
             "type": "ped_grenade",
-            "pos": [17149.0, 28265.0]
+            "pos": [18446.0, 28270.001953125]
         },
         {
             "id": "force_grenade (62)",
             "type": "force_grenade",
-            "pos": [17149.0, 28360.998046875]
+            "pos": [18446.0, 28366.0]
         },
         {
             "id": "force_grenade (63)",
             "type": "force_grenade",
-            "pos": [17144.0, 28457.0]
+            "pos": [18441.0, 28462.0]
         },
         {
             "id": "ped_grenade (20)",
             "type": "ped_grenade",
-            "pos": [17149.0, 28553.0]
+            "pos": [18446.0, 28557.998046875]
         },
         {
             "id": "flashbang (34)",
             "type": "flashbang",
-            "pos": [17149.0, 28649.0]
+            "pos": [18446.0, 28654.0]
         },
         {
             "id": "flashbang (33)",
             "type": "flashbang",
-            "pos": [17213.0, 28169.0]
+            "pos": [18510.0, 28174.0]
         },
         {
             "id": "ped_grenade (19)",
             "type": "ped_grenade",
-            "pos": [17213.0, 28265.0]
+            "pos": [18510.0, 28270.001953125]
         },
         {
             "id": "force_grenade (90)",
             "type": "force_grenade",
-            "pos": [17213.0, 28360.998046875]
+            "pos": [18510.0, 28366.0]
         },
         {
             "id": "force_grenade (91)",
             "type": "force_grenade",
-            "pos": [17208.0, 28457.0]
+            "pos": [18505.0, 28462.0]
         },
         {
             "id": "ped_grenade (18)",
             "type": "ped_grenade",
-            "pos": [17213.0, 28553.0]
+            "pos": [18510.0, 28557.998046875]
         },
         {
             "id": "flashbang (32)",
             "type": "flashbang",
-            "pos": [17213.0, 28649.0]
+            "pos": [18510.0, 28654.0]
         },
         {
             "id": "flashbang (31)",
             "type": "flashbang",
-            "pos": [17021.0, 28169.0]
+            "pos": [18318.0, 28174.0]
         },
         {
             "id": "ped_grenade (17)",
             "type": "ped_grenade",
-            "pos": [17021.0, 28265.0]
+            "pos": [18318.0, 28270.001953125]
         },
         {
             "id": "force_grenade (56)",
             "type": "force_grenade",
-            "pos": [17021.0, 28360.998046875]
+            "pos": [18318.0, 28366.0]
         },
         {
             "id": "ped_grenade (16)",
             "type": "ped_grenade",
-            "pos": [17021.0, 28553.0]
+            "pos": [18318.0, 28557.998046875]
         },
         {
             "id": "flashbang (30)",
             "type": "flashbang",
-            "pos": [17021.0, 28649.0]
+            "pos": [18318.0, 28654.0]
         },
         {
             "id": "flashbang (29)",
             "type": "flashbang",
-            "pos": [17085.0, 28169.0]
+            "pos": [18382.0, 28174.0]
         },
         {
             "id": "ped_grenade (15)",
             "type": "ped_grenade",
-            "pos": [17085.0, 28265.0]
+            "pos": [18382.0, 28270.001953125]
         },
         {
             "id": "force_grenade (57)",
             "type": "force_grenade",
-            "pos": [17085.0, 28360.998046875]
+            "pos": [18382.0, 28366.0]
         },
         {
             "id": "force_grenade (58)",
             "type": "force_grenade",
-            "pos": [17080.0, 28457.0]
+            "pos": [18377.0, 28462.0]
         },
         {
             "id": "ped_grenade (14)",
             "type": "ped_grenade",
-            "pos": [17085.0, 28553.0]
+            "pos": [18382.0, 28557.998046875]
         },
         {
             "id": "flashbang (28)",
             "type": "flashbang",
-            "pos": [17085.0, 28649.0]
+            "pos": [18382.0, 28654.0]
         },
         {
             "id": "force_grenade (59)",
             "type": "force_grenade",
-            "pos": [17016.0, 28457.0]
+            "pos": [18313.0, 28462.0]
         },
         {
             "id": "bomb1",
@@ -10150,11 +10228,6 @@
             "pos": [31251.998046875, 28744.0]
         },
         {
-            "id": "baka47_magazine (1)",
-            "type": "baka47_magazine",
-            "pos": [1498.0, 43977.0]
-        },
-        {
             "id": "baka47_magazine (2)",
             "type": "baka47_magazine",
             "pos": [1498.0, 43849.0]
@@ -10165,19 +10238,9 @@
             "pos": [1498.0, 44105.0]
         },
         {
-            "id": "baka47_magazine (6)",
-            "type": "baka47_magazine",
-            "pos": [1498.0, 44233.0]
-        },
-        {
             "id": "baka47_magazine (8)",
             "type": "baka47_magazine",
             "pos": [1498.0, 44361.0]
-        },
-        {
-            "id": "baka47_magazine (10)",
-            "type": "baka47_magazine",
-            "pos": [1498.0, 44489.0]
         },
         {
             "id": "baka47_magazine (11)",
@@ -10185,19 +10248,9 @@
             "pos": [5306.0, 43318.0]
         },
         {
-            "id": "baka47_magazine (12)",
-            "type": "baka47_magazine",
-            "pos": [5306.0, 43382.0]
-        },
-        {
             "id": "baka47_magazine (13)",
             "type": "baka47_magazine",
             "pos": [5306.0, 43446.0]
-        },
-        {
-            "id": "baka47_magazine (14)",
-            "type": "baka47_magazine",
-            "pos": [5306.0, 43510.0]
         },
         {
             "id": "zamiec_magazine",
@@ -10220,16 +10273,6 @@
             "pos": [11578.0, -1530.0]
         },
         {
-            "id": "kek9_magazine (2)",
-            "type": "kek9_magazine",
-            "pos": [3425.999755859375, 43735.0]
-        },
-        {
-            "id": "kek9_magazine",
-            "type": "kek9_magazine",
-            "pos": [3357.0, 43735.0]
-        },
-        {
             "id": "baka47_magazine",
             "type": "baka47_magazine",
             "pos": [6586.0, 43318.0]
@@ -10245,9 +10288,9 @@
             "pos": [6586.0, 43446.0]
         },
         {
-            "id": "baka47_magazine (7)",
+            "id": "baka47_magazine (1)",
             "type": "baka47_magazine",
-            "pos": [6586.0, 43510.0]
+            "pos": [5306.0, 43382.0]
         },
         {
             "id": "baka47",
@@ -10279,9 +10322,9 @@
             "rotation": -45.0
         },
         {
-            "id": "kek9",
-            "type": "kek9",
-            "pos": [3249.000244140625, 43735.0]
+            "id": "ao44",
+            "type": "ao44",
+            "pos": [3334.0, 43733.0]
         },
         {
             "id": "szturm",
@@ -10308,7 +10351,7 @@
         {
             "id": "bilmer2000",
             "type": "bilmer2000",
-            "pos": [16856.0, 28407.0]
+            "pos": [17343.0, 28404.998046875]
         },
         {
             "id": "galilea",
@@ -10340,6 +10383,11 @@
             "id": "electric_armor",
             "type": "electric_armor",
             "pos": [15680.0, 22656.0]
+        },
+        {
+            "id": "metropolis_backpack (1)",
+            "type": "metropolis_backpack",
+            "pos": [17843.0, 28421.0]
         },
         {
             "id": "kill1",
@@ -10597,19 +10645,19 @@
         {
             "id": "kill15",
             "type": "team_spawn",
-            "pos": [18753.0, 28417.0],
+            "pos": [20353.0, 28417.0],
             "rotation": -180.0
         },
         {
             "id": "kill15 (1)",
             "type": "team_spawn",
-            "pos": [18753.0, 29055.0],
+            "pos": [20353.0, 29055.0],
             "rotation": -180.0
         },
         {
             "id": "kill15 (2)",
             "type": "team_spawn",
-            "pos": [18751.0, 27775.0],
+            "pos": [20351.0, 27775.0],
             "rotation": -180.0
         },
         {
@@ -10855,6 +10903,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -10876,6 +10932,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -10897,6 +10961,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -10985,6 +11057,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11068,6 +11148,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11110,6 +11198,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11131,6 +11227,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11191,6 +11295,7 @@
             "type": "hazard",
             "pos": [0.0, 25728.0],
             "size": [1536, 256],
+            "color_preset": "CYAN",
             "ignore_airborne_characters": false,
             "ignore_walking_characters": true,
             "hazard": {
@@ -11207,6 +11312,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11275,6 +11388,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11296,6 +11417,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11317,6 +11446,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11326,7 +11463,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {TOGGLE_WEAPON_LASER} to toggle laser.\nDashed lines indicate a physical obstacle."
+            "context_tip": "Press {TOGGLE_WEAPON_LASER} to toggle laser. Only you can see it!\nDashed lines indicate a physical obstacle."
         },
         {
             "id": "tip4_1 (4)",
@@ -11338,6 +11475,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11359,6 +11504,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11380,6 +11533,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11401,6 +11562,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11422,6 +11591,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11443,6 +11620,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11464,6 +11649,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11485,6 +11678,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11553,6 +11754,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11597,6 +11806,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11618,6 +11835,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11686,6 +11911,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11707,6 +11940,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11728,6 +11969,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11749,6 +11998,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11770,6 +12027,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11791,6 +12056,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11812,6 +12085,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11833,6 +12114,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11854,6 +12143,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11922,6 +12219,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11931,7 +12236,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "ALL surfaces can bounce bullets.\nWood is the hardest, but absolutely possible!"
+            "context_tip": "ALL surfaces can bounce bullets - including wood!\nKill 2 enemies covering behind orange boxes."
         },
         {
             "id": "hazard (5)",
@@ -11966,6 +12271,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -11987,6 +12300,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12008,6 +12329,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12076,6 +12405,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12097,6 +12434,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12118,6 +12463,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12139,6 +12492,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12160,6 +12521,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12181,6 +12550,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12202,6 +12579,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12223,6 +12608,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12291,6 +12684,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12312,6 +12713,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12333,6 +12742,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12354,6 +12771,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12375,6 +12800,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12500,6 +12933,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12544,6 +12985,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12589,6 +13038,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12610,6 +13067,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12631,6 +13096,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12640,7 +13113,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "These enemies can only be killed with headshots. Use Baka47.\nCan you kill two in one shot? What about three?"
+            "context_tip": "These enemies can only be killed with headshots.\nCan you kill two in one shot? What about three?"
         },
         {
             "id": "tip4_1 (15)",
@@ -12652,6 +13125,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12673,6 +13154,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12694,6 +13183,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12715,6 +13212,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12759,6 +13264,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12802,6 +13315,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12823,6 +13344,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12844,6 +13373,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12865,6 +13402,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12886,6 +13431,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12929,6 +13482,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12944,12 +13505,20 @@
             "id": "tip3_1 (39)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [17408.0, 28416.0],
+            "pos": [18688.0, 28416.0],
             "size": [256, 1536],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -12964,7 +13533,7 @@
         {
             "id": "exit13",
             "type": "portal",
-            "pos": [19456.0, 28416.0],
+            "pos": [21056.0, 28416.0],
             "color_preset": "YELLOW",
             "enter_time_ms": 0.0,
             "travel_time_ms": 0.0,
@@ -12994,6 +13563,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13038,6 +13615,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13088,6 +13673,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13116,6 +13709,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13137,6 +13738,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13196,6 +13805,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13217,6 +13834,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13261,6 +13886,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13282,6 +13915,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13304,6 +13945,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13326,6 +13975,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13347,6 +14004,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13368,6 +14033,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13389,6 +14062,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13410,6 +14091,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13454,6 +14143,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13475,6 +14172,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13541,6 +14246,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13550,7 +14263,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "{SPECIAL_ACTION_BUTTON_6} will restore your Health."
+            "context_tip": "{SPECIAL_ACTION_BUTTON_2} will restore your Health."
         },
         {
             "id": "tip3_1 (59)",
@@ -13562,6 +14275,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13583,6 +14304,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13592,7 +14321,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "{SPECIAL_ACTION_BUTTON_5} will restore your Stamina."
+            "context_tip": "{SPECIAL_ACTION_BUTTON_3} will restore your Stamina."
         },
         {
             "id": "exit17",
@@ -13627,6 +14356,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13636,7 +14373,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {SPECIAL_ACTION_BUTTON_3} to launch three massive explosions.\nThese cannot hurt you."
+            "context_tip": "Press {SPECIAL_ACTION_BUTTON_2} to launch three massive explosions.\nThese cannot hurt you."
         },
         {
             "id": "tip3_1 (62)",
@@ -13648,6 +14385,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13669,6 +14414,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13678,7 +14431,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {SPECIAL_ACTION_BUTTON_4} to cast three magic missiles.\nWatch out, you can die from the explosion! "
+            "context_tip": "Press {SPECIAL_ACTION_BUTTON_3} to cast three magic missiles.\nWatch out, you can die from the explosion! "
         },
         {
             "id": "tip3_1 (64)",
@@ -13690,6 +14443,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13733,6 +14494,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13742,7 +14511,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {SPECIAL_ACTION_BUTTON_2} for a small, instant explosion."
+            "context_tip": "Press {SPECIAL_ACTION_BUTTON_1} for a small, instant explosion."
         },
         {
             "id": "tip3_1 (61)",
@@ -13754,6 +14523,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -13798,6 +14575,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14103,6 +14888,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14124,6 +14917,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14145,6 +14946,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14166,6 +14975,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14187,6 +15004,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14316,7 +15141,7 @@
             "size": [512, 512],
             "color_preset": "WHITE",
             "trampoline_like": true,
-            "character_exit_airborne_ms": 700.0,
+            "character_exit_airborne_ms": 1000.0,
             "character_exit_impulse": {
                 "amount": 20000.0,
                 "mode": "SET_VELOCITY"
@@ -14362,6 +15187,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14403,6 +15236,7 @@
             "size": [512, 512],
             "color_preset": "WHITE",
             "trampoline_like": true,
+            "character_exit_airborne_ms": 1000.0,
             "character_exit_impulse": {
                 "amount": 20000.0,
                 "mode": "SET_VELOCITY"
@@ -14420,40 +15254,7 @@
             "size": [512, 512],
             "color_preset": "WHITE",
             "trampoline_like": true,
-            "character_exit_impulse": {
-                "amount": 20000.0,
-                "mode": "SET_VELOCITY"
-            },
-            "object_exit_impulse": {
-                "amount": 20000.0,
-                "mode": "SET_VELOCITY"
-            }
-        },
-        {
-            "id": "portal (21)",
-            "type": "portal",
-            "pos": [58048.0, 101184.0078125],
-            "rotation": 90.0,
-            "size": [512, 512],
-            "color_preset": "WHITE",
-            "trampoline_like": true,
-            "character_exit_impulse": {
-                "amount": 20000.0,
-                "mode": "SET_VELOCITY"
-            },
-            "object_exit_impulse": {
-                "amount": 20000.0,
-                "mode": "SET_VELOCITY"
-            }
-        },
-        {
-            "id": "portal (20)",
-            "type": "portal",
-            "pos": [58048.0, 103040.015625],
-            "rotation": 90.0,
-            "size": [512, 512],
-            "color_preset": "WHITE",
-            "trampoline_like": true,
+            "character_exit_airborne_ms": 1000.0,
             "character_exit_impulse": {
                 "amount": 20000.0,
                 "mode": "SET_VELOCITY"
@@ -14471,6 +15272,7 @@
             "size": [512, 512],
             "color_preset": "WHITE",
             "trampoline_like": true,
+            "character_exit_airborne_ms": 1000.0,
             "character_exit_impulse": {
                 "amount": 20000.0,
                 "mode": "SET_VELOCITY"
@@ -14548,6 +15350,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14585,8 +15395,8 @@
             "id": "surf_start (4)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-15167.9990234375, 28800.0],
-            "size": [1536, 256],
+            "pos": [-15167.9990234375, 28544.0],
+            "size": [2048, 256],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -14605,7 +15415,7 @@
                 "amount": 0.0
             },
             "exit_position": "PORTAL_CENTER",
-            "context_tip": "The left portal will take you to the Main menu.\nOr, you can go to Shooting range to test all 20+ weapons."
+            "context_tip": "The left portal will take you to the Main menu.\nOr, you can go to the Shooting range to test all 20+ weapons."
         },
         {
             "id": "tip2_1 (7)",
@@ -14617,6 +15427,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -14699,7 +15517,7 @@
             "id": "surf_start (5)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [-14016.0, 28416.0],
+            "pos": [-14016.0, 28928.0],
             "size": [256, 512],
             "color_preset": "PINK",
             "auto_scale_pitches": false,
@@ -15303,6 +16121,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -15312,7 +16138,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Aim in the opposite direction (down).\nHold {SPRINT} and {MOVE_FORWARD} while shooting both Awkas."
+            "context_tip": "Aim in the opposite direction (down).\nHold {SPRINT} and {MOVE_FORWARD} - THEN shoot both Awkas."
         },
         {
             "id": "tip4_1 (20)",
@@ -15324,6 +16150,14 @@
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
             "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
             "decrease_opacity_to": 255,
             "OFF_rings_effect": {},
             "light_size_mult": 0.0,
@@ -15334,6 +16168,93 @@
                 "scale_amounts": 0.30000001192092896
             },
             "context_tip": "Tip: there are 3 enemies,\neach hiding behind a crate."
+        },
+        {
+            "id": "tip3_1 (68)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [17088.0, 28416.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "First pick up the Bilmer."
+        },
+        {
+            "id": "tip3_1 (69)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [17600.0, 28416.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Backpack will be handy to carry lots of grenades."
+        },
+        {
+            "id": "tip3_1 (70)",
+            "type": "portal",
+            "shape": "BOX",
+            "pos": [18112.0, 28416.0],
+            "size": [256, 1536],
+            "color_preset": "GREEN",
+            "auto_scale_pitches": false,
+            "enter_time_ms": 20.0,
+            "exit_cooldown_ms": 0.0,
+            "reacts_to": {
+                "bullets": false,
+                "flying_explosives": false,
+                "flying_melees": false,
+                "lying_items": false,
+                "shells": false,
+                "obstacles": false
+            },
+            "decrease_opacity_to": 255,
+            "OFF_rings_effect": {},
+            "light_size_mult": 0.0,
+            "ambience_sound": {
+                "id": null
+            },
+            "ambience_particles": {
+                "scale_amounts": 0.30000001192092896
+            },
+            "context_tip": "Take as many as you want!"
         }
     ]
 }
