@@ -38,6 +38,10 @@ void action_button::draw(
 		const auto& sentience = context.get_subject_entity().get<components::sentience>();
 		const auto bound_spell = get_bound_spell(context, this_id);
 
+		if (!bound_spell.is_set()) {
+			return;
+		}
+
 		const auto& cosm = context.get_cosmos();
 
 		const auto output = context.get_output();

@@ -604,7 +604,19 @@ void game_gui_system::rebuild_layouts(
 		{
 			const auto action_button_size = context.get_necessary_images().at(assets::necessary_image_id::ACTION_BUTTON_BORDER).get_original_size();
 
-			auto total_width = static_cast<int>(element.action_buttons.size()) * action_button_size.x;
+			int used_action_buttons = 0;
+
+			for (size_t i = 0; i < element.action_buttons.size(); ++i) {
+				auto id = action_button_in_character_gui{int(i)};
+				auto loc = make_dereferenced_location(&element.action_buttons[i], id);
+				auto bound = action_button::get_bound_spell(context, loc);
+
+				if (bound.is_set()) {
+					++used_action_buttons;
+				}
+			}
+
+			auto total_width = static_cast<int>(used_action_buttons) * action_button_size.x;
 
 			const int left_rc_spacing = 4;
 			const int right_rc_spacing = 3;
@@ -623,7 +635,13 @@ void game_gui_system::rebuild_layouts(
 			};
 
 			for (size_t i = 0; i < element.action_buttons.size(); ++i) {
-				set_rc(element.action_buttons[i]);
+				auto id = action_button_in_character_gui{int(i)};
+				auto loc = make_dereferenced_location(&element.action_buttons[i], id);
+				auto bound = action_button::get_bound_spell(context, loc);
+
+				if (bound.is_set()) {
+					set_rc(element.action_buttons[i]);
+				}
 			}
 		}
 	}
