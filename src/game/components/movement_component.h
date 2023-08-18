@@ -102,6 +102,10 @@ namespace components {
 		movement_animation_state four_ways_animation;
 		// END GEN INTROSPECTOR
 
+		auto get_max_inertia() const {
+			return std::max(std::max(const_inertia_ms, linear_inertia_ms), portal_inertia_ms);
+		}
+
 		void reset_movement_flags();
 	};
 }

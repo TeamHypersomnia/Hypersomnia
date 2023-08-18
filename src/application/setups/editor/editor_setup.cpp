@@ -680,7 +680,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		get_arena_handle().adjust(config.drawing);
 	}
 	else {
-		config.drawing.auto_zoom = false;
+		config.drawing.snap_zoom_to_fov_size = false;
 		config.drawing.custom_zoom = 1.0f;
 
 		config.drawing.draw_area_markers.is_enabled = false;

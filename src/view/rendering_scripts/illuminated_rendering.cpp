@@ -87,6 +87,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		return non_zoomed_cone.get_projection_matrix();
 	}();
 
+	const auto circular_bars_matrix = non_zoomed_matrix;
+
 	const auto& visible = in.all_visible;
 	const auto& shaders = in.shaders;
 	auto& fbos = in.fbos;
@@ -98,6 +100,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	auto& profiler = in.frame_performance;
 	auto& renderer = in.renderer;
+
+	auto considered_fov = settings.fog_of_war;
+	considered_fov.size *= in.camera_requested_fov_expansion;;
 
 	/* Shader manipulation lambdas */
 
@@ -113,6 +118,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	auto set_shader_with_non_zoomed_matrix = [&](auto& shader) {
 		shader->set_as_current(renderer);
 		shader->set_projection(renderer, non_zoomed_matrix);
+	};
+
+	auto set_shader_with_custom_matrix = [&](auto& shader, auto& custom_matrix) {
+		shader->set_as_current(renderer);
+		shader->set_projection(renderer, custom_matrix);
 	};
 
 	auto bind_and_update_filtering = [&](auto& tex) {
@@ -159,7 +169,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 #if BUILD_STENCIL_BUFFER
 	const bool fog_of_war_effective = 
 		viewed_character_transform.has_value() 
-		&& settings.fog_of_war.is_enabled()
+		&& considered_fov.is_enabled()
 	;
 #else
 	const bool fog_of_war_effective = false;
@@ -186,7 +196,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			dir.set(1, 0);
 		}
 
-		const auto& angle = settings.fog_of_war.angle;
+		const auto& angle = considered_fov.angle;
 		const auto left_dir = vec2(dir).rotate(-angle / 2).neg_y();
 		const auto right_dir = vec2(dir).rotate(angle / 2).neg_y();
 
@@ -245,7 +255,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			return;
 		}
 
-		set_shader_with_matrix(shaders.circular_bars);
+		set_shader_with_custom_matrix(shaders.circular_bars, circular_bars_matrix);
 
 		const auto set_center_uniform = [&](const auto& tex_id) {
 			set_uniform(shaders.circular_bars, U::texture_center, necessarys[tex_id].get_center());
@@ -309,7 +319,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		set_shader_with_matrix(shaders.pure_color_highlight);
 
-		const auto fow_size = settings.fog_of_war.get_real_size();
+		const auto fow_size = considered_fov.get_real_size();
 
 		get_drawer().aabb(
 			ltrb::center_and_size(viewed_character_transform->pos, fow_size),
@@ -699,7 +709,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			character,
 			in.pre_step_crosshair_displacement,
 			interp,
-			settings.fog_of_war.angle
+			considered_fov.angle
 		);
 	};
 

@@ -428,7 +428,7 @@ void portal_system::advance_portal_logic(const logic_step step) {
 
 				if (portal.ignore_airborne_characters) {
 					if (auto movement = typed_contacted_entity.template find<components::movement>()) {
-						if (movement->const_inertia_ms > 0.0f || movement->linear_inertia_ms > 0.0f || movement->portal_inertia_ms > 0.0f) {
+						if (movement->get_max_inertia() > 0.0f) {
 							return false;
 						}
 					}

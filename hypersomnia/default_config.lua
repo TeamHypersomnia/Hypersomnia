@@ -218,8 +218,6 @@ treat_as_music_sounds_longer_than_secs = 5,
     },
     angled_look_length = 100,
     enable_smoothing = true,
-	adjust_zoom_to_available_fog_of_war_size = false,
-	adjust_zoom_if_fov_bigger_by_pixels = 10,
     look_bound_expand = 0.5,
     smoothing = {
       average_factor = 0.5,
@@ -250,6 +248,9 @@ treat_as_music_sounds_longer_than_secs = 5,
     enabled = false
   },
   drawing = {
+    snap_zoom_to_fov_size = true,
+    snap_zoom_to_multiple_if_different_by_pixels = 100,
+
     crosshair = {
       scale = 3,
       border_width = 1,

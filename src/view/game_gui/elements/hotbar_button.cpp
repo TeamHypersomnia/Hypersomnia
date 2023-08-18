@@ -146,6 +146,10 @@ void hotbar_button::draw(
 
 	auto absolute_rc = this_tree_entry.get_absolute_rect();
 
+	if (!absolute_rc.good()) {
+		return;
+	}
+
 	constexpr int left_rc_spacing = 2;
 	constexpr int right_rc_spacing = 1;
 

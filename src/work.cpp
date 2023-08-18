@@ -1687,34 +1687,68 @@ work_result work(const int argc, const char* const * const argv) try {
 		return true;
 	};
 
+	auto get_logic_eye = [&]() {
+		if (const auto custom = visit_current_setup(
+			[](const auto& setup) { 
+				return setup.find_current_camera_eye(); 
+			}
+		)) {
+			return *custom;
+		}
+
+		if (get_viewed_character().dead()) {
+			return camera_eye();
+		}
+
+		return gameplay_camera.get_current_eye();
+	};
+
+	auto get_camera_requested_fov_expansion = [&]() {		
+		return 1.0f / get_logic_eye().zoom;
+	};
+
 	auto get_camera_eye = [&](const config_lua_table& viewing_config) {		
-		auto logic_eye = [&]() {
-			if(const auto custom = visit_current_setup(
-				[](const auto& setup) { 
-					return setup.find_current_camera_eye(); 
+		auto logic_eye = get_logic_eye();
+
+		const auto considered_fov_size = viewing_config.drawing.fog_of_war.size;
+		const float target_visible_pixels_y = considered_fov_size.y;
+
+		const bool should_zoom_to_fov = viewing_config.drawing.snap_zoom_to_fov_size;
+
+		if (should_zoom_to_fov && target_visible_pixels_y != 0.0f) {
+			const float screen_y = float(logic_get_screen_size().y);
+
+			float closest_zoom_multiple = 1.0f;
+			float closest_multiple_dist = std::numeric_limits<float>::max();
+
+			for (int i = -10; i <= 10; ++i) {
+				if (i == 0) {
+					continue;
 				}
-			)) {
-				return *custom;
-			}
-			
-			if (get_viewed_character().dead()) {
-				return camera_eye();
+
+				const auto mult = i < 0 ? (1.0f / (-i)) : float(i);
+				const auto scaled = target_visible_pixels_y * mult;
+
+				const auto dist = std::abs(scaled - screen_y);
+
+				if (dist < closest_multiple_dist) {
+					closest_multiple_dist = dist;
+					closest_zoom_multiple = mult;
+				}
 			}
 
-			return gameplay_camera.get_current_eye();
-		}();
+			const auto eps = viewing_config.drawing.snap_zoom_to_multiple_if_different_by_pixels;
 
-		if (viewing_config.drawing.auto_zoom) {
-			const float target_resolution_height = 1080;
-			const float screen_h = float(logic_get_screen_size().y);
+			auto zoom_to_snap_to_fov = screen_y / target_visible_pixels_y;
 
-			if (screen_h != target_resolution_height) {
-				logic_eye.zoom *= screen_h / target_resolution_height;
+			if (closest_multiple_dist <= eps) {
+				zoom_to_snap_to_fov = closest_zoom_multiple;
 			}
+
+			logic_eye.zoom *= zoom_to_snap_to_fov;
 		}
-		else if (viewing_config.drawing.custom_zoom != 1.0f) {
-			logic_eye.zoom *= std::max(1.0f, viewing_config.drawing.custom_zoom);
-		}
+
+		logic_eye.zoom *= std::max(1.0f, viewing_config.drawing.custom_zoom);
 
 		return logic_eye;
 	};
@@ -2381,7 +2415,6 @@ work_result work(const int argc, const char* const * const argv) try {
 
 		gameplay_camera.tick(
 			screen_size,
-			viewing_config.drawing.fog_of_war,
 			interp,
 			frame_delta,
 			viewing_config.camera,
@@ -3469,6 +3502,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				return illuminated_rendering_input {
 					{ viewed_character, cone },
+					get_camera_requested_fov_expansion(),
 					get_queried_cone(viewing_config),
 					calc_pre_step_crosshair_displacement(viewing_config),
 					get_audiovisuals(),
@@ -3660,7 +3694,9 @@ work_result work(const int argc, const char* const * const argv) try {
 					get_queried_cone(new_viewing_config).get_visible_world_rect_aabb()
 				);
 
-				const auto& fog_of_war = new_viewing_config.drawing.fog_of_war;
+				auto fog_of_war = new_viewing_config.drawing.fog_of_war;
+				fog_of_war.size *= get_camera_requested_fov_expansion();
+
 				const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
 #if BUILD_STENCIL_BUFFER

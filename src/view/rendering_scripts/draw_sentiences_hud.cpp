@@ -55,6 +55,9 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	const auto watched_character_transform = watched_character.get_viewing_transform(interp);
 	const auto queried_camera_aabb = in.queried_cone.get_visible_world_rect_aabb();
 
+	const auto circular_bars_size_mult = std::max(1.0f, in.text_camera.eye.zoom);
+	const auto circle_positioning_zoom = 1.0f;
+
 	auto viewer_faction_matches = [&](const auto f) {
 		if (!watched_character) {
 			return false;
@@ -260,7 +263,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 
 		for (const auto& meter : in.meters) {
 			const auto& this_tex = meter.tex;
-			const auto circle_radius = static_cast<int>(this_tex.get_original_size().x / 2);
+			const auto circle_radius = circular_bars_size_mult * static_cast<int>(this_tex.get_original_size().x / 2);
 			auto meter_output = augs::drawer { meter.output.triangles };
 			auto& meter_specials = meter.output.specials;
 
@@ -333,7 +336,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 				auto health_col = info.color;
 				health_col.mult_alpha(teleport_alpha);
 
-				meter_output.aabb_centered(this_tex, vec2(transform.pos).discard_fract(), health_col);
+				meter_output.aabb_centered(this_tex, vec2(in.text_camera.to_screen_space(transform.pos)).discard_fract(), vec2(this_tex.get_original_size()) * circular_bars_size_mult, health_col);
 
 				const auto push_angles = [&](
 					const float lower_outside, 
@@ -476,7 +479,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 								ammo_color.a = 200;
 								ammo_color.mult_alpha(teleport_alpha);
 
-								meter_output.aabb_centered(this_tex, vec2(transform.pos).discard_fract(), ammo_color);
+								meter_output.aabb_centered(this_tex, vec2(in.text_camera.to_screen_space(transform.pos)).discard_fract(), ammo_color);
 
 								circle_info new_info;
 
@@ -544,7 +547,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					const auto cam = in.text_camera;
 					const vec2i screen_space_circle_center = cam.to_screen_space(transform.pos);
 					const auto radius = circle_radius * info.circle_radius_mult_for_text;
-					const auto text_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(cam.eye.zoom * (radius + 6.f), bbox, info.angle) - bbox / 2;
+					const auto text_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(circle_positioning_zoom * (radius + 6.f), bbox, info.angle) - bbox / 2;
 					//health_points.pos = screen_space_circle_center + vec2::from_degrees(in.angle).set_length(circle_displacement_length);
 
 					auto stroke_color = black;
@@ -582,7 +585,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 			const auto angle = starting_health_angle + in.color_indicator_angle;
 			const auto bbox = indicator_tex.get_original_size();
 
-			const auto indicator_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(cam.eye.zoom * (outermost_circle_radius + 6.f), bbox, angle) - bbox / 2;
+			const auto indicator_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(circle_positioning_zoom * (outermost_circle_radius + 6.f), bbox, angle) - bbox / 2;
 
 			col.mult_alpha(teammate_indicators.value);
 

@@ -442,15 +442,17 @@ void settings_gui_state::perform(
 
 				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
 
+#if DEPRECATED
 				revertable_checkbox("Auto-zoom", config.drawing.auto_zoom);
 
-				tooltip_on_hover("The game will automatically zoom in\nto render the same area it would render\nif it was running under 1080p resolution.");
+				tooltip_on_hover("The game will automatically zoom in or out\nto match the height of the player's field of vision.\n(1920x1080 on most maps).");
 
 				if (!config.drawing.auto_zoom) {
 					auto indent = scoped_indent();
 
 					revertable_slider("Custom zoom", config.drawing.custom_zoom, 1.0f, 10.0f, "%.1f");
 				}
+#endif
 
 				revertable_enum_radio("Vsync mode", config.window.vsync_mode);
 
@@ -996,8 +998,6 @@ void settings_gui_state::perform(
 						revertable_slider(SCOPE_CFG_NVP(smoothing.averages_per_sec), 0.f, 100.f); 
 						revertable_slider(SCOPE_CFG_NVP(smoothing.average_factor), 0.01f, 0.95f); 
 					}
-
-					revertable_checkbox(SCOPE_CFG_NVP(adjust_zoom_to_available_fog_of_war_size));
 				}
 
 				{

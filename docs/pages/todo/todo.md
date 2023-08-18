@@ -6,6 +6,16 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Zoom semantics (for the last time)
+    - FoW and FoV are different things
+        - Fog of war is occlusion
+        - Field of view determines the viewing size
+            - Obviously fog of war is clipped by the field of view
+            - But field of view settings are still effective even if fog of war is disabled
+    - Maps can specify both FoV size and if FoW is enabled
+    - There's also FoW angle and FoW occlussion
+        - Technically could switch both
+
 - arbitrary upscaling (only UI left)
     - verdict: use zoom on gameplay, let's render GUI to a separate fbo and stretch it
 

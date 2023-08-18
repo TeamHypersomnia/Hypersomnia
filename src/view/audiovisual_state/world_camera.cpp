@@ -20,7 +20,6 @@ camera_eye world_camera::get_current_eye() const
 
 void world_camera::tick(
 	const vec2i screen_size,
-	const fog_of_war_settings& fog_of_war,
 	const interpolation_system& interp,
 	const augs::delta dt,
 	world_camera_settings settings,
@@ -31,17 +30,17 @@ void world_camera::tick(
 		return;
 	}
 
-	const auto target_zoom = [&]() {
-		if (settings.adjust_zoom_to_available_fog_of_war_size) {
-			const auto diff = fog_of_war.size.x - screen_size.x;
+	const auto min_height_for_zoom = 500.0f;
+	//const auto max_height_for_zoom = 1500.0f;
 
-			if (diff > settings.adjust_zoom_if_fov_bigger_by_pixels) {
-				const auto result = screen_size.x / fog_of_war.size.x;
-				return result;
+	const auto height = [&]() {
+		if (entity_to_chase.alive()) {
+			if (auto movement = entity_to_chase.find<components::movement>()) {
+				return movement->portal_inertia_ms;
 			}
 		}
 
-		return 1.f;
+		return 0.0f;
 	}();
 
 	const auto& cosm = entity_to_chase.get_cosmos();
@@ -57,7 +56,7 @@ void world_camera::tick(
 
 			cone.transform = entity_to_chase.get_viewing_transform(interp);
 			cone.transform.rotation = 0;
-			cone.zoom = target_zoom;
+			cone.zoom = current_eye.zoom;
 
 			return cone;
 		}
@@ -134,7 +133,10 @@ void world_camera::tick(
 				player_position_previously_seen = player_position_at_previous_step = player_pos;
 			}
 
-			target_value = (player_pos - player_position_previously_seen) * cosm.get_fixed_delta().in_milliseconds();
+			const auto dt_ms = cosm.get_fixed_delta().in_milliseconds();
+
+			const auto pos_dt = player_pos - player_position_previously_seen;
+			target_value = pos_dt * dt_ms;
 
 			if (target_value.length() < vec2(additional_position_smoothing.value).length()) {
 				// braking
@@ -144,11 +146,30 @@ void world_camera::tick(
 				settings.additional_position_smoothing.averages_per_sec += 1.5;
 			}
 
-			if (target_value.length() > 50) {
-				target_value.set_length(50);
+			auto lookout_bound = 50;
+
+			const auto surfing_zoom  = 1.0f / (1 + 1.5f);
+
+			if (height > min_height_for_zoom) {
+				lookout_bound = 400;
+				target_zoom = surfing_zoom;
+			}
+			else {
+				if (target_zoom < 1.0f) {
+					if (height <= 200.0f) {
+						target_zoom = augs::interp(1.0f, surfing_zoom, height/200.0f);
+					}
+				}
+			}
+
+			if (target_value.length() > lookout_bound) {
+				target_value.set_length(lookout_bound);
 			}
 
 			// LOG("%x, %x, %x", *(vec2*)&player_pos, *(vec2*)&player_position_at_previous_step, *(vec2*)&target_value);
+		}
+		else {
+			target_zoom = 1.0f;
 		}
 		//else {
 		//	target_value = chased_transform.interpolation_direction(previous);
@@ -157,11 +178,24 @@ void world_camera::tick(
 		//}
 
 		additional_position_smoothing.target_value = target_value * (-1);
-		additional_position_smoothing.tick(dt, settings.additional_position_smoothing);
+
+		auto smoothing_settings = settings.additional_position_smoothing;
+
+		const bool surfing = std::abs(current_eye.zoom - 1.0f) > 0.01f;
+
+		if (surfing) {
+			additional_position_smoothing.target_value *= -1;
+			smoothing_settings.averages_per_sec *= 1.f;
+		}
+
+		additional_position_smoothing.tick(dt, smoothing_settings);
 
 		if (dont_smooth_once) {
 			additional_position_smoothing.snap_value_to_target();
 		}
+	}
+	else {
+		target_zoom = 1.0f;
 	}
 
 	if (enable_smoothing) {
@@ -172,6 +206,20 @@ void world_camera::tick(
 	}
 
 	dont_smooth_once = false;
+
+	{
+		auto avgs_per_sec = 10.0f;
+
+		if (target_zoom > current_eye.zoom) {
+			avgs_per_sec = 5.0f;
+			float zoom_averaging_constant = 1.0f - static_cast<float>(std::pow(0.5f, avgs_per_sec * dt.in_seconds()));
+			current_eye.zoom = augs::interp(current_eye.zoom, target_zoom, zoom_averaging_constant);
+		}
+		else {
+			float zoom_averaging_constant = 1.0f - static_cast<float>(std::pow(0.5f, avgs_per_sec * dt.in_seconds()));
+			current_eye.zoom = augs::interp(current_eye.zoom, target_zoom, zoom_averaging_constant);
+		}
+	}
 
 	advance_flash(entity_to_chase, dt);
 }
