@@ -18,6 +18,7 @@ struct world_camera_settings {
 
 	float angled_look_length = 100.f;
 	float look_bound_expand = 0.5f;
+	float surfing_zoom_out = 2.5f;
 	bool enable_smoothing = true;
 	// END GEN INTROSPECTOR
 };

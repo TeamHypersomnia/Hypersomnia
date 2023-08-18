@@ -8,14 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 - Add context tips as separate resource, just like hazards, portal-based
 
-- DISREGARDED:
-    - Switch to previous weapon when:
-        - throwing nade
-        - planting bomb
-    - nOT NECESSARILY - why?
-        - After planting the bomb, you might want to default to holster to quickly jump off.
-            - very important in competitive environments where every second matters
-
 - Fix miniatures not downloading!!! Both externally and through UDP
     - Don't make a "metaresource", this will overcomplicate things.
         - Just force it to become a normal resource but it is always referenced (if it's backed, always with non-default properties, if it's unbacked, always default)

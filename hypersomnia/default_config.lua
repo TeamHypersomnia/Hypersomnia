@@ -216,6 +216,7 @@ treat_as_music_sounds_longer_than_secs = 5,
       average_factor = 0.5,
       averages_per_sec = 0
     },
+    surfing_zoom_out = 2,
     angled_look_length = 100,
     enable_smoothing = true,
     look_bound_expand = 0.5,

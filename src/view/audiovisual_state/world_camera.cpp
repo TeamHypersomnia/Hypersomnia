@@ -18,6 +18,19 @@ camera_eye world_camera::get_current_eye() const
 	return output_eye;
 }
 
+namespace augs {
+	template <class T, class A = float>
+	A calc_alpha(const T a, const T b, const T v) {
+		// Check if a and b are the same to prevent division by zero
+		if (a == b) {
+			// Return 0 or another appropriate default value, 
+			// or perhaps handle this case differently depending on your requirements
+			return static_cast<A>(0);
+		}
+		return static_cast<A>(v - a) / static_cast<A>(b - a);
+	}
+}
+
 void world_camera::tick(
 	const vec2i screen_size,
 	const interpolation_system& interp,
@@ -148,10 +161,11 @@ void world_camera::tick(
 
 			auto lookout_bound = 50;
 
-			const auto surfing_zoom  = 1.0f / (1 + 1.5f);
+			const auto surfing_zoom_out = std::max(1.0f, settings.surfing_zoom_out);
+			const auto surfing_zoom = 1.0f / surfing_zoom_out;
 
 			if (height > min_height_for_zoom) {
-				lookout_bound = 400;
+				lookout_bound = augs::interp(50, 400, augs::calc_alpha(1.0f, 2.5f, surfing_zoom_out));
 				target_zoom = surfing_zoom;
 			}
 			else {

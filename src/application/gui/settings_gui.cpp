@@ -989,6 +989,7 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.camera;
 
 					revertable_slider(SCOPE_CFG_NVP(look_bound_expand), 0.0f, 0.5f);
+					revertable_slider(SCOPE_CFG_NVP(surfing_zoom_out), 1.0f, 2.5f);
 					
 					revertable_checkbox(SCOPE_CFG_NVP(enable_smoothing));
 

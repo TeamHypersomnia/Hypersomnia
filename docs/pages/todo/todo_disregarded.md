@@ -5,6 +5,15 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- DISREGARDED:
+    - Switch to previous weapon when:
+        - throwing nade
+        - planting bomb
+    - nOT NECESSARILY - why?
+        - After planting the bomb, you might want to default to holster to quickly jump off.
+            - very important in competitive environments where every second matters
+
+
 - Perhaps exit the editor to project selector setup?
     - Not really because it introduces another step when we want to host a map for real
 
