@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-17 19:06:09.633823 UTC"
+        "version_timestamp": "2023-08-18 11:34:46.048287 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -120,6 +120,16 @@
             "path": "gfx/arrow.gif",
             "file_hash": "9a1a6c21468029644ae059faf2a0d59fae4b69399b90eb2c6b3721e2346c30ff",
             "id": "@arrow",
+            "size": [500, 250]
+        },
+        {
+            "path": "gfx/arrow_green.gif",
+            "file_hash": "a5a603e1000edc2d429209336b93110632f953e2a75777268b6767d931e3f935",
+            "id": "@arrow_green",
+            "neon_map": {
+                "light_colors": [[16, 242, 0, 255]
+                ]
+            },
             "size": [500, 250]
         },
         {
@@ -277,7 +287,6 @@
     "layers": [
         {
             "id": "Level21",
-            "is_open_in_editor": false,
             "nodes": [
                 "exit19",
                 "point_light (106)",
@@ -1366,11 +1375,11 @@
         {
             "id": "Level9",
             "nodes": [
-                "obs12 (1)-left",
+                "obs12 (5)",
                 "obs12 (1)",
-                "obs12 (2)-left",
+                "obs12 (6)",
                 "obs12 (2)",
-                "obs12-left",
+                "obs12 (7)",
                 "obs12",
                 "obs10",
                 "obs9",
@@ -1423,7 +1432,7 @@
                 "team_spawn (15)",
                 "fury_thrower",
                 "obs12 (4)",
-                "obs12 (3)-left",
+                "obs12 (8)",
                 "obs12 (3)",
                 "obs10 (3)",
                 "obs10 (2)",
@@ -1514,6 +1523,8 @@
                 "dev_floor_256 (42)",
                 "Strong lamp (14)",
                 "Strong lamp (17)",
+                "arrow_green",
+                "arrow_green (1)",
                 "Strong lamp (85)",
                 "Strong lamp (84)",
                 "Strong lamp (16)",
@@ -1768,7 +1779,6 @@
         },
         {
             "id": "Level2",
-            "is_open_in_editor": false,
             "nodes": [
                 "point_light (3)",
                 "point_light (2)",
@@ -1807,7 +1817,6 @@
         },
         {
             "id": "Level1",
-            "is_open_in_editor": false,
             "nodes": [
                 "hazard (2)",
                 "tip1_1",
@@ -3420,7 +3429,7 @@
             "size": [64, 896]
         },
         {
-            "id": "obs12 (1)-left",
+            "id": "obs12 (5)",
             "type": "@materials/glass.png",
             "pos": [37792.0, 7616.00048828125],
             "rotation": -90.0,
@@ -3428,7 +3437,7 @@
             "flip_horizontally": true
         },
         {
-            "id": "obs12 (2)-left",
+            "id": "obs12 (6)",
             "type": "@materials/glass.png",
             "pos": [37728.0, 7104.0],
             "rotation": -90.0,
@@ -3436,14 +3445,14 @@
             "flip_horizontally": true
         },
         {
-            "id": "obs12-left",
+            "id": "obs12 (7)",
             "type": "@materials/glass.png",
             "pos": [37888.0, 7232.0],
             "size": [128, 384],
             "flip_horizontally": true
         },
         {
-            "id": "obs12 (3)-left",
+            "id": "obs12 (8)",
             "type": "@yellow_barrier",
             "pos": [37888.0, 7487.99951171875],
             "rotation": -180.0,
@@ -6505,6 +6514,20 @@
             "pos": [18688.0, 28416.0],
             "size": [256, 1536],
             "color": [0, 255, 0, 255]
+        },
+        {
+            "id": "arrow_green (1)",
+            "type": "@arrow_green",
+            "pos": [20413.0, 10015.0],
+            "rotation": -180.0,
+            "size": [250, 125]
+        },
+        {
+            "id": "arrow_green",
+            "type": "@arrow_green",
+            "pos": [20413.0, 8930.0],
+            "rotation": -180.0,
+            "size": [250, 125]
         },
         {
             "id": "Strong lamp (1)",
@@ -11244,7 +11267,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Hold {WALK_SILENTLY} to walk silently.\nEnemies won't hear your footsteps.\nWalk over the red floor!"
+            "context_tip": "Hold {WALK_SILENTLY} to walk silently.\nEnemies won't hear your footsteps.\nWalk over the blue floor!"
         },
         {
             "id": "entry3",

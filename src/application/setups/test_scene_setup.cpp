@@ -600,7 +600,12 @@ bool test_scene_setup::post_solve(const const_logic_step step) {
 }
 
 void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
-	config.window.name = "Hypersomnia test scene";
+	if (is_tutorial()) {
+		config.window.name = "Hypersomnia - Tutorial";
+	}
+	else {
+		config.window.name = "Hypersomnia - Shooting range";
+	}
 
 	if (speed < 1.0f) {
 		//config.interpolation.enabled = false;
