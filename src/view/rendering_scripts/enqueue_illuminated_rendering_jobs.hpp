@@ -180,7 +180,7 @@ void enqueue_illuminated_rendering_jobs(
 		draw_sentiences_hud(input);
 	};
 
-	auto explosives_hud_job = [&dedicated, global_time_seconds, &necessarys, &settings, &interp, &cosm, viewed_character]() {
+	auto explosives_hud_job = [cone, &dedicated, global_time_seconds, &necessarys, &settings, &interp, &cosm, viewed_character]() {
 		int current_hud = 0;
 
 		auto& target_vectors = dedicated[DV::EXPLOSIVE_HUDS];
@@ -204,6 +204,7 @@ void enqueue_illuminated_rendering_jobs(
 		};
 
 		draw_circular_progresses({
+			cone,
 			settings,
 			requests,
 			interp,

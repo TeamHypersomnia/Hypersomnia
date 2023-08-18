@@ -108,6 +108,7 @@ enum class circular_bar_type {
 using requested_explosive_huds = augs::enum_array<requested_explosive_hud, circular_bar_type>;
 
 struct draw_circular_progresses_input {
+	const camera_cone camera;
 	const game_drawing_settings& settings;
 	const requested_explosive_huds requests;
 	const interpolation_system& interpolation;

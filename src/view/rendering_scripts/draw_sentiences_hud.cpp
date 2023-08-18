@@ -55,7 +55,7 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	const auto watched_character_transform = watched_character.get_viewing_transform(interp);
 	const auto queried_camera_aabb = in.queried_cone.get_visible_world_rect_aabb();
 
-	const auto circular_bars_size_mult = std::max(1.0f, in.text_camera.eye.zoom);
+	const auto circular_bars_size_mult = in.text_camera.eye.zoom;
 	const auto circle_positioning_zoom = 1.0f;
 
 	auto viewer_faction_matches = [&](const auto f) {

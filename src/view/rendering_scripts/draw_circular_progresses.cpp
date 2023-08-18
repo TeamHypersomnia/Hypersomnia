@@ -36,7 +36,7 @@ void draw_circular_progresses(const draw_circular_progresses_input in) {
 			const auto highlight_color = augs::interp(first_col, second_col, (1 - highlight_amount)* (1 - highlight_amount));
 
 			auto drawer = get_drawer(reh);
-			drawer.aabb_centered(tex, vec2(tr.pos).discard_fract(), highlight_color);
+			drawer.aabb_centered(tex, vec2(in.camera.to_screen_space(tr.pos)).discard_fract(), highlight_color);
 
 			augs::special s;
 
