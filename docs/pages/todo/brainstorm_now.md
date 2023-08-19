@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- use pure color highlight shader when loading atlas
+
 - Add context tips as separate resource, just like hazards, portal-based
 
 - Fix miniatures not downloading!!! Both externally and through UDP

@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-18 19:47:30.410931 UTC"
+        "version_timestamp": "2023-08-19 12:45:33.513633 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -15642,8 +15642,8 @@
             "id": "portal (16)",
             "type": "portal",
             "shape": "BOX",
-            "pos": [136512.0, 121536.0],
-            "size": [2048, 25216],
+            "pos": [136512.0, 121024.0],
+            "size": [2048, 26240],
             "color_preset": "PINK",
             "ignore_airborne_characters": true,
             "enter_time_ms": 0.0,
