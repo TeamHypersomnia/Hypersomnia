@@ -13,6 +13,7 @@
 #include "augs/string/path_sanitization.h"
 #include "augs/string/to_forward_slashes.h"
 #include "view/necessary_image_id.h"
+#include "augs/filesystem/find_path.h"
 
 namespace augs {
 	bool natural_order(const std::string& a, const std::string& b);
@@ -25,6 +26,8 @@ struct editor_filesystem_node_ui_state {
 using editor_filesystem_ui_state = 
 	std::map<augs::path_type, editor_filesystem_node_ui_state>
 ;
+
+std::string get_hex_representation(const unsigned char*, size_t length);
 
 struct forbidden_path_result {
 	augs::path_type forbidden_path;
@@ -52,11 +55,23 @@ struct forbidden_path_result {
 		const sanitization::forbidden_path_type r
 	) : forbidden_path(p), reason(r) {
 		const auto bad_filename = augs::string_windows_friendly(forbidden_path.filename());
-		const auto good_filename = sanitization::try_generate_sanitized_filename(bad_filename);
+		auto good_filename = sanitization::try_generate_sanitized_filename(bad_filename);
+
+		if (const bool only_extension = begins_with(good_filename, ".")) {
+			const auto ext = good_filename;
+
+			good_filename = std::string("file_");
+
+			if (const auto num_chars = bad_filename.find("."); num_chars != std::string::npos) {
+				good_filename += ::get_hex_representation(reinterpret_cast<const unsigned char*>(bad_filename.data()), num_chars);
+			}
+
+			good_filename += ext;
+		}
 
 		len = augs::string_windows_friendly(p).length();
 
-		if (good_filename != bad_filename) {
+		if (good_filename != bad_filename && !good_filename.empty()) {
 			suggested_filename = good_filename;
 		}
 	}

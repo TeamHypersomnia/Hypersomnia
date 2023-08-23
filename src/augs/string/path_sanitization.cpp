@@ -503,6 +503,7 @@ TEST_CASE("try_generate_sanitized_filename") {
 	REQUIRE(S::try_generate_sanitized_filename("file.txt") == "file.txt");
 	REQUIRE(S::try_generate_sanitized_filename("file.TXT") == "file.txt");
 	REQUIRE(S::try_generate_sanitized_filename("File 123.Txt") == "file_123.txt");
+	REQUIRE(S::try_generate_sanitized_filename("ćąśąð…łə") == "");
 	REQUIRE(S::try_generate_sanitized_filename("TEST@#$%^&*()_file-+=!;.txt") == "test_file.txt");
 	REQUIRE(S::try_generate_sanitized_filename("A B C.txt") == "a_b_c.txt");
 	REQUIRE(S::try_generate_sanitized_filename("123.ABC") == "123.abc");
