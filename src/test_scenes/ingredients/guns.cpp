@@ -3706,7 +3706,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 2.3f);
-			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false, "0.1");
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 1000;
 			set_chambering_duration_ms(meta, 200.f);

@@ -424,6 +424,10 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	}
 }
 
+bool viewables_streaming::general_atlas_in_progress() const {
+	return general_atlas_progress.has_value();
+}
+
 void viewables_streaming::display_loading_progress() const {
 	using namespace augs::imgui;
 

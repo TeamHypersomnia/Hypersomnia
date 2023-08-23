@@ -103,9 +103,11 @@ class viewables_streaming {
 	bool rescan_for_modified_images = false;
 	bool rescan_for_modified_sounds = false;
 
+	augs::graphics::texture blank_atlas = augs::image::white_pixel();
+	augs::graphics::texture general_atlas = augs::image::white_pixel();
+
 public:
 	augs::graphics::texture avatar_preview_tex = augs::image::white_pixel();
-	augs::graphics::texture general_atlas = augs::image::white_pixel();
 
 	texture_in_progress<avatar_atlas_output> avatars;
 	texture_in_progress<ad_hoc_atlas_output> ad_hoc;
@@ -135,7 +137,16 @@ public:
 	void finalize_pending_tasks();
 
 	bool finished_generating_atlas() const;
+	bool general_atlas_in_progress() const;
 	void display_loading_progress() const;
 
 	void request_rescan();
+
+	auto& get_general_atlas() {
+		return general_atlas;
+	}
+
+	auto& get_general_or_blank() {
+		return general_atlas_in_progress() ? blank_atlas : general_atlas;
+	}
 };

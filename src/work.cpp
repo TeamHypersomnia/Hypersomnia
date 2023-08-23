@@ -3333,7 +3333,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					get_blank_texture(),
 					new_viewing_config,
 					streaming.necessary_images_in_atlas,
-					std::addressof(streaming.general_atlas),
+					std::addressof(streaming.get_general_atlas()),
 					std::addressof(streaming.avatars.texture),
 					streaming.images_in_atlas,
 					streaming.avatars.in_atlas,
@@ -3378,7 +3378,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			};
 
 			auto fallback_overlay_gray_color = [&](augs::renderer& chosen_renderer) {
-				streaming.general_atlas.set_as_current(chosen_renderer);
+				streaming.get_general_atlas().set_as_current(chosen_renderer);
 
 				necessary_shaders.standard->set_as_current(chosen_renderer);
 				setup_standard_projection(chosen_renderer);
@@ -3513,7 +3513,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					get_interpolation_ratio(),
 					chosen_renderer,
 					game_thread_performance,
-					std::addressof(streaming.general_atlas),
+					!has_current_setup() ? std::addressof(streaming.get_general_or_blank()) : std::addressof(streaming.get_general_atlas()),
 					necessary_fbos,
 					necessary_shaders,
 					all_visible,
@@ -3542,7 +3542,7 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				chosen_renderer.draw_call_imgui(
 					imgui_atlas, 
-					std::addressof(streaming.general_atlas), 
+					std::addressof(streaming.get_general_atlas()), 
 					std::addressof(streaming.avatars.texture), 
 					std::addressof(streaming.avatar_preview_tex),
 					std::addressof(streaming.ad_hoc.texture)
@@ -3563,7 +3563,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					chosen_renderer,
 					necessary_shaders,
 					necessary_fbos,
-					streaming.general_atlas,
+					streaming.get_general_atlas(),
 					viewed_character,
 					get_drawer,
 					flash_mult,
