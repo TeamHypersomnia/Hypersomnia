@@ -45,6 +45,10 @@ void bake_fresh_atlas(
 	thread_local randomization rng;
 #endif
 
+	auto bad_size = [ms = in.max_atlas_size](const auto sz) {
+		return sz.any_zero() || sz.x > ms || sz.y > ms;
+	};
+
 	{
 		auto scope = measure_scope_additive(out.profiler.loading_image_sizes);
 
@@ -56,6 +60,10 @@ void bake_fresh_atlas(
 					auto sc = measure_scope(scope); 
 					return augs::image::get_size(input_img_id); 
 				}();
+
+				if (bad_size(u_size)) {
+					throw augs::image_loading_error("bad size");
+				}
 
 				out_entry.cached_original_size_pixels = u_size;
 
@@ -80,6 +88,10 @@ void bake_fresh_atlas(
 					auto sc = measure_scope(scope); 
 					return augs::image::get_size(input_image_bytes); 
 				}();
+
+				if (bad_size(u_size)) {
+					throw augs::image_loading_error("bad size");
+				}
 
 				out_entry.cached_original_size_pixels = u_size;
 

@@ -1142,6 +1142,17 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 						try {
 							new_resource.editable.size = augs::image::get_size(full_path);
 
+							auto bad_size = [](const auto sz) {
+								/* Arbitrary, should be enough */
+								const auto ms = 64000;
+
+								return sz.any_zero() || sz.x > ms || sz.y > ms;
+							};
+
+							if (bad_size(new_resource.editable.size)) {
+								new_resource.editable.size.set(32, 32);
+							}
+
 							if (full_path.extension() == ".gif") {
 								new_resource.animation_frames = augs::image::read_gif_frame_meta(full_path);
 							}

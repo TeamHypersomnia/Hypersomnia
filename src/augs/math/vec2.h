@@ -611,6 +611,15 @@ struct basic_vec2 {
 		}
 	}
 
+	bool any_zero() const {
+		if constexpr(std::is_integral_v<type>) {
+			return x == 0 || y == 0;
+		}
+		else {
+			return repro::fabs(x) < AUGS_EPSILON<real> || repro::fabs(y) < AUGS_EPSILON<real>;
+		}
+	}
+
 	bool is_zero() const {
 		if constexpr(std::is_integral_v<type>) {
 			return x == 0 && y == 0;
