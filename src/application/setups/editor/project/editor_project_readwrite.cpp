@@ -6,6 +6,7 @@
 #include "application/setups/editor/detail/is_editor_typed_node.h"
 #include "application/setups/editor/detail/has_reference_count.h"
 #include "application/setups/editor/resources/resource_traits.h"
+#include "application/setups/editor/project/editor_project_paths.h"
 #include "augs/image/image.h"
 #include "augs/templates/in_order_of.h"
 
@@ -314,6 +315,16 @@ bool editor_project::mark_changed_resources(const editor_official_resource_map& 
 				if (changed) {
 					if constexpr(is_pathed_resource_v<resource_type>) {
 						any_pathed_project_resources_changed = true;
+					}
+				}
+
+				if constexpr(is_sprite) {
+					const bool is_miniature = resource.external_file.path_in_project == editor_project_paths::get_miniature_filename();
+
+					if (is_miniature) {
+						if (resource.found_on_disk) {
+							resource.changes_detected = true;
+						}
 					}
 				}
 			}

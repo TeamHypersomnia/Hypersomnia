@@ -32,9 +32,9 @@ Only 27 MB!
 <img src="https://hypersomnia.xyz/images/linux_icon.svg" height=16 hspace=1></a> is built with ``-g``
 -->
 
-*Archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
-
 The game will start with an **interactive Tutorial!**
+
+*Archives are [digitally signed.](https://github.com/TeamHypersomnia/Hypersomnia/blob/master/src/signing_keys.h) You can [verify signatures.](https://hypersomnia.xyz/builds/latest/)*
 
 # Watch gameplay
 

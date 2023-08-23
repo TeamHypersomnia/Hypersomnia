@@ -366,7 +366,7 @@ void editor_filesystem_gui::perform(const editor_project_files_input in) {
 					return;
 				}
 
-				if (node.sanitization_skipped) {
+				if (node.hidden_in_explorer) {
 					return;
 				}
 			}

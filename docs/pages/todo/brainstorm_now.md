@@ -6,19 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- use pure color highlight shader when loading atlas
-
 - Add context tips as separate resource, just like hazards, portal-based
-
-- Fix miniatures not downloading!!! Both externally and through UDP
-    - Don't make a "metaresource", this will overcomplicate things.
-        - Just force it to become a normal resource but it is always referenced (if it's backed, always with non-default properties, if it's unbacked, always default)
-
-    - disregard:
-        - Easiest will be to just always add the miniature to the external resources and never show it
-        - Just have a separate external resource field in editor project so that it doesn't appear as a valid resource in editor
-            - but gets written to json and thus requested when downloading nevertheless
-
 
 - Settings: split Gameplay tab into HUD and Rendering (or idk name it somehow else)
 - Editor: Fix lighting inconsistency between with and without FOV

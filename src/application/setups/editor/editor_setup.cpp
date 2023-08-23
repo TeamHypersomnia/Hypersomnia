@@ -830,11 +830,11 @@ void editor_setup::on_window_activate() {
 void editor_setup::rescan_physical_filesystem() {
 	last_invalid_paths.clear();
 
-	auto should_skip_sanitization = [&](auto path) {
-		return paths.is_project_specific_file(path.make_preferred());
+	auto should_hide_in_explorer = [&](auto path) {
+		return paths.should_hide_in_explorer(path.make_preferred());
 	};
 
-	files.rebuild_from(paths.project_folder, should_skip_sanitization, last_invalid_paths);
+	files.rebuild_from(paths.project_folder, should_hide_in_explorer, last_invalid_paths);
 	gui.filesystem.clear_drag_drop();
 	rebuild_ad_hoc_atlas = true;
 
@@ -978,7 +978,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 	auto existing_paths = std::unordered_set<std::string>();
 
 	auto register_resources_found_on_disk = [&](editor_filesystem_node& file) {
-		if (file.sanitization_skipped) {
+		if (file.hidden_in_explorer) {
 			return;
 		}
 
@@ -1020,7 +1020,7 @@ editor_paths_changed_report editor_setup::rebuild_pathed_resources() {
 				return;
 			}
 
-			if (file.sanitization_skipped) {
+			if (file.hidden_in_explorer) {
 				return;
 			}
 

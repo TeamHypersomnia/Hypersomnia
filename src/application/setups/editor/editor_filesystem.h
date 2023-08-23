@@ -75,7 +75,7 @@ struct editor_filesystem_node {
 	bool is_open = false;
 	bool passed_filter = false;
 	bool should_sort = true;
-	bool sanitization_skipped = false;
+	bool hidden_in_explorer = false;
 
 	std::string name;
 	std::string after_text;
@@ -273,20 +273,20 @@ struct editor_filesystem_node {
 	void build_from(
 		const augs::path_type& folder_path,
 		const augs::path_type& project_folder,
-		F skip_sanitization,
+		F should_hide_in_explorer,
 		editor_forbidden_paths_result& out_ignored_paths
 	) {
 		clear();
 
-		auto add_entry = [this, skip_sanitization, &project_folder, &out_ignored_paths](const auto& untrusted_path, const bool folder) {
-			auto add_file_or_folder = [&](auto filename, const bool sanitization_skipped) {
+		auto add_entry = [this, should_hide_in_explorer, &project_folder, &out_ignored_paths](const auto& untrusted_path, const bool folder) {
+			auto add_file_or_folder = [&](auto filename, const bool hidden_in_explorer) {
 				if (folder) {
 					filename.replace_extension("");
 				}
 
 				editor_filesystem_node new_node;
 				new_node.name = filename.string();
-				new_node.sanitization_skipped = sanitization_skipped;
+				new_node.hidden_in_explorer = hidden_in_explorer;
 
 				if (folder) {
 					new_node.type = editor_filesystem_node_type::FOLDER;
@@ -308,7 +308,7 @@ struct editor_filesystem_node {
 
 			const auto relative_in_project = std::filesystem::relative(untrusted_path, project_folder);
 
-			if (skip_sanitization(untrusted_path)) {
+			if (should_hide_in_explorer(untrusted_path)) {
 				add_file_or_folder(untrusted_path.filename(), true);
 			}
 			else {
@@ -346,7 +346,7 @@ struct editor_filesystem_node {
 			subfolder.build_from(
 				folder_path / subfolder.name,
 				project_folder, 
-				skip_sanitization, 
+				should_hide_in_explorer, 
 				out_ignored_paths
 			);
 		}
@@ -367,7 +367,7 @@ struct editor_filesystem_node {
 		for_each_file_recursive([&id_counter, &out_subjects, &project_folder](auto& node) {
 			auto path = project_folder / node.get_path_in_project();
 
-			if (node.sanitization_skipped) {
+			if (node.hidden_in_explorer) {
 				return;
 			}
 
@@ -414,12 +414,12 @@ struct editor_filesystem {
 	template <class F>
 	void rebuild_from(
 		const augs::path_type& project_folder,
-		F skip_sanitization,
+		F should_hide_in_explorer,
 		editor_forbidden_paths_result& out_ignored_paths
 	) {
 		auto saved_state = make_ui_state();
 
-		root.build_from(project_folder, project_folder, skip_sanitization, out_ignored_paths);
+		root.build_from(project_folder, project_folder, should_hide_in_explorer, out_ignored_paths);
 
 		apply_ui_state(saved_state);
 	}

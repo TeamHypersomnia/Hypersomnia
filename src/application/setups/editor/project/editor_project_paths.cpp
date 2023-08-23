@@ -118,7 +118,7 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	legacy_autosave_json = in_folder("autosave.json");
 	last_saved_json = in_folder("last_saved.json");
 	editor_view = in_folder("editor_view.json");
-	miniature = in_folder("miniature.png");
+	miniature = in_folder(get_miniature_filename());
 	screenshot = in_folder("screenshot.png");
 	signature = in_folder("signature");
 
@@ -127,13 +127,12 @@ editor_project_paths::editor_project_paths(const augs::path_type& target_folder)
 	fast_load_bin = in_cache("fast_load.bin");
 }
 
-bool editor_project_paths::is_project_specific_file(const augs::path_type& path) const {
+bool editor_project_paths::should_hide_in_explorer(const augs::path_type& path) const {
 	return 
 		path == project_json
 		|| path == legacy_autosave_json
 		|| path == last_saved_json
 		|| path == editor_view
-		|| path == miniature
 		|| path == screenshot
 		|| path == signature
 		|| path == compressed_json

@@ -6456,3 +6456,15 @@ This will discard your redo history."
     - Dash should just take stamina on credit like in souls
     - We can make the dash a little more expensive to compensate so that we can still do 4 dashes on a full bar
         - This game is too fast anyway so we wouldn't want more dashes here
+- use pure color highlight shader when loading atlas
+
+- Fix miniatures not downloading!!! Both externally and through UDP
+    - Don't make a "metaresource", this will overcomplicate things.
+        - Just force it to become a normal resource but it is always referenced (if it's backed, always with non-default properties, if it's unbacked, always default)
+
+    - disregard:
+        - Easiest will be to just always add the miniature to the external resources and never show it
+        - Just have a separate external resource field in editor project so that it doesn't appear as a valid resource in editor
+            - but gets written to json and thus requested when downloading nevertheless
+
+

@@ -28,12 +28,16 @@ struct editor_project_paths {
 
 	editor_project_paths(const augs::path_type& target_folder);
 
-	bool is_project_specific_file(const augs::path_type&) const;
+	bool should_hide_in_explorer(const augs::path_type&) const;
 
 	std::string load_project_json() const;
 
 	auto resolve(const augs::path_type& path) const {
 		return project_folder / path;
+	}
+
+	static const char* get_miniature_filename() {
+		return "miniature.png";
 	}
 };
 
