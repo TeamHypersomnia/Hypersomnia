@@ -309,22 +309,25 @@ bool editor_project::mark_changed_resources(const editor_official_resource_map& 
 					compared.size = vec2i::zero;
 				}
 
-				const bool changed = !(compared == defaults);
+				const bool changed = [&]() {
+					if constexpr(is_sprite) {
+						const bool is_miniature = resource.external_file.path_in_project == editor_project_paths::get_miniature_filename();
+
+						if (is_miniature) {
+							if (resource.found_on_disk) {
+								return true;
+							}
+						}
+					}
+
+					return !(compared == defaults);
+				}();
+
 				resource.changes_detected = changed;
 
 				if (changed) {
 					if constexpr(is_pathed_resource_v<resource_type>) {
 						any_pathed_project_resources_changed = true;
-					}
-				}
-
-				if constexpr(is_sprite) {
-					const bool is_miniature = resource.external_file.path_in_project == editor_project_paths::get_miniature_filename();
-
-					if (is_miniature) {
-						if (resource.found_on_disk) {
-							resource.changes_detected = true;
-						}
 					}
 				}
 			}
