@@ -446,7 +446,10 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 		auto tooltip = typesafe_sprintf("Upload the arena to:\n%x", in.setup.get_settings().upload_url);
 
 		if (!in.setup.upload_icon_visible()) {
-			tooltip += "\n\nYou need an upload API key.\nGo to Settings -> Editor -> Uploading.";
+			tooltip += "\n\nYou need to provide an API key.\nGo to Settings -> Editor -> Uploading.";
+		}
+		else {
+			tooltip += "\n\n(CTRL+SHIFT+U)";
 		}
 
 		if (do_icon(ID::UPLOAD_ICON, tooltip, in.setup.upload_icon_visible(), in.setup.upload_in_progress())) {
