@@ -57,6 +57,10 @@ struct editor_history : public editor_history_base {
 		last_autosaved_revision = get_current_revision();
 	}
 
+	void mark_revision_as_uploaded() {
+		last_uploaded_revision = std::nullopt;
+	}
+
 	auto find_saved_revision() const {
 		return saved_at_revision;
 	}
@@ -77,7 +81,12 @@ struct editor_history : public editor_history_base {
 		return last_autosaved_revision == get_current_revision();
 	}
 
+	bool at_uploaded_revision() const {
+		return last_uploaded_revision == get_current_revision();
+	}
+
 private:
+	std::optional<index_type> last_uploaded_revision;
 	std::optional<index_type> last_autosaved_revision;
 	std::optional<index_type> saved_at_revision;
 };

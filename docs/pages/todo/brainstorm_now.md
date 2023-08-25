@@ -6,6 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Make dualwielding chapter easier
+    - no armor and longer interval
+
+- Editor: subresources.
+    - Would be good to not fuck around and do it properly.
+    - Would have to save subresources as json diffs
+        - State-wise they could stay as they are and only reserialize with json internally, upon modifications, no?
+        - Have to reserialize whenever
+            - a) subresource changes
+            - b) parent resource changes
+            - Actually only when the parent resource changes
+
+
+- Maybe let's first do editing official resources?
+    - Pass for now: We'd have to fully specify all official resources in json format
+
+    - Ability to reset to a specific default
+        - Yeah making these semantics first will help later with subresources
+    - Because this might also come in handy for officials
+
+
 - Add context tips as separate resource, just like hazards, portal-based
 
 - Settings: split Gameplay tab into HUD and Rendering (or idk name it somehow else)
@@ -14,6 +35,9 @@ summary: That which we are brainstorming at the moment.
     - we'll use vent for the tutorial
 
 - recheck what happens if missing arena is chosen, afaik it chose de_jedrula still and reported hash of 0
+
+- Editor: search bar for filtering properties
+    - Boring so for later
 
 - Editor: Grouping.
     - Ctrl+G groupizes selection.

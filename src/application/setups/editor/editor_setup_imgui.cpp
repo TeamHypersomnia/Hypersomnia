@@ -11,6 +11,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/window_framework/window.h"
 #include "3rdparty/imgui/imgui_internal.h"
+#include "application/setups/client/https_file_uploader.h"
 
 void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
@@ -51,6 +52,10 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 	if (auto main_menu = scoped_menu_bar()) {
 		const auto file_button_label = get_arena_name_with_star();
 
+		auto item_if = [](const bool condition, const char* label, const char* shortcut = nullptr) {
+			return ImGui::MenuItem(label, shortcut, nullptr, condition);
+		};
+
 		if (auto menu = scoped_menu(file_button_label.c_str())) {
 			if (ImGui::MenuItem("Save", "CTRL+S")) {
 				save();
@@ -62,14 +67,16 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 
 			ImGui::Separator();
 
+			if (item_if(upload_icon_visible(), "Upload arena", "CTRL+SHIFT+U")) {
+				upload_to_arena_server();
+			}
+
+			ImGui::Separator();
+
 			if (ImGui::MenuItem("Go back to Projects list")) {
 				imgui_return_once = custom_imgui_result::GO_TO_PROJECT_SELECTOR;
 			}
 		}
-
-		auto item_if = [](const bool condition, const char* label, const char* shortcut = nullptr) {
-			return ImGui::MenuItem(label, shortcut, nullptr, condition);
-		};
 
 		if (auto menu = scoped_menu("Edit")) {
 			if (item_if(can_undo(), "Undo", "CTRL+Z")) {
@@ -268,6 +275,9 @@ void editor_setup::perform_main_menu_bar(const perform_custom_imgui_input in) {
 
 custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	(void)in;
+
+	advance_uploading();
+	do_uploading_imgui();
 
 	arena_gui_base::perform_custom_imgui(in);
 

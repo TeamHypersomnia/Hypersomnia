@@ -441,6 +441,17 @@ void editor_toolbar_gui::perform(const editor_toolbar_input in) {
 			}
 		}
 
+		category_separator();
+
+		auto tooltip = typesafe_sprintf("Upload the arena to:\n%x", in.setup.get_settings().upload_url);
+
+		if (!in.setup.upload_icon_visible()) {
+			tooltip += "\n\nYou need an upload API key.\nGo to Settings -> Editor -> Uploading.";
+		}
+
+		if (do_icon(ID::UPLOAD_ICON, tooltip, in.setup.upload_icon_visible(), in.setup.upload_in_progress())) {
+			in.setup.upload_to_arena_server();
+		}
 	};
 
 	DockingToolbar(get_title().c_str(), &toolbar_axis, is_docked, icons_callback);

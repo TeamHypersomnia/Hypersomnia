@@ -184,6 +184,7 @@ namespace assets {
 
 		DISCORD_BUTTON,
 		DOWNLOAD_ICON,
+		UPLOAD_ICON,
 
 		COUNT
 		// END GEN INTROSPECTOR

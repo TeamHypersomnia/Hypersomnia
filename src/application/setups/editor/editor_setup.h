@@ -101,6 +101,8 @@ struct intercosm;
 struct editor_resource_pools;
 struct editor_official_resource_map;
 
+class https_file_uploader;
+
 template <bool C>
 using editor_arena_handle = online_arena_handle<C>;
 
@@ -169,6 +171,10 @@ class editor_setup : public default_setup_settings, public arena_gui_mixin<edito
 	bool should_recount_internal_resource_references = true;
 
 	std::optional<custom_imgui_result> imgui_return_once;
+
+	std::unique_ptr<https_file_uploader> upload_session;
+	std::size_t num_uploaded = 0;
+	std::size_t num_total_uploaded = 0;
 
 	void create_official_filesystems();
 
@@ -803,4 +809,19 @@ public:
 	void recount_internal_resource_references_if_needed();
 
 	bool warp_cursor_once = false;
+
+	void advance_uploading();
+	bool upload_icon_visible() const;
+	bool upload_in_progress() const;
+	void upload_to_arena_server();
+
+	std::string get_project_json_filename() const {
+		return paths.project_json.filename().string();
+	}
+
+	const auto& get_settings() const {
+		return settings;
+	}
+
+	void do_uploading_imgui();
 };

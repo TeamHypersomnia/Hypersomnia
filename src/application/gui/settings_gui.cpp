@@ -1421,6 +1421,17 @@ void settings_gui_state::perform(
 				}
 #endif
 
+				if (auto node = scoped_tree_node("Uploading")) {
+					auto& scope_cfg = config.editor;
+
+					thread_local bool show = false;
+					const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+
+					input_text("Upload API key", scope_cfg.upload_api_key, flags); ImGui::SameLine(); checkbox("Show", show); revert(scope_cfg.upload_api_key);
+
+					revertable_input_text("Upload URL", scope_cfg.upload_url);
+				}
+
 				break;
 			}
 			case settings_pane::INTERFACE: {

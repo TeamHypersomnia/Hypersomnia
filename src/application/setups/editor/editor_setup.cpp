@@ -72,6 +72,8 @@
 #include "application/arena/build_arena_from_editor_project.hpp"
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/passes_filter.h"
+#include "application/setups/client/https_file_uploader.h"
+#include "augs/misc/readable_bytesize.h"
 
 render_layer_filter get_layer_filter_for_miniature();
 
@@ -472,6 +474,7 @@ bool editor_setup::handle_input_before_game(
 				switch (k) {
 					case key::E: in.window.reveal_in_explorer(paths.project_json); return true;
 					case key::Z: redo(); return true;
+					case key::U: upload_to_arena_server(); return true;
 					default: break;
 				}
 			}
@@ -2320,7 +2323,9 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			|| try_preffix("Discarded", orange)
 			|| try_preffix("Reapplied", pink)
 			|| try_preffix("Showing", green)
+			|| try_preffix("Successfully uploaded", green)
 			|| try_preffix("Successfully", green)
+			|| try_preffix("Upload failed.", red)
 			|| try_preffix("Filled", green)
 			|| try_preffix("Exported", green)
 			|| try_preffix("Written", green)
@@ -3544,6 +3549,171 @@ void editor_setup::recount_internal_resource_references_if_needed() {
 	if (should_recount_internal_resource_references) {
 		project.recount_references(official.resources, false);
 		should_recount_internal_resource_references = false;
+	}
+}
+
+bool editor_setup::upload_icon_visible() const {
+	return !settings.upload_api_key.empty();
+}
+
+bool editor_setup::upload_in_progress() const {
+	return upload_session != nullptr;
+}
+
+void editor_setup::upload_to_arena_server() {
+	if (!upload_icon_visible()) {
+		return;
+	}
+
+	upload_session  = std::make_unique<https_file_uploader>(
+		paths.project_folder,
+		settings.upload_url,
+		settings.upload_api_key
+	);
+
+	autosave_now_if_needed();
+
+	num_total_uploaded = 0;
+
+	auto gather_entries = [&]<typename P>(const P& pool) {
+		using R = typename P::mapped_type;
+
+		if constexpr(is_pathed_resource_v<R>) {
+			for (const auto& typed_resource : pool) {
+				const auto path = typed_resource.external_file.path_in_project.string();
+				if (typed_resource.should_be_tracked()) {
+					upload_session->upload_file(path);
+					++num_total_uploaded;
+				}
+			}
+		}
+	};
+
+	project.rescan_resources_to_track(
+		official.resources,
+		official.resource_map
+	);
+
+	project.resources.pools.for_each_container(gather_entries);
+
+	++num_total_uploaded;
+
+	upload_session->upload_file(get_project_json_filename());
+
+	num_uploaded = 0;
+}
+
+void editor_setup::do_uploading_imgui() { 
+	using namespace augs::imgui;
+
+	if (!upload_in_progress()) {
+		return;
+	}
+
+	const auto uploaded_bytes = upload_session->get_uploaded_bytes();
+	const auto total_bytes = upload_session->get_total_bytes();
+
+	const auto this_percent_complete = total_bytes == 0 ? 0.0f : float(uploaded_bytes) / total_bytes;
+	const auto total_progress = [&]() {
+		if (num_total_uploaded == 0) {
+			/* Can't estimate if we don't even have the json file. */
+			return 0.0f;
+		}
+
+		if (num_total_uploaded == 1) {
+			return this_percent_complete;
+		}
+
+		return (float(num_uploaded) + this_percent_complete) / num_total_uploaded;
+	}();
+
+	const auto line_height = 28;
+	const auto num_lines = 13;
+
+	const ImGuiWindowFlags window_flags = 
+		ImGuiWindowFlags_NoTitleBar
+		| ImGuiWindowFlags_NoResize 
+		| ImGuiWindowFlags_NoScrollbar 
+		| ImGuiWindowFlags_NoScrollWithMouse
+		| ImGuiWindowFlags_NoMove 
+		| ImGuiWindowFlags_NoSavedSettings
+	;
+
+	const auto window_size = ImVec2(800, line_height * num_lines);
+
+	center_next_window(ImGuiCond_Always);
+
+	ImGui::SetNextWindowSize(window_size);
+
+	const auto window_name = "Upload progress";
+	auto window = scoped_window(window_name, nullptr, window_flags);
+
+	text_color("Uploading:", cyan);
+	ImGui::SameLine();
+	text_color(paths.arena_name, yellow);
+	ImGui::Separator();
+
+	const auto bytes_per_second = upload_session->get_bandwidth();
+
+	text_color("Target: ", cyan);
+	ImGui::SameLine();
+	text(settings.upload_url);
+	ImGui::Separator();
+
+	text(typesafe_sprintf(
+		"File: %x of %x",
+		num_uploaded + 1,
+		num_total_uploaded
+	));
+
+	ImGui::ProgressBar(total_progress, ImVec2(-1.0f,0.0f));
+
+	text("\n");
+
+	const auto uploaded_file = upload_session->get_currently_downloaded_file();
+
+	text(uploaded_file);
+
+	ImGui::ProgressBar(this_percent_complete, ImVec2(-1.0f, 0.0f));
+
+	const auto readable_speed = readable_bytesize(bytes_per_second , "%2f");
+
+	text(typesafe_sprintf(
+		"%x / %x",
+		readable_bytesize(uploaded_bytes, "%2f"),
+		readable_bytesize(total_bytes, "%2f")
+	));
+
+	text_disabled(typesafe_sprintf("(Speed: %x/s)", readable_speed));
+
+	text("\n");
+	ImGui::Separator();
+
+	if (ImGui::Button("Abort")) {
+		recent_message.set("Aborted arena upload.\nArena files might be in an invalid state.", settings.upload_url);
+		upload_session = nullptr;
+	}
+}
+
+void editor_setup::advance_uploading() {
+	if (!upload_in_progress()) {
+		return;
+	}
+
+	if (upload_session->is_running()) {
+		if (auto uploaded = upload_session->get_uploaded_file()) {
+			++num_uploaded;
+
+			if (const bool finished = num_uploaded == num_total_uploaded) {
+				upload_session = nullptr;
+
+				recent_message.set("Successfully uploaded files to: %x.", settings.upload_url);
+			}
+		}
+	}
+	else {
+		recent_message.set("Upload failed.\nReason: %x", upload_session->get_last_error());
+		upload_session = nullptr;
 	}
 }
 

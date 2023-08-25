@@ -86,5 +86,8 @@ struct editor_settings {
 	rgba rectangular_selection_border_color = { 65, 131, 196, 120 };
 
 	editor_action_notification_settings action_notification;
+
+	std::string upload_api_key;
+	std::string upload_url;
 	// END GEN INTROSPECTOR
 };

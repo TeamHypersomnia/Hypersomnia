@@ -359,7 +359,10 @@ treat_as_music_sounds_longer_than_secs = 5,
       show_for_ms = 3000,
       text_padding = { x = 10, y = 10 },
       offset = { y = 80 },
-    }
+    },
+
+    upload_url = "https://hypersomnia.xyz/upload",
+    upload_api_key = ""
   },
 
   debugger = {
