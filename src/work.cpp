@@ -1193,7 +1193,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				emplace_main_menu(lua, *official, config.main_menu);
 			});
 
-			map_catalogue_gui.request_rescan();
+			map_catalogue_gui.request_refresh();
 		}
 	};
 

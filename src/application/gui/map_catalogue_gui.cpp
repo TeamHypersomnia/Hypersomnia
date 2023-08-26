@@ -711,6 +711,14 @@ void map_catalogue_gui_state::request_rescan() {
 	headless.request_rescan();
 }
 
+void headless_map_catalogue::request_refresh() {
+	refreshed_once = false;
+}
+
+void map_catalogue_gui_state::request_refresh() {
+	headless.request_refresh();
+}
+
 arena_synchronizer_input headless_map_catalogue::launch_download_all(const address_string_type& address) {
 	arena_synchronizer_input downloadable_arenas;
 

@@ -149,6 +149,7 @@ public:
 	bool finalize_download();
 
 	void request_rescan();
+	void request_refresh();
 
 	const std::optional<multi_arena_synchronizer>& get_downloading() const { return downloading; }
 
@@ -202,6 +203,7 @@ public:
 
 	void refresh(address_string_type);
 	void request_rescan();
+	void request_refresh();
 
 	std::optional<std::vector<ad_hoc_atlas_subject>> get_new_ad_hoc_images();
 
