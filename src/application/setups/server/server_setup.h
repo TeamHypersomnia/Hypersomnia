@@ -170,6 +170,7 @@ class server_setup :
 
 	struct webhook_job {
 		mode_player_id player_id;
+		session_id_type session_id;
 		std::unique_ptr<std::future<std::string>> job;
 	};
 
@@ -178,7 +179,10 @@ class server_setup :
 	uint32_t duel_pic_counter = 0;
 
 	template <class F>
-	void push_webhook_job(F&& f, mode_player_id = mode_player_id());
+	void push_webhook_job(F&& f);
+
+	template <class F>
+	void push_session_webhook_job(mode_player_id session_id, F&& f);
 
 	void finalize_webhook_jobs();
 
@@ -291,7 +295,10 @@ public:
 	}
 
 	static mode_player_id to_mode_player_id(const client_id_type&);
-	std::optional<session_id_type> find_session_id(const client_id_type&);
+	static client_id_type to_client_id(const mode_player_id&);
+
+	std::optional<session_id_type> find_session_id(const client_id_type&) const;
+	std::optional<session_id_type> find_session_id(const mode_player_id&) const;
 
 	const auto& get_viewed_cosmos() const {
 		return scene.world;
@@ -623,6 +630,8 @@ public:
 
 	server_client_state* find_client_state(mode_player_id);
 	const server_client_state* find_client_state(mode_player_id) const;
+
+	std::optional<client_id_type> find_client_id(session_id_type) const;
 
 	std::vector<std::string> get_all_nicknames() const;
 

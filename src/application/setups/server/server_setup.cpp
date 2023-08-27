@@ -216,12 +216,23 @@ bool server_heartbeat::is_valid() const {
 }
 
 template <class F>
-void server_setup::push_webhook_job(F&& f, mode_player_id id) {
+void server_setup::push_webhook_job(F&& f) {
+	push_session_webhook_job(mode_player_id(), std::forward<F>(f));
+}
+
+template <class F>
+void server_setup::push_session_webhook_job(const mode_player_id player_id, F&& f) {
 	auto ptr = std::make_unique<std::future<std::string>>(
 		std::async(std::launch::async, std::forward<F>(f))
 	);
 
-	pending_jobs.emplace_back(webhook_job{ id, std::move(ptr) });
+	auto session_id = find_session_id(player_id);
+
+	if (!session_id.has_value()) {
+		session_id = session_id_type();
+	}
+	
+	pending_jobs.emplace_back(webhook_job{ player_id, *session_id, std::move(ptr) });
 }
 
 void server_setup::log_match_start_json(const messages::team_match_start_message& msg) {
@@ -462,7 +473,8 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 		auto current_arena_name = get_current_arena_name();
 		auto priv_vars = private_vars;
 
-		push_webhook_job(
+		push_session_webhook_job(
+			id,
 			[priv_vars, telegram_webhook_url, discord_webhook_url, server_name, avatar, connected_player_nickname, all_nicknames, current_arena_name]() -> std::string {
 				if (telegram_webhook_url.valid()) {
 					auto telegram_channel_id = priv_vars.telegram_channel_id;
@@ -529,8 +541,7 @@ void server_setup::push_connected_webhook(const mode_player_id id) {
 				}
 
 				return "";
-			}, 
-			id
+			}
 		);
 	}
 }
@@ -539,7 +550,9 @@ void server_setup::finalize_webhook_jobs() {
 	auto finalize = [&](auto& webhook_job) {
 		if (is_ready(*webhook_job.job)) {
 			if (auto client = find_client_state(webhook_job.player_id)) {
-				client->uploaded_avatar_url = webhook_job.job->get();
+				if (webhook_job.session_id == find_session_id(webhook_job.player_id)) {
+					client->uploaded_avatar_url = webhook_job.job->get();
+				}
 			}
 
 			return true;
@@ -862,16 +875,24 @@ mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
 	return out;
 }
 
-std::optional<session_id_type> server_setup::find_session_id(const client_id_type& id) {
+client_id_type server_setup::to_client_id(const mode_player_id& id) {
+	return static_cast<client_id_type>(id.value);
+}
+
+std::optional<session_id_type> server_setup::find_session_id(const mode_player_id& id) const {
 	return get_arena_handle().on_mode(
 		[&](const auto& mode) -> std::optional<session_id_type> {
-			if (const auto entry = mode.find(to_mode_player_id(id))) {
+			if (const auto entry = mode.find(id)) {
 				return entry->get_session_id();
 			}
 
 			return std::nullopt;
 		}
 	);
+}
+
+std::optional<session_id_type> server_setup::find_session_id(const client_id_type& id) const {
+	return find_session_id(to_mode_player_id(id));
 }
 
 online_arena_handle<false> server_setup::get_arena_handle() {
@@ -2088,6 +2109,20 @@ const server_client_state* server_setup::find_client_state(const mode_player_id 
 	}
 
 	return nullptr;
+}
+
+std::optional<client_id_type> server_setup::find_client_id(const session_id_type sid) const {
+	std::optional<client_id_type> found;
+
+	auto find = [&](const client_id_type cid, auto&) {
+		if (find_session_id(cid) == sid) {
+			found = cid;
+		}
+	};
+
+	for_each_id_and_client(find, connected_and_integrated_v);
+
+	return found;
 }
 
 server_client_state& server_setup::get_client_state(const mode_player_id id) {

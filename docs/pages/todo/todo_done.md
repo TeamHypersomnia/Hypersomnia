@@ -6468,3 +6468,5 @@ This will discard your redo history."
             - but gets written to json and thus requested when downloading nevertheless
 
 
+- wrong avatar in duel notification
+
