@@ -407,7 +407,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 							return false;
 						},
-						render_layer_filter::whitelist(render_layer::GROUND)
+						render_layer_filter::whitelist(render_layer::GROUND, render_layer::FOREGROUND, render_layer::FOREGROUND_GLOWS)
 					);
 
 					const auto drag_mult = 1 - chosen_speed_mult;

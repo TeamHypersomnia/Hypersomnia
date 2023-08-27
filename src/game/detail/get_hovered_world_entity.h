@@ -59,11 +59,18 @@ entity_id visible_entities::get_topmost_fulfilling(F condition) const {
 
 	auto result = entity_id();
 
+	bool aborted = false;
+
 	for (const auto& layer : order) {
+		if (aborted) {
+			break;
+		}
+
 		per_layer[layer].for_each_reverse(
 			[&](const auto& candidate) {
 				if (condition(candidate)) {
 					result = candidate;
+					aborted = true;
 					return callback_result::ABORT;
 				}
 

@@ -435,7 +435,7 @@ void setup_scene_object_from_resource(
 			fixtures->collision_sound_sensitivity = physical.collision_sound_sensitivity;
 		}
 
-		if (domain == editor_sprite_domain::BACKGROUND) {
+		if (domain != editor_sprite_domain::PHYSICAL) {
 			if (auto ground = scene.template find<invariants::ground>()) {
 				if (nonphysical.custom_footstep.is_enabled) {
 					ground->footstep_effect.is_enabled = true;
