@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-27 14:28:10.880410 UTC"
+        "version_timestamp": "2023-08-27 15:06:15.594143 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -2468,7 +2468,7 @@
             "id": "dev_floor_256 (25)",
             "type": "dev_floor_256",
             "pos": [8320.0, 44800.0],
-            "size": [512, 768],
+            "size": [512, 1024],
             "color": [0, 255, 0, 255]
         },
         {
@@ -2740,7 +2740,7 @@
             "id": "dev_floor_256 (39)",
             "type": "dev_floor_256",
             "pos": [9216.0, 43648.0],
-            "size": [512, 512],
+            "size": [512, 768],
             "color": [0, 255, 0, 255]
         },
         {
@@ -3491,14 +3491,14 @@
             "id": "dev_floor_256 (69)",
             "type": "dev_floor_256",
             "pos": [8896.0, 44800.0],
-            "size": [256, 768],
+            "size": [256, 1024],
             "color": [0, 255, 0, 255]
         },
         {
             "id": "dev_floor_256 (70)",
             "type": "dev_floor_256",
             "pos": [9344.0, 44800.0],
-            "size": [256, 768],
+            "size": [256, 1024],
             "color": [0, 255, 0, 255]
         },
         {
@@ -11557,7 +11557,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Press {LAST_USED_WEAPON} to pull your gun back.\n{LAST_USED_WEAPON} now quickly switches between the gun and free hands."
+            "context_tip": "Press {LAST_USED_WEAPON} to pull your gun back.\n{LAST_USED_WEAPON} now quickly switches between the gun and empty hands."
         },
         {
             "id": "tip0_2 (3)",
@@ -11593,7 +11593,7 @@
             "type": "portal",
             "shape": "BOX",
             "pos": [8320.0, 44800.0],
-            "size": [512, 768],
+            "size": [512, 1024],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -11651,7 +11651,7 @@
             "type": "portal",
             "shape": "BOX",
             "pos": [8896.0, 44800.0],
-            "size": [256, 768],
+            "size": [256, 1024],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -12029,7 +12029,7 @@
             "type": "portal",
             "shape": "BOX",
             "pos": [9344.0, 44800.0],
-            "size": [256, 768],
+            "size": [256, 1024],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -12080,14 +12080,14 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "This means you can move extremely fast,\neven with a very heavy weapon!"
+            "context_tip": "This means you can always move fast -\njust put your weapons away."
         },
         {
             "id": "tip4_1 (13)",
             "type": "portal",
             "shape": "BOX",
             "pos": [9216.0, 43648.0],
-            "size": [512, 512],
+            "size": [512, 768],
             "color_preset": "GREEN",
             "auto_scale_pitches": false,
             "enter_time_ms": 20.0,
@@ -13236,7 +13236,7 @@
             "ambience_particles": {
                 "scale_amounts": 0.30000001192092896
             },
-            "context_tip": "Your speed depends only on what's in your hands."
+            "context_tip": "Wielding heavy guns slows you down,\nbut stashed weapons do not affect your movement speed."
         },
         {
             "id": "exit12",
