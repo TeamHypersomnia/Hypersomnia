@@ -8,10 +8,10 @@
     "ignore_groups": false,
     "panned_camera": {
         "transform": {
-            "pos": [135414.84375, 102109.6875],
+            "pos": [11432.0, -2342.0],
             "rotation": 0.0
         },
-        "zoom": 0.3590323328971863
+        "zoom": 1.0
     },
     "rect_select_mode": "EVERYTHING"
 }

@@ -1,7 +1,7 @@
 {
     "meta": {
         "name": "tutorial",
-        "version_timestamp": "2023-08-19 12:45:33.513633 UTC"
+        "version_timestamp": "2023-08-27 14:28:10.880410 UTC"
     },
     "about": {
         "author": "Pythagoras",
@@ -1624,11 +1624,7 @@
                 "Strong lamp (11)",
                 "floor_right (11)",
                 "datum (1)",
-                "zamiec",
-                "zamiec_magazine (1)",
-                "zamiec_magazine",
-                "datum_gun_magazine (1)",
-                "datum_gun_magazine"
+                "zamiec"
             ]
         },
         {
@@ -10277,26 +10273,6 @@
             "pos": [5306.0, 43446.0]
         },
         {
-            "id": "zamiec_magazine",
-            "type": "zamiec_magazine",
-            "pos": [11332.0, -1481.0]
-        },
-        {
-            "id": "zamiec_magazine (1)",
-            "type": "zamiec_magazine",
-            "pos": [11387.0, -1481.0]
-        },
-        {
-            "id": "datum_gun_magazine",
-            "type": "datum_gun_magazine",
-            "pos": [11514.0, -1530.0]
-        },
-        {
-            "id": "datum_gun_magazine (1)",
-            "type": "datum_gun_magazine",
-            "pos": [11578.0, -1530.0]
-        },
-        {
             "id": "baka47_magazine",
             "type": "baka47_magazine",
             "pos": [6586.0, 43318.0]
@@ -10452,13 +10428,13 @@
         {
             "id": "kill4 (1)",
             "type": "team_spawn",
-            "pos": [11513.0, -2321.0],
+            "pos": [11503.0, -2319.0],
             "rotation": 90.0
         },
         {
             "id": "kill4",
             "type": "team_spawn",
-            "pos": [11399.0, -2321.0],
+            "pos": [11409.0, -2319.0],
             "rotation": 90.0
         },
         {

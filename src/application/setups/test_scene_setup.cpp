@@ -487,7 +487,7 @@ void test_scene_setup::do_tutorial_logic(const logic_step step) {
 
 		while (exists(i, j)) {
 			if (!killed(i, j)) {
-				if (const auto disable_armor = i == 14 || i == 16 || i == 18 || i == 19 || i == 22 || i == 23 || i == 24) {
+				if (const auto disable_armor = i == 4 || i == 14 || i == 16 || i == 18 || i == 19 || i == 22 || i == 23 || i == 24) {
 					if (auto handle = to_handle(get_opp(i, j))) {
 						if (auto armor = handle[slot_function::TORSO_ARMOR].get_item_if_any()) {
 							step.queue_deletion_of(armor, "disable armor");
