@@ -204,9 +204,11 @@ chat_gui_entry chat_gui_entry::from(
 			break;
 
 		case chat_target_type::INFO:
+			new_entry.author.clear();
 			new_entry.overridden_message_color = yellow;
 
 		case chat_target_type::INFO_CRITICAL:
+			new_entry.author.clear();
 			new_entry.overridden_message_color = orange;
 
 		default:

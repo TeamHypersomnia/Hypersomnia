@@ -977,6 +977,27 @@ server_public_vars server_setup::make_public_vars() const {
 	return pub;
 }
 
+void server_setup::rebroadcast_server_public_vars() {
+	const auto new_public_vars = make_public_vars();
+
+	last_broadcast_public_vars = new_public_vars;
+
+	auto broadcast_new_vars = [&](const auto recipient_id, const auto& c) {
+		if (c.should_pause_solvable_stream()) {
+			return;
+		}
+
+		server->send_payload(
+			recipient_id,
+			game_channel_type::RELIABLE_MESSAGES,
+
+			new_public_vars
+		);
+	};
+
+	for_each_id_and_client(broadcast_new_vars, only_connected_v);
+}
+
 void server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	if (!first_time) {
 		if (new_vars == vars) {
@@ -996,7 +1017,7 @@ void server_setup::apply(const server_vars& new_vars, const bool first_time) {
 			rechoose_arena();
 		}
 		catch (const augs::json_deserialization_error& err) {
-			LOG("Failed to load \"%x\":\n%x. Keepign the current arena.", vars.arena, err.what());
+			LOG("Failed to load \"%x\":\n%x. Keeping the current arena.", vars.arena, err.what());
 
 			vars.arena = previous_arena;
 			rechoose_arena();
@@ -1042,23 +1063,16 @@ void server_setup::apply(const server_vars& new_vars, const bool first_time) {
 	const auto new_public_vars = make_public_vars();
 
 	if (first_time || last_broadcast_public_vars != new_public_vars) {
-		last_broadcast_public_vars = new_public_vars;
-
-		auto broadcast_new_vars = [&](const auto recipient_id, const auto& c) {
-			if (c.should_pause_solvable_stream()) {
-				return;
-			}
-
-			server->send_payload(
-				recipient_id,
-				game_channel_type::RELIABLE_MESSAGES,
-
-				new_public_vars
-			);
-		};
-
-		for_each_id_and_client(broadcast_new_vars, only_connected_v);
+		rebroadcast_server_public_vars();
 	}
+}
+
+void server_setup::broadcast_info(const std::string& text) {
+	server_broadcasted_chat message;
+	message.target = chat_target_type::INFO_CRITICAL;
+	message.message = text;
+
+	broadcast(message);
 }
 
 void server_setup::apply(const config_lua_table& cfg) {

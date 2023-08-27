@@ -379,8 +379,8 @@ Irrespectively of the OS, you will need the following software in order to build
 - The newest **CMake**.
 - **git** to clone the respository and later generate version information.
 - [**ninja**](https://ninja-build.org/) to carry out the build.
-- [LLVM](https://releases.llvm.org/) toolchain version 13 or newer.
-	- For Windows, you can use [this installer](https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/LLVM-13.0.1-win64.exe), or a newer one. 
+- [LLVM](https://releases.llvm.org/) toolchain version 15.
+	- For Windows, you can use [this installer](https://github.com/llvm/llvm-project/releases/download/llvmorg-15.0.7/LLVM-15.0.7-win64.exe), or a newer one. 
 	- For Linux, use your distro-specific package. Make sure to install ```libc++```, ```libc++abi``` and ```lld``` as well.
 	- For MacOS, the version that comes pre-installed with **Xcode** is good enough.
 - [OpenSSL](https://www.openssl.org/) needed by the auto-updater to download latest game binaries over HTTPS.

@@ -312,12 +312,7 @@ bool arena_downloading_session::handle_downloaded_project_json(
 ) {
 	last_requested_file_hash = std::nullopt;
 
-	auto project_json = std::string(
-		reinterpret_cast<const char*>(bytes.data()), 
-		reinterpret_cast<const char*>(bytes.data() + bytes.size())
-	);
-
-	augs::crlf_to_lf(project_json);
+	const auto project_json = augs::crlf_to_lf_string(bytes);
 
 	if (!project_json_matches(project_json_hash, project_json)) {
 		last_error = typesafe_sprintf(

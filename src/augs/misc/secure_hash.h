@@ -4,6 +4,7 @@
 #include <string>
 
 #include "augs/misc/constant_size_string.h"
+#include "augs/readwrite/memory_stream_declaration.h"
 
 namespace augs {
 	using secure_hash_type = std::array<uint8_t, 32>;
@@ -12,6 +13,18 @@ namespace augs {
 	std::size_t crlf_to_lf(char*, std::size_t n);
 	void crlf_to_lf(std::string&);
 	void crlf_to_lf(std::vector<std::byte>&);
+
+	template <class T>
+	std::string crlf_to_lf_string(const T& bytes) {
+		auto s = std::string(
+			reinterpret_cast<const char*>(bytes.data()), 
+			reinterpret_cast<const char*>(bytes.data() + bytes.size())
+		);
+
+		crlf_to_lf(s);
+
+		return s;
+	}
 
 	hash_string_type to_hex_format(const secure_hash_type& hstr);
 	secure_hash_type to_secure_hash_byte_format(const std::string& hex_string);

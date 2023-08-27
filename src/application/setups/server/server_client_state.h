@@ -41,6 +41,7 @@ struct server_client_state {
 
 	std::string uploaded_avatar_url;
 	bool pushed_connected_webhook = false;
+	bool lingering_after_arena_reloaded = false;
 
 	downloading_type downloading_status = downloading_type::NONE;
 

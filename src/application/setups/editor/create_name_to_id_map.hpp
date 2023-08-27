@@ -40,7 +40,7 @@ inline auto editor_official_resource_map::create_name_to_id_map() const {
 	auto map_names = [&](const auto&, auto& m) {
 		for (const auto& entry : m) {
 			const auto name = to_lowercase(augs::enum_to_string(entry.first));
-			LOG("Registering %x", name);
+			//LOG("Registering %x", name);
 			const auto it = name_to_id.try_emplace(name, entry.second.operator editor_resource_id());
 
 			(void)it;

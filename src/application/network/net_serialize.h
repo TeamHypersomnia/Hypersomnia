@@ -132,7 +132,7 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream& s, ::file_download_payload& c) {
-		serialize_int(s, c.num_file_bytes, 1, max_direct_download_file_size_v);
+		serialize_int(s, c.num_file_bytes, 0, max_direct_download_file_size_v);
 
 		return true;
 	}

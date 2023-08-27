@@ -188,7 +188,7 @@ message_handler_result server_setup::handle_payload(
 			case special_client_request::RESYNC_ARENA_AFTER_FILES_DOWNLOADED:
 				LOG("Client is asking for a resync after download.");
 				
-				if (c.downloading_status == downloading_type::NONE) {
+				if (c.downloading_status == downloading_type::NONE && !c.lingering_after_arena_reloaded) {
 					LOG("Client notified about downloads completion twice.");
 					return abort_v;
 				}
@@ -359,7 +359,24 @@ message_handler_result server_setup::handle_payload(
 			if (file_bytes.empty()) {
 				try {
 					file_bytes = augs::file_to_bytes(found_file->path);
-					opened_arena_files.emplace(payload.requested_file_hash);
+
+					const auto requested = payload.requested_file_hash;
+
+					if (const bool asking_current_arena = current_arena_hash == requested) {
+						const auto actual = augs::secure_hash(augs::crlf_to_lf_string(file_bytes));
+
+						if (const bool current_arena_is_out_of_date = requested != actual) {
+							file_bytes.clear();
+
+							broadcast_info("Files changed on the server. Reloading arena.");
+							rechoose_arena();
+							rebroadcast_server_public_vars();
+						}
+					}
+
+					if (!file_bytes.empty()) {
+						opened_arena_files.emplace(payload.requested_file_hash);
+					}
 				}
 				catch (...) {
 					kick_file_not_found();
@@ -367,27 +384,44 @@ message_handler_result server_setup::handle_payload(
 				}
 			}
 
-			set_client_is_downloading_files(client_id, c, downloading_type::DIRECTLY);
-			c.when_last_sent_file_packet = get_current_time();
-			c.now_downloading_file = payload.requested_file_hash;
-			c.direct_file_chunks_left = 0;
+			if (const bool canceled = file_bytes.empty()) {
+				set_client_is_downloading_files(client_id, c, downloading_type::DIRECTLY);
 
-			file_download_payload sent_file_payload;
-			sent_file_payload.num_file_bytes = file_bytes.size();
+				file_download_payload sent_file_payload;
+				sent_file_payload.num_file_bytes = 0;
 
-			server->send_payload(
-				client_id, 
-				game_channel_type::RELIABLE_MESSAGES, 
+				server->send_payload(
+					client_id, 
+					game_channel_type::RELIABLE_MESSAGES, 
 
-				sent_file_payload
-			);
+					sent_file_payload
+				);
 
-			const auto max_to_presend = uint16_t(calc_num_chunks_per_tick_per_downloader() * 2);
-			const auto num_to_presend = std::min(max_to_presend, payload.num_chunks_to_presend);
+				c.lingering_after_arena_reloaded = true;
+			}
+			else {
+				set_client_is_downloading_files(client_id, c, downloading_type::DIRECTLY);
+				c.when_last_sent_file_packet = get_current_time();
+				c.now_downloading_file = payload.requested_file_hash;
+				c.direct_file_chunks_left = 0;
 
-			for (file_chunk_index_type chunk_index = 0; chunk_index < num_to_presend; ++chunk_index) {
-				if (!send_file_chunk(client_id, *found_file, chunk_index)) {
-					break;
+				file_download_payload sent_file_payload;
+				sent_file_payload.num_file_bytes = file_bytes.size();
+
+				server->send_payload(
+					client_id, 
+					game_channel_type::RELIABLE_MESSAGES, 
+
+					sent_file_payload
+				);
+
+				const auto max_to_presend = uint16_t(calc_num_chunks_per_tick_per_downloader() * 2);
+				const auto num_to_presend = std::min(max_to_presend, payload.num_chunks_to_presend);
+
+				for (file_chunk_index_type chunk_index = 0; chunk_index < num_to_presend; ++chunk_index) {
+					if (!send_file_chunk(client_id, *found_file, chunk_index)) {
+						break;
+					}
 				}
 			}
 		}

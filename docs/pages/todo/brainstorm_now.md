@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Remember to make a proper dlmaps script to sync back
+
 - Make dualwielding chapter easier
     - no armor and longer interval
 

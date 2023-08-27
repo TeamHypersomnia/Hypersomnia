@@ -319,6 +319,7 @@ public:
 	void apply(const server_private_vars&);
 
 	void rechoose_arena();
+	void rebroadcast_server_public_vars();
 
 	std::string describe_client(const client_id_type id) const;
 	void log_malicious_client(const client_id_type id);
@@ -551,6 +552,8 @@ public:
 	}
 
 	void broadcast(const ::server_broadcasted_chat&, std::optional<client_id_type> except = std::nullopt);
+	void broadcast_info(const std::string&);
+
 	std::string find_client_nickname(const client_id_type&) const;
 
 	auto get_game_gui_subject_id() const {

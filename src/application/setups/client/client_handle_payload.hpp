@@ -46,13 +46,19 @@ message_handler_result client_setup::handle_payload(
 
 		const auto& new_arena = new_vars.arena;
 		const auto& new_mode = new_vars.game_mode;
+		const auto& new_hash = new_vars.required_arena_hash;
 
-		LOG_NVPS(new_arena);
+		const auto& old_arena = sv_public_vars.arena;
+		const auto& old_mode = sv_public_vars.game_mode;
+		const auto& old_hash = sv_public_vars.required_arena_hash;
+
+		LOG_NVPS(new_arena, new_mode, new_hash);
+		LOG_NVPS(old_arena, old_mode, old_hash);
 
 		const bool reload_arena = 
-			new_arena != sv_public_vars.arena
-			|| new_mode != sv_public_vars.game_mode
-			|| new_vars.required_arena_hash != sv_public_vars.required_arena_hash
+			new_arena != old_arena
+			|| new_mode != old_mode
+			|| new_hash != old_hash
 		;
 
 		sv_public_vars = new_vars;
@@ -76,6 +82,16 @@ message_handler_result client_setup::handle_payload(
 		if (!last_requested_direct_file_hash.has_value()) {
 			set_disconnect_reason("The server sent a file payload despite no download request.");
 			return abort_v;
+		}
+
+		if (payload.num_file_bytes == 0) {
+			LOG("Files changed on the server. Sending RESYNC_ARENA_AFTER_FILES_DOWNLOADED.");
+			special_request(special_client_request::RESYNC_ARENA_AFTER_FILES_DOWNLOADED);
+
+			external_downloader = nullptr;
+			downloading = std::nullopt;
+
+			return continue_v;
 		}
 
 		direct_downloader = direct_file_download(*last_requested_direct_file_hash, payload.num_file_bytes);
