@@ -578,7 +578,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 		{
 			// Invalidate TOI
 			c->m_flags &= ~(b2Contact::e_toiFlag | b2Contact::e_islandFlag);
-			c->m_toiCount = 0;
+			//c->m_toiCount = 0;
 			c->m_toi = 1.0f;
 		}
 	}
@@ -845,7 +845,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 		subStep.dt = (1.0f - minAlpha) * step.dt;
 		subStep.inv_dt = 1.0f / subStep.dt;
 		subStep.dtRatio = 1.0f;
-		subStep.positionIterations = 20;
+		subStep.positionIterations = 1;
 		subStep.velocityIterations = step.velocityIterations;
 		subStep.warmStarting = false;
 		island.SolveTOI(subStep, bA->m_islandIndex, bB->m_islandIndex);

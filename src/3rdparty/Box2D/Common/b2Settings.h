@@ -77,7 +77,7 @@ typedef double float64;
 #define b2_polygonRadius		(2.0f * b2_linearSlop)
 
 /// Maximum number of sub-steps per contact in continuous physics simulation.
-#define b2_maxSubSteps			8
+#define b2_maxSubSteps			1
 
 
 // Dynamics

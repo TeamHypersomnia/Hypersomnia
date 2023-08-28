@@ -6470,3 +6470,11 @@ This will discard your redo history."
 
 - wrong avatar in duel notification
 
+- Use callgrind to see what happens when the physics slows down due to hard calculations
+	- e.g. when character is stuck inside two colliders
+	- can e.g. spawn it in the red room on cyberaqua for a test
+
+- Fix the problem with massive performance hit when something lands between walls
+	- Could this be a problem with posting collision sounds?
+		- shouldn't be as there are cooldowns
+	- Probably substepping

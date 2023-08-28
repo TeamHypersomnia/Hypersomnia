@@ -36,6 +36,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "application/gui/client/demo_player_gui.hpp"
 
+#include "application/setups/client/https_file_downloader.h"
 #include "application/setups/client/client_handle_payload.hpp"
 #include "application/network/resolve_address.h"
 #include "augs/network/netcode_sockets.h"
@@ -45,7 +46,6 @@
 #include "application/setups/editor/packaged_official_content.h"
 #include "augs/filesystem/directory.h"
 #include "augs/readwrite/json_readwrite_errors.h"
-#include "application/setups/client/https_file_downloader.h"
 #include "application/setups/server/file_chunk_packet.h"
 #include "application/setups/client/direct_file_download.hpp"
 

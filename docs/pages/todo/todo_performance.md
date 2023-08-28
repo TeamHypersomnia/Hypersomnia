@@ -10,13 +10,6 @@ summary: Just a hidden scratchpad.
 		- actually just stop them abruptly since they'll be inaudible at that point anyway
 	- this is about more than just performance because sounds are simply missed
 
-- Fix the problem with massive performance hit when something lands between walls
-	- Could this be a problem with posting collision sounds?
-		- shouldn't be as there are cooldowns
-	- Probably substepping
-
-
-
 - Move these to cosmos global solvable:
 	real32 teleport_progress = 0.0f;
 	real32 teleport_progress_falloff_speed = 0.0f;
@@ -32,10 +25,6 @@ summary: Just a hidden scratchpad.
 		- And they actually do in calc_needs_analytic_physics! So it's not a problem.
 			- as for players, they already clip sometimes anyway lol
 			- so the mapper would ensure there are no too-thin static walls which is anyway a problem with the clipping/shoot-through glitch
-
-- Use callgrind to see what happens when the physics slows down due to hard calculations
-	- e.g. when character is stuck inside two colliders
-	- can e.g. spawn it in the red room on cyberaqua for a test
 
 - Debug the performance difference between native de_cyberaqua and the new de_cyberaqua
 	- around 1200-1400 fps on CT spawn on the old one, 800-1000 on the new one
