@@ -6478,3 +6478,4 @@ This will discard your redo history."
 	- Could this be a problem with posting collision sounds?
 		- shouldn't be as there are cooldowns
 	- Probably substepping
+- show stamina deficiency in red

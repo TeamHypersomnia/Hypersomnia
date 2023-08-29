@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix editor panning in windowed mode
+
 - watch out when including cpp-httplib as it takes a lot to compile
 
 - Remember to make a proper dlmaps script to sync back

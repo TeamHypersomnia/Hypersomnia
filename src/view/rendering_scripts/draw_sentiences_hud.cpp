@@ -301,6 +301,18 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 								out.color = sentience.calc_health_color(1.0f);
 							}
 						}
+						else if constexpr(std::is_same_v<M, consciousness_meter>) {
+							const auto& meta = std::get<M>(cosm.get_common_significant().meters);
+
+							out.is_health = false;
+							out.color = meta.appearance.bar_color;
+
+							if (out.value < 0) {
+								out.color = rgba(255, 0, 0, 255);
+								out.value = -out.value;
+								out.ratio = 1.0f;
+							}
+						}
 						else {
 							const auto& meta = std::get<M>(cosm.get_common_significant().meters);
 
