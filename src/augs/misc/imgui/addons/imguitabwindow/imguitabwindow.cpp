@@ -1,3 +1,4 @@
+#define IMGUI_DEFINE_MATH_OPERATORS
 //- Common Code For All Addons needed just to ease inclusion as separate files in user code ----------------------
 #include <imgui.h>
 #undef IMGUI_DEFINE_MATH_OPERATORS
@@ -693,12 +694,12 @@ static bool OldBeginChild(const char* str_id, const ImVec2& size_arg = ImVec2(0,
     //if (!(parent_window->Flags & ImGuiWindowFlags_ShowBorders)) child_window->Flags &= ~ImGuiWindowFlags_ShowBorders;
 
     // Process navigation-in immediately so NavInit can run on first frame
-    if (!(flags & ImGuiWindowFlags_NavFlattened) && (child_window->DC.NavLayersActiveMask != 0 || child_window->DC.NavHasScroll) && GImGui->NavActivateId == id)
+    if (!(flags & ImGuiWindowFlags_NavFlattened) && (child_window->DC.NavLayersActiveMask != 0) && GImGui->NavActivateId == id)
     {
         ImGui::FocusWindow(child_window);
         ImGui::NavInitWindow(child_window, false);
         ImGui::SetActiveID(id+1, child_window); // Steal ActiveId with a dummy id so that key-press won't activate child item
-        GImGui->ActiveIdSource = ImGuiInputSource_Nav;
+        GImGui->ActiveIdSource = ImGuiInputSource_None;
     }
 
     return ret;
