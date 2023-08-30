@@ -197,7 +197,19 @@ bool start_client_gui_state::perform(
 		if (into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS) {
 			base::acquire_keyboard_once();
 
-			input_text<100>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address);
+#if IS_PRODUCTION_BUILD
+			thread_local bool show = false;
+#else
+			thread_local bool show = true;
+#endif
+
+			const auto flags = show ? 0 : ImGuiInputTextFlags_Password; 
+
+			input_text<100>("Address (ipv4, ipv6, ipv4:port, hostname:port, [ipv6]:port)", custom_address, flags);
+
+			ImGui::SameLine();
+
+			checkbox("Show", show);
 		}
 		else {
 			auto& preferred = into_start.preferred_official_address;
@@ -439,7 +451,12 @@ bool start_client_gui_state::perform(
 		ImGui::Separator();
 
 		{
-			auto scope = maybe_disabled_cols({}, !is_nickname_valid_characters(into_vars.nickname) || !::nickname_len_in_range(into_vars.nickname.length()));
+			const bool custom_addr_empty = 
+				into_start.chosen_address_type == connect_address_type::CUSTOM_ADDRESS
+				&& custom_address.empty()
+			;
+
+			auto scope = maybe_disabled_cols({}, custom_addr_empty || !is_nickname_valid_characters(into_vars.nickname) || !::nickname_len_in_range(into_vars.nickname.length()));
 
 			if (ImGui::Button("Connect!")) {
 				clear_demo_choice();

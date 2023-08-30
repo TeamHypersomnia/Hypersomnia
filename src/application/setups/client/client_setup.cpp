@@ -326,18 +326,19 @@ client_setup::client_setup(
 
 			if (resolution.result == resolve_result_type::COULDNT_RESOLVE_HOST) {
 				const auto reason = typesafe_sprintf(
-					"Couldn't resolve host: %x", 
-					resolution.host
+					"Couldn't resolve host.\nCheck if the provided address is correct."
 				);
 
 				set_disconnect_reason(reason);
+				LOG("Address: \"%x\"", resolution.host);
 			}
 			else if (resolution.result == resolve_result_type::INVALID_ADDRESS) {
 				const auto reason = typesafe_sprintf(
-					"The address: \"%x\" is invalid!", last_addr.address
+					"You have entered an invalid address!", last_addr.address
 				);
 
 				set_disconnect_reason(reason);
+				LOG("Address: \"%x\"", last_addr.address);
 			}
 			else {
 				resolved_server_address = resolution.addr;

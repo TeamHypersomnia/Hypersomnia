@@ -474,6 +474,10 @@ rgba nat_traversal_state_to_color(const nat_traversal_session::state state) {
 
 
 std::string censor_ips(std::string text) {
+#if !IS_PRODUCTION_BUILD
+	return text;
+#endif
+
 	bool censoring = false;
 
 	for (std::size_t i = 0; i < text.size(); ++i) {
