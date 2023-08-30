@@ -32,6 +32,8 @@
 
 #include "augs/templates/in_order_of.h"
 
+#include "augs/window_framework/shell.h"
+
 constexpr auto miniature_size_v = 80;
 constexpr auto preview_size_v = 400;
 
@@ -457,6 +459,29 @@ project_list_view_result projects_list_view::perform(const perform_custom_imgui_
 
 	const auto button_size_mult = 3.0f;
 	const auto button_padding_mult = 0.5f;
+
+	{
+		const bool go_to_link = selectable_with_icon(
+			in.necessary_images[assets::necessary_image_id::EDITOR_TOOL_PLAYTEST],
+			"Watch the Editor tutorial on YouTube!",
+			1.5f,
+			vec2(1.0f, 0.2f),
+			rgba(255, 255, 255, 255),
+			{
+				rgba(255, 255, 255, 20),
+				rgba(255, 255, 255, 30),
+				rgba(255, 255, 255, 80)
+			}
+		);
+
+		if (go_to_link) {
+			augs::open_url("https://www.youtube.com/watch?v=q1rfIy06_xo");
+		}
+
+		// cancel subsequent padding (I know ugly)
+		const auto text_h = ImGui::GetTextLineHeight();
+		shift_cursor(vec2(0, -text_h * button_padding_mult));
+	}
 
 	const bool create_pressed = selectable_with_icon(
 		in.necessary_images[assets::necessary_image_id::EDITOR_ICON_FILE],
