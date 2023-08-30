@@ -208,7 +208,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				cp_damage_by_sprint = def.sprint_drains_cp_per_second * delta.in_seconds();
 
-				if (cp.value <= 0.0f) {
+				if (cp.value <= cp_damage_by_sprint) {
 					cp_damage_by_sprint = 0.0f;
 					movement.was_sprint_effective = false;
 				}
