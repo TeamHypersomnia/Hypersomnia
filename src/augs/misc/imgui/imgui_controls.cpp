@@ -20,7 +20,7 @@ namespace augs {
 			const std::function<void()> after_cb
 		) {
 			const auto text_h = ImGui::GetTextLineHeight();
-			const auto button_size = ImVec2(0, text_h * size_mult);
+			const auto button_size = ImVec2(0, std::round(text_h * size_mult));
 
 			shift_cursor(vec2(0, text_h * padding_mult.y));
 

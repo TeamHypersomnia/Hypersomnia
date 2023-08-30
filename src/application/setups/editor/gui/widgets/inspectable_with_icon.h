@@ -40,7 +40,7 @@ namespace editor_widgets {
 		//const float padding_mult = 0.1f;
 
 		const auto text_h = ImGui::GetTextLineHeight();
-		const auto button_size = ImVec2(0, text_h * size_mult);
+		const auto button_size = ImVec2(0, std::round(text_h * size_mult));
 
 		//shift_cursor(vec2(0, text_h * padding_mult));
 

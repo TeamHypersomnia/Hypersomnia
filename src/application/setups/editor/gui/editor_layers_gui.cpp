@@ -341,10 +341,12 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 
 		const float size_mult = 1.1f;
 		const auto text_h = ImGui::GetTextLineHeight();
-		const auto button_size = ImVec2(0, text_h * size_mult);
+		const auto button_size = ImVec2(0, std::round(text_h * size_mult));
 		const int node_level = 1;
 
 		const bool node_disabled = !node.active || !layer.is_active();
+
+		bool scroll_here = false;
 
 		{
 			const auto before_pos = ImGui::GetCursorPos();
@@ -352,7 +354,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			if (inspect_next_item) {
 				inspect_next_item = false;
 				in.setup.inspect_only(node_id);
-				ImGui::SetScrollHereY(0.5f);
+				scroll_here = true;
 			}
 
 			bool is_inspected = in.setup.is_inspected(node_id);
@@ -563,7 +565,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 				}
 
 				if (!skip_scroll) {
-					if (scroll_once_to == inspected_variant(node_id)) {
+					if (scroll_here || scroll_once_to == inspected_variant(node_id)) {
 						scroll_once_to = std::nullopt;
 
 						ImGui::SetScrollHereY(0.5f);
@@ -729,6 +731,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 			}
 
 			bool rename_this_layer = false;
+			bool scroll_here = false;
 
 			{
 				const bool all_children_inspected = [&]() {
@@ -749,7 +752,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					inspect_next_item = false;
 					inspect_next_layer = false;
 					in.setup.inspect_only(layer_id);
-					ImGui::SetScrollHereY(0.5f);
+					scroll_here = true;
 				}
 
 				const bool is_inspected = in.setup.is_inspected(layer_id);
@@ -825,7 +828,7 @@ void editor_layers_gui::perform(const editor_layers_input in) {
 					ImGui::EndPopup();
 				}
 
-				if (scroll_once_to == inspected_variant(layer_id)) {
+				if (scroll_here || scroll_once_to == inspected_variant(layer_id)) {
 					scroll_once_to = std::nullopt;
 
 					ImGui::SetScrollHereY(0.5f);

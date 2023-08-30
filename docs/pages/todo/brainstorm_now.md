@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix double backpacks
 - Don't sprint if it causes stamina to go <= 0 
     - So that spamming sprint doesn't destroy our dash opportunity (once it regenerates, we can always do it again)
 
