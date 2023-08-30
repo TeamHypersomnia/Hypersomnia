@@ -593,9 +593,11 @@ bool editor_setup::handle_input_before_game(
 	};
 
 	if (e.msg == message::ldoubleclick) {
-		if (auto node = get_hovered_node(); node.is_set()) {
-			center_view_at_selection();
-			reset_zoom();
+		if (!has_ctrl) {
+			if (auto node = get_hovered_node(); node.is_set()) {
+				center_view_at_selection();
+				reset_zoom();
+			}
 		}
 	}
 
