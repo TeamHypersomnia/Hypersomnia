@@ -295,9 +295,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	auto draw_sentience_neons = [&]() {
 		if (const auto fog_of_war_character = cosm[in.fog_of_war_character ? *in.fog_of_war_character : entity_id()]) {
-			renderer.call_and_clear_triangles();
 			renderer.stencil_positive_test();
-			standard_shader.set_as_current(renderer);
 
 			renderer.set_stencil(true);
 			renderer.call_triangles(D::NEONS_ENEMY_SENTIENCES);
@@ -337,9 +335,10 @@ void light_system::render_all_lights(const light_system_input in) const {
 	renderer.call_triangles(D::GROUND_NEONS);
 	renderer.set_standard_blending();
 	in.neon_occlusion_callback(false);
+	renderer.call_and_clear_triangles();
 	renderer.call_triangles(D::GROUND_NEON_OCCLUDERS);
 	renderer.set_additive_blending();
-
+	standard_shader.set_as_current(renderer);
 	draw_sentience_neons();
 
 	renderer.call_triangles(D::DROPPED_ITEMS_NEONS);

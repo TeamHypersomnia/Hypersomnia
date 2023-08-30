@@ -6481,3 +6481,10 @@ This will discard your redo history."
 - show stamina deficiency in red
 - Make dualwielding chapter easier
     - no armor and longer interval
+- fix double backpacks
+- Don't sprint if it causes stamina to go <= 0 
+    - So that spamming sprint doesn't destroy our dash opportunity (once it regenerates, we can always do it again)
+
+- Editor: Fix lighting inconsistency between with and without FOV
+    - Seen on shooting range with wood material
+    - we'll use vent for the tutorial
