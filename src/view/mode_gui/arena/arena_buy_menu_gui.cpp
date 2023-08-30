@@ -922,11 +922,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			auto for_each_tool = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::tool>(
 					[&](const auto& id, const auto& flavour) {
-						if (::is_backpack_like(flavour)) {
-							callback(id, flavour);
-						}
-
-						if (!::is_armor_like(flavour)) {
+						if (::is_backpack_like(flavour) || !::is_armor_like(flavour)) {
 							callback(id, flavour);
 						}
 					}
