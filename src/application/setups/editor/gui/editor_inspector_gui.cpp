@@ -247,6 +247,24 @@ bool edit_property(
 				return false;
 			}
 
+			if (label == "Density" || label == "Friction" || label == "Bounciness") {
+				if (slider(label, property, 0.0f, 4.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
+			if (label == "Linear damping" || label == "Angular damping") {
+				if (slider(label, property, 0.0f, 20.0f)) { 
+					result = typesafe_sprintf("Set %x to %x in %x", label, property);
+					return true;
+				}
+
+				return false;
+			}
+
 			if (label == "Radius") {
 				if (slider(label, property, 0.0f, 2000.0f)) { 
 					result = typesafe_sprintf("Set %x to %x in %x", label, property);
