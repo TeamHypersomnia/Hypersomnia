@@ -6,14 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Don't sprint if it causes stamina to go <= 0 
+    - So that spamming sprint doesn't destroy our dash opportunity (once it regenerates, we can always do it again)
+
 - fix editor panning in windowed mode
 
 - watch out when including cpp-httplib as it takes a lot to compile
 
 - Remember to make a proper dlmaps script to sync back
-
-- Make dualwielding chapter easier
-    - no armor and longer interval
 
 - Editor: subresources.
     - Would be good to not fuck around and do it properly.

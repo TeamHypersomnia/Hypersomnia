@@ -6479,3 +6479,5 @@ This will discard your redo history."
 		- shouldn't be as there are cooldowns
 	- Probably substepping
 - show stamina deficiency in red
+- Make dualwielding chapter easier
+    - no armor and longer interval

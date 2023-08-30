@@ -2872,6 +2872,32 @@ void editor_inspector_gui::perform(const editor_inspector_input in) {
 			);
 		}
 
+		ImGui::SameLine();
+
+		{
+			const auto max_icon_size = ImGui::GetTextLineHeight();
+
+			const auto visibility_icon = in.necessary_images[node.active
+				? assets::necessary_image_id::EDITOR_ICON_VISIBLE
+				: assets::necessary_image_id::EDITOR_ICON_HIDDEN
+			];
+
+			const auto disabled_color = rgba(255, 255, 255, 110);
+			const auto scaled_icon_size = vec2::scaled_to_max_size(visibility_icon.get_original_size(), max_icon_size);
+
+			const bool node_disabled = !node.active;
+			const auto cols = node_disabled ? colors_nha { disabled_color, disabled_color, disabled_color } : colors_nha{};
+
+			const auto next_value = !node.active;
+
+			if (game_image_button("###NodeVisibility", visibility_icon, scaled_icon_size, cols, augs::imgui_atlas_type::GAME)) {
+				auto command = in.setup.make_command_from_selected_nodes<toggle_nodes_active_command>(next_value ? "Enabled " : "Disabled ");
+				command.update_inspector = false;
+				command.next_value = next_value;
+				in.setup.post_new_command(std::move(command));
+			}
+		}
+
 		{
 			auto edited_node_name = node.unique_name;
 
