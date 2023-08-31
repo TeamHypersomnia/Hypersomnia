@@ -482,6 +482,8 @@ void setup_per_node_flavour(
 	};
 
 	if constexpr(std::is_same_v<editor_area_marker_node, N>) {
+		node.custom_scene_flavour_id = {};
+
 		if (is_portal_based(resource.editable.type)) {
 			using entity_type = area_sensor;
 

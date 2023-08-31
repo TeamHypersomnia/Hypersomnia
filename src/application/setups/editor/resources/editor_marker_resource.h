@@ -28,7 +28,7 @@ struct editor_point_marker_resource {
 	}
 
 	static const char* get_type_name() {
-		return "Point marker";
+		return "Spot";
 	}
 };
 
@@ -58,6 +58,6 @@ struct editor_area_marker_resource {
 	}
 
 	static const char* get_type_name() {
-		return "Area marker";
+		return "Zone";
 	}
 };

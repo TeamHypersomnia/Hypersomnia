@@ -15,7 +15,7 @@ struct editor_point_marker_node : editor_node_base<
 	}
 
 	static const char* get_type_name() {
-		return "Area marker";
+		return "Spot";
 	}
 };
 
@@ -30,6 +30,6 @@ struct editor_area_marker_node : editor_node_base<
 	}
 
 	static const char* get_type_name() {
-		return "Point marker";
+		return "Zone";
 	}
 };
