@@ -46,6 +46,7 @@ struct map_catalogue_input {
 	const ad_hoc_in_atlas_map& ad_hoc_atlas;
 	const necessary_images_in_atlas_map& necessary_images;
 	augs::window& window;
+	bool streamer_mode;
 
 	auto make_headless() const {
 		return headless_map_catalogue_input { external_arena_files_provider };

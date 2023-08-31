@@ -264,7 +264,7 @@ void editor_entity_selector::do_mousemotion(
 
 	if (last_ldown_position.has_value()) {
 		const bool drag_just_left_dead_area = [&]() {
-			const auto drag_dead_area = 10.f;
+			const auto drag_dead_area = 8.f;
 			const auto drag_offset = world_cursor_pos - *last_ldown_position;
 
 			return !drag_offset.is_epsilon(drag_dead_area);

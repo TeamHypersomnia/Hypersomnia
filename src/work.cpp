@@ -1497,7 +1497,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.server_list_provider,
 			config.client_start,
 			config.official_arena_servers,
-			config.faction_view
+			config.faction_view,
+			config.streamer_mode
 		};
 	};
 
@@ -1506,7 +1507,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.server.external_arena_files_provider,
 			streaming.ad_hoc.in_atlas,
 			streaming.necessary_images_in_atlas,
-			window
+			window,
+			config.streamer_mode
 		};
 	};
 
@@ -3344,7 +3346,8 @@ work_result work(const int argc, const char* const * const argv) try {
 					necessary_sounds,
 					visit_current_setup([&](auto& setup) { return setup.find_player_metas(); }),
 					game_gui_mode_flag,
-					is_replaying_demo()
+					is_replaying_demo(),
+					new_viewing_config.streamer_mode
 				};
 			};
 
@@ -3525,6 +3528,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					write_buffer.particle_buffers,
 					viewing_config.damage_indication,
 					cached_visibility.light_requests,
+					viewing_config.streamer_mode,
 					thread_pool
 				};
 			};
@@ -3783,7 +3787,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				thread_pool.enqueue(show_performance_details_job);
 			}
 
-			if (new_viewing_config.session.show_logs) {
+			if (new_viewing_config.session.show_logs && !config.streamer_mode) {
 				thread_pool.enqueue(show_recent_logs_job);
 			}
 

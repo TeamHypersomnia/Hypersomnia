@@ -426,6 +426,10 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
+				revertable_checkbox("Streamer mode", config.streamer_mode);
+
+				tooltip_on_hover("Censors all player-provided content to prevent abuse during streams.\nWill hide:\n\n- All chat activity\n- Player avatars (spectator, scoreboard, death summaries)\n- Player nicknames on the scoreboard/spectator UI\n- Player nicknames on HUD (characters, kill indicators/summaries)\n- Community server names and info (arena/mode/connected players) in the server browser\n- Map descriptions and authors in the catalogue\n- Logs (if accidentally opened)\n\nWARNING!\nCommunity servers can host custom arenas with offensive sprites/sounds.\nTo be 100% secure, only play on the official servers -\nor on the servers of people you trust.");
+
 				text("At startup, launch.."); ImGui::SameLine();
 				revertable_enum("##LaunchAtStartup", config.launch_at_startup);
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
@@ -1030,7 +1034,7 @@ void settings_gui_state::perform(
 							revertable_slider("Alpha##colors", config.drawing.draw_teammate_indicators.value, 0.f, 1.f);
 						}
 
-						revertable_checkbox("Draw tactical indicators", config.drawing.draw_teammate_indicators.is_enabled);
+						revertable_checkbox("Draw tactical indicators", config.drawing.draw_tactical_indicators.is_enabled);
 						text_disabled("(for example, the dropped bomb's location)");
 
 						if (config.drawing.draw_tactical_indicators.is_enabled) {

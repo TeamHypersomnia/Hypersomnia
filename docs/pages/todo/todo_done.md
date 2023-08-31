@@ -6488,3 +6488,10 @@ This will discard your redo history."
 - Editor: Fix lighting inconsistency between with and without FOV
     - Seen on shooting range with wood material
     - we'll use vent for the tutorial
+- Streamer mode
+    - Don't show chat unless Y/U pressed
+    - Scoreboard nicknames
+    - Knockouts nicknames
+    - Server names in scoreboard?
+        - actually no because if you connect somewhere all bets are off already
+

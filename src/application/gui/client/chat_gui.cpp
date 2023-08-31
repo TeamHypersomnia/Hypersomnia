@@ -21,14 +21,15 @@ bool chat_gui_state::add_entry_from_mode_notification(
 ) {
 	using namespace messages;
 
-	auto do_entry = [&](const auto& str, const rgba& col) {
+	auto do_entry = [&](const auto& str, const rgba& col, const std::string author = "") {
 		chat_gui_entry new_entry;
 		new_entry.timestamp = timestamp;
-		new_entry.author = "";
+		new_entry.author = author;
 		new_entry.message = str;
 		new_entry.overridden_message_color = col;
+		new_entry.is_my_message = current_mode_id == msg.subject_mode_id;
 
-		LOG_NOFORMAT(new_entry.operator std::string());
+		LOG_NOFORMAT(new_entry.to_string());
 		add_entry(std::move(new_entry));
 	};
 
@@ -48,10 +49,11 @@ bool chat_gui_state::add_entry_from_mode_notification(
 				);
 			};
 
-			auto make_public_entry = [&](auto&&... args) {
+			auto make_public_entry = [&](auto author, auto&&... args) {
 				do_entry(
 					typesafe_sprintf(std::forward<decltype(args)>(args)...),
-					standard_gray_v
+					standard_gray_v,
+					author
 				);
 			};
 
@@ -88,10 +90,10 @@ bool chat_gui_state::add_entry_from_mode_notification(
 					break;
 				case FR::CHANGED:
 					if (target == faction_type::SPECTATOR) {
-						make_public_entry("%x has joined the Spectators.", msg.subject_name, target); 
+						make_public_entry(msg.subject_name, "has joined the Spectators."); 
 					}
 					else {
-						make_public_entry("%x has joined the %x.", msg.subject_name, format_enum(target)); 
+						make_public_entry(msg.subject_name, "has joined the %x.", format_enum(target)); 
 					}
 
 					break;
@@ -114,8 +116,9 @@ bool chat_gui_state::add_entry_from_mode_notification(
 			}();
 
 			do_entry(
-				typesafe_sprintf("%x %x.", msg.subject_name, action),
-				standard_gray_v
+				typesafe_sprintf("%x.", action),
+				standard_gray_v,
+				msg.subject_name
 			);
 
 			return true;
@@ -129,29 +132,39 @@ bool chat_gui_state::add_entry_from_mode_notification(
 	return std::visit(handle_payload, msg.payload);
 }
 
-std::string chat_gui_entry::get_author_string() const {
+std::string chat_gui_entry::get_author_string(const bool streamer_mode) const {
 	auto result = author;
+
+	if (streamer_mode && result.size() > 0) {
+		result = "Player";
+	}
 
 	if (faction_specific) {
 		result += std::string(" (") + std::string(augs::enum_to_string(author_faction)) + ")";
 	}
 
 	if (result.size() > 0) {
-		result += ": ";
+		if (is_user_message) {
+			result += ": ";
+		}
+		else {
+			result += " ";
+		}
 	}
 
 	return result;
 }
 
-chat_gui_entry::operator std::string() const {
-	return get_author_string() + message;
+std::string chat_gui_entry::to_string() const {
+	return get_author_string(false) + message;
 }
 
 chat_gui_entry chat_gui_entry::from(
 	const ::server_broadcasted_chat& payload,
 	const net_time_t timestamp,
 	const std::string& author,
-	const faction_type author_faction
+	const faction_type author_faction,
+	const bool is_my_message
 ) {
 	chat_gui_entry new_entry;
 
@@ -162,6 +175,7 @@ chat_gui_entry chat_gui_entry::from(
 
 	new_entry.author = author;
 	new_entry.message = message_str;
+	new_entry.is_my_message = is_my_message;
 
 	if (author.empty()) {
 		new_entry.overridden_message_color = rgba(200, 200, 200, 255);
@@ -169,26 +183,22 @@ chat_gui_entry chat_gui_entry::from(
 
 	switch (payload.target) {
 		case chat_target_type::KICK:
-			new_entry.author.clear();
-			new_entry.message = typesafe_sprintf("%x was kicked from the server.\nReason: %x", author, message_str);
+			new_entry.message = typesafe_sprintf("was kicked from the server.\nReason: %x", message_str);
 			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
 			break;
 
 		case chat_target_type::DOWNLOADING_FILES:
-			new_entry.author.clear();
-			new_entry.message = typesafe_sprintf("%x is downloading files.", author);
+			new_entry.message = "is downloading files.";
 			new_entry.overridden_message_color = yellow;
 			break;
 
 		case chat_target_type::DOWNLOADING_FILES_DIRECTLY:
-			new_entry.author.clear();
-			new_entry.message = typesafe_sprintf("%x is downloading files directly over UDP.", author);
+			new_entry.message = "is downloading files directly over UDP.";
 			new_entry.overridden_message_color = yellow;
 			break;
 
 		case chat_target_type::FINISHED_DOWNLOADING:
-			new_entry.author.clear();
-			new_entry.message = typesafe_sprintf("%x finished downloading files.", author);
+			new_entry.message = "finished downloading files.";
 			new_entry.overridden_message_color = green;
 			break;
 
@@ -198,18 +208,25 @@ chat_gui_entry chat_gui_entry::from(
 			break;
 
 		case chat_target_type::BAN:
-			new_entry.author.clear();
-			new_entry.message = typesafe_sprintf("%x was banned from the server.\nReason: %x", author, message_str);
+			new_entry.author = author;
+			new_entry.message = typesafe_sprintf("was banned from the server.\nReason: %x", message_str);
 			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
 			break;
 
 		case chat_target_type::INFO:
 			new_entry.author.clear();
 			new_entry.overridden_message_color = yellow;
+			break;
 
 		case chat_target_type::INFO_CRITICAL:
 			new_entry.author.clear();
 			new_entry.overridden_message_color = orange;
+			break;
+
+		case chat_target_type::GENERAL:
+		case chat_target_type::TEAM_ONLY:
+			new_entry.is_user_message = true;
+			break;
 
 		default:
 			break;
@@ -309,7 +326,8 @@ void chat_gui_state::draw_recent_messages(
 	const client_chat_settings& vars,
    	const faction_view_settings& faction_view,
 	const augs::baked_font& gui_font,
-   	const net_time_t current_time
+   	const net_time_t current_time,
+	const bool streamer_mode
 ) const {
 	using namespace augs::gui::text;
 
@@ -372,12 +390,20 @@ void chat_gui_state::draw_recent_messages(
 	for (int i = history.size() - 1; i >= starting_i; --i) {
 		const auto& entry = history[i];
 
-		const auto author_text = entry.get_author_string();
+		const auto author_text = entry.get_author_string(streamer_mode && !entry.is_my_message);
 
-		const auto author_col = get_col(entry.author_faction);
+		auto message = entry.message;
+
+		if (streamer_mode) {
+			if (entry.is_user_message && !entry.is_my_message) {
+				message = "(wrote something)";
+			}
+		}
+
+		const auto author_col = entry.overridden_message_color == rgba::zero ? get_col(entry.author_faction) : entry.overridden_message_color;
 		const auto message_col = entry.overridden_message_color == rgba::zero ? white : entry.overridden_message_color;
 
-		const auto total_text = colored(author_text, author_col) + colored(entry.message, message_col);
+		const auto total_text = colored(author_text, author_col) + colored(message, message_col);
 
 		const auto bbox = calc_size(total_text);
 		pen.y -= bbox.y + 1;

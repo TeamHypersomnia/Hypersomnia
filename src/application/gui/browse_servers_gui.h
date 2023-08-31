@@ -46,6 +46,7 @@ struct server_list_entry {
 	netcode_address_t address;
 	double time_hosted;
 	server_heartbeat heartbeat;
+	bool is_community_server = false;
 
 	ping_progress progress;
 
@@ -58,14 +59,15 @@ struct browse_servers_input {
 	client_start_input& client_start;
 	const std::vector<std::string>& official_arena_servers;
 	const faction_view_settings& faction_view;
+	const bool streamer_mode;
 };
 
 struct server_details_gui_state : public standard_window_mixin<server_details_gui_state> {
 	using base = standard_window_mixin<server_details_gui_state>;
 	using base::base;
 
-	bool perform(const server_list_entry&, const faction_view_settings&);
-	void perform_online_players(const server_list_entry&, const faction_view_settings&);
+	bool perform(const server_list_entry&, const faction_view_settings&, const bool streamer_mode);
+	void perform_online_players(const server_list_entry&, const faction_view_settings&, const bool streamer_mode);
 };
 
 class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui_state> {
@@ -73,7 +75,13 @@ class browse_servers_gui_state : public standard_window_mixin<browse_servers_gui
 
 	std::unique_ptr<browse_servers_gui_internal> data;
 
-	void show_server_list(const std::string& label, const std::vector<server_list_entry*>&, const faction_view_settings&);
+	void show_server_list(
+		const std::string& label,
+		const std::vector<server_list_entry*>&,
+		const faction_view_settings&,
+		const bool streamer_mode
+	);
+
 	std::optional<netcode_address_t> requested_connection;
 	std::string displayed_connecting_server_name;
 

@@ -633,12 +633,17 @@ void map_catalogue_gui_state::perform_list(const map_catalogue_input in) {
 
 		text(arena_name);
 		ImGui::SameLine();
-		text_disabled("- by " + entry.author);
+
+		if (!in.streamer_mode) {
+			text_disabled("- by " + entry.author);
+		}
 
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
 
-		text_disabled(entry.short_description);
+		if (!in.streamer_mode) {
+			text_disabled(entry.short_description);
+		}
 
 		ImGui::SetCursorPos(after_pos);
 
@@ -925,7 +930,10 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 						text(std::string(entry.name));
 						ImGui::SameLine();
-						text_disabled(std::string("- by ") + entry.author);
+
+						if (!in.streamer_mode) {
+							text_disabled(std::string("- by ") + entry.author);
+						}
 
 						ImGui::Separator();
 
@@ -942,7 +950,9 @@ bool map_catalogue_gui_state::perform(const map_catalogue_input in) {
 
 						ImGui::PushTextWrapPos();
 
-						text_color(entry.short_description, rgba(210, 210, 210, 255));
+						if (!in.streamer_mode) {
+							text_color(entry.short_description, rgba(210, 210, 210, 255));
+						}
 
 						ImGui::PopTextWrapPos();
 					}

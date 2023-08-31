@@ -448,6 +448,11 @@ void arena_gui_state::draw_mode_gui(
 						killer_player_id = k.knockouter.id;
 						killer_origin = k.origin;
 						killer_name = k.knockouter.name;
+
+						if (in.streamer_mode) {
+							killer_name = "Player";
+						}
+
 						break;
 					}
 				}
@@ -513,7 +518,13 @@ void arena_gui_state::draw_mode_gui(
 
 				if (tool_owner.is_set()) {
 					if (const auto owner_data = typed_mode.find(tool_owner)) {
-						return owner_data->get_nickname() + "'s";
+						auto nickname = owner_data->get_nickname();
+
+						if (in.streamer_mode) {
+							nickname = "Player";
+						}
+
+						return nickname + "'s";
 					}
 				}
 
@@ -601,9 +612,12 @@ void arena_gui_state::draw_mode_gui(
 				return 0;
 			}();
 
+			const bool not_our_avatar = killer_player_id != local_player_id;
+			const bool censor_avatar = in.streamer_mode && not_our_avatar;
+
 			const auto avatar_atlas_entry = in.avatars_in_atlas.at(killer_player_id.value); 
 			const bool avatars_enabled = logically_set(in.general_atlas, in.avatar_atlas);
-			const bool avatar_displayed = avatar_atlas_entry.exists() && avatars_enabled;
+			const bool avatar_displayed = !censor_avatar && avatar_atlas_entry.exists() && avatars_enabled;
 
 			const auto displayed_avatar_size = vec2i::square(avatar_displayed ? max_avatar_side_v : 0);
 			
@@ -792,13 +806,19 @@ void arena_gui_state::draw_mode_gui(
 					return in.config.faction_view.colors[participant.faction].standard;
 				};
 
-				auto get_name = [&](const auto& entry) -> const auto& {
+				auto get_name = [&](const auto& entry) -> std::string {
+					if (in.streamer_mode) {
+						if (entry.name.size() > 0 && entry.id != local_player_id) {
+							return "Player";
+						}
+					}
+
 					return entry.name;
 				};
 
-				const auto& knockouter = get_name(ko.knockouter);
-				const auto& assist = get_name(ko.assist);
-				const auto& victim = get_name(ko.victim);
+				const auto knockouter = get_name(ko.knockouter);
+				const auto assist = get_name(ko.assist);
+				const auto victim = get_name(ko.victim);
 
 				const bool is_suicide = ko.knockouter.id == ko.victim.id;
 

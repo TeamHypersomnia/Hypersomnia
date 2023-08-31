@@ -1563,7 +1563,8 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		vars.client_chat,
 		in.config.faction_view,
 		in.gui_fonts.gui,
-		get_current_time()
+		get_current_time(),
+		in.streamer_mode
 	);
 
 	arena_gui_base::draw_custom_gui(in);

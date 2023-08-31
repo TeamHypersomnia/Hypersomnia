@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Experimental auto zoom-out during gameplay
+    - When crosshair is near the edges, we could automatically zoom out up to e.g. 75%
+
 - fix editor panning in windowed mode
 
 - watch out when including cpp-httplib as it takes a lot to compile

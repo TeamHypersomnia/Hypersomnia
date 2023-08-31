@@ -25,7 +25,8 @@ struct chat_gui_entry {
 		const ::server_broadcasted_chat&,
 		net_time_t timestamp,
 		const std::string& author,
-		const faction_type author_faction
+		const faction_type author_faction,
+		const bool is_my_message
 	);
 
 	net_time_t timestamp = 0.0;
@@ -33,12 +34,15 @@ struct chat_gui_entry {
 	std::string author;
 	faction_type author_faction = faction_type::DEFAULT;
 	bool faction_specific = false;
+	bool is_user_message = false;
+	bool is_my_message = false;
 
 	std::string message;
+
 	rgba overridden_message_color = rgba::zero;
 
-	std::string get_author_string() const;
-	explicit operator std::string() const;
+	std::string get_author_string(const bool streamer_mode) const;
+	std::string to_string() const;
 };
 
 struct chat_gui_state {
@@ -72,6 +76,7 @@ struct chat_gui_state {
 		const client_chat_settings&, 
 		const faction_view_settings&,
 		const augs::baked_font& gui_font,
-		net_time_t current_time
+		net_time_t current_time,
+		bool streamer_mode
 	) const;
 };

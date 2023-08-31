@@ -106,6 +106,8 @@ struct config_lua_table {
 	config_lua_table(sol::state&, const augs::path_type& config_lua_path);
 
 	// GEN INTROSPECTOR struct config_lua_table
+	bool streamer_mode = false;
+
 	activity_type last_activity = activity_type::TUTORIAL;
 	launch_type launch_at_startup = launch_type::LAST_ACTIVITY;
 

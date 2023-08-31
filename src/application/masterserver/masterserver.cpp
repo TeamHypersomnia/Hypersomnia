@@ -479,7 +479,7 @@ void perform_masterserver(const config_lua_table& cfg) try {
 		}
 		else {
 			if (cfg.server_private.telegram_webhook_url.size() > 0) {
-				MSR_LOG("Discord webhook url was invalid.");
+				MSR_LOG("Telegram webhook url was invalid.");
 			}
 		}
 	};

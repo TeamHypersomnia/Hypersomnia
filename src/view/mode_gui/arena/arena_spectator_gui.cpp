@@ -99,7 +99,7 @@ void arena_spectator_gui::draw_gui(
 
 	const auto avatar_atlas_entry = in.avatars_in_atlas.at(now_spectating.value); 
 	const bool avatars_enabled = logically_set(in.general_atlas, in.avatar_atlas);
-	const bool avatar_displayed = avatar_atlas_entry.exists() && avatars_enabled;
+	const bool avatar_displayed = !in.streamer_mode && avatar_atlas_entry.exists() && avatars_enabled;
 
 	const auto displayed_avatar_size = vec2i::square(avatar_displayed ? max_avatar_side_v / 2 : 0);
 	const auto larger_font_h = in.gui_fonts.larger_gui.metrics.get_height();
@@ -116,7 +116,14 @@ void arena_spectator_gui::draw_gui(
 	});
 
 	const bool last_man_standing = num_conscious == 1 && spectated_is_conscious;
-	const auto name_text = formatted_string(spectated->get_nickname(), style(in.gui_fonts.larger_gui, white));
+
+	auto nickname = spectated->get_nickname();
+
+	if (in.streamer_mode) {
+		nickname = "Player";
+	}
+
+	const auto name_text = formatted_string(nickname, style(in.gui_fonts.larger_gui, white));
 
 	const auto& key_map = in.config.general_gui_controls;
 

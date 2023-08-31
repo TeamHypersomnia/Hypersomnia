@@ -541,9 +541,15 @@ void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 					false
 				});
 
+				auto nickname = get_bbcoded_entity_name(drawn_character);
+
+				if (in.streamer_mode && watched_character != drawn_character) {
+					nickname = "Player";
+				}
+
 				push_textual_info({
 					starting_health_angle,
-					formatted_string { get_bbcoded_entity_name(drawn_character), { in.gui_font, health_col } },
+					formatted_string { nickname, { in.gui_font, health_col } },
 					true
 				});
 

@@ -35,6 +35,7 @@ struct draw_setup_gui_input {
 	const arena_player_metas* const player_metas;
 	const bool is_cursor_released;
 	const bool demo_replay_mode;
+	const bool streamer_mode;
 
 	auto get_drawer() const {
 		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank_texture };

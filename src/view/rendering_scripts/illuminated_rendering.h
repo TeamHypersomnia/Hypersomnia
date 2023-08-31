@@ -68,6 +68,7 @@ struct illuminated_rendering_input {
 	const damage_indication_settings damage_indication;
 	
 	const std::vector<visibility_request>& light_requests;
+	const bool streamer_mode;
 	augs::thread_pool& pool;
 };
 

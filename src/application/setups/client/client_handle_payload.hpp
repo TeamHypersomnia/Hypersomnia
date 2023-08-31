@@ -158,10 +158,11 @@ message_handler_result client_setup::handle_payload(
 				payload,
 				get_current_time(),
 				sender_player_nickname,
-				sender_player_faction
+				sender_player_faction,
+				author_id == find_local_session_id()
 			);
 
-			LOG(new_entry.operator std::string());
+			LOG(new_entry.to_string());
 			client_gui.chat.add_entry(std::move(new_entry));
 		}
 

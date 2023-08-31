@@ -295,6 +295,12 @@ void arena_scoreboard_gui::draw_gui(
 	auto get_nickname_str = [&](const auto& player_id, const auto& player_data) {
 		auto str = player_data.get_nickname();
 
+		const bool is_me = player_id == draw_in.local_player_id;
+
+		if (in.streamer_mode && !is_me) {
+			str = "Player";
+		}
+
 		if (in.player_metas) {
 			const auto progress = (*in.player_metas)[player_id.value].stats.download_progress;
 
@@ -450,6 +456,9 @@ void arena_scoreboard_gui::draw_gui(
 			const auto& player_id = p.second;
 			const auto& player_data = p.first;
 
+			const bool is_local = player_id == draw_in.local_player_id;
+			const bool censor_avatar = in.streamer_mode && !is_local;
+
 			const auto player_handle = cosm[player_data.controlled_character_id];
 			const auto is_conscious = player_handle.alive() && player_handle.template get<components::sentience>().is_conscious();
 
@@ -468,8 +477,6 @@ void arena_scoreboard_gui::draw_gui(
 
 				auto total_lumi = cfg.bg_lumi_mult;
 				auto total_alpha = 1.f;
-
-				const bool is_local = player_id == draw_in.local_player_id;
 
 				if (is_local) {
 					col.mult_luminance(cfg.current_player_bg_lumi_mult);
@@ -644,7 +651,7 @@ void arena_scoreboard_gui::draw_gui(
 
 			next_col();
 
-			if (avatars_enabled) {
+			if (avatars_enabled && !censor_avatar) {
 				if (const auto entry = in.avatars_in_atlas.at(player_id.value); entry.exists()) {
 					const auto& c = *current_column;
 					const auto& cell_orig = ltrbi(c.l + 1, 1, c.r, cell_h);

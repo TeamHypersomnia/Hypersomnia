@@ -1,4 +1,5 @@
 return {
+  streamer_mode = false,
   launch_at_startup = "LAST_ACTIVITY", -- or "MAIN_MENU"
 
   log_to_live_file = false,

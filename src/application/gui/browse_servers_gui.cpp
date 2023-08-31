@@ -338,7 +338,12 @@ void browse_servers_gui_state::send_pings_and_punch_requests(netcode_socket_t& s
 
 constexpr auto num_columns = 7;
 
-void browse_servers_gui_state::show_server_list(const std::string& label, const std::vector<server_list_entry*>& server_list, const faction_view_settings& faction_view) {
+void browse_servers_gui_state::show_server_list(
+	const std::string& label,
+	const std::vector<server_list_entry*>& server_list,
+	const faction_view_settings& faction_view,
+	const bool streamer_mode
+) {
 	using namespace augs::imgui;
 
 	const auto& style = ImGui::GetStyle();
@@ -391,7 +396,13 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 		{
 			auto col_scope = scoped_style_color(ImGuiCol_Text, color);
 
-			if (ImGui::Selectable(d.server_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
+			auto displayed_name = d.server_name;
+
+			if (streamer_mode && s.is_community_server) {
+				displayed_name = "Community server";
+			}
+
+			if (ImGui::Selectable(displayed_name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns)) {
 				selected_server = s;
 			}
 		}
@@ -415,7 +426,13 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 					const auto labcol = faction_view.colors[faction].current_player_text;
 
 					for (auto& e : entries) {
-						text_color(e.nickname, labcol);
+						auto nickname = e.nickname;
+
+						if (streamer_mode) {
+							nickname = "Player";
+						}
+
+						text_color(nickname, labcol);
 					}
 				};
 
@@ -448,7 +465,13 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 		ImGui::NextColumn();
 
 		if (d.game_mode.size() > 0) {
-			do_text(std::string(d.game_mode));
+			auto displayed_mode = std::string(d.game_mode);
+
+			if (streamer_mode && s.is_community_server) {
+				displayed_mode = "Game mode";
+			}
+
+			do_text(displayed_mode);
 		}
 		else {
 			do_text("<unknown>");
@@ -464,7 +487,16 @@ void browse_servers_gui_state::show_server_list(const std::string& label, const 
 		do_text(typesafe_sprintf("%x/%x", d.get_num_spectators(), d.get_max_spectators()));
 
 		ImGui::NextColumn();
-		do_text(d.current_arena);
+
+		{
+			auto displayed_arena = std::string(d.current_arena);
+
+			if (streamer_mode && s.is_community_server) {
+				displayed_arena = "Community arena";
+			}
+
+			do_text(displayed_arena);
+		}
 
 		ImGui::NextColumn();
 
@@ -559,7 +591,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 	thread_local ImGuiTextFilter filter;
 
-	filter.Draw();
+	filter_with_hint(filter, "##HierarchyFilter", "Filter server names/arenas...");
 	local_server_list.clear();
 	official_server_list.clear();
 	community_server_list.clear();
@@ -603,11 +635,13 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		if (is_internal) {
 			has_local_servers = true;
+			s.is_community_server = false;
 			push_if_passes(local_server_list);
 		}
 		else {
 			if (const auto resolved = find_resolved_official(s.address)) {
 				has_official_servers = true;
+				s.is_community_server = false;
 				push_if_passes(official_server_list);
 
 				if (std::string(name) == "Player's server") {
@@ -616,6 +650,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 			}
 			else {
 				has_community_servers = true;
+				s.is_community_server = true;
 				push_if_passes(community_server_list);
 			}
 		}
@@ -803,7 +838,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 
 		if (has_local_servers) {
 			do_column_labels(local_servers_label, green);
-			show_server_list("local", local_server_list, in.faction_view);
+			show_server_list("local", local_server_list, in.faction_view, in.streamer_mode);
 		}
 
 		if (!has_local_servers) {
@@ -814,7 +849,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 
 		if (has_official_servers) {
-			show_server_list("official", official_server_list, in.faction_view);
+			show_server_list("official", official_server_list, in.faction_view, in.streamer_mode);
 		}
 		else {
 			ImGui::NextColumn();
@@ -825,7 +860,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		separate_with_label_only(community_servers_label, orange);
 
 		if (has_community_servers) {
-			show_server_list("community", community_server_list, in.faction_view);
+			show_server_list("community", community_server_list, in.faction_view, in.streamer_mode);
 		}
 		else {
 			ImGui::NextColumn();
@@ -941,7 +976,7 @@ bool browse_servers_gui_state::perform(const browse_servers_input in) {
 		}
 	}
 
-	if (server_details.perform(selected_server, in.faction_view)) {
+	if (server_details.perform(selected_server, in.faction_view, in.streamer_mode)) {
 		refresh_server_list(in);
 	}
 
@@ -970,7 +1005,11 @@ const server_list_entry* browse_servers_gui_state::find_entry(const client_start
 	return nullptr;
 }
 
-void server_details_gui_state::perform_online_players(const server_list_entry& entry, const faction_view_settings& faction_view) {
+void server_details_gui_state::perform_online_players(
+	const server_list_entry& entry,
+	const faction_view_settings& faction_view,
+	const bool streamer_mode
+) {
 	using namespace augs::imgui;
 
 	auto heartbeat = entry.heartbeat;
@@ -1000,14 +1039,22 @@ void server_details_gui_state::perform_online_players(const server_list_entry& e
 
 	auto longest_nname = std::size_t(0);
 
+	auto get_nickname = [&](const auto& e) -> std::string {
+		if (streamer_mode) {
+			return "Player";
+		}
+
+		return e.nickname;
+	};
+
 	for (auto& e : heartbeat.players_resistance) { 
-		longest_nname = std::max(longest_nname, e.nickname.length());
+		longest_nname = std::max(longest_nname, get_nickname(e).length());
 	}
 	for (auto& e : heartbeat.players_metropolis) { 
-		longest_nname = std::max(longest_nname, e.nickname.length());
+		longest_nname = std::max(longest_nname, get_nickname(e).length());
 	}
 	for (auto& e : heartbeat.players_spectating) { 
-		longest_nname = std::max(longest_nname, e.nickname.length());
+		longest_nname = std::max(longest_nname, get_nickname(e).length());
 	}
 
 	text_color(typesafe_sprintf("Players online: %x", heartbeat.num_online), green);
@@ -1074,7 +1121,7 @@ void server_details_gui_state::perform_online_players(const server_list_entry& e
 
 
 		for (auto& e : entries) {
-			text_color(e.nickname, col);
+			text_color(get_nickname(e), col);
 			ImGui::NextColumn();
 
 			if (faction != faction_type::SPECTATOR) {
@@ -1096,10 +1143,14 @@ void server_details_gui_state::perform_online_players(const server_list_entry& e
 	do_faction(faction_type::SPECTATOR, heartbeat.players_spectating, 0);
 }
 
-bool server_details_gui_state::perform(const server_list_entry& entry, const faction_view_settings& faction_view) {
+bool server_details_gui_state::perform(
+	const server_list_entry& entry,
+	const faction_view_settings& faction_view,
+	const bool streamer_mode
+) {
 	using namespace augs::imgui;
 	//ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
-	auto window = make_scoped_window(ImGuiWindowFlags_AlwaysAutoResize);
+	auto window = make_scoped_window(ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDocking);
 
 	if (!window) {
 		return false;
@@ -1124,7 +1175,11 @@ bool server_details_gui_state::perform(const server_list_entry& entry, const fac
 
 	acquire_keyboard_once();
 
+#if IS_PRODUCTION_BUILD
 	const bool censor_ips = true;
+#else
+	const bool censor_ips = false;
+#endif
 
 	if (censor_ips) {
 		if (ImGui::Button("Copy External IP address to clipboard")) {
@@ -1140,9 +1195,17 @@ bool server_details_gui_state::perform(const server_list_entry& entry, const fac
 		input_text("Internal IP address", internal_address, ImGuiInputTextFlags_ReadOnly);
 	}
 
-	input_text("Server name", heartbeat.server_name, ImGuiInputTextFlags_ReadOnly);
+	auto name = heartbeat.server_name;
+	auto arena = heartbeat.current_arena;
 
-	input_text("Arena", heartbeat.current_arena, ImGuiInputTextFlags_ReadOnly);
+	if (streamer_mode && entry.is_community_server) {
+		name = "Community server";
+		arena = "Community arena";
+	}
+
+	input_text("Server name", name, ImGuiInputTextFlags_ReadOnly);
+
+	input_text("Arena", arena, ImGuiInputTextFlags_ReadOnly);
 
 	auto nat = nat_type_to_string(heartbeat.nat.type); 
 
@@ -1153,7 +1216,7 @@ bool server_details_gui_state::perform(const server_list_entry& entry, const fac
 		input_text("Port delta", delta, ImGuiInputTextFlags_ReadOnly);
 	}
 
-	perform_online_players(entry, faction_view);
+	perform_online_players(entry, faction_view, streamer_mode);
 	return false;
 }
 

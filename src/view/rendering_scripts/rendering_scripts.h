@@ -85,6 +85,7 @@ struct draw_sentiences_hud_input {
 	const special_indicator_meta& indicator_meta;
 
 	const std::function<bool(const_entity_handle)> is_reasonably_in_view;
+	const bool streamer_mode;
 };
 
 struct draw_explosion_body_highlights_input {
