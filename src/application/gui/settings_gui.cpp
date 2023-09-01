@@ -426,9 +426,52 @@ void settings_gui_state::perform(
 
 				ImGui::Separator();
 
-				revertable_checkbox("Streamer mode", config.streamer_mode);
+				const auto streamer_hotkey = [&]() -> std::string {
+					const auto found_k = key_or_default(config.app_controls, app_intent_type::TOGGLE_STREAMER_MODE);
 
-				tooltip_on_hover("Censors all player-provided content to prevent abuse during streams.\nWill hide:\n\n- All chat activity\n- Player avatars (spectator, scoreboard, death summaries)\n- Player nicknames on the scoreboard/spectator UI\n- Player nicknames on HUD (characters, kill indicators/summaries)\n- Community server names and info (arena/mode/connected players) in the server browser\n- Map descriptions and authors in the catalogue\n- Logs (if accidentally opened)\n\nWARNING!\nCommunity servers can host custom arenas with offensive sprites/sounds.\nTo be 100% secure, only play on the official servers -\nor on the servers of people you trust.");
+					if (found_k == augs::event::keys::key()) {
+						return "(UNASSIGNED)";
+					}
+
+					return key_to_string(found_k);
+				}();
+
+				const auto label = std::string("Streamer mode (") + streamer_hotkey + ")";
+				revertable_checkbox(label, config.streamer_mode);
+
+				tooltip_on_hover(typesafe_sprintf("Quickly toggle with %x at any time.\nCensors all player-provided content to prevent abuse during streams.\n\nWARNING!\nCommunity servers can host custom arenas with explicit sprites/sounds.\nTo be 100% secure, only play on the official servers -\nor on the servers of people you trust.", streamer_hotkey));
+
+				if (config.streamer_mode) {
+					auto ind = scoped_indent();
+
+					auto& scope_cfg = config.streamer_mode_flags;
+
+					text("Censor:");
+					revertable_checkbox(SCOPE_CFG_NVP(chat));
+					tooltip_on_hover("All messages of other players and their nicknames.");
+					revertable_checkbox("Chat (when opened)", scope_cfg.chat_open);
+					tooltip_on_hover("When off, shows uncensored chat after explicitly opening it with Y or U.");
+
+					revertable_checkbox("Nicknames above characters", scope_cfg.inworld_hud);
+					tooltip_on_hover("Player nicknames floating above your teammates.");
+
+					revertable_checkbox(SCOPE_CFG_NVP(scoreboard));
+					tooltip_on_hover("Nicknames and avatar on the scoreboard (available under Tab).");
+					revertable_checkbox("Spectator UI", scope_cfg.spectator_ui);
+					tooltip_on_hover("Nickname and avatar of the spectated player.");
+					revertable_checkbox(SCOPE_CFG_NVP(kill_notifications));
+					tooltip_on_hover("Nicknames in kill notifications at the top left.");
+					revertable_checkbox(SCOPE_CFG_NVP(death_summary));
+					tooltip_on_hover("Nickname and avatar of who killed you.");
+					revertable_checkbox(SCOPE_CFG_NVP(community_servers));
+					tooltip_on_hover("Server names and custom arena and game mode names.");
+					revertable_checkbox(SCOPE_CFG_NVP(map_catalogue));
+					tooltip_on_hover("Map descriptions and authors in the catalogue.");
+				}
+
+				if (config.streamer_mode) {
+					ImGui::Separator();
+				}
 
 				text("At startup, launch.."); ImGui::SameLine();
 				revertable_enum("##LaunchAtStartup", config.launch_at_startup);

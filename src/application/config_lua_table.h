@@ -33,6 +33,7 @@
 
 #include "test_scenes/test_scene_settings.h"
 
+#include "application/streamer_mode_flags.h"
 #include "application/debug_settings.h"
 #include "application/session_settings.h"
 #include "application/setups/main_menu_settings.h"
@@ -107,6 +108,7 @@ struct config_lua_table {
 
 	// GEN INTROSPECTOR struct config_lua_table
 	bool streamer_mode = false;
+	streamer_mode_flags_data streamer_mode_flags;
 
 	activity_type last_activity = activity_type::TUTORIAL;
 	launch_type launch_at_startup = launch_type::LAST_ACTIVITY;

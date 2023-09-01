@@ -6495,3 +6495,6 @@ This will discard your redo history."
     - Server names in scoreboard?
         - actually no because if you connect somewhere all bets are off already
 
+- Streamer mode customization
+    - Show uncensored chat when opened
+

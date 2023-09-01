@@ -1498,7 +1498,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			config.client_start,
 			config.official_arena_servers,
 			config.faction_view,
-			config.streamer_mode
+			config.streamer_mode && config.streamer_mode_flags.community_servers
 		};
 	};
 
@@ -1508,7 +1508,7 @@ work_result work(const int argc, const char* const * const argv) try {
 			streaming.ad_hoc.in_atlas,
 			streaming.necessary_images_in_atlas,
 			window,
-			config.streamer_mode
+			config.streamer_mode && config.streamer_mode_flags.map_catalogue
 		};
 	};
 
@@ -2127,6 +2127,18 @@ work_result work(const int argc, const char* const * const argv) try {
 				break;
 			}
 
+			case T::TOGGLE_STREAMER_MODE: {
+				bool& f = config.streamer_mode;
+				f = !f;
+				break;
+			}
+
+			case T::TOGGLE_CINEMATIC_MODE: {
+				bool& f = config.drawing.cinematic_mode;
+				f = !f;
+				break;
+			}
+
 			default: break;
 		}
 	};
@@ -2141,12 +2153,6 @@ work_result work(const int argc, const char* const * const argv) try {
 
 			case T::TOGGLE_WEAPON_LASER: {
 				bool& f = config.drawing.draw_weapon_laser;
-				f = !f;
-				return true;
-			}
-
-			case T::TOGGLE_CINEMATIC_MODE: {
-				bool& f = config.drawing.cinematic_mode;
 				f = !f;
 				return true;
 			}
@@ -3158,13 +3164,6 @@ work_result work(const int argc, const char* const * const argv) try {
 
 							if (was_released || direct_gameplay || game_gui_effective) {
 								if (const auto it = mapped_or_nullptr(viewing_config.general_gui_controls, key)) {
-									const bool has_alt{ common_input_state[key::LALT] };
-
-									if (was_pressed && has_alt && key == augs::event::keys::key::U) {
-										handle_general_gui_intent(general_gui_intent_type::TOGGLE_CINEMATIC_MODE);
-										continue;
-									}
-
 									if (was_pressed) {
 										if (handle_general_gui_intent(*it)) {
 											continue;
@@ -3347,7 +3346,8 @@ work_result work(const int argc, const char* const * const argv) try {
 					visit_current_setup([&](auto& setup) { return setup.find_player_metas(); }),
 					game_gui_mode_flag,
 					is_replaying_demo(),
-					new_viewing_config.streamer_mode
+					new_viewing_config.streamer_mode,
+					new_viewing_config.streamer_mode_flags,
 				};
 			};
 
@@ -3528,7 +3528,7 @@ work_result work(const int argc, const char* const * const argv) try {
 					write_buffer.particle_buffers,
 					viewing_config.damage_indication,
 					cached_visibility.light_requests,
-					viewing_config.streamer_mode,
+					viewing_config.streamer_mode && viewing_config.streamer_mode_flags.inworld_hud,
 					thread_pool
 				};
 			};

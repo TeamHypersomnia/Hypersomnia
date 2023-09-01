@@ -1558,13 +1558,28 @@ bool client_setup::handle_input_before_game(
 void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 	using namespace augs::gui::text;
 
+	const bool is_open = client_gui.chat.show;
+
+	const bool should_censor = [&]() { 
+		if (in.streamer_mode) {
+			if (is_open) {
+				return in.streamer_mode_flags.chat_open;
+			}
+			else {
+				return in.streamer_mode_flags.chat;
+			}
+		}
+
+		return false;
+	}();
+
 	client_gui.chat.draw_recent_messages(
 		in.get_drawer(),
 		vars.client_chat,
 		in.config.faction_view,
 		in.gui_fonts.gui,
 		get_current_time(),
-		in.streamer_mode
+		should_censor
 	);
 
 	arena_gui_base::draw_custom_gui(in);

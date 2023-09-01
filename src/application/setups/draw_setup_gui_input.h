@@ -7,6 +7,7 @@
 #include "view/viewables/avatars_in_atlas_map.h"
 #include "augs/graphics/renderer.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
+#include "application/streamer_mode_flags.h"
 
 class images_in_atlas_map;
 class visible_entities;
@@ -36,6 +37,7 @@ struct draw_setup_gui_input {
 	const bool is_cursor_released;
 	const bool demo_replay_mode;
 	const bool streamer_mode;
+	const streamer_mode_flags_data streamer_mode_flags;
 
 	auto get_drawer() const {
 		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank_texture };

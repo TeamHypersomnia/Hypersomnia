@@ -44,6 +44,8 @@ void arena_scoreboard_gui::draw_gui(
 ) const {
 	using namespace augs::gui::text;
 
+	const bool streamer_mode = in.streamer_mode && in.streamer_mode_flags.scoreboard;
+
 	bool force_show = false;
 	bool is_halftime = false;
 
@@ -297,7 +299,7 @@ void arena_scoreboard_gui::draw_gui(
 
 		const bool is_me = player_id == draw_in.local_player_id;
 
-		if (in.streamer_mode && !is_me) {
+		if (streamer_mode && !is_me) {
 			str = "Player";
 		}
 
@@ -457,7 +459,7 @@ void arena_scoreboard_gui::draw_gui(
 			const auto& player_data = p.first;
 
 			const bool is_local = player_id == draw_in.local_player_id;
-			const bool censor_avatar = in.streamer_mode && !is_local;
+			const bool censor_avatar = streamer_mode && !is_local;
 
 			const auto player_handle = cosm[player_data.controlled_character_id];
 			const auto is_conscious = player_handle.alive() && player_handle.template get<components::sentience>().is_conscious();

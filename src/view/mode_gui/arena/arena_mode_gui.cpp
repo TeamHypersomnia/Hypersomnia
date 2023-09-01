@@ -398,6 +398,8 @@ void arena_gui_state::draw_mode_gui(
 		auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_buffer::DEATH_SUMMARY_AVATAR].triangles;
 
 		auto draw_death_summary = [&]() {
+			const bool streamer_mode = in.streamer_mode && in.streamer_mode_flags.death_summary;
+
 			const auto viewed_player_id = spectator.active ? spectator.now_spectating : local_player_id;
 			const auto viewed_player_data = typed_mode.find(viewed_player_id);
 
@@ -449,7 +451,7 @@ void arena_gui_state::draw_mode_gui(
 						killer_origin = k.origin;
 						killer_name = k.knockouter.name;
 
-						if (in.streamer_mode) {
+						if (streamer_mode) {
 							killer_name = "Player";
 						}
 
@@ -520,7 +522,7 @@ void arena_gui_state::draw_mode_gui(
 					if (const auto owner_data = typed_mode.find(tool_owner)) {
 						auto nickname = owner_data->get_nickname();
 
-						if (in.streamer_mode) {
+						if (streamer_mode) {
 							nickname = "Player";
 						}
 
@@ -613,7 +615,7 @@ void arena_gui_state::draw_mode_gui(
 			}();
 
 			const bool not_our_avatar = killer_player_id != local_player_id;
-			const bool censor_avatar = in.streamer_mode && not_our_avatar;
+			const bool censor_avatar = streamer_mode && not_our_avatar;
 
 			const auto avatar_atlas_entry = in.avatars_in_atlas.at(killer_player_id.value); 
 			const bool avatars_enabled = logically_set(in.general_atlas, in.avatar_atlas);
@@ -807,7 +809,9 @@ void arena_gui_state::draw_mode_gui(
 				};
 
 				auto get_name = [&](const auto& entry) -> std::string {
-					if (in.streamer_mode) {
+					const bool streamer_mode = in.streamer_mode && in.streamer_mode_flags.kill_notifications;
+
+					if (streamer_mode) {
 						if (entry.name.size() > 0 && entry.id != local_player_id) {
 							return "Player";
 						}
