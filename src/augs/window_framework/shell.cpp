@@ -29,9 +29,8 @@ namespace augs {
 
 namespace augs {
 	int shell(const std::string& s) {
-		const auto command = "$SHELL -c '" + s + "'";
-		LOG("SHELL COMMAND: %x", command);
-		return std::system(command.c_str());
+		LOG("SHELL COMMAND: %x", s);
+		return std::system(s.c_str());
 	}
 
 	void open_text_editor(const std::string& on_file) {
