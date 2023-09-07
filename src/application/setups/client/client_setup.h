@@ -90,6 +90,7 @@ class client_setup :
 
 	std::vector<special_client_request> pending_requests;
 	bool now_resyncing = false;
+	bool schedule_disconnect = false;
 
 	arena_player_metas player_metas;
 

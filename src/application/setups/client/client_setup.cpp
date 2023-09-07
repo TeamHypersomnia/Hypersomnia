@@ -225,7 +225,9 @@ void client_setup::handle_received(const file_chunk_packet& chunk) {
 		direct_downloader = std::nullopt;
 		last_requested_direct_file_hash = std::nullopt;
 
-		advance_downloading_session(augs::make_ptr_read_stream(*complete_file));
+		if (advance_downloading_session(augs::make_ptr_read_stream(*complete_file)) == message_handler_result::ABORT_AND_DISCONNECT) {
+			schedule_disconnect = true;
+		}
 	}
 
 	if (data_received != 0) {
@@ -1172,6 +1174,11 @@ custom_imgui_result client_setup::perform_custom_imgui(
 	const bool gameplay_on = is_gameplay_on();
 
 	auto& rcon_gui = client_gui.rcon;
+
+	if (schedule_disconnect) {
+		disconnect();
+		schedule_disconnect = false;
+	}
 
 	if (!is_connected()) {
 		rcon_gui.show = false;
