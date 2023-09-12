@@ -1035,6 +1035,7 @@ void settings_gui_state::perform(
 				if (auto node = scoped_tree_node("Camera")) {
 					auto& scope_cfg = config.camera;
 
+					revertable_slider(SCOPE_CFG_NVP(edge_zoom_out_zone), 0.0f, 0.4f);
 					revertable_slider(SCOPE_CFG_NVP(look_bound_expand), 0.0f, 0.5f);
 					revertable_slider(SCOPE_CFG_NVP(surfing_zoom_out), 1.0f, 2.5f);
 					

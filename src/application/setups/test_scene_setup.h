@@ -178,10 +178,12 @@ public:
 		};
 
 		while (steps--) {
+			auto accum_in = in.make_accumulator_input();
+
 			const auto total = total_collected.extract(
 				get_viewed_character(), 
 				local_player_id, 
-				in.make_accumulator_input()
+				accum_in
 			);
 
 

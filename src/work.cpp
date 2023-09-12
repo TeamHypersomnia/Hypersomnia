@@ -116,6 +116,7 @@ std::function<void()> ensure_handler;
 bool log_to_live_file = false;
 std::string log_timestamp_format;
 
+extern float max_zoom_out_at_edges_v;
 extern std::mutex log_mutex;
 extern std::string live_log_path;
 
@@ -1689,7 +1690,7 @@ work_result work(const int argc, const char* const * const argv) try {
 		return true;
 	};
 
-	auto get_logic_eye = [&]() {
+	auto get_logic_eye = [&](const bool with_edge_zoomout) {
 		if (const auto custom = visit_current_setup(
 			[](const auto& setup) { 
 				return setup.find_current_camera_eye(); 
@@ -1702,15 +1703,26 @@ work_result work(const int argc, const char* const * const argv) try {
 			return camera_eye();
 		}
 
-		return gameplay_camera.get_current_eye();
+		return gameplay_camera.get_current_eye(with_edge_zoomout);
+	};
+
+
+	auto get_camera_edge_zoomout_mult = [&]() {		
+		return gameplay_camera.current_edge_zoomout_mult;
 	};
 
 	auto get_camera_requested_fov_expansion = [&]() {		
-		return 1.0f / get_logic_eye().zoom;
+		auto result = 1.0f / get_logic_eye(false).zoom;
+
+		if (get_camera_edge_zoomout_mult() > 0.001f) {
+			result /= max_zoom_out_at_edges_v;
+		}
+
+		return result;
 	};
 
-	auto get_camera_eye = [&](const config_lua_table& viewing_config) {		
-		auto logic_eye = get_logic_eye();
+	auto get_camera_eye = [&](const config_lua_table& viewing_config, bool with_edge_zoomout = true) {		
+		auto logic_eye = get_logic_eye(with_edge_zoomout);
 
 		const auto considered_fov_size = viewing_config.drawing.fog_of_war.size;
 		const float target_visible_pixels_y = considered_fov_size.y;
@@ -2369,13 +2381,15 @@ work_result work(const int argc, const char* const * const argv) try {
 
 				const auto input_cfg = get_current_input_settings(viewing_config);
 
+				const bool with_edge_zoomout = false;
+
 				if (const auto motion = total_collected.calc_motion(
 					get_viewed_character(), 
 					game_motion_type::MOVE_CROSSHAIR,
 					entropy_accumulator::input {
 						input_cfg, 
 						logic_get_screen_size(), 
-						get_camera_eye(viewing_config).zoom 
+						get_camera_eye(viewing_config, with_edge_zoomout).zoom 
 					}
 				)) {
 					return vec2(motion->offset) * input_cfg.character.crosshair_sensitivity;
@@ -2427,7 +2441,8 @@ work_result work(const int argc, const char* const * const argv) try {
 			frame_delta,
 			viewing_config.camera,
 			viewed_character,
-			calc_pre_step_crosshair_displacement(viewing_config)
+			calc_pre_step_crosshair_displacement(viewing_config),
+			get_camera_eye(viewing_config, false).zoom
 		);
 
 		hud_messages.advance(viewing_config.hud_messages.value);
@@ -2592,7 +2607,8 @@ work_result work(const int argc, const char* const * const argv) try {
 				[&viewing_config, &setup_post_cleanup](const const_logic_step& step) { setup_post_cleanup(viewing_config, step); }
 			);
 
-			const auto zoom = get_camera_eye(viewing_config).zoom;
+			const bool with_edge_zoomout = false;
+			const auto zoom = get_camera_eye(viewing_config, with_edge_zoomout).zoom;
 			const auto input_cfg = get_current_input_settings(viewing_config);
 
 			if constexpr(std::is_same_v<S, client_setup>) {
@@ -3506,6 +3522,7 @@ work_result work(const int argc, const char* const * const argv) try {
 				return illuminated_rendering_input {
 					{ viewed_character, cone },
 					get_camera_requested_fov_expansion(),
+					get_camera_edge_zoomout_mult(),
 					get_queried_cone(viewing_config),
 					calc_pre_step_crosshair_displacement(viewing_config),
 					get_audiovisuals(),

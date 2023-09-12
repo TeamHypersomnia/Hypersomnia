@@ -44,6 +44,7 @@ struct additional_highlight {
 struct illuminated_rendering_input {
 	const character_camera camera;
 	const float camera_requested_fov_expansion;
+	const float camera_edge_zoomout_mult;
 	const camera_cone queried_cone;
 	const vec2 pre_step_crosshair_displacement;
 	const audiovisual_state& audiovisuals;

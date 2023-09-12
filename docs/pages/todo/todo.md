@@ -6,6 +6,12 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Investigate audio delay on Windows
+    - On a second thought, not as bad as I expected
+        - Was probably due to other applications taking control of the sound
+        - Exiting other apps and installing nahimic maybe helped
+    - Linux is still leagues ahead but w/e
+
 - Zoom semantics (for the last time)
     - FoW and FoV are different things
         - Fog of war is occlusion

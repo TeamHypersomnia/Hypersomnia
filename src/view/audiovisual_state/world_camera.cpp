@@ -10,11 +10,20 @@
 #include "game/detail/crosshair_math.hpp"
 #include "view/audiovisual_state/flashbang_math.h"
 
-camera_eye world_camera::get_current_eye() const
+float max_zoom_out_at_edges_v = 0.75f;
+
+camera_eye world_camera::get_current_eye(const bool with_edge_zoomout) const
 {
 	auto output_eye = current_eye;
 	//output_eye.transform.pos.x = (int(output_eye.transform.pos.x) / 3) * 3; 
 	//output_eye.transform.pos.y = (int(output_eye.transform.pos.y) / 3) * 3; 
+
+	if (with_edge_zoomout) {
+		const auto max_zoom_out = max_zoom_out_at_edges_v;
+
+		output_eye.zoom *= augs::interp(1.0f, max_zoom_out, current_edge_zoomout_mult);
+	}
+
 	return output_eye;
 }
 
@@ -37,7 +46,8 @@ void world_camera::tick(
 	const augs::delta dt,
 	world_camera_settings settings,
 	const const_entity_handle entity_to_chase,
-	const vec2 crosshair_displacement
+	const vec2 mid_step_crosshair_displacement,
+	const float last_real_zoom
 ) {
 	if (/* minimized */ screen_size.is_zero()) {
 		return;
@@ -77,7 +87,13 @@ void world_camera::tick(
 		return current_eye;
 	}();
 
-	const vec2 camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings, screen_size, crosshair_displacement);
+	const vec2 camera_crosshair_offset = calc_camera_offset_due_to_character_crosshair(
+		entity_to_chase,
+		settings,
+		screen_size,
+		mid_step_crosshair_displacement,
+		current_eye.zoom
+	);
 
 	current_eye = target_cone;
 	current_eye.transform.pos += camera_crosshair_offset;
@@ -221,29 +237,84 @@ void world_camera::tick(
 
 	dont_smooth_once = false;
 
-	{
-		auto avgs_per_sec = 10.0f;
-
-		if (target_zoom > current_eye.zoom) {
-			avgs_per_sec = 5.0f;
+	auto interp_zoom = [dt](auto& current, const auto& target, float in_avgs = 5.f, float out_avgs = 10.f) {
+		if (target > current) {
+			auto avgs_per_sec = in_avgs;
 			float zoom_averaging_constant = 1.0f - static_cast<float>(std::pow(0.5f, avgs_per_sec * dt.in_seconds()));
-			current_eye.zoom = augs::interp(current_eye.zoom, target_zoom, zoom_averaging_constant);
+			current = augs::interp(current, target, zoom_averaging_constant);
 		}
 		else {
+			auto avgs_per_sec = out_avgs;
 			float zoom_averaging_constant = 1.0f - static_cast<float>(std::pow(0.5f, avgs_per_sec * dt.in_seconds()));
-			current_eye.zoom = augs::interp(current_eye.zoom, target_zoom, zoom_averaging_constant);
+			current = augs::interp(current, target, zoom_averaging_constant);
 		}
+	};
+
+	target_edge_zoomout_mult = calc_camera_zoom_out_due_to_character_crosshair(
+		entity_to_chase,
+		settings,
+		screen_size,
+		mid_step_crosshair_displacement,
+		last_real_zoom
+	);
+
+	interp_zoom(current_eye.zoom, target_zoom);
+
+	/* Here it's reversed */
+	const float in_avgs = 15.0f;
+	const float out_avgs = 5.0f;
+
+	interp_zoom(current_edge_zoomout_mult, target_edge_zoomout_mult, out_avgs, in_avgs);
+
+	if (target_edge_zoomout_mult == 0.0f && augs::is_epsilon(current_edge_zoomout_mult, 0.001f)) {
+		current_edge_zoomout_mult = 0.0f;
 	}
 
 	advance_flash(entity_to_chase, dt);
 }
 
-vec2 world_camera::get_camera_offset_due_to_character_crosshair(
+float world_camera::calc_camera_zoom_out_due_to_character_crosshair(
+	const const_entity_handle entity_to_chase,
+	const world_camera_settings& settings,
+	const vec2 screen_size_real,
+	const vec2 mid_step_crosshair_displacement,
+	const float current_zoom
+) {
+	if (entity_to_chase.dead()) {
+		return 0.0f;
+	}
+
+	const auto screen_size = screen_size_real / current_zoom;
+	const auto zone = screen_size.bigger_side() * settings.edge_zoom_out_zone;
+
+	if (zone == 0.0f) {
+		return 0.0f;
+	}
+
+	const auto crosshair = ::calc_crosshair_displacement(entity_to_chase);
+
+	const auto dist_l = crosshair.x - (-screen_size.x);
+	const auto dist_t = crosshair.y - (-screen_size.y);
+	const auto dist_r = screen_size.x - crosshair.x;
+	const auto dist_b = screen_size.y - crosshair.y;
+	(void)mid_step_crosshair_displacement;
+
+	const auto min_dist = std::max(0.0f, std::min({ dist_l, dist_t, dist_r, dist_b }));
+
+	if (min_dist < zone) {
+		return 1.0f - min_dist / zone;
+	}
+
+	return 0.0f;
+}
+
+vec2 world_camera::calc_camera_offset_due_to_character_crosshair(
 	const const_entity_handle entity_to_chase,
 	const world_camera_settings settings,
 	const vec2 screen_size,
-	const vec2 crosshair_displacement
-) const {
+	const vec2 mid_step_crosshair_displacement,
+	const float zoom
+) {
 	vec2 camera_crosshair_offset;
 
 	if (entity_to_chase.dead()) {
@@ -252,7 +323,7 @@ vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 
 	if (const auto crosshair = entity_to_chase.find_crosshair()) {
 		if (crosshair->orbit_mode != crosshair_orbit_type::NONE) {
-			camera_crosshair_offset = calc_crosshair_displacement(entity_to_chase) + crosshair_displacement;
+			camera_crosshair_offset = calc_crosshair_displacement(entity_to_chase) + mid_step_crosshair_displacement;
 
 			if (crosshair->orbit_mode == crosshair_orbit_type::ANGLED) {
 				camera_crosshair_offset.set_length(settings.angled_look_length);
@@ -265,7 +336,7 @@ vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 					camera_crosshair_offset /= bound;
 				}
 
-				camera_crosshair_offset *= camera_cone(current_eye, screen_size).get_visible_world_area() * std::min(0.5f, settings.look_bound_expand) * current_eye.zoom;
+				camera_crosshair_offset *= camera_cone({ vec2::zero, zoom }, screen_size).get_visible_world_area() * std::min(0.5f, settings.look_bound_expand) * zoom;
 			}
 		}
 	}
